@@ -1,60 +1,13 @@
 /*
  * Form field system (foundation §4, §6, §7). Label row and support row (with the counter) come
- * from FieldFrame; this file is the field itself: fill-based, no visible border, tier
- * height / padding / radius / text. Tier variables live on `.root[data-size]` and cascade into
- * Wrapper / Field. Select, Datepicker and TagSelect triggers match it.
+ * from FieldFrame; the fill and its states from the shared field surface (`internal/fieldSurface`);
+ * height / padding / radius / text from the field tier (`internal/fieldTier`) on the root, which
+ * cascades into Wrapper and Field. Select, Datepicker and TagSelect triggers share both.
  */
 
 /* ---- Root ---- */
 .root {
-  --prime-input-height: var(--prime-control-m-height);
-  --prime-input-padding-x: var(--prime-control-m-field-padding-x);
-  --prime-input-gap: var(--prime-control-m-gap);
-  --prime-input-icon: var(--prime-control-m-icon);
-  --prime-input-radius: var(--prime-control-m-radius);
-  --prime-input-text: var(--prime-control-m-text-size);
-  --prime-input-line-height: var(--prime-control-m-line-height);
   width: 100%;
-}
-
-.root[data-size="xs"] {
-  --prime-input-height: var(--prime-control-xs-height);
-  --prime-input-padding-x: var(--prime-control-xs-field-padding-x);
-  --prime-input-gap: var(--prime-control-xs-gap);
-  --prime-input-icon: var(--prime-control-xs-icon);
-  --prime-input-radius: var(--prime-control-xs-radius);
-  --prime-input-text: var(--prime-control-xs-text-size);
-  --prime-input-line-height: var(--prime-control-xs-line-height);
-}
-
-.root[data-size="s"] {
-  --prime-input-height: var(--prime-control-s-height);
-  --prime-input-padding-x: var(--prime-control-s-field-padding-x);
-  --prime-input-gap: var(--prime-control-s-gap);
-  --prime-input-icon: var(--prime-control-s-icon);
-  --prime-input-radius: var(--prime-control-s-radius);
-  --prime-input-text: var(--prime-control-s-text-size);
-  --prime-input-line-height: var(--prime-control-s-line-height);
-}
-
-.root[data-size="l"] {
-  --prime-input-height: var(--prime-control-l-height);
-  --prime-input-padding-x: var(--prime-control-l-field-padding-x);
-  --prime-input-gap: var(--prime-control-l-gap);
-  --prime-input-icon: var(--prime-control-l-icon);
-  --prime-input-radius: var(--prime-control-l-radius);
-  --prime-input-text: var(--prime-control-l-text-size);
-  --prime-input-line-height: var(--prime-control-l-line-height);
-}
-
-.root[data-size="xl"] {
-  --prime-input-height: var(--prime-control-xl-height);
-  --prime-input-padding-x: var(--prime-control-xl-field-padding-x);
-  --prime-input-gap: var(--prime-control-xl-gap);
-  --prime-input-icon: var(--prime-control-xl-icon);
-  --prime-input-radius: var(--prime-control-xl-radius);
-  --prime-input-text: var(--prime-control-xl-text-size);
-  --prime-input-line-height: var(--prime-control-xl-line-height);
 }
 
 /* ---- Wrapper (the visible field) ---- */
@@ -63,20 +16,13 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: var(--prime-input-gap);
+  gap: var(--field-gap);
   min-width: 0;
-  height: var(--prime-input-height);
-  padding-inline: var(--prime-input-padding-x);
+  height: var(--field-h);
+  padding-inline: var(--field-px);
   overflow: hidden;
-  border-radius: var(--prime-input-radius);
-  background: var(--prime-color-field-bg);
-  /* Transparent control outline; becomes visible under `prefers-contrast: more`. */
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
-  color: var(--prime-color-text-primary);
+  border-radius: var(--field-radius);
   cursor: text;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* Sectioned affix sits flush with the edge. */
@@ -88,36 +34,7 @@
   padding-inline-end: 0;
 }
 
-.wrapper:hover:not(:has(input:disabled, input:read-only, input:focus-visible)) {
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
-}
-
-.wrapper:has(input:focus-visible) {
-  background: var(--prime-color-field-bg-focus);
-}
-
-/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
-.wrapper:not([data-focus-ring="false"]):has(input:focus-visible) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
-.wrapper[data-invalid="true"] {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
-}
-
-.wrapper[data-invalid="true"]:has(input:focus-visible) {
-  outline-color: var(--prime-color-danger-border);
-}
-
-.wrapper:has(input:disabled) {
-  background: var(--prime-color-field-bg-disabled);
-  color: var(--prime-color-text-disabled);
-  box-shadow: none;
-  cursor: not-allowed;
-}
-
-.wrapper:has(input:read-only:not(:disabled)) {
+.wrapper:has(> input:read-only:not(:disabled)) {
   cursor: default;
 }
 
@@ -136,8 +53,8 @@
   outline: none;
   box-shadow: none;
   font: inherit;
-  font-size: var(--prime-input-text);
-  line-height: var(--prime-input-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   text-overflow: ellipsis;
 }
 
@@ -184,14 +101,14 @@
  * The wrapper gap is the tier gap (value ↔ unit), so the icon pads its text side up to padX.
  */
 .icon {
-  --prime-input-icon-space: calc(var(--prime-input-padding-x) - var(--prime-input-gap));
+  --input-icon-space: calc(var(--field-px) - var(--field-gap));
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   box-sizing: content-box;
-  width: var(--prime-input-icon);
-  height: var(--prime-input-icon);
+  width: var(--field-icon);
+  height: var(--field-icon);
   color: var(--prime-color-text-muted);
   pointer-events: none;
   transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
@@ -205,12 +122,12 @@
 
 .icon[data-side="start"] {
   order: -1;
-  padding-inline-end: var(--prime-input-icon-space);
+  padding-inline-end: var(--input-icon-space);
 }
 
 .icon[data-side="end"] {
   order: 3;
-  padding-inline-start: var(--prime-input-icon-space);
+  padding-inline-start: var(--input-icon-space);
 }
 
 .wrapper:has(input:focus-visible) .icon {
@@ -227,11 +144,11 @@
   align-items: center;
   align-self: stretch;
   flex-shrink: 0;
-  padding-inline: var(--prime-input-padding-x);
+  padding-inline: var(--field-px);
   background: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-muted);
-  font-size: var(--prime-input-text);
-  line-height: var(--prime-input-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   white-space: nowrap;
 }
 
@@ -247,8 +164,8 @@
 .inlineAffix {
   flex-shrink: 0;
   color: var(--prime-color-text-muted);
-  font-size: var(--prime-input-text);
-  line-height: var(--prime-input-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   white-space: nowrap;
 }
 
@@ -279,7 +196,7 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: calc(var(--prime-input-icon) + 2 * var(--prime-input-padding-x));
+  width: calc(var(--field-icon) + 2 * var(--field-px));
   margin: 0;
   padding: 0;
   border: 0;
@@ -294,8 +211,8 @@
 
 .action > svg {
   display: block;
-  width: calc(var(--prime-input-icon) - var(--prime-space-1));
-  height: calc(var(--prime-input-icon) - var(--prime-space-1));
+  width: calc(var(--field-icon) - var(--prime-space-1));
+  height: calc(var(--field-icon) - var(--prime-space-1));
 }
 
 .action:hover {

@@ -25,6 +25,7 @@ import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import type { FieldRootDomProps } from "@/internal/FieldFrame";
+import { fieldSurfaceClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
 import { SwatchFill } from "@/internal/swatch";
 
@@ -245,7 +246,7 @@ function ChannelField({
   };
 
   return (
-    <label className={styles.channelCell}>
+    <label className={cx(fieldSurfaceClass, styles.channelCell)}>
       <input
         ref={inputRef}
         aria-label={labels[channel]}
@@ -277,7 +278,7 @@ function StripHexField() {
   }
 
   return (
-    <label className={cx(styles.channelCell, styles.channelCellHex)}>
+    <label className={cx(fieldSurfaceClass, styles.channelCell, styles.channelCellHex)}>
       <input
         ref={inputRef}
         aria-label={labels.hex}

@@ -11,6 +11,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
@@ -128,7 +129,7 @@ function InputRoot({
           counter={counter}
           reserveSupportRow={reserveSupportRow}
           optionalLabel={labels.optional}
-          className={cx(styles.root, className)}
+          className={cx(fieldTierClass, styles.root, className)}
         >
           {children}
         </FieldFrame>
@@ -151,7 +152,7 @@ function InputWrapper({ children, className, ...rest }: InputWrapperProps) {
   return (
     <div
       {...rest}
-      className={cx(styles.wrapper, className)}
+      className={cx(fieldSurfaceClass, styles.wrapper, className)}
       {...toDataAttributes({
         size,
         invalid: invalid || undefined,

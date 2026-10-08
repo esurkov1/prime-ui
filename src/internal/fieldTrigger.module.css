@@ -1,0 +1,59 @@
+/*
+ * Field trigger (foundation §4, §6, §8): the button-shaped field of Select, Datepicker and the
+ * other pickers — the field surface and the field tier on one `<button>` with `data-size`.
+ * Icons (leading, clear, chevron) sit centred between the edge and the text: edge→icon =
+ * icon→text = field padX, so the gap is padX too. Press scales it; an open panel keeps the focus
+ * fill. Hosts take it with `composes: trigger from` and add only their width and parts.
+ * The layout rule has zero specificity, so a host's one-class rule (`display`, `width`) wins
+ * whichever order the bundle emits the files in.
+ */
+
+/* One `composes` per rule (one source file each). */
+.trigger {
+  composes: tier from "./fieldTier.module.css";
+}
+
+.trigger {
+  composes: surface from "./fieldSurface.module.css";
+}
+
+:where(.trigger) {
+  /* A kit Icon inside (chevron, clear, leading icon) takes the tier icon size. */
+  --prime-icon-size: var(--field-icon);
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--field-px);
+  min-width: 0;
+  height: var(--field-h);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--field-px);
+  border: 0;
+  border-radius: var(--field-radius);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--field-text);
+  font-weight: var(--prime-font-weight-regular);
+  line-height: var(--field-lh);
+  text-align: start;
+  cursor: pointer;
+  outline: none;
+}
+
+/* One class: outranks the surface's zero-specificity transition. */
+.trigger {
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.trigger:active:not(:disabled) {
+  transform: scale(var(--prime-motion-press-scale));
+}
+
+/* An open panel keeps the focus fill, hovered or not (outranks the surface hover). */
+.trigger[data-state="open"]:not(:disabled) {
+  background: var(--prime-color-field-bg-focus);
+}

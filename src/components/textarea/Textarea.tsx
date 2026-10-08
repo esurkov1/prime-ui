@@ -5,6 +5,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldCounter, FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
+import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
@@ -155,11 +156,11 @@ function TextareaRoot({
           counter={counter}
           reserveSupportRow={reserveSupportRow}
           optionalLabel={labels.optional}
-          className={cx(styles.root, className)}
+          className={cx(fieldTierClass, styles.root, className)}
         >
           {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer convenience only; the textarea itself is the focus target */}
           <div
-            className={styles.control}
+            className={cx(fieldSurfaceClass, styles.control)}
             onMouseDown={focusFromPadding}
             {...toDataAttributes({
               size,

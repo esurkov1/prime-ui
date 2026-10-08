@@ -101,7 +101,7 @@
 
 .root:hover:not([data-disabled="true"]) {
   border-color: var(--fu-line-hover);
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
+  background: var(--prime-color-field-bg-hover);
 }
 
 /* Drag-over beats hover (equal specificity, later). */

@@ -10,6 +10,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
 
@@ -164,7 +165,7 @@ export function DigitInput({
         aria-labelledby={ids.labelledBy}
         aria-describedby={ids.describedBy}
         disabled={disabled}
-        className={styles.root}
+        className={cx(fieldTierClass, styles.root)}
         {...toDataAttributes({
           size,
           "full-width": fullWidth || undefined,
@@ -191,7 +192,7 @@ export function DigitInput({
             autoFocus={autoFocus && index === entryIndex}
             disabled={disabled}
             required={required}
-            className={styles.cell}
+            className={cx(fieldSurfaceClass, styles.cell)}
             data-size={size}
             data-filled={cell ? "true" : undefined}
             data-group-start={

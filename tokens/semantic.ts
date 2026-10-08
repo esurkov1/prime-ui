@@ -145,6 +145,8 @@ export const semanticTokens = {
       /** Translucent wash, visible on any background; `bgSurface` kept equal for surface contexts. */
       bg: "color-mix(in srgb, var(--prime-ref-color-gray-925) 6%, transparent)",
       bgSurface: "color-mix(in srgb, var(--prime-ref-color-gray-925) 6%, transparent)",
+      /** Hover wash of a field: the `bg` wash, twice as dense (≈ `bg` mixed 94% with the text color). */
+      bgHover: "color-mix(in srgb, var(--prime-ref-color-gray-925) 12%, transparent)",
       bgFocus: "{color.gray.0}",
       bgDisabled: "color-mix(in srgb, var(--prime-ref-color-gray-925) 4%, transparent)",
     },

@@ -1,6 +1,6 @@
 /*
- * OTP / PIN cells: square fields of the tier height, field system fills and states
- * (see Input.module.css). Digits are one type step larger than the tier text, tabular.
+ * OTP / PIN cells: squares of the tier height (field tier on the root) with the shared field
+ * surface. Digits are one type step larger than the tier text, tabular.
  * The label row and the support row come from FieldFrame; the frame hugs the cells.
  * `fullWidth`: one row without wrapping, cells share the width (flex 1) and keep the tier height.
  * `groupSize`: the first cell of every group gets an extra gap before it.
@@ -14,14 +14,11 @@
 }
 
 .root {
-  --prime-digit-cell-size: var(--prime-control-m-height);
-  --prime-digit-cell-radius: var(--prime-control-m-radius);
-  --prime-digit-cell-text: var(--prime-text-body-l-size);
-  --prime-digit-cell-line-height: var(--prime-text-body-l-line-height);
-  --prime-digit-gap: var(--prime-control-m-gap);
+  --digit-cell-text: var(--prime-text-body-l-size);
+  --digit-cell-line-height: var(--prime-text-body-l-line-height);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--prime-digit-gap);
+  gap: var(--field-gap);
   min-width: 0;
   min-inline-size: 0;
   margin: 0;
@@ -35,35 +32,23 @@
 }
 
 .root[data-size="xs"] {
-  --prime-digit-cell-size: var(--prime-control-xs-height);
-  --prime-digit-cell-radius: var(--prime-control-xs-radius);
-  --prime-digit-cell-text: var(--prime-control-xs-text-size);
-  --prime-digit-cell-line-height: var(--prime-control-xs-line-height);
-  --prime-digit-gap: var(--prime-control-xs-gap);
+  --digit-cell-text: var(--prime-control-xs-text-size);
+  --digit-cell-line-height: var(--prime-control-xs-line-height);
 }
 
 .root[data-size="s"] {
-  --prime-digit-cell-size: var(--prime-control-s-height);
-  --prime-digit-cell-radius: var(--prime-control-s-radius);
-  --prime-digit-cell-text: var(--prime-text-body-m-size);
-  --prime-digit-cell-line-height: var(--prime-text-body-m-line-height);
-  --prime-digit-gap: var(--prime-control-s-gap);
+  --digit-cell-text: var(--prime-text-body-m-size);
+  --digit-cell-line-height: var(--prime-text-body-m-line-height);
 }
 
 .root[data-size="l"] {
-  --prime-digit-cell-size: var(--prime-control-l-height);
-  --prime-digit-cell-radius: var(--prime-control-l-radius);
-  --prime-digit-cell-text: var(--prime-text-title-l-size);
-  --prime-digit-cell-line-height: var(--prime-text-title-l-line-height);
-  --prime-digit-gap: var(--prime-control-l-gap);
+  --digit-cell-text: var(--prime-text-title-l-size);
+  --digit-cell-line-height: var(--prime-text-title-l-line-height);
 }
 
 .root[data-size="xl"] {
-  --prime-digit-cell-size: var(--prime-control-xl-height);
-  --prime-digit-cell-radius: var(--prime-control-xl-radius);
-  --prime-digit-cell-text: var(--prime-text-heading-s-size);
-  --prime-digit-cell-line-height: var(--prime-text-heading-s-line-height);
-  --prime-digit-gap: var(--prime-control-xl-gap);
+  --digit-cell-text: var(--prime-text-heading-s-size);
+  --digit-cell-line-height: var(--prime-text-heading-s-line-height);
 }
 
 .cell {
@@ -71,20 +56,17 @@
   appearance: none;
   box-sizing: border-box;
   flex: 0 0 auto;
-  width: var(--prime-digit-cell-size);
-  height: var(--prime-digit-cell-size);
+  width: var(--field-h);
+  height: var(--field-h);
   min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: var(--prime-digit-cell-radius);
-  background: var(--prime-color-field-bg);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
-  color: var(--prime-color-text-primary);
+  border-radius: var(--field-radius);
   caret-color: var(--prime-color-accent-default);
   font: inherit;
-  font-size: var(--prime-digit-cell-text);
-  line-height: var(--prime-digit-cell-line-height);
+  font-size: var(--digit-cell-text);
+  line-height: var(--digit-cell-line-height);
   font-weight: var(--prime-font-weight-semibold);
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -101,36 +83,13 @@
 }
 
 .cell[data-group-start="true"] {
-  margin-inline-start: var(--prime-digit-gap);
-}
-
-.cell:hover:not(:focus-visible):not(:disabled) {
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
-}
-
-.cell:focus-visible {
-  background: var(--prime-color-field-bg-focus);
-}
-
-/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
-.root:not([data-focus-ring="false"]) .cell:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
+  margin-inline-start: var(--field-gap);
 }
 
 .root[data-invalid="true"] .cell {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
   color: var(--prime-color-danger-text);
 }
 
-.root[data-invalid="true"] .cell:focus-visible {
-  outline-color: var(--prime-color-danger-border);
-}
-
 .cell:disabled {
-  background: var(--prime-color-field-bg-disabled);
-  box-shadow: none;
-  color: var(--prime-color-text-disabled);
   -webkit-text-fill-color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
 }
