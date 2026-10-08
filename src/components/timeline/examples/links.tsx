@@ -1,4 +1,4 @@
-/** Link rows highlighted only under the pointer or keyboard focus, with no persistent current row — `highlight`, `href`. */
+/** Rows that open an operation page become links, one Tab stop each with a focus ring — `href`. */
 import { Timeline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -9,9 +9,9 @@ const EVENTS = [
   { id: "wash", title: "Мойка и химчистка салона", date: "01.09.26", value: "−450 ₽" },
 ];
 
-export default function TimelineHoverHighlightExample() {
+export default function TimelineLinksExample() {
   return (
-    <Timeline.Root highlight="hover" className={styles.feed}>
+    <Timeline.Root className={styles.feed}>
       <Timeline.Group label="Операции">
         {EVENTS.map((event) => (
           <Timeline.Item key={event.id} href={`#${event.id}`}>

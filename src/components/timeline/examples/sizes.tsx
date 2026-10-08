@@ -18,7 +18,7 @@ export default function TimelineSizesExample() {
               </Timeline.Meta>
               <Timeline.Value>+6 300 ₽</Timeline.Value>
             </Timeline.Item>
-            <Timeline.Item current>
+            <Timeline.Item>
               <Timeline.Title>ТО: замена масла</Timeline.Title>
               <Timeline.Meta>
                 <Timeline.MetaPrimary>10.09.26</Timeline.MetaPrimary> · 26 д. назад

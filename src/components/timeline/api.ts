@@ -24,13 +24,6 @@ export const api: ComponentApi = {
           ru: "Текст, точка и ритм строк: высота 40 · 52 · 64 · 68 · 76 px.",
         },
         {
-          name: "highlight",
-          type: '"current" | "hover"',
-          default: '"current"',
-          en: "Who gets the highlighted look (pill, accent title and dot): the `current` row, or the row under the pointer / keyboard focus.",
-          ru: "Кто получает выделение (плашка, акцентные заголовок и точка): строка `current` или строка под курсором / в фокусе.",
-        },
-        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
           en: "`children` (`Timeline.Group`), `className` and the other div attributes.",
@@ -59,8 +52,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Timeline.Item",
-      en: "`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended.",
-      ru: "`<li>` со строкой: `<div>`, `<button>` (`onClick`), `<a>` (`href`) или свой элемент (`asChild`); точка добавляется в начало.",
+      en: "`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot).",
+      ru: "`<li>` со строкой: `<div>`, `<button>` (`onClick`), `<a>` (`href`) или свой элемент (`asChild`); точка добавляется в начало. Строка под курсором или в фокусе выделяется (плашка, акцентные заголовок и точка).",
       props: [
         {
           name: "color",
@@ -74,13 +67,6 @@ export const api: ComponentApi = {
           type: TONE,
           en: "Status dot color at full emphasis; wins over `color`.",
           ru: "Цвет точки по статусу, в полную силу; важнее `color`.",
-        },
-        {
-          name: "current",
-          type: "boolean",
-          default: "false",
-          en: 'The current row (open detail, latest event): `aria-current`, `data-state="active"`; highlighted in `highlight="current"`.',
-          ru: 'Текущая строка (открытая деталь, последнее событие): `aria-current`, `data-state="active"`; выделена при `highlight="current"`.',
         },
         {
           name: "onClick",

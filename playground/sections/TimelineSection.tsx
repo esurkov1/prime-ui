@@ -17,7 +17,6 @@ export const page: ComponentPageConfig = {
       "activity",
       "feed",
       "операции",
-      "active",
     ],
     icon: History,
     order: 7,
@@ -31,7 +30,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Лента операций: одна подписанная группа, линия через точки и выделенная текущая строка — `Timeline.Group`, `current`.",
+        "Лента операций: одна подписанная группа, линия через точки, строка под курсором выделяется — `Timeline.Group`, `Timeline.Value`.",
     },
     {
       slot: "variants",
@@ -48,16 +47,10 @@ export const page: ComponentPageConfig = {
         "История обслуживания с промежутками между событиями, подписью справа у промежутка и второй строкой суммы — `Timeline.Gap`, `Timeline.GapMeta`, `Timeline.ValueMeta`.",
     },
     {
-      scenario: "selectable",
-      title: "Выбор строки",
+      scenario: "links",
+      title: "Строки-ссылки",
       description:
-        "Строки с обработчиком клика становятся кнопками и открывают детали; открытая строка остаётся текущей — `onClick`, `current`.",
-    },
-    {
-      scenario: "hover-highlight",
-      title: "Выделение при наведении",
-      description:
-        "Строки-ссылки выделяются только под курсором или в фокусе, без постоянной текущей строки — `highlight`, `href`.",
+        "Строки, открывающие страницу операции, становятся ссылками: по одной точке табуляции и кольцо фокуса — `href`.",
     },
     {
       slot: "narrow",
@@ -77,7 +70,6 @@ export const page: ComponentPageConfig = {
     aria: [
       "Каждая группа — `<ol>` с именем из заголовка (`aria-labelledby`); события — `<li>`.",
       "Точка скрыта (`aria-hidden`): статус пишите в заголовке или мете, а не только цветом.",
-      '`current` ставит `aria-current="true"`.',
     ],
   },
 };

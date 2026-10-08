@@ -8,7 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Timeline } from "./Timeline";
 import styles from "./Timeline.module.css";
 
-function Feed({ onSelect, current }: { onSelect?: (id: string) => void; current?: string }) {
+function Feed({ onSelect }: { onSelect?: (id: string) => void }) {
   const rows = [
     { id: "a", title: "Аренда закончилась", date: "21.09.26", value: "+6 300 ฿" },
     { id: "b", title: "ТО: замена масла", date: "10.09.26", value: "−689 ฿" },
@@ -17,11 +17,7 @@ function Feed({ onSelect, current }: { onSelect?: (id: string) => void; current?
     <Timeline.Root>
       <Timeline.Group label="Недавно">
         {rows.map((row) => (
-          <Timeline.Item
-            key={row.id}
-            current={current === row.id}
-            onClick={onSelect ? () => onSelect(row.id) : undefined}
-          >
+          <Timeline.Item key={row.id} onClick={onSelect ? () => onSelect(row.id) : undefined}>
             <Timeline.Title>{row.title}</Timeline.Title>
             <Timeline.Meta>
               <Timeline.MetaPrimary>{row.date}</Timeline.MetaPrimary> · 15 д. назад
@@ -63,17 +59,13 @@ describe("Timeline", () => {
     expect(screen.getByRole("list")).not.toHaveAttribute("aria-labelledby");
   });
 
-  it("marks the current row with data-state and aria-current", () => {
-    render(<Feed current="b" />);
-    const items = screen.getAllByRole("listitem");
-    const activeRow = within(items[1]).getByText("ТО: замена масла").parentElement;
-    const idleRow = within(items[0]).getByText("Аренда закончилась").parentElement;
-    expect(activeRow).toHaveAttribute("data-state", "active");
-    expect(activeRow).toHaveAttribute("aria-current", "true");
-    expect(idleRow).toHaveAttribute("data-state", "inactive");
-    expect(idleRow).not.toHaveAttribute("aria-current");
-    // The state lives on the row only; the list item carries no styling hook.
-    expect(items[1]).not.toHaveAttribute("data-state");
+  it("keeps no selection: rows carry no state or aria-current", () => {
+    render(<Feed onSelect={() => {}} />);
+    for (const button of screen.getAllByRole("button")) {
+      fireEvent.click(button);
+      expect(button).not.toHaveAttribute("data-state");
+      expect(button).not.toHaveAttribute("aria-current");
+    }
   });
 
   it("dot color: palette color by default, tone wins over color", () => {
@@ -126,7 +118,7 @@ describe("Timeline", () => {
           <Timeline.Item href="/events/1">
             <Timeline.Title>Link row</Timeline.Title>
           </Timeline.Item>
-          <Timeline.Item asChild current>
+          <Timeline.Item asChild>
             <a href="/events/2" data-custom="yes">
               <Timeline.Title>Custom row</Timeline.Title>
             </a>
@@ -139,7 +131,6 @@ describe("Timeline", () => {
     expect(links[0]).toHaveClass(styles.row);
     expect(links[1]).toHaveAttribute("data-custom", "yes");
     expect(links[1]).toHaveClass(styles.row);
-    expect(links[1]).toHaveAttribute("data-state", "active");
     expect(links[1].querySelector(`.${styles.dot}`)).toBeTruthy();
     expect(within(links[1]).getByText("Custom row")).toBeInTheDocument();
   });
@@ -219,30 +210,25 @@ describe("Timeline", () => {
     expect(container.querySelectorAll(`.${styles.dot}`)).toHaveLength(2);
   });
 
-  it("highlight mode: current by default, hover on request; hover rows stay focusable", () => {
-    const { container, rerender } = render(<Feed current="b" />);
-    expect(container.firstElementChild).toHaveAttribute("data-highlight", "current");
-    rerender(
-      <Timeline.Root highlight="hover">
+  it("CSS highlights only the row under the pointer or with keyboard focus", () => {
+    const css = readFileSync(join(__dirname, "Timeline.module.css"), "utf8");
+    expect(css).toMatch(/^\.row:is\(:hover, :focus-visible\) \{/m);
+    expect(css).not.toMatch(/data-state|data-highlight/);
+  });
+
+  it("link rows stay focusable without a click handler", () => {
+    render(
+      <Timeline.Root>
         <Timeline.Group label="Операции">
-          <Timeline.Item href="#a" current>
+          <Timeline.Item href="#a">
             <Timeline.Title>Аренда закончилась</Timeline.Title>
           </Timeline.Item>
         </Timeline.Group>
       </Timeline.Root>,
     );
-    expect(container.firstElementChild).toHaveAttribute("data-highlight", "hover");
     const link = screen.getByRole("link", { name: "Аренда закончилась" });
-    // `current` keeps its semantics in hover mode; the look is driven by :hover / :focus-visible.
-    expect(link).toHaveAttribute("aria-current", "true");
     link.focus();
     expect(link).toHaveFocus();
-  });
-
-  it("CSS gates the persistent highlight to current mode and the transient one to hover mode", () => {
-    const css = readFileSync(join(__dirname, "Timeline.module.css"), "utf8");
-    expect(css).toMatch(/\.root\[data-highlight="current"\] \.row\[data-state="active"\]/);
-    expect(css).toMatch(/\.root\[data-highlight="hover"\] \.row:is\(:hover, :focus-visible\)/);
-    expect(css).not.toMatch(/^\.row\[data-state="active"\] \{/m);
+    expect(link).toHaveAttribute("data-interactive", "true");
   });
 });

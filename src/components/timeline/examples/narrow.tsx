@@ -25,7 +25,7 @@ export default function TimelineNarrowExample() {
         <Timeline.Root key={width.id} className={width.className}>
           <Timeline.Group label={width.label}>
             {EVENTS.map((event) => (
-              <Timeline.Item key={event.id} current={event.id === 2}>
+              <Timeline.Item key={event.id}>
                 <Timeline.Title>{event.title}</Timeline.Title>
                 <Timeline.Meta>
                   <Timeline.MetaPrimary>{event.date}</Timeline.MetaPrimary>

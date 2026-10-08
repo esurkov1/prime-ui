@@ -2,8 +2,9 @@
  * Timeline — Graphite. Activity feed: labelled `ol` groups of rows.
  * Row grid: dot column · text (title over meta) · value (centered on the row, right-aligned).
  * The 2px `border-subtle` line is drawn per `li` around the dot and spans the first to the last dot.
- * Active row: `fill-subtle-active` pill (radius l), accent title and dot. Interactive rows:
- * hover `fill-subtle`, inset focus ring. Below 20rem of root width the value moves under the meta.
+ * The row under the pointer or with keyboard focus: `fill-subtle-active` pill (radius l), accent
+ * title and dot; interactive rows add an inset focus ring. Below 20rem of root width the value moves
+ * under the meta.
  */
 
 .root {
@@ -197,7 +198,7 @@
 .row {
   /* `--hue-solid` comes from `internal/palette` (`data-color`, default `blue` from TSX). */
   --tl-hue: var(--hue-solid);
-  /* Decorative hues sit at reduced emphasis; tones and the active row use full color. */
+  /* Decorative hues sit at reduced emphasis; tones and the highlighted row use full color. */
   --tl-dot-color: color-mix(in srgb, var(--tl-hue) 55%, transparent);
 
   appearance: none;
@@ -250,33 +251,20 @@
   --tl-dot-color: var(--prime-color-info-default);
 }
 
-/*
- * Highlighted look: `fill-subtle-active` pill, accent title, accent dot (a `tone` keeps its dot).
- * `highlight="current"`: the `current` row keeps it; interactive rows get a faint hover wash.
- * `highlight="hover"`: the row under the pointer or with keyboard focus gets it, transiently.
- */
-.root[data-highlight="current"] .row[data-state="active"],
-.root[data-highlight="hover"] .row:is(:hover, :focus-visible) {
+/* Highlighted look on the row under the pointer or with keyboard focus: `fill-subtle-active` pill,
+ * accent title, accent dot (a `tone` keeps its dot). */
+.row:is(:hover, :focus-visible) {
   --tl-title-color: var(--prime-color-accent-text);
 
   background: var(--prime-color-fill-subtle-active);
 }
 
-.root[data-highlight="current"] .row[data-state="active"]:not([data-tone]),
-.root[data-highlight="hover"] .row:is(:hover, :focus-visible):not([data-tone]) {
+.row:is(:hover, :focus-visible):not([data-tone]) {
   --tl-dot-color: var(--prime-color-accent-default);
 }
 
 .row[data-interactive="true"] {
   cursor: pointer;
-}
-
-.root[data-highlight="current"] .row[data-interactive="true"]:hover:not([data-state="active"]) {
-  background: var(--prime-color-fill-subtle);
-}
-
-.root[data-highlight="current"] .row[data-interactive="true"]:active:not([data-state="active"]) {
-  background: var(--prime-color-fill-subtle-active);
 }
 
 /* Full-width list row: the ring is drawn inside its edge. */

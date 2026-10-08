@@ -44,7 +44,6 @@ Timeline.Root                    size container, sets the tier
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px. |
-| `highlight` | `"current" \| "hover"` | `"current"` | Who gets the highlighted look (pill, accent title and dot): the `current` row, or the row under the pointer / keyboard focus. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `children` (`Timeline.Group`), `className` and the other div attributes. |
 
 ### Timeline.Group
@@ -56,13 +55,12 @@ Timeline.Root                    size container, sets the tier
 | `…rest` | `Omit<OlHTMLAttributes<HTMLOListElement>, "children">` | — | `children` (`Timeline.Item`, `Timeline.Gap`), `className` and the other ol attributes. |
 
 ### Timeline.Item
-`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended.
+`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"blue"` | Decorative dot hue for categories, at reduced emphasis. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | — | Status dot color at full emphasis; wins over `color`. |
-| `current` | `boolean` | `false` | The current row (open detail, latest event): `aria-current`, `data-state="active"`; highlighted in `highlight="current"`. |
 | `onClick` | `MouseEventHandler<HTMLElement>` | — | Renders the row as a `<button>`. |
 | `href` | `string` | — | Renders the row as a link (with `target`, `rel`, `download`). |
 | `asChild` | `boolean` | `false` | Renders the row as the single child element (a router link). |
@@ -108,12 +106,6 @@ Timeline.Root                    size container, sets the tier
 | `m` | rows 64, title 14/20, dot 10 | page content and cards | yes |
 | `l` · `xl` | rows 68 / 76, title 16/24, dot 12 | spacious feeds, detail pages | |
 
-### highlight
-| Value | Looks like | Use when | Default |
-|---|---|---|---|
-| `current` | the `current` row has a `fill-subtle-active` pill, accent title and dot; interactive rows get a faint hover | a row opens a detail view and stays open | yes |
-| `hover` | the row under the pointer or keyboard focus gets the pill, transiently | rows are links that open a page | |
-
 ### color (Item)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -135,12 +127,12 @@ On an Item `tone` wins over `color` and shows at full emphasis.
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| tier / highlight | `size`, `highlight` | `data-size`, `data-highlight` on the root |
-| current | `current` | `data-state="active"` on the `<li>` and the row, `aria-current="true"` |
+| tier | `size` | `data-size` on the root |
+| highlighted | pointer over the row, keyboard focus | `:hover`, `:focus-visible`: `fill-subtle-active` pill, accent title and dot (a `tone` keeps its dot) |
 | dot color | `color` / `tone` | `data-color` (without a tone) or `data-tone` |
-| interactive | `onClick`, `href`, `asChild` | `data-interactive`; `fill-subtle` hover, inset focus ring |
+| interactive | `onClick`, `href`, `asChild` | `data-interactive`; pointer cursor, inset focus ring |
 
-Timeline keeps no state: the parent owns `current`.
+Timeline keeps no state and has no persistent selection: every row is highlighted only while it is under the pointer or focused.
 
 ## Layout & spacing
 - The root is a size container: give it a definite width (`width: min(100%, 30rem)`).
@@ -159,7 +151,6 @@ Timeline keeps no state: the parent owns `current`.
 ### ARIA
 - Each group is an `<ol>` labelled by its heading (`aria-labelledby`); events are `<li>`.
 - The dot is `aria-hidden`: put the status into the title or meta, not only the dot color.
-- `current` sets `aria-current="true"`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -169,12 +160,11 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | An operations feed: one labelled group, a line through the dots and the current row highlighted — `Timeline.Group`, `current`. |
+| [overview.tsx](examples/overview.tsx) | An operations feed: one labelled group, a line through the dots, the row under the pointer highlighted — `Timeline.Group`, `Timeline.Value`. |
 | [variants.tsx](examples/variants.tsx) | Dot hues for categories at reduced emphasis, and status tones on items, values and gaps at full emphasis — `color`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier scales text, dot and row rhythm, rows 40 to 76 px — `size`. |
 | [structure.tsx](examples/structure.tsx) | A service history with intervals between events, a caption on the right of a gap and a second value line — `Timeline.Gap`, `Timeline.GapMeta`, `Timeline.ValueMeta`. |
-| [selectable.tsx](examples/selectable.tsx) | Rows with a click handler become buttons that open a detail view; the open row stays current — `onClick`, `current`. |
-| [hover-highlight.tsx](examples/hover-highlight.tsx) | Link rows highlighted only under the pointer or keyboard focus, with no persistent current row — `highlight`, `href`. |
+| [links.tsx](examples/links.tsx) | Rows that open an operation page become links, one Tab stop each with a focus ring — `href`. |
 | [narrow.tsx](examples/narrow.tsx) | At 375 px the title wraps and the amount stays right; below 20rem of its own width the amount moves under the meta line. |
 
 ## Mistakes
@@ -183,7 +173,7 @@ No `labels`.
 - Status only by dot color → put it in the title or meta too.
 - `<div onClick>` inside an item → pass `onClick` to `Timeline.Item` (native button, focus ring).
 - `Timeline.Root` in a shrink-wrapped flex parent → give it a width.
-- More than one `current` row, or `highlight="hover"` with click selection → the selection becomes invisible.
+- Using the timeline to pick a row (a selected / current state) → it has none; use a list with selection (`Select`, `DataTable` row selection) or `Tabs`.
 
 ## Related
 - **Built from:** —

@@ -26,9 +26,9 @@ const LINES: Line[] = [
 ];
 
 const HISTORY = [
-  { id: "h1", title: "Счёт открыт клиентом", date: "2 окт., 11:40", current: true },
-  { id: "h2", title: "Отправлен на billing@veter.ru", date: "30 сент., 16:05", current: false },
-  { id: "h3", title: "Создан · Анна Климова", date: "30 сент., 15:52", current: false },
+  { id: "h1", title: "Счёт открыт клиентом", date: "2 окт., 11:40" },
+  { id: "h2", title: "Отправлен на billing@veter.ru", date: "30 сент., 16:05" },
+  { id: "h3", title: "Создан · Анна Климова", date: "30 сент., 15:52" },
 ];
 
 const MONEY = new Intl.NumberFormat("ru-RU", {
@@ -205,9 +205,9 @@ export default function DetailPagePattern() {
                 <Card.Title as="h2">История</Card.Title>
               </Card.Header>
               <Card.Body>
-                <Timeline.Root highlight="current">
+                <Timeline.Root>
                   {HISTORY.map((event) => (
-                    <Timeline.Item key={event.id} current={event.current}>
+                    <Timeline.Item key={event.id}>
                       <Timeline.Title>{event.title}</Timeline.Title>
                       <Timeline.Meta>{event.date}</Timeline.Meta>
                     </Timeline.Item>

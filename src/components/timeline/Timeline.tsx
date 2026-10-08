@@ -14,33 +14,16 @@ import styles from "./Timeline.module.css";
 export type TimelineRootProps = {
   /** Tier of text, dots and row rhythm. Default `m` (rows 64px). */
   size?: ControlSize;
-  /**
-   * Who gets the highlighted look (pill, accent title and dot):
-   * `current` (default) — the `current` row keeps it; interactive rows get a faint hover wash.
-   * `hover` — the row under the pointer or with keyboard focus, transiently; `current` keeps only
-   * its semantics (`aria-current`), no persistent highlight.
-   */
-  highlight?: "current" | "hover";
   /** `Timeline.Group` elements. */
   children: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLDivElement>;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
 
-function TimelineRoot({
-  size = "m",
-  highlight = "current",
-  children,
-  className,
-  ...rest
-}: TimelineRootProps) {
+function TimelineRoot({ size = "m", children, className, ...rest }: TimelineRootProps) {
   return (
     <ControlSizeProvider value={size}>
-      <div
-        {...rest}
-        className={cx(styles.root, className)}
-        {...toDataAttributes({ size, highlight })}
-      >
+      <div {...rest} className={cx(styles.root, className)} {...toDataAttributes({ size })}>
         {children}
       </div>
     </ControlSizeProvider>
@@ -89,8 +72,6 @@ export type TimelineItemProps = {
   color?: PaletteColor;
   /** Semantic dot color (status). Wins over `color`; shown at full emphasis. */
   tone?: Tone;
-  /** The current row (open detail, latest event): soft pill, accent title and dot; `data-state="active"`, `aria-current`. */
-  current?: boolean;
   /** Renders the row as a link. */
   href?: string;
   /** Renders the row as the single child element (router link etc.); the dot is prepended to its children. */
@@ -108,7 +89,6 @@ export type TimelineItemProps = {
 function TimelineItem({
   color = "blue",
   tone,
-  current = false,
   href,
   asChild,
   onClick,
@@ -124,9 +104,7 @@ function TimelineItem({
     ...rest,
     ref: rowRef,
     className: cx(palette.hue, styles.row, className),
-    "aria-current": current ? ("true" as const) : undefined,
     ...toDataAttributes({
-      state: current ? "active" : "inactive",
       color: tone ? undefined : color,
       tone,
       interactive: interactive || undefined,
@@ -187,7 +165,7 @@ export type TimelineTitleProps = {
   ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
-/** First line: the event. Medium, primary (accent on the active row); wraps when narrow. */
+/** First line: the event. Medium, primary (accent on the highlighted row); wraps when narrow. */
 function TimelineTitle({ children, className, ...rest }: TimelineTitleProps) {
   return (
     <span {...rest} className={cx(styles.title, className)}>
