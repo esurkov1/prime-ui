@@ -615,6 +615,8 @@ export const semanticTokens = {
     handleArea: "{space.5}",
     /** Room kept above a sheet so the page behind stays visible. */
     topGap: "{space.10}",
+    /** A bottom sheet on a tablet or desktop is never narrower than this (= Modal m). */
+    minWidth: "35rem",
   },
 
   bottomNav: {

@@ -10,11 +10,30 @@
   display: contents;
 }
 
+/*
+ * The scrim follows a swipe: `--swipe-progress` (0 at rest … 1 off the edge, written by the panel's
+ * swipe) thins its fill. While the finger drags it tracks at once; on release it glides with the
+ * panel on the same curve, and after a closing swipe it fades by that glide alone.
+ */
 .overlay {
   position: fixed;
   inset: 0;
   z-index: var(--prime-z-overlay);
-  background: var(--prime-color-bg-scrim);
+  background: color-mix(
+    in srgb,
+    var(--prime-color-bg-scrim) calc((1 - var(--swipe-progress, 0)) * 100%),
+    transparent
+  );
+  transition: background-color var(--prime-motion-duration-base)
+    var(--prime-motion-easing-emphasized);
+}
+
+.overlay:has(+ .panel[data-swiping]) {
+  transition: none;
+}
+
+.overlay:has(+ .panel[data-swipe-dismissed]) {
+  animation: none;
 }
 
 .panel {
@@ -75,8 +94,26 @@
   touch-action: pan-y;
 }
 
-/* Bottom sheet: centred at its size width, height by content up to the top gap, rounded on top. */
+/*
+ * A pull against the closing direction moves the panel up to 24 (useSwipeDismiss); an unblurred
+ * shadow of its own fill continues it that far past the screen edge, so it never comes away.
+ */
+.panel[data-side="right"] {
+  box-shadow:
+    var(--prime-space-6) 0 0 0 var(--prime-color-bg-raised),
+    var(--prime-shadow-modal);
+}
+
+.panel[data-side="left"] {
+  box-shadow:
+    calc(-1 * var(--prime-space-6)) 0 0 0 var(--prime-color-bg-raised),
+    var(--prime-shadow-modal);
+}
+
+/* Bottom sheet: centred at its size width but at least `--prime-sheet-min-width` (a tablet gets a
+   real sheet, not a strip), height by content up to the top gap, rounded on top. */
 .panel[data-side="bottom"] {
+  width: min(100vw, max(var(--drawer-width), var(--prime-sheet-min-width)));
   top: auto;
   right: 0;
   left: 0;
@@ -85,6 +122,9 @@
   padding-block-end: env(safe-area-inset-bottom, 0px);
   border-start-start-radius: var(--prime-sheet-radius);
   border-start-end-radius: var(--prime-sheet-radius);
+  box-shadow:
+    0 var(--prime-space-6) 0 0 var(--prime-color-bg-raised),
+    var(--prime-shadow-modal);
 }
 
 /* ─── Narrow viewport: full width; side drawers square, the sheet keeps its top radius ──── */

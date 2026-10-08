@@ -7,11 +7,13 @@ import { type SwipeDirection, useSwipeDismiss } from "./useSwipeDismiss";
 
 function Panel({
   onDismiss,
+  onProgress,
   direction = "down",
   enabled = true,
   touchAnywhere = false,
 }: {
   onDismiss: () => void;
+  onProgress?: (progress: number) => void;
   direction?: SwipeDirection;
   enabled?: boolean;
   touchAnywhere?: boolean;
@@ -20,6 +22,7 @@ function Panel({
     enabled,
     direction,
     onDismiss,
+    onProgress,
     handle: "[data-swipe-handle]",
     touchAnywhere,
   });
@@ -49,6 +52,10 @@ describe("useSwipeDismiss", () => {
     render(<Panel onDismiss={onDismiss} />);
     swipe(screen.getByTestId("handle"), origin, { x: 100, y: 260 });
     expect(onDismiss).toHaveBeenCalledTimes(1);
+    // It glides on out from the release point: the whole height, keyframe exit switched off.
+    const panel = screen.getByTestId("panel");
+    expect(panel).toHaveAttribute("data-swipe-dismissed");
+    expect(panel.style.getPropertyValue("--swipe-offset")).toBe("400px");
   });
 
   it("glides back after a short slow drag and clears the drag state", () => {
@@ -59,6 +66,20 @@ describe("useSwipeDismiss", () => {
     const panel = screen.getByTestId("panel");
     expect(panel.style.getPropertyValue("--swipe-offset")).toBe("0px");
     expect(panel).not.toHaveAttribute("data-swiping");
+  });
+
+  it("reports how far out the panel is: along the drag, then 1 when it leaves or 0 back", () => {
+    const onProgress = vi.fn();
+    render(<Panel onDismiss={() => {}} onProgress={onProgress} />);
+    swipe(screen.getByTestId("handle"), origin, { x: 100, y: 300 }, { steps: 4 });
+    const values = onProgress.mock.calls.map(([progress]) => progress);
+    // 400px panel: moves of 50 · 100 · 150 · 200 (the first one is past the slop) → 0.125 … 0.5.
+    expect(values.slice(0, 4)).toEqual([0.125, 0.25, 0.375, 0.5]);
+    expect(values.at(-1)).toBe(1);
+
+    onProgress.mockClear();
+    swipe(screen.getByTestId("handle"), origin, { x: 100, y: 140 });
+    expect(onProgress.mock.calls.at(-1)?.[0]).toBe(0);
   });
 
   it("closes on a quick flick from any distance past the slop", () => {

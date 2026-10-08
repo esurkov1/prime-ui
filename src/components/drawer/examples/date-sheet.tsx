@@ -20,7 +20,7 @@ export default function DrawerDateSheetExample() {
           {date ? `Отгрузка ${FORMAT.format(date)}` : "Дата отгрузки"}
         </Button.Root>
       </Drawer.Trigger>
-      <Drawer.Content side="bottom" size="s">
+      <Drawer.Content side="bottom">
         <Drawer.Header>
           <Drawer.Title>Дата отгрузки</Drawer.Title>
         </Drawer.Header>

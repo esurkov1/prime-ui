@@ -1,4 +1,4 @@
-import type * as React from "react";
+import * as React from "react";
 
 import {
   DialogBody,
@@ -124,6 +124,7 @@ function DrawerDialog({
   const { ref: layerRef, layer, onClose } = useDialogLayer<HTMLDivElement>(root);
   const panelRef = useMergedRefs(layerRef, ref);
   const bottom = side === "bottom";
+  const scrimRef = React.useRef<HTMLDivElement>(null);
   // Swiping is a dismiss from outside the content, like a scrim click.
   const swipe = useSwipeDismiss({
     enabled: root.closeOnOutsideClick && state === "open",
@@ -131,6 +132,9 @@ function DrawerDialog({
     onDismiss: onClose,
     handle: "[data-swipe-handle], header",
     touchAnywhere: !bottom,
+    // The scrim fades with the panel: half way out, half as dark.
+    onProgress: (progress) =>
+      scrimRef.current?.style.setProperty("--swipe-progress", `${progress}`),
   });
 
   const shell = useDialogShellValue({
@@ -146,6 +150,7 @@ function DrawerDialog({
     // One portal root for scrim + panel, so `useInertSiblings` never makes the scrim inert.
     <div className={styles.root}>
       <div
+        ref={scrimRef}
         role="presentation"
         className={cx(styles.overlay, overlayMotion.scrim, overlayClassName)}
         data-state={state}

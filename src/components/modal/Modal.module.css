@@ -68,6 +68,10 @@
     border-start-end-radius: var(--prime-sheet-radius);
     border-end-start-radius: 0;
     border-end-end-radius: 0;
+    /* Its own fill continues past the bottom edge: an upward pull (up to 24) never lifts it off. */
+    box-shadow:
+      0 var(--prime-space-6) 0 0 var(--prime-color-bg-raised),
+      var(--prime-shadow-modal);
   }
 }
 

@@ -264,6 +264,15 @@ describe("Drawer — bottom sheet and swipe", () => {
     await expectClosed();
   });
 
+  it("the scrim thins with the drag and the sheet glides out from the release point", () => {
+    render(<BasicDrawer side="bottom" />);
+    openDrawer();
+    const scrim = drawerScrim();
+    swipe(header(), { x: 0, y: 0 }, { x: 0, y: 300 });
+    // jsdom has no layout: the panel is 0 high, so any drag counts as all the way out.
+    expect(scrim.style.getPropertyValue("--swipe-progress")).toBe("1");
+  });
+
   it("swiping follows closeOnOutsideClick", () => {
     render(<BasicDrawer side="bottom" closeOnOutsideClick={false} />);
     openDrawer();

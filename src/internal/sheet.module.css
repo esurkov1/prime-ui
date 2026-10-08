@@ -6,8 +6,8 @@
  *   .swipeX      the same along the horizontal axis (side drawers)
  *
  * While `data-swiping` is set the panel follows the pointer with no transition; on release it
- * glides back to rest (or leaves through its exit animation, which runs on `translate`, so the
- * two never fight). Reduced motion collapses the glide (globals.css).
+ * glides back to rest, or on out from where it was let go (`data-swipe-dismissed`, the keyframe
+ * exit switched off). Reduced motion collapses the glide (globals.css).
  */
 
 .handle {
@@ -29,9 +29,10 @@
   background: var(--prime-color-fill-strong);
 }
 
+/* The iOS sheet curve: a release keeps moving at once and lands softly, back or out. */
 .swipeY,
 .swipeX {
-  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
 .swipeY {
@@ -47,6 +48,13 @@
   transition: none;
   cursor: grabbing;
   user-select: none;
+}
+
+/* Closed by a swipe: the transition carries the panel out from the release point; the keyframe
+   exit would restart from rest. Doubled class: wins over the overlay motion's closed state. */
+.swipeY.swipeY[data-swipe-dismissed],
+.swipeX.swipeX[data-swipe-dismissed] {
+  animation: none;
 }
 
 /* A header right under the handle drops its top air: the handle strip is that air. It is part of

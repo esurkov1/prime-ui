@@ -65,7 +65,10 @@
   border-start-start-radius: var(--prime-sheet-radius);
   border-start-end-radius: var(--prime-sheet-radius);
   background: var(--prime-color-bg-raised);
-  box-shadow: var(--prime-shadow-modal);
+  /* Its own fill continues past the bottom edge: an upward pull (up to 24) never lifts it off. */
+  box-shadow:
+    0 var(--prime-space-6) 0 0 var(--prime-color-bg-raised),
+    var(--prime-shadow-modal);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
   outline: none;

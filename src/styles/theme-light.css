@@ -312,6 +312,7 @@
   --prime-sheet-handle-area: var(--prime-ref-space-5);
   --prime-sheet-handle-height: var(--prime-ref-space-1);
   --prime-sheet-handle-width: 2.25rem;
+  --prime-sheet-min-width: 35rem;
   --prime-sheet-radius: var(--prime-ref-radius-16);
   --prime-sheet-top-gap: var(--prime-ref-space-10);
   --prime-space-0: var(--prime-ref-space-0);

@@ -61,7 +61,7 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"left" \| "right" \| "bottom"` | `"right"` | Edge the panel slides from; rounded only on the edge facing the page. `bottom` is a sheet: a grab handle on top, height by content. A swipe toward the edge closes the panel (with `closeOnOutsideClick`): a bottom sheet from its handle or header, a side drawer by touch anywhere (by mouse from the header). |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 360 · 480 · 640 · 800 (a bottom sheet is centred). Below 640 px of viewport — full width; side drawers lose their corners. |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 360 · 480 · 640 · 800; a bottom sheet is centred and at least 560 (`--prime-sheet-min-width`). Below 640 px of viewport — full width; side drawers lose their corners. |
 | `aria-label` | `string` | — | Dialog name when there is no Title. |
 | `aria-labelledby` | `string` | — | Overrides the Title id. |
 | `aria-describedby` | `string` | — | Overrides the Description id. |
@@ -122,7 +122,7 @@ No DOM: clone the single child and chain its `onClick` (unless the child's handl
 | `l` | 640 wide | wide forms | |
 | `xl` | 800 wide | tables, previews | |
 
-A bottom sheet is centred at its width. Below 640px of viewport every size is full width; side drawers lose their corners, the sheet keeps its top radius.
+A bottom sheet is centred at its width, never narrower than 560 (`--prime-sheet-min-width`), so a tablet gets a real sheet. Below 640px of viewport every size is full width; side drawers lose their corners, the sheet keeps its top radius.
 
 ### layout (Footer)
 | Value | Looks like | Use when | Default |
@@ -138,15 +138,15 @@ A bottom sheet is centred at its width. Below 640px of viewport every size is fu
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the scrim and the panel; mounted until the slide-out ends |
 | side / size | Content props | `data-side`, `data-size` on the panel |
-| swiping | a drag toward the edge (with `closeOnOutsideClick`) | `data-swiping` and `--swipe-offset` on the panel while the pointer drags it |
+| swiping | a drag toward the edge (with `closeOnOutsideClick`) | `data-swiping` and `--swipe-offset` on the panel while the pointer drags it; `data-swipe-dismissed` while it glides out after a closing release; `--swipe-progress` (0…1) on the scrim |
 | open: trapped | while open | focus trapped, page scroll locked, siblings of the portal `inert` (the toast region stays usable); a drawer opened from a Modal or another drawer stacks above it |
 
-Motion: the scrim fades, the panel slides from its side over `slow` and leaves over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once. A swipe moves the panel with the pointer; on release it closes past 30% of its size or on a quick flick, otherwise it glides back over `base`. A bottom sheet drags from its handle or header; a side drawer by touch anywhere (not on text fields, sliders or sideways scrollers), by mouse from the header.
+Motion: the scrim fades, the panel slides from its side over `slow` and leaves over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once. A swipe moves the panel with the pointer; on release it closes past 30% of its size or on a quick flick and glides the rest of the way out from where it was let go, otherwise it glides back — both over `base` on the `emphasized` (iOS sheet) curve. A pull the other way meets growing resistance and stops at 24; the panel's fill continues that far past the screen edge, so it never comes away from it. The scrim follows the panel: its fill thins in proportion to how far out the panel is, tracks the finger while dragging and glides with the panel on release. A bottom sheet drags from its handle or header; a side drawer by touch anywhere (not on text fields, sliders or sideways scrollers), by mouse from the header.
 
 ## Layout & spacing
 - Zone padding `--prime-drawer-padding`; hairlines between header, body and footer.
 - Full viewport height; only the body scrolls, with its own side padding.
-- Bottom sheet: height by content up to `100dvh − --prime-sheet-top-gap`, radius `--prime-sheet-radius`, a `--prime-sheet-handle-area` strip with the handle bar, the bottom safe-area inset below the content.
+- Bottom sheet: width by `size`, at least `--prime-sheet-min-width` (560); height by content up to `100dvh − --prime-sheet-top-gap`, radius `--prime-sheet-radius`, a `--prime-sheet-handle-area` strip with the handle bar, the bottom safe-area inset below the content.
 - Fields inside get the surface field fill.
 
 ## Accessibility
