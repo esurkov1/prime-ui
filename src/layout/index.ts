@@ -22,6 +22,7 @@ export type {
 export { AppShell } from "./app-shell/AppShell";
 export type {
   BottomNavItemCountProps,
+  BottomNavActionProps,
   BottomNavItemIconProps,
   BottomNavItemProps,
   BottomNavLabels,

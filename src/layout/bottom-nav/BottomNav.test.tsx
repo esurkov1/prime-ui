@@ -143,6 +143,53 @@ describe("BottomNav", () => {
     expect(screen.getByRole("navigation")).toHaveAttribute("data-floating", "true");
   });
 
+  it("floating puts the selection capsule under the current item and follows it", () => {
+    function Floating() {
+      const [current, setCurrent] = React.useState("home");
+      return (
+        <BottomNav.Root floating>
+          <BottomNav.Item current={current === "home"} onClick={() => setCurrent("home")}>
+            Главная
+          </BottomNav.Item>
+          <BottomNav.Item current={current === "orders"} onClick={() => setCurrent("orders")}>
+            Заказы
+          </BottomNav.Item>
+        </BottomNav.Root>
+      );
+    }
+    render(<Floating />);
+    const selection = screen.getByRole("navigation").querySelector("[data-visible]");
+    expect(selection).toHaveAttribute("data-visible", "true");
+    expect(selection).toHaveAttribute("aria-hidden", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Заказы" }));
+    expect(screen.getByRole("button", { name: "Заказы" })).toHaveAttribute("aria-current", "page");
+    expect(selection).toHaveAttribute("data-visible", "true");
+  });
+
+  it("an action stands beside the bar as a named button inside the landmark", async () => {
+    const user = userEvent.setup();
+    const onCreate = vi.fn();
+    render(
+      <BottomNav.Root floating>
+        <BottomNav.Item current>Главная</BottomNav.Item>
+        <BottomNav.Item>Заказы</BottomNav.Item>
+        <BottomNav.Action aria-label="Новый заказ" onClick={onCreate}>
+          <svg />
+        </BottomNav.Action>
+      </BottomNav.Root>,
+    );
+    const nav = screen.getByRole("navigation");
+    const action = screen.getByRole("button", { name: "Новый заказ" });
+    expect(action).toHaveAttribute("type", "button");
+    expect(nav.lastElementChild).toBe(action);
+    await user.tab();
+    await user.tab();
+    await user.tab();
+    expect(action).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(onCreate).toHaveBeenCalledTimes(1);
+  });
+
   it("a disabled item ignores clicks", () => {
     const onSelect = vi.fn();
     render(<Nav onSelect={onSelect} />);

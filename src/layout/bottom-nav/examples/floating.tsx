@@ -1,4 +1,4 @@
-/** A glass capsule over the page: the client list scrolls under its blur, with labels or icons alone — `floating`, `iconOnly`. */
+/** A glass capsule over the page across the width: the client list scrolls under its blur, the selection glides to a tapped section, with labels or icons alone — `floating`, `iconOnly`. */
 import {
   AppHeader,
   AppShell,
@@ -42,15 +42,15 @@ export default function BottomNavFloatingExample() {
           <AppHeader.Start>
             <AppHeader.Title>Клиенты</AppHeader.Title>
           </AppHeader.Start>
-          <AppHeader.Actions>
-            <Switch.Root checked={iconOnly} onCheckedChange={setIconOnly}>
-              <Switch.Label>Только иконки</Switch.Label>
-            </Switch.Root>
-          </AppHeader.Actions>
         </AppHeader.Root>
         <AppShell.Main>
           <PageContent.Section>
             <PageContent.Body>
+              <div className={styles.options}>
+                <Switch.Root checked={iconOnly} onCheckedChange={setIconOnly}>
+                  <Switch.Label>Только иконки</Switch.Label>
+                </Switch.Root>
+              </div>
               {CLIENTS.map((client) => (
                 <div key={client.name} className={styles.client}>
                   <Avatar.Root color={client.color} aria-hidden="true">

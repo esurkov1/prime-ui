@@ -75,11 +75,11 @@ export const semanticTokens = {
       /** Soft shade over an edge that hides scrolled content (DataTable columns). */
       edgeShadow: "rgba(17, 19, 24, 0.14)",
       /**
-       * Translucent glass over content (floating BottomNav), always with a light backdrop blur:
-       * clear enough that the content reads through it, as Liquid Glass.
+       * Translucent glass over content (floating BottomNav), always with a strong backdrop blur:
+       * dense, as the iOS tab bar — the content shows through as soft shapes.
        */
-      glass: "color-mix(in srgb, var(--prime-ref-color-gray-0) 58%, transparent)",
-      /** The specular top edge of a glass surface: the line that makes it read as glass. */
+      glass: "color-mix(in srgb, var(--prime-ref-color-gray-0) 72%, transparent)",
+      /** The light that catches on the rim of a glass surface: the line that makes it read as glass. */
       glassEdge: "rgba(255, 255, 255, 0.85)",
     },
     /**
@@ -630,28 +630,36 @@ export const semanticTokens = {
     height: "3.25rem",
     /** An icon-only flat bar: no label row, so it is lower. */
     iconOnlyHeight: "{space.12}",
-    /**
-     * Floating capsule (iOS 26 tab bar): items 44 high — icon-only items are 44 squares, the touch
-     * size — inset 4 inside the capsule, so the selection capsule sits clear of its edge (52 in all).
-     */
-    floatingItemSize: "2.75rem",
-    floatingPadding: "{space.1}",
     paddingX: "{space.2}",
     /** Between the icon and the label. */
     itemGap: "{space.1}",
     /** The box that holds the icon and anchors the count. */
-    indicatorWidth: "{space.7}",
-    indicatorHeight: "{space.5}",
+    glyphWidth: "{space.7}",
+    glyphHeight: "{space.5}",
     /** A light icon (20) over a small label (10, as the iOS tab bar): the bar stays quiet. */
     iconSize: "{icon.20}",
     labelSize: "{font.size.10}",
     labelLineHeight: "{font.lineHeight.12}",
     /**
-     * Floating: the capsule's gap from the screen edges and the blur behind it — light, as Liquid
-     * Glass: the content stays recognisable under the glass, only softened.
+     * Floating capsule, the iOS 26 tab bar three quarters its size: 46 high (40 icons only), items
+     * inset 4, so the selection capsule sits clear of the rim; an 18 glyph over a 9 label, 2
+     * apart, with air above and below.
+     */
+    floatingHeight: "2.875rem",
+    floatingIconOnlyHeight: "2.5rem",
+    floatingIconSize: "1.125rem",
+    floatingLabelSize: "0.5625rem",
+    floatingLabelLineHeight: "0.6875rem",
+    floatingItemGap: "0.125rem",
+    floatingPadding: "{space.1}",
+    /** Between the capsule and a round `BottomNav.Action` beside it. */
+    floatingGap: "{space.2}",
+    /**
+     * Floating: the capsule's gap from the screen edges and the blur behind it — strong, as the
+     * iOS tab bar: the page under the glass shows only as soft shapes.
      */
     floatingInset: "{space.3}",
-    blur: "0.5rem",
+    blur: "0.875rem",
   },
 
   /**

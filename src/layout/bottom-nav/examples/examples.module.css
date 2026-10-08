@@ -31,9 +31,16 @@
   height: 100%;
 }
 
-/* floating.tsx: a client row — avatar and two lines of text. */
+/* floating*.tsx: a client row — avatar and two lines of text. */
 .client {
   display: flex;
   align-items: center;
   gap: var(--prime-space-3);
+}
+
+/* floating*.tsx: the look switch above the list. */
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-2) var(--prime-space-6);
 }

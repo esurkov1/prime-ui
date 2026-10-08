@@ -48,7 +48,7 @@ Use these as they are; never wrap them in your own breakpoints.
 | Need | Built in |
 |---|---|
 | app frame | AppShell gutters 16 → 24 → 32; `AppHeader` un-sticks on screens lower than 480px, respects safe areas and, below 36rem of its width, drops the description and folds the search into an icon |
-| app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by `AppHeader.MenuButton`, which shows itself below 768px; `BottomNav` in `AppShell.Footer` for 3–5 app sections on phones — flat or a floating glass capsule (`floating`), icons with or without labels (`iconOnly`); the shell hides it by itself while the Sidebar rail is on screen (from 768px with `offCanvas="auto"`) |
+| app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by `AppHeader.MenuButton`, which shows itself below 768px; `BottomNav` in `AppShell.Footer` for 2–6 app sections on phones — flat or a floating glass capsule (`floating`) with an optional round `BottomNav.Action`, icons with or without labels (`iconOnly`); the shell hides it by itself while the Sidebar rail is on screen (from 768px with `offCanvas="auto"`) |
 | page panel | `PageToolbar` — one row when wide, exactly two rows when narrow (below) |
 | page header | `PageContent.Header`: actions wrap under the title |
 | switchers | SegmentedControl and Tabs never wrap: they scroll inside themselves (hidden scrollbar), the active item is scrolled into view, stretched items tend to equal width, the indicator moves only after a person's choice; Tabs collapse icons and descriptions first |

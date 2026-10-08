@@ -94,7 +94,7 @@ Move between places: app navigation (side rail, bottom bar on phones), tabs, the
 | Pagination | Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view. | [COMPONENT.md](../src/components/pagination/COMPONENT.md) · [examples](../src/components/pagination/examples/) |
 | Stepper | Steps of a multi-step process with pending, active, completed and danger statuses. | [COMPONENT.md](../src/components/stepper/COMPONENT.md) · [examples](../src/components/stepper/examples/) |
 | Sidebar | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. | [COMPONENT.md](../src/layout/sidebar/COMPONENT.md) · [examples](../src/layout/sidebar/examples/) |
-| BottomNav | Phone navigation: 3–5 sections at the bottom, flat or a floating glass capsule, icons with or without labels. | [COMPONENT.md](../src/layout/bottom-nav/COMPONENT.md) · [examples](../src/layout/bottom-nav/examples/) |
+| BottomNav | Phone navigation: 2–6 sections at the bottom, flat or a floating glass capsule, icons with or without labels, an optional round action. | [COMPONENT.md](../src/layout/bottom-nav/COMPONENT.md) · [examples](../src/layout/bottom-nav/examples/) |
 
 ## Overlays (`overlays`)
 

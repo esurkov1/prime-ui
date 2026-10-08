@@ -3,6 +3,7 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import round from "@/internal/roundButton.module.css";
 import { Slot } from "@/internal/slot";
 import type { PaletteColor, Variant } from "@/internal/states";
 import { visuallyHiddenClass } from "@/internal/VisuallyHidden";
@@ -28,26 +29,100 @@ export type BottomNavRootProps = React.HTMLAttributes<HTMLElement> & {
   iconOnly?: boolean;
   /**
    * A glass capsule floating over the content (backdrop blur, inset from the edges) instead of
-   * a flat bar at the edge. It places itself at the bottom of its positioned container
-   * (`AppShell.Footer`), so the page scrolls under it.
+   * a flat bar at the edge, with a selection capsule that glides to the current item. It places
+   * itself at the bottom of its positioned container (`AppShell.Footer`), so the page scrolls
+   * under it.
    */
   floating?: boolean;
   labels?: Partial<BottomNavLabels>;
-  /** The `<nav>` bar. */
+  /** The `<nav>`. */
   ref?: React.Ref<HTMLElement>;
 };
 
+/** Toggles a boolean `data-*` flag without touching React state. */
+function setFlag(element: HTMLElement, name: string, on: boolean) {
+  if (on) element.setAttribute(name, "true");
+  else element.removeAttribute(name);
+}
+
 /**
- * Phone navigation: a bar of 3–5 sections at the bottom of the screen. Inside `AppShell.Footer`
- * it shows only while the Sidebar rail is off screen; once the rail is on screen, Sidebar navigates.
+ * Puts the selection capsule under the current item. It glides when the current item changes
+ * (a person's choice) and snaps on a layout change (resize, fonts, new items).
+ */
+function syncSelection(bar: HTMLElement, selection: HTMLElement, animate: boolean) {
+  const current = bar.querySelector<HTMLElement>('[aria-current="page"]');
+  if (!current) {
+    setFlag(selection, "data-visible", false);
+    setFlag(selection, "data-animate", false);
+    return;
+  }
+  const left = `${current.offsetLeft}px`;
+  const width = `${current.offsetWidth}px`;
+  if (selection.style.left !== left || selection.style.width !== width) {
+    setFlag(selection, "data-animate", animate && selection.hasAttribute("data-visible"));
+  }
+  selection.style.left = left;
+  selection.style.width = width;
+  setFlag(selection, "data-visible", true);
+}
+
+/** Actions before the first item stand at the start of the bar, the rest at its end. */
+function splitRootChildren(children: React.ReactNode) {
+  const start: React.ReactNode[] = [];
+  const items: React.ReactNode[] = [];
+  const end: React.ReactNode[] = [];
+  React.Children.forEach(children, (child) => {
+    if (React.isValidElement(child) && child.type === BottomNavAction) {
+      (items.length === 0 ? start : end).push(child);
+    } else {
+      items.push(child);
+    }
+  });
+  return { start, items, end };
+}
+
+/**
+ * Phone navigation: a bar of 2–6 sections at the bottom of the screen, optionally with a round
+ * action beside it. Inside `AppShell.Footer` it shows only while the Sidebar rail is off screen;
+ * once the rail is on screen, Sidebar navigates.
  */
 function BottomNavRoot({
   iconOnly = false,
   floating = false,
   labels,
   className,
+  children,
   ...rest
 }: BottomNavRootProps) {
+  const barRef = React.useRef<HTMLDivElement>(null);
+  const selectionRef = React.useRef<HTMLSpanElement>(null);
+  const { start, items, end } = splitRootChildren(children);
+
+  // The current item can change outside this render (a router link sets `aria-current` itself),
+  // so the capsule follows the attribute, not the props.
+  React.useLayoutEffect(() => {
+    const bar = barRef.current;
+    const selection = selectionRef.current;
+    if (!floating || !bar || !selection) return;
+    syncSelection(bar, selection, false);
+    const mutation = new MutationObserver(() => syncSelection(bar, selection, true));
+    mutation.observe(bar, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["aria-current"],
+    });
+    const resize =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(() => syncSelection(bar, selection, false));
+    resize?.observe(bar);
+    return () => {
+      mutation.disconnect();
+      resize?.disconnect();
+    };
+  }, [floating]);
+
   return (
     <IconOnlyContext.Provider value={iconOnly}>
       <nav
@@ -58,11 +133,45 @@ function BottomNavRoot({
           "icon-only": iconOnly || undefined,
           floating: floating || undefined,
         })}
-      />
+      >
+        {start}
+        <div ref={barRef} className={styles.bar}>
+          {floating ? (
+            <span ref={selectionRef} className={styles.selection} aria-hidden="true" />
+          ) : null}
+          {items}
+        </div>
+        {end}
+      </nav>
     </IconOnlyContext.Provider>
   );
 }
 BottomNavRoot.displayName = "BottomNav.Root";
+
+// ─── Action ───────────────────────────────────────────────────────────────────
+
+export type BottomNavActionProps = Omit<React.ComponentPropsWithoutRef<"button">, "children"> & {
+  /** The glyph, e.g. `<Icon name="action.add" />`. */
+  children: React.ReactNode;
+  /** The action has no visible text: `aria-label` names it. */
+  "aria-label": string;
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+/**
+ * A round button beside the bar for the screen's main action (create, search, assistant): in
+ * `floating` a glass disk as tall as the capsule, in a flat bar a soft disk at its edge.
+ */
+function BottomNavAction({ className, type, ...rest }: BottomNavActionProps) {
+  return (
+    <button
+      {...rest}
+      type={type ?? "button"}
+      className={cx(round.round, styles.action, className)}
+    />
+  );
+}
+BottomNavAction.displayName = "BottomNav.Action";
 
 // ─── Item parts ───────────────────────────────────────────────────────────────
 
@@ -129,7 +238,7 @@ function splitItemChildren(children: React.ReactNode, iconOnly: boolean) {
     <>
       <span className={iconOnly ? visuallyHiddenClass : styles.label}>{label}</span>
       {/* Keeps the words apart in the accessible name; a flex container renders no space. */}{" "}
-      <span className={styles.indicator}>{icon}</span>
+      <span className={styles.glyph}>{icon}</span>
     </>
   );
 }
@@ -226,4 +335,5 @@ export const BottomNav = {
   Item: BottomNavItem,
   ItemIcon: BottomNavItemIcon,
   ItemCount: BottomNavItemCount,
+  Action: BottomNavAction,
 };

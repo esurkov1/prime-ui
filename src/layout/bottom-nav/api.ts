@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "BottomNav.Root",
-      en: "`ref` → `HTMLElement`. The `<nav>` bar: equal columns, surface fill with a faint top divider, the bottom safe-area inset below the items. Inside `AppShell.Footer` it shows only while the shell has no Sidebar rail on screen (no `AppShell.Nav`, or the Sidebar is off-canvas).",
-      ru: "Полоса `<nav>`: равные колонки, заливка поверхности с тонким разделителем сверху, нижний безопасный отступ под пунктами. Внутри `AppShell.Footer` видна, только пока у каркаса нет рейла Sidebar на экране (нет `AppShell.Nav` или Sidebar выдвижной).",
+      en: "`ref` → `HTMLElement`. The `<nav>`: the bar of items (equal columns, surface fill with a faint top divider, the bottom safe-area inset below the items) and the actions beside it. Inside `AppShell.Footer` it shows only while the shell has no Sidebar rail on screen (no `AppShell.Nav`, or the Sidebar is off-canvas).",
+      ru: "`<nav>`: полоса пунктов (равные колонки, заливка поверхности с тонким разделителем сверху, нижний безопасный отступ под пунктами) и действия рядом с ней. Внутри `AppShell.Footer` видна, только пока у каркаса нет рейла Sidebar на экране (нет `AppShell.Nav` или Sidebar выдвижной).",
       props: [
         {
           name: "iconOnly",
@@ -18,8 +18,8 @@ export const api: ComponentApi = {
           name: "floating",
           type: "boolean",
           default: "false",
-          en: "A Liquid Glass capsule over the content (the iOS 26 tab bar): a clear `--prime-color-bg-glass` tint over a light backdrop blur, a specular top edge, a glass selection capsule under the current item, inset `--prime-bottom-nav-floating-inset` from the edges and above the home indicator. Positions itself at the bottom of its positioned container (`AppShell.Footer`, which then takes no height), so the page scrolls under it; with `iconOnly` the capsule hugs its square items, centred. Opaque under `prefers-reduced-transparency`.",
-          ru: "Капсула из «жидкого стекла» над содержимым, как панель вкладок iOS 26: прозрачная заливка с лёгким размытием, блик по верхней кромке, стеклянная капсула под текущим пунктом, с отступом от краёв экрана и над полоской «домой». Встаёт внизу своего позиционированного контейнера (`AppShell.Footer`, который тогда не занимает высоты), страница прокручивается под ней; с `iconOnly` капсула сжимается до квадратных пунктов по центру. При `prefers-reduced-transparency` — непрозрачная.",
+          en: "A glass capsule over the content: the iOS 26 tab bar at three quarters its size: a dense `--prime-color-bg-glass` tint over a strong backdrop blur with a hairline rim of light, 46 high (40 with `iconOnly`), across the width left beside its actions; the items share it equally. A selection capsule glides under the current item, an 18 icon over a 9 semibold label. A `BottomNav.Action` becomes a glass disk as tall as the capsule. Inset `--prime-bottom-nav-floating-inset` from the edges and above the home indicator; positions itself at the bottom of its positioned container (`AppShell.Footer`, which then takes no height), so the page scrolls under it. Opaque under `prefers-reduced-transparency`.",
+          ru: "Стеклянная капсула над содержимым: как панель вкладок iOS 26, на четверть меньше: плотная заливка с сильным размытием и тонким светлым ободком, высота 46 (40 с `iconOnly`), во всю ширину рядом с действиями; пункты делят её поровну. Под текущим пунктом скользит капсула выбора. `BottomNav.Action` становится стеклянным кругом высотой с капсулу. Отступает от краёв экрана и от полоски «домой»; встаёт внизу своего позиционированного контейнера (`AppShell.Footer`, который тогда не занимает высоты), страница прокручивается под ней. При `prefers-reduced-transparency` — непрозрачная.",
         },
         {
           name: "labels",
@@ -30,8 +30,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
-          en: "`children` (3–5 `BottomNav.Item`), `aria-label` (replaces `labels.nav`), `className` and the other attributes.",
-          ru: "`children` (3–5 `BottomNav.Item`), `aria-label` (заменяет `labels.nav`), `className` и остальные атрибуты.",
+          en: "`children` (2–6 `BottomNav.Item`, optional `BottomNav.Action` before or after them), `aria-label` (replaces `labels.nav`), `className` and the other attributes.",
+          ru: "`children` (2–6 `BottomNav.Item`, необязательный `BottomNav.Action` до или после них), `aria-label` (заменяет `labels.nav`), `className` и остальные атрибуты.",
         },
       ],
     },
@@ -44,8 +44,8 @@ export const api: ComponentApi = {
           name: "current",
           type: "boolean",
           default: "false",
-          en: 'Current section: `aria-current="page"`; the icon and the label turn primary (the others are muted).',
-          ru: 'Текущий раздел: `aria-current="page"`; иконка и подпись становятся основного цвета (остальные приглушены).',
+          en: 'Current section: `aria-current="page"`; the icon and the label turn primary (the others are muted); floating, the item is in the accent on the selection capsule (the others in full ink).',
+          ru: 'Текущий раздел: `aria-current="page"`; иконка и подпись становятся основного цвета (остальные приглушены); в капсуле — акцентного цвета на капсуле выбора (остальные основного).',
         },
         {
           name: "disabled",
@@ -132,6 +132,33 @@ export const api: ComponentApi = {
           type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children" | "color">',
           en: "`className` and the other span attributes.",
           ru: "`className` и остальные атрибуты span.",
+        },
+      ],
+    },
+    {
+      name: "BottomNav.Action",
+      en: '`ref` → `HTMLButtonElement`. A round `<button type="button">` beside the bar for the screen\'s main action (create, search, assistant): a soft disk at the edge of a flat bar, a glass disk as tall as the capsule when `floating`. Placed before the first item it stands at the start, otherwise at the end.',
+      ru: "Круглая кнопка рядом с полосой для главного действия экрана (создать, поиск, ассистент): мягкий круг у края плоской полосы, стеклянный круг высотой с капсулу при `floating`. Перед первым пунктом встаёт в начале, иначе в конце.",
+      props: [
+        {
+          name: "aria-label",
+          type: "string",
+          required: true,
+          en: "The name of the action: the button has no visible text.",
+          ru: "Имя действия: у кнопки нет видимого текста.",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: 'The glyph, e.g. `<Icon name="action.add" />`.',
+          ru: 'Значок, например `<Icon name="action.add" />`.',
+        },
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children">',
+          en: "`onClick`, `disabled`, `className` and the other button attributes.",
+          ru: "`onClick`, `disabled`, `className` и остальные атрибуты кнопки.",
         },
       ],
     },

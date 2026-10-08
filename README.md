@@ -233,7 +233,7 @@ accessibility, examples and common mistakes.
 | [**Pagination**](https://github.com/esurkov1/prime-ui/blob/main/src/components/pagination/COMPONENT.md) | Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view. |
 | [**Stepper**](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) | Steps of a multi-step process with pending, active, completed and danger statuses. |
 | [**Sidebar**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. |
-| [**BottomNav**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/bottom-nav/COMPONENT.md) | Phone navigation bar: 3–5 sections, flat or a floating glass capsule. |
+| [**BottomNav**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/bottom-nav/COMPONENT.md) | Phone navigation bar: 2–6 sections, flat or a floating glass capsule, with an optional round action. |
 
 ### Overlays (`overlays`)
 

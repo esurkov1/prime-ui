@@ -1,20 +1,26 @@
 /*
- * BottomNav — phone navigation bar. Equal columns, each a light icon (20) above a small label (10,
- * as the iOS tab bar) in a 52 bar; the current section is in the primary color, the others muted.
- * `iconOnly` hides the labels visually (they still name the items) and lowers the bar to 48;
- * `floating` turns the bar into an iOS 26 style glass capsule: a light blur, a clear tint, a
- * specular top edge, items 44 high inset 4, and a glass selection capsule under the current item
- * (icon-only: 44 squares). The bar sits on the surface with a faint top divider and keeps
- * the home-indicator inset (safe area) below its items. Inside `AppShell.Footer` it leaves while
- * the Sidebar rail is on screen (AppShell hides the footer): there Sidebar navigates.
+ * BottomNav — phone navigation. The `<nav>` holds the bar of items and, optionally, round actions
+ * beside it. Items are a light icon (20) above a small label (10, as the iOS tab bar) in equal
+ * columns; the current section is in the primary color, the others muted.
+ *
+ * Flat (default): a 52 bar at the edge on the surface with a faint top divider; it keeps the
+ * home-indicator inset (safe area) below its items. `iconOnly` hides the labels visually (they
+ * still name the items) and lowers the bar to 48.
+ *
+ * Floating (the iOS 26 tab bar): a glass capsule over the content with a hairline rim of light,
+ * 46 high (40 icons only), across the width left beside its actions; 18 glyphs over semibold 9
+ * labels, all in full ink, the current one in the accent on a selection capsule that glides to it.
+ * A `BottomNav.Action` is a glass disk as tall as the capsule.
+ *
+ * Inside `AppShell.Footer` the bar leaves while the Sidebar rail is on screen (AppShell hides the
+ * footer): there Sidebar navigates.
  */
 
 .root {
   box-sizing: border-box;
-  display: grid;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-  align-items: stretch;
+  display: flex;
+  align-items: center;
+  gap: var(--prime-bottom-nav-padding-x);
   width: 100%;
   min-height: var(--prime-bottom-nav-height);
   padding-inline: var(--prime-bottom-nav-padding-x);
@@ -28,79 +34,136 @@
   min-height: var(--prime-bottom-nav-icon-only-height);
 }
 
+/* The items: equal columns. */
+.bar {
+  position: relative;
+  display: grid;
+  flex: 1 1 auto;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  align-items: stretch;
+  align-self: stretch;
+  min-width: 0;
+}
+
+/* The action of a flat bar: a soft disk at the bar's edge. */
+.action {
+  --round-size: var(--prime-control-l-height);
+  --round-bg: var(--prime-color-fill-muted);
+  --round-bg-hover: var(--prime-color-fill-muted-hover);
+  --round-fg: var(--prime-color-text-primary);
+}
+
 /*
- * Floating: a glass capsule over the content, inset from the edges and above the home indicator.
- * It positions itself at the bottom of its container (AppShell.Footer), so the page scrolls under
- * it. Liquid Glass reads through a light blur and a clear tint; the glass itself is told by a
- * specular top edge, a hairline of ink around it and a soft lift — never a heavy frost.
+ * Floating: the capsule and its actions as one centred group over the content, inset from the
+ * edges and above the home indicator. It positions itself at the bottom of its container
+ * (AppShell.Footer), so the page scrolls under it; the gaps between the parts pass taps through.
  */
 .root[data-floating="true"] {
+  --bn-height: var(--prime-bottom-nav-floating-height);
+
   position: absolute;
   inset-inline: var(--prime-bottom-nav-floating-inset);
   bottom: calc(var(--prime-bottom-nav-floating-inset) + env(safe-area-inset-bottom, 0px));
-  grid-auto-rows: var(--prime-bottom-nav-floating-item-size);
+  gap: var(--prime-bottom-nav-floating-gap);
   width: auto;
   min-height: 0;
-  padding: var(--prime-bottom-nav-floating-padding);
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-bg-glass);
-  box-shadow:
-    inset 0 var(--prime-border-width) 0 var(--prime-color-bg-glass-edge),
-    inset 0 0 0 var(--prime-border-width)
-    color-mix(in srgb, var(--prime-color-text-primary) 6%, transparent),
-    var(--prime-shadow-overlay);
-  -webkit-backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
-  backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
-}
-
-/* Icons only: the capsule hugs its square items, centred. */
-.root[data-floating="true"][data-icon-only="true"] {
-  inset-inline: 0;
-  grid-auto-columns: var(--prime-bottom-nav-floating-item-size);
-  justify-content: center;
-  width: fit-content;
-  margin-inline: auto;
-}
-
-.root[data-floating="true"] .item {
-  isolation: isolate;
   padding: 0;
-  border-radius: var(--prime-radius-full);
+  background: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.root[data-floating="true"][data-icon-only="true"] {
+  --bn-height: var(--prime-bottom-nav-floating-icon-only-height);
 }
 
 /*
- * The selection capsule (iOS 26): a glass bubble of ink under the current item. It grows in from
- * 92% and fades in when an item becomes current, and leaves the same way (fast, enter easing);
- * under reduced motion the change is instant.
+ * The glass (iOS 26): a dense tint over a strong blur — the page shows through as soft shapes —
+ * and a soft lift. Told as glass by its rim (below).
  */
-.root[data-floating="true"] .item::before {
+.root[data-floating="true"] > .bar,
+.root[data-floating="true"] > .action {
+  box-shadow: var(--prime-shadow-overlay);
+  -webkit-backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
+  backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
+  pointer-events: auto;
+}
+
+/*
+ * The rim: a hairline of light that catches at the top-start and bottom-end corners and fades
+ * along the sides — a gradient ring cut out of a pseudo-element by a mask.
+ */
+.root[data-floating="true"] > .bar::before,
+.root[data-floating="true"] > .action::before {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 1;
+  padding: var(--prime-border-width);
   border-radius: inherit;
-  background: color-mix(in srgb, var(--prime-color-text-primary) 8%, transparent);
-  box-shadow: inset 0 var(--prime-border-width) 0
-    color-mix(in srgb, var(--prime-color-bg-glass-edge) 60%, transparent);
-  opacity: 0;
-  transform: scale(0.92);
-  transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-enter),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-enter);
+  background: linear-gradient(
+    135deg,
+    var(--prime-color-bg-glass-edge),
+    color-mix(in srgb, var(--prime-color-bg-glass-edge) 25%, transparent) 30%,
+    color-mix(in srgb, var(--prime-color-bg-glass-edge) 25%, transparent) 70%,
+    var(--prime-color-bg-glass-edge)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
-.root[data-floating="true"] .item[aria-current="page"]::before {
-  opacity: 1;
-  transform: none;
+/* Fills the width left beside the actions; the items share it equally. */
+.root[data-floating="true"] > .bar {
+  background: var(--prime-color-bg-glass);
+  grid-auto-rows: calc(var(--bn-height) - var(--prime-bottom-nav-floating-padding) * 2);
+  align-self: auto;
+  padding: var(--prime-bottom-nav-floating-padding);
+  border-radius: var(--prime-radius-full);
 }
 
 /* No see-through where the user asked for less transparency. */
 @media (prefers-reduced-transparency: reduce) {
-  .root[data-floating="true"] {
+  .root[data-floating="true"] > .bar,
+  .root[data-floating="true"] > .action {
+    --round-bg: var(--prime-color-layer-floating-bg);
+
     background: var(--prime-color-layer-floating-bg);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+}
+
+/*
+ * The selection capsule: a lighter wash of ink under the current item, no rim. It glides to the item a person picks; a layout change snaps it. It fades when nothing is
+ * current. Under reduced motion the durations are 0, so it jumps.
+ */
+.selection {
+  position: absolute;
+  top: var(--prime-bottom-nav-floating-padding);
+  bottom: var(--prime-bottom-nav-floating-padding);
+  left: 0;
+  border-radius: var(--prime-radius-full);
+  background: color-mix(in srgb, var(--prime-color-text-primary) 12%, transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.selection[data-visible="true"] {
+  opacity: 1;
+}
+
+/* Rides `left`/`width` like the SegmentedControl thumb: no composited layer over the labels. */
+.selection[data-animate="true"] {
+  transition:
+    left var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* ─── Item ───────────────────────────────────────────────────────────────── */
@@ -130,13 +193,14 @@
 }
 
 /* Holds the icon and the count's anchor; no fill of its own. */
-.indicator {
+.glyph {
   position: relative;
   display: grid;
   flex: none;
   place-items: center;
-  width: var(--prime-bottom-nav-indicator-width);
-  height: var(--prime-bottom-nav-indicator-height);
+  width: var(--prime-bottom-nav-glyph-width);
+  height: var(--prime-bottom-nav-glyph-height);
+  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .icon {
@@ -145,8 +209,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--prime-bottom-nav-icon-size);
-  height: var(--prime-bottom-nav-icon-size);
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
 }
 
 .icon > svg {
@@ -173,8 +237,8 @@
 }
 
 /* ─── States ─────────────────────────────────────────────────────────────
- * Two states only: current and not. No hover, no pill, no press fill — the current section is
- * the one in the primary color.
+ * Two states only: current and not. No hover fill — the current section is the one in the
+ * primary color (and, floating, on the selection capsule).
  */
 
 .item[aria-current="page"] {
@@ -189,4 +253,60 @@
 .item[data-disabled="true"] {
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
+}
+
+/* ─── Floating items ─────────────────────────────────────────────────────── */
+
+/*
+ * As the iOS tab bar: every section in full ink on the glass, the current one in the accent over
+ * the selection capsule (the capsule, not the hue alone, tells it); an 18 glyph over a semibold
+ * 9 label.
+ */
+.root[data-floating="true"] .item {
+  gap: var(--prime-bottom-nav-floating-item-gap);
+  padding: 0 var(--prime-space-1);
+  border-radius: var(--prime-radius-full);
+  color: var(--prime-color-text-primary);
+}
+
+.root[data-floating="true"] .item[aria-current="page"] {
+  color: var(--prime-color-accent-text);
+}
+
+.root[data-floating="true"] .glyph {
+  width: calc(var(--prime-bottom-nav-floating-icon-size) + var(--prime-space-2));
+  height: var(--prime-bottom-nav-floating-icon-size);
+}
+
+.root[data-floating="true"] .icon {
+  --prime-icon-size: var(--prime-bottom-nav-floating-icon-size);
+}
+
+.root[data-floating="true"] .label {
+  font-size: var(--prime-bottom-nav-floating-label-size);
+  font-weight: var(--prime-font-weight-semibold);
+  line-height: var(--prime-bottom-nav-floating-label-line-height);
+}
+
+.root[data-floating="true"] .item[data-disabled="true"] {
+  color: var(--prime-color-text-disabled);
+}
+
+/* The glyph gives under the finger. */
+.root[data-floating="true"] .item:not([data-disabled="true"]):active .glyph {
+  transform: scale(var(--prime-motion-press-scale-compact));
+}
+
+/* ─── Action ─────────────────────────────────────────────────────────────── */
+
+/* Floating: a glass disk as tall as the capsule. */
+.root[data-floating="true"] > .action {
+  --round-size: var(--bn-height);
+  --round-bg: var(--prime-color-bg-glass);
+  --round-bg-hover: color-mix(
+    in srgb,
+    var(--prime-color-text-primary) 8%,
+    var(--prime-color-bg-glass)
+  );
+  --prime-icon-size: var(--prime-bottom-nav-floating-icon-size);
 }

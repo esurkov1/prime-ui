@@ -91,6 +91,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(Badge.Root);
     takesRef(Badge.Icon);
     takesRef(Badge.Dot);
+    takesRef(BottomNav.Action);
     takesRef(Badge.Action);
     takesRef(Banner.Root);
     takesRef(Banner.Content);

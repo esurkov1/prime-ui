@@ -89,7 +89,7 @@ export function AppLayout({ title, onSearch, children }: AppLayoutProps) {
 }
 ```
 
-Phone navigation for 3–5 main sections is a `BottomNav.Root` in `AppShell.Footer` (the last child of
+Phone navigation for 2–6 main sections is a `BottomNav.Root` in `AppShell.Footer` (the last child of
 `AppShell.Root`, or the Template `footer` prop) — never in Main, never `position: fixed`, never behind
 your own media query. The shell hides the footer while the Sidebar rail is on screen and shows it
 while the Sidebar is off-canvas, so the bar and the rail never appear together.
