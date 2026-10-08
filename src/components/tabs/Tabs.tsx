@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { prefersReducedMotion } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -26,8 +27,10 @@ const [TabsProvider, useTabsContext] = createComponentContext<TabsContextValue>(
 /** Id of the item, used to keep the description out of the accessible name. */
 const ItemIdContext = React.createContext<string | null>(null);
 
-const tabId = (rootId: string, value: string) => `prime-ui-kit-tab-${rootId}-${value}`;
-const panelId = (rootId: string, value: string) => `prime-ui-kit-panel-${rootId}-${value}`;
+/** A value as an id fragment: idrefs are space-separated, so spaces and symbols are replaced. */
+const idPart = (value: string) => value.replace(/[^A-Za-z0-9_-]/g, "_");
+const tabId = (rootId: string, value: string) => `prime-ui-kit-tab-${rootId}-${idPart(value)}`;
+const panelId = (rootId: string, value: string) => `prime-ui-kit-panel-${rootId}-${idPart(value)}`;
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
@@ -84,53 +87,61 @@ export type TabsListProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-type IndicatorRect = { left: number; top: number; width: number; height: number };
+/**
+ * Places the indicator under / behind the selected tab and keeps exactly one tab stop: the
+ * selected tab, or the first enabled one while nothing is selected. Written straight to the DOM:
+ * measuring never re-renders the items.
+ */
+function syncList(
+  list: HTMLElement,
+  indicator: HTMLElement,
+  activeValue: string,
+  isBar: boolean,
+): void {
+  const tabs = [...list.querySelectorAll<HTMLElement>('[role="tab"]')];
+  const active = tabs.find((tab) => tab.dataset.value === activeValue);
+  const stop = active ?? tabs.find((tab) => tab.dataset.disabled !== "true");
+  for (const tab of tabs) tab.tabIndex = tab === stop ? 0 : -1;
 
-const EMPTY_RECT: IndicatorRect = { left: 0, top: 0, width: 0, height: 0 };
-
-const sameRect = (a: IndicatorRect, b: IndicatorRect) =>
-  a.left === b.left && a.top === b.top && a.width === b.width && a.height === b.height;
+  let left = active?.offsetLeft ?? 0;
+  let width = active?.offsetWidth ?? 0;
+  const top = active?.offsetTop ?? 0;
+  const height = active?.offsetHeight ?? 0;
+  // The underline bar spans the item's content box so it lines up with the text.
+  if (active && isBar) {
+    const style = getComputedStyle(active);
+    const padStart = Number.parseFloat(style.paddingLeft) || 0;
+    const padEnd = Number.parseFloat(style.paddingRight) || 0;
+    left += padStart;
+    width -= padStart + padEnd;
+  }
+  indicator.style.transform = isBar ? `translateX(${left}px)` : `translate(${left}px, ${top}px)`;
+  indicator.style.width = `${width}px`;
+  indicator.style.height = isBar ? "" : `${height}px`;
+  indicator.dataset.visible = String(width > 0 && height > 0);
+}
 
 function TabsList({ children, className, ref, ...rest }: TabsListProps) {
   const { orientation, activeValue, onSelect, size } = useTabsContext();
   const listRef = React.useRef<HTMLDivElement>(null);
+  const indicatorRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(listRef, ref);
-  const [indicator, setIndicator] = React.useState<IndicatorRect>(EMPTY_RECT);
   const isBar = orientation === "horizontal";
 
   React.useLayoutEffect(() => {
     const list = listRef.current;
-    if (!list) return;
-
-    const update = () => {
-      const active = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
-      let next = EMPTY_RECT;
-      if (active) {
-        next = {
-          left: active.offsetLeft,
-          top: active.offsetTop,
-          width: active.offsetWidth,
-          height: active.offsetHeight,
-        };
-        // The underline bar spans the item's content box so it lines up with the text.
-        if (isBar) {
-          const style = getComputedStyle(active);
-          const padStart = Number.parseFloat(style.paddingLeft) || 0;
-          const padEnd = Number.parseFloat(style.paddingRight) || 0;
-          next = { ...next, left: next.left + padStart, width: next.width - padStart - padEnd };
-        }
-      }
-      setIndicator((prev) => (sameRect(prev, next) ? prev : next));
-    };
-
+    const indicator = indicatorRef.current;
+    if (!list || !indicator) return;
+    const update = () => syncList(list, indicator, activeValue, isBar);
     update();
+    // Tabs added, removed, disabled or renamed, and the list resizing, move the indicator too.
     const mutations = new MutationObserver(update);
     mutations.observe(list, {
       subtree: true,
       childList: true,
       characterData: true,
       attributes: true,
-      attributeFilter: ["aria-selected", "data-disabled"],
+      attributeFilter: ["data-disabled"],
     });
     const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
     resize?.observe(list);
@@ -138,19 +149,17 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
       mutations.disconnect();
       resize?.disconnect();
     };
-  }, [isBar]);
+  }, [activeValue, isBar]);
 
   // Keep the active tab visible inside a scrolling list.
   React.useEffect(() => {
     const list = listRef.current;
     if (!list || !activeValue || list.scrollWidth <= list.clientWidth) return;
     const active = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
-    if (typeof active?.scrollIntoView !== "function") return;
-    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    active.scrollIntoView({
+    active?.scrollIntoView({
       block: "nearest",
       inline: "nearest",
-      behavior: reduceMotion ? "auto" : "smooth",
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
   }, [activeValue]);
 
@@ -169,8 +178,6 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
     tabs[next].focus();
   }
 
-  const hasIndicator = indicator.width > 0 && indicator.height > 0;
-
   return (
     <ScrollContainer
       {...rest}
@@ -186,18 +193,9 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
     >
       {/* First in DOM order so it always paints below the items. */}
       <div
+        ref={indicatorRef}
         className={cx(styles.indicator, isBar ? styles.indicatorBar : styles.indicatorPill)}
-        style={
-          isBar
-            ? { transform: `translateX(${indicator.left}px)`, width: indicator.width }
-            : {
-                transform: `translate(${indicator.left}px, ${indicator.top}px)`,
-                width: indicator.width,
-                height: indicator.height,
-              }
-        }
         aria-hidden="true"
-        data-visible={hasIndicator}
       />
       <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
     </ScrollContainer>
