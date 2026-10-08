@@ -95,7 +95,10 @@ export const page: ComponentPageConfig = {
       },
       { keys: "Delete · Backspace", action: "На триггере с `clearable` очищают значение." },
       { keys: "Escape", action: "Закрывает список; фокус возвращается на триггер." },
-      { keys: "Tab", action: "Закрывает список и переходит дальше." },
+      {
+        keys: "Tab",
+        action: "Возвращает фокус на триггер, закрывает список и переходит дальше от триггера.",
+      },
     ],
     aria: [
       'Триггер — `role="combobox"` с `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`; имя — `label`.',

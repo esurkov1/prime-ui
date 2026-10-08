@@ -1,13 +1,5 @@
 export type { ControlSizeProviderProps } from "../internal/ControlSizeContext";
 export { ControlSizeProvider, useOptionalControlSize } from "../internal/ControlSizeContext";
-export type {
-  OverlayPortalLayer,
-  OverlayPortalLayerProviderProps,
-} from "../internal/OverlayPortalLayerContext";
-export {
-  OverlayPortalLayerProvider,
-  useOverlayPortalLayer,
-} from "../internal/OverlayPortalLayerContext";
 export type { ProgressSegment } from "../internal/progressSegments";
 export * from "../layout";
 export type {

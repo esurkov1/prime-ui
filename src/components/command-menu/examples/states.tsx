@@ -1,4 +1,4 @@
-/** A disabled item never shows in the results, and an empty result speaks in the words of the task — `disabled`, `labels`. */
+/** A disabled item stays visible but muted and is skipped by the arrows, and an empty result speaks in the words of the task — `disabled`, `labels`. */
 import { Button, CommandMenu } from "prime-ui-kit";
 import * as React from "react";
 

@@ -111,21 +111,3 @@
 .content[data-side="right"] .arrow {
   right: var(--tt-arrow-out);
 }
-
-/* ─── Layers ─────────────────────────────────────────────────────────────── */
-
-.content[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-z-tooltip);
-}
-
-.content[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-z-tooltip-in-drawer);
-}
-
-.content[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-z-tooltip-in-modal);
-}
-
-.content[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-z-tooltip-in-drawer-in-modal);
-}

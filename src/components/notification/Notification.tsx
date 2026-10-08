@@ -5,7 +5,7 @@ import { Button } from "@/components/button/Button";
 import { Icon, type IconName } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
+import { type ControlSize, type PaletteColor, stepDown, type Tone } from "@/internal/states";
 
 import styles from "./Notification.module.css";
 
@@ -97,24 +97,6 @@ export type NotificationRecord = NotificationOptions & {
   createdAt: number;
 };
 
-/** Action button sits one tier below the card (pairing rule for nested controls). */
-const STEP_DOWN: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "s",
-  l: "m",
-  xl: "l",
-};
-
-/** The close button is a compact ghost button; never under `xs`. */
-const CLOSE_SIZE: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "xs",
-  l: "s",
-  xl: "s",
-};
-
 const TONE_ICON: Record<NotificationTone, IconName> = {
   info: "status.info",
   success: "status.success",
@@ -139,11 +121,18 @@ type CardViewProps = NotificationContent &
     className?: string;
     /** Close button handler; no button without it. */
     onClose?: () => void;
-    /** Countdown share 0–1; no countdown line when undefined. */
-    progress?: number;
+    /** The auto-close countdown line; none when undefined. */
+    countdown?: Countdown;
     stackDepth?: number;
     stackExpanded?: boolean;
   };
+
+type Countdown = {
+  duration: number;
+  paused: boolean;
+  /** The line ran out: the toast expires. */
+  onEnd: () => void;
+};
 
 function CardView({
   tone = "info",
@@ -155,7 +144,7 @@ function CardView({
   action,
   className,
   onClose,
-  progress,
+  countdown,
   stackDepth = 0,
   stackExpanded = false,
   ...rest
@@ -172,7 +161,7 @@ function CardView({
       {...toDataAttributes({
         tone,
         size,
-        persistent: progress === undefined,
+        persistent: countdown === undefined,
         "stack-depth": stackDepth,
         "stack-expanded": stackExpanded,
       })}
@@ -195,7 +184,7 @@ function CardView({
             <Button.Root
               variant="soft"
               tone="neutral"
-              size={STEP_DOWN[size]}
+              size={stepDown(size)}
               onClick={action.onClick}
             >
               {action.label}
@@ -207,7 +196,7 @@ function CardView({
         <Button.Root
           variant="ghost"
           tone="neutral"
-          size={CLOSE_SIZE[size]}
+          size={stepDown(size, 2)}
           aria-label={labels.close}
           onClick={onClose}
         >
@@ -216,9 +205,19 @@ function CardView({
           </Button.Icon>
         </Button.Root>
       ) : null}
-      {progress !== undefined ? (
+      {countdown ? (
         <div className={styles.progressTrack} aria-hidden="true">
-          <span className={styles.progressValue} style={{ transform: `scaleX(${progress})` }} />
+          {/* A CSS animation: no per-frame JS; it stops in place while paused. */}
+          <span
+            className={styles.progressValue}
+            style={{
+              animationDuration: `${countdown.duration}ms`,
+              animationPlayState: countdown.paused ? "paused" : "running",
+            }}
+            onAnimationEnd={(event) => {
+              if (event.target === event.currentTarget) countdown.onEnd();
+            }}
+          />
         </div>
       ) : null}
     </article>
@@ -239,71 +238,18 @@ export function NotificationCard({ onDismiss, ...props }: NotificationCardProps)
   return <CardView {...props} onClose={onDismiss} />;
 }
 
-function isDocumentHidden(): boolean {
-  return typeof document !== "undefined" && document.visibilityState === "hidden";
+function subscribeVisibility(listener: () => void) {
+  document.addEventListener("visibilitychange", listener);
+  return () => document.removeEventListener("visibilitychange", listener);
 }
 
-/*
- * Countdown lives in the card so progress re-renders never reach the stack item. It stops while
- * `paused` (hover, focus, swipe) and while the document is hidden; after either it resumes from
- * where it stopped instead of counting the time away.
- */
-function useCountdown(
-  item: NotificationRecord,
-  paused: boolean,
-  onExpire: (id: string) => void,
-): number {
-  const [progress, setProgress] = React.useState(1);
-  const remainingRef = React.useRef(item.duration);
-  const lastTsRef = React.useRef<number | null>(null);
-  const pausedRef = React.useRef(paused);
-  const onExpireRef = React.useRef(onExpire);
-
-  pausedRef.current = paused;
-  onExpireRef.current = onExpire;
-
-  React.useEffect(() => {
-    if (item.persistent || item.duration <= 0) return;
-
-    remainingRef.current = item.duration;
-    lastTsRef.current = null;
-    setProgress(1);
-
-    let frame: number;
-    let cancelled = false;
-
-    const tick = (now: number) => {
-      if (cancelled) return;
-      const hidden = isDocumentHidden();
-      if (lastTsRef.current !== null && !pausedRef.current && !hidden) {
-        const delta = now - lastTsRef.current;
-        remainingRef.current = Math.max(0, remainingRef.current - delta);
-        setProgress(remainingRef.current / item.duration);
-        if (remainingRef.current <= 0) {
-          onExpireRef.current(item.id);
-          return;
-        }
-      }
-      lastTsRef.current = hidden ? null : now;
-      frame = requestAnimationFrame(tick);
-    };
-
-    // Browsers throttle frames in background tabs: restart the delta so the hidden time is not
-    // charged against the toast when the tab comes back.
-    const onVisibilityChange = () => {
-      lastTsRef.current = null;
-    };
-
-    frame = requestAnimationFrame(tick);
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(frame);
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-    };
-  }, [item.id, item.duration, item.persistent]);
-
-  return progress;
+/** The tab is in the background: countdowns stop and resume where they stopped. */
+function useDocumentHidden(): boolean {
+  return React.useSyncExternalStore(
+    subscribeVisibility,
+    () => document.visibilityState === "hidden",
+    () => false,
+  );
 }
 
 type ToastCardProps = {
@@ -314,9 +260,13 @@ type ToastCardProps = {
   stackExpanded: boolean;
 };
 
-/** A live toast in a provider stack: the card with its countdown. */
+/**
+ * A live toast in a provider stack: the card with its countdown. The countdown stops while
+ * `paused` (hover, focus, swipe) and while the document is hidden.
+ */
 export function ToastCard({ item, paused, onDismiss, stackDepth, stackExpanded }: ToastCardProps) {
-  const progress = useCountdown(item, paused, onDismiss);
+  const hidden = useDocumentHidden();
+  const timed = !item.persistent && item.duration > 0;
   return (
     <CardView
       tone={item.tone}
@@ -327,7 +277,11 @@ export function ToastCard({ item, paused, onDismiss, stackDepth, stackExpanded }
       badge={item.badge}
       action={item.action}
       onClose={item.closable ? () => onDismiss(item.id) : undefined}
-      progress={item.persistent ? undefined : progress}
+      countdown={
+        timed
+          ? { duration: item.duration, paused: paused || hidden, onEnd: () => onDismiss(item.id) }
+          : undefined
+      }
       stackDepth={stackDepth}
       stackExpanded={stackExpanded}
     />

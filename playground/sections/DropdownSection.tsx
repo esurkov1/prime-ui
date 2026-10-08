@@ -59,7 +59,11 @@ export const page: ComponentPageConfig = {
   api,
   accessibility: {
     keyboard: [
-      { keys: "Enter · Space", action: "На триггере открывает меню; на пункте выполняет его." },
+      {
+        keys: "Enter · Space",
+        action:
+          "На триггере открывает меню (фокус на первом пункте); на пункте выполняет его и возвращает фокус на триггер.",
+      },
       {
         keys: "ArrowDown · ArrowUp",
         action: "Переводят фокус на следующий / предыдущий доступный пункт по кругу.",
@@ -68,6 +72,10 @@ export const page: ComponentPageConfig = {
       {
         keys: "Escape",
         action: "Закрывает меню (`closeOnEscape`); фокус возвращается на триггер.",
+      },
+      {
+        keys: "Tab · Shift+Tab",
+        action: "Закрывает меню; фокус возвращается на триггер (Tab затем идёт дальше).",
       },
     ],
     aria: [

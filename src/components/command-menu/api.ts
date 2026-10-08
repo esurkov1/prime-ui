@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "CommandMenu.Root",
-      en: "`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; holds the query and the active item while open (a new opening starts empty, focus in the search field).",
-      ru: "Палитра на основе Modal: панель сверху, запрос и активный пункт живут, пока она открыта.",
+      en: "`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; owns the query (cleared on close) and the active item (a new opening starts empty, focus in the search field).",
+      ru: "Палитра на основе Modal: панель сверху; хранит запрос (сбрасывается при закрытии) и активный пункт.",
       props: [
         {
           name: "open",
@@ -25,6 +25,25 @@ export const api: ComponentApi = {
           type: "(open: boolean) => void",
           en: "Called on every open and close: Escape, scrim click, code.",
           ru: "Вызывается при каждом открытии и закрытии: Escape, клик по подложке, код.",
+        },
+        {
+          name: "value",
+          type: "string",
+          en: "Controlled query; the list filters by it. Together with `onValueChange`.",
+          ru: "Управляемый запрос; список фильтруется по нему. Вместе с `onValueChange`.",
+        },
+        {
+          name: "defaultValue",
+          type: "string",
+          default: '""',
+          en: "Initial query, uncontrolled.",
+          ru: "Начальный запрос без контроля.",
+        },
+        {
+          name: "onValueChange",
+          type: "(value: string) => void",
+          en: 'Called with the new query: typing, and `""` when the palette closes.',
+          ru: 'Вызывается с новым запросом: ввод и `""` при закрытии палитры.',
         },
         {
           name: "closeOnOutsideClick",
@@ -82,21 +101,9 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Input",
-      en: '`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; no focus ring (the caret is the indicator). + native input props.',
-      ru: 'Строка поиска: иконка и поле `role="combobox"`; стрелки, Home, End и Enter управляют списком.',
+      en: '`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; shows `CommandMenu.Root` `value`; takes focus on open; no focus ring (the caret is the indicator). + native input props except `value` / `defaultValue`.',
+      ru: 'Строка поиска: иконка и поле `role="combobox"` с запросом из `CommandMenu.Root`; стрелки, Home, End и Enter управляют списком.',
       props: [
-        {
-          name: "value",
-          type: "string",
-          en: "Controlled query; the list filters by it.",
-          ru: "Управляемый запрос; список фильтруется по нему.",
-        },
-        {
-          name: "onValueChange",
-          type: "(value: string) => void",
-          en: "Called with the new query; native `onChange` still fires.",
-          ru: "Вызывается с новым запросом; нативный `onChange` тоже срабатывает.",
-        },
         {
           name: "placeholder",
           type: "string",
@@ -153,8 +160,8 @@ export const api: ComponentApi = {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "Never shows in the results.",
-          ru: "Не попадает в результаты.",
+          en: "Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, does not run.",
+          ru: "Недоступна сейчас: видна приглушённой с `aria-disabled`, стрелки её пропускают, не выполняется.",
         },
       ],
     },

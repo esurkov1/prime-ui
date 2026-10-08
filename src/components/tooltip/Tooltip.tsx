@@ -1,22 +1,12 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
-import {
-  type PositionAlign,
-  type PositionSide,
-  readCssLengthPx,
-  usePosition,
-} from "@/hooks/usePosition";
-import { usePresence } from "@/hooks/usePresence";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { type PositionAlign, type PositionSide, readCssLengthPx } from "@/hooks/usePosition";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { mergeRefs } from "@/internal/mergeRefs";
-import { useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
-import overlayMotion from "@/internal/overlayMotion.module.css";
-import { Portal } from "@/internal/Portal";
+import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
+import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Tooltip.module.css";
@@ -192,9 +182,6 @@ function TooltipRoot({
 
   React.useEffect(() => () => clearTimeout(timerRef.current), []);
 
-  /* WAI-ARIA tooltip: Escape hides it, focus stays on the trigger. */
-  useEscapeKey({ enabled: isOpen, onEscape: close });
-
   const value = React.useMemo(
     () => ({
       isOpen,
@@ -217,51 +204,51 @@ function TooltipRoot({
 export type TooltipTriggerProps = {
   /** One focusable element: a Button, or a `tabIndex={0}` wrapper around a disabled control. */
   children: React.ReactElement;
-};
+  ref?: React.Ref<HTMLElement>;
+} & Omit<React.HTMLAttributes<HTMLElement>, "children">;
 
-type TriggerChildProps = React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> };
-
-// Not `Slot`: the tooltip id is appended to the child's own `aria-describedby`, not replaced by it.
-function TooltipTrigger({ children }: TooltipTriggerProps) {
+/**
+ * The tooltip id joins the child's own `aria-describedby`; the child's handlers run first. Other
+ * props (handlers, ARIA, `ref`) are forwarded to the child.
+ */
+function TooltipTrigger({ children, ...forwarded }: TooltipTriggerProps) {
   const { isOpen, triggerRef, contentId, scheduleOpen, scheduleClose, close } =
     useTooltipRootContext();
-  const props = children.props as TriggerChildProps;
   /* A press hides the tooltip and the focus it causes must not reopen it (until the pointer leaves). */
   const pressedRef = React.useRef(false);
-  const ref = React.useMemo(() => mergeRefs(props.ref, triggerRef), [props.ref, triggerRef]);
 
-  return React.cloneElement(children as React.ReactElement<TriggerChildProps>, {
-    ref,
-    "aria-describedby":
-      [props["aria-describedby"], isOpen ? contentId : undefined].filter(Boolean).join(" ") ||
-      undefined,
-    ...toDataAttributes({ state: isOpen ? "open" : "closed" }),
-    onPointerEnter: (e: React.PointerEvent<HTMLElement>) => {
-      props.onPointerEnter?.(e);
-      // Touch has no hover: a tap must not leave a tooltip behind. Focus still opens it.
-      if (e.pointerType === "touch") return;
-      if (!pressedRef.current) scheduleOpen();
-    },
-    onPointerLeave: (e: React.PointerEvent<HTMLElement>) => {
-      props.onPointerLeave?.(e);
-      pressedRef.current = false;
-      scheduleClose();
-    },
-    onPointerDown: (e: React.PointerEvent<HTMLElement>) => {
-      props.onPointerDown?.(e);
-      pressedRef.current = true;
-      close();
-    },
-    onFocus: (e: React.FocusEvent<HTMLElement>) => {
-      props.onFocus?.(e);
-      if (!pressedRef.current) scheduleOpen();
-    },
-    onBlur: (e: React.FocusEvent<HTMLElement>) => {
-      props.onBlur?.(e);
-      pressedRef.current = false;
-      close();
-    },
-  });
+  return (
+    <FloatingTrigger
+      {...forwarded}
+      triggerProps={{
+        ref: triggerRef,
+        "aria-describedby": isOpen ? contentId : undefined,
+        ...toDataAttributes({ state: isOpen ? "open" : "closed" }),
+        onPointerEnter: (e: React.PointerEvent<HTMLElement>) => {
+          // Touch has no hover: a tap must not leave a tooltip behind. Focus still opens it.
+          if (e.pointerType === "touch") return;
+          if (!pressedRef.current) scheduleOpen();
+        },
+        onPointerLeave: () => {
+          pressedRef.current = false;
+          scheduleClose();
+        },
+        onPointerDown: () => {
+          pressedRef.current = true;
+          close();
+        },
+        onFocus: () => {
+          if (!pressedRef.current) scheduleOpen();
+        },
+        onBlur: () => {
+          pressedRef.current = false;
+          close();
+        },
+      }}
+    >
+      {children}
+    </FloatingTrigger>
+  );
 }
 
 // ─── Arrow ────────────────────────────────────────────────────────────────────
@@ -300,67 +287,52 @@ function TooltipContent({
   side = "top",
   align = "center",
   className,
-  style,
-  ref,
   ...rest
 }: TooltipContentProps) {
-  const { isOpen, instant, triggerRef, contentId, scheduleClose, cancelPending } =
+  const { isOpen, instant, triggerRef, contentId, scheduleClose, cancelPending, close } =
     useTooltipRootContext();
-  const overlayPortalLayer = useOverlayPortalLayer();
-  const contentRef = React.useRef<HTMLElement | null>(null);
-  const presence = usePresence(isOpen, { exitDuration: "fast" });
-  // A tooltip replaced by its neighbour leaves at once instead of fading under the new one.
-  const mounted = presence.mounted && (isOpen || !instant);
-  // Placed before paint, so the chip never shows up in the wrong place.
-  const position = usePosition(mounted, triggerRef, contentRef, {
+  // A passive layer: placed before paint, never takes focus or presses; Escape hides it and focus
+  // stays on the trigger (WAI-ARIA tooltip). Replaced by its neighbour, it leaves at once.
+  const floating = useFloatingLayer({
+    open: isOpen,
+    onOpenChange: (open) => {
+      if (!open) close();
+    },
+    triggerRef,
     side,
     align,
     offsetToken: "--prime-tooltip-offset",
     arrowInset,
+    dismiss: "none",
+    skipExit: instant,
   });
-  const mergedRef = React.useMemo(
-    () => mergeRefs<HTMLDivElement>(position.attachLayer, ref),
-    [position.attachLayer, ref],
-  );
 
-  if (!mounted) return null;
-
-  const arrow = ARROW_PATH[position.side];
+  const arrow = ARROW_PATH[floating.side];
 
   return (
-    <Portal>
-      <div
-        {...rest}
-        ref={mergedRef}
-        id={contentId}
-        role="tooltip"
-        data-overlay-portal-layer={overlayPortalLayer}
-        className={cx(styles.content, overlayMotion.floating, className)}
-        style={style}
-        onAnimationEnd={presence.onExitEnd}
-        onPointerEnter={cancelPending}
-        onPointerLeave={scheduleClose}
-        {...toDataAttributes({
-          state: presence.state,
-          size,
-          /* Resolved side: flips to the opposite one when the requested side does not fit. */
-          side: position.side,
-          align,
-          instant: instant ? true : undefined,
-        })}
+    <FloatingPanel
+      {...rest}
+      floating={floating}
+      size={size}
+      surface={false}
+      id={contentId}
+      role="tooltip"
+      className={cx(styles.content, className)}
+      onPointerEnter={cancelPending}
+      onPointerLeave={scheduleClose}
+      {...toDataAttributes({ align, instant: instant ? true : undefined })}
+    >
+      {children}
+      <svg
+        className={styles.arrow}
+        viewBox={arrow.viewBox}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        focusable="false"
       >
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-        <svg
-          className={styles.arrow}
-          viewBox={arrow.viewBox}
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path d={arrow.d} />
-        </svg>
-      </div>
-    </Portal>
+        <path d={arrow.d} />
+      </svg>
+    </FloatingPanel>
   );
 }
 

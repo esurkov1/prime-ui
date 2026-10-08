@@ -401,21 +401,7 @@
   --prime-tooltip-padding-y: var(--prime-ref-space-1);
   --prime-tooltip-radius: var(--prime-ref-radius-6);
   --prime-z-base: var(--prime-ref-z-index-base);
-  --prime-z-drawer: var(--prime-ref-z-index-drawer);
-  --prime-z-drawer-nested-shell: var(--prime-ref-z-index-drawer-nested-shell);
-  --prime-z-dropdown: var(--prime-ref-z-index-dropdown);
-  --prime-z-dropdown-in-drawer: var(--prime-ref-z-index-dropdown-in-drawer);
-  --prime-z-dropdown-in-drawer-in-modal: var(--prime-ref-z-index-dropdown-in-drawer-in-modal);
-  --prime-z-dropdown-in-modal: var(--prime-ref-z-index-dropdown-in-modal);
-  --prime-z-modal: var(--prime-ref-z-index-modal);
-  --prime-z-popover: var(--prime-ref-z-index-popover);
-  --prime-z-popover-in-drawer: var(--prime-ref-z-index-popover-in-drawer);
-  --prime-z-popover-in-drawer-in-modal: var(--prime-ref-z-index-popover-in-drawer-in-modal);
-  --prime-z-popover-in-modal: var(--prime-ref-z-index-popover-in-modal);
+  --prime-z-overlay: var(--prime-ref-z-index-overlay);
   --prime-z-sticky: var(--prime-ref-z-index-sticky);
   --prime-z-toast: var(--prime-ref-z-index-toast);
-  --prime-z-tooltip: var(--prime-ref-z-index-tooltip);
-  --prime-z-tooltip-in-drawer: var(--prime-ref-z-index-tooltip-in-drawer);
-  --prime-z-tooltip-in-drawer-in-modal: var(--prime-ref-z-index-tooltip-in-drawer-in-modal);
-  --prime-z-tooltip-in-modal: var(--prime-ref-z-index-tooltip-in-modal);
 }

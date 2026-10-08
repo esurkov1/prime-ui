@@ -7,7 +7,7 @@ import { Popover } from "@/components/popover/Popover";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
-import { useOverlayModal } from "@/hooks/useOverlayModal";
+import { useModalLayer } from "@/hooks/useModalLayer";
 import { Icon } from "@/icons";
 import { AnchorRectProvider, type AnchorRectResolver } from "@/internal/AnchorRectContext";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -15,6 +15,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { mergeRefs } from "@/internal/mergeRefs";
+import { LayerProvider } from "@/internal/overlay/layerStack";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
@@ -234,7 +235,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   }
 
   const close = React.useCallback(() => setOpen(false), [setOpen]);
-  const panelRef = useOverlayModal<HTMLElement>(open, close);
+  const { ref: panelRef, layer } = useModalLayer<HTMLElement>({ open, onDismiss: close });
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const mergedRootRef = React.useMemo(() => mergeRefs<HTMLDivElement>(ref, rootRef), [ref]);
 
@@ -298,15 +299,17 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
           />
         ) : null}
         <nav
-          ref={panelRef as React.Ref<HTMLElement>}
+          ref={panelRef}
           id={navId}
           className={styles.panel}
           aria-label={labels.navigation}
           inert={(offCanvas && !open) || (!offCanvas && mode === "hidden") || undefined}
         >
-          <AnchorRectProvider value={offCanvas ? null : anchorRect}>
-            <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-          </AnchorRectProvider>
+          <LayerProvider value={offCanvas ? layer : null}>
+            <AnchorRectProvider value={offCanvas ? null : anchorRect}>
+              <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+            </AnchorRectProvider>
+          </LayerProvider>
         </nav>
       </div>
     </SidebarProvider>

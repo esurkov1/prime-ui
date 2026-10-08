@@ -142,8 +142,9 @@ cards `--prime-card-radius` (12); floating panels `--prime-panel-radius` (12) wi
 `--prime-panel-padding` (4) and `--prime-panel-item-radius` (8); modal `--prime-modal-radius` (16).
 
 Elevation: `--prime-shadow-raised` (cards, barely there) · `--prime-shadow-overlay` (menus, popovers,
-tooltips, datepicker; z popover/dropdown/tooltip) · `--prime-shadow-modal` (modal, drawer; z modal/drawer).
-Z-index: `--prime-z-*` only.
+tooltips, datepicker) · `--prime-shadow-modal` (modal, drawer).
+Z-index: `--prime-z-*` only. Every overlay shares `--prime-z-overlay` and portals to `<body>` when it
+opens, so the open order is the stacking order; toasts sit above on `--prime-z-toast`.
 
 Focus ring must never be clipped (hard rule):
 - Fields (Input, Textarea, Select/TagSelect/Datepicker triggers, DigitInput cells, ColorPicker channels, search fields in panels)
@@ -252,18 +253,18 @@ holds across the kit.
   CommandMenu that is the scrim — and (b) Escape. Tooltip closes on pointer-leave / blur / Escape.
   Opt out with `closeOnOutsideClick={false}` (Modal keeps it for destructive confirms); the layer still blocks
   the layers below it.
-- **Topmost only.** Open layers form a stack (`useOutsideClick`, `useEscapeKey`, `useFocusTrap` in `src/hooks`).
+- **Topmost only.** Open layers form one stack (`src/internal/overlay/layerStack.ts`).
   Only the topmost layer reacts: one click or one Escape closes one layer. A click inside a nested child layer
   (a Select open inside a Modal, a manage Popover inside a TagSelect panel) never closes the parent, even though
   the child is portaled outside the parent's DOM.
 - **Focus depends on how the layer was dismissed.**
   - **Escape** (and Tab / picking an option where the component closes on it) returns focus to the trigger
-    (focus trap restore, or an explicit focus for non-trapping panels).
+    (`useFloatingLayer`, `useModalLayer`).
   - **A press outside a floating layer** (Popover, Dropdown, Select, TagSelect, Datepicker, ColorPicker /
     ColorPresets) does **not** restore focus: focus follows the pointer. A press on another control focuses that
     control; a press on empty space leaves nothing focused, so a focused field blurs (TagSelect collapses) in the
-    same click — one click leaves the field. `useOutsideClick` marks the press (`isPointerDismiss()`), and
-    `useFocusTrap` skips its restore while it is set.
+    same click — one click leaves the field. The stack passes the reason (`outside`) to the layer, which
+    skips its restore.
   - **A scrim click of Modal / Drawer / CommandMenu** returns focus to the opener: the page behind was inert, the
     click landed on the scrim, not on a control, so the opener is the only sensible place to continue from (the
     keyboard user's position is kept).

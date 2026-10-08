@@ -51,7 +51,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.Trigger",
-      en: 'No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`, `data-state`; the child\'s own `id` wins.',
+      en: 'No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`, `data-state`; the child\'s own `id` wins. Other props given to it (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.',
       ru: "Без DOM: клонирует дочерний элемент, открывает и закрывает меню, ставит ARIA.",
       props: [
         {
@@ -65,8 +65,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.Content",
-      en: '`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves into the menu and Tab stays inside.',
-      ru: 'Портал и панель `role="menu"`; фокус переходит внутрь, стрелки ходят по пунктам.',
+      en: '`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves to the first item; Tab closes the menu and returns focus to the trigger.',
+      ru: 'Портал и панель `role="menu"`; фокус на первом пункте, стрелки ходят по пунктам, Tab закрывает меню.',
       props: [
         {
           name: "side",

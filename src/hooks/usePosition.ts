@@ -12,13 +12,13 @@ export type PositionAlign = "start" | "center" | "end";
  * with tokens, e.g. `max-height: min(var(--prime-panel-max-height), var(--float-max-h))`, so the
  * design limit and the room next to the anchor both apply.
  */
-export const FLOAT_MAX_HEIGHT_VAR = "--float-max-h";
+const FLOAT_MAX_HEIGHT_VAR = "--float-max-h";
 /** Anchor width (px) when the panel should be at least as wide as its anchor. */
-export const FLOAT_MIN_WIDTH_VAR = "--float-min-w";
+const FLOAT_MIN_WIDTH_VAR = "--float-min-w";
 /** Room across the main axis (px): a panel is never wider than the screen or its side. */
-export const FLOAT_MAX_WIDTH_VAR = "--float-max-w";
+const FLOAT_MAX_WIDTH_VAR = "--float-max-w";
 /** Arrow centre along the layer edge that faces the anchor (px), when `arrowInset` is given. */
-export const FLOAT_ARROW_VAR = "--float-arrow";
+const FLOAT_ARROW_VAR = "--float-arrow";
 
 const MIN_MENU_ESTIMATE = 176;
 const FALLBACK_VIEWPORT_PAD_PX = 8;
@@ -218,53 +218,66 @@ export function usePosition(
   const [attached, setAttached] = React.useState(false);
   const [resolvedSide, setResolvedSide] = React.useState<PositionSide>(preferredSide);
   const resolveAnchorRect = useAnchorRectResolver();
+  /** Token lengths read from CSS: once per activation / option change / resize, not per frame. */
+  const metricsRef = React.useRef<{ offset: number; pad: number; arrow?: number } | null>(null);
 
-  const update = React.useCallback(() => {
-    const anchor = anchorRef.current;
-    const layer = layerRef.current;
-    if (!anchor || !layer) return;
-    const rect = anchor.getBoundingClientRect();
+  const update = React.useCallback(
+    (remeasure: boolean) => {
+      const anchor = anchorRef.current;
+      const layer = layerRef.current;
+      if (!anchor || !layer) return;
+      if (remeasure || !metricsRef.current) {
+        metricsRef.current = {
+          offset: readCssLengthPx(offsetToken, FALLBACK_PANEL_OFFSET_PX),
+          pad: getViewportPadPx(),
+          arrow: arrowInset?.(layer),
+        };
+      }
+      const { offset, pad, arrow } = metricsRef.current;
+      const rect = anchor.getBoundingClientRect();
 
-    const pos = computeFloatingPosition(
-      resolveAnchorRect ? resolveAnchorRect(anchor, rect) : rect,
-      layer.offsetWidth,
-      layer.offsetHeight,
-      window.innerWidth,
-      window.innerHeight,
-      {
-        side: preferredSide,
-        align,
-        offset: readCssLengthPx(offsetToken, FALLBACK_PANEL_OFFSET_PX),
-        viewportPad: getViewportPadPx(),
-        flip: true,
-        matchAnchorWidth,
-        arrowInset: arrowInset?.(layer),
-      },
-    );
-    setResolvedSide(pos.side);
+      const pos = computeFloatingPosition(
+        resolveAnchorRect ? resolveAnchorRect(anchor, rect) : rect,
+        layer.offsetWidth,
+        layer.offsetHeight,
+        window.innerWidth,
+        window.innerHeight,
+        {
+          side: preferredSide,
+          align,
+          offset,
+          viewportPad: pad,
+          flip: true,
+          matchAnchorWidth,
+          arrowInset: arrow,
+        },
+      );
+      setResolvedSide(pos.side);
 
-    // Only real changes are written: repeated updates with the same numbers cause no layout work.
-    const set = (name: string, value: string) => {
-      if (layer.style.getPropertyValue(name) !== value) layer.style.setProperty(name, value);
-    };
-    const px = (n: number | undefined) => (n === undefined ? "" : `${n}px`);
-    set("position", "fixed");
-    set("top", px(pos.top));
-    set("left", px(pos.left));
-    set(FLOAT_MIN_WIDTH_VAR, px(pos.minWidth));
-    set(FLOAT_MAX_WIDTH_VAR, px(pos.maxWidth));
-    set(FLOAT_MAX_HEIGHT_VAR, px(pos.maxHeight));
-    set(FLOAT_ARROW_VAR, px(pos.arrow));
-  }, [
-    anchorRef,
-    layerRef,
-    preferredSide,
-    align,
-    matchAnchorWidth,
-    offsetToken,
-    arrowInset,
-    resolveAnchorRect,
-  ]);
+      // Only real changes are written: repeated updates with the same numbers cause no layout work.
+      const set = (name: string, value: string) => {
+        if (layer.style.getPropertyValue(name) !== value) layer.style.setProperty(name, value);
+      };
+      const px = (n: number | undefined) => (n === undefined ? "" : `${n}px`);
+      set("position", "fixed");
+      set("top", px(pos.top));
+      set("left", px(pos.left));
+      set(FLOAT_MIN_WIDTH_VAR, px(pos.minWidth));
+      set(FLOAT_MAX_WIDTH_VAR, px(pos.maxWidth));
+      set(FLOAT_MAX_HEIGHT_VAR, px(pos.maxHeight));
+      set(FLOAT_ARROW_VAR, px(pos.arrow));
+    },
+    [
+      anchorRef,
+      layerRef,
+      preferredSide,
+      align,
+      matchAnchorWidth,
+      offsetToken,
+      arrowInset,
+      resolveAnchorRect,
+    ],
+  );
 
   // `update` changes identity with the options; subscriptions read the latest one.
   const updateRef = React.useRef(update);
@@ -280,41 +293,45 @@ export function usePosition(
 
   const active = enabled && attached;
 
+  // Before paint on activation, and again at once when side / align / width options change.
+  React.useLayoutEffect(() => {
+    if (active) update(true);
+  }, [active, update]);
+
   React.useLayoutEffect(() => {
     if (!active) return;
     let frame = 0;
-    const schedule = () => {
+    let remeasure = false;
+    const schedule = (measure: boolean) => {
+      remeasure ||= measure;
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => updateRef.current());
+      frame = requestAnimationFrame(() => {
+        updateRef.current(remeasure);
+        remeasure = false;
+      });
     };
+    const follow = () => schedule(false);
+    const resize = () => schedule(true);
 
-    updateRef.current();
-    const followUp = requestAnimationFrame(() => updateRef.current());
-
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", resize);
     const scrollTargets = getScrollContainers(anchorRef.current);
     for (const target of scrollTargets) {
-      target.addEventListener("scroll", schedule, { passive: true });
+      target.addEventListener("scroll", follow, { passive: true });
     }
-    window.visualViewport?.addEventListener("resize", schedule);
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
+    window.visualViewport?.addEventListener("resize", resize);
+    // Also catches the layer's late size changes (web fonts, content loading in).
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(follow);
     if (layerRef.current) observer?.observe(layerRef.current);
     if (anchorRef.current) observer?.observe(anchorRef.current);
 
     return () => {
-      cancelAnimationFrame(followUp);
       cancelAnimationFrame(frame);
-      window.removeEventListener("resize", schedule);
-      for (const target of scrollTargets) target.removeEventListener("scroll", schedule);
-      window.visualViewport?.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", resize);
+      for (const target of scrollTargets) target.removeEventListener("scroll", follow);
+      window.visualViewport?.removeEventListener("resize", resize);
       observer?.disconnect();
     };
   }, [active, anchorRef, layerRef]);
-
-  // New side / align / width options while open take effect at once.
-  React.useLayoutEffect(() => {
-    if (active) update();
-  }, [active, update]);
 
   return { side: resolvedSide, attachLayer };
 }

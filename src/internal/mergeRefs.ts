@@ -1,6 +1,9 @@
 import type * as React from "react";
 
-/** Composes multiple refs (callback or object) into one callback — same idea as Radix `composeRefs`. */
+/**
+ * Composes refs (callback or object) into one callback. Internal helper of `useMergedRefs` and
+ * `Slot`; components call `useMergedRefs`, which keeps the callback stable between renders.
+ */
 export function mergeRefs<T>(...refs: Array<React.Ref<T> | undefined>): React.RefCallback<T> {
   return (value) => {
     for (const ref of refs) {
@@ -8,7 +11,7 @@ export function mergeRefs<T>(...refs: Array<React.Ref<T> | undefined>): React.Re
       if (typeof ref === "function") {
         ref(value);
       } else {
-        (ref as React.MutableRefObject<T | null>).current = value;
+        (ref as React.RefObject<T | null>).current = value;
       }
     }
   };

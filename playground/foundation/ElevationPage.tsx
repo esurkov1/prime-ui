@@ -167,7 +167,7 @@ export default function ElevationPage() {
 
       <FoundationSection
         title="z-index"
-        description="Используйте только --prime-z-*. Слои внутри drawer и модалки стоят выше своего хозяина, поэтому вложенные порталы не прячутся под ним."
+        description="Используйте только --prime-z-*. Все оверлеи стоят на одном уровне --prime-z-overlay и попадают в body при открытии, поэтому открытый позже слой всегда выше."
       >
         <ZLayers />
       </FoundationSection>

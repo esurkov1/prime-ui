@@ -621,8 +621,9 @@ const CASES: Case[] = [
   [
     "Select.Content",
     "DIV",
+    // The panel is mounted while open (closed, only the items render hidden for the labels).
     (ref) => (
-      <Select.Root label="Статус">
+      <Select.Root label="Статус" defaultOpen>
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>

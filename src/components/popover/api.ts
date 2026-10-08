@@ -51,7 +51,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Trigger · Popover.Anchor · Popover.Close",
-      en: "No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and adds `aria-haspopup=\"dialog\"`, `aria-expanded`, `aria-controls`, `data-state` (the child's own `id` wins); Anchor only positions the panel and keeps presses on it from dismissing (open state comes from `open`); Close closes the panel unless the child's handler calls `preventDefault()`.",
+      en: "No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and adds `aria-haspopup=\"dialog\"`, `aria-expanded`, `aria-controls`, `data-state` (the child's own `id` wins); Anchor only positions the panel and keeps presses on it from dismissing (open state comes from `open`; focus stays in the anchor on open); Close closes the panel (focus back on the trigger) unless the child's handler calls `preventDefault()`. Other props given to Trigger (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.",
       ru: "Без DOM: клонируют единственный дочерний элемент. Trigger открывает и закрывает панель и ставит ARIA; Anchor только задаёт якорь положения (открытием управляет `open`); Close закрывает панель.",
       props: [
         {
@@ -65,7 +65,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Content",
-      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger.',
+      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger. Opened from a Trigger, focus moves into the panel (`[data-autofocus]`, else the first tab stop, else the panel).',
       ru: 'Портал и панель `role="dialog"`; прокручивается, если не помещается рядом с триггером.',
       props: [
         {
@@ -100,8 +100,8 @@ export const api: ComponentApi = {
           name: "trapFocus",
           type: "boolean",
           default: "false",
-          en: "Tab cycles inside the panel (forms); focus returns to the trigger on close.",
-          ru: "Tab ходит по кругу внутри панели (формы); при закрытии фокус возвращается на триггер.",
+          en: "Tab cycles inside the panel (forms). Without it Tab past the last (Shift+Tab before the first) stop closes the panel and returns focus to the trigger.",
+          ru: "Tab ходит по кругу внутри панели (формы). Без него Tab за последний элемент закрывает панель и возвращает фокус на триггер.",
         },
         {
           name: "flush",

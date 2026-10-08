@@ -41,6 +41,18 @@ describe("TagSelect", () => {
     expect(screen.getByRole("button", { name: /Удалить Alpha/i })).toBeInTheDocument();
   });
 
+  it("Space types into the input: a created tag may have several words", async () => {
+    const user = userEvent.setup();
+    const onCreate = vi.fn();
+    render(<BasicTagSelect creatable onCreate={onCreate} />);
+    const input = screen.getByRole("combobox");
+    await user.click(input);
+    await user.keyboard("Новый тег");
+    expect(input).toHaveValue("Новый тег");
+    await user.keyboard("{Enter}");
+    expect(onCreate).toHaveBeenCalledWith("Новый тег");
+  });
+
   it("снимает последний тег по Backspace при пустом вводе", () => {
     render(<BasicTagSelect defaultValue={["a"]} />);
     const input = screen.getByRole("combobox");
@@ -136,7 +148,11 @@ describe("TagSelect", () => {
     render(<BasicTagSelect onOptionUpdate={onOptionUpdate} />);
     fireEvent.focus(screen.getByRole("combobox"));
     await user.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-overlay-stack", "above-dropdown");
+    // One overlay z-index: the menu opened later is portaled after the list, so it is on top.
+    const position = screen
+      .getByRole("listbox")
+      .compareDocumentPosition(screen.getByRole("dialog"));
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const name = screen.getByRole("textbox", { name: "Название тега" });
     await user.clear(name);
     await user.type(name, "Альфа{Enter}");

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 
 import { Dropdown } from "./Dropdown";
@@ -152,22 +153,26 @@ describe("Dropdown", () => {
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
 
-  it("Enter on item calls onSelect and closes menu", () => {
+  // Enter and Space reach the item as the native button click (no second keydown handler).
+  it("Enter on item calls onSelect once, closes menu and returns focus to the trigger", async () => {
+    const user = userEvent.setup();
     const onSelect1 = vi.fn();
     render(<DropdownWithOnSelect onSelect1={onSelect1} />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    const item = screen.getByRole("menuitem", { name: "Item 1" });
-    fireEvent.keyDown(item, { key: "Enter" });
+    const trigger = screen.getByRole("button", { name: "Open" });
+    await user.click(trigger);
+    expect(screen.getByRole("menuitem", { name: "Item 1" })).toHaveFocus();
+    await user.keyboard("{Enter}");
     expect(onSelect1).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
   });
 
-  it("Space on item calls onSelect and closes menu", () => {
+  it("Space on item calls onSelect once and closes menu", async () => {
+    const user = userEvent.setup();
     const onSelect1 = vi.fn();
     render(<DropdownWithOnSelect onSelect1={onSelect1} />);
-    fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    const item = screen.getByRole("menuitem", { name: "Item 1" });
-    fireEvent.keyDown(item, { key: " " });
+    await user.click(screen.getByRole("button", { name: "Open" }));
+    await user.keyboard(" ");
     expect(onSelect1).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
@@ -197,11 +202,9 @@ describe("Dropdown", () => {
 
   // ─── Keyboard navigation ──────────────────────────────────────────────────────
 
-  it("ArrowDown focuses first item when none focused", () => {
+  it("opening focuses the first item (WAI-ARIA menu button)", () => {
     render(<BasicDropdown />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
-    const menu = screen.getByRole("menu");
-    fireEvent.keyDown(menu, { key: "ArrowDown" });
     expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Item 1" }));
   });
 
@@ -209,7 +212,6 @@ describe("Dropdown", () => {
     render(<BasicDropdown />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
     const menu = screen.getByRole("menu");
-    fireEvent.keyDown(menu, { key: "ArrowDown" });
     fireEvent.keyDown(menu, { key: "ArrowDown" });
     expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Item 2" }));
   });
@@ -244,10 +246,8 @@ describe("Dropdown", () => {
     render(<BasicDropdown />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
     const menu = screen.getByRole("menu");
-    // ArrowDown twice should skip disabled item
+    // Item 1 → Item 2 → wraps back to Item 1 (the disabled item is excluded)
     fireEvent.keyDown(menu, { key: "ArrowDown" });
-    fireEvent.keyDown(menu, { key: "ArrowDown" });
-    // Wraps back to Item 1 (disabled is excluded)
     fireEvent.keyDown(menu, { key: "ArrowDown" });
     expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "Item 1" }));
   });
@@ -549,6 +549,42 @@ describe("Dropdown — overlay contract", () => {
     await user.click(outside);
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
     expect(outside).toHaveFocus();
+  });
+
+  it("Tab closes the menu and returns focus to the trigger (the page then moves on)", async () => {
+    const user = userEvent.setup();
+    render(<BasicDropdown />);
+    const trigger = screen.getByRole("button", { name: "Open" });
+    await user.click(trigger);
+    expect(screen.getByRole("menuitem", { name: "Item 1" })).toHaveFocus();
+    fireEvent.keyDown(screen.getByRole("menuitem", { name: "Item 1" }), { key: "Tab" });
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("Tooltip.Trigger around Dropdown.Trigger keeps both: menu ARIA, tooltip description, both handlers", () => {
+    render(
+      <Dropdown.Root>
+        <Tooltip.Root defaultOpen>
+          <Tooltip.Trigger>
+            <Dropdown.Trigger>
+              <button type="button">Ещё</button>
+            </Dropdown.Trigger>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Действия</Tooltip.Content>
+        </Tooltip.Root>
+        <Dropdown.Content>
+          <Dropdown.Item>Item</Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: "Ещё" });
+    expect(trigger).toHaveAttribute("aria-haspopup", "menu");
+    expect(trigger).toHaveAttribute("aria-describedby", screen.getByRole("tooltip").id);
+    fireEvent.pointerDown(trigger);
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    fireEvent.click(trigger);
+    expect(screen.getByRole("menu")).toBeInTheDocument();
   });
 
   it("a pointerdown on the trigger is not an outside click", () => {

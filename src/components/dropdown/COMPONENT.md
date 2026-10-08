@@ -55,14 +55,14 @@ No DOM, no ref. Open state and dismiss policy.
 | `children` | `ReactNode` | — (required) | Trigger and Content. |
 
 ### Dropdown.Trigger
-No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`, `data-state`; the child's own `id` wins.
+No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`, `data-state`; the child's own `id` wins. Other props given to it (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactElement` | — (required) | One element, usually a Button. |
 
 ### Dropdown.Content
-`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves into the menu and Tab stays inside.
+`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves to the first item; Tab closes the menu and returns focus to the trigger.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -160,10 +160,11 @@ The panel is the shared floating surface: `bg-raised`, `--prime-panel-radius` (1
 ### Keyboard
 | Key | Action |
 |---|---|
-| `Enter` · `Space` | On the trigger opens the menu; on an item runs it. |
+| `Enter` · `Space` | On the trigger opens the menu (focus on the first item); on an item runs it and returns focus to the trigger. |
 | `ArrowDown` · `ArrowUp` | Move focus to the next / previous enabled item, wrapping. |
 | `Home` · `End` | First / last enabled item. |
 | `Escape` | Closes the menu (`closeOnEscape`); focus returns to the trigger. |
+| `Tab` · `Shift+Tab` | Closes the menu; focus returns to the trigger (Tab then goes on to the next stop). |
 
 ### ARIA
 - The menu is `role="menu"` named by the trigger; items are `role="menuitem"`, disabled ones `aria-disabled`.

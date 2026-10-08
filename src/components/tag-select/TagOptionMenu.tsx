@@ -85,12 +85,8 @@ export function TagOptionMenu({
           aria-label={formatLabel(labels.edit, { label })}
           disabled={disabled}
           className={styles.menuTrigger}
-          // Keeps focus in the field input and the press away from the row (no toggle).
-          onMouseDown={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-          }}
-          onClick={(event) => event.stopPropagation()}
+          // Keeps focus in the field input until the menu opens.
+          onMouseDown={(event) => event.preventDefault()}
         >
           <Button.Icon>
             <Icon name="action.more" />
@@ -98,9 +94,7 @@ export function TagOptionMenu({
         </Button.Root>
       </Popover.Trigger>
       <Popover.Content side="bottom" align="end" size="s" flush className={styles.menuPanel}>
-        {/* Keys stay in the menu: the list is its React ancestor and would move its highlight. */}
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: only stops propagation */}
-        <div className={styles.menuBody} onKeyDown={(event) => event.stopPropagation()}>
+        <div className={styles.menuBody}>
           {onUpdate ? (
             <Input.Root size="s">
               <Input.Wrapper>

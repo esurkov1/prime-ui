@@ -4,14 +4,17 @@ import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Kbd } from "@/components/kbd/Kbd";
 import { Modal } from "@/components/modal/Modal";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { highlightChildren } from "@/internal/HighlightMatch";
+import { type Store, useCreateStore, useStoreSlice } from "@/internal/listbox";
+import { MenuGroup } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
-import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./CommandMenu.module.css";
@@ -48,13 +51,14 @@ type CommandMenuContextValue = {
   search: string;
   setSearch: (search: string) => void;
   listboxId: string;
-  activeId: string | null;
-  setActiveId: (id: string | null) => void;
+  /** The active option; items subscribe to their own slice of it. */
+  active: Store<string | null>;
   registerItem: (id: string, item: ItemRegistration) => () => void;
-  /** Ids of the enabled items that match the query, in render order. */
-  visibleIds: string[];
+  /** Items that match the query (disabled ones too). */
+  visible: ReadonlySet<string>;
+  /** Enabled matching items in render order: what the arrows walk. */
+  navigable: string[];
   groupOf: (id: string) => string | undefined;
-  inputRef: React.RefObject<HTMLInputElement | null>;
 };
 
 const [CommandMenuProvider, useCommandMenuContext] =
@@ -64,27 +68,23 @@ const CommandMenuGroupContext = React.createContext("");
 
 const optionId = (id: string) => `${id}-option`;
 
+/** Lives as long as the open dialog: the item registry, the matches and the active option. */
 function CommandMenuState({
   labels,
+  search,
+  setSearch,
   children,
 }: {
   labels: CommandMenuLabels;
+  search: string;
+  setSearch: (search: string) => void;
   children: React.ReactNode;
 }) {
   const listboxId = React.useId();
-  const inputRef = React.useRef<HTMLInputElement>(null);
   const itemsRef = React.useRef(new Map<string, ItemEntry>());
   const orderRef = React.useRef(new Map<string, number>());
   const [version, bump] = React.useReducer((n: number) => n + 1, 0);
-  const [search, setSearch] = React.useState("");
-  const [activeId, setActiveId] = React.useState<string | null>(null);
-
-  // The state lives as long as the open dialog: every opening starts with an empty query and
-  // focus in the search field.
-  React.useEffect(() => {
-    const frame = requestAnimationFrame(() => inputRef.current?.focus());
-    return () => cancelAnimationFrame(frame);
-  }, []);
+  const active = useCreateStore<string | null>(null);
 
   const registerItem = React.useCallback((id: string, item: ItemRegistration) => {
     let order = orderRef.current.get(id);
@@ -101,20 +101,24 @@ function CommandMenuState({
   }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: `version` changes when items (de)register
-  const visibleIds = React.useMemo(() => {
+  const { visible, navigable } = React.useMemo(() => {
     const query = search.trim().toLowerCase();
-    return [...itemsRef.current.entries()]
-      .filter(([, item]) => !item.disabled && item.haystack.includes(query))
-      .sort(([, a], [, b]) => a.order - b.order)
-      .map(([id]) => id);
+    const matches = [...itemsRef.current.entries()]
+      .filter(([, item]) => item.haystack.includes(query))
+      .sort(([, a], [, b]) => a.order - b.order);
+    return {
+      visible: new Set(matches.map(([id]) => id)),
+      navigable: matches.filter(([, item]) => !item.disabled).map(([id]) => id),
+    };
   }, [search, version]);
 
   const groupOf = React.useCallback((id: string) => itemsRef.current.get(id)?.groupId, []);
 
   // The active option stays on screen while the list filters: the first match otherwise.
   React.useLayoutEffect(() => {
-    setActiveId((prev) => (prev && visibleIds.includes(prev) ? prev : (visibleIds[0] ?? null)));
-  }, [visibleIds]);
+    const current = active.get();
+    if (current === null || !navigable.includes(current)) active.set(navigable[0] ?? null);
+  }, [navigable, active]);
 
   const value = React.useMemo(
     () => ({
@@ -122,14 +126,13 @@ function CommandMenuState({
       search,
       setSearch,
       listboxId,
-      activeId,
-      setActiveId,
+      active,
       registerItem,
-      visibleIds,
+      visible,
+      navigable,
       groupOf,
-      inputRef,
     }),
-    [labels, search, listboxId, activeId, registerItem, visibleIds, groupOf],
+    [labels, search, setSearch, listboxId, active, registerItem, visible, navigable, groupOf],
   );
 
   return <CommandMenuProvider value={value}>{children}</CommandMenuProvider>;
@@ -137,10 +140,19 @@ function CommandMenuState({
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
-export type CommandMenuRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+export type CommandMenuRootProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children" | "defaultValue"
+> & {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** The query (controlled); together with `onValueChange`. Cleared when the palette closes. */
+  value?: string;
+  /** The initial query, uncontrolled. Default `""`. */
+  defaultValue?: string;
+  /** Called with the new query (typing, and `""` when the palette closes). */
+  onValueChange?: (value: string) => void;
   /** Escape closes the palette. Default `true`. */
   closeOnEscape?: boolean;
   /** A click on the scrim closes the palette. Default `true`. */
@@ -159,8 +171,11 @@ export type CommandMenuRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "c
 
 function CommandMenuRoot({
   open,
-  defaultOpen,
+  defaultOpen = false,
   onOpenChange,
+  value,
+  defaultValue = "",
+  onValueChange,
   closeOnEscape = true,
   closeOnOutsideClick = true,
   size = "m",
@@ -170,11 +185,28 @@ function CommandMenuRoot({
   ...rest
 }: CommandMenuRootProps) {
   const labels = React.useMemo(() => ({ ...COMMAND_MENU_LABELS, ...labelsProp }), [labelsProp]);
+  const [isOpen, setOpen] = useControllableState({
+    value: open,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  });
+  const [search, setSearch] = useControllableState({
+    value,
+    defaultValue,
+    onChange: onValueChange,
+  });
+
+  // Every opening starts with an empty query.
+  const wasOpenRef = React.useRef(isOpen);
+  React.useEffect(() => {
+    if (wasOpenRef.current && !isOpen) setSearch("");
+    wasOpenRef.current = isOpen;
+  }, [isOpen, setSearch]);
+
   return (
     <Modal.Root
-      open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={onOpenChange}
+      open={isOpen}
+      onOpenChange={setOpen}
       closeOnEscape={closeOnEscape}
       closeOnOutsideClick={closeOnOutsideClick}
     >
@@ -186,7 +218,9 @@ function CommandMenuRoot({
         {/* `display: contents`: carries the tier variables without breaking the panel's flex column. */}
         <div className={cx(menu.tier, styles.tier)} data-size={size}>
           <ControlSizeProvider value={size}>
-            <CommandMenuState labels={labels}>{children}</CommandMenuState>
+            <CommandMenuState labels={labels} search={search} setSearch={setSearch}>
+              {children}
+            </CommandMenuState>
           </ControlSizeProvider>
         </div>
       </Modal.Content>
@@ -221,42 +255,33 @@ CommandMenuDescription.displayName = "CommandMenu.Description";
 
 export type CommandMenuInputProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  "size" | "type" | "role"
+  "size" | "type" | "role" | "value" | "defaultValue"
 > & {
-  /** Called with the new query; native `onChange` still fires. */
-  onValueChange?: (value: string) => void;
   ref?: React.Ref<HTMLInputElement>;
 };
 
 /**
- * The search row: a search icon and the query field. It is the permanent focus of the palette, so
- * it draws no focus ring (foundation §7); arrows, Home, End and Enter drive the list from it.
+ * The search row: a search icon and the query field (the query is `CommandMenu.Root` `value`). It
+ * is the permanent focus of the palette, so it draws no focus ring (foundation §7); focus lands
+ * here on open; arrows, Home, End and Enter drive the list from it.
  */
 function CommandMenuInput({
   className,
   onKeyDown,
-  value: valueProp,
   onChange,
-  onValueChange,
   placeholder,
   "aria-label": ariaLabel,
-  ref,
   ...rest
 }: CommandMenuInputProps) {
-  const { labels, search, setSearch, listboxId, activeId, setActiveId, visibleIds, inputRef } =
-    useCommandMenuContext();
-  const controlled = valueProp !== undefined;
-  const mergedRef = React.useMemo(() => mergeRefs(inputRef, ref), [inputRef, ref]);
-
-  React.useEffect(() => {
-    if (controlled) setSearch(String(valueProp));
-  }, [controlled, valueProp, setSearch]);
+  const { labels, search, setSearch, listboxId, active, navigable } = useCommandMenuContext();
+  const activeId = useStoreSlice(active, (id) => id);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     onKeyDown?.(event);
-    if (event.defaultPrevented || visibleIds.length === 0) return;
-    const index = activeId ? visibleIds.indexOf(activeId) : -1;
-    const last = visibleIds.length - 1;
+    if (event.defaultPrevented || navigable.length === 0) return;
+    const current = active.get();
+    const index = current ? navigable.indexOf(current) : -1;
+    const last = navigable.length - 1;
     const next: Record<string, number> = {
       ArrowDown: index < 0 || index === last ? 0 : index + 1,
       ArrowUp: index <= 0 ? last : index - 1,
@@ -265,10 +290,10 @@ function CommandMenuInput({
     };
     if (event.key in next) {
       event.preventDefault();
-      setActiveId(visibleIds[next[event.key]] ?? null);
-    } else if (event.key === "Enter" && activeId) {
+      active.set(navigable[next[event.key]] ?? null);
+    } else if (event.key === "Enter" && current) {
       event.preventDefault();
-      document.getElementById(optionId(activeId))?.click();
+      document.getElementById(optionId(current))?.click();
     }
   };
 
@@ -277,7 +302,6 @@ function CommandMenuInput({
       <Icon name="action.search" size="m" />
       <input
         {...rest}
-        ref={mergedRef}
         type="search"
         role="combobox"
         placeholder={placeholder ?? labels.search}
@@ -288,12 +312,12 @@ function CommandMenuInput({
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
+        data-autofocus=""
         className={cx(menu.searchInput, styles.input, className)}
-        value={controlled ? valueProp : search}
+        value={search}
         onChange={(event) => {
           onChange?.(event);
-          onValueChange?.(event.target.value);
-          if (!controlled) setSearch(event.target.value);
+          setSearch(event.target.value);
         }}
         onKeyDown={handleKeyDown}
       />
@@ -329,29 +353,18 @@ export type CommandMenuGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
 };
 
 /** A labelled section of items; hidden while none of its items match the query. */
-function CommandMenuGroup({ label, className, children, ...rest }: CommandMenuGroupProps) {
+function CommandMenuGroup({ className, ...rest }: CommandMenuGroupProps) {
   const groupId = React.useId();
-  const { visibleIds, groupOf } = useCommandMenuContext();
-  const hasVisible = visibleIds.some((id) => groupOf(id) === groupId);
-  const labelId = `${groupId}-label`;
+  const { visible, groupOf } = useCommandMenuContext();
+  const hasVisible = [...visible].some((id) => groupOf(id) === groupId);
 
   return (
     <CommandMenuGroupContext.Provider value={groupId}>
-      {/* biome-ignore lint/a11y/useSemanticElements: role="group" inside role="listbox"; <fieldset> is not allowed there */}
-      <div
+      <MenuGroup
         {...rest}
-        role="group"
-        aria-labelledby={label != null ? labelId : undefined}
         hidden={hasVisible ? undefined : true}
-        className={cx(menu.group, styles.group, className)}
-      >
-        {label != null ? (
-          <div id={labelId} className={menu.groupLabel}>
-            {label}
-          </div>
-        ) : null}
-        {children}
-      </div>
+        className={cx(styles.group, className)}
+      />
     </CommandMenuGroupContext.Provider>
   );
 }
@@ -367,6 +380,8 @@ export type CommandMenuItemProps = Omit<
   value: string;
   /** Extra words for the query (synonyms, English names). */
   keywords?: string;
+  /** Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, not runnable. */
+  disabled?: boolean;
   /** Runs the command: a click, or Enter while the item is active. */
   onSelect?: () => void;
   ref?: React.Ref<HTMLButtonElement>;
@@ -386,9 +401,9 @@ function CommandMenuItem({
 }: CommandMenuItemProps) {
   const id = React.useId();
   const groupId = React.useContext(CommandMenuGroupContext);
-  const { registerItem, activeId, setActiveId, visibleIds, search } = useCommandMenuContext();
+  const { registerItem, active: activeStore, visible, search } = useCommandMenuContext();
   const nodeRef = React.useRef<HTMLButtonElement>(null);
-  const mergedRef = React.useMemo(() => mergeRefs(nodeRef, ref), [ref]);
+  const mergedRef = useMergedRefs(nodeRef, ref);
 
   React.useLayoutEffect(
     () =>
@@ -400,8 +415,10 @@ function CommandMenuItem({
     [id, value, keywords, disabled, groupId, registerItem],
   );
 
-  const visible = visibleIds.includes(id);
-  const active = activeId === id;
+  const shown = visible.has(id);
+  // Only this item's slice of the active option: moving it re-renders two rows.
+  const active = useStoreSlice(activeStore, (current) => current === id);
+  const usable = shown && !disabled;
 
   React.useEffect(() => {
     if (active) nodeRef.current?.scrollIntoView?.({ block: "nearest" });
@@ -416,18 +433,18 @@ function CommandMenuItem({
       role="option"
       tabIndex={-1}
       aria-selected={active}
-      hidden={visible ? undefined : true}
-      disabled={disabled}
+      aria-disabled={disabled || undefined}
+      hidden={shown ? undefined : true}
       className={cx(menu.item, styles.item, className)}
       {...toDataAttributes({ highlighted: active || undefined, disabled: disabled || undefined })}
       onPointerMove={(event) => {
         onPointerMove?.(event);
-        if (!event.defaultPrevented && visible) setActiveId(id);
+        if (!event.defaultPrevented && usable && !active) activeStore.set(id);
       }}
       onClick={(event) => {
         onClick?.(event);
-        if (event.defaultPrevented || !visible) return;
-        setActiveId(id);
+        if (event.defaultPrevented || !usable) return;
+        activeStore.set(id);
         onSelect?.();
       }}
     >
@@ -494,8 +511,8 @@ export type CommandMenuEmptyProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
  * is an action under them.
  */
 function CommandMenuEmpty({ children, ...rest }: CommandMenuEmptyProps) {
-  const { visibleIds, labels } = useCommandMenuContext();
-  if (visibleIds.length > 0) return null;
+  const { visible, labels } = useCommandMenuContext();
+  if (visible.size > 0) return null;
   return (
     <EmptyPage.Root layout="compact" role="status" {...rest}>
       <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>

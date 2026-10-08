@@ -195,7 +195,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Content",
-      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel; stays mounted while closed (the items register their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.',
+      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.',
       ru: "Портал и панель списка; смонтирована и в закрытом виде, чтобы триггер знал подписи.",
       props: [
         {

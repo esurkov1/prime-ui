@@ -2,14 +2,24 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
+import {
+  NotificationProvider,
+  useNotifications,
+} from "@/components/notification/NotificationStore";
 import { Select } from "@/components/select/Select";
 
 import { Modal, type ModalRootProps } from "./Modal";
 
+/** The full-screen scrim around the dialog panel. */
+function scrim() {
+  return screen.getByRole("dialog").parentElement as HTMLElement;
+}
+
 /** A scrim dismiss is a full click that starts and ends outside the panel. */
-function clickScrim(scrim: HTMLElement) {
-  fireEvent.pointerDown(scrim);
-  fireEvent.click(scrim);
+function clickScrim() {
+  const node = scrim();
+  fireEvent.pointerDown(node);
+  fireEvent.click(node);
 }
 
 function BasicModal({
@@ -260,13 +270,13 @@ describe("Modal", () => {
   it("closes on overlay click by default and not with closeOnOutsideClick={false}", () => {
     const { unmount } = render(<BasicModal />);
     openModal();
-    clickScrim(screen.getByTestId("modal-overlay"));
+    clickScrim();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     unmount();
 
     render(<BasicModal closeOnOutsideClick={false} />);
     openModal();
-    clickScrim(screen.getByTestId("modal-overlay"));
+    clickScrim();
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
@@ -294,46 +304,77 @@ describe("Modal", () => {
     expect(screen.getByRole("button", { name: "Action" })).toBeInTheDocument();
   });
 
-  it("Enter clicks Modal.Confirm when focus is elsewhere", () => {
+  function FormModal(props: Omit<ModalRootProps, "children"> & { onConfirm?: () => void }) {
+    const { onConfirm, ...rootProps } = props;
+    return (
+      <Modal.Root defaultOpen {...rootProps}>
+        <Modal.Content aria-label="Form">
+          <Modal.Body>
+            <input aria-label="Name" />
+          </Modal.Body>
+          <Modal.Footer>
+            <Modal.Close>
+              <Button.Root variant="outline" tone="neutral">
+                Cancel
+              </Button.Root>
+            </Modal.Close>
+            <Modal.Confirm>
+              <Button.Root onClick={onConfirm}>Confirm</Button.Root>
+            </Modal.Confirm>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal.Root>
+    );
+  }
+
+  it("Enter in a text field clicks Modal.Confirm", () => {
     const onConfirm = vi.fn();
-    render(<BasicModal onConfirm={onConfirm} />);
-    openModal();
+    render(<FormModal onConfirm={onConfirm} />);
+    const field = screen.getByRole("textbox", { name: "Name" });
+    field.focus();
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it("Enter on Cancel does not confirm: the focused button keeps its own Enter", () => {
+    const onConfirm = vi.fn();
+    render(<FormModal onConfirm={onConfirm} />);
     const cancel = screen.getByRole("button", { name: "Cancel" });
     cancel.focus();
     fireEvent.keyDown(cancel, { key: "Enter" });
-    expect(onConfirm).toHaveBeenCalledTimes(1);
+    expect(onConfirm).not.toHaveBeenCalled();
   });
 
   it("Enter does nothing with confirmOnEnter={false}", () => {
     const onConfirm = vi.fn();
-    render(<BasicModal confirmOnEnter={false} onConfirm={onConfirm} />);
-    openModal();
-    const cancel = screen.getByRole("button", { name: "Cancel" });
-    cancel.focus();
-    fireEvent.keyDown(cancel, { key: "Enter" });
+    render(<FormModal confirmOnEnter={false} onConfirm={onConfirm} />);
+    const field = screen.getByRole("textbox", { name: "Name" });
+    field.focus();
+    fireEvent.keyDown(field, { key: "Enter" });
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
   it("onEnterConfirm replaces the default confirm click", () => {
     const onCustom = vi.fn();
     const onConfirm = vi.fn();
-    render(<BasicModal onEnterConfirm={onCustom} onConfirm={onConfirm} />);
-    openModal();
-    const cancel = screen.getByRole("button", { name: "Cancel" });
-    cancel.focus();
-    fireEvent.keyDown(cancel, { key: "Enter" });
+    render(<FormModal onEnterConfirm={onCustom} onConfirm={onConfirm} />);
+    const field = screen.getByRole("textbox", { name: "Name" });
+    field.focus();
+    fireEvent.keyDown(field, { key: "Enter" });
     expect(onCustom).toHaveBeenCalledTimes(1);
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
-  it("Enter targets Modal.Confirm when another footer button is focused", () => {
+  it("Enter on another footer button or a link does not trigger Modal.Confirm", () => {
     const onConfirm = vi.fn();
-    const onDetails = vi.fn();
     render(
       <Modal.Root defaultOpen>
         <Modal.Content aria-label="Order">
+          <Modal.Body>
+            <a href="#terms">Условия</a>
+          </Modal.Body>
           <Modal.Footer>
-            <Button.Root onClick={onDetails}>Details</Button.Root>
+            <Button.Root>Details</Button.Root>
             <Modal.Confirm>
               <Button.Root onClick={onConfirm}>Confirm</Button.Root>
             </Modal.Confirm>
@@ -341,11 +382,14 @@ describe("Modal", () => {
         </Modal.Content>
       </Modal.Root>,
     );
-    const details = screen.getByRole("button", { name: "Details" });
-    details.focus();
-    fireEvent.keyDown(details, { key: "Enter" });
-    expect(onConfirm).toHaveBeenCalledTimes(1);
-    expect(onDetails).not.toHaveBeenCalled();
+    for (const el of [
+      screen.getByRole("button", { name: "Details" }),
+      screen.getByRole("link", { name: "Условия" }),
+    ]) {
+      el.focus();
+      fireEvent.keyDown(el, { key: "Enter" });
+    }
+    expect(onConfirm).not.toHaveBeenCalled();
   });
 
   it("does not confirm on Enter from a textarea", () => {
@@ -389,14 +433,39 @@ describe("Modal", () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it("makes the page behind inert while open", () => {
+  it("makes the page behind inert while open (no extra aria-hidden)", () => {
     const outside = document.createElement("div");
     document.body.appendChild(outside);
     const { unmount } = render(<BasicModal defaultOpen />);
-    expect(outside).toHaveAttribute("aria-hidden", "true");
-    unmount();
+    expect(outside.inert).toBe(true);
     expect(outside).not.toHaveAttribute("aria-hidden");
+    unmount();
+    expect(outside.inert).toBeFalsy();
     outside.remove();
+  });
+
+  it("keeps the toast region usable while open", () => {
+    function Harness() {
+      const { notify } = useNotifications();
+      return (
+        <Modal.Root defaultOpen>
+          <Modal.Content aria-label="With toast">
+            <Button.Root onClick={() => notify({ title: "Сохранено", persistent: true })}>
+              Notify
+            </Button.Root>
+          </Modal.Content>
+        </Modal.Root>
+      );
+    }
+    render(
+      <NotificationProvider>
+        <Harness />
+      </NotificationProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Notify" }));
+    const toast = screen.getByText("Сохранено");
+    expect(toast.closest("[inert]")).toBeNull();
+    expect(screen.getByRole("button", { name: "Закрыть уведомление" })).toBeVisible();
   });
 });
 
@@ -433,11 +502,11 @@ describe("Modal — overlay contract", () => {
   it("an outside click closes only the topmost layer (Select first, then the modal)", () => {
     render(<ModalWithSelect />);
     fireEvent.click(screen.getByRole("combobox"));
-    clickScrim(screen.getByTestId("modal-overlay"));
+    clickScrim();
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(screen.getByRole("dialog")).toBeInTheDocument();
 
-    clickScrim(screen.getByTestId("modal-overlay"));
+    clickScrim();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
@@ -455,7 +524,7 @@ describe("Modal — overlay contract", () => {
   it("a drag that starts inside the dialog and ends on the scrim does not close it", () => {
     render(<BasicModal defaultOpen />);
     fireEvent.pointerDown(screen.getByText("Body content"));
-    fireEvent.click(screen.getByTestId("modal-overlay"));
+    fireEvent.click(scrim());
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
@@ -464,8 +533,36 @@ describe("Modal — overlay contract", () => {
     const trigger = screen.getByRole("button", { name: "Open" });
     trigger.focus();
     fireEvent.click(trigger);
-    clickScrim(screen.getByTestId("modal-overlay"));
+    clickScrim();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
+  });
+
+  it("nested layers opened in the same commit stack child above parent (defaultOpen)", () => {
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Content aria-label="Outer">
+          <Select.Root placeholder="Pick" defaultOpen>
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Item value="one">One</Select.Item>
+            </Select.Content>
+          </Select.Root>
+        </Modal.Content>
+      </Modal.Root>,
+    );
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("Tab cycles inside the dialog", () => {
+    render(<BasicModal defaultOpen />);
+    const confirm = screen.getByRole("button", { name: "Confirm" });
+    confirm.focus();
+    fireEvent.keyDown(confirm, { key: "Tab" });
+    expect(screen.getByRole("button", { name: "Закрыть" })).toHaveFocus();
   });
 });

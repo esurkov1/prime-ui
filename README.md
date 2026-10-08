@@ -277,7 +277,6 @@ accessibility, examples and common mistakes.
 | `NotificationProvider` + `useNotifications()` | Toast queue: `notify`, `dismiss`, `dismissAll`. Place the provider once at the app root. |
 | `ControlSizeProvider` | Default `size` for every control in a subtree (dense toolbars, compact forms). |
 | `Tooltip.Provider` | Shared open delay for a group of tooltips. |
-| `OverlayPortalLayerProvider` | Portal target for overlays rendered inside a custom layer. |
 | `applyTheme(scheme, element?)` | Switch the theme without transition flashes. |
 | `Icon`, `IconSearch`, `IconClose`, … | The kit icon set (built on lucide-react). |
 

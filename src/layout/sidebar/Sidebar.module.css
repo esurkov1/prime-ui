@@ -1138,7 +1138,7 @@
 .scrim {
   position: fixed;
   inset: 0;
-  z-index: var(--prime-z-drawer);
+  z-index: var(--prime-z-overlay);
   margin: 0;
   padding: 0;
   border: 0;
@@ -1166,7 +1166,7 @@
   position: fixed;
   inset-block: 0;
   inset-inline-start: 0;
-  z-index: var(--prime-z-drawer);
+  z-index: var(--prime-z-overlay);
   width: min(var(--sb-expanded), calc(100% - var(--prime-space-12)));
   min-width: 0;
   background: var(--prime-color-bg-canvas);

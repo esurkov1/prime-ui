@@ -27,7 +27,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Неактивный пункт не попадает в результаты, а пустой результат говорит словами задачи — `disabled`, `labels`.",
+        "Неактивный пункт виден приглушённым и стрелки его пропускают, а пустой результат говорит словами задачи — `disabled`, `labels`.",
     },
     {
       slot: "dismiss",
@@ -35,9 +35,14 @@ export const page: ComponentPageConfig = {
         "Обязательный выбор при импорте: случайный клик по подложке не закрывает палитру, только Escape или выбор — `closeOnOutsideClick`, `closeOnEscape`.",
     },
     {
+      slot: "controlled",
+      description:
+        "Запросом владеет родитель: показывает текст снаружи, а команда сбрасывает его; при закрытии палитра очищает запрос — `value`, `onValueChange`.",
+    },
+    {
       slot: "controlled-open",
       description:
-        "Открытием и запросом владеет родитель: читает текст, а команда сбрасывает его или закрывает палитру — `open`, `onOpenChange`, `value`, `onValueChange`.",
+        "Открытием владеет родитель: кнопка открывает палитру, команда закрывает — `open`, `onOpenChange`.",
     },
   ],
   api,

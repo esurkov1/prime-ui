@@ -54,14 +54,14 @@ No DOM, no ref. Open state and dismiss policy.
 | `children` | `ReactNode` | — (required) | Trigger (or Anchor) and Content. |
 
 ### Popover.Trigger · Popover.Anchor · Popover.Close
-No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and adds `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`, `data-state` (the child's own `id` wins); Anchor only positions the panel and keeps presses on it from dismissing (open state comes from `open`); Close closes the panel unless the child's handler calls `preventDefault()`.
+No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and adds `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`, `data-state` (the child's own `id` wins); Anchor only positions the panel and keeps presses on it from dismissing (open state comes from `open`; focus stays in the anchor on open); Close closes the panel (focus back on the trigger) unless the child's handler calls `preventDefault()`. Other props given to Trigger (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactElement` | — (required) | One element, usually a Button (Anchor: any element, e.g. a toolbar). |
 
 ### Popover.Content
-`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger.
+`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger. Opened from a Trigger, focus moves into the panel (`[data-autofocus]`, else the first tab stop, else the panel).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -69,7 +69,7 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 | `align` | `"start" \| "center" \| "end"` | `"start"` | Alignment along the trigger; shifts inside the viewport. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the text, padding and gap; also the size context of the controls inside. |
 | `matchTriggerWidth` | `boolean` | `false` | The panel is exactly as wide as the trigger and its text wraps. |
-| `trapFocus` | `boolean` | `false` | Tab cycles inside the panel (forms); focus returns to the trigger on close. |
+| `trapFocus` | `boolean` | `false` | Tab cycles inside the panel (forms). Without it Tab past the last (Shift+Tab before the first) stop closes the panel and returns focus to the trigger. |
 | `flush` | `boolean` | `false` | No inner padding and no gap: rows and dividers reach the panel edges; the content lays out its own spacing. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `className` and the other attributes of the panel. |
 
@@ -121,7 +121,6 @@ Title uses the tier text size with title weight; Description uses the tier label
 | size | `size` on Content | `data-size` |
 | width | `matchTriggerWidth` | `data-match-trigger-width="true"` |
 | flush | `flush` | `data-flush="true"` |
-| opened from a menu or a list | inside Dropdown / Select / TagSelect panels | `data-overlay-stack="above-dropdown"`: the panel rises above that panel |
 
 There is no `disabled` on Popover: a disabled trigger never opens it.
 
@@ -136,9 +135,9 @@ There is no `disabled` on Popover: a disabled trigger never opens it.
 ### Keyboard
 | Key | Action |
 |---|---|
-| `Enter` · `Space` | On the trigger: opens and closes the panel. |
+| `Enter` · `Space` | On the trigger: opens the panel (focus moves into it) and closes it. |
 | `Escape` | Closes the panel (`closeOnEscape`); focus returns to the trigger. |
-| `Tab` | Moves through the panel content; with `trapFocus` it cycles inside the panel. |
+| `Tab` | Moves through the panel content; with `trapFocus` it cycles inside the panel, without it Tab past the last stop closes the panel and goes on from the trigger. |
 
 ### ARIA
 - The panel is `role="dialog"` without `aria-modal`, named by `Popover.Title` (else by the trigger) and described by `Popover.Description`.

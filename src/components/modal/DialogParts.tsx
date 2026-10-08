@@ -7,12 +7,100 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { useControllableState } from "@/hooks/useControllableState";
+import { useModalLayer } from "@/hooks/useModalLayer";
 import { Icon } from "@/icons";
+import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import { mergeRefs } from "@/internal/mergeRefs";
+import type { DismissReason } from "@/internal/overlay/layerStack";
+import { Slot } from "@/internal/slot";
 import type { Tone } from "@/internal/states";
 
 import styles from "./DialogParts.module.css";
+
+// ─── Root state (shared by Modal.Root and Drawer.Root) ───────────────────────
+
+export type DialogRootOptions = {
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  closeOnEscape?: boolean;
+  closeOnOutsideClick?: boolean;
+  closeLabel: string;
+  /** Modal only: Enter clicks `Modal.Confirm`. */
+  confirmOnEnter?: boolean;
+  onEnterConfirm?: (event: KeyboardEvent) => void;
+};
+
+export type DialogRootState = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  closeOnEscape: boolean;
+  closeOnOutsideClick: boolean;
+  closeLabel: string;
+  confirmOnEnter: boolean;
+  onEnterConfirm?: (event: KeyboardEvent) => void;
+};
+
+const [DialogRootProvider, useDialogRootContext] =
+  createComponentContext<DialogRootState>("Modal / Drawer");
+
+export { DialogRootProvider, useDialogRootContext };
+
+/** State of Modal.Root / Drawer.Root: open (controlled or not) and the dismiss policy. */
+export function useDialogRoot({
+  open,
+  defaultOpen = false,
+  onOpenChange,
+  closeOnEscape = true,
+  closeOnOutsideClick = true,
+  closeLabel,
+  confirmOnEnter = false,
+  onEnterConfirm,
+}: DialogRootOptions): DialogRootState {
+  const [isOpen, setOpen] = useControllableState({
+    value: open,
+    defaultValue: defaultOpen,
+    onChange: onOpenChange,
+  });
+  return React.useMemo(
+    () => ({
+      open: isOpen,
+      setOpen,
+      closeOnEscape,
+      closeOnOutsideClick,
+      closeLabel,
+      confirmOnEnter,
+      onEnterConfirm,
+    }),
+    [
+      isOpen,
+      setOpen,
+      closeOnEscape,
+      closeOnOutsideClick,
+      closeLabel,
+      confirmOnEnter,
+      onEnterConfirm,
+    ],
+  );
+}
+
+/**
+ * The modal layer of a Modal / Drawer panel: Escape and scrim clicks close it per the Root's
+ * `closeOnEscape` / `closeOnOutsideClick`; focus returns to the opener (foundation §8).
+ */
+export function useDialogLayer<T extends HTMLElement>({
+  open,
+  setOpen,
+  closeOnEscape,
+  closeOnOutsideClick,
+}: DialogRootState) {
+  const onClose = React.useCallback(() => setOpen(false), [setOpen]);
+  const onDismiss = (reason: DismissReason) => {
+    if (reason === "escape" ? closeOnEscape : closeOnOutsideClick) onClose();
+  };
+  return { ...useModalLayer<T>({ open, onDismiss }), onClose };
+}
 
 /** Class for the `role="dialog"` element: hairline tokens and the `prime-dialog` container. */
 export const dialogShellClassName = styles.shell;
@@ -242,32 +330,19 @@ type SlotChild = React.ReactElement<{
 
 export type DialogTriggerProps = { children: SlotChild };
 
-/**
- * Adds "open the dialog" to the child's click (unless the child prevents default). The Root of
- * Modal / Drawer passes `onOpen` from its own context.
- */
-export function DialogTrigger({ children, onOpen }: DialogTriggerProps & { onOpen: () => void }) {
-  const child = React.Children.only(children);
-  return React.cloneElement(child, {
-    onClick: (event: React.MouseEvent) => {
-      child.props.onClick?.(event);
-      if (!event.defaultPrevented) onOpen();
-    },
-  });
+/** Adds "open the dialog" to the child's click (unless the child prevents default). */
+export function DialogTrigger({ children }: DialogTriggerProps) {
+  const { setOpen } = useDialogRootContext();
+  return <Slot onClick={() => setOpen(true)}>{children}</Slot>;
 }
+DialogTrigger.displayName = "Dialog.Trigger";
 
 export type DialogCloseProps = { children: SlotChild };
 
 /** Adds "close the dialog" to the child's click (unless the child prevents default). */
 export function DialogClose({ children }: DialogCloseProps) {
   const { onClose } = useDialogShell("Close");
-  const child = React.Children.only(children);
-  return React.cloneElement(child, {
-    onClick: (event: React.MouseEvent) => {
-      child.props.onClick?.(event);
-      if (!event.defaultPrevented) onClose();
-    },
-  });
+  return <Slot onClick={onClose}>{children}</Slot>;
 }
 DialogClose.displayName = "Dialog.Close";
 
@@ -276,15 +351,6 @@ export type DialogConfirmProps = { children: SlotChild };
 /** Marks the primary action: Enter inside the dialog clicks it (`confirmOnEnter`). */
 export function DialogConfirm({ children }: DialogConfirmProps) {
   const { confirmRef } = useDialogShell("Confirm");
-  const child = React.Children.only(children);
-  const childRef = child.props.ref;
-  const ref = React.useMemo(
-    () =>
-      mergeRefs(childRef, (node: HTMLElement | null) => {
-        if (confirmRef) confirmRef.current = node;
-      }),
-    [childRef, confirmRef],
-  );
-  return React.cloneElement(child, { ref });
+  return <Slot ref={confirmRef}>{children}</Slot>;
 }
 DialogConfirm.displayName = "Dialog.Confirm";

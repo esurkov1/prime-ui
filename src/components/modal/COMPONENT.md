@@ -52,7 +52,7 @@ No DOM, no ref. State and dismiss policy.
 | `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the dialog; turn off for destructive confirms. |
 | `labels` | `Partial<ModalLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Trigger and Content. |
-| `confirmOnEnter` | `boolean` | `true` | Enter inside the dialog clicks the element wrapped in `Modal.Confirm`. |
+| `confirmOnEnter` | `boolean` | `true` | Enter inside the dialog clicks the element wrapped in `Modal.Confirm`; Enter on a button or link activates that element instead. |
 | `onEnterConfirm` | `(event: KeyboardEvent) => void` | — | Replaces the default Enter confirm. |
 
 ### Modal.Content
@@ -156,7 +156,7 @@ When the dialog itself is narrower than 360px, actions stack full width in DOM o
 | header with description | a `Modal.Description` inside | `data-has-description="true"` on the header |
 | footer layout | `layout` or the size default | `data-layout` on the footer |
 | icon tone | `tone` on Icon | `data-tone` on the tile |
-| while open | — | focus trapped inside, page scroll locked, siblings of the portal `inert` |
+| while open | — | focus trapped inside, page scroll locked, siblings of the portal `inert` (the toast region stays usable) |
 
 Loading or disabled actions use the Button props (`loading`, `disabled`) inside the footer.
 
@@ -172,7 +172,7 @@ Loading or disabled actions use the Button props (`loading`, `disabled`) inside 
 | Key | Action |
 |---|---|
 | `Escape` | Closes the dialog (`closeOnEscape`); focus returns to the opener. |
-| `Enter` | Clicks `Modal.Confirm` unless focus is in a `<textarea>`, a `<select>`, an `<input>` of type checkbox / radio / file / button / submit / reset, a contenteditable element, inside the header, or on the Confirm element itself. A plain `<button>` in the body does not block it. |
+| `Enter` | Clicks `Modal.Confirm` from a text field or the dialog itself. Enter on a button, link or `role="button"` (Cancel included) activates that element instead; a `<textarea>`, a `<select>`, an `<input>` of type checkbox / radio / file / button / submit / reset, a contenteditable element and the header keep their own Enter. |
 | `Tab` · `Shift+Tab` | Cycles focus inside the dialog. |
 
 ### ARIA

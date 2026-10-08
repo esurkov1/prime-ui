@@ -1,41 +1,41 @@
 import * as React from "react";
 
 let lockCount = 0;
-let savedOverflow = "";
-let savedPaddingRight = "";
+let saved: { overflow: string; paddingRight: string } | null = null;
 
 function lockScroll() {
   if (lockCount === 0) {
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    savedOverflow = document.body.style.overflow;
-    savedPaddingRight = document.body.style.paddingRight;
-
-    document.body.style.overflow = "hidden";
+    const { body, documentElement } = document;
+    const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
+    saved = { overflow: body.style.overflow, paddingRight: body.style.paddingRight };
     if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      // Added to the body's own padding, not written over it.
+      const padding = Number.parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+      body.style.paddingRight = `${padding + scrollbarWidth}px`;
     }
+    body.style.overflow = "hidden";
   }
   lockCount++;
 }
 
 function unlockScroll() {
   lockCount = Math.max(0, lockCount - 1);
-  if (lockCount === 0) {
-    document.body.style.overflow = savedOverflow;
-    document.body.style.paddingRight = savedPaddingRight;
+  if (lockCount === 0 && saved) {
+    document.body.style.overflow = saved.overflow;
+    document.body.style.paddingRight = saved.paddingRight;
+    saved = null;
   }
 }
 
 /**
- * Locks body scroll when enabled. Supports multiple concurrent callers via
- * a reference-counted lock — the last caller to unmount restores scroll.
- * Compensates for scrollbar width to prevent layout shift.
- * Shared by modal/drawer overlays.
+ * Locks document scroll while enabled. Reference-counted: nested modal layers share one lock and
+ * the last one restores it. The scrollbar width is added to the body's right padding, so the page
+ * does not shift. Part of `useModalLayer`.
  */
 export function useScrollLock(enabled: boolean) {
   React.useEffect(() => {
     if (!enabled) return;
     lockScroll();
-    return () => unlockScroll();
+    return unlockScroll;
   }, [enabled]);
 }

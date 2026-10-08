@@ -7,6 +7,12 @@ import { Dropdown } from "@/components/dropdown/Dropdown";
 
 import { Drawer, type DrawerContentProps, type DrawerRootProps } from "./Drawer";
 
+/** The scrim: the sibling before the (topmost) drawer panel. */
+function drawerScrim() {
+  const dialogs = screen.getAllByRole("dialog");
+  return dialogs[dialogs.length - 1]?.previousElementSibling as HTMLElement;
+}
+
 /** A scrim dismiss is a full click that starts and ends outside the panel. */
 function clickScrim(scrim: HTMLElement) {
   fireEvent.pointerDown(scrim);
@@ -111,13 +117,13 @@ describe("Drawer", () => {
   it("closes by overlay click unless closeOnOutsideClick={false}", async () => {
     const { unmount } = render(<BasicDrawer />);
     openDrawer();
-    clickScrim(screen.getByTestId("drawer-overlay"));
+    clickScrim(drawerScrim());
     await expectClosed();
     unmount();
 
     render(<BasicDrawer closeOnOutsideClick={false} />);
     openDrawer();
-    clickScrim(screen.getByTestId("drawer-overlay"));
+    clickScrim(drawerScrim());
     expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
   });
 
@@ -161,7 +167,7 @@ describe("Drawer", () => {
   it("notifies onOpenChange(false) when controlled", () => {
     const onOpenChange = vi.fn();
     render(<BasicDrawer open onOpenChange={onOpenChange} />);
-    clickScrim(screen.getByTestId("drawer-overlay"));
+    clickScrim(drawerScrim());
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
   });
@@ -235,7 +241,7 @@ describe("Drawer — overlay contract", () => {
 
   it("the scrim is not inert, so a click on it reaches the drawer", () => {
     render(<BasicDrawer defaultOpen />);
-    expect(screen.getByTestId("drawer-overlay").closest("[inert]")).toBeNull();
+    expect(drawerScrim().closest("[inert]")).toBeNull();
   });
 
   it("a pointerdown outside the panel (not only on the scrim) closes it", async () => {
@@ -256,7 +262,7 @@ describe("Drawer — overlay contract", () => {
   it("outside click and Escape close only the topmost layer", () => {
     render(<DrawerWithMenu />);
     fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-    clickScrim(screen.getByTestId("drawer-overlay"));
+    clickScrim(drawerScrim());
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
     expect(screen.getByRole("dialog")).toBeInTheDocument();
 
@@ -271,7 +277,7 @@ describe("Drawer — overlay contract", () => {
     const trigger = screen.getByRole("button", { name: "Open" });
     trigger.focus();
     fireEvent.click(trigger);
-    clickScrim(screen.getByTestId("drawer-overlay"));
+    clickScrim(drawerScrim());
     await expectClosed();
     expect(trigger).toHaveFocus();
   });

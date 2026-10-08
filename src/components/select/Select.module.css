@@ -230,15 +230,6 @@
   overflow: hidden;
 }
 
-/* Closed: stays mounted (labels for the trigger) but out of layout and of the pointer's way. */
-.content[hidden] {
-  display: none;
-}
-
-.content[aria-hidden="true"] {
-  pointer-events: none;
-}
-
 .listbox {
   display: flex;
   flex: 1 1 auto;

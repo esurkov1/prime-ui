@@ -20,8 +20,8 @@ export const api: ComponentApi = {
           name: "confirmOnEnter",
           type: "boolean",
           default: "true",
-          en: "Enter inside the dialog clicks the element wrapped in `Modal.Confirm`.",
-          ru: "Enter нажимает элемент в `Modal.Confirm` (кроме textarea, select, чекбоксов, шапки).",
+          en: "Enter inside the dialog clicks the element wrapped in `Modal.Confirm`; Enter on a button or link activates that element instead.",
+          ru: "Enter нажимает элемент в `Modal.Confirm` (кроме кнопок, ссылок, textarea, select, чекбоксов, шапки).",
         },
         {
           name: "onEnterConfirm",
