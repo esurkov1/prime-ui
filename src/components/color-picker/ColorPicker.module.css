@@ -1,6 +1,7 @@
 /*
- * ColorPicker parts (react-aria-components). Inputs follow the field system (Input.module.css):
- * fill-based, no borders, tier m. Thumbs: thumb-colored ring + overlay shadow, like Slider.
+ * ColorPicker parts (react-aria-components). Channel cells take the shared field surface
+ * (`internal/fieldSurface`: fill, hover, focus, invalid, disabled), tier m. Thumbs: thumb-colored
+ * ring + overlay shadow, like Slider.
  * Color surfaces get a subtle inner edge so white / transparent colors stay visible.
  */
 
@@ -164,28 +165,10 @@
   padding-block: calc((var(--prime-control-m-height) - var(--prime-control-s-line-height)) / 2);
   padding-inline: var(--prime-space-2) var(--prime-space-1);
   border-radius: var(--prime-control-m-radius);
-  background: var(--prime-color-field-bg);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
-  color: var(--prime-color-text-primary);
   font-size: var(--prime-control-s-text-size);
   line-height: var(--prime-control-s-line-height);
   font-variant-numeric: tabular-nums;
   cursor: text;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.channelCell:hover:not(:focus-within) {
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
-}
-
-.channelCell:has(.channelInput:focus-visible) {
-  background: var(--prime-color-field-bg-focus);
-}
-
-/* `focusRing={false}` (data-focus-ring="false") hides only the ring. */
-.channelStrip:not([data-focus-ring="false"]) .channelCell:has(.channelInput:focus-visible) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
 }
 
 .channelInput {
@@ -214,30 +197,6 @@
 .channelSuffix {
   flex-shrink: 0;
   color: var(--prime-color-text-muted);
-}
-
-/* ---- Trigger swatch (inside a button) ---- */
-.triggerSwatch {
-  position: relative;
-  box-sizing: border-box;
-  display: inline-block;
-  flex-shrink: 0;
-  /* Follows the host's icon size (Button sets `--prime-icon-size` per tier); m outside a host. */
-  width: var(--prime-icon-size, var(--prime-control-m-icon));
-  height: var(--prime-icon-size, var(--prime-control-m-icon));
-  overflow: hidden;
-  border-radius: var(--prime-radius-xs);
-  vertical-align: middle;
-}
-
-/* Inner edge painted above the color layer. */
-.triggerSwatch::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
-  pointer-events: none;
 }
 
 /* ---- Standalone eyedropper: square, same height as a field ---- */

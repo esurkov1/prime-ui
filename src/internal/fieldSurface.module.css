@@ -1,0 +1,67 @@
+/*
+ * Field surface (foundation §4, §7): the fill of every field box — Input.Wrapper, the Textarea
+ * box, DigitInput cells, ColorPicker channel cells and (through fieldTrigger) the Select,
+ * Datepicker, TagSelect and NativeSelect triggers. No visible border: a transparent control
+ * outline that `prefers-contrast: more` reveals, a hover wash, a focus fill with the inset ring,
+ * the inset danger ring, the disabled fill.
+ *
+ * States come from the box itself or the native control inside it, so hosts only render markup:
+ *   focus     :focus-visible on the box or on its input / textarea
+ *   invalid   data-invalid / aria-invalid on the box, or aria-invalid on its direct input
+ *   disabled  :disabled / data-disabled on the box, or a disabled input / textarea inside
+ *   read-only data-readonly on the box, or a read-only direct input (no hover wash)
+ * `data-focus-ring="false"` on the box or an ancestor hides only the focus ring (WCAG 2.4.7).
+ *
+ * The bundle may emit this file before or after a host's CSS, so nothing may depend on order:
+ * the base rule has zero specificity (a host's one-class rule — its own transition, cursor —
+ * always wins) and every state rule outranks a host's one-class base rule.
+ */
+:where(.surface) {
+  background: var(--prime-color-field-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  color: var(--prime-color-text-primary);
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.surface:hover:not(
+    :where(
+        :focus-visible,
+        :has(:is(input, textarea):focus-visible),
+        :disabled,
+        [data-disabled="true"],
+        :has(:is(input, textarea):disabled),
+        [data-readonly="true"],
+        :has(> input:read-only)
+      )
+  ) {
+  background: var(--prime-color-field-bg-hover);
+}
+
+.surface:is(:focus-visible, :has(:is(input, textarea):focus-visible)) {
+  background: var(--prime-color-field-bg-focus);
+}
+
+.surface:is(:focus-visible, :has(:is(input, textarea):focus-visible)):not(
+    :where([data-focus-ring="false"], [data-focus-ring="false"] *)
+  ) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.surface:is(
+    [data-invalid="true"],
+    [aria-invalid="true"],
+    :has(> :is(input, textarea)[aria-invalid="true"])
+  ) {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+  outline-color: var(--prime-color-danger-border);
+}
+
+.surface:is(:disabled, [data-disabled="true"], :has(:is(input, textarea):disabled)) {
+  background: var(--prime-color-field-bg-disabled);
+  box-shadow: none;
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}

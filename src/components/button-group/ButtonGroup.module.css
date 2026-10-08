@@ -2,60 +2,17 @@
  * Segmented group: joined segments on a neutral fill, no borders.
  * Segments are separated by a hairline gap that shows the surface behind;
  * only the outer corners are rounded, inner corners are square.
+ * Geometry is Button's: the shared field tier (`internal/fieldTier`) on the root.
  */
 .root {
-  --bg-h: var(--prime-control-m-height);
-  --bg-px: var(--prime-control-m-padding-x);
-  --bg-radius: var(--prime-control-m-radius);
-  --bg-gap: var(--prime-control-m-gap);
-  --bg-text: var(--prime-control-m-text-size);
-  --bg-lh: var(--prime-control-m-line-height);
-  --prime-icon-size: var(--prime-control-m-icon);
+  --prime-icon-size: var(--field-icon);
+  /* Optical compensation: the icon side gets padX − 4px, never closer than 8px (xs). */
+  --bg-px-icon: max(calc(var(--field-button-px) - var(--prime-space-1)), var(--prime-space-2));
 
   display: inline-flex;
   gap: var(--prime-border-width);
   max-width: 100%;
   vertical-align: middle;
-}
-
-.root[data-size="xs"] {
-  --bg-h: var(--prime-control-xs-height);
-  --bg-px: var(--prime-control-xs-padding-x);
-  --bg-radius: var(--prime-control-xs-radius);
-  --bg-gap: var(--prime-control-xs-gap);
-  --bg-text: var(--prime-control-xs-text-size);
-  --bg-lh: var(--prime-control-xs-line-height);
-  --prime-icon-size: var(--prime-control-xs-icon);
-}
-
-.root[data-size="s"] {
-  --bg-h: var(--prime-control-s-height);
-  --bg-px: var(--prime-control-s-padding-x);
-  --bg-radius: var(--prime-control-s-radius);
-  --bg-gap: var(--prime-control-s-gap);
-  --bg-text: var(--prime-control-s-text-size);
-  --bg-lh: var(--prime-control-s-line-height);
-  --prime-icon-size: var(--prime-control-s-icon);
-}
-
-.root[data-size="l"] {
-  --bg-h: var(--prime-control-l-height);
-  --bg-px: var(--prime-control-l-padding-x);
-  --bg-radius: var(--prime-control-l-radius);
-  --bg-gap: var(--prime-control-l-gap);
-  --bg-text: var(--prime-control-l-text-size);
-  --bg-lh: var(--prime-control-l-line-height);
-  --prime-icon-size: var(--prime-control-l-icon);
-}
-
-.root[data-size="xl"] {
-  --bg-h: var(--prime-control-xl-height);
-  --bg-px: var(--prime-control-xl-padding-x);
-  --bg-radius: var(--prime-control-xl-radius);
-  --bg-gap: var(--prime-control-xl-gap);
-  --bg-text: var(--prime-control-xl-text-size);
-  --bg-lh: var(--prime-control-xl-line-height);
-  --prime-icon-size: var(--prime-control-xl-icon);
 }
 
 .root[data-orientation="vertical"] {
@@ -74,39 +31,39 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--bg-gap);
-  min-width: var(--bg-h);
-  height: var(--bg-h);
+  gap: var(--field-gap);
+  min-width: var(--field-h);
+  height: var(--field-h);
   padding-block: 0;
-  padding-inline: var(--bg-px);
+  padding-inline: var(--field-button-px);
   margin: 0;
   border: 0;
   border-radius: 0;
   background: var(--prime-color-fill-muted);
   color: var(--prime-color-text-secondary);
   font-family: inherit;
-  font-size: var(--bg-text);
-  line-height: var(--bg-lh);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   font-weight: var(--prime-font-weight-medium);
   white-space: nowrap;
   cursor: pointer;
   transition:
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* Optical compensation: the icon side gets padX − 4px, never closer than 8px (xs). */
 .item[data-leading-icon="true"] {
-  padding-inline-start: max(calc(var(--bg-px) - var(--prime-space-1)), var(--prime-space-2));
+  padding-inline-start: var(--bg-px-icon);
 }
 
 .item[data-trailing-icon="true"] {
-  padding-inline-end: max(calc(var(--bg-px) - var(--prime-space-1)), var(--prime-space-2));
+  padding-inline-end: var(--bg-px-icon);
 }
 
 /* Icon-only segment: square. */
 .item[data-icon-only="true"] {
-  width: var(--bg-h);
+  width: var(--field-h);
   padding-inline: 0;
 }
 
@@ -115,8 +72,14 @@
   color: var(--prime-color-text-primary);
 }
 
+/* Press (foundation §7 rule 6): compact for icon-only segments; disabled never scales. */
 .item:active:not(:disabled) {
   background: var(--prime-color-fill-strong);
+  transform: scale(var(--prime-motion-press-scale));
+}
+
+.item[data-icon-only="true"]:active:not(:disabled) {
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 .item:focus-visible {
@@ -148,23 +111,23 @@
 
 /* Outer corners only. */
 .root:not([data-orientation="vertical"]) > .item:first-child {
-  border-start-start-radius: var(--bg-radius);
-  border-end-start-radius: var(--bg-radius);
+  border-start-start-radius: var(--field-radius);
+  border-end-start-radius: var(--field-radius);
 }
 
 .root:not([data-orientation="vertical"]) > .item:last-child {
-  border-start-end-radius: var(--bg-radius);
-  border-end-end-radius: var(--bg-radius);
+  border-start-end-radius: var(--field-radius);
+  border-end-end-radius: var(--field-radius);
 }
 
 .root[data-orientation="vertical"] > .item:first-child {
-  border-start-start-radius: var(--bg-radius);
-  border-start-end-radius: var(--bg-radius);
+  border-start-start-radius: var(--field-radius);
+  border-start-end-radius: var(--field-radius);
 }
 
 .root[data-orientation="vertical"] > .item:last-child {
-  border-end-start-radius: var(--bg-radius);
-  border-end-end-radius: var(--bg-radius);
+  border-end-start-radius: var(--field-radius);
+  border-end-end-radius: var(--field-radius);
 }
 
 .icon {

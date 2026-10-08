@@ -68,7 +68,7 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `id` | `string` | — | Id of the input; generated when omitted. |
 | `labels` | `Partial<TagSelectLabels>` | — | Built-in strings, see Labels (`colorNames` merges by key). |
 | `aria-label · aria-labelledby` | `string` | — | Name of the input and the list when there is no `label`. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ## Variants
 No `variant` or `tone`. The control is the field look; chips are soft Badges on the field's wash (neutral chips a stronger wash, hue chips a wash of their hue); the list is the shared floating panel.

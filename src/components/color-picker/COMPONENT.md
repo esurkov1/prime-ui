@@ -61,7 +61,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `children` | `ReactNode` | — (required) | The parts. |
 
 ### ColorPicker.Panel
-`forwardRef` → `HTMLDivElement`. Vertical stack of the parts with the standard gap; native `<div>` props.
+`ref` → `HTMLDivElement`. Vertical stack of the parts with the standard gap; native `<div>` props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -75,9 +75,9 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `label` | `ReactNode` | — | Field label; defaults to `labels.hex`. |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; marks the field invalid. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Field tier. Without it the tier of its host (a panel, a popover), else `m`. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ### ColorPicker.TriggerSwatch
 `ref` → `HTMLSpanElement`. A square of the current color for a trigger button (`aria-hidden`); follows the host icon size, e.g. inside `Button.Icon`.
@@ -148,7 +148,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `…rest` | `Omit<ColorSwatchesProps, "value" \| "defaultValue" \| "onValueChange" \| "allowEmpty" \| "name">` | — | `label`, `size`, `aria-label`, `disabled`… |
 
 ### ColorPicker.EyeDropperButton
-`forwardRef` → `HTMLButtonElement`. A square soft kit Button that opens the native EyeDropper, named by `labels.eyeDropper`; without browser support it is disabled and hidden from assistive tech.
+`ref` → `HTMLButtonElement`. A square soft kit Button that opens the native EyeDropper, named by `labels.eyeDropper`; without browser support it is disabled and hidden from assistive tech.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -168,14 +168,14 @@ No DOM. A quick color from a fixed palette: a square trigger and a popover grid 
 | `onOpenChange` | `(open: boolean) => void` | — | Called when the panel opens or closes. |
 | `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches in panel order. |
 | `columns` | `number` | — | Grid columns; default one row for up to 8 presets (+ «no color»), else 8. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the trigger, the swatches and the panel. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`. |
 | `disabled` | `boolean` | `false` | The trigger does not open the panel. |
 | `allowEmpty` | `boolean` | `false` | Adds the «no color» swatch after the presets (value `null`). |
 | `closeOnSelect` | `boolean` | `true` | Close the panel after a pick (focus returns to the trigger). |
 | `labels` | `Partial<ColorPresetsLabels>` | — | Built-in strings, see Labels. |
 
 ### ColorPresets.Trigger
-`forwardRef` → `HTMLButtonElement`. The kit square swatch button of the root tier, named «`labels.trigger`: <color name>»; ArrowDown / ArrowUp open the panel.
+`ref` → `HTMLButtonElement`. The kit square swatch button of the root tier, named «`labels.trigger`: <color name>»; ArrowDown / ArrowUp open the panel.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

@@ -1,39 +1,15 @@
 /*
- * ColorSwatches — inline color choice on the shared swatch (internal/swatch.module.css).
- * Tier T: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = control gap, radius steps
- * with size. The swatches wrap to the container width (one row when the container sizes to its
- * content); the arrow keys move by the visual rows.
+ * ColorSwatches — inline color choice on the shared swatch (internal/swatch.module.css): the tier
+ * on the grid with the control-height base (swatches 20 · 24 · 28 · 32 · 40). The swatches wrap
+ * to the container width (one row when the container sizes to its content); the arrow keys move
+ * by the visual rows.
  */
 .grid {
-  --swatch-size: calc(var(--prime-control-m-height) - var(--prime-space-2));
-  --swatch-radius: var(--prime-radius-s);
+  --swatch-base: var(--swatch-base-control);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--prime-control-m-gap);
+  gap: var(--swatch-gap);
   min-width: 0;
-}
-
-.grid[data-size="xs"] {
-  --swatch-size: calc(var(--prime-control-xs-height) - var(--prime-space-2));
-  --swatch-radius: var(--prime-radius-xs);
-  gap: var(--prime-control-xs-gap);
-}
-
-.grid[data-size="s"] {
-  --swatch-size: calc(var(--prime-control-s-height) - var(--prime-space-2));
-  gap: var(--prime-control-s-gap);
-}
-
-.grid[data-size="l"] {
-  --swatch-size: calc(var(--prime-control-l-height) - var(--prime-space-2));
-  --swatch-radius: var(--prime-radius-m);
-  gap: var(--prime-control-l-gap);
-}
-
-.grid[data-size="xl"] {
-  --swatch-size: calc(var(--prime-control-xl-height) - var(--prime-space-2));
-  --swatch-radius: var(--prime-radius-m);
-  gap: var(--prime-control-xl-gap);
 }
 
 /* Invalid: the selection ring turns danger. */

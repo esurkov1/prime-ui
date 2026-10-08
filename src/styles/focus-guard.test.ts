@@ -49,16 +49,24 @@ describe("focus ring guard", () => {
   });
 
   it("draws the ring inside fields", () => {
-    const fieldStyles = [
-      "components/input/Input.module.css",
-      "components/textarea/Textarea.module.css",
-      "components/select/Select.module.css",
-      "components/tag-select/TagSelect.module.css",
-      "components/datepicker/Datepicker.module.css",
-      "components/digit-input/DigitInput.module.css",
+    // The shared field surface owns the inset ring; every field box uses it (TSX class or CSS
+    // `composes`) or draws its own inset ring.
+    expect(read("internal/fieldSurface.module.css")).toContain("--prime-focus-offset-inset");
+    const fields = [
+      "components/input/Input",
+      "components/textarea/Textarea",
+      "components/select/Select",
+      "components/tag-select/TagSelect",
+      "components/datepicker/Datepicker",
+      "components/digit-input/DigitInput",
     ];
-    const missing = fieldStyles.filter((rel) => !read(rel).includes("--prime-focus-offset-inset"));
-    expect(missing).toEqual([]);
+    const usesInsetRing = (base: string) => {
+      const source = read(`${base}.tsx`) + read(`${base}.module.css`);
+      return ["--prime-focus-offset-inset", "fieldSurfaceClass", "fieldTrigger.module.css"].some(
+        (marker) => source.includes(marker),
+      );
+    };
+    expect(fields.filter((base) => !usesInsetRing(base))).toEqual([]);
   });
 
   it("keeps side padding on the scrolling body of overlays", () => {

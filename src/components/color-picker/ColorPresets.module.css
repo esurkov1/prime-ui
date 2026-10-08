@@ -1,53 +1,30 @@
 /*
  * ColorPresets — quick color pick: a square swatch trigger + a popover grid of preset swatches
- * (the shared swatch from swatch.module.css).
+ * (the shared swatch, its tier and the trigger chip from internal/swatch.module.css).
  * Tier T: trigger = control height · swatch = item-height − 8 (16 · 20 · 24 · 28 · 32) ·
  * gap = control gap · swatch radius steps with size (4 · 6 · 6 · 8 · 8).
  */
 
-/* ---- Trigger: square swatch button of the tier height ---- */
+/* ---- Trigger: square swatch button of the tier height (the shared field tier) ---- */
 .trigger {
-  --cpr-size: var(--prime-control-m-height);
-  --cpr-radius: var(--prime-control-m-radius);
   position: relative;
   box-sizing: border-box;
   display: inline-flex;
   flex-shrink: 0;
-  width: var(--cpr-size);
-  height: var(--cpr-size);
+  width: var(--field-h);
+  height: var(--field-h);
   margin: 0;
   padding: 0;
   overflow: hidden;
   border: 0;
-  border-radius: var(--cpr-radius);
+  border-radius: var(--field-radius);
   background: var(--prime-color-field-bg);
   cursor: pointer;
   transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.trigger[data-size="xs"] {
-  --cpr-size: var(--prime-control-xs-height);
-  --cpr-radius: var(--prime-control-xs-radius);
-}
-
-.trigger[data-size="s"] {
-  --cpr-size: var(--prime-control-s-height);
-  --cpr-radius: var(--prime-control-s-radius);
-}
-
-.trigger[data-size="l"] {
-  --cpr-size: var(--prime-control-l-height);
-  --cpr-radius: var(--prime-control-l-radius);
-}
-
-.trigger[data-size="xl"] {
-  --cpr-size: var(--prime-control-xl-height);
-  --cpr-radius: var(--prime-control-xl-radius);
-}
-
 /* Inner edge above the color layer; darkens on hover / open. */
-.trigger::after,
-.swatch::after {
+.trigger::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -77,19 +54,6 @@
   opacity: 0.5;
 }
 
-/* ---- Swatch for custom triggers (follows the host icon size) ---- */
-.swatch {
-  position: relative;
-  box-sizing: border-box;
-  display: inline-block;
-  flex-shrink: 0;
-  width: var(--prime-icon-size, var(--prime-control-m-icon));
-  height: var(--prime-icon-size, var(--prime-control-m-icon));
-  overflow: hidden;
-  border-radius: var(--prime-radius-xs);
-  vertical-align: middle;
-}
-
 /* ---- Panel: section label + swatch grid ---- */
 /* Label above the swatch grid inside the Popover panel. */
 .body {
@@ -117,35 +81,12 @@
   line-height: var(--prime-control-l-label-line-height);
 }
 
+/* The shared swatch tier on the menu item base (swatches 16 · 20 · 24 · 28 · 32). */
 .grid {
-  --swatch-size: calc(var(--prime-control-m-item-height) - var(--prime-space-2));
-  --swatch-radius: var(--prime-radius-s);
+  --swatch-base: var(--swatch-base-item);
   display: grid;
   grid-template-columns: repeat(var(--cpr-columns, 8), var(--swatch-size));
   justify-content: start;
-  gap: var(--prime-control-m-gap);
+  gap: var(--swatch-gap);
   outline: none;
-}
-
-.grid[data-size="xs"] {
-  --swatch-size: calc(var(--prime-control-xs-item-height) - var(--prime-space-2));
-  --swatch-radius: var(--prime-radius-xs);
-  gap: var(--prime-control-xs-gap);
-}
-
-.grid[data-size="s"] {
-  --swatch-size: calc(var(--prime-control-s-item-height) - var(--prime-space-2));
-  gap: var(--prime-control-s-gap);
-}
-
-.grid[data-size="l"] {
-  --swatch-size: calc(var(--prime-control-l-item-height) - var(--prime-space-2));
-  --swatch-radius: var(--prime-radius-m);
-  gap: var(--prime-control-l-gap);
-}
-
-.grid[data-size="xl"] {
-  --swatch-size: calc(var(--prime-control-xl-item-height) - var(--prime-space-2));
-  --swatch-radius: var(--prime-radius-m);
-  gap: var(--prime-control-xl-gap);
 }

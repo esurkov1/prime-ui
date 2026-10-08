@@ -13,6 +13,8 @@
   --fu-title-line-height: var(--prime-control-m-line-height);
   --fu-icon-box: var(--prime-control-m-height);
   --fu-radius: var(--prime-radius-l);
+  --fu-line: var(--prime-color-border-default);
+  --fu-line-hover: var(--prime-color-text-placeholder);
   position: relative;
   box-sizing: border-box;
   display: flex;
@@ -21,9 +23,10 @@
   justify-content: center;
   width: 100%;
   min-width: 0;
-  padding: var(--fu-pad);
-  border: var(--prime-border-width) dashed var(--prime-color-border-default);
-  border-radius: var(--fu-radius);
+  /* `--file-upload-padding` / `--file-upload-radius` on the root `className` reshape the zone. */
+  padding: var(--file-upload-padding, var(--fu-pad));
+  border: var(--prime-border-width) dashed var(--fu-line);
+  border-radius: var(--file-upload-radius, var(--fu-radius));
   background: var(--prime-color-field-bg);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
@@ -70,13 +73,39 @@
   --fu-radius: var(--prime-radius-xl);
 }
 
-.root:hover:not([data-disabled="true"]) {
-  border-color: var(--prime-color-text-placeholder);
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
+/*
+ * The line is two variables, `--fu-line` and its hover `--fu-line-hover`; each state only assigns
+ * them, in this order: disabled → solid (no line) → invalid → drag-over.
+ */
+.root[data-disabled="true"] {
+  --fu-line: var(--prime-color-border-subtle);
+  background: var(--prime-color-field-bg-disabled);
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
 }
 
+.root[data-variant="solid"] {
+  --fu-line: transparent;
+  --fu-line-hover: transparent;
+}
+
+.root[data-invalid="true"] {
+  --fu-line: var(--prime-color-danger-border);
+  --fu-line-hover: var(--prime-color-danger-border);
+}
+
+.root[data-state="active"] {
+  --fu-line: var(--prime-color-accent-default);
+  --fu-line-hover: var(--prime-color-accent-default);
+}
+
+.root:hover:not([data-disabled="true"]) {
+  border-color: var(--fu-line-hover);
+  background: var(--prime-color-field-bg-hover);
+}
+
+/* Drag-over beats hover (equal specificity, later). */
 .root[data-state="active"]:not([data-disabled="true"]) {
-  border-color: var(--prime-color-accent-default);
   background: var(--prime-color-accent-soft);
 }
 
@@ -89,48 +118,7 @@
   outline-color: var(--prime-color-danger-border);
 }
 
-.root[data-disabled="true"] {
-  border-color: var(--prime-color-border-subtle);
-  background: var(--prime-color-field-bg-disabled);
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
-}
-
-.root[data-invalid="true"]:not([data-state="active"]) {
-  border-color: var(--prime-color-danger-border);
-}
-
-.root[data-variant="solid"] {
-  border-color: transparent;
-}
-
-/* Hover must not bring the dashed line back on `solid` (beats `.root:hover:not(...)`). */
-.root[data-variant="solid"]:hover:not([data-disabled="true"]) {
-  border-color: transparent;
-}
-
-.root[data-variant="solid"][data-invalid="true"]:not([data-state="active"]) {
-  border-color: var(--prime-color-danger-border);
-}
-
-.root[data-variant="solid"][data-state="active"]:not([data-disabled="true"]) {
-  border-color: var(--prime-color-accent-default);
-}
-
-/* Visually hidden but focusable (keyboard opens the picker via the label). */
-.input {
-  position: absolute;
-  width: var(--prime-border-width);
-  height: var(--prime-border-width);
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* ---- Body: no pointer events (no drag flicker over text), interactive children opt back in ---- */
+/* ---- Body: a centered column (drag-over follows enter / leave depth, so children never flicker it) ---- */
 .body {
   display: flex;
   flex-direction: column;
@@ -140,11 +128,6 @@
   width: 100%;
   min-width: 0;
   text-align: center;
-  pointer-events: none;
-}
-
-.body :is(button, a) {
-  pointer-events: auto;
 }
 
 .icon {
@@ -199,12 +182,6 @@
 
 .root[data-disabled="true"] .title {
   color: var(--prime-color-text-disabled);
-}
-
-/* The decorative «browse» Button is a span: it never takes the pointer (the zone does). */
-.body .browse {
-  pointer-events: none;
-  user-select: none;
 }
 
 /* ─── File row: [badge] name / description [actions], then progress ─── */

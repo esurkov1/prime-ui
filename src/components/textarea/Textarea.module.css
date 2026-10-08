@@ -1,53 +1,13 @@
 /*
- * Textarea follows the Input field system (see Input.module.css): fill-based box, tier text. Label
- * row and support row (with the counter) come from FieldFrame.
+ * Textarea follows the Input field system: the shared field surface on the box, the field tier on
+ * the root. Label row and support row (with the counter) come from FieldFrame.
  * Vertical padding = (control height − line height) / 2, so one line sits exactly like an Input.
  */
 .root {
-  --prime-textarea-height: var(--prime-control-m-height);
-  --prime-textarea-padding-x: var(--prime-control-m-field-padding-x);
-  --prime-textarea-radius: var(--prime-control-m-radius);
-  --prime-textarea-body-size: var(--prime-control-m-text-size);
-  --prime-textarea-line-height: var(--prime-control-m-line-height);
-  --prime-textarea-padding-y: calc(
-    (var(--prime-textarea-height) - var(--prime-textarea-line-height)) /
-    2
-  );
+  --textarea-padding-y: calc((var(--field-h) - var(--field-lh)) / 2);
   /* Minimum content height: three lines. */
-  --prime-textarea-inner-min-height: calc(var(--prime-textarea-line-height) * 3);
+  --textarea-inner-min-height: calc(var(--field-lh) * 3);
   width: 100%;
-}
-
-.root[data-size="xs"] {
-  --prime-textarea-height: var(--prime-control-xs-height);
-  --prime-textarea-padding-x: var(--prime-control-xs-field-padding-x);
-  --prime-textarea-radius: var(--prime-control-xs-radius);
-  --prime-textarea-body-size: var(--prime-control-xs-text-size);
-  --prime-textarea-line-height: var(--prime-control-xs-line-height);
-}
-
-.root[data-size="s"] {
-  --prime-textarea-height: var(--prime-control-s-height);
-  --prime-textarea-padding-x: var(--prime-control-s-field-padding-x);
-  --prime-textarea-radius: var(--prime-control-s-radius);
-  --prime-textarea-body-size: var(--prime-control-s-text-size);
-  --prime-textarea-line-height: var(--prime-control-s-line-height);
-}
-
-.root[data-size="l"] {
-  --prime-textarea-height: var(--prime-control-l-height);
-  --prime-textarea-padding-x: var(--prime-control-l-field-padding-x);
-  --prime-textarea-radius: var(--prime-control-l-radius);
-  --prime-textarea-body-size: var(--prime-control-l-text-size);
-  --prime-textarea-line-height: var(--prime-control-l-line-height);
-}
-
-.root[data-size="xl"] {
-  --prime-textarea-height: var(--prime-control-xl-height);
-  --prime-textarea-padding-x: var(--prime-control-xl-field-padding-x);
-  --prime-textarea-radius: var(--prime-control-xl-radius);
-  --prime-textarea-body-size: var(--prime-control-xl-text-size);
-  --prime-textarea-line-height: var(--prime-control-xl-line-height);
 }
 
 /* ── Field box ── */
@@ -57,44 +17,9 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: var(--prime-textarea-padding-y) var(--prime-textarea-padding-x);
-  border-radius: var(--prime-textarea-radius);
-  background: var(--prime-color-field-bg);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
-  color: var(--prime-color-text-primary);
+  padding: var(--textarea-padding-y) var(--field-px);
+  border-radius: var(--field-radius);
   cursor: text;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.control:hover:not(:focus-within):not([data-disabled="true"]):not([data-readonly="true"]) {
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
-}
-
-.control:has(textarea:focus-visible) {
-  background: var(--prime-color-field-bg-focus);
-}
-
-/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
-.control:not([data-focus-ring="false"]):has(textarea:focus-visible) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
-.control[data-invalid="true"] {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
-}
-
-.control[data-invalid="true"]:has(textarea:focus-visible) {
-  outline-color: var(--prime-color-danger-border);
-}
-
-.control[data-disabled="true"] {
-  background: var(--prime-color-field-bg-disabled);
-  color: var(--prime-color-text-disabled);
-  box-shadow: none;
-  cursor: not-allowed;
 }
 
 .control[data-readonly="true"] {
@@ -113,14 +38,14 @@
   grid-area: 1 / 1 / 2 / 2;
   visibility: hidden;
   min-width: 0;
-  min-height: var(--prime-textarea-inner-min-height);
+  min-height: var(--textarea-inner-min-height);
   /* Must match .textarea exactly, otherwise the mirror and the text differ in height. */
   padding: 0;
   border: 0;
   font-family: inherit;
-  font-size: var(--prime-textarea-body-size);
+  font-size: var(--field-text);
   font-weight: inherit;
-  line-height: var(--prime-textarea-line-height);
+  line-height: var(--field-lh);
   letter-spacing: inherit;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -143,8 +68,8 @@
   box-shadow: none;
   resize: vertical;
   font: inherit;
-  font-size: var(--prime-textarea-body-size);
-  line-height: var(--prime-textarea-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -162,7 +87,7 @@
 }
 
 .textarea:not(.textareaAutoResize) {
-  min-height: var(--prime-textarea-inner-min-height);
+  min-height: var(--textarea-inner-min-height);
 }
 
 .textarea::placeholder {

@@ -37,8 +37,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = the tier gap; label and hint follow it.",
+          default: 'host tier, else "m"',
+          en: "Tier: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = the tier gap; label and hint follow it. Without it the tier of its host, else `m`.",
           ru: "Ярус: образец = высота контрола − 8 (20 · 24 · 28 · 32 · 40), зазор яруса.",
         },
         {

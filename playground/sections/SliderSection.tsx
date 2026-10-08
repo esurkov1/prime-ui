@@ -36,6 +36,12 @@ export const page: ComponentPageConfig = {
         "Свои границы, крупный или дробный шаг; ползунок без видимой подписи — `min`, `max`, `step`, `aria-label`.",
     },
     {
+      scenario: "hint-and-error",
+      title: "Подсказка и ошибка",
+      description:
+        "Ползунок в рамке поля, как остальные: пометка обязательности, подсказка и ошибка на её месте — `required`, `hint`, `error`, `optional`.",
+    },
+    {
       slot: "controlled",
       description:
         "Значением владеет родитель и делит его с числовым полем для точного ввода — `value`, `onValueChange`.",
@@ -53,6 +59,7 @@ export const page: ComponentPageConfig = {
       'Нативный `<input type="range">` (`role="slider"`) поверх визуального слоя.',
       "`label` — настоящий `<label htmlFor>`; без него обязателен `aria-label`.",
       "`formatValue` задаёт `aria-valuetext`, скринридер читает единицы; видимый `<output>` скрыт (`aria-hidden`).",
+      "`aria-describedby` поля — ваши id и подсказка или ошибка; `aria-invalid` при ошибке.",
     ],
   },
 };

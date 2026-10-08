@@ -16,7 +16,6 @@
   --slider-thumb-w: calc(var(--slider-track) * 4.5);
   /* Hover glass frosts the track a little; press glass is clear. */
   --slider-glass-blur: calc(var(--slider-track) / 4);
-  --slider-label-gap: var(--prime-control-m-label-gap);
   --slider-value-size: var(--prime-control-m-label-size);
   --slider-value-line-height: var(--prime-control-m-label-line-height);
   --slider-track-bg: var(--prime-color-fill-strong);
@@ -29,37 +28,30 @@
     (100% - var(--slider-thumb-w)) *
     var(--slider-ratio, 0)
   );
-  display: flex;
-  flex-direction: column;
-  gap: var(--slider-label-gap);
+  /* The frame (label row · control · support row) is FieldFrame's; the slider fills its width. */
   width: 100%;
-  min-width: 0;
 }
 
 .root[data-size="xs"] {
   --slider-track: var(--prime-control-xs-track);
-  --slider-label-gap: var(--prime-control-xs-label-gap);
   --slider-value-size: var(--prime-control-xs-label-size);
   --slider-value-line-height: var(--prime-control-xs-label-line-height);
 }
 
 .root[data-size="s"] {
   --slider-track: var(--prime-control-s-track);
-  --slider-label-gap: var(--prime-control-s-label-gap);
   --slider-value-size: var(--prime-control-s-label-size);
   --slider-value-line-height: var(--prime-control-s-label-line-height);
 }
 
 .root[data-size="l"] {
   --slider-track: var(--prime-control-l-track);
-  --slider-label-gap: var(--prime-control-l-label-gap);
   --slider-value-size: var(--prime-control-l-label-size);
   --slider-value-line-height: var(--prime-control-l-label-line-height);
 }
 
 .root[data-size="xl"] {
   --slider-track: var(--prime-control-xl-track);
-  --slider-label-gap: var(--prime-control-xl-label-gap);
   --slider-value-size: var(--prime-control-xl-label-size);
   --slider-value-line-height: var(--prime-control-xl-label-line-height);
 }
@@ -90,17 +82,8 @@
   --slider-thumb-bg: var(--prime-color-fill-strong);
 }
 
-.header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
+/* The current value at the end of the label row (FieldFrame `labelEnd`). */
 .value {
-  flex-shrink: 0;
-  margin-inline-start: auto;
   font-family: var(--prime-font-family-sans);
   font-size: var(--slider-value-size);
   line-height: var(--slider-value-line-height);
@@ -214,14 +197,17 @@
 /* ---- states (input is the previous sibling of the visual layer) ---- */
 
 /* Liquid glass: hover lifts the thumb into light glass, press into clear glass; the track and the
-   rounded end of the range show through. One outer glass edge, drawn outside the shape. */
-.input:not(:disabled):hover ~ .thumb {
-  transform: scale(1.1);
-  background: color-mix(in srgb, var(--slider-thumb-bg) 44%, transparent);
-  box-shadow:
-    0 0 0 var(--prime-border-width) color-mix(in srgb, var(--slider-thumb-bg) 72%, transparent),
-    var(--prime-shadow-thumb);
-  backdrop-filter: blur(var(--slider-glass-blur)) saturate(1.6);
+   rounded end of the range show through. One outer glass edge, drawn outside the shape.
+   The hover lift is for pointers only (foundation §7 rule 10); press works on touch too. */
+@media (hover: hover) and (pointer: fine) {
+  .input:not(:disabled):hover ~ .thumb {
+    transform: scale(1.1);
+    background: color-mix(in srgb, var(--slider-thumb-bg) 44%, transparent);
+    box-shadow:
+      0 0 0 var(--prime-border-width) color-mix(in srgb, var(--slider-thumb-bg) 72%, transparent),
+      var(--prime-shadow-thumb);
+    backdrop-filter: blur(var(--slider-glass-blur)) saturate(1.6);
+  }
 }
 
 .input:not(:disabled):active ~ .thumb {
@@ -248,6 +234,10 @@
 .input:focus-visible ~ .thumb {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
+}
+
+.root[data-invalid="true"] .input:focus-visible ~ .thumb {
+  outline-color: var(--prime-color-danger-border);
 }
 
 .root[data-disabled="true"] .thumb {

@@ -44,12 +44,12 @@ The built-in body (icon, `labels.title`, `labels.description` and a decorative s
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### FileUpload.Root
-`forwardRef` → `HTMLLabelElement` (the drop zone). The field frame (label → zone → hint | error) around a `<label>` drop zone with a visually hidden file input; native label props go to the zone.
+`ref` → `HTMLDivElement` (the field frame). The field frame (label → zone → hint | error) around a `<label>` drop zone with a visually hidden file input. Field-root rule: `className`, `ref` and the rest go to the frame; `id` and `aria-label` to the file input.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `variant` | `"dashed" \| "solid"` | `"dashed"` | `dashed` shows the drop line; `solid` keeps only the fill (cards, modals). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the zone padding, icon, title, button, label and hint. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the zone padding, icon, title, button, label and hint. Without it the tier of its host (a form, a panel), else `m`. |
 | `label` | `ReactNode` | — | Field label above the zone; names the file input. |
 | `required` | `boolean` | — | Red `*` after the label and native `required` on the input. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
@@ -65,10 +65,11 @@ The built-in body (icon, `labels.title`, `labels.description` and a decorative s
 | `id` | `string` | — | Id of the file input; hint id is `<id>-hint`, error id is `<id>-error`. |
 | `labels` | `Partial<FileUploadLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Custom body (`FileUpload.Body`); replaces the built-in icon, title, description and button. |
-| `className` | `string` | — | Class on the drop zone `<label>` (e.g. a round avatar zone). |
+| `aria-label` | `string` | — | Name of the file input when there is no `label`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`. The zone reads `--file-upload-padding` and `--file-upload-radius` from that class (a round zone around an avatar). |
 
 ### FileUpload.Body
-`ref` → `HTMLDivElement`. A centered column for a custom zone body; it takes no pointer events (no drag flicker), nested buttons and links opt back in. Native `<div>` props.
+`ref` → `HTMLDivElement`. A centered column for a custom zone body; nested buttons and links stay interactive (drag-over follows enter / leave depth, so crossing children never flickers it). Native `<div>` props.
 
 ### FileUpload.Icon
 `ref` → `HTMLSpanElement`. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid. Native `<span>` props.
@@ -88,7 +89,7 @@ The built-in body (icon, `labels.title`, `labels.description` and a decorative s
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the padding, text and the format badge. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the padding, text and the format badge. Without it the tier of its host, else `m`. |
 | `invalid` | `boolean` | `false` | A failed upload: danger wash and ring, danger description. |
 
 ### FileUpload.FormatBadge
@@ -163,7 +164,7 @@ Also `data-size`, `data-variant` on the zone and `data-size` on Item. Files are 
 ## Layout & spacing
 - The zone and Item are `width: 100%`; the parent sets the width. Label → zone and zone → hint use the tier `label-gap` / `hint-gap`.
 - Zone → first file row and row → row: `--prime-space-2`.
-- A custom zone can hug its content (avatar zone: `className` with `width: auto`, round radius, small padding).
+- A custom zone can hug its content (avatar zone: a root `className` with `width: fit-content`, `--file-upload-radius: var(--prime-radius-full)` and a small `--file-upload-padding`).
 
 ## Accessibility
 

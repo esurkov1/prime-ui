@@ -105,4 +105,32 @@ describe("Slider", () => {
     slider.focus();
     expect(slider).toHaveFocus();
   });
+
+  it("is framed like every field: required marker, hint, error replacing it, value in the label row", () => {
+    const { rerender } = render(
+      <Slider label="Громкость" required hint="От 0 до 100" showValue defaultValue={40} />,
+    );
+    const slider = screen.getByRole("slider", { name: "Громкость" });
+    expect(slider).toHaveAccessibleDescription("От 0 до 100");
+    expect(screen.getByText("*")).toHaveAttribute("aria-hidden", "true");
+    const value = screen.getByText("40");
+    expect(value.tagName).toBe("OUTPUT");
+    expect(value.closest("label")).toBeNull();
+
+    rerender(
+      <Slider label="Громкость" required hint="От 0 до 100" error="Слишком громко" showValue />,
+    );
+    expect(slider).toHaveAccessibleDescription("Слишком громко");
+    expect(slider).toHaveAttribute("aria-invalid", "true");
+    expect(screen.queryByText("От 0 до 100")).toBeNull();
+  });
+
+  it("puts id on the range input and className / rest on the frame", () => {
+    const { container } = render(
+      <Slider id="vol" className="custom" data-testid="frame" aria-label="Vol" />,
+    );
+    expect(screen.getByRole("slider", { name: "Vol" })).toHaveAttribute("id", "vol");
+    expect(screen.getByTestId("frame")).toBe(container.firstChild);
+    expect(container.firstChild).toHaveClass("custom");
+  });
 });

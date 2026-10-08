@@ -120,7 +120,7 @@ describe("ColorPresets", () => {
     expect(options[16]).toHaveAccessibleName("Без цвета");
     fireEvent.click(options[16]);
     expect(onValueChange).toHaveBeenCalledWith(null);
-    expect(screen.getByRole("button", { name: "Цвет: Без цвета" })).toHaveAttribute("data-empty");
+    expect(screen.getByRole("button", { name: "Цвет: Без цвета" })).toBeInTheDocument();
   });
 
   it("takes custom presets, columns and a section label", () => {

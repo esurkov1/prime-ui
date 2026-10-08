@@ -62,10 +62,11 @@
 }
 
 /* The whole avatar is the drop target: a round zone that hugs it. */
-.avatarRow .avatarZone {
-  width: auto;
-  padding: var(--prime-space-1);
-  border-radius: var(--prime-radius-full);
+.avatarZone {
+  --file-upload-padding: var(--prime-space-1);
+  --file-upload-radius: var(--prime-radius-full);
+  flex-shrink: 0;
+  width: fit-content;
 }
 
 /* Text block → actions: 12; title → description: 4. */

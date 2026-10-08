@@ -37,19 +37,20 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Checkbox.Root
-`forwardRef` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row; native input props go to the input.
+`ref` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row. Field-root rule for a leaf: `className` goes to the field `<div>`; `id`, `ref` and native input props to the input.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `checked` | `boolean` | — | Controlled checked state. |
 | `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
-| `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle. |
+| `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle (not while `readOnly`). |
 | `indeterminate` | `boolean` | `false` | Mixed state (a partial «select all»): a bar instead of the check; wins over `checked` visually and sets the native `indeterminate`. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the box, the text and the gap. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger ring on the unchecked box and `aria-invalid`. A non-empty `error` implies it. |
 | `disabled` | `boolean` | `false` | Disabled fill, dimmed label and hint, no toggling. |
+| `readOnly` | `boolean` | `false` | The state is shown and focusable but does not change (`aria-readonly`); no hover or press. The native checkbox ignores `readOnly`, so the root guards the toggle. |
 | `id` | `string` | — | Id of the input (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
 | `children` | `ReactNode` | — | `Checkbox.Label`. Without it only the box renders — give the root an `aria-label`. |
@@ -103,7 +104,8 @@ Checkbox has no `variant` / `tone` / `color`.
 | checked | `checked` / `defaultChecked` | `data-state="checked"`; accent box, the check draws in |
 | indeterminate | `indeterminate` | `data-state="indeterminate"`, `input.indeterminate`; accent box with a bar |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid` on the input; danger ring on the unchecked box and on focus |
-| disabled | `disabled` | `data-disabled="true"` on root and label; `fill-muted` box, `cursor: not-allowed` |
+| disabled | `disabled` | `data-disabled="true"` on the root; `fill-muted` box, disabled text, `cursor: not-allowed` |
+| read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the root; the state stays, no hover or press, default cursor |
 | pressed | pointer press | the box scales to the compact press scale |
 | focus-visible | keyboard focus | outer focus ring around the box |
 

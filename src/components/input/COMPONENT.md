@@ -59,7 +59,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `labels` | `Partial<InputLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Usually `Input.Wrapper`. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ### Input.Wrapper
 `ref` → `HTMLDivElement`. The visible field: fill, hover, focus ring, invalid ring; `data-size` and `data-invalid` come from the root.
@@ -70,14 +70,14 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the `<div>`. |
 
 ### Input.Field
-`forwardRef` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.
+`ref` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `onValueChange` | `(value: string) => void` | — | Called with the new string; native `onChange` still fires first. |
 | `aria-describedby` | `string` | — | Merged with the hint/error ids from the root. |
 | `required` | `boolean` | — | Overrides the root's `required` for the native input. |
-| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "size">` | — | `value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`… |
+| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "size" \| "id">` | — | `value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`… |
 
 ### Input.Icon
 `ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`), centered between the edge and the text.
@@ -107,7 +107,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ### Input.ClearButton
-`forwardRef` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.
+`ref` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

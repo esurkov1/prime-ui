@@ -1,37 +1,14 @@
-import * as React from "react";
-import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
+import type * as React from "react";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import { iconLayout } from "@/internal/iconLayout";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone, Variant } from "@/internal/states";
 
 import { Spinner } from "../spinner/Spinner";
 import styles from "./Button.module.css";
-
-type ButtonLayout = {
-  iconOnly: boolean;
-  leadingIcon: boolean;
-  trailingIcon: boolean;
-};
-
-/**
- * Reads the direct children to drive optical padding (icon side = padX − 4px),
- * the square icon-only shape and where the loading spinner goes.
- */
-function getButtonLayout(children: React.ReactNode): ButtonLayout {
-  const content = React.Children.toArray(children).filter(
-    (child) => !(typeof child === "string" && child.trim() === ""),
-  );
-  const isIcon = (child: React.ReactNode) =>
-    React.isValidElement(child) && child.type === ButtonIcon;
-  const iconOnly = content.length > 0 && content.every(isIcon);
-
-  return {
-    iconOnly,
-    leadingIcon: !iconOnly && content.length > 0 && isIcon(content[0]),
-    trailingIcon: !iconOnly && content.length > 0 && isIcon(content[content.length - 1]),
-  };
-}
 
 /**
  * `tone="inherit"` takes the host's text color (a close button on a solid Banner): fills are a
@@ -62,83 +39,80 @@ export type ButtonRootProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>
      * dropped, and no spinner is added — the child owns its content.
      */
     asChild?: boolean;
+    ref?: React.Ref<HTMLButtonElement>;
   };
 
-const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
-  (
-    {
-      children,
-      className,
-      variant = "solid",
-      tone = "accent",
-      size: sizeProp,
-      fullWidth,
-      type = "button",
-      loading = false,
-      disabled,
-      asChild = false,
-      onClick,
-      ...rest
-    },
-    ref,
-  ) => {
-    // Without an explicit size the button takes the tier of its host (a form, a panel, a field).
-    const hostSize = useOptionalControlSize();
-    const size = sizeProp ?? hostSize ?? "m";
-    const isDisabled = disabled || loading;
-    const layout = getButtonLayout(children);
-    const dataAttrs = toDataAttributes({
-      variant,
-      tone,
-      size,
-      disabled: isDisabled || undefined,
-      loading,
-      "full-width": fullWidth,
-      "icon-only": layout.iconOnly || undefined,
-      "leading-icon": layout.leadingIcon || undefined,
-      "trailing-icon": layout.trailingIcon || undefined,
-      // Without a leading icon the spinner is centered over the hidden label: width stays put.
-      "loading-overlay":
-        (loading && !asChild && !layout.leadingIcon && !layout.iconOnly) || undefined,
-    });
+function ButtonRoot({
+  children,
+  className,
+  variant = "solid",
+  tone = "accent",
+  size: sizeProp,
+  fullWidth,
+  type = "button",
+  loading = false,
+  disabled,
+  asChild = false,
+  onClick,
+  ref,
+  ...rest
+}: ButtonRootProps) {
+  const size = useControlSize(sizeProp);
+  const isDisabled = disabled || loading;
+  const layout = iconLayout(children, ButtonIcon);
+  const dataAttrs = toDataAttributes({
+    variant,
+    tone,
+    size,
+    // `disabled` only: a loading button is busy, not unavailable, and keeps its colors.
+    disabled: disabled || undefined,
+    loading,
+    "full-width": fullWidth,
+    "icon-only": layout.iconOnly || undefined,
+    "leading-icon": layout.leadingIcon || undefined,
+    "trailing-icon": layout.trailingIcon || undefined,
+    // Without a leading icon the spinner is centered over the hidden label: width stays put.
+    "loading-overlay":
+      (loading && !asChild && !layout.leadingIcon && !layout.iconOnly) || undefined,
+  });
+  const classes = cx(fieldTierClass, styles.root, className);
 
-    if (asChild) {
-      return (
-        <ControlSizeProvider value={size}>
-          <Slot
-            {...rest}
-            ref={ref as React.Ref<HTMLElement>}
-            className={cx(styles.root, className)}
-            aria-disabled={isDisabled || undefined}
-            aria-busy={loading || undefined}
-            onClick={isDisabled ? (event: React.MouseEvent) => event.preventDefault() : onClick}
-            {...dataAttrs}
-          >
-            {children}
-          </Slot>
-        </ControlSizeProvider>
-      );
-    }
-
+  if (asChild) {
     return (
-      <button
-        {...rest}
-        ref={ref}
-        type={type}
-        className={cx(styles.root, className)}
-        disabled={isDisabled}
-        aria-busy={loading || undefined}
-        onClick={onClick}
-        {...dataAttrs}
-      >
-        <ControlSizeProvider value={size}>
-          {loading ? <Spinner className={styles.spinner} aria-hidden="true" /> : null}
+      <ControlSizeProvider value={size}>
+        <Slot
+          {...rest}
+          ref={ref as React.Ref<HTMLElement>}
+          className={classes}
+          aria-disabled={isDisabled || undefined}
+          aria-busy={loading || undefined}
+          onClick={isDisabled ? (event: React.MouseEvent) => event.preventDefault() : onClick}
+          {...dataAttrs}
+        >
           {children}
-        </ControlSizeProvider>
-      </button>
+        </Slot>
+      </ControlSizeProvider>
     );
-  },
-);
+  }
+
+  return (
+    <button
+      {...rest}
+      ref={ref}
+      type={type}
+      className={classes}
+      disabled={isDisabled}
+      aria-busy={loading || undefined}
+      onClick={onClick}
+      {...dataAttrs}
+    >
+      <ControlSizeProvider value={size}>
+        {loading ? <Spinner className={styles.spinner} aria-hidden="true" /> : null}
+        {children}
+      </ControlSizeProvider>
+    </button>
+  );
+}
 
 ButtonRoot.displayName = "Button.Root";
 

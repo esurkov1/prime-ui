@@ -1,5 +1,13 @@
 /* Layout of the Slider scenarios: semantic tokens only. */
 
+/* hint-and-error.tsx: fields of a form column, field → field 24. */
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-6);
+  width: min(100%, var(--prime-modal-width-s));
+}
+
 /* controlled.tsx: the slider takes the row, the number field a fixed column. */
 .withInput {
   display: grid;

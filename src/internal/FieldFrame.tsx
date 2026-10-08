@@ -29,18 +29,22 @@ export type FieldFrameProps = {
 };
 
 /**
- * Native attributes and `ref` of a framed field's root — they land on the frame `<div>`. `id`
- * belongs to the control, the value props to the field.
+ * Native attributes and `ref` of a framed field's root. One rule for every field root:
+ * `className`, `ref` and the rest land on the frame `<div>`, `id` on the control (the value props
+ * belong to the field). Leaf fields whose root wraps a native control and has no `Field` part
+ * (Textarea, Checkbox, Switch, Radio) keep `className` on the frame and send `ref` and the native
+ * attributes to that control instead.
  */
 export type FieldRootDomProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  "id" | "children" | "className" | "defaultValue" | "defaultChecked" | "onChange"
+  "id" | "children" | "defaultValue" | "defaultChecked" | "onChange"
 > & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-export function hasFieldError(error: React.ReactNode): boolean {
-  return error != null && error !== false && error !== "";
+/** Whether a label / hint / error slot has something to render (`false` and `""` do not). */
+function hasContent(node: React.ReactNode): boolean {
+  return node != null && node !== false && node !== "";
 }
 
 export type FieldIds = {
@@ -51,36 +55,54 @@ export type FieldIds = {
   errorId: string;
   /** `aria-describedby` of the control: caller ids + hint or error. */
   describedBy: string | undefined;
+  /** `aria-labelledby` for a group control: the label id when a label renders, else `undefined`. */
+  labelledBy: string | undefined;
+  showHint: boolean;
+  showError: boolean;
   invalid: boolean;
 };
 
-/** Ids and validation state of a framed field. */
+/** Ids, visible slots and validation state of a framed field. */
 export function useFieldFrame(
   explicitId: string | undefined,
-  { hint, error, invalid }: { hint?: React.ReactNode; error?: React.ReactNode; invalid?: boolean },
+  {
+    label,
+    hint,
+    error,
+    invalid,
+  }: {
+    label?: React.ReactNode;
+    hint?: React.ReactNode;
+    error?: React.ReactNode;
+    invalid?: boolean;
+  },
   ariaDescribedBy?: string,
 ): FieldIds {
   const generated = React.useId();
   const controlId = explicitId ?? generated;
+  const labelId = `${controlId}-label`;
   const hintId = `${controlId}-hint`;
   const errorId = `${controlId}-error`;
-  const showError = hasFieldError(error);
-  const showHint = !showError && hint != null && hint !== false && hint !== "";
+  const showError = hasContent(error);
+  const showHint = !showError && hasContent(hint);
   const describedBy =
     [ariaDescribedBy, showHint ? hintId : undefined, showError ? errorId : undefined]
       .filter(Boolean)
       .join(" ") || undefined;
   return {
     controlId,
-    labelId: `${controlId}-label`,
+    labelId,
     hintId,
     errorId,
     describedBy,
+    labelledBy: hasContent(label) ? labelId : undefined,
+    showHint,
+    showError,
     invalid: Boolean(invalid) || showError,
   };
 }
 
-type FieldFrameRenderProps = FieldFrameProps & {
+type FieldFrameRenderProps = Omit<FieldFrameProps, "focusRing"> & {
   size: ControlSize;
   ids: FieldIds;
   disabled?: boolean;
@@ -90,6 +112,8 @@ type FieldFrameRenderProps = FieldFrameProps & {
    * `htmlFor`; the group names itself with `aria-labelledby={ids.labelId}`.
    */
   group?: boolean;
+  /** Right side of the label row (Slider's current value); the row renders even without a label. */
+  labelEnd?: React.ReactNode;
   /** Right side of the support row (a character counter, `FieldCounter`). */
   counter?: React.ReactNode;
   /** Always render the support row so an appearing error does not shift the layout. */
@@ -115,15 +139,29 @@ export function FieldFrame({
   disabled,
   optionalLabel,
   group = false,
+  labelEnd,
   counter,
   reserveSupportRow = false,
   className,
   children,
   ...rest
 }: FieldFrameRenderProps) {
-  const showError = hasFieldError(error);
-  const showHint = !showError && hint != null && hint !== false && hint !== "";
+  const { showError, showHint } = ids;
   const showSupport = showError || showHint || counter != null || reserveSupportRow;
+  const labelNode = hasContent(label) ? (
+    <Label.Root
+      id={ids.labelId}
+      htmlFor={group ? undefined : ids.controlId}
+      size={size}
+      required={required}
+      optional={optional}
+      disabled={disabled}
+      labels={{ optional: optionalLabel }}
+      className={styles.label}
+    >
+      {label}
+    </Label.Root>
+  ) : null;
 
   return (
     <div
@@ -135,20 +173,14 @@ export function FieldFrame({
         disabled: disabled || undefined,
       })}
     >
-      {label != null && label !== false ? (
-        <Label.Root
-          id={ids.labelId}
-          htmlFor={group ? undefined : ids.controlId}
-          size={size}
-          required={required}
-          optional={optional}
-          disabled={disabled}
-          labels={{ optional: optionalLabel }}
-          className={styles.label}
-        >
-          {label}
-        </Label.Root>
-      ) : null}
+      {labelEnd != null ? (
+        <div className={styles.labelRow}>
+          {labelNode}
+          <span className={styles.labelEnd}>{labelEnd}</span>
+        </div>
+      ) : (
+        labelNode
+      )}
       <div className={styles.body}>
         {children}
         {showSupport ? (

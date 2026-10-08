@@ -4,14 +4,14 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Label.Root",
-      en: "`forwardRef` → `HTMLLabelElement`. The native `<label>`: text, then the required `*` or the optional marker; provides its size to the icons inside.",
+      en: "`ref` → `HTMLLabelElement`. The native `<label>`: text, then the required `*` or the optional marker; provides its size to the icons inside.",
       ru: "Нативный `<label>`: текст, затем `*` или пометка «необязательно»; передаёт размер иконкам внутри.",
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Size of the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500.",
+          default: 'host tier, else "m"',
+          en: "Size of the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500. Without it the tier of its host, else `m`.",
           ru: "Ярус поля под подписью: xs/s 12/16 · m 13/20 · l/xl 14/20, начертание 500.",
         },
         {

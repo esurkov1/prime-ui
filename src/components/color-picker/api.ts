@@ -82,7 +82,7 @@ export const api: ComponentApi = {
     },
     {
       name: "ColorPicker.Panel",
-      en: "`forwardRef` → `HTMLDivElement`. Vertical stack of the parts with the standard gap; native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. Vertical stack of the parts with the standard gap; native `<div>` props.",
       props: [
         {
           name: "surface",
@@ -119,8 +119,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Field tier.",
+          default: 'host tier, else "m"',
+          en: "Field tier. Without it the tier of its host (a panel, a popover), else `m`.",
           ru: "Ярус поля.",
         },
         focusRing,
@@ -198,7 +198,7 @@ export const api: ComponentApi = {
     },
     {
       name: "ColorPicker.EyeDropperButton",
-      en: "`forwardRef` → `HTMLButtonElement`. A square soft kit Button that opens the native EyeDropper, named by `labels.eyeDropper`; without browser support it is disabled and hidden from assistive tech.",
+      en: "`ref` → `HTMLButtonElement`. A square soft kit Button that opens the native EyeDropper, named by `labels.eyeDropper`; without browser support it is disabled and hidden from assistive tech.",
       props: [
         {
           name: "children",
@@ -273,8 +273,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the trigger, the swatches and the panel.",
+          default: 'host tier, else "m"',
+          en: "Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`.",
           ru: "Ярус триггера, образцов и панели.",
         },
         {
@@ -308,7 +308,7 @@ export const api: ComponentApi = {
     },
     {
       name: "ColorPresets.Trigger",
-      en: "`forwardRef` → `HTMLButtonElement`. The kit square swatch button of the root tier, named «`labels.trigger`: <color name>»; ArrowDown / ArrowUp open the panel.",
+      en: "`ref` → `HTMLButtonElement`. The kit square swatch button of the root tier, named «`labels.trigger`: <color name>»; ArrowDown / ArrowUp open the panel.",
       props: [
         {
           name: "asChild",

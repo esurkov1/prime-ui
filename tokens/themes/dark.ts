@@ -108,6 +108,7 @@ export const darkThemeOverrides = {
     field: {
       bg: "color-mix(in srgb, var(--prime-ref-color-gray-100) 6%, transparent)",
       bgSurface: "color-mix(in srgb, var(--prime-ref-color-gray-100) 6%, transparent)",
+      bgHover: "color-mix(in srgb, var(--prime-ref-color-gray-100) 12%, transparent)",
       bgFocus: "{color.gray.925}",
       bgDisabled: "color-mix(in srgb, var(--prime-ref-color-gray-100) 4%, transparent)",
     },

@@ -34,14 +34,14 @@ Switch.Root          field grid; ref and input props go to the native input (rol
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Switch.Root
-`forwardRef` → `HTMLInputElement` (the native `input type="checkbox" role="switch"`). Renders the field `<div>`, the `<label>` row with the input and the track, and the support row; native input props go to the input.
+`ref` → `HTMLInputElement` (the native `input type="checkbox" role="switch"`). Renders the field `<div>`, the `<label>` row with the input and the track, and the support row. Field-root rule for a leaf: `className` goes to the field `<div>`; `id`, `ref` and native input props to the input.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `checked` | `boolean` | — | Controlled state. |
 | `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
 | `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle (not while `readOnly`). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the track (24×16 … 44×24), the text and the gap. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger ring on the off track and `aria-invalid`. A non-empty `error` implies it. |
@@ -89,7 +89,7 @@ No `variant` / `tone` / `color`.
 | on | `checked` / `defaultChecked` | `data-state="checked"`; accent track, the thumb glides to the end |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid`; danger ring on the off track and on focus |
 | disabled | `disabled` | `data-disabled="true"`; off track `fill-muted`, on track `accent-soft`, `cursor: not-allowed` |
-| read-only | `readOnly` | `aria-readonly="true"` on the input; no hover, default cursor |
+| read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the field; no hover or press, default cursor |
 | pressed | pointer press | the track scales to the compact press scale (not when disabled or read-only) |
 | focus-visible | keyboard | outer focus ring around the track |
 
@@ -110,7 +110,7 @@ Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncont
 | `Space` | Toggles it (not while `readOnly`). |
 
 ### ARIA
-- A native `<input type="checkbox" role="switch">` with `aria-checked`, visually hidden over the track and wrapped by the `<label>` row.
+- A native `<input type="checkbox" role="switch">` (its native checked state is the switch state), visually hidden over the track and wrapped by the `<label>` row.
 - `aria-invalid`, `aria-readonly` and `aria-describedby` (your ids + the hint or the error) are set on the input.
 - Without visible text, name it with `aria-label` or `aria-labelledby` on `Switch.Root`.
 

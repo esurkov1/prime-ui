@@ -1,7 +1,9 @@
-import * as React from "react";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import type * as React from "react";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import { iconLayout } from "@/internal/iconLayout";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./ButtonGroup.module.css";
@@ -10,18 +12,29 @@ export type ButtonGroupOrientation = "horizontal" | "vertical";
 
 export type ButtonGroupRootProps = React.HTMLAttributes<HTMLDivElement> & {
   orientation?: ButtonGroupOrientation;
+  /** Tier. Default: the tier of the surrounding control (a toolbar, a panel), else `m`. */
   size?: ControlSize;
   /** Stretch the group to its container; horizontal segments share the width equally. */
   fullWidth?: boolean;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-const ButtonGroupRoot = React.forwardRef<HTMLDivElement, ButtonGroupRootProps>(
-  ({ orientation = "horizontal", size = "m", fullWidth, children, className, ...rest }, ref) => (
+function ButtonGroupRoot({
+  orientation = "horizontal",
+  size: sizeProp,
+  fullWidth,
+  children,
+  className,
+  ref,
+  ...rest
+}: ButtonGroupRootProps) {
+  const size = useControlSize(sizeProp);
+  return (
     // biome-ignore lint/a11y/useSemanticElements: a group of buttons, not a form fieldset
     <div
       ref={ref}
       role="group"
-      className={cx(styles.root, className)}
+      className={cx(fieldTierClass, styles.root, className)}
       {...toDataAttributes({
         orientation: orientation === "vertical" ? orientation : undefined,
         size,
@@ -31,45 +44,46 @@ const ButtonGroupRoot = React.forwardRef<HTMLDivElement, ButtonGroupRootProps>(
     >
       <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
     </div>
-  ),
-);
+  );
+}
 
 ButtonGroupRoot.displayName = "ButtonGroup.Root";
 
 export type ButtonGroupItemProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   /** Toggle state of the segment: `aria-pressed` and `data-state="active" | "inactive"`. */
   pressed?: boolean;
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
-const ButtonGroupItem = React.forwardRef<HTMLButtonElement, ButtonGroupItemProps>(
-  ({ className, pressed, type = "button", children, ...rest }, ref) => {
-    // Icon placement drives optical padding and the square icon-only segment (as in Button).
-    const items = React.Children.toArray(children).filter(
-      (child) => !(typeof child === "string" && child.trim() === ""),
-    );
-    const isIcon = (child: React.ReactNode) =>
-      React.isValidElement(child) && child.type === ButtonGroupIcon;
-    const iconOnly = items.length > 0 && items.every(isIcon);
+function ButtonGroupItem({
+  className,
+  pressed,
+  type = "button",
+  children,
+  ref,
+  ...rest
+}: ButtonGroupItemProps) {
+  // Icon placement drives optical padding and the square icon-only segment (as in Button).
+  const layout = iconLayout(children, ButtonGroupIcon);
 
-    return (
-      <button
-        ref={ref}
-        type={type}
-        className={cx(styles.item, className)}
-        aria-pressed={pressed}
-        {...toDataAttributes({
-          state: pressed === undefined ? undefined : pressed ? "active" : "inactive",
-          "icon-only": iconOnly || undefined,
-          "leading-icon": (!iconOnly && isIcon(items[0])) || undefined,
-          "trailing-icon": (!iconOnly && isIcon(items[items.length - 1])) || undefined,
-        })}
-        {...rest}
-      >
-        {children}
-      </button>
-    );
-  },
-);
+  return (
+    <button
+      ref={ref}
+      type={type}
+      className={cx(styles.item, className)}
+      aria-pressed={pressed}
+      {...toDataAttributes({
+        state: pressed === undefined ? undefined : pressed ? "active" : "inactive",
+        "icon-only": layout.iconOnly || undefined,
+        "leading-icon": layout.leadingIcon || undefined,
+        "trailing-icon": layout.trailingIcon || undefined,
+      })}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
 
 ButtonGroupItem.displayName = "ButtonGroup.Item";
 

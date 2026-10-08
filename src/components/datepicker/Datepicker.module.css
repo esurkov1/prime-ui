@@ -12,11 +12,6 @@
   --dp-lh: var(--prime-control-m-line-height);
   --dp-icon: var(--prime-control-m-icon);
   --dp-radius: var(--prime-panel-item-radius);
-  /* Trigger: field of the same tier. */
-  --dp-h: var(--prime-control-m-height);
-  --dp-px: var(--prime-control-m-field-padding-x);
-  --dp-gap: var(--prime-control-m-gap);
-  --dp-field-radius: var(--prime-control-m-radius);
   /* Footer fields: one tier down. */
   --dp-field-h: var(--prime-control-s-height);
   --dp-field-text: var(--prime-control-s-text-size);
@@ -28,10 +23,6 @@
   --dp-lh: var(--prime-control-xs-line-height);
   --dp-icon: var(--prime-control-xs-icon);
   --dp-radius: var(--prime-radius-s);
-  --dp-h: var(--prime-control-xs-height);
-  --dp-px: var(--prime-control-xs-field-padding-x);
-  --dp-gap: var(--prime-control-xs-gap);
-  --dp-field-radius: var(--prime-control-xs-radius);
   --dp-field-h: var(--prime-control-xs-height);
   --dp-field-text: var(--prime-control-xs-text-size);
 }
@@ -42,10 +33,6 @@
   --dp-lh: var(--prime-control-s-line-height);
   --dp-icon: var(--prime-control-s-icon);
   --dp-radius: var(--prime-radius-s);
-  --dp-h: var(--prime-control-s-height);
-  --dp-px: var(--prime-control-s-field-padding-x);
-  --dp-gap: var(--prime-control-s-gap);
-  --dp-field-radius: var(--prime-control-s-radius);
   --dp-field-h: var(--prime-control-xs-height);
   --dp-field-text: var(--prime-control-xs-text-size);
 }
@@ -55,10 +42,6 @@
   --dp-text: var(--prime-control-l-text-size);
   --dp-lh: var(--prime-control-l-line-height);
   --dp-icon: var(--prime-control-l-icon);
-  --dp-h: var(--prime-control-l-height);
-  --dp-px: var(--prime-control-l-field-padding-x);
-  --dp-gap: var(--prime-control-l-gap);
-  --dp-field-radius: var(--prime-control-l-radius);
   --dp-field-h: var(--prime-control-m-height);
   --dp-field-text: var(--prime-control-m-text-size);
 }
@@ -68,87 +51,23 @@
   --dp-text: var(--prime-control-xl-text-size);
   --dp-lh: var(--prime-control-xl-line-height);
   --dp-icon: var(--prime-control-xl-icon);
-  --dp-h: var(--prime-control-xl-height);
-  --dp-px: var(--prime-control-xl-field-padding-x);
-  --dp-gap: var(--prime-control-xl-gap);
-  --dp-field-radius: var(--prime-control-xl-radius);
   --dp-field-h: var(--prime-control-l-height);
   --dp-field-text: var(--prime-control-l-text-size);
 }
 
 /* ─── Trigger (field) ───────────────────────────────────────────────────── */
 
+/* The shared field trigger (`internal/fieldTrigger`), as wide as its content. */
 .trigger {
-  /* Kit icons inside follow the field tier. */
-  --prime-icon-size: var(--dp-icon);
-
-  box-sizing: border-box;
+  composes: trigger from "../../internal/fieldTrigger.module.css";
   display: inline-flex;
-  align-items: center;
-  /* Icons centered between the edge and the text: edge→icon = icon→text = padX (foundation §6). */
-  gap: var(--dp-px);
-  /* As wide as the content, never wider than the container. */
   width: fit-content;
   max-width: 100%;
-  min-width: 0;
-  height: var(--dp-h);
-  margin: 0;
-  padding-block: 0;
-  padding-inline: var(--dp-px);
-  border: 0;
-  border-radius: var(--dp-field-radius);
-  background: var(--prime-color-field-bg);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
-  color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--dp-text);
-  line-height: var(--dp-lh);
-  text-align: start;
-  cursor: pointer;
-  outline: none;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.trigger:active:not(:disabled) {
-  transform: scale(var(--prime-motion-press-scale));
 }
 
 .trigger[data-full-width="true"] {
   display: flex;
   width: 100%;
-}
-
-.trigger:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
-}
-
-.trigger[data-state="open"],
-.trigger:focus-visible {
-  background: var(--prime-color-field-bg-focus);
-}
-
-/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
-.trigger:not([data-focus-ring="false"]):focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
-.trigger[data-invalid="true"] {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
-}
-
-.trigger[data-invalid="true"]:focus-visible {
-  outline-color: var(--prime-color-danger-border);
-}
-
-.trigger:disabled {
-  background: var(--prime-color-field-bg-disabled);
-  box-shadow: none;
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
 }
 
 .triggerIcon {

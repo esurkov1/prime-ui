@@ -1,7 +1,8 @@
 import * as React from "react";
 
-import { COLOR_PRESETS, type ColorPreset } from "@/components/color-picker/ColorPresets";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useControlSize } from "@/internal/ControlSizeContext";
+import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import {
   FieldFrame,
@@ -11,7 +12,15 @@ import {
 } from "@/internal/FieldFrame";
 import { gridIndex } from "@/internal/rovingFocus";
 import type { ControlSize } from "@/internal/states";
-import { markContrast, SwatchCheck, SwatchFill, sameColor, swatchClass } from "@/internal/swatch";
+import {
+  COLOR_PRESETS,
+  type ColorPreset,
+  SwatchContent,
+  sameColor,
+  swatchClass,
+  swatchTierClass,
+  useSwatchOptions,
+} from "@/internal/swatch";
 
 import styles from "./ColorSwatches.module.css";
 
@@ -38,7 +47,10 @@ export type ColorSwatchesProps = FieldRootDomProps &
     onValueChange?: (value: string | null) => void;
     /** Swatches in order. Default: `COLOR_PRESETS` (16). */
     presets?: readonly ColorPreset[];
-    /** Tier: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = tier gap. */
+    /**
+     * Tier: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = tier gap. Default: the
+     * tier of the surrounding control, else `m`.
+     */
     size?: ControlSize;
     disabled?: boolean;
     invalid?: boolean;
@@ -47,7 +59,6 @@ export type ColorSwatchesProps = FieldRootDomProps &
     /** Form field name: a hidden input submits the selected color (empty string for no color). */
     name?: string;
     id?: string;
-    className?: string;
     "aria-label"?: string;
     "aria-labelledby"?: string;
     "aria-describedby"?: string;
@@ -70,7 +81,7 @@ export function ColorSwatches({
   defaultValue = null,
   onValueChange,
   presets = COLOR_PRESETS,
-  size = "m",
+  size: sizeProp,
   disabled = false,
   invalid,
   allowEmpty = false,
@@ -88,26 +99,20 @@ export function ColorSwatches({
   labels: labelsProp,
   ...rest
 }: ColorSwatchesProps) {
+  const size = useControlSize(sizeProp);
   const labels = { ...COLOR_SWATCHES_LABELS, ...labelsProp };
   const [value, setValue] = useControllableState<string | null>({
     value: valueProp,
     defaultValue,
     onChange: onValueChange,
   });
-  const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
-  const hasLabel = label != null && label !== false;
-
-  const options = React.useMemo(
-    () => [
-      ...presets.map((preset) => ({ ...preset, contrast: markContrast(preset.value) })),
-      ...(allowEmpty ? [{ value: null, label: labels.empty, contrast: "dark" as const }] : []),
-    ],
-    [allowEmpty, presets, labels.empty],
-  );
+  const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
+  const options = useSwatchOptions(presets, allowEmpty, labels.empty);
 
   const selectedIndex = options.findIndex((option) => sameColor(option.value, value));
   const focusIndex = Math.max(0, selectedIndex);
   const itemRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
+  const labelledBy = ariaLabelledBy ?? ids.labelledBy;
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const current = itemRefs.current.indexOf(document.activeElement as HTMLButtonElement);
@@ -141,13 +146,12 @@ export function ColorSwatches({
       <div
         id={ids.controlId}
         role="radiogroup"
-        aria-label={hasLabel || ariaLabelledBy ? undefined : (ariaLabel ?? labels.group)}
-        aria-labelledby={ariaLabelledBy ?? (hasLabel ? ids.labelId : undefined)}
+        aria-label={labelledBy ? undefined : (ariaLabel ?? labels.group)}
+        aria-labelledby={labelledBy}
         aria-describedby={ids.describedBy}
         aria-required={required || undefined}
         aria-invalid={ids.invalid || undefined}
-        aria-disabled={disabled || undefined}
-        className={styles.grid}
+        className={cx(swatchTierClass, styles.grid)}
         {...toDataAttributes({
           size,
           invalid: ids.invalid || undefined,
@@ -178,8 +182,7 @@ export function ColorSwatches({
               })}
               onClick={() => setValue(option.value)}
             >
-              <SwatchFill value={option.value} />
-              {selected ? <SwatchCheck /> : null}
+              <SwatchContent value={option.value} selected={selected} />
             </button>
           );
         })}

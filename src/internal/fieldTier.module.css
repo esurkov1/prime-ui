@@ -1,0 +1,64 @@
+/*
+ * One tier table for fields and controls (foundation §6). The element with this class carries
+ * `data-size`; the table resolves there and cascades to its parts:
+ *   --field-h       control height            --field-icon    icon size
+ *   --field-px      field padding-x           --field-radius  corner radius
+ *   --field-gap     tier gap (value ↔ unit)   --field-text    text size
+ *   --field-lh      line height               --field-button-px  button / segment padding-x
+ * A CSS module class (not generated CSS): hosts take it with `fieldTierClass` in TSX or
+ * `composes: tier from` in CSS, so it ships in the same bundle as the components that use it.
+ */
+.tier {
+  --field-h: var(--prime-control-m-height);
+  --field-px: var(--prime-control-m-field-padding-x);
+  --field-gap: var(--prime-control-m-gap);
+  --field-icon: var(--prime-control-m-icon);
+  --field-radius: var(--prime-control-m-radius);
+  --field-text: var(--prime-control-m-text-size);
+  --field-lh: var(--prime-control-m-line-height);
+  --field-button-px: var(--prime-control-m-padding-x);
+}
+
+.tier[data-size="xs"] {
+  --field-h: var(--prime-control-xs-height);
+  --field-px: var(--prime-control-xs-field-padding-x);
+  --field-gap: var(--prime-control-xs-gap);
+  --field-icon: var(--prime-control-xs-icon);
+  --field-radius: var(--prime-control-xs-radius);
+  --field-text: var(--prime-control-xs-text-size);
+  --field-lh: var(--prime-control-xs-line-height);
+  --field-button-px: var(--prime-control-xs-padding-x);
+}
+
+.tier[data-size="s"] {
+  --field-h: var(--prime-control-s-height);
+  --field-px: var(--prime-control-s-field-padding-x);
+  --field-gap: var(--prime-control-s-gap);
+  --field-icon: var(--prime-control-s-icon);
+  --field-radius: var(--prime-control-s-radius);
+  --field-text: var(--prime-control-s-text-size);
+  --field-lh: var(--prime-control-s-line-height);
+  --field-button-px: var(--prime-control-s-padding-x);
+}
+
+.tier[data-size="l"] {
+  --field-h: var(--prime-control-l-height);
+  --field-px: var(--prime-control-l-field-padding-x);
+  --field-gap: var(--prime-control-l-gap);
+  --field-icon: var(--prime-control-l-icon);
+  --field-radius: var(--prime-control-l-radius);
+  --field-text: var(--prime-control-l-text-size);
+  --field-lh: var(--prime-control-l-line-height);
+  --field-button-px: var(--prime-control-l-padding-x);
+}
+
+.tier[data-size="xl"] {
+  --field-h: var(--prime-control-xl-height);
+  --field-px: var(--prime-control-xl-field-padding-x);
+  --field-gap: var(--prime-control-xl-gap);
+  --field-icon: var(--prime-control-xl-icon);
+  --field-radius: var(--prime-control-xl-radius);
+  --field-text: var(--prime-control-xl-text-size);
+  --field-lh: var(--prime-control-xl-line-height);
+  --field-button-px: var(--prime-control-xl-padding-x);
+}

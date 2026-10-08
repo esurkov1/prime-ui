@@ -29,6 +29,23 @@ describe("LinkButton", () => {
     expect(link).toHaveAttribute("data-disabled", "true");
   });
 
+  it("disabled keeps id, aria-label and ref, drops href and swallows the click", () => {
+    const onClick = vi.fn();
+    const ref = { current: null as HTMLAnchorElement | null };
+    render(
+      <LinkButton ref={ref} href="/here" id="gone" aria-label="Ушла" disabled onClick={onClick}>
+        Gone
+      </LinkButton>,
+    );
+    const link = screen.getByRole("link", { name: "Ушла" });
+    expect(link).toHaveAttribute("id", "gone");
+    expect(link).not.toHaveAttribute("href");
+    expect(ref.current).toBe(link);
+    expect(ref.current).toBeInstanceOf(HTMLAnchorElement);
+    fireEvent.click(link);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   it("applies size data attributes", () => {
     const { rerender } = render(<LinkButton href="/s">S</LinkButton>);
     expect(screen.getByRole("link", { name: "S" })).toHaveAttribute("data-size", "m");

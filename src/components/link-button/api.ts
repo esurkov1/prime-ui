@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "LinkButton",
-      en: "`forwardRef` → `HTMLAnchorElement` (the `<span>` when `disabled`, the child with `asChild`). A native `<a>` styled as a text action; passes its tier to nested icons.",
+      en: "`ref` → `HTMLAnchorElement` (the child with `asChild`). A native `<a>` styled as a text action; passes its tier to nested icons.",
       ru: "Нативная ссылка `<a>` в виде текстового действия; передаёт ярус вложенным иконкам.",
       props: [
         {
@@ -17,16 +17,16 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Control tier: text 12 · 13 · 14 · 16 · 18, line height and icon size.",
+          default: 'host tier, else "m"',
+          en: "Control tier: text 12 · 13 · 14 · 16 · 18, line height and icon size. Without it the tier of its host (a form, a panel, a hint), else `m`.",
           ru: "Ярус контрола: кегль 12 · 13 · 14 · 16 · 18, межстрочный интервал и размер иконки.",
         },
         {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: 'Renders `<span role="link" aria-disabled="true" tabIndex={-1}>` without `href`; the native anchor props are not passed.',
-          ru: 'Рендерит `<span role="link">` без `href` и вне порядка Tab; атрибуты ссылки не передаются.',
+          en: 'Renders `<a role="link" aria-disabled="true" tabIndex={-1}>` without `href` and swallows the click; `id`, `aria-*` and the other native props stay.',
+          ru: 'Рендерит `<a role="link" aria-disabled="true">` без `href`, вне порядка Tab и без клика; `id`, `aria-*` и прочие атрибуты сохраняются.',
         },
         {
           name: "asChild",

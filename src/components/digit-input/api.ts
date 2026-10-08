@@ -18,8 +18,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier: the cell is a square with the side of the control height (28 · 32 · 36 · 40 · 48); label and hint follow it.",
+          default: 'host tier, else "m"',
+          en: "Tier: the cell is a square with the side of the control height (28 · 32 · 36 · 40 · 48); label and hint follow it. Without it the tier of its host (LoginForm, a panel), else `m`.",
           ru: "Ярус: ячейка — квадрат со стороной высоты контрола (28 · 32 · 36 · 40 · 48).",
         },
         {

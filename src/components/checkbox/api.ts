@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Checkbox.Root",
-      en: "`forwardRef` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row; native input props go to the input.",
+      en: "`ref` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row. Field-root rule for a leaf: `className` goes to the field `<div>`; `id`, `ref` and native input props to the input.",
       ru: "Поле: строка-`<label>` с нативным input и квадратом, под ней подсказка или ошибка; нативные пропсы уходят в input.",
       props: [
         {
@@ -23,8 +23,8 @@ export const api: ComponentApi = {
         {
           name: "onCheckedChange",
           type: "(checked: boolean) => void",
-          en: "Called with the new state on every toggle.",
-          ru: "Новое состояние при каждом переключении.",
+          en: "Called with the new state on every toggle (not while `readOnly`).",
+          ru: "Новое состояние при каждом переключении (кроме `readOnly`).",
         },
         {
           name: "indeterminate",
@@ -36,8 +36,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the box, the text and the gap.",
+          default: 'host tier, else "m"',
+          en: "Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`.",
           ru: "Ярус квадрата, текста и отступа.",
         },
         {
@@ -65,6 +65,13 @@ export const api: ComponentApi = {
           default: "false",
           en: "Disabled fill, dimmed label and hint, no toggling.",
           ru: "Неактивный вид, приглушённые подпись и подсказка, без переключения.",
+        },
+        {
+          name: "readOnly",
+          type: "boolean",
+          default: "false",
+          en: "The state is shown and focusable but does not change (`aria-readonly`); no hover or press. The native checkbox ignores `readOnly`, so the root guards the toggle.",
+          ru: "Состояние видно и фокусируется, но не меняется (`aria-readonly`).",
         },
         {
           name: "id",

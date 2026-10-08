@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
+import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import {
@@ -9,6 +10,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
 
@@ -33,6 +35,7 @@ export type DigitInputProps = FieldRootDomProps &
   FieldFrameProps & {
     /** Number of cells. */
     length?: number;
+    /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;
     /**
      * Cells share the container width and grow with it (height stays the tier height, so they become
@@ -59,17 +62,14 @@ export type DigitInputProps = FieldRootDomProps &
     id?: string;
     "aria-describedby"?: string;
     labels?: Partial<DigitInputLabels>;
-    className?: string;
   };
 
 const normalizeDigits = (raw: string, length: number) => raw.replace(/\D/g, "").slice(0, length);
 
-const createSlotKeys = (length: number) => Array.from({ length }, () => crypto.randomUUID());
-
 /** A one-time code or PIN split into cells, with the field label, hint and error. */
 export function DigitInput({
   length = 4,
-  size = "m",
+  size: sizeProp,
   fullWidth = false,
   name,
   groupSize,
@@ -93,13 +93,9 @@ export function DigitInput({
   className,
   ...rest
 }: DigitInputProps) {
+  const size = useControlSize(sizeProp);
   const labels = { ...DIGIT_INPUT_LABELS, ...labelsProp };
-  const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
-
-  // Stable keys per cell position; recreated only when the number of cells changes.
-  const slotKeysRef = React.useRef<string[] | null>(null);
-  if (slotKeysRef.current?.length !== length) slotKeysRef.current = createSlotKeys(length);
-  const slotKeys = slotKeysRef.current;
+  const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
 
   const [value, setValue] = useControllableState({
     value: valueProp !== undefined ? normalizeDigits(valueProp, length) : undefined,
@@ -116,11 +112,15 @@ export function DigitInput({
 
   const cells = Array.from({ length }, (_, index) => value[index] ?? "");
   const inputRefs = React.useRef<Array<HTMLInputElement | null>>([]);
+  /** Cell to focus once a value change has committed (its `onFocus` reads the new entry index). */
+  const pendingFocusRef = React.useRef<number | null>(null);
 
-  const focusAt = (index: number) => {
-    const el = inputRefs.current[index];
-    if (el) queueMicrotask(() => el.focus());
-  };
+  React.useLayoutEffect(() => {
+    const index = pendingFocusRef.current;
+    if (index === null) return;
+    pendingFocusRef.current = null;
+    inputRefs.current[index]?.focus();
+  });
 
   /** The value has no gaps, so the only cell that accepts input is the first empty one (or the last). */
   const entryIndex = Math.min(value.length, length - 1);
@@ -129,8 +129,8 @@ export function DigitInput({
     const at = Math.min(index, entryIndex);
     const nextCells = [...cells];
     nextCells[at] = nextChar;
+    if (nextChar && at < length - 1) pendingFocusRef.current = at + 1;
     commit(nextCells.join(""));
-    if (nextChar && at < length - 1) focusAt(at + 1);
   };
 
   const handlePaste = (startIndex: number, pasted: string) => {
@@ -141,16 +141,9 @@ export function DigitInput({
     for (let offset = 0; offset < digits.length && start + offset < length; offset++) {
       nextCells[start + offset] = digits[offset];
     }
+    pendingFocusRef.current = Math.min(start + digits.length, length - 1);
     commit(nextCells.join(""));
-    focusAt(Math.min(start + digits.length, length - 1));
   };
-
-  const entryIndexRef = React.useRef(entryIndex);
-  entryIndexRef.current = entryIndex;
-
-  React.useEffect(() => {
-    if (autoFocus) inputRefs.current[entryIndexRef.current]?.focus();
-  }, [autoFocus]);
 
   return (
     <FieldFrame
@@ -165,13 +158,14 @@ export function DigitInput({
       disabled={disabled}
       optionalLabel={labels.optional}
       className={cx(styles.frame, className)}
+      data-full-width={fullWidth || undefined}
     >
       <fieldset
-        aria-label={label != null ? undefined : labels.group}
-        aria-labelledby={label != null ? ids.labelId : undefined}
+        aria-label={ids.labelledBy ? undefined : labels.group}
+        aria-labelledby={ids.labelledBy}
         aria-describedby={ids.describedBy}
         disabled={disabled}
-        className={styles.root}
+        className={cx(fieldTierClass, styles.root)}
         {...toDataAttributes({
           size,
           "full-width": fullWidth || undefined,
@@ -183,7 +177,8 @@ export function DigitInput({
         {name ? <input type="hidden" name={name} value={value} /> : null}
         {cells.map((cell, index) => (
           <input
-            key={slotKeys[index]}
+            // biome-ignore lint/suspicious/noArrayIndexKey: a cell is its position; cells are never reordered
+            key={index}
             ref={(el) => {
               inputRefs.current[index] = el;
             }}
@@ -193,9 +188,11 @@ export function DigitInput({
             autoComplete="one-time-code"
             autoCorrect="off"
             spellCheck={false}
+            // biome-ignore lint/a11y/noAutofocus: opt-in `autoFocus` of a one-time-code step
+            autoFocus={autoFocus && index === entryIndex}
             disabled={disabled}
             required={required}
-            className={styles.cell}
+            className={cx(fieldSurfaceClass, styles.cell)}
             data-size={size}
             data-filled={cell ? "true" : undefined}
             data-group-start={
@@ -206,7 +203,7 @@ export function DigitInput({
             aria-invalid={ids.invalid || undefined}
             onFocus={(event) => {
               if (index > entryIndex) {
-                focusAt(entryIndex);
+                inputRefs.current[entryIndex]?.focus();
                 return;
               }
               event.currentTarget.select();
@@ -224,22 +221,21 @@ export function DigitInput({
               }
             }}
             onKeyDown={(event) => {
-              if (event.key === "Backspace" && !cells[index] && index > 0) {
-                event.preventDefault();
-                focusAt(index - 1);
-              } else if (event.key === "ArrowLeft" && index > 0) {
-                event.preventDefault();
-                focusAt(index - 1);
-              } else if (event.key === "ArrowRight" && index < entryIndex) {
-                event.preventDefault();
-                focusAt(index + 1);
-              } else if (event.key === "Home") {
-                event.preventDefault();
-                focusAt(0);
-              } else if (event.key === "End") {
-                event.preventDefault();
-                focusAt(entryIndex);
-              }
+              // Moving between cells changes no value: focus the target cell at once.
+              const target =
+                (event.key === "Backspace" && !cells[index] && index > 0) ||
+                (event.key === "ArrowLeft" && index > 0)
+                  ? index - 1
+                  : event.key === "ArrowRight" && index < entryIndex
+                    ? index + 1
+                    : event.key === "Home"
+                      ? 0
+                      : event.key === "End"
+                        ? entryIndex
+                        : null;
+              if (target === null) return;
+              event.preventDefault();
+              inputRefs.current[target]?.focus();
             }}
             onPaste={(event) => {
               event.preventDefault();

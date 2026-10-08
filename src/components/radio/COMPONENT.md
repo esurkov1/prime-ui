@@ -34,7 +34,7 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Radio.Group
-`forwardRef` → `HTMLDivElement` (the `role="radiogroup"` element). Owns the value, the shared `name` and size; renders the group label above and the hint / error below the options.
+`ref` → `HTMLDivElement` (the field frame). Owns the value, the shared `name` and size; renders the group label above and the hint / error below the options. Field-root rule: `className`, `ref` and the rest go to the frame; `id`, `aria-label`, `aria-labelledby` and `aria-describedby` to the `role="radiogroup"` element.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -42,7 +42,7 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 | `defaultValue` | `string` | — | Initial value when uncontrolled. |
 | `onValueChange` | `(value: string) => void` | — | Called with the value of the newly chosen option. |
 | `name` | `string` | — | Native `name` shared by the radios; generated when omitted. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of every circle, text, the label and the hint. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. |
 | `label` | `ReactNode` | — | Group heading above the options; names the radiogroup through `aria-labelledby`. Without it, pass `aria-label`. |
 | `required` | `boolean` | `false` | Red `*` after the label, native `required` on the radios and `aria-required` on the group. |
 | `optional` | `boolean` | `false` | Muted marker right after the label text (`labels.optional`). |
@@ -52,11 +52,12 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 | `disabled` | `boolean` | `false` | Disables every option. |
 | `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | `vertical` stacks the options; `horizontal` lays them out in a wrapping row. Sets `aria-orientation`. |
 | `labels` | `Partial<RadioGroupLabels>` | — | Built-in strings, see Labels. |
-| `className` | `string` | — | Class on the outer field `<div>` (label, options, support row). |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" \| "onChange" \| "dir">` | — | `id`, `aria-label`, `aria-labelledby`, `aria-describedby` and the other attributes of the radiogroup element. |
+| `id` | `string` | — | Id of the `role="radiogroup"` element (generated when omitted); also the default `name`. |
+| `aria-label / aria-labelledby / aria-describedby` | `string` | — | Name and description of the radiogroup (`aria-describedby` is merged before the hint / error ids). |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange" \| "dir">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`. |
 
 ### Radio.Root
-`forwardRef` → `HTMLInputElement` (the native radio). One option inside `Radio.Group`: the `<label>` row with the input and the circle, and its hint; native input props go to the input.
+`ref` → `HTMLInputElement` (the native radio). One option inside `Radio.Group`: the `<label>` row with the input and the circle, and its hint; native input props go to the input.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -109,7 +110,7 @@ No `variant` / `tone` / `color`.
 | unselected | group `value` ≠ option `value` | `data-state="unchecked"` on the option; circle `fill-strong`, hover `fill-strong-hover` |
 | selected | group `value` = option `value` | `data-state="checked"`; accent circle with a thumb-coloured dot that grows in |
 | invalid | `invalid` or a non-empty `error` on the group | `data-invalid="true"`, `aria-invalid` on the group and the inputs; danger ring on unselected circles |
-| disabled | group or option `disabled` | `data-disabled="true"`, `aria-disabled` on the group; `fill-muted` circle, `cursor: not-allowed` |
+| disabled | group or option `disabled` | `data-disabled="true"`, native `disabled` on every radio; `fill-muted` circle, `cursor: not-allowed` |
 | pressed | pointer press | the circle scales to the compact press scale |
 | focus-visible | keyboard | outer focus ring around the circle |
 

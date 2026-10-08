@@ -72,7 +72,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `valuePrefix` | `string` | — | Text before the value, e.g. «С». |
 | `id` | `string` | — | Id of the field button; generated when omitted. |
 | `aria-label · aria-labelledby · aria-describedby` | `string` | — | Name without a `label` (the value is appended) and extra description ids. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`; `id` goes to the control. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ### Datepicker.Panel
 `ref` → `HTMLDivElement`. The calendar without a field, inline in a page: its own card, 1–2 months by the parent's width. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.

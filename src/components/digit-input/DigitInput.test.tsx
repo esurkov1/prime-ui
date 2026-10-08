@@ -20,6 +20,16 @@ describe("DigitInput", () => {
     expect(screen.getByRole("textbox", { name: "Digit 2/2" })).toBeInTheDocument();
   });
 
+  it("renders without crypto.randomUUID (plain http on a LAN)", () => {
+    vi.stubGlobal("crypto", {});
+    try {
+      render(<DigitInput length={3} />);
+      expect(screen.getAllByRole("textbox")).toHaveLength(3);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("renders 6 cells when length is 6", () => {
     render(<DigitInput length={6} />);
 
@@ -237,5 +247,21 @@ describe("DigitInput focusRing", () => {
     expect(screen.getByRole("textbox", { name: "Цифра 1 из 4" })).toHaveFocus();
     await userEvent.keyboard("{End}");
     expect(third).toHaveFocus();
+  });
+
+  it("label={false} names the group from labels.group, without a dangling aria-labelledby", () => {
+    render(<DigitInput label={false} />);
+    const group = screen.getByRole("group", { name: "Код" });
+    expect(group).not.toHaveAttribute("aria-labelledby");
+  });
+
+  it("autoFocus focuses the entry cell on mount", () => {
+    render(<DigitInput length={4} defaultValue="12" autoFocus />);
+    expect(screen.getByRole("textbox", { name: "Цифра 3 из 4" })).toHaveFocus();
+  });
+
+  it("fullWidth marks the frame itself", () => {
+    const { container } = render(<DigitInput fullWidth />);
+    expect(container.firstChild).toHaveAttribute("data-full-width", "true");
   });
 });

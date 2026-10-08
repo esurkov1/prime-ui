@@ -16,7 +16,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Omit `size` for the default `m` — never write `size="m"`.
 - Set `size` on the root (`Input.Root size="s"`, `Select.Root size="s"`) — not on `Input.Field` or `Select.Trigger`.
 - One tier for a whole region: `<ControlSizeProvider value="s">` around a dense toolbar — not `size="s"` on one control to make it fit.
-- Inside a host (Popover, Banner, LoginForm, the DataTable `toolbar`) leave `Button.Root` / `Input.Root` without `size` — the host passes its tier.
+- Inside a host (Popover, Banner, LoginForm, the DataTable `toolbar`) leave fields and controls (`Button.Root`, `Input.Root`, `Textarea.Root`, `Checkbox.Root`, `DigitInput`…) without `size` — the host passes its tier.
 - A control in a table cell or a card header row is one tier down: `<Button.Root size="s" variant="ghost" tone="neutral">`.
 
 ## Structure

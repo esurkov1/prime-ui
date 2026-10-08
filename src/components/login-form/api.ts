@@ -4,14 +4,14 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "LoginForm.Root",
-      en: "`forwardRef` → `HTMLDivElement`. The sign-in card: card fill, radius and shadow, the tier rhythm; provides its size to the parts. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. The sign-in card: card fill, radius and shadow, the tier rhythm; provides its size to the parts. Native `<div>` props.",
       ru: "Карточка входа: заливка, радиус и тень карточки, ритм яруса; передаёт размер частям.",
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Tier of padding, gaps and text roles; Inputs and Buttons inside without their own `size` take it.",
+          en: "Tier of padding, gaps and text roles; every field and button inside without its own `size` takes it.",
           ru: "Ярус отступов, зазоров и текста; поля и кнопки внутри без своего `size` берут его.",
         },
         {
@@ -71,7 +71,7 @@ export const api: ComponentApi = {
     },
     {
       name: "LoginForm.Form",
-      en: "`forwardRef` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props.",
+      en: "`ref` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props.",
       props: [],
     },
     {

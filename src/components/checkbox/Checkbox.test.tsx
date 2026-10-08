@@ -313,4 +313,22 @@ describe("Checkbox", () => {
     await userEvent.click(screen.getByRole("checkbox"));
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("keeps its state when readOnly (click and Space) and marks aria-readonly", async () => {
+    const onChange = vi.fn();
+    render(
+      <Checkbox.Root defaultChecked readOnly onCheckedChange={onChange}>
+        <Checkbox.Label>Locked</Checkbox.Label>
+      </Checkbox.Root>,
+    );
+    const checkbox = screen.getByRole("checkbox", { name: "Locked" });
+    expect(checkbox).toHaveAttribute("aria-readonly", "true");
+    expect(checkbox).not.toBeDisabled();
+
+    fireEvent.click(screen.getByText("Locked"));
+    checkbox.focus();
+    await userEvent.keyboard(" ");
+    expect(checkbox).toBeChecked();
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

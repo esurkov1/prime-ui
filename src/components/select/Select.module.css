@@ -1,142 +1,29 @@
 /* ─── Select ─────────────────────────────────────────────────────────────────
- * Trigger = field system (foundation §4, §6, §8): fill instead of border, tier height,
- * field padding, inset danger ring on error, the single focus ring.
- * Panel = shared floating surface + menu rows (`internal/floatingSurface`, `internal/menu`).
+ * Trigger = the shared field trigger (`internal/fieldTrigger`: field surface + field tier,
+ * foundation §4, §6, §8). Panel = shared floating surface + menu rows
+ * (`internal/floatingSurface`, `internal/menu`).
  */
-
-.trigger {
-  --sel-h: var(--prime-control-m-height);
-  --sel-px: var(--prime-control-m-field-padding-x);
-  --sel-gap: var(--prime-control-m-gap);
-  --sel-icon: var(--prime-control-m-icon);
-  --sel-radius: var(--prime-control-m-radius);
-  --sel-text: var(--prime-control-m-text-size);
-  --sel-lh: var(--prime-control-m-line-height);
-  --sel-desc: var(--prime-text-body-s-size);
-  --sel-desc-lh: var(--prime-text-body-s-line-height);
-  /* A kit Icon inside (chevron, clear, TriggerIcon) takes the tier icon size. */
-  --prime-icon-size: var(--sel-icon);
-}
-
-.trigger[data-size="xs"] {
-  --sel-h: var(--prime-control-xs-height);
-  --sel-px: var(--prime-control-xs-field-padding-x);
-  --sel-gap: var(--prime-control-xs-gap);
-  --sel-icon: var(--prime-control-xs-icon);
-  --sel-radius: var(--prime-control-xs-radius);
-  --sel-text: var(--prime-control-xs-text-size);
-  --sel-lh: var(--prime-control-xs-line-height);
-  --sel-desc: var(--prime-text-caption-size);
-  --sel-desc-lh: var(--prime-text-caption-line-height);
-}
-
-.trigger[data-size="s"] {
-  --sel-h: var(--prime-control-s-height);
-  --sel-px: var(--prime-control-s-field-padding-x);
-  --sel-gap: var(--prime-control-s-gap);
-  --sel-icon: var(--prime-control-s-icon);
-  --sel-radius: var(--prime-control-s-radius);
-  --sel-text: var(--prime-control-s-text-size);
-  --sel-lh: var(--prime-control-s-line-height);
-  --sel-desc: var(--prime-text-caption-size);
-  --sel-desc-lh: var(--prime-text-caption-line-height);
-}
-
-.trigger[data-size="l"] {
-  --sel-h: var(--prime-control-l-height);
-  --sel-px: var(--prime-control-l-field-padding-x);
-  --sel-gap: var(--prime-control-l-gap);
-  --sel-icon: var(--prime-control-l-icon);
-  --sel-radius: var(--prime-control-l-radius);
-  --sel-text: var(--prime-control-l-text-size);
-  --sel-lh: var(--prime-control-l-line-height);
-}
-
-.trigger[data-size="xl"] {
-  --sel-h: var(--prime-control-xl-height);
-  --sel-px: var(--prime-control-xl-field-padding-x);
-  --sel-gap: var(--prime-control-xl-gap);
-  --sel-icon: var(--prime-control-xl-icon);
-  --sel-radius: var(--prime-control-xl-radius);
-  --sel-text: var(--prime-control-xl-text-size);
-  --sel-lh: var(--prime-control-xl-line-height);
-}
 
 /* ─── Trigger ─────────────────────────────────────────────────────────────── */
 
-/*
- * Icons (leading, clear, chevron) sit centred between the edge and the text (foundation §6):
- * edge→icon = icon→text = field padX, so the trigger gap is padX too.
- */
 .trigger {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: var(--sel-px);
+  composes: trigger from "../../internal/fieldTrigger.module.css";
+  /* Description line of a rich value: one step under the tier text. */
+  --sel-desc: var(--prime-text-body-s-size);
+  --sel-desc-lh: var(--prime-text-body-s-line-height);
   width: 100%;
-  min-width: 0;
-  height: var(--sel-h);
-  margin: 0;
-  padding-block: 0;
-  padding-inline: var(--sel-px);
-  border: 0;
-  border-radius: var(--sel-radius);
-  background: var(--prime-color-field-bg);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
-  color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-sans);
-  font-size: var(--sel-text);
-  font-weight: var(--prime-font-weight-regular);
-  line-height: var(--sel-lh);
-  text-align: start;
-  cursor: pointer;
-  outline: none;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.trigger:active:not(:disabled) {
-  transform: scale(var(--prime-motion-press-scale));
-}
-
-.trigger:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary));
-}
-
-.trigger[data-state="open"],
-.trigger:focus-visible {
-  background: var(--prime-color-field-bg-focus);
-}
-
-/* `focusRing={false}` (data-focus-ring="false") hides only the ring; the error ring stays. */
-.trigger:not([data-focus-ring="false"]):focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
-.trigger[data-invalid="true"] {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
-}
-
-.trigger[data-invalid="true"]:focus-visible {
-  outline-color: var(--prime-color-danger-border);
-}
-
-.trigger:disabled {
-  background: var(--prime-color-field-bg-disabled);
-  box-shadow: none;
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
+.trigger:is([data-size="xs"], [data-size="s"]) {
+  --sel-desc: var(--prime-text-caption-size);
+  --sel-desc-lh: var(--prime-text-caption-line-height);
 }
 
 .triggerMain {
   display: flex;
   flex: 1 1 auto;
   align-items: center;
-  gap: var(--sel-px);
+  gap: var(--field-px);
   min-width: 0;
 }
 
@@ -160,14 +47,14 @@
    tier height with tier padding; single-line triggers are unchanged. */
 .trigger:has(.value[data-rich="true"]) {
   height: auto;
-  min-height: var(--sel-h);
-  padding-block: var(--sel-gap);
+  min-height: var(--field-h);
+  padding-block: var(--field-gap);
 }
 
 .value[data-rich="true"] {
   display: flex;
   align-items: center;
-  gap: var(--sel-gap);
+  gap: var(--field-gap);
 }
 
 .valueBody {
@@ -184,8 +71,8 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--sel-icon);
-  height: var(--sel-icon);
+  width: var(--field-icon);
+  height: var(--field-icon);
   color: var(--prime-color-text-muted);
 }
 
@@ -211,7 +98,7 @@
  */
 .clear {
   align-self: stretch;
-  width: calc(var(--sel-icon) + var(--sel-px));
+  width: calc(var(--field-icon) + var(--field-px));
   height: auto;
   cursor: pointer;
   transition:

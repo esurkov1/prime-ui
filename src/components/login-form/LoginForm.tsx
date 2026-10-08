@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 
 import { Typography, type TypographyRole } from "@/components/typography/Typography";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
@@ -36,7 +36,7 @@ const FOOTER_ROLE: Record<ControlSize, TypographyRole> = {
 const useLoginFormSize = (): ControlSize => useOptionalControlSize() ?? "m";
 
 export type LoginFormRootProps = {
-  /** Tier of spacing and type. Pass the same `size` to the fields and buttons inside. Default `m`. */
+  /** Tier of spacing and type; fields and buttons inside without their own `size` take it. Default `m`. */
   size?: ControlSize;
   /**
    * Header layout. `start` (default): the Modal-header layout — a rounded accent tile on the left,
@@ -47,15 +47,21 @@ export type LoginFormRootProps = {
   flat?: boolean;
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-const LoginFormRoot = React.forwardRef<HTMLDivElement, LoginFormRootProps>(function LoginFormRoot(
-  { size = "m", align = "start", flat = false, className, children, ...rest },
-  forwardedRef,
-) {
+function LoginFormRoot({
+  size = "m",
+  align = "start",
+  flat = false,
+  className,
+  children,
+  ref,
+  ...rest
+}: LoginFormRootProps) {
   return (
     <div
-      ref={forwardedRef}
+      ref={ref}
       {...rest}
       className={cx(styles.root, className)}
       {...toDataAttributes({ size, align, flat })}
@@ -63,7 +69,7 @@ const LoginFormRoot = React.forwardRef<HTMLDivElement, LoginFormRootProps>(funct
       <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
     </div>
   );
-});
+}
 LoginFormRoot.displayName = "LoginForm.Root";
 
 export type LoginFormHeaderProps = {
@@ -162,19 +168,17 @@ LoginFormBody.displayName = "LoginForm.Body";
 export type LoginFormFormProps = {
   className?: string;
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLFormElement>;
 } & React.FormHTMLAttributes<HTMLFormElement>;
 
 /** The `<form>`: fields, then the submit button, one column with field → field spacing. Native submit and `onSubmit` work as usual. */
-const LoginFormForm = React.forwardRef<HTMLFormElement, LoginFormFormProps>(function LoginFormForm(
-  { className, children, ...rest },
-  forwardedRef,
-) {
+function LoginFormForm({ className, children, ref, ...rest }: LoginFormFormProps) {
   return (
-    <form ref={forwardedRef} className={cx(styles.form, className)} {...rest}>
+    <form ref={ref} className={cx(styles.form, className)} {...rest}>
       {children}
     </form>
   );
-});
+}
 LoginFormForm.displayName = "LoginForm.Form";
 
 export type LoginFormActionsProps = {

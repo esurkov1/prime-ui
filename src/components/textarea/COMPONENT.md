@@ -31,11 +31,11 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Textarea.Root
-`forwardRef` → `HTMLTextAreaElement`. Renders the label row, the field box with the native `<textarea>` and the support row; native `<textarea>` props go to the textarea.
+`ref` → `HTMLTextAreaElement`. Renders the label row, the field box with the native `<textarea>` and the support row. Field-root rule for a leaf without a `Field` part: `className` goes to the field frame; `id`, `ref` and the native `<textarea>` props to the textarea.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier for text, padding, radius, label and hint. One line of text sits exactly like an Input of the same size. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier for text, padding, radius, label and hint. One line of text sits exactly like an Input of the same size. Without it the tier of its host (LoginForm, Popover, a panel with a size), else `m`. |
 | `label` | `ReactNode` | — | Label above the field (`<label htmlFor>`). Without it, set `aria-label`. |
 | `required` | `boolean` | — | Native `required` on the textarea and a red `*` after the label (`aria-hidden`). |
 | `optional` | `boolean` | `false` | Muted marker right after the label text (`labels.optional`). |
@@ -50,7 +50,7 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `id` | `string` | — | Id of the `<textarea>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
 | `labels` | `Partial<TextareaLabels>` | — | Built-in strings, see Labels. |
-| `className` | `string` | — | Class on the visible field box (not on the outer wrapper). |
+| `className` | `string` | — | Class on the field frame `<div>` (label, field box, support row), as on every field root. |
 | `…rest` | `Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size" \| "children">` | — | `value`, `defaultValue`, `onChange`, `placeholder`, `rows`, `maxLength`, `name`, `disabled`, `readOnly`, `aria-label`… |
 
 ### Textarea.Counter
@@ -150,7 +150,7 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 ## Mistakes
 - `<Textarea.Root><textarea /></Textarea.Root>` → Textarea.Root renders the textarea itself; pass native props to the root.
 - Counter without `maxLength` when the limit is hard → add `maxLength` so extra input is blocked.
-- `className` expected on the outer wrapper → it lands on the field box; wrap the root in your own element for layout.
+- `className` expected on the field box → it lands on the field frame (label, box, support row), as on every field root; size the box through the frame's layout.
 - Expecting a fixed height with the default `autoResize` → set `autoResize={false}` (and `rows`) for a fixed box with a resize handle.
 - Only a placeholder, no label → add `label` or `aria-label`.
 

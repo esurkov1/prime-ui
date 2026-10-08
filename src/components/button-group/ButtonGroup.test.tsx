@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+
 import { ButtonGroup } from "./ButtonGroup";
 
 describe("ButtonGroup", () => {
@@ -150,5 +152,16 @@ describe("ButtonGroup", () => {
       "data-leading-icon",
       "true",
     );
+  });
+
+  it("takes the host tier without its own size", () => {
+    render(
+      <ControlSizeProvider value="s">
+        <ButtonGroup.Root aria-label="View">
+          <ButtonGroup.Item>List</ButtonGroup.Item>
+        </ButtonGroup.Root>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByRole("group", { name: "View" })).toHaveAttribute("data-size", "s");
   });
 });

@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { Icon } from "@/icons";
-import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -11,6 +11,8 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Input.module.css";
@@ -36,6 +38,8 @@ type InputContextValue = {
   focusRing: boolean;
   required: boolean;
   inputId: string;
+  /** `Input.Field` attaches it; `Input.ClearButton` returns focus through it. */
+  inputRef: React.RefObject<HTMLInputElement | null>;
   describedBy: string | undefined;
   labels: InputLabels;
 };
@@ -71,7 +75,6 @@ export type InputRootProps = FieldRootDomProps & {
   id?: string;
   labels?: Partial<InputLabels>;
   children: React.ReactNode;
-  className?: string;
 };
 
 function InputRoot({
@@ -91,15 +94,23 @@ function InputRoot({
   className,
   ...rest
 }: InputRootProps) {
-  // Without an explicit size the field takes the tier of its host (a form, a panel).
-  const hostSize = useOptionalControlSize();
-  const size = sizeProp ?? hostSize ?? "m";
-  const ids = useFieldFrame(id, { hint, error, invalid });
+  const size = useControlSize(sizeProp);
+  const ids = useFieldFrame(id, { label, hint, error, invalid });
   const labels = React.useMemo(() => ({ ...INPUT_LABELS, ...labelsProp }), [labelsProp]);
   const { invalid: isInvalid, controlId: inputId, describedBy } = ids;
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const contextValue = React.useMemo(
-    () => ({ size, invalid: isInvalid, focusRing, required, inputId, describedBy, labels }),
+    () => ({
+      size,
+      invalid: isInvalid,
+      focusRing,
+      required,
+      inputId,
+      inputRef,
+      describedBy,
+      labels,
+    }),
     [size, isInvalid, focusRing, required, inputId, describedBy, labels],
   );
 
@@ -118,7 +129,7 @@ function InputRoot({
           counter={counter}
           reserveSupportRow={reserveSupportRow}
           optionalLabel={labels.optional}
-          className={cx(styles.root, className)}
+          className={cx(fieldTierClass, styles.root, className)}
         >
           {children}
         </FieldFrame>
@@ -141,7 +152,7 @@ function InputWrapper({ children, className, ...rest }: InputWrapperProps) {
   return (
     <div
       {...rest}
-      className={cx(styles.wrapper, className)}
+      className={cx(fieldSurfaceClass, styles.wrapper, className)}
       {...toDataAttributes({
         size,
         invalid: invalid || undefined,
@@ -156,38 +167,43 @@ InputWrapper.displayName = "Input.Wrapper";
 
 // ---- InputField ----
 
-export type InputFieldProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> & {
+export type InputFieldProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "id"> & {
   /** Called with the new string value; native `onChange` still fires. */
   onValueChange?: (value: string) => void;
+  ref?: React.Ref<HTMLInputElement>;
 };
 
-const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
-  (
-    { className, "aria-describedby": ariaDescribedBy, required, onChange, onValueChange, ...rest },
-    ref,
-  ) => {
-    const { inputId, invalid, required: requiredCtx, describedBy } = useInputContext();
+/** The `<input>`; its id comes from `Input.Root` so the label, hint and error stay linked. */
+function InputField({
+  className,
+  "aria-describedby": ariaDescribedBy,
+  required,
+  onChange,
+  onValueChange,
+  ref,
+  ...rest
+}: InputFieldProps) {
+  const { inputId, inputRef, invalid, required: requiredCtx, describedBy } = useInputContext();
+  const setRefs = React.useMemo(() => mergeRefs(inputRef, ref), [inputRef, ref]);
 
-    const resolvedDescribedBy =
-      [ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined;
+  const resolvedDescribedBy = [ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined;
 
-    return (
-      <input
-        ref={ref}
-        id={inputId}
-        className={cx(styles.field, className)}
-        aria-invalid={invalid || undefined}
-        aria-describedby={resolvedDescribedBy}
-        required={required ?? (requiredCtx || undefined)}
-        onChange={(event) => {
-          onChange?.(event);
-          onValueChange?.(event.target.value);
-        }}
-        {...rest}
-      />
-    );
-  },
-);
+  return (
+    <input
+      {...rest}
+      ref={setRefs}
+      id={inputId}
+      className={cx(styles.field, className)}
+      aria-invalid={invalid || undefined}
+      aria-describedby={resolvedDescribedBy}
+      required={required ?? (requiredCtx || undefined)}
+      onChange={(event) => {
+        onChange?.(event);
+        onValueChange?.(event.target.value);
+      }}
+    />
+  );
+}
 InputField.displayName = "Input.Field";
 
 // ---- InputIcon ----
@@ -251,35 +267,33 @@ InputInlineAffix.displayName = "Input.InlineAffix";
 export type InputClearButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "children" | "aria-label"
->;
+> & {
+  ref?: React.Ref<HTMLButtonElement>;
+};
 
 /**
  * Trailing clear action. Render it only when the field has a value; clicking returns focus
  * to the input after `onClick` runs (clear the value in `onClick`).
  */
-const InputClearButton = React.forwardRef<HTMLButtonElement, InputClearButtonProps>(
-  ({ className, onClick, ...rest }, ref) => {
-    const { inputId, labels } = useInputContext();
-    return (
-      <button
-        ref={ref}
-        type="button"
-        className={cx(styles.action, className)}
-        aria-label={labels.clear}
-        aria-controls={inputId}
-        onClick={(event) => {
-          onClick?.(event);
-          if (!event.defaultPrevented) {
-            document.getElementById(inputId)?.focus();
-          }
-        }}
-        {...rest}
-      >
-        <Icon name="action.close" />
-      </button>
-    );
-  },
-);
+function InputClearButton({ className, onClick, ref, ...rest }: InputClearButtonProps) {
+  const { inputId, inputRef, labels } = useInputContext();
+  return (
+    <button
+      {...rest}
+      ref={ref}
+      type="button"
+      className={cx(styles.action, className)}
+      aria-label={labels.clear}
+      aria-controls={inputId}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) inputRef.current?.focus();
+      }}
+    >
+      <Icon name="action.close" />
+    </button>
+  );
+}
 InputClearButton.displayName = "Input.ClearButton";
 
 // ---- InputCounter ----

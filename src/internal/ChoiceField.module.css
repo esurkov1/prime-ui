@@ -1,5 +1,5 @@
 /*
- * Choice layout shared by Checkbox / Radio / Switch:
+ * Choice layout and states shared by Checkbox / Radio / Switch:
  *   grid  [control] [text]
  *         [       ] [hint / error]
  * The label row is a subgrid of the root so descriptions align with the text column. The control
@@ -7,11 +7,45 @@
  * centred on the first line. A component sets `--prime-choice-control-height` when its control
  * is not a square of `--prime-choice-size` (Switch).
  */
-.field {
+
+/* ---- Tier (the field, and Checkbox.Indicator outside a field) ---- */
+.tier {
   --prime-choice-size: var(--prime-control-m-choice);
   --prime-choice-gap: var(--prime-control-m-gap);
   --prime-choice-text: var(--prime-control-m-text-size);
   --prime-choice-line-height: var(--prime-control-m-line-height);
+}
+
+.tier[data-size="xs"] {
+  --prime-choice-size: var(--prime-control-xs-choice);
+  --prime-choice-gap: var(--prime-control-xs-gap);
+  --prime-choice-text: var(--prime-control-xs-text-size);
+  --prime-choice-line-height: var(--prime-control-xs-line-height);
+}
+
+.tier[data-size="s"] {
+  --prime-choice-size: var(--prime-control-s-choice);
+  --prime-choice-gap: var(--prime-control-s-gap);
+  --prime-choice-text: var(--prime-control-s-text-size);
+  --prime-choice-line-height: var(--prime-control-s-line-height);
+}
+
+.tier[data-size="l"] {
+  --prime-choice-size: var(--prime-control-l-choice);
+  --prime-choice-gap: var(--prime-control-l-gap);
+  --prime-choice-text: var(--prime-control-l-text-size);
+  --prime-choice-line-height: var(--prime-control-l-line-height);
+}
+
+.tier[data-size="xl"] {
+  --prime-choice-size: var(--prime-control-xl-choice);
+  --prime-choice-gap: var(--prime-control-xl-gap);
+  --prime-choice-text: var(--prime-control-xl-text-size);
+  --prime-choice-line-height: var(--prime-control-xl-line-height);
+}
+
+/* ---- Field ---- */
+.field {
   box-sizing: border-box;
   /* Shrink to content (so choices sit side by side in horizontal groups); text still wraps
    * within the container. */
@@ -25,50 +59,30 @@
   align-content: start;
 }
 
-.field[data-size="xs"] {
-  --prime-choice-size: var(--prime-control-xs-choice);
-  --prime-choice-gap: var(--prime-control-xs-gap);
-  --prime-choice-text: var(--prime-control-xs-text-size);
-  --prime-choice-line-height: var(--prime-control-xs-line-height);
-}
-
-.field[data-size="s"] {
-  --prime-choice-size: var(--prime-control-s-choice);
-  --prime-choice-gap: var(--prime-control-s-gap);
-  --prime-choice-text: var(--prime-control-s-text-size);
-  --prime-choice-line-height: var(--prime-control-s-line-height);
-}
-
-.field[data-size="l"] {
-  --prime-choice-size: var(--prime-control-l-choice);
-  --prime-choice-gap: var(--prime-control-l-gap);
-  --prime-choice-text: var(--prime-control-l-text-size);
-  --prime-choice-line-height: var(--prime-control-l-line-height);
-}
-
-.field[data-size="xl"] {
-  --prime-choice-size: var(--prime-control-xl-choice);
-  --prime-choice-gap: var(--prime-control-xl-gap);
-  --prime-choice-text: var(--prime-control-xl-text-size);
-  --prime-choice-line-height: var(--prime-control-xl-line-height);
-}
-
-/* `.field .row` outranks Label.Root's own inline-flex. */
-.field .row {
+/* A plain `<label>` row: the choice text is regular weight at the control tier. */
+.row {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: subgrid;
   column-gap: var(--prime-choice-gap);
   align-items: start;
   width: 100%;
+  min-width: 0;
+  font-family: var(--prime-font-family-sans);
   font-size: var(--prime-choice-text);
   line-height: var(--prime-choice-line-height);
   font-weight: var(--prime-font-weight-regular);
+  color: var(--prime-color-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
+.field[data-readonly="true"] .row {
+  cursor: default;
+}
+
 .field[data-disabled="true"] .row {
+  color: var(--prime-color-text-disabled);
   cursor: not-allowed;
 }
 
@@ -103,4 +117,72 @@
 .support {
   grid-column: 2;
   min-width: 0;
+}
+
+/*
+ * ---- Visual control states ----
+ * Fills read variables with defaults, so a host only tunes them on its root: `--choice-bg-hover`,
+ * `--choice-bg-disabled-checked`, `--choice-bg-duration` (pace of the fill change). Read-only and
+ * disabled take no hover or press. Hosts never restyle `.visual` itself, so file order is free.
+ */
+.visual {
+  background: var(--prime-color-fill-strong);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
+  transition:
+    background-color var(--choice-bg-duration, var(--prime-motion-duration-fast))
+    var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.field:not([data-disabled="true"], [data-readonly="true"]) .row:hover .visual {
+  background: var(--prime-color-fill-strong-hover);
+}
+
+/* Tactile press: a small target, so the compact scale. */
+.field:not([data-disabled="true"], [data-readonly="true"]) .row:active .visual {
+  transform: scale(var(--prime-motion-press-scale-compact));
+}
+
+:is(
+    .field:is([data-state="checked"], [data-state="indeterminate"]) .visual,
+    .visual:is([data-state="checked"], [data-state="indeterminate"])
+  ) {
+  background: var(--prime-color-accent-default);
+}
+
+.field:is([data-state="checked"], [data-state="indeterminate"]):not(
+    [data-disabled="true"],
+    [data-readonly="true"]
+  )
+  .row:hover
+  .visual {
+  background: var(--prime-color-accent-hover);
+}
+
+.input:focus-visible + .visual {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.field[data-invalid="true"][data-state="unchecked"] .visual {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
+}
+
+.field[data-invalid="true"] .input:focus-visible + .visual {
+  outline-color: var(--prime-color-danger-border);
+}
+
+/* Disabled is not dimmed with opacity: the fills carry the state. */
+:is(.field[data-disabled="true"] .visual, .visual[data-disabled="true"]) {
+  background: var(--prime-color-fill-muted);
+  box-shadow: none;
+  transform: none;
+}
+
+:is(
+    .field[data-disabled="true"]:is([data-state="checked"], [data-state="indeterminate"]) .visual,
+    .visual[data-disabled="true"]:is([data-state="checked"], [data-state="indeterminate"])
+  ) {
+  background: var(--choice-bg-disabled-checked, var(--prime-color-fill-muted));
 }

@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Switch.Root",
-      en: '`forwardRef` → `HTMLInputElement` (the native `input type="checkbox" role="switch"`). Renders the field `<div>`, the `<label>` row with the input and the track, and the support row; native input props go to the input.',
+      en: '`ref` → `HTMLInputElement` (the native `input type="checkbox" role="switch"`). Renders the field `<div>`, the `<label>` row with the input and the track, and the support row. Field-root rule for a leaf: `className` goes to the field `<div>`; `id`, `ref` and native input props to the input.',
       ru: 'Поле: строка-`<label>` с нативным input (`role="switch"`) и дорожкой, под ней подсказка или ошибка.',
       props: [
         {
@@ -29,8 +29,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the track (24×16 … 44×24), the text and the gap.",
+          default: 'host tier, else "m"',
+          en: "Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`.",
           ru: "Ярус дорожки (24×16 … 44×24), текста и отступа.",
         },
         {

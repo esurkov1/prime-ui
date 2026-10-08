@@ -4,14 +4,14 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "ButtonGroup.Root",
-      en: '`forwardRef` → `HTMLDivElement`. `<div role="group">`; sets the tier and orientation of every segment and passes the tier to nested icons.',
+      en: '`ref` → `HTMLDivElement`. `<div role="group">`; sets the tier and orientation of every segment and passes the tier to nested icons.',
       ru: '`<div role="group">`: задаёт ярус и направление всех сегментов и передаёт ярус иконкам.',
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Control tier of every segment: height 28 · 32 · 36 · 40 · 48, padding, text, icon.",
+          default: 'host tier, else "m"',
+          en: "Control tier of every segment: height 28 · 32 · 36 · 40 · 48, padding, text, icon. Without it the tier of its host (a toolbar, a panel), else `m`.",
           ru: "Ярус всех сегментов: высота 28 · 32 · 36 · 40 · 48, отступы, кегль, иконка.",
         },
         {
@@ -43,7 +43,7 @@ export const api: ComponentApi = {
     },
     {
       name: "ButtonGroup.Item",
-      en: "`forwardRef` → `HTMLButtonElement`. One segment, a native `<button>`.",
+      en: "`ref` → `HTMLButtonElement`. One segment, a native `<button>`.",
       ru: "Один сегмент — нативная `<button>`.",
       props: [
         {

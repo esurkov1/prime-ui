@@ -77,10 +77,6 @@
   --seg-item-pad-x: var(--prime-space-3);
 }
 
-.root[data-size="m"] {
-  --seg-control-height: var(--prime-control-m-height);
-}
-
 .root[data-size="l"] {
   --seg-control-height: var(--prime-control-l-height);
   --seg-two-line-pad-x: var(--prime-control-l-padding-x);
@@ -441,8 +437,4 @@
   box-shadow: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .thumb[data-animate="true"] {
-    transition: none;
-  }
-}
+/* Reduced motion: the root never sets `data-animate` then, and the duration tokens are 0. */

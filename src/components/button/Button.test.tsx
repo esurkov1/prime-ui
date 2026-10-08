@@ -82,6 +82,8 @@ describe("Button", () => {
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute("data-loading", "true");
     expect(button).toHaveAttribute("aria-busy", "true");
+    // Busy, not unavailable: no disabled look while loading.
+    expect(button).not.toHaveAttribute("data-disabled");
   });
 
   it("supports explicit submit type", () => {

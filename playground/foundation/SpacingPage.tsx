@@ -138,9 +138,9 @@ function DemoField({ label, hint, value }: { label: string; hint?: string; value
     <div className={s.fakeFieldGroup}>
       <Label.Root htmlFor={id}>{label}</Label.Root>
       <Gap varName="--prime-control-m-label-gap" label="подпись → поле" />
-      <Input.Root>
+      <Input.Root id={id}>
         <Input.Wrapper>
-          <Input.Field id={id} defaultValue={value ?? ""} />
+          <Input.Field defaultValue={value ?? ""} />
         </Input.Wrapper>
       </Input.Root>
       {hint ? (

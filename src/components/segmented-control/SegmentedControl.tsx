@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -123,13 +123,14 @@ function SegmentedControlRoot({
   defaultValue = "",
   onValueChange,
   disabled = false,
-  size = "m",
+  size: sizeProp,
   fullWidth = false,
   children,
   className,
   onKeyDown,
   ...rest
 }: SegmentedControlRootProps) {
+  const size = useControlSize(sizeProp);
   const [selectedValue, setSelectedValue] = useControllableState<string>({
     value,
     defaultValue,
@@ -164,7 +165,11 @@ function SegmentedControlRoot({
     const userChange = userChangeRef.current;
     userChangeRef.current = false;
     syncThumb(list, thumb, userChange && !prefersReducedMotion());
-    setFirstEnabled(list.querySelector<HTMLElement>(ENABLED_ITEM)?.dataset.value ?? "");
+    // The first enabled item is the tab stop only while nothing is selected; with a value no
+    // state is written, so a commit never schedules another render.
+    if (!selectedValue) {
+      setFirstEnabled(list.querySelector<HTMLElement>(ENABLED_ITEM)?.dataset.value ?? "");
+    }
 
     // A chosen segment in a scrolling row is brought into view (only the row scrolls, not the page).
     const active = list.querySelector<HTMLElement>(CHECKED_ITEM);
@@ -296,6 +301,7 @@ export type SegmentedControlItemProps = Omit<
    */
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
 function isIconOnly(children: React.ReactNode): boolean {
@@ -326,49 +332,56 @@ function wrapText(children: React.ReactNode): React.ReactNode {
   );
 }
 
-const SegmentedControlItem = React.forwardRef<HTMLButtonElement, SegmentedControlItemProps>(
-  ({ value, disabled = false, color, children, className, onClick, ...rest }, ref) => {
-    const ctx = useSegmentedControlContext();
-    const isChecked = ctx.value === value;
-    const isDisabled = ctx.rootDisabled || disabled;
-    const isTabStop = !isDisabled && ctx.focusValue === value;
-    const itemId = React.useId();
-    const twoLine = hasChildOfType(children, SegmentedControlDescription);
-    const hasCount = hasChildOfType(children, SegmentedControlCount);
-    const parts = React.useMemo(() => ({ itemId }), [itemId]);
+function SegmentedControlItem({
+  value,
+  disabled = false,
+  color,
+  children,
+  className,
+  onClick,
+  ref,
+  ...rest
+}: SegmentedControlItemProps) {
+  const ctx = useSegmentedControlContext();
+  const isChecked = ctx.value === value;
+  const isDisabled = ctx.rootDisabled || disabled;
+  const isTabStop = !isDisabled && ctx.focusValue === value;
+  const itemId = React.useId();
+  const twoLine = hasChildOfType(children, SegmentedControlDescription);
+  const hasCount = hasChildOfType(children, SegmentedControlCount);
+  const parts = React.useMemo(() => ({ itemId }), [itemId]);
 
-    return (
-      // biome-ignore lint/a11y/useSemanticElements: radiogroup of buttons with roving tabindex (WAI-ARIA APG)
-      <button
-        {...rest}
-        ref={ref}
-        role="radio"
-        type="button"
-        aria-checked={isChecked}
-        aria-labelledby={twoLine ? cx(`${itemId}-label`, hasCount && `${itemId}-count`) : undefined}
-        aria-describedby={twoLine ? `${itemId}-description` : undefined}
-        {...toDataAttributes({
-          state: isChecked ? "checked" : "unchecked",
-          disabled: isDisabled || undefined,
-          "icon-only": isIconOnly(children) || undefined,
-          "two-line": twoLine || undefined,
-          value,
-          color,
-        })}
-        tabIndex={isTabStop ? 0 : -1}
-        disabled={isDisabled}
-        className={cx(styles.item, className)}
-        onClick={(event) => {
-          onClick?.(event);
-          if (!isDisabled && !event.defaultPrevented) ctx.onSelect(value);
-        }}
-      >
-        {color ? <Badge.Dot className={styles.dot} /> : null}
-        <ItemPartsContext.Provider value={parts}>{wrapText(children)}</ItemPartsContext.Provider>
-      </button>
-    );
-  },
-);
+  return (
+    // biome-ignore lint/a11y/useSemanticElements: radiogroup of buttons with roving tabindex (WAI-ARIA APG)
+    <button
+      {...rest}
+      ref={ref}
+      role="radio"
+      type="button"
+      aria-checked={isChecked}
+      aria-labelledby={twoLine ? cx(`${itemId}-label`, hasCount && `${itemId}-count`) : undefined}
+      aria-describedby={twoLine ? `${itemId}-description` : undefined}
+      {...toDataAttributes({
+        state: isChecked ? "checked" : "unchecked",
+        disabled: isDisabled || undefined,
+        "icon-only": isIconOnly(children) || undefined,
+        "two-line": twoLine || undefined,
+        value,
+        color,
+      })}
+      tabIndex={isTabStop ? 0 : -1}
+      disabled={isDisabled}
+      className={cx(styles.item, className)}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!isDisabled && !event.defaultPrevented) ctx.onSelect(value);
+      }}
+    >
+      {color ? <Badge.Dot className={styles.dot} /> : null}
+      <ItemPartsContext.Provider value={parts}>{wrapText(children)}</ItemPartsContext.Provider>
+    </button>
+  );
+}
 
 SegmentedControlItem.displayName = "SegmentedControl.Item";
 
