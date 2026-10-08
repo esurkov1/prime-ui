@@ -20,6 +20,8 @@ export type DragSourceItem<TData> = {
 
 export type DragSourceProps = {
   "data-dnd-item": string;
+  /** The drag kind: ids are unique only within a kind (two boards may share card ids). */
+  "data-dnd-kind": string;
   "data-dragging"?: true | undefined;
   "aria-roledescription"?: string | undefined;
   onPointerDown: (event: React.PointerEvent<HTMLElement>) => void;
@@ -67,6 +69,7 @@ export function useDragSource<TData = unknown>(
   const props = React.useCallback(
     (item: DragSourceItem<TData>): DragSourceProps => ({
       "data-dnd-item": item.id,
+      "data-dnd-kind": kind,
       "data-dragging": draggingId === item.id || undefined,
       "aria-roledescription": disabled ? undefined : controller.labels().roleDescription,
       onPointerDown: (event) => {
@@ -86,7 +89,7 @@ export function useDragSource<TData = unknown>(
         });
       },
     }),
-    [controller, draggingId, disabled],
+    [controller, draggingId, disabled, kind],
   );
 
   return React.useMemo(() => ({ draggingId, props }), [draggingId, props]);

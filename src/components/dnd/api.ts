@@ -23,7 +23,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.Sortable",
-      en: "Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Renders `<div>`, `<ul>` or `<ol>` and registers itself as the drop target; draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`.",
+      en: "Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Renders `<div>`, `<ul>` or `<ol>` and registers itself as the drop target; draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`; a gap leaving mid-drag fades out as an out-of-flow copy marked `data-dnd-ghost`.",
       ru: "Обобщённый `Dnd.Sortable<T>`. Рендерит `<div>`, `<ul>` или `<ol>`, сам регистрируется как цель, рисует зазор и оптимистичный порядок. Ставит `data-axis` и `data-dragging`.",
       props: [
         {
@@ -58,15 +58,21 @@ export const api: ComponentApi = {
           name: "renderItem",
           type: "(item: T, index: number) => ReactNode",
           required: true,
-          en: "Returns a `Dnd.SortableItem`.",
-          ru: "Возвращает `Dnd.SortableItem`.",
+          en: "Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release (the carried item at the gap), so a shown position follows the gap. Parts marked `data-dnd-mirror` are kept in step on the carried copy (rolling digits roll).",
+          ru: "Возвращает `Dnd.SortableItem`. Во время перетаскивания `index` — место, которое элемент займёт при отпускании (переносимый — на месте зазора), поэтому показанная позиция следует за зазором. Части с `data-dnd-mirror` обновляются и на летящей копии (цифры прокручиваются).",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "Content after the items that never moves and takes no drop position: an add tile at the end of a grid. Inside `ul` / `ol` it must be `li`.",
+          ru: "Содержимое после элементов, которое не перемещается и не становится местом сброса: плитка добавления в конце сетки. Внутри `ul` / `ol` — `li`.",
         },
         {
           name: "axis",
-          type: '"x" | "y"',
+          type: '"x" | "y" | "grid"',
           default: '"y"',
-          en: "A column or a single row; wrapping grids are not supported.",
-          ru: "Столбец или одна строка; сетки с переносом не поддерживаются.",
+          en: "A column, a single row, or a wrapping grid (`display: grid`; the host sets the tracks and the cells' size, the gap takes a cell). Keyboard: Alt + ↑ / ↓ in a column, Alt + ← / → in a row and a grid.",
+          ru: "Столбец, одна строка или сетка с переносом (`display: grid`; дорожки и размер ячеек задаёт хост, зазор занимает ячейку). Клавиатура: Alt + ↑ / ↓ в столбце, Alt + ← / → в строке и сетке.",
         },
         {
           name: "handle",
@@ -112,8 +118,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.SortableItem",
-      en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag.",
-      ru: "`<li>` в `ul` / `ol`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Ставит `data-lifted`, `data-dnd-item`, `aria-roledescription`, `aria-keyshortcuts` и `tabIndex={0}` (без `handle`). Нажатия на кнопки, поля, ссылки и `[data-dnd-ignore]` внутри не начинают перетаскивание.",
+      en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `data-dnd-kind`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag.",
+      ru: "`<li>` в `ul` / `ol`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Ставит `data-lifted`, `data-dnd-item`, `data-dnd-kind`, `aria-roledescription`, `aria-keyshortcuts` и `tabIndex={0}` (без `handle`). Нажатия на кнопки, поля, ссылки и `[data-dnd-ignore]` внутри не начинают перетаскивание.",
       props: [
         {
           name: "id",

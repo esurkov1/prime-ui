@@ -1,6 +1,7 @@
 /*
  * Kanban — Graphite. A row of filled column wells holding filled cards; depth from fill, no lines.
- * The board scrolls sideways inside itself, each column body scrolls on its own. Columns span the
+ * The board scrolls sideways inside itself, each column body scrolls on its own. A grip in the
+ * header moves a column (`reorderableColumns`); the strip of columns is a sortable list. Columns span the
  * board height and their cards sit at the top, so a card drops anywhere in a column, not only on
  * its cards. Wide: columns keep a fixed comfortable width. Narrow (container below 40rem): a
  * column takes 85% of the board and snaps, so the next one peeks.
@@ -9,6 +10,8 @@
 .root {
   --kanban-column-width: calc(var(--prime-space-24) * 3);
   --kanban-gap: var(--prime-space-3);
+  /* Room between the column edge and its cards (the hairline spans the same width). */
+  --kanban-inset: var(--prime-space-2);
 
   container-type: inline-size;
   display: flex;
@@ -26,9 +29,15 @@
   display: flex;
   flex: 1 1 auto;
   align-items: stretch;
-  gap: var(--kanban-gap);
   min-height: 0;
   padding-block-end: var(--prime-space-2);
+}
+
+/* The sortable row of columns (`Dnd.Sortable`, axis x): the board's own gap between them. */
+.columns[data-axis] {
+  flex: 1 0 auto;
+  gap: var(--kanban-gap);
+  min-height: 0;
 }
 
 /* Positioned: the visually hidden count stays inside the column instead of the page. */
@@ -41,11 +50,38 @@
   inline-size: var(--kanban-column-width);
   max-block-size: 100%;
   min-height: 0;
-  padding-block-start: var(--prime-space-2);
+  padding-block-start: var(--prime-space-3);
   border-radius: var(--prime-radius-l);
   /* A well one ladder step off the surface around the board (its control fill, foundation §4). */
   background: var(--prime-color-fill-muted);
   scroll-snap-align: start;
+}
+
+/*
+ * plain: no wells. The cards and the header carry the column: the cards widen to almost the full
+ * column (the inset keeps only the focus ring inside), so the cards of neighbouring columns stand
+ * closer than in wells.
+ */
+.root[data-variant="plain"] {
+  --kanban-gap: var(--prime-space-3);
+  --kanban-inset: var(--prime-space-1);
+}
+
+.root[data-variant="plain"] .column {
+  padding-block-start: 0;
+  border-radius: 0;
+  background: none;
+}
+
+/* Without a well the header carries the column: a filled plate as wide as the cards (one ladder
+   step off the board's surface, the well's fill), in place of the hairline. */
+.root[data-variant="plain"] .header {
+  min-block-size: var(--prime-control-l-height);
+  margin-inline: var(--kanban-inset);
+  padding-block: var(--prime-space-3);
+  padding-inline: var(--prime-space-3) var(--prime-space-2);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-fill-muted);
 }
 
 @container (width < 40rem) {
@@ -63,32 +99,73 @@
   scroll-snap-type: none;
 }
 
+/*
+ * Title, count, actions and the grip (at the end) on the first row; the description under the title
+ * on the second. A grid, so the actions and the grip keep their columns whatever is missing.
+ */
 .header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, max-content) auto 1fr;
   align-items: center;
-  gap: var(--prime-space-2);
-  min-block-size: var(--prime-control-s-height);
-  padding-inline: var(--prime-space-4) var(--prime-space-2);
+  column-gap: var(--prime-space-2);
+  min-block-size: var(--prime-control-m-height);
+  padding-block-end: var(--prime-space-3);
+  /* The title starts where the card text does: the inset plus the card padding. */
+  padding-inline: calc(var(--kanban-inset) + var(--prime-space-3)) var(--kanban-inset);
+  /* The faint inset hairline under the header (as in a dialog header), as wide as the cards. */
+  background:
+    linear-gradient(var(--prime-color-border-faint), var(--prime-color-border-faint)) center bottom
+    / calc(100% - 2 * var(--kanban-inset)) var(--prime-border-width) no-repeat;
+}
+
+.header[data-reorderable] {
+  grid-template-columns: minmax(0, max-content) auto 1fr auto;
+}
+
+.grip {
+  grid-column: 4;
 }
 
 .title {
   min-width: 0;
   margin: 0;
   overflow: hidden;
-  font-size: var(--prime-text-title-s-size);
-  font-weight: var(--prime-text-title-s-weight);
-  line-height: var(--prime-text-title-s-line-height);
-  letter-spacing: var(--prime-text-title-s-tracking);
+  font-size: var(--prime-text-title-m-size);
+  font-weight: var(--prime-text-title-m-weight);
+  line-height: var(--prime-text-title-m-line-height);
+  letter-spacing: var(--prime-text-title-m-tracking);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* The column's palette dot (`Badge.Dot` in the hue's solid color), on the title's line. */
+.dot {
+  margin-inline-end: var(--prime-space-2);
+  color: var(--hue-solid);
+  vertical-align: middle;
+}
+
 .actions {
   display: flex;
-  flex: none;
+  grid-column: 3;
+  justify-self: end;
   align-items: center;
   gap: var(--prime-space-1);
-  margin-inline-start: auto;
+}
+
+.description {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-text-caption-weight);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  color: var(--prime-color-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /*
@@ -101,7 +178,7 @@
   flex: 1 1 auto;
   grid-template-rows: 1fr;
   min-height: 0;
-  padding: var(--prime-space-2);
+  padding: var(--prime-space-3) var(--kanban-inset) var(--kanban-inset);
 }
 
 .swap {
@@ -126,17 +203,16 @@
   list-style: none;
 }
 
-/* An empty column: a well one ladder step deeper than the column (two off the board's surface) at
-   the top of the drop area; it fades out while a card is over it. */
+/* An empty column: a dashed drop slot at the top of the drop area with the text and a hint; it fades out while a card is over it. */
 .empty {
   position: absolute;
   inset-block-start: 0;
   inset-inline: 0;
-  block-size: var(--prime-space-20);
-  display: grid;
-  place-content: center;
+  padding-block: var(--prime-space-6);
   border-radius: var(--prime-radius-m);
-  background: var(--prime-color-fill-muted-hover);
+  /* A drop slot, not a card: the dashed «put it here» line Dnd draws for its gap, no fill. The
+     line is a translucent fill, so it reads the same on a well and on a bare surface. */
+  border: var(--prime-border-width) dashed var(--prime-color-fill-strong);
   pointer-events: none;
   transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
@@ -177,6 +253,35 @@
 
 .item[data-disabled] {
   color: var(--prime-color-text-secondary);
+}
+
+/* The card's top zone: a muted caption row over a faint hairline (as the column header). */
+.itemHeader {
+  --prime-icon-size: var(--prime-icon-xs);
+
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  min-block-size: var(--prime-control-xs-height);
+  padding-block-end: var(--prime-space-2);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-text-caption-weight);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  background:
+    linear-gradient(var(--prime-color-border-faint), var(--prime-color-border-faint)) center bottom
+    / 100% var(--prime-border-width) no-repeat;
+}
+
+.itemHeader > * {
+  min-width: 0;
+}
+
+.itemHeader > :last-child:not(:first-child) {
+  margin-inline-start: auto;
 }
 
 .itemTitle {

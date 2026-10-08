@@ -1,15 +1,32 @@
 /*
  * ColorSwatches — inline color choice on the shared swatch (internal/swatch.module.css): the tier
- * on the grid with the control-height base (swatches 20 · 24 · 28 · 32 · 40). The swatches wrap
- * to the container width (one row when the container sizes to its content); the arrow keys move
- * by the visual rows.
+ * on the grid with the control-height base (swatches 20 · 24 · 28 · 32 · 40). The swatches share
+ * the container width: each stretches across its column and a row wraps only when they no longer
+ * fit; the arrow keys move by the visual rows.
+ *
+ * Width: the preferred size is one row of tier-sized swatches (`--swatch-count`, set by the
+ * component), so a host that sizes to its content gets one row; `min` / `max` 100% make it exactly
+ * the container width wherever that width is known, wider or narrower.
  */
 .grid {
   --swatch-base: var(--swatch-base-control);
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--swatch-size), 1fr));
   gap: var(--swatch-gap);
-  min-width: 0;
+  box-sizing: border-box;
+  inline-size: calc(
+    var(--swatch-count) *
+    var(--swatch-size) +
+    (var(--swatch-count) - 1) *
+    var(--swatch-gap)
+  );
+  min-inline-size: 100%;
+  max-inline-size: 100%;
+}
+
+/* Every swatch stretches across its column; the height stays the tier's. */
+.grid > * {
+  width: 100%;
 }
 
 /* Invalid: the inner edge of every swatch turns danger (the message says why). */

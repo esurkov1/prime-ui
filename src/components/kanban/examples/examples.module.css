@@ -24,6 +24,12 @@
   flex: 1;
 }
 
+/* columns.tsx: the column editor popover, a short form's measure. */
+.panel {
+  inline-size: calc(var(--prime-space-24) * 3.25);
+  max-inline-size: 100%;
+}
+
 /* A phone-width screen. */
 .phone {
   inline-size: min(100%, calc(var(--prime-space-20) * 4.5));

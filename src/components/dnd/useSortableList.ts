@@ -4,7 +4,7 @@ import { formatLabel } from "@/internal/formatLabel";
 
 import { useDragController } from "./context";
 import type { DragItem } from "./dragSession";
-import { type Axis, insertionBefore } from "./geometry";
+import { type Axis, insertionBefore, layoutRect } from "./geometry";
 import { useStoreSelector } from "./store";
 import { type DragSourceProps, useDraggedItem, useDragSource } from "./useDragSource";
 import { type DropTargetProps, useDropTarget } from "./useDropTarget";
@@ -175,14 +175,17 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
       item: DragItem<unknown>,
       element: HTMLElement,
     ): InsertionPoint => {
-      const grab = controller.store.getSnapshot().grab ?? { x: 0, y: 0 };
-      const before = insertionBefore(
-        element,
-        ITEM_SELECTOR,
-        { x: point.x - grab.x, y: point.y - grab.y },
-        axis,
-        item.id,
-      );
+      const { grab = null, origin = null } = controller.store.getSnapshot();
+      const corner = { x: point.x - (grab?.x ?? 0), y: point.y - (grab?.y ?? 0) };
+      // A list compares the carried item's leading edge; a grid the centre of the item as it was
+      // picked up, wherever it was grabbed. Its size at pick-up, never the copy's current size: the
+      // copy is fitted to the cell it would land in, and an aim that moved with it would push the gap
+      // to the next cell, refit the copy and pull it back, round and round.
+      const aim =
+        axis === "grid" && origin
+          ? { x: corner.x + origin.width / 2, y: corner.y + origin.height / 2 }
+          : corner;
+      const before = insertionBefore(element, ITEM_SELECTOR, aim, axis, item.id);
       // In front of itself, or of whatever already follows it, is where the item already is. An
       // item from another list always moves.
       const own = order.includes(item.id);
@@ -224,12 +227,27 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
   const heldId = useStoreSelector(controller.store, (state) => state.heldId);
   const holdsGap =
     overId === target.id || (overId === null && (heldId === null ? own : heldId === target.id));
-  const showGap = dragged !== null && placement !== null && holdsGap;
-  const gapBefore = showGap ? placement.before : undefined;
+  // The frame the item lifts, its own placement is not set yet: the gap already stands where the item
+  // was, so its neighbours never step into the hole and back (a jolt, worst in a grid of mixed cells).
+  const effective = placement ?? (own && dragged ? { before: dragged.id, moves: false } : null);
+  const showGap = dragged !== null && effective !== null && holdsGap;
+  const gapBefore = showGap ? effective.before : undefined;
   const origin = useStoreSelector(controller.store, (state) => state.origin);
   const radius = useStoreSelector(controller.store, (state) => state.radius);
   // Everything that moves an item, and nothing else: re-renders from the owner's state must not animate.
   const gapKey = gapBefore === undefined ? "idle" : (gapBefore ?? "end");
+  // A grid of mixed cells (a cover two cells wide): the carried copy takes the size of the cell the gap
+  // stands in, so what is carried is what will land.
+  React.useLayoutEffect(() => {
+    if (axis !== "grid" || gapKey === "idle") return;
+    const gap = target.element?.querySelector(":scope > [data-dnd-gap]");
+    if (!gap) return;
+    const rect = layoutRect(gap);
+    if (rect.width > 0 && rect.height > 0) {
+      controller.resizeCarried({ width: rect.width, height: rect.height });
+    }
+  }, [axis, gapKey, controller, target.element]);
+
   useFlipList(
     target.element,
     JSON.stringify([order, dragged?.id ?? null, gapKey]),
@@ -263,8 +281,11 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
       ...sourceProps({ id, data: null, label: labelOf(id) }),
       "data-lifted": liftedId === id || undefined,
       onKeyDown: (event) => {
-        // Alt, so plain arrows keep whatever they mean on the element.
+        // Alt, so plain arrows keep whatever they mean on the element. A key from an item of a
+        // nested list is that item's: it never moves the item around it.
         if (disabled || !event.altKey) return;
+        const target = event.target instanceof Element ? event.target : null;
+        if (target?.closest("[data-dnd-item]") !== event.currentTarget) return;
         const back = axis === "y" ? "ArrowUp" : "ArrowLeft";
         const forward = axis === "y" ? "ArrowDown" : "ArrowRight";
         if (event.key !== back && event.key !== forward) return;

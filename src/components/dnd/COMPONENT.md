@@ -45,7 +45,7 @@ No ref, no DOM of its own besides the portalled overlay and a visually hidden li
 | `children` | `ReactNode` | — | The app or the screen that drags. |
 
 ### Dnd.Sortable
-Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Renders `<div>`, `<ul>` or `<ol>` and registers itself as the drop target; draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`.
+Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Renders `<div>`, `<ul>` or `<ol>` and registers itself as the drop target; draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`; a gap leaving mid-drag fades out as an out-of-flow copy marked `data-dnd-ghost`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -53,8 +53,9 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Renders `<div>`, `<ul>` or `
 | `getId` | `(item: T) => string` | — (required) | Stable unique id; must match `Dnd.SortableItem id`. |
 | `getLabel` | `(item: T) => string` | `the id` | Spoken by the live region. |
 | `onReorder` | `(id: string, beforeId: string \| null) => DndReorderResult \| Promise<DndReorderResult>` | — (required) | The item `id` lands in front of `beforeId` (`null` = last); with connected lists `id` may come from another list. Apply it with `moveBefore`; return `{ ok: false }` (or reject) to roll the drawn order back. |
-| `renderItem` | `(item: T, index: number) => ReactNode` | — (required) | Returns a `Dnd.SortableItem`. |
-| `axis` | `"x" \| "y"` | `"y"` | A column or a single row; wrapping grids are not supported. |
+| `renderItem` | `(item: T, index: number) => ReactNode` | — (required) | Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release (the carried item at the gap), so a shown position follows the gap. Parts marked `data-dnd-mirror` are kept in step on the carried copy (rolling digits roll). |
+| `children` | `ReactNode` | — | Content after the items that never moves and takes no drop position: an add tile at the end of a grid. Inside `ul` / `ol` it must be `li`. |
+| `axis` | `"x" \| "y" \| "grid"` | `"y"` | A column, a single row, or a wrapping grid (`display: grid`; the host sets the tracks and the cells' size, the gap takes a cell). Keyboard: Alt + ↑ / ↓ in a column, Alt + ← / → in a row and a grid. |
 | `handle` | `boolean` | `false` | Only `Dnd.Handle` starts a drag; the rest of the item stays free for clicks and text selection. |
 | `disabled` | `boolean` | `false` | No drag, no keyboard reorder. |
 | `kind` | `string` | `unique per list` | Lists sharing a `kind` exchange items (a board). |
@@ -63,7 +64,7 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Renders `<div>`, `<ul>` or `
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children">` | — | `className` (the list layout), `aria-label` (the name of the list) and the other attributes of the list element. |
 
 ### Dnd.SortableItem
-`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag.
+`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `data-dnd-kind`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -119,6 +120,7 @@ Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element
 |---|---|---|---|
 | `y` | a column; the gap opens above or below neighbours | lists, settings, menus | yes |
 | `x` | one row of items; the gap opens left or right | chips, tabs, tag strips | |
+| `grid` | a wrapping grid in reading order; the gap is a cell | photo galleries, tiles | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -152,7 +154,7 @@ All motion is on the tokens (lift `fast`, glide and landing `base`, flash `slow`
 | Key | Action |
 |---|---|
 | `Tab` | Moves to the list items (with `handle`, to the grips). |
-| `Alt + ↑` · `Alt + ↓` | Moves the item one place (`axis="x"`: Alt + ← / →). |
+| `Alt + ↑` · `Alt + ↓` | Moves the item one place (`axis="x"` and `"grid"`: Alt + ← / →). |
 | `Escape` | Cancels a drag in flight. |
 
 ### ARIA

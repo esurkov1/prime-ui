@@ -36,6 +36,12 @@ export type DragSnapshot = {
   origin: Rect | null;
   /** Where inside that rect the pointer grabbed it. */
   grab: Point | null;
+  /**
+   * The size the carried copy is drawn at when a grid list fits it to the cell it would land in (a
+   * cover carried into a row of tiles shrinks); null — the origin's size. The grab point keeps its
+   * place relative to the copy.
+   */
+  carried: { width: number; height: number } | null;
   /** The lifted element's `border-radius`, so the gap it leaves is shaped like it. */
   radius: string | null;
   /** The live region text; `sequence` makes a repeated message count as new for assistive technology. */
@@ -50,6 +56,7 @@ export const IDLE_SNAPSHOT: DragSnapshot = {
   canDrop: false,
   origin: null,
   grab: null,
+  carried: null,
   radius: null,
   announcement: { message: "", sequence: 0 },
 };
@@ -82,6 +89,7 @@ export type DragPreview = {
 export type DragOverlayEvent =
   | { type: "start"; preview: DragPreview }
   | { type: "move"; point: Point }
+  | { type: "resize"; width: number; height: number }
   | { type: "end"; item: DragItem; outcome: DragOutcome; origin: Rect | null };
 
 /**
@@ -138,6 +146,8 @@ export type DragController = {
   labels: () => DndLabels;
   cancel: () => void;
   subscribeOverlay: (listener: (event: DragOverlayEvent) => void) => () => void;
+  /** Fits the carried copy to the cell it would land in (a grid list of mixed cells). */
+  resizeCarried: (size: { width: number; height: number }) => void;
   destroy: () => void;
 };
 
@@ -303,6 +313,7 @@ export function createDragController(
       canDrop: false,
       origin: null,
       grab: null,
+      carried: null,
       radius: null,
     }));
     emit({ type: "end", item, outcome, origin });
@@ -348,6 +359,7 @@ export function createDragController(
       pointerKind,
       origin,
       grab: { x: pressPoint.x - origin.left, y: pressPoint.y - origin.top },
+      carried: null,
       radius: getComputedStyle(element).borderRadius || null,
     }));
     emit({
@@ -510,6 +522,16 @@ export function createDragController(
     announce,
     labels: getLabels,
     cancel,
+    resizeCarried: (size) => {
+      const state = store.getSnapshot();
+      if (!active || !state.origin) return;
+      const current = state.carried ?? state.origin;
+      if (Math.abs(current.width - size.width) < 1 && Math.abs(current.height - size.height) < 1) {
+        return;
+      }
+      store.setState((now) => ({ ...now, carried: { width: size.width, height: size.height } }));
+      emit({ type: "resize", width: size.width, height: size.height });
+    },
     subscribeOverlay: (listener) => {
       overlayListeners.add(listener);
       return () => {

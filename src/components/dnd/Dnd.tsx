@@ -121,10 +121,13 @@ export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "child
   getLabel?: (item: T) => string;
   /** Called when an item lands in front of `beforeId` (`null` = last). Return `{ ok: false }` (or reject) to roll the drawn order back. */
   onReorder: (id: string, beforeId: string | null) => ReorderReturn | Promise<ReorderReturn>;
-  /** Renders one item; return a `Dnd.SortableItem`. */
+  /**
+   * Renders one item; return a `Dnd.SortableItem`. During a drag `index` is the place the item will
+   * have on release. Parts marked `data-dnd-mirror` stay in step on the carried copy.
+   */
   renderItem: (item: T, index: number) => React.ReactNode;
-  /** Layout direction of the list. */
-  axis?: "x" | "y";
+  /** Layout of the list: a column, a row, or a wrapping grid (reading order, Alt + ← / →). */
+  axis?: "x" | "y" | "grid";
   /** Only `Dnd.Handle` starts a drag; the rest of the item stays free for clicks and text selection. */
   handle?: boolean;
   disabled?: boolean;
@@ -140,6 +143,8 @@ export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "child
   as?: "div" | "ul" | "ol";
   /** Accessible name of the list. */
   "aria-label"?: string;
+  /** Content after the items that never moves and takes no drop position (an add tile). */
+  children?: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
 };
 
@@ -160,6 +165,7 @@ function DndSortable<T>({
   canDrop,
   as: Tag = "div",
   className,
+  children: trailing,
   ref: forwardedRef,
   ...rest
 }: DndSortableProps<T>) {
@@ -202,12 +208,17 @@ function DndSortable<T>({
     />
   ) : null;
 
+  // During a drag `index` is the place an item will have on release, so a position it shows (a
+  // number) follows the gap as it moves, not only the drop.
+  const shownIndex = previewIndex(list.order, list.draggingId, list.gapBefore);
   const children: React.ReactNode[] = [];
   list.order.forEach((id, index) => {
     const item = byId.get(id);
     if (item === undefined) return;
     if (placeholder && list.gapBefore === id) children.push(placeholder);
-    children.push(<React.Fragment key={id}>{renderItem(item, index)}</React.Fragment>);
+    children.push(
+      <React.Fragment key={id}>{renderItem(item, shownIndex.get(id) ?? index)}</React.Fragment>,
+    );
   });
   if (placeholder && list.gapBefore === null) children.push(placeholder);
 
@@ -224,11 +235,38 @@ function DndSortable<T>({
         data-dragging={list.draggingId !== null || undefined}
       >
         {children}
+        {trailing}
       </Tag>
     </SortableContext>
   );
 }
 DndSortable.displayName = "Dnd.Sortable";
+
+/**
+ * Where every item would stand if the drag ended now: the carried item at the gap, the others
+ * closing its hole; an item from another list only takes a place (the ones after the gap move on).
+ */
+function previewIndex(
+  order: readonly string[],
+  draggingId: string | null,
+  gapBefore: string | null | undefined,
+): Map<string, number> {
+  const index = new Map<string, number>();
+  if (gapBefore === undefined || gapBefore === draggingId) {
+    order.forEach((id, at) => {
+      index.set(id, at);
+    });
+    return index;
+  }
+  const rest = order.filter((id) => id !== draggingId);
+  const at = gapBefore === null ? rest.length : rest.indexOf(gapBefore);
+  const shown: Array<string | null> = [...rest];
+  shown.splice(at === -1 ? rest.length : at, 0, draggingId);
+  shown.forEach((id, position) => {
+    if (id !== null) index.set(id, position);
+  });
+  return index;
+}
 
 export type DndSortableItemProps = {
   /** Must match `getId` of the item. */
@@ -306,6 +344,8 @@ function fadeOutGap(node: HTMLElement, controller: DragController) {
   const box = rectOf(container);
   const ghost = node.cloneNode(false) as HTMLElement;
   ghost.removeAttribute("data-dnd-gap");
+  // Out of the flow and on its way out: hosts that count cells (a grid's first cell) skip it.
+  ghost.setAttribute("data-dnd-ghost", "");
   ghost.style.position = "absolute";
   ghost.style.margin = "0";
   ghost.style.left = `${rect.left - box.left - container.clientLeft + container.scrollLeft}px`;

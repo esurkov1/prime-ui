@@ -141,7 +141,7 @@ export default function DataTableColumnsVisibilityExample() {
                 Колонки: {shown} из {COLUMNS.length}
               </Button.Root>
             </Dropdown.Trigger>
-            <Dropdown.Content align="end" size="s">
+            <Dropdown.Content size="s">
               <Dropdown.Group label="Колонки таблицы">
                 {COLUMNS.map((column) => (
                   <Dropdown.CheckboxItem

@@ -226,6 +226,105 @@ describe("Kanban", () => {
     expect(screen.getByRole("button", { name: "Добавить в Готово" })).toBeInTheDocument();
   });
 
+  it("shows a column description under the heading and describes the list with it", () => {
+    render(
+      <Board
+        columns={[{ ...(COLUMNS[0] as KanbanColumn), description: "Берём после планирования" }]}
+      />,
+    );
+    expect(screen.getByRole("list", { name: "К выполнению" })).toHaveAccessibleDescription(
+      "Берём после планирования",
+    );
+  });
+
+  it("draws a card header row above the title", () => {
+    render(
+      <Board
+        renderItem={(task) => (
+          <Kanban.Item>
+            <Kanban.ItemHeader data-testid={`header-${task.id}`}>{task.id}</Kanban.ItemHeader>
+            <Kanban.ItemTitle>{task.title}</Kanban.ItemTitle>
+          </Kanban.Item>
+        )}
+      />,
+    );
+    const header = screen.getByTestId("header-a");
+    expect(header).toHaveTextContent("a");
+    expect(header.nextElementSibling).toHaveTextContent("Счёт для «Севера»");
+  });
+
+  it("marks the variant on the root, well by default", () => {
+    const { rerender } = render(<Board />);
+    expect(screen.getByLabelText("Доска")).toHaveAttribute("data-variant", "well");
+    rerender(<Board variant="plain" />);
+    expect(screen.getByLabelText("Доска")).toHaveAttribute("data-variant", "plain");
+  });
+
+  it("has no column grips unless reorderableColumns is set", () => {
+    render(<Board />);
+    expect(screen.queryByRole("button", { name: /Переместить колонку/ })).toBeNull();
+  });
+
+  const headings = () => screen.getAllByRole("heading").map((heading) => heading.textContent);
+
+  it("moves a column with Alt+→ on its grip, reports the order, keeps focus and announces it", () => {
+    const onColumnOrderChange = vi.fn();
+    render(<Board reorderableColumns onColumnOrderChange={onColumnOrderChange} />);
+    const grip = screen.getByRole("button", { name: "Переместить колонку «К выполнению»" });
+    expect(grip).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowLeft Alt+ArrowRight");
+    grip.focus();
+    fireEvent.keyDown(grip, { key: "ArrowRight", altKey: true });
+
+    expect(onColumnOrderChange).toHaveBeenCalledWith(["doing", "todo", "done"], {
+      id: "todo",
+      index: 1,
+    });
+    expect(headings()).toEqual(["В работе", "К выполнению", "Готово"]);
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Переместить колонку «К выполнению»" }),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Колонка «К выполнению»: позиция 2 из 3");
+    // The cards travel with their column.
+    expect(titles("К выполнению")).toEqual(["Счёт для «Севера»", "Отчёт по складу"]);
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowLeft", altKey: true });
+    expect(headings()).toEqual(["К выполнению", "В работе", "Готово"]);
+  });
+
+  it("card keys never move the column, even from a locked card", () => {
+    render(
+      <Board
+        reorderableColumns
+        renderItem={(task) => (
+          <Kanban.Item data-testid={`card-${task.id}`} disabled>
+            {task.title}
+          </Kanban.Item>
+        )}
+      />,
+    );
+    fireEvent.keyDown(screen.getByTestId("card-a"), { key: "ArrowRight", altKey: true });
+    expect(headings()).toEqual(["К выполнению", "В работе", "Готово"]);
+    expect(titles("К выполнению")).toEqual(["Счёт для «Севера»", "Отчёт по складу"]);
+  });
+
+  it("controlled column order: draws the parent's order, cards follow it with Alt+→", () => {
+    render(<Board reorderableColumns columnOrder={["done", "todo", "doing"]} />);
+    expect(headings()).toEqual(["Готово", "К выполнению", "В работе"]);
+    fireEvent.keyDown(screen.getByTestId("card-a"), { key: "ArrowRight", altKey: true });
+    expect(titles("В работе")).toEqual(["Счёт для «Севера»", "Онбординг"]);
+    // The parent did not change the order: it stays.
+    fireEvent.keyDown(screen.getByRole("button", { name: "Переместить колонку «Готово»" }), {
+      key: "ArrowRight",
+      altKey: true,
+    });
+    expect(headings()).toEqual(["Готово", "К выполнению", "В работе"]);
+  });
+
+  it("disabled board has no grips", () => {
+    render(<Board reorderableColumns disabled />);
+    expect(screen.queryByRole("button", { name: /Переместить колонку/ })).toBeNull();
+  });
+
   it("joins a Dnd.Root above it instead of mounting its own", () => {
     render(
       <Dnd.Root>
@@ -318,5 +417,46 @@ describe("Kanban pointer drag", () => {
     fireEvent.pointerUp(window, { ...POINTER, clientX: 310, clientY: 30 });
     await act(async () => {});
     expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it("drags a column by its grip to the end of the board; a press on the column body drags nothing", () => {
+    const onColumnOrderChange = vi.fn();
+    render(<Board reorderableColumns onColumnOrderChange={onColumnOrderChange} />);
+    // Columns stand 300 px apart and 200 px wide; the board spans them all.
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const columnEl = this.closest<HTMLElement>("[data-kanban-column]");
+      const index = COLUMNS.findIndex((col) => col.id === columnEl?.dataset.kanbanColumn);
+      const left = index === -1 ? 0 : index * 300;
+      const width = index === -1 ? 900 : 200;
+      return {
+        left,
+        top: 0,
+        right: left + width,
+        bottom: 400,
+        width,
+        height: 400,
+        x: left,
+        y: 0,
+        toJSON: () => ({}),
+      };
+    });
+
+    const heading = screen.getByRole("heading", { name: "К выполнению" });
+    fireEvent.pointerDown(heading, { ...POINTER, clientX: 40, clientY: 10 });
+    fireEvent.pointerMove(window, { ...POINTER, clientX: 760, clientY: 10 });
+    fireEvent.pointerUp(window, { ...POINTER, clientX: 760, clientY: 10 });
+    expect(onColumnOrderChange).not.toHaveBeenCalled();
+
+    const grip = screen.getByRole("button", { name: "Переместить колонку «К выполнению»" });
+    fireEvent.pointerDown(grip, { ...POINTER, clientX: 10, clientY: 10 });
+    fireEvent.pointerMove(window, { ...POINTER, clientX: 400, clientY: 10 });
+    fireEvent.pointerMove(window, { ...POINTER, clientX: 760, clientY: 10 });
+    fireEvent.pointerUp(window, { ...POINTER, clientX: 760, clientY: 10 });
+    expect(onColumnOrderChange).toHaveBeenCalledWith(["doing", "done", "todo"], {
+      id: "todo",
+      index: 2,
+    });
   });
 });

@@ -20,7 +20,7 @@ export default function DropdownOverviewExample() {
             </Button.Icon>
           </Button.Root>
         </Dropdown.Trigger>
-        <Dropdown.Content align="end">
+        <Dropdown.Content>
           <Dropdown.Item onSelect={() => setStatus("Счёт № 4821 · отправлен")}>
             Отправить клиенту
           </Dropdown.Item>

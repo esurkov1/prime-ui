@@ -27,6 +27,7 @@ Type a value, and the field anatomy: label, hint, error.
 | Textarea | Multi-line text field with label, hint, error and a character counter; grows with its content by default. | [COMPONENT.md](../src/components/textarea/COMPONENT.md) · [examples](../src/components/textarea/examples/) |
 | DigitInput | A row of square single-digit cells for a fixed-length code (OTP from SMS, PIN, pickup code), with the field label, hint and error. | [COMPONENT.md](../src/components/digit-input/COMPONENT.md) · [examples](../src/components/digit-input/examples/) |
 | FileUpload | A file drop zone with the field label, hint and error, plus file rows for the selected files. | [COMPONENT.md](../src/components/file-upload/COMPONENT.md) · [examples](../src/components/file-upload/examples/) |
+| ImageUpload | A set of photos as square tiles (5 · 4 · 3 · 2 across by width), the last tile adds more; reorder by drag, remove, and an optional cover. | [COMPONENT.md](../src/components/image-upload/COMPONENT.md) · [examples](../src/components/image-upload/examples/) |
 | Label | Field label (native `<label>`) with required and optional markers. | [COMPONENT.md](../src/components/label/COMPONENT.md) · [examples](../src/components/label/examples/) |
 | Hint | Help text or a validation error under a field. | [COMPONENT.md](../src/components/hint/COMPONENT.md) · [examples](../src/components/hint/examples/) |
 

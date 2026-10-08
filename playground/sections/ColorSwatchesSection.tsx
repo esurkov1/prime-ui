@@ -32,6 +32,7 @@ export const page: ComponentPageConfig = {
       title: "Перенос",
       description: "В узкой колонке образцы переносятся сами, а стрелки ходят по видимым рядам.",
     },
+
     {
       slot: "controlled",
       description:

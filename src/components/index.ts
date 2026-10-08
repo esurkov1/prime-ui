@@ -204,6 +204,13 @@ export { FileUpload } from "./file-upload/FileUpload";
 export type { HintIconProps, HintRootProps } from "./hint/Hint";
 export { Hint } from "./hint/Hint";
 export type {
+  ImageUploadItem,
+  ImageUploadLabels,
+  ImageUploadProps,
+  ImageUploadVariant,
+} from "./image-upload/ImageUpload";
+export { ImageUpload } from "./image-upload/ImageUpload";
+export type {
   InputAffixProps,
   InputClearButtonProps,
   InputCounterProps,
@@ -218,16 +225,19 @@ export { Input } from "./input/Input";
 export { getPasswordStrength, type PasswordStrength } from "./input/passwordStrength";
 export type {
   KanbanColumn,
+  KanbanColumnMove,
   KanbanItemBadgesProps,
   KanbanItemCountProps,
   KanbanItemDescriptionProps,
   KanbanItemFooterProps,
+  KanbanItemHeaderProps,
   KanbanItemProps,
   KanbanItemTitleProps,
   KanbanLabels,
   KanbanMove,
   KanbanRootProps,
   KanbanValue,
+  KanbanVariant,
 } from "./kanban/Kanban";
 export { Kanban } from "./kanban/Kanban";
 export type { KbdProps } from "./kbd/Kbd";

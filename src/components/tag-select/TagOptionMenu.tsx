@@ -93,7 +93,7 @@ export function TagOptionMenu({
           </Button.Icon>
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content side="bottom" align="end" size="s" flush className={styles.menuPanel}>
+      <Popover.Content side="bottom" size="s" flush className={styles.menuPanel}>
         <div className={styles.menuBody}>
           {onUpdate ? (
             <Input.Root size="s">

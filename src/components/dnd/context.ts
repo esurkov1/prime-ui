@@ -18,6 +18,7 @@ const INERT: DragController = {
   labels: () => defaultDndLabels,
   cancel: () => {},
   subscribeOverlay: () => () => {},
+  resizeCarried: () => {},
   destroy: () => {},
 };
 

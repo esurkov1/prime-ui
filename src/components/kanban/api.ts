@@ -18,15 +18,15 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Kanban.Root",
-      en: "Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns that scrolls sideways inside itself, each column a labelled `<ul>` of cards under a header with the title, a count `Badge` and actions. Mounts its own `Dnd.Root` unless one is already above it. Sets `aria-busy` while loading, `data-loading`, `data-disabled`.",
-      ru: "Обобщённый `Kanban.Root<T>`. Доска: полоса колонок с собственной горизонтальной прокруткой; колонка — подписанный `<ul>` карточек под шапкой с названием, счётчиком `Badge` и действиями. Сама монтирует `Dnd.Root`, если его нет выше. Пока идёт загрузка — `aria-busy`, `data-loading`; `data-disabled`.",
+      en: "Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns (a `<ul>`, sortable along x) that scrolls sideways inside itself, each column a labelled `<ul>` of cards under a header with the title, a count `Badge`, actions and an optional description line. Mounts its own `Dnd.Root` unless one is already above it. Sets `aria-busy` while loading, `data-loading`, `data-disabled`.",
+      ru: "Обобщённый `Kanban.Root<T>`. Доска: полоса колонок (`<ul>`, сортируемый по горизонтали) с собственной горизонтальной прокруткой; колонка — подписанный `<ul>` карточек под шапкой с названием, счётчиком `Badge`, действиями и необязательной строкой подзаголовка. Сама монтирует `Dnd.Root`, если его нет выше. Пока идёт загрузка — `aria-busy`, `data-loading`; `data-disabled`.",
       props: [
         {
           name: "columns",
           type: "readonly KanbanColumn[]",
           required: true,
-          en: "Columns in their order: `{ id, title, limit? }`; `limit` is a WIP limit — a full column refuses cards from other columns and its count turns orange (`count / limit`).",
-          ru: "Колонки по порядку: `{ id, title, limit? }`; `limit` — лимит работы: заполненная колонка не принимает карточки из других, счётчик становится оранжевым (`count / limit`).",
+          en: "Every column: `{ id, title, description?, color?, limit? }`, drawn in `columnOrder` (array order by default). `description` is a muted line under the title that also describes the column's list; `color` (a `PaletteColor`) puts a dot of that hue before the title; `limit` is a WIP limit — a full column refuses cards from other columns and its count turns orange (`count / limit`).",
+          ru: "Все колонки: `{ id, title, description?, color?, limit? }`, в порядке `columnOrder` (по умолчанию — порядок массива). `description` — приглушённая строка под названием, она же описание списка колонки; `color` (`PaletteColor`) ставит точку этого цвета перед названием; `limit` — лимит работы: заполненная колонка не принимает карточки из других, счётчик становится оранжевым (`count / limit`).",
         },
         {
           name: "items",
@@ -69,6 +69,32 @@ export const api: ComponentApi = {
           ru: "Карточку перенесли мышью, касанием или с клавиатуры: новая раскладка, затем `{ id, from, to, index }` для сохранения.",
         },
         {
+          name: "reorderableColumns",
+          type: "boolean",
+          default: "false",
+          en: "A grip (`Dnd.Handle`) at the end of every column header moves the column by pointer, touch hold and Alt + ← / →; the cards travel with it.",
+          ru: "Ручка (`Dnd.Handle`) в конце шапки каждой колонки переносит колонку мышью, удержанием пальца и Alt + ← / →; карточки едут вместе с ней.",
+        },
+        {
+          name: "columnOrder",
+          type: "readonly string[]",
+          en: "Column ids in their order (controlled). Columns it does not name follow in `columns` order.",
+          ru: "Id колонок по порядку (управляемое). Колонки, которых в нём нет, идут следом в порядке `columns`.",
+        },
+        {
+          name: "defaultColumnOrder",
+          type: "readonly string[]",
+          default: "the order of `columns`",
+          en: "Initial column ids in their order (uncontrolled).",
+          ru: "Начальный порядок id колонок (неуправляемое).",
+        },
+        {
+          name: "onColumnOrderChange",
+          type: "(order: readonly string[], move: KanbanColumnMove) => void",
+          en: "A column moved: the new order, then `{ id, index }` to save.",
+          ru: "Колонку переставили: новый порядок, затем `{ id, index }` для сохранения.",
+        },
+        {
           name: "renderItem",
           type: "(item: T) => ReactNode",
           required: true,
@@ -88,6 +114,13 @@ export const api: ComponentApi = {
           ru: "Правило процесса: колонка `columnId` не принимает карточку `id`; колонка краснеет до отпускания, а перенос с клавиатуры объявляется как отказ.",
         },
         {
+          name: "variant",
+          type: '"well" | "plain"',
+          default: '"well"',
+          en: "`well`: every column is a filled well (`fill-muted`) with its cards inside. `plain`: no wells — the header, a filled plate as wide as the cards, and the cards carry the column; cards widen to almost the full column, so neighbouring columns stand closer.",
+          ru: "`well`: каждая колонка — залитая подложка (`fill-muted`) с карточками внутри. `plain`: без подложек колонок — колонку держат шапка на залитой плашке шириной с карточки и сами карточки; карточки расширяются почти на всю колонку, и соседние колонки стоят ближе.",
+        },
+        {
           name: "loading",
           type: "boolean",
           default: "false",
@@ -98,8 +131,8 @@ export const api: ComponentApi = {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "Read-only board: no drag, no keyboard moves; clicks on cards still work.",
-          ru: "Доска только для чтения: без перетаскивания и переноса с клавиатуры; клики по карточкам работают.",
+          en: "Read-only board: no drag, no keyboard moves, no column grips; clicks on cards still work.",
+          ru: "Доска только для чтения: без перетаскивания, переноса с клавиатуры и ручек колонок; клики по карточкам работают.",
         },
         {
           name: "labels",
@@ -134,6 +167,12 @@ export const api: ComponentApi = {
           ru: "`children` (части карточки), `className`, `onClick` и остальные атрибуты; `onKeyDown` срабатывает первым, `preventDefault()` отменяет перенос.",
         },
       ],
+    },
+    {
+      name: "Kanban.ItemHeader",
+      en: "`ref` → `HTMLDivElement`. The top zone of a card over a faint hairline (`border-faint`): a muted caption row with the key or project at the start; the last child (a priority `Badge`, an assignee) sits at the end. Optional — a card without it starts with its title or a full-width `Thumbnail` cover.",
+      ru: "Верхняя зона карточки над еле видимой линией (`border-faint`): приглушённая строка с ключом или проектом в начале; последний элемент (`Badge` приоритета, исполнитель) — в конце. Необязательна: карточка без неё начинается с заголовка или обложки `Thumbnail` во всю ширину.",
+      props: [DIV_REST],
     },
     {
       name: "Kanban.ItemTitle · Kanban.ItemDescription",
@@ -180,6 +219,12 @@ export const api: ComponentApi = {
       ru: "Текст пустой колонки.",
     },
     {
+      key: "emptyHint",
+      default: "Перетащите сюда карточку",
+      en: "Hint under the empty-column text, while cards can be dropped (not on a `disabled` board).",
+      ru: "Подсказка под текстом пустой колонки, пока в неё можно положить карточку (не на доске `disabled`).",
+    },
+    {
       key: "moved",
       default: "{label}: «{column}», позиция {position} из {total}",
       en: "Live region: a card moved to another column with the keyboard.",
@@ -190,6 +235,18 @@ export const api: ComponentApi = {
       default: "{label}: колонка «{column}» не принимает карточку",
       en: "Live region: the next column refused the card (full or `canDrop`).",
       ru: "Live-область: соседняя колонка не приняла карточку (заполнена или `canDrop`).",
+    },
+    {
+      key: "moveColumn",
+      default: "Переместить колонку «{column}»",
+      en: "Name of the column grip (`reorderableColumns`).",
+      ru: "Имя ручки колонки (`reorderableColumns`).",
+    },
+    {
+      key: "columnMoved",
+      default: "Колонка «{column}»: позиция {position} из {total}",
+      en: "Live region: a column moved with the keyboard.",
+      ru: "Live-область: колонка перемещена с клавиатуры.",
     },
   ],
 };

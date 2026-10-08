@@ -152,6 +152,7 @@ export function ColorSwatches({
         aria-required={required || undefined}
         aria-invalid={ids.invalid || undefined}
         className={cx(swatchTierClass, styles.grid)}
+        style={{ "--swatch-count": options.length } as React.CSSProperties}
         {...toDataAttributes({
           size,
           invalid: ids.invalid || undefined,

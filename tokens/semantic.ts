@@ -83,6 +83,16 @@ export const semanticTokens = {
       glassEdge: "rgba(255, 255, 255, 0.85)",
     },
     /**
+     * Over a photo the picture is the ground, not the theme: one look in both themes. `shade` sits
+     * under small text and controls (an index, a delete button), `plate` under a wider action.
+     */
+    media: {
+      shade: "rgba(17, 19, 24, 0.56)",
+      shadeFg: "{color.gray.0}",
+      plate: "rgba(255, 255, 255, 0.92)",
+      plateFg: "{color.gray.925}",
+    },
+    /**
      * Translucent state washes: they sit on any background, including ones off the ladder (an
      * image, a tinted banner). Resting fills of controls come from the ladder instead
      * (`--prime-color-fill-muted`, `--prime-color-field-bg`).

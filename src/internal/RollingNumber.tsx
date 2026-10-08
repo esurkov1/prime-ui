@@ -1,4 +1,4 @@
-import type * as React from "react";
+import * as React from "react";
 
 import { cx } from "@/internal/cx";
 
@@ -19,15 +19,47 @@ export type RollingNumberProps = {
  * percentage) stays plain tabular text: rolling there is noise.
  */
 export function RollingNumber({ children, className }: RollingNumberProps) {
-  const chars = [...String(children)];
+  const value = String(children);
+  const chars = [...value];
+  const rootRef = React.useRef<HTMLSpanElement | null>(null);
+  const previous = React.useRef<string | null>(null);
+
+  // A column the list moved in the DOM (a reorder re-inserts nodes) starts with no style to transition
+  // from, and its digit would just change. Every changed digit is put back to its old value, its
+  // style taken, then set to the new one: the roll runs whether or not the node was moved.
+  React.useLayoutEffect(() => {
+    const before = previous.current;
+    previous.current = value;
+    const root = rootRef.current;
+    if (before === null || before === value || !root) return;
+    const old = [...before];
+    const columns = root.querySelectorAll<HTMLElement>("[data-rolling-digit]");
+    let column = 0;
+    const replays: Array<[HTMLElement, string, string]> = [];
+    chars.forEach((char, i) => {
+      if (!/\d/.test(char)) return;
+      const element = columns[column++];
+      const was = old[old.length - (chars.length - i)];
+      if (element && was !== undefined && /\d/.test(was) && was !== char) {
+        replays.push([element, was, char]);
+      }
+    });
+    if (replays.length === 0) return;
+    for (const [element, was] of replays) element.style.setProperty("--rolling-n", was);
+    void root.offsetWidth;
+    for (const [element, , next] of replays) element.style.setProperty("--rolling-n", next);
+  });
+
   return (
-    <span className={cx(styles.root, className)}>
+    <span ref={rootRef} className={cx(styles.root, className)}>
       {chars.map((char, i) => {
         const key = chars.length - i;
         return /\d/.test(char) ? (
           <span
             key={`d${key}`}
             className={styles.digit}
+            // A carried copy of a host (Dnd's overlay) finds its digits by this and rolls them too.
+            data-rolling-digit=""
             style={{ "--rolling-n": char } as React.CSSProperties}
           >
             {char}

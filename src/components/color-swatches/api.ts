@@ -91,6 +91,7 @@ export const api: ComponentApi = {
           en: "Adds the «no color» checkerboard swatch after the presets (value `null`).",
           ru: "Добавляет образец «без цвета» после пресетов (значение `null`).",
         },
+
         {
           name: "name",
           type: "string",

@@ -9,7 +9,7 @@ export default function DropdownStructureExample() {
           Анна Петрова
         </Button.Root>
       </Dropdown.Trigger>
-      <Dropdown.Content align="end">
+      <Dropdown.Content>
         <Dropdown.Header>
           <Avatar.Root size="l">
             <Avatar.Fallback>АП</Avatar.Fallback>

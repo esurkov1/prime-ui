@@ -74,6 +74,13 @@
   cursor: default;
 }
 
+/* Only the grip of a `handle` item picks it up: the rest keeps its cursor and text selection. */
+.draggable[data-handle] {
+  cursor: auto;
+  user-select: auto;
+  -webkit-user-select: auto;
+}
+
 /* Spatial sources keep a faded copy to show the occupied place. */
 .draggable[data-dragging] {
   cursor: grabbing;
@@ -127,6 +134,17 @@ li.placeholder {
 .sortable[data-axis="x"] {
   flex-direction: row;
   align-items: stretch;
+}
+
+/* A wrapping grid: the host sets the tracks (`grid-template-columns`) and the cells' size. The gap
+   is a cell like the others, so it takes the cell's size instead of the lifted item's. */
+.sortable[data-axis="grid"] {
+  display: grid;
+}
+
+.sortable[data-axis="grid"] > .placeholder {
+  width: auto;
+  height: auto;
 }
 
 /* The grip is a ghost icon-only Button; it only says "hold me" with the cursor. Touch keeps

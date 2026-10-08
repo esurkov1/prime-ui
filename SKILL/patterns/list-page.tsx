@@ -238,7 +238,7 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
             </Button.Icon>
           </Button.Root>
         </Dropdown.Trigger>
-        <Dropdown.Content align="end">
+        <Dropdown.Content>
           <Dropdown.Item>Открыть</Dropdown.Item>
           <Dropdown.Item>Скачать PDF</Dropdown.Item>
           <Dropdown.Item>Отправить повторно</Dropdown.Item>

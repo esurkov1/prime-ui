@@ -32,6 +32,7 @@ import {
   ExampleFrame,
   FileUpload,
   Hint,
+  ImageUpload,
   Input,
   Kanban,
   Label,
@@ -117,6 +118,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(ColorPresets.Content);
     takesRef(ColorPresets.Swatch);
     takesRef(ColorSwatches);
+    takesRef(ImageUpload);
     takesRef(CommandMenu.Root);
     takesRef(CommandMenu.Title);
     takesRef(CommandMenu.Description);
@@ -163,6 +165,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(Input.Affix);
     takesRef(Input.InlineAffix);
     takesRef(Input.Counter);
+    takesRef(Kanban.ItemHeader);
     takesRef(Kanban.ItemTitle);
     takesRef(Kanban.ItemDescription);
     takesRef(Kanban.ItemBadges);

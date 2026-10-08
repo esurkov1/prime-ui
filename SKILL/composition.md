@@ -61,7 +61,7 @@ export function OrdersHeader() {
               </Button.Icon>
             </Button.Root>
           </Dropdown.Trigger>
-          <Dropdown.Content align="end">
+          <Dropdown.Content>
             <Dropdown.Item>Настроить колонки</Dropdown.Item>
             <Dropdown.Item>Импорт из CSV</Dropdown.Item>
           </Dropdown.Content>

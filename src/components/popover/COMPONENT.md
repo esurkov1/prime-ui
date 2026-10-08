@@ -96,9 +96,9 @@ Title uses the tier text size with title weight; Description uses the tier label
 | `side="bottom"` | Below the trigger, `--prime-panel-offset` away | Default | yes |
 | `side="top"` | Above the trigger | Triggers near the bottom of the screen | |
 | `side="left"` / `"right"` | Beside the trigger, aligned along its height | Triggers in a side rail or a narrow column | |
-| `align="start"` | Start edges aligned | Default | yes |
+| `align="start"` | Start edges aligned: the panel opens toward the end (right in LTR); at the screen edge it flips to `end` by itself | Default, triggers anywhere — the end of a toolbar too | yes |
 | `align="center"` | Centred on the trigger | Small icon triggers | |
-| `align="end"` | End edges aligned | Triggers at the end of a toolbar | |
+| `align="end"` | End edges aligned: the panel opens toward the start | A panel that must line up with the end of a block whatever room there is | |
 
 ### Flags
 | Value | Looks like | Use when | Default |

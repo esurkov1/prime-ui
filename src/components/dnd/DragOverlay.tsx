@@ -1,10 +1,10 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 
-import { prefersReducedMotion } from "@/hooks/usePresence";
+import { motionDurationMs, prefersReducedMotion } from "@/hooks/usePresence";
 
 import styles from "./Dnd.module.css";
-import type { DragController, DragPreview } from "./dragSession";
+import type { DragController, DragItem, DragPreview } from "./dragSession";
 import type { Point, Rect } from "./geometry";
 import { layoutRect } from "./geometry";
 import { motionTiming } from "./useFlipList";
@@ -27,12 +27,87 @@ function cloneFor(preview: DragPreview): HTMLElement {
     node.removeAttribute("id");
     node.removeAttribute("data-testid");
     node.removeAttribute("data-dnd-item");
+    node.removeAttribute("data-dnd-kind");
     node.removeAttribute("data-dragging");
     node.removeAttribute("data-lifted");
     node.removeAttribute("tabindex");
   }
   clone.classList.add(styles.lift);
   return clone;
+}
+
+/**
+ * Grows or shrinks the carried copy to a new size over the base motion (the cell it would land in
+ * differs: a cover carried into a row of tiles), calling `step` every frame so the host keeps the
+ * held point under the pointer. Content reflows instead of stretching. Returns a stop.
+ */
+function resizeCopy(
+  copy: HTMLElement,
+  from: { width: number; height: number },
+  to: { width: number; height: number },
+  step: (size: { width: number; height: number }) => void,
+): () => void {
+  const apply = (size: { width: number; height: number }) => {
+    copy.style.width = `${size.width}px`;
+    copy.style.height = `${size.height}px`;
+    step(size);
+  };
+  const duration = prefersReducedMotion() ? 0 : motionDurationMs("base");
+  if (duration === 0 || typeof requestAnimationFrame !== "function") {
+    apply(to);
+    return () => {};
+  }
+  const start = performance.now();
+  let frame = 0;
+  const tick = (now: number) => {
+    const t = Math.min(1, (now - start) / duration);
+    // Ease out: most of the change at once, then it settles.
+    const k = 1 - (1 - t) ** 3;
+    apply({
+      width: from.width + (to.width - from.width) * k,
+      height: from.height + (to.height - from.height) * k,
+    });
+    if (t < 1) frame = requestAnimationFrame(tick);
+  };
+  frame = requestAnimationFrame(tick);
+  return () => cancelAnimationFrame(frame);
+}
+
+/**
+ * The carried copy keeps showing what the item shows while it is in the air: every part marked
+ * `data-dnd-mirror` follows the hidden original — its rolling digits roll, other content is copied.
+ */
+function mirrorParts(copy: HTMLElement, source: HTMLElement) {
+  const own = copy.querySelectorAll<HTMLElement>("[data-dnd-mirror]");
+  source.querySelectorAll<HTMLElement>("[data-dnd-mirror]").forEach((part, index) => {
+    const target = own[index];
+    if (!target) return;
+    const digits = part.querySelectorAll("[data-rolling-digit]").length;
+    if (digits > 0 && digits === target.querySelectorAll("[data-rolling-digit]").length) {
+      rollDigits(target, part);
+    } else if (target.innerHTML !== part.innerHTML) {
+      target.innerHTML = part.innerHTML;
+      // The copy shows the new content as it stands: an entrance the original plays (a word fading
+      // in) would replay on every change and blink while the item is carried.
+      for (const animation of target.getAnimations?.({ subtree: true }) ?? []) animation.finish();
+    }
+  });
+}
+
+/**
+ * The drop changed what the item shows (its position number): the real item is hidden while the
+ * copy lands, so the copy's rolling digits (`RollingNumber`) take the new values and roll in flight.
+ * Matched from the right, as the number keys its columns; a new leading digit appears on settle.
+ */
+function rollDigits(copy: HTMLElement, destination: HTMLElement) {
+  const from = [...copy.querySelectorAll<HTMLElement>("[data-rolling-digit]")].reverse();
+  const to = [...destination.querySelectorAll<HTMLElement>("[data-rolling-digit]")].reverse();
+  to.forEach((digit, index) => {
+    const own = from[index];
+    if (!own) return;
+    own.style.setProperty("--rolling-n", digit.style.getPropertyValue("--rolling-n"));
+    own.textContent = digit.textContent;
+  });
 }
 
 /**
@@ -71,6 +146,13 @@ export function DragOverlay({ controller }: { controller: DragController }) {
 
   /** Stops whatever the previous drop left running: the clone's flight and the hidden destination. */
   const stopLandingRef = React.useRef<(() => void) | null>(null);
+  /** The copy's size and where the pointer holds it (a share of the size), for a resize in flight. */
+  const sizeRef = React.useRef({ width: 0, height: 0 });
+  const holdRef = React.useRef<Point>({ x: 0, y: 0 });
+  /** Stops a resize in flight. */
+  const resizeRef = React.useRef<(() => void) | null>(null);
+  /** Stops the copy following its original (`data-dnd-mirror` parts) once the drag ends. */
+  const mirrorRef = React.useRef<(() => void) | null>(null);
   const endTokenRef = React.useRef(0);
 
   React.useEffect(() => setMounted(true), []);
@@ -87,7 +169,7 @@ export function DragOverlay({ controller }: { controller: DragController }) {
   // while the real element, hidden until then, is swapped in. The destination is read after the
   // owner's state has committed, so it is the item's real new place, not the pointer's.
   const land = React.useCallback(
-    (host: HTMLDivElement, lifted: HTMLElement, id: string, fallback: Rect | null) => {
+    (host: HTMLDivElement, lifted: HTMLElement, item: DragItem, fallback: Rect | null) => {
       const token = ++endTokenRef.current;
       const timing: KeyframeAnimationOptions = { ...motionTiming("base"), fill: "forwards" };
       const from = host.style.transform;
@@ -114,8 +196,10 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         settleOnFinish(animation);
       };
       const destinationFor = (): HTMLElement | null => {
+        // The same id may stand in another list of another kind (two boards with one data set).
         for (const node of document.querySelectorAll<HTMLElement>("[data-dnd-item]")) {
-          if (node.dataset.dndItem !== id || host.contains(node)) continue;
+          if (node.dataset.dndItem !== item.id || node.dataset.dndKind !== item.kind) continue;
+          if (host.contains(node)) continue;
           if (node.hasAttribute("data-lifted")) continue;
           const rect = layoutRect(node);
           if (rect.width > 0 && rect.height > 0) return node;
@@ -138,6 +222,7 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         }
         const rect = layoutRect(destination);
         const to = translate({ x: rect.left, y: rect.top }, { x: 0, y: 0 });
+        rollDigits(lifted, destination);
         destination.setAttribute("data-dnd-landing", "");
         // Where the pointer let go decides the look the item lands in: hovered under a mouse,
         // resting under a finger. Read with transitions off, so it is the end value, not the start.
@@ -158,10 +243,18 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         // From the clone's drawn (lifted) state to the item's own: no second copy of the numbers,
         // and no dip to flat before the hover lift comes back.
         const drawn = getComputedStyle(lifted);
+        // A cell of another size (a grid cover and a tile): the clone takes the new size in flight.
+        const resized =
+          Math.abs(rect.width - lifted.offsetWidth) > 1 ||
+          Math.abs(rect.height - lifted.offsetHeight) > 1;
+        const fromSize = resized
+          ? { width: `${lifted.offsetWidth}px`, height: `${lifted.offsetHeight}px` }
+          : {};
+        const toSize = resized ? { width: `${rect.width}px`, height: `${rect.height}px` } : {};
         const setDown = lifted.animate(
           [
-            { transform: drawn.transform, boxShadow: drawn.boxShadow },
-            { transform: "none", boxShadow: landed },
+            { transform: drawn.transform, boxShadow: drawn.boxShadow, ...fromSize },
+            { transform: "none", boxShadow: landed, ...toSize },
           ],
           timing,
         );
@@ -189,13 +282,40 @@ export function DragOverlay({ controller }: { controller: DragController }) {
       const host = hostRef.current;
       if (!host) return;
       if (event.type === "start") {
+        resizeRef.current?.();
+        resizeRef.current = null;
         grabRef.current = event.preview.grab;
+        // Where the finger holds the copy, as a share of its size: kept when the copy resizes.
+        holdRef.current = {
+          x: event.preview.grab.x / Math.max(1, event.preview.origin.width),
+          y: event.preview.grab.y / Math.max(1, event.preview.origin.height),
+        };
+        sizeRef.current = {
+          width: event.preview.origin.width,
+          height: event.preview.origin.height,
+        };
         pointRef.current = event.preview.point;
         pointerKindRef.current = event.preview.pointerKind;
         // The previous landing holds its final transform (fill: forwards) until stopped.
         settle(host);
-        host.replaceChildren(cloneFor(event.preview));
+        mirrorRef.current?.();
+        mirrorRef.current = null;
+        const copy = cloneFor(event.preview);
+        host.replaceChildren(copy);
         host.style.transform = translate(event.preview.point, event.preview.grab);
+        // The original is hidden but keeps rendering (its place number follows the gap).
+        const source = event.preview.element;
+        if (typeof MutationObserver === "function" && source.querySelector("[data-dnd-mirror]")) {
+          const observer = new MutationObserver(() => mirrorParts(copy, source));
+          observer.observe(source, {
+            subtree: true,
+            childList: true,
+            characterData: true,
+            attributes: true,
+            attributeFilter: ["style"],
+          });
+          mirrorRef.current = () => observer.disconnect();
+        }
         return;
       }
       if (event.type === "move") {
@@ -204,16 +324,40 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         frameRef.current ??= requestAnimationFrame(paint);
         return;
       }
+      if (event.type === "resize") {
+        const copy = host.firstElementChild;
+        if (copy instanceof HTMLElement) {
+          resizeRef.current?.();
+          resizeRef.current = resizeCopy(
+            copy,
+            sizeRef.current,
+            { width: event.width, height: event.height },
+            (size) => {
+              sizeRef.current = size;
+              grabRef.current = {
+                x: holdRef.current.x * size.width,
+                y: holdRef.current.y * size.height,
+              };
+              host.style.transform = translate(pointRef.current, grabRef.current);
+            },
+          );
+        }
+        return;
+      }
+      resizeRef.current?.();
+      resizeRef.current = null;
       if (frameRef.current !== null) {
         cancelAnimationFrame(frameRef.current);
         frameRef.current = null;
       }
+      mirrorRef.current?.();
+      mirrorRef.current = null;
       const lifted = host.firstElementChild;
       if (!(lifted instanceof HTMLElement) || prefersReducedMotion()) {
         settle(host);
         return;
       }
-      land(host, lifted, event.item.id, event.outcome === "cancel" ? event.origin : null);
+      land(host, lifted, event.item, event.outcome === "cancel" ? event.origin : null);
     });
   }, [controller, mounted, land, settle]);
 
@@ -230,6 +374,7 @@ export function DragOverlay({ controller }: { controller: DragController }) {
   React.useEffect(
     () => () => {
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+      mirrorRef.current?.();
     },
     [],
   );

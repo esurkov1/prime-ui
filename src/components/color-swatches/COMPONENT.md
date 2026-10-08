@@ -3,7 +3,7 @@
 **Category:** selection
 **Kind:** control
 
-> An inline color choice: preset swatches that wrap inside a form, without a popover.
+> An inline color choice: preset swatches that fill the width of a form or panel and wrap, without a popover.
 
 ## When to use
 - Picking a color for an entity in a form or dialog (pipeline stage, tag, project, calendar).
@@ -23,7 +23,7 @@ import { COLOR_PRESETS, ColorSwatches } from "prime-ui-kit";
 ## Anatomy
 ```
 ColorSwatches                 field frame: label → swatches → hint | error
-└─ radiogroup                 wrapping row of swatches
+└─ radiogroup                 swatches sharing the width, wrapping into rows
    ├─ radio × presets         swatch button (color fill, faint inner ring, check when selected)
    ├─ radio «Без цвета»       checkerboard swatch (`allowEmpty`)
    └─ input[type=hidden]      submits the value (`name`)
@@ -96,7 +96,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 
 ## Layout & spacing
-- The swatches take the container width and wrap to new rows by themselves; no column count to set. In a content-sized container they stay in one row.
+- The swatches take the container width: each one stretches across its column (the height stays the tier's) and a row wraps only when they no longer fit; no column count to set. In a content-sized container they stand in one row at the tier size.
 - The keyboard focus ring sits outside the swatches; kit hosts (Modal / Drawer body, panels, cards) already keep `--prime-focus-space` padding, so the ring is never clipped. In your own `overflow` container, keep that padding.
 - Label → swatches and swatches → hint use the tier `label-gap` / `hint-gap`; field → field 20.
 

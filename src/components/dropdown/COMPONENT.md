@@ -138,9 +138,9 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 | `side="bottom"` | Below the trigger | Default | yes |
 | `side="top"` | Above the trigger | Triggers near the bottom of the screen | |
 | `side="left"` / `"right"` | Beside the trigger, aligned along its height | Triggers in a side rail (account menu at the bottom of a sidebar) | |
-| `align="start"` | Start edges aligned | Default | yes |
+| `align="start"` | Start edges aligned: the menu opens toward the end (right in LTR); at the screen edge it flips to `end` by itself | Default, triggers anywhere — «⋯» at the end of a row too | yes |
 | `align="center"` | Centred on the trigger | Small triggers | |
-| `align="end"` | End edges aligned | «⋯» buttons at the end of a row | |
+| `align="end"` | End edges aligned: the menu opens toward the start | A menu that must line up with the end of a block whatever room there is | |
 
 ### Flags
 | Value | Looks like | Use when | Default |

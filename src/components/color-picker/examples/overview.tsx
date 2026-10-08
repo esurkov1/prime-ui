@@ -17,7 +17,7 @@ export default function ColorPickerOverviewExample() {
               </Button.Icon>
             </Button.Root>
           </Popover.Trigger>
-          <Popover.Content align="end">
+          <Popover.Content>
             <ColorPicker.Panel className={styles.panel}>
               <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
                 <ColorPicker.AreaThumb />

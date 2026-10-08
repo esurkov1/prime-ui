@@ -2,6 +2,8 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { RollingNumber } from "@/internal/RollingNumber";
+
 import { autoScrollStep } from "./autoScroll";
 import { Dnd } from "./Dnd";
 import { insertionBefore } from "./geometry";
@@ -679,6 +681,133 @@ describe("landing", () => {
   });
 });
 
+describe("landing with a rolling number", () => {
+  it("the carried copy's digits take the new position at the drop and roll in flight", async () => {
+    Object.defineProperty(HTMLElement.prototype, "animate", {
+      configurable: true,
+      value: () => ({ cancel: () => {}, addEventListener: () => {} }),
+    });
+    vi.stubGlobal("matchMedia", () => ({
+      matches: false,
+      addEventListener() {},
+      removeEventListener() {},
+    }));
+    function Numbered() {
+      const [items, setItems] = React.useState(rows("a", "b", "c"));
+      return (
+        <Dnd.Root>
+          <Dnd.Sortable
+            aria-label="list"
+            items={items}
+            getId={(row) => row.id}
+            onReorder={(id, before) =>
+              setItems((current) => moveBefore(current, id, before, (row) => row.id))
+            }
+            renderItem={(row, index) => (
+              <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+                <RollingNumber>{index + 1}</RollingNumber>
+              </Dnd.SortableItem>
+            )}
+          />
+        </Dnd.Root>
+      );
+    }
+    try {
+      render(<Numbered />);
+      pressOn(screen.getByTestId("row-a"), 10, 5);
+      moveTo(10, 25);
+      const copyDigit = () =>
+        document.querySelector<HTMLElement>("[data-dnd-overlay] [data-rolling-digit]");
+      expect(copyDigit()?.style.getPropertyValue("--rolling-n")).toBe("1");
+      await act(async () => {
+        releaseAt(10, 25);
+      });
+      // a now stands second: the copy shows «2» while it lands, not after.
+      expect(copyDigit()?.style.getPropertyValue("--rolling-n")).toBe("2");
+    } finally {
+      vi.unstubAllGlobals();
+      Reflect.deleteProperty(HTMLElement.prototype, "animate");
+    }
+  });
+});
+
+describe("place numbers in flight", () => {
+  it("index is the place on release while dragging; a mirrored part follows on the copy", async () => {
+    function Numbered() {
+      const [items, setItems] = React.useState(rows("a", "b", "c"));
+      return (
+        <Dnd.Root>
+          <Dnd.Sortable
+            aria-label="list"
+            items={items}
+            getId={(row) => row.id}
+            onReorder={(id, before) =>
+              setItems((current) => moveBefore(current, id, before, (row) => row.id))
+            }
+            renderItem={(row, index) => (
+              <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+                <span data-dnd-mirror="" data-testid={`place-${row.id}`}>
+                  <RollingNumber>{index + 1}</RollingNumber>
+                </span>
+              </Dnd.SortableItem>
+            )}
+          />
+        </Dnd.Root>
+      );
+    }
+    render(<Numbered />);
+    const place = (id: string) =>
+      screen
+        .getByTestId(`place-${id}`)
+        .querySelector<HTMLElement>("[data-rolling-digit]")
+        ?.style.getPropertyValue("--rolling-n");
+    pressOn(screen.getByTestId("row-a"), 10, 5);
+    moveTo(10, 25);
+    // a would land second: b already shows 1 and a 2, before the release.
+    expect(place("b")).toBe("1");
+    expect(place("a")).toBe("2");
+    await act(async () => {});
+    const copy = document.querySelector<HTMLElement>(
+      "[data-dnd-overlay] [data-dnd-mirror] [data-rolling-digit]",
+    );
+    expect(copy?.style.getPropertyValue("--rolling-n")).toBe("2");
+    releaseAt(10, 25);
+  });
+});
+
+describe("landing among lists that share ids", () => {
+  it("lands on the item of its own kind, not on a same-id item of another list", async () => {
+    Object.defineProperty(HTMLElement.prototype, "animate", {
+      configurable: true,
+      value: () => ({ cancel: () => {}, addEventListener: () => {} }),
+    });
+    vi.stubGlobal("matchMedia", () => ({
+      matches: false,
+      addEventListener() {},
+      removeEventListener() {},
+    }));
+    try {
+      render(
+        <>
+          {/* Another board drawn earlier with the same card id. */}
+          <div data-dnd-item="a" data-dnd-kind="other-board" data-testid="decoy" />
+          <Sortable initial={rows("a", "b", "c")} />
+        </>,
+      );
+      pressOn(screen.getByTestId("row-a"), 10, 5);
+      moveTo(10, 25);
+      await act(async () => {
+        releaseAt(10, 25);
+      });
+      expect(screen.getByTestId("decoy")).not.toHaveAttribute("data-dnd-landing");
+      expect(screen.getByTestId("row-a")).toHaveAttribute("data-dnd-landing");
+    } finally {
+      vi.unstubAllGlobals();
+      Reflect.deleteProperty(HTMLElement.prototype, "animate");
+    }
+  });
+});
+
 describe("connected lists", () => {
   function Columns({
     onMove,
@@ -935,5 +1064,39 @@ describe("helpers", () => {
     const container = screen.getByTestId("c");
     expect(insertionBefore(container, "[data-dnd-item]", { x: 0, y: 25 })).toBe("b");
     expect(insertionBefore(container, "[data-dnd-item]", { x: 0, y: 35 })).toBe(null);
+  });
+
+  it("insertionBefore in a grid reads slots: the cell under the aim is the index taken", () => {
+    // Two 100 px cells per row: a b / c d.
+    for (const [id, left, top] of [
+      ["a", 0, 0],
+      ["b", 100, 0],
+      ["c", 0, 100],
+      ["d", 100, 100],
+    ] as const) {
+      boxes.set(id, { left, top, width: 100, height: 100 });
+    }
+    stubLayout();
+    render(
+      <div data-testid="grid">
+        {["a", "b", "c", "d"].map((id) => (
+          <div key={id} data-dnd-item={id} data-testid={id} />
+        ))}
+      </div>,
+    );
+    const grid = screen.getByTestId("grid");
+    const at = (x: number, y: number, lifted?: string) =>
+      insertionBefore(grid, "[data-dnd-item]", { x, y }, "grid", lifted);
+    // An item from elsewhere takes the slot it is over.
+    expect(at(80, 50)).toBe("a");
+    expect(at(180, 50)).toBe("b");
+    expect(at(160, 150)).toBe("d");
+    // The carried item still drawn: over its own slot it stays (in front of what follows it)…
+    expect(at(80, 50, "a")).toBe("b");
+    // …and entering the next slot takes it at once: a goes after b.
+    expect(at(120, 50, "a")).toBe("c");
+    // Entering a slot before it puts it in front of the item there.
+    expect(at(20, 50, "d")).toBe("a");
+    boxes.clear();
   });
 });

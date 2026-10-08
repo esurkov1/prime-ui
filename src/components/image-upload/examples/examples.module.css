@@ -1,0 +1,34 @@
+/* Layout of the ImageUpload scenarios: semantic tokens only. */
+
+/* A form column of a listing editor, centred in the preview; variants.tsx and states.tsx hold the
+   caption under the field in it too. */
+.column {
+  width: min(100%, calc(var(--prime-space-24) * 6));
+  margin-inline: auto;
+}
+
+/* controlled.tsx: the saved state over the field. */
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  width: min(100%, calc(var(--prime-space-24) * 6));
+  margin-inline: auto;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* narrow.tsx: a phone-width screen. */
+.phone {
+  width: min(100%, calc(var(--prime-space-20) * 4.5));
+  margin-inline: auto;
+}
