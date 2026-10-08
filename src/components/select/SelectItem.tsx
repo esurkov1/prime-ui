@@ -231,7 +231,7 @@ export function SelectItem({
       </span>
       {parts.meta}
       {multiple ? null : (
-        <span className={styles.check} aria-hidden="true">
+        <span className={menu.check} aria-hidden="true">
           {isSelected ? <Icon name="action.check" /> : null}
         </span>
       )}

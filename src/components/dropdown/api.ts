@@ -139,8 +139,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.CheckboxItem",
-      en: '`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a checkbox look one tier below the menu; a click, Enter or Space toggles it and the menu stays open. + native button props.',
-      ru: "Пункт-флажок: клик, Enter или Space переключают его, меню остаётся открытым; флажок на ярус меньше меню.",
+      en: '`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked`: the label (and an `ItemIcon`) on the left like any item, an accent check mark at the end while checked and nothing while not; a click, Enter or Space toggles it and the menu stays open. + native button props.',
+      ru: "Пункт-переключатель: подпись (и `ItemIcon`) слева, как у обычного пункта, акцентная галочка в конце, пока он выбран, и пусто, пока нет; клик, Enter или Space переключают его, меню остаётся открытым.",
       props: [
         {
           name: "checked",

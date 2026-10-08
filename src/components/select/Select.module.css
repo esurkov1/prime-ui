@@ -231,15 +231,3 @@
 :is(.trigger:disabled, .item[data-disabled="true"]) :is(.itemDescription, .itemMeta) {
   color: var(--prime-color-text-disabled);
 }
-
-/* Fixed trailing column for the check mark (single). */
-.check {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: var(--menu-icon);
-  height: var(--menu-icon);
-  color: var(--prime-color-accent-text);
-  --prime-icon-size: var(--menu-icon);
-}

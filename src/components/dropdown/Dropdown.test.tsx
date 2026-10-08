@@ -627,8 +627,12 @@ describe("Dropdown — overlay contract", () => {
     );
     const item = screen.getByRole("menuitemcheckbox", { name: "Сумма" });
     expect(item).toHaveAttribute("aria-checked", "true");
+    // The label leads; a check mark closes the row while checked, nothing while not.
+    expect(item.firstChild).toHaveTextContent("Сумма");
+    expect(item.lastElementChild?.querySelector("svg")).toBeInTheDocument();
     fireEvent.click(item);
     expect(item).toHaveAttribute("aria-checked", "false");
+    expect(item.lastElementChild?.querySelector("svg")).toBeNull();
     expect(onCheckedChange).toHaveBeenCalledWith(false);
     expect(screen.getByRole("menu")).toBeInTheDocument();
 

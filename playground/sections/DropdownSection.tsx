@@ -52,7 +52,7 @@ export const page: ComponentPageConfig = {
       scenario: "checkbox-items",
       title: "Флажки",
       description:
-        "Выбор колонок: флажки в меню не закрывают его, ключевую колонку не скрыть — `Dropdown.CheckboxItem`, `checked`, `onCheckedChange`.",
+        "Выбор колонок: пункты-переключатели с галочкой в конце не закрывают меню, ключевую колонку не скрыть — `Dropdown.CheckboxItem`, `checked`, `onCheckedChange`.",
     },
     {
       scenario: "long-list",
@@ -77,7 +77,7 @@ export const page: ComponentPageConfig = {
       {
         keys: "Enter · Space",
         action:
-          "На триггере открывает меню (фокус на первом пункте); на пункте выполняет его и возвращает фокус на триггер; на флажке переключает его, меню остаётся открытым.",
+          "На триггере открывает меню (фокус на первом пункте); на пункте выполняет его и возвращает фокус на триггер; на пункте-переключателе переключает его, меню остаётся открытым.",
       },
       {
         keys: "ArrowDown · ArrowUp",
@@ -94,7 +94,7 @@ export const page: ComponentPageConfig = {
       },
     ],
     aria: [
-      'Меню — `role="menu"` с именем от триггера; пункты — `role="menuitem"`, флажки — `role="menuitemcheckbox"` с `aria-checked`, неактивные — `aria-disabled`.',
+      'Меню — `role="menu"` с именем от триггера; пункты — `role="menuitem"`, переключатели — `role="menuitemcheckbox"` с `aria-checked`, неактивные — `aria-disabled`.',
       'Триггер получает `aria-haspopup="menu"`, `aria-expanded` и `aria-controls`.',
       '`Dropdown.Group` — `role="group"` с именем из `label`.',
       "`Dropdown.ItemIcon` скрыт от скринридеров; подсказка клавиш — только текст, обработчик пишет приложение.",

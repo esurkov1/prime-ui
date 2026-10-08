@@ -1,11 +1,10 @@
 import * as React from "react";
 
-import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Divider } from "@/components/divider/Divider";
 import { Kbd } from "@/components/kbd/Kbd";
 import { useControllableState } from "@/hooks/useControllableState";
 import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
-import { useControlSize } from "@/internal/ControlSizeContext";
+import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -14,7 +13,7 @@ import menu from "@/internal/menu.module.css";
 import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { rovingIndex } from "@/internal/rovingFocus";
-import { type ControlSize, stepDown, type Tone } from "@/internal/states";
+import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Dropdown.module.css";
 
@@ -235,8 +234,9 @@ export type DropdownCheckboxItemProps = Omit<
 };
 
 /**
- * A toggle inside the menu (show a column, turn a filter on): a checkbox look one tier below the
- * menu, `role="menuitemcheckbox"`. Toggling keeps the menu open, so several can be set in a row.
+ * A toggle inside the menu (show a column, turn a filter on, pick a view): the label where an item
+ * has it and a check mark at the end while checked, `role="menuitemcheckbox"`. Toggling keeps the
+ * menu open, so several can be set in a row.
  */
 function DropdownCheckboxItem({
   checked: checkedProp,
@@ -253,7 +253,6 @@ function DropdownCheckboxItem({
     defaultValue: defaultChecked,
     onChange: onCheckedChange,
   });
-  const tier = useControlSize(undefined);
 
   return (
     <button
@@ -270,8 +269,10 @@ function DropdownCheckboxItem({
         if (!event.defaultPrevented && !disabled) setChecked(!checked);
       }}
     >
-      <Checkbox.Indicator checked={checked} disabled={disabled} size={stepDown(tier)} />
       {children}
+      <span className={menu.check} aria-hidden="true">
+        {checked ? <Icon name="action.check" /> : null}
+      </span>
     </button>
   );
 }

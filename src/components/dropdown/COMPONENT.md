@@ -35,7 +35,7 @@ Dropdown.Root                     state and dismiss policy (no DOM)
     │   └── Dropdown.Item         <button role="menuitem">
     │       ├── Dropdown.ItemIcon       leading glyph (aria-hidden)
     │       └── Dropdown.ItemShortcut   Kbd at the end
-    ├── Dropdown.CheckboxItem     <button role="menuitemcheckbox">: checkbox look + label; stays open
+    ├── Dropdown.CheckboxItem     <button role="menuitemcheckbox">: label + check mark at the end while checked; stays open
     └── Dropdown.Item
 ```
 
@@ -84,7 +84,7 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 | `children` | `ReactNode` | — | `Dropdown.ItemIcon`, the label, `Dropdown.ItemShortcut`. |
 
 ### Dropdown.CheckboxItem
-`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a checkbox look one tier below the menu; a click, Enter or Space toggles it and the menu stays open. + native button props.
+`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked`: the label (and an `ItemIcon`) on the left like any item, an accent check mark at the end while checked and nothing while not; a click, Enter or Space toggles it and the menu stays open. + native button props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -213,5 +213,5 @@ No `labels`.
 - A destructive item without `tone="danger"`, or in the middle of the list → mark it and put it last.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (the menu), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`), [Divider](../divider/COMPONENT.md) (`Separator`)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (the menu), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`), [Divider](../divider/COMPONENT.md) (`Separator`), Icon (`action.check` of `CheckboxItem`)
 - **See also:** [Select](../select/COMPONENT.md), [CommandMenu](../command-menu/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md)

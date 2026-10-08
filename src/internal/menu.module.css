@@ -150,6 +150,27 @@
   margin-inline-start: auto;
 }
 
+/*
+ * Trailing check mark of a chosen row (a single Select option, a checked Dropdown.CheckboxItem):
+ * a fixed column at the end, accent colour; empty while not chosen, so labels never shift.
+ */
+.check {
+  --prime-icon-size: var(--menu-icon);
+
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--menu-icon);
+  height: var(--menu-icon);
+  margin-inline-start: auto;
+  color: var(--prime-color-accent-text);
+}
+
+.item[data-disabled="true"] .check {
+  color: var(--prime-color-text-disabled);
+}
+
 /* ─── Group / separator ─────────────────────────────────────────────────── */
 
 .group {

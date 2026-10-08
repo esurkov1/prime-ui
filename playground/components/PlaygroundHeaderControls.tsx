@@ -1,4 +1,4 @@
-import { Check, Moon, Square, SquareStack, Sun } from "lucide-react";
+import { Moon, SquareStack, Sun } from "lucide-react";
 
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
@@ -34,12 +34,13 @@ export function PlaygroundHeaderControls() {
         <Dropdown.Content side="bottom" align="end">
           <Dropdown.Group label="Фон превью">
             {PLAYGROUND_PREVIEW_SURFACES.map((entry) => (
-              <Dropdown.Item key={entry.value} onSelect={() => setSurface(entry.value)}>
-                <Dropdown.ItemIcon>
-                  {entry.value === surface ? <Check strokeWidth={2} /> : <Square strokeWidth={2} />}
-                </Dropdown.ItemIcon>
+              <Dropdown.CheckboxItem
+                key={entry.value}
+                checked={entry.value === surface}
+                onCheckedChange={() => setSurface(entry.value)}
+              >
                 {entry.label} — {entry.hint.toLowerCase()}
-              </Dropdown.Item>
+              </Dropdown.CheckboxItem>
             ))}
           </Dropdown.Group>
         </Dropdown.Content>
