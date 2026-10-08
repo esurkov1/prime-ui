@@ -117,7 +117,7 @@ State change is continuous in the whole kit: every region that changes what it s
 10. No state that flips: every region swaps through `Crossfade`, loading is a `Skeleton` of the content.
 11. No overrides of kit internals (`.form :global(button)`); a part's `className` is for placement only.
 
-## Two snippets to copy
+## Snippets to copy
 
 App root, once:
 
@@ -200,3 +200,96 @@ export function ProfilePage() {
   );
 }
 ```
+
+A region with all its states — loading, data, empty, error — that flow into each other. Copy this
+shape for every block that fetches data (a table uses DataTable `loading` / `empty` / `error` instead):
+
+```tsx
+import { Button, Card, Crossfade, EmptyPage, Icon, Skeleton, Typography } from "prime-ui-kit";
+import styles from "./InvoicesCard.module.css";
+// .rows { display: grid; gap: var(--prime-space-3); margin: 0; padding: 0; list-style: none; }
+// .row { display: flex; align-items: center; justify-content: space-between; gap: var(--prime-space-4); }
+// .client { width: 55%; }  .amount { width: 20%; }
+
+type Invoice = { id: string; client: string; amount: string };
+
+type InvoicesCardProps = {
+  status: "loading" | "ready" | "error";
+  invoices: Invoice[];
+  onRetry: () => void;
+};
+
+const PLACEHOLDER_ROWS = ["a", "b", "c"];
+
+export function InvoicesCard({ status, invoices, onRetry }: InvoicesCardProps) {
+  // One key per state: Crossfade cross-fades whenever it changes and glides the height.
+  const state = status === "ready" && invoices.length === 0 ? "empty" : status;
+
+  return (
+    <Card.Root variant="panel">
+      <Card.Header>
+        <Card.Title as="h2">Неоплаченные счета</Card.Title>
+      </Card.Header>
+      <Card.Body>
+        <Crossfade state={state} aria-busy={state === "loading"}>
+          {state === "loading" ? (
+            // Loading: Skeleton rows in the geometry of the data rows — not a Spinner.
+            <ul className={styles.rows}>
+              {PLACEHOLDER_ROWS.map((key) => (
+                <li key={key} className={styles.row}>
+                  <Skeleton className={styles.client} />
+                  <Skeleton className={styles.amount} />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {state === "ready" ? (
+            <ul className={styles.rows}>
+              {invoices.map((invoice) => (
+                <li key={invoice.id} className={styles.row}>
+                  <Typography as="span" variant="body-m">
+                    {invoice.client}
+                  </Typography>
+                  <Typography as="span" variant="body-m">
+                    {invoice.amount}
+                  </Typography>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {state === "empty" ? (
+            <EmptyPage.Root size="s" aria-labelledby="invoices-empty">
+              <EmptyPage.Icon>
+                <Icon name="status.success" />
+              </EmptyPage.Icon>
+              <EmptyPage.Title as="h3" id="invoices-empty">
+                Все счета оплачены
+              </EmptyPage.Title>
+              <EmptyPage.Description>Новые счета появятся здесь после выставления.</EmptyPage.Description>
+            </EmptyPage.Root>
+          ) : null}
+          {state === "error" ? (
+            <EmptyPage.Root size="s" role="alert" aria-labelledby="invoices-error">
+              <EmptyPage.Icon tone="danger">
+                <Icon name="status.danger" />
+              </EmptyPage.Icon>
+              <EmptyPage.Title as="h3" id="invoices-error">
+                Счета не загрузились
+              </EmptyPage.Title>
+              <EmptyPage.Description>Сервер не ответил. Данные не потеряны.</EmptyPage.Description>
+              <EmptyPage.Actions>
+                <Button.Root variant="soft" tone="neutral" onClick={onRetry}>
+                  Повторить
+                </Button.Root>
+              </EmptyPage.Actions>
+            </EmptyPage.Root>
+          ) : null}
+        </Crossfade>
+      </Card.Body>
+    </Card.Root>
+  );
+}
+```
+
+A refetch of data already on screen keeps `status="ready"` and the rows (set `aria-busy` on the
+card) — it does not go back to the skeleton.
