@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "ScrollContainer",
-      en: "`forwardRef` → `HTMLElement`. A scroll region with the kit's thin scrollbar that shrinks inside flex and grid parents; no padding of its own.",
+      en: "`ref` → `HTMLElement`. A scroll region with the kit's thin scrollbar that shrinks inside flex and grid parents; no padding of its own.",
       ru: "Область прокрутки с тонким скроллбаром кита; сжимается внутри flex и grid, своих отступов нет.",
       props: [
         {
