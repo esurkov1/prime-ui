@@ -128,7 +128,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (Groups, Items, Subs), `className` and the other attributes. |
 
 ### Sidebar.Group
-`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail the heading keeps its height and layout: its text slides toward the edge, scales down and is cut by the rail with a fade, so the first letters still name the section. An open group keeps its items on the rail; a folded one stays folded and becomes one `…` row (named by the label, `aria-haspopup="dialog"`) whose items open in a flyout, like a sub-list. A folded group with a count that needs attention inside shows its dot (after the heading, or on the `…` row).
+`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail the heading keeps its height and layout: its text slides toward the edge, scales down and is cut by the rail with a fade, so the first letters still name the section, and it still folds and unfolds the group. An open group keeps its items on the rail; a folded one stays folded and becomes one `…` row (named by the label, `aria-haspopup="dialog"`) whose items open in a flyout, like a sub-list. A folded group with a count that needs attention inside shows its dot (after the heading, or on the `…` row).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -344,7 +344,7 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 - The current item has `aria-current="page"`; in compact mode the label shows as a tooltip, so icon-only items keep a visible name.
 - A collapsible group heading and a SubTrigger are buttons with `aria-expanded` and `aria-controls`; folded content is `inert`.
 - On the compact rail a SubTrigger and the `…` row of a folded group have `aria-haspopup="dialog"`; the flyout is a non-modal dialog named by the parent (the `…` row by the group label).
-- On the rail a group heading is out of the tab order and hidden from screen readers (the group keeps its name); hovering it shows the whole name in a tooltip.
+- On the rail a collapsible group heading stays the same disclosure button (folding it there brings the `…` row); hovering it shows the whole name in a tooltip.
 - An attention dot is decorative: the count it stands for is read inside.
 - A row action is its own button next to the item (never nested), named by `label` with a tooltip.
 - The account avatar is hidden from screen readers; the name and the muted line name the button.

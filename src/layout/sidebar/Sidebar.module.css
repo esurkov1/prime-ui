@@ -519,18 +519,6 @@
   }
 }
 
-/* On the rail a heading only names the section: no hover fill, no click — its tooltip still opens. */
-.root[data-panel-mode="compact"]:not([data-off-canvas]) .groupTrigger {
-  cursor: default;
-}
-
-@media (hover: hover) {
-  .root[data-panel-mode="compact"]:not([data-off-canvas]) .groupTrigger:hover {
-    background-color: transparent;
-    color: var(--prime-color-text-muted);
-  }
-}
-
 .groupTrigger:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset-inset);

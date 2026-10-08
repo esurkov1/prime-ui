@@ -501,13 +501,9 @@ function SidebarGroup({
           className={cx(styles.groupLabel, styles.groupTrigger)}
           aria-expanded={open}
           aria-controls={bodyId}
-          // On the rail the heading only names the section: out of the tab order and the tree, a
-          // click does nothing; hovering it shows the whole name, which the rail cuts.
-          tabIndex={rail ? -1 : undefined}
-          aria-hidden={rail || undefined}
-          onClick={() => {
-            if (!rail) setOpen((prev) => !prev);
-          }}
+          // On the rail too it folds and unfolds the group (folded, the `…` row takes its place);
+          // hovering it shows the whole name, which the rail cuts.
+          onClick={() => setOpen((prev) => !prev)}
         >
           <span className={styles.groupText}>{label}</span>
           <AttentionDot hue={hue} shown={!open && !rail} inline />

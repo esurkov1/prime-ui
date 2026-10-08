@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { Home, Settings } from "lucide-react";
 import type * as React from "react";
 import { MemoryRouter, NavLink } from "react-router-dom";
@@ -626,16 +627,24 @@ describe("Sidebar.Group collapsible", () => {
     expect(wrapper).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("an open group keeps its items on the compact rail; the heading leaves the tab order", () => {
+  it("an open group keeps its items on the compact rail; the heading folds and unfolds it", async () => {
     render(<RailGroup defaultOpen />);
-    const heading = document.querySelector("button[aria-controls]") as HTMLElement;
-    expect(heading).toHaveAttribute("tabindex", "-1");
-    expect(heading).toHaveAttribute("aria-hidden", "true");
-    fireEvent.click(heading);
-    expect(heading).toHaveAttribute("aria-expanded", "true");
+    const heading = screen.getByRole("button", { name: "Инструменты" });
     const region = document.getElementById(heading.getAttribute("aria-controls") ?? "");
+    expect(heading).toHaveAttribute("aria-expanded", "true");
     expect(region).toHaveAttribute("data-state", "open");
     expect(railRow().closest("[data-state]")).toHaveAttribute("data-state", "closed");
+
+    fireEvent.click(heading);
+    expect(heading).toHaveAttribute("aria-expanded", "false");
+    expect(region).toHaveAttribute("data-state", "closed");
+    // Folded on the rail, the `…` row takes the items' place.
+    expect(railRow().closest("[data-state]")).toHaveAttribute("data-state", "open");
+
+    heading.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(heading).toHaveAttribute("aria-expanded", "true");
+    expect(region).toHaveAttribute("data-state", "open");
   });
 
   it("on the rail hovering a heading shows its whole name in a tooltip", () => {
