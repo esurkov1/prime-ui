@@ -126,6 +126,39 @@ describe("Crossfade", () => {
     expect(screen.queryByText("Загрузка")).toBeNull();
   });
 
+  it("glides from the height the region has when the state changes", () => {
+    let height = 100;
+    // «Пусто» is tall: the root measures 140 once it shows it.
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const h = this.textContent?.includes("Пусто") ? 140 : height;
+      return { height: h, width: 200, top: 0, left: 0, right: 200, bottom: h } as DOMRect;
+    });
+    const { container, rerender } = render(
+      <Crossfade state="loading">
+        <p>Загрузка</p>
+      </Crossfade>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    // The content shrank without a render; the next state is as tall: nothing to glide.
+    height = 60;
+    rerender(
+      <Crossfade state="ready">
+        <p>Данные</p>
+      </Crossfade>,
+    );
+    expect(root).not.toHaveAttribute("data-resizing");
+    rerender(
+      <Crossfade state="empty">
+        <p>Пусто</p>
+      </Crossfade>,
+    );
+    // 60 at the change → 140 now: the glide runs.
+    expect(root).toHaveAttribute("data-resizing", "true");
+    vi.restoreAllMocks();
+  });
+
   it("swaps at once under reduced motion", () => {
     stubReducedMotion(true);
     const { rerender } = render(

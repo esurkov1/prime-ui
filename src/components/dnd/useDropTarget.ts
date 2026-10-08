@@ -1,11 +1,10 @@
 import * as React from "react";
 
+import { prefersReducedMotion } from "@/hooks/usePresence";
+
 import { useDragController } from "./context";
 import type { DragItem } from "./dragSession";
 import type { Point } from "./geometry";
-
-// How long a target keeps its "something just landed here" tint after a drop.
-const FLASH_MS = 700;
 
 export type DropTargetOptions<TValue, TData = unknown> = {
   /** Which drag kinds this target answers to. */
@@ -27,18 +26,17 @@ export type DropTargetProps = {
   "data-dnd-over"?: true | undefined;
   "data-dnd-reject"?: true | undefined;
   "data-dnd-flash"?: true | undefined;
+  /** Ends the drop flash when its animation finishes. */
+  onAnimationEnd: (event: React.AnimationEvent<HTMLElement>) => void;
 };
 
-export type DropTargetHandle<TValue> = {
+export type DropTargetHandle = {
   /** The id the target registered under; `DragSnapshot.overId` names it while the pointer is over. */
   id: string;
   /** True while a pointer carrying an accepted item is inside, whether or not the spot can take a drop. */
   isOver: boolean;
   /** The registered element, for callers that also measure it. */
   element: HTMLElement | null;
-  /** What `resolve` last returned. */
-  value: TValue | null;
-  canDrop: boolean;
   props: DropTargetProps;
 };
 
@@ -48,10 +46,15 @@ function acceptsFor(accepts: DropTargetOptions<never>["accepts"]): (item: DragIt
   return (item) => accepts.includes(item.kind);
 }
 
-/** Registers an element as somewhere a drag can land. The target owns the meaning of a drop. */
+const OUTSIDE = { isOver: false, canDrop: false };
+
+/**
+ * Registers an element as somewhere a drag can land. The target owns the meaning of a drop. Only
+ * «over / can drop» is React state: a pointer move that changes neither re-renders nothing.
+ */
 export function useDropTarget<TValue, TData = unknown>(
   options: DropTargetOptions<TValue, TData>,
-): DropTargetHandle<TValue> {
+): DropTargetHandle {
   const controller = useDragController();
   const id = React.useId();
   const optionsRef = React.useRef(options);
@@ -60,11 +63,7 @@ export function useDropTarget<TValue, TData = unknown>(
   });
 
   const [element, setElement] = React.useState<HTMLElement | null>(null);
-  const [state, setState] = React.useState<{
-    isOver: boolean;
-    value: TValue | null;
-    canDrop: boolean;
-  }>({ isOver: false, value: null, canDrop: false });
+  const [state, setState] = React.useState(OUTSIDE);
   const [flashing, setFlashing] = React.useState(false);
 
   const ref = React.useCallback<React.RefCallback<HTMLElement | null>>((node) => {
@@ -75,7 +74,13 @@ export function useDropTarget<TValue, TData = unknown>(
 
   React.useEffect(() => {
     if (!element || disabled) return;
+    // The session hands every target the untyped item; this target's kinds decide what it carries.
     const typed = (item: DragItem) => item as DragItem<TData>;
+    const resolveAt = (point: Point, item: DragItem) => {
+      const value = optionsRef.current.resolve(point, typed(item), element);
+      const canDrop = value !== null && (optionsRef.current.canDrop?.(value, typed(item)) ?? true);
+      return { value, canDrop };
+    };
     return controller.registerTarget({
       id,
       element,
@@ -85,48 +90,41 @@ export function useDropTarget<TValue, TData = unknown>(
         setState((current) => (current.isOver ? current : { ...current, isOver: true }));
       },
       over: (point, item) => {
-        const value = optionsRef.current.resolve(point, typed(item), element);
-        const canDrop =
-          value !== null && (optionsRef.current.canDrop?.(value, typed(item)) ?? true);
+        const { canDrop } = resolveAt(point, item);
         setState((current) =>
-          current.isOver && current.canDrop === canDrop && Object.is(current.value, value)
-            ? current
-            : { isOver: true, value, canDrop },
+          current.isOver && current.canDrop === canDrop ? current : { isOver: true, canDrop },
         );
         return canDrop;
       },
       leave: () => {
         optionsRef.current.onLeave?.();
-        setState({ isOver: false, value: null, canDrop: false });
+        setState(OUTSIDE);
       },
       drop: (point, item) => {
-        const value = optionsRef.current.resolve(point, typed(item), element);
-        setState({ isOver: false, value: null, canDrop: false });
-        if (value === null) return;
-        if (!(optionsRef.current.canDrop?.(value, typed(item)) ?? true)) return;
+        const { value, canDrop } = resolveAt(point, item);
+        setState(OUTSIDE);
+        if (value === null || !canDrop) return;
         optionsRef.current.onDrop(value, typed(item));
-        if (optionsRef.current.flashOnDrop) setFlashing(true);
+        // Under reduced motion the flash has no animation, so nothing would end it.
+        if (optionsRef.current.flashOnDrop && !prefersReducedMotion()) setFlashing(true);
       },
     });
   }, [controller, element, disabled, id]);
 
-  React.useEffect(() => {
-    if (!flashing) return;
-    const timer = setTimeout(() => setFlashing(false), FLASH_MS);
-    return () => clearTimeout(timer);
-  }, [flashing]);
+  const onAnimationEnd = React.useCallback((event: React.AnimationEvent<HTMLElement>) => {
+    if (event.target === event.currentTarget) setFlashing(false);
+  }, []);
 
   return {
     id,
     element,
     isOver: state.isOver,
-    value: state.value,
-    canDrop: state.canDrop,
     props: {
       ref,
       "data-dnd-over": state.isOver || undefined,
       "data-dnd-reject": (state.isOver && !state.canDrop) || undefined,
       "data-dnd-flash": flashing || undefined,
+      onAnimationEnd,
     },
   };
 }

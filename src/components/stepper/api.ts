@@ -63,7 +63,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Stepper.Item",
-      en: '`forwardRef` → `HTMLButtonElement`. One step: an `<li>` with a `<button>`; `aria-current="step"` when active.',
+      en: '`ref` → `HTMLButtonElement`. One step: an `<li>` with a `<button>` (and, between horizontal steps, the decorative chevron in front of it); `aria-current="step"` when active.',
       ru: 'Один шаг: `<li>` с кнопкой; у активного — `aria-current="step"`.',
       props: [
         {

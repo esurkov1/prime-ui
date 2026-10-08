@@ -40,11 +40,13 @@ export type BreadcrumbRootProps = React.HTMLAttributes<HTMLElement> & {
 /** From this many levels the middle ones collapse into «…» on narrow containers. */
 const COLLAPSIBLE_MIN_ITEMS = 3;
 
-function Separator({ size, className }: { size: ControlSize; className?: string }) {
+/** The chevron in front of a level; decorative, and hidden by CSS before the first level. */
+function Separator() {
+  const { size } = React.useContext(BreadcrumbContext);
   return (
-    <li aria-hidden="true" className={cx(styles.separator, className)}>
+    <span aria-hidden="true" className={styles.separator}>
       <Icon name="nav.chevronRight" size={size} tone="secondary" />
-    </li>
+    </span>
   );
 }
 
@@ -64,18 +66,6 @@ function BreadcrumbRoot({
 
   const items = React.Children.toArray(children);
   const collapsible = items.length >= COLLAPSIBLE_MIN_ITEMS;
-  // Chevrons between levels are drawn here, so a trail is just its items.
-  const trail = items.flatMap((item, index) =>
-    index === 0
-      ? [item]
-      : [
-          <Separator
-            key={`separator-${React.isValidElement(item) ? item.key : index}`}
-            size={size}
-          />,
-          item,
-        ],
-  );
 
   return (
     <BreadcrumbContext.Provider value={contextValue}>
@@ -89,16 +79,14 @@ function BreadcrumbRoot({
           <ol className={styles.list}>
             {collapsible ? (
               <>
-                {trail.slice(0, 2)}
-                {/* Shown only on narrow widths (container query) in place of the middle levels. */}
-                <li aria-hidden="true" className={cx(styles.ellipsis, styles.autoCollapse)}>
-                  …
-                </li>
-                <Separator size={size} className={styles.autoCollapse} />
-                {trail.slice(2)}
+                {items[0]}
+                {/* Shown only on narrow widths (container query) in place of the middle levels,
+                    which are then `display: none`; it names them for screen readers. */}
+                <BreadcrumbEllipsis className={styles.autoCollapse} />
+                {items.slice(1)}
               </>
             ) : (
-              trail
+              items
             )}
           </ol>
         </nav>
@@ -127,8 +115,15 @@ function BreadcrumbItem({
   const { size } = React.useContext(BreadcrumbContext);
   return (
     <li {...rest} className={cx(styles.item, className)}>
+      <Separator />
       {href ? (
-        <LinkButton href={href} size={size} className={styles.link} aria-label={ariaLabel}>
+        <LinkButton
+          href={href}
+          size={size}
+          className={styles.link}
+          aria-label={ariaLabel}
+          aria-current={current ? "page" : undefined}
+        >
           {children}
         </LinkButton>
       ) : (
@@ -152,7 +147,8 @@ export type BreadcrumbEllipsisProps = Omit<React.LiHTMLAttributes<HTMLLIElement>
 function BreadcrumbEllipsis({ className, ...rest }: BreadcrumbEllipsisProps) {
   const { labels } = React.useContext(BreadcrumbContext);
   return (
-    <li {...rest} className={cx(styles.ellipsis, className)}>
+    <li {...rest} className={cx(styles.item, styles.ellipsis, className)}>
+      <Separator />
       <span aria-hidden="true">…</span>
       <VisuallyHidden>{labels.ellipsis}</VisuallyHidden>
     </li>

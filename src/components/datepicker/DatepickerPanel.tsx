@@ -1,4 +1,4 @@
-import { addMonths, format, type Locale, startOfMonth, subMonths } from "date-fns";
+import { addMonths, format, type Locale, startOfDay, startOfMonth, subMonths } from "date-fns";
 import { ru } from "date-fns/locale";
 import * as React from "react";
 
@@ -9,6 +9,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Datepicker.module.css";
 import {
@@ -23,14 +24,19 @@ import {
   monthTitle,
   parseTime,
   rowsNeeded,
-  sameDay,
-  toDay,
   type WeekStart,
   weekdayLabels,
   withMinutes,
   YEARLESS_YEAR,
 } from "./datepickerModel";
-import { resolvePanelLayout, STEP_DOWN, useAvailableWidth, useViewportWidth } from "./panelLayout";
+import {
+  readPanelMetrics,
+  resolvePanelLayout,
+  STEP_DOWN,
+  useAvailableWidth,
+  useContainScroll,
+  useViewportWidth,
+} from "./panelLayout";
 
 /** System strings and default texts. */
 export type DatepickerLabels = {
@@ -171,65 +177,79 @@ export function splitCalendarOptions<T extends CalendarOptions>({
   };
 }
 
-/** Resolved (controlled-or-internal) value the panel view works with. */
-export type ResolvedValue =
+/** The value a part works with: controlled or internal, with its setter. */
+export type DatepickerValue =
   | {
       mode: "range";
       value: DatepickerRange;
       onChange: (value: DatepickerRange) => void;
-      resetValue?: DatepickerRange;
+      resetValue?: DatepickerRange | undefined;
     }
   | {
       mode: "single";
       value: Date | null;
       onChange: (value: Date | null) => void;
-      resetValue?: Date | null;
+      resetValue?: Date | null | undefined;
     };
-
-type PanelViewProps = CalendarOptions &
-  ResolvedValue & {
-    /** After a value is applied (Root closes the popover). */
-    onDone?: () => void;
-    className?: string;
-    /** Native attributes and `ref` of the panel card (`Datepicker.Panel`). */
-    dom?: Omit<DatepickerDomProps, "className">;
-  };
 
 const EMPTY_RANGE: DatepickerRange = { from: null, to: null };
 
-export function useResolvedValue(props: RangeModeProps | SingleModeProps): ResolvedValue {
-  const [value, setValue] = useControllableState<DatepickerRange | Date | null>({
-    value: props.value,
-    defaultValue: props.defaultValue ?? (props.mode === "range" ? EMPTY_RANGE : null),
-    onChange: props.onValueChange as ((value: DatepickerRange | Date | null) => void) | undefined,
+/** Controlled-or-internal value of either mode (a part never switches its mode). */
+export function useDatepickerValue(props: RangeModeProps | SingleModeProps): DatepickerValue {
+  const range = props.mode === "range" ? props : null;
+  const single = props.mode === "single" ? props : null;
+  const [rangeValue, setRange] = useControllableState<DatepickerRange>({
+    value: range?.value,
+    defaultValue: range?.defaultValue ?? EMPTY_RANGE,
+    onChange: range?.onValueChange,
   });
-  return props.mode === "range"
-    ? {
-        mode: "range",
-        value: value as DatepickerRange,
-        onChange: setValue,
-        resetValue: props.resetValue,
-      }
-    : {
-        mode: "single",
-        value: value as Date | null,
-        onChange: setValue,
-        resetValue: props.resetValue,
-      };
+  const [singleValue, setSingle] = useControllableState<Date | null>({
+    value: single?.value,
+    defaultValue: single?.defaultValue ?? null,
+    onChange: single?.onValueChange,
+  });
+  if (range) {
+    return { mode: "range", value: rangeValue, onChange: setRange, resetValue: range.resetValue };
+  }
+  return {
+    mode: "single",
+    value: singleValue,
+    onChange: setSingle,
+    resetValue: single?.resetValue,
+  };
 }
 
-function valueDays(props: ResolvedValue): { a: Date | null; b: Date | null } {
-  if (props.mode === "single") return { a: props.value ? toDay(props.value) : null, b: null };
+type Draft = {
+  /** The value the draft was taken from: a new outside value starts a new draft. */
+  key: string;
+  a: Date | null;
+  b: Date | null;
+  fromTime: string;
+  toTime: string;
+};
+
+function draftOf(value: DatepickerValue): Draft {
+  const day = (d: Date | null) => (d ? startOfDay(d) : null);
+  if (value.mode === "single") {
+    return {
+      key: String(value.value?.getTime() ?? ""),
+      a: day(value.value),
+      b: null,
+      fromTime: formatTime(value.value ? minutesOf(value.value) : DAY_START_MINUTES),
+      toTime: formatTime(DAY_END_MINUTES),
+    };
+  }
+  const { from, to } = value.value;
   return {
-    a: props.value.from ? toDay(props.value.from) : null,
-    b: props.value.to ? toDay(props.value.to) : null,
+    key: `${from?.getTime() ?? ""}-${to?.getTime() ?? ""}`,
+    a: day(from),
+    b: day(to),
+    fromTime: formatTime(from ? minutesOf(from) : DAY_START_MINUTES),
+    toTime: formatTime(to ? minutesOf(to) : DAY_END_MINUTES),
   };
 }
 
 const clampYearless = (month: Date) => new Date(YEARLESS_YEAR, month.getMonth(), 1);
-
-/** The panel inside the Root popover sizes to its content; embedded it follows its container. */
-export const InPopoverContext = React.createContext(false);
 
 /** WAI-ARIA date grid: arrows move by day / week, PageUp/Down by month (+Shift a year), Home/End to the week edge. */
 const DAY_KEYS: Record<string, number> = {
@@ -240,28 +260,37 @@ const DAY_KEYS: Record<string, number> = {
 };
 
 /** Calendar panel without a field: inline in a page or a card. */
-export function DatepickerPanel({
-  mode,
-  value,
-  defaultValue,
-  onValueChange,
-  resetValue,
-  ...props
-}: DatepickerPanelProps) {
-  const resolved = useResolvedValue({
-    mode,
-    value,
-    defaultValue,
-    onValueChange,
-    resetValue,
-  } as RangeModeProps | SingleModeProps);
+export function DatepickerPanel(props: DatepickerPanelProps) {
+  const value = useDatepickerValue(props);
+  const { mode, value: _v, defaultValue, onValueChange, resetValue, ...other } = props;
   const {
     options,
     rest: { className, ...dom },
-  } = splitCalendarOptions(props);
-  return <PanelView {...options} {...resolved} className={className} dom={dom} />;
+  } = splitCalendarOptions(other);
+  return (
+    <PanelView
+      {...options}
+      {...value}
+      labels={{ ...DATEPICKER_LABELS, ...options.labels }}
+      embedded
+      className={className}
+      dom={dom}
+    />
+  );
 }
 DatepickerPanel.displayName = "Datepicker.Panel";
+
+type PanelViewProps = Omit<CalendarOptions, "labels"> &
+  DatepickerValue & {
+    labels: DatepickerLabels;
+    /** `Datepicker.Panel`: the card follows its container; otherwise (the Root popover) it sizes to its content. */
+    embedded: boolean;
+    /** After a value is applied (Root closes the popover). */
+    onDone?: () => void;
+    className?: string;
+    /** Native attributes and `ref` of the panel card (`Datepicker.Panel`). */
+    dom?: Omit<DatepickerDomProps, "className">;
+  };
 
 /** Presets aside (or above when narrow), 1–2 months, the step prompt, the footer. */
 export function PanelView(props: PanelViewProps) {
@@ -277,105 +306,70 @@ export function PanelView(props: PanelViewProps) {
     yearless = false,
     locale = ru,
     weekStartsOn = 1,
+    labels,
+    embedded,
     onDone,
     className,
     dom: { ref: domRef, ...dom } = {},
   } = props;
-  const labels = { ...DATEPICKER_LABELS, ...props.labels };
   const isRange = props.mode === "range";
-  const inPopover = React.useContext(InPopoverContext);
   const [panelNode, setPanelNode] = React.useState<HTMLDivElement | null>(null);
   const panelRef = React.useMemo(() => mergeRefs(setPanelNode, domRef), [domRef]);
-  const parentWidth = useAvailableWidth(inPopover ? null : panelNode);
-  const viewportWidth = useViewportWidth(inPopover);
+  const parentWidth = useAvailableWidth(embedded ? panelNode : null);
+  const viewportWidth = useViewportWidth(!embedded);
+  useContainScroll(embedded ? null : panelNode);
   const hasPresets = Boolean(presets) && isRange;
 
   // Embedded: the parent's content box; in the popover: the window minus the edge gaps.
-  const available = inPopover
-    ? viewportWidth == null
+  const available = embedded
+    ? parentWidth
+    : viewportWidth == null
       ? null
-      : viewportWidth - getViewportPadPx() * 2
-    : parentWidth;
+      : viewportWidth - getViewportPadPx() * 2;
   const { monthCount, presetsAside, compact } = resolvePanelLayout({
-    size,
     months: monthsProp,
     hasPresets,
-    embedded: !inPopover,
+    embedded,
     available,
+    metrics: readPanelMetrics(size, embedded),
   });
-  const today = toDay(props.today ?? new Date());
+  const today = startOfDay(props.today ?? new Date());
 
-  const [dayA, setDayA] = React.useState<Date | null>(() => valueDays(props).a);
-  const [dayB, setDayB] = React.useState<Date | null>(() => valueDays(props).b);
+  // The picked days and times: follow the outside value; with a footer they are a draft until
+  // «Применить». A new outside value always starts a new draft.
+  const [draftState, setDraft] = React.useState(() => draftOf(props));
+  let draft = draftState;
+  const valueDraft = draftOf(props);
+  if (draftState.key !== valueDraft.key) {
+    draft = valueDraft;
+    setDraft(valueDraft);
+  }
+  const { a: dayA, b: dayB, fromTime, toTime } = draft;
   const [hover, setHover] = React.useState<Date | null>(null);
-  const [fromTime, setFromTime] = React.useState(() => {
-    const v = props.mode === "single" ? props.value : props.value.from;
-    return formatTime(v ? minutesOf(v) : DAY_START_MINUTES);
-  });
-  const [toTime, setToTime] = React.useState(() =>
-    formatTime(
-      props.mode === "range" && props.value.to ? minutesOf(props.value.to) : DAY_END_MINUTES,
-    ),
-  );
   const [focusDay, setFocusDay] = React.useState<Date>(() => {
-    const days = valueDays(props);
-    const anchor = (isRange ? (days.b ?? days.a) : days.a) ?? today;
+    const anchor = (isRange ? (draft.b ?? draft.a) : draft.a) ?? today;
     return yearless ? new Date(YEARLESS_YEAR, anchor.getMonth(), anchor.getDate()) : anchor;
   });
+  /** The day keyboard paging moved to: its button takes focus once it is rendered. */
+  const [focusTarget, setFocusTarget] = React.useState<number | null>(null);
   const [month, setMonth] = React.useState(() => {
     const base = yearless ? clampYearless(focusDay) : startOfMonth(focusDay);
     return monthCount === 2 ? subMonths(base, 1) : base;
   });
-  const gridRef = React.useRef<HTMLDivElement>(null);
-  const focusPending = React.useRef(false);
 
   // 2 → 1 month (it got tight): stay on the month with the focused day, not the left one of two.
-  const prevMonthCount = React.useRef(monthCount);
-  React.useEffect(() => {
-    const was = prevMonthCount.current;
-    prevMonthCount.current = monthCount;
-    if (was !== 2 || monthCount !== 1) return;
-    setMonth((current) => {
-      const second = yearless ? clampYearless(addMonths(current, 1)) : addMonths(current, 1);
-      return focusDay.getTime() >= second.getTime() ? second : current;
-    });
-  }, [monthCount, focusDay, yearless]);
-
-  // Without a footer the outer value is the source of truth (an embedded calendar).
-  const valueKey =
-    props.mode === "single"
-      ? String(props.value?.getTime() ?? "")
-      : `${props.value.from?.getTime() ?? ""}-${props.value.to?.getTime() ?? ""}`;
-  // biome-ignore lint/correctness/useExhaustiveDependencies: syncs only when the value changes.
-  React.useEffect(() => {
-    if (footer) return;
-    const next = valueDays(props);
-    setDayA(next.a);
-    setDayB(next.b);
-  }, [valueKey, footer]);
-
-  // Moves focus after arrow paging (the new day's button appears after the render).
-  React.useEffect(() => {
-    if (!focusPending.current) return;
-    focusPending.current = false;
-    gridRef.current
-      ?.querySelector<HTMLButtonElement>(`[data-day="${focusDay.getTime()}"]`)
-      ?.focus();
-  });
-
-  // In the popover focus goes to the picked (or today's) day, as in the WAI-ARIA date picker
-  // dialog. The popover's focus trap focuses its first element in its own effect; a frame later —
-  // the day.
-  React.useEffect(() => {
-    if (!inPopover) return;
-    const id = requestAnimationFrame(() => {
-      gridRef.current?.querySelector<HTMLButtonElement>('[data-day][tabindex="0"]')?.focus();
-    });
-    return () => cancelAnimationFrame(id);
-  }, [inPopover]);
+  const [shownCount, setShownCount] = React.useState(monthCount);
+  if (shownCount !== monthCount) {
+    setShownCount(monthCount);
+    if (shownCount === 2 && monthCount === 1) {
+      const second = yearless ? clampYearless(addMonths(month, 1)) : addMonths(month, 1);
+      if (focusDay.getTime() >= second.getTime()) setMonth(second);
+    }
+  }
 
   const visibleMonths = Array.from({ length: monthCount }, (_, i) => addMonths(month, i));
   const rows = Math.max(...visibleMonths.map((m) => rowsNeeded(m, weekStartsOn)));
+  const titles = visibleMonths.map((m) => monthTitle(m, locale, yearless));
 
   const shiftMonth = (delta: number) =>
     setMonth((current) => {
@@ -408,17 +402,16 @@ export function PanelView(props: PanelViewProps) {
     if (dayDisabled(day)) return;
     setFocusDay(day);
     if (!isRange) {
-      setDayA(day);
+      setDraft({ ...draft, a: day });
       if (!footer) commitSingle(day, DAY_START_MINUTES);
       return;
     }
     if (dayA == null || dayB != null) {
-      setDayA(day);
-      setDayB(null);
+      setDraft({ ...draft, a: day, b: null });
       setHover(day);
       return;
     }
-    setDayB(day);
+    setDraft({ ...draft, b: day });
     if (!footer) {
       const [lo, hi] = dayA.getTime() <= day.getTime() ? [dayA, day] : [day, dayA];
       commitRange(lo, hi, DAY_START_MINUTES, DAY_END_MINUTES);
@@ -433,7 +426,7 @@ export function PanelView(props: PanelViewProps) {
       const base = yearless ? clampYearless(target) : startOfMonth(target);
       setMonth(target.getTime() < first ? base : subMonths(base, monthCount - 1));
     }
-    focusPending.current = true;
+    setFocusTarget(target.getTime());
     setFocusDay(target);
     if (isRange && dayA != null && dayB == null) setHover(target);
   };
@@ -457,6 +450,26 @@ export function PanelView(props: PanelViewProps) {
     }
   };
 
+  // Day events reach the grids through stable callbacks: a memoized month re-renders only when
+  // what it draws changes.
+  const latest = React.useRef({ pickDay, preview: false });
+  const preview = isRange && dayA != null && dayB == null;
+  latest.current = { pickDay, preview };
+  const dayEvents = React.useMemo<DayEvents>(
+    () => ({
+      pick: (day) => latest.current.pickDay(day),
+      focus: (day) => {
+        setFocusDay(day);
+        setFocusTarget(null);
+      },
+      hover: (day) => {
+        if (latest.current.preview) setHover(day);
+      },
+      focusNode: (node) => node?.focus(),
+    }),
+    [],
+  );
+
   const sorted: [Date, Date] | null =
     dayA && dayB ? (dayA.getTime() <= dayB.getTime() ? [dayA, dayB] : [dayB, dayA]) : null;
   const canApply = isRange
@@ -476,14 +489,13 @@ export function PanelView(props: PanelViewProps) {
   };
 
   // The band: the picked range, or a preview while only the start is picked.
-  const preview = isRange && dayA != null && dayB == null;
   const edgeB = isRange ? (preview ? (hover ?? dayA) : dayB) : dayA;
-  const lo = dayA && edgeB ? (dayA.getTime() <= edgeB.getTime() ? dayA : edgeB) : null;
-  const hi = dayA && edgeB ? (dayA.getTime() <= edgeB.getTime() ? edgeB : dayA) : null;
+  const lo = dayA && edgeB ? Math.min(dayA.getTime(), edgeB.getTime()) : null;
+  const hi = dayA && edgeB ? Math.max(dayA.getTime(), edgeB.getTime()) : null;
 
   const activePreset =
     presets && isRange && !preview ? matchPreset(presets, dayA, dayB, today) : null;
-  const weekdays = weekdayLabels(locale, weekStartsOn);
+  const weekdays = React.useMemo(() => weekdayLabels(locale, weekStartsOn), [locale, weekStartsOn]);
 
   let promptText: string | null = null;
   if (prompt) {
@@ -497,8 +509,6 @@ export function PanelView(props: PanelViewProps) {
   const footerFormat = yearless ? "dd.MM" : "dd.MM.yyyy";
   const controlSize = STEP_DOWN[size];
   const layout = presetsAside || !hasPresets ? "aside" : "stacked";
-  // Days of the neighbouring months only in a one-month view (two months would repeat them).
-  const showOutside = monthCount === 1;
 
   return (
     <div
@@ -506,7 +516,7 @@ export function PanelView(props: PanelViewProps) {
       ref={panelRef}
       className={cx(styles.panel, className)}
       data-size={size}
-      data-embedded={inPopover ? undefined : "true"}
+      data-embedded={embedded ? "true" : undefined}
       data-compact={compact ? "true" : undefined}
       data-layout={layout}
     >
@@ -540,140 +550,72 @@ export function PanelView(props: PanelViewProps) {
       ) : null}
 
       <div className={styles.main}>
+        {/* One announcement for the visible months, not one live region per month. */}
+        <VisuallyHidden aria-live="polite">{titles.join(" — ")}</VisuallyHidden>
         {/* biome-ignore lint/a11y/noStaticElementInteractions: arrow keys are delegated to the day grid */}
         <div
-          ref={gridRef}
           className={styles.months}
           onKeyDown={onGridKeyDown}
           onMouseLeave={() => preview && setHover(null)}
         >
-          {visibleMonths.map((m, mi) => {
-            const title = monthTitle(m, locale, yearless);
-            return (
-              <div key={m.getTime()} className={styles.month}>
-                <div className={styles.monthHeader}>
-                  {mi === 0 ? (
-                    <Button.Root
-                      variant="ghost"
-                      tone="neutral"
-                      size={controlSize}
-                      aria-label={labels.prevMonth}
-                      onClick={() => shiftMonth(-1)}
-                    >
-                      <Button.Icon>
-                        <Icon name="nav.chevronLeft" />
-                      </Button.Icon>
-                    </Button.Root>
-                  ) : (
-                    <span className={styles.navSpacer} />
-                  )}
-                  <span className={styles.monthTitle} aria-live="polite">
-                    {title}
-                  </span>
-                  {mi === visibleMonths.length - 1 ? (
-                    <Button.Root
-                      variant="ghost"
-                      tone="neutral"
-                      size={controlSize}
-                      aria-label={labels.nextMonth}
-                      onClick={() => shiftMonth(1)}
-                    >
-                      <Button.Icon>
-                        <Icon name="nav.chevronRight" />
-                      </Button.Icon>
-                    </Button.Root>
-                  ) : (
-                    <span className={styles.navSpacer} />
-                  )}
-                </div>
-                <table className={styles.table} aria-label={title}>
-                  <thead className={styles.rowGroup}>
-                    <tr className={styles.row}>
-                      {weekdays.map((w, i) => {
-                        const weekday = (weekStartsOn + i) % 7;
-                        return (
-                          <th
-                            key={w}
-                            scope="col"
-                            className={styles.weekday}
-                            data-weekend={weekday === 0 || weekday === 6 ? "true" : undefined}
-                          >
-                            {w}
-                          </th>
-                        );
-                      })}
-                    </tr>
-                  </thead>
-                  <tbody className={styles.rowGroup}>
-                    {monthGrid(m, rows, weekStartsOn).map((row) => (
-                      <tr key={row.find((c) => c.day)?.day?.getTime()} className={styles.row}>
-                        {row.map(({ day, col, outside }) => {
-                          if (day == null) {
-                            return (
-                              <td key={col} className={styles.cell}>
-                                {showOutside && outside ? (
-                                  <span className={styles.outsideDay} aria-hidden>
-                                    {outside.getDate()}
-                                  </span>
-                                ) : null}
-                              </td>
-                            );
-                          }
-                          const n = day.getDate();
-                          const lastOfMonth =
-                            n === new Date(day.getFullYear(), day.getMonth() + 1, 0).getDate();
-                          const inBand = lo != null && hi != null && day >= lo && day <= hi;
-                          const disabled = dayDisabled(day);
-                          const isToday = !yearless && sameDay(day, today);
-                          return (
-                            <td
-                              key={col}
-                              className={styles.cell}
-                              data-band={inBand ? (preview ? "preview" : "selected") : undefined}
-                              data-band-start={
-                                inBand && (sameDay(day, lo) || col === 0 || n === 1)
-                                  ? "true"
-                                  : undefined
-                              }
-                              data-band-end={
-                                inBand && (sameDay(day, hi) || col === 6 || lastOfMonth)
-                                  ? "true"
-                                  : undefined
-                              }
-                            >
-                              <button
-                                type="button"
-                                className={styles.day}
-                                data-day={day.getTime()}
-                                disabled={disabled}
-                                tabIndex={sameDay(day, focusDay) ? 0 : -1}
-                                data-edge={
-                                  inBand && !preview && (sameDay(day, lo) || sameDay(day, hi))
-                                    ? "true"
-                                    : undefined
-                                }
-                                data-today={isToday ? "true" : undefined}
-                                aria-pressed={inBand && !preview}
-                                aria-current={isToday ? "date" : undefined}
-                                aria-label={format(day, yearless ? "d MMMM" : "d MMMM yyyy", {
-                                  locale,
-                                })}
-                                onClick={() => pickDay(day)}
-                                onFocus={() => setFocusDay(day)}
-                                onMouseEnter={() => preview && !disabled && setHover(day)}
-                              >
-                                {n}
-                              </button>
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {visibleMonths.map((m, mi) => (
+            <div key={m.getTime()} className={styles.month}>
+              <div className={styles.monthHeader}>
+                {mi === 0 ? (
+                  <Button.Root
+                    variant="ghost"
+                    tone="neutral"
+                    size={controlSize}
+                    aria-label={labels.prevMonth}
+                    onClick={() => shiftMonth(-1)}
+                  >
+                    <Button.Icon>
+                      <Icon name="nav.chevronLeft" />
+                    </Button.Icon>
+                  </Button.Root>
+                ) : (
+                  <span className={styles.navSpacer} />
+                )}
+                <span className={styles.monthTitle}>{titles[mi]}</span>
+                {mi === visibleMonths.length - 1 ? (
+                  <Button.Root
+                    variant="ghost"
+                    tone="neutral"
+                    size={controlSize}
+                    aria-label={labels.nextMonth}
+                    onClick={() => shiftMonth(1)}
+                  >
+                    <Button.Icon>
+                      <Icon name="nav.chevronRight" />
+                    </Button.Icon>
+                  </Button.Root>
+                ) : (
+                  <span className={styles.navSpacer} />
+                )}
               </div>
-            );
-          })}
+              <MonthGrid
+                month={m.getTime()}
+                title={titles[mi] ?? ""}
+                rows={rows}
+                weekdays={weekdays}
+                weekStartsOn={weekStartsOn}
+                locale={locale}
+                yearless={yearless}
+                // Days of the neighbouring months only in a one-month view (two would repeat them).
+                showOutside={monthCount === 1}
+                today={today.getTime()}
+                disableFuture={disableFuture}
+                isDayDisabled={isDayDisabled}
+                focusDay={focusDay.getTime()}
+                focusTarget={focusTarget}
+                autoFocus={!embedded}
+                lo={lo}
+                hi={hi}
+                preview={preview}
+                events={dayEvents}
+              />
+            </div>
+          ))}
         </div>
 
         {promptText ? (
@@ -691,7 +633,7 @@ export function PanelView(props: PanelViewProps) {
                 time={withTime ? fromTime : null}
                 timeLabel={isRange ? labels.timeStart : labels.time}
                 invalid={fromMinutes == null}
-                onTime={setFromTime}
+                onTime={(text) => setDraft({ ...draft, fromTime: text })}
               />
               {isRange ? (
                 <>
@@ -704,7 +646,7 @@ export function PanelView(props: PanelViewProps) {
                     time={withTime ? toTime : null}
                     timeLabel={labels.timeEnd}
                     invalid={toMinutes == null}
-                    onTime={setToTime}
+                    onTime={(text) => setDraft({ ...draft, toTime: text })}
                   />
                 </>
               ) : null}
@@ -723,6 +665,159 @@ export function PanelView(props: PanelViewProps) {
     </div>
   );
 }
+
+type DayEvents = {
+  pick: (day: Date) => void;
+  focus: (day: Date) => void;
+  hover: (day: Date) => void;
+  /** Ref of the day keyboard paging moved to. */
+  focusNode: (node: HTMLButtonElement | null) => void;
+};
+
+type MonthGridProps = {
+  /** First day of the month (timestamp: a stable memo key). */
+  month: number;
+  title: string;
+  rows: number;
+  weekdays: string[];
+  weekStartsOn: WeekStart;
+  locale: Locale;
+  yearless: boolean;
+  showOutside: boolean;
+  today: number;
+  disableFuture: boolean;
+  isDayDisabled: ((day: Date) => boolean) | undefined;
+  focusDay: number;
+  focusTarget: number | null;
+  /** The roving day is where the popover's focus trap puts focus on open. */
+  autoFocus: boolean;
+  /** Band bounds (day timestamps), or null. */
+  lo: number | null;
+  hi: number | null;
+  preview: boolean;
+  events: DayEvents;
+};
+
+/**
+ * One month: weekday heads and the day buttons. The cells and their names are computed once per
+ * month and locale, so a hover that only moves the band formats nothing.
+ */
+const MonthGrid = React.memo(function MonthGrid({
+  month,
+  title,
+  rows,
+  weekdays,
+  weekStartsOn,
+  locale,
+  yearless,
+  showOutside,
+  today,
+  disableFuture,
+  isDayDisabled,
+  focusDay,
+  focusTarget,
+  autoFocus,
+  lo,
+  hi,
+  preview,
+  events,
+}: MonthGridProps) {
+  const grid = React.useMemo(
+    () =>
+      monthGrid(new Date(month), rows, weekStartsOn).map((row) =>
+        row.map((cell) => ({
+          ...cell,
+          time: cell.date.getTime(),
+          label: cell.inMonth
+            ? format(cell.date, yearless ? "d MMMM" : "d MMMM yyyy", { locale })
+            : "",
+        })),
+      ),
+    [month, rows, weekStartsOn, locale, yearless],
+  );
+  const first = new Date(month);
+  const lastDay = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+
+  return (
+    <table className={styles.table} aria-label={title}>
+      <thead className={styles.rowGroup}>
+        <tr className={styles.row}>
+          {weekdays.map((w, i) => {
+            const weekday = (weekStartsOn + i) % 7;
+            return (
+              <th
+                key={w}
+                scope="col"
+                className={styles.weekday}
+                data-weekend={weekday === 0 || weekday === 6 ? "true" : undefined}
+              >
+                {w}
+              </th>
+            );
+          })}
+        </tr>
+      </thead>
+      <tbody className={styles.rowGroup}>
+        {grid.map((row) => (
+          <tr key={row[0]?.time} className={styles.row}>
+            {row.map(({ date, inMonth, time, label }, col) => {
+              if (!inMonth) {
+                return (
+                  <td key={time} className={styles.cell}>
+                    {showOutside ? (
+                      <span className={styles.outsideDay} aria-hidden>
+                        {date.getDate()}
+                      </span>
+                    ) : null}
+                  </td>
+                );
+              }
+              const n = date.getDate();
+              const inBand = lo != null && hi != null && time >= lo && time <= hi;
+              const edge = inBand && !preview && (time === lo || time === hi);
+              const disabled = (disableFuture && time > today) || (isDayDisabled?.(date) ?? false);
+              const isToday = !yearless && time === today;
+              const roving = time === focusDay;
+              return (
+                <td
+                  key={time}
+                  className={styles.cell}
+                  data-band={inBand ? (preview ? "preview" : "selected") : undefined}
+                  data-band-start={
+                    inBand && (time === lo || col === 0 || n === 1) ? "true" : undefined
+                  }
+                  data-band-end={
+                    inBand && (time === hi || col === 6 || n === lastDay) ? "true" : undefined
+                  }
+                >
+                  <button
+                    ref={time === focusTarget ? events.focusNode : undefined}
+                    type="button"
+                    className={styles.day}
+                    data-day={time}
+                    data-autofocus={autoFocus && roving ? "" : undefined}
+                    disabled={disabled}
+                    tabIndex={roving ? 0 : -1}
+                    data-edge={edge ? "true" : undefined}
+                    data-today={isToday ? "true" : undefined}
+                    aria-pressed={inBand && !preview}
+                    aria-current={isToday ? "date" : undefined}
+                    aria-label={label}
+                    onClick={() => events.pick(date)}
+                    onFocus={() => events.focus(date)}
+                    onMouseEnter={() => !disabled && events.hover(date)}
+                  >
+                    {n}
+                  </button>
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+});
 
 /**
  * A read-only date with an optional time input: one segmented pill. The kit has no two-segment

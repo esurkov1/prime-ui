@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Tabs } from "./Tabs";
@@ -146,6 +147,41 @@ describe("Tabs — ARIA", () => {
     const [tab1, tab2] = screen.getAllByRole("tab");
     expect(tab1).toHaveAttribute("tabindex", "0");
     expect(tab2).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("without a selection the first enabled tab is the tab stop", () => {
+    render(
+      <Tabs.Root>
+        <Tabs.List>
+          <Tabs.Item value="a" disabled>
+            A
+          </Tabs.Item>
+          <Tabs.Item value="b">B</Tabs.Item>
+          <Tabs.Item value="c">C</Tabs.Item>
+        </Tabs.List>
+      </Tabs.Root>,
+    );
+    expect(screen.getByRole("tab", { name: "B" })).toHaveAttribute("tabindex", "0");
+    expect(screen.getByRole("tab", { name: "C" })).toHaveAttribute("tabindex", "-1");
+    fireEvent.click(screen.getByRole("tab", { name: "C" }));
+    expect(screen.getByRole("tab", { name: "B" })).toHaveAttribute("tabindex", "-1");
+    expect(screen.getByRole("tab", { name: "C" })).toHaveAttribute("tabindex", "0");
+  });
+
+  it("builds valid id references from values with spaces and symbols", () => {
+    render(
+      <Tabs.Root defaultValue="Мои заказы #1">
+        <Tabs.List>
+          <Tabs.Item value="Мои заказы #1">Заказы</Tabs.Item>
+        </Tabs.List>
+        <Tabs.Panel value="Мои заказы #1">Список</Tabs.Panel>
+      </Tabs.Root>,
+    );
+    const tab = screen.getByRole("tab", { name: "Заказы" });
+    const controls = tab.getAttribute("aria-controls") ?? "";
+    expect(controls).not.toMatch(/\s/);
+    expect(document.getElementById(controls)).toBe(screen.getByRole("tabpanel"));
+    expect(screen.getByRole("tabpanel")).toHaveAccessibleName("Заказы");
   });
 
   it("sets aria-controls and aria-labelledby linking tab to panel", () => {
@@ -379,6 +415,80 @@ describe("Tabs — indicator", () => {
   it("scrolls horizontally with an edge fade and a hidden scrollbar", () => {
     render(<BasicTabs />);
     expect(screen.getByRole("tablist")).toHaveAttribute("data-fade", "horizontal");
+  });
+
+  it("moves the indicator to the selected tab without re-rendering the items", () => {
+    let commits = 0;
+    const offsets = { tab1: 0, tab2: 80 };
+    vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return offsets[this.dataset.value as keyof typeof offsets] ?? 0;
+    });
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(60);
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(32);
+    render(
+      <React.Profiler
+        id="tabs"
+        onRender={() => {
+          commits += 1;
+        }}
+      >
+        <Tabs.Root defaultValue="tab1">
+          <Tabs.List>
+            <Tabs.Item value="tab1">tab1</Tabs.Item>
+            <Tabs.Item value="tab2">tab2</Tabs.Item>
+          </Tabs.List>
+        </Tabs.Root>
+      </React.Profiler>,
+    );
+    const indicator = screen.getByRole("tablist").firstElementChild as HTMLElement;
+    expect(indicator).toHaveAttribute("data-visible", "true");
+    expect(indicator.style.transform).toBe("translateX(0px)");
+    commits = 0;
+    fireEvent.click(screen.getByRole("tab", { name: "tab2" }));
+    expect(indicator.style.transform).toBe("translateX(80px)");
+    // One commit for the selection; measuring the indicator adds none.
+    expect(commits).toBe(1);
+    vi.restoreAllMocks();
+  });
+
+  it("scrolls only the list to the selected tab, never the page", () => {
+    const scrollIntoView = vi.fn();
+    const scrollTo = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView,
+    });
+    Object.defineProperty(HTMLElement.prototype, "scrollTo", {
+      configurable: true,
+      value: scrollTo,
+    });
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(400);
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(200);
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(100);
+    vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return this.dataset.value === "tab3" ? 300 : 0;
+    });
+    try {
+      render(
+        <Tabs.Root defaultValue="tab1">
+          <Tabs.List>
+            <Tabs.Item value="tab1">Tab 1</Tabs.Item>
+            <Tabs.Item value="tab3">Tab 3</Tabs.Item>
+          </Tabs.List>
+        </Tabs.Root>,
+      );
+      fireEvent.click(screen.getByRole("tab", { name: "Tab 3" }));
+      expect(scrollTo).toHaveBeenLastCalledWith({ left: 200, behavior: "auto" });
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    } finally {
+      Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+      Reflect.deleteProperty(HTMLElement.prototype, "scrollTo");
+      vi.restoreAllMocks();
+    }
   });
 
   it("uses a pill indicator in a vertical list", () => {

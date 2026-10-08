@@ -189,13 +189,6 @@ export const api: ComponentApi = {
           ru: "Смена раскрытых строк.",
         },
         {
-          name: "initialVisibleRows",
-          type: "number",
-          default: "pageSize",
-          en: 'Rows shown first with `paging="infinite"`.',
-          ru: 'Сколько строк показать сначала при `paging="infinite"`.',
-        },
-        {
           name: "infiniteBatchSize",
           type: "number",
           default: "20",
@@ -398,18 +391,6 @@ export const api: ComponentApi = {
           type: "string",
           en: 'CSS sizes of the column (`"14rem"`).',
           ru: 'CSS-размеры колонки (`"14rem"`).',
-        },
-        {
-          name: "onHeaderClick",
-          type: "(event: MouseEvent<HTMLTableCellElement>) => void",
-          en: "Head cell click (before sorting).",
-          ru: "Клик по заголовку (до сортировки).",
-        },
-        {
-          name: "onCellClick",
-          type: "(row: Row, event: MouseEvent | KeyboardEvent) => void",
-          en: 'Makes the cell a focusable `role="button"`; Enter / Space trigger it.',
-          ru: 'Ячейка становится фокусируемой `role="button"`; срабатывает по Enter / Space.',
         },
       ],
     },

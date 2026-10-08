@@ -72,7 +72,8 @@ describe("Timeline", () => {
     expect(activeRow).toHaveAttribute("aria-current", "true");
     expect(idleRow).toHaveAttribute("data-state", "inactive");
     expect(idleRow).not.toHaveAttribute("aria-current");
-    expect(items[1]).toHaveAttribute("data-state", "active");
+    // The state lives on the row only; the list item carries no styling hook.
+    expect(items[1]).not.toHaveAttribute("data-state");
   });
 
   it("dot color: palette color by default, tone wins over color", () => {

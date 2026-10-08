@@ -7,7 +7,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Badge } from "@/components/badge/Badge";
 import { Kbd } from "@/components/kbd/Kbd";
-import { CSS_PX_SUFFIX, DATA_TABLE_INFINITE_ROOT_MARGIN } from "@/internal/runtimeUnits";
 import swapMotion from "@/internal/swapMotion.module.css";
 
 import { DataTable, type DataTableColumn } from "./DataTable";
@@ -154,29 +153,53 @@ describe("DataTable", () => {
     expect(screen.getByText("⌘")).toHaveAttribute("data-size", "l");
   });
 
-  it("supports onClick callbacks for header, row and cell", () => {
-    const onHeaderClick = vi.fn();
-    const onCellClick = vi.fn();
+  it("calls onRowClick with the row and its index", () => {
     const onRowClick = vi.fn();
-    const clickableColumns: DataTableColumn<Row>[] = [
-      { id: "name", header: "Name", accessor: "name", sortable: true, onHeaderClick, onCellClick },
-      { id: "score", header: "Score", accessor: "score", sortable: true, align: "end" },
-    ];
     render(
-      <DataTable
-        rows={rows.slice(0, 1)}
-        columns={clickableColumns}
-        paging="none"
-        onRowClick={onRowClick}
-      />,
+      <DataTable rows={rows.slice(0, 2)} columns={columns} paging="none" onRowClick={onRowClick} />,
     );
-
-    fireEvent.click(screen.getByText("Name"));
-    fireEvent.click(screen.getByText("C"));
-
-    expect(onHeaderClick).toHaveBeenCalledTimes(1);
-    expect(onCellClick).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByText("A"));
     expect(onRowClick).toHaveBeenCalledTimes(1);
+    expect(onRowClick.mock.calls[0]?.[0]).toBe(rows[1]);
+    expect(onRowClick.mock.calls[0]?.[1]).toBe(1);
+  });
+
+  it("starts on defaultPage", () => {
+    render(<DataTable rows={rows} columns={columns} pageSize={2} defaultPage={2} />);
+    expect(screen.getByText("Показано 3–4 из 6")).toBeInTheDocument();
+  });
+
+  it("a controlled page is shown as is: no onPageChange on mount", () => {
+    const onPageChange = vi.fn();
+    render(
+      <DataTable rows={rows} columns={columns} pageSize={2} page={3} onPageChange={onPageChange} />,
+    );
+    expect(screen.getByText("Показано 5–6 из 6")).toBeInTheDocument();
+    expect(onPageChange).not.toHaveBeenCalled();
+  });
+
+  it("an out-of-range page renders the last page without writing it back", () => {
+    const onPageChange = vi.fn();
+    render(
+      <DataTable rows={rows} columns={columns} pageSize={2} page={9} onPageChange={onPageChange} />,
+    );
+    expect(screen.getByText("Показано 5–6 из 6")).toBeInTheDocument();
+    expect(onPageChange).not.toHaveBeenCalled();
+  });
+
+  it("an inline onPageChange never resets the page on re-render", () => {
+    const { rerender } = render(
+      <DataTable rows={rows} columns={columns} pageSize={2} onPageChange={() => {}} />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Страница 2" }));
+    rerender(<DataTable rows={rows} columns={columns} pageSize={2} onPageChange={() => {}} />);
+    expect(screen.getByText("Показано 3–4 из 6")).toBeInTheDocument();
+  });
+
+  it("a new sort returns to page 1", () => {
+    render(<DataTable rows={rows} columns={columns} pageSize={2} defaultPage={2} />);
+    fireEvent.click(screen.getByRole("button", { name: "Name" }));
+    expect(screen.getByText("Показано 1–2 из 6")).toBeInTheDocument();
   });
 
   it("loads additional rows in infinite mode on intersection", () => {
@@ -202,7 +225,7 @@ describe("DataTable", () => {
         return [];
       }
       root = null;
-      rootMargin = `0${CSS_PX_SUFFIX}`;
+      rootMargin = "0px";
       thresholds = [];
     }
 
@@ -213,14 +236,14 @@ describe("DataTable", () => {
         rows={rows}
         columns={columns}
         paging="infinite"
-        initialVisibleRows={2}
+        pageSize={2}
         infiniteBatchSize={2}
       />,
     );
 
     expect(screen.getByText("Показано 1–2 из 6")).toBeInTheDocument();
     expect(screen.queryByText("B")).not.toBeInTheDocument();
-    expect(options[0]?.rootMargin).toBe(DATA_TABLE_INFINITE_ROOT_MARGIN);
+    expect(options[0]?.rootMargin).toBe("0px 0px 120px 0px");
 
     act(() => {
       callbacks[0]?.([{ isIntersecting: true } as IntersectionObserverEntry]);
@@ -276,22 +299,48 @@ describe("DataTable", () => {
     expect(scoreCell).toHaveStyle({ minWidth: "4rem", maxWidth: "10rem" });
   });
 
-  it("highlights column on cell mouse enter and clears on table mouse leave", () => {
+  it("highlights the hovered column in the DOM without re-rendering the rows", () => {
+    let cellRenders = 0;
+    const counted: DataTableColumn<Row>[] = [
+      {
+        id: "name",
+        header: "Name",
+        cell: (row) => {
+          cellRenders += 1;
+          return row.name;
+        },
+      },
+      { id: "score", header: "Score", accessor: "score" },
+    ];
     const { container } = render(
-      <DataTable rows={rows.slice(0, 2)} columns={columns} highlightColumnOnHover />,
+      <DataTable rows={rows.slice(0, 2)} columns={counted} highlightColumnOnHover />,
     );
-    const table = container.querySelector("table");
-    expect(table).toBeTruthy();
+    const table = container.querySelector("table") as HTMLTableElement;
     const nameCell = screen.getByRole("cell", { name: "C" });
-    fireEvent.mouseEnter(nameCell);
+    const scoreCell = screen.getByRole("cell", { name: "32" });
+    cellRenders = 0;
+    fireEvent.pointerOver(nameCell);
     expect(nameCell).toHaveAttribute("data-column-hovered", "true");
+    expect(screen.getByRole("cell", { name: "A" })).toHaveAttribute("data-column-hovered", "true");
     expect(screen.getByRole("columnheader", { name: "Name" })).toHaveAttribute(
       "data-column-hovered",
       "true",
     );
-    fireEvent.mouseLeave(table as HTMLTableElement);
+    fireEvent.pointerOver(scoreCell);
+    expect(nameCell).not.toHaveAttribute("data-column-hovered");
+    expect(scoreCell).toHaveAttribute("data-column-hovered", "true");
+    fireEvent.pointerLeave(table);
+    expect(scoreCell).not.toHaveAttribute("data-column-hovered");
+    expect(cellRenders).toBe(0);
+  });
+
+  it("leaves the column highlight off without highlightColumnOnHover", () => {
+    render(<DataTable rows={rows.slice(0, 2)} columns={columns} />);
+    const nameCell = screen.getByRole("cell", { name: "C" });
+    fireEvent.pointerOver(nameCell);
     expect(nameCell).not.toHaveAttribute("data-column-hovered");
   });
+
   it("renders a focusable sort button inside sortable headers", () => {
     render(<DataTable rows={rows.slice(0, 3)} columns={columns} pageSize={10} />);
     const button = screen.getByRole("button", { name: "Name" });
@@ -533,6 +582,36 @@ describe("DataTable CSS contract", () => {
       expect(screen.getByText("C").closest("[data-dragging]")).toBeNull();
     });
 
+    it("a click on the box visual (the label forwards it to the input) toggles once", async () => {
+      const user = userEvent.setup();
+      render(<Selectable />);
+      const visual = box("C").nextElementSibling as HTMLElement;
+      await user.click(visual);
+      expect(box("C")).toBeChecked();
+      await user.click(box("C").closest("td") as HTMLElement);
+      expect(box("C")).not.toBeChecked();
+    });
+
+    it("a drag that returns to its first box ends without toggling it back", () => {
+      render(<Selectable />);
+      const cells = five.map((row) => box(row.name).closest("td") as HTMLElement);
+      const original = document.elementFromPoint;
+      let over: Element = cells[0];
+      document.elementFromPoint = () => over;
+      try {
+        fireEvent.pointerDown(cells[0], { button: 0, pointerType: "mouse" });
+        over = cells[2];
+        fireEvent.pointerMove(window, { clientX: 1, clientY: 1 });
+        over = cells[0];
+        fireEvent.pointerMove(window, { clientX: 2, clientY: 2 });
+        fireEvent.pointerUp(window);
+        fireEvent.click(cells[0], { detail: 1 });
+      } finally {
+        document.elementFromPoint = original;
+      }
+      expect(box("C")).toBeChecked();
+    });
+
     it("header checkbox: indeterminate on partial, selects and clears all", async () => {
       const user = userEvent.setup();
       render(<Selectable />);
@@ -602,6 +681,66 @@ describe("DataTable CSS contract", () => {
       expect(screen.getByText("Денис").closest("tr")).toHaveAttribute("data-expanded", "true");
       await user.click(collapse);
       expect(screen.queryByRole("cell", { name: "Выплата" })).toBeNull();
+    });
+
+    it("measures only the direct sub-rows of a collapsed row", () => {
+      const deep: Node[] = [
+        {
+          id: "root",
+          name: "Корень",
+          score: 1,
+          children: [
+            {
+              id: "child",
+              name: "Ребёнок",
+              score: 2,
+              children: [{ id: "grand", name: "Внук", score: 3 }],
+            },
+          ],
+        },
+      ];
+      render(
+        <DataTable
+          rows={deep}
+          columns={treeColumns}
+          getRowKey={(row) => row.id}
+          getRowChildren={(row) => row.children}
+        />,
+      );
+      expect(screen.getByText("Ребёнок").closest("tbody")).toHaveAttribute("aria-hidden", "true");
+      expect(screen.queryByText("Внук")).toBeNull();
+    });
+
+    it("keeps the detail panel mounted while it closes, then removes it", async () => {
+      vi.stubGlobal("matchMedia", (query: string) => ({
+        matches: false,
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }));
+      try {
+        const user = userEvent.setup();
+        render(
+          <DataTable
+            rows={tree}
+            columns={treeColumns}
+            getRowKey={(row) => row.id}
+            getRowLabel={(row) => row.name}
+            renderExpanded={(row) => <p>Детали: {row.name}</p>}
+            defaultExpanded={["olga"]}
+          />,
+        );
+        const detailRow = screen.getByText("Детали: Ольга").closest("tr") as HTMLElement;
+        expect(detailRow).toHaveAttribute("data-state", "open");
+        await user.click(screen.getByRole("button", { name: "Свернуть строку Ольга" }));
+        expect(detailRow).toHaveAttribute("data-state", "closed");
+        expect(detailRow).toBeInTheDocument();
+        const motion = detailRow.querySelector("td > div") as HTMLElement;
+        fireEvent.transitionEnd(motion);
+        expect(screen.queryByText("Детали: Ольга")).toBeNull();
+      } finally {
+        vi.unstubAllGlobals();
+      }
     });
 
     it("marks rows newly added to the data for the enter animation, not the first fill", () => {

@@ -121,6 +121,39 @@ describe("Dnd.Sortable", () => {
     expect(document.documentElement).not.toHaveAttribute("data-dnd-active");
   });
 
+  it("pointer moves that keep the gap in place re-render no item", () => {
+    let renders = 0;
+    function Counted() {
+      const [items] = React.useState(rows("a", "b", "c", "d"));
+      return (
+        <Dnd.Root>
+          <Dnd.Sortable
+            aria-label="list"
+            items={items}
+            getId={(row) => row.id}
+            onReorder={() => {}}
+            renderItem={(row) => <CountedItem id={row.id} />}
+          />
+        </Dnd.Root>
+      );
+    }
+    function CountedItem({ id }: { id: string }) {
+      renders += 1;
+      return (
+        <Dnd.SortableItem id={id} data-testid={`row-${id}`}>
+          {id}
+        </Dnd.SortableItem>
+      );
+    }
+    render(<Counted />);
+    pressOn(screen.getByTestId("row-a"), 10, 5);
+    moveTo(10, 25);
+    renders = 0;
+    for (let x = 11; x < 21; x += 1) moveTo(x, 25);
+    expect(renders).toBe(0);
+    releaseAt(20, 25);
+  });
+
   it("shapes the gap like the lifted item", () => {
     render(<Sortable initial={rows("a", "b")} />);
     screen.getByTestId("row-a").style.borderRadius = "9px";
@@ -373,6 +406,59 @@ describe("Dnd.Draggable + Dnd.DropZone", () => {
     expect(screen.getByTestId("zone")).toHaveAttribute("data-dnd-reject");
     releaseAt(300, 100);
     expect(onDrop).not.toHaveBeenCalled();
+  });
+
+  it("flashes after a drop until the flash animation ends", async () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
+    const animation = { cancel: () => {}, addEventListener: () => {} };
+    Object.defineProperty(HTMLElement.prototype, "animate", {
+      configurable: true,
+      value: () => animation,
+    });
+    try {
+      render(
+        <Dnd.Root>
+          <Dnd.Draggable kind="card" id="c1" data-testid="card">
+            Card
+          </Dnd.Draggable>
+          <Dnd.DropZone accepts="card" data-testid="zone" flashOnDrop onDrop={() => {}}>
+            <span data-testid="inner">Zone</span>
+          </Dnd.DropZone>
+        </Dnd.Root>,
+      );
+      pressOn(screen.getByTestId("card"), 10, 10);
+      moveTo(300, 100);
+      releaseAt(300, 100);
+      const zone = screen.getByTestId("zone");
+      expect(zone).toHaveAttribute("data-dnd-flash");
+      // An animation of a child is not the zone's flash.
+      fireEvent.animationEnd(screen.getByTestId("inner"));
+      expect(zone).toHaveAttribute("data-dnd-flash");
+      fireEvent.animationEnd(zone);
+      expect(zone).not.toHaveAttribute("data-dnd-flash");
+      // The overlay lands in a microtask after the drop.
+      await act(async () => {});
+    } finally {
+      vi.unstubAllGlobals();
+      Reflect.deleteProperty(HTMLElement.prototype, "animate");
+    }
+  });
+
+  it("does not flash under reduced motion (no animation would end it)", () => {
+    render(
+      <Dnd.Root>
+        <Dnd.Draggable kind="card" id="c1" data-testid="card">
+          Card
+        </Dnd.Draggable>
+        <Dnd.DropZone accepts="card" data-testid="zone" flashOnDrop onDrop={() => {}}>
+          Zone
+        </Dnd.DropZone>
+      </Dnd.Root>,
+    );
+    pressOn(screen.getByTestId("card"), 10, 10);
+    moveTo(300, 100);
+    releaseAt(300, 100);
+    expect(screen.getByTestId("zone")).not.toHaveAttribute("data-dnd-flash");
   });
 
   it("releasing outside every zone drops nothing", () => {

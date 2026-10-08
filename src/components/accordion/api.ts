@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Accordion.Root",
-      en: "`forwardRef` → `HTMLDivElement`. Owns which items are open; sets the size tier and the layout.",
+      en: "`ref` → `HTMLDivElement`. Owns which items are open; sets the size tier and the layout.",
       ru: "Хранит открытые разделы; задаёт ярус и раскладку.",
       props: [
         {
@@ -69,7 +69,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Accordion.Item",
-      en: '`forwardRef` → `HTMLDivElement`. One section; `data-state="open" | "closed"`.',
+      en: '`ref` → `HTMLDivElement`. One section; `data-state="open" | "closed"`.',
       ru: "Один раздел.",
       props: [
         {
@@ -96,7 +96,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Accordion.Header",
-      en: "`forwardRef` → `HTMLHeadingElement`. The `<h3>` around the trigger.",
+      en: "`ref` → `HTMLHeadingElement`. The `<h3>` around the trigger.",
       ru: "Заголовок `<h3>` вокруг кнопки раздела.",
       props: [
         {
@@ -109,7 +109,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Accordion.Trigger",
-      en: "`forwardRef` → `HTMLButtonElement`. The `<button>` that toggles the item; draws a chevron after its children that turns when open.",
+      en: "`ref` → `HTMLButtonElement`. The `<button>` that toggles the item; draws a chevron after its children that turns when open.",
       ru: "Кнопка раздела; после содержимого рисует шеврон, который поворачивается при открытии.",
       props: [
         {
@@ -148,8 +148,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Accordion.Content",
-      en: "`forwardRef` → `HTMLElement`. The `<section>` region; closed content is `inert` and `aria-hidden`. `className` goes to the padded inner block.",
-      ru: "Область `<section>`; закрытое содержимое `inert` и `aria-hidden`. `className` попадает на внутренний блок с отступами.",
+      en: "`ref` → `HTMLElement`. The `<section>` region; closed content is `inert` (out of the tab order and the accessibility tree). `className` goes to the padded inner block.",
+      ru: "Область `<section>`; закрытое содержимое `inert` (вне порядка Tab и дерева доступности). `className` попадает на внутренний блок с отступами.",
       props: [
         {
           name: "children",

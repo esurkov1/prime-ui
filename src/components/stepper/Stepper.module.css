@@ -112,17 +112,22 @@
 }
 
 .root[data-orientation="horizontal"] .item {
+  display: flex;
   flex: 0 1 auto;
+  align-items: center;
+  gap: var(--st-root-h-gap);
 }
 
+/* Each step carries the chevron that leads to it: shown between horizontal steps only. */
 .separator {
-  display: flex;
+  display: none;
   flex-shrink: 0;
   align-items: center;
-  margin: 0;
-  padding: 0;
-  list-style: none;
   color: var(--prime-color-text-placeholder);
+}
+
+.root[data-orientation="horizontal"] .item:not(:first-child) > .separator {
+  display: flex;
 }
 
 /* Kit Icons below take the stepper's own glyph scale, not the control tier (two classes win). */
@@ -310,7 +315,7 @@
     flex-basis: 100%;
   }
 
-  .root[data-orientation="horizontal"] .separator {
+  .root[data-orientation="horizontal"] .item:not(:first-child) > .separator {
     display: none;
   }
 

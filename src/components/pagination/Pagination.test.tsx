@@ -64,6 +64,20 @@ describe("Pagination", () => {
     }
   });
 
+  it("shows every page while they fit the slots the siblings need (2 × siblings + 5)", () => {
+    const { rerender } = render(
+      <Pagination value={5} totalPages={9} siblingCount={2} onValueChange={() => undefined} />,
+    );
+    const nav = screen.getByRole("navigation", { name: "Навигация по страницам" });
+    expect(within(nav).queryByText("…")).toBeNull();
+    expect(within(nav).getAllByRole("button", { name: /^Страница/ })).toHaveLength(9);
+    // No siblings: five slots (first, gap, current, gap, last), so six pages already collapse.
+    rerender(
+      <Pagination value={3} totalPages={6} siblingCount={0} onValueChange={() => undefined} />,
+    );
+    expect(within(nav).getAllByText("…")).toHaveLength(2);
+  });
+
   it("always shows first and last page for long ranges", () => {
     render(<Pagination value={10} totalPages={25} onValueChange={() => undefined} />);
 

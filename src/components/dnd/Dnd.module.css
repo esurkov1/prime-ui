@@ -22,8 +22,7 @@
 .lift {
   box-shadow: var(--prime-shadow-modal);
   transform-origin: center;
-  animation: lift var(--dnd-lift-duration, var(--prime-motion-duration-fast))
-    var(--dnd-easing, var(--prime-motion-easing-standard)) both;
+  animation: lift var(--prime-motion-duration-fast) var(--prime-motion-easing-standard) both;
 }
 
 @keyframes lift {
@@ -164,8 +163,7 @@ li.placeholder {
 
 /* Where it went, after the overlay is gone. */
 .dropZone[data-dnd-flash] {
-  animation: dropFlash calc(var(--prime-motion-duration-slow) * 2)
-    var(--prime-motion-easing-standard);
+  animation: dropFlash var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
 }
 
 @keyframes dropFlash {

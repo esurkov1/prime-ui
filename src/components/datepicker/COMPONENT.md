@@ -170,7 +170,7 @@ Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` 
 - The field is a `<button>` named by the label and the value (or `aria-label` + value); hint and error in `aria-describedby`, an error sets `aria-invalid`.
 - The popover is a `role="dialog"` with a focus trap; focus lands on the picked or today's day.
 - Every month is a table named by the month; days are buttons with the full date as name, picked ones `aria-pressed`, today `aria-current="date"`.
-- The month title and the step prompt are polite live regions; presets are a named group of buttons with `aria-pressed`.
+- One polite live region announces the visible months («Сентябрь 2026 — Октябрь 2026») when they change; the step prompt is a polite live region too; on open the popover focuses the picked (or today's) day (`data-autofocus`); presets are a named group of buttons with `aria-pressed`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

@@ -139,7 +139,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.Handle",
-      en: "`forwardRef` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button with the `action.drag` icon; a press always starts the drag, Alt+arrows on it reorder its item.",
+      en: "`ref` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button with the `action.drag` icon; a press always starts the drag, Alt+arrows on it reorder its item.",
       ru: "Ручка: ghost-кнопка `xs` с иконкой `action.drag`; нажатие всегда начинает перетаскивание, Alt + стрелки двигают её элемент.",
       props: [
         {
@@ -291,9 +291,9 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "moveBefore · useSortableList · useDragSource · useDropTarget · useDraggedItem",
-      en: "Helpers for custom drags; the parts are built on them. `moveBefore(items, id, beforeId, getId)` is the body of every `onReorder`; the hooks expose the sortable engine, a drag source, a drop target and the item in flight.",
-      ru: "Помощники для своих сценариев; части построены на них. `moveBefore(items, id, beforeId, getId)` — тело любого `onReorder`; хуки дают движок сортировки, источник, цель и текущий переносимый элемент.",
+      name: "moveBefore",
+      en: "`moveBefore(items, id, beforeId, getId)` returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.",
+      ru: "`moveBefore(items, id, beforeId, getId)` возвращает `items`, где `id` стоит перед `beforeId` (`null` — в конце): тело любого `onReorder`.",
       props: [],
     },
   ],

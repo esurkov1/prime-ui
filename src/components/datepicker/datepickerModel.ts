@@ -39,10 +39,6 @@ export function sameDay(a: Date | null | undefined, b: Date | null | undefined):
   return a != null && b != null && a.getTime() === b.getTime();
 }
 
-export function toDay(value: Date): Date {
-  return startOfDay(value);
-}
-
 export function minutesOf(value: Date): number {
   return value.getHours() * 60 + value.getMinutes();
 }
@@ -60,11 +56,8 @@ export function withMinutes(day: Date, minutes: number, endOfMinute = false): Da
   );
 }
 
-/**
- * A cell of the month grid. `day` — a day of this month, or `null` for a cell of the adjacent
- * month; `outside` — the adjacent month's date in that cell (shown muted).
- */
-export type MonthCell = { day: Date | null; col: number; outside: Date | null };
+/** A cell of the month grid: its date, and whether it belongs to the month (else it is a muted day of a neighbour). */
+export type MonthCell = { date: Date; inMonth: boolean };
 
 function leadingBlanks(month: Date, weekStartsOn: WeekStart): number {
   return (startOfMonth(month).getDay() - weekStartsOn + 7) % 7;
@@ -82,12 +75,7 @@ export function monthGrid(month: Date, rows: number, weekStartsOn: WeekStart): M
   return Array.from({ length: rows }, (_, r) =>
     Array.from({ length: 7 }, (_, c) => {
       const n = r * 7 + c - lead + 1;
-      const inMonth = n >= 1 && n <= dim;
-      return {
-        day: inMonth ? addDays(first, n - 1) : null,
-        col: c,
-        outside: inMonth ? null : addDays(first, n - 1),
-      };
+      return { date: addDays(first, n - 1), inMonth: n >= 1 && n <= dim };
     }),
   );
 }

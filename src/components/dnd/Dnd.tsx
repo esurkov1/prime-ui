@@ -7,24 +7,20 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { mergeRefs } from "@/internal/mergeRefs";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
-import { DragControllerContext } from "./context";
+import { DragControllerContext, useDragController } from "./context";
 import styles from "./Dnd.module.css";
 import { DragOverlay } from "./DragOverlay";
 import { createDragController, type DragItem, type DragOutcome } from "./dragSession";
 import type { Point, Rect } from "./geometry";
 import { type DndLabels, defaultDndLabels } from "./labels";
 import { useStoreSelector } from "./store";
-import { type DragSourceProps, useDragSource } from "./useDragSource";
+import { useDragSource } from "./useDragSource";
 import { useDropTarget } from "./useDropTarget";
 import { type ReorderReturn, useSortableList } from "./useSortableList";
 
-export type { Activation, DragItem, DragOutcome } from "./dragSession";
+export type { DragItem, DragOutcome } from "./dragSession";
 export type { DndLabels } from "./labels";
-export type { DragSourceOptions } from "./useDragSource";
-export type { DropTargetOptions } from "./useDropTarget";
-export type { InsertionPoint, SortableListOptions } from "./useSortableList";
-
-const DndLabelsContext = React.createContext<DndLabels>(defaultDndLabels);
+export type { DndReorderResult } from "./useSortableList";
 
 // ---------------------------------------------------------------------------------------------
 // Root
@@ -41,10 +37,9 @@ export type DndRootProps = {
  * region. Mount once above every screen that drags: a drag crosses component boundaries.
  */
 function DndRoot({ labels, children }: DndRootProps) {
-  const merged: DndLabels = { ...defaultDndLabels, ...labels };
-  // The controller outlives renders and reads the current strings at announcement time.
-  const labelsRef = React.useRef(merged);
-  labelsRef.current = merged;
+  // The controller outlives renders and reads the current strings when it needs them.
+  const labelsRef = React.useRef<DndLabels>(defaultDndLabels);
+  labelsRef.current = { ...defaultDndLabels, ...labels };
   const [controller] = React.useState(() => createDragController(() => labelsRef.current));
   const message = useStoreSelector(controller.store, (state) => state.announcement.message);
 
@@ -52,13 +47,11 @@ function DndRoot({ labels, children }: DndRootProps) {
 
   return (
     <DragControllerContext value={controller}>
-      <DndLabelsContext value={merged}>
-        {children}
-        <DragOverlay controller={controller} />
-        <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
-          {message}
-        </VisuallyHidden>
-      </DndLabelsContext>
+      {children}
+      <DragOverlay controller={controller} />
+      <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
+        {message}
+      </VisuallyHidden>
     </DragControllerContext>
   );
 }
@@ -71,24 +64,23 @@ DndRoot.displayName = "Dnd.Root";
 export type DndHandleProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "children"
->;
+> & {
+  ref?: React.Ref<HTMLButtonElement>;
+};
 
 /**
  * The grip of a `handle` item: a ghost icon-only Button (`xs`), so it is reachable by keyboard
  * (Alt+arrows reorder).
  */
-const DndHandle = React.forwardRef<HTMLButtonElement, DndHandleProps>(function DndHandle(
-  { className, "aria-label": ariaLabel, ...rest },
-  ref,
-) {
-  const labels = React.useContext(DndLabelsContext);
+function DndHandle({ className, "aria-label": ariaLabel, ref, ...rest }: DndHandleProps) {
+  const controller = useDragController();
   return (
     <Button.Root
       ref={ref}
       variant="ghost"
       tone="neutral"
       size="xs"
-      aria-label={ariaLabel ?? labels.handle}
+      aria-label={ariaLabel ?? controller.labels().handle}
       {...rest}
       data-dnd-handle=""
       className={cx(styles.handle, className)}
@@ -98,7 +90,7 @@ const DndHandle = React.forwardRef<HTMLButtonElement, DndHandleProps>(function D
       </Button.Icon>
     </Button.Root>
   );
-});
+}
 DndHandle.displayName = "Dnd.Handle";
 
 // ---------------------------------------------------------------------------------------------
@@ -113,8 +105,6 @@ type SortableContextValue = {
 };
 
 const SortableContext = React.createContext<SortableContextValue | null>(null);
-
-export type DndReorderResult = { ok: boolean } | undefined;
 
 export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
   /** Items in their current order. */
@@ -223,7 +213,7 @@ function DndSortable<T>({
   return (
     <SortableContext value={context}>
       <Tag
-        ref={ref as React.Ref<never>}
+        ref={ref}
         {...rest}
         {...targetData}
         className={cx(styles.sortable, className)}
@@ -258,13 +248,15 @@ function DndSortableItem({
   ...rest
 }: DndSortableItemProps) {
   const context = React.useContext(SortableContext);
+  // A callback ref fits whichever tag the list picks.
+  const elementRef = React.useMemo(() => mergeRefs<HTMLElement | null>(ref), [ref]);
   if (context === null) throw new Error("Dnd.SortableItem must be rendered inside Dnd.Sortable");
   const Tag = context.itemTag;
   const disabled = context.disabled || itemDisabled;
   const sortable = context.itemProps(id);
   return (
     <Tag
-      ref={ref as React.Ref<never>}
+      ref={elementRef}
       tabIndex={context.handle || disabled ? undefined : 0}
       aria-keyshortcuts={disabled ? undefined : "Alt+ArrowUp Alt+ArrowDown"}
       {...rest}
@@ -360,13 +352,15 @@ function DndDraggable<TData = unknown>({
     kind,
     disabled,
     handleOnly: handle,
-    onDragStart: onDragStart as never,
-    onDragEnd: onDragEnd as never,
+    onDragStart,
+    onDragEnd,
   });
-  const dragProps: DragSourceProps = source.props({ id, data, label: label ?? id });
+  const dragProps = source.props({ id, data, label: label ?? id });
+  // A callback ref fits whichever tag `as` picks.
+  const elementRef = React.useMemo(() => mergeRefs<HTMLElement | null>(ref), [ref]);
   return (
     <Tag
-      ref={ref as React.Ref<never>}
+      ref={elementRef}
       {...rest}
       {...dragProps}
       onPointerDown={(event: React.PointerEvent<HTMLElement>) => {
@@ -415,6 +409,7 @@ function DndDropZone<TData = unknown>({
   as: Tag = "div",
   className,
   children,
+  onAnimationEnd,
   ref: forwardedRef,
   ...rest
 }: DndDropZoneProps<TData>) {
@@ -435,9 +430,13 @@ function DndDropZone<TData = unknown>({
   );
   return (
     <Tag
-      ref={ref as React.Ref<never>}
+      ref={ref}
       {...rest}
       {...targetData}
+      onAnimationEnd={(event: React.AnimationEvent<HTMLElement>) => {
+        onAnimationEnd?.(event);
+        targetData.onAnimationEnd(event);
+      }}
       className={cx(styles.dropZone, className)}
       data-disabled={disabled || undefined}
     >

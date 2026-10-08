@@ -50,7 +50,7 @@ Stepper.Root                 <ol>; current step; chevrons between horizontal ite
 | `…rest` | `Omit<OlHTMLAttributes<HTMLOListElement>, "defaultValue" \| "onChange">` | — | `aria-label`, `className` and the other list attributes. |
 
 ### Stepper.Item
-`forwardRef` → `HTMLButtonElement`. One step: an `<li>` with a `<button>`; `aria-current="step"` when active.
+`ref` → `HTMLButtonElement`. One step: an `<li>` with a `<button>` (and, between horizontal steps, the decorative chevron in front of it); `aria-current="step"` when active.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -164,7 +164,7 @@ No `labels`.
 ## Mistakes
 - Wrapping `Stepper.Item` in another component or element → it must be a direct child of Root (it throws otherwise).
 - 1-based `value` → steps are 0-based.
-- Adding separators by hand in horizontal mode → the root inserts them.
+- Adding separators by hand in horizontal mode → every step already draws its chevron.
 - `status="error"` → the status is `danger`; give it an indicator that is not a number so it does not read by color only.
 
 ## Related

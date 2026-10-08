@@ -48,8 +48,8 @@ export const api: ComponentApi = {
         {
           name: "current",
           type: "boolean",
-          en: 'Current page: `aria-current="page"`, primary text, medium weight. The last item, without `href`.',
-          ru: 'Текущая страница: `aria-current="page"`, основной текст. Последний уровень, без `href`.',
+          en: 'Current page: `aria-current="page"` (on the link when `href` is set), primary text, medium weight. Usually the last item, without `href`.',
+          ru: 'Текущая страница: `aria-current="page"` (на ссылке, если есть `href`), основной текст. Обычно последний уровень, без `href`.',
         },
         {
           name: "aria-label",

@@ -3,7 +3,7 @@ import * as React from "react";
 import { formatLabel } from "@/internal/formatLabel";
 
 import { useDragController } from "./context";
-import type { Activation, DragItem } from "./dragSession";
+import type { DragItem } from "./dragSession";
 import { type Axis, insertionBefore } from "./geometry";
 import { useStoreSelector } from "./store";
 import { type DragSourceProps, useDraggedItem, useDragSource } from "./useDragSource";
@@ -18,11 +18,11 @@ import { useFlipList } from "./useFlipList";
 export type InsertionPoint = { before: string | null; moves: boolean };
 
 /** What a caller's own write may answer. Answering is optional; `{ ok: false }` rolls the drawn order back at once. */
-export type ReorderOutcome = { ok: boolean } | undefined;
+export type DndReorderResult = { ok: boolean } | undefined;
 
 // `void` (not `undefined`) so that `(id, before) => { setItems(...) }` is assignable.
 // biome-ignore lint/suspicious/noConfusingVoidType: a callback that returns nothing must fit.
-export type ReorderReturn = ReorderOutcome | void;
+export type ReorderReturn = DndReorderResult | void;
 
 export type SortableListOptions = {
   kind: string;
@@ -36,8 +36,6 @@ export type SortableListOptions = {
   canDrop?: ((id: string) => boolean) | undefined;
   /** Only a press on a `[data-dnd-handle]` element starts a drag. */
   handleOnly?: boolean | undefined;
-  itemSelector?: string | undefined;
-  activation?: Activation | undefined;
 };
 
 export type SortableItemProps = DragSourceProps & {
@@ -61,7 +59,7 @@ export type SortableListHandle = {
   order: readonly string[];
 };
 
-const DEFAULT_SELECTOR = "[data-dnd-item]";
+const ITEM_SELECTOR = "[data-dnd-item]";
 
 // How long the drawn order may run ahead of `items` (reached only when a reorder is silently refused).
 const OPTIMISTIC_TIMEOUT_MS = 2000;
@@ -97,7 +95,6 @@ function neighbourAfter(items: readonly string[], id: string): string | null {
 export function useSortableList(options: SortableListOptions): SortableListHandle {
   const { kind, items, labelOf, onReorder, disabled } = options;
   const axis = options.axis ?? "y";
-  const itemSelector = options.itemSelector ?? DEFAULT_SELECTOR;
   const controller = useDragController();
   // Held here, not read off the drop target: a pointer that wanders out of the list must not close
   // the hole, the item is still in the air.
@@ -168,7 +165,6 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
       }
       setPlacement(null);
     },
-    ...(options.activation !== undefined ? { activation: options.activation } : {}),
   });
 
   const resolve = React.useCallback(
@@ -180,7 +176,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
       const grab = controller.store.getSnapshot().grab ?? { x: 0, y: 0 };
       const before = insertionBefore(
         element,
-        itemSelector,
+        ITEM_SELECTOR,
         { x: point.x - grab.x, y: point.y - grab.y },
         axis,
         item.id,
@@ -196,7 +192,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
       );
       return next;
     },
-    [axis, controller, itemSelector, order],
+    [axis, controller, order],
   );
 
   const target = useDropTarget<InsertionPoint>({
@@ -236,7 +232,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
   useFlipList(
     target.element,
     JSON.stringify([order, dragged?.id ?? null, gapKey]),
-    itemSelector,
+    ITEM_SELECTOR,
     // Only while the item is in the air: after the drop the list already stands in its final order.
     dragged !== null,
   );
@@ -260,10 +256,11 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
     [controller, items, labelOf, onReorder],
   );
 
+  const { props: sourceProps, draggingId: liftedId } = source;
   const itemProps = React.useCallback(
     (id: string): SortableItemProps => ({
-      ...source.props({ id, data: null, label: labelOf(id) }),
-      "data-lifted": source.draggingId === id || undefined,
+      ...sourceProps({ id, data: null, label: labelOf(id) }),
+      "data-lifted": liftedId === id || undefined,
       onKeyDown: (event) => {
         // Alt, so plain arrows keep whatever they mean on the element.
         if (disabled || !event.altKey) return;
@@ -274,7 +271,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
         move(id, event.key === back ? -1 : 1);
       },
     }),
-    [axis, disabled, labelOf, move, source],
+    [axis, disabled, labelOf, move, sourceProps, liftedId],
   );
 
   return {

@@ -1,6 +1,5 @@
-import { format } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import { ru } from "date-fns/locale";
-import * as React from "react";
 
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -17,13 +16,9 @@ import {
   DATEPICKER_LABELS,
   DatepickerPanel,
   type DatepickerPanelProps,
-  InPopoverContext,
   PanelView,
-  type RangeModeProps,
-  type ResolvedValue,
-  type SingleModeProps,
   splitCalendarOptions,
-  useResolvedValue,
+  useDatepickerValue,
 } from "./DatepickerPanel";
 import {
   DAY_END_MINUTES,
@@ -34,9 +29,7 @@ import {
   matchPreset,
   minutesOf,
   sameDay,
-  toDay,
 } from "./datepickerModel";
-import { useContainScroll } from "./panelLayout";
 
 export type { DatepickerLabels, DatepickerPanelProps } from "./DatepickerPanel";
 export type { DatepickerPreset, DatepickerRange, WeekStart } from "./datepickerModel";
@@ -46,21 +39,23 @@ export {
   YEARLESS_YEAR,
 } from "./datepickerModel";
 
-/** Field text of a value: a preset name, «6 окт — 3 нояб», with time when the bounds are not whole days. */
-function formatValue(props: CalendarOptions & ResolvedValue): string | null {
+/** Text of a value as the field shows it (preset name, «6 окт — 3 нояб», time when needed). */
+export function formatDatepickerValue(
+  props: CalendarOptions &
+    ({ mode: "range"; value: DatepickerRange } | { mode: "single"; value: Date | null }),
+): string | null {
   const locale = props.locale ?? ru;
-  const labels = { ...DATEPICKER_LABELS, ...props.labels };
-  const today = toDay(props.today ?? new Date());
+  const today = startOfDay(props.today ?? new Date());
   if (props.mode === "single") {
     if (!props.value) return null;
     if (props.yearless) return format(props.value, "d MMMM", { locale });
     const time = props.withTime ? ` ${formatTime(minutesOf(props.value))}` : "";
-    return `${formatDayShort(toDay(props.value), today, locale)}${time}`;
+    return `${formatDayShort(startOfDay(props.value), today, locale)}${time}`;
   }
   const { from, to } = props.value;
   if (!to) return null;
-  const fromDay = from ? toDay(from) : null;
-  const lastDay = toDay(to);
+  const fromDay = from ? startOfDay(from) : null;
+  const lastDay = startOfDay(to);
   const wholeDays =
     (from == null || minutesOf(from) === DAY_START_MINUTES) && minutesOf(to) === DAY_END_MINUTES;
   if (wholeDays && props.presets) {
@@ -69,17 +64,9 @@ function formatValue(props: CalendarOptions & ResolvedValue): string | null {
   }
   const time = (d: Date) => (wholeDays ? "" : ` ${formatTime(minutesOf(d))}`);
   const toText = `${formatDayShort(lastDay, today, locale)}${time(to)}`;
-  if (!from || !fromDay) return `${labels.until} ${toText}`;
+  if (!from || !fromDay) return `${props.labels?.until ?? DATEPICKER_LABELS.until} ${toText}`;
   if (wholeDays && sameDay(fromDay, lastDay)) return formatDayShort(fromDay, today, locale);
   return `${formatDayShort(fromDay, today, locale)}${time(from)} — ${toText}`;
-}
-
-/** Text of a value as the field shows it (preset name, «6 окт — 3 нояб», time when needed). */
-export function formatDatepickerValue(
-  props: CalendarOptions &
-    ({ mode: "range"; value: DatepickerRange } | { mode: "single"; value: Date | null }),
-): string | null {
-  return formatValue({ ...props, onChange: () => {} } as CalendarOptions & ResolvedValue);
 }
 
 export type DatepickerRootProps = DatepickerPanelProps &
@@ -108,43 +95,38 @@ export type DatepickerRootProps = DatepickerPanelProps &
   };
 
 /** A field (field system: fill, tier height, rings) with the value; a click opens the panel in a popover. */
-function DatepickerRoot({
-  mode,
-  value: valueProp,
-  defaultValue,
-  onValueChange,
-  resetValue,
-  size = "m",
-  placeholder,
-  valuePrefix,
-  open: openProp,
-  defaultOpen = false,
-  onOpenChange,
-  disabled = false,
-  invalid: invalidProp,
-  focusRing = true,
-  fullWidth = false,
-  align = "start",
-  id,
-  label,
-  required = false,
-  optional,
-  hint,
-  error,
-  className,
-  "aria-label": ariaLabel,
-  "aria-labelledby": ariaLabelledBy,
-  "aria-describedby": ariaDescribedBy,
-  ...props
-}: DatepickerRootProps) {
-  const { options, rest } = splitCalendarOptions(props);
-  const resolved = useResolvedValue({
+function DatepickerRoot(props: DatepickerRootProps) {
+  const value = useDatepickerValue(props);
+  const {
     mode,
-    value: valueProp,
+    value: _value,
     defaultValue,
     onValueChange,
     resetValue,
-  } as RangeModeProps | SingleModeProps);
+    size = "m",
+    placeholder,
+    valuePrefix,
+    open: openProp,
+    defaultOpen = false,
+    onOpenChange,
+    disabled = false,
+    invalid: invalidProp,
+    focusRing = true,
+    fullWidth = false,
+    align = "start",
+    id,
+    label,
+    required = false,
+    optional,
+    hint,
+    error,
+    className,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-describedby": ariaDescribedBy,
+    ...other
+  } = props;
+  const { options, rest } = splitCalendarOptions(other);
   const labels = { ...DATEPICKER_LABELS, ...options.labels };
   const ids = useFieldFrame(id, { hint, error, invalid: invalidProp }, ariaDescribedBy);
   const textId = `${ids.controlId}-value`;
@@ -154,11 +136,9 @@ function DatepickerRoot({
     onChange: onOpenChange,
   });
   const open = openState && !disabled;
-  const [panelNode, setPanelNode] = React.useState<HTMLDivElement | null>(null);
-  useContainScroll(panelNode);
-  const value = formatValue({ ...options, size, ...resolved });
-  const text = value
-    ? `${valuePrefix ? `${valuePrefix} ` : ""}${value}`
+  const shown = formatDatepickerValue({ ...options, labels, ...value });
+  const text = shown
+    ? `${valuePrefix ? `${valuePrefix} ` : ""}${shown}`
     : (placeholder ?? labels.placeholder);
   const hasLabel = label != null && label !== false;
 
@@ -193,7 +173,7 @@ function DatepickerRoot({
             className={styles.trigger}
             {...toDataAttributes({
               size,
-              empty: value ? undefined : true,
+              empty: shown ? undefined : true,
               "full-width": fullWidth || undefined,
               invalid: ids.invalid || undefined,
               disabled: disabled || undefined,
@@ -215,13 +195,17 @@ function DatepickerRoot({
           side="bottom"
           size={size}
           trapFocus
+          flush
           className={styles.popover}
         >
-          <div ref={setPanelNode} className={styles.popoverBody}>
-            <InPopoverContext.Provider value={true}>
-              <PanelView {...options} size={size} {...resolved} onDone={() => setOpen(false)} />
-            </InPopoverContext.Provider>
-          </div>
+          <PanelView
+            {...options}
+            {...value}
+            size={size}
+            labels={labels}
+            embedded={false}
+            onDone={() => setOpen(false)}
+          />
         </Popover.Content>
       </Popover.Root>
     </FieldFrame>

@@ -11,9 +11,13 @@ import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Pagination.module.css";
 
-/** Page numbers around `page` with `"…"` gaps; first and last are always shown. */
+/**
+ * Page numbers around `page` with `"…"` gaps; first and last are always shown. The collapsed view
+ * takes first + gap + siblings + current + siblings + gap + last slots: while every page fits
+ * that, every page is shown.
+ */
 function pageRange(page: number, total: number, siblings: number): Array<number | "…"> {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (total <= 2 * siblings + 5) return Array.from({ length: total }, (_, i) => i + 1);
   const left = Math.max(2, page - siblings);
   const right = Math.min(total - 1, page + siblings);
   const pages: Array<number | "…"> = [1];

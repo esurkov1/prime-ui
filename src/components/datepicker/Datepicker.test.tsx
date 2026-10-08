@@ -8,13 +8,31 @@ import { resolvePanelLayout } from "./panelLayout";
 
 const TODAY = new Date(2026, 9, 7); // 7 October 2026, a Wednesday
 
+/** jsdom loads no stylesheet: the layout tokens the panel reads are set on the root for a test. */
+const LAYOUT_TOKENS = {
+  "--prime-control-m-item-height": "32px",
+  "--prime-space-6": "24px",
+  "--prime-space-3": "12px",
+  "--prime-card-padding-s": "16px",
+};
+function withLayoutTokens(run: () => void) {
+  const root = document.documentElement.style;
+  for (const [name, value] of Object.entries(LAYOUT_TOKENS)) root.setProperty(name, value);
+  try {
+    run();
+  } finally {
+    for (const name of Object.keys(LAYOUT_TOKENS)) root.removeProperty(name);
+  }
+}
+
 describe("datepickerModel", () => {
   it("сетка месяца начинается с понедельника и выравнивает строки", () => {
     const oct = new Date(2026, 9, 1); // a Thursday
     const rows = rowsNeeded(oct, 1);
     const grid = monthGrid(oct, rows, 1);
-    expect(grid[0].slice(0, 3).every((c) => c.day == null)).toBe(true);
-    expect(grid[0][3].day?.getDate()).toBe(1);
+    expect(grid[0].slice(0, 3).every((c) => !c.inMonth)).toBe(true);
+    expect(grid[0][0].date.getDate()).toBe(28);
+    expect(grid[0][3]).toEqual({ date: oct, inMonth: true });
     expect(rows).toBe(5);
   });
 
@@ -131,7 +149,7 @@ describe("Datepicker.Panel", () => {
     expect(screen.getByRole("button", { name: "8 октября 2026" })).toHaveFocus();
     fireEvent.keyDown(document.activeElement as Element, { key: "PageDown" });
     expect(screen.getByRole("button", { name: "8 ноября 2026" })).toHaveFocus();
-    expect(screen.getByText("Ноябрь 2026")).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Ноябрь 2026" })).toBeInTheDocument();
   });
 
   it("yearless: без года в заголовке, листание по кругу", async () => {
@@ -144,9 +162,9 @@ describe("Datepicker.Panel", () => {
         onValueChange={onChange}
       />,
     );
-    expect(screen.getByText("Декабрь")).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Декабрь" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Следующий месяц" }));
-    expect(screen.getByText("Январь")).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Январь" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "15 января" }));
     expect(onChange.mock.calls[0][0]).toEqual(new Date(YEARLESS_YEAR, 0, 15));
   });
@@ -159,7 +177,7 @@ describe("Datepicker.Panel — сетка и раскладка", () => {
     today.focus();
     fireEvent.keyDown(today, { key: "PageDown", shiftKey: true });
     expect(screen.getByRole("button", { name: "7 октября 2027" })).toHaveFocus();
-    expect(screen.getByText("Октябрь 2027")).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Октябрь 2027" })).toBeInTheDocument();
   });
 
   it("в одном месяце показывает дни соседних месяцев приглушённо и без кнопок", () => {
@@ -175,23 +193,74 @@ describe("Datepicker.Panel — сетка и раскладка", () => {
     const original = window.innerWidth;
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 320 });
     try {
-      render(
-        <Datepicker.Root
-          mode="range"
-          value={{ from: null, to: null }}
-          onValueChange={() => {}}
-          months={2}
-          presets={[datepickerPresets.today]}
-          today={TODAY}
-          open
-        />,
-      );
-      const dialog = screen.getByRole("dialog");
-      expect(dialog.querySelector('[data-layout="stacked"]')).not.toBeNull();
-      expect(screen.getAllByRole("table")).toHaveLength(1);
+      withLayoutTokens(() => {
+        render(
+          <Datepicker.Root
+            mode="range"
+            value={{ from: null, to: null }}
+            onValueChange={() => {}}
+            months={2}
+            presets={[datepickerPresets.today]}
+            today={TODAY}
+            open
+          />,
+        );
+        const dialog = screen.getByRole("dialog");
+        expect(dialog.querySelector('[data-layout="stacked"]')).not.toBeNull();
+        expect(screen.getAllByRole("table")).toHaveLength(1);
+      });
     } finally {
       Object.defineProperty(window, "innerWidth", { configurable: true, value: original });
     }
+  });
+});
+
+describe("Datepicker.Panel — value and draft", () => {
+  it("with a footer, an outside value change reaches the draft", () => {
+    const { rerender } = render(
+      <Datepicker.Panel mode="single" footer value={new Date(2026, 9, 7)} today={TODAY} />,
+    );
+    expect(screen.getByText("07.10.2026")).toBeInTheDocument();
+    rerender(<Datepicker.Panel mode="single" footer value={new Date(2026, 9, 9)} today={TODAY} />);
+    expect(screen.getByText("09.10.2026")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "9 октября 2026" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  it("without a footer, the band follows the outside value", () => {
+    const { rerender } = render(
+      <Datepicker.Panel
+        mode="range"
+        value={{ from: new Date(2026, 9, 5), to: new Date(2026, 9, 6) }}
+        today={TODAY}
+      />,
+    );
+    rerender(
+      <Datepicker.Panel
+        mode="range"
+        value={{ from: new Date(2026, 9, 12), to: new Date(2026, 9, 14) }}
+        today={TODAY}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "13 октября 2026" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "5 октября 2026" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+  });
+
+  it("announces the visible months in one live region", () => {
+    const { container } = render(
+      <Datepicker.Panel mode="range" months={2} today={TODAY} value={{ from: null, to: null }} />,
+    );
+    const live = container.querySelectorAll("[aria-live]");
+    expect(live).toHaveLength(1);
+    expect(live[0]).toHaveTextContent("Сентябрь 2026 — Октябрь 2026");
   });
 });
 
@@ -257,6 +326,19 @@ describe("Datepicker.Root", () => {
       "aria-pressed",
       "true",
     );
+  });
+
+  it("opening the popover focuses the picked day", async () => {
+    render(
+      <Datepicker.Root
+        mode="single"
+        defaultValue={new Date(2026, 9, 9)}
+        today={TODAY}
+        aria-label="Дата"
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: /Дата/ }));
+    expect(screen.getByRole("button", { name: "9 октября 2026" })).toHaveFocus();
   });
 
   it("без значения показывает placeholder", () => {
@@ -356,7 +438,12 @@ describe("Datepicker — overlay contract", () => {
 
 describe("Datepicker.Panel — доступная ширина", () => {
   it("resolvePanelLayout: 2 месяца при достаточной ширине, 1 — на узкой, compact уже месяца", () => {
-    const base = { size: "m" as const, months: 2 as const, hasPresets: false, embedded: true };
+    const base = {
+      months: 2 as const,
+      hasPresets: false,
+      embedded: true,
+      metrics: { cell: 32, monthsGap: 24, chrome: 32 },
+    };
     // m: cell 32 → month 224; 2 months + gap 24 + padding 2 × 16 = 504.
     expect(resolvePanelLayout({ ...base, available: 1440 }).monthCount).toBe(2);
     expect(resolvePanelLayout({ ...base, available: 504 }).monthCount).toBe(2);
@@ -371,6 +458,9 @@ describe("Datepicker.Panel — доступная ширина", () => {
     expect(resolvePanelLayout({ ...base, available: null }).monthCount).toBe(2);
     // The popover is never compact.
     expect(resolvePanelLayout({ ...base, embedded: false, available: 200 }).compact).toBe(false);
+    // No readable tokens (no stylesheet): everything is assumed to fit.
+    const unstyled = { ...base, metrics: { cell: 0, monthsGap: 0, chrome: 0 } };
+    expect(resolvePanelLayout({ ...unstyled, available: 200 }).monthCount).toBe(2);
   });
 
   it("меряет content box родителя, а не саму панель", () => {
@@ -394,25 +484,27 @@ describe("Datepicker.Panel — доступная ширина", () => {
       disconnect() {}
     } as unknown as typeof ResizeObserver;
     try {
-      const { container } = render(
-        <div data-testid="host">
-          <Datepicker.Panel
-            mode="range"
-            months={2}
-            value={{ from: null, to: null }}
-            onValueChange={() => {}}
-            today={TODAY}
-          />
-        </div>,
-      );
-      expect(observed).toEqual([screen.getByTestId("host")]);
-      notify?.(1200);
-      expect(container.querySelectorAll("table")).toHaveLength(2);
-      notify?.(343);
-      expect(container.querySelectorAll("table")).toHaveLength(1);
-      expect(container.querySelector("[data-embedded]")).not.toHaveAttribute("data-compact");
-      notify?.(240);
-      expect(container.querySelector("[data-compact]")).not.toBeNull();
+      withLayoutTokens(() => {
+        const { container } = render(
+          <div data-testid="host">
+            <Datepicker.Panel
+              mode="range"
+              months={2}
+              value={{ from: null, to: null }}
+              onValueChange={() => {}}
+              today={TODAY}
+            />
+          </div>,
+        );
+        expect(observed).toEqual([screen.getByTestId("host")]);
+        notify?.(1200);
+        expect(container.querySelectorAll("table")).toHaveLength(2);
+        notify?.(343);
+        expect(container.querySelectorAll("table")).toHaveLength(1);
+        expect(container.querySelector("[data-embedded]")).not.toHaveAttribute("data-compact");
+        notify?.(240);
+        expect(container.querySelector("[data-compact]")).not.toBeNull();
+      });
     } finally {
       globalThis.ResizeObserver = Original;
     }

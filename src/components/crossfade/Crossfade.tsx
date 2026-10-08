@@ -27,7 +27,7 @@ export function Crossfade({ state, children, className, ref, ...rest }: Crossfad
   const swapped = useStateSwap(state);
   const rootRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(rootRef, ref);
-  /** Root border-box height as last laid out: the start of the next height glide. */
+  /** Root border-box height when the state changed: the start of the height glide. */
   const heightRef = React.useRef<number | null>(null);
   /** Children of the current state from the last commit: what the outgoing layer keeps showing. */
   const childrenRef = React.useRef(children);
@@ -36,6 +36,8 @@ export function Crossfade({ state, children, className, ref, ...rest }: Crossfad
 
   // Derived during render: the old content stays mounted (same key, same instance) as a layer.
   if (state !== current) {
+    // The DOM still shows the old state: its height is where the glide starts.
+    heightRef.current = rootRef.current?.getBoundingClientRect().height ?? null;
     const outgoing: Layer = { key: current, children: childrenRef.current };
     setLeaving((list) =>
       prefersReducedMotion()
@@ -48,19 +50,6 @@ export function Crossfade({ state, children, className, ref, ...rest }: Crossfad
   React.useLayoutEffect(() => {
     childrenRef.current = children;
   });
-
-  // Track the laid-out height between swaps (content may resize without a render).
-  React.useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    heightRef.current = root.getBoundingClientRect().height;
-    if (typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => {
-      heightRef.current = root.getBoundingClientRect().height;
-    });
-    observer.observe(root);
-    return () => observer.disconnect();
-  }, []);
 
   // Height glide: from the old laid-out height to the new natural one, then back to `auto`.
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs once per state change

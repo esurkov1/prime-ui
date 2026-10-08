@@ -79,13 +79,6 @@ function StepperRoot({
     }
     const index = nextIndex;
     nextIndex += 1;
-    if (orientation === "horizontal" && index > 0) {
-      items.push(
-        <li key={`separator-${child.key}`} className={styles.separator} aria-hidden="true">
-          <Icon name="nav.chevronRight" className={styles.separatorIcon} strokeWidth={2} />
-        </li>,
-      );
-    }
     items.push(
       <StepperIndexContext.Provider key={child.key} value={index}>
         {child}
@@ -114,12 +107,17 @@ StepperRoot.displayName = "Stepper.Root";
 export type StepperItemProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
   /** Overrides the status derived from the Root `value` (e.g. `danger`). */
   status?: StepperItemStatus;
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
-const StepperItem = React.forwardRef<HTMLButtonElement, StepperItemProps>(function StepperItem(
-  { status: statusProp, children, className, disabled, onClick, ...rest },
-  ref,
-) {
+function StepperItem({
+  status: statusProp,
+  children,
+  className,
+  disabled,
+  onClick,
+  ...rest
+}: StepperItemProps) {
   const { value, select } = useStepperRootContext();
   const index = React.useContext(StepperIndexContext);
   if (index === null) {
@@ -131,9 +129,12 @@ const StepperItem = React.forwardRef<HTMLButtonElement, StepperItemProps>(functi
   return (
     <StepperItemProvider value={itemContext}>
       <li className={styles.item}>
+        {/* Decorative chevron in front of the step; CSS shows it only between horizontal steps. */}
+        <span className={styles.separator} aria-hidden="true">
+          <Icon name="nav.chevronRight" className={styles.separatorIcon} strokeWidth={2} />
+        </span>
         <button
           {...rest}
-          ref={ref}
           type="button"
           disabled={disabled}
           className={cx(styles.step, className)}
@@ -149,7 +150,7 @@ const StepperItem = React.forwardRef<HTMLButtonElement, StepperItemProps>(functi
       </li>
     </StepperItemProvider>
   );
-});
+}
 StepperItem.displayName = "Stepper.Item";
 
 // ─── Parts ────────────────────────────────────────────────────────────────────

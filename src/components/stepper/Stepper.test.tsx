@@ -90,11 +90,13 @@ describe("Stepper", () => {
     expect(screen.getByText("★")).toBeInTheDocument();
   });
 
-  it("inserts separators between horizontal steps without consuming indexes", () => {
+  it("draws horizontal separators inside the steps: every list item is a step", () => {
     render(<ThreeStepStepper orientation="horizontal" value={1} />);
-    const list = screen.getByRole("list");
-    expect(list.children).toHaveLength(5);
-    expect(list.children[1]).toHaveAttribute("aria-hidden", "true");
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(3);
+    for (const item of items) expect(item).not.toHaveAttribute("aria-hidden");
+    // A decorative chevron leads each step; CSS shows it only between horizontal steps.
+    expect(items[1].querySelector('[aria-hidden="true"] svg')).toBeInTheDocument();
     const buttons = screen.getAllByRole("button");
     expect(buttons[0].querySelector("svg")).toBeTruthy();
     expect(within(buttons[1]).getByText("2")).toBeInTheDocument();
