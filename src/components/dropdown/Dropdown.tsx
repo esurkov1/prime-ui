@@ -2,25 +2,16 @@ import * as React from "react";
 
 import { Divider } from "@/components/divider/Divider";
 import { Kbd } from "@/components/kbd/Kbd";
-import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
-import { useFocusTrap } from "@/hooks/useFocusTrap";
-import { useOutsideClick } from "@/hooks/useOutsideClick";
-import { type PositionAlign, type PositionSide, usePosition } from "@/hooks/usePosition";
-import { usePresence } from "@/hooks/usePresence";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import surface from "@/internal/floatingSurface.module.css";
+import { MenuGroup, type MenuGroupProps } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
-import { mergeRefs } from "@/internal/mergeRefs";
-import { DropdownLayerContext, useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
-import overlayMotion from "@/internal/overlayMotion.module.css";
-import { Portal } from "@/internal/Portal";
+import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
+import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { rovingIndex } from "@/internal/rovingFocus";
-import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Dropdown.module.css";
@@ -85,22 +76,27 @@ DropdownRoot.displayName = "Dropdown.Root";
 export type DropdownTriggerProps = {
   /** The element that opens the menu (usually a Button); it receives ref, ARIA and the click handler. */
   children: React.ReactElement;
-};
+  ref?: React.Ref<HTMLElement>;
+} & Omit<React.HTMLAttributes<HTMLElement>, "children">;
 
-function DropdownTrigger({ children }: DropdownTriggerProps) {
+/** Other props (handlers, ARIA, `ref`) are forwarded to the child, e.g. from a wrapping `Tooltip.Trigger`. */
+function DropdownTrigger({ children, ...forwarded }: DropdownTriggerProps) {
   const { isOpen, setOpen, triggerId, menuId, triggerRef } = useDropdownContext();
   return (
-    <Slot
-      ref={triggerRef}
-      id={triggerId}
-      aria-expanded={isOpen}
-      aria-haspopup="menu"
-      aria-controls={menuId}
-      data-state={isOpen ? "open" : "closed"}
-      onClick={() => setOpen((value) => !value)}
+    <FloatingTrigger
+      {...forwarded}
+      triggerProps={{
+        ref: triggerRef,
+        id: triggerId,
+        "aria-expanded": isOpen,
+        "aria-haspopup": "menu",
+        "aria-controls": menuId,
+        "data-state": isOpen ? "open" : "closed",
+        onClick: () => setOpen((value) => !value),
+      }}
     >
       {children}
-    </Slot>
+    </FloatingTrigger>
   );
 }
 DropdownTrigger.displayName = "Dropdown.Trigger";
@@ -135,73 +131,44 @@ function DropdownContent({
   className,
   children,
   onKeyDown,
-  ref,
   ...rest
 }: DropdownContentProps) {
   const { isOpen, setOpen, triggerRef, menuId, triggerId, closeOnOutsideClick, closeOnEscape } =
     useDropdownContext();
-  const overlayPortalLayer = useOverlayPortalLayer();
-  const contentRef = React.useRef<HTMLElement | null>(null);
-  const presence = usePresence(isOpen, { exitDuration: "fast" });
 
-  // Keeps its position while the exit animation plays.
-  const position = usePosition(presence.mounted, triggerRef, contentRef, {
+  // WAI-ARIA menu button: focus goes to the first item; Escape, a pick and Tab return it to the
+  // trigger (Tab then moves on); an outside press leaves focus where the pointer put it.
+  const floating = useFloatingLayer({
+    open: isOpen,
+    onOpenChange: setOpen,
+    triggerRef,
     side,
     align,
     matchAnchorWidth: matchTriggerWidth,
+    closeOnEscape,
+    closeOnOutsideClick,
+    focusOnOpen: true,
+    tabExit: "always",
   });
-  // The trap restores focus to the trigger on Escape; an outside press skips the restore (§8).
-  const trapRef = useFocusTrap<HTMLDivElement>({ enabled: isOpen, restoreFocus: true });
-  const mergedRef = React.useMemo(
-    () => mergeRefs<HTMLDivElement>(position.attachLayer, trapRef, ref),
-    [position.attachLayer, trapRef, ref],
-  );
-
-  useEscapeKey({ enabled: isOpen && closeOnEscape, onEscape: () => setOpen(false) });
-  useOutsideClick({
-    refs: [triggerRef, contentRef],
-    enabled: isOpen,
-    onOutsideClick: () => {
-      if (closeOnOutsideClick) setOpen(false);
-    },
-  });
-
-  if (!presence.mounted) return null;
 
   return (
-    <Portal>
-      <ControlSizeProvider value={size}>
-        <DropdownLayerContext.Provider value>
-          <ScrollContainer
-            {...rest}
-            ref={mergedRef}
-            id={menuId}
-            role="menu"
-            aria-labelledby={triggerRef.current?.id || triggerId}
-            data-react-aria-top-layer="true"
-            data-overlay-portal-layer={overlayPortalLayer}
-            data-side={position.side}
-            data-state={presence.state}
-            data-size={size}
-            className={cx(
-              surface.surface,
-              surface.dropdownLayer,
-              menu.tier,
-              menu.menu,
-              overlayMotion.floating,
-              className,
-            )}
-            onAnimationEnd={presence.onExitEnd}
-            onKeyDown={(event) => {
-              onKeyDown?.(event);
-              if (!event.defaultPrevented) moveFocus(event);
-            }}
-          >
-            {children}
-          </ScrollContainer>
-        </DropdownLayerContext.Provider>
-      </ControlSizeProvider>
-    </Portal>
+    <FloatingPanel
+      {...rest}
+      floating={floating}
+      size={size}
+      tier="dropdown"
+      scroll
+      id={menuId}
+      role="menu"
+      aria-labelledby={triggerRef.current?.id || triggerId}
+      className={cx(menu.tier, menu.menu, className)}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (!event.defaultPrevented) moveFocus(event);
+      }}
+    >
+      {children}
+    </FloatingPanel>
   );
 }
 DropdownContent.displayName = "Dropdown.Content";
@@ -224,11 +191,11 @@ function DropdownItem({
   tone = "neutral",
   className,
   onClick,
-  onKeyDown,
   ...rest
 }: DropdownItemProps) {
   const { setOpen } = useDropdownContext();
 
+  // Enter and Space reach here as the native button click.
   const activate = () => {
     if (disabled) return;
     onSelect?.();
@@ -247,12 +214,6 @@ function DropdownItem({
       onClick={(event) => {
         onClick?.(event);
         if (!event.defaultPrevented) activate();
-      }}
-      onKeyDown={(event) => {
-        onKeyDown?.(event);
-        if (event.defaultPrevented || (event.key !== "Enter" && event.key !== " ")) return;
-        event.preventDefault();
-        activate();
       }}
     />
   );
@@ -282,30 +243,10 @@ function DropdownItemShortcut({ className, ...rest }: DropdownItemShortcutProps)
 }
 DropdownItemShortcut.displayName = "Dropdown.ItemShortcut";
 
-export type DropdownGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
-  /** Visible heading of the group; names it for screen readers. */
-  label?: React.ReactNode;
-  ref?: React.Ref<HTMLDivElement>;
-};
+export type DropdownGroupProps = MenuGroupProps;
 
-function DropdownGroup({ label, className, children, ...rest }: DropdownGroupProps) {
-  const labelId = React.useId();
-  return (
-    // biome-ignore lint/a11y/useSemanticElements: role="group" inside role="menu"; <fieldset> is not allowed there
-    <div
-      role="group"
-      aria-labelledby={label != null ? labelId : undefined}
-      className={cx(menu.group, className)}
-      {...rest}
-    >
-      {label != null ? (
-        <div id={labelId} role="presentation" className={menu.groupLabel}>
-          {label}
-        </div>
-      ) : null}
-      {children}
-    </div>
-  );
+function DropdownGroup(props: DropdownGroupProps) {
+  return <MenuGroup {...props} />;
 }
 DropdownGroup.displayName = "Dropdown.Group";
 

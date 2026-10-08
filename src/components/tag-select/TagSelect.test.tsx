@@ -41,6 +41,18 @@ describe("TagSelect", () => {
     expect(screen.getByRole("button", { name: /Удалить Alpha/i })).toBeInTheDocument();
   });
 
+  it("Space types into the input: a created tag may have several words", async () => {
+    const user = userEvent.setup();
+    const onCreate = vi.fn();
+    render(<BasicTagSelect creatable onCreate={onCreate} />);
+    const input = screen.getByRole("combobox");
+    await user.click(input);
+    await user.keyboard("Новый тег");
+    expect(input).toHaveValue("Новый тег");
+    await user.keyboard("{Enter}");
+    expect(onCreate).toHaveBeenCalledWith("Новый тег");
+  });
+
   it("снимает последний тег по Backspace при пустом вводе", () => {
     render(<BasicTagSelect defaultValue={["a"]} />);
     const input = screen.getByRole("combobox");

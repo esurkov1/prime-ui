@@ -45,6 +45,7 @@ describe("Slot", () => {
     const child = vi.fn();
     render(
       <Slot aria-disabled>
+        {/* biome-ignore lint/a11y/useValidAnchor: a navigating link with a handler is the case under test */}
         <a href="#next" onClick={child}>
           Далее
         </a>

@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { LIVE_REGION_ATTR } from "@/hooks/useInertSiblings";
 import { exitTimeoutMs, prefersReducedMotion } from "@/hooks/usePresence";
 import { remToPx } from "@/internal/layoutPxFromPrimitives";
 import { Portal } from "@/internal/Portal";
@@ -274,8 +275,7 @@ function NotificationStack({
   );
 }
 
-// React.memo: the card's 60fps countdown re-renders stay inside NotificationCard; the item only
-// re-renders when its place in the stack changes.
+// React.memo: the item only re-renders when its place in the stack changes.
 const NotificationStackItem = React.memo(function NotificationStackItem({
   item,
   position,
@@ -466,7 +466,8 @@ function NotificationToaster({
 
   return (
     <Portal>
-      <div className={styles.viewport}>
+      {/* A live region: stays usable while a modal layer makes the rest of the page inert. */}
+      <div className={styles.viewport} {...{ [LIVE_REGION_ATTR]: "" }}>
         {POSITIONS.map((pos) => {
           const byTone = grouped.get(pos);
           if (!byTone?.size) return null;

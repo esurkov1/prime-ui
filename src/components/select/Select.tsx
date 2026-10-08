@@ -1,19 +1,13 @@
 import * as React from "react";
 
-import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Divider } from "@/components/divider/Divider";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Spinner } from "@/components/spinner/Spinner";
-import { Thumbnail, type ThumbnailRootProps } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
-import { useOutsideClick } from "@/hooks/useOutsideClick";
-import { usePosition } from "@/hooks/usePosition";
-import { usePresence } from "@/hooks/usePresence";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
-import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import {
@@ -22,32 +16,48 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
-import surface from "@/internal/floatingSurface.module.css";
-import { highlightChildren } from "@/internal/HighlightMatch";
-import { enabledOptions, handleListboxKeyDown } from "@/internal/listbox";
+import {
+  enabledOptions,
+  handleListboxKeyDown,
+  optionDomId,
+  type Store,
+  useCreateStore,
+  useStoreSlice,
+  useTypeahead,
+} from "@/internal/listbox";
+import { MenuGroup, type MenuGroupProps } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
-import { mergeRefs } from "@/internal/mergeRefs";
-import { DropdownLayerContext, useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
-import overlayMotion from "@/internal/overlayMotion.module.css";
-import { Portal } from "@/internal/Portal";
+import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
+import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Select.module.css";
+import {
+  SelectItem,
+  SelectItemDescription,
+  SelectItemIcon,
+  SelectItemMeta,
+  SelectItemText,
+  sizeMedia,
+  splitItemChildren,
+} from "./SelectItem";
+import {
+  createItemRegistry,
+  normalize,
+  type SelectContextValue,
+  type SelectLabels,
+  SelectProvider,
+  useSelectContext,
+} from "./selectContext";
 
-export type SelectLabels = {
-  /** Placeholder and accessible name of the search field (`Select.Content searchable`). */
-  search: string;
-  /** Empty state: no items or nothing matches. */
-  empty: string;
-  /** Second line of the empty state while searching; `""` hides it. */
-  emptyHint: string;
-  /** Status row while `loading`. */
-  loading: string;
-  /** Tooltip of the clear segment (`clearable`). */
-  clear: string;
-  /** Muted marker after the label when `optional`. */
-  optional: string;
-};
+export type {
+  SelectItemDescriptionProps,
+  SelectItemIconProps,
+  SelectItemMetaProps,
+  SelectItemProps,
+  SelectItemTextProps,
+} from "./SelectItem";
+export type { SelectLabels } from "./selectContext";
 
 const SELECT_LABELS: SelectLabels = {
   search: "Поиск",
@@ -57,71 +67,6 @@ const SELECT_LABELS: SelectLabels = {
   clear: "Очистить",
   optional: "необязательно",
 };
-
-/** A pause after which the typeahead buffer starts over. */
-const TYPEAHEAD_RESET_MS = 500;
-
-/** Checkbox one tier below the list (foundation §6 pairing), like the old inline box. */
-const CHECKBOX_SIZE: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "s",
-  l: "m",
-  xl: "l",
-};
-
-/** Thumbnail tier for a Select tier: the media of a rich row stays inside the row height. */
-const MEDIA_SIZE: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "s", l: "s", xl: "m" };
-
-/** `id` of an option for `aria-activedescendant` (no spaces: a valid id). */
-const optionDomId = (listboxId: string, value: string) =>
-  `${listboxId}-opt-${value.replace(/\s+/g, "_")}`;
-
-const normalize = (text: string) => text.trim().toLocaleLowerCase();
-
-/** Plain text of a node tree (a title made of nodes still has a label). */
-function textOf(node: React.ReactNode): string {
-  if (node == null || typeof node === "boolean") return "";
-  if (typeof node === "string" || typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(textOf).join("");
-  if (React.isValidElement<{ children?: React.ReactNode }>(node))
-    return textOf(node.props.children);
-  return "";
-}
-
-// ─── Context ─────────────────────────────────────────────────────────────────
-
-type SelectContextValue = {
-  size: ControlSize;
-  invalid: boolean;
-  focusRing: boolean;
-  required: boolean;
-  disabled: boolean;
-  placeholder: string | undefined;
-  multiple: boolean;
-  /** Selected values: one or none in single mode. */
-  selected: string[];
-  /** Labels of the options by value, registered by the items. */
-  labelsByValue: Record<string, string>;
-  registerLabel: (value: string, label: string) => void;
-  pick: (value: string) => void;
-  clear: () => void;
-  clearable: boolean;
-  loading: boolean;
-  isOpen: boolean;
-  setOpen: (open: boolean) => void;
-  highlightedValue: string | undefined;
-  setHighlightedValue: (value: string | undefined) => void;
-  query: string;
-  setQuery: (query: string) => void;
-  triggerId: string;
-  listboxId: string;
-  describedBy: string | undefined;
-  triggerRef: React.RefObject<HTMLButtonElement | null>;
-  labels: SelectLabels;
-};
-
-const [SelectProvider, useSelectContext] = createComponentContext<SelectContextValue>("Select");
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
@@ -210,21 +155,13 @@ function SelectRoot(props: SelectRootProps) {
     defaultValue: defaultOpen,
     onChange: onOpenChange,
   });
-  const [highlightedValue, setHighlightedValue] = React.useState<string | undefined>();
+  const highlight = useCreateStore<string | undefined>(undefined);
+  const [registry] = React.useState(createItemRegistry);
   const [query, setQuery] = React.useState("");
-  const [labelsByValue, setLabelsByValue] = React.useState<Record<string, string>>({});
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
 
   // Closing (also from outside, through `open`) resets the search.
-  React.useEffect(() => {
-    if (!isOpen) setQuery("");
-  }, [isOpen]);
-
-  const registerLabel = React.useCallback((optionValue: string, optionLabel: string) => {
-    setLabelsByValue((prev) =>
-      prev[optionValue] === optionLabel ? prev : { ...prev, [optionValue]: optionLabel },
-    );
-  }, []);
+  if (!isOpen && query !== "") setQuery("");
 
   const pick = React.useCallback(
     (optionValue: string) => {
@@ -238,6 +175,7 @@ function SelectRoot(props: SelectRootProps) {
         return;
       }
       setValue(optionValue);
+      // Focus goes back to the trigger (the floating layer's close policy).
       setOpen(false);
     },
     [multiple, setValue, setOpen],
@@ -255,16 +193,14 @@ function SelectRoot(props: SelectRootProps) {
       placeholder,
       multiple,
       selected,
-      labelsByValue,
-      registerLabel,
+      registry,
       pick,
       clear,
       clearable,
       loading,
       isOpen,
       setOpen,
-      highlightedValue,
-      setHighlightedValue,
+      highlight,
       query,
       setQuery,
       triggerId: ids.controlId,
@@ -284,15 +220,14 @@ function SelectRoot(props: SelectRootProps) {
       placeholder,
       multiple,
       selected,
-      labelsByValue,
-      registerLabel,
+      registry,
       pick,
       clear,
       clearable,
       loading,
       isOpen,
       setOpen,
-      highlightedValue,
+      highlight,
       query,
       labels,
     ],
@@ -356,7 +291,7 @@ function SelectTrigger({
     clear,
     labels,
   } = useSelectContext();
-  const mergedRef = React.useMemo(() => mergeRefs(triggerRef, ref), [triggerRef, ref]);
+  const mergedRef = useMergedRefs(triggerRef, ref);
   const showClear = clearable && selected.length > 0 && !disabled && !loading;
 
   return (
@@ -442,12 +377,13 @@ export type SelectValueProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "chil
 
 /** The picked label (labels joined in `multiple`), or the placeholder. */
 function SelectValue({ renderValue, className, ...rest }: SelectValueProps) {
-  const { selected, labelsByValue, placeholder, multiple, size } = useSelectContext();
-  const labelOf = (value: string) => labelsByValue[value] ?? value;
+  const { selected, registry, placeholder, multiple, size } = useSelectContext();
+  // Labels come from the items; re-read when they register.
+  const text = useStoreSlice(registry.version, () => selected.map(registry.labelOf).join(", "));
 
   if (selected.length > 0 && renderValue && !multiple) {
     const value = selected[0] ?? "";
-    const parts = splitItemChildren(renderValue({ value, label: labelOf(value) }));
+    const parts = splitItemChildren(renderValue({ value, label: text }));
     return (
       <span
         {...rest}
@@ -460,150 +396,27 @@ function SelectValue({ renderValue, className, ...rest }: SelectValueProps) {
     );
   }
 
-  const display = selected.length > 0 ? selected.map(labelOf).join(", ") : placeholder;
   return (
     <span
       {...rest}
       className={cx(styles.value, className)}
       {...toDataAttributes({ placeholder: selected.length === 0 || undefined })}
     >
-      {display}
+      {selected.length > 0 ? text : placeholder}
     </span>
   );
 }
 SelectValue.displayName = "Select.Value";
 
-type SpanProps = React.HTMLAttributes<HTMLSpanElement> & { ref?: React.Ref<HTMLSpanElement> };
-
-export type SelectTriggerIconProps = SpanProps;
+export type SelectTriggerIconProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
 
 /** A leading glyph in the trigger, before the value (decorative). */
 function SelectTriggerIcon({ className, ...rest }: SelectTriggerIconProps) {
   return <span aria-hidden="true" className={cx(styles.triggerIcon, className)} {...rest} />;
 }
 SelectTriggerIcon.displayName = "Select.TriggerIcon";
-
-// ─── Rich option parts (row and trigger) ─────────────────────────────────────
-
-export type SelectItemIconProps = SpanProps;
-
-/** A leading glyph of an option (decorative). */
-function SelectItemIcon({ className, ...rest }: SelectItemIconProps) {
-  return <span aria-hidden="true" className={cx(menu.itemIcon, className)} {...rest} />;
-}
-SelectItemIcon.displayName = "Select.ItemIcon";
-
-export type SelectItemTextProps = SpanProps & { children: React.ReactNode };
-
-/** The search query inside an option row; empty in the trigger, so `renderValue` never marks it. */
-const OptionQueryContext = React.createContext("");
-
-/** Title of a rich option; its text is the option label (trigger, typeahead, search). */
-function SelectItemText({ children, className, ...rest }: SelectItemTextProps) {
-  const query = React.useContext(OptionQueryContext);
-  return (
-    <span {...rest} className={cx(styles.itemTitle, className)}>
-      {highlightChildren(children, query)}
-    </span>
-  );
-}
-SelectItemText.displayName = "Select.ItemText";
-
-export type SelectItemDescriptionProps = SpanProps & { children: React.ReactNode };
-
-/** Muted second line under `Select.ItemText`; searchable. Makes the row two-line. */
-function SelectItemDescription({ children, className, ...rest }: SelectItemDescriptionProps) {
-  const query = React.useContext(OptionQueryContext);
-  return (
-    <span {...rest} className={cx(styles.itemDescription, className)}>
-      {highlightChildren(children, query)}
-    </span>
-  );
-}
-SelectItemDescription.displayName = "Select.ItemDescription";
-
-export type SelectItemMetaProps = SpanProps & { children: React.ReactNode };
-
-/** Trailing meta of an option (price, count): muted, tabular, before the check. */
-function SelectItemMeta({ children, className, ...rest }: SelectItemMetaProps) {
-  return (
-    <span {...rest} className={cx(styles.itemMeta, className)}>
-      {children}
-    </span>
-  );
-}
-SelectItemMeta.displayName = "Select.ItemMeta";
-
-type ItemParts = {
-  /** `Select.ItemIcon` and `Thumbnail.Root`, before the text. */
-  leading: React.ReactNode[];
-  /** Title, description and plain text, in one column. */
-  body: React.ReactNode[];
-  /** `Select.ItemMeta`, after the text. */
-  meta: React.ReactNode[];
-  /** Two-line layout: a description or a media tile is present. */
-  rich: boolean;
-  /** Text of `Select.ItemText`, else of the plain text children. */
-  title: string;
-  description: string;
-};
-
-/** Sorts the direct children of an item (fragments flattened) into the row slots by part type. */
-function splitItemChildren(children: React.ReactNode): ItemParts {
-  const parts: ItemParts = {
-    leading: [],
-    body: [],
-    meta: [],
-    rich: false,
-    title: "",
-    description: "",
-  };
-  let plain = "";
-  for (const child of React.Children.toArray(children)) {
-    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) {
-      plain += textOf(child);
-      parts.body.push(child);
-    } else if (child.type === React.Fragment) {
-      const inner = splitItemChildren(child.props.children);
-      parts.leading.push(...inner.leading);
-      parts.body.push(...inner.body);
-      parts.meta.push(...inner.meta);
-      parts.rich ||= inner.rich;
-      parts.title ||= inner.title;
-      parts.description ||= inner.description;
-      plain += inner.title;
-    } else if (child.type === SelectItemIcon) {
-      parts.leading.push(child);
-    } else if (child.type === Thumbnail.Root) {
-      parts.leading.push(child);
-      parts.rich = true;
-    } else if (child.type === SelectItemMeta) {
-      parts.meta.push(child);
-    } else {
-      if (child.type === SelectItemText) parts.title = textOf(child.props.children);
-      if (child.type === SelectItemDescription) {
-        parts.description = textOf(child.props.children);
-        parts.rich = true;
-      }
-      parts.body.push(child);
-    }
-  }
-  parts.title = (parts.title || plain).trim();
-  return parts;
-}
-
-/** A `Thumbnail.Root` in a row or the trigger: sized to the tier unless it sets `size`. */
-function sizeMedia(leading: React.ReactNode[], size: ControlSize): React.ReactNode[] {
-  return leading.map((node) =>
-    React.isValidElement<ThumbnailRootProps>(node) && node.type === Thumbnail.Root
-      ? React.cloneElement(node, {
-          size: node.props.size ?? MEDIA_SIZE[size],
-          className: cx(styles.media, node.props.className),
-          "aria-hidden": true,
-        } as Partial<ThumbnailRootProps>)
-      : node,
-  );
-}
 
 // ─── Content ─────────────────────────────────────────────────────────────────
 
@@ -618,13 +431,7 @@ export type SelectContentProps = Omit<
   ref?: React.Ref<HTMLDivElement>;
 };
 
-function SelectContent({
-  searchable = false,
-  className,
-  children,
-  ref,
-  ...rest
-}: SelectContentProps) {
+function SelectContent({ searchable = false, className, children, ...rest }: SelectContentProps) {
   const {
     isOpen,
     setOpen,
@@ -632,342 +439,160 @@ function SelectContent({
     triggerId,
     listboxId,
     triggerRef,
-    highlightedValue,
-    setHighlightedValue,
-    selected,
+    highlight,
     multiple,
     size,
     query,
     setQuery,
     loading,
     labels,
+    registry,
   } = useSelectContext();
 
-  const overlayPortalLayer = useOverlayPortalLayer();
-  const contentRef = React.useRef<HTMLElement | null>(null);
   const listboxRef = React.useRef<HTMLElement | null>(null);
-  const searchRef = React.useRef<HTMLInputElement | null>(null);
-  const position = usePosition(isOpen, triggerRef, contentRef, {
+  // Focus moves to the search (or the list) on open and back to the trigger after Escape, a pick
+  // in single mode and Tab (which then moves on from the trigger); an outside press only closes.
+  const floating = useFloatingLayer({
+    open: isOpen,
+    onOpenChange: setOpen,
+    triggerRef,
     side: "bottom",
     align: "start",
     matchAnchorWidth: true,
-  });
-  const { attachLayer } = position;
-  const layerRef = React.useMemo(
-    () => mergeRefs<HTMLDivElement>(attachLayer, ref),
-    [attachLayer, ref],
-  );
-  // The panel stays in the DOM while closed (items register the labels shown in the trigger);
-  // presence only drives display and motion.
-  const presence = usePresence(isOpen, { exitDuration: "fast" });
-
-  const selectedRef = React.useRef(selected);
-  selectedRef.current = selected;
-
-  // Items hide themselves while searching: count what rendered.
-  const [isEmpty, setIsEmpty] = React.useState(false);
-  React.useLayoutEffect(() => {
-    const empty = (listboxRef.current?.querySelector('[role="option"]') ?? null) === null;
-    setIsEmpty((prev) => (prev === empty ? prev : empty));
+    focusOnOpen: true,
+    tabExit: "always",
   });
 
-  // On open: focus the search (or the list) and highlight the selected option.
-  React.useEffect(() => {
-    if (!isOpen) {
-      setHighlightedValue(undefined);
-      return;
-    }
-    const frame = requestAnimationFrame(() => {
-      (searchRef.current ?? listboxRef.current)?.focus({ preventScroll: true });
-      const options = enabledOptions(listboxRef.current);
-      const first = options.find((item) => selectedRef.current.includes(item.dataset.value ?? ""));
-      setHighlightedValue(first?.dataset.value);
-      first?.scrollIntoView?.({ block: "nearest" });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [isOpen, setHighlightedValue]);
-
-  // Searching moves the highlight to the first match.
-  React.useEffect(() => {
-    if (!isOpen || query === "") return;
-    setHighlightedValue(enabledOptions(listboxRef.current)[0]?.dataset.value);
-  }, [isOpen, query, setHighlightedValue]);
-
-  const closeAndReturnFocus = React.useCallback(() => {
-    setOpen(false);
-    triggerRef.current?.focus({ preventScroll: true });
-  }, [setOpen, triggerRef]);
-
-  useEscapeKey({ enabled: isOpen, onEscape: closeAndReturnFocus });
-  // Focus follows the pointer (foundation §8): no return to the trigger.
-  useOutsideClick({
-    refs: [triggerRef, contentRef],
-    enabled: isOpen,
-    onOutsideClick: () => setOpen(false),
-  });
-
-  // Typeahead by title: the buffer starts over after a pause.
-  const typeahead = React.useRef({ buffer: "", timer: 0 });
-  React.useEffect(() => () => window.clearTimeout(typeahead.current.timer), []);
-
-  const handleTypeahead = (key: string) => {
-    const state = typeahead.current;
-    window.clearTimeout(state.timer);
-    state.buffer += key.toLocaleLowerCase();
-    state.timer = window.setTimeout(() => {
-      state.buffer = "";
-    }, TYPEAHEAD_RESET_MS);
-    const options = enabledOptions(listboxRef.current);
-    const start = options.findIndex((item) => item.dataset.value === highlightedValue);
-    // The same letter repeated cycles through the options on it; otherwise match the prefix.
-    const repeated = [...state.buffer].every((char) => char === state.buffer[0]);
-    const prefix = repeated ? key.toLocaleLowerCase() : state.buffer;
-    const from = repeated ? start + 1 : Math.max(start, 0);
-    const match = [...options.slice(from), ...options.slice(0, from)].find((item) =>
-      (item.dataset.label ?? "").toLocaleLowerCase().startsWith(prefix),
-    );
-    if (match) {
-      setHighlightedValue(match.dataset.value);
-      match.scrollIntoView?.({ block: "nearest" });
-    }
-  };
+  const highlighted = useStoreSlice(highlight, (value) => value);
+  const isEmpty = useStoreSlice(registry.version, () => !registry.anyMatch(normalize(query)));
+  const typeahead = useTypeahead();
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     const inSearch = event.target instanceof HTMLInputElement;
     // In the search field Space, Home and End edit the text.
     if (inSearch && [" ", "Home", "End"].includes(event.key)) return;
+    const items = enabledOptions(listboxRef.current);
     const printable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
-    if (printable && !inSearch && (event.key !== " " || typeahead.current.buffer !== "")) {
+    if (printable && !inSearch && (event.key !== " " || typeahead.isTyping())) {
       event.preventDefault();
-      handleTypeahead(event.key);
+      const match = typeahead.find(event.key, items, highlight.get());
+      if (match) {
+        highlight.set(match.dataset.value);
+        match.scrollIntoView?.({ block: "nearest" });
+      }
       return;
     }
-    if (event.key === "Tab") {
-      setOpen(false);
-      return;
-    }
-    handleListboxKeyDown(event, {
-      items: enabledOptions(listboxRef.current),
-      highlightedValue,
-      setHighlightedValue,
-      onSelect: (value) => {
-        pick(value);
-        if (!multiple) triggerRef.current?.focus({ preventScroll: true });
-      },
-      onClose: closeAndReturnFocus,
-    });
+    handleListboxKeyDown(event, { items, highlight, onSelect: pick });
   };
 
+  // Closed, the items still render (hidden, in place) so the trigger knows their labels.
+  if (!floating.mounted) return <div hidden>{children}</div>;
+
   const activeDescendant =
-    isOpen && highlightedValue !== undefined ? optionDomId(listboxId, highlightedValue) : undefined;
+    isOpen && highlighted !== undefined ? optionDomId(listboxId, highlighted) : undefined;
 
   return (
-    <Portal>
-      <DropdownLayerContext.Provider value>
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: keys bubble up from the search field and the listbox */}
-        <div
-          {...rest}
-          ref={layerRef}
-          aria-hidden={!isOpen}
-          data-react-aria-top-layer="true"
-          data-overlay-portal-layer={overlayPortalLayer}
-          className={cx(
-            surface.surface,
-            surface.dropdownLayer,
-            menu.tier,
-            menu.menu,
-            styles.content,
-            overlayMotion.floating,
-            className,
-          )}
-          hidden={!presence.mounted}
-          onKeyDown={handleKeyDown}
-          onAnimationEnd={presence.onExitEnd}
-          {...toDataAttributes({
-            side: position.side,
-            size,
-            searching: query !== "" || undefined,
-            state: presence.state,
-          })}
-        >
-          {searchable ? (
-            // The permanent focus of the panel: no ring, the caret is the indicator (foundation §7).
-            <div className={cx(menu.searchRow, styles.search)} data-focus-ring="false">
-              <Icon name="action.search" size="s" />
-              <input
-                ref={searchRef}
-                type="text"
-                className={menu.searchInput}
-                value={query}
-                placeholder={labels.search}
-                aria-label={labels.search}
-                aria-controls={listboxId}
-                aria-activedescendant={activeDescendant}
-                aria-autocomplete="list"
-                autoComplete="off"
-                spellCheck={false}
-                onChange={(event) => setQuery(event.target.value)}
-              />
-            </div>
-          ) : null}
-          {loading ? (
-            <div className={styles.status} role="status">
-              <Spinner aria-hidden="true" />
-              {labels.loading}
-            </div>
-          ) : null}
-          <ScrollContainer
-            ref={listboxRef}
-            id={listboxId}
-            role="listbox"
-            aria-multiselectable={multiple || undefined}
-            aria-labelledby={triggerId}
-            aria-activedescendant={searchable ? undefined : activeDescendant}
-            aria-busy={loading || undefined}
-            tabIndex={-1}
-            className={styles.listbox}
-          >
-            {children}
-          </ScrollContainer>
-          {isEmpty && !loading ? (
-            <EmptyPage.Root layout="compact" role="status">
-              <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
-              {query !== "" && labels.emptyHint ? (
-                <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
-              ) : null}
-            </EmptyPage.Root>
-          ) : null}
+    <FloatingPanel
+      {...rest}
+      floating={floating}
+      size={size}
+      tier="dropdown"
+      className={cx(menu.tier, menu.menu, styles.content, className)}
+      onKeyDown={handleKeyDown}
+      {...toDataAttributes({ searching: query !== "" || undefined })}
+    >
+      {searchable ? (
+        // The permanent focus of the panel: no ring, the caret is the indicator (foundation §7).
+        <div className={cx(menu.searchRow, styles.search)} data-focus-ring="false">
+          <Icon name="action.search" size="s" />
+          <input
+            type="text"
+            className={menu.searchInput}
+            value={query}
+            placeholder={labels.search}
+            aria-label={labels.search}
+            aria-controls={listboxId}
+            aria-activedescendant={activeDescendant}
+            aria-autocomplete="list"
+            autoComplete="off"
+            spellCheck={false}
+            data-autofocus=""
+            onChange={(event) => setQuery(event.target.value)}
+          />
         </div>
-      </DropdownLayerContext.Provider>
-    </Portal>
+      ) : null}
+      {loading ? (
+        <div className={styles.status} role="status">
+          <Spinner aria-hidden="true" />
+          {labels.loading}
+        </div>
+      ) : null}
+      <ScrollContainer
+        ref={listboxRef}
+        id={listboxId}
+        role="listbox"
+        aria-multiselectable={multiple || undefined}
+        aria-labelledby={triggerId}
+        aria-activedescendant={searchable ? undefined : activeDescendant}
+        aria-busy={loading || undefined}
+        tabIndex={-1}
+        data-autofocus={searchable ? undefined : ""}
+        className={styles.listbox}
+      >
+        {children}
+      </ScrollContainer>
+      {isEmpty && !loading ? (
+        <EmptyPage.Root layout="compact" role="status">
+          <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
+          {query !== "" && labels.emptyHint ? (
+            <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
+          ) : null}
+        </EmptyPage.Root>
+      ) : null}
+      <HighlightOnOpen listboxRef={listboxRef} highlight={highlight} />
+    </FloatingPanel>
   );
 }
 SelectContent.displayName = "Select.Content";
 
-// ─── Item ────────────────────────────────────────────────────────────────────
+/**
+ * Lives inside the open panel, after the list: on open it highlights (and shows) the first
+ * selected option; while searching, the first match; closing clears the highlight.
+ */
+function HighlightOnOpen({
+  listboxRef,
+  highlight,
+}: {
+  listboxRef: React.RefObject<HTMLElement | null>;
+  highlight: Store<string | undefined>;
+}) {
+  const { isOpen, query, selected } = useSelectContext();
+  const selectedRef = React.useRef(selected);
+  selectedRef.current = selected;
 
-export type SelectItemProps = {
-  value: string;
-  /** Text shown in the trigger and used by typeahead; defaults to `Select.ItemText`, then plain text. */
-  label?: string;
-  /** Extra words for the search (`Select.Content searchable`). */
-  keywords?: string;
-  disabled?: boolean;
-  className?: string;
-  children: React.ReactNode;
-  ref?: React.Ref<HTMLDivElement>;
-};
+  React.useLayoutEffect(() => {
+    if (!isOpen) return;
+    const options = enabledOptions(listboxRef.current);
+    const first = options.find((item) => selectedRef.current.includes(item.dataset.value ?? ""));
+    highlight.set(first?.dataset.value);
+    first?.scrollIntoView?.({ block: "nearest" });
+    return () => highlight.set(undefined);
+  }, [isOpen, listboxRef, highlight]);
 
-function SelectItem({
-  value,
-  label,
-  keywords,
-  disabled,
-  className,
-  children,
-  ref,
-}: SelectItemProps) {
-  const {
-    multiple,
-    size,
-    selected,
-    highlightedValue,
-    setHighlightedValue,
-    pick,
-    registerLabel,
-    listboxId,
-    query,
-  } = useSelectContext();
+  React.useLayoutEffect(() => {
+    if (query !== "") highlight.set(enabledOptions(listboxRef.current)[0]?.dataset.value);
+  }, [query, listboxRef, highlight]);
 
-  const parts = splitItemChildren(children);
-  const resolvedLabel = label || parts.title || value;
-  const isSelected = selected.includes(value);
-  const isHighlighted = highlightedValue === value;
-
-  React.useEffect(() => {
-    registerLabel(value, resolvedLabel);
-  }, [value, resolvedLabel, registerLabel]);
-
-  const search = normalize(query);
-  if (
-    search !== "" &&
-    !normalize(`${resolvedLabel} ${parts.description} ${keywords ?? ""}`).includes(search)
-  ) {
-    return null;
-  }
-
-  return (
-    // biome-ignore lint/a11y/useFocusableInteractive: focus stays on the listbox / search (aria-activedescendant)
-    // biome-ignore lint/a11y/useKeyWithClickEvents: the keyboard is handled on the listbox
-    <div
-      ref={ref}
-      id={optionDomId(listboxId, value)}
-      role="option"
-      aria-selected={isSelected}
-      aria-disabled={disabled || undefined}
-      className={cx(menu.item, styles.item, className)}
-      onClick={() => {
-        if (!disabled) pick(value);
-      }}
-      onMouseMove={() => {
-        if (!disabled && !isHighlighted) setHighlightedValue(value);
-      }}
-      {...toDataAttributes({
-        value,
-        label: resolvedLabel,
-        selected: isSelected,
-        highlighted: isHighlighted,
-        disabled: Boolean(disabled),
-        rich: parts.rich || undefined,
-      })}
-    >
-      {multiple ? (
-        <Checkbox.Indicator checked={isSelected} disabled={disabled} size={CHECKBOX_SIZE[size]} />
-      ) : null}
-      {sizeMedia(parts.leading, size)}
-      <span className={styles.itemText}>
-        <OptionQueryContext.Provider value={query}>
-          {highlightChildren(parts.body, query)}
-        </OptionQueryContext.Provider>
-      </span>
-      {parts.meta}
-      {multiple ? null : (
-        <span className={styles.check} aria-hidden="true">
-          {isSelected ? <Icon name="action.check" /> : null}
-        </span>
-      )}
-    </div>
-  );
+  return null;
 }
-SelectItem.displayName = "Select.Item";
 
 // ─── Group / Separator ───────────────────────────────────────────────────────
 
-export type SelectGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
-  /** Visible heading of the group; names it for screen readers. */
-  label?: React.ReactNode;
-  ref?: React.Ref<HTMLDivElement>;
-};
+export type SelectGroupProps = MenuGroupProps;
 
 /** Options under a heading; hidden while the search leaves none of them. */
-function SelectGroup({ label, className, children, ...rest }: SelectGroupProps) {
-  const labelId = React.useId();
-  return (
-    // biome-ignore lint/a11y/useSemanticElements: role="group" inside role="listbox"; <fieldset> is not allowed there
-    <div
-      {...rest}
-      role="group"
-      aria-labelledby={label != null ? labelId : undefined}
-      className={cx(menu.group, styles.group, className)}
-    >
-      {label != null ? (
-        <div id={labelId} className={menu.groupLabel}>
-          {label}
-        </div>
-      ) : null}
-      {children}
-    </div>
-  );
+function SelectGroup({ className, ...rest }: SelectGroupProps) {
+  return <MenuGroup {...rest} className={cx(styles.group, className)} />;
 }
 SelectGroup.displayName = "Select.Group";
 

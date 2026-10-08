@@ -7,21 +7,24 @@ type ChipOverflowOptions = {
   measureRef: React.RefObject<HTMLElement | null>;
   /** The text input sharing the row; its min width is reserved unless it is collapsed. */
   inputRef: React.RefObject<HTMLInputElement | null>;
-  count: number;
+  /** The chips (a new array when one is added, removed, renamed or recolored). */
+  chips: readonly unknown[];
   inputCollapsed: boolean;
 };
 
 /**
  * How many chips fit on one row of the field; the rest collapse into a «+N» chip. At least one
- * chip stays visible (it shrinks with an ellipsis, «+N» never does).
+ * chip stays visible (it shrinks with an ellipsis, «+N» never does). Recounts when the chips
+ * change and when the row or the measured chips change size (fonts, a renamed tag).
  */
 export function useChipOverflow({
   rowRef,
   measureRef,
   inputRef,
-  count,
+  chips,
   inputCollapsed,
 }: ChipOverflowOptions): number {
+  const count = chips.length;
   const [visible, setVisible] = React.useState(count);
 
   const recompute = React.useCallback(() => {
@@ -53,18 +56,20 @@ export function useChipOverflow({
     setVisible((prev) => (prev === next ? prev : next));
   }, [rowRef, measureRef, inputRef, inputCollapsed]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: recount when the set of chips changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: recount when the chips change
   React.useLayoutEffect(() => {
     recompute();
-  }, [recompute, count]);
+  }, [recompute, chips]);
 
   React.useEffect(() => {
     const row = rowRef.current;
+    const measure = measureRef.current;
     if (!row || typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(() => recompute());
     observer.observe(row);
+    if (measure) observer.observe(measure);
     return () => observer.disconnect();
-  }, [rowRef, recompute]);
+  }, [rowRef, measureRef, recompute]);
 
   return Math.min(visible, count);
 }

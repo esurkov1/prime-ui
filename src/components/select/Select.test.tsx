@@ -730,6 +730,34 @@ describe("Select — overlay contract", () => {
     expect(other).toHaveFocus();
   });
 
+  it("a mouse pick in single mode closes and returns focus to the trigger (not to body)", async () => {
+    const user = userEvent.setup();
+    render(<BasicSelect />);
+    const trigger = screen.getByRole("combobox");
+    await user.click(trigger);
+    await user.click(screen.getByRole("option", { name: "Two" }));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("Tab in the panel focuses the trigger first, then closes (the page goes on from it)", async () => {
+    const user = userEvent.setup();
+    render(<BasicSelect />);
+    const trigger = screen.getByRole("combobox");
+    await user.click(trigger);
+    const listbox = screen.getByRole("listbox");
+    await waitFor(() => expect(listbox).toHaveFocus());
+    fireEvent.keyDown(listbox, { key: "Tab" });
+    expect(trigger).toHaveFocus();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("closed, the panel is not in the DOM but the trigger still shows the item label", () => {
+    render(<BasicSelect defaultValue="two" />);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox")).toHaveTextContent("Two");
+  });
+
   it("Escape closes the listbox and returns focus to the trigger", () => {
     render(<BasicSelect />);
     const trigger = screen.getByRole("combobox");

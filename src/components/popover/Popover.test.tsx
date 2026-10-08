@@ -192,6 +192,50 @@ describe("Popover — overlay contract", () => {
     );
   }
 
+  function FormPopover({ trapFocus }: { trapFocus?: boolean }) {
+    return (
+      <Popover.Root>
+        <Popover.Trigger>
+          <button type="button">Open</button>
+        </Popover.Trigger>
+        <Popover.Content trapFocus={trapFocus}>
+          <input aria-label="Имя" />
+          <button type="button">Сохранить</button>
+        </Popover.Content>
+      </Popover.Root>
+    );
+  }
+
+  it("without trapFocus, focus moves into the panel on open", async () => {
+    const user = userEvent.setup();
+    render(<FormPopover />);
+    await user.click(screen.getByRole("button", { name: "Open" }));
+    expect(screen.getByRole("textbox", { name: "Имя" })).toHaveFocus();
+  });
+
+  it("without trapFocus, Tab past the last stop closes it and returns to the trigger", async () => {
+    const user = userEvent.setup();
+    render(<FormPopover />);
+    const trigger = screen.getByRole("button", { name: "Open" });
+    await user.click(trigger);
+    const save = screen.getByRole("button", { name: "Сохранить" });
+    save.focus();
+    fireEvent.keyDown(save, { key: "Tab" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("with trapFocus, Tab cycles inside the panel", async () => {
+    const user = userEvent.setup();
+    render(<FormPopover trapFocus />);
+    await user.click(screen.getByRole("button", { name: "Open" }));
+    const save = screen.getByRole("button", { name: "Сохранить" });
+    save.focus();
+    fireEvent.keyDown(save, { key: "Tab" });
+    expect(screen.getByRole("textbox", { name: "Имя" })).toHaveFocus();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
   it("a pointerdown inside a nested Select listbox does not close the popover", () => {
     render(<PopoverWithSelect />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));

@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 
 import {
   DialogBody,
@@ -7,27 +7,24 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIcon,
+  DialogRootProvider,
   DialogShellProvider,
   DialogTitle,
   DialogTrigger,
-  type DialogTriggerProps,
   dialogShellClassName,
+  useDialogLayer,
+  useDialogRoot,
+  useDialogRootContext,
   useDialogShellValue,
 } from "@/components/modal/DialogParts";
-import { useInertSiblings } from "@/components/modal/useInertSiblings";
-import { useControllableState } from "@/hooks/useControllableState";
-import { useEscapeKey } from "@/hooks/useEscapeKey";
-import { useFocusTrap } from "@/hooks/useFocusTrap";
-import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { type PresenceState, usePresence } from "@/hooks/usePresence";
-import { useScrollLock } from "@/hooks/useScrollLock";
-import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import { mergeRefs } from "@/internal/mergeRefs";
 import {
   OverlayPortalLayerProvider,
   useOverlayPortalLayer,
 } from "@/internal/OverlayPortalLayerContext";
+import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import type { ControlSize } from "@/internal/states";
@@ -56,16 +53,6 @@ const DRAWER_LABELS: DrawerLabels = {
   close: "Закрыть",
 };
 
-type DrawerContextValue = {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  closeOnEscape: boolean;
-  closeOnOutsideClick: boolean;
-  labels: DrawerLabels;
-};
-
-const [DrawerProvider, useDrawerContext] = createComponentContext<DrawerContextValue>("Drawer");
-
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export type DrawerRootProps = {
@@ -74,51 +61,17 @@ export type DrawerRootProps = {
   onOpenChange?: (open: boolean) => void;
   /** Escape closes the drawer. Default `true`. */
   closeOnEscape?: boolean;
-  /** A click on the scrim (any pointerdown outside the panel) closes the drawer. Default `true`. */
+  /** A click on the scrim closes the drawer. Default `true`. */
   closeOnOutsideClick?: boolean;
   labels?: Partial<DrawerLabels>;
   children?: React.ReactNode;
 };
 
-function DrawerRoot({
-  open,
-  defaultOpen = false,
-  onOpenChange,
-  closeOnEscape = true,
-  closeOnOutsideClick = true,
-  labels,
-  children,
-}: DrawerRootProps) {
-  const [isOpen, setOpen] = useControllableState({
-    value: open,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
-
-  const closeLabel = labels?.close ?? DRAWER_LABELS.close;
-  const value = React.useMemo<DrawerContextValue>(
-    () => ({
-      open: isOpen,
-      setOpen,
-      closeOnEscape,
-      closeOnOutsideClick,
-      labels: { close: closeLabel },
-    }),
-    [isOpen, setOpen, closeOnEscape, closeOnOutsideClick, closeLabel],
-  );
-
-  return <DrawerProvider value={value}>{children}</DrawerProvider>;
+function DrawerRoot({ labels, children, ...options }: DrawerRootProps) {
+  const state = useDialogRoot({ ...options, closeLabel: labels?.close ?? DRAWER_LABELS.close });
+  return <DialogRootProvider value={state}>{children}</DialogRootProvider>;
 }
 DrawerRoot.displayName = "Drawer.Root";
-
-// ─── Trigger ──────────────────────────────────────────────────────────────────
-
-/** Opens the drawer on the child's click (unless the child prevents default). */
-function DrawerTrigger(props: DialogTriggerProps) {
-  const { setOpen } = useDrawerContext();
-  return <DialogTrigger {...props} onOpen={() => setOpen(true)} />;
-}
-DrawerTrigger.displayName = "Drawer.Trigger";
 
 // ─── Content ──────────────────────────────────────────────────────────────────
 
@@ -134,7 +87,7 @@ export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 function DrawerContent(props: DrawerContentProps) {
-  const { open } = useDrawerContext();
+  const { open } = useDialogRootContext();
   // Stays mounted with `data-state="closed"` for the slide-out.
   const presence = usePresence(open, { exitDuration: "base" });
   if (!presence.mounted) return null;
@@ -165,15 +118,16 @@ function DrawerDialog({
   ref,
   ...rest
 }: DrawerDialogProps) {
-  const { open, setOpen, closeOnEscape, closeOnOutsideClick, labels } = useDrawerContext();
-  const onClose = React.useCallback(() => setOpen(false), [setOpen]);
+  const root = useDialogRootContext();
+  const { ref: layerRef, layer, onClose } = useDialogLayer<HTMLDivElement>(root);
+  const panelRef = useMergedRefs(layerRef, ref);
 
   const shell = useDialogShellValue({
     ariaLabel,
     ariaLabelledBy,
     ariaDescribedBy,
     onClose,
-    closeLabel: labels.close,
+    closeLabel: root.closeLabel,
     footerLayout: "end",
   });
 
@@ -181,28 +135,12 @@ function DrawerDialog({
   // A drawer opened from a Modal (or from a drawer above a Modal) stays above it.
   const nestedInModal = parentLayer === "modal" || parentLayer === "drawerInModal";
 
-  const trapRef = useFocusTrap<HTMLDivElement>({ enabled: open });
-  const panelRef = React.useMemo(() => mergeRefs(trapRef, ref), [trapRef, ref]);
-  useScrollLock(open);
-  useInertSiblings(open, trapRef);
-  useEscapeKey({ enabled: open && closeOnEscape, onEscape: onClose });
-  // Scrim layer: the press must start and end outside the panel (no drag-to-close, no click-through).
-  useOutsideClick({
-    refs: [trapRef],
-    enabled: open,
-    trigger: "click",
-    onOutsideClick: () => {
-      if (closeOnOutsideClick) onClose();
-    },
-  });
-
   return (
     // One portal root for scrim + panel, so `useInertSiblings` never makes the scrim inert.
     <div className={styles.root}>
       <div
         role="presentation"
         className={cx(styles.overlay, overlayMotion.scrim, overlayClassName)}
-        data-testid="drawer-overlay"
         data-state={state}
         data-nested-in-modal={nestedInModal ? "true" : undefined}
       />
@@ -221,9 +159,11 @@ function DrawerDialog({
         {...rest}
       >
         <DialogShellProvider value={shell.value}>
-          <OverlayPortalLayerProvider value={nestedInModal ? "drawerInModal" : "drawer"}>
-            {children}
-          </OverlayPortalLayerProvider>
+          <LayerProvider value={layer}>
+            <OverlayPortalLayerProvider value={nestedInModal ? "drawerInModal" : "drawer"}>
+              {children}
+            </OverlayPortalLayerProvider>
+          </LayerProvider>
         </DialogShellProvider>
       </div>
     </div>
@@ -236,7 +176,7 @@ DrawerContent.displayName = "Drawer.Content";
 
 export const Drawer = {
   Root: DrawerRoot,
-  Trigger: DrawerTrigger,
+  Trigger: DialogTrigger,
   Content: DrawerContent,
   Header: DialogHeader,
   Icon: DialogIcon,
