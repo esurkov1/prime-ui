@@ -1,4 +1,4 @@
-/** A phone-wide app: the bar in the footer stays at the bottom while main scrolls under it, and leaves once the panel is 640px wide — `AppShell.Footer`. */
+/** A phone app without a Sidebar: the bar in the footer stays at the bottom while main scrolls under it — `AppShell.Footer`. */
 import { AppHeader, AppShell, BottomNav, Icon, PageContent, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

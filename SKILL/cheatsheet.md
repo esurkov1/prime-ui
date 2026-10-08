@@ -119,7 +119,7 @@ Full rules: [responsive.md](responsive.md).
 - Rearrange, never hide: every desktop function is on the phone, in another place or a menu — not `display: none` below a breakpoint.
 - Breakpoints 640 · 768 · 1024 · 1280 only for the app frame; inside a page — intrinsic grids (`auto-fill, minmax`) and container queries.
 - A wide table scrolls inside itself; offer `hiddenColumns` through a column chooser — never drop columns by breakpoint.
-- App sections on phones: `BottomNav` in `AppShell.Footer`; a phone sheet: `Drawer.Content side="bottom"` — Select, Dropdown, Popover become sheets below 640 by themselves.
+- App sections on phones: `BottomNav` in `AppShell.Footer` — not in Main, not `position: fixed`, no own media query: the shell hides the footer while the Sidebar rail is on screen; a phone sheet: `Drawer.Content side="bottom"` — Select, Dropdown, Popover become sheets below 640 by themselves.
 - Your hover styles inside `@media (hover: hover)`; nothing hover-only. Do not wrap kit fields to raise their text for iOS — they keep 16px on touch already.
 - A long form saves through the panel action with a count («Сохранить 3 изменения») — not a sticky bar at the bottom of a phone.
 

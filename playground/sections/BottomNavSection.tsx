@@ -29,7 +29,7 @@ export const page: ComponentPageConfig = {
   title: "BottomNav",
   kind: "layout",
   description:
-    "Навигация по 3–5 главным разделам приложения внизу экрана телефона. В `AppShell.Footer` видна, пока панель уже 640px; шире навигацию ведёт Sidebar.",
+    "Навигация по 3–5 главным разделам приложения внизу экрана телефона. В `AppShell.Footer` видна, пока рейла Sidebar нет на экране; когда он есть, навигацию ведёт Sidebar.",
   examples: [
     {
       slot: "overview",
@@ -63,7 +63,7 @@ export const page: ComponentPageConfig = {
       scenario: "in-app-shell",
       title: "В каркасе приложения",
       description:
-        "Каркас приложения на телефоне: AppHeader, страница и полоса в нижней зоне, которая уходит, когда панель шире 640px — `AppShell.Footer`.",
+        "Каркас приложения на телефоне: AppHeader, страница и полоса в нижней зоне, которая уступает место рейлу Sidebar, когда он на экране — `AppShell.Footer`.",
     },
   ],
   api,

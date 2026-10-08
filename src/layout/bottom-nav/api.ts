@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "BottomNav.Root",
-      en: "`ref` → `HTMLElement`. The `<nav>` bar: equal columns, surface fill with a faint top divider, the bottom safe-area inset below the items. Inside `AppShell.Footer` it shows only while the panel is narrower than 640px.",
-      ru: "Полоса `<nav>`: равные колонки, заливка поверхности с тонким разделителем сверху, нижний безопасный отступ под пунктами. Внутри `AppShell.Footer` видна, пока панель уже 640px.",
+      en: "`ref` → `HTMLElement`. The `<nav>` bar: equal columns, surface fill with a faint top divider, the bottom safe-area inset below the items. Inside `AppShell.Footer` it shows only while the shell has no Sidebar rail on screen (no `AppShell.Nav`, or the Sidebar is off-canvas).",
+      ru: "Полоса `<nav>`: равные колонки, заливка поверхности с тонким разделителем сверху, нижний безопасный отступ под пунктами. Внутри `AppShell.Footer` видна, только пока у каркаса нет рейла Sidebar на экране (нет `AppShell.Nav` или Sidebar выдвижной).",
       props: [
         {
           name: "iconOnly",

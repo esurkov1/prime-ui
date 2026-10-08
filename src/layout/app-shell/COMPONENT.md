@@ -60,7 +60,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes. |
 
 ### AppShell.Footer
-`ref` → `HTMLDivElement`. Sticky bottom bar of the panel for `BottomNav`; no padding of its own. A container (`prime-shell-footer`): BottomNav inside shows only while the panel is narrower than 640px.
+`ref` → `HTMLDivElement`. Sticky bottom bar of the panel for `BottomNav`; no padding of its own. Shows only while the shell has no navigation column on screen (no `AppShell.Nav`, or the Sidebar is off-canvas); with the rail on screen the footer leaves.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -99,7 +99,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 | with `AppShell.Nav` | Two columns: a rail one layer above the page + the panel that is the page | Apps with navigation | |
 | without Nav | Panel takes the full width | Single-page tools, auth screens | |
 | with `AppHeader.Root` | Sticky bar at the top of the panel | Title or breadcrumbs, global search, actions, the mobile menu button | |
-| with `AppShell.Footer` | Sticky bar at the bottom of the panel, shown while it holds a visible bar | BottomNav on a phone | |
+| with `AppShell.Footer` | Sticky bar at the bottom of the panel, shown while no navigation column is on screen | BottomNav on a phone | |
 
 `AppShell.Template` with `nav={<Sidebar.Root …/>}` and `PageContent` inside is the standard app; `contentWidth="contained"` + `PageContent.Root maxWidth="readable"` for docs and articles.
 
@@ -108,7 +108,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 |---|---|---|
 | fixed frame | `fillViewport` | `data-fill-viewport="true"` on Root |
 | content width | `contentWidth` | `data-content-width` on Main |
-| footer bar | panel width (container `prime-shell-footer` on Footer) | BottomNav inside leaves from 640px of panel width; the empty footer takes no room |
+| footer bar | the navigation column: `AppShell.Nav` with a Sidebar that is not off-canvas | the footer is `display: none` while the rail is on screen; without Nav or with an off-canvas Sidebar it stays at any width |
 
 ## Layout & spacing
 - Two full-height planes edge to edge: no inset, radius, shadow or border — the boundary is the fill change (the Sidebar rail is layer 1, the panel the page: white rail beside a gray page in light, a rail one step lighter than the near-black page in dark).
@@ -135,7 +135,7 @@ No `labels`.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | The app frame: Sidebar in the nav column, breadcrumbs in the AppHeader, the page in main; only main scrolls — `fillViewport`. |
 | [contained.tsx](examples/contained.tsx) | A shell without navigation whose main column is centred and capped for long reads — `contentWidth`. |
-| [footer.tsx](examples/footer.tsx) | A phone-wide app: the bar in the footer stays at the bottom while main scrolls under it, and leaves once the panel is 640px wide — `AppShell.Footer`. |
+| [footer.tsx](examples/footer.tsx) | A phone app without a Sidebar: the bar in the footer stays at the bottom while main scrolls under it — `AppShell.Footer`. |
 | [template.tsx](examples/template.tsx) | Root, nav, header and main in one component; main scrolls back to the top whenever the page changes — `AppShell.Template` with `scrollResetKey`. |
 
 ## Mistakes
@@ -143,6 +143,7 @@ No `labels`.
 - Wrapping Main content in another scroll container → Main scrolls (with `fillViewport`) or the document does.
 - A border or shadow between nav and panel → the fill change is the boundary.
 - Putting the Sidebar directly in Root without `AppShell.Nav` → it lands inside the content panel.
+- BottomNav anywhere but `AppShell.Footer` → it stays next to the Sidebar rail on a desktop; the footer is what leaves while the rail is on screen.
 - `AppShell.Template` in a router app without `scrollResetKey` → a new page opens at the old scroll position; pass the pathname.
 
 ## Related

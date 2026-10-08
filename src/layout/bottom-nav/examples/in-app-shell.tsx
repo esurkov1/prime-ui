@@ -1,4 +1,4 @@
-/** The app frame on a phone: the AppHeader, the page and the bar in the footer, which leaves once the panel is 640px wide — `AppShell.Footer`. */
+/** The app frame on a phone: the AppHeader, the page and the bar in the footer, which gives way to the Sidebar rail once one is on screen — `AppShell.Footer`. */
 import {
   AppHeader,
   AppShell,

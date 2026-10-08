@@ -57,8 +57,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Footer",
-      en: "`ref` → `HTMLDivElement`. Sticky bottom bar of the panel for `BottomNav`; no padding of its own. A container (`prime-shell-footer`): BottomNav inside shows only while the panel is narrower than 640px.",
-      ru: "Липкая нижняя полоса панели для `BottomNav`, без своих отступов. Контейнер: BottomNav внутри виден, пока панель уже 640px.",
+      en: "`ref` → `HTMLDivElement`. Sticky bottom bar of the panel for `BottomNav`; no padding of its own. Shows only while the shell has no navigation column on screen (no `AppShell.Nav`, or the Sidebar is off-canvas); with the rail on screen the footer leaves.",
+      ru: "Липкая нижняя полоса панели для `BottomNav`, без своих отступов. Видна, только пока у каркаса нет колонки навигации на экране (нет `AppShell.Nav` или Sidebar выдвижной); с рейлом на экране нижняя зона уходит.",
       props: [
         {
           name: "…rest",

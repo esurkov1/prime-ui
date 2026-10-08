@@ -28,7 +28,7 @@
   height: 100%;
 }
 
-/* footer.tsx: the same window, phone-wide, so the bar in the footer stays (it leaves from 640px). */
+/* footer.tsx: the same window, phone-wide; no Nav, so the bar in the footer stays. */
 .phone {
   box-sizing: border-box;
   display: flex;

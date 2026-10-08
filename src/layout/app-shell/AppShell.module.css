@@ -76,12 +76,10 @@
 }
 
 /*
- * The footer brings no padding of its own: BottomNav keeps the safe-area inset, and a footer whose
- * bar has left takes no room. It is the `prime-shell-footer` container: BottomNav follows the
- * panel's width, so a shell in a narrow frame behaves like a phone.
+ * The footer brings no padding of its own: BottomNav keeps the safe-area inset. It holds the phone
+ * navigation, so it shows only while the shell has no navigation column on screen (see below).
  */
 .footer {
-  container: prime-shell-footer / inline-size;
   position: sticky;
   bottom: 0;
   z-index: var(--prime-z-sticky);
@@ -134,4 +132,18 @@
     2 +
     env(safe-area-inset-bottom, 0px)
   );
+}
+
+/*
+ * The navigation column is on screen (a Sidebar rail, not an off-canvas panel): it navigates, so
+ * the footer with the phone bar leaves and main drops the room it kept for the capsule. Without a
+ * column, or while the Sidebar is off-canvas (`offCanvas="auto"` below 768px, `"always"`), the bar
+ * stays at any width — navigation is never left behind a hidden bar.
+ */
+.root:has(> .nav):not(:has(> .nav [data-off-canvas])) > .panel > .footer {
+  display: none;
+}
+
+.root:has(> .nav):not(:has(> .nav [data-off-canvas])) > .panel > .main {
+  padding-block-end: var(--prime-space-16);
 }

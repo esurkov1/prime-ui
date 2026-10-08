@@ -39,7 +39,7 @@ export type BottomNavRootProps = React.HTMLAttributes<HTMLElement> & {
 
 /**
  * Phone navigation: a bar of 3–5 sections at the bottom of the screen. Inside `AppShell.Footer`
- * it shows only while the content panel is narrower than 640px; wider, Sidebar navigates.
+ * it shows only while the Sidebar rail is off screen; once the rail is on screen, Sidebar navigates.
  */
 function BottomNavRoot({
   iconOnly = false,

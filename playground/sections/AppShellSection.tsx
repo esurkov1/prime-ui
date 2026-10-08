@@ -34,7 +34,7 @@ export const page: ComponentPageConfig = {
       scenario: "footer",
       title: "Нижняя полоса",
       description:
-        "Приложение шириной с телефон: полоса в нижней зоне стоит внизу, пока main прокручивается под ней, и уходит, когда панель шире 640px — `AppShell.Footer`.",
+        "Приложение для телефона без Sidebar: полоса в нижней зоне стоит внизу, пока main прокручивается под ней — `AppShell.Footer`.",
     },
     {
       scenario: "template",

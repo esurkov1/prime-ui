@@ -26,7 +26,7 @@ toolbar, view switch with `pressed`) → `ButtonGroup`. Navigation to a URL that
 `LinkButton` (it is an `<a>`); a URL that should look like a button → `Button.Root asChild` with `<a>`.
 
 **Text input.** One line → Input. Several lines → Textarea. Fixed-length code (OTP, PIN) → DigitInput.
-Files → FileUpload. A sign-in, sign-up, password-reset or code screen → LoginForm. Number with a unit →
+Files → FileUpload; a set of photos shown in order (a listing, a product), with a cover → ImageUpload. A sign-in, sign-up, password-reset or code screen → LoginForm. Number with a unit →
 Input with `Input.InlineAffix`. Search and filters above a list or table → SmartFilter; a lone search
 field in a toolbar → Input with `Input.Icon` + `type="search"` and `aria-label`.
 
@@ -71,7 +71,8 @@ task on a phone (a date, an action, two fields) → `Drawer.Content side="bottom
 pickers turn into bottom sheets below 640px by themselves — never build your own.
 
 **Phone navigation.** App navigation is Sidebar on a wide screen and `BottomNav` in `AppShell.Footer`
-on a phone for 3–5 main sections (it leaves by itself once the footer is 640px wide) — not Tabs, not a
+on a phone for 3–5 main sections (the shell hides it by itself while the Sidebar rail is on screen;
+only inside `AppShell.Footer`, never your own media query) — not Tabs, not a
 Drawer menu.
 
 **App frame.** Sidebar collapse control: `Sidebar.Toggle variant="header"` next to `Sidebar.Brand` in

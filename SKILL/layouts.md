@@ -89,6 +89,11 @@ export function AppLayout({ title, onSearch, children }: AppLayoutProps) {
 }
 ```
 
+Phone navigation for 3–5 main sections is a `BottomNav.Root` in `AppShell.Footer` (the last child of
+`AppShell.Root`, or the Template `footer` prop) — never in Main, never `position: fixed`, never behind
+your own media query. The shell hides the footer while the Sidebar rail is on screen and shows it
+while the Sidebar is off-canvas, so the bar and the rail never appear together.
+
 A nested record page keeps its `Breadcrumb` at the top of `PageContent.Header`, above the title
 ([patterns/detail-page.tsx](patterns/detail-page.tsx)) — not in `AppHeader`. `AppHeader.Actions` holds at most notifications, the account and one primary action; page
 actions stay in `PageContent.Actions`. With `offCanvas="always"` pass `show="always"` to the menu button.

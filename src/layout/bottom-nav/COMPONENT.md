@@ -7,7 +7,7 @@
 
 ## When to use
 - The main sections of an app on a phone, one tap away (Главная, Заказы, Клиенты, Ещё).
-- Next to Sidebar in one app: Sidebar navigates on a wide screen, BottomNav on a phone (inside `AppShell.Footer` it leaves by itself once the panel is 640px wide).
+- Next to Sidebar in one app: Sidebar navigates on a wide screen, BottomNav on a phone (inside `AppShell.Footer` it leaves by itself while the Sidebar rail is on screen).
 
 ## When not to use
 - More than five destinations or nested sections → use [Sidebar](../sidebar/COMPONENT.md) (off-canvas on a phone), put the rest under «Ещё».
@@ -33,7 +33,7 @@ BottomNav.Root                 <nav> bar, equal columns, safe-area inset below
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### BottomNav.Root
-`ref` → `HTMLElement`. The `<nav>` bar: equal columns, surface fill with a faint top divider, the bottom safe-area inset below the items. Inside `AppShell.Footer` it shows only while the panel is narrower than 640px.
+`ref` → `HTMLElement`. The `<nav>` bar: equal columns, surface fill with a faint top divider, the bottom safe-area inset below the items. Inside `AppShell.Footer` it shows only while the shell has no Sidebar rail on screen (no `AppShell.Nav`, or the Sidebar is off-canvas).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -97,7 +97,7 @@ Without flags the bar is flat at the screen edge on the surface, with a faint to
 | current | `current` or a router link setting `aria-current` | `aria-current="page"` on the item |
 | focus | keyboard | focus ring inside the item edge |
 | disabled | `disabled` | `disabled` / `aria-disabled`, `data-disabled` |
-| hidden | inside `AppShell.Footer` 640px wide or more | `display: none` (container `prime-shell-footer`) |
+| hidden | inside `AppShell.Footer` while the Sidebar rail is on screen (`AppShell.Nav` without an off-canvas Sidebar) | `display: none` on the footer |
 | floating / icon only | `floating` / `iconOnly` | `data-floating="true"` / `data-icon-only="true"` on the `<nav>` |
 | less transparency | `prefers-reduced-transparency: reduce` | a floating capsule turns opaque (`--prime-color-layer-floating-bg`), no blur |
 
@@ -138,7 +138,7 @@ Motion: the color of the icon and the label changes over `fast`; in the floating
 | [icon-only.tsx](examples/icon-only.tsx) | Icons alone: the labels are hidden but still name the sections for screen readers — `iconOnly`. |
 | [floating.tsx](examples/floating.tsx) | A glass capsule over the page: the client list scrolls under its blur, with labels or icons alone — `floating`, `iconOnly`. |
 | [router.tsx](examples/router.tsx) | A router link as the item: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
-| [in-app-shell.tsx](examples/in-app-shell.tsx) | The app frame on a phone: the AppHeader, the page and the bar in the footer, which leaves once the panel is 640px wide — `AppShell.Footer`. |
+| [in-app-shell.tsx](examples/in-app-shell.tsx) | The app frame on a phone: the AppHeader, the page and the bar in the footer, which gives way to the Sidebar rail once one is on screen — `AppShell.Footer`. |
 
 ## Mistakes
 - Six or more items → keep 3–5; the rest goes to a «Ещё» section or Sidebar.
@@ -146,7 +146,8 @@ Motion: the color of the icon and the label changes over `fast`; in the floating
 - `iconOnly` with icons that need a caption to be understood → keep the labels.
 - A floating bar outside a positioned container → it sits at the bottom of the nearest positioned ancestor; put it in `AppShell.Footer`.
 - An action item («Создать») in the bar → the bar navigates; put the action in the page header.
-- Hiding the bar with your own media query inside `AppShell.Footer` → the footer already hides it from 640px of panel width.
+- The bar outside `AppShell.Footer` (in Main, Root or `position: fixed` on the page) → it never leaves and shows next to the Sidebar on a desktop; put it in `AppShell.Footer` (or the Template `footer` prop).
+- Hiding the bar with your own media query → the shell already hides the footer while the Sidebar rail is on screen.
 
 ## Related
 - **Built from:** Badge, VisuallyHidden (internal)

@@ -5,8 +5,8 @@
  * `floating` turns the bar into an iOS 26 style glass capsule: a light blur, a clear tint, a
  * specular top edge, items 44 high inset 4, and a glass selection capsule under the current item
  * (icon-only: 44 squares). The bar sits on the surface with a faint top divider and keeps
- * the home-indicator inset (safe area) below its items. Inside `AppShell.Footer` (container
- * `prime-shell-footer`) it leaves once the content panel is 640px wide: there Sidebar navigates.
+ * the home-indicator inset (safe area) below its items. Inside `AppShell.Footer` it leaves while
+ * the Sidebar rail is on screen (AppShell hides the footer): there Sidebar navigates.
  */
 
 .root {
@@ -100,12 +100,6 @@
     background: var(--prime-color-layer-floating-bg);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-  }
-}
-
-@container prime-shell-footer (min-width: 640px) {
-  .root {
-    display: none;
   }
 }
 
