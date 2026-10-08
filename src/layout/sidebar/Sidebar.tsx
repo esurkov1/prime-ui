@@ -464,8 +464,10 @@ function SidebarGroup({
   const hue = disclosure ? attentionHue(children) : null;
   const flyout = useRailFlyout(folded);
   // Folded or unfolded by its heading on the rail: the `…` row swaps with the items in place
-  // instead of growing on the rail's clock. Leaving the rail ends the swap.
-  const [swap, setSwap] = React.useState(false);
+  // instead of growing on the rail's clock. A rail at mount swaps from the first click on (the
+  // swap must already be set before the state changes, or the first fold animates the old way);
+  // leaving the rail ends it, so entering the rail grows the row with the rail.
+  const [swap, setSwap] = React.useState(rail);
   if (swap && !rail) setSwap(false);
 
   if (!disclosure) {
