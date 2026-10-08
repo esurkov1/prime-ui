@@ -227,22 +227,6 @@
 }
 
 .contentInner {
-  opacity: 0;
-  translate: 0 calc(-1 * var(--prime-space-1));
-  transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
-    translate var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
-}
-
-.content[data-state="open"] .contentInner {
-  opacity: 1;
-  translate: 0 0;
-  transition:
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
-    translate var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
-}
-
-.contentInner {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-3);
@@ -256,6 +240,19 @@
   font-size: var(--acc-content-size);
   line-height: var(--acc-content-line-height);
   overflow-wrap: anywhere;
+  opacity: 0;
+  translate: 0 calc(-1 * var(--prime-space-1));
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    translate var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+}
+
+.content[data-state="open"] .contentInner {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    translate var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
 }
 
 /* Content aligns with the label text when the trigger has a leading icon. */

@@ -37,7 +37,7 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Accordion.Root
-`forwardRef` → `HTMLDivElement`. Owns which items are open; sets the size tier and the layout.
+`ref` → `HTMLDivElement`. Owns which items are open; sets the size tier and the layout.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -52,7 +52,7 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" \| "onChange">` | — | `className` and the other div attributes. |
 
 ### Accordion.Item
-`forwardRef` → `HTMLDivElement`. One section; `data-state="open" | "closed"`.
+`ref` → `HTMLDivElement`. One section; `data-state="open" | "closed"`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -61,14 +61,14 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
 ### Accordion.Header
-`forwardRef` → `HTMLHeadingElement`. The `<h3>` around the trigger.
+`ref` → `HTMLHeadingElement`. The `<h3>` around the trigger.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `className` and the other heading attributes. |
 
 ### Accordion.Trigger
-`forwardRef` → `HTMLButtonElement`. The `<button>` that toggles the item; draws a chevron after its children that turns when open.
+`ref` → `HTMLButtonElement`. The `<button>` that toggles the item; draws a chevron after its children that turns when open.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -84,7 +84,7 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Accordion.Content
-`forwardRef` → `HTMLElement`. The `<section>` region; closed content is `inert` and `aria-hidden`. `className` goes to the padded inner block.
+`ref` → `HTMLElement`. The `<section>` region; closed content is `inert` (out of the tab order and the accessibility tree). `className` goes to the padded inner block.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -120,7 +120,7 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| open / closed | `value` / `defaultValue` + `onValueChange` | `data-state="open" \| "closed"` on Item, Trigger and Content; `aria-expanded` on Trigger; `aria-hidden` + `inert` on a closed Content |
+| open / closed | `value` / `defaultValue` + `onValueChange` | `data-state="open" \| "closed"` on Item, Trigger and Content; `aria-expanded` on Trigger; `inert` on a closed Content |
 | disabled | `disabled` on Item | `data-disabled` on Item and Trigger, native `disabled`, `text-disabled`, `cursor: not-allowed` |
 | hover / active | pointer | trigger `fill-subtle` / `fill-subtle-active` |
 | focus-visible | keyboard | inset focus ring inside the trigger |
@@ -143,7 +143,7 @@ Root: `data-size`, `data-layout`. The panel height transitions through `grid-tem
 
 ### ARIA
 - The trigger is a native `<button>` inside an `<h3>` with `aria-expanded` and `aria-controls`.
-- The panel is a `<section>` with `aria-labelledby`; closed content is `inert` and `aria-hidden`, so its fields leave the tab order.
+- The panel is a `<section>` with `aria-labelledby`; closed content is `inert`, so it leaves the tab order and the accessibility tree.
 - The chevron and `Accordion.Icon` are `aria-hidden`.
 
 ### Labels
