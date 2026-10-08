@@ -1,6 +1,6 @@
 /*
- * Radio circle on the shared choice layout (ChoiceField.module.css).
- * Unchecked = fill-strong, checked = accent with a thumb-colored dot (40%) that pops in.
+ * Radio circle on the shared choice layout and states (internal/ChoiceField.module.css): this file
+ * is the circle geometry and the thumb-colored dot (40%) that pops in when checked.
  */
 .control {
   box-sizing: border-box;
@@ -11,12 +11,6 @@
   width: var(--prime-choice-size);
   height: var(--prime-choice-size);
   border-radius: var(--prime-radius-full);
-  background: var(--prime-color-fill-strong);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .dot {
@@ -32,53 +26,12 @@
     opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
 }
 
-/* ---- hover / active ---- */
-.root > label:hover .control {
-  background: var(--prime-color-fill-strong-hover);
-}
-
-.root > label:active .control {
-  transform: scale(var(--prime-motion-press-scale-compact));
-}
-
-/* ---- checked ---- */
-.root[data-state="checked"] .control {
-  background: var(--prime-color-accent-default);
-}
-
-.root[data-state="checked"] > label:hover .control {
-  background: var(--prime-color-accent-hover);
-}
-
 .root[data-state="checked"] .dot {
   opacity: 1;
   transform: scale(1);
   transition:
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-/* ---- focus-visible ---- */
-.root input:focus-visible + .control {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-/* ---- invalid ---- */
-.root[data-invalid="true"][data-state="unchecked"] .control {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
-}
-
-.root[data-invalid="true"] input:focus-visible + .control {
-  outline-color: var(--prime-color-danger-border);
-}
-
-/* ---- disabled ---- */
-.root[data-disabled="true"] .control,
-.root[data-disabled="true"] > label:hover .control {
-  background: var(--prime-color-fill-muted);
-  box-shadow: none;
-  transform: none;
 }
 
 .root[data-disabled="true"] .dot {

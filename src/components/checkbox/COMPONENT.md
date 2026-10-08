@@ -37,7 +37,7 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Checkbox.Root
-`forwardRef` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row; native input props go to the input.
+`ref` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row. Field-root rule for a leaf: `className` goes to the field `<div>`; `id`, `ref` and native input props to the input.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -104,7 +104,8 @@ Checkbox has no `variant` / `tone` / `color`.
 | checked | `checked` / `defaultChecked` | `data-state="checked"`; accent box, the check draws in |
 | indeterminate | `indeterminate` | `data-state="indeterminate"`, `input.indeterminate`; accent box with a bar |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid` on the input; danger ring on the unchecked box and on focus |
-| disabled | `disabled` | `data-disabled="true"` on root and label; `fill-muted` box, `cursor: not-allowed` |
+| disabled | `disabled` | `data-disabled="true"` on the root; `fill-muted` box, disabled text, `cursor: not-allowed` |
+| read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the root; the state stays, no hover or press, default cursor |
 | pressed | pointer press | the box scales to the compact press scale |
 | focus-visible | keyboard focus | outer focus ring around the box |
 

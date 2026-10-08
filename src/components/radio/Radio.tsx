@@ -6,6 +6,7 @@ import {
   ChoiceLabel,
   type ChoiceLabelProps,
   choiceInputClass,
+  choiceVisualClass,
 } from "@/internal/ChoiceField";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -210,7 +211,7 @@ function RadioRoot({
             aria-invalid={ids.invalid || undefined}
             aria-describedby={ids.describedBy}
           />
-          <span className={styles.control} aria-hidden="true">
+          <span className={cx(choiceVisualClass, styles.control)} aria-hidden="true">
             <span className={styles.dot} />
           </span>
         </>

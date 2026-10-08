@@ -1,7 +1,6 @@
 import type * as React from "react";
 
 import { Hint } from "@/components/hint/Hint";
-import { Label } from "@/components/label/Label";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -11,7 +10,7 @@ import type { ControlSize, DataState } from "@/internal/states";
 import styles from "./ChoiceField.module.css";
 
 /*
- * Layout shared by Checkbox, Radio and Switch:
+ * Layout and states shared by Checkbox, Radio and Switch:
  *   grid  [control] [label text]
  *         [       ] [hint | error]
  * The `<label>` row wraps the native input and its visual, so a click anywhere on it toggles.
@@ -20,11 +19,23 @@ import styles from "./ChoiceField.module.css";
 /** Class of the visually hidden native input that sits on top of the visual control. */
 export const choiceInputClass = styles.input;
 
+/**
+ * Class of the visual control (box, circle, track): fill, hover, press, checked, focus ring,
+ * invalid and disabled come from the field state. A host tunes the fills with `--choice-bg*`.
+ * Outside a field (`Checkbox.Indicator`) the element's own `data-state` / `data-disabled` drive it.
+ */
+export const choiceVisualClass = styles.visual;
+
+/** `--prime-choice-size` / gap / text of the tier in `data-size` on the same element. */
+export const choiceTierClass = styles.tier;
+
 type ChoiceFieldProps = {
   ids: FieldIds;
   size: ControlSize;
   state: Extract<DataState, "checked" | "unchecked" | "indeterminate">;
   disabled: boolean;
+  /** The state is shown but does not change: no hover or press. */
+  readOnly?: boolean;
   hint?: React.ReactNode;
   error?: React.ReactNode;
   /** The native input (with `choiceInputClass`) followed by its aria-hidden visual. */
@@ -38,34 +49,34 @@ export function ChoiceField({
   size,
   state,
   disabled,
+  readOnly = false,
   hint,
   error,
   control,
   className,
   children,
 }: ChoiceFieldProps) {
-  const { showError, showHint } = ids;
-
   return (
     <ControlSizeProvider value={size}>
       <div
-        className={cx(styles.field, className)}
+        className={cx(styles.tier, styles.field, className)}
         {...toDataAttributes({
           size,
           state,
           invalid: ids.invalid || undefined,
           disabled: disabled || undefined,
+          readonly: readOnly || undefined,
         })}
       >
-        <Label.Root htmlFor={ids.controlId} size={size} disabled={disabled} className={styles.row}>
+        <label htmlFor={ids.controlId} className={styles.row}>
           <span className={styles.controlCell}>{control}</span>
           {children}
-        </Label.Root>
-        {showError ? (
+        </label>
+        {ids.showError ? (
           <Hint.Root id={ids.errorId} size={size} invalid className={styles.support}>
             {error}
           </Hint.Root>
-        ) : showHint ? (
+        ) : ids.showHint ? (
           <Hint.Root id={ids.hintId} size={size} disabled={disabled} className={styles.support}>
             {hint}
           </Hint.Root>

@@ -1,10 +1,14 @@
-/* Checkbox box on the shared choice layout (ChoiceField.module.css). */
+/*
+ * Checkbox box on the shared choice layout and states (internal/ChoiceField.module.css): this file
+ * is only the box geometry and the check / bar mark. `Checkbox.Indicator` is the same box outside
+ * a field, its tier and state from its own data-*; the row that hosts it owns hover and press.
+ */
 .root,
 .indicator {
   --prime-choice-radius: var(--prime-radius-xs);
 }
 
-.root[data-size="xl"] {
+:is(.root, .indicator)[data-size="xl"] {
   --prime-choice-radius: var(--prime-radius-s);
 }
 
@@ -17,13 +21,15 @@
   width: var(--prime-choice-size);
   height: var(--prime-choice-size);
   border-radius: var(--prime-choice-radius);
-  background: var(--prime-color-fill-strong);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
   color: var(--prime-color-accent-fg);
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.indicator {
+  pointer-events: none;
+}
+
+:is(.root[data-disabled="true"] .control, .indicator[data-disabled="true"]) {
+  color: var(--prime-color-text-disabled);
 }
 
 .svg {
@@ -63,84 +69,4 @@
     stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-/* ---- hover ---- */
-.root > label:hover .control {
-  background: var(--prime-color-fill-strong-hover);
-}
-
-/* ---- active: tactile press ---- */
-.root > label:active .control {
-  transform: scale(var(--prime-motion-press-scale-compact));
-}
-
-/* ---- checked / indeterminate ---- */
-.root:is([data-state="checked"], [data-state="indeterminate"]) .control {
-  background: var(--prime-color-accent-default);
-}
-
-.root:is([data-state="checked"], [data-state="indeterminate"]) > label:hover .control {
-  background: var(--prime-color-accent-hover);
-}
-
-/* ---- focus-visible ---- */
-.root input:focus-visible + .control {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-/* ---- invalid ---- */
-.root[data-invalid="true"][data-state="unchecked"] .control {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
-}
-
-.root[data-invalid="true"] input:focus-visible + .control {
-  outline-color: var(--prime-color-danger-border);
-}
-
-/* ---- disabled ---- */
-.root[data-disabled="true"] .control,
-.root[data-disabled="true"] > label:hover .control {
-  background: var(--prime-color-fill-muted);
-  box-shadow: none;
-  color: var(--prime-color-text-disabled);
-  transform: none;
-}
-
-/*
- * ---- Checkbox.Indicator: the box without an input ----
- * Same box, fill and check motion as the field; the tier and state come from its own data-*.
- * No hover or press of its own: the row that hosts it (option, menu item) owns those.
- */
-.indicator {
-  --prime-choice-size: var(--prime-control-m-choice);
-  pointer-events: none;
-}
-
-.indicator[data-size="xs"] {
-  --prime-choice-size: var(--prime-control-xs-choice);
-}
-
-.indicator[data-size="s"] {
-  --prime-choice-size: var(--prime-control-s-choice);
-}
-
-.indicator[data-size="l"] {
-  --prime-choice-size: var(--prime-control-l-choice);
-}
-
-.indicator[data-size="xl"] {
-  --prime-choice-size: var(--prime-control-xl-choice);
-  --prime-choice-radius: var(--prime-radius-s);
-}
-
-.indicator:is([data-state="checked"], [data-state="indeterminate"]) {
-  background: var(--prime-color-accent-default);
-}
-
-.indicator[data-disabled="true"] {
-  background: var(--prime-color-fill-muted);
-  box-shadow: none;
-  color: var(--prime-color-text-disabled);
 }

@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Checkbox.Root",
-      en: "`forwardRef` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row; native input props go to the input.",
+      en: "`ref` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row. Field-root rule for a leaf: `className` goes to the field `<div>`; `id`, `ref` and native input props to the input.",
       ru: "Поле: строка-`<label>` с нативным input и квадратом, под ней подсказка или ошибка; нативные пропсы уходят в input.",
       props: [
         {

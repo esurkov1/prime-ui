@@ -68,13 +68,26 @@ describe("Switch", () => {
     );
 
     const control = screen.getByRole("switch", { name: "Readonly switch" });
-    expect(control).toHaveAttribute("aria-checked", "true");
+    expect(control).toBeChecked();
 
     fireEvent.click(screen.getByText("Readonly switch"));
-    expect(control).toHaveAttribute("aria-checked", "true");
+    expect(control).toBeChecked();
+    expect(control).toHaveAttribute("aria-readonly", "true");
+    expect(control.closest("[data-readonly]")).toHaveAttribute("data-readonly", "true");
   });
 
-  it("uses non-dimmed track when disabled and keeps checked + aria-checked in sync", () => {
+  it("exposes the state through the native checked state, without an aria-checked copy", () => {
+    render(
+      <Switch.Root defaultChecked>
+        <Switch.Label>Native</Switch.Label>
+      </Switch.Root>,
+    );
+    const control = screen.getByRole("switch", { name: "Native" });
+    expect(control).toBeChecked();
+    expect(control).not.toHaveAttribute("aria-checked");
+  });
+
+  it("uses non-dimmed track when disabled and keeps the checked state", () => {
     const { unmount: unmountOff } = render(
       <Switch.Root disabled>
         <Switch.Label>Disabled off</Switch.Label>
@@ -86,7 +99,6 @@ describe("Switch", () => {
     expect(trackOff).toBeTruthy();
     expect(window.getComputedStyle(trackOff).opacity).not.toBe("0.6");
     expect(controlOff).not.toBeChecked();
-    expect(controlOff).toHaveAttribute("aria-checked", "false");
 
     unmountOff();
 
@@ -99,11 +111,9 @@ describe("Switch", () => {
     const trackOn = controlOn.nextElementSibling as HTMLElement;
     expect(window.getComputedStyle(trackOn).opacity).not.toBe("0.6");
     expect(controlOn).toBeChecked();
-    expect(controlOn).toHaveAttribute("aria-checked", "true");
 
     fireEvent.click(screen.getByText("Disabled on"));
     expect(controlOn).toBeChecked();
-    expect(controlOn).toHaveAttribute("aria-checked", "true");
 
     const field = onContainer.querySelector("[data-disabled='true']");
     expect(field).toBeTruthy();

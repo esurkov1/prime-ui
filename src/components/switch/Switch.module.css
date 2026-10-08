@@ -1,7 +1,7 @@
 /*
- * Switch track on the shared choice layout (ChoiceField.module.css).
- * Track/thumb from `--prime-switch-<tier>-*`. Thumb inset = (height − thumb) / 2,
- * travel = width − height.
+ * Switch track on the shared choice layout and states (internal/ChoiceField.module.css): this file
+ * is the track and thumb geometry. Track/thumb from `--prime-switch-<tier>-*`.
+ * Thumb inset = (height − thumb) / 2, travel = width − height.
  */
 .root {
   --prime-switch-w: var(--prime-switch-m-width);
@@ -10,6 +10,9 @@
   --prime-switch-inset: calc((var(--prime-switch-h) - var(--prime-switch-thumb)) / 2);
   --prime-switch-travel: calc(var(--prime-switch-w) - var(--prime-switch-h));
   --prime-choice-control-height: var(--prime-switch-h);
+  /* The track fill changes at the thumb's pace; a disabled «on» keeps a soft accent. */
+  --choice-bg-duration: var(--prime-motion-duration-base);
+  --choice-bg-disabled-checked: var(--prime-color-accent-soft);
 }
 
 .root[data-size="xs"] {
@@ -44,12 +47,6 @@
   width: var(--prime-switch-w);
   height: var(--prime-switch-h);
   border-radius: var(--prime-radius-full);
-  background: var(--prime-color-fill-strong);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
-  transition:
-    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .track::before {
@@ -66,67 +63,8 @@
   transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
-/* ---- hover ---- */
-.root > label:hover .track {
-  background: var(--prime-color-fill-strong-hover);
-}
-
-/* ---- press: small target, so compact; read-only and disabled stay still ---- */
-.root:not([data-disabled="true"]):not(:has(input[aria-readonly="true"])) > label:active .track {
-  transform: scale(var(--prime-motion-press-scale-compact));
-}
-
-/* ---- on ---- */
-.root[data-state="checked"] .track {
-  background: var(--prime-color-accent-default);
-}
-
-.root[data-state="checked"] > label:hover .track {
-  background: var(--prime-color-accent-hover);
-}
-
 .root[data-state="checked"] .track::before {
   transform: translateX(var(--prime-switch-travel));
-}
-
-/* ---- focus-visible ---- */
-.root input:focus-visible + .track {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-/* ---- invalid ---- */
-.root[data-invalid="true"][data-state="unchecked"] .track {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
-}
-
-.root[data-invalid="true"] input:focus-visible + .track {
-  outline-color: var(--prime-color-danger-border);
-}
-
-/* ---- read-only: state is visible, interaction is not ---- */
-.root:has(input[aria-readonly="true"]) > label {
-  cursor: default;
-}
-
-.root:has(input[aria-readonly="true"]) > label:hover .track {
-  background: var(--prime-color-fill-strong);
-}
-
-.root[data-state="checked"]:has(input[aria-readonly="true"]) > label:hover .track {
-  background: var(--prime-color-accent-default);
-}
-
-/* ---- disabled (not dimmed with opacity: fills carry the state) ---- */
-.root[data-disabled="true"] .track,
-.root[data-disabled="true"] > label:hover .track {
-  background: var(--prime-color-fill-muted);
-  box-shadow: none;
-}
-
-.root[data-disabled="true"][data-state="checked"] .track,
-.root[data-disabled="true"][data-state="checked"] > label:hover .track {
-  background: var(--prime-color-accent-soft);
 }
 
 .root[data-disabled="true"] .track::before {
