@@ -33,7 +33,7 @@ Label.Root            <label>: text, then the required `*` or the optional marke
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Label.Root
-`forwardRef` → `HTMLLabelElement`. The native `<label>`: text, then the required `*` or the optional marker; provides its size to the icons inside.
+`ref` → `HTMLLabelElement`. The native `<label>`: text, then the required `*` or the optional marker; provides its size to the icons inside.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

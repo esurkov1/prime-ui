@@ -70,7 +70,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the `<div>`. |
 
 ### Input.Field
-`forwardRef` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.
+`ref` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -107,7 +107,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
 ### Input.ClearButton
-`forwardRef` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.
+`ref` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

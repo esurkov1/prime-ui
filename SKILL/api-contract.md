@@ -16,7 +16,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 
 | Concept | API | Notes |
 |---|---|---|
-| Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`; Modal/Drawer `Content` takes `size` for its width. `Button.Root`, `Input.Root`, `Icon` and `Checkbox.Indicator` without `size` take the tier of a sized host (Popover, Banner, LoginForm, DataTable toolbar, `ControlSizeProvider`). |
+| Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`; Modal/Drawer `Content` takes `size` for its width. Every field and control (Input, Textarea, DigitInput, Checkbox, Radio, Switch, Slider, FileUpload, ColorSwatches, ColorPresets, SegmentedControl, Button, ButtonGroup, LinkButton, Label) and `Icon` / `Checkbox.Indicator` without `size` take the tier of a sized host (Popover, Banner, LoginForm, DataTable toolbar, `ControlSizeProvider`), else `m`. |
 | Treatment | `variant` | `solid · soft · outline · ghost`; structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
 | Meaning | `tone` | Button: `accent \| neutral \| danger`, plus `inherit` (with `ghost \| soft \| outline`) for an action on a colored host — it takes the host's text color; never recolor a Button with a CSS override. Destructive is `danger`, never `error`. |
 | Decoration | `color` | Badge, Avatar, Thumbnail, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `FileUpload.FormatBadge`, `Timeline.Item`, TagSelect options. |

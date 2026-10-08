@@ -51,7 +51,7 @@ SegmentedControl.Root                 role="radiogroup"; track + sliding thumb, 
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" \| "onChange">` | — | `aria-label` / `aria-labelledby` (name the group), `className` and the other div attributes. |
 
 ### SegmentedControl.Item
-`forwardRef` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped to truncate.
+`ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped to truncate.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

@@ -131,7 +131,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Input.Field",
-      en: "`forwardRef` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.",
+      en: "`ref` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.",
       ru: "Нативный `<input>` с id, aria-связями и `aria-invalid` из контекста.",
       props: [
         {
@@ -207,7 +207,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Input.ClearButton",
-      en: "`forwardRef` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.",
+      en: "`ref` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.",
       ru: "Сегмент очистки на всю высоту поля у конца. Рендерите его, только пока есть значение.",
       props: [
         {

@@ -73,7 +73,7 @@ export const api: ComponentApi = {
     },
     {
       name: "SegmentedControl.Item",
-      en: '`forwardRef` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped to truncate.',
+      en: '`ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped to truncate.',
       ru: 'Один вариант — `<button role="radio">` с перемещаемым `tabIndex`.',
       props: [
         {

@@ -28,7 +28,10 @@ describe("SegmentedControl — размеры (регрессия CSS)", () => {
   it("каждый ярус берёт высоту контрола своего же яруса", () => {
     const css = readFileSync(segmentedModuleCssPath, "utf8");
 
-    for (const tier of ["xs", "s", "m", "l", "xl"] as const) {
+    // m is the default on the base rule; every other tier overrides it.
+    const base = css.match(/\.root\s*\{[^}]*\}/s)?.[0] ?? "";
+    expect(base).toContain("--seg-control-height: var(--prime-control-m-height)");
+    for (const tier of ["xs", "s", "l", "xl"] as const) {
       const block =
         css.match(new RegExp(`\\.root\\[data-size="${tier}"\\]\\s*\\{[^}]*\\}`, "s"))?.[0] ?? "";
       expect(block).toContain(`--seg-control-height: var(--prime-control-${tier}-height)`);

@@ -41,11 +41,11 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### LoginForm.Root
-`forwardRef` → `HTMLDivElement`. The sign-in card: card fill, radius and shadow, the tier rhythm; provides its size to the parts. Native `<div>` props.
+`ref` → `HTMLDivElement`. The sign-in card: card fill, radius and shadow, the tier rhythm; provides its size to the parts. Native `<div>` props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of padding, gaps and text roles; Inputs and Buttons inside without their own `size` take it. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of padding, gaps and text roles; every field and button inside without its own `size` takes it. |
 | `align` | `"start" \| "center"` | `"start"` | `start` — the Modal header layout (rounded accent tile left, title over description right); `center` — a round logo above centered text. |
 | `flat` | `boolean` | `false` | Removes the card shadow (inside a Modal or on a plain page). No border either way. |
 | `className` | `string` | — | Class on the card. |
@@ -70,7 +70,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 `ref` → `HTMLDivElement`. Everything under the header: provider buttons, divider, form, footer. Native `<div>` props.
 
 ### LoginForm.Form
-`forwardRef` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props.
+`ref` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props.
 
 ### LoginForm.Actions
 `ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action. Native `<div>` props.
@@ -88,7 +88,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | `l` | padding 32, gap 40, field gap 20, heading-s | a standalone sign-in screen on a wide canvas | |
 | `xl` | padding 40, gap 40, field gap 24, heading-m | marketing-grade sign-in, touch-first | |
 
-**Sizes:** Inputs and Buttons inside take the Root `size` unless they set their own.
+**Sizes:** every field and button inside (Input, DigitInput, Checkbox, Button, LinkButton…) takes the Root `size` unless it sets its own.
 
 ### align
 | Value | Looks like | Use when | Default |
@@ -102,7 +102,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | `flat` | card fill, no shadow | inside a Modal or any other surface | `false` |
 
 **Combinations**
-- Recommended: one `size` on Root only (Inputs and Buttons follow it); `hint` / `error` on fields for validation; a danger [Banner](../banner/COMPONENT.md) at the top of `Form` for server errors.
+- Recommended: one `size` on Root only (fields and buttons follow it); `hint` / `error` on fields for validation; a danger [Banner](../banner/COMPONENT.md) at the top of `Form` for server errors.
 - Avoid: more than one primary button; provider buttons in `solid` (they compete with the submit); a Card around LoginForm.
 
 ## States
@@ -155,7 +155,7 @@ No `labels`.
 - `LoginForm.Social` → removed; provider buttons go in `LoginForm.Actions`.
 - A placeholder instead of a field label → pass `label` to the field.
 - A Card around LoginForm → the root already is the card; use `flat` inside another surface.
-- Repeating the card `size` on every field and button → set it once on Root; Inputs and Buttons follow it.
+- Repeating the card `size` on every field and button → set it once on Root; fields and buttons follow it.
 
 ## Related
 - **Built from:** [Typography](../typography/COMPONENT.md) (`Title`, `Description`, `Footer`)
