@@ -7,7 +7,7 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# На main не отменяем в процессе — чтобы не оборвать publish; на PR — отменяем устаревшие прогоны.
+# Runs on main are never cancelled (a publish must not be cut off); stale PR runs are.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/main') }}

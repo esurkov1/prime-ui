@@ -34,8 +34,7 @@ bun run docs:build          # COMPONENT.md API + Labels sections from api.ts
 bun run tokens:build        # src/styles/*.css from tokens/
 bun run build               # tokens + bundle + d.ts
 bun run verify              # everything CI runs — must be green before a commit
-bun run verify:tokens       # tokens:build shows no diff
-bun run verify:docs         # docs:build shows no diff
+bun run verify:tokens       # tokens:build shows no diff (generated API docs: the docs contract test)
 ```
 
 ## Conventions

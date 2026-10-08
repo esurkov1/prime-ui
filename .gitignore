@@ -37,8 +37,9 @@ pnpm-debug.log*
 # Test / tooling
 *.lcov
 
-# IDE / agent (локальные планы Cursor, не часть пакета)
+# Agents: local settings, plans and worktrees
 .cursor/
+.claude/
 
-# Локальное приложение-потребитель кита (не коммитится)
+# A local consumer app of the kit
 platform/
