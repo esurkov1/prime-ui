@@ -23,8 +23,8 @@ describe("generated token styles", () => {
       "--prime-control-xl-height",
       "--prime-text-body-m-size",
       "--prime-space-4",
-      "--prime-z-modal",
-      "--prime-z-tooltip-in-drawer-in-modal",
+      "--prime-z-overlay",
+      "--prime-z-toast",
       "--prime-color-palette-teal-soft",
     ]) {
       expect(light).toContain(`${name}:`);

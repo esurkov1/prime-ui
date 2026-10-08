@@ -202,7 +202,6 @@ function PopoverContent({
       {...rest}
       floating={floating}
       size={size}
-      tier="popover"
       scroll
       id={contentId}
       role="dialog"

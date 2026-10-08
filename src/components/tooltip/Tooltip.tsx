@@ -314,7 +314,6 @@ function TooltipContent({
       {...rest}
       floating={floating}
       size={size}
-      tier="tooltip"
       surface={false}
       id={contentId}
       role="tooltip"

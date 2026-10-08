@@ -142,8 +142,9 @@ cards `--prime-card-radius` (12); floating panels `--prime-panel-radius` (12) wi
 `--prime-panel-padding` (4) and `--prime-panel-item-radius` (8); modal `--prime-modal-radius` (16).
 
 Elevation: `--prime-shadow-raised` (cards, barely there) · `--prime-shadow-overlay` (menus, popovers,
-tooltips, datepicker; z popover/dropdown/tooltip) · `--prime-shadow-modal` (modal, drawer; z modal/drawer).
-Z-index: `--prime-z-*` only.
+tooltips, datepicker) · `--prime-shadow-modal` (modal, drawer).
+Z-index: `--prime-z-*` only. Every overlay shares `--prime-z-overlay` and portals to `<body>` when it
+opens, so the open order is the stacking order; toasts sit above on `--prime-z-toast`.
 
 Focus ring must never be clipped (hard rule):
 - Fields (Input, Textarea, Select/TagSelect/Datepicker triggers, DigitInput cells, ColorPicker channels, search fields in panels)

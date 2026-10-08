@@ -121,7 +121,6 @@ Title uses the tier text size with title weight; Description uses the tier label
 | size | `size` on Content | `data-size` |
 | width | `matchTriggerWidth` | `data-match-trigger-width="true"` |
 | flush | `flush` | `data-flush="true"` |
-| opened from a menu or a list | inside Dropdown / Select / TagSelect panels | `data-overlay-stack="above-dropdown"`: the panel rises above that panel |
 
 There is no `disabled` on Popover: a disabled trigger never opens it.
 

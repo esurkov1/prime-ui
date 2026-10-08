@@ -648,7 +648,6 @@ export function TagSelect({
         <FloatingPanel
           floating={floating}
           size={size}
-          tier="dropdown"
           scroll
           id={listboxId}
           role="listbox"

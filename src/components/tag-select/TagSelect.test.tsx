@@ -148,7 +148,11 @@ describe("TagSelect", () => {
     render(<BasicTagSelect onOptionUpdate={onOptionUpdate} />);
     fireEvent.focus(screen.getByRole("combobox"));
     await user.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-overlay-stack", "above-dropdown");
+    // One overlay z-index: the menu opened later is portaled after the list, so it is on top.
+    const position = screen
+      .getByRole("listbox")
+      .compareDocumentPosition(screen.getByRole("dialog"));
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const name = screen.getByRole("textbox", { name: "Название тега" });
     await user.clear(name);
     await user.type(name, "Альфа{Enter}");

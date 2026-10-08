@@ -198,21 +198,7 @@
   --prime-ref-space-8: 2rem;
   --prime-ref-space-9: 2.25rem;
   --prime-ref-z-index-base: 1;
-  --prime-ref-z-index-drawer: 2000;
-  --prime-ref-z-index-drawer-nested-shell: 3400;
-  --prime-ref-z-index-dropdown: 1200;
-  --prime-ref-z-index-dropdown-in-drawer: 2200;
-  --prime-ref-z-index-dropdown-in-drawer-in-modal: 3600;
-  --prime-ref-z-index-dropdown-in-modal: 3200;
-  --prime-ref-z-index-modal: 3000;
-  --prime-ref-z-index-popover: 1000;
-  --prime-ref-z-index-popover-in-drawer: 2100;
-  --prime-ref-z-index-popover-in-drawer-in-modal: 3500;
-  --prime-ref-z-index-popover-in-modal: 3100;
+  --prime-ref-z-index-overlay: 1000;
   --prime-ref-z-index-sticky: 100;
   --prime-ref-z-index-toast: 10000;
-  --prime-ref-z-index-tooltip: 1600;
-  --prime-ref-z-index-tooltip-in-drawer: 2300;
-  --prime-ref-z-index-tooltip-in-drawer-in-modal: 3700;
-  --prime-ref-z-index-tooltip-in-modal: 3300;
 }

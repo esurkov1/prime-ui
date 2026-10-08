@@ -1,11 +1,10 @@
-import * as React from "react";
+import type * as React from "react";
 
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import surfaceStyles from "@/internal/floatingSurface.module.css";
-import { DropdownLayerContext, useOverlayPortalLayer } from "@/internal/OverlayPortalLayerContext";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import { Slot } from "@/internal/slot";
@@ -18,11 +17,6 @@ export type FloatingPanelProps = Omit<React.HTMLAttributes<HTMLElement>, "onAnim
   floating: FloatingLayer;
   /** Tier of the panel (`data-size`) and of the controls inside. */
   size: ControlSize;
-  /**
-   * Stacking tier: `popover` panels sit under `dropdown` panels (menus, listboxes) of the same
-   * portal layer, `tooltip` above both.
-   */
-  tier: "popover" | "dropdown" | "tooltip";
   /** The panel scrolls (a ScrollContainer) instead of a plain `<div>`. */
   scroll?: boolean;
   /** The raised floating surface (radius, shadow, fill). Default `true`. */
@@ -31,14 +25,14 @@ export type FloatingPanelProps = Omit<React.HTMLAttributes<HTMLElement>, "onAnim
 };
 
 /**
- * The panel of a floating layer: portaled to `<body>`, positioned, animated from `data-state` /
+ * The panel of a floating layer: portaled to `<body>` when it opens (so it stacks above every
+ * layer opened before it, on the one overlay z-index), positioned, animated from `data-state` /
  * `data-side` (foundation §8), a size context for the controls inside, and a layer context so
- * layers opened inside stack above it. Renders nothing while closed.
+ * layers opened inside stack above it in the layer stack. Renders nothing while closed.
  */
 export function FloatingPanel({
   floating,
   size,
-  tier,
   scroll = false,
   surface = true,
   className,
@@ -47,26 +41,20 @@ export function FloatingPanel({
   ref,
   ...rest
 }: FloatingPanelProps) {
-  const portalLayer = useOverlayPortalLayer();
-  const aboveDropdown = React.useContext(DropdownLayerContext);
   const panelRef = useMergedRefs<HTMLElement>(floating.panelRef, ref);
   if (!floating.mounted) return null;
 
   const props = {
     ...rest,
-    ref: panelRef,
     className: cx(
       surface && surfaceStyles.surface,
-      tier === "popover" && surfaceStyles.popoverLayer,
-      tier === "dropdown" && surfaceStyles.dropdownLayer,
+      surfaceStyles.layer,
       overlayMotion.floating,
       className,
     ),
     "data-state": floating.presence.state,
     "data-side": floating.side,
     "data-size": size,
-    "data-overlay-portal-layer": portalLayer,
-    "data-overlay-stack": tier === "popover" && aboveDropdown ? "above-dropdown" : undefined,
     onAnimationEnd: floating.presence.onExitEnd,
     onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
       onKeyDown?.(event);
@@ -77,19 +65,17 @@ export function FloatingPanel({
   return (
     <Portal>
       <LayerProvider value={floating.layer}>
-        <DropdownLayerContext.Provider value={tier === "dropdown" || aboveDropdown}>
-          <ControlSizeProvider value={size}>
-            {scroll ? (
-              <ScrollContainer {...props} ref={panelRef as React.Ref<HTMLDivElement>}>
-                {children}
-              </ScrollContainer>
-            ) : (
-              <div {...props} ref={panelRef as React.Ref<HTMLDivElement>}>
-                {children}
-              </div>
-            )}
-          </ControlSizeProvider>
-        </DropdownLayerContext.Provider>
+        <ControlSizeProvider value={size}>
+          {scroll ? (
+            <ScrollContainer {...props} ref={panelRef as React.Ref<HTMLDivElement>}>
+              {children}
+            </ScrollContainer>
+          ) : (
+            <div {...props} ref={panelRef as React.Ref<HTMLDivElement>}>
+              {children}
+            </div>
+          )}
+        </ControlSizeProvider>
       </LayerProvider>
     </Portal>
   );

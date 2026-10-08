@@ -496,7 +496,6 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
       {...rest}
       floating={floating}
       size={size}
-      tier="dropdown"
       className={cx(menu.tier, menu.menu, styles.content, className)}
       onKeyDown={handleKeyDown}
       {...toDataAttributes({ searching: query !== "" || undefined })}

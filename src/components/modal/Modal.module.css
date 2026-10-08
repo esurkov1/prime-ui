@@ -6,7 +6,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: var(--prime-z-modal);
+  z-index: var(--prime-z-overlay);
   display: grid;
   place-items: center;
   box-sizing: border-box;

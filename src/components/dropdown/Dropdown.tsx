@@ -156,7 +156,6 @@ function DropdownContent({
       {...rest}
       floating={floating}
       size={size}
-      tier="dropdown"
       scroll
       id={menuId}
       role="menu"

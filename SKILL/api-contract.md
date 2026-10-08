@@ -155,7 +155,6 @@ Cancel.
 | `NotificationProvider`, `useNotifications()` | toasts; provider once at the app root, `notify({ tone, title, description, action })` |
 | `Tooltip.Provider` | shared delay for many tooltips |
 | `ControlSizeProvider` | set one `size` for a whole region (dense toolbar, compact form) |
-| `OverlayPortalLayerProvider` | portal target for overlays inside a custom layer |
 | `useSidebar()` | Sidebar state for custom parts inside `Sidebar.Root` |
 | `matchesSmartFilter`, `resolveSmartFilterValues` | apply a SmartFilter value to your rows |
 | `Icon`, `Icon*` | kit icon set — see Icons below |

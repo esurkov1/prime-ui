@@ -135,7 +135,6 @@ Below 640px of viewport every size is full width with square corners.
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the scrim and the panel; mounted until the slide-out ends |
 | side / size | Content props | `data-side`, `data-size` on the panel |
-| nested in a Modal | opened from a Modal | `data-nested-in-modal="true"`: stacks above the Modal |
 | open: trapped | while open | focus trapped, page scroll locked, siblings of the portal `inert` |
 
 Motion: the scrim fades, the panel slides from its side over `slow` and leaves over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once.

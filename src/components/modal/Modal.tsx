@@ -5,7 +5,6 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { type PresenceState, usePresence } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
-import { OverlayPortalLayerProvider } from "@/internal/OverlayPortalLayerContext";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
@@ -169,9 +168,7 @@ function ModalDialog({
       >
         <DialogShellProvider value={shell.value}>
           <LayerProvider value={layer}>
-            <OverlayPortalLayerProvider value="modal">
-              <ControlSizeProvider value="m">{children}</ControlSizeProvider>
-            </OverlayPortalLayerProvider>
+            <ControlSizeProvider value="m">{children}</ControlSizeProvider>
           </LayerProvider>
         </DialogShellProvider>
       </div>

@@ -20,10 +20,6 @@ import {
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { type PresenceState, usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
-import {
-  OverlayPortalLayerProvider,
-  useOverlayPortalLayer,
-} from "@/internal/OverlayPortalLayerContext";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
@@ -103,7 +99,7 @@ type DrawerDialogProps = DrawerContentProps & {
   onExitEnd: (event: React.SyntheticEvent<Element>) => void;
 };
 
-/** Mounted inside the portal so focus trap and inert siblings see the attached node. */
+/** Mounted inside the portal so the modal layer sees the attached node. */
 function DrawerDialog({
   side = "right",
   size = "m",
@@ -131,10 +127,6 @@ function DrawerDialog({
     footerLayout: "end",
   });
 
-  const parentLayer = useOverlayPortalLayer();
-  // A drawer opened from a Modal (or from a drawer above a Modal) stays above it.
-  const nestedInModal = parentLayer === "modal" || parentLayer === "drawerInModal";
-
   return (
     // One portal root for scrim + panel, so `useInertSiblings` never makes the scrim inert.
     <div className={styles.root}>
@@ -142,7 +134,6 @@ function DrawerDialog({
         role="presentation"
         className={cx(styles.overlay, overlayMotion.scrim, overlayClassName)}
         data-state={state}
-        data-nested-in-modal={nestedInModal ? "true" : undefined}
       />
       <div
         ref={panelRef}
@@ -153,17 +144,12 @@ function DrawerDialog({
         data-side={side}
         data-size={size}
         data-state={state}
-        data-nested-in-modal={nestedInModal ? "true" : undefined}
         onAnimationEnd={onExitEnd}
         {...shell.aria}
         {...rest}
       >
         <DialogShellProvider value={shell.value}>
-          <LayerProvider value={layer}>
-            <OverlayPortalLayerProvider value={nestedInModal ? "drawerInModal" : "drawer"}>
-              {children}
-            </OverlayPortalLayerProvider>
-          </LayerProvider>
+          <LayerProvider value={layer}>{children}</LayerProvider>
         </DialogShellProvider>
       </div>
     </div>

@@ -5,8 +5,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Select } from "@/components/select/Select";
 
-import { DropdownLayerContext } from "@/internal/OverlayPortalLayerContext";
-
 import { Popover } from "./Popover";
 
 function BasicPopover({
@@ -384,15 +382,6 @@ describe("Popover — overlay contract", () => {
     const panel = screen.getByRole("dialog");
     expect(panel).toHaveAttribute("data-match-trigger-width", "true");
     expect(panel.style.getPropertyValue("--float-min-w")).not.toBe("");
-  });
-
-  it("rises above the panel it was opened from inside a dropdown layer", () => {
-    render(
-      <DropdownLayerContext.Provider value>
-        <BasicPopover defaultOpen />
-      </DropdownLayerContext.Provider>,
-    );
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-overlay-stack", "above-dropdown");
   });
 
   it("flush marks the panel for edge-to-edge content", () => {

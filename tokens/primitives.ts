@@ -260,25 +260,15 @@ export const primitiveTokens = {
     emphasized: "cubic-bezier(0.32, 0.72, 0, 1)",
   },
 
-  /** Stacking order. In-overlay layers sit above their host so nested portals stay on top. */
+  /**
+   * Stacking order. Every overlay (modal, drawer, popover, menu, listbox, tooltip) portals to
+   * `<body>` when it opens and shares one level: the DOM order is the open order, so a layer opened
+   * later — a Select inside a Modal, a Tooltip inside a Popover — is on top without its own number.
+   */
   zIndex: {
     base: "1",
     sticky: "100",
-    popover: "1000",
-    dropdown: "1200",
-    tooltip: "1600",
-    drawer: "2000",
-    popoverInDrawer: "2100",
-    dropdownInDrawer: "2200",
-    tooltipInDrawer: "2300",
-    modal: "3000",
-    popoverInModal: "3100",
-    dropdownInModal: "3200",
-    tooltipInModal: "3300",
-    drawerNestedShell: "3400",
-    popoverInDrawerInModal: "3500",
-    dropdownInDrawerInModal: "3600",
-    tooltipInDrawerInModal: "3700",
+    overlay: "1000",
     toast: "10000",
   },
 } as const;

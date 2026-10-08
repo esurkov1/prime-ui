@@ -1,7 +1,8 @@
 /*
  * Drawer — raised edge panel on a scrim. Same zones as Modal (DialogParts.module.css), each
- * with its own side padding; header and footer stay put, only the body scrolls. Width per size tier; full width below 640px. Nested drawers stack in DOM order on the same
- * layer; inside a Modal the shell moves to `--prime-z-drawer-nested-shell`.
+ * with its own side padding; header and footer stay put, only the body scrolls. Width per size
+ * tier; full width below 640px. On the one overlay level: a drawer opened from a Modal or another
+ * drawer is portaled later, so it stacks above it in DOM order.
  */
 
 .root {
@@ -11,12 +12,8 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: var(--prime-z-drawer);
+  z-index: var(--prime-z-overlay);
   background: var(--prime-color-bg-scrim);
-}
-
-.overlay[data-nested-in-modal="true"] {
-  z-index: var(--prime-z-drawer-nested-shell);
 }
 
 .panel {
@@ -29,7 +26,7 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  z-index: var(--prime-z-drawer);
+  z-index: var(--prime-z-overlay);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -56,10 +53,6 @@
 
 .panel[data-size="xl"] {
   --drawer-width: var(--prime-drawer-width-xl);
-}
-
-.panel[data-nested-in-modal="true"] {
-  z-index: var(--prime-z-drawer-nested-shell);
 }
 
 /* Rounded only on the edge that faces the page. */

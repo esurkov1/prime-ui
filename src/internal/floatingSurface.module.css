@@ -30,53 +30,7 @@
   outline: none;
 }
 
-/* ─── Stacking: popovers under dropdown-level panels of the same portal layer ─ */
-
-.popoverLayer[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-z-popover);
-}
-
-.popoverLayer[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-z-popover-in-drawer);
-}
-
-.popoverLayer[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-z-popover-in-modal);
-}
-
-.popoverLayer[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-z-popover-in-drawer-in-modal);
-}
-
-.dropdownLayer[data-overlay-portal-layer="page"] {
-  z-index: var(--prime-z-dropdown);
-}
-
-.dropdownLayer[data-overlay-portal-layer="drawer"] {
-  z-index: var(--prime-z-dropdown-in-drawer);
-}
-
-.dropdownLayer[data-overlay-portal-layer="modal"] {
-  z-index: var(--prime-z-dropdown-in-modal);
-}
-
-.dropdownLayer[data-overlay-portal-layer="drawerInModal"] {
-  z-index: var(--prime-z-dropdown-in-drawer-in-modal);
-}
-
-/* A popover opened from inside a dropdown-level panel: tooltip levels clear the panel. */
-.popoverLayer[data-overlay-portal-layer="page"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-z-tooltip);
-}
-
-.popoverLayer[data-overlay-portal-layer="drawer"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-z-tooltip-in-drawer);
-}
-
-.popoverLayer[data-overlay-portal-layer="modal"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-z-tooltip-in-modal);
-}
-
-.popoverLayer[data-overlay-portal-layer="drawerInModal"][data-overlay-stack="above-dropdown"] {
-  z-index: var(--prime-z-tooltip-in-drawer-in-modal);
+/* Every overlay shares one level; the DOM (open) order stacks them (tokens/primitives zIndex). */
+.layer {
+  z-index: var(--prime-z-overlay);
 }
