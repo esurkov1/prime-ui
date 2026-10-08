@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import { StageDepthProvider } from "@/internal/surfaceDepth";
+
 import { ExampleFrame } from "./ExampleFrame";
 
 describe("ExampleFrame", () => {
@@ -13,6 +15,35 @@ describe("ExampleFrame", () => {
     expect(screen.getByText("stage")).toBeInTheDocument();
     expect(container.querySelector("[data-viewport]")).toHaveAttribute("data-viewport", "desktop");
     expect(screen.getByRole("radio", { name: "Десктоп" })).toBeChecked();
+  });
+
+  // The stage lays out its children with `> *` selectors: a wrapper would break every layout.
+  it("keeps the example a direct child of the stage and puts the stage on the asked layer", () => {
+    render(
+      <StageDepthProvider value={1}>
+        <ExampleFrame code="" previewLayout="row">
+          <button type="button">A</button>
+          <span>B</span>
+        </ExampleFrame>
+      </StageDepthProvider>,
+    );
+    const button = screen.getByRole("button", { name: "A" });
+    const stage = button.parentElement as HTMLElement;
+    expect(stage).toHaveAttribute("data-preview-layout", "row");
+    expect(stage).toHaveAttribute("data-depth", "1");
+    expect(screen.getByText("B").parentElement).toBe(stage);
+  });
+
+  it("puts the stage on the page (layer 0) by default", () => {
+    render(
+      <ExampleFrame code="">
+        <button type="button">A</button>
+      </ExampleFrame>,
+    );
+    expect(screen.getByRole("button", { name: "A" }).parentElement).toHaveAttribute(
+      "data-depth",
+      "0",
+    );
   });
 
   it("names both toolbar switches and moves the device choice with arrow keys", () => {

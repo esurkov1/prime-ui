@@ -1,9 +1,10 @@
 import * as React from "react";
 
 import { ExampleFrame, type ExampleFrameProps } from "@/components/example-frame/ExampleFrame";
+import { StageDepthProvider } from "@/internal/surfaceDepth";
 
 import type { SourceEntry } from "../sourceRegistry";
-import { PreviewSurfaceDepth, usePlaygroundPreviewTheme } from "./PlaygroundPreviewTheme";
+import { previewSurfaceDepth, usePlaygroundPreviewTheme } from "./PlaygroundPreviewTheme";
 import { usePlaygroundTheme } from "./PlaygroundTheme";
 
 export type PlaygroundExampleFrameProps = Omit<
@@ -18,24 +19,23 @@ export type PlaygroundExampleFrameProps = Omit<
 
 /**
  * ExampleFrame bound to playground state: theme from `<html data-theme>`, shared viewport and
- * the playground-wide preview layer: `playground.css` paints the stage via `data-preview-surface`,
- * `PreviewSurfaceDepth` puts the example on that layer of the ladder.
+ * the playground-wide preview layer: the stage itself takes that layer's `data-depth`
+ * (`StageDepthProvider`), so it paints the layer and the example stays its direct child.
  */
 export function PlaygroundExampleFrame(props: PlaygroundExampleFrameProps) {
   const { scheme } = usePlaygroundTheme();
   const { viewport, setViewport, surface } = usePlaygroundPreviewTheme();
-  const { children, ...rest } = props;
   return (
-    <div className="playgroundFrame" data-preview-surface={surface}>
-      <ExampleFrame
-        {...rest}
-        colorScheme={scheme}
-        showThemeToggle={false}
-        viewport={viewport}
-        onViewportChange={setViewport}
-      >
-        <PreviewSurfaceDepth surface={surface}>{children}</PreviewSurfaceDepth>
-      </ExampleFrame>
+    <div className="playgroundFrame">
+      <StageDepthProvider value={previewSurfaceDepth(surface)}>
+        <ExampleFrame
+          {...props}
+          colorScheme={scheme}
+          showThemeToggle={false}
+          viewport={viewport}
+          onViewportChange={setViewport}
+        />
+      </StageDepthProvider>
     </div>
   );
 }

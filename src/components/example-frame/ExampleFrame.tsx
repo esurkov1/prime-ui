@@ -4,7 +4,11 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
-import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import {
+  SurfaceDepthProvider,
+  useNestedSurfaceDepth,
+  useStageDepth,
+} from "@/internal/surfaceDepth";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 import { suspendTransitions } from "@/theme/applyTheme";
 
@@ -123,6 +127,7 @@ export function ExampleFrame({
   const rootRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(rootRef, ref);
   const depth = useNestedSurfaceDepth();
+  const stageDepth = useStageDepth();
   const previousScheme = React.useRef(colorScheme);
   React.useLayoutEffect(() => {
     if (previousScheme.current === colorScheme) return;
@@ -150,9 +155,11 @@ export function ExampleFrame({
               className={styles.previewInner}
               data-preview-layout={previewLayout}
               data-theme={colorScheme}
+              data-depth={stageDepth}
             >
-              {/* The stage is a page of its own: surfaces inside count from layer 0 again. */}
-              <SurfaceDepthProvider value={0}>{children}</SurfaceDepthProvider>
+              {/* The stage is a page of its own (or the layer the docs ask for); surfaces inside
+                  count from it. Never wrap `children` in an element: the layouts use `> *`. */}
+              <SurfaceDepthProvider value={stageDepth}>{children}</SurfaceDepthProvider>
             </div>
           </div>
         </div>

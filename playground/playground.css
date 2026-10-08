@@ -130,8 +130,8 @@ body {
 }
 
 /* --- Preview layers --------------------------------------------------------
- * The same example on a layer of the ladder (foundation §4): the page or a card. The stage paints
- * the layer; the example inside gets its `data-depth` from `PreviewSurfaceDepth`.
+ * The same example on a layer of the ladder (foundation §4): the page or a card. The stage takes
+ * the layer as its own `data-depth` (`StageDepthProvider`) and paints it; nothing wraps the example.
  */
 
 .playgroundFrame {
@@ -140,8 +140,4 @@ body {
 
 .playgroundFrame [data-preview-layout] {
   transition: background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
-}
-
-.playgroundFrame[data-preview-surface="card"] [data-preview-layout] {
-  background: var(--prime-color-layer-1-bg);
 }

@@ -2,7 +2,7 @@ import * as React from "react";
 
 import type { ExampleFrameViewport } from "@/components/example-frame/ExampleFrame";
 import { createComponentContext } from "@/internal/context";
-import { type SurfaceDepth, SurfaceDepthProvider } from "@/internal/surfaceDepth";
+import type { SurfaceDepth } from "@/internal/surfaceDepth";
 
 /**
  * The layer a preview sits on (foundation §4): the page or a card. A menu or a modal is the same
@@ -20,24 +20,9 @@ export const PLAYGROUND_PREVIEW_SURFACES: ReadonlyArray<{
   { value: "card", depth: 1, label: "В карточке" },
 ];
 
-/**
- * Puts its children on the layer of `surface`: `data-depth` for the context variables and the
- * depth context for surfaces inside. `display: contents`, so it adds no box of its own.
- */
-export function PreviewSurfaceDepth({
-  surface,
-  children,
-}: {
-  surface: PlaygroundPreviewSurface;
-  children: React.ReactNode;
-}) {
-  const entry = PLAYGROUND_PREVIEW_SURFACES.find((s) => s.value === surface);
-  if (!entry || entry.depth === 0) return <>{children}</>;
-  return (
-    <div style={{ display: "contents" }} data-depth={entry.depth}>
-      <SurfaceDepthProvider value={entry.depth}>{children}</SurfaceDepthProvider>
-    </div>
-  );
+/** The ladder depth of a preview surface. */
+export function previewSurfaceDepth(surface: PlaygroundPreviewSurface): SurfaceDepth {
+  return PLAYGROUND_PREVIEW_SURFACES.find((s) => s.value === surface)?.depth ?? 0;
 }
 
 type PlaygroundPreviewThemeValue = {

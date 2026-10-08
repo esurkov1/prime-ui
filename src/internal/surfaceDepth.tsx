@@ -29,3 +29,17 @@ export function useNestedSurfaceDepth(): SurfaceDepth {
 
 /** Surfaces inside `children` count their depth from `value`. */
 export const SurfaceDepthProvider = SurfaceDepthContext.Provider;
+
+const StageDepthContext = React.createContext<SurfaceDepth>(0);
+StageDepthContext.displayName = "StageDepthContext";
+
+/**
+ * The layer an ExampleFrame stage stands for (the docs' "preview background"). The stage element
+ * itself takes it as `data-depth`: no wrapper may sit between the stage and the example, because
+ * the stage lays out its children with child selectors (`> *`).
+ */
+export const StageDepthProvider = StageDepthContext.Provider;
+
+export function useStageDepth(): SurfaceDepth {
+  return React.useContext(StageDepthContext);
+}
