@@ -114,11 +114,6 @@
   user-select: none;
 }
 
-/* Every level starts with its chevron; the first level has none. */
-.item:first-child > .separator {
-  display: none;
-}
-
 .ellipsis {
   display: inline-flex;
   flex-shrink: 0;

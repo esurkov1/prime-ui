@@ -59,8 +59,30 @@ describe("Breadcrumb", () => {
     const items = screen.getAllByRole("listitem");
     expect(items).toHaveLength(2);
     for (const item of items) expect(item).not.toHaveAttribute("aria-hidden");
-    // The chevron is decorative, inside the level it leads to; CSS hides the first one.
+    // The chevron is decorative, inside the level it leads to; the first level has none.
+    expect(items[0].querySelector('[aria-hidden="true"] svg')).toBeNull();
     expect(items[1].querySelector('[aria-hidden="true"] svg')).toBeInTheDocument();
+  });
+
+  it("a kept level gets its chevron when a level is inserted before it", () => {
+    function Trail({ parent }: { parent?: string }) {
+      return (
+        <Breadcrumb.Root>
+          {parent ? <Breadcrumb.Item>{parent}</Breadcrumb.Item> : null}
+          <Breadcrumb.Item current>Color</Breadcrumb.Item>
+        </Breadcrumb.Root>
+      );
+    }
+    const { rerender } = render(<Trail />);
+    const color = screen.getByText("Color").closest("li") as HTMLElement;
+    expect(color.querySelector('[aria-hidden="true"] svg')).toBeNull();
+
+    rerender(<Trail parent="Основа" />);
+    const [first, second] = screen.getAllByRole("listitem");
+    // The same element, now second: it shows the chevron.
+    expect(second).toBe(color);
+    expect(second.querySelector('[aria-hidden="true"] svg')).toBeInTheDocument();
+    expect(first.querySelector('[aria-hidden="true"] svg')).toBeNull();
   });
 
   it("a current level with a link marks the link as the current page", () => {

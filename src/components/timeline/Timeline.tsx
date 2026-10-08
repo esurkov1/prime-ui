@@ -42,10 +42,28 @@ export type TimelineGroupProps = {
   ref?: React.Ref<HTMLOListElement>;
 } & Omit<React.OlHTMLAttributes<HTMLOListElement>, "children">;
 
+type EdgeValue = { first: boolean; last: boolean };
+
+/**
+ * Where an event sits in its group. The group tells each event, so the line stops at the first
+ * and the last dot from `data-first` / `data-last` — `:first-child` / `:last-child` are not
+ * re-evaluated by every engine when an event is added next to a kept one.
+ */
+const EdgeContext = React.createContext<EdgeValue>({ first: false, last: false });
+
 /** One labelled `<ol>` of events. The connecting line runs from its first dot to its last. */
 function TimelineGroup({ label, children, className, ...rest }: TimelineGroupProps) {
   const labelId = React.useId();
   const hasLabel = label !== undefined && label !== null && label !== false;
+  const events = React.Children.toArray(children);
+  const items = events.map((child, index) => (
+    <EdgeContext.Provider
+      key={React.isValidElement(child) ? child.key : index}
+      value={{ first: index === 0, last: index === events.length - 1 }}
+    >
+      {child}
+    </EdgeContext.Provider>
+  ));
   return (
     <div className={styles.group}>
       {hasLabel ? (
@@ -58,12 +76,16 @@ function TimelineGroup({ label, children, className, ...rest }: TimelineGroupPro
         {...rest}
         className={cx(styles.list, className)}
       >
-        {children}
+        {items}
       </ol>
     </div>
   );
 }
 TimelineGroup.displayName = "Timeline.Group";
+
+function edgeAttributes({ first, last }: EdgeValue) {
+  return { first: first || undefined, last: last || undefined };
+}
 
 // ─── Item ─────────────────────────────────────────────────────────────────────
 
@@ -97,6 +119,7 @@ function TimelineItem({
   ref,
   ...rest
 }: TimelineItemProps) {
+  const edge = React.useContext(EdgeContext);
   // A callback ref fits whichever element the row renders.
   const rowRef = useMergedRefs<HTMLElement | null>(ref);
   const interactive = Boolean(asChild || href || onClick);
@@ -153,7 +176,11 @@ function TimelineItem({
     );
   }
 
-  return <li className={styles.item}>{row}</li>;
+  return (
+    <li className={styles.item} {...toDataAttributes(edgeAttributes(edge))}>
+      {row}
+    </li>
+  );
 }
 TimelineItem.displayName = "Timeline.Item";
 
@@ -275,8 +302,9 @@ function TimelineGap({ tone = "neutral", children, className, ...rest }: Timelin
     React.isValidElement(child) && child.type === TimelineGapMeta;
   const caption = parts.filter((child) => !isMeta(child));
   const meta = parts.filter(isMeta);
+  const edge = React.useContext(EdgeContext);
   return (
-    <li className={cx(styles.item, styles.gapItem)}>
+    <li className={cx(styles.item, styles.gapItem)} {...toDataAttributes(edgeAttributes(edge))}>
       <div {...rest} className={cx(styles.gapRow, className)} {...toDataAttributes({ tone })}>
         <span className={styles.gapDot} aria-hidden="true" />
         <span className={styles.gapCaption}>{caption}</span>

@@ -171,8 +171,9 @@
   bottom: 0;
 }
 
-.item:first-child::before,
-.item:last-child::after {
+/* The group marks its first and last event (not `:first-child`, see Timeline.tsx). */
+.item[data-first]::before,
+.item[data-last]::after {
   display: none;
 }
 

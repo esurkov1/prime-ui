@@ -31,6 +31,33 @@ function Feed({ onSelect }: { onSelect?: (id: string) => void }) {
 }
 
 describe("Timeline", () => {
+  it("marks the first and last event of a group, also after an event is added", () => {
+    function Events({ count }: { count: number }) {
+      return (
+        <Timeline.Root>
+          <Timeline.Group label="Недавно">
+            {["Счёт оплачен", "Заказ отправлен", "Заказ доставлен"].slice(0, count).map((title) => (
+              <Timeline.Item key={title}>
+                <Timeline.Title>{title}</Timeline.Title>
+              </Timeline.Item>
+            ))}
+          </Timeline.Group>
+        </Timeline.Root>
+      );
+    }
+    const { rerender } = render(<Events count={2} />);
+    const second = screen.getAllByRole("listitem")[1];
+    expect(second).toHaveAttribute("data-last");
+
+    rerender(<Events count={3} />);
+    const items = screen.getAllByRole("listitem");
+    expect(items[0]).toHaveAttribute("data-first");
+    // The kept event is no longer last: its line now runs on to the new one.
+    expect(items[1]).toBe(second);
+    expect(second).not.toHaveAttribute("data-last");
+    expect(items[2]).toHaveAttribute("data-last");
+  });
+
   it("renders a labelled ordered list with one item per row", () => {
     render(<Feed />);
     const list = screen.getByRole("list", { name: "Недавно" });

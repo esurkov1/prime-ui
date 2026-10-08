@@ -40,9 +40,18 @@ export type BreadcrumbRootProps = React.HTMLAttributes<HTMLElement> & {
 /** From this many levels the middle ones collapse into «…» on narrow containers. */
 const COLLAPSIBLE_MIN_ITEMS = 3;
 
-/** The chevron in front of a level; decorative, and hidden by CSS before the first level. */
+/**
+ * Whether a level is the first one. Root tells each level its place, so the chevron is rendered
+ * or not by React — a `:first-child` rule is not re-evaluated by every engine when a level is
+ * inserted before a kept one (Safari inside a size container), and the chevron got lost.
+ */
+const FirstLevelContext = React.createContext(true);
+
+/** The chevron in front of a level; decorative, and absent before the first level. */
 function Separator() {
   const { size } = React.useContext(BreadcrumbContext);
+  const first = React.useContext(FirstLevelContext);
+  if (first) return null;
   return (
     <span aria-hidden="true" className={styles.separator}>
       <Icon name="nav.chevronRight" size={size} tone="secondary" />
@@ -64,7 +73,15 @@ function BreadcrumbRoot({
     [size, nav, ellipsis],
   );
 
-  const items = React.Children.toArray(children);
+  // Each level learns whether it is the first; keys stay the children's own.
+  const items = React.Children.toArray(children).map((child, index) => (
+    <FirstLevelContext.Provider
+      key={React.isValidElement(child) ? child.key : index}
+      value={index === 0}
+    >
+      {child}
+    </FirstLevelContext.Provider>
+  ));
   const collapsible = items.length >= COLLAPSIBLE_MIN_ITEMS;
 
   return (
@@ -82,7 +99,9 @@ function BreadcrumbRoot({
                 {items[0]}
                 {/* Shown only on narrow widths (container query) in place of the middle levels,
                     which are then `display: none`; it names them for screen readers. */}
-                <BreadcrumbEllipsis className={styles.autoCollapse} />
+                <FirstLevelContext.Provider value={false}>
+                  <BreadcrumbEllipsis className={styles.autoCollapse} />
+                </FirstLevelContext.Provider>
                 {items.slice(1)}
               </>
             ) : (
