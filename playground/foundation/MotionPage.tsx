@@ -318,9 +318,9 @@ function PressDemo() {
 }
 
 const SWAP_ROWS = [
-  { id: "granit", name: "ООО «Гранит»", amount: "₽ 94 750" },
-  { id: "orlov", name: "ИП Орлов Д. С.", amount: "₽ 18 000" },
-  { id: "alfa", name: "АО «Альфа Медиа»", amount: "₽ 380 000" },
+  { id: "granit", name: "ООО «Гранит»", amount: "94 750 ₽" },
+  { id: "orlov", name: "ИП Орлов Д. С.", amount: "18 000 ₽" },
+  { id: "alfa", name: "АО «Альфа Медиа»", amount: "380 000 ₽" },
 ];
 
 const SWAP_LOAD_MS = 1500;

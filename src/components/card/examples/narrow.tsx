@@ -28,7 +28,7 @@ export default function CardNarrowExample() {
                     <Icon name="object.wallet" />
                   </Card.Icon>
                   <Card.Label>Средний чек</Card.Label>
-                  <Card.Value>₽ 2 450</Card.Value>
+                  <Card.Value>2 450 ₽</Card.Value>
                 </div>
               </Card.Body>
             </Card.Root>
@@ -36,7 +36,7 @@ export default function CardNarrowExample() {
           <div className={width.className}>
             <Card.Root variant="stat-trend">
               <Card.Label>Выручка</Card.Label>
-              <Card.Value>₽ 4,2 млн</Card.Value>
+              <Card.Value>4,2 млн ₽</Card.Value>
               <Card.Delta tone="success">+18% к прошлому месяцу</Card.Delta>
             </Card.Root>
           </div>

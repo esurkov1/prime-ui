@@ -24,7 +24,7 @@ export default function CardVariantsExample() {
 
       <Card.Root variant="stat-trend">
         <Card.Label>Выручка за месяц</Card.Label>
-        <Card.Value>₽ 4,2 млн</Card.Value>
+        <Card.Value>4,2 млн ₽</Card.Value>
         <Card.Delta tone="success">+18% к сентябрю</Card.Delta>
       </Card.Root>
 

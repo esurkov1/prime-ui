@@ -16,9 +16,9 @@ import styles from "./examples.module.css";
 type Status = "loading" | "ready" | "empty" | "error";
 
 const PAYMENTS = [
-  { id: "p1", payer: "ООО «Гранит»", amount: "₽ 94 750" },
-  { id: "p2", payer: "ИП Орлов Д. С.", amount: "₽ 18 000" },
-  { id: "p3", payer: "АО «Альфа Медиа»", amount: "₽ 380 000" },
+  { id: "p1", payer: "ООО «Гранит»", amount: "94 750 ₽" },
+  { id: "p2", payer: "ИП Орлов Д. С.", amount: "18 000 ₽" },
+  { id: "p3", payer: "АО «Альфа Медиа»", amount: "380 000 ₽" },
 ];
 
 export default function CrossfadeOverviewExample() {

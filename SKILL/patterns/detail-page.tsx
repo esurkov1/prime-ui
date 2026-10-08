@@ -89,7 +89,7 @@ export default function DetailPagePattern() {
         <PageContent.Actions>
           <Dropdown.Root>
             <Dropdown.Trigger>
-              <Button.Root variant="ghost" tone="neutral" aria-label="Другие действия">
+              <Button.Root variant="soft" tone="neutral" aria-label="Другие действия">
                 <Button.Icon>
                   <Icon name="action.more" />
                 </Button.Icon>
@@ -206,12 +206,14 @@ export default function DetailPagePattern() {
               </Card.Header>
               <Card.Body>
                 <Timeline.Root>
-                  {HISTORY.map((event) => (
-                    <Timeline.Item key={event.id}>
-                      <Timeline.Title>{event.title}</Timeline.Title>
-                      <Timeline.Meta>{event.date}</Timeline.Meta>
-                    </Timeline.Item>
-                  ))}
+                  <Timeline.Group>
+                    {HISTORY.map((event) => (
+                      <Timeline.Item key={event.id}>
+                        <Timeline.Title>{event.title}</Timeline.Title>
+                        <Timeline.Meta>{event.date}</Timeline.Meta>
+                      </Timeline.Item>
+                    ))}
+                  </Timeline.Group>
                 </Timeline.Root>
               </Card.Body>
             </Card.Root>

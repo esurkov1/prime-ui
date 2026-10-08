@@ -53,7 +53,7 @@ export function OrdersHeader() {
       <PageContent.Actions>
         <Dropdown.Root>
           <Dropdown.Trigger>
-            <Button.Root variant="ghost" tone="neutral" aria-label="Другие действия">
+            <Button.Root variant="soft" tone="neutral" aria-label="Другие действия">
               <Button.Icon>
                 <Icon name="action.more" />
               </Button.Icon>
@@ -139,7 +139,9 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 - **One primary per area** (page header, card, dialog, form): `solid`, last in its row. Secondary:
   `soft` + `tone="neutral"`. Dismiss / revert: `ghost` + `neutral` in pages and cards, `outline` +
-  `neutral` in Modal / Drawer footers. Rare actions: a `Dropdown` behind an `action.more` icon button.
+  `neutral` in Modal / Drawer footers. Rare actions: a `Dropdown` behind an `action.more` icon button —
+  `soft` + `neutral` in a header row (it has a shape beside the other buttons), `ghost` size `s` in a
+  table cell.
 - Placement: page actions in `PageContent.Actions`; card actions in `Card.Footer`; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; bulk actions in the table toolbar.
 - An empty state's action replaces the header's primary, it does not duplicate it.
@@ -253,7 +255,7 @@ Component-level slop with bad → good code: [anti-slop.md](anti-slop.md).
 Go down this ladder and stop at the first step that works.
 
 1. **Find it in the kit.** Search [components.md](components.md), then the Variants and Anatomy of the
-   closest component: Card has 9 templates, Input has icons / affixes / a clear button / a counter,
+   closest component: Card has 7 templates, Input has icons / affixes / a clear button / a counter,
    Select has rich items and search, Dropdown has a profile header, DataTable has a toolbar slot, nested
    rows and a detail row.
 2. **Compose kit parts.** Put existing components together on a layout wrapper (CSS Module, `gap` on
@@ -293,7 +295,7 @@ export function RevenuePanel() {
       </Card.Header>
       <Card.Body>
         <Typography as="p" variant="heading-m">
-          ₽ 4,2 млн
+          4,2 млн ₽
         </Typography>
         <Typography as="p" variant="body-s" tone="secondary">
           +18% к прошлому месяцу

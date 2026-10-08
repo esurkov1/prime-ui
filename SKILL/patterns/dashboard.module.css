@@ -7,11 +7,11 @@
   gap: var(--prime-space-4);
 }
 
-/* Panels: two columns from ~40rem of width. */
+/* Panels: two columns from ~40rem of width; neighbours share one height. */
 .panels {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-20) * 4)), 1fr));
-  align-items: start;
+  align-items: stretch;
   gap: var(--prime-space-4);
 }
 

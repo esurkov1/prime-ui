@@ -27,8 +27,8 @@ const PAYMENTS: Payment[] = [
 ];
 
 const ACCOUNTS = [
-  { name: "Т-Банк, расчётный", balance: "₽ 4 812 300" },
-  { name: "Сбербанк, расчётный", balance: "₽ 1 207 950" },
+  { name: "Т-Банк, расчётный", balance: "4 812 300 ₽" },
+  { name: "Сбербанк, расчётный", balance: "1 207 950 ₽" },
 ];
 
 const MONEY = new Intl.NumberFormat("ru-RU", {

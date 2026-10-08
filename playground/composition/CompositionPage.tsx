@@ -37,9 +37,11 @@ const RHYTHM: Row[] = [
     how: "встроено в `label` / `hint` поля",
   },
   { what: "кнопки и фильтры в ряд", value: "8", how: "`--prime-space-2`" },
+  { what: "строки одного элемента (имя над мета)", value: "0–4", how: "`--prime-space-1`" },
   { what: "заголовок группы → её поля", value: "16", how: "`--prime-space-4`" },
   { what: "плитка → плитка в сетке", value: "16", how: "`--prime-space-4`" },
   { what: "поле → поле, переключатель → переключатель", value: "20", how: "`--prime-space-5`" },
+  { what: "основная колонка → боковая", value: "24", how: "`--prime-space-6`" },
   { what: "группа → группа в форме", value: "32", how: "`--prime-space-8`" },
   { what: "шапка страницы → содержимое", value: "32", how: "даёт `PageContent`" },
   { what: "блок → блок страницы", value: "40", how: "даёт `PageContent.Body`" },
@@ -75,7 +77,7 @@ export default function CompositionPage() {
         <DocList>
           <li>
             {renderInlineCode(
-              "Один раз на приложение — `AppShell.Root` + `Sidebar` в `AppShell.Nav`, страница — в `AppShell.Main`. Экран, который вы отдаёте, рендерит только свою страницу.",
+              "Один раз на приложение — `AppShell.Root` + `Sidebar` в `AppShell.Nav`, сверху `AppHeader` (где вы, поиск ⌘K, кнопка меню на телефоне), страница — в `AppShell.Main`. Экран, который вы отдаёте, рендерит только свою страницу.",
             )}
           </li>
           <li>
@@ -139,7 +141,7 @@ export default function CompositionPage() {
         <DocList>
           <li>
             {renderInlineCode(
-              'Одно главное действие на область (`solid`, последним в ряду). Остальные — `soft` / `ghost` / `outline` с `tone="neutral"`, редкие — в `Dropdown` за `action.more`.',
+              'Одно главное действие на область (`solid`, последним в ряду). Остальные — `soft` / `ghost` / `outline` с `tone="neutral"`, редкие — в `Dropdown` за `action.more` (`soft` в шапке, `ghost` размера `s` в ячейке таблицы).',
             )}
           </li>
           <li>

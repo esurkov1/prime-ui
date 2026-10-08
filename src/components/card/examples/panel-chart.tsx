@@ -23,7 +23,7 @@ export default function CardPanelChartExample() {
         </Card.Header>
         <Card.Body>
           <Typography variant="body-s" tone="secondary">
-            С начала квартала: ₽ 12,6 млн, план выполнен на 84%.
+            С начала квартала: 12,6 млн ₽, план выполнен на 84%.
           </Typography>
         </Card.Body>
         <Card.Media>

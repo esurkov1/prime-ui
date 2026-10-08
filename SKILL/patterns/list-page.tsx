@@ -207,6 +207,7 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
     accessor: "due",
     sortable: true,
     numeric: true,
+    headerAlign: "end",
     cell: (row) => DAY.format(new Date(row.due)),
   },
   {
@@ -215,6 +216,7 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
     accessor: "amount",
     sortable: true,
     numeric: true,
+    headerAlign: "end",
     cell: (row) => MONEY.format(row.amount),
   },
   {

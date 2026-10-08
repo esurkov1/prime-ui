@@ -25,22 +25,22 @@ const KPIS: Record<
   { label: string; value: string; delta: string; tone: "success" | "danger" | "neutral" }[]
 > = {
   week: [
-    { label: "Выручка", value: "₽ 2,1 млн", delta: "+6% к прошлой неделе", tone: "success" },
+    { label: "Выручка", value: "2,1 млн ₽", delta: "+6% к прошлой неделе", tone: "success" },
     { label: "Оплачено счетов", value: "54", delta: "+4", tone: "success" },
-    { label: "Средний чек", value: "₽ 38 900", delta: "без изменений", tone: "neutral" },
-    { label: "Просрочено", value: "₽ 1,2 млн", delta: "+₽ 180 тыс.", tone: "danger" },
+    { label: "Средний чек", value: "38 900 ₽", delta: "без изменений", tone: "neutral" },
+    { label: "Просрочено", value: "1,2 млн ₽", delta: "+180 тыс. ₽", tone: "danger" },
   ],
   month: [
-    { label: "Выручка", value: "₽ 8,4 млн", delta: "+12% к сентябрю", tone: "success" },
+    { label: "Выручка", value: "8,4 млн ₽", delta: "+12% к сентябрю", tone: "success" },
     { label: "Оплачено счетов", value: "214", delta: "+17", tone: "success" },
-    { label: "Средний чек", value: "₽ 39 300", delta: "−3% к сентябрю", tone: "danger" },
-    { label: "Просрочено", value: "₽ 1,2 млн", delta: "−₽ 340 тыс.", tone: "success" },
+    { label: "Средний чек", value: "39 300 ₽", delta: "−3% к сентябрю", tone: "danger" },
+    { label: "Просрочено", value: "1,2 млн ₽", delta: "−340 тыс. ₽", tone: "success" },
   ],
   quarter: [
-    { label: "Выручка", value: "₽ 24,6 млн", delta: "+21% ко II кварталу", tone: "success" },
+    { label: "Выручка", value: "24,6 млн ₽", delta: "+21% ко II кварталу", tone: "success" },
     { label: "Оплачено счетов", value: "631", delta: "+88", tone: "success" },
-    { label: "Средний чек", value: "₽ 39 000", delta: "+1%", tone: "neutral" },
-    { label: "Просрочено", value: "₽ 1,2 млн", delta: "−₽ 1,1 млн", tone: "success" },
+    { label: "Средний чек", value: "39 000 ₽", delta: "+1%", tone: "neutral" },
+    { label: "Просрочено", value: "1,2 млн ₽", delta: "−1,1 млн ₽", tone: "success" },
   ],
 };
 
@@ -164,7 +164,7 @@ export default function DashboardPattern() {
             <Card.Header>
               <Card.Title as="h2">Дебиторка</Card.Title>
               <Typography as="span" variant="caption" tone="muted">
-                ₽ 8,2 млн
+                8,2 млн ₽
               </Typography>
             </Card.Header>
             <Card.Body>
@@ -178,7 +178,7 @@ export default function DashboardPattern() {
                         {part.label}
                       </Badge.Root>
                       <Typography as="span" variant="body-m" className={styles.amount}>
-                        ₽ {String(part.value).replace(".", ",")} млн
+                        {String(part.value).replace(".", ",")} млн ₽
                       </Typography>
                     </li>
                   ))}
