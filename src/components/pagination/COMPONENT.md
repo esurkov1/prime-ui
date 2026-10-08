@@ -68,7 +68,7 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 ### siblingCount
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| any, `totalPages ≤ 7` | every page number, no ellipsis | short lists | |
+| any, `totalPages ≤ 2 × siblingCount + 5` (7 by default) | every page number, no ellipsis | short lists | |
 | `1` | 1 … 19 20 21 … 40 | most lists | yes |
 | `2` | 1 … 18 19 20 21 22 … 40 | wide footers, frequent jumps | |
 
