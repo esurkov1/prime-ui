@@ -1,12 +1,17 @@
 import * as React from "react";
 
+import { DialogGuard } from "@/components/modal/DialogGuard";
 import {
+  DIALOG_DISCARD_LABELS,
+  DialogActions,
   DialogBody,
   DialogClose,
   DialogDescription,
+  type DialogDiscardLabels,
   DialogFooter,
   DialogHeader,
   DialogIcon,
+  DialogMeta,
   DialogRootProvider,
   DialogShellProvider,
   DialogTitle,
@@ -16,40 +21,43 @@ import {
   useDialogRoot,
   useDialogRootContext,
   useDialogShellValue,
+  useExitSnapshot,
 } from "@/components/modal/DialogParts";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { type PresenceState, usePresence } from "@/hooks/usePresence";
-import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 import { cx } from "@/internal/cx";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
-import sheet from "@/internal/sheet.module.css";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 
 import styles from "./Drawer.module.css";
 
+export type { DialogGuardProps as DrawerGuardProps } from "@/components/modal/DialogGuard";
 export type {
+  DialogActionsProps as DrawerActionsProps,
   DialogBodyProps as DrawerBodyProps,
   DialogCloseProps as DrawerCloseProps,
   DialogDescriptionProps as DrawerDescriptionProps,
   DialogFooterProps as DrawerFooterProps,
   DialogHeaderProps as DrawerHeaderProps,
   DialogIconProps as DrawerIconProps,
+  DialogMetaProps as DrawerMetaProps,
   DialogTitleProps as DrawerTitleProps,
   DialogTriggerProps as DrawerTriggerProps,
 } from "@/components/modal/DialogParts";
 
-export type DrawerSide = "left" | "right" | "bottom";
+export type DrawerSide = "left" | "right";
 
-export type DrawerLabels = {
+export type DrawerLabels = DialogDiscardLabels & {
   /** `aria-label` of the header close button. */
   close: string;
 };
 
 const DRAWER_LABELS: DrawerLabels = {
   close: "Закрыть",
+  ...DIALOG_DISCARD_LABELS,
 };
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -60,14 +68,22 @@ export type DrawerRootProps = {
   onOpenChange?: (open: boolean) => void;
   /** Escape closes the drawer. Default `true`. */
   closeOnEscape?: boolean;
-  /** A click on the scrim or a swipe toward the edge closes the drawer. Default `true`. */
+  /** A click on the scrim closes the drawer. Default `true`. */
   closeOnOutsideClick?: boolean;
   labels?: Partial<DrawerLabels>;
   children?: React.ReactNode;
 };
 
 function DrawerRoot({ labels, children, ...options }: DrawerRootProps) {
-  const state = useDialogRoot({ ...options, closeLabel: labels?.close ?? DRAWER_LABELS.close });
+  const { close, discardTitle, discardDescription, discardConfirm, discardCancel } = {
+    ...DRAWER_LABELS,
+    ...labels,
+  };
+  const discardLabels = React.useMemo(
+    () => ({ discardTitle, discardDescription, discardConfirm, discardCancel }),
+    [discardTitle, discardDescription, discardConfirm, discardCancel],
+  );
+  const state = useDialogRoot({ ...options, closeLabel: close, discardLabels });
   return <DialogRootProvider value={state}>{children}</DialogRootProvider>;
 }
 DrawerRoot.displayName = "Drawer.Root";
@@ -75,12 +91,9 @@ DrawerRoot.displayName = "Drawer.Root";
 // ─── Content ──────────────────────────────────────────────────────────────────
 
 export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** Edge the panel slides from; `bottom` is a sheet with a grab handle. Default `right`. */
+  /** Edge the panel slides from. Default `right`. */
   side?: DrawerSide;
-  /**
-   * Panel width: `s` 360 · `m` 480 · `l` 640 · `xl` 800 (a bottom sheet is centred). Full width
-   * below 640px of viewport.
-   */
+  /** Panel width: `s` 360 · `m` 480 · `l` 640 · `xl` 800. Full width below 640px of viewport. */
   size?: Exclude<ControlSize, "xs">;
   /** Class on the full-screen scrim. */
   overlayClassName?: string;
@@ -88,14 +101,17 @@ export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-function DrawerContent(props: DrawerContentProps) {
+function DrawerContent({ children, ...props }: DrawerContentProps) {
   const { open } = useDialogRootContext();
-  // Stays mounted with `data-state="closed"` for the slide-out.
+  // Stays mounted with `data-state="closed"` for the slide-out, showing what it showed open.
   const presence = usePresence(open, { exitDuration: "base" });
+  const shown = useExitSnapshot(open, children);
   if (!presence.mounted) return null;
   return (
     <Portal>
-      <DrawerDialog {...props} state={presence.state} onExitEnd={presence.onExitEnd} />
+      <DrawerDialog {...props} state={presence.state} onExitEnd={presence.onExitEnd}>
+        {shown}
+      </DrawerDialog>
     </Portal>
   );
 }
@@ -117,26 +133,12 @@ function DrawerDialog({
   "aria-describedby": ariaDescribedBy,
   state,
   onExitEnd,
-  onPointerDown,
   ref,
   ...rest
 }: DrawerDialogProps) {
   const root = useDialogRootContext();
   const { ref: layerRef, layer, onClose } = useDialogLayer<HTMLDivElement>(root);
   const panelRef = useMergedRefs(layerRef, ref);
-  const bottom = side === "bottom";
-  const scrimRef = React.useRef<HTMLDivElement>(null);
-  // Swiping is a dismiss from outside the content, like a scrim click.
-  const swipe = useSwipeDismiss({
-    enabled: root.closeOnOutsideClick && state === "open",
-    direction: bottom ? "down" : side,
-    onDismiss: onClose,
-    handle: "[data-swipe-handle], header",
-    touchAnywhere: !bottom,
-    // The scrim fades with the panel: half way out, half as dark.
-    onProgress: (progress) =>
-      scrimRef.current?.style.setProperty("--swipe-progress", `${progress}`),
-  });
 
   const shell = useDialogShellValue({
     ariaLabel,
@@ -144,6 +146,7 @@ function DrawerDialog({
     ariaDescribedBy,
     onClose,
     closeLabel: root.closeLabel,
+    busy: root.busy,
     footerLayout: "end",
   });
 
@@ -151,7 +154,6 @@ function DrawerDialog({
     // One portal root for scrim + panel, so `useInertSiblings` never makes the scrim inert.
     <div className={styles.root}>
       <div
-        ref={scrimRef}
         role="presentation"
         className={cx(styles.overlay, overlayMotion.scrim, overlayClassName)}
         data-state={state}
@@ -161,13 +163,7 @@ function DrawerDialog({
         role="dialog"
         aria-modal="true"
         tabIndex={-1}
-        className={cx(
-          dialogShellClassName,
-          styles.panel,
-          overlayMotion.drawer,
-          bottom ? sheet.swipeY : sheet.swipeX,
-          className,
-        )}
+        className={cx(dialogShellClassName, styles.panel, overlayMotion.drawer, className)}
         data-side={side}
         data-size={size}
         data-state={state}
@@ -175,12 +171,7 @@ function DrawerDialog({
         onAnimationEnd={onExitEnd}
         {...shell.aria}
         {...rest}
-        onPointerDown={(event) => {
-          onPointerDown?.(event);
-          swipe.onPointerDown(event);
-        }}
       >
-        {bottom ? <div className={sheet.handle} data-swipe-handle="" aria-hidden="true" /> : null}
         <DialogShellProvider value={shell.value}>
           <LayerProvider value={layer}>
             <SurfaceDepthProvider value="floating">{children}</SurfaceDepthProvider>
@@ -203,7 +194,10 @@ export const Drawer = {
   Icon: DialogIcon,
   Title: DialogTitle,
   Description: DialogDescription,
+  Actions: DialogActions,
   Body: DialogBody,
   Footer: DialogFooter,
+  Meta: DialogMeta,
   Close: DialogClose,
+  Guard: DialogGuard,
 };

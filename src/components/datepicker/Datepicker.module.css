@@ -222,8 +222,10 @@
   height: var(--dp-cell);
 }
 
-/* Month grid: a table in markup (semantics), a CSS grid of 7 equal columns in layout. */
+/* Month grid: a table in markup (semantics), a CSS grid of 7 columns in layout; the size container
+   the column gaps are measured against. */
 .table {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -236,9 +238,17 @@
   gap: var(--prime-space-1);
 }
 
+/*
+ * Seven day columns, each one cell wide at most; the room left over goes into the six gaps
+ * between them, so the first and the last column stand at the month's edges, under the month
+ * arrows. Narrower than seven cells, the gaps are 0 and the columns shrink.
+ */
 .row {
+  --dp-col-gap: max(0px, calc((100cqi - 7 * var(--dp-cell)) / 6));
+
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, var(--dp-cell)));
+  column-gap: var(--dp-col-gap);
 }
 
 .weekday {
@@ -258,6 +268,7 @@
 }
 
 .cell {
+  position: relative;
   display: grid;
   place-items: center;
   height: var(--dp-cell);
@@ -266,11 +277,26 @@
 
 /* Continuous band: inner cells square, rounded only on the outer side of each run. */
 .cell[data-band="selected"] {
-  background: var(--prime-color-accent-soft);
+  --dp-band: var(--prime-color-accent-soft);
+
+  background: var(--dp-band);
 }
 
 .cell[data-band="preview"] {
-  background: color-mix(in srgb, var(--prime-color-accent-soft) 60%, transparent);
+  --dp-band: color-mix(in srgb, var(--prime-color-accent-soft) 60%, transparent);
+
+  background: var(--dp-band);
+}
+
+/* The band also fills the column gap after a cell, unless the run ends there. */
+.cell[data-band]:not([data-band-end="true"])::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 100%;
+  width: var(--dp-col-gap);
+  background: var(--dp-band);
+  pointer-events: none;
 }
 
 .cell[data-band-start="true"] {
@@ -478,41 +504,30 @@
 }
 
 /* ─── Embedded panel (Datepicker.Panel) ────────────────────────────────────
- * The embedded panel is itself a layer of the ladder (`data-depth`, foundation §4): the layer fill,
- * card radius and the raised whisper on the page, so it reads on any host. It sizes to its content and never centers
- * months in slack; months (1 or 2) follow the parent's available width (see resolvePanelLayout).
+ * Host content, not a card: no fill, radius, shadow or padding — the host (a Drawer sheet, a
+ * Card, the page) is the container and its padding is the calendar's. The panel takes the host's
+ * width: the months (1 or 2, by the available width — see resolvePanelLayout) share it, the day
+ * columns spread, each day stays one cell; a month grows to 20 cells wide at most.
+ * Narrower than one month, the cells shrink.
  */
 
 .panel[data-embedded="true"] {
   box-sizing: border-box;
-  width: fit-content;
-  max-width: 100%;
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-layer-current);
-  box-shadow: var(--prime-layer-shadow);
-}
-
-.panel[data-embedded="true"] .main {
-  padding: var(--prime-card-padding-s);
-}
-
-/* Narrower than one month: the panel takes the column, cells shrink. */
-.panel[data-compact="true"] {
   width: 100%;
 }
 
-.panel[data-compact="true"] .month {
+.panel[data-embedded="true"] .main {
+  padding: 0;
+}
+
+.panel[data-embedded="true"] .month {
   flex: 1 1 0;
   width: auto;
   min-width: 0;
-  max-width: calc(var(--dp-cell) * 7);
+  max-width: calc(var(--dp-cell) * 20);
 }
 
-/* Narrower than one month: cells shrink, tighter gutters. */
-.panel[data-compact="true"] .main {
-  padding: var(--prime-space-2);
-}
-
+/* Narrower than one month: tighter gutters. */
 .panel[data-compact="true"] .months {
   gap: var(--prime-space-4);
 }

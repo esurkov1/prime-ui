@@ -25,15 +25,15 @@
 /* ─── Header ─────────────────────────────────────────────────────────────── */
 
 /*
- * Grid, not markup order: icon | title + description | close always share one row,
- * whatever order the children come in.
+ * Grid, not markup order: icon | title + description | actions | close always share one row,
+ * whatever order the children come in. Every column is named; an absent part leaves an empty
+ * `auto` track of zero width, so the spacing is a margin on each part instead of a column gap.
  */
 .header {
   display: grid;
   flex: 0 0 auto;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: [icon] auto [text] minmax(0, 1fr) [actions] auto [close] auto;
   align-items: center;
-  column-gap: var(--prime-space-4);
   row-gap: var(--prime-space-1);
   min-width: 0;
   padding: var(--prime-space-6) var(--dialog-padding) var(--prime-space-5);
@@ -44,13 +44,9 @@
   background: var(--dialog-hairline) center bottom / var(--dialog-hairline-size) no-repeat;
 }
 
-.header:has(> .icon) {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-}
-
-/* Title, description and any custom text sit in the text column (second from the end). */
-.header > :not(.icon, .close) {
-  grid-column: -3 / -2;
+/* Title, description and any custom text sit in the text column. */
+.header > :not(.icon, .actions, .close) {
+  grid-column: text;
 }
 
 /*
@@ -61,6 +57,23 @@
   align-items: start;
 }
 
+/*
+ * Tabs in the header: the header becomes the tab strip — painted like the strip (two steps off
+ * the dialog), no hairline, flush with the body — and hands the bar its side padding so it runs
+ * edge to edge. The active tab is the body rising into the header; the panels sit in the body.
+ */
+.header:has([role="tablist"]) {
+  --prime-bleed-inline: var(--dialog-padding);
+
+  padding-block-end: 0;
+  background: var(--prime-color-fill-muted-hover);
+}
+
+.header > :has([role="tablist"]) {
+  grid-column: 1 / -1;
+  margin-block-start: var(--prime-space-4);
+}
+
 /* Header alone closes with the dialog's 24px rhythm. */
 .header:last-child {
   padding-block-end: var(--prime-space-6);
@@ -69,8 +82,9 @@
 .icon {
   --prime-icon-size: var(--prime-icon-m);
 
-  grid-column: 1;
+  grid-column: icon;
   grid-row: 1;
+  margin-inline-end: var(--prime-space-4);
 
   display: inline-flex;
   flex: 0 0 auto;
@@ -149,16 +163,41 @@
 }
 
 /*
+ * A row of controls at the end of the header, before the close button (tier s: the close
+ * button's height). With a description it hangs from the top, centered on the title's first line.
+ */
+.actions {
+  grid-column: actions;
+  grid-row: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin-inline-start: var(--prime-space-4);
+}
+
+.header[data-has-description="true"] > .actions {
+  min-height: var(--prime-control-s-height);
+  margin-block: calc((var(--prime-text-title-m-line-height) - var(--prime-control-s-height)) / 2);
+}
+
+/*
  * Square ghost close (tier s). With a description it hangs from the top, centered on the title's
  * first line; the inline pull puts the glyph on the content edge.
  */
 .close {
-  grid-column: -2 / -1;
+  grid-column: close;
   grid-row: 1;
   width: var(--prime-control-s-height);
   min-width: var(--prime-control-s-height);
   padding-inline: 0;
-  margin-inline-end: calc(-1 * var(--prime-space-2));
+  margin-inline: var(--prime-space-4) calc(-1 * var(--prime-space-2));
+}
+
+/* After the actions the close button is one of them: the row's own step. */
+.header:has(> .actions) > .close {
+  margin-inline-start: var(--prime-space-2);
 }
 
 .header[data-has-description="true"] > .close {
@@ -223,6 +262,35 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--prime-space-2);
+}
+
+/*
+ * A status line at the start (`Meta`): it takes the free room, the buttons keep their width at the
+ * end, whatever the layout. On a phone and in a narrow dialog the stack below wins: the line on
+ * top, full-width buttons under it.
+ */
+.footer[data-layout]:where(:has(> .meta)) {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+}
+
+.footer[data-layout]:where(:has(> .meta)) > :where(:not(.meta)) {
+  width: auto;
+}
+
+.meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-text-body-s-weight);
+  overflow-wrap: anywhere;
 }
 
 /*

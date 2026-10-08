@@ -1,0 +1,13 @@
+/* Layout of the Sheet scenarios: semantic tokens only. */
+
+/* overview.tsx: a column of actions, one per row. */
+.actions {
+  display: grid;
+  gap: var(--prime-space-1);
+}
+
+/* in-form.tsx: field groups get 20 between them. */
+.form {
+  display: grid;
+  gap: var(--prime-space-5);
+}

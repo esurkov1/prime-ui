@@ -187,6 +187,69 @@ export const semanticTokens = {
       fill: "rgba(255, 255, 255, 0.14)",
     },
     palette: lightPalette(),
+    /**
+     * Chat bubbles (`Message`). An incoming bubble is a surface on the ladder (one step off its
+     * host); an outgoing one is a tinted host off the ladder in the accent hue, and everything inside
+     * it (meta, links, reply bar, waveform, reactions, players) reads these roles through the
+     * variables the bubble sets. `muted` keeps AA on `bg`; `accent` draws links, the reply bar and
+     * the played waveform, `accentFg` the glyph on an accent disk; `fill` / `fillHover` are inner
+     * tiles (reply, link preview), `track` the unplayed waveform, `chip` / `chipHover` a reaction
+     * chip that is not the reader's (neutral, not tinted).
+     */
+    message: {
+      outgoing: {
+        bg: "{color.cobalt.100}",
+        text: "{color.gray.925}",
+        muted: "{color.gray.600}",
+        accent: "{color.cobalt.700}",
+        accentFg: "{color.white}",
+        /** A failed send, a failed upload: AA on `bg`. */
+        danger: "{color.red.700}",
+        fill: "color-mix(in srgb, var(--prime-ref-color-cobalt-700) 10%, transparent)",
+        fillHover: "color-mix(in srgb, var(--prime-ref-color-cobalt-700) 16%, transparent)",
+        track: "color-mix(in srgb, var(--prime-ref-color-cobalt-700) 28%, transparent)",
+        /**
+         * A reaction chip that is not the reader's: a neutral dark wash over `bg`, precomposed
+         * (opaque), so the ring of its avatars matches it.
+         */
+        chip: "color-mix(in srgb, var(--prime-ref-color-gray-925) 8%, var(--prime-ref-color-cobalt-100))",
+        chipHover:
+          "color-mix(in srgb, var(--prime-ref-color-gray-925) 12%, var(--prime-ref-color-cobalt-100))",
+      },
+    },
+    /**
+     * Data visualisation (foundation §3, SKILL/foundations.md «Charts»). Categories wear these,
+     * statuses wear the tones.
+     * - `1`…`8`: categorical series in one fixed order — blue, orange, teal, yellow, pink, green,
+     *   purple, red. Assign in order, never cycle; a ninth series folds into `other`. Palette hues
+     *   (`color` props) map onto the same steps (`--hue-chart`), so a category keeps its color in a
+     *   chart and in a ProgressBar share.
+     * - `other`: the «Прочее» share. `grid`: gridlines. `axis`: the axis line and ticks (axis
+     *   labels wear text tokens).
+     * - `scale.1`…`scale.5`: sequential magnitude (heatmap cells), one hue from near the ground to
+     *   full; `scaleFg` is the text on steps 4–5 (steps 1–3 take `text.primary`).
+     */
+    chart: {
+      1: "{color.cobalt.600}",
+      2: "{color.chart.light.orange}",
+      3: "{color.chart.light.teal}",
+      4: "{color.chart.light.yellow}",
+      5: "{color.chart.light.pink}",
+      6: "{color.chart.light.green}",
+      7: "{color.chart.light.purple}",
+      8: "{color.chart.light.red}",
+      other: "{color.gray.400}",
+      grid: "{color.gray.100}",
+      axis: "{color.gray.300}",
+      scale: {
+        1: "{color.cobalt.100}",
+        2: "{color.cobalt.200}",
+        3: "{color.cobalt.300}",
+        4: "{color.cobalt.600}",
+        5: "{color.cobalt.800}",
+      },
+      scaleFg: "{color.white}",
+    },
   },
 
   font: {
@@ -377,6 +440,11 @@ export const semanticTokens = {
     },
     /** Step between items of a staggered first render. */
     stagger: "{duration.80}",
+    /**
+     * Period unit of a loading loop (Spinner turns once in 3 units, 6 under reduced motion). A
+     * loading cue is information, like a gesture clock: globals.css does not zero it.
+     */
+    loop: "{duration.570}",
     /** Blur that hides a change of shape while two states swap in place (icon → check, letters). */
     blur: "2px",
     /** `:active` scale of pressable controls; `compact` for icon-only and small targets. */
@@ -573,6 +641,24 @@ export const semanticTokens = {
     xl: { height: "{space.16}", radius: "{radius.12}" },
   },
 
+  /**
+   * Chat bubble geometry (`Message`): the corner radius (one on every corner of every bubble), the
+   * padding, the gap inside a group of one author and between groups,
+   * the width cap of a bubble, and the diameter of a video message.
+   */
+  message: {
+    radius: "{radius.14}",
+    paddingX: "{space.3}",
+    paddingY: "{space.2}",
+    groupGap: "{space.2}",
+    gap: "{space.4}",
+    maxWidth: "30rem",
+    /** The content width of a card in a bubble (file, contact, location): one width for all. */
+    cardWidth: "16rem",
+    mediaMaxHeight: "22.5rem",
+    videoNote: "14.5rem",
+  },
+
   /** Floating panel shared by Select, Dropdown, Combobox, Datepicker, Popover. Item radius = radius − padding. */
   panel: {
     radius: "{radius.12}",
@@ -598,6 +684,8 @@ export const semanticTokens = {
     radius: "{radius.16}",
     padding: "{space.6}",
     viewportPadding: "{space.4}",
+    /** A dialog of one or two fields. */
+    widthXs: "22.5rem",
     widthS: "27.5rem",
     widthM: "35rem",
     widthL: "45rem",
@@ -612,8 +700,10 @@ export const semanticTokens = {
     widthXl: "50rem",
   },
 
-  /** Bottom sheets: Drawer `side="bottom"`, Modal and floating layers on a narrow viewport. */
+  /** Bottom sheets: Sheet, and Modal and floating layers on a narrow viewport. */
   sheet: {
+    /** Side padding of the Sheet zones. */
+    padding: "{space.6}",
     radius: "{radius.16}",
     /** The grab bar at the top edge and the strip that holds it. */
     handleWidth: "2.25rem",
@@ -621,8 +711,8 @@ export const semanticTokens = {
     handleArea: "{space.5}",
     /** Room kept above a sheet so the page behind stays visible. */
     topGap: "{space.10}",
-    /** A bottom sheet on a tablet or desktop is never narrower than this (= Modal m). */
-    minWidth: "35rem",
+    /** A Sheet on a tablet or desktop: centred at this width (= Modal m); full width on a phone. */
+    width: "35rem",
   },
 
   bottomNav: {
@@ -710,10 +800,16 @@ export const semanticTokens = {
     offset: "{space.2}",
   },
 
+  /**
+   * DataTable rows: the minimum row height per table `size` (public, so a skeleton or a matrix
+   * outside the table can stand in its geometry) and the cell padding.
+   */
   table: {
+    rowHeightXs: "{space.9}",
     rowHeightS: "{space.9}",
     rowHeightM: "2.75rem",
     rowHeightL: "3.25rem",
+    rowHeightXl: "3.25rem",
     cellPaddingX: "{space.3}",
   },
 

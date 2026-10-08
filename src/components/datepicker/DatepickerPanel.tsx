@@ -9,7 +9,6 @@ import { getViewportPadPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import type { ControlSize } from "@/internal/states";
-import { useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Datepicker.module.css";
@@ -284,7 +283,7 @@ DatepickerPanel.displayName = "Datepicker.Panel";
 type PanelViewProps = Omit<CalendarOptions, "labels"> &
   DatepickerValue & {
     labels: DatepickerLabels;
-    /** `Datepicker.Panel`: the card follows its container; otherwise (the Root popover) it sizes to its content. */
+    /** `Datepicker.Panel`: host content that takes its container's width; otherwise (the Root popover) it sizes to its content. */
     embedded: boolean;
     /** After a value is applied (Root closes the popover). */
     onDone?: () => void;
@@ -317,8 +316,6 @@ export function PanelView(props: PanelViewProps) {
   const [panelNode, setPanelNode] = React.useState<HTMLDivElement | null>(null);
   const panelRef = useMergedRefs(setPanelNode, domRef);
   const parentWidth = useAvailableWidth(embedded ? panelNode : null);
-  // Embedded, the panel is a layer of its own (a card); in a popover it is the popover's content.
-  const nestedDepth = useNestedSurfaceDepth();
   const viewportWidth = useViewportWidth(!embedded);
   useContainScroll(embedded ? null : panelNode);
   const hasPresets = Boolean(presets) && isRange;
@@ -520,7 +517,6 @@ export function PanelView(props: PanelViewProps) {
       className={cx(styles.panel, className)}
       data-size={size}
       data-embedded={embedded ? "true" : undefined}
-      data-depth={embedded ? nestedDepth : undefined}
       data-compact={compact ? "true" : undefined}
       data-layout={layout}
     >
@@ -540,7 +536,7 @@ export function PanelView(props: PanelViewProps) {
                 size={controlSize}
                 fullWidth={layout === "aside"}
                 className={styles.presetItem}
-                aria-pressed={pressed}
+                pressed={pressed}
                 onClick={() => {
                   const r = preset.days(today);
                   commitRange(r.from, r.to, DAY_START_MINUTES, DAY_END_MINUTES);

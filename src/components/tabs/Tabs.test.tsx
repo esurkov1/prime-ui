@@ -626,10 +626,14 @@ describe("Tabs — indicator", () => {
     }
   });
 
-  it("uses the folder in a vertical list too, and makes the root a layer", () => {
+  it("uses the folder in a vertical list too, and has no surface of its own", () => {
     const { container } = render(<BasicTabs orientation="vertical" />);
     expect(screen.getByRole("tablist")).toHaveAttribute("data-indicator", "folder");
-    expect(container.querySelector('[data-orientation="vertical"]')).toHaveAttribute("data-depth");
+    expect(container.querySelector("[data-depth]")).toBeNull();
+  });
+
+  it("keeps the panel bare: no fill and no padding, it is the host's content", () => {
+    expect(TABS_CSS).not.toMatch(/\.panel \{[^}]*(padding|background)/s);
   });
 });
 
@@ -908,6 +912,70 @@ describe("Tabs — tone and item width", () => {
     const next = container.firstElementChild as HTMLElement;
     expect(next.style.getPropertyValue("--tabs-item-min")).toBe("6rem");
     expect(next.style.getPropertyValue("--tabs-item-max")).toBe("");
+  });
+});
+
+describe("Tabs — removable tabs with a confirm", () => {
+  function ConfirmTabs({ confirm }: { confirm: () => Promise<void> }) {
+    const [docs, setDocs] = React.useState(["10482", "10479"]);
+    return (
+      <Tabs.Root defaultValue="10482">
+        <Tabs.List aria-label="Открытые заказы">
+          {docs.map((doc) => (
+            <Tabs.Item
+              key={doc}
+              value={doc}
+              onRemove={async () => {
+                await confirm();
+                setDocs((current) => current.filter((item) => item !== doc));
+              }}
+            >
+              {`Заказ ${doc}`}
+            </Tabs.Item>
+          ))}
+        </Tabs.List>
+      </Tabs.Root>
+    );
+  }
+
+  it("keeps the tab and its selection while the promise is pending; rejected changes nothing", async () => {
+    let reject = () => {};
+    const confirm = () =>
+      new Promise<void>((_, no) => {
+        reject = () => no(new Error("cancelled"));
+      });
+    render(<ConfirmTabs confirm={confirm} />);
+    const active = screen.getByRole("tab", { name: "Заказ 10482" });
+    active.focus();
+    fireEvent.keyDown(active, { key: "Delete" });
+    expect(active).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("button", { name: "Закрыть вкладку «Заказ 10482»" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    await act(async () => reject());
+    expect(screen.getByRole("tab", { name: "Заказ 10482" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(active).toHaveFocus();
+  });
+
+  it("resolved: the tab goes and the neighbour takes the selection and focus", async () => {
+    let resolve = () => {};
+    const confirm = () =>
+      new Promise<void>((yes) => {
+        resolve = yes;
+      });
+    render(<ConfirmTabs confirm={confirm} />);
+    const active = screen.getByRole("tab", { name: "Заказ 10482" });
+    active.focus();
+    fireEvent.keyDown(active, { key: "Delete" });
+    await act(async () => resolve());
+    expect(screen.queryByRole("tab", { name: "Заказ 10482" })).toBeNull();
+    const next = screen.getByRole("tab", { name: "Заказ 10479" });
+    expect(next).toHaveAttribute("aria-selected", "true");
+    expect(next).toHaveFocus();
   });
 });
 

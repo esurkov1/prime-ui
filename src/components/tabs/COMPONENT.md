@@ -3,10 +3,11 @@
 **Category:** navigation
 **Kind:** navigation
 
-> Folder tabs for navigating between content panels of one screen: the active tab rises out of the panel.
+> A tab bar of folder tabs for navigating between content panels of one screen: the active tab is the host's surface rising into the strip, the panel is the host's content with no frame or padding of its own.
 
 ## When to use
 - Splitting one screen into sections that are viewed one at a time (Overview / Orders / Reviews).
+- Sections of a record opened in a Drawer or Modal: the tab bar runs along the bottom of the header.
 - Settings pages with a side list of sections (`orientation="vertical"`).
 - Dashboard sections that need a counter or a one-line summary per tab (`Tabs.Count`, `Tabs.Description`).
 - Section bars that must survive narrow containers: with an icon on every tab they collapse to icons with tooltips.
@@ -26,7 +27,7 @@ import { Tabs } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItemWidth; the frame (a layer)
+Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItemWidth; no surface
 ├─ Tabs.List              role="tablist" on a ScrollContainer, sliding folder; collapses, then scrolls
 │  ├─ Tabs.Item           one tab (role="tab") in an item wrapper; onRemove adds a close button; parts:
 │  │  ├─ Tabs.Icon        decorative icon; hidden first, kept last
@@ -34,7 +35,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 │  │  ├─ Tabs.Count       counter Badge, one tier below the tabs size
 │  │  └─ Tabs.Description muted second line; makes the tab two-line
 │  └─ Tabs.Separator      Divider hairline between groups of tabs
-└─ Tabs.Panel             role="tabpanel", rendered only while its tab is active
+└─ Tabs.Panel             role="tabpanel", rendered only while its tab is active; no fill, no padding
 ```
 
 ## API
@@ -42,15 +43,15 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Tabs.Root
-`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel. It is the frame and a layer of the surface ladder in both orientations: a strip two steps off the layer and the panel in the layer's own color — above the panel when horizontal, at its inline start when vertical.
+`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel one gap apart. It has no surface: no fill, no padding, no radius. It stands in the host's padding (a Card, the page) — never wrap it in a padded box of its own. In a Modal or Drawer it wraps `X.Header` and `X.Body`: `Tabs.List` goes last into the header, which becomes the strip, and the panels into the body; the root then renders no box (`display: contents`), so the dialog keeps its layout.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `string` | — | Active tab (controlled). |
 | `defaultValue` | `string` | `""` | Initial active tab (uncontrolled). With `""` no tab is selected. |
 | `onValueChange` | `(value: string) => void` | — | Called with the new active value. |
-| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | List direction and arrow keys. Vertical: a column of sections at the panel's inline start, the active one the panel reaching into the column; when the container is narrower than 600px the column becomes the horizontal strip above the panel. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text, icon, spacing, folder radius and panel padding. A horizontal tab is the control height plus the folder rise on both sides; a vertical one is the control height. |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | List direction and arrow keys. Vertical: a column of sections at the panel's inline start, the active one the host's surface reaching into the column; when the container is narrower than 600px the column becomes the horizontal strip above the panel. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel. A tab is at least the control height and grows with its content (a two-line tab is taller); tabs in a row share the tallest height. |
 | `fullWidth` | `boolean` | `true` | Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`, never narrower than their content: a long label keeps its width, short ones share the rest; when they do not fit, the list collapses, then scrolls. `false` sizes each tab to its content within the same bounds. |
 | `tone` | `"neutral" \| "accent"` | `"neutral"` | Colour of the active tab: `neutral` is primary text with an accent icon, `accent` puts text and icon in accent. |
 | `minItemWidth` | `number \| string` | `2.5 × control height` | Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`). When tabs do not fit, the list collapses, then scrolls. Icon-only tabs are square. |
@@ -74,7 +75,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 |---|---|---|---|
 | `value` | `string` | — (required) | Value that selects this tab and its panel. |
 | `disabled` | `boolean` | `false` | Disables the tab; clicks and arrow keys skip it. |
-| `onRemove` | `() => void` | — | Makes the tab closable: a close button (shown on the active tab, on hover and focus, always on touch screens), `Delete` / `Backspace` and a middle click. Closing the active tab first selects its neighbour; remove the item from your list here. |
+| `onRemove` | `() => void \| Promise<void>` | — | Makes the tab closable: a close button (shown on the active tab, on hover and focus, always on touch screens), `Delete` / `Backspace` and a middle click. Closing the active tab selects its neighbour; remove the item from your list here. Return a promise to confirm first (unsaved changes): while pending the close button shows loading and the tab stays; resolved — the neighbour takes the selection and focus; rejected — nothing changes. |
 | `children` | `ReactNode` | — (required) | Plain text, or `Tabs.Icon` / `Tabs.Label` / `Tabs.Count` / `Tabs.Description`. A description makes the tab two-line. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" \| "type" \| "role" \| "onClick">` | — | `className`, `aria-*` and the other button attributes; your `onKeyDown` / `onAuxClick` run first and `preventDefault()` keeps the tab open. |
 
@@ -119,7 +120,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other div attributes. |
 
 ### Tabs.Panel
-`ref` → `HTMLDivElement`. `<div role="tabpanel">`, focusable, rendered only while its tab is active; horizontal, the padded surface the folder rises from. Its content enters each time it opens.
+`ref` → `HTMLDivElement`. `<div role="tabpanel">`, focusable, rendered only while its tab is active. No fill and no padding: its content is the host's content, aligned with the strip's edges. Its content enters each time it opens.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -128,7 +129,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
 ## Variants
-Tabs have no `variant`: navigation tabs are always a folder — rising from the panel's top edge (horizontal) or reaching out of its side (vertical).
+Tabs have no `variant`: navigation tabs are always a folder — the host's surface rising into the strip from below (horizontal) or reaching into the column from its side (vertical).
 
 ### tone
 | Value | Looks like | Use when | Default |
@@ -139,19 +140,19 @@ Tabs have no `variant`: navigation tabs are always a folder — rising from the 
 ### orientation
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `horizontal` | a layer of the surface ladder: a `fill-muted-hover` strip (two steps off the layer) over a padded panel in the layer's own color, tabs edge to edge; the active tab is the panel rising into the strip with concave flares, gliding between tabs; primary text, medium weight, accent icon; hover is the same shape in `fill-faint` | switching sections above the content | yes |
-| `vertical` | the same folder on its side: a column of sections in the `fill-muted-hover` strip at the panel's inline start; the active section is the panel reaching into the column, rounded on the outer side, with concave flares above and below where it meets the panel; hover is the same shape in `fill-faint`. Below a 600px container the column becomes the horizontal strip above the panel (it scrolls, never wraps) | settings pages with a side list of sections | |
+| `horizontal` | a rounded `fill-muted-hover` strip (two steps off the host surface) above the panel, tabs edge to edge; the active tab is the host's surface (`layer-current`) rising into the strip with concave flares, gliding between tabs; primary text, medium weight, accent icon; hover is the same shape in `fill-faint` | switching sections above the content | yes |
+| `vertical` | the same folder on its side: a column of sections in the strip at the panel's inline start; the active section is the host's surface reaching into the column, rounded on the outer side, with concave flares above and below; hover is the same shape in `fill-faint`. Below a 600px container the column becomes the horizontal strip above the panel (it scrolls, never wraps) | settings pages with a side list of sections | |
 
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | 12/16 text, folder radius 8, rise 4, panel padding 16 | dense panels | |
-| `s` | 13/20, radius 8, rise 4, padding 20 | compact cards | |
-| `m` | 14/20, radius 12, rise 8, padding 24 | default | yes |
-| `l` | 16/24, radius 16, rise 12, padding 24 | page-level sections | |
-| `xl` | 16/24, radius 16, rise 12, padding 32 | hero / landing sections | |
+| `xs` | 12/16 text, folder radius 8, rise 4, panel gap 12 | dense panels | |
+| `s` | 13/20, radius 8, rise 4, gap 16 | compact cards | |
+| `m` | 14/20, radius 12, rise 4, gap 20 | default | yes |
+| `l` | 16/24, radius 16, rise 8, gap 24 | page-level sections | |
+| `xl` | 16/24, radius 16, rise 8, gap 32 | hero / landing sections | |
 
-A horizontal tab is the control height of the tier plus the rise above and below its content; a vertical tab is the control height, so a vertical list lines up with Button, Input and SegmentedControl of the same `size`.
+A tab is at least the control height of the tier, so a one-line list lines up with Button, Input and SegmentedControl of the same `size`; content sets the rest — a two-line tab grows by its lines and padding, and the tabs of a row share the tallest height. The strip adds the rise above the tabs.
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -185,6 +186,7 @@ Avoid icons or descriptions on only some tabs (uneven rows; without an icon on e
 | focus-visible | keyboard | focus ring inside the tab, above the folder; the panel shows an inset ring |
 | disabled | `disabled` on Item | native `disabled`, `data-disabled="true"`, `text-disabled`; a removable tab loses its close button |
 | removable | `onRemove` on Item | item wrapper `data-removable="true"`, close button, tab `aria-keyshortcuts="Delete"` |
+| closing, confirm pending | `onRemove` returned a promise that has not settled | the close button is `loading` (`aria-busy`); the tab, its selection and focus stay; resolved → the neighbour takes over, rejected → nothing changes |
 | two-line | `Tabs.Description` child | `data-two-line="true"` |
 | collapsed | tabs wider than the list, or a label that would be cut (horizontal) | list `data-collapse="full" \| "compact" \| "icon"`: `compact` hides icons and descriptions; `icon` hides labels (sr-only, shown in a `Tooltip`), counts and close buttons, only when every tab has an icon |
 | overflow | tabs at their narrowest (content width, `minItemWidth` or icon squares) still wider than the list | `data-overflow-start` / `data-overflow-end` on the list (ScrollContainer), faded edges as deep as the hidden part at most (they grow and melt with the scroll, never switch); the active tab is kept in view and clear of the fades on mount and on every value change, the first and the last tab scroll all the way to the end — only the list scrolls, never the page |
@@ -194,8 +196,24 @@ The indicator glides (`emphasized` + `base`, `data-animate="true"`) only into a 
 Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-width`, inline `--tabs-item-min` / `--tabs-item-max` when set; List `data-indicator="folder"`, its indicator `data-axis="x" | "y"` (follows the list's direction, so a vertical list in a narrow container gets the top folder); Item `data-value` on the tab, `data-state` / `data-disabled` on its wrapper too; Label `data-text`. Inactive panels are unmounted; a panel's content enters each time it opens.
 
 ## Layout & spacing
-- The root is the frame and a layer of the ladder in both orientations (`data-depth`, `radius-xl`, the strip two steps off the layer); the list sits flush on the panel; the panel pads its content by tier (`--prime-space-4` … `--prime-space-8`). Do not wrap Tabs in a Card — it already is one.
-- Vertical: the column is as wide as its widest section (at least four control heights, at most 40% of the root), inset by the folder rise from the frame on the outer side, flush with the panel on the other.
+- Tabs are a bar, not a surface: the root has no fill, padding, radius or `data-depth`. On a page or in a `Card.Body`, put it straight into the host's padded region and the panel content straight into `Tabs.Panel`. The strip's edges and the panel content share the host's content edge; the panel stands one tier gap below the strip (`--prime-space-3` … `--prime-space-8`).
+- In a Modal or Drawer the tabs belong to the header: `Tabs.Root` wraps `X.Header` and `X.Body`, `Tabs.List` goes last into the header, the panels into the body. The header becomes the strip (painted like it, no hairline, edge to edge — the header hands the bar its side padding as `--prime-bleed-inline`), the active tab is the body rising into it, and the root renders no box (`display: contents`), so only the body scrolls and the tabs stay in view.
+
+```tsx
+<Drawer.Content>
+  <Tabs.Root defaultValue="summary">
+    <Drawer.Header>
+      <Drawer.Title>Заказ № 1042</Drawer.Title>
+      <Tabs.List aria-label="Заказ № 1042">…</Tabs.List>
+    </Drawer.Header>
+    <Drawer.Body>
+      <Tabs.Panel value="summary">…</Tabs.Panel>
+    </Drawer.Body>
+  </Tabs.Root>
+</Drawer.Content>
+```
+- The folder paints the host's `layer-current`, so the active tab is always the colour of the surface it stands on; controls in a panel read the host's field and fill tokens.
+- Vertical: the column is as wide as its widest section (at least four control heights, at most 40% of the root) and as tall as its sections; the panel sits beside it, one gap away.
 - The list never wraps: it collapses, then scrolls horizontally with faded edges (hidden scrollbar, `overscroll-behavior: contain`). Give the list's container a width (`min-width: 0` on flex children).
 - A horizontal tab is never narrower than its content (`min-width: max-content`; the tab bounds that content between `minItemWidth` and `maxItemWidth`), so a label is never cut to make room. Full width, tabs tend to equal widths, not widths in proportion to their labels (`flex: 1 1 0`): a long label keeps its width, the short ones share the rest.
 - A vertical Tabs.Root is a size container: give it a width (it measures itself to switch to a row).
@@ -229,7 +247,7 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | Sections of one screen; the active tab rises into the panel and glides to the next one — `defaultValue`. |
+| [overview.tsx](examples/overview.tsx) | Sections of one screen; the active tab rises into the strip and glides to the next one — `defaultValue`. |
 | [variants.tsx](examples/variants.tsx) | The active tab in primary text with an accent icon, or all in accent — `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: text, icon, folder radius and spacing grow together — `size`. |
 | [states.tsx](examples/states.tsx) | A disabled tab that clicks and arrow keys skip — `disabled`. |
@@ -238,19 +256,21 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 | [overflow.tsx](examples/overflow.tsx) | Drag the frame narrower: icons go first, then labels, and icons with tooltips stay; then the list scrolls — `Tabs.Icon`. |
 | [closable.tsx](examples/closable.tsx) | Open order cards as browser tabs: each closes by its button, Delete or a middle click; tabs stay between two widths, and the list scrolls when they do not fit — `onRemove`, `minItemWidth`, `maxItemWidth`. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a summary on the second — `Tabs.Count`, `Tabs.Description`. |
+| [in-drawer.tsx](examples/in-drawer.tsx) | Order details in a Drawer: the tab bar runs along the bottom of the header, the active tab is the body rising into it, and every panel is the body's own content — `Tabs.Root`, `Tabs.List`, `Tabs.Panel`. |
 | [controlled.tsx](examples/controlled.tsx) | The active tab lives in parent state, e.g. synced with the URL — `value`, `onValueChange`. |
 
 ## Mistakes
 - `<Tabs.Root>` without `defaultValue` / `value` → no tab is active; pass the first tab's value.
 - `variant="pills"` / `variant="underline"` → Tabs have no variant; use `orientation`, or SegmentedControl for a pill switch.
 - An icon on only some tabs → the list cannot collapse to icons and scrolls instead; give every tab an icon or none.
-- Tabs inside a `Card.Root` → a frame in a frame; the horizontal root is the surface.
+- Tabs or a panel wrapped in an extra padded box (`Card.Root` around the root, a padded `div` or Card inside `Tabs.Panel`) → a container in a container with doubled padding; Tabs stand in the host's padding and the panel content goes straight in.
 - Using Tabs to filter a list → use SegmentedControl.
 - `onClick` on `Tabs.Item` → use `onValueChange` on Root.
 - A hand-made × inside `Tabs.Item` → a button inside a tab button; pass `onRemove` instead.
 - `onRemove` that does not drop the tab from your list → the tab stays; the kit only moves the selection.
 - `Tabs.List` without `aria-label` → add one.
+- Tabs inside `Drawer.Body` / `Modal.Body` under the header → a floating strip under the header's hairline; wrap the header and the body in `Tabs.Root` and put `Tabs.List` into the header.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Button](../button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Button](../button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), Icon (`action.close`)
 - **See also:** [SegmentedControl](../segmented-control/COMPONENT.md), [ButtonGroup](../button-group/COMPONENT.md), [Accordion](../accordion/COMPONENT.md)

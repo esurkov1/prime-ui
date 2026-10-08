@@ -1,9 +1,8 @@
 /*
- * Bottom sheet and swipe parts shared by Drawer, Modal and floating layers on a narrow viewport.
+ * Bottom sheet and swipe parts shared by Sheet, Modal and floating layers on a narrow viewport.
  *
  *   .handle      the grab bar strip at the top edge (`data-swipe-handle`); a drag starts here
  *   .swipeY      a panel that follows a vertical drag (`--swipe-offset` from useSwipeDismiss)
- *   .swipeX      the same along the horizontal axis (side drawers)
  *
  * While `data-swiping` is set the panel follows the pointer with no transition; on release it
  * glides back to rest, or on out from where it was let go (`data-swipe-dismissed`, the keyframe
@@ -30,21 +29,12 @@
 }
 
 /* The iOS sheet curve: a release keeps moving at once and lands softly, back or out. */
-.swipeY,
-.swipeX {
+.swipeY {
+  transform: translate3d(0, var(--swipe-offset, 0px), 0);
   transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
-.swipeY {
-  transform: translate3d(0, var(--swipe-offset, 0px), 0);
-}
-
-.swipeX {
-  transform: translate3d(var(--swipe-offset, 0px), 0, 0);
-}
-
-.swipeY[data-swiping],
-.swipeX[data-swiping] {
+.swipeY[data-swiping] {
   transition: none;
   cursor: grabbing;
   user-select: none;
@@ -52,8 +42,7 @@
 
 /* Closed by a swipe: the transition carries the panel out from the release point; the keyframe
    exit would restart from rest. Doubled class: wins over the overlay motion's closed state. */
-.swipeY.swipeY[data-swipe-dismissed],
-.swipeX.swipeX[data-swipe-dismissed] {
+.swipeY.swipeY[data-swipe-dismissed] {
   animation: none;
 }
 

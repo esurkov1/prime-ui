@@ -220,64 +220,15 @@ describe("Drawer", () => {
   });
 });
 
-describe("Drawer — bottom sheet and swipe", () => {
-  const header = () => screen.getByRole("dialog").querySelector("header") as HTMLElement;
-
-  it("renders a bottom sheet with a hidden grab handle", () => {
-    render(<BasicDrawer side="bottom" />);
-    openDrawer();
+describe("Drawer — no swipe", () => {
+  it("has no grab handle and a touch swipe toward its edge does not close it", () => {
+    render(<BasicDrawer defaultOpen />);
     const dialog = screen.getByRole("dialog");
-    expect(dialog).toHaveAttribute("data-side", "bottom");
-    const handle = dialog.querySelector("[data-swipe-handle]");
-    expect(handle).toHaveAttribute("aria-hidden", "true");
-    expect(handle).toBe(dialog.firstElementChild);
-  });
-
-  it("closes with a swipe down from the handle or the header", async () => {
-    render(<BasicDrawer side="bottom" />);
-    openDrawer();
-    const handle = screen.getByRole("dialog").querySelector("[data-swipe-handle]") as Element;
-    swipe(handle, { x: 0, y: 0 }, { x: 0, y: 300 });
-    await expectClosed();
-    openDrawer();
-    swipe(header(), { x: 0, y: 0 }, { x: 0, y: 300 });
-    await expectClosed();
-  });
-
-  it("a bottom sheet ignores a swipe from its body", () => {
-    render(<BasicDrawer side="bottom" />);
-    openDrawer();
-    swipe(screen.getByText("Body content"), { x: 0, y: 0 }, { x: 0, y: 300 });
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
-  });
-
-  it("a side drawer closes with a touch swipe toward its edge from anywhere", async () => {
-    const { unmount } = render(<BasicDrawer side="right" />);
-    openDrawer();
+    expect(dialog.querySelector("[data-swipe-handle]")).toBeNull();
     swipe(screen.getByText("Body content"), { x: 100, y: 0 }, { x: 400, y: 0 });
-    await expectClosed();
-    unmount();
-
-    render(<BasicDrawer side="left" />);
-    openDrawer();
-    swipe(screen.getByText("Body content"), { x: 400, y: 0 }, { x: 100, y: 0 });
-    await expectClosed();
-  });
-
-  it("the scrim thins with the drag and the sheet glides out from the release point", () => {
-    render(<BasicDrawer side="bottom" />);
-    openDrawer();
-    const scrim = drawerScrim();
-    swipe(header(), { x: 0, y: 0 }, { x: 0, y: 300 });
-    // jsdom has no layout: the panel is 0 high, so any drag counts as all the way out.
-    expect(scrim.style.getPropertyValue("--swipe-progress")).toBe("1");
-  });
-
-  it("swiping follows closeOnOutsideClick", () => {
-    render(<BasicDrawer side="bottom" closeOnOutsideClick={false} />);
-    openDrawer();
-    swipe(header(), { x: 0, y: 0 }, { x: 0, y: 300 });
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
+    swipe(dialog.querySelector("header") as HTMLElement, { x: 100, y: 0 }, { x: 400, y: 0 });
+    expect(dialog).toHaveAttribute("data-state", "open");
+    expect(dialog).not.toHaveAttribute("data-swiping");
   });
 });
 
@@ -342,5 +293,196 @@ describe("Drawer — overlay contract", () => {
     clickScrim(drawerScrim());
     await expectClosed();
     expect(trigger).toHaveFocus();
+  });
+});
+
+describe("Drawer — header actions, footer meta, exit snapshot", () => {
+  it("places Actions in the header before the close button, one tier down", () => {
+    render(
+      <Drawer.Root defaultOpen>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title>Сделка №1042</Drawer.Title>
+            <Drawer.Actions data-testid="actions">
+              <Button.Root variant="ghost" tone="neutral">
+                Ещё
+              </Button.Root>
+            </Drawer.Actions>
+          </Drawer.Header>
+        </Drawer.Content>
+      </Drawer.Root>,
+    );
+    const actions = screen.getByTestId("actions");
+    const close = screen.getByRole("button", { name: "Закрыть" });
+    expect(actions.nextElementSibling).toBe(close);
+    expect(screen.getByRole("button", { name: "Ещё" })).toHaveAttribute("data-size", "s");
+  });
+
+  it("renders Meta as a footer paragraph that does not describe the dialog", () => {
+    render(
+      <Drawer.Root defaultOpen>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title>Сделка</Drawer.Title>
+          </Drawer.Header>
+          <Drawer.Footer>
+            <Drawer.Meta>Есть несохранённые изменения</Drawer.Meta>
+            <Button.Root>Сохранить</Button.Root>
+          </Drawer.Footer>
+        </Drawer.Content>
+      </Drawer.Root>,
+    );
+    const meta = screen.getByText("Есть несохранённые изменения");
+    expect(meta.tagName).toBe("P");
+    expect(screen.getByRole("dialog")).not.toHaveAttribute("aria-describedby");
+  });
+
+  it("keeps the last open content while it slides out", async () => {
+    function RecordDrawer() {
+      const [record, setRecord] = React.useState<string | null>("Сделка №1042");
+      return (
+        <Drawer.Root open={record !== null} onOpenChange={(open) => !open && setRecord(null)}>
+          <Drawer.Content aria-label="Карточка">
+            <Drawer.Body>{record ?? "Пусто"}</Drawer.Body>
+            <Drawer.Footer>
+              <Drawer.Close>
+                <Button.Root>Закрыть карточку</Button.Root>
+              </Drawer.Close>
+            </Drawer.Footer>
+          </Drawer.Content>
+        </Drawer.Root>
+      );
+    }
+    // With motion: the panel stays mounted for its exit.
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+    try {
+      render(<RecordDrawer />);
+      fireEvent.click(screen.getByRole("button", { name: "Закрыть карточку" }));
+      const panel = screen.getByRole("dialog", { hidden: true });
+      expect(panel).toHaveAttribute("data-state", "closed");
+      expect(screen.getByText("Сделка №1042")).toBeInTheDocument();
+      expect(screen.queryByText("Пусто")).not.toBeInTheDocument();
+      fireEvent.animationEnd(panel);
+      await expectClosed();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+describe("Drawer.Guard", () => {
+  function GuardedDrawer({
+    busy,
+    dirty,
+    onOpenChange,
+  }: {
+    busy?: boolean;
+    dirty?: boolean;
+    onOpenChange?: (open: boolean) => void;
+  }) {
+    return (
+      <Drawer.Root defaultOpen onOpenChange={onOpenChange}>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title>Новая сделка</Drawer.Title>
+          </Drawer.Header>
+          <Drawer.Body>
+            <Drawer.Guard busy={busy} dirty={dirty} />
+            <input aria-label="Название" />
+          </Drawer.Body>
+          <Drawer.Footer>
+            <Drawer.Close>
+              <Button.Root variant="soft" tone="neutral">
+                Отмена
+              </Button.Root>
+            </Drawer.Close>
+          </Drawer.Footer>
+        </Drawer.Content>
+      </Drawer.Root>
+    );
+  }
+
+  it("busy: no dismiss closes it; the close button and Close stay in place, disabled", () => {
+    const onOpenChange = vi.fn();
+    render(<GuardedDrawer busy onOpenChange={onOpenChange} />);
+    fireEvent.keyDown(document, { key: "Escape" });
+    clickScrim(drawerScrim());
+    expect(screen.getByRole("button", { name: "Закрыть" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Отмена" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Закрыть" }));
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
+  });
+
+  it("dirty: Escape asks first; «Продолжить» keeps the drawer and its changes", async () => {
+    const onOpenChange = vi.fn();
+    render(<GuardedDrawer dirty onOpenChange={onOpenChange} />);
+    fireEvent.keyDown(document, { key: "Escape" });
+    const confirm = await screen.findByRole("alertdialog", { name: "Не сохранять изменения?" });
+    expect(confirm).toHaveAccessibleDescription("Изменения в форме пропадут.");
+    fireEvent.click(screen.getByRole("button", { name: "Продолжить" }));
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
+  });
+
+  it("dirty: confirming «Не сохранять» closes the drawer", async () => {
+    const onOpenChange = vi.fn();
+    render(<GuardedDrawer dirty onOpenChange={onOpenChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Отмена" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Не сохранять" }));
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    await expectClosed();
+  });
+
+  it("takes the confirm texts from the Root labels", async () => {
+    render(
+      <Drawer.Root defaultOpen labels={{ discardTitle: "Закрыть без сохранения?" }}>
+        <Drawer.Content aria-label="Сделка">
+          <Drawer.Guard dirty />
+          <Drawer.Header>
+            <Drawer.Title>Сделка</Drawer.Title>
+          </Drawer.Header>
+        </Drawer.Content>
+      </Drawer.Root>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Закрыть" }));
+    expect(
+      await screen.findByRole("alertdialog", { name: "Закрыть без сохранения?" }),
+    ).toBeInTheDocument();
+  });
+
+  it("closing from code is never held", async () => {
+    function Controlled() {
+      const [open, setOpen] = React.useState(true);
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(false)}>
+            Сохранено
+          </button>
+          <Drawer.Root open={open} onOpenChange={setOpen}>
+            <Drawer.Content aria-label="Сделка">
+              <Drawer.Guard busy dirty />
+            </Drawer.Content>
+          </Drawer.Root>
+        </>
+      );
+    }
+    render(<Controlled />);
+    // The drawer makes the page inert; the owner closes it from code.
+    fireEvent.click(screen.getByText("Сохранено"));
+    await expectClosed();
   });
 });

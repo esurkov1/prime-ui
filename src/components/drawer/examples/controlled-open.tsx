@@ -1,5 +1,5 @@
 /** The parent owns the state and opens the drawer from a link, without a trigger — `open`, `onOpenChange`. */
-import { Drawer, LinkButton, Typography } from "prime-ui-kit";
+import { Button, Drawer, LinkButton, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 export default function DrawerControlledOpenExample() {
@@ -26,6 +26,13 @@ export default function DrawerControlledOpenExample() {
               Счёт формируется 1-го числа по тарифу и числу активных пользователей за прошлый месяц.
             </Typography>
           </Drawer.Body>
+          <Drawer.Footer>
+            <Drawer.Close>
+              <Button.Root variant="outline" tone="neutral">
+                Закрыть
+              </Button.Root>
+            </Drawer.Close>
+          </Drawer.Footer>
         </Drawer.Content>
       </Drawer.Root>
     </>

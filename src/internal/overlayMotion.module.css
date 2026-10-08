@@ -72,15 +72,7 @@
   animation: overlayDrawerOut var(--prime-motion-duration-base) var(--prime-motion-easing-exit) both;
 }
 
-.drawer[data-side="bottom"][data-state="open"] {
-  animation: overlaySheetIn var(--prime-motion-duration-slow) var(--prime-motion-easing-enter) both;
-}
-
-.drawer[data-side="bottom"][data-state="closed"] {
-  animation: overlaySheetOut var(--prime-motion-duration-base) var(--prime-motion-easing-exit) both;
-}
-
-/* ─── Sheet: a floating layer at the bottom edge of a narrow viewport ───── */
+/* ─── Sheet: the Sheet component, and a floating layer at the bottom edge of a narrow viewport ─── */
 
 .sheet[data-state="open"] {
   animation: overlaySheetIn var(--prime-motion-duration-slow) var(--prime-motion-easing-enter) both;

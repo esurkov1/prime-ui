@@ -12,7 +12,6 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
-import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import { Badge } from "../badge/Badge";
 import { Button } from "../button/Button";
@@ -144,23 +143,18 @@ function TabsRoot({
     ...(maxItemWidth !== undefined && { "--tabs-item-max": cssLength(maxItemWidth) }),
   };
 
-  // Tabs are a framed block in both orientations: a layer of the ladder, its panel in the layer's
-  // own color, the strip two steps off it.
-  const depth = useNestedSurfaceDepth();
-
+  // Tabs are a bar, not a surface: no layer of their own. The folder is the host's surface
+  // (`layer-current` inherited), the panel is the host's content.
   return (
     <TabsProvider value={context}>
       <div
         {...rest}
         className={cx(styles.root, className)}
         style={{ ...style, ...widths } as React.CSSProperties}
-        data-depth={depth}
         {...toDataAttributes({ orientation, size, tone, "full-width": fullWidth })}
       >
         {/* The root is the size container for the vertical → row switch; the layout sits inside. */}
-        <SurfaceDepthProvider value={depth}>
-          <div className={styles.layout}>{children}</div>
-        </SurfaceDepthProvider>
+        <div className={styles.layout}>{children}</div>
       </div>
     </TabsProvider>
   );
@@ -421,35 +415,38 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
   }
 
   return (
-    <ScrollContainer
-      {...rest}
-      ref={mergedRef}
-      axis="horizontal"
-      fade
-      scrollbar="hidden"
-      role="tablist"
-      aria-orientation={orientation}
-      className={cx(styles.list, className)}
-      data-indicator="folder"
-      data-collapse={collapse}
-      onKeyDown={handleKeyDown}
-    >
-      {/* First in DOM order so it paints below the tab content. */}
-      <div
-        ref={indicatorRef}
-        className={cx(styles.indicator, styles.indicatorFolder)}
-        data-indicator=""
-        aria-hidden="true"
-        onTransitionEnd={(event) => {
-          if (event.target === event.currentTarget && event.propertyName === "transform") {
-            delete event.currentTarget.dataset.animate;
-          }
-        }}
-      />
-      <ControlSizeProvider value={size}>
-        <CollapseContext.Provider value={collapse}>{children}</CollapseContext.Provider>
-      </ControlSizeProvider>
-    </ScrollContainer>
+    // The strip paints the band; the list inside scrolls and fades over it, the band never fades.
+    <div className={styles.strip}>
+      <ScrollContainer
+        {...rest}
+        ref={mergedRef}
+        axis="horizontal"
+        fade
+        scrollbar="hidden"
+        role="tablist"
+        aria-orientation={orientation}
+        className={cx(styles.list, className)}
+        data-indicator="folder"
+        data-collapse={collapse}
+        onKeyDown={handleKeyDown}
+      >
+        {/* First in DOM order so it paints below the tab content. */}
+        <div
+          ref={indicatorRef}
+          className={cx(styles.indicator, styles.indicatorFolder)}
+          data-indicator=""
+          aria-hidden="true"
+          onTransitionEnd={(event) => {
+            if (event.target === event.currentTarget && event.propertyName === "transform") {
+              delete event.currentTarget.dataset.animate;
+            }
+          }}
+        />
+        <ControlSizeProvider value={size}>
+          <CollapseContext.Provider value={collapse}>{children}</CollapseContext.Provider>
+        </ControlSizeProvider>
+      </ScrollContainer>
+    </div>
   );
 }
 TabsList.displayName = "Tabs.List";
@@ -464,9 +461,11 @@ export type TabsItemProps = Omit<
   disabled?: boolean;
   /**
    * Makes the tab closable: a close button, `Delete` / `Backspace` on the focused tab and a middle
-   * click. Closing the active tab first selects its neighbour; remove the item in this callback.
+   * click. Closing the active tab selects its neighbour; remove the item in this callback. Return a
+   * promise to confirm first (unsaved changes): while pending the close button shows loading and
+   * the tab stays selected; resolved — the neighbour takes over; rejected — nothing changes.
    */
-  onRemove?: () => void;
+  onRemove?: () => void | Promise<void>;
   /**
    * Plain text, or parts: `Tabs.Icon`, `Tabs.Label`, `Tabs.Count`, `Tabs.Description`.
    * A `Tabs.Description` makes the item two-line and becomes its accessible description.
@@ -518,6 +517,8 @@ function TabsItem({
   const { activeValue, select, size, rootId, labels } = useTabsContext();
   const collapse = React.useContext(CollapseContext);
   const [tooltipOpen, setTooltipOpen] = React.useState(false);
+  /** A promise from `onRemove` is pending: the close button shows it, the tab stays. */
+  const [removing, setRemoving] = React.useState(false);
   const tabRef = React.useRef<HTMLButtonElement>(null);
   const mergedRef = useMergedRefs(tabRef, ref);
 
@@ -530,10 +531,16 @@ function TabsItem({
   const label = labelOf(children);
   const labelText = typeof label === "string" || typeof label === "number" ? label : value;
 
-  /** Closes the tab; an active tab first hands the selection — and focus, if it had it — on. */
+  /**
+   * Closes the tab; an active tab hands the selection — and focus, if it had it — on. A promise
+   * from `onRemove` (a «discard changes?» confirm) keeps the tab and its selection while pending:
+   * resolved, the hand-over happens; rejected, nothing changes.
+   */
   function remove() {
+    if (removing) return;
     const tab = tabRef.current;
     const list = tab?.closest<HTMLElement>('[role="tablist"]');
+    let handOver = () => {};
     if (tab && list) {
       const tabs = itemsOf(list)
         .map(tabOf)
@@ -545,10 +552,25 @@ function TabsItem({
       const next = isActive
         ? neighbour
         : list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
-      if (isActive && neighbour) select(neighbour.dataset.value ?? "");
-      if (tab.parentElement?.contains(document.activeElement)) next?.focus();
+      const hadFocus = tab.parentElement?.contains(document.activeElement) ?? false;
+      handOver = () => {
+        if (isActive && neighbour) select(neighbour.dataset.value ?? "");
+        if (hadFocus) next?.focus();
+      };
     }
-    onRemove?.();
+    const result = onRemove?.();
+    if (!result || typeof result.then !== "function") {
+      handOver();
+      return;
+    }
+    setRemoving(true);
+    result.then(
+      () => {
+        setRemoving(false);
+        handOver();
+      },
+      () => setRemoving(false),
+    );
   }
 
   return (
@@ -621,6 +643,7 @@ function TabsItem({
             tone="neutral"
             size={stepDown(size, 2)}
             tabIndex={-1}
+            loading={removing}
             aria-label={formatLabel(labels.remove, { label: labelText })}
             onClick={remove}
           >

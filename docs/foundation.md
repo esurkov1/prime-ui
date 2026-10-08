@@ -105,10 +105,11 @@ in dark, so cards on it are layer 1 — white in light. The Sidebar rail beside 
 layer above the page (white in light, a step lighter in dark), so the rail and the content never
 merge; its current item is the rail's fill two steps off it.
 
-**Who sets a depth.** Layers: Card, Sidebar, Accordion, DataTable, LoginForm, Datepicker.Panel,
-horizontal Tabs, an outline Banner, ExampleFrame. Floating: every `FloatingPanel`
-(Popover, Dropdown, Select, TagSelect…), Modal, Drawer, CommandMenu, Notification, a raised
-ColorPicker.Panel. The ladder stops at layer 4: a surface nested deeper keeps layer 4's color — split
+**Who sets a depth.** Layers: Card, Sidebar, Accordion, DataTable, LoginForm, an outline Banner,
+ExampleFrame. Floating: every `FloatingPanel` (Popover, Dropdown, Select, TagSelect…), Modal, Drawer,
+Sheet, CommandMenu, Notification, a raised ColorPicker.Panel. Host content sets none: Tabs (a bar —
+the active tab is the host's own surface) and `Datepicker.Panel` (a calendar in the host's padding)
+read the depth of the surface they stand on. The ladder stops at layer 4: a surface nested deeper keeps layer 4's color — split
 the screen with space and headings instead.
 
 **Hosts off the ladder.** A tinted host (a soft or solid Banner, an accent wash, an image) sets
@@ -188,7 +189,7 @@ cards `--prime-card-radius` (12); floating panels `--prime-panel-radius` (12) wi
 `--prime-panel-padding` (4) and `--prime-panel-item-radius` (8); modal `--prime-modal-radius` (16).
 
 Elevation: `--prime-shadow-raised` (a card on the page, barely there; `--prime-layer-shadow`) · `--prime-shadow-overlay` (menus, popovers,
-tooltips, datepicker) · `--prime-shadow-modal` (modal, drawer).
+tooltips, datepicker) · `--prime-shadow-modal` (modal, drawer, sheet).
 Z-index: `--prime-z-*` only. Every overlay shares `--prime-z-overlay` and portals to `<body>` when it
 opens, so the open order is the stacking order; toasts sit above on `--prime-z-toast`.
 
@@ -197,7 +198,7 @@ Focus ring must never be clipped (hard rule):
   draw the ring INSIDE their edge: `outline: var(--prime-focus-width) solid var(--prime-color-focus-ring); outline-offset: var(--prime-focus-offset-inset);`.
 - Everything else (buttons, links, tabs, chips, checkboxes, menu items use background instead) uses the outer ring with `--prime-focus-offset`.
 - Every element with `overflow: auto | hidden | scroll | clip` that holds focusable content does exactly one of:
-  (a) padded content — keeps at least `--prime-focus-space` between its edge and the content (Modal/Drawer body, panels, tab lists);
+  (a) padded content — keeps at least `--prime-focus-space` between its edge and the content (Modal/Drawer/Sheet body, panels, tab lists);
   (b) full-bleed content — content touches the edges and is clipped by the container's radius; every focusable inside
   uses the inset ring (tables: head cells, sort buttons, rows; full-width list rows).
   Never mix them: a rounded container never shows a gap before square full-bleed content (e.g. a table head).
@@ -233,9 +234,11 @@ Motion tokens:
 | `--prime-motion-easing-emphasized` | decisive start, long soft landing, no overshoot | state gliding into place: thumbs, indicators, checkmarks; with `base` |
 | `--prime-motion-stagger` | 80 ms | step of a staggered first render |
 | `--prime-motion-press-scale` / `-compact` | 0.98 / 0.96 | `:active` scale; compact for icon-only and small targets |
+| `--prime-motion-loop` | 570 ms | period unit of a loading loop (Spinner: one turn in 3 units, 6 under reduced motion) |
 
 Under `prefers-reduced-motion` durations and stagger collapse to 0 and press scales to 1 (globals.css);
-JS animations must also check it.
+JS animations must also check it. A loading loop is information, not decoration: it reads
+`--prime-motion-loop`, which reduced motion does not zero, and only slows down.
 Every component is designed with its micro-animations, not only its static states. Rules (after Emil Kowalski):
 
 1. **Ask first: should it move at all?** By frequency: keyboard-driven or 100+/day actions (option highlight
@@ -259,7 +262,7 @@ Every component is designed with its micro-animations, not only its static state
 7. **Never from nothing.** Entrances start from `opacity: 0` + a small offset (`--prime-space-1/2`) or
    `scale(0.96–0.98)`, never `scale(0)`. Popovers/menus grow from the trigger (`transform-origin` follows
    `data-side`; Tooltip from its arrow tip); modals stay centered. Layers anchored to a screen edge
-   (Drawer, sheet, Notification stack) travel from that edge and leave toward it.
+   (Drawer, Sheet, a Modal as a phone sheet, Notification stack) travel from that edge and leave toward it.
 8. **State moves, it does not swap.** Checkmark draws/scales in, switch thumb slides, selection indicator
    (tabs, segmented control) glides to the new item, chevrons rotate, progress fills, counters and fills
    ease. Two states cross-fade rather than flip when they replace each other in place: a region
@@ -328,12 +331,12 @@ neighbour must be three different colors.
 
 ### Overlay contract
 
-Every floating layer — Modal, Drawer, CommandMenu, Popover (and Datepicker / ColorPicker popovers built on it),
+Every floating layer — Modal, Drawer, Sheet, CommandMenu, Popover (and Datepicker / ColorPicker popovers built on it),
 Dropdown, Select panel, TagSelect panel, Tooltip — behaves the same way, so "click empty space closes what is open"
 holds across the kit.
 
 - **Dismiss.** A layer closes on (a) a pointerdown outside the layer and its trigger — for Modal / Drawer /
-  CommandMenu that is the scrim — and (b) Escape. Tooltip closes on pointer-leave / blur / Escape.
+  Sheet / CommandMenu that is the scrim — and (b) Escape. Tooltip closes on pointer-leave / blur / Escape.
   Opt out with `closeOnOutsideClick={false}` (Modal keeps it for destructive confirms); the layer still blocks
   the layers below it.
 - **Topmost only.** Open layers form one stack (`src/internal/overlay/layerStack.ts`).
@@ -348,9 +351,13 @@ holds across the kit.
     control; a press on empty space leaves nothing focused, so a focused field blurs (TagSelect collapses) in the
     same click — one click leaves the field. The stack passes the reason (`outside`) to the layer, which
     skips its restore.
-  - **A scrim click of Modal / Drawer / CommandMenu** returns focus to the opener: the page behind was inert, the
+  - **A scrim click of Modal / Drawer / Sheet / CommandMenu** returns focus to the opener: the page behind was inert, the
     click landed on the scrim, not on a control, so the opener is the only sensible place to continue from (the
     keyboard user's position is kept).
+- **Gestures.** Only a sheet swipes: Sheet, and a Modal or a floating layer shown as a bottom sheet below
+  640, close with a swipe down from the grab handle or the header (`useSwipeDismiss`), as an extra way out
+  next to Escape and the scrim, following `closeOnOutsideClick`. A Drawer has no touch gestures: it closes
+  by its buttons, Escape and the scrim.
 - **Presence.** `usePresence(open)` keeps the layer mounted with `data-state="closed"` until its exit animation
   ends (`animationend`, fallback timeout = token duration), and unmounts at once under `prefers-reduced-motion`.
   A closing layer takes no pointer events.
@@ -360,7 +367,7 @@ holds across the kit.
 |---|---|---|
 | scrim | fade · base · enter | fade · base · exit |
 | Modal, CommandMenu | fade + scale 0.98 → 1 · base · enter | fast · exit |
-| Modal bottom sheet (< 640px) | slide up · slow · enter | slide down · base · exit |
+| Sheet; Modal and floating layers as a bottom sheet (< 640px) | slide up · slow · enter | slide down · base · exit |
 | Drawer | slide from its side · slow · enter | base · exit |
 | Popover, Dropdown, Select, TagSelect, Datepicker, Tooltip | fade + 4px (`--prime-space-1`) + scale 0.98 from the anchor edge along the resolved `data-side` · fast · enter | fast · exit |
 
@@ -407,12 +414,12 @@ No backward compatibility, no aliases, no `@deprecated` props, no legacy types. 
 | Size | `size?: "xs" \| "s" \| "m" \| "l" \| "xl"`, default `"m"` | Type `ControlSize` from `src/internal/states.ts`. Overlays that size by width (Modal, Drawer) use the subset they need. Avatar adds `"2xl"`. |
 | Treatment | `variant` | Shared vocabulary: `solid` · `soft` · `outline` · `ghost`. Component-specific structural variants (FileUpload `dashed \| solid`, Card templates). Tabs has no variant: navigation tabs are always a folder (horizontal) or pills (vertical); choosing a value is SegmentedControl are allowed and documented. |
 | Semantic color | `tone?: "neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | Components use the subset that makes sense (Button: `accent \| neutral \| danger`, default `accent`). Destructive = `danger`, never `error`. Button also takes `inherit` (with `ghost \| soft \| outline`) for an action on a colored host: color, fills and focus ring derive from the host's `currentColor`; a host never recolors a Button with a CSS override. |
-| Decorative color | `color?: "gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | Badge, Avatar, Thumbnail, and the parts that host a palette hue: `SegmentedControl.Item` (dot + tinted thumb), count badges (`Tabs.Count`, `SegmentedControl.Count`, `Sidebar.ItemCount`), `FileUpload.FormatBadge`, `Timeline.Item` (dot), TagSelect options (tag hue). |
+| Decorative color | `color?: "gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | Badge, Avatar, Thumbnail, Icon (a category hue from data; takes the place of `tone`), and the parts that host a palette hue: `SegmentedControl.Item` (dot + tinted thumb), count badges (`Tabs.Count`, `SegmentedControl.Count`, `Sidebar.ItemCount`), `FileUpload.FormatBadge`, `Timeline.Item` (dot), TagSelect options (tag hue), ProgressBar / ProgressCircle segments (a category share in its chart color, `--hue-chart`; takes the place of `tone`). |
 | Validation | `invalid?: boolean`; fields with a support row also take `hint?: ReactNode` and `error?: ReactNode` | A non-empty `error` implies `invalid`. Sets `aria-invalid`, `data-invalid`. |
 | Value | `value` / `defaultValue` / `onValueChange(value)` | Select, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, RadioGroup, DigitInput, Pagination (`page` → `value`). Native text inputs (Input, Textarea) keep native `value`/`onChange` and add `onValueChange(string)`. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch. |
 | Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure. |
-| Dismiss | `closeOnOutsideClick?: boolean` (default `true`), `closeOnEscape?: boolean` (default `true`) | One name everywhere: Modal, Drawer, CommandMenu, Popover, Dropdown. Turn it off for destructive confirms. No `closeOnOverlayClick`. See §8 Overlay contract. |
+| Dismiss | `closeOnOutsideClick?: boolean` (default `true`), `closeOnEscape?: boolean` (default `true`) | One name everywhere: Modal, Drawer, Sheet, CommandMenu, Popover, Dropdown. Turn it off for destructive confirms. No `closeOnOverlayClick`. See §8 Overlay contract. |
 | Flags | `disabled`, `readOnly`, `required`, `loading`, `fullWidth` | Same names everywhere. |
 | Focus ring | `focusRing?: boolean`, default `true` | Fields only. `false` hides the visual ring (`data-focus-ring="false"`), never focus or the error ring; see §7. |
 | Built-in strings | `labels?: Partial<XLabels>` | Every system string (aria labels, default texts, counters) lives in one `labels` object with Russian defaults. Visible content goes through children/slots, not labels. |

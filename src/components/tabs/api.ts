@@ -11,8 +11,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Tabs.Root",
-      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel. It is the frame and a layer of the surface ladder in both orientations: a strip two steps off the layer and the panel in the layer's own color — above the panel when horizontal, at its inline start when vertical.",
-      ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель. В обоих направлениях это рамка и слой лестницы поверхностей: полоса на два шага от слоя и панель цвета слоя — полоса над панелью в горизонтальном режиме, слева от неё в вертикальном.",
+      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel one gap apart. It has no surface: no fill, no padding, no radius. It stands in the host's padding (a Card, the page) — never wrap it in a padded box of its own. In a Modal or Drawer it wraps `X.Header` and `X.Body`: `Tabs.List` goes last into the header, which becomes the strip, and the panels into the body; the root then renders no box (`display: contents`), so the dialog keeps its layout.",
+      ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель с одним зазором между ними. Своей поверхности нет: ни фона, ни отступов, ни скругления. Стоит в отступах хоста (Card, страница) — не оборачивайте его в отдельный блок с отступами. В Modal и Drawer оборачивает `X.Header` и `X.Body`: `Tabs.List` ставится последним в шапку, и шапка становится полосой вкладок, а панели — в тело; корень тогда не рисует блока (`display: contents`), и раскладка диалога не меняется.",
       props: [
         {
           name: "value",
@@ -37,15 +37,15 @@ export const api: ComponentApi = {
           name: "orientation",
           type: '"horizontal" | "vertical"',
           default: '"horizontal"',
-          en: "List direction and arrow keys. Vertical: a column of sections at the panel's inline start, the active one the panel reaching into the column; when the container is narrower than 600px the column becomes the horizontal strip above the panel.",
-          ru: "Направление списка и стрелок. Вертикальный: колонка разделов слева от панели, активный раздел — панель, вдающаяся в колонку; в контейнере уже 600px колонка становится горизонтальной полосой над панелью.",
+          en: "List direction and arrow keys. Vertical: a column of sections at the panel's inline start, the active one the host's surface reaching into the column; when the container is narrower than 600px the column becomes the horizontal strip above the panel.",
+          ru: "Направление списка и стрелок. Вертикальный: колонка разделов слева от панели, активный раздел — поверхность хоста, вдающаяся в колонку; в контейнере уже 600px колонка становится горизонтальной полосой над панелью.",
         },
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Control tier: text, icon, spacing, folder radius and panel padding. A horizontal tab is the control height plus the folder rise on both sides; a vertical one is the control height.",
-          ru: "Ярус контрола: кегль, иконка, отступы, скругление папки и отступ панели. Горизонтальная вкладка — высота контрола плюс подъём папки сверху и снизу; вертикальная — высота контрола.",
+          en: "Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel. A tab is at least the control height and grows with its content (a two-line tab is taller); tabs in a row share the tallest height.",
+          ru: "Ярус контрола: кегль, иконка, отступы, скругление папки и зазор между полосой и панелью. Вкладка не ниже высоты контрола и растёт по содержимому (двухстрочная выше); вкладки в ряду выравниваются по самой высокой.",
         },
         {
           name: "fullWidth",
@@ -135,9 +135,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onRemove",
-          type: "() => void",
-          en: "Makes the tab closable: a close button (shown on the active tab, on hover and focus, always on touch screens), `Delete` / `Backspace` and a middle click. Closing the active tab first selects its neighbour; remove the item from your list here.",
-          ru: "Делает вкладку закрываемой: кнопка закрытия (видна на активной вкладке, при наведении и фокусе, на сенсорных экранах всегда), `Delete` / `Backspace` и средний клик. Закрытие активной вкладки сначала выбирает соседнюю; уберите вкладку из своего списка в этом обработчике.",
+          type: "() => void | Promise<void>",
+          en: "Makes the tab closable: a close button (shown on the active tab, on hover and focus, always on touch screens), `Delete` / `Backspace` and a middle click. Closing the active tab selects its neighbour; remove the item from your list here. Return a promise to confirm first (unsaved changes): while pending the close button shows loading and the tab stays; resolved — the neighbour takes the selection and focus; rejected — nothing changes.",
+          ru: "Делает вкладку закрываемой: кнопка закрытия (видна на активной вкладке, при наведении и фокусе, на сенсорных экранах всегда), `Delete` / `Backspace` и средний клик. Закрытие активной вкладки выбирает соседнюю; уберите вкладку из своего списка в этом обработчике. Верните промис, чтобы сначала спросить (несохранённые правки): пока он не завершён, кнопка закрытия в загрузке и вкладка остаётся; выполнен — выбор и фокус переходят к соседней; отклонён — ничего не меняется.",
         },
         {
           name: "children",
@@ -236,8 +236,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.Panel",
-      en: '`ref` → `HTMLDivElement`. `<div role="tabpanel">`, focusable, rendered only while its tab is active; horizontal, the padded surface the folder rises from. Its content enters each time it opens.',
-      ru: '`<div role="tabpanel">`, фокусируемая; рендерится только пока её вкладка активна. В горизонтальном режиме — поверхность с отступами, из которой вырастает папка. Содержимое появляется при каждом открытии.',
+      en: "`ref` → `HTMLDivElement`. `<div role=\"tabpanel\">`, focusable, rendered only while its tab is active. No fill and no padding: its content is the host's content, aligned with the strip's edges. Its content enters each time it opens.",
+      ru: '`<div role="tabpanel">`, фокусируемая; рендерится только пока её вкладка активна. Без фона и отступов: её содержимое — контент хоста, по краям полосы вкладок. Содержимое появляется при каждом открытии.',
       props: [
         {
           name: "value",

@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 63 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 74 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines — a surface ladder where every nested
@@ -24,12 +24,12 @@ every screen you build looks like it was drawn by the same hand.
   between loading, data, empty and error cross-fades and glides to its new height (`Crossfade`),
   and while it loads a `Skeleton` holds the shape of the coming content — so nothing on the page
   jumps.
-- **Overlays that behave.** Modal, Drawer, Popover, Dropdown, Select, Tooltip and CommandMenu share
+- **Overlays that behave.** Modal, Drawer, Sheet, Popover, Dropdown, Select, Tooltip and CommandMenu share
   one stack: one click or one Escape closes exactly the topmost layer, focus goes where it should.
 - **Accessible by default.** Keyboard support, ARIA roles, Russian default strings for every system
   label, `prefers-reduced-motion` and `prefers-contrast` respected.
 - **Docs for humans and agents.** Every component ships a full `COMPONENT.md` reference and copyable
-  `examples/` inside the npm package; the repository adds an agent skill that teaches an AI to build
+  `examples/` inside the npm package, together with an agent skill that teaches an AI to build
   screens the way the kit's author would.
 
 **Links:** [npm](https://www.npmjs.com/package/prime-ui-kit) ·
@@ -42,14 +42,8 @@ every screen you build looks like it was drawn by the same hand.
 
 prime-ui-kit is built to be used by coding agents (Claude Code, Cursor, Codex, …) as well as people:
 
-1. **Install the agent skill** — it teaches the agent the design rules, the API and page recipes:
-
-   ```bash
-   npx degit esurkov1/prime-ui/SKILL .claude/skills/prime-ui-kit
-   ```
-
-   Other agents: copy the same folder into their skills or rules directory
-   ([details](#install-the-skill)).
+1. **Install the agent skill** — it teaches the agent the design rules, the API and page recipes.
+   It ships in the package: `npx prime-ui-kit skill` ([details](#install-the-skill)).
 2. **The docs are already on disk.** Every component ships `COMPONENT.md` (full API, variants, states,
    a11y, mistakes) and copyable `examples/*.tsx` in `node_modules/prime-ui-kit/src/components/<name>/`,
    matching the installed version.
@@ -63,7 +57,7 @@ prime-ui-kit is built to be used by coding agents (Claude Code, Cursor, Codex, �
 
 ```bash
 npm install prime-ui-kit react react-dom date-fns
-# using ColorPicker: also react-aria-components
+# using ColorPicker or ColorField: also react-aria-components
 # or: pnpm add … · bun add …
 ```
 
@@ -73,7 +67,9 @@ npm install prime-ui-kit react react-dom date-fns
 | `date-fns` | ^4.0.0 |
 | `react-aria-components` (optional, only for `prime-ui-kit/color-picker`) | ^1.16.0 |
 
-`lucide-react` comes with the package: the kit icons are drawn from Lucide, and `createIcon` wraps any of its glyphs. The kit has no router dependency: pass your router's
+The kit has no runtime dependencies, only the peers above: its icons are drawn in (from Lucide), and
+`createIcon` wraps any SVG component you bring (a `lucide-react` glyph, an SVGR import). It has no
+router dependency either: pass your router's
 pathname to `AppShell.Template scrollResetKey` and use `asChild` for router links.
 
 ## Set up styles and theme
@@ -89,6 +85,34 @@ applyTheme("dark"); // sets data-theme on <html> without a transition flash
 
 `bundle.css` is everything the components need; it leaves the root font size to the browser.
 `data-theme="light" | "dark"` also works on any wrapper, so one page can show both themes.
+
+## Next.js (App Router)
+
+Every JS file of the package starts with `"use client"`: importing the kit never pulls React state
+into the server graph, and you need no re-export wrapper files. Import the CSS once in the root
+layout and set the theme on `<html>` there; `applyTheme` is for switching it later from a client
+component.
+
+```tsx
+// app/layout.tsx
+import "prime-ui-kit/bundle.css";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="ru" data-theme="light">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+Build screens in your own `"use client"` files and render those from pages and layouts. A server
+component itself can render only single-export components with serializable props
+(`<Typography>`, `<Spinner>`, `<Skeleton>`): React does not allow dotting into a client module on the
+server, so compound parts (`<Button.Root>`, `<Modal.Content>`) and any callback prop
+(`onValueChange`, `renderX`) need a client file. The whole package is client code, helpers
+included — call `groupMessages`, `formatMessageDate`, `applyTheme` and the hooks only from client
+components.
 
 ## Quick start
 
@@ -130,7 +154,7 @@ export function App() {
 Short rules that keep code correct — for people and for AI coding assistants:
 
 1. Import everything from the package root: `import { Button, Input } from "prime-ui-kit"`. The one
-   exceptions are `import { ColorPicker } from "prime-ui-kit/color-picker"` and the full glyph set,
+   exceptions are `import { ColorField, ColorPicker } from "prime-ui-kit/color-picker"` and the full glyph set,
    `import { BellIcon } from "prime-ui-kit/icons"`.
 2. Import styles once at the app root: `prime-ui-kit/bundle.css` (plus the optional `fonts.css` and
    `reset.css`).
@@ -171,12 +195,13 @@ accessibility, examples and common mistakes.
 | Component | What it is for |
 |---|---|
 | [**Input**](https://github.com/esurkov1/prime-ui/blob/main/src/components/input/COMPONENT.md) | Single-line text field with label, hint, error and slots for icons, affixes, a badge, a clear button and a counter. |
-| [**Textarea**](https://github.com/esurkov1/prime-ui/blob/main/src/components/textarea/COMPONENT.md) | Multi-line text field with label, hint, error and a character counter; grows with its content by default. |
+| [**Textarea**](https://github.com/esurkov1/prime-ui/blob/main/src/components/textarea/COMPONENT.md) | Multi-line text field with label, hint, error and a character counter; grows with its content from `rows` up to `maxRows`. |
 | [**DigitInput**](https://github.com/esurkov1/prime-ui/blob/main/src/components/digit-input/COMPONENT.md) | A row of square single-digit cells for a fixed-length code (OTP from SMS, PIN, pickup code). |
 | [**FileUpload**](https://github.com/esurkov1/prime-ui/blob/main/src/components/file-upload/COMPONENT.md) | File picker zone with drag and drop, plus presentational parts for the list of selected files. |
 | [**ImageUpload**](https://github.com/esurkov1/prime-ui/blob/main/src/components/image-upload/COMPONENT.md) | Photos as square tiles that follow the width, the last tile adds more: reorder by drag, remove, an optional cover. |
 | [**Label**](https://github.com/esurkov1/prime-ui/blob/main/src/components/label/COMPONENT.md) | Field label (native `<label>`) with required and optional markers. |
 | [**Hint**](https://github.com/esurkov1/prime-ui/blob/main/src/components/hint/COMPONENT.md) | Help text or a validation error under a field. |
+| [**Fieldset**](https://github.com/esurkov1/prime-ui/blob/main/src/components/fieldset/COMPONENT.md) | A frameless group of form fields: a `title-s` legend, the form rhythm and one `disabled` for all of them. |
 
 ### Selection (`selection`)
 
@@ -190,8 +215,9 @@ accessibility, examples and common mistakes.
 | [**Select**](https://github.com/esurkov1/prime-ui/blob/main/src/components/select/COMPONENT.md) | A dropdown field for choosing one value (or several with `multiple`) from a closed list. |
 | [**NativeSelect**](https://github.com/esurkov1/prime-ui/blob/main/src/components/native-select/COMPONENT.md) | The system `<select>` in the kit's field frame: plain text options, native picker on phones. |
 | [**TagSelect**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag-select/COMPONENT.md) | A multi-select field that shows the chosen values as coloured tags, filters as you type and can create new tags. |
-| [**SmartFilter**](https://github.com/esurkov1/prime-ui/blob/main/src/components/smart-filter/COMPONENT.md) | A filter bar for lists and tables: a filter button and search with a panel of values, applied filters as tags, and a show / hide choice for every value. |
+| [**SmartFilter**](https://github.com/esurkov1/prime-ui/blob/main/src/components/smart-filter/COMPONENT.md) | The search and filter bar of lists and tables: the search first, a filter button with a panel of values, applied filters as tags, and a show / hide choice for every value. |
 | [**Datepicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/datepicker/COMPONENT.md) | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). |
+| [**ColorField**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-field/COMPONENT.md) | A form field for any color: the swatch and its hex in a field box that opens the ColorPicker in a popover (`prime-ui-kit/color-picker`). |
 | [**ColorPicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-picker/COMPONENT.md) | Color selection: a full picker (area, channel sliders, hex and channel fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. |
 | [**ColorSwatches**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-swatches/COMPONENT.md) | An inline color choice: a wrapping grid of preset swatches inside a form, without a popover. |
 
@@ -202,14 +228,25 @@ accessibility, examples and common mistakes.
 | [**Badge**](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) | The kit's one chip: a status, category or count label, a removable value or applied filter, and a pressable toggle with a hover action, in a palette color. |
 | [**Avatar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) | A round photo of a person or entity with an initials or icon fallback, presence dot and overlapping groups. |
 | [**Thumbnail**](https://github.com/esurkov1/prime-ui/blob/main/src/components/thumbnail/COMPONENT.md) | A preview of an object — product, vehicle, file, cover — at a fixed aspect ratio, with a colored icon fallback. |
-| [**Sparkline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/sparkline/COMPONENT.md) | A small line chart with its headline — the latest value, its change against the point before and its date — where any point can be scrubbed. |
+| [**Sparkline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/sparkline/COMPONENT.md) | A small line or bar chart with its headline — the value at rest, its change against the point before and its date — where any point can be scrubbed. |
+| [**ChartFrame**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chart-frame/COMPONENT.md) | A dashboard panel around any chart (Recharts, ECharts, visx, Chart.js or a hand-drawn SVG): title, headline value, a measured plot area, a series legend, a tooltip body and a data table for screen readers. |
 | [**Kbd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kbd/COMPONENT.md) | A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`. |
 | [**Card**](https://github.com/esurkov1/prime-ui/blob/main/src/components/card/COMPONENT.md) | A filled surface block with structural templates for metrics, charts, lists, calls to action and covers. |
-| [**DataTable**](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) | A data table with sorting, pagination or infinite scroll, row selection, nested rows and loading / empty / error states. |
-| [**Kanban**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kanban/COMPONENT.md) | A board of status columns: cross-column moves by pointer, touch and keyboard, WIP limits, loading and empty states. |
+| [**DescriptionList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/description-list/COMPONENT.md) | Read-only properties of a record: «label — value» pairs on a `<dl>` that stack where the room is narrow, with a muted dash for an empty value. |
+| [**DataTable**](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) | A data table with sorting, pagination or infinite scroll on the client or by the server, row selection, row groups, rows reordered by drag, rows that open a record, a column chooser, nested rows and loading / empty / error states. |
+| [**Kanban**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kanban/COMPONENT.md) | A board of status columns: cross-column moves by pointer, touch and keyboard, columns reordered by a grip, WIP limits, loading and empty states. |
+| [**Gantt**](https://github.com/esurkov1/prime-ui/blob/main/src/components/gantt/COMPONENT.md) | A resource or project schedule: rows with bars on a day / week / month axis, lanes for overlaps, milestones, a today line, moves, resizes and new bars by pointer and keyboard, thousands of rows virtualized. |
 | [**Timeline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/timeline/COMPONENT.md) | An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels. |
 | [**CodeBlock**](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) | A static TypeScript / TSX snippet with syntax highlighting, on a filled panel or bare inside a host. |
 | [**Accordion**](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) | Collapsible sections: FAQ, settings groups, checkout steps. |
+
+### Messages (`messages`)
+
+| Component | What it is for |
+|---|---|
+| [**Message**](https://github.com/esurkov1/prime-ui/blob/main/src/components/message/COMPONENT.md) | Chat messages in speech bubbles: runs of one author, time and delivery ticks, replies, reactions, a context menu and selection, photos and albums, round videos, files, locations, contacts and link previews; new messages that enter by themselves, read receipts, typing, pinned messages, jump and search. |
+| [**VoicePlayer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/voice-player/COMPONENT.md) | A voice message player: a round play disk, a waveform that is the seek slider, and the time with the playback speed; one sound at a time, `getWaveform` for audio without levels. |
+| [**Composer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/composer/COMPONENT.md) | The message input of a chat: a growing field, Enter to send, attachments, reply / edit bar, Markdown formatting, voice and video messages with pause, the typing signal. |
 
 ### Status and loading (`status`)
 
@@ -217,12 +254,13 @@ accessibility, examples and common mistakes.
 |---|---|
 | [**Banner**](https://github.com/esurkov1/prime-ui/blob/main/src/components/banner/COMPONENT.md) | Full-width in-flow message for a page, section or card: status icon, title, description, actions and dismiss. |
 | [**Notification**](https://github.com/esurkov1/prime-ui/blob/main/src/components/notification/COMPONENT.md) | Pop-up toast notifications: `NotificationProvider` at the app root and `notify()` from any screen. |
-| [**ProgressBar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) | Linear progress: one value on a native `<progress>`, or `segments` that split a whole (storage by type, task statuses), with a label, a percentage and status colors. |
+| [**ProgressBar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) | Linear progress: one value on a native `<progress>`, `segments` that split a whole (storage by type, leads by source) with an optional legend, or a ranking of rows (top cities, a funnel). |
 | [**ProgressCircle**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) | Circular progress — the ring version of ProgressBar: one value or `segments` that split a whole, with status colors and optional content in the center. |
 | [**Spinner**](https://github.com/esurkov1/prime-ui/blob/main/src/components/spinner/COMPONENT.md) | An indeterminate loading indicator: a ring with a gap that turns while a request runs. |
 | [**Skeleton**](https://github.com/esurkov1/prime-ui/blob/main/src/components/skeleton/COMPONENT.md) | A placeholder in the shape of the content that is loading — text lines, a control, an avatar, a block — so the layout is in place before the data arrives. |
 | [**Crossfade**](https://github.com/esurkov1/prime-ui/blob/main/src/components/crossfade/COMPONENT.md) | A region that cross-fades between its states (loading → data → empty → error) and glides to the new height, so the page below does not jump. |
-| [**EmptyPage**](https://github.com/esurkov1/prime-ui/blob/main/src/components/empty-page/COMPONENT.md) | Empty state of a page or a block: icon, title, explanation and an action. |
+| [**EmptyPage**](https://github.com/esurkov1/prime-ui/blob/main/src/components/empty-page/COMPONENT.md) | Empty or failed state of a page or a block: icon, title, explanation and an action — a retry for a failed load. |
+| [**VisuallyHidden**](https://github.com/esurkov1/prime-ui/blob/main/src/components/visually-hidden/COMPONENT.md) | Text that screen readers read and nobody sees: the words behind an icon, a badge or a change on the screen. |
 
 ### Navigation (`navigation`)
 
@@ -243,7 +281,9 @@ accessibility, examples and common mistakes.
 | [**Popover**](https://github.com/esurkov1/prime-ui/blob/main/src/components/popover/COMPONENT.md) | A non-modal floating panel anchored to a trigger: short forms, filters, confirmations, explanations. |
 | [**Dropdown**](https://github.com/esurkov1/prime-ui/blob/main/src/components/dropdown/COMPONENT.md) | A menu of actions that opens from a trigger: groups, a profile header and destructive items. |
 | [**Modal**](https://github.com/esurkov1/prime-ui/blob/main/src/components/modal/COMPONENT.md) | A dialog over the page for confirmations, short forms and important text. |
-| [**Drawer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/drawer/COMPONENT.md) | A modal side panel that slides in from the edge: filters, forms and record details. |
+| [**ConfirmDialog**](https://github.com/esurkov1/prime-ui/blob/main/src/components/confirm-dialog/COMPONENT.md) | The confirm of a destructive or weighty action in one piece: the question, the consequence, Cancel and an action that runs its own request. |
+| [**Drawer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/drawer/COMPONENT.md) | A modal side panel that slides in from the side: filters, forms and record details. |
+| [**Sheet**](https://github.com/esurkov1/prime-ui/blob/main/src/components/sheet/COMPONENT.md) | A panel raised from the bottom edge for a short task that ends by itself: pick a date, choose an action, leave a few words. |
 | [**CommandMenu**](https://github.com/esurkov1/prime-ui/blob/main/src/components/command-menu/COMPONENT.md) | A command palette in a dialog: a search field that filters a list of commands and pages (⌘K). |
 
 ### Page (`page`)
@@ -251,11 +291,11 @@ accessibility, examples and common mistakes.
 | Component | What it is for |
 |---|---|
 | [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame: a content panel that is the page itself and a navigation rail one layer above it. |
-| [**AppHeader**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-header/COMPONENT.md) | The bar at the top of the app: where you are, ⌘K search, a few actions and the phone menu button. |
-| [**PageContent**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) | Page structure inside the main column: title, description, page actions and content sections. |
-| [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — sections, filter and search, view options and the primary action — one row when wide, exactly two rows when narrow. |
+| [**AppHeader**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-header/COMPONENT.md) | The bar at the top of the app: where you are, ⌘K search, a few actions and the phone menu button; it may carry the page title and tools. |
+| [**PageContent**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) | Page structure inside the main column: title, description, page actions and content sections; full-height pages and list + detail. |
+| [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — search and filter, sections, view options and the primary action — one row when wide, stacked rows when narrow. |
 | [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator, horizontal or vertical, with or without a label. |
-| [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents. |
+| [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents; a chat pinned to its end, edge events for loading more. |
 
 ### Interaction (`interaction`)
 
@@ -291,7 +331,15 @@ accessibility, examples and common mistakes.
 | `applyTheme(scheme, element?)` | Switch the theme without transition flashes. |
 | `celebrate({ origin? })` | A short confetti burst for a rare milestone (a quarter closed, the first payment); draws nothing under reduced motion. |
 | `getPasswordStrength(value)` | The kit's 0–4 password estimate behind `Input.Root strength`; replace it with `getStrength`. |
-| `<Icon name="…" />`, `createIcon(glyph)` | The kit icon set: Lucide drawings, each with a small gesture that plays when its host is hovered or pressed; `createIcon` turns a domain lucide glyph into a kit icon. |
+| `useUploadQueue({ upload, concurrency })` | The upload queue behind `FileUpload.Queue` and `ImageUpload queue`: your `upload(file, { signal, onProgress })` runs a few at a time, with progress, abort on remove and retry. |
+| `groupMessages`, `formatMessageDate`, `formatMessageTime` | Chat data → dated runs of one author for `Message.Group`, and the date and time labels. |
+| `getWaveform` | The 0…1 levels of a recorded voice message (a `Blob` or a URL) for `VoicePlayer waveform`, decoded with the Web Audio API. |
+| `moveBefore(items, id, beforeId, getId)` | Applies a `Dnd` or DataTable `onReorder` to your array. |
+| `matchesSmartFilter`, `resolveSmartFilterValues` | Apply a SmartFilter value to your rows. |
+| `datepickerPresets`, `formatDatepickerValue` | Quick ranges and value display for `Datepicker`. |
+| `chartColors` | The chart palette as CSS values for a chart library; follows the theme. |
+| `useTokenValue(token)` | A length token in px for geometry CSS cannot take (SVG, canvas). |
+| `<Icon name="…" />`, `createIcon(glyph)` | The kit icon set: Lucide drawings, each with a small gesture that plays when its host is hovered or pressed; `createIcon` turns any SVG icon component (a `lucide-react` glyph you install, an SVGR import) into a kit icon. |
 
 ## Docs inside the package
 
@@ -301,6 +349,7 @@ Each component folder ships with the package:
 node_modules/prime-ui-kit/src/components/<name>/COMPONENT.md   full reference
 node_modules/prime-ui-kit/src/components/<name>/examples/*.tsx one scenario per file, copyable
 node_modules/prime-ui-kit/src/layout/<name>/…                  AppShell, AppHeader, Sidebar, BottomNav
+node_modules/prime-ui-kit/dist/skill/SKILL.md                  the agent skill (see below)
 ```
 
 Examples import only from `"prime-ui-kit"` and style layout with a local `examples.module.css` on
@@ -311,45 +360,43 @@ Examples import only from `"prime-ui-kit"` and style layout with a local `exampl
 [`SKILL/`](https://github.com/esurkov1/prime-ui/tree/main/SKILL) teaches an AI coding agent to build UI
 with the kit the way its author would: the screen-building process, the design rules in "do this" form,
 the API cheat sheet, how to choose between similar components, what to do when a component is missing,
-page recipes (dashboard, list with table, settings, forms, detail page, empty state, auth), anti-patterns
-and a review checklist. It links to each component's `COMPONENT.md` and `examples/` inside
-`node_modules/prime-ui-kit/` instead of copying them, so the docs always match the installed version.
+page recipes (dashboard, list with table, settings, forms, detail page, screen states, messenger, auth), anti-patterns
+and a review checklist. The package ships it built as one self-contained folder,
+`node_modules/prime-ui-kit/dist/skill/`: `SKILL.md`, the guides, the screen `patterns/`, and every
+component's `COMPONENT.md` and `examples/` under `reference/`, so it always matches the installed
+version.
 
 ### Install the skill
 
-Install the kit first (`npm install prime-ui-kit …`), then copy the skill folder from GitHub.
-
-**Claude Code — for one project** (commit it so the whole team gets it):
+After `npm install prime-ui-kit`, from the project root:
 
 ```bash
-npx degit esurkov1/prime-ui/SKILL .claude/skills/prime-ui-kit
+npx prime-ui-kit skill                                  # Claude Code, this project: .claude/skills/prime-ui-kit
+npx prime-ui-kit skill ~/.claude/skills/prime-ui-kit    # Claude Code, all your projects
 ```
 
-**Claude Code — for all your projects:**
+Commit `.claude/skills/prime-ui-kit` so the whole team gets it. The command only copies the folder
+(Node built-ins, no network); a plain copy does the same:
 
 ```bash
-npx degit esurkov1/prime-ui/SKILL ~/.claude/skills/prime-ui-kit
+rm -rf .claude/skills/prime-ui-kit && mkdir -p .claude/skills
+cp -R node_modules/prime-ui-kit/dist/skill .claude/skills/prime-ui-kit
 ```
 
-**Other agents** (Cursor, Codex, …): copy the same folder into the agent's skills or rules directory,
-or point the agent at `SKILL/SKILL.md`.
-
-Without `degit`:
-
-```bash
-git clone --depth 1 https://github.com/esurkov1/prime-ui.git /tmp/prime-ui
-cp -r /tmp/prime-ui/SKILL .claude/skills/prime-ui-kit
-```
+**Other agents** (Cursor, Codex, …): pass the agent's skills or rules directory
+(`npx prime-ui-kit skill .cursor/skills/prime-ui-kit`), or point the agent at `SKILL.md` in the
+package.
 
 The agent picks the skill up automatically when you ask it to build or review a screen ("build a
-settings page with prime-ui-kit", "check this screen against the design system"). To update it, run the same
-command again with `--force` (degit) or re-copy the folder.
+settings page with prime-ui-kit", "check this screen against the design system"). After upgrading
+the kit, run the command again: it replaces the folder with the skill of the new version.
 
 ## Package exports
 
 | Path | Purpose |
 |---|---|
-| `prime-ui-kit` | The JS/TS API: every component, layout, icon and helper (no CSS side effects). |
+| `prime-ui-kit` | The JS/TS API: every component, layout, icon, hook and helper (no CSS side effects). |
+| `prime-ui-kit/color-picker` | `ColorPicker`, `ColorField` and `parseColor` — the only code on the optional peer `react-aria-components`. |
 | `prime-ui-kit/icons` | The full animated glyph set as named components (`<BellIcon />`): Lucide drawings, one gesture each; only what you import is bundled. |
 | `prime-ui-kit/bundle.css` | Tokens, both themes, base rules (focus ring, reduced motion) and every component's CSS. |
 | `prime-ui-kit/fonts.css` | Optional: Golos Text and JetBrains Mono from Google Fonts. |
@@ -363,7 +410,7 @@ Type definitions ship with the package.
 ```bash
 bun install
 bun run playground:dev   # docs site with every component and scenario
-bun run verify           # biome, typecheck, tests (incl. docs contract), build
+bun run verify           # biome, typecheck, tests (incl. docs contract), build (with the skill)
 ```
 
 Contributor rules: [`CLAUDE.md`](https://github.com/esurkov1/prime-ui/blob/main/CLAUDE.md). A change to a component updates
@@ -376,8 +423,9 @@ keeps them in sync.
 settings, forms, data tables) with its own design system "Graphite", built on CSS Modules and CSS
 custom properties.
 
-**Which React version does it need?** React 19 (`react` and `react-dom` ^19), plus the peer
-dependencies `react-aria-components` ^1.16 and `date-fns` ^4.
+**Which React version does it need?** React 19 (`react` and `react-dom` ^19) and the peer
+dependency `date-fns` ^4. `react-aria-components` ^1.16 is an optional peer, needed only for
+`prime-ui-kit/color-picker` (ColorPicker, ColorField).
 
 **Does it use Tailwind?** No. Styles are CSS Modules compiled into `prime-ui-kit/bundle.css`; theming is
 done with `--prime-*` CSS variables and `data-theme="light" | "dark"`.
@@ -391,8 +439,12 @@ and `…/examples/*.tsx`; on GitHub: the links in the [Components](#components) 
 **What language are the built-in strings in?** Russian. Every system string (aria labels, counters,
 default texts) can be replaced through the component's `labels` prop.
 
-**Can an AI agent build screens with it?** Yes — install the [agent skill](#install-the-skill); it
-teaches the agent the design rules, the API and page recipes and points it to each component's docs.
+**Can an AI agent build screens with it?** Yes — run `npx prime-ui-kit skill` to install the
+[agent skill](#install-the-skill) shipped in the package; it teaches the agent the design rules, the
+API and page recipes and points it to each component's docs.
+
+**Does it work with Next.js App Router?** Yes — the package is marked `"use client"`; build screens
+in client components and render them from server pages ([details](#nextjs-app-router)).
 
 ## License
 

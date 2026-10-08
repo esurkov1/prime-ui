@@ -49,41 +49,48 @@ Use these as they are; never wrap them in your own breakpoints.
 |---|---|
 | app frame | AppShell gutters 16 → 24 → 32; `AppHeader` un-sticks on screens lower than 480px, respects safe areas and, below 36rem of its width, drops the description and folds the search into an icon |
 | app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by `AppHeader.MenuButton`, which shows itself below 768px; `BottomNav` in `AppShell.Footer` for 2–6 app sections on phones — flat or a floating glass capsule (`floating`) with an optional round `BottomNav.Action`, icons with or without labels (`iconOnly`); the shell hides it by itself while the Sidebar rail is on screen (from 768px with `offCanvas="auto"`) |
-| page panel | `PageToolbar` — one row when wide, exactly two rows when narrow (below) |
+| page panel | `PageToolbar` — search and filter first, one row when wide, stacked rows when narrow (below) |
 | page header | `PageContent.Header`: actions wrap under the title |
 | switchers | SegmentedControl and Tabs never wrap: they scroll inside themselves (hidden scrollbar), the active item is scrolled into view, stretched items tend to equal width, the indicator moves only after a person's choice; Tabs collapse icons and descriptions first |
-| tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn`, `hiddenColumns` for a column chooser, the toolbar stacks below a 30rem table, sticky head off on short screens |
+| tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn`, `DataTable.ColumnsMenu` for a column chooser, the toolbar stacks below a 30rem table, sticky head off on short screens |
 | floating layers | Popover (opened from a Trigger), Dropdown, Select (and Datepicker, ColorPresets) never wider than the viewport − 16, 8 from the edges, flip when out of room; below 640 they open as a bottom sheet — scrim, grab handle, swipe down to close, page scroll locked; Tooltip and TagSelect stay anchored |
-| dialogs | Modal is a bottom sheet with a handle below 640 (swipe down closes it while `closeOnOutsideClick` allows); footer actions stack on phones and in a dialog narrower than 360px; `Drawer.Content side="bottom"` is a sheet for a short task, and any drawer closes with a swipe toward its edge |
+| dialogs | Modal is a bottom sheet with a handle below 640 (swipe down closes it while `closeOnOutsideClick` allows); footer actions stack on phones and in a dialog narrower than 360px; `Sheet` is a bottom sheet for a short task at every width (centred at 560 on a tablet or desktop) and closes with a swipe down from its handle or header; a Drawer has no swipe — buttons, Escape and the scrim close it |
 | date picking | Datepicker shows two months and side presets only when they fit; otherwise one month and presets above |
-| messages | Banner actions move under the text in a narrow container; Notification stays within the viewport with safe-area insets |
-| cards | Card templates stack and wrap in a narrow container |
+| system messages | Banner actions move under the text in a narrow container; Notification stays within the viewport with safe-area insets |
+| chat | `Message` bubbles hug their content and cap at 30rem and 85% of the chat column, file / contact / location cards at 16rem and 75%, round video at 70%, so a chat works from 320px; the message menu is a bottom sheet below 640, the reaction bar opens on a long press; `Composer` takes its container's width, keeps 16px text and 44px hit areas on touch, and the recording bar covers the field without changing the row height; `VoicePlayer` shrinks its waveform to fit; a chat beside its dialogs is `PageContent.Split` (one pane at a time when narrow); the header row keeps the avatar, a name that truncates and icon-only actions, a search row puts its counter and arrows after a shrinking field, `Message.Pinned` truncates its line, the «к последним» button floats inside the thread at its bottom-end, and the Composer stays one row (paperclip · field · button) from 320px with its bars above it |
+| schedules and boards | `Gantt` scrolls inside itself with the header and the first column pinned; the first column narrows (12 → 10 → 6rem by the chart's width, or only the avatar); a long press on touch creates a one-unit bar; rows and days are virtualized. `Kanban` columns are 18rem from 40rem of board width, below that 85% of it with snapping so the next column peeks; the strip scrolls sideways inside the board |
+| cards and properties | Card templates stack and wrap in a narrow container; `DescriptionList` stacks label over value below 24rem of its width; `ImageUpload` shows 5 · 4 · 3 · 2 tiles across by its own width |
 | fields | text ≥ 16px under a coarse pointer (no iOS zoom on focus); labels above fields; affixes in the field row |
 | codes | DigitInput cells 36–64px, `fullWidth` cells share a phone column |
 | touch | hover effects only under `(hover: hover)`; under `(pointer: coarse)` small controls get a 44px hit area; nothing is hover-only |
 
 ## Page panel — `PageToolbar`
 
-One strip at the top of the page holds up to five slots; each has a fixed place in one of two rows,
-and an item left alone in its row stretches to the full width.
+One strip at the top of the page holds up to five slots, each in a fixed place. The order is a rule:
+search and filter first, then the sections, the view and the primary action last; the active filters
+always sit right under the search and filter. Every row is 12 from the next; a slot alone in its row
+stretches to the full width. Write the slots in JSX in that order — it is the Tab order.
 
 | Slot | Holds | Place |
 |---|---|---|
-| `PageToolbar.Sections` | sections of the page: a `fullWidth` SegmentedControl with counts | top row |
+| `PageToolbar.Tools` | search + filter button: `SmartFilter.Toolbar` | first, the stretchy item of the top row |
+| `PageToolbar.Sections` | sections of the page: a `fullWidth` SegmentedControl with counts | after the Tools when wide; its own row under the chips when narrow |
+| `PageToolbar.View` | period, table / cards, columns | by content when wide; its own row when narrow |
 | `PageToolbar.Actions` | the primary action («Создать», «Сохранить 3 изменения») | top row, at the end, always |
-| `PageToolbar.Tools` | filter button + search: `SmartFilter.Toolbar` | the stretchy item of the bottom row |
-| `PageToolbar.View` | period, table / cards, columns | by content; alone in a row it stretches |
-| `PageToolbar.Chips` | active filters: `SmartFilter.Chips` | own row under the panel, only while there are chips |
+| `PageToolbar.Chips` | active filters: `SmartFilter.Chips` | right under the search and filter, only while there are chips |
 
 ```text
-Wide (toolbar ≥ 56rem) — one row:
-[ Sections ][ Filter ][ Search ————————— ][ Period ][ + Create ]
+Wide (toolbar ≥ 56rem) — one row, chips under the search:
+[ Search ————————— ][ Filter ][ Sections ][ Period ][ + Create ]
+[ Город: Москва × ][ + Добавить фильтр ]
 
-Narrow — exactly two rows:
-[ Section 1 ][ Section 2 ][ Section 3 ] —— stretch ——   [ + Create ]
-[ Filter ][ Search ——————————————————— ][ Period ]
+Narrow — rows, every one 12 from the next:
+[ Search ———————————— ][ Filter ]   [ + ]
+[ Город: Москва × ][ + Добавить фильтр ]
+[ Section 1 ][ Section 2 ][ Section 3 ] —— stretch ——
+[ ⏱ 7 дней ———————————————————————————— ⌄ ]
 
-Narrow, no search — the view slot takes the whole row:
+Narrow, no search — the sections take the first row:
 [ Overview ][ Activity ][ Resources ]
 [ ⏱ 24 часа ———————————————————————————————— ⌄ ]
 ```
@@ -120,6 +127,9 @@ export function OrdersPanel() {
       onSearchChange={setSearch}
     >
       <PageToolbar.Root aria-label="Заказы">
+        <PageToolbar.Tools>
+          <SmartFilter.Toolbar />
+        </PageToolbar.Tools>
         <PageToolbar.Sections>
           <SegmentedControl.Root fullWidth value={section} onValueChange={setSection} aria-label="Раздел">
             <SegmentedControl.Item value="all">
@@ -130,9 +140,6 @@ export function OrdersPanel() {
             </SegmentedControl.Item>
           </SegmentedControl.Root>
         </PageToolbar.Sections>
-        <PageToolbar.Tools>
-          <SmartFilter.Toolbar />
-        </PageToolbar.Tools>
         <PageToolbar.View>
           <Select.Root value={period} onValueChange={setPeriod}>
             <Select.Trigger aria-label="Период">
@@ -170,8 +177,8 @@ export function OrdersPanel() {
 - Section totals go into `SegmentedControl.Count`, not into stat cards above the table.
 - A long form saves through the panel's action with a count («Сохранить 3 изменения»), never a sticky
   bar at the bottom of a phone screen.
-- Filter button before the search (one field does not say filtering exists); chips under the panel,
-  one tier smaller, wrapping, with «Сбросить все».
+- The search first, the filter button after it at its own width (`SmartFilter.Toolbar` lays them out);
+  chips under the panel, one tier smaller, wrapping, with «Сбросить все».
 - Do not duplicate search: if the panel has one, the list below filters by it.
 
 ## Switchers
@@ -186,17 +193,17 @@ export function OrdersPanel() {
 
 ## List + details, side panels
 
-- From 1024px: the list in a fixed column on the left (wide enough for the name and its indicators —
-  often 20rem), details beside it. Below: the list above the details with its own limited height and
-  scroll, or the details open in a Drawer.
+- A list people work through record by record (mail, a messenger, tickets) is `PageContent.Split`:
+  the list in a 16–20rem column with the details beside it from 48rem of the split's own width, one
+  pane at a time with `PageContent.BackButton` below it. Details opened now and then from a table
+  open in a Drawer.
 - A side panel of details becomes full-screen on a phone (`Drawer.Content` is full width below 640).
 - Its period / view controls stay visible on every tab of the panel.
 
 ## Components on narrow widths — what you still decide
 
-**Tables.** Let DataTable scroll inside itself; offer a column chooser (`hiddenColumns`, a Dropdown
-with a `Dropdown.CheckboxItem` per column in `toolbar`; the key column `hideable: false`); `stickyFirstColumn` for
-the name. On phones a table / cards switch in `PageToolbar.View` is fine — silently dropping columns
+**Tables.** Let DataTable scroll inside itself; offer a column chooser (`DataTable.ColumnsMenu` in
+`toolbar`; the key column `hideable: false`); `stickyFirstColumn` for the name. On phones a table / cards switch in `PageToolbar.View` is fine — silently dropping columns
 by breakpoint is not. Never ask to rotate the phone.
 
 **Card grids.** Columns come from the card's minimum width, not from a list of breakpoints:

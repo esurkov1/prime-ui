@@ -1,4 +1,4 @@
-/** Order details next to the list: a trigger, a header with a close button and a read-only body — `Drawer.Trigger`, `Drawer.Body`. */
+/** Order details next to the list: the three zones of every drawer — a header with a close button, a read-only body and a footer with Close and the main action — `Drawer.Trigger`, `Drawer.Body`, `Drawer.Footer`. */
 import { Button, Drawer, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -42,6 +42,14 @@ export default function DrawerOverviewExample() {
             ))}
           </dl>
         </Drawer.Body>
+        <Drawer.Footer>
+          <Drawer.Close>
+            <Button.Root variant="outline" tone="neutral">
+              Закрыть
+            </Button.Root>
+          </Drawer.Close>
+          <Button.Root>Изменить заказ</Button.Root>
+        </Drawer.Footer>
       </Drawer.Content>
     </Drawer.Root>
   );

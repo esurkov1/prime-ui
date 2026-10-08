@@ -31,9 +31,9 @@ bun run typecheck
 bun run check               # biome (check:fix to autofix)
 bun run test                # vitest, incl. the docs contract
 bun run docs:build          # COMPONENT.md API + Labels sections from api.ts
-bun run skill:build         # installable skill in dist-skill/prime-ui-kit (SKILL + every COMPONENT.md and examples)
+bun run skill:build         # installable skill in dist/skill (SKILL + every COMPONENT.md and examples)
 bun run tokens:build        # src/styles/*.css from tokens/
-bun run build               # tokens + bundle + d.ts
+bun run build               # tokens + bundle + d.ts + skill
 bun run verify              # everything CI runs — must be green before a commit
 bun run verify:tokens       # tokens:build shows no diff (generated API docs: the docs contract test)
 ```
@@ -127,7 +127,7 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
 - A visible text label is `label`; a name only for assistive tech is the native `aria-label`, never
   `label`.
 - `asChild?: boolean` only on single interactive elements that may become a link or another element
-  (Button.Root, LinkButton, Sidebar.Item, Sidebar.Brand, Timeline.Item). `Trigger`, `Close`,
+  (Button.Root, LinkButton, Sidebar.Item, Sidebar.Brand, BottomNav.Item, Timeline.Item, Card.Root, Dropdown.Item, Input.Action, Textarea.Action, Thumbnail.Root). `Trigger`, `Close`,
   `Confirm`, `Anchor` are always slots that clone one child and take no `className`. `as` only picks a semantic tag for non-interactive elements.
 - Functions: `formatX(value)` for display, `getX(item)` for data accessors, `renderX(item)` to render a
   data item. No function-as-children.
@@ -161,6 +161,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | Need | Use |
 |---|---|
 | a button (close, clear, nav arrow, retry, icon button) | `Button` (`variant="ghost"`, `Button.Icon`), `LinkButton` for links (`asChild` + `<button>` for an inline action in text) |
+| a confirm of a destructive action, a «discard changes?» question | `ConfirmDialog` (async `onConfirm`); inside a Modal / Drawer form — `X.Guard` (`busy`, `dirty`) |
 | a loading placeholder (rows, lines, avatar, field, block) | `Skeleton` (`shape`, `size` from the host tier, `lines`) — never a grey box with own keyframes |
 | a loading indicator with no shape to hold | `Spinner` (Button / Select `loading` place it themselves) |
 | a checkbox look inside an option or menu row | `Checkbox.Indicator` (no input; the row carries `aria-selected` / `aria-checked`) |
@@ -194,6 +195,16 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | overlay enter/exit | `overlayMotion.module.css`, `usePresence` (`motionDurationMs`, `prefersReducedMotion`) |
 | anchored positioning, a CSS length in JS | `usePosition` (follows the anchor, 4 sides, `align`, arrow), `readCssLengthPx("--prime-…", fallback)` — never import `tokens/` into components |
 | roving arrow-key focus | `src/internal/rovingFocus.ts` (`rovingIndex`, `gridIndex`) |
+| selection of a list by click, Shift+click and drag-paint (rows, messages) | `src/internal/useRangeSelection` (DataTable, `Message.Group`) |
+| a long list of rows of measured height rendered only in view | `src/hooks/useVirtualRows` (Gantt) |
+| a surface that sticks to the start edge of its scroller | `src/internal/sticky` (`stickySurfaceClass`, `--sticky-bg`; AppHeader, DataTable head, Gantt) |
+| a disabled group of controls (`Fieldset disabled`) | `src/internal/disabledContext` (`useInheritedDisabled`, `DisabledProvider`) — a control with a `disabled` prop reads it |
+| a round icon button that is the disk itself (play, download, cancel / retry on media) | `src/internal/roundButton.module.css` (`--round-size`, `data-look`) |
+| chat Markdown rendered as React (never HTML) | `src/internal/richText` |
+| a file size, a media clock, the first frame of a video | `src/internal/fileSize` (`formatFileSize`), `formatClock`, `mediaFrame` (`firstFrame`) |
+| the time and delivery meta of a chat bubble | `src/internal/messageMeta` (Message, VoicePlayer) |
+| an image with a load state in a fixed box | `src/internal/imageSlot` (Avatar, Thumbnail) |
+| a bottom sheet or a swipe to dismiss | `src/internal/sheet.module.css` + `src/hooks/useSwipeDismiss`; the sheet query `COMPACT_QUERY` in `src/hooks/useMediaQuery` |
 | controlled / uncontrolled state, refs | `useControllableState`, `useMergedRefs`, `slot`, `cx`, `toDataAttributes` |
 
 - If the donor lacks a mode you need, extend the donor (with its docs, tests and example) instead of
@@ -236,7 +247,8 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   components — except one inner component for a provider-based API that must call its hook inside the
   provider (`useNotifications`). State is named by meaning: `[query, setQuery]`, `[open, setOpen]`.
 - Domain: one realistic B2B / product-admin world (orders, invoices, projects, team), Russian text; no
-  lorem, emoji, «Пункт 1/2/3». Size `m` — omit `size`, never write `size="m"` — except in the `sizes` slot; another size only
+  lorem, «Пункт 1/2/3», no emoji in text — the only emoji are reaction data (the `emoji` of
+  `Message.Reactions` items), user content the contract lets through. Size `m` — omit `size`, never write `size="m"` — except in the `sizes` slot; another size only
   where the scenario itself needs it (a dialog width, a spinner for a whole region, a control paired
   one tier down per foundation §6), never for decoration.
 - Show the component itself — the example is about it, not about its neighbours.
@@ -284,12 +296,12 @@ export const page: ComponentPageConfig = {
 - Example description: one Russian sentence «Что показывает — `prop`, `prop`.».
 - **Kind** (the shape of the component, not its sidebar category): `primitive` · `control` · `field` ·
   `overlay` · `navigation` · `composite` · `layout` (primitive — Button, LinkButton, Badge, Avatar,
-  Thumbnail, Kbd, Divider, Label, Hint, Typography, CodeBlock, ProgressBar, ProgressCircle, Spinner,
-  Skeleton, Banner; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup;
+  Thumbnail, Kbd, Divider, Label, Hint, Fieldset, Typography, CodeBlock, ProgressBar, ProgressCircle, Spinner,
+  Skeleton, Banner, Sparkline, VisuallyHidden; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup, VoicePlayer;
   field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
-  FileUpload; overlay — Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu,
+  ColorField, FileUpload; overlay — Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu,
   Notification; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable, Kanban,
-  Dnd, ImageUpload, SmartFilter, Timeline, Card, LoginForm, EmptyPage; layout — AppShell, AppHeader, Sidebar, BottomNav, PageContent,
+  Gantt, Dnd, ImageUpload, SmartFilter, Timeline, Card, DescriptionList, LoginForm, EmptyPage, Composer, Message, ChartFrame; layout — AppShell, AppHeader, Sidebar, BottomNav, PageContent,
   PageToolbar, ScrollContainer, ExampleFrame, Crossfade).
 - **Slots** (`SLOTS` in `pageStandard.ts`, file = slot id): `overview` «Обзор» · `variants` «Варианты» ·
   `sizes` «Размеры» · `states` «Состояния» · `with-icon` «С иконкой» · `structure` «Структура» ·
@@ -359,9 +371,10 @@ A component change is done only when all of these agree. Do them in the same cha
    `COMPONENT.md` and `examples/`. Touch it only when a component is added / removed / renamed (one
    line), when the choice between components changes (`choosing.md`), or when a shared rule changes
    (`api-contract.md`, `foundations.md`, `motion.md`). No symlinks: npm drops them. SKILL links component
-   docs as `../src/<base>/<dir>/…`; `bun run skill:build` (part of `verify`) copies them into the
-   installable skill under `reference/` and fails on any broken link — install the skill from
-   `dist-skill/prime-ui-kit`, never by copying `SKILL/`. Every ```tsx block in SKILL
+   docs as `../src/<base>/<dir>/…`; `bun run skill:build` (the last step of `build`) copies them into the
+   installable skill `dist/skill/` under `reference/` and fails on any broken link. The skill ships in
+   the npm package; consumers install it with `npx prime-ui-kit skill` (`bin/prime-ui-kit.js`), never
+   by copying `SKILL/`. Every ```tsx block in SKILL
    compiles against the kit (checked by `skill-docs.test.ts`) unless marked ```tsx partial.
    `cheatsheet.md` is the one-page «do X, not Y» entry (read first): update it when a shared rule or a
    cross-component decision changes. A new or changed screen pattern goes to `SKILL/patterns/` with an
@@ -389,9 +402,9 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 |---|---|
 | `tokens/` | `primitives.ts` → `semantic.ts` → `themes/{light,dark}.ts`; `bun run tokens:build` generates `src/styles/{tokens,theme-light,theme-dark}.css` (never edit those by hand) |
 | `src/components/<dir>/` | one component: `X.tsx`, `X.module.css`, `X.test.tsx`, `api.ts`, `COMPONENT.md`, `examples/` |
-| `src/layout/` | AppShell, Sidebar (same structure) |
-| `src/internal/` | shared mechanics: `states.ts` (vocabulary types, `stepDown`), contexts (`ControlSizeContext`, `AnchorRectContext`), `overlay/` (`layerStack`, `useFloatingLayer`, `FloatingPanel`, `focus`), `MenuGroup`, `FieldFrame`, `ChoiceField`, `fieldClasses`, `iconLayout`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `VisuallyHidden`, `slot`, `cx`, `data-attributes`; CSS: `overlayMotion`, `enterMotion`, `swapMotion`, `floatingSurface`, `menu`, `fieldSurface`, `fieldTier`, `fieldTrigger`, `palette`, `chipTier`, `iconBox`, `textTone`, `textRole` |
-| `src/hooks/` | `useModalLayer`, `useInertSiblings`, `useScrollLock`, `usePresence`, `usePosition`, `useControllableState`, `useMergedRefs`, `useImageStatus`, `useStateSwap`, `useEnterConfirm` |
+| `src/layout/` | AppShell, AppHeader, Sidebar, BottomNav (same structure) |
+| `src/internal/` | shared mechanics: `states.ts` (vocabulary types, `stepDown`), contexts (`ControlSizeContext`, `AnchorRectContext`, `disabledContext` — a disabled `Fieldset`), `overlay/` (`layerStack`, `useFloatingLayer`, `FloatingPanel`, `focus`), `MenuGroup`, `FieldFrame`, `FieldCommit`, `FieldAction`, `ChoiceField`, `fieldClasses`, `iconLayout`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `useRangeSelection` (click / Shift / drag-paint selection of a list: DataTable rows, chat messages), `sticky` (`stickySurfaceClass` for a block-start sticky surface), `richText` (the Markdown subset of a chat as React elements), `messageMeta`, `imageSlot`, `fileSize` (`formatFileSize`), `formatClock`, `mediaFrame` (`firstFrame`), `MorphText`, `RollingNumber`, `VisuallyHidden`, `slot`, `cx`, `data-attributes`; CSS: `overlayMotion`, `enterMotion`, `swapMotion`, `floatingSurface`, `sheet`, `menu`, `fieldSurface`, `fieldTier`, `fieldTrigger`, `palette`, `chipTier`, `iconBox`, `textTone`, `textRole`, `touchTarget`, `roundButton` (a round icon button that is the disk itself), `sticky` |
+| `src/hooks/` | `useModalLayer`, `useInertSiblings`, `useScrollLock`, `usePresence`, `usePosition`, `useControllableState`, `useMergedRefs`, `useImageStatus`, `useStateSwap`, `useEnterConfirm`, `useEdgeOverflow`, `useMediaQuery`, `useSwipeDismiss`, `useVirtualRows` (rows of measured height rendered only in view: Gantt), `useTokenValue` (public), `useUploadQueue` (public: the upload queue of FileUpload and ImageUpload) |
 | `src/icons/` | public `<Icon name>` registry and `createIcon`; `glyphs/` (Lucide drawings, one gesture each), `glyph.tsx` (`defineGlyph`), `glyphMotion.module.css` (gesture vocabulary), `iconPlay.ts` (when gestures play) — the only icon source for components; notices in `THIRD_PARTY_NOTICES` |
 | `src/index.ts`, `src/components/index.ts`, `src/layout/index.ts` | public exports |
 | `playground/pageStandard.ts` | page kinds, slot vocabulary, `KIND_SLOTS`, `PROP_SLOTS` |
@@ -413,10 +426,15 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 ## Release
 
 `.github/workflows/ci.yml`: every push to `main` runs `bun run verify`; then, if the `package.json`
-version is not on npm yet, publishes it. Bump `version` to release. `package.json` `files` ships `dist`,
-styles, every `COMPONENT.md` and `examples/**`. JS entries: `prime-ui-kit` (`src/index.ts`),
+version is not on npm yet, publishes it. Bump `version` to release (`npm publish` runs `prepublishOnly`: clean + build). `package.json`
+`files` ships `dist` (with the built skill in `dist/skill/`), `bin/` (`prime-ui-kit skill [dir]`,
+Node built-ins only), styles, every `COMPONENT.md` and `examples/**`. Every JS file in `dist/` starts
+with `"use client"` (an esbuild banner, checked by `bundle-lib.ts`), so the package works from
+Next.js App Router server components. JS entries: `prime-ui-kit` (`src/index.ts`),
 `prime-ui-kit/color-picker` (`src/color-picker.ts`, the only code on `react-aria-components`, an
 optional peer) and `prime-ui-kit/icons` (`src/icon-set.ts`, every glyph as `<Name>Icon`, generated by
 `bun run icons:add`); shared code is split into `dist/chunks/`. Nothing in the main entry may import
 react-aria. One `bundle.css` holds every component's styles; `fonts.css` and `reset.css` are opt-in.
-Runtime dependency: `lucide-react` only (react-router is a playground dev dependency).
+No runtime dependencies: `react` / `react-dom` / `date-fns` are peers, `react-aria-components` an
+optional peer; `lucide-react` is a dev dependency only (glyph source for `icons:add`, tests, playground)
+and `createIcon` takes any SVG component (react-router is a playground dev dependency).

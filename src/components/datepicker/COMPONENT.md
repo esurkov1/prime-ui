@@ -33,7 +33,7 @@ import {
 ```
 Datepicker.Root             field frame: label · field button (calendar icon, value, chevron) · hint / error
 └─ Popover                  the calendar panel
-Datepicker.Panel            the same panel without a field, styled as a card
+Datepicker.Panel            the same calendar without a field, the host's own content (no card)
 
 panel                       presets column (range) · 1–2 month grids · prompt · footer
 ├─ month header             ghost icon-only Buttons (previous / next) around the month title
@@ -71,15 +71,16 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `placeholder` | `string` | `labels.placeholder` | Field text without a value for this field. |
 | `valuePrefix` | `string` | — | Text before the value, e.g. «С». |
 | `id` | `string` | — | Id of the field button; generated when omitted. |
+| `name` | `string` | — | Submits the value with a form through hidden inputs: `yyyy-MM-dd` (`yyyy-MM-ddTHH:mm` with `withTime`); a range submits two values under the name, `from` then `to` (empty for an open bound). |
 | `aria-label · aria-labelledby · aria-describedby` | `string` | — | Name without a `label` (the value is appended) and extra description ids. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ### Datepicker.Panel
-`ref` → `HTMLDivElement`. The calendar without a field, inline in a page: its own card, 1–2 months by the parent's width. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.
+`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content: no fill, padding or radius — the host (a Drawer sheet, a Card) is its container. It takes the host's width: 1–2 months by that width, day columns spread across it. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className` and the other attributes of the panel card. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className` and the other attributes of the panel. |
 
 ### Calendar options (Root · Panel)
 Shared by `Datepicker.Root` and `Datepicker.Panel`.
@@ -128,7 +129,7 @@ Shared by `Datepicker.Root` and `Datepicker.Panel`.
 |---|---|---|---|
 | `presets` | «Период» column on the left (a scrolling row above when narrow); the active preset is pressed | analytics periods | `false` |
 | `prompt` | muted step line under the grid | infrequent use of ranges | `false` |
-| `footer` | dates (dd.MM.yyyy) and «Сбросить» / «Применить» | the user confirms, or with time | `false` |
+| `footer` | dates (dd.MM.yyyy, dd.MM with `yearless`) and «Сбросить» / «Применить» | the user confirms, or with time | `false` |
 | `withTime` | HH:mm inputs in the footer | timestamps (with `footer`) | `false` |
 | `yearless` | month title without a year, value «15 октября» | annual dates | `false` |
 | `fullWidth` | the field fills its container | form columns | `false` |
@@ -146,7 +147,9 @@ Shared by `Datepicker.Root` and `Datepicker.Panel`.
 | selected / band | value | day `aria-pressed`, `data-edge`; cell `data-band="selected" \| "preview"`, `data-band-start` / `-end` |
 | day disabled | `isDayDisabled`, `disableFuture` | native `disabled`, muted |
 
-Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` · `stacked`). The popover follows the overlay contract: an outside press or Escape closes it, focus is trapped while open, the wheel over the panel does not scroll the page.
+Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` · `stacked`). The popover follows the overlay contract: an outside press or Escape closes it, focus is trapped while open, the wheel over the panel does not scroll the page. The panel of `Datepicker.Root` mounts only while the popover is open, so every opening starts from the current value; nothing is rendered for it while closed.
+
+Committing: without `footer` a picked day (or the second day of a range) applies at once and closes the popover; with `footer` the pick stays a draft until «Применить», and «Сбросить» sets `resetValue` (else empty) and closes. A preset applies its period at once, with or without `footer`. With `name`, hidden inputs submit `yyyy-MM-dd` (`yyyy-MM-ddTHH:mm` with `withTime`); a range submits `from`, then `to`.
 
 ## Layout & spacing
 - The field fits its text by default (`width: fit-content`, max 100%); in forms use `fullWidth`.
@@ -203,11 +206,11 @@ Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` 
 | [states.tsx](examples/states.tsx) | An empty field with the default placeholder, a filled one and a disabled one — `disabled`. |
 | [validation.tsx](examples/validation.tsx) | A leave period checked live: the error shakes in, names the broken rule and leaves once the period fits; an optional return date — `required`, `hint`, `error`, `optional`. |
 | [range-presets.tsx](examples/range-presets.tsx) | A report period: presets aside, two months, a step prompt, time fields with Reset / Apply, no future days — `presets`, `months`, `prompt`, `footer`, `withTime`, `disableFuture`. |
-| [inline-panel.tsx](examples/inline-panel.tsx) | A booking calendar embedded in the page: its own card, two months when the parent has room, the range applies at once — `Datepicker.Panel`, `months`, `prompt`. |
+| [inline-panel.tsx](examples/inline-panel.tsx) | A booking calendar embedded in a card: the card is its container, two months when the parent has room, the range applies at once — `Datepicker.Panel`, `months`, `prompt`. |
 | [yearless.tsx](examples/yearless.tsx) | An annual price change date: day and month without a year, a value prefix and taken days disabled — `yearless`, `valuePrefix`, `isDayDisabled`. |
 | [controlled.tsx](examples/controlled.tsx) | A report filter owns the period: quick buttons set it from outside, the field shows it — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the panel: a reminder button opens the calendar from code, a picked day closes it — `open`, `onOpenChange`. |
-| [in-form.tsx](examples/in-form.tsx) | A leave request form: submit checks the required period, the error shakes in and leaves once the period is fixed; an optional return date — `required`, `error`, `optional`. |
+| [in-form.tsx](examples/in-form.tsx) | A leave request form: submit reads the period from the form data and checks it, the error shakes in and leaves once the period is fixed; an optional return date — `name`, `required`, `error`, `optional`. |
 | [narrow.tsx](examples/narrow.tsx) | An embedded panel in a 320 px column: one compact month instead of two, the footer fields wrap above the buttons — `months`, `footer`. |
 
 ## Mistakes
@@ -220,5 +223,5 @@ Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` 
 - Converting values to UTC inside the component → values are wall-clock dates; convert in the app.
 
 ## Related
-- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
+- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md) (month arrows, presets, Reset / Apply), [VisuallyHidden](../visually-hidden/COMPONENT.md) (month announcement), `Icon` (calendar, chevron), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

@@ -18,7 +18,7 @@ export type PanelMetrics = {
   cell: number;
   /** Gap between months: `--prime-space-6`. */
   monthsGap: number;
-  /** Side padding of `.main` (both sides): `space-3` in the popover, `card-padding-s` embedded. */
+  /** Side padding of `.main` (both sides): `space-3` in the popover, none embedded (the host pads). */
   chrome: number;
 };
 
@@ -27,7 +27,7 @@ export function readPanelMetrics(size: ControlSize, embedded: boolean): PanelMet
   return {
     cell: readCssLengthPx(`--prime-control-${size}-item-height`, 0),
     monthsGap: readCssLengthPx("--prime-space-6", 0),
-    chrome: readCssLengthPx(embedded ? "--prime-card-padding-s" : "--prime-space-3", 0) * 2,
+    chrome: embedded ? 0 : readCssLengthPx("--prime-space-3", 0) * 2,
   };
 }
 

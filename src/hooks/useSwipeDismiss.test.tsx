@@ -3,28 +3,22 @@ import { describe, expect, it, vi } from "vitest";
 
 import { swipe } from "@/test/mobile";
 
-import { type SwipeDirection, useSwipeDismiss } from "./useSwipeDismiss";
+import { useSwipeDismiss } from "./useSwipeDismiss";
 
 function Panel({
   onDismiss,
   onProgress,
-  direction = "down",
   enabled = true,
-  touchAnywhere = false,
 }: {
   onDismiss: () => void;
   onProgress?: (progress: number) => void;
-  direction?: SwipeDirection;
   enabled?: boolean;
-  touchAnywhere?: boolean;
 }) {
   const swipeProps = useSwipeDismiss({
     enabled,
-    direction,
     onDismiss,
     onProgress,
     handle: "[data-swipe-handle]",
-    touchAnywhere,
   });
   return (
     <div
@@ -103,33 +97,19 @@ describe("useSwipeDismiss", () => {
     expect(onDismiss).not.toHaveBeenCalled();
   });
 
-  it("starts only from the handle unless a touch may start anywhere", () => {
+  it("starts only from the handle, by touch or by mouse", () => {
     const onDismiss = vi.fn();
-    const { unmount } = render(<Panel onDismiss={onDismiss} />);
+    render(<Panel onDismiss={onDismiss} />);
     swipe(screen.getByTestId("body"), origin, { x: 100, y: 300 });
     expect(onDismiss).not.toHaveBeenCalled();
-    unmount();
-
-    render(<Panel onDismiss={onDismiss} direction="right" touchAnywhere />);
-    swipe(screen.getByTestId("body"), origin, { x: 100, y: 300 }, { pointerType: "mouse" });
-    expect(onDismiss).not.toHaveBeenCalled();
-    swipe(screen.getByTestId("body"), origin, { x: 250, y: 100 });
-    expect(onDismiss).toHaveBeenCalledTimes(1);
-  });
-
-  it("closes a left panel with a drag to the left", () => {
-    const onDismiss = vi.fn();
-    render(<Panel onDismiss={onDismiss} direction="left" />);
-    swipe(screen.getByTestId("handle"), origin, { x: 300, y: 100 });
-    expect(onDismiss).not.toHaveBeenCalled();
-    swipe(screen.getByTestId("handle"), { x: 300, y: 100 }, { x: 100, y: 100 });
+    swipe(screen.getByTestId("handle"), origin, { x: 100, y: 300 }, { pointerType: "mouse" });
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
   it("never starts on a text field or while disabled", () => {
     const onDismiss = vi.fn();
-    const { rerender } = render(<Panel onDismiss={onDismiss} touchAnywhere direction="right" />);
-    swipe(screen.getByRole("textbox"), origin, { x: 300, y: 100 });
+    const { rerender } = render(<Panel onDismiss={onDismiss} />);
+    swipe(screen.getByRole("textbox"), origin, { x: 100, y: 400 });
     expect(onDismiss).not.toHaveBeenCalled();
     rerender(<Panel onDismiss={onDismiss} enabled={false} />);
     swipe(screen.getByTestId("handle"), origin, { x: 100, y: 400 });

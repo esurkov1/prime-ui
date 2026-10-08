@@ -27,12 +27,12 @@ export const page: ComponentPageConfig = {
   title: "Tabs",
   kind: "navigation",
   description:
-    "Вкладки-папки для переключения между панелями одного экрана: активная вкладка вырастает из панели. Для выбора значения или режима — SegmentedControl.",
+    "Полоса вкладок-папок для переключения между панелями одного экрана: активная вкладка — поверхность хоста, вросшая в полосу, а панель — контент хоста без своей рамки и отступов. Для выбора значения или режима — SegmentedControl.",
   examples: [
     {
       slot: "overview",
       description:
-        "Разделы одного экрана; активная вкладка вырастает из панели и скользит к следующей — `defaultValue`.",
+        "Разделы одного экрана; активная вкладка вырастает в полосу и скользит к следующей — `defaultValue`.",
     },
     {
       slot: "variants",
@@ -73,6 +73,12 @@ export const page: ComponentPageConfig = {
       title: "Две строки",
       description:
         "Подпись и счётчик в первой строке, сводка во второй — `Tabs.Count`, `Tabs.Description`.",
+    },
+    {
+      scenario: "in-drawer",
+      title: "В Drawer",
+      description:
+        "Карточка заказа в Drawer: полоса вкладок идёт по низу шапки, активная вкладка — тело Drawer, вросшее в шапку, а каждая панель — собственный контент тела — `Tabs.Root`, `Tabs.List`, `Tabs.Panel`.",
     },
     {
       slot: "controlled",

@@ -145,6 +145,12 @@ export const api: ComponentApi = {
           ru: "Id кнопки поля; без него генерируется.",
         },
         {
+          name: "name",
+          type: "string",
+          en: "Submits the value with a form through hidden inputs: `yyyy-MM-dd` (`yyyy-MM-ddTHH:mm` with `withTime`); a range submits two values under the name, `from` then `to` (empty for an open bound).",
+          ru: "Отправляет значение с формой через скрытые поля: `yyyy-MM-dd` (`yyyy-MM-ddTHH:mm` с `withTime`); период — два значения под этим именем, `from`, затем `to` (пусто для открытой границы).",
+        },
+        {
           name: "aria-label · aria-labelledby · aria-describedby",
           type: "string",
           en: "Name without a `label` (the value is appended) and extra description ids.",
@@ -155,14 +161,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Datepicker.Panel",
-      en: "`ref` → `HTMLDivElement`. The calendar without a field, inline in a page: its own card, 1–2 months by the parent's width. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.",
-      ru: "Календарь без поля прямо на странице: своя карточка, 1–2 месяца по ширине родителя. Принимает `mode`, `value` / `defaultValue` / `onValueChange`, как Root, и все параметры календаря ниже.",
+      en: "`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content: no fill, padding or radius — the host (a Drawer sheet, a Card) is its container. It takes the host's width: 1–2 months by that width, day columns spread across it. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.",
+      ru: "Календарь без поля как собственный контент хоста: без фона, отступов и скругления — контейнер даёт хост (шторка Drawer, Card). Занимает ширину хоста: 1–2 месяца по этой ширине, колонки дней распределяются по ней. Принимает `mode`, `value` / `defaultValue` / `onValueChange`, как Root, и все параметры календаря ниже.",
       props: [
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "defaultChecked" | "onChange">',
-          en: "`className` and the other attributes of the panel card.",
-          ru: "`className` и остальные атрибуты карточки панели.",
+          en: "`className` and the other attributes of the panel.",
+          ru: "`className` и остальные атрибуты панели.",
         },
       ],
     },

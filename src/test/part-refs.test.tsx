@@ -9,7 +9,7 @@
 import { render } from "@testing-library/react";
 import type * as React from "react";
 import { describe, expect, it } from "vitest";
-import { ColorPicker } from "@/color-picker";
+import { ColorField, ColorPicker } from "@/color-picker";
 import {
   Accordion,
   Avatar,
@@ -19,24 +19,30 @@ import {
   Button,
   ButtonGroup,
   Card,
+  ChartFrame,
   ColorPresets,
   ColorSwatches,
   CommandMenu,
+  Composer,
   DataTable,
   Datepicker,
+  DescriptionList,
   DigitInput,
   Dnd,
   Drawer,
   Dropdown,
   EmptyPage,
   ExampleFrame,
+  Fieldset,
   FileUpload,
+  Gantt,
   Hint,
   ImageUpload,
   Input,
   Kanban,
   Label,
   LoginForm,
+  Message,
   Modal,
   NotificationCard,
   PageContent,
@@ -44,6 +50,7 @@ import {
   ScrollContainer,
   SegmentedControl,
   Select,
+  Sheet,
   Slider,
   SmartFilter,
   Stepper,
@@ -52,6 +59,8 @@ import {
   Textarea,
   Thumbnail,
   Timeline,
+  VisuallyHidden,
+  VoicePlayer,
 } from "@/components";
 import { AppHeader, AppShell, BottomNav, Sidebar } from "@/layout";
 
@@ -74,6 +83,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(AppHeader.Description);
     takesRef(AppHeader.Separator);
     takesRef(AppHeader.Search);
+    takesRef(AppHeader.Tools);
     takesRef(AppHeader.Actions);
     takesRef(AppHeader.MenuButton);
     takesRef(AppShell.Main);
@@ -82,6 +92,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(BottomNav.Item);
     takesRef(BottomNav.ItemIcon);
     takesRef(BottomNav.ItemCount);
+    takesRef(BottomNav.Action);
     takesRef(Avatar.Root);
     takesRef(Avatar.Image);
     takesRef(Avatar.Fallback);
@@ -91,7 +102,6 @@ describe("part refs: every part declares ref", () => {
     takesRef(Badge.Root);
     takesRef(Badge.Icon);
     takesRef(Badge.Dot);
-    takesRef(BottomNav.Action);
     takesRef(Badge.Action);
     takesRef(Banner.Root);
     takesRef(Banner.Content);
@@ -105,6 +115,8 @@ describe("part refs: every part declares ref", () => {
     takesRef(Button.Icon);
     takesRef(ButtonGroup.Icon);
     for (const part of Object.values(Card)) takesRef(part);
+    for (const part of Object.values(ChartFrame)) takesRef(part);
+    takesRef(ColorField);
     takesRef(ColorPicker.Area);
     takesRef(ColorPicker.AreaThumb);
     takesRef(ColorPicker.ChannelStrip);
@@ -118,6 +130,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(ColorPicker.TriggerSwatch);
     takesRef(ColorPresets.Content);
     takesRef(ColorPresets.Swatch);
+    takesRef(ColorPresets.SwatchButton);
     takesRef(ColorSwatches);
     takesRef(ImageUpload);
     takesRef(CommandMenu.Root);
@@ -130,17 +143,23 @@ describe("part refs: every part declares ref", () => {
     takesRef(CommandMenu.Empty);
     takesRef(CommandMenu.Footer);
     takesRef(CommandMenu.FooterHint);
+    for (const part of Object.values(Composer)) takesRef(part);
+    takesRef(DataTable.ColumnsMenu);
     takesRef(Datepicker.Root);
+    for (const part of Object.values(DescriptionList)) takesRef(part);
     takesRef(DigitInput);
-    for (const D of [Modal, Drawer]) {
+    for (const D of [Modal, Drawer, Sheet]) {
       takesRef(D.Header);
       takesRef(D.Icon);
       takesRef(D.Title);
       takesRef(D.Description);
+      takesRef(D.Actions);
       takesRef(D.Body);
       takesRef(D.Footer);
+      takesRef(D.Meta);
     }
     takesRef(Dropdown.CheckboxItem);
+    takesRef(Dropdown.ItemDescription);
     takesRef(Dropdown.ItemIcon);
     takesRef(Dropdown.ItemShortcut);
     takesRef(Dropdown.Group);
@@ -159,19 +178,40 @@ describe("part refs: every part declares ref", () => {
     takesRef(FileUpload.ItemDescription);
     takesRef(FileUpload.ItemActions);
     takesRef(FileUpload.ItemProgress);
+    takesRef(FileUpload.ItemPreview);
+    takesRef(FileUpload.Queue);
     takesRef(Hint.Icon);
+    takesRef(Fieldset);
     takesRef(Input.Root);
     takesRef(Input.Wrapper);
     takesRef(Input.Icon);
     takesRef(Input.Affix);
     takesRef(Input.InlineAffix);
     takesRef(Input.Counter);
+    takesRef(Input.CopyButton);
+    takesRef(Input.RevealButton);
+    takesRef(Input.Action);
     takesRef(Kanban.ItemHeader);
     takesRef(Kanban.ItemTitle);
     takesRef(Kanban.ItemDescription);
     takesRef(Kanban.ItemBadges);
     takesRef(Kanban.ItemFooter);
     takesRef(Kanban.ItemCount);
+    takesRef(Message.Avatar);
+    takesRef(Message.Author);
+    takesRef(Message.Forwarded);
+    takesRef(Message.Reply);
+    takesRef(Message.Text);
+    takesRef(Message.Media);
+    takesRef(Message.File);
+    takesRef(Message.Location);
+    takesRef(Message.Contact);
+    takesRef(Message.LinkPreview);
+    takesRef(Message.Reactions);
+    takesRef(Message.Menu);
+    takesRef(Message.Separator);
+    takesRef(Message.Service);
+    takesRef(Message.Unread);
     takesRef(Label.Icon);
     takesRef(Label.Description);
     takesRef(LoginForm.Header);
@@ -231,14 +271,19 @@ describe("part refs: every part declares ref", () => {
     takesRef(Tabs.Panel);
     takesRef(TagSelect);
     takesRef(Textarea.Counter);
+    takesRef(Textarea.CopyButton);
+    takesRef(Textarea.Action);
     takesRef(Thumbnail.Root);
     takesRef(Thumbnail.Image);
+    takesRef(Thumbnail.Video);
     takesRef(Thumbnail.Fallback);
     takesRef(Timeline.Title);
     takesRef(Timeline.Meta);
     takesRef(Timeline.MetaPrimary);
     takesRef(Timeline.Value);
     takesRef(Timeline.ValueMeta);
+    takesRef(VisuallyHidden);
+    takesRef(VoicePlayer);
     expect(true).toBe(true);
   });
 });
@@ -260,6 +305,26 @@ const CASES: Case[] = [
     ),
   ],
   ["ScrollContainer", "DIV", (ref) => <ScrollContainer ref={ref} fade />],
+  [
+    "PageContent.List",
+    "DIV",
+    (ref) => (
+      <PageContent.Split>
+        <PageContent.List ref={ref} aria-label="Диалоги" />
+        <PageContent.Detail aria-label="Переписка" />
+      </PageContent.Split>
+    ),
+  ],
+  [
+    "PageContent.Detail",
+    "DIV",
+    (ref) => (
+      <PageContent.Split>
+        <PageContent.List aria-label="Диалоги" />
+        <PageContent.Detail ref={ref} aria-label="Переписка" />
+      </PageContent.Split>
+    ),
+  ],
   [
     "Tabs.Item",
     "BUTTON",
@@ -286,6 +351,17 @@ const CASES: Case[] = [
   ],
   ["Datepicker.Panel", "DIV", (ref) => <Datepicker.Panel ref={ref} mode="single" />],
   [
+    "CommandMenu.List",
+    "DIV",
+    (ref) => (
+      <CommandMenu.Root defaultOpen aria-label="Команды">
+        <CommandMenu.List ref={ref}>
+          <CommandMenu.Item value="заказы">Заказы</CommandMenu.Item>
+        </CommandMenu.List>
+      </CommandMenu.Root>
+    ),
+  ],
+  [
     "Modal.Content",
     "DIV",
     (ref) => (
@@ -308,6 +384,17 @@ const CASES: Case[] = [
     ),
   ],
   [
+    "Sheet.Content",
+    "DIV",
+    (ref) => (
+      <Sheet.Root defaultOpen>
+        <Sheet.Content ref={ref} aria-label="Окно">
+          Текст
+        </Sheet.Content>
+      </Sheet.Root>
+    ),
+  ],
+  [
     "DataTable",
     "DIV",
     (ref) => (
@@ -317,6 +404,40 @@ const CASES: Case[] = [
         rows={[{ name: "Анна" }]}
         getRowKey={(row) => row.name}
       />
+    ),
+  ],
+  [
+    "Gantt",
+    "DIV",
+    (ref) => (
+      <Gantt
+        ref={ref}
+        aria-label="План"
+        rows={[{ name: "Анна" }]}
+        getRowKey={(row) => row.name}
+        getRowLabel={(row) => row.name}
+        getRowBars={() => []}
+      />
+    ),
+  ],
+  [
+    "Card.Root asChild",
+    "A",
+    (ref) => (
+      <Card.Root ref={ref} asChild variant="mini">
+        <a href="#orders">
+          <Card.Label>Заказы</Card.Label>
+        </a>
+      </Card.Root>
+    ),
+  ],
+  [
+    "ChartFrame.Plot",
+    "DIV",
+    (ref) => (
+      <ChartFrame.Root>
+        <ChartFrame.Plot ref={ref} renderPlot={() => null} />
+      </ChartFrame.Root>
     ),
   ],
   [
@@ -425,6 +546,22 @@ const CASES: Case[] = [
         </Sidebar.Sub>
       </Sidebar.Root>
     ),
+  ],
+  ["VoicePlayer", "DIV", (ref) => <VoicePlayer ref={ref} src="/voice.ogg" duration={12} />],
+  ["Message.Group", "DIV", (ref) => <Message.Group ref={ref} aria-label="Чат" />],
+  [
+    "Message.Root",
+    "ARTICLE",
+    (ref) => (
+      <Message.Root ref={ref} time="10:00">
+        <Message.Text>Счёт отправлен</Message.Text>
+      </Message.Root>
+    ),
+  ],
+  [
+    "Message.VideoNote",
+    "BUTTON",
+    (ref) => <Message.VideoNote ref={ref} src="/note.mp4" duration={6} />,
   ],
 ];
 

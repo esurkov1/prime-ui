@@ -15,8 +15,9 @@ is, and is shown live with its code in the playground (category «Компози
 | One record | [detail-page.tsx](patterns/detail-page.tsx) | Breadcrumb + status in the header, actions by weight, main column + side column of Cards, Timeline |
 | Settings | [settings-page.tsx](patterns/settings-page.tsx) | heading column + panel per section, form with its own save, Switches that apply at once, danger zone with a confirm |
 | Create in a side panel | [form-drawer.tsx](patterns/form-drawer.tsx) | Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
-| Dashboard | [dashboard.tsx](patterns/dashboard.tsx) | period switch, KPI row that cross-fades to the new period, a Sparkline revenue trend, panels with progress and a split, short table + link to the list |
+| Dashboard | [dashboard.tsx](patterns/dashboard.tsx) | period switch, KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
 | Screen states | [screen-states.tsx](patterns/screen-states.tsx) | page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
+| Messenger | [chat.tsx](patterns/chat.tsx) | PageContent.Split of dialogs and a conversation, history loaded above in a ScrollContainer `anchor="end"` with a Skeleton bubble, dates and runs from `groupMessages`, the first unread and service events, every kind of Message (photos, file, contact, voice in a VoicePlayer, round video), reactions, pinned messages (`Message.Pinned` + `current`), reply and edit from the menu through `Composer.Context value` (`replyTo` / `editOf`), the jump to the quoted message (`Message.Reply target`), optimistic sends whose messages rise from the composer while the client's answer slides in, «печатает…» both ways (`onActivityChange` → `Message.Typing`), unread counts from `onNewMessage` and `onRead`, delivery ticks |
 
 Pick the closest one, rename the domain, keep the skeleton. Change structure only when the task needs
 it, and then by the rules below.
@@ -105,7 +106,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | page title | `PageContent.Title` (`heading-m`, the only `h1`) |
 | section heading without a card | `Typography as="h2" variant="title-m"` |
 | card / panel title | `Card.Title as="h2"` (under the page title) |
-| group heading inside a card or form | `Typography as="h3" variant="title-s"` |
+| heading of a group of fields | `Fieldset label` (`title-s` in the `<legend>`) |
+| other group heading inside a card | `Typography as="h3" variant="title-s"` |
 | body text, cells | `body-m` |
 | lead under a heading | `body-m` + `tone="secondary"` |
 | meta: dates, ids, labels of values | `caption` + `tone="muted"` |
@@ -148,7 +150,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; bulk actions in the table toolbar.
 - An empty state's action replaces the header's primary, it does not duplicate it.
 - Destructive: `tone="danger"`; a standalone trigger is `outline`, in a menu it is the last item, the
-  confirm is a Modal with `closeOnOutsideClick={false}` and a `solid` danger button.
+  confirm is a `ConfirmDialog` (its `onConfirm` returns the request's Promise).
 - Going somewhere is a link (`LinkButton`, `Button.Root asChild` + `<a>`), doing something is a Button.
   One action — one label on the whole screen.
 
@@ -157,14 +159,15 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - Labels above every field (`label`), placeholder is an example value, help in `hint`, problems in
   `error` — after blur or on submit. Mark the minority (`required` or `optional`).
 - Fields 20 apart; related short fields side by side in an `auto-fit` grid with `align-items: start`
-  (`reserveSupportRow` on Input / Textarea keeps neighbours aligned); groups 32 apart, each with a
-  `title-s` heading 16 above its fields; no dividers between groups.
+  (`reserveSupportRow` on Input / Textarea keeps neighbours aligned); groups 32 apart, each a
+  `Fieldset label` (its `title-s` heading 16 above the fields, no frame); no dividers between groups.
 - Form column width: one column up to ~65ch; never stretch a form across a wide panel.
 - Where: ≤ 4 fields → `Modal`; long create / edit → `Drawer` or a page; settings → a panel Card per
   section, the whole `Card.Root` inside `<form>`, buttons in `Card.Footer`.
 - Submit: `noValidate`, validate all, set `error`s, focus the first invalid field, `loading` on the
-  submit button and the fields disabled (each field's `disabled`, or one `<fieldset disabled>` around
-  them), then a `Notification`.
+  submit button and the fields disabled (one `Fieldset disabled` per group of fields), then the
+  result: the form stays on screen → the button says «Сохранено»; the form goes away (closes,
+  navigates) → a `Notification`; a failure → a `Notification` or the field's `error`.
 - A footer button outside the form submits it with `form={formId}`.
 - Choice controls: Checkbox when the value is submitted later, Switch when it applies at once (no Save
   in that section), `Radio.Group label` for one of 2–5 visible options.
@@ -175,6 +178,10 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   `SmartFilter.Chips` inside `SmartFilter.Root` (or one SegmentedControl / Select for a single field).
 - Paging is built in: `paging="pages"` (default, Pagination and the «Показано 1–6 из 10» range in the
   footer), `paging="infinite"` for feeds, `paging="none"` for short lists on dashboards and details.
+- When the server holds more than you load (a CRM list, a register): `source="server"` — `rows` is the
+  page the server returned, `rowCount` its total; `sort` / `page` / the SmartFilter value make the
+  request, a new search or filter sets `page` to 1, and the old rows stay with `loading` until the
+  answer comes ([server.tsx](../src/components/data-table/examples/server.tsx)).
 - Columns: `numeric` for amounts, counts and dates (end-aligned, tabular; `headerAlign="end"` to line the
   head up); statuses as `Badge` from one status → color map; an avatar + two-line cell for people and
   companies; row menu last.
@@ -188,7 +195,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 | Situation | Component |
 |---|---|
-| the result of an action (saved, sent, failed to save) | `Notification` via `notify()` |
+| the result of an action (sent, created, failed to save; saved when the form goes away) | `Notification` via `notify()` |
+| a form saved and still on screen | the submit button's text: «Сохранено» |
 | a state of the page or a section that persists (sync failed, trial ends, read-only) | `Banner` as the first block of `PageContent.Body` (or inside the Card it concerns) |
 | a problem with one field | the field's `error` |
 | a region failed to load | the region shows it in place: DataTable `error`, `EmptyPage` with `EmptyPage.Icon tone="danger"` and «Повторить» |
@@ -209,14 +217,16 @@ mirror the data's rows and gaps with `Skeleton`, so the swap moves nothing on th
 |---|---|
 | a blocking decision or a short form | `Modal` (`size="s"` for confirms) |
 | a long form, filters, record details beside the page | `Drawer` |
+| a short task that ends by itself: a pick, an action, a short note | `Sheet` |
 | a small non-modal panel at a control | `Popover` |
 | a list of actions | `Dropdown` |
 | a value for a field | `Select` / `NativeSelect` / `TagSelect` / `Datepicker` |
 | a name for an icon button | `Tooltip` |
 | search across commands and pages (⌘K) | `CommandMenu` |
 
-Every overlay takes `closeOnOutsideClick` / `closeOnEscape`; turn them off for destructive confirms and
-while a request runs.
+Every overlay takes `closeOnOutsideClick` / `closeOnEscape`. A destructive confirm is `ConfirmDialog`, which
+turns them off itself; a form in a Modal or Drawer holds closing with `Modal.Guard` / `Drawer.Guard`
+(`busy` while a request runs, `dirty` for unsaved changes).
 
 ## 11. Narrow screens
 
@@ -225,11 +235,12 @@ while a request runs.
   only for app-frame decisions (the phone menu header) at 640 · 768 · 1024 · 1280.
 - From 320px: header actions wrap under the title (built in), side columns drop below the main one,
   pairs of fields stack, tables scroll inside themselves, dialogs stack their footers (built in).
-- A page with sections, filter and search, a view switch and the primary action gets `PageToolbar`:
-  one row when wide, exactly two rows when narrow, the primary action always top right.
+- A page with search and filter, sections, a view switch and the primary action gets `PageToolbar`:
+  search and filter first with the active filters right under them, one row when wide, stacked rows
+  12 apart when narrow, the primary action always top right.
 - Rearrange, never hide: every function of the desktop screen is on the phone — in another place or a
-  menu. App sections on phones: `BottomNav` in `AppShell.Footer`; app-level sheets:
-  `Drawer.Content side="bottom"`.
+  menu. App sections on phones: `BottomNav` in `AppShell.Footer`; a short task from the bottom
+  edge: `Sheet`.
 - Text in flex rows gets `min-width: 0`; long names wrap or truncate, never widen the page.
 - The full rules and the narrow-screen checklist: [responsive.md](responsive.md).
 

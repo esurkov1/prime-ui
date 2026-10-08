@@ -1,19 +1,19 @@
 /*
  * Tabs — Graphite. Navigation between content panels.
  *
- * Horizontal: a folder and a layer of the ladder. The root is a `fill-muted-hover` strip (two steps
- * off the layer) over a panel in the layer's own color (`layer-current`); the active tab is that panel
- * rising into the strip, with concave flares where it meets the panel, gliding
- * between tabs. Hover is the same shape in `fill-faint`, painted under the folder so the two
- * never mix. No lines: depth from fill only. Tabs run edge to edge, each between
- * `--tabs-item-min` and `--tabs-item-max` and never narrower than their content; full width, they
- * tend to equal widths. When they do not fit, icons and descriptions go first, then labels
- * (icons with tooltips stay), then the list scrolls. The folder glides only into a person's choice.
+ * Tabs are a tab bar, not a container. The list is a `fill-muted-hover` strip (two steps off the
+ * surface it stands on); the active tab is that surface itself rising into the strip, with concave
+ * flares where it meets the strip's edge, gliding between tabs. The panel has no fill and no
+ * padding: it is the host's own content (a Drawer or Modal body, a Card, the page), one gap below
+ * the strip. Hover is the folder shape in `fill-faint`, painted under the folder so the two never
+ * mix. No lines: depth from fill only. Tabs run edge to edge, each between `--tabs-item-min` and
+ * `--tabs-item-max` and never narrower than their content; full width, they tend to equal widths.
+ * When they do not fit, icons and descriptions go first, then labels (icons with tooltips stay),
+ * then the list scrolls. The folder glides only into a person's choice.
  *
- * Vertical: the same folder on its side. The strip is a column of sections at the inline start,
- * the panel fills the rest, and the active section is the panel reaching into the strip, with the
- * concave flares above and below where it meets the panel. Under 600px of container width the
- * column turns into the horizontal strip above the panel (it scrolls, never wraps).
+ * Vertical: the same strip on its side, a column of sections at the inline start with the panel
+ * beside it; the active section is the surface reaching into the column. Under 600px of container
+ * width the column turns into the horizontal strip above the panel (it scrolls, never wraps).
  */
 
 .root {
@@ -27,16 +27,16 @@
   --tabs-indicator: calc(var(--prime-control-m-track) / 2);
   --tabs-folder-radius: var(--prime-radius-l);
   --tabs-flare: var(--prime-radius-m);
-  --tabs-rise: var(--prime-space-2);
-  --tabs-panel-pad: var(--prime-space-6);
+  --tabs-rise: var(--prime-space-1);
+  --tabs-panel-gap: var(--prime-space-5);
   --tabs-remove-size: var(--prime-control-xs-height);
 
   /* Tab width bounds; `minItemWidth` / `maxItemWidth` override them inline. */
   --tabs-item-min: calc(2.5 * var(--tabs-height));
   --tabs-item-max: calc(7 * var(--tabs-height));
 
-  /* Derived: a horizontal tab is the control height plus the rise above and below. */
-  --tabs-item-height: calc(var(--tabs-height) + 2 * var(--tabs-rise));
+  /* Derived: the strip's corners are concentric with the folder's, one rise outside it. */
+  --tabs-strip-radius: calc(var(--tabs-folder-radius) + var(--tabs-rise));
   --tabs-two-line-min: calc(4 * var(--tabs-height));
 
   min-width: 0;
@@ -54,8 +54,7 @@
   --tabs-indicator: calc(var(--prime-control-xs-track) / 2);
   --tabs-folder-radius: var(--prime-radius-m);
   --tabs-flare: var(--prime-radius-s);
-  --tabs-rise: var(--prime-space-1);
-  --tabs-panel-pad: var(--prime-space-4);
+  --tabs-panel-gap: var(--prime-space-3);
 }
 
 .root[data-size="s"] {
@@ -69,8 +68,7 @@
   --tabs-indicator: calc(var(--prime-control-s-track) / 2);
   --tabs-folder-radius: var(--prime-radius-m);
   --tabs-flare: var(--prime-radius-s);
-  --tabs-rise: var(--prime-space-1);
-  --tabs-panel-pad: var(--prime-space-5);
+  --tabs-panel-gap: var(--prime-space-4);
 }
 
 .root[data-size="l"] {
@@ -84,7 +82,8 @@
   --tabs-indicator: calc(var(--prime-control-l-track) / 2);
   --tabs-folder-radius: var(--prime-radius-xl);
   --tabs-flare: var(--prime-radius-l);
-  --tabs-rise: var(--prime-space-3);
+  --tabs-rise: var(--prime-space-2);
+  --tabs-panel-gap: var(--prime-space-6);
   --tabs-remove-size: var(--prime-control-s-height);
 }
 
@@ -99,40 +98,58 @@
   --tabs-indicator: calc(var(--prime-control-xl-track) / 2);
   --tabs-folder-radius: var(--prime-radius-xl);
   --tabs-flare: var(--prime-radius-l);
-  --tabs-rise: var(--prime-space-3);
-  --tabs-panel-pad: var(--prime-space-8);
+  --tabs-rise: var(--prime-space-2);
+  --tabs-panel-gap: var(--prime-space-8);
   --tabs-remove-size: var(--prime-control-m-height);
 }
 
 /* ---------- Layout ---------- */
 
+/* The root has no surface of its own: no fill, no padding, no radius. The strip and the panel
+   stand in the host's padding, one gap apart. */
 .layout {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-4);
+  gap: var(--tabs-panel-gap);
   min-width: 0;
-}
-
-/* The root is the frame and a layer of the ladder (`data-depth`) — a strip two steps off the
-   layer, with the panel in the layer's own color beside it. Two steps: the strip is the block's
-   outer edge, and one step off a white card is the light page tone itself. */
-.root {
-  overflow: hidden;
-  border-radius: var(--prime-radius-xl);
-  background: var(--prime-color-fill-muted-hover);
-}
-
-.layout {
-  gap: 0;
 }
 
 .root[data-orientation="vertical"] {
   container-type: inline-size;
 }
 
+/* In a host's zones: the list sits in the host's header (Modal, Drawer) and the panels in its body,
+   so the strip is not the layout's own child. The root then wraps the host's header and body and
+   draws no box at all — the host keeps its own layout (only the body scrolls). */
+.root:not(:has(> .layout > .strip)),
+.root:not(:has(> .layout > .strip)) > .layout {
+  display: contents;
+}
+
 .root[data-orientation="vertical"] .layout {
   flex-direction: row;
-  align-items: stretch;
+  align-items: flex-start;
+}
+
+/* ---------- Strip ---------- */
+
+/* The band behind the tabs, two steps off the surface: the strip is the bar's only fill, and one
+   step off a white card is the light page tone itself. It clips the folder to its corners; the
+   list inside scrolls and fades over it, the band itself never fades. */
+.strip {
+  min-width: 0;
+  /* A host zone that lets the bar run edge to edge hands it its side padding
+     (`--prime-bleed-inline`, a dialog header); elsewhere it is 0. */
+  margin-inline: calc(-1 * var(--prime-bleed-inline, 0px));
+  overflow: hidden;
+  border-radius: var(--tabs-strip-radius);
+  background: var(--prime-color-fill-muted-hover);
+}
+
+.root[data-orientation="vertical"] .strip {
+  flex: none;
+  min-width: var(--tabs-two-line-min);
+  max-width: 40%;
 }
 
 /* ---------- List ---------- */
@@ -147,19 +164,22 @@
   align-items: stretch;
 }
 
-/* Edge to edge: the first and last tab meet the frame, the folder joins the panel edge straight. */
+/* Edge to edge: the first and last tab meet the strip's ends, the folder meets its bottom edge. */
 .root[data-orientation="horizontal"] .list {
   gap: var(--prime-space-1);
   padding-top: var(--tabs-rise);
+  /* Edge to edge of a host zone, the end tabs stand clear of the zone's edge: their flares curve
+     fully inside the strip, with a band of strip beyond them. 0 elsewhere (`min` with the bleed). */
+  padding-inline: min(
+    var(--prime-bleed-inline, 0px),
+    calc(var(--tabs-flare) + var(--prime-space-3))
+  );
 }
 
-/* The column: sections stacked from the top, the folder joins the panel edge straight. */
+/* The column: sections stacked from the top, the folder meets the column's inline-end edge. */
 .root[data-orientation="vertical"] .list {
   flex-direction: column;
-  flex: none;
   gap: var(--prime-space-1);
-  min-width: var(--tabs-two-line-min);
-  max-width: 40%;
   padding-block: var(--tabs-rise);
   padding-inline-start: var(--tabs-rise);
   overflow: visible;
@@ -294,7 +314,9 @@
   justify-content: center;
   box-sizing: border-box;
   min-width: 0;
-  height: var(--tabs-height);
+  /* The control height is the floor, the content sets the rest: a two-line tab grows by its
+     padding and lines, and the row stretches every tab to the tallest one. */
+  min-height: var(--tabs-height);
   margin: 0;
   padding: 0 var(--tabs-pad-x);
   border: 0;
@@ -336,7 +358,6 @@
 }
 
 .root[data-orientation="horizontal"] .tab {
-  height: var(--tabs-item-height);
   padding: 0 calc(var(--tabs-pad-x) + var(--prime-space-1));
   outline: none;
 }
@@ -368,11 +389,6 @@
 }
 
 /* Two-line item: label + count on the first line, description on the second. */
-.tab[data-two-line="true"] {
-  height: auto;
-  padding-block: var(--prime-space-2) var(--prime-space-3);
-}
-
 .tab[data-two-line="true"] .content {
   /* Grid, not wrapping flex: the max-content width is the wider line, not both lines summed. */
   display: inline-grid;
@@ -383,14 +399,13 @@
   row-gap: 0;
 }
 
-.root[data-orientation="horizontal"] .tab[data-two-line="true"] {
-  padding-block: calc(var(--tabs-rise) + var(--prime-space-2))
-    calc(var(--tabs-rise) + var(--prime-space-3));
+/* The orientation rules set `padding` whole; a two-line tab takes its block padding back. */
+.root .tab[data-two-line="true"] {
+  padding-block: var(--prime-space-2);
 }
 
 .root[data-orientation="vertical"] .tab[data-two-line="true"] {
   min-width: var(--tabs-two-line-min);
-  padding-block: var(--prime-space-2);
 }
 
 /* Hover: the folder shape in the faintest wash, under the folder. */
@@ -583,14 +598,13 @@
 
 .list[data-collapse="compact"] .tab[data-two-line="true"],
 .list[data-collapse="icon"] .tab[data-two-line="true"] {
-  height: var(--tabs-item-height);
   padding-block: 0;
 }
 
 /* icon: a square of icons; the label stays for screen readers (sr-only) and fills the tooltip. */
 .root .list[data-collapse="icon"] .item,
 .root .list[data-collapse="icon"] .tab {
-  min-width: var(--tabs-item-height);
+  min-width: var(--tabs-height);
 }
 
 .list[data-collapse="icon"] .tab {
@@ -619,7 +633,6 @@
   flex: none;
   align-self: center;
   height: var(--tabs-icon);
-  margin-top: var(--tabs-rise);
   margin-inline: var(--prime-space-2);
 }
 
@@ -641,14 +654,11 @@
   color: var(--prime-color-text-primary);
 }
 
-.panel {
-  padding: var(--tabs-panel-pad);
-  background: var(--prime-color-layer-current);
-}
-
+/* No fill, no padding: the panel is the host's content. The focus ring sits just outside it. */
 .panel:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-focus-ring);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+  border-radius: var(--prime-radius-s);
 }
 
 .panel :where(p, ul, ol) {
@@ -675,22 +685,22 @@
 @container (max-width: 37.5rem) {
   .root[data-orientation="vertical"] .layout {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .root[data-orientation="vertical"] .strip {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .root[data-orientation="vertical"] .list {
     flex-direction: row;
-    min-width: 0;
-    max-width: 100%;
     padding: var(--tabs-rise) 0 0;
     overflow-x: auto;
   }
 
   .root[data-orientation="vertical"] .item {
     border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
-  }
-
-  .root[data-orientation="vertical"] .tab {
-    height: var(--tabs-item-height);
   }
 
   .root[data-orientation="vertical"] .separator {

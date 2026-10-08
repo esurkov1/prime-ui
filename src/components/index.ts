@@ -1,6 +1,8 @@
 export type { ControlSizeProviderProps } from "../internal/ControlSizeContext";
 export { ControlSizeProvider, useOptionalControlSize } from "../internal/ControlSizeContext";
-export type { ProgressSegment } from "../internal/progressSegments";
+export type { ProgressScale, ProgressSegment } from "../internal/progressSegments";
+export type { VisuallyHiddenProps } from "../internal/VisuallyHidden";
+export { VisuallyHidden } from "../internal/VisuallyHidden";
 export * from "../layout";
 export type {
   AccordionContentProps,
@@ -48,6 +50,7 @@ export { Button } from "./button/Button";
 export type {
   ButtonGroupIconProps,
   ButtonGroupItemProps,
+  ButtonGroupLabels,
   ButtonGroupOrientation,
   ButtonGroupRootProps,
 } from "./button-group/ButtonGroup";
@@ -64,12 +67,34 @@ export type {
   CardListItemProps,
   CardListProps,
   CardMediaProps,
+  CardMetaProps,
   CardRootProps,
   CardTitleProps,
   CardValueProps,
   CardVariant,
 } from "./card/Card";
 export { Card } from "./card/Card";
+export type {
+  ChartFrameActionsProps,
+  ChartFrameDeltaProps,
+  ChartFrameDescriptionProps,
+  ChartFrameHeaderProps,
+  ChartFrameLabels,
+  ChartFrameLegendProps,
+  ChartFramePlotArea,
+  ChartFramePlotProps,
+  ChartFramePlotSeries,
+  ChartFrameRootProps,
+  ChartFrameSeries,
+  ChartFrameState,
+  ChartFrameTableProps,
+  ChartFrameTableRow,
+  ChartFrameTitleProps,
+  ChartFrameTooltipItem,
+  ChartFrameTooltipProps,
+  ChartFrameValueProps,
+} from "./chart-frame/ChartFrame";
+export { ChartFrame } from "./chart-frame/ChartFrame";
 export type {
   CheckboxIndicatorProps,
   CheckboxLabelProps,
@@ -88,6 +113,7 @@ export type {
   ColorPresetsContentProps,
   ColorPresetsLabels,
   ColorPresetsRootProps,
+  ColorPresetsSwatchButtonProps,
   ColorPresetsSwatchProps,
   ColorPresetsTriggerProps,
 } from "./color-picker/ColorPresets";
@@ -111,13 +137,40 @@ export type {
   CommandMenuTitleProps,
 } from "./command-menu/CommandMenu";
 export { CommandMenu } from "./command-menu/CommandMenu";
+export type {
+  ComposerActivity,
+  ComposerAttachProps,
+  ComposerContextMode,
+  ComposerContextProps,
+  ComposerDescriptionProps,
+  ComposerFormat,
+  ComposerItemIconProps,
+  ComposerItemProps,
+  ComposerLabels,
+  ComposerMessage,
+  ComposerQueue,
+  ComposerRecording,
+  ComposerRecordMode,
+  ComposerRootProps,
+  ComposerTitleProps,
+} from "./composer/Composer";
+export { Composer } from "./composer/Composer";
+export type {
+  ConfirmDialogLabels,
+  ConfirmDialogRootProps,
+  ConfirmDialogTriggerProps,
+} from "./confirm-dialog/ConfirmDialog";
+export { ConfirmDialog } from "./confirm-dialog/ConfirmDialog";
 export type { CrossfadeProps } from "./crossfade/Crossfade";
 export { Crossfade } from "./crossfade/Crossfade";
 export type {
   DataTableColumn,
+  DataTableColumnsMenuProps,
+  DataTableGroup,
   DataTableLabels,
   DataTableOrder,
   DataTableProps,
+  DataTableRowClickEvent,
   DataTableSortState,
 } from "./data-table/DataTable";
 export { DataTable } from "./data-table/DataTable";
@@ -136,6 +189,14 @@ export {
   formatDatepickerValue,
   YEARLESS_YEAR,
 } from "./datepicker/Datepicker";
+export type {
+  DescriptionListItemActionProps,
+  DescriptionListItemProps,
+  DescriptionListLabels,
+  DescriptionListOrientation,
+  DescriptionListRootProps,
+} from "./description-list/DescriptionList";
+export { DescriptionList } from "./description-list/DescriptionList";
 export type { DigitInputLabels, DigitInputProps } from "./digit-input/DigitInput";
 export { DigitInput } from "./digit-input/DigitInput";
 export type { DividerAlign, DividerOrientation, DividerProps } from "./divider/Divider";
@@ -145,7 +206,6 @@ export type {
   DndDropZoneProps,
   DndHandleProps,
   DndLabels,
-  DndReorderResult,
   DndRootProps,
   DndSortableItemProps,
   DndSortableProps,
@@ -161,6 +221,7 @@ export type {
   DropdownDescriptionProps,
   DropdownGroupProps,
   DropdownHeaderProps,
+  DropdownItemDescriptionProps,
   DropdownItemIconProps,
   DropdownItemProps,
   DropdownItemShortcutProps,
@@ -174,8 +235,11 @@ export type {
   EmptyPageActionsProps,
   EmptyPageDescriptionProps,
   EmptyPageIconProps,
+  EmptyPageLabels,
+  EmptyPageRetryButtonProps,
   EmptyPageRootProps,
   EmptyPageTitleProps,
+  EmptyPageTone,
 } from "./empty-page/EmptyPage";
 export { EmptyPage } from "./empty-page/EmptyPage";
 export type {
@@ -185,6 +249,8 @@ export type {
   ExampleFrameViewport,
 } from "./example-frame/ExampleFrame";
 export { ExampleFrame } from "./example-frame/ExampleFrame";
+export type { FieldsetProps } from "./fieldset/Fieldset";
+export { Fieldset } from "./fieldset/Fieldset";
 export type {
   FileUploadBodyProps,
   FileUploadDescriptionProps,
@@ -193,31 +259,46 @@ export type {
   FileUploadItemActionsProps,
   FileUploadItemDescriptionProps,
   FileUploadItemNameProps,
+  FileUploadItemPreviewProps,
   FileUploadItemProgressProps,
   FileUploadItemProps,
   FileUploadLabels,
+  FileUploadQueueProps,
+  FileUploadQueueSource,
   FileUploadRootProps,
   FileUploadTitleProps,
   FileUploadVariant,
 } from "./file-upload/FileUpload";
 export { FileUpload } from "./file-upload/FileUpload";
+export type {
+  GanttBar,
+  GanttDates,
+  GanttLabels,
+  GanttProps,
+  GanttScale,
+} from "./gantt/Gantt";
+export { Gantt } from "./gantt/Gantt";
 export type { HintIconProps, HintRootProps } from "./hint/Hint";
 export { Hint } from "./hint/Hint";
 export type {
   ImageUploadItem,
   ImageUploadLabels,
   ImageUploadProps,
+  ImageUploadQueueSource,
   ImageUploadVariant,
 } from "./image-upload/ImageUpload";
 export { ImageUpload } from "./image-upload/ImageUpload";
 export type {
+  InputActionProps,
   InputAffixProps,
   InputClearButtonProps,
+  InputCopyButtonProps,
   InputCounterProps,
   InputFieldProps,
   InputIconProps,
   InputInlineAffixProps,
   InputLabels,
+  InputRevealButtonProps,
   InputRootProps,
   InputWrapperProps,
 } from "./input/Input";
@@ -264,15 +345,66 @@ export type {
 } from "./login-form/LoginForm";
 export { LoginForm } from "./login-form/LoginForm";
 export type {
+  MessageAuthorProps,
+  MessageAvatarProps,
+  MessageDirection,
+  MessageForwardedLabels,
+  MessageForwardedProps,
+  MessageGroupLabels,
+  MessageGroupProps,
+  MessageLabels,
+  MessageMenuProps,
+  MessagePinnedItem,
+  MessagePinnedLabels,
+  MessagePinnedProps,
+  MessageReaction,
+  MessageReactionsLabels,
+  MessageReactionsProps,
+  MessageReplyLabels,
+  MessageReplyProps,
+  MessageRootProps,
+  MessageSeparatorProps,
+  MessageServiceProps,
+  MessageStatus,
+  MessageTextProps,
+  MessageTypingLabels,
+  MessageTypingProps,
+  MessageUnreadLabels,
+  MessageUnreadProps,
+  MessageUser,
+} from "./message/Message";
+export { Message } from "./message/Message";
+export type {
+  MessageContactProps,
+  MessageFileLabels,
+  MessageFileProps,
+  MessageLinkPreviewProps,
+  MessageLocationLabels,
+  MessageLocationProps,
+  MessageMediaItem,
+  MessageMediaLabels,
+  MessageMediaProps,
+} from "./message/MessageContent";
+export type { MessageVideoNoteLabels, MessageVideoNoteProps } from "./message/MessageVideoNote";
+export type {
+  GroupMessagesOptions,
+  MessageListEntry,
+  MessagePosition,
+} from "./message/messageList";
+export { formatMessageDate, formatMessageTime, groupMessages } from "./message/messageList";
+export type {
+  ModalActionsProps,
   ModalBodyProps,
   ModalCloseProps,
   ModalConfirmProps,
   ModalContentProps,
   ModalDescriptionProps,
   ModalFooterProps,
+  ModalGuardProps,
   ModalHeaderProps,
   ModalIconProps,
   ModalLabels,
+  ModalMetaProps,
   ModalRootProps,
   ModalTitleProps,
   ModalTriggerProps,
@@ -297,13 +429,18 @@ export {
 } from "./notification/NotificationStore";
 export type {
   PageContentActionsProps,
+  PageContentBackButtonProps,
   PageContentBodyProps,
   PageContentDescriptionMeasure,
   PageContentDescriptionProps,
+  PageContentDetailProps,
   PageContentHeaderProps,
+  PageContentLabels,
+  PageContentListProps,
   PageContentMaxWidth,
   PageContentRootProps,
   PageContentSectionProps,
+  PageContentSplitProps,
   PageContentTitleProps,
 } from "./page-content/PageContent";
 export { PageContent } from "./page-content/PageContent";
@@ -352,6 +489,7 @@ export type {
   SegmentedControlIconProps,
   SegmentedControlItemProps,
   SegmentedControlLabelProps,
+  SegmentedControlLabels,
   SegmentedControlRootProps,
 } from "./segmented-control/SegmentedControl";
 export { SegmentedControl } from "./segmented-control/SegmentedControl";
@@ -372,22 +510,29 @@ export type {
   SelectValueProps,
 } from "./select/Select";
 export { Select } from "./select/Select";
+export * from "./sheet/Sheet";
 export type { SkeletonProps, SkeletonShape } from "./skeleton/Skeleton";
 export { Skeleton } from "./skeleton/Skeleton";
 export type { SliderLabels, SliderProps } from "./slider/Slider";
 export { Slider } from "./slider/Slider";
 export type {
   SmartFilterChipsProps,
+  SmartFilterDateRangeField,
   SmartFilterField,
+  SmartFilterFieldValue,
   SmartFilterLabels,
   SmartFilterMode,
   SmartFilterOption,
+  SmartFilterOptionsField,
+  SmartFilterRange,
+  SmartFilterRangeField,
   SmartFilterRootProps,
   SmartFilterSelection,
   SmartFilterToolbarProps,
   SmartFilterValue,
 } from "./smart-filter/SmartFilter";
 export {
+  isSmartFilterRange,
   matchesSmartFilter,
   resolveSmartFilterValues,
   SmartFilter,
@@ -396,6 +541,7 @@ export type {
   SparklineLabels,
   SparklinePoint,
   SparklineProps,
+  SparklineVariant,
 } from "./sparkline/Sparkline";
 export { Sparkline } from "./sparkline/Sparkline";
 export type { SpinnerLabels, SpinnerProps } from "./spinner/Spinner";
@@ -425,6 +571,8 @@ export type {
 } from "./tag-select/TagSelect";
 export { TagSelect } from "./tag-select/TagSelect";
 export type {
+  TextareaActionProps,
+  TextareaCopyButtonProps,
   TextareaCounterProps,
   TextareaLabels,
   TextareaRootProps,
@@ -435,6 +583,7 @@ export type {
   ThumbnailImageProps,
   ThumbnailRatio,
   ThumbnailRootProps,
+  ThumbnailVideoProps,
 } from "./thumbnail/Thumbnail";
 export { Thumbnail } from "./thumbnail/Thumbnail";
 export type {
@@ -467,3 +616,9 @@ export type {
   TypographyWeight,
 } from "./typography/Typography";
 export { Typography } from "./typography/Typography";
+export type {
+  VoicePlayerLabels,
+  VoicePlayerProps,
+  VoicePlayerRate,
+} from "./voice-player/VoicePlayer";
+export { getWaveform, VoicePlayer } from "./voice-player/VoicePlayer";

@@ -126,7 +126,6 @@ export function useFloatingLayer({
 
   const swipe = useSwipeDismiss({
     enabled: sheet && open && closeOnOutsideClick,
-    direction: "down",
     onDismiss: dismissOutside,
     handle: "[data-swipe-handle]",
   });

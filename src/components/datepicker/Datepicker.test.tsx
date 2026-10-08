@@ -13,7 +13,6 @@ const LAYOUT_TOKENS = {
   "--prime-control-m-item-height": "32px",
   "--prime-space-6": "24px",
   "--prime-space-3": "12px",
-  "--prime-card-padding-s": "16px",
 };
 function withLayoutTokens(run: () => void) {
   const root = document.documentElement.style;
@@ -502,7 +501,7 @@ describe("Datepicker.Panel — доступная ширина", () => {
         notify?.(343);
         expect(container.querySelectorAll("table")).toHaveLength(1);
         expect(container.querySelector("[data-embedded]")).not.toHaveAttribute("data-compact");
-        notify?.(240);
+        notify?.(200);
         expect(container.querySelector("[data-compact]")).not.toBeNull();
       });
     } finally {
@@ -519,5 +518,26 @@ describe("Datepicker labels", () => {
     expect(screen.getByRole("button", { name: "Дата ТО дд.мм.гггг" })).toBeInTheDocument();
     rerender(<Datepicker.Root mode="single" label="Дата ТО" placeholder="Не заполнено" />);
     expect(screen.getByRole("button", { name: "Дата ТО Не заполнено" })).toBeInTheDocument();
+  });
+});
+
+describe("Datepicker form value", () => {
+  it("submits a single date and a range through hidden inputs under its name", () => {
+    const { container } = render(
+      <form>
+        <Datepicker.Root mode="single" name="due" label="Срок" defaultValue={TODAY} />
+        <Datepicker.Root
+          mode="range"
+          name="period"
+          label="Период"
+          defaultValue={{ from: null, to: new Date(2026, 9, 31) }}
+        />
+        <Datepicker.Root mode="single" name="empty" label="Без даты" />
+      </form>,
+    );
+    const data = new FormData(container.querySelector("form") as HTMLFormElement);
+    expect(data.get("due")).toBe("2026-10-07");
+    expect(data.getAll("period")).toEqual(["", "2026-10-31"]);
+    expect(data.get("empty")).toBe("");
   });
 });
