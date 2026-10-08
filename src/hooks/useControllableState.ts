@@ -15,11 +15,9 @@ export function useControllableState<T>({
 
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value : internalValue;
+  // Read synchronously by `setValue`: two functional updates in one handler chain on each other.
   const currentValueRef = React.useRef(currentValue);
-
-  React.useEffect(() => {
-    currentValueRef.current = currentValue;
-  }, [currentValue]);
+  currentValueRef.current = currentValue;
 
   const setValue = React.useCallback(
     (nextValue: T | ((prev: T) => T)) => {
@@ -31,6 +29,7 @@ export function useControllableState<T>({
         return;
       }
 
+      currentValueRef.current = computedValue;
       if (!isControlled) {
         setInternalValue(computedValue);
       }
