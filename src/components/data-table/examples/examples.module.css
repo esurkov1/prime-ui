@@ -27,6 +27,18 @@
   max-width: calc(var(--prime-space-20) * 4);
 }
 
+/* columns-visibility: the column chooser panel and its list of checkboxes. */
+.columnsPanel {
+  width: calc(var(--prime-space-24) * 2.5);
+  max-width: 100%;
+}
+
+.columnsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+}
+
 /* sizes / appearance / states: a table with its caption under it; specimens kept apart. */
 .specimens {
   display: flex;

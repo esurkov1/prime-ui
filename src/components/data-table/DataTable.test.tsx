@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -915,5 +915,191 @@ describe("DataTable CSS contract", () => {
     expect((scoreCol as HTMLTableColElement).style.width).toBe("");
     expect(table.style.minWidth).toBe("400px");
     spy.mockRestore();
+  });
+});
+
+describe("DataTable hidden columns", () => {
+  type Order = { id: string; client: string; total: number; manager: string };
+  const ORDERS: Order[] = [
+    { id: "1040", client: "ООО «Север»", total: 120, manager: "Ольга" },
+    { id: "1041", client: "ИП Козлов", total: 80, manager: "Игорь" },
+  ];
+  const ORDER_COLUMNS: DataTableColumn<Order>[] = [
+    { id: "id", header: "Заказ", accessor: "id", hideable: false },
+    { id: "client", header: "Клиент", accessor: "client" },
+    { id: "total", header: "Сумма", accessor: "total", sortable: true, numeric: true },
+    { id: "manager", header: "Менеджер", accessor: "manager" },
+  ];
+
+  it("does not render hidden columns in the head, the body or the colgroup", () => {
+    const { container } = render(
+      <DataTable rows={ORDERS} columns={ORDER_COLUMNS} hiddenColumns={["client", "manager"]} />,
+    );
+    expect(screen.queryByRole("columnheader", { name: "Клиент" })).toBeNull();
+    expect(screen.queryByText("ООО «Север»")).toBeNull();
+    expect(screen.queryByText("Ольга")).toBeNull();
+    expect(screen.getByRole("columnheader", { name: "Сумма" })).toBeInTheDocument();
+    expect(container.querySelectorAll("colgroup col")).toHaveLength(2);
+    expect(container.querySelectorAll("tbody tr:first-child td")).toHaveLength(2);
+  });
+
+  it("keeps a column with hideable: false even when its id is listed", () => {
+    render(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} hiddenColumns={["id", "total"]} />);
+    expect(screen.getByRole("columnheader", { name: "Заказ" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Заказ" })).toHaveAttribute(
+      "data-first-column",
+      "true",
+    );
+    expect(screen.queryByRole("columnheader", { name: "Сумма" })).toBeNull();
+  });
+
+  it("follows the parent's list: a column comes back when its id leaves the list", () => {
+    const { rerender } = render(
+      <DataTable rows={ORDERS} columns={ORDER_COLUMNS} hiddenColumns={["manager"]} />,
+    );
+    expect(screen.queryByText("Игорь")).toBeNull();
+    rerender(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} hiddenColumns={[]} />);
+    expect(screen.getByText("Игорь")).toBeInTheDocument();
+  });
+
+  it("the first visible column becomes the first column (sticky edge, sub-row indent)", () => {
+    const columns = ORDER_COLUMNS.map((column) => ({ ...column, hideable: true }));
+    render(<DataTable rows={ORDERS} columns={columns} hiddenColumns={["id"]} stickyFirstColumn />);
+    const first = screen.getByRole("columnheader", { name: "Клиент" });
+    expect(first).toHaveAttribute("data-first-column", "true");
+    expect(screen.getByText("ИП Козлов").closest("td")).toHaveAttribute(
+      "data-first-column",
+      "true",
+    );
+  });
+
+  it("hidden columns leave skeleton rows and the colSpan of state rows", () => {
+    const { container, rerender } = render(
+      <DataTable rows={[]} columns={ORDER_COLUMNS} hiddenColumns={["client"]} loading />,
+    );
+    expect(container.querySelectorAll('tr[data-skeleton="true"]:first-child td')).toHaveLength(3);
+    rerender(<DataTable rows={[]} columns={ORDER_COLUMNS} hiddenColumns={["client"]} />);
+    expect(container.querySelector("tbody td")).toHaveAttribute("colspan", "3");
+  });
+
+  it("keeps the row order when the sorted column is hidden", () => {
+    const { container, rerender } = render(
+      <DataTable
+        rows={ORDERS}
+        columns={ORDER_COLUMNS}
+        defaultSort={{ columnId: "total", order: "asc" }}
+      />,
+    );
+    const order = () =>
+      [...container.querySelectorAll('tbody td[data-column-id="id"]')].map((td) => td.textContent);
+    expect(order()).toEqual(["1041", "1040"]);
+    rerender(
+      <DataTable
+        rows={ORDERS}
+        columns={ORDER_COLUMNS}
+        defaultSort={{ columnId: "total", order: "asc" }}
+        hiddenColumns={["total"]}
+      />,
+    );
+    expect(order()).toEqual(["1041", "1040"]);
+  });
+
+  it("measures the widths again for the new column set", () => {
+    const spy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({
+          width: 90,
+          height: 20,
+          top: 0,
+          left: 0,
+          right: 90,
+          bottom: 20,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        }) as DOMRect,
+    );
+    const { container, rerender } = render(
+      <DataTable rows={ORDERS} columns={ORDER_COLUMNS} paging="none" />,
+    );
+    expect(container.querySelectorAll("colgroup col")).toHaveLength(4);
+    rerender(
+      <DataTable rows={ORDERS} columns={ORDER_COLUMNS} paging="none" hiddenColumns={["client"]} />,
+    );
+    const cols = [...container.querySelectorAll<HTMLTableColElement>("colgroup col")];
+    expect(cols).toHaveLength(3);
+    for (const col of cols) expect(col.style.width).toBe("90px");
+    spy.mockRestore();
+  });
+});
+
+describe("DataTable edge cue", () => {
+  const viewportOf = (container: HTMLElement) =>
+    container.querySelector("table")?.parentElement as HTMLElement;
+
+  /** jsdom has no layout: give the viewport a scroll width, then scroll it. */
+  const overflowBy = (node: HTMLElement, scrollWidth: number, clientWidth: number) => {
+    Object.defineProperty(node, "scrollWidth", { configurable: true, value: scrollWidth });
+    Object.defineProperty(node, "clientWidth", { configurable: true, value: clientWidth });
+  };
+
+  it("marks the edges that hide columns while the table overflows sideways", async () => {
+    const { container } = render(<DataTable rows={rows} columns={columns} />);
+    const root = container.firstElementChild as HTMLElement;
+    const viewport = viewportOf(container);
+    expect(root).not.toHaveAttribute("data-overflow-start");
+    expect(root).not.toHaveAttribute("data-overflow-end");
+
+    overflowBy(viewport, 600, 300);
+    viewport.scrollLeft = 0;
+    fireEvent.scroll(viewport);
+    await waitFor(() => expect(root).toHaveAttribute("data-overflow-end", "true"));
+    expect(root).not.toHaveAttribute("data-overflow-start");
+
+    viewport.scrollLeft = 150;
+    fireEvent.scroll(viewport);
+    await waitFor(() => expect(root).toHaveAttribute("data-overflow-start", "true"));
+    expect(root).toHaveAttribute("data-overflow-end", "true");
+
+    viewport.scrollLeft = 300;
+    fireEvent.scroll(viewport);
+    await waitFor(() => expect(root).not.toHaveAttribute("data-overflow-end"));
+    expect(root).toHaveAttribute("data-overflow-start", "true");
+  });
+
+  it("reads the RTL scroll position as distance from the start", async () => {
+    const { container } = render(
+      <div dir="rtl">
+        <DataTable rows={rows} columns={columns} />
+      </div>,
+    );
+    const root = container.querySelector("[data-size]") as HTMLElement;
+    const viewport = viewportOf(container);
+    overflowBy(viewport, 600, 300);
+    viewport.scrollLeft = -300;
+    fireEvent.scroll(viewport);
+    await waitFor(() => expect(root).toHaveAttribute("data-overflow-start", "true"));
+    expect(root).not.toHaveAttribute("data-overflow-end");
+  });
+
+  it("CSS: edge shadows overlay the viewport; a sticky first column carries the start one", () => {
+    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
+    expect(css).toMatch(/\.root\[data-overflow-start="true"\] \.frame::before/);
+    expect(css).toMatch(/\.root\[data-overflow-end="true"\] \.frame::after/);
+    expect(css).toMatch(
+      /\.root\[data-sticky-first-column="true"\] \.frame::before \{[^}]*display: none/,
+    );
+    expect(css).toMatch(
+      /\.root\[data-overflow-start="true"\] \.firstColumnSticky::after \{[^}]*opacity: 1/,
+    );
+    // Pseudo-elements never take layout space.
+    expect(css).toMatch(/\.frame::before,\n\.frame::after \{[^}]*position: absolute/);
+  });
+
+  it("CSS: on short landscape screens the sticky head scrolls with the rows", () => {
+    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
+    expect(css).toMatch(
+      /@media \(max-height: 479px\) \{\s*\.root\[data-sticky-header="true"\] \.headCell \{\s*top: auto;/,
+    );
   });
 });

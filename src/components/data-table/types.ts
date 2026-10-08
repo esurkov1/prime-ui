@@ -31,4 +31,9 @@ export type DataTableColumn<Row> = {
    * such a column the table fills its container instead of growing to its content width.
    */
   grow?: boolean;
+  /**
+   * The column can be hidden through the table's `hiddenColumns`. Default `true`; `false` for the
+   * key column that names the row — it stays even when its id is listed.
+   */
+  hideable?: boolean;
 };

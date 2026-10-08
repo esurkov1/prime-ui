@@ -44,6 +44,12 @@
   --dt-z-sticky-header: 2;
   --dt-z-sticky-corner: 3;
 
+  /* Edge cue: a soft shadow over the edge that hides columns, from the scrim of the theme. */
+  --dt-edge-depth: var(--prime-space-4);
+  --dt-edge-shadow: color-mix(in srgb, var(--prime-color-bg-scrim) 40%, transparent);
+  /* Gradient direction from the start edge inward; flipped in RTL. */
+  --dt-edge-dir: to right;
+
   /* Surface context: fields inside the table are one step off the surface. */
   --prime-color-field-bg: var(--prime-color-field-bg-surface);
 
@@ -159,12 +165,62 @@
 
 /* ---------- Viewport & table ---------- */
 
+.root:dir(rtl) {
+  --dt-edge-dir: to left;
+}
+
+/* Holds the edge shadows over the viewport; shrinks like the viewport inside a sized root. */
+.frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  isolation: isolate;
+}
+
 /* Full-bleed: head and rows touch the container edges; the root clips them to its radius.
  * Focusables at the edges (sort buttons, clickable cells) use the inset focus ring. */
 .viewport {
   width: 100%;
   padding: 0;
   isolation: isolate;
+}
+
+/*
+ * Edge cue: while the table overflows sideways, a shadow marks the edge that hides columns — the
+ * start edge once scrolled, the end edge while more is to the end. Overlays, never takes space;
+ * fades in and out (fast · standard; durations are 0 under reduced motion).
+ */
+.frame::before,
+.frame::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  z-index: 1;
+  width: var(--dt-edge-depth);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.frame::before {
+  inset-inline-start: 0;
+  background: linear-gradient(var(--dt-edge-dir), var(--dt-edge-shadow), transparent);
+}
+
+.frame::after {
+  inset-inline-end: 0;
+  background: linear-gradient(var(--dt-edge-dir), transparent, var(--dt-edge-shadow));
+}
+
+.root[data-overflow-start="true"] .frame::before,
+.root[data-overflow-end="true"] .frame::after {
+  opacity: 1;
+}
+
+/* With a sticky first column the start shadow falls from that column's end edge instead. */
+.root[data-sticky-first-column="true"] .frame::before {
+  display: none;
 }
 
 .table {
@@ -510,9 +566,30 @@
 
 .firstColumnSticky {
   position: sticky;
-  left: var(--dt-lead, 0);
+  inset-inline-start: var(--dt-lead, 0);
   z-index: var(--dt-z-sticky-first-column);
   box-shadow: inset calc(-1 * var(--prime-border-width)) 0 0 var(--dt-divider-color);
+}
+
+.root:dir(rtl) .firstColumnSticky {
+  box-shadow: inset var(--prime-border-width) 0 0 var(--dt-divider-color);
+}
+
+/* Start edge cue of a sticky first column: a shadow from its end edge over the scrolled columns. */
+.firstColumnSticky::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 100%;
+  width: var(--dt-edge-depth);
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(var(--dt-edge-dir), var(--dt-edge-shadow), transparent);
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-overflow-start="true"] .firstColumnSticky::after {
+  opacity: 1;
 }
 
 /* The sticky column draws its own edge; the neighbour's divider would double it. */
@@ -528,12 +605,12 @@
 /* Leading utility cells stick together with the first content column. */
 .stickyLead {
   position: sticky;
-  left: 0;
+  inset-inline-start: 0;
   z-index: var(--dt-z-sticky-first-column);
 }
 
 .root[data-selectable="true"] .toggleCell.stickyLead {
-  left: var(--dt-select-w);
+  inset-inline-start: var(--dt-select-w);
 }
 
 .headCell.stickyLead {
@@ -638,6 +715,14 @@
 .pagination {
   flex: 1 1 0%;
   min-width: 0;
+}
+
+/* Short landscape screens: a sticky head would take a large share of the height, so it scrolls
+   with the rows (a sticky first column still sticks sideways). */
+@media (max-height: 479px) {
+  .root[data-sticky-header="true"] .headCell {
+    top: auto;
+  }
 }
 
 @container (max-width: 30rem) {

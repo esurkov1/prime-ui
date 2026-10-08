@@ -10,6 +10,7 @@
 - Data that needs sorting, paging, bulk selection or a filter toolbar.
 - Hierarchical rows (`getRowChildren`) or rows with a detail panel (`renderExpanded`).
 - Wide numeric reports with a sticky head and first column.
+- Wide records on narrow screens: let people choose the columns (`hiddenColumns`) instead of dropping them.
 
 ## When not to use
 - One or two KPIs → use [Card](../card/COMPONENT.md).
@@ -28,7 +29,7 @@ Exported types: `DataTableColumn<Row>`, `DataTableProps<Row>`, `DataTableSortSta
 ```
 DataTable                           card-fill block, radius 12, clips its content
 ├── toolbar                         optional panel above the table (search, filters, bulk actions)
-├── scroll viewport                 ScrollContainer, both axes
+├── scroll viewport                 ScrollContainer, both axes, in a frame that holds the edge shadows
 │   └── table
 │       ├── thead                   [select all] [toggle] head cells; sortable heads hold a button
 │       └── tbody                   rows · sub-rows · detail rows · skeleton / empty / error row
@@ -46,6 +47,7 @@ Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an option
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `columns` | `DataTableColumn<Row>[]` | — (required) | Column definitions, see `DataTableColumn<Row>`. |
+| `hiddenColumns` | `string[]` | — | Ids of columns that are not rendered (head, body, skeleton and state rows); widths are measured again. A column with `hideable: false` stays. The list and the control that changes it (a column chooser in `toolbar`) belong to the consumer; sorting by a hidden column keeps the row order. |
 | `rows` | `Row[]` | — (required) | Data; sorted in memory when a sort is set. |
 | `getRowKey` | `(row: Row, index: number) => Key` | — | Stable row id (position by default); selection, expansion and the enter animation of new rows are keyed by it. Pass it whenever sorting, selection or expansion is used. |
 | `getRowLabel` | `(row: Row) => string` | — | Human row name for the checkbox and toggle names (`{label}` in `labels`). |
@@ -78,8 +80,8 @@ Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an option
 | `loadingMore` | `boolean` | `false` | A server batch is loading: footer status, `aria-busy`. |
 | `onLoadMore` | `() => void \| Promise<void>` | — | Called at the end when every loaded row is shown and `hasMore` is set. |
 | `scrollHeight` | `number \| string` | `360 with paging="infinite"` | Max height of the scroll viewport (number = px). |
-| `stickyHeader` | `boolean` | `false` | The head sticks while the body scrolls. |
-| `stickyFirstColumn` | `boolean` | `false` | The first column (with the selection and toggle columns) sticks while scrolling sideways. |
+| `stickyHeader` | `boolean` | `false` | The head sticks while the body scrolls (with `scrollHeight`); on screens lower than 480px it scrolls with the rows. |
+| `stickyFirstColumn` | `boolean` | `false` | The first visible column (with the selection and toggle columns) sticks while scrolling sideways; the start edge shadow falls from its end edge. |
 | `showHeader` | `boolean` | `true` | Render `<thead>`. |
 | `fullWidth` | `boolean` | `true` | The table spans its container; `false` sizes it by its content. |
 | `rowDividers` | `boolean` | `true` | Hairlines between rows. |
@@ -108,6 +110,7 @@ One column of `columns`: data, not a part.
 | `numeric` | `boolean` | — | Tabular figures, no wrapping, end alignment unless `align` is set. |
 | `truncate` | `boolean` | — | One line with an ellipsis; width from `maxWidth` (or `width`); string values get a `title`. |
 | `grow` | `boolean` | — | Takes the free width and wraps its text; the table then fills its container. With `minWidth` it never gets narrower: below that the table scrolls instead of cells overlapping. |
+| `hideable` | `boolean` | `true` | The column can be hidden through `hiddenColumns`; `false` for the key column that names the row. |
 | `width · minWidth · maxWidth` | `string` | — | CSS sizes of the column (`"14rem"`). |
 
 ## Variants
@@ -149,7 +152,8 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | `striped` | every second row one opaque step off the fill | long numeric grids | `false` |
 | `highlightRowOnHover` | `fill-subtle` wash on the hovered row | interactive lists | `true` |
 | `highlightColumnOnHover` | `fill-subtle` wash on the hovered column | comparison tables | `false` |
-| `stickyHeader` · `stickyFirstColumn` | opaque sticky head / first column with a hairline edge | long / wide tables in a `scrollHeight` window | `false` |
+| `stickyHeader` · `stickyFirstColumn` | opaque sticky head / first column with a hairline edge; on screens lower than 480px the head scrolls with the rows | long / wide tables in a `scrollHeight` window | `false` |
+| column `hideable` | `false`: the column stays even when listed in `hiddenColumns` | the key column that names the row | `true` |
 | `showHeader` | head row shown | off only for self-explanatory key/value tables | `true` |
 | `fullWidth` | spans the container; `false` = content width | `false` for short lookup tables in wide layouts | `true` |
 | column `numeric` | tabular figures, end-aligned, no wrap | numbers, money | — |
@@ -166,15 +170,20 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | selected | `selected` / `defaultSelected` | `aria-selected` rows with `accent-soft` fill; polite `labels.selectedCount` |
 | expanded | `expanded` / `defaultExpanded` | `data-expanded` on the parent row (one step darker); toggle `aria-expanded`, chevron turns 90° |
 | new rows | rows mounted by an expand or new in `rows` (by `getRowKey`) | `data-animate`: cells drop in from above (`enterMotion`); detail panels open and close through `grid-template-rows` (`data-state` on the detail row; it unmounts after the close) |
+| overflowing sideways | the table is wider than its viewport | `data-overflow-start` (scrolled from the start) and `data-overflow-end` (more to the end) on the root: a soft shadow over that edge, from the end edge of the sticky first column for the start; fades in and out over `fast` |
+| hidden columns | `hiddenColumns` | the listed columns (except `hideable: false`) are not rendered in the head, rows, skeleton or state rows; widths are measured again |
 | state swap | the body moves between loading, rows, empty and error | the body fades in over `base` (opacity only, the same swap motion as [Crossfade](../crossfade/COMPONENT.md)); the head stays still; nothing moves on the first render |
 
-Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data-sticky-header`, `data-sticky-first-column`, `data-table-width` (`fill` · `auto` · `grow`), `data-highlight-row`, `data-highlight-column`, `data-striped`, `data-loading`, `data-selectable`, `data-expandable`, `data-dragging` (while drag-selecting). Sorting and paging swap rows instantly; everything is still under `prefers-reduced-motion`.
+Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data-sticky-header`, `data-sticky-first-column`, `data-table-width` (`fill` · `auto` · `grow`), `data-highlight-row`, `data-highlight-column`, `data-striped`, `data-loading`, `data-selectable`, `data-expandable`, `data-dragging` (while drag-selecting), `data-overflow-start` · `data-overflow-end` (edges that hide columns). Sorting and paging swap rows instantly; everything is still under `prefers-reduced-motion`.
 
 ## Layout & spacing
 - The root fills its container on `--prime-color-card-bg`, radius 12, and clips full-bleed head and rows; on a card or a modal it becomes a sunken block — never wrap it in a Card.
 - Toolbar padding `--prime-space-3` × cell padding, items `gap: --prime-space-2`; below 30rem of table width toolbar and footer stack.
 - The footer has a hairline on top: range on the left, Pagination on the right. The range shows only with more than one page or with infinite scroll.
-- Columns scroll sideways inside the table; pin the identifying column with `stickyFirstColumn`. Works from 320 px.
+- Columns scroll sideways inside the table, never the page; pin the identifying column with `stickyFirstColumn`. Works from 320 px.
+- While columns are hidden past an edge, that edge shows a `--prime-space-4` shadow (the theme scrim at 40%) over the content; it takes no space and follows RTL. With `stickyFirstColumn` the start shadow falls from the pinned column's end edge.
+- Fewer columns, less scrolling: put a column chooser in `toolbar` (a Popover with a Checkbox per column, the key column `hideable: false` shown checked and disabled) and pass `hiddenColumns`. Never hide columns silently by width.
+- The sticky head stops sticking on screens lower than 480px (landscape phones), so it never takes a large share of the height.
 - Cell content: text, two-line text (title + `caption`), an Avatar with text, a Badge, or a control one tier down (`s` in an `m` table). Toolbar controls use `s` in an `m` table.
 - Column widths: `width` / `minWidth` / `maxWidth` strings; never size cells with custom CSS.
 - Sub-rows indent by `--dt-indent` per level (avatar of the tier + gap); override it on the root for other leading content.
@@ -225,6 +234,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | [nested-rows.tsx](examples/nested-rows.tsx) | Partners with their expense lines: sub-rows indented under the parent's name, a chevron toggle, together with selection and sorting — `getRowChildren`, `expanded`, `onExpandedChange`. |
 | [detail-panel.tsx](examples/detail-panel.tsx) | Order details in a full-width row under an expanded order, aligned with the first content column — `renderExpanded`, `defaultExpanded`. |
 | [sticky.tsx](examples/sticky.tsx) | Monthly sales by region in a 280 px window: the head and the region column stay while scrolling both ways — `stickyHeader`, `stickyFirstColumn`, `scrollHeight`. |
+| [columns-visibility.tsx](examples/columns-visibility.tsx) | Orders with a column chooser in the toolbar: fewer columns, less sideways scrolling; the order number always stays — `hiddenColumns`, `hideable`, `toolbar`. |
 | [infinite-scroll.tsx](examples/infinite-scroll.tsx) | An audit log that reveals loaded rows in batches and then asks the server for more — `paging`, `infiniteBatchSize`, `hasMore`, `loadingMore`, `onLoadMore`. |
 | [states.tsx](examples/states.tsx) | Loading skeleton, an empty period and a load error with a retry: the head stays, only the body changes — `loading`, `loadingRows`, `empty`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | Sort and page owned by the parent (a URL or a store): a header click goes asc → desc → none, a new sort returns to page 1 — `sort`, `onSortChange`, `page`, `onPageChange`. |
@@ -239,6 +249,9 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - A custom checkbox column → use `selectable` (range, drag and announcements built in).
 - A long table in a `scrollHeight` window without `stickyHeader` → the head scrolls away.
 - `paging="none"` for hundreds of rows → use `pages` or `infinite`.
+- Dropping columns below a breakpoint → people lose data without knowing it; offer a column chooser with `hiddenColumns`.
+- Letting the key column be hidden → set `hideable: false` on it, so every row keeps its name.
+- Wrapping the table in an `overflow-x` box of your own → it already scrolls inside and shows the edge shadows.
 
 ## Related
 - **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier)

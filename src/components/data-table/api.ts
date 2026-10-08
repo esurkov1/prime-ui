@@ -15,6 +15,12 @@ export const api: ComponentApi = {
           ru: "Описание колонок, см. `DataTableColumn<Row>`.",
         },
         {
+          name: "hiddenColumns",
+          type: "string[]",
+          en: "Ids of columns that are not rendered (head, body, skeleton and state rows); widths are measured again. A column with `hideable: false` stays. The list and the control that changes it (a column chooser in `toolbar`) belong to the consumer; sorting by a hidden column keeps the row order.",
+          ru: "Id колонок, которые не выводятся (шапка, тело, скелетоны и строки состояний); ширины измеряются заново. Колонка с `hideable: false` остаётся. Список и контрол, который его меняет (выбор колонок в `toolbar`), — у потребителя; сортировка по скрытой колонке сохраняет порядок строк.",
+        },
+        {
           name: "rows",
           type: "Row[]",
           required: true,
@@ -226,15 +232,15 @@ export const api: ComponentApi = {
           name: "stickyHeader",
           type: "boolean",
           default: "false",
-          en: "The head sticks while the body scrolls.",
-          ru: "Шапка остаётся видимой при прокрутке.",
+          en: "The head sticks while the body scrolls (with `scrollHeight`); on screens lower than 480px it scrolls with the rows.",
+          ru: "Шапка остаётся видимой при прокрутке (со `scrollHeight`); на экранах ниже 480px прокручивается вместе со строками.",
         },
         {
           name: "stickyFirstColumn",
           type: "boolean",
           default: "false",
-          en: "The first column (with the selection and toggle columns) sticks while scrolling sideways.",
-          ru: "Первая колонка (с колонками выбора и раскрытия) закреплена при горизонтальной прокрутке.",
+          en: "The first visible column (with the selection and toggle columns) sticks while scrolling sideways; the start edge shadow falls from its end edge.",
+          ru: "Первая видимая колонка (с колонками выбора и раскрытия) закреплена при горизонтальной прокрутке; тень начального края падает от её конца.",
         },
         {
           name: "showHeader",
@@ -385,6 +391,13 @@ export const api: ComponentApi = {
           type: "boolean",
           en: "Takes the free width and wraps its text; the table then fills its container. With `minWidth` it never gets narrower: below that the table scrolls instead of cells overlapping.",
           ru: "Забирает свободную ширину и переносит текст; таблица тогда заполняет контейнер. С `minWidth` не становится уже: ниже этого таблица прокручивается, ячейки не наезжают.",
+        },
+        {
+          name: "hideable",
+          type: "boolean",
+          default: "true",
+          en: "The column can be hidden through `hiddenColumns`; `false` for the key column that names the row.",
+          ru: "Колонку можно скрыть через `hiddenColumns`; `false` — для ключевой колонки, которая называет строку.",
         },
         {
           name: "width · minWidth · maxWidth",

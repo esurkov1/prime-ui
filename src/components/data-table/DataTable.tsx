@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useStateSwap } from "@/hooks/useStateSwap";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -67,6 +68,11 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   /** The outer card-fill `<div>`. */
   ref?: React.Ref<HTMLDivElement>;
   columns: DataTableColumn<Row>[];
+  /**
+   * Ids of columns not rendered (head, body, skeleton, state rows). A column with
+   * `hideable: false` stays. The consumer owns the list and the control that changes it.
+   */
+  hiddenColumns?: string[];
   rows: Row[];
   size?: ControlSize;
   className?: string;
@@ -147,7 +153,8 @@ const INFINITE_SCROLL_HEIGHT = 360;
 const domIdPart = (key: React.Key) => String(key).replace(/[^A-Za-z0-9_-]/g, "_");
 
 export function DataTable<Row>({
-  columns,
+  columns: allColumns,
+  hiddenColumns,
   rows,
   size = "m",
   className,
@@ -204,6 +211,17 @@ export function DataTable<Row>({
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const mergedRootRef = useMergedRefs(rootRef, ref);
 
+  // ─── Columns ───
+  // Hidden columns are not rendered at all; sorting still reads every column, so hiding the sorted
+  // column keeps the row order.
+  const columns = React.useMemo(() => {
+    if (!hiddenColumns?.length) return allColumns;
+    const hidden = new Set(hiddenColumns);
+    return allColumns.filter((column) => column.hideable === false || !hidden.has(column.id));
+  }, [allColumns, hiddenColumns]);
+  // Horizontal overflow of the viewport: the edge cue (shadows at the edges that hide columns).
+  const edges = useEdgeOverflow(scrollRef, true, true);
+
   // ─── Sort and page ───
   const [sortState, setSortState] = useControllableState<DataTableSortState>({
     value: sort,
@@ -216,7 +234,7 @@ export function DataTable<Row>({
     onChange: onPageChange,
   });
   const sortColumn = sortState
-    ? columns.find((column) => column.sortable && column.id === sortState.columnId)
+    ? allColumns.find((column) => column.sortable && column.id === sortState.columnId)
     : undefined;
   const sortOrder = sortColumn ? sortState?.order : undefined;
   const sortedRows = React.useMemo(
@@ -433,104 +451,109 @@ export function DataTable<Row>({
           selectable: selectable || undefined,
           expandable: expandEnabled || undefined,
           dragging: selection.dragging || undefined,
+          "overflow-start": edges.start || undefined,
+          "overflow-end": edges.end || undefined,
         })}
       >
         {toolbar != null ? <div className={styles.toolbar}>{toolbar}</div> : null}
 
-        <ScrollContainer
-          ref={scrollRef}
-          axis="both"
-          overscrollBehavior="none"
-          className={styles.viewport}
-          style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}
-        >
-          <table
-            ref={tableRef}
-            className={styles.table}
-            aria-busy={loading || loadingMore || undefined}
-            {...columnHover}
+        {/* The frame holds the edge shadows over the viewport; they never scroll with the table. */}
+        <div className={styles.frame}>
+          <ScrollContainer
+            ref={scrollRef}
+            axis="both"
+            overscrollBehavior="none"
+            className={styles.viewport}
+            style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}
           >
-            <colgroup>
-              {selectable ? <col /> : null}
-              {expandEnabled ? <col /> : null}
-              {columns.map((column) => (
-                <col key={column.id} data-grow={column.grow ? "true" : undefined} />
-              ))}
-            </colgroup>
-            {showHeader ? (
-              <Head
-                columns={columns}
-                size={size}
-                sort={sortState}
-                onSort={handleSort}
-                stickyFirstColumn={stickyFirstColumn}
-                stickyCorner={stickyHeader && stickyFirstColumn}
-                expandEnabled={expandEnabled}
-                selectAll={
-                  selectable
-                    ? {
-                        checked: selection.allSelected,
-                        indeterminate: selection.someSelected,
-                        disabled: flat.keys.length === 0,
-                        label: labels.selectAll,
-                        onToggle: selection.toggleAll,
-                      }
-                    : undefined
-                }
-              />
-            ) : null}
-
-            <tbody
-              key={bodySwapped ? bodyState : undefined}
-              className={bodySwapped ? swapMotion.swapIn : undefined}
+            <table
+              ref={tableRef}
+              className={styles.table}
+              aria-busy={loading || loadingMore || undefined}
+              {...columnHover}
             >
-              {bodyState === "rows" ? (
-                flat.rows.map((item, index) => (
-                  <DataTableRow
-                    key={String(item.key)}
-                    shared={shared}
-                    row={item.row}
-                    rowKey={item.key}
-                    index={index}
-                    depth={item.depth}
-                    expandable={item.expandable}
-                    expanded={item.expanded}
-                    animate={item.animate}
-                    detailAnimate={lastExpandedKey === item.key}
-                    selected={selectable && selection.selectedSet.has(item.key)}
-                    childControls={item.childKeys.map(rowDomId).join(" ")}
-                  />
-                ))
-              ) : (
-                <StateRows
-                  state={bodyState}
+              <colgroup>
+                {selectable ? <col /> : null}
+                {expandEnabled ? <col /> : null}
+                {columns.map((column) => (
+                  <col key={column.id} data-grow={column.grow ? "true" : undefined} />
+                ))}
+              </colgroup>
+              {showHeader ? (
+                <Head
                   columns={columns}
                   size={size}
-                  totalColumns={totalColumns}
+                  sort={sortState}
+                  onSort={handleSort}
+                  stickyFirstColumn={stickyFirstColumn}
+                  stickyCorner={stickyHeader && stickyFirstColumn}
+                  expandEnabled={expandEnabled}
+                  selectAll={
+                    selectable
+                      ? {
+                          checked: selection.allSelected,
+                          indeterminate: selection.someSelected,
+                          disabled: flat.keys.length === 0,
+                          label: labels.selectAll,
+                          onToggle: selection.toggleAll,
+                        }
+                      : undefined
+                  }
+                />
+              ) : null}
+
+              <tbody
+                key={bodySwapped ? bodyState : undefined}
+                className={bodySwapped ? swapMotion.swapIn : undefined}
+              >
+                {bodyState === "rows" ? (
+                  flat.rows.map((item, index) => (
+                    <DataTableRow
+                      key={String(item.key)}
+                      shared={shared}
+                      row={item.row}
+                      rowKey={item.key}
+                      index={index}
+                      depth={item.depth}
+                      expandable={item.expandable}
+                      expanded={item.expanded}
+                      animate={item.animate}
+                      detailAnimate={lastExpandedKey === item.key}
+                      selected={selectable && selection.selectedSet.has(item.key)}
+                      childControls={item.childKeys.map(rowDomId).join(" ")}
+                    />
+                  ))
+                ) : (
+                  <StateRows
+                    state={bodyState}
+                    columns={columns}
+                    size={size}
+                    totalColumns={totalColumns}
+                    selectable={selectable}
+                    expandEnabled={expandEnabled}
+                    error={error}
+                    empty={empty}
+                    emptyLabel={labels.empty}
+                    skeletonRows={Math.max(1, loadingRows ?? Math.min(safePageSize, SKELETON_ROWS))}
+                  />
+                )}
+              </tbody>
+
+              {flat.measure.length > 0 && !hasError ? (
+                <MeasureBody
+                  rows={flat.measure}
+                  columns={columns}
                   selectable={selectable}
                   expandEnabled={expandEnabled}
-                  error={error}
-                  empty={empty}
-                  emptyLabel={labels.empty}
-                  skeletonRows={Math.max(1, loadingRows ?? Math.min(safePageSize, SKELETON_ROWS))}
                 />
-              )}
-            </tbody>
+              ) : null}
+            </table>
 
-            {flat.measure.length > 0 && !hasError ? (
-              <MeasureBody
-                rows={flat.measure}
-                columns={columns}
-                selectable={selectable}
-                expandEnabled={expandEnabled}
-              />
+            {infinite ? (
+              <div ref={infiniteRows.sentinelRef} className={styles.sentinel} aria-hidden="true" />
             ) : null}
-          </table>
-
-          {infinite ? (
-            <div ref={infiniteRows.sentinelRef} className={styles.sentinel} aria-hidden="true" />
-          ) : null}
-        </ScrollContainer>
+          </ScrollContainer>
+        </div>
 
         {showSkeleton ? <VisuallyHidden role="status">{labels.loading}</VisuallyHidden> : null}
 

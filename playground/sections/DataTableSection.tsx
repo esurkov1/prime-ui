@@ -76,6 +76,12 @@ export const page: ComponentPageConfig = {
         "Продажи по регионам в окне 280 px: шапка и колонка регионов остаются на месте при прокрутке в обе стороны — `stickyHeader`, `stickyFirstColumn`, `scrollHeight`.",
     },
     {
+      scenario: "columns-visibility",
+      title: "Выбор колонок",
+      description:
+        "Заказы с выбором колонок на панели: меньше колонок — меньше прокрутки вбок, номер заказа остаётся всегда — `hiddenColumns`, `hideable`, `toolbar`.",
+    },
+    {
       scenario: "infinite-scroll",
       title: "Бесконечная прокрутка",
       description:
