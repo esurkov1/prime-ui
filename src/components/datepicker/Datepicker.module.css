@@ -183,16 +183,11 @@
 
 /* ─── Popover shell ─────────────────────────────────────────────────────── */
 
-[role="dialog"].popover {
+/* `flush` popover: the panel owns its padding; it is as wide as the months (and presets) need,
+   within the viewport. */
+.popover {
   width: fit-content;
   max-width: var(--float-max-w, calc(100vw - 2 * var(--prime-space-2)));
-  padding: 0;
-}
-
-.popoverBody {
-  display: flex;
-  min-width: 0;
-  min-height: 0;
 }
 
 /* ─── Panel ──────────────────────────────────────────────────────────────── */
