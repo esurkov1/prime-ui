@@ -10,15 +10,24 @@
   min-width: 0;
 }
 
+/*
+ * Filter button + search on one row of controls. The search grows from 9rem; when less than that
+ * is left beside the button, it moves under it at full width. Every row stays one control high.
+ */
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--prime-space-2);
   min-width: 0;
 }
 
+.filterButton {
+  flex: none;
+}
+
 .search {
-  flex: 1;
+  flex: 1 1 calc(var(--prime-space-24) * 1.5);
   min-width: 0;
 }
 

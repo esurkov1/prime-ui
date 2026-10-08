@@ -51,8 +51,8 @@ export const api: ComponentApi = {
           name: "fullWidth",
           type: "boolean",
           default: "true",
-          en: "Horizontal tabs share the list width equally, within `minItemWidth` … `maxItemWidth`; `false` sizes each tab to its content within the same bounds.",
-          ru: "Горизонтальные вкладки делят ширину списка поровну в пределах `minItemWidth` … `maxItemWidth`; `false` — каждая по своему содержимому в тех же пределах.",
+          en: "Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`, never narrower than their content: a long label keeps its width, short ones share the rest; when they do not fit, the list collapses, then scrolls. `false` sizes each tab to its content within the same bounds.",
+          ru: "Горизонтальные вкладки заполняют список и стремятся к равной ширине в пределах `minItemWidth` … `maxItemWidth`, но не уже своего содержимого: длинная подпись сохраняет ширину, короткие делят остаток; если не помещаются, список сворачивается, затем прокручивается. `false` — каждая по своему содержимому в тех же пределах.",
         },
         {
           name: "tone",
@@ -65,8 +65,8 @@ export const api: ComponentApi = {
           name: "minItemWidth",
           type: "number | string",
           default: "2.5 × control height",
-          en: "Narrowest a horizontal tab with a label gets, px or a CSS length; past it the list scrolls. Icon-only tabs are square.",
-          ru: "Наименьшая ширина горизонтальной вкладки с подписью, px или CSS-длина; дальше список прокручивается. Вкладки-иконки квадратные.",
+          en: "Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`). When tabs do not fit, the list collapses, then scrolls. Icon-only tabs are square.",
+          ru: "Наименьшая ширина горизонтальной вкладки с подписью, px или CSS-длина; вкладка к тому же не уже своего содержимого (до `maxItemWidth`). Если вкладки не помещаются, список сворачивается, затем прокручивается. Вкладки-иконки квадратные.",
         },
         {
           name: "maxItemWidth",
@@ -97,8 +97,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.List",
-      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (vertical: pill). When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); tabs then shrink to `minItemWidth` and the list scrolls.',
-      ru: '`role="tablist"` на `ScrollContainer` со скользящей папкой (в вертикальном режиме — пилюлей). Если вкладки не помещаются или подпись пришлось бы обрезать, скрывает иконки и описания, затем подписи (остаются иконки с подсказками; только если иконка есть у каждой вкладки); затем вкладки сжимаются до `minItemWidth` и список прокручивается.',
+      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (vertical: pill), which glides only into a choice by click or keys and is placed without motion on mount, resize and collapse. When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); then the list scrolls; a label is never cut to make room. The active tab is kept in view: only the list scrolls, never the page.',
+      ru: '`role="tablist"` на `ScrollContainer` со скользящей папкой (в вертикальном режиме — пилюлей): она скользит только к вкладке, выбранной кликом или клавишами, а при монтировании, изменении размера и сворачивании встаёт без анимации. Если вкладки не помещаются или подпись пришлось бы обрезать, скрывает иконки и описания, затем подписи (остаются иконки с подсказками; только если иконка есть у каждой вкладки); затем список прокручивается; подпись ради места не обрезается. Активная вкладка остаётся в поле зрения: прокручивается только список, не страница.',
       props: [
         {
           name: "children",

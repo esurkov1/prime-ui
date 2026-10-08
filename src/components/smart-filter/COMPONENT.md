@@ -117,6 +117,8 @@ same height and type.
 
 ## Layout & spacing
 - The panel is a flush Popover as wide as the toolbar; every section is a full-width row with its own padding (`--prime-space-3` × `--prime-space-4`, footer `--prime-space-2` × `--prime-space-4`), Dividers run edge to edge, the field label column is `--prime-space-24`.
+- The toolbar is one row of controls (`--prime-space-2` gap): the filter button keeps its width, the search grows from 9rem (`--prime-space-24` × 1.5). When less than 9rem is left beside the button, the search moves under it at full width; every row stays one control high.
+- Chips are Badges of the toolbar tier on the badge scale (`xs` → `s`), so a tag sits lower than the controls above it; «Добавить фильтр» is a tag of the same tier and «Сбросить все» a LinkButton with the tag's text size.
 - Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end.
 - The root is a flex column (`--prime-space-3`): Toolbar, then Chips.
 

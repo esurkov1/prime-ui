@@ -47,7 +47,7 @@ export const page: ComponentPageConfig = {
       scenario: "full-width",
       title: "На всю ширину",
       description:
-        "Группа заполняет колонку; сегменты делят ширину поровну и обрезают длинные подписи — `fullWidth`.",
+        "Группа заполняет колонку; сегменты стремятся к равной ширине, длинная подпись сохраняет свою — `fullWidth`.",
     },
     {
       scenario: "scroll",

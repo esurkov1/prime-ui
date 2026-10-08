@@ -1,4 +1,4 @@
-/** Open order cards as browser tabs: each closes by its button, Delete or a middle click; tabs stay between two widths and scroll past the narrower one — `onRemove`, `minItemWidth`, `maxItemWidth`. */
+/** Open order cards as browser tabs: each closes by its button, Delete or a middle click; tabs stay between two widths, and the list scrolls when they do not fit — `onRemove`, `minItemWidth`, `maxItemWidth`. */
 import { Button, Tabs, Typography } from "prime-ui-kit";
 import * as React from "react";
 

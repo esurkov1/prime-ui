@@ -5,8 +5,9 @@
  * is that surface rising into the strip, with concave flares where it meets the panel, gliding
  * between tabs. Hover is the same shape in `fill-faint`, painted under the folder so the two
  * never mix. No lines: depth from fill only. Tabs run edge to edge, each between
- * `--tabs-item-min` and `--tabs-item-max`; when they do not fit, icons and descriptions go first,
- * then labels (icons with tooltips stay), then tabs shrink to the minimum and the list scrolls.
+ * `--tabs-item-min` and `--tabs-item-max` and never narrower than their content; full width, they
+ * tend to equal widths. When they do not fit, icons and descriptions go first, then labels
+ * (icons with tooltips stay), then the list scrolls. The folder glides only into a person's choice.
  *
  * Vertical: rounded items without a rail; the active item is a `fill-muted` pill with a short
  * accent mark. Stacks into a scrolling row under 600px of container width.
@@ -165,16 +166,21 @@
   z-index: 1;
   pointer-events: none;
   opacity: 0;
-  /* Position (translate from TS) and size glide to the new tab on one curve. */
+}
+
+.indicator[data-visible="true"] {
+  opacity: 1;
+}
+
+/* Glides only into a person's choice (click, arrows, closing the active tab): position (translate
+   from TS) and size move to the new tab on one curve. Mount, resize, font loading, tab changes and
+   collapse place it without motion. */
+.indicator[data-animate="true"] {
   transition:
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.indicator[data-visible="true"] {
-  opacity: 1;
 }
 
 /* Horizontal: the panel surface under the active tab, flaring into the panel at both sides. */
@@ -274,17 +280,28 @@
   transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* Horizontal width: content size (plus a share of the spare width), within the min / max bounds. */
+/*
+ * Horizontal width: content size. The item never gets narrower than its content (`max-content`),
+ * and the tab bounds that content between `--tabs-item-min` and `--tabs-item-max` (past the cap a
+ * label ends with an ellipsis). A label is never cut to make room: when the tabs do not fit, the
+ * list collapses, then scrolls.
+ */
 .root[data-orientation="horizontal"] .item {
   flex: 0 1 auto;
-  min-width: var(--tabs-item-min);
+  min-width: max-content;
   max-width: var(--tabs-item-max);
   border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
 }
 
-/* Spare width is shared equally on top of each tab's content, so no label is cut to even them. */
+.root[data-orientation="horizontal"] .tab {
+  min-width: var(--tabs-item-min);
+  max-width: var(--tabs-item-max);
+}
+
+/* Full width: tabs tend to equal widths, not widths in proportion to their labels — a long label
+   keeps its width and the short ones share the rest. */
 .root[data-orientation="horizontal"][data-full-width="true"] .item {
-  flex: 1 1 auto;
+  flex: 1 1 0;
 }
 
 .root[data-orientation="horizontal"] .tab {
@@ -544,7 +561,8 @@
 }
 
 /* icon: a square of icons; the label stays for screen readers (sr-only) and fills the tooltip. */
-.list[data-collapse="icon"] .item {
+.root .list[data-collapse="icon"] .item,
+.root .list[data-collapse="icon"] .tab {
   min-width: var(--tabs-item-height);
 }
 
@@ -637,8 +655,8 @@
   }
 }
 
+/* Reduced motion: the list never sets `data-animate` on the indicator then. */
 @media (prefers-reduced-motion: reduce) {
-  .indicator,
   .content,
   .remove {
     transition: none;

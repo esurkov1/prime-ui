@@ -1,4 +1,4 @@
-/** The group fills its column; segments share the width equally and truncate long labels — `fullWidth`. */
+/** The group fills its column; segments tend to equal widths and a long label keeps its own — `fullWidth`. */
 import { SegmentedControl } from "prime-ui-kit";
 
 export default function SegmentedControlFullWidthExample() {

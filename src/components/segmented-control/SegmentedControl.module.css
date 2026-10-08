@@ -6,8 +6,8 @@
  * track with its own faint ring; it slides between segments. Segment radius = track radius − padding.
  * Two-line segments (with `SegmentedControl.Description`) grow the track to their content.
  * Narrow containers: segments never wrap; the row scrolls horizontally with edge fades.
- * `fullWidth` stretches the group: single-line segments share the width equally (labels truncate),
- * two-line segments grow from their content width.
+ * `fullWidth` stretches the group: single-line segments tend to equal widths but never get narrower
+ * than their label (the row scrolls instead), two-line segments grow from their content width.
  */
 
 /* Selected thumb: `--prime-color-control-selected` (white in light, a lighter step above the track in dark). */
@@ -164,14 +164,9 @@
   overflow: clip;
 }
 
-/* Full width: the list fills the viewport and single-line segments share it (and truncate). */
+/* Full width: the list fills the viewport and never gets narrower than its segments — when they
+   do not fit, the row scrolls. */
 .root[data-full-width="true"] .list {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-/* Two-line segments never shrink below their content: the list grows and the row scrolls. */
-.root[data-full-width="true"] .list:has(> [data-two-line="true"]) {
   flex: 1 0 auto;
 }
 
@@ -207,8 +202,14 @@
   transition: color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
+/* Full width: single-line segments tend to equal widths, not widths in proportion to their labels.
+   A long label keeps its width; the short ones share what is left. Nothing truncates. */
 .root[data-full-width="true"] .item {
   flex: 1 1 0;
+}
+
+.root[data-full-width="true"] .item:not([data-icon-only="true"], [data-two-line="true"]) {
+  min-width: max-content;
 }
 
 /* Icon-only segment: square (width = segment height). */
@@ -263,9 +264,6 @@
 /* ─── Parts ─────────────────────────────────────────────────────────────────── */
 
 .label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

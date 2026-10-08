@@ -54,8 +54,8 @@ export const api: ComponentApi = {
           name: "fullWidth",
           type: "boolean",
           default: "false",
-          en: "Fills the container; single-line segments share the width equally and truncate.",
-          ru: "Заполнить контейнер; однострочные сегменты делят ширину поровну и обрезаются.",
+          en: "Fills the container; single-line segments tend to equal widths but never get narrower than their label — when they do not fit, the row scrolls.",
+          ru: "Заполнить контейнер; однострочные сегменты стремятся к равной ширине, но не уже своей подписи — если не помещаются, ряд прокручивается.",
         },
         {
           name: "children",
@@ -73,7 +73,7 @@ export const api: ComponentApi = {
     },
     {
       name: "SegmentedControl.Item",
-      en: '`ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped to truncate.',
+      en: '`ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped in a `SegmentedControl.Label`.',
       ru: 'Один вариант — `<button role="radio">` с перемещаемым `tabIndex`.',
       props: [
         {
@@ -128,8 +128,8 @@ export const api: ComponentApi = {
     },
     {
       name: "SegmentedControl.Label",
-      en: "`ref` → `HTMLSpanElement`. Segment title; truncates with an ellipsis. Plain text is wrapped automatically.",
-      ru: "Подпись сегмента; обрезается многоточием. Простой текст оборачивается сам.",
+      en: "`ref` → `HTMLSpanElement`. Segment title on one line; never truncated. Plain text is wrapped automatically.",
+      ru: "Подпись сегмента в одну строку, не обрезается. Простой текст оборачивается сам.",
       props: [
         {
           name: "children",

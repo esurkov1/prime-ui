@@ -35,7 +35,10 @@ type TabsOrientation = "horizontal" | "vertical";
 
 type TabsContextValue = {
   activeValue: string;
+  /** A person's choice (click, arrows, closing the active tab): the folder glides to it. */
   select: (value: string) => void;
+  /** Set by `select`; the list reads and clears it on the next commit. */
+  userChangeRef: React.RefObject<boolean>;
   orientation: TabsOrientation;
   size: ControlSize;
   rootId: string;
@@ -74,9 +77,12 @@ export type TabsRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultV
   size?: ControlSize;
   /** Text and icon colour of the active tab. Default `neutral`: primary text, accent icon. */
   tone?: "neutral" | "accent";
-  /** Horizontal tabs share the list width. Default `true`; `false` sizes each tab to its content. */
+  /**
+   * Horizontal tabs fill the list and tend to equal widths, never narrower than their content.
+   * Default `true`; `false` sizes each tab to its content.
+   */
   fullWidth?: boolean;
-  /** Narrowest a horizontal tab with a label gets before the list scrolls (px or a CSS length). */
+  /** Narrowest a horizontal tab with a label gets (px or a CSS length); never below its content. */
   minItemWidth?: number | string;
   /** Widest a horizontal tab gets (px or a CSS length); a longer label ends with an ellipsis. */
   maxItemWidth?: number | string;
@@ -107,17 +113,28 @@ function TabsRoot({
     onChange: onValueChange,
   });
   const removeLabel = labels?.remove ?? TABS_LABELS.remove;
+  const userChangeRef = React.useRef(false);
+
+  const select = React.useCallback(
+    (next: string) => {
+      if (next === activeValue) return;
+      userChangeRef.current = true;
+      setActiveValue(next);
+    },
+    [activeValue, setActiveValue],
+  );
 
   const context = React.useMemo<TabsContextValue>(
     () => ({
       activeValue,
-      select: setActiveValue,
+      select,
+      userChangeRef,
       orientation,
       size,
       rootId,
       labels: { remove: removeLabel },
     }),
-    [activeValue, setActiveValue, orientation, size, rootId, removeLabel],
+    [activeValue, select, orientation, size, rootId, removeLabel],
   );
 
   // The defaults scale with the tier in CSS; a prop overrides them on the root.
@@ -206,9 +223,15 @@ function fitCollapse(list: HTMLElement): TabsCollapse {
 /**
  * Moves the indicator behind the active tab and keeps one tab stop: the active tab, or the first
  * enabled one while nothing is active. A flare that would hang past the list edge is dropped:
- * it would be clipped at the start and add a scroll overflow at the end.
+ * it would be clipped at the start and add a scroll overflow at the end. With `animate`, a move
+ * of a visible indicator glides (`data-animate`); every other placement snaps.
  */
-function placeIndicator(list: HTMLElement, indicator: HTMLElement, activeValue: string): void {
+function placeIndicator(
+  list: HTMLElement,
+  indicator: HTMLElement,
+  activeValue: string,
+  animate: boolean,
+): void {
   const items = itemsOf(list);
   const tabs = items.map(tabOf).filter((tab): tab is HTMLElement => tab !== null);
   const activeTab = tabs.find((tab) => tab.dataset.value === activeValue);
@@ -218,27 +241,60 @@ function placeIndicator(list: HTMLElement, indicator: HTMLElement, activeValue: 
   const box = activeTab?.parentElement;
   if (!box) {
     indicator.dataset.visible = "false";
+    delete indicator.dataset.animate;
     return;
   }
   const left = box.offsetLeft;
   const right = left + box.offsetWidth;
   const flare = Number.parseFloat(getComputedStyle(indicator, "::after").width) || 0;
-  indicator.style.transform = `translate(${left}px, ${box.offsetTop}px)`;
-  indicator.style.width = `${box.offsetWidth}px`;
-  indicator.style.height = `${box.offsetHeight}px`;
+  const transform = `translate(${left}px, ${box.offsetTop}px)`;
+  const width = `${box.offsetWidth}px`;
+  const height = `${box.offsetHeight}px`;
+  const moved =
+    indicator.style.transform !== transform ||
+    indicator.style.width !== width ||
+    indicator.style.height !== height;
+  if (moved) {
+    if (animate && indicator.dataset.visible === "true") indicator.dataset.animate = "true";
+    else delete indicator.dataset.animate;
+  }
+  indicator.style.transform = transform;
+  indicator.style.width = width;
+  indicator.style.height = height;
   indicator.dataset.edgeStart = String(left - flare < 0);
   indicator.dataset.edgeEnd = String(box === items.at(-1) && right + flare > list.clientWidth);
   indicator.dataset.visible = String(box.offsetWidth > 0 && box.offsetHeight > 0);
 }
 
 /**
+ * Scrolls the list (never the page: `scrollIntoView` would scroll it too) so the active tab is in
+ * view. Smooth only after a person's choice; on mount and outside changes it jumps.
+ */
+function revealActive(list: HTMLElement, smooth: boolean): void {
+  if (list.scrollWidth <= list.clientWidth || typeof list.scrollTo !== "function") return;
+  const box = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.parentElement;
+  if (!box) return;
+  const start = box.offsetLeft;
+  const end = start + box.offsetWidth;
+  const left =
+    start < list.scrollLeft
+      ? start
+      : end > list.scrollLeft + list.clientWidth
+        ? end - list.clientWidth
+        : null;
+  if (left !== null) list.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
+}
+
+/**
  * Fits the collapse level and places the indicator before paint, and again whenever the list or
  * a tab changes size (a container resize, a label or count changing, fonts loading) or tabs are
  * added or removed. Measuring writes to the DOM; React re-renders only when the level changes.
+ * Only the commit of a person's choice glides the indicator and scrolls the list smoothly.
  */
 function useListLayout(
   listRef: React.RefObject<HTMLElement | null>,
   indicatorRef: React.RefObject<HTMLElement | null>,
+  userChangeRef: React.RefObject<boolean>,
   activeValue: string,
   horizontal: boolean,
 ): TabsCollapse {
@@ -249,14 +305,18 @@ function useListLayout(
     const indicator = indicatorRef.current;
     if (!list || !indicator) return;
 
-    const layout = () => {
+    const layout = (animate: boolean) => {
       const level = horizontal ? fitCollapse(list) : "full";
       list.dataset.collapse = level;
       setCollapse(level);
-      placeIndicator(list, indicator, activeValue);
+      placeIndicator(list, indicator, activeValue, animate);
     };
+    const relayout = () => layout(false);
 
-    const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(layout);
+    const userChange = userChangeRef.current && !prefersReducedMotion();
+    userChangeRef.current = false;
+
+    const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(relayout);
     const observe = () => {
       resize?.disconnect();
       resize?.observe(list);
@@ -265,7 +325,7 @@ function useListLayout(
     // Tabs added or removed; a tab turning disabled moves the tab stop.
     const mutations = new MutationObserver(() => {
       observe();
-      layout();
+      relayout();
     });
     mutations.observe(list, {
       childList: true,
@@ -275,12 +335,19 @@ function useListLayout(
     });
 
     observe();
-    layout();
+    layout(userChange);
+    revealActive(list, userChange);
     return () => {
       mutations.disconnect();
       resize?.disconnect();
     };
-  }, [listRef, indicatorRef, activeValue, horizontal]);
+  }, [listRef, indicatorRef, userChangeRef, activeValue, horizontal]);
+
+  // A choice the owner did not apply (a controlled value kept as is) must not make a later
+  // outside change glide.
+  React.useLayoutEffect(() => {
+    userChangeRef.current = false;
+  });
 
   return collapse;
 }
@@ -292,34 +359,12 @@ export type TabsListProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 function TabsList({ children, className, ref, ...rest }: TabsListProps) {
-  const { orientation, activeValue, select, size } = useTabsContext();
+  const { orientation, activeValue, select, userChangeRef, size } = useTabsContext();
   const listRef = React.useRef<HTMLDivElement>(null);
   const indicatorRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(listRef, ref);
   const horizontal = orientation === "horizontal";
-  const collapse = useListLayout(listRef, indicatorRef, activeValue, horizontal);
-
-  // Keep the active tab visible inside a scrolling list. Only the list scrolls: `scrollIntoView`
-  // would also scroll the page to the tabs (on mount too).
-  React.useEffect(() => {
-    const list = listRef.current;
-    if (!list || !activeValue || list.scrollWidth <= list.clientWidth) return;
-    const box = list.querySelector<HTMLElement>(
-      '[role="tab"][aria-selected="true"]',
-    )?.parentElement;
-    if (!box) return;
-    const start = box.offsetLeft;
-    const end = start + box.offsetWidth;
-    const left =
-      start < list.scrollLeft
-        ? start
-        : end > list.scrollLeft + list.clientWidth
-          ? end - list.clientWidth
-          : null;
-    if (left !== null) {
-      list.scrollTo({ left, behavior: prefersReducedMotion() ? "auto" : "smooth" });
-    }
-  }, [activeValue]);
+  const collapse = useListLayout(listRef, indicatorRef, userChangeRef, activeValue, horizontal);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     const tabs = [
@@ -356,6 +401,11 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
         className={cx(styles.indicator, horizontal ? styles.indicatorFolder : styles.indicatorPill)}
         data-indicator=""
         aria-hidden="true"
+        onTransitionEnd={(event) => {
+          if (event.target === event.currentTarget && event.propertyName === "transform") {
+            delete event.currentTarget.dataset.animate;
+          }
+        }}
       />
       <ControlSizeProvider value={size}>
         <CollapseContext.Provider value={collapse}>{children}</CollapseContext.Provider>

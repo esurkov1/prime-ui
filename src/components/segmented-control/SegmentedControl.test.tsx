@@ -353,6 +353,95 @@ describe("SegmentedControl — thumb and parts", () => {
     ).not.toHaveAttribute("data-animate");
   });
 
+  it("keeps the selected segment in view: instantly on mount and outside changes, smoothly after a choice", () => {
+    const items = ["a", "b", "c", "d"].map((v) => (
+      <SegmentedControl.Item key={v} value={v}>
+        {v.toUpperCase()}
+      </SegmentedControl.Item>
+    ));
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
+    // jsdom has no layout: four 100px segments in a 150px row.
+    const order = ["a", "b", "c", "d"];
+    const spies = [
+      vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        return Math.max(order.indexOf(this.dataset.value ?? ""), 0) * 100;
+      }),
+      vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(100),
+      vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(400),
+      vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(150),
+    ];
+    const offsets = new WeakMap<HTMLElement, number>();
+    spies.push(
+      vi.spyOn(HTMLElement.prototype, "scrollLeft", "get").mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        return offsets.get(this) ?? 0;
+      }),
+    );
+    const scrollTo = vi.fn(function (this: HTMLElement, options: ScrollToOptions) {
+      offsets.set(this, options.left ?? 0);
+    });
+    const pageScroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    Object.defineProperty(HTMLElement.prototype, "scrollTo", {
+      configurable: true,
+      value: scrollTo,
+    });
+    try {
+      const { rerender } = render(
+        <SegmentedControl.Root value="d" aria-label="Период">
+          {items}
+        </SegmentedControl.Root>,
+      );
+      expect(scrollTo).toHaveBeenCalledTimes(1);
+      expect(scrollTo.mock.calls[0][0]).toMatchObject({ behavior: "auto" });
+      expect(scrollTo.mock.calls[0][0].left).toBeGreaterThan(0);
+
+      // A value set from outside: revealed without a glide.
+      rerender(
+        <SegmentedControl.Root value="a" aria-label="Период">
+          {items}
+        </SegmentedControl.Root>,
+      );
+      expect(scrollTo).toHaveBeenCalledTimes(2);
+      expect(scrollTo.mock.calls[1][0]).toMatchObject({ left: 0, behavior: "auto" });
+
+      // A re-render with the same value does not scroll again.
+      rerender(
+        <SegmentedControl.Root value="a" aria-label="Период" onValueChange={() => {}}>
+          {items}
+        </SegmentedControl.Root>,
+      );
+      expect(scrollTo).toHaveBeenCalledTimes(2);
+
+      // A person's choice glides.
+      fireEvent.click(screen.getByRole("radio", { name: "C" }));
+      rerender(
+        <SegmentedControl.Root value="c" aria-label="Период">
+          {items}
+        </SegmentedControl.Root>,
+      );
+      expect(scrollTo).toHaveBeenCalledTimes(3);
+      expect(scrollTo.mock.calls[2][0]).toMatchObject({ behavior: "smooth" });
+      expect(pageScroll).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+      for (const spy of spies) spy.mockRestore();
+      pageScroll.mockRestore();
+      delete (HTMLElement.prototype as { scrollTo?: unknown }).scrollTo;
+    }
+  });
+
+  it("full width: segments tend to equal widths and never get narrower than their label", () => {
+    const css = readFileSync(segmentedModuleCssPath, "utf8");
+    expect(css).toMatch(/\.root\[data-full-width="true"\] \.item \{\s*flex: 1 1 0;/);
+    expect(css).toMatch(
+      /\.root\[data-full-width="true"\] \.item:not\(\[data-icon-only="true"\], \[data-two-line="true"\]\) \{\s*min-width: max-content;/,
+    );
+    expect(css).toMatch(/\.root\[data-full-width="true"\] \.list \{\s*flex: 1 0 auto;/);
+  });
+
   it("hides the thumb when nothing is selected", () => {
     render(
       <SegmentedControl.Root aria-label="Вид">

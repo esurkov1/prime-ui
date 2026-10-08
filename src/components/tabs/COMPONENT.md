@@ -51,16 +51,16 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 | `onValueChange` | `(value: string) => void` | — | Called with the new active value. |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | List direction and arrow keys. A vertical list stacks above the panel when the container is narrower than 600px. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text, icon, spacing, folder radius and panel padding. A horizontal tab is the control height plus the folder rise on both sides; a vertical one is the control height. |
-| `fullWidth` | `boolean` | `true` | Horizontal tabs share the list width equally, within `minItemWidth` … `maxItemWidth`; `false` sizes each tab to its content within the same bounds. |
+| `fullWidth` | `boolean` | `true` | Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`, never narrower than their content: a long label keeps its width, short ones share the rest; when they do not fit, the list collapses, then scrolls. `false` sizes each tab to its content within the same bounds. |
 | `tone` | `"neutral" \| "accent"` | `"neutral"` | Colour of the active tab: `neutral` is primary text with an accent icon, `accent` puts text and icon in accent. |
-| `minItemWidth` | `number \| string` | `2.5 × control height` | Narrowest a horizontal tab with a label gets, px or a CSS length; past it the list scrolls. Icon-only tabs are square. |
+| `minItemWidth` | `number \| string` | `2.5 × control height` | Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`). When tabs do not fit, the list collapses, then scrolls. Icon-only tabs are square. |
 | `maxItemWidth` | `number \| string` | `7 × control height` | Widest a horizontal tab gets, px or a CSS length (`"none"` lifts the cap); a longer label ends with an ellipsis. |
 | `labels` | `Partial<TabsLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | `Tabs.List` and `Tabs.Panel`s. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">` | — | `className` and the other div attributes. |
 
 ### Tabs.List
-`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (vertical: pill). When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); tabs then shrink to `minItemWidth` and the list scrolls.
+`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (vertical: pill), which glides only into a choice by click or keys and is placed without motion on mount, resize and collapse. When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); then the list scrolls; a label is never cut to make room. The active tab is kept in view: only the list scrolls, never the page.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -156,13 +156,13 @@ A horizontal tab is the control height of the tier plus the rise above and below
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `fullWidth` | horizontal tabs share the list width equally (up to `maxItemWidth`), content centred; `false` sizes each tab to its content, the strip still spans the frame | `false` for tabs of very different label lengths | `true` |
+| `fullWidth` | horizontal tabs fill the list and tend to equal widths (`flex: 1 1 0`, up to `maxItemWidth`), content centred; a tab is never narrower than its content or `minItemWidth`, so a long label keeps its width and the short ones share the rest; `false` sizes each tab to its content, the strip still spans the frame | `false` for tabs of very different label lengths | `true` |
 
 ### minItemWidth · maxItemWidth
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | defaults | a horizontal tab is 2.5 to 7 control heights wide (90 … 252 at `m`); tabs never stretch into wide bars | most screens | yes |
-| lengths (`128`, `"16rem"`) | browser tabs: grow up to `maxItemWidth` with the label cut by an ellipsis past it, shrink to `minItemWidth` in a crowded list, then the list scrolls | open documents, records, chats — many tabs with long titles | |
+| lengths (`128`, `"16rem"`) | browser tabs: grow up to `maxItemWidth` with the label cut by an ellipsis past it, never narrower than `minItemWidth` or their title up to the cap; in a crowded list the list scrolls | open documents, records, chats — many tabs with long titles | |
 | `maxItemWidth="none"` | tabs share the whole strip | a few sections that must fill a wide frame | |
 
 ### Item content
@@ -187,14 +187,17 @@ Avoid icons or descriptions on only some tabs (uneven rows; without an icon on e
 | removable | `onRemove` on Item | item wrapper `data-removable="true"`, close button, tab `aria-keyshortcuts="Delete"` |
 | two-line | `Tabs.Description` child | `data-two-line="true"` |
 | collapsed | tabs wider than the list, or a label that would be cut (horizontal) | list `data-collapse="full" \| "compact" \| "icon"`: `compact` hides icons and descriptions; `icon` hides labels (sr-only, shown in a `Tooltip`), counts and close buttons, only when every tab has an icon |
-| overflow | tabs at `minItemWidth` (or icon squares) still wider than the list | `data-overflow-start` / `data-overflow-end` on the list (ScrollContainer), faded edges; the active tab scrolls into view |
+| overflow | tabs at their narrowest (content width, `minItemWidth` or icon squares) still wider than the list | `data-overflow-start` / `data-overflow-end` on the list (ScrollContainer), faded edges; the active tab is kept in view on mount and on every value change — only the list scrolls, never the page |
+
+The indicator glides (`emphasized` + `base`, `data-animate="true"`) only into a choice by click, arrow keys or closing the active tab; on mount, a value set from outside, a resize, font loading, tabs added or removed and collapse it is placed without motion, and it stays still under `prefers-reduced-motion`. The list scrolls smoothly to the active tab only after such a choice too.
 
 Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-width`, inline `--tabs-item-min` / `--tabs-item-max` when set; List `data-indicator="folder" | "pill"`; Item `data-value` on the tab, `data-state` / `data-disabled` on its wrapper too; Label `data-text`. Inactive panels are unmounted; a panel's content enters each time it opens.
 
 ## Layout & spacing
 - Horizontal: the root is the frame (`radius-xl`, `bg-sunken`), the list sits flush on the panel and runs edge to edge; the panel pads its content by tier (`--prime-space-4` … `--prime-space-8`). Do not wrap Tabs in a Card — it already is one.
 - Vertical list → panel: `var(--prime-space-6)`.
-- The list never wraps: it collapses, then scrolls horizontally with faded edges. Give the list's container a width (`min-width: 0` on flex children).
+- The list never wraps: it collapses, then scrolls horizontally with faded edges (hidden scrollbar, `overscroll-behavior: contain`). Give the list's container a width (`min-width: 0` on flex children).
+- A horizontal tab is never narrower than its content (`min-width: max-content`; the tab bounds that content between `minItemWidth` and `maxItemWidth`), so a label is never cut to make room. Full width, tabs tend to equal widths, not widths in proportion to their labels (`flex: 1 1 0`): a long label keeps its width, the short ones share the rest.
 - A vertical Tabs.Root is a size container: give it a width (it measures itself to switch to a row).
 - In a vertical layout align the panel heading with the first tab by making the heading row one control tall (`min-height: var(--prime-control-m-height)`).
 
@@ -234,7 +237,7 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 | [with-icon.tsx](examples/with-icon.tsx) | A muted icon before the label and a hairline before the service section — `Tabs.Icon`, `Tabs.Label`, `Tabs.Separator`. |
 | [orientation.tsx](examples/orientation.tsx) | Tabs over the panel and a side list of sections that stacks on top below 600px — `orientation`. |
 | [overflow.tsx](examples/overflow.tsx) | Drag the frame narrower: icons go first, then labels, and icons with tooltips stay; then the list scrolls — `Tabs.Icon`. |
-| [closable.tsx](examples/closable.tsx) | Open order cards as browser tabs: each closes by its button, Delete or a middle click; tabs stay between two widths and scroll past the narrower one — `onRemove`, `minItemWidth`, `maxItemWidth`. |
+| [closable.tsx](examples/closable.tsx) | Open order cards as browser tabs: each closes by its button, Delete or a middle click; tabs stay between two widths, and the list scrolls when they do not fit — `onRemove`, `minItemWidth`, `maxItemWidth`. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a summary on the second — `Tabs.Count`, `Tabs.Description`. |
 | [controlled.tsx](examples/controlled.tsx) | The active tab lives in parent state, e.g. synced with the URL — `value`, `onValueChange`. |
 

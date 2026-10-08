@@ -27,7 +27,7 @@ import { SegmentedControl } from "prime-ui-kit";
 SegmentedControl.Root                 role="radiogroup"; track + sliding thumb, scrolling row, keyboard
 └─ SegmentedControl.Item              role="radio" button, one option
    ├─ SegmentedControl.Icon           icon slot (optional; icon-only → square segment)
-   ├─ SegmentedControl.Label          title, truncates (optional; plain text is wrapped automatically)
+   ├─ SegmentedControl.Label          title, one line (optional; plain text is wrapped automatically)
    ├─ SegmentedControl.Count          counter Badge after the label (optional)
    └─ SegmentedControl.Description    second line; makes the segment two-line (optional)
 ```
@@ -46,12 +46,12 @@ SegmentedControl.Root                 role="radiogroup"; track + sliding thumb, 
 | `onValueChange` | `(value: string) => void` | — | Called with the new value on click or arrow keys. |
 | `disabled` | `boolean` | `false` | Disables the whole group. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48. Without it the tier of its host (a toolbar, a panel with a size), else `m`. |
-| `fullWidth` | `boolean` | `false` | Fills the container; single-line segments share the width equally and truncate. |
+| `fullWidth` | `boolean` | `false` | Fills the container; single-line segments tend to equal widths but never get narrower than their label — when they do not fit, the row scrolls. |
 | `children` | `ReactNode` | — | `SegmentedControl.Item`s (may be wrapped, e.g. in `Tooltip.Trigger`). |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" \| "onChange">` | — | `aria-label` / `aria-labelledby` (name the group), `className` and the other div attributes. |
 
 ### SegmentedControl.Item
-`ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped to truncate.
+`ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped in a `SegmentedControl.Label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -70,7 +70,7 @@ SegmentedControl.Root                 role="radiogroup"; track + sliding thumb, 
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### SegmentedControl.Label
-`ref` → `HTMLSpanElement`. Segment title; truncates with an ellipsis. Plain text is wrapped automatically.
+`ref` → `HTMLSpanElement`. Segment title on one line; never truncated. Plain text is wrapped automatically.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -123,7 +123,7 @@ Track is `fill-muted` with a faint 1px ring; the selected segment is a floating 
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `fullWidth` | fills the container; single-line segments are equal and truncate, two-line segments grow from their content | modals, mobile panels, overview strips | off |
+| `fullWidth` | fills the container; single-line segments tend to equal widths, a long label keeps its own width and the row scrolls when they do not fit; two-line segments grow from their content | modals, mobile panels, overview strips | off |
 | `disabled` | every segment disabled, thumb `fill-muted-hover` without shadow | the choice is temporarily unavailable | off |
 | icon-only (only `SegmentedControl.Icon`) | square segment (`data-icon-only`) | toolbar view toggles; needs `aria-label` | — |
 
@@ -140,13 +140,13 @@ Colour all items or none; do not give an item and its Count the same hue; prefer
 | focus-visible | keyboard | focus ring inside the segment |
 | overflow | row wider than the container | root `data-overflow-start` / `data-overflow-end`: edge fades in the track color |
 
-Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `data-value`, `data-color`. The thumb glides (`emphasized` + `base`, `data-animate`) only into a user's choice (click, arrows); a value set from outside and layout changes snap it; it stays still under `prefers-reduced-motion`. It sits inside the segment track, which clips it, so moving the selection never changes the row's scroll area; when the row scrolls, the chosen segment is scrolled into view.
+Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `data-value`, `data-color`. The thumb glides (`emphasized` + `base`, `data-animate`) only into a user's choice (click, arrows); a value set from outside and layout changes snap it; it stays still under `prefers-reduced-motion`. It sits inside the segment track, which clips it, so moving the selection never changes the row's scroll area. When the row scrolls, the selected segment is kept in view on mount and on every value change: only the row scrolls, never the page, and the scroll glides only after a user's choice.
 
 ## Layout & spacing
 - Width is content-based by default; segments never wrap. In a narrow container the row scrolls horizontally with fading edges.
 - In a toolbar: gap `--prime-space-3` between controls; keep every control at one size.
 - Caption under a group: gap `--prime-space-2`.
-- `fullWidth` inside modals and mobile sheets.
+- `fullWidth` inside modals and mobile sheets. Single-line segments are `flex: 1 1 0` with `min-width: max-content`: short labels share the spare width equally, a long label keeps its own width, nothing truncates; when the labels do not fit, the row scrolls.
 
 ## Accessibility
 
@@ -177,7 +177,7 @@ No `labels`.
 | [states.tsx](examples/states.tsx) | No selection yet, a disabled segment and a disabled group next to the default — `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | An icon before the label and square icon-only segments named for screen readers — `SegmentedControl.Icon`, `aria-label`. |
 | [colors.tsx](examples/colors.tsx) | A status per option: a dot of its hue before the label and a tinted thumb when chosen — `color`. |
-| [full-width.tsx](examples/full-width.tsx) | The group fills its column; segments share the width equally and truncate long labels — `fullWidth`. |
+| [full-width.tsx](examples/full-width.tsx) | The group fills its column; segments tend to equal widths and a long label keeps its own — `fullWidth`. |
 | [scroll.tsx](examples/scroll.tsx) | Segments never wrap: in a column narrower than the row it scrolls with edge fades and brings the chosen segment into view. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a metric on the second — `SegmentedControl.Label`, `SegmentedControl.Count`, `SegmentedControl.Description`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the choice and updates other content from it — `value`, `onValueChange`. |

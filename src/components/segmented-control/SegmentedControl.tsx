@@ -107,7 +107,10 @@ export type SegmentedControlRootProps = Omit<
   onValueChange?: (value: string) => void;
   disabled?: boolean;
   size?: ControlSize;
-  /** Stretch to the container width; segments share it equally and truncate their labels. */
+  /**
+   * Stretch to the container width. Single-line segments tend to equal widths but never get narrower
+   * than their label; when they do not fit, the row scrolls.
+   */
   fullWidth?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -138,6 +141,8 @@ function SegmentedControlRoot({
   const userChangeRef = React.useRef(false);
   /** Offset the row is gliding to after a choice; `null` once it arrives or the user scrolls. */
   const scrollTargetRef = React.useRef<number | null>(null);
+  /** The value the row last scrolled into view; `null` until the first commit. */
+  const revealedValueRef = React.useRef<string | null>(null);
   const [firstEnabled, setFirstEnabled] = React.useState("");
 
   const onSelect = React.useCallback(
@@ -165,13 +170,17 @@ function SegmentedControlRoot({
       setFirstEnabled(list.querySelector<HTMLElement>(ENABLED_ITEM)?.dataset.value ?? "");
     }
 
-    // A chosen segment in a scrolling row is brought into view (only the row scrolls, not the page).
+    // The selected segment of a scrolling row is brought into view on mount and whenever the value
+    // changes (only the row scrolls, not the page). It glides only into a user's choice.
+    const valueChanged = revealedValueRef.current !== selectedValue;
+    revealedValueRef.current = selectedValue;
     const active = list.querySelector<HTMLElement>(CHECKED_ITEM);
-    if (userChange && active && viewport.scrollWidth > viewport.clientWidth) {
+    if (valueChanged && active && viewport.scrollWidth > viewport.clientWidth) {
       const left = revealOffset(viewport, active);
       if (Math.abs(left - viewport.scrollLeft) >= 1 && typeof viewport.scrollTo === "function") {
-        scrollTargetRef.current = left;
-        viewport.scrollTo({ left, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+        const smooth = userChange && !prefersReducedMotion();
+        scrollTargetRef.current = smooth ? left : null;
+        viewport.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
       }
     }
     syncOverflow(viewport, scrollTargetRef.current ?? undefined);
@@ -315,7 +324,7 @@ function hasChildOfType(children: React.ReactNode, type: React.ElementType): boo
 /** Ids of an item's text parts: name = label + count, description = second line. */
 const ItemPartsContext = React.createContext<{ itemId: string } | null>(null);
 
-/** Text children get their own span so they can truncate in a `fullWidth` group. */
+/** Text children become a `SegmentedControl.Label` span, like an explicit label. */
 function wrapText(children: React.ReactNode): React.ReactNode {
   return React.Children.map(children, (child) =>
     (typeof child === "string" || typeof child === "number") && String(child).trim() !== "" ? (
@@ -405,7 +414,7 @@ export type SegmentedControlLabelProps = {
   ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
-/** Segment title; truncates with an ellipsis. Plain text children are wrapped automatically. */
+/** Segment title on one line; never truncated. Plain text children are wrapped automatically. */
 function SegmentedControlLabel({ children, className, ...rest }: SegmentedControlLabelProps) {
   const parts = React.useContext(ItemPartsContext);
   return (

@@ -241,6 +241,7 @@ function SmartFilterToolbar({ className, ...rest }: SmartFilterToolbarProps) {
               variant="soft"
               tone="neutral"
               size={size}
+              className={styles.filterButton}
               aria-expanded={open}
               aria-haspopup="dialog"
               onClick={() => setOpen(!open)}

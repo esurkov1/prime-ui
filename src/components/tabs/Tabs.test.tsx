@@ -1,8 +1,17 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Tabs } from "./Tabs";
+
+const TABS_CSS = readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), "Tabs.module.css"),
+  "utf8",
+);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -459,6 +468,126 @@ describe("Tabs — indicator", () => {
     vi.restoreAllMocks();
   });
 
+  it("glides the indicator only after a person's choice", () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
+    const offsets = { tab1: 0, tab2: 80 };
+    vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return offsets[valueOfBox(this) as keyof typeof offsets] ?? 0;
+    });
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(60);
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(32);
+    const items = (
+      <Tabs.List>
+        <Tabs.Item value="tab1">tab1</Tabs.Item>
+        <Tabs.Item value="tab2">tab2</Tabs.Item>
+      </Tabs.List>
+    );
+    try {
+      const { rerender } = render(<Tabs.Root value="tab1">{items}</Tabs.Root>);
+      const indicator = screen.getByRole("tablist").firstElementChild as HTMLElement;
+      // Placed on mount without motion.
+      expect(indicator).toHaveAttribute("data-visible", "true");
+      expect(indicator).not.toHaveAttribute("data-animate");
+
+      // A value set from outside snaps.
+      rerender(<Tabs.Root value="tab2">{items}</Tabs.Root>);
+      expect(indicator.style.transform).toBe("translate(80px, 0px)");
+      expect(indicator).not.toHaveAttribute("data-animate");
+
+      // A click applied by the owner glides; the flag clears when the glide ends.
+      rerender(
+        <Tabs.Root value="tab2" onValueChange={() => {}}>
+          {items}
+        </Tabs.Root>,
+      );
+      fireEvent.click(screen.getByRole("tab", { name: "tab1" }));
+      rerender(<Tabs.Root value="tab1">{items}</Tabs.Root>);
+      expect(indicator).toHaveAttribute("data-animate", "true");
+      fireEvent.transitionEnd(indicator, { propertyName: "transform" });
+      expect(indicator).not.toHaveAttribute("data-animate");
+    } finally {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    }
+  });
+
+  it("glides the indicator on arrow keys, never under reduced motion", () => {
+    vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return valueOfBox(this) === "tab2" ? 80 : 0;
+    });
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(60);
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(32);
+    try {
+      vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
+      const { unmount } = render(<BasicTabs />);
+      const indicator = screen.getByRole("tablist").firstElementChild as HTMLElement;
+      fireEvent.keyDown(screen.getByRole("tab", { name: "Tab 1" }), { key: "ArrowRight" });
+      expect(indicator).toHaveAttribute("data-animate", "true");
+      unmount();
+      vi.unstubAllGlobals();
+
+      // Test setup reports `prefers-reduced-motion: reduce`.
+      render(<BasicTabs />);
+      const still = screen.getByRole("tablist").firstElementChild as HTMLElement;
+      fireEvent.click(screen.getByRole("tab", { name: "Tab 2" }));
+      expect(still.style.transform).toBe("translate(80px, 0px)");
+      expect(still).not.toHaveAttribute("data-animate");
+    } finally {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    }
+  });
+
+  it("the indicator transition is declared only under data-animate", () => {
+    const base = TABS_CSS.match(/\n\.indicator \{[^}]*\}/s)?.[0] ?? "";
+    expect(base).not.toContain("transition");
+    expect(TABS_CSS).toMatch(/\.indicator\[data-animate="true"\] \{\s*transition:/);
+  });
+
+  it("scrolls the list to the selected tab on mount without a glide, smoothly after a choice", () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
+    const scrollTo = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollTo", {
+      configurable: true,
+      value: scrollTo,
+    });
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(400);
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(200);
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(100);
+    vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return valueOfBox(this) === "tab3" ? 300 : 0;
+    });
+    const pageScroll = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    try {
+      render(
+        <Tabs.Root defaultValue="tab3">
+          <Tabs.List>
+            <Tabs.Item value="tab1">Tab 1</Tabs.Item>
+            <Tabs.Item value="tab3">Tab 3</Tabs.Item>
+          </Tabs.List>
+        </Tabs.Root>,
+      );
+      expect(scrollTo).toHaveBeenCalledWith({ left: 200, behavior: "auto" });
+      // jsdom keeps scrollLeft at 0, so tab 1 is already in view: no scroll.
+      scrollTo.mockClear();
+      fireEvent.click(screen.getByRole("tab", { name: "Tab 1" }));
+      expect(scrollTo).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByRole("tab", { name: "Tab 3" }));
+      expect(scrollTo).toHaveBeenLastCalledWith({ left: 200, behavior: "smooth" });
+      expect(pageScroll).not.toHaveBeenCalled();
+    } finally {
+      Reflect.deleteProperty(HTMLElement.prototype, "scrollTo");
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    }
+  });
+
   it("scrolls only the list to the selected tab, never the page", () => {
     const scrollIntoView = vi.fn();
     const scrollTo = vi.fn();
@@ -604,6 +733,15 @@ describe("Tabs — width and collapse", () => {
       </Tabs.Root>,
     );
     expect(container.firstElementChild).toHaveAttribute("data-full-width", "false");
+  });
+
+  it("full width: tabs tend to equal widths and never get narrower than their content", () => {
+    const h = '.root[data-orientation="horizontal"]';
+    expect(TABS_CSS).toContain(`${h} .item {\n  flex: 0 1 auto;\n  min-width: max-content;`);
+    expect(TABS_CSS).toContain(
+      `${h} .tab {\n  min-width: var(--tabs-item-min);\n  max-width: var(--tabs-item-max);\n}`,
+    );
+    expect(TABS_CSS).toContain(`${h}[data-full-width="true"] .item {\n  flex: 1 1 0;\n}`);
   });
 
   it("shows everything while the items fit", () => {
