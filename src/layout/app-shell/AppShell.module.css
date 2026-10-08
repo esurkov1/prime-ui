@@ -145,7 +145,8 @@
   padding-block-end: calc(
     var(--prime-space-16) +
     var(--prime-bottom-nav-floating-item-size) +
-    var(--prime-bottom-nav-floating-padding) * 2 +
+    var(--prime-bottom-nav-floating-padding) *
+    2 +
     env(safe-area-inset-bottom, 0px)
   );
 }

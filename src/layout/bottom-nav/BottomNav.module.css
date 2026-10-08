@@ -47,7 +47,7 @@
   box-shadow:
     inset 0 var(--prime-border-width) 0 var(--prime-color-bg-glass-edge),
     inset 0 0 0 var(--prime-border-width)
-      color-mix(in srgb, var(--prime-color-text-primary) 6%, transparent),
+    color-mix(in srgb, var(--prime-color-text-primary) 6%, transparent),
     var(--prime-shadow-overlay);
   -webkit-backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
   backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
