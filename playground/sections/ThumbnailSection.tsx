@@ -1,6 +1,6 @@
-import { Image } from "lucide-react";
 import { api } from "@/components/thumbnail/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Image } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "data-display",

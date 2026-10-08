@@ -1,0 +1,13 @@
+import { defineGlyph } from "../glyph";
+
+/** Lucide `key`: key teeth nudge up. */
+export const Key = /* @__PURE__ */ defineGlyph(
+  "Key",
+  <>
+    <g data-motion="nudge" data-dir="up">
+      <path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4" />
+    </g>
+    <path d="m21 2-9.6 9.6" />
+    <circle cx="7.5" cy="15.5" r="5.5" />
+  </>,
+);

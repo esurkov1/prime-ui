@@ -1,6 +1,6 @@
-import { UserRound } from "lucide-react";
 import { api } from "@/components/avatar/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { UserRound } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "data-display",

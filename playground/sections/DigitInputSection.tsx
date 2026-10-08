@@ -1,6 +1,6 @@
-import { Hash } from "lucide-react";
 import { api } from "@/components/digit-input/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Hash } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "inputs",

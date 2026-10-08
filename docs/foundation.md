@@ -266,13 +266,20 @@ Every component is designed with its micro-animations, not only its static state
    swapping its content uses `Crossfade` (inside a component: `useStateSwap` + `swapMotion`), and its
    loading state is a `Skeleton` of the coming content (principle 7).
 9. **Interruptible.** Toggled state uses CSS transitions (retarget mid-flight), not keyframes. Keyframes only
-   for one-shot enter/exit (overlay presence, spinner, skeleton).
+   for one-shot enter/exit (overlay presence, spinner, skeleton) and one-shot icon gestures (rule 13).
 10. **Hover is for pointers.** Hover transforms/lifts only inside `@media (hover: hover) and (pointer: fine)`;
-    plain color hover is fine. No hover movement on dense rows and cells.
+    plain color hover is fine. No hover movement on dense rows and cells, except the icon gesture (rule 13).
 11. **Lists.** Items entering/leaving fade + shift; stagger only for first-render of short groups
     (`--prime-motion-stagger` steps, ≤ 6 items) and never blocks interaction.
 12. **Reduced motion** is already global through the tokens. Anything not tokenized (JS, `animation-delay`) must
     be gated by `prefers-reduced-motion`. Movement may go; opacity/color feedback should stay.
+13. **Icon gestures.** Every kit glyph carries one small gesture about its meaning (an arrow steps its way,
+    a gear turns, a bell swings, a check draws) from one vocabulary (`src/icons/glyphMotion.module.css`). It
+    plays once, to completion, when a pointer enters the icon's host (button, link, tab, label) or a finger
+    presses it — menu items, options and table rows are hosts too, and an icon belongs to the nearest
+    host; never on keyboard focus (arrowing through a list stays calm), never under reduced motion. One
+    amplitude for all glyphs, large enough to read at 16 px. Gestures start and end at rest, move parts
+    of the glyph and never the svg, so a host turning or flipping the icon composes with them; `animated={false}` keeps an icon still.
 
 Component checklist for motion: press · hover/focus fill · selection/toggle · open/close · enter/exit of
 parts (items, messages, badges, icons) · loading/progress · reduced motion. Skip what the rules above say

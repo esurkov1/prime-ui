@@ -1,6 +1,6 @@
-import { Minus } from "lucide-react";
 import { api } from "@/components/divider/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Minus } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "page",

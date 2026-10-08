@@ -1,6 +1,6 @@
-import { Bookmark } from "lucide-react";
 import { api } from "@/components/label/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Bookmark } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "inputs",

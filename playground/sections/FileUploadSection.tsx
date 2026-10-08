@@ -1,6 +1,6 @@
-import { Upload } from "lucide-react";
 import { api } from "@/components/file-upload/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Upload } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "inputs",

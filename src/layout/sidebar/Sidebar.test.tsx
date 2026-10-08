@@ -1,12 +1,12 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Home, Settings } from "lucide-react";
 import type * as React from "react";
 import { MemoryRouter, NavLink } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { Icon } from "@/icons";
 
 import { Sidebar, type SidebarMode, useSidebar } from "./Sidebar";
 
@@ -53,13 +53,13 @@ function Basic(props: React.ComponentProps<typeof Sidebar.Root>) {
         <Sidebar.Group label="Разделы">
           <Sidebar.Item current>
             <Sidebar.ItemIcon>
-              <Home />
+              <Icon name="nav.home" />
             </Sidebar.ItemIcon>
             Главная
           </Sidebar.Item>
           <Sidebar.Item>
             <Sidebar.ItemIcon>
-              <Settings />
+              <Icon name="action.settings" />
             </Sidebar.ItemIcon>
             Настройки
             <Sidebar.ItemCount>5</Sidebar.ItemCount>
@@ -136,7 +136,7 @@ describe("Sidebar", () => {
           <Sidebar.Item asChild>
             <NavLink to="/" end>
               <Sidebar.ItemIcon>
-                <Home />
+                <Icon name="nav.home" />
               </Sidebar.ItemIcon>
               Главная
             </NavLink>
@@ -144,7 +144,7 @@ describe("Sidebar", () => {
           <Sidebar.Item asChild>
             <NavLink to="/settings">
               <Sidebar.ItemIcon>
-                <Settings />
+                <Icon name="action.settings" />
               </Sidebar.ItemIcon>
               Настройки
             </NavLink>
@@ -443,11 +443,11 @@ describe("Sidebar item parts", () => {
       <Sidebar.Root offCanvas="never">
         <Sidebar.Item href="/help">
           <Sidebar.ItemIcon>
-            <Home data-testid="lead" />
+            <Icon name="nav.home" data-testid="lead" />
           </Sidebar.ItemIcon>
           Справка
           <Sidebar.ItemIcon>
-            <Settings data-testid="trail" />
+            <Icon name="action.settings" data-testid="trail" />
           </Sidebar.ItemIcon>
         </Sidebar.Item>
       </Sidebar.Root>,
@@ -744,7 +744,7 @@ describe("Sidebar.Sub", () => {
         <Sidebar.Sub>
           <Sidebar.SubTrigger>
             <Sidebar.ItemIcon>
-              <Home />
+              <Icon name="nav.home" />
             </Sidebar.ItemIcon>
             Задачи
           </Sidebar.SubTrigger>

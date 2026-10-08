@@ -1,6 +1,6 @@
-import { PanelBottom } from "lucide-react";
 import { api } from "@/layout/bottom-nav/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { PanelBottom } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "navigation",

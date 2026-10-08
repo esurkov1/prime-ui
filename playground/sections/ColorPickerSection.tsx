@@ -1,6 +1,6 @@
-import { Pipette } from "lucide-react";
 import { api } from "@/components/color-picker/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Pipette } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

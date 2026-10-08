@@ -1,6 +1,6 @@
-import { PanelLeft } from "lucide-react";
 import { api } from "@/layout/sidebar/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { PanelLeft } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "navigation",

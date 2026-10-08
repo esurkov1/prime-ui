@@ -1,6 +1,6 @@
-import { GripVertical } from "lucide-react";
 import { api } from "@/components/dnd/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { GripVertical } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "interaction",

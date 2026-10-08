@@ -1,0 +1,156 @@
+/* Icons page: tokens only; the catalog adapts to its own container (320px and up). */
+
+.catalog {
+  display: grid;
+  gap: var(--prime-space-4);
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.controls {
+  display: grid;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.search {
+  flex: 0 0 calc(var(--prime-space-24) * 3);
+}
+
+@container (max-width: 40rem) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search {
+    flex-basis: auto;
+  }
+}
+
+.counter {
+  font-variant-numeric: tabular-nums;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr));
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@container@container (max-width: 24rem) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.cell {
+  display: flex;
+  min-width: 0;
+}
+
+.tile {
+  display: grid;
+  flex: 1;
+  align-content: center;
+  justify-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  padding: var(--prime-space-3) var(--prime-space-1) var(--prime-space-2);
+  border: 0;
+  border-radius: var(--prime-radius-m);
+  /* A surface on the ladder: the layer of its `data-depth`, the raised whisper on the page. */
+  background: var(--prime-color-layer-current);
+  box-shadow: var(--prime-layer-shadow);
+  color: var(--prime-color-text-primary);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  /* A whole surface lifts on hover instead of changing its fill (foundation, hover on a surface). */
+  .tile:hover {
+    box-shadow: var(--prime-shadow-overlay);
+  }
+}
+
+.tile:active {
+  transform: scale(var(--prime-motion-press-scale));
+}
+
+.tile:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.glyph {
+  display: grid;
+  place-items: center;
+}
+
+.caption {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+/* One line each, so every tile is the same height; the full name is in the tile's title. */
+.name,
+.meaning {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The caption is quieter than the glyph: both at the kit's smallest label size; the
+   component name in mono, the semantic or Lucide name quieter still. */
+.name {
+  font-family: var(--prime-font-family-mono);
+  font-size: var(--prime-bottom-nav-label-size);
+  line-height: var(--prime-bottom-nav-label-line-height);
+  color: var(--prime-color-text-placeholder);
+}
+
+.name[data-state="copied"] {
+  color: var(--prime-color-success-text);
+}
+
+.name[data-state="failed"] {
+  color: var(--prime-color-danger-text);
+}
+
+/* The kit's smallest legible label size (the BottomNav label). */
+.meaning {
+  font-size: var(--prime-bottom-nav-label-size);
+  line-height: var(--prime-bottom-nav-label-line-height);
+  color: var(--prime-color-text-disabled);
+}
+
+.snippets {
+  display: grid;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-4);
+}

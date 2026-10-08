@@ -1,6 +1,6 @@
-import { Maximize2 } from "lucide-react";
 import { api } from "@/components/modal/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Maximize2 } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "overlays",

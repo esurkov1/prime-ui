@@ -1,6 +1,6 @@
-import { CircleHelp } from "lucide-react";
 import { api } from "@/components/tooltip/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { CircleQuestionMark } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "overlays",
@@ -9,7 +9,7 @@ export const page: ComponentPageConfig = {
     label: "Tooltip",
     summary: "Короткая подсказка при наведении",
     keywords: ["подсказка", "тултип", "hover", "side"],
-    icon: CircleHelp,
+    icon: CircleQuestionMark,
     order: 1,
   },
   dir: "tooltip",

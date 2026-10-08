@@ -1,6 +1,6 @@
-import { RectangleHorizontal } from "lucide-react";
 import { api } from "@/components/skeleton/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { RectangleHorizontal } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "status",

@@ -1,6 +1,6 @@
-import { Rows3 } from "lucide-react";
 import { api } from "@/components/segmented-control/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Rows3 } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

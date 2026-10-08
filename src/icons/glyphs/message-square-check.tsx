@@ -1,0 +1,10 @@
+import { defineGlyph } from "../glyph";
+
+/** Lucide `message-square-check`: the check draws itself. */
+export const MessageSquareCheck = /* @__PURE__ */ defineGlyph(
+  "MessageSquareCheck",
+  <>
+    <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.7.7 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+    <path d="m9 11 2 2 4-4" pathLength="1" data-motion="draw" />
+  </>,
+);

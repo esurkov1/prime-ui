@@ -1,6 +1,6 @@
-import { LayoutList } from "lucide-react";
 import { api } from "@/components/tabs/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { LayoutList } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "navigation",

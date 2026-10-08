@@ -1,6 +1,6 @@
-import { Calendar } from "lucide-react";
 import { api } from "@/components/datepicker/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Calendar } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

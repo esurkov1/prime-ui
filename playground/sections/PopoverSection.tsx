@@ -1,6 +1,6 @@
-import { MessageSquare } from "lucide-react";
 import { api } from "@/components/popover/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { MessageSquare } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "overlays",

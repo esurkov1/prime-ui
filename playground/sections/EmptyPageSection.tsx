@@ -1,6 +1,6 @@
-import { Inbox } from "lucide-react";
 import { api } from "@/components/empty-page/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Inbox } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "status",

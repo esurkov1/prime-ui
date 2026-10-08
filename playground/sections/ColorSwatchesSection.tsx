@@ -1,6 +1,6 @@
-import { SwatchBook } from "lucide-react";
 import { api } from "@/components/color-swatches/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { SwatchBook } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

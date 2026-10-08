@@ -1,6 +1,6 @@
-import { PanelTop } from "lucide-react";
 import { api } from "@/components/page-content/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { PanelTop } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "page",

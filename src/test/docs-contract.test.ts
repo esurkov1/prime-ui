@@ -8,6 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import * as lucide from "lucide-react";
+import * as iconSet from "@/icon-set";
 import { iconRegistry } from "@/icons/registry";
 import type { ComponentPageConfig } from "../../playground/components/ComponentPage";
 import {
@@ -75,10 +76,11 @@ const DOMAIN_GLYPHS: Record<string, string> = {
   Bike: "Thumbnail examples show a motorcycle catalog and wrap the glyph with createIcon.",
 };
 
-/** Registry names per lucide glyph (aliases share one glyph). */
+/** Registry names per lucide glyph a kit glyph is drawn from (aliases share one glyph). */
 function registryNamesByGlyph(): Map<unknown, string[]> {
   const byGlyph = new Map<unknown, string[]>();
-  for (const [name, glyph] of Object.entries(iconRegistry)) {
+  for (const [name, { source }] of Object.entries(iconRegistry)) {
+    const glyph = (lucide as unknown as Record<string, unknown>)[source];
     byGlyph.set(glyph, [...(byGlyph.get(glyph) ?? []), name]);
   }
   return byGlyph;
@@ -329,6 +331,16 @@ describe("kit icons first", () => {
       expect(
         registered,
         `${file}: use <Icon name="${registered?.[0]}" /> instead of lucide "${name}"`,
+      ).toBeUndefined();
+      const inSet = Object.entries(iconSet).find(
+        ([, value]) =>
+          typeof value === "function" &&
+          "source" in value &&
+          glyphs[value.source as string] === glyph,
+      );
+      expect(
+        inSet,
+        `${file}: use ${inSet?.[0]} from "prime-ui-kit/icons" instead of lucide "${name}"`,
       ).toBeUndefined();
       expect(
         DOMAIN_GLYPHS[name],

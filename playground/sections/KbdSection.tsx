@@ -1,6 +1,6 @@
-import { Keyboard } from "lucide-react";
 import { api } from "@/components/kbd/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Keyboard } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "data-display",

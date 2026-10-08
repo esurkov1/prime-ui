@@ -1,6 +1,6 @@
-import { Info } from "lucide-react";
 import { api } from "@/components/hint/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Info } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "inputs",

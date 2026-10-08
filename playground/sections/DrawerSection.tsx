@@ -1,6 +1,6 @@
-import { PanelRight } from "lucide-react";
 import { api } from "@/components/drawer/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { PanelRight } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "overlays",

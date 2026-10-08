@@ -175,11 +175,18 @@ Cancel.
 - `status.*`: `danger`, `emailSent`, `info`, `locked`, `offline`, `success`, `warning`;
 - `theme.*`: `dark`, `light`; `view.*`: `code`, `preview`; `viewport.*`: `desktop`, `mobile`, `tablet`.
 
-Take a glyph from the kit first. Only a domain glyph the kit lacks (a bike, a tooth) comes from
-`lucide-react` (add it to the app's dependencies), wrapped once at module level with `createIcon` so it
-sizes and tones like a kit icon: `const IconBike = createIcon(Bike);` → `<IconBike />`. Icon-only buttons need `aria-label`;
+Take a glyph from the kit first: a semantic `<Icon name>` above; any other glyph from the full animated
+set `prime-ui-kit/icons` (about 500 named components with the same `size`, `tone`, `animated` —
+`import { BellIcon } from "prime-ui-kit/icons"` → `<BellIcon />`; only what you import is bundled).
+Only a domain glyph neither has (a bike, a tooth) comes from `lucide-react` (add it to the app's
+dependencies), wrapped once at module level with `createIcon` so it sizes and tones like a kit icon: `const IconBike = createIcon(Bike);` → `<IconBike />`. Icon-only buttons need `aria-label`;
 decorative icons inside kit slots (`Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`) are hidden
 automatically.
+
+Every kit icon is animated: its gesture plays once when the host it sits in (button, link, tab,
+label, menu item, option, table row) is hovered or pressed on touch — nothing to wire. Keyboard
+focus and reduced motion stay still; `animated={false}` keeps one icon still. A `createIcon`
+glyph gets a soft pop.
 
 ## Styling your own wrappers
 

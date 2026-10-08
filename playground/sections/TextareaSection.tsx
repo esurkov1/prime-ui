@@ -1,6 +1,6 @@
-import { AlignLeft } from "lucide-react";
 import { api } from "@/components/textarea/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { TextAlignStart } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "inputs",
@@ -9,7 +9,7 @@ export const page: ComponentPageConfig = {
     label: "Textarea",
     summary: "Многострочное поле со счётчиком символов",
     keywords: ["текстовая область", "многострочное", "maxLength", "onValueChange"],
-    icon: AlignLeft,
+    icon: TextAlignStart,
     order: 2,
   },
   dir: "textarea",

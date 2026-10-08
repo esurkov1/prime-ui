@@ -1,6 +1,6 @@
-import { StretchHorizontal } from "lucide-react";
 import { api } from "@/components/progress-bar/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { StretchHorizontal } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "status",

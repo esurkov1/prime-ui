@@ -1,6 +1,6 @@
-import { ListChecks } from "lucide-react";
 import { api } from "@/components/dropdown/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { ListChecks } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "overlays",

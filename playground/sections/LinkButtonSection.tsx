@@ -1,6 +1,6 @@
-import { Link2 } from "lucide-react";
 import { api } from "@/components/link-button/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Link2 } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "actions",

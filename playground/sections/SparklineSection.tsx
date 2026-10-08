@@ -1,6 +1,6 @@
-import { ChartSpline } from "lucide-react";
 import { api } from "@/components/sparkline/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { ChartSpline } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "data-display",

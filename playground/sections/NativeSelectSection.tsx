@@ -1,6 +1,6 @@
-import { ChevronDown } from "lucide-react";
 import { api } from "@/components/native-select/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { ChevronDown } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

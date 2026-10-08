@@ -1,8 +1,7 @@
-import { Moon, SquareStack, Sun } from "lucide-react";
-
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import { Moon, SquareStack, Sun } from "../icons";
 
 import { PLAYGROUND_PREVIEW_SURFACES, usePlaygroundPreviewTheme } from "./PlaygroundPreviewTheme";
 import { usePlaygroundTheme } from "./PlaygroundTheme";

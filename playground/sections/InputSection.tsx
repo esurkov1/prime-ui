@@ -1,6 +1,6 @@
-import { TextCursorInput } from "lucide-react";
 import { api } from "@/components/input/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { TextCursorInput } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "inputs",

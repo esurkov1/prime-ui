@@ -1,6 +1,6 @@
-import { SquareKanban } from "lucide-react";
 import { api } from "@/components/kanban/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { SquareKanban } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "data-display",

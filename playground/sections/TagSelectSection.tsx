@@ -1,6 +1,6 @@
-import { Tags } from "lucide-react";
 import { api } from "@/components/tag-select/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Tags } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

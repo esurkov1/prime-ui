@@ -1,6 +1,6 @@
-import { Code2 } from "lucide-react";
 import { api } from "@/components/code-block/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { CodeXml } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "data-display",
@@ -9,7 +9,7 @@ export const page: ComponentPageConfig = {
     label: "Code Block",
     summary: "Блок кода с подсветкой синтаксиса",
     keywords: ["код", "подсветка", "language"],
-    icon: Code2,
+    icon: CodeXml,
     order: 9,
   },
   dir: "code-block",

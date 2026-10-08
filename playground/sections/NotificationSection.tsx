@@ -1,6 +1,6 @@
-import { Bell } from "lucide-react";
 import { api } from "@/components/notification/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Bell } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "status",

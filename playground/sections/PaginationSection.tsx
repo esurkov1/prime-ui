@@ -1,6 +1,6 @@
-import { ChevronsLeftRight } from "lucide-react";
 import { api } from "@/components/pagination/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { ChevronsLeftRight } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "navigation",

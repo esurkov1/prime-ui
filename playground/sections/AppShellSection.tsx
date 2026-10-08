@@ -1,6 +1,6 @@
-import { LayoutTemplate } from "lucide-react";
 import { api } from "@/layout/app-shell/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { LayoutTemplate } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "page",

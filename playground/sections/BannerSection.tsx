@@ -1,6 +1,6 @@
-import { Megaphone } from "lucide-react";
 import { api } from "@/components/banner/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Megaphone } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "status",

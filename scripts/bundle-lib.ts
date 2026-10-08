@@ -1,6 +1,7 @@
 /**
  * Library bundle via esbuild (no Rollup/treeshake pass that breaks CSS Modules).
- * JS: `src/index.ts` → `dist/index.js`, `src/color-picker.ts` → `dist/color-picker.js`, shared code
+ * JS: `src/index.ts` → `dist/index.js`, `src/color-picker.ts` → `dist/color-picker.js`,
+ * `src/icon-set.ts` → `dist/icons.js`, shared code
  * in `dist/chunks/`. CSS: the base layer (`src/styles/globals.css`: tokens, themes, focus ring,
  * reduced motion) followed by every component module → `dist/index.css` (`prime-ui-kit/bundle.css`). Types: `tsc --emitDeclarationOnly` → `.dts-stage`, merged into `dist/`.
  */
@@ -17,19 +18,24 @@ const dist = resolve(root, "dist");
 await rm(dist, { recursive: true, force: true });
 
 /*
- * Two JS entries: `prime-ui-kit` and `prime-ui-kit/color-picker` (the only code on react-aria).
- * Splitting puts the shared modules in chunks, so both entries use one copy of every context. A
- * third, temporary entry imports both: one build keeps CSS Module class names identical, and its
+ * Three JS entries: `prime-ui-kit`, `prime-ui-kit/color-picker` (the only code on react-aria) and
+ * `prime-ui-kit/icons` (every glyph as a named, tree-shakable component). Splitting puts the shared
+ * modules in chunks, so the entries use one copy of every context and glyph. A fourth, temporary
+ * entry imports them all: one build keeps CSS Module class names identical, and its
  * CSS (every component) becomes `bundle.css`; the per-entry CSS files are dropped.
  */
 const allEntry = resolve(root, ".bundle-all.ts");
-await writeFile(allEntry, 'export * from "./src/index";\nexport * from "./src/color-picker";\n');
+await writeFile(
+  allEntry,
+  'export * from "./src/index";\nexport * from "./src/color-picker";\nexport * from "./src/icon-set";\n',
+);
 try {
   await esbuild.build({
     absWorkingDir: root,
     entryPoints: [
       { in: "src/index.ts", out: "index" },
       { in: "src/color-picker.ts", out: "color-picker" },
+      { in: "src/icon-set.ts", out: "icons" },
       { in: ".bundle-all.ts", out: "all" },
     ],
     outdir: "dist",
@@ -50,6 +56,7 @@ try {
 }
 await rm(resolve(dist, "all.js"), { force: true });
 await rm(resolve(dist, "color-picker.css"), { force: true });
+await rm(resolve(dist, "icons.css"), { force: true });
 
 const base = await esbuild.build({
   absWorkingDir: root,

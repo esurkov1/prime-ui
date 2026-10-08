@@ -1,6 +1,6 @@
-import { ToggleLeft } from "lucide-react";
 import { api } from "@/components/switch/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { ToggleLeft } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

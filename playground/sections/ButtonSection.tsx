@@ -1,6 +1,6 @@
-import { MousePointerClick } from "lucide-react";
 import { api } from "@/components/button/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { MousePointerClick } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "actions",

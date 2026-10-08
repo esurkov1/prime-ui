@@ -1,6 +1,6 @@
-import { PanelTopDashed } from "lucide-react";
 import { api } from "@/layout/app-header/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { PanelTopDashed } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "page",

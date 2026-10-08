@@ -1,6 +1,6 @@
-import { Blend } from "lucide-react";
 import { api } from "@/components/crossfade/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Blend } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "status",

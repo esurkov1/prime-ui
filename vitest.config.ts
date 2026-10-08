@@ -12,6 +12,7 @@ export default defineConfig({
       "@": path.resolve(rootDir, "src"),
       // Composition patterns (SKILL/patterns) import the kit by its package name; subpath first.
       "prime-ui-kit/color-picker": path.resolve(rootDir, "src/color-picker.ts"),
+      "prime-ui-kit/icons": path.resolve(rootDir, "src/icon-set.ts"),
       "prime-ui-kit": path.resolve(rootDir, "src/index.ts"),
     },
   },

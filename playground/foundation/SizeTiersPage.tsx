@@ -1,5 +1,3 @@
-import { Search } from "lucide-react";
-
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Checkbox } from "@/components/checkbox/Checkbox";
@@ -9,11 +7,11 @@ import { Kbd } from "@/components/kbd/Kbd";
 import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
 import { Select } from "@/components/select/Select";
 import { Typography } from "@/components/typography/Typography";
-
 import type { ApiProp } from "../../scripts/docs/componentApi";
 import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import { PlaygroundApiTable } from "../components/PlaygroundApiTable";
 import { DemoApiTitle, DemoDescription } from "../components/PlaygroundDemoTypography";
+import { Search } from "../icons";
 import { Panel } from "./FoundationKit";
 import s from "./foundation.module.css";
 import { formatPx, SIZE_TIERS, type SizeTier, semanticPx } from "./tokenModel";

@@ -1,6 +1,6 @@
-import { PanelsTopLeft } from "lucide-react";
 import { api } from "@/components/page-toolbar/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { PanelsTopLeft } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "page",

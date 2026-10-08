@@ -1,6 +1,6 @@
-import { ChevronsDownUp } from "lucide-react";
 import { api } from "@/components/accordion/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { ChevronsDownUp } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "data-display",

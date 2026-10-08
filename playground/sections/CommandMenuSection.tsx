@@ -1,6 +1,6 @@
-import { Command } from "lucide-react";
 import { api } from "@/components/command-menu/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Command } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "overlays",

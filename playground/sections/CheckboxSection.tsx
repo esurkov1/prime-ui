@@ -1,6 +1,6 @@
-import { CheckSquare } from "lucide-react";
 import { api } from "@/components/checkbox/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { SquareCheckBig } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",
@@ -9,7 +9,7 @@ export const page: ComponentPageConfig = {
     label: "Checkbox",
     summary: "Флажок: checked, indeterminate, группы",
     keywords: ["чекбокс", "флажок", "checked", "onCheckedChange", "indeterminate"],
-    icon: CheckSquare,
+    icon: SquareCheckBig,
     order: 1,
   },
   dir: "checkbox",

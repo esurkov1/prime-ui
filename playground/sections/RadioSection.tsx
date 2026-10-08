@@ -1,6 +1,6 @@
-import { CircleDot } from "lucide-react";
 import { api } from "@/components/radio/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { CircleDot } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

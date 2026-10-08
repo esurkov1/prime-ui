@@ -1,6 +1,6 @@
-import { SlidersHorizontal } from "lucide-react";
 import { api } from "@/components/slider/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { SlidersHorizontal } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "prime-ui-kit": ["./src/index.ts"],
+      "prime-ui-kit/icons": ["./src/icon-set.ts"],
       "prime-ui-kit/*": ["./src/*"],
       "@/*": ["./src/*"]
     },

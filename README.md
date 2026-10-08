@@ -73,7 +73,7 @@ npm install prime-ui-kit react react-dom date-fns
 | `date-fns` | ^4.0.0 |
 | `react-aria-components` (optional, only for `prime-ui-kit/color-picker`) | ^1.16.0 |
 
-`lucide-react` (icons) comes with the package. The kit has no router dependency: pass your router's
+`lucide-react` comes with the package: the kit icons are drawn from Lucide, and `createIcon` wraps any of its glyphs. The kit has no router dependency: pass your router's
 pathname to `AppShell.Template scrollResetKey` and use `asChild` for router links.
 
 ## Set up styles and theme
@@ -130,7 +130,8 @@ export function App() {
 Short rules that keep code correct — for people and for AI coding assistants:
 
 1. Import everything from the package root: `import { Button, Input } from "prime-ui-kit"`. The one
-   exception is `import { ColorPicker } from "prime-ui-kit/color-picker"`.
+   exceptions are `import { ColorPicker } from "prime-ui-kit/color-picker"` and the full glyph set,
+   `import { BellIcon } from "prime-ui-kit/icons"`.
 2. Import styles once at the app root: `prime-ui-kit/bundle.css` (plus the optional `fonts.css` and
    `reset.css`).
 3. Compound components are used through parts: `<Button.Root>`, `<Modal.Root>` + `<Modal.Content>`.
@@ -289,7 +290,7 @@ accessibility, examples and common mistakes.
 | `applyTheme(scheme, element?)` | Switch the theme without transition flashes. |
 | `celebrate({ origin? })` | A short confetti burst for a rare milestone (a quarter closed, the first payment); draws nothing under reduced motion. |
 | `getPasswordStrength(value)` | The kit's 0–4 password estimate behind `Input.Root strength`; replace it with `getStrength`. |
-| `<Icon name="…" />`, `createIcon(glyph)` | The kit icon set (built on lucide-react); `createIcon` turns a domain glyph into a kit icon. |
+| `<Icon name="…" />`, `createIcon(glyph)` | The kit icon set: Lucide drawings, each with a small gesture that plays when its host is hovered or pressed; `createIcon` turns a domain lucide glyph into a kit icon. |
 
 ## Docs inside the package
 
@@ -348,6 +349,7 @@ command again with `--force` (degit) or re-copy the folder.
 | Path | Purpose |
 |---|---|
 | `prime-ui-kit` | The JS/TS API: every component, layout, icon and helper (no CSS side effects). |
+| `prime-ui-kit/icons` | The full animated glyph set as named components (`<BellIcon />`): Lucide drawings, one gesture each; only what you import is bundled. |
 | `prime-ui-kit/bundle.css` | Tokens, both themes, base rules (focus ring, reduced motion) and every component's CSS. |
 | `prime-ui-kit/fonts.css` | Optional: Golos Text and JetBrains Mono from Google Fonts. |
 | `prime-ui-kit/reset.css` | Optional: minimal document reset. |
@@ -393,4 +395,7 @@ teaches the agent the design rules, the API and page recipes and points it to ea
 
 ## License
 
-MIT — see [`LICENSE`](https://github.com/esurkov1/prime-ui/blob/main/LICENSE).
+MIT — see [`LICENSE`](https://github.com/esurkov1/prime-ui/blob/main/LICENSE). Icon drawings come from
+[Lucide](https://lucide.dev) (ISC); their gestures are adapted from
+[lucide-animated](https://lucide-animated.com) (MIT) — notices in
+[`THIRD_PARTY_NOTICES`](https://github.com/esurkov1/prime-ui/blob/main/THIRD_PARTY_NOTICES).

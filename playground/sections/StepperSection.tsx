@@ -1,6 +1,6 @@
-import { ListOrdered } from "lucide-react";
 import { api } from "@/components/stepper/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { ListOrdered } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "navigation",

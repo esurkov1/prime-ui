@@ -1,0 +1,13 @@
+import { defineGlyph } from "../glyph";
+
+/** Lucide `map-pin-x-inside`: the x squeezes. */
+export const MapPinXInside = /* @__PURE__ */ defineGlyph(
+  "MapPinXInside",
+  <>
+    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+    <g data-motion="squeeze">
+      <path d="m14.5 7.5-5 5" />
+      <path d="m9.5 7.5 5 5" />
+    </g>
+  </>,
+);

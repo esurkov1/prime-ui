@@ -1,12 +1,10 @@
-import type { LucideIcon } from "lucide-react";
 import * as React from "react";
-
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Typography } from "@/components/typography/Typography";
-
 import type { ApiLabel, ComponentApi } from "../../scripts/docs/componentApi";
 import type { PlaygroundCategoryId } from "../categories";
 import { type ExampleBase, getExample } from "../exampleRegistry";
+import type { Glyph } from "../icons";
 import { type PageKind, SLOT_TITLES, type SlotId, slotLayout } from "../pageStandard";
 import { DocBlock, DocList, DocPage, DocTable } from "./Doc";
 import { PlaygroundApiTable, renderInlineCode } from "./PlaygroundApiTable";
@@ -37,7 +35,7 @@ export type ComponentPageNav = {
   summary: string;
   /** Extra search terms: Russian name, synonyms, main props. */
   keywords: string[];
-  icon: LucideIcon;
+  icon: Glyph;
   /** Position inside the category: related components side by side, common ones first. */
   order: number;
 };

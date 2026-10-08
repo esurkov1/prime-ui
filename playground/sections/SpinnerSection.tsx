@@ -1,6 +1,6 @@
-import { Loader } from "lucide-react";
 import { api } from "@/components/spinner/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Loader } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "status",

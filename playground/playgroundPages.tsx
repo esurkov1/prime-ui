@@ -1,25 +1,4 @@
-import {
-  Blocks,
-  BookOpen,
-  CircleDashed,
-  FileText,
-  Focus,
-  Gauge,
-  Layers,
-  LayoutDashboard,
-  LayoutTemplate,
-  type LucideIcon,
-  Palette,
-  PanelRightOpen,
-  Ruler,
-  Settings,
-  Space,
-  SquareRoundCorner,
-  Table,
-  Type,
-} from "lucide-react";
 import type { ComponentType } from "react";
-
 import {
   PLAYGROUND_NAV_CATEGORIES,
   type PlaygroundCategoryId,
@@ -32,11 +11,33 @@ import { COMPOSITION_PATTERNS, type CompositionPattern } from "./composition/pat
 import ColorsPage from "./foundation/ColorsPage";
 import ElevationPage from "./foundation/ElevationPage";
 import FocusPage from "./foundation/FocusPage";
+import IconsPage from "./foundation/IconsPage";
 import MotionPage from "./foundation/MotionPage";
 import RadiusPage from "./foundation/RadiusPage";
 import SizeTiersPage from "./foundation/SizeTiersPage";
 import SpacingPage from "./foundation/SpacingPage";
 import TypographyPage from "./foundation/TypographyPage";
+import {
+  Blocks,
+  BookOpen,
+  CircleDashed,
+  FileText,
+  Focus,
+  Gauge,
+  type Glyph,
+  Layers,
+  LayoutDashboard,
+  LayoutTemplate,
+  Palette,
+  PanelRightOpen,
+  Ruler,
+  Settings,
+  Shapes,
+  Space,
+  SquareRoundCorner,
+  Table,
+  Type,
+} from "./icons";
 import IntroPage from "./pages/IntroPage";
 
 /**
@@ -52,7 +53,7 @@ type PageBase = {
   description: string;
   /** Extra search terms: Russian name, synonyms, main props. */
   keywords: string[];
-  icon: LucideIcon;
+  icon: Glyph;
 };
 
 /** A page with its own component, or a component page rendered by `ComponentPage`. */
@@ -116,6 +117,14 @@ const FOUNDATION_PAGES: PageDef[] = [
     Page: MotionPage,
   },
   {
+    segment: "icons",
+    label: "Icons",
+    description: "Набор иконок, анимация жестов, поиск и источник",
+    keywords: ["иконки", "icon", "icons", "glyph", "глиф", "анимация", "lucide", "значки"],
+    icon: Shapes,
+    Page: IconsPage,
+  },
+  {
     segment: "focus",
     label: "Focus",
     description: "Кольцо фокуса: толщина, отступ, контраст",
@@ -125,7 +134,7 @@ const FOUNDATION_PAGES: PageDef[] = [
   },
 ];
 
-const PATTERN_ICONS: Record<string, LucideIcon> = {
+const PATTERN_ICONS: Record<string, Glyph> = {
   "list-page": Table,
   "detail-page": FileText,
   "settings-page": Settings,

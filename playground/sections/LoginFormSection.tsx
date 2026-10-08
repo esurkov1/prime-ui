@@ -1,6 +1,6 @@
-import { LogIn } from "lucide-react";
 import { api } from "@/components/login-form/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { LogIn } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "composition",

@@ -1,6 +1,6 @@
-import { CircleGauge } from "lucide-react";
 import { api } from "@/components/progress-circle/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { CircleGauge } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "status",

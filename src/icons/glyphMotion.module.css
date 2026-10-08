@@ -1,0 +1,298 @@
+/*
+ * Glyph motion: the gesture vocabulary of kit icons. A glyph marks its parts (an element or a
+ * `<g>`) with `data-motion` and optional modifiers; `iconPlay` sets `data-play` on the svg when
+ * its host is hovered or touched and removes it when the carrier animation on the svg ends.
+ *
+ * Rules of the vocabulary:
+ * - Every gesture starts and ends at rest, so taking `data-play` off never jumps.
+ * - Gestures move parts, never the svg itself: a host may rotate or scale the icon (a chevron
+ *   turning, a trend arrow flipping) and the gesture composes with it (individual `translate` /
+ *   `rotate` / `scale` properties).
+ * - One amplitude for every glyph, the largest that still reads as a gesture: 4 units of travel,
+ *   26° of lean, 1.35 swell, 0.65 squeeze.
+ * - Lengths are units of the 24-unit glyph grid; durations and easings are motion tokens, so
+ *   reduced motion collapses every gesture to nothing.
+ *
+ * Modifiers:
+ * - `data-dir` — `up` `down` `left` `right` `up-right` `up-left` `down-right` `down-left` for
+ *   `nudge` and `shake`; `left` / `right` for `tilt` (default `right`, clockwise).
+ * - `data-turn` — `quarter` / `half` for `spin` on parts with 4- or 2-fold symmetry (default a
+ *   full turn).
+ * - `data-axis` — `x` / `y` for `grow` (default `y`).
+ * - `data-origin` — `top` `bottom` `left` `right` `top-left` `top-right` `bottom-left`
+ *   `bottom-right` (default the part's centre).
+ * - `data-delay` — `1`…`3` stagger steps, for parts that follow one another.
+ * - `pathLength="1"` is required on an element with `data-motion="draw"`.
+ */
+
+.root {
+  /* A gesture may carry a part past the 24-unit box; nothing gets clipped. */
+  overflow: visible;
+}
+
+.root {
+  /* The carrier: a still animation on the svg that outlasts every part; its end clears data-play. */
+  --icon-play-length: calc(var(--prime-motion-duration-slow) + 3 * var(--prime-motion-stagger));
+}
+
+.root[data-play] {
+  animation: carrier var(--icon-play-length) linear;
+}
+
+@keyframes carrier {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.root [data-motion] {
+  --icon-dx: 0;
+  --icon-dy: 0;
+  --icon-shift: 4px;
+  --icon-angle: 26deg;
+  --icon-sign: 1;
+  --icon-scale: 1.35;
+  --icon-squeeze: 0.65;
+  --icon-turn: 1turn;
+  --icon-delay: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Modifiers */
+.root [data-dir="up"] {
+  --icon-dy: -1;
+}
+.root [data-dir="down"] {
+  --icon-dy: 1;
+}
+.root [data-dir="left"] {
+  --icon-dx: -1;
+  --icon-sign: -1;
+}
+.root [data-dir="right"] {
+  --icon-dx: 1;
+}
+.root [data-dir="up-right"] {
+  --icon-dx: 0.7;
+  --icon-dy: -0.7;
+}
+.root [data-dir="up-left"] {
+  --icon-dx: -0.7;
+  --icon-dy: -0.7;
+}
+.root [data-dir="down-right"] {
+  --icon-dx: 0.7;
+  --icon-dy: 0.7;
+}
+.root [data-dir="down-left"] {
+  --icon-dx: -0.7;
+  --icon-dy: 0.7;
+}
+
+.root [data-turn="quarter"] {
+  --icon-turn: 0.25turn;
+}
+.root [data-turn="half"] {
+  --icon-turn: 0.5turn;
+}
+
+.root [data-origin="top"] {
+  transform-origin: top;
+}
+.root [data-origin="bottom"] {
+  transform-origin: bottom;
+}
+.root [data-origin="left"] {
+  transform-origin: left;
+}
+.root [data-origin="right"] {
+  transform-origin: right;
+}
+.root [data-origin="top-left"] {
+  transform-origin: top left;
+}
+.root [data-origin="top-right"] {
+  transform-origin: top right;
+}
+.root [data-origin="bottom-left"] {
+  transform-origin: bottom left;
+}
+.root [data-origin="bottom-right"] {
+  transform-origin: bottom right;
+}
+
+.root [data-delay="1"] {
+  --icon-delay: 1;
+}
+.root [data-delay="2"] {
+  --icon-delay: 2;
+}
+.root [data-delay="3"] {
+  --icon-delay: 3;
+}
+
+/* Playing */
+.root[data-play] [data-motion] {
+  animation-duration: var(--prime-motion-duration-base);
+  animation-timing-function: var(--prime-motion-easing-standard);
+  animation-delay: calc(var(--icon-delay) * var(--prime-motion-stagger));
+  animation-fill-mode: both;
+}
+
+/** Moves out along `data-dir` and back: arrows, chevrons, send, upload, exit. */
+.root[data-play] [data-motion="nudge"] {
+  animation-name: nudge;
+}
+
+@keyframes nudge {
+  50% {
+    translate: calc(var(--icon-dx) * var(--icon-shift)) calc(var(--icon-dy) * var(--icon-shift));
+  }
+}
+
+/** Small quick shake along `data-dir` (`left` / `right` shake horizontally): a refusal, a lock. */
+.root[data-play] [data-motion="shake"] {
+  animation-name: shake;
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    translate: calc(var(--icon-shift) / 2) 0;
+  }
+  40%,
+  80% {
+    translate: calc(var(--icon-shift) / -2) 0;
+  }
+}
+
+/** Leans once around `data-origin` and comes back: a lid, a pen, a moon. */
+.root[data-play] [data-motion="tilt"] {
+  animation-name: tilt;
+}
+
+@keyframes tilt {
+  50% {
+    rotate: calc(var(--icon-sign) * var(--icon-angle));
+  }
+}
+
+/** Rings: a damped swing around `data-origin` (a bell, a hanging tag). */
+.root[data-play] [data-motion="swing"] {
+  animation-name: swing;
+  animation-duration: var(--prime-motion-duration-slow);
+}
+
+@keyframes swing {
+  20% {
+    rotate: var(--icon-angle);
+  }
+  45% {
+    rotate: calc(var(--icon-angle) * -0.7);
+  }
+  70% {
+    rotate: calc(var(--icon-angle) * 0.35);
+  }
+  90% {
+    rotate: calc(var(--icon-angle) * -0.1);
+  }
+}
+
+/** Turns once around its centre by `data-turn`: a gear, refresh arrows, sun rays. */
+.root[data-play] [data-motion="spin"] {
+  animation-name: spin;
+  animation-duration: var(--prime-motion-duration-slow);
+}
+
+@keyframes spin {
+  to {
+    rotate: var(--icon-turn);
+  }
+}
+
+/** Swells and settles: an added item, a dot, a badge. */
+.root[data-play] [data-motion="pop"] {
+  animation-name: pop;
+}
+
+@keyframes pop {
+  45% {
+    scale: var(--icon-scale);
+  }
+}
+
+/** Presses in and settles: a delete, a minus, a click. */
+.root[data-play] [data-motion="squeeze"] {
+  animation-name: squeeze;
+}
+
+@keyframes squeeze {
+  45% {
+    scale: var(--icon-squeeze);
+  }
+}
+
+/** Closes and opens along y: an eye. */
+.root[data-play] [data-motion="blink"] {
+  animation-name: blink;
+}
+
+@keyframes blink {
+  45%,
+  55% {
+    scale: 1 0.1;
+  }
+}
+
+/** Shrinks along `data-axis` from `data-origin` and grows back: chart bars, panels, lines. */
+.root[data-play] [data-motion="grow"] {
+  animation-name: grow-y;
+}
+
+.root[data-play] [data-motion="grow"][data-axis="x"] {
+  animation-name: grow-x;
+}
+
+@keyframes grow-y {
+  40% {
+    scale: 1 0.45;
+  }
+}
+
+@keyframes grow-x {
+  40% {
+    scale: 0.45 1;
+  }
+}
+
+/** Draws the stroke again from its start (`pathLength="1"`): a check, a pulse line, a signature. */
+.root[data-play] [data-motion="draw"] {
+  animation-name: draw;
+  animation-timing-function: var(--prime-motion-easing-enter);
+}
+
+@keyframes draw {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* A `createIcon` domain glyph has no annotated parts: the whole drawing pops softly. */
+.root[data-icon-motion="generic"] > * {
+  transform-box: view-box;
+  transform-origin: center;
+}
+
+.root[data-play][data-icon-motion="generic"] > * {
+  animation: pop var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  --icon-scale: 1.1;
+}

@@ -1,6 +1,6 @@
-import { Frame } from "lucide-react";
 import { api } from "@/components/example-frame/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Frame } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "infrastructure",

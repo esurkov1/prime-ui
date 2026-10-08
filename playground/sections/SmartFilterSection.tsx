@@ -1,6 +1,6 @@
-import { ListFilter } from "lucide-react";
 import { api } from "@/components/smart-filter/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { ListFilter } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "selection",

@@ -1,6 +1,6 @@
-import { LayoutDashboard } from "lucide-react";
 import { api } from "@/components/card/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { LayoutDashboard } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "data-display",

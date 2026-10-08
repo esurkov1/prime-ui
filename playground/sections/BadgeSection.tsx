@@ -1,6 +1,6 @@
-import { Award } from "lucide-react";
 import { api } from "@/components/badge/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { Award } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "data-display",

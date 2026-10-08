@@ -1,6 +1,6 @@
-import { ScrollText } from "lucide-react";
 import { api } from "@/components/scroll-container/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
+import { ScrollText } from "../icons";
 
 export const page: ComponentPageConfig = {
   category: "page",
