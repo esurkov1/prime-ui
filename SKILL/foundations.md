@@ -112,14 +112,17 @@ level of air: a page with uniform 16px gaps everywhere reads as a list of unrela
 ## 9. Responsive (§9)
 
 - Flexbox for rows/stacks, Grid for two-dimensional layouts; spacing via `gap`.
-- Must work from 320px. Your media queries use 640 · 768 · 1024 · 1280 (`max-width: 639px` etc.).
-  Components adapt to their own width internally (e.g. Modal footer stacks below 480px) — do not
-  re-implement that.
+- Must work from 320px and at 400% zoom; the full rules are in [responsive.md](responsive.md).
+- Viewport breakpoints 640 · 768 · 1024 · 1280 (`max-width: 639px` for "below 640"), only for the app
+  frame. Components adapt to their own container — do not re-implement that.
+- Touch follows input, not width: your `:hover` styles only inside `@media (hover: hover)`; nothing is
+  hover-only; the kit keeps field text at 16px and gives small controls a 44px hit area on coarse
+  pointers — do not wrap kit fields to change that.
 - Flex children with text: `min-width: 0` + ellipsis or `overflow-wrap: anywhere`.
-- Wide tables on phones: key columns first, `stickyFirstColumn` on DataTable, horizontal scroll stays
-  inside the table; never let the page scroll sideways.
+- Wide tables on phones: they scroll inside themselves with edge shadows; `stickyFirstColumn`, a column
+  chooser through `hiddenColumns`; never let the page scroll sideways.
 - Card grids: `grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr))`.
-- Modal footer actions stack full width below 480px automatically; Sidebar turns into an off-canvas panel.
+- A page panel with sections, filter and search, view and the primary action is `PageToolbar`.
 
 ## 10. Focus and motion (§7)
 

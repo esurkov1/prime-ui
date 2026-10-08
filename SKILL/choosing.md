@@ -8,7 +8,8 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | The user needs to… | Category |
 |---|---|
 | trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
-| type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload, LoginForm (sign-in screens) |
+| type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload |
+| show a whole ready-made screen block (sign-in, sign-up, password reset, code) | Composition — LoginForm |
 | pick from options, toggle, set a range, date or color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorPicker, ColorSwatches |
 | see data: status, labels, people, objects, numbers, rows, events | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DataTable, Timeline, CodeBlock |
 | learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, EmptyPage, Crossfade |

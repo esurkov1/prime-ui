@@ -1,6 +1,6 @@
 # LoginForm
 
-**Category:** inputs
+**Category:** composition
 **Kind:** composite
 
 > A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation.

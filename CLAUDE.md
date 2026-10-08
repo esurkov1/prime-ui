@@ -57,6 +57,13 @@ bun run verify:tokens       # tokens:build shows no diff (generated API docs: th
   component with region states and every example or pattern that loads follows this.
 - A11y minimum: every interactive component works from the keyboard, has explicit ARIA, a visible focus
   ring in both themes, never conveys meaning by color alone, and has keyboard tests.
+- Responsive is part of the code (foundation §9, `SKILL/responsive.md`): every component works from
+  320px and adapts to its own container (container queries); viewport breakpoints 640 · 768 · 1024 ·
+  1280 (`max-width: 639px` style) only for the app shell and overlay form. `:hover` only inside
+  `@media (hover: hover)`, nothing hover-only; small controls get the touch hit area
+  (`src/internal/touchTarget`); editable text uses `--field-input-text` (16px on touch). Switchers
+  scroll, never wrap or truncate; indicators move only after a person's choice. `src/styles/touch.test.ts`
+  guards the mechanical part.
 - Shared internal classes are joined in TSX (`cx(fieldTierClass, styles.root)`), not chained through
   cross-file `composes`; the bundle builds with 0 CSS warnings.
 - Scrolling: a component scrolls only its own scroller (`scrollTop` / `scrollLeft`); `scrollIntoView`
@@ -171,6 +178,9 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a table, pagination, row selection | `DataTable`, `Pagination`, `Checkbox` |
 | screen-reader-only text | `src/internal/VisuallyHidden` |
 | appearance of a part | `src/internal/enterMotion.module.css` (`.enter`, `.enterBase`) |
+| a touch hit area for a small control | `src/internal/touchTarget` (`touchTargetClass`, `touchTargetBlockClass`) |
+| an edge cue for a scroll region (fade / shadow where content is hidden) | `ScrollContainer` `fade`, or `src/hooks/useEdgeOverflow` (DataTable) |
+| a page panel: sections, filter + search, view, primary action, chips | `PageToolbar` |
 | a swap between states of a region (loading / data / empty / error) | `Crossfade` (public) or `useStateSwap` + `src/internal/swapMotion.module.css` inside a component (DataTable); loading state is a `Skeleton` |
 | an action on a coloured host (solid Banner) | `Button` `tone="inherit"` (ghost / soft / outline) — never a host CSS override |
 | overlay stack, dismiss, focus | `src/internal/overlay/layerStack.ts` (`useLayer`, `LayerProvider`; one stack, reasons `escape` / `outside` / `scrim`), `overlay/focus.ts`; modal layers `useModalLayer` + `useInertSiblings` + `useScrollLock`; one z-index `--prime-z-overlay` |
@@ -274,7 +284,7 @@ export const page: ComponentPageConfig = {
   FileUpload; overlay — Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu,
   Notification; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable,
   Dnd, SmartFilter, Timeline, Card, LoginForm, EmptyPage; layout — AppShell, Sidebar, PageContent,
-  ScrollContainer, ExampleFrame, Crossfade).
+  PageToolbar, ScrollContainer, ExampleFrame, Crossfade).
 - **Slots** (`SLOTS` in `pageStandard.ts`, file = slot id): `overview` «Обзор» · `variants` «Варианты» ·
   `sizes` «Размеры» · `states` «Состояния» · `with-icon` «С иконкой» · `structure` «Структура» ·
   `group` «Группа» · `orientation` «Ориентация» · `placement` «Расположение» · `overflow`
@@ -384,7 +394,7 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `scripts/` | `build-tokens.ts`, `bundle-lib.ts`, `build-docs.ts` + `docs/componentApi.ts` (api schema, markdown) |
 | `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component (shared helpers in `contract-utils.ts`) |
 | `src/test/part-refs.test.tsx` | refs of every part: a typed check, runtime cases for merged or redirected refs |
-| `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `choosing`, `components` (index), `composition` (screen assembly guide), `layouts`, `api-contract`, `foundations`, `anti-slop`, `checklist` |
+| `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `choosing`, `components` (index), `composition` (screen assembly guide), `layouts`, `responsive` (narrow screens, touch, `PageToolbar`), `api-contract`, `foundations`, `anti-slop`, `checklist` |
 | `SKILL/patterns/` | composition patterns: one working screen per file (`<name>.tsx` + `<name>.module.css`, `export default function <Name>Pattern`); the one source for the skill and the playground «Композиция» pages |
 | `playground/composition/` | composition pages: `patterns.ts` (page text per pattern), `PatternPage.tsx`, `CompositionPage.tsx` (principles), `patternRegistry.ts` (glob loader) |
 | `src/test/patterns-contract.test.ts` | pattern canon, links from `SKILL/composition.md`, playground list, render smoke test |

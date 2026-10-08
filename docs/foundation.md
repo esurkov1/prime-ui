@@ -297,15 +297,30 @@ Components carry no motion code of their own for these layers.
   via `gap`, never margins on children.
 - Text that can overflow: `min-width: 0` on flex children + `text-overflow: ellipsis` (single line) or
   `overflow-wrap: anywhere` (multi-line). Truncated text gets a `title` or Tooltip when it matters.
+- Every screen works from 320 to 2560px and at 400% zoom without losing a function: narrow first,
+  break by content, rearrange instead of hiding, fluid by default.
 - Composite components adapt with container queries (`container-type: inline-size`) where their own
-  width matters (Card, DataTable toolbar, Modal footer, Datepicker months), media queries for the page
-  shell. Must work from 320px.
-- Breakpoints (for media queries; CSS vars cannot be used there): 640 · 768 · 1024 · 1280.
+  width matters (Card, PageToolbar, DataTable toolbar, Modal footer, Datepicker months), media queries
+  only for the app shell and the overlay form (bottom sheets below 640).
+- Breakpoints (for media queries; CSS vars cannot be used there): 640 · 768 · 1024 · 1280; "below a
+  breakpoint" is `max-width: <bp − 1>px`.
+- Input decides interaction, not width: `:hover` styles only inside `@media (hover: hover)`; whatever
+  hover reveals is also shown on focus and under `(hover: none)`. Under `(pointer: coarse)` small
+  controls get a 44px hit area (`--prime-control-touch-target`, `src/internal/touchTarget`) and menu
+  rows are at least 44px; editable field text is at least 16px under `(pointer: coarse), (max-width:
+  639px)` (`--prime-control-touch-text-size`) so iOS never zooms.
+- Switchers never wrap: they scroll inside themselves, stretched items tend to equal width and never
+  shrink below their label, the selection indicator moves only after a person's choice.
+- Scroll overflow is always visible: a cut-off item, an edge fade or an edge shadow (`useEdgeOverflow`).
+- Sticky headers stop sticking on screens lower than 480px; overlays respect safe-area insets.
+- The page panel is `PageToolbar`: one row from a 56rem container, exactly two rows below it, the
+  primary action always at the end of the top row.
 - Field affixes (units like `%`, `°`, `₽`, prefixes like `https://`) are flex items in the field row next to the value,
   separated by the tier `gap`; never absolutely positioned, never sized with a fixed width. A numeric value with a unit
   is one group: value (tabular-nums) + unit, aligned the same way in every field of a row. Field widths come from the
   layout (grid columns / flex), not from per-field fixed widths, so nothing clips at any size tier.
-- Modal footer: actions right-aligned with `gap: 8`; below 480px they stack full width, primary last.
+- Modal footer: actions right-aligned with `gap: 8`; on phones (below 640) and in a dialog narrower than
+  360px they stack full width, primary last.
 - Overlays near the viewport edge flip/shift, keep `--prime-space-2` from the edge.
 
 ## 10. API contract (v1)

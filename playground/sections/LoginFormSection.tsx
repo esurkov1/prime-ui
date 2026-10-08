@@ -3,7 +3,7 @@ import { api } from "@/components/login-form/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "inputs",
+  category: "composition",
   nav: {
     segment: "login-form",
     label: "Login Form",

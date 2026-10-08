@@ -27,7 +27,9 @@ region, `Skeleton` while it loads).
    states, a11y, mistakes) and its `examples/`. Never guess a prop; copy structure from an example.
 3. **Compose the screen** — [composition.md](composition.md): skeleton, rhythm, hierarchy, surfaces,
    actions, forms, tables, feedback, overlays, narrow screens. Start from the closest working screen in
-   [patterns/](patterns/) and keep its skeleton.
+   [patterns/](patterns/) and keep its skeleton. Every screen works from 320px —
+   [responsive.md](responsive.md): the page panel is `PageToolbar`, nothing is hidden on phones, touch
+   follows `(hover)` / `(pointer)`.
 4. **Check** — [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md). Fix every «no», then hand
    over.
 
@@ -53,6 +55,7 @@ repository; in a consumer project the same files are under `node_modules/prime-u
 | [composition.md](composition.md) | building any screen — the rules of assembly, and what to do when the kit lacks a component |
 | [patterns/](patterns/) | starting a screen — list, detail, settings, form in Drawer, dashboard, states |
 | [layouts.md](layouts.md) | the app frame (once per app), page wrappers, which pattern to start from, auth |
+| [responsive.md](responsive.md) | always — every screen works from 320px: what the kit does by itself, the page panel (`PageToolbar`), switchers, touch, the narrow-screen checklist |
 | [foundations.md](foundations.md) | always — grid, proximity scale, sizes, surfaces, type, tone and color |
 | [api-contract.md](api-contract.md) | writing JSX — prop names, controlled state, forms, icons |
 | [anti-slop.md](anti-slop.md) | before and after writing — what never to do |

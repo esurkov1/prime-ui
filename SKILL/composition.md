@@ -220,7 +220,13 @@ while a request runs.
   only for app-frame decisions (the phone menu header) at 640 · 768 · 1024 · 1280.
 - From 320px: header actions wrap under the title (built in), side columns drop below the main one,
   pairs of fields stack, tables scroll inside themselves, dialogs stack their footers (built in).
+- A page with sections, filter and search, a view switch and the primary action gets `PageToolbar`:
+  one row when wide, exactly two rows when narrow, the primary action always top right.
+- Rearrange, never hide: every function of the desktop screen is on the phone — in another place or a
+  menu. App sections on phones: `BottomNav` in `AppShell.Footer`; app-level sheets:
+  `Drawer.Content side="bottom"`.
 - Text in flex rows gets `min-width: 0`; long names wrap or truncate, never widen the page.
+- The full rules and the narrow-screen checklist: [responsive.md](responsive.md).
 
 ## 12. Motion
 

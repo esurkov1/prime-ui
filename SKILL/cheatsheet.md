@@ -100,6 +100,18 @@ State change is continuous in the whole kit: every region that changes what it s
 - Counts: plain `Sidebar.ItemCount` for information; `color` only when it needs action — it becomes a dot on the rail and on folded parents.
 - Remember the rail and folded groups with `persistKey` on `Sidebar.Root` — not your own `localStorage` code.
 
+## Narrow screens and touch
+
+Full rules: [responsive.md](responsive.md).
+
+- The page panel is `<PageToolbar.Root>` with `Sections` (a `fullWidth` SegmentedControl), `Tools` (`SmartFilter.Toolbar`), `View`, `Actions`, `Chips` — not a hand-made flex row of tabs, search and buttons.
+- Rearrange, never hide: every desktop function is on the phone, in another place or a menu — not `display: none` below a breakpoint.
+- Breakpoints 640 · 768 · 1024 · 1280 only for the app frame; inside a page — intrinsic grids (`auto-fill, minmax`) and container queries.
+- A wide table scrolls inside itself; offer `hiddenColumns` through a column chooser — never drop columns by breakpoint.
+- App sections on phones: `BottomNav` in `AppShell.Footer`; a phone sheet: `Drawer.Content side="bottom"` — Select, Dropdown, Popover become sheets below 640 by themselves.
+- Your hover styles inside `@media (hover: hover)`; nothing hover-only. Do not wrap kit fields to raise their text for iOS — they keep 16px on touch already.
+- A long form saves through the panel action with a count («Сохранить 3 изменения») — not a sticky bar at the bottom of a phone.
+
 ## Spacing and values
 
 - Gaps are `gap` on the parent with `--prime-space-N` (N × 4px): 8 in a row of buttons, 20 field → field, 32 group → group; `PageContent.Body` already spaces blocks 40 — not margins, not outer padding.

@@ -281,6 +281,15 @@ export type {
   PageContentTitleProps,
 } from "./page-content/PageContent";
 export { PageContent } from "./page-content/PageContent";
+export type {
+  PageToolbarActionsProps,
+  PageToolbarChipsProps,
+  PageToolbarRootProps,
+  PageToolbarSectionsProps,
+  PageToolbarToolsProps,
+  PageToolbarViewProps,
+} from "./page-toolbar/PageToolbar";
+export { PageToolbar } from "./page-toolbar/PageToolbar";
 export type { PaginationLabels, PaginationProps } from "./pagination/Pagination";
 export { Pagination } from "./pagination/Pagination";
 export type {

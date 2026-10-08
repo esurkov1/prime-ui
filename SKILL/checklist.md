@@ -58,6 +58,7 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 ## Themes and widths
 - [ ] Screen checked with `data-theme="dark"`: no hard-coded colors, everything readable.
 - [ ] Screen works at 320px: no horizontal page scroll, grids collapse, toolbars wrap, long text truncates or wraps.
+- [ ] The responsive checklist in [responsive.md](responsive.md#checklist-before-handing-a-screen-over) passes: widths 320 · 390 · 768 · 1024 · 1280 · 1920, the primary action in the top row, one height per row, no hover-only functions, zoom 400%.
 - [ ] Below 768px a menu button in `AppShell.Header` opens the Sidebar; no empty header bar on desktop.
 
 ## Keyboard and a11y

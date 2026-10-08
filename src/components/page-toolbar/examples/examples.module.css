@@ -1,0 +1,16 @@
+/* Layout of the PageToolbar scenarios: page columns of a capped width, so the toolbar shows its
+   two-row form. A cap (`max-width`), not a width: the column is as wide as the stage allows. */
+
+/* A phone-width page column (360px). */
+.phone {
+  width: 100%;
+  max-width: calc(var(--prime-space-24) * 3.75);
+  margin-inline: auto;
+}
+
+/* A tablet-width page column (600px). */
+.tablet {
+  width: 100%;
+  max-width: calc(var(--prime-space-24) * 6.25);
+  margin-inline: auto;
+}

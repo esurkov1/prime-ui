@@ -12,7 +12,8 @@
  * - **navigation** — moving between views, places and steps.
  * - **overlays** — floating layers, from tooltip to modal surfaces.
  * - **layout** — app frame, page regions, disclosure, dividers, scrolling.
- * - **composition** — whole screens built from the kit (`SKILL/patterns/`) and the rules behind them.
+ * - **composition** — whole screens built from the kit (`SKILL/patterns/`), the rules behind them,
+ *   and ready-made screen blocks (LoginForm).
  * - **infrastructure** — demo tooling, not product UI.
  */
 export const PLAYGROUND_NAV_CATEGORIES = [
