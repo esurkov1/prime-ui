@@ -50,6 +50,8 @@ export type FlatRow<Row> = {
   expanded: boolean;
   /** Mounted by the latest expand, or newly added to `rows`: plays the enter animation. */
   animate: boolean;
+  /** A sub-row of a row that is collapsing: still drawn while it folds away. */
+  folding: boolean;
 };
 
 export type MeasureRow<Row> = { row: Row; key: React.Key; depth: number };
@@ -67,6 +69,8 @@ export type FlattenOptions<Row> = {
   withDetail: boolean;
   isRowExpandable?: (row: Row) => boolean;
   expanded: ReadonlySet<React.Key>;
+  /** Rows collapsed a moment ago: their sub-rows stay drawn (folding) until the fold ends. */
+  closing?: ReadonlySet<React.Key>;
   /** Top-level rows newly added to the data. */
   arrived: ReadonlySet<React.Key>;
   /** Row whose latest expand mounted new rows: only those animate in. */
@@ -112,22 +116,38 @@ export function flatten<Row>(data: Row[], options: FlattenOptions<Row>): Flatten
     });
   };
 
-  const visit = (row: Row, key: React.Key, depth: number, parentAnimate: boolean) => {
+  const visit = (
+    row: Row,
+    key: React.Key,
+    depth: number,
+    parentAnimate: boolean,
+    parentFolding: boolean,
+  ) => {
     const children = getRowChildren ? childrenOf(row) : [];
     const childKeys = children.map((child, index) => keyOf(child, index, key));
     const expandable =
       options.expandEnabled &&
       (options.isRowExpandable?.(row) ?? (children.length > 0 || options.withDetail));
     const isExpanded = expandable && expanded.has(key);
+    const isClosing = expandable && !isExpanded && Boolean(options.closing?.has(key));
     const animate = parentAnimate || (depth === 0 && arrived.has(key));
-    result.rows.push({ row, key, depth, childKeys, expandable, expanded: isExpanded, animate });
+    result.rows.push({
+      row,
+      key,
+      depth,
+      childKeys,
+      expandable,
+      expanded: isExpanded,
+      animate,
+      folding: parentFolding,
+    });
     if (options.collectKeys) result.keys.push(key);
 
     const childAnimate = parentAnimate || options.lastExpandedKey === key;
     children.forEach((child, index) => {
       const childKey = childKeys[index] as React.Key;
-      if (isExpanded) {
-        visit(child, childKey, depth + 1, childAnimate);
+      if (isExpanded || isClosing) {
+        visit(child, childKey, depth + 1, childAnimate, parentFolding || isClosing);
         return;
       }
       result.measure.push({ row: child, key: childKey, depth: depth + 1 });
@@ -141,7 +161,7 @@ export function flatten<Row>(data: Row[], options: FlattenOptions<Row>): Flatten
   data.forEach((row, index) => {
     const key = keyOf(row, index, null);
     if (index >= options.start && index < options.end) {
-      visit(row, key, 0, false);
+      visit(row, key, 0, false, false);
     } else if (options.collectKeys) {
       result.keys.push(key);
       collect(childrenOf(row), key);

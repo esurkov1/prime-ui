@@ -150,8 +150,8 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | `rowDividers` | hairlines between rows | default; off together with `striped` | `true` |
 | `columnDividers` | hairlines between content columns (none inside the lead columns) | default; off for 2–3 column key/value lists | `true` |
 | `striped` | every second row one opaque step off the fill | long numeric grids | `false` |
-| `highlightRowOnHover` | `fill-subtle` wash on the hovered row | interactive lists | `true` |
-| `highlightColumnOnHover` | `fill-subtle` wash on the hovered column | comparison tables | `false` |
+| `highlightRowOnHover` | `fill-subtle-active` wash on the hovered row (stronger than a zebra step, so a hovered row never takes a zebra row's color) | interactive lists | `true` |
+| `highlightColumnOnHover` | `fill-subtle-active` wash on the hovered column | comparison tables | `false` |
 | `stickyHeader` · `stickyFirstColumn` | opaque sticky head / first column with a hairline edge; on screens lower than 480px the head scrolls with the rows | long / wide tables in a `scrollHeight` window | `false` |
 | column `hideable` | `false`: the column stays even when listed in `hiddenColumns` | the key column that names the row | `true` |
 | `showHeader` | head row shown | off only for self-explanatory key/value tables | `true` |
@@ -169,7 +169,8 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | sorted | `sort` / `defaultSort` | `aria-sort` and `data-sorted` on the head; the sort icon: unsorted `text-disabled`, hover `text-muted`, sorted `text-secondary` — never accent |
 | selected | `selected` / `defaultSelected` | `aria-selected` rows with `accent-soft` fill; polite `labels.selectedCount` |
 | expanded | `expanded` / `defaultExpanded` | `data-expanded` on the parent row (one step darker); toggle `aria-expanded`, chevron turns 90° |
-| new rows | rows mounted by an expand or new in `rows` (by `getRowKey`) | `data-animate`: cells drop in from above (`enterMotion`); detail panels open and close through `grid-template-rows` (`data-state` on the detail row; it unmounts after the close) |
+| new rows | rows new in `rows` (by `getRowKey`) | `data-animate`: top-level cells drop in from above (`enterMotion`) |
+| sub-rows and detail panels | an expand / a collapse | both fold open and shut through `grid-template-rows` (0fr ↔ 1fr) with the fade on the same `base` curve; the row height and padding live inside the track, so nothing is left to jump. Sub-rows: `data-fold` on the row (`opening` · `open` · `closed`); a collapsed row's sub-rows stay mounted until the fold ends. Detail row: `data-state`; it unmounts after the close |
 | overflowing sideways | the table is wider than its viewport | `data-overflow-start` (scrolled from the start) and `data-overflow-end` (more to the end) on the root: a soft shadow over that edge, from the end edge of the sticky first column for the start; fades in and out over `fast` |
 | hidden columns | `hiddenColumns` | the listed columns (except `hideable: false`) are not rendered in the head, rows, skeleton or state rows; widths are measured again |
 | state swap | the body moves between loading, rows, empty and error | the body fades in over `base` (opacity only, the same swap motion as [Crossfade](../crossfade/COMPONENT.md)); the head stays still; nothing moves on the first render |

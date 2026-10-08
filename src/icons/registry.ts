@@ -152,6 +152,8 @@ export const iconRegistry = {
   "status.locked": Lock,
   "status.offline": CloudOff,
   "status.success": CheckCircle2,
+  /** A rising trend; a falling one is the same arrow turned half a turn (it rotates between them). */
+  "status.trendUp": ArrowUp,
   "status.warning": AlertTriangle,
   "theme.dark": Moon,
   "theme.light": Sun,

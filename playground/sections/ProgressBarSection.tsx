@@ -50,6 +50,18 @@ export const page: ComponentPageConfig = {
       description:
         "Части целого в одной полосе: слитно или отдельными капсулами, свободный остаток до `max` и пустой список — `segments`, `segmentGap`, `max`.",
     },
+    {
+      scenario: "steps",
+      title: "Ступени",
+      description:
+        "Шкала целыми ячейками, которые заполняются друг за другом: 2 из 5 шагов настройки, вперёд и назад — `steps`, `max`.",
+    },
+    {
+      scenario: "milestone",
+      title: "Редкое событие",
+      description:
+        "Последний счёт квартала заполняет полосу, тон становится успехом, короткое конфетти отмечает событие — `value`, `tone`, `celebrate()`.",
+    },
   ],
   api,
   accessibility: {

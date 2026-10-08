@@ -35,6 +35,24 @@ export const page: ComponentPageConfig = {
         "Иконка до или после подписи и квадратная кнопка только с иконкой — `Button.Icon`, `aria-label`.",
     },
     {
+      scenario: "download",
+      title: "Скачивание",
+      description:
+        "Долгое скачивание внутри кнопки: заливка показывает прогресс, подпись считает проценты и предлагает открыть файл — `progress`.",
+    },
+    {
+      scenario: "hold-to-confirm",
+      title: "Удержание",
+      description:
+        "Разрушительное действие требует удержания; если отпустить раньше, заливка откатится и ничего не случится — `holdToConfirm`, `onConfirm`.",
+    },
+    {
+      scenario: "label-morph",
+      title: "Смена подписи",
+      description:
+        "Новая подпись перетекает в кнопку по буквам, ширина плывёт: «Сохранить» → «Сохранено» и шаги оплаты — `children`, `loading`.",
+    },
+    {
       scenario: "on-colored-host",
       title: "На цветной подложке",
       description:
@@ -55,7 +73,11 @@ export const page: ComponentPageConfig = {
   api,
   accessibility: {
     keyboard: [
-      { keys: "Enter · Space", action: "Нажимает кнопку (нативное поведение `<button>`)." },
+      {
+        keys: "Enter · Space",
+        action:
+          "Нажимает кнопку (нативное поведение `<button>`); с `holdToConfirm` клавишу держат, пока не дойдёт заливка.",
+      },
       {
         keys: "Tab",
         action:
@@ -65,7 +87,9 @@ export const page: ComponentPageConfig = {
     aria: [
       'Нативный `<button type="button">`: случайно не отправит форму.',
       "Кнопке только с иконкой нужен `aria-label`; `Button.Icon` скрыт (`aria-hidden`).",
-      '`loading` ставит `aria-busy="true"` и блокирует нажатие.',
+      '`loading` ставит `aria-busy="true"` и блокирует нажатие; `progress` тоже ставит `aria-busy`, но кнопка остаётся нажимаемой.',
+      "`holdToConfirm`: жест описан скринридеру через `aria-describedby` («Удерживайте, чтобы подтвердить»); Пробел и Enter удерживаются как указатель.",
+      "Смена подписи читается один раз: буквы анимации скрыты, имя кнопки — новый текст целиком.",
       'С `asChild` неактивное состояние — `aria-disabled="true"` без нативного `disabled`.',
     ],
   },

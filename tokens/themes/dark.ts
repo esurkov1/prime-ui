@@ -115,9 +115,12 @@ export const darkThemeOverrides = {
     control: {
       thumb: "{color.gray.100}",
     },
+    /** A light chip over the dark UI: inverse like in light, so it reads over any layer. */
     tooltip: {
-      bg: "{color.gray.750}",
-      text: "{color.gray.100}",
+      bg: "{color.gray.100}",
+      text: "{color.gray.925}",
+      muted: "{color.gray.600}",
+      fill: "rgba(17, 19, 24, 0.08)",
     },
     palette: darkPalette(),
   },

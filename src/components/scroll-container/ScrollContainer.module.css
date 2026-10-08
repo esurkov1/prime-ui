@@ -73,10 +73,12 @@
 }
 
 /*
- * Edge fade (`fade`): a mask over the edge where content is hidden, `--prime-space-8` deep. One
- * gradient per axis; an edge without hidden content has a zero-depth fade. The mask follows the
- * scroll position at once — scrolling is high-frequency, so nothing animates (foundation §7,
- * rule 1). Mask is alpha-only: any opaque color works.
+ * Edge fade (`fade`): a mask over the edge where content is hidden, `--prime-space-8` deep at most
+ * and never deeper than the hidden content reaches (`--edge-start` / `--edge-end`, written by
+ * `useEdgeOverflow`): the fade grows as the region scrolls away from an edge and melts as it comes
+ * back, so it never switches on or off. One gradient per axis; an edge without hidden content has
+ * a zero-depth fade. The mask follows the scroll position itself — nothing animates (foundation
+ * §7, rule 1). Mask is alpha-only: any opaque color works.
  */
 .root[data-fade] {
   --fade-start: 0px;
@@ -93,11 +95,11 @@
 }
 
 .root[data-fade][data-overflow-start="true"] {
-  --fade-start: var(--prime-space-8);
+  --fade-start: min(var(--prime-space-8), var(--edge-start, var(--prime-space-8)));
 }
 
 .root[data-fade][data-overflow-end="true"] {
-  --fade-end: var(--prime-space-8);
+  --fade-end: min(var(--prime-space-8), var(--edge-end, var(--prime-space-8)));
 }
 
 .root[data-fade]:is([data-overflow-start="true"], [data-overflow-end="true"]) {

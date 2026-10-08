@@ -9,6 +9,10 @@ const NONE: EdgeOverflow = { start: false, end: false };
  * (`ScrollContainer` `fade`, the DataTable edge cue). Measured at most once per frame on scroll,
  * on resize of the region or any child, and when children are added. RTL-aware: the start is the
  * inline start of the region.
+ *
+ * It also writes how far the hidden content reaches on each side to the region itself
+ * (`--edge-start` / `--edge-end`, px), so a fade can be as deep as that distance at most: it grows
+ * as the region scrolls away from an edge and melts as it comes back, instead of switching.
  */
 export function useEdgeOverflow(
   ref: React.RefObject<HTMLElement | null>,
@@ -28,6 +32,8 @@ export function useEdgeOverflow(
         : node.scrollHeight - node.clientHeight;
       const start = position > 1;
       const end = max - position > 1;
+      node.style.setProperty("--edge-start", `${Math.max(0, position)}px`);
+      node.style.setProperty("--edge-end", `${Math.max(0, max - position)}px`);
       setOverflow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
     };
     // Scroll and resize can fire many times per frame (a sidebar collapsing resizes every region

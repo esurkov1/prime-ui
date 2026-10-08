@@ -74,8 +74,8 @@ export const api: ComponentApi = {
         {
           name: "invalid",
           type: "boolean",
-          en: "Danger selection ring and `aria-invalid`. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо выбора, `aria-invalid`.",
+          en: "Danger inner edge on every swatch and `aria-invalid`. A non-empty `error` implies it.",
+          ru: "Ошибка без текста: красная кромка у каждого образца, `aria-invalid`.",
         },
         {
           name: "disabled",

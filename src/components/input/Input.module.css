@@ -237,3 +237,28 @@
   background: transparent;
   cursor: not-allowed;
 }
+
+/* ---- Strength meter (`strength`) ---- */
+/* The steps sit between the field and the support row; the level word is the support row's end. */
+.strengthWord {
+  flex-shrink: 0;
+  color: var(--prime-color-text-secondary);
+  font-weight: var(--prime-font-weight-medium);
+  transition: color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.strengthWord[data-tone="danger"] {
+  color: var(--prime-color-danger-text);
+}
+
+.strengthWord[data-tone="warning"] {
+  color: var(--prime-color-warning-text);
+}
+
+.strengthWord[data-tone="accent"] {
+  color: var(--prime-color-accent-text);
+}
+
+.strengthWord[data-tone="success"] {
+  color: var(--prime-color-success-text);
+}

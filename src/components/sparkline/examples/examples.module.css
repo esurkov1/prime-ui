@@ -1,0 +1,13 @@
+/* Layout of the Sparkline scenarios: semantic tokens only. */
+
+/* A dashboard card's width: the chart takes the card width. */
+.card {
+  width: min(100%, var(--prime-modal-width-s));
+}
+
+/* The period switch above the chart inside the card body. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+}

@@ -83,6 +83,8 @@ type DataTableRowProps<Row> = {
   expandable: boolean;
   expanded: boolean;
   animate: boolean;
+  /** A sub-row of a row that is collapsing: it folds away before it unmounts. */
+  folding?: boolean;
   /** The detail panel opened by the latest expand: it drops in. */
   detailAnimate: boolean;
   selected: boolean;
@@ -99,13 +101,15 @@ function DataTableRowImpl<Row>({
   expandable,
   expanded,
   animate,
+  folding = false,
   detailAnimate,
   selected,
   childControls,
 }: DataTableRowProps<Row>) {
   const { columns, size, labels, selection, renderExpanded } = shared;
   const rowLabel = shared.getRowLabel?.(row);
-  const detail = usePresence(expanded && Boolean(renderExpanded), { exitDuration: "fast" });
+  // Folds on the same clock as it opens (`base`), so the room and the text leave together.
+  const detail = usePresence(expanded && Boolean(renderExpanded), { exitDuration: "base" });
   const detailContent = detail.mounted ? renderExpanded?.(row) : null;
   const hasDetail = detailContent != null && detailContent !== false;
   const controls = [
@@ -114,8 +118,23 @@ function DataTableRowImpl<Row>({
   ]
     .filter(Boolean)
     .join(" ");
-  const enter = animate && enterMotion.enterBase;
+  // Sub-rows fold open and shut like the detail panel: every cell's content sits in a grid track
+  // (0fr ↔ 1fr). Top-level rows that arrive keep the drop-in (`enterMotion`).
+  const sub = depth > 0;
+  const [unfolding, setUnfolding] = React.useState(sub && animate);
+  const fold = !sub ? undefined : folding ? "closed" : unfolding ? "opening" : "open";
+  const enter = animate && !sub && enterMotion.enterBase;
   const lead = cx(styles.cell, enter, shared.stickyFirstColumn && styles.stickyLead);
+  const folded = (node: React.ReactNode) =>
+    sub ? (
+      <div className={styles.fold}>
+        <div className={styles.foldItem}>
+          <div className={styles.foldPad}>{node}</div>
+        </div>
+      </div>
+    ) : (
+      node
+    );
 
   // One fragment either way, so opening the detail never remounts the row (the toggle keeps focus).
   return (
@@ -123,10 +142,18 @@ function DataTableRowImpl<Row>({
       <tr
         id={shared.rowDomId(rowKey)}
         className={styles.row}
-        style={depth > 0 ? ({ "--dt-depth": depth } as React.CSSProperties) : undefined}
+        style={sub ? ({ "--dt-depth": depth } as React.CSSProperties) : undefined}
         data-stripe={shared.striped && index % 2 === 1 ? "alt" : undefined}
         data-clickable={shared.onRowClick ? "true" : undefined}
-        data-depth={depth > 0 ? depth : undefined}
+        data-level={sub ? depth : undefined}
+        data-fold={fold}
+        onAnimationEnd={
+          unfolding
+            ? (event) => {
+                if (event.animationName.includes("dt-fold-open")) setUnfolding(false);
+              }
+            : undefined
+        }
         data-expanded={expanded ? "true" : undefined}
         data-animate={animate ? "true" : undefined}
         aria-selected={shared.selectable ? selected : undefined}
@@ -140,35 +167,39 @@ function DataTableRowImpl<Row>({
             onPointerDown={(event) => selection.onPointerDown(index, event)}
             onClick={(event) => selection.onClick(index, event)}
           >
-            <Checkbox.Root
-              size={size}
-              checked={selected}
-              aria-label={formatLabel(labels.selectRow, { label: rowLabel })}
-            />
+            {folded(
+              <Checkbox.Root
+                size={size}
+                checked={selected}
+                aria-label={formatLabel(labels.selectRow, { label: rowLabel })}
+              />,
+            )}
           </td>
         ) : null}
         {shared.expandEnabled ? (
           <td className={cx(lead, styles.toggleCell)}>
-            {expandable ? (
-              <Button.Root
-                variant="ghost"
-                tone="neutral"
-                size={TOGGLE_SIZE[size]}
-                aria-expanded={expanded}
-                aria-controls={controls || undefined}
-                aria-label={formatLabel(expanded ? labels.collapse : labels.expand, {
-                  label: rowLabel,
-                })}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  shared.toggleExpanded(rowKey);
-                }}
-              >
-                <Button.Icon>
-                  <Icon name="nav.chevronRight" className={styles.chevron} />
-                </Button.Icon>
-              </Button.Root>
-            ) : null}
+            {folded(
+              expandable ? (
+                <Button.Root
+                  variant="ghost"
+                  tone="neutral"
+                  size={TOGGLE_SIZE[size]}
+                  aria-expanded={expanded}
+                  aria-controls={controls || undefined}
+                  aria-label={formatLabel(expanded ? labels.collapse : labels.expand, {
+                    label: rowLabel,
+                  })}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    shared.toggleExpanded(rowKey);
+                  }}
+                >
+                  <Button.Icon>
+                    <Icon name="nav.chevronRight" className={styles.chevron} />
+                  </Button.Icon>
+                </Button.Root>
+              ) : null,
+            )}
           </td>
         ) : null}
         {columns.map((column, columnIndex) => {
@@ -187,7 +218,7 @@ function DataTableRowImpl<Row>({
               data-first-column={isFirstColumn ? "true" : undefined}
               data-column-id={column.id}
             >
-              {renderCell(row, column, true)}
+              {folded(renderCell(row, column, true))}
             </td>
           );
         })}
@@ -202,7 +233,9 @@ function DataTableRowImpl<Row>({
         >
           <td colSpan={shared.totalColumns} className={styles.detailCell}>
             <div className={styles.detailMotion} onTransitionEnd={detail.onExitEnd}>
-              <div className={styles.detailContent}>{detailContent}</div>
+              <div className={styles.detailClip}>
+                <div className={styles.detailContent}>{detailContent}</div>
+              </div>
             </div>
           </td>
         </tr>
@@ -238,7 +271,7 @@ export function MeasureBody<Row>({
           key={String(key)}
           className={styles.row}
           style={{ "--dt-depth": depth } as React.CSSProperties}
-          data-depth={depth}
+          data-level={depth}
         >
           {selectable ? <td className={cx(styles.cell, styles.selectCell)} /> : null}
           {expandEnabled ? <td className={cx(styles.cell, styles.toggleCell)} /> : null}

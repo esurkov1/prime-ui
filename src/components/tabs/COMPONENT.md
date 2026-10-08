@@ -26,8 +26,8 @@ import { Tabs } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItemWidth; horizontal: the frame
-├─ Tabs.List              role="tablist" on a ScrollContainer, sliding folder / pill; collapses, then scrolls
+Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItemWidth; the frame (a layer)
+├─ Tabs.List              role="tablist" on a ScrollContainer, sliding folder; collapses, then scrolls
 │  ├─ Tabs.Item           one tab (role="tab") in an item wrapper; onRemove adds a close button; parts:
 │  │  ├─ Tabs.Icon        decorative icon; hidden first, kept last
 │  │  ├─ Tabs.Label       title; keeps its width when it turns medium weight
@@ -42,14 +42,14 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Tabs.Root
-`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel; horizontal, it is the frame and a layer of the surface ladder: a strip two steps off the layer over the panel in the layer's own color.
+`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel. It is the frame and a layer of the surface ladder in both orientations: a strip two steps off the layer and the panel in the layer's own color — above the panel when horizontal, at its inline start when vertical.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `string` | — | Active tab (controlled). |
 | `defaultValue` | `string` | `""` | Initial active tab (uncontrolled). With `""` no tab is selected. |
 | `onValueChange` | `(value: string) => void` | — | Called with the new active value. |
-| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | List direction and arrow keys. A vertical list stacks above the panel when the container is narrower than 600px. |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | List direction and arrow keys. Vertical: a column of sections at the panel's inline start, the active one the panel reaching into the column; when the container is narrower than 600px the column becomes the horizontal strip above the panel. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text, icon, spacing, folder radius and panel padding. A horizontal tab is the control height plus the folder rise on both sides; a vertical one is the control height. |
 | `fullWidth` | `boolean` | `true` | Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`, never narrower than their content: a long label keeps its width, short ones share the rest; when they do not fit, the list collapses, then scrolls. `false` sizes each tab to its content within the same bounds. |
 | `tone` | `"neutral" \| "accent"` | `"neutral"` | Colour of the active tab: `neutral` is primary text with an accent icon, `accent` puts text and icon in accent. |
@@ -60,7 +60,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">` | — | `className` and the other div attributes. |
 
 ### Tabs.List
-`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (vertical: pill), which glides only into a choice by click or keys and is placed without motion on mount, resize and collapse. When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); then the list scrolls; a label is never cut to make room. The active tab is kept in view: only the list scrolls, never the page.
+`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (in both orientations), which glides only into a choice by click or keys and is placed without motion on mount, resize and collapse. When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); then the list scrolls; a label is never cut to make room. The active tab is kept in view and clear of the edge fades (the first and the last tab scroll all the way to the end); only the list scrolls, never the page.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -128,7 +128,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
 ## Variants
-Tabs have no `variant`: navigation tabs are always a folder (horizontal) or pills (vertical).
+Tabs have no `variant`: navigation tabs are always a folder — rising from the panel's top edge (horizontal) or reaching out of its side (vertical).
 
 ### tone
 | Value | Looks like | Use when | Default |
@@ -140,7 +140,7 @@ Tabs have no `variant`: navigation tabs are always a folder (horizontal) or pill
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `horizontal` | a layer of the surface ladder: a `fill-muted-hover` strip (two steps off the layer) over a padded panel in the layer's own color, tabs edge to edge; the active tab is the panel rising into the strip with concave flares, gliding between tabs; primary text, medium weight, accent icon; hover is the same shape in `fill-faint` | switching sections above the content | yes |
-| `vertical` | items padded like controls, no rail; active item is a `fill-muted` pill with a short accent mark at the start; hover `fill-subtle`; below a 600px container it becomes a scrolling row above the panel | settings pages with a side list of sections | |
+| `vertical` | the same folder on its side: a column of sections in the `fill-muted-hover` strip at the panel's inline start; the active section is the panel reaching into the column, rounded on the outer side, with concave flares above and below where it meets the panel; hover is the same shape in `fill-faint`. Below a 600px container the column becomes the horizontal strip above the panel (it scrolls, never wraps) | settings pages with a side list of sections | |
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -180,26 +180,25 @@ Avoid icons or descriptions on only some tabs (uneven rows; without an icon on e
 | State | Driven by | DOM |
 |---|---|---|
 | active | `value` / `defaultValue` | item `aria-selected="true"`, `data-state="active"`, `tabIndex=0`; others `data-state="inactive"`, `tabIndex=-1` |
-| hover | pointer | text → primary; horizontal: the folder shape in `fill-faint`, under the folder; vertical: `fill-subtle` background |
+| hover | pointer | text → primary; the folder shape in `fill-faint`, under the folder |
 | pressed | pointer down | the tab content scales to `--prime-motion-press-scale-compact` |
-| focus-visible | keyboard | focus ring inside the tab, above the folder; the panel shows an inset ring (vertical: outer ring) |
+| focus-visible | keyboard | focus ring inside the tab, above the folder; the panel shows an inset ring |
 | disabled | `disabled` on Item | native `disabled`, `data-disabled="true"`, `text-disabled`; a removable tab loses its close button |
 | removable | `onRemove` on Item | item wrapper `data-removable="true"`, close button, tab `aria-keyshortcuts="Delete"` |
 | two-line | `Tabs.Description` child | `data-two-line="true"` |
 | collapsed | tabs wider than the list, or a label that would be cut (horizontal) | list `data-collapse="full" \| "compact" \| "icon"`: `compact` hides icons and descriptions; `icon` hides labels (sr-only, shown in a `Tooltip`), counts and close buttons, only when every tab has an icon |
-| overflow | tabs at their narrowest (content width, `minItemWidth` or icon squares) still wider than the list | `data-overflow-start` / `data-overflow-end` on the list (ScrollContainer), faded edges; the active tab is kept in view on mount and on every value change — only the list scrolls, never the page |
+| overflow | tabs at their narrowest (content width, `minItemWidth` or icon squares) still wider than the list | `data-overflow-start` / `data-overflow-end` on the list (ScrollContainer), faded edges as deep as the hidden part at most (they grow and melt with the scroll, never switch); the active tab is kept in view and clear of the fades on mount and on every value change, the first and the last tab scroll all the way to the end — only the list scrolls, never the page |
 
 The indicator glides (`emphasized` + `base`, `data-animate="true"`) only into a choice by click, arrow keys or closing the active tab; on mount, a value set from outside, a resize, font loading, tabs added or removed and collapse it is placed without motion, and it stays still under `prefers-reduced-motion`. The list scrolls smoothly to the active tab only after such a choice too.
 
-Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-width`, inline `--tabs-item-min` / `--tabs-item-max` when set; List `data-indicator="folder" | "pill"`; Item `data-value` on the tab, `data-state` / `data-disabled` on its wrapper too; Label `data-text`. Inactive panels are unmounted; a panel's content enters each time it opens.
+Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-width`, inline `--tabs-item-min` / `--tabs-item-max` when set; List `data-indicator="folder"`, its indicator `data-axis="x" | "y"` (follows the list's direction, so a vertical list in a narrow container gets the top folder); Item `data-value` on the tab, `data-state` / `data-disabled` on its wrapper too; Label `data-text`. Inactive panels are unmounted; a panel's content enters each time it opens.
 
 ## Layout & spacing
-- Horizontal: the root is the frame and a layer of the ladder (`data-depth`, `radius-xl`, the strip two steps off the layer), the list sits flush on the panel and runs edge to edge; the panel pads its content by tier (`--prime-space-4` … `--prime-space-8`). Do not wrap Tabs in a Card — it already is one.
-- Vertical list → panel: `var(--prime-space-6)`.
+- The root is the frame and a layer of the ladder in both orientations (`data-depth`, `radius-xl`, the strip two steps off the layer); the list sits flush on the panel; the panel pads its content by tier (`--prime-space-4` … `--prime-space-8`). Do not wrap Tabs in a Card — it already is one.
+- Vertical: the column is as wide as its widest section (at least four control heights, at most 40% of the root), inset by the folder rise from the frame on the outer side, flush with the panel on the other.
 - The list never wraps: it collapses, then scrolls horizontally with faded edges (hidden scrollbar, `overscroll-behavior: contain`). Give the list's container a width (`min-width: 0` on flex children).
 - A horizontal tab is never narrower than its content (`min-width: max-content`; the tab bounds that content between `minItemWidth` and `maxItemWidth`), so a label is never cut to make room. Full width, tabs tend to equal widths, not widths in proportion to their labels (`flex: 1 1 0`): a long label keeps its width, the short ones share the rest.
 - A vertical Tabs.Root is a size container: give it a width (it measures itself to switch to a row).
-- In a vertical layout align the panel heading with the first tab by making the heading row one control tall (`min-height: var(--prime-control-m-height)`).
 
 ## Accessibility
 
@@ -235,7 +234,7 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: text, icon, folder radius and spacing grow together — `size`. |
 | [states.tsx](examples/states.tsx) | A disabled tab that clicks and arrow keys skip — `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A muted icon before the label and a hairline before the service section — `Tabs.Icon`, `Tabs.Label`, `Tabs.Separator`. |
-| [orientation.tsx](examples/orientation.tsx) | Tabs over the panel and a side list of sections that stacks on top below 600px — `orientation`. |
+| [orientation.tsx](examples/orientation.tsx) | Account settings with a side list of sections: the active section reaches out of the panel, and below 600px the list moves above it — `orientation`. |
 | [overflow.tsx](examples/overflow.tsx) | Drag the frame narrower: icons go first, then labels, and icons with tooltips stay; then the list scrolls — `Tabs.Icon`. |
 | [closable.tsx](examples/closable.tsx) | Open order cards as browser tabs: each closes by its button, Delete or a middle click; tabs stay between two widths, and the list scrolls when they do not fit — `onRemove`, `minItemWidth`, `maxItemWidth`. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a summary on the second — `Tabs.Count`, `Tabs.Description`. |

@@ -140,4 +140,44 @@ describe("ProgressBar", () => {
       expect(group).toHaveAccessibleDescription("A: 50%, B: 50%");
     });
   });
+
+  describe("steps", () => {
+    const cells = (container: HTMLElement) =>
+      [...container.querySelectorAll("[data-steps] > span")] as HTMLElement[];
+
+    it("draws max cells, fills whole ones and keeps the native progress", () => {
+      const { container } = render(
+        <ProgressBar steps value={2.6} max={4} aria-label="Надёжность" />,
+      );
+      expect(cells(container)).toHaveLength(4);
+      expect(cells(container).map((c) => c.hasAttribute("data-filled"))).toEqual([
+        true,
+        true,
+        true,
+        false,
+      ]);
+      const progress = screen.getByRole("progressbar", { name: "Надёжность" });
+      expect(progress).toHaveAttribute("max", "4");
+    });
+
+    it("clamps the cell count to 2…12", () => {
+      const { container, rerender } = render(
+        <ProgressBar steps value={1} max={1} aria-label="a" />,
+      );
+      expect(cells(container)).toHaveLength(2);
+      rerender(<ProgressBar steps value={1} max={40} aria-label="a" />);
+      expect(cells(container)).toHaveLength(12);
+    });
+
+    it("orders a change from the start when filling and from the end when emptying", () => {
+      const { container, rerender } = render(
+        <ProgressBar steps value={1} max={4} aria-label="a" />,
+      );
+      rerender(<ProgressBar steps value={4} max={4} aria-label="a" />);
+      const order = () => cells(container).map((c) => c.style.getPropertyValue("--pb-step-order"));
+      expect(order()).toEqual(["0", "0", "1", "2"]);
+      rerender(<ProgressBar steps value={1} max={4} aria-label="a" />);
+      expect(order()).toEqual(["3", "2", "1", "0"]);
+    });
+  });
 });

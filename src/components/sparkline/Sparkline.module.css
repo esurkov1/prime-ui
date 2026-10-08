@@ -1,0 +1,143 @@
+/*
+ * Sparkline — a headline (title · date, value · change) over a line chart. The plot is drawn in a
+ * stretched 0–100 viewBox with a non-scaling stroke; the cursor (guide + dot) is HTML over it, so
+ * the dot stays round at any width. Scrubbing moves the cursor with the pointer at once (direct
+ * manipulation); when it ends the cursor glides back to the latest point (`base` · emphasized).
+ * The trend arrow turns half a turn between up and down. A new series cross-fades in (swapMotion).
+ */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  min-width: 0;
+  font-family: var(--prime-font-family-sans);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  min-width: 0;
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  color: var(--prime-color-text-secondary);
+}
+
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.valueRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.value {
+  font-size: var(--prime-text-heading-m-size);
+  line-height: var(--prime-text-heading-m-line-height);
+  font-weight: var(--prime-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.change {
+  flex-shrink: 0;
+}
+
+.trend {
+  transition: rotate var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+.trend[data-down] {
+  rotate: 180deg;
+}
+
+/* The plot: inset by the dot's radius so the cursor at either end is never clipped. */
+.plot {
+  --sparkline-dot: var(--prime-space-2);
+  --sparkline-h: var(--prime-space-20);
+
+  position: relative;
+  height: var(--sparkline-h);
+  margin-block-start: var(--prime-space-2);
+  margin-inline: calc(var(--sparkline-dot) / 2);
+  border-radius: var(--prime-radius-xs);
+  touch-action: pan-y;
+  cursor: crosshair;
+  outline: none;
+}
+
+.plot:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.line {
+  fill: none;
+  stroke: var(--prime-color-accent-default);
+  stroke-width: calc(var(--prime-border-width) * 2);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.area {
+  fill: color-mix(in srgb, var(--prime-color-accent-default) 12%, transparent);
+  stroke: none;
+}
+
+/* A full-plot layer moved by x; its guide and dot sit at its start edge. */
+.cursor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateX(calc(var(--sparkline-x) * 100%));
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+.guide {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: var(--prime-border-width);
+  background: var(--prime-color-border-default);
+}
+
+.dot {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  width: var(--sparkline-dot);
+  height: var(--sparkline-dot);
+  margin: calc(var(--sparkline-dot) / -2);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-bg-surface);
+  box-shadow: 0 0 0 calc(var(--prime-border-width) * 2) var(--prime-color-accent-default);
+  transform: translateY(calc(var(--sparkline-y) * var(--sparkline-h)));
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+/* Direct manipulation: while scrubbing the cursor sits under the pointer, no easing. */
+.root[data-scrubbing] .cursor,
+.root[data-scrubbing] .dot {
+  transition: none;
+}

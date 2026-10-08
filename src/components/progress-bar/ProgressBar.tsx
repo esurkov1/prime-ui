@@ -27,7 +27,37 @@ export type ProgressBarProps = Omit<React.HTMLAttributes<HTMLDivElement>, "child
   /** Shows the rounded filled percentage at the end of the label row. */
   showValue?: boolean;
   ref?: React.Ref<HTMLDivElement>;
-} & ProgressModeProps;
+} & ProgressBarModeProps;
+
+/** Value mode may draw its scale as steps; segments already are parts. */
+type ProgressBarModeProps =
+  | (Extract<ProgressModeProps, { value: number }> & {
+      /**
+       * Draws the scale as `max` equal cells (2–12), each filled whole: a level out of a few
+       * (password strength, a step of onboarding). `value` rounds to a whole cell.
+       */
+      steps?: boolean;
+    })
+  | (Extract<ProgressModeProps, { segments: unknown }> & { steps?: never });
+
+/** Cells of a stepped bar: `max` rounded into 2…12. */
+const MIN_STEPS = 2;
+const MAX_STEPS = 12;
+
+/**
+ * Order of each cell in the current change: cells fill from the start and empty from the end,
+ * one stagger step apart, so a level reads as a walk, not a flash.
+ */
+function useStepOrder(filled: number, count: number): number[] {
+  const prev = React.useRef(filled);
+  const from = prev.current;
+  React.useEffect(() => {
+    prev.current = filled;
+  }, [filled]);
+  return Array.from({ length: count }, (_, i) =>
+    filled >= from ? Math.max(0, i - from) : Math.max(0, from - 1 - i),
+  );
+}
 
 /**
  * A linear progress line: a single `value` (native `<progress>` for assistive tech) or
@@ -44,12 +74,22 @@ export function ProgressBar(props: ProgressBarProps) {
     tone: toneProp,
     segments: segmentsProp,
     segmentGap = "none",
+    steps = false,
     labels,
     "aria-label": ariaLabel,
     ...rest
   } = props;
   const labelId = React.useId();
   const descriptionId = React.useId();
+
+  const stepResolved = !segmentsProp && steps ? resolveValue(valueProp ?? 0, maxProp) : null;
+  const stepCount = stepResolved
+    ? Math.min(MAX_STEPS, Math.max(MIN_STEPS, Math.round(stepResolved.max)))
+    : 0;
+  const stepFilled = stepResolved
+    ? Math.round((stepResolved.value / stepResolved.max) * stepCount)
+    : 0;
+  const stepOrder = useStepOrder(stepFilled, stepCount);
 
   let percent: number;
   let tone: Tone | undefined;
@@ -117,14 +157,29 @@ export function ProgressBar(props: ProgressBarProps) {
           aria-label={label ? undefined : ariaLabel}
           className={styles.native}
         />
-        {/* Visual bar: the native element is transparent; one pill slides over the track. */}
-        <span
-          className={styles.bar}
-          aria-hidden="true"
-          style={{ "--pb-ratio": resolved.ratio } as React.CSSProperties}
-        >
-          <span className={styles.fill} />
-        </span>
+        {/* Visual bar: the native element is transparent; one pill slides over the track, or
+            whole cells fill one after another. */}
+        {steps ? (
+          <span className={styles.bar} aria-hidden="true" data-steps="true">
+            {stepOrder.map((order, i) => (
+              <span
+                // biome-ignore lint/suspicious/noArrayIndexKey: cells of a fixed scale
+                key={i}
+                className={styles.step}
+                data-filled={i < stepFilled || undefined}
+                style={{ "--pb-step-order": order } as React.CSSProperties}
+              />
+            ))}
+          </span>
+        ) : (
+          <span
+            className={styles.bar}
+            aria-hidden="true"
+            style={{ "--pb-ratio": resolved.ratio } as React.CSSProperties}
+          >
+            <span className={styles.fill} />
+          </span>
+        )}
       </>
     );
   }

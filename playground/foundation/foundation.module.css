@@ -534,7 +534,11 @@
   margin-block-start: var(--prime-space-4);
 }
 
+/* Positioned above the card: the card's fields are positioned (field surface) and would otherwise
+   paint over the menu's shadow where it overlaps the card. */
 .layerMenu {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 0;
   align-self: start;
@@ -825,4 +829,25 @@
   display: grid;
   align-content: start;
   gap: var(--prime-space-3);
+}
+
+/* Motion catalog: one component example per item, items apart like blocks. */
+.motionItems {
+  display: grid;
+  gap: var(--prime-space-10);
+}
+
+.motionItem {
+  display: grid;
+  gap: var(--prime-space-3);
+  justify-items: start;
+  min-width: 0;
+}
+
+.motionItem > * {
+  justify-self: stretch;
+}
+
+.motionItem > :last-child {
+  justify-self: start;
 }

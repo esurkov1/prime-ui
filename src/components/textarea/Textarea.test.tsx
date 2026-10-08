@@ -4,6 +4,12 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Textarea } from "./Textarea";
 
+/** The visible counter («10/100»): its digits are separate odometer columns. */
+const counterText = (text: string) =>
+  screen.getByText(
+    (_, el) => el?.getAttribute("aria-hidden") === "true" && el.textContent === text,
+  );
+
 const { Root, Counter } = Textarea;
 
 describe("Textarea.Root", () => {
@@ -140,23 +146,23 @@ describe("Textarea.Counter", () => {
 
   it("renders current and max with screen-reader text", () => {
     renderCounter(10, 100);
-    expect(screen.getByText("10/100")).toBeInTheDocument();
+    expect(counterText("10/100")).toBeInTheDocument();
     expect(screen.getByText("10 из 100 символов")).toBeInTheDocument();
   });
 
   it("sets data-invalid only when current > max", () => {
     const { unmount } = renderCounter(100, 100);
-    expect(screen.getByText("100/100").parentElement).not.toHaveAttribute("data-invalid");
+    expect(counterText("100/100").parentElement).not.toHaveAttribute("data-invalid");
     unmount();
     renderCounter(101, 100);
-    expect(screen.getByText("101/100").parentElement).toHaveAttribute("data-invalid", "true");
+    expect(counterText("101/100").parentElement).toHaveAttribute("data-invalid", "true");
   });
 
   // The counter lives in the support row under the field (foundation §6), not inside the
   // field box, so it never becomes part of the textarea's accessible name.
   it("renders outside the field box", () => {
     const { container } = renderCounter(3, 10);
-    const counter = screen.getByText("3/10");
+    const counter = counterText("3/10");
     const textarea = screen.getByPlaceholderText("Counted");
     expect(container.querySelector("label")).toBeNull();
     expect(textarea.parentElement?.parentElement).not.toContainElement(counter);

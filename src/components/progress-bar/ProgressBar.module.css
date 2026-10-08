@@ -184,3 +184,45 @@
 .bar[data-segment-gap="hairline"] .rest {
   background: var(--pb-rest);
 }
+
+/*
+ * Steps (value mode, `steps`): `max` equal cells with the hairline gap. A cell fills whole — its
+ * fill grows from the start edge (`base` · `emphasized`); in one change the cells go one after
+ * another, half a stagger step apart (from the start when filling, from the end when emptying).
+ * The tone recolors every filled cell at once.
+ */
+.bar[data-steps="true"] {
+  gap: var(--pb-gap);
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+}
+
+.step {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--prime-radius-full);
+  background: var(--pb-rest);
+}
+
+.step::after {
+  content: "";
+  display: block;
+  height: 100%;
+  background: var(--pb-fill);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition:
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition-delay: calc(var(--pb-step-order) * var(--prime-motion-stagger) / 2);
+}
+
+.bar:dir(rtl) .step::after {
+  transform-origin: right center;
+}
+
+.step[data-filled]::after {
+  transform: scaleX(1);
+}

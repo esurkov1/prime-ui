@@ -1,6 +1,6 @@
 /*
  * Checkbox box on the shared choice layout and states (internal/ChoiceField.module.css): this file
- * is only the box geometry and the check / bar mark. `Checkbox.Indicator` is the same box outside
+ * is only the box geometry; the check / bar mark is `internal/CheckMark`. `Checkbox.Indicator` is the same box outside
  * a field, its tier and state from its own data-*; the row that hosts it owns hover and press.
  */
 .root,
@@ -30,43 +30,4 @@
 
 :is(.root[data-disabled="true"] .control, .indicator[data-disabled="true"]) {
   color: var(--prime-color-text-disabled);
-}
-
-.svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-/* Rounded check / bar, drawn with a stroke reveal and an emphasized grow (scale) on check.
-   Unchecking leaves quickly on the exit curve. */
-.checkPath,
-.indeterminateLine {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.25;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transform-box: fill-box;
-  transform-origin: center;
-  transform: scale(0.6);
-  opacity: 0;
-  transition:
-    stroke-dashoffset var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
-}
-
-:is(.root, .indicator)[data-state="checked"] .checkPath,
-:is(.root, .indicator)[data-state="indeterminate"] .indeterminateLine {
-  stroke-dashoffset: 0;
-  transform: scale(1);
-  opacity: 1;
-  transition:
-    stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }

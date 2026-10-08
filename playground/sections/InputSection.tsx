@@ -45,6 +45,12 @@ export const page: ComponentPageConfig = {
       description: "Одно поле поиска, где фокус видно по каретке и светлой заливке — `focusRing`.",
     },
     {
+      scenario: "password-strength",
+      title: "Надёжность пароля",
+      description:
+        "Новый пароль со шкалой, которая заполняется по шагам и называет уровень рядом с подсказкой — `strength`.",
+    },
+    {
       slot: "controlled",
       description:
         "Значением владеет родитель: кнопка очистки и счётчик символов следуют за ним — `value`, `onValueChange`, `Input.ClearButton`, `Input.Counter`.",

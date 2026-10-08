@@ -21,6 +21,7 @@
   --digit-gap: var(--prime-space-3);
   --digit-cell-text: var(--prime-text-heading-s-size);
   --digit-cell-line-height: var(--prime-text-heading-s-line-height);
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: var(--digit-gap);
@@ -116,4 +117,52 @@
 
 .cell:disabled {
   -webkit-text-fill-color: var(--prime-color-text-disabled);
+}
+
+/*
+ * Motion. One focus ring for the row glides to the focused cell (`fast` · emphasized); it appears
+ * in place (opacity) and never travels in from nowhere. A digit fades in as it lands. `success`
+ * turns the cells one after another, half a stagger step apart.
+ */
+.ring {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  border-radius: var(--digit-radius);
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    outline-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.ring[data-visible] {
+  opacity: 1;
+}
+
+.root[data-invalid="true"] .ring {
+  outline-color: var(--prime-color-danger-border);
+}
+
+.root[data-focus-ring="false"] .ring {
+  display: none;
+}
+
+.cell[data-filled="true"] {
+  animation: primeDigitIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter);
+}
+
+@keyframes primeDigitIn {
+  from {
+    color: transparent;
+  }
+}
+
+.root[data-success="true"] .cell {
+  background: var(--prime-color-success-soft);
+  color: var(--prime-color-success-text);
+  transition-delay: calc(var(--digit-i) * var(--prime-motion-stagger) / 2);
 }

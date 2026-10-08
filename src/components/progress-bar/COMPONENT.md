@@ -51,6 +51,7 @@ A native `<progress>` (transparent, for assistive tech) under the drawn line.
 | `value` | `number` | — (required) | The current value, clamped to `0…max`. |
 | `max` | `number` | `100` | Top of the scale. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Fill color, telling the outcome. |
+| `steps` | `boolean` | `false` | Draws the scale as `max` equal cells (2–12), each filled whole; `value` rounds to a cell. In one change the cells go one after another — from the start when filling, from the end when emptying. For a level out of a few: password strength, onboarding steps. |
 
 ### ProgressBar · segments mode
 A `role="group"` bar of parts, named by `label` and described by the distribution text.
@@ -100,8 +101,9 @@ A `role="group"` bar of parts, named by `label` and described by the distributio
 | tone / size | props | `data-tone` (value mode), `data-size` on the root |
 | value | `value`, `max` | native `value` / `max`; the drawn pill slides by `translate` over `slow` + `standard`, RTL aware |
 | segments | `segments`, `max`, `segmentGap` | `data-segment-gap` on the group, `data-tone` per part; widths animate by `flex-grow` over `slow` |
+| steps | `steps` (value mode) | `data-steps="true"` on the bar; `max` cells (2–12), filled ones `data-filled`; a cell fills from its start edge (`base` · emphasized), cells of one change go half a stagger step apart — from the start when filling, from the end when emptying |
 | empty segments | `segments` empty or all `0` | only the track; accessible text `labels.empty` / `labels.allEmpty` |
-| reduced motion | `prefers-reduced-motion` | fill and widths change instantly |
+| reduced motion | `prefers-reduced-motion` | fill, widths and cells change instantly |
 
 Always controlled: pass the current `value` or `segments` on every render.
 
@@ -137,6 +139,8 @@ No keyboard interaction.
 | [sizes.tsx](examples/sizes.tsx) | Every tier: the line grows from 4 to 8 px like the Slider track — `size`. |
 | [custom-max.tsx](examples/custom-max.tsx) | A scale of steps instead of percent: 3 of 5 profile steps — `max`. |
 | [segments.tsx](examples/segments.tsx) | Parts of a whole in one bar: joined or separate pills, free capacity up to `max` and an empty list — `segments`, `segmentGap`, `max`. |
+| [steps.tsx](examples/steps.tsx) | The scale as whole cells that fill one after another: 2 of 5 onboarding steps, forward and back — `steps`, `max`. |
+| [milestone.tsx](examples/milestone.tsx) | A rare milestone: the last invoice of the quarter fills the bar, the tone turns success and a short confetti burst marks it — `value`, `tone`, `celebrate()`. |
 
 ## Mistakes
 - No `label` and no `aria-label` → the bar has no accessible name.

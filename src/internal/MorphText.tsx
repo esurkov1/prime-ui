@@ -8,8 +8,6 @@ import styles from "./MorphText.module.css";
 
 export type MorphTextProps = {
   children: string;
-  /** Change in place, without the letter motion (a label that updates every frame). */
-  still?: boolean;
   className?: string;
 };
 
@@ -46,9 +44,10 @@ function settleMs(text: string, root: Element): number {
  * A label that changes in place (foundation §7 rule 8): the old letters leave upward, the new ones
  * come from below one short step apart, and the box glides between the two widths. At rest it is
  * one plain text span; the letter layers exist only while a change plays. Still on the first
- * render, under reduced motion, with `still`, and when only digits change.
+ * render, under reduced motion, and when only digits change (a counter or a percentage in a label
+ * updates in place).
  */
-export function MorphText({ children: text, still = false, className }: MorphTextProps) {
+export function MorphText({ children: text, className }: MorphTextProps) {
   const rootRef = React.useRef<HTMLSpanElement>(null);
   const sizerRef = React.useRef<HTMLSpanElement>(null);
   const prevText = React.useRef<string | null>(null);
@@ -57,8 +56,6 @@ export function MorphText({ children: text, still = false, className }: MorphTex
   const [morph, setMorph] = React.useState<Morph | null>(null);
   const morphRef = React.useRef(morph);
   morphRef.current = morph;
-  const stillRef = React.useRef(still);
-  stillRef.current = still;
 
   // A new text: start a morph from the width the old one had on screen.
   React.useLayoutEffect(() => {
@@ -66,7 +63,7 @@ export function MorphText({ children: text, still = false, className }: MorphTex
     const prev = prevText.current;
     prevText.current = text;
     if (!root || prev === null || prev === text) return;
-    if (stillRef.current || prefersReducedMotion() || digitsOnly(prev, text)) {
+    if (prefersReducedMotion() || digitsOnly(prev, text)) {
       setMorph(null);
       return;
     }

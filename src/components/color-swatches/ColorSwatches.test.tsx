@@ -56,10 +56,18 @@ describe("ColorSwatches", () => {
     expect(group).toHaveAccessibleDescription("Выберите цвет");
   });
 
-  it("draws the check icon only on the selected swatch", () => {
+  it("shows the check from the selected state, so it animates in and out", () => {
     render(<ColorSwatches presets={presets} defaultValue="#5068f5" />);
-    expect(screen.getByRole("radio", { name: "Синий" }).querySelectorAll("svg")).toHaveLength(2);
-    expect(screen.getByRole("radio", { name: "Красный" }).querySelectorAll("svg")).toHaveLength(1);
+    const blue = screen.getByRole("radio", { name: "Синий" });
+    const red = screen.getByRole("radio", { name: "Красный" });
+    // Color layer + check on every swatch; CSS shows the check only under data-state="checked".
+    expect(blue.querySelectorAll("svg")).toHaveLength(2);
+    expect(red.querySelectorAll("svg")).toHaveLength(2);
+    expect(blue).toHaveAttribute("data-state", "checked");
+    expect(red).toHaveAttribute("data-state", "unchecked");
+    fireEvent.click(red);
+    expect(red).toHaveAttribute("data-state", "checked");
+    expect(blue).toHaveAttribute("data-state", "unchecked");
   });
 
   it("disables every swatch", () => {

@@ -163,9 +163,17 @@ export const semanticTokens = {
       /** Switch thumb, slider thumb. */
       thumb: "{color.white}",
     },
+    /**
+     * The tooltip is an inverse chip: everything inside it (a Kbd, a secondary line) reads its
+     * colors from here, through the context the chip sets (`--prime-color-text-*`, fills).
+     */
     tooltip: {
       bg: "{color.gray.925}",
       text: "{color.gray.0}",
+      /** Secondary text on the chip (a shortcut, a second line). */
+      muted: "{color.gray.300}",
+      /** A key cap or chip on the chip: a light wash over the dark fill. */
+      fill: "rgba(255, 255, 255, 0.14)",
     },
     palette: lightPalette(),
   },
@@ -635,10 +643,46 @@ export const semanticTokens = {
     blur: "0.5rem",
   },
 
+  /**
+   * Tooltip tiers: a chip of tier T is as tall as a menu item of tier T (24 · 28 · 32 · 36 · 40),
+   * and text, padding and radius grow together, one step per tier.
+   */
   tooltip: {
-    radius: "{radius.6}",
-    paddingX: "{space.2}",
-    paddingY: "{space.1}",
+    xs: {
+      textSize: "{font.size.12}",
+      lineHeight: "{font.lineHeight.16}",
+      paddingX: "0.375rem",
+      paddingY: "{space.1}",
+      radius: "{radius.4}",
+    },
+    s: {
+      textSize: "{font.size.12}",
+      lineHeight: "{font.lineHeight.16}",
+      paddingX: "{space.2}",
+      paddingY: "0.375rem",
+      radius: "{radius.6}",
+    },
+    m: {
+      textSize: "{font.size.13}",
+      lineHeight: "{font.lineHeight.20}",
+      paddingX: "0.625rem",
+      paddingY: "0.375rem",
+      radius: "{radius.6}",
+    },
+    l: {
+      textSize: "{font.size.14}",
+      lineHeight: "{font.lineHeight.20}",
+      paddingX: "{space.3}",
+      paddingY: "{space.2}",
+      radius: "{radius.8}",
+    },
+    xl: {
+      textSize: "{font.size.16}",
+      lineHeight: "{font.lineHeight.24}",
+      paddingX: "{space.4}",
+      paddingY: "{space.2}",
+      radius: "{radius.8}",
+    },
     maxWidth: "17.5rem",
     /** Arrow base and depth; the arrow points at the trigger's centre. */
     arrowWidth: "0.625rem",

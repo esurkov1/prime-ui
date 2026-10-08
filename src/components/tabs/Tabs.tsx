@@ -144,10 +144,9 @@ function TabsRoot({
     ...(maxItemWidth !== undefined && { "--tabs-item-max": cssLength(maxItemWidth) }),
   };
 
-  // Horizontal tabs are a framed block: a layer of the ladder, its panel in the layer's own color.
-  const nestedDepth = useNestedSurfaceDepth();
-  const depth = orientation === "horizontal" ? nestedDepth : undefined;
-  const layout = <div className={styles.layout}>{children}</div>;
+  // Tabs are a framed block in both orientations: a layer of the ladder, its panel in the layer's
+  // own color, the strip two steps off it.
+  const depth = useNestedSurfaceDepth();
 
   return (
     <TabsProvider value={context}>
@@ -159,11 +158,9 @@ function TabsRoot({
         {...toDataAttributes({ orientation, size, tone, "full-width": fullWidth })}
       >
         {/* The root is the size container for the vertical → row switch; the layout sits inside. */}
-        {depth === undefined ? (
-          layout
-        ) : (
-          <SurfaceDepthProvider value={depth}>{layout}</SurfaceDepthProvider>
-        )}
+        <SurfaceDepthProvider value={depth}>
+          <div className={styles.layout}>{children}</div>
+        </SurfaceDepthProvider>
       </div>
     </TabsProvider>
   );
@@ -257,7 +254,13 @@ function placeIndicator(
   }
   const left = box.offsetLeft;
   const right = left + box.offsetWidth;
-  const flare = Number.parseFloat(getComputedStyle(indicator, "::after").width) || 0;
+  const top = box.offsetTop;
+  const bottom = top + box.offsetHeight;
+  // The folder rises from the panel's top edge in a row, reaches out of its side in a column (a
+  // vertical list in a narrow container is a row again).
+  const column = getComputedStyle(list).flexDirection.startsWith("column");
+  indicator.dataset.axis = column ? "y" : "x";
+  const flare = Number.parseFloat(getComputedStyle(indicator).scrollMarginTop) || 0;
   const transform = `translate(${left}px, ${box.offsetTop}px)`;
   const width = `${box.offsetWidth}px`;
   const height = `${box.offsetHeight}px`;
@@ -272,28 +275,53 @@ function placeIndicator(
   indicator.style.transform = transform;
   indicator.style.width = width;
   indicator.style.height = height;
-  indicator.dataset.edgeStart = String(left - flare < 0);
-  indicator.dataset.edgeEnd = String(box === items.at(-1) && right + flare > list.clientWidth);
+  // Positions are in the list's content box, so a scrolled list compares with its content end: the
+  // last tab of a list that scrolls ends the content, and a flare there would only lengthen the
+  // scroll by its own width (the last tab would never leave the end fade).
+  const scrolls = !column && list.scrollWidth > list.clientWidth + 0.5;
+  indicator.dataset.edgeStart = String(column ? top - flare < 0 : left - flare < 0);
+  indicator.dataset.edgeEnd = String(
+    box === items.at(-1) &&
+      (column ? bottom + flare > list.clientHeight : scrolls || right + flare > list.clientWidth),
+  );
   indicator.dataset.visible = String(box.offsetWidth > 0 && box.offsetHeight > 0);
+}
+
+/** The list's edge fade depth (`--prime-space-8`) in px: a revealed tab keeps clear of it. */
+function fadeDepth(list: HTMLElement): number {
+  const raw = getComputedStyle(list).getPropertyValue("--prime-space-8").trim();
+  const value = Number.parseFloat(raw);
+  if (!Number.isFinite(value)) return 0;
+  if (raw.endsWith("rem")) {
+    return value * (Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+  }
+  return value;
 }
 
 /**
  * Scrolls the list (never the page: `scrollIntoView` would scroll it too) so the active tab is in
- * view. Smooth only after a person's choice; on mount and outside changes it jumps.
+ * view and clear of the edge fade; near an end it scrolls all the way, where the fade melts to
+ * nothing, so the first and the last tab are never left under a fade. Smooth only after a
+ * person's choice; on mount and outside changes it jumps.
  */
 function revealActive(list: HTMLElement, smooth: boolean): void {
   if (list.scrollWidth <= list.clientWidth || typeof list.scrollTo !== "function") return;
   const box = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.parentElement;
   if (!box) return;
-  const start = box.offsetLeft;
-  const end = start + box.offsetWidth;
-  const left =
+  const margin = fadeDepth(list);
+  const max = list.scrollWidth - list.clientWidth;
+  const start = box.offsetLeft - margin;
+  const end = box.offsetLeft + box.offsetWidth + margin;
+  const target =
     start < list.scrollLeft
       ? start
       : end > list.scrollLeft + list.clientWidth
         ? end - list.clientWidth
         : null;
-  if (left !== null) list.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
+  if (target === null) return;
+  const left = Math.min(max, Math.max(0, target));
+  if (Math.abs(left - list.scrollLeft) < 1) return;
+  list.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
 }
 
 /**
@@ -402,14 +430,14 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
       role="tablist"
       aria-orientation={orientation}
       className={cx(styles.list, className)}
-      data-indicator={horizontal ? "folder" : "pill"}
+      data-indicator="folder"
       data-collapse={collapse}
       onKeyDown={handleKeyDown}
     >
       {/* First in DOM order so it paints below the tab content. */}
       <div
         ref={indicatorRef}
-        className={cx(styles.indicator, horizontal ? styles.indicatorFolder : styles.indicatorPill)}
+        className={cx(styles.indicator, styles.indicatorFolder)}
         data-indicator=""
         aria-hidden="true"
         onTransitionEnd={(event) => {

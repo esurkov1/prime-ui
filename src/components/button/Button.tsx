@@ -40,7 +40,8 @@ const BUTTON_LABELS: ButtonLabels = { holdHint: "Удерживайте, что�
 /** How long a hold-to-confirm press lasts; a gesture time, not motion, so reduced motion keeps it. */
 const HOLD_MS = 1200;
 
-type HoldPhase = "idle" | "holding" | "done";
+/** `cancel`: released before the end — the fill rolls back; `idle` after `done` only fades. */
+type HoldPhase = "idle" | "holding" | "done" | "cancel";
 
 export type ButtonRootProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size"> &
   ButtonColorProps & {
@@ -83,7 +84,7 @@ function useHoldToConfirm(enabled: boolean, onConfirm: (() => void) | undefined)
   React.useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const start = () => {
-    if (!enabled || phase !== "idle") return;
+    if (!enabled || phase === "holding" || phase === "done") return;
     setPhase("holding");
     timer.current = window.setTimeout(() => {
       setPhase("done");
@@ -92,22 +93,20 @@ function useHoldToConfirm(enabled: boolean, onConfirm: (() => void) | undefined)
   };
   const stop = () => {
     window.clearTimeout(timer.current);
-    setPhase("idle");
+    setPhase((current) =>
+      current === "holding" ? "cancel" : current === "done" ? "idle" : current,
+    );
   };
   return { phase, start, stop };
 }
 
 /** Runs of text among the children become one `MorphText`: a changed label flows into the new one. */
-function morphLabels(children: React.ReactNode, still: boolean): React.ReactNode[] {
+function morphLabels(children: React.ReactNode): React.ReactNode[] {
   const out: React.ReactNode[] = [];
   let run: string | null = null;
   const flush = () => {
     if (run !== null && run !== "") {
-      out.push(
-        <MorphText key={`label-${out.length}`} still={still}>
-          {run}
-        </MorphText>,
-      );
+      out.push(<MorphText key={`label-${out.length}`}>{run}</MorphText>);
     }
     run = null;
   };
@@ -232,7 +231,7 @@ function ButtonRoot({
         },
         onContextMenu: (event: React.MouseEvent<HTMLButtonElement>) => {
           rest.onContextMenu?.(event);
-          if (hold.phase !== "idle") event.preventDefault();
+          if (hold.phase === "holding" || hold.phase === "done") event.preventDefault();
         },
       }
     : null;
@@ -262,10 +261,14 @@ function ButtonRoot({
       }
       {...dataAttrs}
     >
-      {fillUsed ? <span className={styles.fill} aria-hidden="true" /> : null}
+      {fillUsed ? (
+        <span className={styles.fillTrack} aria-hidden="true">
+          <span className={styles.fill} />
+        </span>
+      ) : null}
       <ControlSizeProvider value={size}>
         {loading ? <Spinner className={styles.spinner} aria-hidden="true" /> : null}
-        {morphLabels(children, inProgress)}
+        {morphLabels(children)}
       </ControlSizeProvider>
     </button>
   );

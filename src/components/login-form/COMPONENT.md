@@ -144,9 +144,9 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a centered header — `align`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Padding, gaps and text roles of the card follow the tier; the fields and buttons take the same one — `size`. |
 | [structure.tsx](examples/structure.tsx) | The minimal form: no logo, description or footer, and no shadow for a host that already is a surface — `flat`. |
-| [register.tsx](examples/register.tsx) | Sign-up: five fields in one column, a password mismatch shown as the field error — `error`, `LoginForm.Form`. |
+| [register.tsx](examples/register.tsx) | Sign-up: five fields in one column, a strength meter on the new password and a mismatch shown as the field error — `strength`, `error`, `LoginForm.Form`. |
 | [forgot-password.tsx](examples/forgot-password.tsx) | Password reset request: one field, the primary action and a quiet way back — `LoginForm.Actions`. |
-| [reset-password.tsx](examples/reset-password.tsx) | A new password after the e-mail link: two fields and a mismatch error under the second one — `error`. |
+| [reset-password.tsx](examples/reset-password.tsx) | A new password after the e-mail link: a strength meter on the first field and a mismatch error under the second one — `strength`, `error`. |
 | [verification-code.tsx](examples/verification-code.tsx) | The second step with a one-time code: a rejected code shows its error under the cells, resend is a quiet action — `DigitInput`, `LoginForm.Actions`. |
 | [states.tsx](examples/states.tsx) | The submit cycle: the button is busy while the request runs, a failed request shows a danger Banner and marks the password — `loading`, `invalid`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen the card keeps its padding, the header wraps and the buttons stay full width. |

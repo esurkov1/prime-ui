@@ -1,4 +1,4 @@
-/** A new password after the e-mail link: two fields and a mismatch error under the second one — `error`. */
+/** A new password after the e-mail link: a strength meter on the first field and a mismatch error under the second one — `strength`, `error`. */
 import { Button, Icon, Input, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
@@ -23,7 +23,7 @@ export default function LoginFormResetPasswordExample() {
         </LoginForm.Header>
         <LoginForm.Body>
           <LoginForm.Form onSubmit={(e) => e.preventDefault()}>
-            <Input.Root label="Новый пароль" required hint="Минимум 6 символов">
+            <Input.Root label="Новый пароль" required hint="Минимум 8 символов" strength>
               <Input.Wrapper>
                 <Input.Field
                   type="password"

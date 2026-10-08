@@ -33,6 +33,10 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] Blocks are separated by fill and air, not borders; no card inside a card without reason.
 - [ ] My own bounded blocks are `Card`s (or plain tiles on `--prime-color-layer-nested` +
       `--prime-card-radius`); no hard-coded `--prime-color-layer-<n>-*`.
+- [ ] Hover never merges: a whole clickable card lifts (`--prime-shadow-overlay`) instead of a wash;
+      a part touching its surface's edge hovers with `--prime-color-fill-muted-hover`;
+      `--prime-color-fill-subtle` only on transparent, padded rows and ghost controls. Checked in both
+      themes, on the page and inside a card.
 
 ## Reuse
 - [ ] Every repeated-looking element is one component (kit or `shared/ui`), not copies.
@@ -55,6 +59,9 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] Destructive irreversible actions confirm in a Modal; results of submitted actions show a Notification
       (instant toggles show one only on failure).
 - [ ] No hand-written animation on kit parts; custom motion uses motion tokens, `transform`/`opacity` only.
+- [ ] Every state change moves through the kit ([motion.md](motion.md)): a changed button label is new
+      children (it morphs), a long action is `progress`, a counter is a number (it rolls), a new password
+      has `strength`, an accepted code is `success`; nothing moves on frequent or keyboard actions.
 
 ## Themes and widths
 - [ ] Screen checked with `data-theme="dark"`: no hard-coded colors, everything readable.

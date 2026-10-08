@@ -61,6 +61,13 @@ export const api: ComponentApi = {
           en: "Fill color, telling the outcome.",
           ru: "Цвет заливки, показывает исход.",
         },
+        {
+          name: "steps",
+          type: "boolean",
+          default: "false",
+          en: "Draws the scale as `max` equal cells (2–12), each filled whole; `value` rounds to a cell. In one change the cells go one after another — from the start when filling, from the end when emptying. For a level out of a few: password strength, onboarding steps.",
+          ru: "Шкала из `max` равных ячеек (2–12), каждая заполняется целиком; `value` округляется до ячейки. За одно изменение ячейки идут друг за другом — от начала при росте, с конца при убывании. Для уровня из нескольких: надёжность пароля, шаги настройки.",
+        },
       ],
     },
     {

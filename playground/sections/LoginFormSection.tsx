@@ -37,7 +37,7 @@ export const page: ComponentPageConfig = {
       scenario: "register",
       title: "Регистрация",
       description:
-        "Регистрация: пять полей в колонку, несовпадение паролей — ошибкой поля — `error`, `LoginForm.Form`.",
+        "Регистрация: пять полей в колонку, шкала надёжности у нового пароля и несовпадение — ошибкой поля — `strength`, `error`, `LoginForm.Form`.",
     },
     {
       scenario: "forgot-password",
@@ -49,7 +49,7 @@ export const page: ComponentPageConfig = {
       scenario: "reset-password",
       title: "Новый пароль",
       description:
-        "Новый пароль по ссылке из письма: два поля и ошибка несовпадения под вторым — `error`.",
+        "Новый пароль по ссылке из письма: шкала надёжности у первого поля и ошибка несовпадения под вторым — `strength`, `error`.",
     },
     {
       scenario: "verification-code",

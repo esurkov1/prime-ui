@@ -53,6 +53,27 @@ Text color goes through `Typography tone="secondary"`, not CSS.
 <DataTable columns={columns} rows={rows} />
 ```
 
+## 3a. Hover that merges with the neighbour
+
+A 4% wash (`fill-subtle`) is exactly one step of the surface ladder. On an opaque card it turns the
+card into the color of what it lies on — the page, a column, a zebra row — and the card vanishes
+under the pointer. A fixed layer color (`--prime-color-layer-floating-bg`) on something that can lie
+on different hosts does the same: on a white host the "white card" is already the host.
+
+```css
+/* bad — the clickable card washes one step: on hover it is the page's own gray */
+.tile { background: var(--prime-color-layer-1-bg); }
+.tile:hover { background: var(--prime-color-fill-subtle); }
+
+/* good — a whole surface lifts; a part touching the edge goes two steps; colors come from context */
+.tile { position: relative; transition: box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard); }
+.tile:hover { z-index: 1; box-shadow: var(--prime-shadow-overlay); } /* above its neighbours, or they cover the shadow */
+.row:hover { background: var(--prime-color-fill-muted-hover); }
+```
+
+Build the tile as a `Card` (it takes the right layer wherever it lands). Check every hover on the page
+and inside a card, in both themes: rest, hover and the neighbour must be three different colors.
+
 ## 4. Mixed control sizes in one row
 
 ```tsx partial

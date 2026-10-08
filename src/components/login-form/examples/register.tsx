@@ -1,4 +1,4 @@
-/** Sign-up: five fields in one column, a password mismatch shown as the field error — `error`, `LoginForm.Form`. */
+/** Sign-up: five fields in one column, a strength meter on the new password and a mismatch shown as the field error — `strength`, `error`, `LoginForm.Form`. */
 import { Button, Divider, Icon, Input, LinkButton, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
@@ -45,7 +45,7 @@ export default function LoginFormRegisterExample() {
                 <Input.Field placeholder="@login" />
               </Input.Wrapper>
             </Input.Root>
-            <Input.Root label="Пароль" required hint="Минимум 6 символов">
+            <Input.Root label="Пароль" required hint="Минимум 8 символов" strength>
               <Input.Wrapper>
                 <Input.Field
                   type="password"

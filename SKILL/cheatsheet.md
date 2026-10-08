@@ -78,6 +78,16 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Never a hand-made `div` backdrop, dialog, menu or tooltip.
 - While a request runs: `closeOnEscape={false}`, `<Modal.Header showClose={false}>`, Cancel disabled.
 
+## Motion — it comes with the components
+
+- Changed button text is new children: `<Button.Root>{saved ? "Сохранено" : "Сохранить"}</Button.Root>` flows in by letters — not two buttons swapped with a condition.
+- A long job from a button: `<Button.Root progress={0.42}>Экспорт 42%</Button.Root>` — not a ProgressBar next to it.
+- A reversible delete without a dialog: `<Button.Root tone="danger" variant="soft" holdToConfirm onConfirm={remove}>` — the action in `onConfirm`, not `onClick`.
+- Counts: a number child of `Badge` rolls its digits — not a string you re-render with your own fade.
+- New password: `<Input.Root strength>`; steps of a whole: `<ProgressBar steps value={2} max={5} />`; a trend tile: `<Sparkline data label formatValue />`.
+- A rare milestone only: `celebrate({ origin: event.currentTarget })` — never for a saved form.
+- No motion on keyboard-driven or high-frequency actions; tokens only, no bounce. Full guide: [motion.md](motion.md).
+
 ## Empty, loading, error — states flow, they never flip
 
 State change is continuous in the whole kit: every region that changes what it shows cross-fades, and loading holds the shape of what is coming.

@@ -1,38 +1,56 @@
 /* ─── Tooltip ────────────────────────────────────────────────────────────────
- * Inverse chip with caption text and an arrow pointing at the trigger's centre:
+ * Inverse chip (dark in light, light in dark) with an arrow pointing at the trigger's centre:
  * `--prime-color-tooltip-*`, `--prime-tooltip-*`. Flat — contrast comes from the inverse fill.
+ * A chip of tier T is as tall as a menu item of tier T; text, padding and radius step together.
+ * The chip is a host of its own: it points the text and fill roles at its inverse colors, so a Kbd
+ * or a secondary line inside reads on it instead of taking the page's colors.
  * `--tt-arrow` (`--float-arrow`, written by `usePosition`) is the arrow centre along the edge facing
  * the trigger; the chip grows out of that point, so it visibly comes from the trigger.
  */
 
 .content {
   --tt-arrow: var(--float-arrow, 50%);
-  --tt-text: var(--prime-text-caption-size);
-  --tt-lh: var(--prime-text-caption-line-height);
-  --tt-px: var(--prime-tooltip-padding-x);
-  --tt-py: var(--prime-tooltip-padding-y);
+  --tt-text: var(--prime-tooltip-m-text-size);
+  --tt-lh: var(--prime-tooltip-m-line-height);
+  --tt-px: var(--prime-tooltip-m-padding-x);
+  --tt-py: var(--prime-tooltip-m-padding-y);
+  --tt-radius: var(--prime-tooltip-m-radius);
   --tt-arrow-w: var(--prime-tooltip-arrow-width);
   --tt-arrow-h: var(--prime-tooltip-arrow-height);
   /* The arrow overlaps the chip by a hairline so no seam shows between them. */
   --tt-arrow-out: calc(100% - var(--prime-border-width));
 
+  /* Inverse context for whatever sits on the chip (Kbd, a muted line, a soft chip). */
+  --prime-color-text-primary: var(--prime-color-tooltip-text);
+  --prime-color-text-secondary: var(--prime-color-tooltip-muted);
+  --prime-color-text-muted: var(--prime-color-tooltip-muted);
+  --prime-color-fill-subtle: var(--prime-color-tooltip-fill);
+  --prime-color-fill-subtle-active: var(--prime-color-tooltip-fill);
+  --prime-color-fill-muted: var(--prime-color-tooltip-fill);
+
   position: fixed;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  /* Inline flow: a label and its key stay on one line («Жирный ⌘B»); block children stack. */
+  display: block;
   max-width: min(var(--prime-tooltip-max-width), calc(100vw - var(--prime-space-4)));
   padding-block: var(--tt-py);
   padding-inline: var(--tt-px);
-  border-radius: var(--prime-tooltip-radius);
+  border-radius: var(--tt-radius);
   background: var(--prime-color-tooltip-bg);
   color: var(--prime-color-tooltip-text);
   font-family: var(--prime-font-family-sans);
   font-size: var(--tt-text);
   font-weight: var(--prime-font-weight-regular);
   line-height: var(--tt-lh);
-  letter-spacing: var(--prime-text-caption-tracking);
   overflow-wrap: anywhere;
   isolation: isolate;
+}
+
+/* A key cap in the text flow sits inside the line box instead of growing it: the chip keeps its
+   tier height with or without a shortcut. */
+.content :where(kbd) {
+  margin-block: calc((var(--tt-lh) - var(--chip-h, var(--tt-lh))) / 2);
+  vertical-align: top;
 }
 
 /* Grows from the arrow tip. `[data-state]` outranks the generic edge-centre origin of
@@ -58,16 +76,37 @@
   animation: none;
 }
 
-/* xs / s / m — caption (12/16). l / xl — body-s (13/20) with larger padding. */
-.content[data-size="l"],
-.content[data-size="xl"] {
-  --tt-text: var(--prime-text-body-s-size);
-  --tt-lh: var(--prime-text-body-s-line-height);
+/* Tiers (`--prime-tooltip-<tier>-*`): height 24 · 28 · 32 · 36 · 40, one step at a time. */
+.content[data-size="xs"] {
+  --tt-text: var(--prime-tooltip-xs-text-size);
+  --tt-lh: var(--prime-tooltip-xs-line-height);
+  --tt-px: var(--prime-tooltip-xs-padding-x);
+  --tt-py: var(--prime-tooltip-xs-padding-y);
+  --tt-radius: var(--prime-tooltip-xs-radius);
+}
+
+.content[data-size="s"] {
+  --tt-text: var(--prime-tooltip-s-text-size);
+  --tt-lh: var(--prime-tooltip-s-line-height);
+  --tt-px: var(--prime-tooltip-s-padding-x);
+  --tt-py: var(--prime-tooltip-s-padding-y);
+  --tt-radius: var(--prime-tooltip-s-radius);
+}
+
+.content[data-size="l"] {
+  --tt-text: var(--prime-tooltip-l-text-size);
+  --tt-lh: var(--prime-tooltip-l-line-height);
+  --tt-px: var(--prime-tooltip-l-padding-x);
+  --tt-py: var(--prime-tooltip-l-padding-y);
+  --tt-radius: var(--prime-tooltip-l-radius);
 }
 
 .content[data-size="xl"] {
-  --tt-px: var(--prime-space-3);
-  --tt-py: var(--prime-space-2);
+  --tt-text: var(--prime-tooltip-xl-text-size);
+  --tt-lh: var(--prime-tooltip-xl-line-height);
+  --tt-px: var(--prime-tooltip-xl-padding-x);
+  --tt-py: var(--prime-tooltip-xl-padding-y);
+  --tt-radius: var(--prime-tooltip-xl-radius);
 }
 
 /* ─── Arrow ──────────────────────────────────────────────────────────────── */

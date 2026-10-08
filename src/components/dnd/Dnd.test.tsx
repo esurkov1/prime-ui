@@ -500,7 +500,11 @@ describe("Dnd.Draggable + Dnd.DropZone", () => {
       pressOn(screen.getByTestId("card"), 10, 10, { pointerType: "touch" });
       expect(document.documentElement).not.toHaveAttribute("data-dnd-active");
       act(() => {
-        vi.advanceTimersByTime(200);
+        vi.advanceTimersByTime(250);
+      });
+      expect(document.documentElement).not.toHaveAttribute("data-dnd-active");
+      act(() => {
+        vi.advanceTimersByTime(50);
       });
       expect(document.documentElement).toHaveAttribute("data-dnd-active", "touch");
       fireEvent.pointerCancel(window, { ...POINTER, pointerType: "touch" });
@@ -517,7 +521,7 @@ describe("Dnd.Draggable + Dnd.DropZone", () => {
       pressOn(screen.getByTestId("card"), 10, 10, { pointerType: "touch" });
       fireEvent.pointerMove(window, { ...POINTER, pointerType: "touch", clientX: 10, clientY: 40 });
       act(() => {
-        vi.advanceTimersByTime(300);
+        vi.advanceTimersByTime(500);
       });
       expect(document.documentElement).not.toHaveAttribute("data-dnd-active");
     } finally {

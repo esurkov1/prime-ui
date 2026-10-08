@@ -11,6 +11,7 @@ import { Icon } from "@/icons";
 import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import { Panel, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
+import { MotionCatalog } from "./MotionCatalog";
 import { resolvePrimitive, semanticKeys, sourceValue, toVarName } from "./tokenModel";
 
 const DURATIONS = semanticKeys("motion.duration").map((key) => ({
@@ -26,13 +27,16 @@ const EASINGS = semanticKeys("motion.easing").map((key) => ({
 }));
 
 /** Single-value motion tokens: the stagger step and the press scales. */
-const EXTRAS = ["motion.stagger", "motion.press.scale", "motion.press.scaleCompact"].map(
-  (path) => ({
-    key: path,
-    varName: toVarName(path),
-    value: resolvePrimitive(sourceValue(path, "light") ?? ""),
-  }),
-);
+const EXTRAS = [
+  "motion.stagger",
+  "motion.blur",
+  "motion.press.scale",
+  "motion.press.scaleCompact",
+].map((path) => ({
+  key: path,
+  varName: toVarName(path),
+  value: resolvePrimitive(sourceValue(path, "light") ?? ""),
+}));
 
 const DURATION_USE: Record<string, string> = {
   xfast: "Заливка при наведении на плотные строки, ячейки, опции",
@@ -43,6 +47,8 @@ const DURATION_USE: Record<string, string> = {
 
 const EXTRA_USE: Record<string, string> = {
   "motion.stagger": "Шаг между элементами при первом появлении группы (до 6 штук)",
+  "motion.blur":
+    "Размытие, которое прячет смену формы, когда два состояния меняются на месте (иконка → галочка, буквы подписи)",
   "motion.press.scale": "Масштаб при нажатии (:active) кнопок и других нажимаемых элементов",
   "motion.press.scaleCompact": "То же для кнопок-иконок и маленьких целей",
 };
@@ -375,13 +381,100 @@ function StateSwapDemo() {
   );
 }
 
+type FrequencyRow = { how: string; motion: string; examples: string };
+
+const FREQUENCY: FrequencyRow[] = [
+  {
+    how: "Сотни раз в день или с клавиатуры",
+    motion: "Без движения — только цвет и заливка, не дольше fast",
+    examples: "Подсветка пунктов стрелками, наведение на строки, палитра команд",
+  },
+  {
+    how: "Десятки раз в день",
+    motion: "Мало и быстро",
+    examples: "Наведение, вкладки, переключатели, галочки",
+  },
+  {
+    how: "Время от времени",
+    motion: "Стандартное движение слоёв",
+    examples: "Диалоги, панели, меню, уведомления",
+  },
+  {
+    how: "Редко",
+    motion: "Можно с удовольствием",
+    examples: "Успех, пустой экран, первое знакомство, закрытый квартал",
+  },
+];
+
+const FREQUENCY_COLUMNS: DataTableColumn<FrequencyRow>[] = [
+  { id: "how", header: "Как часто", accessor: "how", minWidth: "11rem" },
+  { id: "motion", header: "Движение", accessor: "motion", minWidth: "11rem" },
+  { id: "examples", header: "Например", accessor: "examples", grow: true, minWidth: "12rem" },
+];
+
 export default function MotionPage() {
   const reduced = useReducedMotion();
   return (
     <DocPage
       title="Движение"
-      description="Анимация объясняет, что изменилось и откуда появился элемент. Четыре длительности, четыре кривые, шаг стаггера и масштаб нажатия — других значений нет."
+      description="Движение — часть компонента, а не украшение: состояние не переключается, а перетекает, нажатие отвечает, слой появляется оттуда, откуда его вызвали. Большую часть кит делает сам; ниже — когда двигать, правила, приёмы движения на живых примерах и токены. Как двигаются слои, вкладки и переключатели, видно на страницах этих компонентов."
     >
+      <DocBlock
+        title="Сначала решить: двигать ли"
+        description="Решает частота действия. Чем чаще человек делает что-то, тем тише это должно быть."
+      >
+        <DocTable columns={FREQUENCY_COLUMNS} rows={FREQUENCY} getRowKey={(row) => row.how} />
+        <DocList>
+          <li>
+            У движения одна из четырёх целей: отклик (нажатие принято), смена состояния (галочка,
+            переключатель, выбор едет), связь в пространстве (панель растёт из кнопки, индикатор
+            переезжает) или защита от рывка (элементы появляются, высота меняется). «Красиво» на
+            частом элементе — не цель.
+          </li>
+          <li>
+            Прямое управление без сглаживания: пока палец тянет, листает или водит по графику, вещь
+            стоит под ним. Плавность начинается, когда отпустили.
+          </li>
+        </DocList>
+      </DocBlock>
+
+      <DocBlock title="Правила">
+        <DocList>
+          <li>
+            Только токены: никаких своих <code>ms</code> и <code>cubic-bezier</code>. Ничего дольше{" "}
+            <code>slow</code>.
+          </li>
+          <li>
+            Появление — <code>enter</code>, уход — <code>exit</code> и короче появления. Никогда{" "}
+            <code>ease-in</code>.
+          </li>
+          <li>Ничего не проскакивает цель: ни отскока, ни пружины, ни резинки.</li>
+          <li>
+            Не из ничего: появление из <code>opacity: 0</code> и небольшого сдвига или{" "}
+            <code>scale(0.96)</code>, никогда из <code>scale(0)</code>.
+          </li>
+          <li>
+            Состояние едет, а не подменяется: выбор переезжает, галочка рисуется, счётчик катится,
+            два содержимых растворяются друг в друге.
+          </li>
+          <li>
+            Двигаются <code>transform</code> и <code>opacity</code> (плюс цвет, заливка и тень для
+            состояния). Высота — через <code>grid-template-rows</code>. Никогда{" "}
+            <code>transition: all</code>.
+          </li>
+          <li>
+            Переключаемое состояние — переходы (их можно прервать на полпути), ключевые кадры —
+            только для разового появления.
+          </li>
+          <li>
+            Движение при наведении — только внутри <code>(hover: hover)</code>; ничего не доступно
+            лишь наведением.
+          </li>
+        </DocList>
+      </DocBlock>
+
+      <MotionCatalog />
+
       <DocBlock title="Токены">
         <TokensTable />
       </DocBlock>
@@ -431,6 +524,28 @@ export default function MotionPage() {
             <code>aria-busy</code>. Обратно в Skeleton их не возвращают.
           </li>
           <li>DataTable делает всё это сам: свойства loading, empty и error.</li>
+        </DocList>
+      </DocBlock>
+
+      <DocBlock title="Частые ошибки">
+        <DocList>
+          <li>
+            <code>{"{loading ? <A /> : <B />}"}</code> — содержимое мигает. Нужен{" "}
+            <code>Crossfade</code> и <code>Skeleton</code> в форме данных.
+          </li>
+          <li>
+            Две кнопки, подменяемые условием («Сохранить» / «Сохранено»). Нужна одна кнопка с новым
+            текстом — подпись перетечёт сама.
+          </li>
+          <li>
+            Отдельный ProgressBar рядом с кнопкой долгого действия. Нужен <code>progress</code>.
+          </li>
+          <li>Движение подсветки, которую водят стрелками, и подъём строк при наведении.</li>
+          <li>Конфетти за сохранённую форму. Только за редкое событие, остальное — уведомление.</li>
+          <li>Своя анимация галочки, переключателя или индикатора — компонент уже двигается.</li>
+          <li>
+            JS-анимация без проверки <code>prefers-reduced-motion</code>.
+          </li>
         </DocList>
       </DocBlock>
 

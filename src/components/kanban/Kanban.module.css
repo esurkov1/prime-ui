@@ -43,8 +43,8 @@
   min-height: 0;
   padding-block-start: var(--prime-space-2);
   border-radius: var(--prime-radius-l);
-  /* A translucent fill reads as a well on any surface (canvas, card, sunken) in both themes. */
-  background: var(--prime-color-fill-faint);
+  /* A well one ladder step off the surface around the board (its control fill, foundation §4). */
+  background: var(--prime-color-fill-muted);
   scroll-snap-align: start;
 }
 
@@ -126,7 +126,8 @@
   list-style: none;
 }
 
-/* An empty column: a faint well at the top of the drop area; it fades out while a card is over it. */
+/* An empty column: a well one ladder step deeper than the column (two off the board's surface) at
+   the top of the drop area; it fades out while a card is over it. */
 .empty {
   position: absolute;
   inset-block-start: 0;
@@ -135,7 +136,7 @@
   display: grid;
   place-content: center;
   border-radius: var(--prime-radius-m);
-  background: var(--prime-color-fill-faint);
+  background: var(--prime-color-fill-muted-hover);
   pointer-events: none;
   transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
@@ -155,28 +156,22 @@
   min-width: 0;
   padding: var(--prime-space-3);
   border-radius: var(--prime-radius-m);
-  /* A movable card: the floating layer's fill with the raised whisper (it lifts off the column). */
-  background: var(--prime-color-layer-floating-bg);
+  /* A movable card: two ladder steps lighter than its column (the selected thumb of the host's
+     track: white in light), with the raised whisper. */
+  background: var(--prime-color-control-selected);
   box-shadow: var(--prime-shadow-raised);
   list-style: none;
+  transition: box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* Hover wash under the content, faded in and out on opacity. */
-.item::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--prime-color-fill-subtle);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
+/* Hover lifts the card instead of washing it: a wash is one ladder step, the column's own color
+   (foundation §8, hover on a surface). The lifted card rises above its neighbours: the overlay
+   shadow reaches past the gap, and the next card (positioned, later in the DOM) would cover it. */
 @media (hover: hover) {
-  .item:not([data-disabled]):hover::after {
-    opacity: 1;
+  /* `[data-dnd-hover]`: a card dropped under the mouse lands straight into this look (Dnd). */
+  .item:not([data-disabled]):is(:hover, [data-dnd-hover]) {
+    z-index: 1;
+    box-shadow: var(--prime-shadow-overlay);
   }
 }
 
@@ -264,7 +259,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .empty,
-  .item::after {
+  .item {
     transition: none;
   }
 }

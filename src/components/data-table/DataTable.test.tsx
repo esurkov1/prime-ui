@@ -675,12 +675,18 @@ describe("DataTable CSS contract", () => {
       const collapse = screen.getByRole("button", { name: "Свернуть строку Денис" });
       expect(collapse).toHaveAttribute("aria-expanded", "true");
       const child = screen.getByText("Выплата").closest("tr") as HTMLElement;
-      expect(child).toHaveAttribute("data-depth", "1");
+      expect(child).toHaveAttribute("data-level", "1");
+      // `data-depth` is the surface ladder's attribute; a sub-row must never take it.
+      expect(child).not.toHaveAttribute("data-depth");
       expect(child).toHaveAttribute("data-animate", "true");
+      // A sub-row folds open like the detail panel.
+      expect(child).toHaveAttribute("data-fold", "opening");
       expect(collapse.getAttribute("aria-controls")?.split(" ")).toContain(child.id);
       expect(screen.getByText("Денис").closest("tr")).toHaveAttribute("data-expanded", "true");
       await user.click(collapse);
-      expect(screen.queryByRole("cell", { name: "Выплата" })).toBeNull();
+      // It folds shut first, then unmounts.
+      expect(screen.getByText("Выплата").closest("tr")).toHaveAttribute("data-fold", "closed");
+      await waitFor(() => expect(screen.queryByRole("cell", { name: "Выплата" })).toBeNull());
     });
 
     it("measures only the direct sub-rows of a collapsed row", () => {

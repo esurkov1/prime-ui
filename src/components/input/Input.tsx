@@ -12,9 +12,13 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
-import type { ControlSize } from "@/internal/states";
+import { MorphText } from "@/internal/MorphText";
+import type { ControlSize, Tone } from "@/internal/states";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
+import { ProgressBar } from "../progress-bar/ProgressBar";
 import styles from "./Input.module.css";
+import { getPasswordStrength, type PasswordStrength } from "./passwordStrength";
 
 export type InputLabels = {
   /** Muted marker after the label when `optional`. */
@@ -23,12 +27,32 @@ export type InputLabels = {
   clear: string;
   /** Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced. */
   counter: string;
+  /** Accessible name of the `strength` meter. */
+  strength: string;
+  /** Visible words of the four `strength` levels. */
+  strengthWeak: string;
+  strengthEasy: string;
+  strengthMedium: string;
+  strengthHard: string;
 };
 
 const INPUT_LABELS: InputLabels = {
   optional: "необязательно",
   clear: "Очистить",
   counter: "{current} из {max} символов",
+  strength: "Надёжность пароля",
+  strengthWeak: "Слабый",
+  strengthEasy: "Лёгкий",
+  strengthMedium: "Средний",
+  strengthHard: "Сложный",
+};
+
+/** Tone of each strength level: the meaning is also in the word, never in the color alone. */
+const STRENGTH_TONES: Record<Exclude<PasswordStrength, 0>, Tone> = {
+  1: "danger",
+  2: "warning",
+  3: "accent",
+  4: "success",
 };
 
 type InputContextValue = {
@@ -41,6 +65,8 @@ type InputContextValue = {
   inputRef: React.RefObject<HTMLInputElement | null>;
   describedBy: string | undefined;
   labels: InputLabels;
+  /** `Input.Field` reports its value here when the root shows a `strength` meter. */
+  reportValue: ((value: string) => void) | null;
 };
 
 const [InputProvider, useInputContext] = createComponentContext<InputContextValue>("Input");
@@ -72,6 +98,13 @@ export type InputRootProps = FieldRootDomProps & {
   reserveSupportRow?: boolean;
   /** Explicit id for the underlying <input>; auto-generated if omitted. */
   id?: string;
+  /**
+   * A password strength meter under the field: four steps that fill as the value grows stronger,
+   * with the level word on the right of the support row. Use on new-password fields.
+   */
+  strength?: boolean;
+  /** Replaces the kit's estimate (`getPasswordStrength`): return 0 (empty) … 4 (hard). */
+  getStrength?: (value: string) => PasswordStrength;
   labels?: Partial<InputLabels>;
   children: React.ReactNode;
 };
@@ -88,11 +121,14 @@ function InputRoot({
   counter,
   reserveSupportRow = false,
   id,
+  strength = false,
+  getStrength = getPasswordStrength,
   labels: labelsProp,
   children,
   className,
   ...rest
 }: InputRootProps) {
+  const [strengthValue, setStrengthValue] = React.useState("");
   const size = useControlSize(sizeProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid });
   const labels = React.useMemo(() => ({ ...INPUT_LABELS, ...labelsProp }), [labelsProp]);
@@ -109,9 +145,16 @@ function InputRoot({
       inputRef,
       describedBy,
       labels,
+      reportValue: strength ? setStrengthValue : null,
     }),
-    [size, isInvalid, focusRing, required, inputId, describedBy, labels],
+    [size, isInvalid, focusRing, required, inputId, describedBy, labels, strength],
   );
+  const level = strength ? getStrength(strengthValue) : 0;
+  const levelWord = level
+    ? [labels.strengthWeak, labels.strengthEasy, labels.strengthMedium, labels.strengthHard][
+        level - 1
+      ]
+    : "";
 
   return (
     <InputProvider value={contextValue}>
@@ -125,12 +168,42 @@ function InputRoot({
           optional={optional}
           hint={hint}
           error={error}
-          counter={counter}
-          reserveSupportRow={reserveSupportRow}
+          counter={
+            strength ? (
+              <>
+                <span
+                  className={styles.strengthWord}
+                  data-tone={level ? STRENGTH_TONES[level] : undefined}
+                  aria-live="polite"
+                >
+                  {levelWord ? (
+                    <>
+                      <VisuallyHidden>{`${labels.strength}: `}</VisuallyHidden>
+                      <MorphText>{levelWord}</MorphText>
+                    </>
+                  ) : null}
+                </span>
+                {counter}
+              </>
+            ) : (
+              counter
+            )
+          }
+          reserveSupportRow={reserveSupportRow || strength}
           optionalLabel={labels.optional}
           className={cx(fieldTierClass, styles.root, className)}
         >
           {children}
+          {strength ? (
+            <ProgressBar
+              steps
+              value={level}
+              max={4}
+              tone={level ? STRENGTH_TONES[level] : "neutral"}
+              size="xs"
+              aria-label={labels.strength}
+            />
+          ) : null}
         </FieldFrame>
       </ControlSizeProvider>
     </InputProvider>
@@ -182,8 +255,23 @@ function InputField({
   ref,
   ...rest
 }: InputFieldProps) {
-  const { inputId, inputRef, invalid, required: requiredCtx, describedBy } = useInputContext();
+  const {
+    inputId,
+    inputRef,
+    invalid,
+    required: requiredCtx,
+    describedBy,
+    reportValue,
+  } = useInputContext();
   const setRefs = useMergedRefs(inputRef, ref);
+
+  // A strength meter on the root follows the value: controlled, default, then every edit.
+  const controlled = rest.value;
+  React.useEffect(() => {
+    if (!reportValue) return;
+    if (controlled !== undefined) reportValue(String(controlled));
+    else if (inputRef.current) reportValue(inputRef.current.value);
+  }, [reportValue, controlled, inputRef]);
 
   const resolvedDescribedBy = [ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined;
 
@@ -199,6 +287,7 @@ function InputField({
       onChange={(event) => {
         onChange?.(event);
         onValueChange?.(event.target.value);
+        reportValue?.(event.target.value);
       }}
     />
   );

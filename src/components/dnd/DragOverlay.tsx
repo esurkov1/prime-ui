@@ -35,12 +35,38 @@ function cloneFor(preview: DragPreview): HTMLElement {
   return clone;
 }
 
+/**
+ * A mouse drop right over the item's new place: the item is hovered the moment it appears, so it is
+ * marked `data-dnd-hover` (its hover look, readable while it is still hidden) until the pointer
+ * leaves it or presses anywhere. Hosts style their hover lift on `:is(:hover, [data-dnd-hover])`.
+ */
+function holdHoverUntilLeave(node: HTMLElement) {
+  node.setAttribute("data-dnd-hover", "");
+  const release = () => {
+    node.removeAttribute("data-dnd-hover");
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerdown", release, true);
+  };
+  const onMove = (event: PointerEvent) => {
+    const r = node.getBoundingClientRect();
+    const inside =
+      event.clientX >= r.left &&
+      event.clientX <= r.right &&
+      event.clientY >= r.top &&
+      event.clientY <= r.bottom;
+    if (!inside) release();
+  };
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerdown", release, true);
+}
+
 /** The piece that follows the pointer: a clone of the lifted element above every layer. Mounted once by `Dnd.Root`. */
 export function DragOverlay({ controller }: { controller: DragController }) {
   const hostRef = React.useRef<HTMLDivElement | null>(null);
   const grabRef = React.useRef<Point>({ x: 0, y: 0 });
   const pointRef = React.useRef<Point>({ x: 0, y: 0 });
   const frameRef = React.useRef<number | null>(null);
+  const pointerKindRef = React.useRef<DragPreview["pointerKind"]>("mouse");
   const [mounted, setMounted] = React.useState(false);
 
   /** Stops whatever the previous drop left running: the clone's flight and the hidden destination. */
@@ -113,13 +139,29 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         const rect = layoutRect(destination);
         const to = translate({ x: rect.left, y: rect.top }, { x: 0, y: 0 });
         destination.setAttribute("data-dnd-landing", "");
+        // Where the pointer let go decides the look the item lands in: hovered under a mouse,
+        // resting under a finger. Read with transitions off, so it is the end value, not the start.
+        const box = destination.getBoundingClientRect();
+        const point = pointRef.current;
+        const pointerOver =
+          pointerKindRef.current === "mouse" &&
+          point.x >= box.left &&
+          point.x <= box.right &&
+          point.y >= box.top &&
+          point.y <= box.bottom;
+        const transition = destination.style.transition;
+        destination.style.transition = "none";
+        if (pointerOver) holdHoverUntilLeave(destination);
+        const landed = getComputedStyle(destination).boxShadow;
+        destination.style.transition = transition;
         const flight = host.animate([{ transform: from }, { transform: to }], timing);
-        // From the clone's drawn (lifted) state to flat: no second copy of the lift numbers.
+        // From the clone's drawn (lifted) state to the item's own: no second copy of the numbers,
+        // and no dip to flat before the hover lift comes back.
         const drawn = getComputedStyle(lifted);
         const setDown = lifted.animate(
           [
             { transform: drawn.transform, boxShadow: drawn.boxShadow },
-            { transform: "none", boxShadow: "none" },
+            { transform: "none", boxShadow: landed },
           ],
           timing,
         );
@@ -149,6 +191,7 @@ export function DragOverlay({ controller }: { controller: DragController }) {
       if (event.type === "start") {
         grabRef.current = event.preview.grab;
         pointRef.current = event.preview.point;
+        pointerKindRef.current = event.preview.pointerKind;
         // The previous landing holds its final transform (fill: forwards) until stopped.
         settle(host);
         host.replaceChildren(cloneFor(event.preview));

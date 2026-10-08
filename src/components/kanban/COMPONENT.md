@@ -24,7 +24,7 @@ import { Kanban, type KanbanColumn, type KanbanMove, type KanbanValue } from "pr
 ## Anatomy
 ```
 Kanban.Root                       board: horizontal strip of columns, its own Dnd.Root if none above
-└─ column (from `columns`)        `fill-faint` well; header + own vertical scroll
+└─ column (from `columns`)        `fill-muted` well (one ladder step off the board's surface); header + own vertical scroll
    ├─ header                      title (h3) · count Badge · renderColumnActions(column)
    └─ <ul> (Dnd.Sortable)         drop area; Skeleton cards while loading; EmptyPage when empty
       └─ Kanban.Item              <li> card from renderItem(item)
@@ -61,7 +61,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue">` | — | `className` (the board height), `aria-label` and the other div attributes. |
 
 ### Kanban.Item
-`ref` → `HTMLLIElement`. One card: an `<li>` on the floating layer's fill (`layer-floating-bg`) with the raised shadow; return it from `renderItem` (it takes its id from there). Draggable by the whole card, focusable, `aria-keyshortcuts` for Alt + arrows. Presses on buttons, fields and links inside never start a drag.
+`ref` → `HTMLLIElement`. One card: an `<li>` two ladder steps lighter than its column (`control-selected`: white in light) with the raised shadow, lifted to the overlay shadow on hover; return it from `renderItem` (it takes its id from there). Draggable by the whole card, focusable, `aria-keyshortcuts` for Alt + arrows. Presses on buttons, fields and links inside never start a drag.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -111,7 +111,7 @@ The board has no visual variants: one look, fills over lines.
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| idle | — | cards show `cursor: grab`; under a mouse the card gets a `fill-subtle` wash (`@media (hover: hover)` only) |
+| idle | — | cards show `cursor: grab`; under a mouse the card lifts to `--prime-shadow-overlay` (`@media (hover: hover)` only) — no wash: a wash is one ladder step, the column's own color |
 | carried | a drag | Dnd: the clone lifts on `--prime-shadow-modal`, a dashed accent gap opens where the card lands, cards glide aside |
 | over a column | pointer over another column | the gap opens there; an empty column's well fades out |
 | refused | `limit` reached, `canDrop` returns `false` | `data-dnd-reject` on the `<ul>`: `danger-soft` fill |
@@ -120,7 +120,7 @@ The board has no visual variants: one look, fills over lines.
 | loading | `loading` | `aria-busy` and `data-loading` on the root; `Skeleton` cards; `Crossfade` swaps them for the cards |
 | disabled | `disabled` / `Kanban.Item disabled` | `data-disabled` on the root / card; no `aria-roledescription`, no shortcuts |
 
-Motion: the hover wash and the empty well fade on opacity (`fast`, `standard`); the swap from skeletons is `Crossfade`; drag motion is Dnd's (lift, gap, glide, landing). Under `prefers-reduced-motion` all of it is off.
+Motion: the hover lift (shadow, the card rises above its neighbours) and the empty well fade (`fast`, `standard`); a card dropped under the mouse lands straight into its hover lift (`data-dnd-hover`); the swap from skeletons is `Crossfade`; drag motion is Dnd's (lift, gap, glide, landing). Under `prefers-reduced-motion` all of it is off.
 
 ## Layout & spacing
 - Give the root a height (`className`): columns span it and every column body scrolls on its own; without one the columns take the height of the tallest.

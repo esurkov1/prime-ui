@@ -74,16 +74,18 @@ No DOM: clones the single child, composes its `ref`, appends the tooltip id to i
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "role" \| "onPointerEnter" \| "onPointerLeave">` | — | `className`, `style` and the other attributes of the chip. |
 
 ## Variants
-Tooltip has no `variant` or `tone`: it is always a flat inverse chip (`tooltip-bg`, `tooltip-text`) with an arrow and no shadow, so it reads the same on canvas, cards and floating layers. The arrow (`--prime-tooltip-arrow-width` × `--prime-tooltip-arrow-height`) always points at the trigger's centre, also after flipping, aligning or shifting, and never slides into the chip's rounded corner.
+Tooltip has no `variant` or `tone`: it is always a flat inverse chip (`tooltip-bg`, `tooltip-text`) — dark in the light theme, light in the dark one — with an arrow and no shadow, so it reads the same on every layer. The chip is a host of its own: it points the text and fill roles at `tooltip-muted` / `tooltip-fill`, so a Kbd or a secondary line inside reads on it. Content flows inline: a label and its key stay on one line, block children stack. The arrow (`--prime-tooltip-arrow-width` × `--prime-tooltip-arrow-height`) always points at the trigger's centre, also after flipping, aligning or shifting, and never slides into the chip's rounded corner.
 
 ### size (Content)
+A chip of tier T is as tall as a menu item of tier T; text, padding and radius step together (`--prime-tooltip-<tier>-*`).
+
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | caption 12/16, padding 4 × 8 | Next to xs controls | |
-| `s` | caption 12/16, padding 4 × 8 | Dense toolbars, s controls | |
-| `m` | caption 12/16, padding 4 × 8 | Most controls | yes |
-| `l` | body-s 13/20, padding 4 × 8 | l controls, longer sentences | |
-| `xl` | body-s 13/20, padding 8 × 12 | xl controls | |
+| `xs` | 12/16, padding 4 × 6, radius 4 — 24 tall | Next to xs controls | |
+| `s` | 12/16, padding 6 × 8, radius 6 — 28 tall | Dense toolbars, s controls | |
+| `m` | 13/20, padding 6 × 10, radius 6 — 32 tall | Most controls | yes |
+| `l` | 14/20, padding 8 × 12, radius 8 — 36 tall | l controls, longer sentences | |
+| `xl` | 16/24, padding 8 × 16, radius 8 — 40 tall | xl controls | |
 
 ### side (Content)
 | Value | Looks like | Use when | Default |

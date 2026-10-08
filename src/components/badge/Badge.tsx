@@ -6,6 +6,7 @@ import chipTier from "@/internal/chipTier.module.css";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import palette from "@/internal/palette.module.css";
+import { RollingNumber } from "@/internal/RollingNumber";
 import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 
@@ -140,7 +141,14 @@ function BadgeRoot({
   const textOnly = !trailing && !onPress && edges.children.every(isText);
   const body = (
     <ControlSizeProvider value={tier}>
-      {textOnly ? edges.children : wrapText(edges.children)}
+      {typeof children === "number" ? (
+        // A count rolls its digits to the new value (foundation §7 rule 8).
+        <RollingNumber>{children}</RollingNumber>
+      ) : textOnly ? (
+        edges.children
+      ) : (
+        wrapText(edges.children)
+      )}
     </ControlSizeProvider>
   );
 

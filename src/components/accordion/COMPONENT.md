@@ -122,7 +122,7 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 |---|---|---|
 | open / closed | `value` / `defaultValue` + `onValueChange` | `data-state="open" \| "closed"` on Item, Trigger and Content; `aria-expanded` on Trigger; `inert` on a closed Content |
 | disabled | `disabled` on Item | `data-disabled` on Item and Trigger, native `disabled`, `text-disabled`, `cursor: not-allowed` |
-| hover / active | pointer | trigger `fill-subtle` / `fill-subtle-active` |
+| hover / active | pointer | trigger `fill-muted-hover` (two ladder steps off the accordion's layer, so it never lands on the host's color at the edges) / `fill-strong` |
 | focus-visible | keyboard | inset focus ring inside the trigger |
 
 Root: `data-size`, `data-layout`. The panel height transitions through `grid-template-rows: 0fr → 1fr` (no JS measuring, follows content that resizes while open) and the body fades in while settling by `--prime-space-1`; open uses `base` + `enter`, close `fast` + `exit`. The chevron rotates over `base`. Instant under `prefers-reduced-motion`.

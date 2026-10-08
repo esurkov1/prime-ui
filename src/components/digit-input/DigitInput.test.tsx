@@ -265,3 +265,26 @@ describe("DigitInput focusRing", () => {
     expect(container.firstChild).toHaveAttribute("data-full-width", "true");
   });
 });
+
+describe("DigitInput motion", () => {
+  it("shows one row ring on the focused cell instead of each cell's own", () => {
+    const { container } = render(<DigitInput length={4} label="Код" />);
+    const ring = container.querySelector("fieldset > span[aria-hidden='true']");
+    const cells = screen.getAllByRole("textbox");
+    expect(cells.every((cell) => cell.getAttribute("data-focus-ring") === "false")).toBe(true);
+    expect(ring).not.toHaveAttribute("data-visible");
+    fireEvent.focus(cells[0]);
+    expect(ring).toHaveAttribute("data-visible");
+    fireEvent.blur(cells[0], { relatedTarget: document.body });
+    expect(ring).not.toHaveAttribute("data-visible");
+  });
+
+  it("marks success only when the code is not invalid", () => {
+    const { rerender } = render(<DigitInput length={4} label="Код" defaultValue="1234" success />);
+    expect(screen.getByRole("group")).toHaveAttribute("data-success", "true");
+    rerender(
+      <DigitInput length={4} label="Код" defaultValue="1234" success error="Неверный код" />,
+    );
+    expect(screen.getByRole("group")).not.toHaveAttribute("data-success");
+  });
+});

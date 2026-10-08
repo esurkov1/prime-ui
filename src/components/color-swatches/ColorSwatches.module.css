@@ -12,7 +12,7 @@
   min-width: 0;
 }
 
-/* Invalid: the selection ring turns danger. */
-.grid[data-invalid="true"] > [data-state="checked"] {
-  outline-color: var(--prime-color-danger-border);
+/* Invalid: the inner edge of every swatch turns danger (the message says why). */
+.grid[data-invalid="true"] > *::after {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }

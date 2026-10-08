@@ -22,6 +22,7 @@ Read the cheatsheet first, then the skill entry point. Never guess a prop: if a 
 - [API contract](https://github.com/esurkov1/prime-ui/blob/main/SKILL/api-contract.md): prop vocabulary, controlled vs uncontrolled, forms, destructive actions, the icon registry names
 - [Foundations](https://github.com/esurkov1/prime-ui/blob/main/SKILL/foundations.md): grid, proximity scale, sizes, surfaces, type roles, tone and color
 - [Responsive](https://github.com/esurkov1/prime-ui/blob/main/SKILL/responsive.md): every screen from 320px — breakpoints, what the kit adapts by itself, the page panel (PageToolbar), switchers, touch, layout stability, the narrow-screen checklist
+- [Motion](https://github.com/esurkov1/prime-ui/blob/main/SKILL/motion.md): what the kit animates by itself, when to move at all, the motion tokens, recipes for long actions, saves, hold-to-delete, loading regions, counters, codes and milestones
 - [Anti-slop](https://github.com/esurkov1/prime-ui/blob/main/SKILL/anti-slop.md): what makes a screen look generated, bad → good
 - [Checklist](https://github.com/esurkov1/prime-ui/blob/main/SKILL/checklist.md): questions to answer before handing a screen over
 - [Design contract](https://github.com/esurkov1/prime-ui/blob/main/docs/foundation.md): the full design language and API v1 the kit is built on

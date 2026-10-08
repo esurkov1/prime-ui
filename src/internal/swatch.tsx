@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Icon } from "@/icons";
+import { CheckMark } from "@/internal/CheckMark";
 import { cx } from "@/internal/cx";
 
 import styles from "./swatch.module.css";
@@ -80,12 +80,15 @@ export function SwatchFill({ value }: { value: string | null }) {
   );
 }
 
-/** Inside a selectable swatch: the color layer and, when selected, the contrasting check. */
+/**
+ * Inside a selectable swatch: the color layer and the contrasting check, which draws in when the
+ * swatch is selected and retracts when it is not (`CheckMark`, the same mark as Checkbox).
+ */
 export function SwatchContent({ value, selected }: { value: string | null; selected: boolean }) {
   return (
     <>
       <SwatchFill value={value} />
-      {selected ? <Icon name="action.check" strokeWidth={3} className={styles.check} /> : null}
+      <CheckMark state={selected ? "checked" : "unchecked"} className={styles.check} />
     </>
   );
 }

@@ -19,7 +19,9 @@
   display: none;
 }
 
-.lift {
+/* `.overlay > .lift`: the clone keeps the classes of what it copies (a Kanban card, a row), and their
+   own resting shadow must not win over the lift whatever order the styles load in. */
+.overlay > .lift {
   box-shadow: var(--prime-shadow-modal);
   transform-origin: center;
   animation: lift var(--prime-motion-duration-fast) var(--prime-motion-easing-standard) both;
@@ -174,7 +176,7 @@ li.placeholder {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lift,
+  .overlay > .lift,
   .dropZone[data-dnd-flash] {
     animation: none;
   }

@@ -111,8 +111,10 @@
   --prime-color-text-placeholder: var(--prime-ref-color-gray-400);
   --prime-color-text-primary: var(--prime-ref-color-gray-100);
   --prime-color-text-secondary: var(--prime-ref-color-gray-300);
-  --prime-color-tooltip-bg: var(--prime-ref-color-gray-750);
-  --prime-color-tooltip-text: var(--prime-ref-color-gray-100);
+  --prime-color-tooltip-bg: var(--prime-ref-color-gray-100);
+  --prime-color-tooltip-fill: rgba(17, 19, 24, 0.08);
+  --prime-color-tooltip-muted: var(--prime-ref-color-gray-600);
+  --prime-color-tooltip-text: var(--prime-ref-color-gray-925);
   --prime-color-warning-default: var(--prime-ref-color-orange-400);
   --prime-color-warning-fg: var(--prime-ref-color-gray-950);
   --prime-color-warning-soft: color-mix(in srgb, var(--prime-ref-color-orange-500) 16%, transparent);

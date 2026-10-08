@@ -6,6 +6,13 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 
 import { Input } from "./Input";
 import styles from "./Input.module.css";
+import { getPasswordStrength } from "./passwordStrength";
+
+/** The visible counter («10/100»): its digits are separate odometer columns. */
+const counterText = (text: string) =>
+  screen.getByText(
+    (_, el) => el?.getAttribute("aria-hidden") === "true" && el.textContent === text,
+  );
 
 describe("Input size from the host", () => {
   it("takes the host tier without its own size; an explicit size wins", () => {
@@ -455,7 +462,7 @@ describe("Input field system", () => {
         </Input.Wrapper>
       </Input.Root>,
     );
-    expect(screen.getByText("12/10").parentElement).toHaveAttribute("data-invalid", "true");
+    expect(counterText("12/10").parentElement).toHaveAttribute("data-invalid", "true");
     expect(screen.getByText("12 из 10 символов")).toBeInTheDocument();
   });
 
@@ -586,5 +593,66 @@ describe("Input support row", () => {
     const row = screen.getByRole("textbox").parentElement?.nextElementSibling;
     expect(row).toHaveAttribute("data-reserve", "true");
     expect(row).toHaveAttribute("data-size", "l");
+  });
+});
+
+describe("Input strength", () => {
+  const meter = () => screen.getByRole("progressbar", { name: "Надёжность пароля" });
+
+  it("follows the typed value with the kit's estimate and names the level", () => {
+    render(
+      <Input.Root label="Пароль" strength>
+        <Input.Wrapper>
+          <Input.Field type="password" defaultValue="" />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    expect(meter()).toHaveAttribute("value", "0");
+    const field = screen.getByLabelText("Пароль");
+    fireEvent.change(field, { target: { value: "graphite" } });
+    expect(meter()).toHaveAttribute("value", "1");
+    expect(screen.getByText("Слабый")).toBeInTheDocument();
+    fireEvent.change(field, { target: { value: "Graphite2026!" } });
+    expect(meter()).toHaveAttribute("value", "4");
+    expect(screen.getByText("Сложный")).toBeInTheDocument();
+  });
+
+  it("reads a controlled value and a custom estimate", () => {
+    render(
+      <Input.Root label="Пароль" strength getStrength={(v) => (v === "ok" ? 3 : 1)}>
+        <Input.Wrapper>
+          <Input.Field type="password" value="ok" onChange={() => {}} />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    expect(meter()).toHaveAttribute("value", "3");
+    expect(screen.getByText("Средний")).toBeInTheDocument();
+  });
+});
+
+describe("getPasswordStrength", () => {
+  it("is empty only for an empty value", () => {
+    expect(getPasswordStrength("")).toBe(0);
+  });
+
+  it("adds a point for every trait on its own, in any order", () => {
+    expect(getPasswordStrength("graphite")).toBe(1); // lowercase
+    expect(getPasswordStrength("Graphite")).toBe(1); // + uppercase
+    expect(getPasswordStrength("Graphite7")).toBe(2); // + digit → easy
+    expect(getPasswordStrength("7Graphite")).toBe(2); // the order does not matter
+    expect(getPasswordStrength("Graphite7!")).toBe(4); // + symbol, 10 chars → hard
+    expect(getPasswordStrength("graphite7!")).toBe(3); // no uppercase → medium
+    expect(getPasswordStrength("!7etihparG")).toBe(4);
+  });
+
+  it("rewards length alone", () => {
+    expect(getPasswordStrength("graphiteprime")).toBe(1); // lowercase, 10+
+    expect(getPasswordStrength("graphiteprimekit")).toBe(2); // lowercase, 10+, 14+
+  });
+
+  it("keeps a short password at most easy, whatever it is made of", () => {
+    expect(getPasswordStrength("Ab1!")).toBe(2);
+    expect(getPasswordStrength("Ab1!xyz")).toBe(2);
+    expect(getPasswordStrength("Ab1!xyzw")).toBe(3);
   });
 });

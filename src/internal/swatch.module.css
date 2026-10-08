@@ -117,18 +117,14 @@
   }
 }
 
-.swatch[data-state="checked"] {
-  outline: var(--prime-focus-width) solid var(--prime-color-accent-default);
-  outline-offset: var(--prime-focus-offset);
-}
-
 .swatch:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
 
-/* A focused option div shows no browser outline on pointer focus. */
-.swatch:focus:not(:focus-visible):not([data-state="checked"]) {
+/* The check mark is the selection; a ring shows only for keyboard focus. A focused option div
+   shows no browser outline on pointer focus. */
+.swatch:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -139,9 +135,13 @@
 }
 
 /* ---- Check mark: light on dark colors, dark on light ones, in both themes ---- */
+/* The check (`CheckMark`) draws in with the selection and retracts without it. */
 .check {
+  --check-stroke: 3;
   position: relative;
   z-index: 1;
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
   color: var(--prime-color-control-thumb);
   pointer-events: none;
 }

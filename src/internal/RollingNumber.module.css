@@ -1,0 +1,42 @@
+/*
+ * RollingNumber — odometer digits. A digit column keeps its real glyph in the DOM (transparent) and
+ * draws a 0–9 strip in `::before` that glides to the digit (`base` · `emphasized`, never past it).
+ * The column's edges fade so a passing digit reads as motion, not two stacked glyphs. Reduced
+ * motion collapses the duration: digits change in place.
+ */
+.root {
+  display: inline-flex;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.digit {
+  position: relative;
+  display: inline-block;
+  height: 1lh;
+  overflow: hidden;
+  /* The real glyph stays for text and copy but is not painted; the strip paints the digit. */
+  -webkit-text-fill-color: transparent;
+  mask-image: linear-gradient(
+    transparent,
+    var(--prime-color-text-primary) 20%,
+    var(--prime-color-text-primary) 80%,
+    transparent
+  );
+}
+
+.digit::before {
+  content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  -webkit-text-fill-color: currentColor;
+  white-space: pre;
+  text-align: center;
+  transform: translateY(calc(var(--rolling-n) * -1lh));
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+.char {
+  white-space: pre;
+}

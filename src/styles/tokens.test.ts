@@ -67,6 +67,16 @@ describe("generated token styles", () => {
     }
   });
 
+  // `data-depth` belongs to the surface ladder: a component that reuses it for its own meaning
+  // (a tree level, a stack index) would silently swap the context colors of everything inside.
+  it("selects data-depth only in globals.css", () => {
+    const srcRoot = path.resolve(process.cwd(), "src");
+    const offenders = (readdirSync(srcRoot, { recursive: true }) as string[])
+      .filter((file) => file.endsWith(".css") && path.basename(file) !== "globals.css")
+      .filter((file) => readFileSync(path.join(srcRoot, file), "utf8").includes("[data-depth"));
+    expect(offenders).toEqual([]);
+  });
+
   it("maps every palette hue in internal/palette", () => {
     const css = readFileSync(
       path.resolve(process.cwd(), "src/internal/palette.module.css"),

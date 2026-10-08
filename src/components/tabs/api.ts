@@ -11,8 +11,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Tabs.Root",
-      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel; horizontal, it is the frame and a layer of the surface ladder: a strip two steps off the layer over the panel in the layer's own color.",
-      ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель. В горизонтальном режиме это рамка и слой лестницы поверхностей: полоса на два шага от слоя над панелью цвета слоя.",
+      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel. It is the frame and a layer of the surface ladder in both orientations: a strip two steps off the layer and the panel in the layer's own color — above the panel when horizontal, at its inline start when vertical.",
+      ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель. В обоих направлениях это рамка и слой лестницы поверхностей: полоса на два шага от слоя и панель цвета слоя — полоса над панелью в горизонтальном режиме, слева от неё в вертикальном.",
       props: [
         {
           name: "value",
@@ -37,8 +37,8 @@ export const api: ComponentApi = {
           name: "orientation",
           type: '"horizontal" | "vertical"',
           default: '"horizontal"',
-          en: "List direction and arrow keys. A vertical list stacks above the panel when the container is narrower than 600px.",
-          ru: "Направление списка и стрелок. Вертикальный список встаёт над панелью, когда контейнер уже 600px.",
+          en: "List direction and arrow keys. Vertical: a column of sections at the panel's inline start, the active one the panel reaching into the column; when the container is narrower than 600px the column becomes the horizontal strip above the panel.",
+          ru: "Направление списка и стрелок. Вертикальный: колонка разделов слева от панели, активный раздел — панель, вдающаяся в колонку; в контейнере уже 600px колонка становится горизонтальной полосой над панелью.",
         },
         {
           name: "size",
@@ -97,8 +97,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.List",
-      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (vertical: pill), which glides only into a choice by click or keys and is placed without motion on mount, resize and collapse. When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); then the list scrolls; a label is never cut to make room. The active tab is kept in view: only the list scrolls, never the page.',
-      ru: '`role="tablist"` на `ScrollContainer` со скользящей папкой (в вертикальном режиме — пилюлей): она скользит только к вкладке, выбранной кликом или клавишами, а при монтировании, изменении размера и сворачивании встаёт без анимации. Если вкладки не помещаются или подпись пришлось бы обрезать, скрывает иконки и описания, затем подписи (остаются иконки с подсказками; только если иконка есть у каждой вкладки); затем список прокручивается; подпись ради места не обрезается. Активная вкладка остаётся в поле зрения: прокручивается только список, не страница.',
+      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (in both orientations), which glides only into a choice by click or keys and is placed without motion on mount, resize and collapse. When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); then the list scrolls; a label is never cut to make room. The active tab is kept in view and clear of the edge fades (the first and the last tab scroll all the way to the end); only the list scrolls, never the page.',
+      ru: '`role="tablist"` на `ScrollContainer` со скользящей папкой (в обоих направлениях): она скользит только к вкладке, выбранной кликом или клавишами, а при монтировании, изменении размера и сворачивании встаёт без анимации. Если вкладки не помещаются или подпись пришлось бы обрезать, скрывает иконки и описания, затем подписи (остаются иконки с подсказками; только если иконка есть у каждой вкладки); затем список прокручивается; подпись ради места не обрезается. Активная вкладка остаётся в поле зрения и не уходит под тень края (к первой и последней список прокручивается до упора); прокручивается только список, не страница.',
       props: [
         {
           name: "children",

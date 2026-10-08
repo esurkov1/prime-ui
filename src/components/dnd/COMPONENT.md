@@ -134,7 +134,7 @@ Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element
 | carried | a drag | the clone follows the pointer, lifted on `--prime-shadow-modal`, scale 1.02; a sortable source leaves the layout (`data-lifted`) and a dashed accent gap of its size and radius fades in and glides with the items as the landing spot moves; entering a connected list, it fades out in the list it left and in where it opens; crossing empty space (the gutter between lists) leaves the gap in the last list that takes the item; neighbours glide aside; a `Dnd.Draggable` stays at 0.4 opacity (`data-dragging`) |
 | over a zone | pointer over an accepting zone | `data-dnd-over`: `accent-soft` fill, dashed accent outline |
 | refused | `canDrop` returns `false` | `data-dnd-reject`: `danger-soft` fill; the clone gets a dashed `danger` outline |
-| dropped | release over a target, or over empty space while a list holds the gap | the clone glides to the item's new place and is swapped for the real element; `data-dnd-flash` with `flashOnDrop` |
+| dropped | release over a target, or over empty space while a list holds the gap | the clone glides to the item's new place and is swapped for the real element; `data-dnd-flash` with `flashOnDrop`; the clone sets down into the look the item will have in place — its resting shadow, or under the mouse its hover look: the item gets `data-dnd-hover` until the pointer leaves it or presses, so a host styles its hover lift on `:is(:hover, [data-dnd-hover])` and the card never dips to flat and lifts again |
 | cancelled | Escape, a system-cancelled pointer | the clone flies back, nothing changes |
 | disabled | `disabled` | `data-disabled`, no `aria-roledescription` |
 

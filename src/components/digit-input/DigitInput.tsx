@@ -58,6 +58,11 @@ export type DigitInputProps = FieldRootDomProps &
     disabled?: boolean;
     /** Invalid state: danger ring on every cell. A non-empty `error` implies it. */
     invalid?: boolean;
+    /**
+     * The code was accepted (after the server checked it): the cells turn success one after
+     * another. Say it in words too (`hint`), never by color alone.
+     */
+    success?: boolean;
     /** Id of the first cell (the label points at it); generated when omitted. */
     id?: string;
     "aria-describedby"?: string;
@@ -81,6 +86,7 @@ export function DigitInput({
   onComplete,
   disabled,
   invalid,
+  success = false,
   focusRing = true,
   label,
   required,
@@ -120,6 +126,36 @@ export function DigitInput({
     if (index === null) return;
     pendingFocusRef.current = null;
     inputRefs.current[index]?.focus();
+  });
+
+  // One focus ring for the whole row: it glides to the focused cell instead of jumping between
+  // six rings (foundation §7 rule 8). It appears in place and only moves between cells.
+  const [focusIndex, setFocusIndex] = React.useState<number | null>(null);
+  const ringRef = React.useRef<HTMLSpanElement>(null);
+  const ringShown = React.useRef(false);
+
+  React.useLayoutEffect(() => {
+    const ring = ringRef.current;
+    const cell = focusIndex === null ? null : inputRefs.current[focusIndex];
+    if (!ring) return;
+    if (!cell) {
+      ringShown.current = false;
+      return;
+    }
+    const place = () => {
+      ring.style.width = `${cell.offsetWidth}px`;
+      ring.style.height = `${cell.offsetHeight}px`;
+      ring.style.transform = `translate(${cell.offsetLeft}px, ${cell.offsetTop}px)`;
+    };
+    if (!ringShown.current) {
+      ring.style.transition = "none";
+      place();
+      ring.getBoundingClientRect();
+      ring.style.transition = "";
+      ringShown.current = true;
+    } else {
+      place();
+    }
   });
 
   /** The value has no gaps, so the only cell that accepts input is the first empty one (or the last). */
@@ -170,10 +206,24 @@ export function DigitInput({
           size,
           "full-width": fullWidth || undefined,
           invalid: ids.invalid || undefined,
+          success: (success && !ids.invalid) || undefined,
           disabled: disabled || undefined,
           "focus-ring": focusRing ? undefined : false,
         })}
+        onFocus={(event) => {
+          const index = inputRefs.current.indexOf(event.target as unknown as HTMLInputElement);
+          if (index >= 0) setFocusIndex(index);
+        }}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setFocusIndex(null);
+        }}
       >
+        <span
+          ref={ringRef}
+          className={styles.ring}
+          aria-hidden="true"
+          data-visible={focusIndex !== null || undefined}
+        />
         {name ? <input type="hidden" name={name} value={value} /> : null}
         {cells.map((cell, index) => (
           <input
@@ -193,6 +243,9 @@ export function DigitInput({
             disabled={disabled}
             required={required}
             className={cx(fieldSurfaceClass, styles.cell)}
+            // The row's gliding ring replaces each cell's own.
+            data-focus-ring="false"
+            style={{ "--digit-i": index } as React.CSSProperties}
             data-size={size}
             data-filled={cell ? "true" : undefined}
             data-group-start={

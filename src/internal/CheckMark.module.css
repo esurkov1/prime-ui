@@ -1,0 +1,41 @@
+/*
+ * CheckMark — rounded check / bar drawn with a stroke reveal and an emphasized grow (scale) as it
+ * appears; leaving, it retracts quickly on the exit curve. `--check-stroke` sets the line weight
+ * (hosts on a color fill draw it heavier).
+ */
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.check,
+.bar {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--check-stroke, 2.25);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.6);
+  opacity: 0;
+  transition:
+    stroke-dashoffset var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+}
+
+.svg[data-state="checked"] .check,
+.svg[data-state="indeterminate"] .bar {
+  stroke-dashoffset: 0;
+  transform: scale(1);
+  opacity: 1;
+  transition:
+    stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}

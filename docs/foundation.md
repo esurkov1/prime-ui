@@ -282,7 +282,7 @@ should stay still, and say so in a CSS comment only when the omission is non-obv
 
 | State | Recipe |
 |---|---|
-| hover | filled: `-hover` token; ghost/stroke/rows: `--prime-color-fill-subtle` |
+| hover | filled: `-hover` token (`fill-muted-hover`, `field-bg-hover`: one more ladder step away from the host); ghost, stroke and rows inside a padded container: `--prime-color-fill-subtle`; a surface or a row that reaches its surface's edge: see "Hover on a surface" below |
 | active | filled: same as hover + `transform: scale(var(--prime-motion-press-scale))`; ghost: `fill-subtle-active` (+ the same press scale on pressable controls, see Motion) |
 | focus-visible | the focus ring (§7) |
 | selected | `accent-soft` bg + `accent-text`, or check icon in `accent-text` |
@@ -291,6 +291,27 @@ should stay still, and say so in a CSS comment only when the omission is non-obv
 | loading (region) | `Skeleton` in the data's geometry inside `Crossfade`, `aria-busy` on the region; data already shown stays during a refresh |
 | error | `danger-border` inset ring + `danger-text` message; layout does not shift (support row reserves height when the component asks for it) |
 | empty | centered muted text in `body-s`, optional action; reached through `Crossfade` like every region state |
+
+### Hover on a surface (hard rule)
+
+`fill-subtle` (a 4% ink wash) is one ladder step of lightness (ΔL ≈ 3). Laid over an opaque surface, a
+one-step change lands exactly on a neighbour's color — the host around the surface, the column a card
+lies in, a zebra row — and the hovered thing merges with it. So:
+
+- **A whole surface** (a card, a Kanban card, a clickable tile) does not change its fill on hover. It
+  lifts: `--prime-shadow-raised` → `--prime-shadow-overlay`.
+- **A part that reaches its surface's edge** (an Accordion trigger, a full-bleed list row) takes two
+  steps off its own layer: `--prime-color-fill-muted-hover`. Two steps never land on a neighbour.
+- **Rows that sit next to stepped rows** (a table with zebra rows or a stepped head) take
+  `fill-subtle-active`: stronger than one step, so a hovered row never looks like a zebra row.
+- `fill-subtle` stays for elements whose rest is transparent and that are padded away from their
+  surface's edges: ghost buttons, menu items, Sidebar rows, list rows inside a padded panel.
+- Never hard-code a layer color on something that can lie on different hosts (`layer-floating-bg` on
+  a card in a column): take the context (`fill-muted` for a well, `control-selected` for the card on
+  it, `layer-nested` for a tile), so it is always a step off whatever it lies on.
+
+Check every hover on both themes and on both preview layers (page and card): rest, hover and the
+neighbour must be three different colors.
 
 ### Overlay contract
 

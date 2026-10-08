@@ -8,6 +8,20 @@
   margin-inline: auto;
 }
 
+/* A settings block: wide enough for the side list next to a form, never wider than the preview. */
+.wide {
+  box-sizing: border-box;
+  width: min(100%, calc(20 * var(--prime-control-m-height)));
+  margin-inline: auto;
+}
+
+/* Fields and switches of a settings section: field → field rhythm (foundation §1). */
+.form {
+  display: grid;
+  gap: var(--prime-space-5);
+  max-width: calc(10 * var(--prime-control-m-height));
+}
+
 /* The same column, which the reader can drag narrower to watch the tabs collapse and scroll. */
 .resizable {
   composes: frame;

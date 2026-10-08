@@ -337,7 +337,8 @@ describe("Button motion", () => {
       expect(button).toHaveAttribute("data-hold", "holding");
       act(() => vi.advanceTimersByTime(600));
       fireEvent.pointerUp(button);
-      expect(button).toHaveAttribute("data-hold", "idle");
+      // Released early: the fill rolls back.
+      expect(button).toHaveAttribute("data-hold", "cancel");
       act(() => vi.advanceTimersByTime(2000));
       expect(onConfirm).not.toHaveBeenCalled();
 
@@ -346,6 +347,7 @@ describe("Button motion", () => {
       expect(onConfirm).toHaveBeenCalledTimes(1);
       expect(button).toHaveAttribute("data-hold", "done");
       fireEvent.pointerUp(button);
+      // Completed: the fill fades where it is, no roll back.
       expect(button).toHaveAttribute("data-hold", "idle");
     });
 
@@ -441,13 +443,13 @@ describe("Button motion", () => {
       const { rerender } = render(<Button.Root>Продолжить</Button.Root>);
       rerender(<Button.Root>Подтвердить</Button.Root>);
       const button = screen.getByRole("button", { name: "Подтвердить" });
-      expect(button.querySelectorAll("[aria-hidden='true'] > span").length).toBeGreaterThan(0);
+      expect(button.querySelectorAll("[style*='--morph-i']").length).toBeGreaterThan(0);
       act(() => vi.advanceTimersByTime(1000));
-      expect(button.querySelectorAll("[aria-hidden='true'] > span")).toHaveLength(0);
+      expect(button.querySelectorAll("[style*='--morph-i']")).toHaveLength(0);
       expect(button).toHaveTextContent("Подтвердить");
     });
 
-    it("changes in place when only digits change, under reduced motion and while in progress", () => {
+    it("changes in place when only digits change (a running percentage) and under reduced motion", () => {
       motion(false);
       const { rerender } = render(<Button.Root>Повторить через 59 с</Button.Root>);
       rerender(<Button.Root>Повторить через 58 с</Button.Root>);
@@ -455,14 +457,14 @@ describe("Button motion", () => {
       expect(button.querySelectorAll("[aria-hidden='true']")).toHaveLength(0);
 
       rerender(<Button.Root progress={0.3}>Скачивание 30%</Button.Root>);
-      rerender(<Button.Root progress={0.4}>Загрузка 40%</Button.Root>);
-      button = screen.getByRole("button", { name: "Загрузка 40%" });
-      expect(button.querySelectorAll("[aria-hidden='true'] > span")).toHaveLength(0);
+      rerender(<Button.Root progress={0.4}>Скачивание 40%</Button.Root>);
+      button = screen.getByRole("button", { name: "Скачивание 40%" });
+      expect(button.querySelectorAll("[style*='--morph-i']")).toHaveLength(0);
 
       motion(true);
       rerender(<Button.Root>Готово</Button.Root>);
       button = screen.getByRole("button", { name: "Готово" });
-      expect(button.querySelectorAll("[aria-hidden='true'] > span")).toHaveLength(0);
+      expect(button.querySelectorAll("[style*='--morph-i']")).toHaveLength(0);
     });
   });
 });

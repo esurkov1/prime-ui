@@ -99,6 +99,20 @@ export const api: ComponentApi = {
           ru: "Явный id поля; иначе генерируется. Связывает подпись, подсказку и ошибку.",
         },
         {
+          name: "strength",
+          type: "boolean",
+          default: "false",
+          en: "A password strength meter: a stepped `ProgressBar` (4 steps) under the field and the level word at the end of the support row — weak, easy, medium, hard (`labels.strengthWeak` … `strengthHard`), toned danger → warning → accent → success. Follows the value of `Input.Field`, controlled or not. For new-password fields.",
+          ru: "Шкала надёжности пароля: ступенчатый `ProgressBar` (4 шага) под полем и слово уровня в конце строки поддержки — слабый, лёгкий, средний, сложный (`labels.strengthWeak` … `strengthHard`), тон danger → warning → accent → success. Следит за значением `Input.Field`, управляемым или нет. Для поля нового пароля.",
+        },
+        {
+          name: "getStrength",
+          type: "(value: string) => 0 | 1 | 2 | 3 | 4",
+          default: "getPasswordStrength",
+          en: "Replaces the kit's estimate: every trait adds a point on its own, in any order — lowercase, uppercase, digits, symbols, 10+ and 14+ characters; 0–2 points weak, 3 easy, 4 medium, 5+ hard, and under 8 characters at most easy. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check.",
+          ru: "Заменяет оценку кита: каждый признак добавляет балл сам по себе, в любом порядке — строчные, заглавные, цифры, символы, 10+ и 14+ символов; 0–2 балла — слабый, 3 — лёгкий, 4 — средний, 5+ — сложный, короче 8 символов — не выше лёгкого. Верните 0 для пустого, 1 — слабый … 4 — сложный. Подсказка для человека, а не проверка безопасности.",
+        },
+        {
           name: "labels",
           type: "Partial<InputLabels>",
           en: "Built-in strings, see Labels.",
@@ -264,6 +278,36 @@ export const api: ComponentApi = {
       default: "{current} из {max} символов",
       en: "Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced.",
       ru: "Озвучка `Input.Counter`; `{current}` и `{max}` подставляются.",
+    },
+    {
+      key: "strength",
+      default: "Надёжность пароля",
+      en: "Accessible name of the `strength` meter and the spoken prefix of the level word.",
+      ru: "Имя шкалы `strength` и озвучиваемое начало слова уровня.",
+    },
+    {
+      key: "strengthWeak",
+      default: "Слабый",
+      en: "Level word for strength 1.",
+      ru: "Слово уровня 1.",
+    },
+    {
+      key: "strengthEasy",
+      default: "Лёгкий",
+      en: "Level word for strength 2.",
+      ru: "Слово уровня 2.",
+    },
+    {
+      key: "strengthMedium",
+      default: "Средний",
+      en: "Level word for strength 3.",
+      ru: "Слово уровня 3.",
+    },
+    {
+      key: "strengthHard",
+      default: "Сложный",
+      en: "Level word for strength 4.",
+      ru: "Слово уровня 4.",
     },
   ],
 };

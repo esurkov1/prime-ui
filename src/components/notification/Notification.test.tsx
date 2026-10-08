@@ -560,7 +560,7 @@ describe("NotificationCard", () => {
 
     rerender(<NotificationCard tone="danger" title="Ошибка" badge={3} onDismiss={onDismiss} />);
     expect(screen.getByRole("alert")).toBeInTheDocument();
-    expect(screen.getByText("3")).toHaveAttribute("data-color", "red");
+    expect(screen.getByText("3").closest("[data-color]")).toHaveAttribute("data-color", "red");
     fireEvent.click(screen.getByRole("button", { name: "Закрыть уведомление" }));
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });

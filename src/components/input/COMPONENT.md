@@ -57,6 +57,8 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `counter` | `ReactNode` | — | Right side of the support row, usually `<Input.Counter />`. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row (min height = hint line height), so an appearing error does not shift the layout. |
 | `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
+| `strength` | `boolean` | `false` | A password strength meter: a stepped `ProgressBar` (4 steps) under the field and the level word at the end of the support row — weak, easy, medium, hard (`labels.strengthWeak` … `strengthHard`), toned danger → warning → accent → success. Follows the value of `Input.Field`, controlled or not. For new-password fields. |
+| `getStrength` | `(value: string) => 0 \| 1 \| 2 \| 3 \| 4` | `getPasswordStrength` | Replaces the kit's estimate: every trait adds a point on its own, in any order — lowercase, uppercase, digits, symbols, 10+ and 14+ characters; 0–2 points weak, 3 easy, 4 medium, 5+ hard, and under 8 characters at most easy. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check. |
 | `labels` | `Partial<InputLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Usually `Input.Wrapper`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
@@ -168,7 +170,8 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 | disabled | native `disabled` on `Input.Field` | disabled fill, disabled text and icons, `cursor: not-allowed`, clear button disabled look |
 | read-only | native `readOnly` on `Input.Field` | no hover, default cursor |
 | reserved support row | `reserveSupportRow` | `data-reserve="true"` on the support row |
-| counter over limit | `current > max` | `data-invalid="true"` on `Input.Counter` |
+| counter over limit | `current > max` | `data-invalid="true"` on `Input.Counter`; the current count rolls its digits to each new value |
+| strength | `strength` + the value of `Input.Field` | a stepped `ProgressBar` (4 cells, `aria-label` = `labels.strength`) under the field fills one cell after another, weak · easy · medium · hard, toned danger → warning → accent → success; the level word at the end of the support row flows in letter by letter and is announced (`aria-live`); the support row is reserved |
 
 Size: `data-size` on root and wrapper. Slots: `data-side="start" | "end"`.
 
@@ -204,6 +207,11 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | `optional` | `"необязательно"` | Marker after the label when `optional`. |
 | `clear` | `"Очистить"` | Accessible name of `Input.ClearButton`. |
 | `counter` | `"{current} из {max} символов"` | Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced. |
+| `strength` | `"Надёжность пароля"` | Accessible name of the `strength` meter and the spoken prefix of the level word. |
+| `strengthWeak` | `"Слабый"` | Level word for strength 1. |
+| `strengthEasy` | `"Лёгкий"` | Level word for strength 2. |
+| `strengthMedium` | `"Средний"` | Level word for strength 3. |
+| `strengthHard` | `"Сложный"` | Level word for strength 4. |
 
 ## Examples
 | Example | Shows |
@@ -215,6 +223,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | [with-icon.tsx](examples/with-icon.tsx) | A decorative icon at either end of the value — `Input.Icon`, `side`. |
 | [affixes.tsx](examples/affixes.tsx) | A fixed prefix and suffix flush with the edges and a unit next to the value — `Input.Affix`, `Input.InlineAffix`. |
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single search field where the caret and the lighter fill show focus — `focusRing`. |
+| [password-strength.tsx](examples/password-strength.tsx) | A new password with a meter that fills step by step and names the level beside the hint — `strength`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a clear button and a character counter follow it — `value`, `onValueChange`, `Input.ClearButton`, `Input.Counter`. |
 | [in-form.tsx](examples/in-form.tsx) | Company details form: required fields checked on submit, neighbours keep their bottoms aligned — `required`, `error`, `reserveSupportRow`. |
 

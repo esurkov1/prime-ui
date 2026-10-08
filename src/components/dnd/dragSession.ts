@@ -106,9 +106,11 @@ const POINTER_ACTIVATION: Activation = {
   delay: 0,
   tolerance: Number.POSITIVE_INFINITY,
 };
+// 280 ms: long enough that a slow start of a scroll is not taken for a grab, short enough not to
+// feel like waiting.
 const TOUCH_ACTIVATION: Activation = {
   distance: Number.POSITIVE_INFINITY,
-  delay: 180,
+  delay: 280,
   tolerance: 10,
 };
 

@@ -5,6 +5,7 @@ import { Label } from "@/components/label/Label";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
+import { RollingNumber } from "@/internal/RollingNumber";
 import type { ControlSize } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -232,7 +233,7 @@ export function FieldCounter({ current, max, size, label, className, ...rest }: 
       aria-live="polite"
     >
       <span aria-hidden="true">
-        {current}/{max}
+        <RollingNumber>{current}</RollingNumber>/{max}
       </span>
       <VisuallyHidden>{formatLabel(label, { current, max })}</VisuallyHidden>
     </span>

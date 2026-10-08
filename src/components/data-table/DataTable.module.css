@@ -454,8 +454,68 @@
 }
 
 /* Sub-rows: the first content cell is indented by depth. */
-.row[data-depth] > .cell[data-first-column="true"] {
+.row[data-level] > .cell[data-first-column="true"] {
   padding-inline-start: calc(var(--dt-pad-x) + var(--dt-depth) * var(--dt-indent));
+}
+
+/*
+ * Sub-rows fold open and shut like the detail panel: each cell's content runs through a grid track
+ * (0fr ↔ 1fr) on the `base` clock, with the fade on the same curve. The row height and the
+ * vertical padding live inside the track (`.foldPad`), and a closing row's divider thins to 0, so
+ * a folded row takes no room before it unmounts. Clipping is on only while it moves (opening,
+ * closed), so a focus ring at rest is never cut.
+ */
+.row[data-fold] > .cell {
+  height: auto;
+  padding-block: 0;
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    border-top-width var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.fold {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.foldItem {
+  min-height: 0;
+}
+
+.row:is([data-fold="opening"], [data-fold="closed"]) .foldItem {
+  overflow: hidden;
+}
+
+.foldPad {
+  box-sizing: border-box;
+  display: grid;
+  align-content: center;
+  min-height: var(--dt-row-height);
+  padding-block: var(--dt-pad-y);
+}
+
+.row[data-fold="opening"] .fold {
+  animation: dt-fold-open var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+@keyframes dt-fold-open {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+.row[data-fold="closed"] .fold {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.row[data-fold="closed"] > .cell {
+  border-top-width: 0;
 }
 
 /* Sub-rows of collapsed rows: laid out for the column widths, never shown or reachable. */
@@ -475,15 +535,20 @@
   --dt-cell-bg: var(--dt-step);
 }
 
+/* Hover is the stronger wash: the 4% one equals one ladder step, so a hovered plain row would take
+   exactly the zebra row's color (foundation §8, hover on a surface). */
 @media (hover: hover) {
   .root[data-highlight-row="true"] .row:hover {
-    --dt-wash: var(--prime-color-fill-subtle);
+    --dt-wash: var(--prime-color-fill-subtle-active);
   }
 }
 
 .root[data-highlight-column="true"] .cell[data-column-hovered="true"],
 .root[data-highlight-column="true"] .headCell[data-column-hovered="true"] {
-  background-image: linear-gradient(var(--prime-color-fill-subtle), var(--prime-color-fill-subtle));
+  background-image: linear-gradient(
+    var(--prime-color-fill-subtle-active),
+    var(--prime-color-fill-subtle-active)
+  );
 }
 
 /* Expanded parent: one opaque step off the table fill, so its group reads as one. */
@@ -502,21 +567,22 @@
 .detailCell {
   padding: 0;
   background: var(--dt-step);
-  border-top: var(--dt-divider-width) solid var(--dt-divider-color);
 }
 
 /*
  * Height runs through the grid track (0fr ↔ 1fr), like Accordion. Open: the panel opened by an
- * expand drops in (slow · enter); close: it folds and fades (fast · exit) and unmounts after the
- * transition (`usePresence`).
+ * expand drops in (slow · enter); close: it folds on the same clock as it opened (base) and
+ * unmounts after the transition (`usePresence`). The fade follows the height, so text and room
+ * leave together. Nothing outside the track has a size of its own: the padding and the divider
+ * live inside the clipped content, so the track really reaches 0 and the unmount moves nothing.
  */
 .detailMotion {
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
   transition:
-    grid-template-rows var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 .detailRow[data-state="open"] .detailMotion {
@@ -538,12 +604,17 @@
   }
 }
 
-/* Padded content (focus-space kept) inside the clipping wrapper. */
-.detailContent {
+/* The grid item: no padding or border of its own, so the 0fr track collapses it to nothing. */
+.detailClip {
   min-height: 0;
   overflow: hidden;
+}
+
+/* Padded content (focus-space kept) and the divider, inside the clip. */
+.detailContent {
   padding: var(--prime-space-3) var(--dt-pad-x) var(--prime-space-4)
     calc(var(--dt-lead) + var(--dt-pad-x));
+  border-top: var(--dt-divider-width) solid var(--dt-divider-color);
   font-size: var(--prime-text-body-s-size);
   line-height: var(--prime-text-body-s-line-height);
   color: var(--prime-color-text-secondary);
@@ -569,7 +640,7 @@
 }
 
 .root[data-highlight-row="true"] .row[data-clickable="true"]:active {
-  --dt-wash: var(--prime-color-fill-subtle-active);
+  --dt-wash: var(--prime-color-fill-strong);
 }
 
 /* ---------- Sticky first column ---------- */

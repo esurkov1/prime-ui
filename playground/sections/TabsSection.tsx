@@ -55,7 +55,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "orientation",
       description:
-        "Вкладки над панелью и боковой список разделов, который уже 600px встаёт сверху — `orientation`.",
+        "Настройки аккаунта с боковым списком разделов: активный раздел вдаётся в колонку из панели, а уже 600px список встаёт над панелью — `orientation`.",
     },
     {
       slot: "overflow",

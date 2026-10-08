@@ -59,6 +59,13 @@ export const api: ComponentApi = {
           ru: "Ошибка без текста: красное кольцо и цифры, `aria-invalid`.",
         },
         {
+          name: "success",
+          type: "boolean",
+          default: "false",
+          en: "The code was accepted (after the server checked it): the cells turn success one after another. Ignored while invalid. Say it in words too (`hint`).",
+          ru: "Код принят (после проверки на сервере): ячейки по очереди становятся зелёными. Не действует при ошибке. Скажите это и словами (`hint`).",
+        },
+        {
           name: "disabled",
           type: "boolean",
           en: "Disables the fieldset and every cell.",

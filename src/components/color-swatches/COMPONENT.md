@@ -48,7 +48,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
 | `hint` | `ReactNode` | — | Help text under the swatches. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
-| `invalid` | `boolean` | — | Danger selection ring and `aria-invalid`. A non-empty `error` implies it. |
+| `invalid` | `boolean` | — | Danger inner edge on every swatch and `aria-invalid`. A non-empty `error` implies it. |
 | `disabled` | `boolean` | `false` | Disables every swatch (grey, half transparent). |
 | `allowEmpty` | `boolean` | `false` | Adds the «no color» checkerboard swatch after the presets (value `null`). |
 | `name` | `string` | — | Form field name: a hidden input submits the selected color (empty string for no color). |
@@ -76,7 +76,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `allowEmpty` | an extra checkerboard swatch «Без цвета» at the end | the color is optional | `false` |
-| `invalid` | the selection ring turns danger | the message is shown elsewhere; otherwise pass `error` | — |
+| `invalid` | the inner edge of every swatch turns danger | the message is shown elsewhere; otherwise pass `error` | — |
 | `disabled` | every swatch grey at half opacity | the choice is unavailable | `false` |
 
 **Combinations**
@@ -87,17 +87,17 @@ ColorSwatches                 field frame: label → swatches → hint | error
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| selected | `value` / `defaultValue` | `aria-checked="true"`, `data-state="checked"` on the radio; 2px accent ring with a 2px gap and a check mark (light or dark by color contrast) |
+| selected | `value` / `defaultValue` | `aria-checked="true"`, `data-state="checked"` on the radio; the check mark (light or dark by color contrast) scales in from half size (`base` · emphasized) and leaves faster (`fast` · exit); no ring — the check is the selection |
 | hover | pointer | the swatch scales to 1.08 (fine pointers only) |
 | focus-visible | keyboard | focus ring outside the swatch |
-| invalid | `invalid` / `error` | `aria-invalid`, `data-invalid` on the group; the selected ring turns `danger-border` |
+| invalid | `invalid` / `error` | `aria-invalid`, `data-invalid` on the group; the inner edge of every swatch turns `danger-border` |
 | disabled | `disabled` | native `disabled` on every radio, `aria-disabled` and `data-disabled` on the group |
 
 Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 
 ## Layout & spacing
 - The swatches take the container width and wrap to new rows by themselves; no column count to set. In a content-sized container they stay in one row.
-- The selection / focus rings sit outside the swatches; kit hosts (Modal / Drawer body, panels, cards) already keep `--prime-focus-space` padding, so the rings are never clipped. In your own `overflow` container, keep that padding.
+- The keyboard focus ring sits outside the swatches; kit hosts (Modal / Drawer body, panels, cards) already keep `--prime-focus-space` padding, so the ring is never clipped. In your own `overflow` container, keep that padding.
 - Label → swatches and swatches → hint use the tier `label-gap` / `hint-gap`; field → field 20.
 
 ## Accessibility

@@ -130,14 +130,16 @@
   transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
+/* The trigger reaches the surface's edges: a one-step wash would land on the host's color there, so
+   hover is two ladder steps off the accordion's own layer (foundation §8, hover on a surface). */
 @media (hover: hover) {
   .trigger:hover:not(:disabled) {
-    background: var(--prime-color-fill-subtle);
+    background: var(--prime-color-fill-muted-hover);
   }
 }
 
 .trigger:active:not(:disabled) {
-  background: var(--prime-color-fill-subtle-active);
+  background: var(--prime-color-fill-strong);
 }
 
 .trigger:focus-visible {

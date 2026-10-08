@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 61 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 62 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines — a surface ladder where every nested
@@ -200,6 +200,7 @@ accessibility, examples and common mistakes.
 | [**Badge**](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) | The kit's one chip: a status, category or count label, a removable value or applied filter, and a pressable toggle with a hover action, in a palette color. |
 | [**Avatar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) | A round photo of a person or entity with an initials or icon fallback, presence dot and overlapping groups. |
 | [**Thumbnail**](https://github.com/esurkov1/prime-ui/blob/main/src/components/thumbnail/COMPONENT.md) | A preview of an object — product, vehicle, file, cover — at a fixed aspect ratio, with a colored icon fallback. |
+| [**Sparkline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/sparkline/COMPONENT.md) | A small line chart with its headline — the latest value, its change against the point before and its date — where any point can be scrubbed. |
 | [**Kbd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kbd/COMPONENT.md) | A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`. |
 | [**Card**](https://github.com/esurkov1/prime-ui/blob/main/src/components/card/COMPONENT.md) | A filled surface block with structural templates for metrics, charts, lists, calls to action and covers. |
 | [**DataTable**](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) | A data table with sorting, pagination or infinite scroll, row selection, nested rows and loading / empty / error states. |
@@ -286,6 +287,8 @@ accessibility, examples and common mistakes.
 | `ControlSizeProvider` | Default `size` for every control in a subtree (dense toolbars, compact forms). |
 | `Tooltip.Provider` | Shared open delay for a group of tooltips. |
 | `applyTheme(scheme, element?)` | Switch the theme without transition flashes. |
+| `celebrate({ origin? })` | A short confetti burst for a rare milestone (a quarter closed, the first payment); draws nothing under reduced motion. |
+| `getPasswordStrength(value)` | The kit's 0–4 password estimate behind `Input.Root strength`; replace it with `getStrength`. |
 | `<Icon name="…" />`, `createIcon(glyph)` | The kit icon set (built on lucide-react); `createIcon` turns a domain glyph into a kit icon. |
 
 ## Docs inside the package

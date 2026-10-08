@@ -626,9 +626,10 @@ describe("Tabs — indicator", () => {
     }
   });
 
-  it("uses a pill indicator in a vertical list", () => {
-    render(<BasicTabs orientation="vertical" />);
-    expect(screen.getByRole("tablist")).toHaveAttribute("data-indicator", "pill");
+  it("uses the folder in a vertical list too, and makes the root a layer", () => {
+    const { container } = render(<BasicTabs orientation="vertical" />);
+    expect(screen.getByRole("tablist")).toHaveAttribute("data-indicator", "folder");
+    expect(container.querySelector('[data-orientation="vertical"]')).toHaveAttribute("data-depth");
   });
 });
 

@@ -4,6 +4,7 @@ import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { exitTimeoutMs } from "@/hooks/usePresence";
 import { useStateSwap } from "@/hooks/useStateSwap";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
@@ -149,6 +150,7 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
 
 const EMPTY_KEYS: React.Key[] = [];
 const SKELETON_ROWS = 5;
+const NO_KEYS: ReadonlySet<React.Key> = new Set();
 const INFINITE_SCROLL_HEIGHT = 360;
 
 const domIdPart = (key: React.Key) => String(key).replace(/[^A-Za-z0-9_-]/g, "_");
@@ -304,11 +306,31 @@ export function DataTable<Row>({
   /** The latest expansion for the stable toggle (memoized rows keep their props). */
   const expansion = React.useRef({ expandedKeys, setExpandedKeys });
   expansion.current = { expandedKeys, setExpandedKeys };
+  /** Rows collapsed a moment ago: their sub-rows stay drawn while they fold away (base). */
+  const [closingKeys, setClosingKeys] = React.useState<ReadonlySet<React.Key>>(NO_KEYS);
   const toggleExpanded = React.useCallback((key: React.Key) => {
     const { expandedKeys: keys, setExpandedKeys: setKeys } = expansion.current;
     const isOpen = keys.includes(key);
     setLastExpandedKey(isOpen ? null : key);
     setKeys(isOpen ? keys.filter((k) => k !== key) : [...keys, key]);
+    setClosingKeys((prev) => {
+      const next = new Set(prev);
+      if (isOpen) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+    if (isOpen) {
+      window.setTimeout(
+        () =>
+          setClosingKeys((prev) => {
+            if (!prev.has(key)) return prev;
+            const next = new Set(prev);
+            next.delete(key);
+            return next;
+          }),
+        exitTimeoutMs("base"),
+      );
+    }
   }, []);
 
   const flat = React.useMemo(
@@ -324,6 +346,7 @@ export function DataTable<Row>({
         withDetail: Boolean(renderExpanded),
         isRowExpandable,
         expanded: expandedSet,
+        closing: closingKeys,
         arrived: rowArrival.added,
         lastExpandedKey,
         collectKeys: selectable,
@@ -340,6 +363,7 @@ export function DataTable<Row>({
       renderExpanded,
       isRowExpandable,
       expandedSet,
+      closingKeys,
       rowArrival.added,
       lastExpandedKey,
       selectable,
@@ -522,6 +546,7 @@ export function DataTable<Row>({
                         expandable={item.expandable}
                         expanded={item.expanded}
                         animate={item.animate}
+                        folding={item.folding}
                         detailAnimate={lastExpandedKey === item.key}
                         selected={selectable && selection.selectedSet.has(item.key)}
                         childControls={item.childKeys.map(rowDomId).join(" ")}

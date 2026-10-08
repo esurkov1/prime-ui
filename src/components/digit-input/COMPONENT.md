@@ -44,6 +44,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | `hint` | `ReactNode` | — | Help text under the cells. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | — | Danger ring and danger digits on every cell, `aria-invalid`. A non-empty `error` implies it. |
+| `success` | `boolean` | `false` | The code was accepted (after the server checked it): the cells turn success one after another. Ignored while invalid. Say it in words too (`hint`). |
 | `disabled` | `boolean` | — | Disables the fieldset and every cell. |
 | `value` | `string` | — | Controlled code; non-digits are dropped, extra digits cut to `length`. |
 | `defaultValue` | `string` | `""` | Initial code when uncontrolled. |
@@ -92,8 +93,9 @@ No `variant` or `tone`.
 | State | Driven by | DOM |
 |---|---|---|
 | hover | — | cell fill darkens (not on focused or disabled cells) |
-| focus | keyboard / click | focused cell: focus fill + inset focus ring; its content is selected so a new digit replaces it |
-| filled cell | a digit in the cell | `data-filled="true"` on the cell |
+| focus | keyboard / click | focused cell: focus fill and its content selected so a new digit replaces it; one inset ring for the row appears on the cell and glides to the next one (`fast` · emphasized) instead of each cell drawing its own |
+| filled cell | a digit in the cell | `data-filled="true"` on the cell; the digit fades in as it lands |
+| success | `success` (not while invalid) | `data-success="true"` on the fieldset; the cells turn `success-soft` one after another, half a stagger step apart |
 | full width | `fullWidth` | `data-full-width="true"` on the fieldset |
 | group start | `groupSize` | `data-group-start="true"` on the first cell of every group |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the fieldset and the frame, `aria-invalid="true"` on cells |
@@ -142,7 +144,7 @@ No `variant` or `tone`.
 | [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint and an error that replaces it — `required`, `optional`, `hint`, `error`. |
 | [grouped.tsx](examples/grouped.tsx) | A long code read in chunks with a wider gap between groups — `groupSize`. |
 | [full-width.tsx](examples/full-width.tsx) | Cells that share the container width and keep the tier height, above a full-width button — `fullWidth`. |
-| [on-complete.tsx](examples/on-complete.tsx) | The code is checked as soon as the last cell is filled; a wrong code turns the hint into an error — `onComplete`, `error`. |
+| [on-complete.tsx](examples/on-complete.tsx) | The code is checked as soon as the last cell is filled: a right one turns the cells success, a wrong one turns the hint into an error — `onComplete`, `success`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the code and clears it with a button — `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A masked card PIN submitted with a form; a short PIN shows an error — `name`, `mask`, `required`, `error`. |
 

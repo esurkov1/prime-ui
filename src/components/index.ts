@@ -43,7 +43,7 @@ export type {
   BreadcrumbRootProps,
 } from "./breadcrumb/Breadcrumb";
 export { Breadcrumb } from "./breadcrumb/Breadcrumb";
-export type { ButtonIconProps, ButtonRootProps } from "./button/Button";
+export type { ButtonIconProps, ButtonLabels, ButtonRootProps } from "./button/Button";
 export { Button } from "./button/Button";
 export type {
   ButtonGroupIconProps,
@@ -215,6 +215,7 @@ export type {
   InputWrapperProps,
 } from "./input/Input";
 export { Input } from "./input/Input";
+export { getPasswordStrength, type PasswordStrength } from "./input/passwordStrength";
 export type {
   KanbanColumn,
   KanbanItemBadgesProps,
@@ -381,6 +382,12 @@ export {
   resolveSmartFilterValues,
   SmartFilter,
 } from "./smart-filter/SmartFilter";
+export type {
+  SparklineLabels,
+  SparklinePoint,
+  SparklineProps,
+} from "./sparkline/Sparkline";
+export { Sparkline } from "./sparkline/Sparkline";
 export type { SpinnerLabels, SpinnerProps } from "./spinner/Spinner";
 export { Spinner } from "./spinner/Spinner";
 export type {

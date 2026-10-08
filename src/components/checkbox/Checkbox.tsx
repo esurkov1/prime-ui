@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { CheckMark } from "@/internal/CheckMark";
 import {
   ChoiceField,
   ChoiceLabel,
@@ -40,17 +41,6 @@ export type CheckboxRootProps = Omit<
   /** The native checkbox input. */
   ref?: React.Ref<HTMLInputElement>;
 };
-
-/** Check and indeterminate bar; which one shows (and how it draws in) comes from `data-state`. */
-function CheckboxMark() {
-  // Own SVG instead of `Icon`: the draw-in motion needs `pathLength` on the paths.
-  return (
-    <svg viewBox="0 0 24 24" className={styles.svg} aria-hidden="true" focusable="false">
-      <path d="M5.5 12.5l4.25 4.25L18.5 8" pathLength={1} className={styles.checkPath} />
-      <path d="M7 12h10" pathLength={1} className={styles.indeterminateLine} />
-    </svg>
-  );
-}
 
 function CheckboxRoot({
   id,
@@ -114,7 +104,9 @@ function CheckboxRoot({
             aria-describedby={ids.describedBy}
           />
           <span className={cx(choiceVisualClass, styles.control)} aria-hidden="true">
-            <CheckboxMark />
+            <CheckMark
+              state={indeterminate ? "indeterminate" : checked ? "checked" : "unchecked"}
+            />
           </span>
         </>
       }
@@ -173,7 +165,7 @@ function CheckboxIndicator({
       })}
       {...rest}
     >
-      <CheckboxMark />
+      <CheckMark state={indeterminate ? "indeterminate" : checked ? "checked" : "unchecked"} />
     </span>
   );
 }

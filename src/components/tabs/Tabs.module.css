@@ -10,8 +10,10 @@
  * tend to equal widths. When they do not fit, icons and descriptions go first, then labels
  * (icons with tooltips stay), then the list scrolls. The folder glides only into a person's choice.
  *
- * Vertical: rounded items without a rail; the active item is a `fill-muted` pill with a short
- * accent mark. Stacks into a scrolling row under 600px of container width.
+ * Vertical: the same folder on its side. The strip is a column of sections at the inline start,
+ * the panel fills the rest, and the active section is the panel reaching into the strip, with the
+ * concave flares above and below where it meets the panel. Under 600px of container width the
+ * column turns into the horizontal strip above the panel (it scrolls, never wraps).
  */
 
 .root {
@@ -111,16 +113,16 @@
   min-width: 0;
 }
 
-/* Horizontal: the root is the frame and a layer of the ladder (`data-depth`) — a strip two steps off
-   the layer, with the panel in the layer's own color right under it. Two steps: the strip is the
-   block's outer edge, and one step off a white card is the light page tone itself. */
-.root[data-orientation="horizontal"] {
+/* The root is the frame and a layer of the ladder (`data-depth`) — a strip two steps off the
+   layer, with the panel in the layer's own color beside it. Two steps: the strip is the block's
+   outer edge, and one step off a white card is the light page tone itself. */
+.root {
   overflow: hidden;
   border-radius: var(--prime-radius-xl);
   background: var(--prime-color-fill-muted-hover);
 }
 
-.root[data-orientation="horizontal"] .layout {
+.layout {
   gap: 0;
 }
 
@@ -130,8 +132,7 @@
 
 .root[data-orientation="vertical"] .layout {
   flex-direction: row;
-  align-items: flex-start;
-  gap: var(--prime-space-6);
+  align-items: stretch;
 }
 
 /* ---------- List ---------- */
@@ -152,11 +153,15 @@
   padding-top: var(--tabs-rise);
 }
 
+/* The column: sections stacked from the top, the folder joins the panel edge straight. */
 .root[data-orientation="vertical"] .list {
   flex-direction: column;
-  flex-shrink: 0;
+  flex: none;
   gap: var(--prime-space-1);
   min-width: var(--tabs-two-line-min);
+  max-width: 40%;
+  padding-block: var(--tabs-rise);
+  padding-inline-start: var(--tabs-rise);
   overflow: visible;
 }
 
@@ -186,9 +191,13 @@
     opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* Horizontal: the panel surface under the active tab, flaring into the panel at both sides. */
+/* The folder: the panel surface under the active tab, flaring into the panel at both sides. The
+   list sets its axis (`data-axis`, from the list's direction): `x` rises from the panel's top edge,
+   `y` reaches out of the panel's inline-start edge. */
 .indicatorFolder {
-  border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
+  /* The flare size in px for the script (a flare at the list edge is `display: none`, so its own
+     width cannot be read then); scroll margin has no effect on a non-scrolled element. */
+  scroll-margin-top: var(--tabs-flare);
   background: var(--prime-color-layer-current);
 }
 
@@ -196,12 +205,20 @@
 .indicatorFolder::after {
   content: "";
   position: absolute;
-  bottom: 0;
   width: var(--tabs-flare);
   height: var(--tabs-flare);
 }
 
-.indicatorFolder::before {
+.indicatorFolder[data-axis="x"] {
+  border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
+}
+
+.indicatorFolder[data-axis="x"]::before,
+.indicatorFolder[data-axis="x"]::after {
+  bottom: 0;
+}
+
+.indicatorFolder[data-axis="x"]::before {
   right: 100%;
   background: radial-gradient(
     circle at 0 0,
@@ -210,7 +227,7 @@
   );
 }
 
-.indicatorFolder::after {
+.indicatorFolder[data-axis="x"]::after {
   left: 100%;
   background: radial-gradient(
     circle at 100% 0,
@@ -219,27 +236,38 @@
   );
 }
 
-/* At the list edge the folder meets the frame: no flare there. */
+.indicatorFolder[data-axis="y"] {
+  border-radius: var(--tabs-folder-radius) 0 0 var(--tabs-folder-radius);
+}
+
+.indicatorFolder[data-axis="y"]::before,
+.indicatorFolder[data-axis="y"]::after {
+  right: 0;
+}
+
+.indicatorFolder[data-axis="y"]::before {
+  bottom: 100%;
+  background: radial-gradient(
+    circle at 0 0,
+    transparent calc(var(--tabs-flare) - var(--prime-border-width) / 2),
+    var(--prime-color-layer-current) var(--tabs-flare)
+  );
+}
+
+.indicatorFolder[data-axis="y"]::after {
+  top: 100%;
+  background: radial-gradient(
+    circle at 0 100%,
+    transparent calc(var(--tabs-flare) - var(--prime-border-width) / 2),
+    var(--prime-color-layer-current) var(--tabs-flare)
+  );
+}
+
+/* At the list edge the folder meets the frame: no flare there. `display: none`, not `visibility`:
+   a hidden flare would still lengthen the scroll by its width. */
 .indicatorFolder[data-edge-start="true"]::before,
 .indicatorFolder[data-edge-end="true"]::after {
-  visibility: hidden;
-}
-
-/* Vertical: `fill-muted` pill with a short accent mark at the inline start. */
-.indicatorPill {
-  z-index: 0;
-  border-radius: var(--tabs-radius);
-  background: var(--prime-color-fill-muted);
-}
-
-.indicatorPill::before {
-  content: "";
-  position: absolute;
-  inset-block: var(--prime-space-2);
-  inset-inline-start: var(--prime-space-1);
-  width: var(--tabs-indicator);
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-accent-default);
+  display: none;
 }
 
 /* ---------- Item ---------- */
@@ -313,8 +341,15 @@
   outline: none;
 }
 
+/* Vertical: full-width rows in the column, rounded on the inline-start side like the folder. */
+.root[data-orientation="vertical"] .item {
+  border-radius: var(--tabs-folder-radius) 0 0 var(--tabs-folder-radius);
+}
+
 .root[data-orientation="vertical"] .tab {
   justify-content: flex-start;
+  padding: 0 calc(var(--tabs-pad-x) + var(--prime-space-1));
+  outline: none;
 }
 
 /* The content row: icon, label, count — or the two-line grid. Pressing scales it as one. */
@@ -358,9 +393,9 @@
   padding-block: var(--prime-space-2);
 }
 
-/* Horizontal hover: the folder shape in the faintest wash, under the folder. */
-.root[data-orientation="horizontal"] .item::before,
-.root[data-orientation="horizontal"] .tab::after {
+/* Hover: the folder shape in the faintest wash, under the folder. */
+.item::before,
+.tab::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -368,7 +403,7 @@
   pointer-events: none;
 }
 
-.root[data-orientation="horizontal"] .item::before {
+.item::before {
   z-index: 0;
   background: var(--prime-color-fill-faint);
   opacity: 0;
@@ -376,35 +411,24 @@
 }
 
 @media (hover: hover) {
-  .root[data-orientation="horizontal"]
-    .item:hover:not([data-disabled="true"], [data-state="active"])::before {
+  .item:hover:not([data-disabled="true"], [data-state="active"])::before {
     opacity: 1;
     transition-duration: var(--prime-motion-duration-xfast);
   }
 }
 
 /* The focus ring sits above the folder, in the same shape. */
-.root[data-orientation="horizontal"] .tab::after {
+.tab::after {
   z-index: 2;
 }
 
-.root[data-orientation="horizontal"] .tab:focus-visible::after {
+.tab:focus-visible::after {
   box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-focus-ring);
-}
-
-.root[data-orientation="vertical"] .tab:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
 }
 
 @media (hover: hover) {
   .item:hover:not([data-disabled="true"]) .tab {
     color: var(--prime-color-text-primary);
-  }
-
-  .root[data-orientation="vertical"]
-    .tab:hover:not([data-disabled="true"], [aria-selected="true"]) {
-    background: var(--prime-color-fill-subtle);
   }
 }
 
@@ -599,8 +623,11 @@
   margin-inline: var(--prime-space-2);
 }
 
+/* Inset from both sides of the column; `auto` width, so the margins never push it into the panel. */
 .root[data-orientation="vertical"] .separator {
+  width: auto;
   margin-block: var(--prime-space-2);
+  margin-inline: var(--tabs-pad-x);
 }
 
 /* ---------- Panel ---------- */
@@ -614,18 +641,12 @@
   color: var(--prime-color-text-primary);
 }
 
-.root[data-orientation="horizontal"] .panel {
+.panel {
   padding: var(--tabs-panel-pad);
   background: var(--prime-color-layer-current);
 }
 
 .panel:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-  border-radius: var(--prime-radius-xs);
-}
-
-.root[data-orientation="horizontal"] .panel:focus-visible {
   outline: none;
   box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-focus-ring);
 }
@@ -640,17 +661,36 @@
 
 /* ---------- Vertical → horizontal row in narrow containers ---------- */
 
+/* As a column the list never scrolls sideways: no edge fade, or it would dim the folder where it
+   joins the panel. (Doubled class: wins over ScrollContainer's fade whatever the CSS order.) */
+@container (width > 37.5rem) {
+  .root[data-orientation="vertical"] .list.list {
+    overflow: visible;
+    mask-image: none;
+  }
+}
+
+/* The column becomes the horizontal strip above the panel: the folder turns to rise from the top
+   (the list reports `data-axis="x"` to the indicator), and the strip scrolls with faded edges. */
 @container (max-width: 37.5rem) {
   .root[data-orientation="vertical"] .layout {
     flex-direction: column;
-    align-items: stretch;
-    gap: var(--prime-space-4);
   }
 
   .root[data-orientation="vertical"] .list {
     flex-direction: row;
     min-width: 0;
+    max-width: 100%;
+    padding: var(--tabs-rise) 0 0;
     overflow-x: auto;
+  }
+
+  .root[data-orientation="vertical"] .item {
+    border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
+  }
+
+  .root[data-orientation="vertical"] .tab {
+    height: var(--tabs-item-height);
   }
 
   .root[data-orientation="vertical"] .separator {

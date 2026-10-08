@@ -58,6 +58,7 @@ repository; in a consumer project the same files are under `node_modules/prime-u
 | [responsive.md](responsive.md) | always — every screen works from 320px: what the kit does by itself, the page panel (`PageToolbar`), switchers, touch, the narrow-screen checklist |
 | [foundations.md](foundations.md) | always — grid, proximity scale, sizes, surfaces, type, tone and color |
 | [api-contract.md](api-contract.md) | writing JSX — prop names, controlled state, forms, icons |
+| [motion.md](motion.md) | always — what the kit already animates, when to move at all, the tokens, recipes (long actions, saved, hold to delete, loading, counters, codes, milestones) |
 | [anti-slop.md](anti-slop.md) | before and after writing — what never to do |
 | [checklist.md](checklist.md) | before handing the screen over |
 
