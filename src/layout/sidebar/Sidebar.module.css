@@ -671,6 +671,35 @@
   transition: none;
 }
 
+/*
+ * A collapsible group's items and its rail `…` row share one grid cell, as high as the taller of
+ * the two. Folded or unfolded by the heading on the rail (`data-swap`), the row never animates its
+ * height: it takes its full row at once when the group folds and keeps it until the items have
+ * grown past it when the group unfolds. So the cell only ever glides one way — list → row or
+ * row → list — and nothing below moves back; the two contents cross-fade in place. Entering or
+ * leaving the rail, the row grows and shrinks on the rail's clock like any disclosure.
+ */
+.groupBody {
+  display: grid;
+  min-width: 0;
+}
+
+.groupBody > .disclosure {
+  grid-area: 1 / 1;
+}
+
+.groupBody[data-swap] > .groupRail {
+  transition:
+    grid-template-rows 0s linear var(--sb-duration),
+    visibility 0s linear var(--sb-duration);
+}
+
+.groupBody[data-swap] > .groupRail[data-state="open"] {
+  transition:
+    grid-template-rows 0s,
+    visibility 0s;
+}
+
 /* --- Item -------------------------------------------------------------------- */
 
 .item {

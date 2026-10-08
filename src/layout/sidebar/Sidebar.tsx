@@ -461,6 +461,10 @@ function SidebarGroup({
   const folded = disclosure && rail && !open;
   const hue = disclosure ? attentionHue(children) : null;
   const flyout = useRailFlyout(folded);
+  // Folded or unfolded by its heading on the rail: the `…` row swaps with the items in place
+  // instead of growing on the rail's clock. Leaving the rail ends the swap.
+  const [swap, setSwap] = React.useState(false);
+  if (swap && !rail) setSwap(false);
 
   if (!disclosure) {
     return (
@@ -503,69 +507,78 @@ function SidebarGroup({
           aria-controls={bodyId}
           // On the rail too it folds and unfolds the group (folded, the `…` row takes its place);
           // hovering it shows the whole name, which the rail cuts.
-          onClick={() => setOpen((prev) => !prev)}
+          onClick={() => {
+            setSwap(rail);
+            setOpen((prev) => !prev);
+          }}
         >
           <span className={styles.groupText}>{label}</span>
           <AttentionDot hue={hue} shown={!open && !rail} inline />
           <Icon name="nav.chevronDown" className={styles.groupChevron} />
         </button>
       </CompactTooltip>
-      {/* The rail row of a folded group grows in and out on the rail's clock, like a disclosure;
-          off the rail it stays folded and inert. */}
+      {/* One place for the items and the rail row of a folded group: both sit in the same cell,
+          so folding on the rail glides the height from the list to one row while the items fade
+          into the `…` row. Off the rail the row stays folded and inert. */}
       <div
-        className={styles.disclosure}
-        data-state={folded ? "open" : "closed"}
-        inert={!folded || undefined}
-        aria-hidden={!folded || undefined}
+        className={styles.groupBody}
+        {...toDataAttributes({ swap: (swap && rail) || undefined })}
       >
-        <div className={styles.disclosureClip}>
-          <div className={styles.groupItems}>
-            <Popover.Root
-              open={flyout.open}
-              onOpenChange={(next) => {
-                if (!next) flyout.close(false);
-              }}
-            >
-              <CompactTooltip
-                text={text}
-                canOpen={() => !flyout.pointerInside.current && !flyout.open}
+        <div
+          className={cx(styles.disclosure, styles.groupRail)}
+          data-state={folded ? "open" : "closed"}
+          inert={!folded || undefined}
+          aria-hidden={!folded || undefined}
+        >
+          <div className={styles.disclosureClip}>
+            <div className={styles.groupItems}>
+              <Popover.Root
+                open={flyout.open}
+                onOpenChange={(next) => {
+                  if (!next) flyout.close(false);
+                }}
               >
-                <Popover.Anchor>
-                  <button
-                    ref={flyout.triggerRef}
-                    type="button"
-                    className={styles.item}
-                    aria-label={text}
-                    aria-expanded={flyout.open}
-                    aria-haspopup="dialog"
-                    {...toDataAttributes({ "active-path": active || undefined })}
-                    {...flyout.triggerHandlers}
-                  >
-                    <span className={styles.icon} aria-hidden="true">
-                      <Icon name="action.more" />
-                    </span>
-                    <AttentionDot hue={hue} shown={folded} />
-                  </button>
-                </Popover.Anchor>
-              </CompactTooltip>
-              {folded ? (
-                <RailFlyout flyout={flyout}>
-                  <div className={styles.groupItems}>{children}</div>
-                </RailFlyout>
-              ) : null}
-            </Popover.Root>
+                <CompactTooltip
+                  text={text}
+                  canOpen={() => !flyout.pointerInside.current && !flyout.open}
+                >
+                  <Popover.Anchor>
+                    <button
+                      ref={flyout.triggerRef}
+                      type="button"
+                      className={styles.item}
+                      aria-label={text}
+                      aria-expanded={flyout.open}
+                      aria-haspopup="dialog"
+                      {...toDataAttributes({ "active-path": active || undefined })}
+                      {...flyout.triggerHandlers}
+                    >
+                      <span className={styles.icon} aria-hidden="true">
+                        <Icon name="action.more" />
+                      </span>
+                      <AttentionDot hue={hue} shown={folded} />
+                    </button>
+                  </Popover.Anchor>
+                </CompactTooltip>
+                {folded ? (
+                  <RailFlyout flyout={flyout}>
+                    <div className={styles.groupItems}>{children}</div>
+                  </RailFlyout>
+                ) : null}
+              </Popover.Root>
+            </div>
           </div>
         </div>
-      </div>
-      <div
-        ref={bodyRef}
-        id={bodyId}
-        className={styles.disclosure}
-        data-state={open ? "open" : "closed"}
-        inert={!open || undefined}
-      >
-        <div className={styles.disclosureClip}>
-          <div className={styles.groupItems}>{children}</div>
+        <div
+          ref={bodyRef}
+          id={bodyId}
+          className={styles.disclosure}
+          data-state={open ? "open" : "closed"}
+          inert={!open || undefined}
+        >
+          <div className={styles.disclosureClip}>
+            <div className={styles.groupItems}>{children}</div>
+          </div>
         </div>
       </div>
     </div>
