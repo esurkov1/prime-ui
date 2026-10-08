@@ -368,11 +368,9 @@ describe("part refs: merged and redirected refs reach their element", () => {
   it.each(CASES)("%s → <%s>", (_name, tag, ui) => {
     let node: Element | null = null;
     render(
-      <>
-        {ui((element) => {
-          if (element) node = element;
-        })}
-      </>,
+      ui((element) => {
+        if (element) node = element;
+      }),
     );
     expect(node).not.toBeNull();
     expect((node as unknown as Element).tagName.toUpperCase()).toBe(tag.toUpperCase());

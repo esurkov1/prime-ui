@@ -63,11 +63,6 @@
   column-gap: var(--bn-gap);
 }
 
-/* With `Banner.Actions` the dismiss joins that row; the corner close steps aside. */
-.root:has(.actions) > .close {
-  display: none;
-}
-
 /* Full-width page strip: no radius, content follows the page content column. */
 .root[data-placement="page"] {
   --bn-radius: 0;
@@ -269,6 +264,11 @@
   grid-row: 1;
   align-self: start;
   margin-block: calc((var(--bn-title-line-height) - var(--bn-close)) / 2);
+}
+
+/* With `Banner.Actions` the dismiss joins that row; the corner close steps aside. */
+.root:has(.actions) > .close {
+  display: none;
 }
 
 /* ---------- Narrow container: actions under the text ---------- */

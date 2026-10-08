@@ -73,11 +73,12 @@ describe("ScrollContainer", () => {
   });
 
   it("re-measures when children are added later", async () => {
+    const ROWS = ["Первая", "Вторая", "Третья"];
     function Growing({ count }: { count: number }) {
       return (
         <ScrollContainer fade data-testid="scroll">
-          {Array.from({ length: count }, (_, i) => (
-            <p key={i}>row {i}</p>
+          {ROWS.slice(0, count).map((row) => (
+            <p key={row}>{row}</p>
           ))}
         </ScrollContainer>
       );
