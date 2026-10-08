@@ -111,7 +111,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query state
 | `keys` | `ReactNode[]` | — (required) | FooterHint: the keys (text or icons). |
 
 ## Variants
-One look: `bg-raised`, `--prime-modal-radius`, `shadow-modal`, `--prime-modal-width-l` wide, placed in the top part of the viewport so the search row never jumps while the list filters.
+One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radius`, `shadow-modal`, `--prime-modal-width-l` wide, placed in the top part of the viewport so the search row never jumps while the list filters.
 
 ### size (Root)
 | Value | Looks like | Use when | Default |

@@ -20,6 +20,7 @@ import { LayerProvider } from "@/internal/overlay/layerStack";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { Slot } from "@/internal/slot";
 import { type ControlSize, type PaletteColor, stepDown, type Variant } from "@/internal/states";
+import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./Sidebar.module.css";
 
@@ -332,6 +333,8 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   }, [offCanvas, setMode, setOpen]);
 
   const navId = React.useId();
+  // The rail is a surface beside the page: one layer above it (white on the light gray page).
+  const depth = useNestedSurfaceDepth();
 
   const context = React.useMemo<SidebarContextValue>(
     () => ({ persist, mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels }),
@@ -344,6 +347,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
         {...rest}
         ref={mergedRootRef}
         className={cx(styles.root, className)}
+        data-depth={depth}
         {...toDataAttributes({
           size,
           mode,
@@ -372,7 +376,9 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
         >
           <LayerProvider value={offCanvas ? layer : null}>
             <AnchorRectProvider value={offCanvas ? null : anchorRect}>
-              <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+              <SurfaceDepthProvider value={depth}>
+                <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+              </SurfaceDepthProvider>
             </AnchorRectProvider>
           </LayerProvider>
         </nav>

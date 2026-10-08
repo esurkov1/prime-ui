@@ -15,11 +15,11 @@
   min-width: 0;
 }
 
+/* The floating layer of the ladder (`data-depth="floating"`). */
 .panel[data-surface="raised"] {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
   padding: var(--prime-panel-content-padding);
   border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-overlay);
 }
 

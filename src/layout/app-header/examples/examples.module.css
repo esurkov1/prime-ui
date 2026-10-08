@@ -1,12 +1,12 @@
 /* Layout of the AppHeader scenarios: an app window and a phone-wide screen. Semantic tokens only. */
 
-/* The top of an app window: the content panel surface with the header on it. */
+/* The top of an app window: the content panel (the page) with the header on it. */
 .window {
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-bg-surface);
+  background: var(--prime-color-layer-current);
   box-shadow:
     0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
     var(--prime-shadow-raised);
@@ -18,7 +18,7 @@
   margin-inline: auto;
 }
 
-/* in-app-shell.tsx: a whole app window with the rail on the canvas. */
+/* in-app-shell.tsx: a whole app window with the rail on the page. */
 .stage {
   box-sizing: border-box;
   display: flex;
@@ -26,7 +26,7 @@
   height: calc(var(--prime-space-24) * 4);
   overflow: hidden;
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-current);
   box-shadow:
     0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
     var(--prime-shadow-raised);

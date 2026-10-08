@@ -45,6 +45,11 @@ bun run verify:tokens       # tokens:build shows no diff (generated API docs: th
 - Code, identifiers, docs and comments in English; UI strings in Russian.
 - Tokens: edit `tokens/*.ts` only, then `bun run tokens:build`; never edit `src/styles/{tokens,theme-*}.css`.
 - Themes switch only via `data-theme`; components know semantic roles, never the theme.
+- Surfaces stand on the ladder (`tokens/layers.ts`, foundation §4): a surface component sets
+  `data-depth` from `src/internal/surfaceDepth.tsx` (`useNestedSurfaceDepth` + `SurfaceDepthProvider`,
+  or `"floating"` for overlays) and paints `--prime-color-layer-current`; controls read the context
+  variables (`--prime-color-field-bg`, `--prime-color-fill-muted`, `--prime-color-control-selected`).
+  Never hard-code `--prime-color-layer-<n>-*` in a component.
 - Styles: tokens only (no raw px/hex, no `--prime-ref-*`), state styled only from `data-*` and ARIA.
 - Motion is part of the code (foundation §7): press, hover/focus fill, selection/toggle, open/close,
   enter/exit of parts, loading — or consciously still (high-frequency, keyboard). Tokens only,

@@ -1,14 +1,15 @@
 /*
- * Sidebar — navigation rail on the canvas (Graphite).
+ * Sidebar — navigation rail beside the page (Graphite): a surface one layer above it (`data-depth`),
+ * white on the light gray page, a step lighter than the near-black page in dark.
  *
  * No border, no card: items are transparent rows with a `fill-subtle` wash on hover; the current
- * item is lifted to `bg-surface` + `shadow-raised`.
+ * item takes the rail's fill two ladder steps off it (`fill-muted-hover`).
  *
  * Motion — two layers, one clock (expanded ↔ compact ↔ hidden). Every part below is a plain CSS
  * transition over `--sb-duration` with `--sb-ease`, started by the same style change
  * (`data-mode` / `data-panel-mode`); nothing is delayed, nothing runs in JS.
  *
- * - The root is the spacer: it reserves the rail width in the page, paints the canvas and clips
+ * - The root is the spacer: it reserves the rail width in the page, paints the rail and clips
  *   what shows of the panel to its own box. Its `width` is the only layout that moves; the page
  *   column follows it.
  * - The panel is positioned inside it at the expanded width, always: it never lays out again
@@ -130,8 +131,9 @@
     var(--sb-item-pad)
   );
 
-  /* The rail is canvas: fields keep the canvas field fill; avatar rings match the rail. */
-  --avatar-ring: var(--prime-color-bg-canvas);
+  /* The rail is a layer of its own beside the page (`data-depth`): fields inside take its fill; avatar
+     rings match the rail. */
+  --avatar-ring: var(--prime-color-layer-current);
 
   position: relative;
   box-sizing: border-box;
@@ -139,7 +141,7 @@
   width: var(--sb-width);
   height: 100%;
   min-height: 0;
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-current);
   clip-path: polygon(
     0 0,
     100% 0,
@@ -549,7 +551,7 @@
 /*
  * On the rail the heading keeps its layout: its text slides a little toward the edge, and the
  * cut that ends the rows ends it too — travelling with the rail, softened by a fade into the
- * canvas. Nothing re-lays out, so nothing jumps.
+ * rail color. Nothing re-lays out, so nothing jumps.
  */
 .root:not([data-off-canvas]) .groupLabel {
   clip-path: inset(0);
@@ -598,7 +600,7 @@
   inset-block: 0;
   inset-inline-end: 0;
   width: var(--prime-space-3);
-  background: linear-gradient(to right, transparent, var(--prime-color-bg-canvas));
+  background: linear-gradient(to right, transparent, var(--prime-color-layer-current));
   opacity: 0;
   pointer-events: none;
   transition:
@@ -754,10 +756,10 @@
   transform: scale(var(--prime-motion-press-scale));
 }
 
+/* The current item: two ladder steps off the rail, so it stays apart from the `fill-subtle` hover. */
 .item[data-state="active"],
 .item[aria-current="page"] {
-  --sb-fill: var(--prime-color-bg-surface);
-  --sb-lift: var(--prime-shadow-raised);
+  --sb-fill: var(--prime-color-fill-muted-hover);
 
   color: var(--prime-color-text-primary);
 }
@@ -854,7 +856,7 @@
   inset-block-start: calc(50% - var(--sb-icon) / 2 - var(--prime-space-1) / 2);
   inset-inline-start: calc(var(--sb-item-pad) + var(--sb-icon) - var(--prime-space-1));
   display: inline-flex;
-  box-shadow: 0 0 0 calc(2 * var(--prime-border-width)) var(--prime-color-bg-canvas);
+  box-shadow: 0 0 0 calc(2 * var(--prime-border-width)) var(--prime-color-layer-current);
   opacity: 0;
   scale: var(--sb-edge-scale);
   pointer-events: none;
@@ -1063,7 +1065,7 @@
   padding-block-start: 0;
 }
 
-/* On the raised surface the current row is a deeper wash, not the canvas lift. */
+/* On the floating layer the current row is a translucent wash, not the rail's fill. */
 .flyout .item[data-state="active"],
 .flyout .item[aria-current="page"] {
   --sb-fill: var(--prime-color-fill-subtle-active);
@@ -1175,7 +1177,7 @@
 /*
  * One kit Button for both places. Expanded: a ghost icon button at the end of the header row.
  * Compact: it rides the rail edge — moved half out, 3/4 size, round, cut out of the content by a
- * canvas ring; the chevrons turn to point out. It is placed from the panel's start by `translate`
+ * ring in the rail color; the chevrons turn to point out. It is placed from the panel's start by `translate`
  * to where the edge will be, with the rail's duration and easing, so it travels exactly with the
  * edge and never needs a layout per frame. Hidden, it stays at the place of the last visible mode
  * and fades; coming back from hidden it starts at its final place and fades in as the edge
@@ -1197,7 +1199,7 @@
   padding: 0;
   border-radius: var(--sb-radius);
   color: var(--prime-color-text-muted);
-  box-shadow: 0 0 0 0 var(--prime-color-bg-canvas);
+  box-shadow: 0 0 0 0 var(--prime-color-layer-current);
   opacity: 1;
   translate: calc(var(--sb-expanded) - var(--sb-pad) - var(--sb-toggle)) 0;
   scale: 1;
@@ -1230,7 +1232,7 @@
   /* Half its size, not a huge "full" radius: the corner rounds evenly over the whole move instead
      of snapping round in the first frames. */
   border-radius: calc(var(--sb-toggle) / 2);
-  box-shadow: 0 0 0 var(--sb-edge-ring) var(--prime-color-bg-canvas);
+  box-shadow: 0 0 0 var(--sb-edge-ring) var(--prime-color-layer-current);
   translate: calc(var(--sb-compact) - var(--sb-toggle) / 2) 0;
   scale: var(--sb-edge-scale);
 }
@@ -1274,10 +1276,9 @@
   translate: none;
 }
 
-/* A parent stands for its hidden children: on the active path it takes the current lift. */
+/* A parent stands for its hidden children: on the active path it takes the current fill. */
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .item[data-active-path] {
-  --sb-fill: var(--prime-color-bg-surface);
-  --sb-lift: var(--prime-shadow-raised);
+  --sb-fill: var(--prime-color-fill-muted-hover);
 }
 
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .item[aria-haspopup][aria-expanded="true"] {
@@ -1320,7 +1321,7 @@
   z-index: var(--prime-z-overlay);
   width: min(var(--sb-expanded), calc(100% - var(--prime-space-12)));
   min-width: 0;
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-modal);
   transform: translateX(-100%);
   visibility: hidden;

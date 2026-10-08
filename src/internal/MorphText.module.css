@@ -1,0 +1,71 @@
+/*
+ * MorphText — a label that changes in place (foundation §7 rule 8). At rest a plain inline text.
+ * While a change plays: the box holds the old width and glides to the new one (`base` ·
+ * `emphasized`); the old letters leave upward (`fast` · `exit`), the new ones rise from below
+ * (`base` · `emphasized`), one sixth of `--prime-motion-stagger` apart. Letters are one-shot
+ * keyframes; a change during a change restarts from what is on screen. Reduced motion collapses
+ * the durations (and the component skips the morph entirely).
+ */
+.root {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.morphing {
+  position: relative;
+  overflow: visible;
+  transition: width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+/* Sets the line box (height, baseline) and is measured for the target width; never seen. */
+.sizer {
+  display: inline-block;
+  visibility: hidden;
+}
+
+.layer {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  display: inline-flex;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.letter {
+  display: inline-block;
+  white-space: pre;
+  animation-delay: calc(var(--prime-motion-stagger) * var(--morph-i) / 6);
+}
+
+.letterOut {
+  animation-name: primeMorphOut;
+  animation-duration: var(--prime-motion-duration-fast);
+  animation-timing-function: var(--prime-motion-easing-exit);
+  animation-fill-mode: both;
+}
+
+.letterIn {
+  animation-name: primeMorphIn;
+  animation-duration: var(--prime-motion-duration-base);
+  animation-timing-function: var(--prime-motion-easing-emphasized);
+  animation-fill-mode: both;
+}
+
+@keyframes primeMorphOut {
+  to {
+    opacity: 0;
+    transform: translateY(-0.5em);
+    filter: blur(var(--prime-motion-blur));
+  }
+}
+
+@keyframes primeMorphIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em);
+    filter: blur(var(--prime-motion-blur));
+  }
+}

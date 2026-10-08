@@ -111,9 +111,6 @@
 /* ─── Panel ──────────────────────────────────────────────────────────────── */
 
 .panel {
-  /* Fields inside a raised surface stay distinguishable (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-
   display: flex;
   min-width: 0;
   color: var(--prime-color-text-primary);
@@ -481,8 +478,8 @@
 }
 
 /* ─── Embedded panel (Datepicker.Panel) ────────────────────────────────────
- * The embedded panel is itself the bounded block (foundation §4): card fill, radius, padding and
- * shadow from the card context, so it reads on any host. It sizes to its content and never centers
+ * The embedded panel is itself a layer of the ladder (`data-depth`, foundation §4): the layer fill,
+ * card radius and the raised whisper on the page, so it reads on any host. It sizes to its content and never centers
  * months in slack; months (1 or 2) follow the parent's available width (see resolvePanelLayout).
  */
 
@@ -491,8 +488,8 @@
   width: fit-content;
   max-width: 100%;
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
+  background: var(--prime-color-layer-current);
+  box-shadow: var(--prime-layer-shadow);
 }
 
 .panel[data-embedded="true"] .main {

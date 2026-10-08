@@ -1,6 +1,7 @@
 /*
  * DataTable — Graphite.
- * Surface container (bg-surface, card radius, no outer border), sunken head, hairline row separators.
+ * Surface container (a layer of the ladder, card radius, no outer border), head two ladder steps
+ * off it, hairline row separators.
  * Density follows `size`: xs/s = compact (row-height-s), m = default (row-height-m), l/xl = comfortable (row-height-l).
  * Row height is content-driven: the row height token is a minimum, and cells carry vertical padding
  * `--dt-pad-y` = (row height − control one tier down) / 2. A single line of text or a cell control one
@@ -30,12 +31,12 @@
   --dt-select-w: calc(var(--dt-choice) + 2 * var(--dt-pad-x));
   --dt-toggle-w: var(--dt-toggle);
 
-  /* Bounded block: card-bg contrasts with the host plane (surface on canvas, sunken on a surface). */
-  --dt-surface: var(--prime-color-card-bg);
-  /* One opaque step off the table fill, so sticky head and zebra rows stay visible on either host. */
-  --dt-step: color-mix(in srgb, var(--dt-surface) 96%, var(--prime-color-text-primary));
-  /* Two steps: on the canvas one step off white equals the canvas, and the table's top edge vanishes. */
-  --dt-head-bg: color-mix(in srgb, var(--dt-surface) 92%, var(--prime-color-text-primary));
+  /* The table is a layer of the ladder (`data-depth`, foundation §4): one step off its host. */
+  --dt-surface: var(--prime-color-layer-current);
+  /* One ladder step off the table fill: zebra rows and the sticky first column stay visible. */
+  --dt-step: var(--prime-color-field-bg);
+  /* Two steps: one step off white equals the light page, and the table's top edge would vanish. */
+  --dt-head-bg: var(--prime-color-field-bg-hover);
   --dt-divider-color: var(--prime-color-border-subtle);
   --dt-divider-width: var(--prime-border-width);
   --dt-column-divider-width: var(--prime-border-width);
@@ -49,9 +50,6 @@
   --dt-edge-shadow: var(--prime-color-bg-edge-shadow);
   /* Gradient direction from the start edge inward; flipped in RTL. */
   --dt-edge-dir: to right;
-
-  /* Surface context: fields inside the table are one step off the surface. */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
 
   container-type: inline-size;
   display: flex;
@@ -500,7 +498,7 @@
   --enter-shift: calc(-1 * var(--prime-space-1));
 }
 
-/* Detail panel under an expanded row: sunken step, content aligned with the first content column. */
+/* Detail panel under an expanded row: one ladder step off the table, content aligned with the first content column. */
 .detailCell {
   padding: 0;
   background: var(--dt-step);

@@ -16,6 +16,6 @@
   width: 100%;
   padding: var(--prime-space-4);
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
+  background: var(--prime-color-layer-nested);
+  box-shadow: var(--prime-shadow-raised);
 }

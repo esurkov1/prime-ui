@@ -12,6 +12,7 @@ import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import sheet from "@/internal/sheet.module.css";
 import type { ControlSize } from "@/internal/states";
+import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 import {
   DialogBody,
   DialogClose,
@@ -185,6 +186,7 @@ function ModalDialog({
         )}
         data-size={size}
         data-state={state}
+        data-depth="floating"
         {...shell.aria}
         {...rest}
         onPointerDown={(event) => {
@@ -195,7 +197,9 @@ function ModalDialog({
         {compact ? <div className={sheet.handle} data-swipe-handle="" aria-hidden="true" /> : null}
         <DialogShellProvider value={shell.value}>
           <LayerProvider value={layer}>
-            <ControlSizeProvider value="m">{children}</ControlSizeProvider>
+            <SurfaceDepthProvider value="floating">
+              <ControlSizeProvider value="m">{children}</ControlSizeProvider>
+            </SurfaceDepthProvider>
           </LayerProvider>
         </DialogShellProvider>
       </div>

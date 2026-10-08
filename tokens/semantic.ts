@@ -1,6 +1,6 @@
 /**
  * Semantic layer (`--prime-*`). Components read only these variables.
- * Path → variable: `color.bg.canvas` → `--prime-color-bg-canvas`, camelCase → kebab-case.
+ * Path → variable: `color.text.primary` → `--prime-color-text-primary`, camelCase → kebab-case.
  * Values below are the light theme; `themes/dark.ts` overrides colors and shadows.
  *
  * Design rules (see docs/foundation.md):
@@ -8,7 +8,12 @@
  *   (it becomes visible only under `prefers-contrast: more`).
  * - Every size is on the 4px grid. Controls share one size axis: xs 28 · s 32 · m 36 · l 40 · xl 48.
  * - A nested radius equals the outer radius minus the padding between them.
+ * - Surfaces are a ladder (`color.layer`, see `layers.ts`): the page and four nested layers, each one
+ *   ΔL step from its parent. Which row applies is the surface's `data-depth`; `globals.css` maps it
+ *   to the context variables components read (`--prime-color-layer-current`, `--prime-color-field-bg`,
+ *   `--prime-color-fill-muted`, `--prime-color-control-selected`…).
  */
+import { LIGHT_LAYERS, layerTokens } from "./layers";
 
 const hues = ["blue", "green", "orange", "red", "yellow", "purple", "sky", "pink", "teal"] as const;
 type Hue = (typeof hues)[number];
@@ -57,15 +62,14 @@ function lightPalette() {
 
 export const semanticTokens = {
   color: {
+    /**
+     * Surface ladder, computed by `layers.ts`: `0` the page … `4` the deepest nested layer, `floating`
+     * for menus, popovers, modals and drawers (`floating1`/`floating2` nest inside it). Each row:
+     * `bg` the layer, `fill` controls on it, `fillHover`, `selected` the thumb on its track.
+     * Components read them through the depth context variables (globals.css), not directly.
+     */
+    layer: layerTokens(LIGHT_LAYERS),
     bg: {
-      /** App background. */
-      canvas: "{color.gray.50}",
-      /** Cards, panels, table bodies. */
-      surface: "{color.gray.0}",
-      /** Floating layers: menus, popovers, modals, drawers. */
-      raised: "{color.gray.0}",
-      /** Inset areas inside a surface: modal footer, table head, code. */
-      sunken: "{color.gray.75}",
       inverse: "{color.gray.925}",
       scrim: "rgba(17, 19, 24, 0.44)",
       /** Soft shade over an edge that hides scrolled content (DataTable columns). */
@@ -78,22 +82,18 @@ export const semanticTokens = {
       /** The specular top edge of a glass surface: the line that makes it read as glass. */
       glassEdge: "rgba(255, 255, 255, 0.85)",
     },
+    /**
+     * Translucent state washes: they sit on any background, including ones off the ladder (an
+     * image, a tinted banner). Resting fills of controls come from the ladder instead
+     * (`--prime-color-fill-muted`, `--prime-color-field-bg`).
+     */
     fill: {
-      /** Transparent wash: ghost hover, row hover. Works on any background. */
+      /** Ghost hover, row hover. */
       subtle: "rgba(17, 19, 24, 0.04)",
       subtleActive: "rgba(17, 19, 24, 0.07)",
-      /**
-       * The faintest wash: hover of a tab in the sunken strip (Tabs). Stays below the
-       * sunken → surface step in both themes, so a hovered tab never reads as the selected one.
-       */
+      /** The faintest wash: hover of a tab in the tab strip, below the selected tab's step. */
       faint: "rgba(17, 19, 24, 0.04)",
-      /**
-       * Neutral buttons, chips, segmented track. Translucent ink wash: always one step off whatever
-       * it sits on (canvas, card, sunken tile, a custom container), in both themes.
-       */
-      muted: "color-mix(in srgb, var(--prime-ref-color-gray-925) 7%, transparent)",
-      mutedHover: "color-mix(in srgb, var(--prime-ref-color-gray-925) 10%, transparent)",
-      /** Unchecked checkbox, switch track, slider track. Same wash, stronger. */
+      /** Unchecked checkbox, switch track, slider track. */
       strong: "color-mix(in srgb, var(--prime-ref-color-gray-925) 15%, transparent)",
       strongHover: "color-mix(in srgb, var(--prime-ref-color-gray-925) 22%, transparent)",
     },
@@ -151,26 +151,10 @@ export const semanticTokens = {
       soft: "{color.sky.100}",
       text: "{color.sky.800}",
     },
-    /**
-     * Field fill depends on what it sits on. `bg` is the canvas value; every surface component
-     * (Card, Modal, Drawer, Popover, Sidebar…) sets `--prime-color-field-bg: var(--prime-color-field-bg-surface)`.
-     */
+    /** The field fill at rest, hover and focus comes from the ladder (`--prime-color-field-bg*`). */
     field: {
-      /** Translucent wash, visible on any background; `bgSurface` kept equal for surface contexts. */
-      bg: "color-mix(in srgb, var(--prime-ref-color-gray-925) 6%, transparent)",
-      bgSurface: "color-mix(in srgb, var(--prime-ref-color-gray-925) 6%, transparent)",
-      /** Hover wash of a field: the `bg` wash, twice as dense (≈ `bg` mixed 94% with the text color). */
-      bgHover: "color-mix(in srgb, var(--prime-ref-color-gray-925) 12%, transparent)",
-      bgFocus: "{color.gray.0}",
+      /** A disabled field: a faint wash on whatever it sits on. */
       bgDisabled: "color-mix(in srgb, var(--prime-ref-color-gray-925) 4%, transparent)",
-    },
-    /**
-     * Card fill depends on what it sits on (same idea as `field`). On the canvas a card is white and raised;
-     * every surface plane (AppShell content, Card, Modal, Drawer, Popover) sets
-     * `--prime-color-card-bg: var(--prime-color-bg-sunken)`, and a card on a sunken fill drops its shadow.
-     */
-    card: {
-      bg: "{color.bg.surface}",
     },
     focus: {
       ring: "{color.cobalt.700}",
@@ -178,8 +162,6 @@ export const semanticTokens = {
     control: {
       /** Switch thumb, slider thumb. */
       thumb: "{color.white}",
-      /** Selected segment in a segmented track: one step lighter than the track. */
-      selected: "{color.gray.0}",
     },
     tooltip: {
       bg: "{color.gray.925}",
@@ -376,6 +358,8 @@ export const semanticTokens = {
     },
     /** Step between items of a staggered first render. */
     stagger: "{duration.80}",
+    /** Blur that hides a change of shape while two states swap in place (icon → check, letters). */
+    blur: "2px",
     /** `:active` scale of pressable controls; `compact` for icon-only and small targets. */
     press: {
       scale: "0.98",
@@ -584,8 +568,6 @@ export const semanticTokens = {
   },
 
   card: {
-    /** Context: surfaces set it to `none` together with `--prime-color-card-bg` (see color.card). */
-    shadow: "{shadow.raised}",
     radius: "{radius.12}",
     paddingS: "{space.4}",
     paddingM: "{space.5}",

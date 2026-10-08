@@ -20,7 +20,7 @@
 .checker {
   background:
     repeating-conic-gradient(
-      var(--prime-color-bg-surface) 0deg 90deg,
+      var(--prime-color-layer-current) 0deg 90deg,
       var(--prime-color-fill-strong) 90deg 180deg
     )
     0 0 / 50% 50%;

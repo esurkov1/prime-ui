@@ -177,7 +177,7 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data-sticky-header`, `data-sticky-first-column`, `data-table-width` (`fill` · `auto` · `grow`), `data-highlight-row`, `data-highlight-column`, `data-striped`, `data-loading`, `data-selectable`, `data-expandable`, `data-dragging` (while drag-selecting), `data-overflow-start` · `data-overflow-end` (edges that hide columns). Sorting and paging swap rows instantly; everything is still under `prefers-reduced-motion`.
 
 ## Layout & spacing
-- The root fills its container on `--prime-color-card-bg`, radius 12, and clips full-bleed head and rows; on a card or a modal it becomes a sunken block — never wrap it in a Card.
+- The root is a layer of the surface ladder (`data-depth`, one above its host): it fills its container on `--prime-color-layer-current`, radius 12, and clips full-bleed head and rows; zebra rows and the sticky column are one ladder step off it, the head two. On a card or in a modal it is the next layer by itself — never wrap it in a Card.
 - Toolbar padding `--prime-space-3` × cell padding, items `gap: --prime-space-2`; below 30rem of table width toolbar and footer stack.
 - The footer has a hairline on top: range on the left, Pagination on the right. The range shows only with more than one page or with infinite scroll.
 - Columns scroll sideways inside the table, never the page; pin the identifying column with `stickyFirstColumn`. Works from 320 px.

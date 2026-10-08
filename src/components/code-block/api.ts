@@ -18,8 +18,8 @@ export const api: ComponentApi = {
           name: "variant",
           type: '"soft" | "ghost"',
           default: '"soft"',
-          en: "`soft` — sunken panel with padding and the `code` text role; `ghost` — bare `pre` that inherits type and background from its host.",
-          ru: "`soft` — утопленная панель с отступами и ролью текста `code`; `ghost` — голый `pre`, шрифт и фон от хоста.",
+          en: "`soft` — a filled panel (one ladder step off its host) with padding and the `code` text role; `ghost` — bare `pre` that inherits type and background from its host.",
+          ru: "`soft` — залитая панель (на шаг лестницы от хоста) с отступами и ролью текста `code`; `ghost` — голый `pre`, шрифт и фон от хоста.",
         },
         {
           name: "colorScheme",

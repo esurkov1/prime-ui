@@ -117,8 +117,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.Item",
-      en: "`ref` → `HTMLLIElement`. One card: an `<li>` on the raised fill (`bg-raised`) with the card shadow; return it from `renderItem` (it takes its id from there). Draggable by the whole card, focusable, `aria-keyshortcuts` for Alt + arrows. Presses on buttons, fields and links inside never start a drag.",
-      ru: "Одна карточка: `<li>` на приподнятой заливке (`bg-raised`) с тенью карточки; возвращается из `renderItem` (id берёт оттуда). Перетаскивается целиком, фокусируется, `aria-keyshortcuts` для Alt + стрелок. Нажатия на кнопки, поля и ссылки внутри не начинают перетаскивание.",
+      en: "`ref` → `HTMLLIElement`. One card: an `<li>` on the floating layer's fill (`layer-floating-bg`) with the raised shadow; return it from `renderItem` (it takes its id from there). Draggable by the whole card, focusable, `aria-keyshortcuts` for Alt + arrows. Presses on buttons, fields and links inside never start a drag.",
+      ru: "Одна карточка: `<li>` на заливке плавающего слоя (`layer-floating-bg`) с лёгкой тенью; возвращается из `renderItem` (id берёт оттуда). Перетаскивается целиком, фокусируется, `aria-keyshortcuts` для Alt + стрелок. Нажатия на кнопки, поля и ссылки внутри не начинают перетаскивание.",
       props: [
         {
           name: "disabled",

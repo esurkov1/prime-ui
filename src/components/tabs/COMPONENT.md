@@ -42,7 +42,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Tabs.Root
-`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel; horizontal, it is the frame: a sunken strip over the panel surface.
+`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel; horizontal, it is the frame and a layer of the surface ladder: a strip two steps off the layer over the panel in the layer's own color.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -139,7 +139,7 @@ Tabs have no `variant`: navigation tabs are always a folder (horizontal) or pill
 ### orientation
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `horizontal` | a `bg-sunken` strip over a padded `bg-surface` panel, tabs edge to edge; the active tab is the panel surface rising into the strip with concave flares, gliding between tabs; primary text, medium weight, accent icon; hover is the same shape in `fill-faint` | switching sections above the content | yes |
+| `horizontal` | a layer of the surface ladder: a `fill-muted-hover` strip (two steps off the layer) over a padded panel in the layer's own color, tabs edge to edge; the active tab is the panel rising into the strip with concave flares, gliding between tabs; primary text, medium weight, accent icon; hover is the same shape in `fill-faint` | switching sections above the content | yes |
 | `vertical` | items padded like controls, no rail; active item is a `fill-muted` pill with a short accent mark at the start; hover `fill-subtle`; below a 600px container it becomes a scrolling row above the panel | settings pages with a side list of sections | |
 
 ### size
@@ -194,7 +194,7 @@ The indicator glides (`emphasized` + `base`, `data-animate="true"`) only into a 
 Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-width`, inline `--tabs-item-min` / `--tabs-item-max` when set; List `data-indicator="folder" | "pill"`; Item `data-value` on the tab, `data-state` / `data-disabled` on its wrapper too; Label `data-text`. Inactive panels are unmounted; a panel's content enters each time it opens.
 
 ## Layout & spacing
-- Horizontal: the root is the frame (`radius-xl`, `bg-sunken`), the list sits flush on the panel and runs edge to edge; the panel pads its content by tier (`--prime-space-4` … `--prime-space-8`). Do not wrap Tabs in a Card — it already is one.
+- Horizontal: the root is the frame and a layer of the ladder (`data-depth`, `radius-xl`, the strip two steps off the layer), the list sits flush on the panel and runs edge to edge; the panel pads its content by tier (`--prime-space-4` … `--prime-space-8`). Do not wrap Tabs in a Card — it already is one.
 - Vertical list → panel: `var(--prime-space-6)`.
 - The list never wraps: it collapses, then scrolls horizontally with faded edges (hidden scrollbar, `overscroll-behavior: contain`). Give the list's container a width (`min-width: 0` on flex children).
 - A horizontal tab is never narrower than its content (`min-width: max-content`; the tab bounds that content between `minItemWidth` and `maxItemWidth`), so a label is never cut to make room. Full width, tabs tend to equal widths, not widths in proportion to their labels (`flex: 1 1 0`): a long label keeps its width, the short ones share the rest.

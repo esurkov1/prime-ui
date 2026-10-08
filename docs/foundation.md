@@ -5,8 +5,9 @@ The design contract for every component. Tokens live in `tokens/` and are genera
 
 ## 1. Principles
 
-1. **Depth comes from fill, not from lines.** Canvas is light gray, cards are white, fields are a
-   slightly darker gray inside cards and white on the canvas. Borders are hairlines (`border.subtle`)
+1. **Depth comes from fill, not from lines.** Surfaces stand on one ladder (§4): the page, a card one
+   step off it, a block in the card one step off the card; a control is always one step off the layer
+   it sits on, so nothing merges with its host. Borders are hairlines (`border.subtle`)
    used only where a separator is truly needed (table rows, list dividers). Controls have no visible
    outline: `--prime-color-border-control` is `transparent` and becomes visible only under
    `prefers-contrast: more`.
@@ -43,48 +44,88 @@ A component may define private custom properties (`--btn-h`) that are assigned f
 
 | Group | Tokens | Use |
 |---|---|---|
-| `color.bg` | canvas, surface, raised, sunken, inverse, scrim | page / card / floating layer / inset area / tooltip / modal backdrop |
-| `color.fill` | subtle, subtleActive, faint, muted, mutedHover, strong, strongHover | ghost hover & row hover (transparent wash) / tab hover in the sunken Tabs strip, below the sunken → surface step / neutral buttons, chips, segmented track / unchecked checkbox, switch track, slider track |
+| `color.layer.<n>` | `0`…`4`, `floating`, `floating1`, `floating2` × bg, fill, fillHover, selected | the surface ladder (§4), computed by `tokens/layers.ts`; components read it through the depth context variables, not directly |
+| `color.bg` | inverse, scrim, edgeShadow, glass, glassEdge | tooltip / modal backdrop / shade over a scrolled edge / BottomNav glass |
+| `color.fill` | subtle, subtleActive, faint, strong, strongHover | translucent state washes that sit on any background: ghost hover & row hover / tab hover in the Tabs strip / unchecked checkbox, switch track, slider track |
 | `color.text` | primary, secondary, muted, placeholder, disabled, inverse | — |
 | `color.border` | subtle, default, control | hairline separators / stroke buttons / control outline (transparent) |
 | `color.accent` | default, hover, fg, soft, softHover, text | primary action, selection, links, active tab, checked controls |
 | `color.danger/success/warning/info` | default, (hover), fg, soft, text, (border) | status (info is sky, distinct from the cobalt accent) |
-| `color.field` | bg, bgSurface, bgFocus, bgDisabled | field fill (see §4) |
+| `color.field` | bgDisabled | a disabled field; the resting, hover and focus fill come from the ladder (§4) |
 | `color.focus.ring` | — | the one focus ring |
 | `color.control.thumb` | — | switch / slider thumb |
 | `color.tooltip` | bg, text | — |
 | `color.palette.<hue>` | soft, text, solid, solidFg | Badge/Avatar colors: gray, blue, green, orange, red, yellow, purple, sky, pink, teal |
 
-Light and dark are full themes: in dark, layers get lighter as they go up (canvas 950 → surface 900 →
-raised 875), and accent/status move to lighter steps. All text pairs pass WCAG AA (≥ 4.5:1), focus ring ≥ 3:1.
+Light and dark are full themes, not inversions: the surface ladder rises from a near-black page in
+dark (§4), and accent/status move to lighter steps. All text pairs pass WCAG AA (≥ 4.5:1), focus
+ring ≥ 3:1 — including `text.muted` on every layer and on every control fill of it.
 
-## 4. Surfaces and the field context
+## 4. Surfaces: the ladder and the depth context
 
-`--prime-color-field-bg` is white on the canvas. Every surface component sets
+**The ladder.** Surfaces are the page (layer 0) and four nested layers. Neighbouring layers differ by
+one lightness step, ΔL 0.03 in OKLab. `tokens/layers.ts` computes every color at build time:
 
-```css
-.root { --prime-color-field-bg: var(--prime-color-field-bg-surface); }
-```
+- A nested layer is one step lighter than its parent.
+- **Reflect:** with less than half a step of room before the edge of the lightness window, the step
+  goes the other way. **Snap:** if less than half a step would be left after a move, the color lands
+  on the edge.
+- Light theme: window 0.06–1.0, page `gray.50` (`#f3f4f6`). The card snaps to pure white, deeper layers
+  alternate with the page tone (white → `#f4f5f7` → white → `#f4f5f7`), as Carbon's layers do.
+- Dark theme: window 0.06–0.95, page `gray.950` (`#0d0f13`). Every layer is one step lighter
+  (`#14161a` → `#1a1c21` → `#212428` → `#292b2f`); nothing ever sinks towards black.
+- Every color keeps the hue and chroma of the page, so the cool Graphite bias is on every layer.
+- Controls on a layer (field, chip, neutral button, segmented track, the Tabs strip's tone) step from
+  it: darker in light, lighter in dark, with the same reflect. `fillHover` is two steps. The selected
+  thumb on a track is two steps lighter than the track.
+- Floating layers (menus, popovers, modals, drawers, notifications) sit one step above a card and never
+  reflect: white in light (their shadow carries the depth), a step lighter in dark. Two layers can
+  nest inside one (`floating1`, `floating2`).
 
-so fields inside Card, Modal, Drawer, Popover, Dropdown panel, Sidebar, Datepicker panel stay
-distinguishable. Fields: `background: var(--prime-color-field-bg)`, hover darkens via
-`color-mix(in srgb, var(--prime-color-field-bg) 94%, var(--prime-color-text-primary))`,
-focus switches to `--prime-color-field-bg-focus` plus the focus ring, error shows a
-`--prime-color-danger-border` 1px inset ring (`box-shadow: inset 0 0 0 1px …`) and danger text below.
+Each row is `color.layer.<n>.{bg, fill, fillHover, selected}` → `--prime-color-layer-<n>-*`.
 
-Any element that paints `bg-canvas` (preview stages, the AppShell rail) resets the context back to
-`--prime-color-card-bg: var(--prime-color-bg-surface)` and `--prime-card-shadow: var(--prime-shadow-raised)`.
+**The depth context.** A surface sets `data-depth` (`0`–`4`, `floating`, `floating-1`, `floating-2`,
+`tinted`) one above the surface around it; `src/internal/surfaceDepth.tsx` carries the depth through
+React context (portals included). `globals.css` points the context variables at the row of that depth:
 
-Cards follow the same context rule: `--prime-color-card-bg` is `bg-surface` on the canvas; every surface plane
-(AppShell content, Card, Modal, Drawer, Popover) sets `--prime-color-card-bg: var(--prime-color-bg-sunken)` and
-`--prime-card-shadow: none`, so a card
-inside page content or inside another card becomes a sunken tile without a shadow.
+| Variable | Meaning |
+|---|---|
+| `--prime-color-layer-current` | the surface's own fill |
+| `--prime-color-layer-nested` | a surface placed on it (an inset tile, a cover) |
+| `--prime-color-field-bg` / `-hover` / `-focus` | a field at rest (one step), on hover (two), in focus (the layer itself + the ring) |
+| `--prime-color-fill-muted` / `-hover` | neutral buttons, chips, segmented tracks, the Tabs strip |
+| `--prime-color-control-selected` | the selected segment on a track, the active FileUpload icon |
+| `--prime-layer-shadow` | the raised whisper — only on a card that sits on the page (depth 1) |
+
+`:root` and every `[data-theme]` element are layer 0. A component never knows where it lies: it writes
+`background: var(--prime-color-field-bg)` and the depth decides.
+
+**The app frame.** The AppShell content panel is the page itself (layer 0): gray in light, near black
+in dark, so cards on it are layer 1 — white in light. The Sidebar rail beside it is a surface one
+layer above the page (white in light, a step lighter in dark), so the rail and the content never
+merge; its current item is the rail's fill two steps off it.
+
+**Who sets a depth.** Layers: Card, Sidebar, Accordion, DataTable, LoginForm, Datepicker.Panel,
+horizontal Tabs, an outline Banner, ExampleFrame. Floating: every `FloatingPanel`
+(Popover, Dropdown, Select, TagSelect…), Modal, Drawer, CommandMenu, Notification, a raised
+ColorPicker.Panel. The ladder stops at layer 4: a surface nested deeper keeps layer 4's color — split
+the screen with space and headings instead.
+
+**Hosts off the ladder.** A tinted host (a soft or solid Banner, an accent wash, an image) sets
+`data-depth="tinted"`: controls on it take the translucent washes (`fill.subtleActive`,
+`fill.strong`), which read on any color. Translucent fills are otherwise only for states: row and
+ghost hover, checkbox and switch tracks.
+
+Fields: `background: var(--prime-color-field-bg)`, hover `--prime-color-field-bg-hover`, focus
+`--prime-color-field-bg-focus` plus the focus ring, error a `--prime-color-danger-border` 1px inset ring
+(`box-shadow: inset 0 0 0 1px …`) and danger text below.
 
 **Every bounded block must be visible on its host (hard rule).** A block with edges (table, card, panel, code block,
-list group, tile, empty state frame) never has a transparent fill or the same fill as the plane it sits on. It takes
-`--prime-color-card-bg` (or `--prime-color-field-bg` for inputs), which resolves to a contrasting fill for the current
-host. A table's head, body rows and footer all sit inside that fill, so the table's bottom edge is always visible.
-Only explicitly flat/ghost variants may drop the fill, and then they must have no radius (nothing suggests a box).
+list group, tile, empty state frame) never has a transparent fill or the same fill as the plane it sits on. It is a
+layer (Card, or `data-depth` in a kit component) or takes `--prime-color-layer-nested`. A table's head, body rows
+and footer all sit inside that fill, so the table's bottom edge is always visible. A strip on a block's outer edge
+(the Tabs strip) is two steps off the block: one step off a white card is the light page tone itself. Only
+explicitly flat/ghost variants may drop the fill, and then they must have no radius (nothing suggests a box).
 
 ## 5. Typography
 
@@ -146,7 +187,7 @@ Radius: `--prime-radius-{xs 4, s 6, m 8, l 12, xl 16, full}`. Controls use their
 cards `--prime-card-radius` (12); floating panels `--prime-panel-radius` (12) with
 `--prime-panel-padding` (4) and `--prime-panel-item-radius` (8); modal `--prime-modal-radius` (16).
 
-Elevation: `--prime-shadow-raised` (cards, barely there) · `--prime-shadow-overlay` (menus, popovers,
+Elevation: `--prime-shadow-raised` (a card on the page, barely there; `--prime-layer-shadow`) · `--prime-shadow-overlay` (menus, popovers,
 tooltips, datepicker) · `--prime-shadow-modal` (modal, drawer).
 Z-index: `--prime-z-*` only. Every overlay shares `--prime-z-overlay` and portals to `<body>` when it
 opens, so the open order is the stacking order; toasts sit above on `--prime-z-toast`.

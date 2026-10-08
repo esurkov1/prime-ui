@@ -8,7 +8,7 @@ import styles from "./CodeBlock.module.css";
 
 export type CodeBlockColorScheme = "light" | "dark";
 
-/** `soft` — sunken panel with padding and the `code` text role; `ghost` — bare `pre` that inherits type and background from its host. */
+/** `soft` — filled panel with padding and the `code` text role; `ghost` — bare `pre` that inherits type and background from its host. */
 export type CodeBlockVariant = Extract<Variant, "soft" | "ghost">;
 
 export type CodeBlockProps = Omit<

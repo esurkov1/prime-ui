@@ -288,3 +288,59 @@
   inset: 0;
   margin: auto;
 }
+
+/* ─── Progress & hold fill ──────────────────────────────────────────────── */
+
+/* A wash of the button's own text color growing from the start edge, under the label (the root
+   isolates, the fill sits at z-index −1 above the root's background). `progress` follows the value
+   (`fast` · standard smooths the steps); a hold runs linearly for the hold time — a gesture clock,
+   so reduced motion keeps it. Leaving, the fill fades and rolls back together (`fast` · exit). */
+.root:has(> .fill) {
+  isolation: isolate;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--btn-fg) 18%, transparent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+}
+
+.root:dir(rtl) > .fill {
+  transform-origin: right center;
+}
+
+.root[data-progress="true"] > .fill {
+  transform: scaleX(var(--btn-progress));
+  opacity: 1;
+  transition:
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-hold="holding"] > .fill {
+  transform: scaleX(1);
+  opacity: 1;
+  transition:
+    transform var(--btn-hold-duration) linear,
+    opacity var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
+}
+
+.root[data-hold="done"] > .fill {
+  transform: scaleX(1);
+  opacity: 1;
+  transition: none;
+}
+
+/* A held press must not open the touch callout or select the label. */
+.root[data-hold] {
+  -webkit-touch-callout: none;
+}

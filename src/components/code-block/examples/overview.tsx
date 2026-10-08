@@ -1,4 +1,4 @@
-/** An API response sample on a sunken panel, named for screen readers — `code`, `aria-label`. */
+/** An API response sample on a filled panel, named for screen readers — `code`, `aria-label`. */
 import { CodeBlock } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

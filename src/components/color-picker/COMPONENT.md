@@ -211,7 +211,7 @@ No `variant` / `tone` / `color`.
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `none` | parts stacked with a 12px gap, no own background | inside a Popover or a Card | yes |
-| `raised` | `bg-raised`, panel radius and padding, `shadow-overlay`; fields switch to `field-bg-surface` | a standalone panel on the page | |
+| `raised` | the floating layer of the ladder (`data-depth="floating"`), panel radius and padding, `shadow-overlay`; fields take that layer's fill | a standalone panel on the page | |
 
 ### defaultFormat (ColorPicker.Root)
 | Value | Looks like | Use when | Default |

@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 
@@ -282,6 +282,187 @@ describe("Button asChild", () => {
     it("accepts size xs", () => {
       render(<Button.Root size="xs">Tiny</Button.Root>);
       expect(screen.getByRole("button", { name: "Tiny" })).toHaveAttribute("data-size", "xs");
+    });
+  });
+});
+
+describe("Button motion", () => {
+  describe("progress", () => {
+    it("marks the button busy and drives the fill, then lets it go", () => {
+      const { rerender } = render(<Button.Root progress={0.42}>Скачивание 42%</Button.Root>);
+      const button = screen.getByRole("button", { name: "Скачивание 42%" });
+      expect(button).toHaveAttribute("aria-busy", "true");
+      expect(button).toHaveAttribute("data-progress", "true");
+      expect(button.style.getPropertyValue("--btn-progress")).toBe("0.42");
+      expect(button.querySelector(`.${styles.fill}`)).not.toBeNull();
+
+      rerender(<Button.Root>Открыть файл</Button.Root>);
+      const done = screen.getByRole("button", { name: "Открыть файл" });
+      expect(done).not.toHaveAttribute("aria-busy");
+      expect(done).not.toHaveAttribute("data-progress");
+      // The fill stays mounted so its exit can play.
+      expect(done.querySelector(`.${styles.fill}`)).not.toBeNull();
+    });
+
+    it("clamps the value to 0…1 and stays clickable", () => {
+      const onClick = vi.fn();
+      render(
+        <Button.Root progress={1.7} onClick={onClick}>
+          Скачивание
+        </Button.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Скачивание" });
+      expect(button.style.getPropertyValue("--btn-progress")).toBe("1");
+      fireEvent.click(button);
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("holdToConfirm", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("confirms only after a full hold", () => {
+      vi.useFakeTimers();
+      const onConfirm = vi.fn();
+      render(
+        <Button.Root tone="danger" holdToConfirm onConfirm={onConfirm}>
+          Удалить проект
+        </Button.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Удалить проект" });
+
+      fireEvent.pointerDown(button, { button: 0 });
+      expect(button).toHaveAttribute("data-hold", "holding");
+      act(() => vi.advanceTimersByTime(600));
+      fireEvent.pointerUp(button);
+      expect(button).toHaveAttribute("data-hold", "idle");
+      act(() => vi.advanceTimersByTime(2000));
+      expect(onConfirm).not.toHaveBeenCalled();
+
+      fireEvent.pointerDown(button, { button: 0 });
+      act(() => vi.advanceTimersByTime(1200));
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+      expect(button).toHaveAttribute("data-hold", "done");
+      fireEvent.pointerUp(button);
+      expect(button).toHaveAttribute("data-hold", "idle");
+    });
+
+    it("holds from the keyboard with Space and Enter; key repeat does not restart", () => {
+      vi.useFakeTimers();
+      const onConfirm = vi.fn();
+      render(
+        <Button.Root holdToConfirm onConfirm={onConfirm}>
+          Удалить
+        </Button.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Удалить" });
+
+      fireEvent.keyDown(button, { key: " " });
+      act(() => vi.advanceTimersByTime(700));
+      fireEvent.keyDown(button, { key: " ", repeat: true });
+      act(() => vi.advanceTimersByTime(500));
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+      fireEvent.keyUp(button, { key: " " });
+
+      fireEvent.keyDown(button, { key: "Enter" });
+      fireEvent.keyUp(button, { key: "Enter" });
+      act(() => vi.advanceTimersByTime(2000));
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+    });
+
+    it("leaving the button or losing focus cancels", () => {
+      vi.useFakeTimers();
+      const onConfirm = vi.fn();
+      render(
+        <Button.Root holdToConfirm onConfirm={onConfirm}>
+          Удалить
+        </Button.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Удалить" });
+      fireEvent.pointerDown(button, { button: 0 });
+      fireEvent.pointerLeave(button);
+      fireEvent.keyDown(button, { key: "Enter" });
+      fireEvent.blur(button);
+      act(() => vi.advanceTimersByTime(2000));
+      expect(onConfirm).not.toHaveBeenCalled();
+    });
+
+    it("describes the gesture outside the button name; labels override it", () => {
+      render(
+        <Button.Root holdToConfirm labels={{ holdHint: "Удерживайте 1 секунду" }}>
+          Удалить
+        </Button.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Удалить" });
+      expect(button).toHaveAccessibleDescription("Удерживайте 1 секунду");
+    });
+
+    it("a disabled button does not hold", () => {
+      vi.useFakeTimers();
+      const onConfirm = vi.fn();
+      render(
+        <Button.Root holdToConfirm disabled onConfirm={onConfirm}>
+          Удалить
+        </Button.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Удалить" });
+      fireEvent.keyDown(button, { key: " " });
+      act(() => vi.advanceTimersByTime(2000));
+      expect(onConfirm).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("label morph", () => {
+    const motion = (reduce: boolean) =>
+      vi.stubGlobal(
+        "matchMedia",
+        vi.fn((query: string) => ({
+          matches: reduce && query.includes("reduce"),
+          media: query,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          onchange: null,
+          dispatchEvent: vi.fn(),
+        })),
+      );
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.useRealTimers();
+    });
+
+    it("plays the letters of a new label, keeps one accessible name, then settles to text", () => {
+      vi.useFakeTimers();
+      motion(false);
+      const { rerender } = render(<Button.Root>Продолжить</Button.Root>);
+      rerender(<Button.Root>Подтвердить</Button.Root>);
+      const button = screen.getByRole("button", { name: "Подтвердить" });
+      expect(button.querySelectorAll("[aria-hidden='true'] > span").length).toBeGreaterThan(0);
+      act(() => vi.advanceTimersByTime(1000));
+      expect(button.querySelectorAll("[aria-hidden='true'] > span")).toHaveLength(0);
+      expect(button).toHaveTextContent("Подтвердить");
+    });
+
+    it("changes in place when only digits change, under reduced motion and while in progress", () => {
+      motion(false);
+      const { rerender } = render(<Button.Root>Повторить через 59 с</Button.Root>);
+      rerender(<Button.Root>Повторить через 58 с</Button.Root>);
+      let button = screen.getByRole("button", { name: "Повторить через 58 с" });
+      expect(button.querySelectorAll("[aria-hidden='true']")).toHaveLength(0);
+
+      rerender(<Button.Root progress={0.3}>Скачивание 30%</Button.Root>);
+      rerender(<Button.Root progress={0.4}>Загрузка 40%</Button.Root>);
+      button = screen.getByRole("button", { name: "Загрузка 40%" });
+      expect(button.querySelectorAll("[aria-hidden='true'] > span")).toHaveLength(0);
+
+      motion(true);
+      rerender(<Button.Root>Готово</Button.Root>);
+      button = screen.getByRole("button", { name: "Готово" });
+      expect(button.querySelectorAll("[aria-hidden='true'] > span")).toHaveLength(0);
     });
   });
 });

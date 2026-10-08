@@ -1,12 +1,10 @@
 /*
- * Documentation frame: a contained block with its own fill, so it reads on any page background
- * (canvas or surface, both themes). The chrome is the sunken wash with a hairline ring; the
- * preview stage and the code pane are inset wells with concentric radii
- * (radius-xl 16 − padding 4 = radius-l 12).
+ * Documentation frame: a layer of the surface ladder (`data-depth`), so it reads on any host in
+ * both themes. The chrome is that layer with a hairline ring; the preview stage and the code pane
+ * are inset wells with concentric radii (radius-xl 16 − padding 4 = radius-l 12). Both wells carry
+ * `data-theme`, so each is a page of its own (layer 0 of its scheme).
  */
 .root {
-  /* Fields in the toolbar sit on a wash. The stage resets this through its own data-theme. */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
   --frame-padding: var(--prime-space-1);
 
   box-sizing: border-box;
@@ -20,7 +18,7 @@
   padding: 0 var(--frame-padding) var(--frame-padding);
   overflow: hidden;
   border-radius: var(--prime-radius-xl);
-  background: var(--prime-color-bg-sunken);
+  background: var(--prime-color-layer-current);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
   color: var(--prime-color-text-primary);
   text-align: start;
@@ -175,7 +173,7 @@
   max-width: calc(var(--prime-space-24) * 4);
 }
 
-/* Stage: canvas of the previewed theme; layout via flex + data-preview-layout. */
+/* Stage: the page (layer 0) of the previewed theme; layout via flex + data-preview-layout. */
 .previewInner {
   box-sizing: border-box;
   display: flex;
@@ -188,10 +186,7 @@
   min-height: calc(var(--prime-space-20) * 2);
   padding: var(--prime-space-6) var(--prime-space-4);
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-bg-canvas);
-  /* The stage paints the canvas, so cards inside are back in the canvas context. */
-  --prime-color-card-bg: var(--prime-color-bg-surface);
-  --prime-card-shadow: var(--prime-shadow-raised);
+  background: var(--prime-color-layer-current);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
   color: var(--prime-color-text-primary);
   /* Clip content wider than the card (wide button groups, tables without their own scroll). */
@@ -386,7 +381,7 @@
   width: 100%;
 }
 
-/* Code tab: an explicit well (the previewed theme's canvas), same inset and radius as the stage. */
+/* Code tab: an explicit well (the previewed theme's page), same inset and radius as the stage. */
 .codePane {
   box-sizing: border-box;
   min-width: 0;
@@ -396,7 +391,7 @@
   padding: var(--prime-space-4);
   overflow: auto;
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-current);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
   color: var(--prime-color-text-primary);
   font-size: var(--prime-text-code-size);

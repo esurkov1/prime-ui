@@ -61,7 +61,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue">` | — | `className` (the board height), `aria-label` and the other div attributes. |
 
 ### Kanban.Item
-`ref` → `HTMLLIElement`. One card: an `<li>` on the raised fill (`bg-raised`) with the card shadow; return it from `renderItem` (it takes its id from there). Draggable by the whole card, focusable, `aria-keyshortcuts` for Alt + arrows. Presses on buttons, fields and links inside never start a drag.
+`ref` → `HTMLLIElement`. One card: an `<li>` on the floating layer's fill (`layer-floating-bg`) with the raised shadow; return it from `renderItem` (it takes its id from there). Draggable by the whole card, focusable, `aria-keyshortcuts` for Alt + arrows. Presses on buttons, fields and links inside never start a drag.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

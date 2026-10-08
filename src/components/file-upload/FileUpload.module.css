@@ -148,7 +148,7 @@
 }
 
 .root[data-state="active"] .icon {
-  background: var(--prime-color-bg-surface);
+  background: var(--prime-color-control-selected);
   color: var(--prime-color-accent-text);
 }
 

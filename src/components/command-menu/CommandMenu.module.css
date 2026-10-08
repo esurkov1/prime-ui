@@ -21,8 +21,6 @@
   /* One content column: title, search icon, group labels and item icons start at 16
      (list padding 8 + row padding 8). */
   --cm-inset: calc(var(--prime-space-2) + var(--prime-panel-item-padding-x));
-  /* Fields inside a raised surface stay distinguishable (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
 
   box-sizing: border-box;
   display: flex;
@@ -37,7 +35,7 @@
   padding: 0;
   overflow: hidden;
   border-radius: var(--prime-modal-radius);
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-modal);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);

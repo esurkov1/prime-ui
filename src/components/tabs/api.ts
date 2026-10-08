@@ -11,8 +11,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Tabs.Root",
-      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel; horizontal, it is the frame: a sunken strip over the panel surface.",
-      ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель. В горизонтальном режиме это рамка: утопленная полоса над поверхностью панели.",
+      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel; horizontal, it is the frame and a layer of the surface ladder: a strip two steps off the layer over the panel in the layer's own color.",
+      ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель. В горизонтальном режиме это рамка и слой лестницы поверхностей: полоса на два шага от слоя над панелью цвета слоя.",
       props: [
         {
           name: "value",

@@ -20,9 +20,6 @@
   --dialog-hairline-size: calc(100% - 2 * var(--dialog-padding)) var(--prime-border-width);
 
   container: prime-dialog / inline-size;
-  /* Surface context: nested cards become sunken tiles without shadow (foundation §4). */
-  --prime-color-card-bg: var(--prime-color-bg-sunken);
-  --prime-card-shadow: none;
 }
 
 /* ─── Header ─────────────────────────────────────────────────────────────── */

@@ -39,7 +39,7 @@ export function PlaygroundHeaderControls() {
                 checked={entry.value === surface}
                 onCheckedChange={() => setSurface(entry.value)}
               >
-                {entry.label} — {entry.hint.toLowerCase()}
+                {entry.label}
               </Dropdown.CheckboxItem>
             ))}
           </Dropdown.Group>

@@ -38,8 +38,6 @@
 
 .panel {
   --drawer-width: var(--prime-drawer-width-m);
-  /* Fields inside a raised surface use the "on surface" fill. */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
 
   --dialog-padding: var(--prime-drawer-padding);
 
@@ -54,8 +52,8 @@
   min-height: 0;
   overflow: hidden;
   /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-bg-raised);
-  background: var(--prime-color-bg-raised);
+  --avatar-ring: var(--prime-color-layer-current);
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
   box-shadow: var(--prime-shadow-modal);
   outline: none;
@@ -100,13 +98,13 @@
  */
 .panel[data-side="right"] {
   box-shadow:
-    var(--prime-space-6) 0 0 0 var(--prime-color-bg-raised),
+    var(--prime-space-6) 0 0 0 var(--prime-color-layer-current),
     var(--prime-shadow-modal);
 }
 
 .panel[data-side="left"] {
   box-shadow:
-    calc(-1 * var(--prime-space-6)) 0 0 0 var(--prime-color-bg-raised),
+    calc(-1 * var(--prime-space-6)) 0 0 0 var(--prime-color-layer-current),
     var(--prime-shadow-modal);
 }
 
@@ -123,7 +121,7 @@
   border-start-start-radius: var(--prime-sheet-radius);
   border-start-end-radius: var(--prime-sheet-radius);
   box-shadow:
-    0 var(--prime-space-6) 0 0 var(--prime-color-bg-raised),
+    0 var(--prime-space-6) 0 0 var(--prime-color-layer-current),
     var(--prime-shadow-modal);
 }
 

@@ -9,13 +9,13 @@
 
 body {
   min-height: 100vh;
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-0-bg);
   transition: background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 #root {
   min-height: 100vh;
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-0-bg);
 }
 
 /* --- Demo page structure ------------------------------------------------- */
@@ -126,12 +126,12 @@ body {
 .playgroundFramePending {
   min-height: calc(var(--prime-space-24) * 2);
   border-radius: var(--prime-radius-xl);
-  background: var(--prime-color-bg-sunken);
+  background: var(--prime-color-fill-muted);
 }
 
-/* --- Preview surfaces ------------------------------------------------------
- * The same example on canvas / card / floating layer / accent wash. Surfaces that are not
- * the canvas switch the field context, exactly like Card or Modal do (foundation §4).
+/* --- Preview layers --------------------------------------------------------
+ * The same example on a layer of the ladder (foundation §4): the page or a card. The stage paints
+ * the layer; the example inside gets its `data-depth` from `PreviewSurfaceDepth`.
  */
 
 .playgroundFrame {
@@ -142,22 +142,6 @@ body {
   transition: background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.playgroundFrame[data-preview-surface="canvas"] [data-preview-layout] {
-  background: var(--prime-color-bg-canvas);
-}
-
-.playgroundFrame[data-preview-surface="surface"] [data-preview-layout] {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-  background: var(--prime-color-bg-surface);
-  box-shadow: var(--prime-shadow-raised);
-}
-
-.playgroundFrame[data-preview-surface="raised"] [data-preview-layout] {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-  background: var(--prime-color-bg-raised);
-  box-shadow: var(--prime-shadow-overlay);
-}
-
-.playgroundFrame[data-preview-surface="accent"] [data-preview-layout] {
-  background: var(--prime-color-accent-soft);
+.playgroundFrame[data-preview-surface="card"] [data-preview-layout] {
+  background: var(--prime-color-layer-1-bg);
 }

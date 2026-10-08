@@ -1,5 +1,6 @@
 /*
- * CodeBlock — monospace `code` role on a sunken wash, no border.
+ * CodeBlock — monospace `code` role on the host layer's control fill (one ladder step off it), no
+ * border.
  * Token colors come from the palette, so they follow the theme; `data-theme` on the root
  * (from `colorScheme`) re-scopes the whole palette when a fixed scheme is requested.
  */
@@ -27,7 +28,7 @@
 
 /* Forced scheme: the block carries its own background so the palette stays legible. */
 .root[data-variant="soft"][data-theme] {
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-floating-bg);
 }
 
 .root[data-variant="ghost"] {

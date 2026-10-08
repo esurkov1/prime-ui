@@ -8,8 +8,8 @@ import { getPattern } from "./patternRegistry";
 import type { CompositionPattern } from "./patterns";
 
 /**
- * The content panel of an app (`AppShell.Main` on the surface, cards as sunken tiles) inside the
- * preview stage: a pattern renders only its page, exactly as it would in a consumer app.
+ * The content panel of an app (the AppShell panel: the page itself, cards on it are layer 1) inside
+ * the preview stage: a pattern renders only its page, exactly as it would in a consumer app.
  */
 export function ScreenStage({ children }: { children: React.ReactNode }) {
   return (

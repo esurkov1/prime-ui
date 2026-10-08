@@ -4,6 +4,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 import { suspendTransitions } from "@/theme/applyTheme";
 
@@ -121,6 +122,7 @@ export function ExampleFrame({
   // Theme switch inside the frame is instant: no color transition from the old theme.
   const rootRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(rootRef, ref);
+  const depth = useNestedSurfaceDepth();
   const previousScheme = React.useRef(colorScheme);
   React.useLayoutEffect(() => {
     if (previousScheme.current === colorScheme) return;
@@ -129,7 +131,7 @@ export function ExampleFrame({
   }, [colorScheme]);
 
   return (
-    <div {...rest} ref={mergedRef} className={cx(styles.root, className)}>
+    <div {...rest} ref={mergedRef} className={cx(styles.root, className)} data-depth={depth}>
       <ExampleFrameToolbar
         code={code}
         labels={labels}
@@ -149,7 +151,8 @@ export function ExampleFrame({
               data-preview-layout={previewLayout}
               data-theme={colorScheme}
             >
-              {children}
+              {/* The stage is a page of its own: surfaces inside count from layer 0 again. */}
+              <SurfaceDepthProvider value={0}>{children}</SurfaceDepthProvider>
             </div>
           </div>
         </div>

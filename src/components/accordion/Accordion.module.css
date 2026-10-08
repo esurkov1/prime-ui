@@ -1,7 +1,7 @@
 /*
- * Accordion — Graphite.
+ * Accordion — Graphite. The root is a layer of the surface ladder (`data-depth`, foundation §4).
  * grouped: one surface (card radius), hairline separators between items, no outer border.
- * separate: every item is its own surface with a gap between them.
+ * separate: the root is transparent and every item paints the layer, with a gap between them.
  */
 
 .root {
@@ -15,9 +15,6 @@
   --acc-pad-y: var(--prime-space-3);
   --acc-min-height: calc(var(--prime-control-m-height) + var(--prime-space-4));
 
-  /* Surface context for fields inside the content. */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -26,7 +23,7 @@
   max-width: 100%;
   overflow: hidden;
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
 }
@@ -99,8 +96,8 @@
   overflow: hidden;
   border-top: 0;
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
+  background: var(--prime-color-layer-current);
+  box-shadow: var(--prime-layer-shadow);
 }
 
 .header {

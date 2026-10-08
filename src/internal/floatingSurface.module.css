@@ -1,14 +1,12 @@
 /* ─── Floating surface ───────────────────────────────────────────────────────
- * The one look of every anchored panel (Popover, Dropdown, Select, TagSelect): raised fill,
- * `--prime-panel-radius`, overlay shadow, no border. Width follows the content between the panel
+ * The one look of every anchored panel (Popover, Dropdown, Select, TagSelect): the floating layer
+ * of the ladder (`data-depth="floating"`, foundation §4), `--prime-panel-radius`, overlay shadow,
+ * no border. Width follows the content between the panel
  * minimum (or the anchor width, `--float-min-w`) and twice the minimum, never wider than the
  * viewport (`--float-max-w`). `usePosition` writes the `--float-*` variables.
  */
 
 .surface {
-  /* Fields inside a raised surface stay distinguishable (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-
   position: fixed;
   box-sizing: border-box;
   display: flex;
@@ -23,7 +21,7 @@
   margin: 0;
   border: 0;
   border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-overlay);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
@@ -48,7 +46,6 @@
 }
 
 .sheet {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
   --float-max-h: calc(100dvh - var(--prime-sheet-top-gap) - var(--prime-sheet-handle-area));
   /* A list in a sheet uses the room it has, not the anchored panel's limit. */
   --prime-panel-max-height: var(--float-max-h);
@@ -64,10 +61,10 @@
   padding-block-end: max(var(--prime-space-2), env(safe-area-inset-bottom, 0px));
   border-start-start-radius: var(--prime-sheet-radius);
   border-start-end-radius: var(--prime-sheet-radius);
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-current);
   /* Its own fill continues past the bottom edge: an upward pull (up to 24) never lifts it off. */
   box-shadow:
-    0 var(--prime-space-6) 0 0 var(--prime-color-bg-raised),
+    0 var(--prime-space-6) 0 0 var(--prime-color-layer-current),
     var(--prime-shadow-modal);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);

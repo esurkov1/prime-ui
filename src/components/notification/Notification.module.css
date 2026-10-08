@@ -1,6 +1,6 @@
 /*
  * Notification (toast) — Graphite.
- * Raised card (bg-raised, panel radius, shadow-overlay, no border), status icon, title, description,
+ * Floating card (the floating layer of the ladder, panel radius, shadow-overlay, no border), status icon, title, description,
  * optional action and badge, close button, countdown line.
  */
 
@@ -191,9 +191,6 @@
   --ntf-desc-size: var(--prime-text-body-s-size);
   --ntf-desc-line-height: var(--prime-text-body-s-line-height);
 
-  /* Surface context for fields inside custom content. */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-
   position: relative;
   box-sizing: border-box;
   display: grid;
@@ -204,7 +201,8 @@
   padding: var(--ntf-pad);
   overflow: hidden;
   border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
+  /* The floating layer of the ladder (`data-depth="floating"`). */
+  background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-overlay);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);

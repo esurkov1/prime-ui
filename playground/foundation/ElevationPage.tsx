@@ -2,6 +2,8 @@ import { Card } from "@/components/card/Card";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Input } from "@/components/input/Input";
 import { Typography } from "@/components/typography/Typography";
+import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
+
 import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import { SurfaceGallery } from "../components/ExampleSurface";
 import { Panel, TokenName } from "./FoundationKit";
@@ -56,33 +58,36 @@ function StaticField({ value }: { value: string }) {
 }
 
 /**
- * Canvas → card → floating menu → scrim + modal. The card and the fields are kit components; the
- * menu and modal planes are drawn on the same tokens because real overlays float in a portal.
+ * Page → card → floating menu → scrim + modal. The card and the fields are kit components; the
+ * menu and modal planes are drawn on the same layers (`data-depth="floating"`) because real
+ * overlays float in a portal.
  */
 function LayerStack() {
   return (
-    <div className={s.layerStage} aria-hidden>
-      <LayerTag>bg.canvas</LayerTag>
-      <Card.Root variant="cta" className={s.layerCard}>
-        <LayerTag>bg.surface · shadow.raised</LayerTag>
-        <StaticField value="Квартальный отчёт" />
-        <StaticField value="Маркетинг" />
-      </Card.Root>
-      <div className={s.layerMenu}>
-        <LayerTag>bg.raised · shadow.overlay</LayerTag>
-        <Typography as="span" variant="body-m" className={s.nestedItem} data-active>
-          Пункт меню
-        </Typography>
-        <Typography as="span" variant="body-m" className={s.nestedItem}>
-          Ещё пункт
-        </Typography>
-      </div>
-      <div className={s.layerScrim}>
-        <div className={s.layerModal}>
-          <LayerTag>bg.raised · shadow.modal · поверх bg.scrim</LayerTag>
-          <StaticField value="Новый проект" />
+    <div className={s.layerStage} data-depth={0} aria-hidden>
+      <SurfaceDepthProvider value={0}>
+        <LayerTag>слой 0 · страница</LayerTag>
+        <Card.Root variant="cta" className={s.layerCard}>
+          <LayerTag>слой 1 · карточка · shadow.raised</LayerTag>
+          <StaticField value="Квартальный отчёт" />
+          <StaticField value="Маркетинг" />
+        </Card.Root>
+        <div className={s.layerMenu} data-depth="floating">
+          <LayerTag>floating · shadow.overlay</LayerTag>
+          <Typography as="span" variant="body-m" className={s.nestedItem} data-active>
+            Пункт меню
+          </Typography>
+          <Typography as="span" variant="body-m" className={s.nestedItem}>
+            Ещё пункт
+          </Typography>
         </div>
-      </div>
+        <div className={s.layerScrim}>
+          <div className={s.layerModal} data-depth="floating">
+            <LayerTag>floating · shadow.modal · поверх bg.scrim</LayerTag>
+            <StaticField value="Новый проект" />
+          </div>
+        </div>
+      </SurfaceDepthProvider>
     </div>
   );
 }
@@ -124,8 +129,9 @@ export default function ElevationPage() {
       title="Слои и тени"
       description={
         <>
-          Глубину создаёт заливка, а не линия. Фон приложения серый, карточки белые, плавающие слои
-          выше и с тенью. В тёмной теме каждый следующий слой светлее предыдущего.
+          Глубину создаёт заливка, а не линия. Поверхности стоят на лестнице из страницы и четырёх
+          вложенных слоёв (подробно на странице «Цвет»). Тень добавляется только карточке на
+          странице и плавающим слоям: меню, поповерам, модалкам.
         </>
       }
     >
@@ -143,13 +149,13 @@ export default function ElevationPage() {
       </DocBlock>
 
       <DocBlock
-        title="Поле на разных поверхностях"
+        title="Поле на разных слоях"
         description={
           <>
-            Каждая поверхность выше фона переопределяет <code>--prime-color-field-bg</code> на{" "}
-            <code>--prime-color-field-bg-surface</code>. Поэтому поле остаётся заметным без обводки.
-            Это же переключение есть в шапке: кнопка «Фон превью» применяет его ко всем примерам
-            компонентов.
+            Поверхность ставит <code>data-depth</code>, и <code>--prime-color-field-bg</code> берёт
+            заливку своего слоя: на шаг темнее в светлой теме и на шаг светлее в тёмной. Поэтому
+            поле заметно без обводки на любом слое. Тот же выбор есть в шапке: кнопка «Фон превью»
+            ставит на этот слой все примеры компонентов.
           </>
         }
       >

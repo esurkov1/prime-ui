@@ -39,7 +39,7 @@ Card.Root variant="cover"        Media · Body(Title, Description) · Footer
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Card.Root
-`ref` → `HTMLDivElement`. The filled surface (card fill, radius 12, raised shadow, no border) and a size container; `variant` picks the template layout of its parts.
+`ref` → `HTMLDivElement`. A layer of the surface ladder (`data-depth` one above the surface around it: white on the light page, the next layer when nested; radius 12, the raised whisper only on the page, no border) and a size container; `variant` picks the template layout of its parts.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -143,13 +143,15 @@ Card.Root variant="cover"        Media · Body(Title, Description) · Footer
 |---|---|---|
 | template | `variant` | `data-variant` |
 | flat | `flat` | `data-flat` |
+| depth | nesting: one above the nearest surface (the page and the AppShell panel are 0) | `data-depth` (`1`–`4`, `floating-1`/`floating-2` inside a floating layer); the fill is `--prime-color-layer-current`, the shadow only at depth 1 |
 | card width | container queries | `split` stacks below 22rem, `Header` wraps below 22rem, the `stat-trend` value changes at 20rem / 36rem |
 
 Card is static: no hover, focus or press of its own.
 
 ## Layout & spacing
 - Grid of cards: `repeat(auto-fit, minmax(min(100%, 14rem), 1fr))`, gap `--prime-space-4`.
-- Padding `--prime-card-padding-m` (20); `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, on the surface field fill.
+- Padding `--prime-card-padding-m` (20); `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
+- Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
 - Long values wrap, labels truncate; a chart SVG needs a CSS height.
 - In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper.
 

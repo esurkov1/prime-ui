@@ -6,6 +6,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize, Tone, Variant } from "@/internal/states";
+import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./Banner.module.css";
 
@@ -73,33 +74,39 @@ function BannerRoot({
     () => ({ onDismiss, size, dismissLabel }),
     [onDismiss, size, dismissLabel],
   );
+  // A tinted banner is a host off the ladder (translucent fills inside); an outline one is a layer.
+  const nested = useNestedSurfaceDepth();
+  const depth = variant === "outline" ? nested : "tinted";
 
   return (
     <div
       {...rest}
       className={cx(styles.root, className)}
+      data-depth={depth}
       {...toDataAttributes({ variant, tone, size, placement })}
     >
-      <BannerContext.Provider value={context}>
-        <ControlSizeProvider value={size}>
-          {children}
-          {onDismiss ? (
-            <span className={styles.close}>
-              <Button.Root
-                variant="ghost"
-                tone="inherit"
-                size={CORNER_CLOSE_SIZE[size]}
-                aria-label={dismissLabel}
-                onClick={onDismiss}
-              >
-                <Button.Icon>
-                  <Icon name="action.close" />
-                </Button.Icon>
-              </Button.Root>
-            </span>
-          ) : null}
-        </ControlSizeProvider>
-      </BannerContext.Provider>
+      <SurfaceDepthProvider value={depth}>
+        <BannerContext.Provider value={context}>
+          <ControlSizeProvider value={size}>
+            {children}
+            {onDismiss ? (
+              <span className={styles.close}>
+                <Button.Root
+                  variant="ghost"
+                  tone="inherit"
+                  size={CORNER_CLOSE_SIZE[size]}
+                  aria-label={dismissLabel}
+                  onClick={onDismiss}
+                >
+                  <Button.Icon>
+                    <Icon name="action.close" />
+                  </Button.Icon>
+                </Button.Root>
+              </span>
+            ) : null}
+          </ControlSizeProvider>
+        </BannerContext.Provider>
+      </SurfaceDepthProvider>
     </div>
   );
 }

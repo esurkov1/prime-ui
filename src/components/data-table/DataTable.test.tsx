@@ -483,7 +483,7 @@ describe("DataTable CSS contract", () => {
     expect(root).toMatch(/overflow:\s*(hidden|clip);/);
     expect(root).toMatch(/border-radius:\s*var\(--prime-card-radius\)/);
     expect(root).toMatch(/background:\s*var\(--dt-surface\)/);
-    expect(root).toMatch(/--dt-surface:\s*var\(--prime-color-card-bg\)/);
+    expect(root).toMatch(/--dt-surface:\s*var\(--prime-color-layer-current\)/);
   });
 
   it("uses the inset focus ring for edge focusables", () => {

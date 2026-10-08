@@ -1,4 +1,4 @@
-/** A sunken panel and a bare block that takes type and background from its host — `variant`. */
+/** A filled panel and a bare block that takes type and background from its host — `variant`. */
 import { CodeBlock, Typography } from "prime-ui-kit";
 
 const SAMPLE = `const total = formatPrice(14990);`;

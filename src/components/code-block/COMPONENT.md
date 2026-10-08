@@ -3,7 +3,7 @@
 **Category:** data-display
 **Kind:** primitive
 
-> A static TypeScript / TSX snippet with syntax highlighting, on a sunken panel or bare inside a host.
+> A static TypeScript / TSX snippet with syntax highlighting, on a filled panel or bare inside a host.
 
 ## When to use
 - Code samples in docs, settings («API key usage») and onboarding.
@@ -37,7 +37,7 @@ CodeBlock        <pre>; variant, colorScheme (data-theme)
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `code` | `string` | — (required) | TS / TSX source; trailing whitespace is trimmed, then highlighted. |
-| `variant` | `"soft" \| "ghost"` | `"soft"` | `soft` — sunken panel with padding and the `code` text role; `ghost` — bare `pre` that inherits type and background from its host. |
+| `variant` | `"soft" \| "ghost"` | `"soft"` | `soft` — a filled panel (one ladder step off its host) with padding and the `code` text role; `ghost` — bare `pre` that inherits type and background from its host. |
 | `colorScheme` | `"light" \| "dark"` | — | Fixes the theme for this block only (`data-theme`). Omit to follow the page theme. |
 | `tabIndex` | `number` | — | Default `0` for `soft` (a scrolling block stays reachable from the keyboard), none for `ghost`; pass `-1` when it never overflows. |
 | `…rest` | `Omit<HTMLAttributes<HTMLPreElement>, "children" \| "dangerouslySetInnerHTML">` | — | `className`, `aria-label` and the other `<pre>` attributes. |
@@ -54,8 +54,8 @@ CodeBlock        <pre>; variant, colorScheme (data-theme)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | — (omitted) | token colors and fill follow the page theme | normal case | yes |
-| `light` | light palette; the soft fill becomes that scheme's `bg-raised` | a light sample inside a dark page | |
-| `dark` | dark palette; the soft fill becomes that scheme's `bg-raised` | a terminal-like sample inside a light page | |
+| `light` | light palette; the soft fill becomes that scheme's floating layer (`layer-floating-bg`) | a light sample inside a dark page | |
+| `dark` | dark palette; the soft fill becomes that scheme's floating layer (`layer-floating-bg`) | a terminal-like sample inside a light page | |
 
 Syntax tokens: keywords purple (weight 500), strings teal, numbers orange, JSX tags blue, comments muted italic — palette text tokens, readable in both themes.
 
@@ -92,8 +92,8 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | An API response sample on a sunken panel, named for screen readers — `code`, `aria-label`. |
-| [variants.tsx](examples/variants.tsx) | A sunken panel and a bare block that takes type and background from its host — `variant`. |
+| [overview.tsx](examples/overview.tsx) | An API response sample on a filled panel, named for screen readers — `code`, `aria-label`. |
+| [variants.tsx](examples/variants.tsx) | A filled panel and a bare block that takes type and background from its host — `variant`. |
 | [color-scheme.tsx](examples/color-scheme.tsx) | A block fixed to one scheme looks the same in both page themes — `colorScheme`. |
 | [narrow.tsx](examples/narrow.tsx) | In a narrow column a long line scrolls inside the block and never wraps; Tab, then arrow keys. |
 

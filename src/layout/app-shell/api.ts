@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "AppShell.Root",
-      en: "`ref` → `HTMLDivElement`. Grid of the nav column (canvas) and the content panel (surface); every child that is not `AppShell.Nav` goes into the panel.",
-      ru: "Сетка: колонка навигации на холсте и панель содержимого на поверхности; всё, кроме `AppShell.Nav`, попадает в панель.",
+      en: "`ref` → `HTMLDivElement`. Grid of the nav column (Sidebar, a surface one layer above the page) and the content panel (the page itself); every child that is not `AppShell.Nav` goes into the panel.",
+      ru: "Сетка: колонка навигации (Sidebar, поверхность на слой выше страницы) и панель содержимого (сама страница); всё, кроме `AppShell.Nav`, попадает в панель.",
       props: [
         {
           name: "fillViewport",

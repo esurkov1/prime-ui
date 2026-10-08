@@ -3,11 +3,11 @@
 **Category:** page
 **Kind:** layout
 
-> The app frame: a navigation rail on the canvas and a content panel on the surface.
+> The app frame: a content panel that is the page itself and a navigation rail one layer above it.
 
 ## When to use
 - The root layout of an application: navigation column, an optional AppHeader, scrolling main column, a bottom bar for phone navigation.
-- Any page that needs the kit's responsive gutters and the surface context for cards and fields.
+- Any page that needs the kit's responsive gutters and the surface ladder for cards and fields.
 
 ## When not to use
 - The navigation itself → use [Sidebar](../sidebar/COMPONENT.md) inside `AppShell.Nav`, [BottomNav](../bottom-nav/COMPONENT.md) inside `AppShell.Footer`.
@@ -23,8 +23,8 @@ import { AppShell } from "prime-ui-kit";
 
 ## Anatomy
 ```
-AppShell.Root                grid: nav column | content panel (bg-surface)
-├─ AppShell.Nav              navigation column on the canvas (usually Sidebar.Root)
+AppShell.Root                grid: nav column | content panel (the page, layer 0)
+├─ AppShell.Nav              navigation column (usually Sidebar.Root, a surface one layer above the page)
 ├─ AppHeader.Root            sticky top bar of the panel (a separate component)
 ├─ AppShell.Main             <main>, scrolls, carries the gutters
 └─ AppShell.Footer           sticky bottom bar of the panel (usually BottomNav.Root)
@@ -37,7 +37,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### AppShell.Root
-`ref` → `HTMLDivElement`. Grid of the nav column (canvas) and the content panel (surface); every child that is not `AppShell.Nav` goes into the panel.
+`ref` → `HTMLDivElement`. Grid of the nav column (Sidebar, a surface one layer above the page) and the content panel (the page itself); every child that is not `AppShell.Nav` goes into the panel.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -96,7 +96,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 ### Structure
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| with `AppShell.Nav` | Two columns: canvas rail + surface panel | Apps with navigation | |
+| with `AppShell.Nav` | Two columns: a rail one layer above the page + the panel that is the page | Apps with navigation | |
 | without Nav | Panel takes the full width | Single-page tools, auth screens | |
 | with `AppHeader.Root` | Sticky bar at the top of the panel | Title or breadcrumbs, global search, actions, the mobile menu button | |
 | with `AppShell.Footer` | Sticky bar at the bottom of the panel, shown while it holds a visible bar | BottomNav on a phone | |
@@ -111,10 +111,10 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 | footer bar | panel width (container `prime-shell-footer` on Footer) | BottomNav inside leaves from 640px of panel width; the empty footer takes no room |
 
 ## Layout & spacing
-- Two full-height planes edge to edge: no inset, radius, shadow or border — the boundary is the fill change (canvas → surface).
+- Two full-height planes edge to edge: no inset, radius, shadow or border — the boundary is the fill change (the Sidebar rail is layer 1, the panel the page: white rail beside a gray page in light, a rail one step lighter than the near-black page in dark).
 - Gutters in Main: `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px. Main top padding `--prime-space-6` (24) → `--prime-space-10` (40) from 1024px; bottom `--prime-space-16`.
 - Footer: no padding of its own (BottomNav keeps the bottom safe-area inset), sticky at the bottom, `z-index: --prime-z-sticky`.
-- The panel is a surface context: fields use the surface field fill, Cards inside become sunken tiles without shadow.
+- The panel is the page (layer 0 of the surface ladder, gray in light): fields on it take the page fill, a Card inside is layer 1 — white in light with the raised whisper — and cards in cards go deeper.
 
 ## Accessibility
 

@@ -7,8 +7,8 @@
   gap: var(--prime-space-1);
   padding: var(--prime-space-1);
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
+  background: var(--prime-color-layer-nested);
+  box-shadow: var(--prime-shadow-raised);
 }
 
 /* disabled-trigger.tsx: a focusable wrapper around the disabled button, with the outer ring. */

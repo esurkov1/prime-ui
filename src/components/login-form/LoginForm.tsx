@@ -5,6 +5,7 @@ import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlS
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize } from "@/internal/states";
+import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./LoginForm.module.css";
 
@@ -59,14 +60,18 @@ function LoginFormRoot({
   ref,
   ...rest
 }: LoginFormRootProps) {
+  const depth = useNestedSurfaceDepth();
   return (
     <div
       ref={ref}
       {...rest}
       className={cx(styles.root, className)}
+      data-depth={depth}
       {...toDataAttributes({ size, align, flat })}
     >
-      <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+      <SurfaceDepthProvider value={depth}>
+        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+      </SurfaceDepthProvider>
     </div>
   );
 }

@@ -9,7 +9,8 @@
 and data tables. 61 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
-- **Graphite design language.** Depth from fill, not lines; a strict 4px grid; one size axis
+- **Graphite design language.** Depth from fill, not lines — a surface ladder where every nested
+  layer and every control is one lightness step off its host; a strict 4px grid; one size axis
   `xs · s · m · l · xl` where a Button, an Input and a Select of the same size line up to the pixel;
   air as hierarchy.
 - **Light and dark as equals.** Full themes, WCAG AA text contrast, a focus ring that is never clipped.
@@ -144,7 +145,7 @@ Short rules that keep code correct — for people and for AI coding assistants:
 | Rule | In practice |
 |---|---|
 | Tokens only | Components read semantic variables `--prime-*` (`--prime-space-4`, `--prime-color-text-secondary`, `--prime-control-m-height`). Your own CSS uses the same tokens. |
-| Fill, not lines | Canvas → card → field are three fills; controls have no visible outline. |
+| Fill, not lines | Surfaces stand on one ladder: the page and four nested layers, one OKLab lightness step apart, computed at build time. Light: gray page, white card, deeper layers alternate. Dark: a near-black page, every layer a step lighter. A field, chip or neutral button is one step off the layer it sits on, so nothing merges; controls have no visible outline. |
 | Proximity | label → field 4–8 · field → field 20 · group → group 32 · section → section 40–48. |
 | One size axis | `size` is `xs · s · m · l · xl` (28 · 32 · 36 · 40 · 48), default `m`. |
 | Semantic vs decorative color | `tone` carries meaning (`danger` for destructive), `color` is a palette hue for badges, tags and avatars. |
@@ -204,7 +205,7 @@ accessibility, examples and common mistakes.
 | [**DataTable**](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) | A data table with sorting, pagination or infinite scroll, row selection, nested rows and loading / empty / error states. |
 | [**Kanban**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kanban/COMPONENT.md) | A board of status columns: cross-column moves by pointer, touch and keyboard, WIP limits, loading and empty states. |
 | [**Timeline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/timeline/COMPONENT.md) | An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels. |
-| [**CodeBlock**](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) | A static TypeScript / TSX snippet with syntax highlighting, on a sunken panel or bare inside a host. |
+| [**CodeBlock**](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) | A static TypeScript / TSX snippet with syntax highlighting, on a filled panel or bare inside a host. |
 | [**Accordion**](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) | Collapsible sections: FAQ, settings groups, checkout steps. |
 
 ### Status and loading (`status`)
@@ -246,7 +247,7 @@ accessibility, examples and common mistakes.
 
 | Component | What it is for |
 |---|---|
-| [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame: a navigation rail on the canvas and a content panel on the surface. |
+| [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame: a content panel that is the page itself and a navigation rail one layer above it. |
 | [**AppHeader**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-header/COMPONENT.md) | The bar at the top of the app: where you are, ⌘K search, a few actions and the phone menu button. |
 | [**PageContent**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) | Page structure inside the main column: title, description, page actions and content sections. |
 | [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — sections, filter and search, view options and the primary action — one row when wide, exactly two rows when narrow. |

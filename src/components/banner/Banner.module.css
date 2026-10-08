@@ -174,7 +174,7 @@
 }
 
 .root[data-variant="outline"] {
-  --bn-bg: var(--prime-color-card-bg);
+  --bn-bg: var(--prime-color-layer-current);
   --bn-fg: var(--prime-color-text-primary);
   --bn-icon-color: var(--bn-text);
   --bn-desc-color: var(--prime-color-text-secondary);

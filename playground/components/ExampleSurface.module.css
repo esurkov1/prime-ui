@@ -1,6 +1,7 @@
 /*
- * Demo container that imitates a real surface. Fills, not borders, separate it from the
- * preview background; surfaces above the canvas switch the field context (foundation §4).
+ * Demo container on one layer of the surface ladder (foundation §4). It carries that layer's
+ * `data-depth`, so it paints `--prime-color-layer-current` and controls inside take the layer's
+ * fills. Fills, not borders, separate it from the host.
  */
 .root {
   box-sizing: border-box;
@@ -14,37 +15,24 @@
   padding: var(--prime-card-padding-s);
   border-radius: var(--prime-card-radius);
   overflow: hidden;
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
 }
 
-/* Same fill as its host canvas: a hairline keeps the tile's bounds readable (foundation §4). */
-.root[data-surface="canvas"] {
-  background: var(--prime-color-bg-canvas);
+/* Same fill as the page around it: a hairline keeps the tile's bounds readable. */
+.root[data-surface="page"] {
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
 }
 
-.root[data-surface="surface"] {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-  background: var(--prime-color-bg-surface);
+.root[data-surface="card"] {
   box-shadow: var(--prime-shadow-raised);
 }
 
-.root[data-surface="raised"] {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-  border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
-  box-shadow: var(--prime-shadow-overlay);
-}
-
-.root[data-surface="accent"] {
-  background: var(--prime-color-accent-soft);
-}
-
-/* --- Gallery: one example on every surface --------------------------------- */
+/* --- Gallery: one example on every layer ----------------------------------- */
 
 /*
- * On a docs page (the surface plane) the gallery brings its own canvas, so the Surface tile does
- * not vanish into the page; inside an example stage (already canvas) it is a plain grid.
+ * The gallery is a page of its own (layer 0, `data-depth="0"`), so the layers inside read the
+ * same on a docs page and inside an example stage.
  */
 .gallery {
   box-sizing: border-box;
@@ -55,17 +43,10 @@
   min-width: 0;
   padding: var(--prime-card-padding-m);
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-bg-canvas);
-  /* A canvas plane again: restore the canvas field and card context (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-bg-surface);
-  --prime-color-card-bg: var(--prime-color-bg-surface);
-  --prime-card-shadow: var(--prime-shadow-raised);
+  background: var(--prime-color-layer-current);
 }
 
 :global([data-preview-layout]) .gallery {
-  --prime-color-field-bg: inherit;
-  --prime-color-card-bg: inherit;
-  --prime-card-shadow: inherit;
   padding: 0;
   border-radius: 0;
   background: none;
@@ -83,11 +64,4 @@
   width: 100%;
   min-height: var(--prime-space-24);
   justify-content: center;
-}
-
-.galleryLabel {
-  display: flex;
-  align-items: baseline;
-  gap: var(--prime-space-2);
-  min-width: 0;
 }

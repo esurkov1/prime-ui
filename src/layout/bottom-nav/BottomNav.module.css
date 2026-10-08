@@ -19,7 +19,7 @@
   min-height: var(--prime-bottom-nav-height);
   padding-inline: var(--prime-bottom-nav-padding-x);
   padding-block-end: env(safe-area-inset-bottom, 0px);
-  background: var(--prime-color-bg-surface);
+  background: var(--prime-color-layer-current);
   box-shadow: inset 0 var(--prime-border-width) 0 var(--prime-color-border-faint);
 }
 
@@ -97,7 +97,7 @@
 /* No see-through where the user asked for less transparency. */
 @media (prefers-reduced-transparency: reduce) {
   .root[data-floating="true"] {
-    background: var(--prime-color-bg-raised);
+    background: var(--prime-color-layer-floating-bg);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }

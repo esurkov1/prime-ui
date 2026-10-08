@@ -14,7 +14,13 @@ import s from "./foundation.module.css";
 import { composite, contrastRatio, sourceValue, toVarName, useComputedColors } from "./tokenModel";
 
 const RING = toVarName("color.focus.ring");
-const BACKGROUNDS = ["color.bg.canvas", "color.bg.surface", "color.bg.raised", "color.accent.soft"];
+const BACKGROUNDS = [
+  "color.layer.0.bg",
+  "color.layer.1.bg",
+  "color.layer.2.bg",
+  "color.layer.floating.bg",
+  "color.accent.soft",
+];
 
 type TokenRow = { varName: string; value: React.ReactNode };
 
@@ -65,7 +71,7 @@ function RingTokens() {
   const names = React.useMemo(() => [RING, ...BACKGROUNDS.map((b) => toVarName(b))], []);
   const colors = useComputedColors(host, names);
   const ring = colors[RING];
-  const surface = colors[toVarName("color.bg.surface")];
+  const surface = colors[toVarName("color.layer.1.bg")];
   const ringRows: RingRow[] = BACKGROUNDS.map((bgPath) => {
     const bgRaw = colors[toVarName(bgPath)];
     const bg = bgRaw && surface && bgRaw.a < 1 ? composite(bgRaw, surface) : bgRaw;

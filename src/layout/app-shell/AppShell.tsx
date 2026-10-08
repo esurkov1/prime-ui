@@ -17,7 +17,7 @@ export type AppShellNavProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** Navigation column (usually `Sidebar.Root`); sits on the canvas. */
+/** Navigation column (usually `Sidebar.Root`, a surface one layer above the page). */
 function AppShellNav({ className, ...rest }: AppShellNavProps) {
   return <div {...rest} className={cx(styles.nav, className)} />;
 }
@@ -25,7 +25,7 @@ AppShellNav.displayName = "AppShell.Nav";
 
 /**
  * Grid: navigation column | content panel. Everything that is not `AppShell.Nav` goes into the
- * content panel (`bg-surface`, inset from the window on wide screens).
+ * content panel, which is the page itself (the layer around the shell): cards on it are the next layer.
  */
 function AppShellRoot({ fillViewport = false, className, children, ...rest }: AppShellRootProps) {
   const items = React.Children.toArray(children);

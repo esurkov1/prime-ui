@@ -9,6 +9,7 @@ import { getViewportPadPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import type { ControlSize } from "@/internal/states";
+import { useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Datepicker.module.css";
@@ -316,6 +317,8 @@ export function PanelView(props: PanelViewProps) {
   const [panelNode, setPanelNode] = React.useState<HTMLDivElement | null>(null);
   const panelRef = useMergedRefs(setPanelNode, domRef);
   const parentWidth = useAvailableWidth(embedded ? panelNode : null);
+  // Embedded, the panel is a layer of its own (a card); in a popover it is the popover's content.
+  const nestedDepth = useNestedSurfaceDepth();
   const viewportWidth = useViewportWidth(!embedded);
   useContainScroll(embedded ? null : panelNode);
   const hasPresets = Boolean(presets) && isRange;
@@ -517,6 +520,7 @@ export function PanelView(props: PanelViewProps) {
       className={cx(styles.panel, className)}
       data-size={size}
       data-embedded={embedded ? "true" : undefined}
+      data-depth={embedded ? nestedDepth : undefined}
       data-compact={compact ? "true" : undefined}
       data-layout={layout}
     >

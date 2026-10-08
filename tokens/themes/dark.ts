@@ -1,7 +1,9 @@
 /**
- * Dark theme. Not an inversion: surfaces step up in lightness (canvas → surface → raised),
- * accent and status colors move to lighter steps so text keeps WCAG AA on dark fills.
+ * Dark theme. Not an inversion: the surface ladder rises in lightness from a near-black page
+ * (`layers.ts`), accent and status colors move to lighter steps so text keeps WCAG AA on dark fills.
  */
+import { DARK_LAYERS, layerTokens } from "../layers";
+
 const hues = ["blue", "green", "orange", "red", "yellow", "purple", "sky", "pink", "teal"] as const;
 type Hue = (typeof hues)[number];
 const hueRef: Record<Hue, string> = {
@@ -39,12 +41,8 @@ function darkPalette() {
 
 export const darkThemeOverrides = {
   color: {
+    layer: layerTokens(DARK_LAYERS),
     bg: {
-      canvas: "{color.gray.950}",
-      surface: "{color.gray.900}",
-      raised: "{color.gray.875}",
-      /** = canvas: nested tiles on the 900 surface need a clear step (925 read as 1.03:1). */
-      sunken: "{color.gray.950}",
       inverse: "{color.gray.100}",
       scrim: "rgba(0, 0, 0, 0.6)",
       /** Darker than the scrim's share: a shade on a 900 surface needs more ink to read. */
@@ -56,8 +54,6 @@ export const darkThemeOverrides = {
       subtle: "rgba(233, 235, 240, 0.05)",
       subtleActive: "rgba(233, 235, 240, 0.09)",
       faint: "rgba(233, 235, 240, 0.02)",
-      muted: "color-mix(in srgb, var(--prime-ref-color-gray-100) 7%, transparent)",
-      mutedHover: "color-mix(in srgb, var(--prime-ref-color-gray-100) 10%, transparent)",
       strong: "color-mix(in srgb, var(--prime-ref-color-gray-100) 16%, transparent)",
       strongHover: "color-mix(in srgb, var(--prime-ref-color-gray-100) 22%, transparent)",
     },
@@ -111,10 +107,6 @@ export const darkThemeOverrides = {
       text: "{color.sky.300}",
     },
     field: {
-      bg: "color-mix(in srgb, var(--prime-ref-color-gray-100) 6%, transparent)",
-      bgSurface: "color-mix(in srgb, var(--prime-ref-color-gray-100) 6%, transparent)",
-      bgHover: "color-mix(in srgb, var(--prime-ref-color-gray-100) 12%, transparent)",
-      bgFocus: "{color.gray.925}",
       bgDisabled: "color-mix(in srgb, var(--prime-ref-color-gray-100) 4%, transparent)",
     },
     focus: {
@@ -122,7 +114,6 @@ export const darkThemeOverrides = {
     },
     control: {
       thumb: "{color.gray.100}",
-      selected: "{color.gray.750}",
     },
     tooltip: {
       bg: "{color.gray.750}",

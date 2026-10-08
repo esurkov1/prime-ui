@@ -41,7 +41,7 @@
   width: min(100%, var(--prime-panel-min-width));
   padding: var(--prime-panel-padding);
   border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-floating-bg);
   box-shadow: var(--prime-shadow-overlay);
 }
 

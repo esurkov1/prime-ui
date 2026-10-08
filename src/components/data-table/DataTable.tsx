@@ -10,6 +10,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
+import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import swapMotion from "@/internal/swapMotion.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -210,6 +211,7 @@ export function DataTable<Row>({
   const tableRef = React.useRef<HTMLTableElement | null>(null);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const mergedRootRef = useMergedRefs(rootRef, ref);
+  const depth = useNestedSurfaceDepth();
 
   // ─── Columns ───
   // Hidden columns are not rendered at all; sorting still reads every column, so hiding the sorted
@@ -432,158 +434,168 @@ export function DataTable<Row>({
     (infiniteRows.hasInternalMore || loadingMore || infiniteRows.canRequestMore);
 
   return (
-    <ControlSizeProvider value={size}>
-      <div
-        {...rest}
-        ref={mergedRootRef}
-        className={cx(styles.root, className)}
-        {...toDataAttributes({
-          size,
-          "row-dividers": rowDividers ? undefined : "false",
-          "column-dividers": columnDividers ? undefined : "false",
-          "sticky-header": stickyHeader,
-          "sticky-first-column": stickyFirstColumn,
-          "table-width": columns.some((c) => c.grow) ? "grow" : fullWidth ? "fill" : "auto",
-          "highlight-row": highlightRowOnHover,
-          "highlight-column": highlightColumnOnHover,
-          striped,
-          loading: loading || undefined,
-          selectable: selectable || undefined,
-          expandable: expandEnabled || undefined,
-          dragging: selection.dragging || undefined,
-          "overflow-start": edges.start || undefined,
-          "overflow-end": edges.end || undefined,
-        })}
-      >
-        {toolbar != null ? <div className={styles.toolbar}>{toolbar}</div> : null}
+    <SurfaceDepthProvider value={depth}>
+      <ControlSizeProvider value={size}>
+        <div
+          {...rest}
+          ref={mergedRootRef}
+          className={cx(styles.root, className)}
+          data-depth={depth}
+          {...toDataAttributes({
+            size,
+            "row-dividers": rowDividers ? undefined : "false",
+            "column-dividers": columnDividers ? undefined : "false",
+            "sticky-header": stickyHeader,
+            "sticky-first-column": stickyFirstColumn,
+            "table-width": columns.some((c) => c.grow) ? "grow" : fullWidth ? "fill" : "auto",
+            "highlight-row": highlightRowOnHover,
+            "highlight-column": highlightColumnOnHover,
+            striped,
+            loading: loading || undefined,
+            selectable: selectable || undefined,
+            expandable: expandEnabled || undefined,
+            dragging: selection.dragging || undefined,
+            "overflow-start": edges.start || undefined,
+            "overflow-end": edges.end || undefined,
+          })}
+        >
+          {toolbar != null ? <div className={styles.toolbar}>{toolbar}</div> : null}
 
-        {/* The frame holds the edge shadows over the viewport; they never scroll with the table. */}
-        <div className={styles.frame}>
-          <ScrollContainer
-            ref={scrollRef}
-            axis="both"
-            overscrollBehavior="none"
-            className={styles.viewport}
-            style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}
-          >
-            <table
-              ref={tableRef}
-              className={styles.table}
-              aria-busy={loading || loadingMore || undefined}
-              {...columnHover}
+          {/* The frame holds the edge shadows over the viewport; they never scroll with the table. */}
+          <div className={styles.frame}>
+            <ScrollContainer
+              ref={scrollRef}
+              axis="both"
+              overscrollBehavior="none"
+              className={styles.viewport}
+              style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}
             >
-              <colgroup>
-                {selectable ? <col /> : null}
-                {expandEnabled ? <col /> : null}
-                {columns.map((column) => (
-                  <col key={column.id} data-grow={column.grow ? "true" : undefined} />
-                ))}
-              </colgroup>
-              {showHeader ? (
-                <Head
-                  columns={columns}
-                  size={size}
-                  sort={sortState}
-                  onSort={handleSort}
-                  stickyFirstColumn={stickyFirstColumn}
-                  stickyCorner={stickyHeader && stickyFirstColumn}
-                  expandEnabled={expandEnabled}
-                  selectAll={
-                    selectable
-                      ? {
-                          checked: selection.allSelected,
-                          indeterminate: selection.someSelected,
-                          disabled: flat.keys.length === 0,
-                          label: labels.selectAll,
-                          onToggle: selection.toggleAll,
-                        }
-                      : undefined
-                  }
-                />
-              ) : null}
-
-              <tbody
-                key={bodySwapped ? bodyState : undefined}
-                className={bodySwapped ? swapMotion.swapIn : undefined}
+              <table
+                ref={tableRef}
+                className={styles.table}
+                aria-busy={loading || loadingMore || undefined}
+                {...columnHover}
               >
-                {bodyState === "rows" ? (
-                  flat.rows.map((item, index) => (
-                    <DataTableRow
-                      key={String(item.key)}
-                      shared={shared}
-                      row={item.row}
-                      rowKey={item.key}
-                      index={index}
-                      depth={item.depth}
-                      expandable={item.expandable}
-                      expanded={item.expanded}
-                      animate={item.animate}
-                      detailAnimate={lastExpandedKey === item.key}
-                      selected={selectable && selection.selectedSet.has(item.key)}
-                      childControls={item.childKeys.map(rowDomId).join(" ")}
-                    />
-                  ))
-                ) : (
-                  <StateRows
-                    state={bodyState}
+                <colgroup>
+                  {selectable ? <col /> : null}
+                  {expandEnabled ? <col /> : null}
+                  {columns.map((column) => (
+                    <col key={column.id} data-grow={column.grow ? "true" : undefined} />
+                  ))}
+                </colgroup>
+                {showHeader ? (
+                  <Head
                     columns={columns}
                     size={size}
-                    totalColumns={totalColumns}
+                    sort={sortState}
+                    onSort={handleSort}
+                    stickyFirstColumn={stickyFirstColumn}
+                    stickyCorner={stickyHeader && stickyFirstColumn}
+                    expandEnabled={expandEnabled}
+                    selectAll={
+                      selectable
+                        ? {
+                            checked: selection.allSelected,
+                            indeterminate: selection.someSelected,
+                            disabled: flat.keys.length === 0,
+                            label: labels.selectAll,
+                            onToggle: selection.toggleAll,
+                          }
+                        : undefined
+                    }
+                  />
+                ) : null}
+
+                <tbody
+                  key={bodySwapped ? bodyState : undefined}
+                  className={bodySwapped ? swapMotion.swapIn : undefined}
+                >
+                  {bodyState === "rows" ? (
+                    flat.rows.map((item, index) => (
+                      <DataTableRow
+                        key={String(item.key)}
+                        shared={shared}
+                        row={item.row}
+                        rowKey={item.key}
+                        index={index}
+                        depth={item.depth}
+                        expandable={item.expandable}
+                        expanded={item.expanded}
+                        animate={item.animate}
+                        detailAnimate={lastExpandedKey === item.key}
+                        selected={selectable && selection.selectedSet.has(item.key)}
+                        childControls={item.childKeys.map(rowDomId).join(" ")}
+                      />
+                    ))
+                  ) : (
+                    <StateRows
+                      state={bodyState}
+                      columns={columns}
+                      size={size}
+                      totalColumns={totalColumns}
+                      selectable={selectable}
+                      expandEnabled={expandEnabled}
+                      error={error}
+                      empty={empty}
+                      emptyLabel={labels.empty}
+                      skeletonRows={Math.max(
+                        1,
+                        loadingRows ?? Math.min(safePageSize, SKELETON_ROWS),
+                      )}
+                    />
+                  )}
+                </tbody>
+
+                {flat.measure.length > 0 && !hasError ? (
+                  <MeasureBody
+                    rows={flat.measure}
+                    columns={columns}
                     selectable={selectable}
                     expandEnabled={expandEnabled}
-                    error={error}
-                    empty={empty}
-                    emptyLabel={labels.empty}
-                    skeletonRows={Math.max(1, loadingRows ?? Math.min(safePageSize, SKELETON_ROWS))}
                   />
-                )}
-              </tbody>
+                ) : null}
+              </table>
 
-              {flat.measure.length > 0 && !hasError ? (
-                <MeasureBody
-                  rows={flat.measure}
-                  columns={columns}
-                  selectable={selectable}
-                  expandEnabled={expandEnabled}
+              {infinite ? (
+                <div
+                  ref={infiniteRows.sentinelRef}
+                  className={styles.sentinel}
+                  aria-hidden="true"
                 />
               ) : null}
-            </table>
+            </ScrollContainer>
+          </div>
 
-            {infinite ? (
-              <div ref={infiniteRows.sentinelRef} className={styles.sentinel} aria-hidden="true" />
-            ) : null}
-          </ScrollContainer>
+          {showSkeleton ? <VisuallyHidden role="status">{labels.loading}</VisuallyHidden> : null}
+
+          {selectable ? (
+            <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
+              {selection.announcement}
+            </VisuallyHidden>
+          ) : null}
+
+          <Footer
+            size={size}
+            range={
+              showRange
+                ? formatLabel(labels.range, {
+                    from: pageOffset + 1,
+                    to: pageOffset + displayedCount,
+                    total: totalRows,
+                  })
+                : null
+            }
+            pagination={
+              paged && totalPages > 1
+                ? { page: safePage, totalPages, onPageChange: setPageState }
+                : null
+            }
+            status={
+              showInfiniteStatus ? (loadingMore ? labels.loadingMore : labels.scrollForMore) : null
+            }
+          />
         </div>
-
-        {showSkeleton ? <VisuallyHidden role="status">{labels.loading}</VisuallyHidden> : null}
-
-        {selectable ? (
-          <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
-            {selection.announcement}
-          </VisuallyHidden>
-        ) : null}
-
-        <Footer
-          size={size}
-          range={
-            showRange
-              ? formatLabel(labels.range, {
-                  from: pageOffset + 1,
-                  to: pageOffset + displayedCount,
-                  total: totalRows,
-                })
-              : null
-          }
-          pagination={
-            paged && totalPages > 1
-              ? { page: safePage, totalPages, onPageChange: setPageState }
-              : null
-          }
-          status={
-            showInfiniteStatus ? (loadingMore ? labels.loadingMore : labels.scrollForMore) : null
-          }
-        />
-      </div>
-    </ControlSizeProvider>
+      </ControlSizeProvider>
+    </SurfaceDepthProvider>
   );
 }

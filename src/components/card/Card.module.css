@@ -1,7 +1,8 @@
 /*
- * Card — Graphite surface: `--prime-color-card-bg` (bg-surface on the canvas, bg-sunken inside a surface
- * plane), card radius, shadow-raised unless the host plane turns it into a sunken tile, no border.
- * Internal layout adapts to the card's own width (container queries).
+ * Card — a layer of the surface ladder (foundation §4): `data-depth` one above the surface around it,
+ * filled with `--prime-color-layer-current`; on the page it carries the raised whisper, deeper it
+ * is a flat tile. Card radius, no border. Internal layout adapts to the card's own width
+ * (container queries).
  */
 
 .root {
@@ -16,9 +17,6 @@
   );
   --card-hairline-size: calc(100% - 2 * var(--card-pad)) var(--prime-border-width);
 
-  /* Fields inside a card are one step off the surface. */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-
   container-type: inline-size;
   box-sizing: border-box;
   width: 100%;
@@ -26,23 +24,16 @@
   max-width: 100%;
   border-radius: var(--prime-card-radius);
   /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-card-bg);
-  background: var(--prime-color-card-bg);
+  --avatar-ring: var(--prime-color-layer-current);
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
   text-align: start;
 }
 
-/* A surface plane (Card, Modal, Popover, AppShell content) sets `--prime-card-shadow: none` next to
- * `--prime-color-card-bg`, so a nested card is a flat sunken tile. */
+/* The whisper exists only on a card that sits on the page (`--prime-layer-shadow` of depth 1). */
 .root:not([data-flat="true"]) {
-  box-shadow: var(--prime-card-shadow);
-}
-
-/* Context for nested cards: set on children so the card's own fill and shadow still read the host's values. */
-.root > * {
-  --prime-color-card-bg: var(--prime-color-bg-sunken);
-  --prime-card-shadow: none;
+  box-shadow: var(--prime-layer-shadow);
 }
 
 /* ---------- Variants ---------- */
@@ -386,7 +377,7 @@
   min-height: calc(var(--prime-space-16) * 2);
   max-height: calc(var(--prime-space-24) * 2);
   overflow: hidden;
-  background: var(--prime-color-bg-sunken);
+  background: var(--prime-color-layer-nested);
 }
 
 .root[data-variant="cover"] > .media > * {

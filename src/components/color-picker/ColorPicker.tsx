@@ -26,6 +26,7 @@ import { cx } from "@/internal/cx";
 import type { FieldRootDomProps } from "@/internal/FieldFrame";
 import { fieldSurfaceClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
+import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 import { SwatchChip } from "@/internal/swatch";
 
 import styles from "./ColorPicker.module.css";
@@ -105,7 +106,7 @@ export { parseColor };
  * layered under the gradient that React Aria computes per render.
  */
 const CHECKER_BG =
-  "repeating-conic-gradient(var(--prime-color-bg-surface) 0deg 90deg, var(--prime-color-fill-strong) 90deg 180deg) 0% 0% / var(--prime-space-2) var(--prime-space-2)";
+  "repeating-conic-gradient(var(--prime-color-layer-current) 0deg 90deg, var(--prime-color-fill-strong) 90deg 180deg) 0% 0% / var(--prime-space-2) var(--prime-space-2)";
 
 type ColorState = NonNullable<React.ContextType<typeof ColorPickerStateContext>>;
 
@@ -336,8 +337,24 @@ export type ColorPickerPanelProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 /** Vertical stack for picker parts with the standard gap; optional raised surface. */
-function Panel({ surface = "none", className, ...rest }: ColorPickerPanelProps) {
-  return <div className={cx(styles.panel, className)} data-surface={surface} {...rest} />;
+function Panel({ surface = "none", className, children, ...rest }: ColorPickerPanelProps) {
+  if (surface === "none") {
+    return (
+      <div className={cx(styles.panel, className)} data-surface={surface} {...rest}>
+        {children}
+      </div>
+    );
+  }
+  return (
+    <div
+      className={cx(styles.panel, className)}
+      data-surface={surface}
+      data-depth="floating"
+      {...rest}
+    >
+      <SurfaceDepthProvider value="floating">{children}</SurfaceDepthProvider>
+    </div>
+  );
 }
 Panel.displayName = "ColorPicker.Panel";
 

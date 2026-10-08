@@ -16,7 +16,7 @@
   /* The shell gutters, so the header lines up with the page in main; 16 outside a shell. */
   padding-block: max(var(--prime-space-3), env(safe-area-inset-top, 0px)) var(--prime-space-3);
   padding-inline: var(--shell-gutter, var(--prime-space-4));
-  background: var(--prime-color-bg-surface);
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
 }
 

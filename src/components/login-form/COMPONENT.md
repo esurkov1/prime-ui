@@ -119,8 +119,8 @@ Root carries `data-size`, `data-align` and `data-flat`.
 ## Layout & spacing
 - header → body `--prime-space-8` (gap on Root); provider buttons → divider → form `--prime-space-4`; field → field → submit `--prime-space-5`; submit → back action `--prime-space-3`; form → footer `--prime-space-6`.
 - Spacing is `gap` on parents; no margins between parts.
-- The card has no border and is capped at the small modal width. To center it on a page, wrap it in your own flex container on the canvas.
-- Fields inside take `--prime-color-field-bg-surface`, like in Card.
+- The card has no border and is capped at the small modal width. To center it on a page, wrap it in your own flex container on the page.
+- The form is a layer of the surface ladder like Card (`data-depth`): on the page it is white in light with the raised whisper, fields inside are one step off it.
 
 ## Accessibility
 

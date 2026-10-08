@@ -100,7 +100,7 @@
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-success-default);
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width))
-    var(--avatar-ring, var(--prime-color-bg-canvas));
+    var(--avatar-ring, var(--prime-color-layer-current));
 }
 
 .status[data-status="offline"] {
@@ -131,7 +131,7 @@
 
 .group > * {
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width))
-    var(--avatar-ring, var(--prime-color-bg-canvas));
+    var(--avatar-ring, var(--prime-color-layer-current));
 }
 
 /* Soft hues are translucent: back them with the opaque surface so overlapped neighbours never
@@ -139,7 +139,7 @@
 .group > .root {
   background:
     linear-gradient(var(--hue-soft), var(--hue-soft)),
-    var(--avatar-ring, var(--prime-color-bg-canvas));
+    var(--avatar-ring, var(--prime-color-layer-current));
 }
 
 .group > * + * {
@@ -149,7 +149,7 @@
 .overflow {
   background:
     linear-gradient(var(--prime-color-fill-muted), var(--prime-color-fill-muted)),
-    var(--avatar-ring, var(--prime-color-bg-canvas));
+    var(--avatar-ring, var(--prime-color-layer-current));
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
   font-size: calc(var(--avatar-size) * 0.36);

@@ -1,6 +1,7 @@
 /*
- * LoginForm — Graphite sign-in surface. A card on the canvas (card fill, card radius, raised shadow,
- * no border); fields inside it are one step off the surface, like in Card.
+ * LoginForm — Graphite sign-in surface. A layer of the ladder like Card (`data-depth`, foundation §4):
+ * the layer fill, card radius, the raised whisper on the page, no border; fields inside are one
+ * step off it.
  * Rhythm (proximity scale): header → body 32, social → divider → form 16, field → field → submit 20,
  * submit → back action 12, form → footer 24. Spacing is `gap` on the parent.
  * The tier (`data-size`) only widens padding and gaps; text roles are set in LoginForm.tsx.
@@ -13,8 +14,6 @@
   --lf-logo: var(--prime-control-xl-height);
   --lf-logo-icon: var(--prime-icon-l);
 
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -24,14 +23,14 @@
   min-width: 0;
   padding: var(--lf-pad);
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
   text-align: start;
 }
 
 .root:not([data-flat="true"]) {
-  box-shadow: var(--prime-card-shadow);
+  box-shadow: var(--prime-layer-shadow);
 }
 
 .root[data-size="xs"],
@@ -75,7 +74,7 @@
   height: var(--lf-logo);
   margin-block-end: var(--prime-space-3);
   border-radius: var(--prime-radius-full);
-  background: var(--prime-color-bg-sunken);
+  background: var(--prime-color-fill-muted);
   color: var(--prime-color-accent-text);
   overflow: hidden;
 }

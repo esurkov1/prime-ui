@@ -31,7 +31,8 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] No raw px/rem/hex, no `--prime-ref-*`, no inline `style`, no overrides of kit internals
       (allowed: `@media` conditions and length props a COMPONENT.md documents, like DataTable column `width`).
 - [ ] Blocks are separated by fill and air, not borders; no card inside a card without reason.
-- [ ] My own bounded blocks use `--prime-color-card-bg` and `--prime-card-radius`.
+- [ ] My own bounded blocks are `Card`s (or plain tiles on `--prime-color-layer-nested` +
+      `--prime-card-radius`); no hard-coded `--prime-color-layer-<n>-*`.
 
 ## Reuse
 - [ ] Every repeated-looking element is one component (kit or `shared/ui`), not copies.

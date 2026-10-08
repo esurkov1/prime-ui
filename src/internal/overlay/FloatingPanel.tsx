@@ -10,6 +10,7 @@ import { Portal } from "@/internal/Portal";
 import sheetStyles from "@/internal/sheet.module.css";
 import { Slot } from "@/internal/slot";
 import type { ControlSize } from "@/internal/states";
+import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 
 import { LayerProvider } from "./layerStack";
 import type { FloatingLayer } from "./useFloatingLayer";
@@ -60,6 +61,7 @@ export function FloatingPanel({
           className,
         ),
     "data-size": size,
+    ...(surface && !sheet ? { "data-depth": "floating" } : null),
     ...(sheet
       ? null
       : {
@@ -86,34 +88,37 @@ export function FloatingPanel({
   return (
     <Portal>
       <LayerProvider value={floating.layer}>
-        <ControlSizeProvider value={size}>
-          {sheet ? (
-            <>
-              <div
-                role="presentation"
-                className={cx(surfaceStyles.scrim, surfaceStyles.layer, overlayMotion.scrim)}
-                data-state={presence.state}
-              />
-              <div
-                ref={floating.panelRef}
-                className={cx(
-                  surfaceStyles.sheet,
-                  surfaceStyles.layer,
-                  overlayMotion.sheet,
-                  sheetStyles.swipeY,
-                )}
-                data-state={presence.state}
-                onAnimationEnd={presence.onExitEnd}
-                onPointerDown={floating.onSheetPointerDown}
-              >
-                <div className={sheetStyles.handle} data-swipe-handle="" aria-hidden="true" />
-                {panel}
-              </div>
-            </>
-          ) : (
-            panel
-          )}
-        </ControlSizeProvider>
+        <SurfaceDepthProvider value="floating">
+          <ControlSizeProvider value={size}>
+            {sheet ? (
+              <>
+                <div
+                  role="presentation"
+                  className={cx(surfaceStyles.scrim, surfaceStyles.layer, overlayMotion.scrim)}
+                  data-state={presence.state}
+                />
+                <div
+                  ref={floating.panelRef}
+                  className={cx(
+                    surfaceStyles.sheet,
+                    surfaceStyles.layer,
+                    overlayMotion.sheet,
+                    sheetStyles.swipeY,
+                  )}
+                  data-depth="floating"
+                  data-state={presence.state}
+                  onAnimationEnd={presence.onExitEnd}
+                  onPointerDown={floating.onSheetPointerDown}
+                >
+                  <div className={sheetStyles.handle} data-swipe-handle="" aria-hidden="true" />
+                  {panel}
+                </div>
+              </>
+            ) : (
+              panel
+            )}
+          </ControlSizeProvider>
+        </SurfaceDepthProvider>
       </LayerProvider>
     </Portal>
   );

@@ -14,8 +14,8 @@
   min-width: 0;
   padding: var(--prime-space-3) var(--prime-space-4);
   border-radius: var(--prime-radius-m);
-  background: var(--prime-color-card-bg);
-  box-shadow: var(--prime-card-shadow);
+  background: var(--prime-color-layer-nested);
+  box-shadow: var(--prime-shadow-raised);
 }
 
 /* The grip sits closer to the edge: it is a square button with its own inner room. */
@@ -45,7 +45,7 @@
   min-height: calc(var(--prime-space-24) * 2);
   padding: var(--prime-space-3);
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-bg-sunken);
+  background: var(--prime-color-fill-muted);
 }
 
 .columnHeader {
@@ -61,7 +61,7 @@
   gap: var(--prime-space-1);
   padding: var(--prime-space-3) var(--prime-space-4);
   border-radius: var(--prime-radius-m);
-  background: var(--prime-color-bg-surface);
+  background: var(--prime-color-layer-nested);
   box-shadow: var(--prime-shadow-raised);
 }
 

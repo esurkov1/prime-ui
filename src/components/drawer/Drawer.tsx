@@ -26,6 +26,7 @@ import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
 import sheet from "@/internal/sheet.module.css";
 import type { ControlSize } from "@/internal/states";
+import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 
 import styles from "./Drawer.module.css";
 
@@ -170,6 +171,7 @@ function DrawerDialog({
         data-side={side}
         data-size={size}
         data-state={state}
+        data-depth="floating"
         onAnimationEnd={onExitEnd}
         {...shell.aria}
         {...rest}
@@ -180,7 +182,9 @@ function DrawerDialog({
       >
         {bottom ? <div className={sheet.handle} data-swipe-handle="" aria-hidden="true" /> : null}
         <DialogShellProvider value={shell.value}>
-          <LayerProvider value={layer}>{children}</LayerProvider>
+          <LayerProvider value={layer}>
+            <SurfaceDepthProvider value="floating">{children}</SurfaceDepthProvider>
+          </LayerProvider>
         </DialogShellProvider>
       </div>
     </div>

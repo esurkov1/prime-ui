@@ -158,6 +158,7 @@ function CardView({
       className={cx(styles.card, className)}
       role={liveRole}
       aria-live={liveRole === "alert" ? "assertive" : "polite"}
+      data-depth="floating"
       {...toDataAttributes({
         tone,
         size,

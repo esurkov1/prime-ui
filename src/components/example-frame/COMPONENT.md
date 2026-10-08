@@ -74,7 +74,7 @@ ExampleFrame               frame: toolbar + preview stage or code pane
 | `light` | stage and code pane in the light theme | default | yes |
 | `dark` | stage and code pane in the dark theme (`data-theme="dark"`), switched without color transitions | checking dark mode | |
 
-Frame look: `bg-sunken` chrome with a `border-subtle` hairline and `radius-xl`; the stage and code pane are `bg-canvas` wells with `radius-l` (16 − 4 padding = 12). The stage resets the card context (`--prime-color-card-bg: bg-surface`).
+Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above its host) with a `border-subtle` hairline and `radius-xl`; the stage and code pane are wells with `radius-l` (16 − 4 padding = 12). Both wells carry `data-theme`, so each is a page of its own: layer 0 of its scheme, and surfaces in the example count from there.
 
 ## States
 | State | Driven by | DOM |

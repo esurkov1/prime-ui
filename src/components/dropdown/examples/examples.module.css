@@ -18,5 +18,5 @@
   padding-block: var(--prime-space-1);
   padding-inline: var(--prime-space-4) var(--prime-space-1);
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-card-bg);
+  background: var(--prime-color-layer-nested);
 }

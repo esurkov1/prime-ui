@@ -96,8 +96,8 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 ### layout
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `grouped` | One `card-bg` surface with card radius, `border-subtle` hairlines between items, no shadow of its own | FAQ, short settings lists | yes |
-| `separate` | Each item is a separate card (`card-bg`, card radius, `card-shadow`) with `--prime-space-2` between them | Heavier sections, checkout steps | |
+| `grouped` | One surface — a layer of the ladder (`layer-current`) — with card radius, `border-subtle` hairlines between items, no shadow of its own | FAQ, short settings lists | yes |
+| `separate` | Each item is a separate card (`layer-current`, card radius, the raised whisper on the page) with `--prime-space-2` between them | Heavier sections, checkout steps | |
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -130,7 +130,7 @@ Root: `data-size`, `data-layout`. The panel height transitions through `grid-tem
 ## Layout & spacing
 - Takes the full width of its parent (`width: 100%`); the parent sets the measure.
 - Panel content is a flex column with `--prime-space-3` gap; it reserves `--prime-focus-space` at the top so focus rings of fields inside are not clipped.
-- Fields inside panels get the surface field fill automatically.
+- The root is a layer of the surface ladder (`data-depth`): fields inside panels take that layer's fill automatically.
 - Stack several accordions or an accordion and other blocks with the page gap (`--prime-space-8` between groups).
 
 ## Accessibility

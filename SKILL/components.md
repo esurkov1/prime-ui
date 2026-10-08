@@ -63,7 +63,7 @@ Show data: labels, people, objects, cards, tables, boards, feeds, code, disclose
 | DataTable | A data table with sorting, pages or infinite scroll, row selection, nested rows and loading / empty / error states. | [COMPONENT.md](../src/components/data-table/COMPONENT.md) · [examples](../src/components/data-table/examples/) |
 | Kanban | A board of status columns: cards move by drag, touch hold and Alt + arrows, with WIP limits, loading and empty columns. | [COMPONENT.md](../src/components/kanban/COMPONENT.md) · [examples](../src/components/kanban/examples/) |
 | Timeline | An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels. | [COMPONENT.md](../src/components/timeline/COMPONENT.md) · [examples](../src/components/timeline/examples/) |
-| CodeBlock | A static TypeScript / TSX snippet with syntax highlighting, on a sunken panel or bare inside a host. | [COMPONENT.md](../src/components/code-block/COMPONENT.md) · [examples](../src/components/code-block/examples/) |
+| CodeBlock | A static TypeScript / TSX snippet with syntax highlighting, on a filled panel or bare inside a host. | [COMPONENT.md](../src/components/code-block/COMPONENT.md) · [examples](../src/components/code-block/examples/) |
 | Accordion | Collapsible sections: FAQ, settings groups, checkout steps. | [COMPONENT.md](../src/components/accordion/COMPONENT.md) · [examples](../src/components/accordion/examples/) |
 
 ## Status and loading (`status`)
@@ -113,7 +113,7 @@ The frame and structure of a screen: app shell, app header, page column, page pa
 
 | Component | Purpose | Docs |
 |---|---|---|
-| AppShell | The app frame: a navigation rail on the canvas and a content panel on the surface. | [COMPONENT.md](../src/layout/app-shell/COMPONENT.md) · [examples](../src/layout/app-shell/examples/) |
+| AppShell | The app frame: a content panel that is the page itself and a navigation rail one layer above it. | [COMPONENT.md](../src/layout/app-shell/COMPONENT.md) · [examples](../src/layout/app-shell/examples/) |
 | AppHeader | The bar at the top of the content panel: where you are, ⌘K search, a few actions, the phone menu button; as high as the Sidebar brand row. | [COMPONENT.md](../src/layout/app-header/COMPONENT.md) · [examples](../src/layout/app-header/examples/) |
 | PageContent | Page structure inside the main column: title, description, page actions and content sections. | [COMPONENT.md](../src/components/page-content/COMPONENT.md) · [examples](../src/components/page-content/examples/) |
 | PageToolbar | The panel at the top of a page — sections, filter and search, view options and the primary action — laid out from its own width: one row when wide, exactly two rows when narrow, every slot in a fixed place. | [COMPONENT.md](../src/components/page-toolbar/COMPONENT.md) · [examples](../src/components/page-toolbar/examples/) |

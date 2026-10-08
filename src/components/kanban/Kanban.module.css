@@ -155,8 +155,9 @@
   min-width: 0;
   padding: var(--prime-space-3);
   border-radius: var(--prime-radius-m);
-  background: var(--prime-color-bg-raised);
-  box-shadow: var(--prime-card-shadow);
+  /* A movable card: the floating layer's fill with the raised whisper (it lifts off the column). */
+  background: var(--prime-color-layer-floating-bg);
+  box-shadow: var(--prime-shadow-raised);
   list-style: none;
 }
 

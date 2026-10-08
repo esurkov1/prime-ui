@@ -134,7 +134,7 @@ AppHeader.Root               <header>, one sticky row as high as the Sidebar bra
 - Gaps: `--prime-space-3` between zones, `--prime-space-2` inside Start and Actions; `AppHeader.Separator` adds `--prime-space-2` on each side (16 in all) and is 20 high.
 - `AppHeader.Icon` is a 36 tile with the radius and fill of a soft neutral button m, so it lines up with the buttons on the bar.
 - On the panel surface with no divider or shadow (depth from fill); `z-index: --prime-z-sticky`.
-- Search: up to 288 wide, shrinks first; field tier m and the surface field fill. Controls inside are size `m`.
+- Search: up to 288 wide, shrinks first; field tier m and the fill of the panel layer it sits on. Controls inside are size `m`.
 
 ## Accessibility
 

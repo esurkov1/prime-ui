@@ -115,7 +115,7 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 `ref` → `HTMLDivElement`. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description stacked in one column, a trailing badge or button — in the written order / the medium heading line / the muted line under it; both truncate. + native `<div>` props.
 
 ## Variants
-The panel is the shared floating surface: `bg-raised`, `--prime-panel-radius` (12), padding 4, `shadow-overlay`; rows have radius 8 and the tier item height.
+The panel is the shared floating surface: the floating layer of the ladder (`data-depth="floating"`), `--prime-panel-radius` (12), padding 4, `shadow-overlay`; rows have radius 8 and the tier item height.
 
 ### size (Content)
 | Value | Looks like | Use when | Default |

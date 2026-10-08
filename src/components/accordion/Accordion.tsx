@@ -7,6 +7,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { ControlSize } from "@/internal/states";
+import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./Accordion.module.css";
 
@@ -109,11 +110,19 @@ function AccordionRoot(props: AccordionRootProps) {
     children,
     ...rest
   } = props;
+  const depth = useNestedSurfaceDepth();
 
   return (
     <AccordionProvider value={contextValue}>
-      <div {...rest} className={cx(styles.root, className)} {...toDataAttributes({ size, layout })}>
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+      <div
+        {...rest}
+        className={cx(styles.root, className)}
+        data-depth={depth}
+        {...toDataAttributes({ size, layout })}
+      >
+        <SurfaceDepthProvider value={depth}>
+          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+        </SurfaceDepthProvider>
       </div>
     </AccordionProvider>
   );

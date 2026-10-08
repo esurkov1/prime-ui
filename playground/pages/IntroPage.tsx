@@ -178,8 +178,7 @@ export default function IntroPage() {
                   <Typography as="span" variant="body-m" weight="semibold">
                     фон превью
                   </Typography>{" "}
-                  (canvas, surface, raised, accent). Так видно, как компонент выглядит на фоне
-                  страницы, в карточке и внутри меню.
+                  (на странице или в карточке). Так видно, как компонент выглядит на каждом слое.
                 </Typography>
               </li>
               <li>

@@ -11,8 +11,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Card.Root",
-      en: "`ref` → `HTMLDivElement`. The filled surface (card fill, radius 12, raised shadow, no border) and a size container; `variant` picks the template layout of its parts.",
-      ru: "Поверхность (заливка карточки, радиус 12, лёгкая тень, без обводки) и контейнер размера; `variant` выбирает раскладку частей.",
+      en: "`ref` → `HTMLDivElement`. A layer of the surface ladder (`data-depth` one above the surface around it: white on the light page, the next layer when nested; radius 12, the raised whisper only on the page, no border) and a size container; `variant` picks the template layout of its parts.",
+      ru: "Слой лестницы поверхностей (`data-depth` на один выше окружающей поверхности: белая на светлой странице, следующий слой во вложении; радиус 12, лёгкая тень только на странице, без обводки) и контейнер размера; `variant` выбирает раскладку частей.",
       props: [
         {
           name: "variant",

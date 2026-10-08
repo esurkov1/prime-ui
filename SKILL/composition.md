@@ -23,7 +23,7 @@ it, and then by the rules below.
 
 ```
 AppShell.Root                      once per app (layouts.md#app-frame-once-per-app)
-├─ AppShell.Nav → Sidebar          navigation rail on the canvas
+├─ AppShell.Nav → Sidebar          navigation rail, one layer above the page
 ├─ AppHeader.Root                  menu button / title or path / ⌘K search / app actions
 └─ AppShell.Main                   gutters; the page renders here
    └─ PageContent.Section | Root   the page you deliver
@@ -117,8 +117,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 ## 4. Surfaces
 
-- Inside the app the content panel is the surface; a `Card` on it becomes a sunken tile, fields take the
-  surface fill. The kit switches this by context — never set backgrounds.
+- Inside the app the content panel is the page (layer 0 of the surface ladder); a `Card` on it is
+  layer 1, and fields take the fill of the layer they sit on. The kit sets this by context — never set backgrounds.
 - **Card when** the block stands alone and has its own title: a KPI tile, a settings panel, facts in a
   side column, a chart. **No card when** the block is the only thing in its region: a section heading
   and the content are enough.
@@ -269,8 +269,8 @@ Rules for your own component:
 - Follows API v1 ([api-contract.md](api-contract.md)): `size` (default `m`), `tone`/`color`, `X.Root` +
   `X.Part` when it has parts (a single export when it has none), `hint` / `error` props, `labels` for
   system strings, `data-*` for state.
-- Styled with a CSS Module on `--prime-*` tokens. Bounded block: `--prime-color-card-bg` +
-  `--prime-card-radius`. Never override kit internals or reach into their class names.
+- Styled with a CSS Module on `--prime-*` tokens. Bounded block: a `Card`, or a plain tile on
+  `--prime-color-layer-nested` + `--prime-card-radius`. Never override kit internals or reach into their class names.
 - **Threshold:** a pattern used twice becomes a component. Two things that look the same are one
   component with a variant, never two components or two hand-written copies.
 

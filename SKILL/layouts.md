@@ -1,7 +1,7 @@
 # Screen recipes
 
-Every screen sits in one frame: `AppShell.Root` with Nav / `AppHeader` / Main (nav rail on the canvas +
-content panel on the surface) → `PageContent` (header + body). `AppShell.Main` carries the page gutters
+Every screen sits in one frame: `AppShell.Root` with Nav / `AppHeader` / Main (the content panel is the page,
+the nav rail one layer above it) → `PageContent` (header + body). `AppShell.Main` carries the page gutters
 and `PageContent.Body` spaces its blocks 40 apart, so your code adds **no outer padding and no
 margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
 
@@ -195,6 +195,6 @@ export function SignIn() {
   place-items: center;
   min-height: 100dvh;
   padding: var(--prime-space-4);
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-current);
 }
 ```

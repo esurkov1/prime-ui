@@ -10,10 +10,8 @@
   --po-lh: var(--prime-control-m-line-height);
   --po-desc: var(--prime-control-m-label-size);
   --po-desc-lh: var(--prime-control-m-label-line-height);
-  --prime-color-card-bg: var(--prime-color-bg-sunken);
-  --prime-card-shadow: none;
   /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-bg-raised);
+  --avatar-ring: var(--prime-color-layer-current);
 
   gap: var(--po-gap);
   max-height: var(--float-max-h, none);

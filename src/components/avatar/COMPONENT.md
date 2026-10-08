@@ -156,7 +156,7 @@ No keyboard interaction.
 - `alt="Анна Климова"` while the name is printed next to it → `alt=""`.
 - A random `color` on every render → derive it from the user id.
 - A custom presence dot → use `Avatar.Status`.
-- A group on a custom filled block with a canvas-colored ring → set `--avatar-ring` to that fill.
+- A group on a custom filled block with a ring in the wrong color → set `--avatar-ring` to that fill (by default the ring is the current layer, `--prime-color-layer-current`).
 - `size` on every avatar in a group → set it once on `Avatar.Group`.
 
 ## Related

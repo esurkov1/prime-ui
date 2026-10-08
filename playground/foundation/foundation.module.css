@@ -46,6 +46,60 @@
 
 /* --- Colors -------------------------------------------------------------------- */
 
+/* The ladder in both themes: each island is a page of its own (`data-theme` resets it to layer 0). */
+.ladderGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.ladderIsland {
+  display: grid;
+  align-content: start;
+  gap: var(--prime-space-3);
+  min-width: 0;
+  padding: var(--prime-space-4);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-layer-current);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
+  color: var(--prime-color-text-primary);
+}
+
+/* A kit Card in the ladder: only its padding and rhythm. */
+.ladderCard {
+  display: grid;
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-3);
+}
+
+.ladderControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--prime-space-2);
+}
+
+.ladderLabel {
+  display: grid;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.ladderChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  white-space: nowrap;
+}
+
+.ladderChipFill {
+  width: var(--prime-space-5);
+  height: var(--prime-space-5);
+  flex: none;
+  border-radius: var(--prime-radius-xs);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
+}
+
 .roleGroups {
   display: grid;
   gap: var(--prime-space-3);
@@ -397,17 +451,16 @@
   gap: var(--prime-space-3);
   padding: var(--prime-space-6);
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-card-bg);
+  background: var(--prime-color-layer-nested);
 }
 
 .nestedPanel {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
   display: grid;
   gap: 0;
   min-width: var(--prime-panel-min-width);
   padding: var(--prime-panel-padding);
   border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-floating-bg);
   box-shadow: var(--prime-shadow-overlay);
 }
 
@@ -432,7 +485,7 @@
   gap: var(--prime-space-6);
   padding: var(--prime-space-6);
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-0-bg);
 }
 
 .shadowCard {
@@ -442,7 +495,7 @@
   min-height: var(--prime-space-24);
   padding: var(--prime-card-padding-m);
   border-radius: var(--prime-card-radius);
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-floating-bg);
 }
 
 .layerPanel {
@@ -461,12 +514,9 @@
   padding-inline-end: calc(36% + var(--prime-space-6));
   overflow: hidden;
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-bg-canvas);
-  /* A canvas plane again inside the panel: restore the canvas context, so the kit Card on it is a
-     raised surface, not a sunken tile (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-bg-surface);
-  --prime-color-card-bg: var(--prime-color-bg-surface);
-  --prime-card-shadow: var(--prime-shadow-raised);
+  /* A page again inside the docs panel (`data-depth="0"`): the kit Card on it is layer 1 with the
+     raised whisper (foundation §4). */
+  background: var(--prime-color-layer-current);
 }
 
 .layerStage > .layerTag {
@@ -492,7 +542,7 @@
   margin-inline-start: calc(-1 * var(--prime-space-12));
   padding: var(--prime-panel-padding);
   border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-overlay);
 }
 
@@ -512,13 +562,12 @@
 }
 
 .layerModal {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
   display: grid;
   gap: var(--prime-space-3);
   width: 100%;
   padding: var(--prime-space-4);
   border-radius: var(--prime-modal-radius);
-  background: var(--prime-color-bg-raised);
+  background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-modal);
 }
 

@@ -56,16 +56,23 @@ already carries the page gutters — do not add your own outer padding.
 
 ## 4. Fill, not lines (§1.1, §4)
 
-- On a bare page the canvas is light gray and cards are white. Inside `AppShell` the nav rail sits on
-  the gray canvas and the content panel is the white surface — there a Card becomes a gray sunken tile
-  without a shadow. Fields follow their host. The kit switches all of this automatically — just nest
-  components, never set backgrounds yourself.
+- Surfaces stand on one ladder: the page (layer 0) and four nested layers, each one lightness step
+  from its parent. Light: gray page, white card, deeper layers alternate gray / white. Dark: a
+  near-black page, every nested layer a step lighter. Floating layers (menus, popovers, modals,
+  drawers) sit a step above a card, with a shadow.
+- Inside `AppShell` the content panel is the page (gray in light) and a Card on it is layer 1 — white,
+  with the raised whisper; the Sidebar rail beside it is its own layer 1 surface, so it never merges
+  with the content. Fields, chips, neutral buttons and segmented tracks are
+  always one step off the layer they sit on. The kit sets every depth itself (`data-depth`) — just
+  nest components, never set backgrounds yourself.
 - Separate blocks by fill and air. Hairlines (`Divider`) only inside a block: list rows, table rows,
   between a form and its footer.
-- A card inside a card becomes a sunken tile automatically — use it sparingly; usually a section heading
-  inside one card is better.
-- Your own bounded block takes `background: var(--prime-color-card-bg)` and
-  `border-radius: var(--prime-card-radius)`; never a transparent box with a border.
+- A card inside a card becomes the next layer automatically — use it sparingly; usually a section
+  heading inside one card is better. The ladder stops at layer 4.
+- Your own bounded block is a `Card` (it takes the right layer wherever it lands). A plain tile with
+  no controls inside may use `background: var(--prime-color-layer-nested)` and
+  `border-radius: var(--prime-card-radius)`; never a transparent box with a border, never a
+  hard-coded `--prime-color-layer-2-bg`.
 
 ## 5. Nested radius (§1.5, §7)
 

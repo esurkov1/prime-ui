@@ -1,6 +1,6 @@
 /*
- * Composition pages: the preview imitates the app's content panel — the surface plane of
- * AppShell with its gutters — so patterns render in the context they ship to.
+ * Composition pages: the preview imitates the app's content panel — the page with the AppShell
+ * gutters — so patterns render in the context they ship to.
  */
 
 /* Query container: the gutters follow the preview width (desktop / tablet / phone switch). */
@@ -10,18 +10,12 @@
   min-width: 0;
 }
 
-/* Same tokens as `AppShell` panel: fields on the surface fill, cards become sunken tiles. */
+/* Like the `AppShell` panel: the page itself (the stage is one), only the panel's gutters. */
 .screen {
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-  --prime-color-card-bg: var(--prime-color-bg-sunken);
-  --prime-card-shadow: none;
-
   box-sizing: border-box;
   min-width: 0;
   padding: var(--prime-space-10) var(--prime-layout-gutter-l) var(--prime-space-12);
-  border-radius: var(--prime-radius-l);
-  background: var(--prime-color-bg-surface);
-  box-shadow: var(--prime-shadow-raised);
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
 }
 

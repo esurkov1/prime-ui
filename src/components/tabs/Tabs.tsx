@@ -12,6 +12,7 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
+import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import { Badge } from "../badge/Badge";
 import { Button } from "../button/Button";
@@ -143,16 +144,26 @@ function TabsRoot({
     ...(maxItemWidth !== undefined && { "--tabs-item-max": cssLength(maxItemWidth) }),
   };
 
+  // Horizontal tabs are a framed block: a layer of the ladder, its panel in the layer's own color.
+  const nestedDepth = useNestedSurfaceDepth();
+  const depth = orientation === "horizontal" ? nestedDepth : undefined;
+  const layout = <div className={styles.layout}>{children}</div>;
+
   return (
     <TabsProvider value={context}>
       <div
         {...rest}
         className={cx(styles.root, className)}
         style={{ ...style, ...widths } as React.CSSProperties}
+        data-depth={depth}
         {...toDataAttributes({ orientation, size, tone, "full-width": fullWidth })}
       >
         {/* The root is the size container for the vertical → row switch; the layout sits inside. */}
-        <div className={styles.layout}>{children}</div>
+        {depth === undefined ? (
+          layout
+        ) : (
+          <SurfaceDepthProvider value={depth}>{layout}</SurfaceDepthProvider>
+        )}
       </div>
     </TabsProvider>
   );

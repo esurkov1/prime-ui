@@ -8,7 +8,7 @@
 :root {
   font-family: var(--prime-font-family-sans);
   color: var(--prime-color-text-primary);
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-0-bg);
   text-rendering: optimizeLegibility;
   font-kerning: normal;
   font-feature-settings: "cv11", "ss01";
@@ -23,7 +23,7 @@
 }
 
 body {
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-0-bg);
   color: var(--prime-color-text-primary);
   font-size: var(--prime-text-body-m-size);
   line-height: var(--prime-text-body-m-line-height);
@@ -86,6 +86,129 @@ input::-moz-focus-inner {
     --prime-color-border-control: var(--prime-color-text-muted);
     --prime-color-border-subtle: var(--prime-color-text-muted);
   }
+}
+
+/*
+ * Surface depth (foundation §4). The page (and the AppShell panel) is layer 0; every surface (Card,
+ * Sidebar, Accordion, DataTable…) sets `data-depth` one above the surface around it, floating layers set
+ * `floating`. Each depth points the context variables at its row of `--prime-color-layer-*`:
+ *   layer-current   the surface's own fill        layer-nested    a surface placed on it
+ *   field-bg(-hover/-focus), fill-muted(-hover)   controls on it: one step from the surface
+ *   control-selected                              the selected thumb on a track of it
+ *   layer-shadow                                  a whisper only on a card that sits on the page
+ * A theme island (`data-theme`) starts again at layer 0.
+ */
+:root,
+[data-theme],
+[data-depth="0"] {
+  --prime-color-layer-current: var(--prime-color-layer-0-bg);
+  --prime-color-layer-nested: var(--prime-color-layer-1-bg);
+  --prime-color-field-bg: var(--prime-color-layer-0-fill);
+  --prime-color-field-bg-hover: var(--prime-color-layer-0-fill-hover);
+  --prime-color-field-bg-focus: var(--prime-color-layer-0-bg);
+  --prime-color-fill-muted: var(--prime-color-layer-0-fill);
+  --prime-color-fill-muted-hover: var(--prime-color-layer-0-fill-hover);
+  --prime-color-control-selected: var(--prime-color-layer-0-selected);
+  --prime-layer-shadow: none;
+}
+
+[data-depth="1"] {
+  --prime-color-layer-current: var(--prime-color-layer-1-bg);
+  --prime-color-layer-nested: var(--prime-color-layer-2-bg);
+  --prime-color-field-bg: var(--prime-color-layer-1-fill);
+  --prime-color-field-bg-hover: var(--prime-color-layer-1-fill-hover);
+  --prime-color-field-bg-focus: var(--prime-color-layer-1-bg);
+  --prime-color-fill-muted: var(--prime-color-layer-1-fill);
+  --prime-color-fill-muted-hover: var(--prime-color-layer-1-fill-hover);
+  --prime-color-control-selected: var(--prime-color-layer-1-selected);
+  --prime-layer-shadow: var(--prime-shadow-raised);
+}
+
+[data-depth="2"] {
+  --prime-color-layer-current: var(--prime-color-layer-2-bg);
+  --prime-color-layer-nested: var(--prime-color-layer-3-bg);
+  --prime-color-field-bg: var(--prime-color-layer-2-fill);
+  --prime-color-field-bg-hover: var(--prime-color-layer-2-fill-hover);
+  --prime-color-field-bg-focus: var(--prime-color-layer-2-bg);
+  --prime-color-fill-muted: var(--prime-color-layer-2-fill);
+  --prime-color-fill-muted-hover: var(--prime-color-layer-2-fill-hover);
+  --prime-color-control-selected: var(--prime-color-layer-2-selected);
+  --prime-layer-shadow: none;
+}
+
+[data-depth="3"] {
+  --prime-color-layer-current: var(--prime-color-layer-3-bg);
+  --prime-color-layer-nested: var(--prime-color-layer-4-bg);
+  --prime-color-field-bg: var(--prime-color-layer-3-fill);
+  --prime-color-field-bg-hover: var(--prime-color-layer-3-fill-hover);
+  --prime-color-field-bg-focus: var(--prime-color-layer-3-bg);
+  --prime-color-fill-muted: var(--prime-color-layer-3-fill);
+  --prime-color-fill-muted-hover: var(--prime-color-layer-3-fill-hover);
+  --prime-color-control-selected: var(--prime-color-layer-3-selected);
+  --prime-layer-shadow: none;
+}
+
+/* The deepest layer: a surface nested in it keeps its color (deeper nesting is not supported). */
+[data-depth="4"] {
+  --prime-color-layer-current: var(--prime-color-layer-4-bg);
+  --prime-color-layer-nested: var(--prime-color-layer-4-bg);
+  --prime-color-field-bg: var(--prime-color-layer-4-fill);
+  --prime-color-field-bg-hover: var(--prime-color-layer-4-fill-hover);
+  --prime-color-field-bg-focus: var(--prime-color-layer-4-bg);
+  --prime-color-fill-muted: var(--prime-color-layer-4-fill);
+  --prime-color-fill-muted-hover: var(--prime-color-layer-4-fill-hover);
+  --prime-color-control-selected: var(--prime-color-layer-4-selected);
+  --prime-layer-shadow: none;
+}
+
+/* Floating layers (menus, popovers, modals, drawers): one step above a card, depth comes from the
+   shadow; two layers can nest inside. */
+[data-depth="floating"] {
+  --prime-color-layer-current: var(--prime-color-layer-floating-bg);
+  --prime-color-layer-nested: var(--prime-color-layer-floating1-bg);
+  --prime-color-field-bg: var(--prime-color-layer-floating-fill);
+  --prime-color-field-bg-hover: var(--prime-color-layer-floating-fill-hover);
+  --prime-color-field-bg-focus: var(--prime-color-layer-floating-bg);
+  --prime-color-fill-muted: var(--prime-color-layer-floating-fill);
+  --prime-color-fill-muted-hover: var(--prime-color-layer-floating-fill-hover);
+  --prime-color-control-selected: var(--prime-color-layer-floating-selected);
+  --prime-layer-shadow: none;
+}
+
+[data-depth="floating-1"] {
+  --prime-color-layer-current: var(--prime-color-layer-floating1-bg);
+  --prime-color-layer-nested: var(--prime-color-layer-floating2-bg);
+  --prime-color-field-bg: var(--prime-color-layer-floating1-fill);
+  --prime-color-field-bg-hover: var(--prime-color-layer-floating1-fill-hover);
+  --prime-color-field-bg-focus: var(--prime-color-layer-floating1-bg);
+  --prime-color-fill-muted: var(--prime-color-layer-floating1-fill);
+  --prime-color-fill-muted-hover: var(--prime-color-layer-floating1-fill-hover);
+  --prime-color-control-selected: var(--prime-color-layer-floating1-selected);
+  --prime-layer-shadow: none;
+}
+
+[data-depth="floating-2"] {
+  --prime-color-layer-current: var(--prime-color-layer-floating2-bg);
+  --prime-color-layer-nested: var(--prime-color-layer-floating2-bg);
+  --prime-color-field-bg: var(--prime-color-layer-floating2-fill);
+  --prime-color-field-bg-hover: var(--prime-color-layer-floating2-fill-hover);
+  --prime-color-field-bg-focus: var(--prime-color-layer-floating2-bg);
+  --prime-color-fill-muted: var(--prime-color-layer-floating2-fill);
+  --prime-color-fill-muted-hover: var(--prime-color-layer-floating2-fill-hover);
+  --prime-color-control-selected: var(--prime-color-layer-floating2-selected);
+  --prime-layer-shadow: none;
+}
+
+/* A host off the ladder (a tinted banner, an accent wash, an image): its own fill stays, controls
+   on it take translucent washes, which read on any color. */
+[data-depth="tinted"] {
+  --prime-color-field-bg: var(--prime-color-fill-subtle-active);
+  --prime-color-field-bg-hover: var(--prime-color-fill-strong);
+  --prime-color-field-bg-focus: var(--prime-color-layer-floating-bg);
+  --prime-color-fill-muted: var(--prime-color-fill-subtle-active);
+  --prime-color-fill-muted-hover: var(--prime-color-fill-strong);
+  --prime-color-control-selected: var(--prime-color-layer-floating-bg);
+  --prime-layer-shadow: none;
 }
 
 /* Theme switches are instant: a running color transition would start from the old theme and blink. */

@@ -1,7 +1,8 @@
 /*
- * App shell: two full-height planes edge to edge — the navigation column on the canvas and the
- * content plane on the surface. No inset, radius, shadow or border: the boundary is the fill
- * change. Gutters inside the content plane: 16 → 24 from 640px → 32 from 1024px; top air
+ * App shell: two full-height planes edge to edge — the content plane is the page itself (layer 0 of
+ * the surface ladder: gray in light, near black in dark) and the navigation column beside it is a
+ * surface one layer above (Sidebar sets its own `data-depth`). No inset, radius, shadow or border:
+ * the boundary is the fill change. Gutters inside the content plane: 16 → 24 from 640px → 32 from 1024px; top air
  * 24 → 40 from 1024px.
  */
 
@@ -15,7 +16,7 @@
   width: 100%;
   min-width: 0;
   min-height: 100dvh;
-  background: var(--prime-color-bg-canvas);
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
 }
 
@@ -60,12 +61,8 @@
   min-height: 0;
 }
 
+/* The page (foundation §4): cards on it are layer 1, white in light with the raised whisper. */
 .panel {
-  /* Surface context: fields use the surface fill, cards become sunken tiles (foundation §4). */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
-  --prime-color-card-bg: var(--prime-color-bg-sunken);
-  --prime-card-shadow: none;
-
   /* Its sticky header and footer stack inside the panel, under the nav column. */
   isolation: isolate;
   box-sizing: border-box;
@@ -74,7 +71,7 @@
   min-width: 0;
   min-height: 0;
   overflow: clip;
-  background: var(--prime-color-bg-surface);
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
 }
 

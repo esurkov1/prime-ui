@@ -99,7 +99,7 @@ Without flags the bar is flat at the screen edge on the surface, with a faint to
 | disabled | `disabled` | `disabled` / `aria-disabled`, `data-disabled` |
 | hidden | inside `AppShell.Footer` 640px wide or more | `display: none` (container `prime-shell-footer`) |
 | floating / icon only | `floating` / `iconOnly` | `data-floating="true"` / `data-icon-only="true"` on the `<nav>` |
-| less transparency | `prefers-reduced-transparency: reduce` | a floating capsule turns opaque (`--prime-color-bg-raised`), no blur |
+| less transparency | `prefers-reduced-transparency: reduce` | a floating capsule turns opaque (`--prime-color-layer-floating-bg`), no blur |
 
 Motion: the color of the icon and the label changes over `fast`; in the floating capsule the selection capsule grows in from 92% and fades in (`fast`, enter easing), instant under reduced motion. No hover or press feedback: an item is either current or not.
 

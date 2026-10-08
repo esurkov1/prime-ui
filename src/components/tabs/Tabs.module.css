@@ -1,8 +1,9 @@
 /*
  * Tabs — Graphite. Navigation between content panels.
  *
- * Horizontal: a folder. The root is a `bg-sunken` strip over a `bg-surface` panel; the active tab
- * is that surface rising into the strip, with concave flares where it meets the panel, gliding
+ * Horizontal: a folder and a layer of the ladder. The root is a `fill-muted-hover` strip (two steps
+ * off the layer) over a panel in the layer's own color (`layer-current`); the active tab is that panel
+ * rising into the strip, with concave flares where it meets the panel, gliding
  * between tabs. Hover is the same shape in `fill-faint`, painted under the folder so the two
  * never mix. No lines: depth from fill only. Tabs run edge to edge, each between
  * `--tabs-item-min` and `--tabs-item-max` and never narrower than their content; full width, they
@@ -110,11 +111,13 @@
   min-width: 0;
 }
 
-/* Horizontal: the root is the frame — a sunken strip with the panel surface right under it. */
+/* Horizontal: the root is the frame and a layer of the ladder (`data-depth`) — a strip two steps off
+   the layer, with the panel in the layer's own color right under it. Two steps: the strip is the
+   block's outer edge, and one step off a white card is the light page tone itself. */
 .root[data-orientation="horizontal"] {
   overflow: hidden;
   border-radius: var(--prime-radius-xl);
-  background: var(--prime-color-bg-sunken);
+  background: var(--prime-color-fill-muted-hover);
 }
 
 .root[data-orientation="horizontal"] .layout {
@@ -186,7 +189,7 @@
 /* Horizontal: the panel surface under the active tab, flaring into the panel at both sides. */
 .indicatorFolder {
   border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
-  background: var(--prime-color-bg-surface);
+  background: var(--prime-color-layer-current);
 }
 
 .indicatorFolder::before,
@@ -203,7 +206,7 @@
   background: radial-gradient(
     circle at 0 0,
     transparent calc(var(--tabs-flare) - var(--prime-border-width) / 2),
-    var(--prime-color-bg-surface) var(--tabs-flare)
+    var(--prime-color-layer-current) var(--tabs-flare)
   );
 }
 
@@ -212,7 +215,7 @@
   background: radial-gradient(
     circle at 100% 0,
     transparent calc(var(--tabs-flare) - var(--prime-border-width) / 2),
-    var(--prime-color-bg-surface) var(--tabs-flare)
+    var(--prime-color-layer-current) var(--tabs-flare)
   );
 }
 
@@ -613,7 +616,7 @@
 
 .root[data-orientation="horizontal"] .panel {
   padding: var(--tabs-panel-pad);
-  background: var(--prime-color-bg-surface);
+  background: var(--prime-color-layer-current);
 }
 
 .panel:focus-visible {

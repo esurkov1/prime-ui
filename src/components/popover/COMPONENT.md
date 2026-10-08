@@ -77,7 +77,7 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 `ref` → the element. `<div>` (title + description with a 4 px step) / `<h2>` (names the dialog) / `<p>` (describes it) / `<div>` (buttons at the end, stacked full width on phones, below 640 px). + native props.
 
 ## Variants
-The panel has one look: `bg-raised` fill, `--prime-panel-radius`, `shadow-overlay`, no border. Fields inside get the surface field fill; cards inside become sunken tiles.
+The panel has one look: the floating layer of the ladder (`data-depth="floating"`), `--prime-panel-radius`, `shadow-overlay`, no border. Fields inside take that layer's fill; a card inside is the next layer, a flat tile.
 
 ### size (Content)
 | Value | Looks like | Use when | Default |

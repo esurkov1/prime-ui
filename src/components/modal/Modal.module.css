@@ -17,10 +17,8 @@
 
 .content {
   --modal-width: var(--prime-modal-width-m);
-  /* Fields inside a raised surface use the "on surface" fill. */
-  --prime-color-field-bg: var(--prime-color-field-bg-surface);
   /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-bg-raised);
+  --avatar-ring: var(--prime-color-layer-current);
 
   --dialog-padding: var(--prime-modal-padding);
 
@@ -31,7 +29,8 @@
   max-height: calc(100dvh - 2 * var(--prime-modal-viewport-padding));
   min-height: 0;
   overflow: hidden;
-  background: var(--prime-color-bg-raised);
+  /* The floating layer of the ladder (`data-depth="floating"`). */
+  background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
   border-radius: var(--prime-modal-radius);
   box-shadow: var(--prime-shadow-modal);
@@ -70,7 +69,7 @@
     border-end-end-radius: 0;
     /* Its own fill continues past the bottom edge: an upward pull (up to 24) never lifts it off. */
     box-shadow:
-      0 var(--prime-space-6) 0 0 var(--prime-color-bg-raised),
+      0 var(--prime-space-6) 0 0 var(--prime-color-layer-current),
       var(--prime-shadow-modal);
   }
 }

@@ -107,7 +107,7 @@ No DOM: clone the single child and chain its `onClick` (unless the child's handl
 | `children` | `ReactElement` | — (required) | One element, usually a Button. |
 
 ## Variants
-The dialog has one look: `bg-raised`, `--prime-modal-radius` (16), `shadow-modal`, on a `bg-scrim`. Header, body and footer are separated by faint inset hairlines.
+The dialog has one look: the floating layer of the ladder (`data-depth="floating"`: white in light, a step above a card in dark), `--prime-modal-radius` (16), `shadow-modal`, on a `bg-scrim`. Header, body and footer are separated by faint inset hairlines.
 
 ### size (Content)
 | Value | Looks like | Use when | Default |
@@ -165,7 +165,7 @@ Loading or disabled actions use the Button props (`loading`, `disabled`) inside 
 ## Layout & spacing
 - Dialog padding `--prime-modal-padding` (24) on every zone; header 24 top / 20 bottom, body 20 with a 16 gap between blocks, footer 20 top / 24 bottom.
 - Max height = viewport minus `--prime-modal-viewport-padding` on both sides; only the body scrolls.
-- Fields inside get the surface field fill; cards inside become sunken tiles. Group fields with a 20 gap.
+- Fields inside take the floating layer's fill; a card inside is the next layer (`floating-1`), a flat tile. Group fields with a 20 gap.
 - Narrow viewport (< 640px): bottom sheet, full width, top corners `--prime-sheet-radius`, a grab handle strip on top, up to `100dvh − --prime-sheet-top-gap` high, the bottom safe-area inset below the content.
 
 ## Accessibility

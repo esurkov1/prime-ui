@@ -3,6 +3,7 @@ import type * as React from "react";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import type { Tone } from "@/internal/states";
+import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./Card.module.css";
 
@@ -18,13 +19,23 @@ export type CardRootProps = DivProps & {
   flat?: boolean;
 };
 
-function CardRoot({ variant = "panel", flat = false, className, ...rest }: CardRootProps) {
+function CardRoot({
+  variant = "panel",
+  flat = false,
+  className,
+  children,
+  ...rest
+}: CardRootProps) {
+  const depth = useNestedSurfaceDepth();
   return (
     <div
       {...rest}
       className={cx(styles.root, className)}
+      data-depth={depth}
       {...toDataAttributes({ variant, flat: flat || undefined })}
-    />
+    >
+      <SurfaceDepthProvider value={depth}>{children}</SurfaceDepthProvider>
+    </div>
   );
 }
 CardRoot.displayName = "Card.Root";
