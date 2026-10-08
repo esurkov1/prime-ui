@@ -51,6 +51,8 @@ field in a toolbar → Input with `Input.Icon` + `type="search"` and `aria-label
 toggle). Person or organization → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a
 `ratio` — never a round Avatar for things. Keyboard shortcut → Kbd. One block of related
 numbers/content → Card (pick the template). Rows with columns, sorting, selection → DataTable.
+Items that flow through statuses and are moved by hand → Kanban (a single list to reorder, or items
+dropped onto folders or assignees → Dnd directly).
 Chronological events → Timeline. Code → CodeBlock.
 
 **Feedback.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →

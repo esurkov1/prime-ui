@@ -282,7 +282,7 @@ export const page: ComponentPageConfig = {
   Skeleton, Banner; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup;
   field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
   FileUpload; overlay — Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu,
-  Notification; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable,
+  Notification; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable, Kanban,
   Dnd, SmartFilter, Timeline, Card, LoginForm, EmptyPage; layout — AppShell, Sidebar, PageContent,
   PageToolbar, ScrollContainer, ExampleFrame, Crossfade).
 - **Slots** (`SLOTS` in `pageStandard.ts`, file = slot id): `overview` «Обзор» · `variants` «Варианты» ·

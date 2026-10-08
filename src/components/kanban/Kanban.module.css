@@ -1,0 +1,269 @@
+/*
+ * Kanban — Graphite. A row of filled column wells holding filled cards; depth from fill, no lines.
+ * The board scrolls sideways inside itself, each column body scrolls on its own. Columns span the
+ * board height and their cards sit at the top, so a card drops anywhere in a column, not only on
+ * its cards. Wide: columns keep a fixed comfortable width. Narrow (container below 40rem): a
+ * column takes 85% of the board and snaps, so the next one peeks.
+ */
+
+.root {
+  --kanban-column-width: calc(var(--prime-space-24) * 3);
+  --kanban-gap: var(--prime-space-3);
+
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-width: 0;
+  min-height: 0;
+  font-family: var(--prime-font-family-sans);
+  color: var(--prime-color-text-primary);
+}
+
+/* Columns stretch to the board height; the strip keeps room under them for its scrollbar. */
+.scroller {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  gap: var(--kanban-gap);
+  min-height: 0;
+  padding-block-end: var(--prime-space-2);
+}
+
+/* Positioned: the visually hidden count stays inside the column instead of the page. */
+.column {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  box-sizing: border-box;
+  inline-size: var(--kanban-column-width);
+  max-block-size: 100%;
+  min-height: 0;
+  padding-block-start: var(--prime-space-2);
+  border-radius: var(--prime-radius-l);
+  /* A translucent fill reads as a well on any surface (canvas, card, sunken) in both themes. */
+  background: var(--prime-color-fill-faint);
+  scroll-snap-align: start;
+}
+
+@container (width < 40rem) {
+  .scroller {
+    scroll-snap-type: x mandatory;
+  }
+
+  .column {
+    inline-size: 85cqi;
+  }
+}
+
+/* Snapping would pull the strip back while a drag auto-scrolls it. */
+:global(html[data-dnd-active]) .scroller {
+  scroll-snap-type: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-block-size: var(--prime-control-s-height);
+  padding-inline: var(--prime-space-4) var(--prime-space-2);
+}
+
+.title {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--prime-text-title-s-size);
+  font-weight: var(--prime-text-title-s-weight);
+  line-height: var(--prime-text-title-s-line-height);
+  letter-spacing: var(--prime-text-title-s-tracking);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-1);
+  margin-inline-start: auto;
+}
+
+/*
+ * The column body: its own vertical scroll; the padding keeps the cards' focus ring inside.
+ * A one-row grid whose row is at least the visible height: the swap region (a grid too) and the
+ * drop list stretch down to the bottom of the column.
+ */
+.body {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-rows: 1fr;
+  min-height: 0;
+  padding: var(--prime-space-2);
+}
+
+.swap {
+  display: grid;
+}
+
+.drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100%;
+}
+
+.list {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-block-size: var(--prime-space-20);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* An empty column: a faint well at the top of the drop area; it fades out while a card is over it. */
+.empty {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: var(--prime-space-20);
+  display: grid;
+  place-content: center;
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-fill-faint);
+  pointer-events: none;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.list[data-dnd-over] + .empty {
+  opacity: 0;
+}
+
+/* The card. Its look is on its own class: the carried clone is portalled out of the column. */
+.item {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--prime-space-3);
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-card-shadow);
+  list-style: none;
+}
+
+/* Hover wash under the content, faded in and out on opacity. */
+.item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--prime-color-fill-subtle);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .item:not([data-disabled]):hover::after {
+    opacity: 1;
+  }
+}
+
+.item[data-disabled] {
+  color: var(--prime-color-text-secondary);
+}
+
+.itemTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--prime-text-body-m-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-body-m-line-height);
+  letter-spacing: var(--prime-text-body-m-tracking);
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.itemDescription {
+  overflow: hidden;
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-text-caption-weight);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The title and its meta line read as one block. */
+.itemTitle + .itemDescription {
+  margin-block-start: calc(var(--prime-space-1) - var(--prime-space-2));
+}
+
+.itemBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+/* Counts at the start; the last child, unless a count, at the end (the assignee). */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-width: 0;
+  min-block-size: var(--prime-control-xs-height);
+}
+
+.footer > * {
+  min-width: 0;
+}
+
+.footer > :last-child:not(.count):not(:first-child) {
+  margin-inline-start: auto;
+}
+
+.count {
+  --prime-icon-size: var(--prime-icon-xs);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Loading: cards of the same geometry, no hover, no drag. */
+.skeleton {
+  pointer-events: none;
+}
+
+.skeletonBadge {
+  inline-size: var(--prime-space-16);
+  block-size: var(--prime-badge-s-height);
+  min-block-size: 0;
+  border-radius: var(--prime-badge-s-radius);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .empty,
+  .item::after {
+    transition: none;
+  }
+}

@@ -33,6 +33,7 @@ import {
   FileUpload,
   Hint,
   Input,
+  Kanban,
   Label,
   LoginForm,
   Modal,
@@ -148,6 +149,11 @@ describe("part refs: every part declares ref", () => {
     takesRef(Input.Affix);
     takesRef(Input.InlineAffix);
     takesRef(Input.Counter);
+    takesRef(Kanban.ItemTitle);
+    takesRef(Kanban.ItemDescription);
+    takesRef(Kanban.ItemBadges);
+    takesRef(Kanban.ItemFooter);
+    takesRef(Kanban.ItemCount);
     takesRef(Label.Icon);
     takesRef(Label.Description);
     takesRef(LoginForm.Header);
@@ -359,6 +365,33 @@ const CASES: Case[] = [
           Готово
         </Dnd.DropZone>
       </Dnd.Root>
+    ),
+  ],
+  [
+    "Kanban.Root",
+    "DIV",
+    (ref) => (
+      <Kanban.Root
+        ref={ref}
+        columns={[{ id: "todo", title: "К выполнению" }]}
+        items={["a"]}
+        getId={(id) => id}
+        defaultValue={{ todo: ["a"] }}
+        renderItem={(id) => <Kanban.Item>{id}</Kanban.Item>}
+      />
+    ),
+  ],
+  [
+    "Kanban.Item",
+    "LI",
+    (ref) => (
+      <Kanban.Root
+        columns={[{ id: "todo", title: "К выполнению" }]}
+        items={["a"]}
+        getId={(id) => id}
+        defaultValue={{ todo: ["a"] }}
+        renderItem={(id) => <Kanban.Item ref={ref}>{id}</Kanban.Item>}
+      />
     ),
   ],
   [

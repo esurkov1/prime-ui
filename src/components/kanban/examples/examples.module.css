@@ -1,0 +1,31 @@
+/* Layout of the Kanban scenarios: semantic tokens only. */
+
+/* A board gets its height from the page region it fills; tall columns scroll inside it. */
+.board {
+  block-size: calc(var(--prime-space-24) * 5);
+}
+
+/* A board that stands below its own toolbar. */
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  inline-size: 100%;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* A phone-width screen. */
+.phone {
+  inline-size: min(100%, calc(var(--prime-space-20) * 4.5));
+  block-size: calc(var(--prime-space-24) * 5);
+}

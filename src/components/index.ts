@@ -214,6 +214,20 @@ export type {
   InputWrapperProps,
 } from "./input/Input";
 export { Input } from "./input/Input";
+export type {
+  KanbanColumn,
+  KanbanItemBadgesProps,
+  KanbanItemCountProps,
+  KanbanItemDescriptionProps,
+  KanbanItemFooterProps,
+  KanbanItemProps,
+  KanbanItemTitleProps,
+  KanbanLabels,
+  KanbanMove,
+  KanbanRootProps,
+  KanbanValue,
+} from "./kanban/Kanban";
+export { Kanban } from "./kanban/Kanban";
 export type { KbdProps } from "./kbd/Kbd";
 export { Kbd } from "./kbd/Kbd";
 export type {

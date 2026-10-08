@@ -2,7 +2,7 @@
   "name": "prime-ui-kit",
   "version": "0.9.1",
   "packageManager": "bun@1.3.13",
-  "description": "React 19 UI kit for product interfaces: 57 composable components on one design contract — forms, selects, tables, overlays, navigation, app shell. CSS Modules, --prime-* tokens, light and dark themes, TypeScript, a11y. Ships COMPONENT.md docs and copyable examples.",
+  "description": "React 19 UI kit for product interfaces: 59 composable components on one design contract — forms, selects, tables, overlays, navigation, app shell. CSS Modules, --prime-* tokens, light and dark themes, TypeScript, a11y. Ships COMPONENT.md docs and copyable examples.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
