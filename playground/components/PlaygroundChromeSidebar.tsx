@@ -1,8 +1,9 @@
-import { Check, Moon, Square, SquareStack, Sun } from "lucide-react";
 import * as React from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 
+import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { Icon } from "@/icons";
 import { Sidebar } from "@/layout";
 
 import {
@@ -11,8 +12,6 @@ import {
   type PlaygroundPageEntry,
   pageRoute,
 } from "../playgroundPages";
-import { PLAYGROUND_PREVIEW_SURFACES, usePlaygroundPreviewTheme } from "./PlaygroundPreviewTheme";
-import { usePlaygroundTheme } from "./PlaygroundTheme";
 
 function PageItem({ page }: { page: PlaygroundPageEntry }) {
   const Icon = page.icon;
@@ -46,44 +45,40 @@ function Brand() {
   );
 }
 
-/** Footer rows: the theme switch and the preview surface menu, item-shaped like the rest. */
-function FooterControls() {
-  const { scheme, toggleScheme } = usePlaygroundTheme();
-  const { surface, setSurface } = usePlaygroundPreviewTheme();
-  const isDark = scheme === "dark";
-  const active =
-    PLAYGROUND_PREVIEW_SURFACES.find((s) => s.value === surface) ?? PLAYGROUND_PREVIEW_SURFACES[0];
-
+/** A sample signed-in account at the bottom of the rail: how `Sidebar.Account` looks in an app. */
+function Account() {
   return (
-    <>
-      <Sidebar.Item onClick={toggleScheme}>
-        <Sidebar.ItemIcon>{isDark ? <Sun /> : <Moon />}</Sidebar.ItemIcon>
-        {isDark ? "Светлая тема" : "Тёмная тема"}
-      </Sidebar.Item>
-      <Dropdown.Root>
-        <Dropdown.Trigger>
-          <Sidebar.Item>
-            <Sidebar.ItemIcon>
-              <SquareStack />
-            </Sidebar.ItemIcon>
-            Фон превью
-            <Sidebar.ItemCount>{active.label}</Sidebar.ItemCount>
-          </Sidebar.Item>
-        </Dropdown.Trigger>
-        <Dropdown.Content align="start" side="top">
-          <Dropdown.Group label="Фон превью">
-            {PLAYGROUND_PREVIEW_SURFACES.map((entry) => (
-              <Dropdown.Item key={entry.value} onSelect={() => setSurface(entry.value)}>
-                <Dropdown.ItemIcon>
-                  {entry.value === surface ? <Check strokeWidth={2} /> : <Square strokeWidth={2} />}
-                </Dropdown.ItemIcon>
-                {entry.label} — {entry.hint.toLowerCase()}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Group>
-        </Dropdown.Content>
-      </Dropdown.Root>
-    </>
+    <Dropdown.Root>
+      <Dropdown.Trigger>
+        <Sidebar.Account description="anna@company.ru">
+          <Avatar.Root color="purple">
+            <Avatar.Fallback>АС</Avatar.Fallback>
+          </Avatar.Root>
+          Анна Смирнова
+        </Sidebar.Account>
+      </Dropdown.Trigger>
+      <Dropdown.Content side="right" align="end">
+        <Dropdown.Item>
+          <Dropdown.ItemIcon>
+            <Icon name="object.user" />
+          </Dropdown.ItemIcon>
+          Профиль
+        </Dropdown.Item>
+        <Dropdown.Item>
+          <Dropdown.ItemIcon>
+            <Icon name="action.settings" />
+          </Dropdown.ItemIcon>
+          Настройки аккаунта
+        </Dropdown.Item>
+        <Dropdown.Separator />
+        <Dropdown.Item>
+          <Dropdown.ItemIcon>
+            <Icon name="action.logout" />
+          </Dropdown.ItemIcon>
+          Выйти
+        </Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown.Root>
   );
 }
 
@@ -133,7 +128,7 @@ export function PlaygroundChromeSidebar({ open, onOpenChange }: PlaygroundChrome
         ))}
       </Sidebar.Content>
       <Sidebar.Footer>
-        <FooterControls />
+        <Account />
       </Sidebar.Footer>
     </Sidebar.Root>
   );

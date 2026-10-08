@@ -6,6 +6,7 @@ import { AppHeader, AppShell } from "@/layout";
 
 import { PLAYGROUND_NAV_CATEGORIES } from "./categories";
 import { PlaygroundChromeSidebar } from "./components/PlaygroundChromeSidebar";
+import { PlaygroundHeaderControls } from "./components/PlaygroundHeaderControls";
 import { PlaygroundSearch, usePlaygroundSearchHotkey } from "./components/PlaygroundSearch";
 import { PLAYGROUND_INTRO, PLAYGROUND_PAGES, pageRoute } from "./playgroundPages";
 
@@ -48,6 +49,9 @@ export function PlaygroundLayout() {
             >
               Поиск по компонентам
             </AppHeader.Search>
+            <AppHeader.Actions>
+              <PlaygroundHeaderControls />
+            </AppHeader.Actions>
           </AppHeader.Root>
         }
       >
