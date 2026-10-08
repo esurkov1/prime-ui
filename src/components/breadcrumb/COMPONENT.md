@@ -47,7 +47,7 @@ Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `href` | `string` | — | Renders a link; without it the item is text. |
-| `current` | `boolean` | — | Current page: `aria-current="page"`, primary text, medium weight. The last item, without `href`. |
+| `current` | `boolean` | — | Current page: `aria-current="page"` (on the link when `href` is set), primary text, medium weight. Usually the last item, without `href`. |
 | `aria-label` | `string` | — | Name of a link without visible text (e.g. a home icon); set on the link, not the `li`. |
 | `children` | `ReactNode` | — | Text or an `Icon`. A string also becomes the `title` of a text item (full text when truncated). |
 | `…rest` | `Omit<LiHTMLAttributes<HTMLLIElement>, "aria-label">` | — | `className` and the other `li` attributes. |
@@ -83,10 +83,10 @@ Use links for every ancestor and `current` on the last item; `s` above a `headin
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| current | `current` | `aria-current="page"` on the text span |
+| current | `current` | `aria-current="page"` on the text span, or on the link when the item has `href` |
 | hover / focus-visible on links | pointer / keyboard | text → primary; focus ring from LinkButton |
 | truncation | width | each level truncates with an ellipsis, max width `2 × --prime-space-24`; the current item shrinks last |
-| auto-collapse | 3+ levels and a container `< 30rem` | `data-collapsible="true"`; middle levels are visually hidden (still announced) and replaced by «… ›» |
+| auto-collapse | 3+ levels and a container `< 30rem` | `data-collapsible="true"`; middle levels are `display: none` and replaced by «… ›», whose hidden text (`labels.ellipsis`) names them |
 
 Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 
@@ -105,8 +105,8 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 
 ### ARIA
 - `nav` landmark with `aria-label` from `labels.nav`; an ordered list.
-- The current page has `aria-current="page"`; chevrons and the automatic «…» are `aria-hidden`.
-- Collapsed middle levels are only visually hidden and stay announced.
+- The current page has `aria-current="page"`; the chevrons are `aria-hidden` spans inside the levels, so every list item is a level.
+- Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» reads as `labels.ellipsis`.
 - Icon-only links need `aria-label` on the Item.
 
 ### Labels
@@ -123,7 +123,7 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 | [overview.tsx](examples/overview.tsx) | The path to this page: links to the levels above and the current page last — `href`, `current`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; text and chevrons follow the control tier — `size`. |
 | [with-icon.tsx](examples/with-icon.tsx) | The root level as a home icon; a link without text is named for screen readers — `aria-label`. |
-| [overflow.tsx](examples/overflow.tsx) | A long path: levels truncate, and in a 320px container the middle ones collapse into «…» that screen readers still read. |
+| [overflow.tsx](examples/overflow.tsx) | A long path: levels truncate, and in a 320px container the middle ones collapse into «…», which screen readers announce as hidden levels. |
 | [ellipsis.tsx](examples/ellipsis.tsx) | Levels skipped on purpose shown as «…» with hidden text for screen readers — `Breadcrumb.Ellipsis`. |
 
 ## Mistakes

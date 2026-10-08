@@ -1,7 +1,7 @@
 /*
  * Breadcrumb — Graphite.
  * Previous segments muted, current page primary/medium. Each segment truncates with ellipsis;
- * on narrow containers the middle segments collapse into «…» (still read by screen readers).
+ * on narrow containers the middle segments collapse into «…» (announced as `labels.ellipsis`).
  */
 
 .root {
@@ -60,6 +60,7 @@
   display: inline-flex;
   flex: 0 1 auto;
   align-items: center;
+  gap: var(--bc-gap);
   min-width: 0;
   max-width: var(--bc-item-max);
 }
@@ -69,7 +70,7 @@
   flex-shrink: 0.5;
 }
 
-.item > * {
+.item > :not(.separator) {
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
@@ -107,6 +108,11 @@
   user-select: none;
 }
 
+/* Every level starts with its chevron; the first level has none. */
+.item:first-child > .separator {
+  display: none;
+}
+
 .ellipsis {
   display: inline-flex;
   flex-shrink: 0;
@@ -128,17 +134,9 @@
     display: inline-flex;
   }
 
-  /* Middle segments and their separators, up to (not including) the last item: visually hidden,
-   * still announced. The auto «… ›» pair replaces them, so the separator before the last item
-   * is hidden too (otherwise «… › ›»). */
-  .root[data-collapsible="true"] .list > li:nth-child(n + 5):nth-last-child(n + 2) {
-    position: absolute;
-    width: var(--prime-border-width);
-    height: var(--prime-border-width);
-    margin: calc(-1 * var(--prime-border-width));
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  /* The middle levels (after the first and the auto «…», before the last) leave the layout and
+   * the tab order; the «…» names them for screen readers. */
+  .root[data-collapsible="true"] .item:nth-child(n + 3):not(:last-child) {
+    display: none;
   }
 }

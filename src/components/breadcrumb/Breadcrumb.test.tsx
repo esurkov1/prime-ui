@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
@@ -46,18 +49,31 @@ describe("Breadcrumb", () => {
     expect(span).toHaveAttribute("aria-current", "page");
   });
 
-  it("draws a hidden chevron between levels, none before the first", () => {
-    const { container } = render(
+  it("draws the chevrons inside the levels: every list item is a level", () => {
+    render(
       <Breadcrumb.Root>
         <Breadcrumb.Item href="/a">A</Breadcrumb.Item>
         <Breadcrumb.Item current>B</Breadcrumb.Item>
       </Breadcrumb.Root>,
     );
-    const items = container.querySelectorAll("li");
-    expect(items).toHaveLength(3);
-    expect(items[0]).not.toHaveAttribute("aria-hidden");
-    expect(items[1]).toHaveAttribute("aria-hidden", "true");
-    expect(items[1].querySelector("svg")).toBeInTheDocument();
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(2);
+    for (const item of items) expect(item).not.toHaveAttribute("aria-hidden");
+    // The chevron is decorative, inside the level it leads to; CSS hides the first one.
+    expect(items[1].querySelector('[aria-hidden="true"] svg')).toBeInTheDocument();
+  });
+
+  it("a current level with a link marks the link as the current page", () => {
+    render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Item href="/orders" current>
+          Orders
+        </Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    expect(screen.getByRole("link", { name: "Orders" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Home" })).not.toHaveAttribute("aria-current");
   });
 
   it("renders Ellipsis", () => {
@@ -111,8 +127,17 @@ describe("Breadcrumb", () => {
     );
     const nav = screen.getByRole("navigation", { name: "Навигационная цепочка" });
     expect(nav).toHaveAttribute("data-collapsible", "true");
-    expect(container.querySelectorAll("li")).toHaveLength(7);
+    // Three levels and the auto ellipsis, which names the skipped levels for screen readers.
+    expect(container.querySelectorAll("li")).toHaveLength(4);
+    expect(container.querySelectorAll("li")[1]).toHaveTextContent("Скрытые разделы");
     expect(screen.getByRole("link", { name: "A" })).toBeInTheDocument();
+  });
+
+  it("CSS: collapsed middle levels are display: none (never focusable while invisible)", () => {
+    const css = readFileSync(join(__dirname, "Breadcrumb.module.css"), "utf8");
+    const query = css.slice(css.indexOf("@container"));
+    expect(query).toMatch(/\.item:nth-child\(n \+ 3\):not\(:last-child\)\s*\{\s*display:\s*none;/);
+    expect(query).not.toMatch(/clip-path/);
   });
 
   it("does not collapse short paths", () => {
