@@ -70,10 +70,13 @@ export const semanticTokens = {
       scrim: "rgba(17, 19, 24, 0.44)",
       /** Soft shade over an edge that hides scrolled content (DataTable columns). */
       edgeShadow: "rgba(17, 19, 24, 0.14)",
-      /** Translucent glass over content (floating BottomNav), always with a backdrop blur. */
-      glass: "color-mix(in srgb, var(--prime-ref-color-gray-0) 68%, transparent)",
-      /** The bright rim of a glass surface. */
-      glassEdge: "rgba(255, 255, 255, 0.7)",
+      /**
+       * Translucent glass over content (floating BottomNav), always with a light backdrop blur:
+       * clear enough that the content reads through it, as Liquid Glass.
+       */
+      glass: "color-mix(in srgb, var(--prime-ref-color-gray-0) 58%, transparent)",
+      /** The specular top edge of a glass surface: the line that makes it read as glass. */
+      glassEdge: "rgba(255, 255, 255, 0.85)",
     },
     fill: {
       /** Transparent wash: ghost hover, row hover. Works on any background. */
@@ -622,21 +625,32 @@ export const semanticTokens = {
   },
 
   bottomNav: {
-    /** Bar height without the safe-area inset. */
-    height: "3.5rem",
+    /** Bar height without the safe-area inset: icon 20 + gap 4 + label 12 and air around them. */
+    height: "3.25rem",
+    /** An icon-only flat bar: no label row, so it is lower. */
+    iconOnlyHeight: "{space.12}",
+    /**
+     * Floating capsule (iOS 26 tab bar): items 44 high — icon-only items are 44 squares, the touch
+     * size — inset 4 inside the capsule, so the selection capsule sits clear of its edge (52 in all).
+     */
+    floatingItemSize: "2.75rem",
+    floatingPadding: "{space.1}",
     paddingX: "{space.2}",
     /** Between the icon and the label. */
     itemGap: "{space.1}",
     /** The box that holds the icon and anchors the count. */
-    indicatorWidth: "{space.8}",
-    indicatorHeight: "{space.6}",
-    /** The icon (24, `icon.l`) leads; the label under it is small (10, as the iOS tab bar). */
-    iconSize: "{icon.24}",
+    indicatorWidth: "{space.7}",
+    indicatorHeight: "{space.5}",
+    /** A light icon (20) over a small label (10, as the iOS tab bar): the bar stays quiet. */
+    iconSize: "{icon.20}",
     labelSize: "{font.size.10}",
     labelLineHeight: "{font.lineHeight.12}",
-    /** Floating: the capsule's gap from the screen edges and the blur behind it. */
+    /**
+     * Floating: the capsule's gap from the screen edges and the blur behind it — light, as Liquid
+     * Glass: the content stays recognisable under the glass, only softened.
+     */
     floatingInset: "{space.3}",
-    blur: "1.25rem",
+    blur: "0.5rem",
   },
 
   tooltip: {

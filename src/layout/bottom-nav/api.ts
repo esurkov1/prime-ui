@@ -18,8 +18,8 @@ export const api: ComponentApi = {
           name: "floating",
           type: "boolean",
           default: "false",
-          en: "A glass capsule over the content: translucent `--prime-color-bg-glass` with a backdrop blur, a bright rim, inset `--prime-bottom-nav-floating-inset` from the edges and above the home indicator. Positions itself at the bottom of its positioned container (`AppShell.Footer`, which then takes no height), so the page scrolls under it; with `iconOnly` the capsule hugs its square items, centred. Opaque under `prefers-reduced-transparency`.",
-          ru: "Стеклянная капсула над содержимым: полупрозрачная заливка с размытием фона и светлым краем, с отступом от краёв экрана и над полоской «домой». Встаёт внизу своего позиционированного контейнера (`AppShell.Footer`, который тогда не занимает высоты), страница прокручивается под ней; с `iconOnly` капсула сжимается до квадратных пунктов по центру. При `prefers-reduced-transparency` — непрозрачная.",
+          en: "A Liquid Glass capsule over the content (the iOS 26 tab bar): a clear `--prime-color-bg-glass` tint over a light backdrop blur, a specular top edge, a glass selection capsule under the current item, inset `--prime-bottom-nav-floating-inset` from the edges and above the home indicator. Positions itself at the bottom of its positioned container (`AppShell.Footer`, which then takes no height), so the page scrolls under it; with `iconOnly` the capsule hugs its square items, centred. Opaque under `prefers-reduced-transparency`.",
+          ru: "Капсула из «жидкого стекла» над содержимым, как панель вкладок iOS 26: прозрачная заливка с лёгким размытием, блик по верхней кромке, стеклянная капсула под текущим пунктом, с отступом от краёв экрана и над полоской «домой». Встаёт внизу своего позиционированного контейнера (`AppShell.Footer`, который тогда не занимает высоты), страница прокручивается под ней; с `iconOnly` капсула сжимается до квадратных пунктов по центру. При `prefers-reduced-transparency` — непрозрачная.",
         },
         {
           name: "labels",
@@ -37,8 +37,8 @@ export const api: ComponentApi = {
     },
     {
       name: "BottomNav.Item",
-      en: '`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`: the icon (24) above a short label (10).',
-      ru: "Кнопка, ссылка при `href` или единственный дочерний элемент при `asChild`: иконка (24) над короткой подписью (10).",
+      en: '`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`: the icon (20) above a short label (10).',
+      ru: "Кнопка, ссылка при `href` или единственный дочерний элемент при `asChild`: иконка (20) над короткой подписью (10).",
       props: [
         {
           name: "current",
@@ -83,8 +83,8 @@ export const api: ComponentApi = {
     },
     {
       name: "BottomNav.ItemIcon",
-      en: "`ref` → `HTMLSpanElement`. The item glyph (`aria-hidden`, 24) above the label.",
-      ru: "Значок пункта (24, скрыт от скринридеров) над подписью.",
+      en: "`ref` → `HTMLSpanElement`. The item glyph (`aria-hidden`, 20) above the label.",
+      ru: "Значок пункта (20, скрыт от скринридеров) над подписью.",
       props: [
         {
           name: "children",

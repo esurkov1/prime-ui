@@ -1,8 +1,10 @@
 /*
- * BottomNav — phone navigation bar. Equal columns, each an icon (24) above a small label (10, as
- * the iOS tab bar); the current section is in the primary color, the others muted. `iconOnly`
- * hides the labels visually (they still name the items), `floating` turns the bar into a glass
- * capsule. The bar sits on the surface with a faint top divider and keeps
+ * BottomNav — phone navigation bar. Equal columns, each a light icon (20) above a small label (10,
+ * as the iOS tab bar) in a 52 bar; the current section is in the primary color, the others muted.
+ * `iconOnly` hides the labels visually (they still name the items) and lowers the bar to 48;
+ * `floating` turns the bar into an iOS 26 style glass capsule: a light blur, a clear tint, a
+ * specular top edge, items 44 high inset 4, and a glass selection capsule under the current item
+ * (icon-only: 44 squares). The bar sits on the surface with a faint top divider and keeps
  * the home-indicator inset (safe area) below its items. Inside `AppShell.Footer` (container
  * `prime-shell-footer`) it leaves once the content panel is 640px wide: there Sidebar navigates.
  */
@@ -21,20 +23,31 @@
   box-shadow: inset 0 var(--prime-border-width) 0 var(--prime-color-border-faint);
 }
 
-/* Floating: a glass capsule over the content, inset from the edges and above the home indicator.
-   It positions itself at the bottom of its container (AppShell.Footer), so the page scrolls under
-   the blur. */
+/* Icons only: no label row, so the bar is lower. */
+.root[data-icon-only="true"] {
+  min-height: var(--prime-bottom-nav-icon-only-height);
+}
+
+/*
+ * Floating: a glass capsule over the content, inset from the edges and above the home indicator.
+ * It positions itself at the bottom of its container (AppShell.Footer), so the page scrolls under
+ * it. Liquid Glass reads through a light blur and a clear tint; the glass itself is told by a
+ * specular top edge, a hairline of ink around it and a soft lift — never a heavy frost.
+ */
 .root[data-floating="true"] {
   position: absolute;
   inset-inline: var(--prime-bottom-nav-floating-inset);
   bottom: calc(var(--prime-bottom-nav-floating-inset) + env(safe-area-inset-bottom, 0px));
+  grid-auto-rows: var(--prime-bottom-nav-floating-item-size);
   width: auto;
-  padding-inline: var(--prime-space-1);
-  padding-block-end: 0;
+  min-height: 0;
+  padding: var(--prime-bottom-nav-floating-padding);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-bg-glass);
   box-shadow:
-    inset 0 0 0 var(--prime-border-width) var(--prime-color-bg-glass-edge),
+    inset 0 var(--prime-border-width) 0 var(--prime-color-bg-glass-edge),
+    inset 0 0 0 var(--prime-border-width)
+      color-mix(in srgb, var(--prime-color-text-primary) 6%, transparent),
     var(--prime-shadow-overlay);
   -webkit-backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
   backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
@@ -43,14 +56,42 @@
 /* Icons only: the capsule hugs its square items, centred. */
 .root[data-floating="true"][data-icon-only="true"] {
   inset-inline: 0;
-  grid-auto-columns: var(--prime-bottom-nav-height);
+  grid-auto-columns: var(--prime-bottom-nav-floating-item-size);
   justify-content: center;
   width: fit-content;
   margin-inline: auto;
 }
 
 .root[data-floating="true"] .item {
+  isolation: isolate;
+  padding: 0;
   border-radius: var(--prime-radius-full);
+}
+
+/*
+ * The selection capsule (iOS 26): a glass bubble of ink under the current item. It grows in from
+ * 92% and fades in when an item becomes current, and leaves the same way (fast, enter easing);
+ * under reduced motion the change is instant.
+ */
+.root[data-floating="true"] .item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--prime-color-text-primary) 8%, transparent);
+  box-shadow: inset 0 var(--prime-border-width) 0
+    color-mix(in srgb, var(--prime-color-bg-glass-edge) 60%, transparent);
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-enter),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-enter);
+}
+
+.root[data-floating="true"] .item[aria-current="page"]::before {
+  opacity: 1;
+  transform: none;
 }
 
 /* No see-through where the user asked for less transparency. */
@@ -129,11 +170,11 @@
   text-overflow: ellipsis;
 }
 
-/* On the icon's top-end corner, half outside it. */
+/* On the icon's top-end corner, half outside it (the icon is 20: its corner is 10 off centre). */
 .count {
   position: absolute;
   inset-block-start: calc(-1 * var(--prime-space-1));
-  inset-inline-start: calc(50% + var(--prime-space-2));
+  inset-inline-start: calc(50% + var(--prime-space-1));
   pointer-events: none;
 }
 

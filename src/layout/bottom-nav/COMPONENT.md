@@ -38,12 +38,12 @@ BottomNav.Root                 <nav> bar, equal columns, safe-area inset below
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `iconOnly` | `boolean` | `false` | Icons without visible labels; the labels stay in the DOM as visually hidden text and name the items. |
-| `floating` | `boolean` | `false` | A glass capsule over the content: translucent `--prime-color-bg-glass` with a backdrop blur, a bright rim, inset `--prime-bottom-nav-floating-inset` from the edges and above the home indicator. Positions itself at the bottom of its positioned container (`AppShell.Footer`, which then takes no height), so the page scrolls under it; with `iconOnly` the capsule hugs its square items, centred. Opaque under `prefers-reduced-transparency`. |
+| `floating` | `boolean` | `false` | A Liquid Glass capsule over the content (the iOS 26 tab bar): a clear `--prime-color-bg-glass` tint over a light backdrop blur, a specular top edge, a glass selection capsule under the current item, inset `--prime-bottom-nav-floating-inset` from the edges and above the home indicator. Positions itself at the bottom of its positioned container (`AppShell.Footer`, which then takes no height), so the page scrolls under it; with `iconOnly` the capsule hugs its square items, centred. Opaque under `prefers-reduced-transparency`. |
 | `labels` | `Partial<BottomNavLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (3–5 `BottomNav.Item`), `aria-label` (replaces `labels.nav`), `className` and the other attributes. |
 
 ### BottomNav.Item
-`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`: the icon (24) above a short label (10).
+`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`: the icon (20) above a short label (10).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -55,7 +55,7 @@ BottomNav.Root                 <nav> bar, equal columns, safe-area inset below
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
 
 ### BottomNav.ItemIcon
-`ref` → `HTMLSpanElement`. The item glyph (`aria-hidden`, 24) above the label.
+`ref` → `HTMLSpanElement`. The item glyph (`aria-hidden`, 20) above the label.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -101,12 +101,12 @@ Without flags the bar is flat at the screen edge on the surface, with a faint to
 | floating / icon only | `floating` / `iconOnly` | `data-floating="true"` / `data-icon-only="true"` on the `<nav>` |
 | less transparency | `prefers-reduced-transparency: reduce` | a floating capsule turns opaque (`--prime-color-bg-raised`), no blur |
 
-Motion: the color of the icon and the label changes over `fast`. No hover or press feedback: an item is either current or not.
+Motion: the color of the icon and the label changes over `fast`; in the floating capsule the selection capsule grows in from 92% and fades in (`fast`, enter easing), instant under reduced motion. No hover or press feedback: an item is either current or not.
 
 ## Layout & spacing
-- Bar `--prime-bottom-nav-height` (56) plus `env(safe-area-inset-bottom)`; side padding `--prime-bottom-nav-padding-x`.
-- Items share the width equally; the icon (`--prime-bottom-nav-icon-size`, 24) sits in a `--prime-bottom-nav-indicator-width` × `--prime-bottom-nav-indicator-height` box (32 × 24) that anchors the count; the label is `--prime-bottom-nav-label-size` (10, medium, line 12 — the iOS tab-bar size) 4 below it and truncates.
-- Floating: `--prime-bottom-nav-floating-inset` (12) from the sides and above `env(safe-area-inset-bottom)`, a full radius, `--prime-color-bg-glass` with `blur(--prime-bottom-nav-blur)`, a `--prime-color-bg-glass-edge` rim and the overlay shadow. Inside `AppShell.Footer` main gets extra bottom padding so the last line clears the capsule.
+- Bar `--prime-bottom-nav-height` (52) plus `env(safe-area-inset-bottom)`; side padding `--prime-bottom-nav-padding-x`. With `iconOnly` the bar is `--prime-bottom-nav-icon-only-height` (48).
+- Items share the width equally; the icon (`--prime-bottom-nav-icon-size`, 20 — a light glyph, so the bar stays quiet next to the page) sits in a `--prime-bottom-nav-indicator-width` × `--prime-bottom-nav-indicator-height` box (28 × 20) that anchors the count; the label is `--prime-bottom-nav-label-size` (10, medium, line 12 — the iOS tab-bar size) 4 below it and truncates.
+- Floating (the iOS 26 tab bar): items `--prime-bottom-nav-floating-item-size` (44) high inset `--prime-bottom-nav-floating-padding` (4) inside a full-radius capsule (52 in all); with `iconOnly` the items are 44 squares and the capsule hugs them. `--prime-bottom-nav-floating-inset` (12) from the sides and above `env(safe-area-inset-bottom)`. Liquid Glass: a clear `--prime-color-bg-glass` tint over a light `blur(--prime-bottom-nav-blur)` (8) with `saturate(180%)`, so the page reads through; a specular top edge in `--prime-color-bg-glass-edge`, a hairline of ink around it and the overlay shadow. The current item sits on a glass selection capsule (ink at 8% with its own top highlight). Inside `AppShell.Footer` main gets extra bottom padding so the last line clears the capsule.
 - Surface fill with a faint top divider; inside `AppShell.Footer` the bar sticks to the bottom of the panel.
 
 ## Accessibility

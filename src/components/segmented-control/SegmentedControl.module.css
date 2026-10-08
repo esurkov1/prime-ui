@@ -30,8 +30,8 @@
   --seg-two-line-pad-y: var(--prime-space-2);
   --seg-desc-size: var(--prime-control-m-hint-size);
   --seg-desc-line-height: var(--prime-control-m-hint-line-height);
-  /* Faint 1px rings: a wash of the text color, so they read on any fill in both themes. */
-  --seg-ring: color-mix(in srgb, var(--prime-color-text-primary) 7%, transparent);
+  /* The thumb keeps a faint 1px ring (a wash of the text color, so it reads on the track in both
+     themes); the track is fill only, like a Button beside it, so the two read as one height. */
   --seg-thumb-ring: color-mix(in srgb, var(--prime-color-text-primary) 10%, transparent);
 
   position: relative;
@@ -44,7 +44,8 @@
   padding: var(--seg-pad);
   border-radius: var(--seg-radius);
   background: var(--prime-color-fill-muted);
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--seg-ring);
+  /* Transparent by default; the control outline shows only under prefers-contrast: more. */
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
   font-family: var(--prime-font-family-sans);
 }
 
