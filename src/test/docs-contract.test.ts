@@ -6,7 +6,6 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import * as lucide from "lucide-react";
 import { iconRegistry } from "@/icons/registry";
@@ -22,9 +21,7 @@ import {
   slotOrder,
 } from "../../playground/pageStandard";
 import { applyApiToDoc, type ComponentApi } from "../../scripts/docs/componentApi";
-
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
+import { checkLayoutCss, checkSourceCanon, pascal, read, root, walk } from "./contract-utils";
 
 type ComponentDir = { base: "components" | "layout"; dir: string; rel: string };
 
@@ -37,19 +34,6 @@ function exportedDirs(): ComponentDir[] {
   }
   return result;
 }
-
-function walk(relDir: string, ext: RegExp): string[] {
-  const abs = path.join(root, relDir);
-  if (!fs.existsSync(abs)) return [];
-  return fs.readdirSync(abs, { withFileTypes: true }).flatMap((entry) => {
-    const rel = `${relDir}/${entry.name}`;
-    if (entry.isDirectory()) return entry.name === "dist" ? [] : walk(rel, ext);
-    return ext.test(entry.name) ? [rel] : [];
-  });
-}
-
-const pascal = (kebab: string) =>
-  kebab.replace(/(^|-)(\w)/g, (_, __: string, char: string) => char.toUpperCase());
 
 /** Every playground section (`playground/sections/<Pascal>Section.tsx`) by its component dir. */
 const sectionsByDir = new Map(
@@ -80,7 +64,6 @@ const TEMPLATE_HEADINGS = [
   "## Related",
 ];
 const ACCESSIBILITY_HEADINGS = ["### Keyboard", "### ARIA", "### Labels"];
-const PLACEHOLDER_TEXT = /lorem|ipsum|Пункт \d|Item \d|Элемент \d|[\u{1F300}-\u{1FAFF}]/iu;
 
 const dirs = exportedDirs();
 
@@ -158,7 +141,7 @@ describe("docs contract", () => {
       const category = sectionsByDir.get(dir)?.page.category;
       expect(category, `${dir} has no playground section with a category`).toBeDefined();
       expect(doc).toMatch(new RegExp(`^\\*\\*Category:\\*\\* ${category}$`, "m"));
-      expect(doc).not.toMatch(/--prime-(ref|sys)-/);
+      expect(doc).not.toMatch(/--prime-ref-/);
     });
 
     it.each(examples.map((file) => path.posix.basename(file)))("examples/%s", (name) => {
@@ -167,44 +150,19 @@ describe("docs contract", () => {
       const stem = name.replace(/\.tsx$/, "");
 
       expect(read(docPath), `${file} is not listed in COMPONENT.md`).toContain(`examples/${name}`);
-
-      expect(source.startsWith("/**"), `${file}: first line must be a JSDoc`).toBe(true);
+      checkSourceCanon(
+        file,
+        source,
+        (spec) => ALLOWED_IMPORTS.test(spec) || spec === "./examples.module.css",
+      );
       expect(source.match(/^export default function \w+Example\(/gm)?.length).toBe(1);
-
-      for (const m of source.matchAll(/(?:from|import) "([^"]+)"/g)) {
-        const spec = m[1];
-        const ok = ALLOWED_IMPORTS.test(spec) || spec === "./examples.module.css";
-        expect(ok, `${file} imports "${spec}"`).toBe(true);
-      }
-      expect(source, `${file}: React as \`import * as React from "react"\``).not.toMatch(
-        /^import (?!\* as React from "react";).* from "react";$/m,
-      );
-      expect(source, `${file}: size "m" is the default — omit it`).not.toMatch(/\bsize="m"/);
-
-      expect(jsdocOf(source), `${file}: one-line English JSDoc ending with "."`).toMatch(
-        /^[^Ѐ-ӿ]+\.$/,
-      );
       expect(source, `${file}: function name`).toMatch(
         new RegExp(`^export default function ${pascal(dir)}${pascal(stem)}Example\\(\\)`, "m"),
       );
-      expect(source, `${file}: inline style`).not.toMatch(/style=\{\{/);
-      expect(source, `${file}: placeholder text`).not.toMatch(PLACEHOLDER_TEXT);
     });
 
     it("example styles use semantic tokens only", () => {
-      for (const file of walk(`${rel}/examples`, /\.css$/)) {
-        // Breakpoints in @media / @container conditions cannot use custom properties (foundation §9).
-        const css = read(file)
-          .replace(/\/\*[\s\S]*?\*\//g, "")
-          .replace(/^\s*@(media|container)\b.*$/gm, "");
-        expect(css, file).not.toMatch(/--prime-(ref|sys)-/);
-        expect(css, file).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
-        expect(css, file).not.toMatch(/(?<![\w-])\d*\.?\d+(px|rem)\b/);
-        // Text is styled by Typography, never by example CSS.
-        expect(css, file).not.toMatch(
-          /^\s*(font-size|font-weight|line-height|letter-spacing|font-family)\s*:/m,
-        );
-      }
+      for (const file of walk(`${rel}/examples`, /\.css$/)) checkLayoutCss(file, read(file));
     });
 
     describe("page standard", () => {

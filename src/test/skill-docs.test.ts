@@ -9,12 +9,10 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import ts from "typescript";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
+import { read, root } from "./contract-utils";
 
 const skillDocs = fs
   .readdirSync(path.join(root, "SKILL"))
