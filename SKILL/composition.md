@@ -14,7 +14,7 @@ is, and is shown live with its code in the playground (category «Компози
 | Settings | [settings-page.tsx](patterns/settings-page.tsx) | heading column + panel per section, form with its own save, Switches that apply at once, danger zone with a confirm |
 | Create in a side panel | [form-drawer.tsx](patterns/form-drawer.tsx) | Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
 | Dashboard | [dashboard.tsx](patterns/dashboard.tsx) | period switch, KPI row, panels with progress and a split, short table + link to the list |
-| Screen states | [screen-states.tsx](patterns/screen-states.tsx) | page error in a Banner with retry, region loading, table error in place, first-run EmptyPage |
+| Screen states | [screen-states.tsx](patterns/screen-states.tsx) | page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
 
 Pick the closest one, rename the domain, keep the skeleton. Change structure only when the task needs
 it, and then by the rules below.
@@ -187,11 +187,16 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | a state of the page or a section that persists (sync failed, trial ends, read-only) | `Banner` as the first block of `PageContent.Body` (or inside the Card it concerns) |
 | a problem with one field | the field's `error` |
 | a region failed to load | the region shows it in place: DataTable `error`, `EmptyPage` with `EmptyPage.Icon tone="danger"` and «Повторить» |
-| a region is loading | DataTable `loading`; otherwise `Spinner` in place of the content + `aria-busy` on the region |
+| a region is loading | DataTable `loading`; otherwise a `Skeleton` in the geometry of the content + `aria-busy` on the region; `Spinner` only when there is no shape to hold |
+| a region changes state (loading → data → empty → error, another record) | its content in `Crossfade state={status}` — always, so the change flows instead of flipping |
 | nothing here yet (first run) | `EmptyPage` with one action (`tone="accent"` icon for a call to start) |
 | nothing matches the filter | the table's `empty`, with a reset action |
 
 Stale data beats an empty block: show the last known values and say when they are from.
+
+State change is continuous across the kit (foundation §1 rule 7): a region never jumps from one state
+to the next. Give every region its states, render them inside `Crossfade`, and let the loading state
+mirror the data's rows and gaps with `Skeleton`, so the swap moves nothing on the page.
 
 ## 10. Overlays
 
@@ -231,6 +236,7 @@ otherwise be missed. High-frequency and keyboard actions stay still.
 - One gap value for the whole page; outer padding added on top of `AppShell.Main`.
 - A subtitle that repeats the title; filler copy; icons next to every label; emoji.
 - Hand-made spinners, skeletons, badges, dividers, modals, filter bars — the kit has each of them.
+- A region that flips between states (`{loading ? <Spinner /> : <List />}`) — wrap it in `Crossfade`, load with `Skeleton`.
 - Mixed sizes in one row; `size="s"` on a single control to "make it fit".
 - Colored section backgrounds, borders around blocks, extra shadows.
 

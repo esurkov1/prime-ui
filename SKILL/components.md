@@ -66,7 +66,7 @@ Showing data and labels: badges, tags, avatars, cards, tables, feeds, code.
 
 ## Feedback (`feedback`)
 
-System messages, progress and empty states.
+System messages, progress, loading placeholders and empty states.
 
 | Component | Purpose | Docs |
 |---|---|---|
@@ -75,6 +75,7 @@ System messages, progress and empty states.
 | ProgressBar | Linear progress: one value on a native `<progress>`, or `segments` that split a whole (storage by type, task statuses), with a label, a percentage and status colors. | [COMPONENT.md](../src/components/progress-bar/COMPONENT.md) · [examples](../src/components/progress-bar/examples/) |
 | ProgressCircle | Circular progress — the ring version of ProgressBar: one value or `segments` that split a whole, with status colors and optional content in the center. | [COMPONENT.md](../src/components/progress-circle/COMPONENT.md) · [examples](../src/components/progress-circle/examples/) |
 | Spinner | An indeterminate loading indicator: a ring with a gap that turns while a request runs. | [COMPONENT.md](../src/components/spinner/COMPONENT.md) · [examples](../src/components/spinner/examples/) |
+| Skeleton | A placeholder in the shape of the content that is loading — text lines, a control, an avatar, a block — so the layout is in place before the data arrives. | [COMPONENT.md](../src/components/skeleton/COMPONENT.md) · [examples](../src/components/skeleton/examples/) |
 | EmptyPage | Empty state of a page, a block or a menu: icon, title, explanation and an action. | [COMPONENT.md](../src/components/empty-page/COMPONENT.md) · [examples](../src/components/empty-page/examples/) |
 | Crossfade | A region that cross-fades between its states (loading → data → empty → error) and glides to the new height, so the page below does not jump. | [COMPONENT.md](../src/components/crossfade/COMPONENT.md) · [examples](../src/components/crossfade/examples/) |
 

@@ -165,7 +165,8 @@ Cancel.
 - `nav.*`: `chevronDown`, `chevronLeft`, `chevronRight`, `chevronUp`, `chevronsLeft`, `chevronsUpDown`,
   `dashboard`, `home`, `itemDot`, `layoutGrid`, `menu`, `sidebarCollapse`, `sidebarExpand`;
 - `action.*`: `add`, `check`, `close`, `copy`, `delete`, `download`, `drag`, `externalLink`,
-  `eyedropper`, `filter`, `login`, `logout`, `more`, `remove`, `search`, `send`, `settings`, `upload`;
+  `eyedropper`, `filter`, `login`, `logout`, `more`, `refresh`, `remove`, `search`, `send`,
+  `settings`, `upload`;
 - `field.*`: `calendar`, `email`, `password.hide`, `password.show`;
 - `format.*`: `bold`, `italic`, `link`, `list`, `underline`;
 - `object.*`: `activity`, `bell`, `book`, `cart`, `chart`, `document`, `image`, `inbox`, `key`,

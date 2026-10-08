@@ -6,7 +6,7 @@ import {
   EmptyPage,
   Icon,
   SegmentedControl,
-  Spinner,
+  Skeleton,
   Typography,
 } from "prime-ui-kit";
 import * as React from "react";
@@ -44,9 +44,14 @@ export default function CrossfadeOverviewExample() {
         <Card.Body>
           <Crossfade state={status} aria-busy={status === "loading"}>
             {status === "loading" ? (
-              <div className={styles.loading}>
-                <Spinner aria-hidden="true" />
-              </div>
+              <ul className={styles.list}>
+                {PAYMENTS.map((payment) => (
+                  <li key={payment.id} className={styles.listRow}>
+                    <Skeleton className={styles.payerBar} />
+                    <Skeleton className={styles.amountBar} />
+                  </li>
+                ))}
+              </ul>
             ) : null}
             {status === "ready" ? (
               <ul className={styles.list}>

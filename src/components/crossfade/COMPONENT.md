@@ -5,8 +5,12 @@
 
 > A region that cross-fades between its states (loading → data → empty → error) and glides to the new height, so the page below does not jump.
 
+Continuous state change is a foundation of the kit (foundation §1 rule 7): a region never flips from
+one state to another. Crossfade is the mechanic for regions; its loading state is a
+[Skeleton](../skeleton/COMPONENT.md) in the shape of the coming content.
+
 ## When to use
-- A card, panel or page region that switches between loading, data, empty and error states of its own content.
+- A card, panel or page region that switches between loading, data, empty and error states of its own content — every such region, not only the prominent ones.
 - A detail panel that shows one record at a time: key it by the record id.
 - Any in-place swap of one block for another where an instant flip would be jarring.
 
@@ -65,7 +69,7 @@ Motion is opacity only, so nothing shifts under the pointer; the leaving content
 ## Layout & spacing
 - No padding, gap or fill of its own: it sits where the swapped content would sit (inside `Card.Body`, a page section, a panel).
 - Width follows the parent; height is the current content's height except while gliding.
-- Give a loading placeholder roughly the height of the data it stands for (a spinner block, skeleton lines), so the glide is short.
+- The loading state is a `Skeleton` with the geometry of the data it stands for (same rows, same line heights), so the swap to data changes neither layout nor height.
 
 ## Accessibility
 
@@ -90,10 +94,11 @@ No `labels`.
 
 ## Mistakes
 - A new `state` on every data refresh (`state={Date.now()}`) → key by what the region shows, not by when it was fetched.
-- Switching states with `{loading ? <Spinner /> : <List />}` and no wrapper → wrap the region in `Crossfade state={status}`.
+- Switching states with `{loading ? <Spinner /> : <List />}` and no wrapper → wrap the region in `Crossfade state={status}` and show a `Skeleton` of the list while it loads.
+- A spinner block for content of known shape → a `Skeleton` of that shape; a spinner is for loading with no shape to hold (a button, a status line).
 - Wrapping a DataTable to animate its loading / empty / error → the table body already cross-fades; use its props.
 - Hand-written `opacity` transitions or `height` animations for a state swap → Crossfade owns both, with tokens and reduced motion.
 
 ## Related
 - **Built from:** —
-- **See also:** [DataTable](../data-table/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), [Banner](../banner/COMPONENT.md)
+- **See also:** [Skeleton](../skeleton/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), [Banner](../banner/COMPONENT.md)

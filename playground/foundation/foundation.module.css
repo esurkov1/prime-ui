@@ -664,6 +664,36 @@
   gap: var(--prime-space-3);
 }
 
+/* State swap demo: data rows and their skeletons share one row geometry. */
+.swapList {
+  display: grid;
+  max-width: calc(var(--prime-space-24) * 5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swapRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-4);
+  padding-block: var(--prime-space-3);
+  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
+}
+
+.swapRow:last-child {
+  border-bottom: 0;
+}
+
+.swapName {
+  width: 55%;
+}
+
+.swapAmount {
+  width: 20%;
+}
+
 /* --- Focus --------------------------------------------------------------------- */
 
 .focusDemo {

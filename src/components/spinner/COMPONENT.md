@@ -6,13 +6,14 @@
 > An indeterminate loading indicator: a ring with a gap that turns while a request runs.
 
 ## When to use
-- A region, panel or list is loading and the progress is unknown.
+- A region is busy and has no content shape to hold (a running job, a request with no layout yet).
 - A status line next to text («Загружаем счета…»).
 - Inside a kit component that shows loading (it is the kit's one spinner).
 
 ## When not to use
 - The progress is known (upload, steps, quota) → use [ProgressBar](../progress-bar/COMPONENT.md) or [ProgressCircle](../progress-circle/COMPONENT.md).
 - A button waiting for its request → set `loading` on [Button](../button/COMPONENT.md); it places the spinner itself.
+- Content of a known shape is loading (a list, a card, a form) → [Skeleton](../skeleton/COMPONENT.md) of that shape inside [Crossfade](../crossfade/COMPONENT.md).
 - A table loading its rows → `loading` on [DataTable](../data-table/COMPONENT.md) (skeleton rows keep the layout).
 - A whole page failed to load → [EmptyPage](../empty-page/COMPONENT.md) with a retry action.
 
@@ -108,4 +109,4 @@ No keyboard interaction.
 
 ## Related
 - **Built from:** —
-- **See also:** [ProgressBar](../progress-bar/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md), [Button](../button/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)
+- **See also:** [Skeleton](../skeleton/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md), [Button](../button/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)

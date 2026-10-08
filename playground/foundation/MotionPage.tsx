@@ -2,7 +2,9 @@ import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
+import { Crossfade } from "@/components/crossfade/Crossfade";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
+import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Typography } from "@/components/typography/Typography";
 import { Icon } from "@/icons";
 
@@ -315,6 +317,64 @@ function PressDemo() {
   );
 }
 
+const SWAP_ROWS = [
+  { id: "granit", name: "ООО «Гранит»", amount: "₽ 94 750" },
+  { id: "orlov", name: "ИП Орлов Д. С.", amount: "₽ 18 000" },
+  { id: "alfa", name: "АО «Альфа Медиа»", amount: "₽ 380 000" },
+];
+
+const SWAP_LOAD_MS = 1500;
+
+function StateSwapDemo() {
+  const [loading, setLoading] = React.useState(false);
+  React.useEffect(() => {
+    if (!loading) return;
+    const id = window.setTimeout(() => setLoading(false), SWAP_LOAD_MS);
+    return () => window.clearTimeout(id);
+  }, [loading]);
+
+  return (
+    <Panel className={s.motionPanel}>
+      <div className={s.motionHead}>
+        <Note>
+          Загрузка — Skeleton той же геометрии, что и данные; Crossfade растворяет одно в другом.
+          Страница под блоком не сдвигается.
+        </Note>
+        <Button.Root
+          size="s"
+          variant="soft"
+          tone="neutral"
+          disabled={loading}
+          onClick={() => setLoading(true)}
+        >
+          Загрузить снова
+        </Button.Root>
+      </div>
+      <Crossfade state={loading ? "loading" : "ready"} aria-busy={loading}>
+        <ul className={s.swapList}>
+          {SWAP_ROWS.map((row) =>
+            loading ? (
+              <li key={row.id} className={s.swapRow}>
+                <Skeleton className={s.swapName} />
+                <Skeleton className={s.swapAmount} />
+              </li>
+            ) : (
+              <li key={row.id} className={s.swapRow}>
+                <Typography as="span" variant="body-m">
+                  {row.name}
+                </Typography>
+                <Typography as="span" variant="body-m">
+                  {row.amount}
+                </Typography>
+              </li>
+            ),
+          )}
+        </ul>
+      </Crossfade>
+    </Panel>
+  );
+}
+
 export default function MotionPage() {
   const reduced = useReducedMotion();
   return (
@@ -350,6 +410,28 @@ export default function MotionPage() {
 
       <DocBlock title="Нажатие">
         <PressDemo />
+      </DocBlock>
+
+      <DocBlock
+        title="Смена состояний"
+        description="Приложение на ките не переключает состояния, а перетекает между ними. Контролы доезжают до нового состояния; любая область, которая меняет содержимое — загрузка → данные → пусто → ошибка, одна запись → другая, — оборачивается в Crossfade, а пока грузится, показывает Skeleton в форме будущих данных. Так строится каждый экран, а не только заметные блоки."
+      >
+        <StateSwapDemo />
+        <DocList>
+          <li>
+            Область с состояниями — <code>{"<Crossfade state={status}>"}</code>, никогда не{" "}
+            <code>{"{loading ? <A /> : <B />}"}</code>.
+          </li>
+          <li>
+            Загрузка — Skeleton с геометрией данных: те же строки, отступы и высоты. Spinner —
+            только там, где нечего держать (кнопка, фоновая задача).
+          </li>
+          <li>
+            При обновлении уже показанные данные остаются на месте, а область получает{" "}
+            <code>aria-busy</code>. Обратно в Skeleton их не возвращают.
+          </li>
+          <li>DataTable делает всё это сам: свойства loading, empty и error.</li>
+        </DocList>
       </DocBlock>
 
       <DocBlock

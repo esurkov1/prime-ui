@@ -14,7 +14,7 @@
 ## When not to use
 - A message about the page while data is present → use [Banner](../banner/COMPONENT.md).
 - A transient result of an action → use [Notification](../notification/COMPONENT.md).
-- Loading in progress → show [Spinner](../spinner/COMPONENT.md) or skeleton rows, not an empty state.
+- Loading in progress → a [Skeleton](../skeleton/COMPONENT.md) of the content (a [Spinner](../spinner/COMPONENT.md) when there is no shape to hold), not an empty state; [Crossfade](../crossfade/COMPONENT.md) swaps it for the data or the empty state.
 
 ## Import
 ```tsx

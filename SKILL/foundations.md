@@ -130,3 +130,12 @@ or override them. Own custom elements follow the same rules: `--prime-motion-dur
 `--prime-motion-easing-standard|enter|exit` only; animate `transform`/`opacity`, never `transition: all`,
 never `ease-in`; press `scale(0.98)`; no movement on keyboard-driven or frequent actions; exit never slower
 than enter.
+
+## 11. State changes are continuous (§1.7)
+
+Nothing on screen flips from one state to another. Kit controls already move into their new state.
+Every region you build that changes what it shows — loading → data → empty → error, one record →
+another — renders its content inside `<Crossfade state={status}>`: the old state fades out, the new
+one fades in, the height glides. The loading state is a `<Skeleton>` in the data's geometry (same
+rows, gaps and line heights), so the swap moves nothing; a `Spinner` only where there is no shape to
+hold. Data already on screen stays during a refresh (`aria-busy`), it does not go back to a skeleton.

@@ -184,7 +184,7 @@ export default function CompositionPage() {
           </li>
           <li>
             {renderInlineCode(
-              "У каждого блока данных три состояния: загрузка (`loading` / `Spinner`), пусто (`empty` / `EmptyPage`), ошибка (`error` / `Banner`). Раскладка при этом не прыгает.",
+              "У каждого блока данных три состояния: загрузка (`loading` / `Skeleton` в форме данных), пусто (`empty` / `EmptyPage`), ошибка (`error` / `Banner`). Состояния перетекают друг в друга через `Crossfade` — раскладка не прыгает.",
             )}
           </li>
           <li>

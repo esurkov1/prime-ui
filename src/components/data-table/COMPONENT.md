@@ -241,5 +241,5 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - `paging="none"` for hundreds of rows → use `pages` or `infinite`.
 
 ## Related
-- **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)
+- **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier)
 - **See also:** [SmartFilter](../smart-filter/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md)

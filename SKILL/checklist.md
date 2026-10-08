@@ -49,6 +49,8 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] Disabled controls use `disabled`; async actions use `loading` (no hand-made spinners).
 - [ ] Fields show `hint` and `error` (with `invalid`), `required` / `optional` marked.
 - [ ] Data blocks have loading, empty and error states (DataTable `loading` / `empty` / `error`, EmptyPage).
+- [ ] Every region swaps its states through `Crossfade` (nothing flips, the page below does not jump);
+      loading is a `Skeleton` in the data's geometry, a `Spinner` only where there is no shape to hold.
 - [ ] Destructive irreversible actions confirm in a Modal; results of submitted actions show a Notification
       (instant toggles show one only on failure).
 - [ ] No hand-written animation on kit parts; custom motion uses motion tokens, `transform`/`opacity` only.

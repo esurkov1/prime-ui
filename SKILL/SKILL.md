@@ -14,7 +14,8 @@ description: >
 You build screens only from kit components and `--prime-*` tokens, on the kit's own page skeleton.
 Every visually repeated element is one component. The goal: a screen that looks as if the kit's author
 polished it for weeks — one rhythm, one size, one primary action, fill instead of lines, a state for
-every region.
+every region, and states that flow into each other instead of flipping (`Crossfade` around every
+region, `Skeleton` while it loads).
 
 ## How to use this skill
 

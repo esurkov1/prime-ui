@@ -6,7 +6,7 @@ Read the cheatsheet first, then the skill entry point. Never guess a prop: if a 
 
 ## Start here
 
-- [Cheatsheet](https://github.com/esurkov1/prime-ui/blob/main/SKILL/cheatsheet.md): one page of "do this, not that" lines with the exact API — setup, size, structure, fields, state, icons, buttons, cards, tables, overlays, states, Sidebar, spacing, anti-slop top 10
+- [Cheatsheet](https://github.com/esurkov1/prime-ui/blob/main/SKILL/cheatsheet.md): one page of "do this, not that" lines with the exact API — setup, size, structure, fields, state, icons, buttons, cards, tables, overlays, states, Sidebar, spacing, anti-slop top 11
 - [Skill entry point](https://github.com/esurkov1/prime-ui/blob/main/SKILL/SKILL.md): how to use the skill, app setup, the ten rules, which file to read when
 
 ## Choosing and composing

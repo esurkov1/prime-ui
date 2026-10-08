@@ -10,7 +10,7 @@ export const page: ComponentPageConfig = {
     summary: "Пустое состояние страницы или блока",
     keywords: ["пусто", "пустое состояние", "empty state"],
     icon: Inbox,
-    order: 6,
+    order: 7,
   },
   dir: "empty-page",
   title: "EmptyPage",

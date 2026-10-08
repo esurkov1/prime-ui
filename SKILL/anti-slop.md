@@ -109,7 +109,8 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 | `<a className={styles.link}>` | `<LinkButton href="…">` |
 | a list of `<button>`s for navigation | `Sidebar.Item href`, `Tabs.Item` |
 | `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton` |
-| a hand-built spinner, shimmer or «Loading…» text | `loading` on Button / Select / DataTable, otherwise `Spinner` |
+| a hand-built spinner, shimmer, grey placeholder box or «Loading…» text | `loading` on Button / Select / DataTable; a region: `Skeleton` of its content inside `Crossfade`; no shape to hold: `Spinner` |
+| `{loading ? <Spinner /> : <List />}` — a state that flips | `<Crossfade state={status}>` around the region, `Skeleton` while loading |
 | a search Input + a row of filter Selects above a table | `SmartFilter` in the DataTable `toolbar` |
 
 ## 7a. Fighting the table

@@ -1,4 +1,4 @@
-/** Screen states: a page-level error in a Banner with a retry, a region loading with a Spinner and table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states. */
+/** Screen states: a page-level error in a Banner with a retry, a region loading with a Skeleton of its rows and a table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states. */
 import {
   Banner,
   Button,
@@ -9,7 +9,7 @@ import {
   EmptyPage,
   Icon,
   PageContent,
-  Spinner,
+  Skeleton,
   Typography,
   useNotifications,
 } from "prime-ui-kit";
@@ -105,9 +105,15 @@ export default function ScreenStatesPattern() {
               {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
               <Crossfade state={status === "loading" ? "loading" : "ready"}>
                 {status === "loading" ? (
-                  <div className={styles.loading}>
-                    <Spinner aria-hidden="true" />
-                  </div>
+                  <ul className={styles.accounts}>
+                    {ACCOUNTS.map((account) => (
+                      <li key={account.name} className={styles.account}>
+                        <Skeleton className={styles.nameBar} />
+                        {/* title-m is the l text tier: 16 / 24. */}
+                        <Skeleton size="l" className={styles.balanceBar} />
+                      </li>
+                    ))}
+                  </ul>
                 ) : (
                   <ul className={styles.accounts}>
                     {ACCOUNTS.map((account) => (

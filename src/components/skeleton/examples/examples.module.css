@@ -1,0 +1,89 @@
+/* Layout of the Skeleton scenarios: semantic tokens only. */
+
+.card {
+  width: min(100%, calc(var(--prime-space-24) * 3.5));
+}
+
+.content {
+  display: grid;
+  gap: var(--prime-space-4);
+}
+
+.cover {
+  height: calc(var(--prime-space-24) + var(--prime-space-12));
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+.form {
+  display: grid;
+  gap: var(--prime-space-5);
+  width: min(100%, calc(var(--prime-space-24) * 4));
+}
+
+.field {
+  display: grid;
+  gap: var(--prime-space-2);
+}
+
+/* A label is shorter than its field. */
+.label {
+  width: 40%;
+}
+
+/* The placeholder of the submit button: a button, not a full-width field. */
+.button {
+  width: calc(var(--prime-space-24) + var(--prime-space-8));
+}
+
+.stack {
+  display: grid;
+  justify-items: start;
+  gap: var(--prime-space-4);
+  width: min(100%, calc(var(--prime-space-24) * 5));
+}
+
+.stack > * {
+  justify-self: stretch;
+}
+
+.stack > :first-child {
+  justify-self: start;
+}
+
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Data rows and their placeholders share one row geometry, so the swap does not move anything. */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-4);
+  padding-block: var(--prime-space-3);
+  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.payer {
+  width: 55%;
+}
+
+.amount {
+  width: 20%;
+}
+
+.sum {
+  font-variant-numeric: tabular-nums;
+}

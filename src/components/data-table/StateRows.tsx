@@ -1,6 +1,7 @@
 import type * as React from "react";
 
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
+import { Skeleton } from "@/components/skeleton/Skeleton";
 import { cx } from "@/internal/cx";
 import type { ControlSize } from "@/internal/states";
 
@@ -67,7 +68,7 @@ export function StateRows<Row>({
     <tr key={rowIndex} className={cx(styles.row, styles.skeletonRow)} data-skeleton="true">
       {selectable ? (
         <td className={cx(styles.cell, styles.selectCell)}>
-          <span className={styles.skeleton} aria-hidden="true" />
+          <Skeleton shape="block" className={styles.skeletonChoice} />
         </td>
       ) : null}
       {expandEnabled ? <td className={cx(styles.cell, styles.toggleCell)} /> : null}
@@ -78,7 +79,7 @@ export function StateRows<Row>({
           style={columnSizeStyle(column)}
           data-align={columnAlign(column)}
         >
-          <span className={styles.skeleton} aria-hidden="true" />
+          <Skeleton className={styles.skeleton} />
         </td>
       ))}
     </tr>

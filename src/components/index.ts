@@ -337,6 +337,8 @@ export type {
   SelectValueProps,
 } from "./select/Select";
 export { Select } from "./select/Select";
+export type { SkeletonProps, SkeletonShape } from "./skeleton/Skeleton";
+export { Skeleton } from "./skeleton/Skeleton";
 export type { SliderLabels, SliderProps } from "./slider/Slider";
 export { Slider } from "./slider/Slider";
 export type {

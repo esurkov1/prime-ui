@@ -22,7 +22,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 ## Structure
 
 - Components with parts render through `.Root` + parts: `<Button.Root>`, `<Modal.Root>` — `<Button>` and `<Modal>` are not components.
-- Leaves are single exports with no `.Root`: `<Typography>`, `<Divider />`, `<Spinner />`, `<Kbd>`, `<LinkButton>`, `<DataTable>`, `<Pagination>`, `<ProgressBar>` — not `<Typography.Root>`.
+- Leaves are single exports with no `.Root`: `<Typography>`, `<Divider />`, `<Spinner />`, `<Skeleton />`, `<Kbd>`, `<LinkButton>`, `<DataTable>`, `<Pagination>`, `<ProgressBar>` — not `<Typography.Root>`.
 - Data-driven components take data as props: `DataTable columns rows`, `SmartFilter.Root fields`, `TagSelect options`, `ProgressBar segments` — not mapped child parts.
 
 ## Fields
@@ -78,12 +78,16 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Never a hand-made `div` backdrop, dialog, menu or tooltip.
 - While a request runs: `closeOnEscape={false}`, `<Modal.Header showClose={false}>`, Cancel disabled.
 
-## Empty, loading, error
+## Empty, loading, error — states flow, they never flip
 
+State change is continuous in the whole kit: every region that changes what it shows cross-fades, and loading holds the shape of what is coming.
+
+- Every region with loading / data / empty / error (or one record at a time): its content in `<Crossfade state={status} aria-busy={status === "loading"}>` — not `{loading ? <A /> : <B />}` that flips and makes the page jump. DataTable does this itself.
+- Region loading: `<Skeleton>` in the geometry of the data — same rows, same gaps (`<Skeleton />` for a text line, `shape="circle"` for an avatar, `shape="control"` for a field, `shape="block"` for an image or chart) — not a spinner in an empty card, not a grey box or shimmer you draw.
+- `Spinner` only where there is no shape to hold (a running job, a status line); a busy button is `<Button.Root loading>`.
+- Refreshing data already on screen: keep it, set `aria-busy` — not back to a skeleton on every refetch.
 - Table states in place: `loading` (+ `loadingRows`), `empty`, `error` on `DataTable` — the head and toolbar stay.
 - First run of a page or region: `EmptyPage.Root` + `EmptyPage.Icon` + `EmptyPage.Title` + `EmptyPage.Description` + `EmptyPage.Actions` with one action — not «Здесь пока ничего нет».
-- Region loading: `aria-busy` on the region + `<Spinner aria-hidden="true" />` in place — not a skeleton or shimmer you draw.
-- A region that switches between loading, data, empty and error: its content in `<Crossfade state={status}>` — the states fade into each other and the height glides; not an instant swap that makes the page jump. DataTable does this itself.
 - Page-level persistent problem: `<Banner.Root tone="danger">` first in `PageContent.Body`; the result of an action: `useNotifications().notify({ tone, title })`.
 
 ## Sidebar
@@ -99,7 +103,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Tokens only: `var(--prime-space-4)`, `var(--prime-color-text-secondary)`, `var(--prime-radius-m)` — never raw `px` / `rem` / hex, never `--prime-ref-*`, never inline `style`.
 - Text through `Typography` roles (`title-m`, `title-s`, `body-m`, `caption`) and `tone="secondary" | "muted"` — not `font-size` or `color` in CSS.
 
-## Anti-slop top 10
+## Anti-slop top 11
 
 1. One component per look: two statuses are two `Badge.Root`s, never a Badge and a styled `span`.
 2. No card around everything, no card in a card, no card around a table.
@@ -109,8 +113,9 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 6. Three levels of air (inside an item, between items, between blocks) — not one gap for the page.
 7. No emoji, no icon next to every label, no gradients, glows or colored section backgrounds.
 8. No subtitle that repeats the title, no filler copy; an empty state says what to do and gives the action.
-9. No hand-made overlays, spinners, dividers, badges or filter bars — the kit has each.
-10. No overrides of kit internals (`.form :global(button)`); a part's `className` is for placement only.
+9. No hand-made overlays, spinners, skeletons, dividers, badges or filter bars — the kit has each.
+10. No state that flips: every region swaps through `Crossfade`, loading is a `Skeleton` of the content.
+11. No overrides of kit internals (`.form :global(button)`); a part's `className` is for placement only.
 
 ## Two snippets to copy
 

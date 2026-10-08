@@ -11,7 +11,7 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload, LoginForm (sign-in screens) |
 | pick from options, toggle, set a range, date or color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorPicker, ColorSwatches |
 | see data: status, labels, people, objects, numbers, rows, events | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DataTable, Timeline, CodeBlock |
-| learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, ProgressCircle, Spinner, EmptyPage, Crossfade |
+| learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, EmptyPage, Crossfade |
 | move between views, places, steps | Navigation — Tabs, Breadcrumb, Pagination, Stepper |
 | see something on top of the page | Overlays — Tooltip, Popover, Dropdown, Modal, Drawer, CommandMenu |
 | get the app frame and page structure | Layout — AppShell, Sidebar, PageContent, Accordion, Divider, ScrollContainer, Dnd |
@@ -55,8 +55,12 @@ Chronological events → Timeline. Code → CodeBlock.
 **Feedback.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →
 ProgressBar `segments`; compact goal / KPI ring or a ring breakdown → ProgressCircle (`value` or
 `segments`). Loading with unknown progress → `loading` on the component that has it (Button, Select,
-DataTable), otherwise Spinner. Nothing to show → EmptyPage. A region switching between loading, data,
-empty and error → its content in `Crossfade state={status}` (DataTable's body cross-fades by itself).
+DataTable); a region whose content has a shape (list, card, form) → Skeleton of that shape; nothing
+to hold (a running job, a status line) → Spinner. Nothing to show → EmptyPage.
+
+**State changes (a foundation of the kit, foundation §1 rule 7).** A region never flips between states: any region switching between
+loading, data, empty and error, or showing one record at a time → its content in
+`Crossfade state={status}`, with a Skeleton as the loading state (DataTable's body does both by itself).
 
 **Overlays.** See the pairs below. Global search over commands and pages (⌘K) → CommandMenu.
 

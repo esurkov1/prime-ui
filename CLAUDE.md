@@ -51,6 +51,11 @@ bun run verify:docs         # docs:build shows no diff
   enter/exit of parts, loading — or consciously still (high-frequency, keyboard). Tokens only,
   `transform`/`opacity` (+ color/fill/shadow for state), no `transition: all`, no `ease-in`, both
   directions, reduced motion honoured. One-shot appearance of parts uses `src/internal/enterMotion`.
+- State changes are continuous — a foundation of the kit (foundation §1 rule 7). Nothing flips: a
+  control moves into its new state; a region that changes what it shows (loading / data / empty /
+  error, another record) cross-fades and glides its height (`Crossfade`, or `useStateSwap` +
+  `swapMotion` inside a component); a loading region is a `Skeleton` in the data's geometry. Every
+  component with region states and every example or pattern that loads follows this.
 - A11y minimum: every interactive component works from the keyboard, has explicit ARIA, a visible focus
   ring in both themes, never conveys meaning by color alone, and has keyboard tests.
 - Shared internal classes are joined in TSX (`cx(fieldTierClass, styles.root)`), not chained through
@@ -144,7 +149,8 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | Need | Use |
 |---|---|
 | a button (close, clear, nav arrow, retry, icon button) | `Button` (`variant="ghost"`, `Button.Icon`), `LinkButton` for links (`asChild` + `<button>` for an inline action in text) |
-| a loading indicator | `Spinner` (Button / Select `loading` place it themselves) |
+| a loading placeholder (rows, lines, avatar, field, block) | `Skeleton` (`shape`, `size` from the host tier, `lines`) — never a grey box with own keyframes |
+| a loading indicator with no shape to hold | `Spinner` (Button / Select `loading` place it themselves) |
 | a checkbox look inside an option or menu row | `Checkbox.Indicator` (no input; the row carries `aria-selected` / `aria-checked`) |
 | an icon, chevron, check, sort arrow, status glyph | `<Icon name="…" />` from `src/icons` (a new glyph goes into the registry; `createIcon` makes a standalone icon) — never inline `<svg>` or direct `lucide-react` in components |
 | a palette hue (`color` prop) | `src/internal/palette.module.css`: `.hue` on the element with `data-color`, CSS reads `--hue-soft` / `--hue-text` / `--hue-solid` / `--hue-solid-fg` — never a local `[data-color]` map |
@@ -166,7 +172,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a table, pagination, row selection | `DataTable`, `Pagination`, `Checkbox` |
 | screen-reader-only text | `src/internal/VisuallyHidden` |
 | appearance of a part | `src/internal/enterMotion.module.css` (`.enter`, `.enterBase`) |
-| a swap between states of a region (loading / data / empty / error) | `Crossfade` (public) or `useStateSwap` + `src/internal/swapMotion.module.css` inside a component (DataTable) |
+| a swap between states of a region (loading / data / empty / error) | `Crossfade` (public) or `useStateSwap` + `src/internal/swapMotion.module.css` inside a component (DataTable); loading state is a `Skeleton` |
 | an action on a coloured host (solid Banner) | `Button` `tone="inherit"` (ghost / soft / outline) — never a host CSS override |
 | overlay stack, dismiss, focus | `src/internal/overlay/layerStack.ts` (`useLayer`, `LayerProvider`; one stack, reasons `escape` / `outside` / `scrim`), `overlay/focus.ts`; modal layers `useModalLayer` + `useInertSiblings` + `useScrollLock`; one z-index `--prime-z-overlay` |
 | an anchored floating panel (Popover, Dropdown, Tooltip, Select) | `src/internal/overlay/useFloatingLayer` + `FloatingPanel` / `FloatingTrigger`; menu groups `src/internal/MenuGroup` |
@@ -264,7 +270,7 @@ export const page: ComponentPageConfig = {
 - **Kind** (the shape of the component, not its sidebar category): `primitive` · `control` · `field` ·
   `overlay` · `navigation` · `composite` · `layout` (primitive — Button, LinkButton, Badge, Avatar,
   Thumbnail, Kbd, Divider, Label, Hint, Typography, CodeBlock, ProgressBar, ProgressCircle, Spinner,
-  Banner; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup;
+  Skeleton, Banner; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup;
   field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
   FileUpload; overlay — Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu,
   Notification; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable,

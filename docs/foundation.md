@@ -18,6 +18,11 @@ The design contract for every component. Tokens live in `tokens/` and are genera
    perfectly in a row (Button, Input, Select, Datepicker trigger, SegmentedControl, Tabs).
 5. **Nested radius = outer radius − padding.** Panel 12 with padding 4 → items 8.
 6. **Air is hierarchy.** Important content gets more space; secondary content is grouped tighter.
+7. **State changes are continuous.** Nothing on screen flips from one state to another. Controls move
+   into their new state (§7 Motion, rule 8); a region that changes what it shows — loading → data →
+   empty → error, one record → another — cross-fades and glides to its new height (`Crossfade`). A
+   loading region holds the shape of what is coming (`Skeleton` with the data's geometry), so the
+   swap moves nothing. This holds for every region of every screen, not only for prominent ones.
 
 ## 2. Token layers and naming
 
@@ -216,7 +221,9 @@ Every component is designed with its micro-animations, not only its static state
    (Drawer, sheet, Notification stack) travel from that edge and leave toward it.
 8. **State moves, it does not swap.** Checkmark draws/scales in, switch thumb slides, selection indicator
    (tabs, segmented control) glides to the new item, chevrons rotate, progress fills, counters and fills
-   ease. Two states cross-fade rather than flip when they replace each other in place.
+   ease. Two states cross-fade rather than flip when they replace each other in place: a region
+   swapping its content uses `Crossfade` (inside a component: `useStateSwap` + `swapMotion`), and its
+   loading state is a `Skeleton` of the coming content (principle 7).
 9. **Interruptible.** Toggled state uses CSS transitions (retarget mid-flight), not keyframes. Keyframes only
    for one-shot enter/exit (overlay presence, spinner, skeleton).
 10. **Hover is for pointers.** Hover transforms/lifts only inside `@media (hover: hover) and (pointer: fine)`;
@@ -239,9 +246,10 @@ should stay still, and say so in a CSS comment only when the omission is non-obv
 | focus-visible | the focus ring (§7) |
 | selected | `accent-soft` bg + `accent-text`, or check icon in `accent-text` |
 | disabled | `fill-muted`/`field-bg-disabled` bg, `text-disabled` color, no shadow, `cursor: not-allowed` |
-| loading | spinner replaces leading icon, label stays, width does not change, `aria-busy` |
+| loading (control) | spinner replaces leading icon, label stays, width does not change, `aria-busy` |
+| loading (region) | `Skeleton` in the data's geometry inside `Crossfade`, `aria-busy` on the region; data already shown stays during a refresh |
 | error | `danger-border` inset ring + `danger-text` message; layout does not shift (support row reserves height when the component asks for it) |
-| empty | centered muted text in `body-s`, optional action |
+| empty | centered muted text in `body-s`, optional action; reached through `Crossfade` like every region state |
 
 ### Overlay contract
 

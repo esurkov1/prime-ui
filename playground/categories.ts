@@ -8,7 +8,7 @@
  * - **inputs** — typing values and field anatomy (input, textarea, upload, label, hint).
  * - **selection** — choosing from options (toggles, lists, slider, date and color pickers).
  * - **data-display** — labels and data (badge, tag, avatar, card, table, timeline, code).
- * - **feedback** — system messages, progress and empty states.
+ * - **feedback** — system messages, progress, loading placeholders and empty states.
  * - **navigation** — moving between views, places and steps.
  * - **overlays** — floating layers, from tooltip to modal surfaces.
  * - **layout** — app frame, page regions, disclosure, dividers, scrolling.

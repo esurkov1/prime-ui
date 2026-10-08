@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 56 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 57 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines; a strict 4px grid; one size axis
@@ -19,6 +19,10 @@ every screen you build looks like it was drawn by the same hand.
   for leaves (`<Kbd>`, `<Divider>`), state in `data-*`.
 - **Built from itself.** Components reuse the kit's own Button, Badge, Spinner, Icon, Checkbox,
   EmptyPage and ScrollContainer instead of private copies, so a fix in one place lands everywhere.
+- **States flow, they never flip.** Controls move into their new state; a region that switches
+  between loading, data, empty and error cross-fades and glides to its new height (`Crossfade`),
+  and while it loads a `Skeleton` holds the shape of the coming content — so nothing on the page
+  jumps.
 - **Overlays that behave.** Modal, Drawer, Popover, Dropdown, Select, Tooltip and CommandMenu share
   one stack: one click or one Escape closes exactly the topmost layer, focus goes where it should.
 - **Accessible by default.** Keyboard support, ARIA roles, Russian default strings for every system
@@ -211,6 +215,7 @@ accessibility, examples and common mistakes.
 | [**ProgressBar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-bar/COMPONENT.md) | Linear progress: one value on a native `<progress>`, or `segments` that split a whole (storage by type, task statuses), with a label, a percentage and status colors. |
 | [**ProgressCircle**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) | Circular progress — the ring version of ProgressBar: one value or `segments` that split a whole, with status colors and optional content in the center. |
 | [**Spinner**](https://github.com/esurkov1/prime-ui/blob/main/src/components/spinner/COMPONENT.md) | An indeterminate loading indicator: a ring with a gap that turns while a request runs. |
+| [**Skeleton**](https://github.com/esurkov1/prime-ui/blob/main/src/components/skeleton/COMPONENT.md) | A placeholder in the shape of the content that is loading — text lines, a control, an avatar, a block — so the layout is in place before the data arrives. |
 | [**Crossfade**](https://github.com/esurkov1/prime-ui/blob/main/src/components/crossfade/COMPONENT.md) | A region that cross-fades between its states (loading → data → empty → error) and glides to the new height, so the page below does not jump. |
 | [**EmptyPage**](https://github.com/esurkov1/prime-ui/blob/main/src/components/empty-page/COMPONENT.md) | Empty state of a page or a block: icon, title, explanation and an action. |
 

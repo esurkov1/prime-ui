@@ -7,11 +7,13 @@
   gap: var(--prime-space-4);
 }
 
-/* The spinner takes the place of the content, so the card does not jump when data arrives. */
-.loading {
-  display: grid;
-  place-items: center;
-  min-height: calc(var(--prime-space-16) * 2);
+/* Skeleton rows mirror the account rows, so the card keeps its height when data arrives. */
+.nameBar {
+  width: 50%;
+}
+
+.balanceBar {
+  width: 35%;
 }
 
 /* The card stretches to its neighbour's height: rows stay at the top. */

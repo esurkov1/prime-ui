@@ -1,0 +1,122 @@
+/*
+ * Skeleton — a placeholder in the shape of loading content (foundation §1 rule 7, §7 rule 8).
+ * Geometry comes from the tier tokens, so a placeholder takes exactly the room of what replaces it:
+ * text lines use the control text size and line height, `control` the control height and radius,
+ * `circle` the avatar size. Motion: a slow opacity pulse (keyframes are allowed for a skeleton,
+ * foundation §7 rule 9); under reduced motion it stands still.
+ */
+.root {
+  --sk-fill: var(--prime-color-fill-muted);
+
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  animation: primeSkeletonPulse calc(var(--prime-motion-duration-slow) * 5)
+    var(--prime-motion-easing-standard) infinite alternate;
+  pointer-events: none;
+}
+
+.root[data-size="xs"] {
+  --sk-text: var(--prime-control-xs-text-size);
+  --sk-line: var(--prime-control-xs-line-height);
+  --sk-control: var(--prime-control-xs-height);
+  --sk-radius: var(--prime-control-xs-radius);
+  --sk-avatar: var(--prime-avatar-xs);
+}
+
+.root[data-size="s"] {
+  --sk-text: var(--prime-control-s-text-size);
+  --sk-line: var(--prime-control-s-line-height);
+  --sk-control: var(--prime-control-s-height);
+  --sk-radius: var(--prime-control-s-radius);
+  --sk-avatar: var(--prime-avatar-s);
+}
+
+.root[data-size="m"] {
+  --sk-text: var(--prime-control-m-text-size);
+  --sk-line: var(--prime-control-m-line-height);
+  --sk-control: var(--prime-control-m-height);
+  --sk-radius: var(--prime-control-m-radius);
+  --sk-avatar: var(--prime-avatar-m);
+}
+
+.root[data-size="l"] {
+  --sk-text: var(--prime-control-l-text-size);
+  --sk-line: var(--prime-control-l-line-height);
+  --sk-control: var(--prime-control-l-height);
+  --sk-radius: var(--prime-control-l-radius);
+  --sk-avatar: var(--prime-avatar-l);
+}
+
+.root[data-size="xl"] {
+  --sk-text: var(--prime-control-xl-text-size);
+  --sk-line: var(--prime-control-xl-line-height);
+  --sk-control: var(--prime-control-xl-height);
+  --sk-radius: var(--prime-control-xl-radius);
+  --sk-avatar: var(--prime-avatar-xl);
+}
+
+/*
+ * Shape geometry sits in `:where()` (zero specificity), so a consumer `className` always wins:
+ * the width of a line, the height of a block.
+ */
+
+/* Text: one line box per line, a rounded bar in the middle of each. */
+:where(.root[data-shape="text"]) {
+  width: 100%;
+}
+
+.line {
+  display: block;
+  box-sizing: border-box;
+  height: var(--sk-line);
+  padding-block: calc((var(--sk-line) - var(--sk-text) * 0.75) / 2);
+  border-radius: var(--prime-radius-full);
+  background: var(--sk-fill);
+  background-clip: content-box;
+}
+
+.line:last-child:not(:first-child) {
+  width: 60%;
+}
+
+:where(.root[data-shape="control"]) {
+  width: 100%;
+  height: var(--sk-control);
+  border-radius: var(--sk-radius);
+  background: var(--sk-fill);
+}
+
+:where(.root[data-shape="circle"]) {
+  flex: none;
+  width: var(--sk-avatar);
+  height: var(--sk-avatar);
+  border-radius: var(--prime-radius-full);
+  background: var(--sk-fill);
+}
+
+/* A box of any content: it fills its container; the container (or className) gives the size. */
+:where(.root[data-shape="block"]) {
+  width: 100%;
+  height: 100%;
+  min-height: var(--prime-space-16);
+  border-radius: var(--prime-radius-l);
+  background: var(--sk-fill);
+}
+
+@keyframes primeSkeletonPulse {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.4;
+  }
+}
+
+/* An endless pulse would freeze at an arbitrary frame once durations collapse: stand still. */
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    animation: none;
+  }
+}
