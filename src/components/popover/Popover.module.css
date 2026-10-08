@@ -109,8 +109,8 @@
   padding-block-start: var(--prime-space-1);
 }
 
-/* Narrow screen (320px): buttons stack full width, the primary one last. */
-@media (max-width: 479px) {
+/* Phones (below 640, where the popover is a bottom sheet): buttons stack full width, primary last. */
+@media (max-width: 639px) {
   .actions {
     flex-direction: column;
     align-items: stretch;

@@ -46,22 +46,10 @@ function rules(css: string): { prelude: string; parents: string[] }[] {
   return out;
 }
 
-/*
- * Files owned by the overlay work in progress; they gate hover and align breakpoints there.
- * Remove an entry once its file passes.
- */
-const PENDING_HOVER = new Set([
-  "components/dropdown/Dropdown.module.css",
-  "components/select/Select.module.css",
-  "components/tag-select/TagSelect.module.css",
-]);
-const PENDING_BREAKPOINTS = new Set(["components/popover/Popover.module.css"]);
-
 describe("touch and input", () => {
   it("styles :hover only for devices that hover", () => {
     const offenders: string[] = [];
     for (const file of files) {
-      if (PENDING_HOVER.has(rel(file))) continue;
       for (const { prelude, parents } of rules(readFileSync(file, "utf8"))) {
         if (!prelude.includes(":hover")) continue;
         if (parents.some((parent) => /^@media[^{]*\(hover:\s*hover\)/.test(parent))) continue;
@@ -75,7 +63,6 @@ describe("touch and input", () => {
     const allowed = new Set([640, 768, 1024, 1280]);
     const offenders: string[] = [];
     for (const file of files) {
-      if (PENDING_BREAKPOINTS.has(rel(file))) continue;
       for (const m of readFileSync(file, "utf8").matchAll(/@media[^{]*/g)) {
         for (const w of m[0].matchAll(/\((min|max)-width:\s*(\d+)px\)/g)) {
           // `max-width` is the last pixel below a breakpoint: `max-width: 639px`.

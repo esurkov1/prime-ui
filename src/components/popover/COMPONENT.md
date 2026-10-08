@@ -74,7 +74,7 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `className` and the other attributes of the panel. |
 
 ### Popover.Header · Popover.Title · Popover.Description · Popover.Actions
-`ref` → the element. `<div>` (title + description with a 4 px step) / `<h2>` (names the dialog) / `<p>` (describes it) / `<div>` (buttons at the end, stacked full width below 480 px). + native props.
+`ref` → the element. `<div>` (title + description with a 4 px step) / `<h2>` (names the dialog) / `<p>` (describes it) / `<div>` (buttons at the end, stacked full width on phones, below 640 px). + native props.
 
 ## Variants
 The panel has one look: `bg-raised` fill, `--prime-panel-radius`, `shadow-overlay`, no border. Fields inside get the surface field fill; cards inside become sunken tiles.
@@ -129,7 +129,7 @@ There is no `disabled` on Popover: a disabled trigger never opens it.
 - Width is `max-content` between `--prime-panel-min-width` and twice that, never wider than the viewport; give forms an explicit width with `className`.
 - Max height follows the free space on the resolved side; the panel scrolls inside.
 - Kept `--prime-space-2` from viewport edges; follows the trigger on scroll and resize.
-- Actions: at the end, `--prime-space-2` gap; below 480px they stack full width.
+- Actions: at the end, `--prime-space-2` gap; on phones (below 640px) they stack full width.
 
 ## Accessibility
 
