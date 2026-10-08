@@ -1,4 +1,3 @@
-import type { ColorChannel } from "@react-types/color";
 import * as React from "react";
 import {
   ColorArea as AriaColorArea,
@@ -27,12 +26,22 @@ import { cx } from "@/internal/cx";
 import type { FieldRootDomProps } from "@/internal/FieldFrame";
 import { fieldSurfaceClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
-import { SwatchFill } from "@/internal/swatch";
+import { SwatchChip } from "@/internal/swatch";
 
 import styles from "./ColorPicker.module.css";
 
 export type { Color as ColorPickerColorValue } from "react-aria-components";
 export type ColorValueFormat = "hsl" | "rgb" | "hex";
+
+declare global {
+  interface Window {
+    /** The EyeDropper API (Chromium); absent elsewhere. */
+    EyeDropper?: new () => { open: () => Promise<{ sRGBHex: string }> };
+  }
+}
+
+/** A color channel, from the React Aria types the kit already depends on. */
+type ColorChannel = AriaColorSliderProps["channel"];
 
 export type ColorPickerLabels = {
   /** `ColorPicker.FormatSelect` trigger. */
@@ -75,6 +84,7 @@ export type ColorPickerRootProps = {
 };
 
 export type ColorPickerHexInputProps = FieldRootDomProps & {
+  /** Tier. Default: the tier of the surrounding control (a panel, a popover), else `m`. */
   size?: ControlSize;
   label?: React.ReactNode;
   hint?: React.ReactNode;
@@ -86,12 +96,9 @@ export type ColorPickerHexInputProps = FieldRootDomProps & {
    * Turn it off only where focus is otherwise obvious; WCAG 2.4.7.
    */
   focusRing?: boolean;
-  className?: string;
 };
 
 export { parseColor };
-
-type EyeDropperCtor = new () => { open: () => Promise<{ sRGBHex: string }> };
 
 /**
  * Transparency checkerboard under the alpha track (token colors, 8px cells). Inline because it is
@@ -100,7 +107,7 @@ type EyeDropperCtor = new () => { open: () => Promise<{ sRGBHex: string }> };
 const CHECKER_BG =
   "repeating-conic-gradient(var(--prime-color-bg-surface) 0deg 90deg, var(--prime-color-fill-strong) 90deg 180deg) 0% 0% / var(--prime-space-2) var(--prime-space-2)";
 
-type ColorPickerCtx = NonNullable<React.ContextType<typeof ColorPickerStateContext>>;
+type ColorState = NonNullable<React.ContextType<typeof ColorPickerStateContext>>;
 
 type ChannelLabelKey = Extract<ColorChannel, keyof ColorPickerLabels>;
 
@@ -110,37 +117,64 @@ const [ColorPickerProvider, useColorPickerContext] = createComponentContext<{
   labels: ColorPickerLabels;
 }>("ColorPicker");
 
+/** The picker state; every part lives inside `ColorPicker.Root`, which provides it. */
+function useColorState(): ColorState {
+  const state = React.useContext(ColorPickerStateContext);
+  if (!state) throw new Error("ColorPicker parts must be used inside <ColorPicker.Root>.");
+  return state;
+}
+
 /** Hex text of the current color (`#rrggbb`, or `#rrggbbaa` with alpha). */
 function toHexText(color: Color) {
   return color.toString(color.getChannelValue("alpha") < 1 ? "hexa" : "hex");
 }
 
 /**
- * Draft text for a hex input bound to the picker state: re-syncs when the color changes
- * (unless the input is focused) and commits on blur / Enter, reverting invalid input.
+ * Draft text of an input bound to the picker color: re-syncs when the color changes (unless the
+ * input is focused) and commits on blur / Enter. `parse` returns the new color, or `null` for text
+ * it cannot read — the draft then reverts to the current color.
  */
-function useHexDraft(inputRef: React.RefObject<HTMLInputElement | null>) {
-  const state = React.useContext(ColorPickerStateContext);
-  const [text, setText] = React.useState(() => (state ? toHexText(state.color) : ""));
-  const fingerprint = state ? state.color.toString("hexa") : "";
+function useColorDraft(
+  read: (color: Color) => string,
+  parse: (text: string, color: Color) => Color | null,
+) {
+  const state = useColorState();
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [text, setText] = React.useState(() => read(state.color));
+  const fingerprint = state.color.toString("hexa");
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: the RAC state object is stable; the color change is tracked by its fingerprint
   React.useEffect(() => {
-    if (!state || (inputRef.current && document.activeElement === inputRef.current)) return;
-    setText(toHexText(state.color));
+    if (inputRef.current && document.activeElement === inputRef.current) return;
+    setText(read(state.color));
   }, [fingerprint]);
 
   const commit = () => {
-    if (!state) return;
-    try {
-      state.setColor(parseColor(text.trim()));
-    } catch {
-      setText(toHexText(state.color));
-    }
+    const next = parse(text.trim(), state.color);
+    if (next) state.setColor(next);
+    setText(read(next ?? state.color));
   };
 
-  return { state, text, setText, commit };
+  return { inputRef, text, setText, commit };
 }
+
+/** Enter commits the draft and leaves the field, like a blur. */
+function onCommitKeyDown(commit: () => void) {
+  return (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    commit();
+    event.currentTarget.blur();
+  };
+}
+
+const parseHex = (text: string): Color | null => {
+  try {
+    return parseColor(text);
+  } catch {
+    return null;
+  }
+};
 
 const FORMAT_LABELS: Record<ColorValueFormat, string> = { hsl: "HSL", rgb: "RGB", hex: "Hex" };
 
@@ -173,39 +207,26 @@ function FormatSelect({ className, ...rest }: ColorPickerFormatSelectProps) {
   );
 }
 
-function displayChannelValue(
-  color: ColorPickerCtx["color"],
-  channel: ColorChannel,
-  space: "hsl" | "rgb",
-) {
-  const c = color.toFormat(space);
-  const raw = c.getChannelValue(channel);
-  if (channel === "alpha") {
-    return String(Math.round(raw * 100));
-  }
-  return String(Math.round(raw));
+/** Channel value as shown in a cell: alpha in percent, the rest rounded in `space`. */
+function displayChannelValue(color: Color, channel: ColorChannel, space: "hsl" | "rgb") {
+  const raw = color.toFormat(space).getChannelValue(channel);
+  return String(Math.round(channel === "alpha" ? raw * 100 : raw));
 }
 
-function applyChannelValue(
-  state: ColorPickerCtx,
+/** The color with `channel` set from the typed text (clamped to the channel range), or `null`. */
+function parseChannelValue(
+  text: string,
+  color: Color,
   channel: ColorChannel,
   space: "hsl" | "rgb",
-  text: string,
-) {
-  const trimmed = text.trim().replace(",", ".");
-  const n = Number.parseFloat(trimmed);
-  if (Number.isNaN(n)) {
-    return;
-  }
-  if (channel === "alpha") {
-    const pct = Math.min(100, Math.max(0, n));
-    state.setColor(state.color.withChannelValue("alpha", pct / 100));
-    return;
-  }
-  const c = state.color.toFormat(space);
+): Color | null {
+  const n = Number.parseFloat(text.replace(",", "."));
+  if (Number.isNaN(n)) return null;
+  if (channel === "alpha")
+    return color.withChannelValue("alpha", Math.min(100, Math.max(0, n)) / 100);
+  const c = color.toFormat(space);
   const range = c.getChannelRange(channel);
-  const v = Math.min(range.maxValue, Math.max(range.minValue, n));
-  state.setColor(c.withChannelValue(channel, v));
+  return c.withChannelValue(channel, Math.min(range.maxValue, Math.max(range.minValue, n)));
 }
 
 function ChannelField({
@@ -218,32 +239,10 @@ function ChannelField({
   suffix: string;
 }) {
   const { labels } = useColorPickerContext();
-  const state = React.useContext(ColorPickerStateContext);
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const [text, setText] = React.useState(() =>
-    state ? displayChannelValue(state.color, channel, space) : "",
+  const { inputRef, text, setText, commit } = useColorDraft(
+    (color) => displayChannelValue(color, channel, space),
+    (value, color) => parseChannelValue(value, color, channel, space),
   );
-  const fingerprint = state ? state.color.toString("hexa") : "";
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the RAC state object is stable; the color change is tracked by its fingerprint
-  React.useEffect(() => {
-    if (!state) {
-      return;
-    }
-    if (inputRef.current && document.activeElement === inputRef.current) {
-      return;
-    }
-    setText(displayChannelValue(state.color, channel, space));
-  }, [fingerprint]);
-
-  if (!state) {
-    return null;
-  }
-
-  const commit = () => {
-    applyChannelValue(state, channel, space, text);
-    setText(displayChannelValue(state.color, channel, space));
-  };
 
   return (
     <label className={cx(fieldSurfaceClass, styles.channelCell)}>
@@ -255,13 +254,7 @@ function ChannelField({
         value={text}
         onBlur={commit}
         onChange={(e) => setText(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            commit();
-            inputRef.current?.blur();
-          }
-        }}
+        onKeyDown={onCommitKeyDown(commit)}
       />
       {suffix ? <span className={styles.channelSuffix}>{suffix}</span> : null}
     </label>
@@ -270,12 +263,7 @@ function ChannelField({
 
 function StripHexField() {
   const { labels } = useColorPickerContext();
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const { state, text, setText, commit } = useHexDraft(inputRef);
-
-  if (!state) {
-    return null;
-  }
+  const { inputRef, text, setText, commit } = useColorDraft(toHexText, parseHex);
 
   return (
     <label className={cx(fieldSurfaceClass, styles.channelCell, styles.channelCellHex)}>
@@ -289,13 +277,7 @@ function StripHexField() {
         value={text}
         onBlur={commit}
         onChange={(e) => setText(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            commit();
-            inputRef.current?.blur();
-          }
-        }}
+        onKeyDown={onCommitKeyDown(commit)}
       />
     </label>
   );
@@ -350,16 +332,13 @@ export type ColorPickerPanelProps = React.HTMLAttributes<HTMLDivElement> & {
    * `raised` — standalone floating panel: raised background, panel radius/padding, overlay shadow.
    */
   surface?: "none" | "raised";
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 /** Vertical stack for picker parts with the standard gap; optional raised surface. */
-const Panel = React.forwardRef<HTMLDivElement, ColorPickerPanelProps>(function Panel(
-  { surface = "none", className, ...rest },
-  ref,
-) {
-  return <div ref={ref} className={cx(styles.panel, className)} data-surface={surface} {...rest} />;
-});
-
+function Panel({ surface = "none", className, ...rest }: ColorPickerPanelProps) {
+  return <div className={cx(styles.panel, className)} data-surface={surface} {...rest} />;
+}
 Panel.displayName = "ColorPicker.Panel";
 
 function ColorPickerRoot({
@@ -470,8 +449,7 @@ export type ColorPickerSwatchesProps = Omit<
  * elsewhere moves the selection. The kit `ColorSwatches`, so presets carry names.
  */
 function Swatches(props: ColorPickerSwatchesProps) {
-  const state = React.useContext(ColorPickerStateContext);
-  if (!state) return null;
+  const state = useColorState();
   return (
     <ColorSwatches
       {...props}
@@ -480,6 +458,7 @@ function Swatches(props: ColorPickerSwatchesProps) {
     />
   );
 }
+Swatches.displayName = "ColorPicker.Swatches";
 
 export type ColorPickerSliderMetaProps = DivProps & {
   /** The channel name. */
@@ -496,31 +475,16 @@ function SliderMeta({ label, className, ...rest }: ColorPickerSliderMetaProps) {
   );
 }
 
-function HexInput({
-  size = "m",
-  label,
-  hint,
-  error,
-  focusRing = true,
-  className,
-  ...rest
-}: ColorPickerHexInputProps) {
+function HexInput({ label, hint, error, focusRing = true, ...rest }: ColorPickerHexInputProps) {
   const { labels } = useColorPickerContext();
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const { state, text, setText, commit } = useHexDraft(inputRef);
-
-  if (!state) {
-    return null;
-  }
+  const { inputRef, text, setText, commit } = useColorDraft(toHexText, parseHex);
 
   return (
     <Input.Root
       {...rest}
-      className={className}
       label={label ?? labels.hex}
       hint={hint}
       error={error}
-      size={size}
       focusRing={focusRing}
     >
       <Input.Wrapper>
@@ -532,93 +496,67 @@ function HexInput({
           value={text}
           onBlur={commit}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              commit();
-              (e.target as HTMLInputElement).blur();
-            }
-          }}
+          onKeyDown={onCommitKeyDown(commit)}
         />
       </Input.Wrapper>
     </Input.Root>
   );
 }
+HexInput.displayName = "ColorPicker.HexInput";
 
 export type ColorPickerEyeDropperButtonProps = Omit<
   React.ComponentPropsWithoutRef<typeof Button.Root>,
   "variant" | "tone" | "size" | "aria-label"
->;
+> & {
+  ref?: React.Ref<HTMLButtonElement>;
+};
 
 /**
  * Square soft button that opens the native EyeDropper (name: `labels.eyeDropper`). Without
  * browser support it renders disabled and hidden from assistive tech. Default icon: pipette.
  */
-const EyeDropperButton = React.forwardRef<HTMLButtonElement, ColorPickerEyeDropperButtonProps>(
-  function EyeDropperButton(
-    { children, onClick, type = "button", className, ...rest },
-    forwardedRef,
-  ) {
-    const { labels } = useColorPickerContext();
-    const state = React.useContext(ColorPickerStateContext);
-    const content = children ?? (
-      <Button.Icon>
-        <Icon name="action.eyedropper" />
-      </Button.Icon>
-    );
-    const EyeDropperApi =
-      typeof globalThis !== "undefined"
-        ? (globalThis as unknown as { EyeDropper?: EyeDropperCtor }).EyeDropper
-        : undefined;
+function EyeDropperButton({
+  children,
+  onClick,
+  type = "button",
+  className,
+  ref,
+  ...rest
+}: ColorPickerEyeDropperButtonProps) {
+  const { labels } = useColorPickerContext();
+  const state = useColorState();
+  const EyeDropperApi = typeof window === "undefined" ? undefined : window.EyeDropper;
+  const supported = EyeDropperApi !== undefined;
 
-    if (!state) {
-      return null;
-    }
-
-    if (!EyeDropperApi) {
-      return (
-        <Button.Root
-          variant="soft"
-          tone="neutral"
-          ref={forwardedRef}
-          aria-hidden
-          className={cx(styles.eyeDropperSquare, className)}
-          disabled
-          tabIndex={-1}
-          type={type}
-          {...rest}
-        >
-          {content}
-        </Button.Root>
-      );
-    }
-
-    return (
-      <Button.Root
-        variant="soft"
-        tone="neutral"
-        ref={forwardedRef}
-        type={type}
-        aria-label={labels.eyeDropper}
-        className={cx(styles.eyeDropperSquare, className)}
-        onClick={(e) => {
-          onClick?.(e);
-          if (e.defaultPrevented) {
-            return;
-          }
-          void new EyeDropperApi()
-            .open()
-            .then((result) => state.setColor(parseColor(result.sRGBHex)))
-            .catch(() => {});
-        }}
-        {...rest}
-      >
-        {content}
-      </Button.Root>
-    );
-  },
-);
-
+  return (
+    <Button.Root
+      variant="soft"
+      tone="neutral"
+      ref={ref}
+      type={type}
+      aria-label={labels.eyeDropper}
+      aria-hidden={supported ? undefined : true}
+      disabled={!supported}
+      tabIndex={supported ? undefined : -1}
+      className={cx(styles.eyeDropperSquare, className)}
+      onClick={(e) => {
+        onClick?.(e);
+        if (e.defaultPrevented || !EyeDropperApi) return;
+        void new EyeDropperApi()
+          .open()
+          .then((result) => state.setColor(parseColor(result.sRGBHex)))
+          .catch(() => {});
+      }}
+      {...rest}
+    >
+      {children ?? (
+        <Button.Icon>
+          <Icon name="action.eyedropper" />
+        </Button.Icon>
+      )}
+    </Button.Root>
+  );
+}
 EyeDropperButton.displayName = "ColorPicker.EyeDropperButton";
 
 export type ColorPickerTriggerSwatchProps = Omit<
@@ -629,17 +567,11 @@ export type ColorPickerTriggerSwatchProps = Omit<
 };
 
 /** Square of the current color, e.g. inside the popover trigger button. */
-function TriggerSwatch({ className, ...rest }: ColorPickerTriggerSwatchProps) {
-  const state = React.useContext(ColorPickerStateContext);
-  return (
-    <span {...rest} aria-hidden className={cx(styles.triggerSwatch, className)}>
-      <SwatchFill value={state ? state.color.toString("css") : null} />
-    </span>
-  );
+function TriggerSwatch(props: ColorPickerTriggerSwatchProps) {
+  const state = useColorState();
+  return <SwatchChip {...props} value={state.color.toString("css")} />;
 }
-
 TriggerSwatch.displayName = "ColorPicker.TriggerSwatch";
-Swatches.displayName = "ColorPicker.Swatches";
 
 export const ColorPicker = {
   Root: ColorPickerRoot,

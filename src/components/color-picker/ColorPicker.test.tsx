@@ -133,6 +133,47 @@ describe("ColorPicker.HexInput field contract", () => {
   });
 });
 
+describe("ColorPicker drafts and parts", () => {
+  it("a channel cell commits on Enter, clamps to the range and reverts unreadable text", () => {
+    const onValueChange = vi.fn();
+    render(
+      withLocale(
+        <ColorPicker.Root defaultValue="hsl(200, 50%, 40%)" onValueChange={onValueChange}>
+          <ColorPicker.ChannelStrip />
+        </ColorPicker.Root>,
+      ),
+    );
+    const hue = screen.getByRole("textbox", { name: "Оттенок, градусы" }) as HTMLInputElement;
+    fireEvent.change(hue, { target: { value: "500" } });
+    fireEvent.keyDown(hue, { key: "Enter" });
+    expect(onValueChange).toHaveBeenCalled();
+    expect(hue.value).toBe("360");
+
+    fireEvent.change(hue, { target: { value: "abc" } });
+    fireEvent.blur(hue);
+    expect(hue.value).toBe("360");
+  });
+
+  it("the eyedropper without browser support is disabled and hidden from assistive tech", () => {
+    render(
+      withLocale(
+        <ColorPicker.Root defaultValue="#336699">
+          <ColorPicker.EyeDropperButton data-testid="dropper" />
+        </ColorPicker.Root>,
+      ),
+    );
+    const dropper = screen.getByTestId("dropper");
+    expect(dropper).toBeDisabled();
+    expect(dropper).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("parts outside ColorPicker.Root fail loudly", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => render(<ColorPicker.TriggerSwatch />)).toThrow(/ColorPicker.Root/);
+    spy.mockRestore();
+  });
+});
+
 describe("ColorPicker focusRing", () => {
   it("focusRing={false} reaches HexInput and ChannelStrip", () => {
     render(

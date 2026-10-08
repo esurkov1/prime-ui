@@ -26,6 +26,59 @@
     0 0 / 50% 50%;
 }
 
+/*
+ * ---- Tier of a swatch grid ----
+ * swatch = base − 8, where the host picks the base: control height (20 · 24 · 28 · 32 · 40) or
+ * menu item height (16 · 20 · 24 · 28 · 32); gap = control gap; radius steps with size.
+ */
+.tier {
+  --swatch-base-control: var(--prime-control-m-height);
+  --swatch-base-item: var(--prime-control-m-item-height);
+  --swatch-size: calc(var(--swatch-base) - var(--prime-space-2));
+  --swatch-radius: var(--prime-radius-s);
+  --swatch-gap: var(--prime-control-m-gap);
+}
+
+.tier[data-size="xs"] {
+  --swatch-base-control: var(--prime-control-xs-height);
+  --swatch-base-item: var(--prime-control-xs-item-height);
+  --swatch-radius: var(--prime-radius-xs);
+  --swatch-gap: var(--prime-control-xs-gap);
+}
+
+.tier[data-size="s"] {
+  --swatch-base-control: var(--prime-control-s-height);
+  --swatch-base-item: var(--prime-control-s-item-height);
+  --swatch-gap: var(--prime-control-s-gap);
+}
+
+.tier[data-size="l"] {
+  --swatch-base-control: var(--prime-control-l-height);
+  --swatch-base-item: var(--prime-control-l-item-height);
+  --swatch-radius: var(--prime-radius-m);
+  --swatch-gap: var(--prime-control-l-gap);
+}
+
+.tier[data-size="xl"] {
+  --swatch-base-control: var(--prime-control-xl-height);
+  --swatch-base-item: var(--prime-control-xl-item-height);
+  --swatch-radius: var(--prime-radius-m);
+  --swatch-gap: var(--prime-control-xl-gap);
+}
+
+/* ---- Chip: the current color inside a trigger, at the host's icon size ---- */
+.chip {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--prime-icon-size, var(--prime-control-m-icon));
+  height: var(--prime-icon-size, var(--prime-control-m-icon));
+  overflow: hidden;
+  border-radius: var(--prime-radius-xs);
+  vertical-align: middle;
+}
+
 /* ---- Selectable swatch ---- */
 .swatch {
   /* The check mark (a kit Icon without `size`) follows this host size. */
@@ -47,7 +100,9 @@
   transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.swatch::after {
+/* Faint inner edge above the color layer. */
+.swatch::after,
+.chip::after {
   content: "";
   position: absolute;
   inset: 0;

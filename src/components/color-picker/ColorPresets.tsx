@@ -3,45 +3,29 @@ import * as React from "react";
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
 import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import { useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { mergeRefs } from "@/internal/mergeRefs";
 import { gridIndex } from "@/internal/rovingFocus";
+import { Slot } from "@/internal/slot";
 import type { ControlSize } from "@/internal/states";
-import { markContrast, SwatchCheck, SwatchFill, sameColor, swatchClass } from "@/internal/swatch";
+import {
+  COLOR_PRESETS,
+  type ColorPreset,
+  SwatchChip,
+  SwatchContent,
+  SwatchFill,
+  type SwatchOption,
+  sameColor,
+  swatchClass,
+  swatchTierClass,
+  useSwatchOptions,
+} from "@/internal/swatch";
 
 import styles from "./ColorPresets.module.css";
 
-export type ColorPreset = {
-  /** CSS color stored as the value (`onValueChange` returns it as is). */
-  value: string;
-  /** Human-readable name: the option's accessible name and the trigger's `aria-label` suffix. */
-  label: string;
-};
-
-/**
- * Default quick colors: the kit palette primitives (`tokens/primitives.ts`).
- * Row 1 — step 500 of eight hues, row 2 — step 700 of the same hues.
- * Take `COLOR_PRESETS.slice(0, 8)` for a single row of eight.
- */
-export const COLOR_PRESETS: readonly ColorPreset[] = [
-  { value: "#ef4444", label: "Красный" },
-  { value: "#f97316", label: "Оранжевый" },
-  { value: "#eab308", label: "Жёлтый" },
-  { value: "#22c55e", label: "Зелёный" },
-  { value: "#14b8a6", label: "Бирюзовый" },
-  { value: "#5068f5", label: "Синий" },
-  { value: "#a855f7", label: "Фиолетовый" },
-  { value: "#ec4899", label: "Розовый" },
-  { value: "#b91c1c", label: "Тёмно-красный" },
-  { value: "#c2410c", label: "Тёмно-оранжевый" },
-  { value: "#a16207", label: "Горчичный" },
-  { value: "#15803d", label: "Тёмно-зелёный" },
-  { value: "#0f766e", label: "Тёмно-бирюзовый" },
-  { value: "#2f4ae0", label: "Тёмно-синий" },
-  { value: "#7e22ce", label: "Тёмно-фиолетовый" },
-  { value: "#be185d", label: "Тёмно-розовый" },
-];
+export { COLOR_PRESETS, type ColorPreset };
 
 export type ColorPresetsLabels = {
   /** Trigger name prefix: `aria-label` = "<trigger>: <color name>". */
@@ -61,13 +45,11 @@ const COLOR_PRESETS_LABELS: ColorPresetsLabels = {
 /** Viewport width below which l / xl grids wrap to half the columns (foundation §9 breakpoint). */
 const NARROW_QUERY = "(max-width: 479px)";
 
-type Option = { value: string | null; label: string; contrast: "light" | "dark" };
-
 type Ctx = {
   value: string | null;
   select: (value: string | null) => void;
   close: () => void;
-  options: Option[];
+  options: SwatchOption[];
   selectedLabel: string;
   columns: number;
   size: ControlSize;
@@ -90,7 +72,7 @@ export type ColorPresetsRootProps = {
   presets?: readonly ColorPreset[];
   /** Grid columns. Default: one row for up to 8 presets (+ "no color"), else 8; 16 → 8 × 2. */
   columns?: number;
-  /** Tier of the trigger, swatches and panel. */
+  /** Tier of the trigger, swatches and panel. Default: the host tier, else `m`. */
   size?: ControlSize;
   disabled?: boolean;
   /** Adds the "no color" swatch after the presets (value `null`); hue rows stay aligned. */
@@ -110,13 +92,14 @@ function ColorPresetsRoot({
   onOpenChange,
   presets = COLOR_PRESETS,
   columns: columnsProp,
-  size = "m",
+  size: sizeProp,
   disabled = false,
   allowEmpty = false,
   closeOnSelect = true,
   labels: labelsProp,
   children,
 }: ColorPresetsRootProps) {
+  const size = useControlSize(sizeProp);
   const [value, setValue] = useControllableState<string | null>({
     value: valueProp,
     defaultValue,
@@ -129,14 +112,7 @@ function ColorPresetsRoot({
   });
   const triggerRef = React.useRef<HTMLElement | null>(null);
   const labels = React.useMemo(() => ({ ...COLOR_PRESETS_LABELS, ...labelsProp }), [labelsProp]);
-
-  const options = React.useMemo<Option[]>(
-    () => [
-      ...presets.map((p) => ({ ...p, contrast: markContrast(p.value) })),
-      ...(allowEmpty ? [{ value: null, label: labels.empty, contrast: "dark" as const }] : []),
-    ],
-    [allowEmpty, presets, labels.empty],
-  );
+  const options = useSwatchOptions(presets, allowEmpty, labels.empty);
   // Up to 8 presets (+ "no color") fit one row; more wrap into rows of 8.
   const columns = Math.max(
     1,
@@ -145,6 +121,8 @@ function ColorPresetsRoot({
   const selectedLabel =
     value == null ? labels.empty : (presets.find((p) => sameColor(p.value, value))?.label ?? value);
 
+  // The panel does not trap focus, so a pick (like Escape and Tab) hands focus back explicitly
+  // (foundation §8): a clicked trigger is not focused in every browser.
   const select = React.useCallback(
     (next: string | null) => {
       setValue(next);
@@ -191,13 +169,9 @@ export type ColorPresetsSwatchProps = Omit<React.HTMLAttributes<HTMLSpanElement>
  * The current color as a small square for a custom trigger (e.g. inside `Button.Root`). Sized from
  * the host's `--prime-icon-size`; `aria-hidden` — the trigger carries the name.
  */
-function Swatch({ className, ...rest }: ColorPresetsSwatchProps) {
+function Swatch(props: ColorPresetsSwatchProps) {
   const { value } = useColorPresetsContext();
-  return (
-    <span {...rest} aria-hidden className={cx(styles.swatch, className)}>
-      <SwatchFill value={value} />
-    </span>
-  );
+  return <SwatchChip {...props} value={value} />;
 }
 Swatch.displayName = "ColorPresets.Swatch";
 
@@ -211,13 +185,19 @@ export type ColorPresetsTriggerProps = Omit<
    */
   asChild?: boolean;
   children?: React.ReactElement;
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
 /** Opens the panel. Name: `aria-label` ?? "<labels.trigger>: <color name>". */
-const Trigger = React.forwardRef<HTMLButtonElement, ColorPresetsTriggerProps>(function Trigger(
-  { asChild = false, children, className, onKeyDown, "aria-label": ariaLabel, ...rest },
-  forwardedRef,
-) {
+function Trigger({
+  asChild = false,
+  children,
+  className,
+  onKeyDown,
+  "aria-label": ariaLabel,
+  ref: forwardedRef,
+  ...rest
+}: ColorPresetsTriggerProps) {
   const { value, size, disabled, labels, selectedLabel, triggerRef } = useColorPresetsContext();
   const ref = React.useMemo(
     () => mergeRefs<HTMLButtonElement>(forwardedRef, triggerRef as React.Ref<HTMLButtonElement>),
@@ -226,17 +206,12 @@ const Trigger = React.forwardRef<HTMLButtonElement, ColorPresetsTriggerProps>(fu
   const name = ariaLabel ?? `${labels.trigger}: ${selectedLabel}`;
 
   if (asChild && children) {
-    const child = children as React.ReactElement<
-      React.ButtonHTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> }
-    >;
     return (
       <Popover.Trigger>
-        {React.cloneElement(child, {
-          ...rest,
-          ref: mergeRefs(child.props.ref, ref as React.Ref<HTMLElement>),
-          disabled: disabled || child.props.disabled,
-          "aria-label": child.props["aria-label"] ?? name,
-        })}
+        {/* The child's own `aria-label` / `disabled` win over these (Slot merge rules). */}
+        <Slot {...rest} ref={ref} disabled={disabled || undefined} aria-label={name}>
+          {children}
+        </Slot>
       </Popover.Trigger>
     );
   }
@@ -250,8 +225,6 @@ const Trigger = React.forwardRef<HTMLButtonElement, ColorPresetsTriggerProps>(fu
         aria-label={name}
         disabled={disabled}
         data-size={size}
-        data-empty={value == null ? "" : undefined}
-        data-disabled={disabled ? "" : undefined}
         className={cx(styles.trigger, className)}
         onKeyDown={(e) => {
           onKeyDown?.(e);
@@ -266,7 +239,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, ColorPresetsTriggerProps>(fu
       </button>
     </Popover.Trigger>
   );
-});
+}
 Trigger.displayName = "ColorPresets.Trigger";
 
 export type ColorPresetsContentProps = Omit<
@@ -284,12 +257,11 @@ export type ColorPresetsContentProps = Omit<
 function useNarrowViewport() {
   const [narrow, setNarrow] = React.useState(false);
   React.useEffect(() => {
-    if (typeof window.matchMedia !== "function") return;
     const mql = window.matchMedia(NARROW_QUERY);
     const update = () => setNarrow(mql.matches);
     update();
-    mql.addEventListener?.("change", update);
-    return () => mql.removeEventListener?.("change", update);
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
   }, []);
   return narrow;
 }
@@ -318,7 +290,7 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
   const [active, setActive] = React.useState(Math.max(0, selectedIndex));
   const itemRefs = React.useRef<Array<HTMLDivElement | null>>([]);
 
-  // Opening moves focus to the selected swatch (or the first one).
+  // Opening moves focus to the selected swatch (or the first one): the roving tab stop.
   // biome-ignore lint/correctness/useExhaustiveDependencies: focus once on mount
   React.useEffect(() => {
     itemRefs.current[Math.max(0, selectedIndex)]?.focus({ preventScroll: true });
@@ -355,7 +327,7 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
         role="listbox"
         aria-label={label != null ? undefined : labels.list}
         aria-labelledby={label != null ? labelId : undefined}
-        className={styles.grid}
+        className={cx(swatchTierClass, styles.grid)}
         data-size={size}
         style={{ "--cpr-columns": cols } as React.CSSProperties}
         tabIndex={-1}
@@ -381,8 +353,7 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
               onClick={() => select(option.value)}
               onFocus={() => setActive(i)}
             >
-              <SwatchFill value={option.value} />
-              {selected ? <SwatchCheck /> : null}
+              <SwatchContent value={option.value} selected={selected} />
             </div>
           );
         })}

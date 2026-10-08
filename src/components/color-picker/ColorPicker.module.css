@@ -199,30 +199,6 @@
   color: var(--prime-color-text-muted);
 }
 
-/* ---- Trigger swatch (inside a button) ---- */
-.triggerSwatch {
-  position: relative;
-  box-sizing: border-box;
-  display: inline-block;
-  flex-shrink: 0;
-  /* Follows the host's icon size (Button sets `--prime-icon-size` per tier); m outside a host. */
-  width: var(--prime-icon-size, var(--prime-control-m-icon));
-  height: var(--prime-icon-size, var(--prime-control-m-icon));
-  overflow: hidden;
-  border-radius: var(--prime-radius-xs);
-  vertical-align: middle;
-}
-
-/* Inner edge painted above the color layer. */
-.triggerSwatch::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
-  pointer-events: none;
-}
-
 /* ---- Standalone eyedropper: square, same height as a field ---- */
 .eyeDropperSquare {
   flex-shrink: 0;
