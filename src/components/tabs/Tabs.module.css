@@ -1,11 +1,15 @@
 /*
  * Tabs — Graphite. Navigation between content panels.
- * Horizontal: text tabs over a hairline; an accent bar under the active text slides between
- * items. The bar is half the tier track thickness (`--prime-control-<tier>-track`, the line of
- * ProgressBar / Slider): 2 · 2.5 · 3 · 3.5 · 4px, so it grows with the size. Vertical: rounded items without a rail; the active item is a `fill-muted` pill with a
- * short accent mark. Stacks into a scrolling row under 600px of container width.
- * Two-line items (with `Tabs.Description`) size to content with a minimum width.
- * Heights follow control tiers so Tabs line up with Button / Input of the same size.
+ *
+ * Horizontal: a folder. The root is a `bg-sunken` strip over a `bg-surface` panel; the active tab
+ * is that surface rising into the strip, with concave flares where it meets the panel, gliding
+ * between tabs. Hover is the same shape in `fill-faint`, painted under the folder so the two
+ * never mix. No lines: depth from fill only. Tabs run edge to edge, each between
+ * `--tabs-item-min` and `--tabs-item-max`; when they do not fit, icons and descriptions go first,
+ * then labels (icons with tooltips stay), then tabs shrink to the minimum and the list scrolls.
+ *
+ * Vertical: rounded items without a rail; the active item is a `fill-muted` pill with a short
+ * accent mark. Stacks into a scrolling row under 600px of container width.
  */
 
 .root {
@@ -17,7 +21,18 @@
   --tabs-radius: var(--prime-control-m-radius);
   --tabs-pad-x: var(--prime-control-m-padding-x);
   --tabs-indicator: calc(var(--prime-control-m-track) / 2);
-  --tabs-item-gap: var(--prime-space-5);
+  --tabs-folder-radius: var(--prime-radius-l);
+  --tabs-flare: var(--prime-radius-m);
+  --tabs-rise: var(--prime-space-2);
+  --tabs-panel-pad: var(--prime-space-6);
+  --tabs-remove-size: var(--prime-control-xs-height);
+
+  /* Tab width bounds; `minItemWidth` / `maxItemWidth` override them inline. */
+  --tabs-item-min: calc(2.5 * var(--tabs-height));
+  --tabs-item-max: calc(7 * var(--tabs-height));
+
+  /* Derived: a horizontal tab is the control height plus the rise above and below. */
+  --tabs-item-height: calc(var(--tabs-height) + 2 * var(--tabs-rise));
   --tabs-two-line-min: calc(4 * var(--tabs-height));
 
   min-width: 0;
@@ -33,7 +48,10 @@
   --tabs-radius: var(--prime-control-xs-radius);
   --tabs-pad-x: var(--prime-control-xs-padding-x);
   --tabs-indicator: calc(var(--prime-control-xs-track) / 2);
-  --tabs-item-gap: var(--prime-space-3);
+  --tabs-folder-radius: var(--prime-radius-m);
+  --tabs-flare: var(--prime-radius-s);
+  --tabs-rise: var(--prime-space-1);
+  --tabs-panel-pad: var(--prime-space-4);
 }
 
 .root[data-size="s"] {
@@ -45,7 +63,10 @@
   --tabs-radius: var(--prime-control-s-radius);
   --tabs-pad-x: var(--prime-control-s-padding-x);
   --tabs-indicator: calc(var(--prime-control-s-track) / 2);
-  --tabs-item-gap: var(--prime-space-4);
+  --tabs-folder-radius: var(--prime-radius-m);
+  --tabs-flare: var(--prime-radius-s);
+  --tabs-rise: var(--prime-space-1);
+  --tabs-panel-pad: var(--prime-space-5);
 }
 
 .root[data-size="l"] {
@@ -57,7 +78,10 @@
   --tabs-radius: var(--prime-control-l-radius);
   --tabs-pad-x: var(--prime-control-l-padding-x);
   --tabs-indicator: calc(var(--prime-control-l-track) / 2);
-  --tabs-item-gap: var(--prime-space-6);
+  --tabs-folder-radius: var(--prime-radius-xl);
+  --tabs-flare: var(--prime-radius-l);
+  --tabs-rise: var(--prime-space-3);
+  --tabs-remove-size: var(--prime-control-s-height);
 }
 
 .root[data-size="xl"] {
@@ -69,7 +93,11 @@
   --tabs-radius: var(--prime-control-xl-radius);
   --tabs-pad-x: var(--prime-control-xl-padding-x);
   --tabs-indicator: calc(var(--prime-control-xl-track) / 2);
-  --tabs-item-gap: var(--prime-space-8);
+  --tabs-folder-radius: var(--prime-radius-xl);
+  --tabs-flare: var(--prime-radius-l);
+  --tabs-rise: var(--prime-space-3);
+  --tabs-panel-pad: var(--prime-space-8);
+  --tabs-remove-size: var(--prime-control-m-height);
 }
 
 /* ---------- Layout ---------- */
@@ -79,6 +107,17 @@
   flex-direction: column;
   gap: var(--prime-space-4);
   min-width: 0;
+}
+
+/* Horizontal: the root is the frame — a sunken strip with the panel surface right under it. */
+.root[data-orientation="horizontal"] {
+  overflow: hidden;
+  border-radius: var(--prime-radius-xl);
+  background: var(--prime-color-bg-sunken);
+}
+
+.root[data-orientation="horizontal"] .layout {
+  gap: 0;
 }
 
 .root[data-orientation="vertical"] {
@@ -93,7 +132,7 @@
 
 /* ---------- List ---------- */
 
-/* The list is a ScrollContainer (horizontal, edge fade, hidden scrollbar): it scrolls, never wraps. */
+/* A ScrollContainer (horizontal, edge fade, hidden scrollbar): it scrolls, never wraps. */
 .list {
   position: relative;
   isolation: isolate;
@@ -101,6 +140,12 @@
   max-width: 100%;
   flex-wrap: nowrap;
   align-items: stretch;
+}
+
+/* Edge to edge: the first and last tab meet the frame, the folder joins the panel edge straight. */
+.root[data-orientation="horizontal"] .list {
+  gap: var(--prime-space-1);
+  padding-top: var(--tabs-rise);
 }
 
 .root[data-orientation="vertical"] .list {
@@ -111,19 +156,13 @@
   overflow: visible;
 }
 
-/* Horizontal: text tabs over a hairline. */
-.root[data-orientation="horizontal"] .list {
-  gap: var(--tabs-item-gap);
-  box-shadow: inset 0 calc(-1 * var(--prime-border-width)) 0 var(--prime-color-border-subtle);
-}
-
 /* ---------- Indicator ---------- */
 
 .indicator {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
   opacity: 0;
   /* Position (translate from TS) and size glide to the new tab on one curve. */
@@ -138,18 +177,48 @@
   opacity: 1;
 }
 
-/* Accent bar under the text of the active item; thickness follows the tier. */
-.indicatorBar {
-  top: auto;
+/* Horizontal: the panel surface under the active tab, flaring into the panel at both sides. */
+.indicatorFolder {
+  border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
+  background: var(--prime-color-bg-surface);
+}
+
+.indicatorFolder::before,
+.indicatorFolder::after {
+  content: "";
+  position: absolute;
   bottom: 0;
-  width: 0;
-  height: var(--tabs-indicator);
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-accent-default);
+  width: var(--tabs-flare);
+  height: var(--tabs-flare);
+}
+
+.indicatorFolder::before {
+  right: 100%;
+  background: radial-gradient(
+    circle at 0 0,
+    transparent calc(var(--tabs-flare) - var(--prime-border-width) / 2),
+    var(--prime-color-bg-surface) var(--tabs-flare)
+  );
+}
+
+.indicatorFolder::after {
+  left: 100%;
+  background: radial-gradient(
+    circle at 100% 0,
+    transparent calc(var(--tabs-flare) - var(--prime-border-width) / 2),
+    var(--prime-color-bg-surface) var(--tabs-flare)
+  );
+}
+
+/* At the list edge the folder meets the frame: no flare there. */
+.indicatorFolder[data-edge-start="true"]::before,
+.indicatorFolder[data-edge-end="true"]::after {
+  visibility: hidden;
 }
 
 /* Vertical: `fill-muted` pill with a short accent mark at the inline start. */
 .indicatorPill {
+  z-index: 0;
   border-radius: var(--tabs-radius);
   background: var(--prime-color-fill-muted);
 }
@@ -166,21 +235,33 @@
 
 /* ---------- Item ---------- */
 
+/*
+ * An item (`.item`, the flex member the folder measures) wraps the tab button and, when
+ * removable, a close button. Layers inside the list (it isolates): hover wash (0) → folder (1)
+ * → tab content, close button and focus ring (2). Neither the item nor the tab makes a stacking
+ * context, so the hover wash under the arriving folder is covered instead of tinting it.
+ */
+.item {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  min-width: 0;
+  border-radius: var(--tabs-radius);
+}
+
 .tab {
   position: relative;
-  z-index: 1;
   display: inline-flex;
-  flex-shrink: 0;
+  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  gap: var(--tabs-gap);
   box-sizing: border-box;
   min-width: 0;
   height: var(--tabs-height);
   margin: 0;
-  padding: 0 var(--prime-space-1);
+  padding: 0 var(--tabs-pad-x);
   border: 0;
-  border-radius: var(--prime-radius-xs);
+  border-radius: inherit;
   background: none;
   color: var(--prime-color-text-secondary);
   font-family: inherit;
@@ -190,38 +271,111 @@
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
-  transition:
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* Horizontal width: content size (plus a share of the spare width), within the min / max bounds. */
+.root[data-orientation="horizontal"] .item {
+  flex: 0 1 auto;
+  min-width: var(--tabs-item-min);
+  max-width: var(--tabs-item-max);
+  border-radius: var(--tabs-folder-radius) var(--tabs-folder-radius) 0 0;
+}
+
+/* Spare width is shared equally on top of each tab's content, so no label is cut to even them. */
+.root[data-orientation="horizontal"][data-full-width="true"] .item {
+  flex: 1 1 auto;
+}
+
+.root[data-orientation="horizontal"] .tab {
+  height: var(--tabs-item-height);
+  padding: 0 calc(var(--tabs-pad-x) + var(--prime-space-1));
+  outline: none;
 }
 
 .root[data-orientation="vertical"] .tab {
   justify-content: flex-start;
-  padding: 0 var(--tabs-pad-x);
-  border-radius: var(--tabs-radius);
+}
+
+/* The content row: icon, label, count — or the two-line grid. Pressing scales it as one. */
+.content {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tabs-gap);
+  min-width: 0;
+  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.tab:active:not([data-disabled="true"]) .content {
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 /* Two-line item: label + count on the first line, description on the second. */
 .tab[data-two-line="true"] {
-  /* Grid, not wrapping flex: the max-content width is the wider line, not both lines summed. */
-  display: inline-grid;
-  grid-template-columns: minmax(0, auto) auto;
-  align-content: center;
-  justify-content: start;
-  justify-items: start;
-  column-gap: var(--tabs-gap);
-  row-gap: 0;
   height: auto;
   padding-block: var(--prime-space-2) var(--prime-space-3);
 }
 
-/* Vertical items get a minimum width; horizontal ones hug their text so the bar matches it. */
+.tab[data-two-line="true"] .content {
+  /* Grid, not wrapping flex: the max-content width is the wider line, not both lines summed. */
+  display: inline-grid;
+  grid-template-columns: minmax(0, auto) auto;
+  align-content: center;
+  justify-items: start;
+  column-gap: var(--tabs-gap);
+  row-gap: 0;
+}
+
+.root[data-orientation="horizontal"] .tab[data-two-line="true"] {
+  padding-block: calc(var(--tabs-rise) + var(--prime-space-2))
+    calc(var(--tabs-rise) + var(--prime-space-3));
+}
+
 .root[data-orientation="vertical"] .tab[data-two-line="true"] {
   min-width: var(--tabs-two-line-min);
   padding-block: var(--prime-space-2);
 }
 
-.tab:hover:not([data-disabled="true"]) {
+/* Horizontal hover: the folder shape in the faintest wash, under the folder. */
+.root[data-orientation="horizontal"] .item::before,
+.root[data-orientation="horizontal"] .tab::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.root[data-orientation="horizontal"] .item::before {
+  z-index: 0;
+  background: var(--prime-color-fill-faint);
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-orientation="horizontal"]
+  .item:hover:not([data-disabled="true"], [data-state="active"])::before {
+  opacity: 1;
+  transition-duration: var(--prime-motion-duration-xfast);
+}
+
+/* The focus ring sits above the folder, in the same shape. */
+.root[data-orientation="horizontal"] .tab::after {
+  z-index: 2;
+}
+
+.root[data-orientation="horizontal"] .tab:focus-visible::after {
+  box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-focus-ring);
+}
+
+.root[data-orientation="vertical"] .tab:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.item:hover:not([data-disabled="true"]) .tab {
   color: var(--prime-color-text-primary);
 }
 
@@ -234,14 +388,44 @@
   font-weight: var(--prime-font-weight-medium);
 }
 
-.tab:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
+/* tone="accent": the active label and icon take the accent text colour. */
+.root[data-tone="accent"] .tab[aria-selected="true"] {
+  color: var(--prime-color-accent-text);
 }
 
 .tab[data-disabled="true"] {
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
+}
+
+/* ---------- Close button (removable tabs) ---------- */
+
+/* The tab keeps room at its end; the button sits over it, centred on the content line. */
+.item[data-removable="true"] .tab {
+  justify-content: flex-start;
+  padding-inline-end: calc(var(--tabs-remove-size) + var(--prime-space-3));
+}
+
+.remove {
+  position: absolute;
+  inset-inline-end: var(--prime-space-2);
+  top: 50%;
+  z-index: 2;
+  display: flex;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* Shown on the active tab, on hover and while the tab has focus — always on touch screens. */
+.item:is([data-state="active"], :hover, :focus-within) .remove {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .remove {
+    opacity: 1;
+  }
 }
 
 /* ---------- Item parts ---------- */
@@ -264,7 +448,7 @@
   height: 100%;
 }
 
-.tab:hover:not([data-disabled="true"]) .icon,
+.item:hover:not([data-disabled="true"]) .icon,
 .tab[aria-selected="true"] .icon {
   color: inherit;
 }
@@ -330,6 +514,58 @@
   color: var(--prime-color-text-disabled);
 }
 
+/* ---------- Collapse levels (horizontal) ---------- */
+
+/* compact: label and count on one line. */
+.list[data-collapse="compact"] :is(.icon, .description) {
+  display: none;
+}
+
+.list[data-collapse="compact"] .tab[data-two-line="true"],
+.list[data-collapse="icon"] .tab[data-two-line="true"] {
+  height: var(--tabs-item-height);
+  padding-block: 0;
+}
+
+/* icon: a square of icons; the label stays for screen readers (sr-only) and fills the tooltip. */
+.list[data-collapse="icon"] .item {
+  min-width: var(--tabs-item-height);
+}
+
+.list[data-collapse="icon"] .tab {
+  padding-inline: var(--prime-space-2);
+}
+
+/* No room for a close button: Delete and a middle click still close the tab. */
+.list[data-collapse="icon"] :is(.count, .description, .remove) {
+  display: none;
+}
+
+.list[data-collapse="icon"] .label {
+  position: absolute;
+  width: var(--prime-border-width);
+  height: var(--prime-border-width);
+  margin: calc(-1 * var(--prime-border-width));
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Separator ---------- */
+
+/* A Divider across the list direction, as tall as an icon. */
+.root[data-orientation="horizontal"] .separator {
+  flex: none;
+  align-self: center;
+  height: var(--tabs-icon);
+  margin-top: var(--tabs-rise);
+  margin-inline: var(--prime-space-2);
+}
+
+.root[data-orientation="vertical"] .separator {
+  margin-block: var(--prime-space-2);
+}
+
 /* ---------- Panel ---------- */
 
 .panel {
@@ -341,14 +577,28 @@
   color: var(--prime-color-text-primary);
 }
 
+.root[data-orientation="horizontal"] .panel {
+  padding: var(--tabs-panel-pad);
+  background: var(--prime-color-bg-surface);
+}
+
 .panel:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
   border-radius: var(--prime-radius-xs);
 }
 
+.root[data-orientation="horizontal"] .panel:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-focus-ring);
+}
+
 .panel :where(p, ul, ol) {
   margin: 0;
+}
+
+.panelContent {
+  min-width: 0;
 }
 
 /* ---------- Vertical → horizontal row in narrow containers ---------- */
@@ -365,10 +615,20 @@
     min-width: 0;
     overflow-x: auto;
   }
+
+  .root[data-orientation="vertical"] .separator {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .indicator {
+  .indicator,
+  .content,
+  .remove {
     transition: none;
+  }
+
+  .tab:active .content {
+    transform: none;
   }
 }

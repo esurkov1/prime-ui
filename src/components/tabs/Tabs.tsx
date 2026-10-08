@@ -3,34 +3,65 @@ import * as React from "react";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion } from "@/hooks/usePresence";
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import enterMotion from "@/internal/enterMotion.module.css";
+import { formatLabel } from "@/internal/formatLabel";
 import { rovingIndex } from "@/internal/rovingFocus";
-import type { ControlSize, PaletteColor } from "@/internal/states";
+import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
 
 import { Badge } from "../badge/Badge";
+import { Button } from "../button/Button";
+import { Divider } from "../divider/Divider";
 import { ScrollContainer } from "../scroll-container/ScrollContainer";
+import { Tooltip } from "../tooltip/Tooltip";
 import styles from "./Tabs.module.css";
+
+// ─── Shared ───────────────────────────────────────────────────────────────────
+
+export type TabsLabels = {
+  /** Name of the close button of a removable tab; `{label}` is the tab's title. */
+  remove: string;
+};
+
+const TABS_LABELS: TabsLabels = {
+  remove: "Закрыть вкладку «{label}»",
+};
+
+type TabsOrientation = "horizontal" | "vertical";
 
 type TabsContextValue = {
   activeValue: string;
-  onSelect: (value: string) => void;
-  orientation: "horizontal" | "vertical";
-  rootId: string;
+  select: (value: string) => void;
+  orientation: TabsOrientation;
   size: ControlSize;
+  rootId: string;
+  labels: TabsLabels;
 };
 
 const [TabsProvider, useTabsContext] = createComponentContext<TabsContextValue>("Tabs");
 
-/** Id of the item, used to keep the description out of the accessible name. */
-const ItemIdContext = React.createContext<string | null>(null);
+/**
+ * How much of each tab a horizontal list shows: `full` everything; `compact` drops icons and
+ * descriptions; `icon` keeps only icons (the label stays for screen readers and in a tooltip).
+ */
+type TabsCollapse = "full" | "compact" | "icon";
+
+const CollapseContext = React.createContext<TabsCollapse>("full");
+
+/** Id of the tab, so its label, count and description can be referenced from the tab. */
+const TabIdContext = React.createContext<string | null>(null);
 
 /** A value as an id fragment: idrefs are space-separated, so spaces and symbols are replaced. */
 const idPart = (value: string) => value.replace(/[^A-Za-z0-9_-]/g, "_");
 const tabId = (rootId: string, value: string) => `prime-ui-kit-tab-${rootId}-${idPart(value)}`;
 const panelId = (rootId: string, value: string) => `prime-ui-kit-panel-${rootId}-${idPart(value)}`;
+
+const cssLength = (length: number | string | undefined) =>
+  typeof length === "number" ? `${length}px` : length;
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
@@ -39,8 +70,17 @@ export type TabsRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultV
   defaultValue?: string;
   onValueChange?: (value: string) => void;
   /** Default `horizontal`. A vertical list stacks above the panel in containers narrower than 600px. */
-  orientation?: "horizontal" | "vertical";
+  orientation?: TabsOrientation;
   size?: ControlSize;
+  /** Text and icon colour of the active tab. Default `neutral`: primary text, accent icon. */
+  tone?: "neutral" | "accent";
+  /** Horizontal tabs share the list width. Default `true`; `false` sizes each tab to its content. */
+  fullWidth?: boolean;
+  /** Narrowest a horizontal tab with a label gets before the list scrolls (px or a CSS length). */
+  minItemWidth?: number | string;
+  /** Widest a horizontal tab gets (px or a CSS length); a longer label ends with an ellipsis. */
+  maxItemWidth?: number | string;
+  labels?: Partial<TabsLabels>;
   ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -50,8 +90,14 @@ function TabsRoot({
   onValueChange,
   orientation = "horizontal",
   size = "m",
+  tone = "neutral",
+  fullWidth = true,
+  minItemWidth,
+  maxItemWidth,
+  labels,
   children,
   className,
+  style,
   ...rest
 }: TabsRootProps) {
   const rootId = React.useId();
@@ -60,18 +106,33 @@ function TabsRoot({
     defaultValue,
     onChange: onValueChange,
   });
+  const removeLabel = labels?.remove ?? TABS_LABELS.remove;
 
-  const contextValue = React.useMemo<TabsContextValue>(
-    () => ({ activeValue, onSelect: setActiveValue, orientation, rootId, size }),
-    [activeValue, setActiveValue, orientation, rootId, size],
+  const context = React.useMemo<TabsContextValue>(
+    () => ({
+      activeValue,
+      select: setActiveValue,
+      orientation,
+      size,
+      rootId,
+      labels: { remove: removeLabel },
+    }),
+    [activeValue, setActiveValue, orientation, size, rootId, removeLabel],
   );
 
+  // The defaults scale with the tier in CSS; a prop overrides them on the root.
+  const widths = {
+    ...(minItemWidth !== undefined && { "--tabs-item-min": cssLength(minItemWidth) }),
+    ...(maxItemWidth !== undefined && { "--tabs-item-max": cssLength(maxItemWidth) }),
+  };
+
   return (
-    <TabsProvider value={contextValue}>
+    <TabsProvider value={context}>
       <div
         {...rest}
         className={cx(styles.root, className)}
-        {...toDataAttributes({ orientation, size })}
+        style={{ ...style, ...widths } as React.CSSProperties}
+        {...toDataAttributes({ orientation, size, tone, "full-width": fullWidth })}
       >
         {/* The root is the size container for the vertical → row switch; the layout sits inside. */}
         <div className={styles.layout}>{children}</div>
@@ -81,85 +142,174 @@ function TabsRoot({
 }
 TabsRoot.displayName = "Tabs.Root";
 
+// ─── List layout ──────────────────────────────────────────────────────────────
+
+const itemsOf = (list: HTMLElement) => [
+  ...list.querySelectorAll<HTMLElement>(`:scope > .${styles.item}`),
+];
+
+const tabOf = (item: HTMLElement) => item.querySelector<HTMLElement>('[role="tab"]');
+
+/**
+ * Whether the tabs fit the list without scrolling, from the tabs' own extent. `scrollWidth`
+ * would also count the folder's flares, which hang past the active tab.
+ */
+function itemsFit(list: HTMLElement): boolean {
+  let end = 0;
+  for (const child of list.children) {
+    const element = child as HTMLElement;
+    if (element.dataset.indicator !== undefined) continue;
+    end = Math.max(end, element.offsetLeft + element.offsetWidth);
+  }
+  return end <= list.clientWidth + 0.5;
+}
+
+/**
+ * Whether a label or description is cut only because its tab was squeezed. A tab already at its
+ * `maxItemWidth` cuts a long label by design, so that does not count.
+ */
+function textSqueezed(list: HTMLElement): boolean {
+  for (const text of list.querySelectorAll<HTMLElement>(
+    `.${styles.labelText}, .${styles.description}`,
+  )) {
+    if (text.scrollWidth <= text.clientWidth + 0.5) continue;
+    const item = text.closest<HTMLElement>(`.${styles.item}`);
+    if (!item) continue;
+    const max = Number.parseFloat(getComputedStyle(item).maxWidth);
+    if (!(item.offsetWidth >= max - 0.5)) return true;
+  }
+  return false;
+}
+
+/**
+ * The widest collapse level at which a horizontal list fits with uncut text. Each level is
+ * applied to the DOM and measured in place, widest first: icons and descriptions go before a
+ * label is cut, then labels (icon-only needs an icon on every tab). When nothing fits, the last
+ * level stays: tabs shrink to `minItemWidth` (or a square of icons) and the list scrolls.
+ */
+function fitCollapse(list: HTMLElement): TabsCollapse {
+  const items = itemsOf(list);
+  const levels: TabsCollapse[] = ["full"];
+  if (items.some((item) => item.querySelector(`.${styles.icon}, .${styles.description}`))) {
+    levels.push("compact");
+  }
+  if (items.length > 0 && items.every((item) => item.querySelector(`.${styles.icon}`))) {
+    levels.push("icon");
+  }
+  for (const level of levels) {
+    list.dataset.collapse = level;
+    if (itemsFit(list) && (level === "icon" || !textSqueezed(list))) return level;
+  }
+  return levels[levels.length - 1];
+}
+
+/**
+ * Moves the indicator behind the active tab and keeps one tab stop: the active tab, or the first
+ * enabled one while nothing is active. A flare that would hang past the list edge is dropped:
+ * it would be clipped at the start and add a scroll overflow at the end.
+ */
+function placeIndicator(list: HTMLElement, indicator: HTMLElement, activeValue: string): void {
+  const items = itemsOf(list);
+  const tabs = items.map(tabOf).filter((tab): tab is HTMLElement => tab !== null);
+  const activeTab = tabs.find((tab) => tab.dataset.value === activeValue);
+  const stop = activeTab ?? tabs.find((tab) => tab.dataset.disabled !== "true");
+  for (const tab of tabs) tab.tabIndex = tab === stop ? 0 : -1;
+
+  const box = activeTab?.parentElement;
+  if (!box) {
+    indicator.dataset.visible = "false";
+    return;
+  }
+  const left = box.offsetLeft;
+  const right = left + box.offsetWidth;
+  const flare = Number.parseFloat(getComputedStyle(indicator, "::after").width) || 0;
+  indicator.style.transform = `translate(${left}px, ${box.offsetTop}px)`;
+  indicator.style.width = `${box.offsetWidth}px`;
+  indicator.style.height = `${box.offsetHeight}px`;
+  indicator.dataset.edgeStart = String(left - flare < 0);
+  indicator.dataset.edgeEnd = String(box === items.at(-1) && right + flare > list.clientWidth);
+  indicator.dataset.visible = String(box.offsetWidth > 0 && box.offsetHeight > 0);
+}
+
+/**
+ * Fits the collapse level and places the indicator before paint, and again whenever the list or
+ * a tab changes size (a container resize, a label or count changing, fonts loading) or tabs are
+ * added or removed. Measuring writes to the DOM; React re-renders only when the level changes.
+ */
+function useListLayout(
+  listRef: React.RefObject<HTMLElement | null>,
+  indicatorRef: React.RefObject<HTMLElement | null>,
+  activeValue: string,
+  horizontal: boolean,
+): TabsCollapse {
+  const [collapse, setCollapse] = React.useState<TabsCollapse>("full");
+
+  React.useLayoutEffect(() => {
+    const list = listRef.current;
+    const indicator = indicatorRef.current;
+    if (!list || !indicator) return;
+
+    const layout = () => {
+      const level = horizontal ? fitCollapse(list) : "full";
+      list.dataset.collapse = level;
+      setCollapse(level);
+      placeIndicator(list, indicator, activeValue);
+    };
+
+    const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(layout);
+    const observe = () => {
+      resize?.disconnect();
+      resize?.observe(list);
+      for (const item of itemsOf(list)) resize?.observe(item);
+    };
+    // Tabs added or removed; a tab turning disabled moves the tab stop.
+    const mutations = new MutationObserver(() => {
+      observe();
+      layout();
+    });
+    mutations.observe(list, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-disabled"],
+    });
+
+    observe();
+    layout();
+    return () => {
+      mutations.disconnect();
+      resize?.disconnect();
+    };
+  }, [listRef, indicatorRef, activeValue, horizontal]);
+
+  return collapse;
+}
+
 // ─── List ─────────────────────────────────────────────────────────────────────
 
 export type TabsListProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/**
- * Places the indicator under / behind the selected tab and keeps exactly one tab stop: the
- * selected tab, or the first enabled one while nothing is selected. Written straight to the DOM:
- * measuring never re-renders the items.
- */
-function syncList(
-  list: HTMLElement,
-  indicator: HTMLElement,
-  activeValue: string,
-  isBar: boolean,
-): void {
-  const tabs = [...list.querySelectorAll<HTMLElement>('[role="tab"]')];
-  const active = tabs.find((tab) => tab.dataset.value === activeValue);
-  const stop = active ?? tabs.find((tab) => tab.dataset.disabled !== "true");
-  for (const tab of tabs) tab.tabIndex = tab === stop ? 0 : -1;
-
-  let left = active?.offsetLeft ?? 0;
-  let width = active?.offsetWidth ?? 0;
-  const top = active?.offsetTop ?? 0;
-  const height = active?.offsetHeight ?? 0;
-  // The underline bar spans the item's content box so it lines up with the text.
-  if (active && isBar) {
-    const style = getComputedStyle(active);
-    const padStart = Number.parseFloat(style.paddingLeft) || 0;
-    const padEnd = Number.parseFloat(style.paddingRight) || 0;
-    left += padStart;
-    width -= padStart + padEnd;
-  }
-  indicator.style.transform = isBar ? `translateX(${left}px)` : `translate(${left}px, ${top}px)`;
-  indicator.style.width = `${width}px`;
-  indicator.style.height = isBar ? "" : `${height}px`;
-  indicator.dataset.visible = String(width > 0 && height > 0);
-}
-
 function TabsList({ children, className, ref, ...rest }: TabsListProps) {
-  const { orientation, activeValue, onSelect, size } = useTabsContext();
+  const { orientation, activeValue, select, size } = useTabsContext();
   const listRef = React.useRef<HTMLDivElement>(null);
   const indicatorRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(listRef, ref);
-  const isBar = orientation === "horizontal";
-
-  React.useLayoutEffect(() => {
-    const list = listRef.current;
-    const indicator = indicatorRef.current;
-    if (!list || !indicator) return;
-    const update = () => syncList(list, indicator, activeValue, isBar);
-    update();
-    // Tabs added, removed, disabled or renamed, and the list resizing, move the indicator too.
-    const mutations = new MutationObserver(update);
-    mutations.observe(list, {
-      subtree: true,
-      childList: true,
-      characterData: true,
-      attributes: true,
-      attributeFilter: ["data-disabled"],
-    });
-    const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
-    resize?.observe(list);
-    return () => {
-      mutations.disconnect();
-      resize?.disconnect();
-    };
-  }, [activeValue, isBar]);
+  const horizontal = orientation === "horizontal";
+  const collapse = useListLayout(listRef, indicatorRef, activeValue, horizontal);
 
   // Keep the active tab visible inside a scrolling list. Only the list scrolls: `scrollIntoView`
   // would also scroll the page to the tabs (on mount too).
   React.useEffect(() => {
     const list = listRef.current;
     if (!list || !activeValue || list.scrollWidth <= list.clientWidth) return;
-    const active = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
-    if (!active) return;
-    const start = active.offsetLeft;
-    const end = start + active.offsetWidth;
+    const box = list.querySelector<HTMLElement>(
+      '[role="tab"][aria-selected="true"]',
+    )?.parentElement;
+    if (!box) return;
+    const start = box.offsetLeft;
+    const end = start + box.offsetWidth;
     const left =
       start < list.scrollLeft
         ? start
@@ -172,17 +322,17 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
   }, [activeValue]);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLElement>) {
-    const tabs = Array.from(
-      event.currentTarget.querySelectorAll<HTMLButtonElement>(
+    const tabs = [
+      ...event.currentTarget.querySelectorAll<HTMLElement>(
         '[role="tab"]:not([data-disabled="true"])',
       ),
-    );
+    ];
     const current = tabs.findIndex((tab) => tab.dataset.value === activeValue);
     // A vertical list turns into a row on narrow containers: it accepts both axes.
-    const next = rovingIndex(event.key, current, tabs.length, isBar ? "horizontal" : "both");
+    const next = rovingIndex(event.key, current, tabs.length, horizontal ? "horizontal" : "both");
     if (next === null) return;
     event.preventDefault();
-    onSelect(tabs[next].dataset.value ?? "");
+    select(tabs[next].dataset.value ?? "");
     tabs[next].focus();
   }
 
@@ -196,16 +346,20 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
       role="tablist"
       aria-orientation={orientation}
       className={cx(styles.list, className)}
-      data-indicator={isBar ? "bar" : "pill"}
+      data-indicator={horizontal ? "folder" : "pill"}
+      data-collapse={collapse}
       onKeyDown={handleKeyDown}
     >
-      {/* First in DOM order so it always paints below the items. */}
+      {/* First in DOM order so it paints below the tab content. */}
       <div
         ref={indicatorRef}
-        className={cx(styles.indicator, isBar ? styles.indicatorBar : styles.indicatorPill)}
+        className={cx(styles.indicator, horizontal ? styles.indicatorFolder : styles.indicatorPill)}
+        data-indicator=""
         aria-hidden="true"
       />
-      <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+      <ControlSizeProvider value={size}>
+        <CollapseContext.Provider value={collapse}>{children}</CollapseContext.Provider>
+      </ControlSizeProvider>
     </ScrollContainer>
   );
 }
@@ -220,6 +374,11 @@ export type TabsItemProps = Omit<
   value: string;
   disabled?: boolean;
   /**
+   * Makes the tab closable: a close button, `Delete` / `Backspace` on the focused tab and a middle
+   * click. Closing the active tab first selects its neighbour; remove the item in this callback.
+   */
+  onRemove?: () => void;
+  /**
    * Plain text, or parts: `Tabs.Icon`, `Tabs.Label`, `Tabs.Count`, `Tabs.Description`.
    * A `Tabs.Description` makes the item two-line and becomes its accessible description.
    */
@@ -233,6 +392,17 @@ function hasChildOfType(children: React.ReactNode, type: React.ElementType): boo
   );
 }
 
+/** The tab's title: plain text children or the children of its `Tabs.Label`. */
+function labelOf(children: React.ReactNode): React.ReactNode {
+  for (const child of React.Children.toArray(children)) {
+    if (typeof child === "string" || typeof child === "number") return child;
+    if (React.isValidElement<TabsLabelProps>(child) && child.type === TabsLabel) {
+      return child.props.children;
+    }
+  }
+  return null;
+}
+
 /** Plain text children become a `Tabs.Label` so they get truncation and a stable bold width. */
 function wrapText(children: React.ReactNode): React.ReactNode {
   return React.Children.map(children, (child) =>
@@ -244,36 +414,134 @@ function wrapText(children: React.ReactNode): React.ReactNode {
   );
 }
 
-function TabsItem({ value, disabled = false, children, className, ...rest }: TabsItemProps) {
-  const { activeValue, onSelect, rootId } = useTabsContext();
-  const isSelected = activeValue === value;
+function TabsItem({
+  value,
+  disabled = false,
+  onRemove,
+  children,
+  className,
+  onKeyDown,
+  onMouseDown,
+  onAuxClick,
+  ref,
+  ...rest
+}: TabsItemProps) {
+  const { activeValue, select, size, rootId, labels } = useTabsContext();
+  const collapse = React.useContext(CollapseContext);
+  const [tooltipOpen, setTooltipOpen] = React.useState(false);
+  const tabRef = React.useRef<HTMLButtonElement>(null);
+  const mergedRef = useMergedRefs(tabRef, ref);
+
+  const isActive = activeValue === value;
   const id = tabId(rootId, value);
   const twoLine = hasChildOfType(children, TabsDescription);
   const hasCount = hasChildOfType(children, TabsCount);
+  const removable = onRemove !== undefined && !disabled;
+  const iconOnly = collapse === "icon";
+  const label = labelOf(children);
+  const labelText = typeof label === "string" || typeof label === "number" ? label : value;
+
+  /** Closes the tab; an active tab first hands the selection — and focus, if it had it — on. */
+  function remove() {
+    const tab = tabRef.current;
+    const list = tab?.closest<HTMLElement>('[role="tablist"]');
+    if (tab && list) {
+      const tabs = itemsOf(list)
+        .map(tabOf)
+        .filter(
+          (t): t is HTMLElement => t === tab || (t !== null && t.dataset.disabled !== "true"),
+        );
+      const index = tabs.indexOf(tab);
+      const neighbour = tabs[index + 1] ?? tabs[index - 1];
+      const next = isActive
+        ? neighbour
+        : list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+      if (isActive && neighbour) select(neighbour.dataset.value ?? "");
+      if (tab.parentElement?.contains(document.activeElement)) next?.focus();
+    }
+    onRemove?.();
+  }
 
   return (
-    <button
-      {...rest}
-      type="button"
-      role="tab"
-      id={id}
-      aria-selected={isSelected}
-      aria-controls={panelId(rootId, value)}
-      aria-labelledby={twoLine ? cx(`${id}-label`, hasCount && `${id}-count`) : undefined}
-      aria-describedby={twoLine ? `${id}-description` : undefined}
-      tabIndex={isSelected ? 0 : -1}
-      data-value={value}
+    <div
+      className={styles.item}
+      role="presentation"
       {...toDataAttributes({
-        state: isSelected ? "active" : "inactive",
+        state: isActive ? "active" : "inactive",
         disabled: disabled || undefined,
-        "two-line": twoLine || undefined,
+        removable: removable || undefined,
       })}
-      disabled={disabled}
-      className={cx(styles.tab, className)}
-      onClick={() => onSelect(value)}
     >
-      <ItemIdContext.Provider value={id}>{wrapText(children)}</ItemIdContext.Provider>
-    </button>
+      {/* The tooltip wraps every tab so the button is never remounted (and never loses focus)
+          when the list collapses; it opens only while the label is hidden. */}
+      <Tooltip.Root open={iconOnly && tooltipOpen} onOpenChange={setTooltipOpen}>
+        <Tooltip.Trigger>
+          <button
+            {...rest}
+            ref={mergedRef}
+            type="button"
+            role="tab"
+            id={id}
+            aria-selected={isActive}
+            aria-controls={panelId(rootId, value)}
+            aria-labelledby={twoLine ? cx(`${id}-label`, hasCount && `${id}-count`) : undefined}
+            aria-describedby={twoLine ? `${id}-description` : undefined}
+            aria-keyshortcuts={removable ? "Delete" : undefined}
+            tabIndex={isActive ? 0 : -1}
+            data-value={value}
+            {...toDataAttributes({
+              state: isActive ? "active" : "inactive",
+              disabled: disabled || undefined,
+              "two-line": twoLine || undefined,
+            })}
+            disabled={disabled}
+            className={cx(styles.tab, className)}
+            onClick={() => select(value)}
+            onKeyDown={(event) => {
+              onKeyDown?.(event);
+              if (event.defaultPrevented || !removable) return;
+              if (event.key === "Delete" || event.key === "Backspace") {
+                event.preventDefault();
+                remove();
+              }
+            }}
+            onMouseDown={(event) => {
+              onMouseDown?.(event);
+              // A middle press would start autoscroll; its click closes the tab instead.
+              if (removable && event.button === 1) event.preventDefault();
+            }}
+            onAuxClick={(event) => {
+              onAuxClick?.(event);
+              if (event.defaultPrevented || !removable || event.button !== 1) return;
+              event.preventDefault();
+              remove();
+            }}
+          >
+            <span className={styles.content}>
+              <TabIdContext.Provider value={id}>{wrapText(children)}</TabIdContext.Provider>
+            </span>
+          </button>
+        </Tooltip.Trigger>
+        {iconOnly ? <Tooltip.Content>{label}</Tooltip.Content> : null}
+      </Tooltip.Root>
+      {removable ? (
+        // Out of the tab order: the focused tab closes with Delete; the button is for the pointer.
+        <span className={styles.remove}>
+          <Button.Root
+            variant="ghost"
+            tone="neutral"
+            size={stepDown(size, 2)}
+            tabIndex={-1}
+            aria-label={formatLabel(labels.remove, { label: labelText })}
+            onClick={remove}
+          >
+            <Button.Icon>
+              <Icon name="action.close" />
+            </Button.Icon>
+          </Button.Root>
+        </span>
+      ) : null}
+    </div>
   );
 }
 TabsItem.displayName = "Tabs.Item";
@@ -300,15 +568,15 @@ export type TabsLabelProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "childr
 };
 
 /**
- * Item title; truncates with an ellipsis in a constrained row. Text labels reserve the width of
- * the medium weight, so the row does not shift when a tab becomes active.
+ * Tab title; truncates with an ellipsis in a narrow tab. Text labels reserve the width of the
+ * medium weight, so the row does not shift when a tab becomes active.
  */
 function TabsLabel({ children, className, ...rest }: TabsLabelProps) {
-  const itemId = React.useContext(ItemIdContext);
+  const id = React.useContext(TabIdContext);
   const text = typeof children === "string" || typeof children === "number" ? String(children) : "";
   return (
     <span
-      id={itemId ? `${itemId}-label` : undefined}
+      id={id ? `${id}-label` : undefined}
       className={cx(styles.label, className)}
       data-text={text || undefined}
       {...rest}
@@ -328,11 +596,11 @@ export type TabsCountProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "childr
 
 /** Counter next to the label: a soft badge one tier below the tabs size. */
 function TabsCount({ color = "gray", children, className, ...rest }: TabsCountProps) {
-  const itemId = React.useContext(ItemIdContext);
+  const id = React.useContext(TabIdContext);
   return (
     <Badge.Root
       {...rest}
-      id={itemId ? `${itemId}-count` : undefined}
+      id={id ? `${id}-count` : undefined}
       color={color}
       className={cx(styles.count, className)}
     >
@@ -349,10 +617,10 @@ export type TabsDescriptionProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "
 };
 
 function TabsDescription({ children, className, ...rest }: TabsDescriptionProps) {
-  const itemId = React.useContext(ItemIdContext);
+  const id = React.useContext(TabIdContext);
   return (
     <span
-      id={itemId ? `${itemId}-description` : undefined}
+      id={id ? `${id}-description` : undefined}
       className={cx(styles.description, className)}
       {...rest}
     >
@@ -361,6 +629,27 @@ function TabsDescription({ children, className, ...rest }: TabsDescriptionProps)
   );
 }
 TabsDescription.displayName = "Tabs.Description";
+
+// ─── Separator ────────────────────────────────────────────────────────────────
+
+export type TabsSeparatorProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/** A `Divider` hairline between groups of tabs, across the list; a tablist owns only tabs. */
+function TabsSeparator({ className, ...rest }: TabsSeparatorProps) {
+  const { orientation } = useTabsContext();
+  return (
+    <Divider
+      {...rest}
+      orientation={orientation === "horizontal" ? "vertical" : "horizontal"}
+      role="none"
+      aria-hidden="true"
+      className={cx(styles.separator, className)}
+    />
+  );
+}
+TabsSeparator.displayName = "Tabs.Separator";
 
 // ─── Panel ────────────────────────────────────────────────────────────────────
 
@@ -383,7 +672,8 @@ function TabsPanel({ value, children, className, ...rest }: TabsPanelProps) {
       tabIndex={0}
       className={cx(styles.panel, className)}
     >
-      {children}
+      {/* Mounted per tab, so the content enters each time its tab opens it. */}
+      <div className={cx(styles.panelContent, enterMotion.enterBase)}>{children}</div>
     </div>
   );
 }
@@ -397,5 +687,6 @@ export const Tabs = {
   Label: TabsLabel,
   Count: TabsCount,
   Description: TabsDescription,
+  Separator: TabsSeparator,
   Panel: TabsPanel,
 };

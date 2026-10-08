@@ -51,6 +51,7 @@ export const darkThemeOverrides = {
     fill: {
       subtle: "rgba(233, 235, 240, 0.05)",
       subtleActive: "rgba(233, 235, 240, 0.09)",
+      faint: "rgba(233, 235, 240, 0.02)",
       muted: "color-mix(in srgb, var(--prime-ref-color-gray-100) 7%, transparent)",
       mutedHover: "color-mix(in srgb, var(--prime-ref-color-gray-100) 10%, transparent)",
       strong: "color-mix(in srgb, var(--prime-ref-color-gray-100) 16%, transparent)",

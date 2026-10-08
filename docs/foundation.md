@@ -44,7 +44,7 @@ A component may define private custom properties (`--btn-h`) that are assigned f
 | Group | Tokens | Use |
 |---|---|---|
 | `color.bg` | canvas, surface, raised, sunken, inverse, scrim | page / card / floating layer / inset area / tooltip / modal backdrop |
-| `color.fill` | subtle, subtleActive, muted, mutedHover, strong, strongHover | ghost hover & row hover (transparent wash) / neutral buttons, chips, segmented track / unchecked checkbox, switch track, slider track |
+| `color.fill` | subtle, subtleActive, faint, muted, mutedHover, strong, strongHover | ghost hover & row hover (transparent wash) / tab hover in the sunken Tabs strip, below the sunken → surface step / neutral buttons, chips, segmented track / unchecked checkbox, switch track, slider track |
 | `color.text` | primary, secondary, muted, placeholder, disabled, inverse | — |
 | `color.border` | subtle, default, control | hairline separators / stroke buttons / control outline (transparent) |
 | `color.accent` | default, hover, fg, soft, softHover, text | primary action, selection, links, active tab, checked controls |
@@ -315,7 +315,7 @@ No backward compatibility, no aliases, no `@deprecated` props, no legacy types. 
 | Concept | API | Notes |
 |---|---|---|
 | Size | `size?: "xs" \| "s" \| "m" \| "l" \| "xl"`, default `"m"` | Type `ControlSize` from `src/internal/states.ts`. Overlays that size by width (Modal, Drawer) use the subset they need. Avatar adds `"2xl"`. |
-| Treatment | `variant` | Shared vocabulary: `solid` · `soft` · `outline` · `ghost`. Component-specific structural variants (FileUpload `dashed \| solid`, Card templates). Tabs has no variant: navigation tabs are always underline; choosing a value is SegmentedControl are allowed and documented. |
+| Treatment | `variant` | Shared vocabulary: `solid` · `soft` · `outline` · `ghost`. Component-specific structural variants (FileUpload `dashed \| solid`, Card templates). Tabs has no variant: navigation tabs are always a folder (horizontal) or pills (vertical); choosing a value is SegmentedControl are allowed and documented. |
 | Semantic color | `tone?: "neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | Components use the subset that makes sense (Button: `accent \| neutral \| danger`, default `accent`). Destructive = `danger`, never `error`. Button also takes `inherit` (with `ghost \| soft \| outline`) for an action on a colored host: color, fills and focus ring derive from the host's `currentColor`; a host never recolors a Button with a CSS override. |
 | Decorative color | `color?: "gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | Badge, Avatar, Thumbnail, and the parts that host a palette hue: `SegmentedControl.Item` (dot + tinted thumb), count badges (`Tabs.Count`, `SegmentedControl.Count`, `Sidebar.ItemCount`), `FileUpload.FormatBadge`, `Timeline.Item` (dot), TagSelect options (tag hue). |
 | Validation | `invalid?: boolean`; fields with a support row also take `hint?: ReactNode` and `error?: ReactNode` | A non-empty `error` implies `invalid`. Sets `aria-invalid`, `data-invalid`. |

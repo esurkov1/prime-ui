@@ -203,6 +203,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(Tabs.Label);
     takesRef(Tabs.Count);
     takesRef(Tabs.Description);
+    takesRef(Tabs.Separator);
     takesRef(Tabs.Panel);
     takesRef(TagSelect);
     takesRef(Textarea.Counter);
@@ -235,6 +236,19 @@ const CASES: Case[] = [
     ),
   ],
   ["ScrollContainer", "DIV", (ref) => <ScrollContainer ref={ref} fade />],
+  [
+    "Tabs.Item",
+    "BUTTON",
+    (ref) => (
+      <Tabs.Root defaultValue="a">
+        <Tabs.List>
+          <Tabs.Item ref={ref} value="a">
+            Заказы
+          </Tabs.Item>
+        </Tabs.List>
+      </Tabs.Root>
+    ),
+  ],
   [
     "Tabs.List",
     "DIV",

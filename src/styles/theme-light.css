@@ -75,6 +75,7 @@
   --prime-color-field-bg-focus: var(--prime-ref-color-gray-0);
   --prime-color-field-bg-hover: color-mix(in srgb, var(--prime-ref-color-gray-925) 12%, transparent);
   --prime-color-field-bg-surface: color-mix(in srgb, var(--prime-ref-color-gray-925) 6%, transparent);
+  --prime-color-fill-faint: rgba(17, 19, 24, 0.04);
   --prime-color-fill-muted: color-mix(in srgb, var(--prime-ref-color-gray-925) 7%, transparent);
   --prime-color-fill-muted-hover: color-mix(in srgb, var(--prime-ref-color-gray-925) 10%, transparent);
   --prime-color-fill-strong: color-mix(in srgb, var(--prime-ref-color-gray-925) 15%, transparent);

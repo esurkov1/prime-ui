@@ -17,7 +17,7 @@ export default function TabsOrientationExample() {
           key={orientation}
           orientation={orientation}
           defaultValue="notifications"
-          className={styles.wide}
+          className={styles.frame}
         >
           <Tabs.List aria-label="Настройки">
             {SECTIONS.map((section) => (

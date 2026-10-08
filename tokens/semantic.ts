@@ -74,6 +74,11 @@ export const semanticTokens = {
       subtle: "rgba(17, 19, 24, 0.04)",
       subtleActive: "rgba(17, 19, 24, 0.07)",
       /**
+       * The faintest wash: hover of a tab in the sunken strip (Tabs). Stays below the
+       * sunken → surface step in both themes, so a hovered tab never reads as the selected one.
+       */
+      faint: "rgba(17, 19, 24, 0.04)",
+      /**
        * Neutral buttons, chips, segmented track. Translucent ink wash: always one step off whatever
        * it sits on (canvas, card, sunken tile, a custom container), in both themes.
        */

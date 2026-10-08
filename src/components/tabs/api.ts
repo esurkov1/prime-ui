@@ -11,8 +11,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Tabs.Root",
-      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel.",
-      ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель.",
+      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel; horizontal, it is the frame: a sunken strip over the panel surface.",
+      ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель. В горизонтальном режиме это рамка: утопленная полоса над поверхностью панели.",
       props: [
         {
           name: "value",
@@ -44,8 +44,42 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Control tier: tab height 28 · 32 · 36 · 40 · 48, text, icon, radius, spacing, indicator thickness.",
-          ru: "Ярус контрола: высота вкладки 28 · 32 · 36 · 40 · 48, кегль, иконка, отступы, толщина индикатора.",
+          en: "Control tier: text, icon, spacing, folder radius and panel padding. A horizontal tab is the control height plus the folder rise on both sides; a vertical one is the control height.",
+          ru: "Ярус контрола: кегль, иконка, отступы, скругление папки и отступ панели. Горизонтальная вкладка — высота контрола плюс подъём папки сверху и снизу; вертикальная — высота контрола.",
+        },
+        {
+          name: "fullWidth",
+          type: "boolean",
+          default: "true",
+          en: "Horizontal tabs share the list width equally, within `minItemWidth` … `maxItemWidth`; `false` sizes each tab to its content within the same bounds.",
+          ru: "Горизонтальные вкладки делят ширину списка поровну в пределах `minItemWidth` … `maxItemWidth`; `false` — каждая по своему содержимому в тех же пределах.",
+        },
+        {
+          name: "tone",
+          type: '"neutral" | "accent"',
+          default: '"neutral"',
+          en: "Colour of the active tab: `neutral` is primary text with an accent icon, `accent` puts text and icon in accent.",
+          ru: "Цвет активной вкладки: `neutral` — основной текст с акцентной иконкой, `accent` — текст и иконка в акцентном цвете.",
+        },
+        {
+          name: "minItemWidth",
+          type: "number | string",
+          default: "2.5 × control height",
+          en: "Narrowest a horizontal tab with a label gets, px or a CSS length; past it the list scrolls. Icon-only tabs are square.",
+          ru: "Наименьшая ширина горизонтальной вкладки с подписью, px или CSS-длина; дальше список прокручивается. Вкладки-иконки квадратные.",
+        },
+        {
+          name: "maxItemWidth",
+          type: "number | string",
+          default: "7 × control height",
+          en: 'Widest a horizontal tab gets, px or a CSS length (`"none"` lifts the cap); a longer label ends with an ellipsis.',
+          ru: 'Наибольшая ширина горизонтальной вкладки, px или CSS-длина (`"none"` снимает предел); длиннее — подпись обрезается многоточием.',
+        },
+        {
+          name: "labels",
+          type: "Partial<TabsLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "children",
@@ -63,14 +97,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.List",
-      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding indicator; scrolls instead of wrapping.',
-      ru: '`role="tablist"` на `ScrollContainer` со скользящим индикатором: прокручивается с затуханием краёв вместо переноса.',
+      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (vertical: pill). When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); tabs then shrink to `minItemWidth` and the list scrolls.',
+      ru: '`role="tablist"` на `ScrollContainer` со скользящей папкой (в вертикальном режиме — пилюлей). Если вкладки не помещаются или подпись пришлось бы обрезать, скрывает иконки и описания, затем подписи (остаются иконки с подсказками; только если иконка есть у каждой вкладки); затем вкладки сжимаются до `minItemWidth` и список прокручивается.',
       props: [
         {
           name: "children",
           type: "ReactNode",
-          en: "`Tabs.Item`s.",
-          ru: "Вкладки `Tabs.Item`.",
+          en: "`Tabs.Item`s and `Tabs.Separator`s.",
+          ru: "Вкладки `Tabs.Item` и разделители `Tabs.Separator`.",
         },
         {
           name: "…rest",
@@ -82,7 +116,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.Item",
-      en: '`ref` → `HTMLButtonElement`. One tab, a `<button role="tab">`; plain text children are wrapped in `Tabs.Label`.',
+      en: '`ref` → `HTMLButtonElement`. One tab, a `<button role="tab">` in an item wrapper that also holds the close button of a removable tab; plain text children are wrapped in `Tabs.Label`.',
       ru: 'Одна вкладка — `<button role="tab">`; простой текст оборачивается в `Tabs.Label`.',
       props: [
         {
@@ -100,6 +134,12 @@ export const api: ComponentApi = {
           ru: "Отключает вкладку; клик и стрелки её пропускают.",
         },
         {
+          name: "onRemove",
+          type: "() => void",
+          en: "Makes the tab closable: a close button (shown on the active tab, on hover and focus, always on touch screens), `Delete` / `Backspace` and a middle click. Closing the active tab first selects its neighbour; remove the item from your list here.",
+          ru: "Делает вкладку закрываемой: кнопка закрытия (видна на активной вкладке, при наведении и фокусе, на сенсорных экранах всегда), `Delete` / `Backspace` и средний клик. Закрытие активной вкладки сначала выбирает соседнюю; уберите вкладку из своего списка в этом обработчике.",
+        },
+        {
           name: "children",
           type: "ReactNode",
           required: true,
@@ -109,15 +149,15 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "type" | "role" | "onClick">',
-          en: "`className`, `aria-*` and the other button attributes.",
-          ru: "`className`, `aria-*` и остальные атрибуты кнопки.",
+          en: "`className`, `aria-*` and the other button attributes; your `onKeyDown` / `onAuxClick` run first and `preventDefault()` keeps the tab open.",
+          ru: "`className`, `aria-*` и остальные атрибуты кнопки; ваши `onKeyDown` / `onAuxClick` выполняются первыми, `preventDefault()` не даёт закрыть вкладку.",
         },
       ],
     },
     {
       name: "Tabs.Icon",
-      en: "`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`) before the label; muted, accent on the active tab.",
-      ru: "Декоративная иконка перед подписью; приглушённая, на активной вкладке — акцентная.",
+      en: "`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`) before the label; muted, accent on the active tab. Hidden first when tabs do not fit; the last thing left when nothing else fits.",
+      ru: "Декоративная иконка перед подписью; приглушённая, на активной вкладке — акцентная. Скрывается первой, когда вкладки не помещаются; остаётся последней, когда не помещается ничего другого.",
       props: [
         {
           name: "children",
@@ -182,9 +222,22 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "Tabs.Separator",
+      en: "`ref` → `HTMLDivElement`. A `Divider` hairline between groups of tabs, across the list direction; hidden from assistive tech.",
+      ru: "Черта `Divider` между группами вкладок поперёк списка; скрыта от вспомогательных технологий.",
+      props: [
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
       name: "Tabs.Panel",
-      en: '`ref` → `HTMLDivElement`. `<div role="tabpanel">`, focusable, rendered only while its tab is active.',
-      ru: '`<div role="tabpanel">`, фокусируемая; рендерится только пока её вкладка активна.',
+      en: '`ref` → `HTMLDivElement`. `<div role="tabpanel">`, focusable, rendered only while its tab is active; horizontal, the padded surface the folder rises from. Its content enters each time it opens.',
+      ru: '`<div role="tabpanel">`, фокусируемая; рендерится только пока её вкладка активна. В горизонтальном режиме — поверхность с отступами, из которой вырастает папка. Содержимое появляется при каждом открытии.',
       props: [
         {
           name: "value",
@@ -208,5 +261,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [],
+  labels: [
+    {
+      key: "remove",
+      default: "Закрыть вкладку «{label}»",
+      en: "Accessible name of the close button of a removable tab; `{label}` is the tab title (its value when the title is not text).",
+      ru: "Имя кнопки закрытия вкладки; `{label}` — подпись вкладки (её значение, если подпись не текст).",
+    },
+  ],
 };

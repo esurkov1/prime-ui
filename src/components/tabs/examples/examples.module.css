@@ -1,11 +1,18 @@
 /* Layout of the Tabs scenarios: semantic tokens only. */
 
-/* Tabs across the frame: a vertical root measures its own width (container query), so it needs one. */
-.wide {
-  width: 100%;
+/* A column for Tabs that fill their frame (a vertical root measures its own width, so it needs
+   one): wide enough to show the strip, narrower than the preview. */
+.frame {
+  box-sizing: border-box;
+  width: min(100%, calc(16 * var(--prime-control-m-height)));
+  margin-inline: auto;
 }
 
-/* ≈375px — a phone-width column. */
-.narrow {
-  width: min(100%, calc(var(--prime-drawer-width-s) + var(--prime-space-4)));
+/* The same column, which the reader can drag narrower to watch the tabs collapse and scroll. */
+.resizable {
+  composes: frame;
+  min-width: calc(3 * var(--prime-control-m-height));
+  max-width: 100%;
+  overflow: hidden;
+  resize: horizontal;
 }

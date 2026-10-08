@@ -1,4 +1,4 @@
-/** Sections of one screen; the accent bar slides to the active tab — `defaultValue`. */
+/** Sections of one screen; the active tab rises into the panel and glides to the next one — `defaultValue`. */
 import { Tabs, Typography } from "prime-ui-kit";
 
 const SECTIONS = [
