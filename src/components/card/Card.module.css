@@ -47,7 +47,6 @@
 
 /* ---------- Variants ---------- */
 
-.root[data-variant="metric"],
 .root[data-variant="stat-trend"],
 .root[data-variant="cta"] {
   display: flex;
@@ -73,7 +72,6 @@
 }
 
 .root[data-variant="mini"],
-.root[data-variant="mini-media"],
 .root[data-variant="split"] {
   padding: var(--card-pad);
 }
@@ -91,12 +89,9 @@
 }
 
 .title {
+  composes: titleS from "../../internal/textRole.module.css";
   margin: 0;
   min-width: 0;
-  font-size: var(--prime-text-title-s-size);
-  line-height: var(--prime-text-title-s-line-height);
-  letter-spacing: var(--prime-text-title-s-tracking);
-  font-weight: var(--prime-text-title-s-weight);
   color: var(--prime-color-text-primary);
   overflow-wrap: anywhere;
 }
@@ -109,10 +104,8 @@
 }
 
 .description {
+  composes: bodyS from "../../internal/textRole.module.css";
   margin: 0;
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-  font-weight: var(--prime-font-weight-regular);
   color: var(--prime-color-text-secondary);
   overflow-wrap: anywhere;
 }
@@ -137,34 +130,24 @@
 }
 
 .label {
+  composes: bodyS from "../../internal/textRole.module.css";
   max-width: 100%;
   overflow: hidden;
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-  font-weight: var(--prime-font-weight-regular);
   color: var(--prime-color-text-secondary);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .value {
+  composes: titleL from "../../internal/textRole.module.css";
   min-width: 0;
-  font-size: var(--prime-text-title-l-size);
-  line-height: var(--prime-text-title-l-line-height);
-  letter-spacing: var(--prime-text-title-l-tracking);
-  font-weight: var(--prime-text-title-l-weight);
   color: var(--prime-color-text-primary);
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
 
-.root[data-variant="metric"] .value {
-  font-size: var(--prime-text-heading-m-size);
-  line-height: var(--prime-text-heading-m-line-height);
-  letter-spacing: var(--prime-text-heading-m-tracking);
-  font-weight: var(--prime-text-heading-m-weight);
-}
-
+/* `stat-trend`: the value is the tile's headline. Paired with a lead in the header row (a badge
+   or an icon on the left), it is a compact heading-m at the end of that row. */
 .root[data-variant="stat-trend"] .value {
   font-size: var(--prime-text-heading-l-size);
   line-height: var(--prime-text-heading-l-line-height);
@@ -172,7 +155,14 @@
   font-weight: var(--prime-text-heading-l-weight);
 }
 
-/* Everything after the title (a control, a caption, the value of `metric`) keeps its size at the end. */
+.root[data-variant="stat-trend"] > .header > .value {
+  font-size: var(--prime-text-heading-m-size);
+  line-height: var(--prime-text-heading-m-line-height);
+  letter-spacing: var(--prime-text-heading-m-tracking);
+  font-weight: var(--prime-text-heading-m-weight);
+}
+
+/* Everything after the title (a control, a caption, a header-row value) keeps its size at the end. */
 .header > .title {
   flex: 1 1 auto;
 }
@@ -194,10 +184,9 @@
   padding: var(--prime-space-4) var(--card-pad) 0;
 }
 
-/* A KPI cluster — `mini`, `mini-media` and every cell of `split`: the icon tile spans the label and
- * the value rows; without an icon the text is one column. */
+/* A KPI cluster — `mini` and every cell of `split`: the icon tile spans the label and the value
+ * rows; without an icon the text is one column. */
 .root[data-variant="mini"],
-.root[data-variant="mini-media"],
 .root[data-variant="split"] > .body > * {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -209,23 +198,20 @@
 }
 
 .root[data-variant="mini"]:has(> .icon),
-.root[data-variant="mini-media"]:has(> .icon),
 .root[data-variant="split"] > .body > :has(> .icon) {
   grid-template-columns: auto minmax(0, 1fr);
 }
 
 .root[data-variant="mini"] > .icon,
-.root[data-variant="mini-media"] > .icon,
 .root[data-variant="split"] > .body > * > .icon {
   grid-row: 1 / span 2;
 }
 
 .delta {
+  composes: bodyS from "../../internal/textRole.module.css";
   display: inline-flex;
   align-items: center;
   gap: var(--prime-space-1);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
   font-weight: var(--prime-font-weight-medium);
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
@@ -281,9 +267,10 @@
   padding-top: var(--prime-space-2);
 }
 
-/* ---------- mini-media ---------- */
+/* ---------- mini with media ---------- */
 
-.root[data-variant="mini-media"] > .media {
+/* A `Card.Media` in `mini` (a sparkline, a fill level) is a full-width bottom slot. */
+.root[data-variant="mini"] > .media {
   grid-column: 1 / -1;
   justify-self: stretch;
   min-height: var(--prime-space-10);
@@ -351,9 +338,8 @@
 }
 
 .listItem {
+  composes: bodyM from "../../internal/textRole.module.css";
   padding: var(--prime-space-3) var(--card-pad);
-  font-size: var(--prime-text-body-m-size);
-  line-height: var(--prime-text-body-m-line-height);
   color: var(--prime-color-text-primary);
   overflow-wrap: anywhere;
 }
@@ -380,9 +366,10 @@
   padding: 0;
 }
 
+/* The cell divider is the card's one zone hairline (`border-faint`, like the panel zones). */
 .root[data-variant="split"] > .body > * + * {
   padding-inline-start: var(--card-pad);
-  border-inline-start: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  border-inline-start: var(--prime-border-width) solid var(--prime-color-border-faint);
 }
 
 .root[data-variant="split"] > .body > :first-child {
@@ -450,7 +437,7 @@
     padding-top: var(--card-gap);
     padding-inline-start: 0;
     border-inline-start: 0;
-    border-top: var(--prime-border-width) solid var(--prime-color-border-subtle);
+    border-top: var(--prime-border-width) solid var(--prime-color-border-faint);
   }
 
   .header {

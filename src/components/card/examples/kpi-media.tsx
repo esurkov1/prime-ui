@@ -1,14 +1,14 @@
-/** A KPI with a sparkline or a fill level in the bottom slot — `Card.Media`. */
+/** A KPI with a sparkline or a fill level in the bottom slot of `mini` — `Card.Media`. */
 import { Card, Icon, ProgressBar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 const SPARKLINE = "M0 32 L15 28 L30 30 L45 18 L60 22 L75 12 L90 16 L105 8 L120 4";
 
-export default function CardMiniMediaExample() {
+export default function CardKpiMediaExample() {
   return (
     <div className={styles.grid}>
-      <Card.Root variant="mini-media">
+      <Card.Root variant="mini">
         <Card.Icon>
           <Icon name="object.activity" />
         </Card.Icon>
@@ -27,7 +27,7 @@ export default function CardMiniMediaExample() {
         </Card.Media>
       </Card.Root>
 
-      <Card.Root variant="mini-media">
+      <Card.Root variant="mini">
         <Card.Icon>
           <Icon name="object.storage" />
         </Card.Icon>

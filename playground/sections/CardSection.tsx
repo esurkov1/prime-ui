@@ -17,12 +17,12 @@ export const page: ComponentPageConfig = {
     {
       slot: "variants",
       description:
-        "Шаблоны KPI: плашка с иконкой и значением, бейдж со значением и крупное значение с изменением — `variant`, `Card.Delta`.",
+        "Шаблоны KPI: плашка с иконкой и значением, бейдж со значением в строке шапки и крупное значение с изменением — `variant`, `Card.Delta`.",
     },
     {
-      scenario: "mini-media",
+      scenario: "kpi-media",
       title: "Метрика с графиком",
-      description: "KPI со спарклайном или уровнем заполнения в нижнем слоте — `Card.Media`.",
+      description: "KPI со спарклайном или уровнем заполнения в нижнем слоте `mini` — `Card.Media`.",
     },
     {
       scenario: "panel-chart",
