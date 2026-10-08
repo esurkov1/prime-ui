@@ -194,17 +194,19 @@ function CardView({
         ) : null}
       </div>
       {onClose ? (
-        <Button.Root
-          variant="ghost"
-          tone="neutral"
-          size={stepDown(size, 2)}
-          aria-label={labels.close}
-          onClick={onClose}
-        >
-          <Button.Icon>
-            <Icon name="action.close" />
-          </Button.Icon>
-        </Button.Root>
+        <div className={styles.closeWrap}>
+          <Button.Root
+            variant="ghost"
+            tone="neutral"
+            size={stepDown(size, 2)}
+            aria-label={labels.close}
+            onClick={onClose}
+          >
+            <Button.Icon>
+              <Icon name="action.close" />
+            </Button.Icon>
+          </Button.Root>
+        </div>
       ) : null}
       {countdown ? (
         <div className={styles.progressTrack} aria-hidden="true">

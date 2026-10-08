@@ -281,6 +281,14 @@
   height: var(--ntf-icon);
 }
 
+/* The close button is taller than the title line: centered on it, it overhangs into the padding
+   instead of growing the row, so a one-line toast keeps its text in the middle. */
+.closeWrap {
+  display: flex;
+  align-items: center;
+  height: var(--ntf-title-line-height);
+}
+
 .content {
   display: flex;
   flex-direction: column;
