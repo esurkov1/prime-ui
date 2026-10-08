@@ -1,11 +1,13 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { CommandMenu } from "./CommandMenu";
 
 /** A scrim dismiss is a full click that starts and ends outside the panel. */
-function clickScrim(scrim: HTMLElement) {
+function clickScrim() {
+  const scrim = screen.getByRole("dialog").parentElement as HTMLElement;
   fireEvent.pointerDown(scrim);
   fireEvent.click(scrim);
 }
@@ -165,8 +167,9 @@ describe("CommandMenu — size и labels", () => {
         onOpenChange={() => {}}
         size="xl"
         labels={{ search: "Find", empty: "Nothing", emptyHint: "" }}
+        onValueChange={onValueChange}
       >
-        <CommandMenu.Input onValueChange={onValueChange} />
+        <CommandMenu.Input />
         <CommandMenu.List>
           <CommandMenu.Empty />
           <CommandMenu.Item value="alpha">Alpha</CommandMenu.Item>
@@ -211,7 +214,7 @@ describe("CommandMenu — overlay contract", () => {
     fireEvent.pointerDown(screen.getByRole("option", { name: "Alpha" }));
     expect(onOpenChange).not.toHaveBeenCalled();
 
-    clickScrim(screen.getByTestId("modal-overlay"));
+    clickScrim();
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
@@ -240,7 +243,88 @@ describe("CommandMenu — overlay contract", () => {
         <CommandMenu.Input aria-label="Поиск команд" />
       </CommandMenu.Root>,
     );
-    clickScrim(screen.getByTestId("modal-overlay"));
+    clickScrim();
     expect(onOpenChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("CommandMenu — focus, query and disabled items", () => {
+  it("focus lands in the search field on open", async () => {
+    render(<TestPalette />);
+    await waitFor(() =>
+      expect(screen.getByRole("combobox", { name: "Поиск команд" })).toHaveFocus(),
+    );
+  });
+
+  it("the query lives on Root: value / onValueChange, cleared when the palette closes", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    function Harness() {
+      const [open, setOpen] = React.useState(true);
+      const [query, setQuery] = React.useState("al");
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>
+            open
+          </button>
+          <CommandMenu.Root
+            open={open}
+            onOpenChange={setOpen}
+            value={query}
+            onValueChange={(next) => {
+              onValueChange(next);
+              setQuery(next);
+            }}
+          >
+            <CommandMenu.Input aria-label="Поиск команд" />
+            <CommandMenu.List>
+              <CommandMenu.Item value="alpha">Alpha</CommandMenu.Item>
+              <CommandMenu.Item value="beta">Beta</CommandMenu.Item>
+            </CommandMenu.List>
+          </CommandMenu.Root>
+        </>
+      );
+    }
+    render(<Harness />);
+    const input = screen.getByRole("combobox", { name: "Поиск команд" });
+    expect(input).toHaveValue("al");
+    expect(screen.queryByRole("option", { name: "Beta" })).not.toBeInTheDocument();
+    await user.type(input, "p");
+    expect(onValueChange).toHaveBeenLastCalledWith("alp");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onValueChange).toHaveBeenLastCalledWith("");
+  });
+
+  it("a disabled item is shown with aria-disabled, skipped by the arrows and not runnable", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    render(
+      <CommandMenu.Root open onOpenChange={vi.fn()}>
+        <CommandMenu.Input aria-label="Поиск команд" />
+        <CommandMenu.List>
+          <CommandMenu.Item value="alpha">Alpha</CommandMenu.Item>
+          <CommandMenu.Item value="beta" disabled onSelect={onSelect}>
+            Beta
+          </CommandMenu.Item>
+          <CommandMenu.Item value="gamma">Gamma</CommandMenu.Item>
+        </CommandMenu.List>
+      </CommandMenu.Root>,
+    );
+    const beta = screen.getByRole("option", { name: "Beta" });
+    expect(beta).toBeVisible();
+    expect(beta).toHaveAttribute("aria-disabled", "true");
+    const input = screen.getByRole("combobox", { name: "Поиск команд" });
+    await user.type(input, "{ArrowDown}");
+    expect(screen.getByRole("option", { name: "Gamma" })).toHaveAttribute("aria-selected", "true");
+    fireEvent.click(beta);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("the pointer moves the active option", () => {
+    render(<TestPalette />);
+    const beta = screen.getByRole("option", { name: "Beta" });
+    fireEvent.pointerMove(beta);
+    expect(beta).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("option", { name: "Alpha" })).toHaveAttribute("aria-selected", "false");
   });
 });

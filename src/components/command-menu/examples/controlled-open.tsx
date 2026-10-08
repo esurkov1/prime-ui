@@ -14,8 +14,14 @@ export default function CommandMenuControlledOpenExample() {
       <Typography as="span" variant="body-s" tone="secondary">
         Запрос: «{query || "…"}»
       </Typography>
-      <CommandMenu.Root open={open} onOpenChange={setOpen} aria-label="Команды">
-        <CommandMenu.Input placeholder="Начните вводить" value={query} onValueChange={setQuery} />
+      <CommandMenu.Root
+        open={open}
+        onOpenChange={setOpen}
+        value={query}
+        onValueChange={setQuery}
+        aria-label="Команды"
+      >
+        <CommandMenu.Input placeholder="Начните вводить" />
         <CommandMenu.List>
           <CommandMenu.Empty />
           <CommandMenu.Group label="Команды">
