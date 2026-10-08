@@ -1,4 +1,4 @@
-/** Group headings that fold their items away, with a chevron at the end of the heading; in compact mode the items always show — `collapsible`, `defaultOpen`. */
+/** Group headings that fold their items away, with a chevron at the end of the heading; on the compact rail a folded group becomes one row whose items open in a flyout — `collapsible`, `defaultOpen`. */
 import { Icon, Sidebar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

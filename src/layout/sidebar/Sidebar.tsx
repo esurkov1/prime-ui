@@ -51,9 +51,11 @@ const FLYOUT_OPEN_DELAY_MS = 120;
 const FLYOUT_CLOSE_DELAY_MS = 300;
 
 /** Rows the rail clips to their icon box: their layers anchor to the visible part. */
-const RAIL_ROWS = `.${styles.item}, .${styles.account}, .${styles.brand}`;
+const RAIL_ROWS = `.${styles.item}, .${styles.account}, .${styles.brand}, .${styles.groupLabel}`;
 
 type SidebarContextValue = {
+  /** Stored open state of groups and sub-lists (`persistKey`), or `null`. */
+  persist: SidebarPersist | null;
   mode: SidebarMode;
   setMode: (mode: SidebarMode) => void;
   /** Off-canvas panel state (only while `offCanvas`). */
@@ -70,12 +72,67 @@ type SidebarContextValue = {
 
 const [SidebarProvider, useSidebar] = createComponentContext<SidebarContextValue>("Sidebar");
 
+// ─── Persisted state ──────────────────────────────────────────────────────────
+
+type SidebarStored = { mode?: SidebarMode; open?: Record<string, boolean> };
+
+type SidebarPersist = {
+  read: (id: string) => boolean | undefined;
+  write: (id: string, open: boolean) => void;
+};
+
+/** The stored state under `key`; storage may be missing, blocked or hold anything. */
+function readStored(key: string): SidebarStored {
+  try {
+    const value: unknown = JSON.parse(window.localStorage.getItem(key) ?? "{}");
+    return value !== null && typeof value === "object" ? (value as SidebarStored) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeStored(key: string, update: (stored: SidebarStored) => SidebarStored) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(update(readStored(key))));
+  } catch {
+    // Storage full or blocked: the sidebar works, it just will not remember.
+  }
+}
+
+const SIDEBAR_MODES: readonly SidebarMode[] = ["expanded", "compact", "hidden"];
+
+/**
+ * An uncontrolled open state that `persistKey` remembers: the stored value wins over
+ * `defaultOpen`, every change is written back. Controlled (`open` given), nothing is stored.
+ */
+function usePersistedOpen(
+  id: string,
+  openProp: boolean | undefined,
+  defaultOpen: boolean,
+  onOpenChange: ((open: boolean) => void) | undefined,
+) {
+  const { persist } = useSidebar();
+  const [open, setOpen] = useControllableState<boolean>({
+    value: openProp,
+    defaultValue: (id ? persist?.read(id) : undefined) ?? defaultOpen,
+    onChange: onOpenChange,
+  });
+  React.useEffect(() => {
+    if (persist && id && openProp === undefined) persist.write(id, open);
+  }, [persist, id, openProp, open]);
+  return [open, setOpen] as const;
+}
+
 export { useSidebar };
+
+/** Inside a rail flyout the rows are full rows again: a sub-list there unfolds inline. */
+const InFlyoutRailContext = React.createContext(false);
 
 /** The desktop icon rail: labels are gone, items show tooltips, sub-lists open as flyouts. */
 function useRail(): boolean {
   const { mode, offCanvas } = useSidebar();
-  return mode === "compact" && !offCanvas;
+  const inFlyout = React.useContext(InFlyoutRailContext);
+  return mode === "compact" && !offCanvas && !inFlyout;
 }
 
 /** Items rendered inside a compact flyout: no rail tooltips; navigating closes the flyout. */
@@ -169,6 +226,12 @@ export type SidebarRootProps = React.ComponentPropsWithoutRef<"div"> & {
    * `auto` below 768px, `always` at any width (navigation behind a menu button), `never`.
    */
   offCanvas?: "auto" | "always" | "never";
+  /**
+   * Remembers the state across reloads in `localStorage` under this key: the mode and which
+   * collapsible groups and sub-lists are open (by their `id`, else their label text). Controlled
+   * `mode` / `open` are not stored.
+   */
+  persistKey?: string;
   labels?: Partial<SidebarLabels>;
 };
 
@@ -184,20 +247,41 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
     defaultOpen = false,
     onOpenChange,
     offCanvas: offCanvasProp = "auto",
+    persistKey,
     labels: labelsProp,
     ...rest
   },
   ref,
 ) {
+  const persist = React.useMemo<SidebarPersist | null>(
+    () =>
+      persistKey
+        ? {
+            read: (id) => readStored(persistKey).open?.[id],
+            write: (id, open) =>
+              writeStored(persistKey, (stored) => ({
+                ...stored,
+                open: { ...stored.open, [id]: open },
+              })),
+          }
+        : null,
+    [persistKey],
+  );
+  const storedMode = persistKey ? readStored(persistKey).mode : undefined;
   const labels = React.useMemo(() => ({ ...defaultLabels, ...labelsProp }), [labelsProp]);
   const narrow = useMediaQuery(MOBILE_QUERY, offCanvasProp === "auto");
   const offCanvas = offCanvasProp === "always" || narrow;
 
   const [mode, setMode] = useControllableState<SidebarMode>({
     value: modeProp,
-    defaultValue: defaultMode,
+    defaultValue: storedMode && SIDEBAR_MODES.includes(storedMode) ? storedMode : defaultMode,
     onChange: onModeChange,
   });
+  React.useEffect(() => {
+    if (persistKey && modeProp === undefined) {
+      writeStored(persistKey, (stored) => ({ ...stored, mode }));
+    }
+  }, [persistKey, modeProp, mode]);
   const [openState, setOpen] = useControllableState<boolean>({
     value: openProp,
     defaultValue: defaultOpen,
@@ -266,8 +350,8 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   const navId = React.useId();
 
   const context = React.useMemo<SidebarContextValue>(
-    () => ({ mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels }),
-    [mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels],
+    () => ({ persist, mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels }),
+    [persist, mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels],
   );
 
   return (
@@ -380,14 +464,19 @@ function SidebarGroup({
   const bodyId = React.useId();
   const rail = useRail();
   const disclosure = collapsible && label !== undefined;
-  const [open, setOpen] = useControllableState<boolean>({
-    value: openProp,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
+  const [open, setOpen] = usePersistedOpen(
+    disclosure ? `group:${rest.id ?? textOf(label)}` : "",
+    openProp,
+    defaultOpen,
+    onOpenChange,
+  );
   const bodyRef = React.useRef<HTMLDivElement>(null);
   const active = useActivePath(bodyRef);
   useOpenOnActivePath(disclosure, active, open, setOpen);
+  // A folded group on the rail is one row; its items open beside it in a flyout.
+  const folded = disclosure && rail && !open;
+  const hue = disclosure ? attentionHue(children) : null;
+  const flyout = useRailFlyout(folded);
 
   if (!disclosure) {
     return (
@@ -399,17 +488,19 @@ function SidebarGroup({
         className={cx(styles.group, className)}
       >
         {label === undefined ? null : (
-          <div id={labelId} className={styles.groupLabel}>
-            <span className={styles.groupText}>{label}</span>
-          </div>
+          // On the rail the heading shows its first letters; the tooltip gives the whole name.
+          <CompactTooltip text={textOf(label)}>
+            <div id={labelId} className={styles.groupLabel}>
+              <span className={styles.groupText}>{label}</span>
+            </div>
+          </CompactTooltip>
         )}
         {children}
       </div>
     );
   }
 
-  // The rail has no headings: its items always show.
-  const shown = open || rail;
+  const text = textOf(label);
   return (
     // biome-ignore lint/a11y/useSemanticElements: a nav group of links, not a form fieldset
     <div
@@ -419,24 +510,79 @@ function SidebarGroup({
       className={cx(styles.group, className)}
       data-collapsible="true"
     >
-      <button
-        id={labelId}
-        type="button"
-        className={cx(styles.groupLabel, styles.groupTrigger)}
-        aria-expanded={open}
-        aria-controls={bodyId}
-        inert={rail || undefined}
-        onClick={() => setOpen((prev) => !prev)}
+      <CompactTooltip text={text}>
+        <button
+          id={labelId}
+          type="button"
+          className={cx(styles.groupLabel, styles.groupTrigger)}
+          aria-expanded={open}
+          aria-controls={bodyId}
+          // On the rail the heading only names the section: out of the tab order and the tree, a
+          // click does nothing; hovering it shows the whole name, which the rail cuts.
+          tabIndex={rail ? -1 : undefined}
+          aria-hidden={rail || undefined}
+          onClick={() => {
+            if (!rail) setOpen((prev) => !prev);
+          }}
+        >
+          <span className={styles.groupText}>{label}</span>
+          <AttentionDot hue={hue} shown={!open && !rail} inline />
+          <Icon name="nav.chevronDown" className={styles.groupChevron} />
+        </button>
+      </CompactTooltip>
+      {/* The rail row of a folded group grows in and out on the rail's clock, like a disclosure;
+          off the rail it stays folded and inert. */}
+      <div
+        className={styles.disclosure}
+        data-state={folded ? "open" : "closed"}
+        inert={!folded || undefined}
+        aria-hidden={!folded || undefined}
       >
-        <span className={styles.groupText}>{label}</span>
-        <Icon name="nav.chevronDown" className={styles.groupChevron} />
-      </button>
+        <div className={styles.disclosureClip}>
+          <div className={styles.groupItems}>
+            <Popover.Root
+              open={flyout.open}
+              onOpenChange={(next) => {
+                if (!next) flyout.close(false);
+              }}
+            >
+              <CompactTooltip
+                text={text}
+                canOpen={() => !flyout.pointerInside.current && !flyout.open}
+              >
+                <Popover.Anchor>
+                  <button
+                    ref={flyout.triggerRef}
+                    type="button"
+                    className={styles.item}
+                    aria-label={text}
+                    aria-expanded={flyout.open}
+                    aria-haspopup="dialog"
+                    {...toDataAttributes({ "active-path": active || undefined })}
+                    {...flyout.triggerHandlers}
+                  >
+                    <span className={styles.icon} aria-hidden="true">
+                      <Icon name="action.more" />
+                    </span>
+                    <AttentionDot hue={hue} shown={folded} />
+                  </button>
+                </Popover.Anchor>
+              </CompactTooltip>
+              {folded ? (
+                <RailFlyout flyout={flyout}>
+                  <div className={styles.groupItems}>{children}</div>
+                </RailFlyout>
+              ) : null}
+            </Popover.Root>
+          </div>
+        </div>
+      </div>
       <div
         ref={bodyRef}
         id={bodyId}
         className={styles.disclosure}
-        data-state={shown ? "open" : "closed"}
-        inert={!shown || undefined}
+        data-state={open ? "open" : "closed"}
+        inert={!open || undefined}
       >
         <div className={styles.disclosureClip}>
           <div className={styles.groupItems}>{children}</div>
@@ -511,6 +657,50 @@ function SidebarItemCount({ children, color, variant, className, ...rest }: Side
   );
 }
 SidebarItemCount.displayName = "Sidebar.ItemCount";
+
+/**
+ * The hue of the first count that needs attention (`Sidebar.ItemCount` with `color` or `variant`)
+ * anywhere in a subtree, or `null`: a folded parent shows it as a dot.
+ */
+function attentionHue(node: React.ReactNode): PaletteColor | null {
+  for (const child of React.Children.toArray(node)) {
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) continue;
+    if (isElementOf<SidebarItemCountProps>(child, SidebarItemCount)) {
+      const { color, variant } = child.props;
+      if (color !== undefined || variant !== undefined) return color ?? "gray";
+      continue;
+    }
+    const inner = attentionHue(child.props.children);
+    if (inner) return inner;
+  }
+  return null;
+}
+
+/**
+ * The dot of a folded parent (a sub-list's row, a folded group): something inside needs
+ * attention. It fades and scales in and out with the fold. `inline` sits after a heading's text;
+ * otherwise it marks the row's icon like a count's rail dot.
+ */
+function AttentionDot({
+  hue,
+  shown,
+  inline = false,
+}: {
+  hue: PaletteColor | null;
+  shown: boolean;
+  inline?: boolean;
+}) {
+  if (!hue) return null;
+  return (
+    <ControlSizeProvider value="l">
+      <Badge.Dot
+        className={cx(styles.dot, inline && styles.dotInline)}
+        data-attention={shown ? "shown" : "hidden"}
+        style={{ color: `var(--prime-color-palette-${hue}-solid)` }}
+      />
+    </ControlSizeProvider>
+  );
+}
 
 export type SidebarItemShortcutProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   /** A key hint, e.g. `<Kbd>⌘K</Kbd>`. */
@@ -779,17 +969,13 @@ type SubContextValue = {
   setOpen: (open: boolean | ((prev: boolean) => boolean)) => void;
   triggerId: string;
   contentId: string;
-  triggerRef: React.RefObject<HTMLButtonElement | null>;
   regionRef: React.RefObject<HTMLDivElement | null>;
   /** A child is the current page. */
   active: boolean;
-  /** Compact flyout. */
-  flyoutOpen: boolean;
-  openFlyout: (focusFirst: boolean) => void;
-  hoverStart: () => void;
-  hoverEnd: () => void;
-  /** The pointer is over the trigger: the rail tooltip stays closed (the flyout names the item). */
-  pointerInside: React.RefObject<boolean>;
+  /** The compact flyout. */
+  flyout: RailFlyoutState;
+  /** Hue of a child count that needs attention, for the parent's dot while folded. */
+  hue: PaletteColor | null;
 };
 
 const [SubProvider, useSubContext] = createComponentContext<SubContextValue>("Sidebar.Sub");
@@ -802,8 +988,177 @@ export type SidebarSubProps = React.ComponentProps<"div"> & {
   onOpenChange?: (open: boolean) => void;
 };
 
-/** Selector of the focusable rows inside a flyout. */
+/** Selector of the focusable rows inside a flyout (rows of a folded inline sub-list are inert). */
 const FLYOUT_ITEMS = `.${styles.item}:not([data-disabled])`;
+
+const flyoutItems = (flyout: HTMLElement) =>
+  Array.from(flyout.querySelectorAll<HTMLElement>(FLYOUT_ITEMS)).filter(
+    (item) => item.closest("[inert]") === null,
+  );
+
+/**
+ * A flyout beside a rail row (a sub-list's parent, a folded group): it opens on hover after an
+ * intent delay, on click and on `Enter` · `Space` · `→` (focusing its first row), and closes
+ * after a grace period when the pointer leaves, on `←` / `Tab` (focus back on the row), on
+ * `Escape` and when the rail goes away.
+ */
+function useRailFlyout(rail: boolean) {
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const flyoutRef = React.useRef<HTMLDivElement | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const focusFirstRef = React.useRef(false);
+  /** The pointer is over the row: the rail tooltip stays closed (the flyout names the row). */
+  const pointerInside = React.useRef(false);
+  const openTimer = React.useRef<number | undefined>(undefined);
+  const closeTimer = React.useRef<number | undefined>(undefined);
+
+  const clearTimers = React.useCallback(() => {
+    window.clearTimeout(openTimer.current);
+    window.clearTimeout(closeTimer.current);
+  }, []);
+  React.useEffect(() => clearTimers, [clearTimers]);
+
+  // Leaving the rail closes the flyout.
+  React.useEffect(() => {
+    if (!rail) setOpen(false);
+  }, [rail]);
+
+  // The flyout reaches the DOM through a portal a pass later: focus moves in once it is attached.
+  const attach = React.useCallback((node: HTMLDivElement | null) => {
+    flyoutRef.current = node;
+    if (!node || !focusFirstRef.current) return;
+    focusFirstRef.current = false;
+    flyoutItems(node)[0]?.focus({ preventScroll: true });
+  }, []);
+
+  const show = React.useCallback(
+    (focusFirst: boolean) => {
+      clearTimers();
+      if (focusFirst) {
+        if (open && flyoutRef.current) {
+          flyoutItems(flyoutRef.current)[0]?.focus({ preventScroll: true });
+        } else {
+          focusFirstRef.current = true;
+        }
+      }
+      setOpen(true);
+    },
+    [clearTimers, open],
+  );
+
+  const close = React.useCallback(
+    (returnFocus: boolean) => {
+      clearTimers();
+      setOpen(false);
+      if (returnFocus) triggerRef.current?.focus({ preventScroll: true });
+    },
+    [clearTimers],
+  );
+
+  const hoverStart = React.useCallback(() => {
+    clearTimers();
+    openTimer.current = window.setTimeout(() => setOpen(true), FLYOUT_OPEN_DELAY_MS);
+  }, [clearTimers]);
+
+  const hoverEnd = React.useCallback(() => {
+    clearTimers();
+    closeTimer.current = window.setTimeout(() => {
+      // A keyboard user inside the flyout keeps it.
+      if (flyoutRef.current?.contains(document.activeElement)) return;
+      setOpen(false);
+    }, FLYOUT_CLOSE_DELAY_MS);
+  }, [clearTimers]);
+
+  const keepOpen = React.useCallback(() => window.clearTimeout(closeTimer.current), []);
+
+  const onFlyoutKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      close(true);
+      return;
+    }
+    if (event.key === "Tab") {
+      // The flyout lives in a portal: Tab continues from the row.
+      if (event.shiftKey) event.preventDefault();
+      close(true);
+      return;
+    }
+    const items = flyoutItems(event.currentTarget);
+    const next = rovingIndex(
+      event.key,
+      items.indexOf(document.activeElement as HTMLElement),
+      items.length,
+      "vertical",
+    );
+    if (next === null) return;
+    event.preventDefault();
+    items[next]?.focus();
+  };
+
+  /** Props of the rail row: hover intent, click and keys that open the flyout. */
+  const triggerHandlers = {
+    onClick: () => show(false),
+    onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+      if (event.key === "Enter" || event.key === " " || event.key === "ArrowRight") {
+        event.preventDefault();
+        show(true);
+      }
+    },
+    onPointerEnter: (event: React.PointerEvent<HTMLElement>) => {
+      if (event.pointerType === "touch") return;
+      pointerInside.current = true;
+      hoverStart();
+    },
+    onPointerLeave: (event: React.PointerEvent<HTMLElement>) => {
+      pointerInside.current = false;
+      if (event.pointerType !== "touch") hoverEnd();
+    },
+  };
+
+  const flyoutContext = React.useMemo(() => ({ close: () => close(false) }), [close]);
+
+  return {
+    open: rail && open,
+    triggerRef,
+    pointerInside,
+    show,
+    close,
+    attach,
+    keepOpen,
+    hoverEnd,
+    onFlyoutKeyDown,
+    triggerHandlers,
+    flyoutContext,
+  };
+}
+
+type RailFlyoutState = ReturnType<typeof useRailFlyout>;
+
+/** The flyout surface: just the rows (full rows, not the rail); the rail row names it. */
+function RailFlyout({ flyout, children }: { flyout: RailFlyoutState; children: React.ReactNode }) {
+  const { size } = useSidebar();
+  return (
+    <Popover.Content
+      ref={flyout.attach}
+      side="right"
+      align="start"
+      size={size}
+      flush
+      className={styles.flyout}
+      onPointerEnter={(event) => {
+        if (event.pointerType !== "touch") flyout.keepOpen();
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType !== "touch") flyout.hoverEnd();
+      }}
+      onKeyDown={flyout.onFlyoutKeyDown}
+    >
+      <InFlyoutRailContext.Provider value={true}>
+        <FlyoutContext.Provider value={flyout.flyoutContext}>{children}</FlyoutContext.Provider>
+      </InFlyoutRailContext.Provider>
+    </Popover.Content>
+  );
+}
 
 /**
  * A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent`. Expanded, the
@@ -817,88 +1172,26 @@ function SidebarSub({
   children,
   ...rest
 }: SidebarSubProps) {
-  const { size } = useSidebar();
   const rail = useRail();
-  const [open, setOpen] = useControllableState<boolean>({
-    value: openProp,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
+  const trigger = React.Children.toArray(children).find((node) =>
+    isElementOf<SidebarSubTriggerProps>(node, SidebarSubTrigger),
+  );
+  const [open, setOpen] = usePersistedOpen(
+    `sub:${rest.id ?? (trigger ? splitItemChildren(trigger.props.children).text : "")}`,
+    openProp,
+    defaultOpen,
+    onOpenChange,
+  );
   const id = React.useId();
-  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
   const regionRef = React.useRef<HTMLDivElement | null>(null);
-  const flyoutRef = React.useRef<HTMLDivElement | null>(null);
   const active = useActivePath(regionRef);
   useOpenOnActivePath(true, active, open, setOpen);
+  const flyout = useRailFlyout(rail);
 
-  const [flyoutOpen, setFlyoutOpen] = React.useState(false);
-  const focusFirstRef = React.useRef(false);
-  const pointerInside = React.useRef(false);
-  const openTimer = React.useRef<number | undefined>(undefined);
-  const closeTimer = React.useRef<number | undefined>(undefined);
-
-  const clearTimers = React.useCallback(() => {
-    window.clearTimeout(openTimer.current);
-    window.clearTimeout(closeTimer.current);
-  }, []);
-  React.useEffect(() => clearTimers, [clearTimers]);
-
-  // Leaving the rail closes the flyout.
-  React.useEffect(() => {
-    if (!rail) setFlyoutOpen(false);
-  }, [rail]);
-
-  // The flyout reaches the DOM through a portal a pass later: focus moves in once it is attached.
-  const attachFlyout = React.useCallback((node: HTMLDivElement | null) => {
-    flyoutRef.current = node;
-    if (!node || !focusFirstRef.current) return;
-    focusFirstRef.current = false;
-    node.querySelector<HTMLElement>(FLYOUT_ITEMS)?.focus({ preventScroll: true });
-  }, []);
-
-  const openFlyout = React.useCallback(
-    (focusFirst: boolean) => {
-      clearTimers();
-      if (focusFirst) {
-        if (flyoutOpen) {
-          flyoutRef.current
-            ?.querySelector<HTMLElement>(FLYOUT_ITEMS)
-            ?.focus({ preventScroll: true });
-        } else {
-          focusFirstRef.current = true;
-        }
-      }
-      setFlyoutOpen(true);
-    },
-    [clearTimers, flyoutOpen],
-  );
-
-  const closeFlyout = React.useCallback(
-    (returnFocus: boolean) => {
-      clearTimers();
-      setFlyoutOpen(false);
-      if (returnFocus) triggerRef.current?.focus({ preventScroll: true });
-    },
-    [clearTimers],
-  );
-
-  const hoverStart = React.useCallback(() => {
-    window.clearTimeout(closeTimer.current);
-    window.clearTimeout(openTimer.current);
-    openTimer.current = window.setTimeout(() => setFlyoutOpen(true), FLYOUT_OPEN_DELAY_MS);
-  }, []);
-
-  const hoverEnd = React.useCallback(() => {
-    window.clearTimeout(openTimer.current);
-    window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => {
-      // A keyboard user inside the flyout keeps it.
-      if (flyoutRef.current?.contains(document.activeElement)) return;
-      setFlyoutOpen(false);
-    }, FLYOUT_CLOSE_DELAY_MS);
-  }, []);
-
-  const flyoutContext = React.useMemo(() => ({ close: () => closeFlyout(false) }), [closeFlyout]);
+  const content = React.Children.toArray(children).find((node) =>
+    isElementOf<SidebarSubContentProps>(node, SidebarSubContent),
+  ) as React.ReactElement<SidebarSubContentProps> | undefined;
+  const hue = content ? attentionHue(content.props.children) : null;
 
   const context = React.useMemo<SubContextValue>(
     () => ({
@@ -906,85 +1199,29 @@ function SidebarSub({
       setOpen,
       triggerId: `${id}-trigger`,
       contentId: `${id}-content`,
-      triggerRef,
       regionRef,
       active,
-      flyoutOpen,
-      openFlyout,
-      hoverStart,
-      hoverEnd,
-      pointerInside,
+      flyout,
+      hue,
     }),
-    [open, setOpen, id, active, flyoutOpen, openFlyout, hoverStart, hoverEnd],
+    [open, setOpen, id, active, flyout, hue],
   );
-
-  const nodes = React.Children.toArray(children);
-  const trigger = nodes.find((node) =>
-    isElementOf<SidebarSubTriggerProps>(node, SidebarSubTrigger),
-  ) as React.ReactElement<SidebarSubTriggerProps> | undefined;
-  const content = nodes.find((node) =>
-    isElementOf<SidebarSubContentProps>(node, SidebarSubContent),
-  ) as React.ReactElement<SidebarSubContentProps> | undefined;
-  const title = trigger ? splitItemChildren(trigger.props.children).label : null;
-
-  const onFlyoutKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      closeFlyout(true);
-      return;
-    }
-    if (event.key === "Tab") {
-      // The flyout lives in a portal: Tab continues from the parent item.
-      if (event.shiftKey) event.preventDefault();
-      closeFlyout(true);
-      return;
-    }
-    const items = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(FLYOUT_ITEMS));
-    const next = rovingIndex(
-      event.key,
-      items.indexOf(document.activeElement as HTMLElement),
-      items.length,
-      "vertical",
-    );
-    if (next === null) return;
-    event.preventDefault();
-    items[next]?.focus();
-  };
 
   return (
     <SubProvider value={context}>
       <Popover.Root
-        open={rail && flyoutOpen}
+        open={flyout.open}
         onOpenChange={(next) => {
-          if (!next) closeFlyout(false);
+          if (!next) flyout.close(false);
         }}
       >
         <div {...rest} className={cx(styles.sub, className)} data-state={open ? "open" : "closed"}>
           {children}
         </div>
         {rail && content ? (
-          <Popover.Content
-            ref={attachFlyout}
-            side="right"
-            align="start"
-            size={size}
-            flush
-            className={styles.flyout}
-            onPointerEnter={(event) => {
-              if (event.pointerType !== "touch") window.clearTimeout(closeTimer.current);
-            }}
-            onPointerLeave={(event) => {
-              if (event.pointerType !== "touch") hoverEnd();
-            }}
-            onKeyDown={onFlyoutKeyDown}
-          >
-            <FlyoutContext.Provider value={flyoutContext}>
-              <div className={styles.flyoutTitle} aria-hidden="true">
-                {title}
-              </div>
-              <div className={styles.subList}>{subRows(content.props.children)}</div>
-            </FlyoutContext.Provider>
-          </Popover.Content>
+          <RailFlyout flyout={flyout}>
+            <div className={styles.groupItems}>{content.props.children}</div>
+          </RailFlyout>
         ) : null}
       </Popover.Root>
     </SubProvider>
@@ -1024,7 +1261,8 @@ const SidebarSubTrigger = React.forwardRef<HTMLButtonElement, SidebarSubTriggerP
       children,
       <Icon name="nav.chevronDown" className={styles.chevron} />,
     );
-    const mergedRef = useMergedRefs<HTMLButtonElement>(ref, sub.triggerRef);
+    const { flyout } = sub;
+    const mergedRef = useMergedRefs<HTMLButtonElement>(ref, flyout.triggerRef);
 
     const button = (
       <button
@@ -1034,7 +1272,7 @@ const SidebarSubTrigger = React.forwardRef<HTMLButtonElement, SidebarSubTriggerP
         type="button"
         disabled={disabled}
         className={cx(styles.item, className)}
-        aria-expanded={rail ? sub.flyoutOpen : sub.open}
+        aria-expanded={rail ? flyout.open : sub.open}
         aria-controls={rail ? undefined : sub.contentId}
         aria-haspopup={rail ? "dialog" : undefined}
         {...toDataAttributes({
@@ -1044,7 +1282,7 @@ const SidebarSubTrigger = React.forwardRef<HTMLButtonElement, SidebarSubTriggerP
         onClick={(event) => {
           onClick?.(event);
           if (event.defaultPrevented) return;
-          if (rail) sub.openFlyout(false);
+          if (rail) flyout.triggerHandlers.onClick();
           else sub.setOpen((prev) => !prev);
         }}
         onKeyDown={(event) => {
@@ -1052,10 +1290,7 @@ const SidebarSubTrigger = React.forwardRef<HTMLButtonElement, SidebarSubTriggerP
           if (event.defaultPrevented) return;
           const { key } = event;
           if (rail) {
-            if (key === "Enter" || key === " " || key === "ArrowRight") {
-              event.preventDefault();
-              sub.openFlyout(true);
-            }
+            flyout.triggerHandlers.onKeyDown(event);
             return;
           }
           if (key === "ArrowRight" && !sub.open) {
@@ -1068,24 +1303,23 @@ const SidebarSubTrigger = React.forwardRef<HTMLButtonElement, SidebarSubTriggerP
         }}
         onPointerEnter={(event) => {
           onPointerEnter?.(event);
-          if (event.pointerType === "touch") return;
-          sub.pointerInside.current = true;
-          if (rail) sub.hoverStart();
+          if (rail) flyout.triggerHandlers.onPointerEnter(event);
         }}
         onPointerLeave={(event) => {
           onPointerLeave?.(event);
-          sub.pointerInside.current = false;
-          if (rail && event.pointerType !== "touch") sub.hoverEnd();
+          flyout.triggerHandlers.onPointerLeave(event);
         }}
       >
         {parts.content}
+        {/* Folded — inline, or always on the rail where the children live in the flyout. */}
+        <AttentionDot hue={sub.hue} shown={rail || !sub.open} />
       </button>
     );
 
     return (
       <CompactTooltip
         text={parts.text || (rest["aria-label"] ?? "")}
-        canOpen={() => !sub.pointerInside.current && !sub.flyoutOpen}
+        canOpen={() => !flyout.pointerInside.current && !flyout.open}
       >
         <Popover.Anchor>{button}</Popover.Anchor>
       </CompactTooltip>

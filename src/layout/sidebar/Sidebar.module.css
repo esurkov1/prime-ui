@@ -377,15 +377,7 @@
 }
 
 .root[data-panel-mode="compact"]:not([data-off-canvas])
-  :is(
-    .label,
-    .groupText,
-    .brandName,
-    .brandDescription,
-    .accountName,
-    .accountDescription,
-    .countPlain
-  ) {
+  :is(.label, .brandName, .brandDescription, .accountName, .accountDescription, .countPlain) {
   -webkit-text-fill-color: transparent;
 }
 
@@ -461,9 +453,8 @@
 }
 
 /*
- * A constant height: nothing below a heading ever moves. On the rail the text and chevron fade
- * out while a short hairline on the icon axis fades in — the heading becomes a group separator
- * instead of an empty row.
+ * A constant height: nothing below a heading ever moves. On the rail the chevron fades out and
+ * the heading keeps as much of its text as the rail holds, cut with an ellipsis.
  */
 .groupLabel {
   position: relative;
@@ -491,23 +482,6 @@
   white-space: nowrap;
 }
 
-/* The rail separator. */
-.groupLabel::after {
-  content: "";
-  position: absolute;
-  inset-block-start: calc(50% - var(--prime-border-width) / 2);
-  inset-inline-start: var(--sb-item-pad);
-  width: var(--sb-icon);
-  height: var(--prime-border-width);
-  background-color: transparent;
-  pointer-events: none;
-  transition: background-color var(--sb-duration) var(--sb-ease);
-}
-
-.root[data-panel-mode="compact"]:not([data-off-canvas]) .groupLabel::after {
-  background-color: var(--prime-color-border-default);
-}
-
 .groupText {
   flex: 1 1 auto;
   min-width: 0;
@@ -527,9 +501,14 @@
   color: var(--prime-color-text-secondary);
 }
 
-/* On the rail a heading is only a separator: no hover, no click. */
+/* On the rail a heading only names the section: no hover fill, no click — its tooltip still opens. */
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .groupTrigger {
-  pointer-events: none;
+  cursor: default;
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .groupTrigger:hover {
+  background-color: transparent;
+  color: var(--prime-color-text-muted);
 }
 
 .groupTrigger:focus-visible {
@@ -555,6 +534,71 @@
 
 .groupTrigger[aria-expanded="true"] .groupChevron {
   rotate: 180deg;
+}
+
+/*
+ * On the rail the heading keeps its layout: its text slides a little toward the edge, and the
+ * cut that ends the rows ends it too — travelling with the rail, softened by a fade into the
+ * canvas. Nothing re-lays out, so nothing jumps.
+ */
+.root:not([data-off-canvas]) .groupLabel {
+  clip-path: inset(0);
+  transition:
+    clip-path var(--sb-duration) var(--sb-ease),
+    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
+    color var(--prime-motion-duration-xfast) var(--sb-ease);
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .groupLabel {
+  clip-path: inset(0 calc(100% - var(--sb-rail-box)) 0 0);
+}
+
+/*
+ * The text slides toward the edge and scales down (transform only); the dot and the chevron after
+ * it stay where they are and fade. The text box narrows to what the rail shows only once the rail
+ * has closed — the cut hides the difference — and widens at once when it opens, so no box change
+ * is ever seen. `max-width` goes between two lengths, so the switch can wait for the rail (a
+ * `flex` or `none` change would apply at once).
+ */
+.groupText {
+  --sb-head-scale: 0.85;
+
+  max-width: 100%;
+  transform-origin: left center;
+  transition:
+    translate var(--sb-duration) var(--sb-ease),
+    scale var(--sb-duration) var(--sb-ease),
+    max-width 0s linear;
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .groupText {
+  max-width: calc((var(--sb-rail-box) - var(--prime-space-1)) / var(--sb-head-scale));
+  text-overflow: clip;
+  translate: calc(var(--prime-space-1) - var(--sb-item-pad)) 0;
+  scale: var(--sb-head-scale);
+  transition:
+    translate var(--sb-duration) var(--sb-ease),
+    scale var(--sb-duration) var(--sb-ease),
+    max-width 0s linear var(--sb-duration);
+}
+
+.root:not([data-off-canvas]) .groupLabel::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: var(--prime-space-3);
+  background: linear-gradient(to right, transparent, var(--prime-color-bg-canvas));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    inset-inline-end var(--sb-duration) var(--sb-ease),
+    opacity var(--sb-duration) var(--sb-ease);
+}
+
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .groupLabel::after {
+  inset-inline-end: calc(100% - var(--sb-rail-box));
+  opacity: 1;
 }
 
 .groupItems {
@@ -768,9 +812,22 @@
     scale var(--sb-duration) var(--sb-ease);
 }
 
-.root[data-panel-mode="compact"]:not([data-off-canvas]) .dot[data-size] {
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .dot[data-size]:not([data-attention]) {
   opacity: 1;
   scale: 1;
+}
+
+/* A folded parent's dot: shown while something inside needs attention and is out of sight. */
+.dot[data-size][data-attention="shown"] {
+  opacity: 1;
+  scale: 1;
+}
+
+/* After a group heading's text, on its line. */
+.dot[data-size].dotInline {
+  position: static;
+  flex: none;
+  box-shadow: none;
 }
 
 .shortcut {
@@ -897,36 +954,39 @@
 
 /* --- Compact flyout ---------------------------------------------------------------- */
 
-/* The kit floating surface (Popover, flush): the parent's name level with it, then the children. */
-/* Rows keep the same air on the right and at the bottom as the guide line has on the left. */
+/*
+ * The kit floating surface (Popover, flush) with the metrics of a kit menu (Dropdown): just the
+ * rows (no guide line: there is no parent row above them), at the tier's menu item height,
+ * with the panel padding and inset. The rail rows are
+ * taller because they carry the icon axis; a flyout has none. The rail row names the flyout.
+ */
 .flyout {
-  padding: 0 var(--prime-space-2) var(--prime-space-2) var(--prime-space-1);
+  --sb-h: var(--prime-control-m-item-height);
+  --sb-item-pad: var(--prime-panel-item-padding-x);
+
+  padding: var(--prime-panel-padding);
   color: var(--prime-color-text-primary);
 }
 
-.flyoutTitle {
-  display: flex;
-  flex: none;
-  align-items: center;
-  min-height: var(--sb-h);
-  padding-inline: var(--sb-item-pad);
-  color: var(--prime-color-text-primary);
-  font-size: var(--sb-text);
-  line-height: var(--sb-line-height);
-  font-weight: var(--prime-font-weight-semibold);
-  white-space: nowrap;
+.flyout[data-size="xs"] {
+  --sb-h: var(--prime-control-xs-item-height);
 }
 
-.flyout .subList {
-  --sub-line-x: var(--sb-item-pad);
-  --sub-reach: calc((var(--sb-h) - var(--sb-line-height)) / 2 - var(--prime-space-1));
+.flyout[data-size="s"] {
+  --sb-h: var(--prime-control-s-item-height);
+}
 
+.flyout[data-size="l"] {
+  --sb-h: var(--prime-control-l-item-height);
+}
+
+.flyout[data-size="xl"] {
+  --sb-h: var(--prime-control-xl-item-height);
+}
+
+.flyout .groupItems {
+  gap: 0;
   padding-block-start: 0;
-}
-
-.flyout .subRow:first-child::before {
-  inset-block-start: calc(-1 * var(--sub-reach));
-  height: calc(var(--sub-reach) + var(--sb-h) / 2);
 }
 
 /* On the raised surface the current row is a deeper wash, not the canvas lift. */

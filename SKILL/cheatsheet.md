@@ -96,6 +96,9 @@ State change is continuous in the whole kit: every region that changes what it s
 - Off-canvas: `offCanvas="auto"` (default, below 768px) with `open` / `onOpenChange` and a menu button that opens it; `offCanvas="always"` for navigation behind a menu at any width; `offCanvas="never"` for a rail that always stays.
 - Every item has `Sidebar.ItemIcon` (compact mode shows only icons) and is a link: `href` or `asChild` with the router `NavLink`; `current` marks the page.
 - The signed-in user: `Sidebar.Account` inside `Dropdown.Trigger` at the end of `Sidebar.Footer`.
+- Structure: everyday places on top without a label, categories as `Sidebar.Group label collapsible` (one short word, 3–7 items), views of one section as `Sidebar.Sub` (one level, the parent only discloses) — not every group folded, not a sub-list inside a sub-list.
+- Counts: plain `Sidebar.ItemCount` for information; `color` only when it needs action — it becomes a dot on the rail and on folded parents.
+- Remember the rail and folded groups with `persistKey` on `Sidebar.Root` — not your own `localStorage` code.
 
 ## Spacing and values
 

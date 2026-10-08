@@ -107,6 +107,26 @@ menu button inside it with the same media query on the button's wrapper.
 With React Router put `<Outlet />` as the child and pass `NavLink` through `Sidebar.Item asChild`
 (see `src/layout/sidebar/examples/router.tsx`).
 
+## Navigation structure (the sidebar's content)
+
+The sidebar is the product's map: people scan it, remember where things are and come back. Build it
+from what people do, not from how the backend is split. The full guide with the reasoning is in
+[Sidebar COMPONENT.md → Building the navigation](../src/layout/sidebar/COMPONENT.md#building-the-navigation).
+
+| Level | Kit part | Rule |
+|---|---|---|
+| Everyday places | `Sidebar.Group` without `label` at the top | 2–4 items (Обзор, Входящие); never folded |
+| Category of work | `Sidebar.Group label collapsible` | 3–7 items by frequency; label is one short word with a distinct start (the rail shows its first letters); fold only long or rarely used groups |
+| Views of one section | `Sidebar.Sub` | 2–6 children; the parent only discloses (overview page = first child); one level only |
+| Meta | `Sidebar.Footer` | help, settings, then `Sidebar.Account` with its menu last |
+
+- Icons on every top-level item and sub-list parent, distinct shapes; none on sub-list children.
+- `Sidebar.ItemCount` plain for information (12 new); `color` only when it asks for action (3
+  unanswered, 2 overdue) — it becomes a dot on the rail and on every folded parent, so keep it rare:
+  red for blocked or overdue, blue for new or unread.
+- `persistKey` on `Sidebar.Root` keeps the rail mode and folded groups across reloads; give groups an
+  `id` when labels are translated.
+
 ## Page wrapper
 
 - App pages with actions (dashboard, list, detail): `PageContent.Section` — the full width of the panel.

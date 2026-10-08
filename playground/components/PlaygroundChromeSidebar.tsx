@@ -4,7 +4,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Kbd } from "@/components/kbd/Kbd";
-import { Sidebar, type SidebarMode, useSidebar } from "@/layout";
+import { Sidebar, useSidebar } from "@/layout";
 
 import {
   PLAYGROUND_INTRO,
@@ -90,24 +90,6 @@ function FooterControls() {
   );
 }
 
-const MODE_KEY = "prime-playground-sidebar-mode";
-
-function readMode(): SidebarMode {
-  try {
-    return window.localStorage.getItem(MODE_KEY) === "compact" ? "compact" : "expanded";
-  } catch {
-    return "expanded";
-  }
-}
-
-function saveMode(mode: SidebarMode) {
-  try {
-    window.localStorage.setItem(MODE_KEY, mode);
-  } catch {
-    // Storage unavailable: the mode lives for this session only.
-  }
-}
-
 /** Reports the Sidebar's own off-canvas state, so the layout uses the kit breakpoint, not a copy. */
 function OffCanvasReporter({ onChange }: { onChange: (offCanvas: boolean) => void }) {
   const { offCanvas } = useSidebar();
@@ -125,8 +107,8 @@ export type PlaygroundChromeSidebarProps = {
 
 /**
  * Playground navigation built from the kit: brand header, search, collapsible categories, footer.
- * The rail mode is uncontrolled (persisted on change), so a toggle re-renders only what reads the
- * sidebar context — never this tree or the page.
+ * The rail mode and the folded categories are uncontrolled and remembered (`persistKey`), so a
+ * toggle re-renders only what reads the sidebar context — never this tree or the page.
  */
 export function PlaygroundChromeSidebar({
   open,
@@ -136,7 +118,6 @@ export function PlaygroundChromeSidebar({
 }: PlaygroundChromeSidebarProps) {
   const { pathname } = useLocation();
   const contentRef = React.useRef<HTMLDivElement>(null);
-  const [defaultMode] = React.useState(readMode);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: keep the current page in view on route change
   React.useLayoutEffect(() => {
@@ -147,8 +128,7 @@ export function PlaygroundChromeSidebar({
 
   return (
     <Sidebar.Root
-      defaultMode={defaultMode}
-      onModeChange={saveMode}
+      persistKey="prime-playground-sidebar"
       open={open}
       onOpenChange={onOpenChange}
       labels={{ navigation: "Навигация playground" }}

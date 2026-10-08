@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { Home, Settings } from "lucide-react";
 import type * as React from "react";
 import { MemoryRouter, NavLink } from "react-router-dom";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
@@ -604,19 +604,100 @@ describe("Sidebar.Group collapsible", () => {
     );
   });
 
-  it("on the compact rail the items show and the heading leaves the tab order", () => {
+  function RailGroup({ defaultOpen }: { defaultOpen: boolean }) {
+    return (
+      <Sidebar.Root offCanvas="never" mode="compact">
+        <Sidebar.Group label="Инструменты" collapsible defaultOpen={defaultOpen}>
+          <Sidebar.Item href="/tasks">Задачи</Sidebar.Item>
+          <Sidebar.Item href="/reports">Отчёты</Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar.Root>
+    );
+  }
+
+  /** The rail row of a folded group (the inert heading has the same name; jsdom keeps it). */
+  const railRow = () => document.querySelector('button[aria-haspopup="dialog"]') as HTMLElement;
+
+  it("off the rail the rail row of a folded group stays folded and hidden", () => {
+    render(<Groups defaultOpen={false} />);
+    const wrapper = railRow().closest("[data-state]");
+    expect(wrapper).toHaveAttribute("data-state", "closed");
+    expect(wrapper).toHaveAttribute("inert");
+    expect(wrapper).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("an open group keeps its items on the compact rail; the heading leaves the tab order", () => {
+    render(<RailGroup defaultOpen />);
+    const heading = document.querySelector("button[aria-controls]") as HTMLElement;
+    expect(heading).toHaveAttribute("tabindex", "-1");
+    expect(heading).toHaveAttribute("aria-hidden", "true");
+    fireEvent.click(heading);
+    expect(heading).toHaveAttribute("aria-expanded", "true");
+    const region = document.getElementById(heading.getAttribute("aria-controls") ?? "");
+    expect(region).toHaveAttribute("data-state", "open");
+    expect(railRow().closest("[data-state]")).toHaveAttribute("data-state", "closed");
+  });
+
+  it("on the rail hovering a heading shows its whole name in a tooltip", () => {
+    render(<RailGroup defaultOpen />);
+    const heading = document.querySelector("button[aria-controls]") as HTMLElement;
+    fireEvent.pointerEnter(heading, { pointerType: "mouse" });
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Инструменты");
+  });
+
+  it("a folded group stays folded on the rail: one row opens its items in a flyout", () => {
+    render(<RailGroup defaultOpen={false} />);
+    const heading = document.querySelector("button[aria-controls]") as HTMLElement;
+    const region = document.getElementById(heading.getAttribute("aria-controls") ?? "");
+    expect(region).toHaveAttribute("data-state", "closed");
+    expect(region).toHaveAttribute("inert");
+
+    const row = railRow();
+    expect(row).toHaveAttribute("aria-haspopup", "dialog");
+    expect(row).toHaveAttribute("aria-expanded", "false");
+    row.focus();
+    fireEvent.keyDown(row, { key: "Enter" });
+
+    const flyout = screen.getByRole("dialog");
+    expect(row).toHaveAttribute("aria-expanded", "true");
+    const tasks = within(flyout).getByRole("link", { name: "Задачи" });
+    expect(document.activeElement).toBe(tasks);
+    fireEvent.keyDown(tasks, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(within(flyout).getByRole("link", { name: "Отчёты" }));
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowLeft" });
+    expect(row).toHaveAttribute("aria-expanded", "false");
+    expect(document.activeElement).toBe(row);
+  });
+
+  it("a click on an item in the group flyout closes it", () => {
+    render(<RailGroup defaultOpen={false} />);
+    const row = railRow();
+    fireEvent.click(row);
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("link", { name: "Отчёты" }));
+    expect(row).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("a sub-list inside the group flyout unfolds inline instead of opening another flyout", () => {
     render(
       <Sidebar.Root offCanvas="never" mode="compact">
         <Sidebar.Group label="Инструменты" collapsible defaultOpen={false}>
-          <Sidebar.Item>Задачи</Sidebar.Item>
+          <Sidebar.Sub>
+            <Sidebar.SubTrigger>Задачи</Sidebar.SubTrigger>
+            <Sidebar.SubContent>
+              <Sidebar.Item href="/backlog">Бэклог</Sidebar.Item>
+            </Sidebar.SubContent>
+          </Sidebar.Sub>
         </Sidebar.Group>
       </Sidebar.Root>,
     );
-    const heading = document.querySelector("button[aria-controls]") as HTMLElement;
-    expect(heading).toHaveAttribute("inert");
-    const region = document.getElementById(heading.getAttribute("aria-controls") ?? "");
-    expect(region).toHaveAttribute("data-state", "open");
-    expect(region).not.toHaveAttribute("inert");
+    fireEvent.click(railRow());
+    const flyout = screen.getByRole("dialog");
+    const parent = within(flyout).getByRole("button", { name: "Задачи" });
+    expect(parent).not.toHaveAttribute("aria-haspopup");
+    fireEvent.click(parent);
+    expect(parent).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getAllByRole("dialog")).toHaveLength(1);
   });
 });
 
@@ -751,5 +832,135 @@ describe("Sidebar.Sub", () => {
       );
       expect(inline).toHaveAttribute("inert");
     });
+  });
+});
+
+describe("Sidebar persistKey", () => {
+  // The test environment's storage is incomplete: an in-memory one stands in.
+  beforeEach(() => {
+    const data = new Map<string, string>();
+    vi.stubGlobal("localStorage", {
+      getItem: (key: string) => data.get(key) ?? null,
+      setItem: (key: string, value: string) => void data.set(key, String(value)),
+      removeItem: (key: string) => void data.delete(key),
+      clear: () => data.clear(),
+    });
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  function App() {
+    return (
+      <Sidebar.Root offCanvas="never" persistKey="test-sidebar">
+        <Sidebar.Header>
+          <Sidebar.Toggle />
+        </Sidebar.Header>
+        <Sidebar.Content>
+          <Sidebar.Group label="Инструменты" collapsible>
+            <Sidebar.Item href="/tasks">Задачи</Sidebar.Item>
+          </Sidebar.Group>
+          <Sidebar.Sub>
+            <Sidebar.SubTrigger>Заказы</Sidebar.SubTrigger>
+            <Sidebar.SubContent>
+              <Sidebar.Item href="/orders/new">Новые</Sidebar.Item>
+            </Sidebar.SubContent>
+          </Sidebar.Sub>
+        </Sidebar.Content>
+      </Sidebar.Root>
+    );
+  }
+
+  const groupHeading = () =>
+    document.querySelector('[data-collapsible="true"] > button[aria-controls]') as HTMLElement;
+  const subTrigger = () => screen.getByRole("button", { name: "Заказы" });
+
+  it("restores folded groups, open sub-lists and the mode after a reload", () => {
+    window.localStorage.clear();
+    const first = render(<App />);
+    fireEvent.click(groupHeading());
+    fireEvent.click(subTrigger());
+    expect(groupHeading()).toHaveAttribute("aria-expanded", "false");
+    expect(subTrigger()).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Свернуть панель" }));
+    first.unmount();
+
+    const { container } = render(<App />);
+    expect(container.firstElementChild).toHaveAttribute("data-mode", "compact");
+    expect(groupHeading()).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(screen.getByRole("button", { name: "Развернуть панель" }));
+    expect(subTrigger()).toHaveAttribute("aria-expanded", "true");
+    window.localStorage.clear();
+  });
+
+  it("stores nothing for a controlled mode and ignores unreadable storage", () => {
+    window.localStorage.setItem("test-sidebar", "{not json");
+    const { container } = render(
+      <Sidebar.Root offCanvas="never" persistKey="test-sidebar" mode="compact">
+        <Sidebar.Item>Задачи</Sidebar.Item>
+      </Sidebar.Root>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-mode", "compact");
+    expect(window.localStorage.getItem("test-sidebar")).toBe("{not json");
+    window.localStorage.clear();
+  });
+});
+
+describe("Sidebar attention dot on folded parents", () => {
+  function Tree({
+    mode = "expanded",
+    plain = false,
+  }: {
+    mode?: React.ComponentProps<typeof Sidebar.Root>["mode"];
+    plain?: boolean;
+  }) {
+    return (
+      <Sidebar.Root offCanvas="never" mode={mode}>
+        <Sidebar.Group label="Поддержка" collapsible defaultOpen={false}>
+          <Sidebar.Sub>
+            <Sidebar.SubTrigger>Обращения</Sidebar.SubTrigger>
+            <Sidebar.SubContent>
+              <Sidebar.Item href="/tickets">
+                Новые
+                {plain ? (
+                  <Sidebar.ItemCount>3</Sidebar.ItemCount>
+                ) : (
+                  <Sidebar.ItemCount color="red">3</Sidebar.ItemCount>
+                )}
+              </Sidebar.Item>
+            </Sidebar.SubContent>
+          </Sidebar.Sub>
+        </Sidebar.Group>
+      </Sidebar.Root>
+    );
+  }
+
+  const dotIn = (element: Element | null) => element?.querySelector(":scope > [data-attention]");
+
+  it("a folded sub-list's row and a folded group's heading show the child's hue", () => {
+    render(<Tree />);
+    const heading = document.querySelector('[data-collapsible="true"] > button[aria-controls]');
+    expect(dotIn(heading)).toHaveAttribute("data-attention", "shown");
+    expect((dotIn(heading) as HTMLElement).style.color).toBe(
+      "var(--prime-color-palette-red-solid)",
+    );
+
+    fireEvent.click(heading as HTMLElement);
+    expect(dotIn(heading)).toHaveAttribute("data-attention", "hidden");
+    const parent = screen.getByRole("button", { name: "Обращения" });
+    expect(dotIn(parent)).toHaveAttribute("data-attention", "shown");
+    fireEvent.click(parent);
+    expect(dotIn(parent)).toHaveAttribute("data-attention", "hidden");
+  });
+
+  it("on the rail the folded group's row carries the dot", () => {
+    render(<Tree mode="compact" />);
+    const row = document.querySelector('button[aria-haspopup="dialog"][aria-label="Поддержка"]');
+    expect(dotIn(row)).toHaveAttribute("data-attention", "shown");
+  });
+
+  it("a plain count needs no attention: no dot", () => {
+    render(<Tree plain />);
+    expect(document.querySelector("[data-attention]")).toBeNull();
   });
 });

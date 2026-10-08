@@ -84,6 +84,12 @@ export const api: ComponentApi = {
           ru: "Когда рельс уходит из раскладки и становится выезжающей панелью с подложкой и ловушкой фокуса, которую открывает `open`: `auto` — уже 768px (окно браузера); `always` — на любой ширине (навигация за кнопкой меню); `never` — всегда рельс.",
         },
         {
+          name: "persistKey",
+          type: "string",
+          en: "Remembers the navigation across reloads in `localStorage` under this key: the mode and which collapsible groups and sub-lists are open, by their `id`, else their label text (give an `id` when labels are translated or change). The stored state wins over `defaultMode` / `defaultOpen`; controlled `mode` / `open` are not stored. Unavailable storage is ignored.",
+          ru: "Запоминает навигацию между перезагрузками в `localStorage` под этим ключом: режим и какие сворачиваемые группы и вложенные списки открыты — по их `id`, иначе по тексту подписи (задайте `id`, если подписи переводятся или меняются). Сохранённое состояние главнее `defaultMode` / `defaultOpen`; управляемые `mode` / `open` не сохраняются. Недоступное хранилище не мешает работе.",
+        },
+        {
           name: "labels",
           type: "Partial<SidebarLabels>",
           en: "Built-in strings, see Labels.",
@@ -171,14 +177,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Group",
-      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail the heading keeps its height and turns into a short separator on the icon axis; the items always show.',
-      ru: '`<div role="group">`, названная своей подписью. С `collapsible` заголовок — кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце; пункты сворачиваются (inert). В компактном рельсе заголовок сохраняет высоту и становится короткой чертой-разделителем на оси иконок; пункты видны всегда.',
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail the heading keeps its height and layout: its text slides toward the edge, scales down and is cut by the rail with a fade, so the first letters still name the section. An open group keeps its items on the rail; a folded one stays folded and becomes one `…` row (named by the label, `aria-haspopup="dialog"`) whose items open in a flyout, like a sub-list. A folded group with a count that needs attention inside shows its dot (after the heading, or on the `…` row).',
+      ru: '`<div role="group">`, названная своей подписью. С `collapsible` заголовок — кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце; пункты сворачиваются (inert). В компактном рельсе заголовок сохраняет высоту и раскладку: текст сдвигается к краю, уменьшается и обрезается рельсом с затуханием, так что первые буквы по-прежнему называют раздел. Открытая группа показывает пункты и на рельсе; свёрнутая остаётся свёрнутой и становится одной строкой `…` (с именем группы, `aria-haspopup="dialog"`), пункты которой открываются во всплывающей панели, как у вложенного списка. Свёрнутая группа, внутри которой есть счётчик, требующий внимания, показывает его точку (после заголовка или на строке `…`).',
       props: [
         {
           name: "label",
           type: "ReactNode",
-          en: "Group heading (`aria-labelledby`); a separator line in compact mode (same height).",
-          ru: "Заголовок группы (`aria-labelledby`); в компактном режиме — черта-разделитель той же высоты.",
+          en: "Group heading (`aria-labelledby`). Keep it to one short word: on the compact rail only its first letters show.",
+          ru: "Заголовок группы (`aria-labelledby`). Одно короткое слово: в компактном рельсе видны только первые буквы.",
         },
         {
           name: "collapsible",
@@ -271,8 +277,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.ItemCount",
-      en: "`ref` → `HTMLSpanElement` (the number or the Badge). A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set. In compact mode the number leaves the row (still read by screen readers) and a badge leaves a dot of its hue on the icon.",
-      ru: "Счётчик после подписи: по умолчанию простое приглушённое число; `Badge` (на ярус меньше), когда задан `color` или `variant`. В компактном режиме число уходит из строки (остаётся для скринридеров), а бейдж оставляет на иконке точку своего цвета.",
+      en: "`ref` → `HTMLSpanElement` (the number or the Badge). A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set. In compact mode the number leaves the row (still read by screen readers) and a badge leaves a dot of its hue on the icon; a folded sub-list or group shows the dot of a badge inside it.",
+      ru: "Счётчик после подписи: по умолчанию простое приглушённое число; `Badge` (на ярус меньше), когда задан `color` или `variant`. В компактном режиме число уходит из строки (остаётся для скринридеров), а бейдж оставляет на иконке точку своего цвета; свёрнутый вложенный список или группа показывает точку бейджа, который внутри.",
       props: [
         {
           name: "children",
@@ -362,8 +368,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Sub",
-      en: "`ref` → `HTMLDivElement`. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Expanded, the children unfold under the parent on a guide line; on the compact rail they open in a flyout (the kit Popover, to the right). A current child opens the sub-list and marks the parent as on the active path (`data-active-path`).",
-      ru: "Родительский пункт с дочерними: `Sidebar.SubTrigger` + `Sidebar.SubContent` в `<div>`. В развёрнутом режиме дочерние раскрываются под родителем на направляющей линии; в компактном рельсе — во всплывающей панели справа (Popover из кита). Текущий дочерний раскрывает список и отмечает родителя как путь к текущей странице (`data-active-path`).",
+      en: "`ref` → `HTMLDivElement`. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Expanded, the children unfold under the parent on a guide line; on the compact rail they open in a flyout (the kit Popover to the right, with the rows and spacing of a kit menu). A current child opens the sub-list and marks the parent as on the active path (`data-active-path`). While folded (and always on the rail) the parent shows the dot of a count inside that needs attention.",
+      ru: "Родительский пункт с дочерними: `Sidebar.SubTrigger` + `Sidebar.SubContent` в `<div>`. В развёрнутом режиме дочерние раскрываются под родителем на направляющей линии; в компактном рельсе — во всплывающей панели справа (Popover из кита со строками и отступами меню кита). Текущий дочерний раскрывает список и отмечает родителя как путь к текущей странице (`data-active-path`). Пока список свёрнут (и всегда на рельсе), родитель показывает точку счётчика внутри, который требует внимания.",
       props: [
         ...OPEN_TRIAD({ en: "Children", ru: "Дочерние пункты" }),
         {
@@ -384,8 +390,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Label (also the flyout title) and parts as in `Sidebar.Item`: `Sidebar.ItemIcon`, `Sidebar.ItemCount`.",
-          ru: "Подпись (она же заголовок всплывающей панели) и части, как у `Sidebar.Item`: `Sidebar.ItemIcon`, `Sidebar.ItemCount`.",
+          en: "Label (it also names the flyout) and parts as in `Sidebar.Item`: `Sidebar.ItemIcon`, `Sidebar.ItemCount`.",
+          ru: "Подпись (она же имя всплывающей панели) и части, как у `Sidebar.Item`: `Sidebar.ItemIcon`, `Sidebar.ItemCount`.",
         },
         {
           name: "…rest",
