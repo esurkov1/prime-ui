@@ -13,6 +13,28 @@ export type MorphTextProps = {
 
 type Morph = { id: number; from: string; to: string; width: number };
 
+/** The unchanged start and end of two labels: only the part between them morphs. */
+function splitChange(from: string, to: string) {
+  const a = [...from];
+  const b = [...to];
+  let head = 0;
+  while (head < a.length && head < b.length && a[head] === b[head]) head += 1;
+  let tail = 0;
+  while (
+    tail < a.length - head &&
+    tail < b.length - head &&
+    a[a.length - 1 - tail] === b[b.length - 1 - tail]
+  ) {
+    tail += 1;
+  }
+  return {
+    prefix: b.slice(0, head).join(""),
+    suffix: b.slice(b.length - tail).join(""),
+    out: a.slice(head, a.length - tail).join(""),
+    in: b.slice(head, b.length - tail).join(""),
+  };
+}
+
 /** Two labels that differ only in their digits: a counter inside a label changes in place. */
 function digitsOnly(a: string, b: string): boolean {
   return a.replace(/\d/g, "") === b.replace(/\d/g, "");
@@ -41,14 +63,16 @@ function settleMs(text: string, root: Element): number {
 }
 
 /**
- * A label that changes in place (foundation §7 rule 8): the old letters leave upward, the new ones
- * come from below one short step apart, and the box glides between the two widths. At rest it is
+ * A label that changes in place (foundation §7 rule 8): the start and end both labels share stay
+ * still; between them the old letters leave upward, the new ones come from below one short step
+ * apart, and the changed part glides between the two widths. At rest it is
  * one plain text span; the letter layers exist only while a change plays. Still on the first
  * render, under reduced motion, and when only digits change (a counter or a percentage in a label
  * updates in place).
  */
 export function MorphText({ children: text, className }: MorphTextProps) {
   const rootRef = React.useRef<HTMLSpanElement>(null);
+  const segmentRef = React.useRef<HTMLSpanElement>(null);
   const sizerRef = React.useRef<HTMLSpanElement>(null);
   const prevText = React.useRef<string | null>(null);
   const restWidth = React.useRef(0);
@@ -73,30 +97,37 @@ export function MorphText({ children: text, className }: MorphTextProps) {
     setMorph({ id: nextId.current, from: running ? running.to : prev, to: text, width });
   }, [text]);
 
-  // The morph layers are in the DOM at the old width: glide to the new one and settle later.
+  const change = morph ? splitChange(morph.from, morph.to) : null;
+
+  // The morph layers are in the DOM: the changed part glides from its old width to the new one
+  // (the old label's width less the still start and end) and settles later.
   React.useLayoutEffect(() => {
     if (!morph) return;
     const root = rootRef.current;
+    const segment = segmentRef.current;
     const sizer = sizerRef.current;
-    if (!root || !sizer) return;
+    if (!root || !segment || !sizer) return;
     const target = sizer.getBoundingClientRect().width;
-    if (target !== morph.width) {
-      root.style.width = `${morph.width}px`;
-      root.getBoundingClientRect();
-      root.style.width = `${target}px`;
+    const still = root.getBoundingClientRect().width - target;
+    const from = Math.max(0, morph.width - still);
+    if (target !== from) {
+      segment.style.width = `${from}px`;
+      segment.getBoundingClientRect();
+      segment.style.width = `${target}px`;
     }
-    const timer = window.setTimeout(() => setMorph(null), settleMs(morph.to, root));
+    const changed = splitChange(morph.from, morph.to);
+    const longest = changed.in.length > changed.out.length ? changed.in : changed.out;
+    const timer = window.setTimeout(() => setMorph(null), settleMs(longest, root));
     return () => window.clearTimeout(timer);
   }, [morph]);
 
   // At rest: remember the width the text takes, the starting point of the next change.
   React.useLayoutEffect(() => {
     if (morph || !rootRef.current) return;
-    rootRef.current.style.width = "";
     restWidth.current = rootRef.current.getBoundingClientRect().width;
   });
 
-  if (!morph) {
+  if (!morph || !change) {
     return (
       <span ref={rootRef} className={cx(styles.root, className)}>
         {text}
@@ -105,16 +136,20 @@ export function MorphText({ children: text, className }: MorphTextProps) {
   }
 
   return (
-    <span ref={rootRef} className={cx(styles.root, styles.morphing, className)}>
-      <span ref={sizerRef} className={styles.sizer} aria-hidden="true">
-        {morph.to}
+    <span ref={rootRef} className={cx(styles.root, className)}>
+      <span aria-hidden="true">{change.prefix}</span>
+      <span ref={segmentRef} className={styles.segment} aria-hidden="true">
+        <span ref={sizerRef} className={styles.sizer}>
+          {change.in}
+        </span>
+        <span key={`out-${morph.id}`} className={styles.layer}>
+          {letters(change.out, "out")}
+        </span>
+        <span key={`in-${morph.id}`} className={styles.layer}>
+          {letters(change.in, "in")}
+        </span>
       </span>
-      <span key={`out-${morph.id}`} className={styles.layer} aria-hidden="true">
-        {letters(morph.from, "out")}
-      </span>
-      <span key={`in-${morph.id}`} className={styles.layer} aria-hidden="true">
-        {letters(morph.to, "in")}
-      </span>
+      <span aria-hidden="true">{change.suffix}</span>
       <VisuallyHidden>{morph.to}</VisuallyHidden>
     </span>
   );
