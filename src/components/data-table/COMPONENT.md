@@ -182,7 +182,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - The footer has a hairline on top: range on the left, Pagination on the right. The range shows only with more than one page or with infinite scroll.
 - Columns scroll sideways inside the table, never the page; pin the identifying column with `stickyFirstColumn`. Works from 320 px.
 - While columns are hidden past an edge, that edge shows a `--prime-space-4` shadow (the theme scrim at 40%) over the content; it takes no space and follows RTL. With `stickyFirstColumn` the start shadow falls from the pinned column's end edge.
-- Fewer columns, less scrolling: put a column chooser in `toolbar` (a Popover with a Checkbox per column, the key column `hideable: false` shown checked and disabled) and pass `hiddenColumns`. Never hide columns silently by width.
+- Fewer columns, less scrolling: put a column chooser in `toolbar` (a Dropdown with a `Dropdown.CheckboxItem` per column, the key column `hideable: false` shown checked and disabled) and pass `hiddenColumns`. Never hide columns silently by width.
 - The sticky head stops sticking on screens lower than 480px (landscape phones), so it never takes a large share of the height.
 - Cell content: text, two-line text (title + `caption`), an Avatar with text, a Badge, or a control one tier down (`s` in an `m` table). Toolbar controls use `s` in an `m` table.
 - Column widths: `width` / `minWidth` / `maxWidth` strings; never size cells with custom CSS.

@@ -156,6 +156,7 @@ export { Dnd } from "./dnd/Dnd";
 export { moveBefore } from "./dnd/useSortableList";
 export * from "./drawer/Drawer";
 export type {
+  DropdownCheckboxItemProps,
   DropdownContentProps,
   DropdownDescriptionProps,
   DropdownGroupProps,

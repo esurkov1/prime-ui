@@ -2,11 +2,10 @@
 import {
   Badge,
   Button,
-  Checkbox,
   DataTable,
   type DataTableColumn,
+  Dropdown,
   Icon,
-  Popover,
   Typography,
 } from "prime-ui-kit";
 import * as React from "react";
@@ -133,44 +132,34 @@ export default function DataTableColumnsVisibilityExample() {
           <Typography as="span" variant="body-s" tone="secondary">
             Заказы за неделю: {ORDERS.length}
           </Typography>
-          <Popover.Root>
-            <Popover.Trigger>
+          <Dropdown.Root>
+            <Dropdown.Trigger>
               <Button.Root variant="outline" tone="neutral" size="s">
                 <Button.Icon>
                   <Icon name="view.preview" />
                 </Button.Icon>
                 Колонки: {shown} из {COLUMNS.length}
               </Button.Root>
-            </Popover.Trigger>
-            <Popover.Content align="end" size="s" className={styles.columnsPanel}>
-              <Popover.Header>
-                <Popover.Title>Колонки таблицы</Popover.Title>
-                <Popover.Description>Номер заказа показан всегда.</Popover.Description>
-              </Popover.Header>
-              <div className={styles.columnsList}>
+            </Dropdown.Trigger>
+            <Dropdown.Content align="end" size="s">
+              <Dropdown.Group label="Колонки таблицы">
                 {COLUMNS.map((column) => (
-                  <Checkbox.Root
+                  <Dropdown.CheckboxItem
                     key={column.id}
                     checked={!hidden.includes(column.id)}
                     disabled={column.hideable === false}
                     onCheckedChange={(visible) => toggle(column.id, visible)}
                   >
-                    <Checkbox.Label>{column.header}</Checkbox.Label>
-                  </Checkbox.Root>
+                    {column.header}
+                  </Dropdown.CheckboxItem>
                 ))}
-              </div>
-              <Popover.Actions>
-                <Button.Root
-                  variant="ghost"
-                  tone="neutral"
-                  disabled={hidden.length === 0}
-                  onClick={() => setHidden([])}
-                >
-                  Показать все
-                </Button.Root>
-              </Popover.Actions>
-            </Popover.Content>
-          </Popover.Root>
+              </Dropdown.Group>
+              <Dropdown.Separator />
+              <Dropdown.Item disabled={hidden.length === 0} onSelect={() => setHidden([])}>
+                Показать все
+              </Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown.Root>
         </div>
       }
     />

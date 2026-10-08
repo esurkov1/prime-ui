@@ -35,6 +35,7 @@ Dropdown.Root                     state and dismiss policy (no DOM)
     │   └── Dropdown.Item         <button role="menuitem">
     │       ├── Dropdown.ItemIcon       leading glyph (aria-hidden)
     │       └── Dropdown.ItemShortcut   Kbd at the end
+    ├── Dropdown.CheckboxItem     <button role="menuitemcheckbox">: checkbox look + label; stays open
     └── Dropdown.Item
 ```
 
@@ -81,6 +82,17 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 | `disabled` | `boolean` | `false` | Muted, `aria-disabled`, skipped by the arrow keys, does nothing on click. |
 | `tone` | `"neutral" \| "danger"` | `"neutral"` | `danger`: destructive action — danger text, icon and hover fill. |
 | `children` | `ReactNode` | — | `Dropdown.ItemIcon`, the label, `Dropdown.ItemShortcut`. |
+
+### Dropdown.CheckboxItem
+`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a checkbox look one tier below the menu; a click, Enter or Space toggles it and the menu stays open. + native button props.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `checked` | `boolean` | — | Checked state (controlled). |
+| `defaultChecked` | `boolean` | `false` | Initial state (uncontrolled). |
+| `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state. |
+| `disabled` | `boolean` | `false` | Muted, `aria-disabled`, skipped by the arrow keys, does not toggle. |
+| `children` | `ReactNode` | — | The label (optionally after a `Dropdown.ItemIcon`). |
 
 ### Dropdown.ItemIcon · Dropdown.ItemShortcut
 `ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the menu icon size (a kit `Icon` follows it) / a `Kbd` one tier below the menu, pushed to the end of the item — a hint, not a handler. + native props.
@@ -161,14 +173,14 @@ The panel is the shared floating surface: `bg-raised`, `--prime-panel-radius` (1
 ### Keyboard
 | Key | Action |
 |---|---|
-| `Enter` · `Space` | On the trigger opens the menu (focus on the first item); on an item runs it and returns focus to the trigger. |
+| `Enter` · `Space` | On the trigger opens the menu (focus on the first item); on an item runs it and returns focus to the trigger; on a checkbox item toggles it and the menu stays open. |
 | `ArrowDown` · `ArrowUp` | Move focus to the next / previous enabled item, wrapping. |
 | `Home` · `End` | First / last enabled item. |
 | `Escape` | Closes the menu (`closeOnEscape`); focus returns to the trigger. |
 | `Tab` · `Shift+Tab` | Closes the menu; focus returns to the trigger (Tab then goes on to the next stop). |
 
 ### ARIA
-- The menu is `role="menu"` named by the trigger; items are `role="menuitem"`, disabled ones `aria-disabled`.
+- The menu is `role="menu"` named by the trigger; items are `role="menuitem"`, checkbox items `role="menuitemcheckbox"` with `aria-checked`, disabled ones `aria-disabled`.
 - The trigger gets `aria-haspopup="menu"`, `aria-expanded` and `aria-controls`.
 - `Dropdown.Group` is `role="group"` named by its `label`.
 - `Dropdown.ItemIcon` is hidden from screen readers; a key hint is text only — the app handles the shortcut.
@@ -188,6 +200,7 @@ No `labels`.
 | [placement.tsx](examples/placement.tsx) | Every side and alignment relative to the trigger; near the viewport edge the menu flips and shifts — `side`, `align`. |
 | [states.tsx](examples/states.tsx) | A regular, a disabled and a destructive item; arrow keys skip the disabled one — `disabled`, `tone`. |
 | [match-trigger-width.tsx](examples/match-trigger-width.tsx) | Under a full-width button the menu is at least as wide as the trigger — `matchTriggerWidth`. |
+| [checkbox-items.tsx](examples/checkbox-items.tsx) | A column chooser: toggles in the menu keep it open, the key column cannot be hidden — `Dropdown.CheckboxItem`, `checked`, `onCheckedChange`. |
 | [long-list.tsx](examples/long-list.tsx) | More projects than fit: the grouped list scrolls inside the panel, capped by the room next to the trigger — `Dropdown.Group`. |
 | [dismiss.tsx](examples/dismiss.tsx) | An onboarding step keeps the menu open on an outside press and on Escape until an item is picked — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state and opens the menu from another button; the picked step updates the trigger — `open`, `onOpenChange`. |

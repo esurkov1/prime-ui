@@ -129,6 +129,7 @@ describe("part refs: every part declares ref", () => {
       takesRef(D.Body);
       takesRef(D.Footer);
     }
+    takesRef(Dropdown.CheckboxItem);
     takesRef(Dropdown.ItemIcon);
     takesRef(Dropdown.ItemShortcut);
     takesRef(Dropdown.Group);

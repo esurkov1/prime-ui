@@ -1,9 +1,11 @@
 import * as React from "react";
 
+import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Divider } from "@/components/divider/Divider";
 import { Kbd } from "@/components/kbd/Kbd";
 import { useControllableState } from "@/hooks/useControllableState";
 import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import { useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -12,7 +14,7 @@ import menu from "@/internal/menu.module.css";
 import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { rovingIndex } from "@/internal/rovingFocus";
-import type { ControlSize, Tone } from "@/internal/states";
+import { type ControlSize, stepDown, type Tone } from "@/internal/states";
 
 import styles from "./Dropdown.module.css";
 
@@ -101,7 +103,8 @@ function DropdownTrigger({ children, ...forwarded }: DropdownTriggerProps) {
 }
 DropdownTrigger.displayName = "Dropdown.Trigger";
 
-const ENABLED_ITEM = '[role="menuitem"]:not([data-disabled="true"])';
+const ENABLED_ITEM =
+  ':is([role="menuitem"], [role="menuitemcheckbox"]):not([data-disabled="true"])';
 
 /** Arrow keys, Home and End move focus between the enabled items, wrapping around. */
 function moveFocus(event: React.KeyboardEvent<HTMLElement>) {
@@ -220,6 +223,60 @@ function DropdownItem({
 }
 DropdownItem.displayName = "Dropdown.Item";
 
+export type DropdownCheckboxItemProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "type" | "role" | "onSelect" | "onChange" | "defaultChecked"
+> & {
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  disabled?: boolean;
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+/**
+ * A toggle inside the menu (show a column, turn a filter on): a checkbox look one tier below the
+ * menu, `role="menuitemcheckbox"`. Toggling keeps the menu open, so several can be set in a row.
+ */
+function DropdownCheckboxItem({
+  checked: checkedProp,
+  defaultChecked = false,
+  onCheckedChange,
+  disabled = false,
+  className,
+  onClick,
+  children,
+  ...rest
+}: DropdownCheckboxItemProps) {
+  const [checked, setChecked] = useControllableState({
+    value: checkedProp,
+    defaultValue: defaultChecked,
+    onChange: onCheckedChange,
+  });
+  const tier = useControlSize(undefined);
+
+  return (
+    <button
+      {...rest}
+      type="button"
+      role="menuitemcheckbox"
+      aria-checked={checked}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : 0}
+      className={cx(menu.item, styles.item, className)}
+      {...toDataAttributes({ disabled: disabled || undefined, checked: checked || undefined })}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented && !disabled) setChecked(!checked);
+      }}
+    >
+      <Checkbox.Indicator checked={checked} disabled={disabled} size={stepDown(tier)} />
+      {children}
+    </button>
+  );
+}
+DropdownCheckboxItem.displayName = "Dropdown.CheckboxItem";
+
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
 export type DropdownItemIconProps = React.HTMLAttributes<HTMLSpanElement> & {
@@ -314,6 +371,7 @@ export const Dropdown = {
   Description: DropdownDescription,
   Group: DropdownGroup,
   Item: DropdownItem,
+  CheckboxItem: DropdownCheckboxItem,
   ItemIcon: DropdownItemIcon,
   ItemShortcut: DropdownItemShortcut,
   Separator: DropdownSeparator,

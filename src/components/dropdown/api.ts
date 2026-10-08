@@ -138,6 +138,45 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "Dropdown.CheckboxItem",
+      en: '`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a checkbox look one tier below the menu; a click, Enter or Space toggles it and the menu stays open. + native button props.',
+      ru: "Пункт-флажок: клик, Enter или Space переключают его, меню остаётся открытым; флажок на ярус меньше меню.",
+      props: [
+        {
+          name: "checked",
+          type: "boolean",
+          en: "Checked state (controlled).",
+          ru: "Отмечен ли пункт (управляемо).",
+        },
+        {
+          name: "defaultChecked",
+          type: "boolean",
+          default: "false",
+          en: "Initial state (uncontrolled).",
+          ru: "Начальное состояние (неуправляемо).",
+        },
+        {
+          name: "onCheckedChange",
+          type: "(checked: boolean) => void",
+          en: "Called with the new state.",
+          ru: "Вызывается с новым состоянием.",
+        },
+        {
+          name: "disabled",
+          type: "boolean",
+          default: "false",
+          en: "Muted, `aria-disabled`, skipped by the arrow keys, does not toggle.",
+          ru: "Приглушён, `aria-disabled`, стрелки его пропускают, не переключается.",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The label (optionally after a `Dropdown.ItemIcon`).",
+          ru: "Подпись (можно после `Dropdown.ItemIcon`).",
+        },
+      ],
+    },
+    {
       name: "Dropdown.ItemIcon · Dropdown.ItemShortcut",
       en: "`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the menu icon size (a kit `Icon` follows it) / a `Kbd` one tier below the menu, pushed to the end of the item — a hint, not a handler. + native props.",
       ru: "Иконка в начале пункта по размеру яруса меню / подсказка клавиш (Kbd) в конце пункта.",

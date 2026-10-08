@@ -193,8 +193,8 @@ export function OrdersPanel() {
 
 ## Components on narrow widths — what you still decide
 
-**Tables.** Let DataTable scroll inside itself; offer a column chooser (`hiddenColumns`, a Popover
-with a Checkbox per column in `toolbar`; the key column `hideable: false`); `stickyFirstColumn` for
+**Tables.** Let DataTable scroll inside itself; offer a column chooser (`hiddenColumns`, a Dropdown
+with a `Dropdown.CheckboxItem` per column in `toolbar`; the key column `hideable: false`); `stickyFirstColumn` for
 the name. On phones a table / cards switch in `PageToolbar.View` is fine — silently dropping columns
 by breakpoint is not. Never ask to rotate the phone.
 

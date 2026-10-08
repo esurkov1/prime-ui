@@ -610,6 +610,62 @@ describe("Dropdown — overlay contract", () => {
     expect(screen.getByRole("menu")).toBeInTheDocument();
   });
 
+  it("CheckboxItem toggles aria-checked and keeps the menu open", () => {
+    const onCheckedChange = vi.fn();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>
+          <button type="button">Колонки</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.CheckboxItem defaultChecked onCheckedChange={onCheckedChange}>
+            Сумма
+          </Dropdown.CheckboxItem>
+          <Dropdown.CheckboxItem disabled>Номер</Dropdown.CheckboxItem>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const item = screen.getByRole("menuitemcheckbox", { name: "Сумма" });
+    expect(item).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(item);
+    expect(item).toHaveAttribute("aria-checked", "false");
+    expect(onCheckedChange).toHaveBeenCalledWith(false);
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+
+    const disabled = screen.getByRole("menuitemcheckbox", { name: "Номер" });
+    fireEvent.click(disabled);
+    expect(disabled).toHaveAttribute("aria-checked", "false");
+    expect(disabled).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("CheckboxItem follows a controlled value and takes the arrow keys like an item", async () => {
+    const user = userEvent.setup();
+    function Controlled() {
+      const [checked, setChecked] = React.useState(false);
+      return (
+        <Dropdown.Root defaultOpen>
+          <Dropdown.Trigger>
+            <button type="button">Колонки</button>
+          </Dropdown.Trigger>
+          <Dropdown.Content>
+            <Dropdown.Item>Сбросить</Dropdown.Item>
+            <Dropdown.CheckboxItem checked={checked} onCheckedChange={setChecked}>
+              Сумма
+            </Dropdown.CheckboxItem>
+          </Dropdown.Content>
+        </Dropdown.Root>
+      );
+    }
+    render(<Controlled />);
+    const reset = screen.getByRole("menuitem", { name: "Сбросить" });
+    reset.focus();
+    await user.keyboard("{ArrowDown}");
+    const item = screen.getByRole("menuitemcheckbox", { name: "Сумма" });
+    expect(item).toHaveFocus();
+    await user.keyboard(" ");
+    expect(item).toHaveAttribute("aria-checked", "true");
+  });
+
   it("closeOnOutsideClick={false} keeps it open on an outside click", () => {
     render(
       <div>
