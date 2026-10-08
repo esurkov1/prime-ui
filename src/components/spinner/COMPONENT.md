@@ -1,6 +1,6 @@
 # Spinner
 
-**Category:** feedback
+**Category:** status
 **Kind:** primitive
 
 > An indeterminate loading indicator: a ring with a gap that turns while a request runs.

@@ -1,6 +1,6 @@
 # ProgressCircle
 
-**Category:** feedback
+**Category:** status
 **Kind:** primitive
 
 > Circular progress — the ring version of ProgressBar: one value or `segments` that split a whole, with status colors and optional content in the center.

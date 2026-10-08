@@ -1,6 +1,6 @@
 # Dnd
 
-**Category:** layout
+**Category:** interaction
 **Kind:** composite
 
 > Pointer-driven drag and drop: reorderable lists, draggable items and drop zones on one shared session, with a lifted clone, a gap where the item lands, auto-scroll, touch support and a keyboard path.

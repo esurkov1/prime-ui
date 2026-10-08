@@ -1,6 +1,6 @@
 # Crossfade
 
-**Category:** feedback
+**Category:** status
 **Kind:** layout
 
 > A region that cross-fades between its states (loading → data → empty → error) and glides to the new height, so the page below does not jump.

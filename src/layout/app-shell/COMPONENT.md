@@ -1,6 +1,6 @@
 # AppShell
 
-**Category:** layout
+**Category:** page
 **Kind:** layout
 
 > The app frame: a navigation rail on the canvas and a content panel on the surface.

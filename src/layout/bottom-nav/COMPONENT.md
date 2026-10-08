@@ -1,6 +1,6 @@
 # BottomNav
 
-**Category:** layout
+**Category:** navigation
 **Kind:** layout
 
 > Phone navigation: a bar of 3–5 main sections at the bottom of the screen.

@@ -3,14 +3,14 @@ import { api } from "@/components/divider/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "layout",
+  category: "page",
   nav: {
     segment: "divider",
     label: "Divider",
     summary: "Разделитель с подписью и без",
     keywords: ["разделитель", "линия", "separator"],
     icon: Minus,
-    order: 5,
+    order: 4,
   },
   dir: "divider",
   title: "Divider",

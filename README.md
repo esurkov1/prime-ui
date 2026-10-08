@@ -205,8 +205,9 @@ accessibility, examples and common mistakes.
 | [**Kanban**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kanban/COMPONENT.md) | A board of status columns: cross-column moves by pointer, touch and keyboard, WIP limits, loading and empty states. |
 | [**Timeline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/timeline/COMPONENT.md) | An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels. |
 | [**CodeBlock**](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) | A static TypeScript / TSX snippet with syntax highlighting, on a sunken panel or bare inside a host. |
+| [**Accordion**](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) | Collapsible sections: FAQ, settings groups, checkout steps. |
 
-### Feedback (`feedback`)
+### Status and loading (`status`)
 
 | Component | What it is for |
 |---|---|
@@ -226,7 +227,9 @@ accessibility, examples and common mistakes.
 | [**Tabs**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) | Tabs for navigating between content panels of one screen. |
 | [**Breadcrumb**](https://github.com/esurkov1/prime-ui/blob/main/src/components/breadcrumb/COMPONENT.md) | Breadcrumbs: the path to the current page. |
 | [**Pagination**](https://github.com/esurkov1/prime-ui/blob/main/src/components/pagination/COMPONENT.md) | Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view. |
-| [**Stepper**](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) | Steps of a multi-step process with pending, active, completed and error statuses. |
+| [**Stepper**](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) | Steps of a multi-step process with pending, active, completed and danger statuses. |
+| [**Sidebar**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. |
+| [**BottomNav**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/bottom-nav/COMPONENT.md) | Phone navigation bar: 3–5 sections, flat or a floating glass capsule. |
 
 ### Overlays (`overlays`)
 
@@ -239,18 +242,20 @@ accessibility, examples and common mistakes.
 | [**Drawer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/drawer/COMPONENT.md) | A modal side panel that slides in from the edge: filters, forms and record details. |
 | [**CommandMenu**](https://github.com/esurkov1/prime-ui/blob/main/src/components/command-menu/COMPONENT.md) | A command palette in a dialog: a search field that filters a list of commands and pages (⌘K). |
 
-### Layout (`layout`)
+### Page (`page`)
 
 | Component | What it is for |
 |---|---|
 | [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame: a navigation rail on the canvas and a content panel on the surface. |
-| [**Sidebar**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. |
-| [**BottomNav**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/bottom-nav/COMPONENT.md) | Phone navigation bar: 3–5 sections, flat or a floating glass capsule. |
 | [**PageContent**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) | Page structure inside the main column: title, description, page actions and content sections. |
 | [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — sections, filter and search, view options and the primary action — one row when wide, exactly two rows when narrow. |
-| [**Accordion**](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) | Collapsible sections: FAQ, settings groups, checkout steps. |
 | [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator, horizontal or vertical, with or without a label. |
 | [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents. |
+
+### Interaction (`interaction`)
+
+| Component | What it is for |
+|---|---|
 | [**Dnd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/dnd/COMPONENT.md) | Pointer-driven drag and drop: reorderable lists, draggable items and drop zones, with touch and keyboard support. |
 
 ### Composition (`composition`)

@@ -3,14 +3,14 @@ import { api } from "@/components/accordion/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "layout",
+  category: "data-display",
   nav: {
     segment: "accordion",
     label: "Accordion",
     summary: "Раскрывающиеся секции",
     keywords: ["аккордеон", "раскрытие", "collapse", "value", "onValueChange"],
     icon: ChevronsDownUp,
-    order: 4,
+    order: 10,
   },
   dir: "accordion",
   title: "Accordion",

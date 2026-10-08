@@ -1,6 +1,6 @@
 # EmptyPage
 
-**Category:** feedback
+**Category:** status
 **Kind:** composite
 
 > Empty state of a page, a block or a menu: icon, title, explanation and an action.

@@ -1,6 +1,6 @@
 # PageToolbar
 
-**Category:** layout
+**Category:** page
 **Kind:** layout
 
 > The panel at the top of a page — sections, filter and search, view options and the primary action — laid out from its own width: one row when wide, exactly two rows when narrow, every slot in a fixed place.

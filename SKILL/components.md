@@ -1,6 +1,7 @@
 # Components
 
-Index of every kit component, grouped like the playground menu. Each row links to the full reference
+Index of every kit component, grouped like the playground menu — by the task the user has (the same
+categories as [choosing.md](choosing.md)). Each row links to the full reference
 (`COMPONENT.md`: API, variants, states, a11y, mistakes) and to copyable scenarios (`examples/`).
 Paths are relative to this folder in the kit repository; in a consumer project prefix them with
 `node_modules/prime-ui-kit/` instead of `../`. Whole screens built from these components are in
@@ -8,7 +9,7 @@ Paths are relative to this folder in the kit repository; in a consumer project p
 
 ## Actions (`actions`)
 
-Explicit actions on click.
+Trigger an action.
 
 | Component | Purpose | Docs |
 |---|---|---|
@@ -18,7 +19,7 @@ Explicit actions on click.
 
 ## Inputs (`inputs`)
 
-Typing values and field anatomy: label, hint, error.
+Type a value, and the field anatomy: label, hint, error.
 
 | Component | Purpose | Docs |
 |---|---|---|
@@ -31,7 +32,7 @@ Typing values and field anatomy: label, hint, error.
 
 ## Selection (`selection`)
 
-Choosing from options: toggles, lists, ranges, dates, colors.
+Pick from options: toggles, lists, ranges, filters, dates, colors.
 
 | Component | Purpose | Docs |
 |---|---|---|
@@ -50,7 +51,7 @@ Choosing from options: toggles, lists, ranges, dates, colors.
 
 ## Data display (`data-display`)
 
-Showing data and labels: badges, tags, avatars, cards, tables, feeds, code.
+Show data: labels, people, objects, cards, tables, boards, feeds, code, disclosed sections.
 
 | Component | Purpose | Docs |
 |---|---|---|
@@ -63,10 +64,11 @@ Showing data and labels: badges, tags, avatars, cards, tables, feeds, code.
 | Kanban | A board of status columns: cards move by drag, touch hold and Alt + arrows, with WIP limits, loading and empty columns. | [COMPONENT.md](../src/components/kanban/COMPONENT.md) · [examples](../src/components/kanban/examples/) |
 | Timeline | An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels. | [COMPONENT.md](../src/components/timeline/COMPONENT.md) · [examples](../src/components/timeline/examples/) |
 | CodeBlock | A static TypeScript / TSX snippet with syntax highlighting, on a sunken panel or bare inside a host. | [COMPONENT.md](../src/components/code-block/COMPONENT.md) · [examples](../src/components/code-block/examples/) |
+| Accordion | Collapsible sections: FAQ, settings groups, checkout steps. | [COMPONENT.md](../src/components/accordion/COMPONENT.md) · [examples](../src/components/accordion/examples/) |
 
-## Feedback (`feedback`)
+## Status and loading (`status`)
 
-System messages, progress, loading placeholders and empty states.
+Say what happens: system messages, progress, loading placeholders, state swaps, empty states.
 
 | Component | Purpose | Docs |
 |---|---|---|
@@ -81,7 +83,7 @@ System messages, progress, loading placeholders and empty states.
 
 ## Navigation (`navigation`)
 
-Moving between views, places and steps.
+Move between places: app navigation (side rail, bottom bar on phones), tabs, the path, pages, steps.
 
 | Component | Purpose | Docs |
 |---|---|---|
@@ -89,6 +91,8 @@ Moving between views, places and steps.
 | Breadcrumb | Breadcrumbs: the path to the current page. | [COMPONENT.md](../src/components/breadcrumb/COMPONENT.md) · [examples](../src/components/breadcrumb/examples/) |
 | Pagination | Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view. | [COMPONENT.md](../src/components/pagination/COMPONENT.md) · [examples](../src/components/pagination/examples/) |
 | Stepper | Steps of a multi-step process with pending, active, completed and danger statuses. | [COMPONENT.md](../src/components/stepper/COMPONENT.md) · [examples](../src/components/stepper/examples/) |
+| Sidebar | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. | [COMPONENT.md](../src/layout/sidebar/COMPONENT.md) · [examples](../src/layout/sidebar/examples/) |
+| BottomNav | Phone navigation: 3–5 sections at the bottom, flat or a floating glass capsule, icons with or without labels. | [COMPONENT.md](../src/layout/bottom-nav/COMPONENT.md) · [examples](../src/layout/bottom-nav/examples/) |
 
 ## Overlays (`overlays`)
 
@@ -103,20 +107,24 @@ Floating layers above the page, from tooltip to modal.
 | Drawer | A modal side panel that slides in from the edge: filters, forms and record details. | [COMPONENT.md](../src/components/drawer/COMPONENT.md) · [examples](../src/components/drawer/examples/) |
 | CommandMenu | A search palette over the page: the query filters commands and pages, Enter runs the active one. | [COMPONENT.md](../src/components/command-menu/COMPONENT.md) · [examples](../src/components/command-menu/examples/) |
 
-## Layout (`layout`)
+## Page (`page`)
 
-App frame, page regions, disclosure, separators, scrolling, drag and drop.
+The frame and structure of a screen: app shell, page column, page panel, separators, scroll regions.
 
 | Component | Purpose | Docs |
 |---|---|---|
 | AppShell | The app frame: a navigation rail on the canvas and a content panel on the surface. | [COMPONENT.md](../src/layout/app-shell/COMPONENT.md) · [examples](../src/layout/app-shell/examples/) |
-| Sidebar | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. | [COMPONENT.md](../src/layout/sidebar/COMPONENT.md) · [examples](../src/layout/sidebar/examples/) |
-| BottomNav | Phone navigation: 3–5 sections at the bottom, flat or a floating glass capsule, icons with or without labels. | [COMPONENT.md](../src/layout/bottom-nav/COMPONENT.md) · [examples](../src/layout/bottom-nav/examples/) |
 | PageContent | Page structure inside the main column: title, description, page actions and content sections. | [COMPONENT.md](../src/components/page-content/COMPONENT.md) · [examples](../src/components/page-content/examples/) |
 | PageToolbar | The panel at the top of a page — sections, filter and search, view options and the primary action — laid out from its own width: one row when wide, exactly two rows when narrow, every slot in a fixed place. | [COMPONENT.md](../src/components/page-toolbar/COMPONENT.md) · [examples](../src/components/page-toolbar/examples/) |
-| Accordion | Collapsible sections: FAQ, settings groups, checkout steps. | [COMPONENT.md](../src/components/accordion/COMPONENT.md) · [examples](../src/components/accordion/examples/) |
 | Divider | A hairline separator inside one surface, horizontal or vertical, with or without a label. | [COMPONENT.md](../src/components/divider/COMPONENT.md) · [examples](../src/components/divider/examples/) |
 | ScrollContainer | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents. | [COMPONENT.md](../src/components/scroll-container/COMPONENT.md) · [examples](../src/components/scroll-container/examples/) |
+
+## Interaction (`interaction`)
+
+Direct manipulation: drag and drop (Kanban builds a board on it).
+
+| Component | Purpose | Docs |
+|---|---|---|
 | Dnd | Pointer-driven drag and drop: reorderable lists, draggable items and drop zones, with touch and keyboard support. | [COMPONENT.md](../src/components/dnd/COMPONENT.md) · [examples](../src/components/dnd/examples/) |
 
 ## Composition (`composition`)

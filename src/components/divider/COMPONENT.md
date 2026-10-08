@@ -1,6 +1,6 @@
 # Divider
 
-**Category:** layout
+**Category:** page
 **Kind:** primitive
 
 > A hairline separator inside one surface, horizontal or vertical, with or without a label.

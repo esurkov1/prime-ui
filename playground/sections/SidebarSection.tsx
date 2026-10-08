@@ -3,7 +3,7 @@ import { api } from "@/layout/sidebar/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "layout",
+  category: "navigation",
   nav: {
     segment: "sidebar",
     label: "Sidebar",
@@ -20,7 +20,7 @@ export const page: ComponentPageConfig = {
       "сохранение",
     ],
     icon: PanelLeft,
-    order: 2,
+    order: 5,
   },
   dir: "sidebar",
   base: "layout",

@@ -20,7 +20,7 @@ export const page: ComponentPageConfig = {
       "перетаскивание",
     ],
     icon: SquareKanban,
-    order: 6.5,
+    order: 7,
   },
   dir: "kanban",
   title: "Kanban",

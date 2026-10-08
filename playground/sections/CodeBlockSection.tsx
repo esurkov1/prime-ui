@@ -10,7 +10,7 @@ export const page: ComponentPageConfig = {
     summary: "Блок кода с подсветкой синтаксиса",
     keywords: ["код", "подсветка", "language"],
     icon: Code2,
-    order: 8,
+    order: 9,
   },
   dir: "code-block",
   title: "CodeBlock",

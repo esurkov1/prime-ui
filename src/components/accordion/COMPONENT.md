@@ -1,6 +1,6 @@
 # Accordion
 
-**Category:** layout
+**Category:** data-display
 **Kind:** navigation
 
 > Collapsible sections: FAQ, settings groups, checkout steps.

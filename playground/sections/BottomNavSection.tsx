@@ -3,7 +3,7 @@ import { api } from "@/layout/bottom-nav/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "layout",
+  category: "navigation",
   nav: {
     segment: "bottom-nav",
     label: "Bottom Nav",
@@ -22,7 +22,7 @@ export const page: ComponentPageConfig = {
       "iconOnly",
     ],
     icon: PanelBottom,
-    order: 2.5,
+    order: 6,
   },
   dir: "bottom-nav",
   base: "layout",

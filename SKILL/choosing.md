@@ -8,14 +8,15 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | The user needs to… | Category |
 |---|---|
 | trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
-| type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload |
-| show a whole ready-made screen block (sign-in, sign-up, password reset, code) | Composition — LoginForm |
-| pick from options, toggle, set a range, date or color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorPicker, ColorSwatches |
-| see data: status, labels, people, objects, numbers, rows, events | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DataTable, Timeline, CodeBlock |
-| learn what happened or how far along it is | Feedback — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, EmptyPage, Crossfade |
-| move between views, places, steps | Navigation — Tabs, Breadcrumb, Pagination, Stepper |
+| type a value (text, number, code, file) | Inputs — Input, Textarea, DigitInput, FileUpload, Label, Hint |
+| pick from options, toggle, set a range, filter, a date or a color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorPicker, ColorSwatches |
+| see data: status labels, people, objects, numbers, rows, a board, events, code, disclosed sections | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DataTable, Kanban, Timeline, CodeBlock, Accordion |
+| learn what happened, how far along it is, or watch a region load and change state | Status and loading — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, Crossfade, EmptyPage |
+| move between places: app sections, panels of a screen, the path, pages, steps | Navigation — Tabs, Breadcrumb, Pagination, Stepper, Sidebar, BottomNav |
 | see something on top of the page | Overlays — Tooltip, Popover, Dropdown, Modal, Drawer, CommandMenu |
-| get the app frame and page structure | Layout — AppShell, Sidebar, PageContent, Accordion, Divider, ScrollContainer, Dnd |
+| get the app frame and the structure of a page | Page — AppShell, PageContent, PageToolbar, Divider, ScrollContainer |
+| drag things by hand | Interaction — Dnd (a status board: Kanban in Data display) |
+| show a whole ready-made screen block (sign-in, sign-up, password reset, code) | Composition — LoginForm |
 | style text | Foundations — Typography |
 
 ## 2. Inside a category
@@ -55,7 +56,7 @@ Items that flow through statuses and are moved by hand → Kanban (a single list
 dropped onto folders or assignees → Dnd directly).
 Chronological events → Timeline. Code → CodeBlock.
 
-**Feedback.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →
+**Status and loading.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →
 ProgressBar `segments`; compact goal / KPI ring or a ring breakdown → ProgressCircle (`value` or
 `segments`). Loading with unknown progress → `loading` on the component that has it (Button, Select,
 DataTable); a region whose content has a shape (list, card, form) → Skeleton of that shape; nothing

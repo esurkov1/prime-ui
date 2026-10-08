@@ -3,7 +3,7 @@ import { api } from "@/layout/app-shell/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "layout",
+  category: "page",
   nav: {
     segment: "app-shell",
     label: "App Shell",

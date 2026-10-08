@@ -19,7 +19,7 @@ export const page: ComponentPageConfig = {
       "операции",
     ],
     icon: History,
-    order: 7,
+    order: 8,
   },
   dir: "timeline",
   title: "Timeline",

@@ -3,14 +3,14 @@ import { api } from "@/components/dnd/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "layout",
+  category: "interaction",
   nav: {
     segment: "dnd",
     label: "Dnd",
     summary: "Перетаскивание: сортируемые списки, Draggable и DropZone",
     keywords: ["drag", "drop", "перетаскивание", "сортировка", "порядок", "sortable", "доска"],
     icon: GripVertical,
-    order: 7,
+    order: 1,
   },
   dir: "dnd",
   title: "Dnd",

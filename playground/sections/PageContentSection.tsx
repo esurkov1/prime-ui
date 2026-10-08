@@ -3,14 +3,14 @@ import { api } from "@/components/page-content/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "layout",
+  category: "page",
   nav: {
     segment: "page-content",
     label: "Page Content",
     summary: "Страница: заголовок, описание, действия, секции",
     keywords: ["страница", "заголовок", "секция", "title", "description", "actions"],
     icon: PanelTop,
-    order: 3,
+    order: 2,
   },
   dir: "page-content",
   title: "PageContent",

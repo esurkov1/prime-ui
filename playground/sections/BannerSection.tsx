@@ -3,7 +3,7 @@ import { api } from "@/components/banner/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "feedback",
+  category: "status",
   nav: {
     segment: "banner",
     label: "Banner",

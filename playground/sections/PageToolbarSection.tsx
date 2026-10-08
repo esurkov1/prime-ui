@@ -3,7 +3,7 @@ import { api } from "@/components/page-toolbar/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "layout",
+  category: "page",
   nav: {
     segment: "page-toolbar",
     label: "Page Toolbar",
@@ -19,7 +19,7 @@ export const page: ComponentPageConfig = {
       "responsive",
     ],
     icon: PanelsTopLeft,
-    order: 3.5,
+    order: 3,
   },
   dir: "page-toolbar",
   title: "PageToolbar",

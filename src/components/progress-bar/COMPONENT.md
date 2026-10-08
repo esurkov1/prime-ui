@@ -1,6 +1,6 @@
 # ProgressBar
 
-**Category:** feedback
+**Category:** status
 **Kind:** primitive
 
 > Linear progress: one value on a native `<progress>`, or `segments` that split a whole (storage by type, task statuses), with a label, a percentage and status colors.

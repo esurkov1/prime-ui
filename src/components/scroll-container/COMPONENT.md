@@ -1,6 +1,6 @@
 # ScrollContainer
 
-**Category:** layout
+**Category:** page
 **Kind:** layout
 
 > A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents.

@@ -3,14 +3,14 @@ import { api } from "@/components/scroll-container/api";
 import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
-  category: "layout",
+  category: "page",
   nav: {
     segment: "scroll-container",
     label: "Scroll Container",
     summary: "Прокручиваемая область с тонким скроллбаром",
     keywords: ["прокрутка", "скролл", "scroll", "axis"],
     icon: ScrollText,
-    order: 6,
+    order: 5,
   },
   dir: "scroll-container",
   title: "ScrollContainer",

@@ -1,6 +1,6 @@
 # Skeleton
 
-**Category:** feedback
+**Category:** status
 **Kind:** primitive
 
 > A placeholder in the shape of the content that is loading — text lines, a control, an avatar, a block — so the layout is in place before the data arrives.
