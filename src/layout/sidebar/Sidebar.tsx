@@ -456,7 +456,9 @@ function SidebarGroup({
   );
   const bodyRef = React.useRef<HTMLDivElement>(null);
   const active = useActivePath(bodyRef);
-  useOpenOnActivePath(disclosure, active, open, setOpen);
+  // Off the rail a folded group would hide the current page, so it opens; on the rail it stays as
+  // folded as the person left it — its `…` row already marks the active path.
+  useOpenOnActivePath(disclosure && !rail, active, open, setOpen);
   // A folded group on the rail is one row; its items open beside it in a flyout.
   const folded = disclosure && rail && !open;
   const hue = disclosure ? attentionHue(children) : null;

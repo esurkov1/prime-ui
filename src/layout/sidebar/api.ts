@@ -198,8 +198,8 @@ export const api: ComponentApi = {
           name: "defaultOpen",
           type: "boolean",
           default: "true",
-          en: "Initial state (uncontrolled). A closed group opens by itself when the current page moves into it.",
-          ru: "Начальное состояние (неуправляемый режим). Свёрнутая группа раскрывается сама, когда в неё попадает текущая страница.",
+          en: "Initial state (uncontrolled). Off the compact rail a closed group opens by itself when the current page moves into it; on the rail it stays folded and its `…` row marks the page.",
+          ru: "Начальное состояние (неуправляемый режим). Вне компактного рельса свёрнутая группа раскрывается сама, когда в неё попадает текущая страница; на рельсе остаётся свёрнутой, а страницу отмечает её строка `…`.",
         },
         {
           name: "…rest",

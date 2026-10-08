@@ -679,6 +679,30 @@ describe("Sidebar.Group collapsible", () => {
     expect(document.activeElement).toBe(row);
   });
 
+  it("on the rail a folded group stays folded when the current page moves into it", async () => {
+    const { rerender } = render(
+      <Sidebar.Root offCanvas="never" mode="compact">
+        <Sidebar.Group label="Инструменты" collapsible defaultOpen={false}>
+          <Sidebar.Item href="/tasks">Задачи</Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar.Root>,
+    );
+    rerender(
+      <Sidebar.Root offCanvas="never" mode="compact">
+        <Sidebar.Group label="Инструменты" collapsible defaultOpen={false}>
+          <Sidebar.Item href="/tasks" current>
+            Задачи
+          </Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar.Root>,
+    );
+    // The active path is found by a MutationObserver: let it report.
+    await act(async () => {});
+    const heading = document.querySelector("button[aria-controls]") as HTMLElement;
+    expect(railRow()).toHaveAttribute("data-active-path");
+    expect(heading).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("a click on an item in the group flyout closes it", () => {
     render(<RailGroup defaultOpen={false} />);
     const row = railRow();

@@ -22,7 +22,8 @@ same place. Structure it by what people do, not by how the backend is split.
   tooltip), so start sibling labels differently («Продажи» and «Проекты» both read «Про»).
 - **Fold only what is secondary.** Make a group `collapsible` when the list is long (about 12+
   items) or the group is used rarely; keep the main group open and fixed. `defaultOpen={false}`
-  only for rarely used groups — a group with the current page opens by itself.
+  only for rarely used groups — a group with the current page opens by itself (on the compact rail
+  it stays folded; its `…` row marks the page).
 - **One level of nesting.** `Sidebar.Sub` is one section with 2–6 views of the same objects
   (Сделки → Новые · В работе · Закрытые). The parent only discloses; an overview page is the first
   child («Все сделки»). Never a sub-list inside a sub-list — split the section or use page tabs.
@@ -136,7 +137,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `collapsible` | `boolean` | `false` | The heading shows and hides the items. Needs `label`. |
 | `open` | `boolean` | — | Items shown (controlled). |
 | `onOpenChange` | `(open: boolean) => void` | — | Called with the new open state (click, keyboard, a current page moving inside). |
-| `defaultOpen` | `boolean` | `true` | Initial state (uncontrolled). A closed group opens by itself when the current page moves into it. |
+| `defaultOpen` | `boolean` | `true` | Initial state (uncontrolled). Off the compact rail a closed group opens by itself when the current page moves into it; on the rail it stays folded and its `…` row marks the page. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children` (Items, Subs), `className` and the other div attributes. |
 
 ### Sidebar.Item
@@ -297,7 +298,7 @@ Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header,
 | mode | `mode` / `defaultMode` | Root `data-mode`, `data-panel-mode` (the last visible mode while hidden); `<nav inert>` while hidden |
 | off-canvas | `offCanvas="always"`, or `"auto"` + viewport < 768px | Root `data-off-canvas`, `data-state="open" \| "closed"`; `<nav inert>` while closed |
 | current | `current` or a router's `aria-current` | Item `aria-current="page"`, `data-state="active"` |
-| active path | a child of a Sub (or an item of a Group) is current | SubTrigger `data-active-path`; a closed Sub / Group opens |
+| active path | a child of a Sub (or an item of a Group) is current | SubTrigger (or the `…` row of a folded Group) `data-active-path`; a closed Sub opens, a closed Group opens off the compact rail |
 | group open | Group `open` / `defaultOpen` (`collapsible`) | heading `aria-expanded`; region `data-state`, `inert` while closed |
 | sub open | Sub `open` / `defaultOpen` | SubTrigger `aria-expanded`; SubContent `data-state`, `inert` while closed |
 | flyout | hover / click / keyboard on a SubTrigger, or on the `…` row of a folded group, in compact mode | the row `aria-haspopup="dialog"`, `aria-expanded`; a Popover `role="dialog"` |
