@@ -8,6 +8,14 @@
   width: min(100%, var(--prime-modal-width-s));
 }
 
+/* in-form.tsx: the form hugs the cells; as a grid item the button stretches to the code's width. */
+.form {
+  display: grid;
+  gap: var(--prime-space-6);
+  width: fit-content;
+  max-width: 100%;
+}
+
 /* controlled.tsx: the code and its action on one line, bottoms aligned. */
 .row {
   display: flex;

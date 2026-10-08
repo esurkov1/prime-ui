@@ -16,18 +16,17 @@ export default function DigitInputInFormExample() {
   };
 
   return (
-    <form className={styles.panel} noValidate onSubmit={submit}>
+    <form className={styles.form} noValidate onSubmit={submit}>
       <DigitInput
         label="PIN-код карты"
         name="pin"
         length={PIN_LENGTH}
         mask
         required
-        fullWidth
         error={error}
         onValueChange={() => setError(undefined)}
       />
-      <Button.Root type="submit" fullWidth>
+      <Button.Root type="submit">
         Привязать карту
       </Button.Root>
     </form>

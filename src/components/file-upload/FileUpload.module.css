@@ -272,7 +272,9 @@
 }
 
 /* The kit Badge as a square tile of the row tier. */
-.item .formatBadge {
+/* A square of plain text: the Badge's single line takes the square's height and centres the text.
+   `[aria-hidden]` (set here, by FormatBadge) lifts the rule over the Badge's own line height. */
+.item .formatBadge[aria-hidden] {
   grid-area: badge;
   justify-content: center;
   width: var(--fu-item-badge);
@@ -280,6 +282,8 @@
   padding-inline: 0;
   border-radius: var(--fu-item-badge-radius);
   font-weight: var(--prime-font-weight-semibold);
+  line-height: var(--fu-item-badge);
+  text-align: center;
 }
 
 .itemName {

@@ -1,6 +1,8 @@
 /*
- * OTP / PIN cells: squares of the tier height (field tier on the root) with the shared field
- * surface. Digits are one type step larger than the tier text, tabular.
+ * OTP / PIN cells: squares with the shared field surface, on their own scale two steps above the
+ * control tiers — a code is the one thing on its screen, and a small cell is hard to hit and read:
+ * xs 36 · s 40 · m 48 · l 56 · xl 64 (the label and support row keep the field tier). Digits are
+ * tabular and grow with the cell.
  * The label row and the support row come from FieldFrame; the frame hugs the cells.
  * `fullWidth`: one row without wrapping, cells share the width (flex 1) and keep the tier height.
  * `groupSize`: the first cell of every group gets an extra gap before it.
@@ -14,11 +16,14 @@
 }
 
 .root {
-  --digit-cell-text: var(--prime-text-body-l-size);
-  --digit-cell-line-height: var(--prime-text-body-l-line-height);
+  --digit-cell: var(--prime-control-xl-height);
+  --digit-radius: var(--prime-control-xl-radius);
+  --digit-gap: var(--prime-space-3);
+  --digit-cell-text: var(--prime-text-heading-s-size);
+  --digit-cell-line-height: var(--prime-text-heading-s-line-height);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--field-gap);
+  gap: var(--digit-gap);
   min-width: 0;
   min-inline-size: 0;
   margin: 0;
@@ -32,23 +37,35 @@
 }
 
 .root[data-size="xs"] {
-  --digit-cell-text: var(--prime-control-xs-text-size);
-  --digit-cell-line-height: var(--prime-control-xs-line-height);
+  --digit-cell: var(--prime-control-m-height);
+  --digit-radius: var(--prime-control-m-radius);
+  --digit-gap: var(--prime-space-2);
+  --digit-cell-text: var(--prime-text-body-l-size);
+  --digit-cell-line-height: var(--prime-text-body-l-line-height);
 }
 
 .root[data-size="s"] {
-  --digit-cell-text: var(--prime-text-body-m-size);
-  --digit-cell-line-height: var(--prime-text-body-m-line-height);
-}
-
-.root[data-size="l"] {
+  --digit-cell: var(--prime-control-l-height);
+  --digit-radius: var(--prime-control-l-radius);
+  --digit-gap: var(--prime-space-2);
   --digit-cell-text: var(--prime-text-title-l-size);
   --digit-cell-line-height: var(--prime-text-title-l-line-height);
 }
 
+.root[data-size="l"] {
+  --digit-cell: var(--prime-space-14);
+  --digit-radius: var(--prime-radius-l);
+  --digit-gap: var(--prime-space-3);
+  --digit-cell-text: var(--prime-text-heading-m-size);
+  --digit-cell-line-height: var(--prime-text-heading-m-line-height);
+}
+
 .root[data-size="xl"] {
-  --digit-cell-text: var(--prime-text-heading-s-size);
-  --digit-cell-line-height: var(--prime-text-heading-s-line-height);
+  --digit-cell: var(--prime-space-16);
+  --digit-radius: var(--prime-radius-xl);
+  --digit-gap: var(--prime-space-4);
+  --digit-cell-text: var(--prime-text-heading-l-size);
+  --digit-cell-line-height: var(--prime-text-heading-l-line-height);
 }
 
 .cell {
@@ -56,13 +73,13 @@
   appearance: none;
   box-sizing: border-box;
   flex: 0 0 auto;
-  width: var(--field-h);
-  height: var(--field-h);
+  width: var(--digit-cell);
+  height: var(--digit-cell);
   min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: var(--field-radius);
+  border-radius: var(--digit-radius);
   caret-color: var(--prime-color-accent-default);
   font: inherit;
   font-size: var(--digit-cell-text);
@@ -77,13 +94,20 @@
     color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
+/* Cells share the width but stop at 1.5 × their side: a wide column centres a row of cells instead
+   of turning them into long bars. */
+.root[data-full-width="true"] {
+  justify-content: center;
+}
+
 .root[data-full-width="true"] .cell {
   flex: 1 1 0;
   width: auto;
+  max-width: calc(var(--digit-cell) * 1.5);
 }
 
 .cell[data-group-start="true"] {
-  margin-inline-start: var(--field-gap);
+  margin-inline-start: var(--digit-gap);
 }
 
 .root[data-invalid="true"] .cell {

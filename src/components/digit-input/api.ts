@@ -19,8 +19,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: 'host tier, else "m"',
-          en: "Tier: the cell is a square with the side of the control height (28 · 32 · 36 · 40 · 48); label and hint follow it. Without it the tier of its host (LoginForm, a panel), else `m`.",
-          ru: "Ярус: ячейка — квадрат со стороной высоты контрола (28 · 32 · 36 · 40 · 48).",
+          en: "Tier: the cell is a square on its own scale, two steps above the control heights (36 · 40 · 48 · 56 · 64); label and hint follow the field tier. Without it the tier of its host (LoginForm, a panel), else `m`.",
+          ru: "Ярус: ячейка — квадрат своей шкалы, на две ступени крупнее контролов (36 · 40 · 48 · 56 · 64); подпись и подсказка — по ярусу поля.",
         },
         {
           name: "label",
@@ -93,8 +93,8 @@ export const api: ComponentApi = {
           name: "fullWidth",
           type: "boolean",
           default: "false",
-          en: "Cells share the container width and keep the tier height; otherwise square cells and the field hugs them.",
-          ru: "Ячейки делят ширину контейнера и сохраняют высоту яруса; иначе квадратные.",
+          en: "Cells share the container width up to 1.5 × their side (the row centres beyond that) and keep the tier height; otherwise square cells and the field hugs them.",
+          ru: "Ячейки делят ширину контейнера, но не шире 1,5 своей стороны (дальше ряд по центру), высота яруса сохраняется; иначе квадратные.",
         },
         {
           name: "groupSize",

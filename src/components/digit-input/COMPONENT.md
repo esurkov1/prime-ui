@@ -37,7 +37,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `length` | `number` | `4` | Number of cells. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier: the cell is a square with the side of the control height (28 · 32 · 36 · 40 · 48); label and hint follow it. Without it the tier of its host (LoginForm, a panel), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier: the cell is a square on its own scale, two steps above the control heights (36 · 40 · 48 · 56 · 64); label and hint follow the field tier. Without it the tier of its host (LoginForm, a panel), else `m`. |
 | `label` | `ReactNode` | — | Label above the cells; names the group (`aria-labelledby`) and focuses the first cell on click. Without it the group is named by `labels.group`. |
 | `required` | `boolean` | — | Red `*` after the label and native `required` on every cell. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
@@ -49,7 +49,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | `defaultValue` | `string` | `""` | Initial code when uncontrolled. |
 | `onValueChange` | `(value: string) => void` | — | Called with the joined digits on every change. |
 | `onComplete` | `(value: string) => void` | — | Called once when the last empty cell is filled (typing, paste or autofill). |
-| `fullWidth` | `boolean` | `false` | Cells share the container width and keep the tier height; otherwise square cells and the field hugs them. |
+| `fullWidth` | `boolean` | `false` | Cells share the container width up to 1.5 × their side (the row centres beyond that) and keep the tier height; otherwise square cells and the field hugs them. |
 | `groupSize` | `number` | — | Splits the cells into groups of this size with a wider gap (`3` → 123 456). |
 | `mask` | `boolean` | `false` | Hides the digits (PIN): cells are `type="password"`. |
 | `name` | `string` | — | Name of a hidden input that carries the joined code in a native form submit. |
@@ -66,18 +66,18 @@ No `variant` or `tone`.
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | 28 × 28 cells, radius 6, digits 12/16, gap 4 | Inline confirmation inside dense tables or popovers | |
-| `s` | 32 × 32 cells, radius 8, digits 14/20, gap 8 | Compact dialogs | |
-| `m` | 36 × 36 cells, radius 8, digits 16/24, gap 8 | Regular forms and modals | yes |
-| `l` | 40 × 40 cells, radius 10, digits 18/24, gap 8 | Standalone verification screens | |
-| `xl` | 48 × 48 cells, radius 12, digits 20/28, gap 12 | Full-page sign-in, mobile-first screens | |
+| `xs` | 36 × 36 cells, radius 8, digits 16/24, gap 8 | A code inside a popover or a dense panel | |
+| `s` | 40 × 40 cells, radius 10, digits 18/24, gap 8 | Compact dialogs | |
+| `m` | 48 × 48 cells, radius 12, digits 20/28, gap 12 | Regular forms, modals, LoginForm | yes |
+| `l` | 56 × 56 cells, radius 12, digits 24/32, gap 12 | Standalone verification screens | |
+| `xl` | 64 × 64 cells, radius 16, digits 30/36, gap 16 | Full-page sign-in, mobile-first screens | |
 
-**Sizes:** digits are semibold and tabular, one type step larger than the tier text (`xs` uses the tier text). A cell of size T is as high as Input and Button of size T; the label and the hint take the same tier.
+**Sizes:** cells have their own scale, two steps above the control heights: a code is the one thing on its screen and a small cell is hard to hit and to read (cell `xs` = control `m`, `s` = control `l`, `m` = control `xl`). Digits are semibold and tabular and grow with the cell; the label and the hint keep the field tier.
 
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `fullWidth` | one row, cells share the width, tier height | cards, forms and narrow phone columns where a full-width button follows | `false` |
+| `fullWidth` | one row, cells share the width up to 1.5 × their side, then the row centres; tier height | narrow phone columns where a full-width button follows | `false` |
 | `groupSize` | an extra gap before every group (`3` → 123 456) | codes of six digits and longer | — |
 | `mask` | dots instead of digits | PIN codes | `false` |
 | `required` / `optional` | red `*` / muted «необязательно» after the label | mark the minority of the form | — |
@@ -137,7 +137,7 @@ No `variant` or `tone`.
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A six-digit code from SMS with its label and a hint — `label`, `hint`, `length`. |
-| [sizes.tsx](examples/sizes.tsx) | Every size; the cell is a square with the side of the control height — `size`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size; the cell is a square on its own scale, two steps above the control heights — `size`. |
 | [states.tsx](examples/states.tsx) | A default code next to a disabled one — `disabled`. |
 | [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint and an error that replaces it — `required`, `optional`, `hint`, `error`. |
 | [grouped.tsx](examples/grouped.tsx) | A long code read in chunks with a wider gap between groups — `groupSize`. |

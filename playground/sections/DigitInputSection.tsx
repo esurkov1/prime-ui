@@ -24,7 +24,8 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "sizes",
-      description: "Все ярусы; ячейка — квадрат со стороной высоты контрола — `size`.",
+      description:
+        "Все ярусы; ячейка — квадрат своей шкалы, на две ступени крупнее контролов — `size`.",
     },
     { slot: "states", description: "Обычный код рядом с неактивным — `disabled`." },
     {
