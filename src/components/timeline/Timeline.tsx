@@ -3,6 +3,7 @@ import * as React from "react";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { mergeRefs } from "@/internal/mergeRefs";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
 
@@ -23,17 +24,20 @@ export type TimelineRootProps = {
   /** `Timeline.Group` elements. */
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
 
-const TimelineRoot = React.forwardRef<HTMLDivElement, TimelineRootProps>(function TimelineRoot(
-  { size = "m", highlight = "current", children, className, ...rest },
-  ref,
-) {
+function TimelineRoot({
+  size = "m",
+  highlight = "current",
+  children,
+  className,
+  ...rest
+}: TimelineRootProps) {
   return (
     <ControlSizeProvider value={size}>
       <div
         {...rest}
-        ref={ref}
         className={cx(styles.root, className)}
         {...toDataAttributes({ size, highlight })}
       >
@@ -41,7 +45,7 @@ const TimelineRoot = React.forwardRef<HTMLDivElement, TimelineRootProps>(functio
       </div>
     </ControlSizeProvider>
   );
-});
+}
 TimelineRoot.displayName = "Timeline.Root";
 
 // ─── Group ────────────────────────────────────────────────────────────────────
@@ -52,13 +56,11 @@ export type TimelineGroupProps = {
   /** `Timeline.Item` and `Timeline.Gap` elements. */
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLOListElement>;
 } & Omit<React.OlHTMLAttributes<HTMLOListElement>, "children">;
 
 /** One labelled `<ol>` of events. The connecting line runs from its first dot to its last. */
-const TimelineGroup = React.forwardRef<HTMLOListElement, TimelineGroupProps>(function TimelineGroup(
-  { label, children, className, ...rest },
-  ref,
-) {
+function TimelineGroup({ label, children, className, ...rest }: TimelineGroupProps) {
   const labelId = React.useId();
   const hasLabel = label !== undefined && label !== null && label !== false;
   return (
@@ -71,14 +73,13 @@ const TimelineGroup = React.forwardRef<HTMLOListElement, TimelineGroupProps>(fun
       <ol
         aria-labelledby={hasLabel ? labelId : undefined}
         {...rest}
-        ref={ref}
         className={cx(styles.list, className)}
       >
         {children}
       </ol>
     </div>
   );
-});
+}
 TimelineGroup.displayName = "Timeline.Group";
 
 // ─── Item ─────────────────────────────────────────────────────────────────────
@@ -99,21 +100,33 @@ export type TimelineItemProps = {
   /** `Timeline.Title`, `Timeline.Meta`, `Timeline.Value`. */
   children: React.ReactNode;
   className?: string;
+  /** The row element (`a`, `button`, `div` or the `asChild` element). */
+  ref?: React.Ref<HTMLElement>;
 } & Omit<React.HTMLAttributes<HTMLElement>, "children" | "color" | "onClick"> &
   Pick<React.AnchorHTMLAttributes<HTMLAnchorElement>, "target" | "rel" | "download">;
 
-const TimelineItem = React.forwardRef<HTMLElement, TimelineItemProps>(function TimelineItem(
-  { color = "blue", tone, current = false, href, asChild, onClick, children, className, ...rest },
+function TimelineItem({
+  color = "blue",
+  tone,
+  current = false,
+  href,
+  asChild,
+  onClick,
+  children,
+  className,
   ref,
-) {
+  ...rest
+}: TimelineItemProps) {
+  // A callback ref fits whichever element the row renders.
+  const rowRef = React.useMemo(() => mergeRefs<HTMLElement | null>(ref), [ref]);
   const interactive = Boolean(asChild || href || onClick);
-  const state = current ? "active" : "inactive";
   const rowProps = {
     ...rest,
+    ref: rowRef,
     className: cx(styles.row, className),
     "aria-current": current ? ("true" as const) : undefined,
     ...toDataAttributes({
-      state,
+      state: current ? "active" : "inactive",
       color: tone ? undefined : color,
       tone,
       interactive: interactive || undefined,
@@ -123,11 +136,12 @@ const TimelineItem = React.forwardRef<HTMLElement, TimelineItemProps>(function T
 
   let row: React.ReactNode;
   if (asChild) {
-    const child = React.Children.only(children) as React.ReactElement<{
-      children?: React.ReactNode;
-    }>;
+    const child = React.Children.only(children);
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) {
+      throw new Error("Timeline.Item asChild needs a single element child");
+    }
     row = (
-      <Slot {...rowProps} ref={ref} onClick={onClick}>
+      <Slot {...rowProps} onClick={onClick}>
         {React.cloneElement(
           child,
           undefined,
@@ -140,38 +154,29 @@ const TimelineItem = React.forwardRef<HTMLElement, TimelineItemProps>(function T
     );
   } else if (href) {
     row = (
-      <a {...rowProps} ref={ref as React.Ref<HTMLAnchorElement>} href={href} onClick={onClick}>
+      <a {...rowProps} href={href} onClick={onClick}>
         {dot}
         {children}
       </a>
     );
   } else if (onClick) {
     row = (
-      <button
-        {...(rowProps as React.ButtonHTMLAttributes<HTMLButtonElement>)}
-        ref={ref as React.Ref<HTMLButtonElement>}
-        type="button"
-        onClick={onClick}
-      >
+      <button {...rowProps} type="button" onClick={onClick}>
         {dot}
         {children}
       </button>
     );
   } else {
     row = (
-      <div {...rowProps} ref={ref as React.Ref<HTMLDivElement>}>
+      <div {...rowProps}>
         {dot}
         {children}
       </div>
     );
   }
 
-  return (
-    <li className={styles.item} data-state={state}>
-      {row}
-    </li>
-  );
-});
+  return <li className={styles.item}>{row}</li>;
+}
 TimelineItem.displayName = "Timeline.Item";
 
 // ─── Parts ────────────────────────────────────────────────────────────────────
@@ -279,16 +284,14 @@ export type TimelineGapProps = {
   /** Interval caption, e.g. «40 дней · 2 200 км без обслуживания», and an optional `Timeline.GapMeta`. */
   children: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
 
 /**
  * Interval between two events: a shorter row with a small hollow dot on a dashed segment and a
  * muted caption. Renders an `li`, so it goes inside `Timeline.Group` between items.
  */
-const TimelineGap = React.forwardRef<HTMLDivElement, TimelineGapProps>(function TimelineGap(
-  { tone = "neutral", children, className, ...rest },
-  ref,
-) {
+function TimelineGap({ tone = "neutral", children, className, ...rest }: TimelineGapProps) {
   const parts = React.Children.toArray(children);
   const isMeta = (child: React.ReactNode) =>
     React.isValidElement(child) && child.type === TimelineGapMeta;
@@ -296,19 +299,14 @@ const TimelineGap = React.forwardRef<HTMLDivElement, TimelineGapProps>(function 
   const meta = parts.filter(isMeta);
   return (
     <li className={cx(styles.item, styles.gapItem)}>
-      <div
-        {...rest}
-        ref={ref}
-        className={cx(styles.gapRow, className)}
-        {...toDataAttributes({ tone })}
-      >
+      <div {...rest} className={cx(styles.gapRow, className)} {...toDataAttributes({ tone })}>
         <span className={styles.gapDot} aria-hidden="true" />
         <span className={styles.gapCaption}>{caption}</span>
         {meta}
       </div>
     </li>
   );
-});
+}
 TimelineGap.displayName = "Timeline.Gap";
 
 export const Timeline = {
