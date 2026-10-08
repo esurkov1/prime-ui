@@ -9,12 +9,10 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import ts from "typescript";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
+import { read, root } from "./contract-utils";
 
 const skillDocs = fs
   .readdirSync(path.join(root, "SKILL"))
@@ -154,5 +152,21 @@ describe("SKILL links", () => {
   it("SKILL.md sends the reader to the cheatsheet first", () => {
     const howTo = read("SKILL/SKILL.md").split("## How to use this skill")[1] ?? "";
     expect(howTo.trimStart().split("\n")[0]).toContain("(cheatsheet.md)");
+  });
+});
+
+describe("Setup docs", () => {
+  const exportsMap = JSON.parse(read("package.json")).exports as Record<string, string>;
+  const setupDocs = ["README.md", ...skillDocs, "playground/pages/IntroPage.tsx"];
+
+  it.each(setupDocs)("%s names only exported package entries", (doc) => {
+    const entries = [...read(doc).matchAll(/prime-ui-kit\/([a-z-]+\.css)/g)].map((m) => m[1]);
+    expect(entries.filter((entry) => !(`./${entry}` in exportsMap))).toEqual([]);
+  });
+
+  it("the setup snippets import bundle.css, the one stylesheet components need", () => {
+    for (const doc of ["README.md", "SKILL/SKILL.md", "SKILL/cheatsheet.md"]) {
+      expect(read(doc), doc).toContain('import "prime-ui-kit/bundle.css";');
+    }
   });
 });

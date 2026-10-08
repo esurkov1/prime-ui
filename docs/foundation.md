@@ -137,7 +137,7 @@ Switch (`--prime-switch-<tier>-{width,height,thumb}`), Avatar (`--prime-avatar-<
 
 ## 7. Geometry, elevation, layers
 
-Radius: `--prime-radius-{xs 4, s 6, m 8, l 12, xl 16, 2xl 20, full}`. Controls use their tier radius;
+Radius: `--prime-radius-{xs 4, s 6, m 8, l 12, xl 16, full}`. Controls use their tier radius;
 cards `--prime-card-radius` (12); floating panels `--prime-panel-radius` (12) with
 `--prime-panel-padding` (4) and `--prime-panel-item-radius` (8); modal `--prime-modal-radius` (16).
 

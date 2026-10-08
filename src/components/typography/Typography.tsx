@@ -2,7 +2,10 @@ import type * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import type { TagRef } from "@/internal/polymorphic";
 import type { TextTone } from "@/internal/states";
+import roles from "@/internal/textRole.module.css";
+import toneStyles from "@/internal/textTone.module.css";
 
 import styles from "./Typography.module.css";
 
@@ -22,6 +25,23 @@ export type TypographyRole =
   | "display-m"
   | "display-l"
   | "code";
+
+const ROLE_CLASS: Record<TypographyRole, string> = {
+  caption: roles.caption,
+  "body-s": roles.bodyS,
+  "body-m": roles.bodyM,
+  "body-l": roles.bodyL,
+  "title-s": roles.titleS,
+  "title-m": roles.titleM,
+  "title-l": roles.titleL,
+  "heading-s": roles.headingS,
+  "heading-m": roles.headingM,
+  "heading-l": roles.headingL,
+  "display-s": roles.displayS,
+  "display-m": roles.displayM,
+  "display-l": roles.displayL,
+  code: roles.code,
+};
 
 export type TypographyWeight = "regular" | "medium" | "semibold";
 
@@ -81,8 +101,8 @@ export function Typography({
 }: TypographyProps) {
   return (
     <Tag
-      ref={ref as never}
-      className={cx(styles.root, className)}
+      ref={ref as TagRef<TypographyAs>}
+      className={cx(styles.root, ROLE_CLASS[variant], toneStyles.tone, className)}
       {...rest}
       {...toDataAttributes({
         variant,

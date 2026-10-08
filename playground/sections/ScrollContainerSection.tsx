@@ -1,8 +1,17 @@
+import { ScrollText } from "lucide-react";
 import { api } from "@/components/scroll-container/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "layout",
+  nav: {
+    segment: "scroll-container",
+    label: "Scroll Container",
+    summary: "Прокручиваемая область с тонким скроллбаром",
+    keywords: ["прокрутка", "скролл", "scroll", "axis"],
+    icon: ScrollText,
+    order: 6,
+  },
   dir: "scroll-container",
   title: "ScrollContainer",
   kind: "layout",
@@ -42,7 +51,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ScrollContainerSection() {
-  return <ComponentPage page={page} />;
-}

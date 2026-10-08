@@ -1,8 +1,17 @@
+import { CheckSquare } from "lucide-react";
 import { api } from "@/components/checkbox/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "checkbox",
+    label: "Checkbox",
+    summary: "Флажок: checked, indeterminate, группы",
+    keywords: ["чекбокс", "флажок", "checked", "onCheckedChange", "indeterminate"],
+    icon: CheckSquare,
+    order: 1,
+  },
   dir: "checkbox",
   title: "Checkbox",
   kind: "control",
@@ -57,7 +66,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function CheckboxSection() {
-  return <ComponentPage page={page} />;
-}

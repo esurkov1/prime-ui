@@ -227,7 +227,6 @@
   --prime-control-xs-radius: var(--prime-ref-radius-6);
   --prime-control-xs-text-size: var(--prime-ref-font-size-12);
   --prime-control-xs-track: 0.25rem;
-  --prime-drawer-gap: var(--prime-ref-space-4);
   --prime-drawer-padding: var(--prime-ref-space-6);
   --prime-drawer-width-l: 40rem;
   --prime-drawer-width-m: 30rem;
@@ -239,6 +238,10 @@
   --prime-focus-width: 2px;
   --prime-font-family-mono: var(--prime-ref-font-family-mono);
   --prime-font-family-sans: var(--prime-ref-font-family-sans);
+  --prime-font-tracking-normal: var(--prime-ref-font-tracking-normal);
+  --prime-font-tracking-tight: var(--prime-ref-font-tracking-tight);
+  --prime-font-tracking-tighter: var(--prime-ref-font-tracking-tighter);
+  --prime-font-tracking-wide: var(--prime-ref-font-tracking-wide);
   --prime-font-weight-medium: var(--prime-ref-font-weight-medium);
   --prime-font-weight-regular: var(--prime-ref-font-weight-regular);
   --prime-font-weight-semibold: var(--prime-ref-font-weight-semibold);
@@ -254,7 +257,6 @@
   --prime-layout-reading-max-width: 42rem;
   --prime-layout-sidebar-collapsed-width: var(--prime-ref-space-14);
   --prime-layout-sidebar-width: 15.5rem;
-  --prime-modal-gap: var(--prime-ref-space-4);
   --prime-modal-padding: var(--prime-ref-space-6);
   --prime-modal-radius: var(--prime-ref-radius-16);
   --prime-modal-viewport-padding: var(--prime-ref-space-4);
@@ -282,7 +284,6 @@
   --prime-panel-offset: var(--prime-ref-space-1);
   --prime-panel-padding: var(--prime-ref-space-1);
   --prime-panel-radius: var(--prime-ref-radius-12);
-  --prime-radius-2xl: var(--prime-ref-radius-20);
   --prime-radius-full: var(--prime-ref-radius-full);
   --prime-radius-l: var(--prime-ref-radius-12);
   --prime-radius-m: var(--prime-ref-radius-8);
@@ -308,7 +309,6 @@
   --prime-space-6: var(--prime-ref-space-6);
   --prime-space-7: var(--prime-ref-space-7);
   --prime-space-8: var(--prime-ref-space-8);
-  --prime-space-9: var(--prime-ref-space-9);
   --prime-switch-l-height: var(--prime-ref-space-5);
   --prime-switch-l-thumb: 1rem;
   --prime-switch-l-width: var(--prime-ref-space-9);
@@ -401,7 +401,6 @@
   --prime-tooltip-padding-x: var(--prime-ref-space-2);
   --prime-tooltip-padding-y: var(--prime-ref-space-1);
   --prime-tooltip-radius: var(--prime-ref-radius-6);
-  --prime-z-base: var(--prime-ref-z-index-base);
   --prime-z-overlay: var(--prime-ref-z-index-overlay);
   --prime-z-sticky: var(--prime-ref-z-index-sticky);
   --prime-z-toast: var(--prime-ref-z-index-toast);

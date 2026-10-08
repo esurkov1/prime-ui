@@ -1,3 +1,5 @@
+@import "../src/styles/fonts.css";
+@import "../src/styles/reset.css";
 @import "../src/styles/globals.css";
 
 /*
@@ -49,6 +51,10 @@ body {
   max-width: var(--prime-layout-reading-max-width);
   margin: 0;
   padding-inline-start: var(--prime-space-5);
+}
+
+.demoList li::marker {
+  color: var(--prime-color-text-muted);
 }
 
 /* --- Intro page ---------------------------------------------------------- */
@@ -119,13 +125,22 @@ body {
 /* Mobile header bar (menu + page title + search), rendered only on narrow viewports. */
 .playgroundMobileBar {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   gap: var(--prime-space-2);
+  min-width: 0;
 }
 
 .playgroundMobileTitle {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+/* While an example's module and source load: the frame's footprint, no motion. */
+.playgroundFramePending {
+  min-height: calc(var(--prime-space-24) * 2);
+  border-radius: var(--prime-radius-xl);
+  background: var(--prime-color-bg-sunken);
 }
 
 /* --- Preview surfaces ------------------------------------------------------

@@ -1,8 +1,17 @@
+import { LayoutList } from "lucide-react";
 import { api } from "@/components/tabs/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "navigation",
+  nav: {
+    segment: "tabs",
+    label: "Tabs",
+    summary: "Вкладки: навигация между панелями",
+    keywords: ["вкладки", "табы", "tab menu", "value", "onValueChange", "orientation"],
+    icon: LayoutList,
+    order: 1,
+  },
   dir: "tabs",
   title: "Tabs",
   kind: "navigation",
@@ -75,7 +84,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function TabsSection() {
-  return <ComponentPage page={page} />;
-}

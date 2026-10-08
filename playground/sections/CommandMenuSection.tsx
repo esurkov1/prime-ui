@@ -1,8 +1,17 @@
+import { Command } from "lucide-react";
 import { api } from "@/components/command-menu/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "overlays",
+  nav: {
+    segment: "command-menu",
+    label: "Command Menu",
+    summary: "Палитра команд с поиском (⌘K)",
+    keywords: ["командное меню", "поиск", "палитра", "cmdk", "open", "onOpenChange"],
+    icon: Command,
+    order: 6,
+  },
   dir: "command-menu",
   title: "Command Menu",
   kind: "overlay",
@@ -67,7 +76,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function CommandMenuSection() {
-  return <ComponentPage page={page} />;
-}

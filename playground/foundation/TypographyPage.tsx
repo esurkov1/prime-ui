@@ -3,10 +3,11 @@ import {
   type TypographyRole,
   type TypographyWeight,
 } from "@/components/typography/Typography";
-
-import { FoundationPage, FoundationSection, Panel, RuleList, TokenName } from "./FoundationKit";
+import { ComponentPage } from "../components/ComponentPage";
+import { DocBlock, DocList, DocPage } from "../components/Doc";
+import { page as typographyPage } from "../sections/TypographySection";
+import { Panel, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
-import { TypographyComponentDocs } from "./TypographyComponentDocs";
 import {
   formatPx,
   primitiveTokens,
@@ -171,7 +172,7 @@ function TabularNums() {
 
 export default function TypographyPage() {
   return (
-    <FoundationPage
+    <DocPage
       title="Типографика"
       description={
         <>
@@ -181,33 +182,33 @@ export default function TypographyPage() {
         </>
       }
     >
-      <FoundationSection
+      <DocBlock
         title="Роли"
         description="Размер / межстрочный · начертание · трекинг. Чем крупнее кегль, тем плотнее интерлиньяж и меньше трекинг. Мелкому тексту, наоборот, нужно больше воздуха."
       >
         <RoleScale />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Гарнитуры">
+      <DocBlock title="Гарнитуры">
         <FontFamilies />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Ширина строки"
         description="Для сплошного текста нужно 60–75 знаков в строке. Интерфейсные подписи могут быть уже, абзац — нет."
       >
         <ReadingWidth />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Цифры"
         description="Если числа сравнивают по столбцу (суммы, даты, счётчики, цены в таблицах), включайте табличные цифры: тогда разряды стоят друг под другом."
       >
         <TabularNums />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Правила">
-        <RuleList>
+      <DocBlock title="Правила">
+        <DocList>
           <li>Иерархию создают кегль и начертание. Цвет добавляйте в последнюю очередь.</li>
           <li>
             На один экран хватает трёх-четырёх ролей. Если нужна пятая, скорее всего, лишняя одна из
@@ -222,10 +223,10 @@ export default function TypographyPage() {
             Длинные строки переносите через <code>overflow-wrap: anywhere</code>. Однострочные
             подписи обрезайте многоточием и показывайте полный текст в <code>title</code>.
           </li>
-        </RuleList>
-      </FoundationSection>
+        </DocList>
+      </DocBlock>
 
-      <TypographyComponentDocs />
-    </FoundationPage>
+      <ComponentPage page={typographyPage} />
+    </DocPage>
   );
 }

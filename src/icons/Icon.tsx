@@ -1,64 +1,66 @@
 import type { LucideProps } from "lucide-react";
-import * as React from "react";
+import type * as React from "react";
 
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
-import { DividerContentContext } from "@/internal/DividerContentContext";
+import { iconBoxClass } from "@/internal/iconBox";
 import type { ControlSize, TextTone } from "@/internal/states";
+import toneStyles from "@/internal/textTone.module.css";
 
 import styles from "./Icon.module.css";
+import { type IconName, iconRegistry } from "./registry";
 
-/** Explicit sizes map to `--prime-icon-*`: xs 14 · s 16 · m 20 · l 24 · xl 32. */
-const SIZE_CLASS: Record<ControlSize, string> = {
-  xs: styles.sizeXs,
-  s: styles.sizeS,
-  m: styles.sizeM,
-  l: styles.sizeL,
-  xl: styles.sizeXl,
-};
+type Glyph = React.ComponentType<LucideProps>;
 
-type BaseIconProps = Omit<LucideProps, "size" | "color"> & {
+/** Props of an icon made by `createIcon`: everything `<Icon>` takes except `name`. */
+export type DomainIconProps = Omit<LucideProps, "size" | "color" | "ref"> & {
+  /**
+   * Explicit size on the icon scale (xs 14 · s 16 · m 20 · l 24 · xl 32). Without it the icon
+   * follows its host: the host's `--prime-icon-size`, else the nearest control tier, else 16.
+   */
   size?: ControlSize;
   /** Icon color; `default` inherits `currentColor`. */
   tone?: TextTone;
+  ref?: React.Ref<SVGSVGElement>;
 };
 
-type IconComponent = React.ComponentType<LucideProps>;
+export type IconProps = DomainIconProps & {
+  name: IconName;
+};
 
-function createIcon(IconGlyph: IconComponent) {
-  const WrappedIcon = React.forwardRef<SVGSVGElement, BaseIconProps>(
-    ({ className, size: sizeProp, tone = "default", strokeWidth = 1.75, style, ...rest }, ref) => {
-      const controlSize = useOptionalControlSize();
-      const insideDividerContent = React.useContext(DividerContentContext);
-      /*
-       * Explicit `size` → `--prime-icon-<size>`.
-       * Otherwise the icon follows its host: the host's `--prime-icon-size` if it sets one
-       * (Button, Badge, Kbd…), else `--prime-control-<tier>-icon` of the nearest
-       * `ControlSizeProvider`, else the `m` control icon (16px).
-       * Inside `Divider` content the divider sizes the svg itself.
-       */
-      const resolvedSize: ControlSize = sizeProp ?? controlSize ?? "m";
-      const sizeClass = insideDividerContent
-        ? undefined
-        : cx(SIZE_CLASS[resolvedSize], sizeProp === undefined && styles.inherit);
-
-      return (
-        <IconGlyph
-          ref={ref}
-          className={cx(styles.root, sizeClass, className)}
-          data-tone={tone === "default" ? undefined : tone}
-          style={style}
-          strokeWidth={strokeWidth}
-          aria-hidden="true"
-          {...rest}
-        />
-      );
-    },
+function IconSvg({
+  glyph: GlyphSvg,
+  className,
+  size,
+  tone = "default",
+  strokeWidth = 1.75,
+  ...rest
+}: DomainIconProps & { glyph: Glyph }) {
+  const tier = useOptionalControlSize();
+  return (
+    <GlyphSvg
+      className={cx(styles.root, iconBoxClass(size, tier), toneStyles.tone, className)}
+      data-tone={tone === "default" ? undefined : tone}
+      strokeWidth={strokeWidth}
+      aria-hidden="true"
+      {...rest}
+    />
   );
-
-  WrappedIcon.displayName = `EsIcon(${IconGlyph.displayName ?? "Glyph"})`;
-  return WrappedIcon;
 }
 
-export type { BaseIconProps };
-export { createIcon };
+/** A kit glyph by name: decorative (`aria-hidden`), sized and toned like every kit icon. */
+export function Icon({ name, ...rest }: IconProps) {
+  return <IconSvg glyph={iconRegistry[name]} {...rest} />;
+}
+
+/**
+ * Turns a domain glyph the kit lacks (any lucide-react icon) into a kit icon with the same
+ * `size`, `tone` and host sizing as `<Icon>`. Call it once at module level.
+ */
+export function createIcon(glyph: Glyph) {
+  function DomainIcon(props: DomainIconProps) {
+    return <IconSvg glyph={glyph} {...props} />;
+  }
+  DomainIcon.displayName = `Icon(${glyph.displayName ?? "Glyph"})`;
+  return DomainIcon;
+}

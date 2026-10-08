@@ -1,8 +1,17 @@
+import { Frame } from "lucide-react";
 import { api } from "@/components/example-frame/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "infrastructure",
+  nav: {
+    segment: "example-frame",
+    label: "Example Frame",
+    summary: "Рамка примера: превью, код, вьюпорт",
+    keywords: ["пример", "превью", "рамка", "viewport", "code"],
+    icon: Frame,
+    order: 1,
+  },
   dir: "example-frame",
   title: "ExampleFrame",
   kind: "layout",
@@ -39,7 +48,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ExampleFrameSection() {
-  return <ComponentPage page={page} />;
-}

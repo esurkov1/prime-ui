@@ -1,8 +1,17 @@
+import { ChevronsDownUp } from "lucide-react";
 import { api } from "@/components/accordion/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "layout",
+  nav: {
+    segment: "accordion",
+    label: "Accordion",
+    summary: "Раскрывающиеся секции",
+    keywords: ["аккордеон", "раскрытие", "collapse", "value", "onValueChange"],
+    icon: ChevronsDownUp,
+    order: 4,
+  },
   dir: "accordion",
   title: "Accordion",
   kind: "navigation",
@@ -63,7 +72,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function AccordionSection() {
-  return <ComponentPage page={page} />;
-}

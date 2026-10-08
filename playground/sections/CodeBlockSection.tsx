@@ -1,8 +1,17 @@
+import { Code2 } from "lucide-react";
 import { api } from "@/components/code-block/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "data-display",
+  nav: {
+    segment: "code-block",
+    label: "Code Block",
+    summary: "Блок кода с подсветкой синтаксиса",
+    keywords: ["код", "подсветка", "language"],
+    icon: Code2,
+    order: 8,
+  },
   dir: "code-block",
   title: "CodeBlock",
   kind: "primitive",
@@ -43,7 +52,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function CodeBlockSection() {
-  return <ComponentPage page={page} />;
-}

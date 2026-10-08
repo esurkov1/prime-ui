@@ -1,8 +1,17 @@
+import { Keyboard } from "lucide-react";
 import { api } from "@/components/kbd/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "data-display",
+  nav: {
+    segment: "kbd",
+    label: "Kbd",
+    summary: "Клавиша и сочетание клавиш",
+    keywords: ["клавиша", "клавиатура", "shortcut", "горячие клавиши"],
+    icon: Keyboard,
+    order: 4,
+  },
   dir: "kbd",
   title: "Kbd",
   kind: "primitive",
@@ -37,7 +46,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function KbdSection() {
-  return <ComponentPage page={page} />;
-}

@@ -39,7 +39,7 @@ ProgressBar              <div>; size, tone (value mode)
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type. |
-| `label` | `string` | — | Visible label above the line and its accessible name. |
+| `label` | `string` | — | Visible label above the line and its accessible name; a value bar without it needs `aria-label`. |
 | `showValue` | `boolean` | `false` | Shows the rounded filled percentage at the end of the label row (`aria-hidden`). |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root; `aria-label` names the bar when there is no `label`. |
 

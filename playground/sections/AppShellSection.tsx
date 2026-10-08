@@ -1,8 +1,17 @@
+import { LayoutTemplate } from "lucide-react";
 import { api } from "@/layout/app-shell/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "layout",
+  nav: {
+    segment: "app-shell",
+    label: "App Shell",
+    summary: "Каркас приложения: рельс навигации и панель контента",
+    keywords: ["каркас", "оболочка", "layout", "nav", "header", "main", "fillViewport"],
+    icon: LayoutTemplate,
+    order: 1,
+  },
   dir: "app-shell",
   base: "layout",
   title: "AppShell",
@@ -25,7 +34,7 @@ export const page: ComponentPageConfig = {
       scenario: "template",
       title: "Шаблон",
       description:
-        "Root, навигация, шапка и main одним компонентом; внутри роутера main прокручивается наверх при каждой смене маршрута — `AppShell.Template`.",
+        "Root, навигация, шапка и main одним компонентом; main прокручивается наверх при каждой смене страницы — `AppShell.Template` со `scrollResetKey`.",
     },
   ],
   api,
@@ -37,7 +46,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function AppShellSection() {
-  return <ComponentPage page={page} />;
-}

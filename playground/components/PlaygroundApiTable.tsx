@@ -1,16 +1,11 @@
 import type * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
-import { DataTable, type DataTableColumn } from "@/components/data-table/DataTable";
+import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Typography } from "@/components/typography/Typography";
 
-export type PlaygroundApiPropRow = {
-  prop: string;
-  type: string;
-  defaultValue: string;
-  required: string;
-  description: string;
-};
+import type { ApiProp } from "../../scripts/docs/componentApi";
+import { DocTable } from "./Doc";
 
 /** Marks `` `code` `` fragments inside descriptions. */
 export function renderInlineCode(text: string): React.ReactNode {
@@ -25,18 +20,15 @@ export function renderInlineCode(text: string): React.ReactNode {
   );
 }
 
-const isRequired = (row: PlaygroundApiPropRow) =>
-  row.required.trim().toLowerCase().startsWith("да");
-
-const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
+const COLUMNS: DataTableColumn<ApiProp>[] = [
   {
     id: "prop",
     header: "Проп",
     minWidth: "10rem",
-    cell: (row) => (
+    cell: (prop) => (
       <Typography as="span" variant="body-m">
-        <code>{row.prop}</code>{" "}
-        {isRequired(row) ? <Badge.Root color="orange">обязательный</Badge.Root> : null}
+        <code>{prop.name}</code>{" "}
+        {prop.required ? <Badge.Root color="orange">обязательный</Badge.Root> : null}
       </Typography>
     ),
   },
@@ -44,9 +36,9 @@ const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
     id: "type",
     header: "Тип",
     minWidth: "10rem",
-    cell: (row) => (
+    cell: (prop) => (
       <Typography as="span" variant="body-m">
-        <code>{row.type}</code>
+        <code>{prop.type}</code>
       </Typography>
     ),
   },
@@ -54,14 +46,14 @@ const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
     id: "default",
     header: "По умолчанию",
     minWidth: "8rem",
-    cell: (row) =>
-      row.defaultValue === "—" || row.defaultValue === "" ? (
+    cell: (prop) =>
+      prop.default === undefined ? (
         <Typography as="span" variant="body-m" tone="muted">
           —
         </Typography>
       ) : (
         <Typography as="span" variant="body-m">
-          <code>{row.defaultValue}</code>
+          <code>{prop.default}</code>
         </Typography>
       ),
   },
@@ -70,24 +62,17 @@ const COLUMNS: DataTableColumn<PlaygroundApiPropRow>[] = [
     header: "Описание",
     grow: true,
     minWidth: "16rem",
-    cell: (row) => (
+    cell: (prop) => (
       <Typography as="span" variant="body-m" tone="secondary">
-        {renderInlineCode(row.description)}
+        {renderInlineCode(prop.ru)}
       </Typography>
     ),
   },
 ];
 
-/** Props table of a playground page: the kit's own DataTable, Badge and Typography. */
-export function PlaygroundApiTable({ rows }: { rows: PlaygroundApiPropRow[] }) {
+/** Props table of a component part, straight from its `api.ts` entries. */
+export function PlaygroundApiTable({ props }: { props: ApiProp[] }) {
   return (
-    <DataTable
-      columns={COLUMNS}
-      rows={rows}
-      getRowKey={(row) => row.prop}
-      paging="none"
-      highlightRowOnHover={false}
-      labels={{ empty: "Нет пропов" }}
-    />
+    <DocTable columns={COLUMNS} rows={props} getRowKey={(prop) => prop.name} empty="Нет пропов" />
   );
 }

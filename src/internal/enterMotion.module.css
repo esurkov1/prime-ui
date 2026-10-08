@@ -5,6 +5,7 @@
  *
  *   .enter      fast · small parts (hint, error line, row, gap)
  *   .enterBase  base · blocks (empty state, detail panel)
+ *   .enterBaseChildren  base · on a host whose children all enter (EmptyPage outside compact)
  *
  * The host may set `--enter-shift` (default `--prime-space-1`, a rise from below; a negative value
  * drops in from above) and `animation-delay` in `--prime-motion-stagger` steps for a first render.
@@ -13,7 +14,8 @@
   animation: primeEnter var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
 }
 
-.enterBase {
+.enterBase,
+.enterBaseChildren > * {
   animation: primeEnter var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
 }
 

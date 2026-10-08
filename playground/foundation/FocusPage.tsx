@@ -7,16 +7,9 @@ import { Input } from "@/components/input/Input";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { Switch } from "@/components/switch/Switch";
 import { Typography } from "@/components/typography/Typography";
-
+import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import { SurfaceGallery } from "../components/ExampleSurface";
-import {
-  FoundationPage,
-  FoundationSection,
-  Panel,
-  RuleList,
-  TokenName,
-  TokenTable,
-} from "./FoundationKit";
+import { Panel, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
 import { composite, contrastRatio, sourceValue, toVarName, useComputedColors } from "./tokenModel";
 
@@ -80,8 +73,8 @@ function RingTokens() {
   });
   return (
     <div ref={host} className={s.stack}>
-      <TokenTable columns={TOKEN_COLUMNS} rows={TOKEN_ROWS} getRowKey={(row) => row.varName} />
-      <TokenTable columns={RING_COLUMNS} rows={ringRows} getRowKey={(row) => row.bgPath} />
+      <DocTable columns={TOKEN_COLUMNS} rows={TOKEN_ROWS} getRowKey={(row) => row.varName} />
+      <DocTable columns={RING_COLUMNS} rows={ringRows} getRowKey={(row) => row.bgPath} />
     </div>
   );
 }
@@ -126,7 +119,7 @@ function StaticRing() {
 
 export default function FocusPage() {
   return (
-    <FoundationPage
+    <DocPage
       title="Фокус"
       description={
         <>
@@ -137,25 +130,25 @@ export default function FocusPage() {
         </>
       }
     >
-      <FoundationSection title="Токены и контраст">
+      <DocBlock title="Токены и контраст">
         <RingTokens />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="С клавиатуры">
+      <DocBlock title="С клавиатуры">
         <KeyboardDemo />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="На разных поверхностях"
         description="Кольцо показано постоянно, чтобы его можно было сравнить на разных фонах."
       >
         <SurfaceGallery>
           <StaticRing />
         </SurfaceGallery>
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Правила">
-        <RuleList>
+      <DocBlock title="Правила">
+        <DocList>
           <li>
             Нужен <code>:focus-visible</code>, а не <code>:focus</code>. Мышь не должна оставлять
             кольцо.
@@ -168,8 +161,8 @@ export default function FocusPage() {
             У поля с ошибкой кольцо цвета <code>--prime-color-danger-border</code>.
           </li>
           <li>Нельзя убирать outline и ничего не давать взамен.</li>
-        </RuleList>
-      </FoundationSection>
-    </FoundationPage>
+        </DocList>
+      </DocBlock>
+    </DocPage>
   );
 }

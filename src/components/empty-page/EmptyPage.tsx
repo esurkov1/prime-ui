@@ -1,21 +1,15 @@
-import * as React from "react";
+import type * as React from "react";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import type { TagRef } from "@/internal/polymorphic";
 import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./EmptyPage.module.css";
 
 type EmptyPageLayout = "default" | "fill" | "compact";
-
-/** Parts rise in on first render, except in `compact` (it appears on every keystroke). */
-const EmptyPageLayoutContext = React.createContext<EmptyPageLayout>("default");
-
-function useEnterClass(): string | undefined {
-  return React.useContext(EmptyPageLayoutContext) === "compact" ? undefined : enterMotion.enterBase;
-}
 
 export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Control height, type and spacing tier. Default `m`. */
@@ -30,6 +24,7 @@ export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/** Parts rise in on first render, except in `compact` (it appears on every keystroke). */
 function EmptyPageRoot({
   size = "m",
   layout = "default",
@@ -39,13 +34,11 @@ function EmptyPageRoot({
 }: EmptyPageRootProps) {
   return (
     <div
-      className={cx(styles.root, className)}
+      className={cx(styles.root, layout !== "compact" && enterMotion.enterBaseChildren, className)}
       {...rest}
       {...toDataAttributes({ size, layout: layout === "default" ? undefined : layout })}
     >
-      <EmptyPageLayoutContext.Provider value={layout}>
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-      </EmptyPageLayoutContext.Provider>
+      <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
     </div>
   );
 }
@@ -58,28 +51,24 @@ export type EmptyPageIconProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 function EmptyPageIcon({ tone = "neutral", className, ...rest }: EmptyPageIconProps) {
-  return (
-    <div className={cx(styles.iconWrap, useEnterClass(), className)} data-tone={tone} {...rest} />
-  );
+  return <div className={cx(styles.iconWrap, className)} data-tone={tone} {...rest} />;
 }
 EmptyPageIcon.displayName = "EmptyPage.Icon";
+
+type EmptyPageTitleAs = "h2" | "h3" | "h4" | "p";
 
 export type EmptyPageTitleProps = React.HTMLAttributes<HTMLElement> & {
   /**
    * Tag that fits the outline; the look does not change. `p` inside menus, lists and table cells,
    * where a heading would break the page outline.
    */
-  as?: "h2" | "h3" | "h4" | "p";
+  as?: EmptyPageTitleAs;
   ref?: React.Ref<HTMLElement>;
 };
 
 function EmptyPageTitle({ as: Tag = "h2", className, ref, ...rest }: EmptyPageTitleProps) {
   return (
-    <Tag
-      ref={ref as React.Ref<HTMLHeadingElement & HTMLParagraphElement>}
-      className={cx(styles.title, useEnterClass(), className)}
-      {...rest}
-    />
+    <Tag ref={ref as TagRef<EmptyPageTitleAs>} className={cx(styles.title, className)} {...rest} />
   );
 }
 EmptyPageTitle.displayName = "EmptyPage.Title";
@@ -89,7 +78,7 @@ export type EmptyPageDescriptionProps = React.HTMLAttributes<HTMLParagraphElemen
 };
 
 function EmptyPageDescription({ className, ...rest }: EmptyPageDescriptionProps) {
-  return <p className={cx(styles.description, useEnterClass(), className)} {...rest} />;
+  return <p className={cx(styles.description, className)} {...rest} />;
 }
 EmptyPageDescription.displayName = "EmptyPage.Description";
 
@@ -98,7 +87,7 @@ export type EmptyPageActionsProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 function EmptyPageActions({ className, ...rest }: EmptyPageActionsProps) {
-  return <div className={cx(styles.actions, useEnterClass(), className)} {...rest} />;
+  return <div className={cx(styles.actions, className)} {...rest} />;
 }
 EmptyPageActions.displayName = "EmptyPage.Actions";
 

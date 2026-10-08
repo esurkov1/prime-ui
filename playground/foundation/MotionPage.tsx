@@ -4,16 +4,10 @@ import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Typography } from "@/components/typography/Typography";
-import { IconCopy } from "@/icons";
+import { Icon } from "@/icons";
 
-import {
-  FoundationPage,
-  FoundationSection,
-  Panel,
-  RuleList,
-  TokenName,
-  TokenTable,
-} from "./FoundationKit";
+import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
+import { Panel, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
 import { resolvePrimitive, semanticKeys, sourceValue, toVarName } from "./tokenModel";
 
@@ -136,7 +130,7 @@ const TOKEN_COLUMNS: DataTableColumn<MotionToken>[] = [
 ];
 
 function TokensTable() {
-  return <TokenTable columns={TOKEN_COLUMNS} rows={TOKEN_ROWS} getRowKey={(t) => t.key} />;
+  return <DocTable columns={TOKEN_COLUMNS} rows={TOKEN_ROWS} getRowKey={(t) => t.key} />;
 }
 
 /** Muted lead text of a demo panel. */
@@ -312,7 +306,7 @@ function PressDemo() {
         <Button.Root>press-scale · 0.98</Button.Root>
         <Button.Root variant="soft" tone="neutral" aria-label="press-scale-compact · 0.96">
           <Button.Icon>
-            <IconCopy />
+            <Icon name="action.copy" />
           </Button.Icon>
         </Button.Root>
         <Note>press-scale-compact · 0.96</Note>
@@ -324,41 +318,41 @@ function PressDemo() {
 export default function MotionPage() {
   const reduced = useReducedMotion();
   return (
-    <FoundationPage
+    <DocPage
       title="Движение"
       description="Анимация объясняет, что изменилось и откуда появился элемент. Четыре длительности, четыре кривые, шаг стаггера и масштаб нажатия — других значений нет."
     >
-      <FoundationSection title="Токены">
+      <DocBlock title="Токены">
         <TokensTable />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Кривые">
+      <DocBlock title="Кривые">
         <EasingCards />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Попробовать">
+      <DocBlock title="Попробовать">
         <MotionPlayground />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Emphasized и standard"
         description="Emphasized — для состояния, которое доезжает на место, вместе с base. Ничто в ките не проскакивает цель. Появление и исчезновение остаются на enter и exit."
       >
         <EmphasizedDemo />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Стаггер"
         description="Только для первого появления короткой группы (до 6 элементов) и редких состояний вроде пустого экрана."
       >
         <StaggerDemo />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Нажатие">
+      <DocBlock title="Нажатие">
         <PressDemo />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Если анимации отключены"
         description={
           <>
@@ -373,7 +367,7 @@ export default function MotionPage() {
           </>
         }
       >
-        <RuleList>
+        <DocList>
           <li>
             JS-анимации (скролл, измерения, requestAnimationFrame) должны сами проверять{" "}
             <code>matchMedia("(prefers-reduced-motion: reduce)")</code>.
@@ -386,8 +380,8 @@ export default function MotionPage() {
             Ничего не должно двигаться дольше <code>slow</code>. Пользователь не должен ждать
             анимацию.
           </li>
-        </RuleList>
-      </FoundationSection>
-    </FoundationPage>
+        </DocList>
+      </DocBlock>
+    </DocPage>
   );
 }

@@ -1,8 +1,17 @@
+import { PanelRight } from "lucide-react";
 import { api } from "@/components/drawer/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "overlays",
+  nav: {
+    segment: "drawer",
+    label: "Drawer",
+    summary: "Выезжающая панель сбоку",
+    keywords: ["шторка", "панель", "drawer", "open", "onOpenChange", "side"],
+    icon: PanelRight,
+    order: 5,
+  },
   dir: "drawer",
   title: "Drawer",
   kind: "overlay",
@@ -67,7 +76,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function DrawerSection() {
-  return <ComponentPage page={page} />;
-}

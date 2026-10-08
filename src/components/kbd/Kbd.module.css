@@ -1,71 +1,28 @@
 /*
- * Kbd — monospace key cap on a sunken wash, no border. Uses the badge tiers
- * (`--prime-badge-<tier>-*`); `data-tier` is the visual tier (see badge/tier.ts).
+ * Kbd — monospace key cap on a sunken wash, no border. Dimensions come from the chip tier shared
+ * with Badge (`internal/chipTier`, `--chip-*`); `data-tier` is the visual tier (see badge/tier.ts).
  * The wash is a translucent fill so the key reads as inset on canvas, cards and panels alike.
  */
 .root {
-  --kbd-h: var(--prime-badge-m-height);
-  --kbd-px: var(--prime-badge-m-padding-x);
-  --kbd-gap: var(--prime-badge-m-gap);
-  --kbd-radius: var(--prime-badge-m-radius);
-  --kbd-text: var(--prime-badge-m-text-size);
-  --prime-icon-size: var(--prime-badge-m-icon);
-
   box-sizing: border-box;
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  gap: var(--kbd-gap);
-  height: var(--kbd-h);
-  min-width: var(--kbd-h);
-  padding-inline: var(--kbd-px);
-  border-radius: var(--kbd-radius);
+  gap: var(--chip-gap);
+  height: var(--chip-h);
+  min-width: var(--chip-h);
+  padding-inline: var(--chip-px);
+  border-radius: var(--chip-radius);
   background: var(--prime-color-fill-subtle-active);
   color: var(--prime-color-text-secondary);
   font-family: var(--prime-font-family-mono);
-  font-size: var(--kbd-text);
+  font-size: var(--chip-text);
   line-height: 1;
   font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   vertical-align: middle;
-}
-
-.root[data-tier="xs"] {
-  --kbd-h: var(--prime-badge-xs-height);
-  --kbd-px: var(--prime-badge-xs-padding-x);
-  --kbd-gap: var(--prime-badge-xs-gap);
-  --kbd-radius: var(--prime-badge-xs-radius);
-  --kbd-text: var(--prime-badge-xs-text-size);
-  --prime-icon-size: var(--prime-badge-xs-icon);
-}
-
-.root[data-tier="s"] {
-  --kbd-h: var(--prime-badge-s-height);
-  --kbd-px: var(--prime-badge-s-padding-x);
-  --kbd-gap: var(--prime-badge-s-gap);
-  --kbd-radius: var(--prime-badge-s-radius);
-  --kbd-text: var(--prime-badge-s-text-size);
-  --prime-icon-size: var(--prime-badge-s-icon);
-}
-
-.root[data-tier="l"] {
-  --kbd-h: var(--prime-badge-l-height);
-  --kbd-px: var(--prime-badge-l-padding-x);
-  --kbd-gap: var(--prime-badge-l-gap);
-  --kbd-radius: var(--prime-badge-l-radius);
-  --kbd-text: var(--prime-badge-l-text-size);
-  --prime-icon-size: var(--prime-badge-l-icon);
-}
-
-.root[data-tier="xl"] {
-  --kbd-h: var(--prime-badge-xl-height);
-  --kbd-px: var(--prime-badge-xl-padding-x);
-  --kbd-gap: var(--prime-badge-xl-gap);
-  --kbd-radius: var(--prime-badge-xl-radius);
-  --kbd-text: var(--prime-badge-xl-text-size);
-  --prime-icon-size: var(--prime-badge-xl-icon);
 }
 
 .root > * {

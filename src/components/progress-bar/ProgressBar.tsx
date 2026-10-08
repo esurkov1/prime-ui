@@ -4,9 +4,10 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import {
   DEFAULT_PROGRESS_SEGMENTS_LABELS,
-  type ProgressSegment,
+  type ProgressModeProps,
   type ProgressSegmentsLabels,
   resolveSegments,
+  resolveValue,
 } from "@/internal/progressSegments";
 import type { ControlSize, Tone } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -15,42 +16,18 @@ import styles from "./ProgressBar.module.css";
 
 export type ProgressBarLabels = ProgressSegmentsLabels;
 
-type ProgressBarCommonProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /** Visible label above the bar and its accessible name. */
+export type ProgressBarProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  /**
+   * Visible label above the bar and its accessible name. A `value` bar needs a name: `label`, or
+   * `aria-label` when the text around it already says what is loading.
+   */
   label?: string;
   /** Default `m`. */
   size?: ControlSize;
   /** Shows the rounded filled percentage at the end of the label row. */
   showValue?: boolean;
   ref?: React.Ref<HTMLDivElement>;
-};
-
-type ProgressBarValueProps = ProgressBarCommonProps & {
-  /** Current value; clamped to `0…max`. */
-  value: number;
-  /** Top of the scale. Default `100`. */
-  max?: number;
-  /** Fill color. Default `accent`. */
-  tone?: Tone;
-  segments?: never;
-  segmentGap?: never;
-  labels?: never;
-};
-
-type ProgressBarSegmentsProps = ProgressBarCommonProps & {
-  /** Parts of the bar in order; each one's width is its share of `max`. */
-  segments: ProgressSegment[];
-  /** Total capacity. Default: the sum of the segments (they fill the whole bar). */
-  max?: number;
-  /** `hairline` draws every segment as its own pill with a gap. Default `none`. */
-  segmentGap?: "none" | "hairline";
-  /** Built-in accessible strings for empty distributions. */
-  labels?: Partial<ProgressBarLabels>;
-  value?: never;
-  tone?: never;
-};
-
-export type ProgressBarProps = ProgressBarValueProps | ProgressBarSegmentsProps;
+} & ProgressModeProps;
 
 /**
  * A linear progress line: a single `value` (native `<progress>` for assistive tech) or
@@ -126,9 +103,9 @@ export function ProgressBar(props: ProgressBarProps) {
       </>
     );
   } else {
-    const max = maxProp !== undefined && maxProp > 0 ? maxProp : 100;
-    const value = Math.min(max, Math.max(valueProp ?? 0, 0));
-    percent = Math.round((value / max) * 100);
+    const resolved = resolveValue(valueProp ?? 0, maxProp);
+    const { value, max } = resolved;
+    percent = resolved.percent;
     tone = toneProp ?? "accent";
 
     bar = (
@@ -144,7 +121,7 @@ export function ProgressBar(props: ProgressBarProps) {
         <span
           className={styles.bar}
           aria-hidden="true"
-          style={{ "--pb-ratio": value / max } as React.CSSProperties}
+          style={{ "--pb-ratio": resolved.ratio } as React.CSSProperties}
         >
           <span className={styles.fill} />
         </span>

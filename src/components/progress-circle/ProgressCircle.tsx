@@ -4,9 +4,10 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import {
   DEFAULT_PROGRESS_SEGMENTS_LABELS,
-  type ProgressSegment,
+  type ProgressModeProps,
   type ProgressSegmentsLabels,
   resolveSegments,
+  resolveValue,
 } from "@/internal/progressSegments";
 import type { ControlSize, Tone } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -28,7 +29,7 @@ const SIZES_WITHOUT_INNER: ReadonlySet<ControlSize> = new Set(["xs", "s"]);
 
 export type ProgressCircleLabels = ProgressSegmentsLabels;
 
-type ProgressCircleCommonProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+export type ProgressCircleProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   /** Default `m`. */
   size?: ControlSize;
   /**
@@ -37,34 +38,7 @@ type ProgressCircleCommonProps = Omit<React.HTMLAttributes<HTMLDivElement>, "chi
    */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
-};
-
-type ProgressCircleValueProps = ProgressCircleCommonProps & {
-  /** Current value; clamped to `0…max`. */
-  value: number;
-  /** Top of the scale. Default `100`. */
-  max?: number;
-  /** Arc color. Default `accent`. */
-  tone?: Tone;
-  segments?: never;
-  segmentGap?: never;
-  labels?: never;
-};
-
-type ProgressCircleSegmentsProps = ProgressCircleCommonProps & {
-  /** Parts of the ring in order, clockwise from the top; each one's length is its share of `max`. */
-  segments: ProgressSegment[];
-  /** Total capacity. Default: the sum of the segments (they close the ring). */
-  max?: number;
-  /** `hairline` draws every part as its own rounded arc with a gap. */
-  segmentGap?: "none" | "hairline";
-  /** Built-in accessible strings for empty distributions. */
-  labels?: Partial<ProgressCircleLabels>;
-  value?: never;
-  tone?: never;
-};
-
-export type ProgressCircleProps = ProgressCircleValueProps | ProgressCircleSegmentsProps;
+} & ProgressModeProps;
 
 type Arc = { start: number; length: number; tone?: Tone; rest?: boolean };
 
@@ -213,8 +187,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
       </svg>
     );
   } else {
-    const max = maxProp !== undefined && maxProp > 0 ? maxProp : 100;
-    const value = Math.min(max, Math.max(valueProp ?? 0, 0));
+    const { value, max, ratio } = resolveValue(valueProp ?? 0, maxProp);
     tone = toneProp ?? "accent";
     svg = (
       <svg
@@ -233,7 +206,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
             className={styles.fill}
             style={{
               strokeDasharray: `${CIRCUMFERENCE} ${CIRCUMFERENCE}`,
-              strokeDashoffset: CIRCUMFERENCE * (1 - value / max),
+              strokeDashoffset: CIRCUMFERENCE * (1 - ratio),
               opacity: value === 0 ? 0 : undefined,
             }}
           />

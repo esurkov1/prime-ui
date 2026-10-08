@@ -1,8 +1,17 @@
+import { AlignLeft } from "lucide-react";
 import { api } from "@/components/textarea/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "inputs",
+  nav: {
+    segment: "textarea",
+    label: "Textarea",
+    summary: "Многострочное поле со счётчиком символов",
+    keywords: ["текстовая область", "многострочное", "maxLength", "onValueChange"],
+    icon: AlignLeft,
+    order: 2,
+  },
   dir: "textarea",
   title: "Textarea",
   kind: "field",
@@ -62,7 +71,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function TextareaSection() {
-  return <ComponentPage page={page} />;
-}

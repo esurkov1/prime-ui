@@ -1,8 +1,17 @@
+import { ToggleLeft } from "lucide-react";
 import { api } from "@/components/switch/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "switch",
+    label: "Switch",
+    summary: "Переключатель включено/выключено",
+    keywords: ["переключатель", "тумблер", "toggle", "checked", "onCheckedChange"],
+    icon: ToggleLeft,
+    order: 3,
+  },
   dir: "switch",
   title: "Switch",
   kind: "control",
@@ -52,7 +61,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function SwitchSection() {
-  return <ComponentPage page={page} />;
-}

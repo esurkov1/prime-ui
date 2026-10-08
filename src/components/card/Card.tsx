@@ -9,16 +9,7 @@ import styles from "./Card.module.css";
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 type SpanProps = React.HTMLAttributes<HTMLSpanElement> & { ref?: React.Ref<HTMLSpanElement> };
 
-export type CardVariant =
-  | "panel"
-  | "mini"
-  | "mini-media"
-  | "metric"
-  | "stat-trend"
-  | "split"
-  | "cta"
-  | "list"
-  | "cover";
+export type CardVariant = "panel" | "mini" | "stat-trend" | "split" | "cta" | "list" | "cover";
 
 export type CardRootProps = DivProps & {
   /** Structural template: KPI tiles, lists, CTA, split, cover and titled panels. Default `panel`. */
@@ -77,7 +68,7 @@ CardBody.displayName = "Card.Body";
 
 export type CardMediaProps = DivProps;
 
-/** A chart, an image or a gauge: edge to edge in `panel`, the top cover in `cover`, the bottom slot in `mini-media`. */
+/** A chart, an image or a gauge: edge to edge in `panel`, the top cover in `cover`, the bottom slot in `mini`. */
 function CardMedia({ className, ...rest }: CardMediaProps) {
   return <div className={cx(styles.media, className)} {...rest} />;
 }

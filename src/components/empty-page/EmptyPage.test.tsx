@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import enterMotion from "@/internal/enterMotion.module.css";
+
 import { EmptyPage } from "./EmptyPage";
 
 describe("EmptyPage", () => {
@@ -45,17 +47,17 @@ describe("EmptyPage", () => {
 
   it("parts rise in on first render, but not in the compact layout", () => {
     const { rerender } = render(
-      <EmptyPage.Root>
+      <EmptyPage.Root data-testid="empty">
         <EmptyPage.Title>Нет данных</EmptyPage.Title>
       </EmptyPage.Root>,
     );
-    expect(screen.getByRole("heading").className).toMatch(/enterBase/);
+    expect(screen.getByTestId("empty")).toHaveClass(enterMotion.enterBaseChildren);
     rerender(
-      <EmptyPage.Root layout="compact">
+      <EmptyPage.Root layout="compact" data-testid="empty">
         <EmptyPage.Title>Нет данных</EmptyPage.Title>
       </EmptyPage.Root>,
     );
-    expect(screen.getByRole("heading").className).not.toMatch(/enterBase/);
+    expect(screen.getByTestId("empty")).not.toHaveClass(enterMotion.enterBaseChildren);
   });
 
   it("applies fill layout", () => {

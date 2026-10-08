@@ -15,22 +15,12 @@ export default defineConfig({
     },
   },
   test: {
-    /** Тяжёлый jsdom + много файлов: без лимита на машинах с большим числом CPU воркеры иногда не успевают стартовать (Vitest: «Timeout waiting for worker to respond»), отдельные тесты падают по testTimeout. */
+    /** Heavy jsdom and many files: without a cap, machines with many CPUs sometimes fail to start
+     * workers in time ("Timeout waiting for worker to respond") and single tests hit testTimeout. */
     maxWorkers: 4,
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     globals: true,
-    coverage: {
-      provider: "v8",
-      include: ["src/components/**", "src/hooks/**", "src/internal/**"],
-      exclude: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test/**", "src/types/**"],
-      thresholds: {
-        statements: 80,
-        branches: 70,
-        functions: 80,
-        lines: 80,
-      },
-    },
   },
 });

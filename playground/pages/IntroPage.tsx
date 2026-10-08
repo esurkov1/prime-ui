@@ -59,8 +59,9 @@ const FOUNDATION_LINKS: { to: string; title: string; text: string }[] = [
 ];
 
 const INSTALL_CODE = `// Один раз в корне приложения
-import "prime-ui-kit/styles.css";  // шрифты, токены, светлая и тёмная темы
-import "prime-ui-kit/bundle.css";  // стили компонентов
+import "prime-ui-kit/bundle.css";  // токены, обе темы и стили компонентов
+import "prime-ui-kit/fonts.css";   // по желанию: Golos Text и JetBrains Mono из Google Fonts
+import "prime-ui-kit/reset.css";   // по желанию: минимальный сброс документа
 
 import { Button, Input } from "prime-ui-kit";
 

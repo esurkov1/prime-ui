@@ -84,20 +84,22 @@ npm install prime-ui-kit react react-dom react-aria-components date-fns
 | `react-aria-components` | ^1.16.0 |
 | `date-fns` | ^4.0.0 |
 
-`lucide-react` (icons) and `react-router-dom` come with the package.
+`lucide-react` (icons) comes with the package. The kit has no router dependency: pass your router's
+pathname to `AppShell.Template scrollResetKey` and use `asChild` for router links.
 
 ## Set up styles and theme
 
 ```tsx
-import "prime-ui-kit/styles.css"; // Golos Text + JetBrains Mono, reset, tokens, light and dark themes
-import "prime-ui-kit/bundle.css"; // component styles
+import "prime-ui-kit/bundle.css"; // tokens, light and dark themes, component styles
+import "prime-ui-kit/fonts.css"; // optional: Golos Text + JetBrains Mono from Google Fonts
+import "prime-ui-kit/reset.css"; // optional: minimal document reset (skip if the app has its own)
 import { applyTheme } from "prime-ui-kit";
 
 applyTheme("dark"); // sets data-theme on <html> without a transition flash
 ```
 
+`bundle.css` is everything the components need; it leaves the root font size to the browser.
 `data-theme="light" | "dark"` also works on any wrapper, so one page can show both themes.
-Fine-grained alternatives: `prime-ui-kit/tokens.css`, `theme-light.css`, `theme-dark.css`.
 
 ## Quick start
 
@@ -139,7 +141,8 @@ export function App() {
 Short rules that keep code correct — for people and for AI coding assistants:
 
 1. Import everything from the package root: `import { Button, Input } from "prime-ui-kit"`.
-2. Import styles once at the app root: `prime-ui-kit/styles.css` and `prime-ui-kit/bundle.css`.
+2. Import styles once at the app root: `prime-ui-kit/bundle.css` (plus the optional `fonts.css` and
+   `reset.css`).
 3. Compound components are used through parts: `<Button.Root>`, `<Modal.Root>` + `<Modal.Content>`.
    `<Button>` alone is not a component.
 4. Default `size` is `m`; controls in one row share one size.
@@ -278,7 +281,7 @@ accessibility, examples and common mistakes.
 | `ControlSizeProvider` | Default `size` for every control in a subtree (dense toolbars, compact forms). |
 | `Tooltip.Provider` | Shared open delay for a group of tooltips. |
 | `applyTheme(scheme, element?)` | Switch the theme without transition flashes. |
-| `Icon`, `IconSearch`, `IconClose`, … | The kit icon set (built on lucide-react). |
+| `<Icon name="…" />`, `createIcon(glyph)` | The kit icon set (built on lucide-react); `createIcon` turns a domain glyph into a kit icon. |
 
 ## Docs inside the package
 
@@ -336,12 +339,11 @@ command again with `--force` (degit) or re-copy the folder.
 
 | Path | Purpose |
 |---|---|
-| `prime-ui-kit` | Main JS/TS API (includes global styles import). |
-| `prime-ui-kit/components` | Components entry without layout extras. |
-| `prime-ui-kit/styles.css` | Fonts, reset, tokens, both themes. |
-| `prime-ui-kit/tokens.css`, `theme-light.css`, `theme-dark.css` | Individual layers. |
-| `prime-ui-kit/bundle.css` | Component CSS for the main entry. |
-| `prime-ui-kit/components.css` | Component CSS for the `components` entry. |
+| `prime-ui-kit` | The JS/TS API: every component, layout, icon and helper (no CSS side effects). |
+| `prime-ui-kit/bundle.css` | Tokens, both themes, base rules (focus ring, reduced motion) and every component's CSS. |
+| `prime-ui-kit/fonts.css` | Optional: Golos Text and JetBrains Mono from Google Fonts. |
+| `prime-ui-kit/reset.css` | Optional: minimal document reset. |
+| `prime-ui-kit/tokens.css`, `theme-light.css`, `theme-dark.css` | The token layers alone (already inside `bundle.css`), for styling without components. |
 
 Type definitions ship with the package.
 

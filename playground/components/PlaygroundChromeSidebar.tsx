@@ -4,7 +4,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Kbd } from "@/components/kbd/Kbd";
-import { Sidebar, type SidebarMode } from "@/layout";
+import { Sidebar, type SidebarMode, useSidebar } from "@/layout";
 
 import {
   PLAYGROUND_INTRO,
@@ -108,10 +108,19 @@ function saveMode(mode: SidebarMode) {
   }
 }
 
+/** Reports the Sidebar's own off-canvas state, so the layout uses the kit breakpoint, not a copy. */
+function OffCanvasReporter({ onChange }: { onChange: (offCanvas: boolean) => void }) {
+  const { offCanvas } = useSidebar();
+  React.useLayoutEffect(() => onChange(offCanvas), [offCanvas, onChange]);
+  return null;
+}
+
 export type PlaygroundChromeSidebarProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSearch: () => void;
+  /** Called with `true` while the sidebar is an off-canvas panel (narrow viewport). */
+  onOffCanvasChange: (offCanvas: boolean) => void;
 };
 
 /**
@@ -123,6 +132,7 @@ export function PlaygroundChromeSidebar({
   open,
   onOpenChange,
   onSearch,
+  onOffCanvasChange,
 }: PlaygroundChromeSidebarProps) {
   const { pathname } = useLocation();
   const contentRef = React.useRef<HTMLDivElement>(null);
@@ -143,6 +153,7 @@ export function PlaygroundChromeSidebar({
       onOpenChange={onOpenChange}
       labels={{ navigation: "Навигация playground" }}
     >
+      <OffCanvasReporter onChange={onOffCanvasChange} />
       <Sidebar.Header>
         <Brand />
         <Sidebar.Toggle variant="header" />

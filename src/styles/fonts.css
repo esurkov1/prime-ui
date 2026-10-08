@@ -1,0 +1,4 @@
+/* Opt-in (`prime-ui-kit/fonts.css`): the kit's faces from Google Fonts.
+   Golos Text: interface face with full Cyrillic; JetBrains Mono: code and IDs.
+   Self-host them instead and the token stacks pick them up by family name. */
+@import url("https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");

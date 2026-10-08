@@ -1,8 +1,17 @@
+import { Bell } from "lucide-react";
 import { api } from "@/components/notification/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "feedback",
+  nav: {
+    segment: "notification",
+    label: "Notification",
+    summary: "Всплывающие уведомления (тосты)",
+    keywords: ["уведомление", "тост", "toast", "tone"],
+    icon: Bell,
+    order: 2,
+  },
   dir: "notification",
   title: "Notification",
   kind: "overlay",
@@ -63,7 +72,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function NotificationSection() {
-  return <ComponentPage page={page} />;
-}

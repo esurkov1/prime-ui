@@ -1,9 +1,13 @@
-import * as React from "react";
+import type * as React from "react";
 
-import { type ImageStatus, useImageStatus } from "@/hooks/useImageStatus";
-import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import {
+  createImageSlot,
+  type ImageSlotFallbackProps,
+  type ImageSlotImageProps,
+} from "@/internal/imageSlot";
+import palette from "@/internal/palette.module.css";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 
 import styles from "./Thumbnail.module.css";
@@ -11,13 +15,7 @@ import styles from "./Thumbnail.module.css";
 /** Width ÷ height. `1:1` square · `4:3` / `3:2` photo · `16:9` wide cover · `3:4` portrait. */
 export type ThumbnailRatio = "1:1" | "4:3" | "3:2" | "16:9" | "3:4";
 
-type ThumbnailContextValue = {
-  imageStatus: ImageStatus;
-  setImageStatus: (status: ImageStatus) => void;
-};
-
-const [ThumbnailProvider, useThumbnailContext] =
-  createComponentContext<ThumbnailContextValue>("Thumbnail");
+const slot = createImageSlot("Thumbnail", { image: styles.image, fallback: styles.fallback });
 
 export type ThumbnailRootProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Height tier: 24 · 32 · 40 · 48 · 64; width follows `ratio`. Default `m`. */
@@ -47,13 +45,10 @@ function ThumbnailRoot({
   children,
   ...rest
 }: ThumbnailRootProps) {
-  const [imageStatus, setImageStatus] = React.useState<ImageStatus>("idle");
-  const value = React.useMemo(() => ({ imageStatus, setImageStatus }), [imageStatus]);
-
   return (
-    <ThumbnailProvider value={value}>
+    <slot.ImageSlotProvider>
       <div
-        className={cx(styles.root, className)}
+        className={cx(styles.root, palette.hue, className)}
         {...toDataAttributes({
           size,
           ratio,
@@ -66,67 +61,26 @@ function ThumbnailRoot({
       >
         {children}
       </div>
-    </ThumbnailProvider>
+    </slot.ImageSlotProvider>
   );
 }
 ThumbnailRoot.displayName = "Thumbnail.Root";
 
-export type ThumbnailImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
-  src: string;
-  /** Empty (default) when the text next to the thumbnail already names the object. */
-  alt?: string;
+export type ThumbnailImageProps = ImageSlotImageProps & {
   /** `cover` (default) crops to fill; `contain` shows the whole image on the fallback fill. */
   fit?: "cover" | "contain";
-  ref?: React.Ref<HTMLImageElement>;
 };
 
-function ThumbnailImageInner({
-  src,
-  alt = "",
-  fit = "cover",
-  className,
-  onLoad,
-  onError,
-  ...rest
-}: ThumbnailImageProps) {
-  const { setImageStatus } = useThumbnailContext();
-  const image = useImageStatus(setImageStatus, { onLoad, onError });
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className={cx(styles.image, className)}
-      onLoad={image.onLoad}
-      onError={image.onError}
-      {...toDataAttributes({ status: image.status, fit })}
-      {...rest}
-    />
-  );
-}
-
 /** The picture; while it loads or after an error the Fallback shows through. */
-function ThumbnailImage(props: ThumbnailImageProps) {
-  // A new source remounts the image and starts again at `loading`.
-  return <ThumbnailImageInner key={props.src} {...props} />;
+function ThumbnailImage({ fit = "cover", ...rest }: ThumbnailImageProps) {
+  return <slot.Image {...rest} data-fit={fit} />;
 }
 ThumbnailImage.displayName = "Thumbnail.Image";
 
-export type ThumbnailFallbackProps = React.HTMLAttributes<HTMLSpanElement> & {
-  ref?: React.Ref<HTMLSpanElement>;
-};
+export type ThumbnailFallbackProps = ImageSlotFallbackProps;
 
 /** Shown without an image, while it loads and when it fails: palette fill + centered icon. */
-function ThumbnailFallback({ className, ...rest }: ThumbnailFallbackProps) {
-  const { imageStatus } = useThumbnailContext();
-  return (
-    <span
-      className={cx(styles.fallback, className)}
-      aria-hidden={imageStatus === "loaded" ? true : undefined}
-      {...rest}
-    />
-  );
-}
-ThumbnailFallback.displayName = "Thumbnail.Fallback";
+const ThumbnailFallback = slot.Fallback;
 
 export const Thumbnail = {
   Root: ThumbnailRoot,

@@ -1,8 +1,17 @@
+import { CircleDot } from "lucide-react";
 import { api } from "@/components/radio/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "radio",
+    label: "Radio",
+    summary: "Радиокнопки: выбор одного варианта",
+    keywords: ["радио", "переключатель", "RadioGroup", "value", "onValueChange"],
+    icon: CircleDot,
+    order: 2,
+  },
   dir: "radio",
   title: "Radio",
   kind: "control",
@@ -51,7 +60,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function RadioSection() {
-  return <ComponentPage page={page} />;
-}

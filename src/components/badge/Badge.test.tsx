@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { IconHouse } from "@/icons";
-import iconStyles from "@/icons/Icon.module.css";
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { iconBoxStyles } from "@/internal/iconBox";
 import type { PaletteColor } from "@/internal/states";
 import { Badge } from "./Badge";
 import styles from "./Badge.module.css";
@@ -22,6 +22,9 @@ const allColors: PaletteColor[] = [
   "teal",
 ];
 const pillVariants = ["solid", "soft", "outline"] as const;
+
+/** The badge root around a text (the text itself sits in a `.text` span). */
+const badgeOf = (text: string) => screen.getByText(text).closest(`.${styles.root}`);
 
 describe("Badge", () => {
   it("renders", () => {
@@ -45,20 +48,20 @@ describe("Badge", () => {
   it("passes the badge tier to nested Icon via ControlSizeProvider", () => {
     render(
       <Badge.Root size="xl">
-        <IconHouse data-testid="badge-icon" />
+        <Icon name="nav.home" data-testid="badge-icon" />
       </Badge.Root>,
     );
-    expect(screen.getByTestId("badge-icon")).toHaveClass(iconStyles.sizeXl);
+    expect(screen.getByTestId("badge-icon")).toHaveClass(iconBoxStyles.xl);
   });
 
   it('sets data-disabled="true" when disabled', () => {
     render(<Badge.Root disabled>off</Badge.Root>);
-    expect(screen.getByText("off")).toHaveAttribute("data-disabled", "true");
+    expect(badgeOf("off")).toHaveAttribute("data-disabled", "true");
   });
 
   it("does not set data-disabled when not disabled", () => {
     render(<Badge.Root>on</Badge.Root>);
-    expect(screen.getByText("on")).not.toHaveAttribute("data-disabled");
+    expect(badgeOf("on")).not.toHaveAttribute("data-disabled");
   });
 
   it("renders Icon", () => {
@@ -99,7 +102,7 @@ describe("Badge", () => {
 
   it("merges className on Root", () => {
     render(<Badge.Root className="custom-root">x</Badge.Root>);
-    expect(screen.getByText("x")).toHaveClass("custom-root");
+    expect(badgeOf("x")).toHaveClass("custom-root");
   });
 
   it("merges className on Icon", () => {
@@ -124,7 +127,7 @@ describe("Badge", () => {
 
   it("defaults: gray, soft, m", () => {
     render(<Badge.Root>d</Badge.Root>);
-    const el = screen.getByText("d");
+    const el = badgeOf("d");
     expect(el).toHaveAttribute("data-color", "gray");
     expect(el).toHaveAttribute("data-variant", "soft");
     expect(el).toHaveAttribute("data-size", "m");
@@ -132,12 +135,12 @@ describe("Badge", () => {
 
   it.each(allColors)("exposes data-color for extended palette: %s", (color) => {
     render(<Badge.Root color={color}>c</Badge.Root>);
-    expect(screen.getByText("c")).toHaveAttribute("data-color", color);
+    expect(badgeOf("c")).toHaveAttribute("data-color", color);
   });
 
   it("supports size xs", () => {
     render(<Badge.Root size="xs">9</Badge.Root>);
-    const el = screen.getByText("9");
+    const el = badgeOf("9");
     expect(el).toHaveAttribute("data-size", "xs");
     expect(el).toHaveAttribute("data-tier", "xs");
   });
@@ -148,7 +151,7 @@ describe("Badge", () => {
         <Badge.Root>ctx</Badge.Root>
       </ControlSizeProvider>,
     );
-    const el = screen.getByText("ctx");
+    const el = badgeOf("ctx");
     expect(el).toHaveAttribute("data-size", "m");
     expect(el).toHaveAttribute("data-tier", "s");
   });
@@ -159,7 +162,7 @@ describe("Badge", () => {
         <Badge.Root size="m">own</Badge.Root>
       </ControlSizeProvider>,
     );
-    expect(screen.getByText("own")).toHaveAttribute("data-tier", "m");
+    expect(badgeOf("own")).toHaveAttribute("data-tier", "m");
   });
 
   it("marks icon-only badges", () => {
@@ -226,10 +229,25 @@ describe("Badge", () => {
       expect(screen.getByRole("button", { name: "Удалить" })).toBeDisabled();
     });
 
-    it("a read-only badge stays one element", () => {
-      render(<Badge.Root data-testid="b">12</Badge.Root>);
-      expect(screen.getByTestId("b").children).toHaveLength(0);
+    it("a read-only text badge stays one element that ellipsizes itself", () => {
+      render(<Badge.Root data-testid="b">Москва {12}</Badge.Root>);
+      const root = screen.getByTestId("b");
+      expect(root.children).toHaveLength(0);
+      expect(root).toHaveAttribute("data-text-only", "true");
+      expect(root).toHaveTextContent("Москва 12");
       expect(screen.queryByRole("button")).toBeNull();
+    });
+
+    it("in a flex row a text run sits in one block span; its outer spaces stay outside", () => {
+      render(
+        <Badge.Root onPress={() => {}}>
+          {"НЕ "}
+          <span>billing</span>
+        </Badge.Root>,
+      );
+      const button = screen.getByRole("button", { name: "НЕ billing" });
+      expect(button.querySelector(`.${styles.text}`)).toHaveTextContent(/^НЕ$/);
+      expect(button.closest(`.${styles.root}`)).not.toHaveAttribute("data-text-only");
     });
 
     it("onPress makes the body a toggle button with aria-pressed", async () => {

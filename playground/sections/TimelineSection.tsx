@@ -1,8 +1,27 @@
+import { History } from "lucide-react";
 import { api } from "@/components/timeline/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "data-display",
+  nav: {
+    segment: "timeline",
+    label: "Timeline",
+    summary: "Лента событий: точки на линии, дата, сумма",
+    keywords: [
+      "таймлайн",
+      "лента",
+      "история",
+      "события",
+      "активность",
+      "activity",
+      "feed",
+      "операции",
+      "active",
+    ],
+    icon: History,
+    order: 7,
+  },
   dir: "timeline",
   title: "Timeline",
   kind: "composite",
@@ -62,7 +81,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function TimelineSection() {
-  return <ComponentPage page={page} />;
-}

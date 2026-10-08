@@ -2,8 +2,10 @@ import * as React from "react";
 
 import { Icon } from "@/icons";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
+import chipTier from "@/internal/chipTier.module.css";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import palette from "@/internal/palette.module.css";
 import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
 
 import styles from "./Badge.module.css";
@@ -37,6 +39,7 @@ export type BadgeRootProps = {
   disabled?: boolean;
   children?: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLSpanElement>;
 } & React.HTMLAttributes<HTMLSpanElement>;
 
 export type BadgeIconProps = {
@@ -67,97 +70,135 @@ export type BadgeActionProps = Omit<
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-const BadgeRoot = React.forwardRef<HTMLSpanElement, BadgeRootProps>(
-  (
-    {
-      color = "gray",
-      variant = "soft",
-      size: sizeProp,
-      onRemove,
-      onPress,
-      pressed,
-      labels,
-      disabled,
-      children,
-      className,
-      ...rest
-    },
-    ref,
-  ) => {
-    const { size, tier } = useBadgeTier(sizeProp);
+const isText = (item: React.ReactNode): item is string | number =>
+  typeof item === "string" || typeof item === "number";
 
-    // Badge.Action lives at the end of the badge, outside the text body.
-    const items = React.Children.toArray(children);
-    const actionElement = items.find(isAction) ?? null;
-    const content = items.filter((child) => !isAction(child));
-    const trailing = Boolean(onRemove || actionElement);
-    const iconOnly =
-      !trailing &&
-      content.length > 0 &&
-      content.every((child) => React.isValidElement(child) && child.type === BadgeIcon);
-    // The end edge belongs to the remove segment or Badge.Action when there is one.
-    const edges = markEdgeIcons(content, (type) => type === BadgeIcon || type === BadgeDot, {
-      endTaken: trailing,
-    });
-    const body = <ControlSizeProvider value={tier}>{edges.children}</ControlSizeProvider>;
+/**
+ * Next to icons, dots or inside a body (a flex row), each run of text goes into one block `.text`
+ * span so a long label ellipsizes; the run's outer spaces stay outside it, so the accessible name
+ * keeps them («НЕ billing», not «НЕbilling»).
+ */
+function wrapText(items: React.ReactNode[]): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  let run = "";
+  const flush = () => {
+    if (run === "") return;
+    const [, lead, core, trail] = /^(\s*)([\s\S]*?)(\s*)$/.exec(run) ?? ["", "", run, ""];
+    if (lead) out.push(lead);
+    if (core) {
+      out.push(
+        <span key={`text-${out.length}`} className={styles.text}>
+          {core}
+        </span>,
+      );
+    }
+    if (trail) out.push(trail);
+    run = "";
+  };
+  for (const item of items) {
+    if (isText(item)) run += String(item);
+    else {
+      flush();
+      out.push(item);
+    }
+  }
+  flush();
+  return out;
+}
 
-    return (
-      <span
-        ref={ref}
-        className={cx(styles.root, className)}
-        aria-disabled={disabled || undefined}
-        {...toDataAttributes({
-          color,
-          variant,
-          size,
-          tier,
-          "icon-only": iconOnly || undefined,
-          "icon-start": edges.start || undefined,
-          "icon-end": edges.end || undefined,
-          removable: onRemove ? true : undefined,
-          pressable: onPress ? true : undefined,
-          pressed: onPress && pressed !== undefined ? pressed : undefined,
-          action: actionElement
-            ? actionElement.props.persistent
-              ? "persistent"
-              : "reveal"
-            : undefined,
-          disabled: disabled || undefined,
-        })}
-        {...rest}
-      >
-        {onPress ? (
-          <button
-            type="button"
-            className={styles.body}
-            aria-pressed={pressed}
-            disabled={disabled}
-            onClick={onPress}
-          >
-            {body}
-          </button>
-        ) : trailing ? (
-          <span className={styles.body}>{body}</span>
-        ) : (
-          // A read-only badge is one element: its content sits in the root.
-          body
-        )}
-        {actionElement}
-        {onRemove ? (
-          <button
-            type="button"
-            className={styles.remove}
-            aria-label={labels?.remove ?? BADGE_LABELS.remove}
-            onClick={onRemove}
-            disabled={disabled}
-          >
-            <Icon name="action.close" />
-          </button>
-        ) : null}
-      </span>
-    );
-  },
-);
+function BadgeRoot({
+  color = "gray",
+  variant = "soft",
+  size: sizeProp,
+  onRemove,
+  onPress,
+  pressed,
+  labels,
+  disabled,
+  children,
+  className,
+  ...rest
+}: BadgeRootProps) {
+  const { size, tier } = useBadgeTier(sizeProp);
+
+  // Badge.Action lives at the end of the badge, outside the text body.
+  const items = React.Children.toArray(children);
+  const actionElement = items.find(isAction) ?? null;
+  const content = items.filter((child) => !isAction(child));
+  const trailing = Boolean(onRemove || actionElement);
+  const iconOnly =
+    !trailing &&
+    content.length > 0 &&
+    content.every((child) => React.isValidElement(child) && child.type === BadgeIcon);
+  // The end edge belongs to the remove segment or Badge.Action when there is one.
+  const edges = markEdgeIcons(content, (type) => type === BadgeIcon || type === BadgeDot, {
+    endTaken: trailing,
+  });
+  // A read-only badge of plain text is one element: the root itself lays the text out as a block
+  // and ellipsizes it. Anything richer is a flex row, so its text runs are wrapped.
+  const textOnly = !trailing && !onPress && edges.children.every(isText);
+  const body = (
+    <ControlSizeProvider value={tier}>
+      {textOnly ? edges.children : wrapText(edges.children)}
+    </ControlSizeProvider>
+  );
+
+  return (
+    <span
+      className={cx(styles.root, chipTier.tier, palette.hue, className)}
+      aria-disabled={disabled || undefined}
+      {...toDataAttributes({
+        color,
+        variant,
+        size,
+        tier,
+        "icon-only": iconOnly || undefined,
+        "text-only": (textOnly && edges.children.length > 0) || undefined,
+        "icon-start": edges.start || undefined,
+        "icon-end": edges.end || undefined,
+        removable: onRemove ? true : undefined,
+        pressable: onPress ? true : undefined,
+        pressed: onPress && pressed !== undefined ? pressed : undefined,
+        action: actionElement
+          ? actionElement.props.persistent
+            ? "persistent"
+            : "reveal"
+          : undefined,
+        disabled: disabled || undefined,
+      })}
+      {...rest}
+    >
+      {onPress ? (
+        <button
+          type="button"
+          className={styles.body}
+          aria-pressed={pressed}
+          disabled={disabled}
+          onClick={onPress}
+        >
+          {body}
+        </button>
+      ) : trailing ? (
+        <span className={styles.body}>{body}</span>
+      ) : (
+        // A read-only badge is one element: its content sits in the root.
+        body
+      )}
+      {actionElement}
+      {onRemove ? (
+        <button
+          type="button"
+          className={styles.remove}
+          aria-label={labels?.remove ?? BADGE_LABELS.remove}
+          onClick={onRemove}
+          disabled={disabled}
+        >
+          <Icon name="action.close" />
+        </button>
+      ) : null}
+    </span>
+  );
+}
 
 BadgeRoot.displayName = "Badge.Root";
 

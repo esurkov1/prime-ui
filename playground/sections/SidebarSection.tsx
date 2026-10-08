@@ -1,8 +1,17 @@
+import { PanelLeft } from "lucide-react";
 import { api } from "@/layout/sidebar/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "layout",
+  nav: {
+    segment: "sidebar",
+    label: "Sidebar",
+    summary: "Боковая навигация: развёрнут, компактный, скрыт",
+    keywords: ["сайдбар", "боковая панель", "навигация", "меню", "mode", "compact", "open"],
+    icon: PanelLeft,
+    order: 2,
+  },
   dir: "sidebar",
   base: "layout",
   title: "Sidebar",
@@ -101,7 +110,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function SidebarSection() {
-  return <ComponentPage page={page} />;
-}

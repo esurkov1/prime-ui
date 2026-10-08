@@ -32,7 +32,7 @@ ScrollContainer   <div> (or the `as` tag); thin scrollbar, optional edge fade
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### ScrollContainer
-`forwardRef` → `HTMLElement`. A scroll region with the kit's thin scrollbar that shrinks inside flex and grid parents; no padding of its own.
+`ref` → `HTMLElement`. A scroll region with the kit's thin scrollbar that shrinks inside flex and grid parents; no padding of its own.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -76,7 +76,7 @@ ScrollContainer   <div> (or the `as` tag); thin scrollbar, optional edge fade
 | State | Driven by | DOM |
 |---|---|---|
 | fade on | `fade` | `data-fade="vertical" \| "horizontal"` |
-| content hidden before / after | scroll position (with `fade`) | `data-overflow-start="true"`, `data-overflow-end="true"` |
+| content hidden before / after | scroll position (with `fade`), re-measured on resize and when children are added; logical in RTL | `data-overflow-start="true"`, `data-overflow-end="true"` |
 
 The scrollbar thumb uses `fill-strong`, darkening to `fill-strong-hover` on hover (WebKit). The fade mask follows the scroll at once: scrolling is high-frequency, so nothing animates.
 

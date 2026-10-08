@@ -19,17 +19,16 @@ export const PAGE_KINDS = [
 ] as const;
 export type PageKind = (typeof PAGE_KINDS)[number];
 
-export const PAGE_KIND_RULES: Record<PageKind, string> = {
-  primitive: "A visual element defined by its variant / tone / color, size and state matrices.",
-  control: "Picks a value in place: value, group, states and the controlled pair.",
-  field: "A form field: label, hint, error, required / optional, states, controlled, in a form.",
-  overlay:
-    "A floating layer: trigger and content, structure, size / placement, dismiss, controlled open.",
-  navigation: "Moves between views or steps: active item, orientation, overflow, controlled value.",
-  composite:
-    "A ready block of several parts: the full typical scenario first, then features, states, narrow width.",
-  layout: "Page structure: the region in a page context and its responsive behaviour.",
-};
+/*
+ * What each kind shows:
+ * - primitive: a visual element defined by its variant / tone / color, size and state matrices;
+ * - control: picks a value in place — value, group, states and the controlled pair;
+ * - field: label, hint, error, required / optional, states, controlled, in a form;
+ * - overlay: trigger and content, structure, size / placement, dismiss, controlled open;
+ * - navigation: active item, orientation, overflow, controlled value;
+ * - composite: the full typical scenario first, then features, states, narrow width;
+ * - layout: the region in a page context and its responsive behaviour.
+ */
 
 /** Cross-cutting example slots. A slot has one file name, one Russian title and one content rule. */
 export const SLOT_IDS = [
@@ -52,78 +51,40 @@ export const SLOT_IDS = [
 ] as const;
 export type SlotId = (typeof SLOT_IDS)[number];
 
-export type SlotDef = {
-  /** Russian title on the playground page. */
-  title: string;
-  /** What the example must contain. */
-  rule: string;
-};
-
-export const SLOTS: Record<SlotId, SlotDef> = {
-  overview: {
-    title: "Обзор",
-    rule: "Typical usage with defaults — the code a consumer copies first. No decorative extras.",
-  },
-  variants: {
-    title: "Варианты",
-    rule: "Every value of `variant` × `tone` (or `color`) as a labelled matrix.",
-  },
-  sizes: {
-    title: "Размеры",
-    rule: "Every `size` value, xs → xl, labelled by its value.",
-  },
-  states: {
-    title: "Состояния",
-    rule: "Every state side by side (disabled, readOnly, loading, invalid, empty…), labelled by the prop.",
-  },
-  "with-icon": {
-    title: "С иконкой",
-    rule: "Icon slots: leading / trailing icon and the icon-only form.",
-  },
-  structure: {
-    title: "Структура",
-    rule: "Optional parts switched on and off: icon, description, body, footer, header only.",
-  },
-  group: {
-    title: "Группа",
-    rule: "Several items under one group label, with the group's hint and error.",
-  },
-  orientation: {
-    title: "Ориентация",
-    rule: "Every `orientation` value.",
-  },
-  placement: {
-    title: "Расположение",
-    rule: "Every `side` / `align` value relative to the trigger or the screen edge.",
-  },
-  overflow: {
-    title: "Переполнение",
-    rule: "More items than fit: scrolling, collapsing or truncation.",
-  },
-  validation: {
-    title: "Валидация",
-    rule: "`required`, `optional`, `hint`, `error` and how the support row behaves.",
-  },
-  dismiss: {
-    title: "Закрытие",
-    rule: "`closeOnOutsideClick`, `closeOnEscape` and the close parts, incl. a destructive confirm.",
-  },
-  controlled: {
-    title: "Управляемое значение",
-    rule: "`value` / `checked` owned by the parent and changed from outside.",
-  },
-  "controlled-open": {
-    title: "Управляемое открытие",
-    rule: "`open` / `onOpenChange` owned by the parent, opened from code without a trigger.",
-  },
-  "in-form": {
-    title: "В форме",
-    rule: "Inside a real `<form>` with a label, validation and a submit button.",
-  },
-  narrow: {
-    title: "Узкая ширина",
-    rule: "Behaviour in a narrow container (≤ 360px): wrapping, stacking, scrolling.",
-  },
+/** Russian title of each slot on the playground page; the comment is what its example contains. */
+export const SLOT_TITLES: Record<SlotId, string> = {
+  /** Typical usage with defaults — the code a consumer copies first. No decorative extras. */
+  overview: "Обзор",
+  /** Every value of `variant` × `tone` (or `color`) as a labelled matrix. */
+  variants: "Варианты",
+  /** Every `size` value, xs → xl, labelled by its value. */
+  sizes: "Размеры",
+  /** Every state side by side (disabled, readOnly, loading, invalid, empty…), labelled by the prop. */
+  states: "Состояния",
+  /** Icon slots: leading / trailing icon and the icon-only form. */
+  "with-icon": "С иконкой",
+  /** Optional parts switched on and off: icon, description, body, footer, header only. */
+  structure: "Структура",
+  /** Several items under one group label, with the group's hint and error. */
+  group: "Группа",
+  /** Every `orientation` value. */
+  orientation: "Ориентация",
+  /** Every `side` / `align` value relative to the trigger or the screen edge. */
+  placement: "Расположение",
+  /** More items than fit: scrolling, collapsing or truncation. */
+  overflow: "Переполнение",
+  /** `required`, `optional`, `hint`, `error` and how the support row behaves. */
+  validation: "Валидация",
+  /** `closeOnOutsideClick`, `closeOnEscape` and the close parts, incl. a destructive confirm. */
+  dismiss: "Закрытие",
+  /** `value` / `checked` owned by the parent and changed from outside. */
+  controlled: "Управляемое значение",
+  /** `open` / `onOpenChange` owned by the parent, opened from code without a trigger. */
+  "controlled-open": "Управляемое открытие",
+  /** Inside a real `<form>` with a label, validation and a submit button. */
+  "in-form": "В форме",
+  /** Behaviour in a narrow container (≤ 360px): wrapping, stacking, scrolling. */
+  narrow: "Узкая ширина",
 };
 
 /** Position of component-specific scenarios inside a kind's slot order. */

@@ -1,8 +1,17 @@
+import { Calendar } from "lucide-react";
 import { api } from "@/components/datepicker/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "datepicker",
+    label: "Datepicker",
+    summary: "Выбор даты и диапазона в календаре",
+    keywords: ["дата", "календарь", "диапазон", "range", "value", "onValueChange"],
+    icon: Calendar,
+    order: 10,
+  },
   dir: "datepicker",
   title: "Datepicker",
   kind: "field",
@@ -86,7 +95,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function DatepickerSection() {
-  return <ComponentPage page={page} />;
-}

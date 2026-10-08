@@ -18,13 +18,13 @@ const BANNER_LABELS: BannerLabels = { dismiss: "Закрыть" };
 
 /**
  * With `onDismiss` the close button is the small corner button, or — when the banner has
- * `Banner.Actions` — a regular square button at the end of that row, lined up with the others.
+ * `Banner.Actions` — a regular square button at the end of that row, lined up with the others
+ * (CSS hides the corner one with `:has(.actions)`).
  */
 type BannerContextValue = {
   onDismiss?: () => void;
   size: ControlSize;
   dismissLabel: string;
-  registerActions: () => () => void;
 };
 
 const BannerContext = React.createContext<BannerContextValue | null>(null);
@@ -68,15 +68,10 @@ function BannerRoot({
   children,
   ...rest
 }: BannerRootProps) {
-  const [actionsCount, setActionsCount] = React.useState(0);
-  const registerActions = React.useCallback(() => {
-    setActionsCount((n) => n + 1);
-    return () => setActionsCount((n) => n - 1);
-  }, []);
   const dismissLabel = labels?.dismiss ?? BANNER_LABELS.dismiss;
   const context = React.useMemo<BannerContextValue>(
-    () => ({ onDismiss, size, dismissLabel, registerActions }),
-    [onDismiss, size, dismissLabel, registerActions],
+    () => ({ onDismiss, size, dismissLabel }),
+    [onDismiss, size, dismissLabel],
   );
 
   return (
@@ -88,19 +83,20 @@ function BannerRoot({
       <BannerContext.Provider value={context}>
         <ControlSizeProvider value={size}>
           {children}
-          {onDismiss && actionsCount === 0 ? (
-            <Button.Root
-              variant="ghost"
-              tone="inherit"
-              size={CORNER_CLOSE_SIZE[size]}
-              aria-label={dismissLabel}
-              className={styles.close}
-              onClick={onDismiss}
-            >
-              <Button.Icon>
-                <Icon name="action.close" />
-              </Button.Icon>
-            </Button.Root>
+          {onDismiss ? (
+            <span className={styles.close}>
+              <Button.Root
+                variant="ghost"
+                tone="inherit"
+                size={CORNER_CLOSE_SIZE[size]}
+                aria-label={dismissLabel}
+                onClick={onDismiss}
+              >
+                <Button.Icon>
+                  <Icon name="action.close" />
+                </Button.Icon>
+              </Button.Root>
+            </span>
           ) : null}
         </ControlSizeProvider>
       </BannerContext.Provider>
@@ -154,13 +150,6 @@ export type BannerActionsProps = React.HTMLAttributes<HTMLDivElement> & {
 /** Action buttons take the banner `size`; with `onDismiss` the close button joins this row. */
 function BannerActions({ className, children, ...rest }: BannerActionsProps) {
   const banner = React.useContext(BannerContext);
-  const register = banner?.registerActions;
-  const hasDismiss = Boolean(banner?.onDismiss);
-
-  React.useLayoutEffect(() => {
-    if (!register || !hasDismiss) return;
-    return register();
-  }, [register, hasDismiss]);
 
   return (
     <div className={cx(styles.actions, className)} {...rest}>

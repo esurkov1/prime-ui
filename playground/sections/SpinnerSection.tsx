@@ -1,8 +1,17 @@
+import { Loader } from "lucide-react";
 import { api } from "@/components/spinner/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "feedback",
+  nav: {
+    segment: "spinner",
+    label: "Spinner",
+    summary: "Индикатор загрузки без известного прогресса",
+    keywords: ["спиннер", "загрузка", "лоадер", "loader", "loading", "индикатор"],
+    icon: Loader,
+    order: 5,
+  },
   dir: "spinner",
   title: "Spinner",
   kind: "primitive",
@@ -35,7 +44,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function SpinnerSection() {
-  return <ComponentPage page={page} />;
-}

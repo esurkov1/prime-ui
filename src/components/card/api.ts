@@ -16,7 +16,7 @@ export const api: ComponentApi = {
       props: [
         {
           name: "variant",
-          type: '"panel" | "mini" | "mini-media" | "metric" | "stat-trend" | "split" | "cta" | "list" | "cover"',
+          type: '"panel" | "mini" | "stat-trend" | "split" | "cta" | "list" | "cover"',
           default: '"panel"',
           en: "Structural template: titled block with zones (`panel`), KPI tiles, a call to action, a list or a cover tile.",
           ru: "Шаблон: блок с зонами (`panel`), плитки KPI, призыв к действию, список или плитка с обложкой.",
@@ -38,8 +38,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Header",
-      en: "`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. In `panel` and `list` it is a padded zone with a faint hairline below; in `metric` it pairs a leading badge or icon with the `Card.Value`. Wraps below 22rem.",
-      ru: "Верхний ряд: сначала `Card.Title`, всё после него (контрол, тихая подпись) — в конце. В `panel` и `list` — зона с отступами и тонкой линией снизу; в `metric` — бейдж или иконка слева и `Card.Value` справа. Уже 22rem переносится.",
+      en: "`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. In `panel` and `list` it is a padded zone with a faint hairline below; in `stat-trend` it can pair a leading badge or icon with a compact `Card.Value`. Wraps below 22rem.",
+      ru: "Верхний ряд: сначала `Card.Title`, всё после него (контрол, тихая подпись) — в конце. В `panel` и `list` — зона с отступами и тонкой линией снизу; в `stat-trend` может держать бейдж или иконку слева и компактное `Card.Value` справа. Уже 22rem переносится.",
       props: [rest],
     },
     {
@@ -59,8 +59,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Description",
-      en: "`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s, wraps): under the title of `cta` and `cover`, under the header of `metric`.",
-      ru: "Вторичный текст (`<p>`, body-s, переносится): под заголовком `cta` и `cover`, под шапкой `metric`.",
+      en: "`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s, wraps): under the title of `cta` and `cover`, under the header of `stat-trend`.",
+      ru: "Вторичный текст (`<p>`, body-s, переносится): под заголовком `cta` и `cover`, под шапкой `stat-trend`.",
       props: [rest],
     },
     {
@@ -71,8 +71,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Media",
-      en: "`ref` → `HTMLDivElement`. A chart, an image or a gauge: edge to edge under the header or the body in `panel`, the 128–192px cover on top in `cover`, the full-width bottom slot in `mini-media`. A chart SVG needs a CSS height.",
-      ru: "График, картинка или шкала: от края до края под шапкой или телом в `panel`, обложка 128–192px сверху в `cover`, нижний слот на всю ширину в `mini-media`. SVG графика нужна высота в CSS.",
+      en: "`ref` → `HTMLDivElement`. A chart, an image or a gauge: edge to edge under the header or the body in `panel`, the 128–192px cover on top in `cover`, the full-width bottom slot in `mini`. A chart SVG needs a CSS height.",
+      ru: "График, картинка или шкала: от края до края под шапкой или телом в `panel`, обложка 128–192px сверху в `cover`, нижний слот на всю ширину в `mini`. SVG графика нужна высота в CSS.",
       props: [rest],
     },
     {
@@ -83,8 +83,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Icon",
-      en: "`ref` → `HTMLDivElement`. The 40px accent tile of a KPI holding one icon; it spans the label and the value rows in `mini`, `mini-media` and a `split` cell.",
-      ru: "Плашка 40px с акцентом для одной иконки KPI; в `mini`, `mini-media` и ячейке `split` занимает высоту подписи и значения.",
+      en: "`ref` → `HTMLDivElement`. The 40px accent tile of a KPI holding one icon; it spans the label and the value rows in `mini` and a `split` cell.",
+      ru: "Плашка 40px с акцентом для одной иконки KPI; в `mini` и ячейке `split` занимает высоту подписи и значения.",
       props: [rest],
     },
     {

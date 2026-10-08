@@ -90,7 +90,10 @@
   display: none;
 }
 
+/* A kit Icon in the label takes the divider's icon size (`--prime-icon-size`, like Button or Badge). */
 .content {
+  --prime-icon-size: var(--divider-icon);
+
   display: inline-flex;
   align-items: center;
   gap: var(--divider-gap);
@@ -114,12 +117,4 @@
 
 .root[data-orientation="vertical"]:not(:empty) {
   width: auto;
-}
-
-/* Icon inside content has no size class (DividerContentContext); the divider sizes it. */
-.root[data-size] .content svg {
-  flex-shrink: 0;
-  box-sizing: border-box;
-  width: var(--divider-icon);
-  height: var(--divider-icon);
 }

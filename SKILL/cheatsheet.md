@@ -6,7 +6,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Setup
 
-- Import the styles once at the app root: `import "prime-ui-kit/styles.css"` + `import "prime-ui-kit/bundle.css"` — not per page, not a copied token file.
+- Import the styles once at the app root: `import "prime-ui-kit/bundle.css"` (tokens, themes, components), plus the opt-in `prime-ui-kit/fonts.css` and `prime-ui-kit/reset.css` when the app has no fonts or reset of its own — not per page, not a copied token file.
 - Switch the theme with `applyTheme("light" | "dark")` — not a class or `style` on `<html>`.
 - Put `NotificationProvider` and `AppShell.Root` in the app root once — not inside a page component.
 - Import everything from `"prime-ui-kit"` — not from `prime-ui-kit/src/...` or `lucide-react` for a glyph the kit has.
@@ -46,7 +46,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Icons
 
-- Take a glyph from the kit: `<Icon name="action.add" />` (or `IconAdd`) — not `import { Plus } from "lucide-react"`. Names: [api-contract.md](api-contract.md#icons).
+- Take a glyph from the kit: `<Icon name="action.add" />` — not `import { Plus } from "lucide-react"`. Names: [api-contract.md](api-contract.md#icons). A domain glyph the kit lacks: `const IconBike = createIcon(Bike)` once, then `<IconBike />`.
 - Put icons into the part: `<Button.Icon>`, `<Input.Icon side="start">`, `<Sidebar.ItemIcon>`, `<Dropdown.ItemIcon>`, `<EmptyPage.Icon>` — not an `icon` prop (only data arrays such as `notify()` take `icon`).
 - Icon-only button: `<Button.Root variant="ghost" tone="neutral" aria-label="Удалить">` with a `Tooltip` — not an unnamed icon.
 - `lucide-react` only for a domain glyph the kit lacks — not for `Plus`, `Search`, `Bell`, `Settings`…
@@ -117,8 +117,9 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 App root, once:
 
 ```tsx
-import "prime-ui-kit/styles.css";
 import "prime-ui-kit/bundle.css";
+import "prime-ui-kit/fonts.css";
+import "prime-ui-kit/reset.css";
 import { AppShell, applyTheme, Icon, NotificationProvider, Sidebar } from "prime-ui-kit";
 import type { ReactNode } from "react";
 

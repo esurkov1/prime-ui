@@ -1,8 +1,17 @@
+import { Image } from "lucide-react";
 import { api } from "@/components/thumbnail/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "data-display",
+  nav: {
+    segment: "thumbnail",
+    label: "Thumbnail",
+    summary: "Превью объекта с соотношением сторон",
+    keywords: ["миниатюра", "превью", "картинка", "фото", "обложка", "ratio", "image"],
+    icon: Image,
+    order: 3,
+  },
   dir: "thumbnail",
   title: "Thumbnail",
   kind: "primitive",
@@ -57,7 +66,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ThumbnailSection() {
-  return <ComponentPage page={page} />;
-}

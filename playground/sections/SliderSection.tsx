@@ -1,8 +1,17 @@
+import { SlidersHorizontal } from "lucide-react";
 import { api } from "@/components/slider/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "slider",
+    label: "Slider",
+    summary: "Ползунок числового значения в диапазоне",
+    keywords: ["ползунок", "слайдер", "range", "value", "min", "max", "step"],
+    icon: SlidersHorizontal,
+    order: 5,
+  },
   dir: "slider",
   title: "Slider",
   kind: "control",
@@ -63,7 +72,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function SliderSection() {
-  return <ComponentPage page={page} />;
-}

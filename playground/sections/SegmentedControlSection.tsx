@@ -1,8 +1,17 @@
+import { Rows3 } from "lucide-react";
 import { api } from "@/components/segmented-control/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "segmented-control",
+    label: "Segmented Control",
+    summary: "Переключатель между взаимоисключающими вариантами",
+    keywords: ["сегменты", "переключатель", "value", "onValueChange"],
+    icon: Rows3,
+    order: 4,
+  },
   dir: "segmented-control",
   title: "SegmentedControl",
   kind: "control",
@@ -80,7 +89,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function SegmentedControlSection() {
-  return <ComponentPage page={page} />;
-}

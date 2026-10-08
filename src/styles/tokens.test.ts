@@ -1,7 +1,9 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
+
+import { paletteColors } from "@/internal/states";
 
 const stylesRoot = path.resolve(process.cwd(), "src/styles");
 const read = (file: string) => readFileSync(path.join(stylesRoot, file), "utf8");
@@ -31,6 +33,38 @@ describe("generated token styles", () => {
     }
     expect(dark).toContain("--prime-color-bg-canvas:");
     expect(dark).toContain("--prime-shadow-overlay:");
+  });
+
+  it("has no semantic token that the kit does not use", () => {
+    const srcRoot = path.resolve(process.cwd(), "src");
+    const generated = new Set(["tokens.css", "theme-light.css", "theme-dark.css"]);
+    const sources = (readdirSync(srcRoot, { recursive: true }) as string[])
+      .filter((file) => /\.(css|tsx?)$/.test(file) && !/\.test\.tsx?$/.test(file))
+      .filter((file) => !generated.has(path.basename(file)))
+      .map((file) => readFileSync(path.join(srcRoot, file), "utf8"))
+      .join("\n");
+    const declared = new Set(
+      [read("theme-light.css"), read("theme-dark.css")].flatMap((css) =>
+        [...css.matchAll(/^\s+(--prime-[a-z0-9-]+):/gm)].map((m) => m[1]),
+      ),
+    );
+    const unused = [...declared].filter(
+      (name) => !new RegExp(`${name}(?![a-z0-9-])`).test(sources),
+    );
+    expect(unused).toEqual([]);
+  });
+
+  it("maps every palette hue in internal/palette", () => {
+    const css = readFileSync(
+      path.resolve(process.cwd(), "src/internal/palette.module.css"),
+      "utf8",
+    );
+    for (const color of paletteColors.filter((hue) => hue !== "gray")) {
+      expect(css, color).toContain(`.hue[data-color="${color}"] {`);
+      for (const role of ["soft", "text", "solid", "solid-fg"]) {
+        expect(css, `${color} ${role}`).toContain(`var(--prime-color-palette-${color}-${role});`);
+      }
+    }
   });
 
   it("keeps every space token on the 4px grid", () => {

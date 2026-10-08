@@ -23,10 +23,8 @@
   user-select: none;
 }
 
+/* Hue variables come from `internal/palette` (`.hue` on the root). */
 .root {
-  --hue-soft: var(--prime-color-palette-gray-soft);
-  --hue-text: var(--prime-color-palette-gray-text);
-
   background: var(--hue-soft);
   color: var(--hue-text);
 }
@@ -51,53 +49,6 @@
   --avatar-size: var(--avatar-slot-size, var(--prime-avatar-2xl));
 }
 
-/* ─── Hues ──────────────────────────────────────────────────────────────── */
-
-.root[data-color="red"] {
-  --hue-soft: var(--prime-color-palette-red-soft);
-  --hue-text: var(--prime-color-palette-red-text);
-}
-
-.root[data-color="blue"] {
-  --hue-soft: var(--prime-color-palette-blue-soft);
-  --hue-text: var(--prime-color-palette-blue-text);
-}
-
-.root[data-color="green"] {
-  --hue-soft: var(--prime-color-palette-green-soft);
-  --hue-text: var(--prime-color-palette-green-text);
-}
-
-.root[data-color="orange"] {
-  --hue-soft: var(--prime-color-palette-orange-soft);
-  --hue-text: var(--prime-color-palette-orange-text);
-}
-
-.root[data-color="yellow"] {
-  --hue-soft: var(--prime-color-palette-yellow-soft);
-  --hue-text: var(--prime-color-palette-yellow-text);
-}
-
-.root[data-color="purple"] {
-  --hue-soft: var(--prime-color-palette-purple-soft);
-  --hue-text: var(--prime-color-palette-purple-text);
-}
-
-.root[data-color="sky"] {
-  --hue-soft: var(--prime-color-palette-sky-soft);
-  --hue-text: var(--prime-color-palette-sky-text);
-}
-
-.root[data-color="pink"] {
-  --hue-soft: var(--prime-color-palette-pink-soft);
-  --hue-text: var(--prime-color-palette-pink-text);
-}
-
-.root[data-color="teal"] {
-  --hue-soft: var(--prime-color-palette-teal-soft);
-  --hue-text: var(--prime-color-palette-teal-text);
-}
-
 /* ─── Parts ─────────────────────────────────────────────────────────────── */
 
 .image {
@@ -113,10 +64,6 @@
 
 .image[data-status="loading"] {
   opacity: 0;
-}
-
-.image[data-status="loaded"] {
-  opacity: 1;
 }
 
 .image[data-status="error"] {

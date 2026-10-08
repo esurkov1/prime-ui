@@ -1,8 +1,17 @@
+import { LayoutDashboard } from "lucide-react";
 import { api } from "@/components/card/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "data-display",
+  nav: {
+    segment: "card",
+    label: "Card",
+    summary: "Карточка: шаблоны, метрика, действия",
+    keywords: ["карточка", "панель", "kpi", "variant"],
+    icon: LayoutDashboard,
+    order: 5,
+  },
   dir: "card",
   title: "Card",
   kind: "composite",
@@ -17,12 +26,13 @@ export const page: ComponentPageConfig = {
     {
       slot: "variants",
       description:
-        "Шаблоны KPI: плашка с иконкой и значением, бейдж со значением и крупное значение с изменением — `variant`, `Card.Delta`.",
+        "Шаблоны KPI: плашка с иконкой и значением, бейдж со значением в строке шапки и крупное значение с изменением — `variant`, `Card.Delta`.",
     },
     {
-      scenario: "mini-media",
+      scenario: "kpi-media",
       title: "Метрика с графиком",
-      description: "KPI со спарклайном или уровнем заполнения в нижнем слоте — `Card.Media`.",
+      description:
+        "KPI со спарклайном или уровнем заполнения в нижнем слоте `mini` — `Card.Media`.",
     },
     {
       scenario: "panel-chart",
@@ -57,7 +67,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function CardSection() {
-  return <ComponentPage page={page} />;
-}

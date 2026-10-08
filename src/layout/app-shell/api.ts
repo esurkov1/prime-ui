@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "AppShell.Root",
-      en: "`forwardRef` → `HTMLDivElement`. Grid of the nav column (canvas) and the content panel (surface); every child that is not `AppShell.Nav` goes into the panel.",
+      en: "`ref` → `HTMLDivElement`. Grid of the nav column (canvas) and the content panel (surface); every child that is not `AppShell.Nav` goes into the panel.",
       ru: "Сетка: колонка навигации на холсте и панель содержимого на поверхности; всё, кроме `AppShell.Nav`, попадает в панель.",
       props: [
         {
@@ -37,7 +37,7 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Header",
-      en: "`forwardRef` → `HTMLElement`. Sticky `<header>` row of the panel for breadcrumbs, search and actions.",
+      en: "`ref` → `HTMLElement`. Sticky `<header>` row of the panel for breadcrumbs, search and actions.",
       ru: "Липкая строка `<header>` панели для хлебных крошек, поиска и действий.",
       props: [
         {
@@ -50,7 +50,7 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Main",
-      en: "`forwardRef` → `HTMLElement`. The `<main>` with the canonical gutters: a vertical `ScrollContainer`.",
+      en: "`ref` → `HTMLElement`. The `<main>` with the canonical gutters: a vertical `ScrollContainer`.",
       ru: "`<main>` с отступами кита — вертикальный `ScrollContainer`.",
       props: [
         {
@@ -70,8 +70,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Template",
-      en: "`forwardRef` → the `<main>`. Root + Nav + Header + Main in one; inside a router main scrolls to the top on route change.",
-      ru: "Root, Nav, Header и Main одним компонентом; внутри роутера main прокручивается наверх при смене маршрута.",
+      en: "`ref` → the `<main>`. Root + Nav + Header + Main in one; main scrolls to the top when `scrollResetKey` changes.",
+      ru: "Root, Nav, Header и Main одним компонентом; main прокручивается наверх при смене `scrollResetKey`.",
       props: [
         {
           name: "nav",
@@ -90,6 +90,12 @@ export const api: ComponentApi = {
           type: 'Omit<AppShellMainProps, "children">',
           en: "Props for Main (e.g. `contentWidth`).",
           ru: "Пропсы Main (например `contentWidth`).",
+        },
+        {
+          name: "scrollResetKey",
+          type: "unknown",
+          en: "Main scrolls back to the top whenever this value changes; pass the router pathname.",
+          ru: "Main прокручивается наверх при каждом изменении значения; передайте pathname роутера.",
         },
         {
           name: "children",

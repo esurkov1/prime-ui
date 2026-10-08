@@ -1,8 +1,17 @@
+import { CircleGauge } from "lucide-react";
 import { api } from "@/components/progress-circle/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "feedback",
+  nav: {
+    segment: "progress-circle",
+    label: "Progress Circle",
+    summary: "Круговой индикатор прогресса",
+    keywords: ["прогресс", "круг", "кольцо", "value"],
+    icon: CircleGauge,
+    order: 4,
+  },
   dir: "progress-circle",
   title: "ProgressCircle",
   kind: "primitive",
@@ -44,7 +53,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ProgressCircleSection() {
-  return <ComponentPage page={page} />;
-}

@@ -1,8 +1,49 @@
 /**
- * Shared math and accessible text for progress indicators in `segments` mode
- * (ProgressBar, ProgressCircle).
+ * Shared props, math and accessible text of the progress indicators (ProgressBar, ProgressCircle):
+ * one `value`, or `segments` that split a whole.
  */
 import type { Tone } from "./states";
+
+/** The two modes of a progress indicator; the component adds its own common props. */
+export type ProgressModeProps =
+  | {
+      /** Current value; clamped to `0…max`. */
+      value: number;
+      /** Top of the scale. Default `100`. */
+      max?: number;
+      /** Fill color. Default `accent`. */
+      tone?: Tone;
+      segments?: never;
+      segmentGap?: never;
+      labels?: never;
+    }
+  | {
+      /** Parts in order (left to right, clockwise from the top); each one's size is its share of `max`. */
+      segments: ProgressSegment[];
+      /** Total capacity. Default: the sum of the segments (they fill the whole indicator). */
+      max?: number;
+      /** `hairline` draws every part on its own with a gap. Default `none`. */
+      segmentGap?: "none" | "hairline";
+      /** Built-in accessible strings for empty distributions. */
+      labels?: Partial<ProgressSegmentsLabels>;
+      value?: never;
+      tone?: never;
+    };
+
+/** `value` mode: `max` defaults to 100 (or when not positive) and `value` is clamped to `0…max`. */
+export function resolveValue(
+  value: number,
+  max: number | undefined,
+): { value: number; max: number; ratio: number; percent: number } {
+  const top = max !== undefined && max > 0 ? max : 100;
+  const clamped = Math.min(top, Math.max(Number.isFinite(value) ? value : 0, 0));
+  return {
+    value: clamped,
+    max: top,
+    ratio: clamped / top,
+    percent: Math.round((clamped / top) * 100),
+  };
+}
 
 export type ProgressSegment = {
   /** Non-negative weight; negative or non-finite values count as 0. */

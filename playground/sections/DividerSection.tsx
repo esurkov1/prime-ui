@@ -1,8 +1,17 @@
+import { Minus } from "lucide-react";
 import { api } from "@/components/divider/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "layout",
+  nav: {
+    segment: "divider",
+    label: "Divider",
+    summary: "Разделитель с подписью и без",
+    keywords: ["разделитель", "линия", "separator"],
+    icon: Minus,
+    order: 5,
+  },
   dir: "divider",
   title: "Divider",
   kind: "primitive",
@@ -44,7 +53,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function DividerSection() {
-  return <ComponentPage page={page} />;
-}

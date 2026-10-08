@@ -1,8 +1,17 @@
+import { Upload } from "lucide-react";
 import { api } from "@/components/file-upload/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "inputs",
+  nav: {
+    segment: "file-upload",
+    label: "File Upload",
+    summary: "Загрузка файлов: зона перетаскивания и список",
+    keywords: ["загрузка", "файлы", "dropzone", "drag and drop"],
+    icon: Upload,
+    order: 5,
+  },
   dir: "file-upload",
   title: "FileUpload",
   kind: "field",
@@ -78,7 +87,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function FileUploadSection() {
-  return <ComponentPage page={page} />;
-}

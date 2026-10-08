@@ -87,7 +87,8 @@ Frame look: `bg-sunken` chrome with a `border-subtle` hairline and `radius-xl`; 
 
 ## Layout & spacing
 - The frame is `max-width: 100%`; long code lines scroll inside the code pane instead of widening the page.
-- The toolbar wraps below 640px of frame width; below 400px the device labels are visually hidden (icons stay).
+- The toolbar wraps below 40rem of frame width; below 25rem the visible device labels are hidden (icons stay, each option keeps a screen-reader name).
+- The device width switches at once: `max-width` is layout, so it does not animate.
 - Stack frames one per demo block; spacing between blocks comes from the page.
 
 ## Accessibility

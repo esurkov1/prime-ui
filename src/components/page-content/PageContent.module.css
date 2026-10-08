@@ -56,23 +56,18 @@
 }
 
 .title {
+  composes: headingM from "../../internal/textRole.module.css";
   margin: 0;
   color: var(--prime-color-text-primary);
-  font-size: var(--prime-text-heading-m-size);
-  line-height: var(--prime-text-heading-m-line-height);
-  font-weight: var(--prime-text-heading-m-weight);
-  letter-spacing: var(--prime-text-heading-m-tracking);
   overflow-wrap: anywhere;
   text-wrap-style: balance;
 }
 
 .description {
+  composes: bodyM from "../../internal/textRole.module.css";
   margin: 0;
   max-width: var(--prime-layout-reading-max-width);
   color: var(--prime-color-text-secondary);
-  font-size: var(--prime-text-body-m-size);
-  line-height: var(--prime-text-body-m-line-height);
-  font-weight: var(--prime-text-body-m-weight);
   overflow-wrap: anywhere;
   text-wrap-style: pretty;
 }

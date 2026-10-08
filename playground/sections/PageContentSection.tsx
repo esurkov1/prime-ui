@@ -1,8 +1,17 @@
+import { PanelTop } from "lucide-react";
 import { api } from "@/components/page-content/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "layout",
+  nav: {
+    segment: "page-content",
+    label: "Page Content",
+    summary: "Страница: заголовок, описание, действия, секции",
+    keywords: ["страница", "заголовок", "секция", "title", "description", "actions"],
+    icon: PanelTop,
+    order: 3,
+  },
   dir: "page-content",
   title: "PageContent",
   kind: "layout",
@@ -34,7 +43,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function PageContentSection() {
-  return <ComponentPage page={page} />;
-}

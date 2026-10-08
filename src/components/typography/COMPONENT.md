@@ -41,7 +41,7 @@ Typography       the element from `as` (default <p>); variant, tone, weight, tra
 | `tone` | `"default" \| "secondary" \| "muted" \| "accent" \| "success" \| "warning" \| "danger"` | `"default"` | Text color by meaning; `default` is primary text. |
 | `as` | `"p" \| "span" \| "div" \| "h1" \| "h2" \| "h3" \| "h4" \| "h5" \| "h6" \| "small" \| "blockquote" \| "article" \| "section" \| "header" \| "footer" \| "aside" \| "nav" \| "main"` | `"p"` | The element, by the page outline; the role keeps the look. |
 | `weight` | `"regular" \| "medium" \| "semibold"` | — | Overrides the role's weight. |
-| `tracking` | `"normal" \| "tight" \| "tighter" \| "wide"` | — | Overrides the role's tracking. |
+| `tracking` | `"normal" \| "tight" \| "tighter" \| "wide"` | — | Overrides the role's tracking with a `--prime-font-tracking-*` step. |
 | `italic` | `boolean` | `false` | Italic, for quotes and titles of works. |
 | `truncate` | `boolean` | `false` | One line with an ellipsis; set `title` when the full text matters. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className`, `id`, `title` and the other attributes of the element. |
@@ -71,7 +71,7 @@ Typography       the element from `as` (default <p>); variant, tone, weight, tra
 | `italic` | italic | quotes, titles of works | `false` |
 | `truncate` | one line with an ellipsis | names in fixed-width cells | `false` |
 
-`weight` (`regular` · `medium` · `semibold`) and `tracking` (`normal` · `tight` · `tighter` · `wide`) override the role.
+`weight` (`regular` · `medium` · `semibold`) and `tracking` (`normal` 0 · `tight` −0.01em · `tighter` −0.02em · `wide` +0.01em, from `--prime-font-tracking-*`) override the role.
 
 ## States
 | State | Driven by | DOM |

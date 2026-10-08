@@ -1,8 +1,17 @@
+import { LogIn } from "lucide-react";
 import { api } from "@/components/login-form/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "inputs",
+  nav: {
+    segment: "login-form",
+    label: "Login Form",
+    summary: "Карточка входа: логотип, провайдеры, поля, ссылки",
+    keywords: ["вход", "логин", "авторизация", "регистрация", "пароль", "sign in", "login", "auth"],
+    icon: LogIn,
+    order: 4,
+  },
   dir: "login-form",
   title: "LoginForm",
   kind: "composite",
@@ -70,7 +79,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function LoginFormSection() {
-  return <ComponentPage page={page} />;
-}

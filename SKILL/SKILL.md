@@ -60,8 +60,9 @@ repository; in a consumer project the same files are under `node_modules/prime-u
 ## Setup (once per app)
 
 ```tsx
-import "prime-ui-kit/styles.css"; // fonts, reset, tokens, light + dark themes
-import "prime-ui-kit/bundle.css"; // component styles
+import "prime-ui-kit/bundle.css"; // tokens, light + dark themes, component styles
+import "prime-ui-kit/fonts.css"; // optional: Golos Text + JetBrains Mono from Google Fonts
+import "prime-ui-kit/reset.css"; // optional: minimal document reset (skip if the app has one)
 import { applyTheme } from "prime-ui-kit";
 
 applyTheme("light"); // sets data-theme on <html>; "dark" for the dark theme
@@ -73,10 +74,10 @@ and `AppShell` belong to the app root, once. A screen component you deliver rend
 a separate `AppLayout` from [layouts.md](layouts.md#app-frame-once-per-app) — never inline the frame
 into a page.
 
-Icons: the kit exports a set for product UI (`Icon name="…"`, `IconSearch`, … — list in
+Icons: the kit exports a set for product UI (`<Icon name="…" />` — names in
 [api-contract.md](api-contract.md#icons)); take every glyph it has from it. Only for a domain glyph
-the kit lacks add `lucide-react` to the app's own dependencies and import from it; use the same icon
-library everywhere.
+the kit lacks add `lucide-react` to the app's own dependencies and wrap the glyph with `createIcon`;
+use the same icon library everywhere.
 
 ## Ten rules
 

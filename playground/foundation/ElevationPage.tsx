@@ -2,16 +2,9 @@ import { Card } from "@/components/card/Card";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Input } from "@/components/input/Input";
 import { Typography } from "@/components/typography/Typography";
-
+import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import { SurfaceGallery } from "../components/ExampleSurface";
-import {
-  FoundationPage,
-  FoundationSection,
-  Panel,
-  RuleList,
-  TokenName,
-  TokenTable,
-} from "./FoundationKit";
+import { Panel, TokenName } from "./FoundationKit";
 import s from "./foundation.module.css";
 import { primitiveTokens, semanticKeys, sourceValue, toVarName } from "./tokenModel";
 
@@ -112,7 +105,7 @@ const LAYER_COLUMNS: DataTableColumn<Layer>[] = [
 ];
 
 function ZLayers() {
-  return <TokenTable columns={LAYER_COLUMNS} rows={LAYERS} getRowKey={(layer) => layer.key} />;
+  return <DocTable columns={LAYER_COLUMNS} rows={LAYERS} getRowKey={(layer) => layer.key} />;
 }
 
 function FieldOnSurface() {
@@ -127,7 +120,7 @@ function FieldOnSurface() {
 
 export default function ElevationPage() {
   return (
-    <FoundationPage
+    <DocPage
       title="Слои и тени"
       description={
         <>
@@ -136,20 +129,20 @@ export default function ElevationPage() {
         </>
       }
     >
-      <FoundationSection title="Тени">
+      <DocBlock title="Тени">
         <ShadowCards />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Стопка слоёв"
         description="Как слои лежат друг на друге: фон, карточка, меню, затемнение и модалка."
       >
         <Panel className={s.layerPanel}>
           <LayerStack />
         </Panel>
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="Поле на разных поверхностях"
         description={
           <>
@@ -163,25 +156,25 @@ export default function ElevationPage() {
         <SurfaceGallery>
           <FieldOnSurface />
         </SurfaceGallery>
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection
+      <DocBlock
         title="z-index"
         description="Используйте только --prime-z-*. Все оверлеи стоят на одном уровне --prime-z-overlay и попадают в body при открытии, поэтому открытый позже слой всегда выше."
       >
         <ZLayers />
-      </FoundationSection>
+      </DocBlock>
 
-      <FoundationSection title="Правила">
-        <RuleList>
+      <DocBlock title="Правила">
+        <DocList>
           <li>Не добавляйте рамку карточке, если её и так отделяет заливка.</li>
           <li>Тень показывает, что слой парит над другими. Статичным блокам она не нужна.</li>
           <li>
             Линии <code>--prime-color-border-subtle</code> нужны только как разделители: строки
             таблицы, пункты списка.
           </li>
-        </RuleList>
-      </FoundationSection>
-    </FoundationPage>
+        </DocList>
+      </DocBlock>
+    </DocPage>
   );
 }

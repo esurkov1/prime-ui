@@ -1,8 +1,27 @@
+import { ListFilter } from "lucide-react";
 import { api } from "@/components/smart-filter/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "selection",
+  nav: {
+    segment: "smart-filter",
+    label: "Smart Filter",
+    summary: "Умные фильтры: панель значений, поиск и теги применённых фильтров",
+    keywords: [
+      "фильтры",
+      "фильтр",
+      "поиск",
+      "filter",
+      "include",
+      "exclude",
+      "скрыть",
+      "показать",
+      "chips",
+    ],
+    icon: ListFilter,
+    order: 9,
+  },
   dir: "smart-filter",
   title: "SmartFilter",
   kind: "composite",
@@ -51,7 +70,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function SmartFilterSection() {
-  return <ComponentPage page={page} />;
-}

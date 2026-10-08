@@ -1,0 +1,50 @@
+/*
+ * Chip tiers (`--prime-badge-<tier>-*`: 16 · 20 · 24 · 28 · 32) shared by Badge and Kbd. Put
+ * `.tier` on the element that carries `data-tier` (see components/badge/tier.ts); its CSS reads
+ * `--chip-h`, `--chip-px`, `--chip-gap`, `--chip-radius`, `--chip-text`, and nested kit icons take
+ * `--prime-icon-size`. No `data-tier` → `m`.
+ */
+.tier {
+  --chip-h: var(--prime-badge-m-height);
+  --chip-px: var(--prime-badge-m-padding-x);
+  --chip-gap: var(--prime-badge-m-gap);
+  --chip-radius: var(--prime-badge-m-radius);
+  --chip-text: var(--prime-badge-m-text-size);
+  --prime-icon-size: var(--prime-badge-m-icon);
+}
+
+.tier[data-tier="xs"] {
+  --chip-h: var(--prime-badge-xs-height);
+  --chip-px: var(--prime-badge-xs-padding-x);
+  --chip-gap: var(--prime-badge-xs-gap);
+  --chip-radius: var(--prime-badge-xs-radius);
+  --chip-text: var(--prime-badge-xs-text-size);
+  --prime-icon-size: var(--prime-badge-xs-icon);
+}
+
+.tier[data-tier="s"] {
+  --chip-h: var(--prime-badge-s-height);
+  --chip-px: var(--prime-badge-s-padding-x);
+  --chip-gap: var(--prime-badge-s-gap);
+  --chip-radius: var(--prime-badge-s-radius);
+  --chip-text: var(--prime-badge-s-text-size);
+  --prime-icon-size: var(--prime-badge-s-icon);
+}
+
+.tier[data-tier="l"] {
+  --chip-h: var(--prime-badge-l-height);
+  --chip-px: var(--prime-badge-l-padding-x);
+  --chip-gap: var(--prime-badge-l-gap);
+  --chip-radius: var(--prime-badge-l-radius);
+  --chip-text: var(--prime-badge-l-text-size);
+  --prime-icon-size: var(--prime-badge-l-icon);
+}
+
+.tier[data-tier="xl"] {
+  --chip-h: var(--prime-badge-xl-height);
+  --chip-px: var(--prime-badge-xl-padding-x);
+  --chip-gap: var(--prime-badge-xl-gap);
+  --chip-radius: var(--prime-badge-xl-radius);
+  --chip-text: var(--prime-badge-xl-text-size);
+  --prime-icon-size: var(--prime-badge-xl-icon);
+}

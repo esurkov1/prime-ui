@@ -1,8 +1,17 @@
+import { Maximize2 } from "lucide-react";
 import { api } from "@/components/modal/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "overlays",
+  nav: {
+    segment: "modal",
+    label: "Modal",
+    summary: "Модальное окно и подтверждение",
+    keywords: ["модалка", "диалог", "окно", "dialog", "open", "onOpenChange"],
+    icon: Maximize2,
+    order: 4,
+  },
   dir: "modal",
   title: "Modal",
   kind: "overlay",
@@ -73,7 +82,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ModalSection() {
-  return <ComponentPage page={page} />;
-}

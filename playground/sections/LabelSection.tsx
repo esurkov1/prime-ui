@@ -1,8 +1,17 @@
+import { Bookmark } from "lucide-react";
 import { api } from "@/components/label/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "inputs",
+  nav: {
+    segment: "label",
+    label: "Label",
+    summary: "Подпись поля: обязательное и необязательное",
+    keywords: ["подпись", "лейбл", "required", "optional"],
+    icon: Bookmark,
+    order: 6,
+  },
   dir: "label",
   title: "Label",
   kind: "primitive",
@@ -40,7 +49,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function LabelSection() {
-  return <ComponentPage page={page} />;
-}

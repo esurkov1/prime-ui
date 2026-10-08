@@ -1,4 +1,4 @@
-/** KPI templates: an icon tile with a value, a badge with a value, and a large value with its change — `variant`, `Card.Delta`. */
+/** KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change — `variant`, `Card.Delta`. */
 import { Badge, Card, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -14,7 +14,7 @@ export default function CardVariantsExample() {
         <Card.Value>1 248</Card.Value>
       </Card.Root>
 
-      <Card.Root variant="metric">
+      <Card.Root variant="stat-trend">
         <Card.Header>
           <Badge.Root color="green">SLA</Badge.Root>
           <Card.Value>99,95%</Card.Value>

@@ -1,8 +1,17 @@
+import { MousePointerClick } from "lucide-react";
 import { api } from "@/components/button/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "actions",
+  nav: {
+    segment: "buttons",
+    label: "Button",
+    summary: "Кнопка: варианты, тоны, размеры, загрузка",
+    keywords: ["кнопка", "variant", "tone", "size", "loading", "asChild"],
+    icon: MousePointerClick,
+    order: 1,
+  },
   dir: "button",
   title: "Button",
   kind: "primitive",
@@ -61,7 +70,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function ButtonSection() {
-  return <ComponentPage page={page} />;
-}

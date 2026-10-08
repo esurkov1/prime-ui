@@ -55,6 +55,43 @@ describe("ScrollContainer", () => {
     expect(node).toHaveAttribute("data-overflow-start", "true");
   });
 
+  it("reads the RTL scroll position (negative scrollLeft) as distance from the start", async () => {
+    render(
+      <div dir="rtl">
+        <ScrollContainer axis="horizontal" fade data-testid="scroll">
+          items
+        </ScrollContainer>
+      </div>,
+    );
+    const node = screen.getByTestId("scroll");
+    Object.defineProperty(node, "scrollWidth", { configurable: true, value: 300 });
+    Object.defineProperty(node, "clientWidth", { configurable: true, value: 100 });
+    node.scrollLeft = -200;
+    fireEvent.scroll(node);
+    await waitFor(() => expect(node).toHaveAttribute("data-overflow-start", "true"));
+    expect(node).not.toHaveAttribute("data-overflow-end");
+  });
+
+  it("re-measures when children are added later", async () => {
+    const ROWS = ["Первая", "Вторая", "Третья"];
+    function Growing({ count }: { count: number }) {
+      return (
+        <ScrollContainer fade data-testid="scroll">
+          {ROWS.slice(0, count).map((row) => (
+            <p key={row}>{row}</p>
+          ))}
+        </ScrollContainer>
+      );
+    }
+    const { rerender } = render(<Growing count={1} />);
+    const node = screen.getByTestId("scroll");
+    expect(node).not.toHaveAttribute("data-overflow-end");
+    Object.defineProperty(node, "scrollHeight", { configurable: true, value: 300 });
+    Object.defineProperty(node, "clientHeight", { configurable: true, value: 100 });
+    rerender(<Growing count={3} />);
+    await waitFor(() => expect(node).toHaveAttribute("data-overflow-end", "true"));
+  });
+
   it("fades along the horizontal axis for axis=horizontal and sets nothing without fade", () => {
     const { rerender } = render(
       <ScrollContainer axis="horizontal" fade data-testid="scroll">

@@ -1,8 +1,17 @@
+import { CircleHelp } from "lucide-react";
 import { api } from "@/components/tooltip/api";
-
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "overlays",
+  nav: {
+    segment: "tooltip",
+    label: "Tooltip",
+    summary: "Короткая подсказка при наведении",
+    keywords: ["подсказка", "тултип", "hover", "side"],
+    icon: CircleHelp,
+    order: 1,
+  },
   dir: "tooltip",
   title: "Tooltip",
   kind: "overlay",
@@ -68,7 +77,3 @@ export const page: ComponentPageConfig = {
     ],
   },
 };
-
-export default function TooltipSection() {
-  return <ComponentPage page={page} />;
-}

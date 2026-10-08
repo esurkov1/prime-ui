@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { mergeRefs } from "@/internal/mergeRefs";
 
 import styles from "./ScrollContainer.module.css";
 
@@ -22,6 +22,7 @@ export type ScrollContainerProps = React.HTMLAttributes<HTMLElement> & {
   fade?: boolean;
   /** `thin` — the kit's quiet scrollbar (default); `hidden` — no scrollbar (pair it with `fade`). */
   scrollbar?: "thin" | "hidden";
+  ref?: React.Ref<HTMLElement>;
 };
 
 const axisClass: Record<ScrollContainerAxis, string> = {
@@ -44,7 +45,8 @@ function useEdgeOverflow(
     const node = ref.current;
     if (!enabled || !node) return;
     const update = () => {
-      const position = horizontal ? node.scrollLeft : node.scrollTop;
+      // In RTL `scrollLeft` runs from 0 at the start to negative values toward the end.
+      const position = horizontal ? Math.abs(node.scrollLeft) : node.scrollTop;
       const max = horizontal
         ? node.scrollWidth - node.clientWidth
         : node.scrollHeight - node.clientHeight;
@@ -64,13 +66,23 @@ function useEdgeOverflow(
     };
     update();
     node.addEventListener("scroll", schedule, { passive: true });
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
-    observer?.observe(node);
-    for (const child of Array.from(node.children)) observer?.observe(child);
+    // The content size is the children's: observe every child, including ones added later.
+    const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
+    const observeChildren = () => {
+      for (const child of Array.from(node.children)) resize?.observe(child);
+    };
+    resize?.observe(node);
+    observeChildren();
+    const mutation = new MutationObserver(() => {
+      observeChildren();
+      schedule();
+    });
+    mutation.observe(node, { childList: true });
     return () => {
       cancelAnimationFrame(frame);
       node.removeEventListener("scroll", schedule);
-      observer?.disconnect();
+      resize?.disconnect();
+      mutation.disconnect();
     };
   }, [ref, enabled, horizontal]);
 
@@ -78,46 +90,38 @@ function useEdgeOverflow(
 }
 
 /** Scroll region with the kit's thin scrollbars; shrinks inside flex/grid parents. */
-const ScrollContainer = React.forwardRef<HTMLElement, ScrollContainerProps>(
-  function ScrollContainer(
-    {
-      as: Component = "div",
-      axis = "vertical",
-      overscrollBehavior = "contain",
-      fade = false,
-      scrollbar = "thin",
-      className,
-      ...rest
-    },
-    ref,
-  ) {
-    const innerRef = React.useRef<HTMLElement>(null);
-    const mergedRef = useMergedRefs(innerRef, ref);
-    const horizontal = axis === "horizontal";
-    const overflow = useEdgeOverflow(innerRef, fade, horizontal);
+export function ScrollContainer({
+  as: Component = "div",
+  axis = "vertical",
+  overscrollBehavior = "contain",
+  fade = false,
+  scrollbar = "thin",
+  className,
+  ref,
+  ...rest
+}: ScrollContainerProps) {
+  const innerRef = React.useRef<HTMLElement>(null);
+  const mergedRef = React.useMemo(() => mergeRefs(innerRef, ref), [ref]);
+  const horizontal = axis === "horizontal";
+  const overflow = useEdgeOverflow(innerRef, fade, horizontal);
 
-    return (
-      <Component
-        ref={mergedRef as never}
-        className={cx(
-          styles.root,
-          axisClass[axis],
-          overscrollBehavior === "contain" && styles.overscrollContain,
-          overscrollBehavior === "none" && styles.overscrollNone,
-          scrollbar === "hidden" && styles.scrollbarHidden,
-          className,
-        )}
-        {...toDataAttributes({
-          fade: fade ? (horizontal ? "horizontal" : "vertical") : undefined,
-          "overflow-start": overflow.start || undefined,
-          "overflow-end": overflow.end || undefined,
-        })}
-        {...rest}
-      />
-    );
-  },
-);
-
-ScrollContainer.displayName = "ScrollContainer";
-
-export { ScrollContainer };
+  return (
+    <Component
+      ref={mergedRef}
+      className={cx(
+        styles.root,
+        axisClass[axis],
+        overscrollBehavior === "contain" && styles.overscrollContain,
+        overscrollBehavior === "none" && styles.overscrollNone,
+        scrollbar === "hidden" && styles.scrollbarHidden,
+        className,
+      )}
+      {...toDataAttributes({
+        fade: fade ? (horizontal ? "horizontal" : "vertical") : undefined,
+        "overflow-start": overflow.start || undefined,
+        "overflow-end": overflow.end || undefined,
+      })}
+      {...rest}
+    />
+  );
+}

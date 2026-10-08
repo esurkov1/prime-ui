@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import type { ExampleFrameViewport } from "@/components/example-frame/ExampleFrame";
+import { createComponentContext } from "@/internal/context";
 
 /** Background a preview sits on. Components must read well on each of them. */
 export type PlaygroundPreviewSurface = "canvas" | "surface" | "raised" | "accent";
@@ -23,7 +24,10 @@ type PlaygroundPreviewThemeValue = {
   setSurface: (s: PlaygroundPreviewSurface) => void;
 };
 
-const PlaygroundPreviewThemeContext = React.createContext<PlaygroundPreviewThemeValue | null>(null);
+const [PlaygroundPreviewThemeContextProvider, usePlaygroundPreviewTheme] =
+  createComponentContext<PlaygroundPreviewThemeValue>("PlaygroundPreviewTheme");
+
+export { usePlaygroundPreviewTheme };
 
 const SURFACE_STORAGE_KEY = "prime-playground-preview-surface";
 
@@ -61,16 +65,8 @@ export function PlaygroundPreviewThemeProvider({ children }: { children: React.R
   );
 
   return (
-    <PlaygroundPreviewThemeContext.Provider value={value}>
+    <PlaygroundPreviewThemeContextProvider value={value}>
       {children}
-    </PlaygroundPreviewThemeContext.Provider>
+    </PlaygroundPreviewThemeContextProvider>
   );
-}
-
-export function usePlaygroundPreviewTheme(): PlaygroundPreviewThemeValue {
-  const ctx = React.useContext(PlaygroundPreviewThemeContext);
-  if (!ctx) {
-    throw new Error("usePlaygroundPreviewTheme must be used within PlaygroundPreviewThemeProvider");
-  }
-  return ctx;
 }

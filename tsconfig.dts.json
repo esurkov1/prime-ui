@@ -4,7 +4,6 @@
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationMap": true,
     "outDir": ".dts-stage",
     "rootDir": "."
   },

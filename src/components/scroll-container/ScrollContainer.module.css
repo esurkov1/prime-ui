@@ -71,58 +71,39 @@
 }
 
 /*
- * Edge fade (`fade`): a mask over the edge where content is hidden, `--prime-space-8` deep. The
- * mask follows the scroll position at once — scrolling is high-frequency, so nothing animates
- * (foundation §7, rule 1). Mask is alpha-only: any opaque color works.
+ * Edge fade (`fade`): a mask over the edge where content is hidden, `--prime-space-8` deep. One
+ * gradient per axis; an edge without hidden content has a zero-depth fade. The mask follows the
+ * scroll position at once — scrolling is high-frequency, so nothing animates (foundation §7,
+ * rule 1). Mask is alpha-only: any opaque color works.
  */
-.root[data-fade="vertical"][data-overflow-start="true"] {
-  mask-image: linear-gradient(
-    to bottom,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8)
-  );
+.root[data-fade] {
+  --fade-start: 0px;
+  --fade-end: 0px;
+  --fade-dir: to bottom;
 }
 
-.root[data-fade="vertical"][data-overflow-end="true"] {
-  mask-image: linear-gradient(
-    to top,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8)
-  );
+.root[data-fade="horizontal"] {
+  --fade-dir: to right;
 }
 
-.root[data-fade="vertical"][data-overflow-start="true"][data-overflow-end="true"] {
-  mask-image: linear-gradient(
-    to bottom,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8),
-    var(--prime-color-text-primary) calc(100% - var(--prime-space-8)),
-    transparent
-  );
+.root[data-fade="horizontal"]:dir(rtl) {
+  --fade-dir: to left;
 }
 
-.root[data-fade="horizontal"][data-overflow-start="true"] {
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8)
-  );
+.root[data-fade][data-overflow-start="true"] {
+  --fade-start: var(--prime-space-8);
 }
 
-.root[data-fade="horizontal"][data-overflow-end="true"] {
-  mask-image: linear-gradient(
-    to left,
-    transparent,
-    var(--prime-color-text-primary) var(--prime-space-8)
-  );
+.root[data-fade][data-overflow-end="true"] {
+  --fade-end: var(--prime-space-8);
 }
 
-.root[data-fade="horizontal"][data-overflow-start="true"][data-overflow-end="true"] {
+.root[data-fade]:is([data-overflow-start="true"], [data-overflow-end="true"]) {
   mask-image: linear-gradient(
-    to right,
+    var(--fade-dir),
     transparent,
-    var(--prime-color-text-primary) var(--prime-space-8),
-    var(--prime-color-text-primary) calc(100% - var(--prime-space-8)),
+    var(--prime-color-text-primary) var(--fade-start),
+    var(--prime-color-text-primary) calc(100% - var(--fade-end)),
     transparent
   );
 }

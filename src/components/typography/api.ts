@@ -37,8 +37,8 @@ export const api: ComponentApi = {
         {
           name: "tracking",
           type: '"normal" | "tight" | "tighter" | "wide"',
-          en: "Overrides the role's tracking.",
-          ru: "Переопределяет трекинг роли.",
+          en: "Overrides the role's tracking with a `--prime-font-tracking-*` step.",
+          ru: "Переопределяет трекинг роли шагом `--prime-font-tracking-*`.",
         },
         {
           name: "italic",

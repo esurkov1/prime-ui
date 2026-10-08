@@ -2,9 +2,9 @@ import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
-import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { mergeRefs } from "@/internal/mergeRefs";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 import { suspendTransitions } from "@/theme/applyTheme";
 
 import { Button } from "../button/Button";
@@ -62,21 +62,8 @@ const EXAMPLE_FRAME_LABELS: ExampleFrameLabels = {
   codeRegion: "Код примера",
 };
 
-type ExampleFrameContextValue = {
-  code: string;
-  labels: ExampleFrameLabels;
-  pane: Pane;
-  setPane: (p: Pane) => void;
-  viewport: ExampleFrameViewport;
-  setViewport: (v: ExampleFrameViewport) => void;
-  colorScheme: ColorScheme;
-  setColorScheme: (s: ColorScheme) => void;
-  showThemeToggle: boolean;
-  onCopy?: () => void;
-};
-
-const [ExampleFrameProvider, useExampleFrameContext] =
-  createComponentContext<ExampleFrameContextValue>("ExampleFrame");
+/** How long the copy button shows «copied» / «error» before it returns to «copy». */
+const COPY_FEEDBACK_MS = 2000;
 
 export type ExampleFrameProps = Omit<React.HTMLAttributes<HTMLDivElement>, "onCopy"> & {
   /** Source shown on the code pane (TS/TSX highlighting) and copied by the copy button. */
@@ -141,79 +128,92 @@ export function ExampleFrame({
     if (rootRef.current) suspendTransitions(rootRef.current);
   }, [colorScheme]);
 
-  const ctxValue = React.useMemo<ExampleFrameContextValue>(
-    () => ({
-      code,
-      labels,
-      pane,
-      setPane,
-      viewport,
-      setViewport,
-      colorScheme,
-      setColorScheme,
-      showThemeToggle,
-      onCopy,
-    }),
-    [
-      code,
-      labels,
-      pane,
-      viewport,
-      setViewport,
-      colorScheme,
-      setColorScheme,
-      showThemeToggle,
-      onCopy,
-    ],
-  );
-
   return (
-    <ExampleFrameProvider value={ctxValue}>
-      <div {...rest} ref={mergedRef} className={cx(styles.root, className)}>
-        <ExampleFrameToolbar />
-        {pane === "preview" ? (
-          <div className={styles.previewShell}>
-            <div className={styles.previewViewport} data-viewport={viewport}>
-              <div
-                className={styles.previewInner}
-                data-preview-layout={previewLayout}
-                data-theme={colorScheme}
-              >
-                {children}
-              </div>
+    <div {...rest} ref={mergedRef} className={cx(styles.root, className)}>
+      <ExampleFrameToolbar
+        code={code}
+        labels={labels}
+        pane={pane}
+        onPaneChange={setPane}
+        viewport={viewport}
+        onViewportChange={setViewport}
+        colorScheme={colorScheme}
+        onColorSchemeChange={showThemeToggle ? setColorScheme : undefined}
+        onCopy={onCopy}
+      />
+      {pane === "preview" ? (
+        <div className={styles.previewShell}>
+          <div className={styles.previewViewport} data-viewport={viewport}>
+            <div
+              className={styles.previewInner}
+              data-preview-layout={previewLayout}
+              data-theme={colorScheme}
+            >
+              {children}
             </div>
           </div>
-        ) : (
-          <ExampleFrameCodePane />
-        )}
-      </div>
-    </ExampleFrameProvider>
+        </div>
+      ) : (
+        // Plain CodeBlock is not focusable itself; the scrolling pane takes keyboard focus instead.
+        // The pane carries the theme, so the block inherits it (and trims the source itself).
+        <section
+          className={styles.codePane}
+          data-theme={colorScheme}
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region must be keyboard-reachable
+          tabIndex={0}
+          aria-label={labels.codeRegion}
+        >
+          <CodeBlock variant="ghost" code={code} />
+        </section>
+      )}
+    </div>
   );
 }
 
 ExampleFrame.displayName = "ExampleFrame";
 
-function ExampleFrameToolbar() {
-  const ctx = useExampleFrameContext();
+type ExampleFrameToolbarProps = {
+  code: string;
+  labels: ExampleFrameLabels;
+  pane: Pane;
+  onPaneChange: (pane: Pane) => void;
+  viewport: ExampleFrameViewport;
+  onViewportChange: (viewport: ExampleFrameViewport) => void;
+  colorScheme: ColorScheme;
+  /** Without it the theme toggle is not shown. */
+  onColorSchemeChange?: (scheme: ColorScheme) => void;
+  onCopy?: () => void;
+};
+
+function ExampleFrameToolbar({
+  code,
+  labels,
+  pane,
+  onPaneChange,
+  viewport,
+  onViewportChange,
+  colorScheme,
+  onColorSchemeChange,
+  onCopy,
+}: ExampleFrameToolbarProps) {
   const [copyState, setCopyState] = React.useState<"idle" | "copied" | "error">("idle");
 
-  const handleCopy = React.useCallback(async () => {
+  React.useEffect(() => {
+    if (copyState === "idle") return;
+    const timer = window.setTimeout(() => setCopyState("idle"), COPY_FEEDBACK_MS);
+    return () => window.clearTimeout(timer);
+  }, [copyState]);
+
+  const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(ctx.code);
+      await navigator.clipboard.writeText(code);
       setCopyState("copied");
-      ctx.onCopy?.();
-      window.setTimeout(() => setCopyState("idle"), 2000);
+      onCopy?.();
     } catch {
       setCopyState("error");
-      window.setTimeout(() => setCopyState("idle"), 2000);
     }
-  }, [ctx]);
-
-  const toggleScheme = () => {
-    ctx.setColorScheme(ctx.colorScheme === "light" ? "dark" : "light");
   };
 
-  const { labels } = ctx;
   const copyLabel =
     copyState === "copied" ? labels.copied : copyState === "error" ? labels.copyError : labels.copy;
 
@@ -222,8 +222,8 @@ function ExampleFrameToolbar() {
       <div className={styles.toolbarLine1}>
         <SegmentedControl.Root
           className={styles.toolbarPaneSegment}
-          value={ctx.pane}
-          onValueChange={(v) => ctx.setPane(v as Pane)}
+          value={pane}
+          onValueChange={(v) => onPaneChange(v as Pane)}
           size="s"
           aria-label={labels.paneSwitch}
         >
@@ -241,17 +241,17 @@ function ExampleFrameToolbar() {
           </SegmentedControl.Item>
         </SegmentedControl.Root>
         <div className={styles.toolbarLine1End}>
-          {ctx.showThemeToggle ? (
+          {onColorSchemeChange ? (
             <Button.Root
               variant="soft"
               tone="neutral"
               type="button"
               size="s"
-              onClick={toggleScheme}
-              aria-label={ctx.colorScheme === "light" ? labels.themeDark : labels.themeLight}
+              onClick={() => onColorSchemeChange(colorScheme === "light" ? "dark" : "light")}
+              aria-label={colorScheme === "light" ? labels.themeDark : labels.themeLight}
             >
               <Button.Icon>
-                {ctx.colorScheme === "light" ? (
+                {colorScheme === "light" ? (
                   <Icon name="theme.dark" size="s" tone="secondary" />
                 ) : (
                   <Icon name="theme.light" size="s" tone="secondary" />
@@ -275,20 +275,24 @@ function ExampleFrameToolbar() {
           </Button.Root>
         </div>
       </div>
-      {ctx.pane === "preview" ? (
+      {pane === "preview" ? (
         <SegmentedControl.Root
           className={styles.toolbarViewportSegment}
-          value={ctx.viewport}
-          onValueChange={(v) => ctx.setViewport(v as ExampleFrameViewport)}
+          value={viewport}
+          onValueChange={(v) => onViewportChange(v as ExampleFrameViewport)}
           size="s"
           aria-label={labels.viewportSwitch}
         >
-          {VIEWPORTS.map((viewport) => (
-            <SegmentedControl.Item key={viewport} value={viewport}>
+          {VIEWPORTS.map((option) => (
+            <SegmentedControl.Item key={option} value={option}>
               <SegmentedControl.Icon>
-                <Icon name={`viewport.${viewport}`} />
+                <Icon name={`viewport.${option}`} />
               </SegmentedControl.Icon>
-              <span className={styles.viewportLabel}>{labels[viewport]}</span>
+              {/* A phone-width frame hides the visible label; the hidden one keeps the name. */}
+              <span className={styles.viewportLabel} aria-hidden="true">
+                {labels[option]}
+              </span>
+              <VisuallyHidden>{labels[option]}</VisuallyHidden>
             </SegmentedControl.Item>
           ))}
         </SegmentedControl.Root>
@@ -298,23 +302,3 @@ function ExampleFrameToolbar() {
 }
 
 ExampleFrameToolbar.displayName = "ExampleFrame.Toolbar";
-
-function ExampleFrameCodePane() {
-  const ctx = useExampleFrameContext();
-  const trimmed = ctx.code.trimEnd();
-
-  return (
-    // Plain CodeBlock is not focusable itself; the scrolling pane takes keyboard focus instead.
-    <section
-      className={styles.codePane}
-      data-theme={ctx.colorScheme}
-      // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region must be keyboard-reachable
-      tabIndex={0}
-      aria-label={ctx.labels.codeRegion}
-    >
-      <CodeBlock variant="ghost" code={trimmed} colorScheme={ctx.colorScheme} />
-    </section>
-  );
-}
-
-ExampleFrameCodePane.displayName = "ExampleFrame.CodePane";
