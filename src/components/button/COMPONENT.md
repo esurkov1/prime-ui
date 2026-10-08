@@ -35,7 +35,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Button.Root
-`forwardRef` → `HTMLButtonElement`. The `<button>`, or the single child with `asChild`; sets variant, tone and size and passes the tier to nested icons.
+`ref` → `HTMLButtonElement`. The `<button>`, or the single child with `asChild`; sets variant, tone and size and passes the tier to nested icons.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -108,7 +108,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | hover / active | pointer | hover fill per variant; active `scale(var(--prime-motion-press-scale))` |
 | focus-visible | keyboard | outer focus ring with `--prime-focus-offset`; `tone="inherit"` draws it in `currentColor` |
 | disabled | `disabled` | native `disabled`, `data-disabled="true"`, `fill-muted` + `text-disabled`, `cursor: not-allowed`; ghost stays transparent |
-| loading | `loading` (native `<button>`) | `data-loading="true"`, `data-disabled="true"`, `aria-busy="true"`; a `Spinner` (`aria-hidden`) replaces the leading (or only) icon, otherwise it is centered over the hidden label (`data-loading-overlay="true"`) |
+| loading | `loading` (native `<button>`) | `data-loading="true"`, native `disabled`, `aria-busy="true"`, colors kept (busy, not unavailable), no hover or press; a `Spinner` (`aria-hidden`) replaces the leading (or only) icon, otherwise it is centered over the hidden label (`data-loading-overlay="true"`) |
 | asChild disabled / loading | `asChild` + `disabled`/`loading` | `aria-disabled="true"`, `pointer-events: none`, click `preventDefault`; no native `disabled`, no automatic spinner |
 
 Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-full-width`, `data-icon-only`, `data-leading-icon`, `data-trailing-icon`.

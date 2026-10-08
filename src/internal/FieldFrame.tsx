@@ -112,6 +112,8 @@ type FieldFrameRenderProps = Omit<FieldFrameProps, "focusRing"> & {
    * `htmlFor`; the group names itself with `aria-labelledby={ids.labelId}`.
    */
   group?: boolean;
+  /** Right side of the label row (Slider's current value); the row renders even without a label. */
+  labelEnd?: React.ReactNode;
   /** Right side of the support row (a character counter, `FieldCounter`). */
   counter?: React.ReactNode;
   /** Always render the support row so an appearing error does not shift the layout. */
@@ -137,6 +139,7 @@ export function FieldFrame({
   disabled,
   optionalLabel,
   group = false,
+  labelEnd,
   counter,
   reserveSupportRow = false,
   className,
@@ -145,6 +148,20 @@ export function FieldFrame({
 }: FieldFrameRenderProps) {
   const { showError, showHint } = ids;
   const showSupport = showError || showHint || counter != null || reserveSupportRow;
+  const labelNode = hasContent(label) ? (
+    <Label.Root
+      id={ids.labelId}
+      htmlFor={group ? undefined : ids.controlId}
+      size={size}
+      required={required}
+      optional={optional}
+      disabled={disabled}
+      labels={{ optional: optionalLabel }}
+      className={styles.label}
+    >
+      {label}
+    </Label.Root>
+  ) : null;
 
   return (
     <div
@@ -156,20 +173,14 @@ export function FieldFrame({
         disabled: disabled || undefined,
       })}
     >
-      {hasContent(label) ? (
-        <Label.Root
-          id={ids.labelId}
-          htmlFor={group ? undefined : ids.controlId}
-          size={size}
-          required={required}
-          optional={optional}
-          disabled={disabled}
-          labels={{ optional: optionalLabel }}
-          className={styles.label}
-        >
-          {label}
-        </Label.Root>
-      ) : null}
+      {labelEnd != null ? (
+        <div className={styles.labelRow}>
+          {labelNode}
+          <span className={styles.labelEnd}>{labelEnd}</span>
+        </div>
+      ) : (
+        labelNode
+      )}
       <div className={styles.body}>
         {children}
         {showSupport ? (

@@ -34,18 +34,18 @@ ButtonGroup.Root         <div role="group">; size and orientation for every segm
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### ButtonGroup.Root
-`forwardRef` → `HTMLDivElement`. `<div role="group">`; sets the tier and orientation of every segment and passes the tier to nested icons.
+`ref` → `HTMLDivElement`. `<div role="group">`; sets the tier and orientation of every segment and passes the tier to nested icons.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier of every segment: height 28 · 32 · 36 · 40 · 48, padding, text, icon. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier of every segment: height 28 · 32 · 36 · 40 · 48, padding, text, icon. Without it the tier of its host (a toolbar, a panel), else `m`. |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Direction of the segments; `vertical` stretches them to the widest. |
 | `fullWidth` | `boolean` | — | Stretches the group; horizontal segments share the width equally. |
 | `children` | `ReactNode` | — | `ButtonGroup.Item` segments. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `aria-label` (name the group), `role` (e.g. `"toolbar"`), `className` and the other div attributes. |
 
 ### ButtonGroup.Item
-`forwardRef` → `HTMLButtonElement`. One segment, a native `<button>`.
+`ref` → `HTMLButtonElement`. One segment, a native `<button>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -102,7 +102,7 @@ Do not mix action segments and toggle segments in one group, and do not put the 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| hover / active | pointer | hover `fill-muted-hover` + primary text; active `fill-strong` |
+| hover / active | pointer | hover `fill-muted-hover` + primary text; active `fill-strong` + `scale(var(--prime-motion-press-scale))` (`-compact` for icon-only segments); disabled never scales |
 | pressed | `pressed` | `aria-pressed`, `data-state="active" \| "inactive"` |
 | disabled | `disabled` | native `:disabled`: `fill-muted` + `text-disabled`, `cursor: not-allowed` |
 | focus-visible | keyboard | outer focus ring, the segment is raised above neighbours (`z-index: 1`) |

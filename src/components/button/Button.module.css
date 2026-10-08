@@ -1,48 +1,40 @@
 /*
  * Button — fill-based, no visible outline (`outline` draws a 1px inset line).
- * Geometry comes from `--prime-control-<tier>-*` so Button, Input and Select of one size align in a row.
+ * Geometry comes from the shared field tier (`internal/fieldTier`, set from `data-size` in TSX), so
+ * Button, Input and Select of one size align in a row; ButtonGroup segments read the same table.
  * Colors go through private vars: every tone × variant only assigns them.
  */
 .root {
-  --btn-h: var(--prime-control-m-height);
-  --btn-px: var(--prime-control-m-padding-x);
-  --btn-radius: var(--prime-control-m-radius);
-  --btn-gap: var(--prime-control-m-gap);
-  --btn-text: var(--prime-control-m-text-size);
-  --btn-lh: var(--prime-control-m-line-height);
-  --prime-icon-size: var(--prime-control-m-icon);
+  --prime-icon-size: var(--field-icon);
   /* Optical compensation on the icon side: padX − 4px, never closer than 8px to the edge (xs). */
-  --btn-px-icon: max(calc(var(--btn-px) - var(--prime-space-1)), var(--prime-space-2));
+  --btn-px-icon: max(calc(var(--field-button-px) - var(--prime-space-1)), var(--prime-space-2));
 
   --btn-bg: transparent;
   --btn-bg-hover: var(--prime-color-fill-subtle);
   --btn-bg-active: var(--btn-bg-hover);
   --btn-fg: var(--prime-color-text-primary);
   --btn-line: transparent;
-  --btn-depth: 0 0 transparent;
 
   position: relative;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--btn-gap);
-  height: var(--btn-h);
-  min-width: var(--btn-h);
+  gap: var(--field-gap);
+  height: var(--field-h);
+  min-width: var(--field-h);
   max-width: 100%;
   padding-block: 0;
-  padding-inline: var(--btn-px);
+  padding-inline: var(--field-button-px);
   margin: 0;
   border: 0;
-  border-radius: var(--btn-radius);
+  border-radius: var(--field-radius);
   background: var(--btn-bg);
-  box-shadow:
-    inset 0 0 0 var(--prime-border-width) var(--btn-line),
-    var(--btn-depth);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--btn-line);
   color: var(--btn-fg);
   font-family: inherit;
-  font-size: var(--btn-text);
-  line-height: var(--btn-lh);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   font-weight: var(--prime-font-weight-medium);
   white-space: nowrap;
   text-decoration: none;
@@ -56,48 +48,6 @@
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* ─── Sizes ─────────────────────────────────────────────────────────────── */
-
-.root[data-size="xs"] {
-  --btn-h: var(--prime-control-xs-height);
-  --btn-px: var(--prime-control-xs-padding-x);
-  --btn-radius: var(--prime-control-xs-radius);
-  --btn-gap: var(--prime-control-xs-gap);
-  --btn-text: var(--prime-control-xs-text-size);
-  --btn-lh: var(--prime-control-xs-line-height);
-  --prime-icon-size: var(--prime-control-xs-icon);
-}
-
-.root[data-size="s"] {
-  --btn-h: var(--prime-control-s-height);
-  --btn-px: var(--prime-control-s-padding-x);
-  --btn-radius: var(--prime-control-s-radius);
-  --btn-gap: var(--prime-control-s-gap);
-  --btn-text: var(--prime-control-s-text-size);
-  --btn-lh: var(--prime-control-s-line-height);
-  --prime-icon-size: var(--prime-control-s-icon);
-}
-
-.root[data-size="l"] {
-  --btn-h: var(--prime-control-l-height);
-  --btn-px: var(--prime-control-l-padding-x);
-  --btn-radius: var(--prime-control-l-radius);
-  --btn-gap: var(--prime-control-l-gap);
-  --btn-text: var(--prime-control-l-text-size);
-  --btn-lh: var(--prime-control-l-line-height);
-  --prime-icon-size: var(--prime-control-l-icon);
-}
-
-.root[data-size="xl"] {
-  --btn-h: var(--prime-control-xl-height);
-  --btn-px: var(--prime-control-xl-padding-x);
-  --btn-radius: var(--prime-control-xl-radius);
-  --btn-gap: var(--prime-control-xl-gap);
-  --btn-text: var(--prime-control-xl-text-size);
-  --btn-lh: var(--prime-control-xl-line-height);
-  --prime-icon-size: var(--prime-control-xl-icon);
-}
-
 /* Optical compensation on the icon side. */
 .root[data-leading-icon="true"] {
   padding-inline-start: var(--btn-px-icon);
@@ -109,7 +59,7 @@
 
 /* Icon-only buttons are square. */
 .root[data-icon-only="true"] {
-  width: var(--btn-h);
+  width: var(--field-h);
   padding-inline: 0;
 }
 
@@ -117,14 +67,6 @@
   display: flex;
   width: 100%;
   min-width: 0;
-}
-
-/* Nested Typography takes the control's type scale instead of its own role. */
-.root :is(p, span, div, small)[data-variant] {
-  font-size: inherit;
-  line-height: inherit;
-  font-weight: inherit;
-  color: inherit;
 }
 
 /* ─── Tone × variant: assign colors only ────────────────────────────────── */
@@ -172,7 +114,10 @@
   --btn-fg: var(--prime-color-text-secondary);
 }
 
-.root[data-tone="neutral"][data-variant="ghost"]:hover:not([data-disabled="true"]) {
+.root[data-tone="neutral"][data-variant="ghost"]:hover:not(
+    [data-disabled="true"],
+    [data-loading="true"]
+  ) {
   --btn-fg: var(--prime-color-text-primary);
 }
 
@@ -224,11 +169,12 @@
 
 /* ─── Interaction ───────────────────────────────────────────────────────── */
 
-.root:hover:not([data-disabled="true"]) {
+/* Disabled and loading take no hover or press (`data-disabled` marks `disabled` only). */
+.root:hover:not([data-disabled="true"], [data-loading="true"]) {
   background-color: var(--btn-bg-hover);
 }
 
-.root:active:not([data-disabled="true"]) {
+.root:active:not([data-disabled="true"], [data-loading="true"]) {
   background-color: var(--btn-bg-active);
   transform: scale(var(--prime-motion-press-scale));
 }
@@ -253,28 +199,29 @@
   --btn-fg: var(--prime-color-text-primary);
 }
 
-.root[data-disabled="true"]:not([data-loading="true"]) {
+/* `[data-variant]` (every button has one) lifts this over the tone × variant colors. A loading
+   button keeps its colors: it is busy, not unavailable. */
+.root[data-variant][data-disabled="true"] {
   --btn-bg: var(--prime-color-fill-muted);
   --btn-fg: var(--prime-color-text-disabled);
   --btn-line: transparent;
-  --btn-depth: 0 0 transparent;
 
   background-image: none;
   box-shadow: none;
   cursor: not-allowed;
 }
 
-.root[data-disabled="true"]:not([data-loading="true"])[data-variant="ghost"] {
+.root[data-variant="ghost"][data-disabled="true"] {
   --btn-bg: transparent;
 }
 
 /* inherit stays on its host: a faded host color, the soft wash fades with it. */
-.root[data-tone="inherit"][data-disabled="true"]:not([data-loading="true"]) {
+.root[data-tone="inherit"][data-disabled="true"] {
   --btn-bg: transparent;
   --btn-fg: color-mix(in srgb, currentColor 48%, transparent);
 }
 
-.root[data-tone="inherit"][data-variant="soft"][data-disabled="true"]:not([data-loading="true"]) {
+.root[data-tone="inherit"][data-variant="soft"][data-disabled="true"] {
   --btn-bg: color-mix(in srgb, currentColor 12%, transparent);
 }
 

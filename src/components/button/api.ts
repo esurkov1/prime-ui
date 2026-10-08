@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Button.Root",
-      en: "`forwardRef` → `HTMLButtonElement`. The `<button>`, or the single child with `asChild`; sets variant, tone and size and passes the tier to nested icons.",
+      en: "`ref` → `HTMLButtonElement`. The `<button>`, or the single child with `asChild`; sets variant, tone and size and passes the tier to nested icons.",
       ru: "Кнопка или слот для одного дочернего элемента при `asChild`; задаёт подачу, тон и размер, передаёт ярус вложенным иконкам.",
       props: [
         {

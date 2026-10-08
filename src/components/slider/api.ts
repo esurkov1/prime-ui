@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Slider",
-      en: '`ref` → `HTMLDivElement`. The label row with the value, then a native `<input type="range">` (transparent, on top) over the visual track, fill and thumb.',
-      ru: 'Подпись со значением, под ней нативный `<input type="range">` поверх дорожки, заливки и ползунка.',
+      en: '`ref` → `HTMLDivElement` (the field frame). A framed field like every other: the label row with the value, a native `<input type="range">` (transparent, on top) over the visual track, fill and thumb, then the hint or the error. Field-root rule: `className`, `ref` and the rest go to the frame; `id` and `aria-label` to the range input.',
+      ru: 'Поле в рамке, как остальные: подпись со значением, нативный `<input type="range">` поверх дорожки, заливки и ползунка, под ним подсказка или ошибка.',
       props: [
         {
           name: "value",
@@ -50,8 +50,8 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the track thickness T (thumb 4.5T × 3T), the label and the value.",
+          default: 'host tier, else "m"',
+          en: "Tier of the track thickness T (thumb 4.5T × 3T), the label, the value and the hint. Without it the tier of its host (a form, a panel), else `m`.",
           ru: "Ярус толщины дорожки T (ползунок 4.5T × 3T), подписи и значения.",
         },
         {
@@ -74,6 +74,36 @@ export const api: ComponentApi = {
           ru: "Видимая подпись, связанная с input. Без неё задайте `aria-label`.",
         },
         {
+          name: "required",
+          type: "boolean",
+          en: "Red `*` after the label (`aria-hidden`); a range always has a value, so there is no native `required`.",
+          ru: "Красная `*` после подписи; у ползунка всегда есть значение, нативного `required` нет.",
+        },
+        {
+          name: "optional",
+          type: "boolean",
+          en: "Muted marker right after the label text (`labels.optional`).",
+          ru: "Приглушённая пометка после подписи (`labels.optional`).",
+        },
+        {
+          name: "hint",
+          type: "ReactNode",
+          en: "Help text under the track (`aria-describedby`). Hidden while `error` is shown.",
+          ru: "Подсказка под дорожкой; скрывается, пока показан `error`.",
+        },
+        {
+          name: "error",
+          type: "ReactNode",
+          en: "Error message in the hint slot; implies `invalid`.",
+          ru: "Текст ошибки на месте подсказки; включает `invalid`.",
+        },
+        {
+          name: "invalid",
+          type: "boolean",
+          en: "`aria-invalid` on the range input and a danger focus ring on the thumb. A non-empty `error` implies it.",
+          ru: "`aria-invalid` на input и красное кольцо фокуса у ползунка.",
+        },
+        {
           name: "showValue",
           type: "boolean",
           default: "false",
@@ -87,19 +117,44 @@ export const api: ComponentApi = {
           ru: "Формат показанного значения и `aria-valuetext` (единицы, валюта).",
         },
         {
+          name: "id",
+          type: "string",
+          en: "Id of the range input (generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
+          ru: "Id input; иначе генерируется.",
+        },
+        {
           name: "aria-label",
           type: "string",
           en: "Accessible name when there is no visible `label`.",
           ru: "Доступное имя, когда нет видимой подписи.",
         },
         {
+          name: "aria-describedby",
+          type: "string",
+          en: "Merged before the hint / error ids on the range input.",
+          ru: "Добавляется перед id подсказки и ошибки.",
+        },
+        {
+          name: "labels",
+          type: "Partial<SliderLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
+        },
+        {
           name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "defaultChecked" | "onChange">',
-          en: "`className`, `style` and the other attributes of the root `<div>`; `aria-label` goes to the input.",
-          ru: "`className`, `style` и остальные атрибуты корневого `<div>`; `aria-label` уходит полю.",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `style` and the other attributes of the field frame `<div>`.",
+          ru: "`className`, `style` и остальные атрибуты `<div>` рамки поля.",
         },
       ],
     },
   ],
-  labels: [],
+  labels: [
+    {
+      key: "optional",
+      default: "необязательно",
+      en: "Marker after the label when `optional`.",
+      ru: "Пометка после подписи при `optional`.",
+    },
+  ],
 };
