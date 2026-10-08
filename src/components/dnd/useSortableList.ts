@@ -203,11 +203,8 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
     resolve,
     canDrop: options.canDrop ? (_value, item) => options.canDrop?.(item.id) ?? true : undefined,
     disabled: disabled ?? false,
-    // Wandering off changes nothing for the list the item came from: the hole stays where the
-    // pointer last put it. A foreign item's hole closes when it leaves.
-    onLeave: () => {
-      if (!ownRef.current) setPlacement(null);
-    },
+    // Crossing the gutter to the next list keeps the hole where the pointer last put it.
+    holdsDrop: true,
     onDrop: (insertion, item) => {
       if (insertion.moves) commit(item.id, insertion.before, itemsKey);
     },
@@ -216,16 +213,18 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
   // The item in flight from this kind, and whether it belongs to this list.
   const dragged = useDraggedItem(kind);
   const own = dragged !== null && items.includes(dragged.id);
-  const ownRef = React.useRef(own);
+  // A list a foreign item visited keeps its last placement until the drag ends.
   React.useEffect(() => {
-    ownRef.current = own;
-  });
-  // The pointer is over a different target: the list the item came from closes its hole.
-  const overOther = useStoreSelector(
-    controller.store,
-    (state) => state.overId !== null && state.overId !== target.id,
-  );
-  const showGap = dragged !== null && placement !== null && (own ? !overOther : target.isOver);
+    if (dragged === null) setPlacement(null);
+  }, [dragged]);
+  // The hole stands in exactly one list: the one under the pointer; over empty space, the one the
+  // drop is held at; with nothing held (the pointer last crossed a zone or a refusing list), the
+  // list the item came from.
+  const overId = useStoreSelector(controller.store, (state) => state.overId);
+  const heldId = useStoreSelector(controller.store, (state) => state.heldId);
+  const holdsGap =
+    overId === target.id || (overId === null && (heldId === null ? own : heldId === target.id));
+  const showGap = dragged !== null && placement !== null && holdsGap;
   const gapBefore = showGap ? placement.before : undefined;
   const origin = useStoreSelector(controller.store, (state) => state.origin);
   const radius = useStoreSelector(controller.store, (state) => state.radius);

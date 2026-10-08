@@ -15,6 +15,11 @@ export type DropTargetOptions<TValue, TData = unknown> = {
   canDrop?: ((value: TValue, item: DragItem<TData>) => boolean) | undefined;
   onDrop: (value: TValue, item: DragItem<TData>) => void;
   disabled?: boolean | undefined;
+  /**
+   * The drop stays aimed here while the pointer crosses empty space after leaving (the gutter
+   * between lists), and a release there drops here at the last resolved spot.
+   */
+  holdsDrop?: boolean | undefined;
   onEnter?: ((item: DragItem<TData>) => void) | undefined;
   onLeave?: (() => void) | undefined;
   /** Flashes the target once a drop lands, so the eye can follow where the item went. */
@@ -76,15 +81,26 @@ export function useDropTarget<TValue, TData = unknown>(
     if (!element || disabled) return;
     // The session hands every target the untyped item; this target's kinds decide what it carries.
     const typed = (item: DragItem) => item as DragItem<TData>;
+    // What the pointer last resolved here: a release over empty space drops it.
+    let last: { value: TValue | null; canDrop: boolean } = { value: null, canDrop: false };
     const resolveAt = (point: Point, item: DragItem) => {
       const value = optionsRef.current.resolve(point, typed(item), element);
       const canDrop = value !== null && (optionsRef.current.canDrop?.(value, typed(item)) ?? true);
-      return { value, canDrop };
+      last = { value, canDrop };
+      return last;
+    };
+    const land = (value: TValue | null, canDrop: boolean, item: DragItem) => {
+      setState(OUTSIDE);
+      if (value === null || !canDrop) return;
+      optionsRef.current.onDrop(value, typed(item));
+      // Under reduced motion the flash has no animation, so nothing would end it.
+      if (optionsRef.current.flashOnDrop && !prefersReducedMotion()) setFlashing(true);
     };
     return controller.registerTarget({
       id,
       element,
       accepts: (item) => acceptsFor(optionsRef.current.accepts)(item),
+      holdsDrop: optionsRef.current.holdsDrop ?? false,
       enter: (item) => {
         optionsRef.current.onEnter?.(typed(item));
         setState((current) => (current.isOver ? current : { ...current, isOver: true }));
@@ -102,12 +118,9 @@ export function useDropTarget<TValue, TData = unknown>(
       },
       drop: (point, item) => {
         const { value, canDrop } = resolveAt(point, item);
-        setState(OUTSIDE);
-        if (value === null || !canDrop) return;
-        optionsRef.current.onDrop(value, typed(item));
-        // Under reduced motion the flash has no animation, so nothing would end it.
-        if (optionsRef.current.flashOnDrop && !prefersReducedMotion()) setFlashing(true);
+        land(value, canDrop, item);
       },
+      dropHeld: (item) => land(last.value, last.canDrop, item),
     });
   }, [controller, element, disabled, id]);
 

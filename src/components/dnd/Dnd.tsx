@@ -10,8 +10,13 @@ import { VisuallyHidden } from "@/internal/VisuallyHidden";
 import { DragControllerContext, useDragController } from "./context";
 import styles from "./Dnd.module.css";
 import { DragOverlay } from "./DragOverlay";
-import { createDragController, type DragItem, type DragOutcome } from "./dragSession";
-import type { Point, Rect } from "./geometry";
+import {
+  createDragController,
+  type DragController,
+  type DragItem,
+  type DragOutcome,
+} from "./dragSession";
+import { type Point, type Rect, rectOf } from "./geometry";
 import { type DndLabels, defaultDndLabels } from "./labels";
 import { useStoreSelector } from "./store";
 import { useDragSource } from "./useDragSource";
@@ -278,6 +283,46 @@ function DndSortableItem({
 }
 DndSortableItem.displayName = "Dnd.SortableItem";
 
+/**
+ * Leaves a copy of a gap that is leaving mid-drag, out of the flow at the same spot, and fades it
+ * out. First in its parent, so the items gliding into the hole are drawn over it. A drop or a
+ * cancel ends the drag before the gap goes: then the item itself takes the place, nothing fades.
+ * Measured now, while the node is still drawn; placed after the commit, before the paint, and only
+ * if the node really left (Strict Mode replays an unmount on a node that stays).
+ */
+function fadeOutGap(node: HTMLElement, controller: DragController) {
+  const parent = node.parentElement;
+  const container = node.offsetParent;
+  if (
+    controller.store.getSnapshot().item === null ||
+    !parent ||
+    !container ||
+    prefersReducedMotion() ||
+    typeof node.animate !== "function"
+  ) {
+    return;
+  }
+  const rect = rectOf(node);
+  const box = rectOf(container);
+  const ghost = node.cloneNode(false) as HTMLElement;
+  ghost.removeAttribute("data-dnd-gap");
+  ghost.style.position = "absolute";
+  ghost.style.margin = "0";
+  ghost.style.left = `${rect.left - box.left - container.clientLeft + container.scrollLeft}px`;
+  ghost.style.top = `${rect.top - box.top - container.clientTop + container.scrollTop}px`;
+  queueMicrotask(() => {
+    if (node.isConnected || !parent.isConnected) return;
+    parent.prepend(ghost);
+    const animation = ghost.animate([{ opacity: 1 }, { opacity: 0 }], {
+      ...motionTiming("fast", "exit"),
+      fill: "forwards",
+    });
+    const remove = () => ghost.remove();
+    animation.addEventListener("finish", remove, { once: true });
+    animation.addEventListener("cancel", remove, { once: true });
+  });
+}
+
 function DndPlaceholder({
   as: Tag,
   width,
@@ -289,16 +334,31 @@ function DndPlaceholder({
   height: number;
   radius: string | null;
 }) {
-  const faded = React.useRef(false);
+  const controller = useDragController();
+  const nodeRef = React.useRef<HTMLElement | null>(null);
+  const entered = React.useRef(false);
+
   // Fades in once per gap. Not `enterMotion`: React re-inserts the gap's node as it moves through the
-  // list, which restarts a CSS animation, and it may re-attach the ref, so the flag (not the node)
-  // decides; a WAAPI animation keeps running through the move.
+  // list, which restarts a CSS animation, and Strict Mode re-attaches the ref, so the flag (not the
+  // node) decides; a WAAPI animation keeps running through the move.
   const ref = React.useCallback((node: HTMLElement | null) => {
-    if (!node || faded.current) return;
-    faded.current = true;
+    nodeRef.current = node;
+    if (!node || entered.current) return;
+    entered.current = true;
     if (prefersReducedMotion() || typeof node.animate !== "function") return;
     node.animate([{ opacity: 0 }, { opacity: 1 }], motionTiming("base", "enter"));
   }, []);
+
+  // The gap leaves mid-drag (the pointer moved on to another list or a zone): it fades out on the
+  // spot while the items close the hole, and the next gap fades in where the item would land. Read
+  // before React detaches the node, so it is still drawn where the person saw it.
+  React.useLayoutEffect(
+    () => () => {
+      const node = nodeRef.current;
+      if (node) fadeOutGap(node, controller);
+    },
+    [controller],
+  );
   return (
     <Tag
       ref={ref}

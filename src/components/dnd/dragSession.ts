@@ -26,6 +26,11 @@ export type DragSnapshot = {
   pointerKind: PointerKind | null;
   /** The drop target the pointer is over right now, by registered id. */
   overId: string | null;
+  /**
+   * The `holdsDrop` target the drop stays aimed at while the pointer crosses empty space: the last
+   * one it was over that would take the item. Null once the pointer is over any other target.
+   */
+  heldId: string | null;
   canDrop: boolean;
   /** The rect the lifted element occupied when the drag began: the size of the gap a list opens for it. */
   origin: Rect | null;
@@ -41,6 +46,7 @@ export const IDLE_SNAPSHOT: DragSnapshot = {
   item: null,
   pointerKind: null,
   overId: null,
+  heldId: null,
   canDrop: false,
   origin: null,
   grab: null,
@@ -52,11 +58,15 @@ export type DropTargetEntry = {
   id: string;
   element: HTMLElement;
   accepts: (item: DragItem) => boolean;
+  /** Keeps the drop while the pointer crosses empty space (the gutter between two lists). */
+  holdsDrop: boolean;
   enter: (item: DragItem) => void;
   /** Called on every resolved pointer position; returns whether a drop here would be accepted. */
   over: (point: Point, item: DragItem) => boolean;
   leave: () => void;
   drop: (point: Point, item: DragItem) => void;
+  /** Drops where the pointer was last over this target: the release came over empty space. */
+  dropHeld: (item: DragItem) => void;
 };
 
 export type DragPreview = {
@@ -152,6 +162,7 @@ export function createDragController(
     element: HTMLElement;
     origin: Rect;
     over: DropTargetEntry | null;
+    held: DropTargetEntry | null;
     point: Point;
     scrollers: HTMLElement[];
     /** The element `scrollers` was computed for; they are re-read only when it changes. */
@@ -205,11 +216,14 @@ export function createDragController(
       next?.enter(active.item);
     }
     const canDrop = next ? next.over(active.point, active.item) : false;
+    // Empty space changes nothing: the pointer is on its way between two targets.
+    if (next) active.held = next.holdsDrop && canDrop ? next : null;
     const overId = next?.id ?? null;
+    const heldId = active.held?.id ?? null;
     store.setState((current) =>
-      current.overId === overId && current.canDrop === canDrop
+      current.overId === overId && current.heldId === heldId && current.canDrop === canDrop
         ? current
-        : { ...current, overId, canDrop },
+        : { ...current, overId, heldId, canDrop },
     );
     // The pointer scrolls what is under it or, with nothing under it, the box the drag came out of.
     // Walking the ancestors reads computed styles, so it is done once per target, not per move.
@@ -283,6 +297,7 @@ export function createDragController(
       item: null,
       pointerKind: null,
       overId: null,
+      heldId: null,
       canDrop: false,
       origin: null,
       grab: null,
@@ -313,6 +328,7 @@ export function createDragController(
       element,
       origin,
       over: null,
+      held: null,
       point,
       scrollers: scrollableAncestors(element),
       scrollersFor: element,
@@ -382,6 +398,10 @@ export function createDragController(
       const target = hitTest(point, active.item);
       if (target?.over(point, active.item)) {
         target.drop(point, active.item);
+        say("dropped", active.item);
+        finish("drop");
+      } else if (!target && active.held) {
+        active.held.dropHeld(active.item);
         say("dropped", active.item);
         finish("drop");
       } else {
@@ -469,6 +489,10 @@ export function createDragController(
     return () => {
       targets.delete(entry);
       if (active?.over === entry) active.over = null;
+      if (active?.held === entry) {
+        active.held = null;
+        store.setState((current) => ({ ...current, heldId: null }));
+      }
     };
   };
 

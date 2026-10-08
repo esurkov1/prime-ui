@@ -5,9 +5,17 @@ import { type Point, rectOf } from "./geometry";
 const EDGE_PX = 64;
 const MAX_SPEED_PX_PER_MS = 1.1;
 
-function isScrollable(element: Element): boolean {
+const SCROLLS = /^(auto|scroll|overlay)$/;
+
+/** The axes a person can scroll the element along; `hidden` and `clip` are not among them. */
+function scrollAxes(element: Element): { x: boolean; y: boolean } {
   const style = getComputedStyle(element);
-  return /(auto|scroll|overlay)/.test(`${style.overflowY} ${style.overflowX}`);
+  return { x: SCROLLS.test(style.overflowX), y: SCROLLS.test(style.overflowY) };
+}
+
+function isScrollable(element: Element): boolean {
+  const axes = scrollAxes(element);
+  return axes.x || axes.y;
 }
 
 /** Scrollable boxes between `element` and the root, innermost first: a list that can still scroll wins over the page. */
@@ -51,10 +59,17 @@ export function autoScrollStep(
 ): boolean {
   for (const container of containers) {
     const rect = boundsOf(container);
-    const dy =
-      speedFor(point.y - rect.top) * -1 * elapsedMs + speedFor(rect.bottom - point.y) * elapsedMs;
-    const dx =
-      speedFor(point.x - rect.left) * -1 * elapsedMs + speedFor(rect.right - point.x) * elapsedMs;
+    // Only along an axis the box scrolls: a column with `overflow-x: hidden` still takes a
+    // `scrollLeft` once something overflows it (a gap gliding in from the next column), and would
+    // slide sideways under the pointer and snap back when the glide ends.
+    const axes =
+      container === document.scrollingElement ? { x: true, y: true } : scrollAxes(container);
+    const dy = axes.y
+      ? speedFor(point.y - rect.top) * -1 * elapsedMs + speedFor(rect.bottom - point.y) * elapsedMs
+      : 0;
+    const dx = axes.x
+      ? speedFor(point.x - rect.left) * -1 * elapsedMs + speedFor(rect.right - point.x) * elapsedMs
+      : 0;
     if (dy === 0 && dx === 0) continue;
     const beforeTop = container.scrollTop;
     const beforeLeft = container.scrollLeft;

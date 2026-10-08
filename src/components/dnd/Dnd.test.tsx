@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { autoScrollStep } from "./autoScroll";
 import { Dnd } from "./Dnd";
 import { insertionBefore } from "./geometry";
 import { moveBefore } from "./useSortableList";
@@ -804,6 +805,108 @@ describe("connected lists", () => {
     expect(screen.getByLabelText("left").querySelector("[data-dnd-gap]")).toBeNull();
     expect(screen.getByLabelText("right").querySelector("[data-dnd-gap]")).not.toBeNull();
     releaseAt(210, 10);
+  });
+
+  it("keeps the gap in the list it left while the pointer crosses the gutter", () => {
+    const onMove = vi.fn();
+    render(<Columns onMove={onMove} />);
+    stubColumns();
+    pressOn(screen.getByTestId("row-b"), 10, 25);
+    moveTo(210, 5);
+    // Between the lists: over nothing, the drop stays aimed at the right list.
+    moveTo(150, 5);
+    expect(screen.getByLabelText("left").querySelector("[data-dnd-gap]")).toBeNull();
+    expect(screen.getByLabelText("right").querySelector("[data-dnd-gap]")).not.toBeNull();
+    releaseAt(150, 5);
+    expect(onMove).toHaveBeenCalledWith("right", "b", "x");
+    expect(screen.getByRole("status")).toHaveTextContent("перемещён");
+  });
+
+  it("returns the gap to the source list after a refusing list", () => {
+    const onMove = vi.fn();
+    render(<Columns onMove={onMove} />);
+    stubColumns();
+    pressOn(screen.getByTestId("row-a"), 10, 5);
+    moveTo(210, 30);
+    moveTo(150, 30);
+    expect(screen.getByLabelText("right").querySelector("[data-dnd-gap]")).toBeNull();
+    expect(screen.getByLabelText("left").querySelector("[data-dnd-gap]")).not.toBeNull();
+    releaseAt(150, 30);
+    expect(onMove).not.toHaveBeenCalled();
+  });
+
+  it("fades the gap out in the list it left and in where it opens", async () => {
+    const animate = vi.fn(function (this: HTMLElement) {
+      return { cancel: () => {}, addEventListener: () => {} };
+    });
+    Object.defineProperty(HTMLElement.prototype, "animate", { configurable: true, value: animate });
+    // jsdom lays nothing out: the list stands in for the positioned box.
+    const offsetParent = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetParent");
+    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
+      configurable: true,
+      get(this: HTMLElement) {
+        return this.parentElement;
+      },
+    });
+    vi.stubGlobal("matchMedia", () => ({
+      matches: false,
+      addEventListener() {},
+      removeEventListener() {},
+    }));
+    try {
+      render(<Columns onMove={() => {}} />);
+      stubColumns();
+      pressOn(screen.getByTestId("row-b"), 10, 25);
+      moveTo(10, 30);
+      animate.mockClear();
+      await act(async () => {
+        moveTo(210, 5);
+      });
+      const left = screen.getByLabelText("left");
+      const gap = screen.getByLabelText("right").querySelector("[data-dnd-gap]");
+      const frames = (node: Element | null) =>
+        (animate.mock.calls as unknown as Array<[Array<Record<string, unknown>>]>)
+          .filter((_, index) => animate.mock.contexts[index] === node)
+          .map(([keyframes]) => keyframes);
+      // The left gap is gone; a copy out of the flow fades out on its spot (second row, top 20).
+      expect(left.querySelector("[data-dnd-gap]")).toBeNull();
+      const ghost = left.firstElementChild as HTMLElement;
+      expect(ghost.getAttribute("aria-hidden")).toBe("true");
+      expect(ghost.style.position).toBe("absolute");
+      expect(ghost.style.top).toBe("20px");
+      expect(frames(ghost)).toEqual([[{ opacity: 1 }, { opacity: 0 }]]);
+      // The right one fades in on its own spot: nothing flies across.
+      expect(frames(gap)).toEqual([[{ opacity: 0 }, { opacity: 1 }]]);
+      releaseAt(210, 5);
+      await act(async () => {});
+    } finally {
+      vi.unstubAllGlobals();
+      Reflect.deleteProperty(HTMLElement.prototype, "animate");
+      if (offsetParent) Object.defineProperty(HTMLElement.prototype, "offsetParent", offsetParent);
+    }
+  });
+});
+
+describe("auto-scroll", () => {
+  it("scrolls only along the axes the box scrolls", () => {
+    render(<div data-testid="column" style={{ overflowX: "hidden", overflowY: "auto" }} />);
+    const column = screen.getByTestId("column");
+    vi.spyOn(column, "getBoundingClientRect").mockReturnValue({
+      left: 0,
+      top: 0,
+      right: 100,
+      bottom: 100,
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    // Near the right edge, mid-height: only a sideways scroll would be asked for.
+    autoScrollStep([column], { x: 98, y: 50 }, 16);
+    expect(column.scrollLeft).toBe(0);
+    autoScrollStep([column], { x: 50, y: 98 }, 16);
+    expect(column.scrollTop).toBeGreaterThan(0);
   });
 });
 

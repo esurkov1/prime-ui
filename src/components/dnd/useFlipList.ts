@@ -11,7 +11,7 @@ import { layoutRect } from "./geometry";
  */
 export function motionTiming(
   duration: "fast" | "base",
-  curve: "standard" | "enter" = "standard",
+  curve: "standard" | "enter" | "exit" = "standard",
 ): KeyframeAnimationOptions {
   const easing = getComputedStyle(document.documentElement)
     .getPropertyValue(`--prime-motion-easing-${curve}`)

@@ -98,6 +98,11 @@ export function DragOverlay({ controller }: { controller: DragController }) {
       };
       const attempt = (retry: boolean) => {
         if (endTokenRef.current !== token) return;
+        // `animate` is missing in jsdom, where consumers test screens built with the kit.
+        if (typeof host.animate !== "function") {
+          settle(host);
+          return;
+        }
         const destination = destinationFor();
         if (!destination) {
           // The owner may not have committed yet; after that the item is simply somewhere else.
