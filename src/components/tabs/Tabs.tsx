@@ -151,16 +151,24 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
     };
   }, [activeValue, isBar]);
 
-  // Keep the active tab visible inside a scrolling list.
+  // Keep the active tab visible inside a scrolling list. Only the list scrolls: `scrollIntoView`
+  // would also scroll the page to the tabs (on mount too).
   React.useEffect(() => {
     const list = listRef.current;
     if (!list || !activeValue || list.scrollWidth <= list.clientWidth) return;
     const active = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
-    active?.scrollIntoView({
-      block: "nearest",
-      inline: "nearest",
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-    });
+    if (!active) return;
+    const start = active.offsetLeft;
+    const end = start + active.offsetWidth;
+    const left =
+      start < list.scrollLeft
+        ? start
+        : end > list.scrollLeft + list.clientWidth
+          ? end - list.clientWidth
+          : null;
+    if (left !== null) {
+      list.scrollTo({ left, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    }
   }, [activeValue]);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLElement>) {

@@ -453,6 +453,44 @@ describe("Tabs — indicator", () => {
     vi.restoreAllMocks();
   });
 
+  it("scrolls only the list to the selected tab, never the page", () => {
+    const scrollIntoView = vi.fn();
+    const scrollTo = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView,
+    });
+    Object.defineProperty(HTMLElement.prototype, "scrollTo", {
+      configurable: true,
+      value: scrollTo,
+    });
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(400);
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(200);
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(100);
+    vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      return this.dataset.value === "tab3" ? 300 : 0;
+    });
+    try {
+      render(
+        <Tabs.Root defaultValue="tab1">
+          <Tabs.List>
+            <Tabs.Item value="tab1">Tab 1</Tabs.Item>
+            <Tabs.Item value="tab3">Tab 3</Tabs.Item>
+          </Tabs.List>
+        </Tabs.Root>,
+      );
+      fireEvent.click(screen.getByRole("tab", { name: "Tab 3" }));
+      expect(scrollTo).toHaveBeenLastCalledWith({ left: 200, behavior: "auto" });
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    } finally {
+      Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+      Reflect.deleteProperty(HTMLElement.prototype, "scrollTo");
+      vi.restoreAllMocks();
+    }
+  });
+
   it("uses a pill indicator in a vertical list", () => {
     render(<BasicTabs orientation="vertical" />);
     expect(screen.getByRole("tablist")).toHaveAttribute("data-indicator", "pill");
