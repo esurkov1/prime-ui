@@ -65,7 +65,13 @@ to hold (a running job, a status line) → Spinner. Nothing to show → EmptyPag
 loading, data, empty and error, or showing one record at a time → its content in
 `Crossfade state={status}`, with a Skeleton as the loading state (DataTable's body does both by itself).
 
-**Overlays.** See the pairs below. Global search over commands and pages (⌘K) → CommandMenu.
+**Overlays.** See the pairs below. Global search over commands and pages (⌘K) → CommandMenu. A short
+task on a phone (a date, an action, two fields) → `Drawer.Content side="bottom"`. Menus, selects and
+pickers turn into bottom sheets below 640px by themselves — never build your own.
+
+**Phone navigation.** App navigation is Sidebar on a wide screen and `BottomNav` in `AppShell.Footer`
+on a phone for 3–5 main sections (it leaves by itself once the footer is 640px wide) — not Tabs, not a
+Drawer menu.
 
 **App frame.** Sidebar collapse control: `Sidebar.Toggle variant="header"` next to `Sidebar.Brand` in
 `Sidebar.Header` — at the header's end while expanded, a small round button on the rail's edge while

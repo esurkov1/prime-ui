@@ -28,8 +28,8 @@ everything inside a page breaks by its container.
 | Width | Typical | What changes |
 |---|---|---|
 | < 640 | phone | one column; floating layers become bottom sheets; Modal is a bottom sheet; Drawer full width; `BottomNav` in `AppShell.Footer` |
-| 640–767 | small tablet | gutters 24; two-column grids by `auto-fill` |
-| 768–1023 | tablet | Sidebar on-canvas (`offCanvas="auto"`); BottomNav hidden |
+| 640–767 | small tablet | gutters 24; two-column grids by `auto-fill`; BottomNav leaves (it follows the footer's width) |
+| 768–1023 | tablet | Sidebar on-canvas (`offCanvas="auto"`) |
 | 1024–1279 | laptop | gutters 32; list + details side by side when the content asks for it |
 | ≥ 1280 | desktop | extra columns or a side panel; tables and dashboards use every pixel |
 
@@ -48,13 +48,13 @@ Use these as they are; never wrap them in your own breakpoints.
 | Need | Built in |
 |---|---|
 | app frame | AppShell gutters 16 → 24 → 32; `AppShell.Header` un-sticks on screens lower than 480px and respects safe areas |
-| app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by a menu button in `AppShell.Header`; `BottomNav` in `AppShell.Footer` for 3–5 app sections on phones |
+| app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by a menu button in `AppShell.Header`; `BottomNav` in `AppShell.Footer` for 3–5 app sections on phones — flat or a floating glass capsule (`floating`), icons with or without labels (`iconOnly`); it hides by itself once the footer is 640px wide |
 | page panel | `PageToolbar` — one row when wide, exactly two rows when narrow (below) |
 | page header | `PageContent.Header`: actions wrap under the title |
 | switchers | SegmentedControl and Tabs never wrap: they scroll inside themselves (hidden scrollbar), the active item is scrolled into view, stretched items tend to equal width, the indicator moves only after a person's choice; Tabs collapse icons and descriptions first |
 | tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn`, `hiddenColumns` for a column chooser, the toolbar stacks below a 30rem table, sticky head off on short screens |
-| floating layers | Popover, Dropdown, Select (and Datepicker, ColorPresets) never wider than the viewport − 16, 8 from the edges, flip when out of room; below 640 they open as a bottom sheet with a scrim and a grab handle; Tooltip and TagSelect stay anchored |
-| dialogs | Modal is a bottom sheet below 640 (swipe down to close when it can be dismissed); footer actions stack below a 30rem dialog; `Drawer.Content side="bottom"` for an app-level sheet |
+| floating layers | Popover (opened from a Trigger), Dropdown, Select (and Datepicker, ColorPresets) never wider than the viewport − 16, 8 from the edges, flip when out of room; below 640 they open as a bottom sheet — scrim, grab handle, swipe down to close, page scroll locked; Tooltip and TagSelect stay anchored |
+| dialogs | Modal is a bottom sheet with a handle below 640 (swipe down closes it while `closeOnOutsideClick` allows); footer actions stack on phones and in a dialog narrower than 360px; `Drawer.Content side="bottom"` is a sheet for a short task, and any drawer closes with a swipe toward its edge |
 | date picking | Datepicker shows two months and side presets only when they fit; otherwise one month and presets above |
 | messages | Banner actions move under the text in a narrow container; Notification stays within the viewport with safe-area insets |
 | cards | Card templates stack and wrap in a narrow container |

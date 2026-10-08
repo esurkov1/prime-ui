@@ -26,9 +26,7 @@ export default function DigitInputInFormExample() {
         error={error}
         onValueChange={() => setError(undefined)}
       />
-      <Button.Root type="submit">
-        Привязать карту
-      </Button.Root>
+      <Button.Root type="submit">Привязать карту</Button.Root>
     </form>
   );
 }
