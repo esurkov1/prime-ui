@@ -107,6 +107,18 @@ describe("Kanban", () => {
     expect(titles("К выполнению")).toEqual(["Счёт для «Севера»", "Отчёт по складу"]);
   });
 
+  it("follows the writing direction: in right-to-left Alt+← moves to the next column", () => {
+    render(
+      <div dir="rtl">
+        <Board />
+      </div>,
+    );
+    fireEvent.keyDown(screen.getByTestId("card-a"), { key: "ArrowLeft", altKey: true });
+    expect(titles("В работе")).toEqual(["Счёт для «Севера»", "Онбординг"]);
+    fireEvent.keyDown(screen.getByTestId("card-a"), { key: "ArrowRight", altKey: true });
+    expect(titles("К выполнению")).toEqual(["Счёт для «Севера»", "Отчёт по складу"]);
+  });
+
   it("does nothing past the first or last column and without Alt", () => {
     const onValueChange = vi.fn();
     render(<Board onValueChange={onValueChange} />);

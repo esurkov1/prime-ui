@@ -136,7 +136,7 @@ Motion: the hover wash and the empty well fade on opacity (`fast`, `standard`); 
 |---|---|
 | `Tab` | Moves through the cards, column by column. |
 | `Alt + ↑` · `Alt + ↓` | Moves the card one place inside its column. |
-| `Alt + ←` · `Alt + →` | Moves the card to the neighbouring column at the same row (or its end); focus follows it. |
+| `Alt + ←` · `Alt + →` | Moves the card to the neighbouring column at the same row (or its end); focus follows it. The direction follows the writing direction (`dir="rtl"`: ← is the next column). |
 | `Escape` | Cancels a drag in flight. |
 
 ### ARIA

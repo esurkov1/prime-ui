@@ -402,7 +402,10 @@ function KanbanItem({
         if (event.defaultPrevented || locked || !event.altKey) return;
         if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
         event.preventDefault();
-        board.moveAcross(id, event.key === "ArrowLeft" ? -1 : 1);
+        // Columns follow the writing direction: in right-to-left the next column is on the left.
+        const rtl = event.currentTarget.closest("[dir]")?.getAttribute("dir") === "rtl";
+        const towardStart = event.key === (rtl ? "ArrowRight" : "ArrowLeft");
+        board.moveAcross(id, towardStart ? -1 : 1);
       }}
     >
       <ControlSizeProvider value="m">{children}</ControlSizeProvider>
