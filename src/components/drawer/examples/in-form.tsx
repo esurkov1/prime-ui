@@ -1,4 +1,4 @@
-/** A settings form in the panel: the footer button submits the form and an empty name keeps it open — `Drawer.Body`, `Drawer.Footer`, `error`. */
+/** A settings form in the panel: the footer button submits the form and an empty name shakes the field and keeps it open until it is filled — `Drawer.Body`, `Drawer.Footer`, `error`. */
 import { Button, Drawer, Icon, Input, Select, Switch } from "prime-ui-kit";
 import * as React from "react";
 
@@ -44,7 +44,12 @@ export default function DrawerInFormExample() {
           <form id={formId} className={styles.form} noValidate onSubmit={submit}>
             <Input.Root label="Название" required error={error} reserveSupportRow>
               <Input.Wrapper>
-                <Input.Field name="name" defaultValue="Команда продукта" autoFocus />
+                <Input.Field
+                  name="name"
+                  defaultValue="Команда продукта"
+                  autoFocus
+                  onValueChange={() => setError(undefined)}
+                />
               </Input.Wrapper>
             </Input.Root>
             <Input.Root label="Адрес" hint="Только латиница, цифры и дефис">

@@ -1,4 +1,4 @@
-/** Regional settings form: the required country is checked on submit, the error replaces the hint — `required`, `error`, `hint`. */
+/** Regional settings form: the required country is checked on submit, the error shakes the field and leaves once a country is picked, a calm note confirms the save — `required`, `error`, `hint`. */
 import { Button, Select, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -7,10 +7,12 @@ import styles from "./examples.module.css";
 export default function SelectInFormExample() {
   const [country, setCountry] = React.useState("");
   const [error, setError] = React.useState<string>();
+  const [saved, setSaved] = React.useState(false);
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(country ? undefined : "Выберите страну");
+    setSaved(Boolean(country));
   };
 
   return (
@@ -33,6 +35,7 @@ export default function SelectInFormExample() {
           onValueChange={(value) => {
             setCountry(value);
             setError(undefined);
+            setSaved(false);
           }}
         >
           <Select.Trigger>
@@ -44,7 +47,12 @@ export default function SelectInFormExample() {
             <Select.Item value="am">Армения</Select.Item>
           </Select.Content>
         </Select.Root>
-        <Select.Root label="Часовой пояс" hint="Время в отчётах и уведомлениях" defaultValue="msk">
+        <Select.Root
+          label="Часовой пояс"
+          hint="Время в отчётах и уведомлениях"
+          defaultValue="msk"
+          onValueChange={() => setSaved(false)}
+        >
           <Select.Trigger>
             <Select.Value />
           </Select.Trigger>
@@ -56,7 +64,21 @@ export default function SelectInFormExample() {
         </Select.Root>
       </div>
       <div className={styles.formActions}>
-        <Button.Root variant="ghost" tone="neutral" type="reset">
+        {saved ? (
+          <Typography as="p" variant="body-s" tone="secondary">
+            Настройки сохранены
+          </Typography>
+        ) : null}
+        <Button.Root
+          variant="ghost"
+          tone="neutral"
+          type="reset"
+          onClick={() => {
+            setCountry("");
+            setError(undefined);
+            setSaved(false);
+          }}
+        >
           Отменить
         </Button.Root>
         <Button.Root type="submit">Сохранить</Button.Root>

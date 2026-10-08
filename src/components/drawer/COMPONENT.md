@@ -182,7 +182,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Drawer.Body`. |
 | [dismiss.tsx](examples/dismiss.tsx) | An import closes only from its buttons, and not at all while it runs — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the state and opens the drawer from a link, without a trigger — `open`, `onOpenChange`. |
-| [in-form.tsx](examples/in-form.tsx) | A settings form in the panel: the footer button submits the form and an empty name keeps it open — `Drawer.Body`, `Drawer.Footer`, `error`. |
+| [in-form.tsx](examples/in-form.tsx) | A settings form in the panel: the footer button submits the form and an empty name shakes the field and keeps it open until it is filled — `Drawer.Body`, `Drawer.Footer`, `error`. |
 
 ## Mistakes
 - A delete confirmation in a Drawer → use Modal.

@@ -140,7 +140,7 @@ Shared by `Datepicker.Root` and `Datepicker.Panel`.
 | empty | no value | `data-empty="true"`, `labels.placeholder` (or `placeholder`) in placeholder color |
 | open | click, `open` | `data-state="open"`, `field-bg-focus` fill, the chevron turns |
 | focus-visible | keyboard | inset focus ring; none with `focusRing={false}` (`data-focus-ring="false"`) |
-| invalid | `invalid`, `error` | `data-invalid`, `aria-invalid`, inset `danger-border` ring |
+| invalid | `invalid`, `error` | `data-invalid`, `aria-invalid`, inset `danger-border` ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled`, `field-bg-disabled`, cannot open |
 | today | the current day | `data-today`, `aria-current="date"`, accent text |
 | selected / band | value | day `aria-pressed`, `data-edge`; cell `data-band="selected" \| "preview"`, `data-band-start` / `-end` |
@@ -201,13 +201,13 @@ Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` 
 | [overview.tsx](examples/overview.tsx) | A shipping date field: a click opens one month, a picked day applies at once — `mode`, `label`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: the field is 28 to 48 px high, the day cell of the panel 24 to 40 px — `size`. |
 | [states.tsx](examples/states.tsx) | An empty field with the default placeholder, a filled one and a disabled one — `disabled`. |
-| [validation.tsx](examples/validation.tsx) | A required leave period with a hint, the same field with an error and an optional return date — `required`, `hint`, `error`, `optional`. |
+| [validation.tsx](examples/validation.tsx) | A leave period checked live: the error shakes in, names the broken rule and leaves once the period fits; an optional return date — `required`, `hint`, `error`, `optional`. |
 | [range-presets.tsx](examples/range-presets.tsx) | A report period: presets aside, two months, a step prompt, time fields with Reset / Apply, no future days — `presets`, `months`, `prompt`, `footer`, `withTime`, `disableFuture`. |
 | [inline-panel.tsx](examples/inline-panel.tsx) | A booking calendar embedded in the page: its own card, two months when the parent has room, the range applies at once — `Datepicker.Panel`, `months`, `prompt`. |
 | [yearless.tsx](examples/yearless.tsx) | An annual price change date: day and month without a year, a value prefix and taken days disabled — `yearless`, `valuePrefix`, `isDayDisabled`. |
 | [controlled.tsx](examples/controlled.tsx) | A report filter owns the period: quick buttons set it from outside, the field shows it — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the panel: a reminder button opens the calendar from code, a picked day closes it — `open`, `onOpenChange`. |
-| [in-form.tsx](examples/in-form.tsx) | A leave request form: a required period that turns into an error after submit and an optional return date — `required`, `error`, `optional`. |
+| [in-form.tsx](examples/in-form.tsx) | A leave request form: submit checks the required period, the error shakes in and leaves once the period is fixed; an optional return date — `required`, `error`, `optional`. |
 | [narrow.tsx](examples/narrow.tsx) | An embedded panel in a 320 px column: one compact month instead of two, the footer fields wrap above the buttons — `months`, `footer`. |
 
 ## Mistakes

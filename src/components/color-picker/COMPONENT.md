@@ -307,13 +307,13 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | [overview.tsx](examples/overview.tsx) | A color field: a hex value and a swatch button that opens the picker panel — `ColorPicker.HexInput`, `ColorPicker.TriggerSwatch`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size of the hex field with a swatch button of the same tier — `size`. |
 | [states.tsx](examples/states.tsx) | A disabled area and hue slider keep showing the color but take no input — `disabled`. |
-| [validation.tsx](examples/validation.tsx) | A hint under the hex field and an error that replaces it; invalid text reverts on blur — `hint`, `error`. |
+| [validation.tsx](examples/validation.tsx) | A button color checked live: a too light color shakes in an error that leaves once the color is darker; a hint under the other field, invalid text reverts on blur — `hint`, `error`. |
 | [panel.tsx](examples/panel.tsx) | The full raised panel and its part order: format, area, hue and alpha sliders, channels, brand swatches — `ColorPicker.Panel`, `surface`, `ColorPicker.Swatches`. |
 | [formats.tsx](examples/formats.tsx) | The channel strip in each value format; three pickers edit one color — `defaultFormat`, `ColorPicker.ChannelStrip`. |
 | [presets.tsx](examples/presets.tsx) | A quick color from the palette: a square trigger next to a field and a Button trigger; «no color» allowed — `ColorPresets`, `allowEmpty`, `asChild`. |
 | [presets-sizes.tsx](examples/presets-sizes.tsx) | The preset trigger in every size, a square of the control height next to an input of the same tier — `ColorPresets`, `size`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the color: brand swatches and the hex field edit it, a button resets it — `value`, `onValueChange`. |
-| [in-form.tsx](examples/in-form.tsx) | Theme settings: the color goes with the form and a too light color fails on save — `value`, `error`. |
+| [in-form.tsx](examples/in-form.tsx) | Theme settings: the color goes with the form, a too light color shakes in an error on save that leaves once the color changes — `value`, `error`. |
 
 ## Mistakes
 - Trigger in one `ColorPicker.Root` and panel in another → they will not share the color; wrap both in one Root.

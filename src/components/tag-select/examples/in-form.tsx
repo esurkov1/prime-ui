@@ -1,4 +1,4 @@
-/** A new task form: the required labels field is checked on submit and its error replaces the hint — `required`, `error`, `creatable`. */
+/** A new task form: the required labels field is checked on submit, its error shakes the field and leaves once a label is added, a calm note confirms the task — `required`, `error`, `creatable`. */
 import { Button, Input, TagSelect, type TagSelectOption, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -19,10 +19,12 @@ const PEOPLE: TagSelectOption[] = [
 export default function TagSelectInFormExample() {
   const [labels, setLabels] = React.useState<string[]>([]);
   const [error, setError] = React.useState<string>();
+  const [saved, setSaved] = React.useState(false);
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(labels.length ? undefined : "Добавьте хотя бы одну метку");
+    setSaved(labels.length > 0);
   };
 
   return (
@@ -45,13 +47,28 @@ export default function TagSelectInFormExample() {
         onValueChange={(next) => {
           setLabels(next);
           setError(undefined);
+          setSaved(false);
         }}
         creatable
         placeholder="Добавить метку"
       />
       <TagSelect label="Наблюдатели" optional options={PEOPLE} placeholder="Добавить человека" />
       <div className={styles.actions}>
-        <Button.Root variant="ghost" tone="neutral" type="reset">
+        {saved ? (
+          <Typography as="p" variant="body-s" tone="secondary">
+            Задача создана
+          </Typography>
+        ) : null}
+        <Button.Root
+          variant="ghost"
+          tone="neutral"
+          type="reset"
+          onClick={() => {
+            setLabels([]);
+            setError(undefined);
+            setSaved(false);
+          }}
+        >
           Отмена
         </Button.Root>
         <Button.Root type="submit">Создать задачу</Button.Root>

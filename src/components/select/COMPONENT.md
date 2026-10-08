@@ -159,7 +159,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 |---|---|---|
 | empty | no value | `data-placeholder="true"` on Value, placeholder color |
 | open | `open` / click / arrows | trigger `data-state="open"`, `aria-expanded`; panel `data-state`, `data-side`; chevron turns 180° |
-| invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the trigger; error text below |
+| invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the trigger; error text below; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled="true"` |
 | loading | `loading` | `data-loading="true"`, `aria-busy`; status row in the list |
 | searching | typing in the search | panel `data-searching="true"`; groups without matches and separators hide; the match in an option's title, description and plain text is a `<mark>` in `accent-text` (not in the trigger) |
@@ -209,7 +209,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | [overview.tsx](examples/overview.tsx) | A labelled field with a placeholder; picking an option closes the list and shows its label — `label`, `placeholder`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; the label, the list rows and the hint take the tier of the field — `size`. |
 | [states.tsx](examples/states.tsx) | A default field next to a disabled, a loading, an invalid one and a list with nothing in it — `disabled`, `loading`, `invalid`, `labels`. |
-| [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint, and an error that replaces the hint in the same row — `required`, `optional`, `hint`, `error`. |
+| [validation.tsx](examples/validation.tsx) | Live validation: unassigning the owner shakes the field and drops the error in, picking someone clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A leading icon in the trigger and an icon before every option label — `Select.TriggerIcon`, `Select.ItemIcon`. |
 | [multiple.tsx](examples/multiple.tsx) | Several values: checkboxes in the list, the list stays open on a pick, labels joined in the trigger — `multiple`. |
 | [searchable.tsx](examples/searchable.tsx) | A long list with a search field: options match their label and keywords, groups and the separator hide while searching — `searchable`, `keywords`, `Select.Group`. |
@@ -217,7 +217,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | [rich-options.tsx](examples/rich-options.tsx) | Options with a picture, a second line and a price; the trigger draws the picked option with the same parts — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: the plan drives the price under the field and a button resets it — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the list: a button opens it from code, a pick or Escape closes it — `open`, `onOpenChange`. |
-| [in-form.tsx](examples/in-form.tsx) | Regional settings form: the required country is checked on submit, the error replaces the hint — `required`, `error`, `hint`. |
+| [in-form.tsx](examples/in-form.tsx) | Regional settings form: the required country is checked on submit, the error shakes the field and leaves once a country is picked, a calm note confirms the save — `required`, `error`, `hint`. |
 
 ## Mistakes
 - A Label + `aria-labelledby` next to the field → pass `label`, `hint`, `error` to `Select.Root`.

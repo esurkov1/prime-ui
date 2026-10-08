@@ -27,7 +27,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "validation",
       description:
-        "Пометки обязательного и необязательного поля, подсказка, ошибка и строка поддержки без сдвига — `required`, `optional`, `hint`, `error`, `reserveSupportRow`.",
+        "Живая проверка: с ошибкой поле встряхивается, сообщение выезжает и уходит, как только значение исправлено; пометки обязательного и необязательного поля, подсказка и строка поддержки без сдвига — `required`, `optional`, `hint`, `error`, `reserveSupportRow`.",
     },
     {
       slot: "with-icon",
@@ -58,7 +58,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "in-form",
       description:
-        "Реквизиты компании: обязательные поля проверяются при отправке, соседние поля держат низ на одной линии — `required`, `error`, `reserveSupportRow`.",
+        "Реквизиты компании: обязательные поля проверяются при отправке, ошибка уходит, как только поле исправлено, а сохранённая форма красит кнопку в зелёный; соседние поля держат низ на одной линии — `required`, `error`, `reserveSupportRow`.",
     },
   ],
   api,

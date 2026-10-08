@@ -266,7 +266,8 @@ Every component is designed with its micro-animations, not only its static state
    swapping its content uses `Crossfade` (inside a component: `useStateSwap` + `swapMotion`), and its
    loading state is a `Skeleton` of the coming content (principle 7).
 9. **Interruptible.** Toggled state uses CSS transitions (retarget mid-flight), not keyframes. Keyframes only
-   for one-shot enter/exit (overlay presence, spinner, skeleton) and one-shot icon gestures (rule 13).
+   for one-shot enter/exit (overlay presence, spinner, skeleton) and one-shot gestures (icons, rule 13;
+   a field's error shake, rule 14).
 10. **Hover is for pointers.** Hover transforms/lifts only inside `@media (hover: hover) and (pointer: fine)`;
     plain color hover is fine. No hover movement on dense rows and cells, except the icon gesture (rule 13).
 11. **Lists.** Items entering/leaving fade + shift; stagger only for first-render of short groups
@@ -280,6 +281,11 @@ Every component is designed with its micro-animations, not only its static state
     host; never on keyboard focus (arrowing through a list stays calm), never under reduced motion. One
     amplitude for all glyphs, large enough to read at 16 px. Gestures start and end at rest, move parts
     of the glyph and never the svg, so a host turning or flipping the icon composes with them; `animated={false}` keeps an icon still.
+14. **Errors shake.** A field that turns invalid, or whose error message changes, shakes its control once,
+    sharply left and right and decaying to rest (`--prime-space-2` → `--prime-space-1`, `base`), built into
+    the shared field frame (`src/internal/FieldFrame`): every field, the Radio group and a Checkbox / Switch
+    row. Only the control moves — the label stays, the message drops in on its own. Never for an error the
+    field mounts with; reduced motion keeps it still and the red ring and message still say it.
 
 Component checklist for motion: press · hover/focus fill · selection/toggle · open/close · enter/exit of
 parts (items, messages, badges, icons) · loading/progress · reduced motion. Skip what the rules above say

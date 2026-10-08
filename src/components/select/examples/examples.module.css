@@ -23,6 +23,7 @@
 
 .formActions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: var(--prime-space-2);
 }

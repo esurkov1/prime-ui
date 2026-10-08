@@ -1,6 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type * as React from "react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { Checkbox } from "@/components/checkbox/Checkbox";
 
 import { FieldCounter, FieldFrame, useFieldFrame } from "./FieldFrame";
 
@@ -77,5 +79,79 @@ describe("FieldFrame", () => {
       "data-invalid",
       "true",
     );
+  });
+});
+
+describe("error shake", () => {
+  const root = (container: HTMLElement) => container.firstElementChild as HTMLElement;
+
+  it("does not shake for an error the field mounts with", () => {
+    const { container } = render(<Frame error="Укажите роль" />);
+    expect(root(container)).not.toHaveAttribute("data-shake");
+  });
+
+  it("shakes when the field turns invalid and again for a new message", () => {
+    const { container, rerender } = render(<Frame />);
+    expect(root(container)).not.toHaveAttribute("data-shake");
+    rerender(<Frame error="Укажите роль" />);
+    expect(root(container)).toHaveAttribute("data-shake", "odd");
+    rerender(<Frame error="Укажите роль" />);
+    expect(root(container), "the same message does not replay").toHaveAttribute(
+      "data-shake",
+      "odd",
+    );
+    rerender(<Frame error="Роль не найдена" />);
+    expect(root(container), "a new message restarts the keyframes").toHaveAttribute(
+      "data-shake",
+      "even",
+    );
+    rerender(<Frame />);
+    rerender(<Frame error="Укажите роль" />);
+    expect(root(container), "an error that comes back shakes again").toHaveAttribute(
+      "data-shake",
+      "odd",
+    );
+  });
+
+  it("shakes a choice row (Checkbox) when its error arrives", () => {
+    const { rerender } = render(
+      <Checkbox.Root>
+        <Checkbox.Label>Принимаю условия договора</Checkbox.Label>
+      </Checkbox.Root>,
+    );
+    const row = () => screen.getByRole("checkbox").closest("label") as HTMLElement;
+    expect(row()).not.toHaveAttribute("data-shake");
+    rerender(
+      <Checkbox.Root error="Без согласия не продолжить">
+        <Checkbox.Label>Принимаю условия договора</Checkbox.Label>
+      </Checkbox.Root>,
+    );
+    expect(row()).toHaveAttribute("data-shake", "odd");
+  });
+});
+
+describe("leaving error", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("fades the fixed error out before the hint takes the slot", () => {
+    vi.spyOn(window, "matchMedia").mockImplementation(
+      (query: string) => ({ matches: false, media: query }) as MediaQueryList,
+    );
+    const { rerender } = render(<Frame hint="Видна в профиле" error="Укажите роль" />);
+    rerender(<Frame hint="Видна в профиле" />);
+    const leaving = screen.getByText("Укажите роль");
+    expect(leaving).toHaveAttribute("data-state", "closed");
+    expect(leaving).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByText("Видна в профиле")).toBeNull();
+    fireEvent.animationEnd(leaving);
+    expect(screen.queryByText("Укажите роль")).toBeNull();
+    expect(screen.getByText("Видна в профиле")).toBeInTheDocument();
+  });
+
+  it("drops the error at once under reduced motion", () => {
+    const { rerender } = render(<Frame hint="Видна в профиле" error="Укажите роль" />);
+    rerender(<Frame hint="Видна в профиле" />);
+    expect(screen.queryByText("Укажите роль")).toBeNull();
+    expect(screen.getByText("Видна в профиле")).toBeInTheDocument();
   });
 });

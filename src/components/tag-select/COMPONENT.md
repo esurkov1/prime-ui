@@ -96,7 +96,7 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | collapsed / expanded | focus inside or the list open | `data-expanded="true"` on the control: every chip on up to three rows (then scroll with edge fades); the height animates |
 | open | focus, typing, arrows | `data-state="open"` on the control; list `data-state`, `data-side` |
 | overflow | more chips than fit at rest | a «+N» Badge button with `labels.more` and the hidden labels in `title` |
-| invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the input |
+| invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the input; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | `data-disabled="true"`, native `disabled` on the input |
 | option highlighted / selected / disabled | keyboard and pointer / value / option `disabled` | `data-highlighted`, `aria-selected` + checked indicator, `data-disabled` |
 
@@ -147,13 +147,13 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | [overview.tsx](examples/overview.tsx) | A labelled tag field: focus opens the list, typing filters it, picked tags become chips — `label`, `options`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier with two picked tags; chips sit one tier below the field — `size`. |
 | [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one, with a disabled option in the list — `disabled`, `invalid`. |
-| [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint, and an error that replaces the hint in the same row — `required`, `optional`, `hint`, `error`. |
+| [validation.tsx](examples/validation.tsx) | Live validation: removing the last region shakes the field and drops the error in, adding one clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
 | [creatable.tsx](examples/creatable.tsx) | A typed text that is not in the list becomes a new tag from the Create row or Enter — `creatable`, `onCreate`, `defaultColor`. |
 | [many-tags.tsx](examples/many-tags.tsx) | More tags than fit: at rest one row with «+N», focused every tag on up to three wrapped rows that scroll — `defaultValue`. |
 | [manage-tags.tsx](examples/manage-tags.tsx) | Users keep their own tag dictionary: the row «⋯» menu renames, recolors or deletes an option — `onOptionUpdate`, `onOptionDelete`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a preset button replaces the tags and the count follows them — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the list: a button opens it from code, Escape or an outside press closes it — `open`, `onOpenChange`. |
-| [in-form.tsx](examples/in-form.tsx) | A new task form: the required labels field is checked on submit and its error replaces the hint — `required`, `error`, `creatable`. |
+| [in-form.tsx](examples/in-form.tsx) | A new task form: the required labels field is checked on submit, its error shakes the field and leaves once a label is added, a calm note confirms the task — `required`, `error`, `creatable`. |
 
 ## Mistakes
 - `TagSelect.Root` → TagSelect is a single export: `<TagSelect …/>`.

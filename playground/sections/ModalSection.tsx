@@ -57,7 +57,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "in-form",
       description:
-        "Форма настроек в окне: кнопка подвала отправляет форму, пустое название не даёт закрыть окно — `Modal.Body`, `Modal.Footer`, `error`.",
+        "Форма настроек в окне: кнопка подвала отправляет форму, пустое название трясёт поле и не даёт закрыть окно, пока его не заполнят — `Modal.Body`, `Modal.Footer`, `error`.",
     },
   ],
   api,

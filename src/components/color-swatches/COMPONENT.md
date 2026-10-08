@@ -90,7 +90,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | selected | `value` / `defaultValue` | `aria-checked="true"`, `data-state="checked"` on the radio; the check mark (light or dark by color contrast) scales in from half size (`base` · emphasized) and leaves faster (`fast` · exit); no ring — the check is the selection |
 | hover | pointer | the swatch scales to 1.08 (fine pointers only) |
 | focus-visible | keyboard | focus ring outside the swatch |
-| invalid | `invalid` / `error` | `aria-invalid`, `data-invalid` on the group; the inner edge of every swatch turns `danger-border` |
+| invalid | `invalid` / `error` | `aria-invalid`, `data-invalid` on the group; the inner edge of every swatch turns `danger-border`; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled` on every radio, `aria-disabled` and `data-disabled` on the group |
 
 Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
@@ -132,7 +132,7 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 | [states.tsx](examples/states.tsx) | A default palette next to an invalid and a disabled one — `invalid`, `disabled`. |
 | [wrapping.tsx](examples/wrapping.tsx) | In a narrow column the swatches wrap by themselves and the arrows move by the visual rows. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the color, «no color» included, and names it in the hint — `value`, `onValueChange`, `allowEmpty`. |
-| [in-form.tsx](examples/in-form.tsx) | A calendar event form: the color is submitted by `name` and required on save — `name`, `required`, `error`. |
+| [in-form.tsx](examples/in-form.tsx) | A calendar event form: the color is submitted by `name` and required on save: submitting an empty title or no color shakes the field, picking or typing clears the error — `name`, `required`, `error`. |
 
 ## Mistakes
 - `<ColorSwatches.Root>` → the component is a single export: `<ColorSwatches />`.

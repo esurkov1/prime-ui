@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Hint } from "@/components/hint/Hint";
 import { Label } from "@/components/label/Label";
+import { usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
@@ -103,6 +104,46 @@ export function useFieldFrame(
   };
 }
 
+/**
+ * `data-shake` of a field root: the control shakes once when the field turns invalid or its error
+ * message changes (foundation §7, rule 14) — never for an error it mounts with. The value
+ * alternates between `odd` and `even` so a new error restarts the keyframes.
+ */
+export function useErrorShake(
+  invalid: boolean,
+  error: React.ReactNode,
+): "odd" | "even" | undefined {
+  const key = !invalid
+    ? null
+    : typeof error === "string" || typeof error === "number"
+      ? String(error)
+      : "invalid";
+  const previous = React.useRef(key);
+  const [count, setCount] = React.useState(0);
+  React.useEffect(() => {
+    if (key !== null && key !== previous.current) setCount((n) => n + 1);
+    previous.current = key;
+  }, [key]);
+  if (count === 0) return undefined;
+  return count % 2 ? "odd" : "even";
+}
+
+/**
+ * The error that has just been fixed, kept on screen while it fades out (`fast`, `exit`) so the
+ * message leaves as smoothly as it arrived; the hint takes the slot after it. `null` when nothing
+ * is leaving. Reduced motion drops it at once.
+ */
+export function useLeavingError(showError: boolean, error: React.ReactNode) {
+  const last = React.useRef(error);
+  if (showError) last.current = error;
+  const presence = usePresence(showError, { exitDuration: "fast" });
+  if (showError || !presence.mounted) return null;
+  return { node: last.current, onExitEnd: presence.onExitEnd };
+}
+
+/** Class of the leaving error message (`useLeavingError`), for frames that render their own row. */
+export const leavingErrorClass = styles.leaving;
+
 type FieldFrameRenderProps = Omit<FieldFrameProps, "focusRing"> & {
   size: ControlSize;
   ids: FieldIds;
@@ -148,7 +189,10 @@ export function FieldFrame({
   ...rest
 }: FieldFrameRenderProps) {
   const { showError, showHint } = ids;
-  const showSupport = showError || showHint || counter != null || reserveSupportRow;
+  const leaving = useLeavingError(showError, error);
+  const showSupport =
+    showError || showHint || leaving != null || counter != null || reserveSupportRow;
+  const shake = useErrorShake(ids.invalid, error);
   const labelNode = hasContent(label) ? (
     <Label.Root
       id={ids.labelId}
@@ -172,6 +216,7 @@ export function FieldFrame({
         size,
         invalid: ids.invalid || undefined,
         disabled: disabled || undefined,
+        shake,
       })}
     >
       {labelEnd != null ? (
@@ -192,6 +237,17 @@ export function FieldFrame({
             {showError ? (
               <Hint.Root id={ids.errorId} size={size} invalid className={styles.supportText}>
                 {error}
+              </Hint.Root>
+            ) : leaving ? (
+              <Hint.Root
+                size={size}
+                invalid
+                aria-hidden="true"
+                data-state="closed"
+                onAnimationEnd={leaving.onExitEnd}
+                className={cx(styles.supportText, styles.leaving)}
+              >
+                {leaving.node}
               </Hint.Root>
             ) : showHint ? (
               <Hint.Root

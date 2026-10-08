@@ -157,7 +157,7 @@ The built-in body (icon, `labels.title`, `labels.description` and a decorative s
 | hover | — | zone fill and dashed line darken |
 | focus | keyboard focus on the hidden input | inset focus ring on the zone (danger when invalid); Enter / Space opens the dialog |
 | drag-over | a file dragged over the zone | `data-state="active"` on the zone: accent line, accent soft fill, accent icon |
-| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the zone, `aria-invalid` on the input; `data-invalid="true"` on Item |
+| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the zone, `aria-invalid` on the input; `data-invalid="true"` on Item; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | `data-disabled="true"`, disabled input, disabled fill and text, drops ignored |
 
 Also `data-size`, `data-variant` on the zone and `data-size` on Item. Files are not kept by the component: keep the list in your state and update it in `onFilesChange`.
@@ -197,11 +197,11 @@ Also `data-size`, `data-variant` on the zone and `data-size` on Item. Files are 
 | [variants.tsx](examples/variants.tsx) | The dashed drop line next to a zone with only the fill, for cards and modals — `variant`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size of the zone and of a file row: padding, icon, button and text follow the tier — `size`. |
 | [states.tsx](examples/states.tsx) | A default zone, a disabled one and an invalid one without a message — `disabled`, `invalid`. |
-| [validation.tsx](examples/validation.tsx) | A required zone with a hint, a rejected file whose error replaces the hint and an optional zone — `required`, `hint`, `error`, `optional`. |
+| [validation.tsx](examples/validation.tsx) | A required scan checked as soon as it is picked: a wrong type or a large file shakes in an error that leaves when the file is removed; a hint and an optional zone — `required`, `hint`, `error`, `optional`. |
 | [custom-body.tsx](examples/custom-body.tsx) | A custom body: a muted title with a browse link and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`. |
 | [upload-progress.tsx](examples/upload-progress.tsx) | File rows while uploading, uploaded and failed with a retry — `FileUpload.ItemProgress`, `invalid`, `FileUpload.ItemActions`. |
 | [avatar-upload.tsx](examples/avatar-upload.tsx) | A round zone around an Avatar that takes images and shows a preview; buttons open the same input — `inputRef`, `accept`, `className`. |
-| [in-form.tsx](examples/in-form.tsx) | A contract upload form: the required scan is checked on submit and its error replaces the hint — `required`, `error`, `name`. |
+| [in-form.tsx](examples/in-form.tsx) | A contract upload form: submit checks the required scan, its error shakes in and leaves once a valid file is picked or removed — `required`, `error`, `name`. |
 | [narrow.tsx](examples/narrow.tsx) | In a phone-width column the zone text wraps and a long file name truncates. |
 
 ## Mistakes

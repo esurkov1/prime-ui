@@ -317,10 +317,13 @@ describe("kit icons first", () => {
     expect(byGlyph.size).toBeGreaterThan(40);
   });
 
-  /** Code of a source: the whole file, or the ```tsx blocks of a markdown doc. */
+  /** Code of a source: the whole file, or the ```tsx blocks of a markdown doc without the deliberate
+   * `// bad` part of a bad / good pair. */
   const code = (file: string) =>
     file.endsWith(".md")
-      ? [...read(file).matchAll(/^```tsx[^\n]*\n([\s\S]*?)^```$/gm)].map((m) => m[1]).join("\n")
+      ? [...read(file).matchAll(/^```tsx[^\n]*\n([\s\S]*?)^```$/gm)]
+          .map((m) => m[1].replace(/^\/\/ bad\b[\s\S]*?(?=^\/\/ good\b|(?![\s\S]))/gm, ""))
+          .join("\n")
       : read(file);
 
   it.each(sources)("%s takes glyphs from the kit registry", (file) => {

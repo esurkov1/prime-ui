@@ -109,7 +109,7 @@ No `variant` / `tone` / `color`.
 |---|---|---|
 | unselected | group `value` ≠ option `value` | `data-state="unchecked"` on the option; circle `fill-strong`, hover `fill-strong-hover` |
 | selected | group `value` = option `value` | `data-state="checked"`; accent circle with a thumb-coloured dot that grows in |
-| invalid | `invalid` or a non-empty `error` on the group | `data-invalid="true"`, `aria-invalid` on the group and the inputs; danger ring on unselected circles |
+| invalid | `invalid` or a non-empty `error` on the group | `data-invalid="true"`, `aria-invalid` on the group and the inputs; danger ring on unselected circles; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | group or option `disabled` | `data-disabled="true"`, native `disabled` on every radio; `fill-muted` circle, `cursor: not-allowed` |
 | pressed | pointer press | the circle scales to the compact press scale |
 | focus-visible | keyboard | outer focus ring around the circle |

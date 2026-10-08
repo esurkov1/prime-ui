@@ -4,7 +4,13 @@ import { Hint } from "@/components/hint/Hint";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import type { FieldIds } from "@/internal/FieldFrame";
+import {
+  type FieldIds,
+  leavingErrorClass,
+  useErrorShake,
+  useLeavingError,
+} from "@/internal/FieldFrame";
+import frameStyles from "@/internal/FieldFrame.module.css";
 import type { ControlSize, DataState } from "@/internal/states";
 import { touchTargetClass } from "@/internal/touchTarget";
 
@@ -57,6 +63,8 @@ export function ChoiceField({
   className,
   children,
 }: ChoiceFieldProps) {
+  const shake = useErrorShake(ids.invalid, error);
+  const leaving = useLeavingError(ids.showError, error);
   return (
     <ControlSizeProvider value={size}>
       <div
@@ -69,13 +77,28 @@ export function ChoiceField({
           readonly: readOnly || undefined,
         })}
       >
-        <label htmlFor={ids.controlId} className={styles.row}>
+        <label
+          htmlFor={ids.controlId}
+          className={cx(styles.row, frameStyles.shakeSelf)}
+          data-shake={shake}
+        >
           <span className={cx(styles.controlCell, touchTargetClass)}>{control}</span>
           {children}
         </label>
         {ids.showError ? (
           <Hint.Root id={ids.errorId} size={size} invalid className={styles.support}>
             {error}
+          </Hint.Root>
+        ) : leaving ? (
+          <Hint.Root
+            size={size}
+            invalid
+            aria-hidden="true"
+            data-state="closed"
+            onAnimationEnd={leaving.onExitEnd}
+            className={cx(styles.support, leavingErrorClass)}
+          >
+            {leaving.node}
           </Hint.Root>
         ) : ids.showHint ? (
           <Hint.Root id={ids.hintId} size={size} disabled={disabled} className={styles.support}>

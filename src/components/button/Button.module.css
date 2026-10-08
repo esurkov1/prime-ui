@@ -123,6 +123,34 @@
   }
 }
 
+/* success: an action that is done («Оплачено»); a button that turns success glides its fill. */
+.root[data-tone="success"][data-variant="solid"] {
+  --btn-bg: var(--prime-color-success-default);
+  --btn-bg-hover: var(--prime-color-success-hover);
+  --btn-fg: var(--prime-color-success-fg);
+}
+
+.root[data-tone="success"][data-variant="soft"] {
+  --btn-bg: var(--prime-color-success-soft);
+  --btn-bg-hover: color-mix(
+    in srgb,
+    var(--prime-color-success-soft) 88%,
+    var(--prime-color-success-default)
+  );
+  --btn-fg: var(--prime-color-success-text);
+}
+
+.root[data-tone="success"][data-variant="outline"] {
+  --btn-line: var(--prime-color-border-default);
+  --btn-bg-hover: var(--prime-color-success-soft);
+  --btn-fg: var(--prime-color-success-text);
+}
+
+.root[data-tone="success"][data-variant="ghost"] {
+  --btn-bg-hover: var(--prime-color-success-soft);
+  --btn-fg: var(--prime-color-success-text);
+}
+
 /* danger */
 .root[data-tone="danger"][data-variant="solid"] {
   --btn-bg: var(--prime-color-danger-default);

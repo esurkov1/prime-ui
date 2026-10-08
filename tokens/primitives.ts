@@ -68,6 +68,7 @@ export const primitiveTokens = {
       400: "#4ade80",
       500: "#22c55e",
       700: "#15803d",
+      800: "#166534",
     },
     teal: {
       100: "#ccfbf1",

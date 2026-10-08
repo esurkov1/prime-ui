@@ -1,7 +1,10 @@
-/** Required and optional markers, a hint, and an error that replaces the hint in the same row — `required`, `optional`, `hint`, `error`. */
+/** Live validation: unassigning the owner shakes the field and drops the error in, picking someone clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. */
 import { NativeSelect } from "prime-ui-kit";
+import * as React from "react";
 
 export default function NativeSelectValidationExample() {
+  const [owner, setOwner] = React.useState("anna");
+
   return (
     <>
       <NativeSelect label="Страна" required hint="Определяет валюту счетов" defaultValue="ru">
@@ -11,9 +14,11 @@ export default function NativeSelectValidationExample() {
       <NativeSelect
         label="Ответственный"
         required
-        error="Назначьте ответственного"
-        placeholder="Не выбран"
+        error={owner === "none" ? "Назначьте ответственного" : undefined}
+        value={owner}
+        onValueChange={setOwner}
       >
+        <option value="none">Не назначен</option>
         <option value="anna">Анна Петрова</option>
         <option value="ivan">Иван Смирнов</option>
       </NativeSelect>

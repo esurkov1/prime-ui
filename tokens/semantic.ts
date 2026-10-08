@@ -134,6 +134,7 @@ export const semanticTokens = {
     },
     success: {
       default: "{color.green.700}",
+      hover: "{color.green.800}",
       fg: "{color.white}",
       soft: "{color.green.100}",
       text: "{color.green.700}",

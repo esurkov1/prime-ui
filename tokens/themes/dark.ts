@@ -90,6 +90,7 @@ export const darkThemeOverrides = {
     },
     success: {
       default: "{color.green.400}",
+      hover: "{color.green.300}",
       fg: "{color.gray.950}",
       soft: "color-mix(in srgb, var(--prime-ref-color-green-500) 16%, transparent)",
       text: "{color.green.300}",

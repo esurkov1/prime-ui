@@ -50,7 +50,7 @@ export const page: ComponentPageConfig = {
       scenario: "label-morph",
       title: "Смена подписи",
       description:
-        "Новая подпись перетекает в кнопку по буквам, ширина плывёт: «Сохранить» → «Сохранено» и шаги оплаты — `children`, `loading`.",
+        "Новая подпись перетекает в кнопку по буквам, ширина плывёт: «Сохранить» → «Сохранено» и шаги оплаты, на «Оплачено» кнопка зеленеет — `children`, `loading`, `tone`.",
     },
     {
       scenario: "on-colored-host",
@@ -67,7 +67,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "in-form",
       description:
-        "Кнопка отправки на всю ширину показывает идущий запрос — `type`, `loading`, `fullWidth`.",
+        "Кнопка отправки на всю ширину показывает идущий запрос после проверки почты — `type`, `loading`, `fullWidth`.",
     },
   ],
   api,

@@ -98,7 +98,7 @@ No `variant` or `tone`.
 | success | `success` (not while invalid) | `data-success="true"` on the fieldset; the cells turn `success-soft` one after another, half a stagger step apart |
 | full width | `fullWidth` | `data-full-width="true"` on the fieldset |
 | group start | `groupSize` | `data-group-start="true"` on the first cell of every group |
-| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the fieldset and the frame, `aria-invalid="true"` on cells |
+| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the fieldset and the frame, `aria-invalid="true"` on cells; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | `data-disabled="true"` and native `disabled` on the fieldset, every cell disabled, label and hint dimmed |
 | no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the fieldset |
 
@@ -141,12 +141,12 @@ No `variant` or `tone`.
 | [overview.tsx](examples/overview.tsx) | A six-digit code from SMS with its label and a hint — `label`, `hint`, `length`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size; the cell is a square on its own scale, two steps above the control heights — `size`. |
 | [states.tsx](examples/states.tsx) | A default code next to a disabled one — `disabled`. |
-| [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint and an error that replaces it — `required`, `optional`, `hint`, `error`. |
+| [validation.tsx](examples/validation.tsx) | A confirmation code checked once it is complete: a wrong code shakes in with one message and leaves as soon as you type again; a hint and an optional code — `required`, `optional`, `hint`, `error`. |
 | [grouped.tsx](examples/grouped.tsx) | A long code read in chunks with a wider gap between groups — `groupSize`. |
 | [full-width.tsx](examples/full-width.tsx) | Cells that share the container width and keep the tier height, above a full-width button — `fullWidth`. |
 | [on-complete.tsx](examples/on-complete.tsx) | The code is checked as soon as the last cell is filled: a right one turns the cells success, a wrong one turns the hint into an error — `onComplete`, `success`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the code and clears it with a button — `value`, `onValueChange`. |
-| [in-form.tsx](examples/in-form.tsx) | A masked card PIN submitted with a form; a short PIN shows an error — `name`, `mask`, `required`, `error`. |
+| [in-form.tsx](examples/in-form.tsx) | A masked card PIN submitted with a form; a short or wrong PIN shakes in an error that leaves when you type again — `name`, `mask`, `required`, `error`. |
 
 ## Mistakes
 - `<DigitInput.Root>` → the component is a single export: `<DigitInput />`.

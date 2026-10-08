@@ -1,7 +1,10 @@
-/** Required and optional markers, a hint, and an error that replaces the hint in the same row — `required`, `optional`, `hint`, `error`. */
+/** Live validation: unassigning the owner shakes the field and drops the error in, picking someone clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. */
 import { Select } from "prime-ui-kit";
+import * as React from "react";
 
 export default function SelectValidationExample() {
+  const [owner, setOwner] = React.useState("anna");
+
   return (
     <>
       <Select.Root label="Страна" required hint="Определяет валюту счетов" defaultValue="ru">
@@ -16,13 +19,15 @@ export default function SelectValidationExample() {
       <Select.Root
         label="Ответственный"
         required
-        error="Назначьте ответственного"
-        placeholder="Не выбран"
+        error={owner === "none" ? "Назначьте ответственного" : undefined}
+        value={owner}
+        onValueChange={setOwner}
       >
         <Select.Trigger>
           <Select.Value />
         </Select.Trigger>
         <Select.Content>
+          <Select.Item value="none">Не назначен</Select.Item>
           <Select.Item value="anna">Анна Петрова</Select.Item>
           <Select.Item value="ivan">Иван Смирнов</Select.Item>
         </Select.Content>

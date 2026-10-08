@@ -1,4 +1,4 @@
-/** A settings form in a dialog: the footer button submits the form and an empty name keeps it open — `Modal.Body`, `Modal.Footer`, `error`. */
+/** A settings form in a dialog: the footer button submits the form and an empty name shakes the field and keeps it open until it is filled — `Modal.Body`, `Modal.Footer`, `error`. */
 import { Button, Icon, Input, Modal, Select, Switch } from "prime-ui-kit";
 import * as React from "react";
 
@@ -44,7 +44,12 @@ export default function ModalInFormExample() {
           <form id={formId} className={styles.form} noValidate onSubmit={submit}>
             <Input.Root label="Название" required error={error} reserveSupportRow>
               <Input.Wrapper>
-                <Input.Field name="name" defaultValue="Сайт компании" autoFocus />
+                <Input.Field
+                  name="name"
+                  defaultValue="Сайт компании"
+                  autoFocus
+                  onValueChange={() => setError(undefined)}
+                />
               </Input.Wrapper>
             </Input.Root>
             <Select.Root label="Ответственный" defaultValue="anna">

@@ -1,4 +1,4 @@
-/** Support request form: the description is checked on submit and its error does not shift the form — `required`, `error`, `reserveSupportRow`. */
+/** Support request form: the description is checked on submit, its error leaves as soon as the text is long enough and does not shift the form, a sent request turns the button green — `required`, `error`, `reserveSupportRow`. */
 import { Button, Input, Textarea, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -9,13 +9,16 @@ const MIN_LENGTH = 20;
 
 export default function TextareaInFormExample() {
   const [message, setMessage] = React.useState("");
-  const [error, setError] = React.useState<string>();
+  const [checked, setChecked] = React.useState(false);
+  const [sent, setSent] = React.useState(false);
+  const tooShort = message.trim().length < MIN_LENGTH;
+  // After the first submit the check is live: the error leaves as soon as the text is long enough.
+  const error = checked && tooShort ? "Опишите проблему хотя бы в 20 символах" : undefined;
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(
-      message.trim().length < MIN_LENGTH ? "Опишите проблему хотя бы в 20 символах" : undefined,
-    );
+    setChecked(true);
+    setSent(!tooShort);
   };
 
   return (
@@ -44,7 +47,10 @@ export default function TextareaInFormExample() {
           error={error}
           value={message}
           maxLength={LIMIT}
-          onValueChange={setMessage}
+          onValueChange={(value) => {
+            setMessage(value);
+            setSent(false);
+          }}
           counter={<Textarea.Counter current={message.length} max={LIMIT} />}
         />
       </div>
@@ -53,11 +59,17 @@ export default function TextareaInFormExample() {
           variant="ghost"
           tone="neutral"
           type="reset"
-          onClick={() => setError(undefined)}
+          onClick={() => {
+            setMessage("");
+            setChecked(false);
+            setSent(false);
+          }}
         >
           Отменить
         </Button.Root>
-        <Button.Root type="submit">Отправить</Button.Root>
+        <Button.Root type="submit" tone={sent ? "success" : "accent"}>
+          {sent ? "Отправлено" : "Отправить"}
+        </Button.Root>
       </div>
     </form>
   );

@@ -110,7 +110,7 @@ Tone never carries meaning alone: the label names what the value means.
 |---|---|---|
 | default | — | `data-size`, `data-tone`; track `fill-strong`, tone pill up to the thumb centre, opaque thumb |
 | hover | pointer (fine pointers only) | light liquid glass: the thumb grows to 110%, turns translucent and slightly frosted |
-| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the root, `aria-invalid` on the input; the error replaces the hint, danger focus ring |
+| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the root, `aria-invalid` on the input; the error replaces the hint, danger focus ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | pressed | dragging | clear glass: the thumb grows to 125%, the rounded end of the fill shows through |
 | focus-visible | keyboard | outer focus ring around the thumb |
 | disabled | `disabled` | `data-disabled="true"` on the root, native `disabled`; muted track and fill, flat thumb, `cursor: not-allowed` |

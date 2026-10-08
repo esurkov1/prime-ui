@@ -100,7 +100,7 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 | hover | — | fill darkens (not when focused, disabled or read-only) |
 | focus | keyboard focus | focus fill and inset focus ring on the field box; clicking the box padding focuses the textarea |
 | no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the field box |
-| invalid | `invalid` or non-empty `error` | `data-invalid="true"` on the outer wrapper and the field box, `aria-invalid="true"`, danger ring |
+| invalid | `invalid` or non-empty `error` | `data-invalid="true"` on the outer wrapper and the field box, `aria-invalid="true"`, danger ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | `data-disabled="true"` on the field box, disabled fill and text; label and hint dimmed |
 | read-only | `readOnly` | `data-readonly="true"` on the field box, no hover, default cursor |
 | reserved support row | `reserveSupportRow` | `data-reserve="true"` on the support row |
@@ -141,11 +141,11 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 | [overview.tsx](examples/overview.tsx) | A labelled multi-line field with a hint; the height follows the text — `label`, `hint`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; text, padding, label and hint follow the tier — `size`. |
 | [states.tsx](examples/states.tsx) | A default field next to a read-only and a disabled one — `readOnly`, `disabled`. |
-| [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint, an error and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
+| [validation.tsx](examples/validation.tsx) | Live validation: an error shakes the field as it arrives, drops in and leaves as soon as the text is fixed; required and optional markers, a hint and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
 | [auto-resize.tsx](examples/auto-resize.tsx) | A field that grows with its text next to a fixed one with a resize handle — `autoResize`, `rows`. |
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single reply composer where the caret and the lighter fill show focus — `focusRing`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the text; the counter follows it and `maxLength` stops extra input — `value`, `onValueChange`, `Textarea.Counter`, `maxLength`. |
-| [in-form.tsx](examples/in-form.tsx) | Support request form: the description is checked on submit and its error does not shift the form — `required`, `error`, `reserveSupportRow`. |
+| [in-form.tsx](examples/in-form.tsx) | Support request form: the description is checked on submit, its error leaves as soon as the text is long enough and does not shift the form, a sent request turns the button green — `required`, `error`, `reserveSupportRow`. |
 
 ## Mistakes
 - `<Textarea.Root><textarea /></Textarea.Root>` → Textarea.Root renders the textarea itself; pass native props to the root.

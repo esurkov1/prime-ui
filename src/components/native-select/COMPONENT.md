@@ -81,7 +81,7 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 | State | Driven by | DOM |
 |---|---|---|
 | placeholder shown | `placeholder` and no value | the empty first option is selected; placeholder text color |
-| invalid | `invalid` or `error` | `aria-invalid="true"`, `data-invalid="true"` |
+| invalid | `invalid` or `error` | `aria-invalid="true"`, `data-invalid="true"`; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled` |
 | size | `size` | `data-size` |
 | focus ring off | `focusRing={false}` | `data-focus-ring="false"` |
@@ -116,10 +116,10 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 | [overview.tsx](examples/overview.tsx) | A labelled system select with a hint; the OS picker opens on phones — `label`, `hint`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; the label and the hint follow the field tier — `size`. |
 | [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one — `disabled`, `invalid`. |
-| [validation.tsx](examples/validation.tsx) | Required and optional markers, a hint, and an error that replaces the hint in the same row — `required`, `optional`, `hint`, `error`. |
+| [validation.tsx](examples/validation.tsx) | Live validation: unassigning the owner shakes the field and drops the error in, picking someone clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
 | [option-groups.tsx](examples/option-groups.tsx) | Options under group headings with the native optgroup, and a placeholder while nothing is picked — `placeholder`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: the plan drives the price under the field — `value`, `onValueChange`. |
-| [in-form.tsx](examples/in-form.tsx) | A delivery form for phones: the native value goes into FormData, the required city is checked on submit — `name`, `required`, `error`. |
+| [in-form.tsx](examples/in-form.tsx) | A delivery form for phones: the native value goes into FormData, the required city is checked on submit, the error shakes the field and leaves once a city is picked, a calm note confirms the order — `name`, `required`, `error`. |
 
 ## Mistakes
 - `Select.Item` parts as children → NativeSelect takes plain `<option>` / `<optgroup>`.

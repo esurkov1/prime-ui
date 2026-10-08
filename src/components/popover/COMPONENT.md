@@ -162,7 +162,7 @@ No `labels`.
 | [flush.tsx](examples/flush.tsx) | A notification list whose rows and dividers reach the panel edges; each row brings its own padding — `flush`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A destructive confirm that closes only from its buttons, and not at all while the request runs — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state: another button opens the panel from code and its own button closes it — `open`, `onOpenChange`. |
-| [in-form.tsx](examples/in-form.tsx) | An invite form in a panel: Tab stays inside, the role list does not count as an outside click, and submit closes the panel — `trapFocus`. |
+| [in-form.tsx](examples/in-form.tsx) | An invite form in a panel: Tab stays inside, the role list does not count as an outside click, an invalid email shakes the field and keeps the panel open until it is fixed — `trapFocus`, `error`. |
 
 ## Mistakes
 - A hint of a few words in a Popover → use Tooltip (hover / focus, no interactive content).

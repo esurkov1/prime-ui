@@ -1,5 +1,6 @@
-/** Required and optional markers, a hint, and an error that replaces the hint in the same row — `required`, `optional`, `hint`, `error`. */
+/** Live validation: removing the last region shakes the field and drops the error in, adding one clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. */
 import { TagSelect, type TagSelectOption } from "prime-ui-kit";
+import * as React from "react";
 
 const CITIES: TagSelectOption[] = [
   { value: "msk", label: "Москва", color: "blue" },
@@ -13,6 +14,8 @@ const PEOPLE: TagSelectOption[] = [
 ];
 
 export default function TagSelectValidationExample() {
+  const [regions, setRegions] = React.useState(["msk"]);
+
   return (
     <>
       <TagSelect
@@ -25,8 +28,10 @@ export default function TagSelectValidationExample() {
       <TagSelect
         label="Регионы"
         required
-        error="Добавьте хотя бы один регион"
+        error={regions.length ? undefined : "Добавьте хотя бы один регион"}
         options={CITIES}
+        value={regions}
+        onValueChange={setRegions}
         placeholder="Добавить регион"
       />
       <TagSelect label="Наблюдатели" optional options={PEOPLE} placeholder="Добавить человека" />

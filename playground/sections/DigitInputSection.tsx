@@ -31,7 +31,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "validation",
       description:
-        "Пометки обязательного и необязательного поля, подсказка и ошибка на её месте — `required`, `optional`, `hint`, `error`.",
+        "Код проверяется, когда введён целиком: неверный код встряхивает поле с одним сообщением и уходит при следующем вводе; подсказка и необязательный код — `required`, `optional`, `hint`, `error`.",
     },
     {
       scenario: "grouped",
@@ -58,7 +58,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "in-form",
       description:
-        "Скрытый PIN карты отправляется с формой; короткий PIN показывает ошибку — `name`, `mask`, `required`, `error`.",
+        "Скрытый PIN карты отправляется с формой; короткий или неверный PIN встряхивает поле с ошибкой, которая уходит при новом вводе — `name`, `mask`, `required`, `error`.",
     },
   ],
   api,

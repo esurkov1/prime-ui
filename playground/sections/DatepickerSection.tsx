@@ -36,7 +36,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "validation",
       description:
-        "Обязательный период отпуска с подсказкой, то же поле с ошибкой и необязательная дата выхода — `required`, `hint`, `error`, `optional`.",
+        "Период отпуска проверяется на лету: ошибка встряхивает поле, называет нарушенное правило и уходит, когда период подходит; необязательная дата выхода — `required`, `hint`, `error`, `optional`.",
     },
     {
       scenario: "range-presets",
@@ -69,7 +69,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "in-form",
       description:
-        "Заявка на отпуск: обязательный период становится ошибкой после отправки, дата выхода необязательна — `required`, `error`, `optional`.",
+        "Заявка на отпуск: отправка проверяет обязательный период, ошибка встряхивает поле и уходит, как только период выбран; дата выхода необязательна — `required`, `error`, `optional`.",
     },
     {
       slot: "narrow",

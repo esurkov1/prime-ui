@@ -1,4 +1,4 @@
-/** A new label flows into the button letter by letter while the width glides: save, then saved; a step flow — `children`, `loading`. */
+/** A new label flows into the button letter by letter while the width glides: save, then saved; a step flow that turns green once paid — `children`, `loading`, `tone`. */
 import { Button } from "prime-ui-kit";
 import * as React from "react";
 
@@ -27,7 +27,12 @@ export default function ButtonLabelMorphExample() {
       >
         {save === "saved" ? "Изменения сохранены" : "Сохранить изменения"}
       </Button.Root>
-      <Button.Root onClick={() => setStep((step + 1) % STEPS.length)}>{STEPS[step]}</Button.Root>
+      <Button.Root
+        tone={step === STEPS.length - 1 ? "success" : "accent"}
+        onClick={() => setStep((step + 1) % STEPS.length)}
+      >
+        {STEPS[step]}
+      </Button.Root>
     </>
   );
 }

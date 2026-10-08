@@ -21,8 +21,11 @@ type ButtonColorProps =
   | {
       /** Visual treatment. Default `solid`. */
       variant?: Variant;
-      /** Semantic color. Default `accent`; `danger` for destructive actions. */
-      tone?: Extract<Tone, "accent" | "neutral" | "danger">;
+      /**
+       * Semantic color. Default `accent`; `danger` for destructive actions; `success` for an action
+       * that is done («Оплачено»).
+       */
+      tone?: Extract<Tone, "accent" | "neutral" | "success" | "danger">;
     }
   | {
       variant: Exclude<Variant, "solid">;

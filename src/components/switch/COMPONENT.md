@@ -87,7 +87,7 @@ No `variant` / `tone` / `color`.
 |---|---|---|
 | off | `checked={false}` / default | `data-state="unchecked"`; track `fill-strong` (hover `fill-strong-hover`), thumb at the start |
 | on | `checked` / `defaultChecked` | `data-state="checked"`; accent track, the thumb glides to the end |
-| invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid`; danger ring on the off track and on focus |
+| invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid`; danger ring on the off track and on focus; the row shakes once when an error arrives (`data-shake`) |
 | disabled | `disabled` | `data-disabled="true"`; off track `fill-muted`, on track `accent-soft`, `cursor: not-allowed` |
 | read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the field; no hover or press, default cursor |
 | pressed | pointer press | the track scales to the compact press scale (not when disabled or read-only) |

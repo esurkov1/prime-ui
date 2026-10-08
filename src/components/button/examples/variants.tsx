@@ -4,6 +4,7 @@ import { Button, Typography } from "prime-ui-kit";
 const TONES = [
   { tone: "accent", label: "Сохранить" },
   { tone: "neutral", label: "Отмена" },
+  { tone: "success", label: "Оплачено" },
   { tone: "danger", label: "Удалить" },
 ] as const;
 

@@ -61,6 +61,59 @@
   color: var(--prime-color-text-disabled);
 }
 
+/*
+ * An error arriving shakes the control once, sharply left and right, decaying to rest
+ * (foundation §7, rule 14). Only the control moves: the label stays and the message drops in on its
+ * own (Hint). `translate` composes with the control's press scale; two names restart the keyframes
+ * on the next error; reduced motion collapses the duration to nothing. A choice row (Checkbox,
+ * Switch) shakes itself: `shakeSelf` with its own `data-shake`.
+ */
+.root[data-shake] > .body > :not(.support),
+.shakeSelf[data-shake] {
+  animation: field-shake-odd var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.root[data-shake="even"] > .body > :not(.support),
+.shakeSelf[data-shake="even"] {
+  animation-name: field-shake-even;
+}
+
+@keyframes field-shake-odd {
+  12% {
+    translate: calc(-1 * var(--prime-space-2)) 0;
+  }
+  32% {
+    translate: var(--prime-space-2) 0;
+  }
+  52% {
+    translate: calc(-1 * var(--prime-space-1)) 0;
+  }
+  72% {
+    translate: var(--prime-space-1) 0;
+  }
+  88% {
+    translate: calc(-0.5 * var(--prime-space-1)) 0;
+  }
+}
+
+@keyframes field-shake-even {
+  12% {
+    translate: calc(-1 * var(--prime-space-2)) 0;
+  }
+  32% {
+    translate: var(--prime-space-2) 0;
+  }
+  52% {
+    translate: calc(-1 * var(--prime-space-1)) 0;
+  }
+  72% {
+    translate: var(--prime-space-1) 0;
+  }
+  88% {
+    translate: calc(-0.5 * var(--prime-space-1)) 0;
+  }
+}
+
 .body {
   display: flex;
   flex-direction: column;
@@ -125,4 +178,20 @@
 
 .counter[data-invalid="true"] {
   color: var(--prime-color-danger-text);
+}
+
+/*
+ * A fixed error leaves as it came: it fades and lifts back up over `fast` with `exit` easing, then
+ * the hint takes the slot (`useLeavingError`).
+ */
+.leaving[data-state="closed"] {
+  animation: field-error-leave var(--prime-motion-duration-fast) var(--prime-motion-easing-exit)
+    both;
+}
+
+@keyframes field-error-leave {
+  to {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--prime-space-1)));
+  }
 }

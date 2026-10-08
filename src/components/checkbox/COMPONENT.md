@@ -103,7 +103,7 @@ Checkbox has no `variant` / `tone` / `color`.
 | unchecked | `checked={false}` / default | `data-state="unchecked"`; box `fill-strong`, hover `fill-strong-hover` |
 | checked | `checked` / `defaultChecked` | `data-state="checked"`; accent box, the check draws in |
 | indeterminate | `indeterminate` | `data-state="indeterminate"`, `input.indeterminate`; accent box with a bar |
-| invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid` on the input; danger ring on the unchecked box and on focus |
+| invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid` on the input; danger ring on the unchecked box and on focus; the row shakes once when an error arrives (`data-shake`) |
 | disabled | `disabled` | `data-disabled="true"` on the root; `fill-muted` box, disabled text, `cursor: not-allowed` |
 | read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the root; the state stays, no hover or press, default cursor |
 | pressed | pointer press | the box scales to the compact press scale |

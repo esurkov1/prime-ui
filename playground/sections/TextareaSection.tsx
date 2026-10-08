@@ -34,7 +34,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "validation",
       description:
-        "Пометки обязательного и необязательного поля, подсказка, ошибка и строка поддержки без сдвига — `required`, `optional`, `hint`, `error`, `reserveSupportRow`.",
+        "Живая проверка: с ошибкой поле встряхивается, сообщение выезжает и уходит, как только значение исправлено; пометки обязательного и необязательного поля, подсказка и строка поддержки без сдвига — `required`, `optional`, `hint`, `error`, `reserveSupportRow`.",
     },
     {
       scenario: "auto-resize",
@@ -55,7 +55,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "in-form",
       description:
-        "Обращение в поддержку: описание проверяется при отправке, ошибка не сдвигает форму — `required`, `error`, `reserveSupportRow`.",
+        "Обращение в поддержку: описание проверяется при отправке, ошибка уходит, как только текста хватает, и не сдвигает форму, а отправленное обращение красит кнопку в зелёный — `required`, `error`, `reserveSupportRow`.",
     },
   ],
   api,
