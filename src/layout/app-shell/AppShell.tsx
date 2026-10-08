@@ -1,9 +1,9 @@
 import * as React from "react";
 
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { mergeRefs } from "@/internal/mergeRefs";
 
 import styles from "./AppShell.module.css";
 
@@ -106,7 +106,7 @@ function AppShellTemplate({
   ...rootProps
 }: AppShellTemplateProps) {
   const mainRef = React.useRef<HTMLElement>(null);
-  const setMainRef = React.useMemo(() => mergeRefs(mainRef, ref), [ref]);
+  const setMainRef = useMergedRefs(mainRef, ref);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: the key is the trigger, not an input
   React.useLayoutEffect(() => {

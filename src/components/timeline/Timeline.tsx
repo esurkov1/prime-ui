@@ -1,9 +1,9 @@
 import * as React from "react";
-
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { mergeRefs } from "@/internal/mergeRefs";
+import palette from "@/internal/palette.module.css";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
 
@@ -118,12 +118,12 @@ function TimelineItem({
   ...rest
 }: TimelineItemProps) {
   // A callback ref fits whichever element the row renders.
-  const rowRef = React.useMemo(() => mergeRefs<HTMLElement | null>(ref), [ref]);
+  const rowRef = useMergedRefs<HTMLElement | null>(ref);
   const interactive = Boolean(asChild || href || onClick);
   const rowProps = {
     ...rest,
     ref: rowRef,
-    className: cx(styles.row, className),
+    className: cx(palette.hue, styles.row, className),
     "aria-current": current ? ("true" as const) : undefined,
     ...toDataAttributes({
       state: current ? "active" : "inactive",

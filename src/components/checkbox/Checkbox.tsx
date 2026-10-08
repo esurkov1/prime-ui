@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import {
   ChoiceField,
   ChoiceLabel,
@@ -13,7 +14,6 @@ import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useFieldFrame } from "@/internal/FieldFrame";
-import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Checkbox.module.css";
@@ -79,7 +79,7 @@ function CheckboxRoot({
   });
 
   const internalRef = React.useRef<HTMLInputElement>(null);
-  const mergedRef = React.useMemo(() => mergeRefs(internalRef, ref), [ref]);
+  const mergedRef = useMergedRefs(internalRef, ref);
 
   React.useEffect(() => {
     if (internalRef.current) internalRef.current.indeterminate = indeterminate;

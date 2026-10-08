@@ -1,9 +1,9 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
-import { mergeRefs } from "@/internal/mergeRefs";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 import { suspendTransitions } from "@/theme/applyTheme";
 
@@ -120,7 +120,7 @@ export function ExampleFrame({
 
   // Theme switch inside the frame is instant: no color transition from the old theme.
   const rootRef = React.useRef<HTMLDivElement>(null);
-  const mergedRef = React.useMemo(() => mergeRefs(rootRef, ref), [ref]);
+  const mergedRef = useMergedRefs(rootRef, ref);
   const previousScheme = React.useRef(colorScheme);
   React.useLayoutEffect(() => {
     if (previousScheme.current === colorScheme) return;

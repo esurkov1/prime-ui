@@ -4,10 +4,10 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { getViewportPadPx } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
-import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -314,7 +314,7 @@ export function PanelView(props: PanelViewProps) {
   } = props;
   const isRange = props.mode === "range";
   const [panelNode, setPanelNode] = React.useState<HTMLDivElement | null>(null);
-  const panelRef = React.useMemo(() => mergeRefs(setPanelNode, domRef), [domRef]);
+  const panelRef = useMergedRefs(setPanelNode, domRef);
   const parentWidth = useAvailableWidth(embedded ? panelNode : null);
   const viewportWidth = useViewportWidth(!embedded);
   useContainScroll(embedded ? null : panelNode);

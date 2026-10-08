@@ -7,6 +7,7 @@ import { Popover } from "@/components/popover/Popover";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
 import { Icon } from "@/icons";
 import { AnchorRectProvider, type AnchorRectResolver } from "@/internal/AnchorRectContext";
@@ -14,11 +15,10 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { mergeRefs } from "@/internal/mergeRefs";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { Slot } from "@/internal/slot";
-import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
+import { type ControlSize, type PaletteColor, stepDown, type Variant } from "@/internal/states";
 
 import styles from "./Sidebar.module.css";
 
@@ -52,9 +52,6 @@ const FLYOUT_CLOSE_DELAY_MS = 300;
 
 /** Rows the rail clips to their icon box: their layers anchor to the visible part. */
 const RAIL_ROWS = `.${styles.item}, .${styles.account}, .${styles.brand}`;
-
-/** One tier down: inline actions and counters inside an item row. */
-const TIER_DOWN: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "s", l: "m", xl: "l" };
 
 type SidebarContextValue = {
   mode: SidebarMode;
@@ -237,7 +234,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   const close = React.useCallback(() => setOpen(false), [setOpen]);
   const { ref: panelRef, layer } = useModalLayer<HTMLElement>({ open, onDismiss: close });
   const rootRef = React.useRef<HTMLDivElement | null>(null);
-  const mergedRootRef = React.useMemo(() => mergeRefs<HTMLDivElement>(ref, rootRef), [ref]);
+  const mergedRootRef = useMergedRefs<HTMLDivElement>(ref, rootRef);
 
   /*
    * Rows keep their full width on the rail and are clipped to the icon box, so a row's border box
@@ -564,7 +561,7 @@ function SidebarItemAction({
           {...rest}
           variant="ghost"
           tone="neutral"
-          size={TIER_DOWN[size]}
+          size={stepDown(size)}
           className={cx(styles.action, className)}
           aria-label={label}
           disabled={disabled}
@@ -1027,10 +1024,7 @@ const SidebarSubTrigger = React.forwardRef<HTMLButtonElement, SidebarSubTriggerP
       children,
       <Icon name="nav.chevronDown" className={styles.chevron} />,
     );
-    const mergedRef = React.useMemo(
-      () => mergeRefs<HTMLButtonElement>(ref, sub.triggerRef),
-      [ref, sub.triggerRef],
-    );
+    const mergedRef = useMergedRefs<HTMLButtonElement>(ref, sub.triggerRef);
 
     const button = (
       <button
@@ -1118,7 +1112,7 @@ export type SidebarSubContentProps = Omit<React.ComponentProps<"div">, "role">;
 function SidebarSubContent({ className, children, ref, ...rest }: SidebarSubContentProps) {
   const sub = useSubContext();
   const { regionRef } = sub;
-  const mergedRef = React.useMemo(() => mergeRefs(regionRef, ref), [regionRef, ref]);
+  const mergedRef = useMergedRefs(regionRef, ref);
   const rail = useRail();
   // On the rail the children live in the flyout; the inline copy stays folded and inert.
   const shown = sub.open && !rail;

@@ -53,6 +53,10 @@ bun run verify:docs         # docs:build shows no diff
   directions, reduced motion honoured. One-shot appearance of parts uses `src/internal/enterMotion`.
 - A11y minimum: every interactive component works from the keyboard, has explicit ARIA, a visible focus
   ring in both themes, never conveys meaning by color alone, and has keyboard tests.
+- Shared internal classes are joined in TSX (`cx(fieldTierClass, styles.root)`), not chained through
+  cross-file `composes`; the bundle builds with 0 CSS warnings.
+- Scrolling: a component scrolls only its own scroller (`scrollTop` / `scrollLeft`); `scrollIntoView`
+  only for a keyboard-moved highlight with `block: "nearest"` — it also scrolls the page.
 - Biome formatting: 2 spaces, double quotes, line width 100.
 - Visual taste: fills over borders, medium sizes, faint dividers; one component with modes via props
   rather than sibling components that are the same thing.
@@ -116,12 +120,16 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
 - Size: `size` lives on the root only; the root provides `ControlSizeProvider`, parts read size from
   context and set `data-size`. Exception: an overlay's `Content` takes `size` for its width.
   `Button.Root`, `Input.Root`, `Icon` and `Checkbox.Indicator` without `size` take the host tier from
-  context, so a sized host (LoginForm, Popover, Banner) sizes its kit children. A control nested inside
-  another control's row (a checkbox look in a Select option) is one tier smaller.
+  context (`useControlSize`), so a sized host (LoginForm, Popover, Banner) sizes its kit children. A
+  control nested inside another control's row (a checkbox look in a Select option) is one tier smaller:
+  `stepDown(size)` from `src/internal/states.ts`, never a local lookup table.
 - Every part that renders DOM accepts `className`, its native attributes and `ref` (React 19 ref as a
-  prop, or `forwardRef`); an internal ref is merged with the consumer's. A new part gets a row in
-  `src/test/part-refs.test.tsx`. Only slots and state-only roots (`Modal.Root`, `Popover.Root`…) have
-  no ref. `displayName` is `X.Part`; behaviour never depends on `displayName` (compare element types).
+  prop); an internal ref is merged with the consumer's through `useMergedRefs(a, b)` only. A field root
+  sends `className`, `ref` and native attributes to the frame and `id` to the control; a leaf without a
+  field frame keeps `ref` on the control. `src/test/part-refs.test.tsx` checks refs by type; a part
+  whose ref is merged or redirected also gets a runtime row there. Only slots and state-only roots
+  (`Modal.Root`, `Popover.Root`…) have no ref. `displayName` is `X.Part`; behaviour never depends on
+  `displayName` (compare element types).
 - Support row: `hint` / `error` are props on every component that has one (not `Hint` / `Error` parts).
 - `labels` holds system strings and default texts (aria labels, announcements, empty texts, counters,
   default placeholders) with Russian defaults; a per-instance visible text is a prop or children.
@@ -138,7 +146,10 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a button (close, clear, nav arrow, retry, icon button) | `Button` (`variant="ghost"`, `Button.Icon`), `LinkButton` for links (`asChild` + `<button>` for an inline action in text) |
 | a loading indicator | `Spinner` (Button / Select `loading` place it themselves) |
 | a checkbox look inside an option or menu row | `Checkbox.Indicator` (no input; the row carries `aria-selected` / `aria-checked`) |
-| an icon, chevron, check, sort arrow, status glyph | `Icon name="…"` / `Icon*` from `src/icons` — never inline `<svg>` or direct `lucide-react` in components |
+| an icon, chevron, check, sort arrow, status glyph | `<Icon name="…" />` from `src/icons` (a new glyph goes into the registry; `createIcon` makes a standalone icon) — never inline `<svg>` or direct `lucide-react` in components |
+| a palette hue (`color` prop) | `src/internal/palette.module.css`: `.hue` on the element with `data-color`, CSS reads `--hue-soft` / `--hue-text` / `--hue-solid` / `--hue-solid-fg` — never a local `[data-color]` map |
+| a field surface, tier or select-like trigger | `src/internal/fieldClasses.ts` (`fieldSurfaceClass`, `fieldTierClass`, `fieldTriggerClass`), joined in TSX with `cx`; hover fill token `--prime-color-field-bg-hover`; leading / trailing icon split `iconLayout` |
+| a chip tier, icon box, text tone or text role | `src/internal/chipTier`, `iconBox`, `textTone`, `textRole` CSS modules |
 | a chip, tag, status, count | `Badge` (`Badge.Dot`, `Badge.Action`) |
 | a key hint | `Kbd` |
 | a separator | `Divider` |
@@ -157,10 +168,12 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | appearance of a part | `src/internal/enterMotion.module.css` (`.enter`, `.enterBase`) |
 | a swap between states of a region (loading / data / empty / error) | `Crossfade` (public) or `useStateSwap` + `src/internal/swapMotion.module.css` inside a component (DataTable) |
 | an action on a coloured host (solid Banner) | `Button` `tone="inherit"` (ghost / soft / outline) — never a host CSS override |
-| overlay enter/exit, stack, focus | `overlayMotion.module.css`, `usePresence`, `useOutsideClick`, `useEscapeKey`, `useFocusTrap`, `OverlayPortalLayerContext` |
-| anchored positioning | `usePosition` (follows the anchor, 4 sides, `align`, arrow) |
+| overlay stack, dismiss, focus | `src/internal/overlay/layerStack.ts` (`useLayer`, `LayerProvider`; one stack, reasons `escape` / `outside` / `scrim`), `overlay/focus.ts`; modal layers `useModalLayer` + `useInertSiblings` + `useScrollLock`; one z-index `--prime-z-overlay` |
+| an anchored floating panel (Popover, Dropdown, Tooltip, Select) | `src/internal/overlay/useFloatingLayer` + `FloatingPanel` / `FloatingTrigger`; menu groups `src/internal/MenuGroup` |
+| overlay enter/exit | `overlayMotion.module.css`, `usePresence` (`motionDurationMs`, `prefersReducedMotion`) |
+| anchored positioning, a CSS length in JS | `usePosition` (follows the anchor, 4 sides, `align`, arrow), `readCssLengthPx("--prime-…", fallback)` — never import `tokens/` into components |
 | roving arrow-key focus | `src/internal/rovingFocus.ts` (`rovingIndex`, `gridIndex`) |
-| controlled / uncontrolled state, refs | `useControllableState`, `useMergedRefs` / `mergeRefs`, `slot`, `cx`, `toDataAttributes` |
+| controlled / uncontrolled state, refs | `useControllableState`, `useMergedRefs`, `slot`, `cx`, `toDataAttributes` |
 
 - If the donor lacks a mode you need, extend the donor (with its docs, tests and example) instead of
   copying it. A reuse that needs a donor change outside your scope is reported, not hand-rolled.
@@ -180,7 +193,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 - Needed only inside the kit → an internal block in `src/internal/` (or `src/hooks/`), with a test.
   Useful to consumers or as a standalone entity to 2+ components → a public component.
 - A public component goes through the full checklist (§7) and follows §1, §4–§6: code, motion, tests,
-  exports, examples by slots, `api.ts`, a page in `CATEGORY_PAGES` built from a config, COMPONENT.md,
+  exports, examples by slots, `api.ts`, a section config with `category` and `nav`, COMPONENT.md,
   a line in `SKILL/components.md`, `SKILL/choosing.md` if the choice between components changes, and
   `README.md` (components table and count). It replaces every copy it was made for.
 
@@ -220,15 +233,19 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
 ## 5. Playground page
 
 Every component page is the same: **title → description → examples by slots → API → Accessibility**
-(keyboard, ARIA, labels). A section file only declares a `ComponentPageConfig` and renders
-`<ComponentPage page={page} />` (`playground/components/ComponentPage.tsx`); examples load by glob
-(`playground/exampleRegistry.ts`), no import pairs.
+(keyboard, ARIA, labels). A section file is data only: it exports a `ComponentPageConfig` named `page`;
+`playgroundPages.tsx` collects every section by glob, builds routes, sidebar and search from `category`
+(`playground/categories.ts`) and `nav`, and renders each through `ComponentPage`. Examples and their
+sources load lazily by glob (`playground/exampleRegistry.ts`), no import pairs.
 
 ```tsx
+import { MousePointerClick } from "lucide-react";
 import { api } from "@/components/button/api";
-import { ComponentPage, type ComponentPageConfig } from "../components/ComponentPage";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 
 export const page: ComponentPageConfig = {
+  category: "actions",
+  nav: { segment: "buttons", label: "Button", summary: "…", keywords: ["кнопка"], icon: MousePointerClick, order: 1 },
   dir: "button",
   title: "Button",
   kind: "primitive",
@@ -240,7 +257,6 @@ export const page: ComponentPageConfig = {
   api,
   accessibility: { keyboard: [{ keys: "Enter · Space", action: "…" }], aria: ["…"] },
 };
-export default function ButtonSection() { return <ComponentPage page={page} />; }
 ```
 
 - Page description: 1–2 sentences on purpose; keyboard and behaviour go to `accessibility`.
@@ -272,7 +288,8 @@ export default function ButtonSection() { return <ComponentPage page={page} />; 
 - Preview layout and surface are never set per page: the slot sets the layout (`layout` pages use
   `full`), the surface is the playground-wide choice. Stack layouts centre their children in a column of
   at most 640, so container-typed components (Stepper, Breadcrumb) need no width hacks.
-- A new component also gets an entry in `CATEGORY_PAGES` (`playground/playgroundPages.tsx`).
+- A new component needs only its section file: `category` is its sidebar group, `nav` its route and
+  search entry. Nothing else to register.
 
 ## 6. COMPONENT.md
 
@@ -280,7 +297,7 @@ English, one template (reference: `button`, `input`, `modal`, `spinner`):
 
 ```
 # X
-**Category:** <CATEGORY_PAGES id>
+**Category:** <section `category` id>
 **Kind:** <page kind>
 > One-sentence purpose.
 ## When to use · ## When not to use · ## Import · ## Anatomy (tree) · ## API (generated) · ## Variants
@@ -315,7 +332,7 @@ A component change is done only when all of these agree. Do them in the same cha
 4. **`api.ts`** — every prop of every part, exact defaults, both languages; then `bun run docs:build`.
 5. **Examples** — by slots and the canon (§4). A new prop or variant → an example shows it.
 6. **Playground** — the section config (§5): every example listed in slot order, `api` from `api.ts`,
-   accessibility notes; a new component gets a `CATEGORY_PAGES` entry.
+   accessibility notes, `category` and `nav`.
 7. **COMPONENT.md** — the template (§6), Examples table in page order, Related with Built from.
 8. **SKILL/** — holds no per-component content: `components.md` is a category tree of links to each
    `COMPONENT.md` and `examples/`. Touch it only when a component is added / removed / renamed (one
@@ -349,18 +366,19 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `tokens/` | `primitives.ts` → `semantic.ts` → `themes/{light,dark}.ts`; `bun run tokens:build` generates `src/styles/{tokens,theme-light,theme-dark}.css` (never edit those by hand) |
 | `src/components/<dir>/` | one component: `X.tsx`, `X.module.css`, `X.test.tsx`, `api.ts`, `COMPONENT.md`, `examples/` |
 | `src/layout/` | AppShell, Sidebar (same structure) |
-| `src/internal/` | shared mechanics: `states.ts` (vocabulary types), contexts (`ControlSizeContext`, `OverlayPortalLayerContext`), `FieldFrame`, `ChoiceField`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `VisuallyHidden`, `slot`, `cx`, `data-attributes`, `mergeRefs`; CSS: `overlayMotion`, `enterMotion`, `swapMotion`, `floatingSurface`, `menu` |
-| `src/hooks/` | overlay stack (`useOutsideClick`, `useEscapeKey`, `useFocusTrap`, `usePresence`, `usePosition`, `useOverlayModal`, `useModalKeyboard`, `useScrollLock`), `useControllableState`, `useMergedRefs`, `useImageStatus`, `useStateSwap` |
-| `src/icons/` | public `Icon` registry and `Icon*` components on lucide-react — the only icon source for components |
+| `src/internal/` | shared mechanics: `states.ts` (vocabulary types, `stepDown`), contexts (`ControlSizeContext`, `AnchorRectContext`), `overlay/` (`layerStack`, `useFloatingLayer`, `FloatingPanel`, `focus`), `MenuGroup`, `FieldFrame`, `ChoiceField`, `fieldClasses`, `iconLayout`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `VisuallyHidden`, `slot`, `cx`, `data-attributes`; CSS: `overlayMotion`, `enterMotion`, `swapMotion`, `floatingSurface`, `menu`, `fieldSurface`, `fieldTier`, `fieldTrigger`, `palette`, `chipTier`, `iconBox`, `textTone`, `textRole` |
+| `src/hooks/` | `useModalLayer`, `useInertSiblings`, `useScrollLock`, `usePresence`, `usePosition`, `useControllableState`, `useMergedRefs`, `useImageStatus`, `useStateSwap`, `useEnterConfirm` |
+| `src/icons/` | public `<Icon name>` registry and `createIcon` on lucide-react — the only icon source for components |
 | `src/index.ts`, `src/components/index.ts`, `src/layout/index.ts` | public exports |
 | `playground/pageStandard.ts` | page kinds, slot vocabulary, `KIND_SLOTS`, `PROP_SLOTS` |
 | `playground/components/ComponentPage.tsx` | the one page renderer and `ComponentPageConfig` |
-| `playground/exampleRegistry.ts` | glob loader of every example (lazy module + raw source) |
-| `playground/playgroundPages.tsx` | routes, sidebar categories, search (`CATEGORY_PAGES`) |
-| `playground/sections/<Name>Section.tsx` | one page per component: a `ComponentPageConfig` |
+| `playground/exampleRegistry.ts`, `sourceRegistry.ts` | glob loader of every example (lazy module + lazy raw source) |
+| `playground/playgroundPages.tsx`, `categories.ts` | routes, sidebar, search — built from the section configs by glob |
+| `playground/sections/<Name>Section.tsx` | one page per component: data only, `export const page: ComponentPageConfig` |
 | `playground/foundation/` | token pages (Typography's component docs live here) |
 | `scripts/` | `build-tokens.ts`, `bundle-lib.ts`, `build-docs.ts` + `docs/componentApi.ts` (api schema, markdown) |
-| `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component |
+| `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component (shared helpers in `contract-utils.ts`) |
+| `src/test/part-refs.test.tsx` | refs of every part: a typed check, runtime cases for merged or redirected refs |
 | `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `choosing`, `components` (index), `composition` (screen assembly guide), `layouts`, `api-contract`, `foundations`, `anti-slop`, `checklist` |
 | `SKILL/patterns/` | composition patterns: one working screen per file (`<name>.tsx` + `<name>.module.css`, `export default function <Name>Pattern`); the one source for the skill and the playground «Композиция» pages |
 | `playground/composition/` | composition pages: `patterns.ts` (page text per pattern), `PatternPage.tsx`, `CompositionPage.tsx` (principles), `patternRegistry.ts` (glob loader) |
@@ -372,4 +390,6 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 
 `.github/workflows/ci.yml`: every push to `main` runs `bun run verify`; then, if the `package.json`
 version is not on npm yet, publishes it. Bump `version` to release. `package.json` `files` ships `dist`,
-styles, every `COMPONENT.md` and `examples/**`.
+styles, every `COMPONENT.md` and `examples/**`. One JS entry (`prime-ui-kit`) and `bundle.css`;
+`fonts.css` and `reset.css` are opt-in. Runtime dependency: `lucide-react` only (react-router is a
+playground dev dependency).

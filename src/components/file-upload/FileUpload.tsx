@@ -169,13 +169,21 @@ FileUploadItemActions.displayName = "FileUpload.ItemActions";
 export type FileUploadItemProgressProps = Omit<DivProps, "children"> & {
   value: number;
   max?: number;
+  /** Accessible name of the bar; name the file. Default «Загрузка файла». */
+  "aria-label"?: string;
 };
 
 /** Upload progress across the whole row: the kit ProgressBar. */
-function FileUploadItemProgress({ value, max, className, ...rest }: FileUploadItemProgressProps) {
+function FileUploadItemProgress({
+  value,
+  max,
+  className,
+  "aria-label": ariaLabel = "Загрузка файла",
+  ...rest
+}: FileUploadItemProgressProps) {
   return (
     <div {...rest} className={cx(styles.itemProgress, className)}>
-      <ProgressBar value={value} max={max} />
+      <ProgressBar value={value} max={max} aria-label={ariaLabel} />
     </div>
   );
 }

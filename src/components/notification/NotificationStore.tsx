@@ -1,10 +1,9 @@
 import * as React from "react";
 
 import { LIVE_REGION_ATTR } from "@/hooks/useInertSiblings";
+import { readCssLengthPx } from "@/hooks/usePosition";
 import { exitTimeoutMs, prefersReducedMotion } from "@/hooks/usePresence";
-import { remToPx } from "@/internal/layoutPxFromPrimitives";
 import { Portal } from "@/internal/Portal";
-import { primitiveTokens } from "../../../tokens/primitives";
 
 import {
   NOTIFICATION_LABELS,
@@ -63,12 +62,12 @@ const SWIPE_DAMPING_RANGE = 20;
 
 /** Vertical offset of each peeking card in a collapsed stack and the gap of an expanded one: `space.2`. */
 function space2Px(): number {
-  return remToPx(primitiveTokens.space[2]);
+  return readCssLengthPx("--prime-space-2", 8);
 }
 
 /** Swipe distance that dismisses a toast: `space.12`. */
 function swipeThresholdPx(): number {
-  return remToPx(primitiveTokens.space[12]);
+  return readCssLengthPx("--prime-space-12", 48);
 }
 
 type SwipeDirection = { axis: "x" | "y"; sign: 1 | -1 };

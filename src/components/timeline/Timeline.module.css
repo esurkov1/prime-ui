@@ -195,7 +195,8 @@
 /* ---------- Row ---------- */
 
 .row {
-  --tl-hue: var(--prime-color-palette-blue-solid);
+  /* `--hue-solid` comes from `internal/palette` (`data-color`, default `blue` from TSX). */
+  --tl-hue: var(--hue-solid);
   /* Decorative hues sit at reduced emphasis; tones and the active row use full color. */
   --tl-dot-color: color-mix(in srgb, var(--tl-hue) 55%, transparent);
 
@@ -223,42 +224,6 @@
   text-align: start;
   text-decoration: none;
   transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.row[data-color="gray"] {
-  --tl-hue: var(--prime-color-palette-gray-solid);
-}
-
-.row[data-color="green"] {
-  --tl-hue: var(--prime-color-palette-green-solid);
-}
-
-.row[data-color="orange"] {
-  --tl-hue: var(--prime-color-palette-orange-solid);
-}
-
-.row[data-color="red"] {
-  --tl-hue: var(--prime-color-palette-red-solid);
-}
-
-.row[data-color="yellow"] {
-  --tl-hue: var(--prime-color-palette-yellow-solid);
-}
-
-.row[data-color="purple"] {
-  --tl-hue: var(--prime-color-palette-purple-solid);
-}
-
-.row[data-color="sky"] {
-  --tl-hue: var(--prime-color-palette-sky-solid);
-}
-
-.row[data-color="pink"] {
-  --tl-hue: var(--prime-color-palette-pink-solid);
-}
-
-.row[data-color="teal"] {
-  --tl-hue: var(--prime-color-palette-teal-solid);
 }
 
 .row[data-tone="neutral"] {

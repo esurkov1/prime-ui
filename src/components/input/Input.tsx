@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -12,7 +12,6 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
-import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Input.module.css";
@@ -184,7 +183,7 @@ function InputField({
   ...rest
 }: InputFieldProps) {
   const { inputId, inputRef, invalid, required: requiredCtx, describedBy } = useInputContext();
-  const setRefs = React.useMemo(() => mergeRefs(inputRef, ref), [inputRef, ref]);
+  const setRefs = useMergedRefs(inputRef, ref);
 
   const resolvedDescribedBy = [ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined;
 

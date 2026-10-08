@@ -319,60 +319,9 @@
 
 /* ─── Color (SegmentedControl.Item color) ───────────────────────────────────── */
 
-[data-color="gray"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-gray-soft);
-  --seg-hue-text: var(--prime-color-palette-gray-text);
-}
-
-[data-color="blue"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-blue-soft);
-  --seg-hue-text: var(--prime-color-palette-blue-text);
-}
-
-[data-color="green"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-green-soft);
-  --seg-hue-text: var(--prime-color-palette-green-text);
-}
-
-[data-color="orange"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-orange-soft);
-  --seg-hue-text: var(--prime-color-palette-orange-text);
-}
-
-[data-color="red"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-red-soft);
-  --seg-hue-text: var(--prime-color-palette-red-text);
-}
-
-[data-color="yellow"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-yellow-soft);
-  --seg-hue-text: var(--prime-color-palette-yellow-text);
-}
-
-[data-color="purple"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-purple-soft);
-  --seg-hue-text: var(--prime-color-palette-purple-text);
-}
-
-[data-color="sky"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-sky-soft);
-  --seg-hue-text: var(--prime-color-palette-sky-text);
-}
-
-[data-color="pink"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-pink-soft);
-  --seg-hue-text: var(--prime-color-palette-pink-text);
-}
-
-[data-color="teal"]:is(.item, .thumb) {
-  --seg-hue-soft: var(--prime-color-palette-teal-soft);
-  --seg-hue-text: var(--prime-color-palette-teal-text);
-}
-
-/* Hue dot before the content (same size as Badge.Dot). */
-/* `Badge.Dot` in the option hue. */
+/* `Badge.Dot` in the option hue; `--hue-*` come from `internal/palette` on the item and thumb. */
 .dot {
-  color: var(--seg-hue-text);
+  color: var(--hue-text);
 }
 
 .item[data-disabled="true"] .dot {
@@ -411,9 +360,9 @@
 
 /* Colored option selected: soft fill of its hue + a 1px ring of the hue text at low alpha. */
 .thumb[data-color] {
-  background: var(--seg-hue-soft);
+  background: var(--hue-soft);
   box-shadow:
-    inset 0 0 0 var(--prime-border-width) color-mix(in srgb, var(--seg-hue-text) 32%, transparent),
+    inset 0 0 0 var(--prime-border-width) color-mix(in srgb, var(--hue-text) 32%, transparent),
     var(--prime-shadow-raised);
 }
 

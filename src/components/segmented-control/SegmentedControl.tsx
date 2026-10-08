@@ -1,10 +1,12 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
+import { prefersReducedMotion } from "@/hooks/usePresence";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import palette from "@/internal/palette.module.css";
 import { rovingIndex } from "@/internal/rovingFocus";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 
@@ -27,14 +29,6 @@ const [SegmentedControlProvider, useSegmentedControlContext] =
 
 const ENABLED_ITEM = '[role="radio"]:not([data-disabled="true"])';
 const CHECKED_ITEM = '[role="radio"][aria-checked="true"]';
-
-function prefersReducedMotion() {
-  return (
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-}
 
 function setFlag(element: HTMLElement, name: string, on: boolean) {
   if (on) element.setAttribute(name, "true");
@@ -263,7 +257,7 @@ function SegmentedControlRoot({
             {/* First in DOM order so it always paints below the segments. */}
             <div
               ref={thumbRef}
-              className={styles.thumb}
+              className={cx(palette.hue, styles.thumb)}
               aria-hidden="true"
               onTransitionEnd={(event) => {
                 if (event.target === event.currentTarget && event.propertyName === "left") {
@@ -371,7 +365,7 @@ function SegmentedControlItem({
       })}
       tabIndex={isTabStop ? 0 : -1}
       disabled={isDisabled}
-      className={cx(styles.item, className)}
+      className={cx(palette.hue, styles.item, className)}
       onClick={(event) => {
         onClick?.(event);
         if (!isDisabled && !event.defaultPrevented) ctx.onSelect(value);

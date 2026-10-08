@@ -1,10 +1,10 @@
 import * as React from "react";
 
 import { Button } from "@/components/button/Button";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
-import { mergeRefs } from "@/internal/mergeRefs";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { DragControllerContext, useDragController } from "./context";
@@ -206,10 +206,7 @@ function DndSortable<T>({
   if (placeholder && list.gapBefore === null) children.push(placeholder);
 
   const { ref: targetRef, ...targetData } = list.containerProps;
-  const ref = React.useMemo(
-    () => mergeRefs<HTMLElement | null>(targetRef, forwardedRef),
-    [targetRef, forwardedRef],
-  );
+  const ref = useMergedRefs<HTMLElement | null>(targetRef, forwardedRef);
   return (
     <SortableContext value={context}>
       <Tag
@@ -249,7 +246,7 @@ function DndSortableItem({
 }: DndSortableItemProps) {
   const context = React.useContext(SortableContext);
   // A callback ref fits whichever tag the list picks.
-  const elementRef = React.useMemo(() => mergeRefs<HTMLElement | null>(ref), [ref]);
+  const elementRef = useMergedRefs<HTMLElement | null>(ref);
   if (context === null) throw new Error("Dnd.SortableItem must be rendered inside Dnd.Sortable");
   const Tag = context.itemTag;
   const disabled = context.disabled || itemDisabled;
@@ -357,7 +354,7 @@ function DndDraggable<TData = unknown>({
   });
   const dragProps = source.props({ id, data, label: label ?? id });
   // A callback ref fits whichever tag `as` picks.
-  const elementRef = React.useMemo(() => mergeRefs<HTMLElement | null>(ref), [ref]);
+  const elementRef = useMergedRefs<HTMLElement | null>(ref);
   return (
     <Tag
       ref={elementRef}
@@ -424,10 +421,7 @@ function DndDropZone<TData = unknown>({
     disabled,
   });
   const { ref: targetRef, ...targetData } = target.props;
-  const ref = React.useMemo(
-    () => mergeRefs<HTMLElement | null>(targetRef, forwardedRef),
-    [targetRef, forwardedRef],
-  );
+  const ref = useMergedRefs<HTMLElement | null>(targetRef, forwardedRef);
   return (
     <Tag
       ref={ref}

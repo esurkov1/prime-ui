@@ -10,7 +10,7 @@ export default function FileUploadUploadProgressExample() {
         <FileUpload.FormatBadge format="pdf" color="red" />
         <FileUpload.ItemName>Отчёт за квартал.pdf</FileUpload.ItemName>
         <FileUpload.ItemDescription>1,2 МБ из 3 МБ · загрузка 40%</FileUpload.ItemDescription>
-        <FileUpload.ItemProgress value={40} />
+        <FileUpload.ItemProgress value={40} aria-label="Загрузка: Отчёт за квартал.pdf" />
       </FileUpload.Item>
       <FileUpload.Item>
         <FileUpload.FormatBadge format="png" color="blue" />

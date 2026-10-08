@@ -2,12 +2,12 @@ import * as React from "react";
 
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { fieldTierClass } from "@/internal/fieldClasses";
-import { mergeRefs } from "@/internal/mergeRefs";
 import { gridIndex } from "@/internal/rovingFocus";
 import { Slot } from "@/internal/slot";
 import type { ControlSize } from "@/internal/states";
@@ -200,9 +200,9 @@ function Trigger({
   ...rest
 }: ColorPresetsTriggerProps) {
   const { value, size, disabled, labels, selectedLabel, triggerRef } = useColorPresetsContext();
-  const ref = React.useMemo(
-    () => mergeRefs<HTMLButtonElement>(forwardedRef, triggerRef as React.Ref<HTMLButtonElement>),
-    [forwardedRef, triggerRef],
+  const ref = useMergedRefs<HTMLButtonElement>(
+    forwardedRef,
+    triggerRef as React.Ref<HTMLButtonElement>,
   );
   const name = ariaLabel ?? `${labels.trigger}: ${selectedLabel}`;
 

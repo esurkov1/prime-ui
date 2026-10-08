@@ -207,12 +207,15 @@
   grid-row: 1 / span 2;
 }
 
+/* body-s at medium weight: written out, a composed role plus a weight override is order-dependent. */
 .delta {
-  composes: bodyS from "../../internal/textRole.module.css";
   display: inline-flex;
   align-items: center;
   gap: var(--prime-space-1);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
   font-weight: var(--prime-font-weight-medium);
+  letter-spacing: var(--prime-text-body-s-tracking);
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
 }

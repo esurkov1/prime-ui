@@ -1,12 +1,11 @@
 import * as React from "react";
-
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldCounter, FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
-import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Textarea.module.css";
@@ -98,7 +97,7 @@ function TextareaRoot({
   const contextValue = React.useMemo(() => ({ size, labels }), [size, labels]);
 
   const innerRef = React.useRef<HTMLTextAreaElement | null>(null);
-  const setRefs = React.useMemo(() => mergeRefs(innerRef, ref), [ref]);
+  const setRefs = useMergedRefs(innerRef, ref);
   const mirrorRef = React.useRef<HTMLDivElement>(null);
 
   // The auto-resize mirror copies the text; sync it on mount and on controlled value changes.

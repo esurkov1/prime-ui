@@ -2,12 +2,12 @@ import * as React from "react";
 
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useStateSwap } from "@/hooks/useStateSwap";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
-import { mergeRefs } from "@/internal/mergeRefs";
 import type { ControlSize } from "@/internal/states";
 import swapMotion from "@/internal/swapMotion.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -202,7 +202,7 @@ export function DataTable<Row>({
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
   const tableRef = React.useRef<HTMLTableElement | null>(null);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
-  const mergedRootRef = React.useMemo(() => mergeRefs(rootRef, ref), [ref]);
+  const mergedRootRef = useMergedRefs(rootRef, ref);
 
   // ─── Sort and page ───
   const [sortState, setSortState] = useControllableState<DataTableSortState>({

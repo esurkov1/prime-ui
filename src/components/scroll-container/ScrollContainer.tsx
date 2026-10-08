@@ -1,8 +1,7 @@
 import * as React from "react";
-
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { mergeRefs } from "@/internal/mergeRefs";
 
 import styles from "./ScrollContainer.module.css";
 
@@ -101,7 +100,7 @@ export function ScrollContainer({
   ...rest
 }: ScrollContainerProps) {
   const innerRef = React.useRef<HTMLElement>(null);
-  const mergedRef = React.useMemo(() => mergeRefs(innerRef, ref), [ref]);
+  const mergedRef = useMergedRefs(innerRef, ref);
   const horizontal = axis === "horizontal";
   const overflow = useEdgeOverflow(innerRef, fade, horizontal);
 

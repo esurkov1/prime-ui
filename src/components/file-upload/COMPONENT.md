@@ -111,6 +111,7 @@ The built-in body (icon, `labels.title`, `labels.description` and a decorative s
 |---|---|---|---|
 | `value` | `number` | — (required) | Uploaded amount. |
 | `max` | `number` | — | Total amount (ProgressBar default). |
+| `aria-label` | `string` | `«Загрузка файла»` | Accessible name of the bar (not the wrapper); name the file. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the wrapper. |
 
 ## Variants

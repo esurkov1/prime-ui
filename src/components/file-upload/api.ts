@@ -223,6 +223,13 @@ export const api: ComponentApi = {
           ru: "Полный объём (по умолчанию ProgressBar).",
         },
         {
+          name: "aria-label",
+          type: "string",
+          default: "«Загрузка файла»",
+          en: "Accessible name of the bar (not the wrapper); name the file.",
+          ru: "Доступное имя полосы (не обёртки); назовите файл.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
           en: "`className` and the other attributes of the wrapper.",

@@ -180,7 +180,12 @@ describe("FileUpload", () => {
     expect(badge).toHaveAttribute("data-color", "red");
     expect(badge).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByText("report.pdf")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "Загрузка файла" })).toBeInTheDocument();
+  });
+
+  it("names the progress bar by aria-label", () => {
+    render(<FileUpload.ItemProgress value={40} aria-label="Загрузка: report.pdf" />);
+    expect(screen.getByRole("progressbar", { name: "Загрузка: report.pdf" })).toBeInTheDocument();
   });
 
   it("names the input by the field label and describes it by the error", () => {
