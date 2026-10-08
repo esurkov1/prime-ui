@@ -1,4 +1,4 @@
-# Screen recipes
+# Layouts — app frame, page wrappers, auth
 
 Every screen sits in one frame: `AppShell.Root` with Nav / `AppHeader` / Main (the content panel is the page,
 the nav rail one layer above it) → `PageContent` (header + body). `AppShell.Main` carries the page gutters
@@ -89,8 +89,8 @@ export function AppLayout({ title, onSearch, children }: AppLayoutProps) {
 }
 ```
 
-A nested record page puts a back `Button` and a `Breadcrumb` into `AppHeader.Start` instead of the
-title. `AppHeader.Actions` holds at most notifications, the account and one primary action; page
+A nested record page keeps its `Breadcrumb` at the top of `PageContent.Header`, above the title
+([patterns/detail-page.tsx](patterns/detail-page.tsx)) — not in `AppHeader`. `AppHeader.Actions` holds at most notifications, the account and one primary action; page
 actions stay in `PageContent.Actions`. With `offCanvas="always"` pass `show="always"` to the menu button.
 
 With React Router put `<Outlet />` as the child and pass `NavLink` through `Sidebar.Item asChild`
@@ -126,18 +126,11 @@ from what people do, not from how the backend is split. The full guide with the 
 
 ## Which pattern to start from
 
-| Screen | Pattern | Skeleton and rhythm |
-|---|---|---|
-| List of orders / invoices / clients | [list-page.tsx](patterns/list-page.tsx) | header (1 primary) → DataTable with SmartFilter in `toolbar`, pages, `empty` |
-| One record (order, invoice, deal) | [detail-page.tsx](patterns/detail-page.tsx) | Breadcrumb + title + status → main column (sections) + side column (Cards: facts, Timeline); 24 between columns |
-| Settings | [settings-page.tsx](patterns/settings-page.tsx) | sections 40 apart: heading column + panel Card; form saves by its own button, Switches apply at once, danger zone last |
-| Create / edit without leaving the page | [form-drawer.tsx](patterns/form-drawer.tsx) | Drawer: groups 32 apart, fields 20, footer outside the form with `form={id}` |
-| Overview / dashboard | [dashboard.tsx](patterns/dashboard.tsx) | period switch in actions → KPI row (16) → panels grid (16) → short table section |
-| Loading, empty, error | [screen-states.tsx](patterns/screen-states.tsx) | Banner for the page, `error` / `loading` in place, EmptyPage for a first run |
+The table of screens and their patterns lives in [composition.md](composition.md#patterns).
 
 A short form (≤ 4 fields: rename, invite, confirm with a reason) belongs in a `Modal` with the same
 form rules: `Modal.Body` holds the `<form id>`, `Modal.Footer` holds Cancel + submit with `form={id}`
-(see `src/components/modal/examples/in-form.tsx`).
+(see [modal/examples/in-form.tsx](../src/components/modal/examples/in-form.tsx)).
 
 ## Multi-step form
 
@@ -169,7 +162,7 @@ export function SignIn() {
         </LoginForm.Header>
         <LoginForm.Body>
           <LoginForm.Form onSubmit={(event) => event.preventDefault()}>
-            <Input.Root label="Email" required>
+            <Input.Root label="Рабочая почта" required>
               <Input.Wrapper>
                 <Input.Field type="email" autoComplete="email" placeholder="name@company.ru" />
               </Input.Wrapper>

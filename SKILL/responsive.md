@@ -16,7 +16,7 @@ single function. Most of it is built into the components; this file says what th
 5. **A component answers for itself.** Kit components adapt to the width of their own container
    (container queries), not the window — a card behaves the same in a sidebar, a modal and a grid.
 6. **Nothing jumps.** Room for loading data, hover controls and counters is reserved in advance
-   (foundation §1 rule 7: `Skeleton` + `Crossfade`).
+   (`Skeleton` + `Crossfade`, [motion.md](motion.md)).
 7. **Input is not screen size.** A wide screen can be touch, a narrow one can have a mouse. Hover and
    target size follow `(hover)` / `(pointer)`, never the width.
 
@@ -163,7 +163,8 @@ export function OrdersPanel() {
 
 - Write the slots in the reading order of the wide layout; the toolbar reorders them visually.
 - One tier for the whole panel (default `m`): never `size` on one control inside — wrapped rows must
-  stay level. A denser page wraps the toolbar in `<ControlSizeProvider value="s">`.
+  stay level. A denser page wraps the toolbar in `<ControlSizeProvider value="s">` and gives
+  `SmartFilter.Root` and `Select.Root` `size="s"` too — they do not read the host tier.
 - The primary action never leaves the top row. On a phone it may become icon-only with `aria-label`;
   it never disappears.
 - Section totals go into `SegmentedControl.Count`, not into stat cards above the table.
@@ -207,10 +208,8 @@ Cards align to the top; a card with a list shows 6–8 rows and scrolls inside (
 `label` prop), never inside next to the value. Right `type`, `inputMode` and `autoComplete` on every
 `Input.Field`.
 
-**Charts and canvases.** A chart takes its container's width (ResizeObserver), the legend wraps under
-it, axis labels thin out. A large diagram is a canvas: drag to pan, ⌘/Ctrl + wheel to zoom around the
-cursor, − / % / + / «вписать» controls in a row above it (not floating over it). Scroll inside a block
-on the canvas never leaks to the canvas (`overscroll-behavior: contain`).
+**Charts.** A trend is `Sparkline` — it takes its container's width and is scrubbed by touch. A chart of
+your own does the same: container width, the legend wraps under it, axis labels thin out.
 
 **Media.** `width` + `height` or `aspect-ratio` on every image and video, `max-width: 100%`; raster
 images with `srcset` + `sizes` (Thumbnail and Avatar already reserve their box).
@@ -229,7 +228,8 @@ images with `srcset` + `sizes` (Thumbnail and Avatar already reserve their box).
 - Bigger under a coarse pointer: `@media (pointer: coarse)` raises your own row and button heights;
   the dense layout stays for the mouse.
 - Real elements: `<button>`, `<a href>`, `<input>` with a label; an icon-only button has `aria-label`.
-- Zoom stays allowed; sizes in `rem` so the browser text-size setting works.
+- Zoom stays allowed and the font size is never locked: the kit's tokens follow the browser text-size
+  setting.
 - Selected is never colour alone (the kit's selected states add fill, weight or a check).
 - No theme flash: `applyTheme` before the first paint.
 
@@ -239,13 +239,10 @@ Target CLS ≤ 0.1: nothing moves while loading or when a filter changes.
 
 - Loading holds the shape of the content: `Skeleton` in the data's geometry inside `Crossfade` (a table:
   DataTable `loading`). A spinner instead of a skeleton jumps when the data arrives.
-- A refetch keeps the previous data on screen (`aria-busy`), e.g. TanStack Query
-  `placeholderData: keepPreviousData` — a new filter or period does not flash the page.
+- A refetch keeps the previous data on screen (`aria-busy`) — a new filter or period does not flash
+  the page.
 - Room for dynamic parts is reserved: banners, the chips row, hover controls never push neighbours.
 - Fonts: `font-display: swap` with a matched fallback (the kit's `fonts.css` does it).
-- Code in chunks without waiting: lazy sections preloaded when idle; after a deploy a failed chunk
-  reloads the page (Vite `vite:preloadError`).
-- Heavy charts and animations render when they enter the viewport (IntersectionObserver).
 
 ## Checklist before handing a screen over
 

@@ -15,19 +15,19 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 - Omit `size` for the default `m` — never write `size="m"`.
 - Set `size` on the root (`Input.Root size="s"`, `Select.Root size="s"`) — not on `Input.Field` or `Select.Trigger`.
-- One tier for a whole region: `<ControlSizeProvider value="s">` around a dense toolbar — not `size="s"` on one control to make it fit.
-- Inside a host (Popover, Banner, LoginForm, the DataTable `toolbar`) leave fields and controls (`Button.Root`, `Input.Root`, `Textarea.Root`, `Checkbox.Root`, `DigitInput`…) without `size` — the host passes its tier.
+- One tier for a whole region: `<ControlSizeProvider value="s">` around a dense toolbar — not `size="s"` on one control to make it fit. Select, NativeSelect, TagSelect, Datepicker, Tabs and SmartFilter do not read the host tier: give them the same `size` yourself.
+- Inside a host (Popover, Banner, LoginForm, the DataTable `toolbar`) leave `Button.Root`, `Input.Root`, `Textarea.Root`, `Checkbox.Root`, `DigitInput` and the other host-reading controls without `size` — the host passes its tier ([full list](api-contract.md)).
 - A control in a table cell or a card header row is one tier down: `<Button.Root size="s" variant="ghost" tone="neutral">`.
 
 ## Structure
 
 - Components with parts render through `.Root` + parts: `<Button.Root>`, `<Modal.Root>` — `<Button>` and `<Modal>` are not components.
-- Leaves are single exports with no `.Root`: `<Typography>`, `<Divider />`, `<Spinner />`, `<Skeleton />`, `<Kbd>`, `<LinkButton>`, `<DataTable>`, `<Pagination>`, `<ProgressBar>` — not `<Typography.Root>`.
+- Leaves are single exports with no `.Root` (`<Typography>`, `<Skeleton />`, `<DataTable>`, `<Sparkline>`… — [the list](api-contract.md)) — not `<Typography.Root>`.
 - Data-driven components take data as props: `DataTable columns rows`, `SmartFilter.Root fields`, `TagSelect options`, `ProgressBar segments` — not mapped child parts.
 
 ## Fields
 
-- Frame a field with props on the root: `<Input.Root label="Email" hint="…" error="…" required>` — not a separate `Label` / `Hint` next to it.
+- Frame a field with props on the root: `<Input.Root label="Почта" hint="…" error="…" required>` — not a separate `Label` / `Hint` next to it.
 - Mark the minority: `required` when most fields are optional, `optional` when most are required — not both everywhere.
 - Placeholder is an example value (`name@company.ru`) — never the label.
 - Checkbox, Switch, Radio: the text is the part `<Checkbox.Label>`, `hint` / `error` sit on `Checkbox.Root` — not a `label` prop.
@@ -46,15 +46,16 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Icons
 
-- Take a glyph from the kit: `<Icon name="action.add" />` — not `import { Plus } from "lucide-react"`. Names: [api-contract.md](api-contract.md#icons). A domain glyph the kit lacks: `const IconBike = createIcon(Bike)` once, then `<IconBike />`.
+- Every glyph from the kit, in this order: a semantic `<Icon name="action.add" />` ([names](api-contract.md#icons)); else the full animated set `import { ArchiveIcon } from "prime-ui-kit/icons"` → `<ArchiveIcon />` (Lucide name + `Icon`); only a glyph neither has → `const IconBike = createIcon(Bike)` once, then `<IconBike />` — not `import { Plus } from "lucide-react"` in JSX, another icon library or an inline `<svg>`.
+- Kit icons animate by themselves: the gesture plays when their button, link, tab, menu item or row is hovered or pressed — not your own hover rotate or spin on an icon. `animated={false}` only for a glyph repeated in every row of a long list.
 - Put icons into the part: `<Button.Icon>`, `<Input.Icon side="start">`, `<Sidebar.ItemIcon>`, `<Dropdown.ItemIcon>`, `<EmptyPage.Icon>` — not an `icon` prop (only data arrays such as `notify()` take `icon`).
 - Icon-only button: `<Button.Root variant="ghost" tone="neutral" aria-label="Удалить">` with a `Tooltip` — not an unnamed icon.
-- `lucide-react` only for a domain glyph the kit lacks — not for `Plus`, `Search`, `Bell`, `Settings`…
+- `lucide-react` only through `createIcon`, for a glyph missing from both `<Icon name>` and `prime-ui-kit/icons` — not for `Plus`, `Search`, `Bell`, `Settings`…
 
 ## Buttons and actions
 
 - One primary per area (page header, card, dialog): the default `solid` accent, last in the row. Others `variant="soft" tone="neutral"`; dismiss `variant="ghost" tone="neutral"` (pages), `variant="outline" tone="neutral"` (Modal / Drawer footer).
-- Destructive is `tone="danger"` — never `tone="error"`. Standalone trigger `variant="outline"`, menu item `<Dropdown.Item tone="danger">` last, confirm `solid` in a `<Modal.Root closeOnOutsideClick={false}>`.
+- Destructive is `tone="danger"` — never `tone="error"`; which variant where and how it is confirmed: [api-contract.md](api-contract.md#destructive-actions) and [choosing.md](choosing.md).
 - Going somewhere is a link: `<LinkButton href>` or `<Button.Root asChild><a href>…</a></Button.Root>` — not `onClick={() => location.assign(url)}`.
 - Busy action: `<Button.Root loading>` — not a hand-made spinner or «Загрузка…» text.
 - An action on a coloured host (a solid Banner, an accent strip): `<Button.Root variant="ghost" tone="inherit">` — it takes the host's text colour; never recolour a Button with a CSS override.
@@ -82,7 +83,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 - Changed button text is new children: `<Button.Root>{saved ? "Сохранено" : "Сохранить"}</Button.Root>` flows in by letters — not two buttons swapped with a condition.
 - A long job from a button: `<Button.Root progress={0.42}>Экспорт 42%</Button.Root>` — not a ProgressBar next to it.
-- A reversible delete without a dialog: `<Button.Root tone="danger" variant="soft" holdToConfirm onConfirm={remove}>` — the action in `onConfirm`, not `onClick`.
+- A single destructive action that is easy to redo by hand (clear a draft, revoke a token), no list and no dialog: `<Button.Root tone="danger" variant="soft" holdToConfirm onConfirm={remove}>` — the action in `onConfirm`, not `onClick`. A row in a list: delete at once and offer «Отменить» in the notification.
 - Counts: a number child of `Badge` rolls its digits — not a string you re-render with your own fade.
 - New password: `<Input.Root strength>`; steps of a whole: `<ProgressBar steps value={2} max={5} />`; a trend tile: `<Sparkline data label formatValue />`.
 - A rare milestone only: `celebrate({ origin: event.currentTarget })` — never for a saved form.
@@ -128,73 +129,23 @@ Full rules: [responsive.md](responsive.md).
 - Tokens only: `var(--prime-space-4)`, `var(--prime-color-text-secondary)`, `var(--prime-radius-m)` — never raw `px` / `rem` / hex, never `--prime-ref-*`, never inline `style`.
 - Text through `Typography` roles (`title-m`, `title-s`, `body-m`, `caption`) and `tone="secondary" | "muted"` — not `font-size` or `color` in CSS.
 
-## Anti-slop top 11
+## Anti-slop
 
-1. One component per look: two statuses are two `Badge.Root`s, never a Badge and a styled `span`.
-2. No card around everything, no card in a card, no card around a table.
-3. One primary button per area; the rest soft / ghost / outline with `tone="neutral"`.
-4. One size per row; mixed `s` and `m` in a toolbar reads as a bug.
-5. Labels above fields; placeholder is an example.
-6. Three levels of air (inside an item, between items, between blocks) — not one gap for the page.
-7. No emoji, no icon next to every label, no gradients, glows or colored section backgrounds.
-8. No subtitle that repeats the title, no filler copy; an empty state says what to do and gives the action.
-9. No hand-made overlays, spinners, skeletons, dividers, badges or filter bars — the kit has each.
-10. No state that flips: every region swaps through `Crossfade`, loading is a `Skeleton` of the content.
-11. No overrides of kit internals (`.form :global(button)`); a part's `className` is for placement only.
+The whole list, bad → good: [anti-slop.md](anti-slop.md). Before handing over: [checklist.md](checklist.md).
 
 ## Snippets to copy
 
-App root, once:
+App root, once — the styles and the theme:
 
 ```tsx
 import "prime-ui-kit/bundle.css";
-import "prime-ui-kit/fonts.css";
-import "prime-ui-kit/reset.css";
-import { AppShell, applyTheme, Icon, NotificationProvider, Sidebar } from "prime-ui-kit";
-import type { ReactNode } from "react";
+import { applyTheme } from "prime-ui-kit";
 
 applyTheme("light");
-
-export function AppLayout({ children }: { children: ReactNode }) {
-  return (
-    <NotificationProvider>
-      <AppShell.Root fillViewport>
-        <AppShell.Nav>
-          <Sidebar.Root>
-            <Sidebar.Header>
-              <Sidebar.Brand href="/" description="Отдел продаж">
-                <Sidebar.BrandLogo>
-                  <Icon name="nav.layoutGrid" />
-                </Sidebar.BrandLogo>
-                Прайм CRM
-              </Sidebar.Brand>
-              <Sidebar.Toggle variant="header" />
-            </Sidebar.Header>
-            <Sidebar.Content>
-              <Sidebar.Item href="/" current>
-                <Sidebar.ItemIcon>
-                  <Icon name="nav.dashboard" />
-                </Sidebar.ItemIcon>
-                Обзор
-              </Sidebar.Item>
-              <Sidebar.Item href="/orders">
-                <Sidebar.ItemIcon>
-                  <Icon name="object.cart" />
-                </Sidebar.ItemIcon>
-                Заказы
-              </Sidebar.Item>
-            </Sidebar.Content>
-          </Sidebar.Root>
-        </AppShell.Nav>
-        <AppShell.Main>{children}</AppShell.Main>
-      </AppShell.Root>
-    </NotificationProvider>
-  );
-}
 ```
 
-On phones this rail becomes an off-canvas panel: add the menu button from
-[layouts.md](layouts.md#app-frame-once-per-app).
+The frame itself (providers, `AppShell` with `Sidebar` and the phone menu button) is built once too:
+copy it from [layouts.md](layouts.md#app-frame-once-per-app).
 
 A page with one primary action and a field frame:
 

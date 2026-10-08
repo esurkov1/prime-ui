@@ -74,87 +74,95 @@ export default function ScreenStatesPattern() {
         </PageContent.Description>
       </PageContent.Header>
       <PageContent.Body>
-        {status === "error" ? (
-          <Banner.Root tone="danger">
-            <Banner.Content>
-              <Banner.Icon>
-                <Icon name="status.danger" />
-              </Banner.Icon>
-              <Banner.Title>Выписка за 7 октября не получена</Banner.Title>
-              <Banner.Description>
-                Т-Банк не ответил на запрос. Остатки показаны на 6 октября.
-              </Banner.Description>
-              <Banner.Actions>
-                <Button.Root variant="outline" tone="neutral" onClick={retry}>
-                  Повторить
-                </Button.Root>
-              </Banner.Actions>
-            </Banner.Content>
-          </Banner.Root>
-        ) : null}
+        {/* The page banner and the panels are one block: the banner, with the 40 below it, comes and
+            goes inside a Crossfade, so the panels glide instead of jumping. */}
+        <div className={styles.lead}>
+          <Crossfade state={status === "error" ? "error" : "ok"}>
+            {status === "error" ? (
+              <div className={styles.bannerSlot}>
+                <Banner.Root tone="danger">
+                  <Banner.Content>
+                    <Banner.Icon>
+                      <Icon name="status.danger" />
+                    </Banner.Icon>
+                    <Banner.Title>Выписка за 7 октября не получена</Banner.Title>
+                    <Banner.Description>
+                      Т-Банк не ответил на запрос. Остатки показаны на 6 октября.
+                    </Banner.Description>
+                    <Banner.Actions>
+                      <Button.Root tone="danger" onClick={retry}>
+                        Повторить
+                      </Button.Root>
+                    </Banner.Actions>
+                  </Banner.Content>
+                </Banner.Root>
+              </div>
+            ) : null}
+          </Crossfade>
 
-        <div className={styles.panels}>
-          <Card.Root variant="panel" aria-busy={status === "loading"}>
-            <Card.Header>
-              <Card.Title as="h2">Остатки</Card.Title>
-              <Typography as="span" variant="caption" tone="muted">
-                {status === "ready" ? "на 7 октября" : "на 6 октября"}
-              </Typography>
-            </Card.Header>
-            <Card.Body>
-              {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
-              <Crossfade state={status === "loading" ? "loading" : "ready"}>
-                {status === "loading" ? (
-                  <ul className={styles.accounts}>
-                    {ACCOUNTS.map((account) => (
-                      <li key={account.name} className={styles.account}>
-                        <Skeleton className={styles.nameBar} />
-                        {/* title-m is the l text tier: 16 / 24. */}
-                        <Skeleton size="l" className={styles.balanceBar} />
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <ul className={styles.accounts}>
-                    {ACCOUNTS.map((account) => (
-                      <li key={account.name} className={styles.account}>
-                        <Typography as="span" variant="body-m" tone="secondary">
-                          {account.name}
-                        </Typography>
-                        <Typography as="span" variant="title-m" className={styles.amount}>
-                          {account.balance}
-                        </Typography>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </Crossfade>
-            </Card.Body>
-          </Card.Root>
+          <div className={styles.panels}>
+            <Card.Root variant="panel" aria-busy={status === "loading"}>
+              <Card.Header>
+                <Card.Title as="h2">Остатки</Card.Title>
+                <Typography as="span" variant="caption" tone="muted">
+                  {status === "ready" ? "на 7 октября" : "на 6 октября"}
+                </Typography>
+              </Card.Header>
+              <Card.Body>
+                {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
+                <Crossfade state={status === "loading" ? "loading" : "ready"}>
+                  {status === "loading" ? (
+                    <ul className={styles.accounts}>
+                      {ACCOUNTS.map((account) => (
+                        <li key={account.name} className={styles.account}>
+                          <Skeleton className={styles.nameBar} />
+                          {/* title-m is the l text tier: 16 / 24. */}
+                          <Skeleton size="l" className={styles.balanceBar} />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <ul className={styles.accounts}>
+                      {ACCOUNTS.map((account) => (
+                        <li key={account.name} className={styles.account}>
+                          <Typography as="span" variant="body-m" tone="secondary">
+                            {account.name}
+                          </Typography>
+                          <Typography as="span" variant="title-m" className={styles.amount}>
+                            {account.balance}
+                          </Typography>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Crossfade>
+              </Card.Body>
+            </Card.Root>
 
-          <Card.Root variant="panel">
-            <Card.Header>
-              <Card.Title as="h2">Правила разнесения</Card.Title>
-            </Card.Header>
-            <Card.Body>
-              <EmptyPage.Root size="s" aria-labelledby="rules-empty">
-                <EmptyPage.Icon tone="accent">
-                  <Icon name="action.filter" />
-                </EmptyPage.Icon>
-                <EmptyPage.Title as="h3" id="rules-empty">
-                  Правил пока нет
-                </EmptyPage.Title>
-                <EmptyPage.Description>
-                  Правило свяжет платёж со счётом по ИНН или назначению.
-                </EmptyPage.Description>
-                <EmptyPage.Actions>
-                  <Button.Root variant="soft" tone="neutral">
-                    Создать правило
-                  </Button.Root>
-                </EmptyPage.Actions>
-              </EmptyPage.Root>
-            </Card.Body>
-          </Card.Root>
+            <Card.Root variant="panel">
+              <Card.Header>
+                <Card.Title as="h2">Правила разнесения</Card.Title>
+              </Card.Header>
+              <Card.Body>
+                <EmptyPage.Root size="s" aria-labelledby="rules-empty">
+                  <EmptyPage.Icon tone="accent">
+                    <Icon name="action.filter" />
+                  </EmptyPage.Icon>
+                  <EmptyPage.Title as="h3" id="rules-empty">
+                    Правил пока нет
+                  </EmptyPage.Title>
+                  <EmptyPage.Description>
+                    Правило свяжет платёж со счётом по ИНН или назначению.
+                  </EmptyPage.Description>
+                  <EmptyPage.Actions>
+                    <Button.Root variant="soft" tone="neutral">
+                      Создать правило
+                    </Button.Root>
+                  </EmptyPage.Actions>
+                </EmptyPage.Root>
+              </Card.Body>
+            </Card.Root>
+          </div>
         </div>
 
         <section className={styles.region} aria-labelledby="unmatched-title">

@@ -4,14 +4,14 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 
 ## Composition
 - [ ] The screen starts from the closest pattern in [composition.md](composition.md) (list, detail,
-      settings, form in Drawer / Modal, dashboard, states) and keeps its skeleton.
+      settings, form in a Drawer, dashboard, states) and keeps its skeleton.
 - [ ] One `PageContent.Header` with title, one-line description and actions; blocks in `PageContent.Body`.
 - [ ] Cards only for standalone blocks; no card around a table, a single field or the whole page.
 
 ## Grid and spacing
 - [ ] Every spacing, size and gap in my CSS is a `--prime-space-*` (or another `--prime-*`) token on the 4px grid.
 - [ ] Spacing is `gap` on the parent; no margins on children; no outer padding duplicating `AppShell.Main` / `PageContent.Body`.
-- [ ] Proximity holds: field→field 20, inline controls 8, group→group 32, section→section 40–48.
+- [ ] Proximity holds: field→field 20, inline controls 8, group→group 32, section→section 40.
 - [ ] Inside a group things are visibly closer than between groups.
 
 ## Sizes and alignment
@@ -52,20 +52,23 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 ## States
 - [ ] Hover / focus-visible come from the kit (nothing removed).
 - [ ] Disabled controls use `disabled`; async actions use `loading` (no hand-made spinners).
-- [ ] Fields show `hint` and `error` (with `invalid`), `required` / `optional` marked.
+- [ ] Fields show `hint` and `error` (a non-empty `error` is already invalid); only the minority is marked `required` or `optional`.
 - [ ] Data blocks have loading, empty and error states (DataTable `loading` / `empty` / `error`, EmptyPage).
 - [ ] Every region swaps its states through `Crossfade` (nothing flips, the page below does not jump);
       loading is a `Skeleton` in the data's geometry, a `Spinner` only where there is no shape to hold.
 - [ ] Destructive irreversible actions confirm in a Modal; results of submitted actions show a Notification
       (instant toggles show one only on failure).
 - [ ] No hand-written animation on kit parts; custom motion uses motion tokens, `transform`/`opacity` only.
+- [ ] Every glyph comes from the kit — `<Icon name>`, else `prime-ui-kit/icons`, `createIcon` only for one
+      neither has; no raw `lucide-react` in JSX, no other icon library, no inline `<svg>`, no icon
+      animated by hand.
 - [ ] Every state change moves through the kit ([motion.md](motion.md)): a changed button label is new
       children (it morphs), a long action is `progress`, a counter is a number (it rolls), a new password
       has `strength`, an accepted code is `success`; nothing moves on frequent or keyboard actions.
 
 ## Themes and widths
 - [ ] Screen checked with `data-theme="dark"`: no hard-coded colors, everything readable.
-- [ ] Screen works at 320px: no horizontal page scroll, grids collapse, toolbars wrap, long text truncates or wraps.
+- [ ] Screen works at 320px: no horizontal page scroll, grids collapse, toolbars rearrange (`PageToolbar`) and switchers scroll, long text truncates or wraps.
 - [ ] The responsive checklist in [responsive.md](responsive.md#checklist-before-handing-a-screen-over) passes: widths 320 · 390 · 768 · 1024 · 1280 · 1920, the primary action in the top row, one height per row, no hover-only functions, zoom 400%.
 - [ ] Below 768px `AppHeader.MenuButton` opens the Sidebar; the header holds the title or path on every width.
 

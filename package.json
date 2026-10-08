@@ -118,10 +118,11 @@
     "./theme-dark.css": "./src/styles/theme-dark.css"
   },
   "scripts": {
-    "clean": "rm -rf dist .dts-stage playground/dist",
+    "clean": "rm -rf dist dist-skill .dts-stage playground/dist",
     "tokens:build": "bun run scripts/build-tokens.ts",
     "docs:build": "bun run scripts/build-docs.ts",
     "icons:add": "bun run scripts/add-glyph.ts",
+    "skill:build": "bun run scripts/build-skill.ts",
     "build": "bun run tokens:build && bun run scripts/bundle-lib.ts",
     "prepublishOnly": "bun run clean && bun run build",
     "playground:dev": "vite playground --config playground/vite.config.ts",
@@ -131,7 +132,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify": "bun run check:ci && bun run typecheck && bun run test && bun run verify:tokens && bun run build",
+    "verify": "bun run check:ci && bun run typecheck && bun run test && bun run verify:tokens && bun run build && bun run skill:build",
     "verify:tokens": "bun run tokens:build && git diff --exit-code -- src/styles/tokens.css src/styles/theme-light.css src/styles/theme-dark.css"
   },
   "sideEffects": [

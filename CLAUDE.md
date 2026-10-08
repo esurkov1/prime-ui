@@ -31,6 +31,7 @@ bun run typecheck
 bun run check               # biome (check:fix to autofix)
 bun run test                # vitest, incl. the docs contract
 bun run docs:build          # COMPONENT.md API + Labels sections from api.ts
+bun run skill:build         # installable skill in dist-skill/prime-ui-kit (SKILL + every COMPONENT.md and examples)
 bun run tokens:build        # src/styles/*.css from tokens/
 bun run build               # tokens + bundle + d.ts
 bun run verify              # everything CI runs — must be green before a commit
@@ -357,7 +358,10 @@ A component change is done only when all of these agree. Do them in the same cha
 8. **SKILL/** — holds no per-component content: `components.md` is a category tree of links to each
    `COMPONENT.md` and `examples/`. Touch it only when a component is added / removed / renamed (one
    line), when the choice between components changes (`choosing.md`), or when a shared rule changes
-   (`api-contract.md`, `foundations.md`). No symlinks: npm drops them. Every ```tsx block in SKILL
+   (`api-contract.md`, `foundations.md`, `motion.md`). No symlinks: npm drops them. SKILL links component
+   docs as `../src/<base>/<dir>/…`; `bun run skill:build` (part of `verify`) copies them into the
+   installable skill under `reference/` and fails on any broken link — install the skill from
+   `dist-skill/prime-ui-kit`, never by copying `SKILL/`. Every ```tsx block in SKILL
    compiles against the kit (checked by `skill-docs.test.ts`) unless marked ```tsx partial.
    `cheatsheet.md` is the one-page «do X, not Y» entry (read first): update it when a shared rule or a
    cross-component decision changes. A new or changed screen pattern goes to `SKILL/patterns/` with an

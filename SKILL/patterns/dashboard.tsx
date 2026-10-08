@@ -1,8 +1,9 @@
-/** A dashboard: the period switch in the header, a KPI row, panels with plan progress and the receivables split, and a short table with a link to the full list. */
+/** A dashboard: the period switch in the header, a KPI row that cross-fades to the new period, a revenue trend to scrub, panels with plan progress and the receivables split, and a short table with a link to the full list. */
 import {
   Badge,
   Button,
   Card,
+  Crossfade,
   DataTable,
   type DataTableColumn,
   Icon,
@@ -11,6 +12,8 @@ import {
   ProgressBar,
   type ProgressSegment,
   SegmentedControl,
+  Sparkline,
+  type SparklinePoint,
   Typography,
 } from "prime-ui-kit";
 import * as React from "react";
@@ -43,6 +46,28 @@ const KPIS: Record<
     { label: "Просрочено", value: "1,2 млн ₽", delta: "−1,1 млн ₽", tone: "success" },
   ],
 };
+
+const MONTHS = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+
+/** Daily revenue up to 8 October 2026: `days` points ending that day, a deterministic wave. */
+function dailyRevenue(days: number, base: number): SparklinePoint[] {
+  return Array.from({ length: days }, (_, i) => {
+    const day = new Date(2026, 9, 8 - (days - 1 - i));
+    const wave = Math.sin(i / 2.3) * 0.12 + Math.sin(i / 0.9) * 0.05 + i / days / 6;
+    return {
+      label: `${day.getDate()} ${MONTHS[day.getMonth()]}`,
+      value: Math.round((base * (1 + wave)) / 1000) * 1000,
+    };
+  });
+}
+
+const REVENUE: Record<Period, SparklinePoint[]> = {
+  week: dailyRevenue(7, 300_000),
+  month: dailyRevenue(30, 280_000),
+  quarter: dailyRevenue(90, 270_000),
+};
+
+const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
 
 const PLAN = [
   { manager: "Анна Климова", value: 92 },
@@ -127,15 +152,24 @@ export default function DashboardPattern() {
         </PageContent.Actions>
       </PageContent.Header>
       <PageContent.Body>
-        <div className={styles.kpis}>
-          {KPIS[period].map((kpi) => (
-            <Card.Root key={kpi.label} variant="stat-trend">
-              <Card.Label>{kpi.label}</Card.Label>
-              <Card.Value>{kpi.value}</Card.Value>
-              <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
-            </Card.Root>
-          ))}
-        </div>
+        {/* Another period is another set of values: the row cross-fades instead of flipping. */}
+        <Crossfade state={period}>
+          <div className={styles.kpis}>
+            {KPIS[period].map((kpi) => (
+              <Card.Root key={kpi.label} variant="stat-trend">
+                <Card.Label>{kpi.label}</Card.Label>
+                <Card.Value>{kpi.value}</Card.Value>
+                <Card.Delta tone={kpi.tone}>{kpi.delta}</Card.Delta>
+              </Card.Root>
+            ))}
+          </div>
+        </Crossfade>
+
+        <Card.Root variant="panel">
+          <Card.Body>
+            <Sparkline data={REVENUE[period]} label="Выручка по дням" formatValue={formatRubles} />
+          </Card.Body>
+        </Card.Root>
 
         <div className={styles.panels}>
           <Card.Root variant="panel">

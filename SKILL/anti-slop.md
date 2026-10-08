@@ -97,7 +97,7 @@ and inside a card, in both themes: rest, hover and the neighbour must be three d
 </Input.Root>
 
 // good
-<Input.Root label="Email">
+<Input.Root label="Почта">
   <Input.Wrapper>
     <Input.Field placeholder="name@company.ru" />
   </Input.Wrapper>
@@ -156,6 +156,26 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 - No placeholder text in empty states like «Здесь пока ничего нет :(» — say what to do and give the action.
 - No gradients, glows, extra shadows, colored section backgrounds. The kit's fill hierarchy is the style.
 - One primary (solid accent) button per area. Five solid buttons in a row is noise.
+
+## 8a. Icons from elsewhere, icons that do not move
+
+Kit icons are animated: each glyph plays its gesture when its button, link, tab, menu item or row is
+hovered or pressed. A glyph from another source sits dead next to them, and a hand-made hover spin
+fights them.
+
+```tsx partial
+// bad — a raw lucide glyph, an inline svg, and a hover spin of your own
+import { Archive } from "lucide-react";
+<Button.Icon><Archive /></Button.Icon>
+<svg viewBox="0 0 24 24"><path d="M3 6h18" /></svg>
+.button:hover .icon { transform: rotate(90deg); }
+
+// good — the semantic name first, then the full animated set, createIcon only for the rest
+<Button.Icon><Icon name="action.settings" /></Button.Icon>
+import { ArchiveIcon } from "prime-ui-kit/icons";
+<Button.Icon><ArchiveIcon /></Button.Icon>
+const IconBike = createIcon(Bike); // only a glyph neither set has
+```
 
 ## 9. Hand-made overlays
 

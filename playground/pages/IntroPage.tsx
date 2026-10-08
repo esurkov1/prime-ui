@@ -1,6 +1,3 @@
-import { useNavigate } from "react-router-dom";
-
-import { Card } from "@/components/card/Card";
 import { CodeBlock } from "@/components/code-block/CodeBlock";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { PageContent } from "@/components/page-content/PageContent";
@@ -14,49 +11,6 @@ const FOUNDATION_DOC = `${REPO}/blob/main/docs/foundation.md`;
 const SKILL = `${REPO}/blob/main/SKILL/SKILL.md`;
 const NPM = "https://www.npmjs.com/package/prime-ui-kit";
 const ISSUES = `${REPO}/issues`;
-
-const FOUNDATION_LINKS: { to: string; title: string; text: string }[] = [
-  {
-    to: "/color",
-    title: "Цвет",
-    text: "Роли вместо оттенков, светлая и тёмная темы, живая проверка контраста.",
-  },
-  {
-    to: "/typography",
-    title: "Типографика",
-    text: "Golos Text, 14 текстовых ролей, ширина строки и табличные цифры.",
-  },
-  {
-    to: "/spacing",
-    title: "Отступы",
-    text: "Шкала с шагом 4 px и правила близости: подпись, поле, группа, секция.",
-  },
-  {
-    to: "/size-tiers",
-    title: "Размеры",
-    text: "Пять уровней xs–xl. Контролы одного уровня стоят в ряд без подгонки.",
-  },
-  {
-    to: "/radius",
-    title: "Радиусы",
-    text: "8 у контролов, 12 у карточек, 16 у модалок. Вложенный радиус — внешний минус отступ.",
-  },
-  {
-    to: "/elevation",
-    title: "Слои и тени",
-    text: "Фон, карточка, плавающий слой, модалка и порядок z-index.",
-  },
-  {
-    to: "/motion",
-    title: "Движение",
-    text: "Три длительности, три кривые и поведение при reduced motion.",
-  },
-  {
-    to: "/focus",
-    title: "Фокус",
-    text: "Одно кольцо для всего кита: толщина, отступ, контраст.",
-  },
-];
 
 const INSTALL_CODE = `// Один раз в корне приложения
 import "prime-ui-kit/bundle.css";  // токены, обе темы и стили компонентов
@@ -81,7 +35,6 @@ export function Example() {
 // Тёмная тема: <html data-theme="dark">`;
 
 export default function IntroPage() {
-  const navigate = useNavigate();
   return (
     <PageContent.Section aria-labelledby="playground-intro">
       <PageContent.Header>
@@ -133,30 +86,6 @@ export default function IntroPage() {
                 </Typography>
               </li>
             </ul>
-          </div>
-
-          <div className="introPageSection">
-            <DemoSectionTitle>Основа</DemoSectionTitle>
-            <div className="introFeatureGrid">
-              {FOUNDATION_LINKS.map((item) => (
-                <Card.Root key={item.to} variant="cta">
-                  <Card.Title>{item.title}</Card.Title>
-                  <Card.Description>{item.text}</Card.Description>
-                  <Card.Footer>
-                    <LinkButton
-                      href={item.to}
-                      size="s"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        navigate(item.to);
-                      }}
-                    >
-                      Открыть
-                    </LinkButton>
-                  </Card.Footer>
-                </Card.Root>
-              ))}
-            </div>
           </div>
 
           <div className="introPageSection">

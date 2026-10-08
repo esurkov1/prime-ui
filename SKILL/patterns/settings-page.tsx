@@ -103,7 +103,7 @@ export default function SettingsPagePattern() {
             <Card.Root variant="panel">
               <Card.Body>
                 <div className={styles.fields}>
-                  <Input.Root label="Название" required>
+                  <Input.Root label="Название">
                     <Input.Wrapper>
                       <Input.Field name="name" defaultValue="ООО «Прайм Софт»" disabled={saving} />
                     </Input.Wrapper>
@@ -111,7 +111,6 @@ export default function SettingsPagePattern() {
                   <div className={styles.pair}>
                     <Input.Root
                       label="ИНН"
-                      required
                       error={innError}
                       hint="10 или 12 цифр"
                       reserveSupportRow

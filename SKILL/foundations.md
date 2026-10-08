@@ -1,27 +1,27 @@
 # Foundations — do it this way
 
-Condensed from the kit's design contract (`docs/foundation.md` in the kit repository; section numbers
-below refer to it). Use semantic tokens `--prime-*` only.
+Condensed from the kit's design contract (`docs/foundation.md` in the kit repository). Use semantic
+tokens `--prime-*` only.
 
-## 1. 4px grid (§1.2)
+## 1. 4px grid
 
 Every spacing, height, padding and gap is a multiple of 4. Spacing tokens: `--prime-space-N` = N × 4px.
 
 | Token | px | Token | px |
 |---|---|---|---|
-| `--prime-space-1` | 4 | `--prime-space-6` | 24 |
+| `--prime-space-1` | 4 | `--prime-space-7` | 28 |
 | `--prime-space-2` | 8 | `--prime-space-8` | 32 |
 | `--prime-space-3` | 12 | `--prime-space-10` | 40 |
 | `--prime-space-4` | 16 | `--prime-space-12` | 48 |
-| `--prime-space-5` | 20 | `--prime-space-16` | 64 |
-|  |  | `--prime-space-20` / `-24` | 80 / 96 |
+| `--prime-space-5` | 20 | `--prime-space-14` / `-16` | 56 / 64 |
+| `--prime-space-6` | 24 | `--prime-space-20` / `-24` | 80 / 96 |
 
 Off-grid values exist only inside the kit (1px hairline, 2px focus ring). Never in your CSS.
 
 The only places a raw length is allowed: `@media` / `@container` conditions (tokens cannot be used
 there) and props a component documents as a CSS length string, e.g. DataTable column `width: "14rem"`.
 
-## 2. Proximity scale (§1.3)
+## 2. Proximity scale
 
 Things that belong together sit closer than things that do not.
 
@@ -36,12 +36,12 @@ Things that belong together sit closer than things that do not.
 | switch → switch in a settings list | 20 | `--prime-space-5` |
 | group → group (fieldset, form section) | 32 | `--prime-space-8` |
 | card → card in a grid | 16 | `--prime-space-4` |
-| section → section on a page | 40–48 | `--prime-space-10` / `--prime-space-12` |
+| section → section on a page | 40 | `--prime-space-10` — `PageContent.Body` already does it |
 
 `PageContent.Body` already spaces its direct blocks (cards, tables, sections) 40 apart and `AppShell.Main`
 already carries the page gutters — do not add your own outer padding.
 
-## 3. Size axis (§1.4, §6)
+## 3. Size axis
 
 `size: "xs" | "s" | "m" | "l" | "xl"`, default `m` (height 28 · 32 · 36 · 40 · 48).
 
@@ -54,7 +54,7 @@ already carries the page gutters — do not add your own outer padding.
   cell heights in CSS. Column dividers and the sort icon position come from DataTable; do not restyle
   them.
 
-## 4. Fill, not lines (§1.1, §4)
+## 4. Fill, not lines
 
 - Surfaces stand on one ladder: the page (layer 0) and four nested layers, each one lightness step
   from its parent. Light: gray page, white card, deeper layers alternate gray / white. Dark: a
@@ -74,12 +74,12 @@ already carries the page gutters — do not add your own outer padding.
   `border-radius: var(--prime-card-radius)`; never a transparent box with a border, never a
   hard-coded `--prime-color-layer-2-bg`.
 
-## 5. Nested radius (§1.5, §7)
+## 5. Nested radius
 
 Inner radius = outer radius − padding. Panel 12 with padding 4 → items 8. Use `--prime-radius-*`
 (`xs 4 · s 6 · m 8 · l 12 · xl 16 · full`), `--prime-card-radius`, `--prime-panel-radius`.
 
-## 6. tone and color (§3, §10)
+## 6. tone and color
 
 - `tone` is meaning: `neutral · accent · success · warning · danger · info`. Destructive is `danger`.
 - `color` is decoration from the palette: `gray · blue · green · orange · red · yellow · purple · sky ·
@@ -88,7 +88,7 @@ Inner radius = outer radius − padding. Panel 12 with padding 4 → items 8. Us
   across the product (e.g. «Оплачен» is always green): keep one `Record<Status, PaletteColor>` map.
 - Never convey meaning by color alone: a status badge has text.
 
-## 7. Typography (§5)
+## 7. Typography
 
 | Role | Size/LH | Use |
 |---|---|---|
@@ -111,12 +111,12 @@ tabular (the kit does it in DataTable `numeric` columns and `Card.Value`; your o
 (`PageContent.Root maxWidth="readable"`). Secondary text uses `tone="secondary"`/`"muted"` on
 `Typography`, not a lighter custom color.
 
-## 8. Hierarchy through air (§1.6)
+## 8. Hierarchy through air
 
 Important content gets more space; secondary content is grouped tighter. Do not put everything on one
 level of air: a page with uniform 16px gaps everywhere reads as a list of unrelated things.
 
-## 9. Responsive (§9)
+## 9. Responsive
 
 - Flexbox for rows/stacks, Grid for two-dimensional layouts; spacing via `gap`.
 - Must work from 320px and at 400% zoom; the full rules are in [responsive.md](responsive.md).
@@ -131,17 +131,14 @@ level of air: a page with uniform 16px gaps everywhere reads as a list of unrela
 - Card grids: `grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr))`.
 - A page panel with sections, filter and search, view and the primary action is `PageToolbar`.
 
-## 10. Focus and motion (§7)
+## 10. Focus and motion
 
-Never remove focus rings, never set `outline: none`. Motion durations come from
-`--prime-motion-duration-*`; the kit already animates overlays — add no animation of your own to them.
-Kit components ship their micro-animations (press, toggle, selection glide, open/close) — never re-implement
-or override them. Own custom elements follow the same rules: `--prime-motion-duration-fast|base|slow` and
-`--prime-motion-easing-standard|enter|exit` only; animate `transform`/`opacity`, never `transition: all`,
-never `ease-in`; press `scale(0.98)`; no movement on keyboard-driven or frequent actions; exit never slower
-than enter.
+Never remove focus rings, never set `outline: none`. Kit components ship their motion (press, toggle,
+selection glide, open/close, label morph, rolling counters) — never re-implement or override it. Motion
+of your own elements — when to move at all, the tokens, the rules and recipes — is
+[motion.md](motion.md).
 
-## 11. State changes are continuous (§1.7)
+## 11. State changes are continuous
 
 Nothing on screen flips from one state to another. Kit controls already move into their new state.
 Every region you build that changes what it shows — loading → data → empty → error, one record →

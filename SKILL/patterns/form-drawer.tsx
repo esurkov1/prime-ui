@@ -149,7 +149,7 @@ export default function FormDrawerPattern() {
                           <Radio.Label>ИП</Radio.Label>
                         </Radio.Root>
                       </Radio.Group>
-                      <Input.Root label="Название" required error={errors.name}>
+                      <Input.Root label="Название" error={errors.name}>
                         <Input.Wrapper>
                           <Input.Field
                             name="name"
@@ -159,7 +159,7 @@ export default function FormDrawerPattern() {
                         </Input.Wrapper>
                       </Input.Root>
                       <div className={styles.pair}>
-                        <Input.Root label="ИНН" required error={errors.inn} reserveSupportRow>
+                        <Input.Root label="ИНН" error={errors.inn} reserveSupportRow>
                           <Input.Wrapper>
                             <Input.Field name="inn" inputMode="numeric" placeholder="7704512908" />
                           </Input.Wrapper>
@@ -183,7 +183,6 @@ export default function FormDrawerPattern() {
                     <div className={styles.fields}>
                       <Input.Root
                         label="Почта для счетов"
-                        required
                         error={errors.email}
                         hint="На неё уйдут счета и акты"
                       >

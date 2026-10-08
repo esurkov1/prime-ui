@@ -4,6 +4,8 @@ A screen made from the kit looks finished when every block sits on the same few 
 one rhythm, one size, one primary action, fill instead of lines, and a state for every region. This
 file is those rules; [patterns/](patterns/) are the same rules as working screens.
 
+## Patterns
+
 **Start from a pattern.** Each one is a complete page (React + one CSS module on tokens), copyable as
 is, and is shown live with its code in the playground (category «Композиция»):
 
@@ -13,7 +15,7 @@ is, and is shown live with its code in the playground (category «Компози
 | One record | [detail-page.tsx](patterns/detail-page.tsx) | Breadcrumb + status in the header, actions by weight, main column + side column of Cards, Timeline |
 | Settings | [settings-page.tsx](patterns/settings-page.tsx) | heading column + panel per section, form with its own save, Switches that apply at once, danger zone with a confirm |
 | Create in a side panel | [form-drawer.tsx](patterns/form-drawer.tsx) | Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
-| Dashboard | [dashboard.tsx](patterns/dashboard.tsx) | period switch, KPI row, panels with progress and a split, short table + link to the list |
+| Dashboard | [dashboard.tsx](patterns/dashboard.tsx) | period switch, KPI row that cross-fades to the new period, a Sparkline revenue trend, panels with progress and a split, short table + link to the list |
 | Screen states | [screen-states.tsx](patterns/screen-states.tsx) | page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
 
 Pick the closest one, rename the domain, keep the skeleton. Change structure only when the task needs
@@ -161,7 +163,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - Where: ≤ 4 fields → `Modal`; long create / edit → `Drawer` or a page; settings → a panel Card per
   section, the whole `Card.Root` inside `<form>`, buttons in `Card.Footer`.
 - Submit: `noValidate`, validate all, set `error`s, focus the first invalid field, `loading` on the
-  submit button and `disabled` on the fields (`<fieldset disabled>`), then a `Notification`.
+  submit button and the fields disabled (each field's `disabled`, or one `<fieldset disabled>` around
+  them), then a `Notification`.
 - A footer button outside the form submits it with `form={formId}`.
 - Choice controls: Checkbox when the value is submitted later, Switch when it applies at once (no Save
   in that section), `Radio.Group label` for one of 2–5 visible options.
@@ -196,7 +199,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 Stale data beats an empty block: show the last known values and say when they are from.
 
-State change is continuous across the kit (foundation §1 rule 7): a region never jumps from one state
+State change is continuous across the kit: a region never jumps from one state
 to the next. Give every region its states, render them inside `Crossfade`, and let the loading state
 mirror the data's rows and gaps with `Skeleton`, so the swap moves nothing on the page.
 
@@ -232,35 +235,26 @@ while a request runs.
 
 ## 12. Motion
 
-Kit components already animate press, hover, selection, open/close, enter/exit. Add nothing on top of
-them. Your own element animates only with `--prime-motion-duration-*` / `--prime-motion-easing-*`,
-`transform` / `opacity`, both directions, reduced motion respected — and only when the change would
-otherwise be missed. High-frequency and keyboard actions stay still.
+Kit components already move: press, hover, selection, open/close, enter/exit, label morph, rolling
+counters, progress and hold fills. Add nothing on top of them. When to move your own elements at all,
+the tokens and the recipes: [motion.md](motion.md).
 
 ## 13. Screen-level anti-slop
 
-- A card around everything, a card around a table, a card inside a card.
-- Two solid buttons in one area; the same action named twice; a primary button in every card.
-- One gap value for the whole page; outer padding added on top of `AppShell.Main`.
-- A subtitle that repeats the title; filler copy; icons next to every label; emoji.
-- Hand-made spinners, skeletons, badges, dividers, modals, filter bars — the kit has each of them.
-- A region that flips between states (`{loading ? <Spinner /> : <List />}`) — wrap it in `Crossfade`, load with `Skeleton`.
-- Mixed sizes in one row; `size="s"` on a single control to "make it fit".
-- Colored section backgrounds, borders around blocks, extra shadows.
-
-Component-level slop with bad → good code: [anti-slop.md](anti-slop.md).
+What makes a screen look generated, with bad → good code: [anti-slop.md](anti-slop.md).
 
 ## 14. When the kit has no ready component
 
 Go down this ladder and stop at the first step that works.
 
 1. **Find it in the kit.** Search [components.md](components.md), then the Variants and Anatomy of the
-   closest component: Card has 7 templates, Input has icons / affixes / a clear button / a counter,
+   closest component: Card has 7 templates, Input has icons / affixes / a clear button / a counter / a strength meter,
    Select has rich items and search, Dropdown has a profile header, DataTable has a toolbar slot, nested
-   rows and a detail row.
+   rows and a detail row (`renderExpanded`), Sparkline is a small trend chart, Kanban a status board.
 2. **Compose kit parts.** Put existing components together on a layout wrapper (CSS Module, `gap` on
    tokens). Most "missing components" are a Card + Typography + Button arrangement.
-3. **Last resort: a new element on tokens.** Only when 1–2 cannot express it (a chart, a kanban column).
+3. **Last resort: a new element on tokens.** Only when 1–2 cannot express it (a chart with axes and
+   several series, a map).
 
 Rules for your own component:
 
@@ -281,7 +275,7 @@ SegmentedControl right after `Card.Title` in `Card.Header`, one tier down becaus
 header row.
 
 ```tsx
-import { Card, SegmentedControl, Typography } from "prime-ui-kit";
+import { Card, SegmentedControl } from "prime-ui-kit";
 
 export function RevenuePanel() {
   return (
@@ -294,12 +288,8 @@ export function RevenuePanel() {
         </SegmentedControl.Root>
       </Card.Header>
       <Card.Body>
-        <Typography as="p" variant="heading-m">
-          4,2 млн ₽
-        </Typography>
-        <Typography as="p" variant="body-s" tone="secondary">
-          +18% к прошлому месяцу
-        </Typography>
+        <Card.Value>4,2 млн ₽</Card.Value>
+        <Card.Delta tone="success">+18% к прошлому месяцу</Card.Delta>
       </Card.Body>
     </Card.Root>
   );
@@ -307,4 +297,5 @@ export function RevenuePanel() {
 ```
 
 For a plain KPI row use `Card.Root variant="stat-trend"` (Label · Value · Delta) in an `auto-fit` grid —
-see [patterns/dashboard.tsx](patterns/dashboard.tsx).
+see [patterns/dashboard.tsx](patterns/dashboard.tsx). When the trend over days matters, put a
+`Sparkline` in the `Card.Body` instead: it brings the value, the change and a line to scrub.

@@ -5,8 +5,8 @@ the kit's author would make it move: every state change is continuous, every pre
 flips — and nothing moves without a reason. Most of it is already inside the components; your job is
 to use them so it can happen, and to add motion only where the kit leaves the choice to you.
 
-The design contract is `docs/foundation.md` §7 in the kit repository. This file is how to apply it
-on a screen.
+The full design contract lives in the kit repository (`docs/foundation.md`, «Motion»); this file is how
+to apply it on a screen and is enough on its own.
 
 ## 1. What the kit already animates — do not rebuild it
 
@@ -15,15 +15,17 @@ Use the component and the motion comes with it. Never re-animate these with your
 | You need | The kit does it | How you get it |
 |---|---|---|
 | Press feedback | every pressable control scales to 0.98 (0.96 icon-only) | any `Button`, chip, item |
+| Icons that feel alive | every kit icon plays its own gesture once when its host (button, link, tab, menu item, option, row) is hovered or pressed; never on keyboard focus, disabled, or under reduced motion | `<Icon name>`, `prime-ui-kit/icons` glyphs, `createIcon` (a soft pop); `animated={false}` to keep one still |
 | A button whose label changes («Сохранить» → «Сохранено», «Продолжить» → «Подтвердить») | the new label flows in letter by letter, the width glides; digits-only changes stay in place | change the `Button.Root` text children |
 | A long action from a button (download, export) | a fill grows inside the button | `Button.Root progress={0…1}`, the number in the label |
-| A destructive action without a dialog | a held press with a fill clock; early release rolls back | `Button.Root holdToConfirm onConfirm={…}` |
+| One destructive action without a list or a dialog | a held press with a fill clock; early release rolls back | `Button.Root holdToConfirm onConfirm={…}` |
 | Loading inside a button | spinner over the kept label, width does not change | `loading` |
 | Check / uncheck | the check draws in with a stroke, leaves fast | `Checkbox`, `Checkbox.Indicator`, `ColorSwatches` |
 | Toggle | the thumb slides | `Switch` |
 | One of a few | the indicator glides to the choice | `SegmentedControl`, `Tabs` |
 | Disclosure | height through `grid-template-rows`, the chevron turns | `Accordion` |
 | A counter or a count | digits roll like an odometer | `Badge` with a number child, the `counter` of `Input` / `Textarea` |
+| A field with an error | the control shakes once, sharply, when the error arrives or changes; the label stays, the message drops in | `error` (or `invalid`) on any field, `Checkbox.Root`, `Switch.Root`, `Radio.Group` — not for an error the field mounts with |
 | Password strength | stepped bar fills cell by cell, the level word flows in | `Input.Root strength` |
 | A one-time code | one focus ring glides between cells, digits fade in, success rolls across | `DigitInput` (`success` after the server accepts) |
 | Steps of a whole | cells fill one after another | `ProgressBar steps value max` |
@@ -42,7 +44,7 @@ Ask by frequency, then by purpose.
 
 | How often a person does it | Motion |
 |---|---|
-| Hundreds of times a day, or from the keyboard (arrowing a list, row hover, command palette) | none — color / fill only, at most `fast` |
+| Hundreds of times a day, or from the keyboard (arrowing a list, row hover, command palette) | none — color / fill only, at most `xfast` |
 | Tens of times a day (hover, tabs, toggles) | small and quick |
 | Occasionally (dialogs, drawers, toasts) | the standard overlay motion |
 | Rarely (success, empty state, onboarding, a milestone) | may carry delight |
@@ -71,7 +73,7 @@ under it. Easing starts when the hand lets go.
 | `--prime-motion-blur` | 2 px | hiding a change of shape while two states swap |
 | `--prime-motion-press-scale` / `-compact` | 0.98 / 0.96 | `:active` scale |
 
-Under `prefers-reduced-motion` the durations, stagger and press scale collapse to zero globally —
+Under `prefers-reduced-motion` the durations and stagger go to 0 and the press scale to 1 globally —
 token-based CSS honours it for free. Anything you drive from JS checks the media query itself.
 
 ## 4. Rules for your own motion
@@ -86,7 +88,7 @@ token-based CSS honours it for free. Anything you drive from JS checks the media
 - State moves, it does not swap: a selection travels, a check draws, a counter rolls, two contents
   cross-fade. A toggled state uses transitions (they retarget mid-flight); keyframes only for one-shot
   appearance.
-- Hover movement only inside `@media (hover: hover) and (pointer: fine)`; nothing is hover-only.
+- Hover movement only inside `@media (hover: hover)`; nothing is hover-only.
 - Stagger only the first render of a short group (≤ 6 items) and never block interaction with it.
 - A gesture clock (a hold, a countdown) is information, not motion: it keeps running under reduced
   motion.
@@ -118,8 +120,10 @@ export function ExportButton({ progress, ready }: { progress?: number; ready: bo
 **Save → saved.** `loading` while the request runs, then change the label; the kit morphs it. Return
 to the idle label after about two seconds.
 
-**Delete without a dialog.** For an action that is easy to redo by hand, `holdToConfirm` replaces a
-confirm dialog. Keep the dialog for anything irreversible that loses work.
+**Delete without a dialog.** One destructive action that is not a row in a list and is easy to redo
+by hand (clear a draft, revoke a token) → `holdToConfirm` instead of a confirm dialog. A row in a list →
+the undo recipe below. Irreversible loss of work → keep the confirm Modal. (The rule:
+[choosing.md](choosing.md), «Confirming a destructive action».)
 
 ```tsx
 import { Button, Icon } from "prime-ui-kit";
@@ -181,6 +185,9 @@ export function CloseQuarter({ onClose }: { onClose: () => void }) {
 - Bounce, elastic or a spring that overshoots → `emphasized` lands without passing the target.
 - Animating the highlight of a list moved by arrow keys, or a command palette → keep it still.
 - Hover lift on table rows or list items → fill change only.
+- Your own hover rotate, spin or bounce on an icon, or an icon from another library that does not move
+  → a kit icon: it already plays its gesture with its host. A glyph repeated in every row of a long
+  list → `animated={false}`.
 - Your own fade-in keyframes on a whole page or every card → no; first render is still, except a
   short staggered group.
 - Confetti for a saved form → a notification; confetti only for rare milestones.

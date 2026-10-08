@@ -1,4 +1,4 @@
-# API contract v1 — cheat sheet
+# API contract v1
 
 One name per concept across the whole kit. If a prop name below does not appear in a component's
 `COMPONENT.md` API table, the component does not have it — do not invent it.
@@ -16,7 +16,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 
 | Concept | API | Notes |
 |---|---|---|
-| Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`; Modal/Drawer `Content` takes `size` for its width. Every field and control (Input, Textarea, DigitInput, Checkbox, Radio, Switch, Slider, FileUpload, ColorSwatches, ColorPresets, SegmentedControl, Button, ButtonGroup, LinkButton, Label) and `Icon` / `Checkbox.Indicator` without `size` take the tier of a sized host (Popover, Banner, LoginForm, DataTable toolbar, `ControlSizeProvider`), else `m`. |
+| Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`; an overlay `Content` (Modal, Drawer, Popover, Dropdown, Tooltip) takes `size` for its width. Without `size` these take the tier of a sized host (Popover, Banner, LoginForm, DataTable toolbar, `ControlSizeProvider`), else `m`: Input, Textarea, DigitInput, Checkbox, Radio, Switch, Slider, FileUpload, ColorSwatches, ColorPresets, SegmentedControl, Button, ButtonGroup, LinkButton, Label, Badge, Spinner, Skeleton, `Icon`, `Checkbox.Indicator`. Select, NativeSelect, TagSelect, Datepicker, Tabs and SmartFilter do **not** read the host — give them `size` yourself. |
 | Treatment | `variant` | `solid · soft · outline · ghost`; structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
 | Meaning | `tone` | Button: `accent \| neutral \| danger`, plus `inherit` (with `ghost \| soft \| outline`) for an action on a colored host — it takes the host's text color; never recolor a Button with a CSS override. Destructive is `danger`, never `error`. |
 | Decoration | `color` | Badge, Avatar, Thumbnail, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `FileUpload.FormatBadge`, `Timeline.Item`, TagSelect options. |
@@ -32,7 +32,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Flags | `disabled`, `readOnly`, `required`, `optional`, `loading`, `fullWidth` | Same names everywhere. |
 | Focus ring | `focusRing` (default `true`) | Fields only; `false` only where focus is obvious otherwise. |
 | System strings | `labels?: Partial<XLabels>` | aria labels, counters, default texts; Russian defaults; values as `{token}` templates. Visible content goes in children or props. |
-| Structure | `X.Root` + `X.Part` | Only for components with parts. Leaves are single exports: `Typography`, `Kbd`, `Divider`, `Spinner`, `LinkButton`, `NativeSelect`, `DigitInput`, `Slider`, `TagSelect`, `ColorSwatches`, `CodeBlock`, `ProgressBar`, `ProgressCircle`, `Pagination`, `DataTable`, `ExampleFrame`. A group of roots is `X.Group` (`Radio.Group`, `Avatar.Group`). |
+| Structure | `X.Root` + `X.Part` | Only for components with parts. Leaves are single exports: `Typography`, `Kbd`, `Divider`, `Spinner`, `Skeleton`, `Crossfade`, `LinkButton`, `NativeSelect`, `DigitInput`, `Slider`, `TagSelect`, `ColorSwatches`, `CodeBlock`, `ProgressBar`, `ProgressCircle`, `Sparkline`, `Pagination`, `DataTable`, `ExampleFrame`. This is the one list; other files link here. A group of roots is `X.Group` (`Radio.Group`, `Avatar.Group`). |
 | Icons in parts | `X.Icon`, `X.ItemIcon` | `Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`, `Dropdown.ItemIcon`… — never an `icon` prop on a component. Only data arrays (`notify()`, `options`) carry `icon: ReactNode`. |
 | DOM state | `data-size`, `data-variant`, `data-tone`, `data-color`, `data-invalid`, `data-disabled`, `data-loading`, `data-state` | Style your wrappers from these, not from class names of kit internals. |
 
@@ -60,7 +60,7 @@ export function PeriodFilter() {
 
 - Every field has its frame built in: `label`, `hint`, `error`, `required`, `optional` on Input,
   Textarea, Select, NativeSelect, TagSelect, Datepicker, DigitInput, FileUpload, ColorSwatches and
-  `Radio.Group` (ColorPicker: `label`, `hint`, `error`; Slider: `label`). The label row, hint row and
+  `Radio.Group`, and Slider (ColorPicker: `label`, `hint`, `error` on `ColorPicker.HexInput`). The label row, hint row and
   spacing come with it — never put a `Label` or `Hint` next to a field that has `label`.
 - Checkbox, Switch and Radio: the root renders the `<label>` with the input; the visible text is the
   `X.Label` part; `hint` and `error` are props of `X.Root` (`Radio.Root` takes `hint`).
@@ -94,7 +94,7 @@ import styles from "./InviteForm.module.css";
 export function InviteForm() {
   return (
     <form className={styles.form} noValidate onSubmit={(event) => event.preventDefault()}>
-      <Input.Root label="Email" required error="Введите email в формате name@company.ru">
+      <Input.Root label="Почта" required error="Введите почту в формате name@company.ru">
         <Input.Wrapper>
           <Input.Field type="email" name="email" placeholder="name@company.ru" />
         </Input.Wrapper>
@@ -119,14 +119,13 @@ loading and a toast: [patterns/form-drawer.tsx](patterns/form-drawer.tsx).
 
 ## Loading without DataTable
 
-The kit has no skeleton component. DataTable (`loading`), Select (`loading`) and Button (`loading`) have
-built-in states. For a card or region that is loading its data: keep the real layout, set
-`aria-busy="true"` on the Card or region, put a `Spinner` (with `aria-hidden="true"`, since the region
-already says it is busy) where the content will appear, and show the error in place (DataTable `error`,
-a `Banner` for the page, `EmptyPage` with `EmptyPage.Icon tone="danger"` and a retry for a region).
-Wrap the region's content in `Crossfade state={status}` so loading → data → empty → error cross-fade
-and the height glides instead of jumping; DataTable's body already does this.
-Never draw your own spinners or shimmer blocks. See [patterns/screen-states.tsx](patterns/screen-states.tsx).
+DataTable (`loading`), Select (`loading`) and Button (`loading`, `progress`) have built-in states. For
+any other card or region that loads: wrap its content in `Crossfade state={status}` with
+`aria-busy={status === "loading"}`, and render a `Skeleton` in the geometry of the data while it loads
+(same rows, gaps and heights). A `Spinner` only where there is no shape to hold. Show the error in
+place (a `Banner` for the page, `EmptyPage` with `EmptyPage.Icon tone="danger"` and a retry for a
+region). Never draw your own spinners or shimmer blocks. See
+[patterns/screen-states.tsx](patterns/screen-states.tsx) and [motion.md](motion.md).
 
 ## Secondary actions
 
@@ -154,7 +153,12 @@ Cancel.
 | `applyTheme(scheme, element?)` | switch `data-theme` without a transition flash |
 | `NotificationProvider`, `useNotifications()` | toasts; provider once at the app root, `notify({ tone, title, description, action })` |
 | `Tooltip.Provider` | shared delay for many tooltips |
-| `ControlSizeProvider` | set one `size` for a whole region (dense toolbar, compact form) |
+| `ControlSizeProvider` | one `size` for a region (dense toolbar, compact form) — for the components that read the host tier (see Size above); pass `size` to the others |
+| `celebrate({ origin })` | a short confetti burst for a rare milestone; nothing under reduced motion — see [motion.md](motion.md) |
+| `getPasswordStrength(value)` | the 0–4 estimate behind `Input.Root strength`; replace it with `getStrength` |
+| `COLOR_PRESETS` | the kit's 16 palette colors for `ColorSwatches` / `ColorPresets` `presets` |
+| `datepickerPresets`, `DEFAULT_DATEPICKER_PRESETS`, `formatDatepickerValue` | quick ranges and value display for `Datepicker` |
+| `moveBefore(items, id, beforeId, getId)` | apply a `Dnd` reorder to your array in `onReorder` |
 | `useSidebar()` | Sidebar state for custom parts inside `Sidebar.Root` |
 | `matchesSmartFilter`, `resolveSmartFilterValues` | apply a SmartFilter value to your rows |
 | `Icon`, `createIcon` | kit icon set and domain glyphs — see Icons below |
@@ -172,26 +176,39 @@ Cancel.
 - `object.*`: `activity`, `bell`, `book`, `cart`, `chart`, `document`, `image`, `inbox`, `key`,
   `message`, `package`, `receipt`, `rocket`, `storage`, `tasks`, `truck`, `user`, `users`, `wallet`;
 - `sort.*`: `ascending`, `descending`, `none`;
-- `status.*`: `danger`, `emailSent`, `info`, `locked`, `offline`, `success`, `warning`;
+- `status.*`: `danger`, `emailSent`, `info`, `locked`, `offline`, `success`, `trendUp`, `warning`;
 - `theme.*`: `dark`, `light`; `view.*`: `code`, `preview`; `viewport.*`: `desktop`, `mobile`, `tablet`.
 
-Take a glyph from the kit first: a semantic `<Icon name>` above; any other glyph from the full animated
-set `prime-ui-kit/icons` (about 500 named components with the same `size`, `tone`, `animated` —
-`import { BellIcon } from "prime-ui-kit/icons"` → `<BellIcon />`; only what you import is bundled).
-Only a domain glyph neither has (a bike, a tooth) comes from `lucide-react` (add it to the app's
-dependencies), wrapped once at module level with `createIcon` so it sizes and tones like a kit icon: `const IconBike = createIcon(Bike);` → `<IconBike />`. Icon-only buttons need `aria-label`;
+Every glyph comes from the kit, in this order:
+
+1. **A semantic name above** — `<Icon name="object.bell" />`. The meaning is in the name, so the same
+   action has the same glyph across the app.
+2. **The full animated set** — `prime-ui-kit/icons`: about 500 named components, each a Lucide drawing
+   with its own gesture, with the same `size`, `tone`, `strokeWidth`, `animated` props.
+   `import { BellIcon } from "prime-ui-kit/icons"` → `<BellIcon />`; only what you import is bundled.
+   The name is the Lucide name + `Icon` (`ArrowBigDown` → `ArrowBigDownIcon`); the full list is
+   [icon-set.ts](../src/icon-set.ts) — search it before reaching further.
+3. **Only a glyph neither has** comes from `lucide-react` (add it to the app's dependencies), wrapped
+   once at module level with `createIcon` so it sizes, tones and plays like a kit icon:
+   `const IconBike = createIcon(Bike);` → `<IconBike />`.
+
+Never a raw `lucide-react` component, another icon library, an inline `<svg>` or an icon font. Icon-only buttons need `aria-label`;
 decorative icons inside kit slots (`Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`) are hidden
 automatically.
 
 Every kit icon is animated: its gesture plays once when the host it sits in (button, link, tab,
-label, menu item, option, table row) is hovered or pressed on touch — nothing to wire. Keyboard
-focus and reduced motion stay still; `animated={false}` keeps one icon still. A `createIcon`
-glyph gets a soft pop.
+label, menu item, option, table row) is hovered or pressed on touch — nothing to wire. The nearest
+host owns the icon (hovering a card does not play the icons of its buttons); outside any host the
+icon plays when it is hovered itself. Keyboard focus, disabled and loading hosts and reduced motion
+stay still. A `createIcon` glyph gets a soft pop. Never animate an icon yourself (no hover rotate,
+spin or bounce in your CSS). `animated={false}` keeps one icon still — for a glyph repeated in every
+row of a long list, where a gesture on each row hover would be noise ([motion.md](motion.md)).
 
 ## Styling your own wrappers
 
 CSS Modules + tokens. Never override kit internals (`.root button { … }`), never pass `style`.
-`className` on a kit part is for placement only (grid area, width, flex, `align-self`, `display` to hide
-a part at a breakpoint) — not for color, padding, radius or the gap inside a kit container. The only
+`className` on a kit part is for placement only (grid area, width, flex, `align-self`, order) — not for
+color, padding, radius or the gap inside a kit container. Never hide a part at a breakpoint: rearrange
+it ([responsive.md](responsive.md)). The only
 exceptions are the ones a component's `COMPONENT.md` documents (e.g. the round avatar drop zone of
 FileUpload).

@@ -321,7 +321,7 @@ export default function ListPagePattern() {
               </EmptyPage.Title>
               <EmptyPage.Description>Измените запрос или сбросьте фильтры.</EmptyPage.Description>
               <EmptyPage.Actions>
-                <Button.Root variant="outline" tone="neutral" onClick={resetFilters}>
+                <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
                   Сбросить фильтры
                 </Button.Root>
               </EmptyPage.Actions>

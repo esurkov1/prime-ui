@@ -46,7 +46,7 @@ Pick from options: toggles, lists, ranges, filters, dates, colors.
 | TagSelect | A multi-value field that shows the picked values as coloured tags, filters as you type and can create new tags. | [COMPONENT.md](../src/components/tag-select/COMPONENT.md) · [examples](../src/components/tag-select/examples/) |
 | SmartFilter | A filter bar for lists and tables: a filter button and a search with a panel of values, applied filters as removable tags, and a "show / hide" choice for every value. | [COMPONENT.md](../src/components/smart-filter/COMPONENT.md) · [examples](../src/components/smart-filter/examples/) |
 | Datepicker | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). | [COMPONENT.md](../src/components/datepicker/COMPONENT.md) · [examples](../src/components/datepicker/examples/) |
-| ColorPicker | Color selection: a full picker (hex field, area, channel sliders and fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. | [COMPONENT.md](../src/components/color-picker/COMPONENT.md) · [examples](../src/components/color-picker/examples/) |
+| ColorPicker | Color selection: a full picker (hex field, area, channel sliders and fields, eyedropper, swatches) from `prime-ui-kit/color-picker` (needs `react-aria-components`), and `ColorPresets` for a quick color from a fixed palette from the root entry. | [COMPONENT.md](../src/components/color-picker/COMPONENT.md) · [examples](../src/components/color-picker/examples/) |
 | ColorSwatches | An inline color choice: preset swatches that wrap inside a form, without a popover. | [COMPONENT.md](../src/components/color-swatches/COMPONENT.md) · [examples](../src/components/color-swatches/examples/) |
 
 ## Data display (`data-display`)
@@ -139,11 +139,12 @@ Ready-made screen blocks; whole screens are in [composition.md](composition.md) 
 
 ## Foundations (`foundations`)
 
-Text roles.
+Text roles and icons.
 
 | Component | Purpose | Docs |
 |---|---|---|
 | Typography | Text roles of the Golos Text type scale applied to any text element, with reading-width guidance. | [COMPONENT.md](../src/components/typography/COMPONENT.md) · [examples](../src/components/typography/examples/) |
+| Icon | Animated glyphs: the semantic `<Icon name>` set, the full set of about 500 in `prime-ui-kit/icons`, `createIcon` for the rest; each plays a gesture when its host is hovered or pressed. | [api-contract.md](api-contract.md#icons) · [full list](../src/icon-set.ts) |
 
 ## Infrastructure (`infrastructure`)
 
