@@ -49,8 +49,8 @@ describe("focus ring guard", () => {
   });
 
   it("draws the ring inside fields", () => {
-    // The shared field surface owns the inset ring; every field box uses it (TSX class or CSS
-    // `composes`) or draws its own inset ring.
+    // The shared field surface owns the inset ring; every field box uses it (a TSX class:
+    // `fieldSurfaceClass`, or `fieldTriggerClass` which includes it) or draws its own inset ring.
     expect(read("internal/fieldSurface.module.css")).toContain("--prime-focus-offset-inset");
     const fields = [
       "components/input/Input",
@@ -62,7 +62,7 @@ describe("focus ring guard", () => {
     ];
     const usesInsetRing = (base: string) => {
       const source = read(`${base}.tsx`) + read(`${base}.module.css`);
-      return ["--prime-focus-offset-inset", "fieldSurfaceClass", "fieldTrigger.module.css"].some(
+      return ["--prime-focus-offset-inset", "fieldSurfaceClass", "fieldTriggerClass"].some(
         (marker) => source.includes(marker),
       );
     };

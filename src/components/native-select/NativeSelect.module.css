@@ -4,8 +4,8 @@
  * like the Select trigger; the kit chevron on top.
  */
 
+/* With `fieldTierClass` (set in TSX). */
 .root {
-  composes: tier from "../../internal/fieldTier.module.css";
   --prime-icon-size: var(--field-icon);
   position: relative;
   display: flex;
@@ -13,8 +13,8 @@
   min-width: 0;
 }
 
+/* With `fieldSurfaceClass` (set in TSX). */
 .select {
-  composes: surface from "../../internal/fieldSurface.module.css";
   box-sizing: border-box;
   display: block;
   width: 100%;

@@ -57,9 +57,8 @@
 
 /* ─── Trigger (field) ───────────────────────────────────────────────────── */
 
-/* The shared field trigger (`internal/fieldTrigger`), as wide as its content. */
+/* With the shared field trigger (`fieldTriggerClass` in TSX), as wide as its content. */
 .trigger {
-  composes: trigger from "../../internal/fieldTrigger.module.css";
   display: inline-flex;
   width: fit-content;
   max-width: 100%;

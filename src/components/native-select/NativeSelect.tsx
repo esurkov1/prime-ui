@@ -2,8 +2,10 @@ import type * as React from "react";
 
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./NativeSelect.module.css";
@@ -75,7 +77,7 @@ export function NativeSelect({
       className={className}
     >
       <ControlSizeProvider value={size}>
-        <span className={styles.root} {...toDataAttributes({ size })}>
+        <span className={cx(fieldTierClass, styles.root)} {...toDataAttributes({ size })}>
           <select
             {...rest}
             id={ids.controlId}
@@ -85,7 +87,7 @@ export function NativeSelect({
             aria-invalid={ids.invalid || undefined}
             value={value}
             defaultValue={initial}
-            className={styles.select}
+            className={cx(fieldSurfaceClass, styles.select)}
             onChange={(event) => {
               onChange?.(event);
               onValueChange?.(event.target.value);

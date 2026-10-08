@@ -9,7 +9,7 @@ export const fieldSurfaceClass = surface.surface;
 export const fieldTierClass = tier.tier;
 
 /**
- * Surface + tier + trigger layout of a button-shaped field (`fieldTrigger.module.css`). Hosts that
- * apply it in TSX avoid the bundler's cross-file `composes` order warnings.
+ * Tier + surface + trigger layout of a button-shaped field (`fieldTrigger.module.css`). Classes are
+ * joined here, in TSX, never by a cross-file CSS `composes` (the bundler cannot order those).
  */
-export const fieldTriggerClass = trigger.trigger;
+export const fieldTriggerClass = `${tier.tier} ${surface.surface} ${trigger.trigger}`;

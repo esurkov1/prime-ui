@@ -14,6 +14,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import {
   enabledOptions,
@@ -532,7 +533,7 @@ export function TagSelect({
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: the keyboard is handled on the input and the chips */}
         <div
           ref={triggerRef}
-          className={styles.control}
+          className={cx(fieldTierClass, fieldSurfaceClass, styles.control)}
           onMouseDown={(event) => {
             // A press on the field itself keeps focus in the input: no blur, no collapse.
             const target = event.target as Element;

@@ -6,14 +6,9 @@
  * Chips are `Badge` one tier below the field. The list is the shared panel with menu rows.
  */
 
-/* ─── Field: the shared field tier and surface ─────────────────────────────── */
+/* ─── Field: the shared field tier and surface (`fieldTierClass`, `fieldSurfaceClass` in TSX) ─── */
 
 .control {
-  composes: tier from "../../internal/fieldTier.module.css";
-}
-
-.control {
-  composes: surface from "../../internal/fieldSurface.module.css";
   /* Chip row = badge tier one step down (foundation §6). */
   --ts-row: var(--prime-badge-s-height);
   --prime-icon-size: var(--field-icon);

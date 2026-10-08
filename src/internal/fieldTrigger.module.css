@@ -3,19 +3,10 @@
  * other pickers — the field surface and the field tier on one `<button>` with `data-size`.
  * Icons (leading, clear, chevron) sit centred between the edge and the text: edge→icon =
  * icon→text = field padX, so the gap is padX too. Press scales it; an open panel keeps the focus
- * fill. Hosts take it with `composes: trigger from` and add only their width and parts.
- * The layout rule has zero specificity, so a host's one-class rule (`display`, `width`) wins
- * whichever order the bundle emits the files in.
+ * fill. Hosts take it with `fieldTriggerClass` in TSX (tier + surface + this layout) and add only
+ * their width and parts. The layout rule has zero specificity, so a host's one-class rule
+ * (`display`, `width`) wins whichever order the bundle emits the files in.
  */
-
-/* One `composes` per rule (one source file each). */
-.trigger {
-  composes: tier from "./fieldTier.module.css";
-}
-
-.trigger {
-  composes: surface from "./fieldSurface.module.css";
-}
 
 :where(.trigger) {
   /* A kit Icon inside (chevron, clear, leading icon) takes the tier icon size. */

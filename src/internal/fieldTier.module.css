@@ -5,8 +5,8 @@
  *   --field-px      field padding-x           --field-radius  corner radius
  *   --field-gap     tier gap (value ↔ unit)   --field-text    text size
  *   --field-lh      line height               --field-button-px  button / segment padding-x
- * A CSS module class (not generated CSS): hosts take it with `fieldTierClass` in TSX or
- * `composes: tier from` in CSS, so it ships in the same bundle as the components that use it.
+ * A CSS module class (not generated CSS): hosts take it with `fieldTierClass` in TSX (never a
+ * cross-file `composes`, which the bundler cannot order), so it ships with the components.
  */
 .tier {
   --field-h: var(--prime-control-m-height);

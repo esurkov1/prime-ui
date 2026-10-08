@@ -6,8 +6,8 @@
 
 /* ─── Trigger ─────────────────────────────────────────────────────────────── */
 
+/* With the shared field trigger (`fieldTriggerClass` in TSX). */
 .trigger {
-  composes: trigger from "../../internal/fieldTrigger.module.css";
   /* Description line of a rich value: one step under the tier text. */
   --sel-desc: var(--prime-text-body-s-size);
   --sel-desc-lh: var(--prime-text-body-s-line-height);

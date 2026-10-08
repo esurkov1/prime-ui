@@ -16,6 +16,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { fieldTriggerClass } from "@/internal/fieldClasses";
 import {
   enabledOptions,
   handleListboxKeyDown,
@@ -309,7 +310,7 @@ function SelectTrigger({
       aria-describedby={[ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined}
       aria-busy={loading || undefined}
       disabled={disabled}
-      className={cx(styles.trigger, className)}
+      className={cx(fieldTriggerClass, styles.trigger, className)}
       onClick={(event) => {
         onClick?.(event);
         if (!event.defaultPrevented) setOpen(!isOpen);

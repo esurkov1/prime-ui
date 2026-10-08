@@ -8,6 +8,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import { fieldTriggerClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Datepicker.module.css";
@@ -170,7 +171,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
             }
             aria-describedby={ids.describedBy}
             aria-invalid={ids.invalid || undefined}
-            className={styles.trigger}
+            className={cx(fieldTriggerClass, styles.trigger)}
             {...toDataAttributes({
               size,
               empty: shown ? undefined : true,
