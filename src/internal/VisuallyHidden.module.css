@@ -1,6 +1,12 @@
-/* Visually hidden, still read by screen readers: the one copy of the sr-only recipe. */
+/*
+ * Visually hidden, still read by screen readers: the one copy of the sr-only recipe. Pinned to the
+ * start of its containing block: without a positioned ancestor that is the document, and a box left
+ * at its static place deep inside a scrolling column would stretch the page and make it scroll.
+ */
 .root {
   position: absolute;
+  top: 0;
+  inset-inline-start: 0;
   width: var(--prime-border-width);
   height: var(--prime-border-width);
   padding: 0;
