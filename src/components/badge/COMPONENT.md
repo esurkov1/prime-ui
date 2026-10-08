@@ -124,6 +124,7 @@ Badge.Root          <span>: fill, tier dimensions
 | hue / treatment | `color`, `variant` | `data-color`, `data-variant` (always set) |
 | size | `size`, else the control, else `m` | `data-size`, `data-tier` (visual tier) |
 | icon segments | edge `Badge.Icon` / `Badge.Dot`, icon-only | `data-icon-start`, `data-icon-end`, `data-icon-only` |
+| plain text | read-only, text children only | `data-text-only`: the root is one block box that ellipsizes; otherwise each text run sits in its own block span |
 | removable | `onRemove` | `data-removable`; the remove segment takes a `fill-subtle-active` wash on hover |
 | pressable / pressed | `onPress`, `pressed` | `data-pressable`, `data-pressed`, `aria-pressed` on the body; `fill-subtle` wash on hover |
 | action | `Badge.Action` | `data-action="reveal" \| "persistent"`; the text slides and the segment fades in over `fast` |

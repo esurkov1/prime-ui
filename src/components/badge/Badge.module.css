@@ -168,7 +168,17 @@
   overflow: hidden;
 }
 
-/* Text runs in a block box: an ellipsis needs one (a flex container never draws it). */
+/*
+ * An ellipsis needs a block box (a flex container never draws one). A plain-text badge is that box
+ * itself: the line fills the chip height, so the text sits centred as in the flex row. Richer
+ * content keeps the flex row and wraps each text run in `.text`.
+ */
+.root[data-text-only="true"] {
+  display: inline-block;
+  line-height: var(--chip-h);
+  text-overflow: ellipsis;
+}
+
 .text {
   min-width: 0;
   overflow: hidden;

@@ -229,13 +229,25 @@ describe("Badge", () => {
       expect(screen.getByRole("button", { name: "Удалить" })).toBeDisabled();
     });
 
-    it("a read-only badge has no body: its text run sits in the root, in one block span", () => {
+    it("a read-only text badge stays one element that ellipsizes itself", () => {
       render(<Badge.Root data-testid="b">Москва {12}</Badge.Root>);
       const root = screen.getByTestId("b");
-      expect(root.children).toHaveLength(1);
-      expect(root.firstElementChild).toHaveClass(styles.text);
-      expect(root.firstElementChild).toHaveTextContent("Москва 12");
+      expect(root.children).toHaveLength(0);
+      expect(root).toHaveAttribute("data-text-only", "true");
+      expect(root).toHaveTextContent("Москва 12");
       expect(screen.queryByRole("button")).toBeNull();
+    });
+
+    it("in a flex row a text run sits in one block span; its outer spaces stay outside", () => {
+      render(
+        <Badge.Root onPress={() => {}}>
+          {"НЕ "}
+          <span>billing</span>
+        </Badge.Root>,
+      );
+      const button = screen.getByRole("button", { name: "НЕ billing" });
+      expect(button.querySelector(`.${styles.text}`)).toHaveTextContent(/^НЕ$/);
+      expect(button.closest(`.${styles.root}`)).not.toHaveAttribute("data-text-only");
     });
 
     it("onPress makes the body a toggle button with aria-pressed", async () => {

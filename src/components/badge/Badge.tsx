@@ -70,21 +70,33 @@ export type BadgeActionProps = Omit<
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-/** Runs of text (strings, numbers) go into one block `.text` span each, so a long label ellipsizes. */
+const isText = (item: React.ReactNode): item is string | number =>
+  typeof item === "string" || typeof item === "number";
+
+/**
+ * Next to icons, dots or inside a body (a flex row), each run of text goes into one block `.text`
+ * span so a long label ellipsizes; the run's outer spaces stay outside it, so the accessible name
+ * keeps them («НЕ billing», not «НЕbilling»).
+ */
 function wrapText(items: React.ReactNode[]): React.ReactNode[] {
   const out: React.ReactNode[] = [];
-  let run: React.ReactNode[] = [];
+  let run = "";
   const flush = () => {
-    if (run.length === 0) return;
-    out.push(
-      <span key={`text-${out.length}`} className={styles.text}>
-        {run}
-      </span>,
-    );
-    run = [];
+    if (run === "") return;
+    const [, lead, core, trail] = /^(\s*)([\s\S]*?)(\s*)$/.exec(run) ?? ["", "", run, ""];
+    if (lead) out.push(lead);
+    if (core) {
+      out.push(
+        <span key={`text-${out.length}`} className={styles.text}>
+          {core}
+        </span>,
+      );
+    }
+    if (trail) out.push(trail);
+    run = "";
   };
   for (const item of items) {
-    if (typeof item === "string" || typeof item === "number") run.push(item);
+    if (isText(item)) run += String(item);
     else {
       flush();
       out.push(item);
@@ -122,7 +134,14 @@ function BadgeRoot({
   const edges = markEdgeIcons(content, (type) => type === BadgeIcon || type === BadgeDot, {
     endTaken: trailing,
   });
-  const body = <ControlSizeProvider value={tier}>{wrapText(edges.children)}</ControlSizeProvider>;
+  // A read-only badge of plain text is one element: the root itself lays the text out as a block
+  // and ellipsizes it. Anything richer is a flex row, so its text runs are wrapped.
+  const textOnly = !trailing && !onPress && edges.children.every(isText);
+  const body = (
+    <ControlSizeProvider value={tier}>
+      {textOnly ? edges.children : wrapText(edges.children)}
+    </ControlSizeProvider>
+  );
 
   return (
     <span
@@ -134,6 +153,7 @@ function BadgeRoot({
         size,
         tier,
         "icon-only": iconOnly || undefined,
+        "text-only": (textOnly && edges.children.length > 0) || undefined,
         "icon-start": edges.start || undefined,
         "icon-end": edges.end || undefined,
         removable: onRemove ? true : undefined,
