@@ -63,7 +63,7 @@ export const page: ComponentPageConfig = {
       scenario: "in-app-shell",
       title: "В каркасе приложения",
       description:
-        "Каркас приложения на телефоне: липкая шапка, страница и полоса в нижней зоне, которая уходит, когда панель шире 640px — `AppShell.Footer`.",
+        "Каркас приложения на телефоне: AppHeader, страница и полоса в нижней зоне, которая уходит, когда панель шире 640px — `AppShell.Footer`.",
     },
   ],
   api,

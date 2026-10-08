@@ -42,9 +42,12 @@
   }
 }
 
+/* Above the panel: the compact Sidebar toggle rides the rail edge, half over the panel and its
+   sticky header. */
 .nav {
   position: sticky;
   top: 0;
+  z-index: var(--prime-z-sticky);
   box-sizing: border-box;
   display: flex;
   height: 100dvh;
@@ -52,7 +55,7 @@
 }
 
 .root[data-fill-viewport="true"] > .nav {
-  position: static;
+  position: relative;
   height: 100%;
   min-height: 0;
 }
@@ -63,6 +66,8 @@
   --prime-color-card-bg: var(--prime-color-bg-sunken);
   --prime-card-shadow: none;
 
+  /* Its sticky header and footer stack inside the panel, under the nav column. */
+  isolation: isolate;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -71,29 +76,6 @@
   overflow: clip;
   background: var(--prime-color-bg-surface);
   color: var(--prime-color-text-primary);
-}
-
-.header {
-  position: sticky;
-  top: 0;
-  z-index: var(--prime-z-sticky);
-  box-sizing: border-box;
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: var(--prime-space-3);
-  min-width: 0;
-  min-height: calc(var(--prime-control-m-height) + 2 * var(--prime-space-3));
-  padding-block: max(var(--prime-space-3), env(safe-area-inset-top, 0px)) var(--prime-space-3);
-  padding-inline: var(--shell-gutter);
-  background: var(--prime-color-bg-surface);
-}
-
-/* A phone on its side: a sticky bar would eat a third of the height. */
-@media (max-height: 479px) {
-  .header {
-    position: static;
-  }
 }
 
 /*
@@ -125,6 +107,12 @@
   padding-block: var(--shell-top) var(--prime-space-16);
   /* Default: the whole panel, only the responsive gutters. */
   padding-inline: var(--shell-gutter);
+}
+
+/* The gutters belong to the shell's own zones: a header or a nested frame inside the page (an
+   example, a preview) starts from its own default instead of inheriting them. */
+.main > * {
+  --shell-gutter: initial;
 }
 
 /* Long-read pages: a centered column up to the content max width. */

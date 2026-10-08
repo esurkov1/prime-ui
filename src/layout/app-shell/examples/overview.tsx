@@ -1,5 +1,14 @@
-/** The app frame: Sidebar in the nav column, breadcrumbs in the sticky header, the page in main; only main scrolls — `fillViewport`. */
-import { AppShell, Breadcrumb, Button, Icon, PageContent, Sidebar, Typography } from "prime-ui-kit";
+/** The app frame: Sidebar in the nav column, breadcrumbs in the AppHeader, the page in main; only main scrolls — `fillViewport`. */
+import {
+  AppHeader,
+  AppShell,
+  Breadcrumb,
+  Button,
+  Icon,
+  PageContent,
+  Sidebar,
+  Typography,
+} from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -37,12 +46,14 @@ export default function AppShellOverviewExample() {
             </Sidebar.Content>
           </Sidebar.Root>
         </AppShell.Nav>
-        <AppShell.Header>
-          <Breadcrumb.Root>
-            <Breadcrumb.Item href="#crm">CRM</Breadcrumb.Item>
-            <Breadcrumb.Item current>Обзор</Breadcrumb.Item>
-          </Breadcrumb.Root>
-        </AppShell.Header>
+        <AppHeader.Root>
+          <AppHeader.Start>
+            <Breadcrumb.Root>
+              <Breadcrumb.Item href="#crm">CRM</Breadcrumb.Item>
+              <Breadcrumb.Item current>Обзор</Breadcrumb.Item>
+            </Breadcrumb.Root>
+          </AppHeader.Start>
+        </AppHeader.Root>
         <AppShell.Main>
           <PageContent.Section>
             <PageContent.Header>

@@ -1,6 +1,6 @@
 # Screen recipes
 
-Every screen sits in one frame: `AppShell.Root` with Nav / Header / Main (nav rail on the canvas +
+Every screen sits in one frame: `AppShell.Root` with Nav / `AppHeader` / Main (nav rail on the canvas +
 content panel on the surface) → `PageContent` (header + body). `AppShell.Main` carries the page gutters
 and `PageContent.Body` spaces its blocks 40 apart, so your code adds **no outer padding and no
 margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
@@ -14,16 +14,18 @@ Every `Sidebar.Item` gets a `Sidebar.ItemIcon` (in compact mode only icons remai
 `href`, or `asChild` with the router's `NavLink`; `current` marks the current page (`aria-current`), a
 router link sets it itself. Counters go in `Sidebar.ItemCount`. Below 768px the Sidebar becomes an
 off-canvas panel — the app must render a menu button that opens it, otherwise navigation is unreachable
-on phones. Put it into `AppShell.Header` and hide the whole header from 768px up (hiding only its
-content would leave an empty sticky bar). That needs the compound form instead of
-`AppShell.Template`; hiding a kit part with `display` is placement, which `className` may do.
+on phones. `AppHeader` is the top bar of the panel on every width: `AppHeader.MenuButton` shows itself
+below 768px (the Sidebar's own breakpoint), the title says where you are, `AppHeader.Search` opens the
+CommandMenu and folds into an icon on a narrow header. Its row is as high as the Sidebar brand row, so
+the brand and the title read as one line.
 
 ```tsx
-import { AppShell, Button, Icon, NotificationProvider, Sidebar } from "prime-ui-kit";
+import { AppHeader, AppShell, Icon, NotificationProvider, Sidebar } from "prime-ui-kit";
 import { type ReactNode, useState } from "react";
-import styles from "./AppLayout.module.css";
 
-export function AppLayout({ children }: { children: ReactNode }) {
+type AppLayoutProps = { title: string; onSearch: () => void; children: ReactNode };
+
+export function AppLayout({ title, onSearch, children }: AppLayoutProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <NotificationProvider>
@@ -72,19 +74,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </Sidebar.Footer>
           </Sidebar.Root>
         </AppShell.Nav>
-        <AppShell.Header className={styles.mobileHeader}>
-          <Button.Root
-            variant="ghost"
-            tone="neutral"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(true)}
-          >
-            <Button.Icon>
-              <Icon name="nav.menu" />
-            </Button.Icon>
-            Меню
-          </Button.Root>
-        </AppShell.Header>
+        <AppHeader.Root>
+          <AppHeader.Start>
+            <AppHeader.MenuButton aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} />
+            <AppHeader.Title>{title}</AppHeader.Title>
+          </AppHeader.Start>
+          {/* Opens the app's CommandMenu; bind ⌘K to the same handler. */}
+          <AppHeader.Search onClick={onSearch}>Поиск заказов и клиентов</AppHeader.Search>
+        </AppHeader.Root>
         <AppShell.Main>{children}</AppShell.Main>
       </AppShell.Root>
     </NotificationProvider>
@@ -92,17 +89,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
 }
 ```
 
-```css
-/* AppLayout.module.css */
-@media (min-width: 768px) {
-  .mobileHeader {
-    display: none;
-  }
-}
-```
-
-When the app needs a header on every width (breadcrumbs, global search), keep it visible and put the
-menu button inside it with the same media query on the button's wrapper.
+A nested record page puts a back `Button` and a `Breadcrumb` into `AppHeader.Start` instead of the
+title. `AppHeader.Actions` holds at most notifications, the account and one primary action; page
+actions stay in `PageContent.Actions`. With `offCanvas="always"` pass `show="always"` to the menu button.
 
 With React Router put `<Outlet />` as the child and pass `NavLink` through `Sidebar.Item asChild`
 (see `src/layout/sidebar/examples/router.tsx`).

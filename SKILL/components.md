@@ -109,11 +109,12 @@ Floating layers above the page, from tooltip to modal.
 
 ## Page (`page`)
 
-The frame and structure of a screen: app shell, page column, page panel, separators, scroll regions.
+The frame and structure of a screen: app shell, app header, page column, page panel, separators, scroll regions.
 
 | Component | Purpose | Docs |
 |---|---|---|
 | AppShell | The app frame: a navigation rail on the canvas and a content panel on the surface. | [COMPONENT.md](../src/layout/app-shell/COMPONENT.md) · [examples](../src/layout/app-shell/examples/) |
+| AppHeader | The bar at the top of the content panel: where you are, ⌘K search, a few actions, the phone menu button; as high as the Sidebar brand row. | [COMPONENT.md](../src/layout/app-header/COMPONENT.md) · [examples](../src/layout/app-header/examples/) |
 | PageContent | Page structure inside the main column: title, description, page actions and content sections. | [COMPONENT.md](../src/components/page-content/COMPONENT.md) · [examples](../src/components/page-content/examples/) |
 | PageToolbar | The panel at the top of a page — sections, filter and search, view options and the primary action — laid out from its own width: one row when wide, exactly two rows when narrow, every slot in a fixed place. | [COMPONENT.md](../src/components/page-toolbar/COMPONENT.md) · [examples](../src/components/page-toolbar/examples/) |
 | Divider | A hairline separator inside one surface, horizontal or vertical, with or without a label. | [COMPONENT.md](../src/components/divider/COMPONENT.md) · [examples](../src/components/divider/examples/) |

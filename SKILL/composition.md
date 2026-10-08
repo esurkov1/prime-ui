@@ -24,7 +24,7 @@ it, and then by the rules below.
 ```
 AppShell.Root                      once per app (layouts.md#app-frame-once-per-app)
 ├─ AppShell.Nav → Sidebar          navigation rail on the canvas
-├─ AppShell.Header                 phone menu button / breadcrumbs / global search (optional)
+├─ AppHeader.Root                  menu button / title or path / ⌘K search / app actions
 └─ AppShell.Main                   gutters; the page renders here
    └─ PageContent.Section | Root   the page you deliver
       ├─ PageContent.Header

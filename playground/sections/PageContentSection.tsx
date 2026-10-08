@@ -10,7 +10,7 @@ export const page: ComponentPageConfig = {
     summary: "Страница: заголовок, описание, действия, секции",
     keywords: ["страница", "заголовок", "секция", "title", "description", "actions"],
     icon: PanelTop,
-    order: 2,
+    order: 3,
   },
   dir: "page-content",
   title: "PageContent",

@@ -122,20 +122,6 @@ body {
   opacity: 0.5;
 }
 
-/* Mobile header bar (menu + page title + search), rendered only on narrow viewports. */
-.playgroundMobileBar {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  gap: var(--prime-space-2);
-  min-width: 0;
-}
-
-.playgroundMobileTitle {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
 /* While an example's module and source load: the frame's footprint, no motion. */
 .playgroundFramePending {
   min-height: calc(var(--prime-space-24) * 2);

@@ -1,0 +1,191 @@
+/*
+ * AppHeader — the bar at the top of the content panel. One row as high as the Sidebar brand row
+ * (control height + 8, inside 12 of air above and below), so the brand and the title share one
+ * line across the two planes. It sits on the panel surface with no divider (depth from fill), is
+ * sticky, keeps the top safe-area inset and the shell gutters, and lays itself out from its own
+ * width: below 36rem the search folds into a square button and the description goes.
+ */
+.root {
+  container: prime-app-header / inline-size;
+  position: sticky;
+  top: 0;
+  z-index: var(--prime-z-sticky);
+  box-sizing: border-box;
+  flex: none;
+  min-width: 0;
+  /* The shell gutters, so the header lines up with the page in main; 16 outside a shell. */
+  padding-block: max(var(--prime-space-3), env(safe-area-inset-top, 0px)) var(--prime-space-3);
+  padding-inline: var(--shell-gutter, var(--prime-space-4));
+  background: var(--prime-color-bg-surface);
+  color: var(--prime-color-text-primary);
+}
+
+/* A phone on its side: a sticky bar would eat a third of the height. */
+@media (max-height: 479px) {
+  .root {
+    position: static;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-width: 0;
+  min-height: calc(var(--prime-control-m-height) + var(--prime-space-2));
+}
+
+/* ─── Zones ─────────────────────────────────────────────────────────────── */
+
+.start {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+/* ─── Title ─────────────────────────────────────────────────────────────── */
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+/* A tile shaped like the soft neutral buttons on the bar: control m square, radius and fill. */
+.icon {
+  --prime-icon-size: var(--prime-control-m-icon);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--prime-control-m-height);
+  height: var(--prime-control-m-height);
+  border-radius: var(--prime-control-m-radius);
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-secondary);
+}
+
+/* A bare `<svg>` (an app's own icon set) gets the same box as the kit Icon. */
+.icon > svg {
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
+}
+
+/* Twice the zone gap on each side of the line: groups read as separate. */
+.separator[data-orientation="vertical"] {
+  align-self: center;
+  height: var(--prime-space-5);
+  margin-inline: var(--prime-space-2);
+}
+
+.titleText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.titleName,
+.description {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.titleName {
+  composes: titleS from "../../internal/textRole.module.css";
+}
+
+.description {
+  composes: caption from "../../internal/textRole.module.css";
+
+  color: var(--prime-color-text-muted);
+}
+
+/* ─── Search ────────────────────────────────────────────────────────────── */
+
+.search {
+  display: flex;
+  flex: 0 1 calc(var(--prime-space-24) * 3);
+  align-items: center;
+  gap: var(--field-gap);
+  min-width: 0;
+  height: var(--field-h);
+  margin: 0;
+  padding-inline: var(--field-px);
+  border: 0;
+  border-radius: var(--field-radius);
+  color: var(--prime-color-text-placeholder);
+  font: inherit;
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
+  text-align: start;
+  cursor: pointer;
+}
+
+.searchIcon {
+  --prime-icon-size: var(--field-icon);
+
+  flex: none;
+}
+
+.searchText {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.searchKbd {
+  flex: none;
+}
+
+/* ─── Menu button ───────────────────────────────────────────────────────── */
+
+/* Matches Sidebar `offCanvas="auto"`: from 768px the rail is back and the button leaves. */
+@media (min-width: 768px) {
+  .menuButton[data-show="narrow"] {
+    display: none;
+  }
+}
+
+/* ─── Narrow header ─────────────────────────────────────────────────────── */
+
+@container prime-app-header (max-width: 35.99rem) {
+  /* The name keeps the room: the tile and the caption go first. */
+  .description,
+  .icon {
+    display: none;
+  }
+
+  /* The search folds into a square button; its text stays as the hidden name. */
+  .search {
+    flex: none;
+    justify-content: center;
+    width: var(--field-h);
+    padding-inline: 0;
+  }
+
+  .searchText {
+    position: absolute;
+    width: var(--prime-border-width);
+    height: var(--prime-border-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .searchKbd {
+    display: none;
+  }
+}

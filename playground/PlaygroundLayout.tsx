@@ -1,25 +1,25 @@
-import { Menu, Search } from "lucide-react";
 import * as React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
-import { Button } from "@/components/button/Button";
-import { Typography } from "@/components/typography/Typography";
-import { AppShell } from "@/layout";
+import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
+import { AppHeader, AppShell } from "@/layout";
 
+import { PLAYGROUND_NAV_CATEGORIES } from "./categories";
 import { PlaygroundChromeSidebar } from "./components/PlaygroundChromeSidebar";
 import { PlaygroundSearch, usePlaygroundSearchHotkey } from "./components/PlaygroundSearch";
-import { PLAYGROUND_PAGES, pageRoute } from "./playgroundPages";
+import { PLAYGROUND_INTRO, PLAYGROUND_PAGES, pageRoute } from "./playgroundPages";
+
+const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
 
 export function PlaygroundLayout() {
   const { pathname } = useLocation();
   const [navOpen, setNavOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
-  // The mobile bar shows while the Sidebar is off-canvas: its own breakpoint, reported up.
-  const [narrow, setNarrow] = React.useState(false);
 
   usePlaygroundSearchHotkey(setSearchOpen);
 
-  const page = PLAYGROUND_PAGES.find((p) => pageRoute(p.segment) === pathname);
+  const page = PLAYGROUND_PAGES.find((p) => pageRoute(p.segment) === pathname) ?? PLAYGROUND_INTRO;
+  const category = PLAYGROUND_NAV_CATEGORIES.find((c) => c.id === page.category);
 
   return (
     <>
@@ -29,42 +29,26 @@ export function PlaygroundLayout() {
         mainProps={{ id: "playground-main", tabIndex: -1 }}
         nav={
           /* The sidebar owns its mode: toggling it re-renders the rail, not the page. */
-          <PlaygroundChromeSidebar
-            open={navOpen}
-            onOpenChange={setNavOpen}
-            onSearch={() => setSearchOpen(true)}
-            onOffCanvasChange={setNarrow}
-          />
+          <PlaygroundChromeSidebar open={navOpen} onOpenChange={setNavOpen} />
         }
         header={
-          narrow ? (
-            <div className="playgroundMobileBar">
-              <Button.Root
-                variant="ghost"
-                tone="neutral"
-                aria-label="Открыть навигацию"
-                aria-expanded={navOpen}
-                onClick={() => setNavOpen(true)}
-              >
-                <Button.Icon>
-                  <Menu />
-                </Button.Icon>
-              </Button.Root>
-              <Typography as="span" variant="title-m" truncate className="playgroundMobileTitle">
-                {page?.label ?? "Prime UI"}
-              </Typography>
-              <Button.Root
-                variant="ghost"
-                tone="neutral"
-                aria-label="Поиск"
-                onClick={() => setSearchOpen(true)}
-              >
-                <Button.Icon>
-                  <Search />
-                </Button.Icon>
-              </Button.Root>
-            </div>
-          ) : null
+          <AppHeader.Root>
+            <AppHeader.Start>
+              <AppHeader.MenuButton aria-expanded={navOpen} onClick={() => setNavOpen(true)} />
+              {/* Where you are, not a second title: the page heading is the h1 below. */}
+              <Breadcrumb.Root>
+                {category ? <Breadcrumb.Item>{category.label}</Breadcrumb.Item> : null}
+                <Breadcrumb.Item current>{page.label}</Breadcrumb.Item>
+              </Breadcrumb.Root>
+            </AppHeader.Start>
+            <AppHeader.Search
+              aria-haspopup="dialog"
+              shortcut={isMac ? "⌘K" : "Ctrl K"}
+              onClick={() => setSearchOpen(true)}
+            >
+              Поиск по компонентам
+            </AppHeader.Search>
+          </AppHeader.Root>
         }
       >
         <Outlet />

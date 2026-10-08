@@ -138,7 +138,7 @@ Motion: the color of the icon and the label changes over `fast`; in the floating
 | [icon-only.tsx](examples/icon-only.tsx) | Icons alone: the labels are hidden but still name the sections for screen readers — `iconOnly`. |
 | [floating.tsx](examples/floating.tsx) | A glass capsule over the page: the client list scrolls under its blur, with labels or icons alone — `floating`, `iconOnly`. |
 | [router.tsx](examples/router.tsx) | A router link as the item: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
-| [in-app-shell.tsx](examples/in-app-shell.tsx) | The app frame on a phone: a sticky header, the page and the bar in the footer, which leaves once the panel is 640px wide — `AppShell.Footer`. |
+| [in-app-shell.tsx](examples/in-app-shell.tsx) | The app frame on a phone: the AppHeader, the page and the bar in the footer, which leaves once the panel is 640px wide — `AppShell.Footer`. |
 
 ## Mistakes
 - Six or more items → keep 3–5; the rest goes to a «Ещё» section or Sidebar.

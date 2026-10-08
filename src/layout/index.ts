@@ -1,7 +1,19 @@
 export type {
+  AppHeaderActionsProps,
+  AppHeaderDescriptionProps,
+  AppHeaderIconProps,
+  AppHeaderLabels,
+  AppHeaderMenuButtonProps,
+  AppHeaderRootProps,
+  AppHeaderSearchProps,
+  AppHeaderSeparatorProps,
+  AppHeaderStartProps,
+  AppHeaderTitleProps,
+} from "./app-header/AppHeader";
+export { AppHeader } from "./app-header/AppHeader";
+export type {
   AppShellContentWidth,
   AppShellFooterProps,
-  AppShellHeaderProps,
   AppShellMainProps,
   AppShellNavProps,
   AppShellRootProps,

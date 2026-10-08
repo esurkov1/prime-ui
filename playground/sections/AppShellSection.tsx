@@ -17,12 +17,12 @@ export const page: ComponentPageConfig = {
   title: "AppShell",
   kind: "layout",
   description:
-    "Каркас приложения: колонка навигации на холсте и панель содержимого на поверхности, с липкой шапкой и прокручиваемым main.",
+    "Каркас приложения: колонка навигации на холсте и панель содержимого на поверхности, с местом для AppHeader и прокручиваемым main.",
   examples: [
     {
       slot: "overview",
       description:
-        "Каркас приложения: Sidebar в колонке навигации, хлебные крошки в липкой шапке, страница в main; прокручивается только main — `fillViewport`.",
+        "Каркас приложения: Sidebar в колонке навигации, хлебные крошки в AppHeader, страница в main; прокручивается только main — `fillViewport`.",
     },
     {
       scenario: "contained",
@@ -47,7 +47,7 @@ export const page: ComponentPageConfig = {
   accessibility: {
     keyboard: [],
     aria: [
-      "Main — ориентир `<main>`, Header — `<header>`; ориентиры навигации дают Sidebar и BottomNav (`<nav>`).",
+      "Main — ориентир `<main>`; шапку `<header>` даёт AppHeader, ориентиры навигации — Sidebar и BottomNav (`<nav>`).",
       "На странице один `<h1>` (PageContent.Title).",
     ],
   },

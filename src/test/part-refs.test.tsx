@@ -52,7 +52,7 @@ import {
   Thumbnail,
   Timeline,
 } from "@/components";
-import { AppShell, BottomNav, Sidebar } from "@/layout";
+import { AppHeader, AppShell, BottomNav, Sidebar } from "@/layout";
 
 type PropsOf<C> = C extends React.JSXElementConstructor<infer P> ? P : never;
 
@@ -66,7 +66,15 @@ describe("part refs: every part declares ref", () => {
     takesRef(Accordion.Icon);
     takesRef(AppShell.Root);
     takesRef(AppShell.Nav);
-    takesRef(AppShell.Header);
+    takesRef(AppHeader.Root);
+    takesRef(AppHeader.Start);
+    takesRef(AppHeader.Title);
+    takesRef(AppHeader.Icon);
+    takesRef(AppHeader.Description);
+    takesRef(AppHeader.Separator);
+    takesRef(AppHeader.Search);
+    takesRef(AppHeader.Actions);
+    takesRef(AppHeader.MenuButton);
     takesRef(AppShell.Main);
     takesRef(AppShell.Footer);
     takesRef(BottomNav.Root);

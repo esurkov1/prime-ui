@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 60 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 61 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines; a strict 4px grid; one size axis
@@ -247,6 +247,7 @@ accessibility, examples and common mistakes.
 | Component | What it is for |
 |---|---|
 | [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame: a navigation rail on the canvas and a content panel on the surface. |
+| [**AppHeader**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-header/COMPONENT.md) | The bar at the top of the app: where you are, ⌘K search, a few actions and the phone menu button. |
 | [**PageContent**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) | Page structure inside the main column: title, description, page actions and content sections. |
 | [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — sections, filter and search, view options and the primary action — one row when wide, exactly two rows when narrow. |
 | [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator, horizontal or vertical, with or without a label. |
@@ -293,7 +294,7 @@ Each component folder ships with the package:
 ```
 node_modules/prime-ui-kit/src/components/<name>/COMPONENT.md   full reference
 node_modules/prime-ui-kit/src/components/<name>/examples/*.tsx one scenario per file, copyable
-node_modules/prime-ui-kit/src/layout/{app-shell,sidebar}/…     AppShell and Sidebar
+node_modules/prime-ui-kit/src/layout/<name>/…                  AppShell, AppHeader, Sidebar, BottomNav
 ```
 
 Examples import only from `"prime-ui-kit"` and style layout with a local `examples.module.css` on

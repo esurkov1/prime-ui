@@ -289,7 +289,7 @@ The rail width does not depend on `size`.
 | `current` (Item) | surface fill + raised shadow, primary text and icon | the current page | off |
 | `disabled` (Item) | `text-disabled`, no hover, `cursor: not-allowed` | an unavailable section | off |
 
-Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand; on phones (`offCanvas="auto"`) or always (`offCanvas="always"`) pair it with a menu button in `AppShell.Header` (`open` / `onOpenChange`). One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
+Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand; on phones (`offCanvas="auto"`) or always (`offCanvas="always"`) pair it with `AppHeader.MenuButton` (`open` / `onOpenChange`). One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
 
 ## States
 | State | Driven by | DOM |

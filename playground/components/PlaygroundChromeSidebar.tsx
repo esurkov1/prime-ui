@@ -1,10 +1,9 @@
-import { Check, Moon, Search, Square, SquareStack, Sun } from "lucide-react";
+import { Check, Moon, Square, SquareStack, Sun } from "lucide-react";
 import * as React from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 
 import { Dropdown } from "@/components/dropdown/Dropdown";
-import { Kbd } from "@/components/kbd/Kbd";
-import { Sidebar, useSidebar } from "@/layout";
+import { Sidebar } from "@/layout";
 
 import {
   PLAYGROUND_INTRO,
@@ -14,8 +13,6 @@ import {
 } from "../playgroundPages";
 import { PLAYGROUND_PREVIEW_SURFACES, usePlaygroundPreviewTheme } from "./PlaygroundPreviewTheme";
 import { usePlaygroundTheme } from "./PlaygroundTheme";
-
-const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
 
 function PageItem({ page }: { page: PlaygroundPageEntry }) {
   const Icon = page.icon;
@@ -90,32 +87,18 @@ function FooterControls() {
   );
 }
 
-/** Reports the Sidebar's own off-canvas state, so the layout uses the kit breakpoint, not a copy. */
-function OffCanvasReporter({ onChange }: { onChange: (offCanvas: boolean) => void }) {
-  const { offCanvas } = useSidebar();
-  React.useLayoutEffect(() => onChange(offCanvas), [offCanvas, onChange]);
-  return null;
-}
-
 export type PlaygroundChromeSidebarProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSearch: () => void;
-  /** Called with `true` while the sidebar is an off-canvas panel (narrow viewport). */
-  onOffCanvasChange: (offCanvas: boolean) => void;
 };
 
 /**
- * Playground navigation built from the kit: brand header, search, collapsible categories, footer.
+ * Playground navigation built from the kit: brand header, collapsible categories, footer (search
+ * lives in the AppHeader).
  * The rail mode and the folded categories are uncontrolled and remembered (`persistKey`), so a
  * toggle re-renders only what reads the sidebar context — never this tree or the page.
  */
-export function PlaygroundChromeSidebar({
-  open,
-  onOpenChange,
-  onSearch,
-  onOffCanvasChange,
-}: PlaygroundChromeSidebarProps) {
+export function PlaygroundChromeSidebar({ open, onOpenChange }: PlaygroundChromeSidebarProps) {
   const { pathname } = useLocation();
   const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -133,26 +116,10 @@ export function PlaygroundChromeSidebar({
       onOpenChange={onOpenChange}
       labels={{ navigation: "Навигация playground" }}
     >
-      <OffCanvasReporter onChange={onOffCanvasChange} />
       <Sidebar.Header>
         <Brand />
         <Sidebar.Toggle variant="header" />
       </Sidebar.Header>
-      <Sidebar.Item
-        aria-haspopup="dialog"
-        onClick={() => {
-          onOpenChange(false);
-          onSearch();
-        }}
-      >
-        <Sidebar.ItemIcon>
-          <Search />
-        </Sidebar.ItemIcon>
-        Поиск
-        <Sidebar.ItemShortcut>
-          <Kbd>{isMac ? "⌘K" : "Ctrl K"}</Kbd>
-        </Sidebar.ItemShortcut>
-      </Sidebar.Item>
       <Sidebar.Content ref={contentRef}>
         <Sidebar.Group>
           <PageItem page={PLAYGROUND_INTRO} />

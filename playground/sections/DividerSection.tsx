@@ -10,7 +10,7 @@ export const page: ComponentPageConfig = {
     summary: "Разделитель с подписью и без",
     keywords: ["разделитель", "линия", "separator"],
     icon: Minus,
-    order: 4,
+    order: 5,
   },
   dir: "divider",
   title: "Divider",

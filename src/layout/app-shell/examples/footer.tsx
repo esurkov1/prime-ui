@@ -1,5 +1,5 @@
 /** A phone-wide app: the bar in the footer stays at the bottom while main scrolls under it, and leaves once the panel is 640px wide — `AppShell.Footer`. */
-import { AppShell, BottomNav, Icon, PageContent, Typography } from "prime-ui-kit";
+import { AppHeader, AppShell, BottomNav, Icon, PageContent, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -25,11 +25,11 @@ export default function AppShellFooterExample() {
   return (
     <div className={styles.phone}>
       <AppShell.Root fillViewport className={styles.shell}>
-        <AppShell.Header>
-          <Typography as="h2" variant="title-m">
-            Счета
-          </Typography>
-        </AppShell.Header>
+        <AppHeader.Root>
+          <AppHeader.Start>
+            <AppHeader.Title>Счета</AppHeader.Title>
+          </AppHeader.Start>
+        </AppHeader.Root>
         <AppShell.Main>
           <PageContent.Section>
             <PageContent.Body>

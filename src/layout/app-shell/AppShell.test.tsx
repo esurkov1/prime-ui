@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { AppHeader } from "../app-header/AppHeader";
 import { AppShell } from "./AppShell";
 
 describe("AppShell", () => {
@@ -8,7 +9,7 @@ describe("AppShell", () => {
     render(
       <AppShell.Root data-testid="root">
         <AppShell.Nav>rail</AppShell.Nav>
-        <AppShell.Header>top</AppShell.Header>
+        <AppHeader.Root>top</AppHeader.Root>
         <AppShell.Main>body</AppShell.Main>
       </AppShell.Root>,
     );
@@ -51,7 +52,10 @@ describe("AppShell", () => {
 
   it("Template composes nav, optional header and main", () => {
     const { rerender } = render(
-      <AppShell.Template nav={<span>sidebar</span>} header={<span>Crumbs</span>}>
+      <AppShell.Template
+        nav={<span>sidebar</span>}
+        header={<AppHeader.Root>Crumbs</AppHeader.Root>}
+      >
         <span>page</span>
       </AppShell.Template>,
     );

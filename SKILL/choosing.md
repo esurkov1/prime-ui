@@ -77,8 +77,10 @@ Drawer menu.
 **App frame.** Sidebar collapse control: `Sidebar.Toggle variant="header"` next to `Sidebar.Brand` in
 `Sidebar.Header` — at the header's end while expanded, a small round button on the rail's edge while
 compact (the default for a branded rail); `Sidebar.Toggle` (`variant="item"`) in `Sidebar.Footer` when
-the rail has no brand header. On phones neither replaces the menu button in `AppShell.Header` that
-opens the off-canvas Sidebar (`open` / `onOpenChange`). Sections of a long rail → `Sidebar.Group
+the rail has no brand header. On phones neither replaces `AppHeader.MenuButton` that
+opens the off-canvas Sidebar (`open` / `onOpenChange`). The bar at the top of the panel (where you are,
+⌘K search, a few app actions) is `AppHeader`; the page's own heading and actions are `PageContent`, its
+data tools `PageToolbar`. Sections of a long rail → `Sidebar.Group
 collapsible`; a section with sub-pages → `Sidebar.Sub`; the signed-in user → `Sidebar.Account` in a
 `Dropdown.Trigger` at the bottom of `Sidebar.Footer`.
 

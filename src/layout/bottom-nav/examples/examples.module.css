@@ -37,8 +37,3 @@
   align-items: center;
   gap: var(--prime-space-3);
 }
-
-/* floating.tsx: the switch goes to the end of the header. */
-.toggle {
-  margin-inline-start: auto;
-}

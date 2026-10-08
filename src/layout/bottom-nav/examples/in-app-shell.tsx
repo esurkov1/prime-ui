@@ -1,5 +1,13 @@
-/** The app frame on a phone: a sticky header, the page and the bar in the footer, which leaves once the panel is 640px wide — `AppShell.Footer`. */
-import { AppShell, BottomNav, Button, Icon, PageContent, Typography } from "prime-ui-kit";
+/** The app frame on a phone: the AppHeader, the page and the bar in the footer, which leaves once the panel is 640px wide — `AppShell.Footer`. */
+import {
+  AppHeader,
+  AppShell,
+  BottomNav,
+  Button,
+  Icon,
+  PageContent,
+  Typography,
+} from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -16,11 +24,11 @@ export default function BottomNavInAppShellExample() {
   return (
     <div className={styles.phone}>
       <AppShell.Root fillViewport className={styles.shell}>
-        <AppShell.Header>
-          <Typography as="h2" variant="title-m">
-            Заказы
-          </Typography>
-        </AppShell.Header>
+        <AppHeader.Root>
+          <AppHeader.Start>
+            <AppHeader.Title>Заказы</AppHeader.Title>
+          </AppHeader.Start>
+        </AppHeader.Root>
         <AppShell.Main>
           <PageContent.Section>
             <PageContent.Body>

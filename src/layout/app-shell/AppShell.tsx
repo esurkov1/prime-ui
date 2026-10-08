@@ -47,16 +47,6 @@ function AppShellRoot({ fillViewport = false, className, children, ...rest }: Ap
 }
 AppShellRoot.displayName = "AppShell.Root";
 
-export type AppShellHeaderProps = React.HTMLAttributes<HTMLElement> & {
-  ref?: React.Ref<HTMLElement>;
-};
-
-/** Top bar of the content panel (breadcrumbs, page actions, mobile menu button). Sticky. */
-function AppShellHeader({ className, ...rest }: AppShellHeaderProps) {
-  return <header {...rest} className={cx(styles.header, className)} />;
-}
-AppShellHeader.displayName = "AppShell.Header";
-
 export type AppShellFooterProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -97,7 +87,7 @@ export type AppShellTemplateProps = Omit<AppShellRootProps, "children" | "ref"> 
   ref?: React.Ref<HTMLElement>;
   /** Navigation column content, usually `Sidebar.Root`. */
   nav?: React.ReactNode;
-  /** `AppShell.Header` content; no header row when omitted. */
+  /** The top bar of the content panel, an `AppHeader.Root`; no header when omitted. */
   header?: React.ReactNode;
   /** `AppShell.Footer` content (`BottomNav`); no footer when omitted. */
   footer?: React.ReactNode;
@@ -108,7 +98,7 @@ export type AppShellTemplateProps = Omit<AppShellRootProps, "children" | "ref"> 
 };
 
 /**
- * Root + Nav + Header + Main + Footer in one; main scrolls to the top when `scrollResetKey`
+ * Root + Nav + the header + Main + Footer in one; main scrolls to the top when `scrollResetKey`
  * changes.
  */
 function AppShellTemplate({
@@ -133,7 +123,7 @@ function AppShellTemplate({
   return (
     <AppShellRoot {...rootProps}>
       {nav == null ? null : <AppShellNav>{nav}</AppShellNav>}
-      {header == null ? null : <AppShellHeader>{header}</AppShellHeader>}
+      {header}
       <AppShellMain {...mainProps} ref={setMainRef}>
         {children}
       </AppShellMain>
@@ -146,7 +136,6 @@ AppShellTemplate.displayName = "AppShell.Template";
 export const AppShell = {
   Root: AppShellRoot,
   Nav: AppShellNav,
-  Header: AppShellHeader,
   Main: AppShellMain,
   Footer: AppShellFooter,
   Template: AppShellTemplate,

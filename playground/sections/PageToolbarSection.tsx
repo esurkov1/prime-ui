@@ -19,7 +19,7 @@ export const page: ComponentPageConfig = {
       "responsive",
     ],
     icon: PanelsTopLeft,
-    order: 3,
+    order: 4,
   },
   dir: "page-toolbar",
   title: "PageToolbar",

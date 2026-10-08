@@ -17,8 +17,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (Nav, Header, Main, Footer), `className` and the other div attributes.",
-          ru: "`children` (Nav, Header, Main, Footer), `className` и остальные атрибуты div.",
+          en: "`children` (Nav, `AppHeader.Root`, Main, Footer), `className` and the other div attributes.",
+          ru: "`children` (Nav, `AppHeader.Root`, Main, Footer), `className` и остальные атрибуты div.",
         },
       ],
     },
@@ -32,19 +32,6 @@ export const api: ComponentApi = {
           type: "HTMLAttributes<HTMLDivElement>",
           en: "`children` (usually `Sidebar.Root`), `className` and the other div attributes.",
           ru: "`children` (обычно `Sidebar.Root`), `className` и остальные атрибуты div.",
-        },
-      ],
-    },
-    {
-      name: "AppShell.Header",
-      en: "`ref` → `HTMLElement`. Sticky `<header>` row of the panel for breadcrumbs, search and actions; keeps the top safe-area inset and stops sticking below 480px of viewport height.",
-      ru: "Липкая строка `<header>` панели для хлебных крошек, поиска и действий; учитывает верхний безопасный отступ и не липнет при высоте экрана меньше 480px.",
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLElement>",
-          en: "`children`, `className` and the other attributes.",
-          ru: "`children`, `className` и остальные атрибуты.",
         },
       ],
     },
@@ -83,8 +70,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Template",
-      en: "`ref` → the `<main>`. Root + Nav + Header + Main + Footer in one; main scrolls to the top when `scrollResetKey` changes.",
-      ru: "Root, Nav, Header, Main и Footer одним компонентом; main прокручивается наверх при смене `scrollResetKey`.",
+      en: "`ref` → the `<main>`. Root + Nav + the header + Main + Footer in one; main scrolls to the top when `scrollResetKey` changes.",
+      ru: "Root, Nav, шапка, Main и Footer одним компонентом; main прокручивается наверх при смене `scrollResetKey`.",
       props: [
         {
           name: "nav",
@@ -95,8 +82,8 @@ export const api: ComponentApi = {
         {
           name: "header",
           type: "ReactNode",
-          en: "Header content; no header row when omitted.",
-          ru: "Содержимое шапки; без него строки шапки нет.",
+          en: "The top bar of the panel, an `AppHeader.Root`; no header when omitted.",
+          ru: "Верхняя полоса панели — `AppHeader.Root`; без него шапки нет.",
         },
         {
           name: "footer",

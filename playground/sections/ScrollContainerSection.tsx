@@ -10,7 +10,7 @@ export const page: ComponentPageConfig = {
     summary: "Прокручиваемая область с тонким скроллбаром",
     keywords: ["прокрутка", "скролл", "scroll", "axis"],
     icon: ScrollText,
-    order: 5,
+    order: 6,
   },
   dir: "scroll-container",
   title: "ScrollContainer",
