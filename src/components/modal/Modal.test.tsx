@@ -7,6 +7,7 @@ import {
   useNotifications,
 } from "@/components/notification/NotificationStore";
 import { Select } from "@/components/select/Select";
+import { mockCompactViewport, swipe } from "@/test/mobile";
 
 import { Modal, type ModalRootProps } from "./Modal";
 
@@ -564,5 +565,43 @@ describe("Modal — overlay contract", () => {
     confirm.focus();
     fireEvent.keyDown(confirm, { key: "Tab" });
     expect(screen.getByRole("button", { name: "Закрыть" })).toHaveFocus();
+  });
+});
+
+describe("Modal — narrow viewport sheet", () => {
+  const header = () => screen.getByRole("dialog").querySelector("header") as HTMLElement;
+
+  it("has no handle and no swipe on a wide viewport", () => {
+    render(<BasicModal />);
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    expect(screen.getByRole("dialog").querySelector("[data-swipe-handle]")).toBeNull();
+    swipe(header(), { x: 0, y: 0 }, { x: 0, y: 300 });
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("gets a handle and closes with a swipe down below 640px", async () => {
+    const restore = mockCompactViewport();
+    try {
+      render(<BasicModal />);
+      fireEvent.click(screen.getByRole("button", { name: "Open" }));
+      const handle = screen.getByRole("dialog").querySelector("[data-swipe-handle]");
+      expect(handle).toHaveAttribute("aria-hidden", "true");
+      swipe(header(), { x: 0, y: 0 }, { x: 0, y: 300 });
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    } finally {
+      restore();
+    }
+  });
+
+  it("keeps a destructive confirm open: swiping follows closeOnOutsideClick", () => {
+    const restore = mockCompactViewport();
+    try {
+      render(<BasicModal closeOnOutsideClick={false} />);
+      fireEvent.click(screen.getByRole("button", { name: "Open" }));
+      swipe(header(), { x: 0, y: 0 }, { x: 0, y: 300 });
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    } finally {
+      restore();
+    }
   });
 });

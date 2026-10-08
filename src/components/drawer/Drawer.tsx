@@ -19,10 +19,12 @@ import {
 } from "@/components/modal/DialogParts";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { type PresenceState, usePresence } from "@/hooks/usePresence";
+import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 import { cx } from "@/internal/cx";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
+import sheet from "@/internal/sheet.module.css";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Drawer.module.css";
@@ -38,7 +40,7 @@ export type {
   DialogTriggerProps as DrawerTriggerProps,
 } from "@/components/modal/DialogParts";
 
-export type DrawerSide = "left" | "right";
+export type DrawerSide = "left" | "right" | "bottom";
 
 export type DrawerLabels = {
   /** `aria-label` of the header close button. */
@@ -57,7 +59,7 @@ export type DrawerRootProps = {
   onOpenChange?: (open: boolean) => void;
   /** Escape closes the drawer. Default `true`. */
   closeOnEscape?: boolean;
-  /** A click on the scrim closes the drawer. Default `true`. */
+  /** A click on the scrim or a swipe toward the edge closes the drawer. Default `true`. */
   closeOnOutsideClick?: boolean;
   labels?: Partial<DrawerLabels>;
   children?: React.ReactNode;
@@ -72,9 +74,12 @@ DrawerRoot.displayName = "Drawer.Root";
 // ─── Content ──────────────────────────────────────────────────────────────────
 
 export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** Edge the panel slides from. Default `right`. */
+  /** Edge the panel slides from; `bottom` is a sheet with a grab handle. Default `right`. */
   side?: DrawerSide;
-  /** Panel width: `s` 360 · `m` 480 · `l` 640 · `xl` 800. Full width below 640px of viewport. */
+  /**
+   * Panel width: `s` 360 · `m` 480 · `l` 640 · `xl` 800 (a bottom sheet is centred). Full width
+   * below 640px of viewport.
+   */
   size?: Exclude<ControlSize, "xs">;
   /** Class on the full-screen scrim. */
   overlayClassName?: string;
@@ -111,12 +116,22 @@ function DrawerDialog({
   "aria-describedby": ariaDescribedBy,
   state,
   onExitEnd,
+  onPointerDown,
   ref,
   ...rest
 }: DrawerDialogProps) {
   const root = useDialogRootContext();
   const { ref: layerRef, layer, onClose } = useDialogLayer<HTMLDivElement>(root);
   const panelRef = useMergedRefs(layerRef, ref);
+  const bottom = side === "bottom";
+  // Swiping is a dismiss from outside the content, like a scrim click.
+  const swipe = useSwipeDismiss({
+    enabled: root.closeOnOutsideClick && state === "open",
+    direction: bottom ? "down" : side,
+    onDismiss: onClose,
+    handle: "[data-swipe-handle], header",
+    touchAnywhere: !bottom,
+  });
 
   const shell = useDialogShellValue({
     ariaLabel,
@@ -140,14 +155,25 @@ function DrawerDialog({
         role="dialog"
         aria-modal="true"
         tabIndex={-1}
-        className={cx(dialogShellClassName, styles.panel, overlayMotion.drawer, className)}
+        className={cx(
+          dialogShellClassName,
+          styles.panel,
+          overlayMotion.drawer,
+          bottom ? sheet.swipeY : sheet.swipeX,
+          className,
+        )}
         data-side={side}
         data-size={size}
         data-state={state}
         onAnimationEnd={onExitEnd}
         {...shell.aria}
         {...rest}
+        onPointerDown={(event) => {
+          onPointerDown?.(event);
+          swipe.onPointerDown(event);
+        }}
       >
+        {bottom ? <div className={sheet.handle} data-swipe-handle="" aria-hidden="true" /> : null}
         <DialogShellProvider value={shell.value}>
           <LayerProvider value={layer}>{children}</LayerProvider>
         </DialogShellProvider>

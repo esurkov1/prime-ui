@@ -61,7 +61,7 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 | `children` | `ReactElement` | — (required) | One element, usually a Button (Anchor: any element, e.g. a toolbar). |
 
 ### Popover.Content
-`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger. Opened from a Trigger, focus moves into the panel (`[data-autofocus]`, else the first tab stop, else the panel).
+`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger. Opened from a Trigger, focus moves into the panel (`[data-autofocus]`, else the first tab stop, else the panel). Below 640px of viewport a panel opened from a Trigger (not an Anchor) is a bottom sheet: a scrim, a grab handle, swipe down to close (with `closeOnOutsideClick`), page scroll locked.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -121,6 +121,7 @@ Title uses the tier text size with title weight; Description uses the tier label
 | size | `size` on Content | `data-size` |
 | width | `matchTriggerWidth` | `data-match-trigger-width="true"` |
 | flush | `flush` | `data-flush="true"` |
+| sheet | viewport below 640px, opened from a Trigger (an Anchor keeps the panel next to its field) | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the panel; the sheet carries `data-state`, the panel keeps its role and ref; page scroll locked; a swipe down from the handle closes it (with `closeOnOutsideClick`) |
 
 There is no `disabled` on Popover: a disabled trigger never opens it.
 

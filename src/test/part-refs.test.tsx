@@ -52,7 +52,7 @@ import {
   Thumbnail,
   Timeline,
 } from "@/components";
-import { AppShell, Sidebar } from "@/layout";
+import { AppShell, BottomNav, Sidebar } from "@/layout";
 
 type PropsOf<C> = C extends React.JSXElementConstructor<infer P> ? P : never;
 
@@ -68,6 +68,11 @@ describe("part refs: every part declares ref", () => {
     takesRef(AppShell.Nav);
     takesRef(AppShell.Header);
     takesRef(AppShell.Main);
+    takesRef(AppShell.Footer);
+    takesRef(BottomNav.Root);
+    takesRef(BottomNav.Item);
+    takesRef(BottomNav.ItemIcon);
+    takesRef(BottomNav.ItemCount);
     takesRef(Avatar.Root);
     takesRef(Avatar.Image);
     takesRef(Avatar.Fallback);

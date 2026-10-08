@@ -1,13 +1,16 @@
 import * as React from "react";
 
 import { useEnterConfirm } from "@/hooks/useEnterConfirm";
+import { COMPACT_QUERY, useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { type PresenceState, usePresence } from "@/hooks/usePresence";
+import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Portal } from "@/internal/Portal";
+import sheet from "@/internal/sheet.module.css";
 import type { ControlSize } from "@/internal/states";
 import {
   DialogBody,
@@ -58,7 +61,10 @@ export type ModalRootProps = {
   onOpenChange?: (open: boolean) => void;
   /** Escape closes the dialog. Default `true`. */
   closeOnEscape?: boolean;
-  /** A click on the scrim closes the dialog. Default `true`; turn it off for destructive confirms. */
+  /**
+   * A click on the scrim (or, on a narrow viewport, a swipe down) closes the dialog. Default
+   * `true`; turn it off for destructive confirms.
+   */
   closeOnOutsideClick?: boolean;
   /** Enter clicks the action wrapped in `Modal.Confirm`. Default `true`. */
   confirmOnEnter?: boolean;
@@ -83,7 +89,7 @@ ModalRoot.displayName = "Modal.Root";
 export type ModalContentProps = React.HTMLAttributes<HTMLDivElement> & {
   /**
    * Dialog width: `s` 440 · `m` 560 · `l` 720 · `xl` 960. Below 640px of viewport the dialog is
-   * always a full-width bottom sheet.
+   * always a full-width bottom sheet with a grab handle.
    */
   size?: Exclude<ControlSize, "xs">;
   /** Portal target. Default `document.body`. */
@@ -123,6 +129,7 @@ function ModalDialog({
   "aria-describedby": ariaDescribedBy,
   state,
   onExitEnd,
+  onPointerDown,
   ref,
   ...rest
 }: ModalDialogProps) {
@@ -130,6 +137,15 @@ function ModalDialog({
   const confirmRef = React.useRef<HTMLElement | null>(null);
   const { ref: layerRef, layer, onClose } = useDialogLayer<HTMLDivElement>(root);
   const panelRef = useMergedRefs(layerRef, ref);
+  // Below 640px the dialog is a bottom sheet: it gets a handle and closes with a swipe down,
+  // a dismiss from outside the content like a scrim click.
+  const compact = useMediaQuery(COMPACT_QUERY);
+  const swipe = useSwipeDismiss({
+    enabled: compact && root.closeOnOutsideClick && state === "open",
+    direction: "down",
+    onDismiss: onClose,
+    handle: "[data-swipe-handle], header",
+  });
 
   const shell = useDialogShellValue({
     ariaLabel,
@@ -160,12 +176,23 @@ function ModalDialog({
         role="dialog"
         aria-modal="true"
         tabIndex={-1}
-        className={cx(dialogShellClassName, styles.content, overlayMotion.dialog, className)}
+        className={cx(
+          dialogShellClassName,
+          styles.content,
+          overlayMotion.dialog,
+          sheet.swipeY,
+          className,
+        )}
         data-size={size}
         data-state={state}
         {...shell.aria}
         {...rest}
+        onPointerDown={(event) => {
+          onPointerDown?.(event);
+          swipe.onPointerDown(event);
+        }}
       >
+        {compact ? <div className={sheet.handle} data-swipe-handle="" aria-hidden="true" /> : null}
         <DialogShellProvider value={shell.value}>
           <LayerProvider value={layer}>
             <ControlSizeProvider value="m">{children}</ControlSizeProvider>

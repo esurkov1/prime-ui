@@ -1,7 +1,8 @@
 /*
  * Drawer — raised edge panel on a scrim. Same zones as Modal (DialogParts.module.css), each
  * with its own side padding; header and footer stay put, only the body scrolls. Width per size
- * tier; full width below 640px. On the one overlay level: a drawer opened from a Modal or another
+ * tier; full width below 640px. `bottom` is a sheet: a grab handle on top (internal/sheet), height
+ * by content. On the one overlay level: a drawer opened from a Modal or another
  * drawer is portaled later, so it stacks above it in DOM order.
  */
 
@@ -68,12 +69,29 @@
   border-end-end-radius: var(--prime-modal-radius);
 }
 
-/* ─── Narrow viewport: full width, square corners ────────────────────────── */
+/* Side drawers: vertical scrolling stays with the browser, a horizontal touch drag closes. */
+.panel[data-side="left"],
+.panel[data-side="right"] {
+  touch-action: pan-y;
+}
+
+/* Bottom sheet: centred at its size width, height by content up to the top gap, rounded on top. */
+.panel[data-side="bottom"] {
+  top: auto;
+  right: 0;
+  left: 0;
+  max-height: calc(100dvh - var(--prime-sheet-top-gap));
+  margin-inline: auto;
+  padding-block-end: env(safe-area-inset-bottom, 0px);
+  border-start-start-radius: var(--prime-sheet-radius);
+  border-start-end-radius: var(--prime-sheet-radius);
+}
+
+/* ─── Narrow viewport: full width; side drawers square, the sheet keeps its top radius ──── */
 
 @media (max-width: 639px) {
   .panel {
     width: 100vw;
-    border-radius: 0;
   }
 
   .panel[data-side="left"],

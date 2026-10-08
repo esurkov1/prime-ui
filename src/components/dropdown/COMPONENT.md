@@ -62,7 +62,7 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 | `children` | `ReactElement` | — (required) | One element, usually a Button. |
 
 ### Dropdown.Content
-`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves to the first item; Tab closes the menu and returns focus to the trigger.
+`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves to the first item; Tab closes the menu and returns focus to the trigger. Below 640px of viewport the menu is a bottom sheet: a scrim, a grab handle, swipe down to close (with `closeOnOutsideClick`), page scroll locked.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -145,9 +145,10 @@ The panel is the shared floating surface: `bg-raised`, `--prime-panel-radius` (1
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the menu (closed while the exit animation plays) and on the trigger, `aria-expanded` on the trigger |
 | side | `side` and the room next to the trigger | `data-side` (resolved) |
 | size | `size` on Content | `data-size` |
-| item hover / focus | pointer, arrow keys | subtle fill (danger-soft for `danger`), no movement |
+| item hover / focus | a hovering pointer, arrow keys | subtle fill (danger-soft for `danger`), no movement; a tap leaves no hover fill |
 | item disabled | `disabled` | `aria-disabled="true"`, `data-disabled="true"` |
 | item tone | `tone` | `data-tone` |
+| sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the menu; the sheet carries `data-state`, the menu keeps its role and ref; page scroll locked; a swipe down from the handle closes it (with `closeOnOutsideClick`) |
 
 ## Layout & spacing
 - Width is `max-content` between `--prime-panel-min-width` and twice that; items never wrap.

@@ -7,12 +7,23 @@
   white-space: nowrap;
 }
 
-.item:is(:hover, :focus-visible):not([data-disabled="true"]) {
+.item:focus-visible:not([data-disabled="true"]) {
   background: var(--prime-color-fill-subtle);
 }
 
-.item[data-tone="danger"]:is(:hover, :focus-visible):not([data-disabled="true"]) {
+.item[data-tone="danger"]:focus-visible:not([data-disabled="true"]) {
   background: var(--prime-color-danger-soft);
+}
+
+/* Hover only where a pointer hovers: a tap must not leave a row lit. */
+@media (hover: hover) {
+  .item:hover:not([data-disabled="true"]) {
+    background: var(--prime-color-fill-subtle);
+  }
+
+  .item[data-tone="danger"]:hover:not([data-disabled="true"]) {
+    background: var(--prime-color-danger-soft);
+  }
 }
 
 .item[data-disabled="true"] .shortcut {

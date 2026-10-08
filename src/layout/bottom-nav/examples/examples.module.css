@@ -1,0 +1,44 @@
+/* Layout of the BottomNav scenarios: a phone-wide screen frame. Semantic tokens only. */
+
+/* A phone screen: the content above, the bar pinned to the bottom edge. */
+.phone {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, var(--prime-drawer-width-s));
+  height: calc(var(--prime-space-24) * 5);
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-bg-surface);
+  box-shadow:
+    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
+    var(--prime-shadow-raised);
+}
+
+/* The page above the bar. */
+.screen {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-height: 0;
+  padding: var(--prime-space-6) var(--prime-layout-gutter-s);
+}
+
+/* in-app-shell.tsx: the shell fills the phone frame instead of the viewport. */
+.shell {
+  height: 100%;
+}
+
+/* floating.tsx: a client row — avatar and two lines of text. */
+.client {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+/* floating.tsx: the switch goes to the end of the header. */
+.toggle {
+  margin-inline-start: auto;
+}

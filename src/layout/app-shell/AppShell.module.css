@@ -84,9 +84,30 @@
   gap: var(--prime-space-3);
   min-width: 0;
   min-height: calc(var(--prime-control-m-height) + 2 * var(--prime-space-3));
-  padding-block: var(--prime-space-3);
+  padding-block: max(var(--prime-space-3), env(safe-area-inset-top, 0px)) var(--prime-space-3);
   padding-inline: var(--shell-gutter);
   background: var(--prime-color-bg-surface);
+}
+
+/* A phone on its side: a sticky bar would eat a third of the height. */
+@media (max-height: 479px) {
+  .header {
+    position: static;
+  }
+}
+
+/*
+ * The footer brings no padding of its own: BottomNav keeps the safe-area inset, and a footer whose
+ * bar has left takes no room. It is the `prime-shell-footer` container: BottomNav follows the
+ * panel's width, so a shell in a narrow frame behaves like a phone.
+ */
+.footer {
+  container: prime-shell-footer / inline-size;
+  position: sticky;
+  bottom: 0;
+  z-index: var(--prime-z-sticky);
+  flex: none;
+  min-width: 0;
 }
 
 /*
@@ -111,5 +132,19 @@
   padding-inline: max(
     var(--shell-gutter),
     calc((100% - var(--prime-layout-content-max-width)) / 2)
+  );
+}
+
+/* A floating BottomNav overlays the page: the footer takes no height, the capsule rises from its
+   bottom edge, and main keeps room below its last line so nothing ends up under the glass. */
+.footer:has(> [data-floating="true"]) {
+  height: 0;
+}
+
+.panel:has(> .footer > [data-floating="true"]) > .main {
+  padding-block-end: calc(
+    var(--prime-space-16) +
+    var(--prime-bottom-nav-height) +
+    env(safe-area-inset-bottom, 0px)
   );
 }

@@ -37,8 +37,8 @@ export function dialogRootProps(name: "Modal" | "Drawer"): ApiProp[] {
       name: "closeOnOutsideClick",
       type: "boolean",
       default: "true",
-      en: "A click on the scrim closes the dialog; turn off for destructive confirms.",
-      ru: "Клик по подложке закрывает окно; `false` — для подтверждений удаления.",
+      en: "A click on the scrim (and a swipe on a bottom sheet) closes the dialog; turn off for destructive confirms.",
+      ru: "Клик по подложке (и свайп у шторки снизу) закрывает окно; `false` — для подтверждений удаления.",
     },
     {
       name: "labels",

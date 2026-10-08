@@ -65,8 +65,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.Content",
-      en: '`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves to the first item; Tab closes the menu and returns focus to the trigger.',
-      ru: 'Портал и панель `role="menu"`; фокус на первом пункте, стрелки ходят по пунктам, Tab закрывает меню.',
+      en: '`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves to the first item; Tab closes the menu and returns focus to the trigger. Below 640px of viewport the menu is a bottom sheet: a scrim, a grab handle, swipe down to close (with `closeOnOutsideClick`), page scroll locked.',
+      ru: 'Портал и панель `role="menu"`; фокус на первом пункте, стрелки ходят по пунктам, Tab закрывает меню. Уже 640px экрана меню становится шторкой снизу: подложка, ручка, закрытие свайпом вниз (при `closeOnOutsideClick`), прокрутка страницы заблокирована.',
       props: [
         {
           name: "side",

@@ -27,3 +27,18 @@
 .shell {
   height: 100%;
 }
+
+/* footer.tsx: the same window, phone-wide, so the bar in the footer stays (it leaves from 640px). */
+.phone {
+  box-sizing: border-box;
+  display: flex;
+  width: min(100%, var(--prime-drawer-width-s));
+  height: calc(var(--prime-space-24) * 5);
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-bg-surface);
+  box-shadow:
+    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
+    var(--prime-shadow-raised);
+}

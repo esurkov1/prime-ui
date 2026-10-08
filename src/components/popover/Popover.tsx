@@ -186,6 +186,8 @@ function PopoverContent({
     focusOnOpen: !anchoredRef.current,
     trap: trapFocus,
     tabExit: "edges",
+    // A panel driven by typing in its anchor stays next to the field.
+    sheet: !anchoredRef.current,
   });
 
   const titleId = `${contentId}-title`;

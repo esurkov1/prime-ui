@@ -57,6 +57,16 @@ function AppShellHeader({ className, ...rest }: AppShellHeaderProps) {
 }
 AppShellHeader.displayName = "AppShell.Header";
 
+export type AppShellFooterProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/** Bottom bar of the content panel (`BottomNav` on a narrow shell). Sticky. */
+function AppShellFooter({ className, ...rest }: AppShellFooterProps) {
+  return <div {...rest} className={cx(styles.footer, className)} />;
+}
+AppShellFooter.displayName = "AppShell.Footer";
+
 /** `full` (default): the whole panel with responsive gutters; `contained`: centered, up to `--prime-layout-content-max-width` (long-read pages). */
 export type AppShellContentWidth = "contained" | "full";
 
@@ -89,17 +99,23 @@ export type AppShellTemplateProps = Omit<AppShellRootProps, "children" | "ref"> 
   nav?: React.ReactNode;
   /** `AppShell.Header` content; no header row when omitted. */
   header?: React.ReactNode;
+  /** `AppShell.Footer` content (`BottomNav`); no footer when omitted. */
+  footer?: React.ReactNode;
   children?: React.ReactNode;
   mainProps?: Omit<AppShellMainProps, "children" | "ref">;
   /** Main scrolls back to the top whenever this value changes (pass the router pathname). */
   scrollResetKey?: unknown;
 };
 
-/** Root + Nav + Header + Main in one; main scrolls to the top when `scrollResetKey` changes. */
+/**
+ * Root + Nav + Header + Main + Footer in one; main scrolls to the top when `scrollResetKey`
+ * changes.
+ */
 function AppShellTemplate({
   ref,
   nav,
   header,
+  footer,
   children,
   mainProps,
   scrollResetKey,
@@ -121,6 +137,7 @@ function AppShellTemplate({
       <AppShellMain {...mainProps} ref={setMainRef}>
         {children}
       </AppShellMain>
+      {footer == null ? null : <AppShellFooter>{footer}</AppShellFooter>}
     </AppShellRoot>
   );
 }
@@ -131,5 +148,6 @@ export const AppShell = {
   Nav: AppShellNav,
   Header: AppShellHeader,
   Main: AppShellMain,
+  Footer: AppShellFooter,
   Template: AppShellTemplate,
 };

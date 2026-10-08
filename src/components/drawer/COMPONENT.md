@@ -3,13 +3,14 @@
 **Category:** overlays
 **Kind:** overlay
 
-> A modal side panel that slides in from the edge: filters, forms and record details.
+> A modal panel that slides in from the edge: filters, forms and record details at the side, a bottom sheet on a phone.
 
 ## When to use
 - Editing settings or a record without leaving the page.
 - Filters or navigation on narrow screens (`side="left"`).
 - Read-only details of a list row (order, user, event).
 - Long content (history, logs) that needs a tall scrolling area.
+- A short task on a phone — pick a date, choose an action, fill two fields — in a bottom sheet (`side="bottom"`).
 
 ## When not to use
 - Confirmations and short decisions → use [Modal](../modal/COMPONENT.md).
@@ -27,6 +28,7 @@ import { Drawer } from "prime-ui-kit";
 Drawer.Root                    state and dismiss policy (no DOM)
 ├─ Drawer.Trigger              clones its child; opens on click
 └─ Drawer.Content              portal + scrim + role="dialog" panel at the edge
+   ├─ (grab handle)            side="bottom" only: aria-hidden bar, a drag starts here
    ├─ Drawer.Header            grid: [Icon] [Title + Description] [close Button]
    │  ├─ Drawer.Icon
    │  ├─ Drawer.Title          <h2>
@@ -49,7 +51,7 @@ No DOM, no ref. State and dismiss policy.
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, close button, `Close`, Escape, scrim click, code. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the dialog. |
-| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the dialog; turn off for destructive confirms. |
+| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim (and a swipe on a bottom sheet) closes the dialog; turn off for destructive confirms. |
 | `labels` | `Partial<DrawerLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Trigger and Content. |
 
@@ -58,8 +60,8 @@ No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `side` | `"left" \| "right"` | `"right"` | Edge the panel slides from; rounded only on the edge facing the page. |
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 360 · 480 · 640 · 800. Below 640 px of viewport — full width, square corners. |
+| `side` | `"left" \| "right" \| "bottom"` | `"right"` | Edge the panel slides from; rounded only on the edge facing the page. `bottom` is a sheet: a grab handle on top, height by content. A swipe toward the edge closes the panel (with `closeOnOutsideClick`): a bottom sheet from its handle or header, a side drawer by touch anywhere (by mouse from the header). |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 360 · 480 · 640 · 800 (a bottom sheet is centred). Below 640 px of viewport — full width; side drawers lose their corners. |
 | `aria-label` | `string` | — | Dialog name when there is no Title. |
 | `aria-labelledby` | `string` | — | Overrides the Title id. |
 | `aria-describedby` | `string` | — | Overrides the Description id. |
@@ -110,6 +112,7 @@ No DOM: clone the single child and chain its `onClick` (unless the child's handl
 |---|---|---|---|
 | `right` | slides from the right, rounded on its left edge | details and forms | yes |
 | `left` | slides from the left, rounded on its right edge | filters, mobile navigation | |
+| `bottom` | rises from the bottom, rounded on top, grab handle, height by content | a short task on a phone | |
 
 ### size (Content)
 | Value | Looks like | Use when | Default |
@@ -119,7 +122,7 @@ No DOM: clone the single child and chain its `onClick` (unless the child's handl
 | `l` | 640 wide | wide forms | |
 | `xl` | 800 wide | tables, previews | |
 
-Below 640px of viewport every size is full width with square corners.
+A bottom sheet is centred at its width. Below 640px of viewport every size is full width; side drawers lose their corners, the sheet keeps its top radius.
 
 ### layout (Footer)
 | Value | Looks like | Use when | Default |
@@ -135,13 +138,15 @@ Below 640px of viewport every size is full width with square corners.
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the scrim and the panel; mounted until the slide-out ends |
 | side / size | Content props | `data-side`, `data-size` on the panel |
+| swiping | a drag toward the edge (with `closeOnOutsideClick`) | `data-swiping` and `--swipe-offset` on the panel while the pointer drags it |
 | open: trapped | while open | focus trapped, page scroll locked, siblings of the portal `inert` (the toast region stays usable); a drawer opened from a Modal or another drawer stacks above it |
 
-Motion: the scrim fades, the panel slides from its side over `slow` and leaves over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once.
+Motion: the scrim fades, the panel slides from its side over `slow` and leaves over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once. A swipe moves the panel with the pointer; on release it closes past 30% of its size or on a quick flick, otherwise it glides back over `base`. A bottom sheet drags from its handle or header; a side drawer by touch anywhere (not on text fields, sliders or sideways scrollers), by mouse from the header.
 
 ## Layout & spacing
 - Zone padding `--prime-drawer-padding`; hairlines between header, body and footer.
 - Full viewport height; only the body scrolls, with its own side padding.
+- Bottom sheet: height by content up to `100dvh − --prime-sheet-top-gap`, radius `--prime-sheet-radius`, a `--prime-sheet-handle-area` strip with the handle bar, the bottom safe-area inset below the content.
 - Fields inside get the surface field fill.
 
 ## Accessibility
@@ -157,6 +162,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Focus moves into the panel on open and returns to the opener on close, including after a scrim click.
 - The page behind is `inert`, scroll is locked; only the topmost layer reacts.
 - A drawer opened from a Modal stacks above it.
+- A swipe toward the edge is an extra way out; the close button and Escape stay. The grab handle is `aria-hidden`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -171,7 +177,8 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [overview.tsx](examples/overview.tsx) | Order details next to the list: a trigger, a header with a close button and a read-only body — `Drawer.Trigger`, `Drawer.Body`. |
 | [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile in the header and one full-width action in the footer — `Drawer.Icon`, `Drawer.Footer`, `layout`. |
 | [sizes.tsx](examples/sizes.tsx) | Every panel width, 360 to 800 px; below 640 px of viewport the panel takes the full width — `size`. |
-| [placement.tsx](examples/placement.tsx) | The panel slides from the right for details and from the left for filters — `side`. |
+| [placement.tsx](examples/placement.tsx) | The panel slides from the right for details, from the left for filters and up from the bottom as a sheet — `side`. |
+| [date-sheet.tsx](examples/date-sheet.tsx) | A date picked in a bottom sheet: a grab handle on top, a swipe down or a pick closes it — `side`, `Drawer.Body`. |
 | [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Drawer.Body`. |
 | [dismiss.tsx](examples/dismiss.tsx) | An import closes only from its buttons, and not at all while it runs — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the state and opens the drawer from a link, without a trigger — `open`, `onOpenChange`. |
@@ -180,7 +187,8 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 ## Mistakes
 - A delete confirmation in a Drawer → use Modal.
 - Expecting Enter to submit via `Drawer.Confirm` → Drawer has no Confirm; use a `<form>` with a submit button.
-- `side="top"` / `"bottom"` → only `left` and `right`.
+- `side="top"` → only `left`, `right` and `bottom`.
+- Swipe as the only way to close → keep `Drawer.Header` with its close button (or `Drawer.Close`); a swipe is an extra gesture.
 - Padding on a wrapper inside Body → Body already pads and scrolls.
 
 ## Related

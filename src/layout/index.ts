@@ -1,5 +1,6 @@
 export type {
   AppShellContentWidth,
+  AppShellFooterProps,
   AppShellHeaderProps,
   AppShellMainProps,
   AppShellNavProps,
@@ -7,6 +8,14 @@ export type {
   AppShellTemplateProps,
 } from "./app-shell/AppShell";
 export { AppShell } from "./app-shell/AppShell";
+export type {
+  BottomNavItemCountProps,
+  BottomNavItemIconProps,
+  BottomNavItemProps,
+  BottomNavLabels,
+  BottomNavRootProps,
+} from "./bottom-nav/BottomNav";
+export { BottomNav } from "./bottom-nav/BottomNav";
 export type {
   SidebarAccountProps,
   SidebarBrandLogoProps,

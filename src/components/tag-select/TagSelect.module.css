@@ -303,8 +303,10 @@
   justify-content: space-between;
 }
 
-.colorRow:hover {
-  background: var(--prime-color-fill-subtle);
+@media (hover: hover) {
+  .colorRow:hover {
+    background: var(--prime-color-fill-subtle);
+  }
 }
 
 .colorRow:focus-visible {

@@ -34,3 +34,50 @@
 .layer {
   z-index: var(--prime-z-overlay);
 }
+
+/* ─── Sheet: the same layer at the bottom edge of a narrow viewport ───────────
+ * `FloatingPanel` with `sheet`: a scrim, then a full-width raised sheet holding the grab handle
+ * and the panel itself. The panel keeps its own classes (menu, popover content) but takes the
+ * sheet's width; menu-like panels scroll inside the sheet's height (`--float-max-h`).
+ */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--prime-color-bg-scrim);
+}
+
+.sheet {
+  --prime-color-field-bg: var(--prime-color-field-bg-surface);
+  --float-max-h: calc(100dvh - var(--prime-sheet-top-gap) - var(--prime-sheet-handle-area));
+  /* A list in a sheet uses the room it has, not the anchored panel's limit. */
+  --prime-panel-max-height: var(--float-max-h);
+
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - var(--prime-sheet-top-gap));
+  padding-block-end: max(var(--prime-space-2), env(safe-area-inset-bottom, 0px));
+  border-start-start-radius: var(--prime-sheet-radius);
+  border-start-end-radius: var(--prime-sheet-radius);
+  background: var(--prime-color-bg-raised);
+  box-shadow: var(--prime-shadow-modal);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  outline: none;
+}
+
+/* Doubled class: wins over the panel's own width rules, whichever stylesheet loads last. */
+.sheetContent.sheetContent {
+  position: static;
+  flex: 1 1 auto;
+  align-self: stretch;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  min-height: 0;
+}

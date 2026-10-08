@@ -1,7 +1,10 @@
 import * as React from "react";
 
+import { COMPACT_QUERY, useMediaQuery } from "@/hooks/useMediaQuery";
 import { type PositionOptions, type PositionSide, usePosition } from "@/hooks/usePosition";
 import { type MotionDurationToken, type Presence, usePresence } from "@/hooks/usePresence";
+import { useScrollLock } from "@/hooks/useScrollLock";
+import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 
 import { focusBack, focusInto, getFocusable } from "./focus";
 import { type DismissReason, type LayerEntry, useLayer } from "./layerStack";
@@ -34,6 +37,12 @@ export type UseFloatingLayerOptions = PositionOptions & {
   exitDuration?: MotionDurationToken;
   /** Unmount at once on close, skipping the exit animation (a Tooltip replaced by its neighbour). */
   skipExit?: boolean;
+  /**
+   * Below 640px of viewport the panel is a bottom sheet instead of an anchored panel: a scrim,
+   * a grab handle, swipe down to close, page scroll locked. For panels the user works in (menus,
+   * listboxes, pickers); not for a panel driven by typing in its anchor.
+   */
+  sheet?: boolean;
 };
 
 export type FloatingLayer = {
@@ -43,6 +52,10 @@ export type FloatingLayer = {
   mounted: boolean;
   /** The side after flipping. */
   side: PositionSide;
+  /** Rendered as a bottom sheet (`sheet` on a narrow viewport). */
+  sheet: boolean;
+  /** Swipe-to-close of the sheet; part of the sheet's `onPointerDown`. */
+  onSheetPointerDown: (event: React.PointerEvent<HTMLElement>) => void;
   /** Attach to the panel element (merged with a consumer ref). */
   panelRef: React.RefCallback<HTMLElement>;
   /** The panel element while mounted. */
@@ -75,13 +88,17 @@ export function useFloatingLayer({
   tabExit = "none",
   exitDuration = "fast",
   skipExit = false,
+  sheet: sheetOption = false,
   ...positionOptions
 }: UseFloatingLayerOptions): FloatingLayer {
-  const presence = usePresence(open, { exitDuration });
+  const sheet = useMediaQuery(COMPACT_QUERY, sheetOption);
+  // A sheet slides over `base`, an anchored panel fades over its own token.
+  const presence = usePresence(open, { exitDuration: sheet ? "base" : exitDuration });
   const mounted = presence.mounted && (open || !skipExit);
   const contentRef = React.useRef<HTMLElement | null>(null);
-  // Keeps its position while the exit animation plays.
-  const position = usePosition(mounted, triggerRef, contentRef, positionOptions);
+  // Keeps its position while the exit animation plays; a sheet sits at the bottom edge instead.
+  const position = usePosition(mounted && !sheet, triggerRef, contentRef, positionOptions);
+  useScrollLock(open && sheet);
   // The portaled panel reaches the DOM one commit after its owner: effects wait for the node.
   const [panel, setPanel] = React.useState<HTMLElement | null>(null);
   const { attachLayer } = position;
@@ -101,12 +118,24 @@ export function useFloatingLayer({
     onOpenChange(false);
   }, [onOpenChange]);
 
+  /** A dismiss from outside the content: focus is not pulled back to the trigger. */
+  const dismissOutside = React.useCallback(() => {
+    outsideRef.current = true;
+    onOpenChange(false);
+  }, [onOpenChange]);
+
+  const swipe = useSwipeDismiss({
+    enabled: sheet && open && closeOnOutsideClick,
+    direction: "down",
+    onDismiss: dismissOutside,
+    handle: "[data-swipe-handle]",
+  });
+
   const onDismiss = (reason: DismissReason) => {
     if (reason === "escape") {
       if (closeOnEscape) close();
     } else if (closeOnOutsideClick) {
-      outsideRef.current = true;
-      onOpenChange(false);
+      dismissOutside();
     }
   };
 
@@ -154,6 +183,8 @@ export function useFloatingLayer({
     presence,
     mounted,
     side: position.side,
+    sheet,
+    onSheetPointerDown: swipe.onPointerDown,
     panelRef,
     contentRef,
     layer,

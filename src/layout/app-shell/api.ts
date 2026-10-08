@@ -17,8 +17,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (Nav, Header, Main), `className` and the other div attributes.",
-          ru: "`children` (Nav, Header, Main), `className` и остальные атрибуты div.",
+          en: "`children` (Nav, Header, Main, Footer), `className` and the other div attributes.",
+          ru: "`children` (Nav, Header, Main, Footer), `className` и остальные атрибуты div.",
         },
       ],
     },
@@ -37,8 +37,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppShell.Header",
-      en: "`ref` → `HTMLElement`. Sticky `<header>` row of the panel for breadcrumbs, search and actions.",
-      ru: "Липкая строка `<header>` панели для хлебных крошек, поиска и действий.",
+      en: "`ref` → `HTMLElement`. Sticky `<header>` row of the panel for breadcrumbs, search and actions; keeps the top safe-area inset and stops sticking below 480px of viewport height.",
+      ru: "Липкая строка `<header>` панели для хлебных крошек, поиска и действий; учитывает верхний безопасный отступ и не липнет при высоте экрана меньше 480px.",
       props: [
         {
           name: "…rest",
@@ -69,9 +69,22 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "AppShell.Footer",
+      en: "`ref` → `HTMLDivElement`. Sticky bottom bar of the panel for `BottomNav`; no padding of its own. A container (`prime-shell-footer`): BottomNav inside shows only while the panel is narrower than 640px.",
+      ru: "Липкая нижняя полоса панели для `BottomNav`, без своих отступов. Контейнер: BottomNav внутри виден, пока панель уже 640px.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children` (usually `BottomNav.Root`), `className` and the other div attributes.",
+          ru: "`children` (обычно `BottomNav.Root`), `className` и остальные атрибуты div.",
+        },
+      ],
+    },
+    {
       name: "AppShell.Template",
-      en: "`ref` → the `<main>`. Root + Nav + Header + Main in one; main scrolls to the top when `scrollResetKey` changes.",
-      ru: "Root, Nav, Header и Main одним компонентом; main прокручивается наверх при смене `scrollResetKey`.",
+      en: "`ref` → the `<main>`. Root + Nav + Header + Main + Footer in one; main scrolls to the top when `scrollResetKey` changes.",
+      ru: "Root, Nav, Header, Main и Footer одним компонентом; main прокручивается наверх при смене `scrollResetKey`.",
       props: [
         {
           name: "nav",
@@ -84,6 +97,12 @@ export const api: ComponentApi = {
           type: "ReactNode",
           en: "Header content; no header row when omitted.",
           ru: "Содержимое шапки; без него строки шапки нет.",
+        },
+        {
+          name: "footer",
+          type: "ReactNode",
+          en: "Footer content (`BottomNav`); no footer when omitted.",
+          ru: "Содержимое нижней полосы (`BottomNav`); без него полосы нет.",
         },
         {
           name: "mainProps",

@@ -39,6 +39,16 @@
   --prime-badge-xs-radius: var(--prime-ref-radius-4);
   --prime-badge-xs-text-size: var(--prime-ref-font-size-12);
   --prime-border-width: 1px;
+  --prime-bottom-nav-blur: 1.25rem;
+  --prime-bottom-nav-floating-inset: var(--prime-ref-space-3);
+  --prime-bottom-nav-height: 3.5rem;
+  --prime-bottom-nav-icon-size: var(--prime-ref-icon-24);
+  --prime-bottom-nav-indicator-height: var(--prime-ref-space-6);
+  --prime-bottom-nav-indicator-width: var(--prime-ref-space-8);
+  --prime-bottom-nav-item-gap: var(--prime-ref-space-1);
+  --prime-bottom-nav-label-line-height: var(--prime-ref-font-line-height-12);
+  --prime-bottom-nav-label-size: var(--prime-ref-font-size-10);
+  --prime-bottom-nav-padding-x: var(--prime-ref-space-2);
   --prime-card-gap: var(--prime-ref-space-4);
   --prime-card-padding-l: var(--prime-ref-space-6);
   --prime-card-padding-m: var(--prime-ref-space-5);
@@ -52,6 +62,8 @@
   --prime-color-accent-soft-hover: var(--prime-ref-color-cobalt-200);
   --prime-color-accent-text: var(--prime-ref-color-cobalt-700);
   --prime-color-bg-canvas: var(--prime-ref-color-gray-50);
+  --prime-color-bg-glass: color-mix(in srgb, var(--prime-ref-color-gray-0) 68%, transparent);
+  --prime-color-bg-glass-edge: rgba(255, 255, 255, 0.7);
   --prime-color-bg-inverse: var(--prime-ref-color-gray-925);
   --prime-color-bg-raised: var(--prime-ref-color-gray-0);
   --prime-color-bg-scrim: rgba(17, 19, 24, 0.44);
@@ -297,6 +309,11 @@
   --prime-shadow-overlay: 0 0 0 1px rgba(17, 19, 24, 0.04), 0 12px 32px -8px rgba(17, 19, 24, 0.18);
   --prime-shadow-raised: 0 1px 2px rgba(17, 19, 24, 0.04);
   --prime-shadow-thumb: 0 0 0 1px rgba(17, 19, 24, 0.08), 0 1px 3px rgba(17, 19, 24, 0.16);
+  --prime-sheet-handle-area: var(--prime-ref-space-5);
+  --prime-sheet-handle-height: var(--prime-ref-space-1);
+  --prime-sheet-handle-width: 2.25rem;
+  --prime-sheet-radius: var(--prime-ref-radius-16);
+  --prime-sheet-top-gap: var(--prime-ref-space-10);
   --prime-space-0: var(--prime-ref-space-0);
   --prime-space-1: var(--prime-ref-space-1);
   --prime-space-10: var(--prime-ref-space-10);

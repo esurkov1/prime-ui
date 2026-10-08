@@ -195,8 +195,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Content",
-      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.',
-      ru: "Портал и панель списка; смонтирована и в закрытом виде, чтобы триггер знал подписи.",
+      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state. Below 640px of viewport the panel is a bottom sheet: a scrim, a grab handle, swipe down to close, page scroll locked.',
+      ru: "Портал и панель списка; смонтирована и в закрытом виде, чтобы триггер знал подписи. Уже 640px экрана панель становится шторкой снизу: подложка, ручка, закрытие свайпом вниз, прокрутка страницы заблокирована.",
       props: [
         {
           name: "searchable",

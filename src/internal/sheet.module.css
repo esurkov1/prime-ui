@@ -1,0 +1,57 @@
+/*
+ * Bottom sheet and swipe parts shared by Drawer, Modal and floating layers on a narrow viewport.
+ *
+ *   .handle      the grab bar strip at the top edge (`data-swipe-handle`); a drag starts here
+ *   .swipeY      a panel that follows a vertical drag (`--swipe-offset` from useSwipeDismiss)
+ *   .swipeX      the same along the horizontal axis (side drawers)
+ *
+ * While `data-swiping` is set the panel follows the pointer with no transition; on release it
+ * glides back to rest (or leaves through its exit animation, which runs on `translate`, so the
+ * two never fight). Reduced motion collapses the glide (globals.css).
+ */
+
+.handle {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: var(--prime-sheet-handle-area);
+  /* The strip is the drag surface: no browser panning starts from it. */
+  touch-action: none;
+  cursor: grab;
+}
+
+.handle::before {
+  content: "";
+  width: var(--prime-sheet-handle-width);
+  height: var(--prime-sheet-handle-height);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-strong);
+}
+
+.swipeY,
+.swipeX {
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.swipeY {
+  transform: translate3d(0, var(--swipe-offset, 0px), 0);
+}
+
+.swipeX {
+  transform: translate3d(var(--swipe-offset, 0px), 0, 0);
+}
+
+.swipeY[data-swiping],
+.swipeX[data-swiping] {
+  transition: none;
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* A header right under the handle drops its top air: the handle strip is that air. It is part of
+   the drag surface too. */
+.handle + header {
+  padding-block-start: var(--prime-space-1);
+  touch-action: none;
+}

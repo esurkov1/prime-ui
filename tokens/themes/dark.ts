@@ -47,6 +47,8 @@ export const darkThemeOverrides = {
       sunken: "{color.gray.950}",
       inverse: "{color.gray.100}",
       scrim: "rgba(0, 0, 0, 0.6)",
+      glass: "color-mix(in srgb, var(--prime-ref-color-gray-875) 64%, transparent)",
+      glassEdge: "rgba(255, 255, 255, 0.08)",
     },
     fill: {
       subtle: "rgba(233, 235, 240, 0.05)",

@@ -82,6 +82,7 @@
   --prime-ref-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --prime-ref-font-family-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --prime-ref-font-family-sans: "Golos Text", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --prime-ref-font-line-height-12: 0.75rem;
   --prime-ref-font-line-height-16: 1rem;
   --prime-ref-font-line-height-20: 1.25rem;
   --prime-ref-font-line-height-24: 1.5rem;
@@ -91,6 +92,7 @@
   --prime-ref-font-line-height-44: 2.75rem;
   --prime-ref-font-line-height-56: 3.5rem;
   --prime-ref-font-line-height-68: 4.25rem;
+  --prime-ref-font-size-10: 0.625rem;
   --prime-ref-font-size-12: 0.75rem;
   --prime-ref-font-size-13: 0.8125rem;
   --prime-ref-font-size-14: 0.875rem;

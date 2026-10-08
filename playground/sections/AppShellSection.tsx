@@ -8,7 +8,7 @@ export const page: ComponentPageConfig = {
     segment: "app-shell",
     label: "App Shell",
     summary: "Каркас приложения: рельс навигации и панель контента",
-    keywords: ["каркас", "оболочка", "layout", "nav", "header", "main", "fillViewport"],
+    keywords: ["каркас", "оболочка", "layout", "nav", "header", "main", "footer", "fillViewport"],
     icon: LayoutTemplate,
     order: 1,
   },
@@ -31,6 +31,12 @@ export const page: ComponentPageConfig = {
         "Оболочка без навигации, main которой — колонка по центру с ограничением для длинных текстов — `contentWidth`.",
     },
     {
+      scenario: "footer",
+      title: "Нижняя полоса",
+      description:
+        "Приложение шириной с телефон: полоса в нижней зоне стоит внизу, пока main прокручивается под ней, и уходит, когда панель шире 640px — `AppShell.Footer`.",
+    },
+    {
       scenario: "template",
       title: "Шаблон",
       description:
@@ -41,7 +47,7 @@ export const page: ComponentPageConfig = {
   accessibility: {
     keyboard: [],
     aria: [
-      "Main — ориентир `<main>`, Header — `<header>`; ориентир навигации даёт Sidebar (`<nav>`).",
+      "Main — ориентир `<main>`, Header — `<header>`; ориентиры навигации дают Sidebar и BottomNav (`<nav>`).",
       "На странице один `<h1>` (PageContent.Title).",
     ],
   },

@@ -26,6 +26,7 @@ import { Modal } from "prime-ui-kit";
 Modal.Root                    state and dismiss policy (no DOM)
 ├── Modal.Trigger             clones its child; opens on click
 └── Modal.Content             portal + scrim + role="dialog"
+    ├── (grab handle)         below 640px only: aria-hidden bar, a drag starts here
     ├── Modal.Header          grid: [Icon] [Title + Description] [close button]
     │   ├── Modal.Icon        40 tile with a tone fill
     │   ├── Modal.Title       <h2>, names the dialog
@@ -49,7 +50,7 @@ No DOM, no ref. State and dismiss policy.
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, close button, `Close`, Escape, scrim click, code. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the dialog. |
-| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the dialog; turn off for destructive confirms. |
+| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim (and a swipe on a bottom sheet) closes the dialog; turn off for destructive confirms. |
 | `labels` | `Partial<ModalLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Trigger and Content. |
 | `confirmOnEnter` | `boolean` | `true` | Enter inside the dialog clicks the element wrapped in `Modal.Confirm`; Enter on a button or link activates that element instead. |
@@ -60,7 +61,7 @@ No DOM, no ref. State and dismiss policy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 440 · 560 · 720 · 960. Below 640 px of viewport — a full-width bottom sheet. |
+| `size` | `"s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 440 · 560 · 720 · 960. Below 640 px of viewport — a full-width bottom sheet with a grab handle; a swipe down from the handle or the header closes it. |
 | `container` | `HTMLElement \| null` | `document.body` | Portal target. |
 | `aria-label` | `string` | — | Dialog name when there is no Title. |
 | `aria-labelledby` | `string` | — | Overrides the Title id. |
@@ -116,7 +117,7 @@ The dialog has one look: `bg-raised`, `--prime-modal-radius` (16), `shadow-modal
 | `l` | 720 wide, footer buttons right-aligned | Two-column forms | |
 | `xl` | 960 wide, footer buttons right-aligned | Tables, previews | |
 
-Below 640px of viewport every size becomes a full-width bottom sheet.
+Below 640px of viewport every size becomes a full-width bottom sheet with a grab handle.
 
 ### layout (Footer)
 | Value | Looks like | Use when | Default |
@@ -157,6 +158,7 @@ On phones (viewport below 640px, where the dialog is a bottom sheet) and in a di
 | footer layout | `layout` or the size default | `data-layout` on the footer |
 | icon tone | `tone` on Icon | `data-tone` on the tile |
 | while open | — | focus trapped inside, page scroll locked, siblings of the portal `inert` (the toast region stays usable) |
+| swiping | below 640px, a drag down from the handle or the header (with `closeOnOutsideClick`) | `data-swiping` and `--swipe-offset` on the dialog while the pointer drags it; past 30% of its height or on a flick it closes, otherwise it glides back |
 
 Loading or disabled actions use the Button props (`loading`, `disabled`) inside the footer.
 
@@ -164,7 +166,7 @@ Loading or disabled actions use the Button props (`loading`, `disabled`) inside 
 - Dialog padding `--prime-modal-padding` (24) on every zone; header 24 top / 20 bottom, body 20 with a 16 gap between blocks, footer 20 top / 24 bottom.
 - Max height = viewport minus `--prime-modal-viewport-padding` on both sides; only the body scrolls.
 - Fields inside get the surface field fill; cards inside become sunken tiles. Group fields with a 20 gap.
-- Narrow viewport (< 640px): bottom sheet, full width, top corners rounded.
+- Narrow viewport (< 640px): bottom sheet, full width, top corners `--prime-sheet-radius`, a grab handle strip on top, up to `100dvh − --prime-sheet-top-gap` high, the bottom safe-area inset below the content.
 
 ## Accessibility
 
@@ -180,6 +182,7 @@ Loading or disabled actions use the Button props (`loading`, `disabled`) inside 
 - Focus moves into the dialog on open (an `autoFocus` field wins) and returns to the opener on close — also after a scrim click (foundation §8).
 - The page behind is `inert` and its scroll is locked.
 - Only the topmost layer reacts: a Select open inside the dialog closes first.
+- On a narrow viewport a swipe down is an extra way out; the close button and Escape stay. A destructive confirm (`closeOnOutsideClick={false}`) does not close by swipe. The grab handle is `aria-hidden`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

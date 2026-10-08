@@ -462,6 +462,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     matchAnchorWidth: true,
     focusOnOpen: true,
     tabExit: "always",
+    sheet: true,
   });
 
   const highlighted = useStoreSlice(highlight, (value) => value);

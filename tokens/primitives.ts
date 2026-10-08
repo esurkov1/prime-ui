@@ -137,6 +137,8 @@ export const primitiveTokens = {
     },
     /** Modular scale, ~1.2 in the body range, ~1.25 for headings. */
     size: {
+      /** Only for tab-bar labels under an icon (BottomNav, iOS tab bar 10pt); text roles start at 12. */
+      10: "0.625rem",
       12: "0.75rem",
       13: "0.8125rem",
       14: "0.875rem",
@@ -150,6 +152,8 @@ export const primitiveTokens = {
       60: "3.75rem",
     },
     lineHeight: {
+      /** Only for tab-bar labels (BottomNav). */
+      12: "0.75rem",
       16: "1rem",
       20: "1.25rem",
       24: "1.5rem",

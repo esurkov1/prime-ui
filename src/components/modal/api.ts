@@ -40,8 +40,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Width: 440 · 560 · 720 · 960. Below 640 px of viewport — a full-width bottom sheet.",
-          ru: "Ширина 440 · 560 · 720 · 960 px. Уже 640 px экрана — лист снизу на всю ширину.",
+          en: "Width: 440 · 560 · 720 · 960. Below 640 px of viewport — a full-width bottom sheet with a grab handle; a swipe down from the handle or the header closes it.",
+          ru: "Ширина 440 · 560 · 720 · 960 px. Уже 640 px экрана — шторка снизу на всю ширину с ручкой; свайп вниз за ручку или шапку закрывает её.",
         },
         {
           name: "container",

@@ -68,6 +68,10 @@ export const semanticTokens = {
       sunken: "{color.gray.75}",
       inverse: "{color.gray.925}",
       scrim: "rgba(17, 19, 24, 0.44)",
+      /** Translucent glass over content (floating BottomNav), always with a backdrop blur. */
+      glass: "color-mix(in srgb, var(--prime-ref-color-gray-0) 68%, transparent)",
+      /** The bright rim of a glass surface. */
+      glassEdge: "rgba(255, 255, 255, 0.7)",
     },
     fill: {
       /** Transparent wash: ghost hover, row hover. Works on any background. */
@@ -600,6 +604,35 @@ export const semanticTokens = {
     widthM: "30rem",
     widthL: "40rem",
     widthXl: "50rem",
+  },
+
+  /** Bottom sheets: Drawer `side="bottom"`, Modal and floating layers on a narrow viewport. */
+  sheet: {
+    radius: "{radius.16}",
+    /** The grab bar at the top edge and the strip that holds it. */
+    handleWidth: "2.25rem",
+    handleHeight: "{space.1}",
+    handleArea: "{space.5}",
+    /** Room kept above a sheet so the page behind stays visible. */
+    topGap: "{space.10}",
+  },
+
+  bottomNav: {
+    /** Bar height without the safe-area inset. */
+    height: "3.5rem",
+    paddingX: "{space.2}",
+    /** Between the icon and the label. */
+    itemGap: "{space.1}",
+    /** The box that holds the icon and anchors the count. */
+    indicatorWidth: "{space.8}",
+    indicatorHeight: "{space.6}",
+    /** The icon (24, `icon.l`) leads; the label under it is small (10, as the iOS tab bar). */
+    iconSize: "{icon.24}",
+    labelSize: "{font.size.10}",
+    labelLineHeight: "{font.lineHeight.12}",
+    /** Floating: the capsule's gap from the screen edges and the blur behind it. */
+    floatingInset: "{space.3}",
+    blur: "1.25rem",
   },
 
   tooltip: {

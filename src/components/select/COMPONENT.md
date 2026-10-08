@@ -95,7 +95,7 @@ Select.Root                       field frame: label · control · hint/error; v
 `ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label. + native `<span>` props.
 
 ### Select.Content
-`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state.
+`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state. Below 640px of viewport the panel is a bottom sheet: a scrim, a grab handle, swipe down to close, page scroll locked.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -163,6 +163,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | disabled | `disabled` | native `disabled`, `data-disabled="true"` |
 | loading | `loading` | `data-loading="true"`, `aria-busy`; status row in the list |
 | searching | typing in the search | panel `data-searching="true"`; groups without matches and separators hide; the match in an option's title, description and plain text is a `<mark>` in `accent-text` (not in the trigger) |
+| sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the panel; the sheet carries `data-state`, the panel keeps its role and ref; page scroll locked; a swipe down from the handle closes it |
 | option highlighted / selected / disabled | keyboard and pointer / value / `disabled` | `data-highlighted`, `data-selected` + `aria-selected`, `data-disabled` + `aria-disabled`; highlight is a fill only |
 
 ## Layout & spacing

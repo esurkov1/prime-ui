@@ -7,8 +7,8 @@
  *
  *   scrim     fade                    base · enter / base · exit
  *   dialog    fade + scale 0.98 → 1   base · enter / fast · exit   (bottom sheet < 640px: slide)
- *   sheet     slide up / down         slow · enter / base · exit
- *   drawer    slide from its side     slow · enter / base · exit
+ *   sheet     slide up / down         slow · enter / base · exit   (floating layers < 640px)
+ *   drawer    slide from its side     slow · enter / base · exit   (bottom: the sheet slide)
  *   floating  fade + 4px + scale 0.98 from the anchor edge  fast · enter / fast · exit
  *                                     (popover, menu, listbox, tooltip)
  */
@@ -17,6 +17,7 @@
    the page beneath it; the closing panels themselves are click-through. */
 [data-state="closed"].dialog,
 [data-state="closed"].drawer,
+[data-state="closed"].sheet,
 [data-state="closed"].floating {
   pointer-events: none;
 }
@@ -69,6 +70,24 @@
 
 .drawer[data-state="closed"] {
   animation: overlayDrawerOut var(--prime-motion-duration-base) var(--prime-motion-easing-exit) both;
+}
+
+.drawer[data-side="bottom"][data-state="open"] {
+  animation: overlaySheetIn var(--prime-motion-duration-slow) var(--prime-motion-easing-enter) both;
+}
+
+.drawer[data-side="bottom"][data-state="closed"] {
+  animation: overlaySheetOut var(--prime-motion-duration-base) var(--prime-motion-easing-exit) both;
+}
+
+/* ─── Sheet: a floating layer at the bottom edge of a narrow viewport ───── */
+
+.sheet[data-state="open"] {
+  animation: overlaySheetIn var(--prime-motion-duration-slow) var(--prime-motion-easing-enter) both;
+}
+
+.sheet[data-state="closed"] {
+  animation: overlaySheetOut var(--prime-motion-duration-base) var(--prime-motion-easing-exit) both;
 }
 
 /* ─── Floating panels: popover, dropdown, listbox, datepicker, tooltip ─── */

@@ -149,6 +149,7 @@ function DropdownContent({
     closeOnOutsideClick,
     focusOnOpen: true,
     tabExit: "always",
+    sheet: true,
   });
 
   return (

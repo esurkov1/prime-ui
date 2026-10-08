@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { swipe } from "@/test/mobile";
 
 import { Drawer, type DrawerContentProps, type DrawerRootProps } from "./Drawer";
 
@@ -216,6 +217,58 @@ describe("Drawer", () => {
       ).not.toBeInTheDocument();
     });
     expect(screen.getByRole("heading", { name: "Outer", hidden: true })).toBeInTheDocument();
+  });
+});
+
+describe("Drawer — bottom sheet and swipe", () => {
+  const header = () => screen.getByRole("dialog").querySelector("header") as HTMLElement;
+
+  it("renders a bottom sheet with a hidden grab handle", () => {
+    render(<BasicDrawer side="bottom" />);
+    openDrawer();
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute("data-side", "bottom");
+    const handle = dialog.querySelector("[data-swipe-handle]");
+    expect(handle).toHaveAttribute("aria-hidden", "true");
+    expect(handle).toBe(dialog.firstElementChild);
+  });
+
+  it("closes with a swipe down from the handle or the header", async () => {
+    render(<BasicDrawer side="bottom" />);
+    openDrawer();
+    const handle = screen.getByRole("dialog").querySelector("[data-swipe-handle]") as Element;
+    swipe(handle, { x: 0, y: 0 }, { x: 0, y: 300 });
+    await expectClosed();
+    openDrawer();
+    swipe(header(), { x: 0, y: 0 }, { x: 0, y: 300 });
+    await expectClosed();
+  });
+
+  it("a bottom sheet ignores a swipe from its body", () => {
+    render(<BasicDrawer side="bottom" />);
+    openDrawer();
+    swipe(screen.getByText("Body content"), { x: 0, y: 0 }, { x: 0, y: 300 });
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
+  });
+
+  it("a side drawer closes with a touch swipe toward its edge from anywhere", async () => {
+    const { unmount } = render(<BasicDrawer side="right" />);
+    openDrawer();
+    swipe(screen.getByText("Body content"), { x: 100, y: 0 }, { x: 400, y: 0 });
+    await expectClosed();
+    unmount();
+
+    render(<BasicDrawer side="left" />);
+    openDrawer();
+    swipe(screen.getByText("Body content"), { x: 400, y: 0 }, { x: 100, y: 0 });
+    await expectClosed();
+  });
+
+  it("swiping follows closeOnOutsideClick", () => {
+    render(<BasicDrawer side="bottom" closeOnOutsideClick={false} />);
+    openDrawer();
+    swipe(header(), { x: 0, y: 0 }, { x: 0, y: 300 });
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
   });
 });
 

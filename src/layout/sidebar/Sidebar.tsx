@@ -7,6 +7,7 @@ import { Popover } from "@/components/popover/Popover";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
 import { Icon } from "@/icons";
@@ -137,23 +138,6 @@ function useRail(): boolean {
 
 /** Items rendered inside a compact flyout: no rail tooltips; navigating closes the flyout. */
 const FlyoutContext = React.createContext<{ close: () => void } | null>(null);
-
-function useMediaQuery(query: string, enabled: boolean): boolean {
-  const subscribe = React.useCallback(
-    (onChange: () => void) => {
-      if (!enabled || typeof window === "undefined" || !window.matchMedia) return () => {};
-      const mq = window.matchMedia(query);
-      mq.addEventListener("change", onChange);
-      return () => mq.removeEventListener("change", onChange);
-    },
-    [enabled, query],
-  );
-  const getSnapshot = () =>
-    enabled && typeof window !== "undefined" && !!window.matchMedia
-      ? window.matchMedia(query).matches
-      : false;
-  return React.useSyncExternalStore(subscribe, getSnapshot, () => false);
-}
 
 /**
  * True while the region holds the current page (`aria-current="page"`), whoever set it: the

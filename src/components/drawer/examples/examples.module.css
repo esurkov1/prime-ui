@@ -19,3 +19,8 @@
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
+
+/* date-sheet.tsx: the calendar keeps its own width, centred in the sheet. */
+.calendar {
+  align-self: center;
+}

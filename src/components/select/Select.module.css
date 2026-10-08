@@ -106,9 +106,11 @@
     color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.clear:hover {
-  background: var(--prime-color-fill-subtle);
-  color: var(--prime-color-text-primary);
+@media (hover: hover) {
+  .clear:hover {
+    background: var(--prime-color-fill-subtle);
+    color: var(--prime-color-text-primary);
+  }
 }
 
 /* ─── Panel ──────────────────────────────────────────────────────────────── */

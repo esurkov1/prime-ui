@@ -65,8 +65,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Content",
-      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger. Opened from a Trigger, focus moves into the panel (`[data-autofocus]`, else the first tab stop, else the panel).',
-      ru: 'Портал и панель `role="dialog"`; прокручивается, если не помещается рядом с триггером.',
+      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger. Opened from a Trigger, focus moves into the panel (`[data-autofocus]`, else the first tab stop, else the panel). Below 640px of viewport a panel opened from a Trigger (not an Anchor) is a bottom sheet: a scrim, a grab handle, swipe down to close (with `closeOnOutsideClick`), page scroll locked.',
+      ru: 'Портал и панель `role="dialog"`; прокручивается, если не помещается рядом с триггером. Уже 640px экрана панель, открытая из Trigger (не из Anchor), становится шторкой снизу: подложка, ручка, закрытие свайпом вниз (при `closeOnOutsideClick`), прокрутка страницы заблокирована.',
       props: [
         {
           name: "side",
