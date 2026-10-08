@@ -117,7 +117,7 @@
   min-width: 0;
 }
 
-@container (max-width: 639px) {
+@container (width < 40rem) {
   .toolbarLine1 {
     flex: 1 1 100%;
     width: 100%;
@@ -142,18 +142,11 @@
   }
 }
 
-/* Phone-width frame: device labels would be cut to «Деск…»; keep icons, labels stay for screen readers. */
-@container (max-width: 399px) {
+/* Phone-width frame: device labels would be cut to «Деск…»; keep the icons. The visible label is
+   `aria-hidden`; a VisuallyHidden copy names the option at every width. */
+@container (width < 25rem) {
   .viewportLabel {
-    position: absolute;
-    width: var(--prime-border-width);
-    height: var(--prime-border-width);
-    margin: calc(-1 * var(--prime-border-width));
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
+    display: none;
   }
 }
 
@@ -166,7 +159,7 @@
   min-width: 0;
   max-width: 100%;
   margin-inline: auto;
-  transition: max-width var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  /* The width switch is instant: max-width is layout, not a transform (foundation §7). */
 }
 
 .previewViewport[data-viewport="desktop"] {
@@ -269,7 +262,8 @@
  * `--matrix-cell`: 320 for one column, 160 for two, 128 from three on. So a specimen without an
  * intrinsic width (Slider, a block with `container-type: inline-size` and `width: 100%`) fills a
  * sensible cell instead of collapsing, and small specimens sit in even, compact columns. The grid
- * is centered; a matrix wider than the stage scrolls.
+ * is centered; a matrix wider than the stage scrolls. The children are opaque (an example component
+ * renders the rows), so the column count is read from the DOM by `:has()` below, not in TSX.
  */
 .previewInner[data-preview-layout="matrix"] {
   --matrix-columns: 1;
