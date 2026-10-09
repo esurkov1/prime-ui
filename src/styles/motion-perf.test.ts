@@ -132,7 +132,13 @@ const LAYOUT_TRANSITIONS: Record<string, string[]> = {
   ],
   "src/components/tabs/Tabs.module.css": ["width", "height"],
   "src/layout/bottom-nav/BottomNav.module.css": ["left", "width"],
-  "src/components/slider/Slider.module.css": ["inset-inline-start", "width"],
+  // A refused commit glides the thumb and the fill back; a vertical slider along the block axis.
+  "src/components/slider/Slider.module.css": [
+    "inset-inline-start",
+    "width",
+    "inset-block-end",
+    "height",
+  ],
   "src/components/gantt/Gantt.module.css": ["width"],
   // The remove segment opening inside a chip.
   "src/components/badge/Badge.module.css": ["padding"],

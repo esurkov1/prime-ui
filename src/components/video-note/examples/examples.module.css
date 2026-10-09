@@ -1,0 +1,4 @@
+/* A conversation column: messages are rows as wide as the column. */
+.thread {
+  inline-size: 100%;
+}

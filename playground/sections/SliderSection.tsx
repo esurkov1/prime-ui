@@ -33,6 +33,11 @@ export const page: ComponentPageConfig = {
     },
     { slot: "states", description: "Заливка на обоих краях и неактивный ползунок — `disabled`." },
     {
+      slot: "orientation",
+      description:
+        "Уровни звука уведомлений в ряд вертикальных ползунков, минимум внизу — `orientation`.",
+    },
+    {
       scenario: "value-format",
       title: "Формат значения",
       description:

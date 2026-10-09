@@ -3,11 +3,11 @@ import * as React from "react";
 import { usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { defineRowKind, useMessageList } from "@/internal/messageList";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Message.module.css";
-import { defineRowKind, useMessageGroup } from "./MessageGroup";
 import typing from "./MessageTyping.module.css";
 
 export type MessageTypingLabels = {
@@ -24,7 +24,7 @@ export type MessageTypingProps = Omit<React.HTMLAttributes<HTMLDivElement>, "chi
    * Default `true`.
    */
   active?: boolean;
-  /** `Message.Avatar` of who types, for a group chat (`Message.Group avatars`). */
+  /** `Message.Avatar` of who types, for a group chat (`Chat.Messages type="group"`). */
   children?: React.ReactNode;
   labels?: Partial<MessageTypingLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -42,14 +42,14 @@ export function MessageTyping({
   ...rest
 }: MessageTypingProps) {
   const labels = { ...TYPING_LABELS, ...labelsProp };
-  const group = useMessageGroup();
+  const list = useMessageList();
   const depth = useNestedSurfaceDepth();
   const presence = usePresence(active, { exitDuration: "fast" });
   // The reply that ends the typing takes its place: when a message arrives in the same commit the
   // typing stops, the typing goes at once instead of closing its height under the new message.
   const [replaced, setReplaced] = React.useState(false);
   if (active && replaced) setReplaced(false);
-  const { arrivedNow } = group;
+  const { arrivedNow } = list;
   React.useLayoutEffect(() => {
     if (!active && arrivedNow()) setReplaced(true);
   }, [active, arrivedNow]);
@@ -66,8 +66,8 @@ export function MessageTyping({
         }
       }}
     >
-      <div className={typing.row} {...toDataAttributes({ avatars: group.avatars || undefined })}>
-        {group.avatars ? <div className={styles.gutter}>{children}</div> : null}
+      <div className={typing.row} {...toDataAttributes({ avatars: list.group || undefined })}>
+        {list.group ? <div className={styles.gutter}>{children}</div> : null}
         <SurfaceDepthProvider value={depth}>
           <div className={typing.bubble} data-depth={depth} aria-hidden="true">
             <span className={typing.dot} />

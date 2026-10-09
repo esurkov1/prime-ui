@@ -1,6 +1,8 @@
 /** Every kind of message in its shell, both directions, single and in runs: text bubbles, pictures and circles as blocks, a caption bubble, voice, file, contact, place and link cards, reactions inside a bubble and under a picture — `Message.Media`, `VideoNote`, `Message.File`, `Message.Contact`, `Message.Location`, `Message.LinkPreview`, `VoicePlayer`. */
 import { Button, Message, type MessageReaction, VideoNote, VoicePlayer } from "prime-ui-kit";
 
+import styles from "./examples.module.css";
+
 const AUDIO = "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3";
 const VIDEO = "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
 const MAP = "https://tile.openstreetmap.org/15/19808/10244.png";
@@ -18,8 +20,7 @@ const photo = (seed: string, width: number, height: number, alt: string) => ({
 
 export default function MessageKindsExample() {
   return (
-    <Message.Group aria-label="Все виды сообщений">
-      <Message.Separator>Сегодня</Message.Separator>
+    <div className={styles.thread}>
       <Message.Root direction="incoming" position="first" time="09:10">
         <Message.Text>Привет! Пришлю всё по складу одним заходом.</Message.Text>
       </Message.Root>
@@ -34,7 +35,7 @@ export default function MessageKindsExample() {
             photo("rack-c", 800, 600, "Ряд В"),
           ]}
         />
-        <Message.Reactions reactions={FIRE} />
+        <Message.Reactions items={FIRE} />
       </Message.Root>
       <Message.Root direction="outgoing" position="first" time="09:12" status="read">
         <Message.Media items={[photo("dock-gate", 800, 600, "Ворота рампы")]} />
@@ -42,7 +43,7 @@ export default function MessageKindsExample() {
       </Message.Root>
       <Message.Root direction="outgoing" position="last" time="09:12" status="read">
         <Message.Text>Ок</Message.Text>
-        <Message.Reactions reactions={LIKED} />
+        <Message.Reactions items={LIKED} />
       </Message.Root>
       <Message.Root direction="incoming" time="09:14">
         <VideoNote src={VIDEO} duration={6} />
@@ -87,6 +88,6 @@ export default function MessageKindsExample() {
           description="Сроки разгрузки, акты расхождений и фотофиксация паллет."
         />
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

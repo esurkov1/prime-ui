@@ -30,56 +30,97 @@ describe("ScrollContainer", () => {
     expect(ref.current).toHaveAttribute("tabindex", "0");
   });
 
-  it("marks the hidden edges while fade is on (measured once per frame)", async () => {
-    render(
-      <ScrollContainer fade data-testid="scroll">
-        items
-      </ScrollContainer>,
-    );
-    const node = screen.getByTestId("scroll");
-    expect(node).toHaveAttribute("data-fade", "vertical");
-    expect(node).not.toHaveAttribute("data-overflow-start");
+  /** jsdom has no layout: give the region a scroll size along both axes. */
+  function size(node: HTMLElement, scroll: { w?: number; h?: number }, client = 100) {
+    Object.defineProperty(node, "scrollHeight", { configurable: true, value: scroll.h ?? client });
+    Object.defineProperty(node, "clientHeight", { configurable: true, value: client });
+    Object.defineProperty(node, "scrollWidth", { configurable: true, value: scroll.w ?? client });
+    Object.defineProperty(node, "clientWidth", { configurable: true, value: client });
+  }
 
-    // jsdom has no layout: give the region a scroll size, then scroll to the middle.
-    Object.defineProperty(node, "scrollHeight", { configurable: true, value: 300 });
-    Object.defineProperty(node, "clientHeight", { configurable: true, value: 100 });
+  it("fades by default and marks the hidden edges as the region scrolls (once per frame)", async () => {
+    render(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
+    const node = screen.getByTestId("scroll");
+    expect(node).toHaveAttribute("data-edges", "fade");
+    expect(node).not.toHaveAttribute("data-overflow-top");
+
+    size(node, { h: 300 });
     node.scrollTop = 0;
     fireEvent.scroll(node);
-    await waitFor(() => expect(node).toHaveAttribute("data-overflow-end", "true"));
-    expect(node).not.toHaveAttribute("data-overflow-start");
+    await waitFor(() => expect(node).toHaveAttribute("data-overflow-bottom", "true"));
+    expect(node).not.toHaveAttribute("data-overflow-top");
 
     node.scrollTop = 100;
     fireEvent.scroll(node);
-    await waitFor(() => expect(node).toHaveAttribute("data-overflow-start", "true"));
-    expect(node).toHaveAttribute("data-overflow-end", "true");
+    await waitFor(() => expect(node).toHaveAttribute("data-overflow-top", "true"));
+    expect(node).toHaveAttribute("data-overflow-bottom", "true");
 
     node.scrollTop = 200;
     fireEvent.scroll(node);
-    await waitFor(() => expect(node).not.toHaveAttribute("data-overflow-end"));
-    expect(node).toHaveAttribute("data-overflow-start", "true");
-    // The fade's depth: how far the hidden content reaches on each side.
-    expect(node.style.getPropertyValue("--edge-start")).toBe("200px");
-    expect(node.style.getPropertyValue("--edge-end")).toBe("0px");
+    await waitFor(() => expect(node).not.toHaveAttribute("data-overflow-bottom"));
+    expect(node).toHaveAttribute("data-overflow-top", "true");
+    // A vertical region never marks the inline edges.
+    expect(node).not.toHaveAttribute("data-overflow-start");
+    expect(node).not.toHaveAttribute("data-overflow-end");
+  });
+
+  it("writes the fade depth capped at the deepest fade, and only while it changes", async () => {
+    render(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
+    const node = screen.getByTestId("scroll");
+    size(node, { h: 1000 });
+    const write = vi.spyOn(node.style, "setProperty");
+    node.scrollTop = 10;
+    fireEvent.scroll(node);
+    await waitFor(() => expect(node.style.getPropertyValue("--edge-top")).toBe("10px"));
+    expect(node.style.getPropertyValue("--edge-bottom")).toBe("32px");
+
+    // Far from both edges: the depths stay at the cap, so a scroll frame writes nothing.
+    node.scrollTop = 400;
+    fireEvent.scroll(node);
+    await waitFor(() => expect(node.style.getPropertyValue("--edge-top")).toBe("32px"));
+    write.mockClear();
+    node.scrollTop = 500;
+    fireEvent.scroll(node);
+    await act(() => new Promise((resolve) => requestAnimationFrame(() => resolve(undefined))));
+    expect(write).not.toHaveBeenCalled();
   });
 
   it("CSS: the fade depth is not inherited, so a scroll restyles the region, not its content", () => {
     const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
-    for (const name of ["--edge-start", "--edge-end", "--fade-start", "--fade-end"]) {
-      expect(css).toMatch(new RegExp(`@property ${name} \\{[^}]*inherits: false`));
+    for (const edge of ["top", "bottom", "start", "end"]) {
+      for (const name of [`--edge-${edge}`, `--fade-${edge}`]) {
+        expect(css).toMatch(new RegExp(`@property ${name} \\{[^}]*inherits: false`));
+      }
+    }
+  });
+
+  it("axis=both marks the edges of both axes", async () => {
+    render(
+      <ScrollContainer axis="both" data-testid="scroll">
+        items
+      </ScrollContainer>,
+    );
+    const node = screen.getByTestId("scroll");
+    size(node, { w: 300, h: 300 });
+    node.scrollTop = 100;
+    node.scrollLeft = 100;
+    fireEvent.scroll(node);
+    await waitFor(() => expect(node).toHaveAttribute("data-overflow-start", "true"));
+    for (const edge of ["top", "bottom", "start", "end"]) {
+      expect(node).toHaveAttribute(`data-overflow-${edge}`, "true");
     }
   });
 
   it("reads the RTL scroll position (negative scrollLeft) as distance from the start", async () => {
     render(
       <div dir="rtl">
-        <ScrollContainer axis="horizontal" fade data-testid="scroll">
+        <ScrollContainer axis="horizontal" data-testid="scroll">
           items
         </ScrollContainer>
       </div>,
     );
     const node = screen.getByTestId("scroll");
-    Object.defineProperty(node, "scrollWidth", { configurable: true, value: 300 });
-    Object.defineProperty(node, "clientWidth", { configurable: true, value: 100 });
+    size(node, { w: 300 });
     node.scrollLeft = -200;
     fireEvent.scroll(node);
     await waitFor(() => expect(node).toHaveAttribute("data-overflow-start", "true"));
@@ -90,7 +131,7 @@ describe("ScrollContainer", () => {
     const ROWS = ["Первая", "Вторая", "Третья"];
     function Growing({ count }: { count: number }) {
       return (
-        <ScrollContainer fade data-testid="scroll">
+        <ScrollContainer data-testid="scroll">
           {ROWS.slice(0, count).map((row) => (
             <p key={row}>{row}</p>
           ))}
@@ -99,26 +140,156 @@ describe("ScrollContainer", () => {
     }
     const { rerender } = render(<Growing count={1} />);
     const node = screen.getByTestId("scroll");
-    expect(node).not.toHaveAttribute("data-overflow-end");
-    Object.defineProperty(node, "scrollHeight", { configurable: true, value: 300 });
-    Object.defineProperty(node, "clientHeight", { configurable: true, value: 100 });
+    expect(node).not.toHaveAttribute("data-overflow-bottom");
+    size(node, { h: 300 });
     rerender(<Growing count={3} />);
-    await waitFor(() => expect(node).toHaveAttribute("data-overflow-end", "true"));
+    await waitFor(() => expect(node).toHaveAttribute("data-overflow-bottom", "true"));
   });
 
-  it("fades along the horizontal axis for axis=horizontal and sets nothing without fade", () => {
+  it("edges=shadow is drawn by CSS alone and edges=none draws nothing: neither measures", async () => {
     const { rerender } = render(
-      <ScrollContainer axis="horizontal" fade data-testid="scroll">
+      <ScrollContainer edges="shadow" data-testid="scroll">
         items
       </ScrollContainer>,
     );
-    expect(screen.getByTestId("scroll")).toHaveAttribute("data-fade", "horizontal");
+    const node = screen.getByTestId("scroll");
+    expect(node).toHaveAttribute("data-edges", "shadow");
+    size(node, { h: 300 });
+    node.scrollTop = 100;
+    fireEvent.scroll(node);
+    await act(() => new Promise((resolve) => requestAnimationFrame(() => resolve(undefined))));
+    expect(node).not.toHaveAttribute("data-overflow-top");
+    expect(node.style.getPropertyValue("--edge-top")).toBe("");
     rerender(
-      <ScrollContainer axis="horizontal" data-testid="scroll">
+      <ScrollContainer edges="none" data-testid="scroll">
         items
       </ScrollContainer>,
     );
-    expect(screen.getByTestId("scroll")).not.toHaveAttribute("data-fade");
+    expect(node).not.toHaveAttribute("data-edges");
+    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
+    // The shadow: covers that scroll with the content over shadows fixed to the view.
+    expect(css).toMatch(
+      /\.vertical\[data-edges="shadow"\] \{[^}]*background-attachment: local, local, scroll, scroll/,
+    );
+  });
+
+  it("scrollbar=hidden hides the bar; thin is the default", () => {
+    const { rerender } = render(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
+    const node = screen.getByTestId("scroll");
+    const thin = node.className;
+    rerender(
+      <ScrollContainer scrollbar="hidden" data-testid="scroll">
+        items
+      </ScrollContainer>,
+    );
+    expect(node.className).not.toBe(thin);
+    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
+    expect(css).toMatch(/\.scrollbarHidden \{[^}]*scrollbar-width: none/);
+    expect(css).toMatch(/\.root \{[^}]*scrollbar-width: thin/);
+  });
+
+  it("lock: the region keeps its place and takes no scrolling", () => {
+    const { rerender } = render(
+      <ScrollContainer lock data-testid="scroll">
+        items
+      </ScrollContainer>,
+    );
+    const node = screen.getByTestId("scroll");
+    expect(node).toHaveAttribute("data-lock", "true");
+    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
+    expect(css).toMatch(/\.root\[data-lock\] \{[^}]*overflow: hidden/);
+    rerender(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
+    expect(node).not.toHaveAttribute("data-lock");
+  });
+
+  it("snap: proximity snapping along the axis, children rest on their start", () => {
+    render(
+      <ScrollContainer axis="horizontal" snap data-testid="scroll">
+        items
+      </ScrollContainer>,
+    );
+    expect(screen.getByTestId("scroll")).toHaveAttribute("data-snap", "true");
+    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
+    expect(css).toMatch(/\.horizontal\[data-snap\] \{[^}]*scroll-snap-type: x proximity/);
+    expect(css).toMatch(/\.root\[data-snap\] > \* \{[^}]*scroll-snap-align: start/);
+  });
+
+  it("keyboard: a region with tabIndex takes focus (native arrow / Page / Home / End scrolling) with an inset ring", () => {
+    render(
+      <ScrollContainer tabIndex={0} aria-label="Журнал" role="region">
+        items
+      </ScrollContainer>,
+    );
+    const region = screen.getByRole("region", { name: "Журнал" });
+    region.focus();
+    expect(region).toHaveFocus();
+    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
+    expect(css).toMatch(
+      /\.root:focus-visible \{[^}]*outline-offset: var\(--prime-focus-offset-inset\)/,
+    );
+  });
+
+  describe("wheel on a sideways strip", () => {
+    function wheel(node: HTMLElement, init: WheelEventInit & { timeStamp?: number }) {
+      const event = new WheelEvent("wheel", { bubbles: true, cancelable: true, ...init });
+      node.dispatchEvent(event);
+      return event;
+    }
+
+    it("a vertical wheel scrolls the strip sideways; a sideways wheel stays native", () => {
+      render(
+        <ScrollContainer axis="horizontal" data-testid="scroll">
+          items
+        </ScrollContainer>,
+      );
+      const node = screen.getByTestId("scroll");
+      size(node, { w: 500 });
+      const scrollTo = vi.fn();
+      node.scrollTo = scrollTo as typeof node.scrollTo;
+      const down = wheel(node, { deltaY: 100 });
+      expect(down.defaultPrevented).toBe(true);
+      expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ left: 100 }));
+      const sideways = wheel(node, { deltaX: 40, deltaY: 5 });
+      expect(sideways.defaultPrevented).toBe(false);
+    });
+
+    it("at the edge the wheel chains to the page, and a vertical region is left alone", () => {
+      const { rerender } = render(
+        <ScrollContainer axis="horizontal" data-testid="scroll">
+          items
+        </ScrollContainer>,
+      );
+      const node = screen.getByTestId("scroll");
+      size(node, { w: 500 });
+      node.scrollTo = vi.fn() as typeof node.scrollTo;
+      expect(wheel(node, { deltaY: -100 }).defaultPrevented).toBe(false);
+      rerender(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
+      expect(wheel(node, { deltaY: 100 }).defaultPrevented).toBe(false);
+    });
+
+    it("a page scroll passing over the strip keeps scrolling the page", () => {
+      render(
+        <ScrollContainer axis="horizontal" data-testid="scroll">
+          items
+        </ScrollContainer>,
+      );
+      const node = screen.getByTestId("scroll");
+      size(node, { w: 500 });
+      node.scrollTo = vi.fn() as typeof node.scrollTo;
+      wheel(document.body, { deltaY: 100 });
+      expect(wheel(node, { deltaY: 100 }).defaultPrevented).toBe(false);
+    });
+
+    it("a locked strip ignores the wheel", () => {
+      render(
+        <ScrollContainer axis="horizontal" lock data-testid="scroll">
+          items
+        </ScrollContainer>,
+      );
+      const node = screen.getByTestId("scroll");
+      size(node, { w: 500 });
+      expect(wheel(node, { deltaY: 100 }).defaultPrevented).toBe(false);
+    });
   });
 });
 

@@ -8,9 +8,7 @@ import { rovingIndex } from "@/internal/rovingFocus";
 import { touchTargetClass } from "@/internal/touchTarget";
 
 import styles from "./MessageReactionBar.module.css";
-
-/** A reaction the reader can put: the emoji and its name for assistive tech («Нравится»). */
-export type MessageReactionOption = { emoji: string; label: string };
+import type { MessageReactionOption } from "./types";
 
 /** The reactions of the bar, the first seven in its row, the rest behind «⌄». */
 export const DEFAULT_REACTION_OPTIONS: readonly MessageReactionOption[] = [

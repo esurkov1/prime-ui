@@ -1,15 +1,13 @@
 import * as React from "react";
 
-import { readCssLengthPx } from "@/hooks/usePosition";
-
-/** Top speed on the very edge, px per ms (a 120 Hz screen scrolls as fast as a 60 Hz one). */
-const MAX_SPEED_PX_PER_MS = 1.1;
+import { edgeSpeed } from "@/internal/edgeAutoScroll";
 
 /**
  * Horizontal auto-scroll for a gesture on the time axis (move, resize, draw a bar): while the
  * pointer is near the start edge — the end of the pinned column, not the scroller's own edge, which
- * is why Dnd's `autoScrollStep` does not fit — or near the end edge, the chart's scroller moves,
- * faster the closer the pointer is, and `onScrolled` lets the gesture re-read its position.
+ * is why `autoScrollStep` does not fit — or near the end edge, the chart's scroller moves at the
+ * kit's edge speed (`edgeSpeed`, `src/internal/edgeAutoScroll`), and `onScrolled` lets the gesture
+ * re-read its position.
  */
 export function useEdgeAutoScroll(
   scrollRef: React.RefObject<HTMLElement | null>,
@@ -33,15 +31,11 @@ export function useEdgeAutoScroll(
       if (!current || !viewport) return;
       const elapsed = last.current ? Math.min(time - last.current, 50) : 16;
       last.current = time;
-      const zone = readCssLengthPx("--prime-space-12", 48);
       const view = viewport.getBoundingClientRect();
-      const start = startEdge();
-      const fromStart = current.clientX - start;
+      const fromStart = current.clientX - startEdge();
       const toEnd = view.right - current.clientX;
-      const speed = (distance: number) =>
-        distance > zone ? 0 : MAX_SPEED_PX_PER_MS * (1 - Math.max(distance, 0) / zone);
       const rtl = getComputedStyle(viewport).direction === "rtl";
-      const delta = (speed(toEnd) - speed(fromStart)) * elapsed * (rtl ? -1 : 1);
+      const delta = (edgeSpeed(toEnd) - edgeSpeed(fromStart)) * elapsed * (rtl ? -1 : 1);
       if (delta !== 0) {
         const before = viewport.scrollLeft;
         viewport.scrollLeft = before + delta;

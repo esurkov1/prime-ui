@@ -16,7 +16,7 @@ export const page: ComponentPageConfig = {
   title: "Spinner",
   kind: "primitive",
   description:
-    "Индикатор загрузки без известного прогресса: кольцо с разрывом вращается, пока идёт запрос. Когда прогресс известен — ProgressBar или ProgressCircle.",
+    "Индикатор загрузки без известного прогресса: четверть дуги вращается на слабой дорожке, пока идёт запрос. Когда прогресс известен — ProgressBar или ProgressCircle.",
   examples: [
     {
       slot: "overview",

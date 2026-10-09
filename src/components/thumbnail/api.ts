@@ -118,8 +118,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Thumbnail.Video",
-      en: '`ref` → `HTMLVideoElement`. A video in the frame, `preload="metadata"`, `playsInline`; reports its first frame like an image, so the Fallback shows until then (`data-status`). Without `controls` and autoplay it shows a play mark (from `m`) and the duration (from `l` and `fullWidth`) on the `media` shade.',
-      ru: 'Видео в рамке, `preload="metadata"`, `playsInline`; о первом кадре сообщает как картинка — до него видна подложка (`data-status`). Без `controls` и автовоспроизведения показывает знак воспроизведения (от `m`) и длительность (от `l` и при `fullWidth`) на тени `media`.',
+      en: '`ref` → `HTMLVideoElement`. A video in the frame, `preload="metadata"`, `playsInline`; reports its first frame like an image, so the Fallback shows until then (`data-status`). Without `controls` and autoplay it shows a play mark (from `m`) — the media disk of the play and transfer disks over media, 40 with a 20 glyph, at 60% of a lower frame — and the duration on the `media` shade (from `l` and `fullWidth`).',
+      ru: 'Видео в рамке, `preload="metadata"`, `playsInline`; о первом кадре сообщает как картинка — до него видна подложка (`data-status`). Без `controls` и автовоспроизведения показывает знак воспроизведения (от `m`) — тот же диск медиа, что у дисков воспроизведения и передачи, 40 со значком 20, в низкой рамке 60 % её высоты — и длительность на тени `media` (от `l` и при `fullWidth`).',
       props: [
         {
           name: "src",

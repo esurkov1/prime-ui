@@ -7,8 +7,16 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import styles from "./ScrollContainer.module.css";
 import { useFitFlag } from "./useFitFlag";
 import { type ScrollEdgeHandler, ScrollRegionContext, useScrollEdges } from "./useScrollEdges";
+import { useWheelToInline } from "./useWheelToInline";
 
 export type ScrollContainerAxis = "vertical" | "horizontal" | "both";
+
+/**
+ * How an edge that hides content looks. `fade` — the content dissolves (a mask, any background);
+ * `shadow` — a soft shadow falls over it on the region's own fill (`--prime-color-layer-current`),
+ * for a region that is itself a surface; `none` — the edge is plain.
+ */
+export type ScrollContainerEdges = "fade" | "shadow" | "none";
 
 export type ScrollContainerProps = React.HTMLAttributes<HTMLElement> & {
   /** Root element. Default `div`; `AppShell.Main` renders `main`. */
@@ -17,13 +25,14 @@ export type ScrollContainerProps = React.HTMLAttributes<HTMLElement> & {
   axis?: ScrollContainerAxis;
   /** `overscroll-behavior`. Default `contain`: nested panels do not chain scroll into the page. */
   overscrollBehavior?: "auto" | "contain" | "none";
-  /**
-   * Fade the edges where more content is hidden (`data-overflow-start` / `data-overflow-end`):
-   * along the horizontal axis for `axis="horizontal"`, along the vertical one otherwise.
-   */
-  fade?: boolean;
-  /** `thin` — the kit's quiet scrollbar (default); `hidden` — no scrollbar (pair it with `fade`). */
+  /** The edges where more content is hidden, along every scroll axis. Default `fade`. */
+  edges?: ScrollContainerEdges;
+  /** `thin` — the kit's quiet scrollbar (default); `hidden` — no scrollbar (keep `edges`). */
   scrollbar?: "thin" | "hidden";
+  /** The person cannot scroll the region (wheel, touch, keys, autoscroll); it keeps its place. */
+  lock?: boolean;
+  /** Scrolling comes to rest on the start of a child (proximity snapping): strips of tiles. */
+  snap?: boolean;
   /**
    * `end` — a chat or a log: the region starts at the end and stays there while content arrives,
    * as long as the person is at the end; scrolled away, what they look at stays put. Default `start`.
@@ -45,13 +54,15 @@ const axisClass: Record<ScrollContainerAxis, string> = {
   both: styles.both,
 };
 
-/** Scroll region with the kit's thin scrollbars; shrinks inside flex/grid parents. */
+/** Scroll region with the kit's thin scrollbars and soft hidden edges; shrinks inside flex/grid. */
 export function ScrollContainer({
   as: Component = "div",
   axis = "vertical",
   overscrollBehavior = "contain",
-  fade = false,
+  edges = "fade",
   scrollbar = "thin",
+  lock = false,
+  snap = false,
   anchor = "start",
   onReachStart,
   onReachEnd,
@@ -62,14 +73,17 @@ export function ScrollContainer({
   const innerRef = React.useRef<HTMLElement>(null);
   const mergedRef = useMergedRefs(innerRef, ref);
   const horizontal = axis === "horizontal";
-  const overflow = useEdgeOverflow(innerRef, fade, horizontal, fade);
-  const edges = useScrollEdges(innerRef, { anchor, horizontal, onReachStart, onReachEnd });
+  // Only a fade reads the hidden edges; a shadow is drawn by the region's backgrounds alone.
+  const fade = edges === "fade";
+  const overflow = useEdgeOverflow(innerRef, fade ? axis : null, fade);
+  const scroll = useScrollEdges(innerRef, { anchor, horizontal, onReachStart, onReachEnd });
   // A region that follows its content (a chat, a feed that loads more) is always a scroller: a
   // moment of fitting content must never turn it into `overflow: hidden` under the reader.
-  useFitFlag(innerRef, axis, !edges.keepPosition && !onReachEnd);
+  useFitFlag(innerRef, axis, !scroll.keepPosition && !onReachEnd);
+  useWheelToInline(innerRef, horizontal && !lock);
 
   return (
-    <ScrollRegionContext.Provider value={edges.region}>
+    <ScrollRegionContext.Provider value={scroll.region}>
       <Component
         ref={mergedRef}
         className={cx(
@@ -80,12 +94,16 @@ export function ScrollContainer({
           scrollbar === "hidden" && styles.scrollbarHidden,
           className,
         )}
-        aria-busy={edges.busy || undefined}
+        aria-busy={scroll.busy || undefined}
         {...toDataAttributes({
-          fade: fade ? (horizontal ? "horizontal" : "vertical") : undefined,
+          edges: edges === "none" ? undefined : edges,
+          "overflow-top": overflow.top || undefined,
+          "overflow-bottom": overflow.bottom || undefined,
           "overflow-start": overflow.start || undefined,
           "overflow-end": overflow.end || undefined,
-          anchor: edges.keepPosition ? anchor : undefined,
+          lock: lock || undefined,
+          snap: snap || undefined,
+          anchor: scroll.keepPosition ? anchor : undefined,
         })}
         {...rest}
       />

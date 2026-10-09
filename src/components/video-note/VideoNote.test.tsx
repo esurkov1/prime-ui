@@ -111,9 +111,9 @@ describe("VideoNote", () => {
       <VideoNote src={SRC} duration={10} onPlayingChange={onPlayingChange} onEnded={onEnded} />,
     );
     const video = container.querySelector("video") as HTMLVideoElement;
-    const ring = container.querySelector<HTMLElement>("[class*='ring']");
+    const ring = container.querySelector<SVGSVGElement>("svg[data-live]");
     await userEvent.setup().click(circleButton());
-    ring?.style.setProperty("--progress-ring-value", "1");
+    ring?.style.setProperty("--ring-value", "1");
     Object.defineProperty(video, "currentTime", { value: 10, writable: true, configurable: true });
     act(() => {
       video.pause();
@@ -126,7 +126,7 @@ describe("VideoNote", () => {
     expect(activePlayback()).not.toBe(video);
     expect(circleButton()).toHaveAccessibleName(PLAY);
     expect(circleButton()).toHaveAccessibleDescription("Длительность 0:10");
-    expect(ring?.style.getPropertyValue("--progress-ring-value")).toBe("0");
+    expect(ring?.style.getPropertyValue("--ring-value")).toBe("0");
     expect(play).toHaveBeenCalledTimes(1);
   });
 
@@ -182,7 +182,7 @@ describe("VideoNote", () => {
     fireEvent.loadedData(video);
     await userEvent.click(button);
     expect(button).toHaveAttribute("data-state", "playing");
-    const ring = container.querySelector<HTMLElement>("[class*='ring']");
+    const ring = container.querySelector<SVGSVGElement>("svg[data-live]");
     const snapshot = () =>
       Array.from(container.querySelectorAll("*"))
         .filter((element) => element !== ring)
@@ -198,7 +198,7 @@ describe("VideoNote", () => {
       act(() => frames.shift()?.(tick * 16));
     }
     expect(snapshot()).toBe(before);
-    expect(ring?.style.getPropertyValue("--progress-ring-value")).toBe("0.05");
+    expect(ring?.style.getPropertyValue("--ring-value")).toBe("0.05");
   });
 
   it("shows a skeleton until the first frame loads", () => {
@@ -409,13 +409,12 @@ describe("VideoNote transfer", () => {
     );
     const circle = container.querySelector("[data-message-outline]");
     expect(circle).toHaveAttribute("data-covered");
-    expect(screen.getByRole("progressbar", { name: "Отправка 40%" })).toHaveAttribute(
-      "aria-valuenow",
-      "40",
-    );
-    // The circle does not play while it is on its way: only the cross is a button.
+    // The circle does not play while it is on its way: its disk is the cross, described by the share.
     expect(screen.queryByRole("button", { name: PLAY })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Отменить отправку" }));
+    const cancel = screen.getByRole("button", { name: "Отменить отправку" });
+    expect(cancel).toHaveAccessibleDescription("Отправка 40%");
+    expect(cancel).toHaveAttribute("data-variant", "shade");
+    fireEvent.click(cancel);
     expect(onCancel).toHaveBeenCalledTimes(1);
 
     rerender(<VideoNote src={SRC} duration={20} transfer="failed" onRetry={onRetry} />);
@@ -448,7 +447,8 @@ describe("VideoNote transfer", () => {
         onCancel={() => {}}
       />,
     );
-    expect(screen.getByRole("progressbar", { name: "Загрузка 20%" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Отменить загрузку" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Отменить загрузку" })).toHaveAccessibleDescription(
+      "Загрузка 20%",
+    );
   });
 });

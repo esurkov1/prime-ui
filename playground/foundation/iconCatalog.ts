@@ -50,6 +50,18 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Звук выключен",
     keywords: ["без звука", "тихо", "muted", "sound off"],
   },
+  "status.sound": {
+    meaning: "Звук включён",
+    keywords: ["звук", "громкость", "со звуком", "sound", "volume", "unmuted"],
+  },
+  "action.zoomIn": {
+    meaning: "Увеличить масштаб",
+    keywords: ["увеличить", "приблизить", "масштаб", "zoom in", "enlarge"],
+  },
+  "action.zoomOut": {
+    meaning: "Уменьшить масштаб",
+    keywords: ["уменьшить", "отдалить", "масштаб", "zoom out", "shrink"],
+  },
   "status.pending": {
     meaning: "Отправляется",
     keywords: ["отправляется", "часы", "ожидание", "pending", "clock"],

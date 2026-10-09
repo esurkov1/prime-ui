@@ -1,11 +1,13 @@
 /** A place on a map picture from your map service with a pin, the place and its address, and a live location of a courier on its way — `Message.Location`, `href`, `live`. */
 import { Message } from "prime-ui-kit";
 
+import styles from "./examples.module.css";
+
 const MAP = "https://tile.openstreetmap.org/15/19808/10244.png";
 
 export default function MessageLocationExample() {
   return (
-    <Message.Group aria-label="Чат доставки">
+    <div className={styles.thread}>
       <Message.Root direction="incoming" time="08:55">
         <Message.Location
           src={MAP}
@@ -23,6 +25,6 @@ export default function MessageLocationExample() {
           live
         />
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

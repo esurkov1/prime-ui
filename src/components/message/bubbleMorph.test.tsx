@@ -236,6 +236,62 @@ describe("bubbleMorph", () => {
     expect(clipOf(clip)).toMatch(/^inset\(36px 0px 0px 0px/);
   });
 
+  it("gives way with every row, not only messages: a band in the message's own row glides too", () => {
+    // A list row holding the unread band and the message (a fragment row), between a date above
+    // and the typing row below.
+    const scroller = document.createElement("div");
+    scroller.style.overflowY = "auto";
+    let scrollTop = 1000;
+    Object.defineProperty(scroller, "scrollTop", {
+      get: () => scrollTop,
+      set: (value: number) => {
+        scrollTop = value;
+      },
+    });
+    const date = document.createElement("div");
+    const listRow = document.createElement("div");
+    const band = document.createElement("div");
+    const article = document.createElement("article");
+    const column = document.createElement("div");
+    const bubble = document.createElement("div");
+    const fill = document.createElement("span");
+    fill.setAttribute("data-morph-skip", "");
+    bubble.append(fill, document.createElement("div"));
+    column.append(bubble);
+    article.append(column);
+    listRow.append(band, article);
+    const typing = document.createElement("div");
+    scroller.append(date, listRow, typing);
+    document.body.append(scroller);
+    const morph = createBubbleMorph(() => ({ column, bubble, fill, row: listRow, hold: vi.fn() }));
+    place(scroller, { left: 0, top: 0, width: 300, height: 600 });
+    const at = (contentTop: number, height: number) => () => ({
+      left: 0,
+      top: contentTop - scrollTop,
+      width: 300,
+      height,
+    });
+    let grown = 0;
+    place(date, at(1200, 40));
+    place(band, at(1240, 30));
+    place(listRow, () => at(1240, 110 + grown)());
+    place(article, () => at(1270, 80 + grown)());
+    place(bubble, () => at(1274, 72 + grown)());
+    place(typing, () => at(1350 + grown, 40)());
+    morph.capture({ anchor: "end" });
+    grown = 36;
+    morph.play();
+    // The message grows from its bottom: the view scrolls by the change, and everything above the
+    // message — the band in its own row and the date before it — glides on the same clock.
+    expect(scrollTop).toBe(1036);
+    for (const element of [band, date]) {
+      expect(animations.find((a) => a.element === element)?.keyframes[0]).toEqual({
+        transform: "translate(0px, 36px)",
+      });
+    }
+    expect(animations.some((a) => a.element === typing)).toBe(false);
+  });
+
   it("grows a transcript from the top: the rows below glide; off screen the view stays still", () => {
     const s = inScroller(300);
     s.morph.capture({ anchor: "start" });

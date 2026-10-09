@@ -10,11 +10,13 @@
 - Progress where horizontal space is short: table cells, list rows.
 - A value on a custom scale shown as a ring («7/12»).
 - A compact breakdown of a whole: tasks by status, storage by type (`segments`); categories in their chart colors (`color`) with a `legend` beside the ring.
+- A named process whose share is not known yet (`value={null}`) or that turns while its share grows (`spin`), with an icon in the center that changes with its state.
 
 ## When not to use
 - Progress with a label and width to spare (uploads, imports) → use [ProgressBar](../progress-bar/COMPONENT.md).
 - A breakdown with many parts or long labels → [ProgressBar](../progress-bar/COMPONENT.md) with `segments`.
-- Unknown duration → use [Spinner](../spinner/COMPONENT.md); ProgressCircle is always determinate.
+- An anonymous «busy» mark inside a control or a region (a button, a select, a list) → [Spinner](../spinner/COMPONENT.md): it sizes like an icon and is a `status`.
+- A ring you can press (cancel, retry, download) → [Button](../button/COMPONENT.md) `shape="circle"` with `progress`; ProgressCircle is never interactive.
 
 ## Import
 ```tsx
@@ -24,10 +26,12 @@ import { ProgressCircle, type ProgressSegment } from "prime-ui-kit";
 ## Anatomy
 ```
 ProgressCircle           <div>; size, tone (value mode), children in the center, aria-busy while loading
-├─ svg                   role="progressbar" (value) or role="group" (segments); track + arcs
+├─ svg                   the kit ring (internal/ring, data weight); role="progressbar" (value) or
+│                        role="group" (segments); track + arcs
 │                        (loading: a Skeleton ring of the same diameter and stroke)
 ├─ description           visually hidden distribution (segments with aria-label, no legend)
-└─ inner                 children in the hole of the ring (not on xs / s, not while loading)
+└─ inner                 children in the hole of the ring, a changed icon cross-fades
+                         (not on xs, text not on s, not while loading)
 
 with legend:             <div data-legend> — a row: the ring box + <ul> legend (swatch · name · value · share)
 ```
@@ -42,19 +46,20 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Diameter 24 · 32 · 48 · 64 · 80 px; the stroke is 1/12 of it. |
-| `children` | `ReactNode` | — | Content in the center (number, percent, `Icon`). Not rendered on `xs` / `s`; a string or number stays available as `aria-valuetext`. |
+| `children` | `ReactNode` | — | Content in the center (number, percent, `Icon`). Not rendered on `xs`; text only from `m`, an icon from `s`. A new icon (another `name`) cross-fades in and plays its gesture once (`fast`); a changing number updates in place. A string or number stays available as `aria-valuetext`. |
 | `aria-label` | `string` | — | Accessible name of the ring (set on the svg). Always pass it. |
 | `loading` | `boolean` | `false` | The data is on its way: a Skeleton ring of the same diameter and stroke (and legend lines) that cross-fades into the data; the inner content waits, the root is `aria-busy`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root. |
 
 ### ProgressCircle · value mode
-The svg is `role="progressbar"`: a track and one round-capped arc.
+The svg is `role="progressbar"`: a track and one round-capped arc from 12 o'clock.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `number` | — (required) | The current value, clamped to `0…max`. |
+| `value` | `number \| null` | — (required) | The current value, clamped to `0…max`; it glides to a new value (`base`). `null` — under way, the share unknown: a quarter arc that always turns, no `aria-valuenow`. |
+| `spin` | `boolean` | `false` | The ring turns at any share (one turn = 3 × `--prime-motion-loop`; slower under reduced motion, never still) and the arc never drops under 8%: a sync whose share grows. `null` always turns. |
 | `max` | `number` | `100` | Top of the scale. |
-| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Arc color, telling the outcome. |
+| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info" \| "inherit"` | `"accent"` | Arc color, telling the outcome. `inherit` — the arc in the host's text color over a 32% track of it, for a ring on a colored host or over media. |
 
 ### ProgressCircle · segments mode
 The svg is `role="group"`: parts clockwise from the top, described by the legend or the distribution text.
@@ -74,12 +79,12 @@ The svg is `role="group"`: parts clockwise from the top, described by the legend
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `xs` | 24 diameter, no inner content | inline in text or table cells | |
-| `s` | 32 diameter, no inner content | list rows, compact cards | |
-| `m` | 48 diameter, inner text 12/16 | KPI tiles | yes |
-| `l` | 64 diameter, inner text 16/24 | dashboard cards | |
-| `xl` | 80 diameter, inner text 18/24 | hero metrics, breakdowns | |
+| `s` | 32 diameter, an icon 16 in the center, no text | list rows, compact cards | |
+| `m` | 48 diameter, inner text 12/16, icon 20 | KPI tiles | yes |
+| `l` | 64 diameter, inner text 16/24, icon 24 | dashboard cards | |
+| `xl` | 80 diameter, inner text 18/24, icon 32 | hero metrics, breakdowns | |
 
-The stroke is always 1/12 of the diameter.
+The stroke is always 1/12 of the diameter (the kit ring's `data` weight). These diameters are a data scale, separate from the control heights of a circle Button.
 
 ### tone (value mode or each segment)
 | Value | Looks like | Use when | Default |
@@ -90,6 +95,7 @@ The stroke is always 1/12 of the diameter.
 | `warning` | warning arc | at risk, quota almost used | |
 | `danger` | danger arc | failed, overdue share | |
 | `info` | info arc | informational processes (sync, indexing) | |
+| `inherit` (value mode) | the arc in the host's text color over a 32% track of it; the center text inherits it too | a ring on a colored host or over media | |
 
 ### color (each segment, instead of tone)
 | Value | Looks like | Use when | Default |
@@ -101,6 +107,7 @@ The stroke is always 1/12 of the diameter.
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
+| `spin` (value mode) | the ring turns at any share, the arc never under 8% | a process whose share grows while it runs (a sync) | `false` |
 | `legend` | swatch · name · value · share rows beside the ring, below it when narrow | a breakdown read in numbers | `false` |
 | `loading` | a Skeleton ring (and legend lines) of the same geometry | the data is on its way | `false` |
 
@@ -115,17 +122,20 @@ The stroke is always 1/12 of the diameter.
 |---|---|---|
 | size / tone | props | `data-size`, `data-tone` (value mode) on the root |
 | empty | `value` 0, or `segments` empty / all 0 | arc hidden, track only |
-| value | `value`, `max` | `aria-valuenow`, `aria-valuemin="0"`, `aria-valuemax`; the arc glides by `stroke-dashoffset` over `slow` |
+| value | `value`, `max` | `aria-valuenow`, `aria-valuemin="0"`, `aria-valuemax`; `--ring-value` on the svg, the arc glides by `stroke-dashoffset` over `base` |
+| share unknown | `value={null}` | no `aria-valuenow`; `data-spin` on the svg: a quarter arc turning (one turn = 3 × `--prime-motion-loop`); a share that arrives glides out of the quarter |
+| spinning | `spin` | `data-spin` on the svg: the whole svg turns (a compositor transform) while the share glides on its own; the arc is at least 8% |
+| icon change | a new icon in `children` (another `name`) | the old one shrinks to 0.6 and fades, the new one grows in (`fast`) and plays its gesture once; a changing number updates in place |
 | segments | `segments`, `max`, `segmentGap` | `data-segment-gap` on the svg, `data-tone` or `data-color` on every arc and cap; arcs glide by dash, caps by `rotate` |
 | legend | `legend` | `data-legend` on the root, which becomes a wrapping row of the ring and the `<ul>` |
 | loading | `loading` | `aria-busy` on the root; a Skeleton ring (mask of the stroke) and legend lines; the data cross-fades in (`swapMotion`) |
-| reduced motion | `prefers-reduced-motion` | arcs change instantly |
+| reduced motion | `prefers-reduced-motion` | arcs and icons change instantly; a turning ring turns twice as slow and never stops |
 
 Always controlled: pass the current `value` or `segments`.
 
 ## Layout & spacing
 - `display: inline-flex`, never shrinks; a caption sits next to it with `--prime-space-3` or under it with `--prime-space-2`.
-- Diameters sit on the 4px grid (`--prime-space-6…20`); the ring geometry is in viewBox units.
+- Diameters sit on the 4px grid (`--prime-space-6…20`); the ring is placed in CSS (an svg without a viewBox), lengths along it are percent of the circle.
 - Inner content sits in the hole (5/6 of the diameter, clipped), primary, medium weight, tabular numbers.
 - With `legend` the root is a wrapping row: the ring and the legend `--prime-space-5` (20) apart; the legend takes the rest of the row (at least 192 wide) and drops below the ring when it does not fit.
 - `hairline` arcs are ¾ of the stroke apart; arcs start at 12 o'clock and run clockwise.
@@ -136,7 +146,8 @@ Always controlled: pass the current `value` or `segments`.
 No keyboard interaction.
 
 ### ARIA
-- Value mode: the svg is `role="progressbar"` with `aria-valuenow` / `-min` / `-max`; a string or number child becomes `aria-valuetext`.
+- Value mode: the svg is `role="progressbar"` with `aria-valuenow` / `-min` / `-max`; a string or number child becomes `aria-valuetext`. With `value={null}` there is no `aria-valuenow` — the share is unknown.
+- The turn never stops under reduced motion (twice as slow): it is the only sign the work goes on.
 - Segments mode: the svg is `role="group"`; with `aria-label` it is described by the distribution («Видео: 38%, Документы: 21%») or by the legend, without it the distribution is its name.
 - A category color always sits beside its name in the legend, so color is never the only cue.
 - While `loading` the root is `aria-busy` and the Skeletons are `aria-hidden`.
@@ -159,17 +170,20 @@ No keyboard interaction.
 | [sizes.tsx](examples/sizes.tsx) | Diameters 24 to 80 px; the center text is not rendered on `xs` and `s` — `size`. |
 | [states.tsx](examples/states.tsx) | Loading is a Skeleton ring of the same diameter and stroke; the number in the centre waits for the data — `loading`. |
 | [inner-content.tsx](examples/inner-content.tsx) | The center holds a percentage, a count on its own scale or an icon — `children`, `max`. |
+| [under-way.tsx](examples/under-way.tsx) | An import whose share is not known yet turns a quarter arc, then fills and swaps its icon; a sync turns while its share grows — `value`, `spin`, `children`. |
 | [segments.tsx](examples/segments.tsx) | Parts of a whole clockwise from the top: a closed ring, free capacity up to `max`, separate arcs and an empty list — `segments`, `segmentGap`. |
 | [legend.tsx](examples/legend.tsx) | A ring of category shares with a legend beside it, in the categories' chart colors — `color`, `legend`, `formatValue`. |
 
 ## Mistakes
 - No `aria-label` (even with a visible caption) → screen readers get an unnamed progressbar.
-- Text inside an `xs` / `s` ring → it is not rendered; show it outside.
+- Text inside an `xs` / `s` ring → it is not rendered; show it outside (an icon shows from `s`).
+- A fake indeterminate ring (`value={25}` plus a CSS rotation) → `value={null}`.
+- `onClick` on the ring to cancel → a [Button](../button/COMPONENT.md) `shape="circle"` with `progress`.
 - `value` and `segments` together → a type error; pick one mode.
 - `tone` on the root with `segments` → set `tone` on each segment.
 - Long text inside the ring → it is clipped to the inner circle.
 - Categories painted with `tone` → use `color`; a hand-built legend beside the ring → `legend`.
 
 ## Related
-- **Built from:** [Skeleton](../skeleton/COMPONENT.md)
-- **See also:** [ProgressBar](../progress-bar/COMPONENT.md), [Card](../card/COMPONENT.md), [Spinner](../spinner/COMPONENT.md)
+- **Built from:** [Skeleton](../skeleton/COMPONENT.md), `internal/ring` (the ring drawing, shared with Spinner and the circle Button), `internal/glyphSwap` (the center cross-fade)
+- **See also:** [ProgressBar](../progress-bar/COMPONENT.md), [Card](../card/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), [Button](../button/COMPONENT.md)

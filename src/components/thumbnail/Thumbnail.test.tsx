@@ -1,7 +1,13 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import { mediaDiskClass } from "@/internal/mediaDisk";
+
 import { Thumbnail } from "./Thumbnail";
+
+const css = readFileSync(path.resolve(process.cwd(), "src/internal/mediaDisk.module.css"), "utf8");
 
 describe("Thumbnail", () => {
   it("exposes size, ratio and color as data attributes with defaults m · 1:1 · gray", () => {
@@ -74,6 +80,20 @@ describe("Thumbnail", () => {
       fireEvent.loadedMetadata(video);
       expect(screen.getByText("1:23")).toBeInTheDocument();
       expect(video.parentElement?.querySelector('[aria-hidden="true"] svg')).not.toBeNull();
+    });
+
+    it("marks a still video with the media disk — the look of the play and transfer disks", () => {
+      const { container } = render(
+        <Thumbnail.Root fullWidth ratio="16:9">
+          <Thumbnail.Video src="/clip.mp4" />
+        </Thumbnail.Root>,
+      );
+      const mark = container.querySelector(`.${mediaDiskClass}`);
+      expect(mark).toHaveAttribute("aria-hidden", "true");
+      expect(mark?.querySelector("svg")).not.toBeNull();
+      expect(css).toMatch(/\.disk \{[^}]*background: var\(--prime-color-media-disk\);/);
+      expect(css).toMatch(/\.disk \{[^}]*inline-size: var\(--prime-control-l-height\);/);
+      expect(css).toMatch(/backdrop-filter: blur\(var\(--prime-media-disk-blur\)\);/);
     });
 
     it("keeps a poster's source as it is and leaves controls to the browser", () => {

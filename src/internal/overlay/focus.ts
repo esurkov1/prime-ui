@@ -51,6 +51,42 @@ export function focusBack(el: HTMLElement | null | undefined): void {
   if (el?.isConnected) el.focus({ preventScroll: true });
 }
 
+/** A press this recent opened the layer; an older one did not (a key did). */
+const PRESS_OPENS_MS = 1000;
+
+/** The control the person last pressed: Safari does not focus a button on a click. */
+let pressed: { control: HTMLElement; time: number } | null = null;
+
+if (typeof document !== "undefined") {
+  document.addEventListener(
+    "pointerdown",
+    (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const control = target?.closest<HTMLElement>(`${NATIVE_TAB_STOP}, ${FOCUSABLE}`) ?? null;
+      pressed = control ? { control, time: performance.now() } : null;
+    },
+    true,
+  );
+}
+
+/**
+ * The element that opened a layer, to return focus to on close: the control just pressed — a
+ * click leaves focus elsewhere in Safari (on the body, or on a `tabindex="-1"` region around the
+ * button, which would then show its focus ring) — else the element focused right now. Read while
+ * rendering the open transition, before a child `autoFocus` moves focus into the new layer.
+ */
+export function openerElement(): HTMLElement | null {
+  const active = activeElement();
+  if (
+    pressed?.control.isConnected &&
+    performance.now() - pressed.time < PRESS_OPENS_MS &&
+    !(active && pressed.control.contains(active))
+  ) {
+    return pressed.control;
+  }
+  return active;
+}
+
 /**
  * The element focused right now — read while rendering the open transition, before a child
  * `autoFocus` moves focus into the new layer, so it is the opener to return to on close.

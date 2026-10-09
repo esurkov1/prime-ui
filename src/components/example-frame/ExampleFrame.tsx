@@ -14,6 +14,7 @@ import { suspendTransitions } from "@/theme/applyTheme";
 
 import { Button } from "../button/Button";
 import { CodeBlock } from "../code-block/CodeBlock";
+import { ScrollContainer } from "../scroll-container/ScrollContainer";
 import { SegmentedControl } from "../segmented-control/SegmentedControl";
 import styles from "./ExampleFrame.module.css";
 
@@ -239,15 +240,17 @@ export function ExampleFrame({
       ) : (
         // Plain CodeBlock is not focusable itself; the scrolling pane takes keyboard focus instead.
         // The pane carries the theme, so the block inherits it (and trims the source itself).
-        <section
+        <ScrollContainer
+          as="section"
+          axis="both"
+          edges="shadow"
           className={styles.codePane}
           data-theme={colorScheme}
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region must be keyboard-reachable
           tabIndex={0}
           aria-label={labels.codeRegion}
         >
           <CodeBlock variant="ghost" code={code} />
-        </section>
+        </ScrollContainer>
       )}
     </div>
   );
@@ -350,10 +353,13 @@ function ExampleFrameToolbar({
             onClick={handleCopy}
             aria-label={copyLabel}
           >
-            {/* Both glyphs stay mounted and cross-fade in place (see `.copyIcon`). */}
-            <Button.Icon className={styles.copyIcon} data-copy-state={copyState}>
-              <Icon name="action.copy" size="s" tone="secondary" data-glyph="copy" />
-              <Icon name="action.check" size="s" tone="secondary" data-glyph="check" />
+            {/* Button.Icon cross-fades copy ↔ check in place. */}
+            <Button.Icon data-copy-state={copyState}>
+              <Icon
+                name={copyState === "copied" ? "action.check" : "action.copy"}
+                size="s"
+                tone="secondary"
+              />
             </Button.Icon>
           </Button.Root>
         </div>

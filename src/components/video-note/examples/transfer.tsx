@@ -2,6 +2,8 @@
 import { Message, type TransferState, VideoNote } from "prime-ui-kit";
 import * as React from "react";
 
+import styles from "./examples.module.css";
+
 const VIDEO_URL = "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
 
 const TICK_MS = 400;
@@ -45,7 +47,7 @@ export default function VideoNoteTransferExample() {
   }, []);
 
   return (
-    <Message.Group aria-label="Чат выездной бригады">
+    <div className={styles.thread}>
       <Message.Root direction="incoming" time="16:02">
         <VideoNote
           src={VIDEO_URL}
@@ -69,6 +71,6 @@ export default function VideoNoteTransferExample() {
           onRetry={() => setAnswer(start)}
         />
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

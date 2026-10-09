@@ -5,7 +5,6 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useImageStatus } from "@/hooks/useImageStatus";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion } from "@/hooks/usePresence";
-import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatClock } from "@/internal/formatClock";
@@ -14,6 +13,7 @@ import {
   type ImageSlotFallbackProps,
   type ImageSlotImageProps,
 } from "@/internal/imageSlot";
+import { MediaPlayMark } from "@/internal/mediaDisk";
 import { firstFrame } from "@/internal/mediaFrame";
 import { useMediaSession } from "@/internal/mediaSession";
 import palette from "@/internal/palette.module.css";
@@ -254,11 +254,7 @@ function ThumbnailVideoInner({
         }}
       />
       {/* A still frame says it is a video; the native controls say it themselves. */}
-      {!controls && !loops && !playing ? (
-        <span className={styles.play} aria-hidden="true">
-          <Icon name="action.play" />
-        </span>
-      ) : null}
+      {!controls && !loops && !playing ? <MediaPlayMark className={styles.play} /> : null}
       {!controls && duration !== null ? (
         <span className={styles.duration}>{formatDuration(duration)}</span>
       ) : null}

@@ -1,0 +1,112 @@
+/*
+ * Gallery — photos and videos as a messenger album. Every box is final before anything loads (no
+ * layout shift): the root's aspect ratio and every tile's place come from the items' ratios
+ * (`layout.ts`), nothing is measured. The root is as wide as its host allows, up to the album
+ * cap (`--prime-gallery-max-size`; a lone portrait is narrower, its height reaching the cap
+ * instead). Tiles stand absolutely at fractions of the box, inset by half a gap at every inner edge,
+ * so the thin gaps are the root's own background — transparent here, a host may paint it.
+ *
+ * Over a tile: the play mark and the length of a video (media pills), the open button (focus ring
+ * inside: the tile reaches the edges), and a transfer either way — the shared disk in the middle
+ * with the progress ring along its edge (`internal/transferDisk` `TransferOverlay`): pressing it
+ * cancels, a failure turns it danger with a retry, a tile not fetched yet carries the download
+ * arrow. The picture dims under it until the transfer is done. `children` lie over every tile.
+ */
+.root {
+  --gallery-size: var(--prime-gallery-max-size);
+  --gallery-half-gap: calc(var(--prime-gallery-gap) / 2);
+
+  position: relative;
+  box-sizing: border-box;
+  /* The cap is the width, the host's width its limit: definite even in a shrink-to-fit host. */
+  inline-size: calc(var(--gallery-size) * var(--gallery-factor, 1));
+  max-inline-size: 100%;
+  aspect-ratio: var(--gallery-ratio, 1);
+  overflow: clip;
+  border-radius: var(--prime-radius-l);
+  transition: scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* Press: the whole album gives in a little, its rounded clip with it (`data-pressed`, set from a
+   tile's press). A large surface takes the subtle press. */
+.root[data-pressed] {
+  scale: var(--prime-motion-press-scale);
+}
+
+.tile {
+  position: absolute;
+  inset-block-start: calc(var(--y) * 100% + var(--gt) * var(--gallery-half-gap));
+  inset-inline-start: calc(var(--x) * 100% + var(--gs) * var(--gallery-half-gap));
+  inline-size: calc(var(--w) * 100% - (var(--gs) + var(--ge)) * var(--gallery-half-gap));
+  block-size: calc(var(--h) * 100% - (var(--gt) + var(--gb)) * var(--gallery-half-gap));
+  overflow: hidden;
+}
+
+/* The Thumbnail fills its tile; a tile has square corners (the root rounds the outer ones). */
+.tile > .thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.play {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: auto;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* A transfer not done yet: the picture dims under the disk, the play mark gives the middle up. */
+.tile:has(> .transfer[data-covered]) > .thumb {
+  opacity: 0.6;
+}
+
+.tile:has(> .transfer[data-covered]) > .play {
+  opacity: 0;
+}
+
+.length {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: var(--prime-space-2);
+  inset-inline-start: var(--prime-space-2);
+}
+
+.open {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.open:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.transfer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .tile > .thumb,
+  .play {
+    transition: none;
+  }
+
+  .root[data-pressed] {
+    scale: none;
+  }
+}

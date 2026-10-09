@@ -411,7 +411,6 @@ const SidebarContent = React.forwardRef<HTMLElement, SidebarContentProps>(functi
     <ScrollContainer
       {...rest}
       ref={ref}
-      fade
       scrollbar="hidden"
       className={cx(styles.content, className)}
     />

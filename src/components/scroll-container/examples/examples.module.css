@@ -93,3 +93,47 @@
   background: var(--prime-color-fill-subtle);
   font-variant-numeric: tabular-nums;
 }
+
+/* lock.tsx: the title and the review button in one row above the queue. */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+/* snap.tsx: a row of fixed-width cards; the padding keeps the edge cards' rings unclipped. */
+.tiles {
+  display: flex;
+  gap: var(--prime-space-3);
+  width: max-content;
+  margin: 0;
+  padding: var(--prime-space-1);
+  list-style: none;
+}
+
+.tile {
+  inline-size: calc(var(--prime-space-24) * 2);
+  scroll-snap-align: start;
+}
+
+/* auto-scroll.tsx: draggable task rows. */
+.sortable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  margin: 0;
+  padding: 0 var(--prime-space-3) var(--prime-space-3);
+  list-style: none;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  min-height: var(--prime-space-10);
+  padding-inline: var(--prime-space-3);
+  border-radius: var(--prime-radius-m);
+  background: var(--prime-color-fill-muted);
+  cursor: grab;
+}

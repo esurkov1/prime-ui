@@ -96,6 +96,30 @@ export type {
 } from "./chart-frame/ChartFrame";
 export { ChartFrame } from "./chart-frame/ChartFrame";
 export type {
+  ChatActionsProps,
+  ChatDescriptionProps,
+  ChatFooterProps,
+  ChatHeaderProps,
+  ChatLabels,
+  ChatMessageEntry,
+  ChatMessagesProps,
+  ChatPinnedItem,
+  ChatPinnedLabels,
+  ChatPinnedProps,
+  ChatRootProps,
+  ChatSearchButtonProps,
+  ChatSearchProps,
+  ChatSelectionBarProps,
+  ChatSeparatorProps,
+  ChatServiceProps,
+  ChatTitleProps,
+  ChatUnreadLabels,
+  ChatUnreadProps,
+  GroupMessagesOptions,
+  MessageListEntry,
+} from "./chat/Chat";
+export { Chat, formatMessageDate, groupMessages } from "./chat/Chat";
+export type {
   CheckboxIndicatorProps,
   CheckboxLabelProps,
   CheckboxRootProps,
@@ -275,6 +299,8 @@ export type {
   FileUploadVariant,
 } from "./file-upload/FileUpload";
 export { FileUpload } from "./file-upload/FileUpload";
+export type { GalleryItem, GalleryLabels, GalleryProps } from "./gallery/Gallery";
+export { Gallery } from "./gallery/Gallery";
 export type {
   GanttBar,
   GanttDates,
@@ -342,32 +368,33 @@ export type {
 } from "./login-form/LoginForm";
 export { LoginForm } from "./login-form/LoginForm";
 export type {
+  MediaViewerItem,
+  MediaViewerLabels,
+  MediaViewerProps,
+} from "./media-viewer/MediaViewer";
+export { MediaViewer } from "./media-viewer/MediaViewer";
+export { formatMessageTime } from "./message/formatMessageTime";
+export type {
+  MessageAuthorIconProps,
   MessageAuthorProps,
   MessageAvatarProps,
   MessageDirection,
   MessageForwardedLabels,
   MessageForwardedProps,
-  MessageGroupLabels,
-  MessageGroupProps,
   MessageLabels,
   MessageMenuProps,
-  MessagePinnedItem,
-  MessagePinnedLabels,
-  MessagePinnedProps,
+  MessagePosition,
   MessageReaction,
+  MessageReactionOption,
   MessageReactionsLabels,
   MessageReactionsProps,
   MessageReplyLabels,
   MessageReplyProps,
   MessageRootProps,
-  MessageSeparatorProps,
-  MessageServiceProps,
   MessageStatus,
   MessageTextProps,
   MessageTypingLabels,
   MessageTypingProps,
-  MessageUnreadLabels,
-  MessageUnreadProps,
   MessageUser,
 } from "./message/Message";
 export { Message } from "./message/Message";
@@ -378,17 +405,7 @@ export type {
   MessageLocationProps,
 } from "./message/MessageCards";
 export type { MessageFileLabels, MessageFileProps } from "./message/MessageFile";
-export type {
-  MessageMediaItem,
-  MessageMediaLabels,
-  MessageMediaProps,
-} from "./message/MessageMedia";
-export type {
-  GroupMessagesOptions,
-  MessageListEntry,
-  MessagePosition,
-} from "./message/messageList";
-export { formatMessageDate, formatMessageTime, groupMessages } from "./message/messageList";
+export type { MessageMediaProps } from "./message/MessageMedia";
 export type {
   ModalActionsProps,
   ModalBodyProps,
@@ -478,7 +495,11 @@ export type {
   RadioRootProps,
 } from "./radio/Radio";
 export { Radio } from "./radio/Radio";
-export type { ScrollContainerAxis, ScrollContainerProps } from "./scroll-container/ScrollContainer";
+export type {
+  ScrollContainerAxis,
+  ScrollContainerEdges,
+  ScrollContainerProps,
+} from "./scroll-container/ScrollContainer";
 export { ScrollContainer } from "./scroll-container/ScrollContainer";
 export type {
   SegmentedControlCountProps,

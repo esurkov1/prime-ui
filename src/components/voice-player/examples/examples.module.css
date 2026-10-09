@@ -16,3 +16,8 @@
   width: 100%;
   margin-block-start: var(--prime-space-3);
 }
+
+/* A conversation column: messages are rows as wide as the column. */
+.thread {
+  inline-size: 100%;
+}

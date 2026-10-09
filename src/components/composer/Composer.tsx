@@ -27,7 +27,7 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { type MediaKind, mediaKind } from "@/internal/mediaKind";
 import overlayMotion from "@/internal/overlayMotion.module.css";
-import progressRing from "@/internal/progressRing.module.css";
+import { Ring } from "@/internal/ring";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, stepDown } from "@/internal/states";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
@@ -862,7 +862,7 @@ function ComposerRoot({
         shown = label;
       }
       previewRef.current?.style.setProperty(
-        "--progress-ring-value",
+        "--ring-value",
         String(Math.min(1, elapsed / VIDEO_MAX_MS)),
       );
       if (canvas && ctx && wave) {
@@ -1380,7 +1380,7 @@ ComposerRoot.displayName = "Composer.Root";
 /**
  * The round camera preview above the composer while a video message records: the geometry of
  * `VideoNote`, a Skeleton circle until the camera answers, the progress ring toward
- * `VIDEO_MAX_MS` (its `--progress-ring-value` is written every frame by the root).
+ * `VIDEO_MAX_MS` (the kit ring, `live`: its `--ring-value` is written every frame by the root).
  */
 function VideoPreview({
   stream,
@@ -1420,7 +1420,7 @@ function VideoPreview({
           onLoadedData={() => setReady(true)}
         />
       ) : null}
-      <span className={progressRing.ring} />
+      <Ring value={0} live track={false} className={styles.previewRing} />
     </div>
   );
 }

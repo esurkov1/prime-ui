@@ -75,7 +75,6 @@
   min-width: 0;
   margin: calc(-1 * var(--prime-focus-space));
   padding: var(--prime-focus-space);
-  overflow: hidden;
 }
 
 .input {
@@ -155,7 +154,6 @@
 .control[data-expanded="true"] .chips {
   flex-wrap: wrap;
   max-height: calc(3 * var(--ts-row) + 2 * var(--prime-space-1) + 2 * var(--prime-focus-space));
-  overflow-y: auto;
 }
 
 .control[data-expanded="true"] .input {

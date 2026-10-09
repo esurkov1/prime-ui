@@ -5,10 +5,10 @@
  * the boxes around a commit, never writes a size).
  *
  * Row: [select] [avatar gutter] [retry] [column: bubble, reactions] [menu anchor]; incoming rows
- * start, outgoing rows end. The row is a container (`container-type: inline-size`): a bubble is at
- * most `--prime-message-max-width` and 85% of the row. In a scroller the group renders only the
- * rows near the view (`useVirtualRows`): each row in its own box (`.row`, layout and paint
- * contained, measured once) in normal flow between two spacers (`.gap`) — no transforms.
+ * start, outgoing rows end. The row is a container (`container-type: inline-size`, the full width
+ * of its host): a bubble is at most `--prime-message-max-width` and 85% of the row. The list around
+ * messages (`Chat.Messages`) is styled by the chat; it marks itself `data-message-list`, and the
+ * selection and pointing states below read that attribute.
  *
  * Bubble: fits its content (`fit-content`, up to the cap; a picture or a card sets the width and a
  * caption wraps under it). An incoming bubble is a surface one step off its host (`data-depth`); an
@@ -26,32 +26,6 @@
  * the shape: clipped to the radius, no backing; `round` — a video circle, no backing.
  */
 
-/* The chat takes its host's width: rows are containers and never size from their content. */
-.group {
-  display: flex;
-  flex-direction: column;
-  align-self: stretch;
-  box-sizing: border-box;
-  inline-size: 100%;
-  min-width: 0;
-}
-
-/* A rendered row of a windowed list: measured as a whole, its layout and paint kept inside. */
-.row {
-  flex: none;
-  contain: layout paint;
-}
-
-/* While its message morphs, the bubble may still show its old, taller box past the row's edge. */
-.row[data-morphing] {
-  contain: layout;
-}
-
-/* The rows the window does not render, as one block of their measured or estimated height. */
-.gap {
-  flex: none;
-}
-
 /*
  * Only the text of a conversation selects (and copies). The chat and every message are
  * `user-select: none`; the parts that carry meaningful text (`data-message-selectable`) opt back
@@ -59,7 +33,6 @@
  * nothing does (a press selects messages). A long press opens the message's own bar and menu,
  * never the iOS callout.
  */
-.group,
 .root {
   -webkit-user-select: none;
   user-select: none;
@@ -87,8 +60,10 @@
 
   container-type: inline-size;
   position: relative;
+  box-sizing: border-box;
   display: flex;
   align-items: flex-end;
+  inline-size: 100%;
   gap: var(--prime-space-2);
   padding-block: calc(var(--prime-message-group-gap) / 2);
   padding-inline: var(--prime-space-2);
@@ -162,7 +137,7 @@
 }
 
 /*
- * A message new at the end (`data-enter`, set by the group for one play — never on the first render,
+ * A message new at the end (`data-enter`, set by the list for one play — never on the first render,
  * a history load or a status change). Mine and theirs alike float up into their place from
  * `space-3` below and fade in: one keyframe on the column, `transform` + `opacity`, `fast` with the
  * enter easing. Nothing else moves — the list is pushed by layout and a region pinned to the end
@@ -185,102 +160,6 @@
     opacity: 0;
     transform: scale(0.96);
   }
-}
-
-/*
- * «К последним»: a round button at the bottom-end of the conversation while the reader is away
- * from the end, with the count of the messages that came meanwhile. A zero-height sticky row, so it
- * floats over the last messages and takes no room.
- */
-.jump {
-  position: sticky;
-  z-index: 2;
-  inset-block-end: var(--prime-space-3);
-  align-self: flex-end;
-  block-size: 0;
-  margin-inline-end: var(--prime-space-2);
-}
-
-.jump[data-state="open"] {
-  animation: messageJumpIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
-}
-
-.jump[data-state="closed"] {
-  animation: messageJumpOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
-}
-
-/* Above a bar stuck to the bottom (the selection bar): lifted by its height, gliding as it comes
-   and goes (`--message-bottom-bar`, written by the bar), so the two never overlap. */
-.jumpBox {
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline-end: 0;
-  display: flex;
-  translate: 0 calc(-1 * var(--message-bottom-bar, 0px));
-  transition: translate var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.jumpButton {
-  border-radius: var(--prime-radius-full);
-  box-shadow: var(--prime-shadow-overlay);
-}
-
-.jumpCount {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-end: 0;
-  translate: 35% -35%;
-  pointer-events: none;
-}
-
-@keyframes messageJumpIn {
-  from {
-    opacity: 0;
-    transform: translateY(var(--prime-space-2)) scale(0.96);
-  }
-}
-
-@keyframes messageJumpOut {
-  to {
-    opacity: 0;
-    transform: translateY(var(--prime-space-2)) scale(0.96);
-  }
-}
-
-.selectionBar {
-  position: sticky;
-  z-index: 2;
-  inset-block-end: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-2);
-  margin-block-start: var(--prime-space-3);
-  padding: var(--prime-space-2) var(--prime-space-3);
-  border-radius: var(--prime-radius-l);
-  background: var(--prime-color-fill-muted);
-  box-shadow: var(--prime-shadow-overlay);
-}
-
-/* It enters once the «к последним» button has risen out of its place (a `fast` lift, `.jumpBox`):
-   the two never overlap. */
-.group > .selectionBar {
-  animation-delay: var(--prime-motion-duration-fast);
-}
-
-.selectionCount {
-  color: var(--prime-color-text-primary);
-  font-size: var(--prime-text-body-m-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-body-m-line-height);
-  font-variant-numeric: tabular-nums;
-}
-
-.selectionActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--prime-space-2);
 }
 
 .anchor {
@@ -386,6 +265,16 @@
   padding-block-end: 0;
 }
 
+/*
+ * A picture with a caption: the media sets the bubble's width and the caption wraps to it. It is
+ * never narrower than the gallery's minimum, so the caption reads: a lone portrait widened to it
+ * keeps the cap's height and fills its box by cover.
+ */
+.bubble[data-shell="bubble"] > [data-message-bleed][data-count] {
+  min-inline-size: min(var(--prime-gallery-min-size), 85cqi);
+  max-block-size: var(--prime-message-media-max-height);
+}
+
 /* Media: a picture or an album without a caption is the shape — no padding, no backing. */
 .bubble[data-shell="media"] {
   padding: 0;
@@ -465,17 +354,17 @@
 /*
  * Stepping back: nothing is drawn on a message to mark it — the others step back around it
  * (`--prime-message-dim-opacity`, a slight desaturation), the marked one stays at full strength.
- * One attribute on the group decides it, and a descendant selector (no `:has()`) reaches what steps
+ * One attribute on the list decides it, and a descendant selector (no `:has()`) reaches what steps
  * back in each message: its column (the bubble or shape, its tail and reactions), the avatar and
  * the retry. Opacity and filter on those boxes only — composited, nothing is laid out again.
- * - Selection mode (`data-selecting` on the group): every message not selected, while it lasts
+ * - Selection mode (`data-selecting` on the list): every message not selected, while it lasts
  *   (`fast`, both ways).
- * - The chat points at a message (`data-pointing` on the group, `data-pointed` on the message: a
+ * - The chat points at a message (`data-pointing` on the list, `data-pointed` on the message: a
  *   pinned message's jump, a reply's original, a forwarded original, a jump to a search result):
  *   the others step back and come forward three times, one `base` each, and stay forward (`a` /
  *   `b`, flipped so a repeated jump restarts the blink). The current match of a search keeps them
  *   back while it is current (`current`). A message entering meanwhile plays its own entrance.
- * Reduced motion: no blink — the others stand back for a moment (the group lets go).
+ * Reduced motion: no blink — the others stand back for a moment (the list lets go).
  */
 .gutter,
 .column,
@@ -485,18 +374,37 @@
     filter var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.group[data-selecting] .root:not([data-selected]) > :is(.gutter, .column, .retry),
-.group[data-pointing="current"] .root:not([data-pointed]) > :is(.gutter, .column, .retry) {
+/* A press on a part that opens something (a picture's tile): the whole message gives in a little,
+   as one surface — never the part alone inside the bubble's clip. */
+.column {
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    filter var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.column[data-pressed] {
+  scale: var(--prime-motion-press-scale);
+}
+
+[data-message-list][data-selecting] .root:not([data-selected]) > :is(.gutter, .column, .retry),
+[data-message-list][data-pointing="current"]
+  .root:not([data-pointed])
+  > :is(.gutter, .column, .retry) {
   opacity: var(--prime-message-dim-opacity);
   filter: saturate(var(--prime-message-dim-saturation));
 }
 
-.group[data-pointing="a"] .root:not([data-pointed], [data-enter]) > :is(.gutter, .column, .retry) {
+[data-message-list][data-pointing="a"]
+  .root:not([data-pointed], [data-enter])
+  > :is(.gutter, .column, .retry) {
   animation: messagePointingA calc(var(--prime-motion-duration-base) * 3)
     var(--prime-motion-easing-standard) both;
 }
 
-.group[data-pointing="b"] .root:not([data-pointed], [data-enter]) > :is(.gutter, .column, .retry) {
+[data-message-list][data-pointing="b"]
+  .root:not([data-pointed], [data-enter])
+  > :is(.gutter, .column, .retry) {
   animation: messagePointingB calc(var(--prime-motion-duration-base) * 3)
     var(--prime-motion-easing-standard) both;
 }
@@ -531,14 +439,59 @@
 
 /* ─── Author, text ──────────────────────────────────────────────────────── */
 
+/*
+ * The author's header: the name in the author's hue, an optional icon, the tag muted after them.
+ * One line: the name ellipsizes first, then the tag. Nothing in it is pushed to the bubble's edge, so
+ * a size change of the bubble never moves anything inside the line. The bubble hugs the line's intrinsic width
+ * (`data-message-fit="row"`), so a long name or tag widens the bubble up to its cap.
+ */
 .author {
-  overflow: hidden;
+  --prime-icon-size: var(--prime-icon-xs);
+
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  min-width: 0;
   color: var(--hue-text);
   font-size: var(--prime-text-body-s-size);
-  font-weight: var(--prime-font-weight-semibold);
   line-height: var(--prime-text-body-s-line-height);
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.authorName {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: var(--prime-font-weight-semibold);
+  text-overflow: ellipsis;
+}
+
+.authorIcon {
+  display: inline-flex;
+  flex: none;
+}
+
+.authorTag {
+  flex: 0 0 auto;
+  max-inline-size: 50%;
+  padding-inline-start: var(--prime-space-1);
+  overflow: hidden;
+  color: var(--prime-color-text-muted);
+  text-overflow: ellipsis;
+}
+
+/* Over a picture or a circle: the header on the media pill at the top-start corner. */
+.authorPill {
+  position: absolute;
+  z-index: 4;
+  inset-block-start: var(--prime-space-2);
+  inset-inline-start: var(--prime-space-2);
+  max-inline-size: calc(100% - 2 * var(--prime-space-2));
+}
+
+.authorPill .author,
+.authorPill .authorTag {
+  color: inherit;
 }
 
 /*
@@ -557,7 +510,7 @@
 }
 
 /*
- * A search match in a message text (`Message.Group highlight`): a soft accent wash under the
+ * A search match in a message text (`Chat.Search`): a soft accent wash under the
  * letters, not color alone — it reads on both bubbles (an outgoing one remaps the accent wash).
  */
 .text mark {
@@ -994,54 +947,11 @@ button.reply:focus-visible {
   line-height: 1;
 }
 
-/* ─── Separators ────────────────────────────────────────────────────────── */
-
-.separator {
-  display: flex;
-  justify-content: center;
-  padding-block: var(--prime-space-3);
-  pointer-events: none;
-}
-
-/* A date stays at the top while its day scrolls under it. */
-.separator:not(.service) {
-  position: sticky;
-  z-index: 1;
-  inset-block-start: 0;
-}
-
-.pill {
-  max-inline-size: min(28rem, 100%);
-  padding-block: var(--prime-space-1);
-  padding-inline: var(--prime-space-3);
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-secondary);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-  text-align: center;
-  pointer-events: auto;
-}
-
-.service .pill {
-  border-radius: var(--prime-radius-l);
-  font-weight: var(--prime-font-weight-regular);
-}
-
-.unread {
-  margin-block: var(--prime-space-3);
-  padding-block: var(--prime-space-1);
-  border-radius: var(--prime-radius-s);
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-secondary);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-  text-align: center;
-}
-
 @media (prefers-reduced-motion: reduce) {
+  .column[data-pressed] {
+    scale: none;
+  }
+
   .tick,
   .reaction,
   .tail,
@@ -1055,8 +965,10 @@ button.reply:focus-visible {
     transform: none;
   }
 
-  /* No blink: the others stand back (the group lets a jump's go after a moment). */
-  .group[data-pointing] .root:not([data-pointed], [data-enter]) > :is(.gutter, .column, .retry) {
+  /* No blink: the others stand back (the list lets a jump's go after a moment). */
+  [data-message-list][data-pointing]
+    .root:not([data-pointed], [data-enter])
+    > :is(.gutter, .column, .retry) {
     animation: none;
     opacity: var(--prime-message-dim-opacity);
     filter: saturate(var(--prime-message-dim-saturation));

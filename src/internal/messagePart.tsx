@@ -45,6 +45,11 @@ export type MessagePartSpec = {
    * `contain-intrinsic-size` while it is off screen (`content-visibility: auto`).
    */
   estimate?: (props: never) => number;
+  /**
+   * The text a chat's search looks in, from the part's props (a text, a transcript). Only what the
+   * part also marks as a match (`useMessageHighlight`).
+   */
+  text?: (props: never) => string;
 };
 
 const SPECS = new WeakMap<object, MessagePartSpec>();
@@ -87,15 +92,20 @@ export type MessagePartContextValue = {
   /**
    * State of the message's parts that outlives its row: a long conversation renders only the rows
    * near the view, so a row that scrolls away unmounts and mounts again. One entry per part kind
-   * (`memory.get("transcript")`); `null` outside a group.
+   * (`memory.get("transcript")`); `null` outside a list.
    */
   memory?: Map<string, unknown> | null;
   /**
    * Call right before the part changes its own size in place (a transcript that opens or closes):
    * the conversation keeps what the reader sees still while it plays, so the message grows past
-   * the edge instead of pushing the list. `undefined` outside a group.
+   * the edge instead of pushing the list. `undefined` outside a list.
    */
   holdPosition?: () => void;
+  /**
+   * A press inside the part starts (`true`) or ends: the whole message presses as one (a picture
+   * with its caption), never the part alone. `undefined` outside a message.
+   */
+  press?: (pressed: boolean) => void;
 };
 
 const NO_PART: MessagePartContextValue = {
@@ -122,13 +132,13 @@ export function useInMessage(): boolean {
 }
 
 /**
- * The search query of a chat (`Message.Group highlight`): texts and transcripts mark its matches.
+ * The search query of a chat (`Chat.Search`): texts and transcripts mark its matches.
  * Its own context: typing a query re-renders the texts, not the messages.
  */
 export const MessageHighlightContext = React.createContext("");
 MessageHighlightContext.displayName = "MessageHighlightContext";
 
-/** The query a chat text marks; `""` outside a group. */
+/** The query a chat text marks; `""` outside a chat. */
 export function useMessageHighlight(): string {
   return React.useContext(MessageHighlightContext);
 }

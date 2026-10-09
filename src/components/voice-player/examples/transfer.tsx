@@ -2,6 +2,8 @@
 import { Message, type TransferState, VoicePlayer } from "prime-ui-kit";
 import * as React from "react";
 
+import styles from "./examples.module.css";
+
 const VOICE_URL = "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3";
 
 const CLIENT_WAVEFORM = [
@@ -55,7 +57,7 @@ export default function VoicePlayerTransferExample() {
   }, []);
 
   return (
-    <Message.Group aria-label="Чат с клиентом: заказ № 4821">
+    <div className={styles.thread}>
       <Message.Root direction="incoming" time="14:20">
         <VoicePlayer
           src={VOICE_URL}
@@ -81,6 +83,6 @@ export default function VoicePlayerTransferExample() {
           onRetry={() => setReply(start)}
         />
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

@@ -421,7 +421,6 @@ function TabsList({ children, className, ref, ...rest }: TabsListProps) {
         {...rest}
         ref={mergedRef}
         axis="horizontal"
-        fade
         scrollbar="hidden"
         role="tablist"
         aria-orientation={orientation}

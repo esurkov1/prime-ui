@@ -58,13 +58,14 @@ describe("AttachmentTile", () => {
     expect(document.querySelector("img")).toHaveAttribute("decoding", "async");
   });
 
-  it("the ring carries the progress on one variable and is a named progressbar", () => {
+  it("without a cancel the disk is still: its ring carries the share, a named progressbar", () => {
     const { rerender } = render(
       <Tile kind="image" src="blob:photo" upload={upload({})} uploadState="Загрузка 25%" />,
     );
     const bar = screen.getByRole("progressbar", { name: "Загрузка 25%" });
     expect(bar).toHaveAttribute("aria-valuenow", "25");
-    expect(bar.style.getPropertyValue("--transfer-progress")).toBe("0.25");
+    const ring = () => bar.querySelector<SVGSVGElement>("svg[data-weight]");
+    expect(ring()?.style.getPropertyValue("--ring-value")).toBe("0.25");
     rerender(
       <Tile
         kind="image"
@@ -74,7 +75,7 @@ describe("AttachmentTile", () => {
       />,
     );
     expect(bar).toHaveAttribute("aria-valuenow", "60");
-    expect(bar.style.getPropertyValue("--transfer-progress")).toBe("0.6");
+    expect(ring()?.style.getPropertyValue("--ring-value")).toBe("0.6");
   });
 
   it("the disk cancels the upload by click and from the keyboard; the corner button waits", () => {
@@ -159,7 +160,7 @@ describe("AttachmentTile", () => {
     );
     expect(screen.queryByRole("progressbar")).toBeNull();
     const retry = screen.getByRole("button", { name: "Повторить" });
-    expect(retry).toHaveAttribute("data-look", "danger");
+    expect(retry).toHaveAttribute("data-tone", "danger");
     expect(retry).toHaveAccessibleDescription("Нет связи");
     fireEvent.click(retry);
     expect(onRetry).toHaveBeenCalled();

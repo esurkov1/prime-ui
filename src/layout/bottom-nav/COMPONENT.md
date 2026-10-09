@@ -26,7 +26,7 @@ BottomNav.Root                 <nav>, safe-area inset below
 │  ├─ BottomNav.ItemIcon       the glyph above the label (aria-hidden)
 │  ├─ BottomNav.ItemCount      Badge on the icon corner
 │  └─ label                    one short word
-└─ BottomNav.Action            round <button> beside the bar (aria-label)
+└─ BottomNav.Action            Button shape="circle" beside the bar (aria-label)
 ```
 
 ## API
@@ -74,7 +74,7 @@ BottomNav.Root                 <nav>, safe-area inset below
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children" \| "color">` | — | `className` and the other span attributes. |
 
 ### BottomNav.Action
-`ref` → `HTMLButtonElement`. A round `<button type="button">` beside the bar for the screen's main action (create, search, assistant): a soft disk at the edge of a flat bar, a glass disk as tall as the capsule when `floating`. Placed before the first item it stands at the start, otherwise at the end.
+`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral solid) beside the bar for the screen's main action (create, search, assistant): a muted disk at the edge of a flat bar, a glass disk as tall as the capsule when `floating`. Placed before the first item it stands at the start, otherwise at the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -118,7 +118,7 @@ Motion: the color of the icon and the label changes over `fast`. Floating, the s
 - Bar `--prime-bottom-nav-height` (52) plus `env(safe-area-inset-bottom)`; side padding `--prime-bottom-nav-padding-x`. With `iconOnly` the bar is `--prime-bottom-nav-icon-only-height` (48).
 - Items share the width equally; the icon (`--prime-bottom-nav-icon-size`, 20 — a light glyph, so the bar stays quiet next to the page) sits in a `--prime-bottom-nav-glyph-width` × `--prime-bottom-nav-glyph-height` box (28 × 20) that anchors the count; the label is `--prime-bottom-nav-label-size` (10, medium, line 12 — the iOS tab-bar size) 4 below it and truncates.
 - Floating (the iOS 26 tab bar at three quarters its size): a full-radius capsule `--prime-bottom-nav-floating-height` (46; `--prime-bottom-nav-floating-icon-only-height`, 40, with `iconOnly`), items inset `--prime-bottom-nav-floating-padding` (4) with a `--prime-bottom-nav-floating-icon-size` (18) icon over a `--prime-bottom-nav-floating-label-size` (9, semibold) label, `--prime-bottom-nav-floating-item-gap` (2) apart. The capsule spans the width left beside its actions and the items share it equally. `--prime-bottom-nav-floating-inset` (12) from the sides and above `env(safe-area-inset-bottom)`. Glass: a dense `--prime-color-bg-glass` tint over a strong `blur(--prime-bottom-nav-blur)` (14) with `saturate(180%)`, so the page shows as soft shapes; the rim is a 1px ring of `--prime-color-bg-glass-edge` that catches at the top-start and bottom-end corners and fades along the sides (a masked gradient), with the overlay shadow. The selection capsule is ink at 12%, no rim. A `BottomNav.Action` is a glass disk as tall as the capsule with an 18 glyph, `--prime-bottom-nav-floating-gap` (8) beside it. Inside `AppShell.Footer` main gets extra bottom padding so the last line clears the capsule.
-- Flat: a `BottomNav.Action` is a soft disk of the `l` control height at the bar's edge.
+- Flat: a `BottomNav.Action` is a muted disk (Button `shape="circle"`, neutral solid) of the `l` control height at the bar's edge.
 - Surface fill with a faint top divider; inside `AppShell.Footer` the bar sticks to the bottom of the panel.
 
 ## Accessibility
@@ -165,5 +165,5 @@ Motion: the color of the icon and the label changes over `fast`. Floating, the s
 - Hiding the bar with your own media query → the shell already hides the footer while the Sidebar rail is on screen.
 
 ## Related
-- **Built from:** [Badge](../../components/badge/COMPONENT.md), VisuallyHidden (internal), `internal/roundButton` (the action disk)
+- **Built from:** [Badge](../../components/badge/COMPONENT.md), VisuallyHidden (internal), [Button](../../components/button/COMPONENT.md) (`shape="circle"`, the action disk)
 - **See also:** [AppShell](../app-shell/COMPONENT.md), [Sidebar](../sidebar/COMPONENT.md), [Tabs](../../components/tabs/COMPONENT.md)

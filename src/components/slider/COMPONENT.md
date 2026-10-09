@@ -53,6 +53,7 @@ Slider                 field frame (FieldFrame): className, ref, rest
 | `step` | `number` | `1` | Step of the keyboard and of the snapping; fractions allowed. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the track thickness T (thumb 4.5T × 3T), the label, the value and the hint. Without it the tier of its host (a form, a panel), else `m`. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Color of the filled part of the track. |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `vertical` — the track stands upright, minimum at the bottom, seven thumbs long at its tier (a level beside a button, a mixer column); the native range turns with `writing-mode`, so ↑ / ↓ and the pointer work natively and the input has `aria-orientation="vertical"`. |
 | `disabled` | `boolean` | — | Muted track and thumb, dimmed label and value, no interaction. |
 | `label` | `ReactNode` | — | Visible label linked to the range input (`<label htmlFor>`). Without it, set `aria-label`. |
 | `required` | `boolean` | — | Red `*` after the label (`aria-hidden`); a range always has a value, so there is no native `required`. |
@@ -96,6 +97,12 @@ Everything derives from the tier track thickness T (`--prime-control-<tier>-trac
 
 Tone never carries meaning alone: the label names what the value means.
 
+### orientation
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `horizontal` | the track across its container | a value in a form or a panel | yes |
+| `vertical` | the track upright, minimum at the bottom, seven thumbs long at its tier; the label row above it | a level beside a button (a video's sound), a column of a mixer | |
+
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -111,7 +118,7 @@ Tone never carries meaning alone: the label names what the value means.
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| default | — | `data-size`, `data-tone`; track `fill-strong`, tone pill up to the thumb centre, opaque thumb |
+| default | — | `data-size`, `data-tone` (`data-orientation="vertical"` when upright); track `fill-strong`, tone pill up to the thumb centre, opaque thumb |
 | hover | pointer (fine pointers only) | light liquid glass: the thumb grows to 110%, turns translucent and slightly frosted |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the root, `aria-invalid` on the input; the error replaces the hint, danger focus ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | pressed | dragging | clear glass: the thumb grows to 125%, the rounded end of the fill shows through |
@@ -159,6 +166,7 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 | [variants.tsx](examples/variants.tsx) | Every fill color; accent by default, semantic tones when the value carries meaning — `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size; the thumb, the label and the value grow with the tier — `size`. |
 | [states.tsx](examples/states.tsx) | The fill at both ends and a disabled slider — `disabled`. |
+| [orientation.tsx](examples/orientation.tsx) | Notification levels as a row of upright sliders, minimum at the bottom — `orientation`. |
 | [value-format.tsx](examples/value-format.tsx) | Units in the shown value that are also read by screen readers — `formatValue`, `showValue`. |
 | [range-step.tsx](examples/range-step.tsx) | Own bounds and a coarse or fractional step; a slider without a visible label — `min`, `max`, `step`, `aria-label`. |
 | [hint-and-error.tsx](examples/hint-and-error.tsx) | A slider framed like every field: required marker, a hint, and an error in its place — `required`, `hint`, `error`, `optional`. |

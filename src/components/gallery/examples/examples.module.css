@@ -1,0 +1,14 @@
+/* overview.tsx: the switcher above the gallery it re-lays out, one column. */
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-4);
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+/* Both keep to the column: a wider switcher scrolls instead of wrapping, the gallery narrows. */
+.fit {
+  max-inline-size: 100%;
+}

@@ -11,6 +11,7 @@
 - Long actions with known progress (downloads, exports): `progress` fills the button itself.
 - Destructive actions without a dialog: `holdToConfirm` needs a held press.
 - Compact toolbars: icon-only buttons (only `Button.Icon` inside) are square.
+- Round icon actions — the disk is the control (play, download, cancel or retry of a transfer, a floating main action): `shape="circle"`; over a picture or a video, `variant="shade"`. A transfer it can cancel shows its share as the circle's `progress` ring.
 - Action-styled navigation: `asChild` with an `<a>` or a router link.
 
 ## When not to use
@@ -29,6 +30,7 @@ import { Button } from "prime-ui-kit";
 ```
 Button.Root        <button> (or the single child with asChild); variant, tone, size; size tier for nested icons
 ├─ (fill)          progress / hold wash under the label, rendered by Root once used, aria-hidden
+├─ (ring)          a circle's progress ring along its inner edge (internal/ring), once used, aria-hidden
 ├─ (Spinner)       rendered by Root while loading, aria-hidden
 ├─ (label)         text children; a changed label flows in letter by letter
 └─ Button.Icon     decorative icon wrapper (aria-hidden), sized to the tier
@@ -44,13 +46,14 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"solid" \| "soft" \| "outline" \| "ghost"` | `"solid"` | Visual treatment. |
+| `variant` | `"solid" \| "soft" \| "outline" \| "ghost" \| "shade"` | `"solid"` | Visual treatment. `shade` — the media shade with a blur and a light glyph, the same in both themes: a button over a picture, a video or a video circle; with `tone="danger"` it is the danger disk (a failed transfer). |
+| `shape` | `"square" \| "circle"` | `"square"` | Outline. `circle` — a disk with only a `Button.Icon`: as wide as it is tall, full radius, the same tiers, tones and variants; its focus ring, touch area and press (`press-scale-compact`) follow the circle. Requires `aria-label`. |
 | `tone` | `"accent" \| "neutral" \| "success" \| "danger" \| "inherit"` | `"accent"` | Meaning of the action; `danger` for destructive actions; `success` for an action that is done (a payment went through). `inherit` takes the host's text color for an action on a colored host (a solid Banner); it needs `variant` `ghost`, `soft` or `outline`. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. Without it the button takes the tier of its host (LoginForm, Popover, a field, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | — | Stretches to the container width. |
 | `loading` | `boolean` | `false` | Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content. |
 | `pressed` | `boolean` | — | A toggle button: `true` on, `false` off (`aria-pressed`). On takes the selected look, an accent soft fill that glides in and out. Leave it out for an ordinary action; a set of toggles is a ButtonGroup. |
-| `progress` | `number` | — | Progress of a long action started by the button, `0…1`: a wash of the text color grows inside from the start edge, `aria-busy` is set and the button stays pressable (to cancel). Put the number in the label («Скачивание 42%»); remove the prop when done and the fill fades out. |
+| `progress` | `number \| null` | — | Progress of a long action started by the button, `0…1`; `null` — under way, the share unknown. `aria-busy` is set and the button stays pressable (to cancel). A square grows a wash of the text color from the start edge (`null`: a `Spinner` in place of the leading icon); a circle draws a ring along its inner edge in the glyph's color, always turning. Put the number in the label or the description («Скачивание 42%»); remove the prop when done and the fill or ring fades where it is. |
 | `holdToConfirm` | `boolean` | `false` | The action needs a held press: the fill runs for 1.2 s (a gesture clock, kept under reduced motion) and `onConfirm` fires at its end. Releasing, leaving or losing focus earlier rolls it back. Space and Enter hold too; the gesture is described to assistive tech by `labels.holdHint`. |
 | `onConfirm` | `() => void \| Promise<void>` | — | Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. Return the request's promise: the full fill stays and the button is `loading` until it settles; resolve — the fill fades; reject — the fill rolls back (say why with a notification). |
 | `labels` | `Partial<ButtonLabels>` | — | Built-in strings, see Labels. |
@@ -65,7 +68,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | The icon, e.g. `<Icon name="action.copy" />`; `Icon` without `size` takes the button tier. |
+| `children` | `ReactNode` | — (required) | The icon, e.g. `<Icon name="action.copy" />`; `Icon` without `size` takes the button tier. A new icon (another `name`) cross-fades in and plays its gesture once (`fast`). |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ## Variants
@@ -90,6 +93,8 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `ghost` + `inherit` | transparent, the host's text color, a `currentColor` wash on hover / press | close or icon action on a colored host (solid Banner, accent strip) | |
 | `soft` + `inherit` | `currentColor` wash fill, the host's text color | a labelled action on a colored host | |
 | `outline` + `inherit` | 1px inset line in a `currentColor` wash, the host's text color | an action with an edge on a colored host | |
+| `shade` (+ `accent` / `neutral` / `success`) | the media disk ground (`--prime-color-media-disk`, lighter than the pills' `media-shade`) under a gentle backdrop blur (`--prime-media-disk-blur`), so the frame shows through, and its light glyph (≥ 3:1 even over a white frame); the same in both themes and the same look as the still play mark of a video frame | a button over a picture, a video or a video circle (edit a cover, cancel an upload) | |
+| `shade` + `danger` | the danger fill, danger-fg glyph | a failed transfer over media: the retry | |
 
 `tone="inherit"` has no `solid` (the type requires `ghost`, `soft` or `outline`); its focus ring and disabled look also derive from the host's text color, so it reads on any host fill in both themes. Never recolor a Button from its host with a CSS override — use `inherit`.
 
@@ -105,6 +110,12 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `xl` | 48px, 16/24, padX 24, icon 20 | hero CTA, mobile footers | |
 
 A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedControl and Tabs of the same `size`. The icon side gets optical padding `padX − 4px` (never below 8px); icon→label gap is the tier gap.
+
+### shape
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `square` | the tier's radius; with only `Button.Icon`, a square | every labelled button, toolbar icon buttons | yes |
+| `circle` | a disk: width = the tier height, full radius; the focus ring, the touch area and the press (`press-scale-compact`, 0.96) follow the circle; `progress` draws a ring along the inner edge in the glyph's color | play / download / cancel / retry disks, a floating main action; only `Button.Icon` inside, `aria-label` required | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -123,13 +134,16 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | disabled | `disabled`, or a disabled `Fieldset` around it | native `disabled`, `data-disabled="true"`, `fill-muted` + `text-disabled`, `cursor: not-allowed`; ghost stays transparent |
 | loading | `loading` (native `<button>`) | `data-loading="true"`, native `disabled`, `aria-busy="true"`, colors kept (busy, not unavailable), no hover or press; a `Spinner` (`aria-hidden`) replaces the leading (or only) icon, otherwise it is centered over the hidden label (`data-loading-overlay="true"`) |
 | progress | `progress` (0…1) | `data-progress="true"`, `aria-busy="true"`, still pressable; a plate of the text color with the button's radius slides in from the start edge (`fast` · standard), so corners match at any value; removing the prop fades it where it is |
+| progress unknown (square) | `progress={null}` | `data-spinner="true"`, `aria-busy="true"`, still pressable; a `Spinner` takes the leading icon's place as with `loading` |
+| progress (circle) | `shape="circle"` + `progress` (0…1 or `null`) | `aria-busy="true"`, still pressable; the kit ring at the line weight along the inner edge, arc in the glyph's color over a 32% track, always turning (3 × `--prime-motion-loop` a turn, slower but never still under reduced motion; never under 8%; `null` a quarter arc); the share glides (`base`); removing the prop fades the ring where it is (`data-shown="false"`, its turn paused) |
+| glyph change | a new icon in `Button.Icon` (another `name`) | the old glyph shrinks to 0.6 and fades, the new one grows in (`fast`) and plays its gesture once; reduced motion swaps at once |
 | holding | `holdToConfirm` + a held pointer, `Space` or `Enter` | `data-hold="holding"`: the fill runs linearly for 1.2 s (kept under reduced motion — it is a gesture clock), then `onConfirm` and `data-hold="done"` (on release the fill fades in place, `data-hold="idle"`); releasing, leaving the button or losing focus earlier → `data-hold="cancel"`, the fill rolls back (`fast` · exit) |
 | confirming | `onConfirm` returned a pending promise | `data-hold="confirming"`: the full fill stays, the button is `loading` (spinner, `aria-busy`, disabled) even after the release; resolve → `data-hold="idle"`, the fill fades; reject → `data-hold="cancel"`, the fill rolls back |
 | label change | new text children | the old letters leave upward, the new ones rise from below one short step apart (`base` · emphasized, blur `--prime-motion-blur`) while the width glides; digits-only changes and reduced motion change in place |
 | pressed | `pressed` | `aria-pressed="true" \| "false"`; on adds `data-pressed="true"` and the selected fill (accent soft), which glides in and out with the color transition (`fast`) |
 | asChild disabled / loading | `asChild` + `disabled`/`loading` | `aria-disabled="true"`, `pointer-events: none`, click `preventDefault`; no native `disabled`, no automatic spinner |
 
-Other data attributes: `data-pressed`, `data-variant`, `data-tone`, `data-size`, `data-full-width`, `data-icon-only`, `data-leading-icon`, `data-trailing-icon`.
+Other data attributes: `data-pressed`, `data-variant`, `data-tone`, `data-size`, `data-shape`, `data-full-width`, `data-icon-only`, `data-leading-icon`, `data-trailing-icon`.
 
 ## Layout & spacing
 - Buttons in a row: `gap: var(--prime-space-2)`–`var(--prime-space-3)`; toolbar icon buttons `var(--prime-space-1)`.
@@ -147,6 +161,7 @@ Other data attributes: `data-pressed`, `data-variant`, `data-tone`, `data-size`,
 ### ARIA
 - Native `<button>`, `type="button"` by default, so it never submits a form by accident.
 - Icon-only buttons need `aria-label`; `Button.Icon` is `aria-hidden`.
+- `shape="circle"` requires `aria-label`; its `progress` ring is `aria-hidden` — the share goes in the label or in `aria-describedby` («Отменить отправку», described by «Отправка 45%»).
 - `loading` sets `aria-busy="true"` and blocks the press; `progress` sets `aria-busy` and keeps the button pressable.
 - `holdToConfirm` describes the gesture through `aria-describedby` (`labels.holdHint`); `Space` / `Enter` hold like a pointer.
 - A changed label is announced once: the animated letters are hidden, the name is the new text.
@@ -168,6 +183,8 @@ Other data attributes: `data-pressed`, `data-variant`, `data-tone`, `data-size`,
 | [states.tsx](examples/states.tsx) | Disabled and loading next to the default; the spinner keeps the width — `disabled`, `loading`. |
 | [with-icon.tsx](examples/with-icon.tsx) | An icon before or after the label, and a square icon-only button — `Button.Icon`, `aria-label`. |
 | [download.tsx](examples/download.tsx) | A long download inside the button: the fill shows how far it got, the label counts and then offers the file — `progress`. |
+| [circle.tsx](examples/circle.tsx) | Round icon buttons in every treatment, and a disk whose ring tracks an export it can cancel — `shape`, `variant`, `tone`, `progress`. |
+| [over-media.tsx](examples/over-media.tsx) | Buttons over a listing's cover stand on the media shade; a failed upload turns its disk danger — `variant`, `shape`, `tone`. |
 | [toggle.tsx](examples/toggle.tsx) | A toggle in a toolbar: the favourite mark turns the button on with the selected fill and back off — `pressed`. |
 | [hold-to-confirm.tsx](examples/hold-to-confirm.tsx) | A destructive action that needs a held press; letting go early rolls the fill back and does nothing, and the delete request keeps the button loading until the server answers — `holdToConfirm`, `onConfirm`. |
 | [label-morph.tsx](examples/label-morph.tsx) | A new label flows into the button letter by letter while the width glides: save, then saved; a step flow that turns green once paid — `children`, `loading`, `tone`. |
@@ -184,8 +201,10 @@ Other data attributes: `data-pressed`, `data-variant`, `data-tone`, `data-size`,
 - `<a>` inside `<Button.Root>` → use `asChild` so there is one interactive element.
 - Submit button without `type="submit"` → the default is `"button"` and will not submit.
 - A destructive `holdToConfirm` action in `onClick` → it fires on any click; put it in `onConfirm`.
+- A round disk drawn by hand (`border-radius: 50%` on a `<button>`, an own ring around it) → `shape="circle"`, with `progress` for the ring.
+- A disk over media recolored with a dark CSS fill → `variant="shade"`.
 - Rebuilding a progress label with a new word every tick («Загрузка…» / «Скачивание…») → keep the words, change only the number; digits update in place, words morph.
 
 ## Related
-- **Built from:** [Spinner](../spinner/COMPONENT.md)
-- **See also:** [ButtonGroup](../button-group/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md)
+- **Built from:** [Spinner](../spinner/COMPONENT.md), `internal/ring` (the circle's progress ring), `internal/glyphSwap` (the icon cross-fade), `internal/MorphText` (the label morph)
+- **See also:** [ButtonGroup](../button-group/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md)

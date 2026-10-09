@@ -42,6 +42,12 @@ export const page: ComponentPageConfig = {
       description: "В центре процент, счёт по своей шкале или иконка — `children`, `max`.",
     },
     {
+      scenario: "under-way",
+      title: "Доля неизвестна и вращение",
+      description:
+        "Импорт, доля которого ещё неизвестна, крутит четверть дуги, потом заполняется и меняет иконку; синхронизация вращается, пока её доля растёт — `value`, `spin`, `children`.",
+    },
+    {
       scenario: "segments",
       title: "Сегменты",
       description:
@@ -58,7 +64,8 @@ export const page: ComponentPageConfig = {
   accessibility: {
     keyboard: [],
     aria: [
-      'Режим значения: svg с `role="progressbar"` и `aria-valuenow` / `-min` / `-max`; строка или число в центре — `aria-valuetext`.',
+      'Режим значения: svg с `role="progressbar"` и `aria-valuenow` / `-min` / `-max`; строка или число в центре — `aria-valuetext`. С `value={null}` `aria-valuenow` нет — доля неизвестна.',
+      "Вращение не останавливается и при reduced motion (оборот вдвое медленнее): это единственный знак, что работа идёт.",
       'Режим сегментов: svg с `role="group"`; с `aria-label` доли — описание (с `legend` — сама легенда), без него доли — имя.',
       "Цвет категории всегда стоит рядом с её названием в легенде — смысл не передаётся только цветом.",
       "Во время `loading` корень помечен `aria-busy`, заглушки скрыты от скринридеров.",

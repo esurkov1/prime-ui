@@ -1,9 +1,11 @@
 /** A shared contact: initials or a photo, name and phone, with the actions to write or save — `Message.Contact`, `phone`. */
 import { Button, Message } from "prime-ui-kit";
 
+import styles from "./examples.module.css";
+
 export default function MessageContactExample() {
   return (
-    <Message.Group aria-label="Переписка с менеджером">
+    <div className={styles.thread}>
       <Message.Root direction="incoming" time="11:20">
         <Message.Text>Вот контакт бухгалтера, она пришлёт акты.</Message.Text>
       </Message.Root>
@@ -17,6 +19,6 @@ export default function MessageContactExample() {
           </Button.Root>
         </Message.Contact>
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

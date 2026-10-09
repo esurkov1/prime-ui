@@ -1,0 +1,387 @@
+/*
+ * MediaViewer: a full-screen dark island. The backdrop and the slides are moved by the engine
+ * (inline `transform` / `opacity`, once per frame); everything here is the static frame and the
+ * chrome, which fades and drifts aside together (`data-chrome`).
+ */
+
+.root {
+  --viewer-inset: var(--prime-media-viewer-inset);
+  --viewer-top: calc(env(safe-area-inset-top, 0px) + var(--viewer-inset));
+  --viewer-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--viewer-inset));
+  --viewer-start: calc(env(safe-area-inset-left, 0px) + var(--viewer-inset));
+  --viewer-end: calc(env(safe-area-inset-right, 0px) + var(--viewer-inset));
+  /* The filmstrip's height: its thumbnails (Thumbnail `l`) and the gap above them. */
+  --viewer-strip: 0px;
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--prime-z-overlay);
+  overflow: hidden;
+  color: var(--prime-color-media-shade-fg);
+  outline: none;
+  /* Paging sideways must not swipe the browser back, nor bounce the page under the viewer. */
+  overscroll-behavior: contain;
+}
+
+.root[data-thumbnails] {
+  --viewer-strip: calc(var(--prime-thumbnail-l-height) + var(--viewer-inset));
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--prime-color-media-stage);
+  opacity: 0;
+}
+
+/* ─── Stage and pages ────────────────────────────────────────────────────── */
+
+.stage {
+  position: absolute;
+  inset: 0;
+  outline: none;
+  /* Every touch is the viewer's: pinch, pan and swipes; no text selection or callout. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.zoom {
+  position: absolute;
+  inset-block-start: calc(50% - var(--viewer-box-height) / 2);
+  inset-inline-start: calc(50% - var(--viewer-box-width) / 2);
+  inline-size: var(--viewer-box-width);
+  block-size: var(--viewer-box-height);
+  transform-origin: center;
+}
+
+.media,
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+/* The full picture fades in over its thumbnail (or over nothing) once it has decoded. */
+img.media {
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+img.media[data-loaded] {
+  opacity: 1;
+}
+
+/* The small copy is stretched to the box: soft until the full picture arrives. */
+.placeholder {
+  filter: blur(var(--prime-space-2));
+  transform: scale(1.02);
+}
+
+/* A playing video with the view cleared hides the pointer too, as a player does; a move brings
+   both back. */
+.root[data-playing][data-chrome="hidden"] .stage {
+  cursor: none;
+}
+
+.root[data-zoomed] .slide[data-current] .zoom {
+  cursor: grab;
+}
+
+.root[data-gesture="pan"] .slide[data-current] .zoom {
+  cursor: grabbing;
+}
+
+@media (hover: hover) {
+  .root:not([data-zoomed]) .slide[data-current][data-status="loaded"] img.media {
+    cursor: zoom-in;
+  }
+}
+
+/* ─── Centre: a play disk, a spinner, an error ───────────────────────────── */
+
+.center {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-3);
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* During the flight only the picture moves: the play disk comes after it lands, goes before it
+   takes off. */
+.root:not([data-phase="open"]) .center {
+  opacity: 0;
+  transition-duration: var(--prime-motion-duration-xfast);
+}
+
+.center[data-hidden] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.error {
+  --prime-icon-size: var(--prime-icon-xl);
+
+  padding: var(--prime-space-4);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-media-pill);
+  color: var(--prime-color-media-pill-fg);
+  text-align: center;
+}
+
+.errorText {
+  composes: bodyS from "../../internal/textRole.module.css";
+
+  margin: 0;
+  color: var(--prime-color-media-shade-fg);
+}
+
+/* ─── Chrome ─────────────────────────────────────────────────────────────── */
+
+.top,
+.nav,
+.bottom,
+.strip {
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    translate var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+/* Hidden chrome steps aside (fades and drifts toward its edge) and takes no presses. */
+.root[data-chrome="hidden"] .top,
+.root[data-chrome="hidden"] .nav,
+.root[data-chrome="hidden"] .bottom,
+.root[data-chrome="hidden"] .strip {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.root[data-chrome="hidden"] .top {
+  translate: 0 calc(-1 * var(--prime-space-2));
+}
+
+.root[data-chrome="hidden"] .bottom,
+.root[data-chrome="hidden"] .strip {
+  translate: 0 var(--prime-space-2);
+}
+
+/* A closing viewer drops its chrome at once: only the picture flies back. */
+.root[data-state="closed"] .top,
+.root[data-state="closed"] .nav,
+.root[data-state="closed"] .bottom,
+.root[data-state="closed"] .strip {
+  transition-duration: var(--prime-motion-duration-xfast);
+}
+
+.top {
+  position: absolute;
+  inset-block-start: var(--viewer-top);
+  inset-inline: var(--viewer-start) var(--viewer-end);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-2);
+  pointer-events: none;
+}
+
+.top > * {
+  pointer-events: auto;
+}
+
+/* Joined with the media pill in TSX; two classes so its size wins over the pill's. */
+.top .counter {
+  min-block-size: var(--prime-control-s-height);
+  padding-inline: var(--prime-space-3);
+  font-size: var(--prime-text-body-s-size);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  margin-inline-start: auto;
+}
+
+.nav {
+  position: absolute;
+  inset-block-start: 50%;
+  margin-block-start: calc(-1 * var(--prime-control-m-height) / 2);
+}
+
+.previous {
+  inset-inline-start: var(--viewer-start);
+}
+
+.next {
+  inset-inline-end: var(--viewer-end);
+}
+
+/* Arrows are for a pointer that hovers; a finger swipes. */
+@media (hover: none) {
+  .nav {
+    display: none;
+  }
+}
+
+.bottom {
+  position: absolute;
+  inset-block-end: calc(var(--viewer-bottom) + var(--viewer-strip));
+  inset-inline: var(--viewer-start) var(--viewer-end);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-2);
+  pointer-events: none;
+}
+
+.bottom > * {
+  pointer-events: auto;
+}
+
+.caption {
+  composes: bodyS from "../../internal/textRole.module.css";
+
+  max-inline-size: min(40rem, 100%);
+  margin: 0;
+  padding: var(--prime-space-2) var(--prime-space-3);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-media-pill);
+  color: var(--prime-color-media-shade-fg);
+  text-align: center;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(var(--prime-space-2));
+  backdrop-filter: blur(var(--prime-space-2));
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  inline-size: min(40rem, 100%);
+  padding: var(--prime-space-1);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-media-pill);
+  -webkit-backdrop-filter: blur(var(--prime-space-2));
+  backdrop-filter: blur(var(--prime-space-2));
+}
+
+/* Play · time · seek · length · sound · level, as a native player's bar. */
+.time {
+  flex: none;
+  min-inline-size: 4ch;
+  text-align: center;
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-color-media-pill-fg);
+}
+
+/* Two classes: a Slider's own root takes the full width, the bar shares it out. */
+.controls .seek {
+  flex: 1;
+  inline-size: auto;
+  min-inline-size: 0;
+}
+
+/*
+ * The sound button and its level: an upright Slider in a small panel above the button. It rises a
+ * step and fades in; closed, it is out of the tab order (`visibility`, switched after the fade).
+ */
+.sound {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+
+.level {
+  position: absolute;
+  inset-block-end: calc(100% + var(--prime-space-2));
+  inset-inline-start: 50%;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  /* As wide as the sound button under it: one column. */
+  min-inline-size: var(--prime-control-s-height);
+  padding: var(--prime-space-3) var(--prime-space-2);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-media-pill);
+  -webkit-backdrop-filter: blur(var(--prime-space-2));
+  backdrop-filter: blur(var(--prime-space-2));
+  opacity: 0;
+  visibility: hidden;
+  translate: -50% var(--prime-space-1);
+  scale: 0.96;
+  transform-origin: bottom center;
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    translate var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
+    visibility 0s linear var(--prime-motion-duration-fast);
+}
+
+/* The gap between the panel and the button belongs to the panel: the pointer crosses it. */
+.level::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 100%;
+  block-size: var(--prime-space-2);
+}
+
+.sound[data-open] .level {
+  opacity: 1;
+  visibility: visible;
+  translate: -50% 0;
+  scale: 1;
+  transition-delay: 0s;
+}
+
+/* ─── Filmstrip ──────────────────────────────────────────────────────────── */
+
+.strip {
+  position: absolute;
+  inset-block-end: var(--viewer-bottom);
+  inset-inline: 0;
+}
+
+.stripScroll {
+  inline-size: 100%;
+}
+
+/* A row as long as every thumbnail; only those in view are mounted, each at its own place. */
+.stripRow {
+  position: relative;
+  block-size: calc(var(--prime-thumbnail-l-height) + 2 * var(--prime-space-1));
+}
+
+/*
+ * The emphasis is driven on every frame from where the page is (`--thumb-focus`, 0…1), so it flows
+ * from one thumbnail to the next with the swipe: no transition of its own, nothing to catch up.
+ */
+.thumb {
+  position: absolute;
+  inset-block-start: var(--prime-space-1);
+  opacity: calc(0.45 + 0.55 * var(--thumb-focus, 0));
+  scale: calc(0.86 + 0.14 * var(--thumb-focus, 0));
+}
+
+.thumb:focus-visible {
+  opacity: 1;
+}

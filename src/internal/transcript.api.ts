@@ -25,8 +25,8 @@ export function transcriptProps(where: { en: string; ru: string }): ApiProp[] {
       name: "defaultTranscriptExpanded",
       type: "boolean",
       default: "false",
-      en: "Initially open (uncontrolled). Inside a `Message.Group` the open state and a resolved text outlive a windowed row: scrolled away and back, it is still open.",
-      ru: "Изначально открыта (неуправляемо). Внутри `Message.Group` открытое состояние и полученный текст переживают окно отрисовки: строка, ушедшая из вида и вернувшаяся, остаётся открытой.",
+      en: "Initially open (uncontrolled). Inside a chat's list (`Chat.Messages`) the open state and a resolved text outlive a windowed row: scrolled away and back, it is still open.",
+      ru: "Изначально открыта (неуправляемо). В ленте чата (`Chat.Messages`) открытое состояние и полученный текст переживают окно отрисовки: строка, ушедшая из вида и вернувшаяся, остаётся открытой.",
     },
     {
       name: "onTranscriptExpandedChange",

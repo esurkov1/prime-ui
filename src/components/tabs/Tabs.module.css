@@ -182,7 +182,14 @@
   gap: var(--prime-space-1);
   padding-block: var(--tabs-rise);
   padding-inline-start: var(--tabs-rise);
-  overflow: visible;
+}
+
+/* A wide column does not scroll: the folder reaches past the list's edge. Narrow, the column
+   turns into a row and scrolls as the ScrollContainer it is (see below). */
+@container not (max-width: 37.5rem) {
+  .root[data-orientation="vertical"] .list {
+    overflow: visible;
+  }
 }
 
 /* ---------- Indicator ---------- */
@@ -696,7 +703,6 @@
   .root[data-orientation="vertical"] .list {
     flex-direction: row;
     padding: var(--tabs-rise) 0 0;
-    overflow-x: auto;
   }
 
   .root[data-orientation="vertical"] .item {

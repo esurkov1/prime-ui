@@ -41,6 +41,18 @@ export const page: ComponentPageConfig = {
         "Долгое скачивание внутри кнопки: заливка показывает прогресс, подпись считает проценты и предлагает открыть файл — `progress`.",
     },
     {
+      scenario: "circle",
+      title: "Круглая",
+      description:
+        "Круглые кнопки-иконки во всех подачах и диск, кольцо которого показывает выгрузку и который её отменяет — `shape`, `variant`, `tone`, `progress`.",
+    },
+    {
+      scenario: "over-media",
+      title: "Поверх медиа",
+      description:
+        "Кнопки поверх обложки стоят на тени медиа; сорвавшаяся загрузка окрашивает диск в danger — `variant`, `shape`, `tone`.",
+    },
+    {
       scenario: "toggle",
       title: "Переключатель",
       description:
@@ -94,6 +106,7 @@ export const page: ComponentPageConfig = {
       'Нативный `<button type="button">`: случайно не отправит форму.',
       "Кнопке только с иконкой нужен `aria-label`; `Button.Icon` скрыт (`aria-hidden`).",
       '`loading` ставит `aria-busy="true"` и блокирует нажатие; `progress` тоже ставит `aria-busy`, но кнопка остаётся нажимаемой.',
+      '`shape="circle"` требует `aria-label`; кольцо `progress` скрыто (`aria-hidden`), долю называет подпись или `aria-describedby`.',
       "`holdToConfirm`: жест описан скринридеру через `aria-describedby` («Удерживайте, чтобы подтвердить»); Пробел и Enter удерживаются как указатель.",
       "Смена подписи читается один раз: буквы анимации скрыты, имя кнопки — новый текст целиком.",
       'С `asChild` неактивное состояние — `aria-disabled="true"` без нативного `disabled`.',

@@ -79,7 +79,6 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-24) * 2)), 1fr));
   gap: var(--prime-space-4);
   min-height: 0;
-  overflow: auto;
 }
 
 .column {

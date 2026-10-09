@@ -137,8 +137,8 @@ export const api: ComponentApi = {
     },
     {
       name: "BottomNav.Action",
-      en: '`ref` → `HTMLButtonElement`. A round `<button type="button">` beside the bar for the screen\'s main action (create, search, assistant): a soft disk at the edge of a flat bar, a glass disk as tall as the capsule when `floating`. Placed before the first item it stands at the start, otherwise at the end.',
-      ru: "Круглая кнопка рядом с полосой для главного действия экрана (создать, поиск, ассистент): мягкий круг у края плоской полосы, стеклянный круг высотой с капсулу при `floating`. Перед первым пунктом встаёт в начале, иначе в конце.",
+      en: '`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral solid) beside the bar for the screen\'s main action (create, search, assistant): a muted disk at the edge of a flat bar, a glass disk as tall as the capsule when `floating`. Placed before the first item it stands at the start, otherwise at the end.',
+      ru: 'Круглая Button (`shape="circle"`, `l`, нейтральная заливка) рядом с полосой для главного действия экрана (создать, поиск, ассистент): приглушённый круг у края плоской полосы, стеклянный круг высотой с капсулу при `floating`. Перед первым пунктом встаёт в начале, иначе в конце.',
       props: [
         {
           name: "aria-label",

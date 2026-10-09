@@ -2,6 +2,8 @@
 import { Message, type MessageStatus } from "prime-ui-kit";
 import * as React from "react";
 
+import styles from "./examples.module.css";
+
 const STEPS: MessageStatus[] = ["sending", "sent", "read"];
 
 export default function MessageStatusExample() {
@@ -25,7 +27,7 @@ export default function MessageStatusExample() {
     });
 
   return (
-    <Message.Group aria-label="Статусы доставки">
+    <div className={styles.thread}>
       <Message.Root direction="outgoing" position="first" time="14:20" status={STEPS[step]}>
         <Message.Text>Акт сверки за сентябрь во вложении.</Message.Text>
       </Message.Root>
@@ -38,6 +40,6 @@ export default function MessageStatusExample() {
       >
         <Message.Text>Подпишите, пожалуйста, до пятницы.</Message.Text>
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

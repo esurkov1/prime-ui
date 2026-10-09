@@ -16,3 +16,9 @@
   gap: var(--prime-space-4);
   width: min(100%, var(--prime-modal-width-s));
 }
+
+/* orientation.tsx: upright sliders side by side, a mixer row. */
+.levels {
+  display: flex;
+  gap: var(--prime-space-8);
+}

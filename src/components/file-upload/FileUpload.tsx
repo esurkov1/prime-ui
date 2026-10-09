@@ -29,6 +29,7 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { extensionOf, formatColor } from "@/internal/fileFormat";
+import { splitFileName } from "@/internal/fileName";
 import { formatFileSize } from "@/internal/fileSize";
 import { formatLabel } from "@/internal/formatLabel";
 import { leaveInPlace } from "@/internal/leaveInPlace";
@@ -801,7 +802,8 @@ function FileSetView({
             id={file.id}
             kind={kind}
             src={src}
-            name={file.name}
+            name={splitFileName(file.name).base}
+            nameTitle={file.name}
             // A video shows its duration where a size would stand.
             meta={kind === "video" || file.size === undefined ? undefined : formatSize(file.size)}
             badge={
@@ -902,6 +904,7 @@ function FileRow({
   const format = extensionOf(file.name);
   const src = upload?.preview || file.src;
   const status = upload?.status;
+  const picture = src && kindOf(file, src) === "image" ? src : undefined;
   const state = stateOf(upload, labels);
   const parts = [file.size === undefined ? null : formatSize(file.size), state].filter(
     (part): part is string => part !== null,
@@ -915,12 +918,15 @@ function FileRow({
     >
       <FileUploadItem invalid={status === "failed"} data-status={status}>
         {/* A video's preview is a clip, not a picture: it keeps the format badge. */}
-        {src && kindOf(file, src) === "image" ? (
-          <FileUploadItemPreview src={src} />
+        {picture ? (
+          <FileUploadItemPreview src={picture} />
         ) : (
           <FileUploadFormatBadge format={format || "—"} color={formatColor(format)} />
         )}
-        <FileUploadItemName>{file.name}</FileUploadItemName>
+        <FileUploadItemName title={file.name}>
+          {/* The extension stands in the badge; a picture row has none, so it keeps it. */}
+          {picture ? file.name : splitFileName(file.name).base}
+        </FileUploadItemName>
         {parts.length > 0 ? (
           <FileUploadItemDescription>
             {/* One text, so a change of status morphs and a new percentage changes in place. */}

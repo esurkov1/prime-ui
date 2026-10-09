@@ -3,8 +3,8 @@
  * fixed width: the card width of a message, within 75% of the row.
  *
  * The tile is the file's one action, in one spot over the tile's face:
- *   download — an accent disk with the arrow (`internal/roundButton`), shown on hover and focus
- *              (always on touch);
+ *   download — the link as an accent `Button shape="circle"` (`xl`, the tile's size) with the
+ *              arrow, shown on hover and focus (always on touch);
  *   cancel   — while the file transfers, either way: the shared transfer disk
  *              (`internal/transferDisk`, `xl`) — the cross on the media shade with the progress
  *              ring along its edge, always shown;
@@ -76,20 +76,17 @@
   border-radius: 0;
 }
 
-/* The download covers the tile: its disk is the tile, so its hover, press and focus are the circle. */
+/* The download covers the tile (the `xl` circle is the tile's size): its hover, press and focus
+   are the circle's. It adds a fade to the Button's own transitions. */
 .tile > .action {
   position: absolute;
   z-index: 1;
   inset: 0;
-  --round-size: 100%;
-  --prime-icon-size: var(--prime-icon-m);
-
-  inline-size: 100%;
-  block-size: 100%;
   opacity: 0;
   transition:
     opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 

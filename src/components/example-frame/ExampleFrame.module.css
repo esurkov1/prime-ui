@@ -80,35 +80,6 @@
   width: fit-content;
 }
 
-/*
- * Copy feedback stays on the button: copy ↔ check cross-fade in place with scale 0.96 → 1 and a
- * 2px blur that bridges the two glyphs. The check returns to copy after 2 s (ExampleFrame.tsx).
- */
-.copyIcon {
-  display: grid;
-}
-
-.copyIcon > svg {
-  grid-area: 1 / 1;
-  transition:
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
-    filter var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
-}
-
-.copyIcon > [data-glyph="check"],
-.copyIcon[data-copy-state="copied"] > [data-glyph="copy"] {
-  opacity: 0;
-  transform: scale(var(--prime-motion-press-scale-compact));
-  filter: blur(calc(var(--prime-space-1) / 2));
-}
-
-.copyIcon[data-copy-state="copied"] > [data-glyph="check"] {
-  opacity: 1;
-  transform: none;
-  filter: none;
-}
-
 /* Let the segment groups shrink below their content so the toolbar can wrap. */
 .toolbar .toolbarPaneSegment,
 .toolbar .toolbarViewportSegment {
@@ -344,7 +315,6 @@
   max-height: min(calc(var(--prime-space-16) * 8), 70vh);
   margin: 0;
   padding: var(--prime-space-4);
-  overflow: auto;
   border-radius: var(--prime-radius-l);
   background: var(--prime-color-layer-current);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);

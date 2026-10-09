@@ -17,8 +17,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Content in the center (number, percent, `Icon`). Not rendered on `xs` / `s`; a string or number stays available as `aria-valuetext`.",
-          ru: "Содержимое в центре (число, процент, `Icon`). Не рендерится на `xs` / `s`; строка или число остаются в `aria-valuetext`.",
+          en: "Content in the center (number, percent, `Icon`). Not rendered on `xs`; text only from `m`, an icon from `s`. A new icon (another `name`) cross-fades in and plays its gesture once (`fast`); a changing number updates in place. A string or number stays available as `aria-valuetext`.",
+          ru: "Содержимое в центре (число, процент, `Icon`). Не рендерится на `xs`; текст — от `m`, иконка — от `s`. Новая иконка (другой `name`) перетекает на место старой и один раз играет свой жест (`fast`); меняющееся число обновляется на месте. Строка или число остаются в `aria-valuetext`.",
         },
         {
           name: "aria-label",
@@ -43,15 +43,22 @@ export const api: ComponentApi = {
     },
     {
       name: "ProgressCircle · value mode",
-      en: 'The svg is `role="progressbar"`: a track and one round-capped arc.',
-      ru: 'Svg с `role="progressbar"`: дорожка и одна дуга со скруглёнными концами.',
+      en: 'The svg is `role="progressbar"`: a track and one round-capped arc from 12 o\'clock.',
+      ru: 'Svg с `role="progressbar"`: дорожка и одна дуга со скруглёнными концами от 12 часов.',
       props: [
         {
           name: "value",
-          type: "number",
+          type: "number | null",
           required: true,
-          en: "The current value, clamped to `0…max`.",
-          ru: "Текущее значение, ограничено `0…max`.",
+          en: "The current value, clamped to `0…max`; it glides to a new value (`base`). `null` — under way, the share unknown: a quarter arc that always turns, no `aria-valuenow`.",
+          ru: "Текущее значение, ограничено `0…max`; к новому значению дуга скользит (`base`). `null` — идёт, доля неизвестна: дуга в четверть круга всегда вращается, `aria-valuenow` нет.",
+        },
+        {
+          name: "spin",
+          type: "boolean",
+          default: "false",
+          en: "The ring turns at any share (one turn = 3 × `--prime-motion-loop`; slower under reduced motion, never still) and the arc never drops under 8%: a sync whose share grows. `null` always turns.",
+          ru: "Кольцо вращается при любой доле (оборот = 3 × `--prime-motion-loop`; при reduced motion медленнее, но не останавливается), дуга не короче 8 %: синхронизация, у которой доля растёт. `null` вращается всегда.",
         },
         {
           name: "max",
@@ -62,10 +69,10 @@ export const api: ComponentApi = {
         },
         {
           name: "tone",
-          type: '"neutral" | "accent" | "success" | "warning" | "danger" | "info"',
+          type: '"neutral" | "accent" | "success" | "warning" | "danger" | "info" | "inherit"',
           default: '"accent"',
-          en: "Arc color, telling the outcome.",
-          ru: "Цвет дуги, показывает исход.",
+          en: "Arc color, telling the outcome. `inherit` — the arc in the host's text color over a 32% track of it, for a ring on a colored host or over media.",
+          ru: "Цвет дуги, показывает исход. `inherit` — дуга цветом текста подложки на дорожке из 32 % этого цвета: кольцо на цветном фоне или поверх медиа.",
         },
       ],
     },

@@ -75,6 +75,7 @@ function AppShellMain({ contentWidth = "full", className, children, ...rest }: A
       {...rest}
       as="main"
       axis="vertical"
+      edges="none"
       overscrollBehavior="contain"
       className={cx(styles.main, className)}
       data-content-width={contentWidth}

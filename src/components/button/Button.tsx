@@ -4,8 +4,10 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import { GlyphSwap } from "@/internal/glyphSwap";
 import { iconLayout } from "@/internal/iconLayout";
 import { MorphText } from "@/internal/MorphText";
+import { Ring } from "@/internal/ring";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone, Variant } from "@/internal/states";
 import { touchTargetClass } from "@/internal/touchTarget";
@@ -21,8 +23,12 @@ import styles from "./Button.module.css";
  */
 type ButtonColorProps =
   | {
-      /** Visual treatment. Default `solid`. */
-      variant?: Variant;
+      /**
+       * Visual treatment. Default `solid`. `shade` — the media shade with a blur and its light
+       * glyph, for a button that stands over a picture, a video or a video circle; with
+       * `tone="danger"` it turns the danger disk (a failed transfer).
+       */
+      variant?: Variant | "shade";
       /**
        * Semantic color. Default `accent`; `danger` for destructive actions; `success` for an action
        * that is done («Оплачено»).
@@ -33,6 +39,24 @@ type ButtonColorProps =
       variant: Exclude<Variant, "solid">;
       /** Takes the host's text color; for actions placed on a colored host. */
       tone: "inherit";
+    };
+
+/**
+ * `circle` is a disk with an icon only: its name is the `aria-label` (a visible label has no room).
+ */
+type ButtonShapeProps =
+  | {
+      /**
+       * Outline. Default `square` (the tier's radius). `circle` — a disk with only a `Button.Icon`:
+       * as wide as it is tall, full radius, the same tiers, tones and variants; its focus ring,
+       * touch area and press (`press-scale-compact`) follow the circle.
+       */
+      shape?: "square";
+    }
+  | {
+      shape: "circle";
+      /** A circle has no visible label: it is named here. */
+      "aria-label": string;
     };
 
 export type ButtonLabels = {
@@ -52,7 +76,8 @@ export type ButtonRootProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "size" | "aria-pressed"
 > &
-  ButtonColorProps & {
+  ButtonColorProps &
+  ButtonShapeProps & {
     /** Tier. Default: the tier of the surrounding control (a form, a panel, a field), else `m`. */
     size?: ControlSize;
     fullWidth?: boolean;
@@ -63,10 +88,13 @@ export type ButtonRootProps = Omit<
      */
     pressed?: boolean;
     /**
-     * Progress of a long action started by this button, `0…1`: a fill grows inside the button and
-     * `aria-busy` is set. The label carries the number («Скачивание 42%»). Remove it when done.
+     * Progress of a long action started by this button, `0…1`; `null` — under way, the share
+     * unknown. The button stays pressable (a cancel) and is `aria-busy`. On a square a fill grows
+     * inside it (`null`: a spinner takes the leading icon's place); on a circle a ring runs along
+     * its inner edge in the glyph's color and always turns. The label or description carries the
+     * number («Скачивание 42%»). Remove it when done: the fill or the ring fades where it is.
      */
-    progress?: number;
+    progress?: number | null;
     /**
      * The action needs a held press: the fill runs for 1.2 s and `onConfirm` fires at its end.
      * Releasing earlier rolls the fill back and does nothing. Space and Enter hold too.
@@ -154,6 +182,7 @@ function ButtonRoot({
   className,
   variant = "solid",
   tone = "accent",
+  shape = "square",
   size: sizeProp,
   fullWidth,
   type = "button",
@@ -177,13 +206,20 @@ function ButtonRoot({
   const loading = loadingProp || hold.phase === "confirming";
   const isDisabled = disabled || loading;
   const hintId = React.useId();
+  const circle = shape === "circle";
   const inProgress = progress !== undefined;
-  // The fill stays mounted once used, so its exit (fade and roll back) can play.
+  // A square with no share known marks the action with a spinner, like `loading`, yet stays pressable.
+  const spinner = loading || (progress === null && !circle);
+  // The fill (square) or the ring (circle) stays mounted once used, so its exit can play: the
+  // ring fades at the last share it drew.
   const [fillUsed, setFillUsed] = React.useState(false);
-  if ((inProgress || holdToConfirm) && !fillUsed) setFillUsed(true);
+  if (((inProgress && !circle) || holdToConfirm) && !fillUsed) setFillUsed(true);
+  const [ringShare, setRingShare] = React.useState<number | null | undefined>(undefined);
+  if (circle && inProgress && progress !== ringShare) setRingShare(progress);
   const dataAttrs = toDataAttributes({
     variant,
     tone,
+    shape: circle ? "circle" : undefined,
     size,
     // `disabled` only: a loading button is busy, not unavailable, and keeps its colors.
     disabled: disabled || undefined,
@@ -193,10 +229,11 @@ function ButtonRoot({
     "icon-only": layout.iconOnly || undefined,
     "leading-icon": layout.leadingIcon || undefined,
     "trailing-icon": layout.trailingIcon || undefined,
+    spinner: (spinner && !asChild) || undefined,
     // Without a leading icon the spinner is centered over the hidden label: width stays put.
     "loading-overlay":
-      (loading && !asChild && !layout.leadingIcon && !layout.iconOnly) || undefined,
-    progress: inProgress || undefined,
+      (spinner && !asChild && !layout.leadingIcon && !layout.iconOnly) || undefined,
+    progress: (inProgress && progress !== null && !circle) || undefined,
     hold: holdToConfirm ? hold.phase : undefined,
   });
   const classes = cx(fieldTierClass, touchTargetClass, styles.root, className);
@@ -280,15 +317,18 @@ function ButtonRoot({
       type={type}
       className={classes}
       disabled={isDisabled}
-      aria-busy={loading || inProgress || undefined}
+      aria-busy={loading || inProgress || rest["aria-busy"] || undefined}
       aria-pressed={pressed}
       aria-describedby={describedBy}
       onClick={onClick}
       style={
-        inProgress || holdToConfirm
+        (inProgress && !circle) || holdToConfirm
           ? ({
               ...rest.style,
-              "--btn-progress": inProgress ? Math.min(1, Math.max(0, progress)) : undefined,
+              "--btn-progress":
+                inProgress && progress !== null && !circle
+                  ? Math.min(1, Math.max(0, progress))
+                  : undefined,
               "--btn-hold-duration": holdToConfirm ? `${HOLD_MS}ms` : undefined,
             } as React.CSSProperties)
           : rest.style
@@ -300,8 +340,16 @@ function ButtonRoot({
           <span className={styles.fill} />
         </span>
       ) : null}
+      {ringShare !== undefined ? (
+        <Ring
+          value={ringShare}
+          spin
+          className={styles.ring}
+          data-shown={inProgress ? "true" : "false"}
+        />
+      ) : null}
       <ControlSizeProvider value={size}>
-        {loading ? <Spinner className={styles.spinner} aria-hidden="true" /> : null}
+        {spinner ? <Spinner className={styles.spinner} aria-hidden="true" /> : null}
         {morphLabels(children)}
       </ControlSizeProvider>
     </button>
@@ -324,10 +372,11 @@ export type ButtonIconProps = {
   ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
+/** The glyph of a button; a changed glyph (another icon `name`) cross-fades into the new one. */
 function ButtonIcon({ children, className, ...rest }: ButtonIconProps) {
   return (
     <span className={cx(styles.icon, className)} aria-hidden="true" {...rest}>
-      {children}
+      <GlyphSwap layerClassName={styles.glyph}>{children}</GlyphSwap>
     </span>
   );
 }

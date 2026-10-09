@@ -1,45 +1,75 @@
 import * as React from "react";
 
-export type EdgeOverflow = { start: boolean; end: boolean };
+import { readCssLengthPx } from "@/hooks/usePosition";
 
-const NONE: EdgeOverflow = { start: false, end: false };
+/** The axes a region scrolls along: only those are measured. */
+export type EdgeOverflowAxis = "vertical" | "horizontal" | "both";
 
 /**
- * Tracks whether a scroll region hides content before / after its visible part along one axis
- * (`ScrollContainer` `fade`, the DataTable edge cue). Measured at most once per frame on scroll,
- * on resize of the region or any child, and when children are added. RTL-aware: the start is the
- * inline start of the region.
+ * Edges of a scroll region that hide content: `start` / `end` along the inline axis (logical,
+ * RTL-aware), `top` / `bottom` along the block axis.
+ */
+export type EdgeOverflow = { start: boolean; end: boolean; top: boolean; bottom: boolean };
+
+const NONE: EdgeOverflow = { start: false, end: false, top: false, bottom: false };
+
+const same = (a: EdgeOverflow, b: EdgeOverflow) =>
+  a.start === b.start && a.end === b.end && a.top === b.top && a.bottom === b.bottom;
+
+/**
+ * Tracks which edges of a scroll region hide content (`ScrollContainer` `edges="fade"`, the
+ * DataTable and Gantt edge shadows). Measured at most once per frame on scroll, on resize of the
+ * region or any child, and when children are added; `null` measures nothing.
  *
  * With `depth` it also writes how far the hidden content reaches on each side to the region itself
- * (`--edge-start` / `--edge-end`, px), so a fade can be as deep as that distance at most: it grows
- * as the region scrolls away from an edge and melts as it comes back, instead of switching. Only a
- * reader of those values asks for them: a custom property written on every scroll frame costs a
- * style pass on the region (a whole table without the non-inherited `@property` registration).
+ * (`--edge-top` / `--edge-bottom` / `--edge-start` / `--edge-end`, px), so a fade is as deep as
+ * that distance at most: it grows as the region scrolls away from an edge and melts as it comes
+ * back. A distance is written capped at `--prime-space-8` (the deepest fade) and only when it
+ * changes, so away from the edges a scroll frame writes nothing and restyles nothing.
  */
 export function useEdgeOverflow(
   ref: React.RefObject<HTMLElement | null>,
-  enabled: boolean,
-  horizontal: boolean,
+  axis: EdgeOverflowAxis | null,
   depth = false,
 ): EdgeOverflow {
   const [overflow, setOverflow] = React.useState<EdgeOverflow>(NONE);
 
   React.useLayoutEffect(() => {
     const node = ref.current;
-    if (!enabled || !node) return;
+    if (!axis || !node) return;
+    const inline = axis !== "vertical";
+    const block = axis !== "horizontal";
+    const cap = depth ? readCssLengthPx("--prime-space-8", 32) : 0;
+    const written = new Map<string, number>();
+    const write = (name: string, distance: number) => {
+      const value = Math.min(cap, Math.max(0, Math.round(distance)));
+      if (written.get(name) === value) return;
+      written.set(name, value);
+      node.style.setProperty(name, `${value}px`);
+    };
     const update = () => {
       // In RTL `scrollLeft` runs from 0 at the start to negative values toward the end.
-      const position = horizontal ? Math.abs(node.scrollLeft) : node.scrollTop;
-      const max = horizontal
-        ? node.scrollWidth - node.clientWidth
-        : node.scrollHeight - node.clientHeight;
-      const start = position > 1;
-      const end = max - position > 1;
+      const left = Math.abs(node.scrollLeft);
+      const leftMax = node.scrollWidth - node.clientWidth;
+      const top = node.scrollTop;
+      const topMax = node.scrollHeight - node.clientHeight;
+      const next: EdgeOverflow = {
+        start: inline && left > 1,
+        end: inline && leftMax - left > 1,
+        top: block && top > 1,
+        bottom: block && topMax - top > 1,
+      };
       if (depth) {
-        node.style.setProperty("--edge-start", `${Math.max(0, position)}px`);
-        node.style.setProperty("--edge-end", `${Math.max(0, max - position)}px`);
+        if (inline) {
+          write("--edge-start", left);
+          write("--edge-end", leftMax - left);
+        }
+        if (block) {
+          write("--edge-top", top);
+          write("--edge-bottom", topMax - top);
+        }
       }
-      setOverflow((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
+      setOverflow((prev) => (same(prev, next) ? prev : next));
     };
     // Scroll and resize can fire many times per frame (a sidebar collapsing resizes every region
     // beside it): measure at most once per frame.
@@ -70,8 +100,9 @@ export function useEdgeOverflow(
       node.removeEventListener("scroll", schedule);
       resize?.disconnect();
       mutation.disconnect();
+      for (const name of written.keys()) node.style.removeProperty(name);
     };
-  }, [ref, enabled, horizontal, depth]);
+  }, [ref, axis, depth]);
 
-  return enabled ? overflow : NONE;
+  return axis ? overflow : NONE;
 }

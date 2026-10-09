@@ -1,91 +1,18 @@
-/* A phone-width stage: the chat at 320px. */
+/* A conversation column: messages are rows as wide as the column. */
+.thread {
+  inline-size: 100%;
+}
+
+/* A phone-width stage: the messages at 320px. */
 .phone {
   inline-size: min(100%, calc(var(--prime-space-20) * 4));
 }
 
-/* overview.tsx: a messenger in a card — header, search, pinned, the scrolling thread, the composer. */
-.messenger {
+/* typing.tsx: the conversation, and its control apart under it. */
+.stage {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  gap: var(--prime-space-4);
   inline-size: 100%;
-  block-size: min(calc(var(--prime-space-24) * 7), 85dvh);
-  min-block-size: 0;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-2);
-  padding: var(--prime-space-3) var(--prime-space-3) var(--prime-space-2) var(--prime-space-4);
-}
-
-.headerText {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-inline-size: 0;
-}
-
-.search {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-1);
-  padding: 0 var(--prime-space-3) var(--prime-space-2);
-}
-
-.searchField {
-  flex: 1 1 auto;
-  min-inline-size: 0;
-}
-
-.searchCount {
-  flex: none;
-  white-space: nowrap;
-}
-
-.pinned {
-  margin: 0 var(--prime-space-3) var(--prime-space-2);
-}
-
-/* The thread scrolls itself and pads its own sides, so the focus rings of the bubbles fit. */
-.thread {
-  flex: 1 1 auto;
-  min-block-size: 0;
-  padding: var(--prime-space-2) var(--prime-space-2) var(--prime-space-3);
-}
-
-/* Older history on its way: a bubble-shaped placeholder above the first message. */
-.older {
-  display: flex;
-  padding: var(--prime-space-3) var(--prime-space-2);
-}
-
-.olderBubble {
-  inline-size: min(100%, calc(var(--prime-space-24) * 2));
-  block-size: var(--prime-space-10);
-}
-
-.composer {
-  padding: var(--prime-space-2) var(--prime-space-3) var(--prime-space-3);
-}
-
-/* live.tsx: a short chat card under its controls. */
-.live {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-  inline-size: 100%;
-}
-
-.liveBar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-3);
-}
-
-.liveCard {
-  display: flex;
-  flex-direction: column;
-  block-size: calc(var(--prime-space-24) * 3);
 }

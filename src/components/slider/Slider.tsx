@@ -52,6 +52,11 @@ export type SliderProps = FieldRootDomProps &
     size?: ControlSize;
     /** Color of the filled part of the track. */
     tone?: Tone;
+    /**
+     * `vertical` — the track stands upright, minimum at the bottom, seven thumbs long at its tier
+     * (a level beside a button). Default `horizontal`.
+     */
+    orientation?: "horizontal" | "vertical";
     /** Id of the range input; generated when omitted. */
     id?: string;
     /** Name of the range input when there is no `label`. */
@@ -87,6 +92,7 @@ export function Slider({
   formatValue,
   size: sizeProp,
   tone = "accent",
+  orientation = "horizontal",
   id,
   className,
   style,
@@ -180,6 +186,7 @@ export function Slider({
       style={{ ...style, "--slider-ratio": ratio } as React.CSSProperties}
       {...toDataAttributes({
         tone,
+        orientation: orientation === "vertical" ? "vertical" : undefined,
         pending: pending || undefined,
         settling: settling || undefined,
       })}
@@ -208,6 +215,7 @@ export function Slider({
             onPointerUp={commit}
             onKeyUp={commit}
             aria-label={ariaLabel}
+            aria-orientation={orientation === "vertical" ? "vertical" : undefined}
             aria-valuetext={formatValue ? valueText : undefined}
             aria-describedby={ids.describedBy}
             aria-invalid={ids.invalid || undefined}

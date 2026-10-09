@@ -8,8 +8,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Message.Root",
-      en: "`ref` → `HTMLElement` (`<article>`). One message: a `role=\"article\"` row (an `option` in selection mode) with its parts in the shell its content parts declare — `bubble` (fill, padding: text, voice, file, contact, location, link preview, a picture with a caption), `media` (a picture or an album alone: the shape itself, clipped to the radius, no backing, the meta on a dark pill over it, reactions under it), `round` (`VideoNote`: no backing, the meta on its pill, reactions under it); fragments are opened and empty children ignored. The last bubble of a run of one author (`position` `single` or `last`) curls a tail out of its square bottom corner on the author's side when it is a bubble of fill (never a picture, with a caption or not, or a circle); every other corner keeps one radius. The bubble fits its content (up to the cap; a picture or a card sets its width and a caption wraps under it; a bubble of text hugs its widest laid-out line, measured once per text and row width and cached), the meta stands in the bottom-end corner over a spacer that ends the last line and drops to a line of its own only when that line is full. Every message holds a closed reactions row: the first reaction opens it and grows the message upward — its bottom corner, the meta and the tail stay, the meta moving onto the row's last line while the text gives its room back (a card keeps it, so nothing inside the card moves), the rows above gliding up as one block; the last one taken back closes it the same way. Every size change of a message (reactions, a transcript, an edit, an upload state) is laid out at once and played as one stroke: the bubble's box glides from the old size to the new one, width and height together, and its parts glide, fade in or fade out on the same clock (`--prime-message-morph-duration`); reduced motion makes it instant. Parts go in the order you write them; `Message.Avatar` goes to the gutter, `Message.Menu` to the menu.",
-      ru: 'Одно сообщение: строка `role="article"` (в режиме выбора — `option`) с частями в оболочке, которую объявляют части содержимого: `bubble` (заливка и отступы: текст, голосовое, файл, контакт, место, превью ссылки, фото с подписью), `media` (одно фото или альбом: сам блок, обрезанный по скруглению, без подложки, мета на тёмной плашке поверх, реакции под ним), `round` (`VideoNote`: без подложки, мета на плашке, реакции под кружком); фрагменты раскрываются, пустые дети не считаются. Последний пузырь серии одного автора (`position` `single` или `last`) с заливкой выпускает хвостик из прямого нижнего угла на стороне автора (никогда у фото, с подписью или без, и у кружка); остальные углы — одно скругление. Пузырь облегает содержимое (до предела; фото или карточка задают ширину, подпись переносится под ними; пузырь текста ровно по самой широкой строке — она измеряется один раз на текст и ширину строки и запоминается), мета стоит в нижнем углу над распоркой в конце последней строки и уходит на свою строку, только когда строка заполнена. В каждом сообщении закрыта строка реакций: первая реакция раскрывает её и растит сообщение вверх — нижний угол, мета и хвостик стоят на месте, мета уходит на последнюю строку ряда, а текст отдаёт её место (карточка его сохраняет, и внутри карточки ничего не сдвигается), строки выше плавно сдвигаются одним блоком; снятие последней закрывает её так же. Любое изменение размера сообщения (реакции, расшифровка, правка, состояние загрузки) раскладывается сразу и проигрывается одним движением: рамка пузыря плавно переходит от старого размера к новому, ширина и высота вместе, а части скользят, проявляются или гаснут на тех же часах (`--prime-message-morph-duration`); при сниженном движении — сразу. Части идут в порядке записи; `Message.Avatar` — в поле аватара, `Message.Menu` — в меню.',
+      en: "`ref` → `HTMLElement` (`<article>`). One message: a `role=\"article\"` row (an `option` in selection mode) with its parts in the shell its content parts declare — `bubble` (fill, padding: text, voice, file, contact, location, link preview, a picture with a caption), `media` (a picture or an album alone: the shape itself, clipped to the radius, no backing, the meta on a dark pill over it, reactions under it), `round` (`VideoNote`: no backing, the meta on its pill, reactions under it); fragments are opened and empty children ignored. The last bubble of a run of one author (`position` `single` or `last`) curls a tail out of its square bottom corner on the author's side when it is a bubble of fill (never a picture, with a caption or not, or a circle); every other corner keeps one radius. The bubble fits its content (up to the cap; a picture or a card sets its width and a caption wraps under it; a bubble of text hugs its widest laid-out line, measured once per text and row width and cached), the meta stands in the bottom-end corner over a spacer that ends the last line and drops to a line of its own only when that line is full. Every message holds a closed reactions row: the first reaction opens it and grows the message upward — its bottom corner, the meta and the tail stay, the meta moving onto the row's last line while the text gives its room back (a card keeps it, so nothing inside the card moves), the rows above gliding up as one block; the last one taken back closes it the same way. Every size change of a message (reactions, a transcript, an edit, an upload state) is laid out at once and played as one stroke: the bubble's box glides from the old size to the new one, width and height together, and its parts glide, fade in or fade out on the same clock (`--prime-message-morph-duration`); reduced motion makes it instant. Parts go in the order you write them; `Message.Author` heads the bubble (on a pill over a picture or a circle), `Message.Avatar` goes to the gutter, `Message.Menu` to the menu. In a group chat (`Chat.Messages type=\"group\"`) the message shows the author's header only on the first of a run and the avatar only on the last; in a direct chat neither; on its own a message with an author or an avatar does the same by its `position`.",
+      ru: 'Одно сообщение: строка `role="article"` (в режиме выбора — `option`) с частями в оболочке, которую объявляют части содержимого: `bubble` (заливка и отступы: текст, голосовое, файл, контакт, место, превью ссылки, фото с подписью), `media` (одно фото или альбом: сам блок, обрезанный по скруглению, без подложки, мета на тёмной плашке поверх, реакции под ним), `round` (`VideoNote`: без подложки, мета на плашке, реакции под кружком); фрагменты раскрываются, пустые дети не считаются. Последний пузырь серии одного автора (`position` `single` или `last`) с заливкой выпускает хвостик из прямого нижнего угла на стороне автора (никогда у фото, с подписью или без, и у кружка); остальные углы — одно скругление. Пузырь облегает содержимое (до предела; фото или карточка задают ширину, подпись переносится под ними; пузырь текста ровно по самой широкой строке — она измеряется один раз на текст и ширину строки и запоминается), мета стоит в нижнем углу над распоркой в конце последней строки и уходит на свою строку, только когда строка заполнена. В каждом сообщении закрыта строка реакций: первая реакция раскрывает её и растит сообщение вверх — нижний угол, мета и хвостик стоят на месте, мета уходит на последнюю строку ряда, а текст отдаёт её место (карточка его сохраняет, и внутри карточки ничего не сдвигается), строки выше плавно сдвигаются одним блоком; снятие последней закрывает её так же. Любое изменение размера сообщения (реакции, расшифровка, правка, состояние загрузки) раскладывается сразу и проигрывается одним движением: рамка пузыря плавно переходит от старого размера к новому, ширина и высота вместе, а части скользят, проявляются или гаснут на тех же часах (`--prime-message-morph-duration`); при сниженном движении — сразу. Части идут в порядке записи; `Message.Author` возглавляет пузырь (на плашке поверх фото или кружка), `Message.Avatar` — в поле аватара, `Message.Menu` — в меню. В групповом чате (`Chat.Messages type="group"`) сообщение показывает шапку автора только у первого в серии, аватар — только у последнего; в личном чате — ни то ни другое; само по себе сообщение с автором или аватаром делает то же по своему `position`.',
       props: [
         {
           name: "direction",
@@ -22,8 +22,8 @@ export const api: ComponentApi = {
           name: "position",
           type: '"single" | "first" | "middle" | "last"',
           default: '"single"',
-          en: "The place in a run of one author's messages (`groupMessages` gives it): sets the small gap inside a run; `single` and `last` end a run, and a bubble of fill there gets the tail.",
-          ru: "Место в серии сообщений одного автора (его даёт `groupMessages`): задаёт малый зазор внутри серии; `single` и `last` замыкают серию, и пузырь с заливкой там получает хвостик.",
+          en: "The place in a run of one author's messages (`Chat.Messages items` sets it, `groupMessages` gives it): sets the small gap inside a run; `single` and `last` end a run — a bubble of fill there gets the tail, and in a group chat the avatar; `single` and `first` start one and show the author's header.",
+          ru: "Место в серии сообщений одного автора (его ставит `Chat.Messages items`, даёт `groupMessages`): задаёт малый зазор внутри серии; `single` и `last` замыкают серию — пузырь с заливкой получает хвостик, а в групповом чате аватар; `single` и `first` открывают её и показывают шапку автора.",
         },
         {
           name: "time",
@@ -60,14 +60,14 @@ export const api: ComponentApi = {
         {
           name: "onReactionToggle",
           type: "(emoji: string) => void | Promise<unknown>",
-          en: "The reader puts or takes back a reaction: a chip of `Message.Reactions`, a double tap (the group's `quickReaction`), `L`, or the reaction bar (long press, long hover, `R`). The chip shows the new state at once; a returned promise keeps it (`aria-busy`) until it settles — update the reactions before it resolves; a rejection drops it back. Without it reactions are read-only and there is no bar.",
-          ru: "Читатель ставит или снимает реакцию: чип `Message.Reactions`, двойное касание (`quickReaction` ленты), `L` или панель реакций (долгое нажатие, долгое наведение, `R`). Чип сразу показывает новое состояние; возвращённый промис держит его (`aria-busy`), пока не завершится — обновите реакции до его выполнения; отказ возвращает прежнее. Без обработчика реакции только для чтения и панели нет.",
+          en: "The reader puts or takes back a reaction: a chip of `Message.Reactions`, a double tap (the chat's `quickReaction`), `L`, or the reaction bar (long press, long hover, `R`). The chip shows the new state at once; a returned promise keeps it (`aria-busy`) until it settles — update the reactions before it resolves; a rejection drops it back. Without it reactions are read-only and there is no bar.",
+          ru: "Читатель ставит или снимает реакцию: чип `Message.Reactions`, двойное касание (`quickReaction` чата), `L` или панель реакций (долгое нажатие, долгое наведение, `R`). Чип сразу показывает новое состояние; возвращённый промис держит его (`aria-busy`), пока не завершится — обновите реакции до его выполнения; отказ возвращает прежнее. Без обработчика реакции только для чтения и панели нет.",
         },
         {
           name: "value",
           type: "string",
-          en: "The id of the message: selection (`Message.Group selected`), `onNewMessage`, `onRead`, `current`, `Message.Reply target`. Keep it when the server confirms a sent message.",
-          ru: "Идентификатор сообщения: выбор (`Message.Group selected`), `onNewMessage`, `onRead`, `current`, `Message.Reply target`. Сохраняйте его, когда сервер подтвердит отправленное.",
+          en: "The id of the message: selection (`Chat.Root selected`), `onNewMessage`, `onRead`, `current`, search, `Chat.Pinned`, `Message.Reply target` (`Chat.Messages items` sets it to the item's key). Keep it when the server confirms a sent message.",
+          ru: "Идентификатор сообщения: выбор (`Chat.Root selected`), `onNewMessage`, `onRead`, `current`, поиск, `Chat.Pinned`, `Message.Reply target` (`Chat.Messages items` ставит ключ элемента). Сохраняйте его, когда сервер подтвердит отправленное.",
         },
         {
           name: "labels",
@@ -84,99 +84,9 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Message.Group",
-      en: '`ref` → `HTMLDivElement`. The conversation: a `role="log"` of rows (new messages are announced politely) with one tab stop — arrows, Home and End move between messages. Every top-level child is a row — a `Message.Root` (or a fragment with one; an own component standing for a message carries its `value` as `key` and may pass `direction`), a date, a service line, the unread band — except `Message.Typing` and `Message.SelectionBar`, which close the list. Inside a `ScrollContainer anchor="end"` it renders only the rows around the view (in normal flow between two spacers, each measured once and cached by key, the sticky date kept), opens at the end, stays at the end while the reader is there, scrolls to your own new message, and otherwise shows a round «к последним» button with the count of messages that came meanwhile; history loaded above, rows measured on the way and a message that changes size in place keep the reader\'s place; jumps, search, Shift selection, the keyboard (`aria-posinset` / `aria-setsize`), a playing player and the focused message reach or keep rows it does not render. A message added at the end enters by itself, mine and theirs alike: it floats up a little from below into its place and fades in (`fast`); the first render, history, rows scrolled into view and a status change never animate. When the reply arrives with the end of `Message.Typing`, the typing goes at once. In selection mode a multiselectable `listbox`.',
-      ru: 'Переписка: `role="log"` из строк (новые сообщения объявляются вежливо) с одной точкой табуляции — стрелки, Home и End ходят между сообщениями. Каждый дочерний элемент верхнего уровня — строка: `Message.Root` (или фрагмент с ним; свой компонент вместо сообщения несёт его `value` как `key` и может передать `direction`), дата, служебная строка, полоса непрочитанного — кроме `Message.Typing` и `Message.SelectionBar`, которые замыкают ленту. Внутри `ScrollContainer anchor="end"` рендерит только строки рядом с видимой областью (в обычном потоке между двумя распорками, каждая измерена один раз и закеширована по ключу, липкая дата сохраняется), открывается в конце, держит конец, пока читатель там, прокручивает к вашему новому сообщению, а иначе показывает круглую кнопку «к последним» со счётчиком пришедших; история сверху, строки, измеренные по пути, и сообщение, меняющее размер на месте, не сдвигают место чтения; переходы, поиск, выбор с Shift, клавиатура (`aria-posinset` / `aria-setsize`), играющий плеер и сообщение в фокусе достают или удерживают строки вне окна. Сообщение, добавленное в конец, появляется само — своё и чужое одинаково: немного всплывает снизу на своё место и проявляется (`fast`); первый показ, история, строки, въезжающие при прокрутке, и смена статуса не анимируются. Когда ответ приходит вместе с концом `Message.Typing`, индикатор набора уходит сразу. В режиме выбора — `listbox` с множественным выбором.',
-      props: [
-        {
-          name: "avatars",
-          type: "boolean",
-          default: "false",
-          en: "Incoming messages keep a gutter for the author's avatar (a group chat); put `Message.Avatar` on the last message of a run.",
-          ru: "Входящие держат поле под аватар автора (групповой чат); `Message.Avatar` ставьте на последнее сообщение серии.",
-        },
-        {
-          name: "selected",
-          type: "readonly string[] | null",
-          en: "Selection mode (controlled): the `value`s of the selected messages, `null` while not selecting. Any of the triad adds «Выбрать» to every `Message.Menu`. While selecting: a check beside every message, the selected messages stay as they are and the others step back (dimmed, slightly desaturated) — no outline, no wash; a click toggles, Shift+click selects the range from the anchor, press-and-drag (or a finger slid from a check) paints the messages it passes with the first one's new state and scrolls the list at its edges — as DataTable rows; Escape leaves.",
-          ru: "Режим выбора (управляемое): `value` выбранных сообщений, `null` — не выбираем. Любой из тройки добавляет «Выбрать» в каждое `Message.Menu`. В режиме: флажок у каждого сообщения, выбранные сообщения остаются как есть, остальные отступают (приглушены и чуть обесцвечены) — без рамки и заливки; клик переключает, Shift+клик выбирает диапазон от якоря, протягивание (или палец, ведущий от флажка) окрашивает пройденные сообщения состоянием первого и прокручивает ленту у краёв — как строки DataTable; Escape выходит.",
-        },
-        {
-          name: "defaultSelected",
-          type: "readonly string[] | null",
-          default: "null",
-          en: "Initial selection (uncontrolled).",
-          ru: "Начальный выбор (неуправляемое).",
-        },
-        {
-          name: "onSelectedChange",
-          type: "(selected: readonly string[] | null) => void",
-          en: "The selection changed: a message toggled, selection started from the menu (`[value]`) or ended (`null`).",
-          ru: "Выбор изменён: сообщение переключено, выбор начат из меню (`[value]`) или закончен (`null`).",
-        },
-        {
-          name: "quickReaction",
-          type: "string | false",
-          default: "«👍»",
-          en: "The reaction of a double tap (and `L`) on a message: puts it or takes it back through `onReactionToggle`, announced politely. Not on a double click that selected text, nothing extra in selection mode. `false` — off.",
-          ru: "Реакция двойного касания (и `L`) по сообщению: ставит или снимает её через `onReactionToggle`, объявляется вежливо. Не срабатывает на двойной клик, выделивший текст, ничего не добавляет в режиме выбора. `false` — выключено.",
-        },
-        {
-          name: "reactionOptions",
-          type: "readonly { emoji: string; label: string }[]",
-          default: "👍 🔥 🤣 👌 🤔 😢 😱, then 7 more",
-          en: "The reactions of the reaction bar — a floating pill above the message on a long press (with the menu), after a long hover (pointer devices, ~500 ms, the bar alone) or `R`: the first seven in its row, «⌄» glides the rest open. `label` names each toggle button.",
-          ru: "Реакции панели — плавающей «таблетки» над сообщением по долгому нажатию (вместе с меню), после долгого наведения (мышь, ~500 мс, только панель) или `R`: первые семь в ряд, «⌄» раскрывает остальные. `label` называет каждую кнопку.",
-        },
-        {
-          name: "reader",
-          type: "MessageUser",
-          en: "The reader (`{ id, name: «Вы», src?, color? }`): a reaction they put shows them among the chip's avatars at once, before the data comes back; matched by `id`.",
-          ru: "Читатель (`{ id, name: «Вы», src?, color? }`): поставленная им реакция сразу показывает его среди аватаров чипа, до ответа данных; сопоставляется по `id`.",
-        },
-        {
-          name: "onNewMessage",
-          type: '(value: string, details: { direction: "incoming" | "outgoing" }) => void',
-          en: "A message was added at the end after mount — sent or received: for a sound, a counter, a title badge. Never for the first render, history loaded above or a message put back in the middle. Keep a sent message's `key` and `value` when the server confirms it: a re-keyed row would be new again.",
-          ru: "В конец после монтирования добавлено сообщение — отправленное или полученное: для звука, счётчика, значка в заголовке. Не вызывается для первого показа, истории сверху и сообщения, вернувшегося в середину. Сохраняйте `key` и `value` отправленного, когда сервер его подтвердит: строка с новым ключом снова стала бы новой.",
-        },
-        {
-          name: "onRead",
-          type: "(values: string[]) => void",
-          en: "Incoming messages the reader has seen — at least half of each, or half the view, on screen while the page is visible (`IntersectionObserver`). Batched per frame; each `value` once per mount. Send read receipts from here.",
-          ru: "Входящие, которые читатель увидел, — не меньше половины сообщения или половины области на экране, пока страница видна (`IntersectionObserver`). Пачкой за кадр; каждый `value` один раз за монтирование. Отсюда отправляйте отметки о прочтении.",
-        },
-        {
-          name: "current",
-          type: "string | null",
-          en: "The current message of a search or a jump: when it changes, the group brings it to the middle of its ScrollContainer (a message the window does not render is rendered first and jumped to) and points at it: nothing is drawn on it, the other messages step back and come forward three times. While `highlight` is set (a search) they stay back while the message is current. Focus stays where it is.",
-          ru: "Текущее сообщение поиска или перехода: при смене лента приводит его в середину своего ScrollContainer (сообщение вне окна сначала отрисовывается, переход мгновенный), и указывает на него: на нём ничего не рисуется, остальные сообщения трижды отступают и возвращаются. Пока задан `highlight` (поиск), они остаются приглушёнными, пока сообщение текущее. Фокус остаётся на месте.",
-        },
-        {
-          name: "highlight",
-          type: "string",
-          default: '""',
-          en: "A search query: every case-insensitive match in `Message.Text` is marked.",
-          ru: "Поисковый запрос: каждое совпадение без учёта регистра в `Message.Text` выделяется.",
-        },
-        {
-          name: "labels",
-          type: "Partial<MessageGroupLabels>",
-          en: "System strings of the list (announcements, the selection bar, the reaction bar), see Labels.",
-          ru: "Системные строки ленты (объявления, панель выбора, панель реакций), см. Labels.",
-        },
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
-          en: "`aria-label` (name the chat), `className` and the other attributes.",
-          ru: "`aria-label` (назовите чат), `className` и прочие атрибуты.",
-        },
-      ],
-    },
-    {
       name: "Message.Avatar",
-      en: "`ref` → `HTMLDivElement`. The author's picture in the gutter beside an incoming bubble, aligned to its bottom; holds an `Avatar` (`m`). Decorative: the message is named by its author.",
-      ru: "Фото автора в поле рядом с входящим пузырём, по его нижнему краю; внутри `Avatar` (`m`). Декоративно: сообщение названо автором.",
+      en: "`ref` → `HTMLDivElement`. The author's picture in the gutter beside an incoming bubble of a group chat, aligned to its bottom; holds an `Avatar` (`m`). Put it on every message: the message shows it on the last of a run and keeps the gutter empty on the others. Decorative: the message is named by its author.",
+      ru: "Фото автора в поле рядом с входящим пузырём группового чата, по его нижнему краю; внутри `Avatar` (`m`). Ставьте на каждое сообщение: сообщение показывает его у последнего в серии, у остальных поле пустое. Декоративно: сообщение названо автором.",
       props: [
         {
           name: "…rest",
@@ -188,21 +98,40 @@ export const api: ComponentApi = {
     },
     {
       name: "Message.Author",
-      en: "`ref` → `HTMLDivElement`. The author's name at the top of the first bubble of a run, semibold in the author's hue; plain text here also names the message.",
-      ru: "Имя автора вверху первого пузыря серии, полужирным в цвете автора; простой текст здесь заодно называет сообщение.",
+      en: "`ref` → `HTMLDivElement`. The author's header at the top of the first bubble of a run in a group chat: the name semibold in the author's hue, an optional `Message.AuthorIcon` after it and the `tag` muted after them — one line, the name ellipsizing first, then the tag. The bubble hugs the whole line, so a long name or tag widens it up to its cap. Over a picture or a circle without a caption the header stands on a pill at its top-start corner. Plain text here also names the message; the hue never carries meaning on its own.",
+      ru: "Шапка автора вверху первого пузыря серии в групповом чате: имя полужирным в цвете автора, необязательный `Message.AuthorIcon` после него и `tag` приглушённо после них — одна строка, сначала сокращается имя, потом тег. Пузырь облегает всю строку, поэтому длинное имя или тег расширяют его до предела. Над фото или кружком без подписи шапка стоит на плашке в верхнем углу. Простой текст здесь заодно называет сообщение; цвет сам по себе ничего не значит.",
       props: [
         {
           name: "color",
           type: COLORS,
-          default: '"blue"',
-          en: "The author's hue: one per person in a chat.",
-          ru: "Цвет автора: один на человека в чате.",
+          default: "hueOf(name)",
+          en: "The author's hue: one per person in a chat. By default a hue stable per name; pass `hueOf(user.id)` to keep it per person.",
+          ru: "Цвет автора: один на человека в чате. По умолчанию — цвет, постоянный для имени; передайте `hueOf(user.id)`, чтобы он был постоянным для человека.",
+        },
+        {
+          name: "tag",
+          type: "ReactNode",
+          en: "The member's own title in this chat, muted after the name («Админ», «Бухгалтерия»).",
+          ru: "Собственная подпись участника в этом чате, приглушённо после имени («Админ», «Бухгалтерия»).",
         },
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "color">',
-          en: "`children` (the name), `className`.",
-          ru: "`children` (имя), `className`.",
+          en: "`children` (the name, then an optional `Message.AuthorIcon`), `className`.",
+          ru: "`children` (имя, затем необязательный `Message.AuthorIcon`), `className`.",
+        },
+      ],
+    },
+    {
+      name: "Message.AuthorIcon",
+      en: "`ref` → `HTMLSpanElement` (`aria-hidden`). A small mark after the author's name — an `<Icon name=\"…\" />`: a crown of the chat's owner, a check of a verified member. Decorative: say what it means in the `tag` when it matters.",
+      ru: 'Небольшой значок после имени автора — `<Icon name="…" />`: корона владельца чата, галочка проверенного участника. Декоративно: если смысл важен, скажите его в `tag`.',
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (an `Icon`), `className`.",
+          ru: "`children` (`Icon`), `className`.",
         },
       ],
     },
@@ -254,8 +183,8 @@ export const api: ComponentApi = {
         {
           name: "target",
           type: "string",
-          en: "The `value` of the quoted message: a press brings the group to it (rendering it first in a window), the other messages blink back around it, and the focus moves to it. Makes the quote a button.",
-          ru: "`value` цитируемого сообщения: нажатие приводит ленту к нему (в окне сначала отрисовывает), остальные сообщения мигают вокруг него, фокус переходит на него. Делает цитату кнопкой.",
+          en: "The `value` of the quoted message: a press brings the chat to it (rendering it first in a window), the other messages blink back around it, and the focus moves to it. Makes the quote a button.",
+          ru: "`value` цитируемого сообщения: нажатие приводит чат к нему (в окне сначала отрисовывает), остальные сообщения мигают вокруг него, фокус переходит на него. Делает цитату кнопкой.",
         },
         {
           name: "onClick",
@@ -279,8 +208,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Message.Text",
-      en: "`ref` → `HTMLDivElement`. The text: a string renders the Markdown subset the Composer writes (**bold**, _italic_, ~~strike~~, `code`, fenced code, Markdown links, bare URLs, `> ` quotes) as elements, never as HTML; links take only http(s), mailto and tel and open in a new tab. Wraps anywhere; the meta stands at the end of its last line. Marks the matches of `Message.Group highlight`.",
-      ru: "Текст: строка с разметкой, которую пишет Composer (**жирный**, _курсив_, ~~зачёркнутый~~, `код`, блок кода, ссылки Markdown, голые адреса, цитаты `> `), рисуется элементами, никогда не HTML; ссылки — только http(s), mailto и tel, открываются в новой вкладке. Переносится где угодно; мета встаёт в конец последней строки. Выделяет совпадения `Message.Group highlight`.",
+      en: "`ref` → `HTMLDivElement`. The text: a string renders the Markdown subset the Composer writes (**bold**, _italic_, ~~strike~~, `code`, fenced code, Markdown links, bare URLs, `> ` quotes) as elements, never as HTML; links take only http(s), mailto and tel and open in a new tab. Wraps anywhere; the meta stands at the end of its last line. Marks the matches of the chat's search (`Chat.Search`).",
+      ru: "Текст: строка с разметкой, которую пишет Composer (**жирный**, _курсив_, ~~зачёркнутый~~, `код`, блок кода, ссылки Markdown, голые адреса, цитаты `> `), рисуется элементами, никогда не HTML; ссылки — только http(s), mailto и tel, открываются в новой вкладке. Переносится где угодно; мета встаёт в конец последней строки. Выделяет совпадения поиска чата (`Chat.Search`).",
       props: [
         {
           name: "plain",
@@ -300,11 +229,11 @@ export const api: ComponentApi = {
     ...contentParts,
     {
       name: "Message.Reactions",
-      en: "`ref` → `HTMLDivElement`. Reactions at the bottom of a bubble, under a picture or a circle: a `role=\"group\"` of chips (`aria-pressed`) — the emoji, then the avatars of who reacted (`users`: up to 3; from 4 on, 2 and a «+N» circle) or the rolling count. Not the reader's: a neutral wash; the reader's own: the accent. A press goes to `Message.Root onReactionToggle` and shows at once, the reader (`Message.Group reader`) joining the stack. Every message holds the row closed; the first reaction opens it in place and the last one closes it, as the message's one stroke, while the rows below stay still and the rows above glide as one block. A reaction new on the message takes its room at once and fades and scales in from 0.9 where it stands as the bubble glides; a chip taken away fades out where it stood while the chips after it glide into its place; a count change rolls its digits only; nothing animates on mount. In a bubble the meta stands at the end of the row's last line.",
-      ru: 'Реакции внизу пузыря, под фото или кружком: `role="group"` из чипов (`aria-pressed`) — эмодзи, затем аватары отреагировавших (`users`: до 3; с 4 — два и кружок «+N») или счётчик с прокруткой цифр. Чужая реакция — нейтральная подложка, своя — акцент. Нажатие идёт в `Message.Root onReactionToggle` и видно сразу, читатель (`reader` у `Message.Group`) встаёт в стопку. В каждом сообщении строка закрыта и держит место; первая реакция раскрывает её на месте, последняя закрывает — одним движением сообщения, строки ниже стоят, а строки выше скользят одним блоком. Новая для сообщения реакция сразу занимает место и проявляется с масштабом от 0.9 там, где стоит, пока пузырь плавно меняет размер; снятая гаснет на своём месте, а следующие чипы скользят на её место; смена счётчика прокручивает только цифры; при монтировании ничего не анимируется. В пузыре мета стоит в конце последней строки ряда.',
+      en: "`ref` → `HTMLDivElement`. Reactions at the bottom of a bubble, under a picture or a circle: a `role=\"group\"` of chips (`aria-pressed`) — the emoji, then the avatars of who reacted (`users`: up to 3; from 4 on, 2 and a «+N» circle) or the rolling count. Not the reader's: a neutral wash; the reader's own: the accent. A press goes to `Message.Root onReactionToggle` and shows at once, the reader (`Chat.Messages reader`) joining the stack. Every message holds the row closed; the first reaction opens it in place and the last one closes it, as the message's one stroke, while the rows below stay still and the rows above glide as one block. A reaction new on the message takes its room at once and fades and scales in from 0.9 where it stands as the bubble glides; a chip taken away fades out where it stood while the chips after it glide into its place; a count change rolls its digits only; nothing animates on mount. In a bubble the meta stands at the end of the row's last line.",
+      ru: 'Реакции внизу пузыря, под фото или кружком: `role="group"` из чипов (`aria-pressed`) — эмодзи, затем аватары отреагировавших (`users`: до 3; с 4 — два и кружок «+N») или счётчик с прокруткой цифр. Чужая реакция — нейтральная подложка, своя — акцент. Нажатие идёт в `Message.Root onReactionToggle` и видно сразу, читатель (`reader` у `Chat.Messages`) встаёт в стопку. В каждом сообщении строка закрыта и держит место; первая реакция раскрывает её на месте, последняя закрывает — одним движением сообщения, строки ниже стоят, а строки выше скользят одним блоком. Новая для сообщения реакция сразу занимает место и проявляется с масштабом от 0.9 там, где стоит, пока пузырь плавно меняет размер; снятая гаснет на своём месте, а следующие чипы скользят на её место; смена счётчика прокручивает только цифры; при монтировании ничего не анимируется. В пузыре мета стоит в конце последней строки ряда.',
       props: [
         {
-          name: "reactions",
+          name: "items",
           type: "MessageReaction[]",
           required: true,
           en: "`{ emoji, count, selected?, users? }` — `count` is the total, `selected` the reader's own reaction, `users` (`{ id, name, src?, color? }[]`, in the order they put it) who put it; without `users` the chip shows the count.",
@@ -326,8 +255,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Message.Menu",
-      en: '`ref` → `HTMLDivElement`. The context menu (a `Dropdown.Content`): `Dropdown.Item`s you write — Ответить, Скопировать, Закрепить, Переслать, Пожаловаться, Удалить (`tone="danger"`); the kit adds a separator and «Выбрать» when the group has a selection. It opens where the pointer is on right click, with the reaction bar on a long press, under the bubble from the keyboard (Enter, Shift+F10, the menu key); a bottom sheet on phones.',
-      ru: 'Контекстное меню (`Dropdown.Content`): ваши `Dropdown.Item` — Ответить, Скопировать, Закрепить, Переслать, Пожаловаться, Удалить (`tone="danger"`); кит добавляет разделитель и «Выбрать», если у ленты есть выбор. Открывается у указателя по правому клику, вместе с панелью реакций по долгому нажатию, под пузырём — с клавиатуры (Enter, Shift+F10, клавиша меню); на телефоне — нижний лист.',
+      en: '`ref` → `HTMLDivElement`. The context menu (a `Dropdown.Content`): `Dropdown.Item`s you write — Ответить, Скопировать, Закрепить, Переслать, Пожаловаться, Удалить (`tone="danger"`); the kit adds a separator and «Выбрать» when the chat has a selection (`Chat.Root selected`). It opens where the pointer is on right click, with the reaction bar on a long press, under the bubble from the keyboard (Enter, Shift+F10, the menu key); a bottom sheet on phones.',
+      ru: 'Контекстное меню (`Dropdown.Content`): ваши `Dropdown.Item` — Ответить, Скопировать, Закрепить, Переслать, Пожаловаться, Удалить (`tone="danger"`); кит добавляет разделитель и «Выбрать», если у чата есть выбор (`Chat.Root selected`). Открывается у указателя по правому клику, вместе с панелью реакций по долгому нажатию, под пузырём — с клавиатуры (Enter, Shift+F10, клавиша меню); на телефоне — нижний лист.',
       props: [
         {
           name: "size",
@@ -345,67 +274,9 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Message.SelectionBar",
-      en: '`ref` → `HTMLDivElement`. The bar of selection mode, sticky at the bottom of the list while it is on: «Выбрано: N», your actions and «Отмена», which leaves selection (`role="toolbar"`). Renders nothing otherwise.',
-      ru: 'Панель режима выбора, прилипает к низу ленты, пока он включён: «Выбрано: N», ваши действия и «Отмена», которая выходит из выбора (`role="toolbar"`). Иначе ничего не рисует.',
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
-          en: '`children` — the actions (`Button.Root size="s"`: Переслать, Удалить), `className`.',
-          ru: '`children` — действия (`Button.Root size="s"`: Переслать, Удалить), `className`.',
-        },
-      ],
-    },
-    {
-      name: "Message.Separator",
-      en: "`ref` → `HTMLDivElement`. A date between messages («Сегодня», «12 марта» — `formatMessageDate`): a pill in the middle that stays at the top while its day scrolls.",
-      ru: "Дата между сообщениями («Сегодня», «12 марта» — `formatMessageDate`): плашка посередине, которая держится сверху, пока листается её день.",
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (the date), `className`.",
-          ru: "`children` (дата), `className`.",
-        },
-      ],
-    },
-    {
-      name: "Message.Service",
-      en: "`ref` → `HTMLDivElement`. An event of the chat, not a message («Анна добавила Олега»): a centered pill that wraps.",
-      ru: "Событие чата, а не сообщение («Анна добавила Олега»): плашка посередине с переносом.",
-      props: [
-        {
-          name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (the event), `className`.",
-          ru: "`children` (событие), `className`.",
-        },
-      ],
-    },
-    {
-      name: "Message.Unread",
-      en: "`ref` → `HTMLDivElement`. «Непрочитанные сообщения»: a band across the list above the first unread message.",
-      ru: "«Непрочитанные сообщения»: полоса через ленту над первым непрочитанным.",
-      props: [
-        {
-          name: "labels",
-          type: "Partial<MessageUnreadLabels>",
-          en: "`unread` — the text of the band.",
-          ru: "`unread` — текст полосы.",
-        },
-        {
-          name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
-          en: "`className` and the other attributes.",
-          ru: "`className` и прочие атрибуты.",
-        },
-      ],
-    },
-    {
       name: "Message.Typing",
-      en: '`ref` → `HTMLDivElement` (`role="status"`). «Печатает…»: an incoming bubble of three dots that rise and fade in turn (the loading loop: reduced motion slows it), at the end of the group while the other side types. Enters like an incoming message; leaves fading and closing its height. Its hidden text is read politely.',
-      ru: "«Печатает…»: входящий пузырь из трёх точек, которые по очереди поднимаются и проявляются (цикл загрузки: при уменьшенном движении медленнее), в конце ленты, пока собеседник пишет. Появляется как входящее сообщение, уходит, гаснув и закрывая высоту. Скрытый текст читается вежливо.",
+      en: '`ref` → `HTMLDivElement` (`role="status"`). «Печатает…»: an incoming bubble of three dots that rise and fade in turn (the loading loop: reduced motion slows it), at the end of the list while the other side types (`Chat.Root typing` puts it there for you). Enters like an incoming message; leaves fading and closing its height. Its hidden text is read politely.',
+      ru: "«Печатает…»: входящий пузырь из трёх точек, которые по очереди поднимаются и проявляются (цикл загрузки: при уменьшенном движении медленнее), в конце ленты, пока собеседник пишет (`Chat.Root typing` ставит его сам). Появляется как входящее сообщение, уходит, гаснув и закрывая высоту. Скрытый текст читается вежливо.",
       props: [
         {
           name: "active",
@@ -417,8 +288,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "`Message.Avatar` of who types, in a group chat (`Message.Group avatars`).",
-          ru: "`Message.Avatar` того, кто пишет, в групповом чате (`Message.Group avatars`).",
+          en: '`Message.Avatar` of who types, in a group chat (`Chat.Messages type="group"`).',
+          ru: '`Message.Avatar` того, кто пишет, в групповом чате (`Chat.Messages type="group"`).',
         },
         {
           name: "labels",
@@ -429,63 +300,6 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
-          en: "`className` and the other attributes.",
-          ru: "`className` и прочие атрибуты.",
-        },
-      ],
-    },
-    {
-      name: "Message.Pinned",
-      en: "`ref` → `HTMLDivElement`. The pinned messages above a conversation (outside its ScrollContainer): a rail of segments (which of several is shown, the current one in the accent), a pin, «Закреплённое сообщение» or «Закреплённое 2 из 3» over one line of the message, and an optional unpin button. The text area is one button: it shows the message (`onSelect`) and steps to the next older one; the line enters on each step. Renders nothing without items.",
-      ru: "Закреплённые сообщения над перепиской (вне её ScrollContainer): полоска сегментов (какое из нескольких показано, текущее — акцентом), булавка, «Закреплённое сообщение» или «Закреплённое 2 из 3» над строкой сообщения и необязательная кнопка открепления. Текстовая часть — одна кнопка: показывает сообщение (`onSelect`) и переходит к следующему более старому; строка появляется на каждом шаге. Без элементов ничего не рисует.",
-      props: [
-        {
-          name: "items",
-          type: "readonly { value: string; text: string }[]",
-          required: true,
-          en: "The pinned messages, oldest first: the `value` of each `Message.Root` and one line of it («Фото», «Голосовое сообщение» for media).",
-          ru: "Закреплённые сообщения, от старых к новым: `value` каждого `Message.Root` и одна его строка («Фото», «Голосовое сообщение» для медиа).",
-        },
-        {
-          name: "value",
-          type: "string",
-          en: "The pinned message shown (controlled).",
-          ru: "Показанное закреплённое сообщение (управляемое).",
-        },
-        {
-          name: "defaultValue",
-          type: "string",
-          default: "the last item",
-          en: "The one shown first (uncontrolled): the newest.",
-          ru: "Показанное сначала (неуправляемое): самое новое.",
-        },
-        {
-          name: "onValueChange",
-          type: "(value: string) => void",
-          en: "The shown message changed: a press stepped to the next older one (the oldest wraps to the newest).",
-          ru: "Показанное сообщение сменилось: нажатие перешло к следующему более старому (самое старое — снова к новому).",
-        },
-        {
-          name: "onSelect",
-          type: "(value: string) => void",
-          en: "A press on the bar: show the message in the chat — set `Message.Group current` to it.",
-          ru: "Нажатие на плашку: покажите сообщение в чате — передайте его в `Message.Group current`.",
-        },
-        {
-          name: "onRemove",
-          type: "(value: string) => void",
-          en: "Unpin the shown message: a ghost close button at the end. Without it no button.",
-          ru: "Открепить показанное сообщение: кнопка-крестик в конце. Без него кнопки нет.",
-        },
-        {
-          name: "labels",
-          type: "Partial<MessagePinnedLabels>",
-          en: "System strings, see Labels.",
-          ru: "Системные строки, см. Labels.",
-        },
-        {
-          name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "onSelect">',
           en: "`className` and the other attributes.",
           ru: "`className` и прочие атрибуты.",
         },
@@ -580,74 +394,32 @@ export const api: ComponentApi = {
     {
       key: "reactionAdded",
       default: "Реакция {emoji} поставлена",
-      en: "`Message.Group`: announced when the quick reaction is put.",
-      ru: "`Message.Group`: объявление, когда быстрая реакция поставлена.",
+      en: "Announced when the quick reaction (a double tap, `L`) is put.",
+      ru: "Объявление, когда быстрая реакция (двойное касание, `L`) поставлена.",
     },
     {
       key: "reactionRemoved",
       default: "Реакция {emoji} снята",
-      en: "`Message.Group`: announced when the quick reaction is taken back.",
-      ru: "`Message.Group`: объявление, когда быстрая реакция снята.",
-    },
-    {
-      key: "selectedCount",
-      default: "Выбрано: {count}",
-      en: "`Message.Group`: the count of the selection bar.",
-      ru: "`Message.Group`: счётчик панели выбора.",
-    },
-    {
-      key: "cancel",
-      default: "Отмена",
-      en: "`Message.Group`: the selection bar's button that leaves selection.",
-      ru: "`Message.Group`: кнопка панели выбора, которая выходит из выбора.",
+      en: "Announced when the quick reaction is taken back.",
+      ru: "Объявление, когда быстрая реакция снята.",
     },
     {
       key: "reactionBar",
       default: "Реакции",
-      en: "`Message.Group`: the name of the reaction bar.",
-      ru: "`Message.Group`: имя панели реакций.",
+      en: "The name of the reaction bar.",
+      ru: "Имя панели реакций.",
     },
     {
       key: "moreReactions",
       default: "Все реакции",
-      en: "`Message.Group`: the «⌄» of the reaction bar.",
-      ru: "`Message.Group`: кнопка «⌄» панели реакций.",
-    },
-    {
-      key: "scrollToEnd",
-      default: "К последним сообщениям",
-      en: "`Message.Group`: the name of the round button that goes to the newest message.",
-      ru: "`Message.Group`: имя круглой кнопки перехода к последнему сообщению.",
-    },
-    {
-      key: "newMessages",
-      default: "Новых сообщений: {count}. К последним сообщениям",
-      en: "`Message.Group`: the name of that button while new messages wait below.",
-      ru: "`Message.Group`: имя этой кнопки, пока внизу ждут новые сообщения.",
+      en: "The «⌄» of the reaction bar that shows every reaction.",
+      ru: "Кнопка «⌄» панели реакций, которая показывает все реакции.",
     },
     {
       key: "typing",
       default: "Собеседник печатает",
       en: "`Message.Typing`: the text read while the other side types.",
       ru: "`Message.Typing`: текст, который читается, пока собеседник пишет.",
-    },
-    {
-      key: "pinned",
-      default: "Закреплённое сообщение",
-      en: "`Message.Pinned`: the title with one pinned message.",
-      ru: "`Message.Pinned`: заголовок при одном закреплённом.",
-    },
-    {
-      key: "pinnedOf",
-      default: "Закреплённое {index} из {count}",
-      en: "`Message.Pinned`: the title with several, the newest last.",
-      ru: "`Message.Pinned`: заголовок при нескольких, самое новое — последнее.",
-    },
-    {
-      key: "unpin",
-      default: "Открепить",
-      en: "`Message.Pinned`: the name of the unpin button.",
-      ru: "`Message.Pinned`: имя кнопки открепления.",
     },
     ...contentLabelRows,
   ],

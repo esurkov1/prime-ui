@@ -1,8 +1,10 @@
-/** A photo with a caption, an album with a video laid out as tiles, an outgoing album with neutral gaps and a photo still uploading with its ring and cancel; a tile opens your viewer — `Message.Media`, `items`, `onItemOpen`, `onCancel`. */
-import { Message, type MessageMediaItem } from "prime-ui-kit";
+/** Captions under a photo, a tall portrait, an album and a video, each as wide as its media; an album with a video laid out as tiles, an outgoing album with neutral gaps and a photo still uploading with its ring and cancel; a tile opens the album in the viewer — `Message.Media`, `items`, `onCancel`. */
+import { type GalleryItem, Message } from "prime-ui-kit";
 import * as React from "react";
 
-const photo = (seed: string, width: number, height: number, alt: string): MessageMediaItem => ({
+import styles from "./examples.module.css";
+
+const photo = (seed: string, width: number, height: number, alt: string): GalleryItem => ({
   src: `https://picsum.photos/seed/${seed}/${width}/${height}`,
   width,
   height,
@@ -11,7 +13,7 @@ const photo = (seed: string, width: number, height: number, alt: string): Messag
 
 const GATE = [photo("warehouse-gate", 800, 600, "Ворота склада после ремонта")];
 
-const ALBUM: MessageMediaItem[] = [
+const ALBUM: GalleryItem[] = [
   photo("shelf-a", 600, 800, "Стеллаж А"),
   photo("shelf-b", 800, 600, "Стеллаж Б"),
   {
@@ -26,6 +28,19 @@ const ALBUM: MessageMediaItem[] = [
   photo("office-desk", 600, 600, "Рабочее место кладовщика"),
 ];
 
+const SEAL = [photo("seal-portrait", 600, 1000, "Пломба на воротах")];
+
+const CLIP: GalleryItem[] = [
+  {
+    type: "video",
+    src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    width: 1280,
+    height: 720,
+    duration: 6,
+    alt: "Обход рампы",
+  },
+];
+
 const REPORT = [
   photo("pallet-a", 800, 600, "Паллета 1"),
   photo("pallet-b", 800, 600, "Паллета 2"),
@@ -33,23 +48,31 @@ const REPORT = [
 ];
 
 export default function MessageMediaExample() {
-  const [opened, setOpened] = React.useState<string | null>(null);
   const [uploading, setUploading] = React.useState(true);
 
   return (
-    <Message.Group aria-label="Чат склада">
+    <div className={styles.thread}>
       <Message.Root direction="incoming" time="09:12">
-        <Message.Media items={GATE} onItemOpen={(index) => setOpened(GATE[index]?.alt ?? null)} />
+        <Message.Media items={GATE} />
         <Message.Text>Ворота отремонтировали, можно принимать фуры.</Message.Text>
       </Message.Root>
       <Message.Root direction="incoming" time="09:15">
-        <Message.Media items={ALBUM} onItemOpen={(index) => setOpened(ALBUM[index]?.alt ?? null)} />
+        <Message.Media items={ALBUM} />
+      </Message.Root>
+      <Message.Root direction="outgoing" time="09:16" status="read">
+        <Message.Media items={SEAL} />
+        <Message.Text>Пломба цела.</Message.Text>
+      </Message.Root>
+      <Message.Root direction="incoming" time="09:17">
+        <Message.Media items={CLIP} />
+        <Message.Text>
+          Обход рампы перед приёмкой: третья секция стеллажей свободна, паллеты можно ставить сразу
+          после разгрузки, накладные я уже подписала и отправила в бухгалтерию.
+        </Message.Text>
       </Message.Root>
       <Message.Root direction="outgoing" time="09:18" status="read">
-        <Message.Media
-          items={REPORT}
-          onItemOpen={(index) => setOpened(REPORT[index]?.alt ?? null)}
-        />
+        <Message.Media items={REPORT} />
+        <Message.Text>Фотоотчёт по паллетам для «ТехноСнаб».</Message.Text>
       </Message.Root>
       {uploading ? (
         <Message.Root direction="outgoing" time="09:20" status="sending">
@@ -65,7 +88,6 @@ export default function MessageMediaExample() {
           />
         </Message.Root>
       ) : null}
-      {opened ? <Message.Service>Открыто: {opened}</Message.Service> : null}
-    </Message.Group>
+    </div>
   );
 }

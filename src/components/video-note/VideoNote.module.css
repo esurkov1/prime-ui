@@ -10,7 +10,7 @@
  * No shell and no border. At rest it is the still first frame: nothing plays before a press.
  *
  * No flicker: the clip never transforms, toggles compositing or changes per frame; the video's one
- * fade-in is on an element promoted from the start; per frame only `--progress-ring-value` changes,
+ * fade-in is on an element promoted from the start; per frame only `--ring-value` changes,
  * on the ring alone. The ring shows only during a playback.
  * Motion: press scale on the circle (`fast`), the ring and the play disk fade both ways. Reduced
  * motion: no fades.
@@ -59,7 +59,7 @@
 }
 
 /* Disabled: the circle and its duration dim the way a covered circle does; the disk takes the
-   round button's disabled look. */
+   Button's disabled look. */
 .root[data-disabled="true"] :is(.media, .duration) {
   opacity: 0.6;
 }
@@ -85,10 +85,19 @@
   opacity: 1;
 }
 
-/* The progress ring (`internal/progressRing`) only while the note plays with sound. */
+/* The playback ring (`internal/ring`, `live`: the share written every frame, no track) over the
+   circle's edge, in the accent at a band of one spacing step; only while the note plays with
+   sound. */
 .ring {
+  position: absolute;
+  inset: 0;
   opacity: 0;
   transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+}
+
+.circle > .ring {
+  --ring-stroke: var(--prime-space-1);
+  --ring-fill: var(--prime-color-accent-default);
 }
 
 .circle:is([data-state="playing"], [data-state="paused"]) .ring {

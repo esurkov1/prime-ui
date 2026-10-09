@@ -1,3 +1,4 @@
+import { splitFileName } from "./fileName";
 import type { PaletteColor } from "./states";
 
 /** The format badge hue of the common families: documents, sheets, slides, archives, media. */
@@ -23,8 +24,7 @@ const FORMAT_COLORS: Record<string, PaletteColor> = {
 
 /** The extension of a file name, lower case; `""` without one. */
 export function extensionOf(name: string): string {
-  const dot = name.lastIndexOf(".");
-  return dot > 0 ? name.slice(dot + 1).toLowerCase() : "";
+  return splitFileName(name).ext;
 }
 
 /** The hue of a format badge (FileUpload, `Message.File`); `gray` for anything else. */

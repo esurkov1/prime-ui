@@ -1,0 +1,35 @@
+/*
+ * The still disk over media (`mediaDisk.tsx`): the look of a `Button shape="circle"
+ * variant="shade"` at the `l` tier, for a disk that is not a control — the play mark of a video
+ * frame whose whole tile is the button, a transfer disk with no action. One look with the Button:
+ * the media disk ground (`--prime-color-media-disk`) under a gentle blur
+ * (`--prime-media-disk-blur`), the light glyph. The disk is a size container: its glyph is half
+ * its diameter at any size (20 on the 40 disk), so a host may shrink the disk to fit a small frame.
+ *
+ *   .disk  the disk; `data-tone="danger"` — the danger disk of a failed transfer
+ */
+.disk {
+  --prime-icon-size: 50cqi;
+
+  container-type: size;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  box-sizing: border-box;
+  inline-size: var(--prime-control-l-height);
+  aspect-ratio: 1;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-media-disk);
+  color: var(--prime-color-media-shade-fg);
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(var(--prime-media-disk-blur));
+  backdrop-filter: blur(var(--prime-media-disk-blur));
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.disk[data-tone="danger"] {
+  background: var(--prime-color-danger-default);
+  color: var(--prime-color-danger-fg);
+}

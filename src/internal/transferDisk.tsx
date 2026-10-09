@@ -1,10 +1,11 @@
 import * as React from "react";
 
+import { Button } from "@/components/button/Button";
 import { Spinner } from "@/components/spinner/Spinner";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
-import progressRing from "@/internal/progressRing.module.css";
-import round from "@/internal/roundButton.module.css";
+import { mediaDiskClass } from "@/internal/mediaDisk";
+import { Ring } from "@/internal/ring";
 import {
   inFlight,
   type TransferDiskLabels,
@@ -21,15 +22,14 @@ export type TransferDiskProps = {
   /** Share transferred, 0…1. Without it a transfer in flight turns an indeterminate arc. */
   progress?: number;
   /**
-   * `shade` (default) — a disk on the media shade with a blur, over a picture, a video circle or a
-   * file's tile; `solid` — the accent disk of a voice message's play disk (recoloured by an
-   * outgoing bubble like it). Over a play disk (`mediaPlayer` `PlayDisk`) it takes the look of
-   * that disk, and the transfer takes the play glyph's place.
+   * `shade` (default) — Button `variant="shade"`: the media shade with a blur, over a picture, a
+   * video circle or a file's tile; `solid` — the accent disk of a voice message (recoloured by an
+   * outgoing bubble).
    */
   look?: "shade" | "solid";
   /**
    * `l` (default) — the control `l` disk (over media, the voice play disk); `xl` — the control
-   * `xl` round tile of a file in a bubble. The ring is one proportion of the disk at both.
+   * `xl` round tile of a file in a bubble.
    */
   size?: "l" | "xl";
   labels: TransferDiskLabels;
@@ -41,37 +41,51 @@ export type TransferDiskProps = {
   onDownload?: TransferHandler;
   /** The host saves the cancel itself (a tile's pending delete): the disk spins. */
   cancelPending?: boolean;
-  /** The host is disabled: its action is off (native `disabled`, the round button's disabled look). */
+  /** The host is disabled: its action is off. */
   disabled?: boolean;
   className?: string;
 };
 
 type Action = "cancel" | "retry" | "download";
 
+export type TransferDiskModel = {
+  /** What a press does now, or `null` when the disk only shows the state. */
+  action: Action | null;
+  /** The handler of `action` was given. */
+  pressable: boolean;
+  /** A handler's promise (or the host's pending cancel) is in flight. */
+  busy: boolean;
+  /** The glyph in the disk: ×, the retry or download arrow, the failure mark, or a Spinner. */
+  glyph: React.ReactNode;
+  /** The disk's name. */
+  name: string | undefined;
+  /** For Button `progress`: the share in flight (`null` unknown), full when done, else none. */
+  progress: number | null | undefined;
+  failed: boolean;
+  /** The id of the disk's description (the share in flight, the reason of a failure). */
+  describedBy: string | undefined;
+  /** Hidden texts the disk refers to: its description and the live region of refusals. */
+  texts: React.ReactNode;
+  run: () => void;
+};
+
 /**
- * The transfer disk — the one look of a transfer in the kit, both ways: a round disk
- * (`roundButton`) with the share as a ring along its inner edge (`progressRing`: a 32% track and a
- * solid arc in the glyph's colour clockwise from 12 o'clock, 7.5% of the disk at every size). In
- * flight it is the cancel (×); `remote` — the download arrow; a failure turns it danger with a
- * retry arrow; done, it fades and shrinks away (`fast`) and leaves the focus order (`inert`). A
- * promise from a handler keeps it pending (a spinner, `aria-busy`, no second press); a rejection
- * is announced. The progress is one CSS variable on the ring, gliding by itself (`base`). Not
- * ProgressCircle — that is a labelled data ring painted on the theme ladder in tones.
+ * The logic of a transfer disk, shared by `TransferDisk` and the play disk of the players (which
+ * draw it as one `Button shape="circle"`): what a press does in each state, a pending promise (no
+ * second press, `aria-busy`), the announcement of a refusal, the names and the description (the
+ * share in flight — «Отправка 45%» — or the reason of a failure).
  */
-export function TransferDisk({
+export function useTransferDisk({
   state,
   progress,
-  look = "shade",
-  size = "l",
   labels,
   onCancel,
   onRetry,
   onDownload,
   cancelPending = false,
   disabled = false,
-  className,
-}: TransferDiskProps) {
-  const reasonId = React.useId();
+}: Omit<TransferDiskProps, "look" | "size" | "className">): TransferDiskModel {
+  const descriptionId = React.useId();
   const [pending, setPending] = React.useState<Action | null>(null);
   const [notice, setNotice] = React.useState("");
   const alive = React.useRef(true);
@@ -85,28 +99,23 @@ export function TransferDisk({
   const active = inFlight(state);
   const failed = state === "failed";
   const remote = state === "remote";
-  const done = state === "done";
-  const indeterminate = state === "loading" && progress === undefined;
-  // The ring: empty while queued, the share while loading, full when done.
-  const share = Math.min(1, Math.max(0, progress ?? 0));
-  const fill = indeterminate ? 0.25 : state === "loading" ? share : state === "done" ? 1 : 0;
-  const kind: Action | null = active ? "cancel" : failed ? "retry" : remote ? "download" : null;
+  const action: Action | null = active ? "cancel" : failed ? "retry" : remote ? "download" : null;
   const handler =
-    kind === "cancel"
+    action === "cancel"
       ? onCancel
-      : kind === "retry"
+      : action === "retry"
         ? onRetry
-        : kind === "download"
+        : action === "download"
           ? onDownload
           : undefined;
-  const busy = (kind !== null && pending === kind) || (active && cancelPending);
+  const busy = (action !== null && pending === action) || (active && cancelPending);
 
   const run = () => {
-    if (!handler || !kind || busy || disabled) return;
+    if (!handler || !action || busy || disabled) return;
     setNotice("");
     const result = handler();
     if (!isPromiseLike(result)) return;
-    setPending(kind);
+    setPending(action);
     result.then(
       () => {
         if (alive.current) setPending(null);
@@ -115,9 +124,9 @@ export function TransferDisk({
         if (!alive.current) return;
         setPending(null);
         const refused =
-          kind === "cancel"
+          action === "cancel"
             ? labels.cancelFailed
-            : kind === "retry"
+            : action === "retry"
               ? labels.retryFailed
               : labels.downloadFailed;
         setNotice(refused ?? "");
@@ -126,7 +135,7 @@ export function TransferDisk({
   };
 
   const glyph = busy ? (
-    <Spinner aria-hidden="true" />
+    <Spinner />
   ) : (
     <Icon
       name={
@@ -140,60 +149,118 @@ export function TransferDisk({
       }
     />
   );
-  const buttonLook = failed ? "danger" : look;
   const name =
-    kind === "cancel" ? labels.cancel : kind === "retry" ? labels.retry : labels.download;
+    action === "cancel" ? labels.cancel : action === "retry" ? labels.retry : labels.download;
+  // The ring: empty while queued (it turns at its least arc), the share while loading (`null`
+  // unknown), full when done; none on a failure or a content not fetched.
+  const share =
+    state === "queued"
+      ? 0
+      : state === "loading"
+        ? progress === undefined
+          ? null
+          : Math.min(1, Math.max(0, progress))
+        : state === "done"
+          ? 1
+          : undefined;
+  const description = active ? labels.progress : failed ? labels.failed : null;
+
+  return {
+    action,
+    pressable: Boolean(handler),
+    busy,
+    glyph,
+    name,
+    progress: share,
+    failed,
+    describedBy: description ? descriptionId : undefined,
+    texts: (
+      <>
+        {description ? <VisuallyHidden id={descriptionId}>{description}</VisuallyHidden> : null}
+        {/* Only where a refusal has words to announce; a host with its own live region gives none. */}
+        {labels.cancelFailed || labels.retryFailed || labels.downloadFailed ? (
+          <VisuallyHidden role="status">{notice}</VisuallyHidden>
+        ) : null}
+      </>
+    ),
+    run,
+  };
+}
+
+/**
+ * The transfer disk — the one look of a transfer in the kit, both ways: a `Button
+ * shape="circle"` whose `progress` ring runs along its inner edge in the glyph's color (the kit
+ * ring at the line weight, turning). In flight it is the cancel (×), described by the share;
+ * `remote` — the download arrow; a failure turns it danger with a retry arrow, described by the
+ * reason; done, the ring fills, then the disk fades and shrinks to 0.9 and leaves the focus order
+ * (`inert`). Without the handler of its state it is no button: a still disk with the ring, a
+ * named `progressbar` while in flight.
+ */
+export function TransferDisk({
+  look = "shade",
+  size = "l",
+  className,
+  ...props
+}: TransferDiskProps) {
+  const disk = useTransferDisk(props);
+  const { state, disabled = false } = props;
+  const done = state === "done";
+  const variant = look === "shade" ? "shade" : "solid";
+  const tone = disk.failed ? "danger" : "accent";
 
   return (
     <span
       className={cx(styles.disk, className)}
       data-state={state}
-      data-look={look}
       data-size={size}
-      data-indeterminate={indeterminate || undefined}
-      data-action={handler ? kind : undefined}
+      data-action={disk.pressable ? disk.action : undefined}
       inert={done || undefined}
       aria-hidden={done || undefined}
     >
-      {handler ? (
-        <button
-          type="button"
-          className={cx(round.round, styles.button)}
-          data-look={buttonLook}
-          aria-label={name}
-          aria-describedby={failed && labels.failed ? reasonId : undefined}
-          aria-busy={busy || undefined}
-          aria-disabled={busy || undefined}
+      {disk.pressable ? (
+        <Button.Root
+          shape="circle"
+          variant={variant}
+          tone={tone}
+          size={size}
+          className={styles.button}
+          aria-label={disk.name ?? ""}
+          aria-describedby={disk.describedBy}
+          aria-disabled={disk.busy || undefined}
+          aria-busy={disk.busy || undefined}
           disabled={disabled}
-          onClick={run}
+          progress={disk.progress}
+          onClick={disk.run}
         >
-          {glyph}
-        </button>
+          <Button.Icon>{disk.glyph}</Button.Icon>
+        </Button.Root>
       ) : (
-        <span className={cx(round.round, styles.button)} data-look={buttonLook} aria-hidden="true">
-          {failed || remote ? glyph : null}
+        // A disk with no action is no button (a Button would be focusable and pressable): a still
+        // disk in the same colors, with the same ring.
+        <span
+          className={cx(mediaDiskClass, styles.still)}
+          data-variant={variant}
+          data-tone={tone}
+          {...(inFlight(state)
+            ? {
+                role: "progressbar",
+                "aria-valuemin": 0,
+                "aria-valuemax": 100,
+                "aria-valuenow":
+                  disk.progress === null || disk.progress === undefined
+                    ? undefined
+                    : Math.round(disk.progress * 100),
+                "aria-label": props.labels.progress ?? undefined,
+              }
+            : { "aria-hidden": true })}
+        >
+          {disk.progress !== undefined ? (
+            <Ring value={disk.progress} spin={!done} className={styles.ring} />
+          ) : null}
+          {state === "failed" || state === "remote" ? disk.glyph : null}
         </span>
       )}
-      <span
-        className={cx(progressRing.ring, styles.ring)}
-        style={{ "--transfer-progress": fill } as React.CSSProperties}
-        {...(active
-          ? {
-              role: "progressbar",
-              "aria-valuemin": 0,
-              "aria-valuemax": 100,
-              "aria-valuenow": indeterminate ? undefined : Math.round(fill * 100),
-              "aria-label": labels.progress ?? undefined,
-            }
-          : { "aria-hidden": true })}
-      />
-      {failed && labels.failed ? (
-        <VisuallyHidden id={reasonId}>{labels.failed}</VisuallyHidden>
-      ) : null}
-      {/* Only where a refusal has words to announce; a host with its own live region gives none. */}
-      {labels.cancelFailed || labels.retryFailed || labels.downloadFailed ? (
-        <VisuallyHidden role="status">{notice}</VisuallyHidden>
-      ) : null}
+      {disk.texts}
     </span>
   );
 }

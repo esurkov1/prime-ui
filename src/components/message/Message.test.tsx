@@ -5,14 +5,15 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
-
+import { ChatSeparator, ChatService, ChatUnread } from "@/components/chat/ChatRows";
+import { ChatSelectionBar, MessageList } from "@/components/chat/MessageList";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { VideoNote } from "@/components/video-note/VideoNote";
 
 import { Message } from "./Message";
 
 function Chat({ children }: { children: React.ReactNode }) {
-  return <Message.Group aria-label="Переписка с клиентом">{children}</Message.Group>;
+  return <MessageList aria-label="Переписка с клиентом">{children}</MessageList>;
 }
 
 describe("Message", () => {
@@ -148,7 +149,7 @@ describe("Message", () => {
     render(
       <Message.Root onReactionToggle={onReactionToggle}>
         <Message.Text>Сделка закрыта</Message.Text>
-        <Message.Reactions reactions={[{ emoji: "+1", count: 2, selected: true }]} />
+        <Message.Reactions items={[{ emoji: "+1", count: 2, selected: true }]} />
       </Message.Root>,
     );
     const chip = screen.getByRole("button", { name: "+1: 2" });
@@ -182,7 +183,7 @@ describe("Message", () => {
         <Message.Root>
           <Message.Text>Релиз в четверг</Message.Text>
           <Message.Reactions
-            reactions={[
+            items={[
               { emoji: "A", count: 1, users: PEOPLE.slice(0, 1) },
               { emoji: "B", count: 3, users: PEOPLE.slice(0, 3) },
               { emoji: "C", count: 5, users: PEOPLE },
@@ -210,7 +211,7 @@ describe("Message", () => {
         <Message.Root>
           <Message.Text>Релиз в четверг</Message.Text>
           <Message.Reactions
-            reactions={[
+            items={[
               { emoji: "❤️", count: 3, users: PEOPLE.slice(0, 3) },
               { emoji: "🔥", count: 7, users: PEOPLE.slice(0, 2) },
             ]}
@@ -230,12 +231,12 @@ describe("Message", () => {
           }),
       );
       render(
-        <Message.Group aria-label="Чат" reader={ME}>
+        <MessageList aria-label="Чат" reader={ME}>
           <Message.Root onReactionToggle={onReactionToggle}>
             <Message.Text>Релиз в четверг</Message.Text>
-            <Message.Reactions reactions={[{ emoji: "+1", count: 2, users: PEOPLE.slice(0, 2) }]} />
+            <Message.Reactions items={[{ emoji: "+1", count: 2, users: PEOPLE.slice(0, 2) }]} />
           </Message.Root>
-        </Message.Group>,
+        </MessageList>,
       );
       const chip = screen.getByRole("button", { name: "+1 2: Анна, Пётр" });
       act(() => {
@@ -252,17 +253,17 @@ describe("Message", () => {
     it("enters only a reaction new on the message, never on mount, and keeps the other chips", () => {
       const onReactionToggle = vi.fn(() => new Promise<void>(() => {}));
       render(
-        <Message.Group aria-label="Чат" quickReaction="🎉" reader={ME}>
+        <MessageList aria-label="Чат" quickReaction="🎉" reader={ME}>
           <Message.Root onReactionToggle={onReactionToggle}>
             <Message.Text>Релиз в четверг</Message.Text>
             <Message.Reactions
-              reactions={[
+              items={[
                 { emoji: "+1", count: 2, users: PEOPLE.slice(0, 2) },
                 { emoji: "!", count: 4 },
               ]}
             />
           </Message.Root>
-        </Message.Group>,
+        </MessageList>,
       );
       const plus = screen.getByRole("button", { name: /^\+1 2/ });
       const bang = screen.getByRole("button", { name: "!: 4" });
@@ -308,11 +309,11 @@ describe("Message", () => {
             }),
         );
         render(
-          <Message.Group aria-label="Чат" quickReaction="🎉">
+          <MessageList aria-label="Чат" quickReaction="🎉">
             <Message.Root onReactionToggle={onReactionToggle}>
               <Message.Text>Релиз в четверг</Message.Text>
             </Message.Root>
-          </Message.Group>,
+          </MessageList>,
         );
         // Every message holds the row's place, closed.
         const slot = document.querySelector("[data-message-reactions]");
@@ -340,11 +341,11 @@ describe("Message", () => {
   it("puts the quick reaction on a double tap and on L, and announces it", async () => {
     const onReactionToggle = vi.fn();
     render(
-      <Message.Group aria-label="Чат" quickReaction="+1">
+      <MessageList aria-label="Чат" quickReaction="+1">
         <Message.Root time="10:00" onReactionToggle={onReactionToggle}>
           <Message.Text>Счёт отправлен</Message.Text>
         </Message.Root>
-      </Message.Group>,
+      </MessageList>,
     );
     const article = screen.getByRole("article");
     // The row's empty width is not the message.
@@ -360,14 +361,14 @@ describe("Message", () => {
 
   it("keeps a double click from selecting a word, but not a single press or a link", () => {
     render(
-      <Message.Group aria-label="Чат">
+      <MessageList aria-label="Чат">
         <Message.Root time="10:00" onReactionToggle={() => {}}>
           <Message.Text>Счёт на https://prime.app отправлен</Message.Text>
         </Message.Root>
         <Message.Root time="10:01">
           <Message.Text>Без реакций</Message.Text>
         </Message.Root>
-      </Message.Group>,
+      </MessageList>,
     );
     const text = screen.getByText(/Счёт на/);
     // `fireEvent` returns `false` when the default was prevented.
@@ -395,7 +396,7 @@ describe("Message", () => {
   it("opens the reaction bar from the keyboard: arrows move, Enter picks and closes", async () => {
     const onReactionToggle = vi.fn();
     render(
-      <Message.Group
+      <MessageList
         aria-label="Чат"
         reactionOptions={[
           { emoji: "+1", label: "Нравится" },
@@ -405,7 +406,7 @@ describe("Message", () => {
         <Message.Root time="10:00" onReactionToggle={onReactionToggle}>
           <Message.Text>Счёт отправлен</Message.Text>
         </Message.Root>
-      </Message.Group>,
+      </MessageList>,
     );
     screen.getByRole("article").focus();
     await userEvent.keyboard("r");
@@ -422,11 +423,11 @@ describe("Message", () => {
       <div>
         <div data-testid="aside" />
         <div data-testid="chat">
-          <Message.Group aria-label="Чат">
+          <MessageList aria-label="Чат">
             <Message.Root time="10:00" onReactionToggle={() => {}}>
               <Message.Text>Счёт отправлен</Message.Text>
             </Message.Root>
-          </Message.Group>
+          </MessageList>
         </div>
       </div>,
     );
@@ -438,6 +439,35 @@ describe("Message", () => {
     expect(screen.getByRole("toolbar", { name: "Реакции" })).toBeInTheDocument();
     fireEvent.scroll(screen.getByTestId("chat"));
     expect(screen.queryByRole("toolbar")).toBeNull();
+  });
+
+  it("a press during a long hover cancels the bar: it never opens over what the press opened", () => {
+    vi.useFakeTimers();
+    const matchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: query.includes("hover"),
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    })) as never;
+    try {
+      render(
+        <MessageList aria-label="Чат">
+          <Message.Root time="10:00" onReactionToggle={() => {}}>
+            <Message.Text>Счёт отправлен</Message.Text>
+          </Message.Root>
+        </MessageList>,
+      );
+      const text = screen.getByText("Счёт отправлен");
+      fireEvent.pointerEnter(text, { pointerType: "mouse" });
+      act(() => vi.advanceTimersByTime(200));
+      fireEvent.pointerDown(text, { pointerType: "mouse" });
+      act(() => vi.advanceTimersByTime(1000));
+      expect(screen.queryByRole("toolbar")).toBeNull();
+    } finally {
+      window.matchMedia = matchMedia;
+      vi.useRealTimers();
+    }
   });
 
   it("shows the bar after a long hover and the bar with the menu after a long press", () => {
@@ -452,14 +482,14 @@ describe("Message", () => {
     })) as never;
     try {
       render(
-        <Message.Group aria-label="Чат">
+        <MessageList aria-label="Чат">
           <Message.Root time="10:00" onReactionToggle={() => {}}>
             <Message.Text>Счёт отправлен</Message.Text>
             <Message.Menu>
               <Dropdown.Item>Ответить</Dropdown.Item>
             </Message.Menu>
           </Message.Root>
-        </Message.Group>,
+        </MessageList>,
       );
       const article = screen.getByRole("article");
       const text = screen.getByText("Счёт отправлен");
@@ -541,7 +571,7 @@ describe("Message", () => {
     function Selectable() {
       const [selected, setSelected] = React.useState<readonly string[] | null>(null);
       return (
-        <Message.Group
+        <MessageList
           aria-label="Чат"
           selected={selected}
           onSelectedChange={(next) => {
@@ -558,8 +588,8 @@ describe("Message", () => {
           <Message.Root value="b" time="10:01">
             <Message.Text>Новая дата — 10 октября</Message.Text>
           </Message.Root>
-          <Message.SelectionBar />
-        </Message.Group>
+          <ChatSelectionBar />
+        </MessageList>
       );
     }
     render(<Selectable />);
@@ -592,12 +622,12 @@ describe("Message", () => {
     });
     function Chat({ selected }: { selected: readonly string[] | null }) {
       return (
-        <Message.Group aria-label="Чат" selected={selected}>
+        <MessageList aria-label="Чат" selected={selected}>
           <Message.Root value="a" time="10:00">
             <Message.Text>Отгрузка задерживается</Message.Text>
           </Message.Root>
-          <Message.SelectionBar />
-        </Message.Group>
+          <ChatSelectionBar />
+        </MessageList>
       );
     }
     const { rerender, container } = render(<Chat selected={null} />);
@@ -608,7 +638,10 @@ describe("Message", () => {
     expect(group?.style.getPropertyValue("--message-bottom-bar")).toBe("56px");
     rerender(<Chat selected={null} />);
     expect(group?.style.getPropertyValue("--message-bottom-bar")).toBe("");
-    const flat = readFileSync(join(__dirname, "Message.module.css"), "utf8").replace(/\s+/g, " ");
+    const flat = readFileSync(join(__dirname, "../chat/Chat.module.css"), "utf8").replace(
+      /\s+/g,
+      " ",
+    );
     expect(flat).toContain("translate: 0 calc(-1 * var(--message-bottom-bar, 0px));");
     vi.restoreAllMocks();
   });
@@ -619,13 +652,13 @@ describe("Message", () => {
   ])("selects like a table: Shift range from the anchor, a %s drag paints", (pointerType) => {
     const onSelectedChange = vi.fn();
     render(
-      <Message.Group aria-label="Чат" defaultSelected={[]} onSelectedChange={onSelectedChange}>
+      <MessageList aria-label="Чат" defaultSelected={[]} onSelectedChange={onSelectedChange}>
         {["a", "b", "c", "d"].map((value) => (
           <Message.Root key={value} value={value} time="10:00">
             <Message.Text>{`Сообщение ${value}`}</Message.Text>
           </Message.Root>
         ))}
-      </Message.Group>,
+      </MessageList>,
     );
     const options = screen.getAllByRole("option");
     fireEvent.click(options[0], { detail: 1 });
@@ -656,12 +689,12 @@ describe("Message", () => {
       <>
         <Message.Root time="09:15">
           <Message.Media items={[{ src: "/photo.jpg", alt: "Склад" }]} />
-          <Message.Reactions reactions={reactions} />
+          <Message.Reactions items={reactions} />
         </Message.Root>
         <Message.Root time="09:16">
           <Message.Media items={[{ src: "/photo.jpg", alt: "Склад" }]} />
           <Message.Text>Подпись</Message.Text>
-          <Message.Reactions reactions={reactions} />
+          <Message.Reactions items={reactions} />
         </Message.Root>
       </>,
     );
@@ -679,7 +712,7 @@ describe("Message", () => {
       { src: "/b.jpg", alt: "Стеллаж" },
     ];
     render(
-      <Message.Group avatars aria-label="Чат">
+      <MessageList group aria-label="Чат">
         <Message.Root time="13:40" position="first">
           <Message.Text>Первое</Message.Text>
         </Message.Root>
@@ -706,7 +739,7 @@ describe("Message", () => {
           <Message.Media items={[{ src: "/photo.jpg", alt: "Склад" }]} />
           <Message.Text>Подпись</Message.Text>
         </Message.Root>
-      </Message.Group>,
+      </MessageList>,
     );
     const articles = screen.getAllByRole("article");
     const shells = articles.map((article) => article.querySelector<HTMLElement>("[data-shell]"));
@@ -731,18 +764,18 @@ describe("Message", () => {
   });
 
   it("lays out an album and names the tiles that open the viewer", async () => {
-    const onItemOpen = vi.fn();
+    const onIndexChange = vi.fn();
     const items = Array.from({ length: 5 }, (_, i) => ({
       src: `/photo-${i}.jpg`,
       alt: `Стеллаж ${i + 1}`,
     }));
     render(
       <Message.Root time="09:15">
-        <Message.Media items={items} onItemOpen={onItemOpen} />
+        <Message.Media items={items} viewer={false} onIndexChange={onIndexChange} />
       </Message.Root>,
     );
     await userEvent.click(screen.getByRole("button", { name: "Открыть: Стеллаж 3" }));
-    expect(onItemOpen).toHaveBeenCalledWith(2);
+    expect(onIndexChange).toHaveBeenCalledWith(2);
     expect(screen.getByRole("article").querySelector("[data-meta]")).toHaveAttribute(
       "data-meta",
       "overlay",
@@ -763,8 +796,9 @@ describe("Message", () => {
       </Message.Root>,
     );
     expect(screen.getByText("1 КБ из 2 КБ")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: "Отправка 50%" })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Отменить отправку" }));
+    const cancel = screen.getByRole("button", { name: "Отменить отправку" });
+    expect(cancel).toHaveAccessibleDescription("Отправка 50%");
+    await userEvent.click(cancel);
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
@@ -827,7 +861,7 @@ describe("Message", () => {
           </Message.Root>
           <Message.Root time="10:01" onReactionToggle={() => {}}>
             <Message.Text>Счёт оплачен</Message.Text>
-            <Message.Reactions reactions={[{ emoji: "+1", count: 1 }]} />
+            <Message.Reactions items={[{ emoji: "+1", count: 1 }]} />
           </Message.Root>
         </>,
       );
@@ -875,9 +909,9 @@ describe("Message", () => {
   it("renders separators, service lines and the unread band", () => {
     render(
       <Chat>
-        <Message.Separator>Сегодня</Message.Separator>
-        <Message.Service>Анна добавила Олега</Message.Service>
-        <Message.Unread />
+        <ChatSeparator>Сегодня</ChatSeparator>
+        <ChatService>Анна добавила Олега</ChatService>
+        <ChatUnread />
         <Message.Forwarded from="Ирина" />
       </Chat>,
     );
@@ -932,7 +966,7 @@ describe("Message shells and layout contract", () => {
     render(
       <Message.Root time="14:26" direction="outgoing" status="read">
         <Message.Text>Реквизиты склада пришлю после сверки с бухгалтерией.</Message.Text>
-        <Message.Reactions reactions={[{ emoji: "👍", count: 1 }]} />
+        <Message.Reactions items={[{ emoji: "👍", count: 1 }]} />
       </Message.Root>,
     );
     const bubble = document.querySelector("[data-message-bubble]");
@@ -950,7 +984,7 @@ describe("Message shells and layout contract", () => {
     render(
       <Message.Root time="10:07">
         <Message.Location src="/map.png" title="Склад" address="ул. Складочная, 1" />
-        <Message.Reactions reactions={[{ emoji: "👍", count: 1 }]} />
+        <Message.Reactions items={[{ emoji: "👍", count: 1 }]} />
       </Message.Root>,
     );
     const bubble = document.querySelector("[data-message-bubble]");
@@ -987,11 +1021,13 @@ describe("Message shells and layout contract", () => {
     expect(flat).toContain("[data-morphing] .fill { display: block; }");
   });
 
-  it("marks selection and pointing by the others stepping back, from one group attribute", () => {
+  it("marks selection and pointing by the others stepping back, from one list attribute", () => {
     const flat = css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ");
     const back = ".root:not([data-selected]) > :is(.gutter, .column, .retry)";
-    expect(flat).toContain(`.group[data-selecting] ${back}`);
-    expect(flat).toContain('.group[data-pointing="current"] .root:not([data-pointed])');
+    expect(flat).toContain(`[data-message-list][data-selecting] ${back}`);
+    expect(flat).toContain(
+      '[data-message-list][data-pointing="current"] .root:not([data-pointed])',
+    );
     expect(flat).toContain("opacity: var(--prime-message-dim-opacity);");
     expect(flat).toContain("filter: saturate(var(--prime-message-dim-saturation));");
     // Nothing drawn on the message: no outline, wash or ring of a selected or pointed bubble.
@@ -1006,14 +1042,14 @@ describe("Message shells and layout contract", () => {
       { src: "/b.jpg", alt: "Стеллаж", width: 800, height: 600 },
     ];
     render(
-      <Message.Group aria-label="Чат">
+      <MessageList aria-label="Чат">
         <Message.Root value="in">
           <Message.Media items={album} />
         </Message.Root>
         <Message.Root value="out" direction="outgoing">
           <Message.Media items={album} />
         </Message.Root>
-      </Message.Group>,
+      </MessageList>,
     );
     const [incoming, outgoing] = screen.getAllByRole("article");
     const gapsOf = (article: HTMLElement | undefined) =>
@@ -1028,7 +1064,7 @@ describe("Message shells and layout contract", () => {
     render(
       <Message.Root time="10:00" status="read" onReactionToggle={() => {}}>
         <Message.Text>Счёт отправлен</Message.Text>
-        <Message.Reactions reactions={[{ emoji: "+1", count: 1 }]} />
+        <Message.Reactions items={[{ emoji: "+1", count: 1 }]} />
       </Message.Root>,
     );
     const article = screen.getByRole("article");

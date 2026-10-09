@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { activeElement, focusBack, focusInto } from "@/internal/overlay/focus";
+import { focusBack, focusInto, openerElement } from "@/internal/overlay/focus";
 import { type DismissReason, type LayerEntry, useLayer } from "@/internal/overlay/layerStack";
 
 import { useInertSiblings } from "./useInertSiblings";
@@ -23,7 +23,8 @@ export type ModalLayer<T extends HTMLElement> = {
  * The mechanics of a modal layer — Modal, Drawer, CommandMenu, the off-canvas Sidebar — in one
  * fixed order: the rest of the page becomes inert, focus moves in and Tab is trapped, document
  * scroll locks, and the layer joins the stack with scrim (`click`) dismissal. On close the page is
- * restored first, then focus returns to the opener, captured at the open transition. Focus always
+ * restored first, then focus returns to the opener, captured at the open transition — the control
+ * that was pressed (Safari does not focus a clicked button), else the focused element. Focus always
  * returns, also after a scrim click: the page behind was inert, so the opener is the only place to
  * continue from (foundation §8).
  */
@@ -38,7 +39,7 @@ export function useModalLayer<T extends HTMLElement = HTMLElement>({
   const wasOpenRef = React.useRef(false);
   if (open !== wasOpenRef.current) {
     wasOpenRef.current = open;
-    if (open) openerRef.current = activeElement();
+    if (open) openerRef.current = openerElement();
   }
 
   useInertSiblings(open, ref);

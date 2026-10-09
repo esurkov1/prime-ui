@@ -20,6 +20,7 @@ import {
   ButtonGroup,
   Card,
   ChartFrame,
+  Chat,
   ColorPresets,
   ColorSwatches,
   CommandMenu,
@@ -35,12 +36,14 @@ import {
   ExampleFrame,
   Fieldset,
   FileUpload,
+  Gallery,
   Gantt,
   Hint,
   Input,
   Kanban,
   Label,
   LoginForm,
+  MediaViewer,
   Message,
   Modal,
   NotificationCard,
@@ -208,9 +211,22 @@ describe("part refs: every part declares ref", () => {
     takesRef(Message.LinkPreview);
     takesRef(Message.Reactions);
     takesRef(Message.Menu);
-    takesRef(Message.Separator);
-    takesRef(Message.Service);
-    takesRef(Message.Unread);
+    takesRef(Message.AuthorIcon);
+    takesRef(Chat.Root);
+    takesRef(Chat.Header);
+    takesRef(Chat.Title);
+    takesRef(Chat.Description);
+    takesRef(Chat.Actions);
+    takesRef(Chat.SearchButton);
+    takesRef(Chat.Search);
+    takesRef(Chat.Pinned);
+    takesRef(Chat.Messages);
+    takesRef(Chat.SelectionBar);
+    takesRef(Chat.Separator);
+    takesRef(Chat.Service);
+    takesRef(Chat.Unread);
+    takesRef(Chat.Footer);
+    takesRef(Gallery);
     takesRef(Label.Icon);
     takesRef(Label.Description);
     takesRef(LoginForm.Header);
@@ -304,7 +320,7 @@ const CASES: Case[] = [
       </AppShell.Template>
     ),
   ],
-  ["ScrollContainer", "DIV", (ref) => <ScrollContainer ref={ref} fade />],
+  ["ScrollContainer", "DIV", (ref) => <ScrollContainer ref={ref} />],
   [
     "PageContent.List",
     "DIV",
@@ -393,6 +409,11 @@ const CASES: Case[] = [
         </Sheet.Content>
       </Sheet.Root>
     ),
+  ],
+  [
+    "MediaViewer",
+    "DIV",
+    (ref) => <MediaViewer ref={ref} defaultOpen items={[{ src: "/dock.jpg", alt: "Склад" }]} />,
   ],
   [
     "DataTable",
@@ -560,7 +581,15 @@ const CASES: Case[] = [
     ),
   ],
   ["VoicePlayer", "DIV", (ref) => <VoicePlayer ref={ref} src="/voice.ogg" duration={12} />],
-  ["Message.Group", "DIV", (ref) => <Message.Group ref={ref} aria-label="Чат" />],
+  [
+    "Chat.Messages",
+    "DIV",
+    (ref) => (
+      <Chat.Root>
+        <Chat.Messages ref={ref} />
+      </Chat.Root>
+    ),
+  ],
   [
     "Message.Root",
     "ARTICLE",

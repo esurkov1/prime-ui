@@ -107,9 +107,12 @@ import { UserPlus } from "./glyphs/user-plus";
 import { UserRound } from "./glyphs/user-round";
 import { Users } from "./glyphs/users";
 import { Video } from "./glyphs/video";
+import { Volume2 } from "./glyphs/volume-2";
 import { VolumeX } from "./glyphs/volume-x";
 import { Wallet } from "./glyphs/wallet";
 import { X } from "./glyphs/x";
+import { ZoomIn } from "./glyphs/zoom-in";
+import { ZoomOut } from "./glyphs/zoom-out";
 
 /**
  * Named kit glyphs: `<Icon name="…" />` renders one of these. Components and examples take glyphs
@@ -172,6 +175,10 @@ export const iconRegistry = {
   "action.video": Video,
   /** Record a voice message (a composer's record button). */
   "action.voice": Mic,
+  /** Look closer at a picture (a media viewer). */
+  "action.zoomIn": ZoomIn,
+  /** Back out of a closer look. */
+  "action.zoomOut": ZoomOut,
   "field.calendar": Calendar,
   "field.email": Mail,
   "field.password.show": Eye,
@@ -230,6 +237,8 @@ export const iconRegistry = {
   "status.locked": Lock,
   /** Sound is off (a muted video message). */
   "status.muted": VolumeX,
+  /** Sound is on (a video's sound toggle). */
+  "status.sound": Volume2,
   "status.offline": CloudOff,
   /** On its way: a message being sent. */
   "status.pending": Clock,

@@ -2,6 +2,8 @@
 import { Message, type TransferState } from "prime-ui-kit";
 import * as React from "react";
 
+import styles from "./examples.module.css";
+
 export default function MessageFileExample() {
   const [progress, setProgress] = React.useState(0.1);
   const [failed, setFailed] = React.useState(true);
@@ -23,7 +25,7 @@ export default function MessageFileExample() {
   }, [estimate]);
 
   return (
-    <Message.Group aria-label="Документы по договору">
+    <div className={styles.thread}>
       <Message.Root direction="incoming" time="15:02">
         <Message.File
           name="Договор поставки №418.pdf"
@@ -72,6 +74,6 @@ export default function MessageFileExample() {
           onRetry={() => setFailed(false)}
         />
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

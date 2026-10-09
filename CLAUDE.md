@@ -172,7 +172,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a chip, tag, status, count | `Badge` (`Badge.Dot`, `Badge.Action`) |
 | a key hint | `Kbd` |
 | a separator | `Divider` |
-| a scroll region (thin bar, edge fade, hidden bar) | `ScrollContainer` (`axis`, `fade`, `scrollbar="hidden"`) |
+| a scroll region (thin bar, soft hidden edges, hidden bar, snapping, lock) | `ScrollContainer` (`axis`, `edges`, `scrollbar="hidden"`, `snap`, `lock`) — every scroller; `src/styles/scroll.test.ts` fails on a raw `overflow: auto` |
 | an empty result | `EmptyPage` (`layout="compact"` inside menus and lists) |
 | a field label / support row / counter | `Label`, `Hint`, `src/internal/FieldFrame` (`useFieldFrame`, `counter`, `reserveSupportRow`, `group` for a labelled group; `FieldRootDomProps` — a field root's `ref` and native attributes go to the frame, `id` to the control; shared api rows in `src/internal/field.api.ts`) |
 | a checkbox / radio / switch row (control + text + support) | `src/internal/ChoiceField` |
@@ -186,7 +186,8 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | screen-reader-only text | `src/internal/VisuallyHidden` |
 | appearance of a part | `src/internal/enterMotion.module.css` (`.enter`, `.enterBase`) |
 | a touch hit area for a small control | `src/internal/touchTarget` (`touchTargetClass`, `touchTargetBlockClass`) |
-| an edge cue for a scroll region (fade / shadow where content is hidden) | `ScrollContainer` `fade`, or `src/hooks/useEdgeOverflow` (DataTable) |
+| an edge cue for a scroll region (fade / shadow where content is hidden) | `ScrollContainer` `edges` (`fade` default, `shadow` on a filled surface), or `src/hooks/useEdgeOverflow` for a host that draws its own from sticky parts (DataTable, Gantt) |
+| scrolling while a drag is held near an edge | `src/internal/edgeAutoScroll` (`autoScrollStep`, `edgeSpeed`; Dnd, Gantt, `useRangeSelection`) |
 | a page panel: sections, filter + search, view, primary action, chips | `PageToolbar` |
 | a swap between states of a region (loading / data / empty / error) | `Crossfade` (public) or `useStateSwap` + `src/internal/swapMotion.module.css` inside a component (DataTable); loading state is a `Skeleton` |
 | an action on a coloured host (solid Banner) | `Button` `tone="inherit"` (ghost / soft / outline) — never a host CSS override |
@@ -195,12 +196,14 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | overlay enter/exit | `overlayMotion.module.css`, `usePresence` (`motionDurationMs`, `prefersReducedMotion`) |
 | anchored positioning, a CSS length in JS | `usePosition` (follows the anchor, 4 sides, `align`, arrow), `readCssLengthPx("--prime-…", fallback)` — never import `tokens/` into components |
 | roving arrow-key focus | `src/internal/rovingFocus.ts` (`rovingIndex`, `gridIndex`) |
-| selection of a list by click, Shift+click and drag-paint (rows, messages) | `src/internal/useRangeSelection` (DataTable, `Message.Group`) |
+| selection of a list by click, Shift+click and drag-paint (rows, messages) | `src/internal/useRangeSelection` (DataTable, `Chat.Messages`) |
 | a long list of rows of measured height rendered only in view | `src/hooks/useVirtualRows` (Gantt) |
 | a surface that sticks to the start edge of its scroller | `src/internal/sticky` (`stickySurfaceClass`, `--sticky-bg`; AppHeader, DataTable head, Gantt) |
 | a disabled group of controls (`Fieldset disabled`) | `src/internal/disabledContext` (`useInheritedDisabled`, `DisabledProvider`) — a control with a `disabled` prop reads it |
-| a round icon button that is the disk itself (play, download, cancel / retry on media) | `src/internal/roundButton.module.css` (`--round-size`, `data-look`) |
-| a transfer either way (cancel, progress ring, retry, download, done out) | `src/internal/transfer` (`TransferState`, `TransferProps`, `TRANSFER_LABELS`, `transferDiskLabels`; api rows in `transfer.api.ts`) + `src/internal/transferDisk` (`TransferDisk` with `look` `shade` / `solid`, `TransferOverlay` centred over a box) — never a bar, an own ring or an own cancel button |
+| a round icon button that is the disk itself (play, download, cancel / retry on media) | `Button` `shape="circle"` (`variant="shade"` over media; `asChild` for a link); its `progress` is the ring. A disk over media that is not a control (the play mark of a video frame) — `src/internal/mediaDisk` (`MediaPlayMark`, `mediaDiskClass`), the same look |
+| a progress ring, an indeterminate turning arc | `ProgressCircle` (`value` / `null`, `spin`), `Spinner`, or the circle Button's `progress` — all drawn from `src/internal/ring` (`Ring`, `weight` `data` / `line`, `live` for a per-frame `--ring-value`); never an own ring, conic mask or turning keyframes |
+| a glyph that changes in place (play ⇄ pause, × → retry) | `Button.Icon` / ProgressCircle children cross-fade by themselves (`src/internal/glyphSwap`) — never two stacked icons with own CSS |
+| a transfer either way (cancel, progress ring, retry, download, done out) | `src/internal/transfer` (`TransferState`, `TransferProps`, `TRANSFER_LABELS`, `transferDiskLabels`; api rows in `transfer.api.ts`) + `src/internal/transferDisk` (`useTransferDisk` — the logic: pending promise, names, description, announcements; `TransferDisk` with `look` `shade` / `solid` draws it as a circle Button with `progress`, `TransferOverlay` centred over a box) — never a bar, an own ring or an own cancel button |
 | a media player (voice, round video) | `src/internal/mediaPlayer` (`MediaPlayerProps` — the one shared prop set, `useMediaPlayer`, `PlayDisk`, `TranscriptButton`, `seekByKey`; api rows in `mediaPlayer.api.ts`) — a new player extends it, never copies it |
 | chat Markdown rendered as React (never HTML) | `src/internal/richText` |
 | a file size, a media clock, the first frame of a video | `src/internal/fileSize` (`formatFileSize`), `formatClock`, `mediaFrame` (`firstFrame`) |
@@ -299,11 +302,11 @@ export const page: ComponentPageConfig = {
 - **Kind** (the shape of the component, not its sidebar category): `primitive` · `control` · `field` ·
   `overlay` · `navigation` · `composite` · `layout` (primitive — Button, LinkButton, Badge, Avatar,
   Thumbnail, Kbd, Divider, Label, Hint, Fieldset, Typography, CodeBlock, ProgressBar, ProgressCircle, Spinner,
-  Skeleton, Banner, Sparkline, VisuallyHidden; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup, VoicePlayer, VideoNote;
+  Skeleton, Banner, Sparkline, VisuallyHidden, Gallery; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup, VoicePlayer, VideoNote;
   field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
   ColorField, FileUpload; overlay — Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu,
-  Notification; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable, Kanban,
-  Gantt, Dnd, SmartFilter, Timeline, Card, DescriptionList, LoginForm, EmptyPage, Composer, Message, ChartFrame; layout — AppShell, AppHeader, Sidebar, BottomNav, PageContent,
+  Notification, MediaViewer; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable, Kanban,
+  Gantt, Dnd, SmartFilter, Timeline, Card, DescriptionList, LoginForm, EmptyPage, Composer, Chat, Message, ChartFrame; layout — AppShell, AppHeader, Sidebar, BottomNav, PageContent,
   PageToolbar, ScrollContainer, ExampleFrame, Crossfade).
 - **Slots** (`SLOTS` in `pageStandard.ts`, file = slot id): `overview` «Обзор» · `variants` «Варианты» ·
   `sizes` «Размеры» · `states` «Состояния» · `with-icon` «С иконкой» · `structure` «Структура» ·
@@ -405,7 +408,7 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `tokens/` | `primitives.ts` → `semantic.ts` → `themes/{light,dark}.ts`; `bun run tokens:build` generates `src/styles/{tokens,theme-light,theme-dark}.css` (never edit those by hand) |
 | `src/components/<dir>/` | one component: `X.tsx`, `X.module.css`, `X.test.tsx`, `api.ts`, `COMPONENT.md`, `examples/` |
 | `src/layout/` | AppShell, AppHeader, Sidebar, BottomNav (same structure) |
-| `src/internal/` | shared mechanics: `states.ts` (vocabulary types, `stepDown`), contexts (`ControlSizeContext`, `AnchorRectContext`, `disabledContext` — a disabled `Fieldset`), `overlay/` (`layerStack`, `useFloatingLayer`, `FloatingPanel`, `focus`), `MenuGroup`, `FieldFrame`, `FieldCommit`, `FieldAction`, `ChoiceField`, `fieldClasses`, `iconLayout`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `useRangeSelection` (click / Shift / drag-paint selection of a list: DataTable rows, chat messages), `sticky` (`stickySurfaceClass` for a block-start sticky surface), `richText` (the Markdown subset of a chat as React elements), `mediaPlayer` (the shared API and parts of VoicePlayer and VideoNote), `transfer` + `transferDisk` (the transfer of content, either way), `messageMeta`, `imageSlot`, `fileSize` (`formatFileSize`), `formatClock`, `mediaFrame` (`firstFrame`), `MorphText`, `RollingNumber`, `VisuallyHidden`, `slot`, `cx`, `data-attributes`; CSS: `overlayMotion`, `enterMotion`, `swapMotion`, `floatingSurface`, `sheet`, `menu`, `fieldSurface`, `fieldTier`, `fieldTrigger`, `palette`, `chipTier`, `iconBox`, `textTone`, `textRole`, `touchTarget`, `roundButton` (a round icon button that is the disk itself), `sticky` |
+| `src/internal/` | shared mechanics: `states.ts` (vocabulary types, `stepDown`), contexts (`ControlSizeContext`, `AnchorRectContext`, `disabledContext` — a disabled `Fieldset`), `overlay/` (`layerStack`, `useFloatingLayer`, `FloatingPanel`, `focus`), `MenuGroup`, `FieldFrame`, `FieldCommit`, `FieldAction`, `ChoiceField`, `fieldClasses`, `iconLayout`, `swatch`, `HighlightMatch`, `formatLabel`, `listbox`, `rovingFocus`, `useRangeSelection` (click / Shift / drag-paint selection of a list: DataTable rows, chat messages), `edgeAutoScroll` (scrolling near an edge during a drag), `messageList` (the contract between `Chat.Messages` and its messages: selection store, row kinds, jumps), `messagePart` (the contract between a message and its content parts), `palette` (`hueOf`, a hue stable per id), `sticky` (`stickySurfaceClass` for a block-start sticky surface), `richText` (the Markdown subset of a chat as React elements), `mediaPlayer` (the shared API and parts of VoicePlayer and VideoNote), `transfer` + `transferDisk` (the transfer of content, either way), `ring` (the one ring drawing: ProgressCircle, Spinner, the circle Button), `mediaDisk` (the still disk over media: a video's play mark), `glyphSwap` (a glyph cross-fade), `messageMeta`, `imageSlot`, `fileSize` (`formatFileSize`), `formatClock`, `mediaFrame` (`firstFrame`), `MorphText`, `RollingNumber`, `VisuallyHidden`, `slot`, `cx`, `data-attributes`; CSS: `overlayMotion`, `enterMotion`, `swapMotion`, `floatingSurface`, `sheet`, `menu`, `fieldSurface`, `fieldTier`, `fieldTrigger`, `palette`, `chipTier`, `iconBox`, `textTone`, `textRole`, `touchTarget`, `sticky` |
 | `src/hooks/` | `useModalLayer`, `useInertSiblings`, `useScrollLock`, `usePresence`, `usePosition`, `useControllableState`, `useMergedRefs`, `useImageStatus`, `useStateSwap`, `useEnterConfirm`, `useEdgeOverflow`, `useMediaQuery`, `useSwipeDismiss`, `useVirtualRows` (rows of measured height rendered only in view: Gantt), `useTokenValue` (public), `useUploadQueue` (public: the upload queue of FileUpload) |
 | `src/icons/` | public `<Icon name>` registry and `createIcon`; `glyphs/` (Lucide drawings, one gesture each), `glyph.tsx` (`defineGlyph`), `glyphMotion.module.css` (gesture vocabulary), `iconPlay.ts` (when gestures play) — the only icon source for components; notices in `THIRD_PARTY_NOTICES` |
 | `src/index.ts`, `src/components/index.ts`, `src/layout/index.ts` | public exports |

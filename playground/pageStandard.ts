@@ -116,6 +116,8 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: SCENARIOS, layout: "stack" },
     // A primitive that may be selected (a Thumbnail tile of a media library).
     { slot: "controlled", layout: "stack" },
+    // A primitive that opens a viewer of its own (Gallery and its MediaViewer).
+    { slot: "controlled-open", layout: "stack" },
     { slot: "in-form", layout: "stack-narrow" },
     { slot: "narrow", layout: "stack" },
   ],

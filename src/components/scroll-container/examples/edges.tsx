@@ -1,0 +1,43 @@
+/** Hidden edges fade over any background, take a soft shadow on a filled surface, or stay plain — `edges`. */
+import { Card, ScrollContainer, type ScrollContainerEdges, Typography } from "prime-ui-kit";
+
+import styles from "./examples.module.css";
+
+const EVENTS = [
+  "Заказ № 1040 оплачен",
+  "Счёт № 318 выставлен",
+  "Заказ № 1041 передан в доставку",
+  "Возврат по заказу № 1032 одобрен",
+  "Заказ № 1042 оплачен",
+  "Акт № 77 подписан",
+  "Заказ № 1043 отменён клиентом",
+  "Счёт № 319 оплачен",
+  "Заказ № 1044 собран на складе",
+  "Заказ № 1045 оплачен",
+];
+const EDGES: ScrollContainerEdges[] = ["fade", "shadow", "none"];
+
+export default function ScrollContainerEdgesExample() {
+  return (
+    <div className={styles.layout}>
+      {EDGES.map((edges) => (
+        <Card.Root key={edges} role="region" className={styles.card} aria-label={`Лента: ${edges}`}>
+          <Typography as="h3" variant="title-s" className={styles.cardTitle}>
+            {edges}
+          </Typography>
+          <ScrollContainer edges={edges}>
+            <ul className={styles.list}>
+              {EVENTS.map((event) => (
+                <li key={event}>
+                  <Typography as="span" variant="body-m" tone="secondary">
+                    {event}
+                  </Typography>
+                </li>
+              ))}
+            </ul>
+          </ScrollContainer>
+        </Card.Root>
+      ))}
+    </div>
+  );
+}

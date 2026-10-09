@@ -26,6 +26,28 @@
   color: var(--prime-color-text-inverse);
 }
 
+/* A row of round buttons. */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+/* A listing cover with its round actions at the top end. */
+.cover {
+  position: relative;
+}
+
+.coverActions {
+  position: absolute;
+  inset-block-start: var(--prime-space-2);
+  inset-inline-end: var(--prime-space-2);
+  z-index: 1;
+  display: flex;
+  gap: var(--prime-space-2);
+}
+
 .hostText {
   flex: 1;
   min-width: 0;

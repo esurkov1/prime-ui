@@ -344,7 +344,7 @@ export function DataTable<Row>({
     return allColumns.filter((column) => column.hideable === false || !hiddenSet.has(column.id));
   }, [allColumns, hiddenSet]);
   // Horizontal overflow of the viewport: the edge cue (shadows at the edges that hide columns).
-  const edges = useEdgeOverflow(scrollRef, true, true);
+  const edges = useEdgeOverflow(scrollRef, "horizontal");
 
   // ─── Sort and page ───
   const [sortState, setSortState] = useControllableState<DataTableSortState>({
@@ -755,6 +755,7 @@ export function DataTable<Row>({
               <ScrollContainer
                 ref={scrollRef}
                 axis="both"
+                edges="none"
                 overscrollBehavior="none"
                 className={styles.viewport}
                 style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}

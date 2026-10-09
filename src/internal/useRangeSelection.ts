@@ -1,20 +1,9 @@
 import * as React from "react";
 
-/** The edge band of the scroller (px) where a drag scrolls it, and the step per frame. */
-const EDGE = 32;
-const STEP = 12;
+import { autoScrollStep, scrollableAncestors } from "@/internal/edgeAutoScroll";
 
-const SCROLLABLE = /^(auto|scroll|overlay)$/;
-
-/** The nearest ancestor that scrolls vertically (the list's own scroller), else the page. */
-function scrollerOf(node: Element | null): Element | null {
-  for (let el = node?.parentElement ?? null; el; el = el.parentElement) {
-    if (SCROLLABLE.test(getComputedStyle(el).overflowY) && el.scrollHeight > el.clientHeight) {
-      return el;
-    }
-  }
-  return document.scrollingElement;
-}
+/** A drag paints along the list: only up and down scroll it. */
+const VERTICAL = { x: false, y: true };
 
 export type RangeSelectionOptions<K> = {
   /**
@@ -96,7 +85,8 @@ export function useRangeSelection<K>(options: RangeSelectionOptions<K>) {
         let x = event.clientX;
         let y = event.clientY;
         let frame = 0;
-        const scroller = autoScroll ? scrollerOf(containerRef.current) : null;
+        const scrollers = autoScroll ? scrollableAncestors(containerRef.current) : [];
+        let lastTime = 0;
 
         const paintAt = (clientX: number, clientY: number) => {
           const element = document.elementFromPoint(clientX, clientY);
@@ -112,15 +102,14 @@ export function useRangeSelection<K>(options: RangeSelectionOptions<K>) {
           last = next;
           session.current.anchor = keysNow()[next] ?? session.current.anchor;
         };
-        const scroll = () => {
+        const scroll = (time: number) => {
           frame = 0;
-          if (!scroller) return;
-          const box = scroller.getBoundingClientRect();
-          const top = scroller === document.scrollingElement ? 0 : box.top;
-          const bottom = scroller === document.scrollingElement ? window.innerHeight : box.bottom;
-          const delta = y < top + EDGE ? -STEP : y > bottom - EDGE ? STEP : 0;
-          if (delta === 0) return;
-          scroller.scrollTop += delta;
+          const elapsed = lastTime ? Math.min(time - lastTime, 50) : 16;
+          lastTime = time;
+          if (!autoScrollStep(scrollers, { x, y }, elapsed, VERTICAL)) {
+            lastTime = 0;
+            return;
+          }
           paintAt(x, y);
           frame = requestAnimationFrame(scroll);
         };
@@ -128,7 +117,7 @@ export function useRangeSelection<K>(options: RangeSelectionOptions<K>) {
           x = move.clientX;
           y = move.clientY;
           paintAt(move.clientX, move.clientY);
-          if (scroller && !frame) frame = requestAnimationFrame(scroll);
+          if (scrollers.length > 0 && !frame) frame = requestAnimationFrame(scroll);
         };
         const stop = () => {
           window.removeEventListener("pointermove", onMove);

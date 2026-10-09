@@ -17,13 +17,13 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Concept | API | Notes |
 |---|---|---|
 | Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`; an overlay `Content` (Modal, Drawer, Popover, Dropdown, Tooltip) takes `size` for its width. Without `size` these take the tier of a sized host (Popover, Banner, LoginForm, DataTable toolbar, `ControlSizeProvider`), else `m`: Input, Textarea, DigitInput, Checkbox, Radio, Switch, Slider, FileUpload, ColorSwatches, ColorPresets, SegmentedControl, Button, ButtonGroup, LinkButton, Label, Badge, Spinner, Skeleton, DescriptionList, Composer, `Icon`, `Checkbox.Indicator`. Select, NativeSelect, TagSelect, Datepicker, Tabs and SmartFilter do **not** read the host — give them `size` yourself. |
-| Treatment | `variant` | `solid · soft · outline · ghost`; structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
+| Treatment | `variant` | `solid · soft · outline · ghost`; Button also takes `shade` (the media shade with a blur, a button over media); structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
 | Meaning | `tone` | Button: `accent \| neutral \| danger`, plus `inherit` (with `ghost \| soft \| outline`) for an action on a colored host — it takes the host's text color; never recolor a Button with a CSS override. Destructive is `danger`, never `error`. |
 | Decoration | `color` | Badge, Avatar, Thumbnail, Icon, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `Sidebar.ItemCount` / `BottomNav.ItemCount`, `FileUpload.FormatBadge`, `Timeline.Item`, `Message.Author` / `Message.Reply` / `Message.Contact`; in data: TagSelect options, Kanban columns, Gantt bars. |
 | Validation | `invalid`, `hint`, `error` | Props, never parts. A non-empty `error` implies `invalid`; sets `aria-invalid`, `data-invalid`. |
 | Value | `value` / `defaultValue` / `onValueChange(value)` | Select, NativeSelect, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, Radio.Group, DigitInput, Pagination, SmartFilter, ColorPicker, ColorField, ColorSwatches, Kanban, FileUpload (its files), Composer (its text). |
 | Text value | native `value` / `onChange` + `onValueChange(string)` | Input (`Input.Field`), Textarea. |
-| Other state | `x` / `defaultX` / `onXChange(x)` | DataTable `sort`, `page`, `selected`, `expanded`, `hiddenColumns`; SmartFilter, Select and CommandMenu `search`; Sidebar `mode`; Kanban `columnOrder`; Gantt `scale`; `Message.Group` `selected`; Composer `recordMode`; VoicePlayer `rate`. |
+| Other state | `x` / `defaultX` / `onXChange(x)` | DataTable `sort`, `page`, `selected`, `expanded`, `hiddenColumns`; SmartFilter, Select and CommandMenu `search`; Sidebar `mode`; Kanban `columnOrder`; Gantt `scale`; `Chat.Root` `selected` and `search`; Composer `recordMode`; VoicePlayer `rate`. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch. |
 | Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure (Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu, Select, Sidebar off-canvas). |
 | Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay: Modal, Drawer, CommandMenu, Popover, Dropdown. A destructive confirm is `ConfirmDialog` (it turns both off itself); a form holds closing with `Modal.Guard` / `Drawer.Guard`. |
@@ -80,7 +80,7 @@ export function PeriodFilter() {
   `onReactionToggle` and `onRetry`, the `onRetry` / `onCancel` of `Message.File`, the
   `onLoadMore` / `onReachStart` / `onReachEnd` of lists that load more.
 - A notification of what happened, with no state to control, is a plain event with the subject
-  first: `Message.Group` `onNewMessage(value, { direction })` (a message added at the end after
+  first: `Chat.Messages` `onNewMessage(value, { direction })` (a message added at the end after
   mount, decided from the data — never the first render, a history load or a row scrolled into view) and `onRead(values)` (incoming messages the
   reader has seen, batched); Composer `onActivityChange(activity)` fires on a change only (`typing`,
   `voice`, `video`, `null`) — the «печатает…» signal, never a per-keystroke event.
@@ -229,7 +229,7 @@ it saves).
 | `datepickerPresets`, `DEFAULT_DATEPICKER_PRESETS`, `formatDatepickerValue` | quick ranges and value display for `Datepicker` |
 | `moveBefore(items, id, beforeId, getId)` | apply a `Dnd` reorder to your array in `onReorder`; `canDrop` returns `true` or the reason it refuses (a string, announced and shown at the carried copy) |
 | `useUploadQueue({ upload, concurrency })` | the upload queue behind FileUpload `queue`: `upload(file, { signal, onProgress })` is yours, the queue runs it a few at a time, aborts on remove, retries |
-| `groupMessages(messages, options)`, `formatMessageDate`, `formatMessageTime` | turn chat data into dated runs of one author for `Message.Group` (positions, the date separators) and format their dates and times |
+| `groupMessages(messages, options)`, `formatMessageDate`, `formatMessageTime`, `hueOf(id)` | turn chat data into dated runs of one author (positions, the date separators — `Chat.Messages items` does it for you), format their dates and times, and give a person a palette hue stable per id |
 | `useSidebar()` | Sidebar state for custom parts inside `Sidebar.Root` |
 | `matchesSmartFilter`, `resolveSmartFilterValues` | apply a SmartFilter value to your rows |
 | `Icon`, `createIcon` | kit icon set and domain glyphs — see Icons below |

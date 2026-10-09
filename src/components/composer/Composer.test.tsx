@@ -677,7 +677,7 @@ describe("attachments", () => {
     expect(strip).toHaveAttribute("data-axis", "x");
     expect(strip.className).toMatch(/strip/);
     // The scroller around it: sideways, faded edges.
-    expect(strip.parentElement).toHaveAttribute("data-fade", "horizontal");
+    expect(strip.parentElement).toHaveAttribute("data-edges", "fade");
     expect(trayNames()).toHaveLength(40);
     expect(tileCss).toMatch(/\.strip > \* \{[^}]*flex: none;/);
   });

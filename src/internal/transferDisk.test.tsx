@@ -15,38 +15,49 @@ const css = readFileSync(
 const LABELS = { ...transferDiskLabels(TRANSFER_LABELS, "upload", 0.4), failed: "Нет связи" };
 
 const diskOf = () => document.querySelector<HTMLElement>("[data-size]");
+const ringOf = (scope: Element | null) =>
+  scope?.querySelector<SVGSVGElement>("svg[data-weight]") ?? null;
 
 describe("TransferDisk", () => {
-  it("writes the share on one variable of a named progressbar ring", () => {
-    const { rerender } = render(<TransferDisk state="loading" progress={0.4} labels={LABELS} />);
-    const ring = screen.getByRole("progressbar", { name: "Отправка 40%" });
-    expect(ring).toHaveAttribute("aria-valuenow", "40");
-    expect(ring.style.getPropertyValue("--transfer-progress")).toBe("0.4");
-    rerender(<TransferDisk state="queued" labels={LABELS} />);
-    expect(ring.style.getPropertyValue("--transfer-progress")).toBe("0");
-    // The ring glides between values (a registered number), 7.5% of the disk at every size.
-    expect(css).toMatch(/@property --transfer-progress \{[^}]*syntax: "<number>"/);
-    expect(css).toMatch(/transition:\s*--transfer-progress var\(--prime-motion-duration-base\)/);
-    expect(css).toMatch(/--progress-ring-width: calc\(var\(--transfer-disk-size\) \* 0\.075\)/);
-    expect(css).toMatch(
-      /--progress-ring-track: color-mix\(in srgb, currentColor 32%, transparent\)/,
+  it("is a circle Button whose turning ring carries the share, described by it", () => {
+    const { rerender } = render(
+      <TransferDisk state="loading" progress={0.4} labels={LABELS} onCancel={() => {}} />,
     );
+    const button = screen.getByRole("button", { name: "Отменить отправку" });
+    expect(button).toHaveAccessibleDescription("Отправка 40%");
+    expect(button).toHaveAttribute("data-shape", "circle");
+    expect(button).toHaveAttribute("data-variant", "shade");
+    expect(button).toHaveAttribute("aria-busy", "true");
+    const ring = ringOf(button);
+    expect(ring?.style.getPropertyValue("--ring-value")).toBe("0.4");
+    expect(ring).toHaveAttribute("data-spin", "true");
+    // Queued: the empty ring turns at its least arc.
+    rerender(<TransferDisk state="queued" labels={LABELS} onCancel={() => {}} />);
+    expect(ringOf(button)?.style.getPropertyValue("--ring-value")).toBe("0");
   });
 
   it("names the transfer by its direction, never changing the look", () => {
     const down = transferDiskLabels(TRANSFER_LABELS, "download", 0.5);
     render(<TransferDisk state="loading" progress={0.5} labels={down} onCancel={() => {}} />);
-    expect(screen.getByRole("progressbar", { name: "Загрузка 50%" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Отменить загрузку" })).toHaveAttribute(
-      "data-look",
-      "shade",
-    );
+    const button = screen.getByRole("button", { name: "Отменить загрузку" });
+    expect(button).toHaveAccessibleDescription("Загрузка 50%");
+    expect(button).toHaveAttribute("data-variant", "shade");
   });
 
-  it("without a share a transfer in flight is an indeterminate arc with no value", () => {
-    render(<TransferDisk state="loading" labels={LABELS} />);
-    expect(diskOf()).toHaveAttribute("data-indeterminate");
-    expect(screen.getByRole("progressbar")).not.toHaveAttribute("aria-valuenow");
+  it("without a share a transfer in flight turns a quarter arc", () => {
+    render(<TransferDisk state="loading" labels={LABELS} onCancel={() => {}} />);
+    const ring = ringOf(screen.getByRole("button"));
+    expect(ring?.style.getPropertyValue("--ring-value")).toBe("0.25");
+    expect(ring).toHaveAttribute("data-spin", "true");
+  });
+
+  it("without the handler of its state it is no button: a still disk, a named progressbar", () => {
+    render(<TransferDisk state="loading" progress={0.4} labels={LABELS} />);
+    expect(screen.queryByRole("button")).toBeNull();
+    expect(screen.getByRole("progressbar", { name: "Отправка 40%" })).toHaveAttribute(
+      "aria-valuenow",
+      "40",
+    );
   });
 
   it("is the cancel in flight: a button reached by Tab, pressed by Enter and Space", async () => {
@@ -61,27 +72,30 @@ describe("TransferDisk", () => {
     expect(onCancel).toHaveBeenCalledTimes(2);
   });
 
-  it("keeps a slow cancel pending and announces a refusal", async () => {
+  it("keeps a slow cancel pending, focused, and announces a refusal", async () => {
     let reject: () => void = () => {};
     const onCancel = vi.fn(() => new Promise<void>((_, r) => (reject = () => r(new Error("нет")))));
     render(<TransferDisk state="loading" progress={0.4} labels={LABELS} onCancel={onCancel} />);
     const button = screen.getByRole("button", { name: "Отменить отправку" });
+    button.focus();
     fireEvent.click(button);
-    expect(button).toHaveAttribute("aria-busy", "true");
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveFocus();
     fireEvent.click(button);
     expect(onCancel).toHaveBeenCalledTimes(1);
     await act(async () => reject());
-    expect(button).not.toHaveAttribute("aria-busy");
+    expect(button).not.toHaveAttribute("aria-disabled");
     expect(screen.getByRole("status")).toHaveTextContent("Не удалось отменить");
   });
 
-  it("turns into a danger retry described by the reason after a failure", () => {
+  it("turns into a danger retry described by the reason after a failure; the ring fades", () => {
     const onRetry = vi.fn();
     render(<TransferDisk state="failed" progress={0.4} labels={LABELS} onRetry={onRetry} />);
-    expect(screen.queryByRole("progressbar")).toBeNull();
     const retry = screen.getByRole("button", { name: "Повторить отправку" });
-    expect(retry).toHaveAttribute("data-look", "danger");
+    expect(retry).toHaveAttribute("data-tone", "danger");
     expect(retry).toHaveAccessibleDescription("Нет связи");
+    expect(retry).not.toHaveAttribute("aria-busy");
     fireEvent.click(retry);
     expect(onRetry).toHaveBeenCalled();
   });
@@ -92,10 +106,11 @@ describe("TransferDisk", () => {
       () => new Promise<void>((_, r) => (reject = () => r(new Error("нет")))),
     );
     render(<TransferDisk state="remote" look="solid" labels={LABELS} onDownload={onDownload} />);
-    expect(screen.queryByRole("progressbar")).toBeNull();
     const download = screen.getByRole("button", { name: "Скачать" });
-    expect(download).toHaveAttribute("data-look", "solid");
+    expect(download).toHaveAttribute("data-variant", "solid");
+    expect(ringOf(download)).toBeNull();
     fireEvent.click(download);
+    expect(download).toHaveAttribute("aria-busy", "true");
     await act(async () => reject());
     expect(screen.getByRole("status")).toHaveTextContent("Не удалось скачать");
   });
@@ -109,21 +124,18 @@ describe("TransferDisk", () => {
     expect(onCancel).not.toHaveBeenCalled();
   });
 
-  it("done: fades and shrinks away, out of the focus order", () => {
+  it("done: the ring fills, then the disk fades and shrinks away, out of the focus order", () => {
     render(<TransferDisk state="done" progress={1} labels={LABELS} onCancel={() => {}} />);
     expect(diskOf()).toHaveAttribute("inert");
     expect(screen.queryByRole("button")).toBeNull();
-    expect(screen.queryByRole("progressbar")).toBeNull();
-    expect(css).toMatch(/\.disk\[data-state="done"\] \{\s*opacity: 0;\s*transform: scale\(0\.9\);/);
+    expect(css).toMatch(
+      /\.disk\[data-state="done"\] \{\s*opacity: 0;\s*transform: scale\(0\.9\);[^}]*transition-delay: var\(--prime-motion-duration-base\)/,
+    );
   });
 
-  it("has two sizes from the control tiers and honours reduced motion", () => {
-    render(<TransferDisk state="loading" size="xl" labels={LABELS} />);
+  it("has two sizes from the control tiers", () => {
+    render(<TransferDisk state="loading" size="xl" labels={LABELS} onCancel={() => {}} />);
     expect(diskOf()).toHaveAttribute("data-size", "xl");
-    expect(css).toMatch(/--transfer-disk-size: var\(--prime-control-l-height\)/);
-    expect(css).toMatch(
-      /\[data-size="xl"\] \{\s*--transfer-disk-size: var\(--prime-control-xl-height\)/,
-    );
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)/);
+    expect(screen.getByRole("button")).toHaveAttribute("data-size", "xl");
   });
 });

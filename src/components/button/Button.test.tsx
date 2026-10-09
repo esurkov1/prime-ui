@@ -1,4 +1,8 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import type * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -6,6 +10,11 @@ import { DisabledProvider } from "@/internal/disabledContext";
 
 import { Button } from "./Button";
 import styles from "./Button.module.css";
+
+const css = readFileSync(
+  path.resolve(process.cwd(), "src/components/button/Button.module.css"),
+  "utf8",
+);
 
 describe("Button", () => {
   it("takes the host tier without its own size; an explicit size wins", () => {
@@ -287,6 +296,95 @@ describe("Button asChild", () => {
   });
 });
 
+describe("Button shape circle", () => {
+  const circle = (props: Partial<React.ComponentProps<typeof Button.Root>> = {}) => (
+    <Button.Root shape="circle" aria-label="Обновить" {...(props as object)}>
+      <Button.Icon>
+        <svg aria-hidden="true" />
+      </Button.Icon>
+    </Button.Root>
+  );
+
+  it("is a disk named by aria-label, in every tier, tone and variant", () => {
+    render(circle({ variant: "soft", tone: "neutral", size: "s" }));
+    const button = screen.getByRole("button", { name: "Обновить" });
+    expect(button).toHaveAttribute("data-shape", "circle");
+    expect(button).toHaveAttribute("data-icon-only", "true");
+    expect(button).toHaveAttribute("data-size", "s");
+    expect(button).toHaveAttribute("data-variant", "soft");
+  });
+
+  it("is reached by Tab and pressed by Enter and Space", async () => {
+    const onClick = vi.fn();
+    render(circle({ onClick }));
+    const user = userEvent.setup();
+    await user.tab();
+    const button = screen.getByRole("button", { name: "Обновить" });
+    expect(button).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await user.keyboard(" ");
+    expect(onClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("follows the circle: full radius, compact press, round touch area, focus ring outline", () => {
+    expect(css).toMatch(
+      /\.root\[data-shape="circle"\] \{\s*width: var\(--field-h\);\s*padding-inline: 0;\s*border-radius: var\(--prime-radius-full\);/,
+    );
+    expect(css).toMatch(
+      /\.root\[data-shape="circle"\]:active:not\(\[data-disabled="true"\], \[data-loading="true"\]\) \{\s*transform: scale\(var\(--prime-motion-press-scale-compact\)\);/,
+    );
+    expect(css).toMatch(
+      /\.root\[data-shape="circle"\]::after \{\s*border-radius: var\(--prime-radius-full\);/,
+    );
+    expect(css).toMatch(/\.root:focus-visible \{\s*outline: var\(--prime-focus-width\) solid/);
+  });
+
+  it("asChild makes a round link", () => {
+    render(
+      <Button.Root asChild shape="circle" size="xl" aria-label="Скачать Счёт-2381.pdf">
+        <a href="/files/2381.pdf" download>
+          <Button.Icon>
+            <svg aria-hidden="true" />
+          </Button.Icon>
+        </a>
+      </Button.Root>,
+    );
+    const link = screen.getByRole("link", { name: "Скачать Счёт-2381.pdf" });
+    expect(link).toHaveAttribute("data-shape", "circle");
+    expect(link).toHaveAttribute("data-size", "xl");
+    expect(link).toHaveAttribute("href", "/files/2381.pdf");
+  });
+
+  it("variant shade: the media shade with a blur; danger turns the danger disk", () => {
+    render(circle({ variant: "shade", tone: "danger" }));
+    expect(screen.getByRole("button")).toHaveAttribute("data-variant", "shade");
+    expect(css).toMatch(
+      /\.root\[data-variant="shade"\] \{\s*--btn-bg: var\(--prime-color-media-disk\);[\s\S]*?backdrop-filter: blur\(var\(--prime-media-disk-blur\)\);/,
+    );
+    expect(css).toMatch(
+      /\.root\[data-variant="shade"\]\[data-tone="danger"\] \{\s*--btn-bg: var\(--prime-color-danger-default\);/,
+    );
+  });
+
+  it("a changed icon cross-fades in Button.Icon", () => {
+    const { rerender, container } = render(
+      <Button.Root shape="circle" aria-label="Воспроизвести">
+        <Button.Icon>
+          <svg key="play" aria-hidden="true" />
+        </Button.Icon>
+      </Button.Root>,
+    );
+    rerender(
+      <Button.Root shape="circle" aria-label="Пауза">
+        <Button.Icon>
+          <svg key="pause" aria-hidden="true" />
+        </Button.Icon>
+      </Button.Root>,
+    );
+    expect(container.querySelector(`.${styles.glyph}[data-entering]`)).not.toBeNull();
+  });
+});
+
 describe("Button motion", () => {
   describe("progress", () => {
     it("marks the button busy and drives the fill, then lets it go", () => {
@@ -316,6 +414,61 @@ describe("Button motion", () => {
       expect(button.style.getPropertyValue("--btn-progress")).toBe("1");
       fireEvent.click(button);
       expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it("null on a square: a spinner marks it, the button stays pressable and busy", () => {
+      const onClick = vi.fn();
+      const { container } = render(
+        <Button.Root progress={null} onClick={onClick}>
+          Импорт
+        </Button.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Импорт" });
+      expect(button).toHaveAttribute("aria-busy", "true");
+      expect(button).toHaveAttribute("data-spinner", "true");
+      expect(button).not.toHaveAttribute("data-progress");
+      expect(button).not.toBeDisabled();
+      expect(container.querySelector(`.${styles.spinner}`)).not.toBeNull();
+      fireEvent.click(button);
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("circle progress", () => {
+    const disk = (progress?: number | null) => (
+      <Button.Root shape="circle" aria-label="Отменить отправку" progress={progress}>
+        <Button.Icon>
+          <svg aria-hidden="true" />
+        </Button.Icon>
+      </Button.Root>
+    );
+    const ringOf = (button: HTMLElement) =>
+      button.querySelector<SVGSVGElement>(`svg.${styles.ring}`);
+
+    it("draws a turning ring along the inner edge instead of a fill, pressable and busy", () => {
+      render(disk(0.4));
+      const button = screen.getByRole("button", { name: "Отменить отправку" });
+      expect(button).toHaveAttribute("aria-busy", "true");
+      expect(button).not.toBeDisabled();
+      expect(button.querySelector(`.${styles.fill}`)).toBeNull();
+      const ring = ringOf(button);
+      expect(ring).toHaveAttribute("aria-hidden", "true");
+      expect(ring).toHaveAttribute("data-spin", "true");
+      expect(ring).toHaveAttribute("data-weight", "line");
+      expect(ring).toHaveAttribute("data-shown", "true");
+      expect(ring?.style.getPropertyValue("--ring-value")).toBe("0.4");
+    });
+
+    it("null turns a quarter arc; removed, the ring fades where it is", () => {
+      const { rerender } = render(disk(null));
+      const button = screen.getByRole("button");
+      expect(ringOf(button)?.style.getPropertyValue("--ring-value")).toBe("0.25");
+      rerender(disk(0.8));
+      expect(ringOf(button)?.style.getPropertyValue("--ring-value")).toBe("0.8");
+      rerender(disk());
+      expect(button).not.toHaveAttribute("aria-busy");
+      expect(ringOf(button)).toHaveAttribute("data-shown", "false");
+      expect(ringOf(button)?.style.getPropertyValue("--ring-value")).toBe("0.8");
     });
   });
 

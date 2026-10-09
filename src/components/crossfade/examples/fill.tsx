@@ -1,5 +1,13 @@
 /** A deal board that fills its panel's height while it swaps between loading and data, and a notice slot above it that takes no room while empty — `fill`, `state`. */
-import { Banner, Button, Card, Crossfade, Skeleton, Typography } from "prime-ui-kit";
+import {
+  Banner,
+  Button,
+  Card,
+  Crossfade,
+  ScrollContainer,
+  Skeleton,
+  Typography,
+} from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -44,7 +52,7 @@ export default function CrossfadeFillExample() {
         {status === "loading" ? (
           <Skeleton shape="block" className={styles.fillSkeleton} />
         ) : (
-          <div className={styles.board}>
+          <ScrollContainer className={styles.board}>
             {STAGES.map((stage) => (
               <Card.Root key={stage.id} className={styles.column}>
                 <Card.Body>
@@ -63,7 +71,7 @@ export default function CrossfadeFillExample() {
                 </Card.Body>
               </Card.Root>
             ))}
-          </div>
+          </ScrollContainer>
         )}
       </Crossfade>
     </div>

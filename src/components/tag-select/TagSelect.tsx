@@ -657,7 +657,14 @@ export function TagSelect({
             "focus-ring": focusRing ? undefined : false,
           })}
         >
-          <ScrollContainer ref={chipsRef} fade={expanded} className={styles.chips}>
+          <ScrollContainer
+            ref={chipsRef}
+            // Collapsed: one row that never scrolls (the rest is the «+N» chip); expanded: up to
+            // three rows, then it scrolls with faded edges.
+            edges={expanded ? "fade" : "none"}
+            lock={!expanded}
+            className={styles.chips}
+          >
             {visibleChips.map((chip, index) => (
               <Badge.Root
                 key={chip.value}

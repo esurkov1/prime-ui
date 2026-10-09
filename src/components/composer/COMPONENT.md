@@ -9,7 +9,7 @@
 - The bottom of a conversation: support chat, comments on an order, a team thread, a chat with a bot.
 - Short messages sent one after another, where Enter sends and Shift+Enter breaks the line.
 - Replies to a message, edits of your own, files and voice notes in the same place.
-- A messenger: `onSend` carries `replyTo` / `editOf`, `onActivityChange` feeds the other side's «печатает…», and `Message.Group` shows what was sent with the outgoing appearance motion.
+- A messenger: `onSend` carries `replyTo` / `editOf`, `onActivityChange` feeds the other side's «печатает…», and `Chat.Messages` shows what was sent with the outgoing appearance motion; put the Composer in `Chat.Footer`.
 
 ## When not to use
 - A form field for a long text saved with the form (a description, a comment in a form) → use [Textarea](../textarea/COMPONENT.md).
@@ -304,5 +304,5 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 - An `aria-label` on the root to rename the field → use `labels.placeholder` (the field) and `labels.region` (the form).
 
 ## Related
-- **Built from:** [Textarea](../textarea/COMPONENT.md), [Button](../button/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (the paperclip; `FileUpload.Queue layout="strip"`, the tray), [Crossfade](../crossfade/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Hint](../hint/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), Icon (`action.*`, `format.*`, `status.locked`), `useUploadQueue` (the `queue`)
+- **Built from:** [Textarea](../textarea/COMPONENT.md), [Button](../button/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (the paperclip; `FileUpload.Queue layout="strip"`, the tray), [Crossfade](../crossfade/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Hint](../hint/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), Icon (`action.*`, `format.*`, `status.locked`), `useUploadQueue` (the `queue`), `internal/ring` (the video preview's ring)
 - **See also:** [Message](../message/COMPONENT.md) — the bubbles the composer writes into; [VoicePlayer](../voice-player/COMPONENT.md) — plays a sent voice message; [Textarea](../textarea/COMPONENT.md), [Input](../input/COMPONENT.md)

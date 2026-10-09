@@ -3,6 +3,7 @@ import { ru } from "date-fns/locale";
 import * as React from "react";
 
 import { Button } from "@/components/button/Button";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { getViewportPadPx } from "@/hooks/usePosition";
@@ -521,8 +522,13 @@ export function PanelView(props: PanelViewProps) {
       data-layout={layout}
     >
       {presets && isRange ? (
-        // biome-ignore lint/a11y/useSemanticElements: a group of preset buttons, not form fields
-        <div className={styles.presets} role="group" aria-label={labels.presetsTitle}>
+        <ScrollContainer
+          axis={layout === "stacked" ? "horizontal" : "vertical"}
+          scrollbar={layout === "stacked" ? "hidden" : "thin"}
+          className={styles.presets}
+          role="group"
+          aria-label={labels.presetsTitle}
+        >
           <p className={styles.presetTitle} aria-hidden>
             {labels.presetsTitle}
           </p>
@@ -546,7 +552,7 @@ export function PanelView(props: PanelViewProps) {
               </Button.Root>
             );
           })}
-        </div>
+        </ScrollContainer>
       ) : null}
 
       <div className={styles.main}>

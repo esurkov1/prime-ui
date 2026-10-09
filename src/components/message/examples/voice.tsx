@@ -2,6 +2,8 @@
 import { Message, VoicePlayer } from "prime-ui-kit";
 import * as React from "react";
 
+import styles from "./examples.module.css";
+
 const AUDIO = "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3";
 
 const WAVE_IN = [
@@ -17,7 +19,7 @@ const WAVE_OUT = [
 export default function MessageVoiceExample() {
   const [unplayed, setUnplayed] = React.useState(true);
   return (
-    <Message.Group aria-label="Переписка с поставщиком">
+    <div className={styles.thread}>
       <Message.Root direction="incoming" time="10:41">
         <VoicePlayer
           src={AUDIO}
@@ -32,6 +34,6 @@ export default function MessageVoiceExample() {
       <Message.Root direction="outgoing" time="10:44" status="read">
         <VoicePlayer src={AUDIO} waveform={WAVE_OUT} duration={14} />
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

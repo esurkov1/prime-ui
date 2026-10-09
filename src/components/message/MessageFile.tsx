@@ -1,15 +1,16 @@
 import type * as React from "react";
 
+import { Button } from "@/components/button/Button";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { extensionOf, formatColor } from "@/internal/fileFormat";
+import { splitFileName } from "@/internal/fileName";
 import { formatFileSize } from "@/internal/fileSize";
 import { formatLabel } from "@/internal/formatLabel";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
 import palette from "@/internal/palette.module.css";
-import round from "@/internal/roundButton.module.css";
 import {
   inFlight,
   TRANSFER_LABELS,
@@ -56,7 +57,8 @@ export type MessageFileProps = Omit<React.HTMLAttributes<HTMLDivElement>, "child
  * «{done} из {total}», or the failure) beside it. The tile is the file's one action, in one spot:
  * download, cancel, retry. While the file transfers, failed or is not fetched yet, the shared
  * transfer disk (`internal/transferDisk`, size `xl`) covers the tile: the cross on the media shade
- * with the ring of the share, the danger retry, the download arrow.
+ * with the ring of the share, the danger retry, the download arrow. The download of `href` is a
+ * link drawn as a `Button shape="circle"` (`asChild`) over the tile.
  */
 export function MessageFile({
   name,
@@ -123,15 +125,19 @@ export function MessageFile({
         })}
       >
         {download ? (
-          <a
-            className={cx(round.round, styles.action)}
-            data-look="solid"
-            href={href}
-            download={name}
+          <Button.Root
+            asChild
+            shape="circle"
+            size="xl"
+            className={styles.action}
             aria-label={formatLabel(labels.download, { name })}
           >
-            <Icon name="action.download" />
-          </a>
+            <a href={href} download={name}>
+              <Button.Icon>
+                <Icon name="action.download" />
+              </Button.Icon>
+            </a>
+          </Button.Root>
         ) : null}
         {/* After the download: the face under a shown download fades (`.action ~ .face`). */}
         <span className={styles.face}>{face}</span>
@@ -154,7 +160,7 @@ export function MessageFile({
         ) : null}
       </span>
       <div className={styles.name} title={name}>
-        <span data-message-selectable="">{name}</span>
+        <span data-message-selectable="">{preview ? name : splitFileName(name).base}</span>
       </div>
       <div className={styles.meta} data-failed={failed || undefined}>
         {description ? <span className={styles.size}>{description}</span> : null}

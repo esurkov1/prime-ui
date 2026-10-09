@@ -1,6 +1,8 @@
 /** Optional parts of a bubble in their order: the author, a forwarded header, a reply quote, the text and reactions — `Message.Author`, `Message.Forwarded`, `Message.Reply`, `Message.Reactions`. */
 import { Message } from "prime-ui-kit";
 
+import styles from "./examples.module.css";
+
 const REACTIONS = [
   { emoji: "👍", count: 3, selected: true },
   { emoji: "🔥", count: 1 },
@@ -8,7 +10,7 @@ const REACTIONS = [
 
 export default function MessageStructureExample() {
   return (
-    <Message.Group aria-label="Чат проекта «Портал поставщиков»">
+    <div className={styles.thread}>
       <Message.Root direction="incoming" time="11:02">
         <Message.Author color="purple">Олег Смирнов</Message.Author>
         <Message.Text>Макет страницы заказа готов, ссылка в задаче PRJ-412.</Message.Text>
@@ -23,8 +25,8 @@ export default function MessageStructureExample() {
           Макет страницы заказа готов, ссылка в задаче PRJ-412.
         </Message.Reply>
         <Message.Text>Посмотрел — согласовано, передаю в разработку.</Message.Text>
-        <Message.Reactions reactions={REACTIONS} />
+        <Message.Reactions items={REACTIONS} />
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

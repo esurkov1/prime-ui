@@ -92,8 +92,17 @@ export const semanticTokens = {
     media: {
       shade: "rgba(17, 19, 24, 0.56)",
       shadeFg: "{color.gray.0}",
+      /**
+       * A round disk over media (play, cancel, retry, download — Button `shade`, the play mark):
+       * lighter than `shade` under a softer blur, so the frame shows through; its white glyph
+       * keeps 3:1 (a graphical object) even over a white frame. Pills keep `shade` / `pill`:
+       * they carry text, which needs the denser ground.
+       */
+      disk: "rgba(17, 19, 24, 0.48)",
       pill: "rgba(17, 19, 24, 0.72)",
       pillFg: "rgba(255, 255, 255, 0.8)",
+      /** The ground of a full-screen media viewer: near black, so any picture reads at its truest. */
+      stage: "{color.gray.950}",
     },
     /**
      * Translucent state washes: they sit on any background, including ones off the ladder (an
@@ -642,6 +651,34 @@ export const semanticTokens = {
     m: { height: "{space.10}", radius: "{radius.8}" },
     l: { height: "{space.12}", radius: "{radius.8}" },
     xl: { height: "{space.16}", radius: "{radius.12}" },
+  },
+
+  /**
+   * A media album (`Gallery`): the size cap of its box — an album is at most this wide, a lone
+   * portrait this tall — the narrowest it stands over a caption, and the gap between its tiles.
+   */
+  gallery: {
+    maxSize: "22.5rem",
+    /** The narrowest a gallery stands above a caption: a lone portrait widens to it (cover). */
+    minSize: "16rem",
+    gap: "2px",
+  },
+
+  /**
+   * The full-screen media viewer (`MediaViewer`): the gap between two pages while one slides into
+   * the other, and the inset of its bars from the screen edges (the safe areas are added on top).
+   */
+  /**
+   * A round disk over media (`--prime-color-media-disk`): the backdrop blur behind it — gentle,
+   * so the frame under the disk stays recognisable.
+   */
+  mediaDisk: {
+    blur: "{space.1}",
+  },
+
+  mediaViewer: {
+    pageGap: "{space.6}",
+    inset: "{space.4}",
   },
 
   /**

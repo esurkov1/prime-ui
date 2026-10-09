@@ -6,7 +6,6 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { useMediaSession } from "@/internal/mediaSession";
-import round from "@/internal/roundButton.module.css";
 import {
   TRANSCRIPT_LABELS,
   type Transcript,
@@ -25,7 +24,7 @@ import {
   transferCovers,
   transferDiskLabels,
 } from "@/internal/transfer";
-import { TransferDisk, type TransferDiskProps } from "@/internal/transferDisk";
+import { type TransferDiskProps, useTransferDisk } from "@/internal/transferDisk";
 
 import styles from "./mediaPlayer.module.css";
 
@@ -231,11 +230,12 @@ export function useMediaPlayer(
 }
 
 /**
- * The play disk of every player: one round button (`roundButton`, control `l`) with the play ⇄
- * pause glyphs cross-fading in place, and — while the media is on its way, failed or not fetched —
- * the transfer disk of the same look over it (the ×, the retry or the download arrow in the glyph's
- * place, the ring along its inner edge). `solid` is the accent disk of a voice message; `shade` the
- * media shade with a blur over a video circle. Same size, glyphs, press, focus ring and transfer.
+ * The play disk of every player: one `Button shape="circle"` (control `l`) for every state — play
+ * ⇄ pause, and while the media is on its way, failed or not fetched, the transfer's ×, retry or
+ * download arrow (`useTransferDisk`), the share as the Button's `progress` ring along its inner
+ * edge. Glyphs cross-fade in place (`Button.Icon`); done, the ring fades and play comes back.
+ * `solid` is the accent disk of a voice message (an outgoing bubble recolours it); `shade` the
+ * media shade with a blur over a video circle.
  */
 export function PlayDisk({
   look,
@@ -264,38 +264,42 @@ export function PlayDisk({
   className?: string;
 }) {
   const playing = state === "playing";
+  const transfer = useTransferDisk(transferDisk ?? NO_TRANSFER);
+  const inTransfer = transferDisk !== null && covered;
+  // A transfer state whose handler was not given only shows itself: the disk takes no press.
+  const still = inTransfer && !transfer.pressable;
   return (
     <span className={cx(styles.slot, className)}>
-      <button
-        type="button"
-        className={cx(round.round, styles.disk)}
-        data-look={look}
+      <Button.Root
+        shape="circle"
+        size="l"
+        variant={look}
+        tone={inTransfer && transfer.failed ? "danger" : "accent"}
         data-state={state}
         data-covered={covered || undefined}
-        inert={covered || undefined}
-        aria-hidden={covered || undefined}
-        aria-label={playing ? labels.pause : labels.play}
-        aria-describedby={describedBy}
+        aria-label={(inTransfer ? transfer.name : playing ? labels.pause : labels.play) ?? ""}
+        aria-describedby={inTransfer ? transfer.describedBy : describedBy}
+        aria-busy={(inTransfer && transfer.busy) || undefined}
+        aria-disabled={(inTransfer && transfer.busy) || still || undefined}
         disabled={disabled}
-        onClick={onToggle}
-        onKeyDown={onKeyDown}
+        progress={inTransfer ? transfer.progress : undefined}
+        onClick={inTransfer ? transfer.run : onToggle}
+        onKeyDown={inTransfer ? undefined : onKeyDown}
       >
-        <span className={styles.glyphs} aria-hidden="true">
-          <span className={styles.glyph} data-shown={!playing}>
-            <Icon name="action.play" fill="currentColor" />
-          </span>
-          <span className={styles.glyph} data-shown={playing}>
-            <Icon name="action.pause" fill="currentColor" />
-          </span>
-        </span>
-      </button>
-      {/* Mounted for any transfer state: it fills, and fades away over the disk once done. */}
-      {transferDisk ? (
-        <TransferDisk look={look} className={styles.transfer} {...transferDisk} />
-      ) : null}
+        <Button.Icon>
+          {inTransfer ? (
+            transfer.glyph
+          ) : (
+            <Icon name={playing ? "action.pause" : "action.play"} fill="currentColor" />
+          )}
+        </Button.Icon>
+      </Button.Root>
+      {transferDisk ? transfer.texts : null}
     </span>
   );
 }
+
+const NO_TRANSFER = { state: "done", labels: {} } as const;
 
 /**
  * The transcript button of every player, so a voice message and a circle never drift: a soft `xs`

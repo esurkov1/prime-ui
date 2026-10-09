@@ -166,8 +166,11 @@ describe.each(PLAYERS)("$name — the shared player behaviour", (player) => {
     );
     expect(group()).toHaveAttribute("data-transfer", "true");
     expect(screen.queryByRole("button", { name: player.play })).toBeNull();
-    expect(screen.getByRole("progressbar", { name: "Отправка 30%" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Отменить отправку" }));
+    // One disk: the play disk itself is the cancel, described by the share it carries.
+    const cancel = screen.getByRole("button", { name: "Отменить отправку" });
+    expect(cancel).toHaveAccessibleDescription("Отправка 30%");
+    expect(cancel).toHaveAttribute("data-shape", "circle");
+    fireEvent.click(cancel);
     expect(onCancel).toHaveBeenCalledTimes(1);
 
     rerender(player.render({ transfer: "failed", transferDirection: "download", onRetry }));

@@ -1,9 +1,11 @@
 /*
- * ProgressCircle — the ring version of ProgressBar. Geometry lives in viewBox units (0…100,
- * stroke = 1/12 of the diameter, set in TSX), so the ring keeps one proportion at every tier; `--pc-size`
- * sets the diameter from rem tokens.
- * Value mode: track + one round-capped arc. Segments mode: parts clockwise from the top with flat
- * joints and round caps at both ends of the filled share, or separate round arcs with `hairline`.
+ * ProgressCircle — the ring version of ProgressBar, drawn from the kit ring (`internal/ring`,
+ * `data` weight: the stroke is 1/12 of the diameter), so it keeps one proportion at every tier;
+ * `--pc-size` sets the diameter from rem tokens. Colors go to the ring as `--ring-fill` /
+ * `--ring-track`.
+ * Value mode: track + one round-capped arc; `null` or `spin` turns the ring (the ring's motion).
+ * Segments mode: parts clockwise from the top with flat joints and round caps at both ends of the
+ * filled share, or separate round arcs with `hairline`.
  */
 
 .root {
@@ -13,6 +15,7 @@
   /* m (48px): caption keeps «100%» clear of the ring. */
   --pc-text-size: var(--prime-text-caption-size);
   --pc-line-height: var(--prime-text-caption-line-height);
+  --pc-icon-size: var(--prime-icon-m);
 
   font-family: var(--prime-font-family-sans);
 }
@@ -62,18 +65,21 @@
 
 .root[data-size="s"] {
   --pc-size: var(--prime-space-8);
+  --pc-icon-size: var(--prime-icon-s);
 }
 
 .root[data-size="l"] {
   --pc-size: var(--prime-space-16);
   --pc-text-size: var(--prime-text-title-m-size);
   --pc-line-height: var(--prime-text-title-m-line-height);
+  --pc-icon-size: var(--prime-icon-l);
 }
 
 .root[data-size="xl"] {
   --pc-size: var(--prime-space-20);
   --pc-text-size: var(--prime-text-title-l-size);
   --pc-line-height: var(--prime-text-title-l-line-height);
+  --pc-icon-size: var(--prime-icon-xl);
 }
 
 /* Tones: on the root (value mode) and on every part (segments mode). */
@@ -102,71 +108,55 @@
   --pc-fill: var(--prime-color-info-default);
 }
 
+/* The host's text color: the arc in it over a 32% track of it (a colored host, media). */
+.root[data-tone="inherit"] {
+  --pc-fill: currentColor;
+  --pc-rest: color-mix(in srgb, currentColor 32%, transparent);
+}
+
 /* A category color: the hue's step of the chart palette (`palette.hue` on the same element). */
 .svg [data-color] {
   --pc-fill: var(--hue-chart);
 }
 
-.svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+/* Two classes: the ring's own color defaults never win over the tone. */
+.root .svg {
+  --ring-fill: var(--pc-fill);
+  --ring-track: var(--pc-rest);
 }
 
-/* Arcs start at 12 o'clock and run clockwise. */
-.arcs {
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-  transform-box: view-box;
-}
-
-.track,
-.fill,
-.segment,
-.segmentRound,
-.restRound {
-  fill: none;
-}
-
-.track,
-.restRound {
-  stroke: var(--pc-rest);
-}
-
-.fill,
 .segment,
 .segmentRound {
   stroke: var(--pc-fill);
 }
 
-.fill,
+.restRound {
+  stroke: var(--pc-rest);
+}
+
 .segmentRound,
 .restRound {
   stroke-linecap: round;
 }
 
-.fill,
 .segment,
 .segmentRound,
 .restRound {
   transition:
-    stroke-dashoffset var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
-    stroke-dasharray var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
+    stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    stroke-dasharray var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
     stroke var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 .cap {
   fill: var(--pc-fill);
-  transform-origin: 50% 50%;
-  transform-box: view-box;
-  transition:
-    rotate var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
-    fill var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 /* Inner content: the hole of the ring (5/6 of the diameter). */
 .inner {
+  /* An icon in the centre: one step of the icon scale per ring tier (s 16 · m 20 · l 24 · xl 32). */
+  --prime-icon-size: var(--pc-icon-size);
+
   position: absolute;
   display: flex;
   align-items: center;
@@ -181,4 +171,8 @@
   font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
   text-align: center;
+}
+
+.root[data-tone="inherit"] .inner {
+  color: inherit;
 }

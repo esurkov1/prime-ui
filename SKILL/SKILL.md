@@ -35,7 +35,7 @@ region, `Skeleton` while it loads).
    [foundations.md](foundations.md).
 5. **Write the JSX** — [api-contract.md](api-contract.md): prop names, controlled state, events (async
    events return the request's Promise), forms and their submit flow (`Fieldset disabled`), uploads
-   (`useUploadQueue`), destructive actions (`ConfirmDialog`), helpers (`groupMessages` for a chat),
+   (`useUploadQueue`), destructive actions (`ConfirmDialog`), helpers (`groupMessages` for chat rows you build yourself),
    icon names.
 6. **States and motion** — [motion.md](motion.md): every region loads, empties and fails without
    flipping; what the kit animates by itself and when to move your own elements.

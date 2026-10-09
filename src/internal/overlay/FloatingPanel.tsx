@@ -76,7 +76,7 @@ export function FloatingPanel({
   };
 
   const panel = scroll ? (
-    <ScrollContainer {...props} ref={panelRef as React.Ref<HTMLDivElement>}>
+    <ScrollContainer {...props} edges="shadow" ref={panelRef as React.Ref<HTMLDivElement>}>
       {children}
     </ScrollContainer>
   ) : (

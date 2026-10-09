@@ -428,7 +428,7 @@ describe("Tabs — indicator", () => {
 
   it("scrolls horizontally with an edge fade and a hidden scrollbar", () => {
     render(<BasicTabs />);
-    expect(screen.getByRole("tablist")).toHaveAttribute("data-fade", "horizontal");
+    expect(screen.getByRole("tablist")).toHaveAttribute("data-edges", "fade");
   });
 
   it("moves the indicator to the selected tab without re-rendering the items", () => {

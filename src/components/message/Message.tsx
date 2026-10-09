@@ -11,6 +11,12 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
 import mediaPill from "@/internal/mediaPill.module.css";
 import {
+  defineRowKind,
+  useMessageList,
+  useMessageRow,
+  useMessageSelection,
+} from "@/internal/messageList";
+import {
   type MessagePartContextValue,
   MessagePartProvider,
   type MessagePartSpec,
@@ -24,22 +30,17 @@ import {
 
 import { BubbleHug } from "./bubbleHug";
 import { createBubbleMorph, MorphSnapshot } from "./bubbleMorph";
+import { formatMessageTime } from "./formatMessageTime";
 import styles from "./Message.module.css";
 import { MessageContact, MessageLinkPreview, MessageLocation } from "./MessageCards";
 import { MessageFile } from "./MessageFile";
-import {
-  defineRowKind,
-  MessageGroup,
-  MessageSelectionBar,
-  useMessageGroup,
-  useMessageRow,
-  useMessageSelection,
-} from "./MessageGroup";
 import { MessageMedia } from "./MessageMedia";
 import {
   applyOptimistic,
+  authorNameOf,
   MESSAGE_LABELS,
   MessageAuthor,
+  MessageAuthorIcon,
   type MessageAuthorProps,
   MessageAvatar,
   MessageForwarded,
@@ -51,23 +52,14 @@ import {
   MessageReply,
   type MessageRootContextValue,
   MessageRootProvider,
-  MessageSeparator,
-  MessageService,
   MessageText,
-  MessageUnread,
 } from "./MessageParts";
-import { MessagePinned } from "./MessagePinned";
-import { ReactionBar } from "./MessageReactionBar";
+import { DEFAULT_REACTION_OPTIONS, ReactionBar } from "./MessageReactionBar";
 import { MessageTyping } from "./MessageTyping";
-import type { MessagePosition } from "./messageList";
-import type { MessageDirection } from "./types";
+import type { MessageDirection, MessagePosition } from "./types";
 
 export type {
-  MessageGroupLabels,
-  MessageGroupProps,
-  MessageSelectionBarProps,
-} from "./MessageGroup";
-export type {
+  MessageAuthorIconProps,
   MessageAuthorProps,
   MessageAvatarProps,
   MessageForwardedLabels,
@@ -79,19 +71,15 @@ export type {
   MessageReactionsProps,
   MessageReplyLabels,
   MessageReplyProps,
-  MessageSeparatorProps,
-  MessageServiceProps,
   MessageTextProps,
-  MessageUnreadLabels,
-  MessageUnreadProps,
 } from "./MessageParts";
-export type {
-  MessagePinnedItem,
-  MessagePinnedLabels,
-  MessagePinnedProps,
-} from "./MessagePinned";
 export type { MessageTypingLabels, MessageTypingProps } from "./MessageTyping";
-export type { MessageDirection, MessageUser } from "./types";
+export type {
+  MessageDirection,
+  MessagePosition,
+  MessageReactionOption,
+  MessageUser,
+} from "./types";
 
 /** Delivery of an outgoing message: on its way, sent, read by the recipient, or failed. */
 export type MessageStatus = "sending" | "sent" | "read" | "failed";
@@ -313,6 +301,10 @@ function useReactionBarState(rootRef: React.RefObject<HTMLElement | null>) {
       window.clearTimeout(leaveTimer.current);
       leaveTimer.current = window.setTimeout(() => setBar(null), HOVER_GRACE_MS);
     },
+    /** A press is not a hover: a pending long hover never opens the bar over what the press opened. */
+    cancelHover() {
+      if (current.current === null) window.clearTimeout(hoverTimer.current);
+    },
     /** The pointer reached the bar: it stays. */
     stay() {
       window.clearTimeout(leaveTimer.current);
@@ -349,17 +341,20 @@ function flatten(nodes: React.ReactNode, prefix = ""): React.ReactElement[] {
 
 /**
  * The parts of a message and the shell they ask for: a `round` part makes a circle message, a
- * lone `media` part a picture message, anything else a bubble (`MessagePartSpec.shell`).
+ * lone `media` part a picture message, anything else a bubble (`MessagePartSpec.shell`). The
+ * author's header, the avatar, the menu and the reactions have places of their own.
  */
 function partsOf(children: React.ReactNode) {
   const items = flatten(children);
   const avatar = items.find((child) => isElement(child, MessageAvatar));
+  const author = items.find((child) => isElement(child, MessageAuthor));
   const menu = items.find((child) => isElement(child, MessageMenu));
   const reactions = items.find((child) => isElement(child, MessageReactions));
   const body = items.filter(
     (child) =>
       !(
         isElement(child, MessageAvatar) ||
+        isElement(child, MessageAuthor) ||
         isElement(child, MessageMenu) ||
         isElement(child, MessageReactions)
       ),
@@ -370,23 +365,22 @@ function partsOf(children: React.ReactNode) {
     : body.length === 1 && specs[0]?.shell === "media"
       ? "media"
       : "bubble";
-  return { items, avatar, menu, reactions, body, specs, shell };
+  return { avatar, author, menu, reactions, body, specs, shell };
 }
 
-/** The visible name of the author, when `Message.Author` holds plain text. */
-function authorText(children: readonly React.ReactElement[]): string | undefined {
-  for (const child of children) {
-    if (isElement(child, MessageAuthor)) {
-      const name = (child.props as MessageAuthorProps).children;
-      if (typeof name === "string") return name;
-    }
-  }
-  return undefined;
+/** What a chat's search looks in: the text its content parts declare. */
+function searchTextOf(
+  body: readonly React.ReactElement[],
+  specs: readonly (MessagePartSpec | null)[],
+): string {
+  return body
+    .map((element, index) => specs[index]?.text?.(element.props as never) ?? "")
+    .filter(Boolean)
+    .join("\n");
 }
 
 /** Block size of the parts the kit renders around content (px), for the off-screen estimate. */
 const PART_ESTIMATE = new Map<unknown, number>([
-  [MessageAuthor, 20],
   [MessageForwarded, 20],
   [MessageReply, 44],
 ]);
@@ -397,8 +391,9 @@ function estimateOf(
   specs: readonly (MessagePartSpec | null)[],
   shell: MessageShell,
   reactions: boolean,
+  author: boolean,
 ): number {
-  let size = shell === "bubble" ? 16 : 0;
+  let size = (shell === "bubble" ? 16 : 0) + (author && shell === "bubble" ? 20 : 0);
   body.forEach((element, index) => {
     const spec = specs[index];
     size += spec?.estimate?.(element.props as never) ?? PART_ESTIMATE.get(element.type) ?? 40;
@@ -421,7 +416,7 @@ export type MessageRootProps = Omit<React.HTMLAttributes<HTMLElement>, "role"> &
   /** `incoming` on the start side on a surface fill, `outgoing` on the end side in the accent hue. */
   direction?: MessageDirection;
   /**
-   * The place in a run of one author's messages (`groupMessages`): sets the small gap inside a
+   * The place in a run of one author's messages (`Chat.Messages items` sets it): sets the small gap inside a
    * run and the tail on its last bubble. Default `single`.
    */
   position?: MessagePosition;
@@ -440,18 +435,13 @@ export type MessageRootProps = Omit<React.HTMLAttributes<HTMLElement>, "role"> &
   onRetry?: () => void | Promise<void>;
   /**
    * The reader puts or takes back a reaction: a chip of `Message.Reactions`, a double tap (the
-   * group's quick reaction), `L`, or the reaction bar. A returned promise keeps the chip pending until it
+   * chat's quick reaction), `L`, or the reaction bar. A returned promise keeps the chip pending until it
    * settles; update the reactions when it resolves. Without it reactions are read-only.
    */
   onReactionToggle?: AsyncEvent<string>;
   labels?: Partial<MessageLabels>;
   ref?: React.Ref<HTMLElement>;
 };
-
-function defaultFormatTime(date: Date): string {
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
 
 const isInteractive = (target: EventTarget | null) =>
   target instanceof Element &&
@@ -464,14 +454,14 @@ const isInteractive = (target: EventTarget | null) =>
  * the bubble fits its content, the meta's spacer closes the last line, and every size change (the
  * reactions row, a transcript) is a disclosure that glides in layout. The row is a `role="article"`
  * named «{author}, {time}» (an `option` in selection mode); right click, a long press, Enter or
- * Shift+F10 open `Message.Menu` where the pointer is; a double tap puts the group's quick reaction.
+ * Shift+F10 open `Message.Menu` where the pointer is; a double tap puts the chat's quick reaction.
  */
 function MessageRoot({
   value: valueProp,
   direction = "incoming",
   position = "single",
   time: timeProp,
-  formatTime = defaultFormatTime,
+  formatTime = formatMessageTime,
   edited = false,
   status,
   onRetry,
@@ -491,7 +481,7 @@ function MessageRoot({
   ...rest
 }: MessageRootProps) {
   const labels = React.useMemo(() => ({ ...MESSAGE_LABELS, ...labelsProp }), [labelsProp]);
-  const group = useMessageGroup();
+  const list = useMessageList();
   const row = useMessageRow();
   const autoValue = React.useId();
   const value = valueProp ?? row?.value ?? autoValue;
@@ -501,8 +491,8 @@ function MessageRoot({
   const fillRef = React.useRef<HTMLSpanElement>(null);
   // Every size change of the message plays as one stroke (`bubbleMorph`); while it gives way in
   // the conversation, the conversation's own anchoring holds (`hold`).
-  const holdRef = React.useRef(group.hold);
-  holdRef.current = group.hold;
+  const holdRef = React.useRef(list.hold);
+  holdRef.current = list.hold;
   const [morph] = React.useState(() =>
     createBubbleMorph(() => {
       const article = rootRef.current;
@@ -519,9 +509,9 @@ function MessageRoot({
   const inMessage = (target: EventTarget | null) =>
     target instanceof Node && (columnRef.current?.contains(target) ?? false);
   const mergedRef = useMergedRefs(rootRef, ref);
-  // Registered before paint: the group decides whether this message is new at the end (it enters,
+  // Registered before paint: the list decides whether this message is new at the end (it enters,
   // with no render) and watches it for read receipts.
-  const { register } = group;
+  const { register } = list;
   React.useLayoutEffect(() => {
     const article = rootRef.current;
     return article ? register(article, value, direction) : undefined;
@@ -533,11 +523,19 @@ function MessageRoot({
   /** Selection mode: a click or a key toggles this message, Shift sets the range from the anchor. */
   const toggleSelected = (event: { shiftKey: boolean; detail: number }) => {
     const article = rootRef.current;
-    if (article) group.range.onClick(group.indexOf(article), event);
+    if (article) list.range.onClick(list.indexOf(article), event);
   };
 
   // ── parts ──
-  const { items, avatar, menu, reactions, body, specs, shell } = partsOf(children);
+  const { avatar, author, menu, reactions, body, specs, shell } = partsOf(children);
+  // A group chat heads the first message of a run with its author and ends the run with the
+  // avatar, the gutter kept on every incoming row; a direct chat shows neither. A message on its
+  // own is a group of what it is given: the parts it holds, by its place in the run.
+  const grouped = list.inList ? list.group : author !== undefined || avatar !== undefined;
+  const showAuthor =
+    author !== undefined && grouped && (position === "single" || position === "first");
+  const showAvatar = position === "single" || position === "last";
+  const gutter = direction === "incoming" && (list.inList ? list.group : avatar !== undefined);
   // The part that carries the meta: the circle of a round message, else the last part.
   const metaIndex =
     shell === "round" ? specs.findIndex((spec) => spec?.shell === "round") : body.length - 1;
@@ -560,25 +558,23 @@ function MessageRoot({
     shown: ownReactions,
     toggleReaction,
   } = useOptimisticReactions(
-    reactions ? (reactions.props as MessageReactionsProps).reactions : NO_REACTIONS,
+    reactions ? (reactions.props as MessageReactionsProps).items : NO_REACTIONS,
     onReactionToggle,
   );
   const hasReactions = ownReactions.length > 0;
-  const canQuickReact = toggleReaction !== null && group.quickReaction !== false;
+  const canQuickReact = toggleReaction !== null && list.quickReaction !== false;
   const quickReact = () => {
-    const emoji = group.quickReaction;
+    const emoji = list.quickReaction;
     if (!toggleReaction || emoji === false) return;
     const had = ownReactions.some((reaction) => reaction.emoji === emoji && reaction.selected);
-    group.announce(
-      formatLabel(had ? group.labels.reactionRemoved : group.labels.reactionAdded, { emoji }),
-    );
+    list.announce(formatLabel(had ? labels.reactionRemoved : labels.reactionAdded, { emoji }));
     toggleReaction(emoji);
   };
   // Every message holds the row's place (closed until its first reaction): one element, one key,
   // never remounted — its chips keep their state and the row opens and closes in place.
   const reactionsPart = React.cloneElement(
     (reactions as React.ReactElement<MessageReactionsProps> | undefined) ?? (
-      <MessageReactions reactions={NO_REACTIONS} />
+      <MessageReactions items={NO_REACTIONS} />
     ),
     { key: "reactions" },
   );
@@ -638,7 +634,7 @@ function MessageRoot({
   );
   const overlay = metaMode === "overlay" ? meta : null;
   // One context value per role: the part that carries the meta, and every other part.
-  const { memoryOf, hold } = group;
+  const { memoryOf, hold } = list;
   const memory = React.useMemo(() => memoryOf(value), [memoryOf, value]);
   // A part that changes the message from inside (a transcript) keeps the view still and plays its
   // change as the message's morph.
@@ -646,13 +642,28 @@ function MessageRoot({
     hold?.();
     morph.expect();
   }, [hold, morph]);
+  // A press inside a part (a picture's tile) presses the whole message: the bubble with its
+  // caption, its tail and reactions, one surface.
+  const pressMessage = React.useCallback((pressed: boolean) => {
+    const column = columnRef.current;
+    if (!column) return;
+    if (pressed) column.dataset.pressed = "";
+    else delete column.dataset.pressed;
+  }, []);
   const carrier = React.useMemo<MessagePartContextValue>(
-    () => ({ spacer, overlay, neutralDepth, memory, holdPosition }),
-    [spacer, overlay, neutralDepth, memory, holdPosition],
+    () => ({ spacer, overlay, neutralDepth, memory, holdPosition, press: pressMessage }),
+    [spacer, overlay, neutralDepth, memory, holdPosition, pressMessage],
   );
   const plain = React.useMemo<MessagePartContextValue>(
-    () => ({ spacer: null, overlay: null, neutralDepth, memory, holdPosition }),
-    [neutralDepth, memory, holdPosition],
+    () => ({
+      spacer: null,
+      overlay: null,
+      neutralDepth,
+      memory,
+      holdPosition,
+      press: pressMessage,
+    }),
+    [neutralDepth, memory, holdPosition, pressMessage],
   );
 
   // ── menu ──
@@ -689,7 +700,8 @@ function MessageRoot({
   // ── reaction bar ──
   const reactionBar = useReactionBarState(rootRef);
   const { bar, setBar } = reactionBar;
-  const canReact = toggleReaction !== null && group.reactionOptions.length > 0 && !selecting;
+  const reactionOptions = list.reactionOptions ?? DEFAULT_REACTION_OPTIONS;
+  const canReact = toggleReaction !== null && reactionOptions.length > 0 && !selecting;
   const pickReaction = (emoji: string) => {
     toggleReaction?.(emoji);
     setMenuOpen(false);
@@ -703,15 +715,20 @@ function MessageRoot({
     [ownReactions],
   );
 
-  const author = authorText(items) ?? (direction === "outgoing" ? labels.you : undefined);
+  const authorName =
+    (author ? authorNameOf((author.props as MessageAuthorProps).children) : undefined) ??
+    (direction === "outgoing" ? labels.you : undefined);
   const name =
     ariaLabel ??
-    (formatLabel(labels.message, { author, time: time ?? undefined }).replace(/^,\s*|,\s*$/g, "") ||
+    (formatLabel(labels.message, { author: authorName, time: time ?? undefined }).replace(
+      /^,\s*|,\s*$/g,
+      "",
+    ) ||
       undefined);
 
   // Stable while the message's own state is: a render of the row (a hover, the menu, the bar)
   // passes its parts by.
-  const { selectable, setSelected } = group;
+  const { selectable, setSelected } = list;
   const startSelection = React.useMemo(
     () => (selectable ? () => setSelected([value]) : null),
     [selectable, setSelected, value],
@@ -739,6 +756,7 @@ function MessageRoot({
         reactionBar.hoverStart();
       }}
       onPointerLeave={reactionBar.leaveSoon}
+      onPointerDown={reactionBar.cancelHover}
     >
       <SurfaceDepthProvider value={depth}>
         <div
@@ -759,6 +777,11 @@ function MessageRoot({
           {shell === "bubble" ? (
             // The bubble's fill: a layer under the content, so a morph can paint the old box.
             <span ref={fillRef} className={styles.fill} data-morph-skip="" aria-hidden="true" />
+          ) : null}
+          {showAuthor && shell === "bubble" ? author : null}
+          {showAuthor && shell !== "bubble" ? (
+            // Over a picture or a circle the header stands on a pill at its top-start corner.
+            <div className={cx(mediaPill.pill, styles.authorPill)}>{author}</div>
           ) : null}
           {body.map((child, index) => (
             <MessagePartProvider
@@ -801,7 +824,7 @@ function MessageRoot({
           direction,
           position,
           shell,
-          avatars: group.avatars && direction === "incoming" ? true : undefined,
+          avatars: gutter || undefined,
           selecting: selecting || undefined,
           selected: selected || undefined,
           failed: shownStatus === "failed" || undefined,
@@ -823,7 +846,7 @@ function MessageRoot({
           onPointerDown?.(event);
           if (selecting) {
             // Press and drag (or slide a finger from the check) paints the messages passed over.
-            group.range.onPointerDown(group.indexOf(event.currentTarget), event);
+            list.range.onPointerDown(list.indexOf(event.currentTarget), event);
             return;
           }
           if (
@@ -930,9 +953,7 @@ function MessageRoot({
             <Checkbox.Indicator shape="circle" checked={selected} />
           </span>
         ) : null}
-        {group.avatars && direction === "incoming" ? (
-          <div className={styles.gutter}>{avatar}</div>
-        ) : null}
+        {gutter ? <div className={styles.gutter}>{showAvatar ? avatar : null}</div> : null}
         {status === "failed" && onRetry ? (
           <span className={styles.retry} data-morph-item="">
             <Button.Root
@@ -980,11 +1001,11 @@ function MessageRoot({
             }}
             anchorRef={bubbleRef}
             align={direction === "outgoing" ? "end" : "start"}
-            options={group.reactionOptions}
+            options={reactionOptions}
             selected={ownSelected}
             onPick={pickReaction}
             focusOnOpen={bar === "keyboard"}
-            labels={{ bar: group.labels.reactionBar, more: group.labels.moreReactions }}
+            labels={{ bar: labels.reactionBar, more: labels.moreReactions }}
             onPointerEnter={reactionBar.stay}
             onPointerLeave={reactionBar.leaveSoon}
           />
@@ -995,25 +1016,26 @@ function MessageRoot({
 }
 MessageRoot.displayName = "Message.Root";
 
-// The group reads a message row from its props alone: its value, side and estimated height.
+// The list reads a message row from its props alone: its value, side, estimated height and text.
 defineRowKind(MessageRoot, {
   message: (props) => {
-    const { body, specs, shell, reactions } = partsOf((props as MessageRootProps).children);
+    const { body, specs, shell, reactions, author } = partsOf((props as MessageRootProps).children);
     const reacted =
-      ((reactions?.props as MessageReactionsProps | undefined)?.reactions.length ?? 0) > 0;
+      ((reactions?.props as MessageReactionsProps | undefined)?.items.length ?? 0) > 0;
     return {
       value: (props as MessageRootProps).value,
       direction: (props as MessageRootProps).direction ?? "incoming",
-      estimate: estimateOf(body, specs, shell, reacted),
+      estimate: estimateOf(body, specs, shell, reacted, author !== undefined),
+      text: searchTextOf(body, specs),
     };
   },
 });
 
 export const Message = {
-  Group: MessageGroup,
   Root: MessageRoot,
   Avatar: MessageAvatar,
   Author: MessageAuthor,
+  AuthorIcon: MessageAuthorIcon,
   Forwarded: MessageForwarded,
   Reply: MessageReply,
   Text: MessageText,
@@ -1024,10 +1046,5 @@ export const Message = {
   LinkPreview: MessageLinkPreview,
   Reactions: MessageReactions,
   Menu: MessageMenu,
-  SelectionBar: MessageSelectionBar,
-  Separator: MessageSeparator,
-  Service: MessageService,
-  Unread: MessageUnread,
   Typing: MessageTyping,
-  Pinned: MessagePinned,
 };

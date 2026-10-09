@@ -33,6 +33,8 @@ export type AttachmentTileProps = Omit<
   src?: string;
   /** The name, at the start of the bottom band (one line, ellipsis). */
   name?: string;
+  /** The full file name for the tooltip of a trimmed `name` (the format badge shows the extension). */
+  nameTitle?: string;
   /** The size, at the end of the bottom band; a video without it shows its duration. */
   meta?: string;
   /**
@@ -81,6 +83,7 @@ export function AttachmentTile({
   kind,
   src,
   name,
+  nameTitle,
   meta,
   badge,
   upload,
@@ -143,7 +146,9 @@ export function AttachmentTile({
       {name || bandMeta ? (
         // Decorative: the tile's name carries the file name and its state.
         <span className={styles.band} aria-hidden="true">
-          <span className={styles.name}>{name}</span>
+          <span className={styles.name} title={nameTitle}>
+            {name}
+          </span>
           {bandMeta ? <span className={styles.meta}>{bandMeta}</span> : null}
         </span>
       ) : null}
@@ -190,10 +195,11 @@ export function AttachmentTile({
   );
 }
 
-/** A row of tiles scrolls sideways, its hidden edges fading (the bar hidden). */
+/** A row of tiles scrolls sideways — its hidden edges fade, a scroll rests on a tile, a vertical
+ * wheel moves it — with the bar hidden. */
 export function AttachmentStripScroller({ children }: { children: React.ReactNode }) {
   return (
-    <ScrollContainer axis="horizontal" fade scrollbar="hidden" className={styles.scroller}>
+    <ScrollContainer axis="horizontal" snap scrollbar="hidden" className={styles.scroller}>
       {children}
     </ScrollContainer>
   );

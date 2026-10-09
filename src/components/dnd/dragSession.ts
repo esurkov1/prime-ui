@@ -1,5 +1,5 @@
+import { autoScrollStep, scrollableAncestors } from "@/internal/edgeAutoScroll";
 import { formatLabel } from "@/internal/formatLabel";
-import { autoScrollStep, scrollableAncestors } from "./autoScroll";
 import { distanceBetween, type Point, type Rect, rectContains, rectOf } from "./geometry";
 
 import { type DndLabels, defaultDndLabels } from "./labels";

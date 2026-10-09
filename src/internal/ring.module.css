@@ -1,0 +1,100 @@
+/*
+ * The one ring of the kit (`ring.tsx`): ProgressCircle, Spinner and the ring of a circle Button.
+ * An svg without a viewBox, so its user units are CSS pixels and a percentage of a square svg is a
+ * share of its side: the circle sits through the middle of the stroke (`r` = half the side less half
+ * the stroke) and every length along it is percent of the circle (`pathLength="100"`).
+ *
+ * Stroke (`--ring-stroke`), by `data-weight`:
+ *   line — two border widths at every diameter: the weight of an icon's stroke (Spinner, a disk);
+ *   data — 1/12 of the diameter, never under the line weight (ProgressCircle).
+ *
+ * Motion (foundation §7): the share glides on the arc (`stroke-dashoffset`, `base` · standard);
+ * the turn is a transform of the whole svg, so it runs on the compositor and the share keeps
+ * growing while the ring turns. One turn = 3 × `--prime-motion-loop`; reduced motion makes it
+ * twice as slow and never stops it — the turn is the only sign that something is under way.
+ * While turning the arc is never shorter than 8%, so a turning 0% still shows.
+ */
+.ring {
+  --ring-stroke: calc(var(--prime-border-width) * 2);
+  --ring-fill: currentColor;
+  --ring-track: color-mix(in srgb, currentColor 32%, transparent);
+  --ring-arc: var(--ring-value, 0);
+
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ring[data-weight="data"] {
+  --ring-stroke: max(calc(100% / 12), calc(var(--prime-border-width) * 2));
+}
+
+.ring[data-spin] {
+  --ring-arc: max(var(--ring-value, 0), 0.08);
+
+  animation: ringTurn calc(var(--prime-motion-loop) * 3) linear infinite;
+}
+
+@keyframes ringTurn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* Arcs start at 12 o'clock and run clockwise. */
+.turn {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transform-box: view-box;
+}
+
+.circle {
+  r: calc(50% - var(--ring-stroke) / 2);
+  fill: none;
+  stroke-width: var(--ring-stroke);
+}
+
+.track {
+  stroke: var(--ring-track);
+  transition: stroke var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.arc {
+  stroke: var(--ring-fill);
+  stroke-linecap: round;
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: calc(100 - var(--ring-arc) * 100);
+  transition:
+    stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    stroke var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.ring[data-empty] .arc {
+  opacity: 0;
+}
+
+/* The host writes the share every frame: the arc follows it exactly. */
+.ring[data-live] .arc {
+  transition: none;
+}
+
+/* The round cap of a flat-jointed arc (ProgressCircle segments), rotated into place. */
+.cap {
+  cx: calc(100% - var(--ring-stroke) / 2);
+  cy: 50%;
+  r: calc(var(--ring-stroke) / 2);
+  transform-origin: 50% 50%;
+  transform-box: view-box;
+  transition:
+    rotate var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    fill var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring[data-spin] {
+    animation-duration: calc(var(--prime-motion-loop) * 6);
+  }
+}

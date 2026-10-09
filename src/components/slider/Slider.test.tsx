@@ -208,4 +208,27 @@ describe("Slider — commit", () => {
     expect(onValueChange).toHaveBeenLastCalledWith(20);
     expect(input).not.toHaveAttribute("aria-busy");
   });
+
+  it("stands upright with orientation vertical and still steps from the keyboard", () => {
+    const onValueChange = vi.fn();
+    const { container } = render(
+      <Slider
+        aria-label="Громкость"
+        orientation="vertical"
+        defaultValue={50}
+        onValueChange={onValueChange}
+      />,
+    );
+    const input = screen.getByRole("slider", { name: "Громкость" });
+    expect(input).toHaveAttribute("aria-orientation", "vertical");
+    expect(container.firstElementChild).toHaveAttribute("data-orientation", "vertical");
+    fireEvent.change(input, { target: { value: "60" } });
+    expect(onValueChange).toHaveBeenLastCalledWith(60);
+  });
+
+  it("is horizontal by default, with no orientation attributes", () => {
+    const { container } = render(<Slider aria-label="Уровень" />);
+    expect(screen.getByRole("slider")).not.toHaveAttribute("aria-orientation");
+    expect(container.firstElementChild).not.toHaveAttribute("data-orientation");
+  });
 });

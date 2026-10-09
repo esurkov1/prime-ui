@@ -365,6 +365,18 @@
   opacity: 1;
 }
 
+/* The recording's ring toward the length limit (`internal/ring`, `live`), over the circle's edge in
+   the accent, a band of one spacing step — the playback ring of VideoNote. */
+.previewRing {
+  position: absolute;
+  inset: 0;
+}
+
+.preview > .previewRing {
+  --ring-stroke: var(--prime-space-1);
+  --ring-fill: var(--prime-color-accent-default);
+}
+
 /* ── Reply / edit bar ── */
 .context {
   display: flex;

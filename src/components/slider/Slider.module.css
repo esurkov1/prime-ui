@@ -195,6 +195,60 @@
   cursor: not-allowed;
 }
 
+/* ---- vertical ---- */
+
+/* The same capsule along the block axis, minimum at the bottom, seven thumbs long. The native
+   range turns with `writing-mode`, so the arrows, the pointer and assistive tech stay native. */
+.root[data-orientation="vertical"] {
+  --slider-length: calc(var(--slider-thumb-w) * 7);
+  width: auto;
+}
+
+.root[data-orientation="vertical"] .control {
+  flex-direction: column;
+  width: var(--slider-thumb-h);
+  height: var(--slider-length);
+}
+
+.root[data-orientation="vertical"] .track {
+  width: var(--slider-track);
+  height: auto;
+}
+
+.root[data-orientation="vertical"] .range {
+  inset-block: auto 0;
+  inset-inline: 0;
+  width: auto;
+  height: var(--slider-center);
+}
+
+.root[data-orientation="vertical"] .thumb {
+  inset-block: auto calc(var(--slider-center) - var(--slider-thumb-w) / 2);
+  inset-inline-start: 0;
+  width: var(--slider-thumb-h);
+  height: var(--slider-thumb-w);
+}
+
+.root[data-orientation="vertical"] .input {
+  writing-mode: vertical-lr;
+  direction: rtl;
+}
+
+.root[data-orientation="vertical"] .input::-webkit-slider-runnable-track {
+  width: 100%;
+  height: auto;
+}
+
+.root[data-orientation="vertical"] .input::-webkit-slider-thumb {
+  width: var(--slider-thumb-h);
+  height: var(--slider-thumb-w);
+}
+
+.root[data-orientation="vertical"] .input::-moz-range-thumb {
+  width: var(--slider-thumb-h);
+  height: var(--slider-thumb-w);
+}
+
 /* ---- states (input is the previous sibling of the visual layer) ---- */
 
 /* Liquid glass: hover lifts the thumb into light glass, press into clear glass; the track and the
@@ -255,6 +309,7 @@
 .root[data-settling="true"] .thumb {
   transition:
     inset-inline-start var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    inset-block-end var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
@@ -262,5 +317,7 @@
 }
 
 .root[data-settling="true"] .range {
-  transition: width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+  transition:
+    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }

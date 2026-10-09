@@ -1,6 +1,8 @@
 /** Voice messages with a transcript: one known, one asked for on the first open — `transcript`, `onTranscribe`. */
 import { Message, VoicePlayer } from "prime-ui-kit";
 
+import styles from "./examples.module.css";
+
 const VOICE_URL = "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3";
 
 const CLIENT_WAVEFORM = [
@@ -26,7 +28,7 @@ function transcribeAgentVoice(): Promise<string> {
 
 export default function VoicePlayerTranscriptExample() {
   return (
-    <Message.Group aria-label="Чат с клиентом: заказ № 4821">
+    <div className={styles.thread}>
       <Message.Root direction="incoming" time="14:20">
         <VoicePlayer
           src={VOICE_URL}
@@ -43,6 +45,6 @@ export default function VoicePlayerTranscriptExample() {
           onTranscribe={transcribeAgentVoice}
         />
       </Message.Root>
-    </Message.Group>
+    </div>
   );
 }

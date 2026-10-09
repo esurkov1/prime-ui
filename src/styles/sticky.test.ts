@@ -22,8 +22,8 @@ function walk(dir: string): string[] {
 const EXEMPT: Record<string, string> = {
   "layout/app-shell/AppShell.module.css":
     "the nav column and the footer hold their own surfaces and stick to the window, not to a scroller edge with content under it",
-  "components/message/Message.module.css":
-    "the sticky date separator is a transparent wrapper, its pill carries the fill",
+  "components/chat/Chat.module.css":
+    "the sticky date separator is a transparent wrapper, its pill carries the fill; the selection bar and the «к последним» button stick to the bottom and float with their own shadow",
 };
 
 describe("sticky surfaces", () => {

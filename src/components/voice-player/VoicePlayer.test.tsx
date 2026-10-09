@@ -285,11 +285,14 @@ describe("VoicePlayer", () => {
         onCancel={onCancel}
       />,
     );
-    expect(screen.getByRole("progressbar")).not.toHaveAttribute("aria-valuenow");
-    expect(document.querySelector("[data-indeterminate]")).not.toBeNull();
+    const cancel = screen.getByRole("button", { name: "Отменить загрузку" });
+    // No share known: the ring turns a quarter arc.
+    const ring = cancel.querySelector<SVGSVGElement>("svg[data-weight]");
+    expect(ring?.style.getPropertyValue("--ring-value")).toBe("0.25");
+    expect(ring).toHaveAttribute("data-spin", "true");
     expect(screen.queryByRole("button", { name: "Воспроизвести голосовое сообщение" })).toBeNull();
     expect(screen.getByRole("slider")).toHaveAttribute("aria-disabled", "true");
-    fireEvent.click(screen.getByRole("button", { name: "Отменить загрузку" }));
+    fireEvent.click(cancel);
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
@@ -316,8 +319,10 @@ describe("VoicePlayer", () => {
     expect(screen.queryByTestId("spacer")).toBeNull();
   });
 
-  it("is declared a fill part with an inline meta", () => {
-    expect(messagePartOf(VoicePlayer)).toEqual({ shell: "fill", meta: "inline" });
+  it("is declared a fill part with an inline meta, its transcript searchable", () => {
+    const spec = messagePartOf(VoicePlayer);
+    expect(spec).toMatchObject({ shell: "fill", meta: "inline" });
+    expect(spec?.text?.({ src: "/v.ogg", transcript: "Склад B" } as never)).toBe("Склад B");
   });
 
   it("draws as many bars as fit the observed width, the same geometry as the Composer's wave", () => {
@@ -583,30 +588,30 @@ describe("VoicePlayer transfer", () => {
         onCancel={onCancel}
       />,
     );
-    expect(screen.getByRole("progressbar", { name: "Отправка 40%" })).toHaveAttribute(
-      "aria-valuenow",
-      "40",
-    );
-    // The play disk is covered: out of the focus order, the cross takes its place.
+    // One disk: the play disk itself turns into the cross, its ring the share.
     expect(screen.queryByRole("button", { name: "Воспроизвести голосовое сообщение" })).toBeNull();
     const cancel = screen.getByRole("button", { name: "Отменить отправку" });
+    expect(cancel).toHaveAccessibleDescription("Отправка 40%");
+    expect(cancel).toHaveAttribute("aria-busy", "true");
     // The play disk's own look: the solid accent disk, not the media shade.
-    expect(cancel).toHaveAttribute("data-look", "solid");
+    expect(cancel).toHaveAttribute("data-variant", "solid");
+    expect(cancel).toHaveAttribute("data-shape", "circle");
     fireEvent.click(cancel);
     expect(onCancel).toHaveBeenCalledTimes(1);
 
     rerender(<VoicePlayer src="blob:voice" duration={12} transfer="failed" onRetry={onRetry} />);
     const retry = screen.getByRole("button", { name: "Повторить отправку" });
-    expect(retry).toHaveAttribute("data-look", "danger");
+    expect(retry).toBe(cancel);
+    expect(retry).toHaveAttribute("data-tone", "danger");
     expect(retry).toHaveAccessibleDescription("Не отправилось");
     fireEvent.click(retry);
     expect(onRetry).toHaveBeenCalledTimes(1);
 
     rerender(<VoicePlayer src="blob:voice" duration={12} transfer="done" transferProgress={1} />);
-    expect(screen.queryByRole("progressbar")).toBeNull();
-    expect(
-      screen.getByRole("button", { name: "Воспроизвести голосовое сообщение" }),
-    ).not.toHaveAttribute("inert");
+    const play = screen.getByRole("button", { name: "Воспроизвести голосовое сообщение" });
+    expect(play).toBe(cancel);
+    expect(play).not.toHaveAttribute("aria-busy");
+    expect(play).toHaveAttribute("data-tone", "accent");
   });
 
   it("a remote recording offers the download on the play disk; a refused one is announced", async () => {
@@ -623,9 +628,9 @@ describe("VoicePlayer transfer", () => {
         onDownload={onDownload}
       />,
     );
-    expect(screen.queryByRole("progressbar")).toBeNull();
     const download = screen.getByRole("button", { name: "Скачать" });
-    expect(download).toHaveAttribute("data-look", "solid");
+    expect(download).toHaveAttribute("data-variant", "solid");
+    expect(download.querySelector("svg[data-weight]")).toBeNull();
     fireEvent.click(download);
     expect(download).toHaveAttribute("aria-busy", "true");
     await act(async () => reject());
@@ -634,7 +639,7 @@ describe("VoicePlayer transfer", () => {
 
   it("the transfer disk is the same in a message and outside it, in both directions", () => {
     const shape = (root: Element | null) => {
-      const disk = root?.querySelector("[data-state='loading']")?.parentElement;
+      const disk = root?.querySelector("[data-shape='circle']")?.parentElement;
       // Structure and classes only: ids from useId differ between renders.
       return disk?.outerHTML.replace(/ (id|aria-describedby)="[^"]*"/g, "");
     };

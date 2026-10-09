@@ -137,7 +137,7 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 | a Modal hand-built as «Удалить?» with your own pending flag | `ConfirmDialog.Root` with an async `onConfirm` |
 | a `<fieldset>` reset by hand, or `disabled` on every field while saving | `<Fieldset label disabled={saving}>` |
 | your own list of files with progress bars and retry | `useUploadQueue` → FileUpload `queue` |
-| chat bubbles from Cards or a Timeline, a Textarea with a send button | `Message.Group` + `Message.Root`, `Composer.Root` |
+| chat bubbles from Cards or a Timeline, a Textarea with a send button, a chat header and scroller of your own | `Chat` (`Chat.Messages` of `Message.Root`, `Chat.Footer` with `Composer.Root`) |
 | bars of dates drawn by hand, or a DataTable of start / end dates | `Gantt` |
 | a hand-made `<span>` hidden with CSS for screen readers | `<VisuallyHidden>` |
 

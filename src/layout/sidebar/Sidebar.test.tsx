@@ -102,7 +102,7 @@ describe("Sidebar", () => {
   it("puts the scrolling region in a ScrollContainer with edge fades", () => {
     render(<Basic />);
     const group = screen.getByRole("group", { name: "Разделы" });
-    expect(group.parentElement).toHaveAttribute("data-fade", "vertical");
+    expect(group.parentElement).toHaveAttribute("data-edges", "fade");
   });
 
   it("marks the current item with aria-current and data-state", () => {

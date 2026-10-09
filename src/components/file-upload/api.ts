@@ -8,8 +8,8 @@ const SET_PROPS: ApiProp[] = [
   {
     name: "value",
     type: FILE_TYPE,
-    en: "Files in their order (controlled): `{ id, name, size?, type?, src?, alt? }` — on the server, or uploads of `queue` by their ids. `type` is the MIME type (without it the kind is read from the name's extension); `src` a picture or a video: a tile shows the picture, a video's first frame (Thumbnail.Video, mounted once the tile nears the view) with a play mark, or for any other file the sheet glyph, and on every kind the format pill and a band with the name and the size (a video's duration); a row shows the picture as its preview. `alt` is spoken in place of the name, never drawn. Without `value` and `defaultValue` the set is the queue alone.",
-    ru: "Файлы по порядку (управляемое): `{ id, name, size?, type?, src?, alt? }` — на сервере или загрузки `queue` по их id. `type` — MIME-тип (без него вид определяется по расширению имени); `src` — картинка или видео: плитка показывает картинку, первый кадр видео (Thumbnail.Video, монтируется у видимой области) с отметкой воспроизведения или у любого другого файла — лист, и у каждого вида — плашку формата и полосу с именем и размером (у видео — длительностью); строка показывает картинку превью. `alt` озвучивается вместо имени и не рисуется. Без `value` и `defaultValue` набор — одна очередь.",
+    en: "Files in their order (controlled): `{ id, name, size?, type?, src?, alt? }` — on the server, or uploads of `queue` by their ids. `type` is the MIME type (without it the kind is read from the name's extension); `src` a picture or a video: a tile shows the picture, a video's first frame (Thumbnail.Video, mounted once the tile nears the view) with a play mark, or for any other file the sheet glyph, and on every kind the format pill and a band with the name without its extension (the pill shows it; the full name stays in the tooltip and the accessible name) and the size (a video's duration); a row shows the picture as its preview, or the format badge beside the name without its extension. `alt` is spoken in place of the name, never drawn. Without `value` and `defaultValue` the set is the queue alone.",
+    ru: "Файлы по порядку (управляемое): `{ id, name, size?, type?, src?, alt? }` — на сервере или загрузки `queue` по их id. `type` — MIME-тип (без него вид определяется по расширению имени); `src` — картинка или видео: плитка показывает картинку, первый кадр видео (Thumbnail.Video, монтируется у видимой области) с отметкой воспроизведения или у любого другого файла — лист, и у каждого вида — плашку формата и полосу с именем без расширения (его показывает плашка; полное имя — в подсказке и доступном имени) и размером (у видео — длительностью); строка показывает картинку превью или плашку формата рядом с именем без расширения. `alt` озвучивается вместо имени и не рисуется. Без `value` и `defaultValue` набор — одна очередь.",
   },
   {
     name: "defaultValue",
@@ -270,7 +270,7 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.FormatBadge",
-      en: "`ref` → `HTMLSpanElement`. The file format as a square kit Badge of the row tier (`aria-hidden`: the name carries the extension).",
+      en: "`ref` → `HTMLSpanElement`. The file format as a square kit Badge of the row tier (`aria-hidden`: the row's name is trimmed of the extension and the accessible name carries it whole).",
       props: [
         {
           name: "format",

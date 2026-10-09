@@ -1,5 +1,6 @@
 /*
- * Button — fill-based, no visible outline (`outline` draws a 1px inset line).
+ * Button — fill-based, no visible outline (`outline` draws a 1px inset line); `shade` is the media
+ * shade for a button over media. `shape="circle"` is the same button as a disk.
  * Geometry comes from the shared field tier (`internal/fieldTier`, set from `data-size` in TSX), so
  * Button, Input and Select of one size align in a row; ButtonGroup segments read the same table.
  * Colors go through private vars: every tone × variant only assigns them.
@@ -61,6 +62,20 @@
 .root[data-icon-only="true"] {
   width: var(--field-h);
   padding-inline: 0;
+}
+
+/* A circle: the disk itself is the control — width = height of the tier, full radius. The focus
+   ring (outline) follows the radius; the touch area and the press follow the circle below. */
+.root[data-shape="circle"] {
+  width: var(--field-h);
+  padding-inline: 0;
+  border-radius: var(--prime-radius-full);
+}
+
+@media (pointer: coarse) {
+  .root[data-shape="circle"]::after {
+    border-radius: var(--prime-radius-full);
+  }
 }
 
 .root[data-full-width="true"] {
@@ -197,6 +212,29 @@
   --btn-line: color-mix(in srgb, currentColor 32%, transparent);
 }
 
+/* shade: the media disk ground — translucent, under a gentle blur, so the frame shows through —
+   and its light glyph: a button over a picture, a video or a video circle; the same in both
+   themes (the media is the ground). Danger is the danger disk (a failed transfer). The still
+   disk of `internal/mediaDisk` (a play mark) is the same look. */
+.root[data-variant="shade"] {
+  --btn-bg: var(--prime-color-media-disk);
+  --btn-bg-hover: color-mix(
+    in srgb,
+    var(--prime-color-media-shade-fg) 12%,
+    var(--prime-color-media-disk)
+  );
+  --btn-fg: var(--prime-color-media-shade-fg);
+
+  -webkit-backdrop-filter: blur(var(--prime-media-disk-blur));
+  backdrop-filter: blur(var(--prime-media-disk-blur));
+}
+
+.root[data-variant="shade"][data-tone="danger"] {
+  --btn-bg: var(--prime-color-danger-default);
+  --btn-bg-hover: var(--prime-color-danger-hover);
+  --btn-fg: var(--prime-color-danger-fg);
+}
+
 /* A toggle that is on (`pressed`): the selected look (foundation §8, accent soft) over any tone ×
    variant; the fill and text glide in and out with the shared color transition. */
 .root[data-pressed="true"][data-variant] {
@@ -219,6 +257,11 @@
 .root:active:not([data-disabled="true"], [data-loading="true"]) {
   background-color: var(--btn-bg-active);
   transform: scale(var(--prime-motion-press-scale));
+}
+
+/* A small disk gives more under the finger, as a Checkbox does. */
+.root[data-shape="circle"]:active:not([data-disabled="true"], [data-loading="true"]) {
+  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 .root:focus-visible {
@@ -283,7 +326,13 @@
   height: var(--prime-icon-size);
 }
 
-.icon > svg {
+/* The glyph layer of the cross-fade (`internal/glyphSwap`) fills the icon box. */
+.glyph {
+  width: 100%;
+  height: 100%;
+}
+
+.glyph > svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -299,8 +348,9 @@
   cursor: progress;
 }
 
-/* Spinner takes the place of the leading (or only) icon: width does not change. */
-.root[data-loading="true"]:is([data-leading-icon="true"], [data-icon-only="true"])
+/* Spinner (`loading`, or a square `progress` with no share known) takes the place of the leading
+   (or only) icon: width does not change. */
+.root[data-spinner="true"]:is([data-leading-icon="true"], [data-icon-only="true"])
 > .icon:not(.icon ~ .icon) {
   display: none;
 }
@@ -396,6 +446,23 @@
 .root[data-hold="cancel"] .fill {
   opacity: 1;
   transition: translate var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+}
+
+/* The ring of a circle's `progress` (`internal/ring`, line weight): along the inner edge in the
+   glyph's color over a 32% track of it, always turning. Gone (`progress` removed) it fades where
+   it is and its turn pauses, so it never snaps back while fading. */
+.ring {
+  position: absolute;
+  inset: 0;
+}
+
+.root > .ring {
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root > .ring[data-shown="false"] {
+  opacity: 0;
+  animation-play-state: paused;
 }
 
 /* A held press must not open the touch callout or select the label. */

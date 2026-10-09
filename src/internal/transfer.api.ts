@@ -7,24 +7,24 @@ export function transferStateProp(what: { en: string; ru: string }): ApiProp {
   return {
     name: "transfer",
     type: STATE_TYPE,
-    en: `The transfer of ${what.en}, either way (\`TransferState\`, the values of \`UploadItem.status\` plus \`remote\`): \`queued\` / \`loading\` — the cross with the ring of \`transferProgress\` (\`role="progressbar"\`); \`failed\` — the danger disk with the retry arrow; \`remote\` — not fetched yet, the download arrow; \`done\` — the disk fades and shrinks away (\`fast\`).`,
-    ru: `Передача ${what.ru} в любую сторону (\`TransferState\`, значения \`UploadItem.status\` и \`remote\`): \`queued\` / \`loading\` — крестик с кольцом \`transferProgress\` (\`role="progressbar"\`); \`failed\` — красный диск со стрелкой повтора; \`remote\` — ещё не скачано, стрелка загрузки; \`done\` — диск растворяется и уменьшается (\`fast\`).`,
+    en: `The transfer of ${what.en}, either way (\`TransferState\`, the values of \`UploadItem.status\` plus \`remote\`): \`queued\` / \`loading\` — the cross, a circle Button whose \`progress\` ring shows \`transferProgress\` (described by the share); \`failed\` — the danger disk with the retry arrow; \`remote\` — not fetched yet, the download arrow; \`done\` — the ring fills, then the disk fades and shrinks away (\`fast\`).`,
+    ru: `Передача ${what.ru} в любую сторону (\`TransferState\`, значения \`UploadItem.status\` и \`remote\`): \`queued\` / \`loading\` — крестик, круглая Button с кольцом \`progress\` по \`transferProgress\` (описание — доля); \`failed\` — красный диск со стрелкой повтора; \`remote\` — ещё не скачано, стрелка загрузки; \`done\` — кольцо заполняется, потом диск растворяется и уменьшается (\`fast\`).`,
   };
 }
 
 const PROGRESS_PROP: ApiProp = {
   name: "transferProgress",
   type: "number",
-  en: "Share transferred, 0…1 (`UploadItem.progress`): the ring along the disk's inner edge, gliding (`base`). Without it a transfer in flight turns an indeterminate arc.",
-  ru: "Переданная доля, 0…1 (`UploadItem.progress`): кольцо по внутреннему краю диска, плавно (`base`). Без неё идущая передача — неопределённая дуга, которая крутится.",
+  en: "Share transferred, 0…1 (`UploadItem.progress`): the ring along the disk's inner edge, gliding (`base`) while it turns. Without it a transfer in flight turns a quarter arc.",
+  ru: "Переданная доля, 0…1 (`UploadItem.progress`): кольцо по внутреннему краю диска, плавно (`base`) и вращаясь. Без неё идущая передача — вращающаяся четверть дуги.",
 };
 
 const DIRECTION_PROP: ApiProp = {
   name: "transferDirection",
   type: '"upload" | "download"',
   default: '"upload"',
-  en: "Which way it goes: sending (`upload`) or receiving (`download`). Changes only the words — the names of the cross, the retry, the ring and the failure — never the look.",
-  ru: "Куда идёт передача: отправка (`upload`) или получение (`download`). Меняет только слова — имена крестика, повтора, кольца и причины ошибки, — никогда не внешний вид.",
+  en: "Which way it goes: sending (`upload`) or receiving (`download`). Changes only the words — the names of the cross and the retry, the share and the failure — never the look.",
+  ru: "Куда идёт передача: отправка (`upload`) или получение (`download`). Меняет только слова — имена крестика и повтора, долю и причину ошибки, — никогда не внешний вид.",
 };
 
 /** The handlers of one transfer; `index` — Message.Media calls them with the tile's index. */
@@ -91,14 +91,14 @@ export function transferLabels(scope: string, download = "Скачать"): ApiL
     row(
       "uploadProgress",
       "Отправка {percent}%",
-      "the name of the ring while sending.",
-      "имя кольца при отправке.",
+      "the share while sending — the description of the cross.",
+      "доля при отправке — описание крестика.",
     ),
     row(
       "downloadProgress",
       "Загрузка {percent}%",
-      "the name of the ring while receiving.",
-      "имя кольца при получении.",
+      "the share while receiving — the description of the cross.",
+      "доля при получении — описание крестика.",
     ),
     row(
       "notSent",

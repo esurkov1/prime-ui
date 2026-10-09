@@ -21,7 +21,7 @@ import {
   useMediaPlayer,
 } from "@/internal/mediaPlayer";
 import { defineMessagePart, useInMessage, useMessagePart } from "@/internal/messagePart";
-import progressRing from "@/internal/progressRing.module.css";
+import { Ring } from "@/internal/ring";
 import { nextSurfaceDepth, useSurfaceDepth } from "@/internal/surfaceDepth";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -67,7 +67,7 @@ function VideoNoteInner(props: VideoNoteProps) {
   const around = useSurfaceDepth();
   const blockDepth = useInMessage() ? undefined : nextSurfaceDepth(around);
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const ringRef = React.useRef<HTMLSpanElement | null>(null);
+  const ringRef = React.useRef<SVGSVGElement | null>(null);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const mergedRef = useMergedRefs(rootRef, ref);
   const descriptionId = React.useId();
@@ -93,14 +93,14 @@ function VideoNoteInner(props: VideoNoteProps) {
     const ring = ringRef.current;
     if (!video || !ring) return;
     if (state === "idle") {
-      ring.style.setProperty("--progress-ring-value", "0");
+      ring.style.setProperty("--ring-value", "0");
       setCurrent(0);
       return;
     }
     const tick = () => {
       const total = Number.isFinite(video.duration) ? video.duration : (duration ?? 0);
       ring.style.setProperty(
-        "--progress-ring-value",
+        "--ring-value",
         String(total > 0 ? Math.min(1, video.currentTime / total) : 0),
       );
       setCurrent(Math.floor(video.currentTime));
@@ -163,7 +163,7 @@ function VideoNoteInner(props: VideoNoteProps) {
     }
     setCurrent(Math.floor(next));
     ringRef.current?.style.setProperty(
-      "--progress-ring-value",
+      "--ring-value",
       String(total > 0 ? Math.min(1, next / total) : 0),
     );
   };
@@ -239,7 +239,7 @@ function VideoNoteInner(props: VideoNoteProps) {
             onEnded={handleEnded}
           />
         </span>
-        <span ref={ringRef} className={cx(progressRing.ring, styles.ring)} aria-hidden="true" />
+        <Ring ref={ringRef} value={0} live track={false} className={styles.ring} />
         {/* The whole circle takes a press (a pointer aid only: the disk below is the control that
             focus, keys and assistive tech reach). */}
         <span
@@ -307,4 +307,5 @@ defineMessagePart(VideoNote, {
   meta: "overlay",
   sized: true,
   estimate: () => NOTE_PX,
+  text: ({ transcript }: VideoNoteProps) => transcript ?? "",
 });

@@ -325,6 +325,7 @@ function SegmentedControlRoot({
           <ScrollContainer
             ref={viewportRef}
             axis="horizontal"
+            edges="none"
             scrollbar="hidden"
             className={styles.viewport}
             onScroll={(event) => {

@@ -131,8 +131,6 @@
   flex-direction: column;
   width: calc(var(--dp-cell) * 5);
   padding: var(--prime-panel-padding);
-  overflow-y: auto;
-  overscroll-behavior: contain;
   border-inline-end: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
@@ -155,16 +153,13 @@
   justify-content: flex-start;
 }
 
-/* Narrow: presets become a horizontally scrolling row of soft Buttons above the calendar. */
+/* Narrow: presets become a sideways ScrollContainer row of soft Buttons above the calendar. */
 .panel[data-layout="stacked"] .presets {
   flex-direction: row;
   gap: var(--prime-space-1);
   width: auto;
-  overflow-x: auto;
-  overflow-y: hidden;
   border-inline-end: 0;
   border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
-  scrollbar-width: none;
 }
 
 .panel[data-layout="stacked"] .presetTitle {

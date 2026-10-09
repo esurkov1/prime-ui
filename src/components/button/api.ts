@@ -9,10 +9,17 @@ export const api: ComponentApi = {
       props: [
         {
           name: "variant",
-          type: '"solid" | "soft" | "outline" | "ghost"',
+          type: '"solid" | "soft" | "outline" | "ghost" | "shade"',
           default: '"solid"',
-          en: "Visual treatment.",
-          ru: "Подача: заливка, мягкая заливка, линия или прозрачная.",
+          en: 'Visual treatment. `shade` — the media shade with a blur and a light glyph, the same in both themes: a button over a picture, a video or a video circle; with `tone="danger"` it is the danger disk (a failed transfer).',
+          ru: 'Подача: заливка, мягкая заливка, линия или прозрачная. `shade` — тень медиа с размытием и светлый глиф, одинаковые в обеих темах: кнопка поверх фото, видео или кружка; с `tone="danger"` — диск ошибки (сорвавшаяся передача).',
+        },
+        {
+          name: "shape",
+          type: '"square" | "circle"',
+          default: '"square"',
+          en: "Outline. `circle` — a disk with only a `Button.Icon`: as wide as it is tall, full radius, the same tiers, tones and variants; its focus ring, touch area and press (`press-scale-compact`) follow the circle. Requires `aria-label`.",
+          ru: "Контур. `circle` — диск только с `Button.Icon`: ширина равна высоте, полный радиус, те же ярусы, тоны и подачи; фокус-кольцо, зона касания и нажатие (`press-scale-compact`) идут по кругу. Нужен `aria-label`.",
         },
         {
           name: "tone",
@@ -49,9 +56,9 @@ export const api: ComponentApi = {
         },
         {
           name: "progress",
-          type: "number",
-          en: "Progress of a long action started by the button, `0…1`: a wash of the text color grows inside from the start edge, `aria-busy` is set and the button stays pressable (to cancel). Put the number in the label («Скачивание 42%»); remove the prop when done and the fill fades out.",
-          ru: "Прогресс долгого действия, `0…1`: заливка цвета текста растёт от начала кнопки, ставится `aria-busy`, кнопка остаётся нажимаемой (для отмены). Число пишите в подписи («Скачивание 42%»); по завершении уберите проп — заливка погаснет.",
+          type: "number | null",
+          en: "Progress of a long action started by the button, `0…1`; `null` — under way, the share unknown. `aria-busy` is set and the button stays pressable (to cancel). A square grows a wash of the text color from the start edge (`null`: a `Spinner` in place of the leading icon); a circle draws a ring along its inner edge in the glyph's color, always turning. Put the number in the label or the description («Скачивание 42%»); remove the prop when done and the fill or ring fades where it is.",
+          ru: "Прогресс долгого действия, `0…1`; `null` — идёт, доля неизвестна. Ставится `aria-busy`, кнопка остаётся нажимаемой (для отмены). У квадратной заливка цвета текста растёт от начала (`null` — `Spinner` вместо ведущей иконки); у круглой по внутренней кромке идёт кольцо цвета глифа и всегда вращается. Число пишите в подписи или описании («Скачивание 42%»); по завершении уберите проп — заливка или кольцо погаснет на месте.",
         },
         {
           name: "holdToConfirm",
@@ -115,8 +122,8 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: 'The icon, e.g. `<Icon name="action.copy" />`; `Icon` without `size` takes the button tier.',
-          ru: 'Иконка, например `<Icon name="action.copy" />`; без `size` берёт ярус кнопки.',
+          en: 'The icon, e.g. `<Icon name="action.copy" />`; `Icon` without `size` takes the button tier. A new icon (another `name`) cross-fades in and plays its gesture once (`fast`).',
+          ru: 'Иконка, например `<Icon name="action.copy" />`; без `size` берёт ярус кнопки. Новая иконка (другой `name`) перетекает на место старой и один раз играет свой жест (`fast`).',
         },
         {
           name: "…rest",

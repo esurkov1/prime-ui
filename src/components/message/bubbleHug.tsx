@@ -9,9 +9,11 @@ import * as React from "react";
  * width is written once — one read pass, one write pass. Lines are measured in the bubble's layout
  * (a part's `offsetLeft` and its lines relative to it), so a part moving by a transform in flight
  * reads the same. What it hugs:
- * - the text-like parts (`data-message-fit`: text, author, reply, forwarded) — every line of their
+ * - the text-like parts (`data-message-fit`: text, reply, forwarded) — every line of their
  *   text, with the end padding and border of the blocks around it (a quote, a code block, inline
  *   code); the meta's spacer counts only on the last line, where it sits;
+ * - a one-line row (`data-message-fit="row"`: the author's name, icon and tag) — its items at
+ *   their full widths, even while one ellipsizes;
  * - the reactions row, as one line of chips and the meta's room after them (chips that wrap at the
  *   full width keep the full width);
  * - nothing else: a bubble with any other part (a card, a player, a picture, the consumer's own)
@@ -96,9 +98,14 @@ function measure(bubble: HTMLElement): number | null {
     }
     if (part.hasAttribute("data-message-meta")) continue;
     if (!part.hasAttribute("data-message-fit")) return null;
+    const offset = part.offsetLeft - start;
+    if (part.dataset.messageFit === "row") {
+      // One line of items that may ellipsize (the author's name and tag): their full widths.
+      need = Math.max(need, offset + rowWidth(part));
+      continue;
+    }
     // The part's lines relative to the part, placed at its layout offset in the bubble.
     const box = part.getBoundingClientRect();
-    const offset = part.offsetLeft - start;
     const lines: DOMRect[] = [];
     const walker = document.createTreeWalker(part, NodeFilter.SHOW_TEXT);
     for (let text = walker.nextNode(); text; text = walker.nextNode()) {
@@ -132,7 +139,24 @@ function measure(bubble: HTMLElement): number | null {
 }
 
 /**
- * The reactions row as one line: its chips (with their gaps) and the meta's room after them, or
+ * A one-line row of items at their full widths — an ellipsized item counts its whole text
+ * (`scrollWidth`), and the auto margin that pushes the last one to the end counts nothing.
+ */
+function rowWidth(row: HTMLElement): number {
+  const s = getComputedStyle(row);
+  const gap = px(s.columnGap);
+  let width = 0;
+  let count = 0;
+  for (const child of Array.from(row.children) as HTMLElement[]) {
+    if (child.offsetParent === null) continue;
+    width += Math.max(child.scrollWidth, child.offsetWidth);
+    count += 1;
+  }
+  return Math.ceil(width + gap * Math.max(0, count - 1));
+}
+
+/**
+ * The reactions row as one line:its chips (with their gaps) and the meta's room after them, or
  * `null` when the chips wrap at the full width (the bubble keeps it).
  */
 function rowNeed(slot: HTMLElement): number | null {

@@ -1,8 +1,7 @@
 /*
- * Spinner — a ring with a gap turning at a constant speed (foundation §7: keyframes are fine for a
- * spinner). Its clock is `--prime-motion-loop`, which reduced motion does not zero: a loading cue is
- * information, like a gesture clock, so under reduced motion the ring keeps turning, twice as slow
- * and still linear.
+ * Spinner — the kit ring (`internal/ring`) with the share unknown: a quarter arc on a faint track,
+ * turning at a constant speed (one turn = 3 × `--prime-motion-loop`; reduced motion: twice as
+ * slow, never still — a loading cue is information). The stroke is the line weight, the icon's.
  * Size and tone follow the Icon model (`internal/iconBox`, `internal/textTone`).
  */
 .root {
@@ -19,26 +18,10 @@
   contain: paint;
 }
 
-.ring {
+/* Two classes: the ring's own defaults never win over the host's. */
+.root > .ring {
+  --ring-track: color-mix(in srgb, currentColor 18%, transparent);
+
   position: relative;
   z-index: 1;
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  border: calc(var(--prime-border-width) * 2) solid currentColor;
-  border-inline-end-color: transparent;
-  border-radius: var(--prime-radius-full);
-  animation: primeSpinnerTurn calc(var(--prime-motion-loop) * 3) linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ring {
-    animation-duration: calc(var(--prime-motion-loop) * 6);
-  }
-}
-
-@keyframes primeSpinnerTurn {
-  to {
-    transform: rotate(360deg);
-  }
 }

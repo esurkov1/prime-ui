@@ -20,6 +20,7 @@ export { CodeXml } from "@/icons/glyphs/code-xml";
 export { EyeOff } from "@/icons/glyphs/eye-off";
 export { FileText } from "@/icons/glyphs/file-text";
 export { Frame } from "@/icons/glyphs/frame";
+export { GalleryHorizontalEnd } from "@/icons/glyphs/gallery-horizontal-end";
 export { Gauge } from "@/icons/glyphs/gauge";
 export { GripVertical } from "@/icons/glyphs/grip-vertical";
 export { History } from "@/icons/glyphs/history";

@@ -32,7 +32,8 @@
   gap: var(--prime-space-2);
   min-height: 0;
   overflow: hidden;
-  padding-block-start: var(--prime-message-gap);
+  /* The row geometry of an incoming message: the same start inset and gap below it. */
+  padding-block: var(--prime-message-gap) calc(var(--prime-message-group-gap) / 2);
   padding-inline: var(--prime-space-2);
 }
 
@@ -45,6 +46,8 @@
   align-items: center;
   gap: var(--prime-space-1);
   min-block-size: calc(var(--prime-text-body-m-line-height) + 2 * var(--prime-message-padding-y));
+  /* The tail's room on the author's side, as every message column keeps it. */
+  margin-inline-start: var(--prime-message-tail-width);
   padding-inline: var(--prime-message-padding-x);
   border-radius: var(--prime-message-radius);
   background: var(--prime-color-layer-current);

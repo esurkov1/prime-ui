@@ -92,7 +92,7 @@ export type BubbleMorphElements = {
   fill: HTMLElement | null;
   /** The row of the list the message stands in (its windowed box, or the message itself). */
   row: HTMLElement | null;
-  /** Holds the conversation's own anchoring while the message gives way itself (`Message.Group`). */
+  /** Holds the conversation's own anchoring while the message gives way itself (`Chat.Messages`). */
   hold?: (() => void) | undefined;
 };
 
@@ -253,6 +253,8 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
     const glides: { element: HTMLElement; dy: number }[] = [];
     const host = scrollerOf(row);
     if (!host || !before.row) return glides;
+    /** Where the walk over what gives way starts: the message (its article), inside its row. */
+    const origin = elements().column?.parentElement ?? row;
     elements().hold?.();
     const view = boxOf(host);
     const was = before.row;
@@ -264,7 +266,13 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
       // Everything before the row in the scroller, at its place before the scroll.
       const ahead: HTMLElement[] = [];
       if (!aboveView) {
-        for (let node: HTMLElement | null = row; node && node !== host; node = node.parentElement) {
+        // From the message itself: a row of the list may hold more than the message (the unread
+        // band before it, in one row), and those give way with the rest.
+        for (
+          let node: HTMLElement | null = origin;
+          node && node !== host;
+          node = node.parentElement
+        ) {
           for (let sibling = node.previousElementSibling; sibling; ) {
             if (sibling instanceof HTMLElement) ahead.push(sibling);
             sibling = sibling.previousElementSibling;
@@ -287,8 +295,14 @@ export function createBubbleMorph(elements: () => BubbleMorphElements): BubbleMo
     // The rows after it moved by what the scroll did not take back.
     const rest = delta - applied;
     if (!aboveView && Math.abs(rest) >= SAME_PX) {
-      for (let next = row.nextElementSibling; next; next = next.nextElementSibling) {
-        if (next instanceof HTMLElement) glides.push({ element: next, dy: -rest });
+      for (
+        let node: HTMLElement | null = origin;
+        node && node !== host;
+        node = node.parentElement
+      ) {
+        for (let next = node.nextElementSibling; next; next = next.nextElementSibling) {
+          if (next instanceof HTMLElement) glides.push({ element: next, dy: -rest });
+        }
       }
     }
     return glides;

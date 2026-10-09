@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it } from "vitest";
+import { Icon } from "@/icons";
 import type { ControlSize } from "@/internal/states";
 
 import { ProgressCircle } from "./ProgressCircle";
@@ -76,6 +77,59 @@ describe("ProgressCircle", () => {
   it("supports every tone in value mode", () => {
     render(<ProgressCircle value={50} tone="info" />);
     expect(screen.getByRole("progressbar").parentElement).toHaveAttribute("data-tone", "info");
+  });
+
+  it("draws from the kit ring at the data weight", () => {
+    render(<ProgressCircle value={40} />);
+    const ring = screen.getByRole("progressbar");
+    expect(ring).toHaveAttribute("data-weight", "data");
+    expect(ring.style.getPropertyValue("--ring-value")).toBe("0.4");
+    expect(ring).not.toHaveAttribute("data-spin");
+  });
+
+  it("value null: under way, share unknown — no aria-valuenow, a quarter arc that turns", () => {
+    render(<ProgressCircle value={null} aria-label="Импорт счетов" />);
+    const ring = screen.getByRole("progressbar", { name: "Импорт счетов" });
+    expect(ring).not.toHaveAttribute("aria-valuenow");
+    expect(ring).toHaveAttribute("data-spin", "true");
+    expect(ring.style.getPropertyValue("--ring-value")).toBe("0.25");
+  });
+
+  it("spin: the ring turns at any share and keeps its value", () => {
+    render(<ProgressCircle value={30} max={60} spin aria-label="Синхронизация" />);
+    const ring = screen.getByRole("progressbar");
+    expect(ring).toHaveAttribute("aria-valuenow", "30");
+    expect(ring).toHaveAttribute("data-spin", "true");
+    expect(ring.style.getPropertyValue("--ring-value")).toBe("0.5");
+  });
+
+  it("tone inherit takes the host's color", () => {
+    render(<ProgressCircle value={50} tone="inherit" />);
+    expect(screen.getByRole("progressbar").parentElement).toHaveAttribute("data-tone", "inherit");
+  });
+
+  it("an icon in the centre is shown from s; a new icon cross-fades in (one glyph at rest)", () => {
+    const { container, rerender } = render(
+      <ProgressCircle value={null} size="s" aria-label="Импорт">
+        <Icon name="action.download" />
+      </ProgressCircle>,
+    );
+    // The ring and the icon.
+    expect(container.querySelectorAll("svg")).toHaveLength(2);
+    rerender(
+      <ProgressCircle value={null} size="s" aria-label="Импорт">
+        <Icon name="status.failed" />
+      </ProgressCircle>,
+    );
+    // The glyph changed: the incoming layer enters (reduced motion in tests: nothing leaves).
+    expect(container.querySelector("[data-entering]")).not.toBeNull();
+    expect(container.querySelectorAll("svg")).toHaveLength(2);
+    rerender(
+      <ProgressCircle value={null} size="xs" aria-label="Импорт">
+        <Icon name="status.failed" />
+      </ProgressCircle>,
+    );
+    expect(container.querySelectorAll("svg")).toHaveLength(1);
   });
 
   describe("segments", () => {

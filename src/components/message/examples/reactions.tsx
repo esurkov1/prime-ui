@@ -1,4 +1,4 @@
-/** Reactions under a message: each chip shows who reacted — up to three avatars, from four on two and «+N» — and a press on a chip, or a double tap on the message, puts or takes back your own with your avatar at once while the request runs behind it — `Message.Reactions`, `users`, `reader`, `onReactionToggle`. */
+/** Reactions under a message: each chip shows who reacted — up to three avatars, from four on two and «+N» — and a press on a chip, or a double tap on the message, puts or takes back your own at once while the request runs behind it — `Message.Reactions`, `users`, `onReactionToggle`. */
 import { Message, type MessageReaction, type MessageUser } from "prime-ui-kit";
 import * as React from "react";
 
@@ -64,12 +64,10 @@ export default function MessageReactionsExample() {
     });
 
   return (
-    <Message.Group aria-label="Чат отдела продаж" reader={ME}>
-      <Message.Root time="17:40" onReactionToggle={toggle}>
-        <Message.Author color="orange">Мария Лебедева</Message.Author>
-        <Message.Text>Закрыли сделку с «Северным ветром» — 4,2 млн ₽ за год!</Message.Text>
-        <Message.Reactions reactions={reactions} />
-      </Message.Root>
-    </Message.Group>
+    <Message.Root time="17:40" onReactionToggle={toggle}>
+      <Message.Author color="orange">Мария Лебедева</Message.Author>
+      <Message.Text>Закрыли сделку с «Северным ветром» — 4,2 млн ₽ за год!</Message.Text>
+      <Message.Reactions items={reactions} />
+    </Message.Root>
   );
 }

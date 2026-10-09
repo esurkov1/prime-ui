@@ -1,9 +1,9 @@
 import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
+import { Button } from "@/components/button/Button";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import round from "@/internal/roundButton.module.css";
 import { Slot } from "@/internal/slot";
 import type { PaletteColor, Variant } from "@/internal/states";
 import { visuallyHiddenClass } from "@/internal/VisuallyHidden";
@@ -159,16 +159,23 @@ export type BottomNavActionProps = Omit<React.ComponentPropsWithoutRef<"button">
 };
 
 /**
- * A round button beside the bar for the screen's main action (create, search, assistant): in
- * `floating` a glass disk as tall as the capsule, in a flat bar a soft disk at its edge.
+ * A round button beside the bar for the screen's main action (create, search, assistant): a
+ * `Button shape="circle"` (`l`, neutral) — in a flat bar a muted disk at its edge, in `floating` a
+ * glass disk as tall as the capsule (the capsule's own glass, set on the Button by class: Button
+ * has no glass look).
  */
-function BottomNavAction({ className, type, ...rest }: BottomNavActionProps) {
+function BottomNavAction({ className, children, ...rest }: BottomNavActionProps) {
   return (
-    <button
+    <Button.Root
       {...rest}
-      type={type ?? "button"}
-      className={cx(round.round, styles.action, className)}
-    />
+      shape="circle"
+      size="l"
+      variant="solid"
+      tone="neutral"
+      className={cx(styles.action, className)}
+    >
+      <Button.Icon>{children}</Button.Icon>
+    </Button.Root>
   );
 }
 BottomNavAction.displayName = "BottomNav.Action";

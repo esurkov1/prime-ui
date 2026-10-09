@@ -46,14 +46,6 @@
   min-width: 0;
 }
 
-/* The action of a flat bar: a soft disk at the bar's edge. */
-.action {
-  --round-size: var(--prime-control-l-height);
-  --round-bg: var(--prime-color-fill-muted);
-  --round-bg-hover: var(--prime-color-fill-muted-hover);
-  --round-fg: var(--prime-color-text-primary);
-}
-
 /*
  * Floating: the capsule and its actions as one centred group over the content, inset from the
  * edges and above the home indicator. It positions itself at the bottom of its container
@@ -129,8 +121,8 @@
 /* No see-through where the user asked for less transparency. */
 @media (prefers-reduced-transparency: reduce) {
   .root[data-floating="true"] > .bar,
-  .root[data-floating="true"] > .action {
-    --round-bg: var(--prime-color-layer-floating-bg);
+  .root[data-floating="true"] > .action[data-variant] {
+    --btn-bg: var(--prime-color-layer-floating-bg);
 
     background: var(--prime-color-layer-floating-bg);
     -webkit-backdrop-filter: none;
@@ -299,14 +291,17 @@
 
 /* ─── Action ─────────────────────────────────────────────────────────────── */
 
-/* Floating: a glass disk as tall as the capsule. */
-.root[data-floating="true"] > .action {
-  --round-size: var(--bn-height);
-  --round-bg: var(--prime-color-bg-glass);
-  --round-bg-hover: color-mix(
+/* Floating: a glass disk as tall as the capsule. Button (neutral solid, circle) has no glass look
+   and no capsule-high tier: the capsule's glass and height go on it by class, through the
+   variables its colors and tier read (`[data-variant]` lifts this over its tone × variant). */
+.root[data-floating="true"] > .action[data-variant] {
+  --field-h: var(--bn-height);
+  --btn-bg: var(--prime-color-bg-glass);
+  --btn-bg-hover: color-mix(
     in srgb,
     var(--prime-color-text-primary) 8%,
     var(--prime-color-bg-glass)
   );
+  --btn-bg-active: var(--btn-bg-hover);
   --prime-icon-size: var(--prime-bottom-nav-floating-icon-size);
 }

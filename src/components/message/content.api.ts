@@ -1,9 +1,6 @@
 import type { ApiLabel, ApiPart } from "../../../scripts/docs/componentApi";
-import {
-  TRANSFER_INDEX_HANDLER_PROPS,
-  transferLabels,
-  transferProps,
-} from "../../internal/transfer.api";
+import { transferLabels, transferProps } from "../../internal/transfer.api";
+import { galleryLabels, galleryProps } from "../gallery/api";
 
 /**
  * The content parts of a message (`Message.Media`, `.File`, `.Location`, `.Contact`,
@@ -24,24 +21,10 @@ const labelsRow = (type: string) => ({
 export const contentParts: ApiPart[] = [
   {
     name: "Message.Media",
-    en: "`ref` → `HTMLDivElement`. A photo, a video or an album of up to 10 as a tiled grid with thin gaps; every box is final before anything loads (rows from the items' ratios, nothing measured), pictures load lazily and decode async, a video mounts its first frame once it nears the view. Alone in a message it is the shell itself — rounded, no backing, the meta on a dark pill over it; with a caption (`Message.Text` after it) it sits edge to edge at the top of the bubble. The gaps of an album show the neutral surface of an incoming message in both directions. A video tile shows its first frame, a play mark and its length; a tile on its way, either way, dims under the shared transfer disk on the media shade in its middle with the progress ring along the disk's edge — pressing the disk cancels, once done it fades and shrinks away; a failed one's disk turns danger with a retry arrow; a `remote` one carries the download arrow.",
-    ru: "Фото, видео или альбом до 10 штук — плиточная сетка с тонкими зазорами; каждая рамка известна до загрузки (ряды по пропорциям из данных, ничего не измеряется), картинки грузятся лениво и декодируются асинхронно, видео подгружает первый кадр, когда плитка подходит к экрану. Одно в сообщении — это и есть оболочка: скруглённое, без подложки, мета на тёмной плашке поверх; с подписью (`Message.Text` после) стоит от края до края вверху пузыря. Зазоры альбома — нейтральная поверхность входящего сообщения в обе стороны. Видео-плитка — первый кадр, метка воспроизведения и длительность; плитка в пути, в любую сторону, приглушена под общим диском передачи на тени в центре с кольцом прогресса по его краю — нажатие на диск отменяет, по готовности он растворяется и уменьшается; у неудачной диск красный со стрелкой повтора; у `remote` — стрелка загрузки.",
+    en: "`ref` → `HTMLDivElement`. A photo, a video or an album of up to 10 in a message: a `Gallery` the message shapes, with every prop of the gallery. Alone in a message it is the shell itself — rounded by the message, no backing, the meta on a dark pill over it (and a group chat's author header on a pill at the top); with a caption (`Message.Text` after it) it sits edge to edge at the top of the bubble. Its cap is the chat's media cap (`--prime-message-media-max-height`) within 85% of the row. The gaps of an album show the neutral surface of an incoming message in both directions.",
+    ru: "Фото, видео или альбом до 10 штук в сообщении: `Gallery`, которой придаёт форму сообщение, со всеми пропсами галереи. Одно в сообщении — это и есть оболочка: скруглено сообщением, без подложки, мета на тёмной плашке поверх (и шапка автора группового чата на плашке сверху); с подписью (`Message.Text` после) стоит от края до края вверху пузыря. Предел — медиа-предел чата (`--prime-message-media-max-height`) в пределах 85% строки. Зазоры альбома — нейтральная поверхность входящего сообщения в обе стороны.",
     props: [
-      {
-        name: "items",
-        type: "MessageMediaItem[]",
-        required: true,
-        en: '`{ type?: "image" | "video", src, poster?, alt?, width?, height?, duration?, transfer?, transferProgress?, transferDirection? }` — `width` / `height` give the ratio (default 4 : 3) and reserve the box before load; `duration` is a video\'s length before its metadata; `transfer`, `transferProgress` and `transferDirection` are the transfer of the tile, the same shape as every message part (`transfer={item.status}`, `transferProgress={item.progress}` of a `useUploadQueue` item; a share left out in flight turns an indeterminate arc; the direction changes only the words). Items after the 10th are not shown.',
-        ru: '`{ type?: "image" | "video", src, poster?, alt?, width?, height?, duration?, transfer?, transferProgress?, transferDirection? }` — `width` / `height` задают пропорции (по умолчанию 4 : 3) и резервируют рамку до загрузки; `duration` — длительность видео до метаданных; `transfer`, `transferProgress` и `transferDirection` — передача плитки в той же форме, что у всех частей сообщения (`transfer={item.status}`, `transferProgress={item.progress}` элемента `useUploadQueue`; без доли в пути — неопределённая дуга; направление меняет только слова). Элементы после 10-го не показываются.',
-      },
-      {
-        name: "onItemOpen",
-        type: "(index: number) => void",
-        en: "A tile was activated: open your viewer. Makes the tiles buttons named «Открыть: {alt}».",
-        ru: "Плитку активировали: откройте свой просмотрщик. Делает плитки кнопками «Открыть: {alt}».",
-      },
-      ...TRANSFER_INDEX_HANDLER_PROPS,
-      labelsRow("MessageMediaLabels"),
+      ...galleryProps,
       {
         name: "…rest",
         type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
@@ -52,8 +35,8 @@ export const contentParts: ApiPart[] = [
   },
   {
     name: "Message.File",
-    en: "`ref` → `HTMLDivElement`. A document: a round tile with the format (from the name's extension, in its hue) or the file's picture, the name on one line and the size. The tile is the file's one action, in one spot: download (with `href`, a link; or `transfer=\"remote\"` with `onDownload`, fetched in the app), cancel while it transfers, retry after a failure. A transfer either way is the shared transfer disk (`xl`) over the tile — the cross on the media shade with the progress ring along its edge, always shown, and «{done} из {total}» under the name; a failure turns it into the danger retry with the reason under the name. The name and the size line never move.",
-    ru: 'Документ: круглая плитка с форматом (по расширению имени, в его оттенке) или картинкой файла, имя в одну строку и размер. Плитка — единственное действие файла, в одном месте: скачать (с `href` — ссылкой; или `transfer="remote"` с `onDownload` — загрузкой в приложении), отменить во время передачи, повторить после ошибки. Передача в любую сторону — общий диск передачи (`xl`) поверх плитки: крестик на тени media с кольцом прогресса по краю, виден всегда, и «{done} из {total}» под именем; ошибка превращает его в красный повтор с причиной под именем. Имя и строка размера никогда не сдвигаются.',
+    en: "`ref` → `HTMLDivElement`. A document: a round tile with the format (from the name's extension, in its hue) or the file's picture, the name on one line (without the extension the format tile shows; the full name stays in the tooltip and the download label) and the size. The tile is the file's one action, in one spot: download (with `href`, a link; or `transfer=\"remote\"` with `onDownload`, fetched in the app), cancel while it transfers, retry after a failure. A transfer either way is the shared transfer disk (`xl`) over the tile — the cross on the media shade with the progress ring along its edge, always shown, and «{done} из {total}» under the name; a failure turns it into the danger retry with the reason under the name. The name and the size line never move.",
+    ru: 'Документ: круглая плитка с форматом (по расширению имени, в его оттенке) или картинкой файла, имя в одну строку (без расширения, которое показывает плитка формата; полное имя — в подсказке и подписи скачивания) и размер. Плитка — единственное действие файла, в одном месте: скачать (с `href` — ссылкой; или `transfer="remote"` с `onDownload` — загрузкой в приложении), отменить во время передачи, повторить после ошибки. Передача в любую сторону — общий диск передачи (`xl`) поверх плитки: крестик на тени media с кольцом прогресса по краю, виден всегда, и «{done} из {total}» под именем; ошибка превращает его в красный повтор с причиной под именем. Имя и строка размера никогда не сдвигаются.',
     props: [
       {
         name: "name",
@@ -200,24 +183,7 @@ export const contentParts: ApiPart[] = [
 ];
 
 export const contentLabelRows: ApiLabel[] = [
-  {
-    key: "open",
-    default: "Открыть: {name}",
-    en: "`Message.Media`: the name of a tile that opens the viewer; `{name}` is `alt`, else `photo` / `video`.",
-    ru: "`Message.Media`: имя плитки, открывающей просмотр; `{name}` — `alt`, иначе `photo` / `video`.",
-  },
-  {
-    key: "photo",
-    default: "фото",
-    en: "`Message.Media`: `{name}` of a photo without `alt`.",
-    ru: "`Message.Media`: `{name}` фото без `alt`.",
-  },
-  {
-    key: "video",
-    default: "видео",
-    en: "`Message.Media`: `{name}` of a video without `alt`.",
-    ru: "`Message.Media`: `{name}` видео без `alt`.",
-  },
+  ...galleryLabels("`Message.Media`"),
   ...transferLabels("`Message.Media` / `Message.File`", "Скачать {name}").map((row) =>
     row.key === "download"
       ? {

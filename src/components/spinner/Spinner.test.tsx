@@ -12,6 +12,15 @@ describe("Spinner", () => {
     expect(status).toHaveTextContent("Загрузка");
   });
 
+  it("draws the kit ring with the share unknown: a turning quarter arc at the line weight", () => {
+    render(<Spinner />);
+    const ring = screen.getByRole("status").querySelector("svg");
+    expect(ring).toHaveAttribute("aria-hidden", "true");
+    expect(ring).toHaveAttribute("data-spin", "true");
+    expect(ring).toHaveAttribute("data-weight", "line");
+    expect(ring?.style.getPropertyValue("--ring-value")).toBe("0.25");
+  });
+
   it("takes custom labels", () => {
     render(<Spinner labels={{ loading: "Загружаем счета" }} />);
     expect(screen.getByRole("status")).toHaveTextContent("Загружаем счета");

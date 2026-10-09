@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -330,6 +330,44 @@ function queueOf(items: UploadItem[]) {
   };
 }
 
+describe("FileUpload.Queue, the name beside the format badge", () => {
+  const row = (name: string) =>
+    render(
+      <FileUpload.Queue
+        aria-label="Вложения"
+        queue={queueOf([{ id: "1", file: new File(["x"], name), status: "queued", progress: 0 }])}
+      />,
+    );
+
+  it("drops the extension the badge shows and keeps the full name in title and labels", () => {
+    render(
+      <FileUpload.Queue
+        aria-label="Вложения"
+        queue={queueOf([
+          { id: "1", file: new File(["x"], "отчёт.final.pdf"), status: "queued", progress: 0 },
+        ])}
+      />,
+    );
+    expect(screen.getByText("PDF")).toBeInTheDocument();
+    expect(screen.getByText("отчёт.final")).toHaveAttribute("title", "отчёт.final.pdf");
+    expect(screen.getByRole("button", { name: "Убрать отчёт.final.pdf" })).toBeInTheDocument();
+  });
+
+  it("keeps a name without an extension, a dotfile and an unknown format whole", () => {
+    row("README");
+    expect(screen.getByText("README")).toHaveAttribute("title", "README");
+    cleanup();
+    row(".env");
+    expect(screen.getByText(".env")).toBeInTheDocument();
+  });
+
+  it("cuts an unknown extension too: the badge shows it", () => {
+    row("схема.dwg");
+    expect(screen.getByText("DWG")).toBeInTheDocument();
+    expect(screen.getByText("схема")).toHaveAttribute("title", "схема.dwg");
+  });
+});
+
 describe("FileUpload.Queue, a queue only", () => {
   it("draws a row per file: badge or preview, size and status, progress", () => {
     render(
@@ -363,7 +401,7 @@ describe("FileUpload.Queue, a queue only", () => {
     expect(screen.getByText("1 Б · Не удалось загрузить")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Повторить загрузку: Отчёт.pdf" }));
     expect(queue.retry).toHaveBeenCalledWith("1");
-    expect(screen.getByText("Отчёт.pdf").closest("[data-invalid]")).not.toBeNull();
+    expect(screen.getByText("Отчёт").closest("[data-invalid]")).not.toBeNull();
   });
 
   it("removes any row from the queue and announces it; a finished row has no retry", () => {
@@ -473,12 +511,11 @@ describe("FileUpload.Queue, a queue only", () => {
       // Without a cover a picture carries its format.
       expect(screen.getByText("JPG")).toBeInTheDocument();
       expect(document.querySelector('img[src="blob:photo"]')).not.toBeNull();
-      // The ring around the disk in the middle: one progressbar per file on its way.
-      expect(screen.getByRole("progressbar", { name: "Загрузка 40%" })).toHaveAttribute(
-        "aria-valuenow",
-        "40",
+      // The disk in the middle of every file on its way, described by its state.
+      expect(screen.getByRole("button", { description: "Загрузка 40%" })).toHaveAccessibleName(
+        /^Отменить загрузку/,
       );
-      expect(screen.getByRole("progressbar", { name: "В очереди" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { description: "В очереди" })).toBeInTheDocument();
     });
 
     it("Alt+→ moves a tile and the queue's order follows; strip is one sideways row", () => {
@@ -669,6 +706,28 @@ describe('FileUpload.Root trigger="tile", a value', () => {
     expect(screen.getByLabelText("Добавить файлы").closest("label")).toHaveTextContent("3 из 3");
   });
 
+  it("a tile shows the base name; the full name stays in its title and aria-label", () => {
+    render(
+      <FileUpload.Root
+        label="Фотографии"
+        trigger="tile"
+        layout="grid"
+        multiple
+        value={[
+          { id: "a", name: "Спереди.jpg", type: "image/jpeg", src: "a.jpg" },
+          { id: "b", name: "отчёт.final.pdf", type: "application/pdf" },
+          { id: "c", name: "README" },
+        ]}
+        onFilesChange={() => {}}
+        onValueChange={() => {}}
+      />,
+    );
+    expect(tiles()).toEqual(["Фото 1: Спереди.jpg", "Файл 2: отчёт.final.pdf", "Файл 3: README"]);
+    expect(screen.getByText("Спереди")).toHaveAttribute("title", "Спереди.jpg");
+    expect(screen.getByText("отчёт.final")).toHaveAttribute("title", "отчёт.final.pdf");
+    expect(screen.getByText("README")).toHaveAttribute("title", "README");
+  });
+
   it("draws the add tile like a drop zone: whatever handler takes the files", () => {
     render(<Photos onFilesChange={undefined} />);
     expect(screen.getByLabelText("Добавить файлы")).toBeEnabled();
@@ -775,9 +834,9 @@ describe('FileUpload.Root trigger="tile", a value', () => {
         "Фото 2: Сбоку · Загрузка 45%",
         "Фото 3: Сзади · В очереди",
       ]);
-      expect(screen.getByRole("progressbar", { name: "Загрузка 45%" })).toHaveAttribute(
-        "aria-valuenow",
-        "45",
+      expect(screen.getByRole("button", { description: "Загрузка 45%" })).toHaveAttribute(
+        "aria-busy",
+        "true",
       );
       expect(screen.getByRole("listitem", { name: /Сбоку/ })).toHaveAttribute(
         "data-upload",
@@ -788,14 +847,16 @@ describe('FileUpload.Root trigger="tile", a value', () => {
     it("the ring follows the progress, the disk cancels, and it fades out when done", () => {
       const queue = queueOf([{ id: "b", file: jpg, status: "loading", progress: 0.3 }]);
       const { rerender } = render(<Photos queue={queue} />);
-      const ring = screen.getByRole("progressbar", { name: "Загрузка 30%" });
-      expect(ring.style.getPropertyValue("--transfer-progress")).toBe("0.3");
+      const disk = screen.getByRole("button", { name: "Отменить загрузку: side.jpg" });
+      expect(disk).toHaveAccessibleDescription("Загрузка 30%");
+      const ring = disk.querySelector<SVGSVGElement>("svg[data-weight]");
+      expect(ring?.style.getPropertyValue("--ring-value")).toBe("0.3");
       // In flight the disk is the remove: no corner button.
       expect(screen.queryByRole("button", { name: "Убрать side.jpg" })).toBeNull();
-      fireEvent.click(screen.getByRole("button", { name: "Отменить загрузку: side.jpg" }));
+      fireEvent.click(disk);
       expect(queue.remove).toHaveBeenCalledWith("b");
       rerender(<Photos queue={queueOf([{ id: "b", file: jpg, status: "done", progress: 1 }])} />);
-      expect(screen.queryByRole("progressbar")).toBeNull();
+      expect(screen.queryByRole("button", { name: /^Отменить загрузку/ })).toBeNull();
     });
 
     it("a failed tile shows the reason and retries; removing a settled file stops nothing", () => {
@@ -867,9 +928,9 @@ describe('layout="list" with a value and a queue', () => {
     );
     const rows = within(screen.getByRole("list", { name: "Документы" })).getAllByRole("listitem");
     expect(rows.map((row) => row.textContent)).toEqual([
-      "PDFДоговор.pdf4 КБ",
+      "PDFДоговор4 КБ",
       "Площадка.jpg1 КБ",
-      "PDFОтчёт.pdf2 КБ · Загрузка 50%",
+      "PDFОтчёт2 КБ · Загрузка 50%",
     ]);
     expect(screen.getAllByRole("progressbar")).toHaveLength(1);
     expect(document.querySelector('img[src="site.jpg"]')).not.toBeNull();

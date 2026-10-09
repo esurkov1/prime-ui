@@ -1,28 +1,24 @@
-/** A support messenger: dialogs beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, dates and runs from data, every kind of message, pinned messages, replies and edits from the menu with a jump to the quoted message, read receipts and unread counts from what was seen, the typing signal both ways, and the Composer whose messages rise into the list while the client answers. */
+/** A support messenger on `Chat`: dialogs beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, dates and runs from data, every kind of message, search, pinned messages, replies and edits from the menu with a jump to the quoted message, read receipts and unread counts from what was seen, the typing signal both ways, and the Composer whose messages rise into the list while the client answers. */
 import {
   Avatar,
   Badge,
   Button,
   Card,
+  Chat,
   Composer,
   type ComposerActivity,
   type ComposerMediaItem,
   type ComposerMessage,
   type ComposerRecording,
-  Crossfade,
   Dropdown,
-  groupMessages,
+  type GalleryItem,
   Icon,
   Message,
-  type MessageMediaItem,
-  type MessagePosition,
   type MessageReaction,
   type MessageStatus,
   type MessageUser,
   PageContent,
   ScrollContainer,
-  Skeleton,
-  Typography,
   type UploadContext,
   useUploadQueue,
   VideoNote,
@@ -34,7 +30,7 @@ import styles from "./chat.module.css";
 
 type Content =
   | { kind: "text"; text: string }
-  | { kind: "media"; items: MessageMediaItem[]; caption?: string }
+  | { kind: "media"; items: GalleryItem[]; caption?: string }
   | { kind: "voice"; src: string; waveform: number[]; duration: number; transcribable?: boolean }
   | { kind: "videoNote"; src: string; duration: number; transcript?: string }
   | { kind: "file"; name: string; size: number; href: string }
@@ -82,7 +78,7 @@ const CLIENT: MessageUser = {
 /** The client's reaction to the reply. */
 const LIKE: MessageReaction = { emoji: "👍", count: 1, users: [CLIENT] };
 
-const photo = (seed: string, width: number, height: number, alt: string): MessageMediaItem => ({
+const photo = (seed: string, width: number, height: number, alt: string): GalleryItem => ({
   src: `https://picsum.photos/seed/${seed}/${width}/${height}`,
   width,
   height,
@@ -343,7 +339,7 @@ const renderContent = (message: ChatMessage) => {
     case "media":
       return (
         <>
-          <Message.Media items={message.items} onItemOpen={() => {}} />
+          <Message.Media items={message.items} />
           {message.caption ? <Message.Text>{message.caption}</Message.Text> : null}
         </>
       );
@@ -383,100 +379,6 @@ const renderContent = (message: ChatMessage) => {
       return null;
   }
 };
-
-type ChatRowProps = {
-  message: ChatMessage;
-  /** Mine or theirs. */
-  direction: "incoming" | "outgoing";
-  position: MessagePosition;
-  /** The message this one answers: its id, author and excerpt (strings keep the row memoized). */
-  replyId?: string;
-  replyAuthor?: string;
-  replyText?: string;
-  pinned: boolean;
-  onReactionToggle: (id: string, emoji: string) => void;
-  onReply: (message: ChatMessage) => void;
-  onEdit: (message: ChatMessage) => void;
-  onPin: (id: string) => void;
-  onDelete: (id: string) => void;
-};
-
-/**
- * One message of the thread. Memoized with stable callbacks: a reaction, a status change or an
- * upload tick re-renders only the message it touches; selection re-renders through the group.
- */
-const ChatRow = React.memo(function ChatRow({
-  message,
-  direction,
-  position,
-  replyId,
-  replyAuthor,
-  replyText,
-  pinned,
-  onReactionToggle,
-  onReply,
-  onEdit,
-  onPin,
-  onDelete,
-}: ChatRowProps) {
-  const own = direction === "outgoing";
-  return (
-    <Message.Root
-      value={message.id}
-      direction={direction}
-      position={position}
-      time={message.sentAt}
-      status={message.status}
-      edited={message.edited}
-      onReactionToggle={(emoji) => onReactionToggle(message.id, emoji)}
-    >
-      {message.forwardedFrom ? <Message.Forwarded from={message.forwardedFrom} /> : null}
-      {replyId ? (
-        <Message.Reply author={replyAuthor} target={replyId}>
-          {replyText}
-        </Message.Reply>
-      ) : null}
-      {renderContent(message)}
-      {message.reactions?.length ? <Message.Reactions reactions={message.reactions} /> : null}
-      <Message.Menu>
-        <Dropdown.Item onSelect={() => onReply(message)}>
-          <Dropdown.ItemIcon>
-            <Icon name="action.reply" />
-          </Dropdown.ItemIcon>
-          Ответить
-        </Dropdown.Item>
-        {own && message.kind === "text" ? (
-          <Dropdown.Item onSelect={() => onEdit(message)}>
-            <Dropdown.ItemIcon>
-              <Icon name="action.edit" />
-            </Dropdown.ItemIcon>
-            Изменить
-          </Dropdown.Item>
-        ) : null}
-        <Dropdown.Item onSelect={() => navigator.clipboard?.writeText(excerpt(message))}>
-          <Dropdown.ItemIcon>
-            <Icon name="action.copy" />
-          </Dropdown.ItemIcon>
-          Скопировать
-        </Dropdown.Item>
-        <Dropdown.Item onSelect={() => onPin(message.id)}>
-          <Dropdown.ItemIcon>
-            <Icon name="action.pin" />
-          </Dropdown.ItemIcon>
-          {pinned ? "Открепить" : "Закрепить"}
-        </Dropdown.Item>
-        {own ? (
-          <Dropdown.Item tone="danger" onSelect={() => onDelete(message.id)}>
-            <Dropdown.ItemIcon>
-              <Icon name="action.delete" />
-            </Dropdown.ItemIcon>
-            Удалить
-          </Dropdown.Item>
-        ) : null}
-      </Message.Menu>
-    </Message.Root>
-  );
-});
 
 type ChatComposerProps = {
   replyTo: ChatMessage | null;
@@ -594,7 +496,6 @@ export default function ChatPattern() {
   const [editing, setEditing] = React.useState<ChatMessage | null>(null);
   const [selected, setSelected] = React.useState<readonly string[] | null>(null);
   const [pinned, setPinned] = React.useState<readonly string[]>(PINNED);
-  const [jumpTo, setJumpTo] = React.useState<string | null>(null);
   const [clientTyping, setClientTyping] = React.useState(false);
   const [unread, setUnread] = React.useState<Record<string, number>>(() =>
     Object.fromEntries(DIALOGS.map((item) => [item.id, item.unread])),
@@ -620,18 +521,6 @@ export default function ChatPattern() {
     };
   }, []);
   const dialog = DIALOGS.find((item) => item.id === dialogId) ?? DIALOGS[0];
-
-  const entries = React.useMemo(
-    () =>
-      groupMessages(messages, {
-        getAuthor: (message) => message.from,
-        getDate: (message) => message.sentAt,
-        getKey: (message) => message.id,
-        isService: (message) => message.kind === "service",
-        now: NOW,
-      }),
-    [messages],
-  );
 
   const loadOlder = async () => {
     if (!hasOlder) return;
@@ -750,6 +639,81 @@ export default function ChatPattern() {
     return message ? [{ value: id, text: excerpt(message) }] : [];
   });
 
+  // The newest messages for what a row looks up (a reply's original), without making every row
+  // render again when one message changes.
+  const messagesRef = React.useRef(messages);
+  messagesRef.current = messages;
+
+  // A message renders again only when its data, its place or this function change: a reaction, a
+  // status or an upload tick re-renders the one message it touches.
+  const renderMessage = React.useCallback(
+    (message: ChatMessage) => {
+      if (message.kind === "service") return <Chat.Service>{message.text}</Chat.Service>;
+      const own = message.from === "me";
+      const original = message.replyTo
+        ? messagesRef.current.find((item) => item.id === message.replyTo)
+        : undefined;
+      return (
+        <Message.Root
+          direction={own ? "outgoing" : "incoming"}
+          time={message.sentAt}
+          status={message.status}
+          edited={message.edited}
+          onReactionToggle={(emoji) => toggleReaction(message.id, emoji)}
+        >
+          {message.forwardedFrom ? <Message.Forwarded from={message.forwardedFrom} /> : null}
+          {original ? (
+            <Message.Reply
+              author={original.from === "me" ? "Вы" : "Ирина Белова"}
+              target={original.id}
+            >
+              {excerpt(original)}
+            </Message.Reply>
+          ) : null}
+          {renderContent(message)}
+          {message.reactions?.length ? <Message.Reactions items={message.reactions} /> : null}
+          <Message.Menu>
+            <Dropdown.Item onSelect={() => startReply(message)}>
+              <Dropdown.ItemIcon>
+                <Icon name="action.reply" />
+              </Dropdown.ItemIcon>
+              Ответить
+            </Dropdown.Item>
+            {own && message.kind === "text" ? (
+              <Dropdown.Item onSelect={() => startEdit(message)}>
+                <Dropdown.ItemIcon>
+                  <Icon name="action.edit" />
+                </Dropdown.ItemIcon>
+                Изменить
+              </Dropdown.Item>
+            ) : null}
+            <Dropdown.Item onSelect={() => navigator.clipboard?.writeText(excerpt(message))}>
+              <Dropdown.ItemIcon>
+                <Icon name="action.copy" />
+              </Dropdown.ItemIcon>
+              Скопировать
+            </Dropdown.Item>
+            <Dropdown.Item onSelect={() => togglePin(message.id)}>
+              <Dropdown.ItemIcon>
+                <Icon name="action.pin" />
+              </Dropdown.ItemIcon>
+              {pinned.includes(message.id) ? "Открепить" : "Закрепить"}
+            </Dropdown.Item>
+            {own ? (
+              <Dropdown.Item tone="danger" onSelect={() => remove(message.id)}>
+                <Dropdown.ItemIcon>
+                  <Icon name="action.delete" />
+                </Dropdown.ItemIcon>
+                Удалить
+              </Dropdown.Item>
+            ) : null}
+          </Message.Menu>
+        </Message.Root>
+      );
+    },
+    [pinned, toggleReaction, startReply, startEdit, togglePin, remove],
+  );
+
   return (
     <div className={styles.screen}>
       <PageContent.Root fill>
@@ -794,50 +758,33 @@ export default function ChatPattern() {
 
             <PageContent.Detail aria-label="Переписка">
               <Card.Root className={styles.paneCard}>
-                <div className={styles.threadHeader}>
-                  <PageContent.BackButton />
-                  <Avatar.Root color="blue">
-                    <Avatar.Fallback>{dialog.initials}</Avatar.Fallback>
-                    <Avatar.Status status="online" />
-                  </Avatar.Root>
-                  <span className={styles.dialogText}>
-                    <Typography as="h2" variant="title-s">
-                      {dialog.name}
-                    </Typography>
-                    <Crossfade state={clientTyping ? "typing" : "online"}>
-                      <Typography
-                        as="span"
-                        variant="caption"
-                        tone={clientTyping ? "accent" : "muted"}
-                      >
-                        {clientTyping ? "Ирина Белова печатает…" : "Ирина Белова · в сети"}
-                      </Typography>
-                    </Crossfade>
-                  </span>
-                </div>
-                {pinnedItems.length > 0 ? (
-                  <Message.Pinned
-                    className={styles.pinned}
-                    items={pinnedItems}
-                    onSelect={(id) => {
-                      setJumpTo(null);
-                      window.requestAnimationFrame(() => setJumpTo(id));
-                    }}
-                    onRemove={togglePin}
-                  />
-                ) : null}
-                <ScrollContainer anchor="end" onReachStart={loadOlder} className={styles.thread}>
-                  {hasOlder ? (
-                    <div className={styles.older} aria-hidden="true">
-                      <Skeleton shape="block" className={styles.olderBubble} />
-                    </div>
-                  ) : null}
-                  <Message.Group
-                    aria-label={`Переписка: ${dialog.name}`}
+                <Chat.Root typing={clientTyping} selected={selected} onSelectedChange={setSelected}>
+                  <Chat.Header>
+                    <PageContent.BackButton />
+                    <Avatar.Root color="blue">
+                      <Avatar.Fallback>{dialog.initials}</Avatar.Fallback>
+                      <Avatar.Status status="online" />
+                    </Avatar.Root>
+                    <Chat.Title>{dialog.name}</Chat.Title>
+                    <Chat.Description>Ирина Белова · в сети</Chat.Description>
+                    <Chat.Actions>
+                      <Chat.SearchButton />
+                    </Chat.Actions>
+                  </Chat.Header>
+                  <Chat.Search />
+                  <Chat.Pinned items={pinnedItems} onRemove={togglePin} />
+                  <Chat.Messages
                     reader={ME}
-                    selected={selected}
-                    onSelectedChange={setSelected}
-                    current={jumpTo}
+                    items={messages}
+                    getKey={(message) => message.id}
+                    getAuthor={(message) => message.from}
+                    getDate={(message) => message.sentAt}
+                    isService={(message) => message.kind === "service"}
+                    renderMessage={renderMessage}
+                    unread={FIRST_UNREAD}
+                    now={NOW}
+                    hasOlder={hasOlder}
+                    onLoadOlder={loadOlder}
                     onNewMessage={(_, { direction }) => {
                       if (direction !== "incoming" || !dialogId) return;
                       setUnread((current) => ({
@@ -853,45 +800,7 @@ export default function ChatPattern() {
                       }));
                     }}
                   >
-                    {entries.map((entry) => {
-                      if (entry.type === "date") {
-                        return <Message.Separator key={entry.key}>{entry.label}</Message.Separator>;
-                      }
-                      const message = entry.item;
-                      if (message.kind === "service") {
-                        return <Message.Service key={entry.key}>{message.text}</Message.Service>;
-                      }
-                      const original = message.replyTo
-                        ? messages.find((item) => item.id === message.replyTo)
-                        : undefined;
-                      return (
-                        <React.Fragment key={entry.key}>
-                          {message.id === FIRST_UNREAD ? <Message.Unread /> : null}
-                          <ChatRow
-                            message={message}
-                            direction={message.from === "me" ? "outgoing" : "incoming"}
-                            position={entry.position}
-                            replyId={original?.id}
-                            replyAuthor={
-                              original
-                                ? original.from === "me"
-                                  ? "Вы"
-                                  : "Ирина Белова"
-                                : undefined
-                            }
-                            replyText={original ? excerpt(original) : undefined}
-                            pinned={pinned.includes(message.id)}
-                            onReactionToggle={toggleReaction}
-                            onReply={startReply}
-                            onEdit={startEdit}
-                            onPin={togglePin}
-                            onDelete={remove}
-                          />
-                        </React.Fragment>
-                      );
-                    })}
-                    <Message.Typing active={clientTyping} />
-                    <Message.SelectionBar>
+                    <Chat.SelectionBar>
                       <Button.Root
                         variant="soft"
                         tone="danger"
@@ -906,21 +815,21 @@ export default function ChatPattern() {
                       >
                         Удалить
                       </Button.Root>
-                    </Message.SelectionBar>
-                  </Message.Group>
-                </ScrollContainer>
-                <div className={styles.composer}>
-                  <ChatComposer
-                    replyTo={replyTo}
-                    editing={editing}
-                    onReplyDismiss={dismissReply}
-                    onEditDismiss={dismissEdit}
-                    onEditLast={editLast}
-                    onPost={post}
-                    onSave={save}
-                    onActivityChange={reportActivity}
-                  />
-                </div>
+                    </Chat.SelectionBar>
+                  </Chat.Messages>
+                  <Chat.Footer>
+                    <ChatComposer
+                      replyTo={replyTo}
+                      editing={editing}
+                      onReplyDismiss={dismissReply}
+                      onEditDismiss={dismissEdit}
+                      onEditLast={editLast}
+                      onPost={post}
+                      onSave={save}
+                      onActivityChange={reportActivity}
+                    />
+                  </Chat.Footer>
+                </Chat.Root>
               </Card.Root>
             </PageContent.Detail>
           </PageContent.Split>

@@ -11,10 +11,10 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | type a value (text, number, code, file, photos), group the fields of a form | Inputs — Input, Textarea, DigitInput, FileUpload, Label, Hint, Fieldset |
 | pick from options, toggle, set a range, filter, a date or a color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorField, ColorPicker, ColorSwatches |
 | see data: status labels, people, objects, numbers and their trend, properties of a record, rows, a board, a schedule, events, code, disclosed sections | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DescriptionList, DataTable, Kanban, Gantt, Timeline, CodeBlock, Accordion, Sparkline, ChartFrame |
-| hold a conversation: read and send chat messages of every kind | Messages — Message, VoicePlayer, VideoNote, Composer |
+| hold a conversation: read and send chat messages of every kind | Messages — Chat, Message, Gallery, VoicePlayer, VideoNote, Composer |
 | learn what happened, how far along it is, or watch a region load and change state; say it to a screen reader | Status and loading — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, Crossfade, EmptyPage, VisuallyHidden |
 | move between places: app sections, panels of a screen, the path, pages, steps | Navigation — Tabs, Breadcrumb, Pagination, Stepper, Sidebar, BottomNav |
-| see something on top of the page | Overlays — Tooltip, Popover, Dropdown, Modal, ConfirmDialog, Drawer, Sheet, CommandMenu |
+| see something on top of the page, or a photo or video full screen | Overlays — Tooltip, Popover, Dropdown, Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer |
 | get the app frame and the structure of a page | Page — AppShell, AppHeader, PageContent, PageToolbar, Divider, ScrollContainer |
 | drag things by hand | Interaction — Dnd (a status board: Kanban in Data display) |
 | show a whole ready-made screen block (sign-in, sign-up, password reset, code) | Composition — LoginForm |
@@ -69,17 +69,24 @@ hand through `onBarChange`.
 Chronological events → Timeline; a conversation between people (support, a team chat) → Message —
 never a Timeline or a list of Cards styled as bubbles. Code → CodeBlock. A number with its trend over days or weeks (revenue, orders, sign-ups) → Sparkline: the latest value, its change and a line you can scrub; values with a sign by period → Sparkline `variant="bars"`; a chart with axes or several series → ChartFrame around a chart library or your own SVG (the panel, legend, tooltip, states and the screen-reader table come from the kit, the colors from `series` / `chartColors` — never status tones); values to read, sort or compare row by row → DataTable, not a chart.
 
-**Messages.** A chat → `Message.Group` of `Message.Root` (runs and dates from `groupMessages`) in a
-`ScrollContainer anchor="end"`, with the Composer under it. A voice message → `VoicePlayer` inside
-`Message.Root`; a call recording outside a chat → `VoicePlayer` alone. A round video message →
-`VideoNote` inside `Message.Root` (alone there it is the message: no bubble); a face-to-camera report
-outside a chat → `VideoNote` alone. The two players take the same props (`src`, `duration`,
-`unplayed`, `disabled`, `playing`, the transcript and the `transfer` set); only VoicePlayer has
-`waveform` and a rate, only VideoNote a `poster`. A video with controls → `Message.Media` or
-`Thumbnail.Video`, not VideoNote. «Печатает…» → `Message.Typing`, never a text row; pinned messages above the chat →
-`Message.Pinned`; a jump to a message → `Message.Reply target` or `Message.Group current`, never
-`scrollIntoView`; search inside a chat → a search Input above it with `Message.Group highlight`. Files, photos, places and contacts sent in a chat → the `Message` parts, not
-FileUpload rows or Cards.
+**Messages.** A whole conversation → `Chat`: `Chat.Root` with `Chat.Header` (avatar, `Chat.Title`,
+`Chat.Description`, `Chat.Actions` with `Chat.SearchButton`), `Chat.Search`, `Chat.Pinned`,
+`Chat.Messages` (from `items` with `renderMessage`, or `Message.Root` children) and `Chat.Footer`
+with the Composer — never a hand-built header, ScrollContainer and list. A list of messages without
+the rest (comments as a chat, a read-only history) → `Chat.Root` with `Chat.Messages` alone; one
+message on its own → `Message.Root`. A group chat → `Chat.Messages type="group"`: `Message.Author`
+(`tag`, `Message.AuthorIcon`) and `Message.Avatar` on every message, the list shows them on the
+first and the last of a run. A voice message → `VoicePlayer` inside `Message.Root`; a call recording
+outside a chat → `VoicePlayer` alone. A round video message → `VideoNote` inside `Message.Root`
+(alone there it is the message: no bubble); a face-to-camera report outside a chat → `VideoNote`
+alone. The two players take the same props (`src`, `duration`, `unplayed`, `disabled`, `playing`,
+the transcript and the `transfer` set); only VoicePlayer has `waveform` and a rate, only VideoNote a
+`poster`. Photos and videos in a message → `Message.Media`; the same album outside a chat (a post, a
+comment, a report) → `Gallery`; one picture of an object → `Thumbnail`. A video with controls →
+`Message.Media` or `Thumbnail.Video`, not VideoNote. «Печатает…» → `Chat.Root typing` (or
+`Message.Typing`), never a text row; a jump to a message → `Message.Reply target`, `Chat.Pinned` or
+`Chat.Root current`, never `scrollIntoView`; search inside a chat → `Chat.Search`. Files, photos,
+places and contacts sent in a chat → the `Message` parts, not FileUpload rows or Cards.
 
 **Status and loading.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →
 ProgressBar `segments` (categories wear `color`, meanings wear `tone`; `legend` for color · name ·
@@ -98,7 +105,8 @@ loading, data, empty and error, or showing one record at a time → its content 
 **Overlays.** See the pairs below. Global search over commands and pages (⌘K) → CommandMenu. A short
 task that ends by itself (a date, an action on a record, a short note) raised from the bottom edge →
 Sheet. Menus, selects, pickers and Modal turn into bottom sheets below 640px by themselves — never
-build your own.
+build your own. A photo, a scan or a video opened full screen from its thumbnail (a Gallery tile, a
+Thumbnail button) → MediaViewer, never a Modal with an `<img>`.
 
 **Phone navigation.** App navigation is Sidebar on a wide screen and `BottomNav` in `AppShell.Footer`
 on a phone for 3–5 main sections (the shell hides it by itself while the Sidebar rail is on screen;
@@ -132,6 +140,7 @@ collapsible`; a section with sub-pages → `Sidebar.Sub`; the signed-in user →
 | SmartFilter / Select in a toolbar | One field with a few options → SegmentedControl or Select in the table toolbar. Several fields, search, include / exclude → SmartFilter. |
 | Badge / Button | A badge labels or holds a value (status, filter, keyword): `onRemove` drops it, `onPress` toggles it. A command (save, open, go) is always a Button. |
 | Banner / Notification / Hint | Banner: persistent message in the page flow about a page/section state (sync failed, trial ends). Notification: transient toast about the result of an action (saved, failed). Hint / `error`: help or validation text under one field. |
+| ProgressBar / ProgressCircle / Spinner | ProgressBar: a share with width to spare and words beside it (an upload row, an import, a quota line). ProgressCircle: a share on the data scale (24–80) where width is short or a ring reads better (a KPI goal, a ring breakdown, a named import card); `value={null}` while the share is unknown, `spin` while a share grows, an icon in the centre. Spinner: an anonymous «busy» on the icon scale inside a control or a status line, no share, no name of its own. A ring you can press (cancel, retry, download a transfer) → Button `shape="circle"` with `progress`, not any of the three. |
 | Button / LinkButton | Button does something (submit, open, delete). LinkButton goes somewhere (a URL, «Подробнее», «Все заказы»). |
 | Checkbox / Switch / Radio | Checkbox: choice submitted later with a button, can be multiple. Switch: on/off that applies at once (no Save button). Radio: one of several, submitted later. A privacy toggle inside a create form that is submitted → Checkbox. |
 | Card / plain section | Card for a bounded block of related content that stands out (metric, settings panel, side facts). A page section that is the only thing in its region needs no card: a `title-m` heading and the content. Never wrap a single field, a DataTable or a whole page in a Card. |
@@ -145,7 +154,8 @@ collapsible`; a section with sub-pages → `Sidebar.Sub`; the signed-in user →
 | DescriptionList / DataTable / Card | DescriptionList: the properties of **one** record as «label — value» pairs (requisites, deal terms, a summary before a confirm). DataTable: **many** records with the same properties. Card: the bounded block they sit in, or one headline number (`mini`, `stat-trend`) — a DescriptionList inside a `Card.Body`, never a Card per property. |
 | ConfirmDialog / Modal / `holdToConfirm` / undo | A row or item in a list that can be restored → delete at once and offer «Отменить» in the Notification. One standalone destructive action that is easy to redo by hand, no list (clear a draft, revoke a token) → `Button.Root holdToConfirm` with the action in `onConfirm`. Irreversible loss of work or a weighty action (delete a project, send an invoice) → ConfirmDialog (`onConfirm` returns the request; pending, failure and dismiss rules are built in). Unsaved changes in a Modal or Drawer form → `Modal.Guard` / `Drawer.Guard dirty`. A form, a choice or more than a sentence of content → Modal; never a Modal hand-built as a confirm. |
 | Composer / Textarea | Composer: the message input of a conversation — Enter sends, attachments, a reply or edit bar, voice and round video. Textarea: long text saved with a form (a description, a comment field) by its submit button. |
-| Message / Timeline / Notification | Message: what people say to each other in a conversation, in bubbles. Timeline: what happened to a record (status changes, an audit log). Notification: the result of the user's own action, for a few seconds. A chat event («Анна добавила Олега») is `Message.Service`, not a Notification. |
+| Chat / Message / Gallery | Chat: a conversation — the header, search, pinned, the one message list (dates, runs, selection, jumps, read receipts, typing) and the Composer in its footer; a list without the rest is `Chat.Root` with `Chat.Messages`. Message: one message and its content parts — a row of that list, or a bubble on its own (a quoted reply in a ticket). Gallery: an album of photos and videos laid out by their ratios — `Message.Media` in a message, `Gallery` anywhere else (a post, a comment, a report). |
+| Message / Timeline / Notification | Message: what people say to each other in a conversation, in bubbles. Timeline: what happened to a record (status changes, an audit log). Notification: the result of the user's own action, for a few seconds. A chat event («Анна добавила Олега») is `Chat.Service`, not a Notification. |
 | FileUpload list / grid / gallery / strip | One component, four shapes. **List** (`layout="list"`, the default, with the drop zone): documents of a form, where the name matters; rows do not reorder. **Cards** (`trigger="tile"` `layout="grid"`): mixed photos and documents whose order matters (an inspection report). **Gallery** (`trigger="tile"` `layout="grid"` `cover` `accept="image/*"`): the photos of one object (a listing, a product); the first is the cover and dragging a photo first makes it the cover — no «make cover» button. **Strip** (`trigger="button"` + `FileUpload.Queue layout="strip"`): a paperclip and one scrolling row of tiles above a message field; the Composer already is this. Files on a server are `value` + `onValueChange` (return a promise to save); uploads are `queue` from `useUploadQueue`. One picture of a person is the avatar zone, not a gallery. |
 | Fieldset / a labelled group control | Fieldset: several **fields** under one heading (`title-s` legend), with one `disabled` for all of them while the form saves. One **choice** with a heading (`Radio.Group label`, SegmentedControl or ButtonGroup `label`, ColorSwatches `label`) is a single field — its own label names the group, no Fieldset around it. |
 | ColorField / ColorPicker / ColorSwatches | ColorField: any color as a form field (swatch + hex, the picker in a popover, `presets`). ColorPicker: the picker panel is the screen itself (a design tool, an inline editor). ColorSwatches: a short fixed palette visible at once. All but ColorSwatches come from `prime-ui-kit/color-picker`. |

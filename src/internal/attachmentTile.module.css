@@ -10,8 +10,8 @@
 
 /* ─── Sets of tiles ──────────────────────────────────────────────────────── */
 
-/* strip: one row of square tiles (`axis="x"`) in a sideways ScrollContainer; the padding keeps
-   the focus ring of an edge tile inside the scroller's clip. */
+/* strip: one row of square tiles (`axis="x"`) in a sideways ScrollContainer (hidden edges fade,
+   scrolling rests on a tile); the padding keeps the focus ring of an edge tile inside its clip. */
 .scroller {
   min-width: 0;
 }
@@ -25,6 +25,8 @@
   flex: none;
   inline-size: var(--prime-space-24);
   aspect-ratio: 1;
+  /* The strip's ScrollContainer snaps (`snap`): a scroll comes to rest on a tile's start. */
+  scroll-snap-align: start;
 }
 
 /* ─── A tile ─────────────────────────────────────────────────────────────── */

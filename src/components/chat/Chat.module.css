@@ -1,0 +1,333 @@
+/*
+ * Chat — a conversation assembled: a column that fills its host's height. The header, the search
+ * bar and the pinned bar stand at the top, the messages scroll in the middle (`Chat.Messages`,
+ * the one region that grows), the footer with the Composer stays at the bottom. The frame draws
+ * no surface of its own: put it in a `Card` or a page pane.
+ *
+ * The list (`MessageList`): rows in normal flow; in its scroller only the rows near the view
+ * render (`useVirtualRows`), each in its own box (`.row`, layout and paint contained, measured
+ * once) between two spacers (`.gap`) — no transforms. It marks itself `data-message-list`, which
+ * the messages' selection and pointing styles read.
+ */
+.root {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+}
+
+/* ─── Header ───────────────────────────────────────────────────────────── */
+
+.title {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-title-s-size);
+  font-weight: var(--prime-text-title-s-weight);
+  line-height: var(--prime-text-title-s-line-height);
+  letter-spacing: var(--prime-text-title-s-tracking);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* «печатает…» in the accent, cross-fading with the status line. */
+.typing {
+  color: var(--prime-color-accent-text);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+/*
+ * [lead: the avatar] [title over description] [actions]. Anything that is not the title, the
+ * description or the actions leads the row.
+ */
+.header {
+  display: grid;
+  flex: none;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "lead title actions"
+    "lead description actions";
+  align-items: center;
+  column-gap: var(--prime-space-3);
+  padding: var(--prime-space-3) var(--prime-space-3) var(--prime-space-2) var(--prime-space-4);
+}
+
+.header > * {
+  grid-area: lead;
+}
+
+/* Without a leading element the text starts the row (no empty column and gap before it). */
+.header:not(:has(> :not(.title, .description, .actions))) {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title actions"
+    "description actions";
+}
+
+.header > .title {
+  grid-area: title;
+  align-self: end;
+}
+
+.header > .description {
+  grid-area: description;
+  align-self: start;
+}
+
+.header > .actions {
+  grid-area: actions;
+}
+
+.header:not(:has(> .description)) > .title {
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+/* ─── Search ───────────────────────────────────────────────────────────── */
+
+.search {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-1);
+  padding: 0 var(--prime-space-3) var(--prime-space-2);
+}
+
+.searchField {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.searchCount {
+  flex: none;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ─── Pinned ───────────────────────────────────────────────────────────── */
+
+.pinned {
+  flex: none;
+  margin: 0 var(--prime-space-3) var(--prime-space-2);
+}
+
+/* ─── Messages ─────────────────────────────────────────────────────────── */
+
+/* The conversation scrolls itself and pads its own sides, so the focus rings of the bubbles fit. */
+.scroller {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  padding: var(--prime-space-2) var(--prime-space-2) var(--prime-space-3);
+}
+
+/* Older history on its way: a bubble-shaped placeholder above the first message. */
+.older {
+  display: flex;
+  padding: var(--prime-space-3) var(--prime-space-2);
+}
+
+.olderBubble {
+  inline-size: min(100%, calc(var(--prime-space-24) * 2));
+  block-size: var(--prime-space-10);
+}
+
+/* The list takes its host's width: rows are containers and never size from their content. */
+.list {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-width: 0;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* A rendered row of a windowed list: measured as a whole, its layout and paint kept inside. */
+.row {
+  flex: none;
+  contain: layout paint;
+}
+
+/* While its message morphs, the bubble may still show its old, taller box past the row's edge. */
+.row[data-morphing] {
+  contain: layout;
+}
+
+/* The rows the window does not render, as one block of their measured or estimated height. */
+.gap {
+  flex: none;
+}
+
+/*
+ * «К последним»: a round button at the bottom-end of the conversation while the reader is away
+ * from the end, with the count of the messages that came meanwhile. A zero-height sticky row, so it
+ * floats over the last messages and takes no room.
+ */
+.jump {
+  position: sticky;
+  z-index: 2;
+  inset-block-end: var(--prime-space-3);
+  align-self: flex-end;
+  block-size: 0;
+  margin-inline-end: var(--prime-space-2);
+}
+
+.jump[data-state="open"] {
+  animation: chatJumpIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+.jump[data-state="closed"] {
+  animation: chatJumpOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
+}
+
+/* Above a bar stuck to the bottom (the selection bar): lifted by its height, gliding as it comes
+   and goes (`--message-bottom-bar`, written by the bar), so the two never overlap. */
+.jumpBox {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  display: flex;
+  translate: 0 calc(-1 * var(--message-bottom-bar, 0px));
+  transition: translate var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.jumpButton {
+  border-radius: var(--prime-radius-full);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
+.jumpCount {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  translate: 35% -35%;
+  pointer-events: none;
+}
+
+@keyframes chatJumpIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--prime-space-2)) scale(0.96);
+  }
+}
+
+@keyframes chatJumpOut {
+  to {
+    opacity: 0;
+    transform: translateY(var(--prime-space-2)) scale(0.96);
+  }
+}
+
+.selectionBar {
+  position: sticky;
+  z-index: 2;
+  inset-block-end: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-2);
+  margin-block-start: var(--prime-space-3);
+  padding: var(--prime-space-2) var(--prime-space-3);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-fill-muted);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
+/* It enters once the «к последним» button has risen out of its place (a `fast` lift, `.jumpBox`):
+   the two never overlap. */
+.list > .selectionBar {
+  animation-delay: var(--prime-motion-duration-fast);
+}
+
+.selectionCount {
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-body-m-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-body-m-line-height);
+  font-variant-numeric: tabular-nums;
+}
+
+.selectionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-2);
+}
+
+/* ─── Rows between messages ─────────────────────────────────────────────── */
+
+.separator {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--prime-space-3);
+  pointer-events: none;
+}
+
+/* A date stays at the top while its day scrolls under it. */
+.separator:not(.service) {
+  position: sticky;
+  z-index: 1;
+  inset-block-start: 0;
+}
+
+.pill {
+  max-inline-size: min(28rem, 100%);
+  padding-block: var(--prime-space-1);
+  padding-inline: var(--prime-space-3);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-caption-line-height);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.service .pill {
+  border-radius: var(--prime-radius-l);
+  font-weight: var(--prime-font-weight-regular);
+}
+
+.unread {
+  margin-block: var(--prime-space-3);
+  padding-block: var(--prime-space-1);
+  border-radius: var(--prime-radius-s);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-caption-line-height);
+  text-align: center;
+}
+
+/* ─── Footer ───────────────────────────────────────────────────────────── */
+
+.footer {
+  flex: none;
+  padding: var(--prime-space-2) var(--prime-space-3) var(--prime-space-3);
+}

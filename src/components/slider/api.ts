@@ -74,6 +74,13 @@ export const api: ComponentApi = {
           ru: "Цвет заполненной части дорожки.",
         },
         {
+          name: "orientation",
+          type: '"horizontal" | "vertical"',
+          default: '"horizontal"',
+          en: '`vertical` — the track stands upright, minimum at the bottom, seven thumbs long at its tier (a level beside a button, a mixer column); the native range turns with `writing-mode`, so ↑ / ↓ and the pointer work natively and the input has `aria-orientation="vertical"`.',
+          ru: '`vertical` — дорожка стоит вертикально, минимум внизу, длиной в семь ползунков своего тира (уровень у кнопки, колонка микшера); нативный range поворачивается через `writing-mode`, так что ↑ / ↓ и указатель работают нативно, а у поля `aria-orientation="vertical"`.',
+        },
+        {
           name: "disabled",
           type: "boolean",
           en: "Muted track and thumb, dimmed label and value, no interaction.",

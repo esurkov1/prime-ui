@@ -3,7 +3,7 @@
 **Category:** status
 **Kind:** primitive
 
-> An indeterminate loading indicator: a ring with a gap that turns while a request runs.
+> An indeterminate loading indicator: the kit ring with the share unknown — a quarter arc turning on a faint track while a request runs.
 
 ## When to use
 - A region is busy and has no content shape to hold (a running job, a request with no layout yet).
@@ -12,6 +12,7 @@
 
 ## When not to use
 - The progress is known (upload, steps, quota) → use [ProgressBar](../progress-bar/COMPONENT.md) or [ProgressCircle](../progress-circle/COMPONENT.md).
+- A named process on the data scale whose share is not known yet (an import card) → [ProgressCircle](../progress-circle/COMPONENT.md) `value={null}`: a `progressbar` with your name that can show the share once it arrives.
 - A button waiting for its request → set `loading` on [Button](../button/COMPONENT.md); it places the spinner itself.
 - Content of a known shape is loading (a list, a card, a form) → [Skeleton](../skeleton/COMPONENT.md) of that shape inside [Crossfade](../crossfade/COMPONENT.md).
 - A table loading its rows → `loading` on [DataTable](../data-table/COMPONENT.md) (skeleton rows keep the layout).
@@ -25,7 +26,7 @@ import { Spinner } from "prime-ui-kit";
 ## Anatomy
 ```
 Spinner          <span role="status">; size and tone
-├─ ring          the turning ring (aria-hidden)
+├─ ring          the kit ring (internal/ring, value null): a quarter arc on a faint track (aria-hidden)
 └─ label         visually hidden labels.loading
 ```
 
@@ -34,7 +35,7 @@ Spinner          <span role="status">; size and tone
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Spinner
-`ref` → `HTMLSpanElement`. A turning ring inside a `role="status"` region with text for screen readers.
+`ref` → `HTMLSpanElement`. The kit ring with the share unknown — a quarter arc turning on a faint track, at the line weight — inside a `role="status"` region with text for screen readers.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -72,7 +73,7 @@ Spinner          <span role="status">; size and tone
 | size / tone | `size`, `tone` | `data-size` (the explicit size, else the host control tier, else `m`), `data-tone` (only for a non-default tone) |
 
 ## Layout & spacing
-- The ring fills the icon box: a stroke of two border widths in the tone color, one quarter of it transparent (the gap); `inline-flex`, `vertical-align: middle`.
+- The ring fills the icon box: a stroke of two border widths (the line weight, an icon's stroke) — a round-capped quarter arc in the tone color over an 18% track of it; `inline-flex`, `vertical-align: middle`. The svg turns as a whole (a compositor transform).
 - Next to text: one row, `align-items: center`, gap = the tier gap (`--prime-control-m-gap`).
 - In a loading region: centered in the region with its explanation under it, gap `--prime-space-3`.
 - Render the real layout around it; never a full-screen overlay of spinners.
@@ -109,5 +110,5 @@ No keyboard interaction.
 - A spinner for a known progress → ProgressBar / ProgressCircle.
 
 ## Related
-- **Built from:** —
+- **Built from:** `internal/ring` (the ring drawing, shared with ProgressCircle and the circle Button)
 - **See also:** [Skeleton](../skeleton/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md), [Button](../button/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)

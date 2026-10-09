@@ -1139,7 +1139,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     }
   };
 
-  const edges = useEdgeOverflow(scrollRef, true, true);
+  const edges = useEdgeOverflow(scrollRef, "horizontal");
 
   // ─── Region state ───
   const bodyState = model.length > 0 ? "rows" : loading ? "loading" : "empty";
@@ -1425,6 +1425,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
             <ScrollContainer
               ref={scrollRef}
               axis="both"
+              edges="none"
               overscrollBehavior="none"
               className={styles.viewport}
               style={

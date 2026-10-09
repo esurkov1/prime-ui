@@ -85,21 +85,80 @@
 }
 
 /*
- * Edge fade (`fade`): a mask over the edge where content is hidden, `--prime-space-8` deep at most
- * and never deeper than the hidden content reaches (`--edge-start` / `--edge-end`, written by
- * `useEdgeOverflow`): the fade grows as the region scrolls away from an edge and melts as it comes
- * back, so it never switches on or off. One gradient per axis; an edge without hidden content has
- * a zero-depth fade. The mask follows the scroll position itself — nothing animates (foundation
- * §7, rule 1). Mask is alpha-only: any opaque color works.
+ * Focus: a region without focusable content takes `tabIndex={0}` to scroll from the keyboard. Its
+ * ring is inset: the region clips whatever is drawn outside it.
  */
-/* Read only by the region's own mask: not inherited, so the depth written on every scroll frame
-   restyles the region alone, never the content inside it. */
+.root:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* `lock`: nothing the person does scrolls the region (wheel, touch, keys, a drag's autoscroll);
+   the position stays and code may still set it. */
+.root[data-lock] {
+  overflow: hidden;
+}
+
+/* `snap`: scrolling comes to rest on the start of a child; a host aligns deeper items itself. */
+.vertical[data-snap] {
+  scroll-snap-type: y proximity;
+}
+
+.horizontal[data-snap] {
+  scroll-snap-type: x proximity;
+}
+
+.both[data-snap] {
+  scroll-snap-type: both proximity;
+}
+
+.root[data-snap] > * {
+  scroll-snap-align: start;
+}
+
+/* A drag's edge auto-scroll (Dnd) moves the region in small steps: snapping would pull it back. */
+:global(html[data-dnd-active]) .root[data-snap] {
+  scroll-snap-type: none;
+}
+
+/*
+ * Edge fade (`edges="fade"`): a mask over every edge where content is hidden, `--prime-space-8`
+ * deep at most and never deeper than the hidden content reaches (`--edge-*`, written by
+ * `useEdgeOverflow` only while it changes — within the last `--prime-space-8` of an edge): the
+ * fade grows as the region scrolls away from an edge and melts as it comes back, so it never
+ * switches on or off. One gradient per axis, intersected; an edge without hidden content has a
+ * zero-depth fade. The mask follows the scroll position itself — nothing animates (foundation §7,
+ * rule 1). Mask is alpha-only: any opaque color works, over any background. A region that paints
+ * its own fill or shadow takes `shadow` instead (a mask would dissolve them too).
+ */
+/* Read only by the region's own mask: not inherited, so a depth written during a scroll restyles
+   the region alone, never the content inside it. */
+@property --edge-top {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --edge-bottom {
+  syntax: "*";
+  inherits: false;
+}
+
 @property --edge-start {
   syntax: "*";
   inherits: false;
 }
 
 @property --edge-end {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --fade-top {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --fade-bottom {
   syntax: "*";
   inherits: false;
 }
@@ -114,34 +173,126 @@
   inherits: false;
 }
 
-.root[data-fade] {
+.root[data-edges="fade"] {
+  --fade-top: 0px;
+  --fade-bottom: 0px;
   --fade-start: 0px;
   --fade-end: 0px;
-  --fade-dir: to bottom;
+  --fade-inline: to right;
 }
 
-.root[data-fade="horizontal"] {
-  --fade-dir: to right;
+.root[data-edges="fade"]:dir(rtl) {
+  --fade-inline: to left;
 }
 
-.root[data-fade="horizontal"]:dir(rtl) {
-  --fade-dir: to left;
+/* Focus and `scrollIntoView` land clear of the fade, as does a snapped child. */
+.vertical[data-edges="fade"] {
+  scroll-padding-block: var(--prime-space-8);
 }
 
-.root[data-fade][data-overflow-start="true"] {
+.horizontal[data-edges="fade"] {
+  scroll-padding-inline: var(--prime-space-8);
+}
+
+.both[data-edges="fade"] {
+  scroll-padding: var(--prime-space-8);
+}
+
+.root[data-edges="fade"][data-overflow-top="true"] {
+  --fade-top: min(var(--prime-space-8), var(--edge-top, var(--prime-space-8)));
+}
+
+.root[data-edges="fade"][data-overflow-bottom="true"] {
+  --fade-bottom: min(var(--prime-space-8), var(--edge-bottom, var(--prime-space-8)));
+}
+
+.root[data-edges="fade"][data-overflow-start="true"] {
   --fade-start: min(var(--prime-space-8), var(--edge-start, var(--prime-space-8)));
 }
 
-.root[data-fade][data-overflow-end="true"] {
+.root[data-edges="fade"][data-overflow-end="true"] {
   --fade-end: min(var(--prime-space-8), var(--edge-end, var(--prime-space-8)));
 }
 
-.root[data-fade]:is([data-overflow-start="true"], [data-overflow-end="true"]) {
-  mask-image: linear-gradient(
-    var(--fade-dir),
-    transparent,
-    var(--prime-color-text-primary) var(--fade-start),
-    var(--prime-color-text-primary) calc(100% - var(--fade-end)),
-    transparent
+.root[data-edges="fade"]:is(
+    [data-overflow-top="true"],
+    [data-overflow-bottom="true"],
+    [data-overflow-start="true"],
+    [data-overflow-end="true"]
+  ) {
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent,
+      var(--prime-color-text-primary) var(--fade-top),
+      var(--prime-color-text-primary) calc(100% - var(--fade-bottom)),
+      transparent
+    ),
+    linear-gradient(
+      var(--fade-inline),
+      transparent,
+      var(--prime-color-text-primary) var(--fade-start),
+      var(--prime-color-text-primary) calc(100% - var(--fade-end)),
+      transparent
+    );
+  mask-composite: intersect;
+}
+
+/*
+ * Edge shadow (`edges="shadow"`): pure CSS, no measuring — the region's own fill
+ * (`--prime-color-layer-current`) with a soft shadow on each edge of the scroll axis (fixed to the
+ * view) and a cover of the same fill at each end of the content (scrolling with it). At an edge the
+ * cover hides the shadow; scrolling away slides the cover off and the shadow shows as the content
+ * moves, so it grows and melts with the scroll and never switches. Content with an opaque fill of
+ * its own paints over the shadow.
+ */
+.root[data-edges="shadow"] {
+  --shadow-depth: var(--prime-space-4);
+  --shadow-cover: linear-gradient(
+    var(--prime-color-layer-current),
+    var(--prime-color-layer-current)
   );
+
+  background-color: var(--prime-color-layer-current);
+  background-repeat: no-repeat;
+}
+
+.vertical[data-edges="shadow"] {
+  background-image:
+    var(--shadow-cover), var(--shadow-cover),
+    linear-gradient(to bottom, var(--prime-color-bg-edge-shadow), transparent),
+    linear-gradient(to top, var(--prime-color-bg-edge-shadow), transparent);
+  background-position: top, bottom, top, bottom;
+  background-size: 100% var(--shadow-depth);
+  background-attachment: local, local, scroll, scroll;
+}
+
+.horizontal[data-edges="shadow"] {
+  background-image:
+    var(--shadow-cover), var(--shadow-cover),
+    linear-gradient(to right, var(--prime-color-bg-edge-shadow), transparent),
+    linear-gradient(to left, var(--prime-color-bg-edge-shadow), transparent);
+  background-position: left, right, left, right;
+  background-size: var(--shadow-depth) 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+.both[data-edges="shadow"] {
+  background-image:
+    var(--shadow-cover), var(--shadow-cover), var(--shadow-cover), var(--shadow-cover),
+    linear-gradient(to bottom, var(--prime-color-bg-edge-shadow), transparent),
+    linear-gradient(to top, var(--prime-color-bg-edge-shadow), transparent),
+    linear-gradient(to right, var(--prime-color-bg-edge-shadow), transparent),
+    linear-gradient(to left, var(--prime-color-bg-edge-shadow), transparent);
+  background-position: top, bottom, left, right, top, bottom, left, right;
+  background-size:
+    100% var(--shadow-depth),
+    100% var(--shadow-depth),
+    var(--shadow-depth) 100%,
+    var(--shadow-depth) 100%,
+    100% var(--shadow-depth),
+    100% var(--shadow-depth),
+    var(--shadow-depth) 100%,
+    var(--shadow-depth) 100%;
+  background-attachment: local, local, local, local, scroll, scroll, scroll, scroll;
 }

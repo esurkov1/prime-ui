@@ -18,7 +18,7 @@ export default function DndNarrowExample() {
 
   return (
     <Dnd.Root>
-      <ScrollContainer axis="horizontal" fade className={styles.strip}>
+      <ScrollContainer axis="horizontal" className={styles.strip}>
         <Dnd.Sortable
           axis="x"
           as="ul"

@@ -4,6 +4,7 @@ import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { iconBoxClass } from "@/internal/iconBox";
+import { Ring } from "@/internal/ring";
 import type { ControlSize, TextTone } from "@/internal/states";
 import toneStyles from "@/internal/textTone.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -32,8 +33,9 @@ export type SpinnerProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children
 };
 
 /**
- * Indeterminate loading indicator: a rotating ring with a gap. A `role="status"` region with
- * `labels.loading` for screen readers; pass `aria-hidden` when the host already says it is busy.
+ * Indeterminate loading indicator: the kit ring (`internal/ring`) with the share unknown — a quarter
+ * arc turning on a faint track, at the line weight. A `role="status"` region with `labels.loading`
+ * for screen readers; pass `aria-hidden` when the host already says it is busy.
  */
 export function Spinner({
   size: sizeProp,
@@ -53,7 +55,7 @@ export function Spinner({
       {...toDataAttributes({ size, tone: tone === "default" ? undefined : tone })}
       {...rest}
     >
-      <span className={styles.ring} aria-hidden="true" />
+      <Ring value={null} className={styles.ring} />
       <VisuallyHidden>{labels.loading}</VisuallyHidden>
     </span>
   );

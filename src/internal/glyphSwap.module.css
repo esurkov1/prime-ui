@@ -1,0 +1,53 @@
+/*
+ * The glyph cross-fade (`glyphSwap.tsx`): every layer in one grid cell, centred, so the box is the
+ * glyph's size; the outgoing layer shrinks to 0.6 and fades, the incoming one grows from 0.6
+ * (`fast` · standard). Reduced motion: the swap is instant (the leaving layer never mounts).
+ *
+ *   .swap   the cell
+ *   .layer  one glyph (`data-entering` — the incoming one, `data-leaving` — the outgoing one)
+ */
+.swap {
+  display: inline-grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.layer {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  max-width: 100%;
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.layer[data-entering] {
+  animation: glyphIn var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.layer[data-leaving] {
+  opacity: 0;
+  transform: scale(0.6);
+  pointer-events: none;
+}
+
+@keyframes glyphIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer {
+    transition: none;
+  }
+
+  .layer[data-entering] {
+    animation: none;
+  }
+}

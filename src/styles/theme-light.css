@@ -145,10 +145,12 @@
   --prime-color-layer-floating2-fill: #f4f5f7;
   --prime-color-layer-floating2-fill-hover: #eaebed;
   --prime-color-layer-floating2-selected: #ffffff;
+  --prime-color-media-disk: rgba(17, 19, 24, 0.48);
   --prime-color-media-pill: rgba(17, 19, 24, 0.72);
   --prime-color-media-pill-fg: rgba(255, 255, 255, 0.8);
   --prime-color-media-shade: rgba(17, 19, 24, 0.56);
   --prime-color-media-shade-fg: var(--prime-ref-color-gray-0);
+  --prime-color-media-stage: var(--prime-ref-color-gray-950);
   --prime-color-message-outgoing-accent: var(--prime-ref-color-cobalt-700);
   --prime-color-message-outgoing-accent-fg: var(--prime-ref-color-white);
   --prime-color-message-outgoing-bg: var(--prime-ref-color-cobalt-100);
@@ -324,6 +326,9 @@
   --prime-font-weight-medium: var(--prime-ref-font-weight-medium);
   --prime-font-weight-regular: var(--prime-ref-font-weight-regular);
   --prime-font-weight-semibold: var(--prime-ref-font-weight-semibold);
+  --prime-gallery-gap: 2px;
+  --prime-gallery-max-size: 22.5rem;
+  --prime-gallery-min-size: 16rem;
   --prime-icon-l: var(--prime-ref-icon-24);
   --prime-icon-m: var(--prime-ref-icon-20);
   --prime-icon-s: var(--prime-ref-icon-16);
@@ -336,6 +341,9 @@
   --prime-layout-reading-max-width: 42rem;
   --prime-layout-sidebar-collapsed-width: var(--prime-ref-space-14);
   --prime-layout-sidebar-width: 15.5rem;
+  --prime-media-disk-blur: var(--prime-ref-space-1);
+  --prime-media-viewer-inset: var(--prime-ref-space-4);
+  --prime-media-viewer-page-gap: var(--prime-ref-space-6);
   --prime-message-card-width: 16rem;
   --prime-message-dim-opacity: 0.42;
   --prime-message-dim-saturation: 0.6;

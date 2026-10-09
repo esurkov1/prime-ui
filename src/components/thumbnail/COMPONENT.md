@@ -27,7 +27,7 @@ import { Thumbnail } from "prime-ui-kit";
 ```
 Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="checkbox"> when selectable)
 ├─ Thumbnail.Image      <img>, covers the frame; fades in when loaded, hidden on error
-│  or Thumbnail.Video   <video>, first frame or poster; play mark and duration on the media shade
+│  or Thumbnail.Video   <video>, first frame or poster; play mark (the media disk) and duration (media shade)
 ├─ Thumbnail.Fallback   icon or short label on the fill, under the image
 └─ check                Checkbox.Indicator in the start corner (selectable only)
 ```
@@ -64,7 +64,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | `…rest` | `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" \| "alt">` | — | `className`, `onLoad`, `onError` and the other img attributes. |
 
 ### Thumbnail.Video
-`ref` → `HTMLVideoElement`. A video in the frame, `preload="metadata"`, `playsInline`; reports its first frame like an image, so the Fallback shows until then (`data-status`). Without `controls` and autoplay it shows a play mark (from `m`) and the duration (from `l` and `fullWidth`) on the `media` shade.
+`ref` → `HTMLVideoElement`. A video in the frame, `preload="metadata"`, `playsInline`; reports its first frame like an image, so the Fallback shows until then (`data-status`). Without `controls` and autoplay it shows a play mark (from `m`) — the media disk of the play and transfer disks over media, 40 with a 20 glyph, at 60% of a lower frame — and the duration on the `media` shade (from `l` and `fullWidth`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -133,7 +133,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | error | image `error` | `data-status="error"`, image hidden, Fallback visible |
 | frame | props | `data-size`, `data-ratio`, `data-color`, `data-variant`, `data-full-width`, `data-ring` |
 | video loading | `Thumbnail.Video` mounted | `data-status="loading"` until the first frame (`loadeddata`), then `loaded`; `error` falls back like an image |
-| video still | no `controls`, not playing | a play mark in the centre (from `m`), the duration at the end corner (from `l` and `fullWidth`), both on `--prime-color-media-shade` |
+| video still | no `controls`, not playing | a play mark in the centre (from `m`): the still media disk (`internal/mediaDisk`) — the look and size of the shade circle Button over media (40, a 20 glyph, `--prime-color-media-disk` under `--prime-media-disk-blur`), at 60% of a lower frame's height; the duration at the end corner (from `l` and `fullWidth`) on `--prime-color-media-shade` |
 | hover / press / focus | `asChild` or selectable | `data-interactive`: lift on `--prime-shadow-overlay` (`@media (hover: hover)`), scale 0.98 while pressed (`fast`), focus ring |
 | selected | `checked` | `aria-checked="true"`, `data-checked="true"`: an accent ring over the picture and a checked indicator; the indicator is always shown, never hover-only |
 
@@ -187,5 +187,5 @@ No `labels`.
 - A bare `<video>` sized in CSS next to thumbnails → `Thumbnail.Video` in the same frame.
 
 ## Related
-- **Built from:** [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` of a selectable tile), `Icon` (play mark)
+- **Built from:** [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` of a selectable tile), `internal/mediaDisk` (the play mark, one look with the shade circle [Button](../button/COMPONENT.md))
 - **See also:** [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Select](../select/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (`FileUpload.ItemPreview` is a Thumbnail; its tiles draw videos with `Thumbnail.Video`)

@@ -9,7 +9,9 @@ import { Disclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch } from "@/internal/HighlightMatch";
+import { useMessageList } from "@/internal/messageList";
 import { defineMessagePart, useMessageHighlight, useMessagePart } from "@/internal/messagePart";
+import { hueOf } from "@/internal/palette";
 import palette from "@/internal/palette.module.css";
 import { RollingNumber } from "@/internal/RollingNumber";
 import { RichText } from "@/internal/richText";
@@ -17,7 +19,6 @@ import type { PaletteColor } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Message.module.css";
-import { defineRowKind, useMessageGroup } from "./MessageGroup";
 import type { MessageUser } from "./types";
 
 export type MessageLabels = {
@@ -37,6 +38,14 @@ export type MessageLabels = {
   menu: string;
   /** The menu item that starts selection mode with this message. */
   select: string;
+  /** Announced when the quick reaction is put: `{emoji}`. */
+  reactionAdded: string;
+  /** Announced when the quick reaction is taken back: `{emoji}`. */
+  reactionRemoved: string;
+  /** The name of the reaction bar. */
+  reactionBar: string;
+  /** The «⌄» of the reaction bar that shows every reaction. */
+  moreReactions: string;
 };
 
 export const MESSAGE_LABELS: MessageLabels = {
@@ -50,6 +59,10 @@ export const MESSAGE_LABELS: MessageLabels = {
   retry: "Повторить отправку",
   menu: "Действия с сообщением",
   select: "Выбрать",
+  reactionAdded: "Реакция {emoji} поставлена",
+  reactionRemoved: "Реакция {emoji} снята",
+  reactionBar: "Реакции",
+  moreReactions: "Все реакции",
 };
 
 // ─── Root context ─────────────────────────────────────────────────────────────
@@ -87,9 +100,9 @@ export type MessageAvatarProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 /**
- * The author's picture in the gutter beside an incoming bubble (a group chat, `Message.Group
- * avatars`): put an `Avatar` in it on the last message of a run (`showAvatar`); the other
- * messages keep the gutter empty.
+ * The author's picture in the gutter beside an incoming bubble of a group chat (`Chat.Messages
+ * type="group"`): put an `Avatar` in it on every message; the message shows it on the last of a
+ * run and keeps the gutter empty on the others.
  */
 export function MessageAvatar({ className, ...rest }: MessageAvatarProps) {
   return <div className={cx(styles.avatar, className)} aria-hidden="true" {...rest} />;
@@ -97,24 +110,72 @@ export function MessageAvatar({ className, ...rest }: MessageAvatarProps) {
 MessageAvatar.displayName = "Message.Avatar";
 
 export type MessageAuthorProps = Omit<React.HTMLAttributes<HTMLDivElement>, "color"> & {
-  /** The author's hue: one per person in a group chat. Default `blue`. */
+  /**
+   * The author's hue: one per person in a group chat. Default: a hue stable per name
+   * (`hueOf(name)`); pass `hueOf(user.id)` to keep it per person.
+   */
   color?: PaletteColor;
+  /** The member's own title in this chat, muted after the name («Админ», «Бухгалтерия»). */
+  tag?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The author's name at the top of the first bubble of a run, in the author's hue (group chats). */
-export function MessageAuthor({ color = "blue", className, ...rest }: MessageAuthorProps) {
+/** The name of the author when it is plain text (it names the message and picks the hue). */
+export function authorNameOf(children: React.ReactNode): string | undefined {
+  const parts = React.Children.toArray(children).filter(
+    (child) => !(React.isValidElement(child) && child.type === MessageAuthorIcon),
+  );
+  return parts.length > 0 && parts.every((part) => typeof part === "string")
+    ? (parts as string[]).join("")
+    : undefined;
+}
+
+/**
+ * The author's header at the top of the first bubble of a run in a group chat: the name in the
+ * author's hue (it ellipsizes first), an optional `Message.AuthorIcon` after it and the `tag` after
+ * them. Over a picture or a circle it stands on a pill at its top-start corner.
+ */
+export function MessageAuthor({ color, tag, className, children, ...rest }: MessageAuthorProps) {
+  const items = React.Children.toArray(children);
+  const icons = items.filter(
+    (child) => React.isValidElement(child) && child.type === MessageAuthorIcon,
+  );
+  const name = items.filter((child) => !icons.includes(child));
+  const text = authorNameOf(children);
+  const hue = color ?? (text ? hueOf(text) : "blue");
   return (
     <div
-      data-message-selectable=""
-      data-message-fit=""
+      data-message-fit="row"
       className={cx(styles.author, palette.hue, className)}
-      {...toDataAttributes({ color })}
+      {...toDataAttributes({ color: hue })}
       {...rest}
-    />
+    >
+      <span className={styles.authorName} data-message-selectable="">
+        {name}
+      </span>
+      {icons}
+      {tag ? (
+        <span className={styles.authorTag} data-message-selectable="">
+          {tag}
+        </span>
+      ) : null}
+    </div>
   );
 }
 MessageAuthor.displayName = "Message.Author";
+
+export type MessageAuthorIconProps = React.HTMLAttributes<HTMLSpanElement> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/**
+ * A small mark after the author's name (`<Icon name="…" />`: a crown of the chat's owner, a check
+ * of a verified member). Decorative: say what it means in the `tag` or the name if it matters.
+ */
+export function MessageAuthorIcon({ className, ...rest }: MessageAuthorIconProps) {
+  return <span className={cx(styles.authorIcon, className)} aria-hidden="true" {...rest} />;
+}
+MessageAuthorIcon.displayName = "Message.AuthorIcon";
 
 // ─── Text ─────────────────────────────────────────────────────────────────────
 
@@ -131,8 +192,7 @@ export type MessageTextProps = Omit<React.HTMLAttributes<HTMLDivElement>, "child
 
 /**
  * The text of a message, wrapping anywhere; the meta stands at the end of its last line (its
- * spacer closes the last line). Marks the matches of the group's search (`Message.Group
- * highlight`).
+ * spacer closes the last line). Marks the matches of the chat's search (`Chat.Search`).
  */
 export function MessageText({ plain = false, className, children, ...rest }: MessageTextProps) {
   const { spacer } = useMessagePart();
@@ -168,6 +228,7 @@ const LINE_PX = 20;
 defineMessagePart(MessageText, {
   shell: "fill",
   meta: "inline",
+  text: ({ children }: MessageTextProps) => (typeof children === "string" ? children : ""),
   estimate: ({ children }: MessageTextProps) => {
     const text = typeof children === "string" ? children : "";
     const lines = text
@@ -216,7 +277,7 @@ export function MessageReply({
   ...rest
 }: MessageReplyProps) {
   const { reply } = { reply: "Ответ на сообщение", ...labels };
-  const { reveal } = useMessageGroup();
+  const { reveal } = useMessageList();
   const body = (
     <>
       <VisuallyHidden>{`${reply}: `}</VisuallyHidden>
@@ -302,7 +363,7 @@ export type MessageReaction = {
 
 /**
  * The reactions as shown while toggles are pending: each pending emoji in its new state; the
- * reader (`Message.Group reader`) joins or leaves its `users` with it.
+ * reader (`Chat.Messages reader`) joins or leaves its `users` with it.
  */
 export function applyOptimistic(
   reactions: readonly MessageReaction[],
@@ -601,7 +662,7 @@ function ReactionChip({ reaction, labels, pending, toggle }: ReactionChipProps) 
 
 export type MessageReactionsProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   /** The reactions to the message; a press on a chip calls `Message.Root onReactionToggle`. */
-  reactions: readonly MessageReaction[];
+  items: readonly MessageReaction[];
   labels?: Partial<MessageReactionsLabels>;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -613,15 +674,15 @@ export type MessageReactionsProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
  * reaction opens it and the last one taken back closes it, each in one layout.
  */
 export function MessageReactions({
-  reactions: reactionsProp,
+  items,
   labels: labelsProp,
   className,
   ...rest
 }: MessageReactionsProps) {
   const labels = { ...REACTIONS_LABELS, ...labelsProp };
   const { toggleReaction, optimistic, rowSpacer } = React.useContext(RootContext);
-  const { reader } = useMessageGroup();
-  const shown = applyOptimistic(reactionsProp, optimistic, reader);
+  const { reader } = useMessageList();
+  const shown = applyOptimistic(items, optimistic, reader);
   return (
     <Disclosure
       open={shown.length > 0}
@@ -683,55 +744,3 @@ export function MessageMenu({ children, ...rest }: MessageMenuProps) {
   );
 }
 MessageMenu.displayName = "Message.Menu";
-
-// ─── Separators and service lines ─────────────────────────────────────────────
-
-export type MessageSeparatorProps = React.HTMLAttributes<HTMLDivElement> & {
-  ref?: React.Ref<HTMLDivElement>;
-};
-
-/** A date between messages («Сегодня», «12 марта»): a small pill that sticks while its day scrolls. */
-export function MessageSeparator({ className, children, ...rest }: MessageSeparatorProps) {
-  return (
-    <div className={cx(styles.separator, className)} data-scroll-skip="" {...rest}>
-      <span className={styles.pill}>{children}</span>
-    </div>
-  );
-}
-MessageSeparator.displayName = "Message.Separator";
-defineRowKind(MessageSeparator, { sticky: true });
-
-export type MessageServiceProps = React.HTMLAttributes<HTMLDivElement> & {
-  ref?: React.Ref<HTMLDivElement>;
-};
-
-/** An event in the chat, not a message («Анна добавила Олега»): a centered pill that wraps. */
-export function MessageService({ className, children, ...rest }: MessageServiceProps) {
-  return (
-    <div className={cx(styles.separator, styles.service, className)} {...rest}>
-      <span className={styles.pill}>{children}</span>
-    </div>
-  );
-}
-MessageService.displayName = "Message.Service";
-
-export type MessageUnreadLabels = {
-  /** The text of the band. */
-  unread: string;
-};
-
-export type MessageUnreadProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  labels?: Partial<MessageUnreadLabels>;
-  ref?: React.Ref<HTMLDivElement>;
-};
-
-/** «Непрочитанные сообщения»: a band across the list above the first unread message. */
-export function MessageUnread({ labels, className, ...rest }: MessageUnreadProps) {
-  const { unread } = { unread: "Непрочитанные сообщения", ...labels };
-  return (
-    <div className={cx(styles.unread, className)} {...rest}>
-      {unread}
-    </div>
-  );
-}
-MessageUnread.displayName = "Message.Unread";

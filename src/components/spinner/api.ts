@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Spinner",
-      en: '`ref` → `HTMLSpanElement`. A turning ring inside a `role="status"` region with text for screen readers.',
-      ru: 'Вращающееся кольцо в области `role="status"` с текстом для скринридеров.',
+      en: '`ref` → `HTMLSpanElement`. The kit ring with the share unknown — a quarter arc turning on a faint track, at the line weight — inside a `role="status"` region with text for screen readers.',
+      ru: 'Кольцо кита с неизвестной долей — четверть дуги вращается на слабой дорожке, толщина линии — в области `role="status"` с текстом для скринридеров.',
       props: [
         {
           name: "size",

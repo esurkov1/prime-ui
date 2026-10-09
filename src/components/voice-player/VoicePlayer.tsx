@@ -455,4 +455,8 @@ export function VoicePlayer(props: VoicePlayerProps) {
   );
 }
 
-defineMessagePart(VoicePlayer, { shell: "fill", meta: "inline" });
+defineMessagePart(VoicePlayer, {
+  shell: "fill",
+  meta: "inline",
+  text: ({ transcript }: VoicePlayerProps) => transcript ?? "",
+});

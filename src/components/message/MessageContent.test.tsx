@@ -5,13 +5,13 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-
+import type { GalleryItem } from "@/components/gallery/Gallery";
 import { MessagePartProvider, messagePartOf } from "@/internal/messagePart";
 import type { SurfaceDepth } from "@/internal/surfaceDepth";
-
 import { MessageContact, MessageLinkPreview, MessageLocation } from "./MessageCards";
 import { MessageFile } from "./MessageFile";
-import { MessageMedia, type MessageMediaItem } from "./MessageMedia";
+
+import { MessageMedia } from "./MessageMedia";
 
 /** Inside a message that ends with this part: the spacer and the overlay to place. */
 function InMessage({
@@ -34,7 +34,7 @@ function InMessage({
   );
 }
 
-const photo = (i: number, width = 800, height = 600): MessageMediaItem => ({
+const photo = (i: number, width = 800, height = 600): GalleryItem => ({
   src: `/photo-${i}.jpg`,
   alt: `Стеллаж ${i + 1}`,
   width,
@@ -45,79 +45,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("Message.Media", () => {
-  it("lays out an album in rows and names the tiles that open the viewer", async () => {
-    const onItemOpen = vi.fn();
-    const { container } = render(
-      <MessageMedia
-        items={Array.from({ length: 5 }, (_, i) => photo(i))}
-        onItemOpen={onItemOpen}
-      />,
-    );
-    // 5 → a row of 2 over a row of 3.
-    const rows = Array.from(container.firstElementChild?.children ?? []);
-    expect(rows.map((row) => row.children.length)).toEqual([2, 3]);
-    await userEvent.click(screen.getByRole("button", { name: "Открыть: Стеллаж 3" }));
-    expect(onItemOpen).toHaveBeenCalledWith(2);
-  });
-
-  it("keeps at most 10 items", () => {
-    render(
-      <MessageMedia items={Array.from({ length: 12 }, (_, i) => photo(i))} onItemOpen={() => {}} />,
-    );
-    expect(screen.getAllByRole("button", { name: /^Открыть/ })).toHaveLength(10);
-  });
-
-  it("reserves its size before load: every box from the data, images lazy and async", () => {
-    const { container } = render(
-      <MessageMedia items={[photo(0, 600, 900), photo(1, 1600, 900), photo(2)]} />,
-    );
-    const root = container.firstElementChild as HTMLElement;
-    const rows = Array.from(root.children) as HTMLElement[];
-    // 3 → one tile over two: each row's height is its aspect ratio, known now (a lone portrait in
-    // an album row is cropped: a row is never taller than two thirds of its width).
-    expect(rows[0]?.style.getPropertyValue("--row-ratio")).toBe(String(1.5));
-    expect(rows[1]?.style.getPropertyValue("--row-ratio")).toBe(String(16 / 9 + 4 / 3));
-    // Tiles share the row by their own ratios.
-    const shares = Array.from(rows[1]?.children ?? []).map(
-      (cell) => (cell as HTMLElement).style.flexGrow,
-    );
-    expect(shares).toEqual([String((16 / 9) * 100), String((4 / 3) * 100)]);
-    for (const image of container.querySelectorAll("img")) {
-      expect(image).toHaveAttribute("loading", "lazy");
-      expect(image).toHaveAttribute("decoding", "async");
-    }
-    // A lone portrait is narrower than the cap.
-    const single = render(<MessageMedia items={[photo(9, 600, 900)]} />);
-    expect(
-      (single.container.firstElementChild as HTMLElement).style.getPropertyValue("--media-width"),
-    ).toBe(String(600 / 900));
-  });
-
-  it("mounts a video only once its tile nears the view, then shows its first frame and length", () => {
-    let report: IntersectionObserverCallback = () => {};
-    vi.stubGlobal(
-      "IntersectionObserver",
-      class {
-        constructor(callback: IntersectionObserverCallback) {
-          report = callback;
-        }
-        observe() {}
-        disconnect() {}
-      },
-    );
-    const { container } = render(
-      <MessageMedia items={[{ type: "video", src: "/clip.mp4", duration: 75, alt: "Рампа" }]} />,
-    );
-    expect(container.querySelector("video")).toBeNull();
-    // The length is data: shown before anything loads.
-    expect(container).toHaveTextContent("1:15");
-    act(() =>
-      report([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver),
-    );
-    expect(container.querySelector("video")).toHaveAttribute("preload", "metadata");
-  });
-
+describe("Message.Media: a Gallery shaped by its message", () => {
   it("the album's gaps are neutral in an outgoing message: the incoming depth paints behind the tiles", () => {
     const { container } = render(
       <InMessage neutralDepth={2}>
@@ -163,58 +91,6 @@ describe("Message.Media", () => {
     // The off-screen estimate: a 4 : 3 photo at the 360 px cap is 270 px tall.
     expect(messagePartOf(MessageMedia)?.estimate?.({ items: [photo(0)] } as never)).toBe(270);
   });
-
-  it("shows an upload with the shared ring disk that cancels; a slow cancel is pending, a refused one announced", async () => {
-    let reject: () => void = () => {};
-    const onCancel = vi.fn(() => new Promise<void>((_, r) => (reject = () => r(new Error("нет")))));
-    render(
-      <MessageMedia
-        items={[{ ...photo(0), transfer: "loading", transferProgress: 0.42 }]}
-        onCancel={onCancel}
-      />,
-    );
-    expect(screen.getByRole("progressbar", { name: "Отправка 42%" })).toHaveAttribute(
-      "aria-valuenow",
-      "42",
-    );
-    const cancel = screen.getByRole("button", { name: "Отменить отправку" });
-    fireEvent.click(cancel);
-    expect(onCancel).toHaveBeenCalledWith(0);
-    expect(cancel).toHaveAttribute("aria-busy", "true");
-    fireEvent.click(cancel);
-    expect(onCancel).toHaveBeenCalledTimes(1);
-    await act(async () => reject());
-    expect(cancel).not.toHaveAttribute("aria-busy");
-    expect(screen.getByText("Не удалось отменить")).toBeInTheDocument();
-  });
-
-  it("a failed tile turns the disk into a retry described by the reason", async () => {
-    const onRetry = vi.fn();
-    render(
-      <MessageMedia
-        items={[{ ...photo(0), transfer: "failed", transferDirection: "download" }]}
-        onRetry={onRetry}
-      />,
-    );
-    const retry = screen.getByRole("button", { name: "Повторить загрузку" });
-    expect(retry).toHaveAccessibleDescription("Не загрузилось");
-    await userEvent.click(retry);
-    expect(onRetry).toHaveBeenCalledWith(0);
-  });
-
-  it("a remote tile carries the download arrow; the picture dims under it", async () => {
-    const onDownload = vi.fn();
-    const { container } = render(
-      <MessageMedia
-        items={[{ ...photo(0), transfer: "remote", transferDirection: "download" }]}
-        onDownload={onDownload}
-      />,
-    );
-    await userEvent.click(screen.getByRole("button", { name: "Скачать Стеллаж 1" }));
-    expect(onDownload).toHaveBeenCalledWith(0);
-    expect(container.querySelector("[data-covered]")).not.toBeNull();
-    expect(screen.queryByRole("progressbar")).toBeNull();
-  });
 });
 
 describe("Message.File", () => {
@@ -231,9 +107,10 @@ describe("Message.File", () => {
       />,
     );
     expect(screen.getByText("1 КБ из 2 КБ")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: "Загрузка 50%" })).toBeInTheDocument();
+    const cancel = screen.getByRole("button", { name: "Отменить загрузку" });
+    expect(cancel).toHaveAccessibleDescription("Загрузка 50%");
     expect(screen.getByText("XLSX")).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: "Отменить загрузку" }));
+    await userEvent.click(cancel);
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
@@ -287,7 +164,7 @@ describe("Message.File", () => {
     expect(screen.getByText("1 КБ").parentElement?.lastElementChild).toBe(
       screen.getByTestId("spacer"),
     );
-    expect(screen.getByText("Акт.pdf")).toHaveAttribute("data-message-selectable");
+    expect(screen.getByText("Акт")).toHaveAttribute("data-message-selectable");
     expect(messagePartOf(MessageFile)).toEqual({ shell: "fill", meta: "inline", sized: true });
   });
 });
