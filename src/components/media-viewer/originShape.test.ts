@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { originShape } from "./originShape";
+import { findItemMedia, originShape } from "./originShape";
 
 /** Rounds every corner (jsdom does not expand the `border-radius` shorthand into corners). */
 function round(element: HTMLElement, radius: string) {
@@ -74,5 +74,31 @@ describe("originShape", () => {
     place(scroller, 0, 200, 600, 400);
     place(image, 50, 105, 200, 100);
     expect(originShape(image)).toBeNull();
+  });
+});
+
+describe("findItemMedia", () => {
+  it("finds an item's own thumbnail on the page, nearest the one it opened from", () => {
+    document.body.innerHTML = `
+      <section id="other"><img src="/b-small.jpg" /></section>
+      <div id="grid">
+        <button><img src="/a-small.jpg" /></button>
+        <button><img src="/b-small.jpg" /></button>
+        <button><video src="/clip.mp4#t=0.001"></video></button>
+      </div>`;
+    const opener = document.querySelector("#grid img") as HTMLElement;
+    const inGrid = document.querySelectorAll("#grid img")[1];
+    expect(findItemMedia({ src: "/b.jpg", thumbnail: "/b-small.jpg" }, opener, null)).toBe(inGrid);
+    // A video tile asks for its first frame with a fragment: the source still matches.
+    expect(findItemMedia({ type: "video", src: "/clip.mp4" }, opener, null)).toBe(
+      document.querySelector("#grid video"),
+    );
+    expect(findItemMedia({ src: "/missing.jpg" }, opener, null)).toBeNull();
+  });
+
+  it("never picks a picture inside the viewer itself", () => {
+    document.body.innerHTML = `<div id="viewer"><img src="/a.jpg" /></div>`;
+    const viewer = document.querySelector("#viewer");
+    expect(findItemMedia({ src: "/a.jpg" }, null, viewer)).toBeNull();
   });
 });

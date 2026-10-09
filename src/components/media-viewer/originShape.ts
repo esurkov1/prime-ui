@@ -1,3 +1,4 @@
+import type { MediaViewerItem } from "./types";
 import type { ViewerOrigin, ViewerRect } from "./viewerEngine";
 
 /** Two edges this close (px) are one edge: a corner of the frame is a corner of the picture. */
@@ -95,4 +96,35 @@ export function originShape(media: HTMLElement): ViewerOrigin | null {
 
 function viewportRect(): ViewerRect {
   return { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight };
+}
+
+/** A media source as written, without a fragment (`#t=0.001` asks a video for its first frame). */
+const bareSrc = (src: string | null | undefined) => (src ?? "").split("#")[0] ?? "";
+
+/**
+ * The thumbnail of `item` on the page: an `<img>` or `<video>` showing its `thumbnail`, `src` or
+ * `poster`. Of several, the one nearest the thumbnail the viewer opened from (inside the smallest
+ * ancestor they share), so a grid closes into its own tile. Read once, when the viewer closes.
+ */
+export function findItemMedia(
+  item: MediaViewerItem | undefined,
+  near: Element | null,
+  viewer: Element | null,
+): HTMLElement | null {
+  if (!item) return null;
+  const sources = new Set(
+    [item.thumbnail, item.src, item.poster].filter(Boolean).map((src) => bareSrc(src)),
+  );
+  const matches = [...document.querySelectorAll<HTMLElement>("img, video")].filter(
+    (media) =>
+      !viewer?.contains(media) &&
+      (sources.has(bareSrc(media.getAttribute("src"))) ||
+        sources.has(bareSrc(media.getAttribute("poster")))),
+  );
+  if (matches.length <= 1) return matches[0] ?? null;
+  for (let scope = near?.parentElement ?? null; scope; scope = scope.parentElement) {
+    const inside = matches.find((media) => scope.contains(media));
+    if (inside) return inside;
+  }
+  return matches[0] ?? null;
 }

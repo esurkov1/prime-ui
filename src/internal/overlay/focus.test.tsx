@@ -43,6 +43,12 @@ describe("opener of a modal layer", () => {
     expect(opener).toHaveFocus();
     // Opened by a press: back without the focus ring, though a key closed it.
     expect(focus).toHaveBeenCalledWith(expect.objectContaining({ focusVisible: false }));
+    // Wherever `focusVisible` is not supported, the kit hides the ring itself until the next key.
+    expect(opener).toHaveAttribute("data-focus-quiet");
+    fireEvent.keyDown(document, { key: "Shift" });
+    expect(opener).toHaveAttribute("data-focus-quiet");
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(opener).not.toHaveAttribute("data-focus-quiet");
   });
 
   it("is the focused element when a key opened the layer", () => {
@@ -70,5 +76,6 @@ describe("opener of a modal layer", () => {
     expect(opener).toHaveFocus();
     // Opened by a key: the ring shows where focus lands.
     expect(focus).not.toHaveBeenCalledWith(expect.objectContaining({ focusVisible: false }));
+    expect(opener).not.toHaveAttribute("data-focus-quiet");
   });
 });

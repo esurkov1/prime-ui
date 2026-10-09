@@ -46,12 +46,36 @@ export function focusInto(container: HTMLElement): void {
   target.focus({ preventScroll: true });
 }
 
+/** Keys that only modify another: they do not count as the person turning to the keyboard. */
+const MODIFIERS = new Set(["Shift", "Control", "Alt", "Meta", "CapsLock"]);
+
+/**
+ * Hides the focus ring of `el` until the person turns to the keyboard or focus leaves: the
+ * `data-focus-quiet` attribute makes `--prime-color-focus-ring` transparent (globals.css), which
+ * every ring of the kit is drawn with — whatever the browser decides about `:focus-visible`.
+ */
+function quietRing(el: HTMLElement): void {
+  el.setAttribute("data-focus-quiet", "");
+  const clear = () => {
+    el.removeAttribute("data-focus-quiet");
+    el.removeEventListener("blur", clear);
+    document.removeEventListener("keydown", onKey, true);
+  };
+  const onKey = (event: KeyboardEvent) => {
+    if (!MODIFIERS.has(event.key)) clear();
+  };
+  el.addEventListener("blur", clear);
+  document.addEventListener("keydown", onKey, true);
+}
+
 /**
  * Focuses `el` when it is still in the document. `quiet` — the layer was opened with a pointer:
- * focus returns without the focus ring, even after a key closed the layer.
+ * focus returns without the focus ring, also when a key (Escape) closed the layer; the next key
+ * brings the ring back.
  */
 export function focusBack(el: HTMLElement | null | undefined, quiet = false): void {
   if (!el?.isConnected) return;
+  if (quiet) quietRing(el);
   // `focusVisible` is a FocusOptions field newer than the DOM typings.
   el.focus({ preventScroll: true, ...(quiet ? { focusVisible: false } : {}) } as FocusOptions);
 }

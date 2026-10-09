@@ -51,6 +51,12 @@ body {
   outline: none;
 }
 
+/* Focus that came back to a control a pointer used (a layer opened with a click, closed with
+   Escape) shows no ring until the next key: every kit ring is drawn with this token. */
+[data-focus-quiet] {
+  --prime-color-focus-ring: transparent;
+}
+
 :where(a, button, input, textarea, select, [role="button"], [tabindex]) {
   -webkit-tap-highlight-color: transparent;
 }

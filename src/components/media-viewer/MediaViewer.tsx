@@ -19,7 +19,7 @@ import { Portal } from "@/internal/Portal";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./MediaViewer.module.css";
-import { originShape } from "./originShape";
+import { findItemMedia, originShape } from "./originShape";
 import { clamp, fitBox, pageWindow, type Size } from "./physics";
 import type { MediaViewerItem, MediaViewerLabels } from "./types";
 import { type Sound, type VideoControls, ViewerVideo } from "./ViewerVideo";
@@ -367,8 +367,13 @@ function ViewerDialog({
     engine.paint();
   });
 
-  const originFor = (at: number) =>
-    originOf(getOrigin ? getOrigin(at) : at === openedIndex ? opener.current : null);
+  // The thumbnail of the item on screen: `getOrigin`, else the opener for the item it opened
+  // at, else the item's own picture found on the page — paging on, it still closes into its tile.
+  const originFor = (at: number) => {
+    if (getOrigin) return originOf(getOrigin(at));
+    if (at === openedIndex) return originOf(opener.current);
+    return originOf(findItemMedia(items[at], findMedia(opener.current), layerRef.current));
+  };
   const originForRef = React.useRef(originFor);
   originForRef.current = originFor;
   // The picture the viewer opened from: a video page flies as its frame until it plays.
