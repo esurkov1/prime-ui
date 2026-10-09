@@ -18,7 +18,9 @@ type UseInfiniteRowsOptions = {
 
 /**
  * Infinite scroll: reveals loaded rows in batches while a sentinel under the table reaches the
- * viewport, then asks for more data (`onLoadMore`) once every loaded row is shown.
+ * viewport, then asks for more data (`onLoadMore`) once every loaded row is shown. A promise from
+ * `onLoadMore` counts as loading until it settles; after a rejection the table stops asking until
+ * the rows change, so a failing request is never repeated in a loop.
  */
 export function useInfiniteRows({
   enabled,
@@ -31,12 +33,23 @@ export function useInfiniteRows({
   scrollRef,
 }: UseInfiniteRowsOptions) {
   const [revealed, setRevealed] = React.useState(pageSize);
+  const [pending, setPending] = React.useState(false);
+  /** Row count at the last rejected request: no new request until it changes. */
+  const [failedAt, setFailedAt] = React.useState<number | null>(null);
   const visibleCount = Math.min(Math.max(revealed, pageSize), Math.max(pageSize, totalRows));
   const hasInternalMore = enabled && visibleCount < totalRows;
-  const canRequestMore = enabled && Boolean(onLoadMore) && hasMore && !loadingMore;
+  const canRequestMore =
+    enabled && Boolean(onLoadMore) && hasMore && !loadingMore && !pending && failedAt !== totalRows;
   const sentinelRef = React.useRef<HTMLDivElement | null>(null);
   const loadMoreRef = React.useRef(onLoadMore);
   loadMoreRef.current = onLoadMore;
+  const mounted = React.useRef(true);
+  React.useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   // Re-observed after every reveal: a sentinel that is still visible then reports again.
   React.useEffect(() => {
@@ -46,14 +59,36 @@ export function useInfiniteRows({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
-        if (hasInternalMore) setRevealed(visibleCount + Math.max(1, batchSize));
-        else void loadMoreRef.current?.();
+        if (hasInternalMore) {
+          setRevealed(visibleCount + Math.max(1, batchSize));
+          return;
+        }
+        const request = loadMoreRef.current?.();
+        if (!request || typeof request.then !== "function") return;
+        observer.disconnect();
+        setPending(true);
+        request.then(
+          () => {
+            if (mounted.current) setPending(false);
+          },
+          () => {
+            if (!mounted.current) return;
+            setPending(false);
+            setFailedAt(totalRows);
+          },
+        );
       },
       { root, rootMargin: INFINITE_ROOT_MARGIN, threshold: 0.01 },
     );
     observer.observe(target);
     return () => observer.disconnect();
-  }, [scrollRef, hasInternalMore, canRequestMore, visibleCount, batchSize]);
+  }, [scrollRef, hasInternalMore, canRequestMore, visibleCount, batchSize, totalRows]);
 
-  return { visibleCount, hasInternalMore, canRequestMore, sentinelRef };
+  return {
+    visibleCount,
+    hasInternalMore,
+    canRequestMore,
+    loading: loadingMore || pending,
+    sentinelRef,
+  };
 }

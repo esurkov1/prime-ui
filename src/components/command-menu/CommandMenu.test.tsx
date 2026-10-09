@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -160,14 +160,14 @@ describe("CommandMenu — пустое состояние и футер", () => 
 describe("CommandMenu — size и labels", () => {
   it("size задаёт ярус пунктов, labels — строки поиска и пустого состояния", async () => {
     const user = userEvent.setup();
-    const onValueChange = vi.fn();
+    const onSearchChange = vi.fn();
     render(
       <CommandMenu.Root
         open
         onOpenChange={() => {}}
         size="xl"
         labels={{ search: "Find", empty: "Nothing", emptyHint: "" }}
-        onValueChange={onValueChange}
+        onSearchChange={onSearchChange}
       >
         <CommandMenu.Input />
         <CommandMenu.List>
@@ -184,7 +184,7 @@ describe("CommandMenu — size и labels", () => {
     const input = screen.getByRole("combobox", { name: "Find" });
     expect(input).toHaveAttribute("placeholder", "Find");
     await user.type(input, "zz");
-    expect(onValueChange).toHaveBeenLastCalledWith("zz");
+    expect(onSearchChange).toHaveBeenLastCalledWith("zz");
     expect(screen.getByText("Nothing")).toBeInTheDocument();
     expect(screen.getByText("Esc").tagName).toBe("KBD");
   });
@@ -256,9 +256,9 @@ describe("CommandMenu — focus, query and disabled items", () => {
     );
   });
 
-  it("the query lives on Root: value / onValueChange, cleared when the palette closes", async () => {
+  it("the query lives on Root: search / onSearchChange, cleared when the palette closes", async () => {
     const user = userEvent.setup();
-    const onValueChange = vi.fn();
+    const onSearchChange = vi.fn();
     function Harness() {
       const [open, setOpen] = React.useState(true);
       const [query, setQuery] = React.useState("al");
@@ -270,9 +270,9 @@ describe("CommandMenu — focus, query and disabled items", () => {
           <CommandMenu.Root
             open={open}
             onOpenChange={setOpen}
-            value={query}
-            onValueChange={(next) => {
-              onValueChange(next);
+            search={query}
+            onSearchChange={(next) => {
+              onSearchChange(next);
               setQuery(next);
             }}
           >
@@ -290,9 +290,9 @@ describe("CommandMenu — focus, query and disabled items", () => {
     expect(input).toHaveValue("al");
     expect(screen.queryByRole("option", { name: "Beta" })).not.toBeInTheDocument();
     await user.type(input, "p");
-    expect(onValueChange).toHaveBeenLastCalledWith("alp");
+    expect(onSearchChange).toHaveBeenLastCalledWith("alp");
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(onValueChange).toHaveBeenLastCalledWith("");
+    expect(onSearchChange).toHaveBeenLastCalledWith("");
   });
 
   it("a disabled item is shown with aria-disabled, skipped by the arrows and not runnable", async () => {
@@ -326,5 +326,178 @@ describe("CommandMenu — focus, query and disabled items", () => {
     fireEvent.pointerMove(beta);
     expect(beta).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("option", { name: "Alpha" })).toHaveAttribute("aria-selected", "false");
+  });
+});
+
+describe("CommandMenu — an item inside Empty", () => {
+  it("does not loop: the item shows while nothing matches and runs on Enter", async () => {
+    const user = userEvent.setup();
+    const onCreate = vi.fn();
+    function Harness() {
+      const [query, setQuery] = React.useState("");
+      return (
+        <CommandMenu.Root open onOpenChange={vi.fn()} search={query} onSearchChange={setQuery}>
+          <CommandMenu.Input aria-label="Поиск команд" />
+          <CommandMenu.List>
+            <CommandMenu.Item value="alpha">Alpha</CommandMenu.Item>
+            <CommandMenu.Empty>
+              <CommandMenu.Item value={`создать ${query}`} onSelect={() => onCreate(query)}>
+                Создать «{query}»
+              </CommandMenu.Item>
+            </CommandMenu.Empty>
+          </CommandMenu.List>
+        </CommandMenu.Root>
+      );
+    }
+    render(<Harness />);
+    const input = screen.getByRole("combobox", { name: "Поиск команд" });
+    await user.type(input, "zeta");
+    expect(screen.getByRole("status")).toHaveTextContent("Ничего не найдено");
+    const create = screen.getByRole("option", { name: "Создать «zeta»" });
+    expect(create).toHaveAttribute("aria-selected", "true");
+    await user.keyboard("{Enter}");
+    expect(onCreate).toHaveBeenCalledWith("zeta");
+  });
+});
+
+describe("CommandMenu — server search", () => {
+  const PEOPLE = ["Анна Смирнова", "Борис Котов", "Вера Лебедева"];
+
+  function ServerPalette(props: Partial<React.ComponentProps<typeof CommandMenu.Root>>) {
+    return (
+      <CommandMenu.Root open onOpenChange={vi.fn()} filter={false} {...props}>
+        <CommandMenu.Input aria-label="Поиск людей" />
+        <CommandMenu.List>
+          <CommandMenu.Empty />
+          {PEOPLE.map((name) => (
+            <CommandMenu.Item key={name} value={name}>
+              {name}
+            </CommandMenu.Item>
+          ))}
+        </CommandMenu.List>
+      </CommandMenu.Root>
+    );
+  }
+
+  it("filter={false} keeps every item whatever the query", async () => {
+    const user = userEvent.setup();
+    render(<ServerPalette />);
+    await user.type(screen.getByRole("combobox", { name: "Поиск людей" }), "zzz");
+    expect(screen.getAllByRole("option")).toHaveLength(3);
+    expect(screen.queryByText("Ничего не найдено")).not.toBeInTheDocument();
+  });
+
+  it("loading with no items shows skeleton rows in the list, not the empty state", () => {
+    render(
+      <CommandMenu.Root open onOpenChange={vi.fn()} filter={false} loading>
+        <CommandMenu.Input aria-label="Поиск людей" />
+        <CommandMenu.List>
+          <CommandMenu.Empty />
+        </CommandMenu.List>
+      </CommandMenu.Root>,
+    );
+    const list = screen.getByRole("listbox");
+    expect(list).toHaveAttribute("aria-busy", "true");
+    expect(list.querySelectorAll("[data-skeleton]").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Ничего не найдено")).not.toBeInTheDocument();
+    expect(screen.getByText("Загрузка…")).toBeInTheDocument();
+  });
+
+  it("loading with items keeps them on screen and marks the list busy", () => {
+    render(<ServerPalette loading />);
+    expect(screen.getAllByRole("option")).toHaveLength(3);
+    expect(screen.getByRole("listbox").querySelector("[data-skeleton]")).toBeNull();
+    expect(screen.getByRole("listbox")).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("loadingMore adds skeleton rows after the items", () => {
+    render(<ServerPalette loadingMore hasMore />);
+    const list = screen.getByRole("listbox");
+    expect(screen.getAllByRole("option")).toHaveLength(3);
+    expect(list.querySelectorAll("[data-skeleton]").length).toBeGreaterThan(0);
+  });
+
+  it("the arrows reaching the last item ask for more once per round", async () => {
+    const user = userEvent.setup();
+    const onLoadMore = vi.fn();
+    const { rerender } = render(<ServerPalette hasMore onLoadMore={onLoadMore} />);
+    const input = screen.getByRole("combobox", { name: "Поиск людей" });
+    await user.type(input, "{End}");
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+    await user.type(input, "{ArrowUp}{ArrowDown}");
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+    rerender(<ServerPalette hasMore={false} onLoadMore={onLoadMore} />);
+    await user.type(input, "{ArrowUp}{ArrowDown}");
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+  });
+
+  it("the sentinel asks for more when it scrolls into view", () => {
+    const observers: { callback: IntersectionObserverCallback }[] = [];
+    const original = globalThis.IntersectionObserver;
+    globalThis.IntersectionObserver = class {
+      constructor(callback: IntersectionObserverCallback) {
+        observers.push({ callback });
+      }
+      observe() {}
+      disconnect() {}
+    } as unknown as typeof IntersectionObserver;
+    try {
+      const onLoadMore = vi.fn();
+      render(<ServerPalette hasMore onLoadMore={onLoadMore} />);
+      expect(observers.length).toBeGreaterThan(0);
+      observers
+        .at(-1)
+        ?.callback(
+          [{ isIntersecting: true } as IntersectionObserverEntry],
+          {} as IntersectionObserver,
+        );
+      expect(onLoadMore).toHaveBeenCalledTimes(1);
+    } finally {
+      globalThis.IntersectionObserver = original;
+    }
+  });
+
+  it("loadError replaces the list with an alert; the retry button and Enter call onRetry", async () => {
+    const user = userEvent.setup();
+    const onRetry = vi.fn();
+    render(<ServerPalette loadError="Не удалось загрузить людей" onRetry={onRetry} />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Не удалось загрузить людей");
+    expect(screen.queryByRole("option")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Повторить" }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    await user.type(screen.getByRole("combobox", { name: "Поиск людей" }), "{Enter}");
+    expect(onRetry).toHaveBeenCalledTimes(2);
+  });
+
+  it("async onRetry: the button loads and nothing retries again until it settles", async () => {
+    let reject: (reason: unknown) => void = () => {};
+    const onRetry = vi.fn(
+      () =>
+        new Promise<void>((_, fail) => {
+          reject = fail;
+        }),
+    );
+    render(<ServerPalette loadError="Не удалось загрузить людей" onRetry={onRetry} />);
+    const button = screen.getByRole("button", { name: "Повторить" });
+    fireEvent.click(button);
+    expect(button).toHaveAttribute("aria-busy", "true");
+    fireEvent.keyDown(screen.getByRole("combobox", { name: "Поиск людей" }), { key: "Enter" });
+    expect(onRetry).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      reject(new Error("offline"));
+    });
+    expect(screen.getByRole("alert")).toHaveTextContent("Не удалось загрузить людей");
+    expect(button).not.toHaveAttribute("aria-busy");
+    fireEvent.keyDown(screen.getByRole("combobox", { name: "Поиск людей" }), { key: "Enter" });
+    expect(onRetry).toHaveBeenCalledTimes(2);
+  });
+
+  it("a load state change fades the new content in", () => {
+    const { rerender } = render(<ServerPalette />);
+    const region = () => screen.getByRole("listbox").firstElementChild as HTMLElement;
+    expect(region().className).not.toMatch(/swapIn/);
+    rerender(<ServerPalette loadError="Ошибка" />);
+    expect(screen.getByRole("alert").className).toMatch(/swapIn/);
   });
 });

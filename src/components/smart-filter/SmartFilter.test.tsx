@@ -11,7 +11,8 @@ import {
   removeSelectionValue,
   resolveSmartFilterValues,
   toggleSelectionMode,
-  withSelection,
+  toggleSingleValue,
+  withFieldValue,
 } from "./model";
 import { SmartFilter, type SmartFilterField, type SmartFilterValue } from "./SmartFilter";
 
@@ -91,8 +92,28 @@ describe("model", () => {
       exclude: ["b"],
     });
     expect(
-      withSelection({ f: { include: ["a"], exclude: [] } }, "f", { include: [], exclude: [] }),
+      withFieldValue({ f: { include: ["a"], exclude: [] } }, "f", { include: [], exclude: [] }),
     ).toEqual({});
+    expect(withFieldValue({ r: { from: 1, to: null } }, "r", { from: null, to: null })).toEqual({});
+  });
+
+  it("matches ranges: inclusive bounds, dates by whole days", () => {
+    expect(matchesSmartFilter({ from: 1000, to: 5000 }, 1000)).toBe(true);
+    expect(matchesSmartFilter({ from: 1000, to: 5000 }, 5001)).toBe(false);
+    expect(matchesSmartFilter({ from: null, to: 5000 }, -3)).toBe(true);
+    expect(matchesSmartFilter({ from: 1000, to: null }, null)).toBe(false);
+    const march = { from: new Date(2026, 2, 1), to: new Date(2026, 2, 15) };
+    expect(matchesSmartFilter(march, new Date(2026, 2, 15, 18, 30))).toBe(true);
+    expect(matchesSmartFilter(march, new Date(2026, 2, 16))).toBe(false);
+    expect(matchesSmartFilter(march, new Date(2026, 1, 28, 23, 59))).toBe(false);
+    expect(resolveSmartFilterValues({ from: 1, to: 2 }, ["a"])).toEqual([]);
+  });
+
+  it("a single-value field holds one value and clears on a second press", () => {
+    const a = toggleSingleValue(undefined, "x");
+    expect(a).toEqual({ include: ["x"], exclude: [] });
+    expect(toggleSingleValue(a, "y")).toEqual({ include: ["y"], exclude: [] });
+    expect(toggleSingleValue(a, "x")).toEqual({ include: [], exclude: [] });
   });
 
   it("does not allow hiding every value of a fixed set", () => {
@@ -348,5 +369,104 @@ describe("SmartFilter", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<SmartFilter.Toolbar />)).toThrow(/SmartFilter/);
     spy.mockRestore();
+  });
+});
+
+describe("SmartFilter range, single and grouped fields", () => {
+  const RANGE_FIELDS: SmartFilterField[] = [
+    { key: "amount", label: "Сумма", kind: "range", formatValue: (n) => `${n} ₽` },
+    { key: "period", label: "Период", kind: "date-range" },
+    {
+      key: "stage",
+      label: "Этап",
+      multiple: false,
+      options: [
+        { value: "new", label: "Новый" },
+        { value: "won", label: "Выигран" },
+      ],
+    },
+    {
+      key: "owner",
+      label: "Владелец",
+      options: [
+        { value: "team", label: "Моя команда", group: "Тип" },
+        { value: "anna", label: "Анна Ким", group: "Сотрудник" },
+        { value: "mine", label: "Мои", group: "Тип" },
+      ],
+    },
+  ];
+
+  it("types a number range and shows a readable chip; removing it clears the bounds", async () => {
+    const user = userEvent.setup();
+    const onValue = vi.fn();
+    render(<Harness fields={RANGE_FIELDS} onValue={onValue} />);
+    openPanel();
+    await user.type(screen.getByRole("textbox", { name: "Сумма, от" }), "1000");
+    await user.type(screen.getByRole("textbox", { name: "Сумма, до" }), "5 000");
+    expect(onValue).toHaveBeenLastCalledWith({ amount: { from: 1000, to: 5000 } });
+    const chip = within(chips() as HTMLElement).getByText("Сумма: 1000 ₽–5000 ₽");
+    expect(chip).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Фильтр/ })).toHaveTextContent("1");
+    fireEvent.click(screen.getByRole("button", { name: "Убрать фильтр «Сумма: 1000 ₽–5000 ₽»" }));
+    expect(onValue).toHaveBeenLastCalledWith({});
+    expect(screen.getByRole("textbox", { name: "Сумма, от" })).toHaveValue("");
+  });
+
+  it("chips an open-ended range with «от» / «до» and marks an inverted range invalid", async () => {
+    const user = userEvent.setup();
+    render(<Harness fields={RANGE_FIELDS} initial={{ amount: { from: null, to: 300 } }} />);
+    expect(within(chips() as HTMLElement).getByText("Сумма: до 300 ₽")).toBeInTheDocument();
+    openPanel();
+    await user.type(screen.getByRole("textbox", { name: "Сумма, от" }), "900");
+    expect(screen.getByRole("textbox", { name: "Сумма, от" })).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+  });
+
+  it("chips a date range in the Datepicker's own words", () => {
+    render(
+      <Harness
+        fields={RANGE_FIELDS}
+        initial={{ period: { from: new Date(2026, 2, 1), to: new Date(2026, 2, 15, 23, 59) } }}
+      />,
+    );
+    const chip = within(chips() as HTMLElement).getByText(/^Период: /);
+    expect(chip.textContent).toMatch(/1.*15 мар/);
+  });
+
+  it("a single-value field picks one value and has no hide action", () => {
+    const onValue = vi.fn();
+    render(<Harness fields={RANGE_FIELDS} onValue={onValue} />);
+    openPanel();
+    fireEvent.click(screen.getByRole("button", { name: "Новый" }));
+    fireEvent.click(screen.getByRole("button", { name: "Выигран" }));
+    expect(onValue).toHaveBeenLastCalledWith({ stage: { include: ["won"], exclude: [] } });
+    expect(screen.queryByRole("button", { name: "Скрыть Новый" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Скрыть Анна Ким" })).toBeInTheDocument();
+  });
+
+  it("groups the values of one field under their headings", () => {
+    render(<Harness fields={RANGE_FIELDS} />);
+    openPanel();
+    const type = screen.getByRole("group", { name: "Тип" });
+    expect(within(type).getByRole("button", { name: "Моя команда" })).toBeInTheDocument();
+    expect(within(type).getByRole("button", { name: "Мои" })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("group", { name: "Сотрудник" })).getByRole("button", {
+        name: "Анна Ким",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("a toolbar without search keeps only the filter button", () => {
+    render(
+      <SmartFilter.Root fields={RANGE_FIELDS}>
+        <SmartFilter.Toolbar searchable={false} />
+      </SmartFilter.Root>,
+    );
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    openPanel();
+    expect(screen.getByRole("textbox", { name: "Сумма, от" })).toBeInTheDocument();
   });
 });

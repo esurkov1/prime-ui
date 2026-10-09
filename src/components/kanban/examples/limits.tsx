@@ -1,4 +1,4 @@
-/** A support queue with a work-in-progress limit and a workflow rule: a full column and a blocked ticket are refused before the release, from the keyboard too — `limit`, `canDrop`. */
+/** A support queue with a work-in-progress limit and a workflow rule: a full column and a blocked ticket are refused before the release with the reason under the card, from the keyboard too — `limit`, `canDrop`. */
 import { Badge, Kanban } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -38,8 +38,10 @@ export default function KanbanLimitsExample() {
       getId={(ticket) => ticket.id}
       getLabel={(ticket) => ticket.title}
       defaultValue={PLACEMENT}
-      // A ticket waiting on the client cannot be closed.
-      canDrop={(id, columnId) => columnId !== "solved" || !BLOCKED.has(id)}
+      // A ticket waiting on the client cannot be closed; the reason shows under the carried card.
+      canDrop={(id, columnId) =>
+        columnId === "solved" && BLOCKED.has(id) ? "Тикет ждёт ответа клиента" : true
+      }
       renderItem={(ticket) => (
         <Kanban.Item>
           <Kanban.ItemTitle>{ticket.title}</Kanban.ItemTitle>

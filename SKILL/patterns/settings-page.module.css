@@ -21,10 +21,6 @@
 }
 
 /* Field → field 20. */
-.fields {
-  display: grid;
-  gap: var(--prime-space-5);
-}
 
 /* Two short related fields side by side when there is room; tops aligned. */
 .pair {

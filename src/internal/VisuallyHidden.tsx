@@ -13,8 +13,10 @@ export const visuallyHiddenClass = styles.root;
 
 /**
  * Text for screen readers only: spoken counters, live-region messages, names of icon-only parts.
- * Replaces the per-component `.srOnly` / `.visuallyHidden` CSS copies.
+ * Public as `VisuallyHidden` (docs in `src/components/visually-hidden/`); inside the kit it replaces
+ * the per-component `.srOnly` / `.visuallyHidden` CSS copies.
  */
 export function VisuallyHidden({ className, ...rest }: VisuallyHiddenProps) {
   return <span className={cx(styles.root, className)} {...rest} />;
 }
+VisuallyHidden.displayName = "VisuallyHidden";

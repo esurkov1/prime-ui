@@ -49,24 +49,41 @@
   border-radius: var(--prime-radius-full);
 }
 
-.track::before {
-  content: "";
+.thumb {
+  /* A spinner inside sizes itself from here, a ring inside the thumb's edge. */
+  --prime-icon-size: calc(var(--prime-switch-thumb) - var(--prime-space-1));
+
   position: absolute;
   top: var(--prime-switch-inset);
   left: var(--prime-switch-inset);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: var(--prime-switch-thumb);
   height: var(--prime-switch-thumb);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-control-thumb);
   box-shadow: var(--prime-shadow-raised);
-  /* The thumb glides into place in both directions. */
+  color: var(--prime-color-text-muted);
+  /* The thumb glides into place in both directions: on a press, and back when a save is refused. */
   transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
-.root[data-state="checked"] .track::before {
+.root[data-state="checked"] .thumb {
   transform: translateX(var(--prime-switch-travel));
+  color: var(--prime-color-accent-default);
 }
 
-.root[data-disabled="true"] .track::before {
+.root[data-disabled="true"] .thumb {
   box-shadow: none;
+}
+
+/* Saving (`loading`, or a pending `onCheckedChange` promise): a spinner turns inside the thumb,
+   which already stands in the new position; the press does nothing until the answer. */
+.track[data-loading="true"] {
+  cursor: progress;
+}
+
+.spinner {
+  --enter-shift: 0;
 }

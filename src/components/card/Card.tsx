@@ -1,9 +1,11 @@
-import type * as React from "react";
+import * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { Slot } from "@/internal/slot";
 import type { Tone } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./Card.module.css";
 
@@ -17,23 +19,51 @@ export type CardRootProps = DivProps & {
   variant?: CardVariant;
   /** No raised shadow: a flat tile on the page (dense grids where shadows add noise). */
   flat?: boolean;
+  /**
+   * The whole card is one link or button: pass that element as the only child and the card's
+   * parts inside it. It lifts on hover, presses and shows the focus ring. Nothing interactive
+   * may sit inside it.
+   */
+  asChild?: boolean;
 };
 
 function CardRoot({
   variant = "panel",
   flat = false,
+  asChild = false,
   className,
   children,
   ...rest
 }: CardRootProps) {
   const depth = useNestedSurfaceDepth();
+  const rootProps = {
+    ...rest,
+    className: cx(styles.root, className),
+    "data-depth": depth,
+    ...toDataAttributes({
+      variant,
+      flat: flat || undefined,
+      interactive: asChild || undefined,
+    }),
+  };
+
+  if (asChild) {
+    const child = React.Children.only(children);
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) {
+      throw new Error("Card.Root asChild needs a single element child");
+    }
+    return (
+      <Slot {...rootProps}>
+        {React.cloneElement(
+          child,
+          undefined,
+          <SurfaceDepthProvider value={depth}>{child.props.children}</SurfaceDepthProvider>,
+        )}
+      </Slot>
+    );
+  }
   return (
-    <div
-      {...rest}
-      className={cx(styles.root, className)}
-      data-depth={depth}
-      {...toDataAttributes({ variant, flat: flat || undefined })}
-    >
+    <div {...rootProps}>
       <SurfaceDepthProvider value={depth}>{children}</SurfaceDepthProvider>
     </div>
   );
@@ -125,6 +155,17 @@ function CardDelta({ className, tone = "neutral", ...rest }: CardDeltaProps) {
 }
 CardDelta.displayName = "Card.Delta";
 
+export type CardMetaProps = SpanProps;
+
+/**
+ * The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; it sits at the
+ * bottom of the tile, so tiles in a row line their meta up.
+ */
+function CardMeta({ className, ...rest }: CardMetaProps) {
+  return <span className={cx(textRole.caption, styles.meta, className)} {...rest} />;
+}
+CardMeta.displayName = "Card.Meta";
+
 export type CardListProps = React.HTMLAttributes<HTMLUListElement> & {
   ref?: React.Ref<HTMLUListElement>;
 };
@@ -155,6 +196,7 @@ export const Card = {
   Label: CardLabel,
   Value: CardValue,
   Delta: CardDelta,
+  Meta: CardMeta,
   List: CardList,
   ListItem: CardListItem,
 };

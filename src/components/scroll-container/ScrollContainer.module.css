@@ -56,12 +56,24 @@
   overflow: auto;
 }
 
+/* Content that fits along the scroll axis (`data-fits`, see `useFitFlag`): clipped, not a scroller,
+   so the browser never composites a layer for a region that cannot scroll. */
+.root[data-fits] {
+  overflow: hidden;
+}
+
 .overscrollContain {
   overscroll-behavior: contain;
 }
 
 .overscrollNone {
   overscroll-behavior: none;
+}
+
+/* The kit keeps the visible position itself (`anchor="end"`, `onReachStart`): the browser's own
+   scroll anchoring would correct the same change a second time. */
+.root[data-anchor] {
+  overflow-anchor: none;
 }
 
 .scrollbarHidden {
@@ -80,6 +92,28 @@
  * a zero-depth fade. The mask follows the scroll position itself — nothing animates (foundation
  * §7, rule 1). Mask is alpha-only: any opaque color works.
  */
+/* Read only by the region's own mask: not inherited, so the depth written on every scroll frame
+   restyles the region alone, never the content inside it. */
+@property --edge-start {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --edge-end {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --fade-start {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --fade-end {
+  syntax: "*";
+  inherits: false;
+}
+
 .root[data-fade] {
   --fade-start: 0px;
   --fade-end: 0px;

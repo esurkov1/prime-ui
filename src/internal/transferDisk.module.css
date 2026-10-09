@@ -1,0 +1,120 @@
+/*
+ * The transfer disk (`transferDisk.tsx`): the one look of a transfer in the kit, both ways. A round
+ * disk (`roundButton`) with the share as a ring along its inner edge (`progressRing` with a track):
+ * a 32% track and a solid arc in the disk's glyph colour, clockwise from 12 o'clock, 7.5% of the
+ * disk at every size. Looks: `shade` — the media shade with backdrop blur (over a picture, a video,
+ * a circle, a file's tile); `solid` — the accent disk of a voice message's play disk
+ * (`roundButton` `solid`, recoloured by an outgoing bubble). A failure turns either danger and hides the
+ * ring; `remote` carries the download arrow without a ring; done, the disk fades and shrinks to
+ * 0.9 (`fast`). Sizes: `l` — control `l`, `xl` — control `xl` (a file's tile).
+ *
+ *   .overlay  the disk centred over its host's box
+ *   .disk     the disk and its ring
+ */
+
+/* The share: one number on the ring, gliding between the values the host writes. */
+@property --transfer-progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.disk {
+  --transfer-disk-size: var(--prime-control-l-height);
+
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--transfer-disk-size);
+  block-size: var(--transfer-disk-size);
+  border-radius: var(--prime-radius-full);
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.disk[data-size="xl"] {
+  --transfer-disk-size: var(--prime-control-xl-height);
+}
+
+.disk[data-state="done"] {
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+
+/* On the play disk the disk under it is the same: it only fades, the play glyph comes back. */
+.disk[data-look="solid"][data-state="done"] {
+  transform: none;
+}
+
+/* The control is the disk itself: its hover, press, focus ring and touch area follow the circle. */
+.button {
+  --round-size: var(--transfer-disk-size);
+
+  pointer-events: auto;
+}
+
+.disk[data-look="shade"] .button {
+  -webkit-backdrop-filter: blur(var(--prime-space-2));
+  backdrop-filter: blur(var(--prime-space-2));
+}
+
+.button:not(button) {
+  cursor: default;
+}
+
+/* The ring along the disk's inner edge: a faint track, the arc in the disk's glyph colour. */
+.ring {
+  /* One proportion at every size: 3px on the `l` disk, 3.6px on the `xl` one. */
+  --progress-ring-width: calc(var(--transfer-disk-size) * 0.075);
+  --progress-ring-value: var(--transfer-progress);
+  --progress-ring-track: color-mix(in srgb, currentColor 32%, transparent);
+
+  color: var(--prime-color-media-shade-fg);
+  transition:
+    --transfer-progress var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* On the play disk the ring is drawn in the play glyph's colour. */
+.disk[data-look="solid"] .ring {
+  color: var(--prime-color-accent-fg);
+}
+
+/* No share known: a quarter arc turns around the track (as the kit Spinner turns). */
+.disk[data-indeterminate] .ring {
+  animation: transferDiskTurn calc(var(--prime-motion-loop) * 3) linear infinite;
+}
+
+@keyframes transferDiskTurn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* A failure or a content not fetched yet has no share to show: the disk and its glyph say it. */
+.disk:is([data-state="failed"], [data-state="remote"]) .ring {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disk,
+  .ring {
+    transition: none;
+  }
+
+  /* Slower, never still: the turn is the only sign that something is going on. */
+  .disk[data-indeterminate] .ring {
+    animation-duration: calc(var(--prime-motion-loop) * 6);
+  }
+}

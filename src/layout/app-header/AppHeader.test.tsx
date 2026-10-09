@@ -113,4 +113,55 @@ describe("AppHeader", () => {
     await userEvent.tab();
     expect(screen.getByRole("button", { name: "Создать" })).toHaveFocus();
   });
+
+  it('Title as="h1" is the page heading; the description stays out of its name', () => {
+    render(
+      <AppHeader.Root>
+        <AppHeader.Start>
+          <AppHeader.Title as="h1">
+            Сделки
+            <AppHeader.Description>Отдел продаж · октябрь</AppHeader.Description>
+          </AppHeader.Title>
+        </AppHeader.Start>
+      </AppHeader.Root>,
+    );
+    const heading = screen.getByRole("heading", { level: 1 });
+    expect(heading).toHaveAccessibleName("Сделки");
+    expect(screen.getByText("Отдел продаж · октябрь")).toBeInTheDocument();
+    expect(heading).not.toContainElement(screen.getByText("Отдел продаж · октябрь"));
+  });
+
+  it("Title is no heading by default", () => {
+    render(
+      <AppHeader.Root>
+        <AppHeader.Title>Сделки</AppHeader.Title>
+      </AppHeader.Root>,
+    );
+    expect(screen.queryByRole("heading")).toBeNull();
+  });
+
+  it("the page tools are the second row: after the title row in the DOM and the Tab order", async () => {
+    const { container } = render(
+      <AppHeader.Root>
+        <AppHeader.Start>
+          <AppHeader.Title as="h1">Сделки</AppHeader.Title>
+        </AppHeader.Start>
+        <AppHeader.Tools data-testid="tools">
+          <button type="button">Период</button>
+        </AppHeader.Tools>
+        <AppHeader.Actions>
+          <button type="button">Уведомления</button>
+        </AppHeader.Actions>
+      </AppHeader.Root>,
+    );
+    const header = container.querySelector("header") as HTMLElement;
+    const [row, tools] = Array.from(header.children);
+    expect(tools).toBe(screen.getByTestId("tools"));
+    expect(row).toContainElement(screen.getByRole("button", { name: "Уведомления" }));
+    expect(row).not.toContainElement(screen.getByRole("button", { name: "Период" }));
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "Уведомления" })).toHaveFocus();
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "Период" })).toHaveFocus();
+  });
 });

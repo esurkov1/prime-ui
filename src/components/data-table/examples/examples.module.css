@@ -69,6 +69,15 @@
   min-width: 0;
 }
 
+/* fill-height: a panel of a fixed height (the rest of a page, a pane) the table fills. */
+.fillStage {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(var(--prime-space-24) * 4);
+  min-width: 0;
+}
+
 /* 320 px: the smallest supported viewport. */
 .narrow {
   width: min(100%, calc(var(--prime-space-20) * 4));

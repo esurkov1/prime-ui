@@ -5,6 +5,10 @@
  * (`base` · `emphasized`), one sixth of `--prime-motion-stagger` apart. Letters are one-shot
  * keyframes; a change during a change restarts from what is on screen. Reduced motion collapses
  * the durations (and the component skips the morph entirely).
+ *
+ * The letters animate only `transform` and `opacity`, so they run on the compositor; the blur that
+ * bridges the two words is one animation per layer (a blur cannot be composited, and per letter it
+ * would restyle every letter on every frame).
  */
 .root {
   display: inline-block;
@@ -33,6 +37,19 @@
   inset-inline-start: 0;
   display: inline-flex;
   pointer-events: none;
+  animation-fill-mode: both;
+}
+
+.layerOut {
+  animation-name: primeMorphBlurOut;
+  animation-duration: var(--prime-motion-duration-fast);
+  animation-timing-function: var(--prime-motion-easing-exit);
+}
+
+.layerIn {
+  animation-name: primeMorphBlurIn;
+  animation-duration: var(--prime-motion-duration-base);
+  animation-timing-function: var(--prime-motion-easing-emphasized);
 }
 
 .letter {
@@ -59,7 +76,6 @@
   to {
     opacity: 0;
     transform: translateY(-0.5em);
-    filter: blur(var(--prime-motion-blur));
   }
 }
 
@@ -67,6 +83,17 @@
   from {
     opacity: 0;
     transform: translateY(0.5em);
+  }
+}
+
+@keyframes primeMorphBlurOut {
+  to {
+    filter: blur(var(--prime-motion-blur));
+  }
+}
+
+@keyframes primeMorphBlurIn {
+  from {
     filter: blur(var(--prime-motion-blur));
   }
 }

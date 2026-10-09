@@ -1,0 +1,120 @@
+/*
+ * Message.Media — a photo, a video or an album as a tiled grid. Every box is final before
+ * anything loads (no layout shift): the root's width is the media cap (× the ratio of a lone
+ * portrait) within 85% of the message row (the row is a size container); a row's height is its
+ * aspect ratio; a tile's width share is its own ratio. Nothing is measured.
+ *
+ * The root is the positioned box of the message's meta pill (`overlay`). It draws no backing and
+ * no radius: alone in a message the shell rounds and clips it; with a caption the bubble does. An
+ * album paints the neutral surface of an incoming message (its root takes `data-depth`) behind the
+ * tiles, so the thin gaps are neutral grey in both directions — never the outgoing fill.
+ *
+ * Over a tile: the play mark and the length of a video (media pills), the open button (focus ring
+ * inside: the tile reaches the edges), and a transfer either way — the shared disk in the middle
+ * with the progress ring along its edge (`internal/transferDisk` `TransferOverlay`): pressing it
+ * cancels, a failure turns it danger with a retry, a tile not fetched yet carries the download
+ * arrow. The picture dims under it until the transfer is done.
+ */
+.media {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--prime-border-width) * 2);
+  inline-size: min(calc(var(--prime-message-media-max-height) * var(--media-width, 1)), 85cqi);
+}
+
+.media[data-album] {
+  background: var(--prime-color-layer-current);
+}
+
+/* The row's height comes from its aspect ratio alone: tiles fill it, never size it. */
+.row {
+  display: flex;
+  aspect-ratio: var(--row-ratio);
+  gap: calc(var(--prime-border-width) * 2);
+  min-width: 0;
+}
+
+.cell {
+  position: relative;
+  flex-basis: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* Press: the tile that opens the viewer gives in a little. */
+.cell:has(> .open:active) {
+  transform: scale(var(--prime-motion-press-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell:has(> .open:active) {
+    transform: none;
+  }
+}
+
+/* The Thumbnail fills its cell; a tile has square corners (the shell rounds the outer ones). */
+.cell > .thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.play {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: auto;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* A transfer not done yet: the picture dims under the disk, the play mark gives the middle up. */
+.cell:has(> .transfer[data-covered]) > .thumb {
+  opacity: 0.6;
+}
+
+.cell:has(> .transfer[data-covered]) > .play {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell > .thumb,
+  .play {
+    transition: none;
+  }
+}
+
+.length {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: var(--prime-space-2);
+  inset-inline-start: var(--prime-space-2);
+}
+
+.open {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.open:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.transfer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}

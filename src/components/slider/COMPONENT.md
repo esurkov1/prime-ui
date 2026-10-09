@@ -46,6 +46,8 @@ Slider                 field frame (FieldFrame): className, ref, rest
 | `value` | `number` | — | Controlled value; clamped to `min`…`max`. |
 | `defaultValue` | `number` | `min` | Initial value when uncontrolled. |
 | `onValueChange` | `(value: number) => void` | — | Called with the new number while dragging and on every key step. |
+| `onCommit` | `(value: number) => void \| Promise<void>` | — | The value the person settled on: once when the thumb is released or after a key moved it, only when it differs from the last commit. Save here, not on every `onValueChange` step. Return the save's promise: the thumb dims and the input has `aria-busy` until it settles (only the latest commit's answer counts); reject — the value glides back to the last saved one (through `onValueChange` when controlled). |
+| `name` | `string` | — | Name of the range input, submitted with a form. |
 | `min` | `number` | `0` | Lower bound. |
 | `max` | `number` | `100` | Upper bound. |
 | `step` | `number` | `1` | Step of the keyboard and of the snapping; fractions allowed. |
@@ -80,7 +82,7 @@ Everything derives from the tier track thickness T (`--prime-control-<tier>-trac
 | `l` | 7px track, 31.5×21 thumb, 14/20 label | spacious settings pages | |
 | `xl` | 8px track, 36×24 thumb, 14/20 label | touch-first screens | |
 
-**Sizes:** the slider fills its container and never gets narrower than 192px (like a native range); the tier changes the track, the thumb and the label / value text. Use the same tier as the other fields of the form.
+**Sizes:** the slider fills its container; the tier changes the track, the thumb and the label / value text. Use the same tier as the other fields of the form.
 
 ### tone
 | Value | Looks like | Use when | Default |
@@ -104,6 +106,7 @@ Tone never carries meaning alone: the label names what the value means.
 - `showValue` + `formatValue` for any value with a unit; `formatValue` alone only changes `aria-valuetext`.
 - Neither `label` nor `aria-label` → forbidden (unnamed control).
 - A paired number input with `showValue` → redundant; drop `showValue`.
+- `onValueChange` for a live preview, `onCommit` to save: it fires once on pointer release or key release, only when the value differs from the last commit.
 
 ## States
 | State | Driven by | DOM |
@@ -114,8 +117,10 @@ Tone never carries meaning alone: the label names what the value means.
 | pressed | dragging | clear glass: the thumb grows to 125%, the rounded end of the fill shows through |
 | focus-visible | keyboard | outer focus ring around the thumb |
 | disabled | `disabled` | `data-disabled="true"` on the root, native `disabled`; muted track and fill, flat thumb, `cursor: not-allowed` |
+| saving | `onCommit` returned a pending promise | `data-pending="true"` on the root, `aria-busy` on the input; the thumb quiets to 0.6 (`fast`, both ways); the slider stays usable — only the latest commit's answer counts |
+| refused | that promise rejected | the value goes back to the last saved one (`onValueChange` when controlled); `data-settling` glides the thumb and the fill there (`base`, emphasized) |
 
-Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back to `min`).
+Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back to `min`). Both are clamped to `min`…`max`. `onCommit` reports the settled value after a drag or a key step.
 
 ## Layout & spacing
 - Fills its container; place it in a grid column to limit the width.
@@ -138,6 +143,7 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 - `label` is a `<label htmlFor>`; otherwise `aria-label` is required.
 - `formatValue` sets `aria-valuetext`, so screen readers announce the unit; the visual `<output>` is `aria-hidden`.
 - `aria-describedby` on the input: your ids + the hint or the error; `aria-invalid` when invalid.
+- While a commit is saved the input has `aria-busy`; say why a refused value went back with `error`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -156,6 +162,7 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 | [value-format.tsx](examples/value-format.tsx) | Units in the shown value that are also read by screen readers — `formatValue`, `showValue`. |
 | [range-step.tsx](examples/range-step.tsx) | Own bounds and a coarse or fractional step; a slider without a visible label — `min`, `max`, `step`, `aria-label`. |
 | [hint-and-error.tsx](examples/hint-and-error.tsx) | A slider framed like every field: required marker, a hint, and an error in its place — `required`, `hint`, `error`, `optional`. |
+| [autosave.tsx](examples/autosave.tsx) | A setting saved once the thumb is let go, not on every step: the thumb waits dimmed while it saves, and a value the server refuses glides back — `onCommit`, `hint`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value and shares it with a number field for exact entry — `value`, `onValueChange`. |
 
 ## Mistakes
@@ -163,6 +170,7 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 - A slider for an exact amount → use `Input type="number"`.
 - `tone="danger"` as the only signal of a dangerous value → say it in the label.
 - No `label` and no `aria-label` → the control has no name.
+- Saving a setting in `onValueChange` → it fires on every step of a drag; save in `onCommit`.
 
 ## Related
 - **Built from:** the field frame — [Label](../label/COMPONENT.md) (`label`) and [Hint](../hint/COMPONENT.md) (`hint`, `error`)

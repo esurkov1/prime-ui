@@ -178,64 +178,33 @@
 }
 
 /*
- * ---- Trailing action (clear): a segment ----
- * Full field height, flush with the end edge; the icon is centred with padX on both sides, so the
- * icon → edge distance stays padX (foundation §6) while the whole segment is the hit area and takes
- * the hover wash. The usual field gap stays before it, so the wash never touches the text. The
- * field drops its end padding.
+ * ---- Trailing actions (clear, copy, reveal, `Input.Action`): segments ----
+ * The segment look comes from `internal/FieldAction`. Segments sit after the value in source
+ * order, edge to edge; the usual field gap stays before the first, so the wash never touches the
+ * text. The field drops its end padding.
  */
-.wrapper:has(> .action) {
+.wrapper:has(> [data-field-action]) {
   padding-inline-end: 0;
 }
 
-.action {
+.wrapper > [data-field-action] {
   order: 4;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-self: stretch;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: calc(var(--field-icon) + 2 * var(--field-px));
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--prime-color-text-muted);
-  cursor: pointer;
-  transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-.action > svg {
-  display: block;
-  width: calc(var(--field-icon) - var(--prime-space-1));
-  height: calc(var(--field-icon) - var(--prime-space-1));
+/* Every segment after the first one closes the gap: the segments read as one row. */
+.wrapper > [data-field-action] ~ [data-field-action] {
+  margin-inline-start: calc(-1 * var(--field-gap));
 }
 
-@media (hover: hover) {
-  .action:hover {
-    background: var(--prime-color-fill-subtle);
-    color: var(--prime-color-text-primary);
-  }
-}
-
-.action:active {
-  background: var(--prime-color-fill-subtle-active);
-}
-
-.action:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
-}
-
-.action:disabled,
-.wrapper:has(input:disabled) .action {
+.wrapper:has(input:disabled) > [data-field-action] {
   color: var(--prime-color-text-disabled);
   background: transparent;
   cursor: not-allowed;
+}
+
+/* ---- Commit status (`onCommit`): before the trailing icon and actions ---- */
+.status {
+  order: 2;
 }
 
 /* ---- Strength meter (`strength`) ---- */

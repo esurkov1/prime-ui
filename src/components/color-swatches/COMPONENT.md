@@ -12,7 +12,7 @@
 
 ## When not to use
 - A compact color next to a field or in a dense list row (one trigger per row) → use [ColorPresets](../color-picker/COMPONENT.md) (trigger + popover palette).
-- A free color (any hex, eyedropper, channels) → use [ColorPicker](../color-picker/COMPONENT.md).
+- A free color (any hex, eyedropper, channels) → use [ColorField](../color-field/COMPONENT.md) in a form, [ColorPicker](../color-picker/COMPONENT.md) for a panel of its own.
 - Choosing a mode or a value that is not a color → use [SegmentedControl](../segmented-control/COMPONENT.md) or [Radio](../radio/COMPONENT.md).
 
 ## Import
@@ -42,7 +42,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | `defaultValue` | `string \| null` | `null` | Initial color when uncontrolled. |
 | `onValueChange` | `(value: string \| null) => void` | — | Called with the preset `value` (as written in `presets`) or `null`. |
 | `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches in order: `{ value, label }`; the label is the swatch's accessible name and tooltip. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = the tier gap; label and hint follow it. Without it the tier of its host, else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the swatches: height = control height − 8 (20 · 24 · 28 · 32 · 40), gap = the tier gap; the width follows the column. The label and hint keep the tier of the host (a form, a panel), else `m`. Without it the swatches take the host tier too. |
 | `label` | `ReactNode` | — | Label above the swatches; names the radiogroup (`aria-labelledby`). |
 | `required` | `boolean` | — | Red `*` after the label and `aria-required` on the group. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
@@ -70,7 +70,7 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | `l` | Swatch 32, gap 8, radius 8 | Spacious settings pages | |
 | `xl` | Swatch 40, gap 12, radius 8 | Touch-first layouts | |
 
-**Sizes:** match the size of the form around it: an `m` form uses `m` swatches (28), which sit on the same 4px rhythm as `m` fields.
+**Sizes:** `size` sets the swatches only; the label and the hint keep the tier of the form around (else `m`), so larger swatches never enlarge the label. Without `size` the swatches take the host tier: an `m` form gets `m` swatches (28) on the same 4px rhythm as `m` fields.
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -87,16 +87,16 @@ ColorSwatches                 field frame: label → swatches → hint | error
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| selected | `value` / `defaultValue` | `aria-checked="true"`, `data-state="checked"` on the radio; the check mark (light or dark by color contrast) scales in from half size (`base` · emphasized) and leaves faster (`fast` · exit); no ring — the check is the selection |
+| selected | `value` / `defaultValue` | `aria-checked="true"`, `data-state="checked"` on the radio; the check mark (light or dark by color contrast) draws in and grows from 0.6 (`base` · emphasized) and retracts faster (`fast` · exit); no ring — the check is the selection |
 | hover | pointer | the swatch scales to 1.08 (fine pointers only) |
 | focus-visible | keyboard | focus ring outside the swatch |
 | invalid | `invalid` / `error` | `aria-invalid`, `data-invalid` on the group; the inner edge of every swatch turns `danger-border`; the control shakes once when an error arrives (`data-shake` on the frame) |
-| disabled | `disabled` | native `disabled` on every radio, `aria-disabled` and `data-disabled` on the group |
+| disabled | `disabled` | native `disabled` on every radio, `data-disabled` on the group; the arrow keys do nothing |
 
 Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 
 ## Layout & spacing
-- The swatches take the container width: each one stretches across its column (the height stays the tier's) and a row wraps only when they no longer fit; no column count to set. In a content-sized container they stand in one row at the tier size.
+- The swatches take the container width in equal columns: each one stretches across its column (the height stays the tier's). A row wraps only when they no longer fit, and then the swatches split evenly over the rows (16 → 8 + 8, never 14 + 2); no column count to set. In a content-sized container they stand in one row at the tier size.
 - The keyboard focus ring sits outside the swatches; kit hosts (Modal / Drawer body, panels, cards) already keep `--prime-focus-space` padding, so the ring is never clipped. In your own `overflow` container, keep that padding.
 - Label → swatches and swatches → hint use the tier `label-gap` / `hint-gap`; field → field 20.
 
@@ -128,9 +128,9 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | The kit palette inline under a field label, one color chosen — `label`, `defaultValue`. |
-| [sizes.tsx](examples/sizes.tsx) | Every size, swatch 20 to 40 px with the tier gap — `size`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size: the swatch height 20 to 40 px with the tier gap, the label stays the form's — `size`. |
 | [states.tsx](examples/states.tsx) | A default palette next to an invalid and a disabled one — `invalid`, `disabled`. |
-| [wrapping.tsx](examples/wrapping.tsx) | In a narrow column the swatches wrap by themselves and the arrows move by the visual rows. |
+| [wrapping.tsx](examples/wrapping.tsx) | In a narrow column the swatches wrap by themselves into even rows and the arrows move by the visual rows. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the color, «no color» included, and names it in the hint — `value`, `onValueChange`, `allowEmpty`. |
 | [in-form.tsx](examples/in-form.tsx) | A calendar event form: the color is submitted by `name` and required on save: submitting an empty title or no color shakes the field, picking or typing clears the error — `name`, `required`, `error`. |
 
@@ -138,8 +138,9 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 - `<ColorSwatches.Root>` → the component is a single export: `<ColorSwatches />`.
 - A visible heading next to the swatches made by hand → pass `label`.
 - Presets without names → every preset needs a `label`; it is the swatch's accessible name.
+- A larger `size` to make the swatches fill a wide field → they already fill it; `size` changes only their height.
 - Dozens of presets → use ColorPicker.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), `Icon` (check mark)
-- **See also:** [ColorPicker](../color-picker/COMPONENT.md) (`ColorPresets`, `ColorPicker.Swatches`), [Radio](../radio/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
+- **See also:** [ColorField](../color-field/COMPONENT.md), [ColorPicker](../color-picker/COMPONENT.md) (`ColorPresets`, `ColorPicker.Swatches`), [Radio](../radio/COMPONENT.md)

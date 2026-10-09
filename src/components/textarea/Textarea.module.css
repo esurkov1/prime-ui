@@ -5,13 +5,13 @@
  */
 .root {
   --textarea-padding-y: calc((var(--field-h) - var(--field-input-lh)) / 2);
-  /* Minimum content height: three lines. */
-  --textarea-inner-min-height: calc(var(--field-input-lh) * 3);
   width: 100%;
 }
 
 /* ── Field box ── */
 .control {
+  /* Minimum content height: `rows` lines (`--textarea-rows`, three by default). */
+  --textarea-inner-min-height: calc(var(--field-input-lh) * var(--textarea-rows, 3));
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -24,6 +24,51 @@
 
 .control[data-readonly="true"] {
   cursor: default;
+}
+
+/*
+ * ── Edge: commit status and actions in the top end corner ──
+ * The text column and the edge sit side by side; the edge reaches the box's top and end edges so
+ * its button segments are full field height (internal/FieldAction), flush with the corner like the
+ * Input's trailing segments. The box clips their wash to its radius.
+ */
+.control:has(> .edge) {
+  flex-direction: row;
+  align-items: flex-start;
+  padding-inline-end: 0;
+  overflow: hidden;
+}
+
+.body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-self: stretch;
+  min-width: 0;
+}
+
+.edge {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: var(--field-h);
+  margin-block-start: calc(-1 * var(--textarea-padding-y));
+  margin-inline-start: var(--field-gap);
+}
+
+/* The commit status keeps the field padding to the end edge, or the field gap to a segment. */
+.edge > [data-commit] {
+  margin-inline-end: var(--field-px);
+}
+
+.edge > [data-commit]:has(~ [data-field-action]) {
+  margin-inline-end: var(--field-gap);
+}
+
+.control:has(textarea:disabled) .edge > [data-field-action] {
+  color: var(--prime-color-text-disabled);
+  background: transparent;
+  cursor: not-allowed;
 }
 
 /* ── Auto-resize wrapper (CSS grid mirror trick) ── */
@@ -84,6 +129,21 @@
   grid-area: 1 / 1 / 2 / 2;
   resize: none;
   overflow: hidden;
+}
+
+/* maxRows: the mirror and the textarea stop at N lines; past them the textarea scrolls inside. */
+.control[data-capped="true"] .autoResize::after,
+.control[data-capped="true"] .textareaAutoResize {
+  max-height: calc(var(--field-input-lh) * var(--textarea-max-rows));
+}
+
+.control[data-capped="true"] .autoResize::after {
+  overflow: hidden;
+}
+
+.control[data-capped="true"] .textareaAutoResize {
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .textarea:not(.textareaAutoResize) {

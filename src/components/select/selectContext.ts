@@ -11,8 +11,10 @@ export type SelectLabels = {
   empty: string;
   /** Second line of the empty state while searching; `""` hides it. */
   emptyHint: string;
-  /** Status row while `loading`. */
+  /** Announced while `loading` or `loadingMore`. */
   loading: string;
+  /** The retry button of the load error (`onRetry`). */
+  retry: string;
   /** Tooltip of the clear segment (`clearable`). */
   clear: string;
   /** Muted marker after the label when `optional`. */
@@ -79,6 +81,13 @@ export type SelectContextValue = {
   clear: () => void;
   clearable: boolean;
   loading: boolean;
+  loadingMore: boolean;
+  hasMore: boolean;
+  onLoadMore: (() => void | Promise<void>) | undefined;
+  loadError: React.ReactNode;
+  onRetry: (() => void) | undefined;
+  /** The kit filters the items by the query; `false` for results from a server. */
+  filter: boolean;
   isOpen: boolean;
   setOpen: (open: boolean) => void;
   /** The highlighted option; items subscribe to their own slice of it. */

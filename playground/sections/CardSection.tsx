@@ -26,7 +26,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "variants",
       description:
-        "Шаблоны KPI: плашка с иконкой и значением, бейдж со значением в строке шапки и крупное значение с изменением — `variant`, `Card.Delta`.",
+        "Шаблоны KPI: плашка с иконкой и значением, бейдж со значением в строке шапки и крупное значение с изменением и справочной строкой — `variant`, `Card.Delta`, `Card.Meta`.",
     },
     {
       scenario: "kpi-media",
@@ -38,7 +38,13 @@ export const page: ComponentPageConfig = {
       scenario: "panel-chart",
       title: "Виджет с графиком",
       description:
-        "Шапка с переключателем периода, строка итога и график от края до края — `Card.Header`, `Card.Media`.",
+        "Шапка с коротким описанием и переключателем периода, строка итога и график от края до края — `Card.Header`, `Card.Description`, `Card.Media`.",
+    },
+    {
+      scenario: "interactive",
+      title: "Карточка-ссылка",
+      description:
+        "Карточки целиком ведут в свои отчёты: одна остановка Tab, подъём при наведении, нажатие и кольцо фокуса — `asChild`.",
     },
     {
       scenario: "content-templates",
@@ -59,8 +65,15 @@ export const page: ComponentPageConfig = {
   ],
   api,
   accessibility: {
-    keyboard: [],
+    keyboard: [
+      {
+        keys: "Tab",
+        action: "Карточка с `asChild` — одна остановка: фокус на ссылке или кнопке целиком.",
+      },
+      { keys: "Enter", action: "Открывает ссылку или нажимает кнопку карточки с `asChild`." },
+    ],
     aria: [
+      "С `asChild` карточка — сама ссылка или кнопка: её имя складывается из текста частей; внутри не должно быть других интерактивных элементов.",
       '`Card.Root` — обычный `<div>`; `role="region"` и `aria-labelledby` задавайте, только если блок заслуживает ориентира.',
       '`Card.Title` — `<h3>`; прямо под заголовком страницы передайте `as="h2"`, чтобы не пропустить уровень.',
       "Декоративные иконки в `Card.Icon` и обложки в `Card.Media` — `aria-hidden`; контролам в `Card.Header` нужны свои имена.",

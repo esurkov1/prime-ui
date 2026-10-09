@@ -4,16 +4,20 @@ import { Badge } from "@/components/badge/Badge";
 import { Crossfade } from "@/components/crossfade/Crossfade";
 import { DragControllerContext, useDragController } from "@/components/dnd/context";
 import { Dnd } from "@/components/dnd/Dnd";
+import { motionTiming } from "@/components/dnd/useFlipList";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
+import { Spinner } from "@/components/spinner/Spinner";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { prefersReducedMotion } from "@/hooks/usePresence";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
-import palette from "@/internal/palette.module.css";
 import type { PaletteColor } from "@/internal/states";
+import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Kanban.module.css";
@@ -26,10 +30,15 @@ export type KanbanColumn = {
   title: string;
   /** A short muted line under the heading: what the column holds or its rule. */
   description?: string;
-  /** A palette dot before the heading: tells the columns apart at a glance. */
+  /** The stage's palette hue, on its count: tells the columns apart at a glance. */
   color?: PaletteColor;
   /** Most cards the column holds (a WIP limit): when full it refuses cards from other columns. */
   limit?: number;
+  /**
+   * The column holds its place when columns are reordered (a system stage: the first «Новые», the
+   * last «Закрыто»): a lock stands where its grip would, and no column moves past it.
+   */
+  locked?: boolean;
 };
 
 /** Where every card stands: column id → card ids in their order. */
@@ -54,14 +63,16 @@ export type KanbanLabels = {
   empty: string;
   /** Hint under it while cards can be dropped. */
   emptyHint: string;
-  /** Live region: a card moved to another column from the keyboard. */
-  moved: string;
-  /** Live region: the next column refused the card (full or `canDrop`). */
-  refused: string;
+  /** Why a full column refuses a card (spoken, and shown under the carried card): `{column}`, `{limit}`. */
+  full: string;
   /** Name of the grip that moves a column: `{column}`. */
   moveColumn: string;
-  /** Live region: a column moved with the keyboard: `{column}`, `{position}`, `{total}`. */
-  columnMoved: string;
+  /** A column as the live region names it when it is carried or moved: `{column}`. */
+  column: string;
+  /** Spoken when a card's move is refused (its `onValueChange` promise rejected): `{label}`. */
+  moveFailed: string;
+  /** Spoken when a column's move is refused (its `onColumnOrderChange` promise rejected): `{column}`. */
+  columnMoveFailed: string;
 };
 
 export const defaultKanbanLabels: KanbanLabels = {
@@ -69,26 +80,20 @@ export const defaultKanbanLabels: KanbanLabels = {
   countLimit: "Карточек: {count} из {limit}",
   empty: "Нет карточек",
   emptyHint: "Перетащите сюда карточку",
-  moved: "{label}: «{column}», позиция {position} из {total}",
-  refused: "{label}: колонка «{column}» не принимает карточку",
+  full: "Колонка «{column}» заполнена ({limit})",
   moveColumn: "Переместить колонку «{column}»",
-  columnMoved: "Колонка «{column}»: позиция {position} из {total}",
+  column: "Колонка «{column}»",
+  moveFailed: "Не удалось переместить «{label}», карточка вернулась на место",
+  columnMoveFailed: "Не удалось переместить колонку «{column}», она вернулась на место",
 };
 
 const SKELETON_CARDS = [3, 2, 1];
-const ITEM_SHORTCUTS = "Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight";
 const COLUMN_SHORTCUTS = "Alt+ArrowLeft Alt+ArrowRight";
 
-/** Whether Alt + this arrow points toward the start of the row, in the writing direction. */
-function towardStart(event: React.KeyboardEvent<HTMLElement>): boolean {
-  // Columns follow the writing direction: in right-to-left the next column is on the left.
-  const rtl = event.currentTarget.closest("[dir]")?.getAttribute("dir") === "rtl";
-  return event.key === (rtl ? "ArrowRight" : "ArrowLeft");
-}
-
 type BoardContextValue = {
-  moveAcross: (id: string, direction: -1 | 1) => void;
   disabled: boolean;
+  /** Cards whose move the owner is still saving. */
+  pending: ReadonlySet<string>;
 };
 
 const BoardContext = React.createContext<BoardContextValue | null>(null);
@@ -114,22 +119,36 @@ export type KanbanRootProps<T> = Omit<
   value?: KanbanValue;
   /** Initial card ids per column (uncontrolled). */
   defaultValue?: KanbanValue;
-  /** A card moved: the new placement first, then what moved. */
-  onValueChange?: (value: KanbanValue, move: KanbanMove) => void;
+  /**
+   * A card moved: the new placement first, then what moved. Return a promise to save on a server:
+   * the card stays in its new place, busy, until it settles; reject — it glides back.
+   */
+  onValueChange?: (value: KanbanValue, move: KanbanMove) => void | Promise<void>;
   /** Column ids in their order (controlled). */
   columnOrder?: readonly string[];
   /** Initial column ids in their order (uncontrolled). Defaults to the order of `columns`. */
   defaultColumnOrder?: readonly string[];
-  /** A column moved: the new order first, then what moved. */
-  onColumnOrderChange?: (order: readonly string[], move: KanbanColumnMove) => void;
+  /**
+   * A column moved: the new order first, then what moved. Return a promise to save on a server:
+   * the column stays in its new place, busy, until it settles; reject — it glides back.
+   */
+  onColumnOrderChange?: (order: readonly string[], move: KanbanColumnMove) => void | Promise<void>;
   /** A grip in every column header moves the column by pointer, touch and keyboard. */
   reorderableColumns?: boolean;
   /** Renders one card; return a `Kanban.Item`. */
   renderItem: (item: T) => React.ReactNode;
   /** Renders the trailing actions of a column header (add a card, a menu). */
   renderColumnActions?: (column: KanbanColumn) => React.ReactNode;
-  /** Refuses a card in a column (a workflow rule); the column turns `danger` before the release. */
-  canDrop?: (id: string, columnId: string) => boolean;
+  /**
+   * Renders the meta line under a column's title (a stage's figures: «12 сделок · 4,8 млн ₽»).
+   * It describes the column's list, like `description`.
+   */
+  renderColumnMeta?: (column: KanbanColumn) => React.ReactNode;
+  /**
+   * Refuses a card in a column (a workflow rule): `false`, or a string that says why — spoken and
+   * shown under the carried card. The column turns `danger` before the release.
+   */
+  canDrop?: (id: string, columnId: string) => boolean | string;
   /** `well`: every column is a filled well; `plain`: no wells, the cards and the header carry the column. */
   variant?: KanbanVariant;
   /** Columns show skeleton cards; the cards cross-fade in when it turns off. */
@@ -142,7 +161,8 @@ export type KanbanRootProps<T> = Omit<
 
 /**
  * A board of columns: cards move within and between columns by pointer, touch (a hold) and
- * keyboard (Alt + arrows). Mounts its own `Dnd.Root` unless one is already above it.
+ * keyboard (Alt + arrows, Dnd's linked lists). Mounts its own `Dnd.Root` unless one is already
+ * above it.
  */
 function KanbanRoot<T>(props: KanbanRootProps<T>) {
   const outer = React.useContext(DragControllerContext);
@@ -153,7 +173,79 @@ KanbanRoot.displayName = "Kanban.Root";
 
 const EMPTY_VALUE: KanbanValue = {};
 const getColumnId = (column: KanbanColumn) => column.id;
-const getColumnTitle = (column: KanbanColumn) => column.title;
+
+/** A card move: card `id` into column `to` in front of `beforeId` (`null` = last). */
+type CardChange = { id: string; to: string; beforeId: string | null };
+
+/** A column move: column `id` in front of `beforeId` (`null` = last). */
+type ColumnChange = { id: string; beforeId: string | null };
+
+/** `value` with a card move applied; the same object when it changes nothing. */
+function placeCard(value: KanbanValue, { id, to, beforeId }: CardChange): KanbanValue {
+  const from = Object.keys(value).find((column) => value[column]?.includes(id));
+  if (from === undefined) return value;
+  const next: Record<string, readonly string[]> = { ...value };
+  next[from] = (value[from] ?? []).filter((card) => card !== id);
+  const target = (next[to] ?? []).filter((card) => card !== id);
+  const before = beforeId === null ? -1 : target.indexOf(beforeId);
+  target.splice(before === -1 ? target.length : before, 0, id);
+  if (from === to && target.join("\n") === (value[to] ?? []).join("\n")) return value;
+  next[to] = target;
+  return next;
+}
+
+/** `order` with a column move applied; the same array when it changes nothing. */
+function placeColumn(order: readonly string[], { id, beforeId }: ColumnChange): readonly string[] {
+  const next = order.filter((column) => column !== id);
+  const before = beforeId === null ? -1 : next.indexOf(beforeId);
+  next.splice(before === -1 ? next.length : before, 0, id);
+  return next.join("\n") === order.join("\n") ? order : next;
+}
+
+const CARD_SELECTOR = "[data-kanban-item]";
+
+/**
+ * A refused card move glides back: the cards' boxes are read before the rollback is drawn, and every
+ * card that moved (into its old column or aside in either column) glides from where it was.
+ */
+function useCardGlide(board: React.RefObject<HTMLElement | null>) {
+  const from = React.useRef<Map<string, DOMRect> | null>(null);
+  const [tick, setTick] = React.useState(0);
+  const capture = React.useCallback(() => {
+    const root = board.current;
+    if (!root) return;
+    from.current = new Map(
+      Array.from(root.querySelectorAll<HTMLElement>(CARD_SELECTOR), (node) => [
+        node.dataset.kanbanItem ?? "",
+        node.getBoundingClientRect(),
+      ]),
+    );
+    setTick((value) => value + 1);
+  }, [board]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a capture is the trigger.
+  React.useLayoutEffect(() => {
+    const boxes = from.current;
+    from.current = null;
+    const root = board.current;
+    if (!boxes || !root || prefersReducedMotion()) return;
+    const timing = motionTiming("base");
+    // Every box first, then every glide: a read after a started glide would force a style pass.
+    const glides: [HTMLElement, number, number][] = [];
+    for (const node of root.querySelectorAll<HTMLElement>(CARD_SELECTOR)) {
+      const before = boxes.get(node.dataset.kanbanItem ?? "");
+      // `animate` is missing in jsdom.
+      if (!before || typeof node.animate !== "function") continue;
+      const now = node.getBoundingClientRect();
+      const dx = before.left - now.left;
+      const dy = before.top - now.top;
+      if (Math.abs(dx) >= 1 || Math.abs(dy) >= 1) glides.push([node, dx, dy]);
+    }
+    for (const [node, dx, dy] of glides) {
+      node.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], timing);
+    }
+  }, [tick, board]);
+  return capture;
+}
 
 function KanbanBoard<T>({
   columns,
@@ -169,6 +261,7 @@ function KanbanBoard<T>({
   reorderableColumns = false,
   renderItem,
   renderColumnActions,
+  renderColumnMeta,
   canDrop,
   variant = "well",
   loading = false,
@@ -179,23 +272,35 @@ function KanbanBoard<T>({
   ...rest
 }: KanbanRootProps<T>) {
   const labels = { ...defaultKanbanLabels, ...labelsProp };
-  const controller = useDragController();
   const kind = `kanban-${React.useId()}`;
   const columnKind = `${kind}-column`;
-  const rootRef = React.useRef<HTMLDivElement | null>(null);
-  const setRootRef = useMergedRefs<HTMLDivElement | null>(rootRef, ref);
-  // What a keyboard move carried (a card, or a column's grip): focus follows it once it is drawn.
-  const pendingFocus = React.useRef<string | null>(null);
+  const controller = useDragController();
+  const boardRef = React.useRef<HTMLDivElement | null>(null);
+  const rootRef = useMergedRefs(boardRef, ref);
+  const glideCards = useCardGlide(boardRef);
 
-  const [value, setValue] = useControllableState<KanbanValue>({
+  const [storedValue, setValue] = useControllableState<KanbanValue>({
     value: valueProp,
     defaultValue: defaultValue ?? EMPTY_VALUE,
   });
+  // Moves the owner is still saving are drawn ahead of its answer.
+  const cardChanges = usePendingChanges(storedValue, placeCard);
+  const value = cardChanges.shown;
+  const pendingCards = React.useMemo(
+    () => new Set(cardChanges.pending.map((change) => change.id)),
+    [cardChanges.pending],
+  );
 
-  const [order, setOrder] = useControllableState<readonly string[]>({
+  const [storedOrder, setOrder] = useControllableState<readonly string[]>({
     value: columnOrderProp,
     defaultValue: defaultColumnOrder ?? columns.map(getColumnId),
   });
+  const columnChanges = usePendingChanges(storedOrder, placeColumn);
+  const order = columnChanges.shown;
+  const pendingColumns = React.useMemo(
+    () => new Set(columnChanges.pending.map((change) => change.id)),
+    [columnChanges.pending],
+  );
   // The order names the columns it knows; any other column keeps its place in `columns` after them.
   const ordered = React.useMemo(() => {
     const known = new Map(columns.map((column) => [column.id, column]));
@@ -211,116 +316,80 @@ function KanbanBoard<T>({
     [items, getId],
   );
   const idsOf = (columnId: string) => (value[columnId] ?? []).filter((id) => byId.has(id));
-  const labelOf = (id: string) => {
-    const item = byId.get(id);
-    return item === undefined ? id : (getLabel?.(item) ?? id);
-  };
   const columnOf = (id: string) => ordered.find((column) => (value[column.id] ?? []).includes(id));
 
-  const accepts = (column: KanbanColumn, id: string) => {
+  const accepts = (column: KanbanColumn, id: string): boolean | string => {
     const ids = idsOf(column.id);
     if (ids.includes(id)) return true;
-    if (column.limit !== undefined && ids.length >= column.limit) return false;
+    if (column.limit !== undefined && ids.length >= column.limit) {
+      return formatLabel(labels.full, { column: column.title, limit: column.limit });
+    }
     return canDrop?.(id, column.id) ?? true;
   };
 
-  /** Puts card `id` into column `to` in front of `beforeId` (`null` = last). */
-  const place = (id: string, to: string, beforeId: string | null): KanbanMove | null => {
+  const labelOf = (id: string) => {
+    const item = byId.get(id);
+    return item !== undefined && getLabel ? getLabel(item) : id;
+  };
+
+  /**
+   * Puts card `id` into column `to` in front of `beforeId` (`null` = last). A promise from the
+   * owner keeps the card there, busy, until it settles; a rejection glides it back and says so.
+   */
+  const place = (id: string, to: string, beforeId: string | null) => {
     const from = columnOf(id)?.id;
-    if (from === undefined) return null;
-    const next: Record<string, readonly string[]> = { ...value };
-    next[from] = (value[from] ?? []).filter((card) => card !== id);
-    const target = (next[to] ?? []).filter((card) => card !== id);
-    const before = beforeId === null ? -1 : target.indexOf(beforeId);
-    const index = before === -1 ? target.length : before;
-    target.splice(index, 0, id);
-    if (from === to && target.join("\n") === (value[to] ?? []).join("\n")) return null;
-    next[to] = target;
-    const move = { id, from, to, index };
-    setValue(next);
-    onValueChange?.(next, move);
-    return move;
-  };
-
-  const moveAcross = (id: string, direction: -1 | 1) => {
-    if (disabled || loading) return;
-    const from = columnOf(id);
-    if (!from) return;
-    const target = ordered[ordered.indexOf(from) + direction];
-    if (!target) return;
-    if (!accepts(target, id)) {
-      controller.announce(
-        formatLabel(labels.refused, { label: labelOf(id), column: target.title }),
-      );
-      return;
+    if (from === undefined) return;
+    const change: CardChange = { id, to, beforeId };
+    const next = placeCard(value, change);
+    if (next === value) return;
+    const index = (next[to] ?? []).indexOf(id);
+    const outcome = onValueChange?.(next, { id, from, to, index });
+    const apply = () => setValue((current) => placeCard(current, change));
+    if (!isPromiseLike(outcome)) {
+      apply();
+      return outcome;
     }
-    // Same row in the next column, or its end.
-    const position = idsOf(from.id).indexOf(id);
-    const ids = idsOf(target.id);
-    const move = place(id, target.id, ids[position] ?? null);
-    if (!move) return;
-    pendingFocus.current = `[data-kanban-item="${CSS.escape(id)}"]`;
-    controller.announce(
-      formatLabel(labels.moved, {
-        label: labelOf(id),
-        column: target.title,
-        position: move.index + 1,
-        total: ids.length + 1,
-      }),
-    );
+    cardChanges.track(change, outcome, {
+      onResolve: apply,
+      onReject: () => {
+        glideCards();
+        controller.announce(formatLabel(labels.moveFailed, { label: labelOf(id) }));
+      },
+    });
+    return outcome;
   };
 
-  /** Puts column `id` in front of `beforeId` (`null` = last). */
-  const placeColumn = (id: string, beforeId: string | null): KanbanColumnMove | null => {
+  /** Puts column `id` in front of `beforeId` (`null` = last); a promise as for a card. */
+  const moveColumn = (id: string, beforeId: string | null) => {
     const current = ordered.map(getColumnId);
-    const next = current.filter((column) => column !== id);
-    const before = beforeId === null ? -1 : next.indexOf(beforeId);
-    const index = before === -1 ? next.length : before;
-    next.splice(index, 0, id);
-    if (next.join("\n") === current.join("\n")) return null;
-    const move = { id, index };
-    setOrder(next);
-    onColumnOrderChange?.(next, move);
-    return move;
+    const change: ColumnChange = { id, beforeId };
+    const next = placeColumn(current, change);
+    if (next === current) return;
+    const outcome = onColumnOrderChange?.(next, { id, index: next.indexOf(id) });
+    const apply = () => setOrder((stored) => placeColumn(stored, change));
+    if (!isPromiseLike(outcome)) {
+      apply();
+      return outcome;
+    }
+    const title = columns.find((column) => column.id === id)?.title ?? id;
+    // The glide back is the column list's own (Dnd rolls its drawn order back).
+    columnChanges.track(change, outcome, {
+      onResolve: apply,
+      onReject: () => controller.announce(formatLabel(labels.columnMoveFailed, { column: title })),
+    });
+    return outcome;
   };
-
-  const moveColumn = (id: string, direction: -1 | 1) => {
-    if (disabled || loading) return;
-    const index = ordered.findIndex((column) => column.id === id);
-    const to = index + direction;
-    const column = ordered[index];
-    if (!column || to < 0 || to >= ordered.length) return;
-    // Moving forward lands in front of the column after the one stepped over.
-    const beforeId = ordered[direction === -1 ? to : to + 1]?.id ?? null;
-    const move = placeColumn(id, beforeId);
-    if (!move) return;
-    pendingFocus.current = `[data-kanban-column="${CSS.escape(id)}"] [data-dnd-handle]`;
-    controller.announce(
-      formatLabel(labels.columnMoved, {
-        column: column.title,
-        position: move.index + 1,
-        total: ordered.length,
-      }),
-    );
-  };
-
-  React.useLayoutEffect(() => {
-    const selector = pendingFocus.current;
-    if (selector === null) return;
-    pendingFocus.current = null;
-    // A keyboard move: the ring must show even if the element was first focused by a click.
-    rootRef.current
-      ?.querySelector<HTMLElement>(selector)
-      ?.focus({ focusVisible: true } as FocusOptions);
-  });
 
   const locked = disabled || loading;
-  const context = { moveAcross, disabled: locked };
+  const context = React.useMemo(
+    () => ({ disabled: locked, pending: pendingCards }),
+    [locked, pendingCards],
+  );
 
   return (
     <BoardContext value={context}>
       <div
-        ref={setRootRef}
+        ref={rootRef}
         aria-busy={loading || undefined}
         {...rest}
         className={cx(styles.root, className)}
@@ -338,11 +407,9 @@ function KanbanBoard<T>({
             className={styles.columns}
             items={ordered}
             getId={getColumnId}
-            getLabel={getColumnTitle}
+            getLabel={(column) => formatLabel(labels.column, { column: column.title })}
             disabled={!reorderableColumns || locked}
-            onReorder={(id, beforeId) => {
-              placeColumn(id, beforeId);
-            }}
+            onReorder={(id, beforeId) => moveColumn(id, beforeId)}
             renderItem={(column, columnIndex) => (
               <KanbanColumnView
                 column={column}
@@ -355,13 +422,12 @@ function KanbanBoard<T>({
                 getId={getId}
                 getLabel={getLabel}
                 accepts={(id) => accepts(column, id)}
-                onReorder={(id, beforeId) => {
-                  place(id, column.id, beforeId);
-                }}
-                onMoveColumn={(direction) => moveColumn(column.id, direction)}
+                onReorder={(id, beforeId) => place(id, column.id, beforeId)}
                 renderItem={renderItem}
                 actions={renderColumnActions?.(column)}
+                meta={renderColumnMeta?.(column)}
                 reorderable={reorderableColumns && !disabled}
+                pending={pendingColumns.has(column.id)}
                 loading={loading}
                 disabled={disabled}
                 labels={labels}
@@ -381,16 +447,20 @@ type KanbanColumnViewProps<T> = {
   kind: string;
   getId: (item: T) => string;
   getLabel: ((item: T) => string) | undefined;
-  accepts: (id: string) => boolean;
-  onReorder: (id: string, beforeId: string | null) => void;
-  onMoveColumn: (direction: -1 | 1) => void;
+  accepts: (id: string) => boolean | string;
+  onReorder: (id: string, beforeId: string | null) => void | Promise<void>;
   renderItem: (item: T) => React.ReactNode;
   actions: React.ReactNode;
+  meta: React.ReactNode;
   reorderable: boolean;
+  /** The owner is still saving this column's move. */
+  pending: boolean;
   loading: boolean;
   disabled: boolean;
   labels: KanbanLabels;
 };
+
+const hasContent = (node: React.ReactNode) => node != null && node !== false && node !== "";
 
 function KanbanColumnView<T>({
   column,
@@ -401,59 +471,64 @@ function KanbanColumnView<T>({
   getLabel,
   accepts,
   onReorder,
-  onMoveColumn,
   renderItem,
   actions,
+  meta,
   reorderable,
+  pending,
   loading,
   disabled,
   labels,
 }: KanbanColumnViewProps<T>) {
   const headingId = React.useId();
   const descriptionId = React.useId();
+  const metaId = React.useId();
   const count = cards.length;
   const full = column.limit !== undefined && count >= column.limit;
   const countText =
     column.limit === undefined
       ? formatLabel(labels.count, { count })
       : formatLabel(labels.countLimit, { count, limit: column.limit });
+  const showMeta = hasContent(meta);
+  const describedBy =
+    [column.description ? descriptionId : null, showMeta ? metaId : null]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   return (
     <Dnd.SortableItem
       id={column.id}
+      locked={column.locked ?? false}
       className={styles.column}
       data-kanban-column={column.id}
       data-full={full || undefined}
+      data-pending={pending || undefined}
+      aria-busy={pending || undefined}
+      disabled={pending}
       // The grip carries the shortcuts: the column itself is not focusable.
       aria-keyshortcuts={undefined}
-      onKeyDown={(event) => {
-        // The grip moves its column; keys from the cards are theirs.
-        if (!reorderable || !event.altKey) return;
-        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-        const target = event.target instanceof Element ? event.target : null;
-        if (target?.closest("[data-dnd-handle]") === null) return;
-        event.preventDefault();
-        onMoveColumn(towardStart(event) ? -1 : 1);
-      }}
     >
       <ControlSizeProvider value="s">
         <div className={styles.header} data-reorderable={reorderable || undefined}>
           <h3 id={headingId} className={styles.title}>
-            {column.color ? (
-              <Badge.Dot className={cx(palette.hue, styles.dot)} data-color={column.color} />
-            ) : null}
             {column.title}
           </h3>
           {loading ? null : (
             <>
-              <Badge.Root color={full ? "orange" : "gray"} aria-hidden="true">
+              {/* The stage's hue; a full column turns it orange (and reads `count / limit`). */}
+              <Badge.Root color={full ? "orange" : (column.color ?? "gray")} aria-hidden="true">
                 {column.limit === undefined ? count : `${count} / ${column.limit}`}
               </Badge.Root>
               <VisuallyHidden>{countText}</VisuallyHidden>
             </>
           )}
           {actions ? <div className={styles.actions}>{actions}</div> : null}
-          {reorderable ? (
+          {/* While the column's move is saved, a spinner stands in for its grip. */}
+          {reorderable && pending ? (
+            <span className={cx(styles.grip, styles.gripSpinner, enterMotion.enter)}>
+              <Spinner size="xs" aria-hidden="true" />
+            </span>
+          ) : reorderable ? (
             <Dnd.Handle
               className={styles.grip}
               disabled={loading}
@@ -465,6 +540,11 @@ function KanbanColumnView<T>({
             <p id={descriptionId} className={styles.description}>
               {column.description}
             </p>
+          ) : null}
+          {showMeta ? (
+            <div id={metaId} className={styles.meta}>
+              {meta}
+            </div>
           ) : null}
         </div>
       </ControlSizeProvider>
@@ -489,7 +569,7 @@ function KanbanColumnView<T>({
                 as="ul"
                 kind={kind}
                 aria-labelledby={headingId}
-                aria-describedby={column.description ? descriptionId : undefined}
+                aria-describedby={describedBy}
                 className={styles.list}
                 items={cards}
                 getId={getId}
@@ -497,18 +577,18 @@ function KanbanColumnView<T>({
                 canDrop={accepts}
                 disabled={disabled}
                 onReorder={onReorder}
+                empty={
+                  <EmptyPage.Root layout="compact" className={styles.empty}>
+                    <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
+                    {disabled ? null : (
+                      <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
+                    )}
+                  </EmptyPage.Root>
+                }
                 renderItem={(item) => (
                   <ItemIdContext value={getId(item)}>{renderItem(item)}</ItemIdContext>
                 )}
               />
-              {count === 0 ? (
-                <EmptyPage.Root layout="compact" className={styles.empty}>
-                  <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
-                  {disabled ? null : (
-                    <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
-                  )}
-                </EmptyPage.Root>
-              ) : null}
             </div>
           )}
         </Crossfade>
@@ -527,37 +607,35 @@ export type KanbanItemProps = Omit<React.HTMLAttributes<HTMLElement>, "id"> & {
   ref?: React.Ref<HTMLElement>;
 };
 
-/** One card: an `<li>` on a filled surface; drags by the whole card, moves with Alt + arrows. */
-function KanbanItem({
-  disabled = false,
-  className,
-  onKeyDown,
-  children,
-  ...rest
-}: KanbanItemProps) {
+/**
+ * One card: an `<li>` on a filled surface; drags by the whole card, moves with Alt + arrows. While
+ * the owner saves its move it is busy: dimmed under a spinner, still.
+ */
+function KanbanItem({ disabled = false, className, children, ...rest }: KanbanItemProps) {
   const id = React.useContext(ItemIdContext);
   const board = React.useContext(BoardContext);
   if (id === null || board === null) {
     throw new Error("Kanban.Item must be returned from Kanban.Root renderItem");
   }
-  const locked = disabled || board.disabled;
+  const pending = board.pending.has(id);
   return (
     <Dnd.SortableItem
       id={id}
-      disabled={disabled}
-      aria-keyshortcuts={locked ? undefined : ITEM_SHORTCUTS}
+      disabled={disabled || pending}
+      aria-busy={pending || undefined}
       {...rest}
       data-kanban-item={id}
+      data-pending={pending || undefined}
       className={cx(styles.item, className)}
-      onKeyDown={(event) => {
-        onKeyDown?.(event);
-        if (event.defaultPrevented || locked || !event.altKey) return;
-        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-        event.preventDefault();
-        board.moveAcross(id, towardStart(event) ? -1 : 1);
-      }}
     >
       <ControlSizeProvider value="m">{children}</ControlSizeProvider>
+      {pending ? (
+        <Spinner
+          size="s"
+          aria-hidden="true"
+          className={cx(styles.itemSpinner, enterMotion.enter)}
+        />
+      ) : null}
     </Dnd.SortableItem>
   );
 }

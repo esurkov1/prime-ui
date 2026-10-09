@@ -18,15 +18,15 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Kanban.Root",
-      en: "Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns (a `<ul>`, sortable along x) that scrolls sideways inside itself, each column a labelled `<ul>` of cards under a header with the title, a count `Badge`, actions and an optional description line. Mounts its own `Dnd.Root` unless one is already above it. Sets `aria-busy` while loading, `data-loading`, `data-disabled`.",
-      ru: "Обобщённый `Kanban.Root<T>`. Доска: полоса колонок (`<ul>`, сортируемый по горизонтали) с собственной горизонтальной прокруткой; колонка — подписанный `<ul>` карточек под шапкой с названием, счётчиком `Badge`, действиями и необязательной строкой подзаголовка. Сама монтирует `Dnd.Root`, если его нет выше. Пока идёт загрузка — `aria-busy`, `data-loading`; `data-disabled`.",
+      en: "Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns (a `<ul>`, sortable along x) that scrolls sideways inside itself, each column a labelled `<ul>` of cards (Dnd lists of one kind, so Alt + ← / → moves a card across) under a header with the title, a count `Badge`, actions and optional description and meta lines. Mounts its own `Dnd.Root` unless one is already above it. Sets `aria-busy` while loading, `data-loading`, `data-disabled`.",
+      ru: "Обобщённый `Kanban.Root<T>`. Доска: полоса колонок (`<ul>`, сортируемый по горизонтали) с собственной горизонтальной прокруткой; колонка — подписанный `<ul>` карточек (списки Dnd одного вида, поэтому Alt + ← / → переносит карточку) под шапкой с названием, счётчиком `Badge`, действиями и необязательными строками описания и меты. Сама монтирует `Dnd.Root`, если его нет выше. Пока идёт загрузка — `aria-busy`, `data-loading`; `data-disabled`.",
       props: [
         {
           name: "columns",
           type: "readonly KanbanColumn[]",
           required: true,
-          en: "Every column: `{ id, title, description?, color?, limit? }`, drawn in `columnOrder` (array order by default). `description` is a muted line under the title that also describes the column's list; `color` (a `PaletteColor`) puts a dot of that hue before the title; `limit` is a WIP limit — a full column refuses cards from other columns and its count turns orange (`count / limit`).",
-          ru: "Все колонки: `{ id, title, description?, color?, limit? }`, в порядке `columnOrder` (по умолчанию — порядок массива). `description` — приглушённая строка под названием, она же описание списка колонки; `color` (`PaletteColor`) ставит точку этого цвета перед названием; `limit` — лимит работы: заполненная колонка не принимает карточки из других, счётчик становится оранжевым (`count / limit`).",
+          en: "Every column: `{ id, title, description?, color?, limit?, locked? }`, drawn in `columnOrder` (array order by default). `description` is a muted line under the title that also describes the column's list; `color` (a `PaletteColor`) is the stage's hue on its count badge; `limit` is a WIP limit — a full column refuses cards from other columns (the reason «Колонка «…» заполнена» is spoken and shown under the carried card) and its count turns orange (`count / limit`); `locked` keeps a system stage in its place when columns are reordered — a lock stands where its grip would and no column moves past it.",
+          ru: "Все колонки: `{ id, title, description?, color?, limit?, locked? }`, в порядке `columnOrder` (по умолчанию — порядок массива). `description` — приглушённая строка под названием, она же описание списка колонки; `color` (`PaletteColor`) — цвет этапа на счётчике; `limit` — лимит работы: заполненная колонка не принимает карточки из других (причина «Колонка «…» заполнена» озвучивается и видна под переносимой карточкой), счётчик становится оранжевым (`count / limit`); `locked` держит системный этап на месте при перестановке колонок — вместо ручки замок, и никакая колонка его не обходит.",
         },
         {
           name: "items",
@@ -64,9 +64,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onValueChange",
-          type: "(value: KanbanValue, move: KanbanMove) => void",
-          en: "A card moved by pointer, touch or keyboard: the new placement, then `{ id, from, to, index }` to save.",
-          ru: "Карточку перенесли мышью, касанием или с клавиатуры: новая раскладка, затем `{ id, from, to, index }` для сохранения.",
+          type: "(value: KanbanValue, move: KanbanMove) => void | Promise<void>",
+          en: "A card moved by pointer, touch or keyboard: the new placement, then `{ id, from, to, index }` to save. Return the save's promise: the card stays in its new place, busy (dimmed under a spinner, `aria-busy`, it does not move again), until it settles; resolve — the move stands (a controlled owner applies `value` before resolving); reject — the card glides back and `labels.moveFailed` is announced.",
+          ru: "Карточку перенесли мышью, касанием или с клавиатуры: новая раскладка, затем `{ id, from, to, index }` для сохранения. Верните промис сохранения: карточка стоит на новом месте занятой (приглушена под спиннером, `aria-busy`, не переносится), пока он не завершится; resolve — перенос остаётся (управляемый владелец применяет `value` до resolve); reject — карточка плавно возвращается, объявляется `labels.moveFailed`.",
         },
         {
           name: "reorderableColumns",
@@ -90,9 +90,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onColumnOrderChange",
-          type: "(order: readonly string[], move: KanbanColumnMove) => void",
-          en: "A column moved: the new order, then `{ id, index }` to save.",
-          ru: "Колонку переставили: новый порядок, затем `{ id, index }` для сохранения.",
+          type: "(order: readonly string[], move: KanbanColumnMove) => void | Promise<void>",
+          en: "A column moved: the new order, then `{ id, index }` to save. Return the save's promise: the column stays in its new place with a spinner in place of its grip and `aria-busy` until it settles; reject — it glides back and `labels.columnMoveFailed` is announced.",
+          ru: "Колонку переставили: новый порядок, затем `{ id, index }` для сохранения. Верните промис сохранения: колонка стоит на новом месте со спиннером вместо ручки и `aria-busy`, пока он не завершится; reject — она плавно возвращается, объявляется `labels.columnMoveFailed`.",
         },
         {
           name: "renderItem",
@@ -108,10 +108,16 @@ export const api: ComponentApi = {
           ru: "Действия справа в шапке колонки (добавить карточку, меню); контролы кита внутри берут ярус `s`.",
         },
         {
+          name: "renderColumnMeta",
+          type: "(column: KanbanColumn) => ReactNode",
+          en: "The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»), a caption in tabular digits, one line. It describes the column's list too.",
+          ru: "Строка меты под названием и описанием колонки: цифры этапа («12 сделок · 4,8 млн ₽»), подпись с моноширинными цифрами, одна строка. Она же описывает список колонки.",
+        },
+        {
           name: "canDrop",
-          type: "(id: string, columnId: string) => boolean",
-          en: "A workflow rule: refuses card `id` in column `columnId`; the column turns `danger` before the release and a keyboard move is announced as refused.",
-          ru: "Правило процесса: колонка `columnId` не принимает карточку `id`; колонка краснеет до отпускания, а перенос с клавиатуры объявляется как отказ.",
+          type: "(id: string, columnId: string) => boolean | string",
+          en: "A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken, and shown under the carried card); the column turns `danger` before the release and a keyboard move is announced as refused.",
+          ru: "Правило процесса: колонка `columnId` не принимает карточку `id` — `false` или строка с причиной (озвучивается и видна под переносимой карточкой); колонка краснеет до отпускания, перенос с клавиатуры объявляется как отказ.",
         },
         {
           name: "variant",
@@ -225,16 +231,10 @@ export const api: ComponentApi = {
       ru: "Подсказка под текстом пустой колонки, пока в неё можно положить карточку (не на доске `disabled`).",
     },
     {
-      key: "moved",
-      default: "{label}: «{column}», позиция {position} из {total}",
-      en: "Live region: a card moved to another column with the keyboard.",
-      ru: "Live-область: карточка перенесена в другую колонку с клавиатуры.",
-    },
-    {
-      key: "refused",
-      default: "{label}: колонка «{column}» не принимает карточку",
-      en: "Live region: the next column refused the card (full or `canDrop`).",
-      ru: "Live-область: соседняя колонка не приняла карточку (заполнена или `canDrop`).",
+      key: "full",
+      default: "Колонка «{column}» заполнена ({limit})",
+      en: "Why a full column refuses a card: spoken, and shown under the carried card.",
+      ru: "Почему заполненная колонка не принимает карточку: озвучивается и видна под переносимой карточкой.",
     },
     {
       key: "moveColumn",
@@ -243,10 +243,22 @@ export const api: ComponentApi = {
       ru: "Имя ручки колонки (`reorderableColumns`).",
     },
     {
-      key: "columnMoved",
-      default: "Колонка «{column}»: позиция {position} из {total}",
-      en: "Live region: a column moved with the keyboard.",
-      ru: "Live-область: колонка перемещена с клавиатуры.",
+      key: "column",
+      default: "Колонка «{column}»",
+      en: "A column as the live region names it when it is carried or moved («Колонка «Демо»: позиция 2 из 4»).",
+      ru: "Колонка в объявлениях live-области, когда её переносят («Колонка «Демо»: позиция 2 из 4»).",
+    },
+    {
+      key: "moveFailed",
+      default: "Не удалось переместить «{label}», карточка вернулась на место",
+      en: "Spoken when the `onValueChange` promise rejects; `{label}` is `getLabel(item)`.",
+      ru: "Озвучивается, когда промис `onValueChange` отклонён; `{label}` — `getLabel(item)`.",
+    },
+    {
+      key: "columnMoveFailed",
+      default: "Не удалось переместить колонку «{column}», она вернулась на место",
+      en: "Spoken when the `onColumnOrderChange` promise rejects.",
+      ru: "Озвучивается, когда промис `onColumnOrderChange` отклонён.",
     },
   ],
 };

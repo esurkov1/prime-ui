@@ -1,10 +1,11 @@
 import * as React from "react";
 
 export type PresenceState = "open" | "closed";
-export type MotionDurationToken = "fast" | "base" | "slow";
+export type MotionDurationToken = "xfast" | "fast" | "base" | "slow";
 
 /** Token defaults (foundation §7) used when the CSS variable cannot be read. */
 const DURATION_FALLBACK_MS: Record<MotionDurationToken, number> = {
+  xfast: 150,
   fast: 230,
   base: 380,
   slow: 570,

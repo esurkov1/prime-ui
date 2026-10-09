@@ -50,6 +50,63 @@ describe("Sparkline", () => {
     expect(container.firstElementChild).not.toHaveAttribute("data-scrubbing");
   });
 
+  describe("bars", () => {
+    const SIGNED: SparklinePoint[] = [
+      { label: "июл", value: 120 },
+      { label: "авг", value: -40 },
+      { label: "сен", value: 80 },
+      { label: "окт", value: 60 },
+    ];
+    const bars = (container: HTMLElement) => [
+      ...container.querySelectorAll<HTMLElement>(
+        "[data-variant='bars'] [style*='--sparkline-top']",
+      ),
+    ];
+
+    it("draws signed bars from the zero line: positive up, negative down", () => {
+      const { container } = render(<Sparkline data={SIGNED} label="Прибыль" variant="bars" />);
+      const drawn = bars(container);
+      expect(drawn).toHaveLength(4);
+      expect(drawn[1]).toHaveAttribute("data-negative", "true");
+      expect(drawn[0]).not.toHaveAttribute("data-negative");
+      // Scale −40…120: zero at 0.75 of the height; the negative bar starts there and goes down.
+      expect(drawn[1].style.getPropertyValue("--sparkline-top")).toBe("0.75");
+      expect(drawn[0].style.getPropertyValue("--sparkline-top")).toBe("0");
+    });
+
+    it("rests on the highlighted bar, quiets the others and scrubs by slot", () => {
+      const { container } = render(
+        <Sparkline data={SIGNED} label="Прибыль" variant="bars" highlight={2} />,
+      );
+      const slider = screen.getByRole("slider", { name: "Прибыль" });
+      expect(slider).toHaveAttribute("aria-valuenow", "2");
+      expect(slider).toHaveAttribute("aria-valuetext", "сен: 80");
+      const slots = () => bars(container).map((bar) => bar.parentElement);
+      expect(slots()[2]).toHaveAttribute("data-current", "true");
+      expect(slots()[0]).toHaveAttribute("data-quiet", "true");
+      slider.getBoundingClientRect = () => ({ left: 0, width: 400, top: 0, height: 80 }) as DOMRect;
+      fireEvent.pointerMove(slider, { clientX: 150 });
+      expect(slider).toHaveAttribute("aria-valuenow", "1");
+      fireEvent.keyDown(slider, { key: "ArrowRight" });
+      expect(slider).toHaveAttribute("aria-valuenow", "2");
+    });
+
+    it("shows no percentage change across a sign flip", () => {
+      render(<Sparkline data={SIGNED} label="Прибыль" variant="bars" highlight={1} />);
+      expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+    });
+  });
+
+  it("swaps skeletons for the data and keeps the title while loading", () => {
+    const { container, rerender } = render(<Sparkline data={[]} label="Выручка" loading />);
+    expect(container.firstElementChild).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByText("Выручка")).toBeInTheDocument();
+    expect(screen.queryByRole("slider")).not.toBeInTheDocument();
+    rerender(<Sparkline data={DATA} label="Выручка" />);
+    expect(plot()).toHaveAttribute("aria-valuenow", "2");
+    expect(container.firstElementChild).not.toHaveAttribute("aria-busy");
+  });
+
   it("speaks a point through labels", () => {
     render(<Sparkline data={DATA} label="Выручка" labels={{ point: "{value} на {label}" }} />);
     expect(plot()).toHaveAttribute("aria-valuetext", "297 на 8 окт");

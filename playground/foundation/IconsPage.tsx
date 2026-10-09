@@ -223,7 +223,13 @@ name = "object.bell";
 size="l" />
 
 // Цвет: tone, по умолчанию currentColor хоста.
-<Icon name="status.warning" tone="warning" />`;
+<Icon name="status.warning" tone="warning" />
+
+// Цвет категории из данных — оттенок палитры вместо tone.
+<Icon name="object.funnel" color="purple" />
+
+// Иконка со смыслом: role="img" с именем; в Tooltip.Trigger становится фокусируемой.
+<Icon name="status.locked" label="Системный статус" />`;
 
 const SNIPPET_SET = `
 import { BellIcon, ShoppingCartIcon } from "prime-ui-kit/icons";
@@ -330,7 +336,11 @@ export default function IconsPage() {
             Имя состоит из группы и смысла: <code>nav.home</code>, <code>status.success</code>. Если
             смысл меняется, имя остаётся, а рисунок можно заменить.
           </li>
-          <li>Иконки декоративны (aria-hidden): имя элементу даёт текст или aria-label.</li>
+          <li>
+            Иконки декоративны (aria-hidden): имя элементу даёт текст или aria-label. Иконка,
+            которая одна несёт смысл, получает <code>label</code> и становится{" "}
+            <code>role="img"</code>.
+          </li>
           <li>
             Кроме смысловых имён есть полный набор: {ENTRIES.length} анимированных глифов как
             именованные компоненты из <code>prime-ui-kit/icons</code> —{" "}

@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import type { DataTableColumn, DataTableOrder, DataTableSortState } from "./types";
+import type { DataTableColumn, DataTableGroup, DataTableOrder, DataTableSortState } from "./types";
 
 function comparePrimitive(a: unknown, b: unknown): number {
   if (a == null && b == null) return 0;
@@ -20,6 +20,36 @@ export function columnValue<Row>(row: Row, column: DataTableColumn<Row>): unknow
   return undefined;
 }
 
+/** Value range of every `scale` column over the data (top-level rows), with fixed ends applied. */
+export function scaleDomains<Row>(
+  data: Row[],
+  columns: DataTableColumn<Row>[],
+): Map<string, [number, number]> {
+  const domains = new Map<string, [number, number]>();
+  for (const column of columns) {
+    if (!column.scale) continue;
+    const fixed = typeof column.scale === "object" ? column.scale : {};
+    let min = Number.POSITIVE_INFINITY;
+    let max = Number.NEGATIVE_INFINITY;
+    for (const row of data) {
+      const value = columnValue(row, column);
+      if (typeof value !== "number" || Number.isNaN(value)) continue;
+      min = Math.min(min, value);
+      max = Math.max(max, value);
+    }
+    domains.set(column.id, [fixed.min ?? min, fixed.max ?? max]);
+  }
+  return domains;
+}
+
+/** Step 1–5 of a value on the chart scale; equal ends give the middle step. */
+export function scaleStep(value: unknown, [min, max]: [number, number]): number | undefined {
+  if (typeof value !== "number" || Number.isNaN(value) || !Number.isFinite(min)) return undefined;
+  if (max <= min) return 3;
+  const share = (Math.min(Math.max(value, min), max) - min) / (max - min);
+  return Math.min(5, Math.floor(share * 5) + 1);
+}
+
 /** Stable sort: equal rows keep their order. */
 export function sortRows<Row>(list: Row[], column: DataTableColumn<Row>, order: DataTableOrder) {
   const direction = order === "asc" ? 1 : -1;
@@ -32,6 +62,24 @@ export function sortRows<Row>(list: Row[], column: DataTableColumn<Row>, order: 
       return compared === 0 ? a.index - b.index : compared * direction;
     })
     .map((item) => item.row);
+}
+
+/**
+ * Row groups (`getRowGroup`): groups keep the order in which they first appear in the data, rows
+ * inside a group keep the sorted order. Returns the rows in that order and every group by key.
+ */
+export function groupRows<Row>(
+  source: Row[],
+  sorted: Row[],
+  getGroup: (row: Row) => string | number,
+): { rows: Row[]; groups: Map<string | number, DataTableGroup<Row>> } {
+  const groups = new Map<string | number, DataTableGroup<Row>>();
+  for (const row of source) {
+    const key = getGroup(row);
+    if (!groups.has(key)) groups.set(key, { key, rows: [] });
+  }
+  for (const row of sorted) groups.get(getGroup(row))?.rows.push(row);
+  return { rows: [...groups.values()].flatMap((group) => group.rows), groups };
 }
 
 /** Header click cycle: asc → desc → none. */
@@ -52,6 +100,8 @@ export type FlatRow<Row> = {
   animate: boolean;
   /** A sub-row of a row that is collapsing: still drawn while it folds away. */
   folding: boolean;
+  /** Top-level row that opens a group on screen (`groupOf`): the group's key. */
+  groupStart?: string | number;
 };
 
 export type MeasureRow<Row> = { row: Row; key: React.Key; depth: number };
@@ -77,6 +127,8 @@ export type FlattenOptions<Row> = {
   lastExpandedKey: React.Key | null;
   /** Collect every key of the data (all pages, all depths) for «select all». */
   collectKeys: boolean;
+  /** Group key of a top-level row: the first rendered row of each group run opens it. */
+  groupOf?: (row: Row) => string | number;
 };
 
 export type Flattened<Row> = {
@@ -158,10 +210,20 @@ export function flatten<Row>(data: Row[], options: FlattenOptions<Row>): Flatten
     });
   };
 
+  let previousGroup: { key: string | number } | null = null;
   data.forEach((row, index) => {
     const key = keyOf(row, index, null);
     if (index >= options.start && index < options.end) {
+      const at = result.rows.length;
       visit(row, key, 0, false, false);
+      if (options.groupOf) {
+        const group = options.groupOf(row);
+        const first = result.rows[at];
+        if (first && (previousGroup === null || previousGroup.key !== group)) {
+          first.groupStart = group;
+        }
+        previousGroup = { key: group };
+      }
     } else if (options.collectKeys) {
       result.keys.push(key);
       collect(childrenOf(row), key);

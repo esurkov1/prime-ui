@@ -40,6 +40,46 @@ describe("Checkbox.Indicator", () => {
   });
 });
 
+describe("Checkbox shape", () => {
+  const states = [
+    ["unchecked", {}],
+    ["checked", { checked: true }],
+    ["indeterminate", { indeterminate: true }],
+    ["unchecked", { disabled: true }],
+  ] as const;
+
+  it("Indicator is a square by default and a circle on request in every state", () => {
+    render(<Checkbox.Indicator data-testid="sq" />);
+    expect(screen.getByTestId("sq")).toHaveAttribute("data-shape", "square");
+    for (const [state, props] of states) {
+      const { unmount } = render(<Checkbox.Indicator shape="circle" data-testid="c" {...props} />);
+      const box = screen.getByTestId("c");
+      expect(box).toHaveAttribute("data-shape", "circle");
+      expect(box).toHaveAttribute("data-state", state);
+      unmount();
+    }
+  });
+
+  it("Root draws a circle box, keeps the input and the keyboard toggle", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <Checkbox.Root shape="circle" aria-label="Выбрать">
+        <Checkbox.Label>Выбрать</Checkbox.Label>
+      </Checkbox.Root>,
+    );
+    expect(container.querySelector("[data-shape]")).toHaveAttribute("data-shape", "circle");
+    await user.tab();
+    expect(screen.getByRole("checkbox")).toHaveFocus();
+    await user.keyboard(" ");
+    expect(screen.getByRole("checkbox")).toBeChecked();
+  });
+
+  it("Root is a square by default", () => {
+    const { container } = render(<Checkbox.Root aria-label="Выбрать" disabled />);
+    expect(container.querySelector("[data-shape]")).toHaveAttribute("data-shape", "square");
+  });
+});
+
 describe("Checkbox", () => {
   it("renders the bare control when Checkbox.Label is omitted", () => {
     render(<Checkbox.Root aria-label="Выбрать строку" />);

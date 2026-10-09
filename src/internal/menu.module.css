@@ -249,3 +249,33 @@
 .searchInput::placeholder {
   color: var(--prime-color-text-placeholder);
 }
+
+/* ─── Loading rows / load more ───────────────────────────────────────────── */
+
+/*
+ * A Skeleton in the option geometry while a list loads (Select, CommandMenu): the row height and
+ * inline padding of `.item` (joined in TSX), no fill, no pointer. Line widths vary, so the column
+ * reads as text, not as a bar chart.
+ */
+.skeletonRow {
+  cursor: default;
+  pointer-events: none;
+}
+
+.skeletonRow > * {
+  width: 64%;
+}
+
+.skeletonRow:nth-child(3n + 2) > * {
+  width: 48%;
+}
+
+.skeletonRow:nth-child(3n) > * {
+  width: 76%;
+}
+
+/* The end of a list that loads more: observed inside the list's own scroller. */
+.loadSentinel {
+  flex-shrink: 0;
+  min-height: var(--prime-border-width);
+}

@@ -51,7 +51,8 @@
   padding-block: var(--field-gap);
 }
 
-.value[data-rich="true"] {
+/* A value with leading media (an Avatar on one line, a Thumbnail on two): media beside the text. */
+.value:is([data-rich="true"], [data-media="true"]) {
   display: flex;
   align-items: center;
   gap: var(--field-gap);
@@ -127,7 +128,9 @@
   outline: none;
 }
 
-.listbox:empty {
+/* Empty, or replaced by a load error: `hidden` must win over `display: flex`. */
+.listbox:empty,
+.listbox[hidden] {
   display: none;
 }
 
@@ -149,18 +152,6 @@
 
 .content[data-searching="true"] .separator {
   display: none;
-}
-
-.status {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: var(--menu-gap);
-  min-height: var(--menu-item-h);
-  padding-inline: var(--prime-panel-item-padding-x);
-  color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
 }
 
 /* ─── Option ─────────────────────────────────────────────────────────────── */
@@ -223,7 +214,7 @@
   white-space: nowrap;
 }
 
-/* Thumbnail.Root as the leading media of a rich row: placement only, the look is the Thumbnail's. */
+/* Thumbnail.Root / Avatar.Root as the leading media of a row: placement only, the look is theirs. */
 .media {
   flex-shrink: 0;
 }

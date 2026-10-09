@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -95,6 +95,23 @@ describe("Textarea.Root", () => {
       expect(container.querySelector("[data-value]")).toBeInTheDocument();
     });
 
+    it("rows sets the minimum lines (three by default) and maxRows caps the growth", () => {
+      const { rerender } = render(<Root aria-label="Комментарий" />);
+      const control = () => screen.getByRole("textbox").parentElement?.parentElement as HTMLElement;
+      expect(control().style.getPropertyValue("--textarea-rows")).toBe("3");
+      expect(control()).not.toHaveAttribute("data-capped");
+      rerender(<Root aria-label="Комментарий" rows={1} maxRows={8} />);
+      expect(screen.getByRole("textbox")).toHaveAttribute("rows", "1");
+      expect(control().style.getPropertyValue("--textarea-rows")).toBe("1");
+      expect(control().style.getPropertyValue("--textarea-max-rows")).toBe("8");
+      expect(control()).toHaveAttribute("data-capped", "true");
+    });
+
+    it("maxRows does nothing on a fixed-height field", () => {
+      render(<Root aria-label="Условия" autoResize={false} maxRows={4} />);
+      expect(screen.getByRole("textbox").parentElement).not.toHaveAttribute("data-capped");
+    });
+
     it("does not wrap textarea when autoResize=false", () => {
       const { container } = render(<Root autoResize={false} placeholder="manual" />);
       expect(container.querySelector("[data-value]")).toBeNull();
@@ -177,5 +194,73 @@ describe("Textarea focusRing", () => {
     expect(box).toHaveAttribute("data-focus-ring", "false");
     expect(box).toHaveAttribute("data-invalid", "true");
     expect(screen.getByRole("textbox")).toHaveAttribute("aria-invalid", "true");
+  });
+});
+
+describe("Textarea onCommit (inline save)", () => {
+  it("commits on Mod+Enter and blur, not on a plain Enter; Escape reverts", () => {
+    const onCommit = vi.fn();
+    render(<Textarea.Root label="Комментарий" defaultValue="Позвонить" onCommit={onCommit} />);
+    const field = screen.getByLabelText<HTMLTextAreaElement>("Комментарий");
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "Позвонить завтра" } });
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(onCommit).not.toHaveBeenCalled();
+    fireEvent.keyDown(field, { key: "Enter", ctrlKey: true });
+    expect(onCommit).toHaveBeenCalledWith("Позвонить завтра");
+
+    fireEvent.change(field, { target: { value: "Черновик" } });
+    fireEvent.keyDown(field, { key: "Escape" });
+    expect(field.value).toBe("Позвонить завтра");
+    fireEvent.blur(field);
+    expect(onCommit).toHaveBeenCalledTimes(1);
+  });
+
+  it("a rejected save restores the committed value", async () => {
+    let fail!: () => void;
+    const onCommit = () =>
+      new Promise<void>((_, reject) => {
+        fail = () => reject(new Error("500"));
+      });
+    render(<Textarea.Root label="Комментарий" defaultValue="Позвонить" onCommit={onCommit} />);
+    const field = screen.getByLabelText<HTMLTextAreaElement>("Комментарий");
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "Не сохранится" } });
+    fireEvent.blur(field);
+    expect(field).toHaveAttribute("aria-busy", "true");
+    await act(async () => fail());
+    expect(field.value).toBe("Позвонить");
+  });
+});
+
+describe("Textarea edge actions", () => {
+  it("CopyButton and Action sit in the field and copy the text", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    const onClick = vi.fn();
+    render(
+      <Textarea.Root label="Ответ" readOnly defaultValue="Счёт отправлен">
+        <Textarea.Action label="Переписать" onClick={onClick}>
+          <svg />
+        </Textarea.Action>
+        <Textarea.CopyButton />
+      </Textarea.Root>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Переписать" }));
+    expect(onClick).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: "Копировать" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith("Счёт отправлен"));
+    expect(await screen.findByRole("button", { name: "Скопировано" })).toBeInTheDocument();
+  });
+
+  it("a press on an action does not move focus into the textarea", () => {
+    render(
+      <Textarea.Root label="Ответ" defaultValue="Текст">
+        <Textarea.CopyButton />
+      </Textarea.Root>,
+    );
+    const down = new MouseEvent("mousedown", { bubbles: true, cancelable: true });
+    screen.getByRole("button", { name: "Копировать" }).dispatchEvent(down);
+    expect(down.defaultPrevented).toBe(false);
   });
 });

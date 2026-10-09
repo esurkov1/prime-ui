@@ -1,15 +1,19 @@
 import * as React from "react";
 
+import { Button } from "@/components/button/Button";
 import { Divider } from "@/components/divider/Divider";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Spinner } from "@/components/spinner/Spinner";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
   FieldFrame,
   type FieldFrameProps,
@@ -23,14 +27,18 @@ import {
   optionDomId,
   type Store,
   useCreateStore,
+  useLoadMore,
   useStoreSlice,
   useTypeahead,
 } from "@/internal/listbox";
 import { MenuGroup, type MenuGroupProps } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
+import { focusInto } from "@/internal/overlay/focus";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import type { ControlSize } from "@/internal/states";
+import swapMotion from "@/internal/swapMotion.module.css";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Select.module.css";
 import {
@@ -65,6 +73,7 @@ const SELECT_LABELS: SelectLabels = {
   empty: "Ничего не найдено",
   emptyHint: "Попробуйте изменить запрос",
   loading: "Загрузка…",
+  retry: "Повторить",
   clear: "Очистить",
   optional: "необязательно",
 };
@@ -85,8 +94,34 @@ type SelectRootBase = FieldRootDomProps &
     onOpenChange?: (open: boolean) => void;
     /** Clear segment in the trigger (and `Delete` / `Backspace` on it) while a value is selected. */
     clearable?: boolean;
-    /** Spinner instead of the chevron, `aria-busy`, a status row in the list. */
+    /** Form field name: hidden inputs submit the value (one per value with `multiple`). */
+    name?: string;
+    /** The search query (`Select.Content searchable`), controlled; cleared when the list closes. */
+    search?: string;
+    /** The initial query, uncontrolled. Default `""`. */
+    defaultSearch?: string;
+    /** Called with the new query: typing, and `""` when the list closes. */
+    onSearchChange?: (search: string) => void;
+    /**
+     * The list filters its items by the query. `false` when the results come from a server: every
+     * item shows, highlighting of the query stays.
+     */
+    filter?: boolean;
+    /**
+     * Options are loading: a Spinner instead of the chevron, `aria-busy`, skeleton rows in the list
+     * while no item matches (items on screen stay).
+     */
     loading?: boolean;
+    /** More options are loading at the end: skeleton rows after the items. */
+    loadingMore?: boolean;
+    /** More options exist: reaching the end of the list calls `onLoadMore`. */
+    hasMore?: boolean;
+    /** Asked once per round when the end of the list scrolls into view or the highlight reaches it. */
+    onLoadMore?: () => void | Promise<void>;
+    /** The options failed to load: replaces the list with the message in `role="alert"`. */
+    loadError?: React.ReactNode;
+    /** A retry button (`labels.retry`) under `loadError`; Enter in the open list runs it too. */
+    onRetry?: () => void;
     labels?: Partial<SelectLabels>;
     className?: string;
     children: React.ReactNode;
@@ -120,14 +155,24 @@ function SelectRoot(props: SelectRootProps) {
     error,
     invalid,
     focusRing = true,
-    disabled = false,
+    disabled: disabledProp = false,
     placeholder,
     id,
     open,
     defaultOpen = false,
     onOpenChange,
     clearable = false,
+    name,
+    search,
+    defaultSearch = "",
+    onSearchChange,
+    filter = true,
     loading = false,
+    loadingMore = false,
+    hasMore = false,
+    onLoadMore,
+    loadError,
+    onRetry,
     labels: labelsProp,
     className,
     children,
@@ -138,6 +183,7 @@ function SelectRoot(props: SelectRootProps) {
     ...rest
   } = props;
   const multiple = props.multiple === true;
+  const disabled = useInheritedDisabled(disabledProp);
   const labels = React.useMemo(() => ({ ...SELECT_LABELS, ...labelsProp }), [labelsProp]);
   const ids = useFieldFrame(id, { hint, error, invalid });
 
@@ -158,11 +204,19 @@ function SelectRoot(props: SelectRootProps) {
   });
   const highlight = useCreateStore<string | undefined>(undefined);
   const [registry] = React.useState(createItemRegistry);
-  const [query, setQuery] = React.useState("");
+  const [query, setQuery] = useControllableState({
+    value: search,
+    defaultValue: defaultSearch,
+    onChange: onSearchChange,
+  });
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
 
   // Closing (also from outside, through `open`) resets the search.
-  if (!isOpen && query !== "") setQuery("");
+  const wasOpenRef = React.useRef(isOpen);
+  React.useEffect(() => {
+    if (wasOpenRef.current && !isOpen) setQuery("");
+    wasOpenRef.current = isOpen;
+  }, [isOpen, setQuery]);
 
   const pick = React.useCallback(
     (optionValue: string) => {
@@ -199,6 +253,12 @@ function SelectRoot(props: SelectRootProps) {
       clear,
       clearable,
       loading,
+      loadingMore,
+      hasMore,
+      onLoadMore,
+      loadError,
+      onRetry,
+      filter,
       isOpen,
       setOpen,
       highlight,
@@ -226,10 +286,17 @@ function SelectRoot(props: SelectRootProps) {
       clear,
       clearable,
       loading,
+      loadingMore,
+      hasMore,
+      onLoadMore,
+      loadError,
+      onRetry,
+      filter,
       isOpen,
       setOpen,
       highlight,
       query,
+      setQuery,
       labels,
     ],
   );
@@ -251,6 +318,11 @@ function SelectRoot(props: SelectRootProps) {
       <SelectProvider value={context}>
         <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
       </SelectProvider>
+      {name
+        ? (selected.length > 0 || multiple ? selected : [""]).map((item) => (
+            <input key={item} type="hidden" name={name} value={item} disabled={disabled} />
+          ))
+        : null}
     </FieldFrame>
   );
 }
@@ -368,9 +440,10 @@ export type SelectValueItem = { value: string; label: string };
 
 export type SelectValueProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   /**
-   * Single mode: renders the selected option in the trigger, e.g. with the same `Thumbnail.Root`,
-   * `Select.ItemText` and `Select.ItemDescription` parts as the row. Not called while empty (the
-   * placeholder shows) and not used in `multiple` mode.
+   * Single mode: renders the selected option in the trigger with the same parts as the row —
+   * leading `Avatar.Root` / `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, and a
+   * trailing `Badge.Root` / `Select.ItemMeta` at the end. Not called while empty (the placeholder
+   * shows) and not used in `multiple` mode.
    */
   renderValue?: (item: SelectValueItem) => React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
@@ -389,10 +462,15 @@ function SelectValue({ renderValue, className, ...rest }: SelectValueProps) {
       <span
         {...rest}
         className={cx(styles.value, className)}
-        {...toDataAttributes({ rich: parts.rich || undefined })}
+        {...toDataAttributes({
+          rich: parts.rich || undefined,
+          media: parts.leading.length > 0 || parts.meta.length > 0 || undefined,
+        })}
       >
         {sizeMedia(parts.leading, size)}
         <span className={styles.valueBody}>{parts.body}</span>
+        {/* Trailing meta (a role Badge, `Select.ItemMeta`) as in the option row: at the end. */}
+        {parts.meta}
       </span>
     );
   }
@@ -421,11 +499,38 @@ SelectTriggerIcon.displayName = "Select.TriggerIcon";
 
 // ─── Content ─────────────────────────────────────────────────────────────────
 
+/** What the list shows besides its items: the first options loading, a load error, or items. */
+type RegionState = "loading" | "error" | "ready";
+
+/** Skeleton rows while the first options load / while more load at the end. */
+const LOADING_ROWS = 4;
+const LOADING_MORE_ROWS = 2;
+
+const hasContent = (node: React.ReactNode) => node != null && node !== false && node !== "";
+
+/** Skeleton rows in the option geometry; decorative (the list carries `aria-busy`). */
+function SkeletonRows({ count }: { count: number }) {
+  return Array.from({ length: count }, (_, index) => (
+    <div
+      // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder rows
+      key={index}
+      aria-hidden="true"
+      className={cx(menu.item, menu.skeletonRow)}
+      data-skeleton=""
+    >
+      <Skeleton />
+    </div>
+  ));
+}
+
 export type SelectContentProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "hidden" | "onKeyDown" | "onAnimationEnd"
 > & {
-  /** A search field on top of the list; items filter by label, description and `keywords`. */
+  /**
+   * A search field on top of the list; items filter by label, description and `keywords` (or the
+   * owner loads them: `Select.Root` `search`, `filter={false}`).
+   */
   searchable?: boolean;
   children: React.ReactNode;
   /** The floating panel. */
@@ -446,6 +551,12 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     query,
     setQuery,
     loading,
+    loadingMore,
+    hasMore,
+    onLoadMore,
+    loadError,
+    onRetry,
+    filter,
     labels,
     registry,
   } = useSelectContext();
@@ -457,8 +568,6 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     open: isOpen,
     onOpenChange: setOpen,
     triggerRef,
-    side: "bottom",
-    align: "start",
     matchAnchorWidth: true,
     focusOnOpen: true,
     tabExit: "always",
@@ -466,10 +575,50 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
   });
 
   const highlighted = useStoreSlice(highlight, (value) => value);
-  const isEmpty = useStoreSlice(registry.version, () => !registry.anyMatch(normalize(query)));
+  const version = useStoreSlice(registry.version, (value) => value);
+  const isEmpty = !registry.anyMatch(filter ? normalize(query) : "");
   const typeahead = useTypeahead();
 
+  const region: RegionState = hasContent(loadError)
+    ? "error"
+    : loading && isEmpty
+      ? "loading"
+      : "ready";
+  // The first render stays still; every later load state fades in (foundation §1 rule 7).
+  const swapped = useStateSwap(region);
+  const swapClass = swapped ? swapMotion.swapIn : undefined;
+
+  const { sentinelRef, request: requestMore } = useLoadMore({
+    enabled: region === "ready" && hasMore && Boolean(onLoadMore) && !loading && !loadingMore,
+    onLoadMore,
+    scrollRef: listboxRef,
+    rearm: version,
+  });
+
+  // The highlight reached the last option (arrows, End, pointer): ask for more, as scrolling does.
+  React.useEffect(() => {
+    if (highlighted === undefined) return;
+    if (enabledOptions(listboxRef.current).at(-1)?.dataset.value === highlighted) requestMore();
+  }, [highlighted, requestMore]);
+
+  // A swap hides or remounts the focused list: focus stays in the panel (the search, the list or
+  // the retry button).
+  const panelRef = floating.contentRef;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on every region swap
+  React.useEffect(() => {
+    const panel = panelRef.current;
+    if (isOpen && swapped && panel && !panel.contains(document.activeElement)) focusInto(panel);
+  }, [region, swapped, isOpen, panelRef]);
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (region === "error") {
+      // On the retry button Enter is its own click.
+      if (event.key === "Enter" && onRetry && !(event.target instanceof HTMLButtonElement)) {
+        event.preventDefault();
+        onRetry();
+      }
+      return;
+    }
     const inSearch = event.target instanceof HTMLInputElement;
     // In the search field Space, Home and End edit the text.
     if (inSearch && [" ", "Home", "End"].includes(event.key)) return;
@@ -522,27 +671,30 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
           />
         </div>
       ) : null}
-      {loading ? (
-        <div className={styles.status} role="status">
-          <Spinner aria-hidden="true" />
-          {labels.loading}
-        </div>
-      ) : null}
       <ScrollContainer
+        // A load state swap remounts the list, so its new content fades in.
+        key={swapped ? region : undefined}
         ref={listboxRef}
         id={listboxId}
         role="listbox"
         aria-multiselectable={multiple || undefined}
         aria-labelledby={triggerId}
         aria-activedescendant={searchable ? undefined : activeDescendant}
-        aria-busy={loading || undefined}
+        aria-busy={loading || loadingMore || undefined}
         tabIndex={-1}
-        data-autofocus={searchable ? undefined : ""}
-        className={styles.listbox}
+        hidden={region === "error" ? true : undefined}
+        data-autofocus={searchable || region === "error" ? undefined : ""}
+        className={cx(styles.listbox, swapClass)}
       >
+        {/* Items render while loading too: they register, and the first match ends the state. */}
         {children}
+        {region === "loading" ? <SkeletonRows count={LOADING_ROWS} /> : null}
+        {region === "ready" && hasMore ? (
+          <div ref={sentinelRef} aria-hidden="true" className={menu.loadSentinel} />
+        ) : null}
+        {region === "ready" && loadingMore ? <SkeletonRows count={LOADING_MORE_ROWS} /> : null}
       </ScrollContainer>
-      {isEmpty && !loading ? (
+      {region === "ready" && isEmpty ? (
         <EmptyPage.Root layout="compact" role="status">
           <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
           {query !== "" && labels.emptyHint ? (
@@ -550,6 +702,24 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
           ) : null}
         </EmptyPage.Root>
       ) : null}
+      {region === "error" ? (
+        <EmptyPage.Root layout="compact" size={size} role="alert" className={swapClass}>
+          <EmptyPage.Title as="p">{loadError}</EmptyPage.Title>
+          {onRetry ? (
+            <EmptyPage.Actions>
+              <Button.Root variant="soft" tone="neutral" onClick={onRetry}>
+                <Button.Icon>
+                  <Icon name="action.refresh" />
+                </Button.Icon>
+                {labels.retry}
+              </Button.Root>
+            </EmptyPage.Actions>
+          ) : null}
+        </EmptyPage.Root>
+      ) : null}
+      <VisuallyHidden aria-live="polite">
+        {loading || loadingMore ? labels.loading : ""}
+      </VisuallyHidden>
       <HighlightOnOpen listboxRef={listboxRef} highlight={highlight} />
     </FloatingPanel>
   );
@@ -567,9 +737,10 @@ function HighlightOnOpen({
   listboxRef: React.RefObject<HTMLElement | null>;
   highlight: Store<string | undefined>;
 }) {
-  const { isOpen, query, selected } = useSelectContext();
+  const { isOpen, query, selected, registry } = useSelectContext();
   const selectedRef = React.useRef(selected);
   selectedRef.current = selected;
+  const version = useStoreSlice(registry.version, (value) => value);
 
   React.useLayoutEffect(() => {
     if (!isOpen) return;
@@ -583,6 +754,16 @@ function HighlightOnOpen({
   React.useLayoutEffect(() => {
     if (query !== "") highlight.set(enabledOptions(listboxRef.current)[0]?.dataset.value);
   }, [query, listboxRef, highlight]);
+
+  // Results that arrive later (a server search) take the highlight when it has none among them.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `version` changes when options (de)register
+  React.useLayoutEffect(() => {
+    if (query === "") return;
+    const options = enabledOptions(listboxRef.current);
+    if (!options.some((item) => item.dataset.value === highlight.get())) {
+      highlight.set(options[0]?.dataset.value);
+    }
+  }, [version, query, listboxRef, highlight]);
 
   return null;
 }

@@ -1,0 +1,51 @@
+/*
+ * Fieldset — a frameless group of fields (foundation §1 rule 3): heading `title-s`, heading → its
+ * fields 16, heading → description 4, field → field 20. No border, padding or fill: the group is
+ * made by proximity, groups stand 32 apart in the form around them. The native `<legend>` stays the
+ * rendered legend (it names the group); spacing hangs on the body after it, never on the legend.
+ */
+.root {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  overflow-wrap: anywhere;
+}
+
+.body {
+  display: grid;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+.legend + .body {
+  padding-block-start: var(--prime-space-4);
+}
+
+.legend + .body:has(> .description) {
+  padding-block-start: var(--prime-space-1);
+}
+
+.description {
+  margin: 0;
+  color: var(--prime-color-text-secondary);
+  font-family: var(--prime-font-family-sans);
+}
+
+.fields {
+  display: grid;
+  gap: var(--prime-space-5);
+  min-width: 0;
+}

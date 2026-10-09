@@ -39,6 +39,10 @@
   line-height: var(--prime-text-body-m-line-height);
 }
 
+.content[data-size="xs"] {
+  --modal-width: var(--prime-modal-width-xs);
+}
+
 .content[data-size="s"] {
   --modal-width: var(--prime-modal-width-s);
 }

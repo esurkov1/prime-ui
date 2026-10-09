@@ -16,8 +16,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
-          en: "`children` (`AppHeader.Start`, `AppHeader.Search`, `AppHeader.Actions`), `className` and the other attributes.",
-          ru: "`children` (`AppHeader.Start`, `AppHeader.Search`, `AppHeader.Actions`), `className` и остальные атрибуты.",
+          en: "`children` (`AppHeader.Start`, `AppHeader.Search`, `AppHeader.Actions`, `AppHeader.Tools`), `className` and the other attributes.",
+          ru: "`children` (`AppHeader.Start`, `AppHeader.Search`, `AppHeader.Actions`, `AppHeader.Tools`), `className` и остальные атрибуты.",
         },
       ],
     },
@@ -36,9 +36,16 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Title",
-      en: "`ref` → `HTMLDivElement`. Where you are: an optional `AppHeader.Icon`, the name (title-s, truncates) and an optional `AppHeader.Description` under it — the anatomy of the Sidebar brand. Not a heading: the page `<h1>` is PageContent.Title.",
-      ru: "Где вы находитесь: необязательная `AppHeader.Icon`, название (title-s, обрезается) и под ним необязательное `AppHeader.Description` — как бренд в Sidebar. Не заголовок: `<h1>` страницы — PageContent.Title.",
+      en: '`ref` → `HTMLDivElement`. Where you are: an optional `AppHeader.Icon`, the name (title-s, truncates) and an optional `AppHeader.Description` under it — the anatomy of the Sidebar brand. By default not a heading (the page `<h1>` is PageContent.Title); `as="h1"` makes it the page heading when the page has no `PageContent.Header`.',
+      ru: 'Где вы находитесь: необязательная `AppHeader.Icon`, название (title-s, обрезается) и под ним необязательное `AppHeader.Description` — как бренд в Sidebar. По умолчанию не заголовок (`<h1>` страницы — PageContent.Title); `as="h1"` делает его заголовком страницы, если у страницы нет `PageContent.Header`.',
       props: [
+        {
+          name: "as",
+          type: '"span" | "h1"',
+          default: '"span"',
+          en: "Tag of the name. `h1`: the header carries the page title — only the name is the heading, the description stays outside its accessible name; the look does not change.",
+          ru: "Тег названия. `h1`: шапка несёт заголовок страницы — заголовок только название, описание вне его доступного имени; вид не меняется.",
+        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
@@ -110,6 +117,19 @@ export const api: ComponentApi = {
           type: "ButtonHTMLAttributes<HTMLButtonElement>",
           en: "`onClick`, `className` and the other button attributes.",
           ru: "`onClick`, `className` и остальные атрибуты кнопки.",
+        },
+      ],
+    },
+    {
+      name: "AppHeader.Tools",
+      en: "`ref` → `HTMLDivElement`. The page's tools in the header — a `PageToolbar.Root` with sections, the period, filters and the page's primary action: the header's second row, the full width under the title row (12 apart), sticky with it. Root moves it there wherever it is written, so the Tab order follows the rows; the toolbar lays itself out from this width (one row when wide, two when narrow).",
+      ru: "Инструменты страницы в шапке — `PageToolbar.Root` с разделами, периодом, фильтрами и главным действием страницы: вторая строка шапки во всю ширину под строкой заголовка (зазор 12), липкая вместе с ней. Root ставит её туда, где бы она ни была написана, так что Tab идёт по строкам; панель раскладывается по этой ширине (одна строка на широкой, две на узкой).",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children` (a `PageToolbar.Root`), `className` and the other div attributes.",
+          ru: "`children` (`PageToolbar.Root`), `className` и остальные атрибуты div.",
         },
       ],
     },

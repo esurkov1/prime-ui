@@ -197,8 +197,7 @@ accessibility, examples and common mistakes.
 | [**Input**](https://github.com/esurkov1/prime-ui/blob/main/src/components/input/COMPONENT.md) | Single-line text field with label, hint, error and slots for icons, affixes, a badge, a clear button and a counter. |
 | [**Textarea**](https://github.com/esurkov1/prime-ui/blob/main/src/components/textarea/COMPONENT.md) | Multi-line text field with label, hint, error and a character counter; grows with its content from `rows` up to `maxRows`. |
 | [**DigitInput**](https://github.com/esurkov1/prime-ui/blob/main/src/components/digit-input/COMPONENT.md) | A row of square single-digit cells for a fixed-length code (OTP from SMS, PIN, pickup code). |
-| [**FileUpload**](https://github.com/esurkov1/prime-ui/blob/main/src/components/file-upload/COMPONENT.md) | File picker zone with drag and drop, plus presentational parts for the list of selected files. |
-| [**ImageUpload**](https://github.com/esurkov1/prime-ui/blob/main/src/components/image-upload/COMPONENT.md) | Photos as square tiles that follow the width, the last tile adds more: reorder by drag, remove, an optional cover. |
+| [**FileUpload**](https://github.com/esurkov1/prime-ui/blob/main/src/components/file-upload/COMPONENT.md) | Files and the image gallery in one component: a document field (rows), file cards, an image gallery with a cover or an attachment tray; uploads through a queue, reorder and server saves. |
 | [**Label**](https://github.com/esurkov1/prime-ui/blob/main/src/components/label/COMPONENT.md) | Field label (native `<label>`) with required and optional markers. |
 | [**Hint**](https://github.com/esurkov1/prime-ui/blob/main/src/components/hint/COMPONENT.md) | Help text or a validation error under a field. |
 | [**Fieldset**](https://github.com/esurkov1/prime-ui/blob/main/src/components/fieldset/COMPONENT.md) | A frameless group of form fields: a `title-s` legend, the form rhythm and one `disabled` for all of them. |
@@ -246,6 +245,7 @@ accessibility, examples and common mistakes.
 |---|---|
 | [**Message**](https://github.com/esurkov1/prime-ui/blob/main/src/components/message/COMPONENT.md) | Chat messages in speech bubbles: runs of one author, time and delivery ticks, replies, reactions, a context menu and selection, photos and albums, round videos, files, locations, contacts and link previews; new messages that enter by themselves, read receipts, typing, pinned messages, jump and search. |
 | [**VoicePlayer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/voice-player/COMPONENT.md) | A voice message player: a round play disk, a waveform that is the seek slider, and the time with the playback speed; one sound at a time, `getWaveform` for audio without levels. |
+| [**VideoNote**](https://github.com/esurkov1/prime-ui/blob/main/src/components/video-note/COMPONENT.md) | A round video message: a still first frame with the play disk, played with sound on a press; the same player API as VoicePlayer — transcript, transfer either way, one sound at a time. |
 | [**Composer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/composer/COMPONENT.md) | The message input of a chat: a growing field, Enter to send, attachments, reply / edit bar, Markdown formatting, voice and video messages with pause, the typing signal. |
 
 ### Status and loading (`status`)
@@ -331,7 +331,7 @@ accessibility, examples and common mistakes.
 | `applyTheme(scheme, element?)` | Switch the theme without transition flashes. |
 | `celebrate({ origin? })` | A short confetti burst for a rare milestone (a quarter closed, the first payment); draws nothing under reduced motion. |
 | `getPasswordStrength(value)` | The kit's 0–4 password estimate behind `Input.Root strength`; replace it with `getStrength`. |
-| `useUploadQueue({ upload, concurrency })` | The upload queue behind `FileUpload.Queue` and `ImageUpload queue`: your `upload(file, { signal, onProgress })` runs a few at a time, with progress, abort on remove and retry. |
+| `useUploadQueue({ upload, concurrency })` | The upload queue behind FileUpload `queue`: your `upload(file, { signal, onProgress })` runs a few at a time, with progress, abort on remove and retry. |
 | `groupMessages`, `formatMessageDate`, `formatMessageTime` | Chat data → dated runs of one author for `Message.Group`, and the date and time labels. |
 | `getWaveform` | The 0…1 levels of a recorded voice message (a `Blob` or a URL) for `VoicePlayer waveform`, decoded with the Web Audio API. |
 | `moveBefore(items, id, beforeId, getId)` | Applies a `Dnd` or DataTable `onReorder` to your array. |

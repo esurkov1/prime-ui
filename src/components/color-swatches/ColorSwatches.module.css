@@ -7,11 +7,16 @@
  * Width: the preferred size is one row of tier-sized swatches (`--swatch-count`, set by the
  * component), so a host that sizes to its content gets one row; `min` / `max` 100% make it exactly
  * the container width wherever that width is known, wider or narrower.
+ *
+ * Rows: the component measures the width and sets `--swatch-columns` so a wrap splits the swatches
+ * evenly (16 → 8 + 8, never 14 + 2); until it measures, `auto-fit` fills the rows greedily.
+ * The swatch height is the tier's whatever the column width: `size` sets the swatches only, the
+ * label and hint follow the form around.
  */
 .grid {
   --swatch-base: var(--swatch-base-control);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--swatch-size), 1fr));
+  grid-template-columns: repeat(var(--swatch-columns, auto-fit), minmax(var(--swatch-size), 1fr));
   gap: var(--swatch-gap);
   box-sizing: border-box;
   inline-size: calc(

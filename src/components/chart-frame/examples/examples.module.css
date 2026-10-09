@@ -1,0 +1,6 @@
+/* Layout of the ChartFrame scenarios: semantic tokens only. */
+
+/* The narrowest supported column: a phone, or a side panel of a dashboard. */
+.narrow {
+  width: min(100%, calc(var(--prime-space-20) * 4));
+}

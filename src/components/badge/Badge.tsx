@@ -1,14 +1,20 @@
 import * as React from "react";
 
+import { Spinner } from "@/components/spinner/Spinner";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import chipTier from "@/internal/chipTier.module.css";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
+import { leaveInPlace } from "@/internal/leaveInPlace";
 import palette from "@/internal/palette.module.css";
 import { RollingNumber } from "@/internal/RollingNumber";
 import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
+import { isPromiseLike } from "@/internal/usePendingChanges";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Badge.module.css";
 import { markEdgeIcons } from "./edgeIcons";
@@ -17,9 +23,11 @@ import { useBadgeTier } from "./tier";
 export type BadgeLabels = {
   /** Accessible name of the remove button; include the badge text, e.g. «Убрать фильтр «Москва»». */
   remove: string;
+  /** Spoken when the `onRemove` promise rejects and the badge stays. */
+  removeFailed: string;
 };
 
-const BADGE_LABELS: BadgeLabels = { remove: "Удалить" };
+const BADGE_LABELS: BadgeLabels = { remove: "Удалить", removeFailed: "Не удалось удалить" };
 
 export type BadgeRootProps = {
   /** Palette hue. Default `gray`. */
@@ -28,8 +36,18 @@ export type BadgeRootProps = {
   variant?: Exclude<Variant, "ghost">;
   /** Badge tier; without it the badge follows the surrounding control one tier down. */
   size?: ControlSize;
-  /** Shows the remove segment at the end (an applied filter, a selected value). */
-  onRemove?: () => void;
+  /**
+   * Shows the remove segment at the end (an applied filter, a selected value). Return the save's
+   * promise to remove on a server: the badge waits dimmed with a spinner in the segment; resolve —
+   * take it out of your list before resolving, it leaves with its exit; reject — it stays and
+   * `labels.removeFailed` is announced.
+   */
+  onRemove?: () => void | Promise<void>;
+  /**
+   * The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a
+   * spinner in the remove segment, which takes no press. A promise from `onRemove` does this itself.
+   */
+  loading?: boolean;
   /**
    * Makes the body a button covering the whole badge (a toggle chip, a filter value). Receives the
    * click, so Alt / Shift clicks can mean something else.
@@ -115,13 +133,60 @@ function BadgeRoot({
   onRemove,
   onPress,
   pressed,
+  loading = false,
   labels,
-  disabled,
+  disabled: disabledProp,
   children,
   className,
+  ref,
   ...rest
 }: BadgeRootProps) {
   const { size, tier } = useBadgeTier(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
+  const nodeRef = React.useRef<HTMLSpanElement | null>(null);
+  const rootRef = useMergedRefs(nodeRef, ref);
+  /** A promise from `onRemove` is pending: the badge waits, the segment spins. */
+  const [removing, setRemoving] = React.useState(false);
+  const [failure, setFailure] = React.useState("");
+  /** The remove segment was pressed: if the badge now unmounts, the owner took it out. */
+  const leavingRef = React.useRef(false);
+
+  // The owner took the badge out after its remove segment: it leaves with its exit, the badges
+  // after it closing up.
+  React.useLayoutEffect(() => {
+    const node = nodeRef.current;
+    return () => {
+      if (leavingRef.current && node) leaveInPlace(node, "inline");
+    };
+  }, []);
+
+  const busy = removing || loading;
+
+  const remove = () => {
+    if (busy || !onRemove) return;
+    leavingRef.current = true;
+    setFailure("");
+    const outcome = onRemove();
+    if (!isPromiseLike(outcome)) {
+      // A removal answered at once has committed by now; a badge still here was kept.
+      setTimeout(() => {
+        leavingRef.current = false;
+      });
+      return;
+    }
+    setRemoving(true);
+    outcome.then(
+      () => {
+        leavingRef.current = false;
+        setRemoving(false);
+      },
+      () => {
+        leavingRef.current = false;
+        setRemoving(false);
+        setFailure(labels?.removeFailed ?? BADGE_LABELS.removeFailed);
+      },
+    );
+  };
 
   // Badge.Action lives at the end of the badge, outside the text body.
   const items = React.Children.toArray(children);
@@ -154,8 +219,10 @@ function BadgeRoot({
 
   return (
     <span
+      ref={rootRef}
       className={cx(styles.root, chipTier.tier, palette.hue, className)}
       aria-disabled={disabled || undefined}
+      aria-busy={busy || undefined}
       {...toDataAttributes({
         color,
         variant,
@@ -166,6 +233,7 @@ function BadgeRoot({
         "icon-start": edges.start || undefined,
         "icon-end": edges.end || undefined,
         removable: onRemove ? true : undefined,
+        pending: busy || undefined,
         pressable: onPress ? true : undefined,
         pressed: onPress && pressed !== undefined ? pressed : undefined,
         action: actionElement
@@ -199,11 +267,18 @@ function BadgeRoot({
           type="button"
           className={cx(styles.remove, touchTargetBlockClass)}
           aria-label={labels?.remove ?? BADGE_LABELS.remove}
-          onClick={onRemove}
+          aria-disabled={busy || undefined}
+          onClick={remove}
           disabled={disabled}
         >
-          <Icon name="action.close" />
+          {busy ? <Spinner aria-hidden="true" /> : <Icon name="action.close" />}
         </button>
+      ) : null}
+      {/* Mounted once a removal waits (empty), so its refusal is spoken when it comes. */}
+      {onRemove && (removing || failure) ? (
+        <VisuallyHidden role="status" aria-live="polite">
+          {failure}
+        </VisuallyHidden>
       ) : null}
     </span>
   );
@@ -245,12 +320,13 @@ function BadgeAction({
   label,
   onClick,
   persistent: _persistent,
-  disabled,
+  disabled: disabledProp,
   pressed,
   children,
   className,
   ...rest
 }: BadgeActionProps) {
+  const disabled = useInheritedDisabled(disabledProp);
   return (
     <button
       {...rest}

@@ -29,13 +29,19 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Все состояния рядом, каждое подписано своим пропом — `checked`, `readOnly`, `invalid`, `disabled`.",
+        "Все состояния рядом, каждое подписано своим пропом — `checked`, `readOnly`, `invalid`, `loading`, `disabled`.",
     },
     {
       scenario: "settings-row",
       title: "Строка настроек",
       description:
         "Строка настроек: текст слева, дорожка без подписи справа — `aria-labelledby`, `aria-describedby`.",
+    },
+    {
+      scenario: "saving",
+      title: "Сохранение на сервере",
+      description:
+        "Настройка применяется на сервере сразу: бегунок ждёт на новом месте со спиннером, а отказ сервера плавно возвращает его и объясняет причину — `onCheckedChange`, `error`.",
     },
     {
       slot: "controlled",
@@ -52,12 +58,16 @@ export const page: ComponentPageConfig = {
   accessibility: {
     keyboard: [
       { keys: "Tab", action: "Переводит фокус на переключатель." },
-      { keys: "Space", action: "Переключает его (кроме `readOnly`)." },
+      {
+        keys: "Space",
+        action: "Переключает его (кроме `readOnly` и пока идёт сохранение).",
+      },
     ],
     aria: [
-      'Нативный `<input type="checkbox" role="switch">` с `aria-checked`, скрыт поверх дорожки и обёрнут строкой-`<label>`.',
+      'Нативный `<input type="checkbox" role="switch">` без `aria-checked`: состояние переключателя — нативное `checked` поля, его и читает скринридер; поле скрыто поверх дорожки и обёрнут строкой-`<label>`.',
       "`aria-invalid`, `aria-readonly` и `aria-describedby` (ваши id, затем подсказка или ошибка) — на input.",
       "Без видимого текста назовите его через `aria-label` или `aria-labelledby` на `Switch.Root`.",
+      "Пока изменение сохраняется (`loading` или промис из `onCheckedChange`), на input `aria-busy`, а спиннер в бегунке скрыт от чтения с экрана; при отказе состояние возвращается, причину покажите через `error`.",
     ],
   },
 };

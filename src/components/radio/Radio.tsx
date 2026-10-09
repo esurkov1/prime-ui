@@ -12,6 +12,7 @@ import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeConte
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldFrame, type FieldRootDomProps, useFieldFrame } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
 
@@ -80,7 +81,7 @@ function RadioGroup({
   onValueChange,
   name: nameProp,
   size: sizeProp,
-  disabled = false,
+  disabled: disabledProp = false,
   label,
   required = false,
   optional = false,
@@ -97,6 +98,7 @@ function RadioGroup({
   ...rest
 }: RadioGroupProps) {
   const size = useControlSize(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
   const name = nameProp ?? ids.controlId;
   const reportChange = React.useCallback(

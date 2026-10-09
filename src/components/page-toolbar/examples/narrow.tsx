@@ -1,4 +1,4 @@
-/** A phone-width column: exactly two rows — sections and the primary action on top, filter, search and the period below; each row has one stretchy item — `PageToolbar.Root`. */
+/** A phone-width column: search, filter and the primary action on top, the active filters under them, then the sections and the period, every row 12 apart — `PageToolbar.Root`. */
 import {
   Button,
   Icon,
@@ -51,6 +51,9 @@ export default function PageToolbarNarrowExample() {
         onSearchChange={setSearch}
       >
         <PageToolbar.Root aria-label="Заказы">
+          <PageToolbar.Tools>
+            <SmartFilter.Toolbar />
+          </PageToolbar.Tools>
           <PageToolbar.Sections>
             <SegmentedControl.Root
               fullWidth
@@ -66,9 +69,6 @@ export default function PageToolbarNarrowExample() {
               ))}
             </SegmentedControl.Root>
           </PageToolbar.Sections>
-          <PageToolbar.Tools>
-            <SmartFilter.Toolbar />
-          </PageToolbar.Tools>
           <PageToolbar.View>
             <Select.Root value={period} onValueChange={setPeriod}>
               <Select.Trigger aria-label="Период">

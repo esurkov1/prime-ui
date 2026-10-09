@@ -6,13 +6,21 @@
  * 24 → 40 from 1024px.
  */
 
+/*
+ * Zone states travel as custom properties set by a subject `:has()` (or a TSX attribute) and read by
+ * the zone: a `:has()` anchored high in the page whose rule targets a descendant (`… > .main`) is
+ * invalidated on every DOM insert anywhere inside it. Each shell resets them, so a shell nested in
+ * a page (an example) starts clean.
+ */
 .root {
   --shell-gutter: var(--prime-layout-gutter-s);
   --shell-top: var(--prime-space-6);
+  --shell-rail-end: initial;
+  --shell-footer-display: initial;
 
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   width: 100%;
   min-width: 0;
   min-height: 100dvh;
@@ -20,8 +28,8 @@
   color: var(--prime-color-text-primary);
 }
 
-.root:not(:has(> .nav)) {
-  grid-template-columns: minmax(0, 1fr);
+.root[data-nav="true"] {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .root[data-fill-viewport="true"] {
@@ -63,6 +71,8 @@
 
 /* The page (foundation §4): cards on it are layer 1, white in light with the raised whisper. */
 .panel {
+  --shell-floating-end: initial;
+
   /* Its sticky header and footer stack inside the panel, under the nav column. */
   isolation: isolate;
   box-sizing: border-box;
@@ -80,6 +90,7 @@
  * navigation, so it shows only while the shell has no navigation column on screen (see below).
  */
 .footer {
+  display: var(--shell-footer-display, block);
   position: sticky;
   bottom: 0;
   z-index: var(--prime-z-sticky);
@@ -92,6 +103,8 @@
  * wrapper element.
  */
 .main {
+  --shell-fill-end: initial;
+
   box-sizing: border-box;
   display: flex;
   flex: 1 1 auto;
@@ -99,7 +112,9 @@
   min-width: 0;
   min-height: 0;
   margin: 0;
-  padding-block: var(--shell-top) var(--prime-space-16);
+  /* The bottom air: the rail on screen › a floating BottomNav › a fill page › the default. */
+  padding-block: var(--shell-top)
+    var(--shell-rail-end, var(--shell-floating-end, var(--shell-fill-end, var(--prime-space-16))));
   /* Default: the whole panel, only the responsive gutters. */
   padding-inline: var(--shell-gutter);
 }
@@ -108,6 +123,12 @@
    example, a preview) starts from its own default instead of inheriting them. */
 .main > * {
   --shell-gutter: initial;
+}
+
+/* A page that fills the panel's height (`PageContent.Root fill`): no long scroll tail under it,
+   the bottom air matches the side gutters. */
+.main:has(> [data-fill="true"]) {
+  --shell-fill-end: var(--shell-gutter);
 }
 
 /* Long-read pages: a centered column up to the content max width. */
@@ -124,8 +145,8 @@
   height: 0;
 }
 
-.panel:has(> .footer > [data-floating="true"]) > .main {
-  padding-block-end: calc(
+.panel:has(> .footer > [data-floating="true"]) {
+  --shell-floating-end: calc(
     var(--prime-space-16) +
     var(--prime-bottom-nav-floating-height) +
     env(safe-area-inset-bottom, 0px)
@@ -138,10 +159,12 @@
  * column, or while the Sidebar is off-canvas (`offCanvas="auto"` below 768px, `"always"`), the bar
  * stays at any width — navigation is never left behind a hidden bar.
  */
-.root:has(> .nav):not(:has(> .nav [data-off-canvas])) > .panel > .footer {
-  display: none;
+.root[data-nav="true"] {
+  --shell-rail-end: var(--prime-space-16);
+  --shell-footer-display: none;
 }
 
-.root:has(> .nav):not(:has(> .nav [data-off-canvas])) > .panel > .main {
-  padding-block-end: var(--prime-space-16);
+.root[data-nav="true"]:has(> .nav [data-off-canvas]) {
+  --shell-rail-end: initial;
+  --shell-footer-display: initial;
 }

@@ -32,6 +32,8 @@ export type DragSnapshot = {
    */
   heldId: string | null;
   canDrop: boolean;
+  /** Why the target under the pointer refuses the item (its `canDrop` answered a string), or null. */
+  reason: string | null;
   /** The rect the lifted element occupied when the drag began: the size of the gap a list opens for it. */
   origin: Rect | null;
   /** Where inside that rect the pointer grabbed it. */
@@ -54,12 +56,19 @@ export const IDLE_SNAPSHOT: DragSnapshot = {
   overId: null,
   heldId: null,
   canDrop: false,
+  reason: null,
   origin: null,
   grab: null,
   carried: null,
   radius: null,
   announcement: { message: "", sequence: 0 },
 };
+
+/**
+ * A target's answer for the item at a spot: `true` takes it; `false` refuses; a string refuses and
+ * says why (spoken by the live region, shown by the carried copy).
+ */
+export type DropVerdict = boolean | string;
 
 export type DropTargetEntry = {
   id: string;
@@ -68,8 +77,8 @@ export type DropTargetEntry = {
   /** Keeps the drop while the pointer crosses empty space (the gutter between two lists). */
   holdsDrop: boolean;
   enter: (item: DragItem) => void;
-  /** Called on every resolved pointer position; returns whether a drop here would be accepted. */
-  over: (point: Point, item: DragItem) => boolean;
+  /** Called on every resolved pointer position; whether a drop here would be accepted, or why not. */
+  over: (point: Point, item: DragItem) => DropVerdict;
   leave: () => void;
   drop: (point: Point, item: DragItem) => void;
   /** Drops where the pointer was last over this target: the release came over empty space. */
@@ -194,7 +203,7 @@ export function createDragController(
     store.setState((current) => ({ ...current, announcement }));
   };
 
-  const say = (key: Exclude<keyof DndLabels, "handle" | "roleDescription">, item: DragItem) =>
+  const say = (key: "grabbed" | "dropped" | "returned" | "cancelled", item: DragItem) =>
     announce(formatLabel(getLabels()[key], { label: item.label }));
 
   const hitTest = (point: Point, item: DragItem): DropTargetEntry | null => {
@@ -227,16 +236,26 @@ export function createDragController(
       active.over = next;
       next?.enter(active.item);
     }
-    const canDrop = next ? next.over(active.point, active.item) : false;
+    const verdict = next ? next.over(active.point, active.item) : false;
+    const canDrop = verdict === true;
+    const reason = typeof verdict === "string" && verdict !== "" ? verdict : null;
     // Empty space changes nothing: the pointer is on its way between two targets.
     if (next) active.held = next.holdsDrop && canDrop ? next : null;
     const overId = next?.id ?? null;
     const heldId = active.held?.id ?? null;
+    const before = store.getSnapshot().reason;
     store.setState((current) =>
-      current.overId === overId && current.heldId === heldId && current.canDrop === canDrop
+      current.overId === overId &&
+      current.heldId === heldId &&
+      current.canDrop === canDrop &&
+      current.reason === reason
         ? current
-        : { ...current, overId, heldId, canDrop },
+        : { ...current, overId, heldId, canDrop, reason },
     );
+    // A new reason is said once, when it appears, not on every move over the same refusal.
+    if (reason !== null && reason !== before) {
+      announce(formatLabel(getLabels().refusedReason, { label: active.item.label, reason }));
+    }
     // The pointer scrolls what is under it or, with nothing under it, the box the drag came out of.
     // Walking the ancestors reads computed styles, so it is done once per target, not per move.
     const scrollRoot = next?.element ?? active.element;
@@ -311,6 +330,7 @@ export function createDragController(
       overId: null,
       heldId: null,
       canDrop: false,
+      reason: null,
       origin: null,
       grab: null,
       carried: null,
@@ -410,7 +430,7 @@ export function createDragController(
       active.point = point;
       // Resolved from the release point itself: a flick can end between two moves.
       const target = hitTest(point, active.item);
-      if (target?.over(point, active.item)) {
+      if (target?.over(point, active.item) === true) {
         target.drop(point, active.item);
         say("dropped", active.item);
         finish("drop");

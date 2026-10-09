@@ -3,31 +3,40 @@
 **Category:** selection
 **Kind:** composite
 
-> A filter bar for lists and tables: a filter button and a search with a panel of values, applied filters as removable tags, and a "show / hide" choice for every value.
+> The search and filter bar of lists and tables: the search first and a filter button with a panel of values and ranges, applied filters as removable tags, and a "show / hide" choice for every value.
 
 ## When to use
 - Narrowing a list, table or log by several fields at once (service, method, status), where the user also types free text.
 - Filters where "everything except this" matters as much as "only this": every value can be shown or hidden.
 - Many values per field (dozens of services): the panel collapses them to «Ещё N» and narrows as the user types.
+- Ranges next to the values: an amount from–to (`kind: "range"`), a period (`kind: "date-range"`), each one readable chip.
+- An API that takes one value per field (`multiple: false`), a screen whose text search lives elsewhere (`searchable={false}`), values of different kinds in one field (`group`).
 
 ## When not to use
 - One field with a few options → use [SegmentedControl](../segmented-control/COMPONENT.md), [Select](../select/COMPONENT.md) or [TagSelect](../tag-select/COMPONENT.md) in the toolbar.
-- Only a text search → use [Input](../input/COMPONENT.md) with a search icon.
+- A search outside a table or list page (inside a picker, a settings section, a panel) → [Input](../input/COMPONENT.md) with a search icon. Over a table or list page the search is SmartFilter even with no fields yet (`fields={[]}`): it grows into filters without a rebuild.
 - Choosing values for a form field → use [TagSelect](../tag-select/COMPONENT.md).
-- Filtering by a range (dates, price) → use [Datepicker](../datepicker/COMPONENT.md) or [Slider](../slider/COMPONENT.md); SmartFilter works on discrete values.
+- One period that drives a whole dashboard → [Datepicker](../datepicker/COMPONENT.md) in the page toolbar; SmartFilter ranges filter rows of a list.
 
 ## Import
 ```tsx
-import { SmartFilter, matchesSmartFilter, resolveSmartFilterValues } from "prime-ui-kit";
+import {
+  SmartFilter,
+  isSmartFilterRange,
+  matchesSmartFilter,
+  resolveSmartFilterValues,
+} from "prime-ui-kit";
 ```
 
 ## Anatomy
 ```
 SmartFilter.Root                  state + context (flex column)
-├─ SmartFilter.Toolbar            [filter Button (count Badge)] [search Input] — the anchor of the panel
+├─ SmartFilter.Toolbar            [search Input (searchable)] [filter Button (count Badge)] — the anchor of the panel
 │  └─ panel                       flush Popover as wide as the toolbar; sections split by Dividers
 │     ├─ query row                ghost Button «Искать «text»» + Kbd ↵, while typing
 │     ├─ field rows               field label · value Badges with a «−» Badge.Action · «Ещё N» Badge
+│     │                           (groups: a caption over each group's values, role="group")
+│     ├─ range rows               field label · Input «от» – Input «до» · or a Datepicker range field
 │     ├─ no matches               compact EmptyPage naming the fields with nothing found
 │     └─ footer                   hint · count · Reset Button
 └─ SmartFilter.Chips              applied filters as removable Badges · add / clear all Buttons
@@ -44,7 +53,7 @@ The toolbar and the chips are separate parts so a page can put them in different
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `fields` | `readonly SmartFilterField[]` | — (required) | Fields of this screen, in display order; empty — only the search. Pass a stable reference. |
-| `value` | `SmartFilterValue` | — | Selection per field key, controlled: `{ include, exclude }` per field. |
+| `value` | `SmartFilterValue` | — | Value per field key, controlled: `{ include, exclude }` for an options field, `{ from, to }` (numbers or dates, `null` — open) for a range field. |
 | `defaultValue` | `SmartFilterValue` | `{}` | Initial selection, uncontrolled. |
 | `onValueChange` | `(value: SmartFilterValue) => void` | — | The whole next value; keys of fields this root does not show are kept. |
 | `search` | `string` | — | Search text, controlled. |
@@ -57,10 +66,11 @@ The toolbar and the chips are separate parts so a page can put them in different
 | `children` | `ReactNode` | — (required) | `SmartFilter.Toolbar` and `SmartFilter.Chips`, anywhere inside. |
 
 ### SmartFilter.Toolbar
-`ref` → `HTMLDivElement`. A `<div>`: the filter Button (a count Badge while filters apply) and a search Input; the anchor of the panel, a flush Popover.
+`ref` → `HTMLDivElement`. A `<div>`: the search Input first, then the filter Button (a count Badge while filters apply); the anchor of the panel, a flush Popover.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `searchable` | `boolean` | `true` | The search input. `false` — the filter button alone; the panel opens at its own width (24rem at most) and lists every field. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the toolbar. |
 
 ### SmartFilter.Chips
@@ -77,11 +87,14 @@ One entry of `fields`: data, not a part. Selected values missing from `options` 
 |---|---|---|---|
 | `key` | `string` | — (required) | Key of the field in the value. |
 | `label` | `string` | — (required) | Field name in the panel and the chips. |
-| `options` | `{ value: string; label: string; icon?: ReactNode }[]` | — (required) | Values; `icon` is a decorative kit Icon before the label. |
-| `finite` | `boolean` | `true` | A fixed set: hiding every value is refused. `false` for an open set (services, users). |
+| `kind` | `"options" \| "range" \| "date-range"` | `"options"` | `options` — values to show or hide; `range` — a number range in two Inputs («от» – «до»); `date-range` — a period in the kit Datepicker (`mode="range"`). A range is one filter and one chip: «Сумма: 1 000–5 000», «Период: 1–15 мар». |
+| `options` | `{ value: string; label: string; icon?: ReactNode; group?: string }[]` | — (required) | `options` fields: values; `icon` is a decorative kit Icon before the label; values with one `group` stay together under that heading, groups in the order they first appear. |
+| `finite` | `boolean` | `true` | `options` fields: a fixed set — hiding every value is refused. `false` for an open set (services, users). |
+| `multiple` | `boolean` | `true` | `options` fields: many values at once. `false` — one value and no hiding: a press picks only that value, a second press clears it (an API that takes one value per field). |
+| `formatValue` | `(value: number) => string` | `Russian digit groups` | `range` fields: a bound in the chip («1 000 ₽»). |
 
-### matchesSmartFilter · resolveSmartFilterValues
-Helpers. `matchesSmartFilter(selection, value)` checks one value on the client (`include` empty = any, `exclude` rejects). `resolveSmartFilterValues(selection, all)` turns a fixed field into the list to ask a server for: «hide» becomes «all except», `[]` — no filter.
+### matchesSmartFilter · resolveSmartFilterValues · isSmartFilterRange
+Helpers. `matchesSmartFilter(entry, item)` checks one item's value on the client: a selection (`include` empty = any, `exclude` rejects) or a range (both bounds inclusive, dates by whole days); an item with no value passes only an empty filter. `resolveSmartFilterValues(entry, all)` turns a fixed field into the list to ask a server for: «hide» becomes «all except», `[]` — no filter. `isSmartFilterRange(entry)` tells a range from a selection.
 
 ## Variants
 
@@ -104,6 +117,25 @@ same height and type.
 | `true` | the «−» of the last shown value is disabled | fixed sets (method, status) | yes |
 | `false` | every value can be hidden | open sets (services, users) | |
 
+### field `kind`
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `options` | value Badges to show or hide | discrete values | yes |
+| `range` | two Inputs «от» – «до»; chip «Сумма: 1 000–5 000» (`от 1 000`, `до 5 000` with one bound) | amounts, counts | |
+| `date-range` | the kit Datepicker range field; chip in the Datepicker's words («Период: 1–15 мар») | a period | |
+
+### field `multiple`
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `true` | many values, each shown or hidden | most fields | yes |
+| `false` | one value, no «−»: a press picks it, a second press clears it | the API takes one value per field | |
+
+### Toolbar `searchable`
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `true` | search + filter button, the panel as wide as the toolbar | lists with free text | yes |
+| `false` | the filter button alone; the panel at its own width (≤ 24rem) | the search lives elsewhere or there is none | |
+
 ## States
 | State | Driven by | DOM |
 |---|---|---|
@@ -113,13 +145,18 @@ same height and type.
 | value hidden | «−», Alt+click, Shift+Enter | red Badge with «НЕ», `data-mode="exclude"`; its «−» stays visible and unhides |
 | cannot hide | last value of a `finite` field | the «−» is disabled |
 | searching | `search` | only matching values, the match in `accent-text` (a `<mark>`); fields with nothing found in a compact EmptyPage; the «Искать» row closes the panel |
+| range set | a bound typed or a period picked | `{ from, to }` in the value; counts as one filter, one blue chip; removing the chip clears both bounds and the inputs |
+| range inverted | `from` above `to` | both bound inputs `aria-invalid` with the danger ring; nothing matches |
+| single value | `multiple: false` | at most one value `aria-pressed`; no «−» |
 | no filters | empty value | no count on the button, no Chips |
 
 ## Layout & spacing
 - The panel is a flush Popover as wide as the toolbar; every section is a full-width row with its own padding (`--prime-space-3` × `--prime-space-4`, footer `--prime-space-2` × `--prime-space-4`), Dividers run edge to edge, the field label column is `--prime-space-24`.
-- The toolbar is one row of controls (`--prime-space-2` gap): the filter button keeps its width, the search grows from 9rem (`--prime-space-24` × 1.5). When less than 9rem is left beside the button, the search moves under it at full width; every row stays one control high.
+- The toolbar is one row of controls (`--prime-space-2` gap): the search first, growing from 9rem (`--prime-space-24` × 1.5), then the filter button at its own width. When less than 9rem is left beside the button, the button moves under the search; every row stays one control high. Search first, filter second — the active filters (`SmartFilter.Chips`) sit right under them.
 - Chips are Badges of the toolbar tier on the badge scale (`xs` → `s`), so a tag sits lower than the controls above it; «Добавить фильтр» is a tag of the same tier and «Сбросить все» a LinkButton with the tag's text size.
 - Values and chips wrap with `--prime-space-2` gaps; «Сбросить все» is pushed to the end.
+- Option groups stack `--prime-space-3` apart, a caption `--prime-space-1` above each group's values. A range row holds two equal Inputs with a dash between them, centred on the field label.
+- While typing a search a range row stays only when its field name matches.
 - The root is a flex column (`--prime-space-3`): Toolbar, then Chips.
 
 ## Accessibility
@@ -136,6 +173,8 @@ same height and type.
 - The filter button has `aria-expanded` and `aria-haspopup="dialog"`; the panel is a non-modal `role="dialog"` named by a visually hidden `labels.filter` title.
 - Values are toggle buttons with `aria-pressed`; the «−» has its own name (`labels.hideValue` / `labels.unhideValue`); a hidden value carries the «НЕ» text, so meaning is never in color alone.
 - Fields with nothing found are announced through `role="status"`.
+- Range bounds are inputs named by `labels.fromLabel` / `labels.toLabel` («Сумма, от»); an inverted range marks both `aria-invalid`. A date range is the Datepicker field named by the field label.
+- An option group is a `role="group"` named by its `group`.
 - Every filter tag has a remove button named by `labels.remove`.
 
 ### Labels
@@ -161,6 +200,12 @@ same height and type.
 | `chipInclude` | `"{field}: {value}"` | Text of a «show» tag. |
 | `chipExclude` | `"{field}: не {value}"` | Text of a «hide» tag. |
 | `remove` | `"Убрать фильтр «{value}»"` | Name of a tag's remove button. |
+| `from` | `"от"` | Placeholder of a range's lower bound. |
+| `to` | `"до"` | Placeholder of a range's upper bound. |
+| `fromLabel` | `"{field}, от"` | Accessible name of the lower bound input. |
+| `toLabel` | `"{field}, до"` | Accessible name of the upper bound input. |
+| `rangeFrom` | `"от {value}"` | Chip value of a range with only the lower bound. |
+| `rangeTo` | `"до {value}"` | Chip value of a range with only the upper bound. |
 
 ## Examples
 | Example | Shows |
@@ -168,6 +213,9 @@ same height and type.
 | [overview.tsx](examples/overview.tsx) | Filters above a request list: the filter button and the search, applied filters as tags, rows narrowed by the value and the text — `fields`, `value`, `search`, `matchesSmartFilter`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: the filter button, the search, the tags and the panel follow one tier — `size`. |
 | [many-values.tsx](examples/many-values.tsx) | An open set of twenty services, degraded ones marked with an icon, collapsed after eight; typing narrows the panel and marks the match in accent — `finite`, `icon`, `collapsedLimit`. |
+| [ranges.tsx](examples/ranges.tsx) | Deals narrowed by an amount from–to and a period from the calendar; each range is one readable chip — `kind`, `formatValue`, `matchesSmartFilter`. |
+| [single-value.tsx](examples/single-value.tsx) | For an API that takes one value per field: the filter button without a search, a press picks only that value and nothing can be hidden — `searchable`, `multiple`. |
+| [option-groups.tsx](examples/option-groups.tsx) | Values of different kinds in one field: owner types and people under their own headings — `options`, `group`. |
 | [controlled.tsx](examples/controlled.tsx) | A saved view sets the value from outside; the selection is read back as the list to ask the server for — `value`, `onValueChange`, `resolveSmartFilterValues`. |
 | [narrow.tsx](examples/narrow.tsx) | A 320 px column: the search shrinks next to the filter button and the tags wrap under them — `size`. |
 
@@ -178,7 +226,10 @@ same height and type.
 - Sending `include` to a server for a hidden value of a fixed field → use `resolveSmartFilterValues`.
 - Putting `Chips` outside `SmartFilter.Root` → every part needs the root.
 - A second row of filter buttons next to the toolbar → fields belong in `fields`.
+- An amount or a period in its own Popover beside the toolbar → a `range` / `date-range` field; it gets a chip and the count.
+- One field split in two because its values are of different kinds → one field with `group` on the options.
+- Cutting the «−» and the search off on the client for a one-value API → `multiple: false` and `searchable={false}`.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Input](../input/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Typography](../typography/COMPONENT.md)
-- **See also:** [TagSelect](../tag-select/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)
+- **Built from:** [Button](../button/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Input](../input/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Divider](../divider/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Typography](../typography/COMPONENT.md), Icon (`action.search`, `action.filter`, `action.add`, `nav.chevronDown`)
+- **See also:** [PageToolbar](../page-toolbar/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

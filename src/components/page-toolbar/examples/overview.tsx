@@ -1,4 +1,4 @@
-/** The panel of an orders page: sections with counts, filter and search, the period and the primary action in one row; active filters in a row under it — `PageToolbar.Sections`, `PageToolbar.Tools`, `PageToolbar.View`, `PageToolbar.Actions`, `PageToolbar.Chips`. */
+/** The panel of an orders page: search and filter, sections with counts, the period and the primary action in one row; active filters right under the search — `PageToolbar.Tools`, `PageToolbar.Sections`, `PageToolbar.View`, `PageToolbar.Actions`, `PageToolbar.Chips`. */
 import {
   Button,
   Icon,
@@ -61,6 +61,9 @@ export default function PageToolbarOverviewExample() {
       onSearchChange={setSearch}
     >
       <PageToolbar.Root aria-label="Заказы">
+        <PageToolbar.Tools>
+          <SmartFilter.Toolbar />
+        </PageToolbar.Tools>
         <PageToolbar.Sections>
           <SegmentedControl.Root
             fullWidth
@@ -76,9 +79,6 @@ export default function PageToolbarOverviewExample() {
             ))}
           </SegmentedControl.Root>
         </PageToolbar.Sections>
-        <PageToolbar.Tools>
-          <SmartFilter.Toolbar />
-        </PageToolbar.Tools>
         <PageToolbar.View>
           <Select.Root value={period} onValueChange={setPeriod}>
             <Select.Trigger aria-label="Период">

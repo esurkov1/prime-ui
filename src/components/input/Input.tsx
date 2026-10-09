@@ -5,6 +5,19 @@ import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeConte
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
+import {
+  FieldActionButton,
+  type FieldActionButtonProps,
+  FieldCopyButton,
+  fieldActionClass,
+} from "@/internal/FieldAction";
+import {
+  type FieldCommit,
+  type FieldCommitHandler,
+  FieldCommitStatus,
+  useFieldCommit,
+} from "@/internal/FieldCommit";
 import {
   FieldCounter,
   FieldFrame,
@@ -25,6 +38,18 @@ export type InputLabels = {
   optional: string;
   /** Accessible name of `Input.ClearButton`. */
   clear: string;
+  /** Name and tooltip of `Input.CopyButton`. */
+  copy: string;
+  /** Name, tooltip and announcement of `Input.CopyButton` once the value is copied. */
+  copied: string;
+  /** Name, tooltip and announcement of `Input.CopyButton` when the clipboard refuses. */
+  copyError: string;
+  /** Accessible name of `Input.RevealButton` (a toggle: `aria-pressed` says whether it is shown). */
+  reveal: string;
+  /** Announced while an `onCommit` save is pending. */
+  saving: string;
+  /** Announced once an `onCommit` save succeeds. */
+  saved: string;
   /** Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced. */
   counter: string;
   /** Accessible name of the `strength` meter. */
@@ -39,6 +64,12 @@ export type InputLabels = {
 const INPUT_LABELS: InputLabels = {
   optional: "необязательно",
   clear: "Очистить",
+  copy: "Копировать",
+  copied: "Скопировано",
+  copyError: "Не удалось скопировать",
+  reveal: "Показать пароль",
+  saving: "Сохранение",
+  saved: "Сохранено",
   counter: "{current} из {max} символов",
   strength: "Надёжность пароля",
   strengthWeak: "Слабый",
@@ -67,6 +98,14 @@ type InputContextValue = {
   labels: InputLabels;
   /** `Input.Field` reports its value here when the root shows a `strength` meter. */
   reportValue: ((value: string) => void) | null;
+  /** Inline save cycle; inert without `onCommit`. */
+  commit: FieldCommit;
+  hasCommit: boolean;
+  /** `Input.RevealButton` shows a password field as text. */
+  revealed: boolean;
+  setRevealed: React.Dispatch<React.SetStateAction<boolean>>;
+  /** The caret and selection kept across a reveal (changing `type` resets them). */
+  selectionRef: React.RefObject<[number, number] | null>;
 };
 
 const [InputProvider, useInputContext] = createComponentContext<InputContextValue>("Input");
@@ -105,6 +144,13 @@ export type InputRootProps = FieldRootDomProps & {
   strength?: boolean;
   /** Replaces the kit's estimate (`getPasswordStrength`): return 0 (empty) … 4 (hard). */
   getStrength?: (value: string) => PasswordStrength;
+  /**
+   * Saves the field on its own (inline editing): fires with the value on blur and Enter when it
+   * differs from the last committed one; Escape reverts to it. Return a Promise to show a spinner
+   * at the field's edge while it runs (the field stays editable, Tab moves on); a rejection puts
+   * the committed value back — show why through `error`. Success shows a brief check.
+   */
+  onCommit?: FieldCommitHandler;
   labels?: Partial<InputLabels>;
   children: React.ReactNode;
 };
@@ -123,6 +169,7 @@ function InputRoot({
   id,
   strength = false,
   getStrength = getPasswordStrength,
+  onCommit,
   labels: labelsProp,
   children,
   className,
@@ -134,6 +181,10 @@ function InputRoot({
   const labels = React.useMemo(() => ({ ...INPUT_LABELS, ...labelsProp }), [labelsProp]);
   const { invalid: isInvalid, controlId: inputId, describedBy } = ids;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const commit = useFieldCommit(inputRef, onCommit);
+  const hasCommit = onCommit !== undefined;
+  const [revealed, setRevealed] = React.useState(false);
+  const selectionRef = React.useRef<[number, number] | null>(null);
 
   const contextValue = React.useMemo(
     () => ({
@@ -146,8 +197,25 @@ function InputRoot({
       describedBy,
       labels,
       reportValue: strength ? setStrengthValue : null,
+      commit,
+      hasCommit,
+      revealed,
+      setRevealed,
+      selectionRef,
     }),
-    [size, isInvalid, focusRing, required, inputId, describedBy, labels, strength],
+    [
+      size,
+      isInvalid,
+      focusRing,
+      required,
+      inputId,
+      describedBy,
+      labels,
+      strength,
+      commit,
+      hasCommit,
+      revealed,
+    ],
   );
   const level = strength ? getStrength(strengthValue) : 0;
   const levelWord = level
@@ -219,7 +287,7 @@ export type InputWrapperProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 function InputWrapper({ children, className, ...rest }: InputWrapperProps) {
-  const { size, invalid, focusRing } = useInputContext();
+  const { size, invalid, focusRing, commit, hasCommit, labels } = useInputContext();
 
   return (
     <div
@@ -232,6 +300,9 @@ function InputWrapper({ children, className, ...rest }: InputWrapperProps) {
       })}
     >
       {children}
+      {hasCommit ? (
+        <FieldCommitStatus state={commit.state} labels={labels} className={styles.status} />
+      ) : null}
     </div>
   );
 }
@@ -250,8 +321,13 @@ function InputField({
   className,
   "aria-describedby": ariaDescribedBy,
   required,
+  disabled: disabledProp,
+  type,
   onChange,
   onValueChange,
+  onFocus,
+  onBlur,
+  onKeyDown,
   ref,
   ...rest
 }: InputFieldProps) {
@@ -262,8 +338,23 @@ function InputField({
     required: requiredCtx,
     describedBy,
     reportValue,
+    commit,
+    hasCommit,
+    revealed,
+    selectionRef,
   } = useInputContext();
   const setRefs = useMergedRefs(inputRef, ref);
+  const disabled = useInheritedDisabled(disabledProp);
+
+  // A reveal swaps `type`, which resets the caret: put the kept selection back.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs after each reveal toggle
+  React.useLayoutEffect(() => {
+    const selection = selectionRef.current;
+    const input = inputRef.current;
+    if (!selection || !input) return;
+    selectionRef.current = null;
+    input.setSelectionRange(selection[0], selection[1]);
+  }, [revealed, selectionRef, inputRef]);
 
   // A strength meter on the root follows the value: controlled, default, then every edit.
   const controlled = rest.value;
@@ -283,11 +374,29 @@ function InputField({
       className={cx(styles.field, className)}
       aria-invalid={invalid || undefined}
       aria-describedby={resolvedDescribedBy}
+      disabled={disabled || undefined}
       required={required ?? (requiredCtx || undefined)}
+      type={type === "password" && revealed ? "text" : type}
+      aria-busy={commit.state === "pending" || undefined}
       onChange={(event) => {
         onChange?.(event);
         onValueChange?.(event.target.value);
         reportValue?.(event.target.value);
+      }}
+      onFocus={(event) => {
+        onFocus?.(event);
+        if (hasCommit) commit.sync();
+      }}
+      onBlur={(event) => {
+        onBlur?.(event);
+        if (hasCommit) commit.commit();
+      }}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (!hasCommit || event.defaultPrevented || event.nativeEvent.isComposing) return;
+        if (event.key === "Enter") commit.commit();
+        // A reverted Escape is consumed: it does not also close the drawer the field sits in.
+        else if (event.key === "Escape" && commit.revert()) event.preventDefault();
       }}
     />
   );
@@ -370,7 +479,8 @@ function InputClearButton({ className, onClick, ref, ...rest }: InputClearButton
       {...rest}
       ref={ref}
       type="button"
-      className={cx(styles.action, className)}
+      className={cx(fieldActionClass, className)}
+      data-field-action=""
       aria-label={labels.clear}
       aria-controls={inputId}
       onClick={(event) => {
@@ -383,6 +493,97 @@ function InputClearButton({ className, onClick, ref, ...rest }: InputClearButton
   );
 }
 InputClearButton.displayName = "Input.ClearButton";
+
+// ---- InputAction ----
+
+export type InputActionProps = FieldActionButtonProps;
+
+/**
+ * The consumer's icon action at the field's end («Позвонить», «Открыть профиль»): a named button
+ * segment with a tooltip; `asChild` renders a link.
+ */
+function InputAction(props: InputActionProps) {
+  return <FieldActionButton {...props} />;
+}
+InputAction.displayName = "Input.Action";
+
+// ---- InputCopyButton ----
+
+export type InputCopyButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "type" | "children" | "aria-label"
+> & {
+  /** Text to copy; the field's current value when omitted. */
+  value?: string;
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+/** Copies the field's value; the glyph morphs into a check and the name says «copied». */
+function InputCopyButton({ value, ...rest }: InputCopyButtonProps) {
+  const { inputRef, labels } = useInputContext();
+  return (
+    <FieldCopyButton
+      {...rest}
+      labels={labels}
+      getText={() => value ?? inputRef.current?.value ?? ""}
+    />
+  );
+}
+InputCopyButton.displayName = "Input.CopyButton";
+
+// ---- InputRevealButton ----
+
+export type InputRevealButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "type" | "children" | "aria-label" | "aria-pressed"
+> & {
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+/**
+ * Shows a `type="password"` field as text and back (`aria-pressed`). A pointer press keeps the focus
+ * in the field; the caret and selection survive the switch.
+ */
+function InputRevealButton({
+  className,
+  onClick,
+  onMouseDown,
+  ref,
+  ...rest
+}: InputRevealButtonProps) {
+  const { inputId, inputRef, labels, revealed, setRevealed, selectionRef } = useInputContext();
+  return (
+    <button
+      {...rest}
+      ref={ref}
+      type="button"
+      className={cx(fieldActionClass, className)}
+      data-field-action=""
+      aria-label={labels.reveal}
+      aria-pressed={revealed}
+      aria-controls={inputId}
+      onMouseDown={(event) => {
+        onMouseDown?.(event);
+        // Keep the caret in the field: the press does not take focus.
+        if (!event.defaultPrevented && document.activeElement === inputRef.current) {
+          event.preventDefault();
+        }
+      }}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
+        const input = inputRef.current;
+        if (input && input.selectionStart !== null && input.selectionEnd !== null) {
+          selectionRef.current = [input.selectionStart, input.selectionEnd];
+        }
+        setRevealed((shown) => !shown);
+      }}
+    >
+      <Icon name={revealed ? "field.password.hide" : "field.password.show"} />
+    </button>
+  );
+}
+InputRevealButton.displayName = "Input.RevealButton";
 
 // ---- InputCounter ----
 
@@ -407,5 +608,8 @@ export const Input = {
   Affix: InputAffix,
   InlineAffix: InputInlineAffix,
   ClearButton: InputClearButton,
+  CopyButton: InputCopyButton,
+  RevealButton: InputRevealButton,
+  Action: InputAction,
   Counter: InputCounter,
 };

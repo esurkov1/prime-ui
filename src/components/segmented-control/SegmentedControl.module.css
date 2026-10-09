@@ -12,6 +12,19 @@
 
 /* Selected thumb: `--prime-color-control-selected` (white in light, a lighter step above the track in dark). */
 
+/*
+ * Field frame (label · track · support row): hugs the track unless `fullWidth`. Zero specificity,
+ * so a consumer `className` that sizes the frame (a flex item, `width: 100%`) wins; the track
+ * then fills the frame.
+ */
+:where(.field) {
+  width: fit-content;
+}
+
+:where(.field[data-full-width="true"]) {
+  width: 100%;
+}
+
 .root {
   --seg-pad: var(--prime-space-1);
   --seg-item-gap: var(--prime-space-1);
@@ -37,7 +50,7 @@
   position: relative;
   box-sizing: border-box;
   display: flex;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   min-width: 0;
   height: var(--seg-control-height);
@@ -104,8 +117,9 @@
   --seg-item-pad-x: var(--prime-space-5);
 }
 
-.root[data-full-width="true"] {
-  width: 100%;
+/* Invalid (`invalid` / `error`): the inset danger ring of a field on the track. */
+.root[data-invalid="true"] {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
 .root:has([data-two-line="true"]) {
@@ -134,18 +148,30 @@
   transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
+/* Logical sides: `::before` fades the start edge, `::after` the end edge, in either direction. */
 .root::before {
-  left: var(--seg-pad);
+  inset-inline-start: var(--seg-pad);
   border-start-start-radius: var(--seg-item-radius);
   border-end-start-radius: var(--seg-item-radius);
-  background: linear-gradient(to right, var(--prime-color-fill-muted), transparent);
+  background: linear-gradient(var(--seg-fade-to-end), var(--prime-color-fill-muted), transparent);
 }
 
 .root::after {
-  right: var(--seg-pad);
+  inset-inline-end: var(--seg-pad);
   border-start-end-radius: var(--seg-item-radius);
   border-end-end-radius: var(--seg-item-radius);
-  background: linear-gradient(to left, var(--prime-color-fill-muted), transparent);
+  background: linear-gradient(var(--seg-fade-to-start), var(--prime-color-fill-muted), transparent);
+}
+
+/* Gradients have no logical direction: name the inline directions once, flipped under RTL. */
+.root {
+  --seg-fade-to-end: to right;
+  --seg-fade-to-start: to left;
+}
+
+.root:dir(rtl) {
+  --seg-fade-to-end: to left;
+  --seg-fade-to-start: to right;
 }
 
 .root[data-overflow-start="true"]::before,

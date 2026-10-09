@@ -11,7 +11,9 @@ export default function ColorPickerPresetsSizesExample() {
       {SIZES.map((size) => (
         <div key={size} className={styles.row}>
           <ColorPresets.Root size={size} defaultValue="#f97316" labels={{ trigger: "Цвет метки" }}>
-            <ColorPresets.Trigger />
+            <ColorPresets.Trigger>
+              <ColorPresets.SwatchButton />
+            </ColorPresets.Trigger>
             <ColorPresets.Content />
           </ColorPresets.Root>
           <Input.Root size={size}>

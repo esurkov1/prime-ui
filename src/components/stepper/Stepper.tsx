@@ -204,7 +204,7 @@ function StepperDescription({ className, ...rest }: StepperDescriptionProps) {
 }
 StepperDescription.displayName = "Stepper.Description";
 
-export type StepperArrowProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
+export type StepperArrowProps = Omit<React.SVGAttributes<SVGSVGElement>, "children" | "color"> & {
   ref?: React.Ref<SVGSVGElement>;
 };
 

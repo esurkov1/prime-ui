@@ -14,6 +14,12 @@
   --pc-text-size: var(--prime-text-caption-size);
   --pc-line-height: var(--prime-text-caption-line-height);
 
+  font-family: var(--prime-font-family-sans);
+}
+
+/* The ring box: the root itself, or `.ring` beside a legend. */
+.root:not([data-legend]),
+.ring {
   position: relative;
   display: inline-flex;
   flex-shrink: 0;
@@ -21,7 +27,33 @@
   justify-content: center;
   width: var(--pc-size);
   height: var(--pc-size);
-  font-family: var(--prime-font-family-sans);
+}
+
+/* With a legend: the ring and its legend in a row; the legend drops below when the row is narrow. */
+.root[data-legend] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-5);
+  min-width: 0;
+}
+
+.legend {
+  flex: 1 1 calc(var(--prime-space-24) * 2);
+  min-width: 0;
+}
+
+/* Loading: a Skeleton ring of the same diameter and stroke (1/12), its hole masked out. */
+.ringSkeleton {
+  width: var(--pc-size);
+  height: var(--pc-size);
+  min-height: 0;
+  border-radius: var(--prime-radius-full);
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--pc-size) / 12),
+    var(--prime-color-text-primary) calc(100% - var(--pc-size) / 12)
+  );
 }
 
 .root[data-size="xs"] {
@@ -68,6 +100,11 @@
 .root[data-tone="info"],
 .svg [data-tone="info"] {
   --pc-fill: var(--prime-color-info-default);
+}
+
+/* A category color: the hue's step of the chart palette (`palette.hue` on the same element). */
+.svg [data-color] {
+  --pc-fill: var(--hue-chart);
 }
 
 .svg {

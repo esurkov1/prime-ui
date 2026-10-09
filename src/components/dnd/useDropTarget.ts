@@ -3,7 +3,7 @@ import * as React from "react";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 
 import { useDragController } from "./context";
-import type { DragItem } from "./dragSession";
+import type { DragItem, DropVerdict } from "./dragSession";
 import type { Point } from "./geometry";
 
 export type DropTargetOptions<TValue, TData = unknown> = {
@@ -11,8 +11,11 @@ export type DropTargetOptions<TValue, TData = unknown> = {
   accepts: string | readonly string[] | ((item: DragItem) => boolean);
   /** Turns a pointer position into what a drop here would mean (an insertion point, a slot number). `null` means "not over anything droppable". */
   resolve: (point: Point, item: DragItem<TData>, element: HTMLElement) => TValue | null;
-  /** Whether the resolved spot will take this item. Separate from `resolve` so a preview can still be drawn where the refusal is. */
-  canDrop?: ((value: TValue, item: DragItem<TData>) => boolean) | undefined;
+  /**
+   * Whether the resolved spot will take this item; a string refuses and says why. Separate from
+   * `resolve` so a preview can still be drawn where the refusal is.
+   */
+  canDrop?: ((value: TValue, item: DragItem<TData>) => DropVerdict) | undefined;
   onDrop: (value: TValue, item: DragItem<TData>) => void;
   disabled?: boolean | undefined;
   /**
@@ -82,11 +85,16 @@ export function useDropTarget<TValue, TData = unknown>(
     // The session hands every target the untyped item; this target's kinds decide what it carries.
     const typed = (item: DragItem) => item as DragItem<TData>;
     // What the pointer last resolved here: a release over empty space drops it.
-    let last: { value: TValue | null; canDrop: boolean } = { value: null, canDrop: false };
+    let last: { value: TValue | null; canDrop: boolean; verdict: DropVerdict } = {
+      value: null,
+      canDrop: false,
+      verdict: false,
+    };
     const resolveAt = (point: Point, item: DragItem) => {
       const value = optionsRef.current.resolve(point, typed(item), element);
-      const canDrop = value !== null && (optionsRef.current.canDrop?.(value, typed(item)) ?? true);
-      last = { value, canDrop };
+      const verdict: DropVerdict =
+        value === null ? false : (optionsRef.current.canDrop?.(value, typed(item)) ?? true);
+      last = { value, canDrop: verdict === true, verdict };
       return last;
     };
     const land = (value: TValue | null, canDrop: boolean, item: DragItem) => {
@@ -106,11 +114,11 @@ export function useDropTarget<TValue, TData = unknown>(
         setState((current) => (current.isOver ? current : { ...current, isOver: true }));
       },
       over: (point, item) => {
-        const { canDrop } = resolveAt(point, item);
+        const { canDrop, verdict } = resolveAt(point, item);
         setState((current) =>
           current.isOver && current.canDrop === canDrop ? current : { isOver: true, canDrop },
         );
-        return canDrop;
+        return verdict;
       },
       leave: () => {
         optionsRef.current.onLeave?.();

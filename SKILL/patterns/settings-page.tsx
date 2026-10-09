@@ -2,15 +2,14 @@
 import {
   Button,
   Card,
-  Icon,
+  ConfirmDialog,
+  Fieldset,
   Input,
-  Modal,
   PageContent,
   Select,
   Switch,
   Textarea,
   Typography,
-  useNotifications,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -47,11 +46,9 @@ const ALERTS = [
 ];
 
 export default function SettingsPagePattern() {
-  const { notify } = useNotifications();
   const [innError, setInnError] = React.useState<string>();
   const [saving, setSaving] = React.useState(false);
-  const [confirmOpen, setConfirmOpen] = React.useState(false);
-  const [deleting, setDeleting] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
 
   const save = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,19 +59,15 @@ export default function SettingsPagePattern() {
     }
     setInnError(undefined);
     setSaving(true);
+    setSaved(false);
     window.setTimeout(() => {
       setSaving(false);
-      notify({ tone: "success", title: "Реквизиты сохранены" });
+      setSaved(true);
+      window.setTimeout(() => setSaved(false), 2000);
     }, 900);
   };
 
-  const removeWorkspace = () => {
-    setDeleting(true);
-    window.setTimeout(() => {
-      setDeleting(false);
-      setConfirmOpen(false);
-    }, 1200);
-  };
+  const removeWorkspace = () => new Promise<void>((resolve) => window.setTimeout(resolve, 1200));
 
   return (
     <PageContent.Root maxWidth="wide" aria-labelledby="settings-title">
@@ -102,10 +95,10 @@ export default function SettingsPagePattern() {
           >
             <Card.Root variant="panel">
               <Card.Body>
-                <div className={styles.fields}>
+                <Fieldset disabled={saving}>
                   <Input.Root label="Название">
                     <Input.Wrapper>
-                      <Input.Field name="name" defaultValue="ООО «Прайм Софт»" disabled={saving} />
+                      <Input.Field name="name" defaultValue="ООО «Прайм Софт»" />
                     </Input.Wrapper>
                   </Input.Root>
                   <div className={styles.pair}>
@@ -116,19 +109,10 @@ export default function SettingsPagePattern() {
                       reserveSupportRow
                     >
                       <Input.Wrapper>
-                        <Input.Field
-                          name="inn"
-                          inputMode="numeric"
-                          defaultValue="7704512908"
-                          disabled={saving}
-                        />
+                        <Input.Field name="inn" inputMode="numeric" defaultValue="7704512908" />
                       </Input.Wrapper>
                     </Input.Root>
-                    <Select.Root
-                      label="Часовой пояс"
-                      defaultValue="Europe/Moscow"
-                      disabled={saving}
-                    >
+                    <Select.Root label="Часовой пояс" defaultValue="Europe/Moscow">
                       <Select.Trigger>
                         <Select.Value />
                       </Select.Trigger>
@@ -146,17 +130,16 @@ export default function SettingsPagePattern() {
                     label="Юридический адрес"
                     optional
                     rows={2}
-                    disabled={saving}
                     defaultValue="125009, Москва, ул. Тверская, д. 7, офис 412"
                   />
-                </div>
+                </Fieldset>
               </Card.Body>
               <Card.Footer>
                 <Button.Root type="reset" variant="ghost" tone="neutral" disabled={saving}>
                   Отменить изменения
                 </Button.Root>
                 <Button.Root type="submit" loading={saving}>
-                  Сохранить
+                  {saved ? "Сохранено" : "Сохранить"}
                 </Button.Root>
               </Card.Footer>
             </Card.Root>
@@ -175,7 +158,7 @@ export default function SettingsPagePattern() {
           <div className={styles.panel}>
             <Card.Root variant="panel">
               <Card.Body>
-                <div className={styles.fields}>
+                <Fieldset aria-labelledby="alerts-title">
                   {ALERTS.map((alert) => (
                     <Switch.Root
                       key={alert.name}
@@ -186,7 +169,7 @@ export default function SettingsPagePattern() {
                       <Switch.Label>{alert.label}</Switch.Label>
                     </Switch.Root>
                   ))}
-                </div>
+                </Fieldset>
               </Card.Body>
             </Card.Root>
           </div>
@@ -211,42 +194,18 @@ export default function SettingsPagePattern() {
                       Счета, клиенты и история будут удалены для всех участников.
                     </Typography>
                   </div>
-                  <Modal.Root
-                    open={confirmOpen}
-                    onOpenChange={setConfirmOpen}
-                    closeOnOutsideClick={false}
-                    closeOnEscape={!deleting}
+                  <ConfirmDialog.Root
+                    title="Удалить «Прайм Софт»?"
+                    description="312 счетов, 48 клиентов и вся история удалятся без возможности восстановления."
+                    confirmLabel="Удалить пространство"
+                    onConfirm={removeWorkspace}
                   >
-                    <Modal.Trigger>
+                    <ConfirmDialog.Trigger>
                       <Button.Root variant="outline" tone="danger">
                         Удалить
                       </Button.Root>
-                    </Modal.Trigger>
-                    <Modal.Content size="s">
-                      <Modal.Header showClose={!deleting}>
-                        <Modal.Icon tone="danger">
-                          <Icon name="action.delete" />
-                        </Modal.Icon>
-                        <Modal.Title>Удалить «Прайм Софт»?</Modal.Title>
-                        <Modal.Description>
-                          312 счетов, 48 клиентов и вся история удалятся без возможности
-                          восстановления.
-                        </Modal.Description>
-                      </Modal.Header>
-                      <Modal.Footer>
-                        <Modal.Close>
-                          <Button.Root variant="outline" tone="neutral" disabled={deleting}>
-                            Не удалять
-                          </Button.Root>
-                        </Modal.Close>
-                        <Modal.Confirm>
-                          <Button.Root tone="danger" loading={deleting} onClick={removeWorkspace}>
-                            Удалить пространство
-                          </Button.Root>
-                        </Modal.Confirm>
-                      </Modal.Footer>
-                    </Modal.Content>
-                  </Modal.Root>
+                    </ConfirmDialog.Trigger>
+                  </ConfirmDialog.Root>
                 </div>
               </Card.Body>
             </Card.Root>

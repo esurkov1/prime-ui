@@ -51,25 +51,104 @@
   --pb-label-line-height: var(--prime-control-xl-label-line-height);
 }
 
-/* Tone of the whole bar (value mode) or of one part (segments mode). */
-:is(.root, .segment)[data-tone="neutral"] {
+/* Tone of the whole bar (value mode) or of one part (segments: a segment or a row's fill). */
+:is(.root, .segment, .fill)[data-tone="neutral"] {
   --pb-fill: var(--prime-color-text-secondary);
 }
 
-:is(.root, .segment)[data-tone="success"] {
+:is(.root, .segment, .fill)[data-tone="success"] {
   --pb-fill: var(--prime-color-success-default);
 }
 
-:is(.root, .segment)[data-tone="warning"] {
+:is(.root, .segment, .fill)[data-tone="warning"] {
   --pb-fill: var(--prime-color-warning-default);
 }
 
-:is(.root, .segment)[data-tone="danger"] {
+:is(.root, .segment, .fill)[data-tone="danger"] {
   --pb-fill: var(--prime-color-danger-default);
 }
 
-:is(.root, .segment)[data-tone="info"] {
+:is(.root, .segment, .fill)[data-tone="info"] {
   --pb-fill: var(--prime-color-info-default);
+}
+
+/* A category color: the hue's step of the chart palette (`palette.hue` on the same element). */
+:is(.segment, .fill)[data-color] {
+  --pb-fill: var(--hue-chart);
+}
+
+/* The bar and what goes with it (legend, native progress) — one block that swaps with loading. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+/* Loading: a Skeleton in the bar's geometry — the track's thickness and pill. */
+.barSkeleton {
+  height: var(--pb-track);
+  min-height: 0;
+  border-radius: var(--prime-radius-full);
+}
+
+/*
+ * Rows (`layout="rows"`): a ranking. Each row is «label · value · share» over its own bar; values
+ * and shares line up in columns. Rows are a list, one tier-gap apart.
+ */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.rowHeader {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  font-size: var(--pb-label-size);
+  line-height: var(--pb-label-line-height);
+}
+
+.rowLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowValue {
+  flex-shrink: 0;
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+/* «100%» fits without the value moving as shares change. */
+.rowShare {
+  flex-shrink: 0;
+  min-width: 4ch;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.rowSkeletonText {
+  width: 100%;
 }
 
 .header {

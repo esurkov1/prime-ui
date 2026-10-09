@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
+import { useRangeSelection } from "@/internal/useRangeSelection";
 
 type UseRowSelectionOptions = {
   selected?: React.Key[];
@@ -22,11 +23,20 @@ export type RowSelectionHandlers = {
   onClick: (index: number, event: React.MouseEvent<HTMLElement>) => void;
 };
 
+/** A checkbox cell under the pointer, with its row index. */
+const hitCell = (element: Element) => {
+  const cell = element.closest<HTMLElement>("[data-select-index]");
+  if (!cell) return null;
+  const index = Number(cell.dataset.selectIndex);
+  return Number.isNaN(index) ? null : index;
+};
+
 /**
- * Row selection: controlled / uncontrolled ids, «select all» over every id in the data, Shift+click
- * ranges from the last toggled row, press-and-drag across checkbox cells and a polite count
- * announcement. The cell handlers are stable, so memoized rows do not re-render when the
- * selection of other rows changes.
+ * Row selection: controlled / uncontrolled ids, «select all» over every id in the data, and the
+ * shared range selection (`internal/useRangeSelection`) over the checkbox cells — Shift+click
+ * ranges from the anchor, press-and-drag across checkboxes with the table's scroller following,
+ * «the click after a drag is no toggle» — plus a polite count announcement. The cell handlers are
+ * stable, so memoized rows do not re-render when the selection of other rows changes.
  */
 export function useRowSelection({
   selected,
@@ -44,109 +54,53 @@ export function useRowSelection({
   });
   const selectedSet = React.useMemo(() => new Set(selectedKeys), [selectedKeys]);
   const [announcement, setAnnouncement] = React.useState("");
-  const [dragging, setDragging] = React.useState(false);
+  /** The selection as of the last commit: several commits may land before the next render. */
+  const current = React.useRef(selectedSet);
+  current.current = selectedSet;
 
-  /** The latest render's data for the stable handlers. */
-  const latest = React.useRef({ selectedSet, visibleKeys, setSelectedKeys, announce });
-  latest.current = { selectedSet, visibleKeys, setSelectedKeys, announce };
-  /** Shift-range anchor, the active drag's teardown, and «the click after a drag is no toggle». */
-  const session = React.useRef<{
-    anchor: React.Key | null;
-    stopDrag: (() => void) | null;
-    dragged: boolean;
-  }>({ anchor: null, stopDrag: null, dragged: false });
-  React.useEffect(() => () => session.current.stopDrag?.(), []);
+  const commit = (next: Set<React.Key>) => {
+    current.current = next;
+    setSelectedKeys(Array.from(next));
+    setAnnouncement(announce(next.size));
+  };
 
-  const handlers = React.useMemo<RowSelectionHandlers>(() => {
-    const commit = (next: Set<React.Key>) => {
-      latest.current.selectedSet = next;
-      latest.current.setSelectedKeys(Array.from(next));
-      setAnnouncement(latest.current.announce(next.size));
-    };
-    /** Sets every rendered row between two indices (inclusive) to `value`. */
-    const applyRange = (from: number, to: number, value: boolean) => {
-      const next = new Set(latest.current.selectedSet);
-      const keys = latest.current.visibleKeys;
-      for (let i = Math.min(from, to); i <= Math.max(from, to); i += 1) {
-        const key = keys[i];
-        if (key === undefined) continue;
+  const range = useRangeSelection<React.Key>({
+    keys: visibleKeys,
+    isSelected: (key) => current.current.has(key),
+    apply: (keys, value) => {
+      const next = new Set(current.current);
+      for (const key of keys) {
         if (value) next.add(key);
         else next.delete(key);
       }
       commit(next);
-    };
+    },
+    containerRef: tableRef,
+    hit: hitCell,
+    autoScroll: true,
+  });
 
-    return {
+  const handlers = React.useMemo<RowSelectionHandlers>(
+    () => ({
       onPointerDown(index, event) {
         if (event.button !== 0 || event.pointerType === "touch") return;
-        // No native text selection or focus jump while pressing / dragging; the box takes focus
-        // without a ring (pointer press), so Space continues from it.
-        event.preventDefault();
+        // The box takes focus without a ring (a pointer press), so Space continues from it.
         event.currentTarget
           .querySelector("input")
           ?.focus({ preventScroll: true, focusVisible: false } as FocusOptions);
-        const startKey = latest.current.visibleKeys[index];
-        if (startKey === undefined) return;
-        const value = !latest.current.selectedSet.has(startKey);
-        session.current.dragged = false;
-        let last = index;
-
-        const onMove = (moveEvent: PointerEvent) => {
-          const cell = document
-            .elementFromPoint(moveEvent.clientX, moveEvent.clientY)
-            ?.closest<HTMLElement>("[data-select-index]");
-          if (!cell || !tableRef.current?.contains(cell)) return;
-          const next = Number(cell.dataset.selectIndex);
-          if (Number.isNaN(next) || next === last) return;
-          if (!session.current.dragged) {
-            session.current.dragged = true;
-            setDragging(true);
-          }
-          applyRange(last, next, value);
-          last = next;
-          session.current.anchor = latest.current.visibleKeys[next] ?? session.current.anchor;
-        };
-        const stop = () => {
-          window.removeEventListener("pointermove", onMove);
-          window.removeEventListener("pointerup", stop);
-          window.removeEventListener("pointercancel", stop);
-          session.current.stopDrag = null;
-          setDragging(false);
-        };
-        session.current.stopDrag?.();
-        session.current.stopDrag = stop;
-        window.addEventListener("pointermove", onMove);
-        window.addEventListener("pointerup", stop);
-        window.addEventListener("pointercancel", stop);
+        range.handlers.onPointerDown(index, event);
       },
-
       onClick(index, event) {
         event.stopPropagation();
         // The checkbox label forwards a click on the box visual to the input: only that second
         // click (on the input) counts.
         const target = event.target as HTMLElement;
         if (!(target instanceof HTMLInputElement) && target.closest("label")) return;
-        // A drag already applied its range; a pointer click that ends it is no toggle.
-        if (session.current.dragged && event.detail > 0) {
-          session.current.dragged = false;
-          return;
-        }
-        const keys = latest.current.visibleKeys;
-        const key = keys[index];
-        if (key === undefined) return;
-        const anchorIndex =
-          event.shiftKey && session.current.anchor !== null
-            ? keys.indexOf(session.current.anchor)
-            : -1;
-        applyRange(
-          anchorIndex >= 0 ? anchorIndex : index,
-          index,
-          !latest.current.selectedSet.has(key),
-        );
-        session.current.anchor = key;
+        range.handlers.onClick(index, event);
       },
-    };
-  }, [tableRef]);
+    }),
+    [range.handlers],
+  );
 
   const selectedInData = allKeys.filter((key) => selectedSet.has(key)).length;
   const allSelected = allKeys.length > 0 && selectedInData === allKeys.length;
@@ -157,9 +111,7 @@ export function useRowSelection({
       if (allSelected) next.delete(key);
       else next.add(key);
     }
-    latest.current.selectedSet = next;
-    setSelectedKeys(Array.from(next));
-    setAnnouncement(announce(next.size));
+    commit(next);
   };
 
   return {
@@ -167,7 +119,7 @@ export function useRowSelection({
     allSelected,
     someSelected: selectedInData > 0 && !allSelected,
     announcement,
-    dragging,
+    dragging: range.dragging,
     toggleAll,
     handlers,
   };

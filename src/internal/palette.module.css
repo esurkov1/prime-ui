@@ -2,12 +2,16 @@
  * Palette hue (`PaletteColor`, `--prime-color-palette-<hue>-*`) as four local variables. Put `.hue`
  * on the element that carries `data-color`; its CSS reads `--hue-soft`, `--hue-text`, `--hue-solid`
  * and `--hue-solid-fg`. No `data-color` → gray.
+ * `--hue-chart` is the hue as a data mark (a ProgressBar share, a legend swatch): its step of the
+ * categorical chart palette (`--prime-color-chart-*`), so a category has one color in charts and in
+ * shares. Gray is `chart-other`; sky has no chart step (it sits too close to blue) and keeps its solid.
  */
 .hue {
   --hue-soft: var(--prime-color-palette-gray-soft);
   --hue-text: var(--prime-color-palette-gray-text);
   --hue-solid: var(--prime-color-palette-gray-solid);
   --hue-solid-fg: var(--prime-color-palette-gray-solid-fg);
+  --hue-chart: var(--prime-color-chart-other);
 }
 
 .hue[data-color="red"] {
@@ -15,6 +19,7 @@
   --hue-text: var(--prime-color-palette-red-text);
   --hue-solid: var(--prime-color-palette-red-solid);
   --hue-solid-fg: var(--prime-color-palette-red-solid-fg);
+  --hue-chart: var(--prime-color-chart-8);
 }
 
 .hue[data-color="blue"] {
@@ -22,6 +27,7 @@
   --hue-text: var(--prime-color-palette-blue-text);
   --hue-solid: var(--prime-color-palette-blue-solid);
   --hue-solid-fg: var(--prime-color-palette-blue-solid-fg);
+  --hue-chart: var(--prime-color-chart-1);
 }
 
 .hue[data-color="green"] {
@@ -29,6 +35,7 @@
   --hue-text: var(--prime-color-palette-green-text);
   --hue-solid: var(--prime-color-palette-green-solid);
   --hue-solid-fg: var(--prime-color-palette-green-solid-fg);
+  --hue-chart: var(--prime-color-chart-6);
 }
 
 .hue[data-color="orange"] {
@@ -36,6 +43,7 @@
   --hue-text: var(--prime-color-palette-orange-text);
   --hue-solid: var(--prime-color-palette-orange-solid);
   --hue-solid-fg: var(--prime-color-palette-orange-solid-fg);
+  --hue-chart: var(--prime-color-chart-2);
 }
 
 .hue[data-color="yellow"] {
@@ -43,6 +51,7 @@
   --hue-text: var(--prime-color-palette-yellow-text);
   --hue-solid: var(--prime-color-palette-yellow-solid);
   --hue-solid-fg: var(--prime-color-palette-yellow-solid-fg);
+  --hue-chart: var(--prime-color-chart-4);
 }
 
 .hue[data-color="purple"] {
@@ -50,6 +59,7 @@
   --hue-text: var(--prime-color-palette-purple-text);
   --hue-solid: var(--prime-color-palette-purple-solid);
   --hue-solid-fg: var(--prime-color-palette-purple-solid-fg);
+  --hue-chart: var(--prime-color-chart-7);
 }
 
 .hue[data-color="sky"] {
@@ -57,6 +67,7 @@
   --hue-text: var(--prime-color-palette-sky-text);
   --hue-solid: var(--prime-color-palette-sky-solid);
   --hue-solid-fg: var(--prime-color-palette-sky-solid-fg);
+  --hue-chart: var(--prime-color-palette-sky-solid);
 }
 
 .hue[data-color="pink"] {
@@ -64,6 +75,7 @@
   --hue-text: var(--prime-color-palette-pink-text);
   --hue-solid: var(--prime-color-palette-pink-solid);
   --hue-solid-fg: var(--prime-color-palette-pink-solid-fg);
+  --hue-chart: var(--prime-color-chart-5);
 }
 
 .hue[data-color="teal"] {
@@ -71,4 +83,5 @@
   --hue-text: var(--prime-color-palette-teal-text);
   --hue-solid: var(--prime-color-palette-teal-solid);
   --hue-solid-fg: var(--prime-color-palette-teal-solid-fg);
+  --hue-chart: var(--prime-color-chart-3);
 }

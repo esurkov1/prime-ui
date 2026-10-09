@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import enterMotion from "@/internal/enterMotion.module.css";
 
@@ -80,5 +81,68 @@ describe("EmptyPage", () => {
     );
     expect(screen.getByTestId("a")).toHaveAttribute("data-tone", "neutral");
     expect(screen.getByTestId("b")).toHaveAttribute("data-tone", "danger");
+  });
+});
+
+describe("EmptyPage error state", () => {
+  it("announces a danger root and gives its tone to the icon", () => {
+    render(
+      <EmptyPage.Root tone="danger" data-testid="error">
+        <EmptyPage.Icon data-testid="icon">!</EmptyPage.Icon>
+        <EmptyPage.Title as="h3">Не удалось загрузить заказы</EmptyPage.Title>
+      </EmptyPage.Root>,
+    );
+    expect(screen.getByRole("alert")).toBe(screen.getByTestId("error"));
+    expect(screen.getByTestId("error")).toHaveAttribute("data-tone", "danger");
+    expect(screen.getByTestId("icon")).toHaveAttribute("data-tone", "danger");
+    expect(
+      screen.getByRole("heading", { level: 3, name: "Не удалось загрузить заказы" }),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps a role the owner passes", () => {
+    render(<EmptyPage.Root tone="danger" role="status" data-testid="error" />);
+    expect(screen.getByTestId("error")).toHaveAttribute("role", "status");
+  });
+
+  it("retries from the keyboard and shows loading while the retry is pending", async () => {
+    const user = userEvent.setup();
+    let reject: (reason: unknown) => void = () => {};
+    const onRetry = vi.fn(
+      () =>
+        new Promise<void>((_, fail) => {
+          reject = fail;
+        }),
+    );
+    render(
+      <EmptyPage.Root tone="danger" labels={{ retry: "Загрузить снова" }}>
+        <EmptyPage.Actions>
+          <EmptyPage.RetryButton onRetry={onRetry} />
+        </EmptyPage.Actions>
+      </EmptyPage.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Загрузить снова" });
+    button.focus();
+    await user.keyboard("{Enter}");
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    expect(button).toHaveAttribute("aria-busy", "true");
+    await user.keyboard("{Enter}");
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    await act(async () => reject(new Error("offline")));
+    expect(button).not.toHaveAttribute("aria-busy");
+    await user.keyboard(" ");
+    expect(onRetry).toHaveBeenCalledTimes(2);
+  });
+
+  it("takes a synchronous retry and its default label", async () => {
+    const user = userEvent.setup();
+    const onRetry = vi.fn();
+    render(
+      <EmptyPage.Root tone="danger">
+        <EmptyPage.RetryButton onRetry={onRetry} />
+      </EmptyPage.Root>,
+    );
+    await user.click(screen.getByRole("button", { name: "Повторить" }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
   });
 });

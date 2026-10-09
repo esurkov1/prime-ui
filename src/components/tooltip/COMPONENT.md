@@ -7,7 +7,8 @@
 
 ## When to use
 - Name and shortcut of an icon-only button.
-- Why a control is disabled (wrap the disabled control in a focusable element).
+- Why a control is disabled: put the disabled control straight into `Tooltip.Trigger`.
+- What a status badge, an avatar or an information icon means.
 - A one-line definition of a term or abbreviation.
 
 ## When not to use
@@ -27,6 +28,7 @@ import { Tooltip } from "prime-ui-kit";
 Tooltip.Provider        optional; delay and skip-delay group for a subtree
 └── Tooltip.Root        state of one tooltip (no DOM)
     ├── Tooltip.Trigger clones its single child element and adds handlers
+    │                   (a focusable <span> around a disabled control)
     └── Tooltip.Content portaled role="tooltip" chip
         └── arrow       decorative svg pointing at the trigger's centre
 ```
@@ -56,11 +58,11 @@ No DOM, no ref. Its tooltips form a group: one is open at a time, and once one h
 | `children` | `ReactNode` | — (required) | Subtree. |
 
 ### Tooltip.Trigger
-No DOM: clones the single child, composes its `ref`, appends the tooltip id to its `aria-describedby` while open, sets `data-state` and chains `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus`, `onBlur`.
+No DOM of its own: clones the single child, composes its `ref`, appends the tooltip id to its `aria-describedby` while open, sets `data-state` and chains `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus`, `onBlur`. A `disabled` child is wrapped in a focusable `<span>` that takes hover and Tab for it; a child that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactElement` | — (required) | One focusable element: a Button, or a `tabIndex={0}` wrapper around a disabled control. |
+| `children` | `ReactElement` | — (required) | One element: a control, a disabled control or a non-interactive element such as a Badge. |
 
 ### Tooltip.Content
 `ref` → `HTMLDivElement`. Portaled `role="tooltip"` chip with an arrow; renders while open and during its exit animation, placed before paint.
@@ -130,7 +132,8 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 - The chip is `role="tooltip"`; while open the trigger points at it with `aria-describedby`.
 - The tooltip is a description, not the name: an icon-only button needs its own `aria-label`.
 - The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, focus does.
-- A natively `disabled` button gets no events: wrap it in `<span tabIndex={0}>`.
+- A `disabled` control is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control.
+- A trigger that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring; its name comes from `aria-label` or the icon `label`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -144,13 +147,15 @@ No `labels`.
 | [sizes.tsx](examples/sizes.tsx) | Every size tier next to buttons of the same tier; take the tier of the control it describes — `size`. |
 | [placement.tsx](examples/placement.tsx) | Every side, and start / end alignment along the trigger; without room the chip flips and shifts, the arrow keeps pointing at the trigger — `side`, `align`. |
 | [toolbar.tsx](examples/toolbar.tsx) | A formatting toolbar in one group: after the first tooltip the neighbours open at once, each with its name and shortcut — `Tooltip.Provider`. |
-| [disabled-trigger.tsx](examples/disabled-trigger.tsx) | Why an action is unavailable: a disabled button inside a focusable wrapper still shows its tooltip on hover and Tab — `Tooltip.Trigger`. |
+| [disabled-trigger.tsx](examples/disabled-trigger.tsx) | Why an action is unavailable: the disabled button still shows its tooltip on hover and Tab, no wrapper needed — `Tooltip.Trigger`. |
+| [non-interactive-trigger.tsx](examples/non-interactive-trigger.tsx) | A status badge, an avatar and an information icon explain themselves: the kit makes each a tab stop, so the tooltip opens from the keyboard too — `Tooltip.Trigger`. |
 | [delay.tsx](examples/delay.tsx) | The show delay of one tooltip: at once, the default 400 ms and one second — `delayDuration`. |
 | [long-content.tsx](examples/long-content.tsx) | A sentence of explanation wraps at the tooltip max width; anything with actions belongs in a Popover — `Tooltip.Content`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state: a switch shows the tooltip from code, hover and focus still work — `open`, `onOpenChange`. |
 
 ## Mistakes
-- Tooltip on a `disabled` button directly → wrap the button in a focusable `span`.
+- Your own `<span tabIndex={0}>` around a disabled button → the trigger does it; a second wrapper adds a second tab stop.
+- An unnamed Badge or Icon as the trigger → give the icon `label` (or the element `aria-label`): the tooltip describes, it does not name.
 - Links or buttons inside Tooltip.Content → use Popover.
 - Several children inside Tooltip.Trigger → exactly one element.
 - Relying on the tooltip as the button's name → add `aria-label` to the button.

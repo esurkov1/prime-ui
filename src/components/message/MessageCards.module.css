@@ -1,0 +1,218 @@
+/*
+ * The card parts of a message: Location, Contact, LinkPreview. One fixed card width
+ * (`--prime-message-card-width`, within 75% of the message row — a size container). Every
+ * picture has its box before it loads (Thumbnail `ratio`). Inner colors are the semantic roles an
+ * outgoing message redefines.
+ */
+
+/* ─── Location ──────────────────────────────────────────────────────────── */
+
+/* Edge to edge in the bubble (`data-message-bleed`): the card width plus the padding it covers, so
+   its text lines up with a file's or a contact's; it pads its own text. */
+.location {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  inline-size: calc(
+    min(var(--prime-message-card-width), 75cqi) +
+    2 *
+    var(--message-pad-x, var(--prime-message-padding-x))
+  );
+}
+
+.mapFrame {
+  position: relative;
+  display: flex;
+  color: inherit;
+}
+
+a.mapFrame:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* The bubble clips the map's outer corners. */
+.mapFrame > .map {
+  width: 100%;
+  border-radius: 0;
+}
+
+.pin {
+  --prime-icon-size: var(--prime-icon-s);
+
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  inline-size: var(--prime-space-8);
+  block-size: var(--prime-space-8);
+  margin: auto;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+  box-shadow: var(--prime-shadow-overlay);
+}
+
+/* A live location breathes: a ring leaves the pin and fades, over and over (a status, like a spinner). */
+.pin[data-live]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--prime-color-accent-default);
+  animation: livePulse calc(var(--prime-motion-loop) * 3) var(--prime-motion-easing-enter) infinite;
+}
+
+@keyframes livePulse {
+  from {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.place {
+  display: grid;
+  min-width: 0;
+  padding-inline: var(--message-pad-x, var(--prime-message-padding-x));
+  padding-block-end: var(--message-pad-y, var(--prime-message-padding-y));
+}
+
+.placeTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  font-weight: var(--prime-font-weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.placeAddress {
+  display: flex;
+  align-items: baseline;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  overflow-wrap: anywhere;
+}
+
+/* ─── Contact ───────────────────────────────────────────────────────────── */
+
+.contact {
+  display: grid;
+  gap: var(--prime-space-3);
+  inline-size: min(var(--prime-message-card-width), 75cqi);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.personText {
+  display: grid;
+  min-width: 0;
+}
+
+.personName {
+  overflow: hidden;
+  font-weight: var(--prime-font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.personPhone {
+  display: flex;
+  align-items: baseline;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-variant-numeric: tabular-nums;
+}
+
+.contactActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+/* ─── Link preview ──────────────────────────────────────────────────────── */
+
+/* Spans the bubble, never narrower than the card width: the text above (a long URL included)
+   wraps to the bubble and the card stretches with it. */
+.preview {
+  display: grid;
+  min-inline-size: min(var(--prime-message-card-width), 75cqi);
+}
+
+.previewCard {
+  display: grid;
+  min-width: 0;
+  padding-block: var(--prime-space-1) var(--prime-space-2);
+  padding-inline: var(--prime-space-2);
+  border-inline-start: calc(var(--prime-border-width) * 3) solid var(--prime-color-accent-default);
+  border-radius: var(--prime-radius-s);
+  background: var(--prime-color-accent-soft);
+  color: var(--prime-color-text-primary);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .previewCard:hover {
+    background: var(--prime-color-accent-soft-hover);
+  }
+}
+
+.previewCard:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.previewSite {
+  color: var(--prime-color-accent-text);
+  font-weight: var(--prime-font-weight-semibold);
+}
+
+.previewTitle {
+  font-weight: var(--prime-font-weight-semibold);
+}
+
+.previewDescription {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.previewImage {
+  margin-block-start: var(--prime-space-2);
+}
+
+.previewEnd {
+  display: flex;
+  justify-content: flex-end;
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The «Трансляция» badge still says it is live. */
+  .pin[data-live]::after {
+    animation: none;
+    opacity: 0;
+  }
+}

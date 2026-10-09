@@ -83,10 +83,45 @@ Inner radius = outer radius − padding. Panel 12 with padding 4 → items 8. Us
 
 - `tone` is meaning: `neutral · accent · success · warning · danger · info`. Destructive is `danger`.
 - `color` is decoration from the palette: `gray · blue · green · orange · red · yellow · purple · sky ·
-  pink · teal` — Badge, Avatar, Thumbnail, SegmentedControl dots, count badges of Tabs and
-  SegmentedControl, FileUpload format badges, Timeline dots, TagSelect tags. Use one hue per meaning
+  pink · teal` — Badge, Avatar, Thumbnail, SegmentedControl dots, count badges of Tabs,
+  SegmentedControl, Sidebar and BottomNav, FileUpload format badges, Timeline dots, TagSelect tags,
+  Kanban column counts, Gantt bars, the author hue of a chat (`Message.Author`). Use one hue per meaning
   across the product (e.g. «Оплачен» is always green): keep one `Record<Status, PaletteColor>` map.
 - Never convey meaning by color alone: a status badge has text.
+
+### Charts and categorical colors
+
+A chart color does one job, and the job picks the colors:
+
+| Job | Use | Never |
+|---|---|---|
+| identity — which category or series (platforms, sources, regions, teams) | the categorical palette `--prime-color-chart-1…8` (blue, orange, teal, yellow, pink, green, purple, red), `chart-other` for «Прочее»; in kit parts `color` (a ProgressBar / ProgressCircle share, a legend swatch) | `tone`: success / danger read as good / bad |
+| meaning — good, at risk, failed (a status share, a target met) | `tone` | a chart hue |
+| magnitude — how much (heatmap cells) | `--prime-color-chart-scale-1…5` (one hue, near the ground → full); text on steps 4–5 `--prime-color-chart-scale-fg`, on 1–3 `text-primary` | a rainbow |
+
+- Assign series in the palette order and never cycle; a ninth series folds into «Прочее»
+  (`chart-other`). Color follows the entity, not its rank: a filter that hides a series does not
+  repaint the others.
+- One category keeps one hue everywhere: a palette `color` maps to its chart step (`blue` →
+  `chart-1`, `orange` → `chart-2`, `teal` → `chart-3`, `yellow` → `chart-4`, `pink` → `chart-5`,
+  `green` → `chart-6`, `purple` → `chart-7`, `red` → `chart-8`, `gray` → `chart-other`), so a
+  ProgressBar share and a line in a chart library match. `sky` has no chart step (it sits too close to
+  blue).
+- The palette is validated in both themes (OKLCH lightness band, chroma, colour-blind and
+  normal-vision separation of neighbours, ≥ 3:1 on the layer grounds). In scatter-like charts, where
+  any two marks can meet, keep to the first three series or facet.
+- A chart library takes the colors as strings: `chartColors.series[i]`, `chartColors.grid`,
+  `chartColors.axis`, `chartColors.scale[i]` (each a `var(--prime-color-chart-*)`, so the theme
+  switches without a re-render). Gridlines are `chart-grid`, the axis line `chart-axis`, axis labels
+  `text-muted`; values and legends wear text tokens, never the series color.
+- Every chart with two or more series has a legend (ProgressBar / ProgressCircle `legend`,
+  `ChartFrame.Legend`) or direct labels; one series needs none — its title names it. One y-axis per chart: two measures of
+  different scale are two charts.
+- The kit ships no chart library: Sparkline for a trend in a tile, ProgressBar / ProgressCircle for
+  shares and rankings, and for axes and several series a library of your choice (or your own SVG)
+  inside ChartFrame: it brings the panel, the axis-label type, the legend, the tooltip body, the
+  loading / empty / error states and a data table for screen readers, and hands the plot its size
+  and the series colors.
 
 ## 7. Typography
 
@@ -130,6 +165,9 @@ level of air: a page with uniform 16px gaps everywhere reads as a list of unrela
   chooser through `hiddenColumns`; never let the page scroll sideways.
 - Card grids: `grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr))`.
 - A page panel with sections, filter and search, view and the primary action is `PageToolbar`.
+- Sticky parts come from the kit: `AppHeader` (with the `PageToolbar` in `AppHeader.Tools`), the
+  DataTable head and `stickyFirstColumn`, the Gantt header and first column — each sticks inside its
+  own scroller, and the top ones let go on screens lower than 480px. Never a `position: sticky` bar of your own.
 
 ## 10. Focus and motion
 

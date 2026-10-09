@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { StageDepthProvider } from "@/internal/surfaceDepth";
@@ -32,6 +32,64 @@ describe("ExampleFrame", () => {
     expect(stage).toHaveAttribute("data-preview-layout", "row");
     expect(stage).toHaveAttribute("data-depth", "1");
     expect(screen.getByText("B").parentElement).toBe(stage);
+  });
+
+  // Read from the DOM, not by `:has()` (which restyled the page on every insert in an example).
+  it("marks the child that holds a full-width block or a table, also when one arrives later", async () => {
+    const { rerender } = render(
+      <ExampleFrame code="" previewLayout="stack">
+        <div data-testid="form">
+          <span />
+        </div>
+        <span data-testid="plain" />
+      </ExampleFrame>,
+    );
+    const form = screen.getByTestId("form");
+    const stage = form.parentElement as HTMLElement;
+    expect(form).not.toHaveAttribute("data-preview-stretch");
+    expect(stage).not.toHaveAttribute("data-stretch");
+
+    rerender(
+      <ExampleFrame code="" previewLayout="stack">
+        <div data-testid="form">
+          <button type="button" data-full-width="true">
+            Сохранить
+          </button>
+        </div>
+        <span data-testid="plain" />
+      </ExampleFrame>,
+    );
+    await act(async () => {});
+    expect(form).toHaveAttribute("data-preview-stretch");
+    expect(screen.getByTestId("plain")).not.toHaveAttribute("data-preview-stretch");
+    expect(stage).toHaveAttribute("data-stretch");
+
+    // A virtualized list unmounts the full-width row while scrolling: the stage keeps its width.
+    rerender(
+      <ExampleFrame code="" previewLayout="stack">
+        <div data-testid="form">
+          <span />
+        </div>
+        <span data-testid="plain" />
+      </ExampleFrame>,
+    );
+    await act(async () => {});
+    expect(form).toHaveAttribute("data-preview-stretch");
+    expect(stage).toHaveAttribute("data-stretch");
+  });
+
+  it("gives a matrix as many columns as its first row has cells", () => {
+    render(
+      <ExampleFrame code="" previewLayout="matrix">
+        <div data-testid="row">
+          <div>xs</div>
+          <div>s</div>
+          <div>m</div>
+        </div>
+      </ExampleFrame>,
+    );
+    const stage = screen.getByTestId("row").parentElement as HTMLElement;
+    expect(stage.style.getPropertyValue("--matrix-columns")).toBe("3");
   });
 
   it("puts the stage on the page (layer 0) by default", () => {

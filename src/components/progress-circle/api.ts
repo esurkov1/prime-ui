@@ -27,6 +27,13 @@ export const api: ComponentApi = {
           ru: "Доступное имя кольца (ставится на svg). Передавайте всегда.",
         },
         {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "The data is on its way: a Skeleton ring of the same diameter and stroke (and legend lines) that cross-fades into the data; the inner content waits, the root is `aria-busy`.",
+          ru: "Данные загружаются: Skeleton-кольцо того же диаметра и толщины (и строки легенды), которое плавно сменяется данными; содержимое в центре ждёт, корень `aria-busy`.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
           en: "`className`, `data-*` and the other div attributes on the root.",
@@ -64,15 +71,15 @@ export const api: ComponentApi = {
     },
     {
       name: "ProgressCircle · segments mode",
-      en: 'The svg is `role="group"`: parts clockwise from the top, described by the distribution text.',
-      ru: 'Svg с `role="group"`: части по часовой стрелке от верха, описание — текст долей.',
+      en: 'The svg is `role="group"`: parts clockwise from the top, described by the legend or the distribution text.',
+      ru: 'Svg с `role="group"`: части по часовой стрелке от верха, описание — легенда или текст долей.',
       props: [
         {
           name: "segments",
           type: "ProgressSegment[]",
           required: true,
-          en: "Parts in order, `{ value, label?, tone? }` (`tone` default `accent`); each part's length is its share of `max`.",
-          ru: "Части по порядку, `{ value, label?, tone? }` (`tone` по умолчанию `accent`); длина части — её доля от `max`.",
+          en: "Parts in order, `{ value, label?, tone? | color? }`: `tone` names a meaning (default `accent`), `color` a category — its step of the chart palette. Each part's length is its share of `max`.",
+          ru: "Части по порядку, `{ value, label?, tone? | color? }`: `tone` — смысл (по умолчанию `accent`), `color` — категория, её цвет из палитры графиков. Длина части — её доля от `max`.",
         },
         {
           name: "max",
@@ -86,6 +93,20 @@ export const api: ComponentApi = {
           default: '"none"',
           en: "`none` — one continuous ring; `hairline` — every part and the rest are separate round arcs.",
           ru: "`none` — одно сплошное кольцо; `hairline` — каждая часть и остаток отдельными дугами.",
+        },
+        {
+          name: "legend",
+          type: "boolean",
+          default: "false",
+          en: "A legend beside the ring (below it when the row is narrow), one row per part: color · name · value · share; it becomes the group's description. The root turns into the row of ring and legend.",
+          ru: "Легенда рядом с кольцом (под ним, когда ряд узкий), строка на часть: цвет · название · число · доля; она же описание группы. Корень становится рядом из кольца и легенды.",
+        },
+        {
+          name: "formatValue",
+          type: "(value: number) => string",
+          default: "Russian digit groups",
+          en: "Display of a part's value in the legend («38 ГБ»).",
+          ru: "Вид значения части в легенде («38 ГБ»).",
         },
         {
           name: "labels",

@@ -2,11 +2,16 @@ import * as React from "react";
 
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
-import { useMergedRefs } from "@/hooks/useMergedRefs";
-import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import {
+  DEFAULT_ALIGN,
+  DEFAULT_SIDE,
+  type PositionAlign,
+  type PositionSide,
+} from "@/hooks/usePosition";
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { gridIndex } from "@/internal/rovingFocus";
 import { Slot } from "@/internal/slot";
@@ -94,13 +99,14 @@ function ColorPresetsRoot({
   presets = COLOR_PRESETS,
   columns: columnsProp,
   size: sizeProp,
-  disabled = false,
+  disabled: disabledProp,
   allowEmpty = false,
   closeOnSelect = true,
   labels: labelsProp,
   children,
 }: ColorPresetsRootProps) {
   const size = useControlSize(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
   const [value, setValue] = useControllableState<string | null>({
     value: valueProp,
     defaultValue,
@@ -176,72 +182,60 @@ function Swatch(props: ColorPresetsSwatchProps) {
 }
 Swatch.displayName = "ColorPresets.Swatch";
 
-export type ColorPresetsTriggerProps = Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "children" | "disabled" | "value"
-> & {
-  /**
-   * `false` (default) — the kit square swatch button of the Root tier. `true` — `children` (one
-   * element, e.g. `Button.Root` with `ColorPresets.Swatch`) becomes the trigger.
-   */
-  asChild?: boolean;
-  children?: React.ReactElement;
-  ref?: React.Ref<HTMLButtonElement>;
+export type ColorPresetsTriggerProps = {
+  /** One element that opens the panel: `ColorPresets.SwatchButton`, or e.g. `Button.Root` with `ColorPresets.Swatch`. */
+  children: React.ReactElement;
 };
 
-/** Opens the panel. Name: `aria-label` ?? "<labels.trigger>: <color name>". */
-function Trigger({
-  asChild = false,
-  children,
-  className,
-  onKeyDown,
-  "aria-label": ariaLabel,
-  ref: forwardedRef,
-  ...rest
-}: ColorPresetsTriggerProps) {
-  const { value, size, disabled, labels, selectedLabel, triggerRef } = useColorPresetsContext();
-  const ref = useMergedRefs<HTMLButtonElement>(
-    forwardedRef,
-    triggerRef as React.Ref<HTMLButtonElement>,
-  );
-  const name = ariaLabel ?? `${labels.trigger}: ${selectedLabel}`;
-
-  if (asChild && children) {
-    return (
-      <Popover.Trigger>
-        {/* The child's own `aria-label` / `disabled` win over these (Slot merge rules). */}
-        <Slot {...rest} ref={ref} disabled={disabled || undefined} aria-label={name}>
-          {children}
-        </Slot>
-      </Popover.Trigger>
-    );
-  }
-
+/**
+ * A slot: clones its one child into the panel's trigger. Name «<labels.trigger>: <color name>»,
+ * `disabled` from the root, ArrowDown / ArrowUp open the panel; the child's own `aria-label`,
+ * `disabled` and handlers win (Slot merge rules).
+ */
+function Trigger({ children }: ColorPresetsTriggerProps) {
+  const { disabled, labels, selectedLabel, triggerRef } = useColorPresetsContext();
   return (
     <Popover.Trigger>
-      <button
-        type="button"
-        {...rest}
-        ref={ref}
-        aria-label={name}
-        disabled={disabled}
-        data-size={size}
-        className={cx(fieldTierClass, styles.trigger, className)}
-        onKeyDown={(e) => {
-          onKeyDown?.(e);
-          if (e.defaultPrevented) return;
-          if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-            e.preventDefault();
-            e.currentTarget.click();
+      <Slot
+        ref={triggerRef}
+        disabled={disabled || undefined}
+        aria-label={`${labels.trigger}: ${selectedLabel}`}
+        onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
+            event.currentTarget.click();
           }
         }}
       >
-        <SwatchFill value={value} />
-      </button>
+        {children}
+      </Slot>
     </Popover.Trigger>
   );
 }
 Trigger.displayName = "ColorPresets.Trigger";
+
+export type ColorPresetsSwatchButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "children" | "value"
+> & {
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+/** The kit square swatch button of the root tier: the current color, for `ColorPresets.Trigger`. */
+function SwatchButton({ className, ...rest }: ColorPresetsSwatchButtonProps) {
+  const { value, size } = useColorPresetsContext();
+  return (
+    <button
+      type="button"
+      {...rest}
+      data-size={size}
+      className={cx(fieldTierClass, styles.trigger, className)}
+    >
+      <SwatchFill value={value} />
+    </button>
+  );
+}
+SwatchButton.displayName = "ColorPresets.SwatchButton";
 
 export type ColorPresetsContentProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
@@ -268,7 +262,12 @@ function useNarrowViewport() {
 }
 
 /** Floating panel (Popover overlay contract) with the swatch grid: `role="listbox"`. */
-function Content({ label, align = "start", side = "bottom", ...rest }: ColorPresetsContentProps) {
+function Content({
+  label,
+  align = DEFAULT_ALIGN,
+  side = DEFAULT_SIDE,
+  ...rest
+}: ColorPresetsContentProps) {
   const { size } = useColorPresetsContext();
   return (
     <Popover.Content {...rest} align={align} side={side} size={size}>
@@ -366,6 +365,7 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
 export const ColorPresets = {
   Root: ColorPresetsRoot,
   Trigger,
+  SwatchButton,
   Swatch,
   Content,
 };

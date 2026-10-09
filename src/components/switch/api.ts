@@ -22,9 +22,16 @@ export const api: ComponentApi = {
         },
         {
           name: "onCheckedChange",
-          type: "(checked: boolean) => void",
-          en: "Called with the new state on every toggle (not while `readOnly`).",
-          ru: "Новое состояние при каждом переключении (кроме `readOnly`).",
+          type: "(checked: boolean) => void | Promise<void>",
+          en: "Called with the new state on every toggle (not while `readOnly` or saving). Return the save's promise to apply it on a server: the thumb waits in the new position with a spinner and `aria-busy`, presses do nothing; resolve — the state stays (a controlled owner sets `checked` before resolving); reject — the thumb glides back (say why with `error`).",
+          ru: "Новое состояние при каждом переключении (кроме `readOnly` и сохранения). Верните промис сохранения, чтобы применить на сервере: бегунок ждёт в новом положении со спиннером и `aria-busy`, нажатия не действуют; resolve — состояние остаётся (управляемый владелец ставит `checked` до resolve); reject — бегунок плавно возвращается (причину покажите через `error`).",
+        },
+        {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "Saving, for an owner that tracks the request itself: a spinner in the thumb, `aria-busy` on the input, presses do nothing. A promise from `onCheckedChange` does the same on its own.",
+          ru: "Сохранение, когда владелец сам следит за запросом: спиннер в бегунке, `aria-busy` на input, нажатия не действуют. Промис из `onCheckedChange` делает то же сам.",
         },
         {
           name: "size",

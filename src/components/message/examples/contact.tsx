@@ -1,0 +1,22 @@
+/** A shared contact: initials or a photo, name and phone, with the actions to write or save — `Message.Contact`, `phone`. */
+import { Button, Message } from "prime-ui-kit";
+
+export default function MessageContactExample() {
+  return (
+    <Message.Group aria-label="Переписка с менеджером">
+      <Message.Root direction="incoming" time="11:20">
+        <Message.Text>Вот контакт бухгалтера, она пришлёт акты.</Message.Text>
+      </Message.Root>
+      <Message.Root direction="incoming" time="11:20">
+        <Message.Contact name="Ирина Белова" phone="+7 916 204-18-77" color="pink">
+          <Button.Root variant="soft" tone="neutral" size="s">
+            Написать
+          </Button.Root>
+          <Button.Root variant="ghost" tone="neutral" size="s">
+            Добавить
+          </Button.Root>
+        </Message.Contact>
+      </Message.Root>
+    </Message.Group>
+  );
+}

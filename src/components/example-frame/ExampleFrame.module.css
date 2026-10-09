@@ -204,8 +204,9 @@
   margin-inline: auto;
 }
 
-/* fullWidth in the preview: stretch the direct child that contains it (a capped child stays centered). */
-.previewInner > *:global(:has([data-full-width="true"])) {
+/* fullWidth in the preview: stretch the direct child that contains it (a capped child stays centered).
+   `data-preview-stretch` / `data-stretch` come from ExampleFrame.tsx (a DOM read, not `:has()`). */
+.previewInner > [data-preview-stretch] {
   align-self: stretch;
   width: 100%;
   margin-inline: auto;
@@ -219,7 +220,7 @@
   gap: var(--prime-space-4);
 }
 
-.previewInner[data-preview-layout="stack"]:global(:has([data-full-width="true"])) {
+.previewInner[data-preview-layout="stack"][data-stretch] {
   align-items: stretch;
   width: 100%;
   margin-inline: 0;
@@ -258,7 +259,7 @@
  * intrinsic width (Slider, a block with `container-type: inline-size` and `width: 100%`) fills a
  * sensible cell instead of collapsing, and small specimens sit in even, compact columns. The grid
  * is centered; a matrix wider than the stage scrolls. The children are opaque (an example component
- * renders the rows), so the column count is read from the DOM by `:has()` below, not in TSX.
+ * renders the rows), so ExampleFrame.tsx reads the column count from the DOM into `--matrix-columns`.
  */
 .previewInner[data-preview-layout="matrix"] {
   --matrix-columns: 1;
@@ -286,60 +287,14 @@
   min-width: 0;
 }
 
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(2))) {
-  --matrix-columns: 2;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(3))) {
-  --matrix-columns: 3;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(4))) {
-  --matrix-columns: 4;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(5))) {
-  --matrix-columns: 5;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(6))) {
-  --matrix-columns: 6;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(7))) {
-  --matrix-columns: 7;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(8))) {
-  --matrix-columns: 8;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(9))) {
-  --matrix-columns: 9;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(10))) {
-  --matrix-columns: 10;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(11))) {
-  --matrix-columns: 11;
-}
-
-.previewInner[data-preview-layout="matrix"]:global(:has(> :first-child > :nth-child(12))) {
-  --matrix-columns: 12;
-}
-
-.previewInner[data-preview-layout="stack"] > *:global(:has([data-full-width="true"])),
-.previewInner[data-preview-layout="stack"] > *:global(:has(table)) {
+.previewInner[data-preview-layout="stack"] > [data-preview-stretch] {
   align-self: stretch;
   max-width: none;
 }
 
 /* Full width is a default only: a block with its own width (a 320 px phone column around a
    DataTable or a Datepicker panel) keeps it and stays centered. */
-:where(.previewInner[data-preview-layout="stack"])
-  > :where(:global(:has([data-full-width="true"])), :global(:has(table))) {
+:where(.previewInner[data-preview-layout="stack"]) > :where([data-preview-stretch]) {
   width: 100%;
 }
 

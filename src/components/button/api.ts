@@ -42,6 +42,12 @@ export const api: ComponentApi = {
           ru: "Спиннер вместо ведущей иконки или по центру над подписью, `aria-busy` и запрет нажатия. Ширина не меняется.",
         },
         {
+          name: "pressed",
+          type: "boolean",
+          en: "A toggle button: `true` on, `false` off (`aria-pressed`). On takes the selected look, an accent soft fill that glides in and out. Leave it out for an ordinary action; a set of toggles is a ButtonGroup.",
+          ru: "Кнопка-переключатель: `true` — включена, `false` — выключена (`aria-pressed`). Включённая — с заливкой выбора accent soft. Для обычного действия не задавайте; набор переключателей — ButtonGroup.",
+        },
+        {
           name: "progress",
           type: "number",
           en: "Progress of a long action started by the button, `0…1`: a wash of the text color grows inside from the start edge, `aria-busy` is set and the button stays pressable (to cancel). Put the number in the label («Скачивание 42%»); remove the prop when done and the fill fades out.",
@@ -56,9 +62,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onConfirm",
-          type: "() => void",
-          en: "Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`.",
-          ru: "Срабатывает, когда удержание `holdToConfirm` дошло до конца; действие пишите сюда, а не в `onClick`.",
+          type: "() => void | Promise<void>",
+          en: "Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. Return the request's promise: the full fill stays and the button is `loading` until it settles; resolve — the fill fades; reject — the fill rolls back (say why with a notification).",
+          ru: "Срабатывает, когда удержание `holdToConfirm` дошло до конца; действие пишите сюда, а не в `onClick`. Верните промис запроса: полная заливка остаётся, кнопка в `loading`, пока он не завершится; resolve — заливка гаснет; reject — заливка откатывается (причину покажите уведомлением).",
         },
         {
           name: "labels",

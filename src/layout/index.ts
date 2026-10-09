@@ -9,6 +9,7 @@ export type {
   AppHeaderSeparatorProps,
   AppHeaderStartProps,
   AppHeaderTitleProps,
+  AppHeaderToolsProps,
 } from "./app-header/AppHeader";
 export { AppHeader } from "./app-header/AppHeader";
 export type {
@@ -21,8 +22,8 @@ export type {
 } from "./app-shell/AppShell";
 export { AppShell } from "./app-shell/AppShell";
 export type {
-  BottomNavItemCountProps,
   BottomNavActionProps,
+  BottomNavItemCountProps,
   BottomNavItemIconProps,
   BottomNavItemProps,
   BottomNavLabels,

@@ -1,0 +1,221 @@
+import * as React from "react";
+
+import { Icon } from "@/icons";
+import { cx } from "@/internal/cx";
+import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
+import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import { rovingIndex } from "@/internal/rovingFocus";
+import { touchTargetClass } from "@/internal/touchTarget";
+
+import styles from "./MessageReactionBar.module.css";
+
+/** A reaction the reader can put: the emoji and its name for assistive tech («Нравится»). */
+export type MessageReactionOption = { emoji: string; label: string };
+
+/** The reactions of the bar, the first seven in its row, the rest behind «⌄». */
+export const DEFAULT_REACTION_OPTIONS: readonly MessageReactionOption[] = [
+  { emoji: "👍", label: "Нравится" },
+  { emoji: "🔥", label: "Огонь" },
+  { emoji: "🤣", label: "Смешно" },
+  { emoji: "👌", label: "Отлично" },
+  { emoji: "🤔", label: "Задумался" },
+  { emoji: "😢", label: "Грустно" },
+  { emoji: "😱", label: "В шоке" },
+  { emoji: "❤️", label: "Сердце" },
+  { emoji: "🎉", label: "Ура" },
+  { emoji: "👏", label: "Аплодисменты" },
+  { emoji: "🙏", label: "Спасибо" },
+  { emoji: "👀", label: "Смотрю" },
+  { emoji: "✅", label: "Готово" },
+  { emoji: "💯", label: "На все сто" },
+];
+
+/** How many reactions the collapsed row shows. */
+const ROW = 7;
+
+export type ReactionBarLabels = {
+  /** The name of the bar. */
+  bar: string;
+  /** The button that shows every reaction. */
+  more: string;
+};
+
+type ReactionBarProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  /** The message's bubble: the bar opens above it. */
+  anchorRef: React.RefObject<HTMLElement | null>;
+  /** The bubble's side: the bar lines up with its start (incoming) or end (outgoing). */
+  align: "start" | "end";
+  options: readonly MessageReactionOption[];
+  /** The reader's own reactions: their buttons are pressed. */
+  selected: ReadonlySet<string>;
+  onPick: (emoji: string) => void;
+  /** Opened from the keyboard: focus moves to the first reaction. */
+  focusOnOpen: boolean;
+  labels: ReactionBarLabels;
+  onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
+};
+
+function Reaction({
+  option,
+  index,
+  selected,
+  picked,
+  hovered,
+  onHover,
+  onPick,
+}: {
+  option: MessageReactionOption;
+  index: number;
+  selected: boolean;
+  picked: boolean;
+  hovered: boolean;
+  onHover: (hovered: boolean) => void;
+  onPick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={cx(styles.reaction, touchTargetClass)}
+      style={{ "--i": index } as React.CSSProperties}
+      aria-label={option.label}
+      aria-pressed={selected}
+      data-picked={picked || undefined}
+      data-hovered={hovered || undefined}
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") onHover(true);
+      }}
+      onPointerLeave={() => onHover(false)}
+      onClick={onPick}
+    >
+      <span className={styles.glyph} aria-hidden="true">
+        {option.emoji}
+      </span>
+    </button>
+  );
+}
+
+/**
+ * The reaction bar of a message (a long press): a pill of quick reactions above the
+ * bubble, «⌄» glides the rest open under them. A floating layer — it grows from the bubble, the
+ * emoji arrive in a quick stagger, Escape and a press outside close it. A toolbar of toggle
+ * buttons named by the reactions; arrows move between them.
+ */
+export function ReactionBar({
+  open,
+  onOpenChange,
+  anchorRef,
+  align,
+  options,
+  selected,
+  onPick,
+  focusOnOpen,
+  labels,
+  onPointerEnter,
+  onPointerLeave,
+}: ReactionBarProps) {
+  const [expanded, setExpanded] = React.useState(false);
+  const [picked, setPicked] = React.useState<string | null>(null);
+  const floating = useFloatingLayer({
+    open,
+    onOpenChange,
+    triggerRef: anchorRef,
+    side: "top",
+    align,
+    focusOnOpen,
+    tabExit: "always",
+    exitDuration: "base",
+  });
+  const quick = options.slice(0, ROW);
+  const rest = options.slice(ROW);
+  // The lifted emoji follows the pointer only while the bar is open: closing, the bar takes no
+  // pointer events, and its state — hover, «⌄», the pressed reactions — stays as it was.
+  const [hovered, setHovered] = React.useState<string | null>(null);
+  const hover = (emoji: string) => (on: boolean) => {
+    if (open) setHovered(on ? emoji : null);
+  };
+  const frozen = React.useRef(selected);
+  if (open) frozen.current = selected;
+  const shownSelected = frozen.current;
+  const pick = (emoji: string) => {
+    setPicked(emoji);
+    onPick(emoji);
+  };
+
+  return (
+    <FloatingPanel
+      floating={floating}
+      size="s"
+      role="toolbar"
+      aria-label={labels.bar}
+      aria-orientation="horizontal"
+      className={styles.bar}
+      data-expanded={expanded || undefined}
+      data-align={align}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+      onKeyDown={(event) => {
+        // The folded rows stay mounted but inert: arrows skip them.
+        const buttons = Array.from(
+          event.currentTarget.querySelectorAll<HTMLElement>("button:not([tabindex='-1'])"),
+        ).filter((button) => !button.closest("[inert]"));
+        const index = buttons.indexOf(document.activeElement as HTMLElement);
+        const next = rovingIndex(event.key, index, buttons.length, "both");
+        if (next === null) return;
+        event.preventDefault();
+        buttons[next]?.focus();
+      }}
+    >
+      <div className={styles.row}>
+        {quick.map((option, index) => (
+          <Reaction
+            key={option.emoji}
+            option={option}
+            index={index}
+            selected={shownSelected.has(option.emoji)}
+            picked={picked === option.emoji}
+            hovered={hovered === option.emoji}
+            onHover={hover(option.emoji)}
+            onPick={() => pick(option.emoji)}
+          />
+        ))}
+        {rest.length > 0 ? (
+          <button
+            type="button"
+            className={cx(styles.reaction, styles.more, touchTargetClass)}
+            style={{ "--i": quick.length } as React.CSSProperties}
+            aria-label={labels.more}
+            aria-expanded={expanded}
+            onClick={() => setExpanded((value) => !value)}
+          >
+            <span className={styles.glyph} aria-hidden="true">
+              <Icon name="nav.chevronDown" animated={false} />
+            </span>
+          </button>
+        ) : null}
+      </div>
+      {rest.length > 0 ? (
+        // The rest glides open under the row (rows 0fr → 1fr) and back. Its emoji stay mounted
+        // both ways, so the folding rows keep their content while the height glides to 0.
+        <div className={styles.extra} aria-hidden={!expanded || undefined} inert={!expanded}>
+          <div className={styles.extraInner}>
+            {rest.map((option, index) => (
+              <Reaction
+                key={option.emoji}
+                option={option}
+                index={index}
+                selected={shownSelected.has(option.emoji)}
+                picked={picked === option.emoji}
+                hovered={hovered === option.emoji}
+                onHover={hover(option.emoji)}
+                onPick={() => pick(option.emoji)}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </FloatingPanel>
+  );
+}

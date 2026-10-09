@@ -47,7 +47,7 @@ Avatar.Group           overlapping row, gives its size to members
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `aria-label` (when no name is shown) and the other div attributes. |
 
 ### Avatar.Image
-`ref` → `HTMLImageElement`. The photo; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again.
+`ref` → `HTMLImageElement`. The photo; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -95,6 +95,8 @@ Avatar.Group           overlapping row, gives its size to members
 | `gray` | neutral soft fill, gray initials | unknown or system users | yes |
 | `blue` · `sky` · `teal` · `green` · `yellow` · `orange` · `red` · `pink` · `purple` | soft hue fill, hue initials | people: the hue comes from a stable user id | |
 
+The soft fill is opaque: the soft hue is composited over the surface the avatar stands on (`--avatar-ring`, else the current layer), so it looks like the soft hue on that surface and an overlapped neighbour in a group never shows through. `Avatar.Overflow` is composited the same way.
+
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -117,7 +119,7 @@ Avatar.Group           overlapping row, gives its size to members
 ## Layout & spacing
 - Inline-flex, never shrinks, `vertical-align: middle`.
 - Avatar → name: `--prime-space-3` in lists and cards, `--prime-space-2` in table cells.
-- Group: members overlap by 25% of the diameter with a 2px ring in `--avatar-ring` (surfaces set it to their fill).
+- Group: members overlap by 25% of the diameter with a 2px ring in `--avatar-ring` (surfaces set it to their fill; a host such as a reaction chip sets it to its own fill, and the fills of initials and «+N» are composited over it).
 - A host slot may size the avatar by setting `--avatar-slot-size`.
 
 ## Accessibility
@@ -161,4 +163,4 @@ No keyboard interaction.
 
 ## Related
 - **Built from:** —
-- **See also:** [Thumbnail](../thumbnail/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Card](../card/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md)
+- **See also:** [Thumbnail](../thumbnail/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Card](../card/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (a round upload zone around an avatar)

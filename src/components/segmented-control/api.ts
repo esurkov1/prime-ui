@@ -1,4 +1,5 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { FIELD_OPTIONAL_LABEL, fieldGroupProps } from "../../internal/field.api";
 
 const PALETTE =
   '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"';
@@ -14,8 +15,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "SegmentedControl.Root",
-      en: '`ref` → `HTMLDivElement`. `<div role="radiogroup">`: the track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row.',
-      ru: '`<div role="radiogroup">`: дорожка со скользящим бегунком, клавиатура и горизонтальная прокрутка ряда.',
+      en: '`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="radiogroup">` track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row · support row. The frame hugs the track unless `fullWidth`.',
+      ru: 'Поле: подпись · дорожка `<div role="radiogroup">` со скользящим бегунком, клавиатурой и горизонтальной прокруткой · строка поддержки.',
       props: [
         {
           name: "value",
@@ -57,6 +58,7 @@ export const api: ComponentApi = {
           en: "Fills the container; single-line segments tend to equal widths but never get narrower than their label — when they do not fit, the row scrolls.",
           ru: "Заполнить контейнер; однострочные сегменты стремятся к равной ширине, но не уже своей подписи — если не помещаются, ряд прокручивается.",
         },
+        ...fieldGroupProps("radiogroup", "SegmentedControlLabels"),
         {
           name: "children",
           type: "ReactNode",
@@ -65,9 +67,9 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" | "onChange">',
-          en: "`aria-label` / `aria-labelledby` (name the group), `className` and the other div attributes.",
-          ru: "`aria-label` / `aria-labelledby` (имя группы), `className` и остальные атрибуты div.",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange" | "dir">',
+          en: "`aria-label` / `aria-labelledby` / `aria-describedby` and `onKeyDown` go to the radiogroup (a prevented key skips the kit's handling); `className`, `data-*` and the other attributes to the field frame `<div>`.",
+          ru: "`aria-label` / `aria-labelledby` / `aria-describedby` и `onKeyDown` — на radiogroup (отменённая клавиша пропускает обработку кита); `className`, `data-*` и остальное — на `<div>` рамки поля.",
         },
       ],
     },
@@ -179,5 +181,5 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [],
+  labels: [FIELD_OPTIONAL_LABEL],
 };

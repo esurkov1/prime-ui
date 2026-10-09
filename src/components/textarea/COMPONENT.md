@@ -7,12 +7,14 @@
 
 ## When to use
 - Free-form text longer than one line: comments, descriptions, reviews, support requests, notes.
+- A plain growing input (`rows={1} maxRows={8}`) when a full chat composer with attachments, reply and voice is not needed.
 - Text with a length limit shown to the user (`Textarea.Counter`).
 
 ## When not to use
 - A single-line value (name, e-mail, search) → use [Input](../input/COMPONENT.md).
 - A one-time code split into cells → use [DigitInput](../digit-input/COMPONENT.md).
 - Read-only code or logs → use [CodeBlock](../code-block/COMPONENT.md).
+- A chat message input with send, attachments, reply / edit and voice → use [Composer](../composer/COMPONENT.md).
 
 ## Import
 ```tsx
@@ -22,9 +24,11 @@ import { Textarea } from "prime-ui-kit";
 ## Anatomy
 ```
 Textarea.Root       label row → field box with the native <textarea> → support row (hint | error · counter)
+├─ Textarea.CopyButton   children: copies the text from the top end corner (kit-rendered)
+└─ Textarea.Action       children: the consumer's named icon action with a tooltip (button or asChild link)
 Textarea.Counter    goes into Textarea.Root `counter` (right side of the support row)
 ```
-Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the whole field and takes native `<textarea>` props directly.
+Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the whole field and takes native `<textarea>` props directly. Its children are only the corner actions: they sit in the top end corner as full-height segments flush with the box edges, in JSX order, after the commit status of `onCommit`.
 
 ## API
 
@@ -45,10 +49,14 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on the field box (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
 | `counter` | `ReactNode` | — | Right side of the support row, usually `<Textarea.Counter />`. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row (min height = hint line height), so an appearing error does not shift the layout. |
-| `autoResize` | `boolean` | `true` | Height follows the content (minimum three lines, no scrollbar, no resize handle). `false` → fixed height (three lines or `rows`) with native vertical resize. |
+| `autoResize` | `boolean` | `true` | Height follows the content (minimum `rows` lines, no resize handle; up to `maxRows` lines when set, then it scrolls inside). `false` → fixed height of `rows` lines with native vertical resize. |
+| `rows` | `number` | `3` | Minimum height in lines; with `autoResize={false}` the fixed height. `rows={1}` makes a field that starts as one line, like an Input. |
+| `maxRows` | `number` | — | With `autoResize`: the field grows up to this many lines, then scrolls inside (a chat composer: `rows={1} maxRows={8}`). Without it the field grows without a limit. |
 | `onValueChange` | `(value: string) => void` | — | Called with the new string; native `onChange` still fires first. |
 | `id` | `string` | — | Id of the `<textarea>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
+| `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with the value on blur and Mod+Enter when it differs from the last committed one (the value at focus); Escape reverts to it. A returned Promise shows a spinner at the field's edge (`aria-busy` on the control) while the field stays editable and Tab moves on; a rejection puts the committed value back unless the person typed on — show why through `error`. Success shows a brief check (`labels.saved`). |
+| `children` | `ReactNode` | — | Actions in the field's top end corner: `Textarea.CopyButton`, `Textarea.Action`. |
 | `labels` | `Partial<TextareaLabels>` | — | Built-in strings, see Labels. |
 | `className` | `string` | — | Class on the field frame `<div>` (label, field box, support row), as on every field root. |
 | `…rest` | `Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size" \| "children">` | — | `value`, `defaultValue`, `onChange`, `placeholder`, `rows`, `maxLength`, `name`, `disabled`, `readOnly`, `aria-label`… |
@@ -62,6 +70,24 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `max` | `number` | — (required) | Limit; `current > max` turns the counter danger (`data-invalid="true"`). Add `maxLength` on the root for a hard limit. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the `<span>`. |
 
+### Textarea.CopyButton
+`ref` → `HTMLButtonElement`. Copies the field's value from the field's top end corner (a read-only result): the copy glyph morphs into a check, the name and tooltip switch to `labels.copied` (`labels.copyError` when the clipboard refuses), a polite live region repeats it.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `value` | `string` | `the field's value` | Text to copy instead of the field's current value. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children" \| "aria-label">` | — | `onClick`, `disabled` and the other button attributes. |
+
+### Textarea.Action
+`ref` → `HTMLButtonElement` (the child with `asChild`). The consumer's icon action in the field's top end corner: a full-height button segment named by `label`, with a tooltip and the touch hit area.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `label` | `string` | — (required) | Accessible name and tooltip («Позвонить», «Открыть профиль»). |
+| `asChild` | `boolean` | `false` | Renders the one child (an `<a href>`, a router link) with the segment's look; `disabled` becomes `aria-disabled`. |
+| `children` | `ReactNode` | — (required) | The glyph (`<Icon name>`), or with `asChild` the element that carries it. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "aria-label" \| "children">` | — | `onClick`, `disabled` and the other button attributes. |
+
 ## Variants
 Textarea has no `variant` or `tone`: one field treatment (fill, no visible border).
 
@@ -70,7 +96,7 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 |---|---|---|---|
 | `xs` | Text 12/16, padX 8, radius 6, label 12/16, hint 12/16 | Dense panels next to `xs` controls | |
 | `s` | Text 13/20, padX 8, radius 8, label 12/16, hint 12/16 | Compact side panels, comments in lists | |
-| `m` | Text 14/20, padX 12, radius 8, label 13/20, hint 12/16 | Regular forms | yes |
+| `m` | Text 14/20, padX 12, radius 8, label 13/20, hint 12/16 | Regular forms | yes (without `size`: the host's tier, else `m`) |
 | `l` | Text 16/24, padX 12, radius 10, label 14/20, hint 13/20 | Spacious forms, long reading text | |
 | `xl` | Text 16/24, padX 16, radius 12, label 14/20, hint 13/20 | Hero forms next to `xl` inputs | |
 
@@ -79,8 +105,8 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 ### autoResize
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `true` | Box grows line by line with the text, minimum three lines, no resize handle | Comments, descriptions — most cases | yes |
-| `false` | Fixed height (`rows` or three lines), native vertical resize handle, scrolls inside | Very long text where the page must not grow, or a fixed layout | |
+| `true` | Box grows line by line with the text from `rows` lines (three by default), no resize handle; with `maxRows` it stops there and scrolls inside | Comments, descriptions — most cases; `rows={1} maxRows={8}` for a chat input | yes |
+| `false` | Fixed height of `rows` lines, native vertical resize handle, scrolls inside | Very long text where the page must not grow, or a fixed layout | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -101,10 +127,17 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 | focus | keyboard focus | focus fill and inset focus ring on the field box; clicking the box padding focuses the textarea |
 | no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the field box |
 | invalid | `invalid` or non-empty `error` | `data-invalid="true"` on the outer wrapper and the field box, `aria-invalid="true"`, danger ring; the control shakes once when an error arrives (`data-shake` on the frame) |
-| disabled | `disabled` | `data-disabled="true"` on the field box, disabled fill and text; label and hint dimmed |
+| disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"` on the field box, disabled fill and text; label and hint dimmed |
+| capped | `autoResize` with `maxRows` | `data-capped="true"` on the field box; the box grows line by line up to `maxRows` lines, then the textarea scrolls inside with the thin scrollbar |
 | read-only | `readOnly` | `data-readonly="true"` on the field box, no hover, default cursor |
 | reserved support row | `reserveSupportRow` | `data-reserve="true"` on the support row |
 | counter over limit | `current > max` | `data-invalid="true"` on `Textarea.Counter` |
+| saving | `onCommit` returned a pending Promise | `aria-busy="true"` on the textarea, a `Spinner` in the top end corner (`data-commit="pending"`); the field stays editable; a live region says `labels.saving` |
+| saved | the Promise resolved (or `onCommit` returned nothing) | the spinner cross-fades into a success check (`data-commit="saved"`) that fades out; the live region says `labels.saved` |
+| save refused | the Promise rejected | the committed text is put back (unless the person typed on); the owner shows why through `error` |
+| copied | `Textarea.CopyButton` pressed | the copy glyph cross-fades into a check, the name becomes `labels.copied` (or `labels.copyError`) |
+
+Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+Enter (Ctrl or ⌘ with Enter — a plain Enter is a line break) commit a changed text, Escape puts the committed text back and is consumed. An unchanged text never fires.
 
 `data-size` is set on the outer wrapper and the field box. Controlled: `value` + `onValueChange` (or `onChange`). Uncontrolled: `defaultValue`.
 
@@ -119,13 +152,17 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 ### Keyboard
 | Key | Action |
 |---|---|
-| `Tab` | Focuses the field; Enter inserts a line break instead of submitting the form. |
+| `Tab` | Focuses the field, then the buttons in its corner; Enter inserts a line break instead of submitting the form. |
+| `Mod+Enter` | With `onCommit`: saves a changed text; focus stays in the field. |
+| `Escape` | With `onCommit`: puts the committed text back. |
 
 ### ARIA
 - `label` renders `<label htmlFor>` bound to the textarea; without it set `aria-label`. A placeholder never replaces the label.
 - Hint and error are linked via `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.
 - The field box is a `<div>`, not a `<label>`, so counter and hint never leak into the accessible name; clicking its padding focuses the textarea.
 - `Textarea.Counter` shows `12/280` visually and announces `labels.counter` (`aria-live="polite"`).
+- `Textarea.Action` and `Textarea.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied`. A press on them never moves focus into the textarea.
+- With `onCommit` the textarea carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -134,6 +171,11 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 |---|---|---|
 | `optional` | `"необязательно"` | Marker after the label when `optional`. |
 | `counter` | `"{current} из {max} символов"` | Screen-reader text of `Textarea.Counter`; `{current}` and `{max}` are replaced. |
+| `copy` | `"Копировать"` | Name and tooltip of the copy button. |
+| `copied` | `"Скопировано"` | Name, tooltip and announcement once the value is copied. |
+| `copyError` | `"Не удалось скопировать"` | Name, tooltip and announcement when the clipboard refuses. |
+| `saving` | `"Сохранение"` | Announced while an `onCommit` save is pending. |
+| `saved` | `"Сохранено"` | Announced once an `onCommit` save succeeds. |
 
 ## Examples
 | Example | Shows |
@@ -142,8 +184,10 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; text, padding, label and hint follow the tier — `size`. |
 | [states.tsx](examples/states.tsx) | A default field next to a read-only and a disabled one — `readOnly`, `disabled`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: an error shakes the field as it arrives, drops in and leaves as soon as the text is fixed; required and optional markers, a hint and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
-| [auto-resize.tsx](examples/auto-resize.tsx) | A field that grows with its text next to a fixed one with a resize handle — `autoResize`, `rows`. |
+| [auto-resize.tsx](examples/auto-resize.tsx) | A field that grows with its text, one that starts as a line and stops growing at five, and a fixed one with a resize handle — `autoResize`, `rows`, `maxRows`. |
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single reply composer where the caret and the lighter fill show focus — `focusRing`. |
+| [edge-actions.tsx](examples/edge-actions.tsx) | A read-only generated reply with copying and a link to the template in the field's corner — `Textarea.CopyButton`, `Textarea.Action`. |
+| [inline-edit.tsx](examples/inline-edit.tsx) | A record card note that saves on blur and Mod+Enter, reverts on Escape and shows the server's refusal — `onCommit`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the text; the counter follows it and `maxLength` stops extra input — `value`, `onValueChange`, `Textarea.Counter`, `maxLength`. |
 | [in-form.tsx](examples/in-form.tsx) | Support request form: the description is checked on submit, its error leaves as soon as the text is long enough and does not shift the form, a sent request turns the button green — `required`, `error`, `reserveSupportRow`. |
 
@@ -152,8 +196,11 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 - Counter without `maxLength` when the limit is hard → add `maxLength` so extra input is blocked.
 - `className` expected on the field box → it lands on the field frame (label, box, support row), as on every field root; size the box through the frame's layout.
 - Expecting a fixed height with the default `autoResize` → set `autoResize={false}` (and `rows`) for a fixed box with a resize handle.
+- A field that pushes the page down without end (a chat input, a note in a narrow panel) → cap it with `maxRows`; past it the field scrolls inside.
 - Only a placeholder, no label → add `label` or `aria-label`.
+- A copy `Button` under a read-only result → `Textarea.CopyButton` as a child of the root.
+- Other children than `Textarea.CopyButton` / `Textarea.Action` → the root renders the textarea itself; children are only the corner actions.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
-- **See also:** [Input](../input/COMPONENT.md) — the same field contract for one line; [CodeBlock](../code-block/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (corner actions), [Spinner](../spinner/COMPONENT.md) (`onCommit`)
+- **See also:** [Input](../input/COMPONENT.md) — the same field contract for one line; [Composer](../composer/COMPONENT.md) — a chat message input built on Textarea; [CodeBlock](../code-block/COMPONENT.md)

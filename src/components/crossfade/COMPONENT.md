@@ -13,6 +13,8 @@ one state to another. Crossfade is the mechanic for regions; its loading state i
 - A card, panel or page region that switches between loading, data, empty and error states of its own content — every such region, not only the prominent ones.
 - A detail panel that shows one record at a time: key it by the record id.
 - Any in-place swap of one block for another where an instant flip would be jarring.
+- A region as high as its panel (a board, a chat, a full-height table) that swaps states: `fill`.
+- An optional block (a notice, a bulk-action bar) that comes and goes in a grid or a flex column: empty children leave no box, so the gap closes too.
 
 ## When not to use
 - A table loading, empty or failing → set `loading`, `empty`, `error` on [DataTable](../data-table/COMPONENT.md); its body already cross-fades between them.
@@ -43,11 +45,17 @@ Crossfade          <div>; holds the region's height while it changes
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `state` | `string \| number` | — (required) | Key of what the region shows: `"loading"`, `"ready"`, `"empty"`, `"error"` or a record id. A new value cross-fades the old content into the new one; the same value updates in place. |
-| `children` | `ReactNode` | — | Content of the current `state`. |
+| `fill` | `boolean` | `false` | The region takes its parent's height (a flex or grid item, or a sized block) and every state stretches to it; the height never glides. |
+| `children` | `ReactNode` | — | Content of the current `state`. Nothing (`null`, `false`) leaves no box once the old state has faded: no gap in a grid or a flex column. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `aria-busy`, `aria-live`, `role` and the other div attributes. |
 
 ## Variants
 Crossfade has no variants: one treatment, keyed by `state`.
+
+### Flags
+| Flag | Looks like when on | Use when | Default |
+|---|---|---|---|
+| `fill` | the root takes its parent's height; each state's content stretches to it; the leaving layer covers the whole root; no height glide | a full-height region: a board, a chat, a pane in a fixed-height page | `false` |
 
 ### state
 | Value | Looks like | Use when | Default |
@@ -63,12 +71,15 @@ Crossfade has no variants: one treatment, keyed by `state`.
 | swapping | `state` changes | previous layer `data-state="closed"`, `aria-hidden`, `inert`, absolutely placed, fades out over `fast` with `exit` easing and unmounts on `animationend` (timeout fallback); the new layer fades in over `base` with `enter` easing |
 | resizing | the new state has another height | root `data-resizing="true"`: height glides from the old to the new value over `base` with `standard` easing, clipped with a `--prime-focus-space` margin, then returns to `auto` |
 | reduced motion | `prefers-reduced-motion: reduce` | instant swap: no leaving layer, no glide |
+| empty | the current state renders nothing (`null`, `false`, `""`) | no current layer; once nothing is leaving the root is `:empty` and `display: none` — no box and no gap in its grid or flex parent |
+| filling | `fill` | `data-fill="true"`; the root is a one-cell grid (`flex: 1`, `height: 100%`, `min-height: 0`), layers stretch to it |
 
 Motion is opacity only, so nothing shifts under the pointer; the leaving content keeps its instance (no remount, no repeated effects) until it is gone.
 
 ## Layout & spacing
 - No padding, gap or fill of its own: it sits where the swapped content would sit (inside `Card.Body`, a page section, a panel).
-- Width follows the parent; height is the current content's height except while gliding.
+- Width follows the parent; height is the current content's height except while gliding — or, with `fill`, the parent's height (the parent needs one: a flex or grid column with a height, `PageContent.Root fill`).
+- An empty Crossfade has no box: an optional block above a list keeps the page rhythm whether it is there or not.
 - The loading state is a `Skeleton` with the geometry of the data it stands for (same rows, same line heights), so the swap to data changes neither layout nor height.
 
 ## Accessibility
@@ -91,6 +102,7 @@ No `labels`.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A card region that cross-fades between loading, data, empty and error and glides to the new height — `state`. |
 | [record-switch.tsx](examples/record-switch.tsx) | A detail panel keyed by the record id: picking another client cross-fades the details of a different height — `state`. |
+| [fill.tsx](examples/fill.tsx) | A deal board that fills its panel's height while it swaps between loading and data, and a notice slot above it that takes no room while empty — `fill`, `state`. |
 
 ## Mistakes
 - A new `state` on every data refresh (`state={Date.now()}`) → key by what the region shows, not by when it was fetched.
@@ -98,6 +110,8 @@ No `labels`.
 - A spinner block for content of known shape → a `Skeleton` of that shape; a spinner is for loading with no shape to hold (a button, a status line).
 - Wrapping a DataTable to animate its loading / empty / error → the table body already cross-fades; use its props.
 - Hand-written `opacity` transitions or `height` animations for a state swap → Crossfade owns both, with tokens and reduced motion.
+- `height: 100%` on the content of a full-height region → `fill` on the Crossfade; its layers stretch.
+- Rendering an optional block conditionally outside Crossfade (`{notice && <Banner />}`) → it pops in and out; keep the Crossfade and pass `null` when there is nothing to show.
 
 ## Related
 - **Built from:** —

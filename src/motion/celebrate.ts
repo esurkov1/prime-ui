@@ -75,7 +75,6 @@ export function celebrate(options: CelebrateOptions = {}): Promise<void> {
     pointerEvents: "none",
     zIndex: "var(--prime-z-toast)",
   });
-  ctx.scale(dpr, dpr);
   document.body.append(canvas);
 
   const css = getComputedStyle(themed);
@@ -97,6 +96,8 @@ export function celebrate(options: CelebrateOptions = {}): Promise<void> {
       color: palette[Math.floor(Math.random() * palette.length)],
     };
   });
+  // Drawn color by color: one fill style change per color a frame, not one per piece.
+  pieces.sort((a, b) => (a.color < b.color ? -1 : a.color > b.color ? 1 : 0));
 
   return new Promise((resolve) => {
     const start = performance.now();
@@ -105,7 +106,8 @@ export function celebrate(options: CelebrateOptions = {}): Promise<void> {
       const t = now - start;
       const dt = Math.min(32, now - prev);
       prev = now;
-      ctx.clearRect(0, 0, width, height);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (t >= DURATION_MS) {
         canvas.remove();
         resolve();
@@ -113,6 +115,7 @@ export function celebrate(options: CelebrateOptions = {}): Promise<void> {
       }
       ctx.globalAlpha =
         t < DURATION_MS * 0.6 ? 1 : 1 - (t - DURATION_MS * 0.6) / (DURATION_MS * 0.4);
+      let fill = "";
       for (const piece of pieces) {
         piece.vy += GRAVITY * dt;
         piece.vx *= 1 - DRAG * dt;
@@ -120,12 +123,17 @@ export function celebrate(options: CelebrateOptions = {}): Promise<void> {
         piece.x += piece.vx * dt;
         piece.y += piece.vy * dt;
         piece.angle += piece.spin * dt;
-        ctx.save();
-        ctx.translate(piece.x, piece.y);
-        ctx.rotate(piece.angle);
-        ctx.fillStyle = piece.color;
+        // Fallen below the screen: nothing to draw.
+        if (piece.y - piece.size > height) continue;
+        if (piece.color !== fill) {
+          fill = piece.color;
+          ctx.fillStyle = fill;
+        }
+        // One transform per piece (device pixels · position · spin) instead of save / restore.
+        const cos = Math.cos(piece.angle) * dpr;
+        const sin = Math.sin(piece.angle) * dpr;
+        ctx.setTransform(cos, sin, -sin, cos, piece.x * dpr, piece.y * dpr);
         ctx.fillRect(-piece.size / 2, -piece.size / 4, piece.size, piece.size / 2);
-        ctx.restore();
       }
       requestAnimationFrame(frame);
     };

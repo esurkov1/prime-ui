@@ -1,5 +1,5 @@
 /** The submit cycle: the button is busy while the request runs, a failed request shows a danger Banner and marks the password — `loading`, `invalid`. */
-import { Banner, Button, Icon, Input, LoginForm } from "prime-ui-kit";
+import { Banner, Button, Fieldset, Icon, Input, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -43,27 +43,23 @@ export default function LoginFormStatesExample() {
                 </Banner.Content>
               </Banner.Root>
             ) : null}
-            <Input.Root label="Email" required>
-              <Input.Wrapper>
-                <Input.Field
-                  type="email"
-                  autoComplete="email"
-                  placeholder="name@company.ru"
-                  disabled={pending}
-                />
-              </Input.Wrapper>
-            </Input.Root>
-            <Input.Root label="Пароль" required invalid={failed}>
-              <Input.Wrapper>
-                <Input.Field
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="********"
-                  disabled={pending}
-                  onValueChange={() => setFailed(false)}
-                />
-              </Input.Wrapper>
-            </Input.Root>
+            <Fieldset disabled={pending}>
+              <Input.Root label="Email" required>
+                <Input.Wrapper>
+                  <Input.Field type="email" autoComplete="email" placeholder="name@company.ru" />
+                </Input.Wrapper>
+              </Input.Root>
+              <Input.Root label="Пароль" required invalid={failed}>
+                <Input.Wrapper>
+                  <Input.Field
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="********"
+                    onValueChange={() => setFailed(false)}
+                  />
+                </Input.Wrapper>
+              </Input.Root>
+            </Fieldset>
             <Button.Root type="submit" fullWidth loading={pending}>
               Войти
             </Button.Root>

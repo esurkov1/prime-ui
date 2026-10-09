@@ -8,7 +8,17 @@ export const page: ComponentPageConfig = {
     segment: "select",
     label: "Select",
     summary: "Выпадающий список с выбором значения",
-    keywords: ["селект", "список", "выбор", "value", "onValueChange", "open"],
+    keywords: [
+      "селект",
+      "список",
+      "выбор",
+      "value",
+      "onValueChange",
+      "open",
+      "onSearchChange",
+      "сервер",
+      "аватар",
+    ],
     icon: ChevronDown,
     order: 6,
   },
@@ -55,6 +65,18 @@ export const page: ComponentPageConfig = {
         "Длинный список с поиском: пункты ищутся по подписи и ключевым словам, группы и разделитель прячутся при поиске — `searchable`, `keywords`, `Select.Group`.",
     },
     {
+      scenario: "server-search",
+      title: "Поиск на сервере",
+      description:
+        "Клиент из тысяч: родитель ищет на сервере по мере ввода и догружает следующую страницу в конце списка — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`.",
+    },
+    {
+      scenario: "load-error",
+      title: "Ошибка загрузки",
+      description:
+        "Пункты не загрузились: список говорит об этом на месте, а повтор загружает их снова — `loadError`, `onRetry`, `loading`.",
+    },
+    {
       scenario: "clearable",
       title: "Очистка",
       description:
@@ -65,6 +87,12 @@ export const page: ComponentPageConfig = {
       title: "Богатые пункты",
       description:
         "Пункты с картинкой, второй строкой и ценой; триггер рисует выбранный пункт теми же частями — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`.",
+    },
+    {
+      scenario: "people",
+      title: "Люди",
+      description:
+        "Люди в строках и триггере: аватар по ярусу перед именем, бейдж роли после него — `Avatar.Root`, `Badge.Root`, `renderValue`.",
     },
     {
       slot: "controlled",
@@ -103,6 +131,10 @@ export const page: ComponentPageConfig = {
         action: "Набор с клавиатуры: подсветка уходит на пункт с этой буквы или префикса.",
       },
       { keys: "Delete · Backspace", action: "На триггере с `clearable` очищают значение." },
+      {
+        keys: "Enter",
+        action: "При ошибке загрузки в открытом списке повторяет загрузку (`onRetry`).",
+      },
       { keys: "Escape", action: "Закрывает список; фокус возвращается на триггер." },
       {
         keys: "Tab",
@@ -113,6 +145,8 @@ export const page: ComponentPageConfig = {
       'Триггер — `role="combobox"` с `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`; имя — `label`.',
       'Список — `role="listbox"` (`aria-multiselectable` при `multiple`); пункты — `role="option"` с `aria-selected`; подсветка — через `aria-activedescendant`.',
       "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`; при загрузке — `aria-busy`.",
+      'При загрузке список — `aria-busy`, а `labels.loading` объявляется вежливо; строки-скелеты скрыты от скринридеров; ошибка загрузки — `role="alert"`.',
+      "Подсветка, дошедшая до последнего пункта, запрашивает следующую порцию так же, как прокрутка.",
       "Клик снаружи закрывает список без возврата фокуса: фокус остаётся там, куда нажали.",
     ],
   },

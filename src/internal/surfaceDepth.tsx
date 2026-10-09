@@ -27,6 +27,11 @@ export function useNestedSurfaceDepth(): SurfaceDepth {
   return nextSurfaceDepth(React.useContext(SurfaceDepthContext));
 }
 
+/** Depth of the nearest surface around the caller (a part that wears its host's own fill). */
+export function useSurfaceDepth(): SurfaceDepth {
+  return React.useContext(SurfaceDepthContext);
+}
+
 /** Surfaces inside `children` count their depth from `value`. */
 export const SurfaceDepthProvider = SurfaceDepthContext.Provider;
 

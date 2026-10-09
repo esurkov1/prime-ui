@@ -1,17 +1,25 @@
 import * as React from "react";
 
+import { useStateSwap } from "@/hooks/useStateSwap";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
+import palette from "@/internal/palette.module.css";
 import {
   DEFAULT_PROGRESS_SEGMENTS_LABELS,
+  formatProgressValue,
   type ProgressModeProps,
+  type ProgressSegment,
   type ProgressSegmentsLabels,
   resolveSegments,
   resolveValue,
+  segmentFill,
 } from "@/internal/progressSegments";
 import type { ControlSize, Tone } from "@/internal/states";
+import swap from "@/internal/swapMotion.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
+import { Skeleton } from "../skeleton/Skeleton";
 import styles from "./ProgressCircle.module.css";
 
 /*
@@ -27,6 +35,9 @@ const HAIRLINE_GAP = STROKE * 0.75;
 /** Rings below `m` are too small for readable inner text: `children` are not rendered there. */
 const SIZES_WITHOUT_INNER: ReadonlySet<ControlSize> = new Set(["xs", "s"]);
 
+/** Legend rows drawn while a distribution loads and its length is not known yet. */
+const LOADING_ROWS = 3;
+
 export type ProgressCircleLabels = ProgressSegmentsLabels;
 
 export type ProgressCircleProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
@@ -37,10 +48,16 @@ export type ProgressCircleProps = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
    * child stays available as `aria-valuetext`.
    */
   children?: React.ReactNode;
+  /**
+   * The data is on its way: a Skeleton ring of the same size (and legend rows), which cross-fades
+   * into the data. The root is `aria-busy`.
+   */
+  loading?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 } & ProgressModeProps;
 
-type Arc = { start: number; length: number; tone?: Tone; rest?: boolean };
+type Fill = ReturnType<typeof segmentFill>;
+type Arc = { start: number; length: number; fill?: Fill; rest?: boolean };
 
 /** One arc of `length` from `start` (viewBox units along the circle, clockwise from the top). */
 function arcStyle(start: number, length: number): React.CSSProperties {
@@ -54,16 +71,25 @@ function Ring(props: React.SVGProps<SVGCircleElement>) {
   return <circle cx={50} cy={50} r={RADIUS} strokeWidth={STROKE} {...props} />;
 }
 
+/** `data-tone` / `data-color` and the palette class of a part. */
+function fillProps(fill: Fill | undefined) {
+  return {
+    className: fill?.color ? palette.hue : undefined,
+    ...toDataAttributes(fill ?? { tone: "accent" }),
+  };
+}
+
 /** Round cap of a continuous arc: a dot at the arc start (3 o'clock), rotated to `position`. */
-function Cap({ position, tone }: { position: number; tone?: Tone }) {
+function Cap({ position, fill }: { position: number; fill?: Fill }) {
+  const own = fillProps(fill);
   return (
     <circle
       cx={50 + RADIUS}
       cy={50}
       r={STROKE / 2}
-      className={styles.cap}
+      {...own}
+      className={cx(own.className, styles.cap)}
       style={{ rotate: `${(position / CIRCUMFERENCE) * 360}deg` }}
-      {...toDataAttributes({ tone: tone ?? "accent" })}
     />
   );
 }
@@ -82,15 +108,18 @@ function SegmentArcs({
     const inset = (STROKE + HAIRLINE_GAP) / 2;
     return (
       <>
-        {arcs.map((a, i) => (
-          <Ring
-            // biome-ignore lint/suspicious/noArrayIndexKey: presentational parts in source order
-            key={i}
-            className={a.rest ? styles.restRound : styles.segmentRound}
-            style={arcStyle(a.start + inset, a.length - inset * 2)}
-            {...(a.rest ? {} : toDataAttributes({ tone: a.tone ?? "accent" }))}
-          />
-        ))}
+        {arcs.map((a, i) => {
+          const own = a.rest ? { className: undefined } : fillProps(a.fill);
+          return (
+            <Ring
+              // biome-ignore lint/suspicious/noArrayIndexKey: presentational parts in source order
+              key={i}
+              {...own}
+              className={cx(own.className, a.rest ? styles.restRound : styles.segmentRound)}
+              style={arcStyle(a.start + inset, a.length - inset * 2)}
+            />
+          );
+        })}
       </>
     );
   }
@@ -99,20 +128,23 @@ function SegmentArcs({
   const last = parts[parts.length - 1];
   return (
     <>
-      {parts.map((a, i) => (
-        <Ring
-          // biome-ignore lint/suspicious/noArrayIndexKey: presentational parts in source order
-          key={i}
-          className={styles.segment}
-          style={arcStyle(a.start, a.length)}
-          {...toDataAttributes({ tone: a.tone ?? "accent" })}
-        />
-      ))}
+      {parts.map((a, i) => {
+        const own = fillProps(a.fill);
+        return (
+          <Ring
+            // biome-ignore lint/suspicious/noArrayIndexKey: presentational parts in source order
+            key={i}
+            {...own}
+            className={cx(own.className, styles.segment)}
+            style={arcStyle(a.start, a.length)}
+          />
+        );
+      })}
       {/* Flat joints inside, round caps at both ends of the filled share (as in ProgressBar). */}
       {first && last && !closed ? (
         <>
-          <Cap position={first.start} tone={first.tone} />
-          <Cap position={last.start + last.length} tone={last.tone} />
+          <Cap position={first.start} fill={first.fill} />
+          <Cap position={last.start + last.length} fill={last.fill} />
         </>
       ) : null}
     </>
@@ -121,61 +153,89 @@ function SegmentArcs({
 
 /**
  * A progress ring: a single `value` (`role="progressbar"`) or `segments` — parts of a whole
- * clockwise from the top (`role="group"` described by the distribution).
+ * clockwise from the top (`role="group"` described by the distribution), with an optional legend
+ * beside the ring.
  */
 export function ProgressCircle(props: ProgressCircleProps) {
   const {
     size = "m",
     children,
     className,
+    loading = false,
     "aria-label": label,
     value: valueProp,
     max: maxProp,
     tone: toneProp,
     segments: segmentsProp,
     segmentGap = "none",
+    legend = false,
+    formatValue = formatProgressValue,
     labels,
     ...rest
   } = props;
   const descriptionId = React.useId();
-  const showInner = children != null && children !== false && !SIZES_WITHOUT_INNER.has(size);
+  const swapped = useStateSwap(loading ? "loading" : "data");
+  const swapClass = swapped ? swap.swapIn : undefined;
+  const showInner =
+    !loading && children != null && children !== false && !SIZES_WITHOUT_INNER.has(size);
   const valueText =
     typeof children === "string" || typeof children === "number" ? String(children) : undefined;
 
   let tone: Tone | undefined;
   let svg: React.ReactNode;
   let description: React.ReactNode = null;
+  let legendNode: React.ReactNode = null;
 
   if (segmentsProp) {
     const gap = segmentGap;
-    const {
-      segments,
-      total,
-      rest: free,
-      scale,
-      text,
-    } = resolveSegments(segmentsProp, maxProp, {
+    const resolved = resolveSegments(segmentsProp, maxProp, {
       ...DEFAULT_PROGRESS_SEGMENTS_LABELS,
       ...labels,
     });
+    const { segments, total, rest: free, scale, text } = resolved;
     const unit = scale > 0 ? CIRCUMFERENCE / scale : 0;
     const arcs: Arc[] = [];
     let cursor = 0;
-    for (const seg of segments) {
-      if (seg.value > 0) arcs.push({ start: cursor, length: seg.value * unit, tone: seg.tone });
+    for (const seg of segments as ProgressSegment[]) {
+      if (seg.value > 0)
+        arcs.push({ start: cursor, length: seg.value * unit, fill: segmentFill(seg) });
       cursor += seg.value * unit;
     }
     if (free > 0 && total > 0) arcs.push({ start: cursor, length: free * unit, rest: true });
+    const showLegend = legend && segments.length > 0;
     const a11y = label
       ? { "aria-label": label, "aria-describedby": descriptionId }
       : { "aria-label": text };
-    if (label) description = <VisuallyHidden id={descriptionId}>{text}</VisuallyHidden>;
+    if (label && !showLegend) {
+      description = <VisuallyHidden id={descriptionId}>{text}</VisuallyHidden>;
+    }
+    if (legend) {
+      legendNode = loading ? (
+        <ProgressLegendSkeleton
+          key="loading"
+          rows={segmentsProp.length || LOADING_ROWS}
+          size={size}
+          className={cx(styles.legend, swapClass)}
+        />
+      ) : showLegend ? (
+        <ProgressLegend
+          key="data"
+          id={label ? descriptionId : undefined}
+          segments={segments}
+          scale={scale}
+          formatValue={formatValue}
+          size={size}
+          className={cx(styles.legend, swapClass)}
+        />
+      ) : null;
+    }
 
     svg = (
       // biome-ignore lint/a11y/useSemanticElements: a distribution is a group of parts, not a fieldset
       <svg
+        key="data"
         viewBox="0 0 100 100"
-        className={styles.svg}
+        className={cx(styles.svg, swapClass)}
         role="group"
         {...a11y}
         {...toDataAttributes({ "segment-gap": gap })}
@@ -191,8 +251,9 @@ export function ProgressCircle(props: ProgressCircleProps) {
     tone = toneProp ?? "accent";
     svg = (
       <svg
+        key="data"
         viewBox="0 0 100 100"
-        className={styles.svg}
+        className={cx(styles.svg, swapClass)}
         role="progressbar"
         aria-valuenow={value}
         aria-valuemin={0}
@@ -215,15 +276,39 @@ export function ProgressCircle(props: ProgressCircleProps) {
     );
   }
 
-  return (
-    <div className={cx(styles.root, className)} {...rest} {...toDataAttributes({ size, tone })}>
-      {svg}
-      {description}
+  const ring = (
+    <>
+      {loading ? (
+        <Skeleton key="loading" shape="block" className={cx(styles.ringSkeleton, swapClass)} />
+      ) : (
+        svg
+      )}
+      {loading ? null : description}
       {showInner ? (
         <div className={styles.inner} aria-hidden={valueText !== undefined ? true : undefined}>
           {children}
         </div>
       ) : null}
+    </>
+  );
+  const rootProps = {
+    ...rest,
+    "aria-busy": loading || undefined,
+    ...toDataAttributes({ size, tone, legend: legend || undefined }),
+  };
+
+  // With a legend the root is a row: the ring and the legend beside it (below when narrow).
+  if (legend) {
+    return (
+      <div className={cx(styles.root, className)} {...rootProps}>
+        <div className={styles.ring}>{ring}</div>
+        {legendNode}
+      </div>
+    );
+  }
+  return (
+    <div className={cx(styles.root, className)} {...rootProps}>
+      {ring}
     </div>
   );
 }

@@ -1,0 +1,112 @@
+/*
+ * Legend of a distribution: rows of swatch · name · value · share on one grid, so values and shares
+ * line up in columns. Text sizes follow the host's label tier; the swatch is the part's fill.
+ */
+.legend,
+.skeleton {
+  --pl-size: var(--prime-control-m-label-size);
+  --pl-line-height: var(--prime-control-m-label-line-height);
+  --pl-swatch: var(--prime-space-2);
+
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  font-family: var(--prime-font-family-sans);
+}
+
+:is(.legend, .skeleton)[data-size="xs"],
+:is(.legend, .skeleton)[data-size="s"] {
+  --pl-size: var(--prime-control-xs-label-size);
+  --pl-line-height: var(--prime-control-xs-label-line-height);
+}
+
+:is(.legend, .skeleton)[data-size="l"],
+:is(.legend, .skeleton)[data-size="xl"] {
+  --pl-size: var(--prime-control-l-label-size);
+  --pl-line-height: var(--prime-control-l-label-line-height);
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  column-gap: var(--prime-space-2);
+  row-gap: var(--prime-space-1);
+  list-style: none;
+  font-size: var(--pl-size);
+  line-height: var(--pl-line-height);
+}
+
+.item {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  min-width: 0;
+}
+
+.swatch {
+  --pl-fill: var(--prime-color-accent-default);
+
+  width: var(--pl-swatch);
+  height: var(--pl-swatch);
+  border-radius: var(--prime-radius-full);
+  background: var(--pl-fill);
+  transition: background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.swatch[data-tone="neutral"] {
+  --pl-fill: var(--prime-color-text-secondary);
+}
+
+.swatch[data-tone="success"] {
+  --pl-fill: var(--prime-color-success-default);
+}
+
+.swatch[data-tone="warning"] {
+  --pl-fill: var(--prime-color-warning-default);
+}
+
+.swatch[data-tone="danger"] {
+  --pl-fill: var(--prime-color-danger-default);
+}
+
+.swatch[data-tone="info"] {
+  --pl-fill: var(--prime-color-info-default);
+}
+
+.swatch[data-color] {
+  --pl-fill: var(--hue-chart);
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value {
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+/* The share column holds «100%» without the row moving as numbers change. */
+.share {
+  min-width: 4ch;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+}
+
+.skeletonRow {
+  width: 100%;
+}

@@ -161,5 +161,5 @@ No `open` prop: the parent mounts and unmounts the banner.
 - Several `solid` banners on one screen → keep `solid` for the one urgent message.
 
 ## Related
-- **Built from:** Button, Icon
+- **Built from:** [Button](../button/COMPONENT.md) (close button), Icon (`action.close`)
 - **See also:** [Notification](../notification/COMPONENT.md), [Hint](../hint/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md)

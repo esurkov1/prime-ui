@@ -38,7 +38,10 @@ function AppShellRoot({ fillViewport = false, className, children, ...rest }: Ap
     <div
       {...rest}
       className={cx(styles.root, className)}
-      {...toDataAttributes({ "fill-viewport": fillViewport || undefined })}
+      {...toDataAttributes({
+        "fill-viewport": fillViewport || undefined,
+        nav: nav.length > 0 || undefined,
+      })}
     >
       {nav}
       <div className={styles.panel}>{panel}</div>

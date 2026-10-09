@@ -1,7 +1,8 @@
-/** Every width; s and m fill the footer with equal buttons, l and xl align them to the end — `size`. */
+/** Every width; xs, s and m fill the footer with equal buttons, l and xl align them to the end — `size`. */
 import { Button, Modal, Typography } from "prime-ui-kit";
 
 const SIZES = [
+  { size: "xs", width: "360 px — одно-два поля" },
   { size: "s", width: "440 px — подтверждения" },
   { size: "m", width: "560 px — короткие формы" },
   { size: "l", width: "720 px — формы в две колонки" },

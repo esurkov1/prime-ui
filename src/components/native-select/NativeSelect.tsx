@@ -4,6 +4,7 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
@@ -45,7 +46,7 @@ export function NativeSelect({
   error,
   invalid,
   focusRing = true,
-  disabled = false,
+  disabled: disabledProp = false,
   placeholder,
   id,
   value,
@@ -58,6 +59,7 @@ export function NativeSelect({
   "aria-describedby": ariaDescribedBy,
   ...rest
 }: NativeSelectProps) {
+  const disabled = useInheritedDisabled(disabledProp);
   const labels = { ...NATIVE_SELECT_LABELS, ...labelsProp };
   const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
   // With a placeholder and no value, the empty option is the one shown.
@@ -98,7 +100,11 @@ export function NativeSelect({
               "focus-ring": focusRing ? undefined : false,
             })}
           >
-            {placeholder ? <option value="">{placeholder}</option> : null}
+            {placeholder ? (
+              <option value="" className={styles.placeholder}>
+                {placeholder}
+              </option>
+            ) : null}
             {children}
           </select>
           <span className={styles.chevron} aria-hidden="true">

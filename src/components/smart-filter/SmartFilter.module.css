@@ -22,6 +22,11 @@
   min-width: 0;
 }
 
+/* The filter button alone: the toolbar hugs it, so the panel opens at its own width. */
+.toolbar[data-searchable="false"] {
+  align-self: flex-start;
+}
+
 .filterButton {
   flex: none;
 }
@@ -60,6 +65,42 @@
   flex-wrap: wrap;
   gap: var(--prime-space-2);
   min-width: 0;
+}
+
+/* Option groups of one field: a caption over each group's values, groups a step apart. */
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+/* A number range: «от» – «до», two equal fields. The row aligns its label to the fields' centre. */
+.row:has(> .range) {
+  align-items: center;
+}
+
+.range {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.bound {
+  min-width: 0;
+}
+
+.rangeDash {
+  color: var(--prime-color-text-muted);
 }
 
 .footer {

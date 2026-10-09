@@ -235,6 +235,9 @@ describe("Timeline", () => {
     expect(gapDots).toHaveLength(2);
     expect(gapDots[0]).toHaveAttribute("aria-hidden", "true");
     expect(container.querySelectorAll(`.${styles.dot}`)).toHaveLength(2);
+    // The event before a gap dashes its lower segment (marked in TSX, not by `:has(+ …)`).
+    expect(items[1]).toHaveAttribute("data-before-gap", "true");
+    expect(items[3]).not.toHaveAttribute("data-before-gap");
   });
 
   it("CSS highlights only the row under the pointer or with keyboard focus", () => {

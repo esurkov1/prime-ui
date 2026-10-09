@@ -48,7 +48,13 @@ export function useModalLayer<T extends HTMLElement = HTMLElement>({
     const node = ref.current;
     if (!open || !node) return;
     focusInto(node);
-    return () => focusBack(openerRef.current);
+    return () => {
+      const opener = openerRef.current;
+      // A layer above this one that closes in the same commit may still hold the opener inert:
+      // its cleanup runs after this one. Focus it once every cleanup of the commit has run.
+      if (opener?.closest("[inert]")) queueMicrotask(() => focusBack(opener));
+      else focusBack(opener);
+    };
   }, [open]);
 
   useScrollLock(open);

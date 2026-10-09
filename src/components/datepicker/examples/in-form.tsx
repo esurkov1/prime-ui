@@ -1,4 +1,4 @@
-/** A leave request form: submit checks the required period, the error shakes in and leaves once the period is fixed; an optional return date — `required`, `error`, `optional`. */
+/** A leave request form: submit reads the period from the form data and checks it, the error shakes in and leaves once the period is fixed; an optional return date — `name`, `required`, `error`, `optional`. */
 import { Button, Card, Datepicker, type DatepickerRange, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -17,13 +17,16 @@ export default function DatepickerInFormExample() {
         className={styles.form}
         onSubmit={(event) => {
           event.preventDefault();
-          const complete = Boolean(period.from && period.to);
+          // The range submits `from`, then `to` under its name ("2026-07-06").
+          const [from, to] = new FormData(event.currentTarget).getAll("vacation");
+          const complete = Boolean(from && to);
           setError(complete ? undefined : "Укажите начало и конец отпуска");
           setSent(complete);
         }}
       >
         <Datepicker.Root
           mode="range"
+          name="vacation"
           label="Период отпуска"
           required
           hint="Не больше 28 дней подряд"
@@ -39,7 +42,13 @@ export default function DatepickerInFormExample() {
           placeholder="Выбрать период"
           fullWidth
         />
-        <Datepicker.Root mode="single" label="Выход на работу" optional fullWidth />
+        <Datepicker.Root
+          mode="single"
+          name="returnDate"
+          label="Выход на работу"
+          optional
+          fullWidth
+        />
         {sent ? (
           <Typography as="p" variant="body-s" tone="secondary" role="status">
             Заявка отправлена на согласование.

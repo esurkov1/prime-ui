@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -173,5 +176,62 @@ describe("Crossfade", () => {
     );
     expect(screen.queryByText("Загрузка")).toBeNull();
     expect(screen.getByText("Данные")).toBeInTheDocument();
+  });
+
+  it("an empty region draws no layer, so the root is :empty and takes no room", () => {
+    stubReducedMotion(true);
+    const { container, rerender } = render(<Crossfade state="none">{null}</Crossfade>);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.childElementCount).toBe(0);
+    rerender(
+      <Crossfade state="banner">
+        <p>Счёт оплачен</p>
+      </Crossfade>,
+    );
+    expect(root.childElementCount).toBe(1);
+    rerender(<Crossfade state="none">{false}</Crossfade>);
+    expect(root.childElementCount).toBe(0);
+  });
+
+  it("an empty state keeps the leaving layer until it has faded", () => {
+    const { container, rerender } = render(
+      <Crossfade state="banner">
+        <p>Счёт оплачен</p>
+      </Crossfade>,
+    );
+    rerender(<Crossfade state="none">{null}</Crossfade>);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.childElementCount).toBe(1);
+    fireEvent.animationEnd(layerOf("Счёт оплачен"));
+    expect(root.childElementCount).toBe(0);
+  });
+
+  it("fill: marks the root and never glides the height", () => {
+    const heights = [120, 300];
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      () => ({ height: heights.shift() ?? 300 }) as DOMRect,
+    );
+    const { container, rerender } = render(
+      <Crossfade state="loading" fill>
+        <p>Загрузка</p>
+      </Crossfade>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toHaveAttribute("data-fill", "true");
+    rerender(
+      <Crossfade state="ready" fill>
+        <p>Доска</p>
+      </Crossfade>,
+    );
+    expect(root).not.toHaveAttribute("data-resizing");
+    expect(root.style.height).toBe("");
+    vi.restoreAllMocks();
+  });
+
+  it("CSS: an empty root has no box; a filling root stretches its layers", () => {
+    const css = readFileSync(join(__dirname, "Crossfade.module.css"), "utf8");
+    expect(css).toMatch(/\.root:empty \{\s*display: none;/);
+    expect(css).toMatch(/\.root\[data-fill="true"\] > \.layer \{[^}]*grid-area: 1 \/ 1/);
+    expect(css).toMatch(/\.root\[data-fill="true"\] > \.leaving \{\s*inset: 0;/);
   });
 });

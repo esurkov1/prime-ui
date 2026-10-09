@@ -42,7 +42,7 @@ export type TimelineGroupProps = {
   ref?: React.Ref<HTMLOListElement>;
 } & Omit<React.OlHTMLAttributes<HTMLOListElement>, "children">;
 
-type EdgeValue = { first: boolean; last: boolean };
+type EdgeValue = { first: boolean; last: boolean; beforeGap?: boolean };
 
 /**
  * Where an event sits in its group. The group tells each event, so the line stops at the first
@@ -50,6 +50,8 @@ type EdgeValue = { first: boolean; last: boolean };
  * re-evaluated by every engine when an event is added next to a kept one.
  */
 const EdgeContext = React.createContext<EdgeValue>({ first: false, last: false });
+
+const isGap = (child: React.ReactNode) => React.isValidElement(child) && child.type === TimelineGap;
 
 /** One labelled `<ol>` of events. The connecting line runs from its first dot to its last. */
 function TimelineGroup({ label, children, className, ...rest }: TimelineGroupProps) {
@@ -59,7 +61,12 @@ function TimelineGroup({ label, children, className, ...rest }: TimelineGroupPro
   const items = events.map((child, index) => (
     <EdgeContext.Provider
       key={React.isValidElement(child) ? child.key : index}
-      value={{ first: index === 0, last: index === events.length - 1 }}
+      value={{
+        first: index === 0,
+        last: index === events.length - 1,
+        // The line under an event that a gap follows turns dashed (no `:has(+ …)` in CSS).
+        beforeGap: isGap(events[index + 1]),
+      }}
     >
       {child}
     </EdgeContext.Provider>
@@ -83,8 +90,12 @@ function TimelineGroup({ label, children, className, ...rest }: TimelineGroupPro
 }
 TimelineGroup.displayName = "Timeline.Group";
 
-function edgeAttributes({ first, last }: EdgeValue) {
-  return { first: first || undefined, last: last || undefined };
+function edgeAttributes({ first, last, beforeGap }: EdgeValue) {
+  return {
+    first: first || undefined,
+    last: last || undefined,
+    "before-gap": beforeGap || undefined,
+  };
 }
 
 // ─── Item ─────────────────────────────────────────────────────────────────────

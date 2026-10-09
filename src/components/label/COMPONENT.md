@@ -6,11 +6,11 @@
 > Field label (native `<label>`) with required and optional markers.
 
 ## When to use
-- Above a control that has no built-in `label` prop: SegmentedControl, a custom control, or a hand-built field where you wire the ids yourself.
+- Above a control that has no built-in `label` prop: a custom control, or a hand-built field where you wire the ids yourself.
 - When a label needs an icon (`Label.Icon`) or an inline clarification (`Label.Description`).
 
 ## When not to use
-- Input, Textarea, Select and other fields with a `label` prop → pass `label`, `required`, `optional` to the field; it renders Label itself ([Input](../input/COMPONENT.md), [Textarea](../textarea/COMPONENT.md)).
+- Input, Textarea, Select, SegmentedControl, DigitInput, Radio.Group and other fields with a `label` prop → pass `label`, `required`, `optional` to the field; it renders Label itself ([Input](../input/COMPONENT.md), [Textarea](../textarea/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)).
 - Help or error text under a field → use [Hint](../hint/COMPONENT.md).
 - Labels for checkboxes, radios and switches → use their own label parts ([Checkbox](../checkbox/COMPONENT.md), [Radio](../radio/COMPONENT.md), [Switch](../switch/COMPONENT.md)).
 - Section or card headings → use [Typography](../typography/COMPONENT.md).
@@ -95,7 +95,7 @@ The label has no hover or focus state; clicking it focuses the control bound wit
 No keyboard interaction.
 
 ### ARIA
-- Bind with `htmlFor` to a native control, or set `id` on the label and `aria-labelledby` on a custom control (SegmentedControl, DigitInput group).
+- Bind with `htmlFor` to a native control, or set `id` on the label and `aria-labelledby` on a custom control (a `role="radiogroup"`, a `fieldset` of cells).
 - The `*` is `aria-hidden`; requiredness must come from the control (`required`).
 - The optional marker and `Label.Description` are visible text and part of the accessible name; `Label.Icon` is `aria-hidden`.
 
@@ -109,7 +109,7 @@ No keyboard interaction.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A standalone label above a control without its own `label`, linked through `aria-labelledby`. |
+| [overview.tsx](examples/overview.tsx) | A standalone label above a hand-built field, linked to its input through `htmlFor` and `id`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size; the label takes the size of the field below it — `size`. |
 | [states.tsx](examples/states.tsx) | A default label next to a disabled one; the markers dim with the text — `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A muted icon before the text, sized by the label — `Label.Icon`. |

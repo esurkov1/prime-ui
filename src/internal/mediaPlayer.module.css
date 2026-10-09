@@ -1,0 +1,81 @@
+/*
+ * The play disk of every player (`mediaPlayer.tsx` `PlayDisk`): one round button (`roundButton`,
+ * control `l`) with the play ⇄ pause glyphs, and over it — while the media is on its way, failed or
+ * not fetched — the transfer disk of the same look and size (`transferDisk`): the ×, the retry or
+ * the download arrow in the glyph's place and the ring along its inner edge. Looks: `solid` — the
+ * accent disk (VoicePlayer; an outgoing bubble recolours it); `shade` — the media shade with a
+ * blur and the white glyph (VideoNote, over its video). Same size, glyphs, motion and focus ring.
+ *
+ *   .slot      the disk and the transfer disk over it
+ *   .disk      the round play button
+ *   .glyphs    play ⇄ pause, cross-fading and scaling in place
+ *   .transfer  the transfer disk, filling the slot
+ */
+.slot {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+}
+
+/* Press, hover and focus come from `roundButton` (its transitions, plus the fade of a covered
+   shade disk); the shade look adds the blur of media controls. */
+.disk {
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.disk[data-look="shade"] {
+  -webkit-backdrop-filter: blur(var(--prime-space-2));
+  backdrop-filter: blur(var(--prime-space-2));
+}
+
+.transfer {
+  position: absolute;
+  inset: 0;
+}
+
+/* Covered by the transfer disk of the same look: only the play glyph gives way, so the disk never
+   dips while one glyph cross-fades into the other. */
+.glyphs {
+  position: relative;
+  display: block;
+  inline-size: var(--prime-icon-size);
+  block-size: var(--prime-icon-size);
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.disk[data-covered] .glyphs {
+  opacity: 0;
+}
+
+/* A translucent disk under a translucent one would read darker: the shade disk gives way whole. */
+.disk[data-look="shade"][data-covered] {
+  opacity: 0;
+}
+
+.glyph {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.glyph[data-shown="false"] {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disk,
+  .glyphs,
+  .glyph {
+    transition: none;
+  }
+}

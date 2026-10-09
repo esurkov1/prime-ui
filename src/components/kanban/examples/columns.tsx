@@ -1,4 +1,4 @@
-/** A sales pipeline whose stages move by the grip in their header, carry a color and a short rule under the title, and are edited in a popover: rename, recolor, delete — `reorderableColumns`, `onColumnOrderChange`, `description`, `color`, `renderColumnActions`. */
+/** A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures under the title, and is edited in a popover — `reorderableColumns`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. */
 import {
   Button,
   ColorSwatches,
@@ -6,6 +6,7 @@ import {
   Input,
   Kanban,
   type KanbanColumn,
+  type KanbanValue,
   type PaletteColor,
   Popover,
   Typography,
@@ -14,7 +15,7 @@ import * as React from "react";
 
 import styles from "./examples.module.css";
 
-type Deal = { id: string; client: string; amount: string };
+type Deal = { id: string; client: string; amount: number };
 
 /** The column colors offered in the editor: a swatch per palette hue. */
 const COLUMN_COLORS: { color: PaletteColor; value: string; label: string }[] = [
@@ -31,29 +32,51 @@ const COLUMN_COLORS: { color: PaletteColor; value: string; label: string }[] = [
 const PRESETS = COLUMN_COLORS.map(({ value, label }) => ({ value, label }));
 
 const COLUMNS: KanbanColumn[] = [
-  { id: "lead", title: "Заявки", description: "Ответить в течение дня", color: "blue" },
+  {
+    id: "lead",
+    title: "Заявки",
+    description: "Ответить в течение дня",
+    color: "blue",
+    locked: true,
+  },
   { id: "demo", title: "Демо", description: "Показ продукта команде клиента", color: "purple" },
   { id: "offer", title: "Предложение", description: "Счёт и договор отправлены", color: "orange" },
-  { id: "won", title: "Сделка", description: "Оплата получена", color: "green" },
+  { id: "won", title: "Сделка", description: "Оплата получена", color: "green", locked: true },
 ];
 
 const DEALS: Deal[] = [
-  { id: "DL-318", client: "ООО «Север»", amount: "480 000 ₽" },
-  { id: "DL-322", client: "АО «Гранит»", amount: "1 200 000 ₽" },
-  { id: "DL-309", client: "ИП Лебедев", amount: "96 000 ₽" },
-  { id: "DL-301", client: "ООО «Вектор»", amount: "350 000 ₽" },
-  { id: "DL-296", client: "ГК «Меридиан»", amount: "2 750 000 ₽" },
+  { id: "DL-318", client: "ООО «Север»", amount: 480_000 },
+  { id: "DL-322", client: "АО «Гранит»", amount: 1_200_000 },
+  { id: "DL-309", client: "ИП Лебедев", amount: 96_000 },
+  { id: "DL-301", client: "ООО «Вектор»", amount: 350_000 },
+  { id: "DL-296", client: "ГК «Меридиан»", amount: 2_750_000 },
 ];
 
-const PLACEMENT = {
+const PLACEMENT: KanbanValue = {
   lead: ["DL-318", "DL-322"],
   demo: ["DL-309"],
   offer: ["DL-301"],
   won: ["DL-296"],
 };
 
+const RUBLES = new Intl.NumberFormat("ru-RU", {
+  style: "currency",
+  currency: "RUB",
+  maximumFractionDigits: 0,
+});
+
+const dealsWord = (count: number) => {
+  const tens = count % 100;
+  const ones = count % 10;
+  if (tens >= 11 && tens <= 14) return "сделок";
+  if (ones === 1) return "сделка";
+  if (ones >= 2 && ones <= 4) return "сделки";
+  return "сделок";
+};
+
 export default function KanbanColumnsExample() {
   const [columns, setColumns] = React.useState(COLUMNS);
+  const [placement, setPlacement] = React.useState<KanbanValue>(PLACEMENT);
   const [savedOrder, setSavedOrder] = React.useState<readonly string[] | null>(null);
 
   const updateColumn = (id: string, patch: Partial<KanbanColumn>) =>
@@ -61,6 +84,13 @@ export default function KanbanColumnsExample() {
       current.map((column) => (column.id === id ? { ...column, ...patch } : column)),
     );
   const titleOf = (id: string) => columns.find((column) => column.id === id)?.title;
+  const figures = (column: KanbanColumn) => {
+    const deals = (placement[column.id] ?? []).flatMap((id) =>
+      DEALS.filter((deal) => deal.id === id),
+    );
+    const sum = deals.reduce((total, deal) => total + deal.amount, 0);
+    return `${deals.length} ${dealsWord(deals.length)} · ${RUBLES.format(sum)}`;
+  };
 
   return (
     <div className={styles.stage}>
@@ -76,9 +106,11 @@ export default function KanbanColumnsExample() {
         items={DEALS}
         getId={(deal) => deal.id}
         getLabel={(deal) => deal.client}
-        defaultValue={PLACEMENT}
+        value={placement}
+        onValueChange={setPlacement}
         reorderableColumns
         onColumnOrderChange={setSavedOrder}
+        renderColumnMeta={figures}
         renderColumnActions={(column) => (
           <Popover.Root>
             <Popover.Trigger>
@@ -116,21 +148,23 @@ export default function KanbanColumnsExample() {
                   })
                 }
               />
-              <Popover.Actions>
-                <Button.Root
-                  variant="soft"
-                  tone="danger"
-                  fullWidth
-                  onClick={() =>
-                    setColumns((current) => current.filter((item) => item.id !== column.id))
-                  }
-                >
-                  <Button.Icon>
-                    <Icon name="action.delete" />
-                  </Button.Icon>
-                  Удалить этап
-                </Button.Root>
-              </Popover.Actions>
+              {column.locked ? null : (
+                <Popover.Actions>
+                  <Button.Root
+                    variant="soft"
+                    tone="danger"
+                    fullWidth
+                    onClick={() =>
+                      setColumns((current) => current.filter((item) => item.id !== column.id))
+                    }
+                  >
+                    <Button.Icon>
+                      <Icon name="action.delete" />
+                    </Button.Icon>
+                    Удалить этап
+                  </Button.Root>
+                </Popover.Actions>
+              )}
             </Popover.Content>
           </Popover.Root>
         )}
@@ -138,7 +172,7 @@ export default function KanbanColumnsExample() {
           <Kanban.Item>
             <Kanban.ItemTitle>{deal.client}</Kanban.ItemTitle>
             <Kanban.ItemDescription>
-              {deal.id} · {deal.amount}
+              {deal.id} · {RUBLES.format(deal.amount)}
             </Kanban.ItemDescription>
           </Kanban.Item>
         )}

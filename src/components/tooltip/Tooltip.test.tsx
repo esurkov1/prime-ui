@@ -100,6 +100,59 @@ describe("Tooltip", () => {
     expect(chip).toHaveAttribute("data-testid", "chip");
   });
 
+  it("wraps a disabled control in a focusable host that opens the tooltip", async () => {
+    render(
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <button type="button" disabled>
+            Опубликовать
+          </button>
+        </Tooltip.Trigger>
+        <Tooltip.Content>Заполните обязательные поля</Tooltip.Content>
+      </Tooltip.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Опубликовать" });
+    const host = button.parentElement as HTMLElement;
+    expect(host.tagName).toBe("SPAN");
+    expect(host).toHaveAttribute("tabindex", "0");
+    act(() => host.focus());
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Заполните обязательные поля");
+    expect(host).toHaveAttribute("aria-describedby", screen.getByRole("tooltip").id);
+  });
+
+  it("makes a non-focusable trigger a tab stop; a focusable one stays as is", () => {
+    render(
+      <>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <span data-testid="badge">Просрочен</span>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Не оплачен 12 дней</Tooltip.Content>
+        </Tooltip.Root>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <button type="button">Копировать</button>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Копировать ссылку</Tooltip.Content>
+        </Tooltip.Root>
+        <Tooltip.Root>
+          <Tooltip.Trigger>
+            <span data-testid="holder">
+              <button type="button">Внутри</button>
+            </span>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Кнопка внутри</Tooltip.Content>
+        </Tooltip.Root>
+      </>,
+    );
+    expect(screen.getByTestId("badge")).toHaveAttribute("tabindex", "0");
+    expect(screen.getByRole("button", { name: "Копировать" })).not.toHaveAttribute("tabindex");
+    expect(screen.getByTestId("holder")).not.toHaveAttribute("tabindex");
+  });
+
   it("is hidden by default", () => {
     render(<BasicTooltip />);
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();

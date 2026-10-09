@@ -14,10 +14,13 @@ import {
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { useFieldFrame } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Checkbox.module.css";
+
+export type CheckboxShape = "square" | "circle";
 
 export type CheckboxRootProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -36,6 +39,8 @@ export type CheckboxRootProps = Omit<
   error?: React.ReactNode;
   /** Tier. Default: the tier of the surrounding control (a form, a panel, a table), else `m`. */
   size?: ControlSize;
+  /** Outline of the box: rounded square or full circle (a selection mark, like in messengers). */
+  shape?: CheckboxShape;
   /** `Checkbox.Label`; without it the bare box renders (give it an `aria-label`). */
   children?: React.ReactNode;
   /** The native checkbox input. */
@@ -52,7 +57,8 @@ function CheckboxRoot({
   hint,
   error,
   size: sizeProp,
-  disabled = false,
+  shape = "square",
+  disabled: disabledProp = false,
   readOnly = false,
   className,
   "aria-describedby": ariaDescribedBy,
@@ -61,6 +67,7 @@ function CheckboxRoot({
   ...inputRest
 }: CheckboxRootProps) {
   const size = useControlSize(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
   const [checked, setChecked] = useControllableState<boolean>({
     value: checkedProp,
@@ -103,7 +110,11 @@ function CheckboxRoot({
             aria-readonly={readOnly || undefined}
             aria-describedby={ids.describedBy}
           />
-          <span className={cx(choiceVisualClass, styles.control)} aria-hidden="true">
+          <span
+            className={cx(choiceVisualClass, styles.control)}
+            data-shape={shape}
+            aria-hidden="true"
+          >
             <CheckMark
               state={indeterminate ? "indeterminate" : checked ? "checked" : "unchecked"}
             />
@@ -129,6 +140,8 @@ export type CheckboxIndicatorProps = Omit<React.HTMLAttributes<HTMLSpanElement>,
   /** Mixed state; wins over `checked` visually. */
   indeterminate?: boolean;
   disabled?: boolean;
+  /** Outline of the box: rounded square or full circle. */
+  shape?: CheckboxShape;
   /** Box tier; without it the nearest control size (e.g. the Select or menu it sits in), else `m`. */
   size?: ControlSize;
   ref?: React.Ref<HTMLSpanElement>;
@@ -144,6 +157,7 @@ function CheckboxIndicator({
   indeterminate = false,
   disabled = false,
   size: sizeProp,
+  shape = "square",
   className,
   ...rest
 }: CheckboxIndicatorProps) {
@@ -160,6 +174,7 @@ function CheckboxIndicator({
       )}
       {...toDataAttributes({
         size,
+        shape,
         state: indeterminate ? "indeterminate" : checked ? "checked" : "unchecked",
         disabled: disabled || undefined,
       })}

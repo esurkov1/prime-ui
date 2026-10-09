@@ -4,7 +4,7 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 
 ## Composition
 - [ ] The screen starts from the closest pattern in [composition.md](composition.md) (list, detail,
-      settings, form in a Drawer, dashboard, states) and keeps its skeleton.
+      settings, form in a Drawer, dashboard, states, messenger) and keeps its skeleton.
 - [ ] One `PageContent.Header` with title, one-line description and actions; blocks in `PageContent.Body`.
 - [ ] Cards only for standalone blocks; no card around a table, a single field or the whole page.
 
@@ -41,7 +41,9 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 ## Reuse
 - [ ] Every repeated-looking element is one component (kit or `shared/ui`), not copies.
 - [ ] No `div` where a kit component exists (Divider, Kbd, Badge, Card, LinkButton, Typography).
-- [ ] Every overlay (Modal, Drawer, Popover, Dropdown, Tooltip, Select) is a kit component.
+- [ ] Every overlay (Modal, ConfirmDialog, Drawer, Popover, Dropdown, Tooltip, Select) is a kit component.
+- [ ] Properties of one record are a `DescriptionList`, uploads go through `useUploadQueue`, a chat is
+      `Message` + `Composer`, a schedule is `Gantt` — no hand-made copies of them.
 
 ## Hierarchy
 - [ ] One primary action per area (an empty state's action replaces the header's, not duplicates it);
@@ -56,8 +58,14 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] Data blocks have loading, empty and error states (DataTable `loading` / `empty` / `error`, EmptyPage).
 - [ ] Every region swaps its states through `Crossfade` (nothing flips, the page below does not jump);
       loading is a `Skeleton` in the data's geometry, a `Spinner` only where there is no shape to hold.
-- [ ] Destructive irreversible actions confirm in a Modal; results of submitted actions show a Notification
-      (instant toggles show one only on failure).
+- [ ] While a form saves, its submit button is `loading` and its fields are disabled by `Fieldset
+      disabled` (the submit button outside the Fieldset).
+- [ ] Destructive irreversible actions confirm in a `ConfirmDialog` (async `onConfirm`), reversible ones
+      offer «Отменить» instead; a form that stays on screen after saving says
+      «Сохранено» on its button, a form that goes away (closes, navigates) shows a Notification; failures
+      always show a Notification or a field `error` (instant toggles show one only on failure).
+- [ ] Overlays are always mounted and driven by `open` only (no `{open && …}`, no changing `key`), so they
+      close smoothly.
 - [ ] No hand-written animation on kit parts; custom motion uses motion tokens, `transform`/`opacity` only.
 - [ ] Every glyph comes from the kit — `<Icon name>`, else `prime-ui-kit/icons`, `createIcon` only for one
       neither has; no raw `lucide-react` in JSX, no other icon library, no inline `<svg>`, no icon

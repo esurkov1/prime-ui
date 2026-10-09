@@ -1,4 +1,4 @@
-/** A ticket board: columns share one kind, so a ticket lands in another column at an exact position, and a full column refuses it before the release — `kind`, `canDrop`, `onReorder`. */
+/** A ticket board: columns share one kind, so a ticket lands in another column at an exact position or moves there with Alt + ← / →, an empty column says so, and a full column refuses it before the release with the reason under the ticket — `kind`, `canDrop`, `empty`, `onReorder`. */
 import { Badge, Dnd, moveBefore, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -19,7 +19,6 @@ const TICKETS: Ticket[] = [
   { id: "t1", title: "Починить загрузку аватара", status: "todo" },
   { id: "t2", title: "Тёмная тема для таблиц", status: "todo" },
   { id: "t3", title: "Экспорт отчёта в CSV", status: "doing" },
-  { id: "t4", title: "Обновить онбординг", status: "done" },
   { id: "t5", title: "Фильтры в списке заказов", status: "doing" },
 ];
 
@@ -42,25 +41,34 @@ export default function DndBoardExample() {
       <div className={styles.board}>
         {COLUMNS.map((column) => {
           const inColumn = tickets.filter((ticket) => ticket.status === column.status);
+          const headingId = `board-${column.status}`;
           return (
-            <section key={column.status} className={styles.column} aria-label={column.title}>
+            <section key={column.status} className={styles.column}>
               <div className={styles.columnHeader}>
-                <Typography as="h4" variant="title-s">
+                <Typography as="h4" variant="title-s" id={headingId}>
                   {column.title}
                 </Typography>
                 <Badge.Root>{inColumn.length}</Badge.Root>
               </div>
               <Dnd.Sortable
                 kind="ticket"
-                aria-label={`Тикеты: ${column.title}`}
+                // Named by the visible heading: the live region says «В работе» on a move.
+                aria-labelledby={headingId}
                 className={styles.cards}
                 items={inColumn}
                 getId={(ticket) => ticket.id}
                 getLabel={(ticket) => ticket.title}
                 canDrop={(id) =>
-                  column.status !== "doing" ||
-                  inColumn.length < WIP_LIMIT ||
-                  inColumn.some((ticket) => ticket.id === id)
+                  column.status === "doing" &&
+                  inColumn.length >= WIP_LIMIT &&
+                  !inColumn.some((ticket) => ticket.id === id)
+                    ? `В работе уже ${WIP_LIMIT} тикета`
+                    : true
+                }
+                empty={
+                  <Typography as="p" variant="body-s" tone="muted" className={styles.empty}>
+                    Нет тикетов
+                  </Typography>
                 }
                 onReorder={(id, beforeId) => place(id, column.status, beforeId)}
                 renderItem={(ticket) => (

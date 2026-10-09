@@ -38,8 +38,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: 'host tier, else "m"',
-          en: "Tier: swatch = control height − 8 (20 · 24 · 28 · 32 · 40), gap = the tier gap; label and hint follow it. Without it the tier of its host, else `m`.",
-          ru: "Ярус: образец = высота контрола − 8 (20 · 24 · 28 · 32 · 40), зазор яруса.",
+          en: "Tier of the swatches: height = control height − 8 (20 · 24 · 28 · 32 · 40), gap = the tier gap; the width follows the column. The label and hint keep the tier of the host (a form, a panel), else `m`. Without it the swatches take the host tier too.",
+          ru: "Ярус образцов: высота = высота контрола − 8 (20 · 24 · 28 · 32 · 40), зазор яруса; ширина — по колонке. Подпись и подсказка остаются в ярусе окружения, иначе `m`.",
         },
         {
           name: "label",

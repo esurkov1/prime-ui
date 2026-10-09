@@ -3,12 +3,15 @@
 **Category:** data-display
 **Kind:** primitive
 
-> A preview of an object — product, vehicle, file, cover — at a fixed aspect ratio, with a colored icon fallback.
+> A preview of an object — product, vehicle, file, cover, video — at a fixed aspect ratio, with a colored icon fallback; it can open the object or be selected.
 
 ## When to use
 - An object next to its name in a table cell or list row (vehicle, product, document).
 - Covers in a card grid or gallery (`fullWidth`).
 - Any picture of a thing, with a fallback while it loads or when there is none.
+- A video, a GIF-like clip or a video message in the same frame (`Thumbnail.Video`).
+- A preview that opens a viewer or the object (`asChild` on a `<button>` / `<a>`).
+- A tile of a media library that is picked (`checked` / `onCheckedChange`).
 
 ## When not to use
 - A person or an organization's account → use [Avatar](../avatar/COMPONENT.md).
@@ -22,9 +25,11 @@ import { Thumbnail } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Thumbnail.Root          frame: tier height, width from ratio, radius, palette fill; image load state
+Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="checkbox"> when selectable)
 ├─ Thumbnail.Image      <img>, covers the frame; fades in when loaded, hidden on error
-└─ Thumbnail.Fallback   icon or short label on the fill, under the image
+│  or Thumbnail.Video   <video>, first frame or poster; play mark and duration on the media shade
+├─ Thumbnail.Fallback   icon or short label on the fill, under the image
+└─ check                Checkbox.Indicator in the start corner (selectable only)
 ```
 
 ## API
@@ -42,10 +47,14 @@ Thumbnail.Root          frame: tier height, width from ratio, radius, palette fi
 | `variant` | `"soft" \| "solid"` | `"soft"` | Fallback fill: a soft tint with a hue icon, or a solid hue with a contrasting icon. |
 | `fullWidth` | `boolean` | `false` | Fills the container width (cards, galleries); the height follows `ratio`. |
 | `ring` | `boolean` | `false` | A faint inner ring, for photos with a white background on a light surface. |
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `aria-label` + `role` for a fallback-only thumbnail, and the other div attributes. |
+| `asChild` | `boolean` | `false` | Puts the frame on its one child — a `<button>` that opens a viewer, an `<a>` to the object — which holds the parts: the frame's look plus a hover lift (`--prime-shadow-overlay`), a press (scale 0.98) and the focus ring; `data-interactive`. Name the child (`aria-label`) when the picture is all it shows. |
+| `checked` | `boolean` | — | Selected (controlled). Any of the checked triad makes a selectable tile: a `<button role="checkbox">` with `aria-checked`, a `Checkbox.Indicator` in the start corner (always shown) and an accent ring when selected (`data-checked`). Name it with `aria-label` or the image `alt`. |
+| `defaultChecked` | `boolean` | — | Initially selected (uncontrolled); makes the tile selectable. |
+| `onCheckedChange` | `(checked: boolean) => void` | — | Selection changed by click, Space or Enter; makes the tile selectable. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "color" \| "defaultChecked" \| "onChange">` | — | `className`, `aria-label` + `role` for a fallback-only thumbnail, and the other attributes of the frame. |
 
 ### Thumbnail.Image
-`ref` → `HTMLImageElement`. The picture; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again.
+`ref` → `HTMLImageElement`. The picture; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -53,6 +62,19 @@ Thumbnail.Root          frame: tier height, width from ratio, radius, palette fi
 | `alt` | `string` | `""` | Empty when the text next to the thumbnail names the object, otherwise a description. |
 | `fit` | `"cover" \| "contain"` | `"cover"` | `cover` crops to fill; `contain` shows the whole image on the fallback fill (logos). |
 | `…rest` | `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" \| "alt">` | — | `className`, `onLoad`, `onError` and the other img attributes. |
+
+### Thumbnail.Video
+`ref` → `HTMLVideoElement`. A video in the frame, `preload="metadata"`, `playsInline`; reports its first frame like an image, so the Fallback shows until then (`data-status`). Without `controls` and autoplay it shows a play mark (from `m`) and the duration (from `l` and `fullWidth`) on the `media` shade.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `src` | `string` | — (required) | Video URL. Without a `poster` the first frame is asked for (`#t=0.001` is added when the URL has no fragment). |
+| `poster` | `string` | — | A still shown before playing. |
+| `controls` | `boolean` | `false` | Native controls: a video message or a clip to watch in place; no play mark or duration of the kit. |
+| `autoPlay` | `boolean` | `false` | A GIF-like clip: plays muted, in a loop, inline. Off under `prefers-reduced-motion` (read once): the first frame stands still with the play mark. |
+| `fit` | `"cover" \| "contain"` | `"cover"` | `cover` crops to fill; `contain` letterboxes on the fallback fill. |
+| `formatDuration` | `(seconds: number) => string` | `m:ss (h:mm:ss from an hour)` | Display of the duration badge. |
+| `…rest` | `Omit<VideoHTMLAttributes<HTMLVideoElement>, "src" \| "poster" \| "controls" \| "autoPlay" \| "muted" \| "loop" \| "children">` | — | `className`, `aria-label`, `onLoadedData`, `onError` and the other video attributes. |
 
 ### Thumbnail.Fallback
 `ref` → `HTMLSpanElement`. A `<span>` with an icon (sized to the tier) or a short label on the fill; `aria-hidden` once the image has loaded.
@@ -97,6 +119,10 @@ Thumbnail.Root          frame: tier height, width from ratio, radius, palette fi
 |---|---|---|---|
 | `fullWidth` | takes the container width, height from `ratio` | card covers, galleries | `false` |
 | `ring` | faint inner ring | white-background photos on a light surface | `false` |
+| `asChild` | the frame on a button or link: hover lift, press, focus ring | the preview opens a viewer or the object | `false` |
+| `checked` triad | a checkbox tile: the check in the corner, an accent ring when selected | picking media in a library | — |
+| `controls` (Video) | native video controls, no kit marks | a video message, a clip to watch in place | `false` |
+| `autoPlay` (Video) | muted looping clip; still under reduced motion | GIF-like previews | `false` |
 
 ## States
 | State | Driven by | DOM |
@@ -106,6 +132,10 @@ Thumbnail.Root          frame: tier height, width from ratio, radius, palette fi
 | loaded | image `load` | `data-status="loaded"`, the image fades in; Fallback `aria-hidden` |
 | error | image `error` | `data-status="error"`, image hidden, Fallback visible |
 | frame | props | `data-size`, `data-ratio`, `data-color`, `data-variant`, `data-full-width`, `data-ring` |
+| video loading | `Thumbnail.Video` mounted | `data-status="loading"` until the first frame (`loadeddata`), then `loaded`; `error` falls back like an image |
+| video still | no `controls`, not playing | a play mark in the centre (from `m`), the duration at the end corner (from `l` and `fullWidth`), both on `--prime-color-media-shade` |
+| hover / press / focus | `asChild` or selectable | `data-interactive`: lift on `--prime-shadow-overlay` (`@media (hover: hover)`), scale 0.98 while pressed (`fast`), focus ring |
+| selected | `checked` | `aria-checked="true"`, `data-checked="true"`: an accent ring over the picture and a checked indicator; the indicator is always shown, never hover-only |
 
 ## Layout & spacing
 - Thumbnail + text in a row: flex, `align-items: center`, gap `--prime-space-3`; the text column `min-width: 0` with `truncate`.
@@ -116,12 +146,17 @@ Thumbnail.Root          frame: tier height, width from ratio, radius, palette fi
 ## Accessibility
 
 ### Keyboard
-No keyboard interaction.
+| Key | Action |
+|---|---|
+| `Tab` | Focuses a pressable (`asChild`) or selectable tile; a plain thumbnail takes no focus. |
+| `Enter` · `Space` | Opens the object (`asChild`) or toggles a selectable tile. |
 
 ### ARIA
 - Next to a name the thumbnail is decorative: keep `alt=""` (default) and mark fallback icons `aria-hidden`.
 - Alone: give `Thumbnail.Image` a descriptive `alt`, or `role="img"` + `aria-label` on Root for a fallback-only thumbnail.
-- No behaviour of its own: wrap it in a link or button when it opens the object.
+- A preview that opens the object is `asChild` on a `<button>` or `<a>`; name it (`aria-label`) when the picture is all it shows.
+- A selectable tile is a `<button role="checkbox">` with `aria-checked`, named by `aria-label` or the image `alt`; its indicator is `aria-hidden`, and the state is not only color (the check).
+- Name a `Thumbnail.Video` with `aria-label`; the play mark is decorative, the duration is text. Under `prefers-reduced-motion` an `autoPlay` clip stands still.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -138,13 +173,19 @@ No `labels`.
 | [ratios.tsx](examples/ratios.tsx) | Every aspect ratio at the same height; keep one ratio per list — `ratio`. |
 | [ring.tsx](examples/ring.tsx) | A faint inner ring for a white-background photo on a light surface, where the edge would vanish — `ring`. |
 | [full-width.tsx](examples/full-width.tsx) | Covers in a card grid take the card width and keep 16:9, so every cover has one height — `fullWidth`. |
+| [video.tsx](examples/video.tsx) | Videos in the frame: a walkthrough without a poster shows its first frame, a play mark and the duration; a short clip loops muted like a GIF; a video message plays in place with its controls — `Thumbnail.Video`, `autoPlay`, `controls`. |
+| [pressable.tsx](examples/pressable.tsx) | Photos of a delivery that open a viewer: the frame is put on a button, so it lifts on hover, presses and takes the focus ring — `asChild`. |
+| [controlled.tsx](examples/controlled.tsx) | A media library picks photos for a listing: each tile is a checkbox with its check in the corner, the selection lives in the parent and a button clears it — `checked`, `onCheckedChange`. |
 
 ## Mistakes
 - `Avatar` for a product or vehicle → a circle crops the object; use `Thumbnail`.
 - A `div` with a background image and fixed sizes → use `Thumbnail.Root` with `ratio` and `size`.
 - Width or height in CSS → change `size`, `ratio` or `fullWidth`.
 - No `Thumbnail.Fallback` → a broken image leaves an empty box; always add an icon.
+- A `<button>` wrapped around a Thumbnail by hand → `asChild` on the root with the button as its child.
+- A `<label>` with a checkbox laid over a tile → the checked triad on the root.
+- A bare `<video>` sized in CSS next to thumbnails → `Thumbnail.Video` in the same frame.
 
 ## Related
-- **Built from:** —
-- **See also:** [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Select](../select/COMPONENT.md)
+- **Built from:** [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` of a selectable tile), `Icon` (play mark)
+- **See also:** [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Select](../select/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (`FileUpload.ItemPreview` is a Thumbnail; its tiles draw videos with `Thumbnail.Video`)

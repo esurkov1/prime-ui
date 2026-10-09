@@ -36,6 +36,38 @@
   box-shadow: var(--prime-layer-shadow);
 }
 
+/*
+ * A pressable card (`asChild` with a link or a button). A whole surface does not change its fill on
+ * hover (foundation §8): it lifts — raised whisper → overlay shadow — and presses like a control.
+ */
+.root[data-interactive] {
+  display: block;
+  margin: 0;
+  border: 0;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .root[data-interactive]:hover {
+    box-shadow: var(--prime-shadow-overlay);
+  }
+}
+
+.root[data-interactive]:active {
+  transform: scale(var(--prime-motion-press-scale));
+}
+
+.root[data-interactive]:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
 /* ---------- Variants ---------- */
 
 .root[data-variant="stat-trend"],
@@ -221,6 +253,49 @@
 
 .delta[data-tone="danger"] {
   color: var(--prime-color-danger-text);
+}
+
+/* The reference line of a KPI: quiet caption at the bottom of the tile. */
+.meta {
+  min-width: 0;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* In a column template the meta drops to the bottom, so a row of tiles lines its meta up. */
+.root[data-variant="stat-trend"] > .meta {
+  margin-top: auto;
+  padding-top: var(--prime-space-1);
+}
+
+/* In a KPI cluster (`mini`, a `split` cell) it sits in the text column under the value. */
+.root[data-variant="mini"] > .meta,
+.root[data-variant="split"] > .body > * > .meta {
+  grid-column: -2 / -1;
+}
+
+/*
+ * A description in the header (`panel`, `list`): the title and the description stack in the first
+ * column, anything else (a switch, a caption) stays at the end, centred on both lines.
+ */
+.header:has(> .description) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--prime-space-1) var(--prime-space-3);
+}
+
+/* Grid placement applies only once the header is a grid, so the parts need no `:has()` of their
+   own (a class-less target after `:has()` makes its invalidation whole-subtree page-wide). */
+.header > .title,
+.header > .description {
+  grid-column: 1;
+}
+
+.header > :not(.title, .description) {
+  grid-column: 2;
+  grid-row: 1 / span 2;
 }
 
 .body {
@@ -436,5 +511,12 @@
 
   .header {
     flex-wrap: wrap;
+  }
+
+  /* A header with a description: its control drops under the text. */
+  .header > :not(.title, .description) {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
   }
 }

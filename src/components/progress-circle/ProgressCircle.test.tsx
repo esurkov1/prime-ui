@@ -111,6 +111,43 @@ describe("ProgressCircle", () => {
       expect(container.querySelectorAll("circle[data-tone]")).toHaveLength(2);
     });
 
+    it("paints arcs and caps by a palette color", () => {
+      const { container } = render(
+        <ProgressCircle
+          segments={[
+            { value: 30, label: "Сайт", color: "purple" },
+            { value: 20, label: "Звонки", tone: "warning" },
+          ]}
+          max={100}
+        />,
+      );
+      expect(container.querySelectorAll("circle[data-color='purple']")).toHaveLength(2);
+      expect(container.querySelectorAll("circle[data-tone='warning']")).toHaveLength(2);
+    });
+
+    it("puts a legend beside the ring and describes the group with it", () => {
+      const { container } = render(
+        <ProgressCircle segments={tasks} legend aria-label="Проверки" size="xl" />,
+      );
+      const root = container.firstChild as HTMLElement;
+      expect(root).toHaveAttribute("data-legend", "true");
+      expect(screen.getAllByRole("listitem")[1]).toHaveTextContent("OK7070%");
+      expect(screen.getByRole("group", { name: "Проверки" })).toHaveAccessibleDescription(
+        /Errors.*30%.*OK.*70%/,
+      );
+    });
+
+    it("shows a skeleton ring while loading and hides the inner text", () => {
+      const { container } = render(
+        <ProgressCircle segments={[]} legend loading aria-label="Проверки" size="xl">
+          100
+        </ProgressCircle>,
+      );
+      expect(container.firstChild).toHaveAttribute("aria-busy", "true");
+      expect(screen.queryByRole("group")).not.toBeInTheDocument();
+      expect(screen.queryByText("100")).not.toBeInTheDocument();
+    });
+
     it("sets the gap mode and describes empty lists with labels", () => {
       render(<ProgressCircle segments={[]} segmentGap="hairline" labels={{ empty: "Пусто" }} />);
       const group = screen.getByRole("group", { name: "Пусто" });

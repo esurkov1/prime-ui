@@ -1,4 +1,4 @@
-/** In a narrow column the swatches wrap by themselves and the arrows move by the visual rows. */
+/** In a narrow column the swatches wrap by themselves into even rows and the arrows move by the visual rows. */
 import { ColorSwatches } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

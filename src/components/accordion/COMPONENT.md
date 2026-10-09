@@ -171,5 +171,5 @@ No `labels`.
 - Accordion used for tab-like switching → use Tabs.
 
 ## Related
-- **Built from:** Icon (`nav.chevronDown`)
+- **Built from:** `Icon` (`nav.chevronDown`)
 - **See also:** [Tabs](../tabs/COMPONENT.md), [Card](../card/COMPONENT.md), [Stepper](../stepper/COMPONENT.md), [Divider](../divider/COMPONENT.md)

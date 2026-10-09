@@ -1,0 +1,41 @@
+/* Layout of the DescriptionList scenarios: semantic tokens only. */
+
+/* overview.tsx: a record card as wide as a dialog of size m. */
+.card {
+  width: min(100%, var(--prime-modal-width-m));
+}
+
+/* structure.tsx: a column as wide as a short form. */
+.column {
+  width: min(100%, var(--prime-modal-width-s));
+}
+
+/* sizes.tsx: one tier per block, its caption right under it, blocks apart. */
+.sizes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-8);
+  width: min(100%, var(--prime-modal-width-s));
+}
+
+.size {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.size > :first-child {
+  align-self: stretch;
+}
+
+/* vertical.tsx: a record side panel. */
+.side {
+  width: min(100%, var(--prime-drawer-width-s));
+}
+
+/* narrow.tsx: 320 px, the smallest supported viewport. */
+.narrow {
+  width: min(100%, calc(var(--prime-space-20) * 4));
+}

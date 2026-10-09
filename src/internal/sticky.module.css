@@ -1,0 +1,19 @@
+/*
+ * A sticky surface that sticks to the start edge of its scroller (`top: 0`).
+ *
+ * WebKit snaps a sticky layer and the scrolled content to device pixels on their own: with a
+ * fractional scroller offset (a toolbar line height, zoom, a 1.5x or 3x display) the two round
+ * differently and one sub-pixel row stays between the scroller's edge and the sticky box, where the
+ * rows scrolling underneath show through. The surface therefore paints its own fill one border
+ * width further toward the edge it sticks to. Inside the scroller's clip that strip covers the seam;
+ * when the box sits exactly on the edge the scroller clips it and nothing changes.
+ *
+ * The host names the fill in `--sticky-bg` (default: the surface it stands on). A host that already
+ * draws its own `box-shadow` adds `var(--sticky-bleed)` to its list.
+ */
+.surface {
+  --sticky-bleed: 0 calc(-1 * var(--prime-border-width)) 0 0
+    var(--sticky-bg, var(--prime-color-layer-current));
+
+  box-shadow: var(--sticky-bleed);
+}

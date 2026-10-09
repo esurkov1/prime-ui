@@ -46,9 +46,21 @@ export const page: ComponentPageConfig = {
     },
     {
       scenario: "password-strength",
-      title: "Надёжность пароля",
+      title: "Пароль",
       description:
-        "Новый пароль со шкалой, которая заполняется по шагам и называет уровень рядом с подсказкой — `strength`.",
+        "Новый пароль с кнопкой показа и шкалой, которая заполняется по шагам и называет уровень рядом с подсказкой — `Input.RevealButton`, `strength`.",
+    },
+    {
+      scenario: "edge-actions",
+      title: "Действия в поле",
+      description:
+        "Действия у конца поля: ссылка на письмо с подсказкой рядом с копированием значения и ссылка на профиль у поля только для чтения — `Input.Action`, `Input.CopyButton`.",
+    },
+    {
+      scenario: "inline-edit",
+      title: "Правка на месте",
+      description:
+        "Поля карточки записи сохраняются при выходе из поля и по Enter, Escape отменяет правку, отказ сервера показан ошибкой — `onCommit`, `error`.",
     },
     {
       slot: "controlled",
@@ -64,17 +76,30 @@ export const page: ComponentPageConfig = {
   api,
   accessibility: {
     keyboard: [
-      { keys: "Tab", action: "Фокус в поле, затем на кнопку очистки, если она показана." },
+      {
+        keys: "Tab",
+        action:
+          "Фокус в поле, затем на кнопки у его конца (очистка, копирование, показ пароля, действия).",
+      },
       {
         keys: "Enter · Space",
-        action: "На кнопке очистки: очищает значение и возвращает фокус в поле.",
+        action:
+          "На кнопке у конца поля: выполняет её действие (кнопка очистки возвращает фокус в поле).",
       },
+      {
+        keys: "Enter",
+        action: "С `onCommit`: сохраняет изменённое значение, фокус остаётся в поле.",
+      },
+      { keys: "Escape", action: "С `onCommit`: возвращает сохранённое значение." },
     ],
     aria: [
       "`label` — настоящий `<label htmlFor>`; без него задайте `aria-label` на `Input.Field`. Плейсхолдер не заменяет подпись.",
       'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`.',
       "`Input.Icon`, `Input.Affix`, `Input.InlineAffix` скрыты (`aria-hidden`): смысл единицы или префикса дублируйте в подписи.",
       "`Input.ClearButton` — кнопка с именем `labels.clear` и `aria-controls` на поле.",
+      "`Input.Action` и `Input.CopyButton` — кнопки с именем и подсказкой; копирование объявляет `labels.copied` через живой регион.",
+      "`Input.RevealButton` — переключатель с `aria-pressed` и постоянным именем `labels.reveal`.",
+      "С `onCommit` поле ставит `aria-busy`, пока идёт сохранение, а живой регион говорит `labels.saving` и `labels.saved`.",
       '`Input.Counter` показывает «14/40», а скринридер читает `labels.counter` через `aria-live="polite"`.',
     ],
   },

@@ -92,9 +92,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onComplete",
-          type: "(value: string) => void",
-          en: "Called once when the last empty cell is filled (typing, paste or autofill).",
-          ru: "Один раз, когда заполнена последняя пустая ячейка (ввод, вставка, автозаполнение).",
+          type: "(value: string) => void | Promise<void>",
+          en: "Called once when the last empty cell is filled (typing, paste or autofill). Return the check's promise: the cells wait read-only and quiet (`aria-busy` on the group); resolve — the `success` look (say it in words in `hint`); reject — the code clears, focus goes to the first cell, the reason (the rejection's message, else `labels.failed`) shakes in as the error and is announced; typing again takes it away. `error` and `success` you pass win over the check.",
+          ru: "Один раз, когда заполнена последняя пустая ячейка (ввод, вставка, автозаполнение). Верните промис проверки: ячейки ждут только для чтения и приглушённые (`aria-busy` у группы); resolve — вид `success` (скажите это словами в `hint`); reject — код стирается, фокус в первой ячейке, причина (сообщение отказа, иначе `labels.failed`) встаёт ошибкой с покачиванием и объявляется; новый ввод её убирает. Переданные `error` и `success` важнее проверки.",
         },
         {
           name: "fullWidth",
@@ -176,6 +176,12 @@ export const api: ComponentApi = {
       default: "необязательно",
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
+    },
+    {
+      key: "failed",
+      default: "Неверный код",
+      en: "The error of a code whose `onComplete` promise rejected without a reason.",
+      ru: "Ошибка кода, чей промис `onComplete` отклонён без причины.",
     },
   ],
 };

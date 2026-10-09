@@ -1,0 +1,47 @@
+/*
+ * ColorField — the shared field trigger (`fieldTriggerClass` in TSX: field tier, surface, press,
+ * open fill) with the current color as a chip at the tier icon size, its hex and a chevron. The
+ * panel is the ColorPicker in a Popover of the same tier.
+ */
+
+/* With the shared field trigger, as wide as the field column. */
+.trigger {
+  width: 100%;
+}
+
+.swatch {
+  flex-shrink: 0;
+}
+
+.value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--prime-color-text-muted);
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.trigger[data-state="open"] .chevron {
+  transform: rotate(180deg);
+}
+
+.trigger:disabled .chevron {
+  color: var(--prime-color-text-disabled);
+}
+
+.trigger:disabled .swatch {
+  opacity: 0.5;
+}
+
+/* The area and four channel fields fit; never wider than the viewport allows the popover. */
+.panel {
+  width: calc(var(--prime-panel-min-width) * 1.5);
+  max-width: 100%;
+}

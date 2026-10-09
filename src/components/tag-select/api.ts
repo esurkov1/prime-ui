@@ -62,9 +62,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onCreate",
-          type: "(value: string) => void",
-          en: "A new value was created, not picked from `options`.",
-          ru: "Создано новое значение, а не выбрано из `options`.",
+          type: "(value: string) => void | Promise<void>",
+          en: "A new value was created, not picked from `options`; it joins the selection at once. Return the save's promise: the new chip waits busy (dimmed, a spinner in its remove segment, `aria-busy`, it cannot be removed meanwhile); resolve — it stays; reject — it leaves the selection and the list again and `labels.createFailed` is announced (say why with `error`).",
+          ru: "Создано новое значение, а не выбрано из `options`; оно сразу входит в выбор. Верните промис сохранения: новый чип ждёт занятым (приглушён, спиннер в сегменте удаления, `aria-busy`, снять его нельзя); resolve — остаётся; reject — уходит из выбора и списка, объявляется `labels.createFailed` (причину покажите через `error`).",
         },
         {
           name: "defaultColor",
@@ -75,15 +75,15 @@ export const api: ComponentApi = {
         },
         {
           name: "onOptionUpdate",
-          type: "(value: string, updates: { label?: string; color?: PaletteColor }) => void",
-          en: "Enables the row «⋯» menu with the tag name and color; `value` never changes.",
-          ru: "Включает меню «⋯» у строки: имя и цвет тега; `value` не меняется.",
+          type: "(value: string, updates: { label?: string; color?: PaletteColor }) => void | Promise<void>",
+          en: "Enables the row «⋯» menu with the tag name and color; `value` never changes. Return the save's promise: the new name or color shows at once and «⋯» spins (`aria-busy`) while the menu stays open; resolve — apply it to `options` before resolving; reject — the option goes back and `labels.updateFailed` is announced.",
+          ru: "Включает меню «⋯» у строки: имя и цвет тега; `value` не меняется. Верните промис сохранения: новое имя или цвет видны сразу, «⋯» крутится (`aria-busy`), меню остаётся открытым; resolve — примените изменение к `options` до resolve; reject — опция возвращается, объявляется `labels.updateFailed`.",
         },
         {
           name: "onOptionDelete",
-          type: "(value: string) => void",
-          en: "Enables «Удалить» in the row menu; the value also leaves the selection.",
-          ru: "Включает «Удалить» в меню строки; значение уходит и из выбранных.",
+          type: "(value: string) => void | Promise<void>",
+          en: "Enables «Удалить» in the row menu; the value also leaves the selection. A returned Promise keeps everything as is while pending (the row is busy, a spinner replaces «⋯»): resolve applies the deletion, reject keeps the option and the selection — e.g. ask for confirmation first.",
+          ru: "Включает «Удалить» в меню строки; значение уходит и из выбранных. Если вернуть Promise, пока он ждёт, ничего не меняется (строка занята, вместо «⋯» спиннер): resolve применяет удаление, reject оставляет опцию и выбор — например, чтобы сначала спросить подтверждение.",
         },
         {
           name: "label",
@@ -129,6 +129,12 @@ export const api: ComponentApi = {
           default: "false",
           en: "Disabled field and chips; the list never opens.",
           ru: "Неактивное поле и чипы; список не открывается.",
+        },
+        {
+          name: "name",
+          type: "string",
+          en: "Form field name: one hidden input per selected value (read with `formData.getAll(name)`).",
+          ru: "Имя поля формы: по скрытому input на каждое выбранное значение (`formData.getAll(name)`).",
         },
         {
           name: "placeholder",
@@ -203,6 +209,18 @@ export const api: ComponentApi = {
       default: "Удалено: {label}",
       en: "Screen-reader announcement after a tag is removed.",
       ru: "Объявление для скринридера после удаления тега.",
+    },
+    {
+      key: "createFailed",
+      default: "Не удалось создать тег «{label}»",
+      en: "Screen-reader announcement when the `onCreate` promise rejects and the new tag leaves.",
+      ru: "Объявление для скринридера, когда промис `onCreate` отклонён и новый тег ушёл.",
+    },
+    {
+      key: "updateFailed",
+      default: "Не удалось изменить тег «{label}»",
+      en: "Screen-reader announcement when the `onOptionUpdate` promise rejects and the option goes back.",
+      ru: "Объявление для скринридера, когда промис `onOptionUpdate` отклонён и опция вернулась.",
     },
     {
       key: "edit",

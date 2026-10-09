@@ -39,7 +39,13 @@
   --prime-label-line-height: var(--prime-control-xl-label-line-height);
 }
 
+/*
+ * Disabled dims every part. The parts read `--label-dimmed` (inherited from the root), so a host
+ * that dims the label (FieldFrame over a disabled native control) sets one property on the label
+ * instead of reaching into its parts with a descendant selector.
+ */
 .root[data-disabled="true"] {
+  --label-dimmed: var(--prime-color-text-disabled);
   color: var(--prime-color-text-disabled);
 }
 
@@ -47,20 +53,16 @@
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  color: var(--prime-color-text-muted);
+  color: var(--label-dimmed, var(--prime-color-text-muted));
 }
 
 .asterisk {
-  color: var(--prime-color-danger-text);
+  color: var(--label-dimmed, var(--prime-color-danger-text));
   font-weight: var(--prime-font-weight-medium);
 }
 
 .description,
 .optional {
   font-weight: var(--prime-font-weight-regular);
-  color: var(--prime-color-text-muted);
-}
-
-.root[data-disabled="true"] :is(.asterisk, .description, .optional, .icon) {
-  color: var(--prime-color-text-disabled);
+  color: var(--label-dimmed, var(--prime-color-text-muted));
 }

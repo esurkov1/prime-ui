@@ -23,9 +23,9 @@ export default function LoginFormRegisterExample() {
           <LoginForm.Actions>
             <Button.Root variant="outline" tone="neutral" fullWidth>
               <Button.Icon>
-                <Icon name="action.send" />
+                <Icon name="object.key" />
               </Button.Icon>
-              Продолжить через Telegram
+              Войти через SSO компании
             </Button.Root>
           </LoginForm.Actions>
           <Divider>или</Divider>
@@ -38,11 +38,6 @@ export default function LoginFormRegisterExample() {
             <Input.Root label="Email" required>
               <Input.Wrapper>
                 <Input.Field type="email" autoComplete="email" placeholder="name@company.ru" />
-              </Input.Wrapper>
-            </Input.Root>
-            <Input.Root label="Логин в Telegram" required>
-              <Input.Wrapper>
-                <Input.Field placeholder="@login" />
               </Input.Wrapper>
             </Input.Root>
             <Input.Root label="Пароль" required hint="Минимум 8 символов" strength>

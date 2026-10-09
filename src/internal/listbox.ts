@@ -126,3 +126,59 @@ export function useTypeahead() {
 
   return { find, isTyping };
 }
+
+// ─── Load more at the end ────────────────────────────────────────────────────
+
+/** The sentinel reports a little before it scrolls into view, so the next batch is ready. */
+const LOAD_MORE_ROOT_MARGIN = "0px 0px 48px 0px";
+
+export type LoadMoreOptions = {
+  /** More can be requested now: `hasMore`, a handler, nothing loading, no load error. */
+  enabled: boolean;
+  onLoadMore: (() => void | Promise<void>) | undefined;
+  /** The list's own scroller: the observer root. */
+  scrollRef: React.RefObject<HTMLElement | null>;
+  /** Changes when the list changes (a batch arrived): re-arms the request. */
+  rearm: unknown;
+};
+
+/**
+ * Load more at the end of a list (Select, CommandMenu): a sentinel after the last option asks once
+ * per round when it scrolls into the list's own scroller; `request` asks the same way from the
+ * keyboard (the highlight reached the last option). Without `IntersectionObserver` (jsdom, old
+ * engines) only `request` asks.
+ */
+export function useLoadMore({ enabled, onLoadMore, scrollRef, rearm }: LoadMoreOptions) {
+  const sentinelRef = React.useRef<HTMLDivElement | null>(null);
+  const handlerRef = React.useRef(onLoadMore);
+  handlerRef.current = onLoadMore;
+  const askedRef = React.useRef(false);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new round starts on every change
+  React.useLayoutEffect(() => {
+    askedRef.current = false;
+  }, [enabled, rearm]);
+
+  const request = React.useCallback(() => {
+    if (!enabled || askedRef.current) return;
+    askedRef.current = true;
+    void handlerRef.current?.();
+  }, [enabled]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-observed per round — a sentinel still in view reports again
+  React.useEffect(() => {
+    const root = scrollRef.current;
+    const target = sentinelRef.current;
+    if (!enabled || !root || !target || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) request();
+      },
+      { root, rootMargin: LOAD_MORE_ROOT_MARGIN, threshold: 0 },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [enabled, rearm, request, scrollRef]);
+
+  return { sentinelRef, request };
+}

@@ -1,4 +1,4 @@
-/** Every size, swatch 20 to 40 px with the tier gap — `size`. */
+/** Every size: the swatch height 20 to 40 px with the tier gap, the label stays the form's — `size`. */
 import { COLOR_PRESETS, ColorSwatches } from "prime-ui-kit";
 
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;

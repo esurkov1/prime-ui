@@ -43,6 +43,8 @@ const GROUP_NOTES: Record<string, string> = {
   focus: "Одно кольцо фокуса для всех интерактивных элементов.",
   control: "Бегунок switch и slider.",
   tooltip: "Тултип.",
+  chart:
+    "Графики: 1–8 — категории по порядку (проверены в обеих темах), other — «Прочее», grid и axis — сетка и ось, scale — величина (ячейки тепловой карты), scaleFg — текст на шагах 4–5. Категории красят этими цветами, смысл — тонами.",
 };
 
 /** The ladder has its own blocks above; palette has its table. */
@@ -283,16 +285,27 @@ function PaletteTable() {
 
 type Ramp = { hue: string; steps: { step: string; hex: string }[] };
 
-const RAMPS: Ramp[] = Object.entries(
-  primitiveTokens.color as Record<string, string | Record<string, string>>,
-)
-  .flatMap(([hue, steps]) => (typeof steps === "object" ? [{ hue, steps }] : []))
-  .map(({ hue, steps }) => ({
-    hue,
-    steps: Object.entries(steps)
-      .map(([step, hex]) => ({ step, hex }))
-      .sort((a, b) => Number(a.step) - Number(b.step)),
-  }));
+type StepTree = string | { [step: string]: StepTree };
+
+/** Ramps of hex steps; a nested set (the chart hues, light and dark) becomes one ramp per branch. */
+const flattenRamps = (
+  prefix: string,
+  tree: StepTree,
+): { hue: string; steps: Record<string, string> }[] => {
+  if (typeof tree === "string") return [];
+  const entries = Object.entries(tree);
+  if (entries.every(([, v]) => typeof v === "string")) {
+    return [{ hue: prefix, steps: tree as Record<string, string> }];
+  }
+  return entries.flatMap(([key, value]) => flattenRamps(prefix ? `${prefix}-${key}` : key, value));
+};
+
+const RAMPS: Ramp[] = flattenRamps("", primitiveTokens.color as StepTree).map(({ hue, steps }) => ({
+  hue,
+  steps: Object.entries(steps)
+    .map(([step, hex]) => ({ step, hex }))
+    .sort((a, b) => Number(a.step) - Number(b.step)),
+}));
 
 const INK_LIGHT = parseColor(primitiveTokens.color.white);
 const INK_DARK = parseColor(primitiveTokens.color.gray[925]);

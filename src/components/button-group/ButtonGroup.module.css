@@ -4,6 +4,18 @@
  * only the outer corners are rounded, inner corners are square.
  * Geometry is Button's: the shared field tier (`internal/fieldTier`) on the root.
  */
+/*
+ * Field frame (label · segments · support row): hugs the group unless `fullWidth`. Zero
+ * specificity, so a consumer `className` that sizes the frame wins.
+ */
+:where(.field) {
+  width: fit-content;
+}
+
+:where(.field[data-full-width="true"]) {
+  width: 100%;
+}
+
 .root {
   --prime-icon-size: var(--field-icon);
   /* Optical compensation: the icon side gets padX − 4px, never closer than 8px (xs). */
@@ -106,6 +118,11 @@
   background: var(--prime-color-fill-muted);
   color: var(--prime-color-text-disabled);
   cursor: not-allowed;
+}
+
+/* Invalid (`invalid` / `error`): the inset danger ring of a field on every segment. */
+.root[data-invalid="true"] > .item {
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
 .root[data-full-width="true"]:not([data-orientation="vertical"]) > .item {

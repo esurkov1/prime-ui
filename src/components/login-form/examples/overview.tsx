@@ -18,9 +18,9 @@ export default function LoginFormOverviewExample() {
           <LoginForm.Actions>
             <Button.Root variant="outline" tone="neutral" fullWidth>
               <Button.Icon>
-                <Icon name="action.send" />
+                <Icon name="object.key" />
               </Button.Icon>
-              Продолжить через Telegram
+              Войти через SSO компании
             </Button.Root>
           </LoginForm.Actions>
           <Divider>или</Divider>

@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "CommandMenu.Root",
-      en: "`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; owns the query (cleared on close) and the active item (a new opening starts empty, focus in the search field).",
-      ru: "Палитра на основе Modal: панель сверху; хранит запрос (сбрасывается при закрытии) и активный пункт.",
+      en: "`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; owns the query (cleared on close), the active item (a new opening starts empty, focus in the search field) and the load state of server results.",
+      ru: "Палитра на основе Modal: панель сверху; хранит запрос (сбрасывается при закрытии), активный пункт и состояние загрузки результатов с сервера.",
       props: [
         {
           name: "open",
@@ -27,23 +27,69 @@ export const api: ComponentApi = {
           ru: "Вызывается при каждом открытии и закрытии: Escape, клик по подложке, код.",
         },
         {
-          name: "value",
+          name: "search",
           type: "string",
-          en: "Controlled query; the list filters by it. Together with `onValueChange`.",
-          ru: "Управляемый запрос; список фильтруется по нему. Вместе с `onValueChange`.",
+          en: "Controlled query; the list filters by it. Together with `onSearchChange`.",
+          ru: "Управляемый запрос; список фильтруется по нему. Вместе с `onSearchChange`.",
         },
         {
-          name: "defaultValue",
+          name: "defaultSearch",
           type: "string",
           default: '""',
           en: "Initial query, uncontrolled.",
           ru: "Начальный запрос без контроля.",
         },
         {
-          name: "onValueChange",
-          type: "(value: string) => void",
-          en: 'Called with the new query: typing, and `""` when the palette closes.',
-          ru: 'Вызывается с новым запросом: ввод и `""` при закрытии палитры.',
+          name: "onSearchChange",
+          type: "(search: string) => void",
+          en: 'Called with the new query: typing, and `""` when the palette closes. Load the matching results here for a server search.',
+          ru: 'Вызывается с новым запросом: ввод и `""` при закрытии палитры. Здесь загружайте результаты для поиска на сервере.',
+        },
+        {
+          name: "filter",
+          type: "boolean",
+          default: "true",
+          en: "The palette filters its items by the query. `false` when the results come from a server: every item shows, the query is still marked in the labels.",
+          ru: "Палитра сама фильтрует пункты по запросу. `false`, когда результаты приходят с сервера: показываются все пункты, совпадение в подписи всё равно выделяется.",
+        },
+        {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "Results are loading: skeleton rows in the list while no item matches (items already on screen stay), `aria-busy`.",
+          ru: "Результаты загружаются: строки-скелеты, пока нет ни одного пункта (показанные пункты остаются), `aria-busy`.",
+        },
+        {
+          name: "loadingMore",
+          type: "boolean",
+          default: "false",
+          en: "More results are loading at the end: skeleton rows after the items.",
+          ru: "Догружаются следующие результаты: строки-скелеты после пунктов.",
+        },
+        {
+          name: "hasMore",
+          type: "boolean",
+          default: "false",
+          en: "More results exist: reaching the end of the list calls `onLoadMore`.",
+          ru: "Есть ещё результаты: конец списка вызывает `onLoadMore`.",
+        },
+        {
+          name: "onLoadMore",
+          type: "() => void | Promise<void>",
+          en: "Called once per round with `hasMore` when the end of the list scrolls into view or the arrows reach the last item; set `loadingMore` while it runs.",
+          ru: "Вызывается один раз за порцию при `hasMore`, когда конец списка прокручен в видимую область или стрелки дошли до последнего пункта; на время загрузки ставьте `loadingMore`.",
+        },
+        {
+          name: "loadError",
+          type: "ReactNode",
+          en: 'The results failed to load: the message replaces the list in `role="alert"`.',
+          ru: 'Результаты не загрузились: сообщение вместо списка с `role="alert"`.',
+        },
+        {
+          name: "onRetry",
+          type: "() => void | Promise<void>",
+          en: "A retry button (`labels.retry`) under `loadError`; Enter in the search field runs it too. Return the request's promise: the button is loading (`aria-busy`) and neither it nor Enter retries again until it settles; resolve — clear `loadError` and the results swap in; reject — the error stays and the button is ready again.",
+          ru: "Кнопка «Повторить» (`labels.retry`) под `loadError`; Enter в поле поиска тоже её вызывает. Верните промис запроса: кнопка в загрузке (`aria-busy`), ни она, ни Enter не повторяют, пока он не завершится; resolve — уберите `loadError`, и подъедут результаты; reject — ошибка остаётся, кнопка снова готова.",
         },
         {
           name: "closeOnOutsideClick",
@@ -101,7 +147,7 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Input",
-      en: '`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; shows `CommandMenu.Root` `value`; takes focus on open; no focus ring (the caret is the indicator). + native input props except `value` / `defaultValue`.',
+      en: '`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; shows `CommandMenu.Root` `search`; takes focus on open; no focus ring (the caret is the indicator). + native input props except `value` / `defaultValue` (`onChange`, `onKeyDown`, `onFocus`, `onBlur` reach the input).',
       ru: 'Строка поиска: иконка и поле `role="combobox"` с запросом из `CommandMenu.Root`; стрелки, Home, End и Enter управляют списком.',
       props: [
         {
@@ -115,8 +161,8 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.List",
-      en: '`ref` → `HTMLElement`. The scrolling `role="listbox"` (a ScrollContainer) under the search row. + native props.',
-      ru: 'Прокручиваемый список результатов `role="listbox"`.',
+      en: '`ref` → `HTMLElement`. The scrolling `role="listbox"` (a ScrollContainer) under the search row. It draws the load states of Root: skeleton rows while the first results load, skeleton rows at the end while more load, the load error with a retry instead of the list; the states cross-fade. + native props.',
+      ru: 'Прокручиваемый список результатов `role="listbox"`; рисует состояния загрузки: строки-скелеты, догрузку в конце, ошибку с повтором.',
       props: [],
     },
     {
@@ -186,8 +232,8 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Empty",
-      en: '`ref` → `HTMLDivElement`. A compact EmptyPage with `role="status"`, shown only while nothing matches: `labels.empty`, `labels.emptyHint`, and `children` as an action under them.',
-      ru: "Пустой результат (компактный EmptyPage), только когда ничего не найдено; `children` — действие.",
+      en: '`ref` → `HTMLDivElement`. A compact EmptyPage with `role="status"`, shown only while nothing matches and nothing loads: `labels.empty`, `labels.emptyHint`, and `children` as an action under them — a button, or a `CommandMenu.Item` (create from the query) that the arrows and Enter reach and that never counts as a match.',
+      ru: "Пустой результат (компактный EmptyPage), только когда ничего не найдено и не грузится; `children` — действие: кнопка или `CommandMenu.Item` «Создать…», доступный стрелками и Enter.",
       props: [],
     },
     {
@@ -223,6 +269,18 @@ export const api: ComponentApi = {
       default: "Попробуйте изменить запрос",
       en: 'Second line of `CommandMenu.Empty`; `""` hides it.',
       ru: "Вторая строка пустого результата; пустая строка скрывает её.",
+    },
+    {
+      key: "loading",
+      default: "Загрузка…",
+      en: "Announced while `loading` or `loadingMore`.",
+      ru: "Объявляется скринридером при `loading` или `loadingMore`.",
+    },
+    {
+      key: "retry",
+      default: "Повторить",
+      en: "The retry button under `loadError` (`onRetry`).",
+      ru: "Кнопка повтора под `loadError` (`onRetry`).",
     },
   ],
 };

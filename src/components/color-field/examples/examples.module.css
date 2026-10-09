@@ -1,0 +1,22 @@
+/* Layout of the ColorField scenarios: semantic tokens only. */
+
+/* in-form.tsx: a form in a Card. */
+.formCard {
+  width: min(100%, var(--prime-modal-width-s));
+}
+
+/* Field → field 20. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-5);
+}
+
+/* A row of actions at the end. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+}

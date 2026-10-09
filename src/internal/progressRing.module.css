@@ -1,0 +1,34 @@
+/*
+ * Progress ring over the edge of a round media (VideoNote, the Composer video preview): a
+ * conic fill cut to a band by a radial mask. By default only the done arc is drawn — no stroke or
+ * backing around the circle; a host that wants a track under the arc sets `--progress-ring-track`
+ * (a colour, default transparent; the transfer disk). The host is a positioned
+ * circle; it writes `--progress-ring-value`
+ * (0…1, default 0) on the ring or an ancestor, usually every frame from JS, so the ring never
+ * re-renders. Fade-in / out is the host's (it owns the state that shows the ring).
+ *
+ *   .ring  the band, `aria-hidden` (the host names the progress)
+ */
+.ring {
+  --progress-ring-width: var(--prime-space-1);
+
+  position: absolute;
+  inset: 0;
+  border-radius: var(--prime-radius-full);
+  color: var(--prime-color-accent-default);
+  background: conic-gradient(
+    currentColor calc(var(--progress-ring-value, 0) * 1turn),
+    var(--progress-ring-track, transparent) 0
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--progress-ring-width)),
+    currentColor calc(100% - var(--progress-ring-width) + var(--prime-border-width))
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--progress-ring-width)),
+    currentColor calc(100% - var(--progress-ring-width) + var(--prime-border-width))
+  );
+  pointer-events: none;
+}

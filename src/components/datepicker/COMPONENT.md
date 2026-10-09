@@ -66,7 +66,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `invalid` | `boolean` | — | Danger ring and `aria-invalid` without a message. |
 | `disabled` | `boolean` | `false` | The field cannot be opened. |
 | `fullWidth` | `boolean` | `false` | The field stretches to its container; otherwise it fits the text. |
-| `align` | `"start" \| "center" \| "end"` | `"start"` | Popover alignment to the field. |
+| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Popover alignment to the field. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge). |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring (`data-focus-ring="false"`). |
 | `placeholder` | `string` | `labels.placeholder` | Field text without a value for this field. |
 | `valuePrefix` | `string` | — | Text before the value, e.g. «С». |

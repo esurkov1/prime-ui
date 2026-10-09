@@ -11,13 +11,13 @@ describe("PageToolbar", () => {
   it("keeps the JSX order in the DOM, so the Tab order is the reading order", () => {
     render(
       <PageToolbar.Root>
-        <PageToolbar.Sections data-testid="sections" />
         <PageToolbar.Tools data-testid="tools" />
+        <PageToolbar.Sections data-testid="sections" />
         <PageToolbar.View data-testid="view" />
         <PageToolbar.Actions data-testid="actions" />
       </PageToolbar.Root>,
     );
-    const ids = ["sections", "tools", "view", "actions"].map((id) => screen.getByTestId(id));
+    const ids = ["tools", "sections", "view", "actions"].map((id) => screen.getByTestId(id));
     for (let i = 1; i < ids.length; i++) {
       expect(ids[i - 1].compareDocumentPosition(ids[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
         Node.DOCUMENT_POSITION_FOLLOWING,
@@ -25,18 +25,18 @@ describe("PageToolbar", () => {
     }
   });
 
-  it("renders one hidden line break after the slots", () => {
+  it("renders only the slots: no spacer element that would add a second row gap", () => {
     const { container } = render(
       <PageToolbar.Root>
-        <PageToolbar.Sections />
-        <PageToolbar.Actions />
+        <PageToolbar.Sections data-testid="sections" />
+        <PageToolbar.Actions data-testid="actions" />
       </PageToolbar.Root>,
     );
-    const bar = container.firstElementChild?.firstElementChild as HTMLElement;
-    const last = bar.lastElementChild as HTMLElement;
-    expect(last.tagName).toBe("SPAN");
-    expect(last).toHaveAttribute("aria-hidden", "true");
-    expect(last).toBeEmptyDOMElement();
+    const bar = container.firstElementChild?.firstElementChild?.firstElementChild as HTMLElement;
+    expect(Array.from(bar.children)).toEqual([
+      screen.getByTestId("sections"),
+      screen.getByTestId("actions"),
+    ]);
   });
 
   it("puts the chips row under the bar, whatever its place in JSX", () => {
@@ -46,11 +46,11 @@ describe("PageToolbar", () => {
         <PageToolbar.Tools data-testid="tools" />
       </PageToolbar.Root>,
     );
-    const root = container.firstElementChild as HTMLElement;
-    const bar = root.firstElementChild as HTMLElement;
+    const layout = container.firstElementChild?.firstElementChild as HTMLElement;
+    const bar = layout.firstElementChild as HTMLElement;
     expect(bar).toContainElement(screen.getByTestId("tools"));
     expect(bar).not.toContainElement(screen.getByTestId("chips"));
-    expect(root.lastElementChild).toBe(screen.getByTestId("chips"));
+    expect(layout.lastElementChild).toBe(screen.getByTestId("chips"));
   });
 
   it("leaves the tier to the host: controls inside follow a ControlSizeProvider around it", () => {

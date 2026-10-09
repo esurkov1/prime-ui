@@ -1,17 +1,20 @@
-/** A standalone label above a control without its own `label`, linked through `aria-labelledby`. */
-import { Label, SegmentedControl } from "prime-ui-kit";
+/** A standalone label above a hand-built field, linked to its input through `htmlFor` and `id`. */
+import { Input, Label } from "prime-ui-kit";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
 export default function LabelOverviewExample() {
+  const inputId = React.useId();
+
   return (
     <div className={styles.field}>
-      <Label.Root id="report-period-label">Период отчёта</Label.Root>
-      <SegmentedControl.Root defaultValue="week" aria-labelledby="report-period-label">
-        <SegmentedControl.Item value="day">День</SegmentedControl.Item>
-        <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
-        <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
-      </SegmentedControl.Root>
+      <Label.Root htmlFor={inputId}>Название проекта</Label.Root>
+      <Input.Root id={inputId}>
+        <Input.Wrapper>
+          <Input.Field defaultValue="Редизайн личного кабинета" />
+        </Input.Wrapper>
+      </Input.Root>
     </div>
   );
 }

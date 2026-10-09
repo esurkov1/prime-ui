@@ -1,8 +1,12 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { FileUpload } from "./FileUpload";
+import { Button } from "@/components/button/Button";
+import { type UploadItem, useUploadQueue } from "@/hooks/useUploadQueue";
+import { Icon } from "@/icons";
+
+import { FileUpload, type FileUploadFile, type FileUploadRootProps } from "./FileUpload";
 
 function makeDataTransferWithFiles(files: File[]): DataTransfer {
   // jsdom has no DataTransfer; an iterable `files` is enough for Array.from
@@ -221,5 +225,784 @@ describe("FileUpload", () => {
       </FileUpload.Item>,
     );
     expect(container.firstChild).toHaveAttribute("data-invalid", "true");
+  });
+
+  it("an image row shows a decorative preview in place of the badge", () => {
+    const { container } = render(
+      <FileUpload.Item size="s">
+        <FileUpload.ItemPreview src="blob:photo" />
+        <FileUpload.ItemName>photo.jpg</FileUpload.ItemName>
+      </FileUpload.Item>,
+    );
+    const preview = container.querySelector("img") as HTMLImageElement;
+    expect(preview).toHaveAttribute("src", "blob:photo");
+    const frame = preview.parentElement as HTMLElement;
+    expect(frame).toHaveAttribute("aria-hidden", "true");
+    expect(frame).toHaveAttribute("data-size", "s");
+  });
+
+  describe('trigger="button"', () => {
+    it("is a kit button that opens the picker; the input leaves the tab order", () => {
+      const onFilesChange = vi.fn();
+      const { container } = render(
+        <FileUpload.Root trigger="button" onFilesChange={onFilesChange} />,
+      );
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+      const click = vi.spyOn(input, "click");
+      const button = screen.getByRole("button", { name: "Выбрать файл" });
+      fireEvent.click(button);
+      expect(click).toHaveBeenCalledTimes(1);
+      expect(input).toHaveAttribute("tabindex", "-1");
+      expect(container.querySelector("label")).toBeNull();
+
+      fireEvent.change(input, { target: { files: [new File(["x"], "a.pdf")] } });
+      expect(onFilesChange).toHaveBeenCalledTimes(1);
+    });
+
+    it("an icon alone is an icon-only ghost button named by aria-label", () => {
+      render(
+        <FileUpload.Root trigger="button" aria-label="Прикрепить файл">
+          <Button.Icon>
+            <Icon name="action.attach" />
+          </Button.Icon>
+        </FileUpload.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Прикрепить файл" });
+      expect(button).toHaveAttribute("data-variant", "ghost");
+      expect(button).toHaveAttribute("data-icon-only", "true");
+    });
+
+    it("is named by the field label and its text, described by the error", () => {
+      render(<FileUpload.Root trigger="button" label="Договор" error="Нужен PDF" />);
+      const button = screen.getByRole("button", { name: "Договор Выбрать файл" });
+      expect(button).toHaveAccessibleDescription("Нужен PDF");
+      expect(button).toHaveAttribute("aria-invalid", "true");
+    });
+
+    it("disabled blocks the button", () => {
+      render(<FileUpload.Root trigger="button" disabled />);
+      expect(screen.getByRole("button", { name: "Выбрать файл" })).toBeDisabled();
+    });
+  });
+
+  it("takes only the files of accept, by MIME type or extension", () => {
+    const onFilesChange = vi.fn();
+    const { container } = render(
+      <FileUpload.Root accept="image/*,.pdf" onFilesChange={onFilesChange} />,
+    );
+    const files = [
+      new File(["1"], "one.jpg", { type: "image/jpeg" }),
+      new File(["2"], "notes.docx", { type: "application/msword" }),
+      new File(["3"], "act.PDF", { type: "application/pdf" }),
+      new File(["4"], "IMG_2041.heic"),
+    ];
+    fireEvent.drop(container.querySelector("label") as HTMLElement, {
+      dataTransfer: makeDataTransferWithFiles(files),
+    });
+    expect(onFilesChange).toHaveBeenCalledWith([files[0], files[2], files[3]]);
+  });
+});
+
+const pdf = new File(["x".repeat(2048)], "Отчёт.pdf", { type: "application/pdf" });
+const photo = new File(["x"], "Фасад.jpg", { type: "image/jpeg" });
+const clip = new File(["x"], "Обход.mp4", { type: "video/mp4" });
+
+/** Names of the tiles, in order. */
+const tileNames = () =>
+  Array.from(document.querySelectorAll("[data-dnd-item]")).map((tile) =>
+    tile.getAttribute("aria-label"),
+  );
+
+function queueOf(items: UploadItem[]) {
+  return {
+    items,
+    retry: vi.fn(),
+    remove: vi.fn(),
+    add: vi.fn((files: readonly File[]) =>
+      files.map((file, index) => ({
+        id: `new-${index}`,
+        file,
+        status: "queued" as const,
+        progress: 0,
+        preview: `blob:${file.name}`,
+      })),
+    ),
+  };
+}
+
+describe("FileUpload.Queue, a queue only", () => {
+  it("draws a row per file: badge or preview, size and status, progress", () => {
+    render(
+      <FileUpload.Queue
+        aria-label="Вложения"
+        queue={queueOf([
+          { id: "1", file: pdf, status: "loading", progress: 0.4 },
+          { id: "2", file: photo, status: "queued", progress: 0, preview: "blob:1" },
+        ])}
+      />,
+    );
+    const list = screen.getByRole("list", { name: "Вложения" });
+    expect(list.children).toHaveLength(2);
+    expect(screen.getByText("PDF")).toHaveAttribute("data-color", "red");
+    expect(screen.getByText("2 КБ · Загрузка 40%")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "Загрузка: Отчёт.pdf" })).toHaveAttribute(
+      "value",
+      "40",
+    );
+    expect(document.querySelector('img[src="blob:1"]')).not.toBeNull();
+    expect(screen.getByText("1 Б · В очереди")).toBeInTheDocument();
+  });
+
+  it("a failed row is invalid, shows the reason and retries", () => {
+    const queue = queueOf([
+      { id: "1", file: pdf, status: "failed", progress: 0.3, error: "Нет связи" },
+      { id: "2", file: photo, status: "failed", progress: 0 },
+    ]);
+    render(<FileUpload.Queue queue={queue} />);
+    expect(screen.getByText("2 КБ · Нет связи")).toBeInTheDocument();
+    expect(screen.getByText("1 Б · Не удалось загрузить")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Повторить загрузку: Отчёт.pdf" }));
+    expect(queue.retry).toHaveBeenCalledWith("1");
+    expect(screen.getByText("Отчёт.pdf").closest("[data-invalid]")).not.toBeNull();
+  });
+
+  it("removes any row from the queue and announces it; a finished row has no retry", () => {
+    const queue = queueOf([{ id: "1", file: pdf, status: "done", progress: 1 }]);
+    render(<FileUpload.Queue queue={queue} />);
+    expect(screen.queryByRole("button", { name: /Повторить/ })).toBeNull();
+    expect(screen.getByText("2 КБ")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Убрать Отчёт.pdf" }));
+    expect(queue.remove).toHaveBeenCalledWith("1");
+    expect(screen.getByRole("status")).toHaveTextContent("Отчёт.pdf: убран");
+  });
+
+  it("announces a file that finished or failed", () => {
+    const { rerender } = render(
+      <FileUpload.Queue
+        queue={queueOf([{ id: "1", file: pdf, status: "loading", progress: 0.5 }])}
+      />,
+    );
+    rerender(
+      <FileUpload.Queue queue={queueOf([{ id: "1", file: pdf, status: "done", progress: 1 }])} />,
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Отчёт.pdf: загружен");
+    rerender(
+      <FileUpload.Queue
+        queue={queueOf([{ id: "1", file: pdf, status: "failed", progress: 1, error: "Отказ" }])}
+      />,
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Отчёт.pdf: Отказ");
+  });
+
+  it("takes a custom size format and no list while empty", () => {
+    const { rerender } = render(<FileUpload.Queue queue={queueOf([])} />);
+    expect(screen.queryByRole("list")).toBeNull();
+    rerender(
+      <FileUpload.Queue
+        formatSize={() => "мало"}
+        queue={queueOf([{ id: "1", file: pdf, status: "done", progress: 1 }])}
+      />,
+    );
+    expect(screen.getByText("мало")).toBeInTheDocument();
+  });
+
+  it("works with the real queue end to end, the queue on the root", async () => {
+    function Attachments() {
+      const queue = useUploadQueue({ upload: async () => "ok" });
+      return <FileUpload.Root multiple queue={queue} aria-label="Файлы" />;
+    }
+    const { container } = render(<Attachments />);
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    await act(async () => {
+      fireEvent.change(input, { target: { files: [pdf] } });
+    });
+    expect(screen.getByText("2 КБ")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toHaveAttribute("value", "100");
+  });
+
+  describe('layout="grid" | "strip"', () => {
+    /** A queue that really moves and removes its files. */
+    function Live({
+      initial,
+      layout = "grid",
+    }: {
+      initial: UploadItem[];
+      layout?: "grid" | "strip";
+    }) {
+      const [items, setItems] = React.useState(initial);
+      return (
+        <FileUpload.Queue
+          aria-label="Файлы"
+          layout={layout}
+          queue={{
+            items,
+            retry: vi.fn(),
+            remove: (id) => setItems((current) => current.filter((item) => item.id !== id)),
+            move: (id, beforeId) =>
+              setItems((current) => {
+                const item = current.find((entry) => entry.id === id);
+                if (!item) return current;
+                const rest = current.filter((entry) => entry !== item);
+                const at =
+                  beforeId === null ? rest.length : rest.findIndex((e) => e.id === beforeId);
+                return [...rest.slice(0, at), item, ...rest.slice(at)];
+              }),
+          }}
+        />
+      );
+    }
+
+    it("draws a tile per file: a picture, a video frame or the format badge with name and size", () => {
+      render(
+        <Live
+          initial={[
+            { id: "1", file: pdf, status: "loading", progress: 0.4 },
+            { id: "2", file: photo, status: "done", progress: 1, preview: "blob:photo" },
+            { id: "3", file: clip, status: "queued", progress: 0, preview: "blob:clip" },
+          ]}
+        />,
+      );
+      expect(tileNames()).toEqual([
+        "Файл 1: Отчёт.pdf · Загрузка 40%",
+        "Фото 2: Фасад.jpg",
+        "Видео 3: Обход.mp4 · В очереди",
+      ]);
+      expect(screen.getByRole("list", { name: "Файлы" })).toHaveAttribute("data-axis", "grid");
+      expect(screen.getByText("PDF")).toHaveAttribute("data-color", "red");
+      expect(screen.getByText("2 КБ")).toBeInTheDocument();
+      // Without a cover a picture carries its format.
+      expect(screen.getByText("JPG")).toBeInTheDocument();
+      expect(document.querySelector('img[src="blob:photo"]')).not.toBeNull();
+      // The ring around the disk in the middle: one progressbar per file on its way.
+      expect(screen.getByRole("progressbar", { name: "Загрузка 40%" })).toHaveAttribute(
+        "aria-valuenow",
+        "40",
+      );
+      expect(screen.getByRole("progressbar", { name: "В очереди" })).toBeInTheDocument();
+    });
+
+    it("Alt+→ moves a tile and the queue's order follows; strip is one sideways row", () => {
+      render(
+        <Live
+          layout="strip"
+          initial={[
+            { id: "1", file: pdf, status: "done", progress: 1 },
+            { id: "2", file: photo, status: "done", progress: 1, preview: "blob:photo" },
+          ]}
+        />,
+      );
+      expect(screen.getByRole("list", { name: "Файлы" })).toHaveAttribute("data-axis", "x");
+      fireEvent.keyDown(screen.getByRole("listitem", { name: /Отчёт/ }), {
+        key: "ArrowRight",
+        altKey: true,
+      });
+      expect(tileNames()).toEqual(["Фото 1: Фасад.jpg", "Файл 2: Отчёт.pdf"]);
+    });
+
+    it("Delete removes the focused tile, the × removes another", () => {
+      render(
+        <Live
+          initial={[
+            { id: "1", file: pdf, status: "done", progress: 1 },
+            { id: "2", file: photo, status: "done", progress: 1, preview: "blob:photo" },
+          ]}
+        />,
+      );
+      fireEvent.keyDown(screen.getByRole("listitem", { name: /Фасад/ }), { key: "Delete" });
+      expect(tileNames()).toEqual(["Файл 1: Отчёт.pdf"]);
+      fireEvent.click(screen.getByRole("button", { name: "Убрать Отчёт.pdf" }));
+      expect(tileNames()).toEqual([]);
+    });
+
+    it("without queue.move and a value the tiles do not reorder", () => {
+      render(
+        <FileUpload.Queue
+          layout="grid"
+          queue={{
+            items: [{ id: "1", file: pdf, status: "done", progress: 1 }],
+            retry: vi.fn(),
+            remove: vi.fn(),
+          }}
+        />,
+      );
+      expect(screen.getByRole("listitem", { name: /Отчёт/ })).toHaveAttribute(
+        "aria-keyshortcuts",
+        "Delete",
+      );
+    });
+  });
+});
+
+const PHOTOS: FileUploadFile[] = [
+  { id: "a", name: "front.jpg", type: "image/jpeg", src: "a.jpg", alt: "Спереди" },
+  { id: "b", name: "side.jpg", type: "image/jpeg", src: "b.jpg", alt: "Сбоку" },
+  { id: "c", name: "back.jpg", type: "image/jpeg", src: "c.jpg", alt: "Сзади" },
+];
+
+/** A controlled gallery: the add tile, a grid, the value kept by its owner. */
+function Photos({ onValueChange, ...props }: Partial<FileUploadRootProps>) {
+  const [value, setValue] = React.useState<readonly FileUploadFile[]>(PHOTOS);
+  return (
+    <FileUpload.Root
+      label="Фотографии"
+      trigger="tile"
+      layout="grid"
+      multiple
+      value={value}
+      onFilesChange={() => {}}
+      {...props}
+      onValueChange={(next) => {
+        setValue(next);
+        return onValueChange?.(next);
+      }}
+    />
+  );
+}
+
+const tiles = () =>
+  within(screen.getByRole("list", { name: "Фотографии" }))
+    .getAllByRole("listitem")
+    .map((tile) => tile.getAttribute("aria-label"))
+    .filter(Boolean);
+
+describe('FileUpload.Root trigger="tile", a value', () => {
+  it("draws a named list of files in order, each named by its position and alt", () => {
+    render(<Photos />);
+    expect(tiles()).toEqual(["Фото 1: Спереди", "Фото 2: Сбоку", "Фото 3: Сзади"]);
+  });
+
+  it("removes a file with its × and announces it", () => {
+    const onValueChange = vi.fn();
+    render(<Photos onValueChange={onValueChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Убрать side.jpg" }));
+    expect(onValueChange).toHaveBeenCalledWith([PHOTOS[0], PHOTOS[2]]);
+    expect(tiles()).toEqual(["Фото 1: Спереди", "Фото 2: Сзади"]);
+    expect(screen.getByRole("status")).toHaveTextContent("side.jpg: убран");
+  });
+
+  it("removes the focused file with Delete and moves focus to its neighbour", () => {
+    render(<Photos />);
+    const tile = screen.getByRole("listitem", { name: "Фото 1: Спереди" });
+    tile.focus();
+    fireEvent.keyDown(tile, { key: "Delete" });
+    expect(tiles()).toEqual(["Фото 1: Сбоку", "Фото 2: Сзади"]);
+    expect(document.activeElement).toBe(screen.getByRole("listitem", { name: "Фото 1: Сбоку" }));
+  });
+
+  it("moves a file one place with Alt+→", () => {
+    const onValueChange = vi.fn();
+    render(<Photos onValueChange={onValueChange} />);
+    fireEvent.keyDown(screen.getByRole("listitem", { name: "Фото 1: Спереди" }), {
+      key: "ArrowRight",
+      altKey: true,
+    });
+    expect(tiles()).toEqual(["Фото 1: Сбоку", "Фото 2: Спереди", "Фото 3: Сзади"]);
+    expect(onValueChange).toHaveBeenCalledWith([PHOTOS[1], PHOTOS[0], PHOTOS[2]]);
+  });
+
+  it("without cover there is no cover pill", () => {
+    render(<Photos />);
+    expect(screen.queryByText("Обложка")).toBeNull();
+  });
+
+  it("cover marks the first file; the tiles offer no action but remove", () => {
+    render(<Photos cover />);
+    expect(screen.getByText("Обложка")).toBeInTheDocument();
+    // The cover's word takes its format pill's place; the others keep their format.
+    expect(screen.getAllByText("JPG")).toHaveLength(2);
+    const names = screen.getAllByRole("button").map((button) => button.getAttribute("aria-label"));
+    expect(names).toEqual(["Убрать front.jpg", "Убрать side.jpg", "Убрать back.jpg"]);
+  });
+
+  it("cover: a tile moved first with Alt+← becomes the cover, and that is announced", () => {
+    const onValueChange = vi.fn();
+    render(<Photos cover onValueChange={onValueChange} />);
+    fireEvent.keyDown(screen.getByRole("listitem", { name: "Фото 2: Сбоку" }), {
+      key: "ArrowLeft",
+      altKey: true,
+    });
+    expect(onValueChange).toHaveBeenCalledWith([PHOTOS[1], PHOTOS[0], PHOTOS[2]]);
+    expect(tiles()).toEqual(["Фото 1: Сбоку", "Фото 2: Спереди", "Фото 3: Сзади"]);
+    expect(screen.getByRole("status")).toHaveTextContent("Обложка: side.jpg");
+  });
+
+  it("cover: a move that keeps the first file says nothing of the cover", () => {
+    render(<Photos cover />);
+    fireEvent.keyDown(screen.getByRole("listitem", { name: "Фото 2: Сбоку" }), {
+      key: "ArrowRight",
+      altKey: true,
+    });
+    expect(tiles()).toEqual(["Фото 1: Спереди", "Фото 2: Сзади", "Фото 3: Сбоку"]);
+    expect(screen.getByRole("status")).not.toHaveTextContent("Обложка");
+  });
+
+  it("hands picked files to onFilesChange, of accept and cut to the room under max", () => {
+    const onFilesChange = vi.fn();
+    render(<Photos max={4} accept="image/*" onFilesChange={onFilesChange} />);
+    const input = screen.getByLabelText("Добавить файлы");
+    const files = [
+      new File(["1"], "one.jpg", { type: "image/jpeg" }),
+      new File(["2"], "notes.pdf", { type: "application/pdf" }),
+      new File(["3"], "two.png", { type: "image/png" }),
+    ];
+    fireEvent.change(input, { target: { files } });
+    expect(onFilesChange).toHaveBeenCalledWith([files[0]]);
+    expect(input.closest("label")).toHaveTextContent("3 из 4");
+  });
+
+  it("takes files dropped anywhere on the set; the add tile turns into the target", () => {
+    const onFilesChange = vi.fn();
+    const { container } = render(<Photos onFilesChange={onFilesChange} />);
+    const file = new File(["1"], "one.jpg", { type: "image/jpeg" });
+    const list = screen.getByRole("list", { name: "Фотографии" });
+    fireEvent.dragEnter(list, { dataTransfer: { files: [file], types: ["Files"] } });
+    expect(container.querySelector("[data-dropping]")).not.toBeNull();
+    fireEvent.drop(list, { dataTransfer: { files: [file], types: ["Files"] } });
+    expect(onFilesChange).toHaveBeenCalledWith([file]);
+    expect(container.querySelector("[data-dropping]")).toBeNull();
+  });
+
+  it("at max the add tile says so and takes nothing", () => {
+    render(<Photos max={3} />);
+    expect(screen.getByLabelText("Добавить файлы")).toBeDisabled();
+    expect(screen.getByText("Лимит файлов")).toBeInTheDocument();
+    expect(screen.getByLabelText("Добавить файлы").closest("label")).toHaveTextContent("3 из 3");
+  });
+
+  it("draws the add tile like a drop zone: whatever handler takes the files", () => {
+    render(<Photos onFilesChange={undefined} />);
+    expect(screen.getByLabelText("Добавить файлы")).toBeEnabled();
+  });
+
+  it("an empty set is one wide add tile", () => {
+    render(<FileUpload.Root label="Фотографии" trigger="tile" onFilesChange={() => {}} />);
+    expect(screen.getByText("Нажмите или перетащите файлы")).toBeInTheDocument();
+  });
+
+  it("disabled: no add tile, no actions, no shortcuts", () => {
+    render(<Photos disabled cover />);
+    expect(screen.queryByLabelText("Добавить файлы")).toBeNull();
+    expect(screen.queryByRole("button")).toBeNull();
+    expect(screen.getByRole("listitem", { name: "Фото 1: Спереди" })).not.toHaveAttribute(
+      "aria-keyshortcuts",
+    );
+  });
+
+  it("wires the hint and the error to the add tile's input", () => {
+    render(<Photos hint="До 10 МБ" error="Нужно не меньше трёх фото" />);
+    const input = screen.getByLabelText("Добавить файлы");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input).toHaveAccessibleDescription("Нужно не меньше трёх фото");
+  });
+
+  it("a grid of mixed files with a cover: the first file is the cover whatever it is", () => {
+    render(
+      <FileUpload.Root
+        label="Фотографии"
+        trigger="tile"
+        layout="grid"
+        cover
+        defaultValue={[
+          { id: "act", name: "Акт.pdf", size: 2048, type: "application/pdf" },
+          PHOTOS[0] as FileUploadFile,
+          { id: "walk", name: "Обход.mp4", type: "video/mp4", src: "walk.mp4" },
+        ]}
+      />,
+    );
+    expect(tiles()).toEqual(["Файл 1: Акт.pdf", "Фото 2: Спереди", "Видео 3: Обход.mp4"]);
+    expect(screen.getByText("Обложка")).toBeInTheDocument();
+    expect(screen.getByText("2 КБ")).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("listitem", { name: "Фото 2: Спереди" }), {
+      key: "ArrowLeft",
+      altKey: true,
+    });
+    expect(tiles()).toEqual(["Фото 1: Спереди", "Файл 2: Акт.pdf", "Видео 3: Обход.mp4"]);
+    expect(screen.getByRole("status")).toHaveTextContent("Обложка: front.jpg");
+  });
+
+  describe("with a queue", () => {
+    const jpg = new File(["x"], "IMG_2041.jpg", { type: "image/jpeg" });
+
+    it("puts picked files into the queue and their previews into the value at once", () => {
+      const onValueChange = vi.fn();
+      const queue = queueOf([]);
+      render(<Photos queue={queue} onFilesChange={undefined} onValueChange={onValueChange} />);
+      fireEvent.change(screen.getByLabelText("Добавить файлы"), { target: { files: [jpg] } });
+      expect(queue.add).toHaveBeenCalledWith([jpg]);
+      expect(onValueChange).toHaveBeenCalledWith([
+        ...PHOTOS,
+        {
+          id: "new-0",
+          name: "IMG_2041.jpg",
+          size: 1,
+          type: "image/jpeg",
+          src: "blob:IMG_2041.jpg",
+        },
+      ]);
+    });
+
+    it("a refused add takes the new files out of the queue", async () => {
+      const queue = queueOf([]);
+      render(
+        <FileUpload.Root
+          label="Фотографии"
+          trigger="tile"
+          layout="grid"
+          defaultValue={PHOTOS}
+          queue={queue}
+          onValueChange={async () => {
+            throw new Error("offline");
+          }}
+        />,
+      );
+      await act(async () => {
+        fireEvent.change(screen.getByLabelText("Добавить файлы"), { target: { files: [jpg] } });
+      });
+      expect(queue.remove).toHaveBeenCalledWith("new-0");
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Не удалось сохранить изменение, файлы на прежних местах",
+      );
+    });
+
+    it("a tile shows its upload state in its name and over the picture", () => {
+      const queue = queueOf([
+        { id: "b", file: jpg, status: "loading", progress: 0.45 },
+        { id: "c", file: jpg, status: "queued", progress: 0 },
+      ]);
+      render(<Photos queue={queue} />);
+      expect(tiles()).toEqual([
+        "Фото 1: Спереди",
+        "Фото 2: Сбоку · Загрузка 45%",
+        "Фото 3: Сзади · В очереди",
+      ]);
+      expect(screen.getByRole("progressbar", { name: "Загрузка 45%" })).toHaveAttribute(
+        "aria-valuenow",
+        "45",
+      );
+      expect(screen.getByRole("listitem", { name: /Сбоку/ })).toHaveAttribute(
+        "data-upload",
+        "loading",
+      );
+    });
+
+    it("the ring follows the progress, the disk cancels, and it fades out when done", () => {
+      const queue = queueOf([{ id: "b", file: jpg, status: "loading", progress: 0.3 }]);
+      const { rerender } = render(<Photos queue={queue} />);
+      const ring = screen.getByRole("progressbar", { name: "Загрузка 30%" });
+      expect(ring.style.getPropertyValue("--transfer-progress")).toBe("0.3");
+      // In flight the disk is the remove: no corner button.
+      expect(screen.queryByRole("button", { name: "Убрать side.jpg" })).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "Отменить загрузку: side.jpg" }));
+      expect(queue.remove).toHaveBeenCalledWith("b");
+      rerender(<Photos queue={queueOf([{ id: "b", file: jpg, status: "done", progress: 1 }])} />);
+      expect(screen.queryByRole("progressbar")).toBeNull();
+    });
+
+    it("a failed tile shows the reason and retries; removing a settled file stops nothing", () => {
+      const queue = queueOf([
+        { id: "b", file: jpg, status: "failed", progress: 0.2, error: "Нет связи" },
+      ]);
+      render(<Photos queue={queue} />);
+      expect(screen.getByRole("listitem", { name: "Фото 2: Сбоку · Нет связи" })).toBeTruthy();
+      fireEvent.click(screen.getByRole("button", { name: "Повторить загрузку: side.jpg" }));
+      expect(queue.retry).toHaveBeenCalledWith("b");
+      fireEvent.click(screen.getByRole("button", { name: "Убрать side.jpg" }));
+      expect(queue.remove).toHaveBeenCalledWith("b");
+      fireEvent.click(screen.getByRole("button", { name: "Убрать front.jpg" }));
+      expect(queue.remove).toHaveBeenCalledTimes(1);
+    });
+
+    it("announces a file that finished or failed", () => {
+      const { rerender } = render(
+        <Photos queue={queueOf([{ id: "c", file: jpg, status: "loading", progress: 0.9 }])} />,
+      );
+      rerender(<Photos queue={queueOf([{ id: "c", file: jpg, status: "done", progress: 1 }])} />);
+      expect(screen.getByRole("status")).toHaveTextContent("IMG_2041.jpg: загружен");
+      rerender(
+        <Photos
+          queue={queueOf([{ id: "c", file: jpg, status: "failed", progress: 1, error: "Отказ" }])}
+        />,
+      );
+      expect(screen.getByRole("status")).toHaveTextContent("IMG_2041.jpg: Отказ");
+    });
+
+    it("an uploading tile still moves with Alt+→", () => {
+      render(
+        <Photos queue={queueOf([{ id: "a", file: jpg, status: "loading", progress: 0.1 }])} />,
+      );
+      fireEvent.keyDown(screen.getByRole("listitem", { name: /Спереди/ }), {
+        key: "ArrowRight",
+        altKey: true,
+      });
+      expect(tiles()[1]).toBe("Фото 2: Спереди · Загрузка 10%");
+    });
+
+    it("uploads not in the value follow it, in the queue's order", () => {
+      render(
+        <Photos queue={queueOf([{ id: "up", file: pdf, status: "loading", progress: 0.5 }])} />,
+      );
+      expect(tiles()).toEqual([
+        "Фото 1: Спереди",
+        "Фото 2: Сбоку",
+        "Фото 3: Сзади",
+        "Файл 4: Отчёт.pdf · Загрузка 50%",
+      ]);
+    });
+  });
+});
+
+describe('layout="list" with a value and a queue', () => {
+  const DOCS: FileUploadFile[] = [
+    { id: "contract", name: "Договор.pdf", size: 4096, type: "application/pdf" },
+    { id: "site", name: "Площадка.jpg", size: 1024, type: "image/jpeg", src: "site.jpg" },
+  ];
+
+  it("draws the files on the server, then the uploads; a server file has no progress", () => {
+    render(
+      <FileUpload.Root
+        label="Документы"
+        defaultValue={DOCS}
+        queue={queueOf([{ id: "up", file: pdf, status: "loading", progress: 0.5 }])}
+      />,
+    );
+    const rows = within(screen.getByRole("list", { name: "Документы" })).getAllByRole("listitem");
+    expect(rows.map((row) => row.textContent)).toEqual([
+      "PDFДоговор.pdf4 КБ",
+      "Площадка.jpg1 КБ",
+      "PDFОтчёт.pdf2 КБ · Загрузка 50%",
+    ]);
+    expect(screen.getAllByRole("progressbar")).toHaveLength(1);
+    expect(document.querySelector('img[src="site.jpg"]')).not.toBeNull();
+  });
+
+  it("removing an upload through onValueChange takes it out of the queue", () => {
+    const onValueChange = vi.fn();
+    const queue = queueOf([{ id: "up", file: pdf, status: "loading", progress: 0.5 }]);
+    render(
+      <FileUpload.Root
+        label="Документы"
+        defaultValue={DOCS}
+        queue={queue}
+        onValueChange={onValueChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Убрать Отчёт.pdf" }));
+    expect(onValueChange).toHaveBeenCalledWith(DOCS);
+    expect(queue.remove).toHaveBeenCalledWith("up");
+  });
+
+  it("a list has no cover: rows do not reorder", () => {
+    render(<FileUpload.Root label="Документы" cover defaultValue={DOCS} />);
+    expect(screen.queryByText(/Обложка/)).toBeNull();
+  });
+
+  it('trigger="tile" puts the add tile at the end of the rows', () => {
+    render(
+      <FileUpload.Root
+        label="Документы"
+        trigger="tile"
+        defaultValue={DOCS}
+        onFilesChange={() => {}}
+      />,
+    );
+    const rows = within(screen.getByRole("list", { name: "Документы" })).getAllByRole("listitem");
+    expect(rows).toHaveLength(3);
+    expect(rows[2]).toContainElement(screen.getByLabelText("Добавить файлы"));
+  });
+});
+
+describe("async onValueChange", () => {
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+  const names = () =>
+    screen
+      .getAllByRole("listitem", { name: /^Фото/ })
+      .map((tile) => tile.getAttribute("aria-label"));
+
+  it("a removal keeps the file busy until the answer; resolve takes it out", async () => {
+    const save = deferred();
+    render(
+      <FileUpload.Queue layout="grid" defaultValue={PHOTOS} onValueChange={() => save.promise} />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Убрать side.jpg" }));
+    expect(screen.getByRole("listitem", { name: "Фото 2: Сбоку" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Убрать side.jpg" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    await act(async () => {
+      save.resolve();
+    });
+    expect(names()).toEqual(["Фото 1: Спереди", "Фото 2: Сзади"]);
+  });
+
+  it("a refused removal keeps the file and announces it", async () => {
+    render(
+      <FileUpload.Queue
+        layout="grid"
+        defaultValue={PHOTOS}
+        onValueChange={async () => {
+          throw new Error("offline");
+        }}
+      />,
+    );
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Убрать side.jpg" }));
+    });
+    expect(names()).toEqual(["Фото 1: Спереди", "Фото 2: Сбоку", "Фото 3: Сзади"]);
+    expect(screen.getByRole("listitem", { name: "Фото 2: Сбоку" })).not.toHaveAttribute(
+      "aria-busy",
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Не удалось сохранить изменение, файлы на прежних местах",
+    );
+  });
+
+  it("a move stands busy in its new place; reject puts it back", async () => {
+    const save = deferred();
+    render(
+      <FileUpload.Queue layout="grid" defaultValue={PHOTOS} onValueChange={() => save.promise} />,
+    );
+    fireEvent.keyDown(screen.getByRole("listitem", { name: "Фото 1: Спереди" }), {
+      key: "ArrowRight",
+      altKey: true,
+    });
+    expect(names()).toEqual(["Фото 1: Сбоку", "Фото 2: Спереди", "Фото 3: Сзади"]);
+    expect(screen.getByRole("listitem", { name: "Фото 2: Спереди" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(names()).toEqual(["Фото 1: Спереди", "Фото 2: Сбоку", "Фото 3: Сзади"]);
+  });
+
+  it("a list row waits busy with a spinner while its removal is saved", async () => {
+    const save = deferred();
+    render(
+      <FileUpload.Queue
+        defaultValue={[{ id: "1", name: "Счёт.pdf" }]}
+        onValueChange={() => save.promise}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Убрать Счёт.pdf" });
+    fireEvent.click(button);
+    expect(screen.getByRole("listitem")).toHaveAttribute("aria-busy", "true");
+    expect(button).toHaveAttribute("aria-busy", "true");
+    await act(async () => {
+      save.resolve();
+    });
+    expect(screen.queryByRole("listitem")).toBeNull();
   });
 });

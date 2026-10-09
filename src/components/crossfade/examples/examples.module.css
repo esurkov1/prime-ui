@@ -57,6 +57,35 @@
   list-style: none;
 }
 
+/* fill.tsx: a page panel of a fixed height; the board region takes what the rows above leave. */
+.fillPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: 100%;
+  height: calc(var(--prime-space-24) * 4);
+}
+
+.fillPage > :first-child {
+  align-self: flex-start;
+}
+
+.fillSkeleton {
+  height: 100%;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-24) * 2)), 1fr));
+  gap: var(--prime-space-4);
+  min-height: 0;
+  overflow: auto;
+}
+
+.column {
+  align-self: stretch;
+}
+
 .fact {
   display: grid;
   grid-template-columns: calc(var(--prime-space-24) + var(--prime-space-4)) minmax(0, 1fr);

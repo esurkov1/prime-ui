@@ -9,6 +9,7 @@
  * - **selection** — pick from options (toggles, lists, slider, filters, date and color pickers).
  * - **data-display** — show data: labels, people, objects, cards, tables, boards, events, code,
  *   disclosed sections.
+ * - **messages** — a conversation: message bubbles of every kind and the composer.
  * - **status** — say what happens: messages, progress, loading placeholders, state swaps, empty states.
  * - **navigation** — move between places: app navigation (sidebar, bottom bar), tabs, path, pages,
  *   steps.
@@ -26,6 +27,7 @@ export const PLAYGROUND_NAV_CATEGORIES = [
   { id: "inputs", label: "Ввод" },
   { id: "selection", label: "Выбор" },
   { id: "data-display", label: "Данные" },
+  { id: "messages", label: "Сообщения" },
   { id: "status", label: "Статус и загрузка" },
   { id: "navigation", label: "Навигация" },
   { id: "overlays", label: "Оверлеи" },

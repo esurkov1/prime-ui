@@ -24,20 +24,22 @@ import { SegmentedControl } from "prime-ui-kit";
 
 ## Anatomy
 ```
-SegmentedControl.Root                 role="radiogroup"; track + sliding thumb, scrolling row, keyboard
-└─ SegmentedControl.Item              role="radio" button, one option
-   ├─ SegmentedControl.Icon           icon slot (optional; icon-only → square segment)
-   ├─ SegmentedControl.Label          title, one line (optional; plain text is wrapped automatically)
-   ├─ SegmentedControl.Count          counter Badge after the label (optional)
-   └─ SegmentedControl.Description    second line; makes the segment two-line (optional)
+SegmentedControl.Root                 field frame: label row · track · support row (hint | error)
+└─ (track)                            role="radiogroup"; sliding thumb, scrolling row, keyboard
+   └─ SegmentedControl.Item           role="radio" button, one option
+      ├─ SegmentedControl.Icon        icon slot (optional; icon-only → square segment)
+      ├─ SegmentedControl.Label       title, one line (optional; plain text is wrapped automatically)
+      ├─ SegmentedControl.Count       counter Badge after the label (optional)
+      └─ SegmentedControl.Description second line; makes the segment two-line (optional)
 ```
+The root is a field root: `className`, `ref` and the native attributes land on the frame, which hugs the track unless `fullWidth`; `id`, `onKeyDown` and the `aria-label*` / `aria-describedby` names land on the radiogroup. Without `label`, `hint` and `error` the frame shows only the track.
 
 ## API
 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### SegmentedControl.Root
-`ref` → `HTMLDivElement`. `<div role="radiogroup">`: the track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row.
+`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="radiogroup">` track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row · support row. The frame hugs the track unless `fullWidth`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -47,8 +49,17 @@ SegmentedControl.Root                 role="radiogroup"; track + sliding thumb, 
 | `disabled` | `boolean` | `false` | Disables the whole group. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier; the outer height equals the control height 28 · 32 · 36 · 40 · 48. Without it the tier of its host (a toolbar, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | `false` | Fills the container; single-line segments tend to equal widths but never get narrower than their label — when they do not fit, the row scrolls. |
+| `label` | `ReactNode` | — | Heading above the control; names the `radiogroup` (`aria-labelledby`). Without it give the root an `aria-label`. |
+| `required` | `boolean` | `false` | Red `*` after the label and `aria-required` on the `radiogroup`. |
+| `optional` | `boolean` | `false` | Muted marker after the label (`labels.optional`). |
+| `hint` | `ReactNode` | — | Help text under the control (`aria-describedby`). Hidden while `error` is shown. |
+| `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
+| `invalid` | `boolean` | `false` | Danger inset ring, `aria-invalid` and `data-invalid` on the `radiogroup`; the control shakes once when an error arrives. |
+| `reserveSupportRow` | `boolean` | `false` | Always render the support row, so an appearing error does not shift the layout. |
+| `id` | `string` | — | Id of the `radiogroup` element (generated when omitted); hint id is `<id>-hint`, error id `<id>-error`. |
+| `labels` | `Partial<SegmentedControlLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | `SegmentedControl.Item`s (may be wrapped, e.g. in `Tooltip.Trigger`). |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" \| "onChange">` | — | `aria-label` / `aria-labelledby` (name the group), `className` and the other div attributes. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange" \| "dir">` | — | `aria-label` / `aria-labelledby` / `aria-describedby` and `onKeyDown` go to the radiogroup (a prevented key skips the kit's handling); `className`, `data-*` and the other attributes to the field frame `<div>`. |
 
 ### SegmentedControl.Item
 `ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped in a `SegmentedControl.Label`.
@@ -136,13 +147,16 @@ Colour all items or none; do not give an item and its Count the same hue; prefer
 | unselected | — | `aria-checked="false"`, `data-state="unchecked"`; `text-secondary`, hover → `text-primary` (no fill) |
 | no selection | `value` / `defaultValue` = `""` | thumb hidden; the first enabled segment takes Tab focus |
 | item disabled | item `disabled` | `data-disabled="true"`, native `disabled`, `text-disabled`, skipped by arrows |
-| group disabled | root `disabled` | root `data-disabled="true"`, `aria-disabled`; every segment disabled |
+| group disabled | root `disabled` | track `data-disabled="true"`, `aria-disabled`; every segment disabled; label and hint dimmed |
+| invalid | `invalid` or non-empty `error` | track `data-invalid="true"` + `aria-invalid="true"`, inset danger ring on the track; the error replaces the hint; the track shakes once when an error arrives |
+| required | `required` | red `*` after the label, `aria-required="true"` on the radiogroup |
 | focus-visible | keyboard | focus ring inside the segment |
 | overflow | row wider than the container | root `data-overflow-start` / `data-overflow-end`: edge fades in the track color |
 
 Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `data-value`, `data-color`. The thumb glides (`emphasized` + `base`, `data-animate`) only into a user's choice (click, arrows); a value set from outside and layout changes snap it; it stays still under `prefers-reduced-motion`. It sits inside the segment track, which clips it, so moving the selection never changes the row's scroll area. When the row scrolls, the selected segment is kept in view on mount and on every value change: only the row scrolls, never the page, and the scroll glides only after a user's choice.
 
 ## Layout & spacing
+- In a form it is a field: label → track `label-gap`, track → support row `hint-gap`, field → field `--prime-space-5` like every field.
 - Width is content-based by default; segments never wrap. In a narrow container the row scrolls horizontally with fading edges.
 - In a toolbar: gap `--prime-space-3` between controls; keep every control at one size.
 - Caption under a group: gap `--prime-space-2`.
@@ -159,7 +173,8 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 | `Tab` | Enters the group on the selected option (or the first enabled one) and leaves it. |
 
 ### ARIA
-- Root `role="radiogroup"` — always name it with `aria-label` / `aria-labelledby`; `aria-disabled` when disabled.
+- The track is `role="radiogroup"`, named by `label` (`aria-labelledby`); without a label give the root `aria-label`. `aria-disabled` when disabled.
+- Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.
 - Items are `<button role="radio" aria-checked>` with roving `tabIndex`.
 - Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description.
 - Icons are `aria-hidden`; icon-only items need `aria-label` (and a Tooltip for sighted users).
@@ -167,7 +182,9 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-No `labels`.
+| Key | Default | Used for |
+|---|---|---|
+| `optional` | `"необязательно"` | Marker after the label when `optional`. |
 
 ## Examples
 | Example | Shows |
@@ -181,15 +198,17 @@ No `labels`.
 | [scroll.tsx](examples/scroll.tsx) | Segments never wrap: in a column narrower than the row it scrolls with edge fades and brings the chosen segment into view. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a metric on the second — `SegmentedControl.Label`, `SegmentedControl.Count`, `SegmentedControl.Description`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the choice and updates other content from it — `value`, `onValueChange`. |
+| [in-form.tsx](examples/in-form.tsx) | An expense form: the choice is a labelled field with a hint, checked on submit, its error leaves as soon as a segment is chosen — `label`, `hint`, `required`, `error`. |
 
 ## Mistakes
 - Using it as tabs that show different panels → use `Tabs`.
-- No `aria-label` on the root → the radiogroup has no name.
+- No `label` and no `aria-label` → the radiogroup has no name.
+- A `Label` + `Hint` pair wired by hand with `aria-labelledby` in a form → `label`, `hint`, `error` on the root.
 - Icon-only item without `aria-label` → add `aria-label` and wrap in `Tooltip`.
 - `variant="…"` or `tone="…"` on the root → there is none; use `color` on items for hue.
 - Different `size` than neighbouring controls in a toolbar → use the same tier so heights match.
 - Expecting segments to wrap on narrow screens → they scroll; use `fullWidth` or fewer options.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Badge](../badge/COMPONENT.md)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
 - **See also:** [Tabs](../tabs/COMPONENT.md), [Radio](../radio/COMPONENT.md), [Switch](../switch/COMPONENT.md), [ButtonGroup](../button-group/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md)

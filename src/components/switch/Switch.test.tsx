@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Switch } from "./Switch";
@@ -140,5 +141,85 @@ describe("Switch", () => {
     const field = container.firstElementChild;
     expect(field).toHaveAttribute("data-invalid", "true");
     expect(field).toHaveAttribute("data-state", "unchecked");
+  });
+  /** A promise the test settles by hand. */
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  it("async: waits busy in the new position; presses do nothing; resolve keeps it", async () => {
+    const save = deferred();
+    const onCheckedChange = vi.fn(() => save.promise);
+    const { container } = render(
+      <Switch.Root aria-label="Документы на почту" onCheckedChange={onCheckedChange} />,
+    );
+    const control = screen.getByRole("switch");
+    fireEvent.click(control);
+    expect(control).toBeChecked();
+    expect(control).toHaveAttribute("aria-busy", "true");
+    expect(container.querySelector("[data-loading]")).not.toBeNull();
+    // Space (a click on the native input) is ignored until the answer.
+    fireEvent.click(control);
+    expect(onCheckedChange).toHaveBeenCalledTimes(1);
+    expect(control).toBeChecked();
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(control).toBeChecked();
+    expect(control).not.toHaveAttribute("aria-busy");
+    expect(container.querySelector("[data-loading]")).toBeNull();
+  });
+
+  it("async: reject puts the previous state back", async () => {
+    const save = deferred();
+    render(<Switch.Root aria-label="SMS" defaultChecked onCheckedChange={() => save.promise} />);
+    const control = screen.getByRole("switch");
+    fireEvent.click(control);
+    expect(control).not.toBeChecked();
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(control).toBeChecked();
+    expect(control).not.toHaveAttribute("aria-busy");
+  });
+
+  it("async controlled: the owner applies the state before resolving", async () => {
+    function Controlled() {
+      const [checked, setChecked] = React.useState(false);
+      return (
+        <Switch.Root
+          aria-label="Сводка"
+          checked={checked}
+          onCheckedChange={async (next) => {
+            await Promise.resolve();
+            setChecked(next);
+          }}
+        />
+      );
+    }
+    render(<Controlled />);
+    const control = screen.getByRole("switch");
+    await act(async () => {
+      fireEvent.click(control);
+    });
+    expect(control).toBeChecked();
+    expect(control).not.toHaveAttribute("aria-busy");
+  });
+
+  it("loading: busy, ignores presses", () => {
+    const onCheckedChange = vi.fn();
+    render(<Switch.Root aria-label="Сводка" loading onCheckedChange={onCheckedChange} />);
+    const control = screen.getByRole("switch");
+    expect(control).toHaveAttribute("aria-busy", "true");
+    fireEvent.click(control);
+    expect(onCheckedChange).not.toHaveBeenCalled();
+    expect(control).not.toBeChecked();
   });
 });

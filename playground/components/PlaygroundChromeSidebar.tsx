@@ -57,7 +57,7 @@ function Account() {
           Анна Смирнова
         </Sidebar.Account>
       </Dropdown.Trigger>
-      <Dropdown.Content side="right" align="end">
+      <Dropdown.Content side="right">
         <Dropdown.Item>
           <Dropdown.ItemIcon>
             <Icon name="object.user" />

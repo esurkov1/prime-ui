@@ -1,0 +1,30 @@
+/* Layout of the Composer scenarios: semantic tokens only. */
+
+/* A chat column: the composer sits at the bottom of a conversation of this width. */
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  width: min(100%, calc(var(--prime-space-24) * 6));
+  margin-inline: auto;
+}
+
+/* voice.tsx: room above the composer for the round video preview, as a chat history gives it. */
+.withPreview {
+  padding-block-start: calc(var(--prime-message-video-note) + var(--prime-space-8));
+}
+
+/* narrow.tsx: a phone-width chat. */
+.phone {
+  width: min(100%, calc(var(--prime-space-20) * 4));
+  margin-inline: auto;
+}
+
+/* sizes.tsx, states.tsx: one composer per row with its caption. */
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  width: min(100%, calc(var(--prime-space-24) * 6));
+  margin-inline: auto;
+}

@@ -27,7 +27,7 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 └─ Radio.Root           one option (value): the <label> row with the input and the circle, its hint
    └─ Radio.Label       the visible text of the option
 ```
-`Radio.Root` must be inside `Radio.Group`.
+`Radio.Root` must be inside `Radio.Group`. Without `Radio.Label` only the circle renders — give the option an `aria-label`.
 
 ## API
 
@@ -161,5 +161,5 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 - Eight or more options → use `Select`.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (group label, option rows), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
+- **Built from:** [Label](../label/COMPONENT.md) (group label), [Hint](../hint/COMPONENT.md) (`hint`, `error`, option hints); option rows are native `<label>` elements
 - **See also:** [Checkbox](../checkbox/COMPONENT.md), [Switch](../switch/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Select](../select/COMPONENT.md)

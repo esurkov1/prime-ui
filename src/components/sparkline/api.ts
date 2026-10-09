@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Sparkline",
-      en: '`ref` → `HTMLDivElement` (the root). A headline (title · date, value · change) over a line chart; the chart is a `role="slider"` that picks a point.',
-      ru: 'Заголовок (название · дата, значение · изменение) над линейным графиком; график — `role="slider"`, выбирающий точку.',
+      en: '`ref` → `HTMLDivElement` (the root). A headline (title · date, value · change) over a line or bar chart; the chart is a `role="slider"` that picks a point. The change hides when a percentage means nothing (the previous value is 0 or the sign flips).',
+      ru: 'Заголовок (название · дата, значение · изменение) над линейным графиком или столбиками; график — `role="slider"`, выбирающий точку. Изменение скрыто, когда процент бессмысленен (предыдущее значение 0 или знак сменился).',
       props: [
         {
           name: "data",
@@ -20,6 +20,27 @@ export const api: ComponentApi = {
           required: true,
           en: "Visible title above the value and the accessible name of the chart.",
           ru: "Видимое название над значением и доступное имя графика.",
+        },
+        {
+          name: "variant",
+          type: '"line" | "bars"',
+          default: '"line"',
+          en: "`line` — a line over a soft area; `bars` — a bar per point standing on a zero line: up when positive, down (danger) when negative, the value end rounded.",
+          ru: "`line` — линия над мягкой заливкой; `bars` — столбик на точку от нулевой линии: вверх при плюсе, вниз (danger) при минусе, конец значения скруглён.",
+        },
+        {
+          name: "highlight",
+          type: "number",
+          default: "the latest point",
+          en: "Index of the point at rest (the current month): the headline shows it when nobody scrubs and leaving the chart returns to it; `bars` draw the other bars quieter.",
+          ru: "Индекс точки в покое (текущий месяц): заголовок показывает её, пока график не ведут, и возвращается к ней; в `bars` остальные столбики тише.",
+        },
+        {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "The series is on its way: Skeletons of the date, the value and the plot that cross-fade into the data; the title stays, the root is `aria-busy` and the chart is not focusable yet.",
+          ru: "Ряд загружается: Skeleton даты, значения и графика, которые плавно сменяются данными; название остаётся, корень `aria-busy`, график пока не в фокусе.",
         },
         {
           name: "formatValue",

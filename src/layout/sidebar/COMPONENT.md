@@ -145,7 +145,7 @@ useSidebar()                       state hook for custom parts inside Root
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `current` | `boolean` | `false` | Current page: `aria-current="page"`, `data-state="active"`; surface fill and a raised shadow (a deeper wash in a flyout). |
+| `current` | `boolean` | `false` | Current page: `aria-current="page"`, `data-state="active"`; a muted fill two ladder steps off the rail, apart from the hover wash, and primary text and icon colour (a translucent wash in a flyout). No shadow. |
 | `disabled` | `boolean` | `false` | Not interactive: `disabled` / `aria-disabled`, `data-disabled`; a link loses its `href`. |
 | `href` | `string` | — | Renders an `<a>` (with `target`, `rel`). |
 | `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `NavLink`) as the item; its children are the label and parts. |
@@ -200,7 +200,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Sidebar.SubTrigger
-`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. Expanded: click, `→` / `←` open and close. Compact: hover (after a short intent delay), click, `Enter` · `Space` · `→` open the flyout (`aria-haspopup="dialog"`); on the active path it takes the current lift.
+`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. Expanded: click, `→` / `←` open and close. Compact: hover (after a short intent delay), click, `Enter` · `Space` · `→` open the flyout (`aria-haspopup="dialog"`); on the active path it takes the current fill.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -287,7 +287,7 @@ The rail width does not depend on `size`.
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `collapsible` (Group) | the heading is a button with a chevron at its end; items fold away; folded on the rail, one `…` row opens them in a flyout | long navigation with sections | off |
-| `current` (Item) | surface fill + raised shadow, primary text and icon | the current page | off |
+| `current` (Item) | `fill-muted-hover` fill (a `fill-subtle-active` wash in a flyout), primary text and icon | the current page | off |
 | `disabled` (Item) | `text-disabled`, no hover, `cursor: not-allowed` | an unavailable section | off |
 
 Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand; on phones (`offCanvas="auto"`) or always (`offCanvas="always"`) pair it with `AppHeader.MenuButton` (`open` / `onOpenChange`). One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
@@ -393,5 +393,5 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 - Your own `localStorage` code for the rail mode → `persistKey` keeps the mode and the folded groups.
 
 ## Related
-- **Built from:** [ScrollContainer](../../components/scroll-container/COMPONENT.md), [Badge](../../components/badge/COMPONENT.md), [Tooltip](../../components/tooltip/COMPONENT.md), [Popover](../../components/popover/COMPONENT.md) (compact flyout), [Button](../../components/button/COMPONENT.md) (header toggle, row action), [Avatar](../../components/avatar/COMPONENT.md) slot, Icon (`nav.sidebarCollapse`, `nav.sidebarExpand`, `nav.chevronsLeft`, `nav.chevronDown`, `nav.chevronsUpDown`, `action.add`)
+- **Built from:** [ScrollContainer](../../components/scroll-container/COMPONENT.md), [Badge](../../components/badge/COMPONENT.md), [Tooltip](../../components/tooltip/COMPONENT.md), [Popover](../../components/popover/COMPONENT.md) (compact flyout), [Button](../../components/button/COMPONENT.md) (header toggle, row action), [Avatar](../../components/avatar/COMPONENT.md) slot, Icon (`nav.sidebarCollapse`, `nav.sidebarExpand`, `nav.chevronsLeft`, `nav.chevronDown`, `nav.chevronsUpDown`, `action.add`, `action.more`)
 - **See also:** [AppShell](../app-shell/COMPONENT.md), [Dropdown](../../components/dropdown/COMPONENT.md) (account menu), [Drawer](../../components/drawer/COMPONENT.md), [Kbd](../../components/kbd/COMPONENT.md)

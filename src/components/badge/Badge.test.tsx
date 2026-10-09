@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
@@ -329,5 +330,79 @@ describe("Badge", () => {
     const badge = screen.getByTestId("b");
     expect(badge).toHaveAttribute("data-icon-start", "true");
     expect(badge.querySelector("[data-edge]")).toHaveAttribute("aria-hidden", "true");
+  });
+});
+
+describe("Badge async onRemove", () => {
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  it("waits busy with a spinner in the segment and takes no second press", async () => {
+    const save = deferred();
+    const onRemove = vi.fn(() => save.promise);
+    render(
+      <Badge.Root data-testid="b" labels={{ remove: "Убрать «Москва»" }} onRemove={onRemove}>
+        Москва
+      </Badge.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Убрать «Москва»" });
+    await userEvent.click(button);
+    const badge = screen.getByTestId("b");
+    expect(badge).toHaveAttribute("aria-busy", "true");
+    expect(badge).toHaveAttribute("data-pending", "true");
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(button);
+    expect(onRemove).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(badge).not.toHaveAttribute("aria-busy");
+  });
+
+  it("reject keeps the badge and announces the failure", async () => {
+    const save = deferred();
+    render(
+      <Badge.Root
+        data-testid="b"
+        labels={{ remove: "Убрать «Москва»", removeFailed: "Фильтр «Москва» не убран" }}
+        onRemove={() => save.promise}
+      >
+        Москва
+      </Badge.Root>,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Убрать «Москва»" }));
+    await act(async () => {
+      save.reject(new Error("offline"));
+    });
+    expect(screen.getByTestId("b")).not.toHaveAttribute("aria-busy");
+    expect(screen.getByRole("status")).toHaveTextContent("Фильтр «Москва» не убран");
+  });
+
+  it("resolve after the owner took it out: the badge is gone", async () => {
+    function Filters() {
+      const [shown, setShown] = React.useState(true);
+      return shown ? (
+        <Badge.Root
+          labels={{ remove: "Убрать «Москва»" }}
+          onRemove={async () => {
+            await Promise.resolve();
+            setShown(false);
+          }}
+        >
+          Москва
+        </Badge.Root>
+      ) : null;
+    }
+    render(<Filters />);
+    await userEvent.click(screen.getByRole("button", { name: "Убрать «Москва»" }));
+    expect(screen.queryByText("Москва")).toBeNull();
   });
 });

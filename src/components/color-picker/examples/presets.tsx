@@ -1,4 +1,4 @@
-/** A quick color from the palette: a square trigger next to a field and a Button trigger; «no color» allowed — `ColorPresets`, `allowEmpty`, `asChild`. */
+/** A quick color from the palette: a square trigger next to a field and a Button trigger; «no color» allowed — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`. */
 import { Button, COLOR_PRESETS, ColorPresets } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -14,11 +14,13 @@ export default function ColorPickerPresetsExample() {
         defaultValue="#5068f5"
         labels={{ trigger: "Цвет метки" }}
       >
-        <ColorPresets.Trigger />
+        <ColorPresets.Trigger>
+          <ColorPresets.SwatchButton />
+        </ColorPresets.Trigger>
         <ColorPresets.Content />
       </ColorPresets.Root>
       <ColorPresets.Root defaultValue="#22c55e">
-        <ColorPresets.Trigger asChild>
+        <ColorPresets.Trigger>
           <Button.Root variant="soft" tone="neutral">
             <Button.Icon>
               <ColorPresets.Swatch />

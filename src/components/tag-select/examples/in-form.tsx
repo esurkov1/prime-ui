@@ -1,4 +1,4 @@
-/** A new task form: the required labels field is checked on submit, its error shakes the field and leaves once a label is added, a calm note confirms the task — `required`, `error`, `creatable`. */
+/** A new task form: the required labels field is checked on submit, its error shakes the field and leaves once a label is added, a calm note confirms the task; the tags go with the form — `required`, `error`, `creatable`, `name`. */
 import { Button, Input, TagSelect, type TagSelectOption, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -39,6 +39,7 @@ export default function TagSelectInFormExample() {
       </Input.Root>
       <TagSelect
         label="Метки"
+        name="labels"
         required
         hint="Помогают фильтровать задачи"
         error={error}
@@ -52,7 +53,13 @@ export default function TagSelectInFormExample() {
         creatable
         placeholder="Добавить метку"
       />
-      <TagSelect label="Наблюдатели" optional options={PEOPLE} placeholder="Добавить человека" />
+      <TagSelect
+        label="Наблюдатели"
+        name="watchers"
+        optional
+        options={PEOPLE}
+        placeholder="Добавить человека"
+      />
       <div className={styles.actions}>
         {saved ? (
           <Typography as="p" variant="body-s" tone="secondary">

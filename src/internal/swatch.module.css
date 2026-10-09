@@ -1,7 +1,7 @@
 /*
  * Shared color swatch (ColorSwatches, ColorPresets, ColorPicker). Every swatch carries a faint inner
- * ring so white / near-background colors stay visible; the selection is a 2px accent ring with a
- * 2px gap plus a check mark that contrasts with the color.
+ * ring so white / near-background colors stay visible; the selection is a check mark that
+ * contrasts with the color (no selection ring — a ring shows only for keyboard focus).
  */
 
 /* ---- Color layers ---- */

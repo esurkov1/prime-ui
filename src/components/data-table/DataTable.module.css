@@ -2,7 +2,8 @@
  * DataTable — Graphite.
  * Surface container (a layer of the ladder, card radius, no outer border), head two ladder steps
  * off it, hairline row separators.
- * Density follows `size`: xs/s = compact (row-height-s), m = default (row-height-m), l/xl = comfortable (row-height-l).
+ * Density follows `size`: the row height is `--prime-table-row-height-<size>` (36 · 36 · 44 · 52 · 52),
+ * public so a skeleton outside the table can stand in the same geometry.
  * Row height is content-driven: the row height token is a minimum, and cells carry vertical padding
  * `--dt-pad-y` = (row height − control one tier down) / 2. A single line of text or a cell control one
  * tier down (m table → s button) keeps the row at its tier height; two-line cells with an avatar grow
@@ -42,8 +43,10 @@
   --dt-column-divider-width: var(--prime-border-width);
 
   --dt-z-sticky-first-column: 1;
-  --dt-z-sticky-header: 2;
-  --dt-z-sticky-corner: 3;
+  /* A sticky group header rides over the sticky first column, under the head. */
+  --dt-z-sticky-group: 2;
+  --dt-z-sticky-header: 3;
+  --dt-z-sticky-corner: 4;
 
   /* Edge cue: a soft shadow over the edge that hides columns, tuned per theme. */
   --dt-edge-depth: var(--prime-space-4);
@@ -65,7 +68,7 @@
 
 /* Header is one step below the cell text of the same tier; heights follow the control tiers. */
 .root[data-size="xs"] {
-  --dt-row-height: var(--prime-table-row-height-s);
+  --dt-row-height: var(--prime-table-row-height-xs);
   --dt-cell-control: var(--prime-control-xs-height);
   --dt-head-height: var(--prime-control-xs-height);
   --dt-head-size: var(--prime-control-xs-label-size);
@@ -103,7 +106,7 @@
 }
 
 .root[data-size="xl"] {
-  --dt-row-height: var(--prime-table-row-height-l);
+  --dt-row-height: var(--prime-table-row-height-xl);
   --dt-cell-control: var(--prime-control-l-height);
   --dt-head-height: var(--prime-control-xl-height);
   --dt-head-size: var(--prime-control-xl-label-size);
@@ -131,6 +134,17 @@
 
 .root[data-selectable="true"][data-expandable="true"] {
   --dt-lead: calc(var(--dt-select-w) + var(--dt-toggle-w));
+}
+
+/* Reorderable rows (`onReorder`; never with expandable rows): the handle column leads. Its grip is
+   the fixed `xs` Dnd.Handle; the next cell's padding is the gap to it. */
+.root[data-reorderable="true"] {
+  --dt-handle-w: calc(var(--prime-control-xs-height) + var(--dt-pad-x));
+  --dt-lead: var(--dt-handle-w);
+}
+
+.root[data-reorderable="true"][data-selectable="true"] {
+  --dt-lead: calc(var(--dt-handle-w) + var(--dt-select-w));
 }
 
 /* Only while dragging across checkboxes: no native text selection. */
@@ -182,6 +196,20 @@
   width: 100%;
   padding: 0;
   isolation: isolate;
+}
+
+/* `scrollHeight="fill"`: the root takes the height of its flex / grid parent (or a sized block),
+   the viewport takes what the toolbar and the footer leave and scrolls the rows. */
+.root[data-scroll-height="fill"] {
+  flex: 1 1 0%;
+  height: 100%;
+  min-height: 0;
+}
+
+.root[data-scroll-height="fill"] .frame,
+.root[data-scroll-height="fill"] .viewport {
+  flex: 1 1 0%;
+  min-height: 0;
 }
 
 /*
@@ -246,6 +274,8 @@
 .headCell {
   height: var(--dt-head-height);
   padding: 0 var(--dt-pad-x);
+  --sticky-bg: var(--dt-head-bg);
+
   background: var(--dt-head-bg);
   font-size: var(--dt-head-size);
   line-height: var(--dt-head-line-height);
@@ -441,8 +471,40 @@
 .selectCell + .cell,
 .toggleCell + .cell,
 .selectCell + .headCell,
-.toggleCell + .headCell {
+.toggleCell + .headCell,
+.handleCell + .cell,
+.handleCell + .headCell {
   border-inline-start-width: 0;
+}
+
+/* Row handle column: the grip only, centred on the row; a spinner stands in while the row's move
+   is saved. */
+.handleCell {
+  box-sizing: border-box;
+  width: var(--dt-handle-w);
+  min-width: var(--dt-handle-w);
+  max-width: var(--dt-handle-w);
+  padding-inline: var(--dt-pad-x) 0;
+  line-height: 0;
+}
+
+.handleSpinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--prime-control-xs-height);
+  block-size: var(--prime-control-xs-height);
+}
+
+/* A row whose move is being saved: its content quiets down until the answer, both ways eased. */
+.root[data-reorderable="true"] .row > .cell {
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.row[aria-busy="true"] > .cell:not(.handleCell) {
+  opacity: 0.6;
 }
 
 .chevron {
@@ -529,6 +591,35 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/*
+ * Heatmap cells (column `scale`): the cell's opaque base is a step of the sequential chart scale;
+ * steps 4–5 are dark enough to take `chart-scale-fg` text. The value stays in the cell (never
+ * colour alone); hover, selection and focus still wash over it.
+ */
+.cell[data-scale="1"] {
+  --dt-cell-bg: var(--prime-color-chart-scale-1);
+}
+
+.cell[data-scale="2"] {
+  --dt-cell-bg: var(--prime-color-chart-scale-2);
+}
+
+.cell[data-scale="3"] {
+  --dt-cell-bg: var(--prime-color-chart-scale-3);
+}
+
+.cell[data-scale="4"] {
+  --dt-cell-bg: var(--prime-color-chart-scale-4);
+
+  color: var(--prime-color-chart-scale-fg);
+}
+
+.cell[data-scale="5"] {
+  --dt-cell-bg: var(--prime-color-chart-scale-5);
+
+  color: var(--prime-color-chart-scale-fg);
 }
 
 .root[data-striped="true"] .row[data-stripe="alt"] {
@@ -643,6 +734,161 @@
   --dt-wash: var(--prime-color-fill-strong);
 }
 
+/*
+ * Link rows (`getRowHref`): the key cell's text is the link, and the same link (hidden from AT and
+ * Tab) covers every other cell, so the whole row is the link's hit area — a sticky cell included.
+ * Controls inside the cells stand above it; a custom widget joins them with `data-row-click-ignore`.
+ */
+.row[data-link="true"] > .cell:not(.firstColumnSticky, .stickyLead) {
+  position: relative;
+}
+
+.rowLink {
+  display: block;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+}
+
+.rowLink::after,
+.cellLink {
+  position: absolute;
+  inset: 0;
+}
+
+.rowLink::after {
+  content: "";
+}
+
+.cellLink {
+  outline: none;
+}
+
+/* Zero specificity: a control's own `position` / `z-index` always wins. */
+:where(.row[data-link="true"] > .cell)
+  :where(
+    a[href]:not([data-row-link]),
+    button,
+    input,
+    select,
+    textarea,
+    label,
+    summary,
+    [contenteditable="true"],
+    [contenteditable=""],
+    [tabindex]:not([tabindex="-1"]),
+    [role="button"],
+    [role="link"],
+    [role="checkbox"],
+    [role="radio"],
+    [role="switch"],
+    [role="menuitem"],
+    [role="option"],
+    [role="tab"],
+    [role="slider"],
+    [role="combobox"],
+    [role="textbox"],
+    [data-row-click-ignore]
+  ) {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * Focus on a row that opens: its focused link (link rows) or the row itself (in-place rows) rings
+ * the whole row — inset on the cells, so the scroll viewport never clips it — and takes the hover
+ * wash.
+ */
+.row:is(:focus-visible, :has(.rowLink:focus-visible)) {
+  --dt-ring: var(--prime-focus-width);
+  --dt-wash: var(--prime-color-fill-subtle-active);
+
+  outline: none;
+}
+
+.row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell {
+  box-shadow:
+    inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
+    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring);
+}
+
+.row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell:first-child {
+  box-shadow:
+    inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
+    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring),
+    inset var(--dt-ring) 0 0 var(--prime-color-focus-ring);
+}
+
+.row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell:last-child {
+  box-shadow:
+    inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
+    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring),
+    inset calc(-1 * var(--dt-ring)) 0 0 var(--prime-color-focus-ring);
+}
+
+.root:dir(rtl) .row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell:first-child {
+  box-shadow:
+    inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
+    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring),
+    inset calc(-1 * var(--dt-ring)) 0 0 var(--prime-color-focus-ring);
+}
+
+.root:dir(rtl) .row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell:last-child {
+  box-shadow:
+    inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
+    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring),
+    inset var(--dt-ring) 0 0 var(--prime-color-focus-ring);
+}
+
+/* ---------- Row groups ---------- */
+
+/* A group header: one ladder step off the table (opaque, so it can stick), head-tier text. */
+.groupCell {
+  height: var(--dt-head-height);
+  padding: 0;
+  background: var(--dt-step);
+  font-size: var(--dt-head-size);
+  line-height: var(--dt-head-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-text-secondary);
+  text-align: start;
+  vertical-align: middle;
+}
+
+tbody + tbody > .groupRow > .groupCell {
+  border-top: var(--dt-divider-width) solid var(--dt-divider-color);
+}
+
+.groupRow + .row .cell {
+  border-top: var(--dt-divider-width) solid var(--dt-divider-color);
+}
+
+/* Name at the start, totals at the end of the visible width: it stays in view while the table
+   scrolls sideways (the root is the inline-size container). */
+.groupContent {
+  position: sticky;
+  inset-inline-start: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-2) var(--prime-space-4);
+  width: 100cqi;
+  max-width: 100%;
+  padding: 0 var(--dt-pad-x);
+}
+
+.groupCell[data-sticky="true"] {
+  position: sticky;
+  top: 0;
+  z-index: var(--dt-z-sticky-group);
+}
+
+.root[data-sticky-header="true"] .groupCell[data-sticky="true"] {
+  top: var(--dt-head-height);
+}
+
 /* ---------- Sticky first column ---------- */
 
 .firstColumnSticky {
@@ -654,6 +900,19 @@
 
 .root:dir(rtl) .firstColumnSticky {
   box-shadow: inset var(--prime-border-width) 0 0 var(--dt-divider-color);
+}
+
+/* A sticky head keeps the seam cover (`sticky.module.css`) beside the column edge. */
+.headCell.firstColumnSticky {
+  box-shadow:
+    inset calc(-1 * var(--prime-border-width)) 0 0 var(--dt-divider-color),
+    var(--sticky-bleed, 0 0 0 0 transparent);
+}
+
+.root:dir(rtl) .headCell.firstColumnSticky {
+  box-shadow:
+    inset var(--prime-border-width) 0 0 var(--dt-divider-color),
+    var(--sticky-bleed, 0 0 0 0 transparent);
 }
 
 /* Start edge cue of a sticky first column: a shadow from its end edge over the scrolled columns. */
@@ -692,6 +951,10 @@
 
 .root[data-selectable="true"] .toggleCell.stickyLead {
   inset-inline-start: var(--dt-select-w);
+}
+
+.root[data-reorderable="true"] .selectCell.stickyLead {
+  inset-inline-start: var(--dt-handle-w);
 }
 
 .headCell.stickyLead {

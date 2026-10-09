@@ -105,11 +105,69 @@ export const api: ComponentApi = {
           ru: "Неактивное поле; список не открывается.",
         },
         {
+          name: "search",
+          type: "string",
+          en: "Controlled search query (`Select.Content searchable`); together with `onSearchChange`. Cleared when the list closes.",
+          ru: "Управляемый поисковый запрос (`Select.Content searchable`); вместе с `onSearchChange`. Сбрасывается при закрытии списка.",
+        },
+        {
+          name: "defaultSearch",
+          type: "string",
+          default: '""',
+          en: "Initial query, uncontrolled.",
+          ru: "Начальный запрос без контроля.",
+        },
+        {
+          name: "onSearchChange",
+          type: "(search: string) => void",
+          en: 'Called with the new query: typing, and `""` when the list closes. Load the matching options here for a server search.',
+          ru: 'Вызывается с новым запросом: ввод и `""` при закрытии. Здесь загружайте подходящие пункты для поиска на сервере.',
+        },
+        {
+          name: "filter",
+          type: "boolean",
+          default: "true",
+          en: "The list filters its items by the query. `false` when the options come from a server: every item shows, the query is still marked in the labels.",
+          ru: "Список сам фильтрует пункты по запросу. `false`, когда пункты приходят с сервера: показываются все, совпадение в подписи всё равно выделяется.",
+        },
+        {
           name: "loading",
           type: "boolean",
           default: "false",
-          en: "Spinner instead of the chevron, `aria-busy`, a status row in the list.",
-          ru: "Спиннер вместо шеврона, `aria-busy`, строка загрузки в списке.",
+          en: "Options are loading: a Spinner instead of the chevron, `aria-busy`, skeleton rows in the list while no item matches; items already on screen stay.",
+          ru: "Пункты загружаются: спиннер вместо шеврона, `aria-busy`, строки-скелеты в списке, пока нет ни одного пункта; уже показанные пункты остаются.",
+        },
+        {
+          name: "loadingMore",
+          type: "boolean",
+          default: "false",
+          en: "More options are loading at the end: skeleton rows after the items.",
+          ru: "Догружаются следующие пункты: строки-скелеты после пунктов.",
+        },
+        {
+          name: "hasMore",
+          type: "boolean",
+          default: "false",
+          en: "More options exist: reaching the end of the list calls `onLoadMore`.",
+          ru: "Есть ещё пункты: конец списка вызывает `onLoadMore`.",
+        },
+        {
+          name: "onLoadMore",
+          type: "() => void | Promise<void>",
+          en: "Called once per round with `hasMore` when the end of the list scrolls into view or the highlight reaches the last option; set `loadingMore` while it runs.",
+          ru: "Вызывается один раз за порцию при `hasMore`, когда конец списка прокручен в видимую область или подсветка дошла до последнего пункта; на время загрузки ставьте `loadingMore`.",
+        },
+        {
+          name: "loadError",
+          type: "ReactNode",
+          en: 'The options failed to load: the message replaces the list in `role="alert"`. Not the field `error` (validation).',
+          ru: 'Пункты не загрузились: сообщение вместо списка с `role="alert"`. Не путать с `error` поля (проверка).',
+        },
+        {
+          name: "onRetry",
+          type: "() => void",
+          en: "A retry button (`labels.retry`) under `loadError`; Enter in the open list runs it too.",
+          ru: "Кнопка «Повторить» (`labels.retry`) под `loadError`; Enter в открытом списке тоже её вызывает.",
         },
         {
           name: "clearable",
@@ -117,6 +175,12 @@ export const api: ComponentApi = {
           default: "false",
           en: "A clear segment before the chevron while a value is set; `Delete` / `Backspace` on the trigger clear too.",
           ru: "Сегмент очистки перед шевроном, пока есть значение; `Delete` / `Backspace` на триггере тоже очищают.",
+        },
+        {
+          name: "name",
+          type: "string",
+          en: 'Form field name: hidden inputs submit the value (`""` while empty; one input per value with `multiple`).',
+          ru: "Имя поля формы: скрытые input отправляют значение (пустая строка без выбора; по одному на значение при `multiple`).",
         },
         {
           name: "placeholder",
@@ -162,7 +226,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Trigger",
-      en: '`ref` → `HTMLButtonElement`. `<button role="combobox">` with the value, the clear segment and the chevron (a Spinner while `loading`). + native button props.',
+      en: '`ref` → `HTMLButtonElement`. `<button role="combobox">` with the value, the clear segment and the chevron (a Spinner while `loading`). + native button props (`onFocus`, `onBlur`, `onKeyDown`… reach the button).',
       ru: 'Кнопка `role="combobox"`: значение, сегмент очистки и шеврон (спиннер при загрузке).',
       props: [
         {
@@ -181,8 +245,8 @@ export const api: ComponentApi = {
         {
           name: "renderValue",
           type: "(item: { value: string; label: string }) => ReactNode",
-          en: "Single mode: draws the picked option in the trigger with the row parts (Thumbnail, ItemText, ItemDescription); not called while empty.",
-          ru: "Одиночный выбор: рисует выбранный пункт в триггере частями строки; без значения не вызывается.",
+          en: "Single mode: draws the picked option in the trigger with the same parts as the row — a leading Avatar or Thumbnail, ItemText, ItemDescription, and a trailing Badge or ItemMeta at the end before the chevron; not called while empty.",
+          ru: "Одиночный выбор: рисует выбранный пункт в триггере теми же частями, что и строку, — Avatar или Thumbnail в начале, ItemText, ItemDescription и Badge или ItemMeta в конце перед шевроном; без значения не вызывается.",
         },
         spanRest,
       ],
@@ -195,15 +259,15 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Content",
-      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"` and the empty state. Below 640px of viewport the panel is a bottom sheet: a scrim, a grab handle, swipe down to close, page scroll locked.',
+      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"`, the empty state and the load states (skeleton rows, the load error), which cross-fade. Below 640px of viewport the panel is a bottom sheet: a scrim, a grab handle, swipe down to close, page scroll locked.',
       ru: "Портал и панель списка; смонтирована и в закрытом виде, чтобы триггер знал подписи. Уже 640px экрана панель становится шторкой снизу: подложка, ручка, закрытие свайпом вниз, прокрутка страницы заблокирована.",
       props: [
         {
           name: "searchable",
           type: "boolean",
           default: "false",
-          en: "A search field on top; items filter by label, description and `keywords`.",
-          ru: "Поле поиска сверху; пункты фильтруются по подписи, описанию и `keywords`.",
+          en: "A search field on top; items filter by label, description and `keywords` — or the owner loads them by the query (`search`, `filter={false}` on Root).",
+          ru: "Поле поиска сверху; пункты фильтруются по подписи, описанию и `keywords` — или владелец загружает их по запросу (`search`, `filter={false}` на Root).",
         },
         {
           name: "children",
@@ -255,15 +319,15 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "Text, or `Select.ItemIcon`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta` as direct children.",
-          ru: "Текст или части пункта прямыми детьми.",
+          en: "Text, or `Select.ItemIcon`, `Avatar.Root`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`, `Badge.Root` as direct children.",
+          ru: "Текст или части пункта прямыми детьми: иконка, Avatar, Thumbnail, текст, описание, мета, Badge.",
         },
       ],
     },
     {
       name: "Select.ItemText · Select.ItemDescription · Select.ItemMeta",
-      en: "`ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line (searchable; makes the row two-line) / a trailing muted value before the check. A `Thumbnail.Root` child is the leading media, sized to the tier unless it sets `size`. + native `<span>` props.",
-      ru: "Части богатого пункта: заголовок, вторая строка, значение справа; Thumbnail слева.",
+      en: "`ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line (searchable; makes the row two-line) / a trailing muted value before the check. An `Avatar.Root` or `Thumbnail.Root` child is the leading media (a Thumbnail makes the row two-line), sized to the tier unless it sets `size`; a `Badge.Root` child trails the text one tier down. + native `<span>` props.",
+      ru: "Части богатого пункта: заголовок, вторая строка, значение справа; Avatar или Thumbnail слева по ярусу, Badge после текста.",
       props: [],
     },
     {
@@ -315,8 +379,14 @@ export const api: ComponentApi = {
     {
       key: "loading",
       default: "Загрузка…",
-      en: "Status row while `loading`.",
-      ru: "Строка загрузки при `loading`.",
+      en: "Announced while `loading` or `loadingMore`.",
+      ru: "Объявляется скринридером при `loading` или `loadingMore`.",
+    },
+    {
+      key: "retry",
+      default: "Повторить",
+      en: "The retry button under `loadError` (`onRetry`).",
+      ru: "Кнопка повтора под `loadError` (`onRetry`).",
     },
     {
       key: "clear",

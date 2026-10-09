@@ -1,0 +1,184 @@
+/*
+ * Message.File — a round tile and the name over the size line (the meta's spacer at its end). One
+ * fixed width: the card width of a message, within 75% of the row.
+ *
+ * The tile is the file's one action, in one spot over the tile's face:
+ *   download — an accent disk with the arrow (`internal/roundButton`), shown on hover and focus
+ *              (always on touch);
+ *   cancel   — while the file transfers, either way: the shared transfer disk
+ *              (`internal/transferDisk`, `xl`) — the cross on the media shade with the progress
+ *              ring along its edge, always shown;
+ *   retry    — after a failure: the same disk in danger with the refresh glyph;
+ *   fetch    — a file not fetched yet (`remote`): the same disk with the download arrow.
+ * The face (the format in its hue, or the file's picture) fades under a shown action and comes
+ * back (`fast`); the disk fades and shrinks away once the file is done. Nothing here changes the
+ * card's size: the name and the size line never move.
+ */
+.file {
+  display: grid;
+  grid-template-areas:
+    "tile name"
+    "tile meta";
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--prime-space-3);
+  inline-size: min(var(--prime-message-card-width), 75cqi);
+  min-inline-size: 0;
+}
+
+.tile {
+  grid-area: tile;
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: var(--prime-space-12);
+  block-size: var(--prime-space-12);
+  border-radius: var(--prime-radius-full);
+  color: var(--hue-text);
+  isolation: isolate;
+}
+
+/*
+ * The face carries the format's hue: when the action shows, the whole face fades, so a cancel's
+ * media shade stands on the bubble alone (a dark translucent disk, a white cross) in both themes.
+ */
+.face {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--hue-soft);
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* No format: the document glyph on the muted fill. */
+.tile:is(:not([data-color]), [data-color="gray"]) {
+  color: var(--prime-color-text-muted);
+}
+
+.tile:is(:not([data-color]), [data-color="gray"]) > .face {
+  background: var(--prime-color-fill-muted);
+}
+
+.format {
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-semibold);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+}
+
+/* The picture fills the circle. */
+.face > .preview {
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: 0;
+}
+
+/* The download covers the tile: its disk is the tile, so its hover, press and focus are the circle. */
+.tile > .action {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  --round-size: 100%;
+  --prime-icon-size: var(--prime-icon-m);
+
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: 0;
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* Shown on focus and hover (always on touch). The face under a shown download fades. */
+.tile > .action:focus-visible {
+  opacity: 1;
+}
+
+.action:focus-visible ~ .face {
+  opacity: 0;
+}
+
+@media (hover: hover) {
+  .tile:hover > .action {
+    opacity: 1;
+  }
+
+  .tile[data-action]:hover > .face {
+    opacity: 0;
+  }
+}
+
+@media (hover: none) {
+  .tile[data-action] > .action {
+    opacity: 1;
+  }
+
+  .tile[data-action] > .face {
+    opacity: 0;
+  }
+}
+
+/*
+ * A transfer: the shared transfer disk (`internal/transferDisk`, `xl`) is the tile — the cross on
+ * the media shade with the ring, the danger retry after a failure, the download arrow of a remote
+ * file. The face under it fades out and comes back once the disk is done and fades away itself.
+ */
+.disk {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+}
+
+.tile:is(
+    [data-transfer="remote"],
+    [data-transfer="queued"],
+    [data-transfer="loading"],
+    [data-transfer="failed"]
+  )
+  > .face {
+  opacity: 0;
+}
+
+.name {
+  grid-area: name;
+  align-self: end;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: var(--prime-font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  grid-area: meta;
+  align-self: start;
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-variant-numeric: tabular-nums;
+}
+
+.meta[data-failed] {
+  color: var(--prime-color-danger-text);
+}
+
+.size {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .face,
+  .tile > .action {
+    transition: none;
+  }
+}

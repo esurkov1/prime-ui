@@ -21,26 +21,6 @@
   gap: var(--prime-space-5);
 }
 
-.legend {
-  display: grid;
-  gap: var(--prime-space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.legendRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-}
-
-.amount {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
 /* A section without a card: heading row 16 above the table. */
 .recent {
   display: grid;

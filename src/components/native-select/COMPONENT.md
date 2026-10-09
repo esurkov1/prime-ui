@@ -128,5 +128,5 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 - Several values with `multiple` → not supported; use Select `multiple` or TagSelect.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) (field frame)
+- **Built from:** [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md) (field frame), `Icon` (chevron)
 - **See also:** [Select](../select/COMPONENT.md), [Radio](../radio/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

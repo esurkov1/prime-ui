@@ -84,6 +84,12 @@ export type NotificationOptions = NotificationContent & {
   persistent?: boolean;
   /** Shows the close button. Default `true`. */
   closable?: boolean;
+  /**
+   * The toast left: its timer ran out, the close button, a swipe, `dismiss()`, or a newer toast
+   * pushed it out of a full stack. Called once. The place to commit an action the toast offered to
+   * undo («Удалено» with «Отменить»).
+   */
+  onDismiss?: () => void;
 };
 
 export type NotificationRecord = NotificationOptions & {

@@ -3,10 +3,11 @@ import { ru } from "date-fns/locale";
 
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
-import type { PositionAlign } from "@/hooks/usePosition";
+import { DEFAULT_ALIGN, type PositionAlign } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
@@ -89,11 +90,26 @@ export type DatepickerRootProps = DatepickerPanelProps &
     align?: PositionAlign;
     /** Id of the field button; generated when omitted. */
     id?: string;
+    /**
+     * Submits the value with a form through hidden inputs: `yyyy-MM-dd` (`yyyy-MM-ddTHH:mm` with
+     * `withTime`); a range submits two values under the name, `from` then `to` (empty when open).
+     */
+    name?: string;
     /** Accessible name when there is no `label`; the current value is appended. */
     "aria-label"?: string;
     "aria-labelledby"?: string;
     "aria-describedby"?: string;
   };
+
+/** Form values of a `name`d field: one for a single date, `from` and `to` for a range. */
+function formValues(
+  value: { mode: "range"; value: DatepickerRange } | { mode: "single"; value: Date | null },
+  withTime: boolean,
+): string[] {
+  const iso = (date: Date | null) =>
+    date ? format(date, withTime ? "yyyy-MM-dd'T'HH:mm" : "yyyy-MM-dd") : "";
+  return value.mode === "range" ? [iso(value.value.from), iso(value.value.to)] : [iso(value.value)];
+}
 
 /** A field (field system: fill, tier height, rings) with the value; a click opens the panel in a popover. */
 function DatepickerRoot(props: DatepickerRootProps) {
@@ -110,12 +126,13 @@ function DatepickerRoot(props: DatepickerRootProps) {
     open: openProp,
     defaultOpen = false,
     onOpenChange,
-    disabled = false,
+    disabled: disabledProp = false,
     invalid: invalidProp,
     focusRing = true,
     fullWidth = false,
-    align = "start",
+    align = DEFAULT_ALIGN,
     id,
+    name,
     label,
     required = false,
     optional,
@@ -128,6 +145,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
     ...other
   } = props;
   const { options, rest } = splitCalendarOptions(other);
+  const disabled = useInheritedDisabled(disabledProp);
   const labels = { ...DATEPICKER_LABELS, ...options.labels };
   const ids = useFieldFrame(id, { hint, error, invalid: invalidProp }, ariaDescribedBy);
   const textId = `${ids.controlId}-value`;
@@ -142,6 +160,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
     ? `${valuePrefix ? `${valuePrefix} ` : ""}${shown}`
     : (placeholder ?? labels.placeholder);
   const hasLabel = label != null && label !== false;
+  const submitted = name ? formValues(value, Boolean(options.withTime)) : [];
 
   return (
     <FieldFrame
@@ -191,14 +210,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
             />
           </button>
         </Popover.Trigger>
-        <Popover.Content
-          align={align}
-          side="bottom"
-          size={size}
-          trapFocus
-          flush
-          className={styles.popover}
-        >
+        <Popover.Content align={align} size={size} trapFocus flush className={styles.popover}>
           <PanelView
             {...options}
             {...value}
@@ -209,6 +221,10 @@ function DatepickerRoot(props: DatepickerRootProps) {
           />
         </Popover.Content>
       </Popover.Root>
+      {submitted.map((item, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: a range always submits `from`, then `to`
+        <input key={index} type="hidden" name={name} value={item} disabled={disabled} />
+      ))}
     </FieldFrame>
   );
 }

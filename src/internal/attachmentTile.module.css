@@ -1,0 +1,298 @@
+/*
+ * The attachment tile: one square of a set of attachments (FileUpload tiles, the Composer tray).
+ * Every kind has the same slots: the pill at the top start (the format, or «Обложка»), the remove
+ * button at the top end, a band across the bottom (the name, then the size or a video's duration)
+ * and in the middle the picture, a video's first frame with its play mark, or the sheet of a file;
+ * the upload disk stands over the middle. Over a picture the picture is the ground: the chips, the
+ * band's gradient and the disk stand on the `media` shade, the same in both themes. On a file the
+ * band is on the tile's fill in the text roles and the pill is a kit Badge.
+ */
+
+/* ─── Sets of tiles ──────────────────────────────────────────────────────── */
+
+/* strip: one row of square tiles (`axis="x"`) in a sideways ScrollContainer; the padding keeps
+   the focus ring of an edge tile inside the scroller's clip. */
+.scroller {
+  min-width: 0;
+}
+
+.strip {
+  gap: var(--prime-space-2);
+  padding: var(--prime-space-1);
+}
+
+.strip > * {
+  flex: none;
+  inline-size: var(--prime-space-24);
+  aspect-ratio: 1;
+}
+
+/* ─── A tile ─────────────────────────────────────────────────────────────── */
+
+/* A size container: its actions fit themselves to the tile, not to the screen. `--tile-band` is
+   the height of the bottom band: the middle of a file (its sheet, its upload disk) stands above it. */
+.tile {
+  --tile-band: calc(
+    var(--prime-text-caption-line-height) +
+    var(--prime-space-4) +
+    var(--prime-space-2)
+  );
+
+  position: relative;
+  isolation: isolate;
+  container-type: inline-size;
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-fill-muted);
+  list-style: none;
+  transition: box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* A video tile: a Thumbnail of the `m` tier (first frame, play mark; no duration of its own — the
+   band says it) stretched over the whole tile; the tile is dragged. */
+.tile > .media {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/*
+ * A file: its band needs no gradient, so it is lower; the middle — the sheet glyph and the upload
+ * disk in its place — is the area between the pill and the band (`--tile-middle`), so even a small
+ * strip tile keeps the disk clear of both.
+ */
+.tile[data-kind="file"] {
+  --tile-band: calc(
+    var(--prime-text-caption-line-height) +
+    var(--prime-space-1) +
+    var(--prime-space-2)
+  );
+  --tile-middle: calc(var(--prime-space-2) + var(--prime-space-5));
+}
+
+.sheet {
+  position: absolute;
+  inset-inline: 0;
+  inset-block: var(--tile-middle) var(--tile-band);
+  display: grid;
+  place-items: center;
+  color: var(--prime-color-text-muted);
+  pointer-events: none;
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* The bottom band: the name (one line) and the size or the duration at the end, tabular. */
+.band {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-1);
+  padding: var(--prime-space-4) var(--prime-space-2) var(--prime-space-2);
+  border-end-start-radius: inherit;
+  border-end-end-radius: inherit;
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.name {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--prime-color-text-secondary);
+}
+
+.meta {
+  flex: none;
+  color: var(--prime-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tile[data-kind="file"] > .band {
+  padding-block-start: var(--prime-space-1);
+}
+
+/* On a picture or a video the band stands on a soft gradient of the media shade, white text. */
+.tile:not([data-kind="file"]) > .band {
+  background: linear-gradient(transparent, var(--prime-color-media-shade));
+}
+
+.tile:not([data-kind="file"]) > .band > .name {
+  color: var(--prime-color-media-shade-fg);
+}
+
+.tile:not([data-kind="file"]) > .band > .meta {
+  color: var(--prime-color-media-shade-fg);
+  opacity: 0.75;
+}
+
+/* A change the owner is still saving: the content quiets down, its delete button spins. */
+.tile[data-pending] :is(.image, .media, .sheet, .band) {
+  opacity: 0.6;
+}
+
+.tile[data-pending] {
+  cursor: progress;
+}
+
+/* A shade on the picture under the pill or the remove button: one control `xs` square. */
+.chip {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: var(--prime-space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-inline-size: var(--prime-control-xs-height);
+  block-size: var(--prime-control-xs-height);
+  border-radius: var(--prime-control-xs-radius);
+  background: var(--prime-color-media-shade);
+  color: var(--prime-color-media-shade-fg);
+  -webkit-backdrop-filter: blur(var(--prime-space-2));
+  backdrop-filter: blur(var(--prime-space-2));
+}
+
+/* The pill: the format or «Обложка», a small quiet tag, well under the remove button's size. */
+.badge {
+  inset-block-start: var(--prime-space-2);
+  inset-inline-start: var(--prime-space-2);
+  min-inline-size: var(--prime-space-5);
+  block-size: var(--prime-space-5);
+  padding-inline: var(--prime-space-1);
+  border-radius: var(--prime-radius-s);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-space-5);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--prime-text-caption-tracking);
+  pointer-events: none;
+}
+
+/* On a file the pill is a kit Badge with its own palette: no shade under it. */
+.tile[data-kind="file"] > .badge {
+  min-inline-size: 0;
+  padding-inline: 0;
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.remove {
+  inset-inline-end: var(--prime-space-2);
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* The delete button comes in with the pointer or the focus; on touch (no hover) it stays. */
+@media (hover: hover) {
+  /* A busy tile keeps its spinning delete button in view. */
+  .tile:not(:hover, :focus-within, [data-pending]) .remove {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  /* Hover lifts the tile on the overlay shadow instead of washing the picture. */
+  .tile:not([data-disabled]):is(:hover, [data-dnd-hover]) {
+    z-index: 1;
+    box-shadow: var(--prime-shadow-overlay);
+  }
+
+  /* A strip scrolls, so its overflow would clip a lift: hover shows the delete button only. */
+  .strip > .tile:not([data-upload="failed"]):is(:hover, [data-dnd-hover]) {
+    box-shadow: none;
+  }
+}
+
+/* While a tile is carried no tile offers its delete button. */
+:global(html[data-dnd-active]) .remove {
+  opacity: 0;
+}
+
+/* ─── On its way up (an upload queue) ───────────────────────────────────── */
+
+/*
+ * Until the upload is done a picture quiets down under the disk (centred on the tile) and returns
+ * to full after it. A file's disk takes the place of its sheet instead: the sheet fades and shrinks
+ * out under it and comes back, the band stays fully readable below.
+ */
+.tile:is([data-upload="queued"], [data-upload="loading"], [data-upload="failed"]) .image,
+.tile:is([data-upload="queued"], [data-upload="loading"], [data-upload="failed"]) .media {
+  opacity: 0.6;
+}
+
+.tile:is([data-upload="queued"], [data-upload="loading"], [data-upload="failed"]) .sheet {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* Over the content, under the pill and the remove button (later in the tile, same layer). */
+.uploadLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* A file: the layer is the sheet's area — between the pill and the band. */
+.tile[data-kind="file"] > .uploadLayer {
+  inset-block: var(--tile-middle) var(--tile-band);
+}
+
+/* A failed upload is ringed in danger: the state is not only the text. */
+.tile[data-upload="failed"] {
+  box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-danger-default);
+}
+
+@media (hover: hover) {
+  .tile[data-upload="failed"]:not([data-disabled]):is(:hover, [data-dnd-hover]) {
+    box-shadow:
+      inset 0 0 0 var(--prime-focus-width) var(--prime-color-danger-default),
+      var(--prime-shadow-overlay);
+  }
+}
+
+/* A tile that arrived after the first render. */
+.arrived {
+  --enter-shift: var(--prime-space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .image,
+  .tile > .media,
+  .sheet,
+  .remove {
+    transition: none;
+  }
+}

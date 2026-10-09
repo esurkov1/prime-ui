@@ -4,6 +4,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
   FieldFrame,
   type FieldFrameProps,
@@ -73,6 +74,40 @@ function columnsOf(items: Array<HTMLElement | null>): number {
 }
 
 /**
+ * Columns of a grid of `count` swatches in `width`: as many tier-sized swatches as fit, then spread
+ * evenly over the rows that needs (16 in a row of 14 → two rows of 8, not 14 + 2).
+ */
+export function balancedColumns(count: number, width: number, cell: number, gap: number): number {
+  if (count < 1 || width <= 0 || cell <= 0) return Math.max(1, count);
+  const fit = Math.max(1, Math.floor((width + gap) / (cell + gap)));
+  const rows = Math.ceil(count / Math.min(count, fit));
+  return Math.ceil(count / rows);
+}
+
+/** `--swatch-columns` of the grid: balanced rows at its current width (none before the first measure). */
+function useBalancedColumns(
+  gridRef: React.RefObject<HTMLDivElement | null>,
+  count: number,
+): number | undefined {
+  const [columns, setColumns] = React.useState<number>();
+  React.useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid || typeof ResizeObserver === "undefined") return;
+    const measure = () => {
+      // The swatch height is the tier size; the width stretches with the column.
+      const cell = grid.querySelector<HTMLElement>("[role='radio']")?.offsetHeight ?? 0;
+      const gap = Number.parseFloat(getComputedStyle(grid).columnGap) || 0;
+      setColumns(cell > 0 ? balancedColumns(count, grid.clientWidth, cell, gap) : undefined);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(grid);
+    return () => observer.disconnect();
+  }, [gridRef, count]);
+  return columns;
+}
+
+/**
  * Inline color choice: a wrapping grid of swatches, one selected (`role="radiogroup"`).
  * Fits forms and dialogs where opening a palette popover would be one step too many.
  */
@@ -82,7 +117,7 @@ export function ColorSwatches({
   onValueChange,
   presets = COLOR_PRESETS,
   size: sizeProp,
-  disabled = false,
+  disabled: disabledProp = false,
   invalid,
   allowEmpty = false,
   name,
@@ -100,6 +135,9 @@ export function ColorSwatches({
   ...rest
 }: ColorSwatchesProps) {
   const size = useControlSize(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
+  // The label and the support row follow the form around (its tier, else `m`), not the swatches.
+  const frameSize = useControlSize(undefined);
   const labels = { ...COLOR_SWATCHES_LABELS, ...labelsProp };
   const [value, setValue] = useControllableState<string | null>({
     value: valueProp,
@@ -112,6 +150,8 @@ export function ColorSwatches({
   const selectedIndex = options.findIndex((option) => sameColor(option.value, value));
   const focusIndex = Math.max(0, selectedIndex);
   const itemRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
+  const gridRef = React.useRef<HTMLDivElement>(null);
+  const columns = useBalancedColumns(gridRef, options.length);
   const labelledBy = ariaLabelledBy ?? ids.labelledBy;
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -131,7 +171,7 @@ export function ColorSwatches({
   return (
     <FieldFrame
       {...rest}
-      size={size}
+      size={frameSize}
       ids={ids}
       label={label}
       required={required}
@@ -144,6 +184,7 @@ export function ColorSwatches({
       className={className}
     >
       <div
+        ref={gridRef}
         id={ids.controlId}
         role="radiogroup"
         aria-label={labelledBy ? undefined : (ariaLabel ?? labels.group)}
@@ -152,7 +193,12 @@ export function ColorSwatches({
         aria-required={required || undefined}
         aria-invalid={ids.invalid || undefined}
         className={cx(swatchTierClass, styles.grid)}
-        style={{ "--swatch-count": options.length } as React.CSSProperties}
+        style={
+          {
+            "--swatch-count": options.length,
+            "--swatch-columns": columns,
+          } as React.CSSProperties
+        }
         {...toDataAttributes({
           size,
           invalid: ids.invalid || undefined,

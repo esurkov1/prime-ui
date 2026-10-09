@@ -14,16 +14,36 @@ export type CrossfadeProps = React.HTMLAttributes<HTMLDivElement> & {
    * A new value cross-fades the old content into the new one; the same value updates in place.
    */
   state: string | number;
+  /**
+   * The region takes its parent's height (a flex / grid item, or a sized block) and every state
+   * fills it; the height never glides.
+   */
+  fill?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
 
 type Layer = { key: string | number; children: React.ReactNode };
 
+/** Nothing to draw: `null`, `undefined`, booleans, `""` or a list of those. */
+function isEmptyNode(node: React.ReactNode): boolean {
+  if (node == null || typeof node === "boolean" || node === "") return true;
+  if (Array.isArray(node)) return node.every(isEmptyNode);
+  return false;
+}
+
 /**
  * Cross-fades a region between its states (loading → data → empty → error) and glides its height,
- * so the page below does not jump. Nothing moves on the first render.
+ * so the page below does not jump. Nothing moves on the first render. A region with nothing to
+ * show takes no room (no gap in a grid or a flex column).
  */
-export function Crossfade({ state, children, className, ref, ...rest }: CrossfadeProps) {
+export function Crossfade({
+  state,
+  fill = false,
+  children,
+  className,
+  ref,
+  ...rest
+}: CrossfadeProps) {
   const swapped = useStateSwap(state);
   const rootRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(rootRef, ref);
@@ -55,7 +75,8 @@ export function Crossfade({ state, children, className, ref, ...rest }: Crossfad
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs once per state change
   React.useLayoutEffect(() => {
     const root = rootRef.current;
-    if (!root || !swapped) return;
+    // A filling region has its parent's height: nothing to glide.
+    if (!root || !swapped || fill) return;
     root.style.height = "";
     root.removeAttribute("data-resizing");
     const from = heightRef.current;
@@ -112,17 +133,25 @@ export function Crossfade({ state, children, className, ref, ...rest }: Crossfad
         {layer.children}
       </div>
     )),
-    <div
-      key={`state-${String(state)}`}
-      className={cx(styles.layer, swapped && swapMotion.swapIn)}
-      data-state="open"
-    >
-      {children}
-    </div>,
+    // An empty state draws no layer: with no leaving layer either, the root is `:empty` and hides.
+    isEmptyNode(children) ? null : (
+      <div
+        key={`state-${String(state)}`}
+        className={cx(styles.layer, swapped && swapMotion.swapIn)}
+        data-state="open"
+      >
+        {children}
+      </div>
+    ),
   ];
 
   return (
-    <div {...rest} ref={mergedRef} className={cx(styles.root, className)}>
+    <div
+      {...rest}
+      ref={mergedRef}
+      className={cx(styles.root, className)}
+      data-fill={fill ? "true" : undefined}
+    >
       {layers}
     </div>
   );

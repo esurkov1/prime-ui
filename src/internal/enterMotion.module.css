@@ -9,14 +9,18 @@
  *
  * The host may set `--enter-shift` (default `--prime-space-1`, a rise from below; a negative value
  * drops in from above) and `animation-delay` in `--prime-motion-stagger` steps for a first render.
+ *
+ * `backwards`: the start holds through a delay, and once played nothing stays applied, so a part
+ * that entered keeps no transform effect (no compositing layer, stacking context or containing
+ * block) for the rest of its life.
  */
 .enter {
-  animation: primeEnter var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+  animation: primeEnter var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) backwards;
 }
 
 .enterBase,
 .enterBaseChildren > * {
-  animation: primeEnter var(--prime-motion-duration-base) var(--prime-motion-easing-enter) both;
+  animation: primeEnter var(--prime-motion-duration-base) var(--prime-motion-easing-enter) backwards;
 }
 
 @keyframes primeEnter {

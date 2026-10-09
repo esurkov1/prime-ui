@@ -1,0 +1,172 @@
+/*
+ * VideoNote — a round video message, then its transcript block.
+ *
+ * The circle is ONE box: a width (`min()` of the token × 1.15 and the row's width) and
+ * `aspect-ratio: 1` — nothing else sizes it, so it is a perfect circle at every width. Inside it,
+ * all filling it: the clip (a stable, always-composited round layer holding the video), the
+ * progress ring over its edge, the play disk in the middle, the button that is the hit target and
+ * the focus ring; on its corners the duration pill (bottom start), the message's meta pill (bottom
+ * end, core) and the transcript button (top end, in the box's corner outside the circle's edge).
+ * No shell and no border. At rest it is the still first frame: nothing plays before a press.
+ *
+ * No flicker: the clip never transforms, toggles compositing or changes per frame; the video's one
+ * fade-in is on an element promoted from the start; per frame only `--progress-ring-value` changes,
+ * on the ring alone. The ring shows only during a playback.
+ * Motion: press scale on the circle (`fast`), the ring and the play disk fade both ways. Reduced
+ * motion: no fades.
+ */
+.root {
+  display: inline-flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.circle {
+  position: relative;
+  flex: none;
+  inline-size: min(calc(var(--prime-message-video-note) * 1.15), 100cqi);
+  aspect-ratio: 1;
+  border-radius: var(--prime-radius-full);
+  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.circle:has(> .hit:not([data-disabled]):active) {
+  transform: scale(var(--prime-motion-press-scale));
+}
+
+.media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-muted);
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+/* A loaded frame covers the circle: the placeholder fill would bleed as a hairline at its edge. */
+.circle[data-frame="loaded"] .media {
+  background: none;
+}
+
+/* On its way (the transfer disk in the middle): the circle dims, its marks give way. */
+.media {
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.circle[data-covered] .media {
+  opacity: 0.6;
+}
+
+/* Disabled: the circle and its duration dim the way a covered circle does; the disk takes the
+   round button's disabled look. */
+.root[data-disabled="true"] :is(.media, .duration) {
+  opacity: 0.6;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  border-radius: var(--prime-radius-full);
+}
+
+.video {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.circle[data-frame="loaded"] .video {
+  opacity: 1;
+}
+
+/* The progress ring (`internal/progressRing`) only while the note plays with sound. */
+.ring {
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+}
+
+.circle:is([data-state="playing"], [data-state="paused"]) .ring {
+  opacity: 1;
+  transition-timing-function: var(--prime-motion-easing-enter);
+}
+
+/* The shared play disk (`internal/mediaPlayer` `PlayDisk`, `shade`) centred on the circle: at rest
+   and on a pause; it fades out while the note plays and stays while it has the keyboard focus. */
+.play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.play > * {
+  pointer-events: auto;
+}
+
+.play[data-shown="false"]:not(:has(:focus-visible)) {
+  opacity: 0;
+}
+
+/* The whole circle takes a press (a pointer aid; the disk is the control focus and keys reach). */
+.hit {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--prime-radius-full);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hit[data-disabled] {
+  cursor: default;
+}
+
+/* The duration on the bottom-start corner of the square (the meta pill takes the bottom end). */
+.duration {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+}
+
+.dot {
+  inline-size: calc(var(--prime-space-3) / 2);
+  block-size: calc(var(--prime-space-3) / 2);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-accent-default);
+}
+
+/* The transcript button in the top-end corner of the square, outside the circle's edge. */
+.transcribe {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+}
+
+/* The transcript under the circle: a block in the message's own fill (`--message-fill`, set by
+   the message); standalone, a surface on its host. */
+.transcript {
+  padding: var(--prime-message-padding-y) var(--prime-message-padding-x);
+  border-radius: var(--prime-message-radius);
+  background: var(--message-fill, var(--prime-color-layer-current));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circle:has(> .hit:active) {
+    transform: none;
+  }
+
+  .circle,
+  .media,
+  .video,
+  .ring,
+  .play {
+    transition: none;
+  }
+}

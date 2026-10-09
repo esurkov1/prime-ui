@@ -51,7 +51,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "in-form",
       description:
-        "Сегменты — нативные кнопки, поэтому отправка и сброс работают в одной группе — `type`.",
+        "Форма задачи: переключатели приоритета — поле с подписью, которое проверяется при отправке, а нативные отправка и сброс стоят в одной группе — `label`, `required`, `error`, `type`.",
     },
   ],
   api,
@@ -61,7 +61,8 @@ export const page: ComponentPageConfig = {
       { keys: "Enter · Space", action: "Нажимает сегмент (нативная `<button>`)." },
     ],
     aria: [
-      'Корень — `role="group"`: дайте ему `aria-label`; для нескольких групп поставьте `role="toolbar"` на общий контейнер.',
+      'Группа — `role="group"`: её называет `label` (`aria-labelledby`), иначе задайте `aria-label`; для нескольких групп поставьте `role="toolbar"` на общий контейнер.',
+      "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`, `required` — `aria-required`.",
       "Сегменты-переключатели объявляют `aria-pressed`; в наборе переключателей передайте `pressed={false}` остальным.",
       "Сегменту только с иконкой нужен `aria-label`; `ButtonGroup.Icon` скрыт (`aria-hidden`).",
     ],

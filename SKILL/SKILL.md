@@ -2,12 +2,13 @@
 name: prime-ui-kit
 description: >
   Build product UI with prime-ui-kit (React 19, CSS Modules, --prime-* tokens) the way its author would.
-  Use when laying out screens, forms, tables, dashboards, settings or navigation on prime-ui-kit; when
+  Use when laying out screens, forms, tables, boards, schedules, chats, dashboards, settings or
+  navigation on prime-ui-kit; when
   choosing which kit component fits a task; when a needed component is missing and must be composed from
   the kit; when adding loading, empty and error states, feedback, motion or micro-animation to a screen;
   and when reviewing a screen for design-system compliance (spacing rhythm, sizes, tokens, states,
-  motion, a11y, narrow screens). Triggers: build a screen, page, form, table, settings, dashboard,
-  navigation; which component to use; animate, transition, loading state; prime-ui-kit; review a screen
+  motion, a11y, narrow screens). Triggers: build a screen, page, form, table, board, schedule, chat,
+  uploads, settings, dashboard, navigation; which component to use; animate, transition, loading state; prime-ui-kit; review a screen
   against the design system — in any language.
 ---
 
@@ -32,8 +33,10 @@ region, `Skeleton` while it loads).
 4. **Compose the screen** — [composition.md](composition.md): start from the closest working screen in
    [patterns/](patterns/) and keep its skeleton; rhythm, hierarchy, surfaces and type in
    [foundations.md](foundations.md).
-5. **Write the JSX** — [api-contract.md](api-contract.md): prop names, controlled state, forms,
-   destructive actions, helpers, icon names.
+5. **Write the JSX** — [api-contract.md](api-contract.md): prop names, controlled state, events (async
+   events return the request's Promise), forms and their submit flow (`Fieldset disabled`), uploads
+   (`useUploadQueue`), destructive actions (`ConfirmDialog`), helpers (`groupMessages` for a chat),
+   icon names.
 6. **States and motion** — [motion.md](motion.md): every region loads, empties and fails without
    flipping; what the kit animates by itself and when to move your own elements.
 7. **Narrow screens** — [responsive.md](responsive.md): every screen works from 320px, the page panel is
@@ -53,7 +56,7 @@ project under `node_modules/prime-ui-kit/src/`.
 | Component reference | `reference/components/<dir>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<dir>/COMPONENT.md` |
 | Copyable scenarios | `reference/components/<dir>/examples/*.tsx` | `node_modules/prime-ui-kit/src/components/<dir>/examples/*.tsx` |
 | AppShell, Sidebar, AppHeader, BottomNav | `reference/layout/<dir>/…` | `node_modules/prime-ui-kit/src/layout/<dir>/…` |
-| Whole screens | `patterns/*.tsx` | — (only in this skill) |
+| Whole screens | `patterns/*.tsx` | `node_modules/prime-ui-kit/dist/skill/patterns/*.tsx` |
 
 ## Files of this skill
 
@@ -61,10 +64,10 @@ project under `node_modules/prime-ui-kit/src/`.
 |---|---|
 | [cheatsheet.md](cheatsheet.md) | first — the most frequent decisions and mistakes in one page |
 | [layouts.md](layouts.md) | once per app — the app frame, page wrappers, auth screens |
-| [choosing.md](choosing.md) | unsure which component fits; how to confirm a destructive action |
+| [choosing.md](choosing.md) | unsure which component fits (Gantt / Timeline / Kanban / DataTable, Message / Composer, FileUpload list / grid / gallery / strip, ColorField / ColorPicker…); how to confirm a destructive action |
 | [components.md](components.md) | finding a component and its `COMPONENT.md` / `examples/` |
 | [composition.md](composition.md) | building any screen — the patterns table, the rules of assembly, what to do when the kit lacks a component |
-| [patterns/](patterns/) | starting a screen — list, detail, settings, form in a Drawer, dashboard, states |
+| [patterns/](patterns/) | starting a screen — list, detail, settings, form in a Drawer, dashboard, states, messenger |
 | [foundations.md](foundations.md) | grid, proximity scale, sizes, surfaces, type, tone and color |
 | [api-contract.md](api-contract.md) | writing JSX — prop names, sizes and host tiers, controlled state, forms, helpers, icons |
 | [motion.md](motion.md) | every screen — loading / empty / error that flow, what the kit animates, when to move, recipes |
@@ -110,8 +113,8 @@ Take a semantic `<Icon name="…" />` first, else a glyph from the full animated
 7. Labels above fields, always. Placeholder is an example value, never the label.
 8. Text through `Typography` roles (`title-m` section, `title-s` group, `body-m` text, `caption` meta;
    the page title is `PageContent.Title`). No custom font sizes.
-9. Overlays (Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu, Select) come from the kit — never
-   hand-made.
+9. Overlays (Modal, ConfirmDialog, Drawer, Popover, Dropdown, Tooltip, CommandMenu, Select) come from
+   the kit — never hand-made — and stay mounted: drive them with `open`, never `{open && …}`.
 10. No decoration: no emoji, no icons that do not carry meaning, no explanatory text nobody asked for.
     Icons that do carry meaning come from the kit only (`<Icon name>`, `prime-ui-kit/icons`) — they
     are animated.
@@ -122,5 +125,5 @@ Components with parts are used through them: `Button.Root` + `Button.Icon`,
 `Modal.Root > Modal.Content > Modal.Body`; the namespace itself is not a component (`<Button>` is
 invalid, `<Button.Root>` is right). Leaves without parts are single exports (`<Typography>`,
 `<Skeleton>`, `<DataTable>`, `<Sparkline>`… — the full list in [api-contract.md](api-contract.md)). Data-driven
-components take data as props: `DataTable` (`columns`, `rows`), `TagSelect` (`options`), `SmartFilter`
-(`fields`), `ProgressBar` (`segments`).
+components take data as props: `DataTable` (`columns`, `rows`), `Gantt` (`rows`, `getRowBars`), `Kanban`
+(`columns`, `items`), `TagSelect` (`options`), `SmartFilter` (`fields`), `ProgressBar` (`segments`).

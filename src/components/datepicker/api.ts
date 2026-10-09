@@ -113,10 +113,10 @@ export const api: ComponentApi = {
         },
         {
           name: "align",
-          type: '"start" | "center" | "end"',
-          default: '"start"',
-          en: "Popover alignment to the field.",
-          ru: "Выравнивание поповера относительно поля.",
+          type: '"auto" | "start" | "center" | "end"',
+          default: '"auto"',
+          en: "Popover alignment to the field. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge).",
+          ru: "Выравнивание поповера относительно поля. `auto` (по умолчанию) выравнивает панель по тому краю триггера, за которым больше места: у триггера ближе к концу экрана — по концу, и панель растёт к началу, ближе к началу — наоборот; `start`, `center` или `end` задают край явно (у края экрана он всё равно переворачивается).",
         },
         {
           name: "focusRing",

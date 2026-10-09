@@ -398,3 +398,37 @@ describe("Popover — overlay contract", () => {
     expect(screen.getByRole("dialog")).toHaveAttribute("data-flush", "true");
   });
 });
+
+describe("Popover — initialFocus", () => {
+  function Anchored({ initialFocus }: { initialFocus?: boolean }) {
+    const [open, setOpen] = React.useState(false);
+    return (
+      <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Anchor>
+          <button type="button" onClick={() => setOpen(true)}>
+            Действия
+          </button>
+        </Popover.Anchor>
+        <Popover.Content initialFocus={initialFocus}>
+          <input aria-label="Название" />
+        </Popover.Content>
+      </Popover.Root>
+    );
+  }
+
+  it("an anchored panel keeps focus where it is by default", () => {
+    render(<Anchored />);
+    const anchor = screen.getByRole("button", { name: "Действия" });
+    anchor.focus();
+    fireEvent.click(anchor);
+    expect(anchor).toHaveFocus();
+  });
+
+  it("initialFocus moves focus into an anchored panel", async () => {
+    render(<Anchored initialFocus />);
+    const anchor = screen.getByRole("button", { name: "Действия" });
+    anchor.focus();
+    fireEvent.click(anchor);
+    expect(await screen.findByLabelText("Название")).toHaveFocus();
+  });
+});

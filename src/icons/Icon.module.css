@@ -4,3 +4,8 @@
   align-items: center;
   justify-content: center;
 }
+
+/* A palette hue from data (`color`): the readable text step of the hue in both themes. */
+.root[data-color] {
+  color: var(--hue-text);
+}

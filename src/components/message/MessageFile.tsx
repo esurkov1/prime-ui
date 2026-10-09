@@ -1,0 +1,168 @@
+import type * as React from "react";
+
+import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+import { Icon } from "@/icons";
+import { cx } from "@/internal/cx";
+import { toDataAttributes } from "@/internal/data-attributes";
+import { extensionOf, formatColor } from "@/internal/fileFormat";
+import { formatFileSize } from "@/internal/fileSize";
+import { formatLabel } from "@/internal/formatLabel";
+import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
+import palette from "@/internal/palette.module.css";
+import round from "@/internal/roundButton.module.css";
+import {
+  inFlight,
+  TRANSFER_LABELS,
+  type TransferLabels,
+  type TransferProps,
+  transferDiskLabels,
+} from "@/internal/transfer";
+import { TransferDisk } from "@/internal/transferDisk";
+import styles from "./MessageFile.module.css";
+
+/**
+ * The file strings, and the transfer strings every transferring part shares; `download` (the
+ * link of `href` and the arrow of a `remote` file) takes `{name}`.
+ */
+export type MessageFileLabels = {
+  /** The line under the name while it transfers: `{done}`, `{total}`. */
+  transferred: string;
+} & TransferLabels;
+
+const FILE_LABELS: MessageFileLabels = {
+  transferred: "{done} из {total}",
+  ...TRANSFER_LABELS,
+  download: "Скачать {name}",
+};
+
+export type MessageFileProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> &
+  TransferProps & {
+    /** The file name, with its extension (the format tile reads it). */
+    name: string;
+    /** Bytes; shown as «1,2 МБ». */
+    fileSize?: number;
+    /** Display of `fileSize`. Default Russian digits with Б · КБ · МБ · ГБ. */
+    formatSize?: (bytes: number) => string;
+    /** Where to get it: the tile becomes the download button. */
+    href?: string;
+    /** A picture of the file (an image, the first page) in the tile instead of the format. */
+    preview?: string;
+    labels?: Partial<MessageFileLabels>;
+    ref?: React.Ref<HTMLDivElement>;
+  };
+
+/**
+ * A document: a round tile with the format (or the file's picture), the name and the size (or
+ * «{done} из {total}», or the failure) beside it. The tile is the file's one action, in one spot:
+ * download, cancel, retry. While the file transfers, failed or is not fetched yet, the shared
+ * transfer disk (`internal/transferDisk`, size `xl`) covers the tile: the cross on the media shade
+ * with the ring of the share, the danger retry, the download arrow.
+ */
+export function MessageFile({
+  name,
+  fileSize,
+  formatSize = formatFileSize,
+  href,
+  preview,
+  transfer,
+  transferProgress: progressProp,
+  transferDirection = "upload",
+  onCancel,
+  onRetry,
+  onDownload,
+  labels: labelsProp,
+  className,
+  ref,
+  ...rest
+}: MessageFileProps) {
+  const labels = { ...FILE_LABELS, ...labelsProp };
+  const { spacer } = useMessagePart();
+  const transferring = inFlight(transfer);
+  const failed = transfer === "failed";
+  const progress = Math.min(1, Math.max(0, progressProp ?? 0));
+  const format = extensionOf(name);
+  const size = fileSize !== undefined ? formatSize(fileSize) : null;
+  const description = failed
+    ? transferDirection === "upload"
+      ? labels.notSent
+      : labels.notReceived
+    : transferring && fileSize !== undefined
+      ? formatLabel(labels.transferred, {
+          done: formatSize(fileSize * progress),
+          total: size ?? "",
+        })
+      : size;
+
+  // What the tile shows at rest: the file's picture, its format, or a document glyph.
+  const face = preview ? (
+    <Thumbnail.Root size="m" className={styles.preview} aria-hidden="true">
+      <Thumbnail.Image src={preview} />
+      <Thumbnail.Fallback>
+        <Icon name="object.document" />
+      </Thumbnail.Fallback>
+    </Thumbnail.Root>
+  ) : format ? (
+    <span className={styles.format} aria-hidden="true">
+      {format.slice(0, 4).toUpperCase()}
+    </span>
+  ) : (
+    <Icon name="object.document" />
+  );
+
+  // The download link, drawn in the tile itself over the face; a transfer is the transfer disk's.
+  const download = href && (transfer === undefined || transfer === "done");
+
+  return (
+    <div {...rest} ref={ref} className={cx(styles.file, className)}>
+      <span
+        className={cx(styles.tile, palette.hue)}
+        {...toDataAttributes({
+          color: formatColor(format),
+          action: download ? "download" : undefined,
+          transfer,
+        })}
+      >
+        {download ? (
+          <a
+            className={cx(round.round, styles.action)}
+            data-look="solid"
+            href={href}
+            download={name}
+            aria-label={formatLabel(labels.download, { name })}
+          >
+            <Icon name="action.download" />
+          </a>
+        ) : null}
+        {/* After the download: the face under a shown download fades (`.action ~ .face`). */}
+        <span className={styles.face}>{face}</span>
+        {/* Mounted for any transfer state: it fills, and fades out once the file is done. */}
+        {transfer !== undefined ? (
+          <TransferDisk
+            size="xl"
+            className={styles.disk}
+            state={transfer}
+            progress={progressProp}
+            // The reason is the size line beside the tile, not a second copy in the disk.
+            labels={{
+              ...transferDiskLabels(labels, transferDirection, progressProp, { name }),
+              failed: null,
+            }}
+            onCancel={onCancel}
+            onRetry={onRetry}
+            onDownload={onDownload}
+          />
+        ) : null}
+      </span>
+      <div className={styles.name} title={name}>
+        <span data-message-selectable="">{name}</span>
+      </div>
+      <div className={styles.meta} data-failed={failed || undefined}>
+        {description ? <span className={styles.size}>{description}</span> : null}
+        {spacer}
+      </div>
+    </div>
+  );
+}
+MessageFile.displayName = "Message.File";
+
+defineMessagePart(MessageFile, { shell: "fill", meta: "inline", sized: true });

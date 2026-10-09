@@ -605,3 +605,72 @@ describe("Modal — narrow viewport sheet", () => {
     }
   });
 });
+
+describe("Modal — xs, header actions, guard", () => {
+  it("takes size xs with the equal-width footer", () => {
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Content size="xs" aria-label="Переименовать">
+          <Modal.Footer data-testid="footer">
+            <Button.Root>Сохранить</Button.Root>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal.Root>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-size", "xs");
+    expect(screen.getByTestId("footer")).toHaveAttribute("data-layout", "fill");
+  });
+
+  it("renders Modal.Actions in the header with tier s controls", () => {
+    render(
+      <Modal.Root defaultOpen>
+        <Modal.Content>
+          <Modal.Header>
+            <Modal.Title>Счёт №318</Modal.Title>
+            <Modal.Actions>
+              <Button.Root variant="ghost" tone="neutral">
+                Печать
+              </Button.Root>
+            </Modal.Actions>
+          </Modal.Header>
+        </Modal.Content>
+      </Modal.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Печать" })).toHaveAttribute("data-size", "s");
+  });
+
+  it("dirty: discarding from the confirm closes both and returns focus to the opener", async () => {
+    render(
+      <Modal.Root>
+        <Modal.Trigger>
+          <Button.Root>Open</Button.Root>
+        </Modal.Trigger>
+        <Modal.Content>
+          <Modal.Guard dirty />
+          <Modal.Header>
+            <Modal.Title>Новый клиент</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <input aria-label="Компания" />
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    );
+    const opener = screen.getByRole("button", { name: "Open" });
+    opener.focus();
+    fireEvent.click(opener);
+    fireEvent.keyDown(document, { key: "Escape" });
+    const confirm = await screen.findByRole("alertdialog");
+    // The least destructive choice takes focus.
+    await waitFor(() => expect(screen.getByRole("button", { name: "Продолжить" })).toHaveFocus());
+    // Escape closes the confirm only.
+    fireEvent.keyDown(document, { key: "Escape" });
+    await waitFor(() => expect(confirm).not.toBeInTheDocument());
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.click(await screen.findByRole("button", { name: "Не сохранять" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    await waitFor(() => expect(opener).toHaveFocus());
+  });
+});

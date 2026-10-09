@@ -1,0 +1,30 @@
+/* Layout of the Gantt scenarios: semantic tokens only. */
+
+/* variants / sizes / states: a chart with its caption under it; specimens kept apart. */
+.specimens {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-6);
+  width: 100%;
+  min-width: 0;
+}
+
+.specimen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+/* occupancy: a name over a role in the first column. */
+.person {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* narrow: a 360 px phone column. */
+.narrow {
+  width: min(100%, calc(var(--prime-space-24) * 3.75));
+  min-width: 0;
+}

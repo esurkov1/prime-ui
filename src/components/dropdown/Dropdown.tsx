@@ -3,7 +3,12 @@ import * as React from "react";
 import { Divider } from "@/components/divider/Divider";
 import { Kbd } from "@/components/kbd/Kbd";
 import { useControllableState } from "@/hooks/useControllableState";
-import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import {
+  DEFAULT_ALIGN,
+  DEFAULT_SIDE,
+  type PositionAlign,
+  type PositionSide,
+} from "@/hooks/usePosition";
 import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
@@ -13,6 +18,7 @@ import menu from "@/internal/menu.module.css";
 import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { rovingIndex } from "@/internal/rovingFocus";
+import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Dropdown.module.css";
@@ -126,8 +132,8 @@ export type DropdownContentProps = Omit<React.HTMLAttributes<HTMLElement>, "role
 };
 
 function DropdownContent({
-  side = "bottom",
-  align = "start",
+  side = DEFAULT_SIDE,
+  align = DEFAULT_ALIGN,
   size = "m",
   matchTriggerWidth = false,
   className,
@@ -184,40 +190,105 @@ export type DropdownItemProps = Omit<
   disabled?: boolean;
   /** `danger` — destructive action (delete, revoke). */
   tone?: Extract<Tone, "neutral" | "danger">;
+  /**
+   * The item is its single child, a link (`<a href>`, a router `Link`): the item props merge onto
+   * it, so Cmd / Ctrl-click and «open in a new tab» work. Its children are the item content.
+   */
+  asChild?: boolean;
+  /** The item element: `<button>`, or the `asChild` element. */
   ref?: React.Ref<HTMLButtonElement>;
 };
+
+/**
+ * Lays out an item's content: leading `ItemIcon`s, the label, a `Dropdown.ItemDescription` under it
+ * and a trailing `ItemShortcut`. With a description the label names the item (`aria-labelledby`)
+ * and the description describes it (`aria-describedby`), so the reason under a disabled item is
+ * read with it, not as part of its name.
+ */
+function useItemContent(children: React.ReactNode) {
+  const labelId = React.useId();
+  const descriptionId = React.useId();
+  const nodes = React.Children.toArray(children);
+  const isType = (node: React.ReactNode, type: unknown) =>
+    React.isValidElement(node) && node.type === type;
+  const description = nodes.filter((node) => isType(node, DropdownItemDescription));
+  if (description.length === 0) return { content: children, aria: null };
+  const leading = nodes.filter((node) => isType(node, DropdownItemIcon));
+  const trailing = nodes.filter((node) => isType(node, DropdownItemShortcut));
+  const label = nodes.filter(
+    (node) =>
+      !isType(node, DropdownItemDescription) &&
+      !isType(node, DropdownItemIcon) &&
+      !isType(node, DropdownItemShortcut),
+  );
+  return {
+    content: (
+      <>
+        {leading}
+        <span className={styles.itemBody}>
+          <span id={labelId} className={styles.itemLabel}>
+            {label}
+          </span>
+          <span id={descriptionId} className={styles.itemDescriptionSlot}>
+            {description}
+          </span>
+        </span>
+        {trailing}
+      </>
+    ),
+    aria: { "aria-labelledby": labelId, "aria-describedby": descriptionId },
+  };
+}
 
 function DropdownItem({
   onSelect,
   disabled = false,
   tone = "neutral",
+  asChild = false,
   className,
   onClick,
+  children,
+  ref,
   ...rest
 }: DropdownItemProps) {
   const { setOpen } = useDropdownContext();
+  const child =
+    asChild && React.isValidElement<{ children?: React.ReactNode }>(children) ? children : null;
+  const { content, aria } = useItemContent(child ? child.props.children : children);
 
-  // Enter and Space reach here as the native button click.
+  // Enter and Space reach here as the native click (Enter only on a link).
   const activate = () => {
     if (disabled) return;
     onSelect?.();
     setOpen(false);
   };
 
+  const itemProps = {
+    ...rest,
+    ...aria,
+    role: "menuitem",
+    "aria-disabled": disabled || undefined,
+    tabIndex: disabled ? -1 : 0,
+    className: cx(menu.item, styles.item, className),
+    ...toDataAttributes({ tone, disabled: disabled || undefined }),
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event);
+      if (!event.defaultPrevented) activate();
+    },
+  };
+
+  if (child) {
+    // A link keeps its native click: a modified click opens a new tab and the menu still closes.
+    return (
+      <Slot {...itemProps} ref={ref as React.Ref<HTMLElement>}>
+        {React.cloneElement(child, undefined, content)}
+      </Slot>
+    );
+  }
   return (
-    <button
-      {...rest}
-      type="button"
-      role="menuitem"
-      aria-disabled={disabled || undefined}
-      tabIndex={disabled ? -1 : 0}
-      className={cx(menu.item, styles.item, className)}
-      {...toDataAttributes({ tone, disabled: disabled || undefined })}
-      onClick={(event) => {
-        onClick?.(event);
-        if (!event.defaultPrevented) activate();
-      }}
-    />
+    <button {...itemProps} ref={ref} type="button">
+      {content}
+    </button>
   );
 }
 DropdownItem.displayName = "Dropdown.Item";
@@ -253,10 +324,12 @@ function DropdownCheckboxItem({
     defaultValue: defaultChecked,
     onChange: onCheckedChange,
   });
+  const { content, aria } = useItemContent(children);
 
   return (
     <button
       {...rest}
+      {...aria}
       type="button"
       role="menuitemcheckbox"
       aria-checked={checked}
@@ -269,7 +342,7 @@ function DropdownCheckboxItem({
         if (!event.defaultPrevented && !disabled) setChecked(!checked);
       }}
     >
-      {children}
+      {content}
       <span className={menu.check} aria-hidden="true">
         {checked ? <Icon name="action.check" /> : null}
       </span>
@@ -300,6 +373,20 @@ function DropdownItemShortcut({ className, ...rest }: DropdownItemShortcutProps)
   return <Kbd className={cx(menu.shortcut, styles.shortcut, className)} {...rest} />;
 }
 DropdownItemShortcut.displayName = "Dropdown.ItemShortcut";
+
+export type DropdownItemDescriptionProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "id"> & {
+  children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/**
+ * Muted second line of an item, under its label: what the action does, or why a disabled item is
+ * unavailable («Доступно владельцу проекта»). Wraps instead of widening the menu past its limit.
+ */
+function DropdownItemDescription({ className, ...rest }: DropdownItemDescriptionProps) {
+  return <span className={cx(styles.itemDescription, className)} {...rest} />;
+}
+DropdownItemDescription.displayName = "Dropdown.ItemDescription";
 
 export type DropdownGroupProps = MenuGroupProps;
 
@@ -374,6 +461,7 @@ export const Dropdown = {
   Item: DropdownItem,
   CheckboxItem: DropdownCheckboxItem,
   ItemIcon: DropdownItemIcon,
+  ItemDescription: DropdownItemDescription,
   ItemShortcut: DropdownItemShortcut,
   Separator: DropdownSeparator,
 };

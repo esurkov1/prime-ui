@@ -121,11 +121,13 @@ export function MorphText({ children: text, className }: MorphTextProps) {
     return () => window.clearTimeout(timer);
   }, [morph]);
 
-  // At rest: remember the width the text takes, the starting point of the next change.
+  // At rest: remember the width the text takes, the starting point of the next change. Measured
+  // once per settled text, not on every render (a read here forces a synchronous layout).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: text and className change the width
   React.useLayoutEffect(() => {
     if (morph || !rootRef.current) return;
     restWidth.current = rootRef.current.getBoundingClientRect().width;
-  });
+  }, [morph, text, className]);
 
   if (!morph || !change) {
     return (
@@ -142,10 +144,10 @@ export function MorphText({ children: text, className }: MorphTextProps) {
         <span ref={sizerRef} className={styles.sizer}>
           {change.in}
         </span>
-        <span key={`out-${morph.id}`} className={styles.layer}>
+        <span key={`out-${morph.id}`} className={cx(styles.layer, styles.layerOut)}>
           {letters(change.out, "out")}
         </span>
-        <span key={`in-${morph.id}`} className={styles.layer}>
+        <span key={`in-${morph.id}`} className={cx(styles.layer, styles.layerIn)}>
           {letters(change.in, "in")}
         </span>
       </span>

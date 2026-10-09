@@ -186,7 +186,7 @@
 .gapItem::before,
 .gapItem::after,
 .gapItem + .item::before,
-.item:has(+ .gapItem)::after {
+.item[data-before-gap="true"]::after {
   background: repeating-linear-gradient(
     to bottom,
     var(--prime-color-border-default) 0 var(--prime-space-1),

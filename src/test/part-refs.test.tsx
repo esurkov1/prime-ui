@@ -37,7 +37,6 @@ import {
   FileUpload,
   Gantt,
   Hint,
-  ImageUpload,
   Input,
   Kanban,
   Label,
@@ -59,6 +58,7 @@ import {
   Textarea,
   Thumbnail,
   Timeline,
+  VideoNote,
   VisuallyHidden,
   VoicePlayer,
 } from "@/components";
@@ -132,7 +132,6 @@ describe("part refs: every part declares ref", () => {
     takesRef(ColorPresets.Swatch);
     takesRef(ColorPresets.SwatchButton);
     takesRef(ColorSwatches);
-    takesRef(ImageUpload);
     takesRef(CommandMenu.Root);
     takesRef(CommandMenu.Title);
     takesRef(CommandMenu.Description);
@@ -282,6 +281,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(Timeline.MetaPrimary);
     takesRef(Timeline.Value);
     takesRef(Timeline.ValueMeta);
+    takesRef(VideoNote);
     takesRef(VisuallyHidden);
     takesRef(VoicePlayer);
     expect(true).toBe(true);
@@ -450,6 +450,18 @@ const CASES: Case[] = [
     ),
   ],
   [
+    "FileUpload.Queue",
+    "UL",
+    (ref) => <FileUpload.Queue ref={ref} defaultValue={[{ id: "a", name: "Счёт.pdf" }]} />,
+  ],
+  [
+    "FileUpload.Queue (grid)",
+    "UL",
+    (ref) => (
+      <FileUpload.Queue ref={ref} layout="grid" defaultValue={[{ id: "a", name: "Счёт.pdf" }]} />
+    ),
+  ],
+  [
     "Dnd.Sortable",
     "UL",
     (ref) => (
@@ -558,11 +570,7 @@ const CASES: Case[] = [
       </Message.Root>
     ),
   ],
-  [
-    "Message.VideoNote",
-    "BUTTON",
-    (ref) => <Message.VideoNote ref={ref} src="/note.mp4" duration={6} />,
-  ],
+  ["VideoNote", "DIV", (ref) => <VideoNote ref={ref} src="/note.mp4" duration={6} />],
 ];
 
 describe("part refs: merged and redirected refs reach their element", () => {

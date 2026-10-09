@@ -1,23 +1,23 @@
 import * as React from "react";
 
-function paint(table: HTMLTableElement, columnId: string | null) {
-  for (const cell of table.querySelectorAll<HTMLElement>("[data-column-id]")) {
-    if (columnId !== null && cell.dataset.columnId === columnId) {
-      cell.dataset.columnHovered = "true";
-    } else {
-      delete cell.dataset.columnHovered;
-    }
-  }
-}
-
 /**
  * Column highlight: one delegated `pointerover` on the table marks the cells of the hovered column
- * with `data-column-hovered` directly in the DOM. Hovering never re-renders the table.
+ * with `data-column-hovered` directly in the DOM. Hovering never re-renders the table, and a move
+ * to another column touches only the cells of the two columns, not every cell of the table.
  */
 export function useColumnHover(enabled: boolean) {
   return React.useMemo(() => {
     if (!enabled) return undefined;
     let current: string | null = null;
+    let painted: HTMLElement[] = [];
+    const paint = (table: HTMLTableElement, columnId: string | null) => {
+      for (const cell of painted) delete cell.dataset.columnHovered;
+      painted =
+        columnId === null
+          ? []
+          : [...table.querySelectorAll<HTMLElement>(`[data-column-id="${CSS.escape(columnId)}"]`)];
+      for (const cell of painted) cell.dataset.columnHovered = "true";
+    };
     return {
       onPointerOver(event: React.PointerEvent<HTMLTableElement>) {
         const cell = (event.target as Element).closest<HTMLElement>("[data-column-id]");

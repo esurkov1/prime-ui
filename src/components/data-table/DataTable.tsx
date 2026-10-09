@@ -14,20 +14,35 @@ import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import swapMotion from "@/internal/swapMotion.module.css";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
-
+import { DataTableColumnsMenu } from "./ColumnsMenu";
+import { DataTableColumnsContext, type DataTableColumnsContextValue } from "./context";
 import styles from "./DataTable.module.css";
 import { Footer } from "./Footer";
 import { Head } from "./Head";
-import { DataTableRow, MeasureBody, type RowShared } from "./Row";
-import { flatten, nextSort, sortRows } from "./rows";
+import { DataTableRow, GroupRow, MeasureBody, type RowShared } from "./Row";
+import { ReorderBody, ReorderRoot, useRowReorder } from "./reorder";
+import { type FlatRow, flatten, groupRows, nextSort, scaleDomains, sortRows } from "./rows";
 import { StateRows } from "./StateRows";
-import type { DataTableColumn, DataTableSortState } from "./types";
+import { rowsChange } from "./serverMode";
+import type {
+  DataTableColumn,
+  DataTableGroup,
+  DataTableRowClickEvent,
+  DataTableSortState,
+} from "./types";
 import { useColumnHover } from "./useColumnHover";
 import { useFrozenColumns } from "./useFrozenColumns";
 import { useInfiniteRows } from "./useInfiniteRows";
 import { useRowSelection } from "./useRowSelection";
 
-export type { DataTableColumn, DataTableOrder, DataTableSortState } from "./types";
+export type { DataTableColumnsMenuProps } from "./ColumnsMenu";
+export type {
+  DataTableColumn,
+  DataTableGroup,
+  DataTableOrder,
+  DataTableRowClickEvent,
+  DataTableSortState,
+} from "./types";
 
 /** System strings; `{from}`, `{to}`, `{total}`, `{label}`, `{count}` are replaced. */
 export type DataTableLabels = {
@@ -51,6 +66,14 @@ export type DataTableLabels = {
   expand: string;
   /** `aria-label` of the expand toggle of an expanded row. */
   collapse: string;
+  /** Text of the `DataTable.ColumnsMenu` trigger; `{shown}` and `{total}` are column counts. */
+  columns: string;
+  /** The `DataTable.ColumnsMenu` item that shows every column again. */
+  showAllColumns: string;
+  /** `aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`. */
+  reorderRow: string;
+  /** Tooltip of the handles while the table is sorted by a column (reordering is off). */
+  reorderSorted: string;
 };
 
 const DEFAULT_LABELS: DataTableLabels = {
@@ -64,6 +87,10 @@ const DEFAULT_LABELS: DataTableLabels = {
   selectedCount: "Выбрано: {count}",
   expand: "Развернуть строку {label}",
   collapse: "Свернуть строку {label}",
+  columns: "Колонки",
+  showAllColumns: "Показать все",
+  reorderRow: "Переместить строку {label}",
+  reorderSorted: "Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки",
 };
 
 export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
@@ -71,11 +98,24 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   ref?: React.Ref<HTMLDivElement>;
   columns: DataTableColumn<Row>[];
   /**
-   * Ids of columns not rendered (head, body, skeleton, state rows). A column with
-   * `hideable: false` stays. The consumer owns the list and the control that changes it.
+   * Ids of columns not rendered (head, body, skeleton, state rows), controlled. A column with
+   * `hideable: false` stays. `DataTable.ColumnsMenu` in `toolbar` changes it.
    */
   hiddenColumns?: string[];
+  /** Initially hidden column ids, uncontrolled. */
+  defaultHiddenColumns?: string[];
+  /** The hidden column ids changed (`DataTable.ColumnsMenu`); keep them to restore the choice. */
+  onHiddenColumnsChange?: (hiddenColumns: string[]) => void;
   rows: Row[];
+  /**
+   * Who sorts and pages the rows. `client` — the table sorts `rows` and slices pages itself;
+   * `server` — `rows` is the one page (or the loaded batches) the owner fetched, already sorted:
+   * the table never re-sorts or slices them, `sort` / `page` drive the request and `rowCount`
+   * the Pagination and the range line.
+   */
+  source?: "client" | "server";
+  /** Total rows on the server (`source="server"`): Pagination and «Показано … из {total}». */
+  rowCount?: number;
   size?: ControlSize;
   className?: string;
   showHeader?: boolean;
@@ -89,7 +129,20 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   getRowKey?: (row: Row, index: number) => React.Key;
   /** Human name of a row for the checkbox / expand toggle `aria-label`s (e.g. the person's name). */
   getRowLabel?: (row: Row) => string;
-  onRowClick?: (row: Row, index: number, event: React.MouseEvent<HTMLTableRowElement>) => void;
+  /**
+   * The row is a link: the key cell (first visible column) holds a real `<a>` and the same link
+   * covers every other cell, so a click, ⌘/Ctrl-click, a middle click and «open in new tab» work
+   * anywhere on the row; Tab stops on the link.
+   */
+  getRowHref?: (row: Row) => string;
+  /**
+   * Opens a row in place: a click on the row (never on a control inside it, never from a portal)
+   * or Enter / Space on the focused row. With `getRowHref` it gets the plain clicks only — call
+   * `event.preventDefault()` there to route in the app instead of loading the page.
+   */
+  onRowClick?: (row: Row, index: number, event: DataTableRowClickEvent) => void;
+  /** Which rows open (`getRowHref` / `onRowClick`); `false` for totals and service rows. */
+  isRowClickable?: (row: Row) => boolean;
   loading?: boolean;
   /** Empty-state content (e.g. `EmptyPage`); defaults to `labels.empty`. */
   empty?: React.ReactNode;
@@ -114,8 +167,15 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   infiniteBatchSize?: number;
   hasMore?: boolean;
   loadingMore?: boolean;
+  /**
+   * Asks for the next batch. A returned promise shows the loading status until it settles; a
+   * rejected one stops asking until the rows change.
+   */
   onLoadMore?: () => void | Promise<void>;
-  /** Max height of the scroll viewport (number = px). 360 with `paging="infinite"`. */
+  /**
+   * Max height of the scroll viewport (number = px); `"fill"` — the table takes the height of
+   * its flex / grid parent and the rows scroll inside. 360 with `paging="infinite"`.
+   */
   scrollHeight?: number | string;
   /** The table spans its container; `false` sizes it by its content. */
   fullWidth?: boolean;
@@ -131,6 +191,15 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   selected?: React.Key[];
   defaultSelected?: React.Key[];
   onSelectedChange?: (selected: React.Key[]) => void;
+  /**
+   * Rows reorder: a leading handle column (drag, a touch hold, Alt + ↑ / ↓). The row `id` now
+   * stands in front of `beforeId` (`getRowKey` values; `null` — last); on a page, a row put last
+   * stands in front of the first row of the next page. Return a promise to save on a server: the
+   * row stays in its new place with a busy handle, a rejection moves it back. Off while the table
+   * is sorted by a column; with `getRowGroup` rows move inside their group. Not combined with
+   * expandable rows (`getRowChildren`, `renderExpanded`).
+   */
+  onReorder?: (id: React.Key, beforeId: React.Key | null) => void | Promise<void>;
   /** Tree sub-rows: rendered under the parent with the same columns, indented by depth. */
   getRowChildren?: (row: Row) => Row[] | undefined;
   /** Detail panel rendered in a full-width row under an expanded row. */
@@ -146,26 +215,64 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   loadingRows?: number;
   /** Panel above the table (search, filters, actions). Wraps on narrow widths. */
   toolbar?: React.ReactNode;
+  /**
+   * Group key of a row: rows are drawn under a header row per group. Groups keep the order they
+   * first appear in `rows`; a sort orders the rows inside each group.
+   */
+  getRowGroup?: (row: Row) => string | number;
+  /** Content of a group header row (name, totals); defaults to the group key. */
+  renderGroupHeader?: (group: DataTableGroup<Row>) => React.ReactNode;
+  /** Group header rows stick under the head while their rows scroll. */
+  stickyGroupHeaders?: boolean;
 };
 
 const EMPTY_KEYS: React.Key[] = [];
+const EMPTY_IDS: string[] = [];
 const SKELETON_ROWS = 5;
 const NO_KEYS: ReadonlySet<React.Key> = new Set();
 const INFINITE_SCROLL_HEIGHT = 360;
 
 const domIdPart = (key: React.Key) => String(key).replace(/[^A-Za-z0-9_-]/g, "_");
 
+/**
+ * `flat` while the rows on screen stay the same rows (by data, key and depth): a re-render that only
+ * rebuilt it (an inline `getRowKey`, a selection) keeps the previous one, so the column widths are
+ * not re-checked against every cell's layout.
+ */
+function useSameRows<Row>(flat: { rows: FlatRow<Row>[]; measure: unknown[] }) {
+  const ref = React.useRef(flat);
+  const previous = ref.current;
+  if (
+    previous !== flat &&
+    (previous.rows.length !== flat.rows.length ||
+      previous.measure.length !== flat.measure.length ||
+      flat.rows.some((item, index) => {
+        const before = previous.rows[index];
+        return before?.row !== item.row || before.key !== item.key || before.depth !== item.depth;
+      }))
+  ) {
+    ref.current = flat;
+  }
+  return ref.current;
+}
+
 export function DataTable<Row>({
   columns: allColumns,
   hiddenColumns,
+  defaultHiddenColumns = EMPTY_IDS,
+  onHiddenColumnsChange,
   rows,
+  source = "client",
+  rowCount,
   size = "m",
   className,
   showHeader = true,
   stickyHeader = false,
   stickyFirstColumn = false,
   getRowKey,
+  getRowHref,
   onRowClick,
+  isRowClickable,
   loading = false,
   empty,
   labels: labelsProp,
@@ -193,6 +300,7 @@ export function DataTable<Row>({
   selected,
   defaultSelected = EMPTY_KEYS,
   onSelectedChange,
+  onReorder,
   getRowChildren,
   renderExpanded,
   isRowExpandable,
@@ -202,12 +310,19 @@ export function DataTable<Row>({
   error,
   loadingRows,
   toolbar,
+  getRowGroup,
+  renderGroupHeader,
+  stickyGroupHeaders = false,
   ref,
   ...rest
 }: DataTableProps<Row>) {
-  const labels = React.useMemo(() => ({ ...DEFAULT_LABELS, ...labelsProp }), [labelsProp]);
+  // Keyed by content: an inline `labels` object would otherwise re-render every row on each render.
+  const labelsKey = labelsProp ? JSON.stringify(labelsProp) : "";
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `labelsKey` is the content of `labelsProp`.
+  const labels = React.useMemo(() => ({ ...DEFAULT_LABELS, ...labelsProp }), [labelsKey]);
   const infinite = paging === "infinite";
   const paged = paging === "pages";
+  const server = source === "server";
   const safePageSize = Math.max(1, pageSize);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
   const tableRef = React.useRef<HTMLTableElement | null>(null);
@@ -218,11 +333,16 @@ export function DataTable<Row>({
   // ─── Columns ───
   // Hidden columns are not rendered at all; sorting still reads every column, so hiding the sorted
   // column keeps the row order.
+  const [hiddenIds, setHiddenIds] = useControllableState<string[]>({
+    value: hiddenColumns,
+    defaultValue: defaultHiddenColumns,
+    onChange: onHiddenColumnsChange,
+  });
+  const hiddenSet = React.useMemo(() => new Set(hiddenIds), [hiddenIds]);
   const columns = React.useMemo(() => {
-    if (!hiddenColumns?.length) return allColumns;
-    const hidden = new Set(hiddenColumns);
-    return allColumns.filter((column) => column.hideable === false || !hidden.has(column.id));
-  }, [allColumns, hiddenColumns]);
+    if (hiddenSet.size === 0) return allColumns;
+    return allColumns.filter((column) => column.hideable === false || !hiddenSet.has(column.id));
+  }, [allColumns, hiddenSet]);
   // Horizontal overflow of the viewport: the edge cue (shadows at the edges that hide columns).
   const edges = useEdgeOverflow(scrollRef, true, true);
 
@@ -241,15 +361,25 @@ export function DataTable<Row>({
     ? allColumns.find((column) => column.sortable && column.id === sortState.columnId)
     : undefined;
   const sortOrder = sortColumn ? sortState?.order : undefined;
-  const sortedRows = React.useMemo(
-    () => (sortColumn && sortOrder ? sortRows(rows, sortColumn, sortOrder) : rows),
-    [rows, sortColumn, sortOrder],
-  );
-  const totalRows = sortedRows.length;
+  // Groups keep their first-appearance order; a sort orders the rows inside each group.
+  // Server rows arrive sorted: the order the owner gave is the order on screen.
+  const localSort = server ? undefined : sortColumn;
+  const { sortedRows, groups } = React.useMemo(() => {
+    const sorted = localSort && sortOrder ? sortRows(rows, localSort, sortOrder) : rows;
+    if (!getRowGroup) return { sortedRows: sorted, groups: null };
+    const grouped = groupRows(rows, sorted, getRowGroup);
+    return { sortedRows: grouped.rows, groups: grouped.groups };
+  }, [rows, localSort, sortOrder, getRowGroup]);
+  const loadedRows = sortedRows.length;
+  // Server: the owner's total; never less than what is already loaded.
+  const totalRows = server ? Math.max(rowCount ?? loadedRows, loadedRows) : loadedRows;
   const totalPages = Math.max(1, Math.ceil(totalRows / safePageSize));
   // An out-of-range page (the data shrank) shows the nearest page; nothing is written back.
   const safePage = paged ? Math.min(Math.max(pageState, 1), totalPages) : 1;
-  const pageOffset = paged ? (safePage - 1) * safePageSize : 0;
+  /** Position of the first row of the page in the whole data (the range line). */
+  const rangeOffset = paged ? (safePage - 1) * safePageSize : 0;
+  /** Where the page starts in `rows`: server rows are the page itself. */
+  const pageOffset = server ? 0 : rangeOffset;
 
   // A new sort changes the order of the whole data set: back to page 1.
   const handleSort = (columnId: string) => {
@@ -259,29 +389,65 @@ export function DataTable<Row>({
 
   const infiniteRows = useInfiniteRows({
     enabled: infinite,
-    pageSize: safePageSize,
+    // Server batches are shown whole: every loaded row at once, the next one comes from the owner.
+    pageSize: server ? Math.max(1, loadedRows) : safePageSize,
     batchSize: infiniteBatchSize,
-    totalRows,
+    totalRows: loadedRows,
     hasMore,
     loadingMore,
     onLoadMore,
     scrollRef,
   });
-  const end = infinite ? infiniteRows.visibleCount : paged ? pageOffset + safePageSize : totalRows;
-  const displayedCount = Math.max(0, Math.min(end, totalRows) - pageOffset);
+  const end = infinite
+    ? infiniteRows.visibleCount
+    : paged && !server
+      ? pageOffset + safePageSize
+      : loadedRows;
+  const displayedCount = Math.max(0, Math.min(end, loadedRows) - pageOffset);
+
+  // ─── Reorder ───
+  const reorder = useRowReorder({
+    onReorder,
+    expandEnabled: Boolean(getRowChildren || renderExpanded),
+    // The order on screen is the column's, not the manual one.
+    sorted: sortOrder !== undefined,
+    orderedRows: sortedRows,
+    offset: pageOffset,
+    getRowKey,
+    getRowGroup,
+    getRowLabel,
+    handleLabel: labels.reorderRow,
+    lockedHint: labels.reorderSorted,
+  });
 
   /*
    * Rows that appeared in `rows` since the previous data (by `getRowKey`; positional ids cannot tell
    * a new row from a shifted one). They play the enter animation once when mounted. The first fill
    * (from no rows) is not an addition. The set is kept until the next real addition, so unrelated
    * re-renders never cut a running animation short. Removed rows unmount at once.
+   * Server rows that replace the previous ones (another page, sort or filter) are no additions: the
+   * body cross-fades as a whole (`batch`) instead.
    */
-  const [rowArrival, setRowArrival] = React.useState<{ rows: Row[]; added: Set<React.Key> }>(
-    () => ({ rows, added: new Set() }),
-  );
+  const [rowArrival, setRowArrival] = React.useState<{
+    rows: Row[];
+    added: Set<React.Key>;
+    batch: number;
+  }>(() => ({ rows, added: new Set(), batch: 0 }));
   if (rowArrival.rows !== rows) {
     let added = rowArrival.added;
-    if (getRowKey && rowArrival.rows.length > 0) {
+    let batch = rowArrival.batch;
+    const previousIds = getRowKey ? rowArrival.rows.map(getRowKey) : rowArrival.rows;
+    const nextIds = getRowKey ? rows.map(getRowKey) : rows;
+    // The owner's rows after a move the table made: the same rows, nothing replaced.
+    const change = !server
+      ? null
+      : reorder.isOwnMove(previousIds, nextIds)
+        ? "same"
+        : rowsChange<unknown>(previousIds, nextIds);
+    if (change === "replace") {
+      batch += 1;
+      added = new Set();
+    } else if (change !== "same" && getRowKey && rowArrival.rows.length > 0) {
       const previous = new Set(rowArrival.rows.map((row, i) => getRowKey(row, i)));
       const fresh = new Set<React.Key>();
       rows.forEach((row, i) => {
@@ -290,8 +456,12 @@ export function DataTable<Row>({
       });
       if (fresh.size > 0) added = fresh;
     }
-    setRowArrival({ rows, added });
+    setRowArrival({ rows, added, batch });
   }
+  // A replaced server page starts at its top; the table scrolls only its own viewport.
+  React.useEffect(() => {
+    if (rowArrival.batch > 0 && scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [rowArrival.batch]);
 
   // ─── Expansion ───
   const expandEnabled = Boolean(getRowChildren || renderExpanded);
@@ -340,7 +510,7 @@ export function DataTable<Row>({
         end,
         getRowKey,
         getRowChildren,
-        sortColumn,
+        sortColumn: localSort,
         order: sortOrder,
         expandEnabled,
         withDetail: Boolean(renderExpanded),
@@ -350,14 +520,16 @@ export function DataTable<Row>({
         arrived: rowArrival.added,
         lastExpandedKey,
         collectKeys: selectable,
+        groupOf: getRowGroup,
       }),
     [
+      getRowGroup,
       sortedRows,
       pageOffset,
       end,
       getRowKey,
       getRowChildren,
-      sortColumn,
+      localSort,
       sortOrder,
       expandEnabled,
       renderExpanded,
@@ -388,17 +560,24 @@ export function DataTable<Row>({
   const showEmpty = !hasError && !loading && displayedCount === 0;
   const bodyState = hasError ? "error" : showSkeleton ? "loading" : showEmpty ? "empty" : "rows";
   /* Body state swaps (loading → rows → empty / error) cross-fade: the body remounts under its
-     state key and fades in; the first render, sorting and paging stay still (same state). */
-  const bodySwapped = useStateSwap(bodyState);
-  const totalColumns = columns.length + (selectable ? 1 : 0) + (expandEnabled ? 1 : 0);
-  const maxHeight = scrollHeight ?? (infinite ? INFINITE_SCROLL_HEIGHT : undefined);
+     state key and fades in; the first render, sorting and paging stay still (same state). A
+     replaced server page (`rowArrival.batch`) cross-fades the same way. */
+  const stateSwapped = useStateSwap(bodyState);
+  const bodySwapped = stateSwapped || rowArrival.batch > 0;
+  const bodyKey = bodySwapped ? `${bodyState}-${rowArrival.batch}` : undefined;
+  const totalColumns =
+    columns.length + (reorder.enabled ? 1 : 0) + (selectable ? 1 : 0) + (expandEnabled ? 1 : 0);
+  const fillHeight = scrollHeight === "fill";
+  const maxHeight = fillHeight
+    ? undefined
+    : (scrollHeight ?? (infinite ? INFINITE_SCROLL_HEIGHT : undefined));
   const columnHover = useColumnHover(highlightColumnOnHover);
 
   useFrozenColumns(
     tableRef,
     rootRef,
     columns.map((column) => column.id).join("\u0000"),
-    flat,
+    useSameRows(flat),
     bodyState === "rows",
   );
 
@@ -412,6 +591,19 @@ export function DataTable<Row>({
     [baseId],
   );
 
+  // Heatmap columns: the range over every row of the data, so paging never changes a cell's shade.
+  const domains = React.useMemo(() => scaleDomains(rows, columns), [rows, columns]);
+
+  // Rows get the owner's row callbacks as values (label, href, opens) and the click through a stable
+  // wrapper: inline callbacks of a controlled owner never re-render every row on a selection.
+  const rowClickRef = React.useRef(onRowClick);
+  rowClickRef.current = onRowClick;
+  const hasRowClick = onRowClick !== undefined;
+  const openRow = React.useMemo<RowShared<Row>["openRow"]>(
+    () => (hasRowClick ? (row, index, event) => rowClickRef.current?.(row, index, event) : null),
+    [hasRowClick],
+  );
+
   const shared = React.useMemo<RowShared<Row>>(
     () => ({
       columns,
@@ -422,15 +614,18 @@ export function DataTable<Row>({
       stickyFirstColumn,
       striped,
       totalColumns,
-      getRowLabel,
-      onRowClick,
+      openRow,
       renderExpanded,
       rowDomId,
       detailDomId,
+      scaleDomains: domains,
       selection: selection.handlers,
       toggleExpanded,
+      reorder: reorder.shared,
     }),
     [
+      reorder.shared,
+      domains,
       columns,
       size,
       labels,
@@ -439,8 +634,7 @@ export function DataTable<Row>({
       stickyFirstColumn,
       striped,
       totalColumns,
-      getRowLabel,
-      onRowClick,
+      openRow,
       renderExpanded,
       rowDomId,
       detailDomId,
@@ -455,172 +649,263 @@ export function DataTable<Row>({
   const showInfiniteStatus =
     !hasError &&
     infinite &&
-    (infiniteRows.hasInternalMore || loadingMore || infiniteRows.canRequestMore);
+    (infiniteRows.hasInternalMore || infiniteRows.loading || infiniteRows.canRequestMore);
+
+  const columnsMenu = React.useMemo<DataTableColumnsContextValue>(
+    () => ({
+      columns: allColumns as DataTableColumn<never>[],
+      hidden: hiddenSet,
+      setHidden: setHiddenIds,
+      labels,
+      size,
+    }),
+    [allColumns, hiddenSet, setHiddenIds, labels, size],
+  );
+
+  const rowOpens = Boolean(getRowHref || onRowClick);
+  const renderRow = (item: FlatRow<Row>, index: number) => {
+    // A row opens as a link (`getRowHref`) or in place (`onRowClick`); `isRowClickable` takes a row
+    // (a total, a service row) out of both.
+    const opens = rowOpens && (isRowClickable?.(item.row) ?? true);
+    return (
+      <DataTableRow
+        key={String(item.key)}
+        shared={shared}
+        row={item.row}
+        rowKey={item.key}
+        rowLabel={getRowLabel?.(item.row)}
+        opens={opens}
+        href={opens ? getRowHref?.(item.row) : undefined}
+        index={index}
+        depth={item.depth}
+        expandable={item.expandable}
+        expanded={item.expanded}
+        animate={item.animate}
+        folding={item.folding}
+        detailAnimate={lastExpandedKey === item.key}
+        selected={selectable && selection.selectedSet.has(item.key)}
+        childControls={item.childKeys.map(rowDomId).join(" ")}
+      />
+    );
+  };
+
+  // Grouped rows: one `<tbody>` per group run on screen, headed by its group row.
+  const segments: { key: string | number; rows: { item: FlatRow<Row>; index: number }[] }[] = [];
+  // Reorderable rows are one sortable `<tbody>` per run (the page, or each group: rows move inside
+  // their group), so the segments are needed without groups too.
+  if ((groups || reorder.enabled) && bodyState === "rows") {
+    flat.rows.forEach((item, index) => {
+      const last = segments[segments.length - 1];
+      if (item.groupStart !== undefined || !last) {
+        segments.push({ key: item.groupStart ?? "", rows: [{ item, index }] });
+      } else {
+        last.rows.push({ item, index });
+      }
+    });
+  }
+  const swapClass = bodySwapped ? swapMotion.swapIn : undefined;
+
+  const groupHeader = (key: string | number) => {
+    if (!groups) return null;
+    const group = groups.get(key);
+    return (
+      <GroupRow totalColumns={totalColumns} sticky={stickyGroupHeaders}>
+        {renderGroupHeader && group ? renderGroupHeader(group) : String(key)}
+      </GroupRow>
+    );
+  };
 
   return (
-    <SurfaceDepthProvider value={depth}>
-      <ControlSizeProvider value={size}>
-        <div
-          {...rest}
-          ref={mergedRootRef}
-          className={cx(styles.root, className)}
-          data-depth={depth}
-          {...toDataAttributes({
-            size,
-            "row-dividers": rowDividers ? undefined : "false",
-            "column-dividers": columnDividers ? undefined : "false",
-            "sticky-header": stickyHeader,
-            "sticky-first-column": stickyFirstColumn,
-            "table-width": columns.some((c) => c.grow) ? "grow" : fullWidth ? "fill" : "auto",
-            "highlight-row": highlightRowOnHover,
-            "highlight-column": highlightColumnOnHover,
-            striped,
-            loading: loading || undefined,
-            selectable: selectable || undefined,
-            expandable: expandEnabled || undefined,
-            dragging: selection.dragging || undefined,
-            "overflow-start": edges.start || undefined,
-            "overflow-end": edges.end || undefined,
-          })}
-        >
-          {toolbar != null ? <div className={styles.toolbar}>{toolbar}</div> : null}
+    <ReorderRoot enabled={reorder.enabled}>
+      <SurfaceDepthProvider value={depth}>
+        <ControlSizeProvider value={size}>
+          <div
+            {...rest}
+            ref={mergedRootRef}
+            className={cx(styles.root, className)}
+            data-depth={depth}
+            {...toDataAttributes({
+              size,
+              "row-dividers": rowDividers ? undefined : "false",
+              "column-dividers": columnDividers ? undefined : "false",
+              "sticky-header": stickyHeader,
+              "sticky-first-column": stickyFirstColumn,
+              "table-width": columns.some((c) => c.grow) ? "grow" : fullWidth ? "fill" : "auto",
+              "highlight-row": highlightRowOnHover,
+              "highlight-column": highlightColumnOnHover,
+              striped,
+              loading: loading || undefined,
+              reorderable: reorder.enabled || undefined,
+              selectable: selectable || undefined,
+              expandable: expandEnabled || undefined,
+              dragging: selection.dragging || undefined,
+              "overflow-start": edges.start || undefined,
+              "overflow-end": edges.end || undefined,
+              "scroll-height": fillHeight ? "fill" : undefined,
+            })}
+          >
+            {toolbar != null ? (
+              <DataTableColumnsContext value={columnsMenu}>
+                <div className={styles.toolbar}>{toolbar}</div>
+              </DataTableColumnsContext>
+            ) : null}
 
-          {/* The frame holds the edge shadows over the viewport; they never scroll with the table. */}
-          <div className={styles.frame}>
-            <ScrollContainer
-              ref={scrollRef}
-              axis="both"
-              overscrollBehavior="none"
-              className={styles.viewport}
-              style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}
-            >
-              <table
-                ref={tableRef}
-                className={styles.table}
-                aria-busy={loading || loadingMore || undefined}
-                {...columnHover}
+            {/* The frame holds the edge shadows over the viewport; they never scroll with the table. */}
+            <div className={styles.frame}>
+              <ScrollContainer
+                ref={scrollRef}
+                axis="both"
+                overscrollBehavior="none"
+                className={styles.viewport}
+                style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}
               >
-                <colgroup>
-                  {selectable ? <col /> : null}
-                  {expandEnabled ? <col /> : null}
-                  {columns.map((column) => (
-                    <col key={column.id} data-grow={column.grow ? "true" : undefined} />
-                  ))}
-                </colgroup>
-                {showHeader ? (
-                  <Head
-                    columns={columns}
-                    size={size}
-                    sort={sortState}
-                    onSort={handleSort}
-                    stickyFirstColumn={stickyFirstColumn}
-                    stickyCorner={stickyHeader && stickyFirstColumn}
-                    expandEnabled={expandEnabled}
-                    selectAll={
-                      selectable
-                        ? {
-                            checked: selection.allSelected,
-                            indeterminate: selection.someSelected,
-                            disabled: flat.keys.length === 0,
-                            label: labels.selectAll,
-                            onToggle: selection.toggleAll,
-                          }
-                        : undefined
-                    }
-                  />
-                ) : null}
-
-                <tbody
-                  key={bodySwapped ? bodyState : undefined}
-                  className={bodySwapped ? swapMotion.swapIn : undefined}
+                <table
+                  ref={tableRef}
+                  className={styles.table}
+                  aria-busy={loading || infiniteRows.loading || undefined}
+                  {...columnHover}
                 >
-                  {bodyState === "rows" ? (
-                    flat.rows.map((item, index) => (
-                      <DataTableRow
-                        key={String(item.key)}
-                        shared={shared}
-                        row={item.row}
-                        rowKey={item.key}
-                        index={index}
-                        depth={item.depth}
-                        expandable={item.expandable}
-                        expanded={item.expanded}
-                        animate={item.animate}
-                        folding={item.folding}
-                        detailAnimate={lastExpandedKey === item.key}
-                        selected={selectable && selection.selectedSet.has(item.key)}
-                        childControls={item.childKeys.map(rowDomId).join(" ")}
-                      />
-                    ))
-                  ) : (
-                    <StateRows
-                      state={bodyState}
+                  <colgroup>
+                    {reorder.enabled ? <col /> : null}
+                    {selectable ? <col /> : null}
+                    {expandEnabled ? <col /> : null}
+                    {columns.map((column) => (
+                      <col key={column.id} data-grow={column.grow ? "true" : undefined} />
+                    ))}
+                  </colgroup>
+                  {showHeader ? (
+                    <Head
                       columns={columns}
                       size={size}
-                      totalColumns={totalColumns}
+                      sort={sortState}
+                      onSort={handleSort}
+                      stickyFirstColumn={stickyFirstColumn}
+                      stickyHeader={stickyHeader}
+                      stickyCorner={stickyHeader && stickyFirstColumn}
+                      expandEnabled={expandEnabled}
+                      reorderable={reorder.enabled}
+                      selectAll={
+                        selectable
+                          ? {
+                              checked: selection.allSelected,
+                              indeterminate: selection.someSelected,
+                              disabled: flat.keys.length === 0,
+                              label: labels.selectAll,
+                              onToggle: selection.toggleAll,
+                            }
+                          : undefined
+                      }
+                    />
+                  ) : null}
+
+                  {reorder.enabled && bodyState === "rows" ? (
+                    <React.Fragment key={bodyKey}>
+                      {segments.map((segment) => (
+                        <ReorderBody
+                          key={`group-${String(segment.key)}`}
+                          entries={segment.rows}
+                          start={segment.rows[0]?.index ?? 0}
+                          locked={reorder.shared?.locked ?? false}
+                          onReorder={reorder.reorderIn(segment.rows)}
+                          getRowLabel={getRowLabel}
+                          renderRow={renderRow}
+                          header={groupHeader(segment.key)}
+                          className={swapClass}
+                        />
+                      ))}
+                    </React.Fragment>
+                  ) : groups && bodyState === "rows" ? (
+                    <React.Fragment key={bodyKey}>
+                      {segments.map((segment) => (
+                        <tbody key={`group-${String(segment.key)}`} className={swapClass}>
+                          {groupHeader(segment.key)}
+                          {segment.rows.map(({ item, index }) => renderRow(item, index))}
+                        </tbody>
+                      ))}
+                    </React.Fragment>
+                  ) : (
+                    <tbody key={bodyKey} className={swapClass}>
+                      {bodyState === "rows" ? (
+                        flat.rows.map(renderRow)
+                      ) : (
+                        <StateRows
+                          state={bodyState}
+                          columns={columns}
+                          size={size}
+                          totalColumns={totalColumns}
+                          selectable={selectable}
+                          expandEnabled={expandEnabled}
+                          reorderable={reorder.enabled}
+                          error={error}
+                          empty={empty}
+                          emptyLabel={labels.empty}
+                          skeletonRows={Math.max(
+                            1,
+                            loadingRows ?? Math.min(safePageSize, SKELETON_ROWS),
+                          )}
+                        />
+                      )}
+                    </tbody>
+                  )}
+
+                  {flat.measure.length > 0 && !hasError ? (
+                    <MeasureBody
+                      rows={flat.measure}
+                      columns={columns}
                       selectable={selectable}
                       expandEnabled={expandEnabled}
-                      error={error}
-                      empty={empty}
-                      emptyLabel={labels.empty}
-                      skeletonRows={Math.max(
-                        1,
-                        loadingRows ?? Math.min(safePageSize, SKELETON_ROWS),
-                      )}
                     />
-                  )}
-                </tbody>
+                  ) : null}
+                </table>
 
-                {flat.measure.length > 0 && !hasError ? (
-                  <MeasureBody
-                    rows={flat.measure}
-                    columns={columns}
-                    selectable={selectable}
-                    expandEnabled={expandEnabled}
+                {infinite ? (
+                  <div
+                    ref={infiniteRows.sentinelRef}
+                    className={styles.sentinel}
+                    aria-hidden="true"
                   />
                 ) : null}
-              </table>
+              </ScrollContainer>
+            </div>
 
-              {infinite ? (
-                <div
-                  ref={infiniteRows.sentinelRef}
-                  className={styles.sentinel}
-                  aria-hidden="true"
-                />
-              ) : null}
-            </ScrollContainer>
+            {showSkeleton ? <VisuallyHidden role="status">{labels.loading}</VisuallyHidden> : null}
+
+            {selectable ? (
+              <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
+                {selection.announcement}
+              </VisuallyHidden>
+            ) : null}
+
+            <Footer
+              size={size}
+              range={
+                showRange
+                  ? formatLabel(labels.range, {
+                      from: rangeOffset + 1,
+                      to: rangeOffset + displayedCount,
+                      total: totalRows,
+                    })
+                  : null
+              }
+              pagination={
+                paged && totalPages > 1
+                  ? { page: safePage, totalPages, onPageChange: setPageState }
+                  : null
+              }
+              status={
+                showInfiniteStatus
+                  ? infiniteRows.loading
+                    ? labels.loadingMore
+                    : labels.scrollForMore
+                  : null
+              }
+            />
           </div>
-
-          {showSkeleton ? <VisuallyHidden role="status">{labels.loading}</VisuallyHidden> : null}
-
-          {selectable ? (
-            <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
-              {selection.announcement}
-            </VisuallyHidden>
-          ) : null}
-
-          <Footer
-            size={size}
-            range={
-              showRange
-                ? formatLabel(labels.range, {
-                    from: pageOffset + 1,
-                    to: pageOffset + displayedCount,
-                    total: totalRows,
-                  })
-                : null
-            }
-            pagination={
-              paged && totalPages > 1
-                ? { page: safePage, totalPages, onPageChange: setPageState }
-                : null
-            }
-            status={
-              showInfiniteStatus ? (loadingMore ? labels.loadingMore : labels.scrollForMore) : null
-            }
-          />
-        </div>
-      </ControlSizeProvider>
-    </SurfaceDepthProvider>
+        </ControlSizeProvider>
+      </SurfaceDepthProvider>
+    </ReorderRoot>
   );
 }
+
+/** The column chooser of the table it sits in; place it into `toolbar`. */
+DataTable.ColumnsMenu = DataTableColumnsMenu;

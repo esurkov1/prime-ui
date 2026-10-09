@@ -70,6 +70,76 @@ const EXAMPLE_FRAME_LABELS: ExampleFrameLabels = {
 /** How long the copy button shows «copied» / «error» before it returns to «copy». */
 const COPY_FEEDBACK_MS = 2000;
 
+/** A block that wants the whole stage width: a `fullWidth` control or a table. */
+const STRETCH_SELECTOR = '[data-full-width="true"], table';
+const MATRIX_MAX_COLUMNS = 12;
+
+const holdsStretch = (node: Node) =>
+  node instanceof Element &&
+  (node.matches(STRETCH_SELECTOR) || node.querySelector(STRETCH_SELECTOR) !== null);
+
+/**
+ * Facts about the opaque preview children that the stage layouts need: which direct child holds a
+ * stretching block (`data-preview-stretch` on it and `data-stretch` on the stage) and, for
+ * `matrix`, the cell count of the first row (`--matrix-columns`). Read from the DOM here, not by
+ * `:has()` in CSS: a descendant `:has()` on the stage and on every element under it re-matches
+ * on every DOM insert inside the example (a virtualized list restyled ~10k elements per frame).
+ * A MutationObserver re-reads only when a change can matter.
+ */
+function usePreviewFacts(
+  stageRef: React.RefObject<HTMLDivElement | null>,
+  layout: ExampleFramePreviewLayout,
+  active: boolean,
+) {
+  React.useLayoutEffect(() => {
+    const stage = stageRef.current;
+    if (!active || !stage) return;
+    // Stretching only latches on: a virtualized list mounts and unmounts its rows while it
+    // scrolls, and a full-width card leaving the window must not narrow the stage under the reader.
+    const read = () => {
+      for (const child of Array.from(stage.children)) {
+        if (!child.hasAttribute("data-preview-stretch") && child.querySelector(STRETCH_SELECTOR)) {
+          child.setAttribute("data-preview-stretch", "");
+        }
+      }
+      if (!stage.hasAttribute("data-stretch") && stage.querySelector(STRETCH_SELECTOR)) {
+        stage.setAttribute("data-stretch", "");
+      }
+      if (layout === "matrix") {
+        const cells = stage.firstElementChild?.childElementCount ?? 1;
+        stage.style.setProperty(
+          "--matrix-columns",
+          String(Math.min(MATRIX_MAX_COLUMNS, Math.max(1, cells))),
+        );
+      } else {
+        stage.style.removeProperty("--matrix-columns");
+      }
+    };
+    read();
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        const target = record.target;
+        const relevant =
+          record.type === "attributes" ||
+          target === stage ||
+          target.parentNode === stage ||
+          Array.from(record.addedNodes).some(holdsStretch);
+        if (relevant) {
+          read();
+          return;
+        }
+      }
+    });
+    observer.observe(stage, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-full-width"],
+    });
+    return () => observer.disconnect();
+  }, [stageRef, layout, active]);
+}
+
 export type ExampleFrameProps = Omit<React.HTMLAttributes<HTMLDivElement>, "onCopy"> & {
   /** Source shown on the code pane (TS/TSX highlighting) and copied by the copy button. */
   code: string;
@@ -128,6 +198,8 @@ export function ExampleFrame({
   const mergedRef = useMergedRefs(rootRef, ref);
   const depth = useNestedSurfaceDepth();
   const stageDepth = useStageDepth();
+  const stageRef = React.useRef<HTMLDivElement>(null);
+  usePreviewFacts(stageRef, previewLayout, pane === "preview");
   const previousScheme = React.useRef(colorScheme);
   React.useLayoutEffect(() => {
     if (previousScheme.current === colorScheme) return;
@@ -152,6 +224,7 @@ export function ExampleFrame({
         <div className={styles.previewShell}>
           <div className={styles.previewViewport} data-viewport={viewport}>
             <div
+              ref={stageRef}
               className={styles.previewInner}
               data-preview-layout={previewLayout}
               data-theme={colorScheme}

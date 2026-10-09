@@ -253,7 +253,7 @@
 }
 
 .footer[data-layout="fill"] > * {
-  width: 100%;
+  width: var(--dialog-footer-action-width, 100%);
 }
 
 /* Auto-width actions, right-aligned. */
@@ -269,17 +269,17 @@
  * end, whatever the layout. On a phone and in a narrow dialog the stack below wins: the line on
  * top, full-width buttons under it.
  */
+/* The actions read their width from the footer: a class-less target after `:has()` would make its
+   invalidation whole-subtree page-wide. */
 .footer[data-layout]:where(:has(> .meta)) {
+  --dialog-footer-action-width: auto;
+
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   gap: var(--prime-space-2);
-}
-
-.footer[data-layout]:where(:has(> .meta)) > :where(:not(.meta)) {
-  width: auto;
 }
 
 .meta {
@@ -291,6 +291,11 @@
   line-height: var(--prime-text-body-s-line-height);
   font-weight: var(--prime-text-body-s-weight);
   overflow-wrap: anywhere;
+}
+
+/* In the fill layout the status line keeps the full row it had before the actions. */
+.footer[data-layout="fill"] > .meta {
+  width: 100%;
 }
 
 /*

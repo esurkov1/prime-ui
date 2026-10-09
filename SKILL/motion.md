@@ -24,18 +24,25 @@ Use the component and the motion comes with it. Never re-animate these with your
 | Toggle | the thumb slides | `Switch` |
 | One of a few | the indicator glides to the choice | `SegmentedControl`, `Tabs` |
 | Disclosure | height through `grid-template-rows`, the chevron turns | `Accordion` |
+| A chat message changes size (a reaction comes or goes, a transcript opens, an edit, an upload state) | one stroke: the new layout is there at once and the bubble's box glides from the old size to the new one — width and height together, its parts gliding, fading in or out where they stand on the same clock (`--prime-message-morph-duration`); the time and the tail stay, and nothing travels across text (the time dips while text passes through its place, and cross-fades when it changes line): a reaction grows the message upward, the chat scrolling by the change while the rows above glide as one block (the rows below never move); a transcript grows it downward under a still player | `Message.Root` (built in) |
 | A counter or a count | digits roll like an odometer | `Badge` with a number child, the `counter` of `Input` / `Textarea` |
 | A field with an error | the control shakes once, sharply, when the error arrives or changes; the label stays, the message drops in | `error` (or `invalid`) on any field, `Checkbox.Root`, `Switch.Root`, `Radio.Group` — not for an error the field mounts with |
 | Password strength | stepped bar fills cell by cell, the level word flows in | `Input.Root strength` |
-| A one-time code | one focus ring glides between cells, digits fade in, success rolls across | `DigitInput` (`success` after the server accepts) |
+| A one-time code | one focus ring glides between cells, digits fade in; while the server checks it the cells quiet down, success rolls across, a refused code clears and its reason shakes in | `DigitInput` (`onComplete` returns a Promise, or `success` / `error`) |
 | Steps of a whole | cells fill one after another | `ProgressBar steps value max` |
 | Progress | the fill slides | `ProgressBar`, `ProgressCircle` |
 | A trend card | scrub any point, the headline follows, the arrow turns, a new series cross-fades | `Sparkline` |
-| Overlays | grow from the trigger (menus, popovers, tooltip from its arrow), modals stay centred, drawers and toasts come from their edge; exit is shorter than enter | `Dropdown`, `Popover`, `Tooltip`, `Modal`, `Drawer`, notifications |
+| Overlays | grow from the trigger (menus, popovers, tooltip from its arrow), modals stay centred, drawers, sheets and toasts come from their edge; a dialog, drawer or sheet leaves faster than it came, a small floating panel opens and closes on the same quick `fast` clock; the last content stays on screen while the exit plays | `Dropdown`, `Popover`, `Tooltip`, `Modal`, `ConfirmDialog`, `Drawer`, notifications — the `Root` kept mounted |
 | Tooltips along a toolbar | the first waits, the next ones show at once | `Tooltip` (shared warm window) |
 | Toast stack | depth stack, expands on hover | `NotificationProvider` + `useNotifications` |
 | Loading → data → empty → error | the region cross-fades and glides its height; loading is a skeleton of the data | `Crossfade` around the region, `Skeleton` in the data's geometry |
-| Drag | the carried piece lifts, the drop glides into place | `Dnd`, `Kanban` |
+| Drag | the carried piece lifts, its neighbours glide apart, the drop glides into place; while its save runs the piece quiets under a spinner, and a refused save glides it back — across columns too | `Dnd`, `Kanban` cards and columns, DataTable `onReorder`, `FileUpload` tiles |
+| A setting saved on the server | the thumb moves at once and a spinner turns inside it (a slider thumb dims); a refused save glides it back | `Switch` (`onCheckedChange` returns a Promise, or `loading`), `Slider` (`onCommit`) |
+| A chip or a file row removed | it waits dimmed with a spinner on its ×; once gone it fades and closes up, the next ones glide into its place; refused, it stays | `Badge` `onRemove`, `FileUpload` `onValueChange`, TagSelect chips |
+| A schedule bar moved, stretched or drawn | the bar lifts and steps by whole days under the pointer with a dates tooltip; a drawn bar is a ghost that turns into a pulsing Skeleton while `onBarCreate` runs; a refused change glides back, a refused bar fades out; the zoom cross-fades around the day in the middle | `Gantt` (`onBarChange`, `onBarCreate`, `scale`) |
+| Messages | a message new at the end enters by itself — mine and theirs alike float up a little from below and fade in (`fast`), while the list is only pushed by layout and stays pinned to the end; nothing else moves, and nothing is ever moved by a transform computed from page geometry; the first render, history loaded above, rows the group renders as they scroll into view and a status change never move; «печатает…» is an incoming bubble of three dots rising in turn on the loading loop, opening its height as it comes and closing it as it goes — or gone at once when the reply takes its place; a jumped-to message (a reply, a search result, a pinned one) comes to the middle of the chat's own scroller and stays at full strength while the others step back and forth three times (opacity only, `base` each; a search keeps them back while the match is current) — nothing is drawn on it; the «к последним» button rises in while the reader is away from the end; delivery ticks cross-fade into the next status; a reaction new on the message fades and scales in from 0.9 once (never on the first render or a history load); a new chip takes its room at once and fades and scales in, a removed one fades out where it stood while the chips after it glide into its place; the first and the last reaction open and close the row as the message's one stroke, the message growing upward with the time and the tail still and the rows above gliding as one block; a count change rolls its digits only; the reaction bar grows from the bubble, its emoji pop in one after another, the picked one pops while the bar leaves on the same clock it opened with; in selection mode the checks enter at the start of the rows and the unselected messages step back (opacity and a slight desaturation, `fast`) while the selected stay as they are; a transcript opens and closes as one stroke, the player row still and the text fading over the whole stroke as the box opens or closes over it; the transcript button's glyph cross-fades into a chevron | `Message` (`Message.Group selected`, `onReactionToggle`, `Message.Typing`, `current`, `Message.Reply target`) |
+| Writing a message | the send glyph turns into place as text appears; the reply / edit bar enters; a paused recording stills its dot into a pause glyph and freezes the timer and the waveform; the recording bar cross-fades over the field inside the row's height, the hint slides and fades with the finger, the dot breathes and the live waveform follows the voice; the formatting toolbar fades in over a selection | `Composer` |
+| Playing a voice message | the waveform fills as it plays and is the seek slider; play and pause cross-fade; the speed label flows into the next rate | `VoicePlayer` |
 | A rare milestone | a short confetti burst | `celebrate({ origin })` |
 
 ## 2. Decide first: should it move at all?
@@ -62,7 +69,7 @@ under it. Easing starts when the hand lets go.
 | Token | Value | Use |
 |---|---|---|
 | `--prime-motion-duration-xfast` | 150 ms | hover fill on dense rows |
-| `--prime-motion-duration-fast` | 230 ms | press, hover, small panels, every exit |
+| `--prime-motion-duration-fast` | 230 ms | press, hover, small panels (in and out), the exit of a dialog |
 | `--prime-motion-duration-base` | 380 ms | dialogs, toggles, content swaps, things gliding into place |
 | `--prime-motion-duration-slow` | 570 ms | drawers, sheets, long fills |
 | `--prime-motion-easing-enter` | strong ease-out | appearing, responding |
@@ -70,11 +77,13 @@ under it. Easing starts when the hand lets go.
 | `--prime-motion-easing-standard` | ease-in-out | moving on screen, color and fill |
 | `--prime-motion-easing-emphasized` | decisive start, soft landing | a thumb, an indicator, a check gliding into place |
 | `--prime-motion-stagger` | 80 ms | step of a staggered first render |
+| `--prime-motion-loop` | 570 ms | period unit of a loading loop (Spinner); kept under reduced motion |
 | `--prime-motion-blur` | 2 px | hiding a change of shape while two states swap |
 | `--prime-motion-press-scale` / `-compact` | 0.98 / 0.96 | `:active` scale |
 
 Under `prefers-reduced-motion` the durations and stagger go to 0 and the press scale to 1 globally —
-token-based CSS honours it for free. Anything you drive from JS checks the media query itself.
+token-based CSS honours it for free. `--prime-motion-loop` stays: a loading loop is information and
+keeps running, slower. Anything you drive from JS checks the media query itself.
 
 ## 4. Rules for your own motion
 
@@ -122,8 +131,8 @@ to the idle label after about two seconds.
 
 **Delete without a dialog.** One destructive action that is not a row in a list and is easy to redo
 by hand (clear a draft, revoke a token) → `holdToConfirm` instead of a confirm dialog. A row in a list →
-the undo recipe below. Irreversible loss of work → keep the confirm Modal. (The rule:
-[choosing.md](choosing.md), «Confirming a destructive action».)
+the undo recipe below. Irreversible loss of work → a `ConfirmDialog`. (The rule:
+[choosing.md](choosing.md), «ConfirmDialog / Modal / `holdToConfirm` / undo».)
 
 ```tsx
 import { Button, Icon } from "prime-ui-kit";
@@ -154,7 +163,9 @@ hint that states the rule in words.
 (rejected). Never colour the cells green before the server answered.
 
 **Removing a row with undo.** Remove the row from the data, show a notification with an «Отменить»
-action, put the row back on undo — undo beats a confirm dialog for reversible deletes.
+action, put the row back on undo — undo beats a confirm dialog for reversible deletes. When the delete
+reaches the server only after the chance to undo has passed, send it from the notification's
+`onDismiss`.
 
 **A rare achievement.** Say it in words (a `Banner`, the progress label turning success), then call
 `celebrate({ origin: element })` once. Only for something that happens rarely — a quarter closed, the
@@ -190,7 +201,11 @@ export function CloseQuarter({ onClose }: { onClose: () => void }) {
   list → `animated={false}`.
 - Your own fade-in keyframes on a whole page or every card → no; first render is still, except a
   short staggered group.
-- Confetti for a saved form → a notification; confetti only for rare milestones.
+- Confetti for a saved form → «Сохранено» on the button when the form stays on screen, a notification
+  when it goes away; confetti only for rare milestones.
+- An overlay mounted conditionally (`{open && <Modal.Root>}`) or with a `key` that changes per record →
+  it vanishes without its exit. Keep the `Root` mounted and drive it with `open`; the kit holds the last
+  content on screen while the exit plays.
 - Re-implementing a check, a toggle or an indicator with your own CSS → use the kit component; it
   already moves.
 - JS-driven animation without a `prefers-reduced-motion` check → check it, or use CSS tokens.

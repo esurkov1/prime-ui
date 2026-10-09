@@ -1,0 +1,95 @@
+/*
+ * Message.Typing: «печатает…» at the end of a conversation — an incoming bubble of three dots. It
+ * enters floating up and fading in while its height opens, and leaves closing its height (`fast`)
+ * — or at once, when the reply that ends it arrives in the same update and takes its place. Its
+ * block axis clips, so a closed row leaves nothing under the end of the list. The dots rise and
+ * fade one after another on the loading loop (`--prime-motion-loop`): reduced motion slows it,
+ * never stops it.
+ */
+.root {
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow-x: visible;
+  overflow-y: clip;
+  opacity: 1;
+  transition:
+    grid-template-rows var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-xfast) var(--prime-motion-easing-exit);
+}
+
+.root[data-state="open"] {
+  animation: typingOpen var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+.root[data-state="closed"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--prime-space-2);
+  min-height: 0;
+  overflow: hidden;
+  padding-block-start: var(--prime-message-gap);
+  padding-inline: var(--prime-space-2);
+}
+
+.root[data-state="open"] .row {
+  animation: typingRise var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+.bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  min-block-size: calc(var(--prime-text-body-m-line-height) + 2 * var(--prime-message-padding-y));
+  padding-inline: var(--prime-message-padding-x);
+  border-radius: var(--prime-message-radius);
+  background: var(--prime-color-layer-current);
+}
+
+.dot {
+  inline-size: var(--prime-space-2);
+  block-size: var(--prime-space-2);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-text-muted);
+  opacity: 0.4;
+  animation: typingDot calc(var(--prime-motion-loop) * 2) var(--prime-motion-easing-standard)
+    infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: calc(var(--prime-motion-loop) / 3);
+}
+
+.dot:nth-child(3) {
+  animation-delay: calc(var(--prime-motion-loop) * 2 / 3);
+}
+
+@keyframes typingOpen {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+@keyframes typingRise {
+  from {
+    transform: translateY(var(--prime-space-3));
+  }
+}
+
+@keyframes typingDot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.4;
+    transform: none;
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(calc(-1 * var(--prime-space-1)));
+  }
+}

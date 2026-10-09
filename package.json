@@ -2,7 +2,10 @@
   "name": "prime-ui-kit",
   "version": "0.10.0",
   "packageManager": "bun@1.3.13",
-  "description": "React 19 UI kit for product interfaces: 61 composable components on one design contract — forms, selects, tables, overlays, navigation, app shell. CSS Modules, --prime-* tokens, light and dark themes, TypeScript, a11y. Ships COMPONENT.md docs and copyable examples.",
+  "description": "React 19 UI kit for product interfaces: 73 composable components on one design contract — forms, selects, tables, overlays, navigation, app shell. CSS Modules, --prime-* tokens, light and dark themes, TypeScript, a11y, Next.js App Router ready. Ships COMPONENT.md docs, copyable examples and an agent skill.",
+  "bin": {
+    "prime-ui-kit": "./bin/prime-ui-kit.js"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,6 +14,8 @@
     "react-ui",
     "react-components",
     "react19",
+    "nextjs",
+    "agent-skill",
     "ui-kit",
     "ui-library",
     "component-library",
@@ -55,6 +60,7 @@
   "homepage": "https://github.com/esurkov1/prime-ui#readme",
   "files": [
     "dist",
+    "bin",
     "src/styles/*.css",
     "src/components/**/COMPONENT.md",
     "src/layout/**/COMPONENT.md",
@@ -78,6 +84,7 @@
     "date-fns": "^4.1.0",
     "esbuild": "^0.27.0",
     "jsdom": "^29.0.1",
+    "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-aria-components": "^1.16.0",
     "react-dom": "^19.2.4",
@@ -108,7 +115,7 @@
     },
     "./icons": {
       "types": "./dist/icon-set.d.ts",
-      "default": "./dist/icons.js"
+      "default": "./dist/icon-set.js"
     },
     "./bundle.css": "./dist/index.css",
     "./fonts.css": "./src/styles/fonts.css",
@@ -118,12 +125,12 @@
     "./theme-dark.css": "./src/styles/theme-dark.css"
   },
   "scripts": {
-    "clean": "rm -rf dist dist-skill .dts-stage playground/dist",
+    "clean": "rm -rf dist .dts-stage playground/dist",
     "tokens:build": "bun run scripts/build-tokens.ts",
     "docs:build": "bun run scripts/build-docs.ts",
     "icons:add": "bun run scripts/add-glyph.ts",
     "skill:build": "bun run scripts/build-skill.ts",
-    "build": "bun run tokens:build && bun run scripts/bundle-lib.ts",
+    "build": "bun run tokens:build && bun run scripts/bundle-lib.ts && bun run skill:build",
     "prepublishOnly": "bun run clean && bun run build",
     "playground:dev": "vite playground --config playground/vite.config.ts",
     "check": "biome check .",
@@ -132,14 +139,11 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify": "bun run check:ci && bun run typecheck && bun run test && bun run verify:tokens && bun run build && bun run skill:build",
+    "verify": "bun run check:ci && bun run typecheck && bun run test && bun run verify:tokens && bun run build",
     "verify:tokens": "bun run tokens:build && git diff --exit-code -- src/styles/tokens.css src/styles/theme-light.css src/styles/theme-dark.css"
   },
   "sideEffects": [
     "**/*.css"
   ],
-  "type": "module",
-  "dependencies": {
-    "lucide-react": "^0.577.0"
-  }
+  "type": "module"
 }

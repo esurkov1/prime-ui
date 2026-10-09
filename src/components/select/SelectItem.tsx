@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { Avatar, type AvatarRootProps } from "@/components/avatar/Avatar";
+import { Badge } from "@/components/badge/Badge";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Thumbnail, type ThumbnailRootProps } from "@/components/thumbnail/Thumbnail";
 import { Icon } from "@/icons";
@@ -13,7 +15,7 @@ import { type ControlSize, stepDown } from "@/internal/states";
 import styles from "./Select.module.css";
 import { normalize, useSelectContext } from "./selectContext";
 
-/** Thumbnail tier for a Select tier: the media of a rich row stays inside the row height. */
+/** Thumbnail / Avatar tier for a Select tier: the media of a row stays inside the row height. */
 const MEDIA_SIZE: Record<ControlSize, ControlSize> = { xs: "xs", s: "xs", m: "s", l: "s", xl: "m" };
 
 /** Plain text of a node tree (a title made of nodes still has a label). */
@@ -84,11 +86,11 @@ export function SelectItemMeta({ children, className, ...rest }: SelectItemMetaP
 SelectItemMeta.displayName = "Select.ItemMeta";
 
 type ItemParts = {
-  /** `Select.ItemIcon` and `Thumbnail.Root`, before the text. */
+  /** `Select.ItemIcon`, `Avatar.Root` and `Thumbnail.Root`, before the text. */
   leading: React.ReactNode[];
   /** Title, description and plain text, in one column. */
   body: React.ReactNode[];
-  /** `Select.ItemMeta`, after the text. */
+  /** `Select.ItemMeta` and `Badge.Root`, after the text. */
   meta: React.ReactNode[];
   /** Two-line layout: a description or a media tile is present. */
   rich: boolean;
@@ -121,12 +123,12 @@ export function splitItemChildren(children: React.ReactNode): ItemParts {
       parts.title ||= inner.title;
       parts.description ||= inner.description;
       plain += inner.title;
-    } else if (child.type === SelectItemIcon) {
+    } else if (child.type === SelectItemIcon || child.type === Avatar.Root) {
       parts.leading.push(child);
     } else if (child.type === Thumbnail.Root) {
       parts.leading.push(child);
       parts.rich = true;
-    } else if (child.type === SelectItemMeta) {
+    } else if (child.type === SelectItemMeta || child.type === Badge.Root) {
       parts.meta.push(child);
     } else {
       if (child.type === SelectItemText) parts.title = textOf(child.props.children);
@@ -141,15 +143,19 @@ export function splitItemChildren(children: React.ReactNode): ItemParts {
   return parts;
 }
 
-/** A `Thumbnail.Root` in a row or the trigger: sized to the tier unless it sets `size`. */
+/**
+ * A `Thumbnail.Root` or `Avatar.Root` in a row or the trigger: sized to the tier unless it sets
+ * `size`, decorative (the text names the option).
+ */
 export function sizeMedia(leading: React.ReactNode[], size: ControlSize): React.ReactNode[] {
   return leading.map((node) =>
-    React.isValidElement<ThumbnailRootProps>(node) && node.type === Thumbnail.Root
+    React.isValidElement<ThumbnailRootProps | AvatarRootProps>(node) &&
+    (node.type === Thumbnail.Root || node.type === Avatar.Root)
       ? React.cloneElement(node, {
           size: node.props.size ?? MEDIA_SIZE[size],
           className: cx(styles.media, node.props.className),
           "aria-hidden": true,
-        } as Partial<ThumbnailRootProps>)
+        } as Partial<ThumbnailRootProps & AvatarRootProps>)
       : node,
   );
 }
@@ -177,7 +183,7 @@ export function SelectItem({
   children,
   ref,
 }: SelectItemProps) {
-  const { multiple, size, selected, highlight, pick, registry, listboxId, query } =
+  const { multiple, size, selected, highlight, pick, registry, listboxId, query, filter } =
     useSelectContext();
 
   const parts = splitItemChildren(children);
@@ -193,7 +199,7 @@ export function SelectItem({
   );
 
   const search = normalize(query);
-  if (search !== "" && !haystack.includes(search)) return null;
+  if (filter && search !== "" && !haystack.includes(search)) return null;
 
   return (
     // biome-ignore lint/a11y/useFocusableInteractive: focus stays on the listbox / search (aria-activedescendant)

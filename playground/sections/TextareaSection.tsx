@@ -40,12 +40,24 @@ export const page: ComponentPageConfig = {
       scenario: "auto-resize",
       title: "Высота",
       description:
-        "Поле, которое растёт с текстом, рядом с фиксированным и ручкой resize — `autoResize`, `rows`.",
+        "Поле, которое растёт с текстом, поле с одной строки, которое после пяти строк прокручивается, и фиксированное с ручкой resize — `autoResize`, `rows`, `maxRows`.",
     },
     {
       scenario: "without-focus-ring",
       title: "Без кольца фокуса",
       description: "Одно поле ответа, где фокус видно по каретке и светлой заливке — `focusRing`.",
+    },
+    {
+      scenario: "edge-actions",
+      title: "Действия в поле",
+      description:
+        "Готовый ответ только для чтения с копированием и ссылкой на шаблон в углу поля — `Textarea.CopyButton`, `Textarea.Action`.",
+    },
+    {
+      scenario: "inline-edit",
+      title: "Правка на месте",
+      description:
+        "Заметка карточки сохраняется при выходе из поля и по Mod+Enter, Escape отменяет правку, отказ сервера показан ошибкой — `onCommit`, `error`.",
     },
     {
       slot: "controlled",
@@ -61,13 +73,24 @@ export const page: ComponentPageConfig = {
   api,
   accessibility: {
     keyboard: [
-      { keys: "Tab", action: "Фокус в поле; Enter переносит строку, а не отправляет форму." },
+      {
+        keys: "Tab",
+        action:
+          "Фокус в поле, затем на кнопки в его углу; Enter переносит строку, а не отправляет форму.",
+      },
+      {
+        keys: "Mod+Enter",
+        action: "С `onCommit`: сохраняет изменённый текст, фокус остаётся в поле.",
+      },
+      { keys: "Escape", action: "С `onCommit`: возвращает сохранённый текст." },
     ],
     aria: [
       "`label` — настоящий `<label htmlFor>`; без него задайте `aria-label`. Плейсхолдер не заменяет подпись.",
       'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`.',
       "Поле — `<div>`, а не `<label>`: счётчик и подсказка не попадают в имя поля. Клик по отступу фокусирует textarea.",
       '`Textarea.Counter` показывает «12/280», а скринридер читает `labels.counter` через `aria-live="polite"`.',
+      "`Textarea.Action` и `Textarea.CopyButton` — кнопки с именем и подсказкой; копирование объявляет `labels.copied`.",
+      "С `onCommit` поле ставит `aria-busy`, пока идёт сохранение, а живой регион говорит `labels.saving` и `labels.saved`.",
     ],
   },
 };

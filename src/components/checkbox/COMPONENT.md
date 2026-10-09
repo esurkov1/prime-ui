@@ -46,6 +46,7 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 | `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle (not while `readOnly`). |
 | `indeterminate` | `boolean` | `false` | Mixed state (a partial «select all»): a bar instead of the check; wins over `checked` visually and sets the native `indeterminate`. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`. |
+| `shape` | `"square" \| "circle"` | `"square"` | Outline of the box: `square` is the rounded square; `circle` is a full circle (a selection mark in lists and chats). Size, the check draw-in, the indeterminate bar and states are the same. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger ring on the unchecked box and `aria-invalid`. A non-empty `error` implies it. |
@@ -68,11 +69,20 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 | `checked` | `boolean` | `false` | Shows the check. |
 | `indeterminate` | `boolean` | `false` | Shows the bar; wins over `checked`. |
 | `disabled` | `boolean` | `false` | Disabled fill. |
+| `shape` | `"square" \| "circle"` | `"square"` | Outline of the box: `square` is the rounded square; `circle` is a full circle (a selection mark in lists and chats). The rest is the same. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Box tier; without it the nearest control size (the Select or menu it sits in), else `m`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className`, `data-*` and the other span attributes. |
 
 ## Variants
 Checkbox has no `variant` / `tone` / `color`.
+
+### shape
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `square` | rounded square (radius from the tier) | forms, settings, tables | yes |
+| `circle` | full circle, the same size, check and states | selection marks in lists and chat messages | |
+
+The circle changes only the outline (`--prime-radius-full`); the check draw-in, the indeterminate bar, focus ring and touch target are the square's. `Checkbox.Indicator` takes the same `shape`.
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -109,7 +119,7 @@ Checkbox has no `variant` / `tone` / `color`.
 | pressed | pointer press | the box scales to the compact press scale |
 | focus-visible | keyboard focus | outer focus ring around the box |
 
-Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncontrolled: `defaultChecked` (+ optional `onCheckedChange`). There is no native `onChange` prop.
+Root also carries `data-size`; the box carries `data-shape`. Controlled: `checked` + `onCheckedChange`. Uncontrolled: `defaultChecked` (+ optional `onCheckedChange`). There is no native `onChange` prop.
 
 ## Layout & spacing
 - Grid `[box][text]`; the hint or error sits under the text column, not under the box.
@@ -140,6 +150,7 @@ No `labels`.
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A checkbox with its label; a click anywhere on the row toggles it. |
+| [variants.tsx](examples/variants.tsx) | The rounded square next to the circle, in three states — `shape`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size; the box and the text follow the control tier — `size`. |
 | [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `checked`, `indeterminate`, `invalid`, `disabled`. |
 | [without-label.tsx](examples/without-label.tsx) | Bare boxes in table rows, named by `aria-label` and submitted with `name` and `value`. |
@@ -156,5 +167,5 @@ No `labels`.
 - `style` on `Checkbox.Root` expecting to style the field → it goes to the hidden input; use `className`.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (the row), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
-- **See also:** [Radio](../radio/COMPONENT.md), [Switch](../switch/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)
+- **Built from:** [Hint](../hint/COMPONENT.md) (`hint`, `error`); the row is a native `<label>`
+- **See also:** [Radio](../radio/COMPONENT.md), [Switch](../switch/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md); `Checkbox.Indicator` inside [Select](../select/COMPONENT.md) and [TagSelect](../tag-select/COMPONENT.md) rows

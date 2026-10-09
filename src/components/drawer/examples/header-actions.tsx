@@ -32,7 +32,7 @@ export default function DrawerHeaderActionsExample() {
                   </Button.Icon>
                 </Button.Root>
               </Dropdown.Trigger>
-              <Dropdown.Content align="end">
+              <Dropdown.Content>
                 <Dropdown.Item>Дублировать</Dropdown.Item>
                 <Dropdown.Item>Скопировать ссылку</Dropdown.Item>
                 <Dropdown.Separator />

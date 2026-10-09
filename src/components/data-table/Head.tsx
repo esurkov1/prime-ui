@@ -2,6 +2,7 @@ import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import type { ControlSize } from "@/internal/states";
+import { stickySurfaceClass } from "@/internal/sticky";
 
 import styles from "./DataTable.module.css";
 import { columnSizeStyle } from "./Row";
@@ -16,9 +17,13 @@ type HeadProps<Row> = {
   sort: DataTableSortState;
   onSort: (columnId: string) => void;
   stickyFirstColumn: boolean;
+  /** The head sticks to the top of the scroller. */
+  stickyHeader: boolean;
   /** Sticky head and first column: the leading head cells stick to both edges. */
   stickyCorner: boolean;
   expandEnabled: boolean;
+  /** A leading column of row handles (`onReorder`). */
+  reorderable?: boolean;
   selectAll?: {
     checked: boolean;
     indeterminate: boolean;
@@ -34,18 +39,22 @@ export function Head<Row>({
   sort,
   onSort,
   stickyFirstColumn,
+  stickyHeader,
   stickyCorner,
   expandEnabled,
+  reorderable = false,
   selectAll,
 }: HeadProps<Row>) {
   const lead = cx(
     styles.headCell,
+    stickyHeader && stickySurfaceClass,
     stickyFirstColumn && styles.stickyLead,
     stickyCorner && styles.cornerCellSticky,
   );
   return (
     <thead>
       <tr>
+        {reorderable ? <td className={cx(lead, styles.handleCell)} /> : null}
         {selectAll ? (
           <th scope="col" className={cx(lead, styles.selectCell)}>
             <Checkbox.Root
@@ -68,6 +77,7 @@ export function Head<Row>({
               scope="col"
               className={cx(
                 styles.headCell,
+                stickyHeader && stickySurfaceClass,
                 stickyFirstColumn && isFirstColumn && styles.firstColumnSticky,
                 stickyCorner && isFirstColumn && styles.cornerCellSticky,
               )}

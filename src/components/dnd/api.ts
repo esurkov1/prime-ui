@@ -49,10 +49,10 @@ export const api: ComponentApi = {
         },
         {
           name: "onReorder",
-          type: "(id: string, beforeId: string | null) => DndReorderResult | Promise<DndReorderResult>",
+          type: "(id: string, beforeId: string | null) => void | Promise<void>",
           required: true,
-          en: "The item `id` lands in front of `beforeId` (`null` = last); with connected lists `id` may come from another list. Apply it with `moveBefore`; return `{ ok: false }` (or reject) to roll the drawn order back.",
-          ru: "Элемент `id` встаёт перед `beforeId` (`null` — в конец); у связанных списков `id` может прийти из другого списка. Применяйте через `moveBefore`; `{ ok: false }` (или отказ промиса) откатывает порядок.",
+          en: "The item `id` lands in front of `beforeId` (`null` = last); with connected lists `id` may come from another list. Apply it with `moveBefore`. Return a promise to save on a server: a drop or a keyboard move stays drawn in its new place until it settles; resolve — apply the order (before resolving); reject — the item glides back.",
+          ru: "Элемент `id` встаёт перед `beforeId` (`null` — в конец); у связанных списков `id` может прийти из другого списка. Применяйте через `moveBefore`. Верните промис, чтобы сохранить на сервере: сброс или ход с клавиатуры остаётся на новом месте, пока промис не завершится; resolve — примените порядок (до resolve); reject — элемент плавно возвращается.",
         },
         {
           name: "renderItem",
@@ -92,21 +92,33 @@ export const api: ComponentApi = {
           name: "kind",
           type: "string",
           default: "unique per list",
-          en: "Lists sharing a `kind` exchange items (a board).",
-          ru: "Списки с общим `kind` обмениваются элементами (доска).",
+          en: "Lists sharing a `kind` exchange items (a board): by pointer at an exact position, and by keyboard — Alt + the arrows across the axis (← / → in a column, ↑ / ↓ in a row, in the writing direction) move the item to the same row of the neighbouring list of the kind, in document order; focus follows and the move is announced with the list's name (`aria-label` / `aria-labelledby`).",
+          ru: "Списки с общим `kind` обмениваются элементами (доска): мышью на точное место и с клавиатуры — Alt + стрелки поперёк оси (← / → в столбце, ↑ / ↓ в строке, по направлению письма) переносят элемент на ту же строку соседнего списка вида в порядке документа; фокус идёт следом, перенос объявляется именем списка (`aria-label` / `aria-labelledby`).",
         },
         {
           name: "canDrop",
-          type: "(id: string) => boolean",
-          en: "Refuses an item by id; the list gets `data-dnd-reject` and turns `danger` before the release.",
-          ru: "Отказывает элементу по id; список получает `data-dnd-reject` и краснеет до отпускания.",
+          type: "(id: string) => boolean | string",
+          en: "Refuses an item by id: `false`, or a string that says why — spoken by the live region and shown in a chip under the carried copy (a keyboard move across says it too). The list gets `data-dnd-reject` and turns `danger` before the release.",
+          ru: "Отказывает элементу по id: `false` или строка с причиной — её произносит live-область и показывает плашка под переносимой копией (и при переносе с клавиатуры). Список получает `data-dnd-reject` и краснеет до отпускания.",
+        },
+        {
+          name: "empty",
+          type: "ReactNode",
+          en: 'Shown while the list has no items, as its own `li` / `div` (`data-dnd-empty`; `role="presentation"` in a `ul`): in the flow until a gap opens in the list, then out of the flow, fading (`fast`), so the gap takes its place.',
+          ru: "Показывается, пока в списке нет элементов, отдельным `li` / `div` (`data-dnd-empty`): в потоке, пока в списке не откроется зазор, затем выходит из потока и гаснет — зазор встаёт на его место.",
         },
         {
           name: "as",
-          type: '"div" | "ul" | "ol"',
+          type: '"div" | "ul" | "ol" | "tbody"',
           default: '"div"',
-          en: "Root element; `ul` / `ol` render items as `li`.",
-          ru: "Корневой элемент; при `ul` / `ol` элементы — `li`.",
+          en: "Root element; `ul` / `ol` render items as `li`; `tbody` renders them as table rows `tr`: the gap is a row of the lifted row's height whose cell spans every column, and the row flies inside a copy of its table with every column at the width it had.",
+          ru: "Корневой элемент; при `ul` / `ol` элементы — `li`; при `tbody` — строки таблицы `tr`: зазор — строка высотой с поднятую, её ячейка занимает все колонки, а строка летит внутри копии своей таблицы с прежней шириной каждой колонки.",
+        },
+        {
+          name: "header",
+          type: "ReactNode",
+          en: "Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`.",
+          ru: "Содержимое перед элементами, которое не перемещается и не становится местом сброса: строка-заголовок группы в `tbody`.",
         },
         {
           name: "…rest",
@@ -118,8 +130,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.SortableItem",
-      en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `data-dnd-kind`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag.",
-      ru: "`<li>` в `ul` / `ol`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Ставит `data-lifted`, `data-dnd-item`, `data-dnd-kind`, `aria-roledescription`, `aria-keyshortcuts` и `tabIndex={0}` (без `handle`). Нажатия на кнопки, поля, ссылки и `[data-dnd-ignore]` внутри не начинают перетаскивание.",
+      en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<div>` otherwise; throws outside `Dnd.Sortable`. Sets `data-lifted`, `data-dnd-item`, `data-dnd-kind`, `data-locked`, `aria-roledescription`, `aria-keyshortcuts` and `tabIndex={0}` (not with `handle`). Presses on buttons, fields, links and `[data-dnd-ignore]` inside never start a drag; the browser's own drag of an image or a link inside is stopped (`dragstart` is prevented), so it never takes the gesture over.",
+      ru: "`<li>` в `ul` / `ol`, `<tr>` в `tbody`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Ставит `data-lifted`, `data-dnd-item`, `data-dnd-kind`, `data-locked`, `aria-roledescription`, `aria-keyshortcuts` и `tabIndex={0}` (без `handle`). Нажатия на кнопки, поля, ссылки и `[data-dnd-ignore]` внутри не начинают перетаскивание; собственное перетаскивание браузером картинки или ссылки внутри гасится (`dragstart`), жест у кита не перехватывается.",
       props: [
         {
           name: "id",
@@ -132,21 +144,28 @@ export const api: ComponentApi = {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "This item cannot be dragged or moved.",
-          ru: "Этот элемент нельзя перетащить или сдвинуть.",
+          en: "This item cannot be dragged or moved (others may still move past it).",
+          ru: "Этот элемент нельзя перетащить или сдвинуть (другие могут встать перед ним).",
+        },
+        {
+          name: "locked",
+          type: "boolean",
+          default: "false",
+          en: "Holds its place: it does not drag or move, and no item is put where it would shift it — by pointer the gap never stands there, by keyboard the step does not happen, an item from another list takes the nearest free place after it. Its `Dnd.Handle` turns into a lock. A pinned first row, a system column.",
+          ru: "Держит своё место: не перетаскивается и не сдвигается, и никакой элемент не ставится так, чтобы его сместить — мышью зазор туда не встаёт, с клавиатуры шаг не происходит, элемент из другого списка встаёт на ближайшее свободное место после него. Его `Dnd.Handle` становится замком. Закреплённая первая строка, системная колонка.",
         },
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "id">',
-          en: "`className` (the row look: fill, radius, padding) and the other attributes; `onPointerDown` / `onKeyDown` run first, `preventDefault()` keeps the drag from starting.",
-          ru: "`className` (вид строки: заливка, радиус, отступы) и остальные атрибуты; `onPointerDown` / `onKeyDown` срабатывают первыми, `preventDefault()` отменяет перетаскивание.",
+          en: "`className` (the row look: fill, radius, padding), `aria-labelledby` / `aria-describedby` (name the item by its visible title and description: an `aria-label` replaces what the item shows) and the other attributes; `onPointerDown` / `onKeyDown` run first, `preventDefault()` keeps the drag from starting.",
+          ru: "`className` (вид строки: заливка, радиус, отступы), `aria-labelledby` / `aria-describedby` (имя элемента — его видимый заголовок и описание: `aria-label` заменяет то, что элемент показывает) и остальные атрибуты; `onPointerDown` / `onKeyDown` срабатывают первыми, `preventDefault()` отменяет перетаскивание.",
         },
       ],
     },
     {
       name: "Dnd.Handle",
-      en: "`ref` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button with the `action.drag` icon; a press always starts the drag, Alt+arrows on it reorder its item.",
-      ru: "Ручка: ghost-кнопка `xs` с иконкой `action.drag`; нажатие всегда начинает перетаскивание, Alt + стрелки двигают её элемент.",
+      en: '`ref` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button with the `action.drag` icon; a press always starts the drag, Alt+arrows on it reorder its item. In a `locked` item it is a lock instead: a `<span role="img">` named `labels.locked` with the `status.locked` icon, the grip\'s size, no ref.',
+      ru: 'Ручка: ghost-кнопка `xs` с иконкой `action.drag`; нажатие всегда начинает перетаскивание, Alt + стрелки двигают её элемент. В элементе с `locked` вместо неё замок: `<span role="img">` с именем `labels.locked` и иконкой `status.locked` того же размера.',
       props: [
         {
           name: "aria-label",
@@ -165,8 +184,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dnd.Draggable",
-      en: "Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. Renders the `as` element; stays in place at reduced opacity (`data-dragging`) while carried. Has no keyboard path of its own: offer a button or a menu for the same move.",
-      ru: "Обобщённый `Dnd.Draggable<TData>`. Рендерит элемент `as`; на время переноса остаётся на месте полупрозрачным (`data-dragging`). Своего клавиатурного пути нет — дайте кнопку или меню для того же действия.",
+      en: "Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. Renders the `as` element; stays in place at reduced opacity (`data-dragging`) while carried. The browser's own drag of an image or a link inside is stopped (in the capture phase: `onDragStart` here is the kit's event). Has no keyboard path of its own: offer a button or a menu for the same move.",
+      ru: "Обобщённый `Dnd.Draggable<TData>`. Рендерит элемент `as`; на время переноса остаётся на месте полупрозрачным (`data-dragging`). Собственное перетаскивание браузером картинки или ссылки внутри гасится (`onDragStart` здесь — событие кита). Своего клавиатурного пути нет — дайте кнопку или меню для того же действия.",
       props: [
         {
           name: "kind",
@@ -257,9 +276,9 @@ export const api: ComponentApi = {
         },
         {
           name: "canDrop",
-          type: "(item: DragItem<TData>) => boolean",
-          en: "Refuses an item; the zone turns `danger` before the release.",
-          ru: "Отказывает элементу; зона краснеет до отпускания.",
+          type: "(item: DragItem<TData>) => boolean | string",
+          en: "Refuses an item: `false`, or a string that says why (spoken, and shown under the carried copy); the zone turns `danger` before the release.",
+          ru: "Отказывает элементу: `false` или строка с причиной (озвучивается и видна под переносимой копией); зона краснеет до отпускания.",
         },
         {
           name: "onEnter · onLeave",
@@ -306,6 +325,12 @@ export const api: ComponentApi = {
   labels: [
     { key: "handle", default: "Перетащить", en: "Name of `Dnd.Handle`.", ru: "Имя `Dnd.Handle`." },
     {
+      key: "locked",
+      default: "Закреплено",
+      en: "Name of the lock a `Dnd.Handle` shows in a `locked` item.",
+      ru: "Имя замка, который показывает `Dnd.Handle` в элементе с `locked`.",
+    },
+    {
       key: "roleDescription",
       default: "перетаскиваемый элемент",
       en: "`aria-roledescription` of every draggable item.",
@@ -340,6 +365,24 @@ export const api: ComponentApi = {
       default: "{label}: позиция {position} из {total}",
       en: "Live region: moved with the keyboard.",
       ru: "Live-область: сдвинут с клавиатуры.",
+    },
+    {
+      key: "movedTo",
+      default: "{label}: «{list}», позиция {position} из {total}",
+      en: "Live region: moved to a linked list with the keyboard; `{list}` is its accessible name.",
+      ru: "Live-область: перенесён с клавиатуры в связанный список; `{list}` — его имя.",
+    },
+    {
+      key: "refused",
+      default: "{label}: «{list}» не принимает элемент",
+      en: "Live region: a linked list refused a keyboard move (`canDrop` answered `false`).",
+      ru: "Live-область: связанный список не принял перенос с клавиатуры (`canDrop` вернул `false`).",
+    },
+    {
+      key: "refusedReason",
+      default: "{label}: {reason}",
+      en: "Live region: a target refused the item and said why (`canDrop` answered a string).",
+      ru: "Live-область: цель отказала и назвала причину (`canDrop` вернул строку).",
     },
   ],
 };

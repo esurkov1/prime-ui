@@ -1,4 +1,4 @@
-/** A chart widget: a header with a period switch, a summary line and an edge-to-edge chart — `Card.Header`, `Card.Media`. */
+/** A chart widget: a header with a short description and a period switch, a summary line and an edge-to-edge chart — `Card.Header`, `Card.Description`, `Card.Media`. */
 import { Card, SegmentedControl, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -16,6 +16,7 @@ export default function CardPanelChartExample() {
       <Card.Root variant="panel">
         <Card.Header>
           <Card.Title>Выручка</Card.Title>
+          <Card.Description>Оплаченные счета, без возвратов</Card.Description>
           <SegmentedControl.Root size="xs" defaultValue="month" aria-label="Период">
             <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
             <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>

@@ -2,12 +2,14 @@ import * as React from "react";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconLayout } from "@/internal/iconLayout";
 import { MorphText } from "@/internal/MorphText";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone, Variant } from "@/internal/states";
 import { touchTargetClass } from "@/internal/touchTarget";
+import { isPromiseLike } from "@/internal/usePendingChanges";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { Spinner } from "../spinner/Spinner";
@@ -44,14 +46,22 @@ const BUTTON_LABELS: ButtonLabels = { holdHint: "Удерживайте, что�
 const HOLD_MS = 1200;
 
 /** `cancel`: released before the end — the fill rolls back; `idle` after `done` only fades. */
-type HoldPhase = "idle" | "holding" | "done" | "cancel";
+type HoldPhase = "idle" | "holding" | "confirming" | "done" | "cancel";
 
-export type ButtonRootProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "size"> &
+export type ButtonRootProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "size" | "aria-pressed"
+> &
   ButtonColorProps & {
     /** Tier. Default: the tier of the surrounding control (a form, a panel, a field), else `m`. */
     size?: ControlSize;
     fullWidth?: boolean;
     loading?: boolean;
+    /**
+     * A toggle button: `true` on, `false` off (`aria-pressed`); the on state takes the selected look
+     * (accent soft fill). Leave it out for an ordinary action. For a set of toggles use ButtonGroup.
+     */
+    pressed?: boolean;
     /**
      * Progress of a long action started by this button, `0…1`: a fill grows inside the button and
      * `aria-busy` is set. The label carries the number («Скачивание 42%»). Remove it when done.
@@ -62,8 +72,12 @@ export type ButtonRootProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>
      * Releasing earlier rolls the fill back and does nothing. Space and Enter hold too.
      */
     holdToConfirm?: boolean;
-    /** Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. */
-    onConfirm?: () => void;
+    /**
+     * Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. Return
+     * the request's promise: the full fill stays and the button is `loading` until it settles;
+     * resolve — the fill fades; reject — the fill rolls back.
+     */
+    onConfirm?: () => void | Promise<void>;
     labels?: Partial<ButtonLabels>;
     /**
      * Merges Button props onto its single child element instead of rendering `<button>`.
@@ -76,9 +90,10 @@ export type ButtonRootProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>
 
 /**
  * A held press (pointer, Space or Enter) that confirms after `HOLD_MS`. Releasing, leaving the
- * button or losing focus earlier cancels.
+ * button or losing focus earlier cancels. A promise from `onConfirm` keeps the press `confirming`
+ * until it settles: resolve ends it like a sync confirm, reject rolls the fill back.
  */
-function useHoldToConfirm(enabled: boolean, onConfirm: (() => void) | undefined) {
+function useHoldToConfirm(enabled: boolean, onConfirm: (() => void | Promise<void>) | undefined) {
   const [phase, setPhase] = React.useState<HoldPhase>("idle");
   const timer = React.useRef<number | undefined>(undefined);
   const confirm = React.useRef(onConfirm);
@@ -87,15 +102,24 @@ function useHoldToConfirm(enabled: boolean, onConfirm: (() => void) | undefined)
   React.useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const start = () => {
-    if (!enabled || phase === "holding" || phase === "done") return;
+    if (!enabled || phase === "holding" || phase === "confirming" || phase === "done") return;
     setPhase("holding");
     timer.current = window.setTimeout(() => {
-      setPhase("done");
-      confirm.current?.();
+      const outcome = confirm.current?.();
+      if (!isPromiseLike(outcome)) {
+        setPhase("done");
+        return;
+      }
+      setPhase("confirming");
+      outcome.then(
+        () => setPhase((current) => (current === "confirming" ? "idle" : current)),
+        () => setPhase((current) => (current === "confirming" ? "cancel" : current)),
+      );
     }, HOLD_MS);
   };
   const stop = () => {
     window.clearTimeout(timer.current);
+    // A confirm in flight outlives the release: its answer ends it.
     setPhase((current) =>
       current === "holding" ? "cancel" : current === "done" ? "idle" : current,
     );
@@ -133,21 +157,25 @@ function ButtonRoot({
   size: sizeProp,
   fullWidth,
   type = "button",
-  loading = false,
+  loading: loadingProp = false,
+  pressed,
   progress,
   holdToConfirm = false,
   onConfirm,
   labels,
-  disabled,
+  disabled: disabledProp,
   asChild = false,
   onClick,
   ref,
   ...rest
 }: ButtonRootProps) {
   const size = useControlSize(sizeProp);
-  const isDisabled = disabled || loading;
+  const disabled = useInheritedDisabled(disabledProp);
   const layout = iconLayout(children, ButtonIcon);
-  const hold = useHoldToConfirm(holdToConfirm && !isDisabled, onConfirm);
+  const hold = useHoldToConfirm(holdToConfirm && !disabled && !loadingProp, onConfirm);
+  // A held confirm whose promise is pending is a loading button.
+  const loading = loadingProp || hold.phase === "confirming";
+  const isDisabled = disabled || loading;
   const hintId = React.useId();
   const inProgress = progress !== undefined;
   // The fill stays mounted once used, so its exit (fade and roll back) can play.
@@ -160,6 +188,7 @@ function ButtonRoot({
     // `disabled` only: a loading button is busy, not unavailable, and keeps its colors.
     disabled: disabled || undefined,
     loading,
+    pressed: pressed || undefined,
     "full-width": fullWidth,
     "icon-only": layout.iconOnly || undefined,
     "leading-icon": layout.leadingIcon || undefined,
@@ -181,6 +210,7 @@ function ButtonRoot({
           className={classes}
           aria-disabled={isDisabled || undefined}
           aria-busy={loading || undefined}
+          aria-pressed={pressed}
           onClick={isDisabled ? (event: React.MouseEvent) => event.preventDefault() : onClick}
           {...dataAttrs}
         >
@@ -251,6 +281,7 @@ function ButtonRoot({
       className={classes}
       disabled={isDisabled}
       aria-busy={loading || inProgress || undefined}
+      aria-pressed={pressed}
       aria-describedby={describedBy}
       onClick={onClick}
       style={

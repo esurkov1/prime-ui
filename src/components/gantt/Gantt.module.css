@@ -1,0 +1,1017 @@
+/*
+ * Gantt — Graphite.
+ * A layer of the ladder (card radius, no border): a toolbar, then one scroll viewport with a sticky
+ * two-tier header and a sticky first column. The time axis is drawn in days: `--gantt-day` is the
+ * length of a day for the zoom and tier, and every cell, line and bar is placed with
+ * `calc(<days> * var(--gantt-day))` from the custom properties `--x`, `--span`, `--lane` set in TSX.
+ * Weekends are a faint wash, column lines faint hairlines, today an accent line with a chip.
+ */
+
+.root {
+  --gantt-day: var(--prime-space-4);
+  --gantt-dir: 1;
+  --gantt-label-w: calc(var(--prime-space-24) * 2);
+  --gantt-pad-x: var(--prime-space-3);
+  --gantt-pad-y: var(--prime-space-2);
+  --gantt-bar-h: var(--prime-control-xs-height);
+  --gantt-lane-gap: var(--prime-space-1);
+  --gantt-bar-radius: var(--prime-radius-s);
+  --gantt-bar-pad-x: var(--prime-space-2);
+  --gantt-bar-text: var(--prime-control-s-text-size);
+  --gantt-bar-line-height: var(--prime-control-s-line-height);
+  --gantt-text: var(--prime-control-m-text-size);
+  --gantt-line-height: var(--prime-control-m-line-height);
+  --gantt-tier-h: var(--prime-control-xs-height);
+  --gantt-head-text: var(--prime-control-m-label-size);
+  --gantt-head-line-height: var(--prime-control-m-label-line-height);
+
+  /* One step off the surface for the head, as DataTable; the sticky column keeps the surface. */
+  --gantt-surface: var(--prime-color-layer-current);
+  --gantt-head-bg: var(--prime-color-field-bg-hover);
+  --gantt-divider: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  --gantt-edge-depth: var(--prime-space-4);
+  --gantt-column-edge-depth: var(--prime-space-2);
+  --gantt-edge-dir: to right;
+
+  --gantt-z-column: 2;
+  --gantt-z-head: 3;
+  --gantt-z-corner: 4;
+
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--prime-card-radius);
+  background: var(--gantt-surface);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--gantt-text);
+  line-height: var(--gantt-line-height);
+}
+
+.root:dir(rtl) {
+  --gantt-dir: -1;
+  --gantt-edge-dir: to left;
+}
+
+/* ---------- Tiers ---------- */
+
+.root[data-size="xs"],
+.root[data-size="s"] {
+  --gantt-pad-x: var(--prime-space-2);
+  --gantt-pad-y: var(--prime-space-1);
+  --gantt-bar-radius: var(--prime-radius-xs);
+  --gantt-bar-pad-x: var(--prime-space-1);
+  --gantt-bar-text: var(--prime-control-xs-text-size);
+  --gantt-bar-line-height: var(--prime-control-xs-line-height);
+  --gantt-tier-h: var(--prime-space-6);
+  --gantt-head-text: var(--prime-control-xs-label-size);
+  --gantt-head-line-height: var(--prime-control-xs-label-line-height);
+}
+
+.root[data-size="xs"] {
+  --gantt-bar-h: var(--prime-space-5);
+  --gantt-text: var(--prime-control-xs-text-size);
+  --gantt-line-height: var(--prime-control-xs-line-height);
+}
+
+.root[data-size="s"] {
+  --gantt-bar-h: var(--prime-space-6);
+  --gantt-text: var(--prime-control-s-text-size);
+  --gantt-line-height: var(--prime-control-s-line-height);
+}
+
+.root[data-size="l"],
+.root[data-size="xl"] {
+  --gantt-pad-x: var(--prime-space-4);
+  --gantt-bar-radius: var(--prime-radius-m);
+  --gantt-bar-pad-x: var(--prime-space-3);
+  --gantt-tier-h: var(--prime-control-s-height);
+  --gantt-head-text: var(--prime-control-l-label-size);
+  --gantt-head-line-height: var(--prime-control-l-label-line-height);
+}
+
+.root[data-size="l"] {
+  --gantt-bar-h: var(--prime-control-s-height);
+  --gantt-bar-text: var(--prime-control-m-text-size);
+  --gantt-bar-line-height: var(--prime-control-m-line-height);
+  --gantt-text: var(--prime-control-l-text-size);
+  --gantt-line-height: var(--prime-control-l-line-height);
+}
+
+.root[data-size="xl"] {
+  --gantt-bar-h: var(--prime-control-m-height);
+  --gantt-bar-text: var(--prime-control-l-text-size);
+  --gantt-bar-line-height: var(--prime-control-l-line-height);
+  --gantt-text: var(--prime-control-xl-text-size);
+  --gantt-line-height: var(--prime-control-xl-line-height);
+}
+
+/* Length of a day per zoom: a day column fits its number, a week its range, a month its name. */
+.root[data-scale="day"] {
+  --gantt-day: var(--prime-space-10);
+}
+
+.root[data-scale="week"] {
+  --gantt-day: var(--prime-space-4);
+}
+
+.root[data-scale="month"] {
+  --gantt-day: var(--prime-space-1);
+}
+
+.root[data-scale="day"]:is([data-size="xs"], [data-size="s"]) {
+  --gantt-day: var(--prime-space-8);
+}
+
+.root[data-scale="day"]:is([data-size="l"], [data-size="xl"]) {
+  --gantt-day: var(--prime-space-12);
+}
+
+.root[data-scale="week"]:is([data-size="xs"], [data-size="s"]) {
+  --gantt-day: var(--prime-space-3);
+}
+
+.root[data-scale="week"]:is([data-size="l"], [data-size="xl"]) {
+  --gantt-day: var(--prime-space-5);
+}
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-2);
+  padding: var(--prime-space-3) var(--gantt-pad-x);
+}
+
+.toolbarStart {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.toolbarStart:empty {
+  display: none;
+}
+
+.toolbarEnd {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin-inline-start: auto;
+}
+
+/* ---------- Viewport ---------- */
+
+.frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  isolation: isolate;
+}
+
+/* Full-bleed: the grid touches the edges and the root clips it; bars keep room for their ring
+   inside their rows (padded lanes). */
+.viewport {
+  width: 100%;
+  padding: 0;
+  isolation: isolate;
+}
+
+.root[data-scroll-height="fill"] {
+  flex: 1 1 0%;
+  height: 100%;
+  min-height: 0;
+}
+
+.root[data-scroll-height="fill"] .frame,
+.root[data-scroll-height="fill"] .viewport {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+/* End edge cue while more of the axis is to the end (the sticky column draws the start one). */
+.frame::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 1;
+  width: var(--gantt-edge-depth);
+  pointer-events: none;
+  background: linear-gradient(
+    var(--gantt-edge-dir),
+    transparent,
+    var(--prime-color-bg-edge-shadow)
+  );
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-overflow-end="true"] .frame::after {
+  opacity: 1;
+}
+
+.grid {
+  /* The whole axis, set from its length: rows, the head fill and every line span it wherever the
+     chart is scrolled. A max-content width is not enough: engines leave a fixed flex-basis out of
+     it, and the fills stopped at the viewport. */
+  --gantt-axis-w: calc(var(--gantt-days) * var(--gantt-day));
+
+  display: flex;
+  flex-direction: column;
+  width: max(100%, calc(var(--gantt-label-w) + var(--gantt-axis-w)));
+}
+
+/* ---------- Head ---------- */
+
+.head {
+  position: sticky;
+  top: 0;
+  z-index: var(--gantt-z-head);
+  display: flex;
+  width: 100%;
+  --sticky-bg: var(--gantt-head-bg);
+
+  background: var(--gantt-head-bg);
+  color: var(--prime-color-text-secondary);
+  font-size: var(--gantt-head-text);
+  line-height: var(--gantt-head-line-height);
+}
+
+.corner {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: var(--gantt-z-corner);
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  width: var(--gantt-label-w);
+  min-width: 0;
+  padding: var(--prime-space-1) var(--gantt-pad-x);
+  background: var(--gantt-head-bg);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.cornerText {
+  overflow: hidden;
+  min-width: 0;
+  padding-block-end: calc(
+    (var(--gantt-tier-h) - var(--gantt-head-line-height)) /
+    2 -
+    var(--prime-space-1)
+  );
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.axis {
+  position: relative;
+  flex: none;
+  width: var(--gantt-axis-w);
+}
+
+/* The time labels are quiet mono figures; the today line and its flag pass over them. */
+.tier {
+  position: relative;
+  height: var(--gantt-tier-h);
+  color: var(--prime-color-text-muted);
+  font-family: var(--prime-font-family-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tierCell {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--x) * var(--gantt-day));
+  display: flex;
+  align-items: center;
+  width: calc(var(--span) * var(--gantt-day));
+  padding-inline: var(--prime-space-2);
+}
+
+/*
+ * Upper tier: a period (month, year) is told by its label alone — no lines, so nothing cuts a cell
+ * below. The label is sticky inside its span: it rides the start of the visible axis while its
+ * period is on screen and leaves with the period's last cell, never over the next label.
+ */
+.tier:first-child {
+  /* Quieter than any text role: a reference mark behind the data, never a heading. */
+  color: color-mix(in srgb, var(--prime-color-text-disabled) 55%, transparent);
+}
+
+/* A month or a year keeps its name in view while its cell scrolls under the first column. */
+.tierText {
+  position: sticky;
+  inset-inline-start: calc(var(--gantt-label-w) + var(--prime-space-2));
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Lower tier: faint hairlines between cells; the cell that opens a period a step stronger. */
+.tier[data-tier="bottom"] .tierCell {
+  justify-content: center;
+  padding-inline: 0;
+  border-inline-start: var(--prime-border-width) solid var(--prime-color-border-faint);
+}
+
+.tier[data-tier="bottom"] .tierCell[data-boundary="true"] {
+  border-inline-start-color: var(--prime-color-border-subtle);
+}
+
+.root[data-scale="month"] .tier[data-tier="bottom"] .tierCell,
+.root[data-scale="week"] .tier[data-tier="bottom"] .tierCell {
+  justify-content: flex-start;
+  padding-inline: var(--prime-space-2);
+}
+
+.tier[data-tier="bottom"] .tierText {
+  position: static;
+}
+
+.tierCell[data-weekend="true"] {
+  color: var(--prime-color-text-disabled);
+}
+
+/* Today's cell: its text on a solid accent pill over the today line, as in a calendar. */
+.tierCell[data-today="true"] .tierText {
+  position: relative;
+  inset-inline-start: auto;
+  z-index: 2;
+  /* The kit's chip radius, not a pill: one digit reads as a small rectangle, wider than tall. */
+  padding-inline: var(--prime-space-2);
+  border-radius: var(--prime-badge-s-radius);
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+  font-weight: var(--prime-font-weight-medium);
+  text-align: center;
+}
+
+/*
+ * Today: a flag in the top tier and a line down through the bottom tier into the rows. Both lie
+ * over the time labels (the flag simply covers a month name); today's date pill lies over the line.
+ */
+.todayMark {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--x) * var(--gantt-day));
+  z-index: 1;
+  width: 0;
+  pointer-events: none;
+}
+
+.todayMark::after {
+  content: "";
+  position: absolute;
+  inset-block: calc(var(--gantt-tier-h) / 2) 0;
+  inset-inline-start: calc(var(--prime-border-width) * -1);
+  width: calc(var(--prime-border-width) * 2);
+  background: var(--prime-color-accent-default);
+}
+
+.todayChip {
+  position: absolute;
+  top: calc((var(--gantt-tier-h) - var(--prime-badge-m-height)) / 2);
+  /* A flag on the line: it starts at the line and its square corner sits on it. */
+  inset-inline-start: calc(var(--prime-border-width) * -1);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  height: var(--prime-badge-m-height);
+  padding-inline: var(--prime-badge-m-padding-x);
+  border-radius: var(--prime-badge-m-radius);
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--prime-badge-m-text-size);
+  font-weight: var(--prime-font-weight-medium);
+  white-space: nowrap;
+  border-end-start-radius: 0;
+}
+
+/* ---------- Body ---------- */
+
+.body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * The background is two patterns, not an element per day, so a multi-year axis costs nothing:
+ * weekends are a week tile (Monday-aligned through `--gantt-week-offset`) with the last two days
+ * washed; column lines are a tile of one unit with a faint hairline at its start. The month zoom
+ * has months of different lengths: its lines, and the stronger line where a period starts, are
+ * elements (`.gridLine`), rendered only near the view.
+ */
+.backdropWash,
+.backdropLines {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--gantt-label-w);
+  width: var(--gantt-axis-w);
+  pointer-events: none;
+}
+
+.root:not([data-scale="month"]) .backdropWash {
+  background-image: linear-gradient(
+    var(--gantt-edge-dir),
+    transparent calc(5 * var(--gantt-day)),
+    var(--prime-color-fill-faint) 0
+  );
+  background-position: calc(var(--gantt-week-offset) * var(--gantt-day)) 0;
+  background-size: calc(7 * var(--gantt-day)) 100%;
+}
+
+.root:not([data-scale="month"]) .backdropLines {
+  --gantt-line-tile: var(--gantt-day);
+
+  background-image: linear-gradient(
+    var(--gantt-edge-dir),
+    var(--prime-color-border-faint) var(--prime-border-width),
+    transparent 0
+  );
+  background-size: var(--gantt-line-tile) 100%;
+}
+
+.root[data-scale="week"] .backdropLines {
+  --gantt-line-tile: calc(7 * var(--gantt-day));
+}
+
+.root:dir(rtl):not([data-scale="month"]) .backdropWash {
+  background-position: right calc(var(--gantt-week-offset) * var(--gantt-day)) top 0;
+}
+
+.root:dir(rtl):not([data-scale="month"]) .backdropLines {
+  background-position: right 0 top 0;
+}
+
+.gridLine,
+.todayLine {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--x) * var(--gantt-day));
+}
+
+.gridLine {
+  width: var(--prime-border-width);
+  background: var(--prime-color-border-faint);
+}
+
+/* A new month (day and week zoom) or year (month zoom) starts on a slightly stronger line. */
+.gridLine[data-boundary="true"] {
+  background: var(--prime-color-border-subtle);
+}
+
+/* While loading, the column lines and the today line lie over the skeleton bars, so they stay
+   whole; the weekend wash stays under them, so a bar keeps one even fill. */
+.body[data-state="loading"] .backdropLines {
+  z-index: 1;
+}
+
+.todayLine {
+  width: calc(var(--prime-border-width) * 2);
+  margin-inline-start: calc(var(--prime-border-width) * -1);
+  background: var(--prime-color-accent-default);
+}
+
+.row {
+  display: flex;
+  min-height: calc(
+    2 *
+    var(--gantt-pad-y) +
+    var(--lanes) *
+    var(--gantt-bar-h) +
+    (var(--lanes) - 1) *
+    var(--gantt-lane-gap)
+  );
+  border-block-start: var(--gantt-divider);
+}
+
+/* Rows are virtualized: the body has the height of every row, each rendered row stands at its top. */
+.body[data-state="rows"] {
+  height: var(--rows-height);
+}
+
+.body[data-state="rows"] > .row {
+  position: absolute;
+  inset-inline: 0;
+  top: var(--row-top);
+}
+
+.rowHeader {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: var(--gantt-z-column);
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-2);
+  width: var(--gantt-label-w);
+  min-width: 0;
+  padding: var(--gantt-pad-y) var(--gantt-pad-x);
+  background: var(--gantt-surface);
+}
+
+/* A row header is a keyboard stop of the grid (row navigation, `N` creates): full-bleed, so the
+   ring is drawn inside it. */
+.rowHeader:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* Start edge cue: a short soft shadow from the column's end edge over the scrolled axis. */
+.rowHeader::after,
+.corner::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 100%;
+  width: var(--gantt-column-edge-depth);
+  pointer-events: none;
+  background: linear-gradient(
+    var(--gantt-edge-dir),
+    var(--prime-color-bg-edge-shadow),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-overflow-start="true"] .rowHeader::after,
+.root[data-overflow-start="true"] .corner::after {
+  opacity: 1;
+}
+
+.rowAvatar {
+  display: inline-flex;
+  flex: none;
+}
+
+.rowLabel {
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track {
+  position: relative;
+  /* Drags and drawing on the axis never select text. */
+  user-select: none;
+  flex: none;
+  width: var(--gantt-axis-w);
+}
+
+/* ---------- Bars ---------- */
+
+.bar {
+  --bar-bg: var(--hue-soft);
+  --bar-fg: var(--hue-text);
+  --bar-solid: var(--hue-solid);
+  --bar-press: 1;
+
+  position: absolute;
+  inset-block-start: calc(
+    var(--gantt-pad-y) +
+    var(--lane) *
+    (var(--gantt-bar-h) + var(--gantt-lane-gap))
+  );
+  inset-inline-start: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  box-sizing: border-box;
+  width: calc(var(--span) * var(--gantt-day));
+  height: var(--gantt-bar-h);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--gantt-bar-pad-x);
+  border: 0;
+  border-radius: var(--gantt-bar-radius);
+  background: var(--bar-bg);
+  color: var(--bar-fg);
+  font: inherit;
+  font-size: var(--gantt-bar-text);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--gantt-bar-line-height);
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  transform: translateX(calc(var(--x) * var(--gantt-day) * var(--gantt-dir)))
+    scale(var(--bar-press));
+  /*
+   * A changed bar glides to its dates (emphasized · base): a drop, a keyboard step, a refused change
+   * gliding back. The width moves with it on a resize — an absolutely placed bar reflows nothing
+   * around it, and a scale would stretch its label and corners.
+   */
+  transition:
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.bar[data-progress="true"] {
+  --bar-progress: color-mix(in oklab, var(--bar-solid) 32%, var(--bar-bg));
+
+  background: linear-gradient(
+    var(--gantt-edge-dir),
+    var(--bar-progress) var(--progress),
+    var(--bar-bg) var(--progress)
+  );
+}
+
+.bar[data-tone="neutral"] {
+  --bar-bg: var(--prime-color-fill-muted);
+  --bar-fg: var(--prime-color-text-primary);
+  --bar-solid: var(--prime-color-text-muted);
+}
+
+.bar[data-tone="accent"] {
+  --bar-bg: var(--prime-color-accent-soft);
+  --bar-fg: var(--prime-color-accent-text);
+  --bar-solid: var(--prime-color-accent-default);
+}
+
+.bar[data-tone="success"] {
+  --bar-bg: var(--prime-color-success-soft);
+  --bar-fg: var(--prime-color-success-text);
+  --bar-solid: var(--prime-color-success-default);
+}
+
+.bar[data-tone="warning"] {
+  --bar-bg: var(--prime-color-warning-soft);
+  --bar-fg: var(--prime-color-warning-text);
+  --bar-solid: var(--prime-color-warning-default);
+}
+
+.bar[data-tone="danger"] {
+  --bar-bg: var(--prime-color-danger-soft);
+  --bar-fg: var(--prime-color-danger-text);
+  --bar-solid: var(--prime-color-danger-default);
+}
+
+.bar[data-tone="info"] {
+  --bar-bg: var(--prime-color-info-soft);
+  --bar-fg: var(--prime-color-info-text);
+  --bar-solid: var(--prime-color-info-default);
+}
+
+.bar:focus-visible {
+  z-index: 1;
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+/* A bar is a whole surface: it lifts on hover instead of changing its fill (foundation §8). */
+@media (hover: hover) and (pointer: fine) {
+  .bar:hover {
+    z-index: 1;
+    box-shadow: var(--prime-shadow-raised);
+  }
+}
+
+.bar:active:not([data-dragging], [data-pending="true"]) {
+  --bar-press: var(--prime-motion-press-scale);
+}
+
+/*
+ * Direct manipulation: while dragged, the bar follows the pointer exactly (no easing on its place
+ * or size) and stays lifted; on release it glides to the whole day it snapped to.
+ */
+.bar[data-dragging] {
+  z-index: 1;
+  box-shadow: var(--prime-shadow-overlay);
+  cursor: grabbing;
+  transition:
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* Where a dragged edge lands at the week and month zoom: a faint accent tick on the snapped day. */
+.dayGuide {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--x) * var(--gantt-day));
+  width: calc(var(--prime-border-width) * 2);
+  margin-inline-start: calc(var(--prime-border-width) * -1);
+  background: var(--prime-color-accent-default);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.bar[data-editable="true"]:not([data-milestone]) {
+  cursor: grab;
+}
+
+.bar[data-pending="true"] {
+  opacity: 0.72;
+  cursor: progress;
+}
+
+.spinner {
+  flex: none;
+}
+
+/* As wide as its text, so it can slide along a bar scrolled under the pinned column. */
+.label {
+  overflow: hidden;
+  flex: 0 1 auto;
+  min-width: 0;
+  text-overflow: ellipsis;
+  transform: translateX(var(--label-shift, 0));
+}
+
+/* Too short for its text (measured): the label sits after the bar in the primary text color. */
+.bar[data-label="outside"] .label {
+  position: absolute;
+  inset-inline-start: calc(100% + var(--prime-space-2));
+  overflow: visible;
+  color: var(--prime-color-text-primary);
+  pointer-events: none;
+}
+
+/* No room beside it either: the tooltip and the accessible name carry the label. */
+.bar[data-label="hidden"] .label {
+  position: absolute;
+  visibility: hidden;
+}
+
+/* Milestone: a diamond on its day, the label beside it. */
+.bar[data-milestone] {
+  justify-content: center;
+  width: var(--gantt-bar-h);
+  padding: 0;
+  background: transparent;
+  transform: translateX(
+      calc(((var(--x) + 0.5) * var(--gantt-day) - var(--gantt-bar-h) / 2) * var(--gantt-dir))
+    )
+    scale(var(--bar-press));
+}
+
+.diamond {
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: var(--prime-radius-xs);
+  background: var(--bar-solid);
+  transform: rotate(45deg);
+}
+
+.bar[data-milestone] .label {
+  position: absolute;
+  inset-inline-start: calc(100% + var(--prime-space-1));
+  overflow: visible;
+  color: var(--prime-color-text-primary);
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bar[data-milestone]:hover {
+    box-shadow: none;
+  }
+}
+
+/* Grips at both ends resize the bar; a short line shows on hover, always on touch. */
+.handle {
+  position: absolute;
+  inset-block: 0;
+  width: var(--prime-space-2);
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.handle[data-handle="start"] {
+  inset-inline-start: 0;
+}
+
+.handle[data-handle="end"] {
+  inset-inline-end: 0;
+}
+
+.handle::after {
+  content: "";
+  position: absolute;
+  inset-block: 30%;
+  inset-inline-start: calc(50% - var(--prime-border-width));
+  width: calc(var(--prime-border-width) * 2);
+  border-radius: var(--prime-radius-full);
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.bar[data-dragging] .handle::after {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bar:hover .handle::after {
+    opacity: 1;
+  }
+}
+
+@media (pointer: coarse) {
+  .handle {
+    width: var(--prime-space-4);
+  }
+
+  .handle::after {
+    opacity: 1;
+  }
+}
+
+/* ---------- Creating ---------- */
+
+/* Empty space that takes a new bar: a crosshair, and on hover a faint cell with a «+». */
+.track[data-creatable] {
+  cursor: crosshair;
+}
+
+.createCell {
+  position: absolute;
+  inset-block: calc(var(--prime-border-width) * -1) 0;
+  inset-inline-start: calc(var(--x) * var(--gantt-day));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--span) * var(--gantt-day));
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-muted);
+  pointer-events: none;
+  animation: ganttCellIn var(--prime-motion-duration-xfast) var(--prime-motion-easing-enter);
+}
+
+@media (hover: none) {
+  .createCell {
+    display: none;
+  }
+}
+
+@keyframes ganttCellIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * The bar being created: an accent outline of a bar while it is drawn (the tooltip says its dates),
+ * a pulsing Skeleton fill while `onBarCreate` runs, fading out on a refusal. On success the real
+ * bar renders in the same place and lane, so nothing flashes.
+ */
+.ghost {
+  position: absolute;
+  inset-block-start: calc(
+    var(--gantt-pad-y) +
+    var(--lane) *
+    (var(--gantt-bar-h) + var(--gantt-lane-gap))
+  );
+  inset-inline-start: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: calc(var(--span) * var(--gantt-day));
+  height: var(--gantt-bar-h);
+  padding-inline: var(--gantt-bar-pad-x);
+  border-radius: var(--gantt-bar-radius);
+  background: var(--prime-color-accent-soft);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-accent-default);
+  color: var(--prime-color-accent-text);
+  font-size: var(--gantt-bar-text);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--gantt-bar-line-height);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(calc(var(--x) * var(--gantt-day) * var(--gantt-dir)));
+  transition:
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    width var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+  outline: none;
+}
+
+.ghost[data-state="leaving"] {
+  opacity: 0;
+}
+
+.ghostBusy {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  border-radius: inherit;
+}
+
+.ghostLabel {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Tooltip ---------- */
+
+.tipTitle,
+.tipMeta {
+  display: block;
+}
+
+.tipTitle {
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.tipMeta {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Loading and empty ---------- */
+
+.skeletonLabel {
+  width: 70%;
+}
+
+/* A coming bar: the exact height, radius and lane of a real one, in the Skeleton's fill and pulse. */
+.skeletonBar {
+  position: absolute;
+  inset-block-start: var(--gantt-pad-y);
+  inset-inline-start: 0;
+  width: calc(var(--span) * var(--gantt-day));
+  max-width: none;
+  height: var(--gantt-bar-h);
+  min-height: 0;
+  border-radius: var(--gantt-bar-radius);
+  transform: translateX(calc(var(--x) * var(--gantt-day) * var(--gantt-dir)));
+}
+
+.emptyRow {
+  display: flex;
+  border-block-start: var(--gantt-divider);
+}
+
+/* The message stays in the visible part of the viewport however far the axis is scrolled. */
+.emptyCell {
+  position: sticky;
+  inset-inline-start: 0;
+  box-sizing: border-box;
+  width: 100cqi;
+  padding: var(--prime-space-6) var(--gantt-pad-x);
+}
+
+/* ---------- Narrow ---------- */
+
+/* The root is the size container, so the column width is set on the frame inside it. */
+@container (max-width: 47.99rem) {
+  .frame {
+    --gantt-label-w: calc(var(--prime-space-20) * 2);
+  }
+}
+
+@container (max-width: 35.99rem) {
+  .frame {
+    --gantt-label-w: var(--prime-space-24);
+  }
+
+  .toolbarEnd {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+
+  /* With avatars the column keeps only them; the name stays for assistive tech. */
+  .root[data-avatar] .frame {
+    --gantt-label-w: calc(var(--prime-avatar-m) + 2 * var(--gantt-pad-x));
+  }
+
+  .root[data-avatar] .rowLabel,
+  .root[data-avatar] .cornerText {
+    position: absolute;
+    overflow: hidden;
+    width: var(--prime-border-width);
+    height: var(--prime-border-width);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* Short landscape screens: a sticky head would take a large share of the height. */
+@media (max-height: 479px) {
+  .head {
+    position: relative;
+  }
+}

@@ -26,9 +26,10 @@ const EASINGS = semanticKeys("motion.easing").map((key) => ({
   value: resolvePrimitive(sourceValue(`motion.easing.${key}`, "light") ?? ""),
 }));
 
-/** Single-value motion tokens: the stagger step and the press scales. */
+/** Single-value motion tokens: the stagger step, the loading loop, blur and the press scales. */
 const EXTRAS = [
   "motion.stagger",
+  "motion.loop",
   "motion.blur",
   "motion.press.scale",
   "motion.press.scaleCompact",
@@ -47,6 +48,8 @@ const DURATION_USE: Record<string, string> = {
 
 const EXTRA_USE: Record<string, string> = {
   "motion.stagger": "Шаг между элементами при первом появлении группы (до 6 штук)",
+  "motion.loop":
+    "Такт цикла загрузки (Spinner: оборот за 3 такта); при ограничении движения не обнуляется — сигнал загрузки это информация",
   "motion.blur":
     "Размытие, которое прячет смену формы, когда два состояния меняются на месте (иконка → галочка, буквы подписи)",
   "motion.press.scale": "Масштаб при нажатии (:active) кнопок и других нажимаемых элементов",
@@ -212,7 +215,7 @@ function MotionPlayground() {
           size="s"
           variant="soft"
           tone="neutral"
-          aria-pressed={playing}
+          pressed={playing}
           onClick={() => setPlaying((p) => !p)}
         >
           {playing ? "Вернуть" : "Запустить все"}
@@ -248,7 +251,7 @@ function EmphasizedDemo() {
           size="s"
           variant="soft"
           tone="neutral"
-          aria-pressed={on}
+          pressed={on}
           onClick={() => setOn((v) => !v)}
         >
           {on ? "Вернуть" : "Переключить"}

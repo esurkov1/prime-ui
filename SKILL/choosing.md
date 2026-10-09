@@ -8,10 +8,10 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | The user needs to… | Category |
 |---|---|
 | trigger an action (save, delete, go on) | Actions — Button, ButtonGroup, LinkButton |
-| type a value (text, number, code, file, photos), group the fields of a form | Inputs — Input, Textarea, DigitInput, FileUpload, ImageUpload, Label, Hint, Fieldset |
+| type a value (text, number, code, file, photos), group the fields of a form | Inputs — Input, Textarea, DigitInput, FileUpload, Label, Hint, Fieldset |
 | pick from options, toggle, set a range, filter, a date or a color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorField, ColorPicker, ColorSwatches |
 | see data: status labels, people, objects, numbers and their trend, properties of a record, rows, a board, a schedule, events, code, disclosed sections | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DescriptionList, DataTable, Kanban, Gantt, Timeline, CodeBlock, Accordion, Sparkline, ChartFrame |
-| hold a conversation: read and send chat messages of every kind | Messages — Message, VoicePlayer, Composer |
+| hold a conversation: read and send chat messages of every kind | Messages — Message, VoicePlayer, VideoNote, Composer |
 | learn what happened, how far along it is, or watch a region load and change state; say it to a screen reader | Status and loading — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, Crossfade, EmptyPage, VisuallyHidden |
 | move between places: app sections, panels of a screen, the path, pages, steps | Navigation — Tabs, Breadcrumb, Pagination, Stepper, Sidebar, BottomNav |
 | see something on top of the page | Overlays — Tooltip, Popover, Dropdown, Modal, ConfirmDialog, Drawer, Sheet, CommandMenu |
@@ -28,7 +28,7 @@ toolbar, view switch with `pressed`) → `ButtonGroup`. Navigation to a URL that
 
 **Text input.** One line → Input. Several lines → Textarea. The message input of a chat (Enter sends,
 attachments, replies, voice) → Composer, never a Textarea with a send button. Fixed-length code (OTP, PIN) → DigitInput.
-Files → FileUpload; a set of photos shown in order (a listing, a product), with a cover → ImageUpload. A sign-in, sign-up, password-reset or code screen → LoginForm. Number with a unit →
+Files → FileUpload; an image gallery — photos of a listing or a product in order, the first the cover — is FileUpload too: `trigger="tile"` `layout="grid"` `cover` (no separate gallery component). A sign-in, sign-up, password-reset or code screen → LoginForm. Number with a unit →
 Input with `Input.InlineAffix`. Search and filters above a list or table → SmartFilter, a search alone there too
 (`fields={[]}`); a lone search
 field outside a list (a picker, a settings section, a panel) → Input with `Input.Icon` + `type="search"`
@@ -72,7 +72,11 @@ never a Timeline or a list of Cards styled as bubbles. Code → CodeBlock. A num
 **Messages.** A chat → `Message.Group` of `Message.Root` (runs and dates from `groupMessages`) in a
 `ScrollContainer anchor="end"`, with the Composer under it. A voice message → `VoicePlayer` inside
 `Message.Root`; a call recording outside a chat → `VoicePlayer` alone. A round video message →
-`Message.VideoNote`. «Печатает…» → `Message.Typing`, never a text row; pinned messages above the chat →
+`VideoNote` inside `Message.Root` (alone there it is the message: no bubble); a face-to-camera report
+outside a chat → `VideoNote` alone. The two players take the same props (`src`, `duration`,
+`unplayed`, `disabled`, `playing`, the transcript and the `transfer` set); only VoicePlayer has
+`waveform` and a rate, only VideoNote a `poster`. A video with controls → `Message.Media` or
+`Thumbnail.Video`, not VideoNote. «Печатает…» → `Message.Typing`, never a text row; pinned messages above the chat →
 `Message.Pinned`; a jump to a message → `Message.Reply target` or `Message.Group current`, never
 `scrollIntoView`; search inside a chat → a search Input above it with `Message.Group highlight`. Files, photos, places and contacts sent in a chat → the `Message` parts, not
 FileUpload rows or Cards.
@@ -142,6 +146,6 @@ collapsible`; a section with sub-pages → `Sidebar.Sub`; the signed-in user →
 | ConfirmDialog / Modal / `holdToConfirm` / undo | A row or item in a list that can be restored → delete at once and offer «Отменить» in the Notification. One standalone destructive action that is easy to redo by hand, no list (clear a draft, revoke a token) → `Button.Root holdToConfirm` with the action in `onConfirm`. Irreversible loss of work or a weighty action (delete a project, send an invoice) → ConfirmDialog (`onConfirm` returns the request; pending, failure and dismiss rules are built in). Unsaved changes in a Modal or Drawer form → `Modal.Guard` / `Drawer.Guard dirty`. A form, a choice or more than a sentence of content → Modal; never a Modal hand-built as a confirm. |
 | Composer / Textarea | Composer: the message input of a conversation — Enter sends, attachments, a reply or edit bar, voice and round video. Textarea: long text saved with a form (a description, a comment field) by its submit button. |
 | Message / Timeline / Notification | Message: what people say to each other in a conversation, in bubbles. Timeline: what happened to a record (status changes, an audit log). Notification: the result of the user's own action, for a few seconds. A chat event («Анна добавила Олега») is `Message.Service`, not a Notification. |
-| ImageUpload / FileUpload | ImageUpload: a set of photos of one object shown in order, as tiles, with a cover and drag reorder. FileUpload: documents and attachments as rows (any type), one picture of a person through its avatar mode. Both take the same `useUploadQueue`. |
+| FileUpload list / grid / gallery / strip | One component, four shapes. **List** (`layout="list"`, the default, with the drop zone): documents of a form, where the name matters; rows do not reorder. **Cards** (`trigger="tile"` `layout="grid"`): mixed photos and documents whose order matters (an inspection report). **Gallery** (`trigger="tile"` `layout="grid"` `cover` `accept="image/*"`): the photos of one object (a listing, a product); the first is the cover and dragging a photo first makes it the cover — no «make cover» button. **Strip** (`trigger="button"` + `FileUpload.Queue layout="strip"`): a paperclip and one scrolling row of tiles above a message field; the Composer already is this. Files on a server are `value` + `onValueChange` (return a promise to save); uploads are `queue` from `useUploadQueue`. One picture of a person is the avatar zone, not a gallery. |
 | Fieldset / a labelled group control | Fieldset: several **fields** under one heading (`title-s` legend), with one `disabled` for all of them while the form saves. One **choice** with a heading (`Radio.Group label`, SegmentedControl or ButtonGroup `label`, ColorSwatches `label`) is a single field — its own label names the group, no Fieldset around it. |
 | ColorField / ColorPicker / ColorSwatches | ColorField: any color as a form field (swatch + hex, the picker in a popover, `presets`). ColorPicker: the picker panel is the screen itself (a design tool, an inline editor). ColorSwatches: a short fixed palette visible at once. All but ColorSwatches come from `prime-ui-kit/color-picker`. |

@@ -44,7 +44,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Неактивный бейдж, переключатель выключен и включён, снимаемый — `disabled`, `onPress`, `pressed`, `onRemove`.",
+        "Неактивный бейдж, переключатель выключен и включён, снимаемый и ждущий запроса — `disabled`, `onPress`, `pressed`, `onRemove`, `loading`.",
     },
     {
       slot: "with-icon",
@@ -61,6 +61,12 @@ export const page: ComponentPageConfig = {
       title: "Применённые фильтры",
       description:
         "Каждый бейдж снимает свой фильтр и называет его для скринридеров — `onRemove`, `labels`.",
+    },
+    {
+      scenario: "server-tags",
+      title: "Удаление на сервере",
+      description:
+        "Теги заказа снимаются на сервере: бейдж ждёт приглушённым со спиннером, уходит, когда сервер согласился, и остаётся с объявлением, когда отказал — `onRemove`, `labels`.",
     },
     {
       scenario: "filter-values",
@@ -80,6 +86,7 @@ export const page: ComponentPageConfig = {
       "`onPress` делает тело `<button>` с `aria-pressed` при заданном `pressed`; удаление и `Badge.Action` — отдельные кнопки со своими именами.",
       "Дайте каждому удалению уникальное имя через `labels.remove`, иначе скринридер услышит несколько одинаковых «Удалить».",
       "`Badge.Dot` скрыт (`aria-hidden`); бейджу-иконке нужен `aria-label`. Цвет никогда не несёт смысл один — оставляйте слово.",
+      "Пока удаление сохраняется (промис из `onRemove` или `loading`), у бейджа `aria-busy`, у сегмента `aria-disabled`; отказ объявляет вежливая live-область бейджа (`labels.removeFailed`).",
     ],
   },
 };

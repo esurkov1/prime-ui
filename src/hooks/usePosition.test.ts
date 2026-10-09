@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { type ComputeFloatingOptions, computeFloatingPosition } from "./usePosition";
+import {
+  type ComputeFloatingOptions,
+  computeFloatingPosition,
+  DEFAULT_ALIGN,
+  DEFAULT_SIDE,
+} from "./usePosition";
 
 const anchor = (left: number, width: number) =>
   ({ left, right: left + width, top: 100, bottom: 140, width, height: 40 }) as DOMRectReadOnly;
@@ -14,6 +19,37 @@ const opts = {
 };
 
 describe("computeFloatingPosition", () => {
+  it("opens below the anchor, lined up with the anchor edge that has more room (auto)", () => {
+    expect(DEFAULT_SIDE).toBe("bottom");
+    expect(DEFAULT_ALIGN).toBe("auto");
+    const auto = { ...opts, side: DEFAULT_SIDE, align: DEFAULT_ALIGN };
+    // A «⋯» near the end of the screen: the 240-wide menu ends where the trigger ends.
+    const nearEnd = computeFloatingPosition(anchor(1300, 40), 240, 160, 1400, 900, auto);
+    expect(nearEnd.side).toBe("bottom");
+    expect(nearEnd.left + 240).toBe(1340);
+    // A trigger near the start: the menu starts where the trigger starts.
+    const nearStart = computeFloatingPosition(anchor(60, 40), 240, 160, 1400, 900, auto);
+    expect(nearStart.left).toBe(60);
+  });
+
+  it("stays inside a boundary: clamps across, flips when the side has no room in it", () => {
+    // A chip 120 wide at the start of a region whose sticky column ends at x = 200, header at y = 90.
+    const boundary = { left: 200, top: 90, right: 800, bottom: 600 };
+    const pos = computeFloatingPosition(anchor(210, 40), 120, 30, 1400, 900, {
+      ...opts,
+      side: "top",
+      align: "center",
+      boundary,
+      arrowInset: 10,
+    });
+    expect(pos.left).toBe(208);
+    // No room above inside the boundary (100 − 90): it opens below.
+    expect(pos.side).toBe("bottom");
+    // The arrow still points at the anchor's centre (230).
+    expect(pos.left + (pos.arrow ?? 0)).toBe(230);
+    expect(pos.maxWidth).toBe(584);
+  });
+
   it("align=end that overflows on the left aligns to the anchor's left edge", () => {
     const pos = computeFloatingPosition(anchor(300, 200), 900, 400, 1400, 900, {
       ...opts,

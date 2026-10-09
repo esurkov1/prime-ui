@@ -7,3 +7,14 @@
   align-items: flex-start;
   gap: var(--prime-space-3);
 }
+
+/* in-form.tsx: field → field and fields → action at the form rhythm; controls keep their width. */
+.form {
+  display: grid;
+  justify-items: start;
+  gap: var(--prime-space-5);
+}
+
+.form > :last-child {
+  margin-block-start: var(--prime-space-3);
+}

@@ -114,6 +114,57 @@ describe("TagSelect", () => {
     expect(onCreated).toHaveBeenCalledWith("newtag");
   });
 
+  it("async onCreate: the new chip waits busy and cannot be removed; resolve keeps it", async () => {
+    let resolve: () => void = () => {};
+    const onValueChange = vi.fn();
+    render(
+      <BasicTagSelect
+        creatable
+        onValueChange={onValueChange}
+        onCreate={() =>
+          new Promise<void>((done) => {
+            resolve = done;
+          })
+        }
+      />,
+    );
+    const input = screen.getByRole("combobox");
+    fireEvent.change(input, { target: { value: "Опт" } });
+    fireEvent.click(screen.getByRole("option", { name: /Опт/ }));
+    const chip = document.querySelector('[data-chip-value="Опт"]') as HTMLElement;
+    expect(chip).toHaveAttribute("aria-busy", "true");
+    expect(onValueChange).toHaveBeenLastCalledWith(["Опт"]);
+    fireEvent.click(screen.getByRole("button", { name: "Удалить Опт" }));
+    fireEvent.keyDown(input, { key: "Backspace" });
+    expect(document.querySelector('[data-chip-value="Опт"]')).not.toBeNull();
+
+    await act(async () => {
+      resolve();
+    });
+    expect(document.querySelector('[data-chip-value="Опт"]')).not.toHaveAttribute("aria-busy");
+  });
+
+  it("async onCreate: reject takes the new tag out again and announces it", async () => {
+    const onValueChange = vi.fn();
+    render(
+      <BasicTagSelect
+        creatable
+        onValueChange={onValueChange}
+        onCreate={async () => {
+          throw new Error("exists");
+        }}
+      />,
+    );
+    const input = screen.getByRole("combobox");
+    fireEvent.change(input, { target: { value: "Опт" } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("option", { name: /Опт/ }));
+    });
+    expect(document.querySelector('[data-chip-value="Опт"]')).toBeNull();
+    expect(onValueChange).toHaveBeenLastCalledWith([]);
+    expect(screen.getByText("Не удалось создать тег «Опт»")).toBeInTheDocument();
+  });
+
   it("снимает тег по крестику при фокусе в поле ввода", () => {
     render(<BasicTagSelect defaultValue={["a"]} />);
     const input = screen.getByRole("combobox");
@@ -159,6 +210,35 @@ describe("TagSelect", () => {
     expect(onOptionUpdate).toHaveBeenCalledWith("a", { label: "Альфа" });
   });
 
+  it("async onOptionUpdate: the new color shows at once, «⋯» spins; reject puts it back", async () => {
+    let reject: (reason: unknown) => void = () => {};
+    render(
+      <BasicTagSelect
+        defaultValue={["a"]}
+        onOptionUpdate={() =>
+          new Promise<void>((_, fail) => {
+            reject = fail;
+          })
+        }
+      />,
+    );
+    fireEvent.focus(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Красный/ }));
+    const chip = document.querySelector('[data-chip-value="a"]') as HTMLElement;
+    expect(chip).toHaveAttribute("data-color", "red");
+    expect(screen.getByRole("button", { name: /Изменить тег Alpha/i })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+
+    await act(async () => {
+      reject(new Error("offline"));
+    });
+    expect(document.querySelector('[data-chip-value="a"]')).toHaveAttribute("data-color", "blue");
+    expect(screen.getByText("Не удалось изменить тег «Alpha»")).toBeInTheDocument();
+  });
+
   it("с onOptionUpdate / onOptionDelete меню ⋯ есть и у выбранных тегов", () => {
     render(
       <BasicTagSelect
@@ -190,6 +270,94 @@ describe("TagSelect", () => {
     expect(screen.getByRole("button", { name: /^Удалить$/i })).toBeInTheDocument();
     expect(screen.queryByRole("textbox", { name: "Название тега" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Синий" })).not.toBeInTheDocument();
+  });
+
+  describe("onOptionDelete returning a Promise", () => {
+    function deferred() {
+      let resolve!: () => void;
+      let reject!: (reason?: unknown) => void;
+      const promise = new Promise<void>((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
+      return { promise, resolve, reject };
+    }
+
+    function startDelete(onOptionDelete: (value: string) => Promise<void>) {
+      const onValueChange = vi.fn();
+      render(
+        <BasicTagSelect
+          defaultValue={["a", "b"]}
+          onValueChange={onValueChange}
+          onOptionDelete={onOptionDelete}
+        />,
+      );
+      fireEvent.focus(screen.getByRole("combobox"));
+      fireEvent.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
+      fireEvent.click(screen.getByRole("button", { name: /^Удалить$/i }));
+      return onValueChange;
+    }
+
+    it("keeps the value while pending: the row is busy, «⋯» spins, focus waits in the input", () => {
+      const pending = deferred();
+      const onValueChange = startDelete(() => pending.promise);
+      const row = screen.getByRole("option", { name: "Alpha" });
+      expect(row).toHaveAttribute("aria-busy", "true");
+      expect(screen.getByRole("button", { name: /Изменить тег Alpha/i })).toHaveAttribute(
+        "aria-busy",
+        "true",
+      );
+      expect(screen.getByRole("button", { name: /Удалить Alpha/i })).toBeInTheDocument();
+      expect(screen.getByRole("combobox")).toHaveFocus();
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it("a pending row is not picked", () => {
+      const pending = deferred();
+      const onValueChange = startDelete(() => pending.promise);
+      const pick = screen.getByRole("option", { name: "Alpha" }).querySelector("button");
+      if (pick) fireEvent.click(pick);
+      expect(pick).toBeDisabled();
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it("applies the deletion once it resolves", async () => {
+      const pending = deferred();
+      const onValueChange = startDelete(() => pending.promise);
+      await act(async () => pending.resolve());
+      expect(onValueChange).toHaveBeenCalledWith(["b"]);
+      expect(screen.queryByRole("button", { name: /Удалить Alpha/i })).not.toBeInTheDocument();
+    });
+
+    it("a rejection keeps the selection and ends the pending state", async () => {
+      const pending = deferred();
+      const onValueChange = startDelete(() => pending.promise);
+      await act(async () => pending.reject(new Error("cancelled")));
+      expect(onValueChange).not.toHaveBeenCalled();
+      expect(screen.getByRole("button", { name: /Удалить Alpha/i })).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "Alpha" })).not.toHaveAttribute("aria-busy");
+    });
+  });
+
+  it("name submits one hidden input per selected value", () => {
+    const { container } = render(<BasicTagSelect name="labels" defaultValue={["a", "b"]} />);
+    const inputs = container.querySelectorAll('input[type="hidden"][name="labels"]');
+    expect([...inputs].map((input) => (input as HTMLInputElement).value)).toEqual(["a", "b"]);
+  });
+
+  it("onOptionDelete without a Promise removes the value at once", () => {
+    const onValueChange = vi.fn();
+    render(
+      <BasicTagSelect
+        defaultValue={["a", "b"]}
+        onValueChange={onValueChange}
+        onOptionDelete={vi.fn()}
+      />,
+    );
+    fireEvent.focus(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("button", { name: /Изменить тег Alpha/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Удалить$/i }));
+    expect(onValueChange).toHaveBeenCalledWith(["b"]);
   });
 
   it("labels переопределяют системные строки", () => {

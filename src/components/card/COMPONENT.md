@@ -10,6 +10,7 @@
 - A chart or text widget with a header and controls (`panel`).
 - A settings or profile form grouped on its own surface (`panel` + `Body` + `Footer`).
 - An activity list (`list`), a call to action (`cta`), a tile with an image on top (`cover`).
+- A tile that is itself the way to its details — a KPI that opens its report, a project tile (`asChild` with a link or a button).
 
 ## When not to use
 - A whole page region with a title and description → [PageContent](../page-content/COMPONENT.md) sections; do not wrap every section in a card.
@@ -24,14 +25,15 @@ import { Card } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Card.Root variant="panel"        Header(Title, …trailing) · Body · Media · Footer
-Card.Root variant="mini"         Icon · Label · Value · Media?
-Card.Root variant="stat-trend"   Label · Value · Delta
+Card.Root variant="panel"        Header(Title, Description?, …trailing) · Body · Media · Footer
+Card.Root variant="mini"         Icon · Label · Value · Meta? · Media?
+Card.Root variant="stat-trend"   Label · Value · Delta · Meta?
                                  or Header(Badge or Icon, Value) · Description
 Card.Root variant="split"        Body(cell × 2: any element, e.g. <div> with Icon · Label · Value)
 Card.Root variant="cta"          Title · Description · Footer
 Card.Root variant="list"         Header(Title, …trailing) · List(ListItem …)
 Card.Root variant="cover"        Media · Body(Title, Description) · Footer
+Card.Root asChild                <a> or <button> (the only child) holding the parts of any template
 ```
 
 ## API
@@ -39,12 +41,13 @@ Card.Root variant="cover"        Media · Body(Title, Description) · Footer
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Card.Root
-`ref` → `HTMLDivElement`. A layer of the surface ladder (`data-depth` one above the surface around it: white on the light page, the next layer when nested; radius 12, the raised whisper only on the page, no border) and a size container; `variant` picks the template layout of its parts.
+`ref` → `HTMLDivElement` (the `asChild` element). A layer of the surface ladder (`data-depth` one above the surface around it: white on the light page, the next layer when nested; radius 12, the raised whisper only on the page, no border) and a size container; `variant` picks the template layout of its parts.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `variant` | `"panel" \| "mini" \| "stat-trend" \| "split" \| "cta" \| "list" \| "cover"` | `"panel"` | Structural template: titled block with zones (`panel`), KPI tiles, a call to action, a list or a cover tile. |
 | `flat` | `boolean` | `false` | No raised shadow: a flat tile for dense grids. |
+| `asChild` | `boolean` | `false` | The whole card is one link or button: pass that element as the only child with the parts inside it; the root's class, data attributes and `ref` go to it. It lifts on hover (raised → overlay shadow), presses and shows the focus ring. Nothing interactive may sit inside it. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes. |
 
 ### Card.Header
@@ -63,7 +66,7 @@ Card.Root variant="cover"        Media · Body(Title, Description) · Footer
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Description
-`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s, wraps): under the title of `cta` and `cover`, under the header of `stat-trend`.
+`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s, wraps): under the title of `cta` and `cover`, under the header of `stat-trend`; inside `Card.Header` of `panel` and `list` it stacks under the title, the header's control staying at the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -105,6 +108,13 @@ Card.Root variant="cover"        Media · Body(Title, Description) · Footer
 | `tone` | `"neutral" \| "success" \| "warning" \| "danger"` | `"neutral"` | Delta: color by meaning, not by sign (churn up is `danger`). |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
+### Card.Meta
+`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular. In `stat-trend` it drops to the bottom of the tile, so tiles in a row line it up; in `mini` and a `split` cell it sits in the text column under the value.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
+
 ### Card.List · Card.ListItem
 `ref` → `HTMLUListElement` / `HTMLLIElement`. The `list` template: a `<ul>` of `<li>` rows with faint hairlines between them; head it with `Card.Header`.
 
@@ -137,6 +147,7 @@ Card.Root variant="cover"        Media · Body(Title, Description) · Footer
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `flat` | same fill, no shadow | dense grids of tiles | `false` |
+| `asChild` | the card is the link or button it wraps: lifts on hover (raised → overlay shadow), presses, focus ring | the whole tile opens its details | `false` |
 
 ## States
 | State | Driven by | DOM |
@@ -144,23 +155,31 @@ Card.Root variant="cover"        Media · Body(Title, Description) · Footer
 | template | `variant` | `data-variant` |
 | flat | `flat` | `data-flat` |
 | depth | nesting: one above the nearest surface (the page and the AppShell panel are 0) | `data-depth` (`1`–`4`, `floating-1`/`floating-2` inside a floating layer); the fill is `--prime-color-layer-current`, the shadow only at depth 1 |
-| card width | container queries | `split` stacks below 22rem, `Header` wraps below 22rem, the `stat-trend` value changes at 20rem / 36rem |
+| card width | container queries | `split` stacks below 22rem, `Header` wraps below 22rem (a header control under its description), the `stat-trend` value changes at 20rem / 36rem |
+| hover | `asChild`, a fine pointer | the fill stays (a whole surface never changes its fill, foundation §8); the shadow lifts to `--prime-shadow-overlay` over `fast` |
+| press | `asChild`, `:active` | `scale(--prime-motion-press-scale)` over `fast`; reduced motion keeps it still |
+| focus | `asChild`, `:focus-visible` | the focus ring outside the card |
 
-Card is static: no hover, focus or press of its own.
+Without `asChild` a card is static: no hover, focus or press of its own. With it: `data-interactive` on the element.
 
 ## Layout & spacing
 - Grid of cards: `repeat(auto-fit, minmax(min(100%, 14rem), 1fr))`, gap `--prime-space-4`.
 - Padding `--prime-card-padding-m` (20); `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
 - Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
 - Long values wrap, labels truncate; a chart SVG needs a CSS height.
-- In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper.
+- In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper. A `Card.Description` in the header stacks under the title, 4 apart; the control stays at the end, centred on both lines.
+- `Card.Meta` in `stat-trend` takes the bottom of the tile (`margin-top: auto`), so tiles of one row line their meta up.
 
 ## Accessibility
 
 ### Keyboard
-No keyboard interaction.
+| Key | Action |
+|---|---|
+| `Tab` | A card with `asChild` is one stop: focus lands on the whole link or button. |
+| `Enter` | Opens the link or presses the button of a card with `asChild`. |
 
 ### ARIA
+- With `asChild` the card is the link or button itself; its name is the text of its parts. Nothing interactive may sit inside it — put row actions next to the card instead.
 - `Card.Root` is a plain `<div>`; give it `role="region"` + `aria-labelledby` only when it is a landmark-worthy block.
 - `Card.Title` renders `<h3>`; directly under the page title pass `as="h2"`.
 - Decorative icons in `Card.Icon` and cover images in `Card.Media` get `aria-hidden`; controls in `Card.Header` need their own names.
@@ -174,9 +193,10 @@ No `labels`.
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A company settings panel: a header, fields on the surface fill and buttons in the footer — `Card.Header`, `Card.Body`, `Card.Footer`. |
-| [variants.tsx](examples/variants.tsx) | KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change — `variant`, `Card.Delta`. |
+| [variants.tsx](examples/variants.tsx) | KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change and a reference line — `variant`, `Card.Delta`, `Card.Meta`. |
 | [kpi-media.tsx](examples/kpi-media.tsx) | A KPI with a sparkline or a fill level in the bottom slot of `mini` — `Card.Media`. |
-| [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a period switch, a summary line and an edge-to-edge chart — `Card.Header`, `Card.Media`. |
+| [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a short description and a period switch, a summary line and an edge-to-edge chart — `Card.Header`, `Card.Description`, `Card.Media`. |
+| [interactive.tsx](examples/interactive.tsx) | Whole cards as links to their reports: one tab stop each, a lift on hover, a press and the focus ring — `asChild`. |
 | [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
 | [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem. |
@@ -188,7 +208,10 @@ No `labels`.
 - Custom padding on a `panel` root → padding belongs to `Header` / `Body` / `Footer`.
 - A wrapper `<div>` around the label and the value of `mini` → put `Icon`, `Label`, `Value` straight into the root (or into a `split` cell); the template lays them out.
 - A chart SVG with only a `viewBox` → give it a CSS height.
+- A clickable `<div>` card with `onClick` → `asChild` with a real `<a href>` (Cmd-click, a new tab) or a `<button>`.
+- Buttons or links inside an `asChild` card → nested interactive elements; move them out of the card.
+- The reference figures written into `Card.Delta` or `Card.Label` → `Card.Meta`.
 
 ## Related
 - **Built from:** —
-- **See also:** [PageContent](../page-content/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)
+- **See also:** [PageContent](../page-content/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md) (record details inside a `Card.Body`), [Fieldset](../fieldset/COMPONENT.md) (groups of fields inside a settings card), [DataTable](../data-table/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

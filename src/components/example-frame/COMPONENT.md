@@ -79,14 +79,15 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| pane | toolbar switch (internal, starts at Preview) | preview stage or code pane is rendered |
+| pane | toolbar switch (internal, starts at Preview) | preview stage or code pane is rendered; the device switch shows only with the preview |
 | viewport | `viewport` / `defaultViewport` | `data-viewport` on the preview viewport |
 | theme | `colorScheme` / `defaultColorScheme` | `data-theme` on the stage and code pane |
 | layout | `previewLayout` | `data-preview-layout` on the stage |
 | copy | copy button | its `aria-label` switches to `labels.copied` / `labels.copyError` for 2 s; on success the copy glyph cross-fades to a check (`data-copy-state`) |
 
 ## Layout & spacing
-- The frame is `max-width: 100%`; long code lines scroll inside the code pane instead of widening the page.
+- The frame is `max-width: 100%`; long code lines scroll inside the code pane instead of widening the page. The code pane is at most `min(512px, 70vh)` high and scrolls both ways.
+- The stage is at least 160 high with `--prime-space-6` / `--prime-space-4` padding; content wider than it is clipped (`matrix` scrolls instead).
 - The toolbar wraps below 40rem of frame width; below 25rem the visible device labels are hidden (icons stay, each option keeps a screen-reader name).
 - The device width switches at once: `max-width` is layout, so it does not animate.
 - Stack frames one per demo block; spacing between blocks comes from the page.

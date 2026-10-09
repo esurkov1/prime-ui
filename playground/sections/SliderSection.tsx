@@ -51,6 +51,12 @@ export const page: ComponentPageConfig = {
         "Ползунок в рамке поля, как остальные: пометка обязательности, подсказка и ошибка на её месте — `required`, `hint`, `error`, `optional`.",
     },
     {
+      scenario: "autosave",
+      title: "Автосохранение",
+      description:
+        "Настройка сохраняется, когда ползунок отпустили, а не на каждом шаге: ползунок ждёт приглушённым, а значение, от которого сервер отказался, плавно возвращается — `onCommit`, `hint`, `error`.",
+    },
+    {
       slot: "controlled",
       description:
         "Значением владеет родитель и делит его с числовым полем для точного ввода — `value`, `onValueChange`.",
@@ -69,6 +75,7 @@ export const page: ComponentPageConfig = {
       "`label` — настоящий `<label htmlFor>`; без него обязателен `aria-label`.",
       "`formatValue` задаёт `aria-valuetext`, скринридер читает единицы; видимый `<output>` скрыт (`aria-hidden`).",
       "`aria-describedby` поля — ваши id и подсказка или ошибка; `aria-invalid` при ошибке.",
+      "Пока значение сохраняется (промис из `onCommit`), у поля `aria-busy`; почему значение вернулось, покажите через `error`.",
     ],
   },
 };

@@ -1,0 +1,105 @@
+/*
+ * Message.Pinned: the bar of pinned messages above a conversation — a rail of segments, a pin, the
+ * title over one line of the message, and an optional unpin button. A surface on the ladder (its
+ * own fill, no border); the whole text area is one button that shows the message.
+ */
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  min-width: 0;
+  padding: var(--prime-space-1);
+  border-radius: var(--prime-radius-l);
+  background: var(--prime-color-layer-current);
+}
+
+.main {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  padding: var(--prime-space-1) var(--prime-space-2);
+  border: 0;
+  border-radius: var(--prime-radius-m);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .main:hover {
+    background: var(--prime-color-fill-muted);
+  }
+}
+
+.main:active {
+  transform: scale(var(--prime-motion-press-scale));
+}
+
+.main:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* Which of several is shown: the current segment glides its accent fill. */
+.rail {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: calc(var(--prime-space-1) / 2);
+  inline-size: calc(var(--prime-space-1) / 2);
+}
+
+.segment {
+  flex: 1 1 0;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-strong);
+  transition: background-color var(--prime-motion-duration-base)
+    var(--prime-motion-easing-emphasized);
+}
+
+.segment[data-current] {
+  background: var(--prime-color-accent-default);
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+  align-self: center;
+  color: var(--prime-color-accent-text);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  overflow: hidden;
+  color: var(--prime-color-accent-text);
+  font-size: var(--prime-text-body-s-size);
+  font-weight: var(--prime-font-weight-medium);
+  line-height: var(--prime-text-body-s-line-height);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.excerpt {
+  overflow: hidden;
+  color: var(--prime-color-text-secondary);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.unpin {
+  flex: none;
+}

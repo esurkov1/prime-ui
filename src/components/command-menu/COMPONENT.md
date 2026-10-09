@@ -9,6 +9,7 @@
 - Global search of an app opened with ⌘K / Ctrl+K: pages, records, settings.
 - Quick actions (create, invite, switch workspace) for keyboard users.
 - Picking one entry from a long list by typing, when a Select would be too small.
+- Searching records on the server (orders, clients, invoices): `search` / `onSearchChange`, `filter={false}`, `loading`, `hasMore` + `onLoadMore`, `loadError` + `onRetry`.
 
 ## When not to use
 - A few actions next to a button → use [Dropdown](../dropdown/COMPONENT.md).
@@ -22,17 +23,18 @@ import { CommandMenu } from "prime-ui-kit";
 
 ## Anatomy
 ```
-CommandMenu.Root                 Modal + top-aligned palette panel, query state
+CommandMenu.Root                 Modal + top-aligned palette panel, query and load state
 ├── CommandMenu.Title            optional <h2>, names the dialog
 ├── CommandMenu.Description      optional <p>
 ├── CommandMenu.Input            search icon + role="combobox" field, faint hairline below
-├── CommandMenu.List             role="listbox", scrolls
-│   ├── CommandMenu.Empty        compact EmptyPage while nothing matches
+├── CommandMenu.List             role="listbox", scrolls; skeleton rows while loading / loading more
+│   ├── CommandMenu.Empty        compact EmptyPage while nothing matches; may hold a CommandMenu.Item
 │   └── CommandMenu.Group        role="group", named by `label`
 │       └── CommandMenu.Item     <button role="option">
 │           ├── CommandMenu.ItemIcon
 │           ├── CommandMenu.ItemText       title + description line
 │           └── CommandMenu.ItemShortcut   Kbd at the end
+├── load error                   after the List: compact EmptyPage, role="alert", retry Button
 └── CommandMenu.Footer           key hints, hairline above
     └── CommandMenu.FooterHint   Kbd per key + label
 ```
@@ -42,16 +44,23 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query state
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### CommandMenu.Root
-`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; owns the query (cleared on close) and the active item (a new opening starts empty, focus in the search field).
+`ref` → `HTMLDivElement` (the dialog panel). A Modal with a top-aligned palette panel; owns the query (cleared on close), the active item (a new opening starts empty, focus in the search field) and the load state of server results.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `open` | `boolean` | — | Controlled visibility; together with `onOpenChange`. |
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: Escape, scrim click, code. |
-| `value` | `string` | — | Controlled query; the list filters by it. Together with `onValueChange`. |
-| `defaultValue` | `string` | `""` | Initial query, uncontrolled. |
-| `onValueChange` | `(value: string) => void` | — | Called with the new query: typing, and `""` when the palette closes. |
+| `search` | `string` | — | Controlled query; the list filters by it. Together with `onSearchChange`. |
+| `defaultSearch` | `string` | `""` | Initial query, uncontrolled. |
+| `onSearchChange` | `(search: string) => void` | — | Called with the new query: typing, and `""` when the palette closes. Load the matching results here for a server search. |
+| `filter` | `boolean` | `true` | The palette filters its items by the query. `false` when the results come from a server: every item shows, the query is still marked in the labels. |
+| `loading` | `boolean` | `false` | Results are loading: skeleton rows in the list while no item matches (items already on screen stay), `aria-busy`. |
+| `loadingMore` | `boolean` | `false` | More results are loading at the end: skeleton rows after the items. |
+| `hasMore` | `boolean` | `false` | More results exist: reaching the end of the list calls `onLoadMore`. |
+| `onLoadMore` | `() => void \| Promise<void>` | — | Called once per round with `hasMore` when the end of the list scrolls into view or the arrows reach the last item; set `loadingMore` while it runs. |
+| `loadError` | `ReactNode` | — | The results failed to load: the message replaces the list in `role="alert"`. |
+| `onRetry` | `() => void \| Promise<void>` | — | A retry button (`labels.retry`) under `loadError`; Enter in the search field runs it too. Return the request's promise: the button is loading (`aria-busy`) and neither it nor Enter retries again until it settles; resolve — clear `loadError` and the results swap in; reject — the error stays and the button is ready again. |
 | `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the palette; focus returns to the opener. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the palette. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the rows and the search row: item height, text, icon. |
@@ -64,14 +73,14 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query state
 `ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` / `<p>` above the search row; they name and describe the dialog. + native props except `id`.
 
 ### CommandMenu.Input
-`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; shows `CommandMenu.Root` `value`; takes focus on open; no focus ring (the caret is the indicator). + native input props except `value` / `defaultValue`.
+`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; shows `CommandMenu.Root` `search`; takes focus on open; no focus ring (the caret is the indicator). + native input props except `value` / `defaultValue` (`onChange`, `onKeyDown`, `onFocus`, `onBlur` reach the input).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `placeholder` | `string` | `labels.search` | Placeholder; also the default accessible name comes from `labels.search`. |
 
 ### CommandMenu.List
-`ref` → `HTMLElement`. The scrolling `role="listbox"` (a ScrollContainer) under the search row. + native props.
+`ref` → `HTMLElement`. The scrolling `role="listbox"` (a ScrollContainer) under the search row. It draws the load states of Root: skeleton rows while the first results load, skeleton rows at the end while more load, the load error with a retry instead of the list; the states cross-fade. + native props.
 
 ### CommandMenu.Group
 `ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while none of its items match. + native `<div>` props.
@@ -101,7 +110,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query state
 | `description` | `ReactNode` | — | Second line (path, details): caption, muted. |
 
 ### CommandMenu.Empty
-`ref` → `HTMLDivElement`. A compact EmptyPage with `role="status"`, shown only while nothing matches: `labels.empty`, `labels.emptyHint`, and `children` as an action under them.
+`ref` → `HTMLDivElement`. A compact EmptyPage with `role="status"`, shown only while nothing matches and nothing loads: `labels.empty`, `labels.emptyHint`, and `children` as an action under them — a button, or a `CommandMenu.Item` (create from the query) that the arrows and Enter reach and that never counts as a match.
 
 ### CommandMenu.Footer · CommandMenu.FooterHint
 `ref` → `HTMLDivElement` / `HTMLSpanElement`. A bottom row of hints with a hairline above / one hint: every entry of `keys` in its own `Kbd`, then the label (`children`). + native props.
@@ -126,10 +135,13 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `disabled` (Item) | muted row, `aria-disabled`, skipped by the arrows | The command is unavailable right now | `false` |
+| `filter={false}` | every item shows whatever the query; the query is still marked in the labels | The owner searches on the server (`search`, `onSearchChange`) | `true` |
+| `loading` | skeleton rows in the item geometry while no item is on screen; items on screen stay | Results load asynchronously | `false` |
+| `loadingMore` | skeleton rows after the items | The next page is loading (`hasMore` + `onLoadMore`) | `false` |
 | `closeOnOutsideClick={false}` | the scrim does not close it | A required pick | |
 | `closeOnEscape={false}` | Escape does nothing | A required pick that must not be skipped | |
 
-**Combinations** — one palette per app; open it with ⌘K / Ctrl+K and a visible button. Add a Footer with key hints when keyboard use is not obvious.
+**Combinations** — one palette per app; open it with ⌘K / Ctrl+K and a visible button. Add a Footer with key hints when keyboard use is not obvious. A server search: `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; a failed request `loadError` + `onRetry`. A «create from the query» action is a `CommandMenu.Item` inside `CommandMenu.Empty`: it shows only while nothing matches, the arrows and Enter reach it, and it never counts as a match.
 
 ## States
 | State | Driven by | DOM |
@@ -138,8 +150,13 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | active item | arrows, Home, End, pointer move | `aria-selected="true"`, `data-highlighted="true"`: a fill only, no movement |
 | filtered out | the query | `hidden` on items and on groups without matches |
 | matched text | the query | the first match in the item's text children and in `ItemText` is wrapped in a `<mark>` in `accent-text`, no fill (same as SmartFilter) |
-| nothing found | the query | `CommandMenu.Empty` with `role="status"` |
-| query | `value` / `defaultValue` / `onValueChange` on Root | the search field's value; cleared when the palette closes |
+| nothing found | the query | `CommandMenu.Empty` with `role="status"`; hidden while loading or after a load error |
+| query | `search` / `defaultSearch` / `onSearchChange` on Root | the search field's value; cleared when the palette closes |
+| loading | `loading` | `aria-busy` on the list and the field; with no item on screen, `aria-hidden` skeleton rows (`data-skeleton`); `labels.loading` in a polite live region |
+| loading more | `loadingMore` | skeleton rows after the items; the end of the list is watched while `hasMore` (`onLoadMore` once per batch) |
+| load error | `loadError` | the list is `hidden`; a compact EmptyPage with `role="alert"` and a retry Button (`onRetry`) |
+| retrying | `onRetry` returned a pending promise | the retry Button is `loading` (`aria-busy`); a press or Enter does not retry again until it settles; on reject the error stays |
+| state swap | loading ↔ items ↔ load error | the new content fades in (`swapMotion`), the first render stays still |
 | disabled item | `disabled` on Item | `aria-disabled="true"`, `data-disabled`; never active, not runnable |
 | size | `size` | `data-size` on the tier wrapper |
 
@@ -155,13 +172,16 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 |---|---|
 | `ArrowDown` · `ArrowUp` | Move the active item, wrapping; focus stays in the search field. |
 | `Home` · `End` | First / last matching item. |
-| `Enter` | Runs the active item. |
+| `Enter` | Runs the active item; with a load error, retries (`onRetry`). |
+| `Tab` | With a load error, moves focus to the retry button. |
 | `Escape` | Closes the palette (`closeOnEscape`); focus returns to the opener. |
 
 ### ARIA
 - The palette is `role="dialog"` with `aria-modal`, named by `CommandMenu.Title` or `aria-label`.
 - The field is `role="combobox"` with `aria-controls` on the list and `aria-activedescendant` on the active item; items are `role="option"`, the active one `aria-selected`.
 - `CommandMenu.Group` is `role="group"` named by its `label`; the empty result is `role="status"`.
+- While loading the list and the field are `aria-busy` and `labels.loading` is announced politely; skeleton rows are hidden from screen readers; a load error is `role="alert"`.
+- The arrows reaching the last item ask for the next batch the same way scrolling does.
 - The page behind is inert; after closing, focus returns to the opener.
 
 ### Labels
@@ -172,6 +192,8 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | `search` | `"Поиск"` | Default placeholder and accessible name of `CommandMenu.Input`. |
 | `empty` | `"Ничего не найдено"` | `CommandMenu.Empty`: nothing matches the query. |
 | `emptyHint` | `"Попробуйте изменить запрос"` | Second line of `CommandMenu.Empty`; `""` hides it. |
+| `loading` | `"Загрузка…"` | Announced while `loading` or `loadingMore`. |
+| `retry` | `"Повторить"` | The retry button under `loadError` (`onRetry`). |
 
 ## Examples
 | Example | Shows |
@@ -180,8 +202,10 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | [structure.tsx](examples/structure.tsx) | Optional parts: a visible title and description, a description line and a key hint in items, and a footer with key hints — `CommandMenu.Title`, `CommandMenu.ItemText`, `CommandMenu.ItemShortcut`, `CommandMenu.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: rows, text, icons and the search row follow it; match the density of the app — `size`. |
 | [states.tsx](examples/states.tsx) | A disabled item stays visible but muted and is skipped by the arrows, and an empty result speaks in the words of the task — `disabled`, `labels`. |
+| [server-search.tsx](examples/server-search.tsx) | Orders searched on the server: the parent loads results for the query and the next page at the end of the list; with nothing found the palette offers to create an order — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`, `CommandMenu.Empty`. |
+| [load-error.tsx](examples/load-error.tsx) | The results failed to load: the palette says so instead of the list, and a retry asks again with the button loading until the server answers; the first retry fails too, the second brings the results — `loadError`, `onRetry`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A required pick during an import: a stray click on the scrim does not close the palette, only Escape or a choice — `closeOnOutsideClick`, `closeOnEscape`. |
-| [controlled.tsx](examples/controlled.tsx) | The parent owns the query: it shows the text outside and a command resets it; the palette clears it on close — `value`, `onValueChange`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent owns the query: it shows the text outside and a command resets it; the palette clears it on close — `search`, `onSearchChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state: a button opens the palette and a command closes it — `open`, `onOpenChange`. |
 
 ## Mistakes
@@ -190,7 +214,10 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 - `CommandMenu.Group` with a separate heading element → pass the heading as `label`.
 - Items that differ only by an icon → give them distinct `value` texts; the query matches text, not icons.
 - No name for the dialog → add `CommandMenu.Title` (visually hidden if needed) or `aria-label`.
+- Server results squeezed through `keywords` so the kit filter keeps them → set `filter={false}`.
+- A hand-drawn spinner or «Загрузка…» item → set `loading` (skeleton rows) and `loadingMore`.
+- A «Создать …» action placed beside the results with a hand-made visibility check → put it in `CommandMenu.Empty` as a `CommandMenu.Item`.
 
 ## Related
-- **Built from:** [Modal](../modal/COMPONENT.md) (dialog, scrim, focus, Title / Description), [ScrollContainer](../scroll-container/COMPONENT.md) (`List`), [EmptyPage](../empty-page/COMPONENT.md) (`Empty`), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`, `FooterHint`)
+- **Built from:** [Modal](../modal/COMPONENT.md) (dialog, scrim, focus, Title / Description), [ScrollContainer](../scroll-container/COMPONENT.md) (`List`), [EmptyPage](../empty-page/COMPONENT.md) (`Empty`, load error), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [Button](../button/COMPONENT.md) (retry), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`, `FooterHint`), `Icon` (search glyph, retry)
 - **See also:** [Dropdown](../dropdown/COMPONENT.md), [Select](../select/COMPONENT.md), [Modal](../modal/COMPONENT.md)

@@ -565,3 +565,58 @@ describe("NotificationCard", () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("Notification — onDismiss", () => {
+  function Undo({ onDismiss, max }: { onDismiss: (title: string) => void; max?: number }) {
+    return (
+      <NotificationProvider max={max}>
+        <Push onDismiss={onDismiss} />
+      </NotificationProvider>
+    );
+  }
+
+  function Push({ onDismiss }: { onDismiss: (title: string) => void }) {
+    const { notify, dismissAll } = useNotifications();
+    const count = React.useRef(0);
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => {
+            count.current += 1;
+            const title = `Удалено ${count.current}`;
+            notify({ title, persistent: true, onDismiss: () => onDismiss(title) });
+          }}
+        >
+          push
+        </button>
+        <button type="button" onClick={dismissAll}>
+          dismiss all
+        </button>
+      </>
+    );
+  }
+
+  it("fires once when the toast is closed", async () => {
+    const onDismiss = vi.fn();
+    render(<Undo onDismiss={onDismiss} />);
+    fireEvent.click(screen.getByRole("button", { name: "push" }));
+    await screen.findByText("Удалено 1");
+    fireEvent.click(screen.getByRole("button", { name: "dismiss all" }));
+    fireEvent.click(screen.getByRole("button", { name: "dismiss all" }));
+    await waitFor(() => expect(screen.queryByText("Удалено 1")).not.toBeInTheDocument());
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(onDismiss).toHaveBeenCalledWith("Удалено 1");
+  });
+
+  it("fires for a toast a newer one pushes out of a full stack", async () => {
+    const onDismiss = vi.fn();
+    render(<Undo onDismiss={onDismiss} max={1} />);
+    fireEvent.click(screen.getByRole("button", { name: "push" }));
+    await screen.findByText("Удалено 1");
+    fireEvent.click(screen.getByRole("button", { name: "push" }));
+    await screen.findByText("Удалено 2");
+    expect(onDismiss).toHaveBeenCalledWith("Удалено 1");
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+});

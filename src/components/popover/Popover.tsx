@@ -1,7 +1,12 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
-import type { PositionAlign, PositionSide } from "@/hooks/usePosition";
+import {
+  DEFAULT_ALIGN,
+  DEFAULT_SIDE,
+  type PositionAlign,
+  type PositionSide,
+} from "@/hooks/usePosition";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
@@ -109,7 +114,8 @@ export type PopoverAnchorProps = {
  * An anchor that is not a trigger: positions the panel against an element (a whole toolbar) and keeps
  * presses on it from closing the panel, but adds no click handler and no ARIA. Open state is driven
  * by `Popover.Root open`, and focus stays where it is when it opens (a search field in the anchor
- * keeps typing). Use it instead of `Popover.Trigger`, not with it.
+ * keeps typing) unless `Popover.Content initialFocus` asks for it. Use it instead of
+ * `Popover.Trigger`, not with it.
  */
 function PopoverAnchor({ children }: PopoverAnchorProps) {
   const { triggerRef, anchoredRef } = usePopoverContext();
@@ -143,6 +149,13 @@ export type PopoverContentProps = Omit<React.HTMLAttributes<HTMLDivElement>, "ro
   /** Tab cycles inside the panel (forms). Without it Tab past the edges leaves to the trigger and closes. */
   trapFocus?: boolean;
   /**
+   * Focus moves into the panel when it opens (`[data-autofocus]`, else the first tab stop, else the
+   * panel). Default: on with `Popover.Trigger`, off with `Popover.Anchor` (a field driving the
+   * panel keeps typing). Turn it on for an anchored panel opened by a command — a Dropdown item
+   * («Переименовать…») — so focus lands in the panel, not back on the menu trigger.
+   */
+  initialFocus?: boolean;
+  /**
    * No inner padding and no gap: rows reach the panel edges (lists with full-width dividers, filter
    * panels). The content lays out its own spacing and uses inset focus rings.
    */
@@ -151,11 +164,12 @@ export type PopoverContentProps = Omit<React.HTMLAttributes<HTMLDivElement>, "ro
 };
 
 function PopoverContent({
-  side = "bottom",
-  align = "start",
+  side = DEFAULT_SIDE,
+  align = DEFAULT_ALIGN,
   size = "m",
   matchTriggerWidth = false,
   trapFocus = false,
+  initialFocus,
   flush = false,
   className,
   children,
@@ -183,7 +197,7 @@ function PopoverContent({
     matchAnchorWidth: matchTriggerWidth,
     closeOnEscape,
     closeOnOutsideClick,
-    focusOnOpen: !anchoredRef.current,
+    focusOnOpen: initialFocus ?? !anchoredRef.current,
     trap: trapFocus,
     tabExit: "edges",
     // A panel driven by typing in its anchor stays next to the field.

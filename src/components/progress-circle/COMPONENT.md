@@ -9,7 +9,7 @@
 - Compact metrics and goals in cards and dashboards (84% of plan).
 - Progress where horizontal space is short: table cells, list rows.
 - A value on a custom scale shown as a ring («7/12»).
-- A compact breakdown of a whole: tasks by status, storage by type (`segments`).
+- A compact breakdown of a whole: tasks by status, storage by type (`segments`); categories in their chart colors (`color`) with a `legend` beside the ring.
 
 ## When not to use
 - Progress with a label and width to spare (uploads, imports) → use [ProgressBar](../progress-bar/COMPONENT.md).
@@ -23,10 +23,13 @@ import { ProgressCircle, type ProgressSegment } from "prime-ui-kit";
 
 ## Anatomy
 ```
-ProgressCircle           <div>; size, tone (value mode), children in the center
+ProgressCircle           <div>; size, tone (value mode), children in the center, aria-busy while loading
 ├─ svg                   role="progressbar" (value) or role="group" (segments); track + arcs
-├─ description           visually hidden distribution (segments with aria-label)
-└─ inner                 children in the hole of the ring (not on xs / s)
+│                        (loading: a Skeleton ring of the same diameter and stroke)
+├─ description           visually hidden distribution (segments with aria-label, no legend)
+└─ inner                 children in the hole of the ring (not on xs / s, not while loading)
+
+with legend:             <div data-legend> — a row: the ring box + <ul> legend (swatch · name · value · share)
 ```
 
 ## API
@@ -41,6 +44,7 @@ ProgressCircle           <div>; size, tone (value mode), children in the center
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Diameter 24 · 32 · 48 · 64 · 80 px; the stroke is 1/12 of it. |
 | `children` | `ReactNode` | — | Content in the center (number, percent, `Icon`). Not rendered on `xs` / `s`; a string or number stays available as `aria-valuetext`. |
 | `aria-label` | `string` | — | Accessible name of the ring (set on the svg). Always pass it. |
+| `loading` | `boolean` | `false` | The data is on its way: a Skeleton ring of the same diameter and stroke (and legend lines) that cross-fades into the data; the inner content waits, the root is `aria-busy`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root. |
 
 ### ProgressCircle · value mode
@@ -53,13 +57,15 @@ The svg is `role="progressbar"`: a track and one round-capped arc.
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Arc color, telling the outcome. |
 
 ### ProgressCircle · segments mode
-The svg is `role="group"`: parts clockwise from the top, described by the distribution text.
+The svg is `role="group"`: parts clockwise from the top, described by the legend or the distribution text.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `segments` | `ProgressSegment[]` | — (required) | Parts in order, `{ value, label?, tone? }` (`tone` default `accent`); each part's length is its share of `max`. |
+| `segments` | `ProgressSegment[]` | — (required) | Parts in order, `{ value, label?, tone? \| color? }`: `tone` names a meaning (default `accent`), `color` a category — its step of the chart palette. Each part's length is its share of `max`. |
 | `max` | `number` | — | Total capacity. Default: the sum of the parts (they close the ring); a larger `max` leaves the rest as track. |
 | `segmentGap` | `"none" \| "hairline"` | `"none"` | `none` — one continuous ring; `hairline` — every part and the rest are separate round arcs. |
+| `legend` | `boolean` | `false` | A legend beside the ring (below it when the row is narrow), one row per part: color · name · value · share; it becomes the group's description. The root turns into the row of ring and legend. |
+| `formatValue` | `(value: number) => string` | `Russian digit groups` | Display of a part's value in the legend («38 ГБ»). |
 | `labels` | `Partial<ProgressCircleLabels>` | — | Built-in strings, see Labels. |
 
 ## Variants
@@ -85,6 +91,19 @@ The stroke is always 1/12 of the diameter.
 | `danger` | danger arc | failed, overdue share | |
 | `info` | info arc | informational processes (sync, indexing) | |
 
+### color (each segment, instead of tone)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `blue` · `orange` · `teal` · `yellow` · `pink` · `green` · `purple` · `red` | the hue's step of the chart palette (`--prime-color-chart-1…8`) | categories: channels, sources, regions — the color they have in charts | |
+| `gray` | `--prime-color-chart-other` | the «Прочее» share | |
+| `sky` | the palette's sky solid (no chart step) | only when the category is sky elsewhere | |
+
+### Flags
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `legend` | swatch · name · value · share rows beside the ring, below it when narrow | a breakdown read in numbers | `false` |
+| `loading` | a Skeleton ring (and legend lines) of the same geometry | the data is on its way | `false` |
+
 ### segmentGap
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -97,7 +116,9 @@ The stroke is always 1/12 of the diameter.
 | size / tone | props | `data-size`, `data-tone` (value mode) on the root |
 | empty | `value` 0, or `segments` empty / all 0 | arc hidden, track only |
 | value | `value`, `max` | `aria-valuenow`, `aria-valuemin="0"`, `aria-valuemax`; the arc glides by `stroke-dashoffset` over `slow` |
-| segments | `segments`, `max`, `segmentGap` | `data-segment-gap` on the svg, `data-tone` on every arc and cap; arcs glide by dash, caps by `rotate` |
+| segments | `segments`, `max`, `segmentGap` | `data-segment-gap` on the svg, `data-tone` or `data-color` on every arc and cap; arcs glide by dash, caps by `rotate` |
+| legend | `legend` | `data-legend` on the root, which becomes a wrapping row of the ring and the `<ul>` |
+| loading | `loading` | `aria-busy` on the root; a Skeleton ring (mask of the stroke) and legend lines; the data cross-fades in (`swapMotion`) |
 | reduced motion | `prefers-reduced-motion` | arcs change instantly |
 
 Always controlled: pass the current `value` or `segments`.
@@ -105,6 +126,9 @@ Always controlled: pass the current `value` or `segments`.
 ## Layout & spacing
 - `display: inline-flex`, never shrinks; a caption sits next to it with `--prime-space-3` or under it with `--prime-space-2`.
 - Diameters sit on the 4px grid (`--prime-space-6…20`); the ring geometry is in viewBox units.
+- Inner content sits in the hole (5/6 of the diameter, clipped), primary, medium weight, tabular numbers.
+- With `legend` the root is a wrapping row: the ring and the legend `--prime-space-5` (20) apart; the legend takes the rest of the row (at least 192 wide) and drops below the ring when it does not fit.
+- `hairline` arcs are ¾ of the stroke apart; arcs start at 12 o'clock and run clockwise.
 
 ## Accessibility
 
@@ -113,7 +137,9 @@ No keyboard interaction.
 
 ### ARIA
 - Value mode: the svg is `role="progressbar"` with `aria-valuenow` / `-min` / `-max`; a string or number child becomes `aria-valuetext`.
-- Segments mode: the svg is `role="group"`; with `aria-label` it is described by the distribution («Видео: 38%, Документы: 21%»), without it the distribution is its name.
+- Segments mode: the svg is `role="group"`; with `aria-label` it is described by the distribution («Видео: 38%, Документы: 21%») or by the legend, without it the distribution is its name.
+- A category color always sits beside its name in the legend, so color is never the only cue.
+- While `loading` the root is `aria-busy` and the Skeletons are `aria-hidden`.
 - Always pass `aria-label`: a caption next to the ring is not linked to it.
 - The inner text is `aria-hidden` when it is already the `aria-valuetext`.
 
@@ -131,8 +157,10 @@ No keyboard interaction.
 | [overview.tsx](examples/overview.tsx) | A plan ring with the percentage in the center, named for screen readers — `value`, `aria-label`. |
 | [variants.tsx](examples/variants.tsx) | Every arc color; the tone tells the outcome, not the progress — `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Diameters 24 to 80 px; the center text is not rendered on `xs` and `s` — `size`. |
+| [states.tsx](examples/states.tsx) | Loading is a Skeleton ring of the same diameter and stroke; the number in the centre waits for the data — `loading`. |
 | [inner-content.tsx](examples/inner-content.tsx) | The center holds a percentage, a count on its own scale or an icon — `children`, `max`. |
 | [segments.tsx](examples/segments.tsx) | Parts of a whole clockwise from the top: a closed ring, free capacity up to `max`, separate arcs and an empty list — `segments`, `segmentGap`. |
+| [legend.tsx](examples/legend.tsx) | A ring of category shares with a legend beside it, in the categories' chart colors — `color`, `legend`, `formatValue`. |
 
 ## Mistakes
 - No `aria-label` (even with a visible caption) → screen readers get an unnamed progressbar.
@@ -140,7 +168,8 @@ No keyboard interaction.
 - `value` and `segments` together → a type error; pick one mode.
 - `tone` on the root with `segments` → set `tone` on each segment.
 - Long text inside the ring → it is clipped to the inner circle.
+- Categories painted with `tone` → use `color`; a hand-built legend beside the ring → `legend`.
 
 ## Related
-- **Built from:** —
+- **Built from:** [Skeleton](../skeleton/COMPONENT.md)
 - **See also:** [ProgressBar](../progress-bar/COMPONENT.md), [Card](../card/COMPONENT.md), [Spinner](../spinner/COMPONENT.md)

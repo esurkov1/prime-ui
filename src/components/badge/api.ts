@@ -29,9 +29,16 @@ export const api: ComponentApi = {
         },
         {
           name: "onRemove",
-          type: "() => void",
-          en: "Adds the full-height remove segment at the end; called on its click.",
-          ru: "Добавляет сегмент удаления во всю высоту в конце; вызывается по клику на него.",
+          type: "() => void | Promise<void>",
+          en: "Adds the full-height remove segment at the end; called on its click. Return the request's promise to remove on a server: the badge waits dimmed with a spinner in the segment (`aria-busy`, no second press); resolve — take it out of your list before resolving, and it leaves with its exit (fades and closes up, the badges after it glide in); reject — it stays and `labels.removeFailed` is announced.",
+          ru: "Добавляет сегмент удаления во всю высоту в конце; вызывается по клику на него. Верните промис запроса, чтобы удалить на сервере: бейдж ждёт приглушённым со спиннером в сегменте (`aria-busy`, повторное нажатие не действует); resolve — уберите его из списка до resolve, и он уходит с анимацией (гаснет и схлопывается, следующие подъезжают); reject — остаётся, объявляется `labels.removeFailed`.",
+        },
+        {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a spinner in the remove segment, which takes no press. A promise from `onRemove` does the same on its own.",
+          ru: "Бейдж ждёт запроса (значение, которое владелец ещё создаёт): приглушён, `aria-busy`, спиннер в сегменте удаления, нажатие не действует. Промис из `onRemove` делает то же сам.",
         },
         {
           name: "onPress",
@@ -164,6 +171,12 @@ export const api: ComponentApi = {
       default: "Удалить",
       en: "Accessible name of the remove segment; include the badge text («Убрать фильтр «Москва»»).",
       ru: "Имя сегмента удаления; включите текст бейджа («Убрать фильтр «Москва»»).",
+    },
+    {
+      key: "removeFailed",
+      default: "Не удалось удалить",
+      en: "Spoken when the `onRemove` promise rejects and the badge stays; name the badge («Фильтр «Москва» не убран»).",
+      ru: "Озвучивается, когда промис `onRemove` отклонён и бейдж остался; назовите бейдж («Фильтр «Москва» не убран»).",
     },
   ],
 };

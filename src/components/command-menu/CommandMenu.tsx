@@ -1,21 +1,28 @@
 import * as React from "react";
 
+import { Button } from "@/components/button/Button";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Kbd } from "@/components/kbd/Kbd";
 import { Modal } from "@/components/modal/Modal";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { Skeleton } from "@/components/skeleton/Skeleton";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { highlightChildren } from "@/internal/HighlightMatch";
-import { type Store, useCreateStore, useStoreSlice } from "@/internal/listbox";
+import { type Store, useCreateStore, useLoadMore, useStoreSlice } from "@/internal/listbox";
 import { MenuGroup } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
+import { focusInto } from "@/internal/overlay/focus";
 import type { ControlSize } from "@/internal/states";
+import swapMotion from "@/internal/swapMotion.module.css";
+import { isPromiseLike } from "@/internal/usePendingChanges";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./CommandMenu.module.css";
 
@@ -26,13 +33,23 @@ export type CommandMenuLabels = {
   empty: string;
   /** Second line of `CommandMenu.Empty`; `""` hides it. */
   emptyHint: string;
+  /** Announced while `loading` or `loadingMore`. */
+  loading: string;
+  /** The retry button of the load error (`onRetry`). */
+  retry: string;
 };
 
 const COMMAND_MENU_LABELS: CommandMenuLabels = {
   search: "Поиск",
   empty: "Ничего не найдено",
   emptyHint: "Попробуйте изменить запрос",
+  loading: "Загрузка…",
+  retry: "Повторить",
 };
+
+/** Skeleton rows while the first results load / while more load at the end. */
+const LOADING_ROWS = 5;
+const LOADING_MORE_ROWS = 2;
 
 // ─── Item registry and filtering ─────────────────────────────────────────────
 
@@ -42,42 +59,78 @@ type ItemEntry = {
   haystack: string;
   disabled: boolean;
   groupId: string;
+  /** An item inside `CommandMenu.Empty`: shown with it, never counted as a match. */
+  persistent: boolean;
 };
 
 type ItemRegistration = Omit<ItemEntry, "order">;
 
-type CommandMenuContextValue = {
+/** What the list shows besides its items: the first results loading, a load error, or items. */
+type RegionState = "loading" | "error" | "ready";
+
+type LoadProps = {
+  loading: boolean;
+  loadingMore: boolean;
+  hasMore: boolean;
+  onLoadMore: (() => void | Promise<void>) | undefined;
+  loadError: React.ReactNode;
+  /** Runs `onRetry` once at a time (the button and Enter share it); undefined without `onRetry`. */
+  onRetry: (() => void) | undefined;
+  /** A promise from `onRetry` is pending: the retry button is loading. */
+  retrying: boolean;
+};
+
+type CommandMenuContextValue = LoadProps & {
   labels: CommandMenuLabels;
+  size: ControlSize;
   search: string;
   setSearch: (search: string) => void;
   listboxId: string;
   /** The active option; items subscribe to their own slice of it. */
   active: Store<string | null>;
   registerItem: (id: string, item: ItemRegistration) => () => void;
-  /** Items that match the query (disabled ones too). */
+  /** Items shown (matches, and the items of a shown `Empty`), disabled ones too. */
   visible: ReadonlySet<string>;
-  /** Enabled matching items in render order: what the arrows walk. */
+  /** Items that match the query, without the items of `Empty`. */
+  matchCount: number;
+  /** Enabled shown items in render order: what the arrows walk. */
   navigable: string[];
   groupOf: (id: string) => string | undefined;
+  region: RegionState;
+  /** The list's own scroller (the load-more observer root). */
+  listRef: React.RefObject<HTMLElement | null>;
+  sentinelRef: React.RefObject<HTMLDivElement | null>;
+  /** Asks for more once per round (the keyboard reached the last item). */
+  requestMore: () => void;
 };
 
 const [CommandMenuProvider, useCommandMenuContext] =
   createComponentContext<CommandMenuContextValue>("CommandMenu");
 
 const CommandMenuGroupContext = React.createContext("");
+/** Items rendered inside `CommandMenu.Empty` (a «Создать …» action) do not count as matches. */
+const CommandMenuEmptyContext = React.createContext(false);
 
 const optionId = (id: string) => `${id}-option`;
+
+const hasContent = (node: React.ReactNode) => node != null && node !== false && node !== "";
 
 /** Lives as long as the open dialog: the item registry, the matches and the active option. */
 function CommandMenuState({
   labels,
+  size,
   search,
   setSearch,
+  filter,
+  load,
   children,
 }: {
   labels: CommandMenuLabels;
+  size: ControlSize;
   search: string;
   setSearch: (search: string) => void;
+  filter: boolean;
+  load: LoadProps;
   children: React.ReactNode;
 }) {
   const listboxId = React.useId();
@@ -85,6 +138,7 @@ function CommandMenuState({
   const orderRef = React.useRef(new Map<string, number>());
   const [version, bump] = React.useReducer((n: number) => n + 1, 0);
   const active = useCreateStore<string | null>(null);
+  const listRef = React.useRef<HTMLElement | null>(null);
 
   const registerItem = React.useCallback((id: string, item: ItemRegistration) => {
     let order = orderRef.current.get(id);
@@ -101,16 +155,17 @@ function CommandMenuState({
   }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: `version` changes when items (de)register
-  const { visible, navigable } = React.useMemo(() => {
+  const { visible, navigable, matchCount } = React.useMemo(() => {
     const query = search.trim().toLowerCase();
-    const matches = [...itemsRef.current.entries()]
-      .filter(([, item]) => item.haystack.includes(query))
+    const shown = [...itemsRef.current.entries()]
+      .filter(([, item]) => item.persistent || !filter || item.haystack.includes(query))
       .sort(([, a], [, b]) => a.order - b.order);
     return {
-      visible: new Set(matches.map(([id]) => id)),
-      navigable: matches.filter(([, item]) => !item.disabled).map(([id]) => id),
+      visible: new Set(shown.map(([id]) => id)),
+      navigable: shown.filter(([, item]) => !item.disabled).map(([id]) => id),
+      matchCount: shown.filter(([, item]) => !item.persistent).length,
     };
-  }, [search, version]);
+  }, [search, filter, version]);
 
   const groupOf = React.useCallback((id: string) => itemsRef.current.get(id)?.groupId, []);
 
@@ -120,19 +175,61 @@ function CommandMenuState({
     if (current === null || !navigable.includes(current)) active.set(navigable[0] ?? null);
   }, [navigable, active]);
 
+  const hasError = hasContent(load.loadError);
+  const region: RegionState = hasError
+    ? "error"
+    : load.loading && matchCount === 0
+      ? "loading"
+      : "ready";
+
+  const { sentinelRef, request: requestMore } = useLoadMore({
+    enabled:
+      region === "ready" &&
+      load.hasMore &&
+      Boolean(load.onLoadMore) &&
+      !load.loading &&
+      !load.loadingMore,
+    onLoadMore: load.onLoadMore,
+    scrollRef: listRef,
+    rearm: version,
+  });
+
   const value = React.useMemo(
     () => ({
+      ...load,
       labels,
+      size,
       search,
       setSearch,
       listboxId,
       active,
       registerItem,
       visible,
+      matchCount,
       navigable,
       groupOf,
+      region,
+      listRef,
+      sentinelRef,
+      requestMore,
     }),
-    [labels, search, setSearch, listboxId, active, registerItem, visible, navigable, groupOf],
+    [
+      load,
+      labels,
+      size,
+      search,
+      setSearch,
+      listboxId,
+      active,
+      registerItem,
+      visible,
+      matchCount,
+      navigable,
+      groupOf,
+      region,
+      sentinelRef,
+      requestMore,
+    ],
   );
 
   return <CommandMenuProvider value={value}>{children}</CommandMenuProvider>;
@@ -147,12 +244,33 @@ export type CommandMenuRootProps = Omit<
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** The query (controlled); together with `onValueChange`. Cleared when the palette closes. */
-  value?: string;
+  /** The query (controlled); together with `onSearchChange`. Cleared when the palette closes. */
+  search?: string;
   /** The initial query, uncontrolled. Default `""`. */
-  defaultValue?: string;
+  defaultSearch?: string;
   /** Called with the new query (typing, and `""` when the palette closes). */
-  onValueChange?: (value: string) => void;
+  onSearchChange?: (search: string) => void;
+  /**
+   * The palette filters its items by the query. `false` when the results come from a server:
+   * every item shows, highlighting of the query stays.
+   */
+  filter?: boolean;
+  /** The first results are loading: skeleton rows while no item matches; `aria-busy`. */
+  loading?: boolean;
+  /** More results are loading at the end: skeleton rows after the items. */
+  loadingMore?: boolean;
+  /** More results exist: reaching the end of the list calls `onLoadMore`. */
+  hasMore?: boolean;
+  /** Asked once per round when the end of the list scrolls into view or the arrows reach it. */
+  onLoadMore?: () => void | Promise<void>;
+  /** The results failed to load: replaces the list with the message in `role="alert"`. */
+  loadError?: React.ReactNode;
+  /**
+   * A retry button (`labels.retry`) under `loadError`; Enter in the search field runs it too.
+   * Return the request's promise: the button is loading and takes no second press until it
+   * settles; resolve — swap `loadError` for the results; reject — the error stays.
+   */
+  onRetry?: () => void | Promise<void>;
   /** Escape closes the palette. Default `true`. */
   closeOnEscape?: boolean;
   /** A click on the scrim closes the palette. Default `true`. */
@@ -173,9 +291,16 @@ function CommandMenuRoot({
   open,
   defaultOpen = false,
   onOpenChange,
-  value,
-  defaultValue = "",
-  onValueChange,
+  search: searchProp,
+  defaultSearch = "",
+  onSearchChange,
+  filter = true,
+  loading = false,
+  loadingMore = false,
+  hasMore = false,
+  onLoadMore,
+  loadError,
+  onRetry,
   closeOnEscape = true,
   closeOnOutsideClick = true,
   size = "m",
@@ -191,10 +316,34 @@ function CommandMenuRoot({
     onChange: onOpenChange,
   });
   const [search, setSearch] = useControllableState({
-    value,
-    defaultValue,
-    onChange: onValueChange,
+    value: searchProp,
+    defaultValue: defaultSearch,
+    onChange: onSearchChange,
   });
+  const [retrying, setRetrying] = React.useState(false);
+  const retryingRef = React.useRef(false);
+  const retry = React.useMemo(
+    () =>
+      onRetry
+        ? () => {
+            if (retryingRef.current) return;
+            const outcome = onRetry();
+            if (!isPromiseLike(outcome)) return;
+            retryingRef.current = true;
+            setRetrying(true);
+            const done = () => {
+              retryingRef.current = false;
+              setRetrying(false);
+            };
+            outcome.then(done, done);
+          }
+        : undefined,
+    [onRetry],
+  );
+  const load = React.useMemo<LoadProps>(
+    () => ({ loading, loadingMore, hasMore, onLoadMore, loadError, onRetry: retry, retrying }),
+    [loading, loadingMore, hasMore, onLoadMore, loadError, retry, retrying],
+  );
 
   // Every opening starts with an empty query.
   const wasOpenRef = React.useRef(isOpen);
@@ -218,7 +367,14 @@ function CommandMenuRoot({
         {/* `display: contents`: carries the tier variables without breaking the panel's flex column. */}
         <div className={cx(menu.tier, styles.tier)} data-size={size}>
           <ControlSizeProvider value={size}>
-            <CommandMenuState labels={labels} search={search} setSearch={setSearch}>
+            <CommandMenuState
+              labels={labels}
+              size={size}
+              search={search}
+              setSearch={setSearch}
+              filter={filter}
+              load={load}
+            >
               {children}
             </CommandMenuState>
           </ControlSizeProvider>
@@ -261,7 +417,7 @@ export type CommandMenuInputProps = Omit<
 };
 
 /**
- * The search row: a search icon and the query field (the query is `CommandMenu.Root` `value`). It
+ * The search row: a search icon and the query field (the query is `CommandMenu.Root` `search`). It
  * is the permanent focus of the palette, so it draws no focus ring (foundation §7); focus lands
  * here on open; arrows, Home, End and Enter drive the list from it.
  */
@@ -273,12 +429,32 @@ function CommandMenuInput({
   "aria-label": ariaLabel,
   ...rest
 }: CommandMenuInputProps) {
-  const { labels, search, setSearch, listboxId, active, navigable } = useCommandMenuContext();
+  const {
+    labels,
+    search,
+    setSearch,
+    listboxId,
+    active,
+    navigable,
+    region,
+    onRetry,
+    loading,
+    loadingMore,
+    requestMore,
+  } = useCommandMenuContext();
   const activeId = useStoreSlice(active, (id) => id);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     onKeyDown?.(event);
-    if (event.defaultPrevented || navigable.length === 0) return;
+    if (event.defaultPrevented) return;
+    if (region === "error") {
+      if (event.key === "Enter" && onRetry) {
+        event.preventDefault();
+        onRetry();
+      }
+      return;
+    }
+    if (navigable.length === 0) return;
     const current = active.get();
     const index = current ? navigable.indexOf(current) : -1;
     const last = navigable.length - 1;
@@ -291,6 +467,8 @@ function CommandMenuInput({
     if (event.key in next) {
       event.preventDefault();
       active.set(navigable[next[event.key]] ?? null);
+      // The keyboard reached the end: ask for more, as the sentinel does for scrolling.
+      if (next[event.key] === last) requestMore();
     } else if (event.key === "Enter" && current) {
       event.preventDefault();
       document.getElementById(optionId(current))?.click();
@@ -309,6 +487,7 @@ function CommandMenuInput({
         aria-expanded="true"
         aria-controls={listboxId}
         aria-activedescendant={activeId ? optionId(activeId) : undefined}
+        aria-busy={loading || loadingMore || undefined}
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
@@ -332,16 +511,94 @@ export type CommandMenuListProps = Omit<React.HTMLAttributes<HTMLElement>, "role
   ref?: React.Ref<HTMLElement>;
 };
 
-/** The scrolling `role="listbox"` of results under the search row. */
-function CommandMenuList({ className, ...rest }: CommandMenuListProps) {
-  const { listboxId } = useCommandMenuContext();
+/** Skeleton rows in the option geometry; decorative (the list carries `aria-busy`). */
+function SkeletonRows({ count }: { count: number }) {
+  return Array.from({ length: count }, (_, index) => (
+    <div
+      // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder rows
+      key={index}
+      aria-hidden="true"
+      className={cx(menu.item, menu.skeletonRow, styles.item)}
+      data-skeleton=""
+    >
+      <Skeleton />
+    </div>
+  ));
+}
+
+/**
+ * The scrolling `role="listbox"` of results under the search row. It also draws the load states:
+ * skeleton rows while the first results load, a load error with a retry, skeleton rows at the end
+ * while more load; the states cross-fade.
+ */
+function CommandMenuList({ className, children, ref, ...rest }: CommandMenuListProps) {
+  const {
+    listboxId,
+    labels,
+    size,
+    region,
+    loading,
+    loadingMore,
+    hasMore,
+    loadError,
+    onRetry,
+    retrying,
+    listRef,
+    sentinelRef,
+  } = useCommandMenuContext();
+  const mergedRef = useMergedRefs(listRef, ref);
+  // The first render stays still; every later state fades in (foundation §1 rule 7).
+  const swapped = useStateSwap(region);
+  const swapClass = swapped ? swapMotion.swapIn : undefined;
+
+  // The retry button leaves with the error: focus goes back to the search field, not the page.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on every region swap
+  React.useEffect(() => {
+    const dialog = listRef.current?.closest<HTMLElement>('[role="dialog"]');
+    if (!swapped || !dialog || dialog.dataset.state === "closed") return;
+    if (!dialog.contains(document.activeElement)) focusInto(dialog);
+  }, [region, swapped, listRef]);
+
   return (
-    <ScrollContainer
-      {...rest}
-      id={listboxId}
-      role="listbox"
-      className={cx(styles.list, className)}
-    />
+    <>
+      <ScrollContainer
+        {...rest}
+        ref={mergedRef}
+        id={listboxId}
+        role="listbox"
+        aria-busy={loading || loadingMore || undefined}
+        hidden={region === "error" ? true : undefined}
+        className={cx(styles.list, className)}
+      >
+        <div key={swapped ? region : undefined} className={cx(styles.region, swapClass)}>
+          {/* Items render while loading too: they register, and the first match ends the state. */}
+          {children}
+          {region === "loading" ? <SkeletonRows count={LOADING_ROWS} /> : null}
+          {region === "ready" && hasMore ? (
+            <div ref={sentinelRef} aria-hidden="true" className={menu.loadSentinel} />
+          ) : null}
+          {region === "ready" && loadingMore ? <SkeletonRows count={LOADING_MORE_ROWS} /> : null}
+        </div>
+      </ScrollContainer>
+      {region === "error" ? (
+        <EmptyPage.Root layout="compact" size={size} role="alert" className={swapClass}>
+          <EmptyPage.Title as="p">{loadError}</EmptyPage.Title>
+          {onRetry ? (
+            <EmptyPage.Actions>
+              <Button.Root variant="soft" tone="neutral" loading={retrying} onClick={onRetry}>
+                <Button.Icon>
+                  <Icon name="action.refresh" />
+                </Button.Icon>
+                {labels.retry}
+              </Button.Root>
+            </EmptyPage.Actions>
+          ) : null}
+        </EmptyPage.Root>
+      ) : null}
+      <VisuallyHidden aria-live="polite">
+        {loading || loadingMore ? labels.loading : ""}
+      </VisuallyHidden>
+    </>
   );
 }
 CommandMenuList.displayName = "CommandMenu.List";
@@ -401,6 +658,7 @@ function CommandMenuItem({
 }: CommandMenuItemProps) {
   const id = React.useId();
   const groupId = React.useContext(CommandMenuGroupContext);
+  const persistent = React.useContext(CommandMenuEmptyContext);
   const { registerItem, active: activeStore, visible, search } = useCommandMenuContext();
   const nodeRef = React.useRef<HTMLButtonElement>(null);
   const mergedRef = useMergedRefs(nodeRef, ref);
@@ -411,8 +669,9 @@ function CommandMenuItem({
         haystack: `${value} ${keywords}`.trim().toLowerCase(),
         disabled,
         groupId,
+        persistent,
       }),
-    [id, value, keywords, disabled, groupId, registerItem],
+    [id, value, keywords, disabled, groupId, persistent, registerItem],
   );
 
   const shown = visible.has(id);
@@ -507,17 +766,24 @@ export type CommandMenuEmptyProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
 };
 
 /**
- * Shown only while nothing matches the query: `labels.empty` and `labels.emptyHint`; `children`
- * is an action under them.
+ * Shown only while nothing matches the query and nothing loads: `labels.empty` and
+ * `labels.emptyHint`; `children` is an action under them — a button, or a `CommandMenu.Item`
+ * («Создать «…»») that the arrows and Enter reach and that never counts as a match.
  */
 function CommandMenuEmpty({ children, ...rest }: CommandMenuEmptyProps) {
-  const { visible, labels } = useCommandMenuContext();
-  if (visible.size > 0) return null;
+  const { matchCount, labels, region } = useCommandMenuContext();
+  if (matchCount > 0 || region !== "ready") return null;
   return (
     <EmptyPage.Root layout="compact" role="status" {...rest}>
       <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
       {labels.emptyHint ? <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description> : null}
-      {children ? <EmptyPage.Actions>{children}</EmptyPage.Actions> : null}
+      {children ? (
+        <EmptyPage.Actions>
+          <CommandMenuEmptyContext.Provider value={true}>
+            {children}
+          </CommandMenuEmptyContext.Provider>
+        </EmptyPage.Actions>
+      ) : null}
     </EmptyPage.Root>
   );
 }

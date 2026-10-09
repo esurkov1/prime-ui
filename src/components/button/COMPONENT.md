@@ -49,9 +49,10 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. Without it the button takes the tier of its host (LoginForm, Popover, a field, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | — | Stretches to the container width. |
 | `loading` | `boolean` | `false` | Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content. |
+| `pressed` | `boolean` | — | A toggle button: `true` on, `false` off (`aria-pressed`). On takes the selected look, an accent soft fill that glides in and out. Leave it out for an ordinary action; a set of toggles is a ButtonGroup. |
 | `progress` | `number` | — | Progress of a long action started by the button, `0…1`: a wash of the text color grows inside from the start edge, `aria-busy` is set and the button stays pressable (to cancel). Put the number in the label («Скачивание 42%»); remove the prop when done and the fill fades out. |
 | `holdToConfirm` | `boolean` | `false` | The action needs a held press: the fill runs for 1.2 s (a gesture clock, kept under reduced motion) and `onConfirm` fires at its end. Releasing, leaving or losing focus earlier rolls it back. Space and Enter hold too; the gesture is described to assistive tech by `labels.holdHint`. |
-| `onConfirm` | `() => void` | — | Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. |
+| `onConfirm` | `() => void \| Promise<void>` | — | Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. Return the request's promise: the full fill stays and the button is `loading` until it settles; resolve — the fill fades; reject — the fill rolls back (say why with a notification). |
 | `labels` | `Partial<ButtonLabels>` | — | Built-in strings, see Labels. |
 | `asChild` | `boolean` | `false` | Merges Button props and styles onto the single child element instead of rendering `<button>`. `disabled`/`loading` become `aria-disabled`. |
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Native button type; not forwarded with `asChild`. |
@@ -99,7 +100,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 |---|---|---|---|
 | `xs` | 28px high, 12/16 text, padX 8, icon 14 | dense tables and chip rows | |
 | `s` | 32px, 13/20, padX 12, icon 16 | compact toolbars, filters | |
-| `m` | 36px, 14/20, padX 16, icon 16 | default UI | yes |
+| `m` | 36px, 14/20, padX 16, icon 16 | default UI | yes (without `size`: the host's tier, else `m`) |
 | `l` | 40px, 16/24, padX 20, icon 20 | prominent forms | |
 | `xl` | 48px, 16/24, padX 24, icon 20 | hero CTA, mobile footers | |
 
@@ -110,6 +111,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 |---|---|---|---|
 | `fullWidth` | button fills the row | narrow forms, cards, mobile footers | off |
 | icon-only (children are only `Button.Icon`) | square, width = height | toolbars; needs `aria-label` | — |
+| `pressed` | on: accent soft fill and accent text over any variant; off: the variant's own look | a single toggle (favourite, pin, «show archived») | — (not a toggle) |
 
 **Hierarchy:** one primary (`solid accent`) per area, the rest neutral `soft`/`outline`/`ghost`; a destructive action is `tone="danger"` and sits apart (start of the footer). Avoid two `solid accent` buttons side by side and `tone="danger"` for non-destructive actions.
 
@@ -118,14 +120,16 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 |---|---|---|
 | hover / active | pointer | hover fill per variant; active `scale(var(--prime-motion-press-scale))` |
 | focus-visible | keyboard | outer focus ring with `--prime-focus-offset`; `tone="inherit"` draws it in `currentColor` |
-| disabled | `disabled` | native `disabled`, `data-disabled="true"`, `fill-muted` + `text-disabled`, `cursor: not-allowed`; ghost stays transparent |
+| disabled | `disabled`, or a disabled `Fieldset` around it | native `disabled`, `data-disabled="true"`, `fill-muted` + `text-disabled`, `cursor: not-allowed`; ghost stays transparent |
 | loading | `loading` (native `<button>`) | `data-loading="true"`, native `disabled`, `aria-busy="true"`, colors kept (busy, not unavailable), no hover or press; a `Spinner` (`aria-hidden`) replaces the leading (or only) icon, otherwise it is centered over the hidden label (`data-loading-overlay="true"`) |
 | progress | `progress` (0…1) | `data-progress="true"`, `aria-busy="true"`, still pressable; a plate of the text color with the button's radius slides in from the start edge (`fast` · standard), so corners match at any value; removing the prop fades it where it is |
-| holding | `holdToConfirm` + a held pointer, `Space` or `Enter` | `data-hold="holding"`: the fill runs linearly for 1.2 s (kept under reduced motion — it is a gesture clock), then `onConfirm` and `data-hold="done"` (on release the fill fades in place, `data-hold="idle"`); releasing earlier → `data-hold="cancel"`, the fill rolls back (`fast` · exit) |
+| holding | `holdToConfirm` + a held pointer, `Space` or `Enter` | `data-hold="holding"`: the fill runs linearly for 1.2 s (kept under reduced motion — it is a gesture clock), then `onConfirm` and `data-hold="done"` (on release the fill fades in place, `data-hold="idle"`); releasing, leaving the button or losing focus earlier → `data-hold="cancel"`, the fill rolls back (`fast` · exit) |
+| confirming | `onConfirm` returned a pending promise | `data-hold="confirming"`: the full fill stays, the button is `loading` (spinner, `aria-busy`, disabled) even after the release; resolve → `data-hold="idle"`, the fill fades; reject → `data-hold="cancel"`, the fill rolls back |
 | label change | new text children | the old letters leave upward, the new ones rise from below one short step apart (`base` · emphasized, blur `--prime-motion-blur`) while the width glides; digits-only changes and reduced motion change in place |
+| pressed | `pressed` | `aria-pressed="true" \| "false"`; on adds `data-pressed="true"` and the selected fill (accent soft), which glides in and out with the color transition (`fast`) |
 | asChild disabled / loading | `asChild` + `disabled`/`loading` | `aria-disabled="true"`, `pointer-events: none`, click `preventDefault`; no native `disabled`, no automatic spinner |
 
-Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-full-width`, `data-icon-only`, `data-leading-icon`, `data-trailing-icon`.
+Other data attributes: `data-pressed`, `data-variant`, `data-tone`, `data-size`, `data-full-width`, `data-icon-only`, `data-leading-icon`, `data-trailing-icon`.
 
 ## Layout & spacing
 - Buttons in a row: `gap: var(--prime-space-2)`–`var(--prime-space-3)`; toolbar icon buttons `var(--prime-space-1)`.
@@ -164,7 +168,8 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-full-widt
 | [states.tsx](examples/states.tsx) | Disabled and loading next to the default; the spinner keeps the width — `disabled`, `loading`. |
 | [with-icon.tsx](examples/with-icon.tsx) | An icon before or after the label, and a square icon-only button — `Button.Icon`, `aria-label`. |
 | [download.tsx](examples/download.tsx) | A long download inside the button: the fill shows how far it got, the label counts and then offers the file — `progress`. |
-| [hold-to-confirm.tsx](examples/hold-to-confirm.tsx) | A destructive action that needs a held press; letting go early rolls the fill back and does nothing — `holdToConfirm`, `onConfirm`. |
+| [toggle.tsx](examples/toggle.tsx) | A toggle in a toolbar: the favourite mark turns the button on with the selected fill and back off — `pressed`. |
+| [hold-to-confirm.tsx](examples/hold-to-confirm.tsx) | A destructive action that needs a held press; letting go early rolls the fill back and does nothing, and the delete request keeps the button loading until the server answers — `holdToConfirm`, `onConfirm`. |
 | [label-morph.tsx](examples/label-morph.tsx) | A new label flows into the button letter by letter while the width glides: save, then saved; a step flow that turns green once paid — `children`, `loading`, `tone`. |
 | [on-colored-host.tsx](examples/on-colored-host.tsx) | Actions on a colored strip take its text color: a ghost icon close and a soft action — `tone="inherit"`. |
 | [as-child.tsx](examples/as-child.tsx) | The button look on a real link; a disabled link blocks navigation — `asChild`, `disabled`. |
@@ -174,6 +179,7 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-full-widt
 - `<Button.Root><Icon name="action.copy" /></Button.Root>` → wrap in `Button.Icon` so the button becomes square and the icon is sized.
 - Icon-only button without `aria-label` → add `aria-label="Копировать"`.
 - `tone="error"` / `variant="primary"` → `tone="danger"`, `variant="solid"`.
+- A toggle drawn by switching `variant` or `tone` → `pressed`: it sets `aria-pressed` and the selected look; changing the label instead («Закрепить» / «Открепить») is a plain action, without `pressed`.
 - Putting a `<Spinner />` inside a loading button → just set `loading`; the button places it.
 - `<a>` inside `<Button.Root>` → use `asChild` so there is one interactive element.
 - Submit button without `type="submit"` → the default is `"button"` and will not submit.

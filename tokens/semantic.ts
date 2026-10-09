@@ -84,13 +84,16 @@ export const semanticTokens = {
     },
     /**
      * Over a photo the picture is the ground, not the theme: one look in both themes. `shade` sits
-     * under small text and controls (an index, a delete button), `plate` under a wider action.
+     * under small text and controls (an index, a delete button).
+     * `pill` sits under a caption over a video (a duration, a message's time and ticks): denser
+     * than `shade`, so `pillFg` — the muted tone of a caption, not bold white — keeps AA over a
+     * white frame.
      */
     media: {
       shade: "rgba(17, 19, 24, 0.56)",
       shadeFg: "{color.gray.0}",
-      plate: "rgba(255, 255, 255, 0.92)",
-      plateFg: "{color.gray.925}",
+      pill: "rgba(17, 19, 24, 0.72)",
+      pillFg: "rgba(255, 255, 255, 0.8)",
     },
     /**
      * Translucent state washes: they sit on any background, including ones off the ladder (an
@@ -657,6 +660,28 @@ export const semanticTokens = {
     cardWidth: "16rem",
     mediaMaxHeight: "22.5rem",
     videoNote: "14.5rem",
+    /**
+     * A message changing size (a reaction row, a transcript that opens): the bubble's box, its
+     * parts and the messages around glide in one calm stroke, between `fast` and `base`; zeroed
+     * under reduced motion with the other durations.
+     */
+    morphDuration: "{duration.300}",
+    /**
+     * Messages that step back: the unselected ones in selection mode, the others while the chat
+     * points at one (a jump blinks them, the current search match keeps them back). Opacity and a
+     * slight desaturation; the message pointed at or selected stays at full strength.
+     */
+    dimOpacity: "0.42",
+    dimSaturation: "0.6",
+    /**
+     * The tail of the last bubble of a run: a curl out of its square bottom corner on the author's
+     * side, drawn with the bubble's own fill through `tailMask` (the incoming shape, pointing to
+     * the start; outgoing mirrors it). Rows reserve `tailWidth` on the author's side.
+     */
+    tailWidth: "{space.2}",
+    tailHeight: "{space.4}",
+    tailMask:
+      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 16' preserveAspectRatio='none'%3E%3Cpath d='M8 0C8 7 6.5 12.5 0.6 15.3C0.2 15.5 0.3 16 0.8 16H8Z'/%3E%3C/svg%3E\")",
   },
 
   /** Floating panel shared by Select, Dropdown, Combobox, Datepicker, Popover. Item radius = radius − padding. */

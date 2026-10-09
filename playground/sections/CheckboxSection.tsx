@@ -22,6 +22,10 @@ export const page: ComponentPageConfig = {
       slot: "overview",
       description: "Флажок с подписью; клик по всей строке переключает его.",
     },
+    {
+      slot: "variants",
+      description: "Скруглённый квадрат и круг рядом в трёх состояниях — `shape`.",
+    },
     { slot: "sizes", description: "Все размеры; квадрат и текст берут ярус контрола — `size`." },
     {
       slot: "states",

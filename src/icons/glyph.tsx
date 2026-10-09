@@ -3,7 +3,8 @@ import type * as React from "react";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { iconBoxClass } from "@/internal/iconBox";
-import type { ControlSize, TextTone } from "@/internal/states";
+import palette from "@/internal/palette.module.css";
+import type { ControlSize, PaletteColor, TextTone } from "@/internal/states";
 import toneStyles from "@/internal/textTone.module.css";
 
 import motionStyles from "./glyphMotion.module.css";
@@ -17,8 +18,19 @@ export type DomainIconProps = Omit<React.ComponentPropsWithoutRef<"svg">, "color
    * follows its host: the host's `--prime-icon-size`, else the nearest control tier, else 16.
    */
   size?: ControlSize;
-  /** Icon color; `default` inherits `currentColor`. */
+  /** Icon color by meaning; `default` inherits `currentColor`. */
   tone?: TextTone;
+  /**
+   * A palette hue for a category from data (a catalog section, a project colour), its readable
+   * text step in both themes. Takes the place of `tone`.
+   */
+  color?: PaletteColor;
+  /**
+   * Makes the icon meaningful: `role="img"` named by this text instead of `aria-hidden`. Use it for
+   * an icon that carries information alone (a «system» or «pinned» mark); inside a
+   * `Tooltip.Trigger` it also becomes focusable.
+   */
+  label?: string;
   /** Stroke width on the 24-unit glyph grid. */
   strokeWidth?: number;
   /**
@@ -41,9 +53,11 @@ export function useIconRoot({
   className,
   size,
   tone = "default",
+  color,
+  label,
   animated = true,
   motion,
-}: Pick<DomainIconProps, "className" | "size" | "tone" | "animated"> & {
+}: Pick<DomainIconProps, "className" | "size" | "tone" | "color" | "label" | "animated"> & {
   /** `glyph` — parts carry their own `data-motion`; `generic` — the whole drawing pops. */
   motion: "glyph" | "generic";
 }) {
@@ -55,9 +69,14 @@ export function useIconRoot({
       motionStyles.root,
       iconBoxClass(size, tier),
       toneStyles.tone,
+      color !== undefined && palette.hue,
       className,
     ),
-    "data-tone": tone === "default" ? undefined : tone,
+    "data-tone": tone === "default" || color !== undefined ? undefined : tone,
+    "data-color": color,
+    role: label === undefined ? undefined : "img",
+    "aria-label": label,
+    "aria-hidden": label === undefined ? true : undefined,
     "data-icon-motion": animated ? motion : undefined,
   } as const;
 }
@@ -71,12 +90,15 @@ export function defineGlyph(source: string, body: React.ReactNode): Glyph {
     className,
     size,
     tone,
+    color,
+    label,
     animated,
     strokeWidth = 1.75,
     ...rest
   }: DomainIconProps) {
-    const root = useIconRoot({ className, size, tone, animated, motion: "glyph" });
+    const root = useIconRoot({ className, size, tone, color, label, animated, motion: "glyph" });
     return (
+      // biome-ignore lint/a11y/noSvgWithoutTitle: `root` makes it aria-hidden, or role="img" named by `label`
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -87,7 +109,6 @@ export function defineGlyph(source: string, body: React.ReactNode): Glyph {
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
-        aria-hidden="true"
         {...root}
         {...rest}
       >

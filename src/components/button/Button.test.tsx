@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { DisabledProvider } from "@/internal/disabledContext";
 
 import { Button } from "./Button";
 import styles from "./Button.module.css";
@@ -351,6 +352,51 @@ describe("Button motion", () => {
       expect(button).toHaveAttribute("data-hold", "idle");
     });
 
+    it("async onConfirm: loading with a full fill until it settles; resolve fades, reject rolls back", async () => {
+      vi.useFakeTimers();
+      let settle: { resolve: () => void; reject: (reason: unknown) => void } = {
+        resolve: () => {},
+        reject: () => {},
+      };
+      const onConfirm = vi.fn(
+        () =>
+          new Promise<void>((resolve, reject) => {
+            settle = { resolve, reject };
+          }),
+      );
+      render(
+        <Button.Root tone="danger" holdToConfirm onConfirm={onConfirm}>
+          Удалить проект
+        </Button.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Удалить проект" });
+
+      fireEvent.pointerDown(button, { button: 0 });
+      act(() => vi.advanceTimersByTime(1200));
+      expect(button).toHaveAttribute("data-hold", "confirming");
+      expect(button).toHaveAttribute("aria-busy", "true");
+      expect(button).toHaveAttribute("data-loading", "true");
+      expect(button).toBeDisabled();
+      // The release does not end a confirm in flight.
+      fireEvent.pointerUp(button);
+      expect(button).toHaveAttribute("data-hold", "confirming");
+
+      await act(async () => {
+        settle.reject(new Error("offline"));
+      });
+      expect(button).toHaveAttribute("data-hold", "cancel");
+      expect(button).not.toHaveAttribute("aria-busy");
+
+      fireEvent.pointerDown(button, { button: 0 });
+      act(() => vi.advanceTimersByTime(1200));
+      expect(onConfirm).toHaveBeenCalledTimes(2);
+      await act(async () => {
+        settle.resolve();
+      });
+      expect(button).toHaveAttribute("data-hold", "idle");
+      expect(button).not.toBeDisabled();
+    });
+
     it("holds from the keyboard with Space and Enter; key repeat does not restart", () => {
       vi.useFakeTimers();
       const onConfirm = vi.fn();
@@ -466,5 +512,51 @@ describe("Button motion", () => {
       button = screen.getByRole("button", { name: "Готово" });
       expect(button.querySelectorAll("[style*='--morph-i']")).toHaveLength(0);
     });
+  });
+});
+
+describe("Button — pressed", () => {
+  it("a toggle sets aria-pressed both ways and data-pressed only when on", () => {
+    const { rerender } = render(
+      <Button.Root variant="ghost" tone="neutral" pressed={false}>
+        Закрепить
+      </Button.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Закрепить" });
+    expect(button).toHaveAttribute("aria-pressed", "false");
+    expect(button).not.toHaveAttribute("data-pressed");
+    rerender(
+      <Button.Root variant="ghost" tone="neutral" pressed>
+        Закрепить
+      </Button.Root>,
+    );
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(button).toHaveAttribute("data-pressed", "true");
+  });
+
+  it("an ordinary button has no aria-pressed; asChild passes it on", () => {
+    render(
+      <>
+        <Button.Root>Сохранить</Button.Root>
+        <Button.Root asChild pressed>
+          <a href="/favorites">Избранное</a>
+        </Button.Root>
+      </>,
+    );
+    expect(screen.getByRole("button", { name: "Сохранить" })).not.toHaveAttribute("aria-pressed");
+    expect(screen.getByRole("link", { name: "Избранное" })).toHaveAttribute("aria-pressed", "true");
+  });
+});
+
+describe("Button — disabled group", () => {
+  it("takes the disabled look from a disabled Fieldset around it", () => {
+    render(
+      <DisabledProvider disabled>
+        <Button.Root>Сохранить</Button.Root>
+      </DisabledProvider>,
+    );
+    const button = screen.getByRole("button", { name: "Сохранить" });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("data-disabled");
   });
 });

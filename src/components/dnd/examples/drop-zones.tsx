@@ -1,4 +1,4 @@
-/** Documents carried onto folders: a zone takes items by kind, a locked folder refuses before the release, the target flashes where the file landed — `Dnd.Draggable`, `Dnd.DropZone`, `canDrop`, `flashOnDrop`. */
+/** Documents carried onto folders: a zone takes items by kind, a locked folder refuses before the release and says why under the carried file, the target flashes where the file landed — `Dnd.Draggable`, `Dnd.DropZone`, `canDrop`, `flashOnDrop`. */
 import { Badge, Dnd, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -54,7 +54,7 @@ export default function DndDropZonesExample() {
             accepts="document"
             flashOnDrop
             className={styles.column}
-            canDrop={() => !folder.locked}
+            canDrop={() => (folder.locked ? "Архив только для чтения" : true)}
             onDrop={(item) =>
               setDocuments((current) =>
                 current.map((doc) => (doc.id === item.id ? { ...doc, folder: folder.id } : doc)),

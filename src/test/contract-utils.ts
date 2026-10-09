@@ -32,6 +32,14 @@ export function walk(relDir: string, ext: RegExp): string[] {
 export const PLACEHOLDER = /lorem|ipsum|Пункт \d|Item \d|Элемент \d|[\u{1F300}-\u{1FAFF}]/iu;
 
 /**
+ * The source without reaction data: the string value of an `emoji:` field (a `Message.Reactions`
+ * item) is the one place an emoji is user content, not decoration. Everything else stays checked.
+ */
+export function withoutReactionData(source: string): string {
+  return source.replace(/\bemoji:\s*"[^"\n]*"/g, 'emoji: ""');
+}
+
+/**
  * The canon of a copyable source file: a one-line English JSDoc first, imports only from
  * `allowedImport`, React as a namespace import, no inline style, no explicit default size, no
  * placeholder text.
@@ -52,7 +60,7 @@ export function checkSourceCanon(
   );
   expect(source, `${file}: inline style`).not.toMatch(/style=\{\{/);
   expect(source, `${file}: size "m" is the default — omit it`).not.toMatch(/\bsize="m"/);
-  expect(source, `${file}: placeholder text`).not.toMatch(PLACEHOLDER);
+  expect(withoutReactionData(source), `${file}: placeholder text`).not.toMatch(PLACEHOLDER);
 }
 
 /**

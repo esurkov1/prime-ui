@@ -16,7 +16,7 @@ export const page: ComponentPageConfig = {
   title: "SegmentedControl",
   kind: "control",
   description:
-    "Выбор одного из 2–5 вариантов или режимов с мгновенным эффектом: период, вид списка, тема. Для переключения панелей — Tabs.",
+    "Выбор одного из 2–5 вариантов или режимов с мгновенным эффектом: период, вид списка, тема; в форме — поле с подписью, подсказкой и ошибкой. Для переключения панелей — Tabs.",
   examples: [
     {
       slot: "overview",
@@ -66,6 +66,11 @@ export const page: ComponentPageConfig = {
       description:
         "Выбор хранит родитель и обновляет по нему другой контент — `value`, `onValueChange`.",
     },
+    {
+      slot: "in-form",
+      description:
+        "Форма расхода: выбор — поле с подписью и подсказкой, проверяется при отправке, ошибка уходит, как только выбран сегмент — `label`, `hint`, `required`, `error`.",
+    },
   ],
   api,
   accessibility: {
@@ -82,7 +87,8 @@ export const page: ComponentPageConfig = {
       },
     ],
     aria: [
-      'Корень — `role="radiogroup"`: всегда назовите его `aria-label` или `aria-labelledby`; при `disabled` — `aria-disabled`.',
+      'Дорожка — `role="radiogroup"`: её называет `label` (`aria-labelledby`), иначе задайте `aria-label`; при `disabled` — `aria-disabled`.',
+      "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`, `required` — `aria-required`.",
       'Варианты — `<button role="radio" aria-checked>` с перемещаемым `tabIndex`.',
       "В двухстрочном сегменте имя — подпись и счётчик, описание — `aria-describedby`.",
       "Иконки скрыты (`aria-hidden`); сегменту только с иконкой нужен `aria-label`.",

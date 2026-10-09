@@ -8,6 +8,26 @@
   width: min(100%, var(--prime-modal-width-s));
 }
 
+/* Tile scenarios (gallery, file-cards, saving): a wider form column, caption → field 8. */
+.wide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  width: min(100%, calc(var(--prime-space-24) * 6));
+}
+
+/* controlled.tsx: the saved state over the field. */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+}
+
+.spacer {
+  flex: 1;
+}
+
 /* in-form.tsx: header → field 32 → actions 32 (foundation §1). */
 .form {
   display: flex;
@@ -28,20 +48,31 @@
   gap: var(--prime-space-2);
 }
 
-/* sizes.tsx: a zone and its file row of one tier, then the next tier. */
-.sizeRow {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-2);
-  margin-bottom: var(--prime-space-4);
-}
-
 /* custom-body.tsx: source buttons under the title. */
 .sources {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--prime-space-2);
+}
+
+/* attachment-tray.tsx: the tray over the composer row (paperclip · message · send). */
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  width: min(100%, var(--prime-modal-width-m));
+}
+
+.composerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.composerField {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 /* narrow.tsx: a phone-width column. */

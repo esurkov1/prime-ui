@@ -15,15 +15,71 @@ function translate(point: Point, grab: Point): string {
 
 // A clone, not a re-render: the overlay does not know what it carries (a card, a row, a chip), and
 // asking every caller to describe its item twice is how the two drift apart.
+function isTransparent(color: string): boolean {
+  return color === "" || color === "transparent" || /rgba?\([^)]*,\s*0\s*\)$/.test(color);
+}
+
+/**
+ * A table row cannot fly on its own: outside its table its cells shrink to their content and lose
+ * every style their table and its host give them. It flies in a one-row copy of its table with
+ * each column fixed at the width it has now, inside empty copies (`display: contents`) of the
+ * elements up to the nearest surface (`data-depth`), so the host's selectors and variables still
+ * apply. Returns the outermost copy and the table, which carries the lift.
+ */
+function inTableCopy(row: HTMLTableRowElement, copy: HTMLElement, origin: Rect) {
+  const table = row.closest("table");
+  const sheet = (table?.cloneNode(false) ?? document.createElement("table")) as HTMLElement;
+  sheet.style.tableLayout = "fixed";
+  sheet.style.width = `${origin.width}px`;
+  sheet.style.minWidth = "0";
+  sheet.style.maxWidth = "none";
+  sheet.style.margin = "0";
+  const columns = document.createElement("colgroup");
+  for (const cell of Array.from(row.cells)) {
+    const width = cell.getBoundingClientRect().width / cell.colSpan;
+    for (let at = 0; at < cell.colSpan; at += 1) {
+      const column = document.createElement("col");
+      column.style.width = `${width}px`;
+      columns.append(column);
+    }
+  }
+  const body = (row.parentElement?.cloneNode(false) ??
+    document.createElement("tbody")) as HTMLElement;
+  body.append(copy);
+  sheet.append(columns, body);
+  let outer: HTMLElement = sheet;
+  let node = table?.parentElement ?? null;
+  while (node && node !== document.body) {
+    const shell = node.cloneNode(false) as HTMLElement;
+    shell.style.display = "contents";
+    shell.append(outer);
+    outer = shell;
+    if (node.hasAttribute("data-depth")) break;
+    node = node.parentElement;
+  }
+  return { outer, lifted: sheet };
+}
+
 function cloneFor(preview: DragPreview): HTMLElement {
   const clone = preview.element.cloneNode(true) as HTMLElement;
   clone.style.width = `${preview.origin.width}px`;
   clone.style.height = `${preview.origin.height}px`;
   clone.style.margin = "0";
-  clone.setAttribute("aria-hidden", "true");
+  // An item without a fill of its own (a row of fields on a card) would fly as bare content over
+  // the page: the copy takes the fill of the surface it was lifted from.
+  const source = getComputedStyle(preview.element);
+  if (isTransparent(source.backgroundColor)) {
+    const layer = source.getPropertyValue("--prime-color-layer-current").trim();
+    if (layer) clone.style.backgroundColor = layer;
+  }
+  const { outer, lifted } =
+    preview.element instanceof HTMLTableRowElement
+      ? inTableCopy(preview.element, clone, preview.origin)
+      : { outer: clone, lifted: clone };
+  outer.setAttribute("aria-hidden", "true");
   // A copy must not answer to the original's identity: two elements with one id or item marker make
   // every lookup (the engine's, a test's, a screen reader's) a coin toss.
-  for (const node of [clone, ...clone.querySelectorAll("*")]) {
+  for (const node of [outer, ...outer.querySelectorAll("*")]) {
     node.removeAttribute("id");
     node.removeAttribute("data-testid");
     node.removeAttribute("data-dnd-item");
@@ -32,8 +88,17 @@ function cloneFor(preview: DragPreview): HTMLElement {
     node.removeAttribute("data-lifted");
     node.removeAttribute("tabindex");
   }
-  clone.classList.add(styles.lift);
-  return clone;
+  lifted.classList.add(styles.lift);
+  return outer;
+}
+
+/** The element that lifts and sets down: the copy itself, or the table a copied row flies in. */
+function liftedIn(host: HTMLElement): HTMLElement | null {
+  const first = host.firstElementChild;
+  if (!(first instanceof HTMLElement)) return null;
+  return first.classList.contains(styles.lift ?? "")
+    ? first
+    : (first.querySelector<HTMLElement>("table") ?? first);
 }
 
 /**
@@ -352,7 +417,7 @@ export function DragOverlay({ controller }: { controller: DragController }) {
       }
       mirrorRef.current?.();
       mirrorRef.current = null;
-      const lifted = host.firstElementChild;
+      const lifted = liftedIn(host);
       if (!(lifted instanceof HTMLElement) || prefersReducedMotion()) {
         settle(host);
         return;
@@ -366,8 +431,24 @@ export function DragOverlay({ controller }: { controller: DragController }) {
     return controller.store.subscribe(() => {
       const host = hostRef.current;
       const state = controller.store.getSnapshot();
-      if (!host || !state.item) return;
+      if (!host) return;
+      const shown = host.querySelector<HTMLElement>(`:scope > .${styles.reason}`);
+      if (!state.item) {
+        shown?.remove();
+        return;
+      }
       host.dataset.canDrop = state.overId !== null && !state.canDrop ? "false" : "true";
+      // Why the spot under the pointer refuses the item, under the carried copy.
+      if (state.reason === null) {
+        shown?.remove();
+      } else if (shown) {
+        shown.textContent = state.reason;
+      } else {
+        const reason = document.createElement("div");
+        reason.className = styles.reason ?? "";
+        reason.textContent = state.reason;
+        host.append(reason);
+      }
     });
   }, [controller, mounted]);
 

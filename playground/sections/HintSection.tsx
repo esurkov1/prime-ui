@@ -21,7 +21,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Подсказка под контролом без своего пропа `hint`, связанная с ним через `id` и `aria-describedby`.",
+        "Подсказка под собранным вручную полем, связанная с его input через `id` и `aria-describedby`.",
     },
     {
       slot: "sizes",

@@ -1,31 +1,92 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { USE_UPLOAD_QUEUE_PART } from "../../hooks/useUploadQueue.api";
+
+const FILE_TYPE = "readonly FileUploadFile[]";
+
+/** The set of files: the same props on `FileUpload.Root` and `FileUpload.Queue`. */
+const SET_PROPS: ApiProp[] = [
+  {
+    name: "value",
+    type: FILE_TYPE,
+    en: "Files in their order (controlled): `{ id, name, size?, type?, src?, alt? }` — on the server, or uploads of `queue` by their ids. `type` is the MIME type (without it the kind is read from the name's extension); `src` a picture or a video: a tile shows the picture, a video's first frame (Thumbnail.Video, mounted once the tile nears the view) with a play mark, or for any other file the sheet glyph, and on every kind the format pill and a band with the name and the size (a video's duration); a row shows the picture as its preview. `alt` is spoken in place of the name, never drawn. Without `value` and `defaultValue` the set is the queue alone.",
+    ru: "Файлы по порядку (управляемое): `{ id, name, size?, type?, src?, alt? }` — на сервере или загрузки `queue` по их id. `type` — MIME-тип (без него вид определяется по расширению имени); `src` — картинка или видео: плитка показывает картинку, первый кадр видео (Thumbnail.Video, монтируется у видимой области) с отметкой воспроизведения или у любого другого файла — лист, и у каждого вида — плашку формата и полосу с именем и размером (у видео — длительностью); строка показывает картинку превью. `alt` озвучивается вместо имени и не рисуется. Без `value` и `defaultValue` набор — одна очередь.",
+  },
+  {
+    name: "defaultValue",
+    type: FILE_TYPE,
+    default: "[]",
+    en: "Initial files (uncontrolled).",
+    ru: "Начальные файлы (неуправляемое).",
+  },
+  {
+    name: "onValueChange",
+    type: `(value: ${FILE_TYPE}) => void | Promise<void>`,
+    en: "The set changed: reordered by drag or Alt + ← / →, a file removed, files added to `queue`; the new list includes the uploads. Return the save's promise: the files it touches wait busy (dimmed, a spinner on their remove button, `aria-busy`, no drag); a moved file or new files stand in their new places meanwhile, a removed file stays until the answer. Resolve — the change stands (a controlled owner applies `value` before resolving) and the queue follows it (a removed upload leaves it, a moved one keeps its order through `queue.move`); reject — the set goes back (a moved tile glides back, new files leave the queue) and `labels.changeFailed` is announced.",
+    ru: "Набор изменился: порядок перетаскиванием или Alt + ← / →, файл удалён, файлы добавлены в `queue`; новый список включает загрузки. Верните промис сохранения: затронутые файлы ждут занятыми (приглушены, спиннер на кнопке удаления, `aria-busy`, без переноса); перенесённый или новые файлы стоят на новых местах, удаляемый файл остаётся до ответа. Resolve — изменение остаётся (управляемый владелец применяет `value` до resolve), очередь следует за ним (удалённая загрузка уходит из неё, перенесённая сохраняет порядок через `queue.move`); reject — набор возвращается (плитка плавно уходит назад, новые файлы покидают очередь), объявляется `labels.changeFailed`.",
+  },
+  {
+    name: "queue",
+    type: 'Pick<UploadQueue, "items" | "retry" | "remove"> & Partial<Pick<UploadQueue, "add" | "move">>',
+    en: "The uploads: `useUploadQueue(…)`, or any object of that shape. An upload whose id is in `value` shows its state on that file; the others follow the value in the queue's order. A file on its way shows its upload: a row its status («В очереди», «Загрузка 40%», the reason) and a progress bar across it (`success` when done, `danger` where it stopped), a tile a round disk on the `media` shade with the share sent as a ring along its edge — pressing it cancels, a failure turns it danger with a retry, done fades it away. Removing a file aborts its upload. With `add` the root puts picked and dropped files into it, and they enter the set at once as their local previews (`id` = the queue item's id). Without a value, files reorder through `move`.",
+    ru: "Загрузки: `useUploadQueue(…)` или любой объект такой формы. Загрузка с id из `value` показывает состояние на этом файле; остальные идут после значения в порядке очереди. Файл в пути показывает загрузку: строка — статус («В очереди», «Загрузка 40%», причину) и полосу прогресса (`success` — готово, `danger` — где оборвалось), плитка — круглый диск на тени `media` с кольцом отправленной доли; нажатие отменяет, ошибка делает диск красным с повтором, по готовности он растворяется. Удаление файла прерывает его загрузку. С `add` корень кладёт в неё выбранные и брошенные файлы, и они сразу встают в набор локальными превью (`id` — id элемента очереди). Без значения файлы переставляются через `move`.",
+  },
+  {
+    name: "layout",
+    type: '"list" | "grid" | "strip"',
+    default: '"list"',
+    en: "`list`: a row per file. `grid`: square tiles that follow the set's own width (5 · 4 · 3 · 2 across); drag or Alt + arrows reorder. `strip`: one row of `--prime-space-24` tiles that scrolls sideways with faded edges (an attachment tray; a tile removed by its × closes up in place).",
+    ru: "`list`: строка на файл. `grid`: квадратные плитки по своей ширине (5 · 4 · 3 · 2 в ряд); порядок перетаскиванием или Alt + стрелками. `strip`: одна строка плиток `--prime-space-24` с прокруткой вбок и затуханием краёв (лоток вложений; плитка, убранная ×, схлопывается на месте).",
+  },
+  {
+    name: "cover",
+    type: "boolean",
+    default: "false",
+    en: "Tiles (`grid`, `strip`) — an image gallery: the first file is the cover, «Обложка» in place of its format pill, and in a `grid` it spans two columns and two rows. The order is the only control: a tile dragged or moved with Alt + ← to the first place becomes the cover, and the new cover is announced (`labels.coverChanged`). A `list` has no cover.",
+    ru: "Плитки (`grid`, `strip`) — галерея изображений: первый файл — обложка, «Обложка» на месте его плашки формата, в `grid` — две колонки и два ряда. Управляет только порядок: плитка, перенесённая перетаскиванием или Alt + ← на первое место, становится обложкой, новая обложка объявляется (`labels.coverChanged`). У `list` обложки нет.",
+  },
+  {
+    name: "formatSize",
+    type: "(bytes: number) => string",
+    default: "Russian digits, Б · КБ · МБ · ГБ",
+    en: "Display of a file size («820 КБ», «1,2 МБ»).",
+    ru: "Показ размера файла («820 КБ», «1,2 МБ»).",
+  },
+];
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "FileUpload.Root",
-      en: "`ref` → `HTMLDivElement` (the field frame). The field frame (label → zone → hint | error) around a `<label>` drop zone with a visually hidden file input. Field-root rule: `className`, `ref` and the rest go to the frame; `id` and `aria-label` to the file input.",
-      ru: "Рамка поля (подпись → зона → подсказка или ошибка) вокруг зоны-`<label>` со скрытым input файла.",
+      en: '`ref` → `HTMLDivElement` (the field frame). The field frame (label → trigger → files → hint | error): a `<label>` drop zone with a visually hidden file input, a kit Button that opens the picker (`trigger="button"`), or an add tile at the end of the files (`trigger="tile"`); then the files of `value` and `queue` as rows or tiles. Files dropped anywhere on the zone or the set go in. Mounts its own `Dnd.Root` for tiles unless one is already above it. Field-root rule: `className`, `ref` and the rest go to the frame; `id` to the file input, `aria-label` to the file input (to the button with `trigger="button"`, to the list of files without `label`).',
+      ru: 'Рамка поля (подпись → способ добавления → файлы → подсказка или ошибка): зона-`<label>` со скрытым input файла, кнопка кита для выбора (`trigger="button"`) или плитка добавления в конце файлов (`trigger="tile"`); затем файлы `value` и `queue` строками или плитками. Файлы, брошенные на зону или набор, добавляются.',
       props: [
+        {
+          name: "trigger",
+          type: '"dropzone" | "button" | "tile"',
+          default: '"dropzone"',
+          en: '`dropzone`: the drop area. `button`: a compact picker button with no zone and no drop (a paperclip in a composer): soft with text, ghost when its content is an icon alone. `tile`: an add tile — «+», «Добавить», `count из max` — as the last cell of the files (the whole row while the set is empty); the frame is a labelled group and files dropped anywhere on the set go in. With `layout="grid"` and `cover` it makes an image gallery.',
+          ru: '`dropzone`: зона перетаскивания. `button`: компактная кнопка выбора без зоны и сброса (скрепка в поле сообщения): мягкая с текстом, ghost — когда внутри одна иконка. `tile`: плитка добавления («+», «Добавить», `count из max`) последней ячейкой файлов (пока набор пуст — во всю строку); файлы можно бросить на весь набор. С `layout="grid"` и `cover` получается галерея изображений.',
+        },
         {
           name: "variant",
           type: '"dashed" | "solid"',
           default: '"dashed"',
-          en: "`dashed` shows the drop line; `solid` keeps only the fill (cards, modals).",
-          ru: "`dashed` — пунктир; `solid` — только заливка (карточки, модалки).",
+          en: "The look of the drop zone: `dashed` shows the drop line; `solid` keeps only the fill (cards, modals).",
+          ru: "Вид зоны: `dashed` — пунктир; `solid` — только заливка (карточки, модалки).",
         },
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: 'host tier, else "m"',
-          en: "Tier of the zone padding, icon, title, button, label and hint. Without it the tier of its host (a form, a panel), else `m`.",
-          ru: "Ярус отступов, иконки, заголовка, кнопки, подписи и подсказки.",
+          en: "Tier of the zone padding, icon, title, button, label, hint and the rows. Without it the tier of its host (a form, a panel), else `m`. Tiles keep their own size.",
+          ru: "Ярус отступов зоны, иконки, заголовка, кнопки, подписи, подсказки и строк. Плитки держат свой размер.",
         },
+        ...SET_PROPS,
         {
           name: "label",
           type: "ReactNode",
-          en: "Field label above the zone; names the file input.",
-          ru: "Подпись над зоной; называет input файла.",
+          en: "Field label above the trigger; names the file input and the list of files.",
+          ru: "Подпись над полем; называет input файла и список файлов.",
         },
         {
           name: "required",
@@ -42,39 +103,45 @@ export const api: ComponentApi = {
         {
           name: "hint",
           type: "ReactNode",
-          en: "Help text under the zone. Hidden while `error` is shown.",
-          ru: "Подсказка под зоной; скрывается при `error`.",
+          en: "Help text under the field. Hidden while `error` is shown.",
+          ru: "Подсказка под полем; скрывается при `error`.",
         },
         {
           name: "error",
           type: "ReactNode",
-          en: "Error message under the zone (a rejected file); implies `invalid`.",
-          ru: "Ошибка под зоной (файл не подошёл); включает `invalid`.",
+          en: "Error message under the field (a rejected file, too few files); implies `invalid`.",
+          ru: "Ошибка под полем (файл не подошёл, файлов мало); включает `invalid`.",
         },
         {
           name: "invalid",
           type: "boolean",
-          en: "Danger line and icon, `aria-invalid` on the input. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красная линия и иконка, `aria-invalid`.",
+          en: "Danger line and icon of the zone, `aria-invalid` on the input. A non-empty `error` implies it.",
+          ru: "Ошибка без текста: красная линия и иконка зоны, `aria-invalid`.",
         },
         {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "Blocks picking and drag-and-drop.",
-          ru: "Блокирует выбор и перетаскивание.",
+          en: "Blocks picking and drag-and-drop; the files are read-only: no add tile, no reorder, no remove.",
+          ru: "Блокирует выбор и перетаскивание; файлы только для чтения: без плитки добавления, перестановки и удаления.",
         },
         {
           name: "accept",
           type: "string",
-          en: "Native `accept` of the file input.",
-          ru: "Нативный `accept` input файла.",
+          en: "Native `accept` of the file input; dropped files outside it are not taken (MIME type, `type/*` or `.ext`; a file with no MIME type by its extension).",
+          ru: "Нативный `accept` input файла; брошенные файлы вне него не берутся (MIME-тип, `type/*` или `.ext`; файл без MIME-типа — по расширению).",
         },
         {
           name: "multiple",
           type: "boolean",
-          en: "Allows several files at once.",
-          ru: "Разрешает несколько файлов.",
+          en: "Allows several files at once in the picker.",
+          ru: "Разрешает несколько файлов в окне выбора.",
+        },
+        {
+          name: "max",
+          type: "number",
+          en: "Most files in the set: picked and dropped files are cut to the room left; the add tile counts `count из max` (the digits roll) and at the limit says «Лимит файлов» and takes nothing.",
+          ru: "Наибольшее число файлов: выбранные и брошенные файлы урезаются до оставшегося места; плитка добавления считает `count из max` (цифры прокручиваются), на пределе пишет «Лимит файлов» и ничего не принимает.",
         },
         {
           name: "name",
@@ -85,8 +152,8 @@ export const api: ComponentApi = {
         {
           name: "onFilesChange",
           type: "(files: File[]) => void",
-          en: "Called with the picked or dropped files; the input is reset, so the same file can be picked again.",
-          ru: "Выбранные или брошенные файлы; input сбрасывается, тот же файл можно выбрать снова.",
+          en: "Called with the picked or dropped files (of `accept`, cut to `max`); the input is reset, so the same file can be picked again. Not called when `queue.add` takes them.",
+          ru: "Выбранные или брошенные файлы (из `accept`, не больше `max`); input сбрасывается, тот же файл можно выбрать снова. Не вызывается, когда их берёт `queue.add`.",
         },
         {
           name: "inputRef",
@@ -109,14 +176,14 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Custom body (`FileUpload.Body`); replaces the built-in icon, title, description and button.",
-          ru: "Своё содержимое (`FileUpload.Body`) вместо встроенного.",
+          en: 'A zone: a custom body (`FileUpload.Body`) instead of the built-in icon, title, description and button. `trigger="button"`: the button\'s content — `Button.Icon` and text (default: the paperclip and `labels.browse`); a `Button.Icon` alone makes an icon-only button.',
+          ru: 'Зона: своё содержимое (`FileUpload.Body`) вместо встроенного. `trigger="button"`: содержимое кнопки — `Button.Icon` и текст (по умолчанию скрепка и `labels.browse`); один `Button.Icon` — кнопка-иконка.',
         },
         {
           name: "aria-label",
           type: "string",
-          en: "Name of the file input when there is no `label`.",
-          ru: "Имя input файла, когда нет `label`.",
+          en: 'Name of the file input and the list of files when there is no `label`; with `trigger="button"` the name of the button (required for an icon-only one).',
+          ru: 'Имя input файла и списка файлов, когда нет `label`; при `trigger="button"` — имя кнопки (обязательно для кнопки-иконки).',
         },
         {
           name: "…rest",
@@ -153,6 +220,33 @@ export const api: ComponentApi = {
       name: "FileUpload.Description",
       en: "`ref` → `HTMLParagraphElement`. The secondary zone line (formats, size limit), the kit Hint of the zone tier. Native `<p>` props.",
       props: [],
+    },
+    {
+      name: "FileUpload.Queue",
+      en: "`ref` → `HTMLUListElement`. The files of a set with no picker of its own — a tray whose paperclip lives elsewhere: the same rows or tiles `FileUpload.Root` draws, in a `<ul>` (none while empty). A row: a picture's preview or the format badge (pdf red, doc blue, xls green, ppt orange, archives yellow, video purple, audio pink, else gray), the name, the size with the status, retry on a failed upload and remove; rows enter with `enterMotion`, the status text morphs, a row its remove button took out closes up in place. Tiles (`layout=\"grid\" | \"strip\"`, the shared attachment tile) are a `Dnd.Sortable` `<ul>`, every kind with the same slots: the format pill at the top start (on the media shade over a picture, a kit Badge on a file; «Обложка» in its place on the cover), the remove × at the top end, a band across the bottom with the name and the size or a video's duration (on a soft gradient over a picture, on the tile fill for a file), and in the middle a picture, a video's first frame with its play mark or the sheet glyph of a file; the upload disk stands over the middle (for a file in place of its sheet). A polite live region (Dnd's for tiles) speaks a file that finished, failed, was removed or became the cover, and a refused change. Mounts its own `Dnd.Root` for tiles unless one is already above it.",
+      ru: 'Файлы набора без своего способа добавления — лоток, чья скрепка в другом месте: те же строки или плитки, что рисует `FileUpload.Root`, в `<ul>` (пока пусто — ничего). Строка: превью картинки или бейдж формата, имя, размер со статусом, повтор у неудачной загрузки и «Убрать». Плитки (`layout="grid" | "strip"`) — `<ul>` от `Dnd.Sortable`, у каждого вида одни места: плашка формата сверху слева («Обложка» на её месте у обложки), × сверху справа, полоса снизу с именем и размером или длительностью видео, в центре картинка, первый кадр видео с отметкой воспроизведения или лист файла; диск загрузки — по центру (у файла на месте листа). Live-область объявляет загруженный, упавший, убранный файл, новую обложку и отклонённое изменение.',
+      props: [
+        ...SET_PROPS,
+        {
+          name: "disabled",
+          type: "boolean",
+          default: "false",
+          en: "Read-only files: no reorder, no remove.",
+          ru: "Файлы только для чтения: без перестановки и удаления.",
+        },
+        {
+          name: "labels",
+          type: "Partial<FileUploadLabels>",
+          en: "Row and tile strings, see Labels.",
+          ru: "Строки рядов и плиток, см. «Доступность».",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLUListElement>, "children" | "defaultValue">',
+          en: "`className`, `aria-label` (name the list) and the other attributes of the `<ul>`.",
+          ru: "`className`, `aria-label` (имя списка) и остальные атрибуты `<ul>`.",
+        },
+      ],
     },
     {
       name: "FileUpload.Item",
@@ -201,6 +295,26 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "FileUpload.ItemPreview",
+      en: "`ref` → `HTMLDivElement`. An image file's picture in place of the format badge: a square kit Thumbnail of the row tier (`aria-hidden`: the name names the file), the image icon while it loads or if it fails.",
+      ru: "Картинка файла-изображения вместо бейджа формата: квадратный Thumbnail яруса строки (`aria-hidden`: файл называет имя), иконка, пока картинка грузится или если не загрузилась.",
+      props: [
+        {
+          name: "src",
+          type: "string",
+          required: true,
+          en: "The picture: a URL, or the local `preview` of a queued file.",
+          ru: "Картинка: адрес или локальное `preview` файла из очереди.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "color">',
+          en: "`className` and the other attributes of the thumbnail frame.",
+          ru: "`className` и остальные атрибуты рамки превью.",
+        },
+      ],
+    },
+    {
       name: "FileUpload.ItemName · FileUpload.ItemDescription · FileUpload.ItemActions",
       en: "`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row. Native `<div>` props.",
       props: [],
@@ -223,6 +337,13 @@ export const api: ComponentApi = {
           ru: "Полный объём (по умолчанию ProgressBar).",
         },
         {
+          name: "tone",
+          type: '"accent" | "neutral" | "success" | "warning" | "danger" | "info"',
+          default: '"accent"',
+          en: "Fill color: `success` for a finished file, `danger` where a failed one stopped.",
+          ru: "Цвет заполнения: `success` — файл загружен, `danger` — где остановилась неудачная загрузка.",
+        },
+        {
           name: "aria-label",
           type: "string",
           default: "«Загрузка файла»",
@@ -237,6 +358,7 @@ export const api: ComponentApi = {
         },
       ],
     },
+    USE_UPLOAD_QUEUE_PART,
   ],
   labels: [
     {
@@ -254,14 +376,146 @@ export const api: ComponentApi = {
     {
       key: "browse",
       default: "Выбрать файл",
-      en: "Text of the decorative browse button of the built-in body.",
-      ru: "Текст декоративной кнопки выбора.",
+      en: 'Text of the browse button: decorative in the built-in zone body, the control itself with `trigger="button"`.',
+      ru: 'Текст кнопки выбора: декоративной во встроенной зоне, самой кнопки при `trigger="button"`.',
     },
     {
       key: "optional",
       default: "необязательно",
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
+    },
+    {
+      key: "add",
+      default: "Добавить",
+      en: 'Text of the add tile (`trigger="tile"`).',
+      ru: 'Текст плитки добавления (`trigger="tile"`).',
+    },
+    {
+      key: "addLabel",
+      default: "Добавить файлы",
+      en: "Accessible name of the add tile's file input.",
+      ru: "Имя поля выбора файлов в плитке добавления.",
+    },
+    {
+      key: "empty",
+      default: "Нажмите или перетащите файлы",
+      en: "Text of the add tile of an empty set (it spans the row).",
+      ru: "Текст плитки добавления в пустом наборе (она во всю строку).",
+    },
+    {
+      key: "emptyHint",
+      default: "Можно несколько сразу",
+      en: "Second line of the empty add tile without `max` (with it the counter stands there).",
+      ru: "Вторая строка пустой плитки добавления без `max` (с ним там счётчик).",
+    },
+    {
+      key: "full",
+      default: "Лимит файлов",
+      en: "Text of the add tile when `max` is reached.",
+      ru: "Текст плитки добавления, когда достигнут `max`.",
+    },
+    {
+      key: "count",
+      default: "{count} из {max}",
+      en: "Counter on the add tile (with `max`).",
+      ru: "Счётчик на плитке добавления (при `max`).",
+    },
+    {
+      key: "cover",
+      default: "Обложка",
+      en: "Pill of the first tile with `cover`.",
+      ru: "Плашка первой плитки при `cover`.",
+    },
+    {
+      key: "queued",
+      default: "В очереди",
+      en: "A file waiting for a free slot (a row's status, a tile's name and its empty ring).",
+      ru: "Файл ждёт свободного места (статус строки, имя плитки и её пустого кольца).",
+    },
+    {
+      key: "uploading",
+      default: "Загрузка {percent}%",
+      en: "A file in flight.",
+      ru: "Файл загружается.",
+    },
+    {
+      key: "failed",
+      default: "Не удалось загрузить",
+      en: "A failed file whose upload gave no reason.",
+      ru: "Загрузка упала без причины.",
+    },
+    {
+      key: "progress",
+      default: "Загрузка: {name}",
+      en: "Name of a row's progress bar.",
+      ru: "Имя полосы прогресса строки.",
+    },
+    {
+      key: "cancel",
+      default: "Отменить загрузку: {name}",
+      en: "Name of the disk that cancels a tile's upload in flight.",
+      ru: "Имя диска, отменяющего идущую загрузку плитки.",
+    },
+    {
+      key: "retry",
+      default: "Повторить загрузку: {name}",
+      en: "Name of the retry button of a failed row (the retry disk of a failed tile).",
+      ru: "Имя кнопки повтора у неудачной строки (диска повтора у неудачной плитки).",
+    },
+    {
+      key: "remove",
+      default: "Убрать {name}",
+      en: "Name of the remove button of a file (it also stops an upload).",
+      ru: "Имя кнопки «Убрать» у файла (она же прерывает загрузку).",
+    },
+    {
+      key: "removed",
+      default: "{name}: убран",
+      en: "Live region: a file was removed.",
+      ru: "Live-область: файл убран.",
+    },
+    {
+      key: "coverChanged",
+      default: "Обложка: {name}",
+      en: "Live region: a reorder put another file first, the new cover (`cover`).",
+      ru: "Live-область: перестановка поставила первым другой файл — новую обложку (`cover`).",
+    },
+    {
+      key: "changeFailed",
+      default: "Не удалось сохранить изменение, файлы на прежних местах",
+      en: "Live region: the `onValueChange` promise of a change rejected and the set is as it was.",
+      ru: "Live-область: промис `onValueChange` отклонён, набор вернулся.",
+    },
+    {
+      key: "uploaded",
+      default: "{name}: загружен",
+      en: "Live region: a file finished uploading.",
+      ru: "Live-область: файл загружен.",
+    },
+    {
+      key: "uploadFailed",
+      default: "{name}: {reason}",
+      en: "Live region: a file failed to upload; `{reason}` is its error or `failed`.",
+      ru: "Live-область: файл не загрузился; `{reason}` — его ошибка или `failed`.",
+    },
+    {
+      key: "tileImage",
+      default: "Фото {position}: {name}{status}",
+      en: "Name of an image tile; `{name}` is the file's `alt` or name, `{status}` is ` · state` while it uploads.",
+      ru: "Имя плитки изображения; `{name}` — `alt` или имя файла, `{status}` — ` · состояние`, пока файл грузится.",
+    },
+    {
+      key: "tileVideo",
+      default: "Видео {position}: {name}{status}",
+      en: "Name of a video tile; the tokens of `tileImage`.",
+      ru: "Имя плитки видео; токены как у `tileImage`.",
+    },
+    {
+      key: "tileFile",
+      default: "Файл {position}: {name}{status}",
+      en: "Name of the tile of any other file.",
+      ru: "Имя плитки любого другого файла.",
     },
   ],
 };

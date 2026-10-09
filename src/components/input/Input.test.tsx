@@ -1,8 +1,9 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { DisabledProvider } from "@/internal/disabledContext";
 
 import { Input } from "./Input";
 import styles from "./Input.module.css";
@@ -654,5 +655,234 @@ describe("getPasswordStrength", () => {
     expect(getPasswordStrength("Ab1!")).toBe(2);
     expect(getPasswordStrength("Ab1!xyz")).toBe(2);
     expect(getPasswordStrength("Ab1!xyzw")).toBe(3);
+  });
+});
+
+describe("Input onCommit (inline save)", () => {
+  function deferred() {
+    let resolve!: () => void;
+    let reject!: (reason?: unknown) => void;
+    const promise = new Promise<void>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  }
+
+  function CommitField({ onCommit }: { onCommit: (value: string) => void | Promise<void> }) {
+    const [value, setValue] = React.useState("Ромашка");
+    return (
+      <Input.Root label="Компания" onCommit={onCommit}>
+        <Input.Wrapper>
+          <Input.Field value={value} onValueChange={setValue} />
+        </Input.Wrapper>
+      </Input.Root>
+    );
+  }
+
+  it("commits a changed value on blur and Enter, never an unchanged one", () => {
+    const onCommit = vi.fn();
+    render(<CommitField onCommit={onCommit} />);
+    const field = screen.getByLabelText("Компания");
+    fireEvent.focus(field);
+    fireEvent.blur(field);
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(onCommit).not.toHaveBeenCalled();
+
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "Ромашка Плюс" } });
+    fireEvent.keyDown(field, { key: "Enter" });
+    expect(onCommit).toHaveBeenCalledWith("Ромашка Плюс");
+    fireEvent.blur(field);
+    expect(onCommit, "already committed by Enter").toHaveBeenCalledTimes(1);
+  });
+
+  it("Escape reverts to the committed value and is consumed", () => {
+    const onCommit = vi.fn();
+    render(<CommitField onCommit={onCommit} />);
+    const field = screen.getByLabelText<HTMLInputElement>("Компания");
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "Черновик" } });
+    const press = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+    field.dispatchEvent(press);
+    expect(field.value).toBe("Ромашка");
+    expect(press.defaultPrevented).toBe(true);
+    fireEvent.blur(field);
+    expect(onCommit).not.toHaveBeenCalled();
+  });
+
+  it("stays editable while pending, shows the spinner, then a check", async () => {
+    const save = deferred();
+    render(<CommitField onCommit={() => save.promise} />);
+    const field = screen.getByLabelText<HTMLInputElement>("Компания");
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "Ромашка Плюс" } });
+    fireEvent.blur(field);
+    expect(field).toHaveAttribute("aria-busy", "true");
+    expect(field).not.toBeDisabled();
+    expect(document.querySelector('[data-commit="pending"]')).not.toBeNull();
+    expect(screen.getByText("Сохранение")).toBeInTheDocument();
+    await act(async () => save.resolve());
+    expect(field).not.toHaveAttribute("aria-busy");
+    expect(field.value).toBe("Ромашка Плюс");
+    expect(document.querySelector('[data-commit="saved"]')).not.toBeNull();
+    expect(screen.getByText("Сохранено")).toBeInTheDocument();
+  });
+
+  it("a rejected save restores the committed value", async () => {
+    const save = deferred();
+    render(<CommitField onCommit={() => save.promise} />);
+    const field = screen.getByLabelText<HTMLInputElement>("Компания");
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "Ошибка" } });
+    fireEvent.blur(field);
+    await act(async () => save.reject(new Error("409")));
+    await waitFor(() => expect(field.value).toBe("Ромашка"));
+    expect(field).not.toHaveAttribute("aria-busy");
+  });
+
+  it("a rejected save keeps what the person typed after it", async () => {
+    const save = deferred();
+    render(<CommitField onCommit={() => save.promise} />);
+    const field = screen.getByLabelText<HTMLInputElement>("Компания");
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "Первое" } });
+    fireEvent.keyDown(field, { key: "Enter" });
+    fireEvent.change(field, { target: { value: "Второе" } });
+    await act(async () => save.reject(new Error("409")));
+    expect(field.value).toBe("Второе");
+  });
+
+  it("an uncontrolled field reverts too", () => {
+    render(
+      <Input.Root label="Город" onCommit={() => {}}>
+        <Input.Wrapper>
+          <Input.Field defaultValue="Казань" />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const field = screen.getByLabelText<HTMLInputElement>("Город");
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "Самара" } });
+    fireEvent.keyDown(field, { key: "Escape" });
+    expect(field.value).toBe("Казань");
+  });
+
+  it("native focus, blur and keydown handlers still reach the input", () => {
+    const onBlur = vi.fn();
+    const onKeyDown = vi.fn();
+    render(
+      <Input.Root label="Город" onCommit={() => {}}>
+        <Input.Wrapper>
+          <Input.Field defaultValue="Казань" onBlur={onBlur} onKeyDown={onKeyDown} />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const field = screen.getByLabelText("Город");
+    fireEvent.keyDown(field, { key: "a" });
+    fireEvent.blur(field);
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Input edge actions", () => {
+  it("Input.Action is a named button with a tooltip; asChild renders a link", async () => {
+    const onClick = vi.fn();
+    render(
+      <Input.Root label="Телефон">
+        <Input.Wrapper>
+          <Input.Field defaultValue="+7 900 000-00-00" />
+          <Input.Action label="Открыть профиль" onClick={onClick}>
+            <svg />
+          </Input.Action>
+          <Input.Action label="Позвонить" asChild>
+            <a href="tel:+79000000000">
+              <svg />
+            </a>
+          </Input.Action>
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Открыть профиль" });
+    fireEvent.click(button);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(button).toHaveAttribute("data-field-action");
+    expect(screen.getByRole("link", { name: "Позвонить" })).toHaveAttribute(
+      "href",
+      "tel:+79000000000",
+    );
+    fireEvent.focus(button);
+    expect(await screen.findByText("Открыть профиль")).toBeInTheDocument();
+  });
+
+  it("Input.CopyButton copies the value and says so", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(
+      <Input.Root label="ИНН">
+        <Input.Wrapper>
+          <Input.Field defaultValue="7701234567" readOnly />
+          <Input.CopyButton />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Копировать" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith("7701234567"));
+    expect(await screen.findByRole("button", { name: "Скопировано" })).toBeInTheDocument();
+  });
+
+  it("Input.RevealButton toggles a password field and keeps the selection", () => {
+    render(
+      <Input.Root label="Пароль">
+        <Input.Wrapper>
+          <Input.Field type="password" defaultValue="secret-42" />
+          <Input.RevealButton />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const field = screen.getByLabelText<HTMLInputElement>("Пароль");
+    const toggle = screen.getByRole("button", { name: "Показать пароль" });
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+    expect(field).toHaveAttribute("type", "password");
+    field.focus();
+    field.setSelectionRange(2, 5);
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+    expect(field).toHaveAttribute("type", "text");
+    expect([field.selectionStart, field.selectionEnd]).toEqual([2, 5]);
+    fireEvent.click(toggle);
+    expect(field).toHaveAttribute("type", "password");
+  });
+
+  it("a pointer press on RevealButton keeps focus in the field", () => {
+    render(
+      <Input.Root label="Пароль">
+        <Input.Wrapper>
+          <Input.Field type="password" />
+          <Input.RevealButton />
+        </Input.Wrapper>
+      </Input.Root>,
+    );
+    const field = screen.getByLabelText("Пароль");
+    field.focus();
+    const down = new MouseEvent("mousedown", { bubbles: true, cancelable: true });
+    screen.getByRole("button", { name: "Показать пароль" }).dispatchEvent(down);
+    expect(down.defaultPrevented).toBe(true);
+  });
+});
+
+describe("Input inside a disabled Fieldset", () => {
+  it("takes disabled from the Fieldset around it", () => {
+    render(
+      <DisabledProvider disabled>
+        <Input.Root label="Название проекта">
+          <Input.Wrapper>
+            <Input.Field />
+          </Input.Wrapper>
+        </Input.Root>
+      </DisabledProvider>,
+    );
+    expect(screen.getByLabelText("Название проекта")).toBeDisabled();
   });
 });

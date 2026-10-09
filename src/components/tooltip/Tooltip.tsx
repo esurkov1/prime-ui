@@ -6,6 +6,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
+import { hasNativeTabStop } from "@/internal/overlay/focus";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import type { ControlSize } from "@/internal/states";
 
@@ -14,7 +15,8 @@ import styles from "./Tooltip.module.css";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type TooltipSide = PositionSide;
-export type TooltipAlign = PositionAlign;
+/** A tooltip lines up with its trigger by choice: `auto` is for panels that grow. */
+export type TooltipAlign = Exclude<PositionAlign, "auto">;
 
 const DEFAULT_DELAY_MS = 400;
 const DEFAULT_SKIP_DELAY_MS = 300;
@@ -202,7 +204,11 @@ function TooltipRoot({
 // ─── Trigger ─────────────────────────────────────────────────────────────────
 
 export type TooltipTriggerProps = {
-  /** One focusable element: a Button, or a `tabIndex={0}` wrapper around a disabled control. */
+  /**
+   * One element. A focusable one (Button, link) is the trigger as is; a disabled control is wrapped
+   * in a focusable host that takes hover and Tab for it; a non-interactive one (Badge, Avatar,
+   * ProgressCircle, an `Icon` with `label`) becomes a tab stop.
+   */
   children: React.ReactElement;
   ref?: React.Ref<HTMLElement>;
 } & Omit<React.HTMLAttributes<HTMLElement>, "children">;
@@ -216,6 +222,18 @@ function TooltipTrigger({ children, ...forwarded }: TooltipTriggerProps) {
     useTooltipRootContext();
   /* A press hides the tooltip and the focus it causes must not reopen it (until the pointer leaves). */
   const pressedRef = React.useRef(false);
+  // A disabled control gets no pointer events and no focus: a host around it takes both.
+  const childProps = children.props as { disabled?: unknown; tabIndex?: unknown };
+  const disabledChild = childProps.disabled === true;
+  // A child that is no tab stop of its own (a Badge, an Avatar) is made one, so keyboard users
+  // reach the tooltip too. Measured on the DOM: only the element knows whether it is focusable.
+  const [ownTabStop, setOwnTabStop] = React.useState(true);
+  React.useLayoutEffect(() => {
+    const node = triggerRef.current;
+    if (!node || disabledChild) return;
+    setOwnTabStop(childProps.tabIndex !== undefined || hasNativeTabStop(node));
+  });
+  const madeFocusable = disabledChild || !ownTabStop;
 
   return (
     <FloatingTrigger
@@ -224,6 +242,7 @@ function TooltipTrigger({ children, ...forwarded }: TooltipTriggerProps) {
         ref: triggerRef,
         "aria-describedby": isOpen ? contentId : undefined,
         ...toDataAttributes({ state: isOpen ? "open" : "closed" }),
+        ...(madeFocusable ? { tabIndex: 0, className: styles.focusHost } : null),
         onPointerEnter: (e: React.PointerEvent<HTMLElement>) => {
           // Touch has no hover: a tap must not leave a tooltip behind. Focus still opens it.
           if (e.pointerType === "touch") return;
@@ -246,7 +265,13 @@ function TooltipTrigger({ children, ...forwarded }: TooltipTriggerProps) {
         },
       }}
     >
-      {children}
+      {disabledChild ? (
+        <span className={styles.disabledHost} data-disabled-host="">
+          {children}
+        </span>
+      ) : (
+        children
+      )}
     </FloatingTrigger>
   );
 }

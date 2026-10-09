@@ -6,13 +6,13 @@ import {
   DataTable,
   type DataTableColumn,
   Drawer,
+  Fieldset,
   Icon,
   Input,
   PageContent,
   Radio,
   Select,
   Textarea,
-  Typography,
   useNotifications,
 } from "prime-ui-kit";
 import * as React from "react";
@@ -127,94 +127,76 @@ export default function FormDrawerPattern() {
               </Drawer.Header>
               <Drawer.Body>
                 <form id={formId} className={styles.form} noValidate onSubmit={submit}>
-                  <fieldset
-                    className={styles.group}
-                    disabled={saving}
-                    aria-labelledby="new-client-company"
-                  >
-                    <Typography as="h3" variant="title-s" id="new-client-company">
-                      Реквизиты
-                    </Typography>
-                    <div className={styles.fields}>
-                      <Radio.Group
-                        name="kind"
-                        label="Тип клиента"
-                        defaultValue="company"
-                        orientation="horizontal"
-                      >
-                        <Radio.Root value="company">
-                          <Radio.Label>Компания</Radio.Label>
-                        </Radio.Root>
-                        <Radio.Root value="person">
-                          <Radio.Label>ИП</Radio.Label>
-                        </Radio.Root>
-                      </Radio.Group>
-                      <Input.Root label="Название" error={errors.name}>
+                  <Fieldset label="Реквизиты" disabled={saving}>
+                    <Radio.Group
+                      name="kind"
+                      label="Тип клиента"
+                      defaultValue="company"
+                      orientation="horizontal"
+                    >
+                      <Radio.Root value="company">
+                        <Radio.Label>Компания</Radio.Label>
+                      </Radio.Root>
+                      <Radio.Root value="person">
+                        <Radio.Label>ИП</Radio.Label>
+                      </Radio.Root>
+                    </Radio.Group>
+                    <Input.Root label="Название" error={errors.name}>
+                      <Input.Wrapper>
+                        <Input.Field
+                          name="name"
+                          placeholder="ООО «Ромашка»"
+                          autoComplete="organization"
+                        />
+                      </Input.Wrapper>
+                    </Input.Root>
+                    <div className={styles.pair}>
+                      <Input.Root label="ИНН" error={errors.inn} reserveSupportRow>
                         <Input.Wrapper>
-                          <Input.Field
-                            name="name"
-                            placeholder="ООО «Ромашка»"
-                            autoComplete="organization"
-                          />
+                          <Input.Field name="inn" inputMode="numeric" placeholder="7704512908" />
                         </Input.Wrapper>
                       </Input.Root>
-                      <div className={styles.pair}>
-                        <Input.Root label="ИНН" error={errors.inn} reserveSupportRow>
-                          <Input.Wrapper>
-                            <Input.Field name="inn" inputMode="numeric" placeholder="7704512908" />
-                          </Input.Wrapper>
-                        </Input.Root>
-                        <Input.Root label="КПП" optional reserveSupportRow>
-                          <Input.Wrapper>
-                            <Input.Field name="kpp" inputMode="numeric" placeholder="770401001" />
-                          </Input.Wrapper>
-                        </Input.Root>
-                      </div>
-                    </div>
-                  </fieldset>
-                  <fieldset
-                    className={styles.group}
-                    disabled={saving}
-                    aria-labelledby="new-client-contacts"
-                  >
-                    <Typography as="h3" variant="title-s" id="new-client-contacts">
-                      Контакты
-                    </Typography>
-                    <div className={styles.fields}>
-                      <Input.Root
-                        label="Почта для счетов"
-                        error={errors.email}
-                        hint="На неё уйдут счета и акты"
-                      >
+                      <Input.Root label="КПП" optional reserveSupportRow>
                         <Input.Wrapper>
-                          <Input.Icon side="start">
-                            <Icon name="field.email" />
-                          </Input.Icon>
-                          <Input.Field name="email" type="email" placeholder="billing@company.ru" />
+                          <Input.Field name="kpp" inputMode="numeric" placeholder="770401001" />
                         </Input.Wrapper>
                       </Input.Root>
-                      <Select.Root label="Менеджер" value={manager} onValueChange={setManager}>
-                        <Select.Trigger>
-                          <Select.Value />
-                        </Select.Trigger>
-                        <Select.Content>
-                          {MANAGERS.map((name) => (
-                            <Select.Item key={name} value={name}>
-                              {name}
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Root>
-                      <Textarea.Root name="note" label="Комментарий" optional rows={2} />
-                      <Checkbox.Root
-                        name="invite"
-                        defaultChecked
-                        hint="Клиент увидит свои счета и акты онлайн"
-                      >
-                        <Checkbox.Label>Пригласить в личный кабинет</Checkbox.Label>
-                      </Checkbox.Root>
                     </div>
-                  </fieldset>
+                  </Fieldset>
+                  <Fieldset label="Контакты" disabled={saving}>
+                    <Input.Root
+                      label="Почта для счетов"
+                      error={errors.email}
+                      hint="На неё уйдут счета и акты"
+                    >
+                      <Input.Wrapper>
+                        <Input.Icon side="start">
+                          <Icon name="field.email" />
+                        </Input.Icon>
+                        <Input.Field name="email" type="email" placeholder="billing@company.ru" />
+                      </Input.Wrapper>
+                    </Input.Root>
+                    <Select.Root label="Менеджер" value={manager} onValueChange={setManager}>
+                      <Select.Trigger>
+                        <Select.Value />
+                      </Select.Trigger>
+                      <Select.Content>
+                        {MANAGERS.map((name) => (
+                          <Select.Item key={name} value={name}>
+                            {name}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                    <Textarea.Root name="note" label="Комментарий" optional rows={2} />
+                    <Checkbox.Root
+                      name="invite"
+                      defaultChecked
+                      hint="Клиент увидит свои счета и акты онлайн"
+                    >
+                      <Checkbox.Label>Пригласить в личный кабинет</Checkbox.Label>
+                    </Checkbox.Root>
+                  </Fieldset>
                 </form>
               </Drawer.Body>
               <Drawer.Footer>

@@ -1,7 +1,6 @@
 # Dependencies & build
 node_modules/
 dist/
-dist-skill/
 .dts-stage/
 coverage/
 playground/dist/

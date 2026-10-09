@@ -1,0 +1,74 @@
+/* Chat: the page fills a viewport-high main; each pane is a card with a scrolling region. */
+
+.screen {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: min(calc(var(--prime-space-24) * 7), 100dvh);
+}
+
+.paneCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.pane {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.dialogs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  margin: 0;
+  padding: var(--prime-space-2);
+  list-style: none;
+}
+
+/* A dialog row: avatar and name at the start, the unread count at the end. */
+.dialog {
+  justify-content: flex-start;
+}
+
+.dialogText {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.threadHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+/* Pinned messages under the header, above the scrolling conversation. */
+.pinned {
+  margin: 0 var(--prime-space-3) var(--prime-space-2);
+}
+
+/* The conversation scrolls itself and pads its own sides (the focus rings of bubbles fit in). */
+.thread {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--prime-space-2) var(--prime-space-3) var(--prime-space-4);
+}
+
+/* Older history on its way: a bubble-shaped placeholder above the first message. */
+.older {
+  display: flex;
+  padding-block: var(--prime-space-3);
+}
+
+.olderBubble {
+  width: min(100%, calc(var(--prime-space-24) * 2));
+  height: var(--prime-space-10);
+}
+
+.composer {
+  padding: var(--prime-space-2) var(--prime-space-3) var(--prime-space-3);
+}

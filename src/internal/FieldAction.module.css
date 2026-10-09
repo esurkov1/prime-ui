@@ -1,0 +1,86 @@
+/*
+ * A button segment at a field's edge (clear, copy, reveal, the consumer's own action): full field
+ * height, flush with the end edge; the icon is centred with padX on both sides, so the icon → edge
+ * distance stays padX (foundation §6) while the whole segment is the hit area and takes the hover
+ * wash. Neighbouring segments sit edge to edge. The host drops its end padding.
+ */
+.action {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: calc(var(--field-icon) + 2 * var(--field-px));
+  min-height: var(--field-h);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--prime-color-text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.action svg {
+  display: block;
+  width: calc(var(--field-icon) - var(--prime-space-1));
+  height: calc(var(--field-icon) - var(--prime-space-1));
+}
+
+@media (hover: hover) {
+  .action:hover:not(:disabled, [aria-disabled="true"]) {
+    background: var(--prime-color-fill-subtle);
+    color: var(--prime-color-text-primary);
+  }
+}
+
+.action:active:not(:disabled, [aria-disabled="true"]) {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.action:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.action[aria-pressed="true"] {
+  color: var(--prime-color-text-primary);
+}
+
+.action:is(:disabled, [aria-disabled="true"]) {
+  color: var(--prime-color-text-disabled);
+  background: transparent;
+  cursor: not-allowed;
+}
+
+/* Copy → check: both glyphs stay mounted and cross-fade in place. */
+.copyGlyphs {
+  display: grid;
+}
+
+.copyGlyphs > svg {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+}
+
+.copyGlyphs > [data-glyph="check"],
+.copyGlyphs[data-copy-state="copied"] > [data-glyph="copy"] {
+  opacity: 0;
+  transform: scale(var(--prime-motion-press-scale-compact));
+}
+
+.copyGlyphs[data-copy-state="copied"] > [data-glyph="check"] {
+  opacity: 1;
+  transform: none;
+}
+
+.copyGlyphs[data-copy-state="copied"] {
+  color: var(--prime-color-success-text);
+}

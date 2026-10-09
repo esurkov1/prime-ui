@@ -35,8 +35,10 @@
   appearance: none;
 }
 
-/* The empty placeholder option is the one shown. */
-.select:has(> option[value=""]:checked) {
+/* The empty placeholder option is the one shown. Matched by class, never by `[value]`: an
+   attribute inside `:has()` makes Blink re-check :has anchors on every change of that attribute
+   anywhere on the page, and React rewrites `value` on each keystroke of a controlled input. */
+.select:has(> .placeholder:checked) {
   color: var(--prime-color-text-placeholder);
 }
 

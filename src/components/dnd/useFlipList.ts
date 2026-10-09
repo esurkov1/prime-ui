@@ -4,21 +4,33 @@ import { motionDurationMs, prefersReducedMotion } from "@/hooks/usePresence";
 
 import { layoutRect, ownNodes } from "./geometry";
 
+/** Timings read this frame: every list of a board settles in the same commit. */
+const timingCache = new Map<string, KeyframeAnimationOptions>();
+
 /**
  * WAAPI timing from the motion tokens (`--prime-motion-duration-<token>`,
  * `--prime-motion-easing-<curve>`), read at animation time so theme and app overrides apply;
- * WAAPI cannot take `var()`.
+ * WAAPI cannot take `var()`. Read once per frame: a computed style read of the root forces a style
+ * pass, and each list of a board would otherwise force its own after the previous list's glides.
  */
 export function motionTiming(
   duration: "fast" | "base",
   curve: "standard" | "enter" | "exit" = "standard",
 ): KeyframeAnimationOptions {
+  const key = `${duration}|${curve}`;
+  const cached = timingCache.get(key);
+  if (cached) return { ...cached };
   const easing = getComputedStyle(document.documentElement)
     .getPropertyValue(`--prime-motion-easing-${curve}`)
     .trim();
-  return easing
+  const timing = easing
     ? { duration: motionDurationMs(duration), easing }
     : { duration: motionDurationMs(duration) };
+  if (timingCache.size === 0 && typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(() => timingCache.clear());
+  }
+  timingCache.set(key, timing);
+  return { ...timing };
 }
 
 type Box = { left: number; top: number; width: number; height: number };
@@ -35,10 +47,16 @@ export function useFlipList(
   layoutKey: string,
   selector: string,
   enabled: boolean,
+  /**
+   * A new value animates this layout change with no drag in flight: a keyboard move, or a drop the
+   * owner refused gliding back.
+   */
+  settle = 0,
 ) {
   const previous = React.useRef(new Map<string, Box>());
   const running = React.useRef(new Map<HTMLElement, Animation>());
   const wasEnabled = React.useRef(false);
+  const lastSettle = React.useRef(settle);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: layoutKey is the trigger by design.
   React.useLayoutEffect(() => {
@@ -49,11 +67,17 @@ export function useFlipList(
     // this frame only refreshes it.
     const justStarted = enabled && !wasEnabled.current;
     wasEnabled.current = enabled;
+    const settling = settle !== lastSettle.current;
+    lastSettle.current = settle;
     const reduced = prefersReducedMotion();
-    const timing = enabled && !justStarted && !reduced ? motionTiming("base") : null;
+    const glides = (enabled && !justStarted) || settling;
+    const timing = glides && !reduced ? motionTiming("base") : null;
     // Positions are kept relative to the container, so scrolling the page or the list (auto-scroll
     // during a drag) never reads as items moving.
     const box = container.getBoundingClientRect();
+    // Every read first, then every write: starting a glide restyles its node, and a read after it
+    // would force that style pass once per item instead of once per list.
+    const measured: { node: HTMLElement; rect: Box; drawn: DOMRect; before: Box }[] = [];
     for (const node of ownNodes(container, selector)) {
       const id = node.dataset.dndItem ?? (node.dataset.dndGap !== undefined ? GAP_KEY : undefined);
       if (id === undefined) continue;
@@ -63,13 +87,18 @@ export function useFlipList(
       const top = rect.top - box.top + container.scrollTop;
       next.set(id, { left, top, width: rect.width, height: rect.height });
       const before = previous.current.get(id);
-      if (!timing || !before) continue;
-      const dx = before.left - left;
-      const dy = before.top - top;
-      // Where the node is drawn right now, its running glide included. That glide was set against
-      // the previous layout, so the drawn box is mapped back onto it: the next glide starts from
-      // what is on screen, and a reversal mid-way never compounds offsets or scales.
-      const drawn = node.getBoundingClientRect();
+      // `animate` is missing in jsdom, where consumers test screens built with the kit.
+      if (!timing || !before || typeof node.animate !== "function") continue;
+      // Where the node is drawn right now, its running glide included.
+      measured.push({ node, rect, drawn: node.getBoundingClientRect(), before });
+    }
+    for (const { node, rect, drawn, before } of measured) {
+      if (!timing) break;
+      const dx = before.left - (rect.left - box.left + container.scrollLeft);
+      const dy = before.top - (rect.top - box.top + container.scrollTop);
+      // The running glide was set against the previous layout, so the drawn box is mapped back
+      // onto it: the next glide starts from what is on screen, and a reversal mid-way never
+      // compounds offsets or scales.
       const drawnScaleX = rect.width > 0 ? drawn.width / rect.width : 1;
       const drawnScaleY = rect.height > 0 ? drawn.height / rect.height : 1;
       const fromWidth = before.width * drawnScaleX;
@@ -111,7 +140,7 @@ export function useFlipList(
       }
     }
     previous.current = next;
-  }, [container, layoutKey, selector, enabled]);
+  }, [container, layoutKey, selector, enabled, settle]);
 
   React.useLayoutEffect(() => {
     const animations = running.current;

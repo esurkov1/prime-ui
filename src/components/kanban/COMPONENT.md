@@ -15,6 +15,7 @@
 - One list to reorder, or items carried onto folders or assignees → use [Dnd](../dnd/COMPONENT.md) directly.
 - A linear process the user walks through once → use [Stepper](../stepper/COMPONENT.md).
 - A history of events → use [Timeline](../timeline/COMPONENT.md).
+- Work planned on dates, where duration and overlap matter → use [Gantt](../gantt/COMPONENT.md).
 
 ## Import
 ```tsx
@@ -32,9 +33,10 @@ import {
 Kanban.Root                          board: horizontal strip of columns, its own Dnd.Root if none above
 └─ <ul> (Dnd.Sortable, axis x)       the columns in `columnOrder`
    └─ <li> column (from `columns`)   `fill-muted` well (one ladder step off the board's surface)
-      ├─ header                      title (h3) · count Badge · renderColumnActions(column) · [grip Dnd.Handle]
-      │  └─ description              muted line under the title (`column.description`)
-      └─ <ul> (Dnd.Sortable)         own vertical scroll; Skeleton cards while loading; EmptyPage when empty
+      ├─ header                      title (h3) · count Badge (the stage color) · renderColumnActions(column) · [grip Dnd.Handle, a lock when `locked`]
+      │  ├─ description              muted line under the title (`column.description`)
+      │  └─ meta                     the stage's figures (`renderColumnMeta(column)`)
+      └─ <ul> (Dnd.Sortable)         own vertical scroll; Skeleton cards while loading; EmptyPage (Dnd `empty`) when empty
          └─ Kanban.Item              <li> card from renderItem(item)
             ├─ Kanban.ItemHeader     optional top row over a faint hairline: key · priority (or a full-width Thumbnail cover)
             ├─ Kanban.ItemTitle      title, up to three lines
@@ -50,24 +52,25 @@ Columns and cards are application data (`columns`, `items`); the board state is 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Kanban.Root
-Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns (a `<ul>`, sortable along x) that scrolls sideways inside itself, each column a labelled `<ul>` of cards under a header with the title, a count `Badge`, actions and an optional description line. Mounts its own `Dnd.Root` unless one is already above it. Sets `aria-busy` while loading, `data-loading`, `data-disabled`.
+Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns (a `<ul>`, sortable along x) that scrolls sideways inside itself, each column a labelled `<ul>` of cards (Dnd lists of one kind, so Alt + ← / → moves a card across) under a header with the title, a count `Badge`, actions and optional description and meta lines. Mounts its own `Dnd.Root` unless one is already above it. Sets `aria-busy` while loading, `data-loading`, `data-disabled`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `columns` | `readonly KanbanColumn[]` | — (required) | Every column: `{ id, title, description?, color?, limit? }`, drawn in `columnOrder` (array order by default). `description` is a muted line under the title that also describes the column's list; `color` (a `PaletteColor`) puts a dot of that hue before the title; `limit` is a WIP limit — a full column refuses cards from other columns and its count turns orange (`count / limit`). |
+| `columns` | `readonly KanbanColumn[]` | — (required) | Every column: `{ id, title, description?, color?, limit?, locked? }`, drawn in `columnOrder` (array order by default). `description` is a muted line under the title that also describes the column's list; `color` (a `PaletteColor`) is the stage's hue on its count badge; `limit` is a WIP limit — a full column refuses cards from other columns (the reason «Колонка «…» заполнена» is spoken and shown under the carried card) and its count turns orange (`count / limit`); `locked` keeps a system stage in its place when columns are reordered — a lock stands where its grip would and no column moves past it. |
 | `items` | `readonly T[]` | — (required) | Every card the board can show; `value` decides where each one stands. |
 | `getId` | `(item: T) => string` | — (required) | Stable unique id of a card, the one used in `value`. |
 | `getLabel` | `(item: T) => string` | `the id` | Spoken by the live region. |
 | `value` | `KanbanValue` | — | Card ids per column (controlled): `{ [columnId]: id[] }`. Ids missing from `items` are skipped. |
 | `defaultValue` | `KanbanValue` | `{}` | Initial card ids per column (uncontrolled). |
-| `onValueChange` | `(value: KanbanValue, move: KanbanMove) => void` | — | A card moved by pointer, touch or keyboard: the new placement, then `{ id, from, to, index }` to save. |
+| `onValueChange` | `(value: KanbanValue, move: KanbanMove) => void \| Promise<void>` | — | A card moved by pointer, touch or keyboard: the new placement, then `{ id, from, to, index }` to save. Return the save's promise: the card stays in its new place, busy (dimmed under a spinner, `aria-busy`, it does not move again), until it settles; resolve — the move stands (a controlled owner applies `value` before resolving); reject — the card glides back and `labels.moveFailed` is announced. |
 | `reorderableColumns` | `boolean` | `false` | A grip (`Dnd.Handle`) at the end of every column header moves the column by pointer, touch hold and Alt + ← / →; the cards travel with it. |
 | `columnOrder` | `readonly string[]` | — | Column ids in their order (controlled). Columns it does not name follow in `columns` order. |
 | `defaultColumnOrder` | `readonly string[]` | `the order of `columns`` | Initial column ids in their order (uncontrolled). |
-| `onColumnOrderChange` | `(order: readonly string[], move: KanbanColumnMove) => void` | — | A column moved: the new order, then `{ id, index }` to save. |
+| `onColumnOrderChange` | `(order: readonly string[], move: KanbanColumnMove) => void \| Promise<void>` | — | A column moved: the new order, then `{ id, index }` to save. Return the save's promise: the column stays in its new place with a spinner in place of its grip and `aria-busy` until it settles; reject — it glides back and `labels.columnMoveFailed` is announced. |
 | `renderItem` | `(item: T) => ReactNode` | — (required) | Renders one card; return a `Kanban.Item`. |
 | `renderColumnActions` | `(column: KanbanColumn) => ReactNode` | — | Trailing actions of a column header (add a card, a menu); kit controls inside take the `s` tier. |
-| `canDrop` | `(id: string, columnId: string) => boolean` | — | A workflow rule: refuses card `id` in column `columnId`; the column turns `danger` before the release and a keyboard move is announced as refused. |
+| `renderColumnMeta` | `(column: KanbanColumn) => ReactNode` | — | The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»), a caption in tabular digits, one line. It describes the column's list too. |
+| `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken, and shown under the carried card); the column turns `danger` before the release and a keyboard move is announced as refused. |
 | `variant` | `"well" \| "plain"` | `"well"` | `well`: every column is a filled well (`fill-muted`) with its cards inside. `plain`: no wells — the header, a filled plate as wide as the cards, and the cards carry the column; cards widen to almost the full column, so neighbouring columns stand closer. |
 | `loading` | `boolean` | `false` | Columns show skeleton cards in the card geometry; the cards cross-fade in when it turns off. |
 | `disabled` | `boolean` | `false` | Read-only board: no drag, no keyboard moves, no column grips; clicks on cards still work. |
@@ -127,11 +130,13 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `limit` (column) | count reads `count / limit`, orange when full; a full column refuses cards from others | a WIP limit per status | — |
+| `limit` (column) | count reads `count / limit`, orange when full; a full column refuses cards from others with the reason `labels.full` | a WIP limit per status | — |
 | `description` (column) | a muted caption line under the column title, one line with an ellipsis | the column's rule or meaning («Ответить в течение дня») | — |
-| `color` (column) | a palette dot (`Badge.Dot`, the hue's solid) before the column title | telling columns apart; the title still names the column | — |
+| `renderColumnMeta` | a caption line in tabular digits under the description | the stage's figures («2 сделки · 576 000 ₽») | — |
+| `color` (column) | the count Badge in the stage's hue (soft) | telling stages apart, matching their color elsewhere; the title still names the column | — |
+| `locked` (column) | a lock where the grip would be; the column holds its place, no column moves past it | system stages: the first «Новые», the last «Закрыто» | — |
 | `reorderableColumns` | a ghost grip at the end of every column header, after the actions; the column is carried by it | the user arranges the stages | `false` |
-| `canDrop` | the column turns `danger` under a refused card; a keyboard move is announced as refused | workflow rules (a blocked ticket cannot be closed) | — |
+| `canDrop` | the column turns `danger` under a refused card; a string reason is spoken and shown under the carried card; a keyboard move is announced as refused | workflow rules (a blocked ticket cannot be closed) | — |
 | `loading` | skeleton cards in the card geometry, no counts | the first load or a refresh | `false` |
 | `disabled` | cards do not drag, Alt + arrows do nothing | read-only boards, no permission | `false` |
 
@@ -142,13 +147,16 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | carried | a drag | Dnd: the clone lifts on `--prime-shadow-modal`, a dashed accent gap opens where the card lands, cards glide aside |
 | column carried | a drag by the column grip | the same for the whole column: its clone lifts with its cards, a column-sized gap opens in the strip, the columns glide aside |
 | over a column | pointer over another column | the gap opens there; an empty column's slot fades out |
-| refused | `limit` reached, `canDrop` returns `false` | `data-dnd-reject` on the `<ul>`: `danger-soft` fill |
+| refused | `limit` reached, `canDrop` returns `false` or a reason | `data-dnd-reject` on the `<ul>`: `danger-soft` fill; the reason in a chip under the carried card |
+| locked column | `locked` | `data-locked` on the column; the grip is a lock named «Закреплено» |
 | full | count ≥ `limit` | `data-full` on the column, orange count `count / limit` |
 | empty | no cards | a compact `EmptyPage` in a dashed drop slot at the top (`fill-strong` dashed line, no fill): «Нет карточек» and the hint «Перетащите сюда карточку» (not on a `disabled` board); the whole column stays a drop area |
 | loading | `loading` | `aria-busy` and `data-loading` on the root; `Skeleton` cards; `Crossfade` swaps them for the cards |
 | disabled | `disabled` / `Kanban.Item disabled` | `data-disabled` on the root / card; no `aria-roledescription`, no shortcuts, no column grips |
+| saving | `onValueChange` / `onColumnOrderChange` returned a pending promise | the card (column) stays in its new place with `aria-busy` and `data-pending`; a card's content quiets to 0.6 under a centred `Spinner`, a column's heading quiets and a spinner stands in for its grip; it does not move again until the answer |
+| refused save | the promise rejected | the card glides back to its old column and place (every card it pushed aside glides too), a column glides back in the strip; `labels.moveFailed` / `labels.columnMoveFailed` is announced |
 
-Motion: the hover lift (shadow, the card rises above its neighbours) and the empty slot fade (`fast`, `standard`); a card dropped under the mouse lands straight into its hover lift (`data-dnd-hover`); the swap from skeletons is `Crossfade`; drag motion is Dnd's (lift, gap, glide, landing). Under `prefers-reduced-motion` all of it is off.
+Motion: the hover lift (shadow, the card rises above its neighbours) and the empty slot fade (`fast`, `standard`); a card dropped under the mouse lands straight into its hover lift (`data-dnd-hover`); the swap from skeletons is `Crossfade`; drag motion is Dnd's (lift, gap, glide, landing); a saving card or column quiets (`fast`, both ways) and its spinner enters (`enterMotion`); a refused save glides back (`base`), never jumps. Under `prefers-reduced-motion` all of it is off.
 
 ## Layout & spacing
 - Give the root a height (`className`): columns span it and every column body scrolls on its own; without one the columns take the height of the tallest.
@@ -157,7 +165,7 @@ Motion: the hover lift (shadow, the card rises above its neighbours) and the emp
 - `well`: column gap `--prime-space-3`, cards inset `--prime-space-2` from the column edge, column radius `l`. `plain`: column gap `--prime-space-3`, cards inset `--prime-space-1` (room for the focus ring). Card gap `--prime-space-2`, card padding `--prime-space-3`, card radius `m`.
 - The column title is `title-m`; the header is at least a control `m` tall, its text starts where the card text does.
 - A faint inset hairline (`--prime-color-border-faint`, as in a dialog header) separates the header from the cards.
-- The header is a grid: the title, the count, the actions and the grip at the end on the first row; the description under the title on the second.
+- The header is a grid: the title, the count, the actions and the grip at the end on the first row; the description under the title on the second, the meta line under it (`--prime-space-1` above, caption, `text-secondary`).
 - Header actions get the `s` tier; inside a card, kit controls take the `m` host tier (a `Badge` is `s`). Pick a small `Avatar` (`size="s"`).
 
 ## Accessibility
@@ -171,12 +179,13 @@ Motion: the hover lift (shadow, the card rises above its neighbours) and the emp
 | `Escape` | Cancels a drag in flight. |
 
 ### ARIA
-- Every column is a `<ul>` labelled by its heading (`aria-labelledby`) and described by its description (`aria-describedby`); cards are `<li>` with `aria-roledescription` and `aria-keyshortcuts`.
-- The column grip is a button named «Переместить колонку «…»» with `aria-keyshortcuts`; a keyboard column move is announced with its position.
-- A live region (`role="status"`) announces grabbed, dropped, «position N of M», a move to another column and a refusal (`labels`).
+- Every column is a `<ul>` labelled by its heading (`aria-labelledby`) and described by its description and meta (`aria-describedby`); cards are `<li>` with `aria-roledescription` and `aria-keyshortcuts`. The columns are Dnd lists of one kind: Alt + ← / → across them is Dnd's.
+- The column grip is a button named «Переместить колонку «…»» with `aria-keyshortcuts`; a keyboard column move is announced with its position («Колонка «…»: позиция 2 из 4», `labels.column`). A locked column has a lock named «Закреплено» instead.
+- A live region (`role="status"`) announces grabbed, dropped, «position N of M», a move to another column by its title and a refusal with its reason (`labels`, Dnd's labels).
 - The count is spoken as text («Карточек: 3 из 5»), not only by colour; a full column also reads `count / limit`.
 - Touch: a drag starts after a hold; a finger that moves first scrolls the board.
 - While loading the root has `aria-busy`; skeletons are hidden from assistive tech.
+- While a move is saved the card or column has `aria-busy` (its spinner is hidden from assistive tech); a refused save is announced (`labels.moveFailed`, `labels.columnMoveFailed`).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -187,10 +196,11 @@ Motion: the hover lift (shadow, the card rises above its neighbours) and the emp
 | `countLimit` | `"Карточек: {count} из {limit}"` | Spoken name of the count badge of a column with a `limit`. |
 | `empty` | `"Нет карточек"` | Text of an empty column. |
 | `emptyHint` | `"Перетащите сюда карточку"` | Hint under the empty-column text, while cards can be dropped (not on a `disabled` board). |
-| `moved` | `"{label}: «{column}», позиция {position} из {total}"` | Live region: a card moved to another column with the keyboard. |
-| `refused` | `"{label}: колонка «{column}» не принимает карточку"` | Live region: the next column refused the card (full or `canDrop`). |
+| `full` | `"Колонка «{column}» заполнена ({limit})"` | Why a full column refuses a card: spoken, and shown under the carried card. |
 | `moveColumn` | `"Переместить колонку «{column}»"` | Name of the column grip (`reorderableColumns`). |
-| `columnMoved` | `"Колонка «{column}»: позиция {position} из {total}"` | Live region: a column moved with the keyboard. |
+| `column` | `"Колонка «{column}»"` | A column as the live region names it when it is carried or moved («Колонка «Демо»: позиция 2 из 4»). |
+| `moveFailed` | `"Не удалось переместить «{label}», карточка вернулась на место"` | Spoken when the `onValueChange` promise rejects; `{label}` is `getLabel(item)`. |
+| `columnMoveFailed` | `"Не удалось переместить колонку «{column}», она вернулась на место"` | Spoken when the `onColumnOrderChange` promise rejects. |
 
 ## Examples
 | Example | Shows |
@@ -199,8 +209,9 @@ Motion: the hover lift (shadow, the card rises above its neighbours) and the emp
 | [variants.tsx](examples/variants.tsx) | The same release board in both looks: columns as filled wells, and bare columns where the header and wider cards carry each column — `variant`. |
 | [structure.tsx](examples/structure.tsx) | Cards take only the parts they need: a title alone, a meta line, labels, a footer with counts and an assignee — `Kanban.ItemTitle`, `Kanban.ItemDescription`, `Kanban.ItemBadges`, `Kanban.ItemFooter`, `Kanban.ItemCount`. |
 | [cards.tsx](examples/cards.tsx) | Three kinds of cards on one board: a plain note, a ticket with a header row of key and priority, a design task with a cover — `Kanban.ItemHeader`, `Thumbnail`, `Kanban.ItemFooter`. |
-| [limits.tsx](examples/limits.tsx) | A support queue with a work-in-progress limit and a workflow rule: a full column and a blocked ticket are refused before the release, from the keyboard too — `limit`, `canDrop`. |
-| [columns.tsx](examples/columns.tsx) | A sales pipeline whose stages move by the grip in their header, carry a color and a short rule under the title, and are edited in a popover: rename, recolor, delete — `reorderableColumns`, `onColumnOrderChange`, `description`, `color`, `renderColumnActions`. |
+| [limits.tsx](examples/limits.tsx) | A support queue with a work-in-progress limit and a workflow rule: a full column and a blocked ticket are refused before the release with the reason under the card, from the keyboard too — `limit`, `canDrop`. |
+| [columns.tsx](examples/columns.tsx) | A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures under the title, and is edited in a popover — `reorderableColumns`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. |
+| [saving.tsx](examples/saving.tsx) | Every move is saved on the server: the card waits busy in its new place, and an invoice the server refuses to close glides back to its column — `onValueChange`. |
 | [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry and cross-fades the cards in; an empty column keeps its drop area; a read-only board drags nothing — `loading`, `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The placement lives in the parent: every move arrives with its source, target and position to save, and a button resets the board — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen a column takes 85% of the board and snaps into place, so the next one peeks; the strip scrolls inside the board, never the page. |
@@ -213,8 +224,12 @@ Motion: the hover lift (shadow, the card rises above its neighbours) and the emp
 - A hover-only action on a card → touch has no hover; put the action in the card or open the card on click.
 - Styling a card from an ancestor (`.board .card`) → the flying clone is portalled to `<body>` and loses it; put the class on `Kanban.Item`.
 - Keeping the column order in `columns` and reordering that array → pass `columnOrder` / `onColumnOrderChange`; `columns` stays the data.
+- Putting a system stage back first after every move → `locked: true` on that column.
+- Stats squeezed into the column `title` → `renderColumnMeta`.
+- `canDrop` returning `false` for a rule a person cannot guess → return the reason as a string.
+- Applying a move in `onValueChange` and then undoing it yourself when the request fails → return the request's promise and apply `value` only after it succeeds; the board keeps the card in place meanwhile and glides it back on a rejection.
 - Drag as the only way to change a status → keep a status field or a menu in the card details too.
 
 ## Related
-- **Built from:** [Dnd](../dnd/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)
-- **See also:** [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Thumbnail](../thumbnail/COMPONENT.md), [Timeline](../timeline/COMPONENT.md)
+- **Built from:** [Dnd](../dnd/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [Crossfade](../crossfade/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md)
+- **See also:** [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Thumbnail](../thumbnail/COMPONENT.md), [Timeline](../timeline/COMPONENT.md), [Gantt](../gantt/COMPONENT.md)

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 
@@ -616,12 +617,206 @@ describe("Select (search, clear, loading, empty)", () => {
     expect(screen.getByRole("listbox")).toBeInTheDocument();
   });
 
-  it("loading: aria-busy на триггере и строка загрузки в панели", () => {
+  it("loading: aria-busy на триггере, пункты на месте, объявление загрузки", () => {
     render(<SearchSelect loading />);
     const trigger = screen.getByRole("combobox");
     expect(trigger).toHaveAttribute("aria-busy", "true");
     fireEvent.click(trigger);
     expect(screen.getByText("Загрузка…")).toBeInTheDocument();
+    expect(screen.getAllByRole("option")).toHaveLength(2);
+    expect(screen.getByRole("listbox").querySelector("[data-skeleton]")).toBeNull();
+  });
+});
+
+describe("Select (server search)", () => {
+  const CLIENTS = [
+    { value: "c1", label: "ООО «Вектор»" },
+    { value: "c2", label: "АО «Северсталь-Сервис»" },
+    { value: "c3", label: "ИП Лебедева" },
+  ];
+
+  type ServerSelectProps = Pick<
+    React.ComponentProps<typeof Select.Root>,
+    | "search"
+    | "defaultSearch"
+    | "onSearchChange"
+    | "loading"
+    | "loadingMore"
+    | "hasMore"
+    | "onLoadMore"
+    | "loadError"
+    | "onRetry"
+  > & { children?: React.ReactNode };
+
+  function ServerSelect(props: ServerSelectProps) {
+    const { children, ...rest } = props;
+    return (
+      <Select.Root defaultOpen placeholder="Клиент" filter={false} {...rest}>
+        <Select.Trigger aria-label="Клиент">
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content searchable>
+          {"children" in props
+            ? children
+            : CLIENTS.map((client) => (
+                <Select.Item key={client.value} value={client.value}>
+                  {client.label}
+                </Select.Item>
+              ))}
+        </Select.Content>
+      </Select.Root>
+    );
+  }
+
+  it("search / onSearchChange own the query; filter={false} keeps every item", () => {
+    const onSearchChange = vi.fn();
+    function Harness() {
+      const [search, setSearch] = React.useState("");
+      return (
+        <ServerSelect
+          search={search}
+          onSearchChange={(next) => {
+            onSearchChange(next);
+            setSearch(next);
+          }}
+        />
+      );
+    }
+    render(<Harness />);
+    const field = screen.getByRole("textbox", { name: "Поиск" });
+    fireEvent.change(field, { target: { value: "zzz" } });
+    expect(onSearchChange).toHaveBeenLastCalledWith("zzz");
+    expect(field).toHaveValue("zzz");
+    expect(screen.getAllByRole("option")).toHaveLength(3);
+    expect(screen.queryByText("Ничего не найдено")).not.toBeInTheDocument();
+  });
+
+  it("closing clears the query through onSearchChange", () => {
+    const onSearchChange = vi.fn();
+    render(<ServerSelect defaultSearch="век" onSearchChange={onSearchChange} />);
+    expect(screen.getByRole("textbox", { name: "Поиск" })).toHaveValue("век");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onSearchChange).toHaveBeenLastCalledWith("");
+  });
+
+  it("results that arrive later take the highlight", () => {
+    const { rerender } = render(<ServerSelect search="лебед">{null}</ServerSelect>);
+    rerender(
+      <ServerSelect search="лебед">
+        <Select.Item value="c3">ИП Лебедева</Select.Item>
+      </ServerSelect>,
+    );
+    expect(screen.getByRole("option", { name: "ИП Лебедева" })).toHaveAttribute(
+      "data-highlighted",
+      "true",
+    );
+  });
+
+  it("loading with no items: skeleton rows in the list instead of the empty state", () => {
+    render(<ServerSelect loading>{null}</ServerSelect>);
+    const list = screen.getByRole("listbox");
+    expect(list).toHaveAttribute("aria-busy", "true");
+    expect(list.querySelectorAll("[data-skeleton]").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Ничего не найдено")).not.toBeInTheDocument();
+  });
+
+  it("loadingMore: skeleton rows after the items", () => {
+    render(<ServerSelect hasMore loadingMore />);
+    expect(screen.getAllByRole("option")).toHaveLength(3);
+    expect(screen.getByRole("listbox").querySelectorAll("[data-skeleton]").length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  it("the highlight reaching the last option asks for more once per round", () => {
+    const onLoadMore = vi.fn();
+    const { rerender } = render(<ServerSelect hasMore onLoadMore={onLoadMore} />);
+    const field = screen.getByRole("textbox", { name: "Поиск" });
+    fireEvent.keyDown(field, { key: "ArrowUp" });
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    fireEvent.keyDown(field, { key: "ArrowUp" });
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+    rerender(<ServerSelect hasMore={false} onLoadMore={onLoadMore} />);
+    fireEvent.keyDown(field, { key: "ArrowDown" });
+    fireEvent.keyDown(field, { key: "ArrowUp" });
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+  });
+
+  it("loadError replaces the list with an alert; the button and Enter call onRetry", () => {
+    const onRetry = vi.fn();
+    render(<ServerSelect loadError="Не удалось загрузить клиентов" onRetry={onRetry} />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Не удалось загрузить клиентов");
+    expect(screen.queryByRole("option")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Повторить" }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(screen.getByRole("textbox", { name: "Поиск" }), { key: "Enter" });
+    expect(onRetry).toHaveBeenCalledTimes(2);
+  });
+
+  it("a load state change fades the new content in", () => {
+    const { rerender } = render(<ServerSelect />);
+    expect(screen.getByRole("listbox").className).not.toMatch(/swapIn/);
+    rerender(<ServerSelect loadError="Ошибка" />);
+    expect(screen.getByRole("alert").className).toMatch(/swapIn/);
+    rerender(<ServerSelect />);
+    expect(screen.getByRole("listbox").className).toMatch(/swapIn/);
+  });
+});
+
+describe("Select (form name)", () => {
+  it("name submits the value through hidden inputs", () => {
+    const { container, unmount } = render(
+      <form>
+        <Select.Root name="client" defaultValue="c1">
+          <Select.Trigger aria-label="Клиент">
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="c1">Вектор</Select.Item>
+          </Select.Content>
+        </Select.Root>
+      </form>,
+    );
+    expect(new FormData(container.querySelector("form") as HTMLFormElement).get("client")).toBe(
+      "c1",
+    );
+    unmount();
+    const multiple = render(
+      <form>
+        <Select.Root name="tags" multiple defaultValue={["a", "b"]}>
+          <Select.Trigger aria-label="Метки">
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="a">A</Select.Item>
+            <Select.Item value="b">B</Select.Item>
+          </Select.Content>
+        </Select.Root>
+      </form>,
+    );
+    const form = multiple.container.querySelector("form") as HTMLFormElement;
+    expect(new FormData(form).getAll("tags")).toEqual(["a", "b"]);
+  });
+
+  it("native trigger events reach the button", () => {
+    const onBlur = vi.fn();
+    const onFocus = vi.fn();
+    render(
+      <Select.Root>
+        <Select.Trigger aria-label="Клиент" onFocus={onFocus} onBlur={onBlur}>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="c1">Вектор</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole("combobox");
+    fireEvent.focus(trigger);
+    fireEvent.blur(trigger);
+    expect(onFocus).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -840,11 +1035,88 @@ describe("Select rich options", () => {
     expect(trigger.querySelector('[data-rich="true"]')).not.toBeNull();
   });
 
+  it("renderValue keeps a trailing Badge at the end of the value, after the name", () => {
+    render(
+      <Select.Root defaultValue="u1">
+        <Select.Trigger aria-label="Ответственный">
+          <Select.Value
+            renderValue={(item) => (
+              <>
+                <Avatar.Root>
+                  <Avatar.Fallback>ВЛ</Avatar.Fallback>
+                </Avatar.Root>
+                <Select.ItemText>{item.label}</Select.ItemText>
+                <Badge.Root data-testid="value-badge">Админ</Badge.Root>
+              </>
+            )}
+          />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="u1">Вера Лебедева</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    const badge = screen.getByTestId("value-badge");
+    const value = badge.parentElement as HTMLElement;
+    expect(value).toHaveAttribute("data-media", "true");
+    expect(value.lastElementChild).toBe(badge);
+    expect(badge.previousElementSibling).toHaveTextContent("Вера Лебедева");
+  });
+
   it("empty rich trigger shows the placeholder, not the render function", () => {
     render(<RichSelect />);
     const trigger = screen.getByRole("combobox");
     expect(trigger).toHaveTextContent("Выберите байк");
     expect(trigger.querySelector('[data-rich="true"]')).toBeNull();
+  });
+
+  it("an Avatar is leading media sized to the tier, a Badge sits after the text; the label stays the name", () => {
+    render(
+      <Select.Root defaultValue="u1" size="l" defaultOpen>
+        <Select.Trigger aria-label="Ответственный">
+          <Select.Value
+            renderValue={(item) => (
+              <>
+                <Avatar.Root>
+                  <Avatar.Fallback>АС</Avatar.Fallback>
+                </Avatar.Root>
+                <Select.ItemText>{item.label}</Select.ItemText>
+              </>
+            )}
+          />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="u1">
+            <Avatar.Root data-testid="row-avatar">
+              <Avatar.Fallback>АС</Avatar.Fallback>
+            </Avatar.Root>
+            <Select.ItemText>Анна Смирнова</Select.ItemText>
+            <Badge.Root data-testid="row-badge">Админ</Badge.Root>
+          </Select.Item>
+          <Select.Item value="u2">
+            <Avatar.Root size="xs">
+              <Avatar.Fallback>БК</Avatar.Fallback>
+            </Avatar.Root>
+            Борис Котов
+          </Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    const option = screen.getByRole("option", { name: /Анна Смирнова/ });
+    const avatar = screen.getByTestId("row-avatar");
+    expect(avatar).toHaveAttribute("data-size", "s");
+    expect(avatar).toHaveAttribute("aria-hidden", "true");
+    expect(option).not.toHaveAttribute("data-rich");
+    expect(option.firstElementChild).toBe(avatar);
+    const badge = screen.getByTestId("row-badge");
+    expect(badge.previousElementSibling).toHaveTextContent("Анна Смирнова");
+    expect(option).toHaveAttribute("data-label", "Анна Смирнова");
+    expect(
+      screen.getByRole("option", { name: /Борис Котов/ }).querySelector("[data-size]"),
+    ).toHaveAttribute("data-size", "xs");
+    const trigger = screen.getByRole("combobox");
+    expect(trigger).toHaveTextContent("Анна Смирнова");
+    expect(trigger.querySelector('[data-media="true"] [data-size="s"]')).not.toBeNull();
   });
 
   it("a Badge among the Trigger children sits in the trigger one tier down", () => {

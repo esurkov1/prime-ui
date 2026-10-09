@@ -1,10 +1,7 @@
 /** Covers in a card grid take the card width and keep 16:9, so every cover has one height — `fullWidth`. */
-import { Bike } from "lucide-react";
-import { Card, createIcon, type PaletteColor, Thumbnail, Typography } from "prime-ui-kit";
+import { Card, Icon, type PaletteColor, Thumbnail, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
-
-const IconBike = createIcon(Bike);
 
 const BIKES: { id: string; title: string; meta: string; color: PaletteColor; photo?: string }[] = [
   { id: "1", title: "Honda ADV 350", meta: "2026 · 5672", color: "red" },
@@ -28,7 +25,7 @@ export default function ThumbnailFullWidthExample() {
               <Thumbnail.Root ratio="16:9" color={bike.color} fullWidth>
                 {bike.photo ? <Thumbnail.Image src={bike.photo} /> : null}
                 <Thumbnail.Fallback>
-                  <IconBike />
+                  <Icon name="object.bike" />
                 </Thumbnail.Fallback>
               </Thumbnail.Root>
               <div className={styles.entityText}>

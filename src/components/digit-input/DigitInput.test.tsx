@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { DigitInput } from "./DigitInput";
@@ -286,5 +287,105 @@ describe("DigitInput motion", () => {
       <DigitInput length={4} label="Код" defaultValue="1234" success error="Неверный код" />,
     );
     expect(screen.getByRole("group")).not.toHaveAttribute("data-success");
+  });
+});
+
+describe("DigitInput async onComplete", () => {
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  const paste = (cell: HTMLElement, text: string) =>
+    fireEvent.paste(cell, { clipboardData: { getData: () => text } });
+
+  it("checks read-only while pending; resolve shows success", async () => {
+    const check = deferred();
+    render(<DigitInput length={4} onComplete={() => check.promise} />);
+    const cells = screen.getAllByRole("textbox");
+    paste(cells[0] as HTMLElement, "1234");
+    const group = screen.getByRole("group");
+    expect(group).toHaveAttribute("aria-busy", "true");
+    expect(cells[0]).toHaveAttribute("readonly");
+    // Typing waits for the answer.
+    fireEvent.change(cells[3] as HTMLElement, { target: { value: "9" } });
+    expect(cells.map((cell) => (cell as HTMLInputElement).value).join("")).toBe("1234");
+
+    await act(async () => {
+      check.resolve();
+    });
+    expect(group).not.toHaveAttribute("aria-busy");
+    expect(group).toHaveAttribute("data-success", "true");
+  });
+
+  it("reject clears the code, shows and announces the reason; typing takes it away", async () => {
+    const onValueChange = vi.fn();
+    render(
+      <DigitInput
+        length={4}
+        onValueChange={onValueChange}
+        onComplete={async () => {
+          throw new Error("Код устарел");
+        }}
+      />,
+    );
+    const cells = screen.getAllByRole("textbox");
+    await act(async () => {
+      paste(cells[0] as HTMLElement, "1234");
+    });
+    expect(onValueChange).toHaveBeenLastCalledWith("");
+    expect(cells.map((cell) => (cell as HTMLInputElement).value).join("")).toBe("");
+    const group = screen.getByRole("group");
+    expect(group).toHaveAttribute("data-invalid", "true");
+    expect(group).toHaveAccessibleDescription("Код устарел");
+    expect(screen.getByRole("status")).toHaveTextContent("Код устарел");
+
+    fireEvent.change(cells[0] as HTMLElement, { target: { value: "5" } });
+    expect(group).not.toHaveAttribute("data-invalid");
+  });
+
+  it("a reason-less rejection reads labels.failed; the owner's error wins", async () => {
+    const { rerender } = render(
+      <DigitInput length={2} onComplete={() => Promise.reject(undefined)} />,
+    );
+    const cells = screen.getAllByRole("textbox");
+    await act(async () => {
+      paste(cells[0] as HTMLElement, "12");
+    });
+    expect(screen.getByRole("group")).toHaveAccessibleDescription("Неверный код");
+    rerender(
+      <DigitInput
+        length={2}
+        error="Слишком много попыток"
+        onComplete={() => Promise.reject(undefined)}
+      />,
+    );
+    expect(screen.getByRole("group")).toHaveAccessibleDescription("Слишком много попыток");
+  });
+
+  it("controlled: the parent's value follows, success from the prop still applies", async () => {
+    function Controlled() {
+      const [code, setCode] = React.useState("");
+      return (
+        <DigitInput
+          length={2}
+          value={code}
+          onValueChange={setCode}
+          success
+          onComplete={async () => {}}
+        />
+      );
+    }
+    render(<Controlled />);
+    await act(async () => {
+      paste(screen.getAllByRole("textbox")[0] as HTMLElement, "12");
+    });
+    expect(screen.getByRole("group")).toHaveAttribute("data-success", "true");
+    expect((screen.getAllByRole("textbox")[1] as HTMLInputElement).value).toBe("2");
   });
 });

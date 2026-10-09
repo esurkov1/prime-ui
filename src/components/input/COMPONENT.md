@@ -9,6 +9,8 @@
 - Any single-line value: name, e-mail, phone, search query, amount, URL, code.
 - Search fields with a leading icon and a clear button.
 - Values with a fixed prefix/suffix (`https://`, domain, `₽`, `%`).
+- Inline editing in a record card: each field saves itself (`onCommit`) on blur and Enter.
+- A value with actions beside it: copy, write, open a profile (`Input.CopyButton`, `Input.Action`); a password with a show toggle (`Input.RevealButton`).
 - As the reference field: Select, Datepicker, TagSelect and Textarea follow the same label / field / support-row contract.
 
 ## When not to use
@@ -32,10 +34,13 @@ Input.Root            label row, field body, support row; provides size / invali
    ├─ Input.Icon           decorative icon (start | end)
    ├─ Input.InlineAffix    muted text next to the value (start | end)
    ├─ Input.Field          native <input>
-   └─ Input.ClearButton    trailing clear action: a full-height segment at the end edge
+   ├─ Input.ClearButton    clear segment (kit-rendered)
+   ├─ Input.CopyButton     copy segment; the glyph morphs into a check (kit-rendered)
+   ├─ Input.RevealButton   show / hide a password segment, aria-pressed (kit-rendered)
+   └─ Input.Action         the consumer's named icon action with a tooltip (button or asChild link)
 Input.Counter         goes into Input.Root `counter` (support row, right side)
 ```
-The trailing side has a fixed CSS `order`, independent of JSX order: value · end inline affix · end icon · clear button · end affix. All `side="start"` slots share one order before the value, so among them the JSX order decides — write them as affix, icon, inline affix.
+The trailing side has a fixed CSS `order`, independent of JSX order: value · end inline affix · commit status (`onCommit`) · end icon · segments · end affix. The segments (`ClearButton`, `CopyButton`, `RevealButton`, `Action`) keep their JSX order among themselves and sit edge to edge, full field height, flush with the end edge. All `side="start"` slots share one order before the value, so among them the JSX order decides — write them as affix, icon, inline affix.
 
 ## API
 
@@ -59,6 +64,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `strength` | `boolean` | `false` | A password strength meter: a stepped `ProgressBar` (4 steps) under the field and the level word at the end of the support row — weak, easy, medium, hard (`labels.strengthWeak` … `strengthHard`), toned danger → warning → accent → success. Follows the value of `Input.Field`, controlled or not. For new-password fields. |
 | `getStrength` | `(value: string) => 0 \| 1 \| 2 \| 3 \| 4` | `getPasswordStrength` | Replaces the kit's estimate: every trait adds a point on its own, in any order — lowercase, uppercase, digits, symbols, 10+ and 14+ characters; 0–2 points weak, 3 easy, 4 medium, 5+ hard, and under 8 characters at most easy. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check. |
+| `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with the value on blur and Enter when it differs from the last committed one (the value at focus); Escape reverts to it. A returned Promise shows a spinner at the field's edge (`aria-busy` on the control) while the field stays editable and Tab moves on; a rejection puts the committed value back unless the person typed on — show why through `error`. Success shows a brief check (`labels.saved`). |
 | `labels` | `Partial<InputLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Usually `Input.Wrapper`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
@@ -68,11 +74,11 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — (required) | `Field` and the slots: `Icon`, `Affix`, `InlineAffix`, `ClearButton`. |
+| `children` | `ReactNode` | — (required) | `Field` and the slots: `Icon`, `Affix`, `InlineAffix`; the end segments `ClearButton`, `CopyButton`, `RevealButton`, `Action` in source order. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the `<div>`. |
 
 ### Input.Field
-`ref` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.
+`ref` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root, `disabled` also from a disabled `Fieldset` around it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -116,6 +122,31 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `onClick` | `MouseEventHandler<HTMLButtonElement>` | — | Clear the value here. Afterwards focus returns to the input unless `event.preventDefault()` was called. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children" \| "aria-label">` | — | The other button attributes. |
 
+### Input.CopyButton
+`ref` → `HTMLButtonElement`. Copies the field's value as a full-height segment at the end edge: the copy glyph morphs into a check, the name and tooltip switch to `labels.copied` (`labels.copyError` when the clipboard refuses), a polite live region repeats it.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `value` | `string` | `the field's value` | Text to copy instead of the field's current value. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children" \| "aria-label">` | — | `onClick`, `disabled` and the other button attributes. |
+
+### Input.RevealButton
+`ref` → `HTMLButtonElement`. A full-height segment that shows a `type="password"` field as text and back: `aria-pressed`, named by `labels.reveal`, `aria-controls` on the input, the eye glyph switches. A pointer press keeps the focus in the field; the caret and selection survive the switch.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children" \| "aria-label" \| "aria-pressed">` | — | The other button attributes. |
+
+### Input.Action
+`ref` → `HTMLButtonElement` (the child with `asChild`). The consumer's icon action at the end edge («Позвонить», «Открыть профиль»): a full-height button segment named by `label`, with a tooltip and the touch hit area.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `label` | `string` | — (required) | Accessible name and tooltip («Позвонить», «Открыть профиль»). |
+| `asChild` | `boolean` | `false` | Renders the one child (an `<a href>`, a router link) with the segment's look; `disabled` becomes `aria-disabled`. |
+| `children` | `ReactNode` | — (required) | The glyph (`<Icon name>`), or with `asChild` the element that carries it. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "aria-label" \| "children">` | — | `onClick`, `disabled` and the other button attributes. |
+
 ### Input.Counter
 `ref` → `HTMLSpanElement`. Character counter for the support row; shows `14/40` and announces `labels.counter`.
 
@@ -133,7 +164,7 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 |---|---|---|---|
 | `xs` | 28 high, text 12/16, padX 8, radius 6, label 12/16, hint 12/16 | Dense table toolbars, inline filters | |
 | `s` | 32 high, text 13/20, padX 8, radius 8, label 12/16, hint 12/16 | Compact panels, side filters | |
-| `m` | 36 high, text 14/20, padX 12, radius 8, label 13/20, hint 12/16 | Regular forms and pages | yes |
+| `m` | 36 high, text 14/20, padX 12, radius 8, label 13/20, hint 12/16 | Regular forms and pages | yes (without `size`: the host's tier, else `m`) |
 | `l` | 40 high, text 16/24, padX 12, radius 10, label 14/20, hint 13/20 | Spacious forms, onboarding | |
 | `xl` | 48 high, text 16/24, padX 16, radius 12, label 14/20, hint 13/20 | Hero search, landing forms | |
 
@@ -167,13 +198,20 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 | focus | keyboard focus on the input | wrapper gets the focus fill and an inset focus ring (`:has(input:focus-visible)`) |
 | no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the wrapper |
 | invalid | `invalid` or non-empty `error` | `data-invalid="true"` on root and wrapper, `aria-invalid="true"` on the input, danger inset ring, danger focus ring; the control shakes once when an error arrives (`data-shake` on the frame) |
-| disabled | native `disabled` on `Input.Field` | disabled fill, disabled text and icons, `cursor: not-allowed`, clear button disabled look |
+| disabled | native `disabled` on `Input.Field`, or a disabled `Fieldset` around it | disabled fill, disabled text and icons, `cursor: not-allowed`, clear button disabled look |
 | read-only | native `readOnly` on `Input.Field` | no hover, default cursor |
 | reserved support row | `reserveSupportRow` | `data-reserve="true"` on the support row |
 | counter over limit | `current > max` | `data-invalid="true"` on `Input.Counter`; the current count rolls its digits to each new value |
 | strength | `strength` + the value of `Input.Field` | a stepped `ProgressBar` (4 cells, `aria-label` = `labels.strength`) under the field fills one cell after another, weak · easy · medium · hard, toned danger → warning → accent → success; the level word at the end of the support row flows in letter by letter and is announced (`aria-live`); the support row is reserved |
+| saving | `onCommit` returned a pending Promise | `aria-busy="true"` on the input; a `Spinner` at the end of the field (`data-commit="pending"`); the field stays editable and focusable, neighbours are untouched; a live region says `labels.saving` |
+| saved | the Promise resolved (or `onCommit` returned nothing) | the spinner cross-fades into a success check (`data-commit="saved"`) that fades out after a moment; the live region says `labels.saved` |
+| save refused | the Promise rejected | the committed value is put back (unless the person typed on), the status leaves; the owner shows why through `error` |
+| password shown | `Input.RevealButton` pressed | `aria-pressed="true"` on the button, `type="text"` on the input, the eye glyph switches to eye-off; caret and selection kept |
+| copied | `Input.CopyButton` pressed | the copy glyph cross-fades into a check, the button name becomes `labels.copied` (or `labels.copyError`) |
 
-Size: `data-size` on root and wrapper. Slots: `data-side="start" | "end"`.
+Size: `data-size` on root and wrapper. Slots: `data-side="start" | "end"`. Segments: `data-field-action`.
+
+Inline save (`onCommit`): the value at focus is the committed one. Blur and Enter commit a changed value (an unchanged one never fires); Escape puts the committed value back through the field's own `onChange`, so a controlled owner receives it, and is consumed — it does not also close the drawer around the field. Return a Promise for a server save: pending shows a spinner, reject restores the value, resolve shows the check.
 
 Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontrolled: `defaultValue`. Both are native input props.
 
@@ -189,14 +227,19 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 ### Keyboard
 | Key | Action |
 |---|---|
-| `Tab` | Focuses the field, then the clear button when it is shown. |
-| `Enter` · `Space` | On the clear button: clears the value and returns focus to the field. |
+| `Tab` | Focuses the field, then the segments at its end (clear, copy, reveal, actions). |
+| `Enter` · `Space` | On a segment: runs its action (the clear button returns focus to the field). |
+| `Enter` | With `onCommit`: saves a changed value; focus stays in the field. |
+| `Escape` | With `onCommit`: puts the committed value back. |
 
 ### ARIA
 - `label` renders a `<label htmlFor>` bound to the input. Without `label`, set `aria-label` on `Input.Field`. A placeholder never replaces the label.
 - Hint and error are linked through `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.
 - `Input.Icon`, `Input.Affix`, `Input.InlineAffix` are `aria-hidden`: put the meaning in the label (e.g. "Сумма, ₽").
 - `Input.ClearButton` is a real button named by `labels.clear`, with `aria-controls` on the input.
+- `Input.Action` and `Input.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied` through a polite live region.
+- `Input.RevealButton` is a toggle: a constant name `labels.reveal` and `aria-pressed`.
+- With `onCommit` the input carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.
 - `Input.Counter` shows `14/40` visually and announces `labels.counter` through `aria-live="polite"`.
 
 ### Labels
@@ -206,6 +249,12 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 |---|---|---|
 | `optional` | `"необязательно"` | Marker after the label when `optional`. |
 | `clear` | `"Очистить"` | Accessible name of `Input.ClearButton`. |
+| `copy` | `"Копировать"` | Name and tooltip of the copy button. |
+| `copied` | `"Скопировано"` | Name, tooltip and announcement once the value is copied. |
+| `copyError` | `"Не удалось скопировать"` | Name, tooltip and announcement when the clipboard refuses. |
+| `reveal` | `"Показать пароль"` | Accessible name of `Input.RevealButton`;`aria-pressed` says whether the password is shown. |
+| `saving` | `"Сохранение"` | Announced while an `onCommit` save is pending. |
+| `saved` | `"Сохранено"` | Announced once an `onCommit` save succeeds. |
 | `counter` | `"{current} из {max} символов"` | Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced. |
 | `strength` | `"Надёжность пароля"` | Accessible name of the `strength` meter and the spoken prefix of the level word. |
 | `strengthWeak` | `"Слабый"` | Level word for strength 1. |
@@ -223,7 +272,9 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | [with-icon.tsx](examples/with-icon.tsx) | A decorative icon at either end of the value — `Input.Icon`, `side`. |
 | [affixes.tsx](examples/affixes.tsx) | A fixed prefix and suffix flush with the edges and a unit next to the value — `Input.Affix`, `Input.InlineAffix`. |
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single search field where the caret and the lighter fill show focus — `focusRing`. |
-| [password-strength.tsx](examples/password-strength.tsx) | A new password with a meter that fills step by step and names the level beside the hint — `strength`. |
+| [password-strength.tsx](examples/password-strength.tsx) | A new password with a show toggle and a meter that fills step by step and names the level beside the hint — `Input.RevealButton`, `strength`. |
+| [edge-actions.tsx](examples/edge-actions.tsx) | Actions at the field's end: a mail link with a tooltip beside copying the value, and a profile link on a read-only field — `Input.Action`, `Input.CopyButton`. |
+| [inline-edit.tsx](examples/inline-edit.tsx) | Record card fields that save on blur and Enter, revert on Escape and show the server's refusal — `onCommit`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a clear button and a character counter follow it — `value`, `onValueChange`, `Input.ClearButton`, `Input.Counter`. |
 | [in-form.tsx](examples/in-form.tsx) | Company details form: required fields checked on submit, each error leaves as its field is fixed and a saved form turns the button green; neighbours keep their bottoms aligned — `required`, `error`, `reserveSupportRow`. |
 
@@ -235,7 +286,10 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - Rendering `Input.ClearButton` for an empty field → render it only when there is a value.
 - Setting `className` with a custom border or background on `Input.Wrapper` → the fill comes from the surface context; fields inside Card/Modal already switch.
 - `tone="danger"` / `error` as a boolean → use `invalid` or an `error` message.
+- A `Button` placed next to the field for «copy» or «call» → `Input.CopyButton` / `Input.Action` inside `Input.Wrapper`.
+- Hand-written blur / Enter / Escape handlers and a `disabled` field while saving → `onCommit` returning the save Promise; the field stays editable.
+- Returning `false` from `onCommit` to refuse → reject the Promise (throw) and set `error`.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), `Icon` (`Input.ClearButton`)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (`Input.Action`, `Input.CopyButton`), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [ProgressBar](../progress-bar/COMPONENT.md) (`strength`), `Icon` (segments)
 - **See also:** [Textarea](../textarea/COMPONENT.md), [Select](../select/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md) — fields with the same contract

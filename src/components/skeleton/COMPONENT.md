@@ -59,7 +59,7 @@ Skeleton           <span aria-hidden="true">; data-shape, data-size
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| pulsing | mounted | opacity eases 1 → 0.4 and back (`slow × 5`, `standard`, alternate) |
+| pulsing | mounted | opacity eases 1 → 0.6 and back (`slow × 5`, `standard`, alternate) |
 | reduced motion | `prefers-reduced-motion: reduce` | no pulse: the placeholder stands still and stays visible |
 | shape / size | `shape`, `size` | `data-shape`, `data-size` |
 

@@ -9,7 +9,7 @@ type Channel = { id: string; title: string; enabled: boolean };
 const CHANNELS: Channel[] = [
   { id: "email", title: "Почта", enabled: true },
   { id: "push", title: "Push-уведомления", enabled: true },
-  { id: "telegram", title: "Telegram", enabled: false },
+  { id: "slack", title: "Slack", enabled: false },
   { id: "sms", title: "SMS", enabled: false },
 ];
 
@@ -27,7 +27,12 @@ export default function DndHandleExample() {
         getId={(channel) => channel.id}
         getLabel={(channel) => channel.title}
         onReorder={async (id, beforeId) => {
-          await new Promise((resolve) => setTimeout(resolve, 300));
+          await new Promise((resolve) => setTimeout(resolve, 600));
+          // The server refuses to put a switched-off channel first: the row glides back.
+          const moved = channels.find((channel) => channel.id === id);
+          if (moved && !moved.enabled && beforeId === channels[0]?.id) {
+            throw new Error("Выключенный канал не может быть первым");
+          }
           setChannels((current) => moveBefore(current, id, beforeId, (channel) => channel.id));
         }}
         renderItem={(channel) => (

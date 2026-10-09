@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Slider } from "./Slider";
@@ -132,5 +133,79 @@ describe("Slider", () => {
     expect(screen.getByRole("slider", { name: "Vol" })).toHaveAttribute("id", "vol");
     expect(screen.getByTestId("frame")).toBe(container.firstChild);
     expect(container.firstChild).toHaveClass("custom");
+  });
+});
+
+describe("Slider — commit", () => {
+  it("commits once on release and on a key step, never for an unchanged value", () => {
+    const onCommit = vi.fn();
+    render(<Slider aria-label="Громкость" defaultValue={20} onCommit={onCommit} />);
+    const input = screen.getByRole("slider", { name: "Громкость" });
+    fireEvent.pointerDown(input);
+    fireEvent.change(input, { target: { value: "35" } });
+    fireEvent.change(input, { target: { value: "40" } });
+    fireEvent.pointerUp(input);
+    expect(onCommit).toHaveBeenCalledTimes(1);
+    expect(onCommit).toHaveBeenLastCalledWith(40);
+    fireEvent.pointerDown(input);
+    fireEvent.pointerUp(input);
+    expect(onCommit).toHaveBeenCalledTimes(1);
+    fireEvent.change(input, { target: { value: "41" } });
+    fireEvent.keyUp(input, { key: "ArrowRight" });
+    expect(onCommit).toHaveBeenLastCalledWith(41);
+  });
+
+  it("async commit: busy until the answer; resolve keeps the value", async () => {
+    let resolve: () => void = () => {};
+    render(
+      <Slider
+        aria-label="Громкость"
+        defaultValue={20}
+        onCommit={() =>
+          new Promise<void>((done) => {
+            resolve = done;
+          })
+        }
+      />,
+    );
+    const input = screen.getByRole("slider", { name: "Громкость" });
+    fireEvent.pointerDown(input);
+    fireEvent.change(input, { target: { value: "40" } });
+    fireEvent.pointerUp(input);
+    expect(input).toHaveAttribute("aria-busy", "true");
+    await act(async () => {
+      resolve();
+    });
+    expect(input).not.toHaveAttribute("aria-busy");
+    expect(input).toHaveValue("40");
+  });
+
+  it("async commit: reject puts the last saved value back, to a controlled owner too", async () => {
+    const onValueChange = vi.fn();
+    function Controlled() {
+      const [value, setValue] = React.useState(20);
+      return (
+        <Slider
+          aria-label="Громкость"
+          value={value}
+          onValueChange={(next) => {
+            onValueChange(next);
+            setValue(next);
+          }}
+          onCommit={async () => {
+            throw new Error("offline");
+          }}
+        />
+      );
+    }
+    render(<Controlled />);
+    const input = screen.getByRole("slider", { name: "Громкость" });
+    fireEvent.change(input, { target: { value: "45" } });
+    await act(async () => {
+      fireEvent.keyUp(input, { key: "ArrowRight" });
+    });
+    expect(input).toHaveValue("20");
+    expect(onValueChange).toHaveBeenLastCalledWith(20);
+    expect(input).not.toHaveAttribute("aria-busy");
   });
 });

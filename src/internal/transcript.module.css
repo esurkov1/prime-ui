@@ -1,0 +1,66 @@
+/*
+ * The transcript of a voice or video message (`internal/transcript`): the text's `Disclosure` under
+ * the media and the toggle's glyph.
+ *
+ * The disclosure always exists; its text block is rendered while it is open. Open and close are
+ * laid out at once — the height and the text together — and in a chat the message plays them as
+ * one stroke (`bubbleMorph`, through `holdPosition`, which the transcript calls before every
+ * toggle): the bubble glides, the text fades in or out where it stands. The gap above the text
+ * lives inside the clip, so a closed disclosure takes no room. The text never widens its host
+ * (`inline-size: 0` + `min-inline-size`). While the text is asked for the area stays closed and
+ * only the button spins; it opens once the text is there.
+ */
+.disclosure {
+  --disclosure-duration: 0s;
+  --disclosure-ease: var(--prime-motion-easing-standard);
+
+  box-sizing: border-box;
+  inline-size: 0;
+  min-inline-size: 100%;
+}
+
+/* The gap is the block's margin inside the clip (a padding of the clip would hold a closed row
+   open by its own size). */
+.block {
+  box-sizing: border-box;
+  margin-block-start: var(--prime-space-2);
+}
+
+.text {
+  margin: 0;
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
+  letter-spacing: var(--prime-text-body-m-tracking);
+  color: var(--prime-color-text-primary);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.glyphs {
+  position: relative;
+  display: inline-block;
+  inline-size: var(--prime-icon-size);
+  block-size: var(--prime-icon-size);
+}
+
+.glyph {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.glyph[data-shown="false"] {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyph {
+    transition: none;
+  }
+}

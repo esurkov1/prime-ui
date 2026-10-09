@@ -17,12 +17,8 @@ describe("celebrate", () => {
   it("puts a hidden, pointer-transparent canvas above the page and removes it", async () => {
     vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
-      scale: vi.fn(),
+      setTransform: vi.fn(),
       clearRect: vi.fn(),
-      save: vi.fn(),
-      restore: vi.fn(),
-      translate: vi.fn(),
-      rotate: vi.fn(),
       fillRect: vi.fn(),
     } as unknown as CanvasRenderingContext2D);
     let now = 0;

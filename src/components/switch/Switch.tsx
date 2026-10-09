@@ -1,5 +1,6 @@
 import type * as React from "react";
 
+import { Spinner } from "@/components/spinner/Spinner";
 import { useControllableState } from "@/hooks/useControllableState";
 import {
   ChoiceField,
@@ -10,8 +11,11 @@ import {
 } from "@/internal/ChoiceField";
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import { useInheritedDisabled } from "@/internal/disabledContext";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { useFieldFrame } from "@/internal/FieldFrame";
 import type { ControlSize } from "@/internal/states";
+import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
 import styles from "./Switch.module.css";
 
@@ -21,7 +25,17 @@ export type SwitchRootProps = Omit<
 > & {
   checked?: boolean;
   defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
+  /**
+   * The new state. Return the save's promise to apply it on a server: the thumb waits in the new
+   * position with a spinner (`aria-busy`) and presses do nothing; resolve keeps it, reject glides
+   * it back.
+   */
+  onCheckedChange?: (checked: boolean) => void | Promise<void>;
+  /**
+   * Saving: a spinner in the thumb, `aria-busy`, presses do nothing. For an owner that tracks the
+   * request itself; a promise from `onCheckedChange` does this on its own.
+   */
+  loading?: boolean;
   /** Invalid state; a non-empty `error` implies it. */
   invalid?: boolean;
   /** Help text under the label text. Hidden while `error` is shown. */
@@ -41,11 +55,12 @@ function SwitchRoot({
   checked: checkedProp,
   defaultChecked = false,
   onCheckedChange,
+  loading = false,
   invalid,
   hint,
   error,
   size: sizeProp,
-  disabled = false,
+  disabled: disabledProp = false,
   readOnly = false,
   className,
   "aria-describedby": ariaDescribedBy,
@@ -54,12 +69,25 @@ function SwitchRoot({
   ...inputRest
 }: SwitchRootProps) {
   const size = useControlSize(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { hint, error, invalid }, ariaDescribedBy);
-  const [checked, setChecked] = useControllableState<boolean>({
+  const [stored, setStored] = useControllableState<boolean>({
     value: checkedProp,
     defaultValue: defaultChecked,
-    onChange: onCheckedChange,
   });
+  // A state the owner is still saving is drawn ahead of its answer.
+  const changes = usePendingChanges(stored, takeNext);
+  const checked = changes.shown;
+  const busy = loading || changes.pending.length > 0;
+
+  const toggle = (next: boolean) => {
+    const outcome = onCheckedChange?.(next);
+    if (!isPromiseLike(outcome)) {
+      setStored(next);
+      return;
+    }
+    changes.track(next, outcome, { onResolve: () => setStored(next) });
+  };
 
   return (
     <ChoiceField
@@ -85,12 +113,23 @@ function SwitchRoot({
             disabled={disabled}
             aria-invalid={ids.invalid || undefined}
             aria-readonly={readOnly || undefined}
+            aria-busy={busy || undefined}
             aria-describedby={ids.describedBy}
             onChange={(event) => {
-              if (!readOnly) setChecked(event.target.checked);
+              if (!readOnly && !busy) toggle(event.target.checked);
             }}
           />
-          <span className={cx(choiceVisualClass, styles.track)} aria-hidden="true" />
+          <span
+            className={cx(choiceVisualClass, styles.track)}
+            data-loading={busy || undefined}
+            aria-hidden="true"
+          >
+            <span className={styles.thumb}>
+              {busy ? (
+                <Spinner aria-hidden="true" className={cx(styles.spinner, enterMotion.enter)} />
+              ) : null}
+            </span>
+          </span>
         </>
       }
     >
@@ -99,6 +138,8 @@ function SwitchRoot({
   );
 }
 SwitchRoot.displayName = "Switch.Root";
+
+const takeNext = (_current: boolean, next: boolean) => next;
 
 export type SwitchLabelProps = ChoiceLabelProps;
 

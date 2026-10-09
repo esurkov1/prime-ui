@@ -1,0 +1,367 @@
+/*
+ * ChartFrame — a dashboard panel around any chart. The root is a layer of the surface ladder
+ * (foundation §4: `data-depth`, `--prime-color-layer-current`, the whisper only where the depth
+ * gives one), card radius and padding, no border. Zones stack with one gap: header, value, plot,
+ * legend. The panel adapts to its own width (container queries): narrow padding, actions under
+ * the title, a lower default plot.
+ *
+ * Motion: the plot region cross-fades between states (Crossfade, fixed height — nothing glides);
+ * the value and legend values swap from their Skeletons (swapMotion); a legend toggle fills or
+ * empties its swatch and quiets its name (base · standard); a chart mark with `data-hidden` fades
+ * (base · standard). Reduced motion collapses the durations globally.
+ */
+.root {
+  --cf-pad: var(--prime-card-padding-m);
+  --cf-plot-height: calc(var(--prime-space-20) * 3);
+  --cf-swatch: var(--prime-space-2);
+
+  container-type: inline-size;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--cf-pad);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-layer-current);
+  box-shadow: var(--prime-layer-shadow);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  text-align: start;
+}
+
+/* ---------- Header ---------- */
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--prime-space-1) var(--prime-space-3);
+  min-width: 0;
+}
+
+.title,
+.description {
+  grid-column: 1;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.title {
+  color: var(--prime-color-text-primary);
+}
+
+.description {
+  color: var(--prime-color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+/* ---------- Value ---------- */
+
+.value {
+  min-width: 0;
+  color: var(--prime-color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.valueContent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--prime-space-1) var(--prime-space-2);
+  min-width: 0;
+}
+
+.valueUnknown {
+  color: var(--prime-color-text-muted);
+}
+
+.valueSkeleton {
+  width: calc(var(--prime-space-24) * 1.5);
+  max-width: 100%;
+  height: var(--prime-text-heading-m-line-height);
+  min-height: 0;
+  border-radius: var(--prime-radius-s);
+}
+
+/* body-s at medium weight, written out: a composed role plus a weight override is order-dependent. */
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  font-size: var(--prime-text-body-s-size);
+  line-height: var(--prime-text-body-s-line-height);
+  font-weight: var(--prime-font-weight-medium);
+  letter-spacing: var(--prime-text-body-s-tracking);
+  color: var(--prime-color-text-secondary);
+}
+
+.delta[data-tone="success"] {
+  color: var(--prime-color-success-text);
+}
+
+.delta[data-tone="warning"] {
+  color: var(--prime-color-warning-text);
+}
+
+.delta[data-tone="danger"] {
+  color: var(--prime-color-danger-text);
+}
+
+/* ---------- Plot ---------- */
+
+.plot {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  height: var(--chart-frame-plot-height, var(--cf-plot-height));
+}
+
+.canvas {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: visible;
+}
+
+/* A self-sizing chart fills the area. */
+.canvas > :only-child {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* A focusable chart (a slider over the weeks, a library's keyboard layer) gets the kit ring. */
+.canvas > :focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+  border-radius: var(--prime-radius-xs);
+}
+
+/* Kit type on any SVG chart: axis labels and annotations read as captions in the muted color. A
+   library's presentation attributes lose to these; a class of the consumer still wins (:where). */
+.plot :where(svg text) {
+  fill: var(--prime-color-text-muted);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--prime-text-caption-size);
+  letter-spacing: var(--prime-text-caption-tracking);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A series turned off in the legend: its marks stay mounted and fade, the axes keep their scale. */
+.plot :where([data-hidden]) {
+  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.plot :where([data-hidden="true"]) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.plotSkeleton {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: var(--prime-radius-m);
+}
+
+.stateBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ---------- Legend ---------- */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-1) var(--prime-space-2);
+  min-width: 0;
+  /* Entries are chips with side padding: the first swatch lines up with the panel text. */
+  margin: 0 0 0 calc(var(--prime-space-2) * -1);
+  padding: 0;
+  list-style: none;
+}
+
+.legendItem {
+  display: flex;
+  min-width: 0;
+}
+
+.entry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  min-height: var(--prime-control-xs-height);
+  padding: 0 var(--prime-space-2);
+  border: 0;
+  border-radius: var(--prime-radius-s);
+  background: transparent;
+  color: var(--prime-color-text-secondary);
+  font-family: inherit;
+  font-size: var(--prime-control-m-label-size);
+  line-height: var(--prime-control-m-label-line-height);
+  text-align: start;
+}
+
+.toggle {
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .toggle:hover {
+    background: var(--prime-color-fill-muted);
+  }
+}
+
+.toggle:active {
+  transform: scale(var(--prime-motion-press-scale));
+}
+
+.toggle:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.swatch {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: var(--cf-swatch);
+  height: var(--cf-swatch);
+  border-radius: var(--prime-radius-full);
+  background: var(--chart-frame-swatch);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--chart-frame-swatch);
+  transition: background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+/* Hidden: the swatch is a ring (a shape change, not only a color one) and the name goes quiet. */
+.toggle[data-hidden] {
+  color: var(--prime-color-text-muted);
+}
+
+.toggle[data-hidden] .swatch {
+  background: transparent;
+  box-shadow: inset 0 0 0 calc(var(--prime-border-width) * 1.5) var(--chart-frame-swatch);
+}
+
+.legendLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legendValue {
+  color: var(--prime-color-text-primary);
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.toggle[data-hidden] .legendValue {
+  color: inherit;
+}
+
+.legendValueSkeleton {
+  width: var(--prime-space-12);
+}
+
+/* ---------- Tooltip ---------- */
+
+/*
+ * The floating layer's look (floatingSurface) without its fixed positioning: the chart library
+ * places the body itself, so it is a static block.
+ */
+.tooltip {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  width: max-content;
+  min-width: calc(var(--prime-space-24) * 1.5);
+  max-width: min(calc(var(--prime-space-24) * 3), calc(100vw - var(--prime-space-4)));
+  padding: var(--prime-space-2) var(--prime-space-3);
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-layer-current);
+  box-shadow: var(--prime-shadow-overlay);
+  color: var(--prime-color-text-primary);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  pointer-events: none;
+}
+
+.tooltipLabel {
+  color: var(--prime-color-text-secondary);
+}
+
+.tooltipRows {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--prime-space-1) var(--prime-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tooltipRow {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+}
+
+.tooltipName {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--prime-color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltipValue {
+  font-weight: var(--prime-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+/* ---------- Narrow panel ---------- */
+
+/* The root is the container, so only its descendants adapt: the plot gets lower. */
+@container (max-width: 30rem) {
+  .plot {
+    --cf-plot-height: calc(var(--prime-space-20) * 2);
+  }
+}
+
+@container (max-width: 24rem) {
+  .actions {
+    grid-column: 1;
+    grid-row: auto;
+    justify-content: flex-start;
+  }
+}

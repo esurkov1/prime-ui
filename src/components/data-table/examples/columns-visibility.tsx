@@ -1,13 +1,5 @@
-/** Orders with a column chooser in the toolbar: fewer columns, less sideways scrolling; the order number always stays — `hiddenColumns`, `hideable`, `toolbar`. */
-import {
-  Badge,
-  Button,
-  DataTable,
-  type DataTableColumn,
-  Dropdown,
-  Icon,
-  Typography,
-} from "prime-ui-kit";
+/** Orders with the column chooser in the toolbar; the choice outlives a reload in local storage, the order number always stays — `DataTable.ColumnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`. */
+import { Badge, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -113,17 +105,36 @@ const COLUMNS: DataTableColumn<Order>[] = [
   },
 ];
 
-export default function DataTableColumnsVisibilityExample() {
-  const [hidden, setHidden] = React.useState<string[]>(["city", "items"]);
-  const shown = COLUMNS.length - hidden.length;
+/** The kit keeps nothing: the app stores the choice where it likes (here, local storage). */
+const STORAGE_KEY = "orders.hiddenColumns";
+const DEFAULT_HIDDEN = ["city", "items"];
 
-  const toggle = (id: string, visible: boolean) =>
-    setHidden((current) => (visible ? current.filter((c) => c !== id) : [...current, id]));
+function readHidden(): string[] {
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    return saved ? (JSON.parse(saved) as string[]) : DEFAULT_HIDDEN;
+  } catch {
+    return DEFAULT_HIDDEN;
+  }
+}
+
+export default function DataTableColumnsVisibilityExample() {
+  const [hidden, setHidden] = React.useState(readHidden);
+
+  const changeHidden = (next: string[]) => {
+    setHidden(next);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // Private mode or a full storage: the choice lasts until the reload.
+    }
+  };
 
   return (
     <DataTable
       columns={COLUMNS}
       hiddenColumns={hidden}
+      onHiddenColumnsChange={changeHidden}
       rows={ORDERS}
       getRowKey={(row) => row.id}
       stickyFirstColumn
@@ -132,34 +143,7 @@ export default function DataTableColumnsVisibilityExample() {
           <Typography as="span" variant="body-s" tone="secondary">
             Заказы за неделю: {ORDERS.length}
           </Typography>
-          <Dropdown.Root>
-            <Dropdown.Trigger>
-              <Button.Root variant="outline" tone="neutral" size="s">
-                <Button.Icon>
-                  <Icon name="view.preview" />
-                </Button.Icon>
-                Колонки: {shown} из {COLUMNS.length}
-              </Button.Root>
-            </Dropdown.Trigger>
-            <Dropdown.Content size="s">
-              <Dropdown.Group label="Колонки таблицы">
-                {COLUMNS.map((column) => (
-                  <Dropdown.CheckboxItem
-                    key={column.id}
-                    checked={!hidden.includes(column.id)}
-                    disabled={column.hideable === false}
-                    onCheckedChange={(visible) => toggle(column.id, visible)}
-                  >
-                    {column.header}
-                  </Dropdown.CheckboxItem>
-                ))}
-              </Dropdown.Group>
-              <Dropdown.Separator />
-              <Dropdown.Item disabled={hidden.length === 0} onSelect={() => setHidden([])}>
-                Показать все
-              </Dropdown.Item>
-            </Dropdown.Content>
-          </Dropdown.Root>
+          <DataTable.ColumnsMenu />
         </div>
       }
     />

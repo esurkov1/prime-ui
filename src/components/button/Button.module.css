@@ -197,6 +197,16 @@
   --btn-line: color-mix(in srgb, currentColor 32%, transparent);
 }
 
+/* A toggle that is on (`pressed`): the selected look (foundation §8, accent soft) over any tone ×
+   variant; the fill and text glide in and out with the shared color transition. */
+.root[data-pressed="true"][data-variant] {
+  --btn-bg: var(--prime-color-accent-soft);
+  --btn-bg-hover: var(--prime-color-accent-soft-hover);
+  --btn-bg-active: var(--prime-color-accent-soft-hover);
+  --btn-fg: var(--prime-color-accent-text);
+  --btn-line: transparent;
+}
+
 /* ─── Interaction ───────────────────────────────────────────────────────── */
 
 /* Disabled and loading take no hover or press (`data-disabled` marks `disabled` only). */
@@ -377,7 +387,7 @@
     opacity var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
 }
 
-.root[data-hold="done"] .fill {
+.root:is([data-hold="done"], [data-hold="confirming"]) .fill {
   opacity: 1;
   translate: 0 0;
   transition: none;

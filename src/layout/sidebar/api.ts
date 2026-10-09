@@ -218,8 +218,8 @@ export const api: ComponentApi = {
           name: "current",
           type: "boolean",
           default: "false",
-          en: 'Current page: `aria-current="page"`, `data-state="active"`; surface fill and a raised shadow (a deeper wash in a flyout).',
-          ru: 'Текущая страница: `aria-current="page"`, поверхность и приподнятая тень (во всплывающей панели — более плотная заливка).',
+          en: 'Current page: `aria-current="page"`, `data-state="active"`; a muted fill two ladder steps off the rail, apart from the hover wash, and primary text and icon colour (a translucent wash in a flyout). No shadow.',
+          ru: 'Текущая страница: `aria-current="page"`, `data-state="active"`; приглушённая заливка на две ступени темнее панели, отличная от заливки при наведении, и основной цвет текста и иконки (во всплывающей панели — полупрозрачная заливка). Без тени.',
         },
         {
           name: "disabled",
@@ -384,8 +384,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.SubTrigger",
-      en: '`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. Expanded: click, `→` / `←` open and close. Compact: hover (after a short intent delay), click, `Enter` · `Space` · `→` open the flyout (`aria-haspopup="dialog"`); on the active path it takes the current lift.',
-      ru: "Строка родителя: кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце строки. В развёрнутом режиме клик и `→` / `←` раскрывают и сворачивают. В компактном наведение (после короткой задержки), клик, `Enter` · `Space` · `→` открывают всплывающую панель; на пути к текущей странице пункт приподнят.",
+      en: '`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. Expanded: click, `→` / `←` open and close. Compact: hover (after a short intent delay), click, `Enter` · `Space` · `→` open the flyout (`aria-haspopup="dialog"`); on the active path it takes the current fill.',
+      ru: "Строка родителя: кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце строки. В развёрнутом режиме клик и `→` / `←` раскрывают и сворачивают. В компактном наведение (после короткой задержки), клик, `Enter` · `Space` · `→` открывают всплывающую панель; на пути к текущей странице пункт получает заливку текущего.",
       props: [
         {
           name: "children",

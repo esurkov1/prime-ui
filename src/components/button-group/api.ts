@@ -1,11 +1,12 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { FIELD_OPTIONAL_LABEL, fieldGroupProps } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "ButtonGroup.Root",
-      en: '`ref` → `HTMLDivElement`. `<div role="group">`; sets the tier and orientation of every segment and passes the tier to nested icons.',
-      ru: '`<div role="group">`: задаёт ярус и направление всех сегментов и передаёт ярус иконкам.',
+      en: '`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="group">` with the segments · support row; sets the tier and orientation of every segment and passes the tier to nested icons. The frame hugs the group unless `fullWidth`.',
+      ru: 'Поле: подпись · `<div role="group">` с сегментами · строка поддержки; задаёт ярус и направление всех сегментов и передаёт ярус иконкам.',
       props: [
         {
           name: "size",
@@ -27,6 +28,7 @@ export const api: ComponentApi = {
           en: "Stretches the group; horizontal segments share the width equally.",
           ru: "Растянуть группу; горизонтальные сегменты делят ширину поровну.",
         },
+        ...fieldGroupProps("group", "ButtonGroupLabels"),
         {
           name: "children",
           type: "ReactNode",
@@ -35,9 +37,9 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
-          en: '`aria-label` (name the group), `role` (e.g. `"toolbar"`), `className` and the other div attributes.',
-          ru: '`aria-label` (имя группы), `role` (например `"toolbar"`), `className` и остальные атрибуты div.',
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange" | "dir">',
+          en: '`aria-label` / `aria-labelledby` / `aria-describedby` and `role` (e.g. `"toolbar"`) go to the group element; `className`, `data-*` and the other attributes to the field frame `<div>`.',
+          ru: '`aria-label` / `aria-labelledby` / `aria-describedby` и `role` (например `"toolbar"`) — на элемент группы; `className`, `data-*` и остальное — на `<div>` рамки поля.',
         },
       ],
     },
@@ -62,8 +64,8 @@ export const api: ComponentApi = {
         {
           name: "disabled",
           type: "boolean",
-          en: "Native disabled.",
-          ru: "Нативное неактивное состояние.",
+          en: "Native disabled; a disabled `Fieldset` around the group sets it too.",
+          ru: "Нативное неактивное состояние; неактивный `Fieldset` вокруг группы включает его тоже.",
         },
         {
           name: "children",
@@ -100,5 +102,5 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [],
+  labels: [FIELD_OPTIONAL_LABEL],
 };

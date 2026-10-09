@@ -6,7 +6,9 @@
  * foundation §7 rule 9); under reduced motion it stands still.
  */
 .root {
-  --sk-fill: var(--prime-color-fill-muted);
+  /* One step above the surface's control fill, so a placeholder reads on every layer and theme
+     even at the low point of its pulse. */
+  --sk-fill: var(--prime-color-fill-muted-hover);
 
   display: block;
   box-sizing: border-box;
@@ -110,7 +112,7 @@
   }
 
   to {
-    opacity: 0.4;
+    opacity: 0.6;
   }
 }
 

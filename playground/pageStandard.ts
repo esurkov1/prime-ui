@@ -114,6 +114,8 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: "with-icon", layout: "matrix" },
     { slot: "structure", layout: "stack" },
     { slot: SCENARIOS, layout: "stack" },
+    // A primitive that may be selected (a Thumbnail tile of a media library).
+    { slot: "controlled", layout: "stack" },
     { slot: "in-form", layout: "stack-narrow" },
     { slot: "narrow", layout: "stack" },
   ],
@@ -145,6 +147,7 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
   overlay: [
     { slot: "overview", required: true, layout: "default" },
     { slot: "structure", layout: "row" },
+    { slot: "variants", layout: "matrix" },
     { slot: "sizes", layout: "row" },
     { slot: "placement", layout: "row" },
     { slot: "states", layout: "row" },

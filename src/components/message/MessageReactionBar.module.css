@@ -1,0 +1,212 @@
+/*
+ * The reaction bar: a floating pill above the bubble on the kit's floating surface. Cells are the
+ * `s` control tier (32px, a 44px hit area on coarse pointers), the emoji the medium icon size.
+ * Motion, tokens only, transform / opacity:
+ *   open    — the bar grows from the bubble's corner (transitions from `@starting-style`, so an open
+ *             during the exit retargets from where it is instead of restarting); the emoji pop in a
+ *             quarter of the stagger step apart;
+ *   hover   — the emoji itself lifts (`data-hovered`, frozen while the bar closes), not the cell;
+ *   «⌄»     — the extra rows glide open and closed on one clock and curve (grid rows 0fr ↔ 1fr,
+ *             `base`, ease-in-out); their emoji stay mounted and fade / scale in a short stagger
+ *             both ways (in from the first, out from the last); the chevron turns;
+ *   pick    — the chosen emoji pops while the bar leaves;
+ *   close   — the open played back: the same clock and the same ease-in-out curve as a Sidebar
+ *             disclosure, back to the corner, scale 0.96 and out, the emoji shrink a touch with it;
+ *             nothing reflows (the bar keeps its place, size and state). The layer is promoted for
+ *             its whole life (it is mounted only while it shows), so the exit starts without a
+ *             repaint frame.
+ * Under reduced motion the durations and the stagger collapse to 0 (tokens): instant.
+ * The selectors carry the toolbar role and the state to outrank the shared overlay keyframes.
+ */
+
+.bar[role="toolbar"] {
+  --cell: var(--prime-control-s-height);
+  --step: calc(var(--prime-motion-stagger) / 4);
+
+  display: grid;
+  grid-template-rows: auto 0fr;
+  min-width: 0;
+  max-width: 95vw;
+  padding: var(--prime-space-1);
+  border-radius: calc(var(--cell) / 2 + var(--prime-space-1));
+  transform-origin: bottom left;
+  will-change: transform, opacity;
+}
+
+.bar[role="toolbar"][data-align="end"] {
+  transform-origin: bottom right;
+}
+
+.bar[role="toolbar"][data-state] {
+  animation: none;
+  transition:
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+@starting-style {
+  .bar[role="toolbar"][data-state="open"] {
+    opacity: 0;
+    transform: translateY(var(--prime-space-1)) scale(0.96);
+  }
+}
+
+.bar[role="toolbar"][data-state="closed"] {
+  opacity: 0;
+  transform: translateY(var(--prime-space-1)) scale(0.96);
+}
+
+.bar[role="toolbar"][data-expanded] {
+  grid-template-rows: auto 1fr;
+}
+
+.row {
+  display: grid;
+  grid-auto-columns: var(--cell);
+  grid-auto-flow: column;
+  justify-content: start;
+  gap: var(--prime-space-1);
+}
+
+.extra {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The rest wraps under the row, as many per line as the row holds. */
+.extraInner {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--cell));
+  gap: var(--prime-space-1);
+  padding-block-start: var(--prime-space-1);
+}
+
+/*
+ * The extra emoji follow the fold with transitions (they retarget mid-way), not the mount pop:
+ * in after the rows start to open, a step apart from the first; out a step apart from the last,
+ * done before the rows close over them.
+ */
+.extra .reaction {
+  --n: 8;
+  animation: none;
+  opacity: 0;
+  transform: scale(0.8);
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  --out: max(0s, calc((var(--n) - var(--i, 0)) * var(--step) / 2));
+  transition-delay: 0s, var(--out), var(--out);
+}
+
+.bar[data-expanded] .extra .reaction {
+  opacity: 1;
+  transform: none;
+  --in: calc(var(--step) * 2 + var(--i, 0) * var(--step));
+  transition-delay: 0s, var(--in), var(--in);
+}
+
+.reaction {
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--cell);
+  block-size: var(--cell);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--prime-radius-full);
+  background: none;
+  color: var(--prime-color-text-secondary);
+  cursor: pointer;
+  /* `backwards`: once in, the cell answers its static styles (the exit below). */
+  animation: reactionIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) backwards;
+  animation-delay: calc(var(--i, 0) * var(--step));
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.bar[data-state="closed"] .reaction {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.glyph {
+  display: inline-grid;
+  place-items: center;
+  /* The emoji is drawn at the medium icon size. */
+  font-size: var(--prime-icon-m);
+  line-height: 1;
+  --prime-icon-size: var(--prime-icon-s);
+  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .reaction[data-hovered] .glyph {
+    transform: translateY(calc(-1 * var(--prime-space-1) / 2)) scale(1.2);
+  }
+}
+
+.reaction:focus-visible .glyph {
+  transform: scale(1.2);
+}
+
+.reaction:active .glyph {
+  transform: scale(var(--prime-motion-press-scale-compact));
+}
+
+.reaction:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+.reaction[aria-pressed="true"] {
+  background: var(--prime-color-accent-soft);
+}
+
+.reaction[data-picked] .glyph {
+  animation: reactionPick var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+.more {
+  background: var(--prime-color-fill-muted);
+}
+
+.more .glyph {
+  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+.more[aria-expanded="true"] .glyph {
+  transform: rotate(180deg);
+}
+
+/* A reaction is a moment of delight (foundation §7 rule 1): a small pop, never from nothing. */
+@keyframes reactionIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes reactionPick {
+  50% {
+    transform: scale(1.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reaction,
+  .reaction[data-picked] .glyph {
+    animation: none;
+  }
+
+  .glyph,
+  .reaction[data-hovered] .glyph,
+  .reaction:focus-visible .glyph,
+  .reaction:active .glyph {
+    transform: none;
+    transition: none;
+  }
+}

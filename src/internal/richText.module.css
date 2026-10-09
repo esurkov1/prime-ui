@@ -1,0 +1,75 @@
+/*
+ * Rich text of a message (`RichText`): paragraphs keep their line breaks and wrap anywhere, so a long
+ * URL never widens the bubble; a quote is a wash with an accent bar on its start edge; code is the
+ * mono face on a wash. Colors are the semantic roles, so a tinted host (an outgoing bubble) recolors
+ * everything by redefining them.
+ */
+
+.paragraph,
+.quote,
+.pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.paragraph + .paragraph,
+.paragraph + .quote,
+.paragraph + .pre,
+.quote + .paragraph,
+.quote + .pre,
+.pre + .paragraph,
+.pre + .quote {
+  margin-block-start: var(--prime-space-1);
+}
+
+.quote {
+  padding-block: var(--prime-space-1);
+  padding-inline: var(--prime-space-2);
+  border-inline-start: calc(var(--prime-border-width) * 3) solid var(--prime-color-accent-default);
+  border-radius: var(--prime-radius-xs);
+  background: var(--prime-color-fill-subtle-active);
+}
+
+.code,
+.pre {
+  font-family: var(--prime-font-family-mono);
+  font-size: var(--prime-text-code-size);
+}
+
+.code {
+  padding-inline: var(--prime-space-1);
+  border-radius: var(--prime-radius-xs);
+  background: var(--prime-color-fill-subtle-active);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.pre {
+  padding: var(--prime-space-2);
+  border-radius: var(--prime-radius-s);
+  background: var(--prime-color-fill-subtle-active);
+  line-height: var(--prime-text-code-line-height);
+}
+
+.link {
+  border-radius: var(--prime-radius-xs);
+  color: var(--prime-color-accent-text);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--prime-border-width);
+  text-underline-offset: calc(var(--prime-space-1) - var(--prime-border-width));
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  transition: text-decoration-color var(--prime-motion-duration-fast)
+    var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+.link:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}

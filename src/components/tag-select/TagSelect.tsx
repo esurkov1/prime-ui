@@ -8,6 +8,7 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
   FieldFrame,
   type FieldFrameProps,
@@ -28,6 +29,7 @@ import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
+import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { TagOptionMenu } from "./TagOptionMenu";
@@ -54,6 +56,10 @@ export type TagSelectLabels = {
   more: string;
   /** Screen-reader announcement after a tag is removed; `{label}` is the tag text. */
   removed: string;
+  /** Screen-reader announcement when the `onCreate` promise rejects; `{label}` is the tag text. */
+  createFailed: string;
+  /** Screen-reader announcement when the `onOptionUpdate` promise rejects; `{label}` is the tag text. */
+  updateFailed: string;
   /** Accessible name of a row's «⋯» menu; `{label}` is the tag text. */
   edit: string;
   /** Accessible name of the tag name field in the menu. */
@@ -74,6 +80,8 @@ const TAG_SELECT_LABELS: TagSelectLabels = {
   remove: "Удалить {label}",
   more: "Показать ещё {count}",
   removed: "Удалено: {label}",
+  createFailed: "Не удалось создать тег «{label}»",
+  updateFailed: "Не удалось изменить тег «{label}»",
   edit: "Изменить тег {label}",
   name: "Название тега",
   delete: "Удалить",
@@ -138,15 +146,29 @@ export type TagSelectProps = FieldRootDomProps &
     onOpenChange?: (open: boolean) => void;
     /** Allow adding a value that is not in `options`. */
     creatable?: boolean;
-    /** A new value was created (Create row or Enter), not picked from `options`. */
-    onCreate?: (value: string) => void;
+    /**
+     * A new value was created (Create row or Enter), not picked from `options`. Return the save's
+     * promise: the new chip waits busy until it settles; reject — it leaves the selection and
+     * `labels.createFailed` is announced.
+     */
+    onCreate?: (value: string) => void | Promise<void>;
     /** Chip color of values without an option color, including created ones. */
     defaultColor?: PaletteColor;
-    /** Enables the «⋯» row menu: tag name and color. `value` never changes. */
-    onOptionUpdate?: (value: string, updates: TagSelectOptionUpdate) => void;
-    /** Enables «Удалить» in the row menu; the value is also removed from the selection. */
-    onOptionDelete?: (value: string) => void;
+    /**
+     * Enables the «⋯» row menu: tag name and color. `value` never changes. Return the save's
+     * promise: the new name or color shows at once and «⋯» spins until it settles; reject — the
+     * option goes back and `labels.updateFailed` is announced.
+     */
+    onOptionUpdate?: (value: string, updates: TagSelectOptionUpdate) => void | Promise<void>;
+    /**
+     * Enables «Удалить» in the row menu; the value is also removed from the selection. A returned
+     * Promise holds the row pending (spinner on «⋯») and changes nothing until it resolves; a
+     * rejection keeps the option and the selection (the owner shows why).
+     */
+    onOptionDelete?: (value: string) => void | Promise<void>;
     disabled?: boolean;
+    /** Form field name: one hidden input per selected value. */
+    name?: string;
     placeholder?: string;
     /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
     invalid?: boolean;
@@ -177,7 +199,8 @@ export function TagSelect({
   defaultColor = "gray",
   onOptionUpdate,
   onOptionDelete,
-  disabled = false,
+  disabled: disabledProp = false,
+  name,
   placeholder = "",
   invalid: invalidProp,
   focusRing = true,
@@ -194,6 +217,7 @@ export function TagSelect({
   "aria-labelledby": ariaLabelledBy,
   ...rest
 }: TagSelectProps) {
+  const disabled = useInheritedDisabled(disabledProp);
   const labels = React.useMemo(
     () => ({
       ...TAG_SELECT_LABELS,
@@ -228,6 +252,10 @@ export function TagSelect({
    * is ignored by `allOptions`).
    */
   const [created, setCreated] = React.useState<TagSelectOption[]>([]);
+  /** Options whose `onOptionDelete` Promise is pending: the row waits, nothing changes yet. */
+  const [deleting, setDeleting] = React.useState<ReadonlySet<string>>(() => new Set());
+  /** Values whose `onCreate` Promise is pending: the chip stands, busy, until the answer. */
+  const [creating, setCreating] = React.useState<ReadonlySet<string>>(() => new Set());
   /** Where focus goes after a chip is removed from the keyboard: a chip index, or -1 for the input. */
   const pendingChipFocus = React.useRef<number | null>(null);
 
@@ -236,10 +264,17 @@ export function TagSelect({
   const measureRef = React.useRef<HTMLDivElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
-  const allOptions = React.useMemo(() => {
+  const knownOptions = React.useMemo(() => {
     const extra = created.filter((c) => !options.some((o) => o.value === c.value));
     return extra.length ? [...options, ...extra] : options;
   }, [options, created]);
+  // Renames and recolors the owner is still saving are drawn ahead of its answer.
+  const optionChanges = usePendingChanges(knownOptions, updateOption);
+  const allOptions = optionChanges.shown;
+  const updating = React.useMemo(
+    () => new Set(optionChanges.pending.map((change) => change.value)),
+    [optionChanges.pending],
+  );
 
   const inputTrim = inputValue.trim();
   const listed = React.useMemo(
@@ -276,8 +311,6 @@ export function TagSelect({
     open: shown,
     onOpenChange: setOpen,
     triggerRef,
-    side: "bottom",
-    align: "start",
     matchAnchorWidth: true,
   });
   const listboxRef = floating.contentRef;
@@ -287,30 +320,85 @@ export function TagSelect({
 
   const handleOptionUpdate = onOptionUpdate
     ? (optionValue: string, updates: TagSelectOptionUpdate) => {
-        if (!options.some((o) => o.value === optionValue)) {
-          setCreated((prev) =>
-            prev.map((o) => (o.value === optionValue ? { ...o, ...updates } : o)),
-          );
+        const change: OptionChange = { value: optionValue, updates };
+        // A value created here is kept here until the owner lists it in `options`.
+        const applyHere = () => {
+          if (!options.some((o) => o.value === optionValue)) {
+            setCreated((prev) => prev.map((o) => updateOption(o, change)));
+          }
+        };
+        const label = allOptions.find((o) => o.value === optionValue)?.label ?? optionValue;
+        const result = onOptionUpdate(optionValue, updates);
+        if (!isPromiseLike(result)) {
+          applyHere();
+          return;
         }
-        onOptionUpdate(optionValue, updates);
+        optionChanges.track(change, result, {
+          onResolve: applyHere,
+          onReject: () => setAnnouncement(formatLabel(labels.updateFailed, { label })),
+        });
       }
     : undefined;
 
+  const applyOptionDelete = (optionValue: string) => {
+    setSelected((prev) => prev.filter((x) => x !== optionValue));
+    setCreated((prev) => prev.filter((o) => o.value !== optionValue));
+  };
+
   const handleOptionDelete = onOptionDelete
     ? (optionValue: string) => {
-        setSelected((prev) => prev.filter((x) => x !== optionValue));
-        setCreated((prev) => prev.filter((o) => o.value !== optionValue));
-        onOptionDelete(optionValue);
+        const result = onOptionDelete(optionValue);
+        if (!result || typeof result.then !== "function") {
+          applyOptionDelete(optionValue);
+          return;
+        }
+        setDeleting((prev) => new Set(prev).add(optionValue));
+        // The busy «⋯» turns disabled: focus waits in the input, where a confirmation the owner
+        // opens gives it back.
+        inputRef.current?.focus();
+        const settle = (applied: boolean) => {
+          setDeleting((prev) => {
+            const next = new Set(prev);
+            next.delete(optionValue);
+            return next;
+          });
+          if (!applied) return;
+          // Focus left on the row that leaves goes to the input.
+          const row = document.getElementById(optionDomId(listboxId, optionValue));
+          if (row?.contains(document.activeElement)) inputRef.current?.focus();
+          applyOptionDelete(optionValue);
+        };
+        result.then(
+          () => settle(true),
+          () => settle(false),
+        );
       }
     : undefined;
 
   const pick = (rawValue: string) => {
+    if (deleting.has(rawValue)) return;
     if (rawValue === CREATE_VALUE) {
       const text = inputTrim;
       if (!text) return;
       if (!selected.includes(text)) {
-        onCreate?.(text);
+        const result = onCreate?.(text);
         setSelected((prev) => (prev.includes(text) ? prev : [...prev, text]));
+        if (isPromiseLike(result)) {
+          setCreating((prev) => new Set(prev).add(text));
+          const settle = () =>
+            setCreating((prev) => {
+              const next = new Set(prev);
+              next.delete(text);
+              return next;
+            });
+          result.then(settle, () => {
+            settle();
+            // Refused: the new value goes again, from the selection and from the list.
+            setSelected((prev) => prev.filter((x) => x !== text));
+            setCreated((prev) => prev.filter((o) => o.value !== text));
+            setAnnouncement(formatLabel(labels.createFailed, { label: text }));
+          });
+        }
       }
       setCreated((prev) =>
         prev.some((o) => o.value === text) || options.some((o) => o.value === text)
@@ -334,12 +422,18 @@ export function TagSelect({
   }, [selected, allOptions, defaultColor]);
 
   const removeChip = (chip: { value: string; label: string }) => {
+    // A tag still being created waits for its answer.
+    if (creating.has(chip.value)) return;
     setSelected((prev) => prev.filter((x) => x !== chip.value));
     setAnnouncement(formatLabel(labels.removed, { label: chip.label }));
   };
 
   const chipElements = () =>
-    Array.from(chipsRef.current?.querySelectorAll<HTMLElement>("[data-chip-value]") ?? []);
+    Array.from(
+      // A chip on its way out (`data-leaving`) is a copy that only closes up.
+      chipsRef.current?.querySelectorAll<HTMLElement>("[data-chip-value]:not([data-leaving])") ??
+        [],
+    );
 
   // After a keyboard removal: focus the neighbour chip or the input.
   React.useLayoutEffect(() => {
@@ -427,7 +521,7 @@ export function TagSelect({
     } else if ((event.key === "Delete" || event.key === "Backspace") && !disabled) {
       event.preventDefault();
       const chip = chips[index];
-      if (!chip) return;
+      if (!chip || creating.has(chip.value)) return;
       // Backspace goes to the previous chip, Delete to the next; with no chips left, to the input.
       const next = event.key === "Backspace" ? index - 1 : index;
       pendingChipFocus.current = chips.length > 1 ? Math.max(0, next) : -1;
@@ -450,6 +544,8 @@ export function TagSelect({
 
   const optionRow = (option: TagSelectOption) => {
     const isSelected = selected.includes(option.value);
+    const pending = deleting.has(option.value);
+    const saving = updating.has(option.value);
     const pickOption = () => {
       if (!option.disabled) pick(option.value);
     };
@@ -476,6 +572,7 @@ export function TagSelect({
         disabled={Boolean(option.disabled)}
         highlight={highlight}
         managed={manageable}
+        pending={pending}
         onPick={pickOption}
       >
         {manageable ? (
@@ -484,7 +581,7 @@ export function TagSelect({
               type="button"
               tabIndex={-1}
               className={styles.optionPick}
-              disabled={option.disabled}
+              disabled={option.disabled || pending}
               onMouseDown={(event) => {
                 if (!option.disabled) event.preventDefault();
               }}
@@ -497,12 +594,14 @@ export function TagSelect({
                 value={option.value}
                 label={option.label}
                 color={option.color ?? defaultColor}
-                open={menuValue === option.value}
+                open={menuValue === option.value && !pending}
                 onOpenChange={(next) => setMenuValue(next ? option.value : null)}
                 onUpdate={handleOptionUpdate}
                 onDelete={handleOptionDelete}
                 labels={labels}
                 disabled={disabled}
+                pending={pending}
+                saving={saving}
               />
             )}
           </>
@@ -569,6 +668,7 @@ export function TagSelect({
                 // Reached with the arrow keys from the input (not a tab stop); Delete / Backspace remove.
                 tabIndex={disabled ? undefined : -1}
                 data-chip-value={chip.value}
+                loading={creating.has(chip.value)}
                 onKeyDown={(event) => onChipKeyDown(event, index)}
                 onRemove={() => removeChip(chip)}
                 // Removing keeps focus in the field and does not open the list.
@@ -629,6 +729,11 @@ export function TagSelect({
               }}
             />
           </ScrollContainer>
+          {name
+            ? selected.map((item) => (
+                <input key={item} type="hidden" name={name} value={item} disabled={disabled} />
+              ))
+            : null}
           <VisuallyHidden role="status" aria-live="polite">
             {announcement}
           </VisuallyHidden>
@@ -687,6 +792,20 @@ export function TagSelect({
 }
 TagSelect.displayName = "TagSelect";
 
+/** A rename or recolor of option `value`. */
+type OptionChange = { value: string; updates: TagSelectOptionUpdate };
+
+function updateOption(option: TagSelectOption, change: OptionChange): TagSelectOption;
+function updateOption(options: TagSelectOption[], change: OptionChange): TagSelectOption[];
+function updateOption(
+  target: TagSelectOption | TagSelectOption[],
+  change: OptionChange,
+): TagSelectOption | TagSelectOption[] {
+  const one = (option: TagSelectOption) =>
+    option.value === change.value ? { ...option, ...change.updates } : option;
+  return Array.isArray(target) ? target.map(one) : one(target);
+}
+
 type OptionRowProps = {
   id: string;
   value: string;
@@ -696,6 +815,8 @@ type OptionRowProps = {
   highlight: Store<string | undefined>;
   /** A row with its own pick button and «⋯» menu (a `div`); else the row is the pick button. */
   managed: boolean;
+  /** Its deletion is pending: busy, not pickable. */
+  pending?: boolean;
   onPick: () => void;
   children: React.ReactNode;
 };
@@ -709,6 +830,7 @@ function OptionRow({
   disabled,
   highlight,
   managed,
+  pending = false,
   onPick,
   children,
 }: OptionRowProps) {
@@ -718,10 +840,11 @@ function OptionRow({
     role: "option",
     tabIndex: -1,
     "aria-selected": selected,
+    "aria-busy": pending || undefined,
     onMouseMove: () => {
       if (!disabled && !highlighted) highlight.set(value);
     },
-    ...toDataAttributes({ value, label, highlighted, selected, disabled }),
+    ...toDataAttributes({ value, label, highlighted, selected, disabled, pending }),
   } as const;
 
   if (managed) {

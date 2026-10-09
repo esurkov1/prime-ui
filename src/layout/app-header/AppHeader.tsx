@@ -8,6 +8,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { stickySurfaceClass } from "@/internal/sticky";
 
 import styles from "./AppHeader.module.css";
 
@@ -36,11 +37,16 @@ export type AppHeaderRootProps = HeaderProps & {
  */
 function AppHeaderRoot({ labels, className, children, ...rest }: AppHeaderRootProps) {
   const value = React.useMemo(() => ({ ...APP_HEADER_LABELS, ...labels }), [labels]);
+  // The page tools are the header's second row, under the title row.
+  const items = React.Children.toArray(children);
+  const isTools = (child: React.ReactNode) =>
+    React.isValidElement(child) && child.type === AppHeaderTools;
   return (
     <LabelsContext.Provider value={value}>
       <ControlSizeProvider value="m">
-        <header {...rest} className={cx(styles.root, className)}>
-          <div className={styles.row}>{children}</div>
+        <header {...rest} className={cx(styles.root, stickySurfaceClass, className)}>
+          <div className={styles.row}>{items.filter((child) => !isTools(child))}</div>
+          {items.filter(isTools)}
         </header>
       </ControlSizeProvider>
     </LabelsContext.Provider>
@@ -56,13 +62,24 @@ function AppHeaderStart({ className, ...rest }: AppHeaderStartProps) {
 }
 AppHeaderStart.displayName = "AppHeader.Start";
 
-export type AppHeaderTitleProps = DivProps;
+export type AppHeaderTitleProps = DivProps & {
+  /**
+   * Tag of the name: `h1` when the header carries the page title (no `PageContent.Header` in
+   * main) — the description stays outside the heading's name. Default `span`.
+   */
+  as?: "span" | "h1";
+};
 
 /**
  * Where you are: an optional `AppHeader.Icon`, the name and an optional `AppHeader.Description`
  * under it — the same anatomy as the Sidebar brand. The name truncates.
  */
-function AppHeaderTitle({ className, children, ...rest }: AppHeaderTitleProps) {
+function AppHeaderTitle({
+  as: NameTag = "span",
+  className,
+  children,
+  ...rest
+}: AppHeaderTitleProps) {
   const items = React.Children.toArray(children);
   const isIcon = (child: React.ReactNode) =>
     React.isValidElement(child) && child.type === AppHeaderIcon;
@@ -75,10 +92,10 @@ function AppHeaderTitle({ className, children, ...rest }: AppHeaderTitleProps) {
   return (
     <div {...rest} className={cx(styles.title, className)}>
       {icon}
-      <span className={styles.titleText}>
-        <span className={styles.titleName}>{name}</span>
+      <div className={styles.titleText}>
+        <NameTag className={styles.titleName}>{name}</NameTag>
         {description}
-      </span>
+      </div>
     </div>
   );
 }
@@ -149,6 +166,19 @@ function AppHeaderSearch({ children, shortcut = "⌘K", className, ...rest }: Ap
 }
 AppHeaderSearch.displayName = "AppHeader.Search";
 
+export type AppHeaderToolsProps = DivProps;
+
+/**
+ * The page's tools in the header — a `PageToolbar.Root` (sections, period, filters, the primary
+ * action): the header's second row, the full width under the title row, so the toolbar lays
+ * itself out from that width (one row when wide, two when narrow). Root moves it there wherever
+ * it is written.
+ */
+function AppHeaderTools({ className, ...rest }: AppHeaderToolsProps) {
+  return <div {...rest} className={cx(styles.tools, className)} />;
+}
+AppHeaderTools.displayName = "AppHeader.Tools";
+
 export type AppHeaderActionsProps = DivProps;
 
 /** Buttons at the end: one primary action, notifications, the account. Never wraps. */
@@ -197,6 +227,7 @@ export const AppHeader = {
   Description: AppHeaderDescription,
   Separator: AppHeaderSeparator,
   Search: AppHeaderSearch,
+  Tools: AppHeaderTools,
   Actions: AppHeaderActions,
   MenuButton: AppHeaderMenuButton,
 };

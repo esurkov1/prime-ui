@@ -70,3 +70,46 @@
   line-height: var(--prime-text-caption-line-height);
   letter-spacing: var(--prime-text-caption-tracking);
 }
+
+/* ─── Item with a description: label over a muted line ──────────────────── */
+
+/* Two lines grow the row from the tier height with the tier gap above and below. */
+.item:has(> .itemBody) {
+  align-items: center;
+  padding-block: var(--menu-gap);
+}
+
+.itemBody {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.itemLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemDescriptionSlot {
+  display: contents;
+}
+
+/* A sentence (why the item is unavailable) wraps inside the menu's width limit. */
+.itemDescription {
+  color: var(--prime-color-text-muted);
+  font-size: var(--menu-desc);
+  line-height: var(--menu-desc-lh);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.item[data-disabled="true"] .itemDescription {
+  color: var(--prime-color-text-disabled);
+}
+
+/* A link item: no underline, the row's own colors. */
+a.item {
+  text-decoration: none;
+}

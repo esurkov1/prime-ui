@@ -33,15 +33,15 @@ export const api: ComponentApi = {
     },
     {
       name: "Modal.Content",
-      en: '`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"`; renders while open and during its exit animation. Controls inside get size `m`.',
+      en: '`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"`; renders while open and during its exit animation, showing the children it had open (a record cleared with `open` does not empty the panel mid-motion). Controls inside get size `m`.',
       ru: "Портал, подложка и сам диалог: ловушка фокуса, блокировка прокрутки.",
       props: [
         {
           name: "size",
-          type: '"s" | "m" | "l" | "xl"',
+          type: '"xs" | "s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Width: 440 · 560 · 720 · 960. Below 640 px of viewport — a full-width bottom sheet with a grab handle; a swipe down from the handle or the header closes it.",
-          ru: "Ширина 440 · 560 · 720 · 960 px. Уже 640 px экрана — шторка снизу на всю ширину с ручкой; свайп вниз за ручку или шапку закрывает её.",
+          en: "Width: 360 · 440 · 560 · 720 · 960. Below 640 px of viewport — a full-width bottom sheet with a grab handle; a swipe down from the handle or the header closes it.",
+          ru: "Ширина 360 · 440 · 560 · 720 · 960 px. Уже 640 px экрана — шторка снизу на всю ширину с ручкой; свайп вниз за ручку или шапку закрывает её.",
         },
         {
           name: "container",
@@ -53,7 +53,7 @@ export const api: ComponentApi = {
         ...dialogContentAriaProps,
       ],
     },
-    ...dialogParts("Modal", '"fill" (s/m), "end" (l/xl)'),
+    ...dialogParts("Modal", '"fill" (xs/s/m), "end" (l/xl)'),
     dialogSlotsPart("Modal", "Modal.Trigger · Modal.Close · Modal.Confirm"),
   ],
   labels: dialogLabels,

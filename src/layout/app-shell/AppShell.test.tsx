@@ -20,6 +20,8 @@ describe("AppShell", () => {
     expect(panel).toContainElement(screen.getByRole("banner"));
     expect(panel).toContainElement(screen.getByRole("main"));
     expect(screen.getByRole("banner").nextElementSibling).toBe(screen.getByRole("main"));
+    // Two grid columns only with a navigation column (an attribute, not `:has()`).
+    expect(root).toHaveAttribute("data-nav", "true");
   });
 
   it("sets data-fill-viewport and merges className", () => {

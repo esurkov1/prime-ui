@@ -15,10 +15,17 @@ export const api: ComponentApi = {
           ru: 'Ключ того, что показывает область: `"loading"`, `"ready"`, `"empty"`, `"error"` или id записи. Новое значение — смена с переходом; то же значение — обновление на месте.',
         },
         {
+          name: "fill",
+          type: "boolean",
+          default: "false",
+          en: "The region takes its parent's height (a flex or grid item, or a sized block) and every state stretches to it; the height never glides.",
+          ru: "Область занимает высоту родителя (элемент flex или grid, блок с высотой), каждое состояние растягивается по ней; высота не анимируется.",
+        },
+        {
           name: "children",
           type: "ReactNode",
-          en: "Content of the current `state`.",
-          ru: "Содержимое текущего `state`.",
+          en: "Content of the current `state`. Nothing (`null`, `false`) leaves no box once the old state has faded: no gap in a grid or a flex column.",
+          ru: "Содержимое текущего `state`. Пустое (`null`, `false`) после растворения старого состояния не оставляет блока: в grid или flex-колонке нет лишнего зазора.",
         },
         {
           name: "…rest",

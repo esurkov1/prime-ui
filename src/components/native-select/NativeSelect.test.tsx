@@ -31,6 +31,21 @@ describe("NativeSelect", () => {
     expect(onChange).toHaveBeenCalled();
   });
 
+  it("native focus and blur reach the select (form libraries mark it touched)", () => {
+    const onFocus = vi.fn();
+    const onBlur = vi.fn();
+    render(
+      <NativeSelect aria-label="Тема" onFocus={onFocus} onBlur={onBlur}>
+        <option value="a">A</option>
+      </NativeSelect>,
+    );
+    const select = screen.getByRole("combobox");
+    fireEvent.focus(select);
+    fireEvent.blur(select);
+    expect(onFocus).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
+  });
+
   it("shows the placeholder as the empty first option while nothing is picked", () => {
     render(
       <NativeSelect aria-label="Город" placeholder="Выберите город">

@@ -275,7 +275,9 @@ describe("Dnd.Sortable", () => {
             aria-label="list"
             items={items}
             getId={(row) => row.id}
-            onReorder={async () => ({ ok: false })}
+            onReorder={async () => {
+              throw new Error("refused");
+            }}
             renderItem={(row) => (
               <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
                 {row.id}
@@ -1098,5 +1100,475 @@ describe("helpers", () => {
     // Entering a slot before it puts it in front of the item there.
     expect(at(20, 50, "d")).toBe("a");
     boxes.clear();
+  });
+});
+
+describe("native drag inside items", () => {
+  it("a picture or a link in a sortable item never starts the browser's own drag", () => {
+    render(
+      <Dnd.Root>
+        <Dnd.Sortable
+          aria-label="list"
+          items={rows("a")}
+          getId={(row) => row.id}
+          onReorder={() => {}}
+          renderItem={(row) => (
+            <Dnd.SortableItem id={row.id}>
+              <img src="photo.jpg" alt="" data-testid="photo" />
+              <a href="/orders/1" data-testid="link">
+                Заказ
+              </a>
+            </Dnd.SortableItem>
+          )}
+        />
+      </Dnd.Root>,
+    );
+    expect(fireEvent.dragStart(screen.getByTestId("photo"))).toBe(false);
+    expect(fireEvent.dragStart(screen.getByTestId("link"))).toBe(false);
+  });
+
+  it("a Dnd.Draggable stops it too, and keeps its own onDragStart for the kit drag", () => {
+    const onDragStart = vi.fn();
+    render(
+      <Dnd.Root>
+        <Dnd.Draggable kind="card" id="c1" data-testid="card" onDragStart={onDragStart}>
+          <img src="cover.jpg" alt="" data-testid="cover" />
+        </Dnd.Draggable>
+        <Dnd.Draggable kind="card" id="c2" disabled>
+          <img src="cover.jpg" alt="" data-testid="still" />
+        </Dnd.Draggable>
+      </Dnd.Root>,
+    );
+    boxes.set("card", { left: 0, top: 0, width: 100, height: 40 });
+    expect(fireEvent.dragStart(screen.getByTestId("cover"))).toBe(false);
+    // A disabled one is not the kit's to carry: the browser keeps its drag.
+    expect(fireEvent.dragStart(screen.getByTestId("still"))).toBe(true);
+    expect(onDragStart).not.toHaveBeenCalled();
+    pressOn(screen.getByTestId("card"), 10, 10);
+    moveTo(60, 10);
+    expect(onDragStart).toHaveBeenCalledTimes(1);
+    releaseAt(60, 10);
+  });
+});
+
+describe("linked lists from the keyboard", () => {
+  function Board({
+    canDrop,
+    unlinked,
+  }: {
+    canDrop?: (list: string, id: string) => boolean | string;
+    unlinked?: boolean;
+  }) {
+    const [cols, setCols] = React.useState<Record<string, Row[]>>({
+      todo: rows("a", "b"),
+      doing: rows("x", "y"),
+      done: [],
+    });
+    return (
+      <Dnd.Root>
+        {(["todo", "doing", "done"] as const).map((name) => (
+          <section key={name}>
+            <h3 id={`title-${name}`}>{name.toUpperCase()}</h3>
+            <Dnd.Sortable
+              {...(unlinked ? {} : { kind: "task" })}
+              aria-labelledby={`title-${name}`}
+              data-testid={`list-${name}`}
+              items={cols[name] ?? []}
+              getId={(row) => row.id}
+              getLabel={(row) => `Task ${row.id}`}
+              canDrop={canDrop ? (id) => canDrop(name, id) : undefined}
+              onReorder={(id, before) =>
+                setCols((current) => {
+                  const moved = Object.values(current)
+                    .flat()
+                    .find((row) => row.id === id);
+                  if (!moved) return current;
+                  const next: Record<string, Row[]> = {};
+                  for (const [key, list] of Object.entries(current)) {
+                    next[key] = list.filter((row) => row.id !== id);
+                  }
+                  next[name] = moveBefore([...(next[name] ?? []), moved], id, before, (r) => r.id);
+                  return next;
+                })
+              }
+              renderItem={(row) => (
+                <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+                  {row.id}
+                </Dnd.SortableItem>
+              )}
+            />
+          </section>
+        ))}
+      </Dnd.Root>
+    );
+  }
+
+  const idsIn = (list: string) =>
+    within(screen.getByTestId(`list-${list}`))
+      .queryAllByTestId(/row-/)
+      .map((node) => node.textContent);
+
+  it("Alt+→ moves an item to the same row of the next list; focus follows; it is announced", () => {
+    render(<Board />);
+    const row = screen.getByTestId("row-b");
+    expect(row).toHaveAttribute(
+      "aria-keyshortcuts",
+      "Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight",
+    );
+    row.focus();
+    fireEvent.keyDown(row, { key: "ArrowRight", altKey: true });
+    expect(idsIn("todo")).toEqual(["a"]);
+    expect(idsIn("doing")).toEqual(["x", "b", "y"]);
+    expect(document.activeElement).toBe(screen.getByTestId("row-b"));
+    expect(screen.getByRole("status")).toHaveTextContent("Task b: «DOING», позиция 2 из 3");
+    fireEvent.keyDown(screen.getByTestId("row-b"), { key: "ArrowRight", altKey: true });
+    expect(idsIn("done")).toEqual(["b"]);
+    fireEvent.keyDown(screen.getByTestId("row-b"), { key: "ArrowLeft", altKey: true });
+    expect(idsIn("doing")).toEqual(["b", "x", "y"]);
+  });
+
+  it("follows the writing direction: in rtl ← goes to the next list", () => {
+    render(
+      <div dir="rtl">
+        <Board />
+      </div>,
+    );
+    fireEvent.keyDown(screen.getByTestId("row-a"), { key: "ArrowLeft", altKey: true });
+    expect(idsIn("doing")).toEqual(["a", "x", "y"]);
+  });
+
+  it("a refusing list keeps the item and says why", () => {
+    render(
+      <Board
+        canDrop={(list, id) =>
+          list === "doing" && id === "a" ? "Сначала оцените задачу" : list !== "done"
+        }
+      />,
+    );
+    fireEvent.keyDown(screen.getByTestId("row-a"), { key: "ArrowRight", altKey: true });
+    expect(idsIn("todo")).toEqual(["a", "b"]);
+    expect(screen.getByRole("status")).toHaveTextContent("Task a: Сначала оцените задачу");
+    fireEvent.keyDown(screen.getByTestId("row-x"), { key: "ArrowRight", altKey: true });
+    expect(idsIn("doing")).toEqual(["x", "y"]);
+    expect(screen.getByRole("status")).toHaveTextContent("Task x: «DONE» не принимает элемент");
+  });
+
+  it("lists without a shared kind stay apart", () => {
+    render(<Board unlinked />);
+    const row = screen.getByTestId("row-a");
+    expect(row).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
+    fireEvent.keyDown(row, { key: "ArrowRight", altKey: true });
+    expect(idsIn("todo")).toEqual(["a", "b"]);
+  });
+});
+
+describe("locked items", () => {
+  function Pinned({ onReorder }: { onReorder?: (id: string, before: string | null) => void }) {
+    const [items, setItems] = React.useState(rows("inbox", "b", "c"));
+    return (
+      <Dnd.Root>
+        <Dnd.Sortable
+          aria-label="list"
+          handle
+          items={items}
+          getId={(row) => row.id}
+          onReorder={(id, before) => {
+            onReorder?.(id, before);
+            setItems((current) => moveBefore(current, id, before, (row) => row.id));
+          }}
+          renderItem={(row) => (
+            <Dnd.SortableItem id={row.id} locked={row.id === "inbox"} data-testid={`row-${row.id}`}>
+              <Dnd.Handle data-testid={`grip-${row.id}`} />
+              {row.id}
+            </Dnd.SortableItem>
+          )}
+        />
+      </Dnd.Root>
+    );
+  }
+
+  it("a locked item shows a lock instead of the grip and does not drag", () => {
+    render(<Pinned />);
+    const row = screen.getByTestId("row-inbox");
+    expect(row).toHaveAttribute("data-locked");
+    expect(row).not.toHaveAttribute("aria-roledescription");
+    expect(within(row).getByRole("img", { name: "Закреплено" })).toBeInTheDocument();
+    expect(within(row).queryByRole("button")).toBeNull();
+    pressOn(row, 10, 5);
+    moveTo(10, 50);
+    expect(document.documentElement).not.toHaveAttribute("data-dnd-active");
+  });
+
+  it("nothing moves past it: neither by keyboard nor by pointer", () => {
+    const onReorder = vi.fn();
+    render(<Pinned onReorder={onReorder} />);
+    fireEvent.keyDown(screen.getByTestId("grip-b"), { key: "ArrowUp", altKey: true });
+    expect(onReorder).not.toHaveBeenCalled();
+    fireEvent.keyDown(screen.getByTestId("grip-b"), { key: "ArrowDown", altKey: true });
+    expect(onReorder).toHaveBeenCalledWith("b", null);
+
+    onReorder.mockClear();
+    // c (second row now) dragged above the pinned first row: the move does not happen.
+    pressOn(screen.getByTestId("grip-c"), 10, 25);
+    moveTo(10, 2);
+    releaseAt(10, 2);
+    expect(onReorder).not.toHaveBeenCalled();
+    expect(order()).toEqual(["inbox", "c", "b"]);
+  });
+});
+
+describe("empty list", () => {
+  it("shows `empty` while it has no items, and a gap opening steps it out of the flow", () => {
+    function Lists() {
+      const [cols, setCols] = React.useState<Record<string, Row[]>>({ left: rows("a"), right: [] });
+      return (
+        <Dnd.Root>
+          {(["left", "right"] as const).map((name) => (
+            <Dnd.Sortable
+              key={name}
+              kind="card"
+              as="ul"
+              aria-label={name}
+              items={cols[name] ?? []}
+              getId={(row) => row.id}
+              empty="Нет задач"
+              onReorder={(id) =>
+                setCols({
+                  left: name === "left" ? rows(id) : [],
+                  right: name === "right" ? rows(id) : [],
+                })
+              }
+              renderItem={(row) => (
+                <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+                  {row.id}
+                </Dnd.SortableItem>
+              )}
+            />
+          ))}
+        </Dnd.Root>
+      );
+    }
+    render(<Lists />);
+    const right = screen.getByLabelText("right");
+    const empty = within(right).getByText("Нет задач");
+    expect(empty.tagName).toBe("LI");
+    expect(empty).toHaveAttribute("data-dnd-empty");
+    expect(within(screen.getByLabelText("left")).queryByText("Нет задач")).toBeNull();
+    fireEvent.keyDown(screen.getByTestId("row-a"), { key: "ArrowRight", altKey: true });
+    expect(within(right).queryByText("Нет задач")).toBeNull();
+    expect(within(screen.getByLabelText("left")).getByText("Нет задач")).toBeInTheDocument();
+  });
+});
+
+describe("refusal with a reason", () => {
+  it("says why while over the target and shows it under the carried copy", () => {
+    render(
+      <Dnd.Root>
+        <Dnd.Draggable kind="card" id="c1" label="Счёт 42" data-testid="card">
+          Счёт
+        </Dnd.Draggable>
+        <Dnd.DropZone
+          accepts="card"
+          data-testid="zone"
+          canDrop={() => "Папка закрыта для изменений"}
+          onDrop={() => {}}
+        >
+          Архив
+        </Dnd.DropZone>
+      </Dnd.Root>,
+    );
+    boxes.set("card", { left: 0, top: 0, width: 100, height: 40 });
+    boxes.set("zone", { left: 200, top: 0, width: 200, height: 200 });
+    pressOn(screen.getByTestId("card"), 10, 10);
+    moveTo(300, 100);
+    expect(screen.getByTestId("zone")).toHaveAttribute("data-dnd-reject");
+    expect(screen.getByRole("status")).toHaveTextContent("Счёт 42: Папка закрыта для изменений");
+    const overlay = document.querySelector("[data-dnd-overlay]") as HTMLElement;
+    expect(overlay.lastElementChild).toHaveTextContent("Папка закрыта для изменений");
+    moveTo(100, 300);
+    expect(overlay.textContent).not.toContain("Папка закрыта");
+    releaseAt(100, 300);
+  });
+});
+
+describe("the carried copy", () => {
+  it("takes the fill of the surface it was lifted from when the item has none", () => {
+    const getComputed = window.getComputedStyle;
+    vi.spyOn(window, "getComputedStyle").mockImplementation((element, pseudo) => {
+      const style = getComputed(element, pseudo);
+      if (!(element as HTMLElement).hasAttribute?.("data-dnd-item")) return style;
+      return {
+        backgroundColor: "rgba(0, 0, 0, 0)",
+        borderRadius: "",
+        getPropertyValue: (name: string) =>
+          name === "--prime-color-layer-current" ? " rgb(250, 250, 251)" : "",
+      } as unknown as CSSStyleDeclaration;
+    });
+    render(
+      <Dnd.Root>
+        <Dnd.Draggable kind="card" id="c1" data-testid="card">
+          Строка
+        </Dnd.Draggable>
+      </Dnd.Root>,
+    );
+    boxes.set("card", { left: 0, top: 0, width: 100, height: 40 });
+    pressOn(screen.getByTestId("card"), 10, 10);
+    moveTo(60, 60);
+    const copy = document.querySelector("[data-dnd-overlay]")?.firstElementChild as HTMLElement;
+    expect(copy.style.backgroundColor).toBe("rgb(250, 250, 251)");
+    releaseAt(60, 60);
+  });
+});
+
+describe("a wrapping grid", () => {
+  it("drags a tile to the next row and reorders in reading order; Alt+→ steps it", () => {
+    // Two 100 px cells per row: a b / c d.
+    // Cells take their slots in reading order, the lifted one out of the layout.
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const isCell = this.hasAttribute("data-dnd-item") || this.hasAttribute("data-dnd-gap");
+      let box = { left: 0, top: 0, width: 200, height: 200 };
+      if (isCell) {
+        const hidden = this.hasAttribute("data-lifted");
+        const slots = Array.from(this.parentElement?.children ?? []).filter(
+          (node) => !node.hasAttribute("data-lifted"),
+        );
+        const index = slots.indexOf(this);
+        box = hidden
+          ? { left: 0, top: 0, width: 0, height: 0 }
+          : { left: (index % 2) * 100, top: Math.floor(index / 2) * 100, width: 100, height: 100 };
+      }
+      return {
+        ...box,
+        right: box.left + box.width,
+        bottom: box.top + box.height,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      };
+    });
+    function Grid() {
+      const [items, setItems] = React.useState(rows("a", "b", "c", "d"));
+      return (
+        <Dnd.Root>
+          <Dnd.Sortable
+            aria-label="list"
+            axis="grid"
+            items={items}
+            getId={(row) => row.id}
+            onReorder={(id, before) =>
+              setItems((current) => moveBefore(current, id, before, (row) => row.id))
+            }
+            renderItem={(row) => (
+              <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+                {row.id}
+              </Dnd.SortableItem>
+            )}
+          />
+        </Dnd.Root>
+      );
+    }
+    render(<Grid />);
+    expect(screen.getByLabelText("list")).toHaveAttribute("data-axis", "grid");
+    expect(screen.getByTestId("row-a")).toHaveAttribute(
+      "aria-keyshortcuts",
+      "Alt+ArrowLeft Alt+ArrowRight",
+    );
+    // a, grabbed at its centre, carried into the second row over d's cell.
+    pressOn(screen.getByTestId("row-a"), 50, 50);
+    moveTo(150, 150);
+    releaseAt(150, 150);
+    expect(order()).toEqual(["b", "c", "d", "a"]);
+    fireEvent.keyDown(screen.getByTestId("row-b"), { key: "ArrowRight", altKey: true });
+    expect(order()).toEqual(["c", "b", "d", "a"]);
+  });
+});
+
+describe('table rows (`as="tbody"`)', () => {
+  function Rows({ onReorder }: { onReorder?: (id: string, before: string | null) => unknown }) {
+    const [items, setItems] = React.useState(rows("a", "b", "c"));
+    return (
+      <Dnd.Root>
+        <table>
+          <thead>
+            <tr>
+              <th>Этап</th>
+              <th>Сделки</th>
+            </tr>
+          </thead>
+          <Dnd.Sortable
+            as="tbody"
+            aria-label="list"
+            items={items}
+            getId={(row) => row.id}
+            header={
+              <tr data-testid="heading">
+                <th colSpan={2}>Продажи</th>
+              </tr>
+            }
+            onReorder={async (id, before) => {
+              await onReorder?.(id, before);
+              setItems((current) => moveBefore(current, id, before, (row) => row.id));
+            }}
+            renderItem={(row) => (
+              <Dnd.SortableItem id={row.id} data-testid={`row-${row.id}`}>
+                <td>{row.id}</td>
+                <td>1</td>
+              </Dnd.SortableItem>
+            )}
+          />
+        </table>
+      </Dnd.Root>
+    );
+  }
+
+  it("renders tr items after the heading row; the gap is a row across every column", async () => {
+    render(<Rows />);
+    const body = screen.getByLabelText("list");
+    expect(body.tagName).toBe("TBODY");
+    expect(body.firstElementChild).toBe(screen.getByTestId("heading"));
+    expect(screen.getByTestId("row-a").tagName).toBe("TR");
+    pressOn(screen.getByTestId("row-a"), 10, 5);
+    moveTo(10, 30);
+    const gap = document.querySelector<HTMLTableRowElement>("tr[data-dnd-gap]");
+    expect(gap?.cells[0]?.colSpan).toBe(2);
+    await act(async () => {
+      releaseAt(10, 30);
+    });
+    expect(order()).toEqual(["b", "a", "c"]);
+  });
+
+  it("carries a row inside a copy of its table with every column at its width", () => {
+    render(<Rows />);
+    pressOn(screen.getByTestId("row-b"), 10, 25);
+    moveTo(10, 60);
+    const copy = document.querySelector("[data-dnd-overlay] table");
+    expect(copy).not.toBeNull();
+    expect(copy?.querySelectorAll("col")).toHaveLength(2);
+    expect(copy?.querySelector("tbody > tr")).toHaveTextContent("b");
+    expect(copy?.querySelector("[data-dnd-item]")).toBeNull();
+    releaseAt(10, 60);
+  });
+
+  it("keeps a pending move drawn and rolls a rejected one back", async () => {
+    let reject: (reason: unknown) => void = () => {};
+    render(
+      <Rows
+        onReorder={() =>
+          new Promise((_, fail) => {
+            reject = fail;
+          })
+        }
+      />,
+    );
+    await act(async () => {
+      fireEvent.keyDown(screen.getByTestId("row-a"), { key: "ArrowDown", altKey: true });
+    });
+    expect(order()).toEqual(["b", "a", "c"]);
+    await act(async () => {
+      reject(new Error("refused"));
+    });
+    expect(order()).toEqual(["a", "b", "c"]);
   });
 });

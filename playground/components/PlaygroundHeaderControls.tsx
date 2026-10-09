@@ -30,7 +30,7 @@ export function PlaygroundHeaderControls() {
             </Button.Icon>
           </Button.Root>
         </Dropdown.Trigger>
-        <Dropdown.Content side="bottom">
+        <Dropdown.Content>
           <Dropdown.Group label="Фон превью">
             {PLAYGROUND_PREVIEW_SURFACES.map((entry) => (
               <Dropdown.CheckboxItem

@@ -1144,7 +1144,6 @@ function RailFlyout({ flyout, children }: { flyout: RailFlyoutState; children: R
     <Popover.Content
       ref={flyout.attach}
       side="right"
-      align="start"
       size={size}
       flush
       className={styles.flyout}

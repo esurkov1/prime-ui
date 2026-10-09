@@ -22,6 +22,19 @@ export const api: ComponentApi = {
           ru: "`default` — по содержимому; `fill` — на всю высоту родителя по центру; `compact` — тихое состояние в меню или списке: текст и иконка меньше, без анимации появления.",
         },
         {
+          name: "tone",
+          type: '"neutral" | "danger"',
+          default: '"neutral"',
+          en: '`neutral` — nothing here (yet); `danger` — the region failed to load: the icon tile turns danger and the root is `role="alert"` unless you pass a `role`.',
+          ru: '`neutral` — здесь (пока) пусто; `danger` — регион не загрузился: плашка иконки становится danger, корень — `role="alert"`, если не передан свой `role`.',
+        },
+        {
+          name: "labels",
+          type: "Partial<EmptyPageLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Встроенные строки, см. «Доступность».",
+        },
+        {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
           en: "`className`, `role` (`status` in a filtered list), `aria-labelledby` and the other div attributes.",
@@ -37,7 +50,7 @@ export const api: ComponentApi = {
         {
           name: "tone",
           type: '"neutral" | "accent" | "danger"',
-          default: '"neutral"',
+          default: "the root's `tone`",
           en: "`neutral` — no data yet, `accent` — a first run and a call to start, `danger` — a failed load.",
           ru: "`neutral` — данных пока нет, `accent` — первый запуск и призыв начать, `danger` — ошибка загрузки.",
         },
@@ -82,6 +95,33 @@ export const api: ComponentApi = {
         },
       ],
     },
+    {
+      name: "EmptyPage.RetryButton",
+      en: "`ref` → `HTMLButtonElement`. The kit's retry of a failed region: an outline neutral Button with the refresh icon and `labels.retry`, in the root's tier. Put it in `EmptyPage.Actions`.",
+      ru: "Готовая кнопка повтора для упавшего региона: Button outline neutral с иконкой обновления и `labels.retry`, в ярусе корня. Кладите в `EmptyPage.Actions`.",
+      props: [
+        {
+          name: "onRetry",
+          type: "() => void | Promise<void>",
+          required: true,
+          en: "Loads the region again. A returned Promise keeps the button in its loading state (and ignores presses) until it settles: resolve — the owner swaps the region to its data; reject — the error state stays and the button is ready again.",
+          ru: "Загружает регион заново. Пока возвращённый Promise не завершился, кнопка в состоянии загрузки и не нажимается: resolve — владелец показывает данные; reject — ошибка остаётся, кнопка снова готова.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "type">',
+          en: "`children` (text instead of `labels.retry`), `disabled`, `className` and the other button attributes.",
+          ru: "`children` (текст вместо `labels.retry`), `disabled`, `className` и остальные атрибуты кнопки.",
+        },
+      ],
+    },
   ],
-  labels: [],
+  labels: [
+    {
+      key: "retry",
+      default: "Повторить",
+      en: "Text of `EmptyPage.RetryButton`.",
+      ru: "Текст `EmptyPage.RetryButton`.",
+    },
+  ],
 };

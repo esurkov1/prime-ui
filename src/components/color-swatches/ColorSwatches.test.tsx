@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { ColorSwatches } from "./ColorSwatches";
+import { balancedColumns, ColorSwatches } from "./ColorSwatches";
 
 const presets = [
   { value: "#ef4444", label: "Красный" },
@@ -73,5 +73,31 @@ describe("ColorSwatches", () => {
   it("disables every swatch", () => {
     render(<ColorSwatches presets={presets} disabled />);
     for (const radio of screen.getAllByRole("radio")) expect(radio).toBeDisabled();
+  });
+
+  it("size sets the swatches only: the label follows the host tier, else m", () => {
+    const { container } = render(<ColorSwatches presets={presets} label="Цвет" size="xl" />);
+    expect(screen.getByRole("radiogroup")).toHaveAttribute("data-size", "xl");
+    expect(container.firstElementChild).toHaveAttribute("data-size", "m");
+  });
+});
+
+describe("balancedColumns", () => {
+  it("keeps one row while every swatch fits", () => {
+    expect(balancedColumns(16, 1000, 28, 8)).toBe(16);
+  });
+
+  it("splits a wrap evenly over the rows", () => {
+    // 14 fit in 520: two rows of 8, not 14 + 2.
+    expect(balancedColumns(16, 520, 28, 8)).toBe(8);
+    // 9 fit: still two rows of 8; 5 fit: four rows of 4.
+    expect(balancedColumns(16, 320, 28, 8)).toBe(8);
+    expect(balancedColumns(16, 176, 28, 8)).toBe(4);
+    // 17 swatches, 8 fit: three rows of 6 · 6 · 5.
+    expect(balancedColumns(17, 284, 28, 8)).toBe(6);
+  });
+
+  it("falls back to one row before a measure", () => {
+    expect(balancedColumns(5, 0, 28, 8)).toBe(5);
   });
 });

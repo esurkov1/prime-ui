@@ -40,3 +40,12 @@
   justify-content: flex-end;
   gap: var(--prime-space-2);
 }
+
+/* undo.tsx: a task with its delete action at the end. */
+.taskRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+  min-width: 0;
+}

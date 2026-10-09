@@ -30,6 +30,8 @@ export function createImageSlot(
   ImageSlotProvider: (props: { children: React.ReactNode }) => React.ReactElement;
   /** Throws outside the root (for other parts that must sit inside it). */
   useImageSlot: () => ImageStatus;
+  /** The root's status setter, for another media part (a video) that reports its own load. */
+  useReportStatus: () => (status: ImageStatus) => void;
   Image: (props: ImageSlotImageProps) => React.ReactElement;
   Fallback: (props: ImageSlotFallbackProps) => React.ReactElement;
 } {
@@ -47,6 +49,10 @@ export function createImageSlot(
     const image = useImageStatus(setImageStatus, { onLoad, onError });
     return (
       <img
+        // Off-screen pictures (a long chat, a gallery) wait until they come near the view, and
+        // decoding never blocks a frame; both can be overridden through the props.
+        loading="lazy"
+        decoding="async"
         src={src}
         alt={alt}
         className={cx(classNames.image, className)}
@@ -79,6 +85,7 @@ export function createImageSlot(
   return {
     ImageSlotProvider,
     useImageSlot: () => useSlotContext().imageStatus,
+    useReportStatus: () => useSlotContext().setImageStatus,
     Image,
     Fallback,
   };

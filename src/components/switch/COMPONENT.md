@@ -40,7 +40,8 @@ Switch.Root          field grid; ref and input props go to the native input (rol
 |---|---|---|---|
 | `checked` | `boolean` | — | Controlled state. |
 | `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
-| `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle (not while `readOnly`). |
+| `onCheckedChange` | `(checked: boolean) => void \| Promise<void>` | — | Called with the new state on every toggle (not while `readOnly` or saving). Return the save's promise to apply it on a server: the thumb waits in the new position with a spinner and `aria-busy`, presses do nothing; resolve — the state stays (a controlled owner sets `checked` before resolving); reject — the thumb glides back (say why with `error`). |
+| `loading` | `boolean` | `false` | Saving, for an owner that tracks the request itself: a spinner in the thumb, `aria-busy` on the input, presses do nothing. A promise from `onCheckedChange` does the same on its own. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
@@ -76,6 +77,7 @@ No `variant` / `tone` / `color`.
 | `readOnly` | normal colours, no hover or press, clicks ignored | the value is meaningful but someone else controls it | `false` |
 | `disabled` | muted track (on = `accent-soft`), dimmed text | the setting is unavailable | `false` |
 | `invalid` | danger ring on the off track | the message is shown elsewhere; otherwise pass `error` | `false` |
+| `loading` | a spinner turns inside the thumb, presses do nothing | the owner tracks the save itself; with a promise from `onCheckedChange` it comes on its own | `false` |
 
 **Combinations**
 - `readOnly` and `disabled` together are pointless — pick one.
@@ -90,6 +92,7 @@ No `variant` / `tone` / `color`.
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid`; danger ring on the off track and on focus; the row shakes once when an error arrives (`data-shake`) |
 | disabled | `disabled` | `data-disabled="true"`; off track `fill-muted`, on track `accent-soft`, `cursor: not-allowed` |
 | read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the field; no hover or press, default cursor |
+| saving | `loading`, or `onCheckedChange` returned a pending promise | the thumb stands in the new position with a `Spinner` inside (accent when on, muted when off; it enters with `enterMotion`), `aria-busy` on the input, `data-loading` on the track, presses ignored; a rejection glides the thumb back (`base`, emphasized) |
 | pressed | pointer press | the track scales to the compact press scale (not when disabled or read-only) |
 | focus-visible | keyboard | outer focus ring around the track |
 
@@ -107,12 +110,13 @@ Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncont
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus to the switch. |
-| `Space` | Toggles it (not while `readOnly`). |
+| `Space` | Toggles it (not while `readOnly` or saving). |
 
 ### ARIA
 - A native `<input type="checkbox" role="switch">` (its native checked state is the switch state), visually hidden over the track and wrapped by the `<label>` row.
 - `aria-invalid`, `aria-readonly` and `aria-describedby` (your ids + the hint or the error) are set on the input.
 - Without visible text, name it with `aria-label` or `aria-labelledby` on `Switch.Root`.
+- While a change is saved (`loading` or a pending promise) the input has `aria-busy`; the thumb's spinner is hidden from assistive tech. A refused save puts the state back — say why with `error`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -124,8 +128,9 @@ No `labels`.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A setting that applies at once, with a hint under its text — `hint`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size, track 24×16 to 44×24; the text follows the control tier — `size`. |
-| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `checked`, `readOnly`, `invalid`, `disabled`. |
+| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `checked`, `readOnly`, `invalid`, `loading`, `disabled`. |
 | [settings-row.tsx](examples/settings-row.tsx) | A settings row with text on the left and a bare track on the right — `aria-labelledby`, `aria-describedby`. |
+| [saving.tsx](examples/saving.tsx) | A setting that applies on the server at once: the thumb waits in its new place with a spinner, and a refused save glides it back and says why — `onCheckedChange`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the state and rewrites the hint to match it — `checked`, `onCheckedChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Switches submitted with a form: the value goes to FormData by `name`, a required one shows an error — `name`, `required`, `error`. |
 
@@ -135,7 +140,8 @@ No `labels`.
 - `invalid` plus `error` → pass `error` alone.
 - A bare switch without `aria-label` / `aria-labelledby` → it has no accessible name.
 - `readOnly` used to block a setting that is unavailable → use `disabled`.
+- Setting `checked` in `onCheckedChange` and flipping it back when the request fails, or a separate «saving» flag → return the request's promise; set `checked` only after it succeeds.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (the row), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
+- **Built from:** [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Spinner](../spinner/COMPONENT.md) (saving); the row is a native `<label>`
 - **See also:** [Checkbox](../checkbox/COMPONENT.md), [Radio](../radio/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

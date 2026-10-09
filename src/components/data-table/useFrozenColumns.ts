@@ -16,20 +16,69 @@ function unfreeze(table: HTMLTableElement, frozen: Frozen) {
   for (const col of colsOf(table)) col.style.width = "";
 }
 
-function freeze(table: HTMLTableElement, frozen: Frozen) {
-  const lead = table.tHead?.rows[0] ?? table.tBodies[0]?.rows[0];
-  const cols = colsOf(table);
-  if (!lead || cols.length !== lead.cells.length) return;
-  const previous = frozen.widths;
-  // Measure the natural layout of what is on screen now.
+type Measure = { cols: HTMLTableColElement[]; measured: number[]; minimums: number[] };
+
+/** Writes: the natural layout, so the widths can be measured. */
+function release(table: HTMLTableElement) {
   table.style.tableLayout = "";
-  for (const col of cols) col.style.width = "";
+  for (const col of colsOf(table)) col.style.width = "";
+}
+
+/** Reads only: the natural widths of the columns on screen, or null when there is nothing to freeze. */
+function measure(table: HTMLTableElement): Measure | null {
+  const cols = colsOf(table);
+  // The head row, else the first body row with a cell per column (not a group header row).
+  const lead =
+    table.tHead?.rows[0] ??
+    [...table.querySelectorAll<HTMLTableRowElement>(":scope > tbody > tr")].find(
+      (row) => row.cells.length === cols.length,
+    );
+  if (!lead || cols.length !== lead.cells.length) return null;
   const measured = [...lead.cells].map((cell) => cell.getBoundingClientRect().width);
   // Not laid out (hidden, or a test DOM): nothing to freeze.
-  if (measured.every((width) => width === 0)) return;
+  if (measured.every((width) => width === 0)) return null;
   // Browsers ignore `min-width` on table cells, so a column's `minWidth` (resolved to px) is
   // enforced here: frozen widths never go below it.
   const minimums = [...lead.cells].map((cell) => parseFloat(getComputedStyle(cell).minWidth) || 0);
+  return { cols, measured, minimums };
+}
+
+function freeze(table: HTMLTableElement, frozen: Frozen) {
+  release(table);
+  const result = measure(table);
+  if (result) apply(table, frozen, result);
+}
+
+/**
+ * Tables whose container width settled, frozen again together in one frame: every release, then
+ * every measurement, then every write — one layout for all of them, not one per table (a sidebar
+ * collapsing resizes every table beside it).
+ */
+const refreeze = new Map<HTMLTableElement, Frozen>();
+let refreezeFrame = 0;
+
+function scheduleRefreeze(table: HTMLTableElement, frozen: Frozen) {
+  refreeze.set(table, frozen);
+  if (refreezeFrame) return;
+  refreezeFrame = requestAnimationFrame(() => {
+    refreezeFrame = 0;
+    const tables = [...refreeze].filter(([node]) => node.isConnected);
+    refreeze.clear();
+    for (const [node, state] of tables) {
+      state.widths = null;
+      node.style.minWidth = "";
+      release(node);
+    }
+    const measured = tables.map(([node]) => measure(node));
+    tables.forEach(([node, state], index) => {
+      const result = measured[index];
+      if (result) apply(node, state, result);
+    });
+  });
+}
+
+function apply(table: HTMLTableElement, frozen: Frozen, { cols, measured, minimums }: Measure) {
+  const previous = frozen.widths;
   const next = measured.map((width, index) =>
     Math.max(width, previous?.[index] ?? 0, minimums[index] ?? 0),
   );
@@ -80,9 +129,7 @@ export function useFrozenColumns(
       clearTimeout(settle);
       settle = setTimeout(() => {
         const table = tableRef.current;
-        if (!table) return;
-        unfreeze(table, frozen.current);
-        freeze(table, frozen.current);
+        if (table) scheduleRefreeze(table, frozen.current);
       }, RESIZE_SETTLE_MS);
     });
     observer.observe(root);

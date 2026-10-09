@@ -77,10 +77,10 @@ export const api: ComponentApi = {
         },
         {
           name: "align",
-          type: '"start" | "center" | "end"',
-          default: '"start"',
-          en: "Alignment along the trigger; shifts inside the viewport.",
-          ru: "Выравнивание по триггеру; панель сдвигается в пределы экрана.",
+          type: '"auto" | "start" | "center" | "end"',
+          default: '"auto"',
+          en: "Alignment along the trigger. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge).",
+          ru: "Выравнивание по триггеру. `auto` (по умолчанию) выравнивает панель по тому краю триггера, за которым больше места: у триггера ближе к концу экрана — по концу, и панель растёт к началу, ближе к началу — наоборот; `start`, `center` или `end` задают край явно (у края экрана он всё равно переворачивается).",
         },
         {
           name: "size",
@@ -102,6 +102,13 @@ export const api: ComponentApi = {
           default: "false",
           en: "Tab cycles inside the panel (forms). Without it Tab past the last (Shift+Tab before the first) stop closes the panel and returns focus to the trigger.",
           ru: "Tab ходит по кругу внутри панели (формы). Без него Tab за последний элемент закрывает панель и возвращает фокус на триггер.",
+        },
+        {
+          name: "initialFocus",
+          type: "boolean",
+          default: "true with Trigger, false with Anchor",
+          en: "Focus moves into the panel on open (`[data-autofocus]`, else the first tab stop, else the panel). Turn it on for an anchored panel opened by a command, such as a Dropdown item, so focus does not stay on the menu trigger.",
+          ru: "Фокус переходит в панель при открытии (`[data-autofocus]`, иначе первый фокусируемый, иначе панель). Включите для панели с `Anchor`, открытой командой — пунктом Dropdown, — чтобы фокус не остался на кнопке меню.",
         },
         {
           name: "flush",

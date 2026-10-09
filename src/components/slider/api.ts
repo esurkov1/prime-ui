@@ -27,6 +27,18 @@ export const api: ComponentApi = {
           ru: "Новое число при перетаскивании и каждом шаге с клавиатуры.",
         },
         {
+          name: "onCommit",
+          type: "(value: number) => void | Promise<void>",
+          en: "The value the person settled on: once when the thumb is released or after a key moved it, only when it differs from the last commit. Save here, not on every `onValueChange` step. Return the save's promise: the thumb dims and the input has `aria-busy` until it settles (only the latest commit's answer counts); reject — the value glides back to the last saved one (through `onValueChange` when controlled).",
+          ru: "Значение, на котором человек остановился: один раз, когда ползунок отпустили или сдвинули клавишей, и только если оно отличается от прошлого. Сохраняйте здесь, а не на каждом шаге `onValueChange`. Верните промис сохранения: ползунок приглушён, у поля `aria-busy`, пока промис не завершится (важен ответ только на последний коммит); reject — значение плавно возвращается к последнему сохранённому (через `onValueChange` в управляемом режиме).",
+        },
+        {
+          name: "name",
+          type: "string",
+          en: "Name of the range input, submitted with a form.",
+          ru: "Имя ползунка для отправки с формой.",
+        },
+        {
           name: "min",
           type: "number",
           default: "0",

@@ -1,0 +1,45 @@
+/*
+ * A dark translucent pill over a picture or a video (the media shade, one look in both themes):
+ * the duration of a video tile or a video circle, the play and mute marks. Decorative — the host
+ * names what it says. Position is the host's.
+ *
+ *   .pill   caption text (a duration), a dot or a glyph may follow
+ *   .mark   a round mark of a glyph (`--pill-size`, default a control `s` height)
+ */
+.pill,
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-media-shade);
+  color: var(--prime-color-media-shade-fg);
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(var(--prime-space-2));
+  backdrop-filter: blur(var(--prime-space-2));
+}
+
+/* The caption of a voice message's time row: the same size, weight and muted tone, on a pill
+   dense enough to keep it AA over any frame. */
+.pill {
+  gap: var(--prime-space-1);
+  min-block-size: calc(var(--prime-text-caption-line-height) + var(--prime-space-1));
+  padding-inline: var(--prime-space-2);
+  background: var(--prime-color-media-pill);
+  color: var(--prime-color-media-pill-fg);
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-font-weight-regular);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mark {
+  --pill-size: var(--prime-control-s-height);
+  --prime-icon-size: var(--prime-icon-s);
+
+  inline-size: var(--pill-size);
+  block-size: var(--pill-size);
+}

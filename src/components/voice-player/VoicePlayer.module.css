@@ -1,0 +1,209 @@
+/*
+ * VoicePlayer — a row of the round play disk, the waveform (the seek slider) over the time row and,
+ * when it can be transcribed, the transcript button at the waveform's end; the transcript opens
+ * under the row (`internal/transcript`). The time row holds the time, the unplayed dot, the rate
+ * chip and, in a chat message, the meta's spacer last (at the end of the transcript while open).
+ * Colors are semantic roles only: a chat bubble restyles its subtree by overriding them.
+ *   disk      the shared play disk (`internal/mediaPlayer` `PlayDisk`, `solid`): accent default
+ *             with the accent fg glyph; a transfer is drawn on the same disk
+ *   played    accent default bars; unplayed bars fill-strong
+ *   time      text-muted, tabular numbers; the unplayed dot is accent
+ * Bars are centred on the line, the look of the Composer's live wave. The played part is a second
+ * bar layer clipped by `--vp-progress` (0…1), which the component writes on that layer every frame
+ * while playing — the only per-frame write.
+ */
+.root {
+  --vp-bar: calc(var(--prime-space-1) * 0.75);
+  --vp-gap: calc(var(--prime-space-1) / 2);
+  --vp-progress: 0;
+
+  display: inline-flex;
+  flex-direction: column;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  color: var(--prime-color-text-primary);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-3);
+  min-inline-size: 0;
+}
+
+/* The waveform and, at its end, the transcript button; the time row runs under both, so the
+   bubble's meta at the time row's end never meets the button. */
+.waveLine {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-inline-size: 0;
+}
+
+.transcribe {
+  flex: none;
+}
+
+.audio {
+  display: none;
+}
+
+.body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  inline-size: calc(var(--prime-space-24) * 2);
+  min-inline-size: var(--prime-space-16);
+}
+
+/* ─── Waveform (the slider) ─────────────────────────────────────────────── */
+
+.wave {
+  position: relative;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  block-size: var(--prime-space-5);
+  border-radius: var(--prime-radius-xs);
+  cursor: pointer;
+  touch-action: none;
+  outline: none;
+}
+
+.wave:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.wave[aria-disabled="true"] {
+  cursor: default;
+}
+
+.bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: var(--vp-gap);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bar {
+  flex: 0 0 var(--vp-bar);
+  block-size: max(var(--vp-bar), calc(var(--vp-level) * 100%));
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-strong);
+}
+
+.played {
+  clip-path: inset(0 calc((1 - var(--vp-progress)) * 100%) 0 0);
+}
+
+.played:dir(rtl) {
+  clip-path: inset(0 0 0 calc((1 - var(--vp-progress)) * 100%));
+}
+
+.played .bar {
+  background: var(--prime-color-accent-default);
+}
+
+/* A seek while paused (click, key, back to start at the end) glides; playback and dragging follow
+   the frame. */
+.root:not([data-playing="true"], [data-seeking="true"]) .played {
+  transition: clip-path var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root:is([data-disabled="true"], [data-transfer="true"]) .played {
+  visibility: hidden;
+}
+
+/* ─── Time row ──────────────────────────────────────────────────────────── */
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+  min-inline-size: 0;
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  font-variant-numeric: tabular-nums;
+  color: var(--prime-color-text-muted);
+}
+
+.root[data-disabled="true"] .meta {
+  color: var(--prime-color-text-disabled);
+}
+
+.time {
+  white-space: nowrap;
+}
+
+.dot {
+  flex-shrink: 0;
+  inline-size: calc(var(--prime-space-1) * 1.5);
+  block-size: calc(var(--prime-space-1) * 1.5);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-accent-default);
+  animation: vpDotIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+.dot[data-state="closed"] {
+  animation: vpDotOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
+}
+
+@keyframes vpDotIn {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes vpDotOut {
+  to {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* Rate chip: a small fill on the caption line; the label morphs between speeds. */
+.rate {
+  flex-shrink: 0;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--prime-space-1);
+  border: 0;
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-subtle);
+  color: var(--prime-color-text-secondary);
+  font: inherit;
+  font-weight: var(--prime-font-weight-medium);
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .rate:hover:not(:disabled) {
+    background: var(--prime-color-fill-subtle-active);
+    color: var(--prime-color-text-primary);
+  }
+}
+
+.rate:active:not(:disabled) {
+  transform: scale(var(--prime-motion-press-scale-compact));
+}
+
+.rate:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.rate:disabled {
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}

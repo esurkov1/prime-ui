@@ -127,10 +127,14 @@ Derive statuses from `value`; set `status="danger"` only on the failing step wit
 
 Root attributes: `data-orientation`, `data-size`. Uncontrolled (`defaultValue`) clicks still select items.
 
+Motion: a status change moves the indicator's fill, color and halo over `base`; the row fill and text color change over `fast`; press scales the step to `--prime-motion-press-scale`. Under reduced motion the indicator changes at once.
+
 ## Layout & spacing
 - The root is a size container (`inline-size: 100%`): give it a definite width, a shrink-wrapped parent collapses it.
 - Wizard: stepper column and form side by side with `gap: var(--prime-space-8)`, stacking on narrow widths.
 - Vertical rows are separated by `var(--prime-space-1)` (`var(--prime-space-2)` at `size="xl"`); the same value is the row gap of a wrapping horizontal stepper.
+- Horizontal steps and their chevrons sit 8 · 12 · 16 · 20 · 24 apart (xs → xl); below a 30rem (480px) container each step takes its own full-width row with the vertical row padding.
+- Indicator → text gap 8 (xs, s) · 12 (m, l) · 16 (xl); titles are medium weight and wrap long words.
 
 ## Accessibility
 

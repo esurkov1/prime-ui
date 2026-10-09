@@ -22,7 +22,9 @@ export default function SwitchInFormExample() {
         name="processing"
         required
         error={error}
-        onCheckedChange={(checked) => checked && setError(undefined)}
+        onCheckedChange={(checked) => {
+          if (checked) setError(undefined);
+        }}
       >
         <Switch.Label>Согласие на обработку данных</Switch.Label>
       </Switch.Root>

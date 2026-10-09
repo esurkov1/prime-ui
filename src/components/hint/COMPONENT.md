@@ -6,11 +6,11 @@
 > Help text or a validation error under a field.
 
 ## When to use
-- Under a control without `hint` / `error` props (SegmentedControl, Slider, a custom control) where you wire the ids yourself: format rules, limits, where the value comes from.
+- Under a custom control without `hint` / `error` props, or a hand-built field, where you wire the ids yourself: format rules, limits, where the value comes from.
 - As the error message of such a control (`invalid`), in the same slot as the hint.
 
 ## When not to use
-- Input, Textarea, Select, Checkbox and other fields with `hint` / `error` props → pass the props; they render Hint and link the ids ([Input](../input/COMPONENT.md), [Textarea](../textarea/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md)).
+- Input, Textarea, Select, Checkbox, Slider, SegmentedControl and other fields with `hint` / `error` props → pass the props; they render Hint and link the ids ([Input](../input/COMPONENT.md), [Textarea](../textarea/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Slider](../slider/COMPONENT.md)).
 - The field name → use [Label](../label/COMPONENT.md).
 - A message about the whole page or form (success, warning) → use [Banner](../banner/COMPONENT.md) or a [Notification](../notification/COMPONENT.md).
 - An explanation on hover → use [Tooltip](../tooltip/COMPONENT.md).
@@ -96,7 +96,7 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | Help text under a control without its own `hint` prop, linked to it by `id` and `aria-describedby`. |
+| [overview.tsx](examples/overview.tsx) | Help text under a hand-built field, linked to its input by `id` and `aria-describedby`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier, matching the field above: 12/16 for xs–m, 13/20 for l and xl — `size`. |
 | [states.tsx](examples/states.tsx) | Default help text next to an error and a hint under a disabled control — `invalid`, `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A leading icon centred on the first line, in the default and the error state — `Hint.Icon`. |

@@ -16,6 +16,60 @@
   gap: var(--prime-space-10);
 }
 
+/* list-detail: main of a viewport-high shell — a column of a fixed height the page fills. */
+.fillMain {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(var(--prime-space-24) * 5);
+  padding: var(--prime-layout-gutter-m);
+  border-radius: var(--prime-card-radius);
+  background: var(--prime-color-layer-current);
+}
+
+/* A pane's card: an optional header row, then the scrolling region takes the rest. */
+.paneCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.threadHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  padding: var(--prime-space-3) var(--prime-space-4);
+}
+
+.pane {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.dialogs,
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  margin: 0;
+  padding: var(--prime-space-2);
+  list-style: none;
+}
+
+.messages {
+  gap: var(--prime-space-3);
+  padding: var(--prime-space-2) var(--prime-space-4) var(--prime-space-4);
+}
+
+/* A dialog row: the name at the start, the unread count at the end. */
+.dialog {
+  justify-content: space-between;
+}
+
+.hint {
+  padding: var(--prime-space-2) var(--prime-space-4);
+}
+
 /* A phone-width main column (360px). */
 .narrow {
   width: min(100%, calc(var(--prime-space-24) * 3.75));

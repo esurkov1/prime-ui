@@ -135,7 +135,8 @@
   transition:
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
     background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* Native input: transparent, on top, its thumb matches `.thumb` so hit area = visual. */
@@ -242,4 +243,24 @@
 
 .root[data-disabled="true"] .thumb {
   box-shadow: none;
+}
+
+/* Saving (`onCommit` returned a promise): the thumb quiets down until the answer, both ways eased. */
+.root[data-pending="true"] .thumb {
+  opacity: 0.6;
+}
+
+/* A refused commit: the thumb and the fill glide back to the saved value. While a drag or a key
+   moves the value they follow it at once. */
+.root[data-settling="true"] .thumb {
+  transition:
+    inset-inline-start var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
+    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-settling="true"] .range {
+  transition: width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }

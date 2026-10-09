@@ -354,6 +354,12 @@ holds across the kit.
   - **A scrim click of Modal / Drawer / Sheet / CommandMenu** returns focus to the opener: the page behind was inert, the
     click landed on the scrim, not on a control, so the opener is the only sensible place to continue from (the
     keyboard user's position is kept).
+- **Placement.** Every anchored panel (Popover, Dropdown, Select, TagSelect, Datepicker, ColorPresets) opens
+  below its trigger, lined up with the trigger edge that has more room beyond it (`side="bottom"`,
+  `align="auto"` — `DEFAULT_SIDE` / `DEFAULT_ALIGN` in `usePosition`): a trigger near the end of the
+  screen lines up its end edge and the panel grows toward the start. It flips to the top only when it
+  does not fit. Explicit `align` is for a panel that must line up with one edge of a block.
+  Tooltip centres on its trigger.
 - **Gestures.** Only a sheet swipes: Sheet, and a Modal or a floating layer shown as a bottom sheet below
   640, close with a swipe down from the grab handle or the header (`useSwipeDismiss`), as an extra way out
   next to Escape and the scrim, following `closeOnOutsideClick`. A Drawer has no touch gestures: it closes

@@ -23,9 +23,16 @@
   user-select: none;
 }
 
-/* Hue variables come from `internal/palette` (`.hue` on the root). */
+/*
+ * Hue variables come from `internal/palette` (`.hue` on the root). The soft hue is translucent in
+ * dark: it is composited over the surface the avatar stands on (`--avatar-ring`, set by surfaces to
+ * their own fill; the context layer otherwise), so the fill is opaque everywhere and an overlapped
+ * neighbour never shows through, while it looks the same as the bare soft hue on that surface.
+ */
 .root {
-  background: var(--hue-soft);
+  background:
+    linear-gradient(var(--hue-soft), var(--hue-soft)),
+    var(--avatar-ring, var(--prime-color-layer-current));
   color: var(--hue-text);
 }
 
@@ -131,14 +138,6 @@
 
 .group > * {
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width))
-    var(--avatar-ring, var(--prime-color-layer-current));
-}
-
-/* Soft hues are translucent: back them with the opaque surface so overlapped neighbours never
- * show through. */
-.group > .root {
-  background:
-    linear-gradient(var(--hue-soft), var(--hue-soft)),
     var(--avatar-ring, var(--prime-color-layer-current));
 }
 

@@ -72,9 +72,7 @@ const dirs = exportedDirs();
  * Lucide glyphs examples and patterns may still import directly: domain glyphs the kit registry
  * does not carry. Every entry needs a reason; a glyph the registry has never belongs here.
  */
-const DOMAIN_GLYPHS: Record<string, string> = {
-  Bike: "Thumbnail examples show a motorcycle catalog and wrap the glyph with createIcon.",
-};
+const DOMAIN_GLYPHS: Record<string, string> = {};
 
 /** Registry names per lucide glyph a kit glyph is drawn from (aliases share one glyph). */
 function registryNamesByGlyph(): Map<unknown, string[]> {

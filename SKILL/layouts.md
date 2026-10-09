@@ -94,9 +94,65 @@ Phone navigation for 2–6 main sections is a `BottomNav.Root` in `AppShell.Foot
 your own media query. The shell hides the footer while the Sidebar rail is on screen and shows it
 while the Sidebar is off-canvas, so the bar and the rail never appear together.
 
+Next.js App Router: the package is marked `"use client"`, but a server component cannot dot into it
+(`<Button.Root>`) or pass it callbacks. Put `AppLayout` and every screen in a file that starts with
+`"use client"` and render them from `app/layout.tsx` and the pages; import `bundle.css` in the root
+layout and put `data-theme` on `<html>` there.
+
 A nested record page keeps its `Breadcrumb` at the top of `PageContent.Header`, above the title
 ([patterns/detail-page.tsx](patterns/detail-page.tsx)) — not in `AppHeader`. `AppHeader.Actions` holds at most notifications, the account and one primary action; page
 actions stay in `PageContent.Actions`. With `offCanvas="always"` pass `show="always"` to the menu button.
+
+### The page title in the header
+
+A page that wants all its height for the work (a board, a chat, a dense register) may drop the
+heading row in main and let the header carry the page — one or the other, never both:
+
+- `AppHeader.Title as="h1"` is the page's only `<h1>` (the description stays outside its name);
+  main then has no `PageContent.Header`.
+- The page's tools — sections, the period, filters, the page's primary action — go into
+  `AppHeader.Tools` as a `PageToolbar.Root`: the header's second row, full width, sticky with it. The
+  toolbar lays itself out from that width (one row when wide, two on a phone), so the tools wrap
+  under the title instead of squeezing it. `AppHeader.Actions` keeps notifications and the account.
+
+```tsx
+import { AppHeader, Button, Icon, PageToolbar, SegmentedControl } from "prime-ui-kit";
+
+type DealsHeaderProps = { view: string; onViewChange: (view: string) => void };
+
+export function DealsHeader({ view, onViewChange }: DealsHeaderProps) {
+  return (
+    <AppHeader.Root>
+      <AppHeader.Start>
+        <AppHeader.Title as="h1">Сделки</AppHeader.Title>
+      </AppHeader.Start>
+      <AppHeader.Tools>
+        <PageToolbar.Root aria-label="Сделки">
+          <PageToolbar.Sections>
+            <SegmentedControl.Root
+              fullWidth
+              value={view}
+              onValueChange={onViewChange}
+              aria-label="Вид"
+            >
+              <SegmentedControl.Item value="board">Доска</SegmentedControl.Item>
+              <SegmentedControl.Item value="list">Список</SegmentedControl.Item>
+            </SegmentedControl.Root>
+          </PageToolbar.Sections>
+          <PageToolbar.Actions>
+            <Button.Root>
+              <Button.Icon>
+                <Icon name="action.add" />
+              </Button.Icon>
+              Новая сделка
+            </Button.Root>
+          </PageToolbar.Actions>
+        </PageToolbar.Root>
+      </AppHeader.Tools>
+    </AppHeader.Root>
+  );
+}
+```
 
 With React Router put `<Outlet />` as the child and pass `NavLink` through `Sidebar.Item asChild`
 (see `src/layout/sidebar/examples/router.tsx`).
@@ -128,6 +184,14 @@ from what people do, not from how the backend is split. The full guide with the 
   ([patterns/settings-page.tsx](patterns/settings-page.tsx)), or `maxWidth="readable"` for a single
   narrow column of fields.
 - Long reading text (terms, help): `PageContent.Root maxWidth="readable"`.
+- A page as high as the panel (a log, a board, a chat): `AppShell.Root fillViewport` +
+  `PageContent.Root fill`; the body passes its free height to a filling child — DataTable
+  `scrollHeight="fill"`, Crossfade `fill`, `PageContent.Split`. Never compute heights from `100vh`.
+- List + detail (mail, a messenger, a ticket queue): `PageContent.Split` with `PageContent.List` and
+  `PageContent.Detail` in a filling page. Side by side from 48rem of the split's own width, one pane
+  at a time below it with `PageContent.BackButton` first in the detail's header; `open` is «a record
+  is chosen». Each pane gives its last child the free height: a Card with its own `ScrollContainer`
+  (`anchor="end"` for a thread). Details that open over a table and close again are a Drawer instead.
 
 ## Which pattern to start from
 

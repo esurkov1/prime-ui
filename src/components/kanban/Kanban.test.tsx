@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
-import type * as React from "react";
+import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Dnd } from "@/components/dnd/Dnd";
@@ -149,8 +149,70 @@ describe("Kanban", () => {
     fireEvent.keyDown(screen.getByTestId("card-a"), { key: "ArrowRight", altKey: true });
     expect(onValueChange).not.toHaveBeenCalled();
     expect(screen.getByRole("status")).toHaveTextContent(
-      "Счёт для «Севера»: колонка «В работе» не принимает карточку",
+      "Счёт для «Севера»: Колонка «В работе» заполнена (1)",
     );
+  });
+
+  it("canDrop may say why: the reason is announced", () => {
+    render(
+      <Board
+        canDrop={(_id, columnId) => (columnId === "doing" ? "Сначала оцените задачу" : true)}
+      />,
+    );
+    fireEvent.keyDown(screen.getByTestId("card-a"), { key: "ArrowRight", altKey: true });
+    expect(titles("К выполнению")).toEqual(["Счёт для «Севера»", "Отчёт по складу"]);
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Счёт для «Севера»: Сначала оцените задачу",
+    );
+  });
+
+  it("colors a column's count by its stage; a full one turns orange", () => {
+    render(
+      <Board
+        columns={[
+          { id: "todo", title: "К выполнению", color: "blue" },
+          { id: "doing", title: "В работе", color: "purple", limit: 1 },
+        ]}
+      />,
+    );
+    const badge = (text: string) => screen.getByText(text).closest("[data-color]");
+    expect(badge("2")).toHaveAttribute("data-color", "blue");
+    expect(badge("1 / 1")).toHaveAttribute("data-color", "orange");
+  });
+
+  it("draws a meta line under the title that describes the column's list", () => {
+    render(
+      <Board
+        columns={[{ ...(COLUMNS[0] as KanbanColumn), description: "Новые заявки" }]}
+        renderColumnMeta={(col) => `${col.id === "todo" ? 2 : 0} сделки · 480 000 ₽`}
+      />,
+    );
+    expect(screen.getByText("2 сделки · 480 000 ₽")).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "К выполнению" })).toHaveAccessibleDescription(
+      "Новые заявки 2 сделки · 480 000 ₽",
+    );
+  });
+
+  it("a locked column shows a lock for a grip and nothing moves past it", () => {
+    const onColumnOrderChange = vi.fn();
+    render(
+      <Board
+        reorderableColumns
+        onColumnOrderChange={onColumnOrderChange}
+        columns={[
+          { id: "todo", title: "К выполнению", locked: true },
+          COLUMNS[1] as KanbanColumn,
+          COLUMNS[2] as KanbanColumn,
+        ]}
+      />,
+    );
+    expect(screen.getByRole("img", { name: "Закреплено" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Переместить колонку «К выполнению»" })).toBeNull();
+    const grip = screen.getByRole("button", { name: "Переместить колонку «В работе»" });
+    fireEvent.keyDown(grip, { key: "ArrowLeft", altKey: true });
+    expect(onColumnOrderChange).not.toHaveBeenCalled();
+    fireEvent.keyDown(grip, { key: "ArrowRight", altKey: true });
+    expect(headings()).toEqual(["К выполнению", "Готово", "В работе"]);
   });
 
   it("canDrop refuses a card in a column", () => {
@@ -318,6 +380,128 @@ describe("Kanban", () => {
       altKey: true,
     });
     expect(headings()).toEqual(["Готово", "К выполнению", "В работе"]);
+  });
+
+  /** A promise the test settles by hand. */
+  function deferred() {
+    let resolve: () => void = () => {};
+    let reject: (reason: unknown) => void = () => {};
+    const promise = new Promise<void>((done, fail) => {
+      resolve = done;
+      reject = fail;
+    });
+    return { promise, resolve, reject };
+  }
+
+  /** Card ids in a column (a busy card also holds its spinner's text). */
+  const cards = (title: string) =>
+    column(title)
+      .queryAllByRole("listitem")
+      .map((item) => item.getAttribute("data-kanban-item"));
+
+  it("async card move: the card waits busy in its new place; resolve keeps it there", async () => {
+    const save = deferred();
+    render(<Board onValueChange={() => save.promise} />);
+    fireEvent.keyDown(screen.getByTestId("card-b"), { key: "ArrowRight", altKey: true });
+
+    expect(cards("В работе")).toEqual(["c", "b"]);
+    const card = screen.getByTestId("card-b");
+    expect(card).toHaveAttribute("aria-busy", "true");
+    expect(card).toHaveAttribute("data-pending");
+    // Busy: it does not move again until the answer.
+    expect(card).not.toHaveAttribute("aria-keyshortcuts");
+
+    await act(async () => {
+      save.resolve();
+    });
+    expect(cards("В работе")).toEqual(["c", "b"]);
+    expect(screen.getByTestId("card-b")).not.toHaveAttribute("aria-busy");
+  });
+
+  it("async card move: reject puts the card back and announces the failure", async () => {
+    const save = deferred();
+    render(<Board onValueChange={() => save.promise} />);
+    fireEvent.keyDown(screen.getByTestId("card-b"), { key: "ArrowRight", altKey: true });
+    expect(cards("В работе")).toEqual(["c", "b"]);
+
+    await act(async () => {
+      save.reject(new Error("409"));
+    });
+    expect(titles("К выполнению")).toEqual(["Счёт для «Севера»", "Отчёт по складу"]);
+    expect(titles("В работе")).toEqual(["Онбординг"]);
+    expect(screen.getByTestId("card-b")).not.toHaveAttribute("aria-busy");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Не удалось переместить «Отчёт по складу», карточка вернулась на место",
+    );
+  });
+
+  it("async card move inside a column: reject restores the order", async () => {
+    render(
+      <Board
+        onValueChange={async () => {
+          throw new Error("offline");
+        }}
+      />,
+    );
+    await act(async () => {
+      fireEvent.keyDown(screen.getByTestId("card-a"), { key: "ArrowDown", altKey: true });
+    });
+    expect(titles("К выполнению")).toEqual(["Счёт для «Севера»", "Отчёт по складу"]);
+  });
+
+  it("controlled async move: the parent applies it before resolving", async () => {
+    function Controlled() {
+      const [value, setValue] = React.useState<KanbanValue>(PLACEMENT);
+      return (
+        <Board
+          defaultValue={undefined}
+          value={value}
+          onValueChange={async (next) => {
+            await Promise.resolve();
+            setValue(next);
+          }}
+        />
+      );
+    }
+    render(<Controlled />);
+    await act(async () => {
+      fireEvent.keyDown(screen.getByTestId("card-b"), { key: "ArrowRight", altKey: true });
+    });
+    expect(titles("В работе")).toEqual(["Онбординг", "Отчёт по складу"]);
+    expect(screen.getByTestId("card-b")).not.toHaveAttribute("aria-busy");
+  });
+
+  it("async column move: a spinner stands in for the grip; reject puts the column back and says so", async () => {
+    const save = deferred();
+    render(<Board reorderableColumns onColumnOrderChange={() => save.promise} />);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Переместить колонку «К выполнению»" }), {
+      key: "ArrowRight",
+      altKey: true,
+    });
+    expect(headings()).toEqual(["В работе", "К выполнению", "Готово"]);
+    const moved = document.querySelector('[data-kanban-column="todo"]') as HTMLElement;
+    expect(moved).toHaveAttribute("aria-busy", "true");
+    expect(screen.queryByRole("button", { name: "Переместить колонку «К выполнению»" })).toBeNull();
+
+    await act(async () => {
+      save.reject(new Error("409"));
+    });
+    expect(headings()).toEqual(["К выполнению", "В работе", "Готово"]);
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Не удалось переместить колонку «К выполнению», она вернулась на место",
+    );
+  });
+
+  it("async column move: resolve keeps the new order", async () => {
+    render(<Board reorderableColumns onColumnOrderChange={async () => {}} />);
+    await act(async () => {
+      fireEvent.keyDown(
+        screen.getByRole("button", { name: "Переместить колонку «К выполнению»" }),
+        { key: "ArrowRight", altKey: true },
+      );
+    });
+    expect(headings()).toEqual(["В работе", "К выполнению", "Готово"]);
+    expect(document.querySelector('[data-kanban-column="todo"]')).not.toHaveAttribute("aria-busy");
   });
 
   it("disabled board has no grips", () => {

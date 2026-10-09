@@ -11,8 +11,10 @@ import type { ControlSize } from "@/internal/states";
 
 import type { DataTableLabels } from "./DataTable";
 import styles from "./DataTable.module.css";
-import { columnValue, type MeasureRow } from "./rows";
-import type { DataTableCellAlign, DataTableColumn } from "./types";
+import { ReorderHandleCell, RowElement, type RowReorderShared } from "./reorder";
+import { isPlainClick, opensRow } from "./rowEvents";
+import { columnValue, type MeasureRow, scaleStep } from "./rows";
+import type { DataTableCellAlign, DataTableColumn, DataTableRowClickEvent } from "./types";
 import type { RowSelectionHandlers } from "./useRowSelection";
 
 export function columnAlign<Row>(column: DataTableColumn<Row>): DataTableCellAlign {
@@ -65,19 +67,32 @@ export type RowShared<Row> = {
   stickyFirstColumn: boolean;
   striped: boolean;
   totalColumns: number;
-  getRowLabel?: (row: Row) => string;
-  onRowClick?: (row: Row, index: number, event: React.MouseEvent<HTMLTableRowElement>) => void;
+  /**
+   * Opens a row in place (`onRowClick`); null without it. Stable: it calls the owner's latest
+   * handler, so an inline handler never re-renders every row.
+   */
+  openRow: ((row: Row, index: number, event: DataTableRowClickEvent) => void) | null;
   renderExpanded?: (row: Row) => React.ReactNode;
   rowDomId: (key: React.Key) => string;
   detailDomId: (key: React.Key) => string;
+  /** Value range of every `scale` column (heatmap shading). */
+  scaleDomains: Map<string, [number, number]>;
   selection: RowSelectionHandlers;
   toggleExpanded: (key: React.Key) => void;
+  /** Row reordering (`onReorder`): a handle column and sortable rows; null without it. */
+  reorder: RowReorderShared | null;
 };
 
 type DataTableRowProps<Row> = {
   shared: RowShared<Row>;
   row: Row;
   rowKey: React.Key;
+  /** `getRowLabel(row)`: values, not the owner's functions, so rows memoize on what they show. */
+  rowLabel: string | undefined;
+  /** The row opens (`getRowHref` / `onRowClick`, not taken out by `isRowClickable`). */
+  opens: boolean;
+  /** `getRowHref(row)` of a row that opens as a link. */
+  href: string | undefined;
   index: number;
   depth: number;
   expandable: boolean;
@@ -96,6 +111,9 @@ function DataTableRowImpl<Row>({
   shared,
   row,
   rowKey,
+  rowLabel,
+  opens,
+  href,
   index,
   depth,
   expandable,
@@ -106,8 +124,13 @@ function DataTableRowImpl<Row>({
   selected,
   childControls,
 }: DataTableRowProps<Row>) {
-  const { columns, size, labels, selection, renderExpanded } = shared;
-  const rowLabel = shared.getRowLabel?.(row);
+  const { columns, size, labels, selection, renderExpanded, openRow: onRowClick } = shared;
+  // In-place rows take focus themselves; a link row's focus stop is its link.
+  const focusable = opens && href === undefined;
+  const scaleOf = (column: DataTableColumn<Row>) => {
+    const domain = column.scale ? shared.scaleDomains.get(column.id) : undefined;
+    return domain ? scaleStep(columnValue(row, column), domain) : undefined;
+  };
   // Folds on the same clock as it opens (`base`), so the room and the text leave together.
   const detail = usePresence(expanded && Boolean(renderExpanded), { exitDuration: "base" });
   const detailContent = detail.mounted ? renderExpanded?.(row) : null;
@@ -139,12 +162,16 @@ function DataTableRowImpl<Row>({
   // One fragment either way, so opening the detail never remounts the row (the toggle keeps focus).
   return (
     <>
-      <tr
+      <RowElement
+        reorder={shared.reorder}
+        rowKey={rowKey}
         id={shared.rowDomId(rowKey)}
         className={styles.row}
         style={sub ? ({ "--dt-depth": depth } as React.CSSProperties) : undefined}
         data-stripe={shared.striped && index % 2 === 1 ? "alt" : undefined}
-        data-clickable={shared.onRowClick ? "true" : undefined}
+        data-clickable={opens ? "true" : undefined}
+        data-link={href !== undefined ? "true" : undefined}
+        tabIndex={focusable ? 0 : undefined}
         data-level={sub ? depth : undefined}
         data-fold={fold}
         onAnimationEnd={
@@ -157,8 +184,35 @@ function DataTableRowImpl<Row>({
         data-expanded={expanded ? "true" : undefined}
         data-animate={animate ? "true" : undefined}
         aria-selected={shared.selectable ? selected : undefined}
-        onClick={(event) => shared.onRowClick?.(row, index, event)}
+        onClick={
+          opens && onRowClick
+            ? (event) => {
+                if (!opensRow(event)) return;
+                // A link row keeps the browser's modified clicks (new tab, new window).
+                if (href !== undefined && !isPlainClick(event)) return;
+                onRowClick(row, index, event);
+              }
+            : undefined
+        }
+        onKeyDown={
+          focusable && onRowClick
+            ? (event) => {
+                if (event.target !== event.currentTarget || event.repeat) return;
+                if (event.key !== "Enter" && event.key !== " ") return;
+                event.preventDefault();
+                onRowClick(row, index, event);
+              }
+            : undefined
+        }
       >
+        {shared.reorder ? (
+          <ReorderHandleCell
+            reorder={shared.reorder}
+            rowKey={rowKey}
+            rowLabel={rowLabel}
+            className={lead}
+          />
+        ) : null}
         {shared.selectable ? (
           // biome-ignore lint/a11y/useKeyWithClickEvents: the checkbox inside is the keyboard control (Space clicks it and the click bubbles here); the cell only widens the pointer target.
           <td
@@ -217,12 +271,36 @@ function DataTableRowImpl<Row>({
               data-numeric={column.numeric ? "true" : undefined}
               data-first-column={isFirstColumn ? "true" : undefined}
               data-column-id={column.id}
+              data-scale={scaleOf(column)}
             >
-              {folded(renderCell(row, column, true))}
+              {href === undefined ? (
+                folded(renderCell(row, column, true))
+              ) : isFirstColumn ? (
+                // The row's link: the name in the key cell, its hit area stretched over the cell.
+                folded(
+                  <a href={href} className={styles.rowLink} data-row-link="">
+                    {renderCell(row, column, true)}
+                  </a>,
+                )
+              ) : (
+                <>
+                  {/* The same link over every other cell, hidden from AT and Tab: a click,
+                      ⌘-click, middle click or the context menu anywhere on the row is the link's. */}
+                  {/* biome-ignore lint/a11y/useAnchorContent: a pointer-only duplicate of the key cell's named link, hidden from AT and Tab */}
+                  <a
+                    href={href}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className={styles.cellLink}
+                    data-row-link=""
+                  />
+                  {folded(renderCell(row, column, true))}
+                </>
+              )}
             </td>
           );
         })}
-      </tr>
+      </RowElement>
       {hasDetail ? (
         <tr
           id={shared.detailDomId(rowKey)}
@@ -246,6 +324,31 @@ function DataTableRowImpl<Row>({
 
 /** A body row (plus its detail panel); re-renders only when its own props change. */
 export const DataTableRow = React.memo(DataTableRowImpl) as typeof DataTableRowImpl;
+
+type GroupRowProps = {
+  totalColumns: number;
+  sticky: boolean;
+  children: React.ReactNode;
+};
+
+/**
+ * The header row of a group (`getRowGroup`): a `<th scope="rowgroup">` across every column at the
+ * head of its own `<tbody>`. Its content stays in the visible width while the table scrolls sideways.
+ */
+export function GroupRow({ totalColumns, sticky, children }: GroupRowProps) {
+  return (
+    <tr className={styles.groupRow}>
+      <th
+        scope="rowgroup"
+        colSpan={totalColumns}
+        className={styles.groupCell}
+        data-sticky={sticky ? "true" : undefined}
+      >
+        <div className={styles.groupContent}>{children}</div>
+      </th>
+    </tr>
+  );
+}
 
 type MeasureBodyProps<Row> = {
   rows: MeasureRow<Row>[];

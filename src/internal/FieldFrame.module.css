@@ -55,9 +55,13 @@
 /*
  * A disabled native control dims the label and the hint even when its host does not pass
  * `disabled` to the frame (`disabled` on `Input.Field`); the error keeps its color.
+ * The rightmost compound names a class (never `.label *`): a class-less target after a `:has()`
+ * makes the browser's `:has()` invalidation whole-subtree for every anchor on the page. The label's
+ * parts dim through `--label-dimmed` (Label).
  */
 .root:has(> .body :is(input, textarea, select):disabled)
-:is(.label, .label *, .supportText:not([data-invalid="true"])) {
+:is(.label, .supportText:not([data-invalid="true"])) {
+  --label-dimmed: var(--prime-color-text-disabled);
   color: var(--prime-color-text-disabled);
 }
 

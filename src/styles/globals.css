@@ -228,6 +228,7 @@ input::-moz-focus-inner {
     --prime-motion-duration-base: 0ms;
     --prime-motion-duration-slow: 0ms;
     --prime-motion-stagger: 0ms;
+    --prime-message-morph-duration: 0ms;
     --prime-motion-press-scale: 1;
     --prime-motion-press-scale-compact: 1;
   }

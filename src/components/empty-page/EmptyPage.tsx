@@ -1,5 +1,7 @@
-import type * as React from "react";
+import * as React from "react";
 
+import { Button } from "@/components/button/Button";
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -11,6 +13,23 @@ import styles from "./EmptyPage.module.css";
 
 type EmptyPageLayout = "default" | "fill" | "compact";
 
+/** `neutral` — nothing here (yet); `danger` — the region failed to load. */
+export type EmptyPageTone = Extract<Tone, "neutral" | "danger">;
+
+export type EmptyPageLabels = {
+  /** Text of `EmptyPage.RetryButton`. */
+  retry: string;
+};
+
+const DEFAULT_LABELS: EmptyPageLabels = { retry: "Повторить" };
+
+type Ctx = { tone: EmptyPageTone; labels: EmptyPageLabels };
+
+const EmptyPageContext = React.createContext<Ctx>({
+  tone: "neutral",
+  labels: DEFAULT_LABELS,
+});
+
 export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Control height, type and spacing tier. Default `m`. */
   size?: ControlSize;
@@ -21,6 +40,12 @@ export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
    * caption description, a small icon and no entrance motion.
    */
   layout?: EmptyPageLayout;
+  /**
+   * `danger` — the region's load failed: the icon tile turns danger and the root announces itself
+   * (`role="alert"`, unless you pass a `role`). Default `neutral`.
+   */
+  tone?: EmptyPageTone;
+  labels?: Partial<EmptyPageLabels>;
   ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -28,30 +53,46 @@ export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
 function EmptyPageRoot({
   size = "m",
   layout = "default",
+  tone = "neutral",
+  labels,
   className,
   children,
   ...rest
 }: EmptyPageRootProps) {
+  const context: Ctx = { tone, labels: { ...DEFAULT_LABELS, ...labels } };
   return (
     <div
       className={cx(styles.root, layout !== "compact" && enterMotion.enterBaseChildren, className)}
+      role={tone === "danger" ? "alert" : undefined}
       {...rest}
-      {...toDataAttributes({ size, layout: layout === "default" ? undefined : layout })}
+      {...toDataAttributes({
+        size,
+        layout: layout === "default" ? undefined : layout,
+        tone: tone === "neutral" ? undefined : tone,
+      })}
     >
-      <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+      <EmptyPageContext.Provider value={context}>
+        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+      </EmptyPageContext.Provider>
     </div>
   );
 }
 EmptyPageRoot.displayName = "EmptyPage.Root";
 
 export type EmptyPageIconProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** Tile fill: `neutral` (default), `accent` — an invitation to start, `danger` — a failure. */
+  /**
+   * Tile fill: `neutral`, `accent` — an invitation to start, `danger` — a failure. Default: the
+   * root's `tone`.
+   */
   tone?: Extract<Tone, "neutral" | "accent" | "danger">;
   ref?: React.Ref<HTMLDivElement>;
 };
 
-function EmptyPageIcon({ tone = "neutral", className, ...rest }: EmptyPageIconProps) {
-  return <div className={cx(styles.iconWrap, className)} data-tone={tone} {...rest} />;
+function EmptyPageIcon({ tone: toneProp, className, ...rest }: EmptyPageIconProps) {
+  const { tone: rootTone } = React.useContext(EmptyPageContext);
+  return (
+    <div className={cx(styles.iconWrap, className)} data-tone={toneProp ?? rootTone} {...rest} />
+  );
 }
 EmptyPageIcon.displayName = "EmptyPage.Icon";
 
@@ -91,10 +132,68 @@ function EmptyPageActions({ className, ...rest }: EmptyPageActionsProps) {
 }
 EmptyPageActions.displayName = "EmptyPage.Actions";
 
+export type EmptyPageRetryButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "onClick" | "type"
+> & {
+  /**
+   * Loads the region again. May return a Promise: while it is pending the button shows its loading
+   * state and cannot be pressed twice. Resolve — the owner swaps the region to its data; reject —
+   * the error state stays and the button is ready again.
+   */
+  onRetry: () => void | Promise<void>;
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+/** The kit's «Повторить» for an error state: an outline neutral Button with the refresh icon. */
+function EmptyPageRetryButton({ onRetry, children, disabled, ...rest }: EmptyPageRetryButtonProps) {
+  const { labels } = React.useContext(EmptyPageContext);
+  const [pending, setPending] = React.useState(false);
+  const mounted = React.useRef(true);
+  React.useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  const retry = () => {
+    if (pending) return;
+    const result = onRetry();
+    if (!(result instanceof Promise)) return;
+    setPending(true);
+    result
+      .catch(() => {
+        // The owner keeps the error state and says why; the button is ready for another try.
+      })
+      .finally(() => {
+        if (mounted.current) setPending(false);
+      });
+  };
+
+  return (
+    <Button.Root
+      {...rest}
+      variant="outline"
+      tone="neutral"
+      loading={pending}
+      disabled={disabled}
+      onClick={retry}
+    >
+      <Button.Icon>
+        <Icon name="action.refresh" />
+      </Button.Icon>
+      {children ?? labels.retry}
+    </Button.Root>
+  );
+}
+EmptyPageRetryButton.displayName = "EmptyPage.RetryButton";
+
 export const EmptyPage = {
   Root: EmptyPageRoot,
   Icon: EmptyPageIcon,
   Title: EmptyPageTitle,
   Description: EmptyPageDescription,
   Actions: EmptyPageActions,
+  RetryButton: EmptyPageRetryButton,
 };

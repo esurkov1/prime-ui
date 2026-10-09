@@ -1,13 +1,16 @@
-const FOCUSABLE = [
+const NATIVE_FOCUSABLE = [
   "a[href]",
   "button:not([disabled])",
   'input:not([disabled]):not([type="hidden"])',
   "select:not([disabled])",
   "textarea:not([disabled])",
-  "[tabindex]",
-]
+];
+
+const FOCUSABLE = [...NATIVE_FOCUSABLE, "[tabindex]"]
   .map((selector) => `${selector}:not([tabindex="-1"])`)
   .join(", ");
+
+const NATIVE_TAB_STOP = NATIVE_FOCUSABLE.join(", ");
 
 /** Tab stops inside `container`, in DOM order (hidden and `aria-hidden` ones skipped). */
 export function getFocusable(container: HTMLElement): HTMLElement[] {
@@ -16,6 +19,18 @@ export function getFocusable(container: HTMLElement): HTMLElement[] {
     const style = window.getComputedStyle(el);
     return style.display !== "none" && style.visibility !== "hidden";
   });
+}
+
+/**
+ * The element is, or holds, a tab stop by nature (a native control, a link, editable text): focus
+ * reaches it without an added `tabindex`.
+ */
+export function hasNativeTabStop(el: HTMLElement): boolean {
+  return (
+    el.matches(NATIVE_TAB_STOP) ||
+    el.isContentEditable ||
+    el.querySelector(NATIVE_TAB_STOP) !== null
+  );
 }
 
 /**

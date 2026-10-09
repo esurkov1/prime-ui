@@ -66,10 +66,11 @@ No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles th
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side; flips to the opposite side when there is no room. |
-| `align` | `"start" \| "center" \| "end"` | `"start"` | Alignment along the trigger; shifts inside the viewport. |
+| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge). |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the text, padding and gap; also the size context of the controls inside. |
 | `matchTriggerWidth` | `boolean` | `false` | The panel is exactly as wide as the trigger and its text wraps. |
 | `trapFocus` | `boolean` | `false` | Tab cycles inside the panel (forms). Without it Tab past the last (Shift+Tab before the first) stop closes the panel and returns focus to the trigger. |
+| `initialFocus` | `boolean` | `true with Trigger, false with Anchor` | Focus moves into the panel on open (`[data-autofocus]`, else the first tab stop, else the panel). Turn it on for an anchored panel opened by a command, such as a Dropdown item, so focus does not stay on the menu trigger. |
 | `flush` | `boolean` | `false` | No inner padding and no gap: rows and dividers reach the panel edges; the content lays out its own spacing. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `className` and the other attributes of the panel. |
 
@@ -96,9 +97,10 @@ Title uses the tier text size with title weight; Description uses the tier label
 | `side="bottom"` | Below the trigger, `--prime-panel-offset` away | Default | yes |
 | `side="top"` | Above the trigger | Triggers near the bottom of the screen | |
 | `side="left"` / `"right"` | Beside the trigger, aligned along its height | Triggers in a side rail or a narrow column | |
-| `align="start"` | Start edges aligned: the panel opens toward the end (right in LTR); at the screen edge it flips to `end` by itself | Default, triggers anywhere — the end of a toolbar too | yes |
+| `align="auto"` | Lined up with the trigger edge that has more room: near the end of the screen the end edges meet and the panel grows toward the start, near the start the other way; below the trigger, flipping to the top without room | Default — triggers anywhere | yes |
+| `align="end"` | End edges aligned: the panel grows toward the start | The panel must line up with the end of a block whatever room there is | |
 | `align="center"` | Centred on the trigger | Small icon triggers | |
-| `align="end"` | End edges aligned: the panel opens toward the start | A panel that must line up with the end of a block whatever room there is | |
+| `align="start"` | Start edges aligned: the panel grows toward the end | The panel must line up with the start of a block whatever room there is | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -124,6 +126,8 @@ Title uses the tier text size with title weight; Description uses the tier label
 | sheet | viewport below 640px, opened from a Trigger (an Anchor keeps the panel next to its field) | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the panel; the sheet carries `data-state`, the panel keeps its role and ref; page scroll locked; a swipe down from the handle closes it (with `closeOnOutsideClick`) |
 
 There is no `disabled` on Popover: a disabled trigger never opens it.
+
+Motion (`overlayMotion`): the panel grows out of the side that faces its trigger and fades, in and out over `fast`; as a sheet it slides up over `slow` and down over `base`. Content stays mounted until the exit ends; under `prefers-reduced-motion` it unmounts at once.
 
 ## Layout & spacing
 - Width is `max-content` between `--prime-panel-min-width` and twice that, never wider than the viewport; give forms an explicit width with `className`.
@@ -160,11 +164,13 @@ No `labels`.
 | [placement.tsx](examples/placement.tsx) | Every side and alignment relative to the trigger; near the viewport edge the panel flips and shifts — `side`, `align`. |
 | [match-trigger-width.tsx](examples/match-trigger-width.tsx) | In a narrow column the panel takes the exact width of a full-width trigger and its text wraps — `matchTriggerWidth`. |
 | [flush.tsx](examples/flush.tsx) | A notification list whose rows and dividers reach the panel edges; each row brings its own padding — `flush`. |
+| [from-menu.tsx](examples/from-menu.tsx) | A menu command opens a panel at the same button: the rename item shows a form anchored to the menu button and focus lands in its field, not back on that button — `Popover.Anchor`, `initialFocus`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A destructive confirm that closes only from its buttons, and not at all while the request runs — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state: another button opens the panel from code and its own button closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | An invite form in a panel: Tab stays inside, the role list does not count as an outside click, an invalid email shakes the field and keeps the panel open until it is fixed — `trapFocus`, `error`. |
 
 ## Mistakes
+- A Popover opened from a Dropdown item with `Popover.Anchor` and no `initialFocus` → focus returns to the menu button and the panel is out of keyboard reach; set `initialFocus`.
 - A hint of a few words in a Popover → use Tooltip (hover / focus, no interactive content).
 - A form without `trapFocus` → add it so Tab stays in the panel.
 - Closing from inside through your own `open` state only → wrap the button in `Popover.Close`.
@@ -172,4 +178,4 @@ No `labels`.
 
 ## Related
 - **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (the panel)
-- **See also:** [Tooltip](../tooltip/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Modal](../modal/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [ColorPicker](../color-picker/COMPONENT.md)
+- **See also:** [Tooltip](../tooltip/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Modal](../modal/COMPONENT.md), [Drawer](../drawer/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [ColorPicker](../color-picker/COMPONENT.md)

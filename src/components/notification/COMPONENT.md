@@ -76,6 +76,7 @@ Must be called inside `NotificationProvider`; returns the store.
 | `duration` | `number` | `5000` | Auto-close delay in ms; the timer pauses on hover, focus, swipe and in a hidden tab. |
 | `persistent` | `boolean` | `false` | No timer and no countdown line. |
 | `closable` | `boolean` | `true` | Shows the close button. |
+| `onDismiss` | `() => void` | — | The toast left: its timer ran out, the close button, a swipe, `dismiss()`, or a newer toast pushed it out of a full stack. Called once — the place to commit an action the toast offered to undo. |
 
 ### NotificationCard
 `ref` → `HTMLElement`. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.
@@ -175,6 +176,7 @@ Collapsed stacks show up to 3 cards peeking behind each other. Hover or keyboard
 | [placement.tsx](examples/placement.tsx) | Toasts in each corner or centered at the top or bottom edge — `position`. |
 | [tones.tsx](examples/tones.tsx) | The four tones: the icon carries the meaning; danger and warning are announced at once — `tone`. |
 | [stacking.tsx](examples/stacking.tsx) | Toasts of one position and tone stack; hover expands the stack and pauses the timers — `max`, `items`, `dismissAll`. |
+| [undo.tsx](examples/undo.tsx) | Delete at once and offer to undo: the row leaves the list, the toast brings it back, and the deletion is sent only when the toast leaves without an undo — `onDismiss`, `action`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A short timer, a toast that stays until closed, and one without a close button — `duration`, `persistent`, `closable`. |
 | [in-form.tsx](examples/in-form.tsx) | Saving a form: the button shows loading, then a success toast or an error toast with a retry action — `notify`, `action`. |
 
@@ -183,8 +185,9 @@ Collapsed stacks show up to 3 cards peeking behind each other. Hover or keyboard
 - Several providers in one app → one provider at the root.
 - `tone: "error"` → use `tone: "danger"`.
 - Expecting `action` to close the toast → call `dismiss(id)` in `onClick` if it should.
+- Sending a deletion to the server before the «Отменить» toast is gone → send it in `onDismiss`, unless the action ran.
 - A toast for a permanent state («пробный период закончится через 3 дня») → use a Banner.
 
 ## Related
-- **Built from:** Button, Badge, Icon
+- **Built from:** [Button](../button/COMPONENT.md) (action, close), [Badge](../badge/COMPONENT.md) (`badge`), Icon (`status.*`, `action.close`)
 - **See also:** [Banner](../banner/COMPONENT.md), [Button](../button/COMPONENT.md), [Modal](../modal/COMPONENT.md)

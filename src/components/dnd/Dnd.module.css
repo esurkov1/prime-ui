@@ -19,9 +19,10 @@
   display: none;
 }
 
-/* `.overlay > .lift`: the clone keeps the classes of what it copies (a Kanban card, a row), and their
-   own resting shadow must not win over the lift whatever order the styles load in. */
-.overlay > .lift {
+/* `.overlay .lift`: the clone keeps the classes of what it copies (a Kanban card, a row), and their
+   own resting shadow must not win over the lift whatever order the styles load in. A table row
+   flies inside a copy of its table, which carries the lift. */
+.overlay .lift {
   box-shadow: var(--prime-shadow-modal);
   transform-origin: center;
   animation: lift var(--prime-motion-duration-fast) var(--prime-motion-easing-standard) both;
@@ -40,6 +41,34 @@
 .overlay[data-can-drop="false"] .lift {
   outline: var(--prime-border-width) dashed var(--prime-color-danger-default);
   outline-offset: var(--prime-focus-offset-inset);
+}
+
+/* Why the spot refuses the item (`canDrop` answered a string): the tooltip's inverse chip under
+   the carried copy, start-aligned with it, so it moves with the copy and never covers the target. */
+.reason {
+  position: absolute;
+  inset-block-start: calc(100% + var(--prime-tooltip-offset));
+  inset-inline-start: 0;
+  box-sizing: border-box;
+  inline-size: max-content;
+  max-inline-size: var(--prime-tooltip-max-width);
+  padding-block: var(--prime-tooltip-m-padding-y);
+  padding-inline: var(--prime-tooltip-m-padding-x);
+  border-radius: var(--prime-tooltip-m-radius);
+  background: var(--prime-color-tooltip-bg);
+  color: var(--prime-color-tooltip-text);
+  font-family: var(--prime-font-family-sans);
+  font-size: var(--prime-tooltip-m-text-size);
+  line-height: var(--prime-tooltip-m-line-height);
+  overflow-wrap: anywhere;
+  animation: reasonIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+@keyframes reasonIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--prime-space-1) * -1));
+  }
 }
 
 /* The carried clone keeps its colours but never its interactivity. */
@@ -92,7 +121,8 @@
   display: none;
 }
 
-.draggable:focus-visible {
+/* A table row draws its focus on its cells (the table's own style); an outline on a row is clipped. */
+.draggable:not(tr):focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
@@ -112,6 +142,23 @@
 
 li.placeholder {
   list-style: none;
+}
+
+/* The gap in a table body: a row of the lifted row's height whose one cell spans every column. */
+.gapRow > td {
+  box-sizing: border-box;
+  height: var(--dnd-gap-height);
+  padding: 0;
+  border: var(--prime-border-width) dashed var(--prime-color-accent-default);
+  border-radius: var(--dnd-gap-radius, 0);
+  background: var(--prime-color-accent-soft);
+  pointer-events: none;
+}
+
+/* A table body that sorts its rows stays a row group (the table lays it out); a refusing one tints
+   its cells. */
+.sortableRows[data-dnd-reject] > tr > td {
+  background-color: var(--prime-color-danger-soft);
 }
 
 /* The sortable container. */
@@ -193,9 +240,56 @@ li.placeholder {
   }
 }
 
+/* A locked item: the lock stands where the grip would, the item holds its place. */
+.lock {
+  --prime-icon-size: var(--prime-icon-xs);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--prime-control-xs-height);
+  block-size: var(--prime-control-xs-height);
+  color: var(--prime-color-text-muted);
+}
+
+.draggable[data-locked] {
+  cursor: default;
+}
+
+/* The empty state of a list (`empty`): in the flow while the list is empty; once a gap opens in
+   the list it steps out of the flow and fades, so the gap takes its place. */
+.sortable:has(> .empty) {
+  position: relative;
+}
+
+.empty {
+  min-width: 0;
+  list-style: none;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.sortable > [data-dnd-gap] ~ .empty {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .overlay > .lift,
-  .dropZone[data-dnd-flash] {
+  .overlay .lift,
+  .dropZone[data-dnd-flash],
+  .reason {
     animation: none;
   }
+
+  .empty {
+    transition: none;
+  }
+}
+
+/* A table has no room for the empty row beside the gap: the gap takes its place. */
+.sortableRows > [data-dnd-gap] ~ .empty {
+  display: none;
 }

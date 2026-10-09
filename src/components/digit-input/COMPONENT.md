@@ -49,7 +49,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | `value` | `string` | — | Controlled code; non-digits are dropped, extra digits cut to `length`. |
 | `defaultValue` | `string` | `""` | Initial code when uncontrolled. |
 | `onValueChange` | `(value: string) => void` | — | Called with the joined digits on every change. |
-| `onComplete` | `(value: string) => void` | — | Called once when the last empty cell is filled (typing, paste or autofill). |
+| `onComplete` | `(value: string) => void \| Promise<void>` | — | Called once when the last empty cell is filled (typing, paste or autofill). Return the check's promise: the cells wait read-only and quiet (`aria-busy` on the group); resolve — the `success` look (say it in words in `hint`); reject — the code clears, focus goes to the first cell, the reason (the rejection's message, else `labels.failed`) shakes in as the error and is announced; typing again takes it away. `error` and `success` you pass win over the check. |
 | `fullWidth` | `boolean` | `false` | Cells share the container width up to 1.5 × their side (the row centres beyond that) and keep the tier height; otherwise square cells and the field hugs them. |
 | `groupSize` | `number` | — | Splits the cells into groups of this size with a wider gap (`3` → 123 456). |
 | `mask` | `boolean` | `false` | Hides the digits (PIN): cells are `type="password"`. |
@@ -85,7 +85,7 @@ No `variant` or `tone`.
 | `focusRing={false}` | no focus ring; the focus fill and the caret remain | a single code on a screen where focus is obvious | `true` |
 
 **Combinations**
-- Recommended: `error` set after a rejected code and cleared in `onValueChange`; `onComplete` to check the code as soon as it is filled.
+- Recommended: `onComplete` returning the check's promise — the field waits, shows success or clears and shows the reason; or, checking by hand, `error` set after a rejected code and cleared in `onValueChange`.
 - Pointless: `invalid` together with `error`; `length` larger than the real code.
 - Forbidden: `focusRing={false}` without another focus indicator (WCAG 2.4.7).
 
@@ -93,12 +93,14 @@ No `variant` or `tone`.
 | State | Driven by | DOM |
 |---|---|---|
 | hover | — | cell fill darkens (not on focused or disabled cells) |
-| focus | keyboard / click | focused cell: focus fill and its content selected so a new digit replaces it; one inset ring for the row appears on the cell and glides to the next one (`fast` · emphasized) instead of each cell drawing its own |
+| focus | keyboard / click | focused cell: focus fill and its content selected so a new digit replaces it; one inset ring for the row appears on the cell and glides to the next one (`fast` · emphasized) instead of each cell drawing its own; the code has no gaps, so focusing a cell past the first empty one moves focus to that entry cell |
 | filled cell | a digit in the cell | `data-filled="true"` on the cell; the digit fades in as it lands |
-| success | `success` (not while invalid) | `data-success="true"` on the fieldset; the cells turn `success-soft` one after another, half a stagger step apart |
+| checking | `onComplete` returned a pending promise | `aria-busy` and `data-pending="true"` on the fieldset, cells `readonly` and quiet to 0.6 (`fast`, both ways); typing waits for the answer |
+| refused | that promise rejected | the code clears and focus goes to the first cell; the reason becomes the error (unless you pass `error`) and shakes in, a polite live region speaks it; typing again takes it away |
+| success | `success`, or a resolved `onComplete` promise (not while invalid) | `data-success="true"` on the fieldset; the cells turn `success-soft` one after another, half a stagger step apart |
 | full width | `fullWidth` | `data-full-width="true"` on the fieldset |
 | group start | `groupSize` | `data-group-start="true"` on the first cell of every group |
-| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the fieldset and the frame, `aria-invalid="true"` on cells; the control shakes once when an error arrives (`data-shake` on the frame) |
+| invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the fieldset and the frame, `aria-invalid="true"` on cells; the digits turn `danger-text` and the focus ring `danger-border`; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | `data-disabled="true"` and native `disabled` on the fieldset, every cell disabled, label and hint dimmed |
 | no focus ring | `focusRing={false}` | `data-focus-ring="false"` on the fieldset |
 
@@ -124,6 +126,7 @@ No `variant` or `tone`.
 - The cells sit in a `<fieldset>` (`role="group"`) named by the `label` (`aria-labelledby`) or `labels.group`; clicking the label focuses the first cell.
 - Each cell is named by `labels.cell` («Цифра 1 из 6») and has `autocomplete="one-time-code"` and `inputmode="numeric"`, so SMS codes are suggested on phones.
 - The hint or the error is linked to the group through `aria-describedby`; invalid cells carry `aria-invalid`.
+- While a code is checked the group has `aria-busy`; the reason of a refused code is spoken by a polite live region.
 - Paste and autofill of the whole code into any cell fill all cells.
 
 ### Labels
@@ -134,6 +137,7 @@ No `variant` or `tone`.
 | `group` | `"Код"` | Accessible name of the group when there is no visible `label`. |
 | `cell` | `"Цифра {index} из {length}"` | Accessible name of each cell; `{index}` (1-based) and `{length}` are replaced. |
 | `optional` | `"необязательно"` | Marker after the label when `optional`. |
+| `failed` | `"Неверный код"` | The error of a code whose `onComplete` promise rejected without a reason. |
 
 ## Examples
 | Example | Shows |
@@ -144,7 +148,7 @@ No `variant` or `tone`.
 | [validation.tsx](examples/validation.tsx) | A confirmation code checked once it is complete: a wrong code shakes in with one message and leaves as soon as you type again; a hint and an optional code — `required`, `optional`, `hint`, `error`. |
 | [grouped.tsx](examples/grouped.tsx) | A long code read in chunks with a wider gap between groups — `groupSize`. |
 | [full-width.tsx](examples/full-width.tsx) | Cells that share the container width and keep the tier height, above a full-width button — `fullWidth`. |
-| [on-complete.tsx](examples/on-complete.tsx) | The code is checked as soon as the last cell is filled: a right one turns the cells success, a wrong one turns the hint into an error — `onComplete`, `success`, `error`. |
+| [on-complete.tsx](examples/on-complete.tsx) | The code is checked on the server as soon as the last cell is filled: the cells wait, a right one turns them success, a wrong one clears them and shakes in the reason — `onComplete`, `hint`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the code and clears it with a button — `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A masked card PIN submitted with a form; a short or wrong PIN shakes in an error that leaves when you type again — `name`, `mask`, `required`, `error`. |
 
@@ -153,6 +157,7 @@ No `variant` or `tone`.
 - A `Label` and a `Hint` placed next to the code by hand → pass `label`, `hint`, `error`.
 - Letters in the code → use `Input`; DigitInput accepts digits only.
 - Keeping `error` after the user edits the code → clear it in `onValueChange`.
+- A hand-made «checking…» state, a disabled field and a manual reset after a wrong code → return the check's promise from `onComplete`.
 
 ## Related
 - **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`)

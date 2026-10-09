@@ -1,11 +1,21 @@
 import * as React from "react";
 
-import { useAnchorRectResolver } from "@/internal/AnchorRectContext";
+import { useAnchorRectResolver, useFloatingBoundaryResolver } from "@/internal/AnchorRectContext";
 import { getRootFontSizePx } from "@/internal/layoutPxFromPrimitives";
 import { getScrollContainers } from "@/internal/scrollAncestors";
 
 export type PositionSide = "top" | "right" | "bottom" | "left";
-export type PositionAlign = "start" | "center" | "end";
+/** `auto` picks `start` or `end` by the room around the anchor (see `computeFloatingPosition`). */
+export type PositionAlign = "auto" | "start" | "center" | "end";
+
+/**
+ * Where every anchored panel (Popover, Dropdown, Select, TagSelect, Datepicker, ColorPresets)
+ * opens unless it asks otherwise: below its anchor, lined up with the anchor edge that has the
+ * room — a trigger near the end of the screen lines up its end edge and the panel grows toward
+ * the start, a trigger near the start the other way. It flips to the top only when it does not fit.
+ */
+export const DEFAULT_SIDE: PositionSide = "bottom";
+export const DEFAULT_ALIGN: PositionAlign = "auto";
 
 /**
  * Private custom properties written by `usePosition` on the floating element. Panels combine them
@@ -67,6 +77,12 @@ export type ComputeFloatingOptions = {
   matchAnchorWidth: boolean;
   /** Closest the arrow centre may come to a layer corner; computes `arrow` when set. */
   arrowInset?: number;
+  /**
+   * The box the layer must stay in (viewport px), intersected with the viewport: a scroll region
+   * whose sticky parts the layer must not cover. Flipping, the cross-axis clamp and the size limits
+   * use it instead of the viewport.
+   */
+  boundary?: Pick<DOMRectReadOnly, "top" | "left" | "right" | "bottom">;
 };
 
 export type ComputedFloatPosition = {
@@ -100,13 +116,18 @@ export function computeFloatingPosition(
   vh: number,
   opts: ComputeFloatingOptions,
 ): ComputedFloatPosition {
-  const { align, offset, flip, matchAnchorWidth, arrowInset } = opts;
+  const { align, offset, flip, matchAnchorWidth, arrowInset, boundary } = opts;
   const pad = opts.viewportPad ?? FALLBACK_VIEWPORT_PAD_PX;
+  // The box to stay in: the viewport, or the boundary inside it.
+  const minX = boundary ? Math.max(0, boundary.left) : 0;
+  const minY = boundary ? Math.max(0, boundary.top) : 0;
+  const maxX = boundary ? Math.min(vw, boundary.right) : vw;
+  const maxY = boundary ? Math.min(vh, boundary.bottom) : vh;
   const room: Record<PositionSide, number> = {
-    top: anchor.top - offset - pad,
-    bottom: vh - anchor.bottom - offset - pad,
-    left: anchor.left - offset - pad,
-    right: vw - anchor.right - offset - pad,
+    top: anchor.top - minY - offset - pad,
+    bottom: maxY - anchor.bottom - offset - pad,
+    left: anchor.left - minX - offset - pad,
+    right: maxX - anchor.right - offset - pad,
   };
   const isVertical = (s: PositionSide) => s === "top" || s === "bottom";
 
@@ -119,7 +140,7 @@ export function computeFloatingPosition(
   }
   const vertical = isVertical(side);
 
-  const viewportMaxWidth = Math.max(0, Math.floor(vw - pad * 2));
+  const viewportMaxWidth = Math.max(0, Math.floor(maxX - minX - pad * 2));
   const maxWidth = vertical
     ? viewportMaxWidth
     : Math.max(0, Math.min(viewportMaxWidth, Math.floor(room[side])));
@@ -135,38 +156,50 @@ export function computeFloatingPosition(
   let main: number;
   if (side === "bottom") main = anchor.bottom + offset;
   else if (side === "right") main = anchor.right + offset;
-  else if (side === "left") main = Math.max(pad, anchor.left - offset - width);
+  else if (side === "left") main = Math.max(minX + pad, anchor.left - offset - width);
   else
     main = Math.max(
-      pad,
+      minY + pad,
       anchor.top - offset - (contentH > 0 ? contentH : FIRST_PAINT_FLOAT_HEIGHT_GUESS_PX),
     );
 
   const anchorStart = vertical ? anchor.left : anchor.top;
   const anchorSize = vertical ? anchor.width : anchor.height;
   const crossSize = vertical ? width : contentH;
-  const viewport = vertical ? vw : vh;
+  const crossMin = (vertical ? minX : minY) + pad;
+  const crossMax = (vertical ? maxX : maxY) - pad;
   const crossFor = (a: PositionAlign) =>
     a === "start"
       ? anchorStart
       : a === "end"
         ? anchorStart + anchorSize - crossSize
         : anchorStart + anchorSize / 2 - crossSize / 2;
-  const fits = (x: number) => x >= pad && x + crossSize <= viewport - pad;
-  let cross = crossFor(align);
+  const fits = (x: number) => x >= crossMin && x + crossSize <= crossMax;
+  // `auto`: the anchor edge with more room beyond it — the room toward the end from the start
+  // edge against the room toward the start from the end edge.
+  const edge: PositionAlign =
+    align !== "auto"
+      ? align
+      : crossMax - anchorStart >= anchorStart + anchorSize - crossMin
+        ? "start"
+        : "end";
+  let cross = crossFor(edge);
   // Edge flip: does not fit from the chosen edge — try the opposite edge of the anchor.
   if (flip && !fits(cross)) {
-    const opposite: PositionAlign = align === "end" ? "start" : align === "start" ? "end" : align;
-    if (opposite !== align && fits(crossFor(opposite))) cross = crossFor(opposite);
+    const opposite: PositionAlign = edge === "end" ? "start" : edge === "start" ? "end" : edge;
+    if (opposite !== edge && fits(crossFor(opposite))) cross = crossFor(opposite);
   }
-  cross = Math.round(clamp(cross, pad, viewport - crossSize - pad));
+  cross = Math.round(clamp(cross, crossMin, crossMax - crossSize));
 
   const out: ComputedFloatPosition = {
     top: Math.round(vertical ? main : cross),
     left: Math.round(vertical ? cross : main),
     side,
     maxWidth,
-    maxHeight: Math.max(MIN_FLOATING_MAX_HEIGHT, Math.floor(vertical ? room[side] : vh - pad * 2)),
+    maxHeight: Math.max(
+      MIN_FLOATING_MAX_HEIGHT,
+      Math.floor(vertical ? room[side] : maxY - minY - pad * 2),
+    ),
   };
   if (matchAnchorWidth) out.minWidth = Math.min(anchor.width, maxWidth);
   if (arrowInset !== undefined) {
@@ -208,8 +241,8 @@ export function usePosition(
   anchorRef: React.RefObject<HTMLElement | null>,
   layerRef: React.RefObject<HTMLElement | null>,
   {
-    side: preferredSide = "bottom",
-    align = "start",
+    side: preferredSide = DEFAULT_SIDE,
+    align = DEFAULT_ALIGN,
     matchAnchorWidth = false,
     offsetToken = "--prime-panel-offset",
     arrowInset,
@@ -218,6 +251,7 @@ export function usePosition(
   const [attached, setAttached] = React.useState(false);
   const [resolvedSide, setResolvedSide] = React.useState<PositionSide>(preferredSide);
   const resolveAnchorRect = useAnchorRectResolver();
+  const resolveBoundary = useFloatingBoundaryResolver();
   /** Token lengths read from CSS: once per activation / option change / resize, not per frame. */
   const metricsRef = React.useRef<{ offset: number; pad: number; arrow?: number } | null>(null);
 
@@ -250,6 +284,7 @@ export function usePosition(
           flip: true,
           matchAnchorWidth,
           arrowInset: arrow,
+          boundary: resolveBoundary?.(anchor) ?? undefined,
         },
       );
       setResolvedSide(pos.side);
@@ -276,6 +311,7 @@ export function usePosition(
       offsetToken,
       arrowInset,
       resolveAnchorRect,
+      resolveBoundary,
     ],
   );
 

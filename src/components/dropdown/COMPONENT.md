@@ -32,9 +32,10 @@ Dropdown.Root                     state and dismiss policy (no DOM)
     │   └── Dropdown.Description
     ├── Dropdown.Separator        full-bleed Divider
     ├── Dropdown.Group            role="group", named by `label`
-    │   └── Dropdown.Item         <button role="menuitem">
-    │       ├── Dropdown.ItemIcon       leading glyph (aria-hidden)
-    │       └── Dropdown.ItemShortcut   Kbd at the end
+    │   └── Dropdown.Item         <button role="menuitem"> (or the asChild link)
+    │       ├── Dropdown.ItemIcon         leading glyph (aria-hidden)
+    │       ├── Dropdown.ItemDescription  muted second line; describes the item
+    │       └── Dropdown.ItemShortcut     Kbd at the end
     ├── Dropdown.CheckboxItem     <button role="menuitemcheckbox">: label + check mark at the end while checked; stays open
     └── Dropdown.Item
 ```
@@ -68,20 +69,21 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side; flips to the opposite side when there is no room. |
-| `align` | `"start" \| "center" \| "end"` | `"start"` | Alignment along the trigger; shifts inside the viewport. |
+| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge). |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: item height, text and icon; key hints one tier down. |
 | `matchTriggerWidth` | `boolean` | `false` | The menu is at least as wide as the trigger. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "role">` | — | `className`, `onKeyDown` (runs before the arrow-key navigation) and the other attributes of the menu. |
 
 ### Dropdown.Item
-`ref` → `HTMLButtonElement`. A `<button role="menuitem">`; a click, Enter or Space runs `onSelect` and closes the menu. + native button props.
+`ref` → `HTMLButtonElement` (or the `asChild` element). A `<button role="menuitem">`; a click, Enter or Space runs `onSelect` and closes the menu. With a `Dropdown.ItemDescription` the label names the item and the description describes it (`aria-labelledby` / `aria-describedby`). + native button props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `onSelect` | `() => void` | — | The action of the item. |
 | `disabled` | `boolean` | `false` | Muted, `aria-disabled`, skipped by the arrow keys, does nothing on click. |
 | `tone` | `"neutral" \| "danger"` | `"neutral"` | `danger`: destructive action — danger text, icon and hover fill. |
-| `children` | `ReactNode` | — | `Dropdown.ItemIcon`, the label, `Dropdown.ItemShortcut`. |
+| `asChild` | `boolean` | `false` | The item is its single child, a link (`<a href>`, a router `Link`): the item props merge onto it, so Cmd / Ctrl-click and «open in a new tab» work; the pick still closes the menu. The link's children are the item content. Disabled: `aria-disabled`, the click is stopped. |
+| `children` | `ReactNode` | — | `Dropdown.ItemIcon`, the label, `Dropdown.ItemDescription`, `Dropdown.ItemShortcut`; with `asChild` one link element holding them. |
 
 ### Dropdown.CheckboxItem
 `ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked`: the label (and an `ItemIcon`) on the left like any item, an accent check mark at the end while checked and nothing while not; a click, Enter or Space toggles it and the menu stays open. + native button props.
@@ -93,6 +95,9 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 | `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state. |
 | `disabled` | `boolean` | `false` | Muted, `aria-disabled`, skipped by the arrow keys, does not toggle. |
 | `children` | `ReactNode` | — | The label (optionally after a `Dropdown.ItemIcon`). |
+
+### Dropdown.ItemDescription
+`ref` → `HTMLSpanElement`. A muted second line under the item label: what the action does, or why a disabled item is unavailable («Доступно владельцу проекта»). Wraps instead of widening the menu past its limit; describes the item for assistive tech. + native `<span>` props except `id`.
 
 ### Dropdown.ItemIcon · Dropdown.ItemShortcut
 `ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the menu icon size (a kit `Icon` follows it) / a `Kbd` one tier below the menu, pushed to the end of the item — a hint, not a handler. + native props.
@@ -138,14 +143,15 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 | `side="bottom"` | Below the trigger | Default | yes |
 | `side="top"` | Above the trigger | Triggers near the bottom of the screen | |
 | `side="left"` / `"right"` | Beside the trigger, aligned along its height | Triggers in a side rail (account menu at the bottom of a sidebar) | |
-| `align="start"` | Start edges aligned: the menu opens toward the end (right in LTR); at the screen edge it flips to `end` by itself | Default, triggers anywhere — «⋯» at the end of a row too | yes |
+| `align="auto"` | Lined up with the trigger edge that has more room: near the end of the screen the end edges meet and the menu grows toward the start, near the start the other way; below the trigger, flipping to the top without room | Default — triggers anywhere | yes |
+| `align="end"` | End edges aligned: the menu grows toward the start | The menu must line up with the end of a block whatever room there is | |
 | `align="center"` | Centred on the trigger | Small triggers | |
-| `align="end"` | End edges aligned: the menu opens toward the start | A menu that must line up with the end of a block whatever room there is | |
+| `align="start"` | Start edges aligned: the menu grows toward the end | The menu must line up with the start of a block whatever room there is | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `disabled` (Item) | Disabled text, skipped by arrows | Not allowed right now (say why in the label) | `false` |
+| `disabled` (Item) | Disabled text, skipped by arrows | Not allowed right now (say why in `Dropdown.ItemDescription`) | `false` |
 | `matchTriggerWidth` | Menu at least as wide as the trigger | Full-width buttons | `false` |
 | `closeOnOutsideClick={false}` · `closeOnEscape={false}` | Stays open until an item is picked | A required choice in an onboarding step | |
 
@@ -162,8 +168,10 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 | item tone | `tone` | `data-tone` |
 | sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the menu; the sheet carries `data-state`, the menu keeps its role and ref; page scroll locked; a swipe down from the handle closes it (with `closeOnOutsideClick`) |
 
+Motion (`overlayMotion`): the menu grows out of the side that faces its trigger and fades, in and out over `fast`; as a sheet it slides up over `slow` and down over `base`. Content stays mounted until the exit ends; under `prefers-reduced-motion` it unmounts at once.
+
 ## Layout & spacing
-- Width is `max-content` between `--prime-panel-min-width` and twice that; items never wrap.
+- Width is `max-content` between `--prime-panel-min-width` and twice that; item labels never wrap, a `Dropdown.ItemDescription` wraps inside that limit.
 - Max height = min(`--prime-panel-max-height`, the room on the resolved side); the menu scrolls inside.
 - Separators run edge to edge across the panel padding; group labels take `--prime-panel-group-label-height`.
 - Kept `--prime-space-2` from viewport edges; follows the trigger on scroll and resize.
@@ -199,6 +207,8 @@ No `labels`.
 | [sizes.tsx](examples/sizes.tsx) | Every size tier with icons, key hints and a destructive item; the menu takes the tier of its trigger — `size`. |
 | [placement.tsx](examples/placement.tsx) | Every side and alignment relative to the trigger; near the viewport edge the menu flips and shifts — `side`, `align`. |
 | [states.tsx](examples/states.tsx) | A regular, a disabled and a destructive item; arrow keys skip the disabled one — `disabled`, `tone`. |
+| [item-description.tsx](examples/item-description.tsx) | A second line under an item: what an action does, and why a disabled one is unavailable, readable by everyone and read with the item — `Dropdown.ItemDescription`. |
+| [link-items.tsx](examples/link-items.tsx) | Items that navigate are real links: Cmd-click or the context menu opens them in a new tab, a plain pick closes the menu — `asChild`. |
 | [match-trigger-width.tsx](examples/match-trigger-width.tsx) | Under a full-width button the menu is at least as wide as the trigger — `matchTriggerWidth`. |
 | [checkbox-items.tsx](examples/checkbox-items.tsx) | A column chooser: toggles in the menu keep it open, the key column cannot be hidden — `Dropdown.CheckboxItem`, `checked`, `onCheckedChange`. |
 | [long-list.tsx](examples/long-list.tsx) | More projects than fit: the grouped list scrolls inside the panel, capped by the room next to the trigger — `Dropdown.Group`. |
@@ -211,7 +221,9 @@ No `labels`.
 - A hand-written shortcut `<kbd>` → `Dropdown.ItemShortcut` (a Kbd at the end of the item).
 - `Dropdown.Group` with a separate heading element → pass the heading as `label`.
 - A destructive item without `tone="danger"`, or in the middle of the list → mark it and put it last.
+- A Tooltip on a disabled item to say why → keyboard and touch users never see it; put the reason in `Dropdown.ItemDescription`.
+- `onSelect={() => navigate(url)}` for an item that opens a page → `asChild` with a link, so Cmd-click and a new tab work.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (the menu), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`), [Divider](../divider/COMPONENT.md) (`Separator`), Icon (`action.check` of `CheckboxItem`)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (the menu), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`), [Divider](../divider/COMPONENT.md) (`Separator`), `Icon` (`action.check` of `CheckboxItem`)
 - **See also:** [Select](../select/COMPONENT.md), [CommandMenu](../command-menu/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md)

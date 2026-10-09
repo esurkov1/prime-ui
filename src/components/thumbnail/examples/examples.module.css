@@ -38,6 +38,37 @@
   grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 3)), 1fr));
 }
 
+/* video.tsx: three videos side by side, wrapping on a narrow page. */
+.media {
+  display: grid;
+  gap: var(--prime-space-4);
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 3)), 1fr));
+}
+
+/* controlled.tsx: the selection bar over a grid of tiles. */
+.library {
+  display: grid;
+  gap: var(--prime-space-3);
+  width: min(100%, calc(var(--prime-space-24) * 5));
+}
+
+.libraryBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+}
+
+.libraryGrid {
+  display: grid;
+  gap: var(--prime-space-3);
+  grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(100%, calc(var(--prime-space-24) * 1.25)), 1fr)
+    );
+}
+
 .cardContent {
   display: grid;
   gap: var(--prime-space-3);

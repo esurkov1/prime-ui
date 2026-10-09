@@ -1,5 +1,12 @@
 import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_ROOT_REST } from "../../internal/field.api";
+import {
+  FIELD_COMMIT_LABELS,
+  FIELD_COPY_LABELS,
+  FIELD_ROOT_REST,
+  fieldActionPart,
+  fieldCommitProp,
+  fieldCopyPart,
+} from "../../internal/field.api";
 
 const side = (en: string, ru: string): ApiProp => ({
   name: "side",
@@ -112,6 +119,7 @@ export const api: ComponentApi = {
           en: "Replaces the kit's estimate: every trait adds a point on its own, in any order — lowercase, uppercase, digits, symbols, 10+ and 14+ characters; 0–2 points weak, 3 easy, 4 medium, 5+ hard, and under 8 characters at most easy. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check.",
           ru: "Заменяет оценку кита: каждый признак добавляет балл сам по себе, в любом порядке — строчные, заглавные, цифры, символы, 10+ и 14+ символов; 0–2 балла — слабый, 3 — лёгкий, 4 — средний, 5+ — сложный, короче 8 символов — не выше лёгкого. Верните 0 для пустого, 1 — слабый … 4 — сложный. Подсказка для человека, а не проверка безопасности.",
         },
+        fieldCommitProp({ en: "Enter", ru: "Enter" }),
         {
           name: "labels",
           type: "Partial<InputLabels>",
@@ -137,16 +145,16 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "`Field` and the slots: `Icon`, `Affix`, `InlineAffix`, `ClearButton`.",
-          ru: "`Field`, `Icon`, `Affix`, `InlineAffix`, `ClearButton`.",
+          en: "`Field` and the slots: `Icon`, `Affix`, `InlineAffix`; the end segments `ClearButton`, `CopyButton`, `RevealButton`, `Action` in source order.",
+          ru: "`Field`, `Icon`, `Affix`, `InlineAffix`; сегменты у конца — `ClearButton`, `CopyButton`, `RevealButton`, `Action` в порядке разметки.",
         },
         rest("div"),
       ],
     },
     {
       name: "Input.Field",
-      en: "`ref` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root.",
-      ru: "Нативный `<input>` с id, aria-связями и `aria-invalid` из контекста.",
+      en: "`ref` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root, `disabled` also from a disabled `Fieldset` around it.",
+      ru: "Нативный `<input>` с id, aria-связями и `aria-invalid` из контекста; `disabled` — также от неактивного `Fieldset` вокруг.",
       props: [
         {
           name: "onValueChange",
@@ -238,6 +246,27 @@ export const api: ComponentApi = {
         },
       ],
     },
+    fieldCopyPart("Input.CopyButton", {
+      en: "as a full-height segment at the end edge",
+      ru: "сегментом на всю высоту поля у конца",
+    }),
+    {
+      name: "Input.RevealButton",
+      en: '`ref` → `HTMLButtonElement`. A full-height segment that shows a `type="password"` field as text and back: `aria-pressed`, named by `labels.reveal`, `aria-controls` on the input, the eye glyph switches. A pointer press keeps the focus in the field; the caret and selection survive the switch.',
+      ru: "Сегмент, который показывает пароль текстом и прячет обратно: `aria-pressed`, имя `labels.reveal`, иконка глаза меняется. Нажатие мышью оставляет фокус в поле, курсор и выделение сохраняются.",
+      props: [
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "children" | "aria-label" | "aria-pressed">',
+          en: "The other button attributes.",
+          ru: "Остальные атрибуты кнопки.",
+        },
+      ],
+    },
+    fieldActionPart("Input.Action", {
+      en: "at the end edge («Позвонить», «Открыть профиль»)",
+      ru: "у конца поля («Позвонить», «Открыть профиль»)",
+    }),
     {
       name: "Input.Counter",
       en: "`ref` → `HTMLSpanElement`. Character counter for the support row; shows `14/40` and announces `labels.counter`.",
@@ -273,6 +302,14 @@ export const api: ComponentApi = {
       en: "Accessible name of `Input.ClearButton`.",
       ru: "Имя `Input.ClearButton`.",
     },
+    ...FIELD_COPY_LABELS,
+    {
+      key: "reveal",
+      default: "Показать пароль",
+      en: "Accessible name of `Input.RevealButton`;`aria-pressed` says whether the password is shown.",
+      ru: "Имя `Input.RevealButton`; `aria-pressed` говорит, показан ли пароль.",
+    },
+    ...FIELD_COMMIT_LABELS,
     {
       key: "counter",
       default: "{current} из {max} символов",

@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { SegmentedControl } from "./SegmentedControl";
@@ -541,5 +542,102 @@ describe("SegmentedControl — цвет пунктов", () => {
     const block = rule.slice(0, rule.indexOf("}"));
     expect(block).toMatch(/background-color var\(--prime-motion-duration-base\)/);
     expect(block).toMatch(/box-shadow var\(--prime-motion-duration-base\)/);
+  });
+});
+
+describe("SegmentedControl field frame", () => {
+  it("names the radiogroup with its label, describes it and marks it invalid with an error", () => {
+    const { rerender } = render(
+      <SegmentedControl.Root label="Тип сделки" hint="Влияет на воронку" required>
+        <SegmentedControl.Item value="new">Новая</SegmentedControl.Item>
+        <SegmentedControl.Item value="renewal">Продление</SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+    const group = screen.getByRole("radiogroup", { name: /Тип сделки/ });
+    expect(group).toHaveAccessibleDescription("Влияет на воронку");
+    expect(group).toHaveAttribute("aria-required", "true");
+
+    rerender(
+      <SegmentedControl.Root label="Тип сделки" error="Выберите тип">
+        <SegmentedControl.Item value="new">Новая</SegmentedControl.Item>
+        <SegmentedControl.Item value="renewal">Продление</SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+    expect(group).toHaveAccessibleDescription("Выберите тип");
+    expect(group).toHaveAttribute("aria-invalid", "true");
+    expect(group).toHaveAttribute("data-invalid", "true");
+    expect(screen.getByText("Выберите тип")).toBeInTheDocument();
+  });
+
+  it("sends id and onKeyDown to the radiogroup, className and ref to the frame", () => {
+    const ref = { current: null as HTMLDivElement | null };
+    const onKeyDown = vi.fn((event: React.KeyboardEvent) => event.preventDefault());
+    const onValueChange = vi.fn();
+    render(
+      <SegmentedControl.Root
+        id="deal-type"
+        className="frame"
+        ref={ref}
+        aria-label="Тип сделки"
+        defaultValue="new"
+        onValueChange={onValueChange}
+        onKeyDown={onKeyDown}
+      >
+        <SegmentedControl.Item value="new">Новая</SegmentedControl.Item>
+        <SegmentedControl.Item value="renewal">Продление</SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+    const group = screen.getByRole("radiogroup", { name: "Тип сделки" });
+    expect(group).toHaveAttribute("id", "deal-type");
+    expect(ref.current).toHaveClass("frame");
+    expect(ref.current).toContainElement(group);
+    fireEvent.keyDown(screen.getByRole("radio", { name: "Новая" }), { key: "ArrowRight" });
+    expect(onKeyDown).toHaveBeenCalled();
+    expect(onValueChange, "a prevented key keeps the value").not.toHaveBeenCalled();
+  });
+
+  it("edge fades are logical: start / end sides and gradients flip under RTL", () => {
+    const css = readFileSync(segmentedModuleCssPath, "utf8");
+    const blocks = (selector: RegExp) =>
+      [...css.matchAll(new RegExp(`${selector.source}\\s*\\{[^}]*\\}`, "g"))]
+        .map((m) => m[0])
+        .join("\n");
+    const before = blocks(/(?<=\n)\.root::before/);
+    const after = blocks(/(?<=\n)\.root::after/);
+    expect(before).toContain("inset-inline-start:");
+    expect(after).toContain("inset-inline-end:");
+    expect(`${before}${after}`).not.toMatch(/(^|[\s;{])(left|right):/m);
+    expect(`${before}${after}`).not.toMatch(/to (left|right)/);
+    const rtl = css.match(/\.root:dir\(rtl\)\s*\{[^}]*\}/s)?.[0] ?? "";
+    expect(rtl).toContain("--seg-fade-to-end: to left;");
+    expect(rtl).toContain("--seg-fade-to-start: to right;");
+  });
+
+  it("in RTL the fades follow the negative scroll offset", () => {
+    const spies = [
+      vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(400),
+      vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(150),
+      // RTL: 0 at the start, negative toward the end; here scrolled to the middle.
+      vi.spyOn(HTMLElement.prototype, "scrollLeft", "get").mockReturnValue(-100),
+    ];
+    try {
+      render(
+        <div dir="rtl">
+          <SegmentedControl.Root defaultValue="a" aria-label="Период">
+            <SegmentedControl.Item value="a">День</SegmentedControl.Item>
+            <SegmentedControl.Item value="b">Неделя</SegmentedControl.Item>
+          </SegmentedControl.Root>
+        </div>,
+      );
+      // The radio's parent is the list, the list's parent the scrolling viewport.
+      const viewport = screen.getByRole("radio", { name: "День" }).parentElement
+        ?.parentElement as HTMLElement;
+      fireEvent.scroll(viewport);
+      const group = screen.getByRole("radiogroup", { name: "Период" });
+      expect(group).toHaveAttribute("data-overflow-start", "true");
+      expect(group).toHaveAttribute("data-overflow-end", "true");
+    } finally {
+      for (const spy of spies) spy.mockRestore();
+    }
   });
 });

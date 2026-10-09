@@ -1,52 +1,49 @@
-/** Attachments of a request: a labelled drop zone and the chosen files as rows with a remove button — `label`, `hint`, `multiple`, `onFilesChange`, `FileUpload.Item`. */
-import { Button, FileUpload, Icon } from "prime-ui-kit";
-import * as React from "react";
+/** Documents of a deal: a drop zone, the files already attached as rows, and new files uploading through a queue with progress, a reason and a retry — `label`, `hint`, `multiple`, `defaultValue`, `queue`. */
+import { FileUpload, type FileUploadFile, type UploadContext, useUploadQueue } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const formatSize = (bytes: number) =>
-  bytes < 1024 * 1024
-    ? `${Math.max(1, Math.round(bytes / 1024))} КБ`
-    : `${(bytes / 1024 / 1024).toFixed(1)} МБ`;
+const MAX_SIZE = 10 * 1024 * 1024;
 
-const fileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
+const ATTACHED: readonly FileUploadFile[] = [
+  { id: "deal-contract", name: "Договор № 48-П.pdf", size: 1_840_000, type: "application/pdf" },
+  { id: "deal-estimate", name: "Смета.xlsx", size: 240_000 },
+];
+
+/** A stand-in for the server: sends a file in a few steps and answers with its address. */
+function sendFile(file: File, { signal, onProgress }: UploadContext): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (file.size > MAX_SIZE) {
+      reject(new Error("Файл больше 10 МБ"));
+      return;
+    }
+    let sent = 0;
+    const timer = window.setInterval(() => {
+      sent = Math.min(1, sent + 0.12 + Math.random() * 0.12);
+      onProgress(sent);
+      if (sent < 1) return;
+      window.clearInterval(timer);
+      resolve(`https://files.example.com/deals/${encodeURIComponent(file.name)}`);
+    }, 300);
+    signal.addEventListener("abort", () => {
+      window.clearInterval(timer);
+      reject(signal.reason);
+    });
+  });
+}
 
 export default function FileUploadOverviewExample() {
-  const [files, setFiles] = React.useState<File[]>([]);
+  const queue = useUploadQueue({ upload: sendFile, concurrency: 2 });
 
   return (
     <div className={styles.column}>
       <FileUpload.Root
-        label="Документы к заявке"
-        hint="PDF, PNG или JPG, можно несколько"
+        label="Документы сделки"
+        hint="Любые файлы до 10 МБ, можно несколько"
         multiple
-        accept=".pdf,.png,.jpg,.jpeg"
-        onFilesChange={(next) =>
-          setFiles((current) => {
-            const known = new Set(current.map(fileKey));
-            return [...current, ...next.filter((file) => !known.has(fileKey(file)))];
-          })
-        }
+        defaultValue={ATTACHED}
+        queue={queue}
       />
-      {files.map((file) => (
-        <FileUpload.Item key={fileKey(file)}>
-          <FileUpload.FormatBadge format={file.name.split(".").pop() ?? "file"} />
-          <FileUpload.ItemName>{file.name}</FileUpload.ItemName>
-          <FileUpload.ItemDescription>{formatSize(file.size)}</FileUpload.ItemDescription>
-          <FileUpload.ItemActions>
-            <Button.Root
-              variant="ghost"
-              tone="neutral"
-              aria-label={`Удалить ${file.name}`}
-              onClick={() => setFiles((current) => current.filter((item) => item !== file))}
-            >
-              <Button.Icon>
-                <Icon name="action.close" />
-              </Button.Icon>
-            </Button.Root>
-          </FileUpload.ItemActions>
-        </FileUpload.Item>
-      ))}
     </div>
   );
 }

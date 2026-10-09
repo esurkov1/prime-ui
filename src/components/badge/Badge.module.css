@@ -256,6 +256,20 @@
   cursor: not-allowed;
 }
 
+/* Removing (a pending `onRemove` promise): the content quiets down, the segment spins and takes no
+   press until the answer. Both ways eased. */
+.body {
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-pending="true"] > .body {
+  opacity: 0.6;
+}
+
+.root[data-pending="true"] > .remove {
+  cursor: progress;
+}
+
 /* Any glyph — the default close / minus or a custom icon — sits at the tier icon size. */
 .remove > *,
 .action > * {
@@ -282,7 +296,9 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
-  transition: padding var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition:
+    padding var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {

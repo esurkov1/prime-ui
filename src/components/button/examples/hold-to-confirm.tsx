@@ -1,6 +1,9 @@
-/** A destructive action that needs a held press; letting go early rolls the fill back and does nothing — `holdToConfirm`, `onConfirm`. */
+/** A destructive action that needs a held press; letting go early rolls the fill back and does nothing, and the delete request keeps the button loading until the server answers — `holdToConfirm`, `onConfirm`. */
 import { Button, Icon } from "prime-ui-kit";
 import * as React from "react";
+
+/** The server deleting the project a beat later. */
+const deleteProject = () => new Promise<void>((resolve) => setTimeout(resolve, 900));
 
 export default function ButtonHoldToConfirmExample() {
   const [deleted, setDeleted] = React.useState(false);
@@ -13,7 +16,15 @@ export default function ButtonHoldToConfirmExample() {
       Восстановить проект
     </Button.Root>
   ) : (
-    <Button.Root variant="soft" tone="danger" holdToConfirm onConfirm={() => setDeleted(true)}>
+    <Button.Root
+      variant="soft"
+      tone="danger"
+      holdToConfirm
+      onConfirm={async () => {
+        await deleteProject();
+        setDeleted(true);
+      }}
+    >
       <Button.Icon>
         <Icon name="action.delete" />
       </Button.Icon>

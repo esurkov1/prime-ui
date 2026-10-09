@@ -538,10 +538,20 @@ export function NotificationProvider({
     setEntries((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
+  /** Calls `onDismiss` of every toast that leaves, once per toast. */
+  const announceLeave = React.useCallback((ids: Iterable<string>) => {
+    const target = new Set(ids);
+    for (const entry of entriesRef.current) {
+      if (!target.has(entry.id) || entry.dismissing) continue;
+      entry.onDismiss?.();
+    }
+  }, []);
+
   // Phase 1: mark as dismissing so the card plays its exit; under reduced motion remove at once.
   const startExit = React.useCallback(
     (ids: string[]) => {
       if (ids.length === 0) return;
+      announceLeave(ids);
       const target = new Set(ids);
       if (prefersReducedMotion()) {
         for (const id of ids) {
@@ -565,7 +575,7 @@ export function NotificationProvider({
         );
       }
     },
-    [remove],
+    [remove, announceLeave],
   );
 
   const dismiss = React.useCallback((id: string) => startExit([id]), [startExit]);
@@ -590,6 +600,12 @@ export function NotificationProvider({
         createdAt: Date.now(),
       };
 
+      // A full stack drops its oldest toasts: they leave too.
+      const stack = entriesRef.current.filter(
+        (n) => n.position === record.position && n.tone === record.tone && !n.dismissing,
+      );
+      announceLeave(stack.slice(max - 1).map((n) => n.id));
+
       setEntries((prev) => {
         const sameStack = prev.filter(
           (n) => n.position === record.position && n.tone === record.tone && !n.dismissing,
@@ -603,7 +619,7 @@ export function NotificationProvider({
 
       return id;
     },
-    [position, max],
+    [position, max, announceLeave],
   );
 
   const publicItems = React.useMemo(() => entries.filter((n) => !n.dismissing), [entries]);

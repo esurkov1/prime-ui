@@ -36,6 +36,8 @@ export const primitiveTokens = {
       600: "#3f59f0",
       700: "#2f4ae0",
       800: "#2540c8",
+      /** Dark-theme sequential chart scale (`color.chart.scale.2`). */
+      900: "#283a9a",
       950: "#1b2249",
     },
     red: {
@@ -92,6 +94,32 @@ export const primitiveTokens = {
       500: "#a855f7",
       700: "#7e22ce",
     },
+    /**
+     * Categorical chart hues: not ramps but one set, validated together (dataviz checks — OKLCH
+     * lightness band, chroma floor, CVD and normal-vision separation of neighbours in the
+     * `color.chart` order, ≥ 3:1 on the layer grounds). Light steps for gray.0–50 grounds, dark steps
+     * for gray.950–850. Blue is cobalt (600 light, 500 dark). Change one only by re-running the checks.
+     */
+    chart: {
+      light: {
+        orange: "#d95926",
+        teal: "#13946a",
+        yellow: "#b07800",
+        pink: "#d1487c",
+        green: "#008300",
+        purple: "#4a3aa7",
+        red: "#e34948",
+      },
+      dark: {
+        orange: "#d95926",
+        teal: "#199e70",
+        yellow: "#c98500",
+        pink: "#d55181",
+        green: "#008300",
+        purple: "#9085e9",
+        red: "#e66767",
+      },
+    },
     pink: {
       100: "#fce7f3",
       300: "#f9a8d4",
@@ -127,6 +155,7 @@ export const primitiveTokens = {
     8: "8px",
     10: "10px",
     12: "12px",
+    14: "14px",
     16: "16px",
     full: "9999px",
   },
@@ -191,6 +220,7 @@ export const primitiveTokens = {
     80: "80ms",
     150: "150ms",
     230: "230ms",
+    300: "300ms",
     380: "380ms",
     570: "570ms",
   },

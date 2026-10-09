@@ -67,11 +67,12 @@ Spinner          <span role="status">; size and tone
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| spinning | mounted | the ring turns at a constant speed (`slow × 3` per turn, linear) |
-| reduced motion | `prefers-reduced-motion` | duration collapses to 0: the ring stays still and visible |
-| size / tone | `size`, `tone` | `data-size`, `data-tone` (only for a non-default tone) |
+| spinning | mounted | the ring turns at a constant speed (`--prime-motion-loop × 3` per turn, linear) |
+| reduced motion | `prefers-reduced-motion` | the ring keeps turning, twice as slow (`--prime-motion-loop × 6` per turn) and linear: a loading cue is information, so the token is not zeroed |
+| size / tone | `size`, `tone` | `data-size` (the explicit size, else the host control tier, else `m`), `data-tone` (only for a non-default tone) |
 
 ## Layout & spacing
+- The ring fills the icon box: a stroke of two border widths in the tone color, one quarter of it transparent (the gap); `inline-flex`, `vertical-align: middle`.
 - Next to text: one row, `align-items: center`, gap = the tier gap (`--prime-control-m-gap`).
 - In a loading region: centered in the region with its explanation under it, gap `--prime-space-3`.
 - Render the real layout around it; never a full-screen overlay of spinners.
@@ -84,7 +85,7 @@ No keyboard interaction.
 ### ARIA
 - `role="status"` with a visually hidden `labels.loading`, so screen readers learn that something is loading.
 - When the host already announces it is busy (`aria-busy` on a button or a region), pass `aria-hidden="true"`.
-- Under `prefers-reduced-motion` the ring does not turn and stays visible.
+- Under `prefers-reduced-motion` the ring keeps turning, slower and linear, so the loading cue stays readable.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

@@ -10,7 +10,7 @@ export const page: ComponentPageConfig = {
     summary: "Выбор цвета из образцов прямо в форме",
     keywords: ["цвет", "образцы", "палитра", "swatches", "inline", "value", "onValueChange"],
     icon: SwatchBook,
-    order: 12,
+    order: 13,
   },
   dir: "color-swatches",
   title: "ColorSwatches",
@@ -22,7 +22,11 @@ export const page: ComponentPageConfig = {
       slot: "overview",
       description: "Палитра кита под подписью поля, один цвет выбран — `label`, `defaultValue`.",
     },
-    { slot: "sizes", description: "Все размеры, образец от 20 до 40 px с зазором яруса — `size`." },
+    {
+      slot: "sizes",
+      description:
+        "Все размеры: высота образца от 20 до 40 px с зазором яруса, подпись остаётся подписью формы — `size`.",
+    },
     {
       slot: "states",
       description: "Обычная палитра рядом с ошибочной и неактивной — `invalid`, `disabled`.",
@@ -30,7 +34,8 @@ export const page: ComponentPageConfig = {
     {
       scenario: "wrapping",
       title: "Перенос",
-      description: "В узкой колонке образцы переносятся сами, а стрелки ходят по видимым рядам.",
+      description:
+        "В узкой колонке образцы переносятся сами поровну по рядам, а стрелки ходят по видимым рядам.",
     },
 
     {

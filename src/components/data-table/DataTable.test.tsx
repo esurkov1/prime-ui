@@ -3,6 +3,8 @@ import { join } from "node:path";
 
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as React from "react";
+import { createPortal } from "react-dom";
 import { describe, expect, it, vi } from "vitest";
 
 import { Badge } from "@/components/badge/Badge";
@@ -527,6 +529,43 @@ describe("DataTable CSS contract", () => {
       await user.click(box("C"));
       expect(onSelectedChange).toHaveBeenLastCalledWith([]);
       expect(box("C")).not.toBeChecked();
+    });
+
+    it("re-renders only the toggled row under a controlled owner with inline callbacks", async () => {
+      const user = userEvent.setup();
+      const renders = new Map<number, number>();
+      const counted: DataTableColumn<Row>[] = [
+        {
+          id: "name",
+          header: "Name",
+          cell: (row) => {
+            renders.set(row.id, (renders.get(row.id) ?? 0) + 1);
+            return row.name;
+          },
+        },
+      ];
+      function Owner() {
+        const [selected, setSelected] = React.useState<React.Key[]>([]);
+        return (
+          <DataTable
+            rows={five}
+            columns={counted}
+            getRowKey={(row) => row.id}
+            getRowLabel={(row) => row.name}
+            onRowClick={() => {}}
+            labels={{ empty: "Пусто" }}
+            selectable
+            selected={selected}
+            onSelectedChange={setSelected}
+            paging="none"
+          />
+        );
+      }
+      render(<Owner />);
+      renders.clear();
+      await user.click(box("C"));
+      expect(box("C")).toBeChecked();
+      expect([...renders.keys()]).toEqual([1]);
     });
 
     it("Space on a focused checkbox toggles it", async () => {
@@ -1071,6 +1110,10 @@ describe("DataTable edge cue", () => {
     fireEvent.scroll(viewport);
     await waitFor(() => expect(root).not.toHaveAttribute("data-overflow-end"));
     expect(root).toHaveAttribute("data-overflow-start", "true");
+    // No fade reads the depth: nothing is written on the scroller per scroll frame (an inherited
+    // custom property there would restyle every cell of the table).
+    expect(viewport.style.getPropertyValue("--edge-start")).toBe("");
+    expect(viewport.style.getPropertyValue("--edge-end")).toBe("");
   });
 
   it("reads the RTL scroll position as distance from the start", async () => {
@@ -1107,5 +1150,521 @@ describe("DataTable edge cue", () => {
     expect(css).toMatch(
       /@media \(max-height: 479px\) \{\s*\.root\[data-sticky-header="true"\] \.headCell \{\s*top: auto;/,
     );
+  });
+});
+
+describe("DataTable opening rows", () => {
+  type Deal = { id: string; client: string; total: number; summary?: boolean };
+  const DEALS: Deal[] = [
+    { id: "d1", client: "ООО «Север»", total: 120 },
+    { id: "d2", client: "ИП Козлов", total: 80 },
+    { id: "sum", client: "Итого", total: 200, summary: true },
+  ];
+  const dealColumns = (extra?: DataTableColumn<Deal>): DataTableColumn<Deal>[] => [
+    { id: "client", header: "Клиент", accessor: "client" },
+    { id: "total", header: "Сумма", accessor: "total", numeric: true },
+    ...(extra ? [extra] : []),
+  ];
+  const rowOf = (text: string) => screen.getByText(text).closest("tr") as HTMLTableRowElement;
+
+  it("in-place rows take focus and open on Enter and Space", async () => {
+    const user = userEvent.setup();
+    const onRowClick = vi.fn();
+    render(
+      <DataTable
+        rows={DEALS.slice(0, 2)}
+        columns={dealColumns()}
+        getRowKey={(row) => row.id}
+        paging="none"
+        onRowClick={onRowClick}
+      />,
+    );
+    const first = rowOf("ООО «Север»");
+    expect(first).toHaveAttribute("tabindex", "0");
+    expect(first).toHaveAttribute("data-clickable", "true");
+    await user.tab();
+    expect(first).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(onRowClick).toHaveBeenLastCalledWith(DEALS[0], 0, expect.anything());
+    await user.tab();
+    expect(rowOf("ИП Козлов")).toHaveFocus();
+    await user.keyboard(" ");
+    expect(onRowClick).toHaveBeenLastCalledWith(DEALS[1], 1, expect.anything());
+    expect(onRowClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("never opens from a control inside the row, the opt-out attribute or a portal", () => {
+    const onRowClick = vi.fn();
+    const onAction = vi.fn();
+    const portalHost = document.createElement("div");
+    document.body.append(portalHost);
+    const actions: DataTableColumn<Deal> = {
+      id: "actions",
+      header: "Действия",
+      cell: (row) => (
+        <span>
+          <button type="button" onClick={onAction}>
+            Изменить {row.id}
+          </button>
+          <input aria-label={`Комментарий ${row.id}`} />
+          <span role="menuitem" tabIndex={-1}>
+            Пункт {row.id}
+          </span>
+          <span data-row-click-ignore="">
+            <span>Виджет {row.id}</span>
+          </span>
+          {createPortal(<button type="button">Меню {row.id}</button>, portalHost)}
+        </span>
+      ),
+    };
+    render(
+      <DataTable
+        rows={DEALS.slice(0, 1)}
+        columns={dealColumns(actions)}
+        getRowKey={(row) => row.id}
+        paging="none"
+        onRowClick={onRowClick}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Изменить d1" }));
+    fireEvent.click(screen.getByRole("textbox", { name: "Комментарий d1" }));
+    fireEvent.click(screen.getByText("Пункт d1"));
+    fireEvent.click(screen.getByText("Виджет d1"));
+    fireEvent.click(screen.getByRole("button", { name: "Меню d1" }));
+    expect(onAction).toHaveBeenCalledTimes(1);
+    expect(onRowClick).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText("ООО «Север»"));
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+    portalHost.remove();
+  });
+
+  it("a link row: the key cell holds the named link, the other cells its hidden copies", () => {
+    render(
+      <DataTable
+        rows={DEALS.slice(0, 2)}
+        columns={dealColumns()}
+        getRowKey={(row) => row.id}
+        paging="none"
+        getRowHref={(row) => `/deals/${row.id}`}
+      />,
+    );
+    const link = screen.getByRole("link", { name: "ООО «Север»" });
+    expect(link).toHaveAttribute("href", "/deals/d1");
+    const row = rowOf("ООО «Север»");
+    expect(row).not.toHaveAttribute("tabindex");
+    expect(row).toHaveAttribute("data-link", "true");
+    const copies = row.querySelectorAll('a[aria-hidden="true"]');
+    expect(copies).toHaveLength(1);
+    expect(copies[0]).toHaveAttribute("href", "/deals/d1");
+    expect(copies[0]).toHaveAttribute("tabindex", "-1");
+    // Only the named links are links for assistive tech.
+    expect(screen.getAllByRole("link")).toHaveLength(2);
+  });
+
+  it("a link row passes plain clicks to onRowClick and leaves modified clicks to the browser", () => {
+    const onRowClick = vi.fn((_row: Deal, _index: number, event: { preventDefault(): void }) =>
+      event.preventDefault(),
+    );
+    render(
+      <DataTable
+        rows={DEALS.slice(0, 1)}
+        columns={dealColumns()}
+        getRowKey={(row) => row.id}
+        paging="none"
+        getRowHref={(row) => `/deals/${row.id}`}
+        onRowClick={onRowClick}
+      />,
+    );
+    const link = screen.getByRole("link", { name: "ООО «Север»" });
+    expect(fireEvent.click(link, { metaKey: true })).toBe(true);
+    expect(fireEvent.click(link, { ctrlKey: true })).toBe(true);
+    expect(onRowClick).not.toHaveBeenCalled();
+    // The app routes in place: the default navigation is cancelled.
+    expect(fireEvent.click(link)).toBe(false);
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+    expect(onRowClick.mock.calls[0]?.[0]).toBe(DEALS[0]);
+  });
+
+  it("isRowClickable takes a row out of both the link and the in-place opening", () => {
+    const onRowClick = vi.fn();
+    render(
+      <DataTable
+        rows={DEALS}
+        columns={dealColumns()}
+        getRowKey={(row) => row.id}
+        paging="none"
+        getRowHref={(row) => `/deals/${row.id}`}
+        onRowClick={onRowClick}
+        isRowClickable={(row) => !row.summary}
+      />,
+    );
+    const total = rowOf("Итого");
+    expect(total).not.toHaveAttribute("data-clickable");
+    expect(total.querySelector("a")).toBeNull();
+    fireEvent.click(screen.getByText("Итого"));
+    expect(onRowClick).not.toHaveBeenCalled();
+    expect(screen.getAllByRole("link")).toHaveLength(2);
+  });
+
+  it("CSS: controls stand above the link copies and the focused row rings all its cells", () => {
+    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
+    expect(css).toMatch(/:where\(\.row\[data-link="true"\] > \.cell\)/);
+    expect(css).toMatch(/\[data-row-click-ignore\]\s*\) \{\s*position: relative;\s*z-index: 1;/);
+    expect(css).toMatch(/\.row:is\(:focus-visible, :has\(\.rowLink:focus-visible\)\) > \.cell \{/);
+  });
+});
+
+describe("DataTable columns menu", () => {
+  type Order = { id: string; client: string; city: string };
+  const ORDERS: Order[] = [{ id: "1040", client: "ООО «Север»", city: "Казань" }];
+  const ORDER_COLUMNS: DataTableColumn<Order>[] = [
+    { id: "id", header: "Заказ", accessor: "id", hideable: false },
+    { id: "client", header: "Клиент", accessor: "client" },
+    { id: "city", header: "Город", accessor: "city" },
+  ];
+
+  it("hides and shows columns through the triad; the key column stays", async () => {
+    const user = userEvent.setup();
+    const onHiddenColumnsChange = vi.fn();
+    render(
+      <DataTable
+        rows={ORDERS}
+        columns={ORDER_COLUMNS}
+        defaultHiddenColumns={["city"]}
+        onHiddenColumnsChange={onHiddenColumnsChange}
+        toolbar={<DataTable.ColumnsMenu />}
+      />,
+    );
+    expect(screen.queryByRole("columnheader", { name: "Город" })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Колонки" }));
+    expect(screen.getByRole("menuitemcheckbox", { name: "Заказ" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("menuitemcheckbox", { name: "Заказ" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    await user.click(screen.getByRole("menuitemcheckbox", { name: "Город" }));
+    expect(onHiddenColumnsChange).toHaveBeenLastCalledWith([]);
+    expect(screen.getByRole("columnheader", { name: "Город" })).toBeInTheDocument();
+    await user.click(screen.getByRole("menuitemcheckbox", { name: "Клиент" }));
+    expect(onHiddenColumnsChange).toHaveBeenLastCalledWith(["client"]);
+    expect(screen.queryByRole("columnheader", { name: "Клиент" })).toBeNull();
+    await user.click(screen.getByRole("menuitem", { name: "Показать все" }));
+    expect(onHiddenColumnsChange).toHaveBeenLastCalledWith([]);
+    expect(screen.getByRole("columnheader", { name: "Клиент" })).toBeInTheDocument();
+  });
+
+  it("never hides the last visible column; the trigger text takes {shown} and {total}", async () => {
+    const user = userEvent.setup();
+    const columns = ORDER_COLUMNS.map((column) => ({ ...column, hideable: true }));
+    render(
+      <DataTable
+        rows={ORDERS}
+        columns={columns}
+        hiddenColumns={["client", "city"]}
+        labels={{ columns: "Колонки: {shown} из {total}" }}
+        toolbar={<DataTable.ColumnsMenu />}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Колонки: 1 из 3" }));
+    expect(screen.getByRole("menuitemcheckbox", { name: "Заказ" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("works from the keyboard: the menu opens on Enter, Space toggles a column", async () => {
+    const user = userEvent.setup();
+    render(<DataTable rows={ORDERS} columns={ORDER_COLUMNS} toolbar={<DataTable.ColumnsMenu />} />);
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Колонки" })).toHaveFocus();
+    await user.keyboard("{Enter}");
+    // The key column is disabled: focus starts on the first column that can be hidden.
+    expect(screen.getByRole("menuitemcheckbox", { name: "Клиент" })).toHaveFocus();
+    await user.keyboard(" ");
+    expect(screen.queryByRole("columnheader", { name: "Клиент" })).toBeNull();
+  });
+
+  it("throws outside a table", () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => render(<DataTable.ColumnsMenu />)).toThrow(/inside the DataTable toolbar/);
+    vi.restoreAllMocks();
+  });
+});
+
+describe("DataTable fill height and row tokens", () => {
+  it('scrollHeight="fill" drops the max height, also with infinite paging', () => {
+    const { container } = render(
+      <DataTable rows={rows} columns={columns} paging="infinite" scrollHeight="fill" />,
+    );
+    const root = container.querySelector("[data-size]") as HTMLElement;
+    expect(root).toHaveAttribute("data-scroll-height", "fill");
+    const viewport = container.querySelector("table")?.parentElement as HTMLElement;
+    expect(viewport.style.maxHeight).toBe("");
+  });
+
+  it("CSS: the filling table stretches in its parent; every size reads its row token", () => {
+    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
+    expect(css).toMatch(/\.root\[data-scroll-height="fill"\] \{[^}]*flex: 1 1 0%/);
+    for (const size of ["xs", "s", "l", "xl"]) {
+      expect(css).toMatch(
+        new RegExp(
+          `\\.root\\[data-size="${size}"\\] \\{\\s*--dt-row-height: var\\(--prime-table-row-height-${size}\\)`,
+        ),
+      );
+    }
+    expect(css).toMatch(/--dt-row-height: var\(--prime-table-row-height-m\)/);
+  });
+});
+
+describe("DataTable heatmap columns", () => {
+  type Cell = { id: string; manager: string; deals: number | null };
+  const CELLS: Cell[] = [
+    { id: "1", manager: "Ольга", deals: 0 },
+    { id: "2", manager: "Игорь", deals: 50 },
+    { id: "3", manager: "Мария", deals: 100 },
+    { id: "4", manager: "Анна", deals: null },
+  ];
+  const cellOf = (text: string) => screen.getByText(text).closest("td") as HTMLElement;
+
+  it("shades each cell by its value on five steps and keeps the value", () => {
+    render(
+      <DataTable
+        rows={CELLS}
+        columns={[
+          { id: "manager", header: "Менеджер", accessor: "manager" },
+          { id: "deals", header: "Сделки", accessor: "deals", numeric: true, scale: true },
+        ]}
+        paging="none"
+      />,
+    );
+    expect(cellOf("0")).toHaveAttribute("data-scale", "1");
+    expect(cellOf("50")).toHaveAttribute("data-scale", "3");
+    expect(cellOf("100")).toHaveAttribute("data-scale", "5");
+    expect(cellOf("—")).not.toHaveAttribute("data-scale");
+    expect(cellOf("Ольга")).not.toHaveAttribute("data-scale");
+  });
+
+  it("a fixed range clamps the values outside it", () => {
+    render(
+      <DataTable
+        rows={CELLS}
+        columns={[
+          { id: "deals", header: "Сделки", accessor: "deals", scale: { min: 50, max: 60 } },
+        ]}
+        paging="none"
+      />,
+    );
+    expect(cellOf("0")).toHaveAttribute("data-scale", "1");
+    expect(cellOf("100")).toHaveAttribute("data-scale", "5");
+  });
+
+  it("CSS: every step reads the chart scale; dark steps take its text colour", () => {
+    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
+    for (const step of [1, 2, 3, 4, 5]) {
+      expect(css).toContain(`--dt-cell-bg: var(--prime-color-chart-scale-${step});`);
+    }
+    expect(css).toMatch(/\[data-scale="5"\] \{[^}]*color: var\(--prime-color-chart-scale-fg\)/);
+  });
+});
+
+describe("DataTable row groups", () => {
+  type Payment = { id: string; month: string; client: string; amount: number };
+  const PAYMENTS: Payment[] = [
+    { id: "p1", month: "Октябрь", client: "Север", amount: 300 },
+    { id: "p2", month: "Сентябрь", client: "Козлов", amount: 100 },
+    { id: "p3", month: "Октябрь", client: "Гранит", amount: 50 },
+    { id: "p4", month: "Сентябрь", client: "Лето", amount: 700 },
+  ];
+  const paymentColumns: DataTableColumn<Payment>[] = [
+    { id: "client", header: "Клиент", accessor: "client" },
+    { id: "amount", header: "Сумма", accessor: "amount", numeric: true, sortable: true },
+  ];
+
+  it("draws one tbody per group under a rowgroup header with the group's totals", () => {
+    const renderGroupHeader = vi.fn(
+      (group: { key: string | number; rows: Payment[] }) =>
+        `${group.key}: ${group.rows.reduce((sum, row) => sum + row.amount, 0)}`,
+    );
+    const { container } = render(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowGroup={(row) => row.month}
+        renderGroupHeader={renderGroupHeader}
+        paging="none"
+      />,
+    );
+    const headers = screen.getAllByRole("rowheader");
+    expect(headers.map((cell) => cell.textContent)).toEqual(["Октябрь: 350", "Сентябрь: 800"]);
+    expect(headers[0]).toHaveAttribute("scope", "rowgroup");
+    expect(headers[0]).toHaveAttribute("colspan", "2");
+    const bodies = container.querySelectorAll("table > tbody");
+    expect(bodies).toHaveLength(2);
+    expect(within(bodies[0] as HTMLElement).getByText("Гранит")).toBeInTheDocument();
+    expect(within(bodies[1] as HTMLElement).getByText("Лето")).toBeInTheDocument();
+  });
+
+  it("a sort orders the rows inside each group and keeps the group order", () => {
+    const { container } = render(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowGroup={(row) => row.month}
+        defaultSort={{ columnId: "amount", order: "asc" }}
+        paging="none"
+      />,
+    );
+    const bodies = [...container.querySelectorAll("table > tbody")];
+    const clients = bodies.map((body) =>
+      [...body.querySelectorAll("td[data-column-id='client']")].map((cell) => cell.textContent),
+    );
+    expect(clients).toEqual([
+      ["Гранит", "Север"],
+      ["Козлов", "Лето"],
+    ]);
+    expect(screen.getAllByRole("rowheader").map((cell) => cell.textContent)).toEqual([
+      "Октябрь",
+      "Сентябрь",
+    ]);
+  });
+
+  it("selection keeps working across groups: Shift+click selects the range over a header", async () => {
+    const user = userEvent.setup();
+    const onSelectedChange = vi.fn();
+    render(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowLabel={(row) => row.client}
+        getRowGroup={(row) => row.month}
+        selectable
+        onSelectedChange={onSelectedChange}
+        paging="none"
+        stickyGroupHeaders
+      />,
+    );
+    await user.click(screen.getByRole("checkbox", { name: "Выбрать строку Гранит" }));
+    await user.keyboard("{Shift>}");
+    await user.click(screen.getByRole("checkbox", { name: "Выбрать строку Козлов" }));
+    await user.keyboard("{/Shift}");
+    expect(onSelectedChange).toHaveBeenLastCalledWith(["p3", "p2"]);
+    expect(screen.getAllByRole("rowheader")[0]).toHaveAttribute("data-sticky", "true");
+  });
+
+  it("repeats the group header on the next page when a group continues there", () => {
+    render(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowGroup={(row) => row.month}
+        pageSize={3}
+        defaultPage={2}
+      />,
+    );
+    expect(screen.getAllByRole("rowheader").map((cell) => cell.textContent)).toEqual(["Сентябрь"]);
+    expect(screen.getByText("Лето")).toBeInTheDocument();
+  });
+});
+
+describe("DataTable async load more", () => {
+  function mockObserver() {
+    const live = new Set<(entries: IntersectionObserverEntry[]) => void>();
+    class MockIntersectionObserver {
+      callback: (entries: IntersectionObserverEntry[]) => void;
+      constructor(cb: (entries: IntersectionObserverEntry[]) => void) {
+        this.callback = cb;
+      }
+      observe() {
+        live.add(this.callback);
+      }
+      unobserve() {}
+      disconnect() {
+        live.delete(this.callback);
+      }
+      takeRecords() {
+        return [];
+      }
+      root = null;
+      rootMargin = "0px";
+      thresholds = [];
+    }
+    vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
+    return () =>
+      act(() => {
+        for (const callback of [...live]) {
+          callback([{ isIntersecting: true } as IntersectionObserverEntry]);
+        }
+      });
+  }
+
+  it("shows the loading status while the promise is pending, then asks again", async () => {
+    const reach = mockObserver();
+    let resolve = () => {};
+    const onLoadMore = vi.fn(
+      () =>
+        new Promise<void>((done) => {
+          resolve = done;
+        }),
+    );
+    const { container } = render(
+      <DataTable
+        rows={rows.slice(0, 2)}
+        columns={columns}
+        paging="infinite"
+        pageSize={2}
+        hasMore
+        onLoadMore={onLoadMore}
+      />,
+    );
+    reach();
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Догружаем строки…")).toBeInTheDocument();
+    expect(container.querySelector("table")).toHaveAttribute("aria-busy", "true");
+    reach();
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+    await act(async () => resolve());
+    expect(screen.queryByText("Догружаем строки…")).toBeNull();
+    reach();
+    expect(onLoadMore).toHaveBeenCalledTimes(2);
+    vi.unstubAllGlobals();
+  });
+
+  it("a rejected request is not repeated until the rows change", async () => {
+    const reach = mockObserver();
+    const onLoadMore = vi.fn(() => Promise.reject(new Error("offline")));
+    const { rerender } = render(
+      <DataTable
+        rows={rows.slice(0, 2)}
+        columns={columns}
+        paging="infinite"
+        pageSize={2}
+        hasMore
+        onLoadMore={onLoadMore}
+      />,
+    );
+    reach();
+    await act(async () => {});
+    reach();
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+    rerender(
+      <DataTable
+        rows={rows.slice(0, 3)}
+        columns={columns}
+        paging="infinite"
+        pageSize={3}
+        hasMore
+        onLoadMore={onLoadMore}
+      />,
+    );
+    reach();
+    expect(onLoadMore).toHaveBeenCalledTimes(2);
+    vi.unstubAllGlobals();
   });
 });

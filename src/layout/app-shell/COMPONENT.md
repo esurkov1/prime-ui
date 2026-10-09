@@ -107,13 +107,18 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 | State | Driven by | DOM |
 |---|---|---|
 | fixed frame | `fillViewport` | `data-fill-viewport="true"` on Root |
+| navigation column | an `AppShell.Nav` child | `data-nav="true"` on Root (two grid columns) |
 | content width | `contentWidth` | `data-content-width` on Main |
 | footer bar | the navigation column: `AppShell.Nav` with a Sidebar that is not off-canvas | the footer is `display: none` while the rail is on screen; without Nav or with an off-canvas Sidebar it stays at any width |
 
 ## Layout & spacing
 - Two full-height planes edge to edge: no inset, radius, shadow or border — the boundary is the fill change (the Sidebar rail is layer 1, the panel the page: white rail beside a gray page in light, a rail one step lighter than the near-black page in dark).
-- Gutters in Main: `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px. Main top padding `--prime-space-6` (24) → `--prime-space-10` (40) from 1024px; bottom `--prime-space-16`.
+- Gutters in Main (and in an `AppHeader.Root` in the panel): `--prime-layout-gutter-s` (16) → `-m` (24) from 640px → `-l` (32) from 1024px. Main top padding `--prime-space-6` (24) → `--prime-space-10` (40) from 1024px; bottom `--prime-space-16`. Children of Main start from their own gutters, not the shell's.
+- A page that fills the panel height (`PageContent.Root fill`): Main's bottom padding drops to the side gutter, so no long scroll tail stays under it.
+- Main scrolls with `overscroll-behavior: contain`, so its scroll never chains to the document.
+- Nav column: sticky at the top, viewport high, `z-index: --prime-z-sticky` (above the panel, so the compact Sidebar toggle can ride the rail edge); with `fillViewport` it fills the shell height instead.
 - Footer: no padding of its own (BottomNav keeps the bottom safe-area inset), sticky at the bottom, `z-index: --prime-z-sticky`.
+- A floating BottomNav (`floating`) in the footer: the footer takes no height, the capsule overlays the page, and Main keeps extra bottom room (the capsule height and the safe-area inset) so its last line never ends up under it.
 - The panel is the page (layer 0 of the surface ladder, gray in light): fields on it take the page fill, a Card inside is layer 1 — white in light with the raised whisper — and cards in cards go deeper.
 
 ## Accessibility

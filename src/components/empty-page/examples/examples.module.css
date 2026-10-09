@@ -1,6 +1,6 @@
 /* Layout of the EmptyPage scenarios: semantic tokens only. */
 
-/* sizes.tsx, icon-tones.tsx: cells of 16rem that wrap; an odd last cell stays centered. */
+/* sizes.tsx, variants.tsx: cells of 16rem that wrap; an odd last cell stays centered. */
 .grid {
   display: flex;
   flex-wrap: wrap;
@@ -16,9 +16,26 @@
   min-width: 0;
 }
 
-/* data-region.tsx: the Card's minimum height that the empty state fills. */
+/* data-region.tsx, region-error.tsx: the Card's minimum height that the state fills. */
 .region {
   min-height: calc(var(--prime-space-24) * 3);
+}
+
+/* region-error.tsx: the loaded rows — client and amount at the two ends. */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--prime-space-4);
+  min-width: 0;
 }
 
 /* compact.tsx: a floating panel (menu / listbox) the compact empty state sits in. */

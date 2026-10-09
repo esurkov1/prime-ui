@@ -124,6 +124,46 @@ export const darkThemeOverrides = {
       fill: "rgba(17, 19, 24, 0.08)",
     },
     palette: darkPalette(),
+    /** The outgoing bubble is the accent itself in dark, as messengers do; text on it is light. */
+    message: {
+      outgoing: {
+        bg: "{color.cobalt.700}",
+        text: "{color.white}",
+        muted: "{color.cobalt.200}",
+        accent: "{color.white}",
+        accentFg: "{color.cobalt.700}",
+        danger: "{color.red.100}",
+        fill: "rgba(255, 255, 255, 0.14)",
+        fillHover: "rgba(255, 255, 255, 0.2)",
+        track: "rgba(255, 255, 255, 0.36)",
+        /** A light wash over `bg`, precomposed (opaque) for the avatar ring. */
+        chip: "color-mix(in srgb, var(--prime-ref-color-white) 14%, var(--prime-ref-color-cobalt-700))",
+        chipHover:
+          "color-mix(in srgb, var(--prime-ref-color-white) 20%, var(--prime-ref-color-cobalt-700))",
+      },
+    },
+    /** Own steps for the dark grounds, validated as a set; the scale rises from the ground. */
+    chart: {
+      1: "{color.cobalt.500}",
+      2: "{color.chart.dark.orange}",
+      3: "{color.chart.dark.teal}",
+      4: "{color.chart.dark.yellow}",
+      5: "{color.chart.dark.pink}",
+      6: "{color.chart.dark.green}",
+      7: "{color.chart.dark.purple}",
+      8: "{color.chart.dark.red}",
+      other: "{color.gray.500}",
+      grid: "{color.gray.800}",
+      axis: "{color.gray.700}",
+      scale: {
+        1: "{color.cobalt.950}",
+        2: "{color.cobalt.900}",
+        3: "{color.cobalt.600}",
+        4: "{color.cobalt.400}",
+        5: "{color.cobalt.200}",
+      },
+      scaleFg: "{color.gray.950}",
+    },
   },
   shadow: {
     raised: "none",

@@ -6,6 +6,13 @@ import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeConte
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
+import {
+  FieldFrame,
+  type FieldFrameProps,
+  type FieldRootDomProps,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
 import palette from "@/internal/palette.module.css";
 import { rovingIndex } from "@/internal/rovingFocus";
 import type { ControlSize, PaletteColor } from "@/internal/states";
@@ -30,7 +37,9 @@ const [SegmentedControlProvider, useSegmentedControlContext] =
 const ENABLED_ITEM = '[role="radio"]:not([data-disabled="true"])';
 const CHECKED_ITEM = '[role="radio"][aria-checked="true"]';
 
+/** Writes only a change: an unchanged flag must not restyle the row on every resize frame. */
 function setFlag(element: HTMLElement, name: string, on: boolean) {
+  if (on === element.hasAttribute(name)) return;
   if (on) element.setAttribute(name, "true");
   else element.removeAttribute(name);
 }
@@ -57,13 +66,18 @@ function syncThumb(list: HTMLElement, thumb: HTMLElement, animate: boolean) {
     thumb.style.width !== width ||
     thumb.style.height !== height;
   // Glide only into a user's choice; a layout change (resize, fonts, new items) snaps the thumb.
-  if (moved) setFlag(thumb, "data-animate", animate && thumb.hasAttribute("data-visible"));
-  thumb.style.left = left;
-  thumb.style.top = top;
-  thumb.style.width = width;
-  thumb.style.height = height;
-  if (active.dataset.color) thumb.dataset.color = active.dataset.color;
-  else delete thumb.dataset.color;
+  if (moved) {
+    setFlag(thumb, "data-animate", animate && thumb.hasAttribute("data-visible"));
+    thumb.style.left = left;
+    thumb.style.top = top;
+    thumb.style.width = width;
+    thumb.style.height = height;
+  }
+  const color = active.dataset.color;
+  if (color !== thumb.dataset.color) {
+    if (color) thumb.dataset.color = color;
+    else delete thumb.dataset.color;
+  }
   setFlag(thumb, "data-visible", true);
 }
 
@@ -73,11 +87,22 @@ function syncThumb(list: HTMLElement, thumb: HTMLElement, animate: boolean) {
  * never sits over the segment being revealed.
  */
 function syncOverflow(viewport: HTMLElement, scrollLeft = viewport.scrollLeft) {
+  applyOverflow(viewport, measureOverflow(viewport, scrollLeft));
+}
+
+/** The read half of `syncOverflow`, for callers that batch it before their writes. */
+function measureOverflow(viewport: HTMLElement, scrollLeft = viewport.scrollLeft) {
+  const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+  // In RTL `scrollLeft` runs from 0 at the start to negative values toward the end.
+  const offset = Math.abs(scrollLeft);
+  return { start: offset > 1, end: maxScroll - offset > 1 };
+}
+
+function applyOverflow(viewport: HTMLElement, overflow: { start: boolean; end: boolean }) {
   const root = viewport.parentElement;
   if (!root) return;
-  const maxScroll = viewport.scrollWidth - viewport.clientWidth;
-  setFlag(root, "data-overflow-start", scrollLeft > 1);
-  setFlag(root, "data-overflow-end", maxScroll - scrollLeft > 1);
+  setFlag(root, "data-overflow-start", overflow.start);
+  setFlag(root, "data-overflow-end", overflow.end);
 }
 
 /**
@@ -98,36 +123,67 @@ function revealOffset(viewport: HTMLElement, item: HTMLElement): number {
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
-export type SegmentedControlRootProps = Omit<
-  React.HTMLAttributes<HTMLDivElement>,
-  "defaultValue" | "onChange"
-> & {
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  disabled?: boolean;
-  size?: ControlSize;
-  /**
-   * Stretch to the container width. Single-line segments tend to equal widths but never get narrower
-   * than their label; when they do not fit, the row scrolls.
-   */
-  fullWidth?: boolean;
-  ref?: React.Ref<HTMLDivElement>;
+export type SegmentedControlLabels = {
+  /** Muted marker after the label when `optional`. */
+  optional: string;
 };
 
+const SEGMENTED_CONTROL_LABELS: SegmentedControlLabels = { optional: "необязательно" };
+
+export type SegmentedControlRootProps = Omit<FieldRootDomProps, "dir"> &
+  Omit<FieldFrameProps, "focusRing"> & {
+    value?: string;
+    defaultValue?: string;
+    onValueChange?: (value: string) => void;
+    disabled?: boolean;
+    size?: ControlSize;
+    /**
+     * Stretch to the container width. Single-line segments tend to equal widths but never get
+     * narrower than their label; when they do not fit, the row scrolls.
+     */
+    fullWidth?: boolean;
+    /** Invalid state: a danger ring on the track and `aria-invalid` on the radiogroup. */
+    invalid?: boolean;
+    /** Always render the support row so an appearing error does not shift the layout. */
+    reserveSupportRow?: boolean;
+    /** Id of the `role="radiogroup"` element; generated when omitted. */
+    id?: string;
+    labels?: Partial<SegmentedControlLabels>;
+    /** `SegmentedControl.Item` segments. */
+    children?: React.ReactNode;
+  };
+
+/**
+ * The field: label · radiogroup track · hint or error. `className`, `ref` and the rest go to the
+ * frame; `id`, `onKeyDown` and the `aria-label*` / `aria-describedby` names to the radiogroup.
+ */
 function SegmentedControlRoot({
   value,
   defaultValue = "",
   onValueChange,
-  disabled = false,
+  disabled: disabledProp = false,
   size: sizeProp,
   fullWidth = false,
+  label,
+  required = false,
+  optional = false,
+  hint,
+  error,
+  invalid,
+  reserveSupportRow = false,
+  id,
+  labels: labelsProp,
   children,
   className,
   onKeyDown,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
   ...rest
 }: SegmentedControlRootProps) {
   const size = useControlSize(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
+  const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
   const [selectedValue, setSelectedValue] = useControllableState<string>({
     value,
     defaultValue,
@@ -194,8 +250,11 @@ function SegmentedControlRoot({
     if (!viewport || !list || !thumb || typeof ResizeObserver === "undefined") return;
     const ro = new ResizeObserver(() => {
       scrollTargetRef.current = null;
+      // Read the row before the thumb is written: a write in between would force a second layout
+      // on every frame of a container resize (a sidebar collapsing beside the page).
+      const overflow = measureOverflow(viewport);
       syncThumb(list, thumb, false);
-      syncOverflow(viewport);
+      applyOverflow(viewport, overflow);
     });
     ro.observe(viewport);
     ro.observe(list);
@@ -228,56 +287,79 @@ function SegmentedControlRoot({
 
   return (
     <SegmentedControlProvider value={contextValue}>
-      <div
+      <FieldFrame
         {...rest}
-        role="radiogroup"
-        aria-disabled={disabled || undefined}
-        className={cx(styles.root, className)}
-        onKeyDown={handleKeyDown}
-        {...toDataAttributes({
-          size,
-          disabled: disabled || undefined,
-          "full-width": fullWidth || undefined,
-        })}
+        size={size}
+        ids={ids}
+        label={label}
+        required={required}
+        optional={optional}
+        hint={hint}
+        error={error}
+        disabled={disabled}
+        reserveSupportRow={reserveSupportRow}
+        optionalLabel={labelsProp?.optional ?? SEGMENTED_CONTROL_LABELS.optional}
+        group
+        className={cx(styles.field, className)}
+        data-full-width={fullWidth || undefined}
       >
-        {/* Edge fades are overlays on the still root (see CSS), so the viewport scrolls without a mask. */}
-        <ScrollContainer
-          ref={viewportRef}
-          axis="horizontal"
-          scrollbar="hidden"
-          className={styles.viewport}
-          onScroll={(event) => {
-            const viewport = event.currentTarget;
-            const target = scrollTargetRef.current;
-            if (target !== null && Math.abs(viewport.scrollLeft - target) < 1) {
-              scrollTargetRef.current = null;
-            }
-            syncOverflow(viewport, scrollTargetRef.current ?? undefined);
-          }}
-          // The user takes over scrolling: fades follow the real offset again.
-          onWheel={() => {
-            scrollTargetRef.current = null;
-          }}
-          onTouchStart={() => {
-            scrollTargetRef.current = null;
-          }}
+        <div
+          id={ids.controlId}
+          role="radiogroup"
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy ?? ids.labelledBy}
+          aria-describedby={ids.describedBy}
+          aria-invalid={ids.invalid || undefined}
+          aria-required={required || undefined}
+          aria-disabled={disabled || undefined}
+          className={styles.root}
+          onKeyDown={handleKeyDown}
+          {...toDataAttributes({
+            size,
+            disabled: disabled || undefined,
+            invalid: ids.invalid || undefined,
+            "full-width": fullWidth || undefined,
+          })}
         >
-          <div ref={listRef} className={styles.list}>
-            {/* First in DOM order so it always paints below the segments. */}
-            <div
-              ref={thumbRef}
-              className={cx(palette.hue, styles.thumb)}
-              aria-hidden="true"
-              onTransitionEnd={(event) => {
-                if (event.target === event.currentTarget && event.propertyName === "left") {
-                  setFlag(event.currentTarget, "data-animate", false);
-                }
-              }}
-            />
-            <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-          </div>
-        </ScrollContainer>
-      </div>
+          {/* Edge fades are overlays on the still root (see CSS), so the viewport scrolls without a mask. */}
+          <ScrollContainer
+            ref={viewportRef}
+            axis="horizontal"
+            scrollbar="hidden"
+            className={styles.viewport}
+            onScroll={(event) => {
+              const viewport = event.currentTarget;
+              const target = scrollTargetRef.current;
+              if (target !== null && Math.abs(viewport.scrollLeft - target) < 1) {
+                scrollTargetRef.current = null;
+              }
+              syncOverflow(viewport, scrollTargetRef.current ?? undefined);
+            }}
+            // The user takes over scrolling: fades follow the real offset again.
+            onWheel={() => {
+              scrollTargetRef.current = null;
+            }}
+            onTouchStart={() => {
+              scrollTargetRef.current = null;
+            }}
+          >
+            <div ref={listRef} className={styles.list}>
+              {/* First in DOM order so it always paints below the segments. */}
+              <div
+                ref={thumbRef}
+                className={cx(palette.hue, styles.thumb)}
+                aria-hidden="true"
+                onTransitionEnd={(event) => {
+                  if (event.target === event.currentTarget && event.propertyName === "left") {
+                    setFlag(event.currentTarget, "data-animate", false);
+                  }
+                }}
+              />
+              <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+            </div>
+          </ScrollContainer>
+        </div>
+      </FieldFrame>
     </SegmentedControlProvider>
   );
 }

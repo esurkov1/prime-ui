@@ -150,3 +150,34 @@
 .content[data-side="right"] .arrow {
   right: var(--tt-arrow-out);
 }
+
+/* ─── Trigger hosts ──────────────────────────────────────────────────────────
+ * A trigger the kit made a tab stop (a Badge, an Avatar, the host of a disabled control) shows the
+ * focus ring of every control. Around a disabled control the host takes hover and focus: the
+ * control itself gets no pointer events, and the ring is drawn on it, so it follows its radius.
+ */
+.focusHost:focus-visible:not(.disabledHost) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+.disabledHost {
+  display: inline-flex;
+  max-width: 100%;
+  outline: none;
+  cursor: not-allowed;
+}
+
+.disabledHost:has(> [data-full-width="true"]) {
+  display: flex;
+  width: 100%;
+}
+
+.disabledHost > * {
+  pointer-events: none;
+}
+
+.disabledHost:focus-visible > * {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}

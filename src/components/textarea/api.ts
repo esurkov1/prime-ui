@@ -1,4 +1,11 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import {
+  FIELD_COMMIT_LABELS,
+  FIELD_COPY_LABELS,
+  fieldActionPart,
+  fieldCommitProp,
+  fieldCopyPart,
+} from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
@@ -76,8 +83,21 @@ export const api: ComponentApi = {
           name: "autoResize",
           type: "boolean",
           default: "true",
-          en: "Height follows the content (minimum three lines, no scrollbar, no resize handle). `false` → fixed height (three lines or `rows`) with native vertical resize.",
-          ru: "Высота следует за текстом (минимум три строки). `false` — фиксированная высота (три строки или `rows`) и нативный resize.",
+          en: "Height follows the content (minimum `rows` lines, no resize handle; up to `maxRows` lines when set, then it scrolls inside). `false` → fixed height of `rows` lines with native vertical resize.",
+          ru: "Высота следует за текстом (минимум `rows` строк; с `maxRows` — до этого числа строк, дальше прокрутка внутри). `false` — фиксированная высота в `rows` строк и нативный resize.",
+        },
+        {
+          name: "rows",
+          type: "number",
+          default: "3",
+          en: "Minimum height in lines; with `autoResize={false}` the fixed height. `rows={1}` makes a field that starts as one line, like an Input.",
+          ru: "Минимальная высота в строках; при `autoResize={false}` — фиксированная. `rows={1}` — поле начинается с одной строки, как Input.",
+        },
+        {
+          name: "maxRows",
+          type: "number",
+          en: "With `autoResize`: the field grows up to this many lines, then scrolls inside (a chat composer: `rows={1} maxRows={8}`). Without it the field grows without a limit.",
+          ru: "С `autoResize`: поле растёт до этого числа строк, дальше прокручивается внутри (поле чата: `rows={1} maxRows={8}`). Без него растёт без предела.",
         },
         {
           name: "onValueChange",
@@ -96,6 +116,13 @@ export const api: ComponentApi = {
           type: "string",
           en: "Merged before the hint/error ids.",
           ru: "Добавляется перед id подсказки и ошибки.",
+        },
+        fieldCommitProp({ en: "Mod+Enter", ru: "Mod+Enter" }),
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "Actions in the field's top end corner: `Textarea.CopyButton`, `Textarea.Action`.",
+          ru: "Действия в верхнем углу поля: `Textarea.CopyButton`, `Textarea.Action`.",
         },
         {
           name: "labels",
@@ -143,6 +170,14 @@ export const api: ComponentApi = {
         },
       ],
     },
+    fieldCopyPart("Textarea.CopyButton", {
+      en: "from the field's top end corner (a read-only result)",
+      ru: "из верхнего угла поля (готовый результат только для чтения)",
+    }),
+    fieldActionPart("Textarea.Action", {
+      en: "in the field's top end corner",
+      ru: "в верхнем углу поля",
+    }),
   ],
   labels: [
     {
@@ -157,5 +192,7 @@ export const api: ComponentApi = {
       en: "Screen-reader text of `Textarea.Counter`; `{current}` and `{max}` are replaced.",
       ru: "Озвучка `Textarea.Counter`; `{current}` и `{max}` подставляются.",
     },
+    ...FIELD_COPY_LABELS,
+    ...FIELD_COMMIT_LABELS,
   ],
 };

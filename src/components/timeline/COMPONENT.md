@@ -14,6 +14,7 @@
 - Steps of a process the user goes through → use [Stepper](../stepper/COMPONENT.md).
 - Records with many attributes to compare or sort → use [DataTable](../data-table/COMPONENT.md).
 - Transient system messages → use [Notification](../notification/COMPONENT.md).
+- Work with a start and an end laid out on a calendar (tasks, bookings, occupancy) → use [Gantt](../gantt/COMPONENT.md).
 
 ## Import
 ```tsx
@@ -177,4 +178,4 @@ No `labels`.
 
 ## Related
 - **Built from:** —
-- **See also:** [Stepper](../stepper/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md)
+- **See also:** [Stepper](../stepper/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Gantt](../gantt/COMPONENT.md), [Card](../card/COMPONENT.md)

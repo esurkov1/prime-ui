@@ -1,0 +1,416 @@
+/*
+ * Composer: the message input of a chat. One row — paperclip · field · send / record — standing on
+ * its bottom edge, so the buttons stay by the last line while the field grows; above it the
+ * attachments, the reply / edit bar and the recording error. The field is the kit Textarea
+ * (`rows={1} maxRows={8}`). The root carries the field tier (`--field-*`) for the bars and is a
+ * size container (the round video preview follows its width).
+ */
+.root {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  container-type: inline-size;
+}
+
+/* Parts above the row are items of the root column; an empty zone leaves no gap. */
+.top {
+  display: contents;
+}
+
+/* The attachment tray: one strip of tiles (FileUpload.Queue `layout="strip"`, a single row that
+   scrolls sideways, so its height is one tile whatever the count) and the «как файлы» option.
+   A Crossfade: it fades and glides its height open and closed; empty, it takes no room. */
+.tray {
+  min-width: 0;
+}
+
+.trayBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.asFiles {
+  padding-inline-start: var(--prime-space-1);
+}
+
+.error {
+  margin: 0;
+}
+
+/* ── Row ──
+ * One grid row, always: paperclip · field (flexible) · send / record. Every other block (the
+ * attachments, the bars, the error, the preview) stands outside it. The paperclip renders itself
+ * into the start cell; an empty cell takes no room and no gap (the cells carry their own spacing).
+ * The recording bar lies over the first two cells in the same grid row, so the row keeps its height.
+ */
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto;
+  align-items: end;
+  min-width: 0;
+}
+
+/* Recording: the paperclip and the field fade out under the bar (and back in after it). */
+.start,
+.field {
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-recording] :is(.start, .field) {
+  opacity: 0;
+}
+
+.start,
+.end {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  grid-row: 1;
+}
+
+.start {
+  grid-column: 1;
+}
+
+.start:not(:empty) {
+  margin-inline-end: var(--prime-space-2);
+}
+
+.end {
+  grid-column: 3;
+  margin-inline-start: var(--prime-space-2);
+}
+
+.attach {
+  display: flex;
+}
+
+/* ── Field: the kit Textarea (one line up to eight, then it scrolls); this box anchors the overlays ── */
+.field {
+  position: relative;
+  grid-row: 1;
+  grid-column: 2;
+  min-width: 0;
+}
+
+/* Files dragged over the composer: an accent ring over the field, drawn on top of the Textarea. */
+.root[data-dropping="true"] .field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--field-radius);
+  box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-accent-default);
+  pointer-events: none;
+}
+
+/* ── Formatting toolbar: a floating panel over the field while text is selected ── */
+.toolbar {
+  position: absolute;
+  z-index: var(--prime-z-overlay);
+  inset-block-end: calc(100% + var(--prime-space-2));
+  inset-inline-start: 0;
+  display: flex;
+  gap: var(--prime-space-0);
+  max-width: 100%;
+  padding: var(--prime-panel-padding);
+  border-radius: var(--prime-panel-radius);
+  background: var(--prime-color-layer-current);
+  box-shadow: var(--prime-shadow-overlay);
+  cursor: default;
+}
+
+/* ── Send / record button ── */
+.action {
+  position: relative;
+  z-index: 1;
+  /* A held record button is dragged: no page scroll, no text selection under the finger. */
+  touch-action: none;
+}
+
+/* The glyphs of every action stand in one cell; the current one turns and scales in. */
+.morph {
+  display: grid;
+  place-items: center;
+}
+
+.glyph {
+  grid-area: 1 / 1;
+  display: flex;
+  transition:
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+}
+
+.glyph[data-state="inactive"] {
+  opacity: 0;
+  transform: scale(0.6) rotate(-30deg);
+}
+
+/*
+ * Slide up to lock: a pill above the held button. Its arrow follows the finger up to the lock
+ * threshold (`--prime-space-12`); at the threshold the recording locks and the pill leaves with a
+ * short scale-and-fade (the lock "snaps").
+ */
+.lock {
+  position: absolute;
+  inset-block-end: calc(100% + var(--prime-space-3));
+  inset-inline-start: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--prime-space-1);
+  padding: var(--prime-space-2) var(--prime-space-1);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-fill-muted);
+  color: var(--prime-color-text-secondary);
+  box-shadow: var(--prime-shadow-overlay);
+  translate: -50% calc(-1 * min(var(--composer-lift, 0px), var(--prime-space-12)) / 2);
+  pointer-events: none;
+}
+
+.lock[data-state="open"] {
+  animation: composerLockIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+.lock[data-state="closed"] {
+  color: var(--prime-color-accent-text);
+  animation: composerLockOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
+}
+
+.lockArrow {
+  display: flex;
+  translate: 0 calc(-1 * min(var(--composer-lift, 0px), var(--prime-space-12)) / 2);
+}
+
+@keyframes composerLockIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--prime-space-2));
+  }
+}
+
+@keyframes composerLockOut {
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/*
+ * ── Recording bar ──
+ * Covers the paperclip and the field (the first two cells of the row), so its height never changes:
+ * delete · dot · timer · waveform (locked), or dot · timer · «slide to cancel» (held).
+ * Cross-fades with the field (`swapMotion`).
+ */
+.recording {
+  position: relative;
+  grid-row: 1;
+  grid-column: 1 / 3;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: var(--field-gap);
+  min-width: 0;
+  padding-inline: var(--field-px);
+  border-radius: var(--field-radius);
+  background: var(--prime-color-field-bg);
+  cursor: default;
+}
+
+.recording[data-locked="true"] {
+  padding-inline-start: 0;
+}
+
+.recording[data-state="closed"] {
+  pointer-events: none;
+}
+
+.cancel {
+  flex: none;
+}
+
+/* The recording dot breathes (a status loop, like a spinner); still under reduced motion. */
+.dot {
+  flex: none;
+  width: var(--prime-space-2);
+  height: var(--prime-space-2);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-danger-default);
+  animation: composerPulse var(--prime-motion-duration-slow) var(--prime-motion-easing-standard)
+    infinite alternate;
+}
+
+/* A paused recording: the dot becomes a still pause glyph in the same hue. */
+.pausedGlyph {
+  display: inline-flex;
+  flex: none;
+  color: var(--prime-color-danger-default);
+}
+
+@keyframes composerPulse {
+  to {
+    opacity: 0.3;
+    transform: scale(0.75);
+  }
+}
+
+/* `0:09,2`: tabular digits keep the width while the time runs. */
+.timer {
+  flex: none;
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--prime-color-text-primary);
+}
+
+.slide {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--prime-space-1);
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
+  white-space: nowrap;
+  color: var(--prime-color-text-secondary);
+  translate: calc(-1 * var(--composer-slide, 0px)) 0;
+  opacity: calc(1 - var(--composer-slide-progress, 0));
+}
+
+/*
+ * The live waveform: a canvas over all the free width, as tall as the button; the root paints it
+ * every frame. `color` is the bars with a sample (VoicePlayer's played bars), `border-color` the
+ * calm line before the voice (its unplayed bars) — read by the painter, never drawn as a border.
+ */
+.wave {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: calc(var(--field-h) - var(--prime-space-2));
+  border: 0 solid var(--prime-color-fill-strong);
+  color: var(--prime-color-accent-default);
+}
+
+/* ── Round video message preview, above the composer (VideoNote geometry) ── */
+.preview {
+  position: absolute;
+  z-index: var(--prime-z-overlay);
+  inset-block-end: calc(100% + var(--prime-space-4));
+  inset-inline: 0;
+  width: min(var(--prime-message-video-note), 70cqi);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  border-radius: var(--prime-radius-full);
+  box-shadow: var(--prime-shadow-modal);
+  pointer-events: none;
+}
+
+.preview[data-state="open"] {
+  animation: composerPreviewIn var(--prime-motion-duration-base)
+    var(--prime-motion-easing-emphasized) both;
+}
+
+.preview[data-state="closed"] {
+  animation: composerPreviewOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit)
+    both;
+}
+
+@keyframes composerPreviewIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--prime-space-4)) scale(0.6);
+  }
+}
+
+@keyframes composerPreviewOut {
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.previewSkeleton {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  border-radius: var(--prime-radius-full);
+}
+
+.video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--prime-radius-full);
+  object-fit: cover;
+  /* A selfie camera reads as a mirror. */
+  transform: scaleX(-1);
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.preview[data-ready="true"] .video {
+  opacity: 1;
+}
+
+/* ── Reply / edit bar ── */
+.context {
+  display: flex;
+  align-items: center;
+  gap: var(--field-gap);
+  min-width: 0;
+  padding-inline-start: var(--field-px);
+}
+
+.contextIcon {
+  display: flex;
+  flex: none;
+  color: var(--prime-color-accent-text);
+}
+
+.contextText {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  padding-inline-start: var(--prime-space-2);
+  border-inline-start: var(--prime-focus-width) solid var(--prime-color-accent-default);
+}
+
+.title,
+.description {
+  overflow: hidden;
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.title {
+  font-weight: var(--prime-font-weight-medium);
+  color: var(--prime-color-accent-text);
+}
+
+.description {
+  color: var(--prime-color-text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Status loops stand still (durations collapse to 0, an infinite loop would flicker); the
+     waveform still shows the level, without its scroll tween. */
+  .dot {
+    animation: none;
+  }
+}

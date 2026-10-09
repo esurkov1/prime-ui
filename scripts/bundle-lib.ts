@@ -1,19 +1,24 @@
 /**
  * Library bundle via esbuild (no Rollup/treeshake pass that breaks CSS Modules).
  * JS: `src/index.ts` → `dist/index.js`, `src/color-picker.ts` → `dist/color-picker.js`,
- * `src/icon-set.ts` → `dist/icons.js`, shared code
- * in `dist/chunks/`. CSS: the base layer (`src/styles/globals.css`: tokens, themes, focus ring,
- * reduced motion) followed by every component module → `dist/index.css` (`prime-ui-kit/bundle.css`). Types: `tsc --emitDeclarationOnly` → `.dts-stage`, merged into `dist/`.
+ * `src/icon-set.ts` → `dist/icon-set.js` (next to its `icon-set.d.ts`; a `dist/icons.js` would shadow
+ * the `dist/icons/` types folder for `./icons` specifiers), shared code in `dist/chunks/`. Every JS file starts with `"use client"` (checked).
+ * CSS: the base layer (`src/styles/globals.css`: tokens, themes, focus ring,
+ * reduced motion) followed by every component module → `dist/index.css` (`prime-ui-kit/bundle.css`,
+ * minified). Types: `tsc --emitDeclarationOnly` → `.dts-stage`, merged into `dist/`; every
+ * specifier is rewritten to an explicit relative path inside `dist/` (no `@/` alias, no directory
+ * import) and the build fails on any specifier that leaves `dist/` or does not resolve.
  */
 
 import { spawn } from "node:child_process";
-import { cp, readFile, rm, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { cp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = resolve(root, "dist");
+const USE_CLIENT = '"use client";';
 
 await rm(dist, { recursive: true, force: true });
 
@@ -35,7 +40,7 @@ try {
     entryPoints: [
       { in: "src/index.ts", out: "index" },
       { in: "src/color-picker.ts", out: "color-picker" },
-      { in: "src/icon-set.ts", out: "icons" },
+      { in: "src/icon-set.ts", out: "icon-set" },
       { in: ".bundle-all.ts", out: "all" },
     ],
     outdir: "dist",
@@ -50,13 +55,23 @@ try {
     packages: "external",
     logLevel: "info",
     loader: { ".module.css": "local-css" },
+    /* Every component holds state or effects: each entry and chunk is a client module (RSC). */
+    banner: { js: `${USE_CLIENT}\n` },
   });
 } finally {
   await rm(allEntry, { force: true });
 }
 await rm(resolve(dist, "all.js"), { force: true });
+
+/* Guard: every published JS file starts with the directive, or Next.js server components break. */
+const jsFiles = (await readdir(dist, { recursive: true })).filter((file) => file.endsWith(".js"));
+const missing: string[] = [];
+for (const file of jsFiles) {
+  if (!(await readFile(resolve(dist, file), "utf8")).startsWith(USE_CLIENT)) missing.push(file);
+}
+if (missing.length > 0) throw new Error(`dist JS without "use client":\n${missing.join("\n")}`);
 await rm(resolve(dist, "color-picker.css"), { force: true });
-await rm(resolve(dist, "icons.css"), { force: true });
+await rm(resolve(dist, "icon-set.css"), { force: true });
 
 const base = await esbuild.build({
   absWorkingDir: root,
@@ -65,10 +80,14 @@ const base = await esbuild.build({
   write: false,
   logLevel: "warning",
 });
-await writeFile(
-  resolve(dist, "index.css"),
+/* Shipped minified: comments, whitespace and duplicate declarations out (about a third of the raw
+   size); the hashed class names and the rule order stay as built. */
+const bundleCss = await esbuild.transform(
   base.outputFiles[0].text + (await readFile(resolve(dist, "all.css"), "utf8")),
+  { loader: "css", minify: true, logLevel: "warning" },
 );
+if (bundleCss.warnings.length > 0) throw new Error("bundle.css minification warnings");
+await writeFile(resolve(dist, "index.css"), bundleCss.code);
 await rm(resolve(dist, "all.css"), { force: true });
 
 const stage = resolve(root, ".dts-stage");
@@ -83,6 +102,110 @@ const code = await new Promise<number>((res, rej) => {
   child.on("exit", (c) => res(c ?? 1));
 });
 if (code !== 0) throw new Error(`tsc emitDeclarationOnly failed with exit code ${code}`);
-await cp(resolve(stage, "src"), dist, { recursive: true });
-await cp(resolve(stage, "tokens"), resolve(dist, "tokens"), { recursive: true });
+
+/*
+ * Declarations: `.dts-stage/src/*` lands in `dist/*`, `.dts-stage/tokens/*` in `dist/tokens/*`.
+ * Each import / export specifier is resolved against the stage (the `@/` alias → `src/`), mapped to
+ * its place in `dist/` and written back as an explicit relative path to the file. Bare package
+ * specifiers stay. Anything that resolves outside the two staged trees fails the build.
+ */
+const stageSrc = resolve(stage, "src");
+const stageTokens = resolve(stage, "tokens");
+
+function toDist(stagePath: string): string | null {
+  if (stagePath.startsWith(stageSrc + sep)) return resolve(dist, relative(stageSrc, stagePath));
+  if (stagePath.startsWith(stageTokens + sep))
+    return resolve(dist, "tokens", relative(stageTokens, stagePath));
+  return null;
+}
+
+async function isFile(path: string): Promise<boolean> {
+  try {
+    return (await stat(path)).isFile();
+  } catch {
+    return false;
+  }
+}
+
+async function resolveDeclaration(base: string): Promise<string | null> {
+  const stripped = base.replace(/\.(js|ts|tsx)$/, "");
+  for (const candidate of [`${stripped}.d.ts`, resolve(stripped, "index.d.ts")]) {
+    if (await isFile(candidate)) return candidate;
+  }
+  return null;
+}
+
+async function listDeclarations(dir: string): Promise<string[]> {
+  const out: string[] = [];
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const path = resolve(dir, entry.name);
+    if (entry.isDirectory()) out.push(...(await listDeclarations(path)));
+    else if (entry.name.endsWith(".d.ts")) out.push(path);
+  }
+  return out;
+}
+
+const CSS_MODULE_DECLARATION =
+  "declare const styles: Readonly<Record<string, string>>;\nexport default styles;\n";
+const SPECIFIER = /(\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)(["'])([^"']+)\2/g;
+const problems: string[] = [];
+for (const file of [
+  ...(await listDeclarations(stageSrc)),
+  ...(await listDeclarations(stageTokens)),
+]) {
+  const fileDist = toDist(file);
+  if (!fileDist) continue;
+  const text = await readFile(file, "utf8");
+  const replacements = new Map<string, string>();
+  for (const match of text.matchAll(SPECIFIER)) {
+    const spec = match[3];
+    const isAlias = spec.startsWith("@/");
+    if (!isAlias && !spec.startsWith(".")) continue;
+    const base = isAlias ? resolve(stageSrc, spec.slice(2)) : resolve(dirname(file), spec);
+    if (spec.endsWith(".module.css")) {
+      /* A CSS Module typed by its declaration: `x.module.css.d.ts` with the class map. */
+      await writeFile(`${base}.d.ts`, CSS_MODULE_DECLARATION);
+    }
+    const target = spec.endsWith(".module.css") ? `${base}.d.ts` : await resolveDeclaration(base);
+    const targetDist = target ? toDist(target) : null;
+    if (!targetDist) {
+      problems.push(`${relative(stage, file)}: "${spec}" does not resolve inside dist/`);
+      continue;
+    }
+    let rel = relative(dirname(fileDist), targetDist)
+      .split(sep)
+      .join("/")
+      .replace(/\.d\.ts$/, "");
+    if (!rel.startsWith(".")) rel = `./${rel}`;
+    replacements.set(spec, rel);
+  }
+  const rewritten = text.replace(SPECIFIER, (whole, lead: string, quote: string, spec: string) => {
+    const next = replacements.get(spec);
+    return next ? `${lead}${quote}${next}${quote}` : whole;
+  });
+  if (rewritten !== text) await writeFile(file, rewritten);
+}
+if (problems.length > 0) {
+  await rm(stage, { recursive: true, force: true });
+  throw new Error(`Declaration specifiers outside dist/:\n${problems.join("\n")}`);
+}
+
+await cp(stageSrc, dist, { recursive: true });
+await cp(stageTokens, resolve(dist, "tokens"), { recursive: true });
 await rm(stage, { recursive: true, force: true });
+
+/* Guard: no alias and no path out of `dist/` in any published declaration. */
+const leaks: string[] = [];
+for (const file of await listDeclarations(dist)) {
+  const text = await readFile(file, "utf8");
+  for (const match of text.matchAll(SPECIFIER)) {
+    const spec = match[3];
+    if (spec.startsWith("@/")) leaks.push(`${relative(dist, file)}: "${spec}"`);
+    else if (spec.startsWith(".")) {
+      const target = resolve(dirname(file), spec);
+      if (target !== dist && !target.startsWith(dist + sep))
+        leaks.push(`${relative(dist, file)}: "${spec}" leaves dist/`);
+    }
+  }
+}
+if (leaks.length > 0) throw new Error(`dist/**/*.d.ts leak internal paths:\n${leaks.join("\n")}`);

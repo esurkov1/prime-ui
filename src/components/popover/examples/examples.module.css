@@ -42,3 +42,8 @@
   justify-content: flex-end;
   padding: var(--prime-space-1);
 }
+
+/* from-menu.tsx: the anchor box around the menu button. */
+.anchor {
+  display: inline-flex;
+}

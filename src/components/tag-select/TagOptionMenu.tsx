@@ -45,6 +45,10 @@ type TagOptionMenuProps = {
   onDelete?: (value: string) => void;
   labels: TagOptionMenuLabels;
   disabled: boolean;
+  /** The deletion is pending: «⋯» shows a spinner in its place and does not open. */
+  pending: boolean;
+  /** A rename or recolor is being saved: «⋯» spins, the menu stays as it is. */
+  saving: boolean;
 };
 
 /**
@@ -62,6 +66,8 @@ export function TagOptionMenu({
   onDelete,
   labels,
   disabled,
+  pending,
+  saving,
 }: TagOptionMenuProps) {
   const [draft, setDraft] = React.useState(label);
 
@@ -84,6 +90,7 @@ export function TagOptionMenu({
           size="xs"
           aria-label={formatLabel(labels.edit, { label })}
           disabled={disabled}
+          loading={pending || saving}
           className={styles.menuTrigger}
           // Keeps focus in the field input until the menu opens.
           onMouseDown={(event) => event.preventDefault()}
@@ -93,7 +100,7 @@ export function TagOptionMenu({
           </Button.Icon>
         </Button.Root>
       </Popover.Trigger>
-      <Popover.Content side="bottom" size="s" flush className={styles.menuPanel}>
+      <Popover.Content size="s" flush className={styles.menuPanel}>
         <div className={styles.menuBody}>
           {onUpdate ? (
             <Input.Root size="s">
@@ -121,8 +128,8 @@ export function TagOptionMenu({
               size="s"
               className={styles.menuDelete}
               onClick={() => {
-                onDelete(value);
                 onOpenChange(false);
+                onDelete(value);
               }}
             >
               <Button.Icon>

@@ -240,3 +240,25 @@ describe("prime-ui-kit/icons", () => {
     expect(actual).toEqual(expected);
   });
 });
+
+describe("Icon — label and color", () => {
+  it("a label makes it a named image instead of a hidden one", () => {
+    render(<Icon name="status.locked" label="Системный статус" />);
+    const img = screen.getByRole("img", { name: "Системный статус" });
+    expect(img).not.toHaveAttribute("aria-hidden");
+  });
+
+  it("a palette color sets data-color and takes the place of tone", () => {
+    const { container } = render(<Icon name="object.funnel" color="purple" tone="muted" />);
+    const svg = container.querySelector("svg");
+    expect(svg).toHaveAttribute("data-color", "purple");
+    expect(svg).not.toHaveAttribute("data-tone");
+    expect(svg).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("createIcon glyphs take label and color too", () => {
+    const IconBike = createIcon(Bike);
+    render(<IconBike label="Велосипед" color="teal" />);
+    expect(screen.getByRole("img", { name: "Велосипед" })).toHaveAttribute("data-color", "teal");
+  });
+});

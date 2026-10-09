@@ -1,4 +1,4 @@
-/** The parent owns the query: it shows the text outside and a command resets it; the palette clears it on close — `value`, `onValueChange`. */
+/** The parent owns the query: it shows the text outside and a command resets it; the palette clears it on close — `search`, `onSearchChange`. */
 import { Button, CommandMenu, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -17,8 +17,8 @@ export default function CommandMenuControlledExample() {
       <CommandMenu.Root
         open={open}
         onOpenChange={setOpen}
-        value={query}
-        onValueChange={setQuery}
+        search={query}
+        onSearchChange={setQuery}
         aria-label="Поиск по отчётам"
       >
         <CommandMenu.Input placeholder="Название отчёта" />

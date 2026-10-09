@@ -3,20 +3,20 @@ import * as React from "react";
 /** Load status of an image part as its root sees it; `idle` = no image part mounted. */
 export type ImageStatus = "idle" | "loading" | "loaded" | "error";
 
-type ImageHandlers = {
-  onLoad?: React.ReactEventHandler<HTMLImageElement>;
-  onError?: React.ReactEventHandler<HTMLImageElement>;
+type MediaHandlers<E extends Element> = {
+  onLoad?: React.ReactEventHandler<E>;
+  onError?: React.ReactEventHandler<E>;
 };
 
 /**
- * Image side of an image-with-fallback component (Avatar, Thumbnail): tracks the `<img>` load and
- * reports it to the root through `report`, so the root's Fallback shows while loading and after an
- * error. Key the image element by `src`: a new source remounts it and starts again at `loading`.
- * Unmounting the image reports `idle`.
+ * Media side of an image-with-fallback component (Avatar, Thumbnail): tracks the `<img>` (or a
+ * `<video>`'s first frame) and reports it to the root through `report`, so the root's Fallback
+ * shows while loading and after an error. Key the element by `src`: a new source remounts it and
+ * starts again at `loading`. Unmounting the media reports `idle`.
  */
-export function useImageStatus(
+export function useImageStatus<E extends Element = HTMLImageElement>(
   report: (status: ImageStatus) => void,
-  { onLoad, onError }: ImageHandlers = {},
+  { onLoad, onError }: MediaHandlers<E> = {},
 ) {
   const [status, setStatus] = React.useState<Exclude<ImageStatus, "idle">>("loading");
 
@@ -26,7 +26,7 @@ export function useImageStatus(
   }, [report]);
 
   const handleLoad = React.useCallback(
-    (event: React.SyntheticEvent<HTMLImageElement>) => {
+    (event: React.SyntheticEvent<E>) => {
       setStatus("loaded");
       report("loaded");
       onLoad?.(event);
@@ -35,7 +35,7 @@ export function useImageStatus(
   );
 
   const handleError = React.useCallback(
-    (event: React.SyntheticEvent<HTMLImageElement>) => {
+    (event: React.SyntheticEvent<E>) => {
       setStatus("error");
       report("error");
       onError?.(event);

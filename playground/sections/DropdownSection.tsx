@@ -44,6 +44,18 @@ export const page: ComponentPageConfig = {
         "Обычный, неактивный и опасный пункт; стрелки пропускают неактивный — `disabled`, `tone`.",
     },
     {
+      scenario: "item-description",
+      title: "Описание пункта",
+      description:
+        "Вторая строка под пунктом: что делает действие и почему недоступное недоступно — видно всем и зачитывается вместе с пунктом — `Dropdown.ItemDescription`.",
+    },
+    {
+      scenario: "link-items",
+      title: "Пункты-ссылки",
+      description:
+        "Пункты, которые ведут на страницу, — настоящие ссылки: Cmd-клик и контекстное меню открывают их в новой вкладке, обычный выбор закрывает меню — `asChild`.",
+    },
+    {
       scenario: "match-trigger-width",
       title: "Ширина триггера",
       description: "Под кнопкой на всю ширину меню не уже триггера — `matchTriggerWidth`.",

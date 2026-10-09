@@ -16,7 +16,7 @@ export const page: ComponentPageConfig = {
   title: "PageContent",
   kind: "layout",
   description:
-    "Структура страницы внутри основной колонки: заголовок, описание, действия страницы и блоки содержимого.",
+    "Структура страницы внутри основной колонки: заголовок, описание, действия страницы и блоки содержимого; страница во всю высоту панели и раскладка «список + детали».",
   examples: [
     {
       slot: "overview",
@@ -29,6 +29,12 @@ export const page: ComponentPageConfig = {
         "Одна колонка с тремя ограничениями: весь main, широкая колонка дашборда, колонка для чтения — `maxWidth`.",
     },
     {
+      scenario: "list-detail",
+      title: "Список и детали",
+      description:
+        "Обращения поддержки списком и перепиской на странице во всю высоту: рядом на широкой панели, по одной панели с кнопкой «назад» на узкой — `PageContent.Split`, `PageContent.BackButton`, `fill`.",
+    },
+    {
       slot: "narrow",
       description:
         "В колонке ширины телефона действия страницы переносятся под заголовок, а не сжимают его.",
@@ -36,10 +42,18 @@ export const page: ComponentPageConfig = {
   ],
   api,
   accessibility: {
-    keyboard: [],
+    keyboard: [
+      {
+        keys: "Enter · Space",
+        action:
+          "На `PageContent.BackButton` возвращает из деталей к списку; фокус встаёт на элемент списка, с которого их открыли.",
+      },
+    ],
     aria: [
       "`PageContent.Title` — `<h1>`; один на страницу.",
       "Назовите `PageContent.Section` через `aria-labelledby` на `id` заголовка.",
+      "Назовите панели `PageContent.List` и `PageContent.Detail` через `aria-label`. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера.",
+      "`PageContent.BackButton` названа `labels.back` и видна, только пока сплит показывает одну панель.",
     ],
   },
 };

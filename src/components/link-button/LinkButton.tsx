@@ -3,6 +3,7 @@ import type * as React from "react";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
 
@@ -26,7 +27,7 @@ export type LinkButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
 export function LinkButton({
   size: sizeProp,
   tone = "accent",
-  disabled = false,
+  disabled: disabledProp,
   asChild = false,
   children,
   className,
@@ -36,6 +37,7 @@ export function LinkButton({
   ...rest
 }: LinkButtonProps) {
   const size = useControlSize(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
   const shared = {
     className: cx(styles.root, className),
     ...toDataAttributes({ size, tone, disabled: disabled || undefined }),

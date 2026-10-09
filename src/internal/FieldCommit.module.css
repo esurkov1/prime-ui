@@ -1,0 +1,54 @@
+/*
+ * Commit status at a field's edge (inline editing, foundation §7): a spinner while the save runs,
+ * then a check that cross-fades in its place and fades out. The slot enters and leaves with
+ * opacity + scale; the glyphs share one grid cell so nothing shifts between them. Reduced motion
+ * collapses the token durations globally.
+ */
+.status {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--field-icon);
+  height: var(--field-icon);
+  color: var(--prime-color-text-muted);
+  pointer-events: none;
+  transition: color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  animation: commitIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) both;
+}
+
+.status[data-state="closed"] {
+  animation: commitOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
+}
+
+.glyph {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  transition:
+    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.status[data-commit="pending"] > [data-glyph="saved"],
+.status[data-commit="saved"] > [data-glyph="pending"] {
+  opacity: 0;
+  transform: scale(var(--prime-motion-press-scale-compact));
+}
+
+.status[data-commit="saved"] {
+  color: var(--prime-color-success-text);
+}
+
+@keyframes commitIn {
+  from {
+    opacity: 0;
+    transform: scale(var(--prime-motion-press-scale-compact));
+  }
+}
+
+@keyframes commitOut {
+  to {
+    opacity: 0;
+    transform: scale(var(--prime-motion-press-scale-compact));
+  }
+}

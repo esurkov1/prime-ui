@@ -29,6 +29,25 @@ export const api: ComponentApi = {
           ru: "`thin` — тихий скроллбар кита; `hidden` — без скроллбара, только вместе с `fade`.",
         },
         {
+          name: "anchor",
+          type: '"start" | "end"',
+          default: '"start"',
+          en: "`end` — a chat or a log: the region opens at the end and stays there while content arrives, as long as the person is at the end (within 4 px); scrolled away, what they look at stays put. Sets `data-anchor` and turns the browser's own scroll anchoring off.",
+          ru: "`end` — чат или журнал: область открывается в конце и остаётся там, пока приходит содержимое, если человек в конце (ближе 4 px); если он прокрутил выше, видимое остаётся на месте. Ставит `data-anchor` и выключает собственную привязку прокрутки браузера.",
+        },
+        {
+          name: "onReachStart",
+          type: "() => void | Promise<void>",
+          en: "The scroll position came within 120 px of the start: load older content. Fires once per approach (again after leaving the zone or when the content grows); a returned promise blocks repeat calls and sets `aria-busy` until it settles. Content added above keeps the view in place.",
+          ru: "Прокрутка подошла к началу ближе 120 px: подгрузите более старое. Срабатывает один раз за подход (снова — после ухода из зоны или когда содержимое выросло); пока возвращённый промис не завершён, повторов нет и стоит `aria-busy`. Добавленное сверху не сдвигает видимое.",
+        },
+        {
+          name: "onReachEnd",
+          type: "() => void | Promise<void>",
+          en: "The scroll position came within 120 px of the end: load the next page. Same once-per-approach and promise rules as `onReachStart`.",
+          ru: "Прокрутка подошла к концу ближе 120 px: подгрузите следующую порцию. Те же правила, что у `onReachStart`.",
+        },
+        {
           name: "overscrollBehavior",
           type: '"auto" | "contain" | "none"',
           default: '"contain"',

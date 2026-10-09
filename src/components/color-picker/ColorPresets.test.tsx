@@ -3,13 +3,16 @@ import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
+import { DisabledProvider } from "@/internal/disabledContext";
 import { primitiveTokens } from "../../../tokens/primitives";
 import { COLOR_PRESETS, ColorPresets, type ColorPresetsRootProps } from "./ColorPresets";
 
 function Picker(props: Omit<ColorPresetsRootProps, "children">) {
   return (
     <ColorPresets.Root {...props}>
-      <ColorPresets.Trigger />
+      <ColorPresets.Trigger>
+        <ColorPresets.SwatchButton />
+      </ColorPresets.Trigger>
       <ColorPresets.Content />
     </ColorPresets.Root>
   );
@@ -130,7 +133,9 @@ describe("ColorPresets", () => {
     ];
     render(
       <ColorPresets.Root presets={presets} defaultValue="#ffffff" columns={1}>
-        <ColorPresets.Trigger />
+        <ColorPresets.Trigger>
+          <ColorPresets.SwatchButton />
+        </ColorPresets.Trigger>
         <ColorPresets.Content label="Цвет метки" />
       </ColorPresets.Root>,
     );
@@ -172,10 +177,22 @@ describe("ColorPresets", () => {
     expect(screen.queryByRole("listbox")).toBeNull();
   });
 
-  it("asChild turns a Button into the trigger", () => {
+  it("takes disabled from a disabled Fieldset around it", () => {
+    render(
+      <DisabledProvider disabled>
+        <Picker />
+      </DisabledProvider>,
+    );
+    const trigger = screen.getByRole("button");
+    expect(trigger).toBeDisabled();
+    fireEvent.click(trigger);
+    expect(screen.queryByRole("listbox")).toBeNull();
+  });
+
+  it("Trigger turns its one child, a Button, into the trigger", () => {
     render(
       <ColorPresets.Root defaultValue="#ef4444">
-        <ColorPresets.Trigger asChild>
+        <ColorPresets.Trigger>
           <Button.Root variant="outline" tone="neutral">
             <ColorPresets.Swatch />
             Цвет
@@ -190,5 +207,7 @@ describe("ColorPresets", () => {
     fireEvent.click(screen.getByRole("option", { name: "Жёлтый" }));
     expect(trigger).toHaveFocus();
     expect(trigger).toHaveAccessibleName("Цвет: Жёлтый");
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
   });
 });

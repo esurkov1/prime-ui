@@ -126,6 +126,25 @@
   grid-column: 4;
 }
 
+/* While the column's move is saved, a spinner stands in the grip's box (DataTable's handle cell). */
+.gripSpinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--prime-control-xs-height);
+  block-size: var(--prime-control-xs-height);
+  color: var(--prime-color-text-muted);
+}
+
+/* A column whose move is being saved: its heading quiets down until the answer, both ways eased. */
+.header > :not(.gripSpinner) {
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.column[data-pending] .header > :not(.gripSpinner) {
+  opacity: 0.6;
+}
+
 .title {
   min-width: 0;
   margin: 0;
@@ -136,13 +155,6 @@
   letter-spacing: var(--prime-text-title-m-tracking);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* The column's palette dot (`Badge.Dot` in the hue's solid color), on the title's line. */
-.dot {
-  margin-inline-end: var(--prime-space-2);
-  color: var(--hue-solid);
-  vertical-align: middle;
 }
 
 .actions {
@@ -165,6 +177,24 @@
   letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-muted);
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The stage's figures (`renderColumnMeta`): a caption row under the description, tabular digits. */
+.meta {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin-block-start: var(--prime-space-1);
+  overflow: hidden;
+  font-size: var(--prime-text-caption-size);
+  font-weight: var(--prime-text-caption-weight);
+  line-height: var(--prime-text-caption-line-height);
+  letter-spacing: var(--prime-text-caption-tracking);
+  color: var(--prime-color-text-secondary);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
@@ -203,22 +233,16 @@
   list-style: none;
 }
 
-/* An empty column: a dashed drop slot at the top of the drop area with the text and a hint; it fades out while a card is over it. */
+/* An empty column: Dnd's empty state, a dashed drop slot at the top of the drop area with the text
+   and a hint; Dnd steps it out of the flow and fades it once a card's gap opens in the column. */
 .empty {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline: 0;
+  box-sizing: border-box;
   padding-block: var(--prime-space-6);
   border-radius: var(--prime-radius-m);
   /* A drop slot, not a card: the dashed «put it here» line Dnd draws for its gap, no fill. The
      line is a translucent fill, so it reads the same on a well and on a bare surface. */
   border: var(--prime-border-width) dashed var(--prime-color-fill-strong);
   pointer-events: none;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.list[data-dnd-over] + .empty {
-  opacity: 0;
 }
 
 /* The card. Its look is on its own class: the carried clone is portalled out of the column. */
@@ -251,7 +275,31 @@
   }
 }
 
-.item[data-disabled] {
+.item[data-disabled]:not([data-pending]) {
+  color: var(--prime-color-text-secondary);
+}
+
+/*
+ * A card whose move is being saved (`onValueChange` returned a promise): it stays where it was put,
+ * its content quiets down under a spinner until the answer, both ways eased (DataTable's busy row).
+ */
+.item > * {
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.item[data-pending] > :not(.itemSpinner) {
+  opacity: 0.6;
+}
+
+.item[data-pending] {
+  cursor: progress;
+}
+
+.itemSpinner {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
   color: var(--prime-color-text-secondary);
 }
 
@@ -363,8 +411,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .empty,
-  .item {
+  .item,
+  .item > *,
+  .header > * {
     transition: none;
   }
 }

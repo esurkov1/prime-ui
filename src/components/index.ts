@@ -99,6 +99,7 @@ export type {
   CheckboxIndicatorProps,
   CheckboxLabelProps,
   CheckboxRootProps,
+  CheckboxShape,
 } from "./checkbox/Checkbox";
 export { Checkbox } from "./checkbox/Checkbox";
 export type {
@@ -147,6 +148,7 @@ export type {
   ComposerItemIconProps,
   ComposerItemProps,
   ComposerLabels,
+  ComposerMediaItem,
   ComposerMessage,
   ComposerQueue,
   ComposerRecording,
@@ -254,6 +256,7 @@ export { Fieldset } from "./fieldset/Fieldset";
 export type {
   FileUploadBodyProps,
   FileUploadDescriptionProps,
+  FileUploadFile,
   FileUploadFormatBadgeProps,
   FileUploadIconProps,
   FileUploadItemActionsProps,
@@ -263,10 +266,12 @@ export type {
   FileUploadItemProgressProps,
   FileUploadItemProps,
   FileUploadLabels,
+  FileUploadLayout,
   FileUploadQueueProps,
   FileUploadQueueSource,
   FileUploadRootProps,
   FileUploadTitleProps,
+  FileUploadTrigger,
   FileUploadVariant,
 } from "./file-upload/FileUpload";
 export { FileUpload } from "./file-upload/FileUpload";
@@ -280,14 +285,6 @@ export type {
 export { Gantt } from "./gantt/Gantt";
 export type { HintIconProps, HintRootProps } from "./hint/Hint";
 export { Hint } from "./hint/Hint";
-export type {
-  ImageUploadItem,
-  ImageUploadLabels,
-  ImageUploadProps,
-  ImageUploadQueueSource,
-  ImageUploadVariant,
-} from "./image-upload/ImageUpload";
-export { ImageUpload } from "./image-upload/ImageUpload";
 export type {
   InputActionProps,
   InputAffixProps,
@@ -376,16 +373,16 @@ export type {
 export { Message } from "./message/Message";
 export type {
   MessageContactProps,
-  MessageFileLabels,
-  MessageFileProps,
   MessageLinkPreviewProps,
   MessageLocationLabels,
   MessageLocationProps,
+} from "./message/MessageCards";
+export type { MessageFileLabels, MessageFileProps } from "./message/MessageFile";
+export type {
   MessageMediaItem,
   MessageMediaLabels,
   MessageMediaProps,
-} from "./message/MessageContent";
-export type { MessageVideoNoteLabels, MessageVideoNoteProps } from "./message/MessageVideoNote";
+} from "./message/MessageMedia";
 export type {
   GroupMessagesOptions,
   MessageListEntry,
@@ -616,6 +613,8 @@ export type {
   TypographyWeight,
 } from "./typography/Typography";
 export { Typography } from "./typography/Typography";
+export type { VideoNoteLabels, VideoNoteProps } from "./video-note/VideoNote";
+export { VideoNote } from "./video-note/VideoNote";
 export type {
   VoicePlayerLabels,
   VoicePlayerProps,

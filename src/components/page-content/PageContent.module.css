@@ -83,3 +83,86 @@
   gap: var(--prime-space-10);
   min-width: 0;
 }
+
+/*
+ * `fill`: the page takes the height of the panel's main (`AppShell.Root fillViewport`) and the
+ * body takes what the header leaves. A filling child inside (DataTable `scrollHeight="fill"`,
+ * Crossfade `fill`, PageContent.Split) takes the body's free height.
+ */
+.root[data-fill="true"] {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.root[data-fill="true"] > .body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/*
+ * List + detail. Wide (from 48rem of its own width): the list in a 20rem column (16rem at least),
+ * the detail beside it. Narrow: one pane at a time — the list, or the open detail; the pane that
+ * comes into view enters (`enterMotion`, base). Each pane is a column that gives its last child
+ * the free height, so a card with its own ScrollContainer fills the pane.
+ */
+.split {
+  container: prime-split / inline-size;
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The grid of panes inside the container (a container never queries itself). */
+.panes {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--prime-space-6);
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  /* A landing point for focus when the panes swap, not a control: no ring. */
+  outline: none;
+}
+
+.pane > :last-child {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.split:not([data-open="true"]) > .panes > .detail,
+.split[data-open="true"] > .panes > .list {
+  display: none;
+}
+
+@container prime-split (min-width: 48rem) {
+  .panes {
+    grid-template-columns:
+      minmax(calc(var(--prime-space-16) * 4), calc(var(--prime-space-20) * 4))
+      minmax(0, 1fr);
+  }
+
+  .panes > .pane {
+    animation: none;
+  }
+
+  .split:not([data-open="true"]) > .panes > .detail,
+  .split[data-open="true"] > .panes > .list {
+    display: flex;
+  }
+
+  /* Both panes are on screen: there is nothing to go back to. */
+  .backButton {
+    display: none;
+  }
+}

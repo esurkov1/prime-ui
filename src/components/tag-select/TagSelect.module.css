@@ -22,8 +22,8 @@
   min-width: 0;
   height: var(--field-h);
   padding-block: 0;
-  /* Chips sit closer to the edge than text (padX − 4); the chevron side keeps padX. */
-  padding-inline: calc(var(--field-px) - var(--prime-space-1)) var(--field-px);
+  /* Empty: text padding on both sides; chips sit closer to the edge (below). */
+  padding-inline: var(--field-px);
   border-radius: var(--field-radius);
   font-family: var(--prime-font-family-sans);
   font-size: var(--field-text);
@@ -52,8 +52,10 @@
   --ts-row: var(--prime-badge-l-height);
 }
 
-.control:not(:has(.chips > .chip)) {
-  padding-inline-start: var(--field-px);
+/* Chips sit closer to the edge than text (padX − 4); the chevron side keeps padX. A positive
+   `:has()`: one inside `:not()` makes the browser's `:has()` invalidation whole-subtree page-wide. */
+.control:has(.chips > .chip) {
+  padding-inline-start: calc(var(--field-px) - var(--prime-space-1));
 }
 
 /* Focus on a chip action keeps the focus fill too (the surface reacts to the input only). */
@@ -250,6 +252,11 @@
   cursor: not-allowed;
 }
 
+/* Its deletion is pending: the row keeps its look and place, the spinner on «⋯» says it waits. */
+.option[data-pending="true"] .optionPick {
+  cursor: progress;
+}
+
 .createIcon {
   display: inline-flex;
   flex-shrink: 0;
@@ -274,7 +281,8 @@
 
 .option[data-highlighted="true"] .menuTrigger,
 .menuTrigger:focus-visible,
-.menuTrigger[aria-expanded="true"] {
+.menuTrigger[aria-expanded="true"],
+.menuTrigger[aria-busy="true"] {
   opacity: 1;
 }
 

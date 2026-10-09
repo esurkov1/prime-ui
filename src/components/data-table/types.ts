@@ -2,6 +2,14 @@ import type * as React from "react";
 
 export type DataTableOrder = "asc" | "desc";
 export type DataTableSortState = { columnId: string; order: DataTableOrder } | null;
+
+/** What opened a row in place: a click on it, or Enter / Space on the focused row. */
+export type DataTableRowClickEvent =
+  | React.MouseEvent<HTMLTableRowElement>
+  | React.KeyboardEvent<HTMLTableRowElement>;
+
+/** A group of rows (`getRowGroup`): its key and every row of the data in it, in table order. */
+export type DataTableGroup<Row> = { key: string | number; rows: Row[] };
 /** Internal to the data-table folder (not exported from the kit). */
 export type DataTableCellAlign = "start" | "center" | "end";
 
@@ -36,4 +44,10 @@ export type DataTableColumn<Row> = {
    * key column that names the row — it stays even when its id is listed.
    */
   hideable?: boolean;
+  /**
+   * Heatmap: each cell is shaded by its numeric value (`sortAccessor`, else `accessor`) on the
+   * five-step chart scale (`--prime-color-chart-scale-1…5`); the value itself stays in the cell.
+   * `true` spans the column's own minimum to maximum; `{ min, max }` fixes either end.
+   */
+  scale?: boolean | { min?: number; max?: number };
 };

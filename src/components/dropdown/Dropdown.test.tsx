@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -687,5 +687,79 @@ describe("Dropdown — overlay contract", () => {
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
     fireEvent.pointerDown(screen.getByRole("button", { name: "Outside" }));
     expect(screen.getByRole("menu")).toBeInTheDocument();
+  });
+});
+
+describe("Dropdown — item description and link items", () => {
+  it("a description is a second line that describes, not names, the item", () => {
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>
+          <button type="button">Действия</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item disabled tone="danger">
+            <Dropdown.ItemIcon>
+              <svg />
+            </Dropdown.ItemIcon>
+            Удалить проект
+            <Dropdown.ItemDescription>Доступно владельцу проекта</Dropdown.ItemDescription>
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const item = screen.getByRole("menuitem");
+    expect(item).toHaveAccessibleName("Удалить проект");
+    expect(item).toHaveAccessibleDescription("Доступно владельцу проекта");
+    expect(item).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("asChild renders the item as the link: href kept, the pick closes the menu", () => {
+    const onSelect = vi.fn();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>
+          <button type="button">Действия</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item asChild onSelect={onSelect}>
+            <a href="/deals/1042">Открыть сделку</a>
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const link = screen.getByRole("menuitem", { name: "Открыть сделку" });
+    expect(link.tagName).toBe("A");
+    expect(link).toHaveAttribute("href", "/deals/1042");
+    expect(link).toHaveAttribute("tabindex", "0");
+    // A modified click keeps its native meaning (new tab); the kit does not prevent it.
+    const event = new MouseEvent("click", { bubbles: true, cancelable: true, metaKey: true });
+    act(() => {
+      link.dispatchEvent(event);
+    });
+    expect(event.defaultPrevented).toBe(false);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
+  it("a disabled link item does not navigate or select", () => {
+    const onSelect = vi.fn();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>
+          <button type="button">Действия</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item asChild disabled onSelect={onSelect}>
+            <a href="/deals/1042">Открыть сделку</a>
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    const link = screen.getByRole("menuitem", { name: "Открыть сделку" });
+    const event = new MouseEvent("click", { bubbles: true, cancelable: true });
+    link.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });

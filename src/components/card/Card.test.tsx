@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { Card } from "./Card";
 
@@ -79,5 +80,63 @@ describe("Card", () => {
     );
     expect(screen.getByRole("heading", { level: 2, name: "Профиль" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Тариф" })).toBeInTheDocument();
+  });
+
+  it("renders a meta line and a description in a panel header", () => {
+    render(
+      <>
+        <Card.Root variant="stat-trend">
+          <Card.Label>Выручка</Card.Label>
+          <Card.Value>4,2 млн ₽</Card.Value>
+          <Card.Meta>Лидов 120 · сделок 18</Card.Meta>
+        </Card.Root>
+        <Card.Root>
+          <Card.Header>
+            <Card.Title>Воронка</Card.Title>
+            <Card.Description>Заявки за октябрь</Card.Description>
+          </Card.Header>
+        </Card.Root>
+      </>,
+    );
+    expect(screen.getByText("Лидов 120 · сделок 18").tagName).toBe("SPAN");
+    expect(screen.getByText("Заявки за октябрь").parentElement).toHaveTextContent("Воронка");
+  });
+
+  it("becomes the link it wraps with asChild: one tab stop, parts inside, the root's attributes", async () => {
+    render(
+      <Card.Root asChild variant="mini" className="extra">
+        <a href="#orders">
+          <Card.Label>Заказы</Card.Label>
+          <Card.Value>128</Card.Value>
+        </a>
+      </Card.Root>,
+    );
+    const link = screen.getByRole("link", { name: /Заказы\s*128/ });
+    expect(link).toHaveAttribute("href", "#orders");
+    expect(link).toHaveAttribute("data-interactive", "true");
+    expect(link).toHaveAttribute("data-variant", "mini");
+    expect(link).toHaveAttribute("data-depth");
+    expect(link).toHaveClass("extra");
+    link.focus();
+    expect(link).toHaveFocus();
+  });
+
+  it("works as a button: Enter and Space activate it", async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <Card.Root asChild>
+        <button type="button" onClick={onClick}>
+          <Card.Header>
+            <Card.Title>Отчёт</Card.Title>
+          </Card.Header>
+        </button>
+      </Card.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Отчёт" });
+    button.focus();
+    await user.keyboard("{Enter}");
+    await user.keyboard(" ");
+    expect(onClick).toHaveBeenCalledTimes(2);
   });
 });

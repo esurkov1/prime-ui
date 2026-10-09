@@ -110,7 +110,7 @@ LoginForm has no state of its own. Compose them:
 
 | State | Driven by | DOM |
 |---|---|---|
-| submitting | `loading` on the submit Button, `disabled` on the fields | `aria-busy` on the button |
+| submitting | `loading` on the submit Button; the fields in a `Fieldset disabled`, the submit Button outside it | `aria-busy` on the button; native `disabled` on the `<fieldset>`, the fields in their disabled look |
 | field error | `error` / `invalid` on `Input.Root`, `error` on `DigitInput` | `aria-invalid`, the error under the field |
 | server error | `Banner.Root tone="danger" role="alert"` as the first child of `LoginForm.Form` | `role="alert"` |
 
@@ -152,11 +152,12 @@ No `labels`.
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen the card keeps its padding, the header wraps and the buttons stay full width. |
 
 ## Mistakes
-- `LoginForm.Social` → removed; provider buttons go in `LoginForm.Actions`.
+- A separate block of your own for provider buttons → put them in `LoginForm.Actions`.
+- `disabled` on every field while the request runs → one [Fieldset](../fieldset/COMPONENT.md) `disabled` around the fields; keep the submit Button outside it so it shows `loading`.
 - A placeholder instead of a field label → pass `label` to the field.
 - A Card around LoginForm → the root already is the card; use `flat` inside another surface.
 - Repeating the card `size` on every field and button → set it once on Root; fields and buttons follow it.
 
 ## Related
 - **Built from:** [Typography](../typography/COMPONENT.md) (`Title`, `Description`, `Footer`)
-- **See also:** [Input](../input/COMPONENT.md), [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [DigitInput](../digit-input/COMPONENT.md), [Banner](../banner/COMPONENT.md), [Modal](../modal/COMPONENT.md)
+- **See also:** [Input](../input/COMPONENT.md), [Fieldset](../fieldset/COMPONENT.md) (disables the fields while signing in), [Card](../card/COMPONENT.md) (the same surface for forms on an app page), [Button](../button/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Divider](../divider/COMPONENT.md), [DigitInput](../digit-input/COMPONENT.md), [Banner](../banner/COMPONENT.md), [Modal](../modal/COMPONENT.md)

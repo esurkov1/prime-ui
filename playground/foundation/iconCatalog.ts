@@ -18,6 +18,50 @@ export type IconGroupId = (typeof ICON_GROUPS)[number]["id"];
 
 /** What each icon means in a product interface, plus search synonyms (Russian and English). */
 export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[] }> = {
+  "action.addContact": {
+    meaning: "Добавить контакт",
+    keywords: ["добавить контакт", "контакт", "add contact", "user plus"],
+  },
+  "action.forward": {
+    meaning: "Переслать сообщение",
+    keywords: ["переслать", "forward", "share", "reply all"],
+  },
+  "action.pause": {
+    meaning: "Пауза воспроизведения",
+    keywords: ["пауза", "остановить", "pause", "stop"],
+  },
+  "action.react": {
+    meaning: "Поставить реакцию",
+    keywords: ["реакция", "эмодзи", "react", "reaction", "smile"],
+  },
+  "object.mapPin": {
+    meaning: "Место на карте",
+    keywords: ["место", "карта", "геолокация", "map", "pin", "location"],
+  },
+  "object.phone": {
+    meaning: "Телефон, звонок",
+    keywords: ["телефон", "звонок", "позвонить", "phone", "call"],
+  },
+  "status.failed": {
+    meaning: "Не отправлено",
+    keywords: ["ошибка", "не отправлено", "failed", "error"],
+  },
+  "status.muted": {
+    meaning: "Звук выключен",
+    keywords: ["без звука", "тихо", "muted", "sound off"],
+  },
+  "status.pending": {
+    meaning: "Отправляется",
+    keywords: ["отправляется", "часы", "ожидание", "pending", "clock"],
+  },
+  "status.read": {
+    meaning: "Прочитано",
+    keywords: ["прочитано", "две галочки", "read", "double check"],
+  },
+  "status.sent": {
+    meaning: "Отправлено",
+    keywords: ["отправлено", "галочка", "sent", "check"],
+  },
   "nav.chevronDown": {
     meaning: "Раскрыть список или секцию",
     keywords: ["стрелка вниз", "раскрыть", "выпадающий", "chevron", "down", "expand", "dropdown"],
@@ -82,6 +126,18 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Закрыть или очистить",
     keywords: ["крестик", "закрыть", "очистить", "x", "close", "clear", "cancel"],
   },
+  "action.pin": {
+    meaning: "Закрепить",
+    keywords: ["закрепить", "булавка", "наверх", "pin"],
+  },
+  "action.report": {
+    meaning: "Пожаловаться",
+    keywords: ["пожаловаться", "жалоба", "флаг", "report", "flag"],
+  },
+  "action.attach": {
+    meaning: "Прикрепить файл",
+    keywords: ["прикрепить", "скрепка", "вложение", "attach", "paperclip", "attachment"],
+  },
   "action.copy": {
     meaning: "Скопировать в буфер",
     keywords: ["копировать", "буфер", "copy", "clipboard", "duplicate"],
@@ -93,6 +149,26 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
   "action.download": {
     meaning: "Скачать файл",
     keywords: ["скачать", "загрузить на устройство", "download", "save"],
+  },
+  "action.edit": {
+    meaning: "Изменить, редактировать",
+    keywords: ["изменить", "редактировать", "правка", "карандаш", "edit", "pencil"],
+  },
+  "action.reply": {
+    meaning: "Ответить на сообщение",
+    keywords: ["ответить", "ответ", "reply", "respond"],
+  },
+  "action.video": {
+    meaning: "Видеозвонок, видео",
+    keywords: ["видео", "видеозвонок", "камера", "video", "call"],
+  },
+  "action.voice": {
+    meaning: "Голосовой ввод, микрофон",
+    keywords: ["голос", "микрофон", "запись", "voice", "mic"],
+  },
+  "action.transcribe": {
+    meaning: "Расшифровать голосовое или видеосообщение в текст",
+    keywords: ["расшифровка", "текст", "субтитры", "transcribe", "transcript", "captions"],
   },
   "action.drag": {
     meaning: "Ручка для перетаскивания",
@@ -121,6 +197,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
   "action.more": {
     meaning: "Открыть меню действий",
     keywords: ["ещё", "три точки", "меню", "more", "ellipsis", "kebab", "overflow"],
+  },
+  "action.play": {
+    meaning: "Воспроизвести видео или запись",
+    keywords: ["играть", "воспроизвести", "видео", "play", "video", "start"],
   },
   "action.refresh": {
     meaning: "Обновить данные",
@@ -166,6 +246,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Полужирный текст",
     keywords: ["жирный", "bold", "strong", "editor"],
   },
+  "format.code": {
+    meaning: "Код в тексте",
+    keywords: ["код", "моноширинный", "code", "inline", "editor"],
+  },
   "format.italic": {
     meaning: "Курсив",
     keywords: ["наклонный", "italic", "emphasis", "editor"],
@@ -177,6 +261,14 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
   "format.list": {
     meaning: "Маркированный список",
     keywords: ["список", "маркеры", "list", "bullets", "editor"],
+  },
+  "format.quote": {
+    meaning: "Цитата",
+    keywords: ["цитата", "кавычки", "блок", "quote", "blockquote", "editor"],
+  },
+  "format.strikethrough": {
+    meaning: "Зачёркнутый текст",
+    keywords: ["зачёркивание", "зачеркнуть", "strikethrough", "strike", "editor"],
   },
   "format.underline": {
     meaning: "Подчёркнутый текст",
@@ -190,6 +282,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Уведомления",
     keywords: ["колокольчик", "оповещения", "bell", "notifications", "alerts"],
   },
+  "object.bike": {
+    meaning: "Велосипед, курьер, лёгкий транспорт",
+    keywords: ["велосипед", "курьер", "доставка", "транспорт", "bike", "bicycle", "courier"],
+  },
   "object.book": {
     meaning: "Документация, справочник",
     keywords: ["книга", "справка", "docs", "book", "guide", "help"],
@@ -202,9 +298,47 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "График, аналитика",
     keywords: ["диаграмма", "статистика", "столбцы", "chart", "analytics", "bars", "stats"],
   },
+  "object.crown": {
+    meaning: "Владелец, премиум-тариф",
+    keywords: ["корона", "владелец", "премиум", "vip", "crown", "owner", "premium"],
+  },
+  "object.disc": {
+    meaning: "Релиз, альбом, носитель",
+    keywords: ["диск", "релиз", "альбом", "музыка", "disc", "album", "release", "music"],
+  },
   "object.document": {
     meaning: "Документ или файл с текстом",
     keywords: ["файл", "документ", "договор", "file", "document", "text", "doc"],
+  },
+  "object.file": {
+    meaning: "Файл любого формата: лист, на котором печатается формат",
+    keywords: ["файл", "вложение", "лист", "file", "attachment", "blank"],
+  },
+  "object.fuel": {
+    meaning: "Топливо, заправка, расход",
+    keywords: ["топливо", "заправка", "бензин", "fuel", "gas", "petrol"],
+  },
+  "object.funnel": {
+    meaning: "Воронка продаж",
+    keywords: ["воронка", "продажи", "этапы", "конверсия", "funnel", "pipeline", "sales"],
+  },
+  "object.globe": {
+    meaning: "Сайт, язык, регион",
+    keywords: [
+      "глобус",
+      "сайт",
+      "язык",
+      "регион",
+      "интернет",
+      "globe",
+      "web",
+      "language",
+      "region",
+    ],
+  },
+  "object.headset": {
+    meaning: "Поддержка, оператор",
+    keywords: ["гарнитура", "поддержка", "оператор", "звонок", "headset", "support", "call"],
   },
   "object.image": {
     meaning: "Изображение, фото",
@@ -218,9 +352,25 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Ключ доступа",
     keywords: ["ключ", "токен", "api", "key", "token", "access"],
   },
+  "object.megaphone": {
+    meaning: "Рассылка, объявление, кампания",
+    keywords: [
+      "рупор",
+      "объявление",
+      "рассылка",
+      "кампания",
+      "megaphone",
+      "announcement",
+      "campaign",
+    ],
+  },
   "object.message": {
     meaning: "Сообщение, комментарий, чат",
     keywords: ["сообщение", "чат", "комментарий", "message", "chat", "comment"],
+  },
+  "object.motorbike": {
+    meaning: "Мотоцикл, транспорт, курьер",
+    keywords: ["мотоцикл", "транспорт", "курьер", "motorbike", "motorcycle", "vehicle"],
   },
   "object.package": {
     meaning: "Посылка, товар, пакет",
@@ -234,6 +384,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Запуск, быстрый старт",
     keywords: ["ракета", "запуск", "старт", "rocket", "launch", "start"],
   },
+  "object.scale": {
+    meaning: "Юридическое, сравнение, баланс",
+    keywords: ["весы", "право", "юрист", "сравнение", "scale", "legal", "law", "compare"],
+  },
   "object.storage": {
     meaning: "Хранилище, диск",
     keywords: ["диск", "хранилище", "сервер", "storage", "disk", "drive", "server"],
@@ -241,6 +395,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
   "object.tasks": {
     meaning: "Список задач",
     keywords: ["задачи", "чеклист", "tasks", "todo", "checklist"],
+  },
+  "object.trophy": {
+    meaning: "Достижение, победа, рейтинг",
+    keywords: ["кубок", "награда", "победа", "рейтинг", "trophy", "award", "win", "achievement"],
   },
   "object.truck": {
     meaning: "Доставка, отгрузка",
@@ -278,6 +436,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Письмо отправлено",
     keywords: ["письмо", "отправлено", "почта", "email", "sent", "mail check"],
   },
+  "status.favorite": {
+    meaning: "Избранное, отмечено звездой",
+    keywords: ["звезда", "избранное", "оценка", "star", "favorite", "starred", "rating"],
+  },
   "status.info": {
     meaning: "Пояснение, информация",
     keywords: ["информация", "справка", "подсказка", "info", "hint", "help"],
@@ -309,6 +471,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
   "theme.light": {
     meaning: "Светлая тема",
     keywords: ["светлая", "день", "солнце", "light", "day", "sun"],
+  },
+  "view.columns": {
+    meaning: "Выбор колонок таблицы",
+    keywords: ["колонки", "столбцы", "таблица", "columns", "table", "layout"],
   },
   "view.code": {
     meaning: "Показать код",

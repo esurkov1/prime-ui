@@ -151,6 +151,12 @@ export const api: ComponentApi = {
           en: "Shows the close button.",
           ru: "Показывает кнопку закрытия.",
         },
+        {
+          name: "onDismiss",
+          type: "() => void",
+          en: "The toast left: its timer ran out, the close button, a swipe, `dismiss()`, or a newer toast pushed it out of a full stack. Called once — the place to commit an action the toast offered to undo.",
+          ru: "Уведомление ушло: истёк таймер, крестик, свайп, `dismiss()` или его вытеснило новое. Вызывается один раз — здесь применяют действие, которое уведомление предлагало отменить.",
+        },
       ],
     },
     {

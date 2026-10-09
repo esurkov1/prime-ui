@@ -10,7 +10,7 @@ export const page: ComponentPageConfig = {
     summary: "Выбор цвета: палитра, HEX, пипетка",
     keywords: ["выбор цвета", "палитра", "hex", "value", "onValueChange"],
     icon: Pipette,
-    order: 11,
+    order: 12,
   },
   dir: "color-picker",
   title: "ColorPicker",
@@ -53,7 +53,7 @@ export const page: ComponentPageConfig = {
       scenario: "presets",
       title: "Пресеты",
       description:
-        "Быстрый цвет из палитры: квадратный триггер рядом с полем и триггер-кнопка; можно «без цвета» — `ColorPresets`, `allowEmpty`, `asChild`.",
+        "Быстрый цвет из палитры: квадратный триггер рядом с полем и триггер-кнопка; можно «без цвета» — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`.",
     },
     {
       scenario: "presets-sizes",
@@ -96,7 +96,7 @@ export const page: ComponentPageConfig = {
     ],
     aria: [
       'Область и ползунки — примитивы React Aria со своими именами `role="slider"`.',
-      "`TriggerSwatch` и `ColorPresets.Swatch` скрыты (`aria-hidden`) — дайте кнопке-триггеру `aria-label`; `ColorPresets.Trigger` называет себя «`labels.trigger`: <цвет>».",
+      "`TriggerSwatch` и `ColorPresets.Swatch` скрыты (`aria-hidden`) — дайте кнопке-триггеру `aria-label`; `ColorPresets.Trigger` называет свой элемент «`labels.trigger`: <цвет>», если у него нет своего `aria-label`.",
       '`ColorPicker.Swatches` — `role="radiogroup"` (ColorSwatches): назовите через `label` или `aria-label`.',
       'Сетка ColorPresets — `role="listbox"` с образцами `role="option"`, имя из `label` у Content или `labels.list`.',
     ],

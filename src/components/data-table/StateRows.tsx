@@ -16,6 +16,8 @@ type StateRowsProps<Row> = {
   totalColumns: number;
   selectable: boolean;
   expandEnabled: boolean;
+  /** A leading column of row handles (`onReorder`). */
+  reorderable?: boolean;
   error: React.ReactNode;
   empty: React.ReactNode;
   emptyLabel: string;
@@ -30,6 +32,7 @@ export function StateRows<Row>({
   totalColumns,
   selectable,
   expandEnabled,
+  reorderable = false,
   error,
   empty,
   emptyLabel,
@@ -66,6 +69,7 @@ export function StateRows<Row>({
   return Array.from({ length: skeletonRows }, (_, rowIndex) => (
     // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows
     <tr key={rowIndex} className={cx(styles.row, styles.skeletonRow)} data-skeleton="true">
+      {reorderable ? <td className={cx(styles.cell, styles.handleCell)} /> : null}
       {selectable ? (
         <td className={cx(styles.cell, styles.selectCell)}>
           <Skeleton shape="block" className={styles.skeletonChoice} />

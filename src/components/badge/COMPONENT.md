@@ -46,7 +46,8 @@ Badge.Root          <span>: fill, tier dimensions
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue. Categorizes; the text carries the meaning. |
 | `variant` | `"solid" \| "soft" \| "outline"` | `"soft"` | Treatment. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Badge tier, 16 · 20 · 24 · 28 · 32 px high. Without it the badge follows the surrounding control one tier down; outside a control it is `m`. |
-| `onRemove` | `() => void` | — | Adds the full-height remove segment at the end; called on its click. |
+| `onRemove` | `() => void \| Promise<void>` | — | Adds the full-height remove segment at the end; called on its click. Return the request's promise to remove on a server: the badge waits dimmed with a spinner in the segment (`aria-busy`, no second press); resolve — take it out of your list before resolving, and it leaves with its exit (fades and closes up, the badges after it glide in); reject — it stays and `labels.removeFailed` is announced. |
+| `loading` | `boolean` | `false` | The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a spinner in the remove segment, which takes no press. A promise from `onRemove` does the same on its own. |
 | `onPress` | `(event: MouseEvent<HTMLButtonElement>) => void` | — | Makes the body a `<button>` covering the whole badge (a toggle chip, a filter value); gets the event, so Alt / Shift clicks can mean more. |
 | `pressed` | `boolean` | — | Toggle state of a pressable badge: `aria-pressed` on the body, `data-pressed` on the root. |
 | `disabled` | `boolean` | — | Muted look for every variant, `aria-disabled`; the body button, remove and action get native `disabled`. |
@@ -117,6 +118,7 @@ Badge.Root          <span>: fill, tier dimensions
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `disabled` | muted fill, disabled text, no outline, for every variant | the labelled item is inactive | `false` |
+| `loading` | content dimmed, a spinner in the remove segment | the value waits on a request its owner runs (a tag being created); a promise from `onRemove` needs no flag | `false` |
 
 ## States
 | State | Driven by | DOM |
@@ -126,9 +128,12 @@ Badge.Root          <span>: fill, tier dimensions
 | icon segments | edge `Badge.Icon` / `Badge.Dot`, icon-only | `data-icon-start`, `data-icon-end`, `data-icon-only` |
 | plain text | read-only, text children only | `data-text-only`: the root is one block box that ellipsizes; otherwise each text run sits in its own block span |
 | removable | `onRemove` | `data-removable`; the remove segment takes a `fill-subtle-active` wash on hover |
+| removing | `onRemove` returned a pending promise, or `loading` | `data-pending`, `aria-busy`; the content quiets to 0.6 (`fast`, both ways), a `Spinner` stands in for the ×, the segment gets `aria-disabled` and takes no second press; rejected — the badge stays and `labels.removeFailed` is announced |
+| leaving | the owner took the badge out after its remove segment | a copy stays in place and closes up — fades, settles to 0.96 and shrinks to nothing with its gap (`fast`, `exit`) — so the badges after it glide in; off under reduced motion |
 | pressable / pressed | `onPress`, `pressed` | `data-pressable`, `data-pressed`, `aria-pressed` on the body; `fill-subtle` wash on hover |
 | action | `Badge.Action` | `data-action="reveal" \| "persistent"`; the text slides and the segment fades in over `fast` |
 | disabled | `disabled` | `data-disabled`, `aria-disabled`; inner buttons disabled |
+| count | a number as the only child | the digits roll to the new value when the number changes |
 
 ## Layout & spacing
 - Inline-flex, `width: fit-content`, `max-width: 100%`; text never wraps and ends in an ellipsis.
@@ -148,6 +153,7 @@ Badge.Root          <span>: fill, tier dimensions
 - A read-only badge is plain text in a `<span>`, no role.
 - `onPress` makes the body a `<button>` with `aria-pressed` when `pressed` is set; remove and `Badge.Action` are separate buttons with their own names.
 - Give every remove button a unique name with `labels.remove`; after removing, move focus to a neighbouring badge or the source field.
+- While a removal is saved the badge has `aria-busy` and the segment `aria-disabled`; once a removal waits, the badge mounts a polite live region that speaks `labels.removeFailed` if the promise rejects.
 - `Badge.Dot` is `aria-hidden`; icon-only badges need `aria-label`. Color never carries meaning alone.
 
 ### Labels
@@ -156,6 +162,7 @@ Badge.Root          <span>: fill, tier dimensions
 | Key | Default | Used for |
 |---|---|---|
 | `remove` | `"Удалить"` | Accessible name of the remove segment; include the badge text («Убрать фильтр «Москва»»). |
+| `removeFailed` | `"Не удалось удалить"` | Spoken when the `onRemove` promise rejects and the badge stays; name the badge («Фильтр «Москва» не убран»). |
 
 ## Examples
 | Example | Shows |
@@ -163,10 +170,11 @@ Badge.Root          <span>: fill, tier dimensions
 | [overview.tsx](examples/overview.tsx) | Publication statuses: soft badges where the text carries the meaning and the hue repeats it — `color`. |
 | [variants.tsx](examples/variants.tsx) | Every palette hue in every treatment; the text must read without the color — `variant`, `color`. |
 | [sizes.tsx](examples/sizes.tsx) | Every badge tier, 16 to 32 px high — `size`. |
-| [states.tsx](examples/states.tsx) | An inactive badge, a pressable toggle off and on, and a removable one — `disabled`, `onPress`, `pressed`, `onRemove`. |
+| [states.tsx](examples/states.tsx) | An inactive badge, a pressable toggle off and on, a removable one and one that waits on a request — `disabled`, `onPress`, `pressed`, `onRemove`, `loading`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A leading dot, a leading or trailing icon and an icon-only square with a name — `Badge.Dot`, `Badge.Icon`, `aria-label`. |
 | [in-controls.tsx](examples/in-controls.tsx) | Inside a button or a field the badge takes the tier one step down without `size`. |
 | [applied-filters.tsx](examples/applied-filters.tsx) | Applied filters: each badge drops its filter and names it for screen readers — `onRemove`, `labels`. |
+| [server-tags.tsx](examples/server-tags.tsx) | Order tags removed on the server: a badge waits dimmed with a spinner, leaves once the server agrees and stays with an announcement when it refuses — `onRemove`, `labels`. |
 | [filter-values.tsx](examples/filter-values.tsx) | Filter values as toggles with a hide action that slides in without changing the width — `onPress`, `pressed`, `Badge.Action`, `persistent`. |
 
 ## Mistakes
@@ -176,7 +184,8 @@ Badge.Root          <span>: fill, tier dimensions
 - A colored badge with no text → keep a word; color alone is not a signal.
 - An explicit `size` inside a control → drop it; the badge takes the tier one step down.
 - `onRemove` together with `Badge.Action` → one end segment per badge.
+- Removing the badge from your list first and putting it back when the request fails → return the request's promise and remove it after it succeeds; the badge waits meanwhile.
 
 ## Related
-- **Built from:** Icon
-- **See also:** [TagSelect](../tag-select/COMPONENT.md), [SmartFilter](../smart-filter/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)
+- **Built from:** `Icon` (remove ×, `Badge.Action` −), [Spinner](../spinner/COMPONENT.md) (removing)
+- **See also:** [TagSelect](../tag-select/COMPONENT.md), [Select](../select/COMPONENT.md) (row badges), [SegmentedControl](../segmented-control/COMPONENT.md) (`Count`, color dots), [SmartFilter](../smart-filter/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

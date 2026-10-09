@@ -1,5 +1,6 @@
 /**
- * `bun run skill:build` — the installable agent skill in `dist-skill/prime-ui-kit/`.
+ * `bun run skill:build` (the last step of `bun run build`) — the installable agent skill in
+ * `dist/skill/`, shipped in the npm package (`npx prime-ui-kit skill` copies it into a project).
  *
  * `SKILL/` links the component docs where they live in the repository (`../src/components/<dir>/`).
  * An installed skill is a folder on its own, so the build copies `SKILL/` together with every
@@ -13,9 +14,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const out = path.join(root, "dist-skill", "prime-ui-kit");
+const out = path.join(root, "dist", "skill");
 
-fs.rmSync(path.dirname(out), { recursive: true, force: true });
+fs.rmSync(out, { recursive: true, force: true });
 fs.cpSync(path.join(root, "SKILL"), out, {
   recursive: true,
   filter: (src) => path.basename(src) !== ".DS_Store",

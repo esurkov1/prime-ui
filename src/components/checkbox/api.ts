@@ -41,6 +41,13 @@ export const api: ComponentApi = {
           ru: "Ярус квадрата, текста и отступа.",
         },
         {
+          name: "shape",
+          type: '"square" | "circle"',
+          default: '"square"',
+          en: "Outline of the box: `square` is the rounded square; `circle` is a full circle (a selection mark in lists and chats). Size, the check draw-in, the indeterminate bar and states are the same.",
+          ru: "Контур: `square` — скруглённый квадрат; `circle` — круг (отметка выбора в списках и чатах). Размер, анимация галочки, полоска и состояния те же.",
+        },
+        {
           name: "hint",
           type: "ReactNode",
           en: "Help text under the label text. Hidden while `error` is shown.",
@@ -136,6 +143,13 @@ export const api: ComponentApi = {
           default: "false",
           en: "Disabled fill.",
           ru: "Неактивная заливка.",
+        },
+        {
+          name: "shape",
+          type: '"square" | "circle"',
+          default: '"square"',
+          en: "Outline of the box: `square` is the rounded square; `circle` is a full circle (a selection mark in lists and chats). The rest is the same.",
+          ru: "Контур: `square` — скруглённый квадрат; `circle` — круг (отметка выбора в списках и чатах). Остальное то же.",
         },
         {
           name: "size",

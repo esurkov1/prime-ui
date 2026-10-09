@@ -4,6 +4,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
   FieldFrame,
   type FieldFrameProps,
@@ -13,6 +14,8 @@ import {
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
+import { isPromiseLike } from "@/internal/usePendingChanges";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./DigitInput.module.css";
 
@@ -23,13 +26,27 @@ export type DigitInputLabels = {
   cell: string;
   /** Muted marker after the label when `optional`. */
   optional: string;
+  /** The error of a code whose `onComplete` promise rejected without a reason. */
+  failed: string;
 };
 
 const DIGIT_INPUT_LABELS: DigitInputLabels = {
   group: "Код",
   cell: "Цифра {index} из {length}",
   optional: "необязательно",
+  failed: "Неверный код",
 };
+
+/** Where the check of a complete code is: running, accepted, or refused with its reason. */
+type Verification =
+  | { state: "pending" }
+  | { state: "accepted" }
+  | { state: "refused"; reason: string };
+
+function reasonOf(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) return error.message;
+  return typeof error === "string" && error ? error : fallback;
+}
 
 export type DigitInputProps = FieldRootDomProps &
   FieldFrameProps & {
@@ -53,8 +70,13 @@ export type DigitInputProps = FieldRootDomProps &
     value?: string;
     defaultValue?: string;
     onValueChange?: (value: string) => void;
-    /** Called once when the last empty cell is filled. */
-    onComplete?: (value: string) => void;
+    /**
+     * Called once when the last empty cell is filled. Return the check's promise: the cells wait
+     * read-only and quiet (`aria-busy`); resolve — the `success` look; reject — the code clears,
+     * the field shakes in the reason (the rejection's message, else `labels.failed`) as its error,
+     * and the reason is announced. Typing again takes the error away.
+     */
+    onComplete?: (value: string) => void | Promise<void>;
     disabled?: boolean;
     /** Invalid state: danger ring on every cell. A non-empty `error` implies it. */
     invalid?: boolean;
@@ -84,7 +106,7 @@ export function DigitInput({
   defaultValue = "",
   onValueChange,
   onComplete,
-  disabled,
+  disabled: disabledProp,
   invalid,
   success = false,
   focusRing = true,
@@ -100,8 +122,16 @@ export function DigitInput({
   ...rest
 }: DigitInputProps) {
   const size = useControlSize(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
   const labels = { ...DIGIT_INPUT_LABELS, ...labelsProp };
-  const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
+  const [verification, setVerification] = React.useState<Verification | null>(null);
+  /** Checks in flight: only the answer for the code on screen counts. */
+  const attemptRef = React.useRef(0);
+  const verifying = verification?.state === "pending";
+  // The owner's `error` / `success` win; a refused or accepted check fills in when they are unset.
+  const shownError = error ?? (verification?.state === "refused" ? verification.reason : undefined);
+  const shownSuccess = success || verification?.state === "accepted";
+  const ids = useFieldFrame(id, { label, hint, error: shownError, invalid }, ariaDescribedBy);
 
   const [value, setValue] = useControllableState({
     value: valueProp !== undefined ? normalizeDigits(valueProp, length) : undefined,
@@ -109,11 +139,37 @@ export function DigitInput({
     onChange: onValueChange,
   });
 
+  const check = (code: string) => {
+    const outcome = onComplete?.(code);
+    if (!isPromiseLike(outcome)) return;
+    attemptRef.current += 1;
+    const attempt = attemptRef.current;
+    setVerification({ state: "pending" });
+    outcome.then(
+      () => {
+        if (attempt === attemptRef.current) setVerification({ state: "accepted" });
+      },
+      (reason: unknown) => {
+        if (attempt !== attemptRef.current) return;
+        setVerification({ state: "refused", reason: reasonOf(reason, labels.failed) });
+        // The code goes, so the person types it again from the first cell.
+        setValue("");
+        pendingFocusRef.current = 0;
+      },
+    );
+  };
+
   const commit = (nextRaw: string) => {
+    if (verifying) return;
     const next = normalizeDigits(nextRaw, length);
     const wasComplete = value.length === length;
+    // Typing again takes a refused or accepted check away.
+    if (verification !== null && next !== value) {
+      attemptRef.current += 1;
+      setVerification(null);
+    }
     setValue(next);
-    if (next.length === length && !wasComplete) onComplete?.(next);
+    if (next.length === length && !wasComplete) check(next);
   };
 
   const cells = Array.from({ length }, (_, index) => value[index] ?? "");
@@ -142,10 +198,18 @@ export function DigitInput({
       ringShown.current = false;
       return;
     }
+    // All reads first, then the writes: interleaving them would force a layout per property.
     const place = () => {
-      ring.style.width = `${cell.offsetWidth}px`;
-      ring.style.height = `${cell.offsetHeight}px`;
-      ring.style.transform = `translate(${cell.offsetLeft}px, ${cell.offsetTop}px)`;
+      const { offsetWidth, offsetHeight, offsetLeft, offsetTop } = cell;
+      const next = {
+        width: `${offsetWidth}px`,
+        height: `${offsetHeight}px`,
+        transform: `translate(${offsetLeft}px, ${offsetTop}px)`,
+      } as const;
+      // The effect runs on every render: an unchanged ring is not written (no style invalidation).
+      for (const key of ["width", "height", "transform"] as const) {
+        if (ring.style[key] !== next[key]) ring.style[key] = next[key];
+      }
     };
     if (!ringShown.current) {
       ring.style.transition = "none";
@@ -190,7 +254,7 @@ export function DigitInput({
       required={required}
       optional={optional}
       hint={hint}
-      error={error}
+      error={shownError}
       disabled={disabled}
       optionalLabel={labels.optional}
       className={cx(styles.frame, className)}
@@ -200,13 +264,15 @@ export function DigitInput({
         aria-label={ids.labelledBy ? undefined : labels.group}
         aria-labelledby={ids.labelledBy}
         aria-describedby={ids.describedBy}
+        aria-busy={verifying || undefined}
         disabled={disabled}
         className={cx(fieldTierClass, styles.root)}
         {...toDataAttributes({
           size,
           "full-width": fullWidth || undefined,
           invalid: ids.invalid || undefined,
-          success: (success && !ids.invalid) || undefined,
+          success: (shownSuccess && !ids.invalid) || undefined,
+          pending: verifying || undefined,
           disabled: disabled || undefined,
           "focus-ring": focusRing ? undefined : false,
         })}
@@ -241,6 +307,7 @@ export function DigitInput({
             // biome-ignore lint/a11y/noAutofocus: opt-in `autoFocus` of a one-time-code step
             autoFocus={autoFocus && index === entryIndex}
             disabled={disabled}
+            readOnly={verifying}
             required={required}
             className={cx(fieldSurfaceClass, styles.cell)}
             // The row's gliding ring replaces each cell's own.
@@ -296,6 +363,9 @@ export function DigitInput({
             }}
           />
         ))}
+        <VisuallyHidden role="status" aria-live="polite">
+          {verification?.state === "refused" ? verification.reason : ""}
+        </VisuallyHidden>
       </fieldset>
     </FieldFrame>
   );

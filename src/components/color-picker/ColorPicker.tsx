@@ -23,6 +23,7 @@ import { Select } from "@/components/select/Select";
 import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import type { FieldRootDomProps } from "@/internal/FieldFrame";
 import { fieldSurfaceClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
@@ -60,7 +61,7 @@ export type ColorPickerLabels = {
   blue: string;
 };
 
-const COLOR_PICKER_LABELS: ColorPickerLabels = {
+export const COLOR_PICKER_LABELS: ColorPickerLabels = {
   format: "Формат значений цвета",
   eyeDropper: "Пипетка",
   hex: "Hex",
@@ -389,7 +390,7 @@ function Slider({ className, disabled, ...props }: ColorPickerSliderProps) {
   return (
     <AriaColorSlider
       className={composeRenderProps(className, (c) => cx(styles.slider, c))}
-      isDisabled={disabled}
+      isDisabled={useInheritedDisabled(disabled)}
       {...props}
     />
   );
@@ -410,7 +411,7 @@ function Area({ className, disabled, ...props }: ColorPickerAreaProps) {
   return (
     <AriaColorArea
       className={composeRenderProps(className, (c) => cx(styles.area, c))}
-      isDisabled={disabled}
+      isDisabled={useInheritedDisabled(disabled)}
       {...props}
     />
   );

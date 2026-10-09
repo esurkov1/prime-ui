@@ -76,9 +76,11 @@ Match the link size to the surrounding text or to the Button it sits next to. Av
 |---|---|---|
 | hover | pointer | hover color + underline (`text-decoration-color: currentColor`) |
 | focus-visible | keyboard | outer focus ring with `--prime-focus-offset`, radius `--prime-radius-xs` |
-| disabled | `disabled` | `<a role="link">` without `href`, `aria-disabled="true"`, `tabIndex=-1`, `data-disabled="true"` |
+| disabled | `disabled` | `<a role="link">` without `href`, `aria-disabled="true"`, `tabIndex=-1`, `data-disabled="true"`; with `asChild` the child gets `aria-disabled="true"` and `data-disabled="true"`, keeps its own focusability, and its click is swallowed |
 
 Root attributes: `data-size`, `data-tone`, `data-disabled` (only when disabled).
+
+Motion: the color and the underline fade in over `fast` (the underline is always drawn, transparent at rest, 1px thick and 3px below the text).
 
 ## Layout & spacing
 - Inline in text: put a space before it (`{" "}`) and keep the text's size.

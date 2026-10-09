@@ -24,6 +24,11 @@
   color: var(--prime-color-accent-fg);
 }
 
+/* The circle changes only the outline; size, mark, motion and focus ring are the square's. */
+.control[data-shape="circle"] {
+  border-radius: var(--prime-radius-full);
+}
+
 .indicator {
   pointer-events: none;
 }

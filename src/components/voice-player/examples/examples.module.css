@@ -1,0 +1,18 @@
+/* Layout of the VoicePlayer scenarios: semantic tokens only. */
+
+/* call-recording.tsx: a deal card of 21rem, title and player stacked. */
+.card {
+  width: min(100%, calc(var(--prime-space-24) * 3.5));
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+}
+
+/* The player fills the card: its waveform grows with it. */
+.player {
+  width: 100%;
+  margin-block-start: var(--prime-space-3);
+}

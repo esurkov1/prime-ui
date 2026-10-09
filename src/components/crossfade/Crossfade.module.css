@@ -12,6 +12,11 @@
   transition: height var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
+/* Nothing to show and nothing leaving: no box, so a grid or flex gap closes around it. */
+.root:empty {
+  display: none;
+}
+
 /* While the height glides the content may be taller than the root: clip it, but keep room for
    focus rings (foundation §7). */
 .root[data-resizing="true"] {
@@ -30,4 +35,32 @@
   right: 0;
   left: 0;
   pointer-events: none;
+}
+
+/*
+ * `fill`: the root takes its parent's height (flex item, grid item or a sized block); each layer
+ * is a one-cell grid, so the state's content stretches to the full height, and the leaving layer
+ * covers the whole root.
+ */
+.root[data-fill="true"] {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  flex: 1 1 0%;
+  height: 100%;
+  min-height: 0;
+}
+
+.root[data-fill="true"]:empty {
+  display: none;
+}
+
+.root[data-fill="true"] > .layer {
+  display: grid;
+  grid-area: 1 / 1;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  min-height: 0;
+}
+
+.root[data-fill="true"] > .leaving {
+  inset: 0;
 }

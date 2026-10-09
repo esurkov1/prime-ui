@@ -1,0 +1,114 @@
+/*
+ * DescriptionList — read-only «label — value» pairs. The list is a size container: a horizontal
+ * list puts each label in a column beside its value (one third of the width) and stacks the pair
+ * once the list is narrower than 24rem; a vertical list always stacks. Labels wear the tier's
+ * label type in secondary ink, values the tier's text in primary ink and wrap anywhere. Air, not
+ * lines, separates the pairs.
+ */
+.root {
+  --dl-label-size: var(--prime-control-m-label-size);
+  --dl-label-line-height: var(--prime-control-m-label-line-height);
+  --dl-text-size: var(--prime-control-m-text-size);
+  --dl-line-height: var(--prime-control-m-line-height);
+  --dl-row-gap: var(--prime-space-3);
+  /* A row action is one tier smaller; the value keeps the row at least that tall. */
+  --dl-action: var(--prime-control-s-height);
+
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dl-row-gap);
+  min-width: 0;
+  margin: 0;
+  font-family: var(--prime-font-family-sans);
+}
+
+.root[data-size="xs"] {
+  --dl-label-size: var(--prime-control-xs-label-size);
+  --dl-label-line-height: var(--prime-control-xs-label-line-height);
+  --dl-text-size: var(--prime-control-xs-text-size);
+  --dl-line-height: var(--prime-control-xs-line-height);
+  --dl-row-gap: var(--prime-space-2);
+  --dl-action: var(--prime-control-xs-height);
+}
+
+.root[data-size="s"] {
+  --dl-label-size: var(--prime-control-s-label-size);
+  --dl-label-line-height: var(--prime-control-s-label-line-height);
+  --dl-text-size: var(--prime-control-s-text-size);
+  --dl-line-height: var(--prime-control-s-line-height);
+  --dl-row-gap: var(--prime-space-2);
+  --dl-action: var(--prime-control-xs-height);
+}
+
+.root[data-size="l"] {
+  --dl-label-size: var(--prime-control-l-label-size);
+  --dl-label-line-height: var(--prime-control-l-label-line-height);
+  --dl-text-size: var(--prime-control-l-text-size);
+  --dl-line-height: var(--prime-control-l-line-height);
+  --dl-row-gap: var(--prime-space-4);
+  --dl-action: var(--prime-control-m-height);
+}
+
+.root[data-size="xl"] {
+  --dl-label-size: var(--prime-control-xl-label-size);
+  --dl-label-line-height: var(--prime-control-xl-label-line-height);
+  --dl-text-size: var(--prime-control-xl-text-size);
+  --dl-line-height: var(--prime-control-xl-line-height);
+  --dl-row-gap: var(--prime-space-4);
+  --dl-action: var(--prime-control-l-height);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  align-items: baseline;
+  gap: var(--prime-space-1) var(--prime-space-4);
+  min-width: 0;
+}
+
+.root[data-orientation="vertical"] .item {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (max-width: 24rem) {
+  .item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.label {
+  min-width: 0;
+  color: var(--prime-color-text-secondary);
+  font-size: var(--dl-label-size);
+  line-height: var(--dl-label-line-height);
+  overflow-wrap: anywhere;
+}
+
+.value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  margin: 0;
+  color: var(--prime-color-text-primary);
+  font-size: var(--dl-text-size);
+  line-height: var(--dl-line-height);
+}
+
+.text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.value[data-empty] .text {
+  color: var(--prime-color-text-muted);
+}
+
+/* The action centres on the value's first line and never pushes the row taller than it is. */
+.action {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-block: calc((var(--dl-line-height) - var(--dl-action)) / 2);
+}

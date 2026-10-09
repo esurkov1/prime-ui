@@ -83,6 +83,8 @@ Text has no interactive states.
 
 ## Layout & spacing
 - No outer margins: spacing comes from the parent's `gap`.
+- Title, heading and display roles balance their lines (`text-wrap-style: balance`); body and caption avoid a lone last word (`pretty`). Long words break (`overflow-wrap: break-word`).
+- `code` uses the mono family (JetBrains Mono); every other role the sans family (Golos Text).
 - Reading text: cap the column at `--prime-layout-reading-max-width` (60–75 characters).
 - `truncate` needs a block element and a shrinking parent (`min-width: 0` in flex rows).
 
