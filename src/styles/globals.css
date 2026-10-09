@@ -4,6 +4,7 @@
 @import "./tokens.css";
 @import "./theme-light.css";
 @import "./theme-dark.css";
+@import "./controls.css";
 
 :root {
   font-family: var(--prime-font-family-sans);
