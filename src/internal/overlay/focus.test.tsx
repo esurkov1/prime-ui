@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { MediaViewer } from "@/components/media-viewer/MediaViewer";
 import { Modal } from "@/components/modal/Modal";
@@ -37,9 +37,12 @@ describe("opener of a modal layer", () => {
     region.focus();
     safariPress(opener);
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+    const focus = vi.spyOn(opener, "focus");
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(opener).toHaveFocus();
+    // Opened by a press: back without the focus ring, though a key closed it.
+    expect(focus).toHaveBeenCalledWith(expect.objectContaining({ focusVisible: false }));
   });
 
   it("is the focused element when a key opened the layer", () => {
@@ -62,7 +65,10 @@ describe("opener of a modal layer", () => {
     const opener = screen.getByRole("button", { name: "Изменить заказ" });
     opener.focus();
     fireEvent.click(opener);
+    const focus = vi.spyOn(opener, "focus");
     fireEvent.keyDown(document, { key: "Escape" });
     expect(opener).toHaveFocus();
+    // Opened by a key: the ring shows where focus lands.
+    expect(focus).not.toHaveBeenCalledWith(expect.objectContaining({ focusVisible: false }));
   });
 });

@@ -46,16 +46,21 @@ export function focusInto(container: HTMLElement): void {
   target.focus({ preventScroll: true });
 }
 
-/** Focuses `el` when it is still in the document. */
-export function focusBack(el: HTMLElement | null | undefined): void {
-  if (el?.isConnected) el.focus({ preventScroll: true });
+/**
+ * Focuses `el` when it is still in the document. `quiet` — the layer was opened with a pointer:
+ * focus returns without the focus ring, even after a key closed the layer.
+ */
+export function focusBack(el: HTMLElement | null | undefined, quiet = false): void {
+  if (!el?.isConnected) return;
+  // `focusVisible` is a FocusOptions field newer than the DOM typings.
+  el.focus({ preventScroll: true, ...(quiet ? { focusVisible: false } : {}) } as FocusOptions);
 }
 
 /** A press this recent opened the layer; an older one did not (a key did). */
 const PRESS_OPENS_MS = 1000;
 
-/** The control the person last pressed: Safari does not focus a button on a click. */
-let pressed: { control: HTMLElement; time: number } | null = null;
+/** The last press: when, and the control it landed on (Safari does not focus a clicked button). */
+let press: { control: HTMLElement | null; time: number } | null = null;
 
 if (typeof document !== "undefined") {
   document.addEventListener(
@@ -63,28 +68,38 @@ if (typeof document !== "undefined") {
     (event) => {
       const target = event.target instanceof Element ? event.target : null;
       const control = target?.closest<HTMLElement>(`${NATIVE_TAB_STOP}, ${FOCUSABLE}`) ?? null;
-      pressed = control ? { control, time: performance.now() } : null;
+      press = { control, time: performance.now() };
+    },
+    true,
+  );
+  // A key after the press is what acts next (Enter on a focused button): the press no longer counts.
+  document.addEventListener(
+    "keydown",
+    () => {
+      press = null;
     },
     true,
   );
 }
 
+/** Who opened a layer, to return focus to on close, and whether a pointer did it. */
+export type Opener = { element: HTMLElement | null; byPointer: boolean };
+
 /**
- * The element that opened a layer, to return focus to on close: the control just pressed — a
- * click leaves focus elsewhere in Safari (on the body, or on a `tabindex="-1"` region around the
- * button, which would then show its focus ring) — else the element focused right now. Read while
- * rendering the open transition, before a child `autoFocus` moves focus into the new layer.
+ * The opener of a layer, read while rendering the open transition (before a child `autoFocus`
+ * moves focus in). After a press: the control pressed — a click leaves focus elsewhere in Safari
+ * (the body, or a `tabindex="-1"` region around the button) — and `byPointer`, so focus goes
+ * back without a focus ring. After a key: the focused element, and the ring shows.
  */
-export function openerElement(): HTMLElement | null {
+export function captureOpener(): Opener {
   const active = activeElement();
-  if (
-    pressed?.control.isConnected &&
-    performance.now() - pressed.time < PRESS_OPENS_MS &&
-    !(active && pressed.control.contains(active))
-  ) {
-    return pressed.control;
+  if (press && performance.now() - press.time < PRESS_OPENS_MS) {
+    const { control } = press;
+    const element =
+      control?.isConnected && !(active && control.contains(active)) ? control : active;
+    return { element, byPointer: true };
   }
-  return active;
+  return { element: active, byPointer: false };
 }
 
 /**
