@@ -42,6 +42,7 @@ import {
   Input,
   Kanban,
   Label,
+  List,
   LoginForm,
   MediaViewer,
   Message,
@@ -229,6 +230,13 @@ describe("part refs: every part declares ref", () => {
     takesRef(Gallery);
     takesRef(Label.Icon);
     takesRef(Label.Description);
+    takesRef(List.Root);
+    takesRef(List.Item);
+    takesRef(List.ItemIcon);
+    takesRef(List.ItemText);
+    takesRef(List.ItemDescription);
+    takesRef(List.ItemMeta);
+    takesRef(List.ItemCount);
     takesRef(LoginForm.Header);
     takesRef(LoginForm.Logo);
     takesRef(LoginForm.Title);
@@ -339,6 +347,15 @@ const CASES: Case[] = [
         <PageContent.List aria-label="Диалоги" />
         <PageContent.Detail ref={ref} aria-label="Переписка" />
       </PageContent.Split>
+    ),
+  ],
+  [
+    "List.Item",
+    "BUTTON",
+    (ref) => (
+      <List.Root aria-label="Диалоги">
+        <List.Item ref={ref}>ООО «Гранит»</List.Item>
+      </List.Root>
     ),
   ],
   [

@@ -103,13 +103,14 @@ Say what happens: system messages, progress, loading placeholders, state swaps, 
 
 ## Navigation (`navigation`)
 
-Move between places: app navigation (side rail, bottom bar on phones), tabs, the path, pages, steps.
+Move between places: app navigation (side rail, bottom bar on phones), tabs, the records of a list, the path, pages, steps.
 
 | Component | Purpose | Docs |
 |---|---|---|
 | Tabs | Tabs for navigating between content panels of one screen. | [COMPONENT.md](../src/components/tabs/COMPONENT.md) · [examples](../src/components/tabs/examples/) |
 | Breadcrumb | Breadcrumbs: the path to the current page. | [COMPONENT.md](../src/components/breadcrumb/COMPONENT.md) · [examples](../src/components/breadcrumb/examples/) |
 | Pagination | Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view. | [COMPONENT.md](../src/components/pagination/COMPONENT.md) · [examples](../src/components/pagination/examples/) |
+| List | A selectable list of rows — the list half of a list + detail screen: conversations, tickets, mail, records; the open one is `current`. | [COMPONENT.md](../src/components/list/COMPONENT.md) · [examples](../src/components/list/examples/) |
 | Stepper | Steps of a multi-step process with pending, active, completed and danger statuses. | [COMPONENT.md](../src/components/stepper/COMPONENT.md) · [examples](../src/components/stepper/examples/) |
 | Sidebar | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. | [COMPONENT.md](../src/layout/sidebar/COMPONENT.md) · [examples](../src/layout/sidebar/examples/) |
 | BottomNav | Phone navigation: 2–6 sections at the bottom, flat or a floating glass capsule, icons with or without labels, an optional round action. | [COMPONENT.md](../src/layout/bottom-nav/COMPONENT.md) · [examples](../src/layout/bottom-nav/examples/) |

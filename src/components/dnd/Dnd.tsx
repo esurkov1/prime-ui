@@ -54,9 +54,7 @@ function DndRoot({ labels, children }: DndRootProps) {
     <DragControllerContext value={controller}>
       {children}
       <DragOverlay controller={controller} />
-      <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
-        {message}
-      </VisuallyHidden>
+      <VisuallyHidden live="polite">{message}</VisuallyHidden>
     </DragControllerContext>
   );
 }

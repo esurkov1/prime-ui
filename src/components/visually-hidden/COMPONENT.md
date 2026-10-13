@@ -36,7 +36,8 @@ VisuallyHidden    <span>: out of sight (1px, clipped), pinned to its containing 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — | The text to read. |
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `id` (to point `aria-describedby` at it), `role="status"` with `aria-live` for an announcement, `className` and the other span attributes. |
+| `live` | `"polite" \| "assertive"` | — | An announcement region, read as a whole on every change: `polite` — `role="status"`, `assertive` — `role="alert"` (urgent only). |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `id` (to point `aria-describedby` at it), `className` and the other span attributes. |
 
 ## Variants
 One look: none. It renders no pixels and takes no room.
@@ -45,7 +46,7 @@ One look: none. It renders no pixels and takes no room.
 | State | Driven by | DOM |
 |---|---|---|
 | hidden text | children | a clipped `<span>` |
-| live region | `role="status"` + `aria-live="polite"` | read when its text changes; mount it empty first, then set the message |
+| live region | `live="polite"` (`"assertive"` for an urgent one) | `role="status"` (`"alert"`), `aria-live`, `aria-atomic`: read as a whole when its text changes; mount it empty first, then set the message |
 
 ## Layout & spacing
 - Takes no room and never scrolls its column: it is pinned to the start of the nearest positioned ancestor.
@@ -58,7 +59,7 @@ No keyboard interaction.
 
 ### ARIA
 - The text stays in the accessibility tree: it joins the accessible name of the element around it.
-- With `role="status"` it is a polite live region; keep it mounted and change its text — a region mounted together with its message is often not read.
+- With `live="polite"` it is a polite live region (`role="status"`), with `live="assertive"` an alert (`role="alert"`) for what cannot wait; keep it mounted and change its text — a region mounted together with its message is often not read.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -73,6 +74,8 @@ No `labels`.
 ## Mistakes
 - `display: none` or `hidden` for screen-reader text → both remove it from the accessibility tree.
 - A live region mounted with its first message → mount it empty, then set the text.
+- `role="status"` and `aria-live` written by hand → `live="polite"` sets them together, atomic.
+- `live="assertive"` for a routine result («Сохранено») → it interrupts the reader; keep it for errors that block.
 - VisuallyHidden as the only name of a button that has `aria-label` → the `aria-label` wins; use one of them.
 - Hidden text that repeats the visible label → screen readers read it twice.
 

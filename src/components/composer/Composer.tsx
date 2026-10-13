@@ -1365,9 +1365,7 @@ function ComposerRoot({
               </VisuallyHidden>
             </div>
           </div>
-          <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
-            {announcement}
-          </VisuallyHidden>
+          <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
         </form>
       </ControlSizeProvider>
     </ComposerProvider>

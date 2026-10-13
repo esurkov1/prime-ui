@@ -969,9 +969,7 @@ export function DataTable<Row>({
             {showSkeleton ? <VisuallyHidden role="status">{labels.loading}</VisuallyHidden> : null}
 
             {selectable ? (
-              <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
-                {selection.announcement}
-              </VisuallyHidden>
+              <VisuallyHidden live="polite">{selection.announcement}</VisuallyHidden>
             ) : null}
 
             <Footer

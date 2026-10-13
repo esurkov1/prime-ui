@@ -15,12 +15,13 @@ describe("VisuallyHidden (public)", () => {
     expect(screen.getByTestId("hidden").tagName).toBe("SPAN");
   });
 
-  it("serves as a polite live region", () => {
-    render(
-      <VisuallyHidden role="status" aria-live="polite">
-        Сохранено
-      </VisuallyHidden>,
-    );
-    expect(screen.getByRole("status")).toHaveTextContent("Сохранено");
+  it("live: a polite status or an assertive alert, read as a whole", () => {
+    const { rerender } = render(<VisuallyHidden live="polite">Сохранено</VisuallyHidden>);
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("Сохранено");
+    expect(status).toHaveAttribute("aria-live", "polite");
+    expect(status).toHaveAttribute("aria-atomic", "true");
+    rerender(<VisuallyHidden live="assertive">Не удалось сохранить</VisuallyHidden>);
+    expect(screen.getByRole("alert")).toHaveAttribute("aria-live", "assertive");
   });
 });

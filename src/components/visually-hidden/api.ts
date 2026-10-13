@@ -14,10 +14,16 @@ export const api: ComponentApi = {
           ru: "Текст, который зачитывается.",
         },
         {
+          name: "live",
+          type: '"polite" | "assertive"',
+          en: 'An announcement region, read as a whole on every change: `polite` — `role="status"`, `assertive` — `role="alert"` (urgent only).',
+          ru: 'Область объявлений, зачитывается целиком при каждом изменении: `polite` — `role="status"`, `assertive` — `role="alert"` (только срочное).',
+        },
+        {
           name: "…rest",
           type: "HTMLAttributes<HTMLSpanElement>",
-          en: '`id` (to point `aria-describedby` at it), `role="status"` with `aria-live` for an announcement, `className` and the other span attributes.',
-          ru: '`id` (для `aria-describedby`), `role="status"` с `aria-live` для объявления, `className` и остальные атрибуты.',
+          en: "`id` (to point `aria-describedby` at it), `className` and the other span attributes.",
+          ru: "`id` (для `aria-describedby`), `className` и остальные атрибуты.",
         },
       ],
     },

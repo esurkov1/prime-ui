@@ -33,8 +33,10 @@
 
 ## Import
 ```tsx
-import { FileUpload, type FileUploadFile, useUploadQueue } from "prime-ui-kit";
+import { FileUpload, type FileUploadFile, formatFileSize, useUploadQueue } from "prime-ui-kit";
 ```
+
+`formatFileSize(bytes)` writes a size the way the rows do («820 КБ», «1,2 МБ»): use it wherever a file size appears beside the kit's.
 
 ## Anatomy
 ```

@@ -127,7 +127,7 @@ open triads, dismiss, flags, focusRing, labels, structure, DOM state). These rul
 - A visible text label is `label`; a name only for assistive tech is the native `aria-label`, never
   `label`.
 - `asChild?: boolean` only on single interactive elements that may become a link or another element
-  (Button.Root, LinkButton, Sidebar.Item, Sidebar.Brand, BottomNav.Item, Timeline.Item, Card.Root, Dropdown.Item, Input.Action, Textarea.Action, Thumbnail.Root). `Trigger`, `Close`,
+  (Button.Root, LinkButton, Sidebar.Item, Sidebar.Brand, BottomNav.Item, List.Item, Timeline.Item, Card.Root, Dropdown.Item, Input.Action, Textarea.Action, Thumbnail.Root). `Trigger`, `Close`,
   `Confirm`, `Anchor` are always slots that clone one child and take no `className`. `as` only picks a semantic tag for non-interactive elements.
 - Functions: `formatX(value)` for display, `getX(item)` for data accessors, `renderX(item)` to render a
   data item. No function-as-children.
@@ -183,6 +183,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a bounded block in an example (panel, card) | `Card` (`Card.Root` + `Card.Body`) — never a hand-drawn card in CSS |
 | a person / object picture | `Avatar` / `Thumbnail`; image load state via `src/hooks/useImageStatus` |
 | a table, pagination, row selection | `DataTable`, `Pagination`, `Checkbox` |
+| a selectable list of rows (dialogs, tickets, mail — the list side of a list + detail) | `List` (`current`, `List.ItemIcon` / `ItemText` / `ItemDescription` / `ItemMeta` / `ItemCount`) — never ghost Buttons with a soft current |
 | screen-reader-only text | `src/internal/VisuallyHidden` |
 | appearance of a part | `src/internal/enterMotion.module.css` (`.enter`, `.enterBase`) |
 | a touch hit area for a small control | `src/internal/touchTarget` (`touchTargetClass`, `touchTargetBlockClass`) |
@@ -305,7 +306,7 @@ export const page: ComponentPageConfig = {
   Skeleton, Banner, Sparkline, VisuallyHidden, Gallery; control — Checkbox, Radio, Switch, Slider, SegmentedControl, ColorSwatches, ButtonGroup, VoicePlayer, VideoNote;
   field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
   ColorField, FileUpload; overlay — Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu,
-  Notification, MediaViewer; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination; composite — DataTable, Kanban,
+  Notification, MediaViewer; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination, List; composite — DataTable, Kanban,
   Gantt, Dnd, SmartFilter, Timeline, Card, DescriptionList, LoginForm, EmptyPage, Composer, Chat, Message, ChartFrame; layout — AppShell, AppHeader, Sidebar, BottomNav, PageContent,
   PageToolbar, ScrollContainer, ExampleFrame, Crossfade).
 - **Slots** (`SLOTS` in `pageStandard.ts`, file = slot id): `overview` «Обзор» · `variants` «Варианты» ·

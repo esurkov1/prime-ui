@@ -1,0 +1,22 @@
+/* Schedule: the page fills the app panel (`AppShell.Root fillViewport` + `PageContent.Root fill`);
+   the page panel sits close over the chart it filters and the chart takes the free height. */
+
+.board {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+  min-height: 0;
+}
+
+/* On a short screen the chart keeps room for a few rows; the page scrolls instead. */
+.chart {
+  min-height: calc(var(--prime-space-24) * 3);
+}
+
+/* First column: the name over the role. */
+.person {
+  display: grid;
+  min-width: 0;
+}

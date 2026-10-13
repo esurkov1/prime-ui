@@ -235,7 +235,7 @@ it saves).
 | `Icon`, `createIcon` | kit icon set and domain glyphs — see Icons below |
 | `chartColors` | the chart palette as CSS values for a chart library: `series` 1…8 in order, `other`, `grid`, `axis`, `scale` — follows the theme |
 | `useTokenValue("--prime-space-7")` | a length token in px for geometry CSS cannot take (SVG coordinates, canvas, virtual rows); follows a theme switch |
-| `VisuallyHidden` | text for screen readers only (an icon-only part's name, a spoken count); `role="status"` on it for a polite announcement |
+| `VisuallyHidden` | text for screen readers only (an icon-only part's name, a spoken count); `live="polite"` on it for an announcement (`"assertive"` only for an error that blocks) |
 
 ## Icons
 

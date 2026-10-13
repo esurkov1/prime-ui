@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 77 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 78 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines — a surface ladder where every nested
@@ -271,6 +271,7 @@ accessibility, examples and common mistakes.
 | [**Tabs**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) | Tabs for navigating between content panels of one screen. |
 | [**Breadcrumb**](https://github.com/esurkov1/prime-ui/blob/main/src/components/breadcrumb/COMPONENT.md) | Breadcrumbs: the path to the current page. |
 | [**Pagination**](https://github.com/esurkov1/prime-ui/blob/main/src/components/pagination/COMPONENT.md) | Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view. |
+| [**List**](https://github.com/esurkov1/prime-ui/blob/main/src/components/list/COMPONENT.md) | A selectable list of rows — the list half of a list + detail screen: conversations, tickets, mail, records. |
 | [**Stepper**](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) | Steps of a multi-step process with pending, active, completed and danger statuses. |
 | [**Sidebar**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. |
 | [**BottomNav**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/bottom-nav/COMPONENT.md) | Phone navigation bar: 2–6 sections, flat or a floating glass capsule, with an optional round action. |

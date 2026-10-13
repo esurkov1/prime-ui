@@ -1,0 +1,242 @@
+/*
+ * List — a selectable navigation list (the master half of a list + detail screen). No border, no
+ * card of its own: rows are transparent with a `fill-subtle` wash on hover; the current row takes
+ * the surface's fill two ladder steps off it (`fill-muted-hover`), as the Sidebar's current item.
+ * A one-line row is the control height of the tier; a second line (description) or an avatar
+ * makes it taller. On a coarse pointer a row is at least the touch target.
+ */
+
+.root {
+  --list-h: var(--prime-control-m-height);
+  --list-text: var(--prime-control-m-text-size);
+  --list-lh: var(--prime-control-m-line-height);
+  --list-icon: var(--prime-control-m-icon);
+  --list-avatar: var(--prime-avatar-m);
+  --list-gap: var(--prime-control-m-gap);
+  --list-pad-x: var(--prime-control-m-field-padding-x);
+  --list-radius: var(--prime-control-m-radius);
+  --list-desc: var(--prime-text-body-s-size);
+  --list-desc-lh: var(--prime-text-body-s-line-height);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-1);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+/* The list reset at zero specificity: a consumer's class may pad the list in its pane. */
+:where(.root) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.root[data-size="xs"] {
+  --list-h: var(--prime-control-xs-height);
+  --list-text: var(--prime-control-xs-text-size);
+  --list-lh: var(--prime-control-xs-line-height);
+  --list-icon: var(--prime-control-xs-icon);
+  --list-avatar: var(--prime-avatar-xs);
+  --list-gap: var(--prime-control-xs-gap);
+  --list-pad-x: var(--prime-control-xs-field-padding-x);
+  --list-radius: var(--prime-control-xs-radius);
+  --list-desc: var(--prime-text-caption-size);
+  --list-desc-lh: var(--prime-text-caption-line-height);
+}
+
+.root[data-size="s"] {
+  --list-h: var(--prime-control-s-height);
+  --list-text: var(--prime-control-s-text-size);
+  --list-lh: var(--prime-control-s-line-height);
+  --list-icon: var(--prime-control-s-icon);
+  --list-avatar: var(--prime-avatar-s);
+  --list-gap: var(--prime-control-s-gap);
+  --list-pad-x: var(--prime-control-s-field-padding-x);
+  --list-radius: var(--prime-control-s-radius);
+  --list-desc: var(--prime-text-caption-size);
+  --list-desc-lh: var(--prime-text-caption-line-height);
+}
+
+.root[data-size="l"] {
+  --list-h: var(--prime-control-l-height);
+  --list-text: var(--prime-control-l-text-size);
+  --list-lh: var(--prime-control-l-line-height);
+  --list-icon: var(--prime-control-l-icon);
+  --list-avatar: var(--prime-avatar-l);
+  --list-gap: var(--prime-control-l-gap);
+  --list-pad-x: var(--prime-control-l-field-padding-x);
+  --list-radius: var(--prime-control-l-radius);
+}
+
+.root[data-size="xl"] {
+  --list-h: var(--prime-control-xl-height);
+  --list-text: var(--prime-control-xl-text-size);
+  --list-lh: var(--prime-control-xl-line-height);
+  --list-icon: var(--prime-control-xl-icon);
+  --list-avatar: var(--prime-avatar-xl);
+  --list-gap: var(--prime-control-xl-gap);
+  --list-pad-x: var(--prime-control-xl-field-padding-x);
+  --list-radius: var(--prime-control-xl-radius);
+}
+
+@media (pointer: coarse) {
+  .root {
+    --list-row-h: max(var(--list-h), var(--prime-control-touch-target));
+  }
+}
+
+.row {
+  display: flex;
+  min-width: 0;
+}
+
+/* --- Item ------------------------------------------------------------------------ */
+
+.item {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--list-gap);
+  width: 100%;
+  min-width: 0;
+  min-height: var(--list-row-h, var(--list-h));
+  margin: 0;
+  padding-block: calc((var(--list-h) - var(--list-lh)) / 2);
+  padding-inline: var(--list-pad-x);
+  border: 0;
+  border-radius: var(--list-radius);
+  background: transparent;
+  color: var(--prime-color-text-secondary);
+  font: inherit;
+  font-size: var(--list-text);
+  line-height: var(--list-lh);
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
+}
+
+/* Inside the row edge: a scrolling pane never cuts the ring. */
+.item:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
+@media (hover: hover) {
+  .item:hover {
+    background: var(--prime-color-fill-subtle);
+    color: var(--prime-color-text-primary);
+  }
+}
+
+.item:active:not([data-disabled="true"], :disabled) {
+  background: var(--prime-color-fill-subtle-active);
+}
+
+/* The open record: two ladder steps off the surface, apart from the `fill-subtle` hover. */
+.item[aria-current="true"],
+.item[aria-current="page"] {
+  background: var(--prime-color-fill-muted-hover);
+  color: var(--prime-color-text-primary);
+}
+
+.item[data-disabled="true"],
+.item:disabled {
+  background: transparent;
+  color: var(--prime-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* --- Parts ----------------------------------------------------------------------- */
+
+/* The leading picture: an icon at the tier size, or an avatar the slot sizes to the tier. */
+.icon {
+  --prime-icon-size: var(--list-icon);
+  --avatar-slot-size: var(--list-avatar);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--prime-color-text-muted);
+}
+
+/* A trailing glyph stays quiet: the icon size, never an avatar. */
+.icon[data-edge="end"] {
+  width: var(--list-icon);
+  height: var(--list-icon);
+}
+
+.item[data-disabled="true"] .icon,
+.item:disabled .icon {
+  color: var(--prime-color-text-disabled);
+}
+
+.body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.text,
+.description {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text {
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.item[aria-current="true"] .text,
+.item[aria-current="page"] .text {
+  color: var(--prime-color-text-primary);
+}
+
+.description {
+  color: var(--prime-color-text-muted);
+  font-size: var(--list-desc);
+  line-height: var(--list-desc-lh);
+}
+
+.item[data-disabled="true"] .description,
+.item:disabled .description {
+  color: inherit;
+}
+
+/* Meta, count, trailing icons: one cluster at the end; beside two lines meta on top, count below. */
+.trail {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--prime-space-2);
+}
+
+.trailStacked {
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: stretch;
+  justify-content: space-between;
+  gap: var(--prime-space-1);
+}
+
+.meta {
+  color: var(--prime-color-text-muted);
+  font-size: var(--prime-text-caption-size);
+  line-height: var(--prime-text-caption-line-height);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.count {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}

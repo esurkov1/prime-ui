@@ -1,7 +1,6 @@
 /** A support messenger on `Chat`: dialogs beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, dates and runs from data, every kind of message, search, pinned messages, replies and edits from the menu with a jump to the quoted message, read receipts and unread counts from what was seen, the typing signal both ways, and the Composer whose messages rise into the list while the client answers. */
 import {
   Avatar,
-  Badge,
   Button,
   Card,
   Chat,
@@ -13,6 +12,7 @@ import {
   Dropdown,
   type GalleryItem,
   Icon,
+  List,
   Message,
   type MessageReaction,
   type MessageStatus,
@@ -729,28 +729,25 @@ export default function ChatPattern() {
           <PageContent.List aria-label="Диалоги">
             <Card.Root className={styles.paneCard}>
               <ScrollContainer className={styles.pane}>
-                <ul className={styles.dialogs}>
+                <List.Root className={styles.dialogs}>
                   {DIALOGS.map((item) => (
-                    <li key={item.id}>
-                      <Button.Root
-                        variant={item.id === dialogId ? "soft" : "ghost"}
-                        tone="neutral"
-                        fullWidth
-                        aria-current={item.id === dialogId ? "true" : undefined}
-                        className={styles.dialog}
-                        onClick={() => setDialogId(item.id)}
-                      >
-                        <Avatar.Root size="s" color="blue">
+                    <List.Item
+                      key={item.id}
+                      current={item.id === dialogId}
+                      onClick={() => setDialogId(item.id)}
+                    >
+                      <List.ItemIcon>
+                        <Avatar.Root color="blue">
                           <Avatar.Fallback>{item.initials}</Avatar.Fallback>
                         </Avatar.Root>
-                        <span className={styles.dialogText}>{item.name}</span>
-                        {(unread[item.id] ?? 0) > 0 ? (
-                          <Badge.Root color="blue">{unread[item.id]}</Badge.Root>
-                        ) : null}
-                      </Button.Root>
-                    </li>
+                      </List.ItemIcon>
+                      <List.ItemText>{item.name}</List.ItemText>
+                      {(unread[item.id] ?? 0) > 0 ? (
+                        <List.ItemCount color="blue">{unread[item.id]}</List.ItemCount>
+                      ) : null}
+                    </List.Item>
                   ))}
-                </ul>
+                </List.Root>
               </ScrollContainer>
             </Card.Root>
           </PageContent.List>

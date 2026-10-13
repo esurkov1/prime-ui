@@ -1,5 +1,5 @@
 /** A support inbox as list + detail on a full-height page: side by side on a wide panel, one pane at a time with a back button on a narrow one — `PageContent.Split`, `PageContent.BackButton`, `fill`. */
-import { Badge, Button, Card, PageContent, ScrollContainer, Typography } from "prime-ui-kit";
+import { Card, List, PageContent, ScrollContainer, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -58,25 +58,20 @@ export default function PageContentListDetailExample() {
             <PageContent.List aria-label="Диалоги">
               <Card.Root className={styles.paneCard}>
                 <ScrollContainer className={styles.pane}>
-                  <ul className={styles.dialogs}>
+                  <List.Root className={styles.dialogs}>
                     {DIALOGS.map((dialog) => (
-                      <li key={dialog.id}>
-                        <Button.Root
-                          variant={dialog.id === dialogId ? "soft" : "ghost"}
-                          tone="neutral"
-                          fullWidth
-                          aria-current={dialog.id === dialogId ? "true" : undefined}
-                          className={styles.dialog}
-                          onClick={() => open(dialog)}
-                        >
-                          {dialog.client}
-                          {dialog.unread > 0 ? (
-                            <Badge.Root color="blue">{dialog.unread}</Badge.Root>
-                          ) : null}
-                        </Button.Root>
-                      </li>
+                      <List.Item
+                        key={dialog.id}
+                        current={dialog.id === dialogId}
+                        onClick={() => open(dialog)}
+                      >
+                        <List.ItemText>{dialog.client}</List.ItemText>
+                        {dialog.unread > 0 ? (
+                          <List.ItemCount color="blue">{dialog.unread}</List.ItemCount>
+                        ) : null}
+                      </List.Item>
                     ))}
-                  </ul>
+                  </List.Root>
                 </ScrollContainer>
               </Card.Root>
             </PageContent.List>

@@ -1542,9 +1542,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
           {bodyState === "loading" ? (
             <VisuallyHidden role="status">{labels.loading}</VisuallyHidden>
           ) : null}
-          <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
-            {announcement}
-          </VisuallyHidden>
+          <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
         </div>
       </ControlSizeProvider>
     </SurfaceDepthProvider>

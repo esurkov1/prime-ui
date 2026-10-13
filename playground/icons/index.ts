@@ -33,6 +33,7 @@ export { Layers } from "@/icons/glyphs/layers";
 export { LayoutDashboard } from "@/icons/glyphs/layout-dashboard";
 export { LayoutGrid } from "@/icons/glyphs/layout-grid";
 export { Link2 } from "@/icons/glyphs/link-2";
+export { List } from "@/icons/glyphs/list";
 export { ListFilter } from "@/icons/glyphs/list-filter";
 export { Loader } from "@/icons/glyphs/loader";
 export { LogIn } from "@/icons/glyphs/log-in";

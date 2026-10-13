@@ -13,21 +13,5 @@
 }
 
 .dialogs {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-1);
-  margin: 0;
   padding: var(--prime-space-2);
-  list-style: none;
-}
-
-/* A dialog row: avatar and name at the start, the unread count at the end. */
-.dialog {
-  justify-content: flex-start;
-}
-
-.dialogText {
-  display: grid;
-  flex: 1;
-  min-width: 0;
 }

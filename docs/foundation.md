@@ -331,14 +331,15 @@ neighbour must be three different colors.
 
 ### Overlay contract
 
-Every floating layer — Modal, Drawer, Sheet, CommandMenu, Popover (and Datepicker / ColorPicker popovers built on it),
-Dropdown, Select panel, TagSelect panel, Tooltip — behaves the same way, so "click empty space closes what is open"
+Every floating layer — Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer, Popover (and Datepicker /
+ColorPicker popovers built on it), Dropdown, Select panel, TagSelect panel, Tooltip — behaves the same way, so "click empty space closes what is open"
 holds across the kit.
 
 - **Dismiss.** A layer closes on (a) a pointerdown outside the layer and its trigger — for Modal / Drawer /
-  Sheet / CommandMenu that is the scrim — and (b) Escape. Tooltip closes on pointer-leave / blur / Escape.
-  Opt out with `closeOnOutsideClick={false}` (Modal keeps it for destructive confirms); the layer still blocks
-  the layers below it.
+  Sheet / CommandMenu / MediaViewer that is the scrim — and (b) Escape. Tooltip closes on pointer-leave / blur / Escape.
+  Opt out with `closeOnOutsideClick={false}` (ConfirmDialog turns it off itself); the layer still blocks the
+  layers below it. A form inside a Modal / Drawer / Sheet holds closing with `X.Guard` (`busy` while it saves,
+  `dirty` to ask before unsaved changes are lost).
 - **Topmost only.** Open layers form one stack (`src/internal/overlay/layerStack.ts`).
   Only the topmost layer reacts: one click or one Escape closes one layer. A click inside a nested child layer
   (a Select open inside a Modal, a manage Popover inside a TagSelect panel) never closes the parent, even though
@@ -418,14 +419,15 @@ No backward compatibility, no aliases, no `@deprecated` props, no legacy types. 
 | Concept | API | Notes |
 |---|---|---|
 | Size | `size?: "xs" \| "s" \| "m" \| "l" \| "xl"`, default `"m"` | Type `ControlSize` from `src/internal/states.ts`. Overlays that size by width (Modal, Drawer) use the subset they need. Avatar adds `"2xl"`. |
-| Treatment | `variant` | Shared vocabulary: `solid` · `soft` · `outline` · `ghost`. Button also takes `shade` — the media shade with a blur, for a button over media (a picture, a video, a video circle). Component-specific structural variants (FileUpload `dashed \| solid`, Card templates). Tabs has no variant: navigation tabs are always a folder (horizontal) or pills (vertical); choosing a value is SegmentedControl are allowed and documented. |
-| Semantic color | `tone?: "neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | Components use the subset that makes sense (Button: `accent \| neutral \| danger`, default `accent`). Destructive = `danger`, never `error`. Button also takes `inherit` (with `ghost \| soft \| outline`) for an action on a colored host: color, fills and focus ring derive from the host's `currentColor`; a host never recolors a Button with a CSS override. |
-| Decorative color | `color?: "gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | Badge, Avatar, Thumbnail, Icon (a category hue from data; takes the place of `tone`), and the parts that host a palette hue: `SegmentedControl.Item` (dot + tinted thumb), count badges (`Tabs.Count`, `SegmentedControl.Count`, `Sidebar.ItemCount`), `FileUpload.FormatBadge`, `Timeline.Item` (dot), TagSelect options (tag hue), ProgressBar / ProgressCircle segments (a category share in its chart color, `--hue-chart`; takes the place of `tone`). |
+| Treatment | `variant` | Shared vocabulary: `solid` · `soft` · `outline` · `ghost`. Button also takes `shade` — the media shade with a blur, for a button over media (a picture, a video, a video circle). Component-specific structural variants (FileUpload `dashed \| solid`, Card templates, Kanban `well \| plain`, Sparkline `line \| bars`, Thumbnail `soft \| solid`, CodeBlock `soft \| ghost`). Tabs has no variant: navigation tabs are always a folder (horizontal) or pills (vertical); choosing a value is SegmentedControl are allowed and documented. |
+| Semantic color | `tone?: "neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | Components use the subset that makes sense (Button: `accent \| neutral \| success \| danger`, default `accent`). Destructive = `danger`, never `error`. Button also takes `inherit` (with `ghost \| soft \| outline`) for an action on a colored host: color, fills and focus ring derive from the host's `currentColor`; a host never recolors a Button with a CSS override. |
+| Decorative color | `color?: "gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | Badge, Avatar, Thumbnail, Icon (a category hue from data; takes the place of `tone`), and the parts that host a palette hue: `SegmentedControl.Item` (dot + tinted thumb), count badges (`Tabs.Count`, `SegmentedControl.Count`, `Sidebar.ItemCount`, `BottomNav.ItemCount`), `FileUpload.FormatBadge`, `Timeline.Item` (dot), `Message.Author` / `Message.Reply` (the author's hue, `hueOf(id)`), a contact's avatar in a message, Gantt bars, Kanban columns, ChartFrame series, TagSelect options (tag hue), ProgressBar / ProgressCircle segments (a category share in its chart color, `--hue-chart`; takes the place of `tone`). |
 | Validation | `invalid?: boolean`; fields with a support row also take `hint?: ReactNode` and `error?: ReactNode` | A non-empty `error` implies `invalid`. Sets `aria-invalid`, `data-invalid`. |
-| Value | `value` / `defaultValue` / `onValueChange(value)` | Select, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, RadioGroup, DigitInput, Pagination (`page` → `value`). Native text inputs (Input, Textarea) keep native `value`/`onChange` and add `onValueChange(string)`. |
-| Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch. |
+| Value | `value` / `defaultValue` / `onValueChange(value)` | Select, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, `Radio.Group`, DigitInput, Pagination, ColorPicker, ColorField, ColorSwatches, Kanban, SmartFilter, Composer. Native text inputs (Input, Textarea) keep native `value`/`onChange` and add `onValueChange(string)`. |
+| Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch, a selectable Thumbnail. |
+| Other state | `x` / `defaultX` / `onXChange(x)` | The same triad for every other stateful aspect: DataTable `sort`, `page`, `selected`, `expanded`, `hiddenColumns`; `search` of Select, CommandMenu, SmartFilter, Chat; MediaViewer and Gallery `index`; ChartFrame `hiddenSeries`; Gantt `scale`; Kanban `columnOrder`. The new value is always the first argument. |
 | Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure. |
-| Dismiss | `closeOnOutsideClick?: boolean` (default `true`), `closeOnEscape?: boolean` (default `true`) | One name everywhere: Modal, Drawer, Sheet, CommandMenu, Popover, Dropdown. Turn it off for destructive confirms. No `closeOnOverlayClick`. See §8 Overlay contract. |
+| Dismiss | `closeOnOutsideClick?: boolean` (default `true`), `closeOnEscape?: boolean` (default `true`) | One name everywhere: Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer, Popover, Dropdown. ConfirmDialog turns outside click off itself; a form holds closing with `X.Guard`. No `closeOnOverlayClick`. See §8 Overlay contract. |
 | Flags | `disabled`, `readOnly`, `required`, `loading`, `fullWidth` | Same names everywhere. |
 | Focus ring | `focusRing?: boolean`, default `true` | Fields only. `false` hides the visual ring (`data-focus-ring="false"`), never focus or the error ring; see §7. |
 | Built-in strings | `labels?: Partial<XLabels>` | Every system string (aria labels, default texts, counters) lives in one `labels` object with Russian defaults. Visible content goes through children/slots, not labels. |

@@ -46,24 +46,17 @@
   min-height: 0;
 }
 
-.dialogs,
+.dialogs {
+  padding: var(--prime-space-2);
+}
+
 .messages {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-1);
-  margin: 0;
-  padding: var(--prime-space-2);
-  list-style: none;
-}
-
-.messages {
   gap: var(--prime-space-3);
+  margin: 0;
   padding: var(--prime-space-2) var(--prime-space-4) var(--prime-space-4);
-}
-
-/* A dialog row: the name at the start, the unread count at the end. */
-.dialog {
-  justify-content: space-between;
+  list-style: none;
 }
 
 .hint {

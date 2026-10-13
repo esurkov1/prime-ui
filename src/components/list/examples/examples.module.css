@@ -1,0 +1,18 @@
+/* Layout of the List scenarios: the list stands in a pane as wide as the master side of a split. */
+
+.pane {
+  width: min(100%, calc(var(--prime-space-24) * 4));
+}
+
+/* overflow: a pane of a fixed height whose list scrolls. */
+.scroll {
+  height: calc(var(--prime-space-24) * 3);
+}
+
+/* sizes: a caption above each tier's list. */
+.tier {
+  display: flex;
+  width: min(100%, calc(var(--prime-space-24) * 4));
+  flex-direction: column;
+  gap: var(--prime-space-2);
+}

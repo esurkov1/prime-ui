@@ -163,7 +163,7 @@ Full rules: [responsive.md](responsive.md).
 - Breakpoints 640 · 768 · 1024 · 1280 only for the app frame; inside a page — intrinsic grids (`auto-fill, minmax`) and container queries.
 - A wide table scrolls inside itself; offer `DataTable.ColumnsMenu` in its `toolbar` — never drop columns by breakpoint, never hand-build the chooser.
 - A row that opens a record page is `getRowHref` (a real link: ⌘-click, new tab), a row that opens a drawer is `onRowClick` — never `navigate()` in `onRowClick`, never your own `event.target` checks for buttons in the row.
-- A list + detail screen is `PageContent.Split` in a `PageContent.Root fill` page; a full-height table is `scrollHeight="fill"` — never a height computed from `100vh`.
+- A list + detail screen is `PageContent.Split` in a `PageContent.Root fill` page, its records a `List` (`current` on the open one) — never ghost Buttons with a soft current; a full-height table is `scrollHeight="fill"` — never a height computed from `100vh`.
 - App sections on phones: `BottomNav` in `AppShell.Footer` — not in Main, not `position: fixed`, no own media query: the shell hides the footer while the Sidebar rail is on screen; a short task from the bottom edge: `Sheet` — Select, Dropdown, Popover and Modal become sheets below 640 by themselves.
 - Your hover styles inside `@media (hover: hover)`; nothing hover-only. Do not wrap kit fields to raise their text for iOS — they keep 16px on touch already.
 - A long form saves through the panel action with a count («Сохранить 3 изменения») — not a sticky bar at the bottom of a phone.

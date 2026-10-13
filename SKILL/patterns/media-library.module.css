@@ -1,0 +1,66 @@
+/* Media library: layout inside the library block only; the page rhythm comes from PageContent. */
+
+/* A section without a card: the heading row 16 above the grid. */
+.library {
+  display: grid;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+/* Heading and count on the start side, the selection actions on the end; they wrap on a phone. */
+.libraryHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3) var(--prime-space-4);
+}
+
+.heading {
+  display: grid;
+  gap: var(--prime-space-1);
+  min-width: 0;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-2);
+}
+
+/* As many ~8rem tiles as fit: two across from 320px, more as the panel grows. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 2)), 1fr));
+  gap: var(--prime-space-5) var(--prime-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A tile: the picture, then the name over the size and date. */
+.tile {
+  display: grid;
+  align-content: start;
+  gap: var(--prime-space-2);
+  min-width: 0;
+}
+
+.tileText {
+  display: grid;
+  min-width: 0;
+}
+
+/* The skeleton tile keeps the picture's 4 : 3 and the two text lines, so nothing moves on load. */
+.picture {
+  height: auto;
+  aspect-ratio: 4 / 3;
+}
+
+.nameBar {
+  width: 75%;
+}
+
+.metaBar {
+  width: 45%;
+}

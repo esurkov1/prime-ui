@@ -191,7 +191,8 @@ from what people do, not from how the backend is split. The full guide with the 
   `PageContent.Detail` in a filling page. Side by side from 48rem of the split's own width, one pane
   at a time below it with `PageContent.BackButton` first in the detail's header; `open` is «a record
   is chosen». Each pane gives its last child the free height: a Card with its own `ScrollContainer`
-  (`anchor="end"` for a thread). Details that open over a table and close again are a Drawer instead.
+  (`anchor="end"` for a thread). The records in the list pane are a `List` (`current` on the open
+  one). Details that open over a table and close again are a Drawer instead.
 
 ## Which pattern to start from
 

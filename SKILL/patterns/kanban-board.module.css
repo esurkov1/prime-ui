@@ -1,0 +1,28 @@
+/* Kanban board: the toolbar sits right above the view it filters; the page rhythm comes from
+   PageContent. */
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-4);
+  min-width: 0;
+}
+
+/* The board takes most of the screen; every column scrolls inside it, never the page. */
+.board {
+  block-size: min(calc(var(--prime-space-24) * 7), 75dvh);
+}
+
+/* Company cell: the name over the deal id. */
+.company {
+  display: grid;
+  white-space: nowrap;
+}
+
+/* Owner: avatar, then the name. */
+.owner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-2);
+  white-space: nowrap;
+}

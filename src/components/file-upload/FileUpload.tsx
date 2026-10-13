@@ -746,9 +746,7 @@ function FileSetView({
   };
 
   const region = announcer.own ? (
-    <VisuallyHidden role="status" aria-live="polite" aria-atomic="true">
-      {announcer.message}
-    </VisuallyHidden>
+    <VisuallyHidden live="polite">{announcer.message}</VisuallyHidden>
   ) : null;
 
   if (layout === "list") {

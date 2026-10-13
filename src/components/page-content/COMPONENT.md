@@ -170,7 +170,7 @@ One `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s
 - Header is a wrapping row: actions stay to the right of the title while the heading keeps half a reading measure, otherwise they wrap below it — no breakpoint needed, works from 320px.
 - Title and Description wrap long words (`overflow-wrap: anywhere`).
 - `fill` needs a main with a height: `AppShell.Root fillViewport` (main scrolls inside the panel). The body passes its free height on to a filling child — DataTable `scrollHeight="fill"`, Crossfade `fill`, `PageContent.Split`.
-- Split takes the free height of a filling page and lays itself out from its own width (container `prime-split`), never from the window: a split beside an open Sidebar may be narrow on a wide screen. Each pane is a column whose last child takes the free height — put a Card with its own `ScrollContainer` there, so the list and the thread scroll separately.
+- Split takes the free height of a filling page and lays itself out from its own width (container `prime-split`), never from the window: a split beside an open Sidebar may be narrow on a wide screen. Each pane is a column whose last child takes the free height — put a Card with its own `ScrollContainer` there, so the list and the thread scroll separately. The records of the list pane are a [List](../list/COMPONENT.md).
 - The detail pane is on screen all the time on a wide split: while nothing is chosen it shows a short hint («Выберите диалог»), never an empty card.
 
 ## Accessibility
@@ -212,4 +212,4 @@ One `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md) (`PageContent.BackButton`), Icon (`nav.chevronLeft`)
-- **See also:** [AppShell](../../layout/app-shell/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Card](../card/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Drawer](../drawer/COMPONENT.md)
+- **See also:** [AppShell](../../layout/app-shell/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Card](../card/COMPONENT.md), [List](../list/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Drawer](../drawer/COMPONENT.md)
