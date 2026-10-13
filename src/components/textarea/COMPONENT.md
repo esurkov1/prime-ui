@@ -55,7 +55,7 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `onValueChange` | `(value: string) => void` | — | Called with the new string; native `onChange` still fires first. |
 | `id` | `string` | — | Id of the `<textarea>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
-| `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with the value on blur and Mod+Enter when it differs from the last committed one (the value at focus); Escape reverts to it. A returned Promise shows a spinner at the field's edge (`aria-busy` on the control) while the field stays editable and Tab moves on; a rejection puts the committed value back unless the person typed on — show why through `error`. Success shows a brief check (`labels.saved`). |
+| `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with a changed value on blur and Mod+Enter; Escape reverts. Return a Promise: the field shows a spinner and stays editable; a rejection restores the value — show why through `error`. |
 | `children` | `ReactNode` | — | Actions in the field's top end corner: `Textarea.CopyButton`, `Textarea.Action`. |
 | `labels` | `Partial<TextareaLabels>` | — | Built-in strings, see Labels. |
 | `className` | `string` | — | Class on the field frame `<div>` (label, field box, support row), as on every field root. |
@@ -137,7 +137,7 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 | save refused | the Promise rejected | the committed text is put back (unless the person typed on); the owner shows why through `error` |
 | copied | `Textarea.CopyButton` pressed | the copy glyph cross-fades into a check, the name becomes `labels.copied` (or `labels.copyError`) |
 
-Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+Enter (Ctrl or ⌘ with Enter — a plain Enter is a line break) commit a changed text, Escape puts the committed text back and is consumed. An unchanged text never fires.
+Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+Enter (Ctrl or ⌘ with Enter — a plain Enter is a line break) commit a changed text, Escape puts the committed text back and is consumed. An unchanged text never fires. Return a Promise for a server save: pending shows a spinner while the field stays editable and Tab moves on, reject restores the text, resolve shows the check.
 
 `data-size` is set on the outer wrapper and the field box. Controlled: `value` + `onValueChange` (or `onChange`). Uncontrolled: `defaultValue`.
 

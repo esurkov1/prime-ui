@@ -74,7 +74,7 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `onRetry` | `() => void \| Promise<void>` | — (required) | Loads the region again. A returned Promise keeps the button in its loading state (and ignores presses) until it settles: resolve — the owner swaps the region to its data; reject — the error state stays and the button is ready again. |
+| `onRetry` | `() => void \| Promise<void>` | — (required) | Loads the region again. A returned Promise keeps the button loading until it settles; on reject the error state stays and the button is ready again. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" \| "type">` | — | `children` (text instead of `labels.retry`), `disabled`, `className` and the other button attributes. |
 
 ## Variants

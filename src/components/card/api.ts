@@ -11,8 +11,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Card.Root",
-      en: "`ref` → `HTMLDivElement` (the `asChild` element). A layer of the surface ladder (`data-depth` one above the surface around it: white on the light page, the next layer when nested; radius 12, the raised whisper only on the page, no border) and a size container; `variant` picks the template layout of its parts.",
-      ru: "Слой лестницы поверхностей (`data-depth` на один выше окружающей поверхности: белая на светлой странице, следующий слой во вложении; радиус 12, лёгкая тень только на странице, без обводки) и контейнер размера; `variant` выбирает раскладку частей.",
+      en: "`ref` → `HTMLDivElement` (the `asChild` element). A surface one layer above the one around it, no border, and a size container; `variant` picks the template layout of its parts.",
+      ru: "Поверхность на слой выше окружающей, без обводки, и контейнер размера; `variant` выбирает раскладку частей.",
       props: [
         {
           name: "variant",
@@ -32,8 +32,8 @@ export const api: ComponentApi = {
           name: "asChild",
           type: "boolean",
           default: "false",
-          en: "The whole card is one link or button: pass that element as the only child with the parts inside it; the root's class, data attributes and `ref` go to it. It lifts on hover (raised → overlay shadow), presses and shows the focus ring. Nothing interactive may sit inside it.",
-          ru: "Вся карточка — одна ссылка или кнопка: передайте этот элемент единственным ребёнком, части — внутри него; класс, data-атрибуты и `ref` корня переходят на него. Поднимается при наведении (тень raised → overlay), нажимается и показывает кольцо фокуса. Внутри не должно быть других интерактивных элементов.",
+          en: "The whole card is one link or button: pass that element as the only child with the parts inside it; it gets hover, press and the focus ring. Nothing interactive may sit inside it.",
+          ru: "Вся карточка — одна ссылка или кнопка: передайте этот элемент единственным ребёнком с частями внутри; он получает наведение, нажатие и кольцо фокуса. Внутри не должно быть других интерактивных элементов.",
         },
         {
           name: "…rest",
@@ -45,8 +45,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Header",
-      en: "`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. In `panel` and `list` it is a padded zone with a faint hairline below; in `stat-trend` it can pair a leading badge or icon with a compact `Card.Value`. Wraps below 22rem.",
-      ru: "Верхний ряд: сначала `Card.Title`, всё после него (контрол, тихая подпись) — в конце. В `panel` и `list` — зона с отступами и тонкой линией снизу; в `stat-trend` может держать бейдж или иконку слева и компактное `Card.Value` справа. Уже 22rem переносится.",
+      en: "`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. Wraps below 22rem.",
+      ru: "Верхний ряд: сначала `Card.Title`, всё после него (контрол, тихая подпись) — в конце. Уже 22rem переносится.",
       props: [rest],
     },
     {
@@ -66,8 +66,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Description",
-      en: "`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s, wraps): under the title of `cta` and `cover`, under the header of `stat-trend`; inside `Card.Header` of `panel` and `list` it stacks under the title, the header's control staying at the end.",
-      ru: "Вторичный текст (`<p>`, body-s, переносится): под заголовком `cta` и `cover`, под шапкой `stat-trend`; внутри `Card.Header` у `panel` и `list` встаёт под заголовком, контрол шапки остаётся в конце.",
+      en: "`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s): under the title of `cta` and `cover`, under the header of `stat-trend`; inside `Card.Header` it stacks under the title.",
+      ru: "Вторичный текст (`<p>`, body-s): под заголовком `cta` и `cover`, под шапкой `stat-trend`; внутри `Card.Header` встаёт под заголовком.",
       props: [rest],
     },
     {
@@ -111,8 +111,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Card.Meta",
-      en: "`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular. In `stat-trend` it drops to the bottom of the tile, so tiles in a row line it up; in `mini` and a `split` cell it sits in the text column under the value.",
-      ru: "Справочная строка KPI («Лидов 120 · сделок 18»): caption, приглушённый, табличные цифры. В `stat-trend` уходит к низу плитки, чтобы у плиток в ряд она стояла на одной линии; в `mini` и ячейке `split` — в колонке текста под значением.",
+      en: "`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; under the value.",
+      ru: "Справочная строка KPI («Лидов 120 · сделок 18»): caption, приглушённый, табличные цифры; под значением.",
       props: [rest],
     },
     {

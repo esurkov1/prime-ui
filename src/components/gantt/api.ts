@@ -6,15 +6,15 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Gantt",
-      en: '`ref` → `HTMLDivElement` (the surface). A schedule: a toolbar with the zoom and «Сегодня», then a `role="grid"` of rows — a sticky row header and a track of bars on a two-tier time axis with weekends and a today line. `aria-label` / `aria-labelledby` name the grid; the other attributes go to the surface.',
-      ru: 'Поверхность-график: панель с масштабом и «Сегодня», под ней `role="grid"` строк — закреплённый заголовок строки и дорожка полос на двухъярусной шкале с выходными и линией сегодняшнего дня. `aria-label` / `aria-labelledby` называют сетку, остальные атрибуты уходят на поверхность.',
+      en: '`ref` → `HTMLDivElement` (the surface). A schedule: a toolbar with the zoom and «Сегодня», then a `role="grid"` of rows with bars on a time axis. `aria-label` / `aria-labelledby` name the grid; the other attributes go to the surface.',
+      ru: '`ref` → `HTMLDivElement` (поверхность). График: панель с масштабом и «Сегодня», под ней `role="grid"` строк с полосами на шкале времени. `aria-label` / `aria-labelledby` называют сетку, остальные атрибуты уходят на поверхность.',
       props: [
         {
           name: "rows",
           type: "Row[]",
           required: true,
-          en: "Rows: people, rooms, vehicles, tasks. Virtualized: only the rows in view (plus an overscan) are rendered, at offsets from their lane count and measured height, so thousands of rows stay fast.",
-          ru: "Строки: люди, переговорные, машины, задачи. Виртуализированы: рендерятся только строки в поле зрения (с запасом) по смещениям из числа дорожек и замеренной высоты, поэтому тысячи строк работают быстро.",
+          en: "Rows: people, rooms, vehicles, tasks. Virtualized, so thousands of rows stay fast.",
+          ru: "Строки: люди, переговорные, машины, задачи. Виртуализированы, поэтому тысячи строк работают быстро.",
         },
         {
           name: "getRowKey",
@@ -136,14 +136,14 @@ export const api: ComponentApi = {
         {
           name: "onBarChange",
           type: "(dates: GanttDates, bar: Bar, row: Row) => void | Promise<void>",
-          en: "New dates of a bar after a drag or an editing key, in whole days at every zoom (whole weeks / months with Alt) — update your data with them. A drag follows the pointer exactly and snaps to days with a little hysteresis; a resize stops at one day and never flips. A returned Promise keeps the bar at the new dates and busy (spinner, `aria-busy`) until it settles; on reject it glides back and `labels.changeFailed` is announced. Without it bars cannot be edited.",
-          ru: "Новые даты полосы после перетаскивания или клавиш правки, целыми днями при любом масштабе (с Alt — неделями / месяцами) — обновите по ним данные. Перетаскивание идёт точно за указателем и прилипает к дням с небольшим гистерезисом; растягивание останавливается на одном дне и не переворачивает полосу. Возвращённый Promise держит полосу на новых датах и занятой (спиннер, `aria-busy`), пока не завершится; при отказе она плавно возвращается и озвучивается `labels.changeFailed`. Без него полосы не редактируются.",
+          en: "New dates of a bar after a drag or an editing key — update your data. A returned Promise keeps the bar busy at the new dates; a rejection glides it back. Without it bars cannot be edited.",
+          ru: "Новые даты полосы после перетаскивания или клавиш правки — обновите данные. Возвращённый Promise держит полосу занятой на новых датах; reject плавно возвращает её. Без него полосы не редактируются.",
         },
         {
           name: "onBarCreate",
           type: "(dates: GanttDates, row: Row) => void | Promise<void>",
-          en: "A new bar in a row: drawn across empty space in whole days (whole units of the zoom with Alt; a ghost with a dates and duration tooltip follows the pointer, Escape cancels), one unit of the zoom on a double-click or a touch long-press (a drag after the long press draws days), or `N` on a row header (at today) or a bar (right after it). Add it to your data. A returned Promise keeps a busy ghost in place until it settles: resolve — the bar you added stands where the ghost stood; reject — the ghost fades out and `labels.createFailed` is announced. Without it (and with `readOnly`) nothing can be created and empty space shows no create cursor.",
-          ru: "Новая полоса в строке: рисуется протяжкой по пустому месту целыми днями (с Alt — единицами масштаба; призрак с подсказкой дат и длительности идёт за указателем, Escape отменяет), одна единица масштаба — двойным кликом или долгим нажатием на тач-экране (протяжка после долгого нажатия рисует дни), или `N` на заголовке строки (на сегодня) или на полосе (сразу после неё). Добавьте её в данные. Возвращённый Promise держит занятый призрак на месте, пока не завершится: resolve — добавленная полоса встаёт на место призрака; reject — призрак тает и озвучивается `labels.createFailed`. Без него (и при `readOnly`) создать ничего нельзя, и на пустом месте нет курсора создания.",
+          en: "A new bar in a row: drawn across empty space, a double-click, a touch long-press or `N`. Add it to your data; a returned Promise keeps a busy ghost in place. Without it nothing can be created.",
+          ru: "Новая полоса в строке: протяжкой по пустому месту, двойным кликом, долгим нажатием или `N`. Добавьте её в данные; возвращённый Promise держит занятый призрак на месте. Без него создать ничего нельзя.",
         },
         {
           name: "labels",
@@ -161,8 +161,8 @@ export const api: ComponentApi = {
     },
     {
       name: "GanttBar",
-      en: "One bar of `getRowBars`: data, not a part. Dates are calendar days; `end` is exclusive (a one-day task on 3 July ends on 4 July), so `start` equal to `end` is a milestone — a diamond on that day with the label beside it. Extend the type for your own fields: callbacks get your object back.",
-      ru: "Одна полоса из `getRowBars`: данные, а не часть разметки. Даты — календарные дни; `end` не включается (однодневная задача 3 июля заканчивается 4 июля), поэтому `start`, равный `end`, — веха: ромб на этот день с подписью рядом. Расширяйте тип своими полями: колбэки получают ваш объект.",
+      en: "One bar of `getRowBars`: data, not a part. Dates are calendar days with an exclusive `end`; `start` equal to `end` is a milestone. Extend the type with your own fields: callbacks get your object back.",
+      ru: "Одна полоса из `getRowBars`: данные, а не часть разметки. Даты — календарные дни, `end` не включается; `start`, равный `end`, — веха. Расширяйте тип своими полями: колбэки получают ваш объект.",
       props: [
         {
           name: "id",

@@ -4,7 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Composer.Root",
-      en: "`ref` → `HTMLFormElement`. A `<form>` named by `labels.region`: the attachments, the reply / edit bar and the recording error above one row — paperclip · auto-growing field · send / record button. Owns the text, the send, the recording and the formatting; passes its tier to every part. Sets `data-size`, `data-disabled`, `data-recording` (`hold` | `locked`, from the press on — before the browser grants the device) and `data-dropping` while files are over it.",
+      en: "`ref` → `HTMLFormElement`. A `<form>` named by `labels.region`: attachments, the reply / edit bar and one row — paperclip · auto-growing field · send / record button. Owns the text, the send, the recording and the formatting; passes its tier to every part.",
+      ru: "`<form>` с именем из `labels.region`: вложения, плашка ответа / правки и одна строка — скрепка · растущее поле · кнопка отправки / записи. Хранит текст, отправку, запись и форматирование; передаёт ярус всем частям.",
       props: [
         {
           name: "value",
@@ -28,26 +29,26 @@ export const api: ComponentApi = {
         {
           name: "onSend",
           type: '(message: { text: string; media: readonly (UploadItem & { type: "image" | "video" })[]; files: readonly UploadItem[]; replyTo?: string; editOf?: string }) => void | Promise<unknown>',
-          en: 'Sends the message — Enter, Mod+Enter or the send button; `text` is trimmed; `media` are the uploaded photos and videos of `queue` in the order of the tray, each with its `type` (send them as one album, `Message.Media`, the text as its caption); `files` the other uploaded files in the order of the tray (a `Message.File` each) — every file, in the order of the tray, with «Отправить как файлы»; `replyTo` / `editOf` the `value` of the shown `Composer.Context` (a reply / an edit). The queue\'s previews are revoked once the send goes through: show the sent media from `result` or your own `URL.createObjectURL(item.file)`. Nothing to send (no text, no uploaded file) or an upload still running keeps the button disabled. Return a Promise to keep the text while it runs (the button is busy, the field read-only): resolve clears the field and the queue, closes the reply / edit bar through its `onDismiss` and keeps the focus; reject leaves everything as it was. For an optimistic chat add the message with `status="sending"` and return at once.',
-          ru: 'Отправка: Enter, Mod+Enter или кнопка; `text` без пробелов по краям; `media` — загруженные фото и видео `queue` в порядке лотка, у каждого `type` (отправляйте одним альбомом `Message.Media`, текст — подписью); `files` — остальные загруженные файлы в порядке лотка (по `Message.File` на каждый), а с «Отправить как файлы» — все в порядке лотка; `replyTo` / `editOf` — `value` показанной `Composer.Context` (ответ / правка). Превью очереди отзываются после отправки: показывайте отправленное по `result` или своему `URL.createObjectURL(item.file)`. Promise держит текст на время отправки (кнопка занята, поле только для чтения): resolve очищает поле и очередь и закрывает плашку через её `onDismiss`, reject оставляет всё как было. Для оптимистичного чата добавьте сообщение со `status="sending"` и верните управление сразу.',
+          en: "Sends the message (Enter, Mod+Enter, the button): trimmed `text`, the uploaded `media` and `files` and `replyTo` / `editOf`. Return a Promise to keep the text until it resolves; reject leaves everything as it was.",
+          ru: "Отправка (Enter, Mod+Enter, кнопка): `text` без пробелов по краям, загруженные `media` и `files`, `replyTo` / `editOf`. Promise держит текст до resolve; reject оставляет всё как было.",
         },
         {
           name: "onActivityChange",
           type: '(activity: "typing" | "voice" | "video" | null) => void',
-          en: "What the person is doing changed, for the «печатает…» signal of the other side: `typing` from the first keystroke until the text is sent, emptied or rests for 3 s; `voice` / `video` while a recording shows; `null` — nothing. Fires on a change only, and `null` on unmount while active. A server that expires the signal wants it again every few seconds: repeat it on your side while the value is not `null`.",
-          ru: "Изменилось, что делает человек, — для сигнала «печатает…» у собеседника: `typing` от первого нажатия, пока текст не отправлен, не стёрт или не простоял 3 с; `voice` / `video`, пока видна запись; `null` — ничего. Вызывается только при смене, и `null` при размонтировании, если что-то шло. Если сервер забывает сигнал, повторяйте его у себя, пока значение не `null`.",
+          en: "What the person is doing changed, for the other side's «печатает…»: `typing`, `voice` / `video` while recording, or `null`. Fires on a change only.",
+          ru: "Изменилось, что делает человек, — для «печатает…» у собеседника: `typing`, `voice` / `video` во время записи или `null`. Вызывается только при смене.",
         },
         {
           name: "onSendVoice",
           type: "(recording: { blob: Blob; durationMs: number; waveform: number[] }) => void | Promise<unknown>",
-          en: "A voice message was recorded: the blob of `MediaRecorder`, its length and 48 loudness values 0…1 for its waveform. With it an empty field shows the record button (where the browser can record). The row turns into the recording bar on the press and the timer runs from it while the device is asked for in parallel: a mouse click, Enter or Space record hands-free (delete · timer · live waveform · send); a finger records while held — release sends, slide left cancels, slide up locks. A refused device rolls the row back and shows the error. Recordings under 0.7 s are dropped.",
-          ru: "Записано голосовое: blob от `MediaRecorder`, длительность и 48 значений громкости 0…1 для волны. С ним пустое поле показывает кнопку записи (если браузер умеет записывать). Строка становится полосой записи сразу при нажатии, таймер идёт от него, доступ к устройству запрашивается параллельно: щелчок мышью, Enter или Space пишут без удержания (удаление · таймер · живая волна · отправка); пальцем запись идёт, пока кнопку держат — отпустить значит отправить, влево — отмена, вверх — закрепить. Отказ в доступе возвращает строку и показывает ошибку. Записи короче 0,7 с отбрасываются.",
+          en: "A voice message was recorded: the `MediaRecorder` blob, its length and 48 loudness values 0…1 for its waveform. With it an empty field shows the record button (where the browser can record).",
+          ru: "Записано голосовое: blob от `MediaRecorder`, длительность и 48 значений громкости 0…1 для волны. С ним пустое поле показывает кнопку записи (если браузер умеет записывать).",
         },
         {
           name: "onSendVideoNote",
           type: "(recording: { blob: Blob; durationMs: number; waveform: number[] }) => void | Promise<unknown>",
-          en: "A round video message was recorded (front camera and microphone). While recording a round preview in the geometry of `VideoNote` stands above the composer, its ring filling toward the 60 s limit, where the recording sends itself. With both handlers a double click or double tap on the record button (or ↑ / ↓ on it) switches voice and video; a single click or tap still records hands-free, a hold records while held, Enter and Space record at once. The first press records out of sight until the 300 ms double-click window passes, so a double one shows no recording and sends nothing; the timer still counts from the press.",
-          ru: "Записано круглое видеосообщение (фронтальная камера и микрофон). Во время записи над полем видно круглое превью в геометрии `VideoNote`, его кольцо заполняется к пределу 60 с, на котором запись отправляется сама. С обоими обработчиками двойной щелчок или двойное касание кнопки (или ↑ / ↓ на ней) переключает голос и видео; одиночный щелчок или касание пишет без удержания, удержание пишет, пока держат, Enter и Space начинают запись сразу. Первое нажатие пишет незаметно, пока не пройдёт окно двойного нажатия 300 мс, поэтому двойное не показывает записи и ничего не отправляет; таймер всё равно идёт от нажатия.",
+          en: "A round video message was recorded (front camera and microphone), at most 60 s. With both record handlers a double click or tap on the record button (or ↑ / ↓ on it) switches voice and video.",
+          ru: "Записано круглое видеосообщение (фронтальная камера и микрофон), не длиннее 60 с. С обоими обработчиками двойной щелчок или касание кнопки записи (или ↑ / ↓ на ней) переключает голос и видео.",
         },
         {
           name: "onEditLast",
@@ -77,15 +78,15 @@ export const api: ComponentApi = {
         {
           name: "queue",
           type: 'Pick<UploadQueue, "items" | "add" | "retry" | "remove" | "clear" | "move">',
-          en: "Attachments, usually `useUploadQueue(…)`: files from `Composer.Attach`, a paste into the field and a drop anywhere on the composer go into it, and a tray above the row shows them as one strip of tiles (`FileUpload.Queue layout=\"strip\"`) in the order attached: photos and videos (by MIME type, else by the name's extension; a pasted file with no type takes its clipboard item's) as pictures or first frames, other files as the sheet glyph; every tile with the format pill at the top start, a remove × and a band at the bottom with the name and the size (a video's duration); while it goes up a round disk with the progress ring along its edge stands in the middle of a picture (dimmed under it) or in place of a file's sheet (the name and size stay readable) (pressing it cancels, a failure turns it into a danger retry, done fades it away). Drag or Alt + ← / → reorder them (`queue.move`). One row that scrolls sideways: the composer's height never grows with the count. With photos or videos the tray offers «Отправить как файлы, без сжатия», which changes only what `onSend` receives. The tray fades and glides its height open and closed. Without `queue` paste and drop of files do nothing.",
-          ru: 'Вложения, обычно `useUploadQueue(…)`: сюда попадают файлы из `Composer.Attach`, вставка в поле и перетаскивание на композер, а лоток над строкой показывает их одной лентой плиток (`FileUpload.Queue layout="strip"`) в порядке добавления: фото и видео (по MIME-типу, иначе по расширению; вставленный файл без типа берёт тип из буфера) — картинкой или первым кадром, остальные файлы — листом; у каждой плитки плашка формата сверху слева, × и полоса снизу с именем и размером (у видео — длительностью); пока файл загружается, круглый диск с кольцом прогресса по краю стоит в центре картинки (приглушённой под ним) или на месте листа файла (имя и размер читаются) (нажатие отменяет, ошибка делает его красным повтором, по готовности он растворяется). Порядок меняется перетаскиванием или Alt + ← / → (`queue.move`). Одна строка с прокруткой вбок: высота композера не растёт с числом файлов. С фото или видео лоток предлагает «Отправить как файлы, без сжатия» — меняется только то, что получает `onSend`. Лоток открывается и закрывается растворением и сменой высоты. Без `queue` вставка и перетаскивание файлов ничего не делают.',
+          en: "Attachments, usually `useUploadQueue(…)`: the paperclip, a paste and a drop add to it, and a tray above the row shows them as one reorderable strip of tiles. Without `queue` paste and drop of files do nothing.",
+          ru: "Вложения, обычно `useUploadQueue(…)`: сюда добавляют скрепка, вставка и перетаскивание, а лоток над строкой показывает их одной лентой плиток с перестановкой. Без `queue` вставка и перетаскивание файлов ничего не делают.",
         },
         {
           name: "formatting",
           type: "boolean",
           default: "true",
-          en: "Selecting text shows a floating toolbar — bold, italic, strikethrough, code, link, quote — and the hotkeys work; each writes Markdown around the selection (`**…**`, `_…_`, `~~…~~`, `` `…` `` or a fenced block, `[…](https://)`, `> `) and a second press removes it. `false` turns both off.",
-          ru: "Выделение текста показывает плавающую панель — жирный, курсив, зачёркнутый, код, ссылка, цитата — и работают сочетания клавиш; каждое пишет Markdown вокруг выделения, повторное нажатие снимает его. `false` выключает и то, и другое.",
+          en: "Selecting text shows a floating toolbar (bold, italic, strikethrough, code, link, quote) and enables the hotkeys; each writes Markdown around the selection. `false` turns both off.",
+          ru: "Выделение текста показывает плавающую панель (жирный, курсив, зачёркнутый, код, ссылка, цитата) и включает сочетания клавиш; каждое пишет Markdown вокруг выделения. `false` выключает и то, и другое.",
         },
         {
           name: "size",
@@ -129,7 +130,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Composer.Context",
-      en: "`ref` → `HTMLDivElement`. The bar above the field: a reply or edit glyph, `Composer.Title` over `Composer.Description` behind an accent rule, and a close button. Describes the field (`aria-describedby`); when it appears after the first render the caret moves to the field. + native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. The bar above the field: a reply or edit glyph, `Composer.Title` over `Composer.Description` behind an accent rule, and a close button; it describes the field; when it appears, the caret moves to the field. + native `<div>` props.",
       ru: "Плашка над полем: значок ответа или правки, заголовок и цитата за акцентной чертой, кнопка закрытия. Описывает поле; появившись, ставит курсор в поле.",
       props: [
         {
@@ -162,12 +163,12 @@ export const api: ComponentApi = {
     {
       name: "Composer.Title · Composer.Description",
       en: "`ref` → `HTMLDivElement`. The first line of the bar in the accent text color, medium weight («Ответ Анне», «Редактирование») / the quoted message in the secondary color; both one line, cut with an ellipsis. + native `<div>` props.",
-      ru: "Первая строка плашки акцентным цветом / цитируемое сообщение вторичным цветом; обе в одну строку с многоточием.",
+      ru: "Первая строка плашки акцентным цветом, средней насыщенности («Ответ Анне», «Редактирование») / цитируемое сообщение вторичным цветом; обе в одну строку с многоточием.",
       props: [],
     },
     {
       name: "Composer.Attach",
-      en: '`ref` → `HTMLDivElement`. The paperclip at the start of the row, a quiet icon button. Alone it opens the file picker (FileUpload `trigger="button"`, several files); with `Composer.Item` children it opens a menu above it (Dropdown) where every item picks its own file types. Picked files go to the root\'s `queue`. + native `<div>` props.',
+      en: '`ref` → `HTMLDivElement`. The paperclip at the start of the row. Alone it opens the file picker (FileUpload `trigger="button"`); with `Composer.Item` children it opens a menu where every item picks its own file types. Files go to the root\'s `queue`. + native `<div>` props.',
       ru: 'Скрепка в начале строки. Без детей открывает выбор файлов (FileUpload `trigger="button"`); с `Composer.Item` открывает меню, где каждый пункт выбирает свои типы файлов. Файлы уходят в `queue` корня.',
       props: [
         {
@@ -193,7 +194,7 @@ export const api: ComponentApi = {
     {
       name: "Composer.Item",
       en: '`ref` → `HTMLButtonElement`. A kind of attachment in the paperclip menu, a `Dropdown.Item` (`role="menuitem"`): `Composer.ItemIcon` and the label. + native button props.',
-      ru: "Вид вложения в меню скрепки (`Dropdown.Item`): значок и подпись.",
+      ru: 'Вид вложения в меню скрепки, `Dropdown.Item` (`role="menuitem"`): `Composer.ItemIcon` и подпись.',
       props: [
         {
           name: "accept",
@@ -219,7 +220,7 @@ export const api: ComponentApi = {
     {
       name: "Composer.ItemIcon",
       en: "`ref` → `HTMLSpanElement`. The leading glyph of a menu item (`Dropdown.ItemIcon`, `aria-hidden`). + native `<span>` props.",
-      ru: "Значок пункта меню (`Dropdown.ItemIcon`).",
+      ru: "Значок пункта меню (`Dropdown.ItemIcon`, `aria-hidden`).",
       props: [],
     },
   ],

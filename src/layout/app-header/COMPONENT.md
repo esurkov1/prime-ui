@@ -41,7 +41,7 @@ AppHeader.Root               <header>, one sticky row as high as the Sidebar bra
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### AppHeader.Root
-`ref` → `HTMLElement`. The `<header>` bar at the top of the content panel: one row as high as the Sidebar brand row, on the panel surface with no divider, sticky with the top safe-area inset (static below 480px of viewport height); inline padding is the shell gutter, so it lines up with the page in main (16 outside a shell). Its controls are size `m`; icon buttons inside are `soft` (a light fill), not `ghost`. A container (`prime-app-header`): below 36rem the icon tile and the description go and the search folds into an icon.
+`ref` → `HTMLElement`. The sticky `<header>` bar at the top of the content panel, one row as high as the Sidebar brand row and lined up with the page. Icon buttons inside are `soft`, not `ghost`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -56,7 +56,7 @@ AppHeader.Root               <header>, one sticky row as high as the Sidebar bra
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### AppHeader.Title
-`ref` → `HTMLDivElement`. Where you are: an optional `AppHeader.Icon`, the name (title-s, truncates) and an optional `AppHeader.Description` under it — the anatomy of the Sidebar brand. By default not a heading (the page `<h1>` is PageContent.Title); `as="h1"` makes it the page heading when the page has no `PageContent.Header`.
+`ref` → `HTMLDivElement`. Where you are: an optional `AppHeader.Icon`, the name (title-s, truncates) and an optional `AppHeader.Description` under it. Not a heading unless `as="h1"`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -94,7 +94,7 @@ AppHeader.Root               <header>, one sticky row as high as the Sidebar bra
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `onClick`, `className` and the other button attributes. |
 
 ### AppHeader.Tools
-`ref` → `HTMLDivElement`. The page's tools in the header — a `PageToolbar.Root` with sections, the period, filters and the page's primary action: the header's second row, the full width under the title row (12 apart), sticky with it. Root moves it there wherever it is written, so the Tab order follows the rows; the toolbar lays itself out from this width (one row when wide, two when narrow).
+`ref` → `HTMLDivElement`. The page's tools in the header (a `PageToolbar.Root`): the header's second row, full width under the title row, wherever it is written.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

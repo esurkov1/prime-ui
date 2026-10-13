@@ -305,7 +305,13 @@ function BottomNavItem({
 
   if (child) {
     return (
-      <Slot {...shared} ref={ref} aria-disabled={disabled || undefined}>
+      // A disabled child keeps its own `href` / `to`: out of the Tab order like the other kinds.
+      <Slot
+        {...shared}
+        ref={ref}
+        aria-disabled={disabled || undefined}
+        tabIndex={disabled ? -1 : rest.tabIndex}
+      >
         {React.cloneElement(child, undefined, splitItemChildren(child.props.children, iconOnly))}
       </Slot>
     );

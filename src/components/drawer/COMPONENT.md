@@ -76,7 +76,7 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`; disabled in place while a `Guard` is `busy`. |
-| `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around the header and the body) spans the last row: the header becomes the tab strip, edge to edge and without the hairline, and the active tab is the body rising into it. |
+| `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
 
 ### Drawer.Actions
 `ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`. + native `<div>` props.
@@ -168,6 +168,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
   Both the header × and the footer button stay: the × is the quick way out at the top, the footer is the end of the reading or editing path, where the hand already is.
 - Zone padding `--prime-drawer-padding`; hairlines between header, body and footer.
 - Full viewport height; only the body scrolls, with its own side padding.
+- Tabs in the header: a `Tabs.List` inside `Drawer.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside get the surface field fill.
 
 ## Accessibility

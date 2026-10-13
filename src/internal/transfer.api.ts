@@ -7,8 +7,8 @@ export function transferStateProp(what: { en: string; ru: string }): ApiProp {
   return {
     name: "transfer",
     type: STATE_TYPE,
-    en: `The transfer of ${what.en}, either way (\`TransferState\`, the values of \`UploadItem.status\` plus \`remote\`): \`queued\` / \`loading\` — the cross, a circle Button whose \`progress\` ring shows \`transferProgress\` (described by the share); \`failed\` — the danger disk with the retry arrow; \`remote\` — not fetched yet, the download arrow; \`done\` — the ring fills, then the disk fades and shrinks away (\`fast\`).`,
-    ru: `Передача ${what.ru} в любую сторону (\`TransferState\`, значения \`UploadItem.status\` и \`remote\`): \`queued\` / \`loading\` — крестик, круглая Button с кольцом \`progress\` по \`transferProgress\` (описание — доля); \`failed\` — красный диск со стрелкой повтора; \`remote\` — ещё не скачано, стрелка загрузки; \`done\` — кольцо заполняется, потом диск растворяется и уменьшается (\`fast\`).`,
+    en: `The transfer of ${what.en}, either way (\`TransferState\`): \`queued\` / \`loading\` — the cancel cross and the share ring; \`failed\` — retry; \`remote\` — download; \`done\` — the disk fades out.`,
+    ru: `Передача ${what.ru} в любую сторону (\`TransferState\`): \`queued\` / \`loading\` — крестик отмены и кольцо доли; \`failed\` — повтор; \`remote\` — скачивание; \`done\` — диск растворяется.`,
   };
 }
 

@@ -35,13 +35,13 @@ A leaf: everything is a prop or a child. A row of two fields inside is the consu
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Fieldset
-`ref` → `HTMLFieldSetElement`. A native `<fieldset>` without border, padding or fill: the `<legend>` heading (`title-s`), an optional description, then the children at the form rhythm (heading → fields 16, field → field 20). `disabled` disables every control inside.
+`ref` → `HTMLFieldSetElement`. A native `<fieldset>` without border, padding or fill: the `<legend>` heading, an optional description, then the children at the form rhythm. `disabled` disables every control inside.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — | Group heading in the native `<legend>` (`title-s`); it names the group for assistive tech. Without it give the fieldset an `aria-label` when the group needs a name. |
 | `description` | `ReactNode` | — | Secondary text under the heading (`body-s`, secondary), linked through `aria-describedby`. |
-| `disabled` | `boolean` | `false` | Disables every control inside: native `disabled` on the `<fieldset>` for native controls, and the kit's disabled context, so kit controls (choice rows, segments, triggers, sliders) take their own disabled look, ARIA and keyboard. Nested groups inherit it. Use it while the form's request runs. |
+| `disabled` | `boolean` | `false` | Disables every control inside, native and kit (they take their own disabled look, ARIA and keyboard); nested groups inherit it. Use it while the form's request runs. |
 | `children` | `ReactNode` | — (required) | The fields, stacked 20 apart; a row of two fields is the consumer's grid. |
 | `…rest` | `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "children" \| "disabled">` | — | `className`, `name`, `form`, `aria-*` and the other attributes of the `<fieldset>`. |
 

@@ -296,3 +296,21 @@ export function useVirtualRows({
 
   return { rows, totalSize: starts[count] ?? 0, startOf, measure };
 }
+
+/**
+ * For rows laid out in flow (table rows, listbox options) rather than placed by offset: each
+ * rendered row with the empty space before it, and the space after the last one, px. Spacer
+ * elements of those heights stand for the rows not rendered.
+ */
+export function rowGaps({ rows, totalSize }: Pick<VirtualRows, "rows" | "totalSize">): {
+  rows: (VirtualRow & { gap: number })[];
+  end: number;
+} {
+  let cursor = 0;
+  const withGaps = rows.map((row) => {
+    const gap = Math.max(0, row.start - cursor);
+    cursor = row.start + row.size;
+    return { ...row, gap };
+  });
+  return { rows: withGaps, end: Math.max(0, totalSize - cursor) };
+}

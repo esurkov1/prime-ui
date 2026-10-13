@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "VideoNote",
-      en: "`ref` → `HTMLDivElement` (the `role=\"group\"` root). A round video message: a perfect circle at every width (the `--prime-message-video-note` token × 1.15, within the row), no shell. At rest it is the still first frame (or `poster`) with the shared play disk in its shade look in the middle and the duration on a pill — nothing plays or loops before a press. The disk (or a press anywhere on the circle) plays it with sound and a progress ring fills over the circle's edge, the disk fading out; again it pauses; at the end it rewinds to the still frame. The duration reads like a voice message's time row (the muted caption on the media pill). Inside `Message.Root` it is the message itself — no bubble, the meta on its pill at the bottom-end corner, reactions under it. Its props are VoicePlayer's (`MediaPlayerProps`) plus `poster`.",
-      ru: 'Корень `role="group"`. Круглое видеосообщение: идеальный круг при любой ширине (токен `--prime-message-video-note` × 1,15, в пределах строки), без оболочки. В покое — неподвижный первый кадр (или `poster`) с общим диском воспроизведения в полупрозрачном виде по центру и длительностью на плашке: до нажатия ничего не играет и не крутится. Диск (или нажатие в любом месте кружка) запускает его со звуком, по краю круга заполняется кольцо прогресса, диск гаснет; повторно — пауза; в конце перематывается к неподвижному кадру. Длительность читается как время голосового (приглушённая подпись на плашке media). Внутри `Message.Root` это само сообщение: без пузыря, мета на плашке у нижнего конечного угла, реакции под кружком. Пропсы — те же, что у VoicePlayer (`MediaPlayerProps`), плюс `poster`.',
+      en: '`ref` → `HTMLDivElement` (the `role="group"` root). A round video message: a still first frame that plays with sound on a press. Inside `Message.Root` it is the message itself, without a bubble. Its props are VoicePlayer\'s (`MediaPlayerProps`) plus `poster`.',
+      ru: 'Корень `role="group"`. Круглое видеосообщение: неподвижный первый кадр, который по нажатию играет со звуком. Внутри `Message.Root` это само сообщение, без пузыря. Пропсы — те же, что у VoicePlayer (`MediaPlayerProps`), плюс `poster`.',
       props: [
         ...mediaPlayerProps({
           media: { en: "Video", ru: "видео" },
@@ -24,12 +24,12 @@ export const api: ComponentApi = {
             ru: "кружок вернулся к неподвижному первому кадру",
           },
           transcript: {
-            en: "at the top end of the circle's box, outside its edge (where the voice message has it, at the end of its top row), and the text opens in a block of the message's fill under the circle",
-            ru: "в верхнем конечном углу рамки кружка, за его краем (там же, где у голосового, — в конце верхней строки), а текст раскрывается под кружком в блоке цвета сообщения",
+            en: "the button stands at the circle's top-end corner, the text opens under the circle",
+            ru: "кнопка стоит в верхнем конечном углу кружка, текст раскрывается под ним",
           },
           transfer: {
-            en: "the note, drawn on the play disk itself in the middle (the same disk in its shade look: the × or the arrow in the play glyph's place, the ring along its inner edge); the circle dims and does not play until it is done",
-            ru: "кружка, на самом диске воспроизведения в центре (тот же диск в полупрозрачном виде: × или стрелка вместо значка воспроизведения, кольцо по внутреннему краю); кружок приглушён и не воспроизводится до готовности",
+            en: "the note, drawn on the play disk itself",
+            ru: "кружка, на самом диске воспроизведения",
           },
           own: [
             {

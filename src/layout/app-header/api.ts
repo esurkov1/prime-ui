@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "AppHeader.Root",
-      en: "`ref` → `HTMLElement`. The `<header>` bar at the top of the content panel: one row as high as the Sidebar brand row, on the panel surface with no divider, sticky with the top safe-area inset (static below 480px of viewport height); inline padding is the shell gutter, so it lines up with the page in main (16 outside a shell). Its controls are size `m`; icon buttons inside are `soft` (a light fill), not `ghost`. A container (`prime-app-header`): below 36rem the icon tile and the description go and the search folds into an icon.",
-      ru: "Полоса `<header>` вверху панели содержимого: одна строка высотой со строку бренда Sidebar, на поверхности панели без разделителя, липкая с верхним безопасным отступом (не липнет при высоте экрана меньше 480px); боковые отступы — как у оболочки, шапка выровнена со страницей в main (16 вне оболочки). Контролы внутри — размера `m`; иконочные кнопки — `soft` (лёгкая заливка), не `ghost`. Контейнер: уже 36rem плитка иконки и описание скрываются, а поиск сворачивается в иконку.",
+      en: "`ref` → `HTMLElement`. The sticky `<header>` bar at the top of the content panel, one row as high as the Sidebar brand row and lined up with the page. Icon buttons inside are `soft`, not `ghost`.",
+      ru: "Липкая полоса `<header>` вверху панели содержимого: одна строка высотой со строку бренда Sidebar, выровненная со страницей. Иконочные кнопки внутри — `soft`, не `ghost`.",
       props: [
         {
           name: "labels",
@@ -36,8 +36,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Title",
-      en: '`ref` → `HTMLDivElement`. Where you are: an optional `AppHeader.Icon`, the name (title-s, truncates) and an optional `AppHeader.Description` under it — the anatomy of the Sidebar brand. By default not a heading (the page `<h1>` is PageContent.Title); `as="h1"` makes it the page heading when the page has no `PageContent.Header`.',
-      ru: 'Где вы находитесь: необязательная `AppHeader.Icon`, название (title-s, обрезается) и под ним необязательное `AppHeader.Description` — как бренд в Sidebar. По умолчанию не заголовок (`<h1>` страницы — PageContent.Title); `as="h1"` делает его заголовком страницы, если у страницы нет `PageContent.Header`.',
+      en: '`ref` → `HTMLDivElement`. Where you are: an optional `AppHeader.Icon`, the name (title-s, truncates) and an optional `AppHeader.Description` under it. Not a heading unless `as="h1"`.',
+      ru: 'Где вы находитесь: необязательная `AppHeader.Icon`, название (title-s, обрезается) и под ним необязательное `AppHeader.Description`. Не заголовок, если не задан `as="h1"`.',
       props: [
         {
           name: "as",
@@ -122,8 +122,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Tools",
-      en: "`ref` → `HTMLDivElement`. The page's tools in the header — a `PageToolbar.Root` with sections, the period, filters and the page's primary action: the header's second row, the full width under the title row (12 apart), sticky with it. Root moves it there wherever it is written, so the Tab order follows the rows; the toolbar lays itself out from this width (one row when wide, two when narrow).",
-      ru: "Инструменты страницы в шапке — `PageToolbar.Root` с разделами, периодом, фильтрами и главным действием страницы: вторая строка шапки во всю ширину под строкой заголовка (зазор 12), липкая вместе с ней. Root ставит её туда, где бы она ни была написана, так что Tab идёт по строкам; панель раскладывается по этой ширине (одна строка на широкой, две на узкой).",
+      en: "`ref` → `HTMLDivElement`. The page's tools in the header (a `PageToolbar.Root`): the header's second row, full width under the title row, wherever it is written.",
+      ru: "Инструменты страницы в шапке (`PageToolbar.Root`): вторая строка шапки во всю ширину под строкой заголовка, где бы она ни была написана.",
       props: [
         {
           name: "…rest",

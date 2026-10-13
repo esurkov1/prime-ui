@@ -39,21 +39,21 @@ Slider                 field frame (FieldFrame): className, ref, rest
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Slider
-`ref` → `HTMLDivElement` (the field frame). A framed field like every other: the label row with the value, a native `<input type="range">` (transparent, on top) over the visual track, fill and thumb, then the hint or the error. Field-root rule: `className`, `ref` and the rest go to the frame; `id` and `aria-label` to the range input.
+`ref` → `HTMLDivElement` (the field frame). A framed field: the label row with the value, a native `<input type="range">` over the visual track, then the hint or the error. `id` and `aria-label` go to the range input.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `number` | — | Controlled value; clamped to `min`…`max`. |
 | `defaultValue` | `number` | `min` | Initial value when uncontrolled. |
 | `onValueChange` | `(value: number) => void` | — | Called with the new number while dragging and on every key step. |
-| `onCommit` | `(value: number) => void \| Promise<void>` | — | The value the person settled on: once when the thumb is released or after a key moved it, only when it differs from the last commit. Save here, not on every `onValueChange` step. Return the save's promise: the thumb dims and the input has `aria-busy` until it settles (only the latest commit's answer counts); reject — the value glides back to the last saved one (through `onValueChange` when controlled). |
+| `onCommit` | `(value: number) => void \| Promise<void>` | — | The value the person settled on, once after a drag or a key step. Save here, not in `onValueChange`. Return the save's promise: the thumb dims until it settles; on reject the value goes back. |
 | `name` | `string` | — | Name of the range input, submitted with a form. |
 | `min` | `number` | `0` | Lower bound. |
 | `max` | `number` | `100` | Upper bound. |
 | `step` | `number` | `1` | Step of the keyboard and of the snapping; fractions allowed. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the track thickness T (thumb 4.5T × 3T), the label, the value and the hint. Without it the tier of its host (a form, a panel), else `m`. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Color of the filled part of the track. |
-| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `vertical` — the track stands upright, minimum at the bottom, seven thumbs long at its tier (a level beside a button, a mixer column); the native range turns with `writing-mode`, so ↑ / ↓ and the pointer work natively and the input has `aria-orientation="vertical"`. |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `vertical` — the track stands upright, minimum at the bottom: a level beside a button, a mixer column. |
 | `disabled` | `boolean` | — | Muted track and thumb, dimmed label and value, no interaction. |
 | `label` | `ReactNode` | — | Visible label linked to the range input (`<label htmlFor>`). Without it, set `aria-label`. |
 | `required` | `boolean` | — | Red `*` after the label (`aria-hidden`); a range always has a value, so there is no native `required`. |
@@ -148,6 +148,7 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 ### ARIA
 - A native `<input type="range">` (`role="slider"`) on top of the visual layer.
 - `label` is a `<label htmlFor>`; otherwise `aria-label` is required.
+- `orientation="vertical"` turns the native range with `writing-mode`, so ↑ / ↓ and the pointer work natively; the input has `aria-orientation="vertical"`.
 - `formatValue` sets `aria-valuetext`, so screen readers announce the unit; the visual `<output>` is `aria-hidden`.
 - `aria-describedby` on the input: your ids + the hint or the error; `aria-invalid` when invalid.
 - While a commit is saved the input has `aria-busy`; say why a refused value went back with `error`.

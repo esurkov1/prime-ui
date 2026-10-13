@@ -50,12 +50,12 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `onValueChange` | `(value: string[]) => void` | — | Called with the new list after a pick, a removal or a creation. |
 | `open` | `boolean` | — | Controlled open state of the list. |
 | `defaultOpen` | `boolean` | `false` | Initial open state, uncontrolled. |
-| `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: field click, Escape, an outside press. |
+| `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: focus, a field click, typing, arrows, Escape, an outside press; typing closes it when nothing matches. |
 | `creatable` | `boolean` | `false` | A typed text that is not an option can be added (the Create row or Enter). |
-| `onCreate` | `(value: string) => void \| Promise<void>` | — | A new value was created, not picked from `options`; it joins the selection at once. Return the save's promise: the new chip waits busy (dimmed, a spinner in its remove segment, `aria-busy`, it cannot be removed meanwhile); resolve — it stays; reject — it leaves the selection and the list again and `labels.createFailed` is announced (say why with `error`). |
+| `onCreate` | `(value: string) => void \| Promise<void>` | — | A new value was created, not picked from `options`; it joins the selection at once. Return the save's promise: the chip waits busy; on reject it leaves again (say why with `error`). |
 | `defaultColor` | `PaletteColor` | `"gray"` | Chip color of values without an option color, created ones included. |
-| `onOptionUpdate` | `(value: string, updates: { label?: string; color?: PaletteColor }) => void \| Promise<void>` | — | Enables the row «⋯» menu with the tag name and color; `value` never changes. Return the save's promise: the new name or color shows at once and «⋯» spins (`aria-busy`) while the menu stays open; resolve — apply it to `options` before resolving; reject — the option goes back and `labels.updateFailed` is announced. |
-| `onOptionDelete` | `(value: string) => void \| Promise<void>` | — | Enables «Удалить» in the row menu; the value also leaves the selection. A returned Promise keeps everything as is while pending (the row is busy, a spinner replaces «⋯»): resolve applies the deletion, reject keeps the option and the selection — e.g. ask for confirmation first. |
+| `onOptionUpdate` | `(value: string, updates: { label?: string; color?: PaletteColor }) => void \| Promise<void>` | — | Enables the row «⋯» menu to rename and recolor a tag; `value` never changes. Return the save's promise and apply the change to `options` before it resolves; on reject the option goes back. |
+| `onOptionDelete` | `(value: string) => void \| Promise<void>` | — | Enables «Удалить» in the row menu; the value also leaves the selection. A returned Promise defers it: resolve deletes, reject keeps everything (e.g. after a confirmation). |
 | `label` | `ReactNode` | — | Field label above; names the input. |
 | `hint` | `ReactNode` | — | Support text under the field; linked by `aria-describedby`. |
 | `error` | `ReactNode` | — | Error message; replaces the hint and implies `invalid`. |
@@ -89,7 +89,7 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 |---|---|---|---|
 | `creatable` | a «Создать» row with the preview chip while the typed text is new | The dictionary is open | `false` |
 | `onOptionUpdate` / `onOptionDelete` | a «⋯» button on the highlighted row (always shown on touch screens) opening a rename / color / delete menu | Users keep their own tags | |
-| `disabled` | disabled fill, muted chips, no list | Not editable now | `false` |
+| `disabled` | disabled fill, muted chips, no list | The value is read-only in this context | `false` |
 | `invalid` / `error` | danger inset ring (+ the message) | Validation failed | |
 
 ## States
@@ -110,6 +110,7 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 - The field is 100% wide; set the width with the layout.
 - Chips sit `--prime-space-1` apart; the chip row keeps `--prime-focus-space` so chip rings are never cut.
 - The list is at least the field width and `--prime-panel-min-width`; max height `--prime-panel-max-height`, flips near the viewport edge.
+- Pass every option: past 100 listed options the list renders only the options around the view; the highlighted option and the one whose «⋯» menu is open stay rendered, options carry `aria-posinset` / `aria-setsize`.
 
 ## Accessibility
 
@@ -117,12 +118,12 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | Key | Action |
 |---|---|
 | `ArrowDown` · `ArrowUp` | Open the list (when it has something to show) and move the highlight over the options. |
-| `Enter` | Tick or untick the highlighted option (the first one when nothing is highlighted); on the Create row, create the tag. |
+| `Enter` | Tick or untick the highlighted option (the first one when nothing is highlighted); on the Create row, create the tag; in the row menu's name field, save the new name and close the menu. |
 | `Space` | Types a space: a tag may have several words. |
 | `Backspace` | In an empty input removes the last tag; on a tag removes it and focuses the previous tag. |
 | `ArrowLeft` · `ArrowRight` | From the start of the input move focus over the tags and back to the input. |
 | `Delete` | On a tag removes it; focus moves to the next tag, or to the input when none is left. |
-| `Escape` | Closes the list. |
+| `Escape` | Closes the row «⋯» menu if it is open, otherwise the list. |
 
 ### ARIA
 - The input is `role="combobox"` with `aria-expanded` and `aria-controls`; the list is `role="listbox"` with `aria-multiselectable`, options are `role="option"` with `aria-selected`.
@@ -174,5 +175,5 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 - Deleting a shared tag without asking, or restoring the value by hand after a cancelled confirmation → return a Promise from `onOptionDelete` that resolves on confirm and rejects on cancel; nothing changes until it resolves.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (chips, «+N»), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator`), [ScrollContainer](../scroll-container/COMPONENT.md) (chip row, list), [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md), [Input](../input/COMPONENT.md) and [Divider](../divider/COMPONENT.md) (row menu), [VisuallyHidden](../visually-hidden/COMPONENT.md) («+N» name, removal announcement), `Icon` (chevron, plus, «⋯», delete), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame)
+- **Built from:** [Badge](../badge/COMPONENT.md) (chips, «+N»), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator`), [ScrollContainer](../scroll-container/COMPONENT.md) (chip row, list), [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md), [Input](../input/COMPONENT.md) and [Divider](../divider/COMPONENT.md) (row menu), [VisuallyHidden](../visually-hidden/COMPONENT.md) («+N» name, removal announcement), `Icon` (chevron, plus, «⋯», delete), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame); `useVirtualRows` (the window of a long list)
 - **See also:** [Select](../select/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md)

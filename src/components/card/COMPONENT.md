@@ -41,17 +41,17 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Card.Root
-`ref` → `HTMLDivElement` (the `asChild` element). A layer of the surface ladder (`data-depth` one above the surface around it: white on the light page, the next layer when nested; radius 12, the raised whisper only on the page, no border) and a size container; `variant` picks the template layout of its parts.
+`ref` → `HTMLDivElement` (the `asChild` element). A surface one layer above the one around it, no border, and a size container; `variant` picks the template layout of its parts.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `variant` | `"panel" \| "mini" \| "stat-trend" \| "split" \| "cta" \| "list" \| "cover"` | `"panel"` | Structural template: titled block with zones (`panel`), KPI tiles, a call to action, a list or a cover tile. |
 | `flat` | `boolean` | `false` | No raised shadow: a flat tile for dense grids. |
-| `asChild` | `boolean` | `false` | The whole card is one link or button: pass that element as the only child with the parts inside it; the root's class, data attributes and `ref` go to it. It lifts on hover (raised → overlay shadow), presses and shows the focus ring. Nothing interactive may sit inside it. |
+| `asChild` | `boolean` | `false` | The whole card is one link or button: pass that element as the only child with the parts inside it; it gets hover, press and the focus ring. Nothing interactive may sit inside it. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` + `aria-labelledby` for a landmark block, and the other div attributes. |
 
 ### Card.Header
-`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. In `panel` and `list` it is a padded zone with a faint hairline below; in `stat-trend` it can pair a leading badge or icon with a compact `Card.Value`. Wraps below 22rem.
+`ref` → `HTMLDivElement`. The top row: `Card.Title` first, anything after it (a control, a quiet caption) at the end. Wraps below 22rem.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -66,7 +66,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Description
-`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s, wraps): under the title of `cta` and `cover`, under the header of `stat-trend`; inside `Card.Header` of `panel` and `list` it stacks under the title, the header's control staying at the end.
+`ref` → `HTMLParagraphElement`. Secondary text (`<p>`, body-s): under the title of `cta` and `cover`, under the header of `stat-trend`; inside `Card.Header` it stacks under the title.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -109,7 +109,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` and the other attributes of the element. |
 
 ### Card.Meta
-`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular. In `stat-trend` it drops to the bottom of the tile, so tiles in a row line it up; in `mini` and a `split` cell it sits in the text column under the value.
+`ref` → `HTMLSpanElement`. The reference line of a KPI («Лидов 120 · сделок 18»): caption, muted, tabular; under the value.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -164,11 +164,12 @@ Without `asChild` a card is static: no hover, focus or press of its own. With it
 
 ## Layout & spacing
 - Grid of cards: `repeat(auto-fit, minmax(min(100%, 14rem), 1fr))`, gap `--prime-space-4`.
+- Radius `--prime-card-radius`, no border. In `panel` and `list` the `Header` is a padded zone with a faint inset hairline below; in `stat-trend` it can pair a leading Badge or icon with a compact `Card.Value`.
 - Padding `--prime-card-padding-m` (20); `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
 - Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
 - Long values wrap, labels truncate; a chart SVG needs a CSS height.
 - In a `Header` the title takes the free width; a control or a caption after it sits at the end without a wrapper. A `Card.Description` in the header stacks under the title, 4 apart; the control stays at the end, centred on both lines.
-- `Card.Meta` in `stat-trend` takes the bottom of the tile (`margin-top: auto`), so tiles of one row line their meta up.
+- `Card.Meta` in `stat-trend` takes the bottom of the tile (`margin-top: auto`), so tiles of one row line their meta up; in `mini` and a `split` cell it sits in the text column under the value.
 
 ## Accessibility
 

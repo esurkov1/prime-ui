@@ -37,7 +37,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Thumbnail.Root
-`ref` → `HTMLDivElement`. The frame: height of the tier, width from `ratio`, radius, palette fill; tracks the image load for the Fallback.
+`ref` → `HTMLDivElement` (the `<button>` of a selectable tile, the child with `asChild`). The frame: height of the tier, width from `ratio`, radius, palette fill; tracks the image load for the Fallback.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -47,8 +47,8 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | `variant` | `"soft" \| "solid"` | `"soft"` | Fallback fill: a soft tint with a hue icon, or a solid hue with a contrasting icon. |
 | `fullWidth` | `boolean` | `false` | Fills the container width (cards, galleries); the height follows `ratio`. |
 | `ring` | `boolean` | `false` | A faint inner ring, for photos with a white background on a light surface. |
-| `asChild` | `boolean` | `false` | Puts the frame on its one child — a `<button>` that opens a viewer, an `<a>` to the object — which holds the parts: the frame's look plus a hover lift (`--prime-shadow-overlay`), a press (scale 0.98) and the focus ring; `data-interactive`. Name the child (`aria-label`) when the picture is all it shows. |
-| `checked` | `boolean` | — | Selected (controlled). Any of the checked triad makes a selectable tile: a `<button role="checkbox">` with `aria-checked`, a `Checkbox.Indicator` in the start corner (always shown) and an accent ring when selected (`data-checked`). Name it with `aria-label` or the image `alt`. |
+| `asChild` | `boolean` | `false` | Puts the frame, with hover, press and focus ring, on its one child — a `<button>` that opens a viewer or an `<a>` to the object. Name the child (`aria-label`) when the picture is all it shows. |
+| `checked` | `boolean` | — | Selected (controlled). Any of the checked triad makes a selectable tile — a `<button role="checkbox">` with a check in the corner. Name it with `aria-label` or the image `alt`. |
 | `defaultChecked` | `boolean` | — | Initially selected (uncontrolled); makes the tile selectable. |
 | `onCheckedChange` | `(checked: boolean) => void` | — | Selection changed by click, Space or Enter; makes the tile selectable. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "color" \| "defaultChecked" \| "onChange">` | — | `className`, `aria-label` + `role` for a fallback-only thumbnail, and the other attributes of the frame. |
@@ -64,7 +64,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | `…rest` | `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" \| "alt">` | — | `className`, `onLoad`, `onError` and the other img attributes. |
 
 ### Thumbnail.Video
-`ref` → `HTMLVideoElement`. A video in the frame, `preload="metadata"`, `playsInline`; reports its first frame like an image, so the Fallback shows until then (`data-status`). Without `controls` and autoplay it shows a play mark (from `m`) — the media disk of the play and transfer disks over media, 40 with a 20 glyph, at 60% of a lower frame — and the duration on the `media` shade (from `l` and `fullWidth`).
+`ref` → `HTMLVideoElement`. A video in the frame (`preload="metadata"`, `playsInline`); the Fallback shows until its first frame. Without `controls` it shows the duration, and a play mark while it is still (not looping, not playing).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

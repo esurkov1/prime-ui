@@ -331,3 +331,8 @@
   color: var(--prime-color-accent-text);
   --prime-icon-size: var(--menu-icon);
 }
+
+/* A long list: the height of the options not rendered. */
+.spacer {
+  flex-shrink: 0;
+}

@@ -23,7 +23,7 @@ import { Gallery, type GalleryItem } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Gallery                      <div>, aspect-ratio from the layout; data-count
+Gallery                      <div>, aspect-ratio from the layout; data-count, data-pressed while a tile is pressed
 ├─ tile × 1–10               a box at fractions of the gallery, inset by half a gap at inner edges
 │  ├─ Thumbnail              the picture (lazy, async decode) or a video's first frame (near the view)
 │  ├─ play mark · length     the media disk and a pill over a video tile (aria-hidden)
@@ -34,17 +34,19 @@ Gallery                      <div>, aspect-ratio from the layout; data-count
 ```
 The layout is a pure function of the items' ratios (`layout.ts`, `layoutGallery`): each item's ratio is kept between a tall portrait and a wide panorama (0.5…2 in an album, 0.6…1.8 alone), its orientation is read (wide, narrow, about square), and the shape is picked as a messenger does — two wide ones of one shape stacked, two alike side by side, two different ones sharing one height by their ratios; three with a tall first one as that one beside a column of two, otherwise a wide one over two; four the same with three; five to ten in rows, the partition (up to four rows of up to four) that comes closest to a square, penalised for very short rows and for more items above fewer. Nothing is measured: the tiles stand absolutely at fractions of the gallery's box, which keeps its aspect ratio.
 
+An item (`GalleryItem`) is `type` (`"image"` by default, or `"video"`), `src`, an optional `poster` and `alt`, its natural `width` / `height` (the ratio that lays the album out and reserves every box before load), a video's `duration` before its metadata loads, and its transfer — `transfer`, `transferProgress`, `transferDirection`, the same shape as every transferring part.
+
 ## API
 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Gallery
-`ref` → `HTMLDivElement`. Photos and videos as a messenger album: one, or 2–10 laid out from their aspect ratios alone — two side by side or stacked, a tall first one beside a column, a wide first one over a row, larger albums in rows chosen to come close to a square with fewer items above more. Every box is final before anything loads (nothing is measured): the gallery is as wide as its host allows up to `--prime-gallery-max-size` (a lone portrait is narrower, its height reaching the cap), the tiles stand at fractions of its box with `--prime-gallery-gap` between them, the outer corners rounded. Pictures load lazily and decode async; a video tile mounts its first frame once it nears the view and shows a play mark and its length. A tile opens the album in `MediaViewer` at that item, out of the tile and back into it. A tile on its way, either way, dims under the shared transfer disk in its middle — pressing it cancels, a failure turns it danger with a retry, a `remote` one carries the download arrow, and once done it fades and shrinks away.
+`ref` → `HTMLDivElement`. Photos and videos as a messenger album: one, or 2–10 laid out from their aspect ratios alone, every box final before anything loads. A tile opens the album in `MediaViewer`; a tile on its way shows the shared transfer disk.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `items` | `GalleryItem[]` | — (required) | `{ type?: "image" \| "video", src, poster?, alt?, width?, height?, duration?, transfer?, transferProgress?, transferDirection? }` — `width` / `height` give the ratio (default 4 : 3) that lays the album out and reserves every box before load; `duration` is a video's length before its metadata; `transfer`, `transferProgress` and `transferDirection` are the transfer of the tile, the same shape as every transferring part (`transfer={item.status}`, `transferProgress={item.progress}` of a `useUploadQueue` item; a share left out in flight turns an indeterminate arc; the direction changes only the words). Items after the 10th are not shown. |
-| `viewer` | `boolean` | `true` | The album opens in the kit's `MediaViewer`: a tile (a press or Enter) opens it at that item with the whole album as its set — arrows and swipes page, a video plays inside, pictures zoom, Escape closes — growing out of the tile and closing back into it, the focus returning to the tile. `false` — no viewer of the kit: open your own from `onOpenChange` and `onIndexChange`. |
+| `items` | `GalleryItem[]` | — (required) | `{ type?, src, poster?, alt?, width?, height?, duration?, transfer?, transferProgress?, transferDirection? }`; `width` / `height` give the ratio (default 4 : 3). The first 10 are shown. |
+| `viewer` | `boolean` | `true` | A tile (a press, Enter or Space) opens the album in the kit's `MediaViewer` at that item. `false` — no viewer of the kit: open your own from `onOpenChange` and `onIndexChange`. |
 | `open` | `boolean` | — | The viewer is open (controlled). |
 | `defaultOpen` | `boolean` | `false` | Initially open (uncontrolled). |
 | `onOpenChange` | `(open: boolean) => void` | — | A tile opened the viewer (`true`), or the viewer closed (`false`). |
@@ -73,15 +75,15 @@ Decided by the items, not a prop: the number of items and their ratios.
 ### Flags
 | Prop | Effect |
 |---|---|
-| `viewer` | the album opens in `MediaViewer` (default); `false` — your own viewer from `onOpenChange` / `onIndexChange` |
+| `viewer` | the album opens in `MediaViewer` (default) with the whole album as its set: arrows and swipes page, a video plays inside, pictures zoom, Escape closes; `false` — your own viewer from `onOpenChange` / `onIndexChange` |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | loading | an image that has not loaded | the Thumbnail's own placeholder in the tile's final box; nothing moves when it loads |
-| video near the view | a video tile entering the view | the `<video preload="metadata">` mounts and shows its first frame; the length comes from the item first, then from the metadata |
-| pressed | a press on a tile | the tile gives in a little (`--prime-motion-press-scale`, `fast`) |
-| transferring | `transfer` `queued` / `loading` on an item | the picture dims to 0.6 under the shared transfer disk with its progress ring; the play mark gives way (`fast`) |
+| video near the view | a video tile entering the view | the `<video preload="metadata">` mounts and shows its first frame; the length comes from the item's `duration` first, then from the metadata |
+| pressed | a press on a tile (pointer, or Enter / Space held) | the whole album gives in a little (`data-pressed` on the root, `--prime-motion-press-scale`, `fast`); inside a message the bubble presses instead |
+| transferring | `transfer` `queued` / `loading` on an item | the picture dims to 0.6 under the shared transfer disk with its progress ring (an indeterminate arc while `transferProgress` is left out; `transferDirection` changes only the words); pressing the disk cancels; the play mark gives way (`fast`) |
 | failed | `transfer="failed"` | the disk turns danger with a retry arrow, described by the reason |
 | remote | `transfer="remote"` | the download arrow on the disk; the picture dims under it |
 | done | `transfer="done"` | the disk fades and shrinks away (`fast`), the picture returns to full |
@@ -141,9 +143,9 @@ Decided by the items, not a prop: the number of items and their ratios.
 - A rounded wrapper with `overflow: hidden` around it → the gallery rounds its own corners.
 - A video that autoplays in a tile → the tile shows its first frame; it plays in the viewer.
 - A lightbox of your own around the gallery → the gallery opens `MediaViewer` itself; control it with `open` / `index`, or `viewer={false}` for a viewer of your own.
-- A progress bar or a spinner of your own over an uploading picture → `transfer` and `transferProgress` on the item: the shared transfer disk.
-- More than ten items in one gallery → split them into several albums of up to ten.
+- A progress bar or a spinner of your own over an uploading picture → `transfer` and `transferProgress` on the item (`transfer={item.status}`, `transferProgress={item.progress}` of a `useUploadQueue` item): the shared transfer disk.
+- More than ten items in one gallery → items after the tenth are not shown; split them into several albums of up to ten.
 
 ## Related
-- **Built from:** [Thumbnail](../thumbnail/COMPONENT.md) (`Thumbnail.Image`, `Thumbnail.Video`), [MediaViewer](../media-viewer/COMPONENT.md) (the album full-screen), [Button](../button/COMPONENT.md) (the transfer disk), Icon (`action.play`, `action.video`, `object.image`); `internal/transferDisk` (the transfer of a tile), `internal/mediaDisk` (the play mark), `internal/mediaPill` (the length), `internal/useNearView` (a video mounts near the view), `internal/formatClock`
+- **Built from:** [Thumbnail](../thumbnail/COMPONENT.md) (`Thumbnail.Image`, `Thumbnail.Video`), [MediaViewer](../media-viewer/COMPONENT.md) (the album full-screen), [Button](../button/COMPONENT.md) (the transfer disk), Icon (`action.play`, `action.video`, `object.image`); `internal/transferDisk` (the transfer of a tile), `internal/mediaDisk` (the play mark), `internal/mediaPill` (the length), `internal/useNearView` (a video mounts near the view), `internal/formatClock`, `internal/messagePart` (the press goes to the message)
 - **See also:** [Message](../message/COMPONENT.md) — `Message.Media` is a Gallery in a message; [MediaViewer](../media-viewer/COMPONENT.md) — the viewer on its own; [Thumbnail](../thumbnail/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md), [VideoNote](../video-note/COMPONENT.md)

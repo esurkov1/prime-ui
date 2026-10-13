@@ -36,21 +36,21 @@ PageToolbar.Root                 container: its own width picks the layout
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### PageToolbar.Root
-`ref` → `HTMLDivElement`. The page panel: lays its slots out from its own width — one row from a 56rem container (Tools · Sections · View · Actions), stacked rows below it (Tools + Actions, Chips, Sections, View). Search and filter always come first, so the Chips sit right under them. Every row is 12 from the next. Parts may be left out; JSX order is the Tab order — write Tools, Sections, View, Actions, Chips.
+`ref` → `HTMLDivElement`. The page panel: one row from 56rem of its own width, stacked rows below. Any slot may be left out; JSX order is the Tab order — write Tools, Sections, View, Actions, Chips.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### PageToolbar.Sections
-`ref` → `HTMLDivElement`. Sections of the page — a `fullWidth` SegmentedControl with counts. After the Tools and sized by content when wide; a full row under the Chips when narrow (beside the action when there are no Tools); scrolls inside when it does not fit.
+`ref` → `HTMLDivElement`. Sections of the page — a `fullWidth` SegmentedControl with counts; scrolls inside when it does not fit.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### PageToolbar.Tools
-`ref` → `HTMLDivElement`. Search and filter button (`SmartFilter.Toolbar`): always the first slot and the stretchy one, the Chips right under it. Wide, it gives way down to 18rem (a 9rem search and the button on one line), then the Sections shrink.
+`ref` → `HTMLDivElement`. Search and filter button (`SmartFilter.Toolbar`): always the first slot and the stretchy one, the Chips right under it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -83,7 +83,7 @@ PageToolbar has no variants: the layout follows the toolbar's width.
 ### Layout by width
 | Toolbar width | Looks like | Default |
 |---|---|---|
-| `≥ 56rem` | one row that never wraps: Tools (stretch, at least 18rem) · Sections (content width) · View (content width) · Actions; Chips under it; short of room the Sections shrink and scroll inside | |
+| `≥ 56rem` | one row that never wraps: Tools (stretch, at least 18rem — a 9rem search and the filter button on one line) · Sections (content width) · View (content width) · Actions; Chips under it; short of room the Tools give way first, then the Sections shrink and scroll inside | |
 | `< 56rem` | rows: Tools (stretch) + Actions; Chips; Sections (full row); View (full row) | yes (mobile first) |
 | any | Chips right under the search and filter, only while there are chips | |
 

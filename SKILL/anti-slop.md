@@ -140,6 +140,11 @@ A search field in a toolbar may go without a visible label, but then it needs `a
 | chat bubbles from Cards or a Timeline, a Textarea with a send button, a chat header and scroller of your own | `Chat` (`Chat.Messages` of `Message.Root`, `Chat.Footer` with `Composer.Root`) |
 | bars of dates drawn by hand, or a DataTable of start / end dates | `Gantt` |
 | a hand-made `<span>` hidden with CSS for screen readers | `<VisuallyHidden>` |
+| a `div` with `overflow: auto` | `ScrollContainer` (`edges`, `scrollbar="hidden"`, `snap`) |
+| an `<img>` with your own radius and loading box | `Thumbnail.Root` / `Avatar.Root` |
+| a lightbox, or a Modal with an `<img>` | `Gallery` (opens `MediaViewer` itself) or `MediaViewer` |
+| a `position: fixed` bottom tab bar | `BottomNav` in `AppShell.Footer` |
+| a bottom panel built from a Drawer or a `div` | `Sheet` |
 
 ## 7a. Fighting the table
 

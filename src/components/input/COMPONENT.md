@@ -62,9 +62,9 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `counter` | `ReactNode` | — | Right side of the support row, usually `<Input.Counter />`. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row (min height = hint line height), so an appearing error does not shift the layout. |
 | `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
-| `strength` | `boolean` | `false` | A password strength meter: a stepped `ProgressBar` (4 steps) under the field and the level word at the end of the support row — weak, easy, medium, hard (`labels.strengthWeak` … `strengthHard`), toned danger → warning → accent → success. Follows the value of `Input.Field`, controlled or not. For new-password fields. |
-| `getStrength` | `(value: string) => 0 \| 1 \| 2 \| 3 \| 4` | `getPasswordStrength` | Replaces the kit's estimate: every trait adds a point on its own, in any order — lowercase, uppercase, digits, symbols, 10+ and 14+ characters; 0–2 points weak, 3 easy, 4 medium, 5+ hard, and under 8 characters at most easy. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check. |
-| `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with the value on blur and Enter when it differs from the last committed one (the value at focus); Escape reverts to it. A returned Promise shows a spinner at the field's edge (`aria-busy` on the control) while the field stays editable and Tab moves on; a rejection puts the committed value back unless the person typed on — show why through `error`. Success shows a brief check (`labels.saved`). |
+| `strength` | `boolean` | `false` | A password strength meter for new-password fields: a stepped `ProgressBar` under the field and the level word (weak … hard) in the support row. Follows the value of `Input.Field`. |
+| `getStrength` | `(value: string) => 0 \| 1 \| 2 \| 3 \| 4` | `getPasswordStrength` | Replaces the kit's estimate of `strength`. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check. |
+| `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with a changed value on blur and Enter; Escape reverts. Return a Promise: the field shows a spinner and stays editable; a rejection restores the value — show why through `error`. |
 | `labels` | `Partial<InputLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Usually `Input.Wrapper`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
@@ -131,7 +131,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children" \| "aria-label">` | — | `onClick`, `disabled` and the other button attributes. |
 
 ### Input.RevealButton
-`ref` → `HTMLButtonElement`. A full-height segment that shows a `type="password"` field as text and back: `aria-pressed`, named by `labels.reveal`, `aria-controls` on the input, the eye glyph switches. A pointer press keeps the focus in the field; the caret and selection survive the switch.
+`ref` → `HTMLButtonElement`. A full-height toggle segment that shows a `type="password"` field as text and back (`aria-pressed`, named by `labels.reveal`); the focus, caret and selection stay in the field.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -213,6 +213,8 @@ Size: `data-size` on root and wrapper. Slots: `data-side="start" | "end"`. Segme
 
 Inline save (`onCommit`): the value at focus is the committed one. Blur and Enter commit a changed value (an unchanged one never fires); Escape puts the committed value back through the field's own `onChange`, so a controlled owner receives it, and is consumed — it does not also close the drawer around the field. Return a Promise for a server save: pending shows a spinner, reject restores the value, resolve shows the check.
 
+Strength estimate (`strength`, replaced by `getStrength`): every trait adds a point on its own, in any order — lowercase, uppercase, digits, symbols, 10+ and 14+ characters; 0–2 points weak, 3 easy, 4 medium, 5+ hard, and under 8 characters at most easy. The meter follows `Input.Field` controlled or not.
+
 Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontrolled: `defaultValue`. Both are native input props.
 
 ## Layout & spacing
@@ -238,7 +240,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 - `Input.Icon`, `Input.Affix`, `Input.InlineAffix` are `aria-hidden`: put the meaning in the label (e.g. "Сумма, ₽").
 - `Input.ClearButton` is a real button named by `labels.clear`, with `aria-controls` on the input.
 - `Input.Action` and `Input.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied` through a polite live region.
-- `Input.RevealButton` is a toggle: a constant name `labels.reveal` and `aria-pressed`.
+- `Input.RevealButton` is a toggle: a constant name `labels.reveal`, `aria-pressed` and `aria-controls` on the input; a pointer press keeps the focus in the field.
 - With `onCommit` the input carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.
 - `Input.Counter` shows `14/40` visually and announces `labels.counter` through `aria-live="polite"`.
 

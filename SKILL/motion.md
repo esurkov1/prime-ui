@@ -32,7 +32,7 @@ Use the component and the motion comes with it. Never re-animate these with your
 | Steps of a whole | cells fill one after another | `ProgressBar steps value max` |
 | Progress | the fill slides | `ProgressBar`, `ProgressCircle` |
 | A trend card | scrub any point, the headline follows, the arrow turns, a new series cross-fades | `Sparkline` |
-| Overlays | grow from the trigger (menus, popovers, tooltip from its arrow), modals stay centred, drawers, sheets and toasts come from their edge; a dialog, drawer or sheet leaves faster than it came, a small floating panel opens and closes on the same quick `fast` clock; the last content stays on screen while the exit plays | `Dropdown`, `Popover`, `Tooltip`, `Modal`, `ConfirmDialog`, `Drawer`, notifications — the `Root` kept mounted |
+| Overlays | grow from the trigger (menus, popovers, tooltip from its arrow), modals stay centred, drawers, sheets and toasts come from their edge; a dialog, drawer or sheet leaves faster than it came, a small floating panel opens and closes on the same quick `fast` clock; the last content stays on screen while the exit plays | `Dropdown`, `Popover`, `Tooltip`, `Modal`, `ConfirmDialog`, `Drawer`, `Sheet`, `MediaViewer`, notifications — the `Root` kept mounted |
 | Tooltips along a toolbar | the first waits, the next ones show at once | `Tooltip` (shared warm window) |
 | Toast stack | depth stack, expands on hover | `NotificationProvider` + `useNotifications` |
 | Loading → data → empty → error | the region cross-fades and glides its height; loading is a skeleton of the data | `Crossfade` around the region, `Skeleton` in the data's geometry |

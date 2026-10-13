@@ -83,7 +83,8 @@ export const page: ComponentPageConfig = {
       { keys: "ArrowDown · ArrowUp", action: "Открывают список и двигают подсветку по опциям." },
       {
         keys: "Enter",
-        action: "Отмечает или снимает подсвеченную опцию; на строке «Создать» — создаёт тег.",
+        action:
+          "Отмечает или снимает подсвеченную опцию; на строке «Создать» — создаёт тег; в поле имени меню строки — сохраняет имя и закрывает меню.",
       },
       { keys: "Space", action: "Печатает пробел: в теге может быть несколько слов." },
       {
@@ -100,7 +101,7 @@ export const page: ComponentPageConfig = {
         action:
           "На теге удаляет его; фокус уходит на следующий тег, а если тегов не осталось — в поле.",
       },
-      { keys: "Escape", action: "Закрывает список." },
+      { keys: "Escape", action: "Закрывает меню «⋯» строки, если оно открыто, иначе список." },
     ],
     aria: [
       'Поле ввода — `role="combobox"` с `aria-expanded` и `aria-controls`; список — `role="listbox"` с `aria-multiselectable`, опции — `role="option"` с `aria-selected`.',

@@ -88,8 +88,8 @@ export const api: ComponentApi = {
         {
           name: "onRetry",
           type: "() => void | Promise<void>",
-          en: "A retry button (`labels.retry`) under `loadError`; Enter in the search field runs it too. Return the request's promise: the button is loading (`aria-busy`) and neither it nor Enter retries again until it settles; resolve — clear `loadError` and the results swap in; reject — the error stays and the button is ready again.",
-          ru: "Кнопка «Повторить» (`labels.retry`) под `loadError`; Enter в поле поиска тоже её вызывает. Верните промис запроса: кнопка в загрузке (`aria-busy`), ни она, ни Enter не повторяют, пока он не завершится; resolve — уберите `loadError`, и подъедут результаты; reject — ошибка остаётся, кнопка снова готова.",
+          en: "A retry button (`labels.retry`) under `loadError`; Enter in the search field runs it too. Return the request's promise to keep the button loading until it settles.",
+          ru: "Кнопка «Повторить» (`labels.retry`) под `loadError`; Enter в поле поиска тоже её вызывает. Верните промис запроса — кнопка в загрузке, пока он не завершится.",
         },
         {
           name: "closeOnOutsideClick",
@@ -147,8 +147,8 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Input",
-      en: '`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; shows `CommandMenu.Root` `search`; takes focus on open; no focus ring (the caret is the indicator). + native input props except `value` / `defaultValue` (`onChange`, `onKeyDown`, `onFocus`, `onBlur` reach the input).',
-      ru: 'Строка поиска: иконка и поле `role="combobox"` с запросом из `CommandMenu.Root`; стрелки, Home, End и Enter управляют списком.',
+      en: '`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list, showing `CommandMenu.Root` `search`; takes focus on open. + native input props except `value` / `defaultValue`.',
+      ru: 'Строка поиска: иконка и поле `role="combobox"`, управляющее списком, с запросом из `CommandMenu.Root`; получает фокус при открытии.',
       props: [
         {
           name: "placeholder",
@@ -161,7 +161,7 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.List",
-      en: '`ref` → `HTMLElement`. The scrolling `role="listbox"` (a ScrollContainer) under the search row. It draws the load states of Root: skeleton rows while the first results load, skeleton rows at the end while more load, the load error with a retry instead of the list; the states cross-fade. + native props.',
+      en: '`ref` → `HTMLElement`. The scrolling `role="listbox"` under the search row; draws the load states of Root: skeleton rows, more rows loading at the end, the error with a retry. + native props.',
       ru: 'Прокручиваемый список результатов `role="listbox"`; рисует состояния загрузки: строки-скелеты, догрузку в конце, ошибку с повтором.',
       props: [],
     },
@@ -213,8 +213,8 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.ItemIcon · CommandMenu.ItemShortcut",
-      en: "`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the tier icon size / a `Kbd` one tier below, pushed to the end of the item — a hint, not a handler. + native props.",
-      ru: "Иконка в начале пункта / подсказка клавиш (Kbd) в конце пункта.",
+      en: "`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). The `aria-hidden` leading glyph / a `Kbd` key hint at the end of the item — a hint, not a handler. + native props.",
+      ru: "Иконка в начале пункта (`aria-hidden`) / подсказка клавиш (`Kbd`) в конце пункта — подсказка, не обработчик.",
       props: [],
     },
     {
@@ -232,8 +232,8 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Empty",
-      en: '`ref` → `HTMLDivElement`. A compact EmptyPage with `role="status"`, shown only while nothing matches and nothing loads: `labels.empty`, `labels.emptyHint`, and `children` as an action under them — a button, or a `CommandMenu.Item` (create from the query) that the arrows and Enter reach and that never counts as a match.',
-      ru: "Пустой результат (компактный EmptyPage), только когда ничего не найдено и не грузится; `children` — действие: кнопка или `CommandMenu.Item` «Создать…», доступный стрелками и Enter.",
+      en: '`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty`, `labels.emptyHint`, and `children` as an action — a button or a `CommandMenu.Item`.',
+      ru: 'Компактный EmptyPage (`role="status"`), пока ничего не найдено и не грузится: `labels.empty`, `labels.emptyHint` и `children` как действие — кнопка или `CommandMenu.Item`.',
       props: [],
     },
     {

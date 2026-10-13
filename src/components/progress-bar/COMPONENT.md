@@ -46,7 +46,7 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type. |
 | `label` | `string` | — | Visible label above the line and its accessible name; a value bar without it needs `aria-label`. |
 | `showValue` | `boolean` | `false` | Shows the rounded filled percentage at the end of the label row (`aria-hidden`); `bar` layout only. |
-| `loading` | `boolean` | `false` | The data is on its way: a Skeleton in the bar's geometry (and of the legend or the rows) that cross-fades into the data; the label stays, the root is `aria-busy`. Pass the last known `value` or `segments` (or `0` / `[]`). |
+| `loading` | `boolean` | `false` | The data is on its way: a Skeleton in the bar's geometry cross-fades into the data; the label stays. Pass the last known `value` or `segments` (or `0` / `[]`). |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root; `aria-label` names the bar when there is no `label`. |
 
 ### ProgressBar · value mode
@@ -57,14 +57,14 @@ A native `<progress>` (transparent, for assistive tech) under the drawn line.
 | `value` | `number` | — (required) | The current value, clamped to `0…max`. |
 | `max` | `number` | `100` | Top of the scale. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Fill color, telling the outcome. |
-| `steps` | `boolean` | `false` | Draws the scale as `max` equal cells (2–12), each filled whole; `value` rounds to a cell. In one change the cells go one after another — from the start when filling, from the end when emptying. For a level out of a few: password strength, onboarding steps. |
+| `steps` | `boolean` | `false` | Draws the scale as `max` equal cells (2–12), each filled whole; `value` rounds to a cell. For a level out of a few: password strength, onboarding steps. |
 
 ### ProgressBar · segments mode
 A `role="group"` bar of parts, named by `label` and described by the legend or the distribution text; with `layout="rows"` an `<ol>` named by `label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `segments` | `ProgressSegment[]` | — (required) | Parts in order, `{ value, label?, tone? \| color? }`: `tone` names a meaning (default `accent`), `color` a category — its step of the chart palette, the same color the category has in charts. Each part's width is its share of `max`. |
+| `segments` | `ProgressSegment[]` | — (required) | Parts in order, `{ value, label?, tone? \| color? }`: `tone` names a meaning (default `accent`), `color` a category, as in its charts. Each part's width is its share of `max`. |
 | `max` | `number` | — | Total capacity. Default: the sum of the parts; a larger `max` leaves the rest as track. |
 | `segmentGap` | `"none" \| "hairline"` | `"none"` | `none` — one continuous pill; `hairline` — every part and the rest are separate pills. `bar` layout. |
 | `legend` | `boolean` | `false` | A legend under the bar, one row per part: color · name · value · share; it becomes the group's description. `bar` layout. |

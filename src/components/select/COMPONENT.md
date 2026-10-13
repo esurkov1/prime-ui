@@ -101,14 +101,14 @@ Select.Root                       field frame: label · control · hint/error; v
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `renderValue` | `(item: { value: string; label: string }) => ReactNode` | — | Single mode: draws the picked option in the trigger with the same parts as the row — a leading Avatar or Thumbnail, ItemText, ItemDescription, and a trailing Badge or ItemMeta at the end before the chevron; not called while empty. |
+| `renderValue` | `(item: { value: string; label: string }) => ReactNode` | — | Single mode: draws the picked option in the trigger with the same parts as the row (Avatar, ItemText, Badge…); not called while empty. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Select.TriggerIcon · Select.ItemIcon
 `ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label. + native `<span>` props.
 
 ### Select.Content
-`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"`, the empty state and the load states (skeleton rows, the load error), which cross-fade. Below 640px of viewport the panel is a bottom sheet: a scrim, a grab handle, swipe down to close, page scroll locked.
+`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel with the search row, the `role="listbox"`, the empty and load states. Closed, the items render hidden so the trigger knows their labels. Below 640px it is a bottom sheet.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -128,7 +128,7 @@ Select.Root                       field frame: label · control · hint/error; v
 | `children` | `ReactNode` | — (required) | Text, or `Select.ItemIcon`, `Avatar.Root`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`, `Badge.Root` as direct children. |
 
 ### Select.ItemText · Select.ItemDescription · Select.ItemMeta
-`ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line (searchable; makes the row two-line) / a trailing muted value before the check. An `Avatar.Root` or `Thumbnail.Root` child is the leading media (a Thumbnail makes the row two-line), sized to the tier unless it sets `size`; a `Badge.Root` child trails the text one tier down. + native `<span>` props.
+`ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line / a trailing muted value. Leading media is an `Avatar.Root` or `Thumbnail.Root` child, a trailing status a `Badge.Root`.
 
 ### Select.Group
 `ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while the search leaves none of its options. + native `<div>` props.
@@ -167,7 +167,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | `searchable` (Content) | search row with a faint hairline at the top of the list | More than ~10 options | `false` |
 | rich options | `Thumbnail.Root` or `Select.ItemDescription` in an item: a two-line row; `Avatar.Root` before the text and `Badge.Root` after it keep one line; the trigger the same with `renderValue` | Products, people, delivery tariffs | |
 
-**Combinations** — `renderValue` is single-mode only; with `multiple` the trigger shows the joined labels. `error` implies `invalid`; `loadError` is a different thing — the options failed to load — and never marks the field invalid. A status Badge can follow `Select.Value` inside the trigger; it takes the tier one step down by itself. An `Avatar.Root` or `Thumbnail.Root` in a row or `renderValue` takes the tier media size (`xs` · `xs` · `s` · `s` · `m` for `xs`–`xl`) unless it sets `size`. A server search: `searchable` + `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; keep the selected option among the items (or draw it with `renderValue`) so the trigger knows its label.
+**Combinations** — `renderValue` is single-mode only; with `multiple` the trigger shows the joined labels. `error` implies `invalid`; `loadError` is a different thing — the options failed to load — and never marks the field invalid. `Select.ItemDescription` is searchable. A status Badge can follow `Select.Value` inside the trigger; it takes the tier one step down by itself. An `Avatar.Root` or `Thumbnail.Root` in a row or `renderValue` takes the tier media size (`xs` · `xs` · `s` · `s` · `m` for `xs`–`xl`) unless it sets `size`. A server search: `searchable` + `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; keep the selected option among the items (or draw it with `renderValue`) so the trigger knows its label.
 
 ## States
 | State | Driven by | DOM |

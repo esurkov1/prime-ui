@@ -50,8 +50,8 @@ export const api: ComponentApi = {
         {
           name: "onOpenChange",
           type: "(open: boolean) => void",
-          en: "Called on every open and close: field click, Escape, an outside press.",
-          ru: "Вызывается при каждом открытии и закрытии: клик по полю, Escape, нажатие снаружи.",
+          en: "Called on every open and close: focus, a field click, typing, arrows, Escape, an outside press; typing closes it when nothing matches.",
+          ru: "Вызывается при каждом открытии и закрытии: фокус, клик по полю, ввод, стрелки, Escape, нажатие снаружи; ввод закрывает список, когда ничего не подходит.",
         },
         {
           name: "creatable",
@@ -63,8 +63,8 @@ export const api: ComponentApi = {
         {
           name: "onCreate",
           type: "(value: string) => void | Promise<void>",
-          en: "A new value was created, not picked from `options`; it joins the selection at once. Return the save's promise: the new chip waits busy (dimmed, a spinner in its remove segment, `aria-busy`, it cannot be removed meanwhile); resolve — it stays; reject — it leaves the selection and the list again and `labels.createFailed` is announced (say why with `error`).",
-          ru: "Создано новое значение, а не выбрано из `options`; оно сразу входит в выбор. Верните промис сохранения: новый чип ждёт занятым (приглушён, спиннер в сегменте удаления, `aria-busy`, снять его нельзя); resolve — остаётся; reject — уходит из выбора и списка, объявляется `labels.createFailed` (причину покажите через `error`).",
+          en: "A new value was created, not picked from `options`; it joins the selection at once. Return the save's promise: the chip waits busy; on reject it leaves again (say why with `error`).",
+          ru: "Создано новое значение, а не выбрано из `options`; оно сразу входит в выбор. Верните промис сохранения: чип ждёт занятым; при reject уходит (причину покажите через `error`).",
         },
         {
           name: "defaultColor",
@@ -76,14 +76,14 @@ export const api: ComponentApi = {
         {
           name: "onOptionUpdate",
           type: "(value: string, updates: { label?: string; color?: PaletteColor }) => void | Promise<void>",
-          en: "Enables the row «⋯» menu with the tag name and color; `value` never changes. Return the save's promise: the new name or color shows at once and «⋯» spins (`aria-busy`) while the menu stays open; resolve — apply it to `options` before resolving; reject — the option goes back and `labels.updateFailed` is announced.",
-          ru: "Включает меню «⋯» у строки: имя и цвет тега; `value` не меняется. Верните промис сохранения: новое имя или цвет видны сразу, «⋯» крутится (`aria-busy`), меню остаётся открытым; resolve — примените изменение к `options` до resolve; reject — опция возвращается, объявляется `labels.updateFailed`.",
+          en: "Enables the row «⋯» menu to rename and recolor a tag; `value` never changes. Return the save's promise and apply the change to `options` before it resolves; on reject the option goes back.",
+          ru: "Включает меню «⋯» у строки, чтобы переименовать и перекрасить тег; `value` не меняется. Верните промис сохранения и примените изменение к `options` до resolve; при reject опция возвращается.",
         },
         {
           name: "onOptionDelete",
           type: "(value: string) => void | Promise<void>",
-          en: "Enables «Удалить» in the row menu; the value also leaves the selection. A returned Promise keeps everything as is while pending (the row is busy, a spinner replaces «⋯»): resolve applies the deletion, reject keeps the option and the selection — e.g. ask for confirmation first.",
-          ru: "Включает «Удалить» в меню строки; значение уходит и из выбранных. Если вернуть Promise, пока он ждёт, ничего не меняется (строка занята, вместо «⋯» спиннер): resolve применяет удаление, reject оставляет опцию и выбор — например, чтобы сначала спросить подтверждение.",
+          en: "Enables «Удалить» in the row menu; the value also leaves the selection. A returned Promise defers it: resolve deletes, reject keeps everything (e.g. after a confirmation).",
+          ru: "Включает «Удалить» в меню строки; значение уходит и из выбранных. Возвращённый Promise откладывает удаление: resolve удаляет, reject всё оставляет (например, после подтверждения).",
         },
         {
           name: "label",
@@ -155,7 +155,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "true",
           en: '`false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring.',
-          ru: "`false` скрывает кольцо фокуса, но не фокус и не кольцо ошибки.",
+          ru: '`false` скрывает видимое кольцо фокуса (`data-focus-ring="false"`), но не фокус и не кольцо ошибки.',
         },
         {
           name: "id",

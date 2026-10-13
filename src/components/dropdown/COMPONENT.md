@@ -57,36 +57,36 @@ No DOM, no ref. Open state and dismiss policy.
 | `children` | `ReactNode` | — (required) | Trigger and Content. |
 
 ### Dropdown.Trigger
-No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`, `data-state`; the child's own `id` wins. Other props given to it (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
+No DOM: clones the single child, merges `ref` and `onClick`; toggles the menu and sets its ARIA.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactElement` | — (required) | One element, usually a Button. |
 
 ### Dropdown.Content
-`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves to the first item; Tab closes the menu and returns focus to the trigger. Below 640px of viewport the menu is a bottom sheet: a scrim, a grab handle, swipe down to close (with `closeOnOutsideClick`), page scroll locked.
+`ref` → `HTMLDivElement`. Portal + `role="menu"` floating panel that scrolls inside, named by the trigger; focus moves to the first item. Below 640px of viewport it is a bottom sheet.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side; flips to the opposite side when there is no room. |
-| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge). |
+| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` lines the menu up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix the edge. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: item height, text and icon; key hints one tier down. |
 | `matchTriggerWidth` | `boolean` | `false` | The menu is at least as wide as the trigger. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "role">` | — | `className`, `onKeyDown` (runs before the arrow-key navigation) and the other attributes of the menu. |
 
 ### Dropdown.Item
-`ref` → `HTMLButtonElement` (or the `asChild` element). A `<button role="menuitem">`; a click, Enter or Space runs `onSelect` and closes the menu. With a `Dropdown.ItemDescription` the label names the item and the description describes it (`aria-labelledby` / `aria-describedby`). + native button props.
+`ref` → `HTMLButtonElement` (or the `asChild` element). A `<button role="menuitem">`; a click, Enter or Space runs `onSelect` and closes the menu. + native button props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `onSelect` | `() => void` | — | The action of the item. |
 | `disabled` | `boolean` | `false` | Muted, `aria-disabled`, skipped by the arrow keys, does nothing on click. |
 | `tone` | `"neutral" \| "danger"` | `"neutral"` | `danger`: destructive action — danger text, icon and hover fill. |
-| `asChild` | `boolean` | `false` | The item is its single child, a link (`<a href>`, a router `Link`): the item props merge onto it, so Cmd / Ctrl-click and «open in a new tab» work; the pick still closes the menu. The link's children are the item content. Disabled: `aria-disabled`, the click is stopped. |
+| `asChild` | `boolean` | `false` | The item is its single child link (`<a href>`, a router `Link`), so Cmd / Ctrl-click and «open in a new tab» work; the pick still closes the menu. |
 | `children` | `ReactNode` | — | `Dropdown.ItemIcon`, the label, `Dropdown.ItemDescription`, `Dropdown.ItemShortcut`; with `asChild` one link element holding them. |
 
 ### Dropdown.CheckboxItem
-`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked`: the label (and an `ItemIcon`) on the left like any item, an accent check mark at the end while checked and nothing while not; a click, Enter or Space toggles it and the menu stays open. + native button props.
+`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a check mark at the end while checked; a click, Enter or Space toggles it and the menu stays open. + native button props.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -97,10 +97,10 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 | `children` | `ReactNode` | — | The label (optionally after a `Dropdown.ItemIcon`). |
 
 ### Dropdown.ItemDescription
-`ref` → `HTMLSpanElement`. A muted second line under the item label: what the action does, or why a disabled item is unavailable («Доступно владельцу проекта»). Wraps instead of widening the menu past its limit; describes the item for assistive tech. + native `<span>` props except `id`.
+`ref` → `HTMLSpanElement`. A muted second line under the item label: what the action does, or why a disabled item is unavailable. Describes the item for assistive tech. + native `<span>` props except `id`.
 
 ### Dropdown.ItemIcon · Dropdown.ItemShortcut
-`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the menu icon size (a kit `Icon` follows it) / a `Kbd` one tier below the menu, pushed to the end of the item — a hint, not a handler. + native props.
+`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). The `aria-hidden` leading glyph at the menu icon size / a `Kbd` key hint at the end of the item — a hint, not a handler. + native props.
 
 ### Dropdown.Group
 `ref` → `HTMLDivElement`. `<div role="group">` named by its visible `label`. + native `<div>` props.
@@ -117,7 +117,7 @@ No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `ari
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the divider. |
 
 ### Dropdown.Header · Dropdown.Title · Dropdown.Description
-`ref` → `HTMLDivElement`. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description stacked in one column, a trailing badge or button — in the written order / the medium heading line / the muted line under it; both truncate. + native `<div>` props.
+`ref` → `HTMLDivElement`. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description in one column, a trailing badge or button. + native `<div>` props.
 
 ## Variants
 The panel is the shared floating surface: the floating layer of the ladder (`data-depth="floating"`), `--prime-panel-radius` (12), padding 4, `shadow-overlay`; rows have radius 8 and the tier item height.
@@ -166,6 +166,7 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 | item hover / focus | a hovering pointer, arrow keys | subtle fill (danger-soft for `danger`), no movement; a tap leaves no hover fill |
 | item disabled | `disabled` | `aria-disabled="true"`, `data-disabled="true"` |
 | item tone | `tone` | `data-tone` |
+| item checked | `checked` / `defaultChecked` / `onCheckedChange` on `Dropdown.CheckboxItem` | `aria-checked`; an accent check mark at the end while checked, nothing while not |
 | sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the menu; the sheet carries `data-state`, the menu keeps its role and ref; page scroll locked; a swipe down from the handle closes it (with `closeOnOutsideClick`) |
 
 Motion (`overlayMotion`): the menu grows out of the side that faces its trigger and fades, in and out over `fast`; as a sheet it slides up over `slow` and down over `base`. Content stays mounted until the exit ends; under `prefers-reduced-motion` it unmounts at once.
@@ -173,6 +174,9 @@ Motion (`overlayMotion`): the menu grows out of the side that faces its trigger 
 ## Layout & spacing
 - Width is `max-content` between `--prime-panel-min-width` and twice that; item labels never wrap, a `Dropdown.ItemDescription` wraps inside that limit.
 - Max height = min(`--prime-panel-max-height`, the room on the resolved side); the menu scrolls inside.
+- A checkbox item keeps the label (and an `ItemIcon`) on the left like any item; the check mark sits at the end.
+- `Dropdown.ItemIcon` holds the glyph at the menu icon size (a kit `Icon` follows it); `Dropdown.ItemShortcut` is a `Kbd` one tier below the menu, pushed to the end of the item.
+- `Dropdown.Header` lays out its children in the written order; `Dropdown.Title` is the medium heading line, `Dropdown.Description` the muted line under it; both truncate.
 - Separators run edge to edge across the panel padding; group labels take `--prime-panel-group-label-height`.
 - Kept `--prime-space-2` from viewport edges; follows the trigger on scroll and resize.
 
@@ -189,7 +193,9 @@ Motion (`overlayMotion`): the menu grows out of the side that faces its trigger 
 
 ### ARIA
 - The menu is `role="menu"` named by the trigger; items are `role="menuitem"`, checkbox items `role="menuitemcheckbox"` with `aria-checked`, disabled ones `aria-disabled`.
-- The trigger gets `aria-haspopup="menu"`, `aria-expanded` and `aria-controls`.
+- The trigger gets `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` and `data-state`; the child's own `id` wins. Other props given to `Dropdown.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
+- With a `Dropdown.ItemDescription` the label names the item (`aria-labelledby`) and the description describes it (`aria-describedby`).
+- An `asChild` item merges its props onto the link; the link's children are the item content. A disabled link item gets `aria-disabled` and its click is stopped.
 - `Dropdown.Group` is `role="group"` named by its `label`.
 - `Dropdown.ItemIcon` is hidden from screen readers; a key hint is text only — the app handles the shortcut.
 - An outside press closes the menu without moving focus back to the trigger: focus follows the pointer (foundation §8).

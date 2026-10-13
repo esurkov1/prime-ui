@@ -1,12 +1,5 @@
-/* Chat: the page fills a viewport-high main; each pane is a card with a scrolling region. */
-
-.screen {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: min(calc(var(--prime-space-24) * 7), 100dvh);
-}
+/* Chat: the page fills the app panel (`AppShell.Root fillViewport` + `PageContent.Root fill`); each
+   pane is a card with a scrolling region. */
 
 .paneCard {
   display: flex;

@@ -64,12 +64,16 @@ export default function FormDrawerPattern() {
   const [open, setOpen] = React.useState(false);
   const [errors, setErrors] = React.useState<Errors>({});
   const [saving, setSaving] = React.useState(false);
+  const [dirty, setDirty] = React.useState(false);
   const [manager, setManager] = React.useState(MANAGERS[0]);
 
+  // Drawer.Guard holds every way out while saving and asks before an edited form is discarded.
   const changeOpen = (next: boolean) => {
-    if (saving) return;
     setOpen(next);
-    if (!next) setErrors({});
+    if (!next) {
+      setErrors({});
+      setDirty(false);
+    }
   };
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -96,6 +100,7 @@ export default function FormDrawerPattern() {
         ...list,
       ]);
       setSaving(false);
+      setDirty(false);
       setOpen(false);
       notify({ tone: "success", title: "Клиент добавлен", description: name });
     }, 900);
@@ -109,7 +114,7 @@ export default function FormDrawerPattern() {
           Компании и ИП, которым вы выставляете счета.
         </PageContent.Description>
         <PageContent.Actions>
-          <Drawer.Root open={open} onOpenChange={changeOpen} closeOnEscape={!saving}>
+          <Drawer.Root open={open} onOpenChange={changeOpen}>
             <Drawer.Trigger>
               <Button.Root>
                 <Button.Icon>
@@ -119,14 +124,21 @@ export default function FormDrawerPattern() {
               </Button.Root>
             </Drawer.Trigger>
             <Drawer.Content>
-              <Drawer.Header showClose={!saving}>
+              <Drawer.Header>
                 <Drawer.Title>Новый клиент</Drawer.Title>
                 <Drawer.Description>
                   Появится в списке и в выборе клиента при выставлении счёта.
                 </Drawer.Description>
               </Drawer.Header>
               <Drawer.Body>
-                <form id={formId} className={styles.form} noValidate onSubmit={submit}>
+                <Drawer.Guard busy={saving} dirty={dirty} />
+                <form
+                  id={formId}
+                  className={styles.form}
+                  noValidate
+                  onSubmit={submit}
+                  onChange={() => setDirty(true)}
+                >
                   <Fieldset label="Реквизиты" disabled={saving}>
                     <Radio.Group
                       name="kind"
@@ -176,7 +188,14 @@ export default function FormDrawerPattern() {
                         <Input.Field name="email" type="email" placeholder="billing@company.ru" />
                       </Input.Wrapper>
                     </Input.Root>
-                    <Select.Root label="Менеджер" value={manager} onValueChange={setManager}>
+                    <Select.Root
+                      label="Менеджер"
+                      value={manager}
+                      onValueChange={(next) => {
+                        setManager(next);
+                        setDirty(true);
+                      }}
+                    >
                       <Select.Trigger>
                         <Select.Value />
                       </Select.Trigger>
@@ -201,7 +220,7 @@ export default function FormDrawerPattern() {
               </Drawer.Body>
               <Drawer.Footer>
                 <Drawer.Close>
-                  <Button.Root variant="outline" tone="neutral" disabled={saving}>
+                  <Button.Root variant="outline" tone="neutral">
                     Отмена
                   </Button.Root>
                 </Drawer.Close>

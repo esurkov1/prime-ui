@@ -245,8 +245,8 @@ export const api: ComponentApi = {
         {
           name: "renderValue",
           type: "(item: { value: string; label: string }) => ReactNode",
-          en: "Single mode: draws the picked option in the trigger with the same parts as the row — a leading Avatar or Thumbnail, ItemText, ItemDescription, and a trailing Badge or ItemMeta at the end before the chevron; not called while empty.",
-          ru: "Одиночный выбор: рисует выбранный пункт в триггере теми же частями, что и строку, — Avatar или Thumbnail в начале, ItemText, ItemDescription и Badge или ItemMeta в конце перед шевроном; без значения не вызывается.",
+          en: "Single mode: draws the picked option in the trigger with the same parts as the row (Avatar, ItemText, Badge…); not called while empty.",
+          ru: "Одиночный выбор: рисует выбранный пункт в триггере теми же частями, что и строку (Avatar, ItemText, Badge…); без значения не вызывается.",
         },
         spanRest,
       ],
@@ -259,7 +259,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Content",
-      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel, mounted while open and during its exit animation (closed, the items render hidden in place so the trigger knows their labels), shown with the overlay motion. Holds the search row, the `role="listbox"`, the empty state and the load states (skeleton rows, the load error), which cross-fade. Below 640px of viewport the panel is a bottom sheet: a scrim, a grab handle, swipe down to close, page scroll locked.',
+      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel with the search row, the `role="listbox"`, the empty and load states. Closed, the items render hidden so the trigger knows their labels. Below 640px it is a bottom sheet.',
       ru: "Портал и панель списка; смонтирована и в закрытом виде, чтобы триггер знал подписи. Уже 640px экрана панель становится шторкой снизу: подложка, ручка, закрытие свайпом вниз, прокрутка страницы заблокирована.",
       props: [
         {
@@ -326,7 +326,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.ItemText · Select.ItemDescription · Select.ItemMeta",
-      en: "`ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line (searchable; makes the row two-line) / a trailing muted value before the check. An `Avatar.Root` or `Thumbnail.Root` child is the leading media (a Thumbnail makes the row two-line), sized to the tier unless it sets `size`; a `Badge.Root` child trails the text one tier down. + native `<span>` props.",
+      en: "`ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line / a trailing muted value. Leading media is an `Avatar.Root` or `Thumbnail.Root` child, a trailing status a `Badge.Root`.",
       ru: "Части богатого пункта: заголовок, вторая строка, значение справа; Avatar или Thumbnail слева по ярусу, Badge после текста.",
       props: [],
     },

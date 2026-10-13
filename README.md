@@ -194,7 +194,7 @@ accessibility, examples and common mistakes.
 
 | Component | What it is for |
 |---|---|
-| [**Input**](https://github.com/esurkov1/prime-ui/blob/main/src/components/input/COMPONENT.md) | Single-line text field with label, hint, error and slots for icons, affixes, a badge, a clear button and a counter. |
+| [**Input**](https://github.com/esurkov1/prime-ui/blob/main/src/components/input/COMPONENT.md) | Single-line text field with label, hint, error and slots for icons, affixes, clear / copy / reveal / action segments and a counter; a password strength meter (`strength`). |
 | [**Textarea**](https://github.com/esurkov1/prime-ui/blob/main/src/components/textarea/COMPONENT.md) | Multi-line text field with label, hint, error and a character counter; grows with its content from `rows` up to `maxRows`. |
 | [**DigitInput**](https://github.com/esurkov1/prime-ui/blob/main/src/components/digit-input/COMPONENT.md) | A row of square single-digit cells for a fixed-length code (OTP from SMS, PIN, pickup code). |
 | [**FileUpload**](https://github.com/esurkov1/prime-ui/blob/main/src/components/file-upload/COMPONENT.md) | Files and the image gallery in one component: a document field (rows), file cards, an image gallery with a cover or an attachment tray; uploads through a queue, reorder and server saves. |
@@ -206,7 +206,7 @@ accessibility, examples and common mistakes.
 
 | Component | What it is for |
 |---|---|
-| [**Checkbox**](https://github.com/esurkov1/prime-ui/blob/main/src/components/checkbox/COMPONENT.md) | A checkbox for an independent yes/no choice that submits with a form: checked, indeterminate, groups. |
+| [**Checkbox**](https://github.com/esurkov1/prime-ui/blob/main/src/components/checkbox/COMPONENT.md) | A checkbox for an independent yes/no choice that submits with a form: checked, indeterminate, with a hint or an error. |
 | [**Radio**](https://github.com/esurkov1/prime-ui/blob/main/src/components/radio/COMPONENT.md) | Radio buttons for choosing exactly one option out of a small visible set. |
 | [**Switch**](https://github.com/esurkov1/prime-ui/blob/main/src/components/switch/COMPONENT.md) | An on/off switch for a setting that takes effect immediately. |
 | [**SegmentedControl**](https://github.com/esurkov1/prime-ui/blob/main/src/components/segmented-control/COMPONENT.md) | A switch between 2–5 mutually exclusive options or modes that takes effect immediately. |
@@ -245,7 +245,7 @@ accessibility, examples and common mistakes.
 |---|---|
 | [**Chat**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chat/COMPONENT.md) | A conversation assembled: the header with the status that turns into typing, search through the messages, pinned messages, the virtualized message list from data (dates, runs, unread, selection, jumps, read receipts, history paging, group-chat author headers) and the Composer in its footer. |
 | [**Message**](https://github.com/esurkov1/prime-ui/blob/main/src/components/message/COMPONENT.md) | One chat message in its shell: bubble, picture or circle, time and delivery ticks, the author's header with a tag, replies, forwards, reactions with the reaction bar, a context menu, and every content kind — text, albums, round videos, voice, files, locations, contacts, link previews; the typing bubble. |
-| [**Gallery**](https://github.com/esurkov1/prime-ui/blob/main/src/components/gallery/COMPONENT.md) | Photos and videos as a messenger album: up to ten laid out from their aspect ratios with nothing measured, video tiles, the transfer of each tile, tiles that open your viewer. |
+| [**Gallery**](https://github.com/esurkov1/prime-ui/blob/main/src/components/gallery/COMPONENT.md) | Photos and videos as a messenger album: up to ten laid out from their aspect ratios with nothing measured, video tiles, the transfer of each tile, tiles that open the album in MediaViewer. |
 | [**VoicePlayer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/voice-player/COMPONENT.md) | A voice message player: a round play disk, a waveform that is the seek slider, and the time with the playback speed; one sound at a time, `getWaveform` for audio without levels. |
 | [**VideoNote**](https://github.com/esurkov1/prime-ui/blob/main/src/components/video-note/COMPONENT.md) | A round video message: a still first frame with the play disk, played with sound on a press; the same player API as VoicePlayer — transcript, transfer either way, one sound at a time. |
 | [**Composer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/composer/COMPONENT.md) | The message input of a chat: a growing field, Enter to send, attachments, reply / edit bar, Markdown formatting, voice and video messages with pause, the typing signal. |

@@ -38,11 +38,11 @@ Gantt                          surface (layer of the ladder), size container
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Gantt
-`ref` → `HTMLDivElement` (the surface). A schedule: a toolbar with the zoom and «Сегодня», then a `role="grid"` of rows — a sticky row header and a track of bars on a two-tier time axis with weekends and a today line. `aria-label` / `aria-labelledby` name the grid; the other attributes go to the surface.
+`ref` → `HTMLDivElement` (the surface). A schedule: a toolbar with the zoom and «Сегодня», then a `role="grid"` of rows with bars on a time axis. `aria-label` / `aria-labelledby` name the grid; the other attributes go to the surface.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `rows` | `Row[]` | — (required) | Rows: people, rooms, vehicles, tasks. Virtualized: only the rows in view (plus an overscan) are rendered, at offsets from their lane count and measured height, so thousands of rows stay fast. |
+| `rows` | `Row[]` | — (required) | Rows: people, rooms, vehicles, tasks. Virtualized, so thousands of rows stay fast. |
 | `getRowKey` | `(row: Row) => Key` | — (required) | Stable row id. |
 | `getRowLabel` | `(row: Row) => string` | — (required) | Row name: the first column text by default and the row header for assistive tech. |
 | `getRowBars` | `(row: Row) => Bar[]` | — (required) | Bars of a row (`GanttBar`); bars that overlap in time stack into lanes and grow the row. |
@@ -61,13 +61,13 @@ Gantt                          surface (layer of the ladder), size container
 | `toolbar` | `ReactNode` | — | Content at the start of the toolbar (title, filters, a primary action); the zoom and «Сегодня» sit at its end. |
 | `scrollHeight` | `number \| "fill"` | — | Max height of the viewport in px, so the header sticks while rows scroll; `"fill"` — the chart takes its flex / grid parent's height. |
 | `onSelect` | `(bar: Bar, row: Row) => void` | — | A bar was activated (click, Enter, Space): open its record. A drag never selects. |
-| `onBarChange` | `(dates: GanttDates, bar: Bar, row: Row) => void \| Promise<void>` | — | New dates of a bar after a drag or an editing key, in whole days at every zoom (whole weeks / months with Alt) — update your data with them. A drag follows the pointer exactly and snaps to days with a little hysteresis; a resize stops at one day and never flips. A returned Promise keeps the bar at the new dates and busy (spinner, `aria-busy`) until it settles; on reject it glides back and `labels.changeFailed` is announced. Without it bars cannot be edited. |
-| `onBarCreate` | `(dates: GanttDates, row: Row) => void \| Promise<void>` | — | A new bar in a row: drawn across empty space in whole days (whole units of the zoom with Alt; a ghost with a dates and duration tooltip follows the pointer, Escape cancels), one unit of the zoom on a double-click or a touch long-press (a drag after the long press draws days), or `N` on a row header (at today) or a bar (right after it). Add it to your data. A returned Promise keeps a busy ghost in place until it settles: resolve — the bar you added stands where the ghost stood; reject — the ghost fades out and `labels.createFailed` is announced. Without it (and with `readOnly`) nothing can be created and empty space shows no create cursor. |
+| `onBarChange` | `(dates: GanttDates, bar: Bar, row: Row) => void \| Promise<void>` | — | New dates of a bar after a drag or an editing key — update your data. A returned Promise keeps the bar busy at the new dates; a rejection glides it back. Without it bars cannot be edited. |
+| `onBarCreate` | `(dates: GanttDates, row: Row) => void \| Promise<void>` | — | A new bar in a row: drawn across empty space, a double-click, a touch long-press or `N`. Add it to your data; a returned Promise keeps a busy ghost in place. Without it nothing can be created. |
 | `labels` | `Partial<GanttLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "onSelect">` | — | `aria-label` (the grid's name), `className` and the other div attributes. |
 
 ### GanttBar
-One bar of `getRowBars`: data, not a part. Dates are calendar days; `end` is exclusive (a one-day task on 3 July ends on 4 July), so `start` equal to `end` is a milestone — a diamond on that day with the label beside it. Extend the type for your own fields: callbacks get your object back.
+One bar of `getRowBars`: data, not a part. Dates are calendar days with an exclusive `end`; `start` equal to `end` is a milestone. Extend the type with your own fields: callbacks get your object back.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -86,7 +86,7 @@ One bar of `getRowBars`: data, not a part. Dates are calendar days; `end` is exc
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `day` | a column per day (40 px at `m`), months over day numbers, weekends shaded, today's number in accent | shifts, bookings, a sprint | |
-| `week` | a day is 16 px, months over week ranges («6–12»), weekends shaded | a quarter of projects, team occupancy | yes |
+| `week` | a day is 16 px at `m`, months over week ranges («6–12»), weekends shaded | a quarter of projects, team occupancy | yes |
 | `month` | a day is 4 px, years over month names, no weekend wash | a yearly roadmap | |
 
 ### size
@@ -125,11 +125,11 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 | tier | `size` | `data-size` on the root |
 | bar color | `color` / `tone` | `data-color` (without a tone) or `data-tone` on the bar |
 | milestone | `start` equal to `end` | `data-milestone`: a diamond on its day, the label beside it |
-| label beside | the label does not fit the bar (measured) | `data-label="outside"` |
+| label beside | the label does not fit the bar (measured) | `data-label="inside" \| "outside" \| "hidden"` (beside the bar when there is room, else hidden; the name and the tooltip keep it) |
 | progress | `progress` | `data-progress`, `--progress` |
 | editable | `onBarChange`, not `readOnly` | `data-editable`, grips at both ends, `aria-keyshortcuts`, `aria-describedby` → `labels.editHint` |
 | dragging | a pointer drag | `data-dragging="move \| start \| end"`: the bar lifts and follows the pointer exactly; the dates snap to whole days (with Alt to the zoom's unit) with hysteresis, a faint accent guide marks the snapped edge at the week and month zoom, the tooltip shows the dates and the duration («5 – 18 октября · 14 дн.»); on release the bar glides to the snapped days |
-| creating | drawing on empty space, `onBarCreate` pending or refused | a ghost bar in its future lane: accent outline with a dates tooltip while drawn (`data-state="drawing"`), a pulsing Skeleton while pending, fading out on reject (`leaving`) |
+| creating | drawing on empty space, `onBarCreate` pending or refused | a ghost bar in its future lane: accent outline with a dates tooltip while drawn (`data-state="drawing"`), a pulsing Skeleton while pending; on resolve the bar you added stands where the ghost stood, on reject the ghost fades out (`leaving`) |
 | pending | `onBarChange` returned a Promise | `data-pending`, `aria-busy`, a Spinner; reject → the bar glides back |
 | loading | `loading` without rows | Skeleton rows with one or two bars each in a real bar's height, radius and lane, under the column and today lines; `aria-busy`, status `labels.loading`; data cross-fades in |
 | empty | `rows` empty | a compact `EmptyPage` (`empty` or `labels.empty`), cross-faded in |
@@ -142,7 +142,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 - The header (two tiers) and the first column stick inside the chart's own scroller; pass `scrollHeight` (or `"fill"` in a sized parent) so the header sticks while rows scroll. Below 480 px of screen height the header scrolls with the rows.
 - Virtualization: rows render only in view (plus an overscan) at offsets computed from their lanes and corrected by measuring, so the total height and the scrollbar stay exact; header cells, period lines and bars render only inside the visible time window plus a screen on each side; weekends and day / week column lines are CSS patterns, not elements. A focused, dragged, pending or new bar stays rendered wherever the chart scrolls.
 - Editing precision: a move, a resize and a drawing snap to whole days at every zoom (at the month zoom a day is 4 px, so the snap holds a day until the pointer clearly leaves it); hold Alt to snap to the zoom's week or month. A bar is at least one day long: a resize past the opposite edge stops there and never flips. On touch a long press picks a bar up, then it drags like a pointer.
-- Creating: on empty space the cursor is a crosshair and, on pointer devices, the cell under it is washed with a «+». Drag across a row to draw a range in days, double-click (or long-press on touch) for one unit of the zoom; a drag after the long press draws days. Near the edges of the axis a drag, a resize and a drawing scroll the chart.
+- Creating: on empty space the cursor is a crosshair and, on pointer devices, the cell under it is washed with a «+». Drag across a row to draw a range in days, double-click (or long-press on touch) for one unit of the zoom; a drag after the long press draws days. While drawing, a ghost with a dates and duration tooltip follows the pointer. Without `onBarCreate` (or with `readOnly`) nothing can be created and empty space shows no create cursor. Near the edges of the axis a drag, a resize and a drawing scroll the chart.
 - The default axis covers every bar and today with a unit of room on both sides; pass `range` for a fixed period.
 - The chart opens with today a third into the view; «Сегодня» and the arrow keys scroll only the chart's scroller, never the page.
 - A row grows by a lane for every overlapping bar: lanes are packed greedily by start date.
@@ -215,7 +215,7 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 - An inclusive `end` (`{ start: 3 July, end: 3 July }` for a one-day task) → that is a milestone; `end` is the day after the last one.
 - Status only by bar color → put it into the label too («Отпуск», «Просрочено»).
 - Dates with times expecting hour precision → the chart works in calendar days.
-- A `<div onClick>` inside `renderRow` to open a bar's record → use `onSelect`; the row header is not interactive.
+- A `<div onClick>` inside `renderRow` to open a bar's record → use `onSelect`; the row header takes focus but not a press.
 - Wrapping the chart in a Card → it is a surface itself; place it directly in the page or a Card body only as the card's one content.
 - Expecting the page to scroll to today → «Сегодня» scrolls only the chart.
 

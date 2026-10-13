@@ -87,14 +87,14 @@ One entry of `fields`: data, not a part. Selected values missing from `options` 
 |---|---|---|---|
 | `key` | `string` | — (required) | Key of the field in the value. |
 | `label` | `string` | — (required) | Field name in the panel and the chips. |
-| `kind` | `"options" \| "range" \| "date-range"` | `"options"` | `options` — values to show or hide; `range` — a number range in two Inputs («от» – «до»); `date-range` — a period in the kit Datepicker (`mode="range"`). A range is one filter and one chip: «Сумма: 1 000–5 000», «Период: 1–15 мар». |
+| `kind` | `"options" \| "range" \| "date-range"` | `"options"` | `options` — values to show or hide; `range` — a number range in two Inputs; `date-range` — a period in the kit Datepicker. A range is one filter and one chip. |
 | `options` | `{ value: string; label: string; icon?: ReactNode; group?: string }[]` | — (required) | `options` fields: values; `icon` is a decorative kit Icon before the label; values with one `group` stay together under that heading, groups in the order they first appear. |
 | `finite` | `boolean` | `true` | `options` fields: a fixed set — hiding every value is refused. `false` for an open set (services, users). |
 | `multiple` | `boolean` | `true` | `options` fields: many values at once. `false` — one value and no hiding: a press picks only that value, a second press clears it (an API that takes one value per field). |
 | `formatValue` | `(value: number) => string` | `Russian digit groups` | `range` fields: a bound in the chip («1 000 ₽»). |
 
 ### matchesSmartFilter · resolveSmartFilterValues · isSmartFilterRange
-Helpers. `matchesSmartFilter(entry, item)` checks one item's value on the client: a selection (`include` empty = any, `exclude` rejects) or a range (both bounds inclusive, dates by whole days); an item with no value passes only an empty filter. `resolveSmartFilterValues(entry, all)` turns a fixed field into the list to ask a server for: «hide» becomes «all except», `[]` — no filter. `isSmartFilterRange(entry)` tells a range from a selection.
+Helpers. `matchesSmartFilter(entry, item)` checks one item's value on the client. `resolveSmartFilterValues(entry, all)` turns a fixed field into the list of values to ask a server for. `isSmartFilterRange(entry)` tells a range from a selection.
 
 ## Variants
 
@@ -145,7 +145,7 @@ same height and type.
 | value hidden | «−», Alt+click, Shift+Enter | red Badge with «НЕ», `data-mode="exclude"`; its «−» stays visible and unhides |
 | cannot hide | last value of a `finite` field | the «−» is disabled |
 | searching | `search` | only matching values, the match in `accent-text` (a `<mark>`); fields with nothing found in a compact EmptyPage; the «Искать» row closes the panel |
-| range set | a bound typed or a period picked | `{ from, to }` in the value; counts as one filter, one blue chip; removing the chip clears both bounds and the inputs |
+| range set | a bound typed (`range`: two Inputs «от» – «до») or a period picked (`date-range`: Datepicker `mode="range"`) | `{ from, to }` in the value; counts as one filter, one blue chip («Сумма: 1 000–5 000», «Период: 1–15 мар»); removing the chip clears both bounds and the inputs |
 | range inverted | `from` above `to` | both bound inputs `aria-invalid` with the danger ring; nothing matches |
 | single value | `multiple: false` | at most one value `aria-pressed`; no «−» |
 | no filters | empty value | no count on the button, no Chips |
@@ -222,8 +222,8 @@ same height and type.
 ## Mistakes
 - Creating `fields` inline on every render → pass a stable array (a module constant or `useMemo`).
 - A fixed field marked `finite: false` → the user can hide every value and get an empty list.
-- Filtering the list with `includes` → use `matchesSmartFilter` (empty `include` is "any", `exclude` rejects).
-- Sending `include` to a server for a hidden value of a fixed field → use `resolveSmartFilterValues`.
+- Filtering the list with `includes` → use `matchesSmartFilter` (empty `include` is "any", `exclude` rejects; range bounds are inclusive, dates by whole days; an item with no value passes only an empty filter).
+- Sending `include` to a server for a hidden value of a fixed field → use `resolveSmartFilterValues` («hide» becomes «all except», `[]` means no filter).
 - Putting `Chips` outside `SmartFilter.Root` → every part needs the root.
 - A second row of filter buttons next to the toolbar → fields belong in `fields`.
 - An amount or a period in its own Popover beside the toolbar → a `range` / `date-range` field; it gets a chip and the count.

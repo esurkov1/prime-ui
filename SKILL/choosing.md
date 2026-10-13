@@ -109,7 +109,7 @@ build your own. A photo, a scan or a video opened full screen from its thumbnail
 Thumbnail button) → MediaViewer, never a Modal with an `<img>`.
 
 **Phone navigation.** App navigation is Sidebar on a wide screen and `BottomNav` in `AppShell.Footer`
-on a phone for 3–5 main sections (the shell hides it by itself while the Sidebar rail is on screen;
+on a phone for 2–6 main sections (the shell hides it by itself while the Sidebar rail is on screen;
 only inside `AppShell.Footer`, never your own media query) — not Tabs, not a
 Drawer menu.
 
@@ -143,6 +143,9 @@ collapsible`; a section with sub-pages → `Sidebar.Sub`; the signed-in user →
 | ProgressBar / ProgressCircle / Spinner | ProgressBar: a share with width to spare and words beside it (an upload row, an import, a quota line). ProgressCircle: a share on the data scale (24–80) where width is short or a ring reads better (a KPI goal, a ring breakdown, a named import card); `value={null}` while the share is unknown, `spin` while a share grows, an icon in the centre. Spinner: an anonymous «busy» on the icon scale inside a control or a status line, no share, no name of its own. A ring you can press (cancel, retry, download a transfer) → Button `shape="circle"` with `progress`, not any of the three. |
 | Button / LinkButton | Button does something (submit, open, delete). LinkButton goes somewhere (a URL, «Подробнее», «Все заказы»). |
 | Checkbox / Switch / Radio | Checkbox: choice submitted later with a button, can be multiple. Switch: on/off that applies at once (no Save button). Radio: one of several, submitted later. A privacy toggle inside a create form that is submitted → Checkbox. |
+| Gallery / MediaViewer / Thumbnail | Thumbnail: one picture or video of an object in a list, card or picker (selectable with `checked`). Gallery: an album of 1–10 photos and videos laid out by their ratios; it opens MediaViewer itself. MediaViewer: the full-screen viewer on its own, opened from your own thumbnails or a button (`getOrigin` for the zoom out of the tile). A grid of many images to browse → a CSS grid of Thumbnails, not a Gallery. |
+| Sparkline / ChartFrame | Sparkline: one series as a headline number with its change and a small line or bars you can scrub (`variant="bars"` for signed values). ChartFrame: a panel around a real chart (axes, several series, legend, tooltip, states) drawn by a library or your SVG. Rows to compare → DataTable. |
+| VoicePlayer / VideoNote | The same player props (`src`, `duration`, `playing`, transcript, `transfer`). VoicePlayer: audio, a waveform seek slider and a playback rate. VideoNote: a round face-to-camera video with a `poster`; alone in `Message.Root` it is the message. A video with controls → `Thumbnail.Video` / `Message.Media`. |
 | Card / plain section | Card for a bounded block of related content that stands out (metric, settings panel, side facts). A page section that is the only thing in its region needs no card: a `title-m` heading and the content. Never wrap a single field, a DataTable or a whole page in a Card. |
 | EmptyPage / empty DataTable | Empty table (no rows yet or nothing matches the filter): the DataTable `empty` prop — headers and toolbar stay. Whole page or region with no data at all (first run): EmptyPage with one action. |
 | Accordion / Tabs | Accordion when the user may need several sections open or reads them in order (FAQ, settings groups). Tabs when sections are alternatives viewed one at a time. |

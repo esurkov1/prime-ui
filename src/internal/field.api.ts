@@ -91,8 +91,8 @@ export function fieldCommitProp(keys: { en: string; ru: string }): ApiProp {
   return {
     name: "onCommit",
     type: "(value: string) => void | Promise<void>",
-    en: `Inline save: fires with the value on blur and ${keys.en} when it differs from the last committed one (the value at focus); Escape reverts to it. A returned Promise shows a spinner at the field's edge (\`aria-busy\` on the control) while the field stays editable and Tab moves on; a rejection puts the committed value back unless the person typed on — show why through \`error\`. Success shows a brief check (\`labels.saved\`).`,
-    ru: `Сохранение на месте: вызывается со значением при уходе фокуса и ${keys.ru}, если оно отличается от сохранённого (значения при фокусе); Escape возвращает сохранённое. Пока Promise не завершён, у края поля крутится Spinner (\`aria-busy\`), поле остаётся редактируемым, Tab уходит дальше; отказ возвращает сохранённое значение, если человек не продолжил ввод, — причину покажите через \`error\`. Успех — короткая галочка (\`labels.saved\`).`,
+    en: `Inline save: fires with a changed value on blur and ${keys.en}; Escape reverts. Return a Promise: the field shows a spinner and stays editable; a rejection restores the value — show why through \`error\`.`,
+    ru: `Сохранение на месте: вызывается с изменённым значением при уходе фокуса и ${keys.ru}; Escape отменяет. Верните Promise: поле со спиннером остаётся редактируемым; отказ вернёт значение — причину покажите через \`error\`.`,
   };
 }
 

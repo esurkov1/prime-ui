@@ -17,8 +17,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "Content in the center (number, percent, `Icon`). Not rendered on `xs`; text only from `m`, an icon from `s`. A new icon (another `name`) cross-fades in and plays its gesture once (`fast`); a changing number updates in place. A string or number stays available as `aria-valuetext`.",
-          ru: "Содержимое в центре (число, процент, `Icon`). Не рендерится на `xs`; текст — от `m`, иконка — от `s`. Новая иконка (другой `name`) перетекает на место старой и один раз играет свой жест (`fast`); меняющееся число обновляется на месте. Строка или число остаются в `aria-valuetext`.",
+          en: "Content in the center (number, percent, `Icon`): text from `m`, an icon from `s`, nothing on `xs`. A string or number also becomes `aria-valuetext`.",
+          ru: "Содержимое в центре (число, процент, `Icon`): текст — от `m`, иконка — от `s`, на `xs` ничего. Строка или число становятся и `aria-valuetext`.",
         },
         {
           name: "aria-label",

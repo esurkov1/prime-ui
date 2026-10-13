@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Thumbnail.Root",
-      en: "`ref` → `HTMLDivElement`. The frame: height of the tier, width from `ratio`, radius, palette fill; tracks the image load for the Fallback.",
+      en: "`ref` → `HTMLDivElement` (the `<button>` of a selectable tile, the child with `asChild`). The frame: height of the tier, width from `ratio`, radius, palette fill; tracks the image load for the Fallback.",
       ru: "Рамка: высота яруса, ширина по `ratio`, скругление и заливка палитры; следит за загрузкой картинки для Fallback.",
       props: [
         {
@@ -53,14 +53,14 @@ export const api: ComponentApi = {
           name: "asChild",
           type: "boolean",
           default: "false",
-          en: "Puts the frame on its one child — a `<button>` that opens a viewer, an `<a>` to the object — which holds the parts: the frame's look plus a hover lift (`--prime-shadow-overlay`), a press (scale 0.98) and the focus ring; `data-interactive`. Name the child (`aria-label`) when the picture is all it shows.",
-          ru: "Ставит рамку на единственного потомка — `<button>`, открывающую просмотр, или `<a>` на объект, — внутри которого части: вид рамки, подъём тенью при наведении, нажатие (0.98) и кольцо фокуса; `data-interactive`. Назовите потомка (`aria-label`), если на нём только картинка.",
+          en: "Puts the frame, with hover, press and focus ring, on its one child — a `<button>` that opens a viewer or an `<a>` to the object. Name the child (`aria-label`) when the picture is all it shows.",
+          ru: "Ставит рамку с наведением, нажатием и кольцом фокуса на единственного потомка — `<button>`, открывающую просмотр, или `<a>` на объект. Назовите потомка (`aria-label`), если на нём только картинка.",
         },
         {
           name: "checked",
           type: "boolean",
-          en: 'Selected (controlled). Any of the checked triad makes a selectable tile: a `<button role="checkbox">` with `aria-checked`, a `Checkbox.Indicator` in the start corner (always shown) and an accent ring when selected (`data-checked`). Name it with `aria-label` or the image `alt`.',
-          ru: 'Выбрано (управляемое). Любой из тройки делает плитку выбираемой: `<button role="checkbox">` с `aria-checked`, `Checkbox.Indicator` в начальном углу (виден всегда) и акцентное кольцо при выборе (`data-checked`). Имя — `aria-label` или `alt` картинки.',
+          en: 'Selected (controlled). Any of the checked triad makes a selectable tile — a `<button role="checkbox">` with a check in the corner. Name it with `aria-label` or the image `alt`.',
+          ru: 'Выбрано (управляемое). Любой из тройки делает плитку выбираемой — `<button role="checkbox">` с галочкой в углу. Имя — `aria-label` или `alt` картинки.',
         },
         {
           name: "defaultChecked",
@@ -118,8 +118,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Thumbnail.Video",
-      en: '`ref` → `HTMLVideoElement`. A video in the frame, `preload="metadata"`, `playsInline`; reports its first frame like an image, so the Fallback shows until then (`data-status`). Without `controls` and autoplay it shows a play mark (from `m`) — the media disk of the play and transfer disks over media, 40 with a 20 glyph, at 60% of a lower frame — and the duration on the `media` shade (from `l` and `fullWidth`).',
-      ru: 'Видео в рамке, `preload="metadata"`, `playsInline`; о первом кадре сообщает как картинка — до него видна подложка (`data-status`). Без `controls` и автовоспроизведения показывает знак воспроизведения (от `m`) — тот же диск медиа, что у дисков воспроизведения и передачи, 40 со значком 20, в низкой рамке 60 % её высоты — и длительность на тени `media` (от `l` и при `fullWidth`).',
+      en: '`ref` → `HTMLVideoElement`. A video in the frame (`preload="metadata"`, `playsInline`); the Fallback shows until its first frame. Without `controls` it shows the duration, and a play mark while it is still (not looping, not playing).',
+      ru: 'Видео в рамке (`preload="metadata"`, `playsInline`); до первого кадра видна подложка. Без `controls` показывает длительность, а пока стоит (не по кругу и не играет) — знак воспроизведения.',
       props: [
         {
           name: "src",
@@ -146,7 +146,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "A GIF-like clip: plays muted, in a loop, inline. Off under `prefers-reduced-motion` (read once): the first frame stands still with the play mark.",
-          ru: "Ролик как GIF: без звука, по кругу, на месте. При `prefers-reduced-motion` выключено: стоит первый кадр со знаком воспроизведения.",
+          ru: "Ролик как GIF: без звука, по кругу, на месте. При `prefers-reduced-motion` (читается один раз) выключено: стоит первый кадр со знаком воспроизведения.",
         },
         {
           name: "fit",

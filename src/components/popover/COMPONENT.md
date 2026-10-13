@@ -54,19 +54,19 @@ No DOM, no ref. Open state and dismiss policy.
 | `children` | `ReactNode` | — (required) | Trigger (or Anchor) and Content. |
 
 ### Popover.Trigger · Popover.Anchor · Popover.Close
-No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and adds `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls`, `data-state` (the child's own `id` wins); Anchor only positions the panel and keeps presses on it from dismissing (open state comes from `open`; focus stays in the anchor on open); Close closes the panel (focus back on the trigger) unless the child's handler calls `preventDefault()`. Other props given to Trigger (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
+No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and sets its ARIA; Anchor only positions the panel (open state comes from `open`); Close closes the panel.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactElement` | — (required) | One element, usually a Button (Anchor: any element, e.g. a toolbar). |
 
 ### Popover.Content
-`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger. Opened from a Trigger, focus moves into the panel (`[data-autofocus]`, else the first tab stop, else the panel). Below 640px of viewport a panel opened from a Trigger (not an Anchor) is a bottom sheet: a scrim, a grab handle, swipe down to close (with `closeOnOutsideClick`), page scroll locked.
+`ref` → `HTMLDivElement`. Portal + `role="dialog"` floating panel that scrolls inside, named by `Popover.Title`. Below 640px of viewport, opened from a Trigger, it is a bottom sheet.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side; flips to the opposite side when there is no room. |
-| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge). |
+| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix the edge. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the text, padding and gap; also the size context of the controls inside. |
 | `matchTriggerWidth` | `boolean` | `false` | The panel is exactly as wide as the trigger and its text wraps. |
 | `trapFocus` | `boolean` | `false` | Tab cycles inside the panel (forms). Without it Tab past the last (Shift+Tab before the first) stop closes the panel and returns focus to the trigger. |
@@ -146,7 +146,9 @@ Motion (`overlayMotion`): the panel grows out of the side that faces its trigger
 
 ### ARIA
 - The panel is `role="dialog"` without `aria-modal`, named by `Popover.Title` (else by the trigger) and described by `Popover.Description`.
-- The trigger gets `aria-haspopup="dialog"`, `aria-expanded` and `aria-controls`.
+- The trigger gets `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` and `data-state`; the child's own `id` wins. Other props given to `Popover.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
+- Opened from a Trigger, focus moves into the panel: `[data-autofocus]`, else the first tab stop, else the panel. Opened at a `Popover.Anchor`, focus stays in the anchor (`initialFocus` moves it in), and presses on the anchor do not dismiss the panel.
+- `Popover.Close` closes the panel and returns focus to the trigger, unless the child's own `onClick` calls `preventDefault()`.
 - An outside press closes the panel without moving focus back to the trigger: focus follows the pointer (foundation §8).
 - Only the topmost layer reacts: a Select open inside the panel closes first.
 

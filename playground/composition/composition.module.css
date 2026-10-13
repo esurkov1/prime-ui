@@ -19,6 +19,13 @@
   color: var(--prime-color-text-primary);
 }
 
+/* A page that fills the panel's height: a viewport-high column for `PageContent.Root fill`. */
+.screen[data-fill] {
+  display: flex;
+  flex-direction: column;
+  height: min(calc(var(--prime-space-24) * 7), 100dvh);
+}
+
 @container (max-width: 1023px) {
   .screen {
     padding: var(--prime-space-6) var(--prime-layout-gutter-m) var(--prime-space-10);

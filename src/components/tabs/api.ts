@@ -11,8 +11,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Tabs.Root",
-      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel one gap apart. It has no surface: no fill, no padding, no radius. It stands in the host's padding (a Card, the page) — never wrap it in a padded box of its own. In a Modal or Drawer it wraps `X.Header` and `X.Body`: `Tabs.List` goes last into the header, which becomes the strip, and the panels into the body; the root then renders no box (`display: contents`), so the dialog keeps its layout.",
-      ru: "Хранит активную вкладку, размер и направление; раскладывает список и панель с одним зазором между ними. Своей поверхности нет: ни фона, ни отступов, ни скругления. Стоит в отступах хоста (Card, страница) — не оборачивайте его в отдельный блок с отступами. В Modal и Drawer оборачивает `X.Header` и `X.Body`: `Tabs.List` ставится последним в шапку, и шапка становится полосой вкладок, а панели — в тело; корень тогда не рисует блока (`display: contents`), и раскладка диалога не меняется.",
+      en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation; no surface of its own — it stands in the host's padding. In a Modal or Drawer it wraps `X.Header` (with `Tabs.List` last) and `X.Body`.",
+      ru: "Хранит активную вкладку, размер и направление; своей поверхности нет — стоит в отступах хоста. В Modal и Drawer оборачивает `X.Header` (с `Tabs.List` последним) и `X.Body`.",
       props: [
         {
           name: "value",
@@ -37,22 +37,22 @@ export const api: ComponentApi = {
           name: "orientation",
           type: '"horizontal" | "vertical"',
           default: '"horizontal"',
-          en: "List direction and arrow keys. Vertical: a column of sections at the panel's inline start, the active one the host's surface reaching into the column; when the container is narrower than 600px the column becomes the horizontal strip above the panel.",
-          ru: "Направление списка и стрелок. Вертикальный: колонка разделов слева от панели, активный раздел — поверхность хоста, вдающаяся в колонку; в контейнере уже 600px колонка становится горизонтальной полосой над панелью.",
+          en: "List direction and arrow keys. Vertical: a column of sections beside the panel, which becomes a horizontal strip in a container below 600px.",
+          ru: "Направление списка и стрелок. Вертикальный: колонка разделов рядом с панелью; в контейнере уже 600px она становится горизонтальной полосой.",
         },
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel. A tab is at least the control height and grows with its content (a two-line tab is taller); tabs in a row share the tallest height.",
-          ru: "Ярус контрола: кегль, иконка, отступы, скругление папки и зазор между полосой и панелью. Вкладка не ниже высоты контрола и растёт по содержимому (двухстрочная выше); вкладки в ряду выравниваются по самой высокой.",
+          en: "Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel; a tab is at least the control height.",
+          ru: "Ярус контрола: кегль, иконка, отступы, скругление папки и зазор между полосой и панелью; вкладка не ниже высоты контрола.",
         },
         {
           name: "fullWidth",
           type: "boolean",
           default: "true",
-          en: "Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`, never narrower than their content: a long label keeps its width, short ones share the rest; when they do not fit, the list collapses, then scrolls. `false` sizes each tab to its content within the same bounds.",
-          ru: "Горизонтальные вкладки заполняют список и стремятся к равной ширине в пределах `minItemWidth` … `maxItemWidth`, но не уже своего содержимого: длинная подпись сохраняет ширину, короткие делят остаток; если не помещаются, список сворачивается, затем прокручивается. `false` — каждая по своему содержимому в тех же пределах.",
+          en: "Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`; `false` sizes each tab to its content within the same bounds.",
+          ru: "Горизонтальные вкладки заполняют список и стремятся к равной ширине в пределах `minItemWidth` … `maxItemWidth`; `false` — каждая по своему содержимому в тех же пределах.",
         },
         {
           name: "tone",
@@ -65,8 +65,8 @@ export const api: ComponentApi = {
           name: "minItemWidth",
           type: "number | string",
           default: "2.5 × control height",
-          en: "Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`). When tabs do not fit, the list collapses, then scrolls. Icon-only tabs are square.",
-          ru: "Наименьшая ширина горизонтальной вкладки с подписью, px или CSS-длина; вкладка к тому же не уже своего содержимого (до `maxItemWidth`). Если вкладки не помещаются, список сворачивается, затем прокручивается. Вкладки-иконки квадратные.",
+          en: "Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`).",
+          ru: "Наименьшая ширина горизонтальной вкладки с подписью, px или CSS-длина; вкладка к тому же не уже своего содержимого (до `maxItemWidth`).",
         },
         {
           name: "maxItemWidth",
@@ -97,8 +97,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Tabs.List",
-      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (in both orientations), which glides only into a choice by click or keys and is placed without motion on mount, resize and collapse. When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); then the list scrolls; a label is never cut to make room. The active tab is kept in view and clear of the edge fades (the first and the last tab scroll all the way to the end); only the list scrolls, never the page.',
-      ru: '`role="tablist"` на `ScrollContainer` со скользящей папкой (в обоих направлениях): она скользит только к вкладке, выбранной кликом или клавишами, а при монтировании, изменении размера и сворачивании встаёт без анимации. Если вкладки не помещаются или подпись пришлось бы обрезать, скрывает иконки и описания, затем подписи (остаются иконки с подсказками; только если иконка есть у каждой вкладки); затем список прокручивается; подпись ради места не обрезается. Активная вкладка остаётся в поле зрения и не уходит под тень края (к первой и последней список прокручивается до упора); прокручивается только список, не страница.',
+      en: '`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` with the sliding folder. When tabs do not fit it hides icons and descriptions, then labels (only when every tab has an icon), then scrolls; the active tab stays in view.',
+      ru: '`role="tablist"` на `ScrollContainer` со скользящей папкой. Если вкладки не помещаются, скрывает иконки и описания, затем подписи (только если иконка есть у каждой вкладки), затем прокручивается; активная вкладка остаётся на виду.',
       props: [
         {
           name: "children",
@@ -136,8 +136,8 @@ export const api: ComponentApi = {
         {
           name: "onRemove",
           type: "() => void | Promise<void>",
-          en: "Makes the tab closable: a close button (shown on the active tab, on hover and focus, always on touch screens), `Delete` / `Backspace` and a middle click. Closing the active tab selects its neighbour; remove the item from your list here. Return a promise to confirm first (unsaved changes): while pending the close button shows loading and the tab stays; resolved — the neighbour takes the selection and focus; rejected — nothing changes.",
-          ru: "Делает вкладку закрываемой: кнопка закрытия (видна на активной вкладке, при наведении и фокусе, на сенсорных экранах всегда), `Delete` / `Backspace` и средний клик. Закрытие активной вкладки выбирает соседнюю; уберите вкладку из своего списка в этом обработчике. Верните промис, чтобы сначала спросить (несохранённые правки): пока он не завершён, кнопка закрытия в загрузке и вкладка остаётся; выполнен — выбор и фокус переходят к соседней; отклонён — ничего не меняется.",
+          en: "Makes the tab closable (close button, `Delete` / `Backspace`, middle click); remove the item from your list here. Return a promise to confirm first: rejected, the tab stays.",
+          ru: "Делает вкладку закрываемой (кнопка закрытия, `Delete` / `Backspace`, средний клик); уберите вкладку из своего списка здесь. Верните промис, чтобы сначала спросить: отклонён — вкладка остаётся.",
         },
         {
           name: "children",

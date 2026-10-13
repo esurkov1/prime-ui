@@ -72,19 +72,3 @@
   display: grid;
   min-width: 0;
 }
-
-.facts {
-  display: grid;
-  gap: var(--prime-space-3);
-  margin: 0;
-}
-
-.fact {
-  display: grid;
-  gap: var(--prime-space-1);
-}
-
-.fact dd {
-  margin: 0;
-  overflow-wrap: anywhere;
-}

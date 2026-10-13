@@ -45,8 +45,8 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `state` | `"ready" \| "loading" \| "empty" \| "error"` | `"ready"` | What the chart region shows: `loading` — Skeletons of the value, the plot and the legend values; `empty` — the empty state in the plot's place; `error` — the load error with a retry button (`onRetry`). Every change cross-fades; the plot keeps its height. |
-| `series` | `ChartFrameSeries[]` | `[]` | The series in drawing order, `{ id, label, color?, value? }`: legend entries, tooltip rows, table columns and the colors `renderPlot` gets. `color` is a palette hue (its chart step); without it a series takes `chartColors.series[index]`, past the eighth `chartColors.other`. `value` is the summary in the legend. |
+| `state` | `"ready" \| "loading" \| "empty" \| "error"` | `"ready"` | What the chart region shows: the plot, Skeletons while `loading`, the empty state, or the load error with a retry (`onRetry`). Changes cross-fade at the same height. |
+| `series` | `ChartFrameSeries[]` | `[]` | The series in drawing order, `{ id, label, color?, value? }`: legend entries, tooltip rows, table columns and `renderPlot` colors. `color` is a palette hue; `value` is the legend summary. |
 | `hiddenSeries` | `string[]` | — | Ids of the series turned off in the legend (controlled). |
 | `defaultHiddenSeries` | `string[]` | `[]` | Initially hidden series (uncontrolled). |
 | `onHiddenSeriesChange` | `(hiddenSeries: string[]) => void` | — | The legend turned a series on or off; gets the new list of hidden ids. |
@@ -105,12 +105,12 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `height` | `number` | `240, 160 under 30rem` | Height of the plot area in px. |
-| `renderPlot` | `(area: ChartFramePlotArea) => ReactNode` | — | Renders the chart at the measured `{ width, height }` with every series `{ id, label, color, hidden }` — for libraries that need explicit sizes (Chart.js, visx, Recharts without `ResponsiveContainer`). Called once the area has a size. |
+| `renderPlot` | `(area: ChartFramePlotArea) => ReactNode` | — | Renders the chart at the measured `{ width, height }` with every series `{ id, label, color, hidden }` — for libraries that need explicit sizes (Chart.js, visx). |
 | `children` | `ReactNode` | — | A chart that sizes itself to its container (an SVG with a `viewBox`, `ResponsiveContainer`); it fills the area. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
 ### ChartFrame.Legend
-`ref` → `HTMLUListElement`. The root's series as entries: swatch, name and the summary value. Each entry is a toggle button (`aria-pressed` — the series is shown); a hidden series keeps its place and color, its swatch becomes a ring and its name goes quiet. Renders nothing without series.
+`ref` → `HTMLUListElement`. The root's series as entries — swatch, name, summary value — each a toggle button that shows or hides its series. Renders nothing without series.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -118,7 +118,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | `…rest` | `HTMLAttributes<HTMLUListElement>` | — | `className` and the other ul attributes. |
 
 ### ChartFrame.Tooltip
-`ref` → `HTMLDivElement`. The kit's tooltip body for a chart library's custom tooltip (Recharts `content`, visx `TooltipWithBounds`, a hand-drawn overlay): a floating panel with the point's label and rows of swatch · series name · value. The library positions it; render it inside `ChartFrame.Root`.
+`ref` → `HTMLDivElement`. The kit's tooltip body for a chart library's custom tooltip (Recharts `content`, visx `TooltipWithBounds`). The library positions it; render it inside `ChartFrame.Root`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -147,7 +147,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 ### Plot
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `renderPlot` | the chart drawn at the measured `{ width, height }` | the library needs explicit sizes, or the drawing computes positions in px | |
+| `renderPlot` | the chart drawn at the measured `{ width, height }`, called once the area has a size | the library needs explicit sizes, or the drawing computes positions in px | |
 | `children` | the chart stretched to the area | the chart sizes itself (an SVG with a `viewBox`, `ResponsiveContainer`) | |
 | `height` | the area's height in px | the chart needs more or less room than 240 px | 240, 160 under 30rem |
 
@@ -158,18 +158,18 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 
 ### Colors
 - A series without `color` takes `chartColors.series[index]` by its place in `series`; past the eighth it is `chartColors.other`. Hiding a series never shifts the colors of the others.
-- `color` (a palette hue) maps to the same chart step as everywhere in the kit (`blue` → `chart-1`, `orange` → `chart-2` …, `gray` → `chart-other`), so a category matches its ProgressBar share.
+- `color` (a palette hue) maps to the same chart step as everywhere in the kit (`blue` → `chart-1`, `orange` → `chart-2` …, `gray` → `chart-other`), so a category matches its ProgressBar share; `sky` has no chart step and keeps its palette solid (too close to blue).
 - `renderPlot` gets each series with its `color` as a CSS value (`var(--prime-color-chart-*)`): pass it to the library as is; the theme switches with no re-render. Gridlines are `chartColors.grid`, the axis line `chartColors.axis`.
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| ready | `state="ready"` | the plot; the legend values; `ChartFrame.Table` present |
-| loading | `state="loading"` | `aria-busy` on the root; Skeletons of the value, the plot and the legend values; the title, actions and legend names stay |
-| empty | `state="empty"` | EmptyPage `compact` (`role="status"`, `labels.empty`) in the plot's place |
-| error | `state="error"` | the value is a muted dash; EmptyPage `compact` `tone="danger"` (`role="alert"`, `labels.error`) with the retry button when `onRetry` is set; it waits for a returned Promise |
+| ready | `state="ready"` | `data-state="ready"` on the root; the plot; the legend values; `ChartFrame.Table` present |
+| loading | `state="loading"` | `data-state="loading"` and `aria-busy` on the root; Skeletons of the value, the plot and the legend values; the title, actions and legend names stay |
+| empty | `state="empty"` | `data-state="empty"` on the root; EmptyPage `compact` (`role="status"`, `labels.empty`) in the plot's place |
+| error | `state="error"` | `data-state="error"` on the root; the value is a muted dash; EmptyPage `compact` `tone="danger"` (`role="alert"`, `labels.error`) with the retry button when `onRetry` is set; it waits for a returned Promise |
 | swap | `state` changes | the plot region cross-fades (Crossfade, the height stays); the value and legend values fade in from their Skeletons |
-| series hidden | a legend toggle, `hiddenSeries` | `aria-pressed="false"`, `data-hidden` on the entry: the swatch becomes a ring, the name quiet; `renderPlot` gets `hidden: true` — a mark with `data-hidden="true"` fades out, the axes keep their scale |
+| series hidden | a legend toggle, `hiddenSeries` | `aria-pressed="false"`, `data-hidden` on the entry: it keeps its place and color, the swatch becomes a ring, the name quiet; `renderPlot` gets `hidden: true` — a mark with `data-hidden="true"` fades out, the axes keep their scale |
 | hover / press | pointer on a legend entry | hover fill (hover-capable pointers only), press scale |
 
 ## Layout & spacing
@@ -177,6 +177,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 - The header puts the title and the description in the first column and the actions at the end; under 24rem of panel width the actions drop under the description.
 - The plot is 240 px high (160 px under 30rem of panel width) unless `height` is set; it never changes height between states.
 - Legend entries wrap onto more lines; each has a 44 px touch hit area on coarse pointers.
+- `ChartFrame.Tooltip` is a floating panel with the point's label over rows of swatch · series name · value; the chart library positions it (Recharts `content`, visx `TooltipWithBounds`, a hand-drawn overlay).
 - SVG `<text>` in the plot takes the caption type in `--prime-color-text-muted`; a class of your own still wins.
 - Works from 320 px; the container queries are on the panel's own width, so it adapts in a grid cell as on a phone.
 

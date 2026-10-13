@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Fieldset",
-      en: "`ref` → `HTMLFieldSetElement`. A native `<fieldset>` without border, padding or fill: the `<legend>` heading (`title-s`), an optional description, then the children at the form rhythm (heading → fields 16, field → field 20). `disabled` disables every control inside.",
-      ru: "Нативный `<fieldset>` без рамки, отступов и заливки: заголовок `<legend>` (`title-s`), необязательное описание, затем поля в ритме формы (заголовок → поля 16, поле → поле 20). `disabled` выключает все контролы внутри.",
+      en: "`ref` → `HTMLFieldSetElement`. A native `<fieldset>` without border, padding or fill: the `<legend>` heading, an optional description, then the children at the form rhythm. `disabled` disables every control inside.",
+      ru: "Нативный `<fieldset>` без рамки, отступов и заливки: заголовок `<legend>`, необязательное описание, затем поля в ритме формы. `disabled` выключает все контролы внутри.",
       props: [
         {
           name: "label",
@@ -23,8 +23,8 @@ export const api: ComponentApi = {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "Disables every control inside: native `disabled` on the `<fieldset>` for native controls, and the kit's disabled context, so kit controls (choice rows, segments, triggers, sliders) take their own disabled look, ARIA and keyboard. Nested groups inherit it. Use it while the form's request runs.",
-          ru: "Выключает все контролы внутри: нативный `disabled` у `<fieldset>` для нативных контролов и контекст кита, поэтому контролы кита (строки выбора, сегменты, триггеры, слайдеры) принимают свой вид, ARIA и клавиатуру неактивного. Вложенные группы наследуют его. Используйте на время запроса формы.",
+          en: "Disables every control inside, native and kit (they take their own disabled look, ARIA and keyboard); nested groups inherit it. Use it while the form's request runs.",
+          ru: "Выключает все контролы внутри, нативные и кита (они принимают свой вид, ARIA и клавиатуру неактивного); вложенные группы наследуют его. Используйте на время запроса формы.",
         },
         {
           name: "children",

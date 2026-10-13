@@ -57,7 +57,7 @@ No DOM, no ref. State and dismiss policy.
 | `children` | `ReactNode` | — | Trigger and Content. |
 
 ### Sheet.Content
-`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel raised from the bottom edge: a grab handle on top (`aria-hidden`), height by content up to `100dvh − --prime-sheet-top-gap`, rounded on top; centred at `--prime-sheet-width` (560) on a tablet or desktop, full width below it. Header and footer are optional: without a header give it `aria-label`. A swipe down from the handle or the header closes it (with `closeOnOutsideClick`). Renders while open and during its exit animation, showing the children it had open.
+`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel raised from the bottom edge, as tall as its content. Header and footer are optional: without a header name it with `aria-label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -73,7 +73,7 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`; disabled in place while a `Guard` is `busy`. |
-| `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around the header and the body) spans the last row: the header becomes the tab strip, edge to edge and without the hairline, and the active tab is the body rising into it. |
+| `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
 
 ### Sheet.Actions
 `ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`. + native `<div>` props.
@@ -156,6 +156,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - The content is the sheet's own, across its width: `Datepicker.Panel` or a column of actions straight in `Sheet.Body` — never a Card or a padded box inside it.
 - Zone padding `--prime-sheet-padding`; height by content up to `100dvh − --prime-sheet-top-gap`, radius `--prime-sheet-radius` on top, a `--prime-sheet-handle-area` strip with the handle bar, the bottom safe-area inset below the content.
 - Only the body scrolls; header and footer stay in place.
+- Tabs in the header: a `Tabs.List` inside `Sheet.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside get the surface field fill.
 
 ```tsx

@@ -78,7 +78,7 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`; disabled in place while a `Guard` is `busy`. |
-| `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around the header and the body) spans the last row: the header becomes the tab strip, edge to edge and without the hairline, and the active tab is the body rising into it. |
+| `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
 
 ### Modal.Actions
 `ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`. + native `<div>` props.
@@ -188,6 +188,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 ## Layout & spacing
 - Dialog padding `--prime-modal-padding` (24) on every zone; header 24 top / 20 bottom, body 20 with a 16 gap between blocks, footer 20 top / 24 bottom.
 - Max height = viewport minus `--prime-modal-viewport-padding` on both sides; only the body scrolls.
+- Tabs in the header: a `Tabs.List` inside `Modal.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside take the floating layer's fill; a card inside is the next layer (`floating-1`), a flat tile. Group fields with a 20 gap.
 - Narrow viewport (< 640px): bottom sheet, full width, top corners `--prime-sheet-radius`, a grab handle strip on top, up to `100dvh − --prime-sheet-top-gap` high, the bottom safe-area inset below the content.
 

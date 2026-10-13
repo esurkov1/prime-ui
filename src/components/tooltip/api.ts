@@ -72,8 +72,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Tooltip.Trigger",
-      en: "No DOM of its own: clones the single child, composes its `ref`, appends the tooltip id to its `aria-describedby` while open, sets `data-state` and chains `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus`, `onBlur`. A `disabled` child is wrapped in a focusable `<span>` that takes hover and Tab for it; a child that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring.",
-      ru: "Без своего DOM: клонирует дочерний элемент и связывает его с подсказкой. Неактивный контрол оборачивает в фокусируемый `<span>`, нефокусируемый элемент (Badge, Avatar, ProgressCircle, `Icon` с `label`) делает фокусируемым.",
+      en: "No DOM of its own: clones the single child and links it to the tooltip with `aria-describedby`. A `disabled` child is wrapped in a focusable `<span>`; a child that is no tab stop becomes one.",
+      ru: "Без своего DOM: клонирует дочерний элемент и связывает его с подсказкой через `aria-describedby`. Неактивный контрол оборачивает в фокусируемый `<span>`, нефокусируемый элемент делает фокусируемым.",
       props: [
         {
           name: "children",

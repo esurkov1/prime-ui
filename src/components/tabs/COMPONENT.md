@@ -43,25 +43,25 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Tabs.Root
-`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation and lays out the list and the panel one gap apart. It has no surface: no fill, no padding, no radius. It stands in the host's padding (a Card, the page) — never wrap it in a padded box of its own. In a Modal or Drawer it wraps `X.Header` and `X.Body`: `Tabs.List` goes last into the header, which becomes the strip, and the panels into the body; the root then renders no box (`display: contents`), so the dialog keeps its layout.
+`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation; no surface of its own — it stands in the host's padding. In a Modal or Drawer it wraps `X.Header` (with `Tabs.List` last) and `X.Body`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `string` | — | Active tab (controlled). |
 | `defaultValue` | `string` | `""` | Initial active tab (uncontrolled). With `""` no tab is selected. |
 | `onValueChange` | `(value: string) => void` | — | Called with the new active value. |
-| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | List direction and arrow keys. Vertical: a column of sections at the panel's inline start, the active one the host's surface reaching into the column; when the container is narrower than 600px the column becomes the horizontal strip above the panel. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel. A tab is at least the control height and grows with its content (a two-line tab is taller); tabs in a row share the tallest height. |
-| `fullWidth` | `boolean` | `true` | Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`, never narrower than their content: a long label keeps its width, short ones share the rest; when they do not fit, the list collapses, then scrolls. `false` sizes each tab to its content within the same bounds. |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | List direction and arrow keys. Vertical: a column of sections beside the panel, which becomes a horizontal strip in a container below 600px. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier: text, icon, spacing, folder radius and the gap between the strip and the panel; a tab is at least the control height. |
+| `fullWidth` | `boolean` | `true` | Horizontal tabs fill the list and tend to equal widths within `minItemWidth` … `maxItemWidth`; `false` sizes each tab to its content within the same bounds. |
 | `tone` | `"neutral" \| "accent"` | `"neutral"` | Colour of the active tab: `neutral` is primary text with an accent icon, `accent` puts text and icon in accent. |
-| `minItemWidth` | `number \| string` | `2.5 × control height` | Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`). When tabs do not fit, the list collapses, then scrolls. Icon-only tabs are square. |
+| `minItemWidth` | `number \| string` | `2.5 × control height` | Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`). |
 | `maxItemWidth` | `number \| string` | `7 × control height` | Widest a horizontal tab gets, px or a CSS length (`"none"` lifts the cap); a longer label ends with an ellipsis. |
 | `labels` | `Partial<TabsLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | `Tabs.List` and `Tabs.Panel`s. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">` | — | `className` and the other div attributes. |
 
 ### Tabs.List
-`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` (horizontal, edge fade, hidden scrollbar) with the sliding folder (in both orientations), which glides only into a choice by click or keys and is placed without motion on mount, resize and collapse. When tabs do not fit or a label would be cut, it hides icons and descriptions, then labels (icons with tooltips stay; only when every tab has an icon); then the list scrolls; a label is never cut to make room. The active tab is kept in view and clear of the edge fades (the first and the last tab scroll all the way to the end); only the list scrolls, never the page.
+`ref` → `HTMLDivElement`. `role="tablist"` on a `ScrollContainer` with the sliding folder. When tabs do not fit it hides icons and descriptions, then labels (only when every tab has an icon), then scrolls; the active tab stays in view.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -75,7 +75,7 @@ Tabs.Root                 value, size, orientation, tone, fullWidth, min/maxItem
 |---|---|---|---|
 | `value` | `string` | — (required) | Value that selects this tab and its panel. |
 | `disabled` | `boolean` | `false` | Disables the tab; clicks and arrow keys skip it. |
-| `onRemove` | `() => void \| Promise<void>` | — | Makes the tab closable: a close button (shown on the active tab, on hover and focus, always on touch screens), `Delete` / `Backspace` and a middle click. Closing the active tab selects its neighbour; remove the item from your list here. Return a promise to confirm first (unsaved changes): while pending the close button shows loading and the tab stays; resolved — the neighbour takes the selection and focus; rejected — nothing changes. |
+| `onRemove` | `() => void \| Promise<void>` | — | Makes the tab closable (close button, `Delete` / `Backspace`, middle click); remove the item from your list here. Return a promise to confirm first: rejected, the tab stays. |
 | `children` | `ReactNode` | — (required) | Plain text, or `Tabs.Icon` / `Tabs.Label` / `Tabs.Count` / `Tabs.Description`. A description makes the tab two-line. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" \| "type" \| "role" \| "onClick">` | — | `className`, `aria-*` and the other button attributes; your `onKeyDown` / `onAuxClick` run first and `preventDefault()` keeps the tab open. |
 
@@ -173,7 +173,7 @@ A tab is at least the control height of the tier, so a one-line list lines up wi
 | `Tabs.Icon` + `Tabs.Label` | muted icon before the label; the active tab's leading icon turns accent | sections with recognizable icons | |
 | `Tabs.Count` | soft badge after the label, tabular numbers | showing how many items a section has | |
 | `Tabs.Description` (two-line) | label (+ count) on line 1, `body-s` muted text on line 2; `<strong>` is primary / medium | dashboards with a summary per section | |
-| `onRemove` on Item | a ghost close button (`action.close`, two tiers below) at the end of the tab: on the active tab, on hover and focus, always on touch screens | open documents the user closes, like browser tabs | |
+| `onRemove` on Item | a ghost close button (`action.close`, two tiers below) at the end of the tab: on the active tab, on hover and focus, always on touch screens; the tab also closes by `Delete` / `Backspace` and a middle click, and closing the active tab selects its neighbour | open documents the user closes, like browser tabs | |
 
 Avoid icons or descriptions on only some tabs (uneven rows; without an icon on every tab the list cannot collapse to icons) and Tabs used as a filter — use SegmentedControl.
 

@@ -58,7 +58,7 @@ No DOM, no ref. Its tooltips form a group: one is open at a time, and once one h
 | `children` | `ReactNode` | — (required) | Subtree. |
 
 ### Tooltip.Trigger
-No DOM of its own: clones the single child, composes its `ref`, appends the tooltip id to its `aria-describedby` while open, sets `data-state` and chains `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus`, `onBlur`. A `disabled` child is wrapped in a focusable `<span>` that takes hover and Tab for it; a child that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring.
+No DOM of its own: clones the single child and links it to the tooltip with `aria-describedby`. A `disabled` child is wrapped in a focusable `<span>`; a child that is no tab stop becomes one.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -129,7 +129,8 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 | `Escape` | Hides the tooltip; focus stays on the trigger. |
 
 ### ARIA
-- The chip is `role="tooltip"`; while open the trigger points at it with `aria-describedby`.
+- The chip is `role="tooltip"`; while open the trigger points at it with `aria-describedby` (appended to the child's own).
+- `Tooltip.Trigger` composes the child's `ref`, sets `data-state` and chains the child's `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus` and `onBlur`.
 - The tooltip is a description, not the name: an icon-only button needs its own `aria-label`.
 - The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, focus does.
 - A `disabled` control is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control.

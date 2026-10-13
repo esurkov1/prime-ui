@@ -46,21 +46,21 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"solid" \| "soft" \| "outline" \| "ghost" \| "shade"` | `"solid"` | Visual treatment. `shade` — the media shade with a blur and a light glyph, the same in both themes: a button over a picture, a video or a video circle; with `tone="danger"` it is the danger disk (a failed transfer). |
-| `shape` | `"square" \| "circle"` | `"square"` | Outline. `circle` — a disk with only a `Button.Icon`: as wide as it is tall, full radius, the same tiers, tones and variants; its focus ring, touch area and press (`press-scale-compact`) follow the circle. Requires `aria-label`. |
-| `tone` | `"accent" \| "neutral" \| "success" \| "danger" \| "inherit"` | `"accent"` | Meaning of the action; `danger` for destructive actions; `success` for an action that is done (a payment went through). `inherit` takes the host's text color for an action on a colored host (a solid Banner); it needs `variant` `ghost`, `soft` or `outline`. |
+| `variant` | `"solid" \| "soft" \| "outline" \| "ghost" \| "shade"` | `"solid"` | Visual treatment: fill, soft fill, line or transparent. `shade` — the media shade with a light glyph for a button over a picture or video; with `tone="danger"` — the error disk. |
+| `shape` | `"square" \| "circle"` | `"square"` | Outline. `circle` — a disk as wide as it is tall, with only a `Button.Icon` inside; same tiers, tones and variants. Requires `aria-label`. |
+| `tone` | `"accent" \| "neutral" \| "success" \| "danger" \| "inherit"` | `"accent"` | Meaning: primary, secondary, done (`success`) or destructive (`danger`). `inherit` takes the host's text color for an action on a colored host; only with `ghost`, `soft` or `outline`. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. Without it the button takes the tier of its host (LoginForm, Popover, a field, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | — | Stretches to the container width. |
 | `loading` | `boolean` | `false` | Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content. |
 | `pressed` | `boolean` | — | A toggle button: `true` on, `false` off (`aria-pressed`). On takes the selected look, an accent soft fill that glides in and out. Leave it out for an ordinary action; a set of toggles is a ButtonGroup. |
-| `progress` | `number \| null` | — | Progress of a long action started by the button, `0…1`; `null` — under way, the share unknown. `aria-busy` is set and the button stays pressable (to cancel). A square grows a wash of the text color from the start edge (`null`: a `Spinner` in place of the leading icon); a circle draws a ring along its inner edge in the glyph's color, always turning. Put the number in the label or the description («Скачивание 42%»); remove the prop when done and the fill or ring fades where it is. |
-| `holdToConfirm` | `boolean` | `false` | The action needs a held press: the fill runs for 1.2 s (a gesture clock, kept under reduced motion) and `onConfirm` fires at its end. Releasing, leaving or losing focus earlier rolls it back. Space and Enter hold too; the gesture is described to assistive tech by `labels.holdHint`. |
-| `onConfirm` | `() => void \| Promise<void>` | — | Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. Return the request's promise: the full fill stays and the button is `loading` until it settles; resolve — the fill fades; reject — the fill rolls back (say why with a notification). |
+| `progress` | `number \| null` | — | Progress of a long action, `0…1`; `null` — the share is unknown. Sets `aria-busy`, stays pressable (to cancel); a square fills from the start edge, a circle draws a ring. Remove the prop when done. |
+| `holdToConfirm` | `boolean` | `false` | The action needs a held press (pointer, `Space` or `Enter`): the fill runs for 1.2 s, then `onConfirm` fires; releasing earlier rolls it back. |
+| `onConfirm` | `() => void \| Promise<void>` | — | Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. Return the request's promise to keep the button `loading` until it settles. |
 | `labels` | `Partial<ButtonLabels>` | — | Built-in strings, see Labels. |
 | `asChild` | `boolean` | `false` | Merges Button props and styles onto the single child element instead of rendering `<button>`. `disabled`/`loading` become `aria-disabled`. |
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Native button type; not forwarded with `asChild`. |
 | `disabled` | `boolean` | — | Disabled state; `loading` also disables. |
-| `children` | `ReactNode` | — | Label and `Button.Icon`. Only `Button.Icon` children → square icon-only button; give it `aria-label`. A changed text label flows into the new one letter by letter while the width glides; a change of digits only («58 с» → «57 с», «42%» → «43%») stays in place. |
+| `children` | `ReactNode` | — | Label and `Button.Icon`. Only `Button.Icon` children → a square icon-only button that needs `aria-label`. A changed label morphs letter by letter. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | `onClick`, `className`, `aria-*`, `data-*` and the other button attributes. |
 
 ### Button.Icon
@@ -138,7 +138,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 | progress (circle) | `shape="circle"` + `progress` (0…1 or `null`) | `aria-busy="true"`, still pressable; the kit ring at the line weight along the inner edge, arc in the glyph's color over a 32% track, always turning (3 × `--prime-motion-loop` a turn, slower but never still under reduced motion; never under 8%; `null` a quarter arc); the share glides (`base`); removing the prop fades the ring where it is (`data-shown="false"`, its turn paused) |
 | glyph change | a new icon in `Button.Icon` (another `name`) | the old glyph shrinks to 0.6 and fades, the new one grows in (`fast`) and plays its gesture once; reduced motion swaps at once |
 | holding | `holdToConfirm` + a held pointer, `Space` or `Enter` | `data-hold="holding"`: the fill runs linearly for 1.2 s (kept under reduced motion — it is a gesture clock), then `onConfirm` and `data-hold="done"` (on release the fill fades in place, `data-hold="idle"`); releasing, leaving the button or losing focus earlier → `data-hold="cancel"`, the fill rolls back (`fast` · exit) |
-| confirming | `onConfirm` returned a pending promise | `data-hold="confirming"`: the full fill stays, the button is `loading` (spinner, `aria-busy`, disabled) even after the release; resolve → `data-hold="idle"`, the fill fades; reject → `data-hold="cancel"`, the fill rolls back |
+| confirming | `onConfirm` returned a pending promise | `data-hold="confirming"`: the full fill stays, the button is `loading` (spinner, `aria-busy`, disabled) even after the release; resolve → `data-hold="idle"`, the fill fades; reject → `data-hold="cancel"`, the fill rolls back (say why with a notification) |
 | label change | new text children | the old letters leave upward, the new ones rise from below one short step apart (`base` · emphasized, blur `--prime-motion-blur`) while the width glides; digits-only changes and reduced motion change in place |
 | pressed | `pressed` | `aria-pressed="true" \| "false"`; on adds `data-pressed="true"` and the selected fill (accent soft), which glides in and out with the color transition (`fast`) |
 | asChild disabled / loading | `asChild` + `disabled`/`loading` | `aria-disabled="true"`, `pointer-events: none`, click `preventDefault`; no native `disabled`, no automatic spinner |
@@ -161,7 +161,8 @@ Other data attributes: `data-pressed`, `data-variant`, `data-tone`, `data-size`,
 ### ARIA
 - Native `<button>`, `type="button"` by default, so it never submits a form by accident.
 - Icon-only buttons need `aria-label`; `Button.Icon` is `aria-hidden`.
-- `shape="circle"` requires `aria-label`; its `progress` ring is `aria-hidden` — the share goes in the label or in `aria-describedby` («Отменить отправку», described by «Отправка 45%»).
+- `progress` is visual only: put the share in the label or in `aria-describedby` («Скачивание 42%»).
+- `shape="circle"` requires `aria-label`; its `progress` ring is `aria-hidden`, the share goes in the label or description («Отменить отправку», described by «Отправка 45%»).
 - `loading` sets `aria-busy="true"` and blocks the press; `progress` sets `aria-busy` and keeps the button pressable.
 - `holdToConfirm` describes the gesture through `aria-describedby` (`labels.holdHint`); `Space` / `Enter` hold like a pointer.
 - A changed label is announced once: the animated letters are hidden, the name is the new text.

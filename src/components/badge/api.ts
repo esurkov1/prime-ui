@@ -30,8 +30,8 @@ export const api: ComponentApi = {
         {
           name: "onRemove",
           type: "() => void | Promise<void>",
-          en: "Adds the full-height remove segment at the end; called on its click. Return the request's promise to remove on a server: the badge waits dimmed with a spinner in the segment (`aria-busy`, no second press); resolve — take it out of your list before resolving, and it leaves with its exit (fades and closes up, the badges after it glide in); reject — it stays and `labels.removeFailed` is announced.",
-          ru: "Добавляет сегмент удаления во всю высоту в конце; вызывается по клику на него. Верните промис запроса, чтобы удалить на сервере: бейдж ждёт приглушённым со спиннером в сегменте (`aria-busy`, повторное нажатие не действует); resolve — уберите его из списка до resolve, и он уходит с анимацией (гаснет и схлопывается, следующие подъезжают); reject — остаётся, объявляется `labels.removeFailed`.",
+          en: "Adds the full-height remove segment at the end; called on its click. Return the request's promise: the badge waits with a spinner; take it out of your list before resolving; on reject it stays.",
+          ru: "Добавляет сегмент удаления во всю высоту в конце; вызывается по клику на него. Верните промис запроса: бейдж ждёт со спиннером; уберите его из списка до resolve; при reject он остаётся.",
         },
         {
           name: "loading",
@@ -100,8 +100,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Dot",
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon. Also usable alone (a marker on an icon, before a label): it takes the tier of the surrounding control (6px, 8px from `l`) and the color set on it.",
-      ru: "Точка цвета текста, `aria-hidden`; у края становится сегментом, как иконка. Работает и отдельно (метка на иконке, перед подписью): размер по ярусу окружающего контрола (6px, с `l` — 8px), цвет — заданный на ней.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment. Alone (a marker on an icon, before a label) it takes the host tier and the color set on it.",
+      ru: "Точка цвета текста, `aria-hidden`; у края становится сегментом. Отдельно (метка на иконке, перед подписью) берёт ярус контейнера и заданный на ней цвет.",
       props: [
         {
           name: "…rest",
@@ -113,7 +113,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Action",
-      en: "`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus, always shown on touch screens; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.",
+      en: "`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus (always shown on touch); the width never changes. One per badge, not together with `onRemove`.",
       ru: "Кнопка-сегмент в конце, появляется при наведении и фокусе, на сенсорных экранах видна всегда; место зарезервировано, ширина не меняется. Одна на бейдж, не вместе с `onRemove`.",
       props: [
         {

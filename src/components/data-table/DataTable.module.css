@@ -430,8 +430,15 @@
   border-inline-start: var(--dt-column-divider-width) solid var(--dt-divider-color);
 }
 
-.row + .row .cell {
+.row + .row .cell,
+.spacerRow + .row .cell {
   border-top: var(--dt-divider-width) solid var(--dt-divider-color);
+}
+
+/* A virtualized body: the height of the rows not rendered; no paint, no dividers of its own. */
+.spacerCell {
+  padding: 0;
+  border: 0;
 }
 
 /* ---------- Leading utility columns ---------- */

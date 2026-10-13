@@ -18,6 +18,11 @@ export type CompositionPattern = {
   rules: string[];
   /** Extra search terms. */
   keywords: string[];
+  /**
+   * The page fills the app panel's height (`PageContent.Root fill` in `AppShell.Root fillViewport`):
+   * the preview stage gives it a viewport-high box.
+   */
+  fill?: boolean;
 };
 
 export const COMPOSITION_PATTERNS: CompositionPattern[] = [
@@ -60,7 +65,7 @@ export const COMPOSITION_PATTERNS: CompositionPattern[] = [
       'Действия по весу: одно главное (`solid`, последним), второстепенное `soft` + `tone="neutral"`, редкие и разрушительные — в `Dropdown` за иконкой `action.more` (тоже `soft`, чтобы у кнопки была форма рядом с соседями); аннулирование — `tone="danger"` внизу меню.',
       "Колонки — CSS-модуль на flex-wrap без брейкпоинтов: основная растёт, боковая держит ~18rem и уходит вниз, когда основной не хватает места.",
       'Раздел без рамки — заголовок `Typography as="h2" variant="title-m"` в 16 px над таблицей; `Card variant="panel"` — только для самостоятельных блоков боковой колонки. Таблица — уже залитый блок, в карточку её не кладут.',
-      'Пары «подпись → значение» — `<dl>` с `caption` + `tone="muted"` над `body-m`; суммы — табличные цифры, итог крупнее (`title-m`) и кончается там же, где колонка «Сумма» (отступ ячейки таблицы).',
+      'Пары «подпись → значение» о клиенте — `DescriptionList.Root orientation="vertical"` с `DescriptionList.Item label`; суммы — табличные цифры, итог крупнее (`title-m`) и кончается там же, где колонка «Сумма» (отступ ячейки таблицы).',
       "История — `Timeline`: события сверху вниз от последнего, даты в `Timeline.Meta`; строка выделяется при наведении.",
     ],
     keywords: ["детали", "карточка", "объект", "страница", "detail", "Breadcrumb", "Timeline"],
@@ -103,7 +108,7 @@ export const COMPOSITION_PATTERNS: CompositionPattern[] = [
       "Группы — `Fieldset` без рамки с заголовком `title-s` в 16 px над полями; группа от группы — 32 px воздуха, без разделителей. `Fieldset disabled` выключает все поля на время запроса.",
       "Проверка — при отправке: ошибки в `error` каждого поля, фокус на первое неверное поле; отмечено меньшинство: обязательных полей больше, поэтому `optional` стоит только у необязательных.",
       "Тип клиента — `Radio.Group` с `label` (два видимых варианта), менеджер — `Select`, согласие — `Checkbox` с `hint`: значение уходит с формой, а не применяется сразу.",
-      "Подвал: «Отмена» `outline` + `neutral`, главное действие последним, в `loading` во время запроса; пока сохраняем, панель не закрывается (`closeOnEscape={false}`, без крестика).",
+      "Подвал: «Отмена» `outline` + `neutral`, главное действие последним, в `loading` во время запроса; закрытие держит `Drawer.Guard` (`busy` — пока сохраняем, ни Escape, ни крестик не закрывают; `dirty` — после правки спрашивает, сбросить ли изменения).",
       "Результат — `Notification` и новая строка в таблице; панель закрывается сама.",
     ],
     keywords: ["форма", "drawer", "панель", "создание", "валидация", "fieldset", "form"],
@@ -158,6 +163,7 @@ export const COMPOSITION_PATTERNS: CompositionPattern[] = [
   },
   {
     file: "chat",
+    fill: true,
     segment: "pattern-chat",
     label: "Chat",
     title: "Мессенджер",

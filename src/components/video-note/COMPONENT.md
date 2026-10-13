@@ -40,7 +40,7 @@ VideoNote              <div role="group">; data-playing · data-disabled · data
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### VideoNote
-`ref` → `HTMLDivElement` (the `role="group"` root). A round video message: a perfect circle at every width (the `--prime-message-video-note` token × 1.15, within the row), no shell. At rest it is the still first frame (or `poster`) with the shared play disk in its shade look in the middle and the duration on a pill — nothing plays or loops before a press. The disk (or a press anywhere on the circle) plays it with sound and a progress ring fills over the circle's edge, the disk fading out; again it pauses; at the end it rewinds to the still frame. The duration reads like a voice message's time row (the muted caption on the media pill). Inside `Message.Root` it is the message itself — no bubble, the meta on its pill at the bottom-end corner, reactions under it. Its props are VoicePlayer's (`MediaPlayerProps`) plus `poster`.
+`ref` → `HTMLDivElement` (the `role="group"` root). A round video message: a still first frame that plays with sound on a press. Inside `Message.Root` it is the message itself, without a bubble. Its props are VoicePlayer's (`MediaPlayerProps`) plus `poster`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -49,16 +49,16 @@ VideoNote              <div role="group">; data-playing · data-disabled · data
 | `unplayed` | `boolean` | `false` | Nobody has played it yet: an accent dot after the duration and `labels.unplayed` for screen readers. Clear it when `onPlayingChange(true)` comes; the dot leaves with a fade. |
 | `disabled` | `boolean` | `false` | Nothing can be played: the play disk and the keyboard seek, the transcript button and the transfer actions are off (native `disabled`). A disabled `Fieldset` around it disables it too. |
 | `poster` | `string` | — | A still shown before the first frame; without it the first frame is drawn. Video only. |
-| `playing` | `boolean` | — | Playing with sound (controlled): `true` plays it (from the start, or on from a pause), `false` pauses it. One sound plays at a time on the page: starting it pauses any other voice message, video message or video in `Message.Media`, and starting one of them pauses it. |
+| `playing` | `boolean` | — | Playing with sound (controlled): `true` plays it (from the start or on from a pause), `false` pauses it. One sound plays on the page at a time. |
 | `defaultPlaying` | `boolean` | `false` | Initial playing state (uncontrolled). |
 | `onPlayingChange` | `(playing: boolean) => void` | — | Playback with sound started or stopped: the play disk, Enter / Space, another sound taking over, the end (then `onEnded` too); a seek from the keyboard does not count. |
 | `onEnded` | `() => void` | — | Playback reached the end; the note is back at its still first frame. |
-| `transcript` | `string` | — | The text of the recording, when it is known. With it or `onTranscribe` a «→A» transcript button shows at the top end of the circle's box, outside its edge (where the voice message has it, at the end of its top row), and the text opens in a block of the message's fill under the circle; it opens the text (selectable, marked by the chat search) and turns into a chevron that closes it. In a chat, open and close are one stroke of the message: the height and the width change together, the text fades in or out where it stands, and the player row above never moves. |
-| `onTranscribe` | `() => Promise<string> \| void` | — | Asks for the text on the first open while `transcript` is not known. Return a Promise of the text: only the button spins and the area stays closed; on resolve the area opens with the text; a rejection closes the area (`onTranscriptExpandedChange(false)`) and announces `labels.transcribeFailed`, and the next open asks again. Returning nothing keeps the button spinning until you pass `transcript`. |
+| `transcript` | `string` | — | The text of the recording, when it is known. With it or `onTranscribe` a «→A» button opens and closes the text: the button stands at the circle's top-end corner, the text opens under the circle. |
+| `onTranscribe` | `() => Promise<string> \| void` | — | Asks for the text on the first open while `transcript` is not known; return a Promise of the text. The button spins, then the text opens; a rejection announces `labels.transcribeFailed`. |
 | `transcriptExpanded` | `boolean` | — | The transcript is open (controlled). Opening it without a text calls `onTranscribe`. |
-| `defaultTranscriptExpanded` | `boolean` | `false` | Initially open (uncontrolled). Inside a chat's list (`Chat.Messages`) the open state and a resolved text outlive a windowed row: scrolled away and back, it is still open. |
+| `defaultTranscriptExpanded` | `boolean` | `false` | Initially open (uncontrolled). In `Chat.Messages` the open state and a resolved text survive a row scrolled away and back. |
 | `onTranscriptExpandedChange` | `(expanded: boolean) => void` | — | The transcript button was pressed, or a rejected `onTranscribe` closed the transcript. |
-| `transfer` | `"remote" \| "queued" \| "loading" \| "failed" \| "done"` | — | The transfer of the note, drawn on the play disk itself in the middle (the same disk in its shade look: the × or the arrow in the play glyph's place, the ring along its inner edge); the circle dims and does not play until it is done, either way (`TransferState`, the values of `UploadItem.status` plus `remote`): `queued` / `loading` — the cross, a circle Button whose `progress` ring shows `transferProgress` (described by the share); `failed` — the danger disk with the retry arrow; `remote` — not fetched yet, the download arrow; `done` — the ring fills, then the disk fades and shrinks away (`fast`). |
+| `transfer` | `"remote" \| "queued" \| "loading" \| "failed" \| "done"` | — | The transfer of the note, drawn on the play disk itself, either way (`TransferState`): `queued` / `loading` — the cancel cross and the share ring; `failed` — retry; `remote` — download; `done` — the disk fades out. |
 | `transferProgress` | `number` | — | Share transferred, 0…1 (`UploadItem.progress`): the ring along the disk's inner edge, gliding (`base`) while it turns. Without it a transfer in flight turns a quarter arc. |
 | `transferDirection` | `"upload" \| "download"` | `"upload"` | Which way it goes: sending (`upload`) or receiving (`download`). Changes only the words — the names of the cross and the retry, the share and the failure — never the look. |
 | `onCancel` | `() => void \| Promise<void>` | — | Cancel the transfer in flight: the disk's cross. A returned promise keeps the disk pending (a spinner, `aria-busy`, no second press); a rejection leaves the transfer as it was and announces `cancelFailed`. |
@@ -80,25 +80,26 @@ One look. The circle is the video; the play disk and the pills stand on the medi
 | State | Driven by | DOM |
 |---|---|---|
 | loading | the first frame not drawn yet | `data-frame="loading"` on the circle: a Skeleton fills it, the video fades in (`base`) once loaded |
-| at rest | idle | the still first frame (or `poster`) with the play disk and the duration; nothing plays, loops or decodes past the metadata and the first frame — a long chat costs nothing until a press |
+| at rest | idle | `data-state="idle"` on the circle; the still first frame (or `poster`) with the play disk and the duration; nothing plays, loops or decodes past the metadata and the first frame — a long chat costs nothing until a press |
 | playing | the disk (or a press on the circle), `playing` / `defaultPlaying` | `data-playing="true"` on the root, `data-state="playing"`; sound from the start, the ring fills over the edge every frame (one CSS variable on the ring), the duration counts down, the disk's glyph turns to pause and the disk fades out (it stays while it has the keyboard focus); `onPlayingChange(true)`; any other sound pauses |
 | paused | the disk or the circle again, another sound starting, `playing={false}` | `data-state="paused"`, the disk with the play glyph comes back, the ring stays; `onPlayingChange(false)` |
 | sought | an arrow, PageUp / PageDown, Home / End on the disk | the position moves (5 s, a tenth, the edges), the ring and the description follow; from rest it stops there, paused |
 | ended | the media ends | rewound, the ring empties, the still first frame and the play disk; `onPlayingChange(false)`, `onEnded` |
 | unplayed | `unplayed` | the accent dot and `labels.unplayed` in the description |
 | disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"`; the circle and its duration dim to 0.6, the disk, the transcript button and the transfer disk are natively `disabled`; nothing plays by a press, a key or `playing` |
-| transferring | `transfer` `queued` / `loading`, `transferProgress` | `data-transfer="true"`; the circle dims to 0.6 and the play disk itself becomes the transfer in the same place and look (the play glyph cross-fades into a white ×; the share is the Button's `progress` ring along its inner edge — the kit ring at the line weight, a 32% track, gliding `base`, always turning; a quarter arc without a share); the button is `aria-busy`, described by `uploadProgress` / `downloadProgress` |
-| transfer failed | `transfer="failed"` | the disk turns danger with a retry arrow (`retryUpload` / `retryDownload`, described by `notSent` / `notReceived`); `onRetry` |
-| remote | `transfer="remote"` | not fetched yet: the disk with the download arrow (`labels.download`), no ring, the video is not preloaded; `onDownload` |
+| transferring | `transfer` `queued` / `loading`, `transferProgress` | `data-transfer="true"`; the circle dims to 0.6 and the play disk itself becomes the transfer in the same place and look (the play glyph cross-fades into a white ×; the share is the Button's `progress` ring along its inner edge — the kit ring at the line weight, a 32% track, gliding `base`, always turning; a quarter arc without a share); the button is `aria-busy`, described by `uploadProgress` / `downloadProgress`; nothing plays until it is done |
+| transfer failed | `transfer="failed"` | `data-transfer="true"`, the circle dims to 0.6; the disk turns danger with a retry arrow (`retryUpload` / `retryDownload`, described by `notSent` / `notReceived`); `onRetry` |
+| remote | `transfer="remote"` | `data-transfer="true"`, the circle dims to 0.6; not fetched yet: the disk with the download arrow (`labels.download`), no ring, the video is not preloaded; `onDownload` |
 | transferred | `transfer="done"` | the ring fades where it is (`fast`), the × cross-fades back into play and the circle returns to full |
 | transcript open | the transcript button, `transcriptExpanded` / `defaultTranscriptExpanded` | the button's glyph cross-fades into a chevron up, `aria-expanded="true"`; the text opens under the circle at once; in a chat the view is held still and the message grows downward |
-| transcript pending | an open with no text while `onTranscribe`'s Promise is in flight | only the button spins (`loading`, `aria-busy`); the area stays closed and opens with the text |
+| transcript pending | an open with no text while `onTranscribe`'s Promise is in flight | only the button spins (`loading`, `aria-busy`); the area stays closed and opens with the text; when `onTranscribe` returns nothing, the button spins until `transcript` comes |
+| transcript failed | `onTranscribe` rejects | the area closes, `onTranscriptExpandedChange(false)`, `labels.transcribeFailed` announced; the next open asks again |
 
 ## Layout & spacing
 - The circle is one square box: `min(--prime-message-video-note × 1.15, 100cqi)` wide with `aspect-ratio: 1`; everything in it fills it, so it stays a perfect circle at every width from 320px.
 - The duration pill stands at the bottom-start corner, the message's meta pill at the bottom-end corner, the transcript button at the top-end corner of the square — where the circle leaves room — the place a voice message has it, at the end of its top row.
 - The duration and the meta read like a voice message's time row: the caption size and regular weight in the muted tone of the media pill (`--prime-color-media-pill-fg` on `--prime-color-media-pill`), AA over a white frame.
-- The transcript opens under the circle in a block of the message's fill (`--prime-message-padding-*`, `--prime-message-radius`).
+- The transcript opens under the circle in a block of the message's fill (`--prime-message-padding-*`, `--prime-message-radius`). In a chat, opening and closing it is one motion of the message: the height and the width change together and the text fades in or out where it stands, the circle never moves. The text is selectable, and the chat search marks its matches in it.
 - The play disk is the control `l` disk centred on the circle — the same element, size, glyphs and motion as VoicePlayer's, on the media shade with a blur.
 - One sound at a time on the page: starting it pauses whatever else plays with sound — a voice message, another circle, a video in `Message.Media`.
 - Symmetric with VoicePlayer: the same shared props (`MediaPlayerProps`), labels keys, `data-*` and keys. Its own prop is `poster`; it has no `waveform` (a face, not levels) and no rate (a face is watched at its own pace), and it seeks from its disk, having no slider.
@@ -110,8 +111,8 @@ One look. The circle is the video; the play disk and the pills stand on the medi
 |---|---|
 | `Tab` | Moves focus: the play disk (or the transfer disk), the transcript button. |
 | `Enter` · `Space` | On the disk: play with sound or pause; on the transcript button: open or close the text; on the transfer disk: cancel, retry or download. |
-| `ArrowRight` · `ArrowUp` | On the disk: 5 seconds forward. |
-| `ArrowLeft` · `ArrowDown` | On the disk: 5 seconds back. |
+| `ArrowRight` · `ArrowUp` | On the disk: 5 seconds forward (`ArrowRight` mirrored in RTL). |
+| `ArrowLeft` · `ArrowDown` | On the disk: 5 seconds back (`ArrowLeft` mirrored in RTL). |
 | `PageUp` · `PageDown` | On the disk: 10 % of the note forward or back. |
 | `Home` · `End` | On the disk: to the start or the end. |
 
@@ -168,5 +169,5 @@ One look. The circle is the video; the play disk and the pills stand on the medi
 - `transferDirection` used to restyle → it changes only the words; the look is one both ways.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (the play disk, `shape="circle"` `variant="shade"`; the transcript button), [Skeleton](../skeleton/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), Icon (`action.play`, `action.pause`, `action.close`, `action.refresh`, `action.download`, `action.transcribe`); `internal/mediaPlayer` (the shared props, the play disk, the transcript button, the keyboard seek, the playing triad, the transfer — with VoicePlayer), `internal/disabledContext` (a disabled `Fieldset`), `internal/mediaSession` (one sound at a time), `internal/transferDisk` (the transfer's logic), `internal/ring` (the playback ring), `internal/mediaPill` (pills and marks), `internal/transcript` + `internal/Disclosure` (the transcript), `internal/messagePart` (the round part of a message)
+- **Built from:** [Button](../button/COMPONENT.md) (the play disk, `shape="circle"` `variant="shade"`; the transcript button), [Skeleton](../skeleton/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), Icon (`action.play`, `action.pause`, `action.close`, `action.refresh`, `action.download`, `action.transcribe`, `nav.chevronUp`, `status.failed`); `internal/mediaPlayer` (the shared props, the play disk, the transcript button, the keyboard seek, the playing triad, the transfer — with VoicePlayer), `internal/disabledContext` (a disabled `Fieldset`), `internal/mediaSession` (one sound at a time), `internal/transferDisk` (the transfer's logic), `internal/ring` (the playback ring), `internal/mediaPill` (pills and marks), `internal/transcript` + `internal/Disclosure` (the transcript), `internal/messagePart` (the round part of a message)
 - **See also:** [VoicePlayer](../voice-player/COMPONENT.md) — the voice message, the same player contract; [Message](../message/COMPONENT.md) — the chat it sits in; [Composer](../composer/COMPONENT.md) — records the video message

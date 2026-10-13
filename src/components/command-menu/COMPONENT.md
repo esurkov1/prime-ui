@@ -60,7 +60,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `hasMore` | `boolean` | `false` | More results exist: reaching the end of the list calls `onLoadMore`. |
 | `onLoadMore` | `() => void \| Promise<void>` | — | Called once per round with `hasMore` when the end of the list scrolls into view or the arrows reach the last item; set `loadingMore` while it runs. |
 | `loadError` | `ReactNode` | — | The results failed to load: the message replaces the list in `role="alert"`. |
-| `onRetry` | `() => void \| Promise<void>` | — | A retry button (`labels.retry`) under `loadError`; Enter in the search field runs it too. Return the request's promise: the button is loading (`aria-busy`) and neither it nor Enter retries again until it settles; resolve — clear `loadError` and the results swap in; reject — the error stays and the button is ready again. |
+| `onRetry` | `() => void \| Promise<void>` | — | A retry button (`labels.retry`) under `loadError`; Enter in the search field runs it too. Return the request's promise to keep the button loading until it settles. |
 | `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the palette; focus returns to the opener. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the palette. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the rows and the search row: item height, text, icon. |
@@ -73,14 +73,14 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 `ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` / `<p>` above the search row; they name and describe the dialog. + native props except `id`.
 
 ### CommandMenu.Input
-`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list; shows `CommandMenu.Root` `search`; takes focus on open; no focus ring (the caret is the indicator). + native input props except `value` / `defaultValue` (`onChange`, `onKeyDown`, `onFocus`, `onBlur` reach the input).
+`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list, showing `CommandMenu.Root` `search`; takes focus on open. + native input props except `value` / `defaultValue`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `placeholder` | `string` | `labels.search` | Placeholder; also the default accessible name comes from `labels.search`. |
 
 ### CommandMenu.List
-`ref` → `HTMLElement`. The scrolling `role="listbox"` (a ScrollContainer) under the search row. It draws the load states of Root: skeleton rows while the first results load, skeleton rows at the end while more load, the load error with a retry instead of the list; the states cross-fade. + native props.
+`ref` → `HTMLElement`. The scrolling `role="listbox"` under the search row; draws the load states of Root: skeleton rows, more rows loading at the end, the error with a retry. + native props.
 
 ### CommandMenu.Group
 `ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while none of its items match. + native `<div>` props.
@@ -100,7 +100,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `disabled` | `boolean` | `false` | Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, does not run. |
 
 ### CommandMenu.ItemIcon · CommandMenu.ItemShortcut
-`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the tier icon size / a `Kbd` one tier below, pushed to the end of the item — a hint, not a handler. + native props.
+`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). The `aria-hidden` leading glyph / a `Kbd` key hint at the end of the item — a hint, not a handler. + native props.
 
 ### CommandMenu.ItemText
 `ref` → `HTMLSpanElement`. A `<span>` column: the title with an ellipsis and an optional description line. + native `<span>` props.
@@ -110,7 +110,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `description` | `ReactNode` | — | Second line (path, details): caption, muted. |
 
 ### CommandMenu.Empty
-`ref` → `HTMLDivElement`. A compact EmptyPage with `role="status"`, shown only while nothing matches and nothing loads: `labels.empty`, `labels.emptyHint`, and `children` as an action under them — a button, or a `CommandMenu.Item` (create from the query) that the arrows and Enter reach and that never counts as a match.
+`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty`, `labels.emptyHint`, and `children` as an action — a button or a `CommandMenu.Item`.
 
 ### CommandMenu.Footer · CommandMenu.FooterHint
 `ref` → `HTMLDivElement` / `HTMLSpanElement`. A bottom row of hints with a hairline above / one hint: every entry of `keys` in its own `Kbd`, then the label (`children`). + native props.
@@ -150,12 +150,12 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | active item | arrows, Home, End, pointer move | `aria-selected="true"`, `data-highlighted="true"`: a fill only, no movement |
 | filtered out | the query | `hidden` on items and on groups without matches |
 | matched text | the query | the first match in the item's text children and in `ItemText` is wrapped in a `<mark>` in `accent-text`, no fill (same as SmartFilter) |
-| nothing found | the query | `CommandMenu.Empty` with `role="status"`; hidden while loading or after a load error |
+| nothing found | the query | `CommandMenu.Empty` with `role="status"`; hidden while loading or after a load error. A `CommandMenu.Item` inside it (create from the query) is reached by the arrows and Enter and never counts as a match |
 | query | `search` / `defaultSearch` / `onSearchChange` on Root | the search field's value; cleared when the palette closes |
 | loading | `loading` | `aria-busy` on the list and the field; with no item on screen, `aria-hidden` skeleton rows (`data-skeleton`); `labels.loading` in a polite live region |
 | loading more | `loadingMore` | skeleton rows after the items; the end of the list is watched while `hasMore` (`onLoadMore` once per batch) |
 | load error | `loadError` | the list is `hidden`; a compact EmptyPage with `role="alert"` and a retry Button (`onRetry`) |
-| retrying | `onRetry` returned a pending promise | the retry Button is `loading` (`aria-busy`); a press or Enter does not retry again until it settles; on reject the error stays |
+| retrying | `onRetry` returned a pending promise | the retry Button is `loading` (`aria-busy`); a press or Enter does not retry again until it settles; on resolve clear `loadError` and the results swap in; on reject the error stays and the button is ready again |
 | state swap | loading ↔ items ↔ load error | the new content fades in (`swapMotion`), the first render stays still |
 | disabled item | `disabled` on Item | `aria-disabled="true"`, `data-disabled`; never active, not runnable |
 | size | `size` | `data-size` on the tier wrapper |
@@ -163,6 +163,7 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 ## Layout & spacing
 - Width `--prime-modal-width-l`, max height 1.5 × `--prime-panel-max-height`; only the list scrolls.
 - One content column: title, search icon, group labels and item icons start 16 from the edge.
+- `CommandMenu.ItemIcon` holds the glyph at the tier icon size; `CommandMenu.ItemShortcut` is a `Kbd` one tier below, pushed to the end of the item.
 - Search row and footer are separated from the list by hairlines; the search row hairline is faint.
 
 ## Accessibility
@@ -178,6 +179,7 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 
 ### ARIA
 - The palette is `role="dialog"` with `aria-modal`, named by `CommandMenu.Title` or `aria-label`.
+- The search field takes focus on open and has no focus ring: the caret is the indicator. Its `onChange`, `onKeyDown`, `onFocus` and `onBlur` reach the input.
 - The field is `role="combobox"` with `aria-controls` on the list and `aria-activedescendant` on the active item; items are `role="option"`, the active one `aria-selected`.
 - `CommandMenu.Group` is `role="group"` named by its `label`; the empty result is `role="status"`.
 - While loading the list and the field are `aria-busy` and `labels.loading` is announced politely; skeleton rows are hidden from screen readers; a load error is `role="alert"`.

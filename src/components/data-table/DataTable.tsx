@@ -4,8 +4,10 @@ import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { readCssLengthPx } from "@/hooks/usePosition";
 import { exitTimeoutMs } from "@/hooks/usePresence";
 import { useStateSwap } from "@/hooks/useStateSwap";
+import { rowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -231,6 +233,10 @@ const EMPTY_IDS: string[] = [];
 const SKELETON_ROWS = 5;
 const NO_KEYS: ReadonlySet<React.Key> = new Set();
 const INFINITE_SCROLL_HEIGHT = 360;
+/** Rows above which a body in a bounded viewport renders only the rows around the view. */
+const VIRTUAL_FROM = 100;
+/** Rows share one measured height until each is measured itself. */
+const ONE_GROUP = () => 0;
 
 const domIdPart = (key: React.Key) => String(key).replace(/[^A-Za-z0-9_-]/g, "_");
 
@@ -573,11 +579,75 @@ export function DataTable<Row>({
     : (scrollHeight ?? (infinite ? INFINITE_SCROLL_HEIGHT : undefined));
   const columnHover = useColumnHover(highlightColumnOnHover);
 
+  // ─── Virtual body ───
+  /*
+   * A long body in a bounded viewport (`scrollHeight`, `fill`, infinite paging) renders only the
+   * rows around the view: spacer rows hold the height of the rest, so the scrollbar, the sticky
+   * head and the infinite sentinel stay where they belong. The focused row stays rendered. Grouped,
+   * reorderable and detail-panel bodies render every row (segmented bodies, rows of two `<tr>`).
+   */
+  const flatRows = flat.rows;
+  const virtualized =
+    bodyState === "rows" &&
+    flatRows.length > VIRTUAL_FROM &&
+    (fillHeight || maxHeight !== undefined) &&
+    !groups &&
+    !reorder.enabled &&
+    !renderExpanded;
+  const headRows = showHeader ? 1 : 0;
+  const [focusedKey, setFocusedKey] = React.useState<React.Key | null>(null);
+  const pinnedRows = React.useMemo(() => {
+    if (focusedKey === null) return undefined;
+    const index = flatRows.findIndex((item) => item.key === focusedKey);
+    return index >= 0 ? [index] : undefined;
+  }, [flatRows, focusedKey]);
+  const getVirtualKey = React.useCallback(
+    (index: number) => flatRows[index]?.key ?? index,
+    [flatRows],
+  );
+  const rowEstimate = React.useMemo(
+    () => readCssLengthPx(`--prime-table-row-height-${size}`, 44),
+    [size],
+  );
+  const estimateRow = React.useCallback(() => rowEstimate, [rowEstimate]);
+  const headOffset = React.useCallback(() => tableRef.current?.tHead?.offsetHeight ?? 0, []);
+  const virtual = useVirtualRows({
+    count: virtualized ? flatRows.length : 0,
+    scrollRef,
+    getKey: getVirtualKey,
+    estimateSize: estimateRow,
+    getGroup: ONE_GROUP,
+    offset: headOffset,
+    pinned: pinnedRows,
+  });
+  const trackFocus = virtualized
+    ? {
+        onFocus(event: React.FocusEvent<HTMLTableSectionElement>) {
+          const row = (event.target as Element).closest<HTMLElement>("tr[aria-rowindex]");
+          const index = Number(row?.getAttribute("aria-rowindex")) - headRows - 1;
+          setFocusedKey(flatRows[index]?.key ?? null);
+        },
+        onBlur(event: React.FocusEvent<HTMLTableSectionElement>) {
+          if (!event.currentTarget.contains(event.relatedTarget)) setFocusedKey(null);
+        },
+      }
+    : undefined;
+
+  // A virtualized body brings new rows into view as it scrolls: their content may need wider
+  // columns too.
+  const sameRows = useSameRows(flat);
+  const firstRendered = virtual.rows[0]?.index;
+  const lastRendered = virtual.rows.at(-1)?.index;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the rendered range is the trigger, not a value read here.
+  const renderedRows = React.useMemo(
+    () => ({ rows: sameRows }),
+    [sameRows, firstRendered, lastRendered],
+  );
   useFrozenColumns(
     tableRef,
     rootRef,
     columns.map((column) => column.id).join("\u0000"),
-    useSameRows(flat),
+    renderedRows,
     bodyState === "rows",
   );
 
@@ -663,7 +733,7 @@ export function DataTable<Row>({
   );
 
   const rowOpens = Boolean(getRowHref || onRowClick);
-  const renderRow = (item: FlatRow<Row>, index: number) => {
+  const renderRow = (item: FlatRow<Row>, index: number, inWindow = false) => {
     // A row opens as a link (`getRowHref`) or in place (`onRowClick`); `isRowClickable` takes a row
     // (a total, a service row) out of both.
     const opens = rowOpens && (isRowClickable?.(item.row) ?? true);
@@ -685,8 +755,30 @@ export function DataTable<Row>({
         detailAnimate={lastExpandedKey === item.key}
         selected={selectable && selection.selectedSet.has(item.key)}
         childControls={item.childKeys.map(rowDomId).join(" ")}
+        measureRef={inWindow ? virtual.measure(index) : undefined}
+        ariaRowIndex={inWindow ? index + 1 + headRows : undefined}
       />
     );
+  };
+
+  /** Stands for rows not rendered in a virtualized body: their height, nothing to read or reach. */
+  const spacerRow = (key: string, height: number) =>
+    height > 0 ? (
+      // biome-ignore lint/a11y/noAriaHiddenOnFocusable: a spacer `<tr>` holds nothing focusable
+      <tr key={key} className={styles.spacerRow} aria-hidden="true">
+        <td colSpan={totalColumns} className={styles.spacerCell} style={{ height }} />
+      </tr>
+    ) : null;
+  const renderWindow = () => {
+    const laid = rowGaps(virtual);
+    return [
+      ...laid.rows.flatMap(({ index, gap }) => {
+        const item = flatRows[index];
+        if (!item) return [];
+        return [spacerRow(`gap-${String(item.key)}`, gap), renderRow(item, index, true)];
+      }),
+      spacerRow("gap-end", laid.end),
+    ];
   };
 
   // Grouped rows: one `<tbody>` per group run on screen, headed by its group row.
@@ -764,6 +856,7 @@ export function DataTable<Row>({
                   ref={tableRef}
                   className={styles.table}
                   aria-busy={loading || infiniteRows.loading || undefined}
+                  aria-rowcount={virtualized ? flatRows.length + headRows : undefined}
                   {...columnHover}
                 >
                   <colgroup>
@@ -825,9 +918,13 @@ export function DataTable<Row>({
                       ))}
                     </React.Fragment>
                   ) : (
-                    <tbody key={bodyKey} className={swapClass}>
+                    <tbody key={bodyKey} className={swapClass} {...trackFocus}>
                       {bodyState === "rows" ? (
-                        flat.rows.map(renderRow)
+                        virtualized ? (
+                          renderWindow()
+                        ) : (
+                          flat.rows.map((item, index) => renderRow(item, index))
+                        )
                       ) : (
                         <StateRows
                           state={bodyState}

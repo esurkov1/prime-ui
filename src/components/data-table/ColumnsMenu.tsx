@@ -15,7 +15,7 @@ export type DataTableColumnsMenuProps = Omit<
 > & {
   /** Side of the trigger the menu opens on. Default `bottom`. */
   side?: PositionSide;
-  /** Alignment to the trigger. Default `start`; `end` for a trigger at the toolbar's end edge. */
+  /** Alignment to the trigger. Default `auto` (the edge with more room). */
   align?: PositionAlign;
   /** The trigger button. */
   ref?: React.Ref<HTMLButtonElement>;

@@ -18,15 +18,15 @@ export const api: ComponentApi = {
           name: "state",
           type: '"ready" | "loading" | "empty" | "error"',
           default: '"ready"',
-          en: "What the chart region shows: `loading` — Skeletons of the value, the plot and the legend values; `empty` — the empty state in the plot's place; `error` — the load error with a retry button (`onRetry`). Every change cross-fades; the plot keeps its height.",
-          ru: "Что показывает область графика: `loading` — Skeleton значения, графика и значений легенды; `empty` — пустое состояние на месте графика; `error` — ошибка загрузки с кнопкой повтора (`onRetry`). Каждая смена плавно перетекает; высота графика не меняется.",
+          en: "What the chart region shows: the plot, Skeletons while `loading`, the empty state, or the load error with a retry (`onRetry`). Changes cross-fade at the same height.",
+          ru: "Что показывает область графика: график, Skeleton при `loading`, пустое состояние или ошибку загрузки с повтором (`onRetry`). Смены плавно перетекают без изменения высоты.",
         },
         {
           name: "series",
           type: "ChartFrameSeries[]",
           default: "[]",
-          en: "The series in drawing order, `{ id, label, color?, value? }`: legend entries, tooltip rows, table columns and the colors `renderPlot` gets. `color` is a palette hue (its chart step); without it a series takes `chartColors.series[index]`, past the eighth `chartColors.other`. `value` is the summary in the legend.",
-          ru: "Ряды в порядке отрисовки, `{ id, label, color?, value? }`: записи легенды, строки подсказки, столбцы таблицы и цвета для `renderPlot`. `color` — оттенок палитры (его шаг графиков); без него ряд берёт `chartColors.series[index]`, после восьмого — `chartColors.other`. `value` — итог в легенде.",
+          en: "The series in drawing order, `{ id, label, color?, value? }`: legend entries, tooltip rows, table columns and `renderPlot` colors. `color` is a palette hue; `value` is the legend summary.",
+          ru: "Ряды в порядке отрисовки, `{ id, label, color?, value? }`: записи легенды, строки подсказки, столбцы таблицы и цвета для `renderPlot`. `color` — оттенок палитры; `value` — итог в легенде.",
         },
         {
           name: "hiddenSeries",
@@ -138,8 +138,8 @@ export const api: ComponentApi = {
         {
           name: "renderPlot",
           type: "(area: ChartFramePlotArea) => ReactNode",
-          en: "Renders the chart at the measured `{ width, height }` with every series `{ id, label, color, hidden }` — for libraries that need explicit sizes (Chart.js, visx, Recharts without `ResponsiveContainer`). Called once the area has a size.",
-          ru: "Рисует график по измеренным `{ width, height }` со всеми рядами `{ id, label, color, hidden }` — для библиотек, которым нужны явные размеры (Chart.js, visx, Recharts без `ResponsiveContainer`). Вызывается, когда у области есть размер.",
+          en: "Renders the chart at the measured `{ width, height }` with every series `{ id, label, color, hidden }` — for libraries that need explicit sizes (Chart.js, visx).",
+          ru: "Рисует график по измеренным `{ width, height }` со всеми рядами `{ id, label, color, hidden }` — для библиотек, которым нужны явные размеры (Chart.js, visx).",
         },
         {
           name: "children",
@@ -152,8 +152,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ChartFrame.Legend",
-      en: "`ref` → `HTMLUListElement`. The root's series as entries: swatch, name and the summary value. Each entry is a toggle button (`aria-pressed` — the series is shown); a hidden series keeps its place and color, its swatch becomes a ring and its name goes quiet. Renders nothing without series.",
-      ru: "Ряды корня записями: образец цвета, название и итог. Каждая запись — кнопка-переключатель (`aria-pressed` — ряд показан); скрытый ряд сохраняет место и цвет, образец становится кольцом, название приглушается. Без рядов ничего не рисует.",
+      en: "`ref` → `HTMLUListElement`. The root's series as entries — swatch, name, summary value — each a toggle button that shows or hides its series. Renders nothing without series.",
+      ru: "Ряды корня записями — образец цвета, название, итог; каждая — кнопка-переключатель, показывающая или скрывающая свой ряд. Без рядов ничего не рисует.",
       props: [
         {
           name: "readOnly",
@@ -167,8 +167,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ChartFrame.Tooltip",
-      en: "`ref` → `HTMLDivElement`. The kit's tooltip body for a chart library's custom tooltip (Recharts `content`, visx `TooltipWithBounds`, a hand-drawn overlay): a floating panel with the point's label and rows of swatch · series name · value. The library positions it; render it inside `ChartFrame.Root`.",
-      ru: "Тело подсказки кита для своей подсказки библиотеки графиков (Recharts `content`, visx `TooltipWithBounds`, оверлей SVG): плавающая панель с подписью точки и строками «образец · название ряда · значение». Положение задаёт библиотека; рендерить внутри `ChartFrame.Root`.",
+      en: "`ref` → `HTMLDivElement`. The kit's tooltip body for a chart library's custom tooltip (Recharts `content`, visx `TooltipWithBounds`). The library positions it; render it inside `ChartFrame.Root`.",
+      ru: "Тело подсказки кита для своей подсказки библиотеки графиков (Recharts `content`, visx `TooltipWithBounds`). Положение задаёт библиотека; рендерить внутри `ChartFrame.Root`.",
       props: [
         {
           name: "label",

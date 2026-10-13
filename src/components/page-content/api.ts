@@ -18,8 +18,8 @@ export const api: ComponentApi = {
           name: "fill",
           type: "boolean",
           default: "false",
-          en: 'The page takes the height of the panel\'s main (`AppShell.Root fillViewport`) and the body takes what the header leaves: for a full-height table (`scrollHeight="fill"`), board (Crossfade `fill`), chat or `PageContent.Split`. Main keeps only gutter-high air below it.',
-          ru: 'Страница занимает высоту main панели (`AppShell.Root fillViewport`), тело — всё, что оставила шапка: для таблицы на всю высоту (`scrollHeight="fill"`), доски (Crossfade `fill`), чата или `PageContent.Split`. Под ней в main остаётся только отступ, равный боковому.',
+          en: "The page takes the height of main (`AppShell.Root fillViewport`) and the body takes what the header leaves: for a full-height table, board, chat or `PageContent.Split`.",
+          ru: "Страница занимает высоту main (`AppShell.Root fillViewport`), тело — всё, что оставила шапка: для таблицы, доски или чата на всю высоту и `PageContent.Split`.",
         },
         {
           name: "…rest",
@@ -116,8 +116,8 @@ export const api: ComponentApi = {
     },
     {
       name: "PageContent.Split",
-      en: "`ref` → `HTMLDivElement`. List + detail (mail, a messenger, a ticket queue), a container (`prime-split`): from 48rem of its own width the list stands in a 16–20rem column with the detail beside it, 24 apart; below that one pane at a time — the list, or the open detail. The pane that comes into view enters (`enterMotion`, base) and focus follows it: into the detail, back to the list control it left. Takes the free height of a filling page.",
-      ru: "Список + детали (почта, мессенджер, очередь обращений), контейнер (`prime-split`): от 48rem своей ширины список стоит колонкой 16–20rem, детали рядом, зазор 24; уже — одна панель: список или открытые детали. Появившаяся панель входит (`enterMotion`, base), фокус следует за ней: в детали и обратно к элементу списка. Занимает свободную высоту заполняющей страницы.",
+      en: "`ref` → `HTMLDivElement`. List + detail (mail, a messenger, a ticket queue): side by side from 48rem of its own width, one pane at a time below it, focus following the pane that comes into view.",
+      ru: "Список + детали (почта, мессенджер, очередь обращений): рядом от 48rem своей ширины, уже — по одной панели; фокус следует за появившейся панелью.",
       props: [
         {
           name: "open",

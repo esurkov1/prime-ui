@@ -71,8 +71,8 @@ Put it in a `Card` for a dashboard tile.
 | State | Driven by | DOM |
 |---|---|---|
 | at rest | — | the latest point or `highlight`; the value rolls its digits when `data` changes |
-| scrubbing | pointer or touch over the plot | `data-scrubbing` on the root; the cursor (or the bar under the pointer) and the headline follow with no easing (direct manipulation), digits change in place |
-| keyboard | arrows, Home, End on the focused plot | `aria-valuenow` / `aria-valuetext`; the cursor glides to the point (`base` · emphasized); in `bars` the current bar keeps its fill, the others go quiet (`fast` opacity) |
+| scrubbing | pointer, touch or the arrow keys | `data-scrubbing` on the root; the cursor (or the bar under the pointer) and the headline follow with no easing (direct manipulation), digits change in place |
+| keyboard | arrows, Home, End on the focused plot | `aria-valuenow` / `aria-valuetext`, `data-scrubbing`; the cursor moves to the point at once (keyboard steps are high-frequency); in `bars` the current bar keeps its fill, the others go quiet (`fast` opacity) |
 | settle | pointer leaves, touch ends, focus leaves | back to the point at rest |
 | change hidden | the first point, the previous value is 0, or the sign flips | no change Badge: a percentage would mean nothing |
 | new series | a new `data` array | the chart cross-fades in (swap motion); the trend arrow turns half a turn between up and down |

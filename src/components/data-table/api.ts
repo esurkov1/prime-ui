@@ -17,8 +17,8 @@ export const api: ComponentApi = {
         {
           name: "hiddenColumns",
           type: "string[]",
-          en: "Ids of columns that are not rendered (head, body, skeleton and state rows), controlled; widths are measured again. A column with `hideable: false` stays; sorting by a hidden column keeps the row order. `DataTable.ColumnsMenu` in `toolbar` changes it.",
-          ru: "Id колонок, которые не выводятся (шапка, тело, скелетоны и строки состояний), управляемо; ширины измеряются заново. Колонка с `hideable: false` остаётся; сортировка по скрытой колонке сохраняет порядок строк. Меняет его `DataTable.ColumnsMenu` в `toolbar`.",
+          en: "Ids of columns that are not rendered, controlled. A column with `hideable: false` stays. `DataTable.ColumnsMenu` in `toolbar` changes it.",
+          ru: "Id колонок, которые не выводятся, управляемо. Колонка с `hideable: false` остаётся. Меняет его `DataTable.ColumnsMenu` в `toolbar`.",
         },
         {
           name: "defaultHiddenColumns",
@@ -44,8 +44,8 @@ export const api: ComponentApi = {
           name: "source",
           type: '"client" | "server"',
           default: '"client"',
-          en: "Who sorts and pages the rows. `client` — the table sorts `rows` and slices pages itself. `server` — the owner fetches one page, already sorted: the table never re-sorts or slices `rows`; `sort` / `page` changes are the request, `rowCount` drives Pagination and the range; a page or sort change keeps the rows on screen with `aria-busy` while `loading`, and the new page cross-fades in. Control `page` and set it to 1 when the search or filters change. «Select all» covers the rows on screen; ids from other pages stay in `selected`.",
-          ru: "Кто сортирует и делит строки на страницы. `client` — таблица сама сортирует `rows` и режет страницы. `server` — владелец загружает одну страницу, уже отсортированную: таблица не пересортировывает и не режет `rows`; смена `sort` / `page` — это запрос, `rowCount` задаёт Pagination и диапазон; при смене страницы или сортировки строки остаются на экране с `aria-busy`, пока `loading`, новая страница проявляется плавно. Держите `page` под контролем и сбрасывайте на 1 при смене поиска или фильтров. «Выбрать все» — строки на экране; id с других страниц остаются в `selected`.",
+          en: "Who sorts and pages the rows. `client`: the table sorts `rows` and slices pages. `server`: `rows` is one page, already sorted; `sort` / `page` changes are the request, `rowCount` drives Pagination.",
+          ru: "Кто сортирует и делит строки на страницы. `client`: таблица сама сортирует `rows` и режет страницы. `server`: `rows` — одна уже отсортированная страница; смена `sort` / `page` — это запрос, `rowCount` задаёт Pagination.",
         },
         {
           name: "rowCount",
@@ -187,8 +187,8 @@ export const api: ComponentApi = {
         {
           name: "onReorder",
           type: "(id: Key, beforeId: Key | null) => void | Promise<void>",
-          en: "Rows reorder: a leading handle column (drag by the handle, a touch hold, Alt + ↑ / ↓ on it). The row `id` is placed in front of `beforeId` (`getRowKey` values, `null` = last); on a page, a row put last stands in front of the first row of the next page. Apply it with `moveBefore`. Return a promise to save on a server: the row stays in its new place with a spinner in its handle cell and `aria-busy`, a rejection glides it back. Off while the table is sorted by a column (the handles are disabled, a tooltip says why); with `getRowGroup` rows move inside their group; not combined with `getRowChildren` / `renderExpanded`.",
-          ru: "Перестановка строк: ведущая колонка с ручками (перетаскивание за ручку, удержание пальцем, Alt + ↑ / ↓ на ней). Строка `id` встаёт перед `beforeId` (значения `getRowKey`, `null` — в конец); на странице строка, поставленная последней, встаёт перед первой строкой следующей страницы. Применяйте через `moveBefore`. Верните промис, чтобы сохранить на сервере: строка остаётся на новом месте со спиннером в ячейке ручки и `aria-busy`, при отказе плавно возвращается. Выключено, пока таблица отсортирована по колонке (ручки неактивны, подсказка объясняет почему); с `getRowGroup` строки двигаются внутри своей группы; не сочетается с `getRowChildren` / `renderExpanded`.",
+          en: "Rows reorder by a leading handle column. Row `id` goes in front of `beforeId` (`null` = last); apply it with `moveBefore`, return a promise to save. Off while sorted by a column.",
+          ru: "Перестановка строк за ведущую колонку с ручками. Строка `id` встаёт перед `beforeId` (`null` — в конец); применяйте через `moveBefore`, верните промис для сохранения. Выключено при сортировке по колонке.",
         },
         {
           name: "getRowChildren",
@@ -251,8 +251,8 @@ export const api: ComponentApi = {
         {
           name: "onLoadMore",
           type: "() => void | Promise<void>",
-          en: "Called at the end when every loaded row is shown and `hasMore` is set. A returned promise shows the loading status until it settles; after a rejection the table stops asking until the rows change (show the error yourself).",
-          ru: "Вызывается в конце, когда все загруженные строки показаны и `hasMore`. Пока возвращённый промис не завершён, виден статус догрузки; после отказа таблица не просит снова, пока не изменятся строки (ошибку показываете сами).",
+          en: "Called at the end when every loaded row is shown and `hasMore` is set. A returned promise shows the loading status until it settles.",
+          ru: "Вызывается в конце, когда все загруженные строки показаны и `hasMore`. Пока возвращённый промис не завершён, виден статус догрузки.",
         },
         {
           name: "scrollHeight",
@@ -327,14 +327,14 @@ export const api: ComponentApi = {
         {
           name: "getRowHref",
           type: "(row: Row) => string",
-          en: "The row is a link: the key cell (first visible column) holds a real `<a>`, and the same link, hidden from assistive tech and Tab, covers every other cell — a click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on the row. Tab stops on the link; the focused row is ringed. Keep controls out of the key cell.",
-          ru: "Строка — ссылка: в ключевой ячейке (первая видимая колонка) настоящий `<a>`, а та же ссылка, скрытая от скринридеров и Tab, накрывает остальные ячейки — клик, ⌘/Ctrl-клик, средняя кнопка и «открыть в новой вкладке» работают по всей строке. Tab останавливается на ссылке, строка в фокусе обведена. Контролы в ключевую ячейку не кладите.",
+          en: "The row is a link: a real `<a>` in the key cell (first visible column), and the same link covers the whole row. Keep controls out of the key cell.",
+          ru: "Строка — ссылка: настоящий `<a>` в ключевой ячейке (первая видимая колонка), и та же ссылка накрывает всю строку. Контролы в ключевую ячейку не кладите.",
         },
         {
           name: "onRowClick",
           type: "(row: Row, index: number, event: DataTableRowClickEvent) => void",
-          en: "Opens a row in place (a drawer, a panel): the row takes focus and opens on a click, Enter or Space. Never from a control inside the row (links, buttons, fields, labels, ARIA widgets, `data-row-click-ignore`) or from a portal (a ⋯ menu item). With `getRowHref` it gets only plain clicks: `event.preventDefault()` there routes in the app; modified clicks stay the browser's.",
-          ru: "Открывает строку на месте (дровер, панель): строка получает фокус и открывается кликом, Enter или Space. Никогда — от контрола внутри строки (ссылки, кнопки, поля, label, ARIA-виджеты, `data-row-click-ignore`) и из портала (пункт меню ⋯). С `getRowHref` получает только обычные клики: `event.preventDefault()` в нём переходит роутером приложения; клики с модификаторами остаются браузеру.",
+          en: "Opens a row in place (a drawer, a panel) on a click, Enter or Space; never from a control inside the row. With `getRowHref` it gets plain clicks: `event.preventDefault()` routes in the app.",
+          ru: "Открывает строку на месте (дровер, панель) кликом, Enter или Space; никогда — от контрола внутри строки. С `getRowHref` получает обычные клики: `event.preventDefault()` переходит роутером приложения.",
         },
         {
           name: "isRowClickable",
@@ -379,8 +379,8 @@ export const api: ComponentApi = {
     },
     {
       name: "DataTable.ColumnsMenu",
-      en: "`ref` → `HTMLButtonElement` (the trigger). The column chooser of the table it sits in — place it into `toolbar`: an outline neutral Button one tier below the table (`view.columns` icon, `labels.columns`) opening a Dropdown with a check item per column and `labels.showAllColumns`. Writes the table's hidden columns; a `hideable: false` column stays checked and disabled, and the last visible column cannot be hidden. Throws outside a DataTable toolbar.",
-      ru: "Выбор колонок той таблицы, в которой стоит, — кладите в `toolbar`: кнопка outline neutral на ярус ниже таблицы (иконка `view.columns`, `labels.columns`) открывает Dropdown с пунктом-флажком на каждую колонку и `labels.showAllColumns`. Меняет скрытые колонки таблицы; колонка с `hideable: false` отмечена и выключена, последнюю видимую колонку скрыть нельзя. Вне панели DataTable бросает ошибку.",
+      en: "`ref` → `HTMLButtonElement` (the trigger). The column chooser of the table it sits in: a Button opening a Dropdown with a check item per column. Writes the table's hidden columns; throws outside a DataTable `toolbar`.",
+      ru: "`ref` → `HTMLButtonElement` (кнопка). Выбор колонок той таблицы, в которой стоит: кнопка открывает Dropdown с пунктом-флажком на каждую колонку. Меняет скрытые колонки таблицы; вне `toolbar` DataTable бросает ошибку.",
       props: [
         {
           name: "side",
@@ -393,8 +393,8 @@ export const api: ComponentApi = {
           name: "align",
           type: '"auto" | "start" | "center" | "end"',
           default: '"auto"',
-          en: "Alignment to the trigger. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge).",
-          ru: "Выравнивание по кнопке. `auto` (по умолчанию) выравнивает панель по тому краю триггера, за которым больше места: у триггера ближе к концу экрана — по концу, и панель растёт к началу, ближе к началу — наоборот; `start`, `center` или `end` задают край явно (у края экрана он всё равно переворачивается).",
+          en: "Alignment to the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it.",
+          ru: "Выравнивание по кнопке. `auto` выравнивает панель по тому краю кнопки, за которым больше места; `start`, `center` или `end` задают край явно.",
         },
         {
           name: "…rest",
@@ -495,8 +495,8 @@ export const api: ComponentApi = {
         {
           name: "scale",
           type: "boolean | { min?: number; max?: number }",
-          en: "Heatmap: each cell is shaded by its numeric value (`sortAccessor`, else `accessor`) on the five-step chart scale (`--prime-color-chart-scale-1…5`, text `--prime-color-chart-scale-fg` on steps 4–5); `data-scale` on the cell. `true` spans the column's minimum to maximum over all rows; `{ min, max }` fixes either end. The value stays in the cell; non-numbers stay plain.",
-          ru: "Тепловая карта: ячейка закрашивается по своему числу (`sortAccessor`, иначе `accessor`) на пятиступенчатой шкале графиков (`--prime-color-chart-scale-1…5`, текст `--prime-color-chart-scale-fg` на ступенях 4–5); `data-scale` на ячейке. `true` — от минимума до максимума колонки по всем строкам; `{ min, max }` фиксирует концы. Значение остаётся в ячейке; не числа не закрашиваются.",
+          en: "Heatmap: each cell is shaded by its numeric value on the five-step chart scale. `true` spans the column's minimum to maximum over all rows; `{ min, max }` fixes either end.",
+          ru: "Тепловая карта: ячейка закрашивается по своему числу на пятиступенчатой шкале графиков. `true` — от минимума до максимума колонки по всем строкам; `{ min, max }` фиксирует концы.",
         },
         {
           name: "width · minWidth · maxWidth",

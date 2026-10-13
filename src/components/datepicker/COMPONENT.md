@@ -66,7 +66,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `invalid` | `boolean` | — | Danger ring and `aria-invalid` without a message. |
 | `disabled` | `boolean` | `false` | The field cannot be opened. |
 | `fullWidth` | `boolean` | `false` | The field stretches to its container; otherwise it fits the text. |
-| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Popover alignment to the field. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge). |
+| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Popover alignment to the field. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring (`data-focus-ring="false"`). |
 | `placeholder` | `string` | `labels.placeholder` | Field text without a value for this field. |
 | `valuePrefix` | `string` | — | Text before the value, e.g. «С». |
@@ -76,7 +76,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ### Datepicker.Panel
-`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content: no fill, padding or radius — the host (a Drawer sheet, a Card) is its container. It takes the host's width: 1–2 months by that width, day columns spread across it. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.
+`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content (a Drawer sheet, a Card); 1–2 months by the host's width. Takes `mode`, the value triad and every calendar option below.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -154,7 +154,8 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 ## Layout & spacing
 - The field fits its text by default (`width: fit-content`, max 100%); in forms use `fullWidth`.
 - Label → field: the tier `label-gap`; field → field in a form: `--prime-space-5`.
-- Months gap `--prime-space-6`. An embedded panel measures its parent; narrower than one month → compact cells and footer fields above the buttons. Works from 320 px.
+- `align="auto"`: a field near the end of the screen lines up the popover's end edge and the panel grows toward the start, and the other way near the start; a fixed `align` still flips at the screen edge.
+- Months gap `--prime-space-6`. `Datepicker.Panel` has no fill, padding or radius — the host is its container; it shows 1–2 months by the host's width with day columns spread across it. An embedded panel measures its parent; narrower than one month → compact cells and footer fields above the buttons. Works from 320 px.
 - Values are wall-clock local dates; convert time zones in the app.
 
 ## Accessibility

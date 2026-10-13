@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Switch.Root",
-      en: '`ref` → `HTMLInputElement` (the native `input type="checkbox" role="switch"`). Renders the field `<div>`, the `<label>` row with the input and the track, and the support row. Field-root rule for a leaf: `className` goes to the field `<div>`; `id`, `ref` and native input props to the input.',
+      en: '`ref` → `HTMLInputElement` (the native `input type="checkbox" role="switch"`). Renders the field `<div>`, the `<label>` row with the input and the track, and the support row. `className` goes to the field `<div>`, native input props to the input.',
       ru: 'Поле: строка-`<label>` с нативным input (`role="switch"`) и дорожкой, под ней подсказка или ошибка.',
       props: [
         {
@@ -23,8 +23,8 @@ export const api: ComponentApi = {
         {
           name: "onCheckedChange",
           type: "(checked: boolean) => void | Promise<void>",
-          en: "Called with the new state on every toggle (not while `readOnly` or saving). Return the save's promise to apply it on a server: the thumb waits in the new position with a spinner and `aria-busy`, presses do nothing; resolve — the state stays (a controlled owner sets `checked` before resolving); reject — the thumb glides back (say why with `error`).",
-          ru: "Новое состояние при каждом переключении (кроме `readOnly` и сохранения). Верните промис сохранения, чтобы применить на сервере: бегунок ждёт в новом положении со спиннером и `aria-busy`, нажатия не действуют; resolve — состояние остаётся (управляемый владелец ставит `checked` до resolve); reject — бегунок плавно возвращается (причину покажите через `error`).",
+          en: "Called with the new state on every toggle. Return the save's promise: the thumb waits with a spinner; a controlled owner sets `checked` before resolving; on reject the thumb goes back (say why with `error`).",
+          ru: "Новое состояние при каждом переключении. Верните промис сохранения: бегунок ждёт со спиннером; управляемый владелец ставит `checked` до resolve; при reject бегунок возвращается (причину покажите через `error`).",
         },
         {
           name: "loading",

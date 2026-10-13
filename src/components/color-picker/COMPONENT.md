@@ -209,7 +209,7 @@ No DOM: clones the single child into the panel's trigger, merges `ref` and `onCl
 |---|---|---|---|
 | `label` | `ReactNode` | — | Heading above the grid; also the list's accessible name (else `labels.list`). |
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Side of the trigger. |
-| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge). |
+| `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "role">` | — | `className` and the other attributes of the panel. |
 
 ## Variants
@@ -269,6 +269,7 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 - Panel width comes from the layout (e.g. `calc(var(--prime-panel-min-width) * 1.5)` fits the area and four channel fields).
 - Field + trigger row: gap `--prime-space-2`, `align-items: flex-end` so the trigger aligns with the field box under a label.
 - Panel parts gap: 12px (`--prime-space-3`) from `ColorPicker.Panel`.
+- ColorPresets.Content `align="auto"`: a trigger near the end of the screen lines up the panel's end edge and the panel grows toward the start, and the other way near the start; a fixed `align` still flips at the screen edge.
 - ColorPresets grid: one row for up to 8 presets (+ «no color»), else rows of 8 (`columns` overrides); below 480px viewport width the `l` / `xl` grids wrap to half the columns.
 
 ## Accessibility

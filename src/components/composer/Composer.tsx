@@ -308,7 +308,7 @@ export type ComposerRootProps = Omit<
    * a change only (and `null` on unmount while active): send the signal to the other side from here.
    */
   onActivityChange?: (activity: ComposerActivity | null) => void;
-  /** A voice message was recorded. Without it the record button is not shown. */
+  /** A voice message was recorded. With it (or `onSendVideoNote`) an empty field shows the record button. */
   onSendVoice?: AsyncEvent<ComposerRecording>;
   /**
    * A round video message was recorded. With it a double click / double tap (or ↑ ↓) on the record

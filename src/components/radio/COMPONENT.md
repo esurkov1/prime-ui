@@ -27,14 +27,14 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 └─ Radio.Root           one option (value): the <label> row with the input and the circle, its hint
    └─ Radio.Label       the visible text of the option
 ```
-`Radio.Root` must be inside `Radio.Group`. Without `Radio.Label` only the circle renders — give the option an `aria-label`.
+`className`, `ref` and the rest of `Radio.Group` go to the field frame; `id`, `aria-label`, `aria-labelledby` and `aria-describedby` to the `role="radiogroup"` element. `Radio.Root` must be inside `Radio.Group`. Without `Radio.Label` only the circle renders — give the option an `aria-label`.
 
 ## API
 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Radio.Group
-`ref` → `HTMLDivElement` (the field frame). Owns the value, the shared `name` and size; renders the group label above and the hint / error below the options. Field-root rule: `className`, `ref` and the rest go to the frame; `id`, `aria-label`, `aria-labelledby` and `aria-describedby` to the `role="radiogroup"` element.
+`ref` → `HTMLDivElement` (the field frame). Owns the value, the shared `name` and size; renders the group label and the hint / error. `id` and the `aria-*` naming props go to the `role="radiogroup"` element.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

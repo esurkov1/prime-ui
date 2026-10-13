@@ -74,6 +74,25 @@ describe("BottomNav", () => {
     expect(disabled).toHaveAttribute("aria-disabled", "true");
   });
 
+  it("takes a disabled asChild link out of the Tab order and blocks its click", () => {
+    const onClick = vi.fn();
+    render(
+      <BottomNav.Root>
+        <BottomNav.Item asChild disabled>
+          {/* biome-ignore lint/a11y/useValidAnchor: a router link stand-in */}
+          <a href="#reports" onClick={onClick}>
+            Отчёты
+          </a>
+        </BottomNav.Item>
+      </BottomNav.Root>,
+    );
+    const link = screen.getByText("Отчёты").closest("a") as HTMLElement;
+    expect(link).toHaveAttribute("tabindex", "-1");
+    expect(link).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(link);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   it("renders the child as the item with asChild, keeping the parts", () => {
     render(
       <BottomNav.Root>

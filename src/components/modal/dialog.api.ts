@@ -139,8 +139,8 @@ export function dialogParts(name: "Modal" | "Drawer" | "Sheet", footerDefault: s
         {
           name: "children",
           type: "ReactNode",
-          en: "Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around the header and the body) spans the last row: the header becomes the tab strip, edge to edge and without the hairline, and the active tab is the body rising into it.",
-          ru: "Icon (левый слот), Title, Description, Actions (перед крестиком). `Tabs.List` (с `Tabs.Root` вокруг шапки и тела) занимает последнюю строку: шапка становится полосой вкладок от края до края, без линии под ней, а активная вкладка — тело, вросшее в шапку.",
+          en: "Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip.",
+          ru: "Icon, Title, Description, Actions в любом порядке; каждый встаёт в свою колонку. `Tabs.List` (с `Tabs.Root` вокруг шапки и тела) превращает шапку в полосу вкладок.",
         },
       ],
     },

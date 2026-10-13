@@ -49,7 +49,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | `value` | `string` | — | Controlled code; non-digits are dropped, extra digits cut to `length`. |
 | `defaultValue` | `string` | `""` | Initial code when uncontrolled. |
 | `onValueChange` | `(value: string) => void` | — | Called with the joined digits on every change. |
-| `onComplete` | `(value: string) => void \| Promise<void>` | — | Called once when the last empty cell is filled (typing, paste or autofill). Return the check's promise: the cells wait read-only and quiet (`aria-busy` on the group); resolve — the `success` look (say it in words in `hint`); reject — the code clears, focus goes to the first cell, the reason (the rejection's message, else `labels.failed`) shakes in as the error and is announced; typing again takes it away. `error` and `success` you pass win over the check. |
+| `onComplete` | `(value: string) => void \| Promise<void>` | — | Called once when the last empty cell is filled (typing, paste or autofill). Return the check's promise: the cells wait read-only; resolve — the `success` look; reject — the code clears and the reason shows as the error. |
 | `fullWidth` | `boolean` | `false` | Cells share the container width up to 1.5 × their side (the row centres beyond that) and keep the tier height; otherwise square cells and the field hugs them. |
 | `groupSize` | `number` | — | Splits the cells into groups of this size with a wider gap (`3` → 123 456). |
 | `mask` | `boolean` | `false` | Hides the digits (PIN): cells are `type="password"`. |
@@ -86,6 +86,7 @@ No `variant` or `tone`.
 
 **Combinations**
 - Recommended: `onComplete` returning the check's promise — the field waits, shows success or clears and shows the reason; or, checking by hand, `error` set after a rejected code and cleared in `onValueChange`.
+- `error` and `success` you pass win over the `onComplete` check.
 - Pointless: `invalid` together with `error`; `length` larger than the real code.
 - Forbidden: `focusRing={false}` without another focus indicator (WCAG 2.4.7).
 
@@ -96,8 +97,8 @@ No `variant` or `tone`.
 | focus | keyboard / click | focused cell: focus fill and its content selected so a new digit replaces it; one inset ring for the row appears on the cell and glides to the next one (`fast` · emphasized) instead of each cell drawing its own; the code has no gaps, so focusing a cell past the first empty one moves focus to that entry cell |
 | filled cell | a digit in the cell | `data-filled="true"` on the cell; the digit fades in as it lands |
 | checking | `onComplete` returned a pending promise | `aria-busy` and `data-pending="true"` on the fieldset, cells `readonly` and quiet to 0.6 (`fast`, both ways); typing waits for the answer |
-| refused | that promise rejected | the code clears and focus goes to the first cell; the reason becomes the error (unless you pass `error`) and shakes in, a polite live region speaks it; typing again takes it away |
-| success | `success`, or a resolved `onComplete` promise (not while invalid) | `data-success="true"` on the fieldset; the cells turn `success-soft` one after another, half a stagger step apart |
+| refused | that promise rejected | the code clears and focus goes to the first cell; the reason (the rejection's message, else `labels.failed`) becomes the error (unless you pass `error`) and shakes in, a polite live region speaks it; typing again takes it away |
+| success | `success`, or a resolved `onComplete` promise (not while invalid) | `data-success="true"` on the fieldset (say it in words in `hint`); the cells turn `success-soft` one after another, half a stagger step apart |
 | full width | `fullWidth` | `data-full-width="true"` on the fieldset |
 | group start | `groupSize` | `data-group-start="true"` on the first cell of every group |
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"` on the fieldset and the frame, `aria-invalid="true"` on cells; the digits turn `danger-text` and the focus ring `danger-border`; the control shakes once when an error arrives (`data-shake` on the frame) |

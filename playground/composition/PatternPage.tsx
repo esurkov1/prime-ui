@@ -11,15 +11,19 @@ import type { CompositionPattern } from "./patterns";
  * The content panel of an app (the AppShell panel: the page itself, cards on it are layer 1) inside
  * the preview stage: a pattern renders only its page, exactly as it would in a consumer app.
  */
-export function ScreenStage({ children }: { children: React.ReactNode }) {
+export function ScreenStage({ children, fill }: { children: React.ReactNode; fill?: boolean }) {
   return (
     <div className={styles.screenFrame}>
-      <div className={styles.screen}>{children}</div>
+      <div className={styles.screen} data-fill={fill || undefined}>
+        {children}
+      </div>
     </div>
   );
 }
 
 const screenStage = (preview: React.ReactNode) => <ScreenStage>{preview}</ScreenStage>;
+/** A page that fills the app panel's height: the stage stands in for a viewport-high panel. */
+const fillStage = (preview: React.ReactNode) => <ScreenStage fill>{preview}</ScreenStage>;
 
 /** One composition pattern: title → description → the screen (preview + code) → its rules. */
 export function PatternPage({ pattern }: { pattern: CompositionPattern }) {
@@ -38,7 +42,7 @@ export function PatternPage({ pattern }: { pattern: CompositionPattern }) {
         <PlaygroundSourceFrame
           entry={getPattern(pattern.file)}
           previewLayout="full"
-          stage={screenStage}
+          stage={pattern.fill ? fillStage : screenStage}
         />
       </DocBlock>
       <DocBlock title="Что здесь важно">

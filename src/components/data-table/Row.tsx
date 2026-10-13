@@ -48,7 +48,10 @@ function renderCell<Row>(row: Row, column: DataTableColumn<Row>, withTitle: bool
   );
 }
 
-/** Toggle buttons sit one tier below the table tier (m table → xs button, 28). */
+/**
+ * Expand toggles are a fixed small control, not a step down of the table tier (`stepDown` would
+ * give `s` in an `m` table): `xs` up to `m`, `s` for `l` and `xl`.
+ */
 const TOGGLE_SIZE: Record<ControlSize, ControlSize> = {
   xs: "xs",
   s: "xs",
@@ -105,6 +108,10 @@ type DataTableRowProps<Row> = {
   selected: boolean;
   /** Ids of the sub-rows the toggle controls (while expanded). */
   childControls: string;
+  /** A virtualized body: measures the row's `<tr>` (`useVirtualRows`). */
+  measureRef?: ((node: HTMLElement | null) => void) | undefined;
+  /** A virtualized body: the row's position among all rows of the table, head included. */
+  ariaRowIndex?: number | undefined;
 };
 
 function DataTableRowImpl<Row>({
@@ -123,6 +130,8 @@ function DataTableRowImpl<Row>({
   detailAnimate,
   selected,
   childControls,
+  measureRef,
+  ariaRowIndex,
 }: DataTableRowProps<Row>) {
   const { columns, size, labels, selection, renderExpanded, openRow: onRowClick } = shared;
   // In-place rows take focus themselves; a link row's focus stop is its link.
@@ -165,7 +174,9 @@ function DataTableRowImpl<Row>({
       <RowElement
         reorder={shared.reorder}
         rowKey={rowKey}
+        rowRef={measureRef}
         id={shared.rowDomId(rowKey)}
+        aria-rowindex={ariaRowIndex}
         className={styles.row}
         style={sub ? ({ "--dt-depth": depth } as React.CSSProperties) : undefined}
         data-stripe={shared.striped && index % 2 === 1 ? "alt" : undefined}

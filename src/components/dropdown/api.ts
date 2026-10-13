@@ -51,8 +51,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.Trigger",
-      en: 'No DOM: clones the single child, merges `ref` and `onClick` (toggles), sets `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`, `data-state`; the child\'s own `id` wins. Other props given to it (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.',
-      ru: "Без DOM: клонирует дочерний элемент, открывает и закрывает меню, ставит ARIA.",
+      en: "No DOM: clones the single child, merges `ref` and `onClick`; toggles the menu and sets its ARIA.",
+      ru: "Без DOM: клонирует дочерний элемент, сливает `ref` и `onClick`; открывает и закрывает меню и ставит ARIA.",
       props: [
         {
           name: "children",
@@ -65,8 +65,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.Content",
-      en: '`ref` → `HTMLDivElement`. Portal + `role="menu"` on the floating surface (a ScrollContainer), named by the trigger; renders while open and during its exit animation. Focus moves to the first item; Tab closes the menu and returns focus to the trigger. Below 640px of viewport the menu is a bottom sheet: a scrim, a grab handle, swipe down to close (with `closeOnOutsideClick`), page scroll locked.',
-      ru: 'Портал и панель `role="menu"`; фокус на первом пункте, стрелки ходят по пунктам, Tab закрывает меню. Уже 640px экрана меню становится шторкой снизу: подложка, ручка, закрытие свайпом вниз (при `closeOnOutsideClick`), прокрутка страницы заблокирована.',
+      en: '`ref` → `HTMLDivElement`. Portal + `role="menu"` floating panel that scrolls inside, named by the trigger; focus moves to the first item. Below 640px of viewport it is a bottom sheet.',
+      ru: 'Портал и плавающая панель `role="menu"` с прокруткой внутри, названная триггером; фокус встаёт на первый пункт. Уже 640px экрана меню становится шторкой снизу.',
       props: [
         {
           name: "side",
@@ -79,8 +79,8 @@ export const api: ComponentApi = {
           name: "align",
           type: '"auto" | "start" | "center" | "end"',
           default: '"auto"',
-          en: "Alignment along the trigger. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge).",
-          ru: "Выравнивание по триггеру. `auto` (по умолчанию) выравнивает панель по тому краю триггера, за которым больше места: у триггера ближе к концу экрана — по концу, и панель растёт к началу, ближе к началу — наоборот; `start`, `center` или `end` задают край явно (у края экрана он всё равно переворачивается).",
+          en: "Alignment along the trigger. `auto` lines the menu up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix the edge.",
+          ru: "Выравнивание по триггеру. `auto` выравнивает меню по краю триггера, за которым больше места; `start`, `center` или `end` задают край явно.",
         },
         {
           name: "size",
@@ -106,8 +106,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.Item",
-      en: '`ref` → `HTMLButtonElement` (or the `asChild` element). A `<button role="menuitem">`; a click, Enter or Space runs `onSelect` and closes the menu. With a `Dropdown.ItemDescription` the label names the item and the description describes it (`aria-labelledby` / `aria-describedby`). + native button props.',
-      ru: "Пункт меню: клик, Enter или Space выполняют `onSelect` и закрывают меню. С `Dropdown.ItemDescription` подпись — имя пункта, вторая строка — его описание.",
+      en: '`ref` → `HTMLButtonElement` (or the `asChild` element). A `<button role="menuitem">`; a click, Enter or Space runs `onSelect` and closes the menu. + native button props.',
+      ru: 'Пункт меню `<button role="menuitem">`: клик, Enter или Space выполняют `onSelect` и закрывают меню.',
       props: [
         {
           name: "onSelect",
@@ -133,8 +133,8 @@ export const api: ComponentApi = {
           name: "asChild",
           type: "boolean",
           default: "false",
-          en: "The item is its single child, a link (`<a href>`, a router `Link`): the item props merge onto it, so Cmd / Ctrl-click and «open in a new tab» work; the pick still closes the menu. The link's children are the item content. Disabled: `aria-disabled`, the click is stopped.",
-          ru: "Пункт — его единственный дочерний элемент-ссылка (`<a href>`, `Link` роутера): работают Cmd/Ctrl-клик и «открыть в новой вкладке», выбор закрывает меню. Неактивная ссылка не переходит.",
+          en: "The item is its single child link (`<a href>`, a router `Link`), so Cmd / Ctrl-click and «open in a new tab» work; the pick still closes the menu.",
+          ru: "Пункт — его единственный дочерний элемент-ссылка (`<a href>`, `Link` роутера): работают Cmd/Ctrl-клик и «открыть в новой вкладке»; выбор закрывает меню.",
         },
         {
           name: "children",
@@ -146,8 +146,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.CheckboxItem",
-      en: '`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked`: the label (and an `ItemIcon`) on the left like any item, an accent check mark at the end while checked and nothing while not; a click, Enter or Space toggles it and the menu stays open. + native button props.',
-      ru: "Пункт-переключатель: подпись (и `ItemIcon`) слева, как у обычного пункта, акцентная галочка в конце, пока он выбран, и пусто, пока нет; клик, Enter или Space переключают его, меню остаётся открытым.",
+      en: '`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a check mark at the end while checked; a click, Enter or Space toggles it and the menu stays open. + native button props.',
+      ru: 'Пункт-переключатель `<button role="menuitemcheckbox">` с `aria-checked` и галочкой в конце, пока он выбран; клик, Enter или Space переключают его, меню остаётся открытым.',
       props: [
         {
           name: "checked",
@@ -185,14 +185,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.ItemDescription",
-      en: "`ref` → `HTMLSpanElement`. A muted second line under the item label: what the action does, or why a disabled item is unavailable («Доступно владельцу проекта»). Wraps instead of widening the menu past its limit; describes the item for assistive tech. + native `<span>` props except `id`.",
-      ru: "Вторая строка пункта под подписью: что делает действие или почему пункт недоступен («Доступно владельцу проекта»). Переносится, не расширяя меню; описывает пункт для скринридера.",
+      en: "`ref` → `HTMLSpanElement`. A muted second line under the item label: what the action does, or why a disabled item is unavailable. Describes the item for assistive tech. + native `<span>` props except `id`.",
+      ru: "Приглушённая вторая строка пункта под подписью: что делает действие или почему пункт недоступен. Описывает пункт для скринридера.",
       props: [],
     },
     {
       name: "Dropdown.ItemIcon · Dropdown.ItemShortcut",
-      en: "`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). An `aria-hidden` `<span>` holding the leading glyph at the menu icon size (a kit `Icon` follows it) / a `Kbd` one tier below the menu, pushed to the end of the item — a hint, not a handler. + native props.",
-      ru: "Иконка в начале пункта по размеру яруса меню / подсказка клавиш (Kbd) в конце пункта.",
+      en: "`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). The `aria-hidden` leading glyph at the menu icon size / a `Kbd` key hint at the end of the item — a hint, not a handler. + native props.",
+      ru: "Иконка в начале пункта (`aria-hidden`) по размеру яруса меню / подсказка клавиш (`Kbd`) в конце пункта — подсказка, не обработчик.",
       props: [],
     },
     {
@@ -223,8 +223,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Dropdown.Header · Dropdown.Title · Dropdown.Description",
-      en: "`ref` → `HTMLDivElement`. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description stacked in one column, a trailing badge or button — in the written order / the medium heading line / the muted line under it; both truncate. + native `<div>` props.",
-      ru: "Неинтерактивная строка сверху: аватар, заголовок и описание одной колонкой, бейдж или кнопка в конце.",
+      en: "`ref` → `HTMLDivElement`. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description in one column, a trailing badge or button. + native `<div>` props.",
+      ru: "Неинтерактивная строка сверху (кто вошёл, тариф): аватар, заголовок и описание одной колонкой, бейдж или кнопка в конце.",
       props: [],
     },
   ],

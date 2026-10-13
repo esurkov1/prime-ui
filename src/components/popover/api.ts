@@ -51,8 +51,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Trigger · Popover.Anchor · Popover.Close",
-      en: "No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and adds `aria-haspopup=\"dialog\"`, `aria-expanded`, `aria-controls`, `data-state` (the child's own `id` wins); Anchor only positions the panel and keeps presses on it from dismissing (open state comes from `open`; focus stays in the anchor on open); Close closes the panel (focus back on the trigger) unless the child's handler calls `preventDefault()`. Other props given to Trigger (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.",
-      ru: "Без DOM: клонируют единственный дочерний элемент. Trigger открывает и закрывает панель и ставит ARIA; Anchor только задаёт якорь положения (открытием управляет `open`); Close закрывает панель.",
+      en: "No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and sets its ARIA; Anchor only positions the panel (open state comes from `open`); Close closes the panel.",
+      ru: "Без DOM: клонируют единственный дочерний элемент и сливают `ref` и `onClick`. Trigger открывает и закрывает панель и ставит ARIA; Anchor только задаёт положение (открытием управляет `open`); Close закрывает панель.",
       props: [
         {
           name: "children",
@@ -65,8 +65,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Content",
-      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` on the floating surface (a ScrollContainer); renders while open and during its exit animation. Named by `Popover.Title`, else by the trigger. Opened from a Trigger, focus moves into the panel (`[data-autofocus]`, else the first tab stop, else the panel). Below 640px of viewport a panel opened from a Trigger (not an Anchor) is a bottom sheet: a scrim, a grab handle, swipe down to close (with `closeOnOutsideClick`), page scroll locked.',
-      ru: 'Портал и панель `role="dialog"`; прокручивается, если не помещается рядом с триггером. Уже 640px экрана панель, открытая из Trigger (не из Anchor), становится шторкой снизу: подложка, ручка, закрытие свайпом вниз (при `closeOnOutsideClick`), прокрутка страницы заблокирована.',
+      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` floating panel that scrolls inside, named by `Popover.Title`. Below 640px of viewport, opened from a Trigger, it is a bottom sheet.',
+      ru: 'Портал и плавающая панель `role="dialog"` с прокруткой внутри, названная `Popover.Title`. Уже 640px экрана, открытая из Trigger, она становится шторкой снизу.',
       props: [
         {
           name: "side",
@@ -79,8 +79,8 @@ export const api: ComponentApi = {
           name: "align",
           type: '"auto" | "start" | "center" | "end"',
           default: '"auto"',
-          en: "Alignment along the trigger. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge).",
-          ru: "Выравнивание по триггеру. `auto` (по умолчанию) выравнивает панель по тому краю триггера, за которым больше места: у триггера ближе к концу экрана — по концу, и панель растёт к началу, ближе к началу — наоборот; `start`, `center` или `end` задают край явно (у края экрана он всё равно переворачивается).",
+          en: "Alignment along the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix the edge.",
+          ru: "Выравнивание по триггеру. `auto` выравнивает панель по краю триггера, за которым больше места; `start`, `center` или `end` задают край явно.",
         },
         {
           name: "size",

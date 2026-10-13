@@ -136,7 +136,7 @@ function ConfirmDialogRoot({
         <DialogFooter>
           <DialogClose>
             {/* The least destructive choice takes focus first. */}
-            <Button.Root variant="soft" tone="neutral" data-autofocus="">
+            <Button.Root variant="outline" tone="neutral" data-autofocus="">
               {text.cancel}
             </Button.Root>
           </DialogClose>

@@ -9,6 +9,8 @@ import { fileURLToPath } from "node:url";
 
 import { expect } from "vitest";
 
+import type { ComponentApi } from "../../scripts/docs/componentApi";
+
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 export const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
@@ -83,4 +85,30 @@ export function checkLayoutCss(file: string, css: string, forbidden: string[] = 
     ...forbidden,
   ];
   expect(sheet, file).not.toMatch(new RegExp(`^\\s*(${properties.join("|")})\\s*:`, "m"));
+}
+
+/** Longest part description in `api.ts` (`en` and `ru`): the element line and a short summary. */
+export const API_PART_MAX = 280;
+/** Longest prop description in `api.ts` (`en` and `ru`): one or two sentences. */
+export const API_PROP_MAX = 220;
+
+/**
+ * Descriptions of `api` over the limits, as `Part.prop en: 312 > 220`. Details beyond a short
+ * summary belong in the hand-written COMPONENT.md sections (Variants, States, Layout & spacing,
+ * Accessibility, Mistakes), not in the API tables.
+ */
+export function overlongApiDescriptions(api: ComponentApi): string[] {
+  const over: string[] = [];
+  const check = (where: string, text: string | undefined, max: number) => {
+    if (text && text.length > max) over.push(`${where}: ${text.length} > ${max}`);
+  };
+  for (const part of api.parts) {
+    check(`${part.name} en`, part.en, API_PART_MAX);
+    check(`${part.name} ru`, part.ru, API_PART_MAX);
+    for (const prop of part.props) {
+      check(`${part.name}.${prop.name} en`, prop.en, API_PROP_MAX);
+      check(`${part.name}.${prop.name} ru`, prop.ru, API_PROP_MAX);
+    }
+  }
+  return over;
 }

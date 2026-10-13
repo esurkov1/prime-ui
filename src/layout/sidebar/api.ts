@@ -80,14 +80,14 @@ export const api: ComponentApi = {
           name: "offCanvas",
           type: '"auto" | "always" | "never"',
           default: '"auto"',
-          en: "When the rail leaves the layout and becomes an off-canvas panel with a scrim and a focus trap, opened by `open`: `auto` — below 768px (viewport); `always` — at any width (navigation behind a menu button); `never` — always a rail.",
-          ru: "Когда рельс уходит из раскладки и становится выезжающей панелью с подложкой и ловушкой фокуса, которую открывает `open`: `auto` — уже 768px (окно браузера); `always` — на любой ширине (навигация за кнопкой меню); `never` — всегда рельс.",
+          en: "When the rail becomes an off-canvas panel opened by `open`: `auto` — below 768px (viewport); `always` — at any width; `never` — always a rail.",
+          ru: "Когда рельс становится выезжающей панелью, которую открывает `open`: `auto` — уже 768px (окно браузера); `always` — на любой ширине; `never` — всегда рельс.",
         },
         {
           name: "persistKey",
           type: "string",
-          en: "Remembers the navigation across reloads in `localStorage` under this key: the mode and which collapsible groups and sub-lists are open, by their `id`, else their label text (give an `id` when labels are translated or change). The stored state wins over `defaultMode` / `defaultOpen`; controlled `mode` / `open` are not stored. Unavailable storage is ignored.",
-          ru: "Запоминает навигацию между перезагрузками в `localStorage` под этим ключом: режим и какие сворачиваемые группы и вложенные списки открыты — по их `id`, иначе по тексту подписи (задайте `id`, если подписи переводятся или меняются). Сохранённое состояние главнее `defaultMode` / `defaultOpen`; управляемые `mode` / `open` не сохраняются. Недоступное хранилище не мешает работе.",
+          en: "`localStorage` key that keeps the mode and the open groups and sub-lists across reloads (keyed by `id`, else label text). Wins over `defaultMode` / `defaultOpen`.",
+          ru: "Ключ `localStorage`, под которым режим и открытые группы и вложенные списки переживают перезагрузку (по `id`, иначе по тексту подписи). Главнее `defaultMode` / `defaultOpen`.",
         },
         {
           name: "labels",
@@ -106,8 +106,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Brand",
-      en: "`forwardRef` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays, without a tooltip (it would cover the edge toggle); the faded name still names the link.",
-      ru: "Блок продукта: `Sidebar.BrandLogo`, название и приглушённая строка; ссылка при `href`, единственный дочерний элемент при `asChild`, иначе `<div>`. В компактном режиме остаётся логотип, без подсказки (она закрыла бы кнопку на краю); скрытое название по-прежнему называет ссылку.",
+      en: "`forwardRef` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays.",
+      ru: "Блок продукта: `Sidebar.BrandLogo`, название и приглушённая строка; ссылка при `href`, единственный дочерний элемент при `asChild`, иначе `<div>`. В компактном режиме остаётся логотип.",
       props: [
         {
           name: "description",
@@ -177,8 +177,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Group",
-      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail the heading keeps its height and layout: its text slides toward the edge, scales down and is cut by the rail with a fade, so the first letters still name the section, and it still folds and unfolds the group. An open group keeps its items on the rail; a folded one stays folded and becomes one `…` row (named by the label, `aria-haspopup="dialog"`) whose items open in a flyout, like a sub-list. A folded group with a count that needs attention inside shows its dot (after the heading, or on the `…` row).',
-      ru: '`<div role="group">`, названная своей подписью. С `collapsible` заголовок — кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце; пункты сворачиваются (inert). В компактном рельсе заголовок сохраняет высоту и раскладку: текст сдвигается к краю, уменьшается и обрезается рельсом с затуханием, так что первые буквы по-прежнему называют раздел, и по-прежнему сворачивает и разворачивает группу. Открытая группа показывает пункты и на рельсе; свёрнутая остаётся свёрнутой и становится одной строкой `…` (с именем группы, `aria-haspopup="dialog"`), пункты которой открываются во всплывающей панели, как у вложенного списка. Свёрнутая группа, внутри которой есть счётчик, требующий внимания, показывает его точку (после заголовка или на строке `…`).',
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button that folds the items away; on the compact rail a folded group becomes one `…` row whose items open in a flyout.',
+      ru: '`<div role="group">`, названная своей подписью. С `collapsible` заголовок — кнопка-раскрывашка, сворачивающая пункты; в компактном рельсе свёрнутая группа становится строкой `…`, пункты которой открываются во всплывающей панели.',
       props: [
         {
           name: "label",
@@ -218,8 +218,8 @@ export const api: ComponentApi = {
           name: "current",
           type: "boolean",
           default: "false",
-          en: 'Current page: `aria-current="page"`, `data-state="active"`; a muted fill two ladder steps off the rail, apart from the hover wash, and primary text and icon colour (a translucent wash in a flyout). No shadow.',
-          ru: 'Текущая страница: `aria-current="page"`, `data-state="active"`; приглушённая заливка на две ступени темнее панели, отличная от заливки при наведении, и основной цвет текста и иконки (во всплывающей панели — полупрозрачная заливка). Без тени.',
+          en: 'Current page: `aria-current="page"`, `data-state="active"`; a muted fill and primary text and icon colour.',
+          ru: 'Текущая страница: `aria-current="page"`, `data-state="active"`; приглушённая заливка и основной цвет текста и иконки.',
         },
         {
           name: "disabled",
@@ -277,8 +277,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.ItemCount",
-      en: "`ref` → `HTMLSpanElement` (the number or the Badge). A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set. In compact mode the number leaves the row (still read by screen readers) and a badge leaves a dot of its hue on the icon; a folded sub-list or group shows the dot of a badge inside it.",
-      ru: "Счётчик после подписи: по умолчанию простое приглушённое число; `Badge` (на ярус меньше), когда задан `color` или `variant`. В компактном режиме число уходит из строки (остаётся для скринридеров), а бейдж оставляет на иконке точку своего цвета; свёрнутый вложенный список или группа показывает точку бейджа, который внутри.",
+      en: "`ref` → `HTMLSpanElement` (the number or the Badge). A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set — on the compact rail it becomes a dot of its hue.",
+      ru: "Счётчик после подписи: по умолчанию простое приглушённое число; `Badge` (на ярус меньше), когда задан `color` или `variant`, — в компактном рельсе он становится точкой своего цвета.",
       props: [
         {
           name: "children",
@@ -329,8 +329,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.ItemAction",
-      en: "`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row, always on touch screens, while the trail (count, hint) steps aside; hidden on the compact rail.",
-      ru: "Действие в строке (создать, добавить): призрачная кнопка-иконка `Button` на ярус меньше с подсказкой, рядом с элементом пункта — не внутри. Появляется при наведении и фокусе строки, на сенсорных экранах видно всегда, счётчик отодвигается; в компактном рельсе скрыто.",
+      en: "`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. Shows on hover and focus of the row (always on touch); hidden on the compact rail.",
+      ru: "Действие в строке (создать, добавить): призрачная кнопка-иконка `Button` на ярус меньше с подсказкой, рядом с элементом пункта — не внутри. Видно при наведении и фокусе строки (на сенсорных — всегда); в компактном рельсе скрыто.",
       props: [
         {
           name: "label",
@@ -368,8 +368,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Sub",
-      en: "`ref` → `HTMLDivElement`. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Expanded, the children unfold under the parent on a guide line; on the compact rail they open in a flyout (the kit Popover to the right, with the rows and spacing of a kit menu). A current child opens the sub-list and marks the parent as on the active path (`data-active-path`). While folded (and always on the rail) the parent shows the dot of a count inside that needs attention.",
-      ru: "Родительский пункт с дочерними: `Sidebar.SubTrigger` + `Sidebar.SubContent` в `<div>`. В развёрнутом режиме дочерние раскрываются под родителем на направляющей линии; в компактном рельсе — во всплывающей панели справа (Popover из кита со строками и отступами меню кита). Текущий дочерний раскрывает список и отмечает родителя как путь к текущей странице (`data-active-path`). Пока список свёрнут (и всегда на рельсе), родитель показывает точку счётчика внутри, который требует внимания.",
+      en: "`ref` → `HTMLDivElement`. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Children unfold on a guide line, or in a flyout on the compact rail. A current child opens the sub-list and marks the parent (`data-active-path`).",
+      ru: "Родительский пункт с дочерними: `Sidebar.SubTrigger` + `Sidebar.SubContent` в `<div>`. Дочерние раскрываются под родителем на направляющей линии, в компактном рельсе — во всплывающей панели. Текущий дочерний раскрывает список и отмечает родителя (`data-active-path`).",
       props: [
         ...OPEN_TRIAD({ en: "Children", ru: "Дочерние пункты" }),
         {
@@ -384,8 +384,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.SubTrigger",
-      en: '`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. Expanded: click, `→` / `←` open and close. Compact: hover (after a short intent delay), click, `Enter` · `Space` · `→` open the flyout (`aria-haspopup="dialog"`); on the active path it takes the current fill.',
-      ru: "Строка родителя: кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце строки. В развёрнутом режиме клик и `→` / `←` раскрывают и сворачивают. В компактном наведение (после короткой задержки), клик, `Enter` · `Space` · `→` открывают всплывающую панель; на пути к текущей странице пункт получает заливку текущего.",
+      en: '`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. On the compact rail it opens the flyout (`aria-haspopup="dialog"`).',
+      ru: 'Строка родителя: кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце строки. В компактном рельсе открывает всплывающую панель (`aria-haspopup="dialog"`).',
       props: [
         {
           name: "children",
@@ -448,8 +448,8 @@ export const api: ComponentApi = {
           name: "variant",
           type: '"item" | "header"',
           default: '"item"',
-          en: "`item` — a row in the rail. `header` — an icon button «‹‹» at the end of `Sidebar.Header`; in compact mode the same button moves onto the rail's outer edge, shrinks and turns round, and its chevrons turn to point out. Off-canvas it stays in the header and closes the panel.",
-          ru: "`item` — пункт в рельсе. `header` — кнопка-иконка «‹‹» в конце `Sidebar.Header`; в компактном режиме та же кнопка переезжает на внешнюю кромку рельса, уменьшается и становится круглой, шевроны разворачиваются наружу. На узком экране остаётся в шапке и закрывает панель.",
+          en: "`item` — a row in the rail. `header` — an icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode.",
+          ru: "`item` — пункт в рельсе. `header` — кнопка-иконка «‹‹» в конце `Sidebar.Header`, в компактном режиме переезжает на кромку рельса.",
         },
         {
           name: "…rest",

@@ -109,15 +109,15 @@ export const api: ComponentApi = {
           name: "strength",
           type: "boolean",
           default: "false",
-          en: "A password strength meter: a stepped `ProgressBar` (4 steps) under the field and the level word at the end of the support row — weak, easy, medium, hard (`labels.strengthWeak` … `strengthHard`), toned danger → warning → accent → success. Follows the value of `Input.Field`, controlled or not. For new-password fields.",
-          ru: "Шкала надёжности пароля: ступенчатый `ProgressBar` (4 шага) под полем и слово уровня в конце строки поддержки — слабый, лёгкий, средний, сложный (`labels.strengthWeak` … `strengthHard`), тон danger → warning → accent → success. Следит за значением `Input.Field`, управляемым или нет. Для поля нового пароля.",
+          en: "A password strength meter for new-password fields: a stepped `ProgressBar` under the field and the level word (weak … hard) in the support row. Follows the value of `Input.Field`.",
+          ru: "Шкала надёжности для поля нового пароля: ступенчатый `ProgressBar` под полем и слово уровня (слабый … сложный) в строке поддержки. Следит за значением `Input.Field`.",
         },
         {
           name: "getStrength",
           type: "(value: string) => 0 | 1 | 2 | 3 | 4",
           default: "getPasswordStrength",
-          en: "Replaces the kit's estimate: every trait adds a point on its own, in any order — lowercase, uppercase, digits, symbols, 10+ and 14+ characters; 0–2 points weak, 3 easy, 4 medium, 5+ hard, and under 8 characters at most easy. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check.",
-          ru: "Заменяет оценку кита: каждый признак добавляет балл сам по себе, в любом порядке — строчные, заглавные, цифры, символы, 10+ и 14+ символов; 0–2 балла — слабый, 3 — лёгкий, 4 — средний, 5+ — сложный, короче 8 символов — не выше лёгкого. Верните 0 для пустого, 1 — слабый … 4 — сложный. Подсказка для человека, а не проверка безопасности.",
+          en: "Replaces the kit's estimate of `strength`. Return 0 for empty, 1 weak … 4 hard. A hint for the person typing, not a security check.",
+          ru: "Заменяет оценку кита для `strength`. Верните 0 для пустого, 1 — слабый … 4 — сложный. Подсказка для человека, а не проверка безопасности.",
         },
         fieldCommitProp({ en: "Enter", ru: "Enter" }),
         {
@@ -252,8 +252,8 @@ export const api: ComponentApi = {
     }),
     {
       name: "Input.RevealButton",
-      en: '`ref` → `HTMLButtonElement`. A full-height segment that shows a `type="password"` field as text and back: `aria-pressed`, named by `labels.reveal`, `aria-controls` on the input, the eye glyph switches. A pointer press keeps the focus in the field; the caret and selection survive the switch.',
-      ru: "Сегмент, который показывает пароль текстом и прячет обратно: `aria-pressed`, имя `labels.reveal`, иконка глаза меняется. Нажатие мышью оставляет фокус в поле, курсор и выделение сохраняются.",
+      en: '`ref` → `HTMLButtonElement`. A full-height toggle segment that shows a `type="password"` field as text and back (`aria-pressed`, named by `labels.reveal`); the focus, caret and selection stay in the field.',
+      ru: "Сегмент-переключатель, который показывает пароль текстом и прячет обратно (`aria-pressed`, имя `labels.reveal`); фокус, курсор и выделение остаются в поле.",
       props: [
         {
           name: "…rest",

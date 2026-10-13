@@ -48,7 +48,7 @@ PageContent.Root | PageContent.Section     column; Root adds maxWidth and fill, 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `maxWidth` | `"full" \| "readable" \| "wide"` | `"full"` | Cap of the column, centred: `full` — the whole main; `readable` — the reading measure `--prime-layout-reading-max-width` (42rem); `wide` — the content width `--prime-layout-content-max-width` (75rem). |
-| `fill` | `boolean` | `false` | The page takes the height of the panel's main (`AppShell.Root fillViewport`) and the body takes what the header leaves: for a full-height table (`scrollHeight="fill"`), board (Crossfade `fill`), chat or `PageContent.Split`. Main keeps only gutter-high air below it. |
+| `fill` | `boolean` | `false` | The page takes the height of main (`AppShell.Root fillViewport`) and the body takes what the header leaves: for a full-height table, board, chat or `PageContent.Split`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (Header, Body), `className` and the other div attributes. |
 
 ### PageContent.Section
@@ -95,7 +95,7 @@ PageContent.Root | PageContent.Section     column; Root adds maxWidth and fill, 
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### PageContent.Split
-`ref` → `HTMLDivElement`. List + detail (mail, a messenger, a ticket queue), a container (`prime-split`): from 48rem of its own width the list stands in a 16–20rem column with the detail beside it, 24 apart; below that one pane at a time — the list, or the open detail. The pane that comes into view enters (`enterMotion`, base) and focus follows it: into the detail, back to the list control it left. Takes the free height of a filling page.
+`ref` → `HTMLDivElement`. List + detail (mail, a messenger, a ticket queue): side by side from 48rem of its own width, one pane at a time below it, focus following the pane that comes into view.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -170,7 +170,7 @@ One `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s
 - Header is a wrapping row: actions stay to the right of the title while the heading keeps half a reading measure, otherwise they wrap below it — no breakpoint needed, works from 320px.
 - Title and Description wrap long words (`overflow-wrap: anywhere`).
 - `fill` needs a main with a height: `AppShell.Root fillViewport` (main scrolls inside the panel). The body passes its free height on to a filling child — DataTable `scrollHeight="fill"`, Crossfade `fill`, `PageContent.Split`.
-- Split lays itself out from its own width (container `prime-split`), never from the window: a split beside an open Sidebar may be narrow on a wide screen. Each pane is a column whose last child takes the free height — put a Card with its own `ScrollContainer` there, so the list and the thread scroll separately.
+- Split takes the free height of a filling page and lays itself out from its own width (container `prime-split`), never from the window: a split beside an open Sidebar may be narrow on a wide screen. Each pane is a column whose last child takes the free height — put a Card with its own `ScrollContainer` there, so the list and the thread scroll separately.
 - The detail pane is on screen all the time on a wide split: while nothing is chosen it shows a short hint («Выберите диалог»), never an empty card.
 
 ## Accessibility

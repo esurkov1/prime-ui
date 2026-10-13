@@ -39,13 +39,13 @@ ScrollContainer   <div> (or the `as` tag); thin scrollbar, soft hidden edges
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `axis` | `"vertical" \| "horizontal" \| "both"` | `"vertical"` | Scroll axis; the other axis is clipped (except `both`). On `horizontal` a vertical mouse wheel scrolls the strip sideways while it can move (a trackpad's own sideways swipe, Shift + wheel and a page scroll passing over stay native). |
-| `edges` | `"fade" \| "shadow" \| "none"` | `"fade"` | Every edge of the scroll axes that hides content: `fade` dissolves it (an alpha mask, over any background; as deep as the hidden part, `--prime-space-8` at most, so it grows and melts with the scroll) and sets `scroll-padding` of that depth, so focus and `scrollIntoView` land clear of it; `shadow` — a soft shadow over the edge on the region's own fill `--prime-color-layer-current`, pure CSS (a region that is itself a surface: a floating panel, a code well); `none` — plain edges (a page column, a table that draws its own edge shadows). |
+| `axis` | `"vertical" \| "horizontal" \| "both"` | `"vertical"` | Scroll axis; the other axis is clipped (except `both`). On `horizontal` a vertical mouse wheel scrolls the strip sideways. |
+| `edges` | `"fade" \| "shadow" \| "none"` | `"fade"` | Edges that hide content: `fade` dissolves them over any background; `shadow` — a soft shadow on the region's own fill (a floating panel, a code well); `none` — plain edges. |
 | `scrollbar` | `"thin" \| "hidden"` | `"thin"` | `thin` — the kit's quiet scrollbar; `hidden` — no scrollbar, keep `edges` on so the overflow stays visible. |
-| `lock` | `boolean` | `false` | The person cannot scroll the region — wheel, touch, keys and a drag's edge auto-scroll; it keeps its position (code may still set it). For a list behind an open review or a drag that must not move it. Sets `data-lock`. |
-| `snap` | `boolean` | `false` | Scrolling comes to rest on the start of a child (`scroll-snap-type: proximity` along the axis, `scroll-snap-align: start` on the children); a host aligns deeper items itself. For strips of tiles and cards; not with `anchor="end"`. |
-| `anchor` | `"start" \| "end"` | `"start"` | `end` — a chat or a log: the region opens at the end and stays there while content arrives, as long as the person is at the end (within 4 px); scrolled away, what they look at stays put. Sets `data-anchor` and turns the browser's own scroll anchoring off. |
-| `onReachStart` | `() => void \| Promise<void>` | — | The scroll position came within 120 px of the start: load older content. Fires once per approach (again after leaving the zone or when the content grows); a returned promise blocks repeat calls and sets `aria-busy` until it settles. Content added above keeps the view in place. |
+| `lock` | `boolean` | `false` | The person cannot scroll the region (wheel, touch, keys, a drag's auto-scroll); code still can. Sets `data-lock`. |
+| `snap` | `boolean` | `false` | Scrolling comes to rest on the start of a child (proximity snapping). For strips of tiles and cards; not with `anchor="end"`. |
+| `anchor` | `"start" \| "end"` | `"start"` | `end` — a chat or a log: opens at the end and follows new content while the person is at the end; scrolled away, the view holds still. |
+| `onReachStart` | `() => void \| Promise<void>` | — | Fires within 120 px of the start, once per approach: load older content. A returned promise blocks repeats and sets `aria-busy`; content added above keeps the view. |
 | `onReachEnd` | `() => void \| Promise<void>` | — | The scroll position came within 120 px of the end: load the next page. Same once-per-approach and promise rules as `onReachStart`. |
 | `overscrollBehavior` | `"auto" \| "contain" \| "none"` | `"contain"` | CSS `overscroll-behavior`; `contain` stops scroll chaining into the page. |
 | `as` | `"div" \| "main" \| "aside" \| "section" \| "nav" \| "article"` | `"div"` | Root element; a landmark tag when the region is one. |
@@ -91,8 +91,8 @@ Only the reader scrolling back unpins the end: content that keeps growing (an an
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `lock` | nothing the person does scrolls the region (wheel, touch, keys, a drag's edge auto-scroll); the position stays | a list behind an open review, a gesture that must not move it | off |
-| `snap` | a scroll comes to rest on the start of a child (proximity snapping) | strips of tiles or cards | off |
+| `lock` | nothing the person does scrolls the region (wheel, touch, keys, a drag's edge auto-scroll); the position stays, and code may still set it | a list behind an open review, a gesture that must not move it | off |
+| `snap` | a scroll comes to rest on the start of a direct child (proximity snapping); a host aligns deeper items itself | strips of tiles or cards | off |
 
 ### Wheel and auto-scroll
 - `axis="horizontal"`: a vertical mouse wheel scrolls the strip sideways while it can move, gliding to an accumulated target (instant under reduced motion). A trackpad's sideways swipe and Shift + wheel stay native; a wheel gesture that began outside the strip keeps scrolling the page; at the strip's edge the wheel chains to the page. There is no drag-to-scroll: a press-and-drag in a strip belongs to its items (reordering tiles, tabs); touch pans natively.
@@ -114,11 +114,11 @@ Each fires once per approach — again after the position leaves the zone or the
 | edge treatment | `edges` | `data-edges="fade" \| "shadow"` (none for `none`) |
 | content hidden at an edge | scroll position (with `edges="fade"`), measured at most once per frame on scroll, on resize of the region or a child and when children are added; only the scroll axes; logical in RTL | `data-overflow-top`, `data-overflow-bottom`, `data-overflow-start`, `data-overflow-end` = `"true"`; `--edge-*` depths written only while they change (within the last `--prime-space-8` of an edge), on non-inherited properties |
 | locked | `lock` | `data-lock`, `overflow: hidden` |
-| snapping | `snap` | `data-snap`, `scroll-snap-type: <axis> proximity` |
+| snapping | `snap` | `data-snap`, `scroll-snap-type: <axis> proximity`; `scroll-snap-align: start` on the children |
 | kit anchoring | `anchor="end"` or `onReachStart` | `data-anchor="end" \| "start"`, `overflow-anchor: none`: the kit keeps the visible entry in place (or the end, while pinned) before paint, the same in every browser |
 | pinned to the end | `anchor="end"` and the position within 4 px of the end | content changes scroll to the new end at once (high-frequency: no animation) |
 | loading at an edge | a pending promise from `onReachStart` / `onReachEnd` | `aria-busy="true"` |
-| content fits | the content is no larger than the region along its axis (re-measured on resize of the region or a child, and when children change) | `data-fits`, `overflow: hidden`: a region that cannot scroll is no scroller, so the browser never composites a layer for a sub-pixel overflow; text or inline content straight inside keeps it a scroller |
+| content fits | the content is no larger than the region along its axis (re-measured on resize of the region or a child, and when children change); never with `anchor="end"`, `onReachStart` or `onReachEnd` — a region that follows its content always stays a scroller | `data-fits`, `overflow: hidden`: a region that cannot scroll is no scroller, so the browser never composites a layer for a sub-pixel overflow; text or inline content straight inside keeps it a scroller |
 | keyboard focus | `tabIndex={0}` on a region without focusable content | inset focus ring (`--prime-focus-offset-inset`) |
 
 The scrollbar thumb uses `fill-strong`, darkening to `fill-strong-hover` on hover (WebKit). The fade and the shadow follow the scroll at once: scrolling is high-frequency, so nothing animates. A fade region sets `scroll-padding` of the fade depth on its scroll axes, so focus, `scrollIntoView` and a snapped child land clear of the fade.

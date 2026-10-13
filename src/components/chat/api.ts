@@ -4,14 +4,14 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Chat.Root",
-      en: "`ref` → `HTMLDivElement`. A chat, assembled: the frame of a conversation that owns its state — the selection, the search and its current match, the typing signal, the jump to a message — and hands it to its parts. A column that fills its host's height (put it in a `Card` or a page pane): the header, the search bar and the pinned bar on top, the messages scrolling in the middle, the footer with the Composer at the bottom. Every part but `Chat.Messages` is optional: a list without the rest is `Chat.Root` with `Chat.Messages` alone. One sound plays at a time across its voice messages, circles and videos.",
-      ru: "Чат в сборе: рамка переписки, которая владеет её состоянием — выбором, поиском и его текущим совпадением, сигналом набора, переходом к сообщению — и раздаёт его частям. Колонка во всю высоту родителя (положите её в `Card` или панель страницы): шапка, строка поиска и закреплённые сверху, сообщения прокручиваются посередине, внизу подвал с Composer. Все части, кроме `Chat.Messages`, необязательны: лента без остального — это `Chat.Root` с одним `Chat.Messages`. Голосовые, кружки и видео звучат по одному.",
+      en: "`ref` → `HTMLDivElement`. The chat frame: owns the selection, the search, the typing signal and jumps, and hands them to its parts. A column that fills its host's height; every part but `Chat.Messages` is optional.",
+      ru: "Рамка чата: владеет выбором, поиском, сигналом набора и переходами и раздаёт их частям. Колонка во всю высоту родителя; все части, кроме `Chat.Messages`, необязательны.",
       props: [
         {
           name: "selected",
           type: "readonly string[] | null",
-          en: "Selection mode (controlled): the `value`s of the selected messages, `null` while not selecting. Any of the triad adds «Выбрать» to every `Message.Menu`; without one the chat has no selection. While selecting: a check beside every message, the selected messages stay as they are and the others step back (dimmed, slightly desaturated) — no outline, no wash; a click toggles, Shift+click selects the range from the anchor, press-and-drag (or a finger slid from a check) paints the messages it passes with the first one's new state and scrolls the list at its edges — as DataTable rows; Escape leaves.",
-          ru: "Режим выбора (управляемое): `value` выбранных сообщений, `null` — не выбираем. Любой из тройки добавляет «Выбрать» в каждое `Message.Menu`; без неё в чате нет выбора. В режиме: флажок у каждого сообщения, выбранные сообщения остаются как есть, остальные отступают (приглушены и чуть обесцвечены) — без рамки и заливки; клик переключает, Shift+клик выбирает диапазон от якоря, протягивание (или палец, ведущий от флажка) окрашивает пройденные сообщения состоянием первого и прокручивает ленту у краёв — как строки DataTable; Escape выходит.",
+          en: "Selection mode (controlled): the `value`s of the selected messages, `null` while not selecting. Any of the triad adds «Выбрать» to every `Message.Menu`; without it the chat has no selection.",
+          ru: "Режим выбора (управляемое): `value` выбранных сообщений, `null` — не выбираем. Любой из тройки добавляет «Выбрать» в каждое `Message.Menu`; без неё выбора нет.",
         },
         {
           name: "defaultSelected",
@@ -29,8 +29,8 @@ export const api: ComponentApi = {
         {
           name: "search",
           type: "string | null",
-          en: "The search query (controlled); `null` — the search bar is closed. Every case-insensitive match in the messages' text and transcripts is marked; the newest match is current and brought into view while the other messages step back.",
-          ru: "Поисковый запрос (управляемое); `null` — строка поиска закрыта. Каждое совпадение без учёта регистра в тексте и расшифровках сообщений выделено; самое новое — текущее, чат приводит к нему, остальные сообщения отступают.",
+          en: "The search query (controlled); `null` — the search bar is closed. Matches in the messages' text and transcripts are marked; the newest is current.",
+          ru: "Поисковый запрос (управляемое); `null` — строка поиска закрыта. Совпадения в тексте и расшифровках сообщений выделены; самое новое — текущее.",
         },
         {
           name: "defaultSearch",
@@ -49,8 +49,8 @@ export const api: ComponentApi = {
           name: "current",
           type: "string | null",
           default: "null",
-          en: "A message to bring into view (a link, a notification): when it changes, the chat brings it to the middle of its scroller (a message the window does not render is rendered first and jumped to) and points at it: nothing is drawn on it, the other messages step back and come forward three times. While the search is open its current match takes this place, and the others stay back while it is current. Focus stays where it is.",
-          ru: "Сообщение, к которому перейти (ссылка, уведомление): при смене чат приводит его в середину своей прокрутки (сообщение вне окна сначала отрисовывается) и указывает на него: на нём ничего не рисуется, остальные сообщения трижды отступают и возвращаются. Пока открыт поиск, его место занимает текущее совпадение, и остальные стоят отступив, пока оно текущее. Фокус остаётся на месте.",
+          en: "A message to bring into view (a link, a notification): on change the chat brings it to the middle and the other messages blink back. The focus stays where it is.",
+          ru: "Сообщение, к которому перейти (ссылка, уведомление): при смене чат приводит его в середину, остальные сообщения мигают, отступая. Фокус остаётся на месте.",
         },
         {
           name: "typing",
@@ -67,7 +67,7 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: "HTMLAttributes<HTMLDivElement>",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">',
           en: "`className` and the other attributes of the frame.",
           ru: "`className` и прочие атрибуты рамки.",
         },
@@ -147,8 +147,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Search",
-      en: "`ref` → `HTMLDivElement`. The search bar, shown while the search is open: the field (focused as it opens), the place of the current match («2 из 5», announced politely) and the steps to the older and newer match. Enter goes to the older match, Escape closes; the focus stays in the field while the chat moves.",
-      ru: "Строка поиска, видна, пока поиск открыт: поле (получает фокус при открытии), место текущего совпадения («2 из 5», объявляется вежливо) и шаги к более старому и более новому совпадению. Enter — к более старому, Escape закрывает; фокус остаётся в поле, пока чат перемещается.",
+      en: "`ref` → `HTMLDivElement`. The search bar, shown while the search is open: the field (focused as it opens), the place of the current match («2 из 5») and the steps to the older and newer match.",
+      ru: "Строка поиска, видна, пока поиск открыт: поле (получает фокус при открытии), место текущего совпадения («2 из 5») и шаги к более старому и более новому совпадению.",
       props: [
         {
           name: "…rest",
@@ -160,8 +160,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Pinned",
-      en: "`ref` → `HTMLDivElement`. The pinned messages above the conversation: a rail of segments (which of several is shown, the current one in the accent), a pin, «Закреплённое сообщение» or «Закреплённое 2 из 3» over one line of the message, and an optional unpin button. The text area is one button: the chat brings the message into view and blinks the others around it, then the bar steps to the next older one; the line enters on each step. Renders nothing without items.",
-      ru: "Закреплённые сообщения над перепиской: полоска сегментов (какое из нескольких показано, текущее — акцентом), булавка, «Закреплённое сообщение» или «Закреплённое 2 из 3» над строкой сообщения и необязательная кнопка открепления. Текстовая часть — одна кнопка: чат приводит к сообщению и мигает остальными вокруг него, затем плашка переходит к следующему более старому; строка появляется на каждом шаге. Без элементов ничего не рисует.",
+      en: "`ref` → `HTMLDivElement`. The pinned messages above the conversation: a rail of segments, the title over one line of the message and an optional unpin button. A press jumps to the message, then steps to the next older one.",
+      ru: "Закреплённые сообщения над перепиской: полоска сегментов, заголовок над строкой сообщения и необязательная кнопка открепления. Нажатие переходит к сообщению, затем к следующему более старому.",
       props: [
         {
           name: "items",
@@ -217,21 +217,21 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Messages",
-      en: '`ref` → `HTMLDivElement` (the log: `ref`, `className`, `aria-label` and the other attributes go to it). The conversation, the one message list of the kit, in its own scroller: a `role="log"` of rows (new messages are announced politely) with one tab stop — arrows, Home and End move between messages. Rows come from `items` (the dates, the runs, the unread band and every message\'s `value` and `position` added for you; an item renders again only when its data or place changed) or from children: every top-level child is a row — a `Message.Root` (or a fragment with one; an own component standing for a message carries its `value` as `key` and may pass `direction`), `Chat.Separator`, `Chat.Service`, `Chat.Unread` — except `Message.Typing` and `Chat.SelectionBar`, which close the list (the chat\'s own typing bubble from `Chat.Root typing` closes it unless you put one). It scrolls itself (`anchor="end"`) and renders only the rows around the view (in normal flow between two spacers, each measured once and cached by key, the sticky date kept), opens at the end, stays at the end while the reader is there, scrolls to your own new message, and otherwise shows a round «к последним» button with the count of messages that came meanwhile; history loaded above (`hasOlder`, `onLoadOlder`, a placeholder above the first message), rows measured on the way and a message that changes size in place keep the reader\'s place; jumps, search, Shift selection, the keyboard (`aria-posinset` / `aria-setsize`), a playing player and the focused message reach or keep rows it does not render. A message added at the end enters by itself, mine and theirs alike: it floats up a little from below into its place and fades in (`fast`); the first render, history, rows scrolled into view and a status change never animate. When the reply arrives with the end of `Message.Typing`, the typing goes at once. In selection mode a multiselectable `listbox`.',
-      ru: 'Переписка, единственная лента сообщений кита, в своей прокрутке (`ref`, `className`, `aria-label` и прочие атрибуты — у ленты): `role="log"` из строк (новые сообщения объявляются вежливо) с одной точкой табуляции — стрелки, Home и End ходят между сообщениями. Строки берутся из `items` (даты, серии, полоса непрочитанного и `value` с `position` каждого сообщения — сами; элемент перерисовывается, только когда изменились его данные или место) или из детей: каждый дочерний элемент верхнего уровня — строка: `Message.Root` (или фрагмент с ним; свой компонент вместо сообщения несёт его `value` как `key` и может передать `direction`), `Chat.Separator`, `Chat.Service`, `Chat.Unread` — кроме `Message.Typing` и `Chat.SelectionBar`, которые замыкают ленту (свой индикатор набора чата из `Chat.Root typing` замыкает её, если вы не поставили свой). Прокручивается сама (`anchor="end"`) и рендерит только строки рядом с видимой областью (в обычном потоке между двумя распорками, каждая измерена один раз и закеширована по ключу, липкая дата сохраняется), открывается в конце, держит конец, пока читатель там, прокручивает к вашему новому сообщению, а иначе показывает круглую кнопку «к последним» со счётчиком пришедших; история сверху (`hasOlder`, `onLoadOlder`, заглушка над первым сообщением), строки, измеренные по пути, и сообщение, меняющее размер на месте, не сдвигают место чтения; переходы, поиск, выбор с Shift, клавиатура (`aria-posinset` / `aria-setsize`), играющий плеер и сообщение в фокусе достают или удерживают строки вне окна. Сообщение, добавленное в конец, появляется само — своё и чужое одинаково: немного всплывает снизу на своё место и проявляется (`fast`); первый показ, история, строки, въезжающие при прокрутке, и смена статуса не анимируются. Когда ответ приходит вместе с концом `Message.Typing`, индикатор набора уходит сразу. В режиме выбора — `listbox` с множественным выбором.',
+      en: "`ref` → `HTMLDivElement` (the log). The message list in its own scroller, rendering only the rows near the view. Rows come from `items` (dates, runs and the unread band added for you) or from children; it keeps the end and the reader's place itself.",
+      ru: "Лента сообщений в своей прокрутке, рендерит только строки рядом с видимой областью. Строки — из `items` (даты, серии и полоса непрочитанного — сами) или из детей; конец ленты и место чтения она держит сама.",
       props: [
         {
           name: "type",
           type: '"direct" | "group"',
           default: '"direct"',
-          en: "`direct` — a conversation of two; `group` — many authors: the first message of an author's run shows the author's header (`Message.Author`), the last one the avatar (`Message.Avatar`), and incoming messages keep the avatar's gutter.",
-          ru: "`direct` — переписка двоих; `group` — много авторов: первое сообщение серии автора показывает его шапку (`Message.Author`), последнее — аватар (`Message.Avatar`), входящие держат поле под аватар.",
+          en: "`direct` — a conversation of two; `group` — many authors, with the author's header and avatar on each run.",
+          ru: "`direct` — переписка двоих; `group` — много авторов, с шапкой автора и аватаром у каждой серии.",
         },
         {
           name: "items",
           type: "readonly T[]",
-          en: "Messages as application data, in time order: the list adds the dates, the runs and the unread band, sets each message's `value` and `position`, and renders an item again only when it or its place changed. Without it, children are the rows.",
-          ru: "Сообщения как данные приложения, по времени: лента сама ставит даты, серии и полосу непрочитанного, задаёт каждому сообщению `value` и `position` и перерисовывает элемент, только когда изменились он или его место. Без них строки — это дети.",
+          en: "Messages as application data, in time order: the list adds the dates, the runs and the unread band and sets each message's `value` and `position`. Without it, children are the rows.",
+          ru: "Сообщения как данные приложения, по времени: лента сама ставит даты, серии и полосу непрочитанного и задаёт `value` и `position`. Без них строки — это дети.",
         },
         {
           name: "getKey",
@@ -254,8 +254,8 @@ export const api: ComponentApi = {
         {
           name: "renderMessage",
           type: "(item: T, entry: ChatMessageEntry) => ReactElement",
-          en: "Renders an item (with `items`): a `Message.Root` — its `value` and `position` are set for you — or a `Chat.Service`. `entry` is `{ position, showAuthor, showAvatar }`. Keep it stable (`useCallback`) for a long history — a new function renders every item again; read other messages (a reply's original) through a ref, not as a dependency.",
-          ru: "Рисует элемент (с `items`): `Message.Root` — его `value` и `position` ставятся сами — или `Chat.Service`. `entry` — `{ position, showAuthor, showAvatar }`. Держите функцию стабильной (`useCallback`) для длинной истории — новая функция перерисовывает все элементы; другие сообщения (оригинал ответа) читайте через ref, а не зависимостью.",
+          en: "Renders an item (with `items`): a `Message.Root` (`value` and `position` set for you) or a `Chat.Service`; `entry` is `{ position, showAuthor, showAvatar }`. Keep it stable (`useCallback`).",
+          ru: "Рисует элемент (с `items`): `Message.Root` (`value` и `position` ставятся сами) или `Chat.Service`; `entry` — `{ position, showAuthor, showAvatar }`. Держите её стабильной (`useCallback`).",
         },
         {
           name: "isService",
@@ -307,15 +307,15 @@ export const api: ComponentApi = {
           name: "quickReaction",
           type: "string | false",
           default: "«👍»",
-          en: "The reaction of a double tap (and `L`) on a message: puts it or takes it back through `onReactionToggle`, announced politely. Not on a double click that selected text, nothing extra in selection mode. `false` — off.",
-          ru: "Реакция двойного касания (и `L`) по сообщению: ставит или снимает её через `onReactionToggle`, объявляется вежливо. Не срабатывает на двойной клик, выделивший текст, ничего не добавляет в режиме выбора. `false` — выключено.",
+          en: "The reaction of a double tap (and `L`) on a message: puts it or takes it back through `onReactionToggle`. `false` — off.",
+          ru: "Реакция двойного касания (и `L`) по сообщению: ставит или снимает её через `onReactionToggle`. `false` — выключено.",
         },
         {
           name: "reactionOptions",
           type: "readonly { emoji: string; label: string }[]",
           default: "👍 🔥 🤣 👌 🤔 😢 😱, then 7 more",
-          en: "The reactions of the reaction bar — a floating pill above the message on a long press (with the menu), after a long hover (pointer devices, ~500 ms, the bar alone) or `R`: the first seven in its row, «⌄» glides the rest open. `label` names each toggle button.",
-          ru: "Реакции панели — плавающей «таблетки» над сообщением по долгому нажатию (вместе с меню), после долгого наведения (мышь, ~500 мс, только панель) или `R`: первые семь в ряд, «⌄» раскрывает остальные. `label` называет каждую кнопку.",
+          en: "The reactions of the bar above a message (long press, long hover or `R`): the first seven in a row, «⌄» opens the rest. `label` names each toggle button.",
+          ru: "Реакции панели над сообщением (долгое нажатие, долгое наведение или `R`): первые семь в ряд, «⌄» раскрывает остальные. `label` называет каждую кнопку.",
         },
         {
           name: "reader",
@@ -326,14 +326,14 @@ export const api: ComponentApi = {
         {
           name: "onNewMessage",
           type: '(value: string, details: { direction: "incoming" | "outgoing" }) => void',
-          en: "A message was added at the end after mount — sent or received: for a sound, a counter, a title badge. Never for the first render, history loaded above or a message put back in the middle. Keep a sent message's `key` and `value` when the server confirms it: a re-keyed row would be new again.",
-          ru: "В конец после монтирования добавлено сообщение — отправленное или полученное: для звука, счётчика, значка в заголовке. Не вызывается для первого показа, истории сверху и сообщения, вернувшегося в середину. Сохраняйте `key` и `value` отправленного, когда сервер его подтвердит: строка с новым ключом снова стала бы новой.",
+          en: "A message was added at the end after mount, sent or received: for a sound, a counter, a title badge. Not called for the first render, history or a message put back in the middle.",
+          ru: "В конец после монтирования добавлено сообщение, отправленное или полученное: для звука, счётчика, значка в заголовке. Не вызывается для первого показа, истории и сообщения, вернувшегося в середину.",
         },
         {
           name: "onRead",
           type: "(values: string[]) => void",
-          en: "Incoming messages the reader has seen — at least half of each, or half the view, on screen while the page is visible (`IntersectionObserver`). Batched per frame; each `value` once per mount. Send read receipts from here.",
-          ru: "Входящие, которые читатель увидел, — не меньше половины сообщения или половины области на экране, пока страница видна (`IntersectionObserver`). Пачкой за кадр; каждый `value` один раз за монтирование. Отсюда отправляйте отметки о прочтении.",
+          en: "Incoming messages the reader has seen (at least half on screen while the page is visible); batched per frame, each `value` once per mount. Send read receipts from here.",
+          ru: "Входящие, которые читатель увидел (не меньше половины на экране, пока страница видна); пачкой за кадр, каждый `value` один раз за монтирование. Отсюда отправляйте отметки о прочтении.",
         },
         {
           name: "…rest",
@@ -345,8 +345,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.SelectionBar",
-      en: '`ref` → `HTMLDivElement`. The bar of selection mode, a child of `Chat.Messages`, sticky at the bottom of the list while it is on; the «к последним» button rises above it first: «Выбрано: N», your actions and «Отмена», which leaves selection (`role="toolbar"`). Renders nothing otherwise.',
-      ru: 'Панель режима выбора, ребёнок `Chat.Messages`, прилипает к низу ленты, пока он включён; кнопка «к последним» сначала поднимается над ней: «Выбрано: N», ваши действия и «Отмена», которая выходит из выбора (`role="toolbar"`). Иначе ничего не рисует.',
+      en: '`ref` → `HTMLDivElement`. The bar of selection mode (`role="toolbar"`), a child of `Chat.Messages` sticky at its bottom: «Выбрано: N», your actions and «Отмена». Renders nothing outside selection.',
+      ru: 'Панель режима выбора (`role="toolbar"`), ребёнок `Chat.Messages`, прилипает к её низу: «Выбрано: N», ваши действия и «Отмена». Вне режима выбора ничего не рисует.',
       props: [
         {
           name: "…rest",
@@ -491,26 +491,26 @@ export const api: ComponentApi = {
     {
       key: "pinned",
       default: "Закреплённое сообщение",
-      en: "`Chat.Pinned`: the title with one pinned message.",
-      ru: "`Chat.Pinned`: заголовок при одном закреплённом.",
+      en: "`Chat.Pinned labels`: the title with one pinned message.",
+      ru: "`Chat.Pinned labels`: заголовок при одном закреплённом.",
     },
     {
       key: "pinnedOf",
       default: "Закреплённое {index} из {count}",
-      en: "`Chat.Pinned`: the title with several, the newest last.",
-      ru: "`Chat.Pinned`: заголовок при нескольких, самое новое — последнее.",
+      en: "`Chat.Pinned labels`: the title with several, the newest last.",
+      ru: "`Chat.Pinned labels`: заголовок при нескольких, самое новое — последнее.",
     },
     {
       key: "unpin",
       default: "Открепить",
-      en: "`Chat.Pinned`: the name of the unpin button.",
-      ru: "`Chat.Pinned`: имя кнопки открепления.",
+      en: "`Chat.Pinned labels`: the name of the unpin button.",
+      ru: "`Chat.Pinned labels`: имя кнопки открепления.",
     },
     {
       key: "unread",
       default: "Непрочитанные сообщения",
-      en: "`Chat.Unread`: the text of the band.",
-      ru: "`Chat.Unread`: текст полосы.",
+      en: "The text of the «unread» band: `Chat.Root labels` for rows from `items`, `Chat.Unread labels` for a hand-placed band.",
+      ru: "Текст полосы непрочитанных: `Chat.Root labels` для строк из `items`, `Chat.Unread labels` для полосы, поставленной вручную.",
     },
   ],
 };

@@ -715,126 +715,124 @@ export default function ChatPattern() {
   );
 
   return (
-    <div className={styles.screen}>
-      <PageContent.Root fill>
-        <PageContent.Header>
-          <PageContent.Title>Поддержка</PageContent.Title>
-        </PageContent.Header>
-        <PageContent.Body>
-          <PageContent.Split
-            open={dialogId !== null}
-            onOpenChange={(next) => {
-              if (!next) setDialogId(null);
-            }}
-          >
-            <PageContent.List aria-label="Диалоги">
-              <Card.Root className={styles.paneCard}>
-                <ScrollContainer className={styles.pane}>
-                  <ul className={styles.dialogs}>
-                    {DIALOGS.map((item) => (
-                      <li key={item.id}>
-                        <Button.Root
-                          variant={item.id === dialogId ? "soft" : "ghost"}
-                          tone="neutral"
-                          fullWidth
-                          aria-current={item.id === dialogId ? "true" : undefined}
-                          className={styles.dialog}
-                          onClick={() => setDialogId(item.id)}
-                        >
-                          <Avatar.Root size="s" color="blue">
-                            <Avatar.Fallback>{item.initials}</Avatar.Fallback>
-                          </Avatar.Root>
-                          <span className={styles.dialogText}>{item.name}</span>
-                          {(unread[item.id] ?? 0) > 0 ? (
-                            <Badge.Root color="blue">{unread[item.id]}</Badge.Root>
-                          ) : null}
-                        </Button.Root>
-                      </li>
-                    ))}
-                  </ul>
-                </ScrollContainer>
-              </Card.Root>
-            </PageContent.List>
-
-            <PageContent.Detail aria-label="Переписка">
-              <Card.Root className={styles.paneCard}>
-                <Chat.Root typing={clientTyping} selected={selected} onSelectedChange={setSelected}>
-                  <Chat.Header>
-                    <PageContent.BackButton />
-                    <Avatar.Root color="blue">
-                      <Avatar.Fallback>{dialog.initials}</Avatar.Fallback>
-                      <Avatar.Status status="online" />
-                    </Avatar.Root>
-                    <Chat.Title>{dialog.name}</Chat.Title>
-                    <Chat.Description>Ирина Белова · в сети</Chat.Description>
-                    <Chat.Actions>
-                      <Chat.SearchButton />
-                    </Chat.Actions>
-                  </Chat.Header>
-                  <Chat.Search />
-                  <Chat.Pinned items={pinnedItems} onRemove={togglePin} />
-                  <Chat.Messages
-                    reader={ME}
-                    items={messages}
-                    getKey={(message) => message.id}
-                    getAuthor={(message) => message.from}
-                    getDate={(message) => message.sentAt}
-                    isService={(message) => message.kind === "service"}
-                    renderMessage={renderMessage}
-                    unread={FIRST_UNREAD}
-                    now={NOW}
-                    hasOlder={hasOlder}
-                    onLoadOlder={loadOlder}
-                    onNewMessage={(_, { direction }) => {
-                      if (direction !== "incoming" || !dialogId) return;
-                      setUnread((current) => ({
-                        ...current,
-                        [dialogId]: (current[dialogId] ?? 0) + 1,
-                      }));
-                    }}
-                    onRead={(values) => {
-                      if (!dialogId) return;
-                      setUnread((current) => ({
-                        ...current,
-                        [dialogId]: Math.max(0, (current[dialogId] ?? 0) - values.length),
-                      }));
-                    }}
-                  >
-                    <Chat.SelectionBar>
+    <PageContent.Root fill>
+      <PageContent.Header>
+        <PageContent.Title>Поддержка</PageContent.Title>
+      </PageContent.Header>
+      <PageContent.Body>
+        <PageContent.Split
+          open={dialogId !== null}
+          onOpenChange={(next) => {
+            if (!next) setDialogId(null);
+          }}
+        >
+          <PageContent.List aria-label="Диалоги">
+            <Card.Root className={styles.paneCard}>
+              <ScrollContainer className={styles.pane}>
+                <ul className={styles.dialogs}>
+                  {DIALOGS.map((item) => (
+                    <li key={item.id}>
                       <Button.Root
-                        variant="soft"
-                        tone="danger"
-                        size="s"
-                        disabled={!selected?.length}
-                        onClick={() => {
-                          setMessages((current) =>
-                            current.filter((item) => !selected?.includes(item.id)),
-                          );
-                          setSelected(null);
-                        }}
+                        variant={item.id === dialogId ? "soft" : "ghost"}
+                        tone="neutral"
+                        fullWidth
+                        aria-current={item.id === dialogId ? "true" : undefined}
+                        className={styles.dialog}
+                        onClick={() => setDialogId(item.id)}
                       >
-                        Удалить
+                        <Avatar.Root size="s" color="blue">
+                          <Avatar.Fallback>{item.initials}</Avatar.Fallback>
+                        </Avatar.Root>
+                        <span className={styles.dialogText}>{item.name}</span>
+                        {(unread[item.id] ?? 0) > 0 ? (
+                          <Badge.Root color="blue">{unread[item.id]}</Badge.Root>
+                        ) : null}
                       </Button.Root>
-                    </Chat.SelectionBar>
-                  </Chat.Messages>
-                  <Chat.Footer>
-                    <ChatComposer
-                      replyTo={replyTo}
-                      editing={editing}
-                      onReplyDismiss={dismissReply}
-                      onEditDismiss={dismissEdit}
-                      onEditLast={editLast}
-                      onPost={post}
-                      onSave={save}
-                      onActivityChange={reportActivity}
-                    />
-                  </Chat.Footer>
-                </Chat.Root>
-              </Card.Root>
-            </PageContent.Detail>
-          </PageContent.Split>
-        </PageContent.Body>
-      </PageContent.Root>
-    </div>
+                    </li>
+                  ))}
+                </ul>
+              </ScrollContainer>
+            </Card.Root>
+          </PageContent.List>
+
+          <PageContent.Detail aria-label="Переписка">
+            <Card.Root className={styles.paneCard}>
+              <Chat.Root typing={clientTyping} selected={selected} onSelectedChange={setSelected}>
+                <Chat.Header>
+                  <PageContent.BackButton />
+                  <Avatar.Root color="blue">
+                    <Avatar.Fallback>{dialog.initials}</Avatar.Fallback>
+                    <Avatar.Status status="online" />
+                  </Avatar.Root>
+                  <Chat.Title>{dialog.name}</Chat.Title>
+                  <Chat.Description>Ирина Белова · в сети</Chat.Description>
+                  <Chat.Actions>
+                    <Chat.SearchButton />
+                  </Chat.Actions>
+                </Chat.Header>
+                <Chat.Search />
+                <Chat.Pinned items={pinnedItems} onRemove={togglePin} />
+                <Chat.Messages
+                  reader={ME}
+                  items={messages}
+                  getKey={(message) => message.id}
+                  getAuthor={(message) => message.from}
+                  getDate={(message) => message.sentAt}
+                  isService={(message) => message.kind === "service"}
+                  renderMessage={renderMessage}
+                  unread={FIRST_UNREAD}
+                  now={NOW}
+                  hasOlder={hasOlder}
+                  onLoadOlder={loadOlder}
+                  onNewMessage={(_, { direction }) => {
+                    if (direction !== "incoming" || !dialogId) return;
+                    setUnread((current) => ({
+                      ...current,
+                      [dialogId]: (current[dialogId] ?? 0) + 1,
+                    }));
+                  }}
+                  onRead={(values) => {
+                    if (!dialogId) return;
+                    setUnread((current) => ({
+                      ...current,
+                      [dialogId]: Math.max(0, (current[dialogId] ?? 0) - values.length),
+                    }));
+                  }}
+                >
+                  <Chat.SelectionBar>
+                    <Button.Root
+                      variant="soft"
+                      tone="danger"
+                      size="s"
+                      disabled={!selected?.length}
+                      onClick={() => {
+                        setMessages((current) =>
+                          current.filter((item) => !selected?.includes(item.id)),
+                        );
+                        setSelected(null);
+                      }}
+                    >
+                      Удалить
+                    </Button.Root>
+                  </Chat.SelectionBar>
+                </Chat.Messages>
+                <Chat.Footer>
+                  <ChatComposer
+                    replyTo={replyTo}
+                    editing={editing}
+                    onReplyDismiss={dismissReply}
+                    onEditDismiss={dismissEdit}
+                    onEditLast={editLast}
+                    onPost={post}
+                    onSave={save}
+                    onActivityChange={reportActivity}
+                  />
+                </Chat.Footer>
+              </Chat.Root>
+            </Card.Root>
+          </PageContent.Detail>
+        </PageContent.Split>
+      </PageContent.Body>
+    </PageContent.Root>
   );
 }

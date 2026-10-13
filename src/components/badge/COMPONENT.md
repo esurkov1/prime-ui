@@ -46,7 +46,7 @@ Badge.Root          <span>: fill, tier dimensions
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue. Categorizes; the text carries the meaning. |
 | `variant` | `"solid" \| "soft" \| "outline"` | `"soft"` | Treatment. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | — | Badge tier, 16 · 20 · 24 · 28 · 32 px high. Without it the badge follows the surrounding control one tier down; outside a control it is `m`. |
-| `onRemove` | `() => void \| Promise<void>` | — | Adds the full-height remove segment at the end; called on its click. Return the request's promise to remove on a server: the badge waits dimmed with a spinner in the segment (`aria-busy`, no second press); resolve — take it out of your list before resolving, and it leaves with its exit (fades and closes up, the badges after it glide in); reject — it stays and `labels.removeFailed` is announced. |
+| `onRemove` | `() => void \| Promise<void>` | — | Adds the full-height remove segment at the end; called on its click. Return the request's promise: the badge waits with a spinner; take it out of your list before resolving; on reject it stays. |
 | `loading` | `boolean` | `false` | The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a spinner in the remove segment, which takes no press. A promise from `onRemove` does the same on its own. |
 | `onPress` | `(event: MouseEvent<HTMLButtonElement>) => void` | — | Makes the body a `<button>` covering the whole badge (a toggle chip, a filter value); gets the event, so Alt / Shift clicks can mean more. |
 | `pressed` | `boolean` | — | Toggle state of a pressable badge: `aria-pressed` on the body, `data-pressed` on the root. |
@@ -64,14 +64,14 @@ Badge.Root          <span>: fill, tier dimensions
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Badge.Dot
-`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment like an edge icon. Also usable alone (a marker on an icon, before a label): it takes the tier of the surrounding control (6px, 8px from `l`) and the color set on it.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment. Alone (a marker on an icon, before a label) it takes the host tier and the color set on it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
 
 ### Badge.Action
-`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus, always shown on touch screens; the badge reserves its room, so the width never changes. One per badge, not together with `onRemove`.
+`ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus (always shown on touch); the width never changes. One per badge, not together with `onRemove`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -138,6 +138,8 @@ Badge.Root          <span>: fill, tier dimensions
 ## Layout & spacing
 - Inline-flex, `width: fit-content`, `max-width: 100%`; text never wraps and ends in an ellipsis.
 - Segments are `mark + padding + gap` wide and full height; the mark sits with equal space to the edge and to the text.
+- `Badge.Dot` is 6px, 8px from `l`; alone it takes the tier of the surrounding control.
+- `Badge.Action` room is reserved, so revealing it never changes the badge width.
 - Several badges in a row: `gap: var(--prime-space-2)`.
 - In a list row the badge is the trailing column; the title column gets `min-width: 0` and an ellipsis.
 

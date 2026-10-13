@@ -1,37 +1,41 @@
 /* Opt-in (`prime-ui-kit/reset.css`): a minimal document reset for a new app. Components do not need
-   it — they set their own box sizing — so an app with its own reset can skip this file. */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+   it — they set their own box sizing — so an app with its own reset can skip this file. In the
+   `prime-reset` cascade layer, like `controls.css`: a component rule always wins over it. */
 
-* {
-  margin: 0;
-}
+@layer prime-reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-html,
-body {
-  height: 100%;
-}
+  * {
+    margin: 0;
+  }
 
-body {
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
+  html,
+  body {
+    height: 100%;
+  }
 
-img,
-picture,
-video,
-canvas,
-svg {
-  display: block;
-  max-width: 100%;
-}
+  body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
 
-input,
-button,
-textarea,
-select {
-  font: inherit;
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
 }

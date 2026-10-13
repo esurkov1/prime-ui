@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "VoicePlayer",
-      en: "`ref` → `HTMLDivElement` (the `role=\"group\"` root). A voice message: the shared play disk (solid), the waveform as the seek slider (bars centred on the line, the look of the Composer's recorder) and the time row with the playback speed; plays one at a time on the page. At the end it stops, rewinds, the waveform empties and the total time and the play glyph come back. As the last part of a chat message it keeps the meta's room at the end of its time row (of the transcript while open). Its props are VideoNote's (`MediaPlayerProps`) plus `waveform` and the rate triad.",
-      ru: 'Корень `role="group"`. Голосовое сообщение: общий диск воспроизведения (сплошной), волна как ползунок перемотки (полоски по центру линии, как у записи в Composer) и строка времени со скоростью; на странице играет только один плеер. В конце останавливается, перематывается в начало, волна пустеет, возвращаются общее время и значок воспроизведения. Последней частью сообщения оставляет место под мету в конце строки времени (или расшифровки, пока она открыта). Пропсы — те же, что у VideoNote (`MediaPlayerProps`), плюс `waveform` и тройка скорости.',
+      en: '`ref` → `HTMLDivElement` (the `role="group"` root). A voice message: the play disk, the waveform as the seek slider and the time row with the playback speed. Its props are VideoNote\'s (`MediaPlayerProps`) plus `waveform` and the rate triad.',
+      ru: 'Корень `role="group"`. Голосовое сообщение: диск воспроизведения, волна как ползунок перемотки и строка времени со скоростью. Пропсы — те же, что у VideoNote (`MediaPlayerProps`), плюс `waveform` и тройка скорости.',
       props: [
         ...mediaPlayerProps({
           media: { en: "Audio", ru: "аудио" },
@@ -24,12 +24,12 @@ export const api: ComponentApi = {
             ru: "плеер вернулся в начало на паузе",
           },
           transcript: {
-            en: "at the end of the waveform and the text opens under the player, inside the same bubble",
-            ru: "в конце волны, а текст раскрывается под плеером в том же пузыре",
+            en: "the button ends the waveform, the text opens under the player",
+            ru: "кнопка стоит в конце волны, текст раскрывается под плеером",
           },
           transfer: {
-            en: "the recording, drawn on the play disk itself — the same disk, size and fill (the accent disk, recoloured by an outgoing bubble), the × or the arrow in the play glyph's place and the ring along its inner edge, one look in a bubble and outside it; the waveform and the rate chip are off until it is done",
-            ru: "записи, на самом диске воспроизведения — тот же диск, размер и заливка (акцентный диск, перекрашенный исходящим пузырём), × или стрелка вместо значка воспроизведения и кольцо по внутреннему краю, одинаково в пузыре и вне его; волна и чип скорости выключены до готовности",
+            en: "the recording, drawn on the play disk itself",
+            ru: "записи, на самом диске воспроизведения",
           },
           own: [
             {
@@ -72,6 +72,12 @@ export const api: ComponentApi = {
           ru: "`className`, `aria-label` (вместо `labels.player`), `data-*` и остальные атрибуты div.",
         },
       ],
+    },
+    {
+      name: "getWaveform",
+      en: "`getWaveform(source, bars = 48)`: the 0…1 peaks of a `Blob` or URL with no stored levels, for `waveform`.",
+      ru: "`getWaveform(source, bars = 48)`: пики 0…1 записи (`Blob` или URL) без сохранённых уровней, для `waveform`.",
+      props: [],
     },
   ],
   labels: mediaPlayerLabels({

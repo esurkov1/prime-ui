@@ -1,135 +1,138 @@
 /* Browser form-control styles switched off (part of `bundle.css`, always on). Every UA look —
    native chrome, autofill paint, spin buttons, pickers, credential badges — is removed, so a
-   control is drawn only by its component and looks the same in every browser. Specificity is 0
-   (`:where`): a component rule always wins. */
+   control is drawn only by its component and looks the same in every browser. Everything sits in
+   the `prime-reset` cascade layer: any unlayered rule wins over it whatever the specificity and the
+   file order — every component rule, the zero-specificity shared ones too (`:where(.trigger)`). */
 
-:where(html) {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
+@layer prime-reset {
+  :where(html) {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
 
-:where(button, input, select, textarea, optgroup) {
-  margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
-  color: inherit;
-  -webkit-appearance: none;
-  appearance: none;
-}
+  :where(button, input, select, textarea, optgroup) {
+    margin: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+  }
 
-:where(button, input:not([type="checkbox"], [type="radio"]), select, textarea) {
-  border-radius: 0;
-}
+  :where(button, input:not([type="checkbox"], [type="radio"]), select, textarea) {
+    border-radius: 0;
+  }
 
-:where(button, [type="button"], [type="submit"], [type="reset"]) {
-  padding: 0;
-  border: 0;
-  background: none;
-  text-align: inherit;
-}
+  :where(button, [type="button"], [type="submit"], [type="reset"]) {
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: inherit;
+  }
 
-:where(fieldset) {
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
+  :where(fieldset) {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
 
-:where(legend) {
-  padding: 0;
-}
+  :where(legend) {
+    padding: 0;
+  }
 
-:where(progress, meter) {
-  -webkit-appearance: none;
-  appearance: none;
-}
+  :where(progress, meter) {
+    -webkit-appearance: none;
+    appearance: none;
+  }
 
-:where(select)::-ms-expand {
-  display: none;
-}
+  :where(select)::-ms-expand {
+    display: none;
+  }
 
-/* Number: no spin buttons. */
-:where(input[type="number"]) {
-  -moz-appearance: textfield;
-}
+  /* Number: no spin buttons. */
+  :where(input[type="number"]) {
+    -moz-appearance: textfield;
+  }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 
-/* Search: no native clear / magnifier. */
-input[type="search"]::-webkit-search-decoration,
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-results-button,
-input[type="search"]::-webkit-search-results-decoration {
-  -webkit-appearance: none;
-  display: none;
-}
+  /* Search: no native clear / magnifier. */
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-results-button,
+  input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none;
+  }
 
-/* Date / time: no native picker glyph, no inner padding. */
-input::-webkit-calendar-picker-indicator {
-  display: none;
-  -webkit-appearance: none;
-}
+  /* Date / time: no native picker glyph, no inner padding. */
+  input::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+  }
 
-input::-webkit-date-and-time-value {
-  min-height: 0;
-  text-align: inherit;
-}
+  input::-webkit-date-and-time-value {
+    min-height: 0;
+    text-align: inherit;
+  }
 
-input::-webkit-datetime-edit,
-input::-webkit-datetime-edit-fields-wrapper {
-  padding: 0;
-}
+  input::-webkit-datetime-edit,
+  input::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
 
-/* File / color: no native button or swatch frame. */
-input[type="file"]::file-selector-button,
-input[type="file"]::-webkit-file-upload-button {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-}
+  /* File / color: no native button or swatch frame. */
+  input[type="file"]::file-selector-button,
+  input[type="file"]::-webkit-file-upload-button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+  }
 
-input[type="color"]::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
+  input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
 
-input[type="color"]::-webkit-color-swatch {
-  border: 0;
-}
+  input[type="color"]::-webkit-color-swatch {
+    border: 0;
+  }
 
-input[type="color"]::-moz-color-swatch {
-  border: 0;
-}
+  input[type="color"]::-moz-color-swatch {
+    border: 0;
+  }
 
-/* Safari's autofill / credentials / contacts badges. */
-input::-webkit-contacts-auto-fill-button,
-input::-webkit-credentials-auto-fill-button,
-input::-webkit-strong-password-auto-fill-button {
-  /* biome-ignore lint/complexity/noImportantStyles: the UA badge is `!important` itself */
-  display: none !important;
-  visibility: hidden;
-  pointer-events: none;
-}
+  /* Safari's autofill / credentials / contacts badges. */
+  input::-webkit-contacts-auto-fill-button,
+  input::-webkit-credentials-auto-fill-button,
+  input::-webkit-strong-password-auto-fill-button {
+    /* biome-ignore lint/complexity/noImportantStyles: the UA badge is `!important` itself */
+    display: none !important;
+    visibility: hidden;
+    pointer-events: none;
+  }
 
-/* Autofill paint (Chrome yellow / blue fill, forced text colour) never shows: the field keeps its
-   own surface and text. The background cannot be overridden directly, so its transition is pushed
-   out of reach; the text colour and caret are set explicitly. */
-input:is(:-webkit-autofill, :autofill),
-textarea:is(:-webkit-autofill, :autofill),
-select:is(:-webkit-autofill, :autofill) {
-  -webkit-text-fill-color: var(--prime-color-text-primary);
-  caret-color: var(--prime-color-text-primary);
-  transition:
-    background-color 600000s 0s,
-    color 600000s 0s;
-}
+  /* Autofill paint (Chrome yellow / blue fill, forced text colour) never shows: the field keeps its
+     own surface and text. The background cannot be overridden directly, so its transition is pushed
+     out of reach; the text colour and caret are set explicitly. */
+  input:is(:-webkit-autofill, :autofill),
+  textarea:is(:-webkit-autofill, :autofill),
+  select:is(:-webkit-autofill, :autofill) {
+    -webkit-text-fill-color: var(--prime-color-text-primary);
+    caret-color: var(--prime-color-text-primary);
+    transition:
+      background-color 600000s 0s,
+      color 600000s 0s;
+  }
 
-input:is(:-webkit-autofill, :autofill):disabled {
-  -webkit-text-fill-color: var(--prime-color-text-disabled);
+  input:is(:-webkit-autofill, :autofill):disabled {
+    -webkit-text-fill-color: var(--prime-color-text-disabled);
+  }
 }

@@ -7,6 +7,7 @@ import {
   Card,
   DataTable,
   type DataTableColumn,
+  DescriptionList,
   Dropdown,
   Icon,
   LinkButton,
@@ -124,6 +125,7 @@ export default function DetailPagePattern() {
               paging="none"
               highlightRowOnHover={false}
             />
+            {/* Totals line up with the «Сумма» column of the table above: a layout of its own. */}
             <dl className={styles.totals}>
               {TOTALS.map((row) => (
                 <div key={row.label} className={styles.totalRow}>
@@ -171,32 +173,14 @@ export default function DetailPagePattern() {
                       </Typography>
                     </span>
                   </span>
-                  <dl className={styles.facts}>
-                    <div className={styles.fact}>
-                      <dt>
-                        <Typography variant="caption" tone="muted">
-                          Контакт
-                        </Typography>
-                      </dt>
-                      <dd>
-                        <Typography variant="body-m">
-                          Ольга Мартынова, финансовый директор
-                        </Typography>
-                      </dd>
-                    </div>
-                    <div className={styles.fact}>
-                      <dt>
-                        <Typography variant="caption" tone="muted">
-                          Почта для счетов
-                        </Typography>
-                      </dt>
-                      <dd>
-                        <Typography variant="body-m">
-                          <LinkButton href="mailto:billing@veter.ru">billing@veter.ru</LinkButton>
-                        </Typography>
-                      </dd>
-                    </div>
-                  </dl>
+                  <DescriptionList.Root orientation="vertical">
+                    <DescriptionList.Item label="Контакт">
+                      Ольга Мартынова, финансовый директор
+                    </DescriptionList.Item>
+                    <DescriptionList.Item label="Почта для счетов">
+                      <LinkButton href="mailto:billing@veter.ru">billing@veter.ru</LinkButton>
+                    </DescriptionList.Item>
+                  </DescriptionList.Root>
                 </div>
               </Card.Body>
             </Card.Root>

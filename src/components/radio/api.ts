@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Radio.Group",
-      en: '`ref` → `HTMLDivElement` (the field frame). Owns the value, the shared `name` and size; renders the group label above and the hint / error below the options. Field-root rule: `className`, `ref` and the rest go to the frame; `id`, `aria-label`, `aria-labelledby` and `aria-describedby` to the `role="radiogroup"` element.',
+      en: '`ref` → `HTMLDivElement` (the field frame). Owns the value, the shared `name` and size; renders the group label and the hint / error. `id` and the `aria-*` naming props go to the `role="radiogroup"` element.',
       ru: "Держит значение, общий `name` и размер; подпись группы сверху, подсказка или ошибка под вариантами.",
       props: [
         {

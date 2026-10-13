@@ -52,41 +52,41 @@ Columns and cards are application data (`columns`, `items`); the board state is 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Kanban.Root
-Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns (a `<ul>`, sortable along x) that scrolls sideways inside itself, each column a labelled `<ul>` of cards (Dnd lists of one kind, so Alt + ← / → moves a card across) under a header with the title, a count `Badge`, actions and optional description and meta lines. Mounts its own `Dnd.Root` unless one is already above it. Sets `aria-busy` while loading, `data-loading`, `data-disabled`.
+Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns that scrolls sideways inside itself, each a labelled list of cards under a header. Mounts its own `Dnd.Root` unless one is above it. Give it a height.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `columns` | `readonly KanbanColumn[]` | — (required) | Every column: `{ id, title, description?, color?, limit?, locked? }`, drawn in `columnOrder` (array order by default). `description` is a muted line under the title that also describes the column's list; `color` (a `PaletteColor`) is the stage's hue on its count badge; `limit` is a WIP limit — a full column refuses cards from other columns (the reason «Колонка «…» заполнена» is spoken and shown under the carried card) and its count turns orange (`count / limit`); `locked` keeps a system stage in its place when columns are reordered — a lock stands where its grip would and no column moves past it. |
+| `columns` | `readonly KanbanColumn[]` | — (required) | Every column: `{ id, title, description?, color?, limit?, locked? }`, drawn in `columnOrder`. `color` is a `PaletteColor` for the count badge, `limit` a WIP limit, `locked` keeps a system stage in place. |
 | `items` | `readonly T[]` | — (required) | Every card the board can show; `value` decides where each one stands. |
 | `getId` | `(item: T) => string` | — (required) | Stable unique id of a card, the one used in `value`. |
 | `getLabel` | `(item: T) => string` | `the id` | Spoken by the live region. |
 | `value` | `KanbanValue` | — | Card ids per column (controlled): `{ [columnId]: id[] }`. Ids missing from `items` are skipped. |
 | `defaultValue` | `KanbanValue` | `{}` | Initial card ids per column (uncontrolled). |
-| `onValueChange` | `(value: KanbanValue, move: KanbanMove) => void \| Promise<void>` | — | A card moved by pointer, touch or keyboard: the new placement, then `{ id, from, to, index }` to save. Return the save's promise: the card stays in its new place, busy (dimmed under a spinner, `aria-busy`, it does not move again), until it settles; resolve — the move stands (a controlled owner applies `value` before resolving); reject — the card glides back and `labels.moveFailed` is announced. |
+| `onValueChange` | `(value: KanbanValue, move: KanbanMove) => void \| Promise<void>` | — | A card moved: the new placement, then `{ id, from, to, index }` to save. Return the save's promise: the card waits busy in its new place; a rejection glides it back. |
 | `reorderableColumns` | `boolean` | `false` | A grip (`Dnd.Handle`) at the end of every column header moves the column by pointer, touch hold and Alt + ← / →; the cards travel with it. |
 | `columnOrder` | `readonly string[]` | — | Column ids in their order (controlled). Columns it does not name follow in `columns` order. |
 | `defaultColumnOrder` | `readonly string[]` | `the order of `columns`` | Initial column ids in their order (uncontrolled). |
-| `onColumnOrderChange` | `(order: readonly string[], move: KanbanColumnMove) => void \| Promise<void>` | — | A column moved: the new order, then `{ id, index }` to save. Return the save's promise: the column stays in its new place with a spinner in place of its grip and `aria-busy` until it settles; reject — it glides back and `labels.columnMoveFailed` is announced. |
+| `onColumnOrderChange` | `(order: readonly string[], move: KanbanColumnMove) => void \| Promise<void>` | — | A column moved: the new order, then `{ id, index }` to save. Return the save's promise: the column waits busy in its new place; a rejection glides it back. |
 | `renderItem` | `(item: T) => ReactNode` | — (required) | Renders one card; return a `Kanban.Item`. |
 | `renderColumnActions` | `(column: KanbanColumn) => ReactNode` | — | Trailing actions of a column header (add a card, a menu); kit controls inside take the `s` tier. |
-| `renderColumnMeta` | `(column: KanbanColumn) => ReactNode` | — | The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»), a caption in tabular digits, one line. It describes the column's list too. |
-| `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken, and shown under the carried card); the column turns `danger` before the release and a keyboard move is announced as refused. |
-| `variant` | `"well" \| "plain"` | `"well"` | `well`: every column is a filled well (`fill-muted`) with its cards inside. `plain`: no wells — the header, a filled plate as wide as the cards, and the cards carry the column; cards widen to almost the full column, so neighbouring columns stand closer. |
+| `renderColumnMeta` | `(column: KanbanColumn) => ReactNode` | — | The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»). |
+| `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card). |
+| `variant` | `"well" \| "plain"` | `"well"` | `well`: every column is a filled well with its cards inside. `plain`: no wells — a filled header plate and wider cards carry the column. |
 | `loading` | `boolean` | `false` | Columns show skeleton cards in the card geometry; the cards cross-fade in when it turns off. |
 | `disabled` | `boolean` | `false` | Read-only board: no drag, no keyboard moves, no column grips; clicks on cards still work. |
 | `labels` | `Partial<KanbanLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue">` | — | `className` (the board height), `aria-label` and the other div attributes. |
 
 ### Kanban.Item
-`ref` → `HTMLLIElement`. One card: an `<li>` two ladder steps lighter than its column (`control-selected`: white in light) with the raised shadow, lifted to the overlay shadow on hover; return it from `renderItem` (it takes its id from there). Draggable by the whole card, focusable, `aria-keyshortcuts` for Alt + arrows. Presses on buttons, fields and links inside never start a drag.
+`ref` → `HTMLLIElement`. One card; return it from `renderItem` (it takes its id from there). Dragged by the whole card and focusable; presses on buttons, fields and links inside never start a drag.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `disabled` | `boolean` | `false` | This card cannot be dragged or moved. |
-| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `children` (the card parts), `className`, `onClick` and the other attributes; `onKeyDown` runs first, `preventDefault()` keeps the move from happening. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `children` (the card parts), `className`, `onClick` and the other attributes. |
 
 ### Kanban.ItemHeader
-`ref` → `HTMLDivElement`. The top zone of a card over a faint hairline (`border-faint`): a muted caption row with the key or project at the start; the last child (a priority `Badge`, an assignee) sits at the end. Optional — a card without it starts with its title or a full-width `Thumbnail` cover.
+`ref` → `HTMLDivElement`. Optional top row of a card: the key or project at the start, the last child (a priority `Badge`, an assignee) at the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -158,6 +158,8 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 
 Motion: the hover lift (shadow, the card rises above its neighbours) and the empty slot fade (`fast`, `standard`); a card dropped under the mouse lands straight into its hover lift (`data-dnd-hover`); the swap from skeletons is `Crossfade`; drag motion is Dnd's (lift, gap, glide, landing); a saving card or column quiets (`fast`, both ways) and its spinner enters (`enterMotion`); a refused save glides back (`base`), never jumps. Under `prefers-reduced-motion` all of it is off.
 
+A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps the move from happening. A controlled owner applies the new `value` (or `columnOrder`) once the request succeeds — in the promise chain, before the returned promise resolves — never before the answer.
+
 ## Layout & spacing
 - Give the root a height (`className`): columns span it and every column body scrolls on its own; without one the columns take the height of the tallest.
 - The board is a size container. From 40rem of its own width columns keep a fixed 18rem; below it a column takes 85% of the board and snaps (`scroll-snap-type: x mandatory`), so the next column peeks. Snapping is off while a drag auto-scrolls the strip.
@@ -166,6 +168,8 @@ Motion: the hover lift (shadow, the card rises above its neighbours) and the emp
 - The column title is `title-m`; the header is at least a control `m` tall, its text starts where the card text does.
 - A faint inset hairline (`--prime-color-border-faint`, as in a dialog header) separates the header from the cards.
 - The header is a grid: the title, the count, the actions and the grip at the end on the first row; the description under the title on the second, the meta line under it (`--prime-space-1` above, caption, `text-secondary`).
+- A card is `--prime-color-control-selected` (two ladder steps off its column; white in light) on `--prime-shadow-raised`.
+- `Kanban.ItemHeader` is a muted caption row over a faint hairline (`--prime-color-border-faint`); a card without it starts with its title or a full-width `Thumbnail` cover.
 - Header actions get the `s` tier; inside a card, kit controls take the `m` host tier (a `Badge` is `s`). Pick a small `Avatar` (`size="s"`).
 
 ## Accessibility

@@ -4,15 +4,15 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "MediaViewer",
-      en: '`ref` → `HTMLDivElement` (the `role="dialog"` element). A full-screen viewer of photos and videos on a near-black stage (a dark theme island in both themes), in a portal above the page. Pages slide under the finger and settle with a spring; a pinch, a double tap, ⌘ / Ctrl + wheel or a trackpad pinch zooms a picture about the point, up to `maxZoom`; a zoomed picture pans with iOS momentum and bounces off its edges, and at its edge a sideways drag turns the page; a vertical swipe carries the picture away and closes. A tap shows or hides the bars (counter, actions, close, arrows on a hovering pointer, caption, filmstrip); a pinch or a double tap clears them. It opens out of the thumbnail it was opened from and closes back into the thumbnail of the item on screen, cut to its crop and corners; without one it fades. Any item — a neighbour, a thumbnail far along the filmstrip, Home / End — arrives by the same slide, never a cut or a fade. Only the page on screen and two on each side are mounted, so hundreds of items cost five pages; a picture shows only once it is decoded, and its `thumbnail` stands in until the full picture has fully shown over it, so no frame is ever blank. A failed picture offers a retry. The flight follows the real shape of the thumbnail: the part the page shows (cut by scrollers, albums, bubbles) and the radius of each corner, so corners glide and never snap; only the picture moves, the bars and the play disk come after it lands. A video page flies as the frame of the thumbnail it opened from and has its own bar — play, time, a seek Slider, length and the sound button with an upright level Slider over it (hover, focus or a tap opens it) — one sound setting for every video of the viewer; it starts once its page lands with `autoPlay`, pauses when its page leaves, keeps its bar while it stands still and clears the view after 2.5 s of a still pointer while it plays; Space / K, Shift + arrows, ↑ / ↓ and M work as in a player.',
-      ru: "Полноэкранный просмотр фото и видео на почти чёрной сцене (тёмный остров темы в обеих темах), в портале над страницей. Страницы скользят за пальцем и встают на место пружиной; щипок, двойной тап, ⌘ / Ctrl + колесо или щипок на трекпаде приближают картинку вокруг точки, до `maxZoom`; приближенная картинка двигается с инерцией iOS и пружинит от краёв, а у края боковой жест листает дальше; вертикальный свайп уносит картинку и закрывает просмотр. Тап показывает и прячет панели (счётчик, действия, закрытие, стрелки при наведении, подпись, плёнка); щипок и двойной тап убирают их. Открывается из миниатюры, с которой его открыли, и закрывается обратно в миниатюру текущего элемента — с её обрезкой и скруглением; без миниатюры — растворяется. Любой элемент — соседний, далёкая миниатюра в плёнке, Home / End — приезжает тем же свайпом, без склейки и затухания. Смонтированы только текущая страница и по две с каждой стороны, поэтому сотни элементов стоят пять страниц; картинка показывается только после декодирования, а `thumbnail` держится, пока полная картинка не проявится целиком, — пустого кадра не бывает. При ошибке — повтор. Полёт повторяет настоящую форму миниатюры: видимую на странице часть (обрезанную прокруткой, альбомом, пузырём) и радиус каждого угла, поэтому углы плавно перетекают, а не щёлкают; движется только картинка, панели и диск воспроизведения появляются после приземления. Видео летит кадром миниатюры, из которой его открыли, и у него своя панель — воспроизведение, время, перемотка Slider, длительность и кнопка звука с вертикальным ползунком громкости над ней (открывается наведением, фокусом или касанием), одна настройка звука на все видео просмотра; с `autoPlay` видео запускается, когда страница встала на место, и встаёт на паузу, когда она уходит; на паузе панель видна всегда, при воспроизведении уходит через 2,5 с неподвижного указателя; работают Space / K, Shift + стрелки, ↑ / ↓ и M, как в плеере.",
+      en: '`ref` → `HTMLDivElement` (the `role="dialog"` element). A full-screen viewer of photos and videos: pages follow the finger, pictures zoom and pan, a swipe closes it, and it opens out of the thumbnail it came from and closes back into it.',
+      ru: "Полноэкранный просмотр фото и видео: страницы следуют за пальцем, картинки приближаются и двигаются, свайп закрывает просмотр, а открывается и закрывается он из миниатюры, с которой его открыли.",
       props: [
         {
           name: "items",
-          type: "MediaViewerItem[]",
+          type: "readonly MediaViewerItem[]",
           required: true,
-          en: '`{ type?: "image" | "video", src, thumbnail?, poster?, alt?, caption?, width?, height? }` — `thumbnail` is a small copy shown at once while `src` loads and in the filmstrip; `poster` a still of a video; `alt` the picture\'s text, the name of its page and its thumbnail; `caption` a line or two under the picture; `width` / `height` the natural size, so the picture takes its final box before load (else 4 : 3 until the file reports its own).',
-          ru: '`{ type?: "image" | "video", src, thumbnail?, poster?, alt?, caption?, width?, height? }` — `thumbnail` — маленькая копия, видная сразу, пока грузится `src`, и в плёнке; `poster` — кадр видео; `alt` — текст картинки, имя её страницы и миниатюры; `caption` — строка-две под картинкой; `width` / `height` — натуральный размер, чтобы картинка заняла итоговую рамку до загрузки (иначе 4 : 3, пока файл не сообщит свой).',
+          en: '`{ type?: "image" | "video", src, thumbnail?, poster?, alt?, caption?, width?, height? }`: `thumbnail` stands in while `src` loads, `width` / `height` give the picture its box before load.',
+          ru: '`{ type?: "image" | "video", src, thumbnail?, poster?, alt?, caption?, width?, height? }`: `thumbnail` видна, пока грузится `src`, `width` / `height` дают картинке рамку до загрузки.',
         },
         {
           name: "open",
@@ -70,15 +70,15 @@ export const api: ComponentApi = {
           name: "thumbnails",
           type: "boolean",
           default: "false",
-          en: "A filmstrip of every item along the bottom. It follows the page on every frame: it glides with the swipe and the emphasis (size and strength) flows from one thumbnail to the next; the current one stays in the middle. Only the thumbnails in view are mounted. At rest the row is a scroller of its own — wheel, trackpad, a finger or a mouse drag move it and it stays where it was left; the next page turn glides it back to the page and it follows again. A press slides to that item.",
-          ru: "Плёнка миниатюр всех элементов внизу. Она следует за страницей на каждом кадре: едет вместе со свайпом, а выделение (размер и яркость) перетекает от миниатюры к миниатюре; текущая держится по центру. Смонтированы только видимые миниатюры. В покое ряд — самостоятельная прокрутка: колесо, трекпад, палец или перетаскивание мышью двигают его, и он остаётся там, где его оставили; следующее листание плавно возвращает его к странице, и он снова следует за ней. Нажатие приводит к элементу свайпом.",
+          en: "A filmstrip of every item along the bottom: it follows the page, scrolls on its own at rest, and a press slides to that item.",
+          ru: "Плёнка миниатюр всех элементов внизу: следует за страницей, в покое прокручивается сама по себе, нажатие приводит к элементу свайпом.",
         },
         {
           name: "autoPlay",
           type: "boolean",
           default: "true",
-          en: "A video starts as soon as its page settles on screen; where the browser refuses sound without a press, it starts muted and the sound button brings the sound back. `false` — a video waits for a press on its play disk.",
-          ru: "Видео запускается, как только его страница встала на место; если браузер не даёт звук без нажатия, оно стартует без звука, и кнопка звука его возвращает. `false` — видео ждёт нажатия на диск воспроизведения.",
+          en: "A video starts once its page settles, muted where the browser refuses sound without a press. `false` — it waits for a press on its play disk.",
+          ru: "Видео запускается, когда его страница встала на место, без звука, если браузер не даёт звук без нажатия. `false` — ждёт нажатия на диск воспроизведения.",
         },
         {
           name: "closeOnEscape",
@@ -97,8 +97,8 @@ export const api: ComponentApi = {
         {
           name: "getOrigin",
           type: "(index: number) => Element | null",
-          en: "The element item `index` opens from and closes into (its thumbnail, or an element holding it). Without it the viewer finds the picture in or around the element that opened it, for the item it opened at; with neither, or off screen, it fades.",
-          ru: "Элемент, из которого элемент `index` открывается и в который закрывается (его миниатюра или элемент с ней). Без него просмотр находит картинку в элементе, который его открыл, или рядом — для элемента, с которого открыли; если нет ни того ни другого или он за экраном — растворяется.",
+          en: "The element item `index` opens from and closes into (its thumbnail). Without it the viewer finds the picture showing the item's `thumbnail`, `src` or `poster`; with none on screen, it fades.",
+          ru: "Элемент, из которого элемент `index` открывается и в который закрывается (его миниатюра). Без него просмотр сам находит картинку с `thumbnail`, `src` или `poster` элемента; если её нет на экране — растворяется.",
         },
         {
           name: "renderActions",

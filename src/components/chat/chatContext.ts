@@ -22,6 +22,8 @@ export type ChatLabels = MessageListLabels & {
   nextMatch: string;
   /** The name of the conversation when the header has no `Chat.Title`. */
   messages: string;
+  /** The band above the first unread message of `items` (`Chat.Messages unread`). */
+  unread: string;
 };
 
 /** What the parts of a chat share; `Chat.Root` owns it. */

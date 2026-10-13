@@ -21,8 +21,8 @@ const labelsRow = (type: string) => ({
 export const contentParts: ApiPart[] = [
   {
     name: "Message.Media",
-    en: "`ref` → `HTMLDivElement`. A photo, a video or an album of up to 10 in a message: a `Gallery` the message shapes, with every prop of the gallery. Alone in a message it is the shell itself — rounded by the message, no backing, the meta on a dark pill over it (and a group chat's author header on a pill at the top); with a caption (`Message.Text` after it) it sits edge to edge at the top of the bubble. Its cap is the chat's media cap (`--prime-message-media-max-height`) within 85% of the row. The gaps of an album show the neutral surface of an incoming message in both directions.",
-    ru: "Фото, видео или альбом до 10 штук в сообщении: `Gallery`, которой придаёт форму сообщение, со всеми пропсами галереи. Одно в сообщении — это и есть оболочка: скруглено сообщением, без подложки, мета на тёмной плашке поверх (и шапка автора группового чата на плашке сверху); с подписью (`Message.Text` после) стоит от края до края вверху пузыря. Предел — медиа-предел чата (`--prime-message-media-max-height`) в пределах 85% строки. Зазоры альбома — нейтральная поверхность входящего сообщения в обе стороны.",
+    en: "`ref` → `HTMLDivElement`. A photo, a video or an album of up to 10: a `Gallery` the message shapes, with every gallery prop. Alone it is the `media` shell; with a `Message.Text` caption after it, it tops a bubble edge to edge.",
+    ru: "Фото, видео или альбом до 10 штук: `Gallery`, которой придаёт форму сообщение, со всеми пропсами галереи. Одно — это оболочка `media`; с подписью (`Message.Text` после) стоит от края до края вверху пузыря.",
     props: [
       ...galleryProps,
       {
@@ -35,8 +35,8 @@ export const contentParts: ApiPart[] = [
   },
   {
     name: "Message.File",
-    en: "`ref` → `HTMLDivElement`. A document: a round tile with the format (from the name's extension, in its hue) or the file's picture, the name on one line (without the extension the format tile shows; the full name stays in the tooltip and the download label) and the size. The tile is the file's one action, in one spot: download (with `href`, a link; or `transfer=\"remote\"` with `onDownload`, fetched in the app), cancel while it transfers, retry after a failure. A transfer either way is the shared transfer disk (`xl`) over the tile — the cross on the media shade with the progress ring along its edge, always shown, and «{done} из {total}» under the name; a failure turns it into the danger retry with the reason under the name. The name and the size line never move.",
-    ru: 'Документ: круглая плитка с форматом (по расширению имени, в его оттенке) или картинкой файла, имя в одну строку (без расширения, которое показывает плитка формата; полное имя — в подсказке и подписи скачивания) и размер. Плитка — единственное действие файла, в одном месте: скачать (с `href` — ссылкой; или `transfer="remote"` с `onDownload` — загрузкой в приложении), отменить во время передачи, повторить после ошибки. Передача в любую сторону — общий диск передачи (`xl`) поверх плитки: крестик на тени media с кольцом прогресса по краю, виден всегда, и «{done} из {total}» под именем; ошибка превращает его в красный повтор с причиной под именем. Имя и строка размера никогда не сдвигаются.',
+    en: "`ref` → `HTMLDivElement`. A document: a round format tile (or `preview`), the name and the size. The tile is the file's one action — download (`href` or `onDownload`), cancel while it transfers, retry after a failure.",
+    ru: "Документ: круглая плитка формата (или `preview`), имя и размер. Плитка — единственное действие файла: скачать (`href` или `onDownload`), отменить во время передачи, повторить после ошибки.",
     props: [
       {
         name: "name",
@@ -70,10 +70,7 @@ export const contentParts: ApiPart[] = [
         en: "A picture of the file (an image, the first page) in the tile in place of the format.",
         ru: "Картинка файла (изображение, первая страница) в плитке вместо формата.",
       },
-      ...transferProps({
-        en: "the file — the transfer disk (`xl`) over its tile, the transferred share under the name",
-        ru: "файла — диск передачи (`xl`) поверх плитки, переданная доля под именем",
-      }),
+      ...transferProps({ en: "the file", ru: "файла" }),
       labelsRow("MessageFileLabels"),
       {
         name: "…rest",

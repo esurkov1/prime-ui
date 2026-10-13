@@ -6,7 +6,7 @@ and `PageContent.Body` spaces its blocks 40 apart, so your code adds **no outer 
 margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
 
 The page recipes are whole, working screens in [patterns/](patterns/) — start from the closest one
-(table below) and keep its skeleton. The rules behind them are in [composition.md](composition.md).
+([the list](composition.md#patterns)) and keep its skeleton. The rules behind them are in [composition.md](composition.md).
 
 ## App frame (once per app)
 

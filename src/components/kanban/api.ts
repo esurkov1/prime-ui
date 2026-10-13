@@ -18,15 +18,15 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Kanban.Root",
-      en: "Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns (a `<ul>`, sortable along x) that scrolls sideways inside itself, each column a labelled `<ul>` of cards (Dnd lists of one kind, so Alt + ← / → moves a card across) under a header with the title, a count `Badge`, actions and optional description and meta lines. Mounts its own `Dnd.Root` unless one is already above it. Sets `aria-busy` while loading, `data-loading`, `data-disabled`.",
-      ru: "Обобщённый `Kanban.Root<T>`. Доска: полоса колонок (`<ul>`, сортируемый по горизонтали) с собственной горизонтальной прокруткой; колонка — подписанный `<ul>` карточек (списки Dnd одного вида, поэтому Alt + ← / → переносит карточку) под шапкой с названием, счётчиком `Badge`, действиями и необязательными строками описания и меты. Сама монтирует `Dnd.Root`, если его нет выше. Пока идёт загрузка — `aria-busy`, `data-loading`; `data-disabled`.",
+      en: "Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns that scrolls sideways inside itself, each a labelled list of cards under a header. Mounts its own `Dnd.Root` unless one is above it. Give it a height.",
+      ru: "Обобщённый `Kanban.Root<T>`; `ref` → `HTMLDivElement`. Доска: полоса колонок с собственной горизонтальной прокруткой, каждая — подписанный список карточек под шапкой. Сама монтирует `Dnd.Root`, если его нет выше. Задайте ей высоту.",
       props: [
         {
           name: "columns",
           type: "readonly KanbanColumn[]",
           required: true,
-          en: "Every column: `{ id, title, description?, color?, limit?, locked? }`, drawn in `columnOrder` (array order by default). `description` is a muted line under the title that also describes the column's list; `color` (a `PaletteColor`) is the stage's hue on its count badge; `limit` is a WIP limit — a full column refuses cards from other columns (the reason «Колонка «…» заполнена» is spoken and shown under the carried card) and its count turns orange (`count / limit`); `locked` keeps a system stage in its place when columns are reordered — a lock stands where its grip would and no column moves past it.",
-          ru: "Все колонки: `{ id, title, description?, color?, limit?, locked? }`, в порядке `columnOrder` (по умолчанию — порядок массива). `description` — приглушённая строка под названием, она же описание списка колонки; `color` (`PaletteColor`) — цвет этапа на счётчике; `limit` — лимит работы: заполненная колонка не принимает карточки из других (причина «Колонка «…» заполнена» озвучивается и видна под переносимой карточкой), счётчик становится оранжевым (`count / limit`); `locked` держит системный этап на месте при перестановке колонок — вместо ручки замок, и никакая колонка его не обходит.",
+          en: "Every column: `{ id, title, description?, color?, limit?, locked? }`, drawn in `columnOrder`. `color` is a `PaletteColor` for the count badge, `limit` a WIP limit, `locked` keeps a system stage in place.",
+          ru: "Все колонки: `{ id, title, description?, color?, limit?, locked? }`, в порядке `columnOrder`. `color` — `PaletteColor` счётчика, `limit` — лимит работы, `locked` держит системный этап на месте.",
         },
         {
           name: "items",
@@ -65,8 +65,8 @@ export const api: ComponentApi = {
         {
           name: "onValueChange",
           type: "(value: KanbanValue, move: KanbanMove) => void | Promise<void>",
-          en: "A card moved by pointer, touch or keyboard: the new placement, then `{ id, from, to, index }` to save. Return the save's promise: the card stays in its new place, busy (dimmed under a spinner, `aria-busy`, it does not move again), until it settles; resolve — the move stands (a controlled owner applies `value` before resolving); reject — the card glides back and `labels.moveFailed` is announced.",
-          ru: "Карточку перенесли мышью, касанием или с клавиатуры: новая раскладка, затем `{ id, from, to, index }` для сохранения. Верните промис сохранения: карточка стоит на новом месте занятой (приглушена под спиннером, `aria-busy`, не переносится), пока он не завершится; resolve — перенос остаётся (управляемый владелец применяет `value` до resolve); reject — карточка плавно возвращается, объявляется `labels.moveFailed`.",
+          en: "A card moved: the new placement, then `{ id, from, to, index }` to save. Return the save's promise: the card waits busy in its new place; a rejection glides it back.",
+          ru: "Карточку перенесли: новая раскладка, затем `{ id, from, to, index }` для сохранения. Верните промис сохранения: карточка ждёт занятой на новом месте; reject плавно возвращает её.",
         },
         {
           name: "reorderableColumns",
@@ -91,8 +91,8 @@ export const api: ComponentApi = {
         {
           name: "onColumnOrderChange",
           type: "(order: readonly string[], move: KanbanColumnMove) => void | Promise<void>",
-          en: "A column moved: the new order, then `{ id, index }` to save. Return the save's promise: the column stays in its new place with a spinner in place of its grip and `aria-busy` until it settles; reject — it glides back and `labels.columnMoveFailed` is announced.",
-          ru: "Колонку переставили: новый порядок, затем `{ id, index }` для сохранения. Верните промис сохранения: колонка стоит на новом месте со спиннером вместо ручки и `aria-busy`, пока он не завершится; reject — она плавно возвращается, объявляется `labels.columnMoveFailed`.",
+          en: "A column moved: the new order, then `{ id, index }` to save. Return the save's promise: the column waits busy in its new place; a rejection glides it back.",
+          ru: "Колонку переставили: новый порядок, затем `{ id, index }` для сохранения. Верните промис сохранения: колонка ждёт занятой на новом месте; reject плавно возвращает её.",
         },
         {
           name: "renderItem",
@@ -110,21 +110,21 @@ export const api: ComponentApi = {
         {
           name: "renderColumnMeta",
           type: "(column: KanbanColumn) => ReactNode",
-          en: "The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»), a caption in tabular digits, one line. It describes the column's list too.",
-          ru: "Строка меты под названием и описанием колонки: цифры этапа («12 сделок · 4,8 млн ₽»), подпись с моноширинными цифрами, одна строка. Она же описывает список колонки.",
+          en: "The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»).",
+          ru: "Строка меты под названием и описанием колонки: цифры этапа («12 сделок · 4,8 млн ₽»).",
         },
         {
           name: "canDrop",
           type: "(id: string, columnId: string) => boolean | string",
-          en: "A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken, and shown under the carried card); the column turns `danger` before the release and a keyboard move is announced as refused.",
-          ru: "Правило процесса: колонка `columnId` не принимает карточку `id` — `false` или строка с причиной (озвучивается и видна под переносимой карточкой); колонка краснеет до отпускания, перенос с клавиатуры объявляется как отказ.",
+          en: "A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card).",
+          ru: "Правило процесса: колонка `columnId` не принимает карточку `id` — `false` или строка с причиной (озвучивается и видна под переносимой карточкой).",
         },
         {
           name: "variant",
           type: '"well" | "plain"',
           default: '"well"',
-          en: "`well`: every column is a filled well (`fill-muted`) with its cards inside. `plain`: no wells — the header, a filled plate as wide as the cards, and the cards carry the column; cards widen to almost the full column, so neighbouring columns stand closer.",
-          ru: "`well`: каждая колонка — залитая подложка (`fill-muted`) с карточками внутри. `plain`: без подложек колонок — колонку держат шапка на залитой плашке шириной с карточки и сами карточки; карточки расширяются почти на всю колонку, и соседние колонки стоят ближе.",
+          en: "`well`: every column is a filled well with its cards inside. `plain`: no wells — a filled header plate and wider cards carry the column.",
+          ru: "`well`: каждая колонка — залитая подложка с карточками внутри. `plain`: без подложек — колонку держат залитая плашка шапки и более широкие карточки.",
         },
         {
           name: "loading",
@@ -156,8 +156,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Kanban.Item",
-      en: "`ref` → `HTMLLIElement`. One card: an `<li>` two ladder steps lighter than its column (`control-selected`: white in light) with the raised shadow, lifted to the overlay shadow on hover; return it from `renderItem` (it takes its id from there). Draggable by the whole card, focusable, `aria-keyshortcuts` for Alt + arrows. Presses on buttons, fields and links inside never start a drag.",
-      ru: "Одна карточка: `<li>` на два шага лестницы светлее колонки (`control-selected`: белая в светлой теме) с лёгкой тенью, при наведении приподнимается тенью overlay; возвращается из `renderItem` (id берёт оттуда). Перетаскивается целиком, фокусируется, `aria-keyshortcuts` для Alt + стрелок. Нажатия на кнопки, поля и ссылки внутри не начинают перетаскивание.",
+      en: "`ref` → `HTMLLIElement`. One card; return it from `renderItem` (it takes its id from there). Dragged by the whole card and focusable; presses on buttons, fields and links inside never start a drag.",
+      ru: "`ref` → `HTMLLIElement`. Одна карточка; возвращается из `renderItem` (id берёт оттуда). Перетаскивается целиком и фокусируется; нажатия на кнопки, поля и ссылки внутри не начинают перетаскивание.",
       props: [
         {
           name: "disabled",
@@ -169,15 +169,15 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "id">',
-          en: "`children` (the card parts), `className`, `onClick` and the other attributes; `onKeyDown` runs first, `preventDefault()` keeps the move from happening.",
-          ru: "`children` (части карточки), `className`, `onClick` и остальные атрибуты; `onKeyDown` срабатывает первым, `preventDefault()` отменяет перенос.",
+          en: "`children` (the card parts), `className`, `onClick` and the other attributes.",
+          ru: "`children` (части карточки), `className`, `onClick` и остальные атрибуты.",
         },
       ],
     },
     {
       name: "Kanban.ItemHeader",
-      en: "`ref` → `HTMLDivElement`. The top zone of a card over a faint hairline (`border-faint`): a muted caption row with the key or project at the start; the last child (a priority `Badge`, an assignee) sits at the end. Optional — a card without it starts with its title or a full-width `Thumbnail` cover.",
-      ru: "Верхняя зона карточки над еле видимой линией (`border-faint`): приглушённая строка с ключом или проектом в начале; последний элемент (`Badge` приоритета, исполнитель) — в конце. Необязательна: карточка без неё начинается с заголовка или обложки `Thumbnail` во всю ширину.",
+      en: "`ref` → `HTMLDivElement`. Optional top row of a card: the key or project at the start, the last child (a priority `Badge`, an assignee) at the end.",
+      ru: "`ref` → `HTMLDivElement`. Необязательная верхняя строка карточки: ключ или проект в начале, последний элемент (`Badge` приоритета, исполнитель) — в конце.",
       props: [DIV_REST],
     },
     {

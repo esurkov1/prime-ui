@@ -115,8 +115,8 @@ export const api: ComponentApi = {
           name: "align",
           type: '"auto" | "start" | "center" | "end"',
           default: '"auto"',
-          en: "Popover alignment to the field. `auto` (default) lines the panel up with the trigger edge that has more room beyond it: a trigger near the end of the screen lines up its end edge and the panel grows toward the start, and the other way near the start; `start`, `center` or `end` fix it (still flipping at the screen edge).",
-          ru: "Выравнивание поповера относительно поля. `auto` (по умолчанию) выравнивает панель по тому краю триггера, за которым больше места: у триггера ближе к концу экрана — по концу, и панель растёт к началу, ближе к началу — наоборот; `start`, `center` или `end` задают край явно (у края экрана он всё равно переворачивается).",
+          en: "Popover alignment to the field. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it.",
+          ru: "Выравнивание поповера относительно поля. `auto` выравнивает панель по краю триггера, за которым больше места; `start`, `center` или `end` задают край явно.",
         },
         {
           name: "focusRing",
@@ -161,8 +161,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Datepicker.Panel",
-      en: "`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content: no fill, padding or radius — the host (a Drawer sheet, a Card) is its container. It takes the host's width: 1–2 months by that width, day columns spread across it. Takes `mode`, `value` / `defaultValue` / `onValueChange` like Root and every calendar option below.",
-      ru: "Календарь без поля как собственный контент хоста: без фона, отступов и скругления — контейнер даёт хост (шторка Drawer, Card). Занимает ширину хоста: 1–2 месяца по этой ширине, колонки дней распределяются по ней. Принимает `mode`, `value` / `defaultValue` / `onValueChange`, как Root, и все параметры календаря ниже.",
+      en: "`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content (a Drawer sheet, a Card); 1–2 months by the host's width. Takes `mode`, the value triad and every calendar option below.",
+      ru: "Календарь без поля как собственный контент хоста (шторка Drawer, Card); 1–2 месяца по ширине хоста. Принимает `mode`, тройку значения и все параметры календаря ниже.",
       props: [
         {
           name: "…rest",

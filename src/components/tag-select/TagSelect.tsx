@@ -17,17 +17,11 @@ import {
 } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
-import {
-  enabledOptions,
-  handleListboxKeyDown,
-  optionDomId,
-  type Store,
-  useCreateStore,
-  useStoreSlice,
-} from "@/internal/listbox";
+import { optionDomId, type Store, useCreateStore, useStoreSlice } from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -35,6 +29,7 @@ import { VisuallyHidden } from "@/internal/VisuallyHidden";
 import { TagOptionMenu } from "./TagOptionMenu";
 import styles from "./TagSelect.module.css";
 import { useChipOverflow } from "./useChipOverflow";
+import { VirtualOptions, type VirtualOptionsHandle } from "./VirtualOptions";
 
 export type TagSelectOption = {
   value: string;
@@ -102,6 +97,8 @@ const TAG_SELECT_LABELS: TagSelectLabels = {
 };
 
 const CREATE_VALUE = "__prime_tag_select_create__";
+/** Listed options above which the panel renders only the options around the view. */
+const VIRTUAL_FROM = 100;
 
 type Chip = { value: string; label: string; color: PaletteColor };
 
@@ -314,6 +311,28 @@ export function TagSelect({
     matchAnchorWidth: true,
   });
   const listboxRef = floating.contentRef;
+  const scrollerRef = React.useRef<HTMLElement | null>(null);
+  const virtualRef = React.useRef<VirtualOptionsHandle | null>(null);
+  // A long list renders a window of options; the highlighted one (`aria-activedescendant` points
+  // at it) and the one whose menu is open stay rendered wherever the list scrolls.
+  const virtualized = listed.length > VIRTUAL_FROM;
+  const pinnedHighlight = useStoreSlice(highlight, (value) => (virtualized ? value : undefined));
+  const pinnedOptions = React.useMemo(() => {
+    if (!virtualized) return [];
+    return listed.flatMap((option, index) =>
+      option.value === pinnedHighlight || option.value === menuValue ? [index] : [],
+    );
+  }, [virtualized, listed, pinnedHighlight, menuValue]);
+  const getOptionKey = React.useCallback((index: number) => listed[index]?.value ?? "", [listed]);
+  /** The highlight moved from the keyboard: its option comes into view in the list's own scroller. */
+  const revealOption = (value: string) => {
+    const index = virtualized ? listed.findIndex((option) => option.value === value) : -1;
+    if (index >= 0) virtualRef.current?.reveal(index);
+    else
+      document
+        .getElementById(optionDomId(listboxId, value))
+        ?.scrollIntoView?.({ block: "nearest" });
+  };
   const activeDescendant = useStoreSlice(highlight, (value) =>
     shown && value ? optionDomId(listboxId, value) : undefined,
   );
@@ -502,11 +521,17 @@ export function TagSelect({
       pick(highlight.get() ?? navigable[0] ?? "");
       return;
     }
-    handleListboxKeyDown(event, {
-      items: enabledOptions(listboxRef.current),
-      highlight,
-      onSelect: pick,
-    });
+    const next = rovingIndex(
+      event.key,
+      navigable.indexOf(highlight.get() ?? ""),
+      navigable.length,
+      "vertical",
+    );
+    const target = next === null ? undefined : navigable[next];
+    if (target === undefined) return;
+    event.preventDefault();
+    highlight.set(target);
+    revealOption(target);
   };
 
   const onChipKeyDown = (event: React.KeyboardEvent<HTMLElement>, index: number) => {
@@ -542,7 +567,11 @@ export function TagSelect({
     setInputValue("");
   };
 
-  const optionRow = (option: TagSelectOption) => {
+  const setSize = listed.length + (showCreate ? 1 : 0);
+  const optionRow = (
+    option: TagSelectOption,
+    windowed?: { index: number; measure: (node: HTMLElement | null) => void },
+  ) => {
     const isSelected = selected.includes(option.value);
     const pending = deleting.has(option.value);
     const saving = updating.has(option.value);
@@ -574,6 +603,9 @@ export function TagSelect({
         managed={manageable}
         pending={pending}
         onPick={pickOption}
+        ref={windowed?.measure}
+        posInSet={windowed ? windowed.index + 1 + (showCreate ? 1 : 0) : undefined}
+        setSize={windowed ? setSize : undefined}
       >
         {manageable ? (
           <>
@@ -768,6 +800,7 @@ export function TagSelect({
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
           tabIndex={-1}
+          ref={scrollerRef}
           className={cx(menu.tier, menu.menu, styles.panel)}
         >
           {labels.panelHint ? <div className={styles.panelHint}>{labels.panelHint}</div> : null}
@@ -791,7 +824,22 @@ export function TagSelect({
               </Badge.Root>
             </OptionRow>
           ) : null}
-          {listed.map(optionRow)}
+          {virtualized ? (
+            <VirtualOptions
+              ref={virtualRef}
+              count={listed.length}
+              getKey={getOptionKey}
+              scrollRef={scrollerRef}
+              pinned={pinnedOptions}
+              size={size}
+              renderOption={(index, measure) => {
+                const option = listed[index];
+                return option ? optionRow(option, { index, measure }) : null;
+              }}
+            />
+          ) : (
+            listed.map((option) => optionRow(option))
+          )}
         </FloatingPanel>
       </ControlSizeProvider>
     </FieldFrame>
@@ -825,6 +873,10 @@ type OptionRowProps = {
   /** Its deletion is pending: busy, not pickable. */
   pending?: boolean;
   onPick: () => void;
+  /** A windowed list: measures the row, and its place among every option. */
+  ref?: ((node: HTMLElement | null) => void) | undefined;
+  posInSet?: number | undefined;
+  setSize?: number | undefined;
   children: React.ReactNode;
 };
 
@@ -839,12 +891,18 @@ function OptionRow({
   managed,
   pending = false,
   onPick,
+  ref,
+  posInSet,
+  setSize,
   children,
 }: OptionRowProps) {
   const highlighted = useStoreSlice(highlight, (current) => current === value);
   const props = {
     id,
+    ref,
     role: "option",
+    "aria-posinset": posInSet,
+    "aria-setsize": setSize,
     tabIndex: -1,
     "aria-selected": selected,
     "aria-busy": pending || undefined,

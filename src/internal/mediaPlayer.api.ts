@@ -21,7 +21,7 @@ export function mediaPlayerProps(what: {
   change: Text;
   /** Where the player is after the end. */
   ended: Text;
-  /** Where the transcript button stands and the text opens. */
+  /** Where the transcript button stands and where the text opens. */
   transcript: Text;
   /** How the player shows a transfer. */
   transfer: Text;
@@ -59,8 +59,8 @@ export function mediaPlayerProps(what: {
     {
       name: "playing",
       type: "boolean",
-      en: "Playing with sound (controlled): `true` plays it (from the start, or on from a pause), `false` pauses it. One sound plays at a time on the page: starting it pauses any other voice message, video message or video in `Message.Media`, and starting one of them pauses it.",
-      ru: "Играет ли со звуком (управляемо): `true` запускает (с начала или с паузы), `false` ставит на паузу. На странице звучит что-то одно: запуск ставит на паузу другое голосовое, видеосообщение или видео в `Message.Media`, и наоборот.",
+      en: "Playing with sound (controlled): `true` plays it (from the start or on from a pause), `false` pauses it. One sound plays on the page at a time.",
+      ru: "Играет ли со звуком (управляемо): `true` запускает (с начала или с паузы), `false` ставит на паузу. На странице звучит что-то одно.",
     },
     {
       name: "defaultPlaying",

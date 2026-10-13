@@ -197,16 +197,18 @@ export function ReorderRoot({
 type RowElementProps = Omit<React.ComponentProps<"tr">, "ref"> & {
   reorder: RowReorderShared | null;
   rowKey: React.Key;
+  /** The plain `<tr>` (a virtualized body measures it; virtualized tables never reorder). */
+  rowRef?: ((node: HTMLElement | null) => void) | undefined;
 };
 
 /**
  * A body row's `<tr>`; in a reorderable table, a sortable item rendered as that `<tr>` (it needs no
  * DOM id: only expandable rows are pointed at, and those do not reorder).
  */
-export function RowElement({ reorder, rowKey, id, children, ...rest }: RowElementProps) {
+export function RowElement({ reorder, rowKey, rowRef, id, children, ...rest }: RowElementProps) {
   if (!reorder) {
     return (
-      <tr id={id} {...rest}>
+      <tr ref={rowRef} id={id} {...rest}>
         {children}
       </tr>
     );

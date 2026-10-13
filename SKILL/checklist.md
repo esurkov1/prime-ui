@@ -17,7 +17,8 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 ## Sizes and alignment
 - [ ] Default size `m`, unless the whole region is deliberately dense (`s`) or prominent (`l`).
 - [ ] Every row of controls uses one size; their heights line up.
-- [ ] Icon-only buttons are square and have `aria-label`.
+- [ ] Icon-only buttons are square (round `shape="circle"` only for media and transfer actions) and have
+      `aria-label`.
 - [ ] Controls inside table cells are one tier below the table; no CSS sets table row or cell heights.
 
 ## Text
@@ -30,6 +31,8 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 ## Tokens and surfaces
 - [ ] No raw px/rem/hex, no `--prime-ref-*`, no inline `style`, no overrides of kit internals
       (allowed: `@media` conditions and length props a COMPONENT.md documents, like DataTable column `width`).
+- [ ] Every scroll region is a `ScrollContainer` (no `overflow: auto` of my own); kit components are not
+      wrapped in another one.
 - [ ] Blocks are separated by fill and air, not borders; no card inside a card without reason.
 - [ ] My own bounded blocks are `Card`s (or plain tiles on `--prime-color-layer-nested` +
       `--prime-card-radius`); no hard-coded `--prime-color-layer-<n>-*`.
@@ -41,9 +44,10 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 ## Reuse
 - [ ] Every repeated-looking element is one component (kit or `shared/ui`), not copies.
 - [ ] No `div` where a kit component exists (Divider, Kbd, Badge, Card, LinkButton, Typography).
-- [ ] Every overlay (Modal, ConfirmDialog, Drawer, Popover, Dropdown, Tooltip, Select) is a kit component.
+- [ ] Every overlay (Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu, Select, MediaViewer) is a kit component.
 - [ ] Properties of one record are a `DescriptionList`, uploads go through `useUploadQueue`, a chat is
-      `Message` + `Composer`, a schedule is `Gantt` — no hand-made copies of them.
+      `Chat` (`Chat.Messages` of `Message.Root`, `Chat.Footer` with `Composer.Root`), an album is `Gallery`,
+      a schedule is `Gantt` — no hand-made copies of them.
 
 ## Hierarchy
 - [ ] One primary action per area (an empty state's action replaces the header's, not duplicates it);

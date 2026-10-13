@@ -104,8 +104,8 @@ export const api: ComponentApi = {
           name: "onRetry",
           type: "() => void | Promise<void>",
           required: true,
-          en: "Loads the region again. A returned Promise keeps the button in its loading state (and ignores presses) until it settles: resolve — the owner swaps the region to its data; reject — the error state stays and the button is ready again.",
-          ru: "Загружает регион заново. Пока возвращённый Promise не завершился, кнопка в состоянии загрузки и не нажимается: resolve — владелец показывает данные; reject — ошибка остаётся, кнопка снова готова.",
+          en: "Loads the region again. A returned Promise keeps the button loading until it settles; on reject the error state stays and the button is ready again.",
+          ru: "Загружает регион заново. Возвращённый Promise держит кнопку в загрузке до ответа; при reject ошибка остаётся, кнопка снова готова.",
         },
         {
           name: "…rest",

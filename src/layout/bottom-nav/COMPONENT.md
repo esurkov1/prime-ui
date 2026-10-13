@@ -34,12 +34,12 @@ BottomNav.Root                 <nav>, safe-area inset below
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### BottomNav.Root
-`ref` → `HTMLElement`. The `<nav>`: the bar of items (equal columns, surface fill with a faint top divider, the bottom safe-area inset below the items) and the actions beside it. Inside `AppShell.Footer` it shows only while the shell has no Sidebar rail on screen (no `AppShell.Nav`, or the Sidebar is off-canvas).
+`ref` → `HTMLElement`. The `<nav>`: the bar of items in equal columns and the actions beside it. Inside `AppShell.Footer` it shows only while no Sidebar rail is on screen.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `iconOnly` | `boolean` | `false` | Icons without visible labels; the labels stay in the DOM as visually hidden text and name the items. |
-| `floating` | `boolean` | `false` | A glass capsule over the content: the iOS 26 tab bar at three quarters its size: a dense `--prime-color-bg-glass` tint over a strong backdrop blur with a hairline rim of light, 46 high (40 with `iconOnly`), across the width left beside its actions; the items share it equally. A selection capsule glides under the current item, an 18 icon over a 9 semibold label. A `BottomNav.Action` becomes a glass disk as tall as the capsule. Inset `--prime-bottom-nav-floating-inset` from the edges and above the home indicator; positions itself at the bottom of its positioned container (`AppShell.Footer`, which then takes no height), so the page scrolls under it. Opaque under `prefers-reduced-transparency`. |
+| `floating` | `boolean` | `false` | A glass capsule floating over the content at the bottom of its positioned container (`AppShell.Footer`), with a selection capsule gliding under the current item; the page scrolls under it. |
 | `labels` | `Partial<BottomNavLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (2–6 `BottomNav.Item`, optional `BottomNav.Action` before or after them), `aria-label` (replaces `labels.nav`), `className` and the other attributes. |
 
@@ -49,7 +49,7 @@ BottomNav.Root                 <nav>, safe-area inset below
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `current` | `boolean` | `false` | Current section: `aria-current="page"`; the icon and the label turn primary (the others are muted); floating, the item is in the accent on the selection capsule (the others in full ink). |
-| `disabled` | `boolean` | `false` | Not interactive: `disabled` / `aria-disabled`, `data-disabled`; a link loses its `href`. |
+| `disabled` | `boolean` | `false` | Not interactive: `disabled` / `aria-disabled`, `data-disabled`, out of the Tab order; an `href` link loses its `href`, an `asChild` child keeps its own and only its clicks are blocked. |
 | `href` | `string` | — | Renders an `<a>` (with `target`, `rel`). |
 | `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `NavLink`) as the item; its children are the label and parts. |
 | `children` | `ReactNode` | — | `BottomNav.ItemIcon`, an optional `BottomNav.ItemCount` and a short label (one word). |
@@ -74,7 +74,7 @@ BottomNav.Root                 <nav>, safe-area inset below
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children" \| "color">` | — | `className` and the other span attributes. |
 
 ### BottomNav.Action
-`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral solid) beside the bar for the screen's main action (create, search, assistant): a muted disk at the edge of a flat bar, a glass disk as tall as the capsule when `floating`. Placed before the first item it stands at the start, otherwise at the end.
+`ref` → `HTMLButtonElement`. A Button `shape="circle"` (`l`, neutral solid) beside the bar for the screen's main action. Placed before the first item it stands at the start, otherwise at the end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -87,10 +87,10 @@ BottomNav.Root                 <nav>, safe-area inset below
 Two item states only — current and not; no hover fill. Flat: current in the primary color, the others muted. Floating (as iOS): current in the accent on the selection capsule, the others in full ink.
 
 ### Flags (Root)
-| Flag | Looks like | Use when | Default |
+| Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `floating` | a glass capsule over the content across the width: translucent fill, backdrop blur, glass rim, a selection capsule under the current item; an action becomes a glass disk beside it | the app's look wants depth over the page, the iOS tab-bar feel | |
-| `iconOnly` | icons alone; labels visually hidden, still the items' names | sections with unmistakable icons | |
+| `floating` | a glass capsule over the content across the width: translucent fill, backdrop blur, glass rim, a selection capsule under the current item; an action becomes a glass disk beside it | the app's look wants depth over the page, the iOS tab-bar feel | `false` |
+| `iconOnly` | icons alone; labels visually hidden, still the items' names | sections with unmistakable icons | `false` |
 
 Without flags the bar is flat at the screen edge on the surface, with a faint top divider.
 
@@ -117,7 +117,7 @@ Motion: the color of the icon and the label changes over `fast`. Floating, the s
 ## Layout & spacing
 - Bar `--prime-bottom-nav-height` (52) plus `env(safe-area-inset-bottom)`; side padding `--prime-bottom-nav-padding-x`. With `iconOnly` the bar is `--prime-bottom-nav-icon-only-height` (48).
 - Items share the width equally; the icon (`--prime-bottom-nav-icon-size`, 20 — a light glyph, so the bar stays quiet next to the page) sits in a `--prime-bottom-nav-glyph-width` × `--prime-bottom-nav-glyph-height` box (28 × 20) that anchors the count; the label is `--prime-bottom-nav-label-size` (10, medium, line 12 — the iOS tab-bar size) 4 below it and truncates.
-- Floating (the iOS 26 tab bar at three quarters its size): a full-radius capsule `--prime-bottom-nav-floating-height` (46; `--prime-bottom-nav-floating-icon-only-height`, 40, with `iconOnly`), items inset `--prime-bottom-nav-floating-padding` (4) with a `--prime-bottom-nav-floating-icon-size` (18) icon over a `--prime-bottom-nav-floating-label-size` (9, semibold) label, `--prime-bottom-nav-floating-item-gap` (2) apart. The capsule spans the width left beside its actions and the items share it equally. `--prime-bottom-nav-floating-inset` (12) from the sides and above `env(safe-area-inset-bottom)`. Glass: a dense `--prime-color-bg-glass` tint over a strong `blur(--prime-bottom-nav-blur)` (14) with `saturate(180%)`, so the page shows as soft shapes; the rim is a 1px ring of `--prime-color-bg-glass-edge` that catches at the top-start and bottom-end corners and fades along the sides (a masked gradient), with the overlay shadow. The selection capsule is ink at 12%, no rim. A `BottomNav.Action` is a glass disk as tall as the capsule with an 18 glyph, `--prime-bottom-nav-floating-gap` (8) beside it. Inside `AppShell.Footer` main gets extra bottom padding so the last line clears the capsule.
+- Floating (the iOS 26 tab bar at three quarters its size): a full-radius capsule `--prime-bottom-nav-floating-height` (46; `--prime-bottom-nav-floating-icon-only-height`, 40, with `iconOnly`), items inset `--prime-bottom-nav-floating-padding` (4) with a `--prime-bottom-nav-floating-icon-size` (18) icon over a `--prime-bottom-nav-floating-label-size` (9, semibold) label, `--prime-bottom-nav-floating-item-gap` (2) apart. The capsule spans the width left beside its actions and the items share it equally. `--prime-bottom-nav-floating-inset` (12) from the sides and above `env(safe-area-inset-bottom)`. Glass: a dense `--prime-color-bg-glass` tint over a strong `blur(--prime-bottom-nav-blur)` (14) with `saturate(180%)`, so the page shows as soft shapes; the rim is a 1px ring of `--prime-color-bg-glass-edge` that catches at the top-start and bottom-end corners and fades along the sides (a masked gradient), with the overlay shadow. The selection capsule is ink at 12%, no rim. A `BottomNav.Action` is a glass disk as tall as the capsule with an 18 glyph, `--prime-bottom-nav-floating-gap` (8) beside it. The floating bar positions itself at the bottom of its positioned container; `AppShell.Footer` then takes no height, the page scrolls under the capsule and main gets extra bottom padding so the last line clears it.
 - Flat: a `BottomNav.Action` is a muted disk (Button `shape="circle"`, neutral solid) of the `l` control height at the bar's edge.
 - Surface fill with a faint top divider; inside `AppShell.Footer` the bar sticks to the bottom of the panel.
 
@@ -133,8 +133,8 @@ Motion: the color of the icon and the label changes over `fast`. Floating, the s
 - A `<nav>` landmark named by `labels.nav` («Основные разделы») or its own `aria-label`.
 - The current section has `aria-current="page"`; visually it is the primary-color item among muted ones (a contrast step, not a hue); floating, it also sits on the selection capsule, so the accent is never the only cue.
 - The icon is hidden from assistive tech; the item is named by its label, the count is read after it («Заказы 12»).
-- `BottomNav.Action` is a button without text, named by its required `aria-label`; it sits inside the landmark after the items.
-- A disabled item is a `disabled` button or an `aria-disabled` link without `href`.
+- `BottomNav.Action` is a button without text, named by its required `aria-label`; it sits inside the landmark, before or after the items (where it is placed).
+- A disabled item is a `disabled` button, an `aria-disabled` link without `href`, or an `aria-disabled` `asChild` child out of the Tab order (`tabIndex={-1}`).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

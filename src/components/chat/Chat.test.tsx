@@ -106,6 +106,12 @@ describe("Chat: the conversation assembled", () => {
     expect(article("m4")).toHaveAttribute("aria-setsize", "4");
   });
 
+  it("takes the text of the unread band from Chat.Root labels", () => {
+    render(<Thread labels={{ unread: "Новые" }} />);
+    expect(screen.getByText("Новые")).toBeInTheDocument();
+    expect(screen.queryByText("Непрочитанные сообщения")).toBeNull();
+  });
+
   it("renders an item again only when its data or its place changed", () => {
     const draw = vi.fn((item: Item) => (
       <Message.Root time={item.at}>

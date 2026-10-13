@@ -4,7 +4,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Slider",
-      en: '`ref` → `HTMLDivElement` (the field frame). A framed field like every other: the label row with the value, a native `<input type="range">` (transparent, on top) over the visual track, fill and thumb, then the hint or the error. Field-root rule: `className`, `ref` and the rest go to the frame; `id` and `aria-label` to the range input.',
+      en: '`ref` → `HTMLDivElement` (the field frame). A framed field: the label row with the value, a native `<input type="range">` over the visual track, then the hint or the error. `id` and `aria-label` go to the range input.',
       ru: 'Поле в рамке, как остальные: подпись со значением, нативный `<input type="range">` поверх дорожки, заливки и ползунка, под ним подсказка или ошибка.',
       props: [
         {
@@ -29,8 +29,8 @@ export const api: ComponentApi = {
         {
           name: "onCommit",
           type: "(value: number) => void | Promise<void>",
-          en: "The value the person settled on: once when the thumb is released or after a key moved it, only when it differs from the last commit. Save here, not on every `onValueChange` step. Return the save's promise: the thumb dims and the input has `aria-busy` until it settles (only the latest commit's answer counts); reject — the value glides back to the last saved one (through `onValueChange` when controlled).",
-          ru: "Значение, на котором человек остановился: один раз, когда ползунок отпустили или сдвинули клавишей, и только если оно отличается от прошлого. Сохраняйте здесь, а не на каждом шаге `onValueChange`. Верните промис сохранения: ползунок приглушён, у поля `aria-busy`, пока промис не завершится (важен ответ только на последний коммит); reject — значение плавно возвращается к последнему сохранённому (через `onValueChange` в управляемом режиме).",
+          en: "The value the person settled on, once after a drag or a key step. Save here, not in `onValueChange`. Return the save's promise: the thumb dims until it settles; on reject the value goes back.",
+          ru: "Итоговое значение — один раз после перетаскивания или шага клавишей. Сохраняйте здесь, а не в `onValueChange`. Верните промис сохранения: ползунок приглушён до ответа; при reject значение возвращается.",
         },
         {
           name: "name",
@@ -77,8 +77,8 @@ export const api: ComponentApi = {
           name: "orientation",
           type: '"horizontal" | "vertical"',
           default: '"horizontal"',
-          en: '`vertical` — the track stands upright, minimum at the bottom, seven thumbs long at its tier (a level beside a button, a mixer column); the native range turns with `writing-mode`, so ↑ / ↓ and the pointer work natively and the input has `aria-orientation="vertical"`.',
-          ru: '`vertical` — дорожка стоит вертикально, минимум внизу, длиной в семь ползунков своего тира (уровень у кнопки, колонка микшера); нативный range поворачивается через `writing-mode`, так что ↑ / ↓ и указатель работают нативно, а у поля `aria-orientation="vertical"`.',
+          en: "`vertical` — the track stands upright, minimum at the bottom: a level beside a button, a mixer column.",
+          ru: "`vertical` — дорожка стоит вертикально, минимум внизу: уровень у кнопки, колонка микшера.",
         },
         {
           name: "disabled",

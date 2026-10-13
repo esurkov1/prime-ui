@@ -113,8 +113,9 @@ Take a semantic `<Icon name="…" />` first, else a glyph from the full animated
 7. Labels above fields, always. Placeholder is an example value, never the label.
 8. Text through `Typography` roles (`title-m` section, `title-s` group, `body-m` text, `caption` meta;
    the page title is `PageContent.Title`). No custom font sizes.
-9. Overlays (Modal, ConfirmDialog, Drawer, Popover, Dropdown, Tooltip, CommandMenu, Select) come from
-   the kit — never hand-made — and stay mounted: drive them with `open`, never `{open && …}`.
+9. Overlays (Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu, Select,
+   MediaViewer) come from the kit — never hand-made — and stay mounted: drive them with `open`,
+   never `{open && …}`.
 10. No decoration: no emoji, no icons that do not carry meaning, no explanatory text nobody asked for.
     Icons that do carry meaning come from the kit only (`<Icon name>`, `prime-ui-kit/icons`) — they
     are animated.

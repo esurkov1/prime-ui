@@ -143,8 +143,8 @@ export const api: ComponentApi = {
           name: "kind",
           type: '"options" | "range" | "date-range"',
           default: '"options"',
-          en: '`options` — values to show or hide; `range` — a number range in two Inputs («от» – «до»); `date-range` — a period in the kit Datepicker (`mode="range"`). A range is one filter and one chip: «Сумма: 1 000–5 000», «Период: 1–15 мар».',
-          ru: '`options` — значения, которые показывают или скрывают; `range` — числовой диапазон в двух Input («от» – «до»); `date-range` — период в Datepicker набора (`mode="range"`). Диапазон — один фильтр и один тег: «Сумма: 1 000–5 000», «Период: 1–15 мар».',
+          en: "`options` — values to show or hide; `range` — a number range in two Inputs; `date-range` — a period in the kit Datepicker. A range is one filter and one chip.",
+          ru: "`options` — значения, которые показывают или скрывают; `range` — числовой диапазон в двух Input; `date-range` — период в Datepicker набора. Диапазон — один фильтр и один тег.",
         },
         {
           name: "options",
@@ -178,8 +178,8 @@ export const api: ComponentApi = {
     },
     {
       name: "matchesSmartFilter · resolveSmartFilterValues · isSmartFilterRange",
-      en: "Helpers. `matchesSmartFilter(entry, item)` checks one item's value on the client: a selection (`include` empty = any, `exclude` rejects) or a range (both bounds inclusive, dates by whole days); an item with no value passes only an empty filter. `resolveSmartFilterValues(entry, all)` turns a fixed field into the list to ask a server for: «hide» becomes «all except», `[]` — no filter. `isSmartFilterRange(entry)` tells a range from a selection.",
-      ru: "Помощники. `matchesSmartFilter(entry, item)` проверяет значение записи на клиенте: выбор (пустой `include` — любое, `exclude` отклоняет) или диапазон (обе границы включены, даты — целыми днями); запись без значения проходит только пустой фильтр. `resolveSmartFilterValues(entry, all)` превращает фиксированное поле в список для сервера: «скрыть» — «все, кроме», `[]` — без фильтра. `isSmartFilterRange(entry)` отличает диапазон от выбора.",
+      en: "Helpers. `matchesSmartFilter(entry, item)` checks one item's value on the client. `resolveSmartFilterValues(entry, all)` turns a fixed field into the list of values to ask a server for. `isSmartFilterRange(entry)` tells a range from a selection.",
+      ru: "Помощники. `matchesSmartFilter(entry, item)` проверяет значение записи на клиенте. `resolveSmartFilterValues(entry, all)` превращает фиксированное поле в список значений для сервера. `isSmartFilterRange(entry)` отличает диапазон от выбора.",
       props: [],
     },
   ],

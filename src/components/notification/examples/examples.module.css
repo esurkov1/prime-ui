@@ -20,7 +20,8 @@
 
 /* placement.tsx: a 16rem position picker. */
 .select {
-  width: min(100%, calc(var(--prime-space-16) * 4));
+  width: calc(var(--prime-space-16) * 4);
+  max-width: 100%;
 }
 
 /* in-form.tsx: a settings form in a Card. */

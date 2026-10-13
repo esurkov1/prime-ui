@@ -11,20 +11,20 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "PageToolbar.Root",
-      en: "`ref` → `HTMLDivElement`. The page panel: lays its slots out from its own width — one row from a 56rem container (Tools · Sections · View · Actions), stacked rows below it (Tools + Actions, Chips, Sections, View). Search and filter always come first, so the Chips sit right under them. Every row is 12 from the next. Parts may be left out; JSX order is the Tab order — write Tools, Sections, View, Actions, Chips.",
-      ru: "Панель страницы: раскладывает слоты по своей ширине — одна строка от 56rem (инструменты · разделы · вид · действие), уже — строки друг под другом (инструменты + действие, чипы, разделы, вид). Поиск и фильтр всегда первые, поэтому чипы стоят прямо под ними. Между любыми строками 12. Любой слот можно опустить; порядок в JSX — порядок Tab: Tools, Sections, View, Actions, Chips.",
+      en: "`ref` → `HTMLDivElement`. The page panel: one row from 56rem of its own width, stacked rows below. Any slot may be left out; JSX order is the Tab order — write Tools, Sections, View, Actions, Chips.",
+      ru: "Панель страницы: одна строка от 56rem своей ширины, уже — строки друг под другом. Любой слот можно опустить; порядок в JSX — порядок Tab: Tools, Sections, View, Actions, Chips.",
       props: [SLOT_REST],
     },
     {
       name: "PageToolbar.Sections",
-      en: "`ref` → `HTMLDivElement`. Sections of the page — a `fullWidth` SegmentedControl with counts. After the Tools and sized by content when wide; a full row under the Chips when narrow (beside the action when there are no Tools); scrolls inside when it does not fit.",
-      ru: "Разделы страницы — SegmentedControl с `fullWidth` и счётчиками. Широко — после инструментов, по содержимому; узко — на всю строку под чипами (рядом с действием, если инструментов нет); не помещается — прокрутка внутри.",
+      en: "`ref` → `HTMLDivElement`. Sections of the page — a `fullWidth` SegmentedControl with counts; scrolls inside when it does not fit.",
+      ru: "Разделы страницы — SegmentedControl с `fullWidth` и счётчиками; не помещается — прокрутка внутри.",
       props: [SLOT_REST],
     },
     {
       name: "PageToolbar.Tools",
-      en: "`ref` → `HTMLDivElement`. Search and filter button (`SmartFilter.Toolbar`): always the first slot and the stretchy one, the Chips right under it. Wide, it gives way down to 18rem (a 9rem search and the button on one line), then the Sections shrink.",
-      ru: "Поиск и кнопка фильтра (`SmartFilter.Toolbar`): всегда первый слот и резиновый, чипы — прямо под ним. Широко сжимается до 18rem (поиск 9rem и кнопка в одну строку), дальше сжимаются разделы.",
+      en: "`ref` → `HTMLDivElement`. Search and filter button (`SmartFilter.Toolbar`): always the first slot and the stretchy one, the Chips right under it.",
+      ru: "Поиск и кнопка фильтра (`SmartFilter.Toolbar`): всегда первый слот и резиновый, чипы — прямо под ним.",
       props: [SLOT_REST],
     },
     {

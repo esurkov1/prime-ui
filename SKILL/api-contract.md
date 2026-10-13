@@ -18,21 +18,21 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 |---|---|---|
 | Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`; an overlay `Content` (Modal, Drawer, Popover, Dropdown, Tooltip) takes `size` for its width. Without `size` these take the tier of a sized host (Popover, Banner, LoginForm, DataTable toolbar, `ControlSizeProvider`), else `m`: Input, Textarea, DigitInput, Checkbox, Radio, Switch, Slider, FileUpload, ColorSwatches, ColorPresets, SegmentedControl, Button, ButtonGroup, LinkButton, Label, Badge, Spinner, Skeleton, DescriptionList, Composer, `Icon`, `Checkbox.Indicator`. Select, NativeSelect, TagSelect, Datepicker, Tabs and SmartFilter do **not** read the host — give them `size` yourself. |
 | Treatment | `variant` | `solid · soft · outline · ghost`; Button also takes `shade` (the media shade with a blur, a button over media); structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
-| Meaning | `tone` | Button: `accent \| neutral \| danger`, plus `inherit` (with `ghost \| soft \| outline`) for an action on a colored host — it takes the host's text color; never recolor a Button with a CSS override. Destructive is `danger`, never `error`. |
+| Meaning | `tone` | Button: `accent \| neutral \| success \| danger` (`success` for a done action), plus `inherit` (with `ghost \| soft \| outline`) for an action on a colored host — it takes the host's text color; never recolor a Button with a CSS override. Destructive is `danger`, never `error`. |
 | Decoration | `color` | Badge, Avatar, Thumbnail, Icon, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `Sidebar.ItemCount` / `BottomNav.ItemCount`, `FileUpload.FormatBadge`, `Timeline.Item`, `Message.Author` / `Message.Reply` / `Message.Contact`; in data: TagSelect options, Kanban columns, Gantt bars. |
 | Validation | `invalid`, `hint`, `error` | Props, never parts. A non-empty `error` implies `invalid`; sets `aria-invalid`, `data-invalid`. |
 | Value | `value` / `defaultValue` / `onValueChange(value)` | Select, NativeSelect, TagSelect, Tabs, SegmentedControl, Slider, Datepicker, Accordion, Radio.Group, DigitInput, Pagination, SmartFilter, ColorPicker, ColorField, ColorSwatches, Kanban, FileUpload (its files), Composer (its text). |
 | Text value | native `value` / `onChange` + `onValueChange(string)` | Input (`Input.Field`), Textarea. |
-| Other state | `x` / `defaultX` / `onXChange(x)` | DataTable `sort`, `page`, `selected`, `expanded`, `hiddenColumns`; SmartFilter, Select and CommandMenu `search`; Sidebar `mode`; Kanban `columnOrder`; Gantt `scale`; `Chat.Root` `selected` and `search`; Composer `recordMode`; VoicePlayer `rate`. |
+| Other state | `x` / `defaultX` / `onXChange(x)` | DataTable `sort`, `page`, `selected`, `expanded`, `hiddenColumns`; SmartFilter, Select and CommandMenu `search`; Sidebar `mode`; Kanban `columnOrder`; Gantt `scale`; `Chat.Root` `selected` and `search`; Composer `recordMode`; VoicePlayer `rate`; MediaViewer and Gallery `index`; ChartFrame `hiddenSeries`; ColorPicker `format`; VoicePlayer / VideoNote `transcriptExpanded`. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Switch. |
-| Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure (Modal, Drawer, Popover, Dropdown, Tooltip, CommandMenu, Select, Sidebar off-canvas). |
-| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay: Modal, Drawer, CommandMenu, Popover, Dropdown. A destructive confirm is `ConfirmDialog` (it turns both off itself); a form holds closing with `Modal.Guard` / `Drawer.Guard`. |
+| Open | `open` / `defaultOpen` / `onOpenChange(open)` | Every overlay and disclosure (Modal, Drawer, Sheet, ConfirmDialog, Popover, Dropdown, Tooltip, CommandMenu, MediaViewer, Select, TagSelect, Datepicker, ColorPicker, Sidebar off-canvas). |
+| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay: Modal, Drawer, Sheet, CommandMenu, Popover, Dropdown, MediaViewer. A destructive confirm is `ConfirmDialog` (it turns outside click off itself; Escape is held while `onConfirm` runs); a form holds closing with `Modal.Guard` / `Drawer.Guard` / `Sheet.Guard`. |
 | Selection mode | `multiple` | One vs many (Select, Accordion) — never `type`. `mode` only for structurally different values (Datepicker `single \| range`). |
 | Status words | `selected`, `current`, `pressed` | `current` marks a navigation location (`Sidebar.Item`, `Breadcrumb.Item`) and sets `aria-current`; `pressed` a toggle button. |
 | Flags | `disabled`, `readOnly`, `required`, `optional`, `loading`, `fullWidth` | Same names everywhere. |
 | Focus ring | `focusRing` (default `true`) | Fields only; `false` only where focus is obvious otherwise. |
 | System strings | `labels?: Partial<XLabels>` | aria labels, counters, default texts; Russian defaults; values as `{token}` templates. Visible content goes in children or props. |
-| Structure | `X.Root` + `X.Part` | Only for components with parts. Leaves are single exports: `Typography`, `Kbd`, `Divider`, `Spinner`, `Skeleton`, `Crossfade`, `LinkButton`, `NativeSelect`, `DigitInput`, `Slider`, `TagSelect`, `ColorSwatches`, `CodeBlock`, `ProgressBar`, `ProgressCircle`, `Sparkline`, `Pagination`, `DataTable`, `Gantt`, `Fieldset`, `VisuallyHidden`, `ColorField`, `ExampleFrame`, `VoicePlayer`, `VideoNote`. This is the one list; other files link here. A group of roots is `X.Group` (`Radio.Group`, `Avatar.Group`). |
+| Structure | `X.Root` + `X.Part` | Only for components with parts. Leaves are single exports: `Typography`, `Kbd`, `Divider`, `Spinner`, `Skeleton`, `Crossfade`, `LinkButton`, `NativeSelect`, `DigitInput`, `Slider`, `TagSelect`, `ColorSwatches`, `CodeBlock`, `ProgressBar`, `ProgressCircle`, `Sparkline`, `Pagination`, `DataTable`, `Gantt`, `Fieldset`, `VisuallyHidden`, `ColorField`, `ExampleFrame`, `VoicePlayer`, `VideoNote`, `ScrollContainer`, `Gallery`, `MediaViewer`. This is the one list; other files link here. A group of roots is `X.Group` (`Radio.Group`, `Avatar.Group`). |
 | Icons in parts | `X.Icon`, `X.ItemIcon` | `Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`, `Dropdown.ItemIcon`… — never an `icon` prop on a component. Only data arrays (`notify()`, `options`) carry `icon: ReactNode`. |
 | DOM state | `data-size`, `data-variant`, `data-tone`, `data-color`, `data-invalid`, `data-disabled`, `data-loading`, `data-state` | Style your wrappers from these, not from class names of kit internals. |
 
@@ -90,8 +90,8 @@ export function PeriodFilter() {
   tracks the request itself, the flag is `loading` (Button, Switch, Badge).
 - A transfer of content, either way, is one set: `transfer` (`remote` · `queued` · `loading` ·
   `failed` · `done`), `transferProgress`, `transferDirection` (`upload` / `download`, the words
-  only), `onCancel` / `onRetry` / `onDownload` (VoicePlayer, VideoNote, `Message.File`, the items of
-  `Message.Media`); `useUploadQueue` items carry the same states in `status`.
+  only), `onCancel` / `onRetry` / `onDownload` (VoicePlayer, VideoNote, `Message.File`; on `Message.Media` / `Gallery` the state sits on
+  each item and the handlers on the root, called with the item's index); `useUploadQueue` items carry the same states in `status`.
 - A value that settles at the end of a gesture has its own event beside the triad: Slider
   `onValueChange` follows the drag, `onCommit` fires once on release (or after a key moves it) —
   save there.
@@ -245,16 +245,16 @@ it saves).
 - `action.*`: `add`, `addContact`, `attach`, `check`, `close`, `copy`, `delete`, `download`, `drag`,
   `edit`, `externalLink`, `eyedropper`, `filter`, `forward`, `login`, `logout`, `more`, `pause`,
   `pin`, `play`, `react`, `refresh`, `remove`, `reply`, `report`, `search`, `send`, `settings`,
-  `upload`, `video`, `voice`;
+  `transcribe`, `upload`, `video`, `voice`, `zoomIn`, `zoomOut`;
 - `field.*`: `calendar`, `email`, `password.hide`, `password.show`;
 - `format.*`: `bold`, `code`, `italic`, `link`, `list`, `quote`, `strikethrough`, `underline`;
-- `object.*`: `activity`, `bell`, `bike`, `book`, `cart`, `chart`, `crown`, `disc`, `document`, `fuel`,
+- `object.*`: `activity`, `bell`, `bike`, `book`, `cart`, `chart`, `crown`, `disc`, `document`, `file`, `fuel`,
   `funnel`, `globe`, `headset`, `image`, `inbox`, `key`, `mapPin`, `megaphone`, `message`,
   `motorbike`, `package`, `phone`, `receipt`, `rocket`, `scale`, `storage`, `tasks`, `trophy`,
   `truck`, `user`, `users`, `wallet`;
 - `sort.*`: `ascending`, `descending`, `none`;
 - `status.*`: `danger`, `emailSent`, `failed`, `favorite`, `info`, `locked`, `muted`, `offline`,
-  `pending`, `read`, `sent`, `success`, `trendUp`, `warning`;
+  `pending`, `read`, `sent`, `sound`, `success`, `trendUp`, `warning`;
 - `theme.*`: `dark`, `light`; `view.*`: `code`, `columns`, `preview`; `viewport.*`: `desktop`, `mobile`, `tablet`.
 
 Every glyph comes from the kit, in this order:

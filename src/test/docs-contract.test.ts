@@ -22,7 +22,15 @@ import {
   slotOrder,
 } from "../../playground/pageStandard";
 import { applyApiToDoc, type ComponentApi } from "../../scripts/docs/componentApi";
-import { checkLayoutCss, checkSourceCanon, pascal, read, root, walk } from "./contract-utils";
+import {
+  checkLayoutCss,
+  checkSourceCanon,
+  overlongApiDescriptions,
+  pascal,
+  read,
+  root,
+  walk,
+} from "./contract-utils";
 
 type ComponentDir = { base: "components" | "layout"; dir: string; rel: string };
 
@@ -285,6 +293,11 @@ describe("docs contract", () => {
         expect(doc === applyApiToDoc(doc, api), `${docPath} is stale: run bun run docs:build`).toBe(
           true,
         );
+      });
+
+      it("api.ts descriptions are short summaries (details live in COMPONENT.md)", async () => {
+        const { api } = await apiModules[`../${base}/${dir}/api.ts`]();
+        expect(overlongApiDescriptions(api), `${rel}/api.ts`).toEqual([]);
       });
 
       it("COMPONENT.md lists the examples in page order with their JSDoc", () => {

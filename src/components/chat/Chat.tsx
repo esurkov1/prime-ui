@@ -46,6 +46,7 @@ const CHAT_LABELS: ChatLabels = {
   previousMatch: "Предыдущее совпадение",
   nextMatch: "Следующее совпадение",
   messages: "Переписка",
+  unread: "Непрочитанные сообщения",
 };
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -433,7 +434,8 @@ export type ChatMessagesProps<T = unknown> = Omit<
 type Built = {
   item: unknown;
   position: MessagePosition;
-  unread: boolean;
+  /** The text of the band above it, `false` without one. */
+  unread: string | false;
   render: unknown;
   element: React.ReactElement;
 };
@@ -453,6 +455,8 @@ function useItemRows<T>(
     | "now"
     | "formatDate"
   >,
+  /** The text of the «unread» band (`labels.unread`). */
+  unreadLabel: string,
 ): React.ReactElement[] | null {
   const built = React.useRef(new Map<string, Built>());
   const dates = React.useRef(new Map<string, React.ReactElement>());
@@ -478,7 +482,7 @@ function useItemRows<T>(
       }
       return element;
     }
-    const isUnread = entry.key === unread;
+    const isUnread = entry.key === unread ? unreadLabel : false;
     const cached = built.current.get(entry.key);
     if (
       cached &&
@@ -505,7 +509,7 @@ function useItemRows<T>(
         : rendered;
     const element = isUnread ? (
       <React.Fragment key={entry.key}>
-        <ChatUnread />
+        <ChatUnread labels={{ unread: isUnread }} />
         {message}
       </React.Fragment>
     ) : (
@@ -552,18 +556,21 @@ function ChatMessages<T>({
   ...rest
 }: ChatMessagesProps<T>) {
   const chat = useChat();
-  const rows = useItemRows<T>({
-    items,
-    getKey,
-    getAuthor,
-    getDate,
-    isService,
-    renderMessage,
-    unread,
-    groupWindow,
-    now,
-    formatDate,
-  });
+  const rows = useItemRows<T>(
+    {
+      items,
+      getKey,
+      getAuthor,
+      getDate,
+      isService,
+      renderMessage,
+      unread,
+      groupWindow,
+      now,
+      formatDate,
+    },
+    chat.labels.unread,
+  );
   // The chat's own typing bubble ends the list, unless the list has one of its own (a group chat
   // shows who types).
   const ownTyping = React.Children.toArray(children).some(

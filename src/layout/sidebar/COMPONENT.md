@@ -90,8 +90,8 @@ useSidebar()                       state hook for custom parts inside Root
 | `open` | `boolean` | — | Off-canvas panel on narrow viewports (controlled). |
 | `defaultOpen` | `boolean` | `false` | Initial off-canvas state (uncontrolled). |
 | `onOpenChange` | `(open: boolean) => void` | — | Off-canvas open / close: Toggle, scrim, Escape, navigation, leaving the narrow viewport. |
-| `offCanvas` | `"auto" \| "always" \| "never"` | `"auto"` | When the rail leaves the layout and becomes an off-canvas panel with a scrim and a focus trap, opened by `open`: `auto` — below 768px (viewport); `always` — at any width (navigation behind a menu button); `never` — always a rail. |
-| `persistKey` | `string` | — | Remembers the navigation across reloads in `localStorage` under this key: the mode and which collapsible groups and sub-lists are open, by their `id`, else their label text (give an `id` when labels are translated or change). The stored state wins over `defaultMode` / `defaultOpen`; controlled `mode` / `open` are not stored. Unavailable storage is ignored. |
+| `offCanvas` | `"auto" \| "always" \| "never"` | `"auto"` | When the rail becomes an off-canvas panel opened by `open`: `auto` — below 768px (viewport); `always` — at any width; `never` — always a rail. |
+| `persistKey` | `string` | — | `localStorage` key that keeps the mode and the open groups and sub-lists across reloads (keyed by `id`, else label text). Wins over `defaultMode` / `defaultOpen`. |
 | `labels` | `Partial<SidebarLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
@@ -103,7 +103,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Sidebar.Brand
-`forwardRef` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays, without a tooltip (it would cover the edge toggle); the faded name still names the link.
+`forwardRef` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -129,7 +129,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children` (Groups, Items, Subs), `className` and the other attributes. |
 
 ### Sidebar.Group
-`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button (`aria-expanded`, `aria-controls`) with a chevron at its end; the items fold away (inert). On the compact rail the heading keeps its height and layout: its text slides toward the edge, scales down and is cut by the rail with a fade, so the first letters still name the section, and it still folds and unfolds the group. An open group keeps its items on the rail; a folded one stays folded and becomes one `…` row (named by the label, `aria-haspopup="dialog"`) whose items open in a flyout, like a sub-list. A folded group with a count that needs attention inside shows its dot (after the heading, or on the `…` row).
+`ref` → `HTMLDivElement`. `<div role="group">` named by its label. With `collapsible` the heading is a disclosure button that folds the items away; on the compact rail a folded group becomes one `…` row whose items open in a flyout.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -145,7 +145,7 @@ useSidebar()                       state hook for custom parts inside Root
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `current` | `boolean` | `false` | Current page: `aria-current="page"`, `data-state="active"`; a muted fill two ladder steps off the rail, apart from the hover wash, and primary text and icon colour (a translucent wash in a flyout). No shadow. |
+| `current` | `boolean` | `false` | Current page: `aria-current="page"`, `data-state="active"`; a muted fill and primary text and icon colour. |
 | `disabled` | `boolean` | `false` | Not interactive: `disabled` / `aria-disabled`, `data-disabled`; a link loses its `href`. |
 | `href` | `string` | — | Renders an `<a>` (with `target`, `rel`). |
 | `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `NavLink`) as the item; its children are the label and parts. |
@@ -161,7 +161,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Sidebar.ItemCount
-`ref` → `HTMLSpanElement` (the number or the Badge). A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set. In compact mode the number leaves the row (still read by screen readers) and a badge leaves a dot of its hue on the icon; a folded sub-list or group shows the dot of a badge inside it.
+`ref` → `HTMLSpanElement` (the number or the Badge). A count after the label: a plain muted number by default; a `Badge` (one tier down) when `color` or `variant` is set — on the compact rail it becomes a dot of its hue.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -179,7 +179,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Sidebar.ItemAction
-`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. It shows on hover and focus of the row, always on touch screens, while the trail (count, hint) steps aside; hidden on the compact rail.
+`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. Shows on hover and focus of the row (always on touch); hidden on the compact rail.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -190,7 +190,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "onClick" \| "aria-label">` | — | `className` and the other attributes of the Button. |
 
 ### Sidebar.Sub
-`ref` → `HTMLDivElement`. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Expanded, the children unfold under the parent on a guide line; on the compact rail they open in a flyout (the kit Popover to the right, with the rows and spacing of a kit menu). A current child opens the sub-list and marks the parent as on the active path (`data-active-path`). While folded (and always on the rail) the parent shows the dot of a count inside that needs attention.
+`ref` → `HTMLDivElement`. A parent item with child items: `Sidebar.SubTrigger` + `Sidebar.SubContent` in a `<div>`. Children unfold on a guide line, or in a flyout on the compact rail. A current child opens the sub-list and marks the parent (`data-active-path`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -200,7 +200,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Sidebar.SubTrigger
-`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. Expanded: click, `→` / `←` open and close. Compact: hover (after a short intent delay), click, `Enter` · `Space` · `→` open the flyout (`aria-haspopup="dialog"`); on the active path it takes the current fill.
+`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. On the compact rail it opens the flyout (`aria-haspopup="dialog"`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -228,7 +228,7 @@ useSidebar()                       state hook for custom parts inside Root
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"item" \| "header"` | `"item"` | `item` — a row in the rail. `header` — an icon button «‹‹» at the end of `Sidebar.Header`; in compact mode the same button moves onto the rail's outer edge, shrinks and turns round, and its chevrons turn to point out. Off-canvas it stays in the header and closes the panel. |
+| `variant` | `"item" \| "header"` | `"item"` | `item` — a row in the rail. `header` — an icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "aria-label" \| "aria-expanded" \| "aria-controls">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `className` and the other button attributes. |
 
 ### useSidebar()
@@ -306,6 +306,10 @@ Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header,
 | persisted | `persistKey` on Root | the mode and the open state of collapsible groups and sub-lists are read from and written to `localStorage` |
 | disabled | `disabled` | Item `disabled` / `aria-disabled`, `data-disabled` |
 
+`persistKey` stores collapsible groups and sub-lists by their `id`, else by their label text — give an `id` when labels are translated or change. The stored state wins over `defaultMode` / `defaultOpen`; controlled `mode` / `open` are not stored, and unavailable storage is ignored.
+
+On the active path a SubTrigger takes the current fill. On the compact rail a SubTrigger opens its flyout on hover after a short intent delay, as well as on click and from the keyboard.
+
 Leaving the narrow viewport closes the off-canvas panel; navigating from an `href` / `asChild` item (or the brand) closes it too. Navigating from a flyout closes the flyout.
 
 ## Layout & spacing
@@ -346,7 +350,8 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 - A collapsible group heading and a SubTrigger are buttons with `aria-expanded` and `aria-controls`; folded content is `inert`.
 - On the compact rail a SubTrigger and the `…` row of a folded group have `aria-haspopup="dialog"`; the flyout is a non-modal dialog named by the parent (the `…` row by the group label).
 - On the rail a collapsible group heading stays the same disclosure button (folding it there brings the `…` row); hovering it shows the whole name in a tooltip.
-- An attention dot is decorative: the count it stands for is read inside.
+- An attention dot is decorative: the count it stands for is read inside. On the compact rail a plain count leaves the row visually but stays readable by screen readers.
+- In compact mode the brand's name fades out but still names the link.
 - A row action is its own button next to the item (never nested), named by `label` with a tooltip.
 - The account avatar is hidden from screen readers; the name and the muted line name the button.
 - Off-canvas: scrim, focus trap and Escape; the scrim is a button labelled `labels.close`.
