@@ -164,6 +164,12 @@ describe("Setup docs", () => {
     expect(entries.filter((entry) => !(`./${entry}` in exportsMap))).toEqual([]);
   });
 
+  it("`npx prime-ui-kit skill` has its bin: a normalized path npm publishes as is", () => {
+    // npm rewrites a `./`-prefixed bin path at publish and the registry manifest loses `bin`.
+    const { bin } = JSON.parse(read("package.json")) as { bin: Record<string, string> };
+    expect(bin).toEqual({ "prime-ui-kit": "bin/prime-ui-kit.js" });
+  });
+
   it("the setup snippets import bundle.css, the one stylesheet components need", () => {
     for (const doc of ["README.md", "SKILL/SKILL.md", "SKILL/cheatsheet.md"]) {
       expect(read(doc), doc).toContain('import "prime-ui-kit/bundle.css";');
