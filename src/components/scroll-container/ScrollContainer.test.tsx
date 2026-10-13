@@ -525,7 +525,8 @@ describe("ScrollContainer anchor and edges", () => {
           <Probe into={region} />
         </ScrollContainer>,
       );
-      await waitFor(() => expect(node.scrollTop).toBe(1400), { timeout: 2000 });
+      // The glide runs on real frames: a slow runner needs longer than a laptop.
+      await waitFor(() => expect(node.scrollTop).toBe(1400), { timeout: 5000 });
       expect(region.current?.atEnd()).toBe(true);
     } finally {
       vi.unstubAllGlobals();

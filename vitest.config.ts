@@ -20,6 +20,8 @@ export default defineConfig({
     /** Heavy jsdom and many files: without a cap, machines with many CPUs sometimes fail to start
      * workers in time ("Timeout waiting for worker to respond") and single tests hit testTimeout. */
     maxWorkers: 4,
+    /** A whole screen (the chat pattern, the chat example) mounts in seconds on a 2-CPU CI runner. */
+    testTimeout: 15_000,
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
