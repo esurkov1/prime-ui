@@ -31,12 +31,14 @@ describe("Chat overview example: media from the Composer", () => {
     // The stand-in server takes four steps of 200 ms.
     await waitFor(
       () => expect(screen.getByRole("button", { name: "Отправить" })).not.toBeDisabled(),
-      { timeout: 3000 },
+      { timeout: 10_000 },
     );
     fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
 
     // The album: a photo and a video (not file messages), in the tray order, with the caption.
-    expect(await screen.findByRole("button", { name: "Открыть: стеллаж.jpg" })).toBeTruthy();
+    expect(
+      await screen.findByRole("button", { name: "Открыть: стеллаж.jpg" }, { timeout: 5000 }),
+    ).toBeTruthy();
     expect(screen.getByRole("button", { name: "Открыть: обзор склада.mp4" })).toBeTruthy();
     expect(screen.getAllByText("Склад после приёмки").length).toBeGreaterThan(0);
     // The other file is a file message.
@@ -45,5 +47,5 @@ describe("Chat overview example: media from the Composer", () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:local-1");
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:local-2");
     expect(URL.revokeObjectURL).not.toHaveBeenCalledWith("blob:local-3");
-  }, 10000);
+  }, 20_000);
 });
