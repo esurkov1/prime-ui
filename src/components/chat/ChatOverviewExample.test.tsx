@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import ChatOverviewExample from "./examples/overview";
@@ -12,11 +12,13 @@ describe("Chat overview example: media from the Composer", () => {
     URL.revokeObjectURL = vi.fn();
   });
   afterEach(() => {
+    vi.useRealTimers();
     URL.createObjectURL = original.create;
     URL.revokeObjectURL = original.revoke;
   });
 
   it("sends photos and a video as one Message.Media album with the text as its caption", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval"] });
     render(<ChatOverviewExample />);
     const field = screen.getByRole("textbox", { name: "Сообщение" });
     const files = [
@@ -28,17 +30,19 @@ describe("Chat overview example: media from the Composer", () => {
       fireEvent.paste(field, { clipboardData: { files, types: ["Files"] } });
     });
     fireEvent.change(field, { target: { value: "Склад после приёмки" } });
-    // The stand-in server takes four steps of 200 ms.
-    await waitFor(
-      () => expect(screen.getByRole("button", { name: "Отправить" })).not.toBeDisabled(),
-      { timeout: 10_000 },
-    );
+    // The stand-in server takes four steps of 200 ms: run its clock instead of waiting for it, so a
+    // slow machine never decides the result.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+    });
+    expect(screen.getByRole("button", { name: "Отправить" })).not.toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
 
     // The album: a photo and a video (not file messages), in the tray order, with the caption.
-    expect(
-      await screen.findByRole("button", { name: "Открыть: стеллаж.jpg" }, { timeout: 5000 }),
-    ).toBeTruthy();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(100);
+    });
+    expect(screen.getByRole("button", { name: "Открыть: стеллаж.jpg" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Открыть: обзор склада.mp4" })).toBeTruthy();
     expect(screen.getAllByText("Склад после приёмки").length).toBeGreaterThan(0);
     // The other file is a file message.
@@ -47,5 +51,5 @@ describe("Chat overview example: media from the Composer", () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:local-1");
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:local-2");
     expect(URL.revokeObjectURL).not.toHaveBeenCalledWith("blob:local-3");
-  }, 20_000);
+  });
 });
