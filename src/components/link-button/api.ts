@@ -8,11 +8,17 @@ export const api: ComponentApi = {
       ru: "Нативная ссылка `<a>` в виде текстового действия; передаёт ярус вложенным иконкам.",
       props: [
         {
+          name: "href",
+          type: "string",
+          en: "The destination. Required without `asChild`; with `asChild` the child carries its own target.",
+          ru: "Адрес перехода. Обязателен без `asChild`; с `asChild` цель задаёт сам вложенный элемент.",
+        },
+        {
           name: "tone",
-          type: '"accent" | "neutral"',
+          type: '"accent" | "neutral" | "muted"',
           default: '"accent"',
-          en: "`accent` — a regular link; `neutral` — secondary text, primary on hover, for footers and metadata.",
-          ru: "`accent` — обычная ссылка; `neutral` — вторичный текст, на наведении основной: футеры и метаданные.",
+          en: "`accent` — a regular link; `neutral` — secondary text for footers and metadata; `muted` — muted text with no underline, for trails such as a breadcrumb.",
+          ru: "`accent` — обычная ссылка; `neutral` — вторичный текст для футеров и метаданных; `muted` — приглушённый текст без подчёркивания, для цепочек вроде хлебных крошек.",
         },
         {
           name: "size",
@@ -22,30 +28,37 @@ export const api: ComponentApi = {
           ru: "Ярус контрола: кегль 12 · 13 · 14 · 16 · 18, межстрочный интервал и размер иконки. Без него — ярус хоста, иначе `m`.",
         },
         {
+          name: "inline",
+          type: "boolean",
+          default: "false",
+          en: "A link inside running text: it takes the text's type, wraps with it and keeps its underline drawn.",
+          ru: "Ссылка внутри текста: берёт его шрифт, переносится вместе с ним и всегда подчёркнута.",
+        },
+        {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: 'Renders `<a role="link" aria-disabled="true" tabIndex={-1}>` without `href` and swallows the click; `id`, `aria-*` and the other native props stay.',
-          ru: 'Рендерит `<a role="link" aria-disabled="true" tabIndex={-1}>` без `href` и гасит клик; `id`, `aria-*` и прочие атрибуты сохраняются.',
+          en: 'Renders `<a role="link" aria-disabled="true">` without `href`, out of the Tab order, and swallows the click; `id`, `aria-*` and the other native props stay.',
+          ru: 'Рендерит `<a role="link" aria-disabled="true">` без `href`, вне порядка Tab, и гасит клик; `id`, `aria-*` и прочие атрибуты сохраняются.',
         },
         {
           name: "asChild",
           type: "boolean",
           default: "false",
-          en: 'Merges the link look onto its single child instead of rendering `<a>`: a router link, or a `<button type="button">` for an inline action that is not navigation. `disabled` becomes `aria-disabled` and swallows the click.',
-          ru: 'Переносит вид ссылки на единственный дочерний элемент вместо `<a>`: ссылку роутера или `<button type="button">` для действия в тексте. `disabled` становится `aria-disabled` и гасит клик.',
+          en: 'Merges the link look onto its single child instead of rendering `<a>`: a router link, or a `<button type="button">` for an inline action that is not navigation.',
+          ru: 'Переносит вид ссылки на единственный дочерний элемент вместо `<a>`: ссылку роутера или `<button type="button">` для действия в тексте.',
         },
         {
           name: "children",
           type: "ReactNode",
-          en: "Text and optional `Icon`s before or after it; the text is the accessible name.",
-          ru: "Текст и необязательные `Icon` до или после него; текст — доступное имя.",
+          en: "Text and optional `Icon`s before or after it; the text is the accessible name. With `asChild`, the one child element.",
+          ru: "Текст и необязательные `Icon` до или после него; текст — доступное имя. С `asChild` — единственный дочерний элемент.",
         },
         {
           name: "…rest",
-          type: "AnchorHTMLAttributes<HTMLAnchorElement>",
-          en: "`href`, `target`, `rel`, `download`, `onClick`, `className`, `aria-*` and the other anchor attributes.",
-          ru: "`href`, `target`, `rel`, `download`, `onClick`, `className`, `aria-*` и остальные атрибуты ссылки.",
+          type: 'Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">',
+          en: "`target`, `rel`, `download`, `onClick`, `className`, `aria-*` and the other anchor attributes.",
+          ru: "`target`, `rel`, `download`, `onClick`, `className`, `aria-*` и остальные атрибуты ссылки.",
         },
       ],
     },
@@ -55,13 +68,15 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Enter",
-        en: "Follows the link (native `<a>`).",
-        ru: "Переходит по ссылке (нативное поведение `<a>`).",
+        native: true,
+        en: "Follows the link (native `<a>`). With `asChild` on a `<button>`, `Enter` and `Space` run its action.",
+        ru: "Переходит по ссылке (нативное поведение `<a>`). С `asChild` на `<button>` действие запускают `Enter` и `Space`.",
       },
       {
         keys: "Tab",
-        en: "Moves focus; a disabled link is skipped.",
-        ru: "Переводит фокус; неактивная ссылка пропускается.",
+        native: true,
+        en: "Moves focus; a disabled link is skipped, the `asChild` child too (`tabIndex=-1`).",
+        ru: "Переводит фокус; неактивная ссылка пропускается, вложенный элемент `asChild` тоже (`tabIndex=-1`).",
       },
     ],
     aria: [
@@ -80,6 +95,10 @@ export const api: ComponentApi = {
       {
         en: "Icons are decorative; say «новая вкладка» in the text or `aria-label` for external links.",
         ru: "Иконки декоративные; о новой вкладке скажите в тексте или в `aria-label`.",
+      },
+      {
+        en: "`inline` keeps the underline drawn, so a link in text never rests on color alone.",
+        ru: "`inline` всегда рисует подчёркивание: ссылка в тексте не держится только на цвете.",
       },
     ],
   },

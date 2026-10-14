@@ -1,7 +1,7 @@
-/** A regular link and a quiet one for footers and metadata — `tone`. */
+/** A regular link, a quiet one for footers and metadata, a muted one for trails — `tone`. */
 import { LinkButton, Typography } from "prime-ui-kit";
 
-const TONES = ["accent", "neutral"] as const;
+const TONES = ["accent", "neutral", "muted"] as const;
 
 export default function LinkButtonVariantsExample() {
   return (

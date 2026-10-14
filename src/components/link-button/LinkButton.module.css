@@ -1,10 +1,17 @@
+/*
+ * LinkButton — a link as a text action. Text, line height and icon come from the shared tier table
+ * (`internal/fieldTier`, set from `data-size` in TSX); `inline` takes the type of the running text
+ * around it instead.
+ */
 .root {
-  --link-text: var(--prime-control-m-text-size);
-  --link-lh: var(--prime-control-m-line-height);
+  --link-text: var(--field-text);
+  --link-lh: var(--field-lh);
   --link-gap: var(--prime-space-1);
   --link-fg: var(--prime-color-accent-text);
   --link-fg-hover: var(--prime-color-accent-hover);
-  --prime-icon-size: var(--prime-control-m-icon);
+  --link-line: transparent;
+  --link-line-hover: currentColor;
+  --prime-icon-size: var(--field-icon);
 
   display: inline-flex;
   align-items: center;
@@ -16,7 +23,7 @@
   line-height: var(--link-lh);
   font-weight: var(--prime-font-weight-medium);
   text-decoration-line: underline;
-  text-decoration-color: transparent;
+  text-decoration-color: var(--link-line);
   text-decoration-thickness: var(--prime-border-width);
   text-underline-offset: calc(var(--prime-space-1) - var(--prime-border-width));
   cursor: pointer;
@@ -25,8 +32,9 @@
     text-decoration-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-/* `asChild` on a `<button>`: drop the native button chrome, keep the link look. */
-button.root {
+/* `asChild` on a `<button>`: drop the native button chrome, keep the link look. `:where()` keeps
+   the element out of the specificity, so a host's class still wins. */
+:where(button).root {
   margin: 0;
   padding: 0;
   border: 0;
@@ -39,37 +47,40 @@ button.root {
   --link-fg-hover: var(--prime-color-text-primary);
 }
 
-.root[data-size="xs"] {
-  --link-text: var(--prime-control-xs-text-size);
-  --link-lh: var(--prime-control-xs-line-height);
-  --prime-icon-size: var(--prime-control-xs-icon);
+/* Muted: a quiet trail (a path, a breadcrumb): muted text that turns primary on hover, never
+   underlined — its place in the trail says it is a link. */
+.root[data-tone="muted"] {
+  --link-fg: var(--prime-color-text-muted);
+  --link-fg-hover: var(--prime-color-text-primary);
+  --link-line-hover: transparent;
 }
 
-.root[data-size="s"] {
-  --link-text: var(--prime-control-s-text-size);
-  --link-lh: var(--prime-control-s-line-height);
-  --prime-icon-size: var(--prime-control-s-icon);
-}
-
-.root[data-size="l"] {
-  --link-text: var(--prime-control-l-text-size);
-  --link-lh: var(--prime-control-l-line-height);
+.root[data-size="l"],
+.root[data-size="xl"] {
   --link-gap: var(--prime-space-2);
-  --prime-icon-size: var(--prime-control-l-icon);
 }
 
 /* Control tiers l and xl share text 16/24, so xl steps up to the title-l type (18) to stay distinct. */
 .root[data-size="xl"] {
   --link-text: var(--prime-text-title-l-size);
   --link-lh: var(--prime-text-title-l-line-height);
-  --link-gap: var(--prime-space-2);
-  --prime-icon-size: var(--prime-control-xl-icon);
+}
+
+/* Inline: a link inside running text takes the text's type and wraps with it; the underline is
+   always drawn, so the link never rests on color alone. */
+.root[data-inline="true"] {
+  --link-line: currentColor;
+
+  display: inline;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
 }
 
 @media (hover: hover) {
   .root:hover:not([data-disabled="true"]) {
     color: var(--link-fg-hover);
-    text-decoration-color: currentColor;
+    text-decoration-color: var(--link-line-hover);
   }
 }
 

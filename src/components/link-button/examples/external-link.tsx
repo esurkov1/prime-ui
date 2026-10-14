@@ -5,7 +5,7 @@ export default function LinkButtonExternalLinkExample() {
   return (
     <Typography variant="body-m" tone="secondary">
       Тарифы и лимиты описаны в{" "}
-      <LinkButton href="https://example.com/docs" target="_blank" rel="noopener noreferrer">
+      <LinkButton href="https://example.com/docs" target="_blank" rel="noopener noreferrer" inline>
         документации (новая вкладка)
       </LinkButton>
       .
