@@ -16,7 +16,6 @@ import { type ControlSize, stepDown, tierMappings } from "@/internal/states";
 import styles from "./Select.module.css";
 import { normalize, useSelectContext } from "./selectContext";
 
-
 type SpanProps = React.HTMLAttributes<HTMLSpanElement> & { ref?: React.Ref<HTMLSpanElement> };
 
 // ─── Rich option parts (row and trigger) ─────────────────────────────────────
