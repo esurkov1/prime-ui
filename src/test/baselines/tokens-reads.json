@@ -9,7 +9,6 @@
   "src/components/switch/Switch.module.css: --prime-switch-travel",
   "src/components/switch/Switch.module.css: --prime-switch-w",
   "src/icons/glyph.tsx: --prime-icon-size",
-  "src/internal/ChoiceField.module.css: --prime-choice-control-height",
   "src/internal/iconBox.module.css: --prime-icon-size",
   "src/internal/iconBox.ts: --prime-icon-size",
   "src/internal/swatch.module.css: --prime-icon-size",

@@ -76,14 +76,17 @@
 
 /*
  * A spoiler: until pressed, a wash over transparent text — the words cannot be read, selected or
- * copied, only the length of the run shows. Pressed, the wash and the text cross-fade into plain
- * text (`base`; instant under reduced motion through the duration tokens).
+ * copied, only the length of the run shows. Pressed, the same element turns into plain text: the
+ * wash and the text cross-fade on the fade clock (`base`), which reduced motion keeps.
  */
 .spoiler {
   border-radius: var(--prime-radius-xs);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
   outline: none;
+  transition:
+    color var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .spoiler[data-state="masked"] {
@@ -105,18 +108,7 @@
   }
 }
 
-.spoiler[data-state="revealed"] {
-  animation: spoiler-reveal var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
-}
-
 .spoiler:focus-visible {
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
-}
-
-@keyframes spoiler-reveal {
-  from {
-    color: transparent;
-    background-color: var(--prime-color-fill-strong);
-  }
 }

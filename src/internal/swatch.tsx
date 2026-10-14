@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { CheckMark } from "@/internal/CheckMark";
 import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import press from "@/internal/press.module.css";
 import { gridIndex } from "@/internal/rovingFocus";
 import type { PaletteColor } from "@/internal/states";
@@ -119,11 +120,12 @@ export const swatchClass = cx(styles.swatch, press.press);
 export const swatchTriggerClass = cx(styles.trigger, press.press);
 
 /**
- * Tier of a swatch grid, from `data-size` on the same element: `--swatch-radius`, `--swatch-gap`
- * and `--swatch-size` = base − 8, where the base is the control height, or the menu item height
- * with `data-base="item"`; on a coarse pointer at least the touch target.
+ * Tier of a swatch grid, on the grid element with `data-size`: the field tier plus
+ * `--swatch-radius`, the gap between swatches and `--swatch-size` = base − 8, where the base is the
+ * control height, or the menu item height with `data-base="item"`; on a coarse pointer at least the
+ * touch target.
  */
-export const swatchTierClass = styles.tier;
+export const swatchTierClass = cx(fieldTierClass, styles.tier);
 
 /**
  * Defines `--swatch-checker`, the kit's transparency checkerboard as a background layer, for a host

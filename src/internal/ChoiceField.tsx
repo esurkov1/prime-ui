@@ -4,8 +4,8 @@ import { LabelMarks } from "@/components/label/Label";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { type FieldIds, FieldSupport, useErrorShake, useLeavingError } from "@/internal/FieldFrame";
-import frameStyles from "@/internal/FieldFrame.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import press from "@/internal/press.module.css";
 import type { CheckState, ControlSize } from "@/internal/states";
@@ -113,7 +113,7 @@ export function ChoiceField({
           data-loading={busy || undefined}
         >
           <span
-            className={cx(styles.controlCell, frameStyles.shakeSelf, touchTargetClass)}
+            className={cx(styles.controlCell, enterMotion.shake, touchTargetClass)}
             data-shake={shake}
           >
             {control}

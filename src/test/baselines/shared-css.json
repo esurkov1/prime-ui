@@ -34,6 +34,5 @@
   "src/internal/ProgressLegend.module.css: control tier tokens outside fieldTier",
   "src/internal/iconBox.module.css: control tier tokens outside fieldTier",
   "src/internal/menu.module.css: control tier tokens outside fieldTier",
-  "src/internal/swatch.module.css: control tier tokens outside fieldTier",
   "src/layout/sidebar/Sidebar.module.css: control tier tokens outside fieldTier"
 ]
