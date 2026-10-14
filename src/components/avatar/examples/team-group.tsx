@@ -30,8 +30,8 @@ export default function AvatarTeamGroupExample() {
   return (
     <Avatar.Group size="s" aria-label="Участники проекта: 7">
       {MEMBERS.map((member) => (
-        <Avatar.Root key={member.initials} color={member.color}>
-          {member.src ? <Avatar.Image src={member.src} alt={member.name} /> : null}
+        <Avatar.Root key={member.initials} color={member.color} aria-label={member.name}>
+          {member.src ? <Avatar.Image src={member.src} /> : null}
           <Avatar.Fallback>{member.initials}</Avatar.Fallback>
         </Avatar.Root>
       ))}

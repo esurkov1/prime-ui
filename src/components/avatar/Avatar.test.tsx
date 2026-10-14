@@ -1,6 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { iconSlotClass } from "@/internal/iconBox";
+import { cssRule, cssValue } from "@/test/css";
+
 import { Avatar, type AvatarSize } from "./Avatar";
 import styles from "./Avatar.module.css";
 
@@ -73,6 +76,39 @@ describe("Avatar", () => {
     );
     expect(screen.getByText("Z").closest("div")).toHaveClass("avatar-custom");
   });
+
+  it("named by aria-label it is one image of that name; unnamed it has no role", () => {
+    const { rerender } = render(
+      <Avatar.Root aria-label="Ольга Белова">
+        <Avatar.Fallback>ОБ</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByRole("img", { name: "Ольга Белова" })).toBeInTheDocument();
+    rerender(
+      <Avatar.Root>
+        <Avatar.Fallback>ОБ</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.queryByRole("img")).toBeNull();
+    expect(screen.getByText("ОБ").closest("div")).not.toHaveAttribute("role");
+  });
+
+  it("an icon fallback is half the diameter, a kit Icon and a raw svg alike", () => {
+    const { container } = render(
+      <Avatar.Root>
+        <Avatar.Fallback>
+          <svg aria-hidden="true" />
+        </Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(container.querySelector("svg")?.parentElement).toHaveClass(iconSlotClass);
+    expect(
+      cssValue(
+        cssRule("src/components/avatar/Avatar.module.css", ".fallback"),
+        "--prime-icon-size",
+      ),
+    ).toBe("calc(var(--avatar-size) * 0.5)");
+  });
 });
 
 describe("Avatar.Group", () => {
@@ -94,6 +130,15 @@ describe("Avatar.Group", () => {
     expect(screen.getByText("A")).toBeInTheDocument();
     expect(screen.getByText("B")).toBeInTheDocument();
     expect(screen.getByText("C")).toBeInTheDocument();
+  });
+
+  it("a named overflow cell is an image of that name", () => {
+    render(
+      <Avatar.Group aria-label="Участники проекта">
+        <Avatar.Overflow aria-label="Ещё 3 участника">+3</Avatar.Overflow>
+      </Avatar.Group>,
+    );
+    expect(screen.getByRole("img", { name: "Ещё 3 участника" })).toHaveTextContent("+3");
   });
 
   it("passes the group size to avatars and overflow", () => {

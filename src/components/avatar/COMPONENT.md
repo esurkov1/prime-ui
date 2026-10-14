@@ -38,13 +38,13 @@ Avatar.Group           overlapping row, gives its size to members
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Avatar.Root
-`ref` → `HTMLDivElement`. The circle: diameter tier and fallback hue; tracks the image load for the Fallback.
+`ref` → `HTMLDivElement`. The circle: diameter tier and fallback hue; tracks the image load for the Fallback. Named by `aria-label`, it is one `role="img"`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | `"m"` | Diameter 20 · 24 · 32 · 40 · 48 · 64 px. Inside `Avatar.Group` the group size is used when it is not set. |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue of the fallback; derive it from a stable user id. |
-| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `aria-label` (when no name is shown) and the other div attributes. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `aria-label` (when no name is shown: the avatar becomes `role="img"` of that name) and the other div attributes. |
 
 ### Avatar.Image
 `ref` → `HTMLImageElement`. The photo; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).
@@ -52,7 +52,7 @@ Avatar.Group           overlapping row, gives its size to members
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `src` | `string` | — (required) | Photo URL. |
-| `alt` | `string` | `""` | Empty when the name is written next to the avatar, otherwise the name. |
+| `alt` | `string` | `""` | Empty: the name is written next to the avatar or set once with `aria-label` on `Avatar.Root`. |
 | `…rest` | `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" \| "alt">` | — | `className`, `onLoad`, `onError` and the other img attributes. |
 
 ### Avatar.Fallback
@@ -80,7 +80,7 @@ Avatar.Group           overlapping row, gives its size to members
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `aria-label`, `className` and the other div attributes. |
 
 ### Avatar.Overflow
-`ref` → `HTMLDivElement`. The «+N» cell at the end of a group, the same diameter as its avatars.
+`ref` → `HTMLDivElement`. The «+N» cell at the end of a group, the same diameter as its avatars; named by `aria-label`, it is `role="img"`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -95,7 +95,7 @@ Avatar.Group           overlapping row, gives its size to members
 | `gray` | neutral soft fill, gray initials | unknown or system users | yes |
 | `blue` · `sky` · `teal` · `green` · `yellow` · `orange` · `red` · `pink` · `purple` | soft hue fill, hue initials | people: the hue comes from a stable user id | |
 
-The soft fill is opaque: the soft hue is composited over the surface the avatar stands on (`--avatar-ring`, else the current layer), so it looks like the soft hue on that surface and an overlapped neighbour in a group never shows through. `Avatar.Overflow` is composited the same way.
+The soft fill is opaque: the soft hue is composited over the ground the avatar stands on (the current layer, which every surface sets; `--avatar-ring` from a host whose ground is not a layer), so it looks like the soft hue there and an overlapped neighbour in a group never shows through. `Avatar.Overflow` is composited the same way.
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -119,7 +119,8 @@ The soft fill is opaque: the soft hue is composited over the surface the avatar 
 ## Layout & spacing
 - Inline-flex, never shrinks, `vertical-align: middle`.
 - Avatar → name: `--prime-space-3` in lists and cards, `--prime-space-2` in table cells.
-- Group: members overlap by 25% of the diameter with a 2px ring in `--avatar-ring` (surfaces set it to their fill; a host such as a reaction chip sets it to its own fill, and the fills of initials and «+N» are composited over it).
+- Group: members overlap by 25% of the diameter with a 2px ring in the ground they stand on: the current layer of the surface around them (no surface sets anything), or `--avatar-ring` from a host whose ground is not a layer (a reaction chip sets its own fill); the fills of initials and «+N» are composited over the same ground.
+- An icon fallback is half the diameter: a kit `Icon` reads `--prime-icon-size`, a raw svg too.
 - A host slot may size the avatar by setting `--avatar-slot-size`.
 
 ## Accessibility
@@ -132,9 +133,9 @@ No keyboard interaction.
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- `Avatar.Image` `alt`: empty when the name is written next to it, otherwise the name. Without a photo and without a name nearby, put `aria-label` on `Avatar.Root`.
+- `Avatar.Image` `alt` stays empty. Without the name written nearby, name the avatar once with `aria-label` on `Avatar.Root`: it becomes `role="img"` of that name, whether the photo, the initials or an icon shows.
 - `Avatar.Status` is `role="img"` with `aria-label` from `labels`. Every state has its own shape (full dot, crescent, dot with a bar, hollow ring), so presence never rests on color alone.
-- `Avatar.Group` is `role="group"`; give it `aria-label`. Give `Avatar.Overflow` an `aria-label` («Ещё 3 участника»).
+- `Avatar.Group` is `role="group"`; give it `aria-label`. Give `Avatar.Overflow` an `aria-label` («Ещё 3 участника»): it becomes `role="img"`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -151,7 +152,7 @@ No keyboard interaction.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A photo with initials underneath while it loads, and initials alone — `Avatar.Image`, `Avatar.Fallback`. |
+| [overview.tsx](examples/overview.tsx) | A photo with initials underneath while it loads, and initials alone; the name is on the avatar itself — `Avatar.Image`, `Avatar.Fallback`, `aria-label`. |
 | [variants.tsx](examples/variants.tsx) | Every palette hue of the fallback; derive it from a stable user id — `color`. |
 | [sizes.tsx](examples/sizes.tsx) | Every diameter, 20 to 64 px; initials take 40% of it — `size`. |
 | [states.tsx](examples/states.tsx) | A loaded photo, a broken URL that falls back to initials, and an icon fallback for a guest — `Avatar.Image`, `Avatar.Fallback`. |
@@ -164,9 +165,10 @@ No keyboard interaction.
 - `alt="Анна Климова"` while the name is printed next to it → `alt=""`.
 - A random `color` on every render → derive it from the user id.
 - A custom presence dot → use `Avatar.Status`.
-- A group on a custom filled block with a ring in the wrong color → set `--avatar-ring` to that fill (by default the ring is the current layer, `--prime-color-layer-current`).
+- A group on a custom filled block with a ring in the wrong color → set `--avatar-ring` to that fill (by default the ring is the current layer, `--prime-color-layer-current`); a kit surface needs nothing.
+- The name in both the image `alt` and the root `aria-label`, or only in `alt` (it vanishes when the photo fails) → `aria-label` on `Avatar.Root` once.
 - `size` on every avatar in a group → set it once on `Avatar.Group`.
 
 ## Related
-- **Built from:** —
+- **Built from:** `internal/imageSlot` (the photo and its fallback), `internal/namedRole` (a named avatar is an image)
 - **See also:** [Thumbnail](../thumbnail/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Card](../card/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (a round upload zone around an avatar)

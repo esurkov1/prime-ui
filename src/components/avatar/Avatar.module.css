@@ -25,9 +25,10 @@
 
 /*
  * Hue variables come from `internal/palette` (`.hue` on the root). The soft hue is translucent in
- * dark: it is composited over the surface the avatar stands on (`--avatar-ring`, set by surfaces to
- * their own fill; the context layer otherwise), so the fill is opaque everywhere and an overlapped
- * neighbour never shows through, while it looks the same as the bare soft hue on that surface.
+ * dark: it is composited over the ground the avatar stands on — the context layer
+ * (`--prime-color-layer-current`, which every surface of the ladder sets), or `--avatar-ring` from a
+ * host whose ground is not a layer (a message bubble) — so the fill is opaque everywhere and an
+ * overlapped neighbour never shows through, while it looks the same as the bare soft hue there.
  */
 .root {
   background:
@@ -77,7 +78,11 @@
   display: none;
 }
 
+/* An icon as fallback fills half of the circle: a kit Icon reads the size, a raw svg too
+   (`iconSlotClass`). */
 .fallback {
+  --prime-icon-size: calc(var(--avatar-size) * 0.5);
+
   position: absolute;
   inset: 0;
   z-index: var(--prime-z-base);
@@ -87,12 +92,6 @@
   justify-content: center;
   overflow: hidden;
   text-align: center;
-}
-
-/* An icon as fallback fills about half of the circle. */
-.fallback > svg {
-  width: 50%;
-  height: 50%;
 }
 
 /*
@@ -163,9 +162,9 @@
 /* ─── Group: overlap with a ring in the surface color ──────────────────── */
 
 /*
- * `--avatar-ring` is inherited, not declared here: surfaces (Card, Modal, Drawer, Popover,
- * Sidebar) set it to their own background, so the ring matches wherever the group sits.
- * Canvas is the fallback.
+ * The ring is the ground the group stands on: the context layer of the surface around it (every
+ * surface of the ladder sets `--prime-color-layer-current`, so no surface sets anything), or
+ * `--avatar-ring` from a host whose ground is not a layer (a message bubble).
  */
 .group {
   display: inline-flex;
@@ -183,6 +182,8 @@
   margin-inline-start: calc(var(--avatar-size) * -0.25);
 }
 
+/* The «+N» fill is the muted fill composited over the same ground as the ring, so it is opaque
+   and reads as one more member. */
 .overflow {
   background:
     linear-gradient(var(--prime-color-fill-muted), var(--prime-color-fill-muted)),

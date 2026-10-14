@@ -14,8 +14,8 @@ export default function AvatarSrcFromStateExample() {
 
   return (
     <div className={styles.row}>
-      <Avatar.Root size="xl" color="sky">
-        <Avatar.Image src={SOURCES[index]} alt="" />
+      <Avatar.Root size="xl" color="sky" aria-label="Ирина Павлова">
+        <Avatar.Image src={SOURCES[index]} />
         <Avatar.Fallback>ИП</Avatar.Fallback>
       </Avatar.Root>
       <Button.Root
