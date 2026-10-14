@@ -170,7 +170,7 @@ Card.Root asChild                <a> or <button> (the only child) holding the pa
 Without `asChild` a card is static: no hover, focus or press of its own. With it: `data-interactive` on the element.
 
 ## Layout & spacing
-- Cards on a page: one `PageContent.Grid` with a `PageContent.Cell span` per card (16 on both axes, the cards of a row share one height); a grid inside one block is the block's own intrinsic grid, `repeat(auto-fill, minmax(min(100%, var(--prime-layout-tile-min-width)), 1fr))` (a lone card keeps its column width), gap `--prime-space-4`.
+- Cards on a page: one `PageContent.Grid` with a `PageContent.Cell span` per card (16 on both axes, the cards of a row share one height); a grid inside one block is the block's own intrinsic `auto-fill` grid on the tile width of the layout tokens (a lone card keeps its column width), gap `--prime-space-4`.
 - Radius `--prime-card-radius`, no border. In `panel` and `list` the `Header` is a padded zone with a faint inset hairline below; in `stat-trend` it can pair a leading Badge or icon with a compact `Card.Value`.
 - Padding `--prime-card-padding-m` (20); `Body` gap `--prime-card-gap` (16); fields inside `Body` 20 apart, one ladder step off the card.
 - Depth comes from nesting (foundation §4): on the page — the AppShell panel is the page — a card is layer 1 (white in light) with the raised whisper; inside another card it is the next layer, a flat tile. The ladder stops at layer 4.
