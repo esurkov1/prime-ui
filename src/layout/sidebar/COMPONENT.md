@@ -231,16 +231,12 @@ useSidebar()                       state hook for custom parts inside Root
 | `variant` | `"item" \| "header"` | `"item"` | `item` — a row in the rail. `header` — an icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "aria-label" \| "aria-expanded" \| "aria-controls">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `className` and the other button attributes. |
 
-### useSidebar()
-Hook for custom parts inside `Sidebar.Root` (throws outside). Returns the fields below.
+### Functions
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `mode · setMode` | `SidebarMode · (mode: SidebarMode) => void` | — | Desktop mode. |
-| `open · setOpen` | `boolean · (open: boolean) => void` | — | Off-canvas panel. |
-| `toggle` | `() => void` | — | The action of `Sidebar.Toggle`. |
-| `offCanvas` | `boolean` | — | The sidebar is an off-canvas panel now (`offCanvas="always"`, or `"auto"` under 768px). |
-| `size · navId · labels` | `ControlSize · string · SidebarLabels` | — | Tier, id of the `<nav>` (for `aria-controls` on your own menu button), resolved strings. |
+#### `useSidebar()`
+`() => { mode: SidebarMode; setMode: (mode: SidebarMode) => void; open: boolean; setOpen: (open: boolean) => void; toggle: () => void; offCanvas: boolean; size: ControlSize; navId: string; labels: SidebarLabels }`
+
+Hook for custom parts inside `Sidebar.Root` (throws outside): the desktop `mode`, the off-canvas `open` state, `toggle` (the action of `Sidebar.Toggle`), `offCanvas` (the sidebar is an off-canvas panel: `offCanvas="always"`, or `"auto"` under 768px), the tier, the `navId` of the `<nav>` (for `aria-controls` on your own menu button) and the resolved strings.
 
 ## Variants
 The rail is a surface beside the page, one layer above it on the surface ladder (`data-depth`): white on the light gray page, one step lighter than the near-black page in dark; no border or card. Items are transparent rows with `text-secondary`, `fill-subtle` on hover; the current item takes the rail's fill two ladder steps off it (`fill-muted-hover`) with primary text.

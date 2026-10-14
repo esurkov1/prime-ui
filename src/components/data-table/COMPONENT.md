@@ -52,7 +52,7 @@ Columns are data (`DataTableColumn<Row>[]`), not child parts. The one part, `Dat
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### DataTable
-Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.
+Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -125,10 +125,12 @@ Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an option
 | `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment to the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children">` | — | `className`, `aria-label` and the other attributes of the trigger button. |
 
-### DataTableColumn<Row>
+### Types
+
+#### `DataTableColumn<Row>`
 One column of `columns`: data, not a part.
 
-| Prop | Type | Default | Description |
+| Field | Type | Default | Description |
 |---|---|---|---|
 | `id` | `string` | — (required) | Unique column id (sort state, `data-column-id`). |
 | `header` | `ReactNode` | — (required) | Head content. |

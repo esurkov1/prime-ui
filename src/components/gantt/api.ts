@@ -178,11 +178,13 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  types: [
     {
       name: "GanttBar",
       en: "One bar of `getRowBars`: data, not a part. Dates are calendar days with an exclusive `end`; `start` equal to `end` is a milestone. Extend the type with your own fields: callbacks get your object back.",
       ru: "Одна полоса из `getRowBars`: данные, а не часть разметки. Даты — календарные дни, `end` не включается; `start`, равный `end`, — веха. Расширяйте тип своими полями: колбэки получают ваш объект.",
-      props: [
+      fields: [
         {
           name: "id",
           type: "string",

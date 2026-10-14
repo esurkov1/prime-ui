@@ -70,10 +70,12 @@ Gantt                          surface (layer of the ladder), size container
 | `labels` | `Partial<GanttLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "onSelect">` | — | `aria-label` (the grid's name), `className` and the other div attributes. |
 
-### GanttBar
+### Types
+
+#### `GanttBar`
 One bar of `getRowBars`: data, not a part. Dates are calendar days with an exclusive `end`; `start` equal to `end` is a milestone. Extend the type with your own fields: callbacks get your object back.
 
-| Prop | Type | Default | Description |
+| Field | Type | Default | Description |
 |---|---|---|---|
 | `id` | `string` | — (required) | Unique across the chart. |
 | `start` | `Date` | — (required) | First day. |

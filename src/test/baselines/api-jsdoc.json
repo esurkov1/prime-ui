@@ -769,8 +769,6 @@
   "src/components/voice-player/VoicePlayer.tsx: VoicePlayerProps.defaultRate",
   "src/components/voice-player/VoicePlayer.tsx: VoicePlayerProps.rate",
   "src/components/voice-player/VoicePlayer.tsx: VoicePlayerProps.waveform",
-  "src/hooks/useUploadQueue.ts: UploadQueueOptions.concurrency",
-  "src/hooks/useUploadQueue.ts: UploadQueueOptions.upload",
   "src/internal/FieldAction.tsx: FieldActionButtonProps.asChild",
   "src/internal/FieldAction.tsx: FieldActionButtonProps.children",
   "src/internal/FieldAction.tsx: FieldActionButtonProps.label",

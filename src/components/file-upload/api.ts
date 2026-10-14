@@ -1,5 +1,8 @@
 import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
-import { USE_UPLOAD_QUEUE_PART } from "../../hooks/useUploadQueue.api";
+import {
+  UPLOAD_QUEUE_OPTIONS_TYPE,
+  USE_UPLOAD_QUEUE_FUNCTION,
+} from "../../hooks/useUploadQueue.api";
 import { FILE_UPLOAD_LABELS } from "./FileUpload";
 
 const FILE_TYPE = "readonly FileUploadFile[]";
@@ -367,8 +370,9 @@ export const api: ComponentApi = {
         },
       ],
     },
-    USE_UPLOAD_QUEUE_PART,
   ],
+  types: [UPLOAD_QUEUE_OPTIONS_TYPE],
+  functions: [USE_UPLOAD_QUEUE_FUNCTION],
   labels: labelRows(FILE_UPLOAD_LABELS, {
     title: { en: "Title of the built-in zone body.", ru: "Заголовок встроенной зоны." },
     description: {

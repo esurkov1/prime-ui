@@ -1,42 +1,143 @@
-import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import { DATEPICKER_LABELS } from "./DatepickerPanel";
+
+/** The value of both parts: the mode and the value triad. */
+const VALUE_PROPS: ApiProp[] = [
+  {
+    name: "mode",
+    type: '"single" | "range"',
+    required: true,
+    en: "One date or a period; sets the value type.",
+    ru: "Одна дата или период; задаёт тип значения.",
+  },
+  {
+    name: "value",
+    type: "Date | null  ·  DatepickerRange",
+    en: "Controlled value: a date (`single`) or `{ from, to }` in wall-clock time (`range`); `null` — not set.",
+    ru: "Значение, управляемо: дата (`single`) или `{ from, to }` в «настенном» времени (`range`); `null` — не задано.",
+  },
+  {
+    name: "defaultValue",
+    type: "Date | null  ·  DatepickerRange",
+    defaultNote: {
+      en: "`null` · `{ from: null, to: null }`",
+      ru: "`null` · `{ from: null, to: null }`",
+    },
+    en: "Initial value, uncontrolled.",
+    ru: "Начальное значение без контроля.",
+  },
+  {
+    name: "onValueChange",
+    type: "(value) => void",
+    en: "Called when a pick, a preset, Apply or Reset changes the value.",
+    ru: "Выбор дня, пресет, «Применить» или «Сбросить» меняют значение.",
+  },
+];
+
+/** The calendar options both parts take. */
+const CALENDAR_OPTIONS: ApiProp[] = [
+  {
+    name: "months",
+    type: "1 | 2",
+    default: "1",
+    en: "Months side by side; one when there is no room.",
+    ru: "Сколько месяцев рядом; если места мало — один.",
+  },
+  {
+    name: "presets",
+    type: "DatepickerPreset[] | false",
+    default: "false",
+    en: "Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` or picks from `datepickerPresets`; a row above the calendar when narrow.",
+    ru: "Колонка периодов (только `range`): `DEFAULT_DATEPICKER_PRESETS` или выборка из `datepickerPresets`; на узком — строкой над календарём.",
+  },
+  {
+    name: "prompt",
+    type: "boolean",
+    default: "false",
+    en: "Step prompt under the calendar (`labels.pickStart` / `pickEnd` / `pickDate`).",
+    ru: "Подсказка шага под календарём (`labels.pickStart` / `pickEnd` / `pickDate`).",
+  },
+  {
+    name: "footer",
+    type: "boolean",
+    default: "false",
+    en: "Footer with date fields and Reset / Apply; without it a pick applies at once.",
+    ru: "Нижняя строка с датами и «Сбросить» / «Применить»; без неё выбор применяется сразу.",
+  },
+  {
+    name: "withTime",
+    type: "boolean",
+    default: "false",
+    en: "Time fields in the footer (00:00 — 23:59 by default).",
+    ru: "Поля времени в нижней строке (по умолчанию 00:00 — 23:59).",
+  },
+  {
+    name: "isDayDisabled",
+    type: "(day: Date) => boolean",
+    en: "Days that cannot be picked.",
+    ru: "Дни, которые нельзя выбрать.",
+  },
+  {
+    name: "disableFuture",
+    type: "boolean",
+    default: "false",
+    en: "Future days are muted and cannot be picked.",
+    ru: "Будущие дни приглушены и недоступны.",
+  },
+  {
+    name: "yearless",
+    type: "boolean",
+    default: "false",
+    en: "An annual day + month: no year, months wrap around inside `YEARLESS_YEAR`.",
+    ru: "Ежегодная дата «день + месяц»: без года, листание по кругу в `YEARLESS_YEAR`.",
+  },
+  {
+    name: "resetValue",
+    type: "Date | null  ·  DatepickerRange",
+    defaultNote: {
+      en: "`null` · `{ from: null, to: null }`",
+      ru: "`null` · `{ from: null, to: null }`",
+    },
+    en: "Value applied by Reset.",
+    ru: "Значение, которое ставит «Сбросить».",
+  },
+  {
+    name: "today",
+    type: "Date",
+    defaultNote: { en: "today", ru: "сегодня" },
+    en: "«Today» for highlighting, presets and `disableFuture`.",
+    ru: "«Сегодня» для подсветки, пресетов и `disableFuture`.",
+  },
+  {
+    name: "locale",
+    type: "Locale",
+    default: "ru",
+    en: "date-fns locale of titles, weekdays and day names.",
+    ru: "Локаль date-fns для заголовков, дней недели и имён дней.",
+  },
+  {
+    name: "weekStartsOn",
+    type: "0 | 1 | 2 | 3 | 4 | 5 | 6",
+    default: "1",
+    en: "First day of the week (1 — Monday).",
+    ru: "Первый день недели (1 — понедельник).",
+  },
+  {
+    name: "labels",
+    type: "Partial<DatepickerLabels>",
+    en: "Built-in strings, see Labels.",
+    ru: "Системные строки, см. «Доступность».",
+  },
+];
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Datepicker.Root",
-      en: "`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option below.",
-      ru: "Поле (подпись, подсказка или ошибка, кнопка поля с иконкой календаря, значение и шеврон), которое открывает панель календаря в Popover. Принимает все параметры календаря ниже.",
+      en: "`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option.",
+      ru: "Поле (подпись, подсказка или ошибка, кнопка поля с иконкой календаря, значение и шеврон), которое открывает панель календаря в Popover. Принимает все параметры календаря.",
       props: [
-        {
-          name: "mode",
-          type: '"single" | "range"',
-          required: true,
-          en: "One date or a period; sets the value type.",
-          ru: "Одна дата или период; задаёт тип значения.",
-        },
-        {
-          name: "value",
-          type: "Date | null  ·  DatepickerRange",
-          en: "Controlled value: a date (`single`) or `{ from, to }` in wall-clock time (`range`); `null` — not set.",
-          ru: "Значение, управляемо: дата (`single`) или `{ from, to }` в «настенном» времени (`range`); `null` — не задано.",
-        },
-        {
-          name: "defaultValue",
-          type: "Date | null  ·  DatepickerRange",
-          defaultNote: {
-            en: "`null` · `{ from: null, to: null }`",
-            ru: "`null` · `{ from: null, to: null }`",
-          },
-          en: "Initial value, uncontrolled.",
-          ru: "Начальное значение без контроля.",
-        },
-        {
-          name: "onValueChange",
-          type: "(value) => void",
-          en: "Called when a pick, a preset, Apply or Reset changes the value.",
-          ru: "Выбор дня, пресет, «Применить» или «Сбросить» меняют значение.",
-        },
+        ...VALUE_PROPS,
         {
           name: "open",
           type: "boolean",
@@ -159,6 +260,7 @@ export const api: ComponentApi = {
           en: "Name without a `label` (the value is appended) and extra description ids.",
           ru: "Имя без `label` (значение добавляется) и дополнительные id описания.",
         },
+        ...CALENDAR_OPTIONS,
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
@@ -169,113 +271,23 @@ export const api: ComponentApi = {
     },
     {
       name: "Datepicker.Panel",
-      en: "`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content (a Drawer sheet, a Card); 1–2 months by the host's width. Takes `mode`, the value triad and every calendar option below.",
-      ru: "Календарь без поля как собственный контент хоста (шторка Drawer, Card); 1–2 месяца по ширине хоста. Принимает `mode`, тройку значения и все параметры календаря ниже.",
+      en: "`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content (a Drawer sheet, a Card); 1–2 months by the host's width. Takes `mode`, the value triad and every calendar option.",
+      ru: "Календарь без поля как собственный контент хоста (шторка Drawer, Card); 1–2 месяца по ширине хоста. Принимает `mode`, тройку значения и все параметры календаря.",
       props: [
+        ...VALUE_PROPS,
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          default: '"m"',
+          en: "Panel tier (day cell 24 · 28 · 32 · 36 · 40).",
+          ru: "Ярус панели (клетка дня 24 · 28 · 32 · 36 · 40).",
+        },
+        ...CALENDAR_OPTIONS,
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "defaultChecked" | "onChange">',
           en: "`className` and the other attributes of the panel.",
           ru: "`className` и остальные атрибуты панели.",
-        },
-      ],
-    },
-    {
-      name: "Calendar options (Root · Panel)",
-      en: "Shared by `Datepicker.Root` and `Datepicker.Panel`.",
-      ru: "Общие для `Datepicker.Root` и `Datepicker.Panel`.",
-      props: [
-        {
-          name: "months",
-          type: "1 | 2",
-          default: "1",
-          en: "Months side by side; one when there is no room.",
-          ru: "Сколько месяцев рядом; если места мало — один.",
-        },
-        {
-          name: "presets",
-          type: "DatepickerPreset[] | false",
-          default: "false",
-          en: "Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` or picks from `datepickerPresets`; a row above the calendar when narrow.",
-          ru: "Колонка периодов (только `range`): `DEFAULT_DATEPICKER_PRESETS` или выборка из `datepickerPresets`; на узком — строкой над календарём.",
-        },
-        {
-          name: "prompt",
-          type: "boolean",
-          default: "false",
-          en: "Step prompt under the calendar (`labels.pickStart` / `pickEnd` / `pickDate`).",
-          ru: "Подсказка шага под календарём (`labels.pickStart` / `pickEnd` / `pickDate`).",
-        },
-        {
-          name: "footer",
-          type: "boolean",
-          default: "false",
-          en: "Footer with date fields and Reset / Apply; without it a pick applies at once.",
-          ru: "Нижняя строка с датами и «Сбросить» / «Применить»; без неё выбор применяется сразу.",
-        },
-        {
-          name: "withTime",
-          type: "boolean",
-          default: "false",
-          en: "Time fields in the footer (00:00 — 23:59 by default).",
-          ru: "Поля времени в нижней строке (по умолчанию 00:00 — 23:59).",
-        },
-        {
-          name: "isDayDisabled",
-          type: "(day: Date) => boolean",
-          en: "Days that cannot be picked.",
-          ru: "Дни, которые нельзя выбрать.",
-        },
-        {
-          name: "disableFuture",
-          type: "boolean",
-          default: "false",
-          en: "Future days are muted and cannot be picked.",
-          ru: "Будущие дни приглушены и недоступны.",
-        },
-        {
-          name: "yearless",
-          type: "boolean",
-          default: "false",
-          en: "An annual day + month: no year, months wrap around inside `YEARLESS_YEAR`.",
-          ru: "Ежегодная дата «день + месяц»: без года, листание по кругу в `YEARLESS_YEAR`.",
-        },
-        {
-          name: "resetValue",
-          type: "Date | null  ·  DatepickerRange",
-          defaultNote: {
-            en: "`null` · `{ from: null, to: null }`",
-            ru: "`null` · `{ from: null, to: null }`",
-          },
-          en: "Value applied by Reset.",
-          ru: "Значение, которое ставит «Сбросить».",
-        },
-        {
-          name: "today",
-          type: "Date",
-          defaultNote: { en: "today", ru: "сегодня" },
-          en: "«Today» for highlighting, presets and `disableFuture`.",
-          ru: "«Сегодня» для подсветки, пресетов и `disableFuture`.",
-        },
-        {
-          name: "locale",
-          type: "Locale",
-          default: "ru",
-          en: "date-fns locale of titles, weekdays and day names.",
-          ru: "Локаль date-fns для заголовков, дней недели и имён дней.",
-        },
-        {
-          name: "weekStartsOn",
-          type: "0 | 1 | 2 | 3 | 4 | 5 | 6",
-          default: "1",
-          en: "First day of the week (1 — Monday).",
-          ru: "Первый день недели (1 — понедельник).",
-        },
-        {
-          name: "labels",
-          type: "Partial<DatepickerLabels>",
-          en: "Built-in strings, see Labels.",
-          ru: "Системные строки, см. «Доступность».",
         },
       ],
     },

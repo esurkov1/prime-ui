@@ -121,11 +121,13 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  types: [
     {
       name: "SmartFilterField",
       en: "One entry of `fields`: data, not a part. Selected values missing from `options` stay visible so they can be removed.",
       ru: "Один элемент `fields`: данные, а не часть. Выбранные значения, которых нет в `options`, остаются видны, чтобы их можно было убрать.",
-      props: [
+      fields: [
         {
           name: "key",
           type: "string",
@@ -177,11 +179,25 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  functions: [
     {
-      name: "matchesSmartFilter · resolveSmartFilterValues · isSmartFilterRange",
-      en: "Helpers. `matchesSmartFilter(entry, item)` checks one item's value on the client. `resolveSmartFilterValues(entry, all)` turns a fixed field into the list of values to ask a server for. `isSmartFilterRange(entry)` tells a range from a selection.",
-      ru: "Помощники. `matchesSmartFilter(entry, item)` проверяет значение записи на клиенте. `resolveSmartFilterValues(entry, all)` превращает фиксированное поле в список значений для сервера. `isSmartFilterRange(entry)` отличает диапазон от выбора.",
-      props: [],
+      name: "matchesSmartFilter(entry, item)",
+      type: "(entry: SmartFilterFieldValue | undefined, item: string | number | Date | null | undefined) => boolean",
+      en: "Checks one item's value against a field's entry on the client; an empty entry matches everything.",
+      ru: "Проверяет значение одной записи по условию поля на клиенте; пустое условие пропускает всё.",
+    },
+    {
+      name: "resolveSmartFilterValues(entry, all)",
+      type: "(entry: SmartFilterFieldValue | undefined, all: readonly string[]) => string[]",
+      en: "Turns a fixed field's entry into the list of values to ask a server for.",
+      ru: "Превращает условие фиксированного поля в список значений для запроса к серверу.",
+    },
+    {
+      name: "isSmartFilterRange(entry)",
+      type: "(entry: SmartFilterFieldValue | undefined) => entry is SmartFilterRange<number> | SmartFilterRange<Date>",
+      en: "Tells a range entry from a selection.",
+      ru: "Отличает условие-диапазон от выбора.",
     },
   ],
   labels: labelRows(SMART_FILTER_LABELS, {

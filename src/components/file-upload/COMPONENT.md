@@ -205,13 +205,22 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `aria-label` | `string` | `"Загрузка файла"` | Accessible name of the bar (not the wrapper); name the file. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the wrapper. |
 
-### useUploadQueue
-`useUploadQueue<TResult>({ upload, concurrency })` → `{ items, add, retry, remove, clear, move }`. The upload queue of FileUpload: `concurrency` files go at once through `upload`, the rest wait as `queued`; each has its progress, error and retry.
+### Types
 
-| Prop | Type | Default | Description |
+#### `UploadQueueOptions<TResult>`
+The argument of `useUploadQueue(options)`.
+
+| Field | Type | Default | Description |
 |---|---|---|---|
 | `upload` | `(file: File, context: { id: string; signal: AbortSignal; onProgress: (progress: number) => void }) => Promise<TResult>` | — (required) | Sends one file: progress through `onProgress` (0…1), stop on `signal`, resolve with the answer (`result`), reject to fail. `id` is the item: after-upload work runs here once the request resolves. |
 | `concurrency` | `number` | `3` | How many files upload at once; the rest wait as `queued`. |
+
+### Functions
+
+#### `useUploadQueue(options)`
+`<TResult>(options: UploadQueueOptions<TResult>) => UploadQueue<TResult>`
+
+The upload queue of FileUpload: `concurrency` files go at once through `upload`, the rest wait as `queued`; each has its progress, error and retry. Returns `{ items, add, retry, remove, clear, move }`.
 
 ## Variants
 

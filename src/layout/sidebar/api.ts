@@ -470,42 +470,13 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  functions: [
     {
       name: "useSidebar()",
-      en: "Hook for custom parts inside `Sidebar.Root` (throws outside). Returns the fields below.",
-      ru: "Хук для своих частей внутри `Sidebar.Root` (вне него — ошибка). Возвращает поля ниже.",
-      props: [
-        {
-          name: "mode · setMode",
-          type: "SidebarMode · (mode: SidebarMode) => void",
-          en: "Desktop mode.",
-          ru: "Режим на десктопе.",
-        },
-        {
-          name: "open · setOpen",
-          type: "boolean · (open: boolean) => void",
-          en: "Off-canvas panel.",
-          ru: "Выезжающая панель.",
-        },
-        {
-          name: "toggle",
-          type: "() => void",
-          en: "The action of `Sidebar.Toggle`.",
-          ru: "Действие `Sidebar.Toggle`.",
-        },
-        {
-          name: "offCanvas",
-          type: "boolean",
-          en: 'The sidebar is an off-canvas panel now (`offCanvas="always"`, or `"auto"` under 768px).',
-          ru: 'Сейчас панель выезжающая (`offCanvas="always"` или `"auto"` уже 768px).',
-        },
-        {
-          name: "size · navId · labels",
-          type: "ControlSize · string · SidebarLabels",
-          en: "Tier, id of the `<nav>` (for `aria-controls` on your own menu button), resolved strings.",
-          ru: "Ярус, id `<nav>` (для `aria-controls` своей кнопки меню), строки.",
-        },
-      ],
+      type: "() => { mode: SidebarMode; setMode: (mode: SidebarMode) => void; open: boolean; setOpen: (open: boolean) => void; toggle: () => void; offCanvas: boolean; size: ControlSize; navId: string; labels: SidebarLabels }",
+      en: 'Hook for custom parts inside `Sidebar.Root` (throws outside): the desktop `mode`, the off-canvas `open` state, `toggle` (the action of `Sidebar.Toggle`), `offCanvas` (the sidebar is an off-canvas panel: `offCanvas="always"`, or `"auto"` under 768px), the tier, the `navId` of the `<nav>` (for `aria-controls` on your own menu button) and the resolved strings.',
+      ru: 'Хук для своих частей внутри `Sidebar.Root` (вне него — ошибка): режим `mode` на десктопе, состояние `open` выезжающей панели, `toggle` (действие `Sidebar.Toggle`), `offCanvas` (панель сейчас выезжающая: `offCanvas="always"` или `"auto"` уже 768px), ярус, `navId` у `<nav>` (для `aria-controls` своей кнопки меню) и строки.',
     },
   ],
   labels: labelRows(SIDEBAR_LABELS, {

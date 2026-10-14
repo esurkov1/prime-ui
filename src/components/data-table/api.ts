@@ -5,7 +5,7 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "DataTable",
-      en: "Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.",
+      en: "Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.",
       ru: "Блок с заливкой карточки: панель сверху, прокручиваемая `<table>` и подвал (диапазон, Pagination, статус догрузки); передаёт ярус контролам внутри.",
       props: [
         {
@@ -426,11 +426,13 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  types: [
     {
       name: "DataTableColumn<Row>",
       en: "One column of `columns`: data, not a part.",
       ru: "Одна колонка из `columns`: данные, а не часть разметки.",
-      props: [
+      fields: [
         {
           name: "id",
           type: "string",

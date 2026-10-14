@@ -158,7 +158,12 @@ function resolvesToExport(name: string): boolean {
   const [ns, member] = name.split(".");
   const value = kit[ns];
   if (value === undefined) return false;
-  return member === undefined || (typeof value === "object" && value !== null && member in value);
+  return (
+    member === undefined ||
+    ((typeof value === "object" || typeof value === "function") &&
+      value !== null &&
+      member in value)
+  );
 }
 
 /** A default is a code literal: it parses as a TypeScript expression. */

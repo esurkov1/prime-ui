@@ -89,41 +89,32 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "useNotifications()",
-      en: "Must be called inside `NotificationProvider`; returns the store.",
-      ru: "Вызывается внутри `NotificationProvider`; возвращает хранилище.",
+      name: "NotificationCard",
+      en: '`ref` → `HTMLElement`. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.',
+      ru: 'Статичная карточка `<article role="status|alert">` без таймера: подтверждения на месте, документация, макеты.',
       props: [
+        ...CONTENT,
         {
-          name: "notify",
-          type: "(options: NotificationOptions) => string",
-          en: "Shows a toast and returns its id.",
-          ru: "Показывает уведомление и возвращает его id.",
-        },
-        {
-          name: "dismiss",
-          type: "(id: string) => void",
-          en: "Closes one toast with its exit animation.",
-          ru: "Закрывает одно уведомление с анимацией ухода.",
-        },
-        {
-          name: "dismissAll",
+          name: "onDismiss",
           type: "() => void",
-          en: "Closes every toast.",
-          ru: "Закрывает все уведомления.",
+          en: "Shows the close button and is called on its click.",
+          ru: "Показывает кнопку закрытия и вызывается по клику.",
         },
         {
-          name: "items",
-          type: "NotificationRecord[]",
-          en: "Active toasts (without the ones playing their exit).",
-          ru: "Активные уведомления (без уходящих).",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLElement>, "title" | "children" | "role">',
+          en: "`className` and the other attributes of the `<article>`.",
+          ru: "`className` и остальные атрибуты `<article>`.",
         },
       ],
     },
+  ],
+  types: [
     {
-      name: "notify(options)",
-      en: "`NotificationOptions`: what the toast shows and how it closes.",
-      ru: "`NotificationOptions`: что показывает уведомление и как оно закрывается.",
-      props: [
+      name: "NotificationOptions",
+      en: "The argument of `notify(options)`: what the toast shows and how it closes.",
+      ru: "Аргумент `notify(options)`: что показывает уведомление и как оно закрывается.",
+      fields: [
         ...CONTENT,
         {
           name: "position",
@@ -160,25 +151,13 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  functions: [
     {
-      name: "NotificationCard",
-      en: '`ref` → `HTMLElement`. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.',
-      ru: 'Статичная карточка `<article role="status|alert">` без таймера: подтверждения на месте, документация, макеты.',
-      props: [
-        ...CONTENT,
-        {
-          name: "onDismiss",
-          type: "() => void",
-          en: "Shows the close button and is called on its click.",
-          ru: "Показывает кнопку закрытия и вызывается по клику.",
-        },
-        {
-          name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLElement>, "title" | "children" | "role">',
-          en: "`className` and the other attributes of the `<article>`.",
-          ru: "`className` и остальные атрибуты `<article>`.",
-        },
-      ],
+      name: "useNotifications()",
+      type: "() => { notify: (options: NotificationOptions) => string; dismiss: (id: string) => void; dismissAll: () => void; items: NotificationRecord[] }",
+      en: "Called inside `NotificationProvider`; returns the store: `notify(options)` shows a toast and returns its id, `dismiss(id)` closes one with its exit animation, `dismissAll()` closes every toast, `items` holds the active toasts (without the ones playing their exit).",
+      ru: "Вызывается внутри `NotificationProvider`; возвращает хранилище: `notify(options)` показывает уведомление и возвращает его id, `dismiss(id)` закрывает одно с анимацией ухода, `dismissAll()` закрывает все, `items` — активные уведомления (без уходящих).",
     },
   ],
   labels: labelRows(NOTIFICATION_LABELS, {

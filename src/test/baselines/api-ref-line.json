@@ -1,8 +1,4 @@
 [
-  "src/components/data-table/api.ts: DataTable",
-  "src/components/dnd/api.ts: moveBefore",
-  "src/components/file-upload/api.ts: useUploadQueue",
-  "src/components/smart-filter/api.ts: matchesSmartFilter · resolveSmartFilterValues · isSmartFilterRange",
   "src/layout/sidebar/api.ts: Sidebar.Account",
   "src/layout/sidebar/api.ts: Sidebar.Brand",
   "src/layout/sidebar/api.ts: Sidebar.Content",

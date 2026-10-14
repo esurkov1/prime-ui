@@ -46,7 +46,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Datepicker.Root
-`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option below.
+`ref` → `HTMLDivElement` (the field frame). A field (label, hint / error, the field button with a calendar icon, the value and a chevron) that opens the calendar panel in a Popover. Takes every calendar option.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -73,20 +73,6 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `id` | `string` | — | Id of the field button; generated when omitted. |
 | `name` | `string` | — | Submits the value with a form through hidden inputs: `yyyy-MM-dd` (`yyyy-MM-ddTHH:mm` with `withTime`); a range submits two values under the name, `from` then `to` (empty for an open bound). |
 | `aria-label · aria-labelledby · aria-describedby` | `string` | — | Name without a `label` (the value is appended) and extra description ids. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
-
-### Datepicker.Panel
-`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content (a Drawer sheet, a Card); 1–2 months by the host's width. Takes `mode`, the value triad and every calendar option below.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className` and the other attributes of the panel. |
-
-### Calendar options (Root · Panel)
-Shared by `Datepicker.Root` and `Datepicker.Panel`.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
 | `months` | `1 \| 2` | `1` | Months side by side; one when there is no room. |
 | `presets` | `DatepickerPreset[] \| false` | `false` | Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` or picks from `datepickerPresets`; a row above the calendar when narrow. |
 | `prompt` | `boolean` | `false` | Step prompt under the calendar (`labels.pickStart` / `pickEnd` / `pickDate`). |
@@ -100,6 +86,32 @@ Shared by `Datepicker.Root` and `Datepicker.Panel`.
 | `locale` | `Locale` | `ru` | date-fns locale of titles, weekdays and day names. |
 | `weekStartsOn` | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6` | `1` | First day of the week (1 — Monday). |
 | `labels` | `Partial<DatepickerLabels>` | — | Built-in strings, see Labels. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
+
+### Datepicker.Panel
+`ref` → `HTMLDivElement`. The calendar without a field, as the host's own content (a Drawer sheet, a Card); 1–2 months by the host's width. Takes `mode`, the value triad and every calendar option.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `mode` | `"single" \| "range"` | — (required) | One date or a period; sets the value type. |
+| `value` | `Date \| null  ·  DatepickerRange` | — | Controlled value: a date (`single`) or `{ from, to }` in wall-clock time (`range`); `null` — not set. |
+| `defaultValue` | `Date \| null  ·  DatepickerRange` | `null` · `{ from: null, to: null }` | Initial value, uncontrolled. |
+| `onValueChange` | `(value) => void` | — | Called when a pick, a preset, Apply or Reset changes the value. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Panel tier (day cell 24 · 28 · 32 · 36 · 40). |
+| `months` | `1 \| 2` | `1` | Months side by side; one when there is no room. |
+| `presets` | `DatepickerPreset[] \| false` | `false` | Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` or picks from `datepickerPresets`; a row above the calendar when narrow. |
+| `prompt` | `boolean` | `false` | Step prompt under the calendar (`labels.pickStart` / `pickEnd` / `pickDate`). |
+| `footer` | `boolean` | `false` | Footer with date fields and Reset / Apply; without it a pick applies at once. |
+| `withTime` | `boolean` | `false` | Time fields in the footer (00:00 — 23:59 by default). |
+| `isDayDisabled` | `(day: Date) => boolean` | — | Days that cannot be picked. |
+| `disableFuture` | `boolean` | `false` | Future days are muted and cannot be picked. |
+| `yearless` | `boolean` | `false` | An annual day + month: no year, months wrap around inside `YEARLESS_YEAR`. |
+| `resetValue` | `Date \| null  ·  DatepickerRange` | `null` · `{ from: null, to: null }` | Value applied by Reset. |
+| `today` | `Date` | today | «Today» for highlighting, presets and `disableFuture`. |
+| `locale` | `Locale` | `ru` | date-fns locale of titles, weekdays and day names. |
+| `weekStartsOn` | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6` | `1` | First day of the week (1 — Monday). |
+| `labels` | `Partial<DatepickerLabels>` | — | Built-in strings, see Labels. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className` and the other attributes of the panel. |
 
 ## Variants
 

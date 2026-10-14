@@ -50,34 +50,6 @@ No DOM of its own, no ref. Wraps the app once: keeps the toasts and renders thei
 | `labels` | `Partial<NotificationLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | The app. |
 
-### useNotifications()
-Must be called inside `NotificationProvider`; returns the store.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `notify` | `(options: NotificationOptions) => string` | — | Shows a toast and returns its id. |
-| `dismiss` | `(id: string) => void` | — | Closes one toast with its exit animation. |
-| `dismissAll` | `() => void` | — | Closes every toast. |
-| `items` | `NotificationRecord[]` | — | Active toasts (without the ones playing their exit). |
-
-### notify(options)
-`NotificationOptions`: what the toast shows and how it closes.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Semantic color and tone icon; `danger` and `warning` are announced assertively. |
-| `title` | `string` | — (required) | The message. |
-| `description` | `string` | — | Secondary text under the title. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Padding, icon and text tier of the card. |
-| `icon` | `ReactNode` | — | Replaces the tone icon. |
-| `badge` | `string \| number` | — | A counter next to the title (a `Badge` in the tone hue). |
-| `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card. |
-| `position` | `"top-left" \| "top-center" \| "top-right" \| "bottom-left" \| "bottom-center" \| "bottom-right"` | — | Default: the provider's `position`. |
-| `duration` | `number` | `5000` | Auto-close delay in ms; the timer pauses on hover, focus, swipe and in a hidden tab. |
-| `persistent` | `boolean` | `false` | No timer and no countdown line. |
-| `closable` | `boolean` | `true` | Shows the close button. |
-| `onDismiss` | `() => void` | — | The toast left: its timer ran out, the close button, a swipe, `dismiss()`, or a newer toast pushed it out of a full stack. Called once — the place to commit an action the toast offered to undo. |
-
 ### NotificationCard
 `ref` → `HTMLElement`. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.
 
@@ -92,6 +64,33 @@ Must be called inside `NotificationProvider`; returns the store.
 | `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card. |
 | `onDismiss` | `() => void` | — | Shows the close button and is called on its click. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title" \| "children" \| "role">` | — | `className` and the other attributes of the `<article>`. |
+
+### Types
+
+#### `NotificationOptions`
+The argument of `notify(options)`: what the toast shows and how it closes.
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `tone` | `"info" \| "success" \| "warning" \| "danger"` | `"info"` | Semantic color and tone icon; `danger` and `warning` are announced assertively. |
+| `title` | `string` | — (required) | The message. |
+| `description` | `string` | — | Secondary text under the title. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Padding, icon and text tier of the card. |
+| `icon` | `ReactNode` | — | Replaces the tone icon. |
+| `badge` | `string \| number` | — | A counter next to the title (a `Badge` in the tone hue). |
+| `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card. |
+| `position` | `"top-left" \| "top-center" \| "top-right" \| "bottom-left" \| "bottom-center" \| "bottom-right"` | — | Default: the provider's `position`. |
+| `duration` | `number` | `5000` | Auto-close delay in ms; the timer pauses on hover, focus, swipe and in a hidden tab. |
+| `persistent` | `boolean` | `false` | No timer and no countdown line. |
+| `closable` | `boolean` | `true` | Shows the close button. |
+| `onDismiss` | `() => void` | — | The toast left: its timer ran out, the close button, a swipe, `dismiss()`, or a newer toast pushed it out of a full stack. Called once — the place to commit an action the toast offered to undo. |
+
+### Functions
+
+#### `useNotifications()`
+`() => { notify: (options: NotificationOptions) => string; dismiss: (id: string) => void; dismissAll: () => void; items: NotificationRecord[] }`
+
+Called inside `NotificationProvider`; returns the store: `notify(options)` shows a toast and returns its id, `dismiss(id)` closes one with its exit animation, `dismissAll()` closes every toast, `items` holds the active toasts (without the ones playing their exit).
 
 ## Variants
 

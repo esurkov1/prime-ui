@@ -119,8 +119,12 @@ Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element
 | `as` | `"div" \| "section" \| "li" \| "ul" \| "ol" \| "span"` | `"div"` | Element. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "onDrop">` | — | `className` (the zone's own look) and the other attributes. |
 
-### moveBefore
-`moveBefore(items, id, beforeId, getId)` returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.
+### Functions
+
+#### `moveBefore(items, id, beforeId, getId)`
+`<T>(items: readonly T[], id: string, beforeId: string \| null, getId: (item: T) => string) => T[]`
+
+Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.
 
 ## Variants
 

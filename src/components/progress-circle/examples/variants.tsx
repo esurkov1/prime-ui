@@ -8,6 +8,7 @@ const TONES = [
   { tone: "danger", label: "Сбой импорта", value: 20 },
   { tone: "info", label: "Синхронизация", value: 30 },
   { tone: "neutral", label: "Индексация", value: 55 },
+  { tone: "inherit", label: "Экспорт", value: 64 },
 ] as const;
 
 export default function ProgressCircleVariantsExample() {

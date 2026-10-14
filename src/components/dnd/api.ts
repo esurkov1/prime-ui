@@ -316,11 +316,13 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  functions: [
     {
-      name: "moveBefore",
-      en: "`moveBefore(items, id, beforeId, getId)` returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.",
-      ru: "`moveBefore(items, id, beforeId, getId)` возвращает `items`, где `id` стоит перед `beforeId` (`null` — в конце): тело любого `onReorder`.",
-      props: [],
+      name: "moveBefore(items, id, beforeId, getId)",
+      type: "<T>(items: readonly T[], id: string, beforeId: string | null, getId: (item: T) => string) => T[]",
+      en: "Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.",
+      ru: "Возвращает `items`, где `id` стоит перед `beforeId` (`null` — в конце): тело любого `onReorder`.",
     },
   ],
   labels: labelRows(DND_LABELS, {

@@ -80,10 +80,12 @@ The toolbar and the chips are separate parts so a page can put them in different
 |---|---|---|---|
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the chips row. |
 
-### SmartFilterField
+### Types
+
+#### `SmartFilterField`
 One entry of `fields`: data, not a part. Selected values missing from `options` stay visible so they can be removed.
 
-| Prop | Type | Default | Description |
+| Field | Type | Default | Description |
 |---|---|---|---|
 | `key` | `string` | — (required) | Key of the field in the value. |
 | `label` | `string` | — (required) | Field name in the panel and the chips. |
@@ -93,8 +95,22 @@ One entry of `fields`: data, not a part. Selected values missing from `options` 
 | `multiple` | `boolean` | `true` | `options` fields: many values at once. `false` — one value and no hiding: a press picks only that value, a second press clears it (an API that takes one value per field). |
 | `formatValue` | `(value: number) => string` | Russian digit groups | `range` fields: a bound in the chip («1 000 ₽»). |
 
-### matchesSmartFilter · resolveSmartFilterValues · isSmartFilterRange
-Helpers. `matchesSmartFilter(entry, item)` checks one item's value on the client. `resolveSmartFilterValues(entry, all)` turns a fixed field into the list of values to ask a server for. `isSmartFilterRange(entry)` tells a range from a selection.
+### Functions
+
+#### `matchesSmartFilter(entry, item)`
+`(entry: SmartFilterFieldValue \| undefined, item: string \| number \| Date \| null \| undefined) => boolean`
+
+Checks one item's value against a field's entry on the client; an empty entry matches everything.
+
+#### `resolveSmartFilterValues(entry, all)`
+`(entry: SmartFilterFieldValue \| undefined, all: readonly string[]) => string[]`
+
+Turns a fixed field's entry into the list of values to ask a server for.
+
+#### `isSmartFilterRange(entry)`
+`(entry: SmartFilterFieldValue \| undefined) => entry is SmartFilterRange<number> \| SmartFilterRange<Date>`
+
+Tells a range entry from a selection.
 
 ## Variants
 
