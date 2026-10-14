@@ -4,7 +4,7 @@ import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
-import { iconBoxStyles } from "@/internal/iconBox";
+import fieldTier from "@/internal/fieldTier.module.css";
 import type { PaletteColor } from "@/internal/states";
 import { cssRule, cssValue } from "@/test/css";
 import { Badge } from "./Badge";
@@ -55,7 +55,7 @@ describe("Badge", () => {
         <Icon name="nav.home" data-testid="badge-icon" />
       </Badge.Root>,
     );
-    expect(screen.getByTestId("badge-icon")).toHaveClass(iconBoxStyles.xl);
+    expect(screen.getByTestId("badge-icon")).toHaveClass(fieldTier.iconXl);
   });
 
   it('sets data-disabled="true" when disabled', () => {

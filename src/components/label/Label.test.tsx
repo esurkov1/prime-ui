@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { Fieldset } from "@/components/fieldset/Fieldset";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
-import { iconBoxStyles } from "@/internal/iconBox";
+import fieldTier from "@/internal/fieldTier.module.css";
 
 import { Label } from "./Label";
 
@@ -42,7 +42,7 @@ describe("Label", () => {
         </Label.Icon>
       </Label.Root>,
     );
-    expect(screen.getByTestId("label-icon")).toHaveClass(iconBoxStyles.s);
+    expect(screen.getByTestId("label-icon")).toHaveClass(fieldTier.iconS);
   });
 
   it("renders a decorative asterisk when required", () => {
