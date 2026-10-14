@@ -7,6 +7,7 @@ import {
   ChoiceLabel,
   type ChoiceLabelProps,
   choiceInputClass,
+  choiceTrackClass,
   choiceVisualClass,
 } from "@/internal/ChoiceField";
 import { useControlSize } from "@/internal/ControlSizeContext";
@@ -32,30 +33,15 @@ export type SwitchRootProps = Omit<
 > & {
   checked?: boolean;
   defaultChecked?: boolean;
-  /**
-   * The new state. Return the save's promise to apply it on a server: the thumb waits in the new
-   * position with a spinner (`aria-busy`) and presses do nothing; resolve keeps it, reject glides
-   * it back.
-   */
   onCheckedChange?: (checked: boolean) => void | Promise<void>;
-  /**
-   * Saving: a spinner in the thumb, `aria-busy`, presses do nothing. For an owner that tracks the
-   * request itself; a promise from `onCheckedChange` does this on its own.
-   */
   loading?: boolean;
-  /** Invalid state; a non-empty `error` implies it. */
   invalid?: boolean;
-  /** Help text under the label text. Hidden while `error` is shown. */
   hint?: React.ReactNode;
-  /** Error message in the hint slot; implies `invalid`. */
   error?: React.ReactNode;
-  /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
   size?: ControlSize;
   optional?: boolean;
   labels?: Partial<SwitchLabels>;
-  /** `Switch.Label`; without it only the track renders (give it an `aria-label`). */
   children?: React.ReactNode;
-  /** The native `role="switch"` input. */
   ref?: React.Ref<HTMLInputElement>;
 };
 
@@ -136,13 +122,11 @@ function SwitchRoot({
             }}
           />
           <span
-            className={cx(choiceVisualClass, styles.track)}
+            className={cx(choiceVisualClass, choiceTrackClass, styles.track)}
             data-loading={busy || undefined}
             aria-hidden="true"
           >
-            <span className={styles.thumb}>
-              {busy ? <Spinner aria-hidden="true" className={styles.spinner} /> : null}
-            </span>
+            <span className={styles.thumb}>{busy ? <Spinner aria-hidden="true" /> : null}</span>
           </span>
         </>
       }

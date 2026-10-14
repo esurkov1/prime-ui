@@ -99,7 +99,7 @@ No `variant` / `tone` / `color`.
 | invalid | `invalid` or a non-empty `error` | `data-invalid="true"`, `aria-invalid`; danger ring on the off track and on focus; the row shakes once when an error arrives (`data-shake`) |
 | disabled | `disabled` | `data-disabled="true"`; off track `fill-muted`, on track `accent-soft`, `cursor: not-allowed` |
 | read-only | `readOnly` | `aria-readonly="true"` on the input, `data-readonly="true"` on the field; no hover or press, default cursor |
-| saving | `loading`, or `onCheckedChange` returned a pending promise | the thumb stands in the new position with a `Spinner` inside (accent when on, muted when off; it enters with `enterMotion`), `aria-busy` on the input, `data-loading` on the track, presses ignored; a rejection glides the thumb back (`base`, emphasized) |
+| saving | `loading`, or `onCheckedChange` returned a pending promise | the thumb stands in the new position with a `Spinner` inside (accent when on, muted when off; it fades in by itself), `aria-busy` on the input, `data-loading` on the track, presses ignored; a rejection glides the thumb back (`base`, emphasized) |
 | pressed | pointer press | the track scales to the compact press scale (not when disabled or read-only) |
 | focus-visible | keyboard | outer focus ring around the track |
 
@@ -107,8 +107,8 @@ Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncont
 
 ## Layout & spacing
 - Grid `[track][text]`; hint and error sit under the text column.
-- Switches in a settings list: gap `--prime-space-4`–`--prime-space-5` between fields.
-- Settings row (text left, switch right): flex row with `justify-content: space-between`, gap `--prime-space-4`; a bare `Switch.Root` with `aria-labelledby` / `aria-describedby` pointing at the row text.
+- Switches in a settings list: a label-less [Fieldset](../fieldset/COMPONENT.md), the field column of a form, sets their rhythm.
+- Settings row (text left, switch right): flex row with `justify-content: space-between`; a bare `Switch.Root` with `aria-labelledby` / `aria-describedby` pointing at the row text.
 - In a form, a `name`d switch submits `"on"` when checked (native checkbox semantics).
 
 ## Accessibility
@@ -141,7 +141,7 @@ Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncont
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A setting that applies at once, with a hint under its text — `hint`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size, track 24×16 to 44×24; the text follows the control tier — `size`. |
-| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `checked`, `readOnly`, `invalid`, `loading`, `disabled`. |
+| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `defaultChecked`, `readOnly`, `invalid`, `loading`, `disabled`. |
 | [settings-row.tsx](examples/settings-row.tsx) | A settings row with text on the left and a bare track on the right — `aria-labelledby`, `aria-describedby`. |
 | [saving.tsx](examples/saving.tsx) | A setting that applies on the server at once: the thumb waits in its new place with a spinner, and a refused save glides it back and says why — `onCheckedChange`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the state and rewrites the hint to match it — `checked`, `onCheckedChange`. |
@@ -156,5 +156,5 @@ Root also carries `data-size`. Controlled: `checked` + `onCheckedChange`. Uncont
 - Setting `checked` in `onCheckedChange` and flipping it back when the request fails, or a separate «saving» flag → return the request's promise; set `checked` only after it succeeds.
 
 ## Related
-- **Built from:** [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Spinner](../spinner/COMPONENT.md) (saving), [VisuallyHidden](../visually-hidden/COMPONENT.md); the row is a native `<label>`
+- **Built from:** [Label](../label/COMPONENT.md) (the `optional` and `required` marks), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Spinner](../spinner/COMPONENT.md) (saving), [VisuallyHidden](../visually-hidden/COMPONENT.md); the row is a native `<label>`
 - **See also:** [Checkbox](../checkbox/COMPONENT.md), [Radio](../radio/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

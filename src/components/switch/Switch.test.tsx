@@ -1,6 +1,10 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
+
+import { choiceTrackClass } from "@/internal/ChoiceField";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Switch } from "./Switch";
 
@@ -97,37 +101,55 @@ describe("Switch", () => {
     expect(control).not.toHaveAttribute("aria-checked");
   });
 
-  it("uses non-dimmed track when disabled and keeps the checked state", () => {
-    const { unmount: unmountOff } = render(
-      <Switch.Root disabled>
-        <Switch.Label>Disabled off</Switch.Label>
-      </Switch.Root>,
-    );
-
-    const controlOff = screen.getByRole("switch", { name: "Disabled off" });
-    const trackOff = controlOff.nextElementSibling as HTMLElement;
-    expect(trackOff).toBeTruthy();
-    expect(window.getComputedStyle(trackOff).opacity).not.toBe("0.6");
-    expect(controlOff).not.toBeChecked();
-
-    unmountOff();
-
-    const { container: onContainer } = render(
+  it("disabled keeps the checked state and ignores presses; the track keeps a soft accent", () => {
+    const { container } = render(
       <Switch.Root disabled defaultChecked>
         <Switch.Label>Disabled on</Switch.Label>
       </Switch.Root>,
     );
-    const controlOn = screen.getByRole("switch", { name: "Disabled on" });
-    const trackOn = controlOn.nextElementSibling as HTMLElement;
-    expect(window.getComputedStyle(trackOn).opacity).not.toBe("0.6");
-    expect(controlOn).toBeChecked();
-
+    const control = screen.getByRole("switch", { name: "Disabled on" });
+    expect(control).toBeChecked();
     fireEvent.click(screen.getByText("Disabled on"));
-    expect(controlOn).toBeChecked();
+    expect(control).toBeChecked();
 
-    const field = onContainer.querySelector("[data-disabled='true']");
-    expect(field).toBeTruthy();
+    const field = container.querySelector("[data-disabled='true']");
     expect(field).toHaveAttribute("data-state", "checked");
+    // The track joins the choice track mode: a disabled «on» is a soft accent, not a dimmed copy.
+    const track = control.nextElementSibling as HTMLElement;
+    expect(track.className).toContain(choiceTrackClass);
+    expect(
+      cssValue(
+        cssRule("src/internal/ChoiceField.module.css", ".track"),
+        "--choice-bg-disabled-checked",
+      ),
+    ).toBe("var(--prime-color-accent-soft)");
+  });
+
+  it("keyboard: Tab focuses the switch, Space toggles it", async () => {
+    const user = userEvent.setup();
+    const onCheckedChange = vi.fn();
+    render(
+      <Switch.Root onCheckedChange={onCheckedChange}>
+        <Switch.Label>Уведомления</Switch.Label>
+      </Switch.Root>,
+    );
+    const control = screen.getByRole("switch", { name: "Уведомления" });
+    await user.tab();
+    expect(control).toHaveFocus();
+    await user.keyboard(" ");
+    expect(control).toBeChecked();
+    expect(onCheckedChange).toHaveBeenLastCalledWith(true);
+    await user.keyboard(" ");
+    expect(control).not.toBeChecked();
+  });
+
+  it("keyboard: Space does nothing while readOnly", async () => {
+    const user = userEvent.setup();
+    render(<Switch.Root aria-label="Архив" readOnly />);
+    const control = screen.getByRole("switch", { name: "Архив" });
+    await user.tab();
+    await user.keyboard(" ");
+    expect(control).not.toBeChecked();
   });
 
   it("shows the error in place of the hint and marks the switch invalid", () => {
