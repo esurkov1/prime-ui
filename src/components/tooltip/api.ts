@@ -127,4 +127,48 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Focus on the trigger opens the tooltip after the delay.",
+        ru: "Фокус на триггере открывает подсказку после задержки.",
+      },
+      {
+        keys: "Escape",
+        en: "Hides the tooltip; focus stays on the trigger.",
+        ru: "Скрывает подсказку; фокус остаётся на триггере.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The chip is `role="tooltip"`; while open the trigger points at it with `aria-describedby` (appended to the child\'s own).',
+        ru: 'Чип — `role="tooltip"`; пока он открыт, триггер ссылается на него через `aria-describedby`.',
+      },
+      {
+        en: "`Tooltip.Trigger` composes the child's `ref`, sets `data-state` and chains the child's `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus` and `onBlur`.",
+        ru: "`Tooltip.Trigger` соединяет `ref` ребёнка, ставит `data-state` и сцепляет его `onPointerEnter`, `onPointerLeave`, `onPointerDown`, `onFocus` и `onBlur`.",
+      },
+      {
+        en: "The tooltip is a description, not the name: an icon-only button needs its own `aria-label`.",
+        ru: "Подсказка — описание, а не имя: иконке-кнопке нужен свой `aria-label`.",
+      },
+      {
+        en: "The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, focus does.",
+        ru: "Указатель может перейти на чип — подсказка не закроется (WCAG 1.4.13); касание не открывает её, фокус — открывает.",
+      },
+      {
+        en: "Tooltip has no `closeOnEscape` / `closeOnOutsideClick` (foundation §8): it closes on pointer-leave, blur, a press on the trigger and Escape, and Escape cannot be turned off — WCAG 1.4.13 requires the chip to be dismissable without moving the pointer or focus.",
+        ru: "У подсказки нет `closeOnEscape` / `closeOnOutsideClick`: она закрывается при уходе указателя, потере фокуса, нажатии на триггер и по Escape, а Escape не отключается — WCAG 1.4.13 требует закрывать чип, не двигая указатель и фокус.",
+      },
+      {
+        en: "A `disabled` control is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control.",
+        ru: "Неактивный контрол кит оборачивает в фокусируемый `<span>`: наведение и Tab получает обёртка, кольцо фокуса рисуется на контроле.",
+      },
+      {
+        en: "A trigger that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring; its name comes from `aria-label` or the icon `label`.",
+        ru: "Нефокусируемый триггер (Badge, Avatar, ProgressCircle, `Icon` с `label`) получает `tabIndex={0}` и кольцо фокуса; его имя — `aria-label` или `label` у иконки.",
+      },
+    ],
+  },
 };

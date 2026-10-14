@@ -170,12 +170,16 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Escape` | Closes the sheet (`closeOnEscape`); focus returns to the trigger. |
 | `Tab` · `Shift+Tab` | Cycle focus inside the sheet. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `role="dialog"`, `aria-modal="true"`, named by Title — without a header by `aria-label` on `Sheet.Content`; described by Description.
 - Focus moves into the sheet on open and returns to the opener on close, including after a scrim click.
 - The page behind is `inert`, scroll is locked; only the topmost layer reacts.

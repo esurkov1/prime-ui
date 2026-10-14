@@ -51,7 +51,7 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `tone` | `"neutral" \| "accent" \| "danger"` | `the root's `tone`` | `neutral` — no data yet, `accent` — a first run and a call to start, `danger` — a failed load. |
+| `tone` | `"neutral" \| "accent" \| "danger"` | the root's `tone` | `neutral` — no data yet, `accent` — a first run and a call to start, `danger` — a failed load. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the icon), `className` and the other div attributes. |
 
 ### EmptyPage.Title · EmptyPage.Description
@@ -124,11 +124,15 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` · `Space` | On `EmptyPage.RetryButton`: retry the load; while the retry runs the button is loading and ignores presses. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `tone="danger"` makes the root `role="alert"`, so the failure is announced when it appears; a `role` you pass replaces it.
 - The title is an `<h2>` (`as` picks `h3` / `h4` by the outline, `p` inside menus, lists and table cells); link the root to it with `aria-labelledby` when the empty state replaces a whole region.
 - In a filtered menu or list set `role="status"`, so screen readers announce «Ничего не найдено».

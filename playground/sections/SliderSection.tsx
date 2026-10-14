@@ -77,19 +77,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "ArrowRight · ArrowUp", action: "Увеличивает значение на `step`." },
-      { keys: "ArrowLeft · ArrowDown", action: "Уменьшает значение на `step`." },
-      { keys: "PageUp · PageDown", action: "Меняет значение крупным шагом." },
-      { keys: "Home · End", action: "Переход к `min` / `max`." },
-    ],
-    aria: [
-      'Нативный `<input type="range">` (`role="slider"`) поверх визуального слоя.',
-      "`label` — настоящий `<label htmlFor>`; без него обязателен `aria-label`.",
-      "`formatValue` задаёт `aria-valuetext`, скринридер читает единицы; видимый `<output>` скрыт (`aria-hidden`).",
-      "`aria-describedby` поля — ваши id и подсказка или ошибка; `aria-invalid` при ошибке.",
-      "Пока значение сохраняется (промис из `onCommit`), у поля `aria-busy`; почему значение вернулось, покажите через `error`.",
-    ],
-  },
 };

@@ -1,4 +1,3 @@
-import { FIELD_ROOT_REST } from "@/internal/field.api";
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
 
 export const api: ComponentApi = {
@@ -136,7 +135,12 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Системные строки, см. «Доступность».",
         },
-        FIELD_ROOT_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
       ],
     },
   ],
@@ -178,4 +182,45 @@ export const api: ComponentApi = {
       ru: "Текст у выключенной кнопки добавления, когда строк уже `max`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves through the fields of a row, then to its remove button and on.",
+        ru: "Переводит фокус по полям строки, затем к её кнопке удаления и дальше.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "On the add button adds a row and focuses its first field; on a remove button removes the row and focuses the next row's remove button.",
+        ru: "На кнопке добавления добавляет строку и ставит фокус в её первое поле; на кнопке удаления удаляет строку, фокус переходит к соседней.",
+      },
+      {
+        keys: "Alt + ↑ · Alt + ↓",
+        en: "With `reorderable`, moves the row up or down (from its handle).",
+        ru: "С `reorderable` переносит строку выше или ниже (с ручки).",
+      },
+    ],
+    aria: [
+      {
+        en: "The rows are an `<ol>` named by the list `label` (`aria-labelledby`); the list gives each row its position.",
+        ru: "Строки — `<ol>`, названный подписью списка (`label`); номер строки даёт сам список.",
+      },
+      {
+        en: "The heading row is `aria-hidden`: each field in a cell carries its column heading as its own label, read but not shown on wide rows.",
+        ru: "Заголовки столбцов видны один раз и скрыты от скринридеров (`aria-hidden`): каждое поле в ячейке получает подпись своего столбца как собственную, читаемую, но не видимую на широких строках.",
+      },
+      {
+        en: "In a narrow container the heading row goes and each field's label shows above it.",
+        ru: "В узком контейнере заголовки уходят, и подпись каждого поля показывается над ним.",
+      },
+      {
+        en: "The remove button is «Удалить {row}», the handle «Переместить {row}»: the row's name from `getLabel`, else its number.",
+        ru: "Кнопка удаления — «Удалить {row}», ручка — «Переместить {row}»: имя строки из `getLabel` или её номер.",
+      },
+      {
+        en: "A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is an image named «Закреплена».",
+        ru: "Закреплённая строка — замок вместо ручки, без кнопки удаления; в списке без перестановки замок назван «Закреплена».",
+      },
+    ],
+  },
 };

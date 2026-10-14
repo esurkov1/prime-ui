@@ -1,322 +1,223 @@
 /**
- * Every part that renders DOM takes `ref` (CLAUDE.md §1).
+ * Every part that renders DOM takes `ref` (CLAUDE.md §1), and its `api.ts` says where it lands.
  *
- * Most parts declare `ref` in their props and pass it to their element through `{...rest}`: for
- * them the props type is the contract, checked at compile time below (`takesRef`). Parts that
- * merge the consumer's ref with an internal one or redirect it to another element are rendered
- * and checked at runtime: the ref must reach the right element.
+ * Compile time (tsc runs this file): `part-refs.generated.ts` holds the ref line of every
+ * `api.ts` part (`bun run docs:build`). Each entry must be an exported part whose props take a
+ * ref of that element and its native attributes (`className`, `style`); every exported part must
+ * have an entry, and a part without `ref` is either `null` there (its `api.ts` says "No DOM" /
+ * "No ref") or in `NO_REF` below with the reason.
+ *
+ * Runtime: a part that merges the consumer's ref with its own or points it at another element is
+ * rendered in `CASES`, and the ref and a native attribute must reach the same element. Every part
+ * that calls `useMergedRefs(…, ref)` or hands `ref` to an element without its rest props needs a
+ * row (the completeness scan below).
  */
+import fs from "node:fs";
+import path from "node:path";
+
 import { render } from "@testing-library/react";
 import type * as React from "react";
+import ts from "typescript";
 import { describe, expect, it } from "vitest";
-import { ColorField, ColorPicker } from "@/color-picker";
+import type * as colorPickerEntry from "@/color-picker";
 import {
-  Accordion,
-  Avatar,
   Badge,
   Banner,
-  Breadcrumb,
   Button,
-  ButtonGroup,
   Card,
   ChartFrame,
   Chat,
   ChatList,
-  ColorPresets,
-  ColorSwatches,
+  Checkbox,
   CommandMenu,
   Composer,
   DataTable,
   Datepicker,
-  DescriptionList,
-  DigitInput,
   Dnd,
   Drawer,
-  Dropdown,
-  EmptyPage,
   ExampleFrame,
-  Fieldset,
+  FieldList,
   FileUpload,
   Gallery,
   Gantt,
-  Hint,
   Input,
   Kanban,
-  Label,
   List,
-  LoginForm,
   MediaViewer,
   Message,
   Modal,
-  NotificationCard,
   PageContent,
-  Popover,
   ScrollContainer,
-  SegmentedControl,
   Select,
   Sheet,
-  Slider,
   SmartFilter,
-  Stepper,
   Tabs,
-  TagSelect,
   Textarea,
-  Thumbnail,
   Timeline,
   VideoNote,
-  VisuallyHidden,
   VoicePlayer,
 } from "@/components";
-import { AppHeader, AppShell, BottomNav, Sidebar } from "@/layout";
+import type * as mainEntry from "@/index";
+import { AppShell, Sidebar } from "@/layout";
+
+import { root, walk } from "./contract-utils";
+import type { PART_REFS } from "./part-refs.generated";
+import { ratchet } from "./ratchet";
+
+type Kit = typeof mainEntry & typeof colorPickerEntry;
+type Refs = typeof PART_REFS;
 
 type PropsOf<C> = C extends React.JSXElementConstructor<infer P> ? P : never;
 
-/** Compile-time: the part's props declare `ref` (it reaches the element through `{...rest}`). */
-function takesRef<C>(
-  _part: C & ("ref" extends keyof PropsOf<C> ? unknown : "props declare no ref"),
-) {}
+/** `Button.Root` → the exported `Button.Root`; `Spinner` → `Spinner`. */
+type PartOf<N> = N extends `${infer A}.${infer B}`
+  ? A extends keyof Kit
+    ? B extends keyof Kit[A]
+      ? Kit[A][B]
+      : never
+    : never
+  : N extends keyof Kit
+    ? Kit[N]
+    : never;
 
-describe("part refs: every part declares ref", () => {
-  it("type-checks (tsc runs this file)", () => {
-    takesRef(Accordion.Icon);
-    takesRef(AppShell.Root);
-    takesRef(AppShell.Nav);
-    takesRef(AppHeader.Root);
-    takesRef(AppHeader.Start);
-    takesRef(AppHeader.Title);
-    takesRef(AppHeader.Icon);
-    takesRef(AppHeader.Description);
-    takesRef(AppHeader.Separator);
-    takesRef(AppHeader.Tools);
-    takesRef(AppHeader.Actions);
-    takesRef(AppHeader.MenuButton);
-    takesRef(AppShell.Main);
-    takesRef(AppShell.Footer);
-    takesRef(BottomNav.Root);
-    takesRef(BottomNav.Item);
-    takesRef(BottomNav.ItemIcon);
-    takesRef(BottomNav.ItemCount);
-    takesRef(BottomNav.Action);
-    takesRef(Avatar.Root);
-    takesRef(Avatar.Image);
-    takesRef(Avatar.Fallback);
-    takesRef(Avatar.Status);
-    takesRef(Avatar.Group);
-    takesRef(Avatar.Overflow);
-    takesRef(Badge.Root);
-    takesRef(Badge.Icon);
-    takesRef(Badge.Dot);
-    takesRef(Badge.Action);
-    takesRef(Banner.Root);
-    takesRef(Banner.Content);
-    takesRef(Banner.Icon);
-    takesRef(Banner.Title);
-    takesRef(Banner.Description);
-    takesRef(Banner.Actions);
-    takesRef(Breadcrumb.Root);
-    takesRef(Breadcrumb.Item);
-    takesRef(Breadcrumb.Ellipsis);
-    takesRef(Button.Icon);
-    takesRef(ButtonGroup.Icon);
-    for (const part of Object.values(Card)) takesRef(part);
-    for (const part of Object.values(ChartFrame)) takesRef(part);
-    takesRef(ColorField);
-    takesRef(ColorPicker.Area);
-    takesRef(ColorPicker.AreaThumb);
-    takesRef(ColorPicker.ChannelStrip);
-    takesRef(ColorPicker.FormatSelect);
-    takesRef(ColorPicker.HexInput);
-    takesRef(ColorPicker.Slider);
-    takesRef(ColorPicker.SliderMeta);
-    takesRef(ColorPicker.SliderTrack);
-    takesRef(ColorPicker.Swatches);
-    takesRef(ColorPicker.Thumb);
-    takesRef(ColorPicker.TriggerSwatch);
-    takesRef(ColorPresets.Content);
-    takesRef(ColorPresets.Swatch);
-    takesRef(ColorPresets.SwatchButton);
-    takesRef(ColorSwatches);
-    takesRef(CommandMenu.Root);
-    takesRef(CommandMenu.Title);
-    takesRef(CommandMenu.Description);
-    takesRef(CommandMenu.Group);
-    takesRef(CommandMenu.ItemIcon);
-    takesRef(CommandMenu.ItemText);
-    takesRef(CommandMenu.ItemShortcut);
-    takesRef(CommandMenu.Empty);
-    takesRef(CommandMenu.Footer);
-    takesRef(CommandMenu.FooterHint);
-    for (const part of Object.values(Composer)) takesRef(part);
-    takesRef(DataTable.ColumnsMenu);
-    takesRef(Datepicker.Root);
-    for (const part of Object.values(DescriptionList)) takesRef(part);
-    takesRef(DigitInput);
-    for (const D of [Modal, Drawer, Sheet]) {
-      takesRef(D.Header);
-      takesRef(D.Icon);
-      takesRef(D.Title);
-      takesRef(D.Description);
-      takesRef(D.Actions);
-      takesRef(D.Body);
-      takesRef(D.Footer);
-      takesRef(D.Meta);
-    }
-    takesRef(Dropdown.CheckboxItem);
-    takesRef(Dropdown.ItemDescription);
-    takesRef(Dropdown.ItemIcon);
-    takesRef(Dropdown.ItemShortcut);
-    takesRef(Dropdown.Group);
-    takesRef(Dropdown.Separator);
-    takesRef(Dropdown.Header);
-    takesRef(Dropdown.Title);
-    takesRef(Dropdown.Description);
-    for (const part of Object.values(EmptyPage)) takesRef(part);
-    takesRef(FileUpload.Body);
-    takesRef(FileUpload.Icon);
-    takesRef(FileUpload.Title);
-    takesRef(FileUpload.Description);
-    takesRef(FileUpload.FormatBadge);
-    takesRef(FileUpload.Item);
-    takesRef(FileUpload.ItemName);
-    takesRef(FileUpload.ItemDescription);
-    takesRef(FileUpload.ItemActions);
-    takesRef(FileUpload.ItemProgress);
-    takesRef(FileUpload.ItemPreview);
-    takesRef(FileUpload.Queue);
-    takesRef(Hint.Icon);
-    takesRef(Fieldset);
-    takesRef(Input.Root);
-    takesRef(Input.Wrapper);
-    takesRef(Input.Icon);
-    takesRef(Input.Affix);
-    takesRef(Input.InlineAffix);
-    takesRef(Input.Counter);
-    takesRef(Input.CopyButton);
-    takesRef(Input.RevealButton);
-    takesRef(Input.Action);
-    takesRef(Kanban.ItemHeader);
-    takesRef(Kanban.ItemTitle);
-    takesRef(Kanban.ItemDescription);
-    takesRef(Kanban.ItemBadges);
-    takesRef(Kanban.ItemFooter);
-    takesRef(Kanban.ItemCount);
-    takesRef(Message.Avatar);
-    takesRef(Message.Author);
-    takesRef(Message.Forwarded);
-    takesRef(Message.Reply);
-    takesRef(Message.Text);
-    takesRef(Message.Media);
-    takesRef(Message.File);
-    takesRef(Message.Location);
-    takesRef(Message.Contact);
-    takesRef(Message.LinkPreview);
-    takesRef(Message.Reactions);
-    takesRef(Message.Actions);
-    takesRef(Message.Menu);
-    takesRef(Message.AuthorIcon);
-    takesRef(Chat.Root);
-    takesRef(Chat.Header);
-    takesRef(Chat.Title);
-    takesRef(Chat.Description);
-    takesRef(Chat.Actions);
-    takesRef(Chat.SearchButton);
-    takesRef(Chat.Search);
-    takesRef(Chat.Pinned);
-    takesRef(Chat.Messages);
-    takesRef(Chat.SelectionBar);
-    takesRef(Chat.Separator);
-    takesRef(Chat.Service);
-    takesRef(Chat.Unread);
-    takesRef(Chat.Footer);
-    takesRef(ChatList.Root);
-    takesRef(ChatList.Item);
-    takesRef(ChatList.ItemIcon);
-    takesRef(ChatList.ItemText);
-    takesRef(ChatList.ItemDescription);
-    takesRef(ChatList.ItemMenu);
-    takesRef(Gallery);
-    takesRef(Label.Icon);
-    takesRef(Label.Description);
-    takesRef(List.Root);
-    takesRef(List.Item);
-    takesRef(List.ItemIcon);
-    takesRef(List.ItemText);
-    takesRef(List.ItemDescription);
-    takesRef(List.ItemMeta);
-    takesRef(List.ItemCount);
-    takesRef(LoginForm.Header);
-    takesRef(LoginForm.Logo);
-    takesRef(LoginForm.Title);
-    takesRef(LoginForm.Description);
-    takesRef(LoginForm.Body);
-    takesRef(LoginForm.Actions);
-    takesRef(LoginForm.Footer);
-    takesRef(NotificationCard);
-    for (const part of Object.values(PageContent)) takesRef(part);
-    takesRef(Popover.Header);
-    takesRef(Popover.Title);
-    takesRef(Popover.Description);
-    takesRef(Popover.Actions);
-    takesRef(SegmentedControl.Root);
-    takesRef(SegmentedControl.Icon);
-    takesRef(SegmentedControl.Label);
-    takesRef(SegmentedControl.Count);
-    takesRef(SegmentedControl.Description);
-    takesRef(Select.Root);
-    takesRef(Select.Value);
-    takesRef(Select.TriggerIcon);
-    takesRef(Select.Content);
-    takesRef(Select.ItemIcon);
-    takesRef(Select.ItemText);
-    takesRef(Select.ItemDescription);
-    takesRef(Select.ItemMeta);
-    takesRef(Select.Group);
-    takesRef(Select.Separator);
-    takesRef(Select.Action);
-    takesRef(Sidebar.Header);
-    takesRef(Sidebar.BrandLogo);
-    takesRef(Sidebar.Footer);
-    takesRef(Sidebar.Group);
-    takesRef(Sidebar.ItemIcon);
-    takesRef(Sidebar.ItemCount);
-    takesRef(Sidebar.ItemShortcut);
-    takesRef(Sidebar.ItemAction);
-    takesRef(Sidebar.Sub);
-    takesRef(Slider);
-    takesRef(SmartFilter.Root);
-    takesRef(SmartFilter.Toolbar);
-    takesRef(SmartFilter.Chips);
-    takesRef(Stepper.Root);
-    takesRef(Stepper.Arrow);
-    takesRef(Stepper.Content);
-    takesRef(Stepper.Description);
-    takesRef(Stepper.Indicator);
-    takesRef(Stepper.Title);
-    takesRef(Tabs.Root);
-    takesRef(Tabs.Item);
-    takesRef(Tabs.Icon);
-    takesRef(Tabs.Label);
-    takesRef(Tabs.Count);
-    takesRef(Tabs.Description);
-    takesRef(Tabs.Separator);
-    takesRef(Tabs.Panel);
-    takesRef(TagSelect);
-    takesRef(Textarea.Counter);
-    takesRef(Textarea.CopyButton);
-    takesRef(Textarea.Action);
-    takesRef(Thumbnail.Root);
-    takesRef(Thumbnail.Image);
-    takesRef(Thumbnail.Video);
-    takesRef(Thumbnail.Fallback);
-    takesRef(Timeline.Title);
-    takesRef(Timeline.Meta);
-    takesRef(Timeline.MetaPrimary);
-    takesRef(Timeline.Value);
-    takesRef(Timeline.ValueMeta);
-    takesRef(VideoNote);
-    takesRef(VisuallyHidden);
-    takesRef(VoicePlayer);
-    expect(true).toBe(true);
+/** `HTMLDivElement` → the DOM interface. */
+type ElementOf<N> = N extends keyof typeof globalThis
+  ? (typeof globalThis)[N] extends { prototype: infer E }
+    ? E
+    : never
+  : never;
+
+type Component = React.JSXElementConstructor<never>;
+/** A component name: PascalCase, not a constant (`COLOR_PRESETS`). */
+type PascalName<K> = K extends string
+  ? K extends Uppercase<K>
+    ? never
+    : K extends Capitalize<K>
+      ? K
+      : never
+  : never;
+
+/** Every exported part: a component export, or a component member of an exported namespace. */
+type ExportedParts = {
+  [K in PascalName<keyof Kit>]: Kit[K] extends Component
+    ? K
+    : Kit[K] extends object
+      ? {
+          [P in PascalName<keyof Kit[K]>]: Kit[K][P] extends Component ? `${K}.${P}` : never;
+        }[PascalName<keyof Kit[K]>]
+      : never;
+}[PascalName<keyof Kit>];
+
+/**
+ * Exported components that are no part of any `api.ts` table and take no ref, with the reason.
+ * A part of a component is documented in its `api.ts` instead (and `null` there when it has no
+ * ref).
+ */
+const NO_REF = {
+  ControlSizeProvider: "a context provider: renders its children only",
+} as const;
+
+/**
+ * Exported components documented outside the component `api.ts` tables, with the element their
+ * ref reaches: `Icon` is the icon registry's renderer (`SKILL/api-contract.md`, Icons).
+ */
+const OUTSIDE_API = {
+  Icon: "SVGSVGElement",
+} as const;
+
+/**
+ * Parts whose props do not forward their element's native attributes yet: the typed baseline of
+ * this check. It only shrinks — the owner of the part fixes its props and removes the entry (a
+ * fixed part still listed fails to compile).
+ */
+const PENDING_DOM_PROPS = {
+  "Select.Item": "SelectItemProps is a closed type: no native attributes reach the option",
+  "SmartFilter.Root": "SmartFilterRootProps takes className but no other native attribute",
+} as const;
+
+type TakesRef<C> = "ref" extends keyof PropsOf<C> ? true : false;
+/** The props take a ref of the element: a `RefObject` of it is assignable to their `ref`. */
+type RefReaches<C, E> =
+  PropsOf<C> extends { ref?: infer R }
+    ? React.RefObject<E | null> extends R
+      ? true
+      : false
+    : false;
+/** The props forward the element's native attributes. */
+type TakesDomProps<C> = "className" extends keyof PropsOf<C>
+  ? "style" extends keyof PropsOf<C>
+    ? true
+    : false
+  : false;
+
+/** Entries whose part is not exported. */
+type NotExported = { [N in keyof Refs]: [PartOf<N>] extends [never] ? N : never }[keyof Refs];
+/** Entries whose ref does not reach the element their `api.ts` names. */
+type WrongRef = {
+  [N in keyof Refs]: Refs[N] extends readonly [infer E, ...unknown[]]
+    ? E extends "Element"
+      ? TakesRef<PartOf<N>> extends true
+        ? never
+        : N
+      : RefReaches<PartOf<N>, ElementOf<E>> extends true
+        ? never
+        : N
+    : never;
+}[keyof Refs];
+/** Entries with an element whose props drop the native attributes. */
+type NoDomProps = Exclude<
+  {
+    [N in keyof Refs]: Refs[N] extends null
+      ? never
+      : TakesDomProps<PartOf<N>> extends true
+        ? never
+        : N;
+  }[keyof Refs],
+  keyof typeof PENDING_DOM_PROPS
+>;
+/** `PENDING_DOM_PROPS` entries whose part forwards its native attributes now. */
+type StalePendingDomProps = {
+  [N in keyof typeof PENDING_DOM_PROPS]: TakesDomProps<PartOf<N>> extends true ? N : never;
+}[keyof typeof PENDING_DOM_PROPS];
+/** Exported parts no `api.ts` documents and `NO_REF` does not list. */
+type Undocumented = Exclude<
+  ExportedParts,
+  keyof Refs | keyof typeof NO_REF | keyof typeof OUTSIDE_API
+>;
+/** `OUTSIDE_API` entries whose ref does not reach the element named there. */
+type WrongOutsideRef = {
+  [N in keyof typeof OUTSIDE_API]: RefReaches<
+    PartOf<N>,
+    ElementOf<(typeof OUTSIDE_API)[N]>
+  > extends true
+    ? never
+    : N;
+}[keyof typeof OUTSIDE_API];
+/** `NO_REF` entries that are documented or take a ref after all. */
+type StaleNoRef = {
+  [N in keyof typeof NO_REF]: N extends keyof Refs
+    ? N
+    : TakesRef<PartOf<N>> extends true
+      ? N
+      : never;
+}[keyof typeof NO_REF];
+
+/** Fails to compile with the offending names when `T` is not `never`. */
+type Expect<T extends never> = T;
+type PartRefChecks = [
+  Expect<NotExported>,
+  Expect<WrongRef>,
+  Expect<NoDomProps>,
+  Expect<Undocumented>,
+  Expect<WrongOutsideRef>,
+  Expect<StaleNoRef>,
+  Expect<StalePendingDomProps>,
+];
+
+describe("part refs: every documented ref is the code's ref", () => {
+  it("type-checks (tsc compiles PartRefChecks above)", () => {
+    const compiled: PartRefChecks extends unknown[] ? true : false = true;
+    expect(compiled).toBe(true);
   });
 });
 
@@ -331,17 +232,20 @@ const CASES: Case[] = [
     "AppShell.Template",
     "MAIN",
     (ref) => (
-      <AppShell.Template ref={ref}>
+      <AppShell.Template
+        ref={ref}
+        mainProps={{ "data-testid": "part" } as React.ComponentProps<"main">}
+      >
         <span>page</span>
       </AppShell.Template>
     ),
   ],
-  ["ScrollContainer", "DIV", (ref) => <ScrollContainer ref={ref} />],
+  ["ScrollContainer", "DIV", (ref) => <ScrollContainer ref={ref} data-testid="part" />],
   [
     "Banner.Root",
     "DIV",
     (ref) => (
-      <Banner.Root ref={ref}>
+      <Banner.Root ref={ref} data-testid="part">
         <Banner.Content>X</Banner.Content>
       </Banner.Root>
     ),
@@ -351,7 +255,7 @@ const CASES: Case[] = [
     "DIV",
     (ref) => (
       <PageContent.Split>
-        <PageContent.List ref={ref} aria-label="Диалоги" />
+        <PageContent.List ref={ref} data-testid="part" aria-label="Диалоги" />
         <PageContent.Detail aria-label="Переписка" />
       </PageContent.Split>
     ),
@@ -362,7 +266,7 @@ const CASES: Case[] = [
     (ref) => (
       <PageContent.Split>
         <PageContent.List aria-label="Диалоги" />
-        <PageContent.Detail ref={ref} aria-label="Переписка" />
+        <PageContent.Detail ref={ref} data-testid="part" aria-label="Переписка" />
       </PageContent.Split>
     ),
   ],
@@ -371,7 +275,9 @@ const CASES: Case[] = [
     "BUTTON",
     (ref) => (
       <List.Root aria-label="Диалоги">
-        <List.Item ref={ref}>ООО «Гранит»</List.Item>
+        <List.Item ref={ref} data-testid="part">
+          ООО «Гранит»
+        </List.Item>
       </List.Root>
     ),
   ],
@@ -381,7 +287,7 @@ const CASES: Case[] = [
     (ref) => (
       <Tabs.Root defaultValue="a">
         <Tabs.List>
-          <Tabs.Item ref={ref} value="a">
+          <Tabs.Item ref={ref} data-testid="part" value="a">
             Заказы
           </Tabs.Item>
         </Tabs.List>
@@ -393,19 +299,23 @@ const CASES: Case[] = [
     "DIV",
     (ref) => (
       <Tabs.Root defaultValue="a">
-        <Tabs.List ref={ref}>
+        <Tabs.List ref={ref} data-testid="part">
           <Tabs.Item value="a">Заказы</Tabs.Item>
         </Tabs.List>
       </Tabs.Root>
     ),
   ],
-  ["Datepicker.Panel", "DIV", (ref) => <Datepicker.Panel ref={ref} mode="single" />],
+  [
+    "Datepicker.Panel",
+    "DIV",
+    (ref) => <Datepicker.Panel ref={ref} data-testid="part" mode="single" />,
+  ],
   [
     "CommandMenu.List",
     "DIV",
     (ref) => (
       <CommandMenu.Root defaultOpen aria-label="Команды">
-        <CommandMenu.List ref={ref}>
+        <CommandMenu.List ref={ref} data-testid="part">
           <CommandMenu.Item value="заказы">Заказы</CommandMenu.Item>
         </CommandMenu.List>
       </CommandMenu.Root>
@@ -416,7 +326,7 @@ const CASES: Case[] = [
     "DIV",
     (ref) => (
       <Modal.Root defaultOpen>
-        <Modal.Content ref={ref} aria-label="Окно">
+        <Modal.Content ref={ref} data-testid="part" aria-label="Окно">
           Текст
         </Modal.Content>
       </Modal.Root>
@@ -427,7 +337,7 @@ const CASES: Case[] = [
     "DIV",
     (ref) => (
       <Drawer.Root defaultOpen>
-        <Drawer.Content ref={ref} aria-label="Окно">
+        <Drawer.Content ref={ref} data-testid="part" aria-label="Окно">
           Текст
         </Drawer.Content>
       </Drawer.Root>
@@ -438,7 +348,7 @@ const CASES: Case[] = [
     "DIV",
     (ref) => (
       <Sheet.Root defaultOpen>
-        <Sheet.Content ref={ref} aria-label="Окно">
+        <Sheet.Content ref={ref} data-testid="part" aria-label="Окно">
           Текст
         </Sheet.Content>
       </Sheet.Root>
@@ -447,7 +357,14 @@ const CASES: Case[] = [
   [
     "MediaViewer",
     "DIV",
-    (ref) => <MediaViewer ref={ref} defaultOpen items={[{ src: "/dock.jpg", alt: "Склад" }]} />,
+    (ref) => (
+      <MediaViewer
+        ref={ref}
+        data-testid="part"
+        defaultOpen
+        items={[{ src: "/dock.jpg", alt: "Склад" }]}
+      />
+    ),
   ],
   [
     "DataTable",
@@ -455,6 +372,7 @@ const CASES: Case[] = [
     (ref) => (
       <DataTable
         ref={ref}
+        data-testid="part"
         columns={[{ id: "name", header: "Имя", cell: (row: { name: string }) => row.name }]}
         rows={[{ name: "Анна" }]}
         getRowKey={(row) => row.name}
@@ -467,6 +385,7 @@ const CASES: Case[] = [
     (ref) => (
       <Gantt
         ref={ref}
+        data-testid="part"
         aria-label="План"
         rows={[{ name: "Анна" }]}
         getRowKey={(row) => row.name}
@@ -479,7 +398,7 @@ const CASES: Case[] = [
     "Card.Root asChild",
     "A",
     (ref) => (
-      <Card.Root ref={ref} asChild variant="mini">
+      <Card.Root ref={ref} data-testid="part" asChild variant="mini">
         <a href="#orders">
           <Card.Label>Заказы</Card.Label>
         </a>
@@ -491,7 +410,7 @@ const CASES: Case[] = [
     "DIV",
     (ref) => (
       <ChartFrame.Root>
-        <ChartFrame.Plot ref={ref} renderPlot={() => null} />
+        <ChartFrame.Plot ref={ref} data-testid="part" renderPlot={() => null} />
       </ChartFrame.Root>
     ),
   ],
@@ -499,7 +418,7 @@ const CASES: Case[] = [
     "ExampleFrame",
     "DIV",
     (ref) => (
-      <ExampleFrame ref={ref} code="<Button.Root />">
+      <ExampleFrame ref={ref} data-testid="part" code="<Button.Root />">
         <Button.Root>Пример</Button.Root>
       </ExampleFrame>
     ),
@@ -507,13 +426,24 @@ const CASES: Case[] = [
   [
     "FileUpload.Queue",
     "UL",
-    (ref) => <FileUpload.Queue ref={ref} defaultValue={[{ id: "a", name: "Счёт.pdf" }]} />,
+    (ref) => (
+      <FileUpload.Queue
+        ref={ref}
+        data-testid="part"
+        defaultValue={[{ id: "a", name: "Счёт.pdf" }]}
+      />
+    ),
   ],
   [
     "FileUpload.Queue (grid)",
     "UL",
     (ref) => (
-      <FileUpload.Queue ref={ref} layout="grid" defaultValue={[{ id: "a", name: "Счёт.pdf" }]} />
+      <FileUpload.Queue
+        ref={ref}
+        data-testid="part"
+        layout="grid"
+        defaultValue={[{ id: "a", name: "Счёт.pdf" }]}
+      />
     ),
   ],
   [
@@ -523,6 +453,7 @@ const CASES: Case[] = [
       <Dnd.Root>
         <Dnd.Sortable
           ref={ref}
+          data-testid="part"
           as="ul"
           items={["a"]}
           getId={(id) => id}
@@ -543,7 +474,7 @@ const CASES: Case[] = [
           getId={(id) => id}
           onReorder={() => undefined}
           renderItem={(id) => (
-            <Dnd.SortableItem ref={ref} id={id}>
+            <Dnd.SortableItem ref={ref} data-testid="part" id={id}>
               {id}
             </Dnd.SortableItem>
           )}
@@ -556,7 +487,7 @@ const CASES: Case[] = [
     "DIV",
     (ref) => (
       <Dnd.Root>
-        <Dnd.Draggable ref={ref} kind="task" id="a">
+        <Dnd.Draggable ref={ref} data-testid="part" kind="task" id="a">
           Задача
         </Dnd.Draggable>
       </Dnd.Root>
@@ -567,7 +498,7 @@ const CASES: Case[] = [
     "SECTION",
     (ref) => (
       <Dnd.Root>
-        <Dnd.DropZone ref={ref} as="section" accepts="task" onDrop={() => {}}>
+        <Dnd.DropZone ref={ref} data-testid="part" as="section" accepts="task" onDrop={() => {}}>
           Готово
         </Dnd.DropZone>
       </Dnd.Root>
@@ -579,6 +510,7 @@ const CASES: Case[] = [
     (ref) => (
       <Kanban.Root
         ref={ref}
+        data-testid="part"
         columns={[{ id: "todo", title: "К выполнению" }]}
         items={["a"]}
         getId={(id) => id}
@@ -596,7 +528,11 @@ const CASES: Case[] = [
         items={["a"]}
         getId={(id) => id}
         defaultValue={{ todo: ["a"] }}
-        renderItem={(id) => <Kanban.Item ref={ref}>{id}</Kanban.Item>}
+        renderItem={(id) => (
+          <Kanban.Item ref={ref} data-testid="part">
+            {id}
+          </Kanban.Item>
+        )}
       />
     ),
   ],
@@ -607,20 +543,25 @@ const CASES: Case[] = [
       <Sidebar.Root offCanvas="never">
         <Sidebar.Sub>
           <Sidebar.SubTrigger>Задачи</Sidebar.SubTrigger>
-          <Sidebar.SubContent ref={ref}>
+          <Sidebar.SubContent ref={ref} data-testid="part">
             <Sidebar.Item>Бэклог</Sidebar.Item>
           </Sidebar.SubContent>
         </Sidebar.Sub>
       </Sidebar.Root>
     ),
   ],
-  ["VoicePlayer", "DIV", (ref) => <VoicePlayer ref={ref} src="/voice.ogg" duration={12} />],
+  [
+    "VoicePlayer",
+    "DIV",
+    (ref) => <VoicePlayer ref={ref} data-testid="part" src="/voice.ogg" duration={12} />,
+  ],
   [
     "ChatList.Root",
     "DIV",
     (ref) => (
       <ChatList.Root
         ref={ref}
+        data-testid="part"
         items={["granit"]}
         getKey={(item) => item}
         renderItem={() => (
@@ -639,7 +580,7 @@ const CASES: Case[] = [
         items={["granit"]}
         getKey={(item) => item}
         renderItem={() => (
-          <ChatList.Item ref={ref}>
+          <ChatList.Item ref={ref} data-testid="part">
             <ChatList.ItemText>ООО «Гранит»</ChatList.ItemText>
           </ChatList.Item>
         )}
@@ -655,7 +596,9 @@ const CASES: Case[] = [
         getKey={(item) => item}
         renderItem={() => (
           <ChatList.Item>
-            <ChatList.ItemText ref={ref}>ООО «Гранит»</ChatList.ItemText>
+            <ChatList.ItemText ref={ref} data-testid="part">
+              ООО «Гранит»
+            </ChatList.ItemText>
           </ChatList.Item>
         )}
       />
@@ -666,7 +609,7 @@ const CASES: Case[] = [
     "DIV",
     (ref) => (
       <Chat.Root>
-        <Chat.Messages ref={ref} />
+        <Chat.Messages ref={ref} data-testid="part" />
       </Chat.Root>
     ),
   ],
@@ -674,16 +617,197 @@ const CASES: Case[] = [
     "Message.Root",
     "ARTICLE",
     (ref) => (
-      <Message.Root ref={ref} time="10:00">
+      <Message.Root ref={ref} data-testid="part" time="10:00">
         <Message.Text>Счёт отправлен</Message.Text>
       </Message.Root>
     ),
   ],
-  ["VideoNote", "DIV", (ref) => <VideoNote ref={ref} src="/note.mp4" duration={6} />],
+  [
+    "VideoNote",
+    "DIV",
+    (ref) => <VideoNote ref={ref} data-testid="part" src="/note.mp4" duration={6} />,
+  ],
+  [
+    "Badge.Root",
+    "SPAN",
+    (ref) => (
+      <Badge.Root ref={ref} data-testid="part">
+        Новый
+      </Badge.Root>
+    ),
+  ],
+  [
+    "Checkbox.Root",
+    "INPUT",
+    (ref) => (
+      <Checkbox.Root ref={ref} data-testid="part">
+        <Checkbox.Label>Согласен</Checkbox.Label>
+      </Checkbox.Root>
+    ),
+  ],
+  [
+    "Input.Field",
+    "INPUT",
+    (ref) => (
+      <Input.Root label="Имя">
+        <Input.Wrapper>
+          <Input.Field ref={ref} data-testid="part" />
+        </Input.Wrapper>
+      </Input.Root>
+    ),
+  ],
+  [
+    "Textarea.Root",
+    "TEXTAREA",
+    (ref) => <Textarea.Root ref={ref} data-testid="part" label="Комментарий" />,
+  ],
+  [
+    "Select.Trigger",
+    "BUTTON",
+    (ref) => (
+      <Select.Root label="Статус">
+        <Select.Trigger ref={ref} data-testid="part" />
+        <Select.Content>
+          <Select.Item value="new">Новый</Select.Item>
+        </Select.Content>
+      </Select.Root>
+    ),
+  ],
+  [
+    "CommandMenu.Item",
+    "BUTTON",
+    (ref) => (
+      <CommandMenu.Root defaultOpen aria-label="Команды">
+        <CommandMenu.List>
+          <CommandMenu.Item ref={ref} data-testid="part" value="заказы">
+            Заказы
+          </CommandMenu.Item>
+        </CommandMenu.List>
+      </CommandMenu.Root>
+    ),
+  ],
+  [
+    "Gallery",
+    "DIV",
+    (ref) => (
+      <Gallery
+        ref={ref}
+        data-testid="part"
+        items={[{ src: "/dock.jpg", alt: "Склад", width: 800, height: 600 }]}
+      />
+    ),
+  ],
+  [
+    "Timeline.Item",
+    "DIV",
+    (ref) => (
+      <Timeline.Root>
+        <Timeline.Group label="Сегодня">
+          <Timeline.Item ref={ref} data-testid="part">
+            <Timeline.Title>Счёт оплачен</Timeline.Title>
+          </Timeline.Item>
+        </Timeline.Group>
+      </Timeline.Root>
+    ),
+  ],
+  [
+    "Chat.SearchButton",
+    "BUTTON",
+    (ref) => (
+      <Chat.Root>
+        <Chat.Header>
+          <Chat.SearchButton ref={ref} data-testid="part" />
+        </Chat.Header>
+      </Chat.Root>
+    ),
+  ],
+  [
+    "Chat.SelectionBar",
+    "DIV",
+    (ref) => (
+      <Chat.Root defaultSelected={[]}>
+        <Chat.Messages>
+          <Chat.SelectionBar ref={ref} data-testid="part" />
+        </Chat.Messages>
+      </Chat.Root>
+    ),
+  ],
+  ["Composer.Root", "FORM", (ref) => <Composer.Root ref={ref} data-testid="part" />],
+  [
+    "SmartFilter.Root",
+    "DIV",
+    (ref) => (
+      <SmartFilter.Root
+        ref={ref}
+        data-testid="part"
+        fields={[
+          {
+            key: "status",
+            label: "Статус",
+            options: [
+              { value: "new", label: "Новый" },
+              { value: "paid", label: "Оплачен" },
+            ],
+          },
+        ]}
+      >
+        <SmartFilter.Toolbar />
+      </SmartFilter.Root>
+    ),
+  ],
+  [
+    "Sidebar.Root",
+    "DIV",
+    (ref) => (
+      <Sidebar.Root ref={ref} data-testid="part" offCanvas="never">
+        <Sidebar.Content>
+          <Sidebar.Item>Заказы</Sidebar.Item>
+        </Sidebar.Content>
+      </Sidebar.Root>
+    ),
+  ],
+  [
+    "Sidebar.SubTrigger",
+    "BUTTON",
+    (ref) => (
+      <Sidebar.Root offCanvas="never">
+        <Sidebar.Sub>
+          <Sidebar.SubTrigger ref={ref} data-testid="part">
+            Задачи
+          </Sidebar.SubTrigger>
+          <Sidebar.SubContent>
+            <Sidebar.Item>Бэклог</Sidebar.Item>
+          </Sidebar.SubContent>
+        </Sidebar.Sub>
+      </Sidebar.Root>
+    ),
+  ],
+  [
+    "FieldList",
+    "DIV",
+    (ref) => (
+      <FieldList
+        ref={ref}
+        data-testid="part"
+        label="Контакты"
+        columns={[{ label: "Имя" }]}
+        defaultValue={[{ id: "a", name: "Анна" }]}
+        getId={(row: { id: string; name: string }) => row.id}
+        createItem={() => ({ id: "b", name: "" })}
+        renderItem={(row: { id: string; name: string }) => (
+          <Input.Root>
+            <Input.Wrapper>
+              <Input.Field defaultValue={row.name} />
+            </Input.Wrapper>
+          </Input.Root>
+        )}
+      />
+    ),
+  ],
 ];
 
 describe("part refs: merged and redirected refs reach their element", () => {
-  it.each(CASES)("%s → <%s>", (_name, tag, ui) => {
+  it.each(CASES)("%s → <%s>", (name, tag, ui) => {
     let node: Element | null = null;
     render(
       ui((element) => {
@@ -691,7 +815,104 @@ describe("part refs: merged and redirected refs reach their element", () => {
       }),
     );
     expect(node).not.toBeNull();
-    expect((node as unknown as Element).tagName.toUpperCase()).toBe(tag.toUpperCase());
-    expect(document.body.contains(node)).toBe(true);
+    const element = node as unknown as Element;
+    expect(element.tagName.toUpperCase()).toBe(tag.toUpperCase());
+    expect(document.body.contains(element)).toBe(true);
+    // The native attributes reach the same element as the ref (a part still listed in
+    // PENDING_DOM_PROPS forwards none yet).
+    if (!(name.split(" ")[0] in PENDING_DOM_PROPS)) {
+      expect(element.getAttribute("data-testid")).toBe("part");
+    }
+  });
+});
+
+/**
+ * The parts whose ref is merged (`useMergedRefs(…, ref)`) or redirected (`ref={ref}` on an
+ * element without the rest props), by part name: found in the component sources, named by the
+ * namespace object or the `displayName` that exports them.
+ */
+function mergedOrRedirectedParts(): string[] {
+  const files = [...walk("src/components", /\.tsx$/), ...walk("src/layout", /\.tsx$/)].filter(
+    (file) => !/\.test\.tsx$/.test(file) && !file.includes("/examples/"),
+  );
+  const parts = new Set<string>();
+  for (const file of files) {
+    const text = fs.readFileSync(path.join(root, file), "utf8");
+    if (!/\bref\b/.test(text)) continue;
+    const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    const names = new Map<string, string>();
+    const visitNames = (node: ts.Node) => {
+      // `X.displayName = "Ns.Part"`.
+      if (
+        ts.isBinaryExpression(node) &&
+        ts.isPropertyAccessExpression(node.left) &&
+        node.left.name.text === "displayName" &&
+        ts.isIdentifier(node.left.expression) &&
+        ts.isStringLiteral(node.right)
+      ) {
+        names.set(node.left.expression.text, node.right.text);
+      }
+      ts.forEachChild(node, visitNames);
+    };
+    visitNames(source);
+    const flagged = new Set<string>();
+    const inspect = (fn: ts.Node, name: string) => {
+      let hit = false;
+      const visit = (node: ts.Node) => {
+        if (
+          ts.isCallExpression(node) &&
+          ts.isIdentifier(node.expression) &&
+          node.expression.text === "useMergedRefs" &&
+          node.arguments.some((arg) => ts.isIdentifier(arg) && arg.text === "ref")
+        ) {
+          hit = true;
+        }
+        if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
+          const attributes = node.attributes.properties;
+          const passesRef = attributes.some(
+            (attr) =>
+              ts.isJsxAttribute(attr) &&
+              attr.name.getText() === "ref" &&
+              attr.initializer &&
+              ts.isJsxExpression(attr.initializer) &&
+              attr.initializer.expression?.getText() === "ref",
+          );
+          const spreadsRest = attributes.some((attr) => ts.isJsxSpreadAttribute(attr));
+          if (passesRef && !spreadsRest) hit = true;
+        }
+        ts.forEachChild(node, visit);
+      };
+      visit(fn);
+      if (hit) flagged.add(name);
+    };
+    for (const statement of source.statements) {
+      if (ts.isFunctionDeclaration(statement) && statement.name) {
+        inspect(statement, statement.name.text);
+      } else if (ts.isVariableStatement(statement)) {
+        for (const declaration of statement.declarationList.declarations) {
+          if (
+            ts.isIdentifier(declaration.name) &&
+            declaration.initializer &&
+            (ts.isArrowFunction(declaration.initializer) ||
+              ts.isFunctionExpression(declaration.initializer))
+          ) {
+            inspect(declaration.initializer, declaration.name.text);
+          }
+        }
+      }
+    }
+    for (const fn of flagged) {
+      const name = names.get(fn);
+      if (name && /^[A-Z]\w*(\.[A-Z]\w*)?$/.test(name)) parts.add(name);
+    }
+  }
+  return [...parts].sort();
+}
+
+describe("part refs: every merged or redirected ref has a runtime row", () => {
+  it("CASES covers the parts the sources merge or redirect", () => {
+    const covered = new Set(CASES.map(([name]) => name.split(" ")[0]));
+    const missing = mergedOrRedirectedParts().filter((name) => !covered.has(name));
+    ratchet("part-refs-runtime", missing);
   });
 });

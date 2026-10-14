@@ -43,4 +43,21 @@ export const api: ComponentApi = {
       ru: 'Текст для скринридеров внутри `role="status"`.',
     },
   ],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: '`role="status"` with a visually hidden `labels.loading`, so screen readers learn that something is loading.',
+        ru: '`role="status"` со скрытым текстом `labels.loading`: скринридер узнаёт о загрузке.',
+      },
+      {
+        en: 'When the host already announces it is busy (`aria-busy` on a button or a region), pass `aria-hidden="true"`.',
+        ru: 'Внутри хоста, который уже сообщает о загрузке (`aria-busy` на кнопке или области), передайте `aria-hidden="true"`.',
+      },
+      {
+        en: "Under `prefers-reduced-motion` the ring keeps turning, slower and linear, so the loading cue stays readable.",
+        ru: "Под `prefers-reduced-motion` кольцо продолжает вращаться — вдвое медленнее и равномерно, чтобы сигнал загрузки оставался читаемым.",
+      },
+    ],
+  },
 };

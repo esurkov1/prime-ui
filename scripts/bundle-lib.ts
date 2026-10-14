@@ -5,16 +5,21 @@
  * the `dist/icons/` types folder for `./icons` specifiers), shared code in `dist/chunks/`. Every JS file starts with `"use client"` (checked).
  * CSS: the base layer (`src/styles/globals.css`: tokens, themes, focus ring,
  * reduced motion) followed by every component module → `dist/index.css` (`prime-ui-kit/bundle.css`,
- * minified). Types: `tsc --emitDeclarationOnly` → `.dts-stage`, merged into `dist/`; every
+ * minified). Types: the declarations of `tsconfig.dts.json` → `.dts-stage`, every documented prop
+ * carrying its `api.ts` `en` text as JSDoc (the one prose source), merged into `dist/`; every
  * specifier is rewritten to an explicit relative path inside `dist/` (no `@/` alias, no directory
  * import) and the build fails on any specifier that leaves `dist/` or does not resolve.
  */
 
-import { spawn } from "node:child_process";
+import { existsSync, readdirSync } from "node:fs";
 import { cp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import ts from "typescript";
+
+import { documentedProps, kitExports } from "./docs/apiTypes";
+import type { ComponentApi } from "./docs/componentApi";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = resolve(root, "dist");
@@ -92,16 +97,70 @@ await rm(resolve(dist, "all.css"), { force: true });
 
 const stage = resolve(root, ".dts-stage");
 await rm(stage, { recursive: true, force: true });
-const tscJs = resolve(root, "node_modules/typescript/lib/tsc.js");
-const code = await new Promise<number>((res, rej) => {
-  const child = spawn(process.execPath, [tscJs, "-p", "tsconfig.dts.json"], {
-    cwd: root,
-    stdio: "inherit",
-  });
-  child.on("error", rej);
-  child.on("exit", (c) => res(c ?? 1));
+
+/*
+ * Declarations with the `api.ts` prose: every prop an `api.ts` table documents gets its `en` text
+ * as the JSDoc of its declaration, so an editor shows the same words as COMPONENT.md.
+ */
+const dtsConfig = ts.getParsedCommandLineOfConfigFile(
+  resolve(root, "tsconfig.dts.json"),
+  undefined,
+  {
+    ...ts.sys,
+    onUnRecoverableConfigFileDiagnostic: (diagnostic) => {
+      throw new Error(ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"));
+    },
+  },
+);
+if (!dtsConfig) throw new Error("tsconfig.dts.json does not parse");
+const dtsProgram = ts.createProgram(dtsConfig.fileNames, dtsConfig.options);
+const apis: ComponentApi[] = [];
+for (const base of ["components", "layout"]) {
+  for (const dir of readdirSync(resolve(root, "src", base)).sort()) {
+    const file = resolve(root, "src", base, dir, "api.ts");
+    if (existsSync(file)) apis.push(((await import(file)) as { api: ComponentApi }).api);
+  }
+}
+const propDocs = new Map<string, string>();
+for (const { declaration, en } of documentedProps(dtsProgram, kitExports(dtsProgram, root), apis)) {
+  propDocs.set(`${declaration.getSourceFile().fileName}:${declaration.pos}`, en);
+}
+/** `*` lines of a JSDoc block; a closing marker in the text is broken so the comment stays one. */
+const jsdoc = (text: string) => `*\n * ${text.replaceAll("*/", "*\\/")}\n `;
+const withApiDocs: ts.TransformerFactory<ts.SourceFile | ts.Bundle> = (context) => {
+  const visit = (node: ts.Node): ts.Node => {
+    const original = ts.getOriginalNode(node);
+    if ((ts.isPropertySignature(node) || ts.isPropertyDeclaration(node)) && original.pos >= 0) {
+      const text = propDocs.get(`${original.getSourceFile()?.fileName}:${original.pos}`);
+      if (text) {
+        ts.setEmitFlags(node, ts.EmitFlags.NoLeadingComments);
+        ts.addSyntheticLeadingComment(
+          node,
+          ts.SyntaxKind.MultiLineCommentTrivia,
+          jsdoc(text),
+          true,
+        );
+      }
+    }
+    return ts.visitEachChild(node, visit, context);
+  };
+  return (file) => ts.visitNode(file, visit) as ts.SourceFile | ts.Bundle;
+};
+const emitted = dtsProgram.emit(undefined, undefined, undefined, true, {
+  afterDeclarations: [withApiDocs],
 });
-if (code !== 0) throw new Error(`tsc emitDeclarationOnly failed with exit code ${code}`);
+const dtsErrors = [...ts.getPreEmitDiagnostics(dtsProgram), ...emitted.diagnostics].filter(
+  (diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error,
+);
+if (dtsErrors.length > 0 || emitted.emitSkipped) {
+  throw new Error(
+    `declarations failed:\n${ts.formatDiagnostics(dtsErrors, {
+      getCanonicalFileName: (name) => name,
+      getCurrentDirectory: () => root,
+      getNewLine: () => "\n",
+    })}`,
+  );
+}
 
 /*
  * Declarations: `.dts-stage/src/*` lands in `dist/*`, `.dts-stage/tokens/*` in `dist/tokens/*`.

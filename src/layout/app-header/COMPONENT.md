@@ -143,12 +143,16 @@ The name of `AppHeader.Title` (not the icon or the description) is the page's `<
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves through the menu button, the path links and the page's buttons in reading order, then the page tools in the second row. |
 | `Enter` · `Space` | Presses the focused button: opens the menu or runs the action. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Root is a `<header>`: the banner landmark when it sits at the top level of the page.
 - MenuButton is named by `labels.menu`; pass `aria-expanded` (whether the Sidebar is open).
 - The name of `AppHeader.Title` is the page heading `<h1>`; the description sits next to it, outside its accessible name. One `<h1>` per page: in the header on app pages, `PageContent.Title` on a document page (whose header has no title).

@@ -72,9 +72,13 @@ Skeleton           <span aria-hidden="true">; data-shape, data-size
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Decorative: `aria-hidden="true"`, screen readers skip it.
 - The loading region announces itself: `aria-busy` on it (Crossfade, a card, a form) and, when the wait matters, a `role="status"` text.
 - Under `prefers-reduced-motion` the placeholder does not pulse.

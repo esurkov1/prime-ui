@@ -55,25 +55,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Enter · Space",
-        action: "Открывают панель с поля; в ячейке каналов применяют значение.",
-      },
-      {
-        keys: "ArrowLeft · ArrowRight · ArrowUp · ArrowDown",
-        action: "Двигают ползунок области или канала; в готовых цветах — между образцами.",
-      },
-      { keys: "PageUp · PageDown", action: "Крупный шаг области и ползунков." },
-      { keys: "Tab", action: "Ходит по частям панели по кругу." },
-      { keys: "Escape", action: "Закрывает панель и возвращает фокус на поле." },
-    ],
-    aria: [
-      'Поле — `<button>` с `aria-haspopup="dialog"` и `aria-expanded`; имя — подпись и текущий hex (`aria-labelledby`), без подписи — `aria-label` и hex.',
-      'Панель — `role="dialog"` с именем поля; область и ползунки — `role="slider"` React Aria, ползунки названы `labels.hue` и `labels.alpha`.',
-      'Готовые цвета — `role="radiogroup"` с именем `labels.presets`.',
-      "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`.",
-    ],
-  },
 };

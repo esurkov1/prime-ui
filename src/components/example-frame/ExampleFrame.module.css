@@ -282,6 +282,31 @@
   min-width: 0;
 }
 
+/*
+ * Wide matrix (variants, sizes and states of specimens as wide as their container: Tabs, a
+ * toolbar, a table): the same rows of labelled cells, one cell under another, each as wide as the
+ * stage up to the stack measure (640, `10 × --prime-space-16`), its caption under it.
+ */
+.previewInner[data-preview-layout="matrix-wide"] {
+  align-items: stretch;
+  gap: var(--prime-space-6);
+}
+
+.previewInner[data-preview-layout="matrix-wide"] > * {
+  display: contents;
+}
+
+.previewInner[data-preview-layout="matrix-wide"] > * > * {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--prime-space-2);
+  width: 100%;
+  min-width: 0;
+  max-width: calc(var(--prime-space-16) * 10);
+  margin-inline: auto;
+}
+
 .previewInner[data-preview-layout="stack"] > [data-preview-stretch] {
   align-self: stretch;
   max-width: none;

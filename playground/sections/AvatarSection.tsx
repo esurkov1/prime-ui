@@ -56,12 +56,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      "`alt` у `Avatar.Image` пустой, когда имя написано рядом, иначе — имя. Без фото и без имени рядом — `aria-label` на `Avatar.Root`.",
-      '`Avatar.Status` — `role="img"` с `aria-label` из `labels`. У каждого состояния своя форма (сплошная точка, полумесяц, точка с чертой, пустое кольцо): присутствие не передаётся одним цветом.',
-      '`Avatar.Group` — `role="group"`, задайте ему `aria-label`; `Avatar.Overflow` — `aria-label` («Ещё 3 участника»).',
-    ],
-  },
 };

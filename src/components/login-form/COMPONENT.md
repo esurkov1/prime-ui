@@ -125,9 +125,13 @@ Root carries `data-size`, `data-align` and `data-flat`.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The title is a real heading (`h1` by default) and the form is a native `<form>`: Enter submits.
 - The logo is decorative; with an `aria-label` it is the product mark image (`role="img"`).
 - Give `LoginForm.Form` an `aria-label` (or `aria-labelledby` pointing to the title id) so the form is a landmark.

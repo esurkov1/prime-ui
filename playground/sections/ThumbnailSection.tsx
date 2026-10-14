@@ -80,24 +80,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Tab",
-        action:
-          "Фокус на превью-кнопке (`asChild`) или выбираемой плитке; простое превью не фокусируется.",
-      },
-      {
-        keys: "Enter · Space",
-        action: "Открывает объект (`asChild`) или переключает выбор плитки.",
-      },
-    ],
-    aria: [
-      'Рядом с названием превью декоративно: `alt=""` (по умолчанию), иконки подложки — `aria-hidden`.',
-      'Без названия рядом: осмысленный `alt` у `Thumbnail.Image` или `role="img"` + `aria-label` на корне для превью без картинки.',
-      "Превью, открывающее объект, — `asChild` на `<button>` или `<a>` с именем (`aria-label`, если на нём только картинка).",
-      'Выбираемая плитка — `<button role="checkbox">` с `aria-checked`; галочка `Checkbox.Indicator` скрыта от чтения, выбор не передаётся только цветом.',
-      "`Thumbnail.Video` назовите `aria-label`; знак воспроизведения и длительность — подсказки на тени `media`. При `prefers-reduced-motion` ролик с `autoPlay` стоит на первом кадре.",
-    ],
-  },
 };

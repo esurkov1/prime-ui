@@ -116,4 +116,27 @@ export const api: ComponentApi = {
       ru: "`aria-label` кнопки закрытия.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Actions and the close button are regular buttons in Tab order.",
+        ru: "Действия и кнопка закрытия — обычные кнопки в порядке Tab.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The banner has no role of its own: give an error after an action `role="alert"`, a calm status `role="status"`, a page strip `role="region"` with `aria-label`.',
+        ru: 'Сам баннер без роли: ошибкам после действия задайте `role="alert"`, спокойным статусам — `role="status"`, полосе страницы — `role="region"` с `aria-label`.',
+      },
+      {
+        en: "The icon is `aria-hidden`: the title carries the meaning, not the color.",
+        ru: "Иконка скрыта (`aria-hidden`): смысл несёт заголовок, а не цвет.",
+      },
+      {
+        en: "The close button is named by `labels.dismiss`. It leaves with the banner, so after dismissing the parent moves focus to a sensible place: the control that takes the banner's spot, or the next heading or action of the section (see `dismissible.tsx`).",
+        ru: "Кнопка закрытия названа `labels.dismiss` и уходит вместе с баннером: после закрытия родитель переводит фокус в разумное место — на элемент, занявший место баннера, или на следующий заголовок или действие раздела.",
+      },
+    ],
+  },
 };

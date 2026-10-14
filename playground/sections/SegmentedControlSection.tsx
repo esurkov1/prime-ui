@@ -73,25 +73,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "ArrowRight · ArrowDown",
-        action: "Следующий вариант по кругу, пропуская неактивные; фокус и выбор двигаются вместе.",
-      },
-      { keys: "ArrowLeft · ArrowUp", action: "Предыдущий вариант." },
-      { keys: "Home · End", action: "Первый и последний доступный вариант." },
-      {
-        keys: "Tab",
-        action: "Входит в группу на выбранном варианте (или первом доступном) и выходит из неё.",
-      },
-    ],
-    aria: [
-      'Дорожка — `role="radiogroup"`: её называет `label` (`aria-labelledby`), иначе задайте `aria-label`; при `disabled` — `aria-disabled`.',
-      "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`, `required` — `aria-required`.",
-      'Варианты — `<button role="radio" aria-checked>` с перемещаемым `tabIndex`.',
-      "В двухстрочном сегменте имя — подпись и счётчик, описание — `aria-describedby`.",
-      "Иконки скрыты (`aria-hidden`); сегменту только с иконкой нужен `aria-label`.",
-    ],
-  },
 };

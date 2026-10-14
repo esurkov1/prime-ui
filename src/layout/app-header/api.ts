@@ -141,4 +141,36 @@ export const api: ComponentApi = {
       ru: "Имя `AppHeader.MenuButton`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves through the menu button, the path links and the page's buttons in reading order, then the page tools in the second row.",
+        ru: "Проходит по кнопке меню, ссылкам пути и кнопкам страницы в порядке чтения, затем по инструментам страницы во второй строке.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Presses the focused button: opens the menu or runs the action.",
+        ru: "Нажимает кнопку: открывает меню или выполняет действие.",
+      },
+    ],
+    aria: [
+      {
+        en: "Root is a `<header>`: the banner landmark when it sits at the top level of the page.",
+        ru: "Root — ориентир `<header>` (banner), когда стоит на верхнем уровне страницы.",
+      },
+      {
+        en: "MenuButton is named by `labels.menu`; pass `aria-expanded` (whether the Sidebar is open).",
+        ru: "MenuButton названа `labels.menu`; передайте `aria-expanded` — открыт ли Sidebar.",
+      },
+      {
+        en: "The name of `AppHeader.Title` is the page heading `<h1>`; the description sits next to it, outside its accessible name. One `<h1>` per page: in the header on app pages, `PageContent.Title` on a document page (whose header has no title).",
+        ru: "Название `AppHeader.Title` — заголовок страницы `<h1>`; описание остаётся вне его имени. Один `<h1>` на странице: в шапке на страницах приложения, `PageContent.Title` на странице-документе (тогда в шапке нет заголовка).",
+      },
+      {
+        en: "`AppHeader.Tools` follows the title row in the DOM, so Tab and screen readers meet the page tools after the header's own buttons.",
+        ru: "`AppHeader.Tools` стоит в DOM после строки заголовка, поэтому Tab проходит строку заголовка, затем инструменты страницы.",
+      },
+    ],
+  },
 };

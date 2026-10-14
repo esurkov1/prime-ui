@@ -1,5 +1,4 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
@@ -175,7 +174,12 @@ export const api: ComponentApi = {
           en: "Name of the input and the list when there is no `label`.",
           ru: "Имя поля и списка, если нет `label`.",
         },
-        FIELD_ROOT_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
       ],
     },
   ],
@@ -259,4 +263,65 @@ export const api: ComponentApi = {
       ru: "Приглушённая пометка после подписи при `optional`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "ArrowDown · ArrowUp",
+        en: "Open the list (when it has something to show) and move the highlight over the options.",
+        ru: "Открывают список и двигают подсветку по опциям.",
+      },
+      {
+        keys: "Enter",
+        en: "Tick or untick the highlighted option (the first one when nothing is highlighted); on the Create row, create the tag; in the row menu's name field, save the new name and close the menu.",
+        ru: "Отмечает или снимает подсвеченную опцию; на строке «Создать» — создаёт тег; в поле имени меню строки — сохраняет имя и закрывает меню.",
+      },
+      {
+        keys: "Space",
+        en: "Types a space: a tag may have several words.",
+        ru: "Печатает пробел: в теге может быть несколько слов.",
+      },
+      {
+        keys: "Backspace",
+        en: "In an empty input removes the last tag; on a tag removes it and focuses the previous tag.",
+        ru: "В пустом поле удаляет последний тег; на теге удаляет его, фокус уходит на предыдущий тег, а если тегов не осталось — в поле.",
+      },
+      {
+        keys: "ArrowLeft · ArrowRight",
+        en: "From the start of the input move focus over the tags and back to the input.",
+        ru: "Из начала поля переводят фокус по тегам и обратно в поле.",
+      },
+      {
+        keys: "Delete",
+        en: "On a tag removes it; focus moves to the next tag, or to the input when none is left.",
+        ru: "На теге удаляет его; фокус уходит на следующий тег, а если тегов не осталось — в поле.",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the row «⋯» menu if it is open, otherwise the list.",
+        ru: "Закрывает меню «⋯» строки, если оно открыто, иначе список.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The input is `role="combobox"` with `aria-expanded` and `aria-controls`; the list is `role="listbox"` with `aria-multiselectable`, options are `role="option"` with `aria-selected`.',
+        ru: 'Поле ввода — `role="combobox"` с `aria-expanded` и `aria-controls`; список — `role="listbox"` с `aria-multiselectable`, опции — `role="option"` с `aria-selected`.',
+      },
+      {
+        en: "The highlight goes through `aria-activedescendant`; the checkbox in a row is decorative.",
+        ru: "Подсветка — через `aria-activedescendant`; чекбокс в строке декоративен.",
+      },
+      {
+        en: "A removal is announced with `labels.removed` in a live region; the remove button is named by `labels.remove`.",
+        ru: "Удаление тега объявляется через `labels.removed` в живой области; у кнопки удаления — имя `labels.remove`.",
+      },
+      {
+        en: "A tag being created has `aria-busy` on its chip, a row whose rename or recolor is saved has a busy «⋯»; a refused creation or change is announced with `labels.createFailed` / `labels.updateFailed`.",
+        ru: "Пока новый тег сохраняется (промис из `onCreate`), у его чипа `aria-busy`; отказ объявляется через `labels.createFailed`.",
+      },
+      {
+        en: "The hint and the error are linked by `aria-describedby`; the error sets `aria-invalid`.",
+        ru: "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`.",
+      },
+    ],
+  },
 };

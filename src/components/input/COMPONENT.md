@@ -227,6 +227,8 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Focuses the field, then the segments at its end (clear, copy, reveal, actions). |
@@ -235,6 +237,8 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 | `Escape` | With `onCommit`: puts the committed value back. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `label` renders a `<label htmlFor>` bound to the input. Without `label`, set `aria-label` on `Input.Field`. A placeholder never replaces the label.
 - Hint and error are linked through `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.
 - `Input.Icon`, `Input.Affix`, `Input.InlineAffix` are `aria-hidden`: put the meaning in the label (e.g. "Сумма, ₽").

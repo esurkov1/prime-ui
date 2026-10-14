@@ -89,12 +89,16 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves between the arrows and the page numbers. |
 | `Enter` · `Space` | Opens the focused page. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - A `<nav>` landmark named by `labels.nav`.
 - The current page has `aria-current="page"`; every page button is named by `labels.page` («Страница 3»).
 - The edge arrows are `disabled`; the ellipsis is `aria-hidden`.

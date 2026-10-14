@@ -73,20 +73,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "Tab", action: "Переходит по значениям панели и их «−» (появляется при фокусе)." },
-      { keys: "Enter · Space", action: "Показывает только это значение; повтор снимает выбор." },
-      { keys: "Shift + Enter", action: "Скрывает значение." },
-      { keys: "Enter · Escape", action: "В поле поиска закрывают панель." },
-    ],
-    aria: [
-      'Кнопка фильтра — `aria-expanded`, `aria-haspopup="dialog"`; панель — немодальный `role="dialog"` со скрытым заголовком `labels.filter`.',
-      "Значения — переключатели с `aria-pressed`; у «−» своё имя (`labels.hideValue` / `labels.unhideValue`); скрытое значение несёт текст «НЕ», смысл не только в цвете.",
-      'Поля без совпадений при поиске объявляются через `role="status"`.',
-      "Границы диапазона — поля ввода с именами `labels.fromLabel` / `labels.toLabel` («Сумма, от»); перевёрнутый диапазон помечает оба `aria-invalid`.",
-      'Группа значений — `role="group"` с именем из `group`.',
-      "Каждый тег фильтра удаляется кнопкой с именем `labels.remove`.",
-    ],
-  },
 };

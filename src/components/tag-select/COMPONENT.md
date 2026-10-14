@@ -115,6 +115,8 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `ArrowDown` · `ArrowUp` | Open the list (when it has something to show) and move the highlight over the options. |
@@ -126,6 +128,8 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | `Escape` | Closes the row «⋯» menu if it is open, otherwise the list. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The input is `role="combobox"` with `aria-expanded` and `aria-controls`; the list is `role="listbox"` with `aria-multiselectable`, options are `role="option"` with `aria-selected`.
 - The highlight goes through `aria-activedescendant`; the checkbox in a row is decorative.
 - A removal is announced with `labels.removed` in a live region; the remove button is named by `labels.remove`.

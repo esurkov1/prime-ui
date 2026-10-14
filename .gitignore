@@ -43,3 +43,6 @@ pnpm-debug.log*
 
 # A local consumer app of the kit
 platform/
+
+# Editor and script backups
+*.bak

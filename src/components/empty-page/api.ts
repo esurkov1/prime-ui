@@ -50,7 +50,7 @@ export const api: ComponentApi = {
         {
           name: "tone",
           type: '"neutral" | "accent" | "danger"',
-          default: "the root's `tone`",
+          defaultNote: { en: "the root's `tone`", ru: "`tone` корня" },
           en: "`neutral` — no data yet, `accent` — a first run and a call to start, `danger` — a failed load.",
           ru: "`neutral` — данных пока нет, `accent` — первый запуск и призыв начать, `danger` — ошибка загрузки.",
         },
@@ -124,4 +124,31 @@ export const api: ComponentApi = {
       ru: "Текст `EmptyPage.RetryButton`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter · Space",
+        en: "On `EmptyPage.RetryButton`: retry the load; while the retry runs the button is loading and ignores presses.",
+        ru: "На `EmptyPage.RetryButton` — повторить загрузку; пока повтор идёт, кнопка в состоянии загрузки и не нажимается.",
+      },
+    ],
+    aria: [
+      {
+        en: '`tone="danger"` makes the root `role="alert"`, so the failure is announced when it appears; a `role` you pass replaces it.',
+        ru: '`tone="danger"` делает корень `role="alert"` — ошибка объявляется, когда появляется; свой `role` заменяет его.',
+      },
+      {
+        en: "The title is an `<h2>` (`as` picks `h3` / `h4` by the outline, `p` inside menus, lists and table cells); link the root to it with `aria-labelledby` when the empty state replaces a whole region.",
+        ru: "Заголовок — `<h2>` (`as` выбирает `h3` / `h4` по структуре, `p` внутри меню, списков и ячеек таблицы); свяжите с ним корень через `aria-labelledby`, когда пустое состояние заменяет целую область.",
+      },
+      {
+        en: 'In a filtered menu or list set `role="status"`, so screen readers announce «Ничего не найдено».',
+        ru: 'В фильтруемом меню или списке задайте `role="status"`, чтобы скринридер объявил «Ничего не найдено».',
+      },
+      {
+        en: "The icon is decorative: pass it with `aria-hidden`.",
+        ru: "Иконка декоративна: передавайте её с `aria-hidden`.",
+      },
+    ],
+  },
 };

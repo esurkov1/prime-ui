@@ -254,6 +254,8 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` · `Space` · `ArrowDown` · `ArrowUp` | On the trigger open the list; focus moves into the search or the list. |
@@ -266,6 +268,8 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | `Tab` | Returns focus to the trigger, closes the list and moves on from the trigger. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The trigger is `role="combobox"` with `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`; `label` names it.
 - The list is `role="listbox"` (`aria-multiselectable` with `multiple`); options are `role="option"` with `aria-selected`; the highlight goes through `aria-activedescendant`.
 - The hint and the error are linked by `aria-describedby`; the error sets `aria-invalid`; loading sets `aria-busy`.

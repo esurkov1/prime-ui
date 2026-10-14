@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Message } from "@/components/message/Message";
 import { claimPlayback, releasePlayback } from "@/internal/mediaSession";
@@ -408,10 +408,10 @@ describe("getWaveform", () => {
     });
   }
 
-  beforeAll(() => {
+  // Globals are unstubbed after every test (`unstubGlobals`), so each test stubs its own.
+  beforeEach(() => {
     vi.stubGlobal("AudioContext", FakeAudioContext);
   });
-  afterAll(() => vi.unstubAllGlobals());
 
   it("decodes a blob into peak levels 0…1, the loudest at 1, and closes its context", async () => {
     const blob = new Blob([new Uint8Array(16)], { type: "audio/ogg" });

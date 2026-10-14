@@ -197,6 +197,8 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves to the list items (with `handle`, to the grips). |
@@ -205,6 +207,8 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | `Escape` | Cancels a drag in flight. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - A live region (`role="status"`, `aria-live="polite"`) announces grabbed, dropped, returned, cancelled, «position N of M», a move to another list by its name and a refusal with its reason, from `labels`.
 - Every draggable item has `aria-roledescription` and `aria-keyshortcuts` (with the across keys in linked lists) and is in the tab order (`tabIndex={0}`); with `handle` the grip takes focus instead. The clone is `aria-hidden`.
 - In lists sharing a `kind`, Alt + the across arrows move the item to the same row of the neighbouring list in document order; focus follows the item.

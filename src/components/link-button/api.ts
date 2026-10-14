@@ -51,4 +51,36 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter",
+        en: "Follows the link (native `<a>`).",
+        ru: "Переходит по ссылке (нативное поведение `<a>`).",
+      },
+      {
+        keys: "Tab",
+        en: "Moves focus; a disabled link is skipped.",
+        ru: "Переводит фокус; неактивная ссылка пропускается.",
+      },
+    ],
+    aria: [
+      {
+        en: "A native `<a>`: announced as a link, named by its text.",
+        ru: "Нативный `<a>`: объявляется как ссылка, имя — её текст.",
+      },
+      {
+        en: 'The disabled state is a non-focusable `<a role="link" aria-disabled="true">` without `href`; it keeps `id` and `aria-*`.',
+        ru: 'Неактивная ссылка — `<a role="link" aria-disabled="true">` без `href`, вне порядка фокуса.',
+      },
+      {
+        en: "With `asChild` the child gives the role and name: a router link, or a `<button>` for an action.",
+        ru: "С `asChild` роль и имя даёт вложенный элемент: ссылка роутера или `<button>` для действия.",
+      },
+      {
+        en: "Icons are decorative; say «новая вкладка» in the text or `aria-label` for external links.",
+        ru: "Иконки декоративные; о новой вкладке скажите в тексте или в `aria-label`.",
+      },
+    ],
+  },
 };

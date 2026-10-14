@@ -107,6 +107,8 @@ One look. The circle is the video; the play disk and the pills stand on the medi
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus: the play disk (or the transfer disk), the transcript button. |
@@ -117,6 +119,8 @@ One look. The circle is the video; the play disk and the pills stand on the medi
 | `Home` · `End` | On the disk: to the start or the end. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The root is `role="group"` named by `labels.player` (or your `aria-label`).
 - The play disk is a button named `labels.play` / `labels.pause`, described by the duration (`labels.duration`) or the position (`labels.position`) and `labels.unplayed`; the pills are `aria-hidden`, and the press area over the whole circle is a pointer aid only (`aria-hidden`).
 - While the note is on its way, failed or not fetched, the play button itself is the transfer, named by the direction (`cancelUpload` / `cancelDownload` described by `uploadProgress` / `downloadProgress`, `retryUpload` / `retryDownload` described by `notSent` / `notReceived`, `download`); its ring is `aria-hidden`; a refused action is announced (`role="status"`).

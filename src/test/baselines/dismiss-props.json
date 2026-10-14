@@ -1,0 +1,8 @@
+[
+  "src/components/message/api.ts: closeOnEscape",
+  "src/components/message/api.ts: closeOnOutsideClick",
+  "src/components/select/api.ts: closeOnEscape",
+  "src/components/select/api.ts: closeOnOutsideClick",
+  "src/components/tag-select/api.ts: closeOnEscape",
+  "src/components/tag-select/api.ts: closeOnOutsideClick"
+]

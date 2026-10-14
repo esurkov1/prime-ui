@@ -99,4 +99,32 @@ export const api: ComponentApi = {
       ru: "Скрытый текст `Breadcrumb.Ellipsis`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves focus between the level links; the current page is not focusable.",
+        ru: "Переводит фокус между ссылками уровней; текущая страница не фокусируется.",
+      },
+      { keys: "Enter", en: "Follows the link.", ru: "Переходит по ссылке." },
+    ],
+    aria: [
+      {
+        en: "`nav` landmark with `aria-label` from `labels.nav`; an ordered list.",
+        ru: "Область `nav` с `aria-label` из `labels.nav` и упорядоченный список `<ol>`.",
+      },
+      {
+        en: 'The current page has `aria-current="page"`; the chevrons are `aria-hidden` spans inside the levels, so every list item is a level.',
+        ru: 'Текущая страница — `aria-current="page"`; шевроны и знак «…» скрыты (`aria-hidden`).',
+      },
+      {
+        en: "Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» reads as `labels.ellipsis`.",
+        ru: "При 3+ уровнях в контейнере уже 30rem средние уровни получают `display: none` — уходят из раскладки, порядка Tab и дерева доступности; на их месте «…», скрытый текст которого (`labels.ellipsis`) читается скринридером.",
+      },
+      {
+        en: "Icon-only links need `aria-label` on the Item.",
+        ru: "Ссылке только с иконкой нужен `aria-label`.",
+      },
+    ],
+  },
 };

@@ -113,4 +113,32 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      { keys: "Tab", en: "Moves focus to the switch.", ru: "Переводит фокус на переключатель." },
+      {
+        keys: "Space",
+        en: "Toggles it (not while `readOnly` or saving).",
+        ru: "Переключает его (кроме `readOnly` и пока идёт сохранение).",
+      },
+    ],
+    aria: [
+      {
+        en: 'A native `<input type="checkbox" role="switch">` (its native checked state is the switch state), visually hidden over the track and wrapped by the `<label>` row.',
+        ru: 'Нативный `<input type="checkbox" role="switch">` без `aria-checked`: состояние переключателя — нативное `checked` поля, его и читает скринридер; поле скрыто поверх дорожки и обёрнут строкой-`<label>`.',
+      },
+      {
+        en: "`aria-invalid`, `aria-readonly` and `aria-describedby` (your ids + the hint or the error) are set on the input.",
+        ru: "`aria-invalid`, `aria-readonly` и `aria-describedby` (ваши id, затем подсказка или ошибка) — на input.",
+      },
+      {
+        en: "Without visible text, name it with `aria-label` or `aria-labelledby` on `Switch.Root`.",
+        ru: "Без видимого текста назовите его через `aria-label` или `aria-labelledby` на `Switch.Root`.",
+      },
+      {
+        en: "While a change is saved (`loading` or a pending promise) the input has `aria-busy`; the thumb's spinner is hidden from assistive tech. A refused save puts the state back — say why with `error`.",
+        ru: "Пока изменение сохраняется (`loading` или промис из `onCheckedChange`), на input `aria-busy`, а спиннер в бегунке скрыт от чтения с экрана; при отказе состояние возвращается, причину покажите через `error`.",
+      },
+    ],
+  },
 };

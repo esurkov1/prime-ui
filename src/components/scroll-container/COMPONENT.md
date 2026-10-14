@@ -130,6 +130,8 @@ The scrollbar thumb uses `fill-strong`, darkening to `fill-strong-hover` on hove
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `↑` · `↓` · `←` · `→` | Scroll the focused region (with `tabIndex={0}`) by a step |
@@ -137,6 +139,8 @@ The scrollbar thumb uses `fill-strong`, darkening to `fill-strong-hover` on hove
 | `Home` · `End` | To the start and to the end |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Renders a plain element; add `tabIndex={0}` and `aria-label` when the region has no focusable content but must scroll from the keyboard (the browser scrolls it; the ring is inset).
 - Choose a semantic `as` (`main`, `nav`, `aside`) when the region is a landmark.
 - `edges` is only decoration: content under a fade or a shadow stays reachable and scrolls by wheel, touch and focus; focus and `scrollIntoView` stop clear of a fade.

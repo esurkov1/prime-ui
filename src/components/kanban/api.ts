@@ -1,19 +1,5 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
 
-const SPAN_REST = {
-  name: "…rest",
-  type: "HTMLAttributes<HTMLSpanElement>",
-  en: "`children`, `className` and the other span attributes.",
-  ru: "`children`, `className` и остальные атрибуты span.",
-};
-
-const DIV_REST = {
-  name: "…rest",
-  type: "HTMLAttributes<HTMLDivElement>",
-  en: "`children`, `className` and the other div attributes.",
-  ru: "`children`, `className` и остальные атрибуты div.",
-};
-
 export const api: ComponentApi = {
   parts: [
     {
@@ -84,7 +70,7 @@ export const api: ComponentApi = {
         {
           name: "defaultColumnOrder",
           type: "readonly string[]",
-          default: "the order of `columns`",
+          defaultNote: { en: "the order of `columns`", ru: "порядок `columns`" },
           en: "Initial column ids in their order (uncontrolled).",
           ru: "Начальный порядок id колонок (неуправляемое).",
         },
@@ -190,31 +176,66 @@ export const api: ComponentApi = {
       name: "Kanban.ItemHeader",
       en: "`ref` → `HTMLDivElement`. Optional top row of a card: the key or project at the start, the last child (a priority `Badge`, an assignee) at the end.",
       ru: "`ref` → `HTMLDivElement`. Необязательная верхняя строка карточки: ключ или проект в начале, последний элемент (`Badge` приоритета, исполнитель) — в конце.",
-      props: [DIV_REST],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "Kanban.ItemTitle · Kanban.ItemDescription",
       en: "`ref` → `HTMLSpanElement`. The card title (medium body text, up to three lines) and the muted meta line under it (id, due date; one line, tabular numbers).",
       ru: "Заголовок карточки (средний текст, до трёх строк) и приглушённая строка меты под ним (id, срок; одна строка, моноширинные цифры).",
-      props: [SPAN_REST],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children`, `className` and the other span attributes.",
+          ru: "`children`, `className` и остальные атрибуты span.",
+        },
+      ],
     },
     {
       name: "Kanban.ItemBadges",
       en: "`ref` → `HTMLDivElement`. A wrapping row of `Badge`s: labels, priority.",
       ru: "Строка `Badge` с переносом: метки, приоритет.",
-      props: [DIV_REST],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "Kanban.ItemFooter",
       en: "`ref` → `HTMLDivElement`. The bottom row: `Kanban.ItemCount`s at the start; the last child, unless a count, sits at the end (the assignee `Avatar`).",
       ru: "Нижняя строка: `Kanban.ItemCount` в начале; последний элемент, если это не счётчик, — в конце (`Avatar` исполнителя).",
-      props: [DIV_REST],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "Kanban.ItemCount",
       en: "`ref` → `HTMLSpanElement`. A small muted counter with a 14 px icon: comments, attachments, subtasks.",
       ru: "Маленький приглушённый счётчик с иконкой 14 px: комментарии, вложения, подзадачи.",
-      props: [SPAN_REST],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children`, `className` and the other span attributes.",
+          ru: "`children`, `className` и остальные атрибуты span.",
+        },
+      ],
     },
   ],
   labels: [
@@ -273,4 +294,67 @@ export const api: ComponentApi = {
       ru: "Озвучивается, когда промис `onColumnOrderChange` отклонён.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves through the cards, column by column.",
+        ru: "Переходит по карточкам колонка за колонкой.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Opens the focused card (`onItemClick`) or follows its link (`getItemHref`).",
+        ru: "Открывает карточку в фокусе (`onItemClick`) или переходит по её ссылке (`getItemHref`).",
+      },
+      {
+        keys: "Alt + ↑ · Alt + ↓",
+        en: "Moves the card one place inside its column.",
+        ru: "Сдвигает карточку на одно место внутри колонки.",
+      },
+      {
+        keys: "Alt + ← · Alt + →",
+        en: 'On a card: moves it to the neighbouring column at the same row (or its end). On a column grip: moves the column one place. Focus follows. The direction follows the writing direction (`dir="rtl"`: ← goes forward).',
+        ru: 'На карточке — переносит её в соседнюю колонку на ту же строку (или в конец); на ручке колонки — сдвигает колонку на одно место. Фокус идёт следом. Направление — по письму: при `dir="rtl"` ← ведёт вперёд.',
+      },
+      {
+        keys: "Escape",
+        en: "Cancels a drag in flight.",
+        ru: "Отменяет перетаскивание в процессе.",
+      },
+    ],
+    aria: [
+      {
+        en: "Every column is a `<ul>` labelled by its heading (`aria-labelledby`) and described by its description and meta (`aria-describedby`); cards are `<li>` with `aria-roledescription` and `aria-keyshortcuts`. The columns are Dnd lists of one kind: Alt + ← / → across them is Dnd's.",
+        ru: "Каждая колонка — `<ul>`, подписанный заголовком колонки (`aria-labelledby`) и описанный подзаголовком (`aria-describedby`); карточки — `<li>` с `aria-roledescription` и `aria-keyshortcuts`.",
+      },
+      {
+        en: "The column grip is a button named «Переместить колонку «…»» with `aria-keyshortcuts`; a keyboard column move is announced with its position («Колонка «…»: позиция 2 из 4», `labels.column`). A locked column has a lock named «Закреплено» instead.",
+        ru: "Ручка колонки — кнопка с именем «Переместить колонку «…»» и `aria-keyshortcuts`; перенос колонки с клавиатуры объявляется позицией. У закреплённой колонки вместо ручки — замок с именем «Закреплено».",
+      },
+      {
+        en: 'A live region (`role="status"`) announces grabbed, dropped, «position N of M», a move to another column by its title and a refusal with its reason (`labels`, Dnd\'s labels).',
+        ru: 'Live-область (`role="status"`) объявляет: взята, перемещена, позиция N из M, перенос в колонку и отказ колонки с причиной (`labels`, подписи Dnd).',
+      },
+      {
+        en: "The count is spoken as text («Карточек: 3 из 5»), not only by colour; a full column also reads `count / limit`.",
+        ru: "Счётчик колонки озвучивается текстом («Карточек: 3 из 5»), а не только цветом; полная колонка ещё и показывает `count / limit`.",
+      },
+      {
+        en: "With `getItemHref` a real `<a>` named by `getLabel` covers the card and is its tab stop: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on the card, Space follows it like Enter, Alt + arrows move the card from it and a press on it drags the card; the release of a drag never follows it. Controls inside the card stand above the link. With `onItemClick` alone the card opens by a click, Enter or Space; a control inside the card never opens it, and a card that opens stays a tab stop on a `disabled` board.",
+        ru: "С `getItemHref` карточку накрывает настоящая ссылка `<a>` с именем из `getLabel` — она и остановка Tab; Alt + стрелки с неё переносят карточку, нажатие тащит её, а отпускание после перетаскивания не переходит по ссылке. С `onItemClick` сама карточка открывается кликом, Enter и Space; контролы внутри карточки её не открывают.",
+      },
+      {
+        en: "Touch: a drag starts after a hold; a finger that moves first scrolls the board.",
+        ru: "Касание: перенос начинается после удержания, движение пальца раньше — обычная прокрутка доски.",
+      },
+      {
+        en: "While loading the root has `aria-busy`; skeletons are hidden from assistive tech.",
+        ru: "Пока идёт загрузка, у доски `aria-busy`; скелетоны скрыты от чтения с экрана.",
+      },
+      {
+        en: "While a move is saved the card or column has `aria-busy` (its spinner is hidden from assistive tech); a refused save is announced (`labels.moveFailed`, `labels.columnMoveFailed`).",
+        ru: "Пока перенос сохраняется (промис из `onValueChange` / `onColumnOrderChange`), у карточки или колонки `aria-busy`; отказ сервера объявляется (`labels.moveFailed`, `labels.columnMoveFailed`), а карточка или колонка плавно возвращается.",
+      },
+    ],
+  },
 };

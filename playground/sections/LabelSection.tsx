@@ -40,12 +40,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      "Свяжите подпись с нативным контролом через `htmlFor`, с кастомным — через `id` и `aria-labelledby` на контроле.",
-      "`*` скрыта (`aria-hidden`): обязательность сообщает сам контрол (`required`).",
-      "Пометка «необязательно» и `Label.Description` — видимый текст и входят в имя поля; `Label.Icon` скрыт.",
-    ],
-  },
 };

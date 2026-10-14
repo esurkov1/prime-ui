@@ -44,12 +44,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      '`role="separator"`; у вертикального — `aria-orientation="vertical"`.',
-      'Чисто визуальная линия (между строками, которые и так разделены) — `role="presentation"`.',
-      "Подпись читается как текст разделителя; у разделителя с одной иконкой задайте `aria-label`.",
-    ],
-  },
 };

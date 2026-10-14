@@ -397,4 +397,102 @@ export const api: ComponentApi = {
       ru: "Имя кнопки закрытия правки.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter",
+        en: "In the field sends the message; on a touch screen breaks the line.",
+        ru: "В поле отправляет сообщение; на сенсорном экране переносит строку.",
+      },
+      { keys: "Shift + Enter", en: "Breaks the line.", ru: "Переносит строку." },
+      {
+        keys: "Mod + Enter",
+        en: "Always sends, on a touch screen too.",
+        ru: "Отправляет всегда, и на сенсорном экране.",
+      },
+      {
+        keys: "↑",
+        en: "In an empty field opens your last message for editing (`onEditLast`).",
+        ru: "В пустом поле открывает последнее своё сообщение для правки.",
+      },
+      {
+        keys: "Escape",
+        en: "Clears a selection with the toolbar, then cancels the reply or edit; while recording throws the recording away and stops there, so an enclosing Modal or Drawer stays open.",
+        ru: "Снимает выделение с панелью форматирования, затем отменяет ответ или правку; во время записи удаляет её и не доходит до окна вокруг (Modal, Drawer).",
+      },
+      {
+        keys: "Mod + B · Mod + I · Mod + Shift + X · Mod + E · Mod + Shift + H · Mod + K · Mod + Shift + 9",
+        en: "Bold, italic, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works.",
+        ru: "Жирный, курсив, зачёркнутый, код, скрытый текст, ссылка и цитата для выделения.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "On the record button: record hands-free at once. During a hands-free recording, wherever the focus is in the composer: Enter sends the recording (a paused one too), Space pauses and resumes it — the timer and the waveform stand, the dot turns into a pause glyph.",
+        ru: "На кнопке записи сразу начинают запись без удержания. Во время записи без удержания, где бы ни был фокус в композере: Enter отправляет запись (и приостановленную), Space приостанавливает и продолжает её — таймер и волна стоят, точка становится знаком паузы.",
+      },
+      {
+        keys: "↑ · ↓",
+        en: "On the record button, with voice and video both offered: switches voice and video (`aria-keyshortcuts`, named in the button's description).",
+        ru: "На кнопке записи, когда предложены и голос, и видео: переключают голос и видео (`aria-keyshortcuts`, названы в описании кнопки).",
+      },
+      {
+        keys: "← · →",
+        en: "Move between the formatting buttons.",
+        ru: "Переходят по кнопкам панели форматирования.",
+      },
+      {
+        keys: "Home · End",
+        en: "Jump to the first / last formatting button.",
+        ru: "Переходят к первой / последней кнопке панели форматирования.",
+      },
+      {
+        keys: "Alt + ← · Alt + →",
+        en: "On a tile of the tray: moves the attachment one place.",
+        ru: "На плитке вложения сдвигают её на одно место.",
+      },
+      {
+        keys: "Delete · Backspace",
+        en: "On a tile of the tray: removes the attachment; focus moves to its neighbour.",
+        ru: "На плитке вложения убирают его; фокус переходит на соседнюю плитку.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The composer is a `<form>` named «Новое сообщение»; the field is a `<textarea>` named «Сообщение» with `enterkeyhint="send"` (`enter` on touch).',
+        ru: "Композер — `<form>` с именем «Новое сообщение»; поле — `<textarea>` с именем «Сообщение».",
+      },
+      {
+        en: "A reply / edit bar describes the field (`aria-describedby`); when it appears after the first render the caret moves to the field. Its close button is «Отменить ответ» / «Отменить редактирование». A send that went through closes it.",
+        ru: "Плашка ответа или правки описывает поле (`aria-describedby`); у её кнопки закрытия имя «Отменить ответ» / «Отменить редактирование». Отправка, которая прошла, закрывает плашку.",
+      },
+      {
+        en: 'The formatting toolbar is `role="toolbar"` with one Tab stop and arrow keys; every button has `aria-keyshortcuts` and a tooltip with its keys (`⌘B` on Apple systems, `Ctrl+B` elsewhere).',
+        ru: 'Панель форматирования — `role="toolbar"` с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами.',
+      },
+      {
+        en: "The action button is named by what it does — «Отправить», «Сохранить», «Записать голосовое», «Записать видеосообщение», «Отправить запись» — and described by how to record. While sending it is `aria-busy` and the field is read-only.",
+        ru: "Кнопка отправки меняет имя по состоянию: «Отправить», «Сохранить», «Записать голосовое», «Записать видеосообщение», «Отправить запись»; способ записи — в её описании. Во время отправки она `aria-busy`, поле только для чтения.",
+      },
+      {
+        en: 'A live region (`role="status"`) announces a recording started, locked, deleted and sent, and the record mode after a switch («Голосовое сообщение» / «Видеосообщение»); a refused microphone is a `role="alert"` message that also describes the field, never a thrown error.',
+        ru: 'Live-область (`role="status"`) объявляет начало, закрепление, удаление и отправку записи, а после переключения — режим («Голосовое сообщение» / «Видеосообщение»); ошибка доступа к микрофону — `role="alert"`, она же описывает поле.',
+      },
+      {
+        en: 'While recording the paperclip and the field are `inert` under the bar; the bar\'s buttons are «Удалить запись» and «Приостановить запись» / «Продолжить запись» (`aria-keyshortcuts="Space"`), the action button «Отправить запись». Deleting brings the focus back to the action button. Pause and resume are announced. The timer and the waveform are decorative. While a finger holds a recording only `Escape` works (it throws the recording away); the delete and pause buttons keep their own Enter and Space.',
+        ru: 'Во время записи скрепка и поле `inert` под полосой записи; у её кнопок имена «Удалить запись» и «Приостановить запись» / «Продолжить запись» (`aria-keyshortcuts="Space"`), после удаления фокус возвращается на кнопку действия. Пауза и продолжение объявляются в live-области. Таймер и волна декоративны. Пока палец держит запись, клавиши не действуют.',
+      },
+      {
+        en: "The attachments are one `<ul>` named «Вложения» (FileUpload.Queue `layout=\"strip\"`): every tile is «Фото N: name» / «Видео N: name» / «Файл N: name» with its upload state, `aria-keyshortcuts` for `Alt + ←` / `→` and `Delete`, a remove button «Убрать name»; the upload disk is a `progressbar` while the file goes up. Moves are announced by Dnd's live region, finished and failed files by the queue's. «Отправить как файлы, без сжатия» is a labelled Checkbox.",
+        ru: 'Вложения — один `<ul>` с именем «Вложения» (FileUpload.Queue `layout="strip"`): каждая плитка — «Фото N: имя» / «Видео N: имя» / «Файл N: имя» с состоянием загрузки, `aria-keyshortcuts` для `Alt + ←` / `→` и `Delete`, кнопкой «Убрать имя»; диск загрузки — `progressbar`, пока файл уходит. Перестановки объявляет live-область Dnd, готовые и сорвавшиеся файлы — область очереди. «Отправить как файлы, без сжатия» — Checkbox с подписью.',
+      },
+      {
+        en: "Touch: the buttons get a 44 px hit area; Enter breaks the line, the button sends.",
+        ru: "Касание: кнопки получают область нажатия 44 px; Enter переносит строку, отправка — кнопкой.",
+      },
+      {
+        en: "Voice and video together: a single press records without holding, a double press (within 300 ms) switches the mode. The first press records silently until the window ends, so a double press shows no recording and sends nothing.",
+        ru: "Голос и видео вместе: одиночное нажатие пишет без удержания, двойное (в пределах 300 мс) переключает режим. Первое нажатие пишет незаметно до конца окна, поэтому двойное не показывает записи и ничего не отправляет.",
+      },
+    ],
+  },
 };

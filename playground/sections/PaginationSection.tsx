@@ -45,16 +45,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "Tab", action: "Переходит между стрелками и номерами страниц." },
-      { keys: "Enter · Space", action: "Открывает страницу под фокусом." },
-    ],
-    aria: [
-      "`<nav>` с именем из `labels.nav`.",
-      'Текущая страница — `aria-current="page"`; у каждой кнопки имя из `labels.page` («Страница 3»).',
-      "Стрелки на краях отключены (`disabled`), многоточие скрыто от скринридеров.",
-      "В компактном виде «3 / 12» читается как «3 из 12» (`labels.of`).",
-    ],
-  },
 };

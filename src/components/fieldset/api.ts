@@ -43,4 +43,27 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves through the group's fields; the fields of a disabled group are skipped.",
+        ru: "Проходит по полям группы; в выключенной группе поля пропускаются.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The native `<fieldset>` is a group (`role="group"`) named by the `<legend>` text from `label`; without a heading give it `aria-label`.',
+        ru: 'Нативный `<fieldset>` — группа (`role="group"`), её имя — текст `<legend>` из `label`; без заголовка задайте `aria-label`.',
+      },
+      {
+        en: "`description` is linked to the group through `aria-describedby`.",
+        ru: "`description` связан с группой через `aria-describedby`.",
+      },
+      {
+        en: "`disabled` disables the native controls inside and passes a context to kit controls: they set their own `disabled` / `aria-disabled` and drop out of the Tab order.",
+        ru: "`disabled` выключает нативные контролы внутри и передаёт контекст контролам кита: они ставят свои `disabled` / `aria-disabled` и пропускаются при навигации.",
+      },
+    ],
+  },
 };

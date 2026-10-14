@@ -44,4 +44,21 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: '`role="separator"`; vertical sets `aria-orientation="vertical"`.',
+        ru: '`role="separator"`; у вертикального — `aria-orientation="vertical"`.',
+      },
+      {
+        en: 'A purely visual line between rows that are separate anyway → `role="presentation"`.',
+        ru: 'Чисто визуальная линия (между строками, которые и так разделены) — `role="presentation"`.',
+      },
+      {
+        en: "The label is read as the separator's text; an icon-only divider needs `aria-label`.",
+        ru: "Подпись читается как текст разделителя; у разделителя с одной иконкой задайте `aria-label`.",
+      },
+    ],
+  },
 };

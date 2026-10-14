@@ -138,4 +138,37 @@ export const api: ComponentApi = {
       ru: "Текст для скринридеров, когда все сегменты равны 0.",
     },
   ],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: 'Value mode: the svg is `role="progressbar"` with `aria-valuenow` / `-min` / `-max`; a string or number child becomes `aria-valuetext`. With `value={null}` there is no `aria-valuenow` — the share is unknown.',
+        ru: 'Режим значения: svg с `role="progressbar"` и `aria-valuenow` / `-min` / `-max`; строка или число в центре — `aria-valuetext`. С `value={null}` `aria-valuenow` нет — доля неизвестна.',
+      },
+      {
+        en: "The turn never stops under reduced motion (twice as slow): it is the only sign the work goes on.",
+        ru: "Вращение не останавливается и при reduced motion (оборот вдвое медленнее): это единственный знак, что работа идёт.",
+      },
+      {
+        en: 'Segments mode: the svg is `role="group"`; with `aria-label` it is described by the distribution («Видео: 38%, Документы: 21%») or by the legend, without it the distribution is its name.',
+        ru: 'Режим сегментов: svg с `role="group"`; с `aria-label` доли — описание (с `legend` — сама легенда), без него доли — имя.',
+      },
+      {
+        en: "A category color always sits beside its name in the legend, so color is never the only cue.",
+        ru: "Цвет категории всегда стоит рядом с её названием в легенде — смысл не передаётся только цветом.",
+      },
+      {
+        en: "While `loading` the root is `aria-busy` and the Skeletons are `aria-hidden`.",
+        ru: "Во время `loading` корень помечен `aria-busy`, заглушки скрыты от скринридеров.",
+      },
+      {
+        en: "Always pass `aria-label`: a caption next to the ring is not linked to it.",
+        ru: "Всегда передавайте `aria-label`: подпись рядом с кольцом с ним не связана.",
+      },
+      {
+        en: "The inner text is `aria-hidden` when it is already the `aria-valuetext`.",
+        ru: "Текст в центре скрыт (`aria-hidden`), когда он уже стал `aria-valuetext`.",
+      },
+    ],
+  },
 };

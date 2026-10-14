@@ -526,4 +526,86 @@ export const api: ComponentApi = {
       ru: "Вежливо объявляется, пока переписка загружается впервые (`Chat.Messages loading`).",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Enters the list on the last (or last focused) message, then its buttons and links",
+        ru: "Входит в ленту на последнем (или последнем выбранном) сообщении, дальше — в его кнопки и ссылки",
+      },
+      {
+        keys: "↑ · ↓",
+        en: "Moves to the previous / next message",
+        ru: "Переходит к предыдущему / следующему сообщению",
+      },
+      {
+        keys: "Home · End",
+        en: "Moves to the first / last message",
+        ru: "Переходит к первому / последнему сообщению",
+      },
+      {
+        keys: "Space · Shift+Space",
+        en: "In selection mode toggles the focused message; with Shift the range from the last toggled",
+        ru: "В режиме выбора переключает сообщение; с Shift — диапазон от последнего отмеченного",
+      },
+      {
+        keys: "Enter",
+        en: "In the search field goes to the older match; on a message opens its menu; in selection mode toggles the message (`Shift+Enter` — the range)",
+        ru: "В поле поиска — к более старому совпадению; на сообщении открывает его меню; в режиме выбора переключает сообщение (`Shift+Enter` — диапазон)",
+      },
+      {
+        keys: "L · R",
+        en: "On a focused message: the quick reaction / the reaction bar (see Message)",
+        ru: "На сообщении в фокусе: быстрая реакция / панель реакций (см. Message)",
+      },
+      {
+        keys: "ContextMenu · Shift+F10",
+        en: "Opens the focused message's menu",
+        ru: "Открывает меню сообщения в фокусе",
+      },
+      {
+        keys: "Escape",
+        en: "In the search field closes the search and returns the focus to `Chat.SearchButton`; in the list leaves selection mode",
+        ru: "В поле поиска закрывает поиск и возвращает фокус на `Chat.SearchButton`; в ленте выходит из режима выбора",
+      },
+    ],
+    aria: [
+      {
+        en: 'The list is `role="log"`: new messages are announced politely; its name is `Chat.Title` (`aria-labelledby`), else `labels.messages`, or your `aria-label`. It is one tab stop; the messages carry `aria-posinset` / `aria-setsize`, so the keyboard reaches rows the window does not render. In selection mode it is a `listbox` with `aria-multiselectable`, the messages `option`s with `aria-selected`.',
+        ru: 'Лента — `role="log"`: новые сообщения вежливо объявляются; её имя — `Chat.Title` (`aria-labelledby`), без заголовка — `labels.messages`. В режиме выбора — `listbox` с `aria-multiselectable`, сообщения — `option` с `aria-selected`.',
+      },
+      {
+        en: "`Chat.SearchButton` is a toggle (`aria-pressed`); the search field takes the focus as it opens and keeps it while the chat steps through matches; the place of the match («2 из 5», «Нет совпадений») is announced politely.",
+        ru: "`Chat.SearchButton` — кнопка-переключатель (`aria-pressed`); поле поиска получает фокус при открытии и держит его, пока чат переходит по совпадениям; место совпадения («2 из 5», «Нет совпадений») объявляется вежливо.",
+      },
+      {
+        en: "`Chat.Pinned` is a button named by its content, the title and the line («Закреплённое 2 из 3» + the text); the rail is decorative; «Открепить» is a separate button.",
+        ru: "`Chat.Pinned` — кнопка с именем из её содержимого: заголовок и строка («Закреплённое 2 из 3» + текст); «Открепить» — отдельная кнопка.",
+      },
+      {
+        en: "The «к последним» button is named «К последним сообщениям», with the count «Новых сообщений: N. …»; the badge is `aria-hidden`.",
+        ru: "Кнопка «К последним сообщениям» со счётчиком «Новых сообщений: N»; значок счётчика скрыт от скринридеров.",
+      },
+      {
+        en: "`Chat.SelectionBar` is a `toolbar` named by the count «Выбрано: N», which is announced politely as it changes.",
+        ru: "`Chat.SelectionBar` — `toolbar` с именем «Выбрано: N», которое объявляется по мере изменения.",
+      },
+      {
+        en: "The quick reaction (double tap, `L`) is announced politely.",
+        ru: "На странице звучит одно: голосовое, видеосообщение или видео из чата ставят друг друга на паузу.",
+      },
+      {
+        en: "«Печатает…» in the header is visible text; in the list the typing bubble is a polite `status` «Собеседник печатает».",
+        ru: "«Печатает…» в шапке — видимый текст; в ленте — вежливый `status` «Собеседник печатает».",
+      },
+      {
+        en: "While `loading` the messages' region is `aria-busy`, the placeholders are `aria-hidden`, and «Загрузка сообщений» (`labels.loading`) is announced politely.",
+        ru: "Первая загрузка (`loading`): область ленты — `aria-busy`, заглушки скрыты от скринридеров, «Загрузка сообщений» (`labels.loading`) объявляется вежливо.",
+      },
+      {
+        en: "A message reached by a jump or the current search match is not announced as such: a reply's target takes the focus, a search keeps it in its field; the others stepping back is visual only.",
+        ru: "Сообщение, к которому перешли поиском или закреплённым, не объявляется: фокус остаётся, где был; остальные отступают только визуально.",
+      },
+    ],
+  },
 };

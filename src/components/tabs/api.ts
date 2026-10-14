@@ -1,12 +1,5 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
 
-const SPAN_REST = {
-  name: "…rest",
-  type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
-  en: "`className` and the other span attributes.",
-  ru: "`className` и остальные атрибуты span.",
-};
-
 export const api: ComponentApi = {
   parts: [
     {
@@ -166,7 +159,12 @@ export const api: ComponentApi = {
           en: 'The icon, e.g. `<Icon name="field.calendar" />`.',
           ru: 'Иконка, например `<Icon name="field.calendar" />`.',
         },
-        SPAN_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
     {
@@ -181,7 +179,12 @@ export const api: ComponentApi = {
           en: "Title text.",
           ru: "Текст подписи.",
         },
-        SPAN_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
     {
@@ -203,7 +206,12 @@ export const api: ComponentApi = {
           en: "The number.",
           ru: "Число.",
         },
-        SPAN_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
     {
@@ -218,7 +226,12 @@ export const api: ComponentApi = {
           en: "Second-line text; wrap a key value in `<strong>`.",
           ru: "Текст второй строки; ключевое значение оберните в `<strong>`.",
         },
-        SPAN_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
     {
@@ -269,4 +282,59 @@ export const api: ComponentApi = {
       ru: "Имя кнопки закрытия вкладки; `{label}` — подпись вкладки (её значение, если подпись не текст).",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "ArrowLeft · ArrowRight",
+        en: "Select the neighbouring tab, wrapping and skipping disabled ones; also work in a vertical list.",
+        ru: "Выбирают соседнюю вкладку по кругу, пропуская неактивные; в вертикальном списке тоже работают.",
+      },
+      {
+        keys: "ArrowUp · ArrowDown",
+        en: "The same in a vertical list.",
+        ru: "То же в вертикальном списке.",
+      },
+      {
+        keys: "Home · End",
+        en: "First and last enabled tab.",
+        ru: "Первая и последняя доступная вкладка.",
+      },
+      {
+        keys: "Delete · Backspace",
+        en: "Close a tab with `onRemove`; closing the active tab selects and focuses its neighbour.",
+        ru: "Закрывают вкладку с `onRemove`; если она была активной, выбор и фокус переходят к соседней.",
+      },
+      {
+        keys: "Tab",
+        en: "Enters the active tab (roving tabindex), then moves to the panel.",
+        ru: "Входит в активную вкладку (roving tabindex), затем переходит в панель.",
+      },
+    ],
+    aria: [
+      {
+        en: "WAI-ARIA tabs pattern: `tablist` / `tab` / `tabpanel` with `aria-controls` / `aria-labelledby` wired automatically; give `Tabs.List` an `aria-label`.",
+        ru: "Паттерн WAI-ARIA tabs: `tablist` / `tab` / `tabpanel`, `aria-controls` и `aria-labelledby` связываются сами; дайте `Tabs.List` `aria-label`.",
+      },
+      {
+        en: "Selection follows focus; the panel is focusable (`tabIndex=0`).",
+        ru: "Выбор следует за фокусом; панель фокусируема (`tabIndex=0`).",
+      },
+      {
+        en: "In a two-line tab the accessible name is label (+ count); `Tabs.Description` becomes `aria-describedby`.",
+        ru: "В двухстрочной вкладке имя — подпись и счётчик, `Tabs.Description` — `aria-describedby`.",
+      },
+      {
+        en: "`Tabs.Icon` and `Tabs.Separator` are `aria-hidden`.",
+        ru: "`Tabs.Icon` и `Tabs.Separator` скрыты (`aria-hidden`).",
+      },
+      {
+        en: "When only icons are left, the label stays for screen readers (sr-only) and shows in a `Tooltip` on hover and focus.",
+        ru: "Когда остаются только иконки, подпись остаётся для экранного диктора, а при наведении и фокусе показывается в `Tooltip`.",
+      },
+      {
+        en: 'The close button of a removable tab is named after it (`labels.remove`) and stays out of the Tab order; the tab announces `aria-keyshortcuts="Delete"`.',
+        ru: 'Кнопка закрытия названа по вкладке (`labels.remove`) и не входит в порядок Tab; у вкладки `aria-keyshortcuts="Delete"`.',
+      },
+    ],
+  },
 };

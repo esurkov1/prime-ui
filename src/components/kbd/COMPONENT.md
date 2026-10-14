@@ -68,9 +68,13 @@ Minimum width equals the height, so single-character keys are square.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Renders a native `<kbd>`; its text is read as is.
 - Symbol keys (⌘ ⌥ ⇧ ↵) need `aria-label` and `title` («Command», «Shift»).
 - A visual «+» between keys gets `aria-hidden="true"`.

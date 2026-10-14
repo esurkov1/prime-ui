@@ -37,12 +37,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      "Нативный `<kbd>`: текст клавиши читается как есть.",
-      "Символьным клавишам (⌘ ⌥ ⇧ ↵) нужны `aria-label` и `title` («Command», «Shift»).",
-      'Визуальный «+» между клавишами — `aria-hidden="true"`.',
-    ],
-  },
 };

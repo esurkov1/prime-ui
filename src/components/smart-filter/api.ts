@@ -324,4 +324,50 @@ export const api: ComponentApi = {
       ru: "Значение тега диапазона только с верхней границей.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves through the panel values and their «−» (shown on focus).",
+        ru: "Переходит по значениям панели и их «−» (появляется при фокусе).",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Shows only this value; pressing again clears it.",
+        ru: "Показывает только это значение; повтор снимает выбор.",
+      },
+      { keys: "Shift + Enter", en: "Hides the value.", ru: "Скрывает значение." },
+      {
+        keys: "Enter · Escape",
+        en: "In the search, close the panel.",
+        ru: "В поле поиска закрывают панель.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The filter button has `aria-expanded` and `aria-haspopup="dialog"`; the panel is a non-modal `role="dialog"` named by a visually hidden `labels.filter` title.',
+        ru: 'Кнопка фильтра — `aria-expanded`, `aria-haspopup="dialog"`; панель — немодальный `role="dialog"` со скрытым заголовком `labels.filter`.',
+      },
+      {
+        en: "Values are toggle buttons with `aria-pressed`; the «−» has its own name (`labels.hideValue` / `labels.unhideValue`); a hidden value carries the «НЕ» text, so meaning is never in color alone.",
+        ru: "Значения — переключатели с `aria-pressed`; у «−» своё имя (`labels.hideValue` / `labels.unhideValue`); скрытое значение несёт текст «НЕ», смысл не только в цвете.",
+      },
+      {
+        en: 'Fields with nothing found are announced through `role="status"`.',
+        ru: 'Поля без совпадений при поиске объявляются через `role="status"`.',
+      },
+      {
+        en: "Range bounds are inputs named by `labels.fromLabel` / `labels.toLabel` («Сумма, от»); an inverted range marks both `aria-invalid`. A date range is the Datepicker field named by the field label.",
+        ru: "Границы диапазона — поля ввода с именами `labels.fromLabel` / `labels.toLabel` («Сумма, от»); перевёрнутый диапазон помечает оба `aria-invalid`.",
+      },
+      {
+        en: 'An option group is a `role="group"` named by its `group`.',
+        ru: 'Группа значений — `role="group"` с именем из `group`.',
+      },
+      {
+        en: "Every filter tag has a remove button named by `labels.remove`.",
+        ru: "Каждый тег фильтра удаляется кнопкой с именем `labels.remove`.",
+      },
+    ],
+  },
 };

@@ -385,4 +385,58 @@ export const api: ComponentApi = {
       ru: "Live-область: цель отказала и назвала причину (`canDrop` вернул строку).",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves to the list items (with `handle`, to the grips).",
+        ru: "Переходит к элементам списка (с `handle` — к ручкам).",
+      },
+      {
+        keys: "Alt + ↑ · Alt + ↓",
+        en: 'Moves the item one place (`axis="x"` and `"grid"`: Alt + ← / → in the writing direction).',
+        ru: 'Сдвигает элемент на одно место (`axis="x"` и `"grid"` — Alt + ← / → по направлению письма).',
+      },
+      {
+        keys: "Alt + ← · Alt + →",
+        en: 'In lists sharing a `kind`: moves the item to the same row of the neighbouring list (`axis="x"`: Alt + ↑ / ↓); focus follows.',
+        ru: 'В списке с общим `kind` — переносит элемент в соседний список на ту же строку (при `axis="x"` — Alt + ↑ / ↓); фокус идёт следом.',
+      },
+      {
+        keys: "Escape",
+        en: "Cancels a drag in flight.",
+        ru: "Отменяет перетаскивание в процессе.",
+      },
+    ],
+    aria: [
+      {
+        en: 'A live region (`role="status"`, `aria-live="polite"`) announces grabbed, dropped, returned, cancelled, «position N of M», a move to another list by its name and a refusal with its reason, from `labels`.',
+        ru: 'Live-область (`role="status"`, `aria-live="polite"`) объявляет: взят, перемещён, возвращён, отменён, позиция N из M, перенос в другой список и причину отказа (`labels`).',
+      },
+      {
+        en: "Every draggable item has `aria-roledescription` and `aria-keyshortcuts` (with the across keys in linked lists) and is in the tab order (`tabIndex={0}`); with `handle` the grip takes focus instead. The clone is `aria-hidden`.",
+        ru: "У каждого перетаскиваемого элемента `aria-roledescription` и `aria-keyshortcuts`; клон в полёте — `aria-hidden`.",
+      },
+      {
+        en: "In lists sharing a `kind`, Alt + the across arrows move the item to the same row of the neighbouring list in document order; focus follows the item.",
+        ru: "В списках с общим `kind` Alt и поперечные стрелки переносят элемент в ту же строку соседнего списка по порядку документа; фокус следует за элементом.",
+      },
+      {
+        en: "Name an item by what it shows: `aria-labelledby` on its visible title and `aria-describedby` on its description. An `aria-label` on the item replaces its content for assistive tech — use it only when the item shows no text (a photo tile). Name every linked list (`aria-label` or `aria-labelledby` on its heading): that name is spoken when an item moves into it.",
+        ru: "Имя элемента — его видимый текст: `aria-labelledby` / `aria-describedby` на заголовок и описание, а не `aria-label`, который заглушает содержимое. Список называет `aria-label` или `aria-labelledby` — это имя звучит при переносе в него.",
+      },
+      {
+        en: 'A `locked` item has no role description or shortcuts; its `Dnd.Handle` is a lock: a `<span role="img">` named `labels.locked` with the `status.locked` icon at the grip\'s size (no ref).',
+        ru: "У закреплённого элемента (`locked`) нет `aria-roledescription` и сочетаний; его `Dnd.Handle` — замок с именем «Закреплено».",
+      },
+      {
+        en: "Touch: a drag starts after a hold; a finger that moves first scrolls the page.",
+        ru: "Касание: перетаскивание начинается после удержания, движение пальца раньше — обычная прокрутка.",
+      },
+      {
+        en: "`Dnd.Draggable` has no keyboard path of its own — offer a button or a menu for the same move.",
+        ru: "У `Dnd.Draggable` нет клавиатурного пути — дайте кнопку или меню для того же действия.",
+      },
+    ],
+  },
 };

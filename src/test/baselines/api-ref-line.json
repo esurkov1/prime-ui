@@ -1,0 +1,14 @@
+[
+  "src/components/data-table/api.ts: DataTable",
+  "src/components/dnd/api.ts: moveBefore",
+  "src/components/file-upload/api.ts: useUploadQueue",
+  "src/components/smart-filter/api.ts: matchesSmartFilter · resolveSmartFilterValues · isSmartFilterRange",
+  "src/components/voice-player/api.ts: getWaveform",
+  "src/layout/sidebar/api.ts: Sidebar.Account",
+  "src/layout/sidebar/api.ts: Sidebar.Brand",
+  "src/layout/sidebar/api.ts: Sidebar.Content",
+  "src/layout/sidebar/api.ts: Sidebar.Item",
+  "src/layout/sidebar/api.ts: Sidebar.Root",
+  "src/layout/sidebar/api.ts: Sidebar.SubTrigger",
+  "src/layout/sidebar/api.ts: Sidebar.Toggle"
+]

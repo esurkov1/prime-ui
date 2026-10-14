@@ -167,4 +167,32 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      { keys: "Tab", en: "Moves focus to the checkbox.", ru: "Переводит фокус на флажок." },
+      { keys: "Space", en: "Toggles it.", ru: "Переключает его." },
+    ],
+    aria: [
+      {
+        en: 'A native `<input type="checkbox">` (visually hidden over the box, so validation bubbles point at it), wrapped by the `<label>` row.',
+        ru: 'Нативный `<input type="checkbox">` скрыт поверх квадрата и обёрнут строкой-`<label>`.',
+      },
+      {
+        en: "`aria-invalid` is set when invalid; `aria-describedby` = your ids + the hint or the error id.",
+        ru: "`aria-invalid` при ошибке; `aria-describedby` — ваши id, затем id подсказки или ошибки.",
+      },
+      {
+        en: "Without visible text, pass `aria-label` on `Checkbox.Root` (it lands on the input).",
+        ru: "Без видимого текста задайте `aria-label` на `Checkbox.Root` — он попадёт на input.",
+      },
+      {
+        en: "`required` goes to the native input; no asterisk is drawn — state it in the text or the hint.",
+        ru: "`required` уходит в нативный input; звёздочка не рисуется — скажите об этом в тексте или подсказке.",
+      },
+      {
+        en: "`Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked`.",
+        ru: "`Checkbox.Indicator` скрыт (`aria-hidden`); состояние несёт строка (`aria-selected` / `aria-checked`).",
+      },
+    ],
+  },
 };

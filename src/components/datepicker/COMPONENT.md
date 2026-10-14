@@ -162,6 +162,8 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` · `Space` | On the field opens the calendar; on a day picks it. |
@@ -172,6 +174,8 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 | `Escape` | Closes the calendar and returns focus to the field. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The field is a `<button>` named by the label and the value (or `aria-label` + value); hint and error in `aria-describedby`, an error sets `aria-invalid`.
 - The popover is a `role="dialog"` with a focus trap; focus lands on the picked or today's day.
 - Every month is a table named by the month; days are buttons with the full date as name, picked ones `aria-pressed`, today `aria-current="date"`.

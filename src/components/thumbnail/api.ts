@@ -185,4 +185,40 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Focuses a pressable (`asChild`) or selectable tile; a plain thumbnail takes no focus.",
+        ru: "Фокус на превью-кнопке (`asChild`) или выбираемой плитке; простое превью не фокусируется.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Opens the object (`asChild`) or toggles a selectable tile.",
+        ru: "Открывает объект (`asChild`) или переключает выбор плитки.",
+      },
+    ],
+    aria: [
+      {
+        en: 'Next to a name the thumbnail is decorative: keep `alt=""` (default) and mark fallback icons `aria-hidden`.',
+        ru: 'Рядом с названием превью декоративно: `alt=""` (по умолчанию), иконки подложки — `aria-hidden`.',
+      },
+      {
+        en: 'Alone: give `Thumbnail.Image` a descriptive `alt`, or `role="img"` + `aria-label` on Root for a fallback-only thumbnail.',
+        ru: 'Без названия рядом: осмысленный `alt` у `Thumbnail.Image` или `role="img"` + `aria-label` на корне для превью без картинки.',
+      },
+      {
+        en: "A preview that opens the object is `asChild` on a `<button>` or `<a>`; name it (`aria-label`) when the picture is all it shows.",
+        ru: "Превью, открывающее объект, — `asChild` на `<button>` или `<a>` с именем (`aria-label`, если на нём только картинка).",
+      },
+      {
+        en: 'A selectable tile is a `<button role="checkbox">` with `aria-checked`, named by `aria-label` or the image `alt`; its indicator is `aria-hidden`, and the state is not only color (the check).',
+        ru: 'Выбираемая плитка — `<button role="checkbox">` с `aria-checked`; галочка `Checkbox.Indicator` скрыта от чтения, выбор не передаётся только цветом.',
+      },
+      {
+        en: "Name a `Thumbnail.Video` with `aria-label`; the play mark is decorative, the duration is text. Under `prefers-reduced-motion` an `autoPlay` clip stands still.",
+        ru: "`Thumbnail.Video` назовите `aria-label`; знак воспроизведения и длительность — подсказки на тени `media`. При `prefers-reduced-motion` ролик с `autoPlay` стоит на первом кадре.",
+      },
+    ],
+  },
 };

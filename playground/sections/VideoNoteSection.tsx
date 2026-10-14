@@ -53,28 +53,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Tab",
-        action: "Переводит фокус: диск воспроизведения (или диск передачи), кнопка расшифровки.",
-      },
-      {
-        keys: "Enter · Space",
-        action:
-          "На диске — воспроизведение со звуком или пауза; на кнопке расшифровки — открыть или свернуть текст; на диске передачи — отменить, повторить или скачать.",
-      },
-      { keys: "ArrowRight · ArrowUp", action: "На диске — вперёд на 5 секунд." },
-      { keys: "ArrowLeft · ArrowDown", action: "На диске — назад на 5 секунд." },
-      { keys: "PageUp · PageDown", action: "На диске — на 10 % записи вперёд или назад." },
-      { keys: "Home · End", action: "На диске — в начало или в конец." },
-    ],
-    aria: [
-      'Корень — `role="group"` с названием `labels.player` (или вашим `aria-label`).',
-      "Диск воспроизведения — кнопка `labels.play` / `labels.pause`, её описание — длительность (`labels.duration`) или позиция (`labels.position`) и `labels.unplayed`; плашки скрыты от чтения. Нажатие в любом месте кружка — только помощь указателю.",
-      'Пока кружок в пути, не удался или не скачан, диск `inert`, а на его месте диск передачи: кнопка с именем по направлению (`cancelUpload` / `cancelDownload`, `retryUpload` / `retryDownload` с описанием `notSent` / `notReceived`, `download`) и кольцо `role="progressbar"`; отказ объявляется (`role="status"`).',
-      "Кнопка расшифровки называется `labels.transcribe` или `labels.hideTranscript`, несёт `aria-expanded` и `aria-controls`; ошибка запроса объявляется `labels.transcribeFailed`.",
-      "`disabled` (или выключенный `Fieldset`) выключает диск, кнопку расшифровки и действия передачи нативным `disabled`.",
-    ],
-  },
 };

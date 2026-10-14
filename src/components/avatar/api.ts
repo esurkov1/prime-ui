@@ -152,4 +152,21 @@ export const api: ComponentApi = {
     { key: "away", default: "Отошёл", en: "Name of the `away` dot.", ru: "Имя точки `away`." },
     { key: "busy", default: "Занят", en: "Name of the `busy` dot.", ru: "Имя точки `busy`." },
   ],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: "`Avatar.Image` `alt`: empty when the name is written next to it, otherwise the name. Without a photo and without a name nearby, put `aria-label` on `Avatar.Root`.",
+        ru: "`alt` у `Avatar.Image` пустой, когда имя написано рядом, иначе — имя. Без фото и без имени рядом — `aria-label` на `Avatar.Root`.",
+      },
+      {
+        en: '`Avatar.Status` is `role="img"` with `aria-label` from `labels`. Every state has its own shape (full dot, crescent, dot with a bar, hollow ring), so presence never rests on color alone.',
+        ru: '`Avatar.Status` — `role="img"` с `aria-label` из `labels`. У каждого состояния своя форма (сплошная точка, полумесяц, точка с чертой, пустое кольцо): присутствие не передаётся одним цветом.',
+      },
+      {
+        en: '`Avatar.Group` is `role="group"`; give it `aria-label`. Give `Avatar.Overflow` an `aria-label` («Ещё 3 участника»).',
+        ru: '`Avatar.Group` — `role="group"`, задайте ему `aria-label`; `Avatar.Overflow` — `aria-label` («Ещё 3 участника»).',
+      },
+    ],
+  },
 };

@@ -36,7 +36,7 @@ ExampleFrame               frame: toolbar + preview stage or code pane
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `code` | `string` | — (required) | Source shown on the code pane (TS / TSX highlighting via CodeBlock) and copied by the copy button. |
-| `previewLayout` | `"default" \| "stack" \| "stack-narrow" \| "full" \| "row" \| "matrix"` | `"default"` | How the preview lays out its children, so snippets need no wrapper divs (see Variants). |
+| `previewLayout` | `"default" \| "stack" \| "stack-narrow" \| "full" \| "row" \| "matrix" \| "matrix-wide"` | `"default"` | How the preview lays out its children, so snippets need no wrapper divs (see Variants). |
 | `viewport` | `"desktop" \| "tablet" \| "mobile"` | — | Preview width (controlled). |
 | `defaultViewport` | `"desktop" \| "tablet" \| "mobile"` | `"desktop"` | Initial preview width (uncontrolled). |
 | `onViewportChange` | `(viewport: "desktop" \| "tablet" \| "mobile") => void` | — | Called with the new width from the device switch. |
@@ -60,6 +60,7 @@ ExampleFrame               frame: toolbar + preview stage or code pane
 | `full` | column, gap 16, every child takes the whole stage width | page structure: app shells, page regions | |
 | `row` | centered wrapping row, gap 12, extra vertical padding | a few buttons or controls side by side | |
 | `matrix` | centered grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns (up to 12) line up across rows, are never narrower than their content and grow to 320 / 160 / 128px for 1 / 2 / 3+ columns, so width-less specimens (Slider, `width: 100%` blocks) get a real cell; centered vertically too; when the grid is wider than the stage (a phone frame) each row wraps its cells, centered (`data-matrix-wrap` on the stage) | variant, size and state matrices | |
+| `matrix-wide` | the same rows of labelled cells, one cell under another, each as wide as the stage up to 640px (`10 × --prime-space-16`), the caption under the specimen | matrices of specimens as wide as their container: tabs, toolbars, tables | |
 
 ### viewport
 | Value | Looks like | Use when | Default |
@@ -95,12 +96,16 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves through the switches, the theme and copy buttons and the code pane. |
 | `ArrowLeft` · `ArrowRight` | Choose the pane or the width inside a switch (SegmentedControl). |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The pane and device switches are radio groups named by `labels.paneSwitch` and `labels.viewportSwitch`.
 - The theme and copy buttons are icon-only Buttons with `aria-label`; after copying the label becomes `labels.copied`.
 - The code pane is a focusable `section` with `aria-label` from `labels.codeRegion`, so keyboard users can scroll it.

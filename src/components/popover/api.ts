@@ -133,4 +133,49 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter · Space",
+        en: "On the trigger: opens the panel (focus moves into it) and closes it.",
+        ru: "На триггере открывает панель (фокус переходит в неё) и закрывает.",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the panel (`closeOnEscape`); focus returns to the trigger.",
+        ru: "Закрывает панель (`closeOnEscape`); фокус возвращается на триггер.",
+      },
+      {
+        keys: "Tab",
+        en: "Moves through the panel content; with `trapFocus` it cycles inside the panel, without it Tab past the last stop closes the panel and goes on from the trigger.",
+        ru: "Переходит по содержимому панели; с `trapFocus` ходит по кругу, без него Tab за последний элемент закрывает панель и идёт дальше от триггера.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The panel is `role="dialog"` without `aria-modal`, named by `Popover.Title` (else by the trigger) and described by `Popover.Description`.',
+        ru: 'Панель — `role="dialog"` без `aria-modal`; имя — `Popover.Title`, иначе триггер; описание — `Popover.Description`.',
+      },
+      {
+        en: 'The trigger gets `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` and `data-state`; the child\'s own `id` wins. Other props given to `Popover.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.',
+        ru: 'Триггер получает `aria-haspopup="dialog"`, `aria-expanded` и `aria-controls`.',
+      },
+      {
+        en: "Opened from a Trigger, focus moves into the panel: `[data-autofocus]`, else the first tab stop, else the panel. Opened at a `Popover.Anchor`, focus stays in the anchor (`initialFocus` moves it in), and presses on the anchor do not dismiss the panel.",
+        ru: "При открытии от Trigger фокус уходит в панель: `[data-autofocus]`, иначе первая точка Tab, иначе сама панель. При открытии у `Popover.Anchor` фокус остаётся в якоре (`initialFocus` переносит его внутрь), а нажатия на якорь панель не закрывают.",
+      },
+      {
+        en: "`Popover.Close` closes the panel and returns focus to the trigger, unless the child's own `onClick` calls `preventDefault()`.",
+        ru: "`Popover.Close` закрывает панель и возвращает фокус на триггер, если собственный `onClick` ребёнка не вызвал `preventDefault()`.",
+      },
+      {
+        en: "An outside press closes the panel without moving focus back to the trigger: focus follows the pointer (foundation §8).",
+        ru: "Клик снаружи закрывает панель без возврата фокуса на триггер: фокус остаётся там, куда нажали.",
+      },
+      {
+        en: "Only the topmost layer reacts: a Select open inside the panel closes first.",
+        ru: "Реагирует только верхний слой: Select, открытый внутри панели, закрывается первым.",
+      },
+    ],
+  },
 };

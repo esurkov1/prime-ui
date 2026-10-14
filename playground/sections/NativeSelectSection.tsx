@@ -52,21 +52,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Enter · Space · ArrowDown",
-        action: "Открывают системный список (поведение браузера и ОС).",
-      },
-      {
-        keys: "ArrowUp · ArrowDown",
-        action: "На закрытом поле меняют значение (в большинстве браузеров).",
-      },
-    ],
-    aria: [
-      "Это настоящий `<select>`: роль, клавиатура и список — от браузера и ОС.",
-      "`label` — `<label htmlFor>`; подсказка и ошибка связаны через `aria-describedby`, ошибка ставит `aria-invalid`.",
-      "Шеврон декоративен (`aria-hidden`).",
-    ],
-  },
 };

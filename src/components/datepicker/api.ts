@@ -1,5 +1,4 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
@@ -156,7 +155,12 @@ export const api: ComponentApi = {
           en: "Name without a `label` (the value is appended) and extra description ids.",
           ru: "Имя без `label` (значение добавляется) и дополнительные id описания.",
         },
-        FIELD_ROOT_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
       ],
     },
     {
@@ -363,4 +367,48 @@ export const api: ComponentApi = {
       ru: "Приглушённая пометка после подписи при `optional`.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter · Space",
+        en: "On the field opens the calendar; on a day picks it.",
+        ru: "На поле открывает календарь; на дне выбирает его.",
+      },
+      { keys: "← · →", en: "The neighbouring day.", ru: "Соседний день." },
+      {
+        keys: "↑ · ↓",
+        en: "The same day of the neighbouring week.",
+        ru: "Тот же день соседней недели.",
+      },
+      { keys: "Home · End", en: "Start and end of the week.", ru: "Начало и конец недели." },
+      {
+        keys: "PageUp · PageDown",
+        en: "The same day of the neighbouring month; with Shift — of the year.",
+        ru: "Тот же день соседнего месяца; с Shift — года.",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the calendar and returns focus to the field.",
+        ru: "Закрывает календарь и возвращает фокус на поле.",
+      },
+    ],
+    aria: [
+      {
+        en: "The field is a `<button>` named by the label and the value (or `aria-label` + value); hint and error in `aria-describedby`, an error sets `aria-invalid`.",
+        ru: "Поле — кнопка с именем из подписи и значения; подсказка и ошибка — в `aria-describedby`, ошибка ставит `aria-invalid`.",
+      },
+      {
+        en: 'The popover is a `role="dialog"` with a focus trap; focus lands on the picked or today\'s day.',
+        ru: 'Календарь — `role="dialog"` с ловушкой фокуса; при открытии фокус на выбранном или сегодняшнем дне.',
+      },
+      {
+        en: 'Every month is a table named by the month; days are buttons with the full date as name, picked ones `aria-pressed`, today `aria-current="date"`.',
+        ru: 'Каждый месяц — таблица с именем месяца; дни — кнопки с полной датой в имени, выбранные — `aria-pressed`, сегодня — `aria-current="date"`.',
+      },
+      {
+        en: "One polite live region announces the visible months («Сентябрь 2026 — Октябрь 2026») when they change; the step prompt is a polite live region too; on open the popover focuses the picked (or today's) day (`data-autofocus`); presets are a named group of buttons with `aria-pressed`.",
+        ru: "Заголовок месяца и подсказка шага — вежливые live-области; пресеты — группа кнопок с `aria-pressed`.",
+      },
+    ],
+  },
 };

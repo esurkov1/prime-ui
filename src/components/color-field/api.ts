@@ -1,5 +1,4 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_ROOT_REST } from "../../internal/field.api";
 
 export const api: ComponentApi = {
   parts: [
@@ -134,7 +133,12 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Системные строки, см. «Доступность».",
         },
-        FIELD_ROOT_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
+          en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
+          ru: "`className`, `data-*` и остальные атрибуты `<div>` рамки поля (правило корня поля: `className`, `ref` и остальное → рамка, `id` → контрол).",
+        },
       ],
     },
   ],
@@ -212,4 +216,51 @@ export const api: ComponentApi = {
       ru: "Ячейка синего.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter · Space",
+        en: "Open the panel from the field; in a channel cell, apply the value.",
+        ru: "Открывают панель с поля; в ячейке каналов применяют значение.",
+      },
+      {
+        keys: "ArrowLeft · ArrowRight · ArrowUp · ArrowDown",
+        en: "Move the area or a channel slider; in the ready colors, move between swatches.",
+        ru: "Двигают ползунок области или канала; в готовых цветах — между образцами.",
+      },
+      {
+        keys: "PageUp · PageDown",
+        en: "Large step of the area and the sliders.",
+        ru: "Крупный шаг области и ползунков.",
+      },
+      {
+        keys: "Tab",
+        en: "Cycles through the parts of the panel.",
+        ru: "Ходит по частям панели по кругу.",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the panel and returns focus to the field.",
+        ru: "Закрывает панель и возвращает фокус на поле.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The field is a `<button>` with `aria-haspopup="dialog"` and `aria-expanded`; it is named by the label and the current hex (`aria-labelledby`), or by `aria-label` plus the hex.',
+        ru: 'Поле — `<button>` с `aria-haspopup="dialog"` и `aria-expanded`; имя — подпись и текущий hex (`aria-labelledby`), без подписи — `aria-label` и hex.',
+      },
+      {
+        en: 'The panel is `role="dialog"` named by the field; the area and the sliders are React Aria `role="slider"`, the sliders named by `labels.hue` and `labels.alpha`.',
+        ru: 'Панель — `role="dialog"` с именем поля; область и ползунки — `role="slider"` React Aria, ползунки названы `labels.hue` и `labels.alpha`.',
+      },
+      {
+        en: 'The ready colors are a `role="radiogroup"` named by `labels.presets`.',
+        ru: 'Готовые цвета — `role="radiogroup"` с именем `labels.presets`.',
+      },
+      {
+        en: "The hint and the error are linked by `aria-describedby`; the error sets `aria-invalid`.",
+        ru: "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`.",
+      },
+    ],
+  },
 };

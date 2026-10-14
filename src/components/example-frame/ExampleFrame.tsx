@@ -26,7 +26,9 @@ type ColorScheme = "light" | "dark";
 /**
  * Layout of the preview children, so snippets need no wrapper divs for rows and stacks.
  * `matrix`: labelled specimens — every direct child is a row, its children are cells (a specimen
- * above its caption), and cells line up in columns across rows.
+ * above its caption), and cells line up in columns across rows. `matrix-wide`: the same rows and
+ * cells for specimens as wide as their container (tabs, a toolbar, a table), one cell under
+ * another at the stack measure.
  */
 export type ExampleFramePreviewLayout =
   | "default"
@@ -34,7 +36,8 @@ export type ExampleFramePreviewLayout =
   | "stack-narrow"
   | "full"
   | "row"
-  | "matrix";
+  | "matrix"
+  | "matrix-wide";
 
 export type ExampleFrameLabels = {
   paneSwitch: string;

@@ -49,19 +49,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "Tab", action: "Фокус на выбранный вариант (или первый, если ничего не выбрано)." },
-      {
-        keys: "ArrowDown · ArrowRight · ArrowUp · ArrowLeft",
-        action: "Выбирает следующий или предыдущий вариант группы (нативное поведение radio).",
-      },
-      { keys: "Space", action: "Выбирает вариант в фокусе." },
-    ],
-    aria: [
-      '`Radio.Group` — `role="radiogroup"`, названный подписью (`label`) через `aria-labelledby` или `aria-label`.',
-      "`aria-required`, `aria-invalid`, `aria-orientation` на группе; подсказка или ошибка группы — в её `aria-describedby`.",
-      'Каждый вариант — нативный `<input type="radio">` с общим `name`; описание варианта (`hint`) связано через `aria-describedby`.',
-    ],
-  },
 };

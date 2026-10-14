@@ -463,4 +463,68 @@ export const api: ComponentApi = {
       ru: "`aria-label` точки, от которой открывается меню строки.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Enters the list at one stop — the open dialog (or where the focus was last); the next Tab leaves the list.",
+        ru: "Входит в список одной остановкой — на открытый диалог (или последний, где был фокус); следующий Tab уходит из списка.",
+      },
+      {
+        keys: "↑ · ↓",
+        en: "Moves the focus to the previous or next dialog; ↑ on the first goes to the search field.",
+        ru: "Переводит фокус на предыдущий или следующий диалог; ↑ с первого — в поле поиска.",
+      },
+      {
+        keys: "Home · End",
+        en: "Moves the focus to the first or last dialog.",
+        ru: "Переводит фокус на первый или последний диалог.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Opens the focused dialog; a link row takes Enter only.",
+        ru: "Открывает диалог в фокусе; у строки-ссылки — только Enter.",
+      },
+      {
+        keys: "Shift + F10 · ContextMenu",
+        en: "Opens the dialog's menu under the row.",
+        ru: "Открывает меню диалога под строкой.",
+      },
+      {
+        keys: "Escape",
+        en: "In the search field clears the query; in the menu closes it and returns the focus to the row.",
+        ru: "В поле поиска очищает запрос; в меню закрывает его и возвращает фокус на строку.",
+      },
+    ],
+    aria: [
+      {
+        en: "The list is a `<ul>` named «Диалоги» (`labels.list`); each row an `<li>` with a button, or a link with `href`.",
+        ru: "Список — `<ul>` с именем «Диалоги» (`labels.list`); каждая строка — `<li>` с кнопкой или ссылкой.",
+      },
+      {
+        en: 'The open dialog is `aria-current="true"` on a button, `"page"` on a link. Selection does not follow the focus: arrows only move it (a dialog may load a conversation); Enter, Space and a click open.',
+        ru: 'Открытый диалог — `aria-current="true"` на кнопке, `aria-current="page"` на ссылке. Выбор не следует за фокусом: стрелки только переводят фокус, открывают Enter, Space и клик.',
+      },
+      {
+        en: "The row is named by its content: the name, glyphs with a `label` («Без звука», a verified mark), the preview, the delivery mark («Прочитано»), the time, then «упоминание» and «непрочитанных: 3» instead of the bare badges; the avatar is `aria-hidden`.",
+        ru: "Имя строки: имя диалога, значки с `label` (без звука, подтверждён), превью, отметка доставки («Прочитано»), время и «непрочитанных: 3» вместо голого числа; аватар скрыт (`aria-hidden`).",
+      },
+      {
+        en: "While the other side types, the preview is `aria-hidden` and «печатает…» is read; a draft reads «Черновик: …».",
+        ru: "Пока собеседник печатает, превью скрыто от скринридера, читается «печатает…».",
+      },
+      {
+        en: 'A row with a menu has `aria-keyshortcuts="Shift+F10"`; the menu is a `Dropdown` (`menu` / `menuitem`).',
+        ru: 'Строка с меню — `aria-keyshortcuts="Shift+F10"`; меню — `Dropdown` с ролями `menu` / `menuitem`.',
+      },
+      {
+        en: 'The search field is `type="search"` named «Поиск по диалогам»; after a search a polite status says «Найдено: 4» or «Ничего не найдено».',
+        ru: 'Поле поиска — `type="search"` с именем «Поиск по диалогам»; после поиска вежливо объявляется «Найдено: 4» или «Ничего не найдено».',
+      },
+      {
+        en: "While loading the scroller is `aria-busy` and «Загрузка диалогов» is announced; placeholder rows are `inert` and `aria-hidden`.",
+        ru: "Пока идёт загрузка, область прокрутки — `aria-busy`, а «Загрузка диалогов» объявляется; заглушки скрыты (`inert`, `aria-hidden`).",
+      },
+    ],
+  },
 };

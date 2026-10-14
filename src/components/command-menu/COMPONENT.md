@@ -172,6 +172,8 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `ArrowDown` · `ArrowUp` | Move the active item, wrapping; focus stays in the search field. |
@@ -181,6 +183,8 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | `Escape` | Closes the palette (`closeOnEscape`); focus returns to the opener. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The palette is `role="dialog"` with `aria-modal`, named by `CommandMenu.Title` or `aria-label`.
 - The search field takes focus on open and has no focus ring: the caret is the indicator. Its `onChange`, `onKeyDown`, `onFocus` and `onBlur` reach the input.
 - The field is `role="combobox"` with `aria-controls` on the list and `aria-activedescendant` on the active item; items are `role="option"`, the active one `aria-selected`.

@@ -623,4 +623,84 @@ export const api: ComponentApi = {
       ru: "Имя переключателя развёрнутой группы; `{group}` — ключ группы.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves through the toolbar (`DataTable.ColumnsMenu`), sort buttons, row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination.",
+        ru: "Переходит по кнопкам сортировки, флажкам, переключателям, ссылкам строк и строкам, которые открываются на месте.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Sorts by the column, toggles the row or the group, or opens the focused row (`onRowClick`); Enter on a row link follows it.",
+        ru: "Сортирует по колонке, раскрывает строку или группу, открывает строку в фокусе (`onRowClick`); на ссылке строки Enter переходит по ней.",
+      },
+      {
+        keys: "Space",
+        en: "Toggles the focused row checkbox.",
+        ru: "Отмечает строку на флажке под фокусом.",
+      },
+      {
+        keys: "Shift + Space",
+        en: "Selects the range from the last toggled row.",
+        ru: "Отмечает диапазон от последней отмеченной строки.",
+      },
+      {
+        keys: "Alt + ↑ · Alt + ↓",
+        en: "On a row handle (`onReorder`), moves the row one place up or down.",
+        ru: "На ручке строки (`onReorder`) переставляет строку на место выше или ниже.",
+      },
+      {
+        keys: "Escape",
+        en: "Cancels a row drag; the row goes back to its place.",
+        ru: "Отменяет перетаскивание строки, она возвращается на место.",
+      },
+    ],
+    aria: [
+      {
+        en: 'Native `<table>` semantics; head cells are `scope="col"` (the empty handle-column cell is a `<td>`); sortable heads hold a `<button>` and expose `aria-sort`; the whole head cell shows the inset focus ring.',
+        ru: 'Нативная `<table>`; заголовки — `scope="col"`, у сортируемых — `<button>` и `aria-sort`.',
+      },
+      {
+        en: 'A link row has one link for assistive tech: the `<a>` in the key cell, named by its text. Its copies over the other cells are `aria-hidden` and `tabindex="-1"`, so the pointer can use the whole row. An in-place row is focusable itself (`tabindex="0"`) and reads as its cells. Either way the focused row shows a ring around all its cells.',
+        ru: "Строка-ссылка: в ключевой ячейке настоящий `<a>` с именем из её текста; копии ссылки в остальных ячейках скрыты (`aria-hidden`, `tabindex=-1`). Строка, которая открывается на месте, получает фокус; фокус обводит всю строку.",
+      },
+      {
+        en: "A row never opens from a control inside it (links, buttons, fields, `label`, `summary`, ARIA widgets, `data-row-click-ignore`), from a text selection, or from a React event that bubbled out of a portal (a ⋯ menu item).",
+        ru: "Строка не открывается от контрола внутри неё (ссылки, кнопки, поля, `label`, `summary`, ARIA-виджеты, `data-row-click-ignore`), от выделения текста и от React-события, всплывшего из портала (пункт меню ⋯).",
+      },
+      {
+        en: 'A group header is a `<th scope="rowgroup">` across every column, first in its own `<tbody>`.',
+        ru: 'Заголовок группы — `<th scope="rowgroup">` во всю ширину, первым в своём `<tbody>`.',
+      },
+      {
+        en: "`DataTable.ColumnsMenu` is a menu button: `menuitemcheckbox` items with `aria-checked`; the key column is `aria-disabled`.",
+        ru: "`DataTable.ColumnsMenu` — Dropdown: пункты `menuitemcheckbox` с `aria-checked`; ключевая колонка выключена (`aria-disabled`).",
+      },
+      {
+        en: "Row checkboxes are named by `labels.selectRow` with `{label}` from `getRowLabel` (pass it so the names are unique); the head checkbox by `labels.selectAll`, `indeterminate` on a partial selection.",
+        ru: "Флажки строк названы `labels.selectRow` с `{label}` из `getRowLabel`; флажок в шапке — `labels.selectAll`, частичный выбор — `indeterminate`.",
+      },
+      {
+        en: "After a selection change a polite live region announces `labels.selectedCount`; selected rows carry `aria-selected`.",
+        ru: "После смены выбора вежливая область объявляет `labels.selectedCount`; выбранные строки — `aria-selected`.",
+      },
+      {
+        en: "A row handle is a button named by `labels.reorderRow` with `aria-keyshortcuts`; a pick-up, a drop and a keyboard move are announced in a polite live region («Договор: позиция 2 из 6»). While its move is saved the row is `aria-busy`; while the table is sorted the handles are disabled and a tooltip gives `labels.reorderSorted`.",
+        ru: "Ручка строки — кнопка с именем `labels.reorderRow` и `aria-keyshortcuts`; взятие, сброс и ход с клавиатуры объявляются вежливой областью («Этап: позиция 2 из 6»). Пока ход сохраняется, строка — `aria-busy`; при сортировке ручки неактивны, подсказка — `labels.reorderSorted`.",
+      },
+      {
+        en: "The expand toggle is a button with `aria-expanded`, `aria-controls` (detail row or sub-rows) and `labels.expand` / `labels.collapse`.",
+        ru: "Переключатель раскрытия — кнопка с `aria-expanded`, `aria-controls` (детали или вложенные строки) и `labels.expand` / `labels.collapse`.",
+      },
+      {
+        en: "A group toggle (collapsible groups) is a button in the group header with `aria-expanded`, `aria-controls` (the group's rows, while open; not on reorderable rows, which carry no id) and `labels.expandGroup` / `labels.collapseGroup` with `{group}`.",
+        ru: "Переключатель группы (сворачиваемые группы) — кнопка в заголовке группы с `aria-expanded`, `aria-controls` (строки открытой группы) и `labels.expandGroup` / `labels.collapseGroup` с `{group}`.",
+      },
+      {
+        en: 'Loading sets `aria-busy` and a `labels.loading` status; the error is `role="alert"`; the default empty state is `role="status"`.',
+        ru: 'Загрузка: `aria-busy` на таблице и статус `labels.loading`; ошибка — `role="alert"`; пустое состояние — `role="status"`.',
+      },
+    ],
+  },
 };

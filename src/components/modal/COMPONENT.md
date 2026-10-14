@@ -197,6 +197,8 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Escape` | Closes the dialog (`closeOnEscape`); focus returns to the opener. |
@@ -204,6 +206,8 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 | `Tab` · `Shift+Tab` | Cycles focus inside the dialog. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `role="dialog"`, `aria-modal="true"`, named by Title (or `aria-label`), described by Description.
 - Focus moves into the dialog on open (an `autoFocus` field wins) and returns to the opener on close — also after a scrim click (foundation §8).
 - The page behind is `inert` and its scroll is locked.

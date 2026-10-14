@@ -101,4 +101,33 @@ export const api: ComponentApi = {
       ru: "Скрытое слово между текущей и общей страницей в компактном виде.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves between the arrows and the page numbers.",
+        ru: "Переходит между стрелками и номерами страниц.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Opens the focused page.",
+        ru: "Открывает страницу под фокусом.",
+      },
+    ],
+    aria: [
+      { en: "A `<nav>` landmark named by `labels.nav`.", ru: "`<nav>` с именем из `labels.nav`." },
+      {
+        en: 'The current page has `aria-current="page"`; every page button is named by `labels.page` («Страница 3»).',
+        ru: 'Текущая страница — `aria-current="page"`; у каждой кнопки имя из `labels.page` («Страница 3»).',
+      },
+      {
+        en: "The edge arrows are `disabled`; the ellipsis is `aria-hidden`.",
+        ru: "Стрелки на краях отключены (`disabled`), многоточие скрыто от скринридеров.",
+      },
+      {
+        en: "The compact view reads «3 из 12» through the visually hidden `labels.of`.",
+        ru: "В компактном виде «3 / 12» читается как «3 из 12» (`labels.of`).",
+      },
+    ],
+  },
 };

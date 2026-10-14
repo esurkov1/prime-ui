@@ -56,17 +56,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "Tab", action: "Переводит фокус на флажок." },
-      { keys: "Space", action: "Переключает его." },
-    ],
-    aria: [
-      'Нативный `<input type="checkbox">` скрыт поверх квадрата и обёрнут строкой-`<label>`.',
-      "`aria-invalid` при ошибке; `aria-describedby` — ваши id, затем id подсказки или ошибки.",
-      "Без видимого текста задайте `aria-label` на `Checkbox.Root` — он попадёт на input.",
-      "`required` уходит в нативный input; звёздочка не рисуется — скажите об этом в тексте или подсказке.",
-      "`Checkbox.Indicator` скрыт (`aria-hidden`); состояние несёт строка (`aria-selected` / `aria-checked`).",
-    ],
-  },
 };

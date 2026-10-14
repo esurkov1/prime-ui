@@ -150,6 +150,8 @@ Root attribute: `data-size`. The fill changes on `background-color` with `--prim
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus between rows; a disabled row is skipped. |
@@ -157,6 +159,8 @@ Root attribute: `data-size`. The fill changes on `background-color` with `--prim
 | `Alt + ↑` · `Alt + ↓` | With `onReorder`, moves the row one place up or down (from its handle or the row). |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `<ul>` named by `aria-label` (or `aria-labelledby` to a visible heading); each row is an `<li>` with a button or link.
 - The open record: `aria-current="true"` on a button (a selection inside the screen), `aria-current="page"` on a link (`href`, `asChild`) — the link points at the current URL. A router link may set it itself.
 - The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row.

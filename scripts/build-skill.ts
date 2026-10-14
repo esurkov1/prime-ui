@@ -7,11 +7,14 @@
  * `COMPONENT.md` and `examples/` into `reference/components/<dir>/` and `reference/layout/<dir>/`
  * (the same tree, so the docs' own cross-links keep working) and rewrites `../src/` to
  * `reference/`, with `src/icon-set.ts` (the names of the full glyph set) next to them. It fails when
- * any relative link in the built skill points at nothing.
+ * any relative link in the built skill points at nothing, or at a heading its file does not have
+ * (`scripts/docs/links.ts`).
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { brokenLinkAt, linkTargets } from "./docs/links";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const out = path.join(root, "dist", "skill");
@@ -58,13 +61,9 @@ for (const file of fs.readdirSync(out).filter((name) => name.endsWith(".md"))) {
 
 const broken: string[] = [];
 for (const file of markdownFiles(out)) {
-  const text = fs.readFileSync(file, "utf8");
-  for (const match of text.matchAll(/\]\(([^)\s]+)\)/g)) {
-    const target = match[1].split("#")[0];
-    if (!target || /^[a-z]+:/i.test(target)) continue;
-    if (!fs.existsSync(path.resolve(path.dirname(file), target))) {
-      broken.push(`${path.relative(out, file)} → ${match[1]}`);
-    }
+  for (const target of linkTargets(fs.readFileSync(file, "utf8"))) {
+    const problem = brokenLinkAt(file, target);
+    if (problem) broken.push(`${path.relative(out, file)} → ${problem}`);
   }
 }
 

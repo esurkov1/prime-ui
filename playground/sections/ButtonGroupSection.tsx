@@ -56,16 +56,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "Tab", action: "Переводит фокус между сегментами; неактивный пропускается." },
-      { keys: "Enter · Space", action: "Нажимает сегмент (нативная `<button>`)." },
-    ],
-    aria: [
-      'Группа — `role="group"`: её называет `label` (`aria-labelledby`), иначе задайте `aria-label`; для нескольких групп поставьте `role="toolbar"` на общий контейнер.',
-      "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`, `required` — `aria-required`.",
-      "Сегменты-переключатели объявляют `aria-pressed`; в наборе переключателей передайте `pressed={false}` остальным.",
-      "Сегменту только с иконкой нужен `aria-label`; `ButtonGroup.Icon` скрыт (`aria-hidden`).",
-    ],
-  },
 };

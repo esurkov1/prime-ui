@@ -167,4 +167,32 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves focus between triggers; a disabled one is skipped.",
+        ru: "Переводит фокус между заголовками разделов; неактивный пропускается.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Opens or closes the section.",
+        ru: "Открывает или закрывает раздел.",
+      },
+    ],
+    aria: [
+      {
+        en: "The trigger is a native `<button>` inside an `<h3>` with `aria-expanded` and `aria-controls`.",
+        ru: "Заголовок — нативная `<button>` внутри `<h3>` с `aria-expanded` и `aria-controls`.",
+      },
+      {
+        en: "The panel is a `<section>` with `aria-labelledby`; closed content is `inert`, so it leaves the tab order and the accessibility tree.",
+        ru: "Содержимое — `<section>` с `aria-labelledby`; закрытое — `inert` и `aria-hidden`, его поля выходят из порядка Tab.",
+      },
+      {
+        en: "The chevron and `Accordion.Icon` are `aria-hidden`.",
+        ru: "Шеврон и `Accordion.Icon` скрыты (`aria-hidden`).",
+      },
+    ],
+  },
 };

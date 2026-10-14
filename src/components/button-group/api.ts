@@ -103,4 +103,36 @@ export const api: ComponentApi = {
     },
   ],
   labels: [FIELD_OPTIONAL_LABEL],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves focus between segments; a disabled one is skipped.",
+        ru: "Переводит фокус между сегментами; неактивный пропускается.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Presses the segment (native `<button>`).",
+        ru: "Нажимает сегмент (нативная `<button>`).",
+      },
+    ],
+    aria: [
+      {
+        en: 'The group element is `role="group"`, named by `label` (`aria-labelledby`); without a label give the root `aria-label`. Set `role="toolbar"` on the outer container of several groups.',
+        ru: 'Группа — `role="group"`: её называет `label` (`aria-labelledby`), иначе задайте `aria-label`; для нескольких групп поставьте `role="toolbar"` на общий контейнер.',
+      },
+      {
+        en: 'Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.',
+        ru: "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`, `required` — `aria-required`.",
+      },
+      {
+        en: "Toggle segments expose `aria-pressed`; in a toggle set pass `pressed={false}` to the inactive ones.",
+        ru: "Сегменты-переключатели объявляют `aria-pressed`; в наборе переключателей передайте `pressed={false}` остальным.",
+      },
+      {
+        en: "Icon-only segments need `aria-label`; `ButtonGroup.Icon` is `aria-hidden`.",
+        ru: "Сегменту только с иконкой нужен `aria-label`; `ButtonGroup.Icon` скрыт (`aria-hidden`).",
+      },
+    ],
+  },
 };

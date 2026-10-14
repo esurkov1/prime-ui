@@ -139,12 +139,16 @@ Motion: a status change moves the indicator's fill, color and halo over `base`; 
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves focus between items; a disabled one is skipped. |
 | `Enter` · `Space` | Selects the item. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Semantic `<ol>`; each item is a `<button>` inside an `<li>`; the active one has `aria-current="step"`.
 - Separators, indicator and arrow are `aria-hidden`; the name comes from Title (and Description).
 - Give the `<ol>` an `aria-label` when there are several steppers on a page.

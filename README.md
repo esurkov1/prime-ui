@@ -186,6 +186,13 @@ The full contract lives in [`docs/foundation.md`](https://github.com/esurkov1/pr
 Every link opens the full reference: anatomy, every prop with its default, every variant, states,
 accessibility, examples and common mistakes.
 
+<!-- components:start -->
+### Foundations (`foundations`)
+
+| Component | What it is for |
+|---|---|
+| [**Typography**](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md) | Text roles of the Golos Text type scale applied to any text element, with reading-width guidance. |
+
 ### Actions (`actions`)
 
 | Component | What it is for |
@@ -198,14 +205,14 @@ accessibility, examples and common mistakes.
 
 | Component | What it is for |
 |---|---|
-| [**Input**](https://github.com/esurkov1/prime-ui/blob/main/src/components/input/COMPONENT.md) | Single-line text field with label, hint, error and slots for icons, affixes, clear / copy / reveal / action segments and a counter; a password strength meter (`strength`). |
-| [**Textarea**](https://github.com/esurkov1/prime-ui/blob/main/src/components/textarea/COMPONENT.md) | Multi-line text field with label, hint, error and a character counter; grows with its content from `rows` up to `maxRows`. |
-| [**DigitInput**](https://github.com/esurkov1/prime-ui/blob/main/src/components/digit-input/COMPONENT.md) | A row of square single-digit cells for a fixed-length code (OTP from SMS, PIN, pickup code). |
-| [**FileUpload**](https://github.com/esurkov1/prime-ui/blob/main/src/components/file-upload/COMPONENT.md) | Files and the image gallery in one component: a document field (rows), file cards, an image gallery with a cover or an attachment tray; uploads through a queue, reorder and server saves. |
+| [**Input**](https://github.com/esurkov1/prime-ui/blob/main/src/components/input/COMPONENT.md) | Single-line text field with label, hint, error and slots for icons, affixes, a clear button and a counter. |
+| [**Textarea**](https://github.com/esurkov1/prime-ui/blob/main/src/components/textarea/COMPONENT.md) | Multi-line text field with label, hint, error and a character counter; grows with its content by default. |
+| [**DigitInput**](https://github.com/esurkov1/prime-ui/blob/main/src/components/digit-input/COMPONENT.md) | A row of square single-digit cells for a fixed-length code (OTP from SMS, PIN, pickup code), with the field label, hint and error. |
+| [**FileUpload**](https://github.com/esurkov1/prime-ui/blob/main/src/components/file-upload/COMPONENT.md) | One component for every set of files a person adds: a document field, file cards, an **image gallery with a cover**, an attachment tray — `trigger` picks how files are added, `layout` how they lie, `cover` makes the first tile the cover; uploads go through a queue, the order and removals can be saved on a server. |
 | [**Label**](https://github.com/esurkov1/prime-ui/blob/main/src/components/label/COMPONENT.md) | Field label (native `<label>`) with required and optional markers. |
 | [**Hint**](https://github.com/esurkov1/prime-ui/blob/main/src/components/hint/COMPONENT.md) | Help text or a validation error under a field. |
-| [**Fieldset**](https://github.com/esurkov1/prime-ui/blob/main/src/components/fieldset/COMPONENT.md) | A frameless group of form fields: a `title-s` legend, the form rhythm and one `disabled` for all of them. |
-| [**FieldList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/field-list/COMPONENT.md) | An editable list of records of one shape: one row of fields per record, the column headings once, add, remove, reorder and pinned rows. |
+| [**Fieldset**](https://github.com/esurkov1/prime-ui/blob/main/src/components/fieldset/COMPONENT.md) | A frameless group of related form fields: a native `<fieldset>` with a `title-s` legend, the form rhythm between its fields and one `disabled` for all of them. |
+| [**FieldList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/field-list/COMPONENT.md) | An editable list of records of one shape — invoice lines, specs, contacts, prices by period: one row per record, the column headings once above the rows, a remove button per row and an add button under them. |
 
 ### Selection (`selection`)
 
@@ -216,45 +223,45 @@ accessibility, examples and common mistakes.
 | [**Switch**](https://github.com/esurkov1/prime-ui/blob/main/src/components/switch/COMPONENT.md) | An on/off switch for a setting that takes effect immediately. |
 | [**SegmentedControl**](https://github.com/esurkov1/prime-ui/blob/main/src/components/segmented-control/COMPONENT.md) | A switch between 2–5 mutually exclusive options or modes that takes effect immediately. |
 | [**Slider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/slider/COMPONENT.md) | A slider for picking an approximate numeric value within a range, with an optional label and value readout. |
-| [**Select**](https://github.com/esurkov1/prime-ui/blob/main/src/components/select/COMPONENT.md) | A dropdown field for choosing one value (or several with `multiple`) from a closed list. |
-| [**NativeSelect**](https://github.com/esurkov1/prime-ui/blob/main/src/components/native-select/COMPONENT.md) | The system `<select>` in the kit's field frame: plain text options, native picker on phones. |
-| [**TagSelect**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag-select/COMPONENT.md) | A multi-select field that shows the chosen values as coloured tags, filters as you type and can create new tags. |
-| [**SmartFilter**](https://github.com/esurkov1/prime-ui/blob/main/src/components/smart-filter/COMPONENT.md) | The search and filter bar of lists and tables: the search first, a filter button with a panel of values, applied filters as tags, and a show / hide choice for every value. |
+| [**Select**](https://github.com/esurkov1/prime-ui/blob/main/src/components/select/COMPONENT.md) | A field for choosing one value (or several with `multiple`) from a closed list. |
+| [**NativeSelect**](https://github.com/esurkov1/prime-ui/blob/main/src/components/native-select/COMPONENT.md) | The system `<select>` in the kit's field look: the operating system's picker opens on phones. |
+| [**TagSelect**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tag-select/COMPONENT.md) | A multi-value field that shows the picked values as coloured tags, filters as you type and can create new tags. |
+| [**SmartFilter**](https://github.com/esurkov1/prime-ui/blob/main/src/components/smart-filter/COMPONENT.md) | The search and filter bar of lists and tables: the search first and a filter button with a panel of values and ranges, applied filters as removable tags, and a "show / hide" choice for every value. |
 | [**Datepicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/datepicker/COMPONENT.md) | A calendar for picking a date or a date range: a field with a popover (`Datepicker.Root`) or an embedded panel (`Datepicker.Panel`). |
-| [**ColorField**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-field/COMPONENT.md) | A form field for any color: the swatch and its hex in a field box that opens the ColorPicker in a popover (`prime-ui-kit/color-picker`). |
-| [**ColorPicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-picker/COMPONENT.md) | Color selection: a full picker (area, channel sliders, hex and channel fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. |
-| [**ColorSwatches**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-swatches/COMPONENT.md) | An inline color choice: a wrapping grid of preset swatches inside a form, without a popover. |
+| [**ColorField**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-field/COMPONENT.md) | A form field for any color: the swatch and its hex in a field box that opens the ColorPicker in a popover. |
+| [**ColorPicker**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-picker/COMPONENT.md) | Color selection: a full picker (hex field, area, channel sliders and fields, eyedropper, swatches) and `ColorPresets` for a quick color from a fixed palette. |
+| [**ColorSwatches**](https://github.com/esurkov1/prime-ui/blob/main/src/components/color-swatches/COMPONENT.md) | An inline color choice: preset swatches that fill the width of a form or panel and wrap, without a popover. |
 
 ### Data display (`data-display`)
 
 | Component | What it is for |
 |---|---|
-| [**Badge**](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) | The kit's one chip: a status, category or count label, a removable value or applied filter, and a pressable toggle with a hover action, in a palette color. |
-| [**Avatar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) | A round photo of a person or entity with an initials or icon fallback, presence dot and overlapping groups. |
-| [**Thumbnail**](https://github.com/esurkov1/prime-ui/blob/main/src/components/thumbnail/COMPONENT.md) | A preview of an object — product, vehicle, file, cover — at a fixed aspect ratio, with a colored icon fallback. |
-| [**Sparkline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/sparkline/COMPONENT.md) | A small chart — a smooth line over a fading area, a bare line or bars — with its headline: the value at rest, its change and its date; any point can be scrubbed. |
-| [**ChartFrame**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chart-frame/COMPONENT.md) | A dashboard panel around any chart (Recharts, ECharts, visx, Chart.js or a hand-drawn SVG): title, headline value, a measured plot area, a series legend, a tooltip body and a data table for screen readers. |
+| [**Badge**](https://github.com/esurkov1/prime-ui/blob/main/src/components/badge/COMPONENT.md) | The kit's one chip: a static label for a status, category or count, a removable value or applied filter, and a pressable toggle with a hover action — in a palette color. |
+| [**Avatar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/avatar/COMPONENT.md) | A round photo of a person or organization with an initials or icon fallback, a presence dot and overlapping groups. |
+| [**Thumbnail**](https://github.com/esurkov1/prime-ui/blob/main/src/components/thumbnail/COMPONENT.md) | A preview of an object — product, vehicle, file, cover, video — at a fixed aspect ratio, with a colored icon fallback; it can open the object or be selected. |
 | [**Kbd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kbd/COMPONENT.md) | A key cap for a keyboard key or a shortcut, rendered as a native `<kbd>`. |
 | [**Card**](https://github.com/esurkov1/prime-ui/blob/main/src/components/card/COMPONENT.md) | A filled surface block with structural templates for metrics, charts, lists, calls to action and covers. |
-| [**DescriptionList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/description-list/COMPONENT.md) | Read-only properties of a record: «label — value» pairs on a `<dl>` that stack where the room is narrow, with a muted dash for an empty value. |
-| [**DataTable**](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) | A data table with sorting, pagination or infinite scroll on the client or by the server, row selection, row groups, rows reordered by drag, rows that open a record, a column chooser, nested rows and loading / empty / error states. |
-| [**Kanban**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kanban/COMPONENT.md) | A board of status columns: cross-column moves by pointer, touch and keyboard, columns reordered by a grip, WIP limits, loading and empty states. |
-| [**Gantt**](https://github.com/esurkov1/prime-ui/blob/main/src/components/gantt/COMPONENT.md) | A resource or project schedule: rows with bars on a day / week / month axis, lanes for overlaps, milestones, a today line, moves, resizes and new bars by pointer and keyboard, thousands of rows virtualized. |
+| [**DataTable**](https://github.com/esurkov1/prime-ui/blob/main/src/components/data-table/COMPONENT.md) | A data table with sorting, pages or infinite scroll, row selection, row groups, rows that open a record, a column chooser, nested rows and loading / empty / error states. |
+| [**Kanban**](https://github.com/esurkov1/prime-ui/blob/main/src/components/kanban/COMPONENT.md) | A board of status columns: cards reorder within a column and move between columns by pointer, touch hold and keyboard, with announcements, WIP limits, loading and empty states and a layout that scrolls inside itself at any width. |
+| [**Gantt**](https://github.com/esurkov1/prime-ui/blob/main/src/components/gantt/COMPONENT.md) | A resource or project schedule: rows of people, rooms, vehicles or tasks with bars on a day / week / month axis, edited by pointer and keyboard. |
 | [**Timeline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/timeline/COMPONENT.md) | An event feed: dots on a thin line, event title and date, an optional amount on the right, grouped under labels. |
 | [**CodeBlock**](https://github.com/esurkov1/prime-ui/blob/main/src/components/code-block/COMPONENT.md) | A static TypeScript / TSX snippet with syntax highlighting, on a filled panel or bare inside a host. |
 | [**Accordion**](https://github.com/esurkov1/prime-ui/blob/main/src/components/accordion/COMPONENT.md) | Collapsible sections: FAQ, settings groups, checkout steps. |
+| [**Sparkline**](https://github.com/esurkov1/prime-ui/blob/main/src/components/sparkline/COMPONENT.md) | A small chart — a smooth line over a fading area, a bare line or bars — with its headline: the value at rest, its change and its date; any point can be scrubbed. |
+| [**ChartFrame**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chart-frame/COMPONENT.md) | A dashboard panel around any chart — Recharts, ECharts, visx, Chart.js or a hand-drawn SVG — with the title, a headline value, a measured plot area, a series legend, a tooltip body and a data table for screen readers. |
+| [**DescriptionList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/description-list/COMPONENT.md) | Read-only properties of a record: «label — value» pairs on a `<dl>` that stack by themselves where the room is narrow, with a muted dash for an empty value. |
 
 ### Messages (`messages`)
 
 | Component | What it is for |
 |---|---|
-| [**Chat**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chat/COMPONENT.md) | A conversation assembled: the header with the status that turns into typing, search through the messages, pinned messages, the virtualized message list from data (dates, runs, unread, selection, jumps, read receipts, history paging, group-chat author headers) and the Composer in its footer. |
-| [**Message**](https://github.com/esurkov1/prime-ui/blob/main/src/components/message/COMPONENT.md) | One chat message in its shell: bubble, picture or circle, time and delivery ticks, the author's header with a tag, replies, forwards, reactions with the reaction bar, a context menu, and every content kind — text, albums, round videos, voice, files, locations, contacts, link previews; the typing bubble. |
-| [**Gallery**](https://github.com/esurkov1/prime-ui/blob/main/src/components/gallery/COMPONENT.md) | Photos and videos as a messenger album: up to ten laid out from their aspect ratios with nothing measured, video tiles, the transfer of each tile, tiles that open the album in MediaViewer. |
-| [**VoicePlayer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/voice-player/COMPONENT.md) | A voice message player: a round play disk, a waveform that is the seek slider, and the time with the playback speed; one sound at a time, `getWaveform` for audio without levels. |
-| [**VideoNote**](https://github.com/esurkov1/prime-ui/blob/main/src/components/video-note/COMPONENT.md) | A round video message: a still first frame with the play disk, played with sound on a press; the same player API as VoicePlayer — transcript, transfer either way, one sound at a time. |
-| [**Composer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/composer/COMPONENT.md) | The message input of a chat: a growing field, Enter to send, attachments, reply / edit bar, Markdown formatting, voice and video messages with pause, the typing signal. |
-| [**ChatList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chat-list/COMPONENT.md) | The conversation list of a messenger: avatars with presence, names, times, the last message with its author or media word, unread / muted / mention counts, typing and drafts, a row menu, search, rows that glide to a new order, long lists rendered around the view. |
+| [**Chat**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chat/COMPONENT.md) | A conversation, assembled: the header with who it is with, search, pinned messages, the virtualized message list with dates, runs, selection and jumps, typing, and the Composer at the bottom. |
+| [**Message**](https://github.com/esurkov1/prime-ui/blob/main/src/components/message/COMPONENT.md) | One chat message in its shell: a speech bubble, a picture or a circle, incoming or outgoing, the tail that ends a run, the time and delivery ticks in the corner, reactions, the menu, a group chat's author header, and every content kind of a messenger. |
+| [**VoicePlayer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/voice-player/COMPONENT.md) | A voice message player: a round play disk, a waveform that is the seek slider, and the time with the playback speed — the same player API as VideoNote. |
+| [**VideoNote**](https://github.com/esurkov1/prime-ui/blob/main/src/components/video-note/COMPONENT.md) | A round video message: a still first frame with the play disk that plays with sound on a press — the same player API as VoicePlayer. |
+| [**Composer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/composer/COMPONENT.md) | The message input of a chat: a field that grows from one line, Enter to send, attachments, a reply / edit bar, Markdown formatting of a selection, and voice or round video messages from the same button. |
+| [**Gallery**](https://github.com/esurkov1/prime-ui/blob/main/src/components/gallery/COMPONENT.md) | Photos and videos as a messenger album: one, or up to ten laid out from their aspect ratios alone, every box final before a byte loads; a tile opens the album in MediaViewer. |
+| [**ChatList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chat-list/COMPONENT.md) | The conversation list of a messenger: the pane where the reader picks a dialog — avatar, name, time, the last message, counts, «печатает…» and drafts. |
 
 ### Status and loading (`status`)
 
@@ -266,21 +273,21 @@ accessibility, examples and common mistakes.
 | [**ProgressCircle**](https://github.com/esurkov1/prime-ui/blob/main/src/components/progress-circle/COMPONENT.md) | Circular progress — the ring version of ProgressBar: one value or `segments` that split a whole, with status colors and optional content in the center. |
 | [**Spinner**](https://github.com/esurkov1/prime-ui/blob/main/src/components/spinner/COMPONENT.md) | An indeterminate loading indicator: the kit ring with the share unknown — a quarter arc turning on a faint track while a request runs. |
 | [**Skeleton**](https://github.com/esurkov1/prime-ui/blob/main/src/components/skeleton/COMPONENT.md) | A placeholder in the shape of the content that is loading — text lines, a control, an avatar, a block — so the layout is in place before the data arrives. |
+| [**EmptyPage**](https://github.com/esurkov1/prime-ui/blob/main/src/components/empty-page/COMPONENT.md) | Empty or failed state of a page, a block or a menu: icon, title, explanation and an action — a retry for a failed load. |
 | [**Crossfade**](https://github.com/esurkov1/prime-ui/blob/main/src/components/crossfade/COMPONENT.md) | A region that cross-fades between its states (loading → data → empty → error) and glides to the new height, so the page below does not jump. |
-| [**EmptyPage**](https://github.com/esurkov1/prime-ui/blob/main/src/components/empty-page/COMPONENT.md) | Empty or failed state of a page or a block: icon, title, explanation and an action — a retry for a failed load. |
 | [**VisuallyHidden**](https://github.com/esurkov1/prime-ui/blob/main/src/components/visually-hidden/COMPONENT.md) | Text that screen readers read and nobody sees: the words behind an icon, a badge or a change on the screen. |
 
 ### Navigation (`navigation`)
 
 | Component | What it is for |
 |---|---|
-| [**Tabs**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) | Tabs for navigating between content panels of one screen. |
+| [**Tabs**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tabs/COMPONENT.md) | A tab bar of folder tabs for navigating between content panels of one screen: the active tab is the host's surface rising into the strip, the panel is the host's content with no frame or padding of its own. |
 | [**Breadcrumb**](https://github.com/esurkov1/prime-ui/blob/main/src/components/breadcrumb/COMPONENT.md) | Breadcrumbs: the path to the current page. |
 | [**Pagination**](https://github.com/esurkov1/prime-ui/blob/main/src/components/pagination/COMPONENT.md) | Page-by-page navigation: arrows, page numbers with ellipsis and a compact «3 / 12» view. |
-| [**List**](https://github.com/esurkov1/prime-ui/blob/main/src/components/list/COMPONENT.md) | A selectable list of rows — the list half of a list + detail screen: conversations, tickets, mail, records. |
 | [**Stepper**](https://github.com/esurkov1/prime-ui/blob/main/src/components/stepper/COMPONENT.md) | Steps of a multi-step process with pending, active, completed and danger statuses. |
 | [**Sidebar**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/sidebar/COMPONENT.md) | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. |
-| [**BottomNav**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/bottom-nav/COMPONENT.md) | Phone navigation bar: 2–6 sections, flat or a floating glass capsule, with an optional round action. |
+| [**BottomNav**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/bottom-nav/COMPONENT.md) | Phone navigation: a bar of 2–6 main sections at the bottom of the screen, optionally with a round action beside it. |
+| [**List**](https://github.com/esurkov1/prime-ui/blob/main/src/components/list/COMPONENT.md) | A selectable navigation list of rows: the master half of a list + detail screen (conversations, tickets, mail, records). |
 
 ### Overlays (`overlays`)
 
@@ -288,43 +295,38 @@ accessibility, examples and common mistakes.
 |---|---|
 | [**Tooltip**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tooltip/COMPONENT.md) | A short hint that appears next to an element on hover or keyboard focus. |
 | [**Popover**](https://github.com/esurkov1/prime-ui/blob/main/src/components/popover/COMPONENT.md) | A non-modal floating panel anchored to a trigger: short forms, filters, confirmations, explanations. |
-| [**Dropdown**](https://github.com/esurkov1/prime-ui/blob/main/src/components/dropdown/COMPONENT.md) | A menu of actions that opens from a trigger: groups, a profile header and destructive items. |
+| [**Dropdown**](https://github.com/esurkov1/prime-ui/blob/main/src/components/dropdown/COMPONENT.md) | A menu of actions that opens from a trigger: picking an item runs it and closes the menu. |
 | [**Modal**](https://github.com/esurkov1/prime-ui/blob/main/src/components/modal/COMPONENT.md) | A dialog over the page for confirmations, short forms and important text. |
 | [**ConfirmDialog**](https://github.com/esurkov1/prime-ui/blob/main/src/components/confirm-dialog/COMPONENT.md) | The confirm of a destructive or weighty action in one piece: the question, the consequence, Cancel and an action that runs its own request. |
-| [**Drawer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/drawer/COMPONENT.md) | A modal side panel that slides in from the side: filters, forms and record details. |
+| [**Drawer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/drawer/COMPONENT.md) | A modal panel that slides in from the side: filters, forms and record details without leaving the page. |
+| [**Command Menu**](https://github.com/esurkov1/prime-ui/blob/main/src/components/command-menu/COMPONENT.md) | A search palette over the page: the query filters commands and pages, Enter runs the active one. |
 | [**Sheet**](https://github.com/esurkov1/prime-ui/blob/main/src/components/sheet/COMPONENT.md) | A panel raised from the bottom edge for a short task that ends by itself: pick a date, choose an action, leave a few words. |
-| [**CommandMenu**](https://github.com/esurkov1/prime-ui/blob/main/src/components/command-menu/COMPONENT.md) | A command palette in a dialog: a search field that filters a list of commands and pages (⌘K). |
-| [**MediaViewer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/media-viewer/COMPONENT.md) | A full-screen viewer of photos and videos: paging under the finger, pinch and double-tap zoom, momentum pan, swipe to close, opening out of its thumbnail. |
+| [**MediaViewer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/media-viewer/COMPONENT.md) | A full-screen viewer of photos and videos that behaves like a native one: pages follow the finger, pictures zoom and pan with momentum, a swipe closes it, and it opens out of the thumbnail it came from. |
 
 ### Page (`page`)
 
 | Component | What it is for |
 |---|---|
 | [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame: a content panel that is the page itself and a navigation rail one layer above it. |
-| [**AppHeader**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-header/COMPONENT.md) | The page's bar at the top of the app: the page title with a line of data, the page's own buttons and tools, the phone menu button. |
-| [**PageContent**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) | Page structure inside the main column: title, page actions, titled sections and a bento tile grid; full-height pages and list + detail. |
-| [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — search and filter, sections, view options and the primary action — one row when wide, stacked rows when narrow. |
-| [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator, horizontal or vertical, with or without a label. |
-| [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents; a chat pinned to its end, edge events for loading more. |
+| [**AppHeader**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-header/COMPONENT.md) | The page's bar at the top of the app's content panel: the page title with a line of data, the page's tools and its own buttons — only what the current page needs. |
+| [**PageContent**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) | Page structure inside the main column: title, page actions and content blocks, titled sections and the tile grid of a dashboard; a page as high as the panel and the list + detail layout. |
+| [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — sections, filter and search, view options and the primary action — laid out from its own width: one row when wide, stacked rows when narrow, search and filter always first with the active filters under the top row. |
+| [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator inside one surface, horizontal or vertical, with or without a label. |
+| [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | The kit's one scroll region: a thin scrollbar, soft edges wherever content is hidden, and correct shrinking inside flex and grid parents. |
 | [**LoginForm**](https://github.com/esurkov1/prime-ui/blob/main/src/components/login-form/COMPONENT.md) | A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation. |
 
 ### Interaction (`interaction`)
 
 | Component | What it is for |
 |---|---|
-| [**Dnd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/dnd/COMPONENT.md) | Pointer-driven drag and drop: reorderable lists, draggable items and drop zones, with touch and keyboard support. |
-
-### Foundations (`foundations`)
-
-| Component | What it is for |
-|---|---|
-| [**Typography**](https://github.com/esurkov1/prime-ui/blob/main/src/components/typography/COMPONENT.md) | Text roles of the Golos Text type scale applied to any text element, with reading-width guidance. |
+| [**Dnd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/dnd/COMPONENT.md) | Pointer-driven drag and drop: reorderable lists, draggable items and drop zones on one shared session, with a lifted clone, a gap where the item lands, auto-scroll, touch support and a keyboard path. |
 
 ### Infrastructure (`infrastructure`)
 
 | Component | What it is for |
 |---|---|
 | [**ExampleFrame**](https://github.com/esurkov1/prime-ui/blob/main/src/components/example-frame/COMPONENT.md) | A documentation frame: live preview, source code and device width in one block. |
+<!-- components:end -->
 
 ## Providers and helpers
 

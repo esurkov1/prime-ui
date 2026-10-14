@@ -85,9 +85,13 @@ Motion is opacity only, so nothing shifts under the pointer; the leaving content
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 No keyboard interaction.
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Renders a plain `<div>`; pass `aria-busy` while the region loads and `aria-live` or `role` when its changes must be announced.
 - The leaving layer is `aria-hidden` and `inert`: screen readers and Tab never reach content that is going away.
 - Move focus yourself when the focused control was in the old state (e.g. the retry button of an error).

@@ -38,4 +38,21 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: 'Decorative: `aria-hidden="true"`, screen readers skip it.',
+        ru: 'Заглушка декоративная: `aria-hidden="true"`, скринридер её не читает.',
+      },
+      {
+        en: 'The loading region announces itself: `aria-busy` on it (Crossfade, a card, a form) and, when the wait matters, a `role="status"` text.',
+        ru: 'О загрузке сообщает область: `aria-busy` на ней (Crossfade, карточка, форма), при необходимости — `role="status"` с текстом.',
+      },
+      {
+        en: "Under `prefers-reduced-motion` the placeholder does not pulse.",
+        ru: "Под `prefers-reduced-motion` заглушка не пульсирует.",
+      },
+    ],
+  },
 };

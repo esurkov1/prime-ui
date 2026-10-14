@@ -1,12 +1,5 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
 
-const SPAN_REST = {
-  name: "…rest",
-  type: "HTMLAttributes<HTMLSpanElement>",
-  en: "`className` and the other span attributes.",
-  ru: "`className` и остальные атрибуты span.",
-};
-
 export const api: ComponentApi = {
   parts: [
     {
@@ -103,20 +96,39 @@ export const api: ComponentApi = {
           en: 'Replaces the default content, e.g. `<Icon name="status.danger" />`.',
           ru: 'Заменяет содержимое по умолчанию, например `<Icon name="status.danger" />`.',
         },
-        SPAN_REST,
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
     {
       name: "Stepper.Content",
       en: "`ref` → `HTMLSpanElement`. Text column for the title and the description.",
       ru: "Колонка текста: заголовок и описание.",
-      props: [SPAN_REST],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
+      ],
     },
     {
       name: "Stepper.Title · Stepper.Description",
       en: "`ref` → `HTMLSpanElement`. Step title in the control text; muted secondary line in the hint text.",
       ru: "Заголовок шага кеглем контрола; приглушённая вторая строка кеглем подсказки.",
-      props: [SPAN_REST],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
+      ],
     },
     {
       name: "Stepper.Arrow",
@@ -133,4 +145,28 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves focus between items; a disabled one is skipped.",
+        ru: "Переводит фокус между шагами; неактивный пропускается.",
+      },
+      { keys: "Enter · Space", en: "Selects the item.", ru: "Выбирает шаг." },
+    ],
+    aria: [
+      {
+        en: 'Semantic `<ol>`; each item is a `<button>` inside an `<li>`; the active one has `aria-current="step"`.',
+        ru: 'Семантический `<ol>`; каждый шаг — `<button>` внутри `<li>`, у активного — `aria-current="step"`.',
+      },
+      {
+        en: "Separators, indicator and arrow are `aria-hidden`; the name comes from Title (and Description).",
+        ru: "Шевроны, индикатор и `Stepper.Arrow` скрыты (`aria-hidden`); имя шага — заголовок и описание.",
+      },
+      {
+        en: "Give the `<ol>` an `aria-label` when there are several steppers on a page.",
+        ru: "Если степперов на странице несколько, дайте `<ol>` `aria-label`.",
+      },
+    ],
+  },
 };

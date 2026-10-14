@@ -1,11 +1,4 @@
-import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
-
-const rest = (element: string): ApiProp => ({
-  name: "…rest",
-  type: `HTMLAttributes<${element}>`,
-  en: "`className`, `id`, `data-*` and the other attributes of the element.",
-  ru: "`className`, `id`, `data-*` и остальные атрибуты элемента.",
-});
+import type { ComponentApi } from "../../../scripts/docs/componentApi";
 
 export const api: ComponentApi = {
   parts: [
@@ -17,7 +10,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else `"m"`',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Label and value type and the gap between pairs; without it the list takes the tier of its host (a Card, a Drawer, a form).",
           ru: "Шрифт подписи и значения и зазор между парами; без него список берёт ярус хоста (Card, Drawer, форма).",
         },
@@ -34,7 +27,12 @@ export const api: ComponentApi = {
           en: "Built-in strings, see Labels.",
           ru: "Встроенные строки, см. «Доступность».",
         },
-        rest("HTMLDListElement"),
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDListElement>",
+          en: "`className`, `id`, `data-*` and the other attributes of the element.",
+          ru: "`className`, `id`, `data-*` и остальные атрибуты элемента.",
+        },
       ],
     },
     {
@@ -55,7 +53,12 @@ export const api: ComponentApi = {
           en: "The value (`<dd>`): text, a Badge, a link; plus an optional `DescriptionList.ItemAction`, which goes to the end of the value.",
           ru: "Значение (`<dd>`): текст, Badge, ссылка; и необязательный `DescriptionList.ItemAction`, который встаёт в конец значения.",
         },
-        rest("HTMLDivElement"),
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className`, `id`, `data-*` and the other attributes of the element.",
+          ru: "`className`, `id`, `data-*` и остальные атрибуты элемента.",
+        },
       ],
     },
     {
@@ -100,4 +103,28 @@ export const api: ComponentApi = {
       ru: "Что читают скринридеры у пустого значения.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves to the row actions (`DescriptionList.ItemAction`); the pairs themselves are not focusable.",
+        ru: "Переходит к действиям строк (`DescriptionList.ItemAction`); сами пары не в порядке фокуса.",
+      },
+      { keys: "Enter · Space", en: "Runs the row action.", ru: "Выполняет действие строки." },
+    ],
+    aria: [
+      {
+        en: "The list is a `<dl>`: the label is a `<dt>`, the value a `<dd>`; screen readers read each pair as a term and its definition.",
+        ru: "Список — `<dl>`: подпись — `<dt>`, значение — `<dd>`; скринридеры читают пары как термин и определение.",
+      },
+      {
+        en: "An empty value shows a muted `labels.empty` (hidden from assistive tech) and is read as `labels.emptyText`.",
+        ru: "Пустое значение показывает приглушённый `labels.empty` (скрыт от скринридеров) и читается как `labels.emptyText`.",
+      },
+      {
+        en: "A row action is named by its `label`, which is also its tooltip; the icon is decorative.",
+        ru: "У действия строки имя и подсказка из `label`; иконка декоративна.",
+      },
+    ],
+  },
 };

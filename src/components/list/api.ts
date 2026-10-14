@@ -199,4 +199,45 @@ export const api: ComponentApi = {
       ru: "`aria-label` ручки строки (`onReorder`); `{label}` — текст строки.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves focus between rows; a disabled row is skipped.",
+        ru: "Переводит фокус по строкам; недоступная строка пропускается.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Opens the record; a link row takes Enter only.",
+        ru: "Открывает запись; у строки-ссылки — только Enter.",
+      },
+      {
+        keys: "Alt + ↑ · Alt + ↓",
+        en: "With `onReorder`, moves the row one place up or down (from its handle or the row).",
+        ru: "С `onReorder` переносит строку на место выше или ниже (с ручки или со строки).",
+      },
+    ],
+    aria: [
+      {
+        en: "`<ul>` named by `aria-label` (or `aria-labelledby` to a visible heading); each row is an `<li>` with a button or link.",
+        ru: "Список — `<ul>` с именем из `aria-label`; каждая строка — `<li>` с кнопкой или ссылкой.",
+      },
+      {
+        en: 'The open record: `aria-current="true"` on a button (a selection inside the screen), `aria-current="page"` on a link (`href`, `asChild`) — the link points at the current URL. A router link may set it itself.',
+        ru: 'Открытая запись — `aria-current="true"` на кнопке, `aria-current="page"` на ссылке (`href`, `asChild`).',
+      },
+      {
+        en: "The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row.",
+        ru: "Имя строки складывается из текста, описания, меты и счётчика; ведущая иконка или аватар скрыты (`aria-hidden`).",
+      },
+      {
+        en: "Arrow keys do not move between rows: rows are ordinary Tab stops, as in the Sidebar.",
+        ru: "Недоступная строка: `disabled` у кнопки, `aria-disabled` и `tabindex=-1` у ссылки — вне порядка Tab.",
+      },
+      {
+        en: "With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.",
+        ru: "С `onReorder` перед строкой стоит ручка «Переместить {label}»; новое место объявляется вежливо, сохраняемая строка — `aria-busy`.",
+      },
+    ],
+  },
 };

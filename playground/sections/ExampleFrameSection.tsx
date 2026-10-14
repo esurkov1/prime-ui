@@ -36,21 +36,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Tab",
-        action: "Переводит фокус по переключателям, кнопкам темы и копирования, области кода.",
-      },
-      {
-        keys: "ArrowLeft · ArrowRight",
-        action: "Выбирают вид или ширину внутри переключателя (SegmentedControl).",
-      },
-    ],
-    aria: [
-      "Переключатели вида и ширины — радиогруппы с `aria-label` из `labels.paneSwitch` и `labels.viewportSwitch`.",
-      "Кнопки темы и копирования — кнопки только с иконкой и `aria-label`; после копирования метка меняется на `labels.copied`.",
-      "Область кода — фокусируемая `section` с `aria-label` из `labels.codeRegion`, её можно прокручивать с клавиатуры.",
-    ],
-  },
 };

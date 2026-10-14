@@ -109,6 +109,8 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`. A c
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Enter` · `Space` | Open the panel from the field; in a channel cell, apply the value. |
@@ -118,6 +120,8 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`. A c
 | `Escape` | Closes the panel and returns focus to the field. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - The field is a `<button>` with `aria-haspopup="dialog"` and `aria-expanded`; it is named by the label and the current hex (`aria-labelledby`), or by `aria-label` plus the hex.
 - The panel is `role="dialog"` named by the field; the area and the sliders are React Aria `role="slider"`, the sliders named by `labels.hue` and `labels.alpha`.
 - The ready colors are a `role="radiogroup"` named by `labels.presets`.

@@ -4,13 +4,6 @@ import { FIELD_OPTIONAL_LABEL, fieldGroupProps } from "../../internal/field.api"
 const PALETTE =
   '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"';
 
-const SPAN_REST = {
-  name: "…rest",
-  type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
-  en: "`className` and the other span attributes.",
-  ru: "`className` и остальные атрибуты span.",
-};
-
 export const api: ComponentApi = {
   parts: [
     {
@@ -125,7 +118,12 @@ export const api: ComponentApi = {
           en: 'The icon, e.g. `<Icon name="theme.light" />`.',
           ru: 'Иконка, например `<Icon name="theme.light" />`.',
         },
-        SPAN_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
     {
@@ -140,7 +138,12 @@ export const api: ComponentApi = {
           en: "Title text.",
           ru: "Текст подписи.",
         },
-        SPAN_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
     {
@@ -162,7 +165,12 @@ export const api: ComponentApi = {
           en: "The number.",
           ru: "Число.",
         },
-        SPAN_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
     {
@@ -177,9 +185,56 @@ export const api: ComponentApi = {
           en: "Second-line text; wrap a key value in `<strong>`.",
           ru: "Текст второй строки; ключевое значение оберните в `<strong>`.",
         },
-        SPAN_REST,
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
       ],
     },
   ],
   labels: [FIELD_OPTIONAL_LABEL],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "ArrowRight · ArrowDown",
+        en: "Next option, wrapping and skipping disabled ones; focus and selection move together.",
+        ru: "Следующий вариант по кругу, пропуская неактивные; фокус и выбор двигаются вместе.",
+      },
+      { keys: "ArrowLeft · ArrowUp", en: "Previous option.", ru: "Предыдущий вариант." },
+      {
+        keys: "Home · End",
+        en: "First and last enabled option.",
+        ru: "Первый и последний доступный вариант.",
+      },
+      {
+        keys: "Tab",
+        en: "Enters the group on the selected option (or the first enabled one) and leaves it.",
+        ru: "Входит в группу на выбранном варианте (или первом доступном) и выходит из неё.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The track is `role="radiogroup"`, named by `label` (`aria-labelledby`); without a label give the root `aria-label`. `aria-disabled` when disabled.',
+        ru: 'Дорожка — `role="radiogroup"`: её называет `label` (`aria-labelledby`), иначе задайте `aria-label`; при `disabled` — `aria-disabled`.',
+      },
+      {
+        en: 'Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.',
+        ru: "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`, `required` — `aria-required`.",
+      },
+      {
+        en: 'Items are `<button role="radio" aria-checked>` with roving `tabIndex`.',
+        ru: 'Варианты — `<button role="radio" aria-checked>` с перемещаемым `tabIndex`.',
+      },
+      {
+        en: "Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description.",
+        ru: "В двухстрочном сегменте имя — подпись и счётчик, описание — `aria-describedby`.",
+      },
+      {
+        en: "Icons are `aria-hidden`; icon-only items need `aria-label` (and a Tooltip for sighted users).",
+        ru: "Иконки скрыты (`aria-hidden`); сегменту только с иконкой нужен `aria-label`.",
+      },
+    ],
+  },
 };

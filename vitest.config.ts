@@ -24,6 +24,9 @@ export default defineConfig({
     testTimeout: 15_000,
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
+    /** Every spy, mock and stubbed global is undone after each test: no test leaks into the next. */
+    restoreMocks: true,
+    unstubGlobals: true,
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     globals: true,
   },

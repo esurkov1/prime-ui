@@ -88,35 +88,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "ArrowLeft · ArrowRight",
-        action:
-          "Выбирают соседнюю вкладку по кругу, пропуская неактивные; в вертикальном списке тоже работают.",
-      },
-      {
-        keys: "ArrowUp · ArrowDown",
-        action: "То же в вертикальном списке.",
-      },
-      { keys: "Home · End", action: "Первая и последняя доступная вкладка." },
-      {
-        keys: "Delete · Backspace",
-        action:
-          "Закрывают вкладку с `onRemove`; если она была активной, выбор и фокус переходят к соседней.",
-      },
-      {
-        keys: "Tab",
-        action: "Входит в активную вкладку (roving tabindex), затем переходит в панель.",
-      },
-    ],
-    aria: [
-      "Паттерн WAI-ARIA tabs: `tablist` / `tab` / `tabpanel`, `aria-controls` и `aria-labelledby` связываются сами; дайте `Tabs.List` `aria-label`.",
-      "Выбор следует за фокусом; панель фокусируема (`tabIndex=0`).",
-      "В двухстрочной вкладке имя — подпись и счётчик, `Tabs.Description` — `aria-describedby`.",
-      "`Tabs.Icon` и `Tabs.Separator` скрыты (`aria-hidden`).",
-      'Кнопка закрытия названа по вкладке (`labels.remove`) и не входит в порядок Tab; у вкладки `aria-keyshortcuts="Delete"`.',
-      "Когда остаются только иконки, подпись остаётся для экранного диктора, а при наведении и фокусе показывается в `Tooltip`.",
-    ],
-  },
 };

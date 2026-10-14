@@ -77,33 +77,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "ArrowDown · ArrowUp",
-        action: "Переводят активный пункт по кругу; фокус остаётся в поле поиска.",
-      },
-      { keys: "Home · End", action: "Первый / последний найденный пункт." },
-      {
-        keys: "Enter",
-        action: "Выполняет активный пункт; при ошибке загрузки повторяет её (`onRetry`).",
-      },
-      {
-        keys: "Tab",
-        action: "При ошибке загрузки переводит фокус на кнопку «Повторить».",
-      },
-      {
-        keys: "Escape",
-        action: "Закрывает палитру (`closeOnEscape`); фокус возвращается на открывший элемент.",
-      },
-    ],
-    aria: [
-      'Палитра — `role="dialog"` с `aria-modal`; имя — `CommandMenu.Title` или `aria-label`.',
-      'Поле — `role="combobox"` с `aria-controls` на список и `aria-activedescendant` на активный пункт; пункты — `role="option"`, активный — `aria-selected`.',
-      '`CommandMenu.Group` — `role="group"` с именем из `label`; пустой результат — `role="status"`.',
-      'При загрузке список и поле — `aria-busy`, а `labels.loading` объявляется вежливо; строки-скелеты скрыты от скринридеров; ошибка загрузки — `role="alert"`.',
-      "Стрелки, дошедшие до последнего пункта, запрашивают следующую порцию так же, как прокрутка.",
-      "Страница за палитрой неактивна; после закрытия фокус возвращается на открывший элемент.",
-    ],
-  },
 };

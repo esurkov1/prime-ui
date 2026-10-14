@@ -49,17 +49,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "Tab", action: "Вход на выбранный образец (или первый)." },
-      { keys: "ArrowRight · ArrowLeft", action: "Следующий / предыдущий образец с выбором." },
-      { keys: "ArrowDown · ArrowUp", action: "На видимый ряд ниже / выше с выбором." },
-      { keys: "Home · End", action: "Первый / последний образец с выбором." },
-    ],
-    aria: [
-      '`role="radiogroup"` с кнопкой `role="radio"` на каждый образец; название цвета — имя и `title` образца.',
-      "Группу называют `label`, `aria-labelledby`, `aria-label` или `labels.group`; подсказка или ошибка — через `aria-describedby`.",
-      "Галочка декоративна; выбор объявляет `aria-checked`.",
-    ],
-  },
 };

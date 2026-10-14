@@ -94,4 +94,29 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [],
+    aria: [
+      {
+        en: "The title is a real heading (`h1` by default) and the form is a native `<form>`: Enter submits.",
+        ru: "Заголовок — настоящий `h1` (или `as`), форма — нативный `<form>`: Enter отправляет её.",
+      },
+      {
+        en: 'The logo is decorative; with an `aria-label` it is the product mark image (`role="img"`).',
+        ru: 'Логотип декоративен; с `aria-label` он становится изображением знака продукта (`role="img"`).',
+      },
+      {
+        en: "Give `LoginForm.Form` an `aria-label` (or `aria-labelledby` pointing to the title id) so the form is a landmark.",
+        ru: "Дайте `LoginForm.Form` `aria-label` (или `aria-labelledby` на id заголовка), чтобы форма стала ориентиром.",
+      },
+      {
+        en: "Fields use `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) so password managers and OTP autofill work.",
+        ru: "Поля с `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) работают с менеджерами паролей и автозаполнением кода.",
+      },
+      {
+        en: 'Server errors in a Banner need `role="alert"`; field errors come from the fields (`aria-invalid`, described by the error).',
+        ru: 'Ошибке сервера в Banner нужен `role="alert"`; ошибки полей приходят из самих полей.',
+      },
+    ],
+  },
 };

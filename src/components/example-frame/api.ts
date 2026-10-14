@@ -18,7 +18,7 @@ export const api: ComponentApi = {
         },
         {
           name: "previewLayout",
-          type: '"default" | "stack" | "stack-narrow" | "full" | "row" | "matrix"',
+          type: '"default" | "stack" | "stack-narrow" | "full" | "row" | "matrix" | "matrix-wide"',
           default: '"default"',
           en: "How the preview lays out its children, so snippets need no wrapper divs (see Variants).",
           ru: "Как превью раскладывает детей, чтобы примерам не нужны были обёртки (см. «Варианты» в COMPONENT.md).",
@@ -150,4 +150,32 @@ export const api: ComponentApi = {
       ru: "`aria-label` области кода.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Moves through the switches, the theme and copy buttons and the code pane.",
+        ru: "Переводит фокус по переключателям, кнопкам темы и копирования, области кода.",
+      },
+      {
+        keys: "ArrowLeft · ArrowRight",
+        en: "Choose the pane or the width inside a switch (SegmentedControl).",
+        ru: "Выбирают вид или ширину внутри переключателя (SegmentedControl).",
+      },
+    ],
+    aria: [
+      {
+        en: "The pane and device switches are radio groups named by `labels.paneSwitch` and `labels.viewportSwitch`.",
+        ru: "Переключатели вида и ширины — радиогруппы с `aria-label` из `labels.paneSwitch` и `labels.viewportSwitch`.",
+      },
+      {
+        en: "The theme and copy buttons are icon-only Buttons with `aria-label`; after copying the label becomes `labels.copied`.",
+        ru: "Кнопки темы и копирования — кнопки только с иконкой и `aria-label`; после копирования метка меняется на `labels.copied`.",
+      },
+      {
+        en: "The code pane is a focusable `section` with `aria-label` from `labels.codeRegion`, so keyboard users can scroll it.",
+        ru: "Область кода — фокусируемая `section` с `aria-label` из `labels.codeRegion`, её можно прокручивать с клавиатуры.",
+      },
+    ],
+  },
 };

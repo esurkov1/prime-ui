@@ -98,12 +98,16 @@ Decided by the items, not a prop: the number of items and their ratios.
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Moves through the tiles that open the viewer and the transfer disks |
 | `Enter` · `Space` | Opens the album in the viewer at this tile, or presses a transfer disk; in the viewer `←` `→` page and `Escape` closes, the focus returning to the tile |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - A tile is a button «Открыть: {alt}» (`labels.open`; without `alt` — «фото» or «видео») with `aria-haspopup="dialog"`; its picture is then decorative. The viewer is MediaViewer's dialog with its own names; on close the focus returns to the tile.
 - With `viewer={false}` and no open handlers a picture is an image with its own `alt`; the play mark and the length of a video are `aria-hidden`.
 - A transfer disk is the cancel, retry or download button; the share is its accessible description («Отправка 42%»), the reason of a failure the retry's description; a refused cancel, retry or download is announced politely.

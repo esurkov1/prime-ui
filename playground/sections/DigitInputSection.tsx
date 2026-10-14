@@ -72,20 +72,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      { keys: "0–9", action: "Ввод в первую пустую ячейку и переход к следующей." },
-      { keys: "Backspace", action: "Стирает цифру; в пустой ячейке — переход к предыдущей." },
-      { keys: "ArrowLeft · ArrowRight", action: "Ходит по заполненным ячейкам и ячейке ввода." },
-      { keys: "Home · End", action: "К первой ячейке / к ячейке ввода." },
-      { keys: "Tab", action: "Уходит из кода." },
-    ],
-    aria: [
-      'Ячейки — в `<fieldset>` (`role="group"`), названном подписью (`aria-labelledby`) или `labels.group`; клик по подписи фокусирует первую ячейку.',
-      'Каждая ячейка названа `labels.cell` («Цифра 1 из 6»), с `autocomplete="one-time-code"` и `inputmode="numeric"`.',
-      "Подсказка или ошибка связаны с группой через `aria-describedby`; ячейки при ошибке — `aria-invalid`.",
-      "Вставка и автозаполнение всего кода в любую ячейку заполняют все ячейки.",
-      "Пока код проверяется (промис из `onComplete`), у группы `aria-busy`, ячейки только для чтения; причина отказа объявляется вежливой live-областью.",
-    ],
-  },
 };

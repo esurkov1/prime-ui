@@ -74,12 +74,16 @@ Syntax tokens: keywords purple (weight 500), strings teal, numbers orange, JSX t
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Focuses a `soft` block so overflowing code can be scrolled. |
 | `←` · `→` | Scroll a focused block horizontally. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - Native `<pre>` / `<code>`; screen readers read the text.
 - A `soft` block is a Tab stop (`tabIndex=0`); pass `tabIndex={-1}` when it never overflows.
 - Give standalone blocks an `aria-label` («Команда установки»).

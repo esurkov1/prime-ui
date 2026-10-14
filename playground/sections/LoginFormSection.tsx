@@ -69,14 +69,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [],
-    aria: [
-      "Заголовок — настоящий `h1` (или `as`), форма — нативный `<form>`: Enter отправляет её.",
-      'Логотип декоративен; с `aria-label` он становится изображением знака продукта (`role="img"`).',
-      "Дайте `LoginForm.Form` `aria-label` (или `aria-labelledby` на id заголовка), чтобы форма стала ориентиром.",
-      "Поля с `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) работают с менеджерами паролей и автозаполнением кода.",
-      'Ошибке сервера в Banner нужен `role="alert"`; ошибки полей приходят из самих полей.',
-    ],
-  },
 };

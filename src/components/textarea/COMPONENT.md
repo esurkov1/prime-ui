@@ -156,6 +156,8 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 ## Accessibility
 
 ### Keyboard
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 | Key | Action |
 |---|---|
 | `Tab` | Focuses the field, then the buttons in its corner; Enter inserts a line break instead of submitting the form. |
@@ -166,6 +168,8 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 | `Home` · `End` | Jump to the first / last formatting button. |
 
 ### ARIA
+<!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
 - `label` renders `<label htmlFor>` bound to the textarea; without it set `aria-label`. A placeholder never replaces the label.
 - Hint and error are linked via `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.
 - The field box is a `<div>`, not a `<label>`, so counter and hint never leak into the accessible name; clicking its padding focuses the textarea.

@@ -46,16 +46,27 @@ const COLUMNS: DataTableColumn<ApiProp>[] = [
     id: "default",
     header: "По умолчанию",
     minWidth: "8rem",
-    cell: (prop) =>
-      prop.default === undefined ? (
+    cell: (prop) => {
+      if (prop.default !== undefined) {
+        return (
+          <Typography as="span" variant="body-m">
+            <code>{prop.default}</code>
+          </Typography>
+        );
+      }
+      if (prop.defaultNote) {
+        return (
+          <Typography as="span" variant="body-m" tone="secondary">
+            {renderInlineCode(prop.defaultNote.ru)}
+          </Typography>
+        );
+      }
+      return (
         <Typography as="span" variant="body-m" tone="muted">
           —
         </Typography>
-      ) : (
-        <Typography as="span" variant="body-m">
-          <code>{prop.default}</code>
-        </Typography>
-      ),
+      );
+    },
   },
   {
     id: "description",

@@ -1,6 +1,7 @@
 /**
- * Shared helpers of the docs contracts (docs-contract, skill-docs): repository paths, file walking,
- * and the checks every copyable source (an example, a screen) and its layout CSS must pass.
+ * Shared helpers of the contracts (docs-contract, skill-docs, part-refs, refs and the source
+ * guards): repository paths, file walking, the component dirs, markdown sections and links, and
+ * the checks every copyable source (an example, a screen) and its layout CSS must pass.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -8,11 +9,16 @@ import { fileURLToPath } from "node:url";
 
 import { expect } from "vitest";
 
-import type { ComponentApi } from "../../scripts/docs/componentApi";
+import type { ApiText, ComponentApi } from "../../scripts/docs/componentApi";
+import { brokenLinkAt } from "../../scripts/docs/links";
+
+export { linkTargets } from "../../scripts/docs/links";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 export const read = (rel: string) => fs.readFileSync(path.join(root, rel), "utf8");
+
+export const exists = (rel: string) => fs.existsSync(path.join(root, rel));
 
 /** `button-group` → `ButtonGroup`. */
 export const pascal = (kebab: string) =>
@@ -24,9 +30,28 @@ export function walk(relDir: string, ext: RegExp): string[] {
   if (!fs.existsSync(abs)) return [];
   return fs.readdirSync(abs, { withFileTypes: true }).flatMap((entry) => {
     const rel = `${relDir}/${entry.name}`;
-    if (entry.isDirectory()) return entry.name === "dist" ? [] : walk(rel, ext);
+    if (entry.isDirectory()) {
+      return entry.name === "dist" || entry.name === "node_modules" ? [] : walk(rel, ext);
+    }
     return ext.test(entry.name) ? [rel] : [];
   });
+}
+
+export type ComponentDir = { base: "components" | "layout"; dir: string; rel: string };
+
+/**
+ * Every component dir, from the filesystem: `src/components/*` and `src/layout/*`. The one list
+ * the docs contract, part-refs, the catalogue checks and the screen tests share.
+ */
+export function componentDirs(): ComponentDir[] {
+  return (["components", "layout"] as const).flatMap((base) =>
+    fs
+      .readdirSync(path.join(root, "src", base), { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort()
+      .map((dir) => ({ base, dir, rel: `src/${base}/${dir}` })),
+  );
 }
 
 /** Filler a real screen never shows: lorem, numbered placeholders, emoji. */
@@ -39,6 +64,13 @@ export const PLACEHOLDER = /lorem|ipsum|Пункт \d|Item \d|Элемент \d|
 export function withoutReactionData(source: string): string {
   return source.replace(/\bemoji:\s*"[^"\n]*"/g, 'emoji: ""');
 }
+
+/** The backticked code tokens of a text, sorted: `` `size` `` → `size`. */
+export const codeTokens = (text: string) =>
+  [...text.matchAll(/`([^`]+)`/g)].map((m) => m[1]).sort();
+
+/** The one-line JSDoc text of a copyable source (`/** text *\/` on line 1). */
+export const jsdocOf = (source: string) => source.match(/^\/\*\* (.+) \*\/\n/)?.[1];
 
 /**
  * The canon of a copyable source file: a one-line English JSDoc first, imports only from
@@ -65,6 +97,25 @@ export function checkSourceCanon(
 }
 
 /**
+ * The rest of the copyable-source canon, as offender ids (`file: rule`) for the `example-canon`
+ * ratchet: the JSDoc ends with the props it shows (` — \`a\`, \`b\`.`), no `biome-ignore`, no
+ * `toISOString().slice(` (Datepicker formats dates), no raw `<dl>` (DescriptionList) and no
+ * hand-written arrow-key handler (the kit's roving focus).
+ */
+export function sourceCanonOffenders(file: string, source: string): string[] {
+  const offenders: string[] = [];
+  const jsdoc = jsdocOf(source) ?? "";
+  if (!/ — `[^`]+`(, `[^`]+`)*\.$/.test(jsdoc)) offenders.push(`${file}: JSDoc tail`);
+  if (/biome-ignore/.test(source)) offenders.push(`${file}: biome-ignore`);
+  if (/toISOString\(\)\.slice\(/.test(source)) offenders.push(`${file}: toISOString().slice`);
+  if (/<d[ldt][\s>]/.test(source)) offenders.push(`${file}: raw <dl>`);
+  if (/onKeyDown/.test(source) && /["'`]Arrow(Up|Down|Left|Right)["'`]/.test(source)) {
+    offenders.push(`${file}: arrow-key onKeyDown`);
+  }
+  return offenders;
+}
+
+/**
  * Layout CSS next to a copyable source: semantic tokens only (no `--prime-ref-*`, hex or raw
  * px / rem outside breakpoints) and no text styling — text belongs to Typography. `forbidden`
  * adds properties the file must not set either.
@@ -84,6 +135,39 @@ export function checkLayoutCss(file: string, css: string, forbidden: string[] = 
     ...forbidden,
   ];
   expect(sheet, file).not.toMatch(new RegExp(`^\\s*(${properties.join("|")})\\s*:`, "m"));
+}
+
+/**
+ * What example CSS may not do, beyond `checkLayoutCss`: paint a surface (a bounded block is
+ * `Card.Root`), style text (Typography), or reach into a component's tier tokens. Offender ids
+ * are `file: property` (numbered when repeated) for the `example-css` ratchet.
+ */
+export const EXAMPLE_CSS_BANS = [
+  /^background(-\w+)?$/,
+  /^box-shadow$/,
+  /^border(-[\w-]+)?$/,
+  /^outline(-\w+)?$/,
+  /^font(-[\w-]+)?$/,
+  /^letter-spacing$/,
+  /^text-transform$/,
+  /^text-align$/,
+  /^white-space$/,
+  /^list-style(-\w+)?$/,
+];
+/** Component-tier tokens an example never sets or reads. */
+export const EXAMPLE_TOKEN_BANS = /--prime-(card-padding|modal|drawer)-/;
+
+export function layoutCssOffenders(file: string, css: string): string[] {
+  const offenders: string[] = [];
+  const lines = css.replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, " "));
+  lines.split("\n").forEach((line) => {
+    const m = line.match(/^\s*([a-z-]+)\s*:/);
+    if (m && EXAMPLE_CSS_BANS.some((ban) => ban.test(m[1]))) {
+      offenders.push(`${file}: ${m[1]}`);
+    }
+    if (EXAMPLE_TOKEN_BANS.test(line)) offenders.push(`${file}: component token`);
+  });
+  return offenders;
 }
 
 /** Longest part description in `api.ts` (`en` and `ru`): the element line and a short summary. */
@@ -110,4 +194,54 @@ export function overlongApiDescriptions(api: ComponentApi): string[] {
     }
   }
   return over;
+}
+
+/** The part's `en` without its leading ref line (`` `ref` → `X`. ``), which has no `ru` twin. */
+export const withoutRefLine = (en: string) =>
+  en.replace(/^(?:Generic [^;]+; )?`(?:forward)?[Rr]ef` → [^.]*(?:\.(?!\w)|$)\s*/, "");
+
+/** Every bilingual text of an `api.ts`, by where it sits: `Part`, `Part.prop`, `labels.key`… */
+export function apiTexts(api: ComponentApi): { where: string; text: ApiText }[] {
+  const texts: { where: string; text: ApiText }[] = [];
+  for (const part of api.parts) {
+    texts.push({ where: part.name, text: { en: withoutRefLine(part.en), ru: part.ru } });
+    for (const prop of part.props) {
+      texts.push({ where: `${part.name}.${prop.name}`, text: prop });
+      if (prop.defaultNote) {
+        texts.push({ where: `${part.name}.${prop.name} default`, text: prop.defaultNote });
+      }
+    }
+  }
+  for (const type of api.types ?? []) {
+    texts.push({ where: type.name, text: type });
+    for (const field of type.fields)
+      texts.push({ where: `${type.name}.${field.name}`, text: field });
+  }
+  for (const fn of api.functions ?? []) texts.push({ where: fn.name, text: fn });
+  for (const label of api.labels) texts.push({ where: `labels.${label.key}`, text: label });
+  api.accessibility.keyboard.forEach((row) => {
+    texts.push({ where: `keyboard ${row.keys}`, text: row });
+  });
+  api.accessibility.aria.forEach((row, index) => {
+    texts.push({ where: `aria ${index + 1}`, text: row });
+  });
+  return texts;
+}
+
+/** H2 section `## <title>` of a markdown document, without the heading line. */
+export function docSection(doc: string, title: string): string {
+  const start = doc.indexOf(`\n${title}\n`);
+  if (start === -1) return "";
+  const body = doc.slice(start + title.length + 2);
+  const level = title.match(/^#+/)?.[0].length ?? 2;
+  const end = body.search(new RegExp(`^#{1,${level}} `, "m"));
+  return end === -1 ? body : body.slice(0, end);
+}
+
+/**
+ * Why a relative link of the markdown file `from` (repository-relative) does not resolve, or
+ * `null` — the one link checker (`scripts/docs/links.ts`), anchors included.
+ */
+export function brokenLink(from: string, target: string): string | null {
+  return brokenLinkAt(path.join(root, from), target);
 }

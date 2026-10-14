@@ -89,27 +89,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Enter · Space",
-        action:
-          "Нажимает кнопку (нативное поведение `<button>`); с `holdToConfirm` клавишу держат, пока не дойдёт заливка.",
-      },
-      {
-        keys: "Tab",
-        action:
-          "Переводит фокус; неактивная кнопка пропускается, а с `asChild` остаётся в порядке фокуса с `aria-disabled`.",
-      },
-    ],
-    aria: [
-      'Нативный `<button type="button">`: случайно не отправит форму.',
-      "Кнопке только с иконкой нужен `aria-label`; `Button.Icon` скрыт (`aria-hidden`).",
-      '`loading` ставит `aria-busy="true"` и блокирует нажатие; `progress` тоже ставит `aria-busy`, но кнопка остаётся нажимаемой.',
-      '`shape="circle"` требует `aria-label`; кольцо `progress` скрыто (`aria-hidden`), долю называет подпись или `aria-describedby`.',
-      "`holdToConfirm`: жест описан скринридеру через `aria-describedby` («Удерживайте, чтобы подтвердить»); Пробел и Enter удерживаются как указатель.",
-      "Смена подписи читается один раз: буквы анимации скрыты, имя кнопки — новый текст целиком.",
-      'С `asChild` неактивное состояние — `aria-disabled="true"` без нативного `disabled`.',
-    ],
-  },
 };

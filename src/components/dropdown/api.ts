@@ -229,4 +229,63 @@ export const api: ComponentApi = {
     },
   ],
   labels: [],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Enter · Space",
+        en: "On the trigger opens the menu (focus on the first item); on an item runs it and returns focus to the trigger; on a checkbox item toggles it and the menu stays open.",
+        ru: "На триггере открывает меню (фокус на первом пункте); на пункте выполняет его и возвращает фокус на триггер; на пункте-переключателе переключает его, меню остаётся открытым.",
+      },
+      {
+        keys: "ArrowDown · ArrowUp",
+        en: "Move focus to the next / previous enabled item, wrapping.",
+        ru: "Переводят фокус на следующий / предыдущий доступный пункт по кругу.",
+      },
+      {
+        keys: "Home · End",
+        en: "First / last enabled item.",
+        ru: "Первый / последний доступный пункт.",
+      },
+      {
+        keys: "Escape",
+        en: "Closes the menu (`closeOnEscape`); focus returns to the trigger.",
+        ru: "Закрывает меню (`closeOnEscape`); фокус возвращается на триггер.",
+      },
+      {
+        keys: "Tab · Shift+Tab",
+        en: "Closes the menu; focus returns to the trigger (Tab then goes on to the next stop).",
+        ru: "Закрывает меню; фокус возвращается на триггер (Tab затем идёт дальше).",
+      },
+    ],
+    aria: [
+      {
+        en: 'The menu is `role="menu"` named by the trigger; items are `role="menuitem"`, checkbox items `role="menuitemcheckbox"` with `aria-checked`, disabled ones `aria-disabled`.',
+        ru: 'Меню — `role="menu"` с именем от триггера; пункты — `role="menuitem"`, переключатели — `role="menuitemcheckbox"` с `aria-checked`, неактивные — `aria-disabled`.',
+      },
+      {
+        en: 'The trigger gets `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` and `data-state`; the child\'s own `id` wins. Other props given to `Dropdown.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.',
+        ru: 'Триггер получает `aria-haspopup="menu"`, `aria-expanded` и `aria-controls`.',
+      },
+      {
+        en: "With a `Dropdown.ItemDescription` the label names the item (`aria-labelledby`) and the description describes it (`aria-describedby`).",
+        ru: "С `Dropdown.ItemDescription` подпись называет пункт (`aria-labelledby`), а описание описывает его (`aria-describedby`).",
+      },
+      {
+        en: "An `asChild` item merges its props onto the link; the link's children are the item content. A disabled link item gets `aria-disabled` and its click is stopped.",
+        ru: "Пункт с `asChild` переносит свои пропсы на ссылку; дети ссылки — содержимое пункта. Неактивный пункт-ссылка получает `aria-disabled`, его клик останавливается.",
+      },
+      {
+        en: '`Dropdown.Group` is `role="group"` named by its `label`.',
+        ru: '`Dropdown.Group` — `role="group"` с именем из `label`.',
+      },
+      {
+        en: "`Dropdown.ItemIcon` is hidden from screen readers; a key hint is text only — the app handles the shortcut.",
+        ru: "`Dropdown.ItemIcon` скрыт от скринридеров; подсказка клавиш — только текст, обработчик пишет приложение.",
+      },
+      {
+        en: "An outside press closes the menu without moving focus back to the trigger: focus follows the pointer (foundation §8).",
+        ru: "Клик снаружи закрывает меню без возврата фокуса на триггер: фокус остаётся там, куда нажали.",
+      },
+    ],
+  },
 };

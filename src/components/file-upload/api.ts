@@ -532,4 +532,71 @@ export const api: ComponentApi = {
       ru: "Имя плитки любого другого файла.",
     },
   ],
+  accessibility: {
+    keyboard: [
+      {
+        keys: "Tab",
+        en: "Focuses the hidden file input (the zone or the add tile shows the ring), then the files and their buttons.",
+        ru: "Фокус на скрытый input файла (у зоны или плитки добавления появляется кольцо), затем на файлы и их кнопки.",
+      },
+      {
+        keys: "Enter · Space",
+        en: "Opens the system file dialog (on the zone, the button or the add tile).",
+        ru: "Открывает системный выбор файлов (на зоне, кнопке или плитке добавления).",
+      },
+      {
+        keys: "Alt + ← · Alt + →",
+        en: 'On a tile (`layout="grid" | "strip"`): moves the file one place; with `cover`, moving it first makes it the cover, and that is announced.',
+        ru: 'На плитке (`layout="grid" | "strip"`) сдвигает файл на одно место; при `cover` сдвиг на первое место делает его обложкой, и это объявляется.',
+      },
+      {
+        keys: "Delete · Backspace",
+        en: "On a tile: removes the file; focus moves to its neighbour.",
+        ru: "На плитке убирает файл; фокус переходит на соседнюю плитку.",
+      },
+      {
+        keys: "Escape",
+        en: "Cancels a tile drag in flight.",
+        ru: "Отменяет перетаскивание плитки в процессе.",
+      },
+    ],
+    aria: [
+      {
+        en: 'The zone is a `<label>` around a visually hidden but focusable `<input type="file">`. With `label` the input is named by it (`aria-labelledby`) and described by the hint or error; without it the zone text names the input — give a custom body without text an `aria-label` on Root.',
+        ru: 'Зона — `<label>` вокруг визуально скрытого, но фокусируемого `<input type="file">`. С `label` input назван подписью (`aria-labelledby`) и описан подсказкой или ошибкой; без неё имя даёт текст зоны.',
+      },
+      {
+        en: '`trigger="button"`: the kit Button takes the focus, named by the field label and its own text (or `aria-label`, required when it is an icon alone) and described by the hint or error; the input leaves the tab order.',
+        ru: 'При `trigger="button"` в фокусе кнопка кита: её называют подпись поля и текст (или `aria-label`), описывают подсказка и ошибка; скрытый input вне порядка Tab.',
+      },
+      {
+        en: '`trigger="tile"`: the frame is a group named by the label; the add tile is the label of a hidden input («Добавить файлы») with the hint, the error and `aria-invalid` wired to it.',
+        ru: 'При `trigger="tile"` поле — группа, названная подписью; плитка добавления — подпись к скрытому input («Добавить файлы»), с ним связаны подсказка, ошибка и `aria-invalid`.',
+      },
+      {
+        en: "The files are a `<ul>` named by the field label (or `aria-label`). `FileUpload.Icon`, `FormatBadge` and `ItemPreview` are `aria-hidden`: the file name and description carry the meaning.",
+        ru: "Список файлов — `<ul>`, названный подписью поля (или `aria-label`); `FileUpload.Icon`, `FormatBadge` и `ItemPreview` скрыты (`aria-hidden`): смысл несут имя и описание файла.",
+      },
+      {
+        en: "Icon-only buttons in `ItemActions` need an `aria-label` with the file name; the set names its own («Убрать …», «Повторить загрузку: …»).",
+        ru: "Кнопкам-иконкам в `ItemActions` нужен `aria-label` с именем файла; набор называет свои сам («Убрать …», «Повторить загрузку: …»).",
+      },
+      {
+        en: "A row in flight has its progress bar named by the file; a polite live region speaks a file that finished, the reason of one that failed, a removed file, the new cover after a reorder («Обложка: name», `labels.coverChanged`) and a refused change (`labels.changeFailed`); a file whose change is saved has `aria-busy`.",
+        ru: "У строки в пути полоса прогресса, названная именем файла; live-область объявляет загруженный, упавший и убранный файл, новую обложку после перестановки и отклонённое изменение (`labels.changeFailed`).",
+      },
+      {
+        en: "Tiles are `<li>` of a Dnd.Sortable `<ul>`, named «Фото 2: склад.jpg · Загрузка 45%» («Видео …», «Файл …»; the file's `alt` in place of its name), with `aria-roledescription` and `aria-keyshortcuts`; the position and format on a tile are hidden (the name says them); the disk is a circle button («Отменить загрузку: …» described by the state, «В очереди» / «Загрузка 45%», `aria-busy`, its ring `aria-hidden`; on a failure «Повторить загрузку: …» described by the reason); without a remove handler the disk is no button but a `progressbar` (`aria-valuenow`) while the file is queued or uploading; Dnd's live region announces moves.",
+        ru: 'Плитки (`layout="grid" | "strip"`) — `<li>` в `<ul>` от Dnd.Sortable с именем «Фото 2: склад.jpg · Загрузка 45%» («Видео …», «Файл …»), `aria-roledescription` и `aria-keyshortcuts`; номер и формат на плитке скрыты от чтения; кольцо диска — `progressbar`, сам диск — кнопка «Отменить загрузку: …»; перенос объявляет live-область Dnd.',
+      },
+      {
+        en: 'A file with `href`: in a row its name is a link (`<a target="_blank">`, named by the name); a tile holds a link over its middle named «Открыть name» (`labels.open`), a Tab stop after the tile itself.',
+        ru: "Пока изменение сохраняется (промис из `onValueChange`), у затронутых файлов `aria-busy`, их кнопка удаления крутится.",
+      },
+      {
+        en: "Touch: a tile drag starts after a hold; the buttons on a tile are always shown, never hover-only.",
+        ru: "Касание: перенос плитки начинается после удержания; кнопки на плитке видны всегда, без наведения.",
+      },
+    ],
+  },
 };

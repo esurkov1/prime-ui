@@ -47,3 +47,27 @@ describe("sticky surfaces", () => {
     });
   }
 });
+
+/** The one height query (foundation §9): a sticky header stops sticking on a short screen. */
+const HEIGHT_QUERY_FILES = new Set([
+  "layout/app-header/AppHeader.module.css",
+  "components/data-table/DataTable.module.css",
+  "components/gantt/Gantt.module.css",
+]);
+
+describe("the height query", () => {
+  it("only the sticky headers use `max-height: 479px`, each citing foundation §9", () => {
+    const offenders: string[] = [];
+    for (const file of walk(root).filter((name) => name.endsWith(".css"))) {
+      const rel = path.relative(root, file);
+      const css = readFileSync(file, "utf8");
+      if (!/@media[^{]*max-height:\s*479px/.test(css)) continue;
+      if (!HEIGHT_QUERY_FILES.has(rel)) {
+        offenders.push(`${rel}: height query outside a sticky header`);
+      } else if (!/foundation §9/.test(css)) {
+        offenders.push(`${rel}: height query without its foundation §9 note`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+});

@@ -58,20 +58,4 @@ export const page: ComponentPageConfig = {
     },
   ],
   api,
-  accessibility: {
-    keyboard: [
-      {
-        keys: "Enter · Space",
-        action:
-          "На `PageContent.BackButton` возвращает из деталей к списку; фокус встаёт на элемент списка, с которого их открыли.",
-      },
-    ],
-    aria: [
-      "`PageContent.Title` — `<h1>`; один на страницу.",
-      "Назовите `PageContent.Page` через `aria-labelledby` на `id` заголовка.",
-      "`PageContent.Section` — `<section>`, названный своим `<h2>` (`label`) через `aria-labelledby`.",
-      "Назовите панели `PageContent.List` и `PageContent.Detail` через `aria-label`. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера.",
-      "`PageContent.BackButton` названа `labels.back` и видна, только пока сплит показывает одну панель.",
-    ],
-  },
 };
