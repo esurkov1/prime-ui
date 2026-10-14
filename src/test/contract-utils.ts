@@ -137,7 +137,7 @@ export function checkLayoutCss(file: string, css: string, forbidden: string[] = 
 /**
  * What example CSS may not do, beyond `checkLayoutCss`: paint a surface (a bounded block is
  * `Card.Root`), style text (Typography), or reach into a component's tier tokens. Offender ids
- * are `file:line property` for the `example-css` ratchet.
+ * are `file: property` (numbered when repeated) for the `example-css` ratchet.
  */
 export const EXAMPLE_CSS_BANS = [
   /^background(-\w+)?$/,
@@ -157,12 +157,12 @@ export const EXAMPLE_TOKEN_BANS = /--prime-(card-padding|modal|drawer)-/;
 export function layoutCssOffenders(file: string, css: string): string[] {
   const offenders: string[] = [];
   const lines = css.replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, " "));
-  lines.split("\n").forEach((line, index) => {
+  lines.split("\n").forEach((line) => {
     const m = line.match(/^\s*([a-z-]+)\s*:/);
     if (m && EXAMPLE_CSS_BANS.some((ban) => ban.test(m[1]))) {
-      offenders.push(`${file}:${index + 1} ${m[1]}`);
+      offenders.push(`${file}: ${m[1]}`);
     }
-    if (EXAMPLE_TOKEN_BANS.test(line)) offenders.push(`${file}:${index + 1} component token`);
+    if (EXAMPLE_TOKEN_BANS.test(line)) offenders.push(`${file}: component token`);
   });
   return offenders;
 }

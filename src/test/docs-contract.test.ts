@@ -54,7 +54,7 @@ import {
   sourceCanonOffenders,
   walk,
 } from "./contract-utils";
-import { ratchet } from "./ratchet";
+import { numbered, ratchet } from "./ratchet";
 
 const dirs = componentDirs();
 
@@ -686,7 +686,7 @@ describe("docs contract", () => {
           }
         }
       }
-      ratchet("example-css", offenders, scope);
+      ratchet("example-css", numbered(offenders), scope);
     });
 
     const screenModule = screenModules[`../${base}/${dir}/examples/screen.tsx`];

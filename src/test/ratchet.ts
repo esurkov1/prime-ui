@@ -71,3 +71,17 @@ export function ratchet(guard: string, offenders: readonly string[], scope = "")
     );
   }
 }
+
+/**
+ * Offender ids that survive edits elsewhere in a file: no line numbers, a repeated id numbered
+ * by its occurrence (`file: rule`, `file: rule #2`). Fixing one occurrence leaves a stale `#n`;
+ * adding one makes a fresh `#n+1`.
+ */
+export function numbered(ids: readonly string[]): string[] {
+  const seen = new Map<string, number>();
+  return ids.map((id) => {
+    const count = (seen.get(id) ?? 0) + 1;
+    seen.set(id, count);
+    return count === 1 ? id : `${id} #${count}`;
+  });
+}

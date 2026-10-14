@@ -205,9 +205,14 @@ describe("api.ts is the one prose source of a prop", () => {
     for (const { declaration } of documentedProps(program, exports, apis)) {
       if (ts.getJSDocCommentsAndTags(declaration).length === 0) continue;
       const source = declaration.getSourceFile();
-      const line = source.getLineAndCharacterOfPosition(declaration.getStart(source)).line + 1;
       const name = ts.getNameOfDeclaration(declaration)?.getText(source) ?? "?";
-      offenders.add(`${source.fileName.slice(root.length + 1)}:${line} ${name}`);
+      const owner = ts.findAncestor(
+        declaration.parent,
+        (node) => ts.isTypeAliasDeclaration(node) || ts.isInterfaceDeclaration(node),
+      ) as ts.TypeAliasDeclaration | ts.InterfaceDeclaration | undefined;
+      offenders.add(
+        `${source.fileName.slice(root.length + 1)}: ${owner ? `${owner.name.text}.` : ""}${name}`,
+      );
     }
     ratchet("api-jsdoc", [...offenders]);
   });
