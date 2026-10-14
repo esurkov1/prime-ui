@@ -56,7 +56,7 @@ export const page: ComponentPageConfig = {
       scenario: "search",
       title: "Поиск и закреплённые",
       description:
-        "Строка поиска выделяет каждое совпадение в текстах и расшифровках, считает их и ходит по ним, пока остальные отступают; нажатие на закреплённое переходит к нему и мигает остальными — `Chat.SearchButton`, `Chat.Search`, `defaultSearch`, `Chat.Pinned`.",
+        "Строка поиска выделяет каждое совпадение в текстах и расшифровках, считает их и ходит по ним, пока остальные отступают; нажатие на закреплённое переходит к нему и мигает им — `Chat.SearchButton`, `Chat.Search`, `defaultSearch`, `Chat.Pinned`.",
     },
     {
       slot: "states",

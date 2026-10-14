@@ -46,7 +46,7 @@ export type ChatContextValue = {
   current: string | null;
   /** The other side types. */
   typing: boolean;
-  /** Brings a message into view and blinks the others around it (a pinned message's press). */
+  /** Brings a message into view and blinks it (a pinned message's press). */
   jump: (value: string) => void;
   /** `Chat.SearchButton`: the focus goes back to it when the search closes from its field. */
   searchButtonRef: React.RefObject<HTMLButtonElement | null>;

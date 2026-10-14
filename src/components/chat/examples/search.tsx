@@ -1,4 +1,4 @@
-/** Search and pinned messages: the search bar marks every match in the texts and transcripts, counts them and steps between them while the others step back; a pinned message's press jumps to it and blinks the others — `Chat.SearchButton`, `Chat.Search`, `defaultSearch`, `Chat.Pinned`. */
+/** Search and pinned messages: the search bar marks every match in the texts and transcripts, counts them and steps between them while the others step back; a pinned message's press jumps to it and blinks it — `Chat.SearchButton`, `Chat.Search`, `defaultSearch`, `Chat.Pinned`. */
 import { Card, Chat, Message, VoicePlayer } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

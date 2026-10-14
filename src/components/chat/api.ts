@@ -49,8 +49,8 @@ export const api: ComponentApi = {
           name: "current",
           type: "string | null",
           default: "null",
-          en: "A message to bring into view (a link, a notification): on change the chat brings it to the middle and the other messages blink back. The focus stays where it is.",
-          ru: "Сообщение, к которому перейти (ссылка, уведомление): при смене чат приводит его в середину, остальные сообщения мигают, отступая. Фокус остаётся на месте.",
+          en: "A message to bring into view (a link, a notification): on change the chat brings it to the middle and the message itself blinks. The focus stays where it is.",
+          ru: "Сообщение, к которому перейти (ссылка, уведомление): при смене чат приводит его в середину, и само сообщение мигает. Фокус остаётся на месте.",
         },
         {
           name: "typing",

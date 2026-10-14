@@ -70,8 +70,8 @@ export type ChatRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultV
   /** The search opened, changed its query or closed (`null`). */
   onSearchChange?: (search: string | null) => void;
   /**
-   * A message to bring into view and point at (a link, a notification): the others blink around
-   * it. A search's current match takes its place while the search is open.
+   * A message to bring into view and point at (a link, a notification): it
+   * blinks. A search's current match takes its place while the search is open.
    */
   current?: string | null;
   /** The other side is typing: the header's status turns into «печатает…» and the list ends with the typing bubble. */

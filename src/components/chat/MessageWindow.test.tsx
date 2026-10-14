@@ -191,7 +191,7 @@ describe("The message list in a scroller: a window of rows", () => {
     const target = article("m3");
     expect(target).not.toBeNull();
     expect(region.scrollToElement).toHaveBeenCalledWith(target, "auto");
-    // The target stays at full strength while the others blink around it.
+    // The target blinks; the others stay still.
     expect(target).toHaveAttribute("data-pointed");
     expect(target?.closest("[role=log]")).toHaveAttribute("data-pointing", "a");
   });

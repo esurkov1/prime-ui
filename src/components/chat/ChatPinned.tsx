@@ -51,8 +51,8 @@ export type ChatPinnedProps = Omit<
   /** The shown pinned message changed: a press went on to the next older one. */
   onValueChange?: (value: string) => void;
   /**
-   * A press on the bar, after the chat has brought the message into view and blinked the others
-   * around it: load it when it is not in the list yet. The bar then moves on to the next older
+   * A press on the bar, after the chat has brought the message into view and blinked it:
+   * load it when it is not in the list yet. The bar then moves on to the next older
    * pinned message, the oldest wraps to the newest.
    */
   onSelect?: (value: string) => void;

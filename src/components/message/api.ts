@@ -183,8 +183,8 @@ export const api: ComponentApi = {
         {
           name: "target",
           type: "string",
-          en: "The `value` of the quoted message: a press brings the chat to it (rendering it first in a window), the other messages blink back around it, and the focus moves to it. Makes the quote a button.",
-          ru: "`value` цитируемого сообщения: нажатие приводит чат к нему (в окне сначала отрисовывает), остальные сообщения мигают вокруг него, фокус переходит на него. Делает цитату кнопкой.",
+          en: "The `value` of the quoted message: a press brings the chat to it (rendering it first in a window), the message blinks, and the focus moves to it. Makes the quote a button.",
+          ru: "`value` цитируемого сообщения: нажатие приводит чат к нему (в окне сначала отрисовывает), сообщение мигает, фокус переходит на него. Делает цитату кнопкой.",
         },
         {
           name: "onClick",

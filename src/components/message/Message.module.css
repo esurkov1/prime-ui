@@ -360,10 +360,10 @@
  * - Selection mode (`data-selecting` on the list): every message not selected, while it lasts
  *   (`fast`, both ways).
  * - The chat points at a message (`data-pointing` on the list, `data-pointed` on the message: a
- *   pinned message's jump, a reply's original, a forwarded original, a jump to a search result):
- *   the others step back and come forward three times, one `base` each, and stay forward (`a` /
- *   `b`, flipped so a repeated jump restarts the blink). The current match of a search keeps them
- *   back while it is current (`current`). A message entering meanwhile plays its own entrance.
+ *   pinned message's jump, a reply's original, a forwarded original): the message itself steps
+ *   back and comes forward three times, one `base` each, and stays forward (`a` / `b`, flipped so
+ *   a repeated jump restarts the blink); the others stay still. The current match of a search
+ *   keeps the others back while it is current (`current`).
  * Reduced motion: no blink — the others stand back for a moment (the list lets go).
  */
 .gutter,
@@ -396,14 +396,14 @@
 }
 
 [data-message-list][data-pointing="a"]
-  .root:not([data-pointed], [data-enter])
+  .root[data-pointed]:not([data-enter])
   > :is(.gutter, .column, .retry) {
   animation: messagePointingA calc(var(--prime-motion-duration-base) * 3)
     var(--prime-motion-easing-standard) both;
 }
 
 [data-message-list][data-pointing="b"]
-  .root:not([data-pointed], [data-enter])
+  .root[data-pointed]:not([data-enter])
   > :is(.gutter, .column, .retry) {
   animation: messagePointingB calc(var(--prime-motion-duration-base) * 3)
     var(--prime-motion-easing-standard) both;
@@ -990,10 +990,13 @@ button.reply:focus-visible {
   }
 
   /* No blink: the others stand back (the list lets a jump's go after a moment). */
+  [data-message-list][data-pointing] .root[data-pointed] > :is(.gutter, .column, .retry) {
+    animation: none;
+  }
+
   [data-message-list][data-pointing]
     .root:not([data-pointed], [data-enter])
     > :is(.gutter, .column, .retry) {
-    animation: none;
     opacity: var(--prime-message-dim-opacity);
     filter: saturate(var(--prime-message-dim-saturation));
   }

@@ -262,7 +262,7 @@ describe("The message list: jump, search, read receipts", () => {
     search.remove();
   });
 
-  it("a jump outside a search blinks the others around the target, again on a repeated jump", () => {
+  it("a jump outside a search blinks the target, again on a repeated jump", () => {
     const region = fakeRegion();
     const { rerender } = render(<Conversation rows={HISTORY} region={region} />);
     rerender(<Conversation rows={HISTORY} region={region} current="m1" />);

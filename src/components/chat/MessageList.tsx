@@ -120,7 +120,7 @@ export type MessageListProps = React.HTMLAttributes<HTMLDivElement> & {
   highlight?: string;
   /** The messages whose text holds `highlight`, in list order (oldest first), as they change. */
   onMatchesChange?: (values: readonly string[]) => void;
-  /** Receives the list's jump: bring a message into view and blink the others around it. */
+  /** Receives the list's jump: bring a message into view and blink it. */
   revealRef?: React.Ref<((value: string) => void) | null>;
   labels?: Partial<MessageListLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -131,7 +131,7 @@ const articlesOf = (container: HTMLElement | null) =>
 
 /** Under reduced motion the others of a jump stand back this long, then come forward. */
 const STILL_POINT_MS = 1200;
-/** A blink that plays on no other message (a list of one) lets go after this. */
+/** A blink whose end is never seen lets go after this. */
 const POINT_LIMIT_MS = 2000;
 
 /** A jump further than this many views lands at once (then settles), nearer ones glide. */
@@ -279,9 +279,9 @@ export function MessageList({
   const innerRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(innerRef, ref);
   /**
-   * The message the chat points at: the list's other messages step back around it (CSS, from
-   * `data-pointing` on the list and `data-pointed` on the message). A jump blinks them (`a` / `b`,
-   * flipped so a repeated jump restarts) and lets go; the current search match keeps them back.
+   * The message the chat points at (CSS, from `data-pointing` on the list and `data-pointed` on
+   * the message). A jump blinks it (`a` / `b`, flipped so a repeated jump restarts) and lets go;
+   * the current search match keeps the others back.
    * Kept by value, so a row that renders again while pointed at is marked again.
    */
   const pointed = React.useRef<string | null>(null);
@@ -311,7 +311,7 @@ export function MessageList({
       element.dataset.pointing =
         mode === "current" ? "current" : element.dataset.pointing === "a" ? "b" : "a";
       if (mode === "current") return;
-      // The blink's end lets go; under reduced motion (no blink) or in a group of one, the time.
+      // The blink's end lets go; under reduced motion (no blink), the time.
       const onEnd = (event: AnimationEvent) => {
         if (!event.animationName?.includes("messagePointing")) return;
         element.removeEventListener("animationend", onEnd);
@@ -600,7 +600,7 @@ export function MessageList({
   );
   React.useImperativeHandle(revealRef, () => (value: string) => void reveal(value), [reveal]);
   // The current match of a search keeps the others back while it is current; any other jump
-  // blinks them once. Moving to the next match moves the mark in one step (no flicker between).
+  // blinks the message once. Moving to the next match moves the mark in one step (no flicker between).
   const searching = highlight.trim() !== "";
   React.useEffect(() => {
     if (!currentProp) return;

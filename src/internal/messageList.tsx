@@ -77,8 +77,8 @@ export type MessageListContextValue = {
   /** A message was new at the end in this commit. */
   arrivedNow: () => boolean;
   /**
-   * Brings a message into view and points at it (unless `flash` is `false`: the others blink
-   * around it); `focus` moves the focus to it too.
+   * Brings a message into view and blinks it (unless `flash` is `false`); `focus`
+   * moves the focus to it too.
    */
   reveal: (value: string, focus?: boolean, flash?: boolean) => boolean;
   /** The selection; read it through `useMessageSelection` / `useListSelection`. */

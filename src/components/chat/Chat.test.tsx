@@ -167,7 +167,7 @@ describe("Chat: the conversation assembled", () => {
     expect(screen.getByText("Нет совпадений")).toBeInTheDocument();
   });
 
-  it("a pinned message's press brings it into view and blinks the others", () => {
+  it("a pinned message's press brings it into view and blinks it", () => {
     render(<Thread />);
     act(() => {
       fireEvent.click(screen.getByRole("button", { name: /Закреплённое сообщение/ }));
