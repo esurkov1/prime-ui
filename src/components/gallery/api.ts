@@ -65,8 +65,8 @@ export const galleryProps: ApiPart["props"] = [
   {
     name: "labels",
     type: "Partial<GalleryLabels>",
-    en: "System strings, see Labels.",
-    ru: "Системные строки, см. Labels.",
+    en: "Built-in strings, see Labels.",
+    ru: "Системные строки, см. «Доступность».",
   },
 ];
 

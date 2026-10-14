@@ -37,7 +37,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`.",
-          ru: "Ярус кружков, текста, подписи и подсказки. Без него — ярус хоста, иначе `m`.",
+          ru: "Ярус кружков, текста, подписи и подсказки. Без него группа берёт ярус хоста (LoginForm, Popover, панель с размером), иначе `m`.",
         },
         {
           name: "label",
@@ -127,7 +127,7 @@ export const api: ComponentApi = {
     {
       name: "Radio.Root",
       en: "`ref` → `HTMLInputElement` (the native radio). One option inside `Radio.Group`: the `<label>` row with the input and the circle, and its hint; native input props go to the input.",
-      ru: "Один вариант внутри `Radio.Group`: строка-`<label>` с input и кружком и его подсказка.",
+      ru: "Один вариант внутри `Radio.Group`: строка-`<label>` с input и кружком и его подсказка; нативные пропсы input уходят на input.",
       props: [
         {
           name: "value",

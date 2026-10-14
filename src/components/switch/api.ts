@@ -38,7 +38,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`.",
-          ru: "Ярус дорожки (24×16 … 44×24), текста и отступа. Без него — ярус хоста, иначе `m`.",
+          ru: "Ярус дорожки (24×16 … 44×24), текста и отступа. Без него — ярус хоста (форма, панель), иначе `m`.",
         },
         {
           name: "hint",
@@ -71,7 +71,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "The state is shown and focusable but does not change (`aria-readonly`); no hover or press.",
-          ru: "Состояние видно и фокусируется, но не меняется (`aria-readonly`).",
+          ru: "Состояние видно и фокусируется, но не меняется (`aria-readonly`); без наведения и нажатия.",
         },
         {
           name: "id",

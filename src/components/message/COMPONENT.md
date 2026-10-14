@@ -74,7 +74,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `onRetry` | `() => void \| Promise<void>` | — | Sends a failed message again: a ghost danger button beside the bubble. A returned promise shows `sending` until it settles; a rejection leaves it failed. |
 | `onReactionToggle` | `(emoji: string) => void \| Promise<unknown>` | — | Puts or takes back the reader's reaction (a chip, a double tap, `L`, the reaction bar). Shown at once; a returned promise keeps it pending, a rejection drops it back. Without it reactions are read-only. |
 | `value` | `string` | — | The message id for selection, jumps, read receipts, search, pins and `Message.Reply target` (`Chat.Messages items` sets the item's key). Keep it when the server confirms a sent message. |
-| `labels` | `Partial<MessageLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<MessageLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "role">` | — | `id`, `aria-label` to replace «{author}, {time}», `className` and the other attributes of the row. |
 
 ### Message.Avatar
@@ -146,7 +146,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `onCancel` | `(index: number) => void \| Promise<void>` | — | Cancel the transfer in flight: the disk's cross. A returned promise keeps the disk pending (a spinner, `aria-busy`, no second press); a rejection leaves the transfer as it was and announces `cancelFailed`. |
 | `onRetry` | `(index: number) => void \| Promise<void>` | — | Transfer it again after a failure: the danger disk's retry; a promise works the same (`retryFailed` on a rejection). |
 | `onDownload` | `(index: number) => void \| Promise<void>` | — | Fetch a `remote` content: the download arrow; set `transfer` to `loading` with `transferDirection="download"` as it starts. A promise works the same (`downloadFailed` on a rejection). |
-| `labels` | `Partial<GalleryLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<GalleryLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
 ### Message.File
@@ -165,7 +165,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `onCancel` | `() => void \| Promise<void>` | — | Cancel the transfer in flight: the disk's cross. A returned promise keeps the disk pending (a spinner, `aria-busy`, no second press); a rejection leaves the transfer as it was and announces `cancelFailed`. |
 | `onRetry` | `() => void \| Promise<void>` | — | Transfer it again after a failure: the danger disk's retry; a promise works the same (`retryFailed` on a rejection). |
 | `onDownload` | `() => void \| Promise<void>` | — | Fetch a `remote` content: the download arrow; set `transfer` to `loading` with `transferDirection="download"` as it starts. A promise works the same (`downloadFailed` on a rejection). |
-| `labels` | `Partial<MessageFileLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<MessageFileLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
 ### Message.Location
@@ -178,7 +178,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `title` | `string` | — | The place. |
 | `address` | `string` | — | Its address. |
 | `live` | `boolean` | `false` | A location shared live (still under reduced motion). |
-| `labels` | `Partial<MessageLocationLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<MessageLocationLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
 ### Message.Contact
@@ -211,7 +211,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `items` | `MessageReaction[]` | — (required) | `{ emoji, count, selected?, users? }` — `count` is the total, `selected` the reader's own reaction, `users` (`{ id, name, src?, color? }[]`, in the order they put it) who put it; without `users` the chip shows the count. |
-| `labels` | `Partial<MessageReactionsLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<MessageReactionsLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
 ### Message.Actions

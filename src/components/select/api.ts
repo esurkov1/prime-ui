@@ -13,7 +13,7 @@ export const api: ComponentApi = {
     {
       name: "Select.Root",
       en: "`ref` → `HTMLDivElement`. The field frame (label row · control · support row) holding the value, the open state and the search query.",
-      ru: "Поле целиком: подпись, контрол, строка поддержки; хранит значение, открытие и поиск.",
+      ru: "Рамка поля (строка подписи · контрол · строка поддержки); хранит значение, открытие и поисковый запрос.",
       props: [
         {
           name: "value",
@@ -257,7 +257,7 @@ export const api: ComponentApi = {
     {
       name: "Select.Value",
       en: "`ref` → `HTMLSpanElement`. The picked label (labels joined with `multiple`) with an ellipsis, or the placeholder.",
-      ru: "Выбранная подпись (через запятую при `multiple`) или плейсхолдер.",
+      ru: "Выбранная подпись (подписи через запятую при `multiple`) с многоточием или плейсхолдер.",
       props: [
         {
           name: "renderValue",
@@ -396,7 +396,7 @@ export const api: ComponentApi = {
     {
       name: "Select.Separator",
       en: "`ref` → `HTMLDivElement`. A full-bleed Divider between groups; hidden while searching.",
-      ru: "Разделитель на всю ширину; скрыт во время поиска.",
+      ru: "Divider на всю ширину между группами; скрыт во время поиска.",
       props: [
         {
           name: "…rest",

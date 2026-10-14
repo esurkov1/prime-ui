@@ -71,8 +71,8 @@ export const api: ComponentApi = {
           name: "thumbnails",
           type: "boolean",
           default: "false",
-          en: "A filmstrip of every item along the bottom: it follows the page, scrolls on its own at rest, and a press slides to that item.",
-          ru: "Плёнка миниатюр всех элементов внизу: следует за страницей, в покое прокручивается сама по себе, нажатие приводит к элементу свайпом.",
+          en: "A filmstrip of every item along the bottom: it follows the page; after a scroll by the person it stays where it was left until the page turns, then glides back. A press slides to that item.",
+          ru: "Плёнка миниатюр всех элементов внизу: следует за страницей; после прокрутки человеком остаётся, где её оставили, пока страница не сменится, затем плавно возвращается. Нажатие приводит к элементу.",
         },
         {
           name: "autoPlay",
@@ -110,8 +110,8 @@ export const api: ComponentApi = {
         {
           name: "labels",
           type: "Partial<MediaViewerLabels>",
-          en: "System strings, see Labels.",
-          ru: "Системные строки, см. Labels.",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "aria-label",
@@ -257,7 +257,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The level is an upright Slider in a panel over the sound button: it opens on hover, on focus (Tab) and on a tap; Escape closes the panel, not the viewer. A mouse click on the button mutes; a click on the video plays and pauses it.",
-        ru: "Громкость — вертикальный Slider во всплывающей панели над кнопкой звука: открывается наведением, фокусом (Tab) или касанием; Escape закрывает панель, а не просмотр.",
+        ru: "Громкость — вертикальный Slider во всплывающей панели над кнопкой звука: открывается наведением, фокусом (Tab) или касанием; Escape закрывает панель, а не просмотр. Клик мышью по кнопке выключает звук; клик по видео запускает и ставит на паузу.",
       },
       {
         en: "The page under the viewer is `inert`, scroll is locked; on close focus returns to the opener.",

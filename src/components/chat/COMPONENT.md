@@ -99,7 +99,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `onSearchChange` | `(search: string \| null) => void` | — | The search opened (`""`), changed its query or closed (`null`). |
 | `current` | `string \| null` | `null` | A message to bring into view (a link, a notification): on change the chat brings it to the middle and the message itself blinks. The focus stays where it is. |
 | `typing` | `boolean` | `false` | The other side is typing: `Chat.Description` cross-fades into «печатает…» and the list ends with the typing bubble (`Message.Typing`), which gives way at once to the reply that ends it. |
-| `labels` | `Partial<ChatLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<ChatLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">` | — | `className` and the other attributes of the frame. |
 
 ### Chat.Header
@@ -156,7 +156,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `onValueChange` | `(value: string) => void` | — | The shown message changed: a press stepped to the next older one (the oldest wraps to the newest). |
 | `onSelect` | `(value: string) => void` | — | A press on the bar, after the chat has jumped to the message: load it when it is not in the list yet. |
 | `onRemove` | `(value: string) => void` | — | Unpin the shown message: a ghost close button at the end. Without it no button. |
-| `labels` | `Partial<ChatPinnedLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<ChatPinnedLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "onSelect">` | — | `className` and the other attributes. |
 
 ### Chat.Messages

@@ -8,7 +8,7 @@ export const api: ComponentApi = {
     {
       name: "ExampleFrame",
       en: "`ref` → `HTMLDivElement`. The documentation frame: a toolbar (pane switch, theme toggle, copy button, device switch) above the preview stage or the code pane.",
-      ru: "Рамка документации: панель (вид, тема, копирование, ширина) над превью или кодом.",
+      ru: "Рамка документации: панель (переключатель вида, тема, кнопка копирования, переключатель устройства) над сценой превью или панелью кода.",
       props: [
         {
           name: "code",

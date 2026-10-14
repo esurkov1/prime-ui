@@ -26,7 +26,7 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<DescriptionListLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. «Доступность».",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",

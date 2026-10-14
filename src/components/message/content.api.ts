@@ -17,8 +17,8 @@ const COLORS =
 const labelsRow = (type: string) => ({
   name: "labels",
   type: `Partial<${type}>`,
-  en: "System strings, see Labels.",
-  ru: "Системные строки, см. Labels.",
+  en: "Built-in strings, see Labels.",
+  ru: "Системные строки, см. «Доступность».",
 });
 
 export const contentParts: ApiPart[] = [

@@ -56,7 +56,7 @@ An item (`GalleryItem`) is `type` (`"image"` by default, or `"video"`), `src`, a
 | `onCancel` | `(index: number) => void \| Promise<void>` | — | Cancel the transfer in flight: the disk's cross. A returned promise keeps the disk pending (a spinner, `aria-busy`, no second press); a rejection leaves the transfer as it was and announces `cancelFailed`. |
 | `onRetry` | `(index: number) => void \| Promise<void>` | — | Transfer it again after a failure: the danger disk's retry; a promise works the same (`retryFailed` on a rejection). |
 | `onDownload` | `(index: number) => void \| Promise<void>` | — | Fetch a `remote` content: the download arrow; set `transfer` to `loading` with `transferDirection="download"` as it starts. A promise works the same (`downloadFailed` on a rejection). |
-| `labels` | `Partial<GalleryLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<GalleryLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Laid over the gallery, above every tile (a caption pill, a message's time). |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes. |
 

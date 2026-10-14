@@ -33,7 +33,7 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<EmptyPageLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. «Доступность».",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",

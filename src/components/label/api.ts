@@ -6,7 +6,7 @@ export const api: ComponentApi = {
     {
       name: "Label.Root",
       en: "`ref` → `HTMLLabelElement`. The native `<label>`: text, then the required `*` or the optional marker; provides its size to the icons inside.",
-      ru: "Нативный `<label>`: текст, затем `*` или пометка «необязательно»; передаёт размер иконкам внутри.",
+      ru: "Нативный `<label>`: текст, затем обязательная `*` или пометка «необязательно»; передаёт размер иконкам внутри.",
       props: [
         {
           name: "size",

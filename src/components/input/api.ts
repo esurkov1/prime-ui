@@ -28,7 +28,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier for height, padding, radius, text, label and hint. Without it the field takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. Also provided to nested controls via the control-size context.",
-          ru: "Ярус поля: высота, отступы, радиус, кегль поля, подписи и подсказки. Без него поле берёт ярус контейнера (LoginForm, Popover, панель с размером), иначе `m`.",
+          ru: "Ярус поля: высота, отступы, радиус, кегль поля, подписи и подсказки. Без него поле берёт ярус контейнера (LoginForm, Popover, панель с размером), иначе `m`. Передаётся и вложенным контролам через контекст размера.",
         },
         {
           name: "label",
@@ -87,7 +87,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Always render the support row (min height = hint line height), so an appearing error does not shift the layout.",
-          ru: "Строка поддержки есть всегда, поэтому ошибка не сдвигает вёрстку.",
+          ru: "Строка поддержки есть всегда (минимальная высота — строка подсказки), поэтому ошибка не сдвигает вёрстку.",
         },
         {
           name: "id",
@@ -134,7 +134,7 @@ export const api: ComponentApi = {
     {
       name: "Input.Wrapper",
       en: "`ref` → `HTMLDivElement`. The visible field: fill, hover, focus ring, invalid ring; `data-size` and `data-invalid` come from the root.",
-      ru: "Видимое поле: заливка, наведение, фокус, ошибка; `data-size` и `data-invalid` приходят из контекста.",
+      ru: "Видимое поле: заливка, наведение, кольцо фокуса, кольцо ошибки; `data-size` и `data-invalid` приходят от корня.",
       props: [
         {
           name: "children",
@@ -193,7 +193,7 @@ export const api: ComponentApi = {
           type: "ReactNode",
           required: true,
           en: "An icon; kit icons without an explicit `size` take the field tier.",
-          ru: "Иконка; без `size` берёт ярус поля.",
+          ru: "Иконка; иконки кита без явного `size` берут ярус поля.",
         },
         {
           name: "…rest",

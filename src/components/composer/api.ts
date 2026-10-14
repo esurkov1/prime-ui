@@ -108,7 +108,7 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<ComposerLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "children",

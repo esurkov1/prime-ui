@@ -64,8 +64,8 @@ export const api: ComponentApi = {
         {
           name: "labels",
           type: "Partial<ChatLabels>",
-          en: "System strings, see Labels.",
-          ru: "Системные строки, см. Labels.",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -206,8 +206,8 @@ export const api: ComponentApi = {
         {
           name: "labels",
           type: "Partial<ChatPinnedLabels>",
-          en: "System strings, see Labels.",
-          ru: "Системные строки, см. Labels.",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",

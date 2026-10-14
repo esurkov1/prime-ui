@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Pagination",
-      en: "`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with ghost `Button`s: previous, page numbers with ellipses, next.",
-      ru: "`<nav>` с именем из `labels.nav` и ghost-кнопками `Button`: назад, номера страниц с многоточием, вперёд.",
+      en: "`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with `Button`s: ghost previous and next, ghost page numbers with ellipses, the current page soft accent.",
+      ru: "`<nav>` с именем из `labels.nav` и кнопками `Button`: ghost «назад» и «вперёд», ghost-номера страниц с многоточием, текущая — soft accent.",
       props: [
         {
           name: "totalPages",
@@ -38,8 +38,8 @@ export const api: ComponentApi = {
           name: "siblingCount",
           type: "number",
           default: "1",
-          en: "Pages on each side of the current one before an ellipsis (when `totalPages > 7`).",
-          ru: "Сколько номеров по бокам от текущей до многоточия (при `totalPages > 7`).",
+          en: "Pages on each side of the current one before an ellipsis (when `totalPages > 2·siblingCount+5`).",
+          ru: "Сколько номеров по бокам от текущей до многоточия (при `totalPages > 2·siblingCount+5`).",
         },
         {
           name: "size",

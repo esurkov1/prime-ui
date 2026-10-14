@@ -38,7 +38,7 @@ export const api: ComponentApi = {
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`.",
-          ru: "Ярус квадрата, текста и отступа. Без него — ярус хоста, иначе `m`.",
+          ru: "Ярус квадрата, текста и отступа. Без него — ярус хоста (форма, панель, таблица), иначе `m`.",
         },
         {
           name: "shape",
@@ -162,7 +162,7 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           en: "Box tier; without it the nearest control size (the Select or menu it sits in), else `m`.",
-          ru: "Ярус квадрата; без него — ярус ближайшего контрола, иначе `m`.",
+          ru: "Ярус квадрата; без него — ярус ближайшего контрола (Select или меню, в котором он стоит), иначе `m`.",
         },
         {
           name: "…rest",
@@ -182,7 +182,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'A native `<input type="checkbox">` (visually hidden over the box, so validation bubbles point at it), wrapped by the `<label>` row.',
-        ru: 'Нативный `<input type="checkbox">` скрыт поверх квадрата и обёрнут строкой-`<label>`.',
+        ru: 'Нативный `<input type="checkbox">` визуально скрыт поверх квадрата (подсказки валидации указывают на него) и обёрнут строкой-`<label>`.',
       },
       {
         en: "`aria-invalid` is set when invalid; `aria-describedby` = your ids + the hint or the error id.",
