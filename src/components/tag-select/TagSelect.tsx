@@ -308,6 +308,8 @@ export function TagSelect({
     open: shown,
     onOpenChange: setOpen,
     triggerRef,
+    closeOnEscape: true,
+    closeOnOutsideClick: true,
     matchAnchorWidth: true,
   });
   const listboxRef = floating.contentRef;

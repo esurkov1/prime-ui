@@ -1,8 +1,9 @@
 /*
- * Header / body / footer of Modal and Drawer. Every zone owns its side padding
- * (`--dialog-padding`, set by Modal.Content / Drawer.Content): the scrolling body keeps it inside
- * the scroll box, so focus rings of edge-to-edge fields are never clipped (foundation §7).
- * Header and footer are separated by a faint hairline (a 1px background line inset by the same padding):
+ * The dialog shell of Modal, Drawer and Sheet, and their header / body / footer. Every zone owns
+ * its side padding (`--dialog-padding`, set by the component's panel class): the scrolling body
+ * keeps it inside the scroll box, so focus rings of edge-to-edge fields are never clipped
+ * (foundation §7). Header and footer are separated by a faint hairline (a 1px background line
+ * inset by the same padding):
  *
  *   header  24 top · 20 bottom
  *   ─────── body 20 · gap 16 (scrolls)
@@ -11,7 +12,17 @@
 
 /* ─── Shell ──────────────────────────────────────────────────────────────── */
 
-/* Applied by Modal.Content and Drawer.Content next to their own surface class. */
+/* One portal root for the scrim and the panel, siblings: `useInertSiblings` never makes the scrim
+   inert, and the panel's geometry never depends on the scrim. */
+.root {
+  display: contents;
+}
+
+/*
+ * The `role="dialog"` panel, next to the component's own geometry class (Modal centred, Drawer at
+ * an edge) or the bottom-sheet surface (internal/sheet): the floating layer of the ladder, a
+ * column whose body alone scrolls, the hairline tokens and the `prime-dialog` container.
+ */
 .shell {
   --dialog-hairline: linear-gradient(
     var(--prime-color-border-faint),
@@ -20,6 +31,17 @@
   --dialog-hairline-size: calc(100% - 2 * var(--dialog-padding)) var(--prime-border-width);
 
   container: prime-dialog / inline-size;
+  z-index: var(--prime-z-overlay);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--prime-color-layer-current);
+  color: var(--prime-color-text-primary);
+  outline: none;
+  font-size: var(--prime-text-body-m-size);
+  line-height: var(--prime-text-body-m-line-height);
 }
 
 /* ─── Header ─────────────────────────────────────────────────────────────── */
@@ -79,22 +101,11 @@
   padding-block-end: var(--prime-space-6);
 }
 
+/* The icon tile (internal/iconBox `.tile`) or the record's picture, in the icon column. */
 .icon {
-  --prime-icon-size: var(--prime-icon-m);
-
   grid-column: icon;
   grid-row: 1;
   margin-inline-end: var(--prime-space-4);
-
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: var(--prime-space-10);
-  height: var(--prime-space-10);
-  border-radius: var(--prime-radius-l);
-  background: var(--prime-color-fill-muted);
-  color: var(--prime-color-text-secondary);
 }
 
 .header[data-has-description="true"] > .icon {
@@ -111,48 +122,17 @@
 }
 
 /*
- * The record's picture (`Avatar.Root`, `Thumbnail.Root`): no box of its own, the picture is the
+ * The record's picture (`Avatar.Root`, `Thumbnail.Root`): no tile of its own, the picture is the
  * mark. An avatar fills the 40px box; a thumbnail keeps its `m` height (40) and its ratio.
  */
 .icon[data-media="true"] {
   --avatar-slot-size: var(--prime-avatar-l);
 
-  width: auto;
-  min-width: var(--prime-space-10);
-  border-radius: 0;
-  background: none;
-}
-
-/* Raw SVG children (lucide etc.) follow the icon tier too. */
-.icon > svg {
+  display: inline-flex;
   flex: 0 0 auto;
-  width: var(--prime-icon-size);
-  height: var(--prime-icon-size);
-}
-
-.icon[data-tone="accent"] {
-  background: var(--prime-color-accent-soft);
-  color: var(--prime-color-accent-text);
-}
-
-.icon[data-tone="success"] {
-  background: var(--prime-color-success-soft);
-  color: var(--prime-color-success-text);
-}
-
-.icon[data-tone="warning"] {
-  background: var(--prime-color-warning-soft);
-  color: var(--prime-color-warning-text);
-}
-
-.icon[data-tone="danger"] {
-  background: var(--prime-color-danger-soft);
-  color: var(--prime-color-danger-text);
-}
-
-.icon[data-tone="info"] {
-  background: var(--prime-color-info-soft);
-  color: var(--prime-color-info-text);
+  align-items: center;
+  min-width: var(--prime-space-10);
+  height: var(--prime-space-10);
 }
 
 .title {
@@ -205,7 +185,7 @@
   width: var(--prime-control-s-height);
   min-width: var(--prime-control-s-height);
   padding-inline: 0;
-  margin-inline: var(--prime-space-4) calc(-1 * var(--prime-space-2));
+  margin-inline: var(--prime-space-4) calc(var(--prime-space-2) * -1);
 }
 
 /* After the actions the close button is one of them: the row's own step. */

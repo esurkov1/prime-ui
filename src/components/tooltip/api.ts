@@ -45,7 +45,7 @@ export const api: ComponentApi = {
     {
       name: "Tooltip.Provider",
       en: "No DOM, no ref. Its tooltips form a group: one is open at a time, and once one has been shown the next opens at once and without motion, until `skipDelayDuration` passes with none open.",
-      ru: "Группа подсказок: открыта одна; после первой соседние открываются сразу и без анимации.",
+      ru: "Группа подсказок без своего DOM: открыта одна; после первой соседние открываются сразу и без анимации, пока не пройдёт `skipDelayDuration` без открытой подсказки.",
       props: [
         {
           name: "delayDuration",
@@ -72,8 +72,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Tooltip.Trigger",
-      en: "No DOM of its own: clones the single child and links it to the tooltip with `aria-describedby`. A `disabled` child is wrapped in a focusable `<span>`; a child that is no tab stop becomes one.",
-      ru: "Без своего DOM: клонирует дочерний элемент и связывает его с подсказкой через `aria-describedby`. Неактивный контрол оборачивает в фокусируемый `<span>`, нефокусируемый элемент делает фокусируемым.",
+      en: "No DOM of its own: clones the single child and links it to the tooltip with `aria-describedby`. A `disabled` child — by its own prop or a disabled `Fieldset` around it — is wrapped in a focusable `<span>`; a child that is no tab stop becomes one.",
+      ru: "Без своего DOM: клонирует дочерний элемент и связывает его с подсказкой через `aria-describedby`. Контрол в состоянии `disabled` — своим пропом или внутри выключенного `Fieldset` — оборачивает в фокусируемый `<span>`; нефокусируемый элемент делает точкой Tab.",
       props: [
         {
           name: "children",
@@ -162,8 +162,8 @@ export const api: ComponentApi = {
         ru: "У подсказки нет `closeOnEscape` / `closeOnOutsideClick`: она закрывается при уходе указателя, потере фокуса, нажатии на триггер и по Escape, а Escape не отключается — WCAG 1.4.13 требует закрывать чип, не двигая указатель и фокус.",
       },
       {
-        en: "A `disabled` control is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control.",
-        ru: "Неактивный контрол кит оборачивает в фокусируемый `<span>`: наведение и Tab получает обёртка, кольцо фокуса рисуется на контроле.",
+        en: 'A `disabled` control (its own prop or a disabled `Fieldset`) is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control. Around a button the host is that button for assistive tech — `role="button"`, `aria-disabled`, named by the control through `aria-labelledby` — and the control itself leaves the tree.',
+        ru: 'Контрол в состоянии `disabled` (свой проп или выключенный `Fieldset`) кит оборачивает в фокусируемый `<span>`: наведение и Tab получает обёртка, кольцо фокуса рисуется на контроле. Вокруг кнопки обёртка и есть эта кнопка для скринридера — `role="button"`, `aria-disabled`, имя от контрола через `aria-labelledby`, — а сам контрол из дерева уходит.',
       },
       {
         en: "A trigger that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring; its name comes from `aria-label` or the icon `label`.",

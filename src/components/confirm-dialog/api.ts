@@ -1,11 +1,13 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+
+import { CONFIRM_DIALOG_LABELS } from "./ConfirmDialog";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "ConfirmDialog.Root",
-      en: 'No ref (state root). Renders its Trigger and a Modal `s` with `role="alertdialog"`: the title, the description, an inline danger message after a failure, Cancel (focused first) and the confirm. A press outside never closes it; while `onConfirm` runs nothing closes it.',
-      ru: "Подтверждение действия целиком: окно `s`, вопрос, последствия, «Отмена» и кнопка действия. Клик мимо не закрывает; пока идёт запрос — не закрывается ничем.",
+      en: 'No ref (state root). Renders its Trigger and a Modal `s` with `role="alertdialog"`: the question, the consequence, the reason after a failure, Cancel (focused first) and the confirm. While `onConfirm` runs nothing closes it.',
+      ru: 'Подтверждение целиком: окно `s` с `role="alertdialog"`, вопрос, последствия, причина после ошибки, «Отмена» (в фокусе первой) и кнопка действия. Пока идёт `onConfirm`, окно не закрывается ничем.',
       props: [
         {
           name: "open",
@@ -25,6 +27,20 @@ export const api: ComponentApi = {
           type: "(open: boolean) => void",
           en: "Called on open and close: the Trigger, Cancel, the close button, Escape, a resolved `onConfirm`.",
           ru: "Вызывается при открытии и закрытии: триггер, «Отмена», крестик, Escape, успешный `onConfirm`.",
+        },
+        {
+          name: "closeOnEscape",
+          type: "boolean",
+          default: "true",
+          en: "Escape closes the dialog, like Cancel.",
+          ru: "Escape закрывает окно, как «Отмена».",
+        },
+        {
+          name: "closeOnOutsideClick",
+          type: "boolean",
+          default: "false",
+          en: "A click on the scrim (and on a phone a swipe down) closes the dialog. Off by default: a question about a weighty action is answered with a button, not by a stray click beside it.",
+          ru: "Клик по подложке (и на телефоне свайп вниз) закрывает окно. По умолчанию выключено: на вопрос о весомом действии отвечают кнопкой, а не случайным кликом мимо.",
         },
         {
           name: "title",
@@ -57,14 +73,8 @@ export const api: ComponentApi = {
           name: "onConfirm",
           type: "() => unknown",
           required: true,
-          en: "The action. A Promise keeps the dialog busy: the confirm shows `loading`, Cancel and the close button are disabled, Escape is ignored. Resolve closes the dialog; reject keeps it open with `error` (else `labels.error`).",
-          ru: "Действие. Пока Promise не завершён: кнопка в `loading`, «Отмена» и крестик выключены, Escape не работает. Успех закрывает окно; ошибка оставляет его открытым с `error` (иначе `labels.error`).",
-        },
-        {
-          name: "error",
-          type: "ReactNode",
-          en: "Why the action failed, from the owner; shown under the text while set.",
-          ru: "Причина ошибки от владельца; показывается под текстом, пока задана.",
+          en: "The action. A pending Promise keeps the dialog busy (`loading`, nothing closes it). Resolve closes it; reject keeps it open with the reason: the `Error.message` or string, else `labels.error`.",
+          ru: "Действие. Пока Promise не завершён, окно занято (`loading`, ничто его не закрывает). Успех закрывает окно; отказ оставляет с причиной: `Error.message` или строка, иначе `labels.error`.",
         },
         {
           name: "labels",
@@ -83,7 +93,7 @@ export const api: ComponentApi = {
     {
       name: "ConfirmDialog.Trigger",
       en: "No DOM: clones the single child and chains its `onClick` to open the dialog (unless the child's handler calls `preventDefault()`); focus returns to it on close.",
-      ru: "Без DOM: клик по дочернему элементу открывает окно; фокус возвращается на него.",
+      ru: "Без DOM: клонирует единственный элемент и добавляет к его `onClick` открытие окна (если обработчик элемента не вызвал `preventDefault()`); фокус возвращается на него при закрытии.",
       props: [
         {
           name: "children",
@@ -95,26 +105,20 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "cancel",
-      default: "Отмена",
+  labels: labelRows(CONFIRM_DIALOG_LABELS, {
+    cancel: {
       en: "The cancel button.",
       ru: "Кнопка отмены.",
     },
-    {
-      key: "close",
-      default: "Закрыть",
+    close: {
       en: "`aria-label` of the header close button.",
       ru: "`aria-label` кнопки закрытия в шапке.",
     },
-    {
-      key: "error",
-      default: "Не получилось. Попробуйте ещё раз.",
-      en: "The message after a rejected `onConfirm` when there is no `error`.",
-      ru: "Сообщение после ошибки `onConfirm`, если `error` не задан.",
+    error: {
+      en: "The message after a rejected `onConfirm` without a reason of its own.",
+      ru: "Сообщение после отказа `onConfirm` без своей причины.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -129,8 +133,8 @@ export const api: ComponentApi = {
       },
       {
         keys: "Escape",
-        en: "Closes the dialog unless the action runs; focus returns to the trigger.",
-        ru: "Закрывает окно, пока не идёт запрос; фокус возвращается на триггер.",
+        en: "Closes the dialog (`closeOnEscape`) unless the action runs; focus returns to the trigger.",
+        ru: "Закрывает окно (`closeOnEscape`), если не идёт запрос; фокус возвращается на триггер.",
       },
     ],
     aria: [
@@ -147,8 +151,8 @@ export const api: ComponentApi = {
         ru: 'Пока идёт запрос, у кнопки действия `aria-busy="true"`, «Отмена» и крестик выключены.',
       },
       {
-        en: 'The failure message is `role="alert"`, read at once.',
-        ru: 'Сообщение об ошибке — `role="alert"`, его зачитывают сразу.',
+        en: 'The reason of a failure is `role="alert"`, read at once.',
+        ru: 'Причина ошибки — `role="alert"`, её зачитывают сразу.',
       },
     ],
   },

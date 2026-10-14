@@ -1,6 +1,6 @@
 /* Layout of the Dropdown scenarios: semantic tokens only. */
 
-/* match-trigger-width.tsx: a column with a full-width button. */
+/* match-trigger-width.tsx, context-menu.tsx: a column of a full-width button or of rows. */
 .column {
   display: flex;
   flex-direction: column;

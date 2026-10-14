@@ -8,11 +8,9 @@
   "src/components/login-form/examples/forgot-password.tsx: fields with a submit and no <form>",
   "src/components/login-form/examples/reset-password.tsx: fields with a submit and no <form>",
   "src/components/login-form/examples/verification-code.tsx: fields with a submit and no <form>",
-  "src/components/modal/examples/dismiss.tsx: solid danger primary in an overlay (ConfirmDialog)",
   "src/components/modal/examples/enter-key.tsx: fields with a submit and no <form>",
   "src/components/modal/examples/enter-key.tsx: solid danger primary in an overlay (ConfirmDialog)",
   "src/components/page-toolbar/examples/save-changes.tsx: fields with a submit and no <form>",
-  "src/components/popover/examples/dismiss.tsx: solid danger primary in an overlay (ConfirmDialog)",
   "src/components/spinner/examples/loading-region.tsx: Spinner in a Card (a Skeleton holds the shape)",
   "src/components/textarea/examples/validation.tsx: fields with a submit and no <form>"
 ]

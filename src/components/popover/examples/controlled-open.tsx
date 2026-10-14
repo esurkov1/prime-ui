@@ -1,4 +1,4 @@
-/** The parent owns the open state: another button opens the panel from code and its own button closes it — `open`, `onOpenChange`. */
+/** The parent owns the open state: another button opens the panel from code, and the panel's own button in `Popover.Close` closes it — `open`, `onOpenChange`. */
 import { Button, Popover, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -21,9 +21,11 @@ export default function PopoverControlledOpenExample() {
             Отчёт выгрузится в CSV с текущими фильтрами.
           </Typography>
           <Popover.Actions>
-            <Button.Root variant="soft" tone="neutral" onClick={() => setOpen(false)}>
-              Понятно
-            </Button.Root>
+            <Popover.Close>
+              <Button.Root variant="soft" tone="neutral">
+                Понятно
+              </Button.Root>
+            </Popover.Close>
           </Popover.Actions>
         </Popover.Content>
       </Popover.Root>

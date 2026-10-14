@@ -374,7 +374,7 @@ function SmartFilterToolbar({ searchable = true, className, ...rest }: SmartFilt
         </div>
       </Popover.Anchor>
       {hasFilters && (
-        <Popover.Content matchTriggerWidth={searchable} flush size={size}>
+        <Popover.Content width={searchable ? "trigger" : "auto"} flush size={size}>
           <Panel searchable={searchable} />
         </Popover.Content>
       )}

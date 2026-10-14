@@ -2,6 +2,9 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { Button } from "@/components/button/Button";
+import { Fieldset } from "@/components/fieldset/Fieldset";
+
 import { Tooltip } from "./Tooltip";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -111,16 +114,39 @@ describe("Tooltip", () => {
         <Tooltip.Content>Заполните обязательные поля</Tooltip.Content>
       </Tooltip.Root>,
     );
-    const button = screen.getByRole("button", { name: "Опубликовать" });
-    const host = button.parentElement as HTMLElement;
+    // The host is the one button: disabled, named by the control it stands for.
+    const host = screen.getByRole("button", { name: "Опубликовать" });
     expect(host.tagName).toBe("SPAN");
     expect(host).toHaveAttribute("tabindex", "0");
+    expect(host).toHaveAttribute("aria-disabled", "true");
     act(() => host.focus());
     await act(async () => {
       vi.advanceTimersByTime(0);
     });
     expect(screen.getByRole("tooltip")).toHaveTextContent("Заполните обязательные поля");
     expect(host).toHaveAttribute("aria-describedby", screen.getByRole("tooltip").id);
+  });
+
+  it("wraps a control a disabled Fieldset disables, as one of its own", async () => {
+    render(
+      <Fieldset label="Публикация" disabled>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Button.Root>Опубликовать</Button.Root>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Сначала сохраните черновик</Tooltip.Content>
+        </Tooltip.Root>
+      </Fieldset>,
+    );
+    const host = screen.getByRole("button", { name: "Опубликовать" });
+    expect(host).toHaveAttribute("data-disabled-host");
+    expect(host).toHaveAttribute("aria-disabled", "true");
+    expect(host).toHaveAttribute("tabindex", "0");
+    act(() => host.focus());
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Сначала сохраните черновик");
   });
 
   it("makes a non-focusable trigger a tab stop; a focusable one stays as is", () => {

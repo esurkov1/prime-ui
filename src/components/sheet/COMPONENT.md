@@ -26,7 +26,7 @@ import { Sheet } from "prime-ui-kit";
 Sheet.Root                     state and dismiss policy (no DOM)
 ├─ Sheet.Trigger               clones its child; opens on click
 └─ Sheet.Content               portal + scrim + role="dialog" panel at the bottom edge
-   ├─ (grab handle)            aria-hidden bar on top; a drag starts here
+   ├─ (grab handle)            aria-hidden bar on top while the sheet swipes (`closeOnOutsideClick`); a drag starts here
    ├─ Sheet.Guard              no DOM: holds the sheet (busy / dirty) from inside
    ├─ Sheet.Header             optional: [Icon] [Title + Description] [Actions] [close Button]
    │  ├─ Sheet.Icon
@@ -52,12 +52,12 @@ No DOM, no ref. State and dismiss policy.
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, close button, `Close`, Escape, scrim click, code. A `Guard` holds the dismisses (not code). |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the dialog. |
-| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim (and a swipe down) closes the dialog; turn off for destructive confirms. |
+| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim (and a swipe down, which draws the grab handle) closes the dialog. A destructive action is confirmed in a ConfirmDialog; unsaved changes are held by `Guard`. |
 | `labels` | `Partial<SheetLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Trigger and Content. |
 
 ### Sheet.Content
-`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel raised from the bottom edge, as tall as its content. Header and footer are optional: without a header name it with `aria-label`.
+`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel raised from the bottom edge, as tall as its content, with a grab handle while it swipes. Header and footer are optional: without a header name it with `aria-label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -68,15 +68,20 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Sheet.Header
-`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button]. + native `HTMLAttributes<HTMLElement>`.
+`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button].
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`; disabled in place while a `Guard` is `busy`. |
 | `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Sheet.Actions
-`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`. + native `<div>` props.
+`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the row. |
 
 ### Sheet.Icon
 `ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around an `Avatar.Root` or a `Thumbnail.Root` (the record's picture) no tile — `data-media`, the avatar sized to 40 px.
@@ -84,35 +89,48 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color; not used around a picture. |
-| `children` | `ReactNode` | — (required) | An icon glyph (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
+| `children` | `ReactNode` | — (required) | An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Sheet.Title · Sheet.Description
-`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.
+`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement \| HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Sheet.Body
-`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.
+`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the zone. |
 
 ### Sheet.Footer
-`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start. + native `HTMLAttributes<HTMLElement>`.
+`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `layout` | `"fill" \| "end"` | `"end"` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `className`, `children` and the other attributes of the `<footer>`. |
 
 ### Sheet.Meta
-`ref` → `HTMLParagraphElement`. A `<p>` at the start of the footer: short muted status text («Есть несохранённые изменения»); the buttons keep their width at the end. Not part of the dialog description. + native `<p>` props.
+`ref` → `HTMLParagraphElement`. A `<p>` at the start of the footer: short muted status text («Есть несохранённые изменения»); the buttons keep their width at the end. Not part of the dialog description.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `className`, `children` and the other attributes of the `<p>`. |
 
 ### Sheet.Guard
 No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. Closing from code is never held.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `busy` | `boolean` | `false` | A request runs: Escape, a press outside, a swipe, the close button and `Close` do nothing; the close button and the `Close` child stay in place, disabled. |
-| `dirty` | `boolean` | `false` | Unsaved changes: any of those dismisses first asks «Не сохранять изменения?» (a ConfirmDialog with `labels.discard*`); confirming closes the dialog. |
+| `busy` | `boolean` | `false` | A request runs: Escape, a press outside, a swipe, the close button and `Close` do nothing; the close button and the `Close` child stay in place, disabled. The grab handle stays and takes no drag. |
+| `dirty` | `boolean` | `false` | Unsaved changes: any of those dismisses (a swipe glides back first) asks «Не сохранять изменения?» (a ConfirmDialog with `labels.discard*`); confirming closes the dialog. |
 
 ### Sheet.Trigger · Sheet.Close
-No DOM: clone the single child and chain its `onClick` (unless the child's handler calls `preventDefault()`). `Close` goes through a `Guard` and makes its child `disabled` while the guard is busy.
+No DOM: each clones its child. `Trigger` and `Close` chain its `onClick` (skipped after `preventDefault()`): open; close through `Guard`, `disabled` while it is busy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -141,11 +159,11 @@ Sheet has no `variant`, `side` or `size`: it always rises from the bottom edge, 
 | State | Driven by | DOM |
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the scrim and the panel; mounted until the slide-down ends |
-| swiping | a drag down from the handle or the header (with `closeOnOutsideClick`) | `data-swiping` and `--swipe-offset` on the panel while the pointer drags it; `data-swipe-dismissed` while it glides out after a closing release; `--swipe-progress` (0…1) on the scrim |
+| swiping | a drag down from the handle or the header (with `closeOnOutsideClick`; without it there is no handle and no swipe) | `data-swiping` and `--swipe-offset` on the panel while the pointer drags it, `data-swipe-dismissed` while it glides out after a closing release — both mirrored on the scrim, which carries `--swipe-progress` (0…1) |
 | open: trapped | while open | focus trapped, page scroll locked, siblings of the portal `inert`; a sheet opened from another overlay stacks above it |
 | closing | `open` turns false | the panel keeps showing the children it had open while it slides down |
-| busy | `Sheet.Guard busy` | Escape, the scrim, a swipe, the close button and `Sheet.Close` do nothing; the close button and the `Close` child are `disabled` in place |
-| dirty | `Sheet.Guard dirty` | a dismiss opens the «Не сохранять изменения?» ConfirmDialog (`labels.discard*`); no swipe |
+| busy | `Sheet.Guard busy` | Escape, the scrim, a swipe, the close button and `Sheet.Close` do nothing; the close button and the `Close` child are `disabled` in place; the handle stays, `data-swipe-disabled` on the panel (no grab cursor) |
+| dirty | `Sheet.Guard dirty` | a dismiss opens the «Не сохранять изменения?» ConfirmDialog (`labels.discard*`); a swipe past the threshold glides back and asks the same |
 
 Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`overlayMotion`); under `prefers-reduced-motion` it unmounts at once. A swipe down moves the sheet with the pointer; on release it closes past 30% of its height or on a quick flick and glides the rest of the way out, otherwise it glides back — both over `base` on the `emphasized` (iOS sheet) curve. A pull upward meets growing resistance and stops at 24; the sheet's fill continues that far below the screen edge. The scrim thins as the sheet goes down. The drag starts from the handle or the header, never from the body, so its content scrolls and its controls work as usual.
 
@@ -154,7 +172,7 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
   - **No footer by default.** A footer only for a form with an explicit submit: «Отмена» (`Sheet.Close`, outline neutral) and the submit (solid, last; `type="submit" form={formId}`).
   - **The header is optional.** Keep it when the content needs a title to be understood (a list of actions on «Заказ № 1042»). Drop it — and with it the × and the hairline — when the content speaks for itself (a calendar opened from a «Дата отгрузки» button): name the sheet with `aria-label` on `Sheet.Content`.
 - The content is the sheet's own, across its width: `Datepicker.Panel` or a column of actions straight in `Sheet.Body` — never a Card or a padded box inside it.
-- Zone padding `--prime-sheet-padding`; height by content up to `100dvh − --prime-sheet-top-gap`, radius `--prime-sheet-radius` on top, a `--prime-sheet-handle-area` strip with the handle bar, the bottom safe-area inset below the content.
+- Zone padding `--prime-sheet-padding`, width `--prime-sheet-width`. The bottom-sheet surface (`src/internal/sheet.module.css`, shared with a Modal and the floating layers on a phone) gives the height by content up to the top gap, the rounded top, the handle strip and the bottom safe-area inset below the content.
 - Only the body scrolls; header and footer stay in place.
 - Tabs in the header: a `Tabs.List` inside `Sheet.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside get the surface field fill.
@@ -180,11 +198,11 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- `role="dialog"`, `aria-modal="true"`, named by Title — without a header by `aria-label` on `Sheet.Content`; described by Description.
+- `role="dialog"`, `aria-modal="true"`, named by `Sheet.Title` — without a header by `aria-label` on `Sheet.Content`; described by `Sheet.Description`.
 - Focus moves into the sheet on open and returns to the opener on close, including after a scrim click.
 - The page behind is `inert`, scroll is locked; only the topmost layer reacts.
-- A swipe down is an extra way out; Escape and the scrim stay. The grab handle is `aria-hidden`.
-- A busy `Guard` holds every dismiss, the swipe included; a dirty one opens a `role="alertdialog"` confirm with focus on «Продолжить».
+- A swipe down from the grab handle or the header is an extra way out next to Escape and the scrim, following `closeOnOutsideClick`: with it off there is no swipe and no handle. The handle is `aria-hidden`.
+- A `Guard` that is `busy` holds every dismiss: the handle stays and takes no drag. A `dirty` one glides a swipe back and opens a `role="alertdialog"` confirm with focus on «Продолжить», as every other dismiss does.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

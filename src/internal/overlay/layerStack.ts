@@ -3,8 +3,10 @@ import * as React from "react";
 import { getFocusable } from "./focus";
 
 /**
- * The one stack of open overlay layers (foundation §8 "Overlay contract"): Modal, Drawer, the
- * off-canvas Sidebar, CommandMenu, Popover, Dropdown, Select, TagSelect, Tooltip. One set of
+ * The one stack of open overlay layers (foundation §8 "Overlay contract"): Modal, ConfirmDialog,
+ * Drawer, Sheet, CommandMenu, MediaViewer, the off-canvas Sidebar (through `useModalLayer`),
+ * Popover, Dropdown, Tooltip, the Select, TagSelect, Datepicker and ColorPresets panels, the
+ * reaction bar of a Message and the chart tooltip (through `useFloatingLayer`). One set of
  * document listeners serves every layer and only the topmost layer reacts, so one Escape or one
  * press outside closes one layer, and a press inside a nested (portaled) child layer never reaches
  * its parent. The owner gets the reason and decides about focus.
@@ -21,7 +23,7 @@ export type DismissReason = "escape" | "outside" | "scrim";
  * - `none` — the layer takes no part in presses or Tab (Tooltip); it still gets Escape first.
  *
  * A layer that opts out of outside dismissal (`closeOnOutsideClick={false}`) keeps `pointerdown` /
- * `click` and ignores the reason, so it still blocks the layers below it.
+ * `click`; its hook drops the reason, so it still blocks the layers below it.
  */
 export type OutsideDismiss = "pointerdown" | "click" | "none";
 

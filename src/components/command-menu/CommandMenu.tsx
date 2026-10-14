@@ -362,6 +362,8 @@ function CommandMenuRoot({
     >
       <Modal.Content
         {...rest}
+        size="l"
+        placement="top"
         className={cx(styles.content, className)}
         overlayClassName={styles.overlay}
       >

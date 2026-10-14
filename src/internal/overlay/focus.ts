@@ -35,11 +35,13 @@ export function hasNativeTabStop(el: HTMLElement): boolean {
 
 /**
  * Moves focus into a layer that just opened, unless focus is already inside (a child `autoFocus`):
+ * the first match of `first` (a menu's first enabled item, which is no tab stop of its own), else
  * `[data-autofocus]`, else the first tab stop, else the container itself.
  */
-export function focusInto(container: HTMLElement): void {
+export function focusInto(container: HTMLElement, first?: string): void {
   if (container.contains(document.activeElement)) return;
   const target =
+    (first ? container.querySelector<HTMLElement>(first) : null) ??
     container.querySelector<HTMLElement>("[data-autofocus]") ??
     getFocusable(container)[0] ??
     container;
@@ -68,23 +70,67 @@ function quietRing(el: HTMLElement): void {
   document.addEventListener("keydown", onKey, true);
 }
 
+/** Nothing holds focus: the document body (or nothing at all) is the active element. */
+function focusLost(): boolean {
+  const active = document.activeElement;
+  return active === null || active === document.body;
+}
+
 /**
  * Focuses `el` when it is still in the document. `quiet` — the layer was opened with a pointer:
  * focus returns without the focus ring, also when a key (Escape) closed the layer; the next key
- * brings the ring back.
+ * brings the ring back. When `el` is gone (the row that opened a menu was deleted), focus goes to
+ * the first tab stop of the page instead, so it is never lost and the next Tab starts from a known
+ * place.
  */
 export function focusBack(el: HTMLElement | null | undefined, quiet = false): void {
-  if (!el?.isConnected) return;
-  if (quiet) quietRing(el);
+  if (typeof document === "undefined") return;
+  const target = el?.isConnected ? el : getFocusable(document.body)[0];
+  if (!target) return;
+  if (quiet) quietRing(target);
   // `focusVisible` is a FocusOptions field newer than the DOM typings.
-  el.focus({ preventScroll: true, ...(quiet ? { focusVisible: false } : {}) } as FocusOptions);
+  target.focus({ preventScroll: true, ...(quiet ? { focusVisible: false } : {}) } as FocusOptions);
+}
+
+/**
+ * Hands focus from a part that is about to leave to the part that takes its place (a region that
+ * swaps state, a dismissed message, an item moved to another place): only when `leaving` holds
+ * focus, or held it and is already gone with focus lost to the body. `next` is focused itself when
+ * it is a tab stop; a container gets focus on its `[data-autofocus]`, else its first tab stop,
+ * else itself (made programmatically focusable, `tabindex="-1"`). Without a `next` in the document,
+ * focus goes to the first tab stop of the page. Returns whether focus moved.
+ */
+export function handoffFocus(
+  leaving: Element | null | undefined,
+  next: HTMLElement | null | undefined,
+): boolean {
+  if (typeof document === "undefined" || !leaving) return false;
+  const held = leaving.isConnected ? leaving.contains(document.activeElement) : focusLost();
+  if (!held) return false;
+  const target = next?.isConnected ? focusTarget(next) : getFocusable(document.body)[0];
+  if (!target) return false;
+  target.focus({ preventScroll: true });
+  return document.activeElement === target;
+}
+
+/** Where focus lands in `container`: itself when a tab stop, else as `handoffFocus` describes. */
+function focusTarget(container: HTMLElement): HTMLElement {
+  if (container.matches(FOCUSABLE) || container.isContentEditable) return container;
+  const inner =
+    container.querySelector<HTMLElement>("[data-autofocus]") ?? getFocusable(container)[0];
+  if (inner) return inner;
+  if (!container.hasAttribute("tabindex")) container.setAttribute("tabindex", "-1");
+  return container;
 }
 
 /** A press this recent opened the layer; an older one did not (a key did). */
 const PRESS_OPENS_MS = 1000;
 
-/** The last press: when, and the control it landed on (Safari does not focus a clicked button). */
-let press: { control: HTMLElement | null; time: number } | null = null;
+/**
+ * The last press: when, the element it landed on and the control around it (Safari does not focus
+ * a clicked button).
+ */
+let press: { control: HTMLElement | null; target: Element | null; time: number } | null = null;
 
 if (typeof document !== "undefined") {
   document.addEventListener(
@@ -92,7 +138,7 @@ if (typeof document !== "undefined") {
     (event) => {
       const target = event.target instanceof Element ? event.target : null;
       const control = target?.closest<HTMLElement>(`${NATIVE_TAB_STOP}, ${FOCUSABLE}`) ?? null;
-      press = { control, time: performance.now() };
+      press = { control, target, time: performance.now() };
     },
     true,
   );
@@ -106,24 +152,29 @@ if (typeof document !== "undefined") {
   );
 }
 
-/** Who opened a layer, to return focus to on close, and whether a pointer did it. */
-export type Opener = { element: HTMLElement | null; byPointer: boolean };
+/**
+ * Who opened a layer, to return focus to on close: `element` — the control (or the focused
+ * element); `target` — the exact element a press landed on (a picture inside a link, for a layer
+ * that grows out of it), `null` after a key; `byPointer` — a pointer did it.
+ */
+export type Opener = { element: HTMLElement | null; target: Element | null; byPointer: boolean };
 
 /**
  * The opener of a layer, read while rendering the open transition (before a child `autoFocus`
  * moves focus in). After a press: the control pressed — a click leaves focus elsewhere in Safari
- * (the body, or a `tabindex="-1"` region around the button) — and `byPointer`, so focus goes
- * back without a focus ring. After a key: the focused element, and the ring shows.
+ * (the body, or a `tabindex="-1"` region around the button) — the element pressed, and
+ * `byPointer`, so focus goes back without a focus ring. After a key: the focused element, and the
+ * ring shows.
  */
 export function captureOpener(): Opener {
   const active = activeElement();
   if (press && performance.now() - press.time < PRESS_OPENS_MS) {
-    const { control } = press;
+    const { control, target } = press;
     const element =
       control?.isConnected && !(active && control.contains(active)) ? control : active;
-    return { element, byPointer: true };
+    return { element, target: target?.isConnected ? target : null, byPointer: true };
   }
-  return { element: active, byPointer: false };
+  return { element: active, target: null, byPointer: false };
 }
 
 /**

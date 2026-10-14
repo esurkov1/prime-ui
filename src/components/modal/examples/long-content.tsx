@@ -1,4 +1,4 @@
-/** A long body scrolls on its own while the header and the footer stay in place — `Modal.Body`. */
+/** A long body scrolls on its own while the header and the footer stay in place; the primary closes the dialog and is the Enter target — `Modal.Body`, `Modal.Confirm`. */
 import { Button, Modal, Typography } from "prime-ui-kit";
 
 const TERMS = [
@@ -42,9 +42,11 @@ export default function ModalLongContentExample() {
               Не сейчас
             </Button.Root>
           </Modal.Close>
-          <Modal.Close>
-            <Button.Root>Принимаю</Button.Root>
-          </Modal.Close>
+          <Modal.Confirm>
+            <Modal.Close>
+              <Button.Root>Принимаю</Button.Root>
+            </Modal.Close>
+          </Modal.Confirm>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

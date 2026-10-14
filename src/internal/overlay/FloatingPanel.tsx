@@ -2,6 +2,7 @@ import type * as React from "react";
 
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
+import { SWIPE_HANDLE_ATTRIBUTE, type SwipeDismiss } from "@/hooks/useSwipeDismiss";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import surfaceStyles from "@/internal/floatingSurface.module.css";
@@ -15,7 +16,29 @@ import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 import { LayerProvider } from "./layerStack";
 import type { FloatingLayer } from "./useFloatingLayer";
 
-export type FloatingPanelProps = Omit<React.HTMLAttributes<HTMLElement>, "onAnimationEnd"> & {
+/**
+ * The grab bar of a bottom sheet (Sheet, a Modal or a floating layer as a phone sheet): drawn only
+ * while the swipe exists, `aria-hidden` (the gesture is an extra way out next to Escape and the
+ * scrim). The drag starts on it or on the header right after it.
+ */
+export function SheetHandle({ swipe }: { swipe: Pick<SwipeDismiss, "enabled"> }) {
+  if (!swipe.enabled) return null;
+  return (
+    <div className={sheetStyles.handle} {...{ [SWIPE_HANDLE_ATTRIBUTE]: "" }} aria-hidden="true" />
+  );
+}
+
+/** How wide an anchored panel is (`data-width` on the floating surface). */
+export type FloatingWidth = "auto" | "trigger" | "content";
+
+/**
+ * The panel is a `<div>`; `E` is the element type its consumer holds it as (a menu, a listbox:
+ * `HTMLElement`), so the consumer ref needs no cast.
+ */
+export type FloatingPanelProps<E extends HTMLElement = HTMLDivElement> = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "onAnimationEnd"
+> & {
   floating: FloatingLayer;
   /** Tier of the panel (`data-size`) and of the controls inside. */
   size: ControlSize;
@@ -23,7 +46,13 @@ export type FloatingPanelProps = Omit<React.HTMLAttributes<HTMLElement>, "onAnim
   scroll?: boolean;
   /** The raised floating surface (radius, shadow, fill). Default `true`. */
   surface?: boolean;
-  ref?: React.Ref<HTMLElement>;
+  /**
+   * `auto` — the content's width between the panel minimum (or the trigger's width) and twice the
+   * minimum; `trigger` — exactly the trigger's width; `content` — what the content needs, within
+   * the viewport. A bottom sheet is always full width.
+   */
+  width?: FloatingWidth;
+  ref?: React.Ref<E>;
 };
 
 /**
@@ -32,28 +61,28 @@ export type FloatingPanelProps = Omit<React.HTMLAttributes<HTMLElement>, "onAnim
  * `data-side` (foundation §8), a size context for the controls inside, and a layer context so
  * layers opened inside stack above it in the layer stack. Renders nothing while closed. A layer in
  * sheet mode (`floating.sheet`) renders a scrim and a bottom sheet with a grab handle around the
- * same panel element; the consumer ref stays on the panel.
+ * same panel element, which then carries `data-sheet`; the consumer ref stays on the panel.
  */
-export function FloatingPanel({
+export function FloatingPanel<E extends HTMLElement = HTMLDivElement>({
   floating,
   size,
   scroll = false,
   surface = true,
+  width = "auto",
   className,
   onKeyDown,
   children,
   ref,
   ...rest
-}: FloatingPanelProps) {
-  const mergedRef = useMergedRefs<HTMLElement>(floating.panelRef, ref);
+}: FloatingPanelProps<E>) {
+  const mergedRef = useMergedRefs<E>(floating.panelRef, ref);
   if (!floating.mounted) return null;
 
-  const { sheet, presence } = floating;
-  const panelRef = sheet ? ref : mergedRef;
+  const { sheet, presence, swipe } = floating;
   const props = {
     ...rest,
     className: sheet
-      ? cx(surfaceStyles.sheetContent, className)
+      ? cx(surfaceStyles.sheetPanel, className)
       : cx(
           surface && surfaceStyles.surface,
           surfaceStyles.layer,
@@ -61,26 +90,28 @@ export function FloatingPanel({
           className,
         ),
     "data-size": size,
-    ...(surface && !sheet ? { "data-depth": "floating" } : null),
     ...(sheet
-      ? null
+      ? { "data-sheet": "" }
       : {
+          ...(surface ? { "data-depth": "floating", "data-width": width } : null),
           "data-state": presence.state,
           "data-side": floating.side,
           onAnimationEnd: presence.onExitEnd,
         }),
-    onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+    onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(event);
       floating.onKeyDown(event);
     },
   };
+  // A div is every `E` the consumer may hold it as.
+  const panelRef = (sheet ? ref : mergedRef) as React.Ref<HTMLDivElement> | undefined;
 
   const panel = scroll ? (
-    <ScrollContainer {...props} edges="shadow" ref={panelRef as React.Ref<HTMLDivElement>}>
+    <ScrollContainer {...props} edges="shadow" ref={panelRef}>
       {children}
     </ScrollContainer>
   ) : (
-    <div {...props} ref={panelRef as React.Ref<HTMLDivElement>}>
+    <div {...props} ref={panelRef}>
       {children}
     </div>
   );
@@ -94,23 +125,24 @@ export function FloatingPanel({
               <>
                 <div
                   role="presentation"
-                  className={cx(surfaceStyles.scrim, surfaceStyles.layer, overlayMotion.scrim)}
+                  className={cx(sheetStyles.scrim, overlayMotion.scrim)}
                   data-state={presence.state}
                 />
                 <div
                   ref={floating.panelRef}
                   className={cx(
+                    sheetStyles.surface,
                     surfaceStyles.sheet,
-                    surfaceStyles.layer,
                     overlayMotion.sheet,
                     sheetStyles.swipeY,
                   )}
                   data-depth="floating"
                   data-state={presence.state}
                   onAnimationEnd={presence.onExitEnd}
-                  onPointerDown={floating.onSheetPointerDown}
+                  onPointerDown={swipe.onPointerDown}
+                  {...swipe.panelProps}
                 >
-                  <div className={sheetStyles.handle} data-swipe-handle="" aria-hidden="true" />
+                  <SheetHandle swipe={swipe} />
                   {panel}
                 </div>
               </>

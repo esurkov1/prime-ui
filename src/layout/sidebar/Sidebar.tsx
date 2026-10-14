@@ -303,7 +303,12 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   }
 
   const close = React.useCallback(() => setOpen(false), [setOpen]);
-  const { ref: panelRef, layer } = useModalLayer<HTMLElement>({ open, onDismiss: close });
+  const { ref: panelRef, layer } = useModalLayer<HTMLElement>({
+    open,
+    closeOnEscape: true,
+    closeOnOutsideClick: true,
+    onDismiss: close,
+  });
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const mergedRootRef = useMergedRefs<HTMLDivElement>(ref, rootRef);
 

@@ -20,7 +20,8 @@ export default function DropdownStatesExample() {
           <Dropdown.ItemIcon>
             <Icon name="status.locked" />
           </Dropdown.ItemIcon>
-          Архивировать — нет прав
+          Архивировать
+          <Dropdown.ItemDescription>Доступно владельцу документа</Dropdown.ItemDescription>
         </Dropdown.Item>
         <Dropdown.Separator />
         <Dropdown.Item tone="danger">

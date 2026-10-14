@@ -1,6 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-
 import { Button } from "@/components/button/Button";
 import {
   NotificationProvider,
@@ -8,12 +7,13 @@ import {
 } from "@/components/notification/NotificationStore";
 import { Select } from "@/components/select/Select";
 import { mockCompactViewport, swipe } from "@/test/mobile";
+import { describeOverlayConformance } from "@/test/overlayConformance";
 
 import { Modal, type ModalRootProps } from "./Modal";
 
-/** The full-screen scrim around the dialog panel. */
+/** The full-screen scrim: the sibling before the dialog panel. */
 function scrim() {
-  return screen.getByRole("dialog").parentElement as HTMLElement;
+  return screen.getByRole("dialog").previousElementSibling as HTMLElement;
 }
 
 /** A scrim dismiss is a full click that starts and ends outside the panel. */
@@ -606,7 +606,7 @@ describe("Modal — narrow viewport sheet", () => {
   });
 });
 
-describe("Modal — xs, header actions, guard", () => {
+describe("Modal — xs, header actions", () => {
   it("takes size xs with the equal-width footer", () => {
     render(
       <Modal.Root defaultOpen>
@@ -638,39 +638,29 @@ describe("Modal — xs, header actions, guard", () => {
     );
     expect(screen.getByRole("button", { name: "Печать" })).toHaveAttribute("data-size", "s");
   });
+});
 
-  it("dirty: discarding from the confirm closes both and returns focus to the opener", async () => {
-    render(
-      <Modal.Root>
-        <Modal.Trigger>
-          <Button.Root>Open</Button.Root>
-        </Modal.Trigger>
-        <Modal.Content>
-          <Modal.Guard dirty />
-          <Modal.Header>
-            <Modal.Title>Новый клиент</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <input aria-label="Компания" />
-          </Modal.Body>
-        </Modal.Content>
-      </Modal.Root>,
-    );
-    const opener = screen.getByRole("button", { name: "Open" });
-    opener.focus();
-    fireEvent.click(opener);
-    fireEvent.keyDown(document, { key: "Escape" });
-    const confirm = await screen.findByRole("alertdialog");
-    // The least destructive choice takes focus.
-    await waitFor(() => expect(screen.getByRole("button", { name: "Продолжить" })).toHaveFocus());
-    // Escape closes the confirm only.
-    fireEvent.keyDown(document, { key: "Escape" });
-    await waitFor(() => expect(confirm).not.toBeInTheDocument());
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-
-    fireEvent.keyDown(document, { key: "Escape" });
-    fireEvent.click(await screen.findByRole("button", { name: "Не сохранять" }));
-    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
-    await waitFor(() => expect(opener).toHaveFocus());
-  });
+describeOverlayConformance("Modal", {
+  render: () => (
+    <Modal.Root>
+      <Modal.Trigger>
+        <Button.Root>Открыть</Button.Root>
+      </Modal.Trigger>
+      <Modal.Content aria-label="Новый клиент">
+        <Modal.Body>
+          <input aria-label="Компания" />
+        </Modal.Body>
+        <Modal.Footer>
+          <Modal.Close>
+            <Button.Root variant="soft" tone="neutral">
+              Отмена
+            </Button.Root>
+          </Modal.Close>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal.Root>
+  ),
+  trigger: "Открыть",
+  role: "dialog",
+  modal: true,
 });

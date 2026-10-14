@@ -28,7 +28,12 @@ export type {
   DialogTitleProps as ModalTitleProps,
   DialogTriggerProps as ModalTriggerProps,
 } from "./DialogParts";
-export type { ModalContentProps, ModalLabels, ModalRootProps } from "./ModalDialog";
+export type {
+  ModalContentProps,
+  ModalLabels,
+  ModalPlacement,
+  ModalRootProps,
+} from "./ModalDialog";
 
 export const Modal = {
   Root: ModalRoot,

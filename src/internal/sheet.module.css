@@ -1,13 +1,64 @@
 /*
- * Bottom sheet and swipe parts shared by Sheet, Modal and floating layers on a narrow viewport.
+ * The modal scrim, the bottom-sheet surface and the swipe parts, shared by Modal, Drawer, Sheet,
+ * the floating layers on a narrow viewport and the off-canvas Sidebar.
  *
+ *   .scrim       the dimmed page behind a modal layer; it follows a swipe of the panel above it
+ *   .surface     a raised panel standing on the bottom edge (Sheet, a Modal or a floating layer as
+ *                a phone sheet): top corners, its own fill continued past the edge
  *   .handle      the grab bar strip at the top edge (`data-swipe-handle`); a drag starts here
  *   .swipeY      a panel that follows a vertical drag (`--swipe-offset` from useSwipeDismiss)
  *
  * While `data-swiping` is set the panel follows the pointer with no transition; on release it
  * glides back to rest, or on out from where it was let go (`data-swipe-dismissed`, the keyframe
- * exit switched off). Reduced motion collapses the glide (globals.css).
+ * exit switched off in overlayMotion). Reduced motion collapses the glide (globals.css).
  */
+
+/*
+ * `--swipe-progress` (0 at rest … 1 off the edge, written by the panel's swipe) thins the fill.
+ * While the finger drags it tracks at once; on release it glides with the panel on the same curve,
+ * and after a closing swipe it fades by that glide alone.
+ */
+.scrim {
+  /* The share of the scrim colour left: a computed mix, not a fixed tint. */
+  --scrim-share: calc((1 - var(--swipe-progress, 0)) * 100%);
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--prime-z-overlay);
+  background: color-mix(in srgb, var(--prime-color-bg-scrim) var(--scrim-share), transparent);
+  transition: background-color var(--prime-motion-fade-base) var(--prime-motion-easing-emphasized);
+}
+
+.scrim[data-swiping] {
+  transition: none;
+}
+
+/*
+ * A pull upward moves the panel up to 24 (useSwipeDismiss); an unblurred shadow of its own fill
+ * continues it that far below the screen edge, so it never comes away from the edge. The host
+ * sets the width (full width by default; Sheet centres at `--prime-sheet-width`).
+ */
+.surface {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: var(--prime-z-overlay);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: calc(100dvh - var(--prime-sheet-top-gap));
+  margin: 0 auto;
+  padding-block-end: env(safe-area-inset-bottom);
+  border-radius: var(--prime-sheet-radius) var(--prime-sheet-radius) 0 0;
+  background: var(--prime-color-layer-current);
+  box-shadow:
+    0 var(--prime-space-6) 0 0 var(--prime-color-layer-current),
+    var(--prime-shadow-modal);
+  color: var(--prime-color-text-primary);
+  outline: none;
+}
 
 .handle {
   display: flex;
@@ -28,6 +79,20 @@
   background: var(--prime-color-fill-strong);
 }
 
+/* A header right under the handle drops its top air: the handle strip is that air. It is part of
+   the drag surface too. */
+.handle + header {
+  padding-block-start: var(--prime-space-1);
+  touch-action: none;
+}
+
+/* A busy guard holds the panel: the handle stays in place, but nothing grabs or blocks panning. */
+.swipeY[data-swipe-disabled] > .handle,
+.swipeY[data-swipe-disabled] > .handle + header {
+  touch-action: auto;
+  cursor: auto;
+}
+
 /* The iOS sheet curve: a release keeps moving at once and lands softly, back or out. */
 .swipeY {
   transform: translate3d(0, var(--swipe-offset, 0px), 0);
@@ -38,17 +103,4 @@
   transition: none;
   cursor: grabbing;
   user-select: none;
-}
-
-/* Closed by a swipe: the transition carries the panel out from the release point; the keyframe
-   exit would restart from rest. Doubled class: wins over the overlay motion's closed state. */
-.swipeY.swipeY[data-swipe-dismissed] {
-  animation: none;
-}
-
-/* A header right under the handle drops its top air: the handle strip is that air. It is part of
-   the drag surface too. */
-.handle + header {
-  padding-block-start: var(--prime-space-1);
-  touch-action: none;
 }

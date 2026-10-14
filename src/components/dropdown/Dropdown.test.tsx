@@ -2,9 +2,9 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
-
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { describeOverlayConformance } from "@/test/overlayConformance";
 
 import { Dropdown } from "./Dropdown";
 
@@ -254,12 +254,56 @@ describe("Dropdown", () => {
 
   // ─── Disabled item ───────────────────────────────────────────────────────────
 
-  it("disabled item has aria-disabled and data-disabled", () => {
+  it("disabled item is disabled and marked data-disabled", () => {
     render(<BasicDropdown />);
     fireEvent.click(screen.getByRole("button", { name: "Open" }));
     const disabled = screen.getByRole("menuitem", { name: "Item Disabled" });
-    expect(disabled).toHaveAttribute("aria-disabled", "true");
+    expect(disabled).toBeDisabled();
     expect(disabled).toHaveAttribute("data-disabled", "true");
+  });
+
+  it("items are no tab stops: the arrow keys move between them", () => {
+    render(<BasicDropdown />);
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    for (const item of screen.getAllByRole("menuitem")) {
+      expect(item).toHaveAttribute("tabindex", "-1");
+    }
+  });
+
+  it("a disabled item runs no handler, the consumer's onClick included", () => {
+    const onClick = vi.fn();
+    const onSelect = vi.fn();
+    render(
+      <Dropdown.Root defaultOpen>
+        <Dropdown.Trigger>
+          <button type="button">Действия</button>
+        </Dropdown.Trigger>
+        <Dropdown.Content>
+          <Dropdown.Item disabled onClick={onClick} onSelect={onSelect}>
+            Архивировать
+          </Dropdown.Item>
+          <Dropdown.CheckboxItem disabled onClick={onClick}>
+            Сумма
+          </Dropdown.CheckboxItem>
+        </Dropdown.Content>
+      </Dropdown.Root>,
+    );
+    fireEvent.click(screen.getByRole("menuitem", { name: "Архивировать" }));
+    fireEvent.click(screen.getByRole("menuitemcheckbox", { name: "Сумма" }));
+    expect(onClick).not.toHaveBeenCalled();
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("ArrowDown and ArrowUp on the trigger open the menu at its first item", async () => {
+    const user = userEvent.setup();
+    render(<BasicDropdown />);
+    screen.getByRole("button", { name: "Open" }).focus();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "Item 1" })).toHaveFocus();
+    await user.keyboard("{Escape}");
+    await user.keyboard("{ArrowUp}");
+    expect(screen.getByRole("menu")).toBeInTheDocument();
   });
 
   it("disabled item click does not call onSelect and does not close", () => {
@@ -639,7 +683,7 @@ describe("Dropdown — overlay contract", () => {
     const disabled = screen.getByRole("menuitemcheckbox", { name: "Номер" });
     fireEvent.click(disabled);
     expect(disabled).toHaveAttribute("aria-checked", "false");
-    expect(disabled).toHaveAttribute("aria-disabled", "true");
+    expect(disabled).toBeDisabled();
   });
 
   it("CheckboxItem follows a controlled value and takes the arrow keys like an item", async () => {
@@ -711,7 +755,7 @@ describe("Dropdown — item description and link items", () => {
     const item = screen.getByRole("menuitem");
     expect(item).toHaveAccessibleName("Удалить проект");
     expect(item).toHaveAccessibleDescription("Доступно владельцу проекта");
-    expect(item).toHaveAttribute("aria-disabled", "true");
+    expect(item).toBeDisabled();
   });
 
   it("asChild renders the item as the link: href kept, the pick closes the menu", () => {
@@ -731,7 +775,8 @@ describe("Dropdown — item description and link items", () => {
     const link = screen.getByRole("menuitem", { name: "Открыть сделку" });
     expect(link.tagName).toBe("A");
     expect(link).toHaveAttribute("href", "/deals/1042");
-    expect(link).toHaveAttribute("tabindex", "0");
+    // A menu item is reached with the arrow keys, not Tab.
+    expect(link).toHaveAttribute("tabindex", "-1");
     // A modified click keeps its native meaning (new tab); the kit does not prevent it.
     const event = new MouseEvent("click", { bubbles: true, cancelable: true, metaKey: true });
     act(() => {
@@ -762,4 +807,61 @@ describe("Dropdown — item description and link items", () => {
     expect(event.defaultPrevented).toBe(true);
     expect(onSelect).not.toHaveBeenCalled();
   });
+});
+
+describe("Dropdown — context menu", () => {
+  it("opens at anchorPoint inside a Dropdown.Anchor, named by its control; focus returns to it", async () => {
+    const user = userEvent.setup();
+    function Row() {
+      const [open, setOpen] = React.useState(false);
+      return (
+        <Dropdown.Root open={open} onOpenChange={setOpen} anchorPoint={{ x: 40, y: 12 }}>
+          <Dropdown.Anchor>
+            <button
+              type="button"
+              onContextMenu={(event) => {
+                event.preventDefault();
+                setOpen(true);
+              }}
+            >
+              Поставка оборудования
+            </button>
+          </Dropdown.Anchor>
+          <Dropdown.Content>
+            <Dropdown.Item>Переименовать</Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>
+      );
+    }
+    render(<Row />);
+    const row = screen.getByRole("button", { name: "Поставка оборудования" });
+    // An anchor adds no ARIA and no click of its own.
+    expect(row).not.toHaveAttribute("aria-haspopup");
+    fireEvent.click(row);
+    expect(screen.queryByRole("menu")).toBeNull();
+    row.focus();
+    fireEvent.contextMenu(row);
+    const menu = screen.getByRole("menu");
+    expect(menu).toHaveAccessibleName("Поставка оборудования");
+    expect(screen.getByRole("menuitem", { name: "Переименовать" })).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(row).toHaveFocus();
+  });
+});
+
+describeOverlayConformance("Dropdown", {
+  render: () => (
+    <Dropdown.Root>
+      <Dropdown.Trigger>
+        <button type="button">Открыть</button>
+      </Dropdown.Trigger>
+      <Dropdown.Content>
+        <Dropdown.Item>Переименовать</Dropdown.Item>
+        <Dropdown.Item>Архивировать</Dropdown.Item>
+      </Dropdown.Content>
+    </Dropdown.Root>
+  ),
+  trigger: "Открыть",
+  role: "menu",
 });

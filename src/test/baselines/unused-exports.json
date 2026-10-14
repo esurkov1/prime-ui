@@ -11,7 +11,6 @@
   "src/hooks/usePosition.ts: ComputedFloatPosition is unused",
   "src/hooks/usePosition.ts: computeFloatingPosition is test-only",
   "src/hooks/usePresence.ts: UsePresenceOptions is unused",
-  "src/hooks/useSwipeDismiss.ts: SWIPE_OFFSET_VAR is unused",
   "src/hooks/useSwipeDismiss.ts: UseSwipeDismissOptions is unused",
   "src/hooks/useVirtualRows.ts: UseVirtualRowsOptions is unused",
   "src/hooks/useVirtualRows.ts: VirtualRow is unused",

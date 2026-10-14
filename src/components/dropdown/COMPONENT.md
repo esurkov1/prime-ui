@@ -25,7 +25,8 @@ import { Dropdown } from "prime-ui-kit";
 ## Anatomy
 ```
 Dropdown.Root                     state and dismiss policy (no DOM)
-├── Dropdown.Trigger              clones its child; toggles the menu
+├── Dropdown.Trigger              clones its child; toggles the menu, opens it on the arrow keys
+├── Dropdown.Anchor               instead of Trigger: the row or list a context menu opens at (anchorPoint)
 └── Dropdown.Content              portaled role="menu" on the floating surface, scrolls
     ├── Dropdown.Header           non-interactive row: [avatar] [Title + Description] [badge]
     │   ├── Dropdown.Title
@@ -54,60 +55,81 @@ No DOM, no ref. Open state and dismiss policy.
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, item pick, Escape, outside press, code. |
 | `closeOnOutsideClick` | `boolean` | `true` | A pointerdown outside the menu and its trigger closes it; focus follows the pointer. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the menu and returns focus to the trigger. |
-| `children` | `ReactNode` | — (required) | Trigger and Content. |
+| `anchorPoint` | `{ x: number; y: number } \| null` | `null` | A point inside the trigger or `Dropdown.Anchor` (px from its top-left corner) the menu opens at: a context menu at the pointer. It moves with the element on scroll. |
+| `children` | `ReactNode` | — (required) | Trigger (or Anchor) and Content. |
 
-### Dropdown.Trigger
-No DOM: clones the single child, merges `ref` and `onClick`; toggles the menu and sets its ARIA.
+### Dropdown.Trigger · Dropdown.Anchor
+No DOM: clone the single child and merge `ref`. Trigger toggles the menu on a click, opens it on the arrow keys and sets its ARIA; Anchor only places the menu (a context menu with `anchorPoint`, opened through `open`) and names it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactElement` | — (required) | One element, usually a Button. |
+| `children` | `ReactElement` | — (required) | One element: usually a Button (Anchor: the row or list the context menu belongs to). |
 
 ### Dropdown.Content
-`ref` → `HTMLDivElement`. Portal + `role="menu"` floating panel that scrolls inside, named by the trigger; focus moves to the first item. Below 640px of viewport it is a bottom sheet.
+`ref` → `HTMLDivElement`. Portal + `role="menu"` floating panel that scrolls inside, named by the control it opened from; focus moves to the first enabled item. Below 640px of viewport it is a bottom sheet.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side; flips to the opposite side when there is no room. |
 | `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment along the trigger. `auto` lines the menu up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix the edge. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: item height, text and icon; key hints one tier down. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: item height, text and icon; key hints one tier down. The menu's own: it does not follow the trigger's size. |
 | `matchTriggerWidth` | `boolean` | `false` | The menu is at least as wide as the trigger. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "role">` | — | `className`, `onKeyDown` (runs before the arrow-key navigation) and the other attributes of the menu. |
 
 ### Dropdown.Item
-`ref` → `HTMLButtonElement` (or the `asChild` element). A `<button role="menuitem">`; a click, Enter or Space runs `onSelect` and closes the menu. + native button props.
+`ref` → `HTMLButtonElement` (or the `asChild` element). A `<button role="menuitem">`, no tab stop of its own (`tabIndex -1`, the arrow keys move between items); a click, Enter or Space runs `onSelect` and closes the menu.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `onSelect` | `() => void` | — | The action of the item. |
-| `disabled` | `boolean` | `false` | Muted, `aria-disabled`, skipped by the arrow keys, does nothing on click. |
+| `disabled` | `boolean` | `false` | Muted and `disabled` (a link item: `aria-disabled`), skipped by the arrow keys; no handler runs, the item's own `onClick` included. |
 | `tone` | `"neutral" \| "danger"` | `"neutral"` | `danger`: destructive action — danger text, icon and hover fill. |
 | `asChild` | `boolean` | `false` | The item is its single child link (`<a href>`, a router `Link`), so Cmd / Ctrl-click and «open in a new tab» work; the pick still closes the menu. |
 | `children` | `ReactNode` | — | `Dropdown.ItemIcon`, the label, `Dropdown.ItemDescription`, `Dropdown.ItemShortcut`; with `asChild` one link element holding them. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "role" \| "onSelect">` | — | `className`, `onClick` (runs before `onSelect`; `preventDefault()` keeps the menu open) and the other attributes of the item. |
 
 ### Dropdown.CheckboxItem
-`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a check mark at the end while checked; a click, Enter or Space toggles it and the menu stays open. + native button props.
+`ref` → `HTMLButtonElement`. A `<button role="menuitemcheckbox">` with `aria-checked` and a check mark at the end while checked; a click, Enter or Space toggles it and the menu stays open.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `checked` | `boolean` | — | Checked state (controlled). |
 | `defaultChecked` | `boolean` | `false` | Initial state (uncontrolled). |
 | `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state. |
-| `disabled` | `boolean` | `false` | Muted, `aria-disabled`, skipped by the arrow keys, does not toggle. |
+| `disabled` | `boolean` | `false` | Muted and `disabled`, skipped by the arrow keys; no handler runs, the item's own `onClick` included. |
 | `children` | `ReactNode` | — | The label (optionally after a `Dropdown.ItemIcon`). |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "role" \| "onSelect" \| "onChange" \| "defaultChecked">` | — | `className`, `onClick` (runs before the toggle; `preventDefault()` skips it) and the other attributes of the item. |
 
 ### Dropdown.ItemDescription
-`ref` → `HTMLSpanElement`. A muted second line under the item label: what the action does, or why a disabled item is unavailable. Describes the item for assistive tech. + native `<span>` props except `id`.
+`ref` → `HTMLSpanElement`. A muted second line under the item label: what the action does, or why a disabled item is unavailable. Describes the item for assistive tech.
 
-### Dropdown.ItemIcon · Dropdown.ItemShortcut
-`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). The `aria-hidden` leading glyph at the menu icon size / a `Kbd` key hint at the end of the item — a hint, not a handler. + native props.
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | The sentence; it wraps inside the menu's width. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "id">` | — | `className` and the other attributes except `id` (the item points at it). |
+
+### Dropdown.ItemIcon
+`ref` → `HTMLSpanElement`. The `aria-hidden` leading glyph of an item at the menu icon size.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className`, `children` (the glyph) and the other attributes. |
+
+### Dropdown.ItemShortcut
+`ref` → `HTMLElement` (the `<kbd>`). A `Kbd` key hint at the end of the item, one tier below the menu — a hint, not a handler.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | The keys («⌘D»). |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children">` | — | `className` and the other attributes of the `<kbd>`. |
 
 ### Dropdown.Group
-`ref` → `HTMLDivElement`. `<div role="group">` named by its visible `label`. + native `<div>` props.
+`ref` → `HTMLDivElement`. `<div role="group">` named by its visible `label`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — | Heading of the group (caption, muted); also its accessible name. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` (the items) and the other attributes of the group. |
 
 ### Dropdown.Separator
 `ref` → `HTMLDivElement`. A full-bleed Divider between items or groups.
@@ -117,7 +139,11 @@ No DOM: clones the single child, merges `ref` and `onClick`; toggles the menu an
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the divider. |
 
 ### Dropdown.Header · Dropdown.Title · Dropdown.Description
-`ref` → `HTMLDivElement`. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description in one column, a trailing badge or button. + native `<div>` props.
+`ref` → `HTMLDivElement`. A non-interactive row at the top (who is signed in, the plan): an avatar, Title + Description in one column, a trailing badge or button.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the `<div>`. |
 
 ## Variants
 The panel is the shared floating surface: the floating layer of the ladder (`data-depth="floating"`), `--prime-panel-radius` (12), padding 4, `shadow-overlay`; rows have radius 8 and the tier item height.
@@ -154,8 +180,9 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 | `disabled` (Item) | Disabled text, skipped by arrows | Not allowed right now (say why in `Dropdown.ItemDescription`) | `false` |
 | `matchTriggerWidth` | Menu at least as wide as the trigger | Full-width buttons | `false` |
 | `closeOnOutsideClick={false}` · `closeOnEscape={false}` | Stays open until an item is picked | A required choice in an onboarding step | |
+| `anchorPoint` (Root) | The menu opens at a point inside the trigger or `Dropdown.Anchor` | A context menu at the pointer over a row or a list | `null` |
 
-**Combinations** — menu `size` = trigger `size`. Destructive items go last, after a separator. Key hints only for shortcuts the app really handles.
+**Combinations** — `size` is the menu's own, set on `Dropdown.Content`; match it to the trigger by hand when they stand together. Destructive items go last, after a separator. Key hints only for shortcuts the app really handles. A context menu: `Dropdown.Anchor` around the row, `anchorPoint` from the `contextmenu` event, `open` driven by it.
 
 ## States
 | State | Driven by | DOM |
@@ -164,10 +191,10 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 | side | `side` and the room next to the trigger | `data-side` (resolved) |
 | size | `size` on Content | `data-size` |
 | item hover / focus | a hovering pointer, arrow keys | subtle fill (danger-soft for `danger`), no movement; a tap leaves no hover fill |
-| item disabled | `disabled` | `aria-disabled="true"`, `data-disabled="true"` |
+| item disabled | `disabled` | native `disabled` (a link item `aria-disabled="true"`), `data-disabled="true"`; no handler runs |
 | item tone | `tone` | `data-tone` |
 | item checked | `checked` / `defaultChecked` / `onCheckedChange` on `Dropdown.CheckboxItem` | `aria-checked`; an accent check mark at the end while checked, nothing while not |
-| sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the menu; the sheet carries `data-state`, the menu keeps its role and ref; page scroll locked; a swipe down from the handle closes it (with `closeOnOutsideClick`) |
+| sheet | a phone viewport | a scrim and a full-width bottom sheet around the menu; the sheet carries `data-state`, the menu `data-sheet` and keeps its role and ref; page scroll locked; with `closeOnOutsideClick` an `aria-hidden` grab handle, and a swipe down from it closes the sheet |
 
 Motion (`overlayMotion`): the menu grows out of the side that faces its trigger and fades, in and out over `fast`; as a sheet it slides up over `slow` and down over `base`. Content stays mounted until the exit ends; under `prefers-reduced-motion` it unmounts at once.
 
@@ -188,7 +215,7 @@ Motion (`overlayMotion`): the menu grows out of the side that faces its trigger 
 | Key | Action |
 |---|---|
 | `Enter` · `Space` | On the trigger opens the menu (focus on the first item); on an item runs it and returns focus to the trigger; on a checkbox item toggles it and the menu stays open. |
-| `ArrowDown` · `ArrowUp` | Move focus to the next / previous enabled item, wrapping. |
+| `ArrowDown` · `ArrowUp` | On the trigger open the menu at its first item; in the menu move focus to the next / previous enabled item, wrapping. |
 | `Home` · `End` | First / last enabled item. |
 | `Escape` | Closes the menu (`closeOnEscape`); focus returns to the trigger. |
 | `Tab` · `Shift+Tab` | Closes the menu; focus returns to the trigger (Tab then goes on to the next stop). |
@@ -196,8 +223,8 @@ Motion (`overlayMotion`): the menu grows out of the side that faces its trigger 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- The menu is `role="menu"` named by the trigger; items are `role="menuitem"`, checkbox items `role="menuitemcheckbox"` with `aria-checked`, disabled ones `aria-disabled`.
-- The trigger gets `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` and `data-state`; the child's own `id` wins. Other props given to `Dropdown.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
+- The menu is `role="menu"` named by the control it opened from (the trigger, or the control inside `Dropdown.Anchor`), read from the page; items are `role="menuitem"`, checkbox items `role="menuitemcheckbox"` with `aria-checked`, disabled ones `disabled`. Items are no tab stops: one Tab leaves the menu.
+- The trigger gets `aria-haspopup="menu"`, `aria-expanded`, `data-state` and, while open, `aria-controls`; the child's own `id` wins. Other props given to `Dropdown.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.
 - With a `Dropdown.ItemDescription` the label names the item (`aria-labelledby`) and the description describes it (`aria-describedby`).
 - An `asChild` item merges its props onto the link; the link's children are the item content. A disabled link item gets `aria-disabled` and its click is stopped.
 - `Dropdown.Group` is `role="group"` named by its `label`.
@@ -214,11 +241,12 @@ No `labels`.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | An icon-only button opens the row actions; picking an item runs it and closes the menu — `Dropdown.Item`, `onSelect`. |
 | [structure.tsx](examples/structure.tsx) | Optional parts of an account menu: a header with an avatar, a labelled group, item icons, key hints and separators — `Dropdown.Header`, `Dropdown.Group`, `Dropdown.ItemIcon`, `Dropdown.ItemShortcut`. |
-| [sizes.tsx](examples/sizes.tsx) | Every size tier with icons, key hints and a destructive item; the menu takes the tier of its trigger — `size`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size tier with icons, key hints and a destructive item; the tier is the menu's own, set on `Dropdown.Content`, not taken from its trigger — `size`. |
 | [placement.tsx](examples/placement.tsx) | Every side and alignment relative to the trigger; near the viewport edge the menu flips and shifts — `side`, `align`. |
 | [states.tsx](examples/states.tsx) | A regular, a disabled and a destructive item; arrow keys skip the disabled one — `disabled`, `tone`. |
 | [item-description.tsx](examples/item-description.tsx) | A second line under an item: what an action does, and why a disabled one is unavailable, readable by everyone and read with the item — `Dropdown.ItemDescription`. |
 | [link-items.tsx](examples/link-items.tsx) | Items that navigate are real links: Cmd-click or the context menu opens them in a new tab, a plain pick closes the menu — `asChild`. |
+| [context-menu.tsx](examples/context-menu.tsx) | A right-click on a deal opens its menu at the pointer, and Escape or a pick returns focus to that row — `anchorPoint`, `Dropdown.Anchor`. |
 | [match-trigger-width.tsx](examples/match-trigger-width.tsx) | Under a full-width button the menu is at least as wide as the trigger — `matchTriggerWidth`. |
 | [checkbox-items.tsx](examples/checkbox-items.tsx) | A column chooser: toggles in the menu keep it open, the key column cannot be hidden — `Dropdown.CheckboxItem`, `checked`, `onCheckedChange`. |
 | [long-list.tsx](examples/long-list.tsx) | More projects than fit: the grouped list scrolls inside the panel, capped by the room next to the trigger — `Dropdown.Group`. |
@@ -233,6 +261,8 @@ No `labels`.
 - A destructive item without `tone="danger"`, or in the middle of the list → mark it and put it last.
 - A Tooltip on a disabled item to say why → keyboard and touch users never see it; put the reason in `Dropdown.ItemDescription`.
 - `onSelect={() => navigate(url)}` for an item that opens a page → `asChild` with a link, so Cmd-click and a new tab work.
+- A hidden button placed at the pointer to anchor a context menu → `Dropdown.Anchor` around the row and `anchorPoint` from the `contextmenu` event.
+- Expecting the menu to take the trigger's `size` → it has its own; set `size` on `Dropdown.Content`.
 
 ## Related
 - **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (the menu), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`), [Divider](../divider/COMPONENT.md) (`Separator`), `Icon` (`action.check` of `CheckboxItem`)

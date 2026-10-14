@@ -1,4 +1,4 @@
-/** An edit form that holds the dialog: changes make any dismiss ask first and show a note in the footer; while saving nothing closes it — `Modal.Guard`, `Modal.Meta`. */
+/** An edit form that holds the dialog: changes make any dismiss ask first and show a note in the footer, the submit button saves the form, and while saving nothing closes it — `Modal.Guard`, `Modal.Meta`. */
 import { Button, Fieldset, Input, Modal } from "prime-ui-kit";
 import * as React from "react";
 

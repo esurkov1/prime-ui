@@ -35,7 +35,6 @@ import {
   resolvePanelLayout,
   STEP_DOWN,
   useAvailableWidth,
-  useContainScroll,
   useViewportWidth,
 } from "./panelLayout";
 
@@ -307,7 +306,6 @@ export function PanelView(props: PanelViewProps) {
   const panelRef = useMergedRefs(setPanelNode, domRef);
   const parentWidth = useAvailableWidth(embedded ? panelNode : null);
   const viewportWidth = useViewportWidth(!embedded);
-  useContainScroll(embedded ? null : panelNode);
   const hasPresets = Boolean(presets) && isRange;
 
   // Embedded: the parent's content box; in the popover: the window minus the edge gaps.

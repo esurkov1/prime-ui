@@ -5,27 +5,31 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { type PositionOptions, type PositionSide, usePosition } from "@/hooks/usePosition";
 import { type MotionDurationToken, type Presence, usePresence } from "@/hooks/usePresence";
 import { useScrollLock } from "@/hooks/useScrollLock";
-import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
+import { type SwipeDismiss, useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 
-import { focusBack, focusInto, getFocusable } from "./focus";
+import { focusBack, focusInto, getFocusable, handoffFocus } from "./focus";
 import { type DismissReason, type LayerEntry, useLayer } from "./layerStack";
+import { useContainScroll } from "./useContainScroll";
 
 export type UseFloatingLayerOptions = PositionOptions & {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** The anchor: positions the panel, is not "outside", and gets focus back on close. */
   triggerRef: React.RefObject<HTMLElement | null>;
-  /** Escape closes the panel. Default `true`. */
-  closeOnEscape?: boolean;
-  /** A press outside the panel and its trigger closes it. Default `true`. */
-  closeOnOutsideClick?: boolean;
+  /** Escape closes the panel (a passive layer passes `true`: Escape always hides it). */
+  closeOnEscape: boolean;
+  /** A press outside the panel and its trigger, or a swipe down on its sheet, closes it. */
+  closeOnOutsideClick: boolean;
   /**
    * `pointerdown` (default) — a regular floating panel. `none` — a passive layer (Tooltip): no
    * part in presses or Tab, no focus restore; Escape still closes it first.
    */
   dismiss?: "pointerdown" | "none";
-  /** Focus moves into the panel on open (`[data-autofocus]` → first tab stop → the panel). */
-  focusOnOpen?: boolean;
+  /**
+   * Focus moves into the panel on open: `true` — `[data-autofocus]` → first tab stop → the panel;
+   * a selector — its first match first (a menu's first enabled item, which is no tab stop).
+   */
+  focusOnOpen?: boolean | string;
   /** Tab cycles inside the panel. */
   trap?: boolean;
   /**
@@ -55,8 +59,8 @@ export type FloatingLayer = {
   side: PositionSide;
   /** Rendered as a bottom sheet (`sheet` on a narrow viewport). */
   sheet: boolean;
-  /** Swipe-to-close of the sheet; part of the sheet's `onPointerDown`. */
-  onSheetPointerDown: (event: React.PointerEvent<HTMLElement>) => void;
+  /** Swipe-to-close of the sheet: its handle shows while `enabled`; part of the sheet's props. */
+  swipe: SwipeDismiss;
   /** Attach to the panel element (merged with a consumer ref). */
   panelRef: React.RefCallback<HTMLElement>;
   /** The panel element while mounted. */
@@ -72,17 +76,19 @@ export type FloatingLayer = {
 };
 
 /**
- * The one floating-layer primitive: Popover, Dropdown, Tooltip, Select and TagSelect. Presence
- * (exit animation), positioning against the trigger, a place in the layer stack and one focus
- * policy (foundation §8): focus returns to the trigger after Escape, a pick, Tab or a close — not
- * after a press outside, where focus follows the pointer. Render the panel with `FloatingPanel`.
+ * The one floating-layer primitive: Popover, Dropdown, Tooltip, Select, TagSelect, the reaction
+ * bar of a Message and the chart tooltip. Presence (exit animation), positioning against the
+ * trigger, a place in the layer stack with the dismiss options applied inside, the wheel kept off
+ * the page under the panel, and one focus policy (foundation §8): focus returns to the trigger
+ * after Escape, a pick, Tab or a close — not after a press outside, where focus follows the
+ * pointer. Render the panel with `FloatingPanel`.
  */
 export function useFloatingLayer({
   open,
   onOpenChange,
   triggerRef,
-  closeOnEscape = true,
-  closeOnOutsideClick = true,
+  closeOnEscape,
+  closeOnOutsideClick,
   dismiss = "pointerdown",
   focusOnOpen = false,
   trap = false,
@@ -110,6 +116,9 @@ export function useFloatingLayer({
     },
     [attachLayer],
   );
+  const passive = dismiss === "none";
+  // A sheet locks the page scroll itself; a passive layer takes no wheel.
+  useContainScroll(open && !sheet && !passive ? panel : null);
 
   /** Set by a press outside: focus follows the pointer instead of returning to the trigger. */
   const outsideRef = React.useRef(false);
@@ -128,7 +137,6 @@ export function useFloatingLayer({
   const swipe = useSwipeDismiss({
     enabled: sheet && open && closeOnOutsideClick,
     onDismiss: dismissOutside,
-    handle: "[data-swipe-handle]",
   });
 
   const onDismiss = (reason: DismissReason) => {
@@ -146,17 +154,17 @@ export function useFloatingLayer({
     onDismiss,
   });
 
-  const passive = dismiss === "none";
   React.useEffect(() => {
     if (!open || !panel || passive) return;
     outsideRef.current = false;
-    if (focusOnOpen) focusInto(panel);
+    if (focusOnOpen) focusInto(panel, typeof focusOnOpen === "string" ? focusOnOpen : undefined);
     return () => {
       if (outsideRef.current) return;
+      // Focus in the closing panel goes back to the trigger; so does focus lost to the body (the
+      // focused item was removed while the panel was open).
       const active = document.activeElement;
-      if (!active || active === document.body || panel.contains(active)) {
-        focusBack(triggerRef.current);
-      }
+      if (!active || active === document.body) focusBack(triggerRef.current);
+      else handoffFocus(panel, triggerRef.current);
     };
   }, [open, panel, passive, focusOnOpen, triggerRef]);
 
@@ -184,11 +192,48 @@ export function useFloatingLayer({
     mounted,
     side: position.side,
     sheet,
-    onSheetPointerDown: swipe.onPointerDown,
+    swipe,
     panelRef,
     contentRef,
     layer,
     close,
     onKeyDown,
+  };
+}
+
+type FloatingTriggerStateOptions = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  /**
+   * ArrowDown and ArrowUp on the trigger open a closed layer, as on a menu button or a picker
+   * (WAI-ARIA); Enter and Space open it as the trigger's click.
+   */
+  openOnArrow?: boolean;
+};
+
+/**
+ * The props of a floating layer's trigger that follow its open state: `aria-expanded`,
+ * `data-state`, the click that toggles the layer, and with `openOnArrow` the arrow keys that open
+ * it. Merged onto the consumer's element by `FloatingTrigger` (the element's own handlers run
+ * first; `preventDefault()` in them skips these).
+ */
+export function floatingTriggerProps({
+  open,
+  setOpen,
+  openOnArrow = false,
+}: FloatingTriggerStateOptions) {
+  return {
+    "aria-expanded": open,
+    "data-state": open ? "open" : "closed",
+    onClick: () => setOpen(!open),
+    ...(openOnArrow
+      ? {
+          onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+            if (open || (event.key !== "ArrowDown" && event.key !== "ArrowUp")) return;
+            event.preventDefault();
+            setOpen(true);
+          },
+        }
+      : null),
   };
 }

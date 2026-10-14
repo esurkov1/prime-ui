@@ -120,6 +120,8 @@ export function ReactionBar({
     open,
     onOpenChange,
     triggerRef: anchorRef,
+    closeOnEscape: true,
+    closeOnOutsideClick: true,
     side: "top",
     align,
     focusOnOpen,

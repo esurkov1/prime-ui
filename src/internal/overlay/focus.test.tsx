@@ -5,6 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 import { MediaViewer } from "@/components/media-viewer/MediaViewer";
 import { Modal } from "@/components/modal/Modal";
 
+import { captureOpener, focusBack, handoffFocus } from "./focus";
+
 /**
  * Safari does not focus a button on a click: focus stays on the `tabindex="-1"` region around it
  * (or the body). A press is fired without moving focus, as Safari does.
@@ -77,5 +79,95 @@ describe("opener of a modal layer", () => {
     // Opened by a key: the ring shows where focus lands.
     expect(focus).not.toHaveBeenCalledWith(expect.objectContaining({ focusVisible: false }));
     expect(opener).not.toHaveAttribute("data-focus-quiet");
+  });
+});
+
+describe("captureOpener", () => {
+  it("keeps the element a press landed on, inside the control around it", () => {
+    render(
+      <button type="button">
+        <img alt="Фото склада" src="/dock.jpg" />
+      </button>,
+    );
+    const picture = screen.getByRole("img");
+    fireEvent.pointerDown(picture);
+    const opener = captureOpener();
+    expect(opener.byPointer).toBe(true);
+    expect(opener.element).toBe(screen.getByRole("button"));
+    expect(opener.target).toBe(picture);
+  });
+
+  it("has no press target after a key", () => {
+    render(<button type="button">Открыть</button>);
+    const button = screen.getByRole("button");
+    button.focus();
+    fireEvent.keyDown(document, { key: "Enter" });
+    expect(captureOpener()).toEqual({ element: button, target: null, byPointer: false });
+  });
+});
+
+describe("focusBack", () => {
+  it("falls back to the first tab stop of the page when the element is gone", () => {
+    render(
+      <>
+        <a href="/orders">Заказы</a>
+        <button type="button">Удалить</button>
+      </>,
+    );
+    const gone = document.createElement("button");
+    focusBack(gone);
+    expect(screen.getByRole("link", { name: "Заказы" })).toHaveFocus();
+  });
+});
+
+describe("handoffFocus", () => {
+  it("moves focus to the part that takes the leaving one's place", () => {
+    render(
+      <>
+        <div data-testid="old">
+          <button type="button">Повторить</button>
+        </div>
+        <div data-testid="new">
+          <p>Заказ оплачен</p>
+          <button type="button">Открыть счёт</button>
+        </div>
+      </>,
+    );
+    screen.getByRole("button", { name: "Повторить" }).focus();
+    expect(handoffFocus(screen.getByTestId("old"), screen.getByTestId("new"))).toBe(true);
+    expect(screen.getByRole("button", { name: "Открыть счёт" })).toHaveFocus();
+  });
+
+  it("focuses a container without tab stops itself", () => {
+    render(
+      <>
+        <button type="button">Закрыть</button>
+        <section data-testid="region">Нет заказов</section>
+      </>,
+    );
+    const button = screen.getByRole("button");
+    button.focus();
+    const region = screen.getByTestId("region");
+    handoffFocus(button, region);
+    expect(region).toHaveFocus();
+    expect(region).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("leaves focus alone when the leaving part does not hold it", () => {
+    render(
+      <>
+        <input aria-label="Поиск" />
+        <div data-testid="old">
+          <button type="button">Повторить</button>
+        </div>
+        <button type="button">Далее</button>
+      </>,
+    );
+    const search = screen.getByRole("textbox");
+    search.focus();
+    expect(
+      handoffFocus(screen.getByTestId("old"), screen.getByRole("button", { name: "Далее" })),
+    ).toBe(false);
+    expect(search).toHaveFocus();
   });
 });

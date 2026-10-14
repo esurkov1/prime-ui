@@ -1,42 +1,14 @@
 /*
- * Modal — raised surface on a scrim. Header / body / footer (DialogParts.module.css) own their
- * side padding (`--dialog-padding`) and the inset hairlines. Only the body scrolls. Below 640px of viewport the dialog becomes a bottom sheet.
+ * Modal — a raised panel over the scrim, on the dialog shell (DialogParts.module.css: the zones,
+ * their padding and the inset hairlines; only the body scrolls). Centred at its width tier, or
+ * near the top (`placement="top"`: a palette whose list grows downward, the search row never
+ * jumps). Below 640px of viewport a centred dialog is a bottom sheet — the shared sheet surface
+ * (internal/sheet) with `data-sheet` — and this geometry steps aside.
  */
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: var(--prime-z-overlay);
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  padding: var(--prime-modal-viewport-padding);
-  background: var(--prime-color-bg-scrim);
-  overflow: hidden;
-}
 
 .content {
   --modal-width: var(--prime-modal-width-m);
-  /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-layer-current);
-
   --dialog-padding: var(--prime-modal-padding);
-
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  width: min(100%, var(--modal-width));
-  max-height: calc(100dvh - 2 * var(--prime-modal-viewport-padding));
-  min-height: 0;
-  overflow: hidden;
-  /* The floating layer of the ladder (`data-depth="floating"`). */
-  background: var(--prime-color-layer-current);
-  color: var(--prime-color-text-primary);
-  border-radius: var(--prime-modal-radius);
-  box-shadow: var(--prime-shadow-modal);
-  outline: none;
-  font-size: var(--prime-text-body-m-size);
-  line-height: var(--prime-text-body-m-line-height);
 }
 
 .content[data-size="xs"] {
@@ -55,28 +27,24 @@
   --modal-width: var(--prime-modal-width-xl);
 }
 
-/* ─── Narrow viewport: bottom sheet ──────────────────────────────────────── */
+/* Centred in the viewport, its height by content up to the viewport less the padding. */
+.content:not([data-sheet]) {
+  position: fixed;
+  inset: 0;
+  width: min(calc(100% - 2 * var(--prime-modal-viewport-padding)), var(--modal-width));
+  height: fit-content;
+  max-height: calc(100dvh - 2 * var(--prime-modal-viewport-padding));
+  margin: auto;
+  border-radius: var(--prime-modal-radius);
+  box-shadow: var(--prime-shadow-modal);
+}
 
-/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
-@media (max-width: 639px) {
-  .overlay {
-    place-items: end stretch;
-    padding: var(--prime-modal-viewport-padding) 0 0;
-  }
+/* Near the top: the panel hangs from a fixed line and grows downward. */
+.content[data-placement="top"] {
+  --modal-top: clamp(var(--prime-modal-viewport-padding), 12vh, var(--prime-space-24));
 
-  .content {
-    width: 100%;
-    max-height: calc(100dvh - var(--prime-sheet-top-gap));
-    padding-block-end: env(safe-area-inset-bottom, 0px);
-    border-start-start-radius: var(--prime-sheet-radius);
-    border-start-end-radius: var(--prime-sheet-radius);
-    border-end-start-radius: 0;
-    border-end-end-radius: 0;
-    /* Its own fill continues past the bottom edge: an upward pull (up to 24) never lifts it off. */
-    box-shadow:
-      0 var(--prime-space-6) 0 0 var(--prime-color-layer-current),
-      var(--prime-shadow-modal);
-  }
+  max-height: calc(100dvh - var(--modal-top) - var(--prime-modal-viewport-padding));
+  margin-block: var(--modal-top) auto;
 }
 
 /* Motion (scrim fade, dialog scale, bottom-sheet slide) lives in internal/overlayMotion.module.css. */

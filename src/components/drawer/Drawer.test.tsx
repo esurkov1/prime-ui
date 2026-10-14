@@ -1,12 +1,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
-
 import { Avatar } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { swipe } from "@/test/mobile";
+import { describeOverlayConformance } from "@/test/overlayConformance";
 
 import { Drawer, type DrawerContentProps, type DrawerRootProps } from "./Drawer";
 
@@ -425,107 +425,27 @@ describe("Drawer — header actions, footer meta, exit snapshot", () => {
   });
 });
 
-describe("Drawer.Guard", () => {
-  function GuardedDrawer({
-    busy,
-    dirty,
-    onOpenChange,
-  }: {
-    busy?: boolean;
-    dirty?: boolean;
-    onOpenChange?: (open: boolean) => void;
-  }) {
-    return (
-      <Drawer.Root defaultOpen onOpenChange={onOpenChange}>
-        <Drawer.Content>
-          <Drawer.Header>
-            <Drawer.Title>Новая сделка</Drawer.Title>
-          </Drawer.Header>
-          <Drawer.Body>
-            <Drawer.Guard busy={busy} dirty={dirty} />
-            <input aria-label="Название" />
-          </Drawer.Body>
-          <Drawer.Footer>
-            <Drawer.Close>
-              <Button.Root variant="soft" tone="neutral">
-                Отмена
-              </Button.Root>
-            </Drawer.Close>
-          </Drawer.Footer>
-        </Drawer.Content>
-      </Drawer.Root>
-    );
-  }
-
-  it("busy: no dismiss closes it; the close button and Close stay in place, disabled", () => {
-    const onOpenChange = vi.fn();
-    render(<GuardedDrawer busy onOpenChange={onOpenChange} />);
-    fireEvent.keyDown(document, { key: "Escape" });
-    clickScrim(drawerScrim());
-    expect(screen.getByRole("button", { name: "Закрыть" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Отмена" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "Закрыть" }));
-    expect(onOpenChange).not.toHaveBeenCalled();
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
-  });
-
-  it("dirty: Escape asks first; «Продолжить» keeps the drawer and its changes", async () => {
-    const onOpenChange = vi.fn();
-    render(<GuardedDrawer dirty onOpenChange={onOpenChange} />);
-    fireEvent.keyDown(document, { key: "Escape" });
-    const confirm = await screen.findByRole("alertdialog", { name: "Не сохранять изменения?" });
-    expect(confirm).toHaveAccessibleDescription("Изменения в форме пропадут.");
-    fireEvent.click(screen.getByRole("button", { name: "Продолжить" }));
-    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
-    expect(onOpenChange).not.toHaveBeenCalled();
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
-  });
-
-  it("dirty: confirming «Не сохранять» closes the drawer", async () => {
-    const onOpenChange = vi.fn();
-    render(<GuardedDrawer dirty onOpenChange={onOpenChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Отмена" }));
-    fireEvent.click(await screen.findByRole("button", { name: "Не сохранять" }));
-    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
-    await expectClosed();
-  });
-
-  it("takes the confirm texts from the Root labels", async () => {
-    render(
-      <Drawer.Root defaultOpen labels={{ discardTitle: "Закрыть без сохранения?" }}>
-        <Drawer.Content aria-label="Сделка">
-          <Drawer.Guard dirty />
-          <Drawer.Header>
-            <Drawer.Title>Сделка</Drawer.Title>
-          </Drawer.Header>
-        </Drawer.Content>
-      </Drawer.Root>,
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Закрыть" }));
-    expect(
-      await screen.findByRole("alertdialog", { name: "Закрыть без сохранения?" }),
-    ).toBeInTheDocument();
-  });
-
-  it("closing from code is never held", async () => {
-    function Controlled() {
-      const [open, setOpen] = React.useState(true);
-      return (
-        <>
-          <button type="button" onClick={() => setOpen(false)}>
-            Сохранено
-          </button>
-          <Drawer.Root open={open} onOpenChange={setOpen}>
-            <Drawer.Content aria-label="Сделка">
-              <Drawer.Guard busy dirty />
-            </Drawer.Content>
-          </Drawer.Root>
-        </>
-      );
-    }
-    render(<Controlled />);
-    // The drawer makes the page inert; the owner closes it from code.
-    fireEvent.click(screen.getByText("Сохранено"));
-    await expectClosed();
-  });
+describeOverlayConformance("Drawer", {
+  render: () => (
+    <Drawer.Root>
+      <Drawer.Trigger>
+        <Button.Root>Открыть</Button.Root>
+      </Drawer.Trigger>
+      <Drawer.Content aria-label="Новый клиент">
+        <Drawer.Body>
+          <input aria-label="Компания" />
+        </Drawer.Body>
+        <Drawer.Footer>
+          <Drawer.Close>
+            <Button.Root variant="soft" tone="neutral">
+              Отмена
+            </Button.Root>
+          </Drawer.Close>
+        </Drawer.Footer>
+      </Drawer.Content>
+    </Drawer.Root>
+  ),
+  trigger: "Открыть",
+  role: "dialog",
+  modal: true,
 });

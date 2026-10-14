@@ -1,18 +1,13 @@
-/** A destructive confirm closes only from its buttons, and not at all while the request runs — `closeOnOutsideClick`, `closeOnEscape`. */
-import { Button, Icon, Modal } from "prime-ui-kit";
+/** A step the person has to finish: the payment details dialog closes only from its buttons, and not at all while they are saved — `closeOnOutsideClick`, `closeOnEscape`. */
+import { Button, Icon, Input, Modal } from "prime-ui-kit";
 import * as React from "react";
 
-export default function ModalDismissExample() {
-  const [open, setOpen] = React.useState(false);
-  const [deleting, setDeleting] = React.useState(false);
+import styles from "./examples.module.css";
 
-  const remove = () => {
-    setDeleting(true);
-    window.setTimeout(() => {
-      setDeleting(false);
-      setOpen(false);
-    }, 1200);
-  };
+export default function ModalDismissExample() {
+  const formId = React.useId();
+  const [open, setOpen] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
 
   return (
     <Modal.Root
@@ -22,33 +17,49 @@ export default function ModalDismissExample() {
       closeOnEscape={false}
     >
       <Modal.Trigger>
-        <Button.Root variant="outline" tone="danger">
-          Удалить проект
+        <Button.Root variant="soft" tone="neutral">
+          Реквизиты для счетов
         </Button.Root>
       </Modal.Trigger>
       <Modal.Content size="s">
-        {/* While the request runs, the guard keeps «Отмена» in place, disabled. */}
-        <Modal.Guard busy={deleting} />
+        {/* While the details are saved, the guard keeps «Позже» in place, disabled. */}
+        <Modal.Guard busy={saving} />
         <Modal.Header showClose={false}>
-          <Modal.Icon tone="danger">
-            <Icon name="action.delete" />
+          <Modal.Icon tone="accent">
+            <Icon name="object.receipt" />
           </Modal.Icon>
-          <Modal.Title>Удалить «Сайт компании»?</Modal.Title>
-          <Modal.Description>
-            Задачи, файлы и история будут удалены без возможности восстановления.
-          </Modal.Description>
+          <Modal.Title>Укажите реквизиты</Modal.Title>
+          <Modal.Description>Без них счета клиентам не выставить.</Modal.Description>
         </Modal.Header>
+        <Modal.Body>
+          <form
+            id={formId}
+            className={styles.form}
+            onSubmit={(event) => {
+              event.preventDefault();
+              setSaving(true);
+              window.setTimeout(() => {
+                setSaving(false);
+                setOpen(false);
+              }, 1200);
+            }}
+          >
+            <Input.Root label="ИНН">
+              <Input.Wrapper>
+                <Input.Field name="inn" inputMode="numeric" autoComplete="off" />
+              </Input.Wrapper>
+            </Input.Root>
+          </form>
+        </Modal.Body>
         <Modal.Footer>
           <Modal.Close>
             <Button.Root variant="outline" tone="neutral">
-              Отмена
+              Позже
             </Button.Root>
           </Modal.Close>
-          <Modal.Confirm>
-            <Button.Root tone="danger" loading={deleting} onClick={remove}>
-              Удалить
-            </Button.Root>
-          </Modal.Confirm>
+          <Button.Root type="submit" form={formId} loading={saving}>
+            Сохранить
+          </Button.Root>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

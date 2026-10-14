@@ -1,6 +1,7 @@
 /* ─── Popover ────────────────────────────────────────────────────────────────
- * Free-form content on the shared floating surface (`surface.module.css`): tier padding and gap,
- * scrolls inside the room next to its trigger (`--float-max-h`).
+ * Free-form content on the shared floating surface (`internal/floatingSurface.module.css`, which
+ * also owns the width modes): tier padding and gap, scrolls inside the room next to its trigger
+ * (`--float-max-h`). On a phone it stands in a bottom sheet (`data-sheet`).
  */
 
 .content {
@@ -10,8 +11,6 @@
   --po-lh: var(--prime-control-m-line-height);
   --po-desc: var(--prime-control-m-label-size);
   --po-desc-lh: var(--prime-control-m-label-line-height);
-  /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-layer-current);
 
   gap: var(--po-gap);
   max-height: var(--float-max-h, none);
@@ -55,12 +54,6 @@
   --po-lh: var(--prime-control-xl-line-height);
   --po-desc: var(--prime-control-xl-label-size);
   --po-desc-lh: var(--prime-control-xl-label-line-height);
-}
-
-/* Exactly the trigger's width (`--float-min-w`), even below the panel minimum. */
-.content[data-match-trigger-width="true"] {
-  width: var(--float-min-w, max-content);
-  min-width: var(--float-min-w, 0px);
 }
 
 /* Flush: rows reach the panel edges; the content owns its spacing. */
@@ -109,11 +102,8 @@
   padding-block-start: var(--prime-space-1);
 }
 
-/* Phones (below 640, where the popover is a bottom sheet): buttons stack full width, primary last. */
-/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
-@media (max-width: 639px) {
-  .actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
+/* In a bottom sheet (a phone) the buttons stack full width, primary last. */
+.content[data-sheet] .actions {
+  flex-direction: column;
+  align-items: stretch;
 }

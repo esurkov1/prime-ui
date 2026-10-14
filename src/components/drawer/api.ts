@@ -18,8 +18,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Drawer.Content",
-      en: '`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel at the edge; renders while open and during its exit animation, showing the children it had open (a record cleared with `open` does not empty the panel mid-motion).',
-      ru: "Портал, подложка и панель у края экрана: ловушка фокуса, блокировка прокрутки.",
+      en: '`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel at the edge, side by side; renders while open and during its exit animation, showing the children it had open (a record cleared with `open` does not empty the panel mid-motion).',
+      ru: 'Портал, подложка и панель `role="dialog"` у края экрана рядом; видна, пока открыта и пока играет выход, с тем содержимым, что было открыто (запись, очищенная вместе с `open`, не пустеет на ходу).',
       props: [
         {
           name: "side",
@@ -38,7 +38,7 @@ export const api: ComponentApi = {
         ...dialogContentAriaProps,
       ],
     },
-    ...dialogParts("Drawer", '"end"'),
+    ...dialogParts("Drawer", { value: '"end"' }),
     dialogSlotsPart("Drawer", "Drawer.Trigger · Drawer.Close"),
   ],
   labels: dialogLabels,
@@ -57,7 +57,7 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: '`role="dialog"`, `aria-modal="true"`, named by Title (or `aria-label`), described by Description.',
+        en: '`role="dialog"`, `aria-modal="true"`, named by `Drawer.Title` (or `aria-label`), described by `Drawer.Description`.',
         ru: '`role="dialog"` и `aria-modal="true"`; имя — `Drawer.Title` (или `aria-label`), описание — `Drawer.Description`.',
       },
       {
@@ -77,8 +77,8 @@ export const api: ComponentApi = {
         ru: "Свайпа нет: панель закрывают крестик, `Drawer.Close`, Escape и подложка.",
       },
       {
-        en: 'A busy `Guard` keeps the close button and the `Close` child in place, `disabled`; a dirty one opens a `role="alertdialog"` confirm with focus on «Продолжить».',
-        ru: '`Drawer.Guard busy` оставляет крестик и кнопку в `Drawer.Close` на месте выключенными; `dirty` открывает подтверждение `role="alertdialog"` с фокусом на «Продолжить».',
+        en: 'A `Guard` that is `busy` keeps the close button and the `Close` child in place, `disabled`; a `dirty` one opens a `role="alertdialog"` confirm with focus on «Продолжить».',
+        ru: '`Guard` `busy` оставляет крестик и кнопку в `Close` на месте выключенными (`disabled`); `dirty` открывает подтверждение `role="alertdialog"` с фокусом на «Продолжить».',
       },
     ],
   },
