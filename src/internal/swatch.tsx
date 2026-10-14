@@ -166,7 +166,7 @@ export function SwatchContent({
   );
 }
 
-export type SwatchChipProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
+type SwatchChipProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   value: string | null;
   ref?: React.Ref<HTMLSpanElement>;
 };
@@ -192,7 +192,7 @@ export function sameColor(a: string | null, b: string | null): boolean {
  * sRGB channels (0–255) of a hex, `rgb()` or `hsl()` color; `null` for anything else (named colors,
  * other spaces). Kept dependency-free so the swatches stay out of the ColorPicker entry.
  */
-export function colorToRgb(value: string): [number, number, number] | null {
+function colorToRgb(value: string): [number, number, number] | null {
   const input = value.trim().toLowerCase();
   const hex = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/.exec(input)?.[1];
   if (hex) {
@@ -226,7 +226,7 @@ export function colorToRgb(value: string): [number, number, number] | null {
 }
 
 /** `dark` when a dark mark contrasts better with the color than a light one (WCAG luminance). */
-export function markContrast(value: string): "light" | "dark" {
+function markContrast(value: string): "light" | "dark" {
   const rgb = colorToRgb(value);
   if (!rgb) return "dark";
   const lin = (c: number) => {
@@ -242,7 +242,7 @@ export function markContrast(value: string): "light" | "dark" {
  * Columns of a grid of `count` swatches in `width`: as many tier-sized swatches as fit, then spread
  * evenly over the rows that needs (16 in a row of 14 → two rows of 8, not 14 + 2).
  */
-export function balancedColumns(count: number, width: number, cell: number, gap: number): number {
+function balancedColumns(count: number, width: number, cell: number, gap: number): number {
   if (count < 1 || width <= 0 || cell <= 0) return Math.max(1, count);
   const fit = Math.max(1, Math.floor((width + gap) / (cell + gap)));
   const rows = Math.ceil(count / Math.min(count, fit));

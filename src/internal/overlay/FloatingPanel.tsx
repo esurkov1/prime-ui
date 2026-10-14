@@ -35,7 +35,7 @@ export type FloatingWidth = "auto" | "trigger" | "content";
  * The panel is a `<div>`; `E` is the element type its consumer holds it as (a menu, a listbox:
  * `HTMLElement`), so the consumer ref needs no cast.
  */
-export type FloatingPanelProps<E extends HTMLElement = HTMLDivElement> = Omit<
+type FloatingPanelProps<E extends HTMLElement = HTMLDivElement> = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "onAnimationEnd"
 > & {
@@ -156,7 +156,7 @@ export function FloatingPanel<E extends HTMLElement = HTMLDivElement>({
   );
 }
 
-export type FloatingTriggerProps = {
+type FloatingTriggerProps = {
   /** Props of the layer for its trigger: `ref`, ARIA, handlers, `data-state`. */
   triggerProps: Record<string, unknown> & { ref?: React.Ref<HTMLElement> };
   children: React.ReactElement;

@@ -12,7 +12,7 @@ import { focusBack, focusInto, getFocusable, handoffFocus } from "./focus";
 import { type DismissReason, type LayerEntry, useLayer } from "./layerStack";
 import { useContainScroll } from "./useContainScroll";
 
-export type UseFloatingLayerOptions = PositionOptions & {
+type UseFloatingLayerOptions = PositionOptions & {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** The anchor: positions the panel, is not "outside", and gets focus back on close. */

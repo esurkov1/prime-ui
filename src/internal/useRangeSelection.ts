@@ -5,7 +5,7 @@ import { createEdgeAutoScroll, edgeScrollers } from "@/internal/edgeAutoScroll";
 /** A drag paints along the list: only up and down scroll it. */
 const VERTICAL = { x: false, y: true };
 
-export type RangeSelectionOptions<K> = {
+type RangeSelectionOptions<K> = {
   /**
    * The items in their visual order: ranges and drags run over them. A function is read at the
    * moment of the press (items whose order lives in the DOM).

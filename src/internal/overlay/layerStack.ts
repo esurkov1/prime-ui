@@ -25,7 +25,7 @@ export type DismissReason = "escape" | "outside" | "scrim";
  * A layer that opts out of outside dismissal (`closeOnOutsideClick={false}`) keeps `pointerdown` /
  * `click`; its hook drops the reason, so it still blocks the layers below it.
  */
-export type OutsideDismiss = "pointerdown" | "click" | "none";
+type OutsideDismiss = "pointerdown" | "click" | "none";
 
 export type LayerEntry = {
   /** The layer that rendered this one (context): it stays below its descendants. */
@@ -146,7 +146,7 @@ const LayerContext = React.createContext<LayerEntry | null>(null);
 /** Wrap a layer's content: layers opened inside it register as its descendants. */
 export const LayerProvider = LayerContext.Provider;
 
-export type UseLayerOptions = Omit<LayerEntry, "parent" | "trap"> & { trap?: boolean };
+type UseLayerOptions = Omit<LayerEntry, "parent" | "trap"> & { trap?: boolean };
 
 /**
  * Registers a layer in the stack while `open`. The entry keeps the latest options (no

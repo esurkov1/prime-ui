@@ -64,7 +64,7 @@ function blockDisabledClick(event: React.MouseEvent) {
 /** What a slot reads from its child: the child's own `ref` (React 19: a regular prop). */
 type SlotChildProps<E extends HTMLElement> = AnyProps & { ref?: React.Ref<E> };
 
-export type SlotProps<E extends HTMLElement = HTMLElement> = {
+type SlotProps<E extends HTMLElement = HTMLElement> = {
   children?: React.ReactNode;
   ref?: React.Ref<E>;
 } & AnyProps;

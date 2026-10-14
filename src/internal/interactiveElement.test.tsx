@@ -1,12 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { InteractiveElement, type InteractiveElementProps } from "./interactiveElement";
+import { InteractiveElement } from "./interactiveElement";
 
 type Case = {
   name: string;
-  props: Exclude<InteractiveElementProps, { element: "static" }>;
+  props: Exclude<React.ComponentProps<typeof InteractiveElement>, { element: "static" }>;
   role: "link" | "button";
 };
 

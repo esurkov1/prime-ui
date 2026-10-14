@@ -12,7 +12,7 @@ import palette from "./palette.module.css";
 import { type ProgressSegment, segmentFill } from "./progressSegments";
 import { type ControlSize, tierMappings } from "./states";
 
-export type ProgressLegendProps = {
+type ProgressLegendProps = {
   segments: ProgressSegment[];
   /** 100% of a share (the resolved scale of the distribution). */
   scale: number;

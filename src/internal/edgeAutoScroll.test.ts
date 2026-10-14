@@ -1,9 +1,8 @@
-import {
-  createEdgeAutoScroll,
-  EDGE_ZONE_PX,
-  edgeScrollers,
-  MAX_SPEED_PX_PER_MS,
-} from "./edgeAutoScroll";
+import { createEdgeAutoScroll, edgeScrollers } from "./edgeAutoScroll";
+
+/** The zone near an edge where a held drag scrolls, and the top speed at the edge itself. */
+const EDGE_ZONE_PX = 64;
+const MAX_SPEED_PX_PER_MS = 1.1;
 
 function scroller(overflowX: string, overflowY: string, direction = "ltr", width = 200) {
   const node = document.createElement("div");

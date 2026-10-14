@@ -30,7 +30,7 @@ type ButtonAttributes = Pick<
  *   since a click handler needs a button or a link to reach it from the keyboard;
  * - `slot` — the consumer's one element (`asChild`: a router link), through `Slot`.
  */
-export type InteractiveElementProps =
+type InteractiveElementProps =
   | (BaseProps & LinkAttributes & { element: "link"; href: string })
   | (BaseProps & ButtonAttributes & { element: "button"; type?: "button" | "submit" | "reset" })
   | (Omit<BaseProps, "onClick"> & { element: "static"; onClick?: never })

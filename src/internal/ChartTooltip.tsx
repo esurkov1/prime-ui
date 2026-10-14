@@ -9,7 +9,7 @@ import styles from "./chartTooltip.module.css";
 
 export type { AnchorPoint };
 
-export type ChartTooltipProps = React.HTMLAttributes<HTMLDivElement> & {
+type ChartTooltipProps = React.HTMLAttributes<HTMLDivElement> & {
   /** The point the content belongs to («8 окт», «Неделя 41»), over the content. */
   label?: React.ReactNode;
   /**

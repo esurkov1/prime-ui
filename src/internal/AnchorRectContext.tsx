@@ -1,10 +1,7 @@
 import * as React from "react";
 
 /** The box a floating layer is placed against (viewport px). */
-export type AnchorRect = Pick<
-  DOMRectReadOnly,
-  "top" | "left" | "right" | "bottom" | "width" | "height"
->;
+type AnchorRect = Pick<DOMRectReadOnly, "top" | "left" | "right" | "bottom" | "width" | "height">;
 
 /**
  * Maps an anchor's border box to the part of it that is actually visible. A layout whose rows are

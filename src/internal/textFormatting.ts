@@ -43,7 +43,7 @@ export const TEXT_FORMATS: readonly TextFormat[] = [
 ];
 
 /** Text with its selection, `start <= end` (a caret when equal). */
-export type TextSelection = { text: string; start: number; end: number };
+type TextSelection = { text: string; start: number; end: number };
 
 const MARKERS: Record<"bold" | "italic" | "strikethrough" | "code" | "spoiler", string> = {
   bold: "**",

@@ -2,9 +2,6 @@ import * as React from "react";
 
 type Entry<Change> = { key: number; change: Change };
 
-/** A value an event handler answers with now or later. */
-export type MaybePromise<T> = T | PromiseLike<T>;
-
 /**
  * The kit's async event: a handler that returns nothing is a sync event; one that returns a
  * Promise keeps the change pending until it settles (resolve — done, reject — nothing changes).

@@ -31,7 +31,6 @@
   "src/components/slider/Slider.module.css: numeric scale() in transform #2",
   "src/components/slider/Slider.module.css: numeric z-index",
   "src/internal/CheckMark.module.css: numeric scale() in transform",
-  "src/internal/CheckMark.module.css: numeric scale() in transform #2",
   "src/internal/floatingSurface.module.css: raw length in min-width",
   "src/internal/menu.module.css: raw length in font-size",
   "src/internal/sheet.module.css: raw length in transform",

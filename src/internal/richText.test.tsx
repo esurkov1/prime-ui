@@ -1,79 +1,68 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { parseInline, parseRichText, RichText, safeHref } from "./richText";
+import { RichText } from "./richText";
 
 const LABELS = { spoiler: "Скрытый текст" };
 
-describe("parseInline", () => {
-  it("parses bold, italic, strike and code", () => {
-    expect(parseInline("**счёт** _срочно_ ~~вчера~~ `INV-204`")).toEqual([
-      { type: "bold", children: [{ type: "text", text: "счёт" }] },
-      { type: "text", text: " " },
-      { type: "italic", children: [{ type: "text", text: "срочно" }] },
-      { type: "text", text: " " },
-      { type: "strike", children: [{ type: "text", text: "вчера" }] },
-      { type: "text", text: " " },
-      { type: "code", text: "INV-204" },
-    ]);
+/**
+ * The rendered markup of `source`: tags and text only, links with their href, a masked spoiler as
+ * `<spoiler>` (its wrapper spans unwrapped).
+ */
+function markup(source: string) {
+  const { container } = render(<RichText labels={LABELS} source={source} />);
+  const serialize = (node: Node): string => {
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
+    const element = node as Element;
+    const inner = Array.from(element.childNodes, serialize).join("");
+    const tag = element.tagName.toLowerCase();
+    if (element.getAttribute("role") === "button") return `<spoiler>${inner}</spoiler>`;
+    if (tag === "span") return inner;
+    const href = tag === "a" ? ` href="${element.getAttribute("href")}"` : "";
+    return `<${tag}${href}>${inner}</${tag}>`;
+  };
+  return Array.from(container.childNodes, serialize).join("");
+}
+
+describe("RichText markup", () => {
+  it("renders bold, italic, strike and code", () => {
+    expect(markup("**счёт** _срочно_ ~~вчера~~ `INV-204`")).toBe(
+      "<p><strong>счёт</strong> <em>срочно</em> <s>вчера</s> <code>INV-204</code></p>",
+    );
   });
 
   it("keeps underscores inside words and unmatched markers as text", () => {
-    expect(parseInline("order_id и **нет")).toEqual([{ type: "text", text: "order_id и **нет" }]);
+    expect(markup("order_id и **нет")).toBe("<p>order_id и **нет</p>");
   });
 
   it("nests emphasis", () => {
-    expect(parseInline("**очень _важно_**")).toEqual([
-      {
-        type: "bold",
-        children: [
-          { type: "text", text: "очень " },
-          { type: "italic", children: [{ type: "text", text: "важно" }] },
-        ],
-      },
-    ]);
+    expect(markup("**очень _важно_**")).toBe("<p><strong>очень <em>важно</em></strong></p>");
   });
 
   it("links labelled and bare URLs, leaving trailing punctuation", () => {
-    expect(parseInline("[договор](https://prime.app/d/1) и https://prime.app/i/2.")).toEqual([
-      {
-        type: "link",
-        href: "https://prime.app/d/1",
-        children: [{ type: "text", text: "договор" }],
-      },
-      { type: "text", text: " и " },
-      {
-        type: "link",
-        href: "https://prime.app/i/2",
-        children: [{ type: "text", text: "https://prime.app/i/2" }],
-      },
-      { type: "text", text: "." },
-    ]);
+    expect(markup("[договор](https://prime.app/d/1) и https://prime.app/i/2.")).toBe(
+      '<p><a href="https://prime.app/d/1">договор</a> и ' +
+        '<a href="https://prime.app/i/2">https://prime.app/i/2</a>.</p>',
+    );
   });
 
-  it("parses a spoiler with markup inside, never across a space at its edges", () => {
-    expect(parseInline("код ||**4821**|| и || нет||")).toEqual([
-      { type: "text", text: "код " },
-      { type: "spoiler", children: [{ type: "bold", children: [{ type: "text", text: "4821" }] }] },
-      { type: "text", text: " и || нет||" },
-    ]);
+  it("masks a spoiler with markup inside, never across a space at its edges", () => {
+    expect(markup("код ||**4821**|| и || нет||")).toBe(
+      "<p>код <spoiler><strong>4821</strong></spoiler> и || нет||</p>",
+    );
   });
 
   it("never links unsafe protocols", () => {
-    expect(parseInline("[x](javascript:alert(1))")[0]).toEqual({
-      type: "text",
-      text: "[x](javascript:alert(1))",
-    });
-    expect(safeHref("javascript:alert(1)")).toBeNull();
-    expect(safeHref("mailto:team@prime.app")).toBe("mailto:team@prime.app");
+    expect(markup("[x](javascript:alert(1))")).toBe("<p>[x](javascript:alert(1))</p>");
+    expect(markup("[почта](mailto:team@prime.app)")).toBe(
+      '<p><a href="mailto:team@prime.app">почта</a></p>',
+    );
   });
-});
 
-describe("parseRichText", () => {
   it("splits text, quotes and fenced code", () => {
-    const blocks = parseRichText("> Когда оплата?\nВ пятницу\n```\nnpm run build\n```");
-    expect(blocks.map((block) => block.type)).toEqual(["quote", "text", "code"]);
-    expect(blocks[2]).toEqual({ type: "code", text: "npm run build" });
+    expect(markup("> Когда оплата?\nВ пятницу\n```\nnpm run build\n```")).toBe(
+      "<blockquote>Когда оплата?</blockquote><p>В пятницу</p><pre><code>npm run build</code></pre>",
+    );
   });
 });
 

@@ -6,7 +6,7 @@ import { afterMotionMs, readCssDurationMs } from "@/internal/motionTiming";
 
 import styles from "./MorphText.module.css";
 
-export type MorphTextProps = {
+type MorphTextProps = {
   children: string;
   className?: string;
 };

@@ -85,7 +85,7 @@ export function segmentFill(segment: ProgressSegment): {
 /** What 100% of a row is in the `rows` layout. */
 export type ProgressScale = "sum" | "max" | "first";
 
-export type ResolvedRow = {
+type ResolvedRow = {
   segment: ProgressSegment;
   /** Bar length, 0–1. */
   ratio: number;
@@ -133,7 +133,7 @@ export const PROGRESS_SEGMENTS_LABELS: ProgressSegmentsLabels = {
   allEmpty: "Все сегменты пусты",
 };
 
-export type ResolvedSegments = {
+type ResolvedSegments = {
   segments: ProgressSegment[];
   /** Sum of the segment weights. */
   total: number;

@@ -4,7 +4,7 @@ import { cx } from "@/internal/cx";
 
 import styles from "./RollingNumber.module.css";
 
-export type RollingNumberProps = {
+type RollingNumberProps = {
   /** The formatted value («4 812 350 ₽», «12», «−3,4%»); digits roll, other characters stay put. */
   children: string | number;
   className?: string;
