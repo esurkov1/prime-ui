@@ -16,45 +16,13 @@
   max-width: 100%;
 }
 
-/* Placeholder rows share the data rows' geometry: the swap to data does not change the height. */
+/* Placeholder bars share the data's geometry: the swap to data does not change the height. */
 .payerBar {
   width: 55%;
 }
 
 .amountBar {
   width: 20%;
-}
-
-.list {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.listRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-4);
-  padding-block: var(--prime-space-3);
-  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
-}
-
-.listRow:last-child {
-  border-bottom: 0;
-}
-
-.amount {
-  font-variant-numeric: tabular-nums;
-}
-
-.facts {
-  display: grid;
-  gap: var(--prime-space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
 /* fill.tsx: a page panel of a fixed height; the board region takes what the rows above leave. */
@@ -83,11 +51,4 @@
 
 .column {
   align-self: stretch;
-}
-
-.fact {
-  display: grid;
-  grid-template-columns: calc(var(--prime-space-24) + var(--prime-space-4)) minmax(0, 1fr);
-  align-items: baseline;
-  gap: var(--prime-space-4);
 }

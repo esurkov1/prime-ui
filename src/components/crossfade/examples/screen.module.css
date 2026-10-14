@@ -11,30 +11,7 @@
   padding-block-end: var(--prime-space-6);
 }
 
-/* Skeleton rows mirror the account rows, so the card keeps its height when data arrives. */
-.nameBar {
-  width: 50%;
-}
-
+/* A balance placeholder as wide as a balance, so the value column keeps its shape. */
 .balanceBar {
   width: 35%;
-}
-
-/* The card stretches to its neighbour's height: rows stay at the top. */
-.accounts {
-  display: grid;
-  align-content: start;
-  gap: var(--prime-space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.account {
-  display: grid;
-  gap: var(--prime-space-1);
-}
-
-.amount {
-  font-variant-numeric: tabular-nums;
 }

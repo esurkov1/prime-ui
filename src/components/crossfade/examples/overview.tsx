@@ -3,11 +3,11 @@ import {
   Button,
   Card,
   Crossfade,
+  DescriptionList,
   EmptyPage,
   Icon,
   SegmentedControl,
   Skeleton,
-  Typography,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -43,29 +43,27 @@ export default function CrossfadeOverviewExample() {
         </Card.Header>
         <Card.Body>
           <Crossfade state={status} aria-busy={status === "loading"}>
+            {/* The placeholder is the same list with bars for the text: the swap keeps the height. */}
             {status === "loading" ? (
-              <ul className={styles.list}>
+              <DescriptionList.Root>
                 {PAYMENTS.map((payment) => (
-                  <li key={payment.id} className={styles.listRow}>
-                    <Skeleton className={styles.payerBar} />
+                  <DescriptionList.Item
+                    key={payment.id}
+                    label={<Skeleton className={styles.payerBar} />}
+                  >
                     <Skeleton className={styles.amountBar} />
-                  </li>
+                  </DescriptionList.Item>
                 ))}
-              </ul>
+              </DescriptionList.Root>
             ) : null}
             {status === "ready" ? (
-              <ul className={styles.list}>
+              <DescriptionList.Root>
                 {PAYMENTS.map((payment) => (
-                  <li key={payment.id} className={styles.listRow}>
-                    <Typography as="span" variant="body-m">
-                      {payment.payer}
-                    </Typography>
-                    <Typography as="span" variant="body-m" className={styles.amount}>
-                      {payment.amount}
-                    </Typography>
-                  </li>
+                  <DescriptionList.Item key={payment.id} label={payment.payer}>
+                    {payment.amount}
+                  </DescriptionList.Item>
                 ))}
-              </ul>
+              </DescriptionList.Root>
             ) : null}
             {status === "empty" ? (
               <EmptyPage.Root size="s" aria-labelledby="payments-empty">

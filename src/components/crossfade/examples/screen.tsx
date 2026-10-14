@@ -7,6 +7,7 @@ import {
   Crossfade,
   DataTable,
   type DataTableColumn,
+  DescriptionList,
   EmptyPage,
   Icon,
   PageContent,
@@ -121,30 +122,18 @@ export default function CrossfadeScreenExample() {
                   <Card.Body>
                     {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
                     <Crossfade state={status === "loading" ? "loading" : "ready"}>
-                      {status === "loading" ? (
-                        <ul className={styles.accounts}>
-                          {ACCOUNTS.map((account) => (
-                            <li key={account.name} className={styles.account}>
-                              <Skeleton className={styles.nameBar} />
-                              {/* title-m is the l text tier: 16 / 24. */}
-                              <Skeleton size="l" className={styles.balanceBar} />
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <ul className={styles.accounts}>
-                          {ACCOUNTS.map((account) => (
-                            <li key={account.name} className={styles.account}>
-                              <Typography as="span" variant="body-m" tone="secondary">
-                                {account.name}
-                              </Typography>
-                              <Typography as="span" variant="title-m" className={styles.amount}>
-                                {account.balance}
-                              </Typography>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                      {/* The accounts are known: only their balances wait, as bars of the value. */}
+                      <DescriptionList.Root>
+                        {ACCOUNTS.map((account) => (
+                          <DescriptionList.Item key={account.name} label={account.name}>
+                            {status === "loading" ? (
+                              <Skeleton className={styles.balanceBar} />
+                            ) : (
+                              account.balance
+                            )}
+                          </DescriptionList.Item>
+                        ))}
+                      </DescriptionList.Root>
                     </Crossfade>
                   </Card.Body>
                 </Card.Root>
