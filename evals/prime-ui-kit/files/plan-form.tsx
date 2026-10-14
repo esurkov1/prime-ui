@@ -1,7 +1,8 @@
 // A plan editor built without the UX rules: the input of the «change an existing screen» eval.
 // Labels in every row, numbered labels, a record split over two lines, a hint that explains the
 // layout, a base price apart from its changes, a deposit in three currencies with three labels.
-import { Button, ColorField, Fieldset, Input, Select, Typography } from "prime-ui-kit";
+import { Button, Fieldset, Input, Select, Typography } from "prime-ui-kit";
+import { ColorField } from "prime-ui-kit/color-picker";
 import * as React from "react";
 
 import styles from "./plan-form.module.css";

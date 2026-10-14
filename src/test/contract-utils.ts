@@ -10,6 +10,9 @@ import { fileURLToPath } from "node:url";
 import { expect } from "vitest";
 
 import type { ApiText, ComponentApi } from "../../scripts/docs/componentApi";
+import { brokenLinkAt } from "../../scripts/docs/links";
+
+export { linkTargets } from "../../scripts/docs/links";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -235,48 +238,10 @@ export function docSection(doc: string, title: string): string {
   return end === -1 ? body : body.slice(0, end);
 }
 
-/** The heading anchor GitHub gives `heading`: lower case, punctuation dropped, spaces → `-`. */
-export function githubSlug(heading: string): string {
-  return heading
-    .trim()
-    .toLowerCase()
-    .replace(/<[^>]+>/g, "")
-    .replace(/[^\p{L}\p{N}\s_-]/gu, "")
-    .replace(/\s/g, "-");
-}
-
-/** Every heading anchor of a markdown document (repeated headings get `-1`, `-2`…). */
-export function headingSlugs(markdown: string): Set<string> {
-  const slugs = new Set<string>();
-  const counts = new Map<string, number>();
-  const body = markdown.replace(/^```[\s\S]*?^```$/gm, "");
-  for (const m of body.matchAll(/^#{1,6} (.+)$/gm)) {
-    const slug = githubSlug(m[1].replace(/`/g, ""));
-    const count = counts.get(slug) ?? 0;
-    slugs.add(count === 0 ? slug : `${slug}-${count}`);
-    counts.set(slug, count + 1);
-  }
-  return slugs;
-}
-
-/** Markdown link targets `[text](target)` of a text; external and mail links are skipped. */
-export function linkTargets(text: string): string[] {
-  return [...text.matchAll(/\]\(([^)\s]+)\)/g)]
-    .map((m) => m[1])
-    .filter((target) => target !== "" && !/^(mailto:|https?:)/.test(target));
-}
-
 /**
  * Why a relative link of the markdown file `from` (repository-relative) does not resolve, or
- * `null`: the file must exist and an `#anchor` into a markdown file must name one of its headings.
+ * `null` — the one link checker (`scripts/docs/links.ts`), anchors included.
  */
 export function brokenLink(from: string, target: string): string | null {
-  const [file, anchor] = target.split("#");
-  const rel =
-    file === "" ? from : path.posix.normalize(path.posix.join(path.posix.dirname(from), file));
-  if (!exists(rel)) return `${target}: no file ${rel}`;
-  if (anchor && rel.endsWith(".md") && !headingSlugs(read(rel)).has(anchor)) {
-    return `${target}: no heading #${anchor} in ${rel}`;
-  }
-  return null;
+  return brokenLinkAt(path.join(root, from), target);
 }
