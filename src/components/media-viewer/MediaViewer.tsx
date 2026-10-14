@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useElementSize, useResizeEffect } from "@/hooks/useElementSize";
 import { type ImageStatus, useImageStatus } from "@/hooks/useImageStatus";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
@@ -249,7 +250,9 @@ function ViewerDialog({
   const stageRef = React.useRef<HTMLDivElement>(null);
   const backdropRef = React.useRef<HTMLDivElement>(null);
 
-  const [area, setArea] = React.useState(viewport);
+  // The stage's box once measured (it follows every resize); the viewport until then.
+  const [viewportArea] = React.useState(viewport);
+  const area = useElementSize(stageRef) ?? viewportArea;
   const [ratios, setRatios] = React.useState<Record<string, number>>({});
   const [chrome, setChrome] = React.useState(true);
   const [zoomed, setZoomed] = React.useState(false);
@@ -311,21 +314,7 @@ function ViewerDialog({
     engine.reducedMotion = prefersReducedMotion();
     engine.gap = readCssLengthPx("--prime-media-viewer-page-gap", 24);
     setRtl(getComputedStyle(stage).direction === "rtl");
-    const detach = engine.attach(stage, backdrop);
-    if (typeof ResizeObserver === "undefined") return detach;
-    const observer = new ResizeObserver(() => {
-      const rect = stage.getBoundingClientRect();
-      setArea((current) =>
-        current.width === rect.width && current.height === rect.height
-          ? current
-          : { width: rect.width, height: rect.height },
-      );
-    });
-    observer.observe(stage);
-    return () => {
-      observer.disconnect();
-      detach();
-    };
+    return engine.attach(stage, backdrop);
   }, [engine]);
 
   // After every render: the engine takes the page React shows and paints the mounted slides.
@@ -1066,17 +1055,12 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
     setWidth(scroller.clientWidth);
     engine.positionListener = apply;
     engine.replayPosition();
-    if (typeof ResizeObserver === "undefined")
-      return () => {
-        engine.positionListener = null;
-      };
-    const observer = new ResizeObserver(() => setWidth(scroller.clientWidth));
-    observer.observe(scroller);
     return () => {
-      observer.disconnect();
       engine.positionListener = null;
     };
   }, [engine, apply]);
+  // The row centres on its padding box (`clientWidth`): it follows every resize of the scroller.
+  useResizeEffect(scrollerRef, () => setWidth(scrollerRef.current?.clientWidth ?? 0));
 
   // The person's hands on the row: any of them stops a glide and leaves the row where they put it.
   // A vertical wheel scrolls it sideways; a mouse drags it like a finger.

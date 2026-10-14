@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { prefersReducedMotion } from "@/hooks/usePresence";
+
 /**
  * Plays icon gestures. One delegated listener set on the document: when a pointer enters an
  * interactive host (or touches it), every animated icon that belongs to that host gets
@@ -38,10 +40,6 @@ const DISABLED = ':disabled, [aria-disabled="true"], [data-disabled="true"], [da
 let installed = false;
 let currentOwner: Element | null = null;
 
-function reducedMotion(): boolean {
-  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-}
-
 function play(icon: Element) {
   if (!icon.hasAttribute("data-play")) icon.setAttribute("data-play", "");
 }
@@ -53,7 +51,7 @@ function ownerOf(target: Element): Element | null {
 
 /** Plays the icons that belong to `owner` (or `owner` itself when it is a lone icon). */
 function playOwner(owner: Element) {
-  if (reducedMotion()) return;
+  if (prefersReducedMotion()) return;
   if (owner.matches(ICON)) {
     play(owner);
     return;
