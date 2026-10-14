@@ -1,12 +1,15 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { type ScrollRegion, useScrollRegion } from "@/hooks/useScrollRegion";
+import { cssRule, cssValue, parseCss } from "@/test/css";
+
 import { ScrollContainer, type ScrollContainerProps } from "./ScrollContainer";
-import { type ScrollRegion, useScrollRegion } from "./useScrollEdges";
+
+const CSS = "src/components/scroll-container/ScrollContainer.module.css";
+const value = (selector: string, prop: string, parents?: string[]) =>
+  cssValue(cssRule(CSS, selector, parents), prop);
 
 describe("ScrollContainer", () => {
   it("рендерит дочерний контент", () => {
@@ -86,10 +89,14 @@ describe("ScrollContainer", () => {
   });
 
   it("CSS: the fade depth is not inherited, so a scroll restyles the region, not its content", () => {
-    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
+    const inherits = new Map<string, string | undefined>();
+    parseCss(CSS).walkAtRules("property", (rule) => {
+      const decl = rule.nodes?.find((node) => node.type === "decl" && node.prop === "inherits");
+      inherits.set(rule.params, decl?.type === "decl" ? decl.value : undefined);
+    });
     for (const edge of ["top", "bottom", "start", "end"]) {
       for (const name of [`--edge-${edge}`, `--fade-${edge}`]) {
-        expect(css).toMatch(new RegExp(`@property ${name} \\{[^}]*inherits: false`));
+        expect(inherits.get(name)).toBe("false");
       }
     }
   });
@@ -166,10 +173,9 @@ describe("ScrollContainer", () => {
       </ScrollContainer>,
     );
     expect(node).not.toHaveAttribute("data-edges");
-    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
     // The shadow: covers that scroll with the content over shadows fixed to the view.
-    expect(css).toMatch(
-      /\.vertical\[data-edges="shadow"\] \{[^}]*background-attachment: local, local, scroll, scroll/,
+    expect(value('.vertical[data-edges="shadow"]', "background-attachment")).toBe(
+      "local, local, scroll, scroll",
     );
   });
 
@@ -183,9 +189,8 @@ describe("ScrollContainer", () => {
       </ScrollContainer>,
     );
     expect(node.className).not.toBe(thin);
-    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
-    expect(css).toMatch(/\.scrollbarHidden \{[^}]*scrollbar-width: none/);
-    expect(css).toMatch(/\.root \{[^}]*scrollbar-width: thin/);
+    expect(value(".scrollbarHidden", "scrollbar-width")).toBe("none");
+    expect(value(".root", "scrollbar-width")).toBe("thin");
   });
 
   it("lock: the region keeps its place and takes no scrolling", () => {
@@ -196,22 +201,58 @@ describe("ScrollContainer", () => {
     );
     const node = screen.getByTestId("scroll");
     expect(node).toHaveAttribute("data-lock", "true");
-    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
-    expect(css).toMatch(/\.root\[data-lock\] \{[^}]*overflow: hidden/);
+    expect(value(".root[data-lock]", "overflow")).toBe("hidden");
     rerender(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
     expect(node).not.toHaveAttribute("data-lock");
   });
 
-  it("snap: proximity snapping along the axis, children rest on their start", () => {
-    render(
+  it("snap: proximity or mandatory snapping along the axis, children rest on their start", () => {
+    const { rerender } = render(
       <ScrollContainer axis="horizontal" snap data-testid="scroll">
         items
       </ScrollContainer>,
     );
-    expect(screen.getByTestId("scroll")).toHaveAttribute("data-snap", "true");
-    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
-    expect(css).toMatch(/\.horizontal\[data-snap\] \{[^}]*scroll-snap-type: x proximity/);
-    expect(css).toMatch(/\.root\[data-snap\] > \* \{[^}]*scroll-snap-align: start/);
+    const node = screen.getByTestId("scroll");
+    expect(node).toHaveAttribute("data-snap", "proximity");
+    rerender(
+      <ScrollContainer axis="horizontal" snap="mandatory" data-testid="scroll">
+        items
+      </ScrollContainer>,
+    );
+    expect(node).toHaveAttribute("data-snap", "mandatory");
+    rerender(<ScrollContainer data-testid="scroll">items</ScrollContainer>);
+    expect(node).not.toHaveAttribute("data-snap");
+    expect(value(".horizontal[data-snap]", "scroll-snap-type")).toBe("x var(--snap-strictness)");
+    expect(value('.root[data-snap="proximity"]', "--snap-strictness")).toBe("proximity");
+    expect(value('.root[data-snap="mandatory"]', "--snap-strictness")).toBe("mandatory");
+    expect(value(".root[data-snap] > *", "scroll-snap-align")).toBe("start");
+  });
+
+  it("a named region is a region landmark; its own role wins, an unnamed one has none", () => {
+    const { rerender } = render(<ScrollContainer aria-label="Журнал">items</ScrollContainer>);
+    expect(screen.getByRole("region", { name: "Журнал" })).toBeInTheDocument();
+    rerender(
+      <ScrollContainer aria-label="Журнал" role="log">
+        items
+      </ScrollContainer>,
+    );
+    expect(screen.getByRole("log", { name: "Журнал" })).toBeInTheDocument();
+    rerender(<ScrollContainer data-testid="plain">items</ScrollContainer>);
+    expect(screen.getByTestId("plain")).not.toHaveAttribute("role");
+  });
+
+  it("snap: a drag of a list inside the region (Dnd carrying) turns snapping off", () => {
+    expect(value(".root[data-snap]:has([data-dnd-carrying])", "scroll-snap-type")).toBe("none");
+  });
+
+  it("the fade depth is one public hook: the mask, the scroll padding and the measured depth", () => {
+    expect(value(":where(.root)", "--scroll-fade-depth")).toBe("var(--prime-space-8)");
+    expect(value('.horizontal[data-edges="fade"]', "scroll-padding-inline")).toBe(
+      "var(--scroll-fade-depth)",
+    );
+    expect(value('.root[data-edges="fade"][data-overflow-end="true"]', "--fade-end")).toBe(
+      "min(var(--scroll-fade-depth), var(--edge-end, var(--scroll-fade-depth)))",
+    );
   });
 
   it("keyboard: a region with tabIndex takes focus (native arrow / Page / Home / End scrolling) with an inset ring", () => {
@@ -223,10 +264,7 @@ describe("ScrollContainer", () => {
     const region = screen.getByRole("region", { name: "Журнал" });
     region.focus();
     expect(region).toHaveFocus();
-    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
-    expect(css).toMatch(
-      /\.root:focus-visible \{[^}]*outline-offset: var\(--prime-focus-offset-inset\)/,
-    );
+    expect(value(".root:focus-visible", "outline-offset")).toBe("var(--prime-focus-offset-inset)");
   });
 
   describe("wheel on a sideways strip", () => {
@@ -456,8 +494,7 @@ describe("ScrollContainer anchor and edges", () => {
   });
 
   it("CSS: the kit's own anchoring turns the browser's off", () => {
-    const css = readFileSync(join(__dirname, "ScrollContainer.module.css"), "utf8");
-    expect(css).toMatch(/\.root\[data-anchor\] \{\s*overflow-anchor: none;/);
+    expect(value(".root[data-anchor]", "overflow-anchor")).toBe("none");
   });
 
   it("a date stuck to the top is never the anchor: the row under it is", async () => {
@@ -535,8 +572,10 @@ describe("ScrollContainer anchor and edges", () => {
 
   it("hold: a change in place at the end grows past the edge, the view stays", async () => {
     const region = { current: null as ScrollRegion | null };
+    // The clock of the change, read on the region.
+    const clock = { "--prime-message-morph-duration": "10s" } as React.CSSProperties;
     const { rerender } = render(
-      <ScrollContainer data-testid="region" anchor="end">
+      <ScrollContainer data-testid="region" anchor="end" style={clock}>
         <ul>
           <li data-id="Сообщение">Сообщение</li>
         </ul>
@@ -545,12 +584,12 @@ describe("ScrollContainer anchor and edges", () => {
     );
     const node = screen.getByTestId("region");
     expect(node.scrollTop).toBe(800);
-    act(() => region.current?.hold(10_000));
+    act(() => region.current?.hold("--prime-message-morph-duration"));
     expect(region.current?.atEnd()).toBe(false);
     // The last message opens its transcript: the content grows below the view.
     metrics.scrollHeight = 1100;
     rerender(
-      <ScrollContainer data-testid="region" anchor="end">
+      <ScrollContainer data-testid="region" anchor="end" style={clock}>
         <ul>
           <li data-id="Сообщение">Сообщение с расшифровкой</li>
         </ul>

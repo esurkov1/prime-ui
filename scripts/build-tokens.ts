@@ -191,6 +191,8 @@ const JS_DEFAULTS = [
   "panel.offset",
   "space.2",
   "space.6",
+  "space.8",
+  "space.20",
 ];
 
 /** `230ms` → 230, `0.5rem` → 8 (px at the default root size), `24px` → 24. */

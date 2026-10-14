@@ -35,33 +35,21 @@
   border-bottom: 0;
 }
 
-/* chat.tsx: title, the scrolling messages and the composer in a fixed-height card. */
-.chat {
+/* log.tsx: title, the scrolling entries in a fixed-height card. */
+.log {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   width: min(100%, calc(var(--prime-space-24) * 4));
   height: calc(var(--prime-space-24) * 3.5);
 }
 
-.messages {
+.entries {
   min-height: 0;
 }
 
-/* Older messages loading: lines in the messages' geometry, at the top where they will appear. */
+/* Older entries loading: lines in the entries' geometry, at the top where they will appear. */
 .older {
   margin: 0 var(--prime-space-4) var(--prime-space-2);
-}
-
-.composer {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-2);
-  padding: var(--prime-space-3) var(--prime-space-4);
-}
-
-.composerField {
-  flex: 1 1 auto;
-  min-width: 0;
 }
 
 .strip {

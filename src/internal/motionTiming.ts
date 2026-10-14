@@ -38,6 +38,14 @@ export function readCssDurationMs(name: keyof typeof TOKEN_DEFAULTS): number {
   return parseDurationMs(raw) ?? TOKEN_DEFAULTS[name];
 }
 
+/**
+ * A duration custom property in ms as it applies to `element` (a component clock such as
+ * `--prime-message-morph-duration`, which a theme or reduced motion may set); 0 when unset.
+ */
+export function readElementDurationMs(element: Element, name: `--${string}`): number {
+  return parseDurationMs(getComputedStyle(element).getPropertyValue(name)) ?? 0;
+}
+
 /** `--prime-motion-duration-<token>` in ms. */
 export function motionDurationMs(token: MotionDurationToken): number {
   return readCssDurationMs(`--prime-motion-duration-${token}`);

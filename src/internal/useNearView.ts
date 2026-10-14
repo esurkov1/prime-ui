@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { useScrollRegion } from "@/components/scroll-container/useScrollEdges";
+import { useScrollRegion } from "@/hooks/useScrollRegion";
 
 /**
  * `true` once the element has come near the view of its scroller (half a view ahead) and from

@@ -5,7 +5,7 @@
  * - No doubled-class selector (`.a.a`): a specificity hack to win over a donor.
  * - No custom property a stylesheet sets for another module to read (a donor's private variable),
  *   outside the public hooks.
- * - `:global(html …)` only in Dnd (the drag cursor) and ScrollContainer (the page scroll lock).
+ * - `:global(html …)` only in Dnd (the drag cursor).
  *
  * In ratchet mode (`donor-override`): the overrides found when the guard landed are the baseline.
  */
@@ -28,12 +28,10 @@ const PUBLIC_HOOKS = [
   /^--swatch-inline-size$/,
   /^--hairline-inset$/,
   /^--floating-width$/,
+  /^--scroll-fade-depth$/,
 ];
 
-const GLOBAL_HTML = new Set([
-  "src/components/dnd/Dnd.module.css",
-  "src/components/scroll-container/ScrollContainer.module.css",
-]);
+const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);
 
 const files = moduleCssFiles().filter((file) => !file.includes("/examples/"));
 

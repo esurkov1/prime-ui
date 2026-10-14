@@ -1,6 +1,8 @@
 import * as React from "react";
 
-import { motionDurationMs } from "@/internal/motionTiming";
+import { prefersReducedMotion } from "@/hooks/usePresence";
+import type { ScrollRegion } from "@/hooks/useScrollRegion";
+import { afterMotionMs, motionDurationMs, readElementDurationMs } from "@/internal/motionTiming";
 
 /** How close to an edge counts as reaching it: the next batch is asked for before the edge shows. */
 const EDGE_PX = 120;
@@ -16,30 +18,6 @@ const GLIDE_VIEWS = 3;
 
 export type ScrollEdgeHandler = () => void | Promise<void>;
 
-/**
- * What a ScrollContainer lets its content ask for (`useScrollRegion`): a chat list asks to go to
- * the end after its own message, to bring a message into view, and follows whether the reader is
- * at the end. The region scrolls only itself.
- */
-export type ScrollRegion = {
-  /** The scrolling element (an IntersectionObserver root for content inside it). */
-  element: () => HTMLElement | null;
-  /** The reader is at the end (`anchor="end"`, within 4 px). */
-  atEnd: () => boolean;
-  /** Follows `atEnd`; returns the unsubscribe. */
-  subscribe: (listener: () => void) => () => void;
-  /** Scrolls to the end; `smooth` glides there (instant under reduced motion). */
-  scrollToEnd: (behavior?: ScrollBehavior) => void;
-  /** Scrolls the region (only) so `element` stands in its middle. */
-  scrollToElement: (element: Element, behavior?: ScrollBehavior) => void;
-  /**
-   * Content is about to change size in place (a message opens its transcript or its reactions
-   * row): for `ms`, what the reader sees stays still — even at the end of `anchor="end"`, so the
-   * change grows past the edge instead of pushing everything up. Call it right before the change.
-   */
-  hold: (ms: number) => void;
-};
-
 /** What the live scroller answers; `element` is the ref itself. */
 type RegionImpl = Omit<ScrollRegion, "element">;
 
@@ -50,17 +28,6 @@ const NO_REGION: RegionImpl = {
   scrollToElement: () => {},
   hold: () => {},
 };
-
-export const ScrollRegionContext = React.createContext<ScrollRegion | null>(null);
-
-/** The ScrollContainer around this component, or `null` outside one. */
-export function useScrollRegion(): ScrollRegion | null {
-  return React.useContext(ScrollRegionContext);
-}
-
-const reducedMotion = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
 
 type Options = {
   anchor: "start" | "end";
@@ -108,7 +75,7 @@ export function useScrollEdges(
       },
       scrollToEnd: (behavior) => impl.current.scrollToEnd(behavior),
       scrollToElement: (element, behavior) => impl.current.scrollToElement(element, behavior),
-      hold: (ms) => impl.current.hold(ms),
+      hold: (clock) => impl.current.hold(clock),
     };
     return api;
   });
@@ -342,8 +309,9 @@ export function useScrollEdges(
 
     regionImpl.current = {
       atEnd: () => anchor !== "end" || state.pinned,
-      hold: (ms) => {
+      hold: (clock) => {
         if (!keepPosition) return;
+        const ms = afterMotionMs(readElementDurationMs(node, clock));
         stopGlide();
         record();
         state.holdUntil = performance.now() + ms;
@@ -358,7 +326,7 @@ export function useScrollEdges(
       },
       subscribe: () => () => {},
       scrollToEnd: (behavior) => {
-        if (behavior !== "smooth" || reducedMotion()) {
+        if (behavior !== "smooth" || prefersReducedMotion()) {
           stopGlide();
           toEnd();
           record();
@@ -372,7 +340,7 @@ export function useScrollEdges(
         const delta = near(rect) - near(box) - (view() - extent(rect)) / 2;
         const target = Math.min(max(), Math.max(0, position() + delta));
         stopGlide();
-        glideTo(target, behavior === "smooth" && !reducedMotion() ? "smooth" : "auto");
+        glideTo(target, behavior === "smooth" && !prefersReducedMotion() ? "smooth" : "auto");
         // A jump away from the end unpins at once: content that changes before the scroll event
         // arrives must not pull the reader back to the end.
         if (anchor === "end" && max() - target > PIN_PX && state.pinned) {

@@ -1,5 +1,5 @@
 import type { MessageDirection } from "@/components/message/types";
-import type { ScrollRegion } from "@/components/scroll-container/useScrollEdges";
+import type { ScrollRegion } from "@/hooks/useScrollRegion";
 
 /** A message of the conversation in data order: its value and side. */
 export type FlowEntry = { value: string; direction: MessageDirection };
