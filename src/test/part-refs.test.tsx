@@ -62,7 +62,6 @@ import { AppShell, Sidebar } from "@/layout";
 
 import { root, walk } from "./contract-utils";
 import type { PART_REFS } from "./part-refs.generated";
-import { ratchet } from "./ratchet";
 
 type Kit = typeof mainEntry & typeof colorPickerEntry;
 type Refs = typeof PART_REFS;
@@ -126,9 +125,8 @@ const OUTSIDE_API = {
 } as const;
 
 /**
- * Parts whose props do not forward their element's native attributes yet: the typed baseline of
- * this check. It only shrinks — the owner of the part fixes its props and removes the entry (a
- * fixed part still listed fails to compile).
+ * Parts whose props do not forward their element's native attributes, each named with its reason
+ * (a fixed part still listed fails to compile).
  */
 const PENDING_DOM_PROPS = {} as const;
 
@@ -999,6 +997,6 @@ describe("part refs: every merged or redirected ref has a runtime row", () => {
   it("CASES covers the parts the sources merge or redirect", () => {
     const covered = new Set(CASES.map(([name]) => name.split(" ")[0]));
     const missing = mergedOrRedirectedParts().filter((name) => !covered.has(name));
-    ratchet("part-refs-runtime", missing);
+    expect(missing, "part-refs-runtime").toEqual([]);
   });
 });

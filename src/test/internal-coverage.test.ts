@@ -4,16 +4,12 @@
  * `x.test.ts` or `x.test.tsx`): the shared mechanics are tested where they live, not only through
  * the components that use them. Types-only modules and the `*.api.ts` tables are skipped; a
  * stylesheet is no module.
- *
- * In ratchet mode (`internal-coverage`): the modules without a test when the check landed are the
- * baseline.
  */
 import path from "node:path";
 
 import ts from "typescript";
 
 import { exists, read, walk } from "./contract-utils";
-import { ratchet } from "./ratchet";
 
 /** A module with no runtime code: only types, interfaces and type-only imports or exports. */
 function typesOnly(file: string): boolean {
@@ -38,11 +34,11 @@ describe("internal coverage", () => {
       return !exists(`${stem}.test.ts`) && !exists(`${stem}.test.tsx`);
     });
     expect(modules.length).toBeGreaterThan(40);
-    ratchet(
-      "internal-coverage",
+    expect(
       untested.map(
         (file) => `${file}: no ${path.posix.basename(file).replace(/\.tsx?$/, ".test")}`,
       ),
-    );
+      "internal-coverage",
+    ).toEqual([]);
   });
 });

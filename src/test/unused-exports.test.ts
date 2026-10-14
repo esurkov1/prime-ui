@@ -4,15 +4,12 @@
  * an export nothing imports is dead code, and one only the tests import is a test-only seam that
  * belongs inside the module. A module re-exported whole by a package entry (`export * from …`)
  * is public API.
- *
- * In ratchet mode (`unused-exports`): the offenders found when the check landed are the baseline.
  */
 import path from "node:path";
 
 import ts from "typescript";
 
 import { read, walk } from "./contract-utils";
-import { ratchet } from "./ratchet";
 
 const MODULES = [
   ...walk("src/internal", /\.tsx?$/),
@@ -98,6 +95,6 @@ describe("unused exports", () => {
           offenders.push(`${module}: ${name} is test-only`);
       }
     }
-    ratchet("unused-exports", offenders);
+    expect(offenders, "unused-exports").toEqual([]);
   });
 });

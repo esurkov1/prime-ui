@@ -8,7 +8,6 @@ import { paletteColors } from "@/internal/states";
 import { SYS_PREFIX, toVarName } from "../../tokens/naming";
 import { OFF_GRID } from "../../tokens/offGrid";
 import { read as readRepo, walk } from "../test/contract-utils";
-import { ratchet } from "../test/ratchet";
 
 const stylesRoot = path.resolve(process.cwd(), "src/styles");
 const read = (file: string) => readFileSync(path.join(stylesRoot, file), "utf8");
@@ -131,7 +130,7 @@ describe("generated token styles", () => {
         if (!declared.has(m[1]) && !m[1].endsWith("-")) offenders.add(`${file}: ${m[1]}`);
       }
     }
-    ratchet("tokens-reads", [...offenders]);
+    expect([...offenders], "tokens-reads").toEqual([]);
   });
 
   // The exceptions are the list of foundation §1 rule 2, which `tokens:build` writes from

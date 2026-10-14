@@ -11,13 +11,10 @@
  *   (shared mechanics live in `src/internal` / `src/hooks`);
  * - every `biome-ignore lint/correctness/useExhaustiveDependencies` is a counted exception;
  * - `src/icons/glyphs` holds only glyph modules (`*.tsx`).
- *
- * In ratchet mode (`source-rules`): the offenders found when the check landed are the baseline.
  */
 import path from "node:path";
 
 import { pascal, read, walk } from "./contract-utils";
-import { numbered, ratchet } from "./ratchet";
 
 /** Runtime sources of the kit: no tests, examples or api tables. */
 const sources = walk("src", /\.tsx?$/).filter(
@@ -83,7 +80,7 @@ describe("source rules", () => {
         }
       }
     }
-    ratchet("source-rules", numbered(offenders));
+    expect(offenders, "source-rules").toEqual([]);
   });
 
   it("src/icons/glyphs holds only glyph modules", () => {

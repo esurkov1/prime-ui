@@ -4,11 +4,8 @@
  * changes in place cross-fades through its GlyphSwap host (`Button.Icon`, ProgressCircle children,
  * `src/internal/glyphSwap`), never a ternary of two icons that flips; a region keyed to remount
  * (`key={swapped …}`) is a local copy of the region swap (`src/internal/RegionSwap`).
- *
- * In ratchet mode (`glyph-swap`): the offenders found when the check landed are the baseline.
  */
 import { read, walk } from "./contract-utils";
-import { numbered, ratchet } from "./ratchet";
 
 const sources = walk("src", /\.tsx?$/).filter(
   (file) => !/\.test\.tsx?$|\/examples\/|^src\/test\//.test(file),
@@ -36,6 +33,6 @@ describe("glyph and region swaps", () => {
         for (const _ of text.matchAll(pattern)) offenders.push(`${file}: ${rule}`);
       }
     }
-    ratchet("glyph-swap", numbered(offenders));
+    expect(offenders, "glyph-swap").toEqual([]);
   });
 });

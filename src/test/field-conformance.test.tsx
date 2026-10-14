@@ -4,9 +4,6 @@
  * - A disabled `Fieldset` disables every control inside (`src/internal/disabledContext`).
  * - In a FieldList cell the field is named by its column heading, and a required column makes it
  *   required for assistive tech.
- *
- * In ratchet mode (`field-conformance`): the fields that failed when the suite landed are the
- * baseline.
  */
 import { cleanup, render, screen } from "@testing-library/react";
 import type * as React from "react";
@@ -31,8 +28,6 @@ import {
   TagSelect,
   Textarea,
 } from "@/components";
-
-import { ratchet } from "./ratchet";
 
 const OPTIONS = [
   { value: "new", label: "Новый" },
@@ -240,7 +235,7 @@ describe("field conformance", () => {
         offenders.push(`disabled-open/${name}: disabled + defaultOpen opens`);
       cleanup();
     }
-    ratchet("field-conformance", offenders, "disabled-open/");
+    expect(offenders, "field-conformance").toEqual([]);
   });
 
   it("a disabled Fieldset disables every control inside", () => {
@@ -257,7 +252,7 @@ describe("field conformance", () => {
       }
       cleanup();
     }
-    ratchet("field-conformance", offenders, "fieldset/");
+    expect(offenders, "field-conformance").toEqual([]);
   });
 
   it("a FieldList cell names its field by the column and marks a required column", () => {
@@ -289,6 +284,6 @@ describe("field conformance", () => {
       }
       cleanup();
     }
-    ratchet("field-conformance", offenders, "cell/");
+    expect(offenders, "field-conformance").toEqual([]);
   });
 });

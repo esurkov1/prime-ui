@@ -14,8 +14,6 @@
  *   is written once.
  * - The component counts of package.json, README and llms.txt are the number of component dirs;
  *   the screen index of composition.md lists every `examples/screen.tsx`.
- *
- * The rules that landed after their offenders are ratchets (`./ratchet.ts`).
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -24,7 +22,6 @@ import ts from "typescript";
 
 import type { ComponentApi } from "../../scripts/docs/componentApi";
 import { brokenLink, componentDirs, linkTargets, read, root, walk } from "./contract-utils";
-import { numbered, ratchet } from "./ratchet";
 
 const skillDocs = fs
   .readdirSync(path.join(root, "SKILL"))
@@ -219,7 +216,7 @@ describe("snippets compile", () => {
     const offenders = snippets
       .filter((snippet) => snippet.kind === "partial" && /^\/\/ good\b/m.test(snippet.code))
       .map((snippet) => `${snippet.doc}: a partial block holds a good half`);
-    ratchet("skill-good-halves", numbered(offenders));
+    expect(offenders, "skill-good-halves").toEqual([]);
   });
 });
 
@@ -291,7 +288,7 @@ describe("SKILL prose", () => {
         }
       }
     }
-    ratchet("skill-api-names", numbered(offenders));
+    expect(offenders, "skill-api-names").toEqual([]);
   });
 
   it("every checklist item links to the rule it checks (skill-checklist-anchors)", () => {
@@ -302,7 +299,7 @@ describe("SKILL prose", () => {
     const offenders = items
       .filter((item) => !/\]\([^)]*#[^)]+\)/.test(item))
       .map((item) => `SKILL/checklist.md: ${item.slice(6, 70).replace(/\s+/g, " ")}`);
-    ratchet("skill-checklist-anchors", offenders);
+    expect(offenders, "skill-checklist-anchors").toEqual([]);
   });
 
   it("writes every rule once: no sentence repeated across SKILL files (skill-duplicates)", () => {
@@ -320,7 +317,7 @@ describe("SKILL prose", () => {
         else seen.set(text, doc);
       }
     }
-    ratchet("skill-duplicates", offenders);
+    expect(offenders, "skill-duplicates").toEqual([]);
   });
 });
 
@@ -369,7 +366,7 @@ describe("aggregates", () => {
         offenders.push(`${file}: inline JSX string`);
       }
     }
-    ratchet("code-snippets", offenders);
+    expect(offenders, "code-snippets").toEqual([]);
   });
 });
 

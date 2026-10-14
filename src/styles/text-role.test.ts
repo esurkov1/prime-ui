@@ -3,12 +3,9 @@
  * comes from `src/internal/textRole.module.css` (or Typography), a text tone from
  * `src/internal/textTone.module.css`. A component never reads a role's `-tracking` / `-weight`
  * token itself, and never maps `[data-tone]` to a color of its own.
- *
- * In ratchet mode (`text-role`): the copies found when the guard landed are the baseline.
  */
 import { read } from "../test/contract-utils";
 import { cssRules, moduleCssFiles } from "../test/css";
-import { numbered, ratchet } from "../test/ratchet";
 
 const HOMES = new Set([
   "src/internal/textRole.module.css",
@@ -31,6 +28,6 @@ describe("text roles and tones", () => {
         }
       }
     }
-    ratchet("text-role", numbered(offenders));
+    expect(offenders, "text-role").toEqual([]);
   });
 });

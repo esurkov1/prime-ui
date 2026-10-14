@@ -86,11 +86,11 @@ bun run verify:tokens       # tokens:build shows no diff (generated API docs: th
   (`src/test/source-rules.test.ts`). Nothing is exported only for a test: a test reaches a module
   through its public surface (`src/test/unused-exports.test.ts`).
 - Every mechanical rule of this file has a guard test (`src/test/**`, `src/styles/*.test.ts`); a rule
-  only in prose is a defect. A guard that landed after its offenders is a ratchet
-  (`src/test/ratchet.ts`): the offenders it found are its baseline `src/test/baselines/<guard>.json`,
-  a new offender fails at once, and a fixed one is deleted from the baseline in the same change (a
-  stale entry warns, and fails under `RATCHET_STRICT=1`). A baseline only shrinks — never add an
-  entry to get a change through — and an empty baseline file is deleted.
+  only in prose is a defect. A guard asserts no offender at all. A deliberate exception is a named
+  allowlist entry inside the guard with a one-line reason (the public hooks of
+  `donor-override.test.ts`, `PAINTED_EXAMPLES`, `SHOWN_BY_CONTENT`…), kept minimal — never an
+  entry added to get a change through; a list that can tell (`DOMAIN_GLYPHS`, `DOCUMENT_SCREENS`,
+  `PAINTED_EXAMPLES`, `SHOWN_BY_CONTENT`) fails once an entry no longer applies.
 - Scrolling: a component scrolls only its own scroller (`scrollTop` / `scrollLeft`); `scrollIntoView`
   only for a keyboard-moved highlight with `block: "nearest"` — it also scrolls the page.
 - Biome formatting: 2 spaces, double quotes, line width 100.
@@ -528,7 +528,7 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
   props as the JSDoc; example canon (JSDoc, function name, no inline style, no placeholder text);
   COMPONENT.md headings, Related lines and Examples table match; the API, Keyboard, ARIA and Labels
   sections equal what `api.ts` renders.
-- No guard got a new baseline entry; every offender the change fixed is deleted from its baseline.
+- Every guard finds no offender; no allowlist entry was added to get the change through.
 - No copy of an existing kit block was added (§2); donors you extended are documented and tested.
 - Behaviour, a11y, motion and visuals in both themes are not worse: check the page in the playground in
   light and dark.
@@ -554,7 +554,6 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `scripts/` | `build-tokens.ts`, `bundle-lib.ts` (writes the `api.ts` prose into the `.d.ts`), `build-skill.ts`, `build-docs.ts` + `scripts/docs/` (`componentApi.ts` — the api schema and markdown; `aggregates.ts` — the README / SKILL indexes, the icon list, the triad rows; `apiTypes.ts` — the TypeScript side of the api contract; `links.ts` — the one link checker; `vocabulary.ts` — the API vocabulary as data) |
 | `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component, incl. the render smoke test of every screen (shared helpers in `contract-utils.ts`) |
 | `src/test/*.test.ts(x)`, `src/styles/*.test.ts` | the guards of the mechanical rules: `api-types` (api.ts against the types), `a11y-examples` (every example rendered: named roles, IDREFs, accessible names), `overlayConformance` and `field-conformance` (shared behaviour suites), `refs` (paths, `§` and `bun run` references, this map), `source-rules`, `unused-exports`, `internal-coverage` (every runtime internal has a test), `glyph-swap`, `test-hygiene`; CSS: `literals`, `tokens`, `donor-override`, `touch`, `motion-perf`, `state-motion`, `sticky`, `text-role`, `shared-css`, `a11y-css`, `icon-size`, `css-modules`, `scroll` |
-| `src/test/ratchet.ts`, `src/test/baselines/` | ratchet mode of a guard and the baselines of the offenders it still allows (Conventions) |
 | `src/test/part-refs.test.tsx` | refs of every part listed in the generated `part-refs.generated.ts`: a typed check, runtime cases for merged or redirected refs |
 | `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `cheatsheet` (read first), `ux` (what goes on a screen: brief, data shape → layout, label economy, copy, friction), `choosing`, `components` (generated index), `composition` (screen assembly guide and the screens index), `layouts` (the app frame), `responsive` (narrow screens, touch, `PageToolbar`), `api-contract`, `foundations`, `motion`, `anti-slop`, `checklist` |
 | `evals/prime-ui-kit/` | skill evals (skill-creator `evals.json`): prompts with checkable expectations for the UX bugs the skill must not repeat; `files/` holds the screens the «change an existing screen» cases start from. Not shipped |

@@ -3,11 +3,8 @@
  * element (`[data-state]`, `[aria-*]`, `:hover`, `:active`, `:checked`…) is in the transition of
  * that element's base rule, so the element glides into the state instead of flipping. A state
  * never swaps a `background-image` (it cannot interpolate).
- *
- * In ratchet mode (`state-motion`): the flips found when the guard landed are the baseline.
  */
 import { cssRules, moduleCssFiles } from "../test/css";
-import { numbered, ratchet } from "../test/ratchet";
 
 /** Properties that read as a visible state change and can interpolate. */
 const STATE_PROPS =
@@ -76,6 +73,6 @@ describe("state motion", () => {
         }
       }
     }
-    ratchet("state-motion", numbered(offenders));
+    expect(offenders, "state-motion").toEqual([]);
   });
 });

@@ -4,7 +4,6 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { cssAtRules, cssRules, moduleCssFiles } from "../test/css";
-import { numbered, ratchet } from "../test/ratchet";
 
 /**
  * Rendering-cost guards over the CSS (foundation §7: motion is `transform` / `opacity`, plus
@@ -12,15 +11,15 @@ import { numbered, ratchet } from "../test/ratchet";
  *
  * - No `transition: all`: it animates whatever changes next, layout included.
  * - No transition or keyframe on a layout property (size, inset, margin, padding, grid tracks,
- *   border width) outside the ratchet below: each frame of one runs layout for the subtree. An
+ *   border width) outside `LAYOUT_TRANSITIONS`: each frame of one runs layout for the subtree. An
  *   entry there is a documented exception (a content-driven height, a grid-rows disclosure, an
  *   indicator that cannot scale without stretching its label); a new one needs a reason, and a
  *   fixed one leaves the list.
- * - No permanent `will-change` outside the ratchet: every promoted element holds a GPU layer.
- * - Ratchets (`motion-perf`): a `grid-template-rows: 0fr` fold outside the shared Disclosure, an
+ * - No permanent `will-change` outside `WILL_CHANGE`: every promoted element holds a GPU layer.
+ * - `motion-perf`: no `grid-template-rows: 0fr` fold outside the shared Disclosure, no
  *   animated property outside the sanctioned set (transform, opacity, color, fill, shadow…) and
- *   the layout exceptions above, a local `@keyframes` outside the shared motion modules,
- *   `ease-in`, and a reduced-motion block that only repeats what globals.css already zeroes.
+ *   the layout exceptions above, no local `@keyframes` outside the shared motion modules, no
+ *   `ease-in`, and no reduced-motion block that only repeats what globals.css already zeroes.
  * - No `:has()` before a class-less target (`X:has(…) *`, `X:has(…) > :not(.a)`): Blink then
  *   invalidates the whole subtree of every `:has()` anchor on the page whenever anything inside
  *   one changes — a virtualized list restyled ~10k elements per frame. Give the target a class,
@@ -103,8 +102,8 @@ const LAYOUT_PROPERTY =
   /^(width|height|(min|max)-(width|height|inline-size|block-size)|inline-size|block-size|top|right|bottom|left|inset(-[a-z-]+)?|margin(-[a-z-]+)?|padding(-[a-z-]+)?|grid-template-(rows|columns)|border(-[a-z]+)*-width|gap|row-gap|column-gap|font-size|line-height|flex(-grow|-shrink|-basis)?)$/;
 
 /**
- * Layout transitions that stay on purpose, per file. Ratchet: add only with a reason in the file,
- * remove when the transition goes.
+ * Layout transitions that stay on purpose, per file: add only with a reason in the file, remove
+ * when the transition goes.
  */
 const LAYOUT_TRANSITIONS: Record<string, string[]> = {
   // The changed part of a label glides between two widths (a few letters, one element).
@@ -147,7 +146,7 @@ const LAYOUT_TRANSITIONS: Record<string, string[]> = {
   "src/components/progress-bar/ProgressBar.module.css": ["flex-grow"],
 };
 
-/** Permanent `will-change`, per file. Ratchet as above. */
+/** Permanent `will-change`, per file, each with its reason; the same rule as above. */
 const WILL_CHANGE: Record<string, string> = {
   // The round clip of a video note holds its own composited layer (WebKit leaks the radius).
   "src/components/video-note/VideoNote.module.css": "the round clip of a playing video in WebKit",
@@ -284,7 +283,7 @@ function transitioned(prop: string, value: string): string[] {
   return [];
 }
 
-describe("motion guards (ratchet)", () => {
+describe("motion guards", () => {
   it("follows the motion rules of foundation §7 (motion-perf)", () => {
     const offenders: string[] = [];
     for (const file of moduleCssFiles().filter((item) => !item.includes("/examples/"))) {
@@ -328,6 +327,6 @@ describe("motion guards (ratchet)", () => {
         }
       }
     }
-    ratchet("motion-perf", numbered(offenders));
+    expect(offenders, "motion-perf").toEqual([]);
   });
 });

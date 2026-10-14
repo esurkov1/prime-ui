@@ -4,12 +4,9 @@
  *   `src/internal/fieldTier.module.css`; everything else reads the tier variables it sets;
  * - the visually-hidden clip (`clip-path: inset(50%)`) is `src/components/visually-hidden/VisuallyHidden`;
  * - the dark shade over media (`--prime-color-media-shade`) is `src/internal/mediaPill`.
- *
- * In ratchet mode (`shared-css`): the copies found when the guard landed are the baseline.
  */
 import { read } from "../test/contract-utils";
 import { cssRules, moduleCssFiles } from "../test/css";
-import { ratchet } from "../test/ratchet";
 
 const RECIPES: { home: string; rule: string; test: (css: string) => number }[] = [
   {
@@ -41,6 +38,6 @@ describe("shared CSS recipes", () => {
       }
     }
     expect(cssRules("src/internal/fieldTier.module.css").length).toBeGreaterThan(0);
-    ratchet("shared-css", offenders);
+    expect(offenders, "shared-css").toEqual([]);
   });
 });

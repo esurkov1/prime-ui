@@ -98,7 +98,7 @@ export function checkSourceCanon(
 
 /**
  * The rest of the copyable-source canon, as offender ids (`file: rule`) for the `example-canon`
- * ratchet: the JSDoc ends with the props it shows (` — \`a\`, \`b\`.`), no `biome-ignore`, no
+ * guard: the JSDoc ends with the props it shows (` — \`a\`, \`b\`.`), no `biome-ignore`, no
  * `toISOString().slice(` (Datepicker formats dates), no raw `<dl>` (DescriptionList) and no
  * hand-written arrow-key handler (the kit's roving focus).
  */
@@ -140,7 +140,7 @@ export function checkLayoutCss(file: string, css: string, forbidden: string[] = 
 /**
  * What example CSS may not do, beyond `checkLayoutCss`: paint a surface (a bounded block is
  * `Card.Root`), style text (Typography), or reach into a component's tier tokens. Offender ids
- * are `file: property` (numbered when repeated) for the `example-css` ratchet.
+ * are `file: property` for the `example-css` guard.
  */
 export const EXAMPLE_CSS_BANS = [
   /^background(-\w+)?$/,

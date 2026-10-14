@@ -6,14 +6,11 @@
  * - no `* 1` factor in a `calc()`;
  * - no declaration a later one of the same rule overrides (a fallback pair for an older value,
  *   like `100vh` before `100dvh`, is not an override: the values differ in kind).
- *
- * In ratchet mode (`css-modules`): the offenders found when the guard landed are the baseline.
  */
 import path from "node:path";
 
 import { read, walk } from "../test/contract-utils";
 import { cssRules, moduleCssFiles } from "../test/css";
-import { numbered, ratchet } from "../test/ratchet";
 
 const sources = walk("src", /\.tsx?$/).filter((file) => !/\.test\.tsx?$/.test(file));
 
@@ -72,6 +69,6 @@ describe("CSS Modules", () => {
         }
       }
     }
-    ratchet("css-modules", numbered(offenders));
+    expect(offenders, "css-modules").toEqual([]);
   });
 });

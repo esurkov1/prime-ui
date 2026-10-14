@@ -3,13 +3,8 @@
  * duration, easing, stacking or scale literal and no primitive `--prime-ref-*` token in a
  * declaration. Breakpoint conditions of `@media` take px (custom properties cannot be used there);
  * a container query takes rem (the `@container` rem convention, foundation §9).
- *
- * In ratchet mode (`literals`): the literals found when the guard landed are the baseline; the
- * documented exceptions (a 1px hairline, foundation's 4px exceptions) stay there until foundation
- * names them as tokens.
  */
 import { cssAtRules, cssRules, moduleCssFiles } from "../test/css";
-import { numbered, ratchet } from "../test/ratchet";
 
 /** Component and internal stylesheets; examples are checked by the docs contract. */
 const files = [
@@ -49,6 +44,6 @@ describe("CSS literals", () => {
         }
       }
     }
-    ratchet("literals", numbered(offenders));
+    expect(offenders, "literals").toEqual([]);
   });
 });

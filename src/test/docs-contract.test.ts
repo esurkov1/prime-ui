@@ -5,8 +5,9 @@
  * canon and the COMPONENT.md template. A `screen` example (a whole page) keeps the same canon with
  * its own `screen.module.css` and renders a page with one h1.
  *
- * Guards that landed after their offenders are ratchets (`./ratchet.ts`): the offenders found
- * today are in `src/test/baselines/<guard>.json`; anything new fails.
+ * Each guard asserts no offender, named by the guard's id; a deliberate exception is a named
+ * allowlist entry with its reason (`DOMAIN_GLYPHS`, `DOCUMENT_SCREENS`, `PAINTED_EXAMPLES`), and a
+ * test fails once an entry no longer applies.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -60,7 +61,6 @@ import {
   sourceCanonOffenders,
   walk,
 } from "./contract-utils";
-import { numbered, ratchet } from "./ratchet";
 
 const dirs = componentDirs();
 
@@ -260,7 +260,7 @@ const FRAMED_FIELDS =
 
 /**
  * Scenarios that break the kit's own rules (CLAUDE.md §2, SKILL/ux.md), as offender ids for the
- * `example-content` ratchet.
+ * `example-content` guard.
  */
 function contentOffenders(dir: string, file: string, source: string): string[] {
   const offenders: string[] = [];
@@ -627,13 +627,12 @@ describe("docs contract", () => {
         }
       }
     }
-    ratchet("dismiss-props", offenders);
+    expect(offenders, "dismiss-props").toEqual([]);
   });
 
   describe.each(dirs)("$rel", ({ base, dir, rel }) => {
     const docPath = `${rel}/COMPONENT.md`;
     const examples = walk(`${rel}/examples`, /\.tsx$/);
-    const scope = `${rel}/`;
 
     it("has COMPONENT.md and examples/", () => {
       expect(fs.existsSync(path.join(root, docPath)), docPath).toBe(true);
@@ -670,27 +669,24 @@ describe("docs contract", () => {
     });
 
     it("examples follow the rest of the canon (example-canon)", () => {
-      ratchet(
-        "example-canon",
+      expect(
         examples.flatMap((file) => sourceCanonOffenders(file, read(file))),
-        scope,
-      );
+        "example-canon",
+      ).toEqual([]);
     });
 
     it("examples render what their JSDoc names (example-names)", () => {
-      ratchet(
-        "example-names",
+      expect(
         examples.flatMap((file) => unrenderedNames(file, read(file))),
-        scope,
-      );
+        "example-names",
+      ).toEqual([]);
     });
 
     it("examples obey the kit's own rules (example-content)", () => {
-      ratchet(
-        "example-content",
+      expect(
         examples.flatMap((file) => contentOffenders(dir, file, read(file))),
-        scope,
-      );
+        "example-content",
+      ).toEqual([]);
     });
 
     it("example styles use semantic tokens only", () => {
@@ -727,7 +723,7 @@ describe("docs contract", () => {
           }
         }
       }
-      ratchet("example-css", numbered(offenders), scope);
+      expect(offenders, "example-css").toEqual([]);
     });
 
     const screenModule = screenModules[`../${base}/${dir}/examples/screen.tsx`];
@@ -820,7 +816,7 @@ describe("docs contract", () => {
             ({ slot, by }) =>
               `${rel}/examples: ${slot} (by ${by === "kind" ? `the ${page.kind} kind` : `\`${by}\``})`,
           );
-        ratchet("required-slots", missing, scope);
+        expect(missing, "required-slots").toEqual([]);
       });
 
       it("the kind allows every slot the root API requires", () => {
@@ -852,7 +848,7 @@ describe("docs contract", () => {
             );
           }
         }
-        ratchet("slot-prop", offenders, scope);
+        expect(offenders, "slot-prop").toEqual([]);
       });
 
       it("matrix examples bring no CSS: the preview layout lines the cells up (matrix-css)", () => {
@@ -864,7 +860,7 @@ describe("docs contract", () => {
             offenders.push(`${file}: imports CSS`);
           }
         }
-        ratchet("matrix-css", offenders, scope);
+        expect(offenders, "matrix-css").toEqual([]);
       });
 
       it("matrix examples are rows of labelled cells (matrix-cells)", async () => {
@@ -894,7 +890,7 @@ describe("docs contract", () => {
           if (rows.length === 0 || bad) offenders.push(`${file}: not rows of labelled cells`);
           unmount();
         }
-        ratchet("matrix-cells", offenders, scope);
+        expect(offenders, "matrix-cells").toEqual([]);
       }, 30_000);
 
       it("examples show every value of variant, tone and color (variant-values)", () => {
@@ -907,7 +903,7 @@ describe("docs contract", () => {
               offenders.push(`${rel}/examples: ${prop.name}="${value}"`);
           }
         }
-        ratchet("variant-values", offenders, scope);
+        expect(offenders, "variant-values").toEqual([]);
       });
 
       it("example descriptions name the same props as the example JSDoc", () => {
@@ -937,7 +933,7 @@ describe("docs contract", () => {
       });
 
       it("COMPONENT.md states only what the code does (component-md)", () => {
-        ratchet("component-md", componentDocOffenders(rel, dir, read(docPath), api), scope);
+        expect(componentDocOffenders(rel, dir, read(docPath), api), "component-md").toEqual([]);
       });
 
       it("api.ts descriptions are short summaries (details live in COMPONENT.md)", () => {
@@ -946,14 +942,14 @@ describe("docs contract", () => {
 
       it("api.ts follows the API rules", () => {
         const out = apiOffenders(rel, api);
-        ratchet("api-en-ru", out.enRu, scope);
-        ratchet("api-default-literal", out.defaults, scope);
-        ratchet("api-part-names", out.partNames, scope);
-        ratchet("api-triads", out.triads, scope);
-        ratchet("api-error-support", out.support, scope);
-        ratchet("api-slot-classname", out.slotClassName, scope);
-        ratchet("api-ref-line", out.refLine, scope);
-        ratchet("vocabulary", out.vocabulary, scope);
+        expect(out.enRu, "api-en-ru").toEqual([]);
+        expect(out.defaults, "api-default-literal").toEqual([]);
+        expect(out.partNames, "api-part-names").toEqual([]);
+        expect(out.triads, "api-triads").toEqual([]);
+        expect(out.support, "api-error-support").toEqual([]);
+        expect(out.slotClassName, "api-slot-classname").toEqual([]);
+        expect(out.refLine, "api-ref-line").toEqual([]);
+        expect(out.vocabulary, "vocabulary").toEqual([]);
       });
 
       it("every documented key is pressed in the component's tests (keyboard-tests)", () => {
@@ -968,15 +964,14 @@ describe("docs contract", () => {
               offenders.push(`${rel}/api.ts: keyboard ${row.keys} — ${token}`);
           }
         }
-        ratchet("keyboard-tests", offenders, scope);
+        expect(offenders, "keyboard-tests").toEqual([]);
       });
 
       it("tests never fake an activation with keyDown + click (keydown-click)", () => {
-        ratchet(
-          "keydown-click",
+        expect(
           walk(rel, /\.test\.tsx?$/).flatMap((file) => keyDownThenClick(file, read(file))),
-          scope,
-        );
+          "keydown-click",
+        ).toEqual([]);
       });
 
       it("COMPONENT.md lists the examples in page order with their JSDoc", () => {

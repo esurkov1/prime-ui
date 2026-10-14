@@ -6,8 +6,6 @@
  *   `aria-activedescendant`, `for`) points at an element in the document.
  * - No `aria-label` sits on a generic element (a `div` / `span` with no role), where it names
  *   nothing.
- *
- * In ratchet mode (`a11y-examples`): the issues found when the check landed are the baseline.
  */
 import { cleanup, render } from "@testing-library/react";
 import { computeAccessibleName, getRole } from "dom-accessibility-api";
@@ -16,7 +14,6 @@ import { MemoryRouter } from "react-router-dom";
 
 import { NotificationProvider } from "../components/notification/NotificationStore";
 import { componentDirs } from "./contract-utils";
-import { ratchet } from "./ratchet";
 
 const examples = import.meta.glob<{ default: React.ComponentType }>(
   "../{components,layout}/*/examples/*.tsx",
@@ -127,6 +124,6 @@ describe("examples name what assistive tech needs", () => {
       offenders.push(...issuesOf(file, container));
       cleanup();
     }
-    ratchet("a11y-examples", offenders, `${rel}/`);
+    expect(offenders, "a11y-examples").toEqual([]);
   }, 60_000);
 });

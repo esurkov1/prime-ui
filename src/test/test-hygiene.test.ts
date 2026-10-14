@@ -4,11 +4,8 @@
  * `[class*=…]` query passes on the wrong element, `getComputedStyle` in jsdom never sees CSS
  * Module rules. A component test asserts CSS through `src/test/css.ts` (`cssRule` throws on a
  * missing selector) and behaviour through roles and data attributes.
- *
- * In ratchet mode (`test-hygiene`): the offenders found when the check landed are the baseline.
  */
 import { read, walk } from "./contract-utils";
-import { ratchet } from "./ratchet";
 
 /** The shared contracts and CSS guards read stylesheets on purpose. */
 const GUARDS = /^src\/(test|styles)\//;
@@ -32,6 +29,6 @@ describe("test hygiene", () => {
         if (pattern.test(source)) offenders.push(`${file}: ${rule}`);
       }
     }
-    ratchet("test-hygiene", offenders);
+    expect(offenders, "test-hygiene").toEqual([]);
   });
 });

@@ -9,14 +9,11 @@
  *   fieldTier, menu, palette) is the one home of the values its hosts read. A donor's own hook is
  *   read with a fallback (`var(--avatar-ring, …)`), or the donor sets it too.
  * - `:global(html …)` only in Dnd (the drag cursor).
- *
- * In ratchet mode (`donor-override`): the overrides found when the guard landed are the baseline.
  */
 import path from "node:path";
 
 import { read } from "../test/contract-utils";
 import { cssRules, moduleCssFiles } from "../test/css";
-import { numbered, ratchet } from "../test/ratchet";
 
 /** Public hooks a host may set on a donor. */
 const PUBLIC_HOOKS = [
@@ -96,6 +93,6 @@ describe("donor overrides", () => {
         }
       }
     }
-    ratchet("donor-override", numbered(offenders));
+    expect(offenders, "donor-override").toEqual([]);
   });
 });

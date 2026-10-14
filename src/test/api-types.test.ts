@@ -5,8 +5,6 @@
  * unions, a `…rest` row exactly when native attributes are forwarded and no Omit key that still
  * reaches the element. Every `labels` key is a key of the part's labels type and its default is
  * the runtime default.
- *
- * In ratchet mode (`api-types`): the drift found when the check landed is the baseline.
  */
 import ts from "typescript";
 
@@ -24,7 +22,6 @@ import {
 } from "../../scripts/docs/apiTypes";
 import type { ComponentApi } from "../../scripts/docs/componentApi";
 import { componentDirs, root, walk } from "./contract-utils";
-import { ratchet } from "./ratchet";
 
 const apiModules = import.meta.glob<{ api: ComponentApi }>("../{components,layout}/*/api.ts", {
   eager: true,
@@ -194,7 +191,7 @@ describe("api.ts matches the TypeScript props", () => {
   it.each(componentDirs())("$rel", ({ base, dir, rel }) => {
     const api = apiModules[`../${base}/${dir}/api.ts`]?.api;
     expect(api, `${rel}/api.ts`).toBeDefined();
-    ratchet("api-types", offendersOf(rel, api as ComponentApi), `${rel}/`);
+    expect(offendersOf(rel, api as ComponentApi), "api-types").toEqual([]);
   });
 });
 
@@ -214,6 +211,6 @@ describe("api.ts is the one prose source of a prop", () => {
         `${source.fileName.slice(root.length + 1)}: ${owner ? `${owner.name.text}.` : ""}${name}`,
       );
     }
-    ratchet("api-jsdoc", [...offenders]);
+    expect([...offenders], "api-jsdoc").toEqual([]);
   });
 });

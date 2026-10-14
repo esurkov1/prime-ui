@@ -2,12 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import { read as readRepo, walk } from "../test/contract-utils";
 import { cssAtRules, cssRule, cssRules, cssValue, srcCssFiles } from "../test/css";
-import { numbered, ratchet } from "../test/ratchet";
 
 /**
  * Touch and input guards over the CSS: hover never sticks after a tap, viewport breakpoints come
  * from one scale, editable fields never trigger the iOS focus zoom, small controls get a touch
- * hit area. The ratchet below (`touch`) covers the rest of the touch rules (foundation §9, owner
+ * hit area. The guard below (`touch`) covers the rest of the touch rules (foundation §9, owner
  * decision on hover): a hover transform also needs `(pointer: fine)`, a hover guard honours
  * `aria-disabled`, the touch text token stays in the field tier, viewport queries stay in the app
  * shell and overlay form, media queries in TS go through `useMediaQuery`, and every switcher
@@ -180,7 +179,7 @@ const SWITCHERS = [
   "src/layout/bottom-nav/BottomNav.tsx",
 ];
 
-describe("touch rules (ratchet)", () => {
+describe("touch rules", () => {
   it("follows the touch rules of foundation §9 (touch)", () => {
     const offenders: string[] = [];
     for (const file of files) {
@@ -230,6 +229,6 @@ describe("touch rules (ratchet)", () => {
         offenders.push(`${file}: switcher without SwitcherScroller`);
       }
     }
-    ratchet("touch", numbered(offenders));
+    expect(offenders, "touch").toEqual([]);
   });
 });

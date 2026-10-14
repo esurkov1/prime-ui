@@ -3,11 +3,8 @@
  * `src/internal/iconBox` sets it), never from an `svg` type selector in a component's CSS: such a
  * rule resizes every glyph inside, the consumer's included. The files below draw their own SVG,
  * or only move an icon (a transform, a transition), and may select it.
- *
- * In ratchet mode (`icon-size`): the selectors found when the guard landed are the baseline.
  */
 import { cssRules, moduleCssFiles } from "../test/css";
-import { numbered, ratchet } from "../test/ratchet";
 
 /** Stylesheets that may select `svg`, with the reason. */
 const ALLOWED: Record<string, string> = {
@@ -33,6 +30,6 @@ describe("icon size", () => {
         if (SVG_SELECTOR.test(rule.selector)) offenders.push(`${file}: ${rule.selector}`);
       }
     }
-    ratchet("icon-size", numbered(offenders));
+    expect(offenders, "icon-size").toEqual([]);
   });
 });

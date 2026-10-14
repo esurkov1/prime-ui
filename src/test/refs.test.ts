@@ -7,14 +7,11 @@
  * - a comment of an examples stylesheet that names `<file>.tsx` heads a class that file uses;
  * - every module of `src/internal` is in the repository map of CLAUDE.md (§9);
  * - the motion token table of foundation §7 has every motion token, with its generated value.
- *
- * In ratchet mode (`refs`): the dead references found when the check landed are the baseline.
  */
 import fs from "node:fs";
 import path from "node:path";
 
 import { componentDirs, exists, read, root, walk } from "./contract-utils";
-import { numbered, ratchet } from "./ratchet";
 
 const foundation = read("docs/foundation.md");
 
@@ -95,7 +92,7 @@ describe("references resolve", () => {
           offenders.push(`${file}: ${m[1]} (no such file)`);
       }
     }
-    ratchet("refs", numbered(offenders), "");
+    expect(offenders, "refs").toEqual([]);
   });
 
   it("an examples stylesheet comment that names an example heads a class it uses", () => {
@@ -123,7 +120,7 @@ describe("references resolve", () => {
         }
       }
     }
-    ratchet("refs-example-css", numbered(offenders));
+    expect(offenders, "refs-example-css").toEqual([]);
   });
 
   it("every internal module is in the CLAUDE.md repository map", () => {
@@ -135,10 +132,10 @@ describe("references resolve", () => {
         .map((name) => name.replace(/(\.module)?\.(tsx?|css)$/, "")),
     );
     const missing = [...names].filter((name) => !new RegExp(`\\b${name}\\b`).test(map));
-    ratchet(
-      "refs-internal-map",
+    expect(
       missing.map((name) => `CLAUDE.md §9: src/internal/${name}`),
-    );
+      "refs-internal-map",
+    ).toEqual([]);
   });
 
   it("the motion table of foundation §7 lists every motion token with its value", () => {
@@ -175,6 +172,6 @@ describe("references resolve", () => {
     for (const token of tokens.keys()) {
       if (!listed.has(token)) offenders.push(`foundation §7: ${token} is missing from the table`);
     }
-    ratchet("refs-motion-table", offenders);
+    expect(offenders, "refs-motion-table").toEqual([]);
   });
 });

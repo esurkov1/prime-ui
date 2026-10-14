@@ -4,14 +4,11 @@
  * `aria-current` has a CSS selector for it (in its own stylesheets or the internal ones it uses),
  * and a list styled `list-style: none` keeps its list semantics with `role="list"` (WebKit drops
  * them otherwise).
- *
- * In ratchet mode (`a11y-css`): the gaps found when the guard landed are the baseline.
  */
 import path from "node:path";
 
 import { read, walk } from "../test/contract-utils";
 import { cssRules } from "../test/css";
-import { ratchet } from "../test/ratchet";
 
 const STATES = ["data-pressed", "aria-pressed", "aria-current"];
 
@@ -67,6 +64,6 @@ describe("a11y state in CSS", () => {
       }
     }
     expect(Object.keys(SHOWN_BY_CONTENT).filter((key) => !shown.has(key))).toEqual([]);
-    ratchet("a11y-css", offenders);
+    expect(offenders, "a11y-css").toEqual([]);
   });
 });
