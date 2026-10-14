@@ -35,7 +35,7 @@ NativeSelect          field frame: label row · control · support row
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### NativeSelect
-`ref` → `HTMLSelectElement`. The system `<select>` in the field look with the label row and the support row; the kit chevron over its end. + native `<select>` props except `size` and `multiple`.
+`ref` → `HTMLSelectElement`. The system `<select>` in the field look with the label row and the support row; the kit chevron over its end.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

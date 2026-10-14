@@ -1,7 +1,6 @@
 import * as React from "react";
 
 import { HighlightMatch } from "./HighlightMatch";
-import { useLabels } from "./labels";
 import styles from "./richText.module.css";
 
 /*
@@ -191,8 +190,6 @@ export type RichTextLabels = {
   spoiler: string;
 };
 
-const RICH_TEXT_LABELS: RichTextLabels = { spoiler: "Скрытый текст" };
-
 /**
  * A `||spoiler||`: a button named «Скрытый текст» over a masked run until it is pressed (click,
  * Enter, Space), then the run itself (its links work); a keyboard press moves the focus onto it, so
@@ -307,13 +304,13 @@ export type RichTextProps = {
   end?: React.ReactNode;
   /** Marks every case-insensitive match of this text (a search through a chat). */
   highlight?: string;
-  labels?: Partial<RichTextLabels>;
+  /** The host's strings (`Message.Text` passes its `spoiler`). */
+  labels: RichTextLabels;
 };
 
 /** A message text with its Markdown subset rendered safely; `end` closes the last text line. */
-export function RichText({ source, end, highlight = "", labels: labelsProp }: RichTextProps) {
+export function RichText({ source, end, highlight = "", labels }: RichTextProps) {
   const query = highlight.trim();
-  const labels = useLabels(RICH_TEXT_LABELS, labelsProp);
   // Parsed once per text: a message re-renders on its hover, menu and reaction state.
   const blocks = React.useMemo(() => parseRichText(source), [source]);
   const last = blocks[blocks.length - 1];

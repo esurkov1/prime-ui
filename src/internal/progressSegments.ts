@@ -128,7 +128,7 @@ export type ProgressSegmentsLabels = {
   allEmpty: string;
 };
 
-export const DEFAULT_PROGRESS_SEGMENTS_LABELS: ProgressSegmentsLabels = {
+export const PROGRESS_SEGMENTS_LABELS: ProgressSegmentsLabels = {
   empty: "Нет сегментов",
   allEmpty: "Все сегменты пусты",
 };

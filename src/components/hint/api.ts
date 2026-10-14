@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Hint.Root",
-      en: "`ref` → `HTMLParagraphElement`. A `<p>` with the support text; provides its tier to nested icons. + native `<p>` props (`id`, `role`, `className`, …).",
-      ru: "Строка поддержки под полем; ярус передаётся иконкам внутри.",
+      en: "`ref` → `HTMLParagraphElement`. A `<p>` with the support text; provides its tier to nested icons.",
+      ru: "`<p>` с текстом поддержки; передаёт ярус иконкам внутри.",
       props: [
         {
           name: "size",
@@ -34,13 +34,26 @@ export const api: ComponentApi = {
           en: "Text, optionally with `Hint.Icon` first.",
           ru: "Текст, при необходимости с `Hint.Icon` в начале.",
         },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLParagraphElement>",
+          en: "`children`, `id`, `role`, `className` and the other paragraph attributes.",
+          ru: "`children`, `id`, `role`, `className` и остальные атрибуты абзаца.",
+        },
       ],
     },
     {
       name: "Hint.Icon",
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding a glyph: 14 px for xs–m, 16 px for l and xl, centred on the first line. + native `<span>` props.",
-      ru: "Иконка в начале строки по центру первой линии; скрыта от скринридеров.",
-      props: [],
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding a glyph: 14 px for xs–m, 16 px for l and xl, centred on the first line.",
+      ru: "`<span>` с глифом, `aria-hidden`: 14 px для xs–m, 16 px для l и xl, по центру первой линии.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (the glyph), `className` and the other span attributes.",
+          ru: "`children` (глиф), `className` и остальные атрибуты span.",
+        },
+      ],
     },
   ],
   labels: [],

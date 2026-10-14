@@ -27,7 +27,7 @@ export type BadgeLabels = {
   removeFailed: string;
 };
 
-const BADGE_LABELS: BadgeLabels = { remove: "Удалить", removeFailed: "Не удалось удалить" };
+export const BADGE_LABELS: BadgeLabels = { remove: "Удалить", removeFailed: "Не удалось удалить" };
 
 export type BadgeRootProps = {
   /** Palette hue. Default `gray`. */

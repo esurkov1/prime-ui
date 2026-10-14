@@ -1,11 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { SLIDER_LABELS } from "./Slider";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Slider",
       en: '`ref` → `HTMLDivElement` (the field frame). A framed field: the label row with the value, a native `<input type="range">` over the visual track, then the hint or the error. `id` and `aria-label` go to the range input.',
-      ru: 'Поле в рамке, как остальные: подпись со значением, нативный `<input type="range">` поверх дорожки, заливки и ползунка, под ним подсказка или ошибка.',
+      ru: 'Поле в рамке, как остальные: подпись со значением, нативный `<input type="range">` поверх дорожки, заливки и ползунка, под ним подсказка или ошибка. `id` и `aria-label` уходят на input.',
       props: [
         {
           name: "value",
@@ -62,9 +63,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the track thickness T (thumb 4.5T × 3T), the label, the value and the hint. Without it the tier of its host (a form, a panel), else `m`.",
-          ru: "Ярус толщины дорожки T (ползунок 4.5T × 3T), подписи и значения.",
+          ru: "Ярус толщины дорожки T (ползунок 4.5T × 3T), подписи и значения. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "tone",
@@ -90,13 +91,13 @@ export const api: ComponentApi = {
           name: "label",
           type: "ReactNode",
           en: "Visible label linked to the range input (`<label htmlFor>`). Without it, set `aria-label`.",
-          ru: "Видимая подпись, связанная с input. Без неё задайте `aria-label`.",
+          ru: "Видимая подпись, связанная с input (`<label htmlFor>`). Без неё задайте `aria-label`.",
         },
         {
           name: "required",
           type: "boolean",
           en: "Red `*` after the label (`aria-hidden`); a range always has a value, so there is no native `required`.",
-          ru: "Красная `*` после подписи; у ползунка всегда есть значение, нативного `required` нет.",
+          ru: "Красная `*` после подписи (`aria-hidden`); у ползунка всегда есть значение, нативного `required` нет.",
         },
         {
           name: "optional",
@@ -108,7 +109,7 @@ export const api: ComponentApi = {
           name: "hint",
           type: "ReactNode",
           en: "Help text under the track (`aria-describedby`). Hidden while `error` is shown.",
-          ru: "Подсказка под дорожкой; скрывается, пока показан `error`.",
+          ru: "Подсказка под дорожкой (`aria-describedby`); скрывается, пока показан `error`.",
         },
         {
           name: "error",
@@ -120,14 +121,14 @@ export const api: ComponentApi = {
           name: "invalid",
           type: "boolean",
           en: "`aria-invalid` on the range input and a danger focus ring on the thumb. A non-empty `error` implies it.",
-          ru: "`aria-invalid` на input и красное кольцо фокуса у ползунка.",
+          ru: "`aria-invalid` на input и красное кольцо фокуса у ползунка. Непустой `error` включает его.",
         },
         {
           name: "showValue",
           type: "boolean",
           default: "false",
           en: "Shows the current value at the end of the label row (tabular numbers, `aria-hidden` — the input announces it).",
-          ru: "Текущее значение в конце строки подписи (табличные цифры).",
+          ru: "Текущее значение в конце строки подписи (табличные цифры, `aria-hidden` — его объявляет input).",
         },
         {
           name: "formatValue",
@@ -139,13 +140,13 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the range input (generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id input; иначе генерируется.",
+          ru: "Id input; иначе генерируется. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-label",
           type: "string",
           en: "Accessible name when there is no visible `label`.",
-          ru: "Доступное имя, когда нет видимой подписи.",
+          ru: "Доступное имя, когда нет видимой `label`.",
         },
         {
           name: "aria-describedby",
@@ -168,14 +169,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(SLIDER_LABELS, {
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -218,7 +217,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While a commit is saved the input has `aria-busy`; say why a refused value went back with `error`.",
-        ru: "Пока значение сохраняется (промис из `onCommit`), у поля `aria-busy`; почему значение вернулось, покажите через `error`.",
+        ru: "Пока значение сохраняется, у поля `aria-busy`; почему значение вернулось, покажите через `error`.",
       },
     ],
   },

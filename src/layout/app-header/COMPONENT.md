@@ -80,10 +80,10 @@ The name of `AppHeader.Title` (not the icon or the description) is the page's `<
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `Omit<DividerProps, "orientation" \| "children">` | — | `className` and the other div attributes. |
+| `…rest` | `Omit<DividerProps, "orientation" \| "children" \| "align" \| "size">` | — | `className` and the other div attributes. |
 
 ### AppHeader.Tools
-`ref` → `HTMLDivElement`. The page's tools in the header (a `PageToolbar.Root`): the header's second row, full width under the title row, wherever it is written.
+`ref` → `HTMLDivElement`. The page's tools in the header (a `PageToolbar.Root`): the header's second row, full width under the title row, as a direct child of `AppHeader.Root`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

@@ -1,4 +1,5 @@
-import type { ApiLabel, ApiProp } from "../../scripts/docs/componentApi";
+import type { ApiProp, LabelDocs } from "../../scripts/docs/componentApi";
+import type { TranscriptLabels } from "./transcript";
 
 /** The transcript props of a voice or video message (`internal/transcript`): VoicePlayer, VideoNote. */
 export function transcriptProps(where: { en: string; ru: string }): ApiProp[] {
@@ -37,23 +38,18 @@ export function transcriptProps(where: { en: string; ru: string }): ApiProp[] {
   ];
 }
 
-export const TRANSCRIPT_LABEL_ROWS: ApiLabel[] = [
-  {
-    key: "transcribe",
-    default: "Расшифровать",
+/** The descriptions of the transcript strings (`TranscriptLabels`). */
+export const TRANSCRIPT_LABEL_DOCS: LabelDocs<TranscriptLabels> = {
+  transcribe: {
     en: "Name of the transcript button while the text is closed.",
     ru: "Название кнопки расшифровки, пока текст свёрнут.",
   },
-  {
-    key: "hideTranscript",
-    default: "Скрыть расшифровку",
+  hideTranscript: {
     en: "Name of the transcript button while the text is open.",
     ru: "Название кнопки расшифровки, пока текст открыт.",
   },
-  {
-    key: "transcribeFailed",
-    default: "Не удалось расшифровать сообщение",
+  transcribeFailed: {
     en: "Announced when `onTranscribe` rejects.",
     ru: "Объявляется, когда `onTranscribe` отклонён.",
   },
-];
+};

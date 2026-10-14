@@ -55,7 +55,7 @@ export type GalleryLabels = {
   video: string;
 } & TransferLabels;
 
-const GALLERY_LABELS: GalleryLabels = {
+export const GALLERY_LABELS: GalleryLabels = {
   open: "Открыть: {name}",
   photo: "фото",
   video: "видео",

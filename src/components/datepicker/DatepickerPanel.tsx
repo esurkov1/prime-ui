@@ -87,23 +87,14 @@ export const DATEPICKER_LABELS: DatepickerLabels = {
 export type CalendarOptions = {
   /** Tier: day cell = the tier's menu item height (`m` → 32 px), text = the tier's text. */
   size?: ControlSize;
-  /** Months side by side; one when there is no room. */
   months?: 1 | 2;
-  /** The presets column (`range` only). */
   presets?: DatepickerPreset[] | false;
-  /** Step prompt under the calendar: «Выберите начальную дату» / «… конечную дату». */
   prompt?: boolean;
-  /** Footer with date fields and Reset / Apply. Without it a pick applies at once. */
   footer?: boolean;
-  /** Time fields in the footer (00:00 — 23:59 by default). */
   withTime?: boolean;
-  /** Days that cannot be picked (a calendar day is a Date at local midnight). */
   isDayDisabled?: (day: Date) => boolean;
-  /** Future days are muted and cannot be picked. */
   disableFuture?: boolean;
-  /** An annual day + month: no year, months wrap around inside `YEARLESS_YEAR`. */
   yearless?: boolean;
-  /** «Today» for highlighting, presets and `disableFuture`; the browser's day by default. */
   today?: Date;
   locale?: Locale;
   weekStartsOn?: WeekStart;
@@ -116,7 +107,6 @@ export type RangeModeProps = {
   value?: DatepickerRange;
   defaultValue?: DatepickerRange;
   onValueChange?: (value: DatepickerRange) => void;
-  /** Value applied by «Сбросить»; an empty range by default. */
   resetValue?: DatepickerRange;
 };
 
@@ -125,7 +115,6 @@ export type SingleModeProps = {
   value?: Date | null;
   defaultValue?: Date | null;
   onValueChange?: (value: Date | null) => void;
-  /** Value applied by «Сбросить»; `null` by default. */
   resetValue?: Date | null;
 };
 

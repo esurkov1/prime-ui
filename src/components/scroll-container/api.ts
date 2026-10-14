@@ -114,7 +114,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While an edge load is pending the region is `aria-busy`; announcing new entries is the feed's job (a polite status or `aria-live` on a counter), so a busy chat does not read every message aloud.",
-        ru: "Пока промис `onReachStart` / `onReachEnd` не завершён, на области `aria-busy`; озвучить подгрузку — дело ленты (`aria-live` у счётчика или статуса).",
+        ru: "Пока догрузка у края не завершена, на области `aria-busy`; объявлять новые записи — дело ленты (вежливый статус или `aria-live` у счётчика), чтобы занятый чат не зачитывал каждое сообщение.",
       },
     ],
   },

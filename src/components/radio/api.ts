@@ -1,11 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { RADIO_GROUP_LABELS } from "./Radio";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Radio.Group",
       en: '`ref` → `HTMLDivElement` (the field frame). Owns the value, the shared `name` and size; renders the group label and the hint / error. `id` and the `aria-*` naming props go to the `role="radiogroup"` element.',
-      ru: "Держит значение, общий `name` и размер; подпись группы сверху, подсказка или ошибка под вариантами.",
+      ru: 'Держит значение, общий `name` и размер; подпись группы сверху, подсказка или ошибка под вариантами. `id` и пропсы имени `aria-*` уходят на элемент `role="radiogroup"`.',
       props: [
         {
           name: "value",
@@ -34,9 +35,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`.",
-          ru: "Ярус кружков, текста, подписи и подсказки.",
+          ru: "Ярус кружков, текста, подписи и подсказки. Без него группа берёт ярус хоста (LoginForm, Popover, панель с размером), иначе `m`.",
         },
         {
           name: "label",
@@ -75,7 +76,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger ring on the unchecked circles and `aria-invalid` on the group and the inputs. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо у невыбранных кружков, `aria-invalid`.",
+          ru: "Ошибка без текста: красное кольцо у невыбранных кружков, `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "disabled",
@@ -101,13 +102,19 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: 'Id of the `role="radiogroup"` element (generated when omitted); also the default `name`.',
-          ru: "Id элемента radiogroup (иначе генерируется); он же `name` по умолчанию.",
+          ru: 'Id элемента `role="radiogroup"` (иначе генерируется); он же `name` по умолчанию.',
         },
         {
           name: "aria-label / aria-labelledby / aria-describedby",
           type: "string",
           en: "Name and description of the radiogroup (`aria-describedby` is merged before the hint / error ids).",
           ru: "Имя и описание radiogroup (`aria-describedby` — перед id подсказки и ошибки).",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The `Radio.Root` options.",
+          ru: "Варианты `Radio.Root`.",
         },
         {
           name: "…rest",
@@ -120,7 +127,7 @@ export const api: ComponentApi = {
     {
       name: "Radio.Root",
       en: "`ref` → `HTMLInputElement` (the native radio). One option inside `Radio.Group`: the `<label>` row with the input and the circle, and its hint; native input props go to the input.",
-      ru: "Один вариант внутри `Radio.Group`: строка-`<label>` с input и кружком и его подсказка.",
+      ru: "Один вариант внутри `Radio.Group`: строка-`<label>` с input и кружком и его подсказка; нативные пропсы input уходят на input.",
       props: [
         {
           name: "value",
@@ -158,25 +165,30 @@ export const api: ComponentApi = {
           name: "…rest",
           type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "checked" | "defaultChecked" | "onChange" | "name" | "value">',
           en: "`id`, `aria-label`, `aria-describedby`, `onBlur`… on the native input.",
-          ru: "`id`, `aria-label`, `aria-describedby`… на нативном input.",
+          ru: "`id`, `aria-label`, `aria-describedby`, `onBlur`… на нативном input.",
         },
       ],
     },
     {
       name: "Radio.Label",
       en: "`ref` → `HTMLSpanElement`. The visible text in the text column of the option row. Native `<span>` props.",
-      ru: "Видимый текст варианта в колонке текста.",
-      props: [],
+      ru: "Видимый текст варианта в колонке текста. Нативные пропсы `<span>`.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children`, `className` and the other span attributes.",
+          ru: "`children`, `className` и остальные атрибуты span.",
+        },
+      ],
     },
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(RADIO_GROUP_LABELS, {
+    optional: {
       en: "Marker after the group label when `optional`.",
       ru: "Пометка после подписи группы при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

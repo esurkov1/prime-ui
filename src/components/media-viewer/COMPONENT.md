@@ -57,13 +57,13 @@ MediaViewer                        portal + role="dialog", a dark theme island o
 | `onIndexChange` | `(index: number) => void` | — | The page turned: a swipe, an arrow, a key, a thumbnail of the filmstrip. Fires once the page has settled, also after a slide to a far item. |
 | `loop` | `boolean` | `false` | Past the last item comes the first, and back (with three items or more). |
 | `maxZoom` | `number` | `4` | How far a picture zooms, times its fitted size. |
-| `thumbnails` | `boolean` | `false` | A filmstrip of every item along the bottom: it follows the page, scrolls on its own at rest, and a press slides to that item. |
+| `thumbnails` | `boolean` | `false` | A filmstrip of every item along the bottom: it follows the page; after a scroll by the person it stays where it was left until the page turns, then glides back. A press slides to that item. |
 | `autoPlay` | `boolean` | `true` | A video starts once its page settles, muted where the browser refuses sound without a press. `false` — it waits for a press on its play disk. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the viewer. |
 | `closeOnOutsideClick` | `boolean` | `true` | A vertical swipe, or a mouse click on the stage past the media, closes the viewer. |
 | `getOrigin` | `(index: number) => Element \| null` | — | The element item `index` opens from and closes into (its thumbnail). Without it the viewer finds the picture showing the item's `thumbnail`, `src` or `poster`; with none on screen, it fades. |
 | `renderActions` | `(item: MediaViewerItem, index: number) => ReactNode` | — | Actions for the item on screen in the top bar, before the zoom and close buttons: `Button shape="circle" variant="shade"`, a ⋯ Dropdown. |
-| `labels` | `Partial<MediaViewerLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<MediaViewerLabels>` | — | Built-in strings, see Labels. |
 | `aria-label` | `string` | — | The name of the dialog; default `labels.viewer`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the `role="dialog"` element. |
 

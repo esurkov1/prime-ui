@@ -45,7 +45,7 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 | `defaultChecked` | `boolean` | `false` | Initial state when uncontrolled. |
 | `onCheckedChange` | `(checked: boolean) => void` | — | Called with the new state on every toggle (not while `readOnly`). |
 | `indeterminate` | `boolean` | `false` | Mixed state (a partial «select all»): a bar instead of the check; wins over `checked` visually and sets the native `indeterminate`. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`. |
 | `shape` | `"square" \| "circle"` | `"square"` | Outline of the box: `square` is the rounded square; `circle` is a full circle (a selection mark in lists and chats). Size, the check draw-in, the indeterminate bar and states are the same. |
 | `hint` | `ReactNode` | — | Help text under the label text. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
@@ -60,6 +60,10 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 
 ### Checkbox.Label
 `ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Checkbox.Indicator
 `ref` → `HTMLSpanElement`. The box alone, without an input (`aria-hidden`, no focus or clicks) for rows that carry the state themselves: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`.

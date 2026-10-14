@@ -49,7 +49,7 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `variant` | `"solid" \| "soft" \| "outline" \| "ghost" \| "shade"` | `"solid"` | Visual treatment: fill, soft fill, line or transparent. `shade` — the media shade with a light glyph for a button over a picture or video; with `tone="danger"` — the error disk. |
 | `shape` | `"square" \| "circle"` | `"square"` | Outline. `circle` — a disk as wide as it is tall, with only a `Button.Icon` inside; same tiers, tones and variants. Requires `aria-label`. |
 | `tone` | `"accent" \| "neutral" \| "success" \| "danger" \| "inherit"` | `"accent"` | Meaning: primary, secondary, done (`success`) or destructive (`danger`). `inherit` takes the host's text color for an action on a colored host; only with `ghost`, `soft` or `outline`. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. Without it the button takes the tier of its host (LoginForm, Popover, a field, a panel with a size), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. Without it the button takes the tier of its host (LoginForm, Popover, a field, a panel with a size), else `m`. |
 | `fullWidth` | `boolean` | — | Stretches to the container width. |
 | `loading` | `boolean` | `false` | Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content. |
 | `pressed` | `boolean` | — | A toggle button: `true` on, `false` off (`aria-pressed`). On takes the selected look, an accent soft fill that glides in and out. Leave it out for an ordinary action; a set of toggles is a ButtonGroup. |
@@ -61,7 +61,8 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Native button type; not forwarded with `asChild`. |
 | `disabled` | `boolean` | — | Disabled state; `loading` also disables. |
 | `children` | `ReactNode` | — | Label and `Button.Icon`. Only `Button.Icon` children → a square icon-only button that needs `aria-label`. A changed label morphs letter by letter. |
-| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size">` | — | `onClick`, `className`, `aria-*`, `data-*` and the other button attributes. |
+| `aria-label` | `string` | — | The name of a button without a visible label; required with `shape="circle"`. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size" \| "aria-pressed">` | — | `onClick`, `className`, `aria-*`, `data-*` and the other button attributes. |
 
 ### Button.Icon
 `ref` → `HTMLSpanElement`. Decorative icon wrapper (`aria-hidden`) sized to the button tier.
@@ -69,7 +70,8 @@ Button.Root        <button> (or the single child with asChild); variant, tone, s
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | The icon, e.g. `<Icon name="action.copy" />`; `Icon` without `size` takes the button tier. A new icon (another `name`) cross-fades in and plays its gesture once (`fast`). |
-| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
+| `className` | `string` | — | Class on the icon box. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
 
 ## Variants
 

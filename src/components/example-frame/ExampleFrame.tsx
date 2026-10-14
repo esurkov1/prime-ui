@@ -4,6 +4,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { useLabels } from "@/internal/labels";
 import {
   SurfaceDepthProvider,
   useNestedSurfaceDepth,
@@ -55,7 +56,7 @@ export type ExampleFrameLabels = {
   codeRegion: string;
 };
 
-const EXAMPLE_FRAME_LABELS: ExampleFrameLabels = {
+export const EXAMPLE_FRAME_LABELS: ExampleFrameLabels = {
   paneSwitch: "Вид примера",
   preview: "Превью",
   code: "Код",
@@ -211,7 +212,7 @@ export function ExampleFrame({
   ref,
   ...rest
 }: ExampleFrameProps) {
-  const labels = React.useMemo(() => ({ ...EXAMPLE_FRAME_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(EXAMPLE_FRAME_LABELS, labelsProp);
   const [pane, setPane] = React.useState<Pane>("preview");
   const [colorScheme, setColorScheme] = useControllableState({
     value: colorSchemeProp,

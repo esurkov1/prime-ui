@@ -41,7 +41,7 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### ProgressCircle
-`ref` → `HTMLDivElement` (the root). Props of both modes; pass either `value` (value mode) or `segments` (segments mode), never both.
+`ref` → `HTMLDivElement` (the root). Pass `value` (value mode: the svg is `role="progressbar"`, a track and one round-capped arc from the top) or `segments` (segments mode: the svg is `role="group"`, parts clockwise from the top), never both.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -49,29 +49,16 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 | `children` | `ReactNode` | — | Content in the center (number, percent, `Icon`): text from `m`, an icon from `s`, nothing on `xs`. A string or number also becomes `aria-valuetext`. |
 | `aria-label` | `string` | — | Accessible name of the ring (set on the svg). Always pass it. |
 | `loading` | `boolean` | `false` | The data is on its way: a Skeleton ring of the same diameter and stroke (and legend lines) that cross-fades into the data; the inner content waits, the root is `aria-busy`. |
+| `value` | `number \| null` | — | Value mode: the current value, clamped to `0…max`; it glides to a new value (`base`). `null` — under way, the share unknown: a quarter arc that always turns, no `aria-valuenow`. |
+| `spin` | `boolean` | `false` | Value mode: the ring turns at any share (one turn = 3 × `--prime-motion-loop`; slower under reduced motion, never still) and the arc never drops under 8%: a sync whose share grows. `null` always turns. |
+| `max` | `number` | `100` (value mode), the sum of the parts (segments mode) | Value mode: top of the scale. Segments mode: total capacity; the sum of the parts closes the ring, a larger `max` leaves the rest as track. |
+| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info" \| "inherit"` | `"accent"` | Value mode: arc color, telling the outcome. `inherit` — the arc in the host's text color over a 32% track of it, for a ring on a colored host or over media. |
+| `segments` | `ProgressSegment[]` | — | Segments mode: parts in order, `{ value, label?, tone? \| color? }`: `tone` names a meaning (default `accent`), `color` a category — its step of the chart palette. Each part's length is its share of `max`. |
+| `segmentGap` | `"none" \| "hairline"` | `"none"` | Segments mode: `none` — one continuous ring; `hairline` — every part and the rest are separate round arcs. |
+| `legend` | `boolean` | `false` | Segments mode: a legend beside the ring (below it when narrow), one row per part: color · name · value · share; with `aria-label` it becomes the group's description. The root turns into the row of ring and legend. |
+| `formatValue` | `(value: number) => string` | Russian digit groups | Segments mode: display of a part's value in the legend («38 ГБ»). |
+| `labels` | `Partial<ProgressCircleLabels>` | — | Segments mode: built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root. |
-
-### ProgressCircle · value mode
-The svg is `role="progressbar"`: a track and one round-capped arc from 12 o'clock.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `value` | `number \| null` | — (required) | The current value, clamped to `0…max`; it glides to a new value (`base`). `null` — under way, the share unknown: a quarter arc that always turns, no `aria-valuenow`. |
-| `spin` | `boolean` | `false` | The ring turns at any share (one turn = 3 × `--prime-motion-loop`; slower under reduced motion, never still) and the arc never drops under 8%: a sync whose share grows. `null` always turns. |
-| `max` | `number` | `100` | Top of the scale. |
-| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info" \| "inherit"` | `"accent"` | Arc color, telling the outcome. `inherit` — the arc in the host's text color over a 32% track of it, for a ring on a colored host or over media. |
-
-### ProgressCircle · segments mode
-The svg is `role="group"`: parts clockwise from the top, described by the legend or the distribution text.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `segments` | `ProgressSegment[]` | — (required) | Parts in order, `{ value, label?, tone? \| color? }`: `tone` names a meaning (default `accent`), `color` a category — its step of the chart palette. Each part's length is its share of `max`. |
-| `max` | `number` | — | Total capacity. Default: the sum of the parts (they close the ring); a larger `max` leaves the rest as track. |
-| `segmentGap` | `"none" \| "hairline"` | `"none"` | `none` — one continuous ring; `hairline` — every part and the rest are separate round arcs. |
-| `legend` | `boolean` | `false` | A legend beside the ring (below it when the row is narrow), one row per part: color · name · value · share; it becomes the group's description. The root turns into the row of ring and legend. |
-| `formatValue` | `(value: number) => string` | `Russian digit groups` | Display of a part's value in the legend («38 ГБ»). |
-| `labels` | `Partial<ProgressCircleLabels>` | — | Built-in strings, see Labels. |
 
 ## Variants
 

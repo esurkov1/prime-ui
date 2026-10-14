@@ -73,6 +73,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `surface` | `"none" \| "raised"` | `"none"` | `none` — layout only (inside a Popover or Card). `raised` — a standalone floating panel: raised background, panel radius and padding, overlay shadow. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the parts), `className` and the other div attributes. |
 
 ### ColorPicker.HexInput
 `ref` → `HTMLDivElement` (the field frame). The hex value as a kit Input field (label, hint, error); commits on blur / Enter and reverts invalid text.
@@ -82,7 +83,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `label` | `ReactNode` | — | Field label; defaults to `labels.hex`. |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; marks the field invalid. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Field tier. Without it the tier of its host (a panel, a popover), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier. Without it the tier of its host (a panel, a popover), else `m`. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
@@ -152,7 +153,8 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches `{ value, label }`; the label names the swatch. |
-| `…rest` | `Omit<ColorSwatchesProps, "value" \| "defaultValue" \| "onValueChange" \| "allowEmpty" \| "name">` | — | `label`, `size`, `aria-label`, `disabled`… |
+| `label · hint · error · invalid · required · optional · disabled · size · id · labels · aria-label · aria-labelledby · aria-describedby` | `ColorSwatchesProps` | — | As on `ColorSwatches`. |
+| `…rest` | `Omit<ColorSwatchesProps, "value" \| "defaultValue" \| "onValueChange" \| "allowEmpty" \| "name">` | — | `className` and the other attributes of the field frame. |
 
 ### ColorPicker.EyeDropperButton
 `ref` → `HTMLButtonElement`. A square soft kit Button that opens the native EyeDropper, named by `labels.eyeDropper`; without browser support it is disabled and hidden from assistive tech.
@@ -160,7 +162,8 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — | Custom content; default is the pipette icon. |
-| `…rest` | `Omit<ButtonRootProps, "variant" \| "tone" \| "size" \| "aria-label">` | — | The other Button props. |
+| `asChild · fullWidth · holdToConfirm · onConfirm · labels · loading · pressed · progress · shape` | `ButtonRootProps` | — | As on `Button.Root`. |
+| `…rest` | `Omit<ButtonRootProps, "variant" \| "tone" \| "size" \| "aria-label">` | — | `onClick`, `className` and the other button attributes. |
 
 ### ColorPresets.Root
 No DOM and no ref, except a field frame in a FieldList cell (the column heading as its label). A quick color from a fixed palette: a square trigger and a popover grid of presets.
@@ -175,11 +178,12 @@ No DOM and no ref, except a field frame in a FieldList cell (the column heading 
 | `onOpenChange` | `(open: boolean) => void` | — | Called when the panel opens or closes. |
 | `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches in panel order. |
 | `columns` | `number` | — | Grid columns; default one row for up to 8 presets (+ «no color»), else 8. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`. |
 | `disabled` | `boolean` | `false` | The trigger is disabled and does not open the panel. A disabled `Fieldset` around it sets it too. |
 | `allowEmpty` | `boolean` | `false` | Adds the «no color» swatch after the presets (value `null`). |
 | `closeOnSelect` | `boolean` | `true` | Close the panel after a pick (focus returns to the trigger). |
 | `labels` | `Partial<ColorPresetsLabels>` | — | Built-in strings, see Labels. |
+| `children` | `ReactNode` | — (required) | `ColorPresets.Trigger` and `ColorPresets.Content`. |
 
 ### ColorPresets.Trigger
 No DOM: clones the single child into the panel's trigger, merges `ref` and `onClick` (toggles), names it «`labels.trigger`: <color name>», sets `disabled` from the root and opens the panel on ArrowDown / ArrowUp. The child's own `aria-label`, `disabled` and handlers win.
@@ -290,13 +294,15 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - Area and sliders are React Aria primitives with their own `role="slider"` names.
-- `TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (ColorPresets.Trigger names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).
+- `TriggerSwatch` and `ColorPresets.Swatch` are `aria-hidden` — give the trigger button an `aria-label` (`ColorPresets.Trigger` names its element «`labels.trigger`: <color name>» unless the element has its own `aria-label`).
 - `ColorPicker.Swatches` is a `role="radiogroup"` (ColorSwatches): name it with `label` or `aria-label`.
 - The ColorPresets grid is `role="listbox"` with `role="option"` swatches (roving tabindex), named by the Content `label` or `labels.list`.
 - Channel fields are named by `labels` (`hue`, `red`…); HexInput by its label (`labels.hex` by default).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
+
+#### ColorPicker.Root
 
 | Key | Default | Used for |
 |---|---|---|
@@ -310,6 +316,25 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | `red` | `"Красный, 0–255"` | Red channel field. |
 | `green` | `"Зелёный, 0–255"` | Green channel field. |
 | `blue` | `"Синий, 0–255"` | Blue channel field. |
+
+#### ColorPicker.Swatches
+
+| Key | Default | Used for |
+|---|---|---|
+| `group` | `"Цвет"` | Name of the swatch group without a visible `label` and `aria-label`. |
+| `empty` | `"Без цвета"` | Name of the «no color» swatch (never shown here: the picker has no `allowEmpty`). |
+| `optional` | `"необязательно"` | Marker after the label when `optional`. |
+
+#### ColorPicker.EyeDropperButton
+
+| Key | Default | Used for |
+|---|---|---|
+| `holdHint` | `"Удерживайте, чтобы подтвердить"` | Description of the button with `holdToConfirm`. |
+
+#### ColorPresets.Root
+
+| Key | Default | Used for |
+|---|---|---|
 | `trigger` | `"Цвет"` | ColorPresets trigger name prefix: «<trigger>: <color name>»; in a FieldList cell the column heading. |
 | `list` | `"Цвета"` | ColorPresets swatch list name when `Content` has no `label`. |
 | `empty` | `"Без цвета"` | ColorPresets «no color» swatch and the trigger name for an empty value. |

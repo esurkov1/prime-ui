@@ -73,7 +73,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | `controls` | `boolean` | `false` | Native controls: a video message or a clip to watch in place; no play mark or duration of the kit. |
 | `autoPlay` | `boolean` | `false` | A GIF-like clip: plays muted, in a loop, inline. Off under `prefers-reduced-motion` (read once): the first frame stands still with the play mark. |
 | `fit` | `"cover" \| "contain"` | `"cover"` | `cover` crops to fill; `contain` letterboxes on the fallback fill. |
-| `formatDuration` | `(seconds: number) => string` | `m:ss (h:mm:ss from an hour)` | Display of the duration badge. |
+| `formatDuration` | `(seconds: number) => string` | `m:ss` (`h:mm:ss` from an hour) | Display of the duration badge. |
 | `…rest` | `Omit<VideoHTMLAttributes<HTMLVideoElement>, "src" \| "poster" \| "controls" \| "autoPlay" \| "muted" \| "loop" \| "children">` | — | `className`, `aria-label`, `onLoadedData`, `onError` and the other video attributes. |
 
 ### Thumbnail.Fallback

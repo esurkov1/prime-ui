@@ -1,11 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { NATIVE_SELECT_LABELS } from "./NativeSelect";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "NativeSelect",
-      en: "`ref` → `HTMLSelectElement`. The system `<select>` in the field look with the label row and the support row; the kit chevron over its end. + native `<select>` props except `size` and `multiple`.",
-      ru: "Системный `<select>` в виде поля: подпись, поле, строка поддержки.",
+      en: "`ref` → `HTMLSelectElement`. The system `<select>` in the field look with the label row and the support row; the kit chevron over its end.",
+      ru: "Системный `<select>` в виде поля со строкой подписи и строкой поддержки; шеврон кита поверх его конца.",
       props: [
         {
           name: "label",
@@ -88,7 +89,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "true",
           en: '`false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring.',
-          ru: "`false` скрывает кольцо фокуса, но не фокус и не кольцо ошибки.",
+          ru: '`false` скрывает кольцо фокуса, но не фокус и не кольцо ошибки. Атрибут — `data-focus-ring="false"`.',
         },
         {
           name: "labels",
@@ -112,14 +113,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(NATIVE_SELECT_LABELS, {
+    optional: {
       en: "Muted marker after the label when `optional`.",
       ru: "Приглушённая пометка после подписи при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

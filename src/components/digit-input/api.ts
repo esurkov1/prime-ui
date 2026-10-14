@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DIGIT_INPUT_LABELS } from "./DigitInput";
 
 export const api: ComponentApi = {
   parts: [
@@ -17,15 +18,15 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier: the cell is a square on its own scale, two steps above the control heights (36 · 40 · 48 · 56 · 64); label and hint follow the field tier. Without it the tier of its host (LoginForm, a panel), else `m`.",
-          ru: "Ярус: ячейка — квадрат своей шкалы, на две ступени крупнее контролов (36 · 40 · 48 · 56 · 64); подпись и подсказка — по ярусу поля.",
+          ru: "Ярус: ячейка — квадрат своей шкалы, на две ступени крупнее контролов (36 · 40 · 48 · 56 · 64); подпись и подсказка — по ярусу поля. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "label",
           type: "ReactNode",
           en: "Label above the cells; names the group (`aria-labelledby`) and focuses the first cell on click. Without it the group is named by `labels.group`.",
-          ru: "Подпись над ячейками; называет группу и по клику фокусирует первую ячейку. Без неё имя — `labels.group`.",
+          ru: "Подпись над ячейками; называет группу (`aria-labelledby`) и по клику фокусирует первую ячейку. Без неё имя — `labels.group`.",
         },
         {
           name: "required",
@@ -55,7 +56,7 @@ export const api: ComponentApi = {
           name: "invalid",
           type: "boolean",
           en: "Danger ring and danger digits on every cell, `aria-invalid`. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо и цифры, `aria-invalid`.",
+          ru: "Ошибка без текста: красное кольцо и цифры, `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "success",
@@ -133,13 +134,13 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "true",
           en: '`false` hides only the visual focus ring on the cells (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay.',
-          ru: "`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются.",
+          ru: '`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются. Атрибут — `data-focus-ring="false"`.',
         },
         {
           name: "id",
           type: "string",
           en: "Id of the first cell (the label points at it); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id первой ячейки (на неё указывает подпись); иначе генерируется.",
+          ru: "Id первой ячейки (на неё указывает подпись); иначе генерируется. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-describedby",
@@ -162,32 +163,24 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "group",
-      default: "Код",
+  labels: labelRows(DIGIT_INPUT_LABELS, {
+    group: {
       en: "Accessible name of the group when there is no visible `label`.",
-      ru: "Имя группы, когда нет видимой подписи.",
+      ru: "Имя группы, когда нет видимой `label`.",
     },
-    {
-      key: "cell",
-      default: "Цифра {index} из {length}",
+    cell: {
       en: "Accessible name of each cell; `{index}` (1-based) and `{length}` are replaced.",
       ru: "Имя каждой ячейки; `{index}` (с 1) и `{length}` подставляются.",
     },
-    {
-      key: "optional",
-      default: "необязательно",
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-    {
-      key: "failed",
-      default: "Неверный код",
+    failed: {
       en: "The error of a code whose `onComplete` promise rejected without a reason.",
       ru: "Ошибка кода, чей промис `onComplete` отклонён без причины.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -215,7 +208,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'The cells sit in a `<fieldset>` (`role="group"`) named by the `label` (`aria-labelledby`) or `labels.group`; clicking the label focuses the first cell.',
-        ru: 'Ячейки — в `<fieldset>` (`role="group"`), названном подписью (`aria-labelledby`) или `labels.group`; клик по подписи фокусирует первую ячейку.',
+        ru: 'Ячейки — в `<fieldset>` (`role="group"`), названном `label` (`aria-labelledby`) или `labels.group`; клик по подписи фокусирует первую ячейку.',
       },
       {
         en: 'Each cell is named by `labels.cell` («Цифра 1 из 6») and has `autocomplete="one-time-code"` and `inputmode="numeric"`, so SMS codes are suggested on phones.',
@@ -227,7 +220,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While a code is checked the group has `aria-busy`; the reason of a refused code is spoken by a polite live region.",
-        ru: "Пока код проверяется (промис из `onComplete`), у группы `aria-busy`, ячейки только для чтения; причина отказа объявляется вежливой live-областью.",
+        ru: "Пока код проверяется, у группы `aria-busy`; причина отказа объявляется вежливой live-областью.",
       },
       {
         en: "Paste and autofill of the whole code into any cell fill all cells.",

@@ -12,7 +12,7 @@ export type LabelLabels = {
   optional: string;
 };
 
-const LABEL_LABELS: LabelLabels = { optional: "необязательно" };
+export const LABEL_LABELS: LabelLabels = { optional: "необязательно" };
 
 export type LabelRootProps = Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size"> & {
   disabled?: boolean;

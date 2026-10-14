@@ -134,10 +134,10 @@ One look. The circle is the video; the play disk and the pills stand on the medi
 |---|---|---|
 | `player` | `"Видеосообщение"` | Name of the player group. |
 | `play` | `"Воспроизвести видеосообщение"` | Name of the play disk while it does not play. |
-| `pause` | `"Пауза"` | Name of the play disk while it plays. |
-| `position` | `"{current} из {duration}"` | The position: `{current}` and `{duration}` as m:ss. |
 | `unplayed` | `"Не просмотрено"` | Visually hidden text read while `unplayed`. |
 | `duration` | `"Длительность {duration}"` | The play disk's description before playback (during it, `position`). |
+| `pause` | `"Пауза"` | Name of the play disk while it plays. |
+| `position` | `"{current} из {duration}"` | The position: `{current}` and `{duration}` as m:ss. |
 | `transcribe` | `"Расшифровать"` | Name of the transcript button while the text is closed. |
 | `hideTranscript` | `"Скрыть расшифровку"` | Name of the transcript button while the text is open. |
 | `transcribeFailed` | `"Не удалось расшифровать сообщение"` | Announced when `onTranscribe` rejects. |

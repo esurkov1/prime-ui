@@ -57,18 +57,19 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 |---|---|---|---|
 | `items` | `readonly T[]` | — (required) | Items in their current order. |
 | `getId` | `(item: T) => string` | — (required) | Stable unique id; must match `Dnd.SortableItem id`. |
-| `getLabel` | `(item: T) => string` | `the id` | Spoken by the live region. |
+| `getLabel` | `(item: T) => string` | the `id` | Spoken by the live region. |
 | `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — (required) | Item `id` lands in front of `beforeId` (`null` = last); in linked lists `id` may come from another list. Apply it with `moveBefore`; return a promise to save on a server (a rejection moves the item back). |
 | `renderItem` | `(item: T, index: number) => ReactNode` | — (required) | Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release, so a shown position follows the gap. |
 | `children` | `ReactNode` | — | Content after the items that never moves and takes no drop position: an add tile at the end of a grid. Inside `ul` / `ol` it must be `li`. |
 | `axis` | `"x" \| "y" \| "grid"` | `"y"` | A column, a single row, or a wrapping grid (`display: grid`; the host sets the tracks and the cells' size, the gap takes a cell). Keyboard: Alt + ↑ / ↓ in a column, Alt + ← / → in a row and a grid. |
 | `handle` | `boolean` | `false` | Only `Dnd.Handle` starts a drag; the rest of the item stays free for clicks and text selection. |
 | `disabled` | `boolean` | `false` | No drag, no keyboard reorder. |
-| `kind` | `string` | `unique per list` | Lists sharing a `kind` exchange items (a board): by pointer at an exact position, by keyboard with Alt + the arrows across the axis. Name each list: the name is spoken on a move. |
+| `kind` | `string` | unique per list | Lists sharing a `kind` exchange items (a board): by pointer at an exact position, by keyboard with Alt + the arrows across the axis. Name each list: the name is spoken on a move. |
 | `canDrop` | `(id: string) => boolean \| string` | — | Refuses an item by id: `false`, or a string that says why (spoken and shown under the carried copy). The list turns `danger` before the release. |
 | `empty` | `ReactNode` | — | Shown while the list has no items; fades out when a gap opens in the list, so the gap takes its place. |
 | `as` | `"div" \| "ul" \| "ol" \| "tbody"` | `"div"` | Root element; `ul` / `ol` render items as `li`, `tbody` as table rows `tr`. |
 | `header` | `ReactNode` | — | Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`. |
+| `aria-label` | `string` | — | Accessible name of the list. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children">` | — | `className` (the list layout), `aria-label` (the name of the list) and the other attributes of the list element. |
 
 ### Dnd.SortableItem
@@ -79,7 +80,9 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `id` | `string` | — (required) | The item id (same as `getId`). |
 | `disabled` | `boolean` | `false` | This item cannot be dragged or moved (others may still move past it). |
 | `locked` | `boolean` | `false` | Holds its place: it does not move and nothing is put where it would shift it. Its `Dnd.Handle` turns into a lock. A pinned first row, a system column. |
-| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `className` (the row look: fill, radius, padding), `aria-labelledby` / `aria-describedby` (the visible title and description) and the other attributes. |
+| `className` | `string` | — | The row look: fill, radius, padding. |
+| `children` | `ReactNode` | — | The row content. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `aria-labelledby` / `aria-describedby` (the visible title and description) and the other attributes. |
 
 ### Dnd.Handle
 `ref` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button; a press always starts the drag, Alt + arrows on it move its item. In a `locked` item it is a lock instead.
@@ -97,12 +100,14 @@ Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. An item carried onto a 
 | `kind` | `string` | — (required) | What it is; zones accept by kind. |
 | `id` | `string` | — (required) | Unique within its kind. |
 | `data` | `TData` | — | Payload handed to the zone's `onDrop`. |
-| `label` | `string` | `the id` | Spoken by the live region. |
+| `label` | `string` | the `id` | Spoken by the live region. |
 | `disabled` | `boolean` | `false` | Not draggable. |
 | `handle` | `boolean` | `false` | Only a `Dnd.Handle` inside starts the drag. |
 | `as` | `"div" \| "li" \| "span" \| "article" \| "section"` | `"div"` | Element. |
 | `onDragStart` | `(item, point, origin) => void` | — | Fired once the press became a drag. |
 | `onDragEnd` | `(item, outcome: "drop" \| "release" \| "cancel") => void` | — | Always fired at the end. |
+| `className` | `string` | — | Class on the item. |
+| `children` | `ReactNode` | — | The item content. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id" \| "onDragStart" \| "onDragEnd">` | — | `className` and the other attributes. |
 
 ### Dnd.DropZone
@@ -117,10 +122,16 @@ Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element
 | `flashOnDrop` | `boolean` | `false` | Flashes the zone after a drop. |
 | `disabled` | `boolean` | `false` | Not a target. |
 | `as` | `"div" \| "section" \| "li" \| "ul" \| "ol" \| "span"` | `"div"` | Element. |
-| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "onDrop">` | — | `className` (the zone's own look) and the other attributes. |
+| `className` | `string` | — | The zone look. |
+| `children` | `ReactNode` | — | The zone content. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "onDrop">` | — | The other attributes. |
 
-### moveBefore
-`moveBefore(items, id, beforeId, getId)` returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.
+### Functions
+
+#### `moveBefore(items, id, beforeId, getId)`
+`<T>(items: readonly T[], id: string, beforeId: string \| null, getId: (item: T) => string) => T[]`
+
+Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.
 
 ## Variants
 

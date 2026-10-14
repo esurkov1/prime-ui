@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { parseInline, parseRichText, RichText, safeHref } from "./richText";
 
+const LABELS = { spoiler: "Скрытый текст" };
+
 describe("parseInline", () => {
   it("parses bold, italic, strike and code", () => {
     expect(parseInline("**счёт** _срочно_ ~~вчера~~ `INV-204`")).toEqual([
@@ -77,27 +79,33 @@ describe("parseRichText", () => {
 
 describe("RichText", () => {
   it("renders elements, never HTML", () => {
-    const { container } = render(<RichText source={'<img src=x onerror="alert(1)"> **жирный**'} />);
+    const { container } = render(
+      <RichText labels={LABELS} source={'<img src=x onerror="alert(1)"> **жирный**'} />,
+    );
     expect(container.querySelector("img")).toBeNull();
     expect(container.querySelector("strong")?.textContent).toBe("жирный");
     expect(container.textContent).toContain("<img");
   });
 
   it("opens links in a new tab without the opener", () => {
-    const { getByRole } = render(<RichText source="https://prime.app" />);
+    const { getByRole } = render(<RichText labels={LABELS} source="https://prime.app" />);
     const link = getByRole("link");
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
 
   it("puts `end` at the end of the last text line", () => {
-    const { container } = render(<RichText source={"Привет\nкак дела"} end={<i data-end="" />} />);
+    const { container } = render(
+      <RichText labels={LABELS} source={"Привет\nкак дела"} end={<i data-end="" />} />,
+    );
     const paragraph = container.querySelector("p");
     expect(paragraph?.lastElementChild).toHaveAttribute("data-end");
   });
 
   it("puts `end` on its own line after a code block", () => {
-    const { container } = render(<RichText source={"```\nls\n```"} end={<i data-end="" />} />);
+    const { container } = render(
+      <RichText labels={LABELS} source={"```\nls\n```"} end={<i data-end="" />} />,
+    );
     expect(container.lastElementChild?.tagName).toBe("P");
     expect(container.querySelector("p [data-end]")).not.toBeNull();
   });
@@ -106,7 +114,7 @@ describe("RichText", () => {
 describe("RichText highlight", () => {
   it("marks every match, inside emphasis too, case-insensitively", () => {
     const { container } = render(
-      <RichText source="Счёт **INV-2048** и ещё счёт: inv-2049" highlight="inv" />,
+      <RichText labels={LABELS} source="Счёт **INV-2048** и ещё счёт: inv-2049" highlight="inv" />,
     );
     const marks = Array.from(container.querySelectorAll("mark")).map((mark) => mark.textContent);
     expect(marks).toEqual(["INV", "inv"]);
@@ -114,14 +122,18 @@ describe("RichText highlight", () => {
   });
 
   it("marks nothing without a query", () => {
-    const { container } = render(<RichText source="Счёт INV-2048" highlight="  " />);
+    const { container } = render(
+      <RichText labels={LABELS} source="Счёт INV-2048" highlight="  " />,
+    );
     expect(container.querySelector("mark")).toBeNull();
   });
 });
 
 describe("RichText spoiler", () => {
   it("is a button named «Скрытый текст» that hides its words until pressed", () => {
-    const { container } = render(<RichText source="Пароль: ||Prime-2048|| до пятницы" />);
+    const { container } = render(
+      <RichText labels={LABELS} source="Пароль: ||Prime-2048|| до пятницы" />,
+    );
     const spoiler = screen.getByRole("button", { name: "Скрытый текст" });
     expect(spoiler).toHaveAttribute("tabindex", "0");
     expect(spoiler).toHaveAttribute("data-state", "masked");
@@ -134,7 +146,7 @@ describe("RichText spoiler", () => {
   });
 
   it("Enter and Space reveal it and move the focus onto the text", () => {
-    const { container } = render(<RichText source="||первый|| и ||второй||" />);
+    const { container } = render(<RichText labels={LABELS} source="||первый|| и ||второй||" />);
     const [first, second] = screen.getAllByRole("button", { name: "Скрытый текст" });
     first.focus();
     fireEvent.keyDown(first, { key: "Enter" });
@@ -147,7 +159,11 @@ describe("RichText spoiler", () => {
 
   it("keeps links and search marks out of the mask, then shows them", () => {
     const { container } = render(
-      <RichText source="||[счёт](https://prime.app/i/1) к оплате||" highlight="счёт" />,
+      <RichText
+        labels={LABELS}
+        source="||[счёт](https://prime.app/i/1) к оплате||"
+        highlight="счёт"
+      />,
     );
     expect(container.querySelector("a")).toBeNull();
     expect(container.querySelector("mark")).toBeNull();

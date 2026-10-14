@@ -1,10 +1,11 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DATA_TABLE_LABELS } from "./DataTable";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "DataTable",
-      en: "Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.",
+      en: "Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.",
       ru: "Блок с заливкой карточки: панель сверху, прокручиваемая `<table>` и подвал (диапазон, Pagination, статус догрузки); передаёт ярус контролам внутри.",
       props: [
         {
@@ -257,7 +258,10 @@ export const api: ComponentApi = {
         {
           name: "scrollHeight",
           type: 'number | string | "fill"',
-          default: '360 with paging="infinite"',
+          defaultNote: {
+            en: '`360` with `paging="infinite"`, else none',
+            ru: '`360` при `paging="infinite"`, иначе нет',
+          },
           en: 'Max height of the scroll viewport (number = px); `"fill"` — the table takes the height of its flex / grid parent (or a sized block), the rows scroll inside, infinite paging follows it.',
           ru: 'Максимальная высота области прокрутки (число — px); `"fill"` — таблица занимает высоту flex / grid-родителя (или блока с высотой), строки прокручиваются внутри, бесконечная прокрутка работает в ней.',
         },
@@ -339,7 +343,7 @@ export const api: ComponentApi = {
         {
           name: "isRowClickable",
           type: "(row: Row) => boolean",
-          default: "every row",
+          defaultNote: { en: "every row", ru: "каждая строка" },
           en: "Which rows open (`getRowHref` and `onRowClick` alike); `false` for a total or a service row — no link, no focus, no cursor.",
           ru: "Какие строки открываются (и `getRowHref`, и `onRowClick`); `false` — для итоговой или служебной строки: без ссылки, фокуса и курсора.",
         },
@@ -352,7 +356,7 @@ export const api: ComponentApi = {
         {
           name: "renderGroupHeader",
           type: "(group: DataTableGroup<Row>) => ReactNode",
-          default: "the group key",
+          defaultNote: { en: "the group key", ru: "ключ группы" },
           en: "Content of a group header; `group.rows` holds every row of the group (all pages) for totals. Children are laid out start / end in the visible width.",
           ru: "Содержимое заголовка группы; в `group.rows` все строки группы (со всех страниц) для итогов. Дети раскладываются по краям видимой ширины.",
         },
@@ -388,17 +392,23 @@ export const api: ComponentApi = {
           ru: "Системные строки, см. «Доступность».",
         },
         {
+          name: "className",
+          type: "string",
+          en: "Class on the root `<div>`.",
+          ru: "Класс на корневом `<div>`.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
-          en: "`className` and the other attributes of the root `<div>`.",
-          ru: "`className` и остальные атрибуты корневого `<div>`.",
+          en: "The other attributes of the root `<div>`.",
+          ru: "Остальные атрибуты корневого `<div>`.",
         },
       ],
     },
     {
       name: "DataTable.ColumnsMenu",
       en: "`ref` → `HTMLButtonElement` (the trigger). The column chooser of the table it sits in: a Button opening a Dropdown with a check item per column. Writes the table's hidden columns; throws outside a DataTable `toolbar`.",
-      ru: "`ref` → `HTMLButtonElement` (кнопка). Выбор колонок той таблицы, в которой стоит: кнопка открывает Dropdown с пунктом-флажком на каждую колонку. Меняет скрытые колонки таблицы; вне `toolbar` DataTable бросает ошибку.",
+      ru: "Выбор колонок той таблицы, в которой стоит: кнопка открывает Dropdown с пунктом-флажком на каждую колонку. Меняет скрытые колонки таблицы; вне `toolbar` DataTable бросает ошибку.",
       props: [
         {
           name: "side",
@@ -422,11 +432,13 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  types: [
     {
       name: "DataTableColumn<Row>",
       en: "One column of `columns`: data, not a part.",
       ru: "Одна колонка из `columns`: данные, а не часть разметки.",
-      props: [
+      fields: [
         {
           name: "id",
           type: "string",
@@ -474,7 +486,10 @@ export const api: ComponentApi = {
         {
           name: "align",
           type: '"start" | "center" | "end"',
-          default: '"start" ("end" with numeric)',
+          defaultNote: {
+            en: '`"start"` (`"end"` with `numeric`)',
+            ru: '`"start"` (`"end"` при `numeric`)',
+          },
           en: "Cell alignment; heads do not follow it.",
           ru: "Выравнивание ячеек; заголовки за ним не следуют.",
         },
@@ -525,110 +540,75 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "loading",
-      default: "Загрузка данных…",
+  labels: labelRows(DATA_TABLE_LABELS, {
+    loading: {
       en: "Screen-reader status while skeleton rows are shown.",
       ru: "Статус для скринридера, пока видны скелетоны.",
     },
-    {
-      key: "empty",
-      default: "Нет данных для отображения.",
-      en: "Default empty-state text.",
-      ru: "Текст пустого состояния по умолчанию.",
-    },
-    {
-      key: "range",
-      default: "Показано {from}–{to} из {total}",
+    empty: { en: "Default empty-state text.", ru: "Текст пустого состояния по умолчанию." },
+    range: {
       en: "Footer range line; `{from}`, `{to}`, `{total}` are replaced.",
       ru: "Строка диапазона в подвале; `{from}`, `{to}`, `{total}` заменяются.",
     },
-    {
-      key: "loadingMore",
-      default: "Догружаем строки…",
+    loadingMore: {
       en: "Footer status while `loadingMore`.",
       ru: "Статус в подвале при `loadingMore`.",
     },
-    {
-      key: "scrollForMore",
-      default: "Прокрутите вниз для загрузки",
+    scrollForMore: {
       en: "Footer hint when more rows can appear by scrolling.",
       ru: "Подсказка в подвале, когда прокрутка добавит строки.",
     },
-    {
-      key: "selectAll",
-      default: "Выбрать все строки",
+    selectAll: {
       en: "Name of the head «select all» checkbox.",
       ru: "Имя флажка «выбрать все» в шапке.",
     },
-    {
-      key: "selectRow",
-      default: "Выбрать строку {label}",
+    selectRow: {
       en: "Name of a row checkbox; `{label}` is `getRowLabel(row)`, empty without it.",
       ru: "Имя флажка строки; `{label}` — `getRowLabel(row)`, без него пусто.",
     },
-    {
-      key: "selectedCount",
-      default: "Выбрано: {count}",
+    selectedCount: {
       en: "Polite announcement after the selection changes.",
       ru: "Вежливое объявление после смены выбора.",
     },
-    {
-      key: "expand",
-      default: "Развернуть строку {label}",
+    expand: {
       en: "Name of the toggle of a collapsed row.",
       ru: "Имя переключателя свёрнутой строки.",
     },
-    {
-      key: "collapse",
-      default: "Свернуть строку {label}",
+    collapse: {
       en: "Name of the toggle of an expanded row.",
       ru: "Имя переключателя раскрытой строки.",
     },
-    {
-      key: "columns",
-      default: "Колонки",
+    columns: {
       en: "Text of the `DataTable.ColumnsMenu` trigger; `{shown}` and `{total}` are column counts.",
       ru: "Текст кнопки `DataTable.ColumnsMenu`; `{shown}` и `{total}` — число колонок.",
     },
-    {
-      key: "showAllColumns",
-      default: "Показать все",
+    showAllColumns: {
       en: "The `DataTable.ColumnsMenu` item that shows every column again.",
       ru: "Пункт `DataTable.ColumnsMenu`, который возвращает все колонки.",
     },
-    {
-      key: "reorderRow",
-      default: "Переместить строку {label}",
+    reorderRow: {
       en: "`aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`.",
       ru: "`aria-label` ручки строки (`onReorder`); `{label}` — `getRowLabel(row)`.",
     },
-    {
-      key: "reorderSorted",
-      default: "Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки",
+    reorderSorted: {
       en: "Tooltip of the disabled handles while the table is sorted by a column.",
       ru: "Подсказка неактивных ручек, пока таблица отсортирована по колонке.",
     },
-    {
-      key: "expandGroup",
-      default: "Развернуть группу {group}",
+    expandGroup: {
       en: "Name of the toggle of a collapsed group; `{group}` is the group key.",
       ru: "Имя переключателя свёрнутой группы; `{group}` — ключ группы.",
     },
-    {
-      key: "collapseGroup",
-      default: "Свернуть группу {group}",
+    collapseGroup: {
       en: "Name of the toggle of an expanded group; `{group}` is the group key.",
       ru: "Имя переключателя развёрнутой группы; `{group}` — ключ группы.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
         keys: "Tab",
         en: "Moves through the toolbar (`DataTable.ColumnsMenu`), sort buttons, row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination.",
-        ru: "Переходит по кнопкам сортировки, флажкам, переключателям, ссылкам строк и строкам, которые открываются на месте.",
+        ru: "Переходит по панели (`DataTable.ColumnsMenu`), кнопкам сортировки, ручкам строк, флажкам, переключателям раскрытия, ссылкам строк, строкам, которые открываются на месте, и Pagination.",
       },
       {
         keys: "Enter · Space",
@@ -659,11 +639,11 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'Native `<table>` semantics; head cells are `scope="col"` (the empty handle-column cell is a `<td>`); sortable heads hold a `<button>` and expose `aria-sort`; the whole head cell shows the inset focus ring.',
-        ru: 'Нативная `<table>`; заголовки — `scope="col"`, у сортируемых — `<button>` и `aria-sort`.',
+        ru: 'Семантика нативной `<table>`; заголовки — `scope="col"` (пустая ячейка колонки ручек — `<td>`); у сортируемых — `<button>` и `aria-sort`; вся ячейка заголовка показывает внутреннее кольцо фокуса.',
       },
       {
         en: 'A link row has one link for assistive tech: the `<a>` in the key cell, named by its text. Its copies over the other cells are `aria-hidden` and `tabindex="-1"`, so the pointer can use the whole row. An in-place row is focusable itself (`tabindex="0"`) and reads as its cells. Either way the focused row shows a ring around all its cells.',
-        ru: "Строка-ссылка: в ключевой ячейке настоящий `<a>` с именем из её текста; копии ссылки в остальных ячейках скрыты (`aria-hidden`, `tabindex=-1`). Строка, которая открывается на месте, получает фокус; фокус обводит всю строку.",
+        ru: 'Строка-ссылка: в ключевой ячейке настоящий `<a>` с именем из её текста; копии ссылки в остальных ячейках скрыты (`aria-hidden`, `tabindex="-1"`), поэтому указатель работает по всей строке. Строка, которая открывается на месте, сама фокусируется (`tabindex="0"`) и читается как свои ячейки; фокус обводит всю строку.',
       },
       {
         en: "A row never opens from a control inside it (links, buttons, fields, `label`, `summary`, ARIA widgets, `data-row-click-ignore`), from a text selection, or from a React event that bubbled out of a portal (a ⋯ menu item).",

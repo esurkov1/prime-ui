@@ -1,11 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { TABS_LABELS } from "./Tabs";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Tabs.Root",
       en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation; no surface of its own — it stands in the host's padding. In a Modal or Drawer it wraps `X.Header` (with `Tabs.List` last) and `X.Body`.",
-      ru: "Хранит активную вкладку, размер и направление; своей поверхности нет — стоит в отступах хоста. В Modal и Drawer оборачивает `X.Header` (с `Tabs.List` последним) и `X.Body`.",
+      ru: "`<div>`, который хранит активную вкладку, размер и направление; своей поверхности нет — стоит в отступах хоста. В Modal и Drawer оборачивает `X.Header` (с `Tabs.List` последним) и `X.Body`.",
       props: [
         {
           name: "value",
@@ -57,14 +58,14 @@ export const api: ComponentApi = {
         {
           name: "minItemWidth",
           type: "number | string",
-          default: "2.5 × control height",
+          defaultNote: { en: "2.5 × control height", ru: "2,5 × высота контрола" },
           en: "Narrowest a horizontal tab with a label gets, px or a CSS length; a tab is also never narrower than its content (up to `maxItemWidth`).",
           ru: "Наименьшая ширина горизонтальной вкладки с подписью, px или CSS-длина; вкладка к тому же не уже своего содержимого (до `maxItemWidth`).",
         },
         {
           name: "maxItemWidth",
           type: "number | string",
-          default: "7 × control height",
+          defaultNote: { en: "7 × control height", ru: "7 × высота контрола" },
           en: 'Widest a horizontal tab gets, px or a CSS length (`"none"` lifts the cap); a longer label ends with an ellipsis.',
           ru: 'Наибольшая ширина горизонтальной вкладки, px или CSS-длина (`"none"` снимает предел); длиннее — подпись обрезается многоточием.',
         },
@@ -150,7 +151,7 @@ export const api: ComponentApi = {
     {
       name: "Tabs.Icon",
       en: "`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`) before the label; muted, accent on the active tab. Hidden first when tabs do not fit; the last thing left when nothing else fits.",
-      ru: "Декоративная иконка перед подписью; приглушённая, на активной вкладке — акцентная. Скрывается первой, когда вкладки не помещаются; остаётся последней, когда не помещается ничего другого.",
+      ru: "Декоративная иконка (`aria-hidden`) перед подписью; приглушённая, на активной вкладке — акцентная. Скрывается первой, когда вкладки не помещаются; остаётся последней, когда не помещается ничего другого.",
       props: [
         {
           name: "children",
@@ -274,14 +275,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "remove",
-      default: "Закрыть вкладку «{label}»",
+  labels: labelRows(TABS_LABELS, {
+    remove: {
       en: "Accessible name of the close button of a removable tab; `{label}` is the tab title (its value when the title is not text).",
       ru: "Имя кнопки закрытия вкладки; `{label}` — подпись вкладки (её значение, если подпись не текст).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

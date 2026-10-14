@@ -39,7 +39,7 @@ export type FieldListLabels = {
   maxReached: string;
 };
 
-const FIELD_LIST_LABELS: FieldListLabels = {
+export const FIELD_LIST_LABELS: FieldListLabels = {
   remove: "Удалить {row}",
   reorder: "Переместить {row}",
   row: "строку {index}",

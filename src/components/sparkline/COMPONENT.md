@@ -57,13 +57,13 @@ compact:               the plot alone (no head, no value row); loading — the p
 | `layout` | `"default" \| "compact"` | `"default"` | `default` — the headline over an 80 px plot; `compact` — the plot alone at an `xs` control height with the dot at rest, for a DataTable cell; the scrubbed point shows in the tooltip and `aria-valuetext`. |
 | `change` | `"previous" \| "first" \| "none"` | `"previous"` | What the change badge of a shown point compares it with: `previous` — the point before it; `first` — the first point with a value (the change over the period); `none` — no badge. |
 | `summary` | `"latest" \| "sum" \| "average"` | `"latest"` | What the headline shows at rest: `latest` — the latest point (or `highlight`), for a level (MRR, conversion); `sum` — the period total, for a flow (revenue per day); `average` — the period mean. |
-| `highlight` | `number` | `the latest point with a value` | Index of the point at rest with `summary="latest"` (the current month): the headline returns to it; `bars` draw the other bars quieter. Not allowed with `sum` / `average`. |
+| `highlight` | `number` | the latest point with a value | Index of the point at rest with `summary="latest"` (the current month): the headline returns to it; `bars` draw the other bars quieter. Not allowed with `sum` / `average`. |
 | `compareTo` | `number` | — | The same summary for the previous period («прошлые 30 дней»): the badge at rest compares the headline with it. Without it a `sum` / `average` headline shows no change at rest. |
 | `min` | `number` | — | The value axis reaches down to at least this value: a floor of zero, or one scale for several sparklines (a table column). Data below widens the scale, never gets cut. |
 | `max` | `number` | — | The value axis reaches up to at least this value; data above widens the scale. |
 | `reference` | `number` | — | A dashed horizontal line at this value — a plan, a target, an average; the scale holds it and the chart is described by `labels.reference`. |
 | `loading` | `boolean` | `false` | The series is on its way: Skeletons of the date, the value and the plot that cross-fade into the data; the title stays, the root is `aria-busy` and the chart is not focusable yet. |
-| `formatValue` | `(value: number) => string` | `Russian digit groups` | Display of a value in the headline, the tooltip, the reference description and the spoken point («312 400 ₽»). |
+| `formatValue` | `(value: number) => string` | Russian digit groups | Display of a value in the headline, the tooltip, the reference description and the spoken point («312 400 ₽»). |
 | `labels` | `Partial<SparklineLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className`, `data-*` and the other div attributes on the root. |
 

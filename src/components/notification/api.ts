@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { NOTIFICATION_LABELS } from "./Notification";
 
 const POSITION =
   '"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"';
@@ -88,41 +89,32 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "useNotifications()",
-      en: "Must be called inside `NotificationProvider`; returns the store.",
-      ru: "Вызывается внутри `NotificationProvider`; возвращает хранилище.",
+      name: "NotificationCard",
+      en: '`ref` → `HTMLElement`. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.',
+      ru: 'Статичная карточка `<article role="status|alert">` без таймера: подтверждения на месте, документация, макеты.',
       props: [
+        ...CONTENT,
         {
-          name: "notify",
-          type: "(options: NotificationOptions) => string",
-          en: "Shows a toast and returns its id.",
-          ru: "Показывает уведомление и возвращает его id.",
-        },
-        {
-          name: "dismiss",
-          type: "(id: string) => void",
-          en: "Closes one toast with its exit animation.",
-          ru: "Закрывает одно уведомление с анимацией ухода.",
-        },
-        {
-          name: "dismissAll",
+          name: "onDismiss",
           type: "() => void",
-          en: "Closes every toast.",
-          ru: "Закрывает все уведомления.",
+          en: "Shows the close button and is called on its click.",
+          ru: "Показывает кнопку закрытия и вызывается по клику.",
         },
         {
-          name: "items",
-          type: "NotificationRecord[]",
-          en: "Active toasts (without the ones playing their exit).",
-          ru: "Активные уведомления (без уходящих).",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLElement>, "title" | "children" | "role">',
+          en: "`className` and the other attributes of the `<article>`.",
+          ru: "`className` и остальные атрибуты `<article>`.",
         },
       ],
     },
+  ],
+  types: [
     {
-      name: "notify(options)",
-      en: "`NotificationOptions`: what the toast shows and how it closes.",
-      ru: "`NotificationOptions`: что показывает уведомление и как оно закрывается.",
-      props: [
+      name: "NotificationOptions",
+      en: "The argument of `notify(options)`: what the toast shows and how it closes.",
+      ru: "Аргумент `notify(options)`: что показывает уведомление и как оно закрывается.",
+      fields: [
         ...CONTENT,
         {
           name: "position",
@@ -159,71 +151,42 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  functions: [
     {
-      name: "NotificationCard",
-      en: '`ref` → `HTMLElement`. A static `<article role="status|alert">` card without a timer: inline confirmations, docs, mockups.',
-      ru: 'Статичная карточка `<article role="status|alert">` без таймера: подтверждения на месте, документация, макеты.',
-      props: [
-        ...CONTENT,
-        {
-          name: "onDismiss",
-          type: "() => void",
-          en: "Shows the close button and is called on its click.",
-          ru: "Показывает кнопку закрытия и вызывается по клику.",
-        },
-        {
-          name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLElement>, "title" | "children" | "role">',
-          en: "`className` and the other attributes of the `<article>`.",
-          ru: "`className` и остальные атрибуты `<article>`.",
-        },
-      ],
+      name: "useNotifications()",
+      type: "() => { notify: (options: NotificationOptions) => string; dismiss: (id: string) => void; dismissAll: () => void; items: NotificationRecord[] }",
+      en: "Called inside `NotificationProvider`; returns the store: `notify(options)` shows a toast and returns its id, `dismiss(id)` closes one with its exit animation, `dismissAll()` closes every toast, `items` holds the active toasts (without the ones playing their exit).",
+      ru: "Вызывается внутри `NotificationProvider`; возвращает хранилище: `notify(options)` показывает уведомление и возвращает его id, `dismiss(id)` закрывает одно с анимацией ухода, `dismissAll()` закрывает все, `items` — активные уведомления (без уходящих).",
     },
   ],
-  labels: [
-    {
-      key: "close",
-      default: "Закрыть уведомление",
-      en: "`aria-label` of the close button.",
-      ru: "`aria-label` кнопки закрытия.",
-    },
-    {
-      key: "regionTopLeft",
-      default: "Уведомления сверху слева",
+  labels: labelRows(NOTIFICATION_LABELS, {
+    close: { en: "`aria-label` of the close button.", ru: "`aria-label` кнопки закрытия." },
+    regionTopLeft: {
       en: "Name of the top-left toast list.",
       ru: "Имя списка уведомлений сверху слева.",
     },
-    {
-      key: "regionTopCenter",
-      default: "Уведомления сверху по центру",
+    regionTopCenter: {
       en: "Name of the top-center toast list.",
       ru: "Имя списка уведомлений сверху по центру.",
     },
-    {
-      key: "regionTopRight",
-      default: "Уведомления сверху справа",
+    regionTopRight: {
       en: "Name of the top-right toast list.",
       ru: "Имя списка уведомлений сверху справа.",
     },
-    {
-      key: "regionBottomLeft",
-      default: "Уведомления снизу слева",
+    regionBottomLeft: {
       en: "Name of the bottom-left toast list.",
       ru: "Имя списка уведомлений снизу слева.",
     },
-    {
-      key: "regionBottomCenter",
-      default: "Уведомления снизу по центру",
+    regionBottomCenter: {
       en: "Name of the bottom-center toast list.",
       ru: "Имя списка уведомлений снизу по центру.",
     },
-    {
-      key: "regionBottomRight",
-      default: "Уведомления снизу справа",
+    regionBottomRight: {
       en: "Name of the bottom-right toast list.",
       ru: "Имя списка уведомлений снизу справа.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -240,7 +203,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'Each stack is an `<ol>` named by the region label of its position; each card is an `<article>`: `role="status"` + `aria-live="polite"`, or `role="alert"` + `aria-live="assertive"` for `warning` / `danger`.',
-        ru: 'Каждая стопка — `<ol>` с именем из `labels` для своей позиции; карточка — `<article>` с `role="status"` (`aria-live="polite"`) или `role="alert"` для danger и warning.',
+        ru: 'Каждая стопка — `<ol>` с именем области своей позиции; карточка — `<article>`: `role="status"` + `aria-live="polite"` или `role="alert"` + `aria-live="assertive"` для `warning` / `danger`.',
       },
       {
         en: "The icon and the countdown are `aria-hidden`; the close button is named by `labels.close`.",

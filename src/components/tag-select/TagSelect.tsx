@@ -69,7 +69,7 @@ export type TagSelectLabels = {
   optional: string;
 };
 
-const TAG_SELECT_LABELS: TagSelectLabels = {
+export const TAG_SELECT_LABELS: TagSelectLabels = {
   panelHint: "Выберите вариант или создайте новый",
   create: "Создать",
   remove: "Удалить {label}",

@@ -2,7 +2,7 @@ import { autoScrollStep, scrollableAncestors } from "@/internal/edgeAutoScroll";
 import { formatLabel } from "@/internal/formatLabel";
 import { distanceBetween, type Point, type Rect, rectContains, rectOf } from "./geometry";
 
-import { type DndLabels, defaultDndLabels } from "./labels";
+import { DND_LABELS, type DndLabels } from "./labels";
 import { createStore, type Store } from "./store";
 
 /**
@@ -163,7 +163,7 @@ export type DragController = {
 const area = (rect: Rect) => rect.width * rect.height;
 
 export function createDragController(
-  getLabels: () => DndLabels = () => defaultDndLabels,
+  getLabels: () => DndLabels = () => DND_LABELS,
 ): DragController {
   const store = createStore<DragSnapshot>(IDLE_SNAPSHOT);
   const targets = new Set<DropTargetEntry>();

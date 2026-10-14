@@ -7,8 +7,8 @@ import { GlyphSwap } from "@/internal/glyphSwap";
 import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
 import palette from "@/internal/palette.module.css";
 import {
-  DEFAULT_PROGRESS_SEGMENTS_LABELS,
   formatProgressValue,
+  PROGRESS_SEGMENTS_LABELS,
   type ProgressModeProps,
   type ProgressSegment,
   type ProgressSegmentsLabels,
@@ -200,7 +200,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
   if (segmentsProp) {
     const gap = segmentGap;
     const resolved = resolveSegments(segmentsProp, maxProp, {
-      ...DEFAULT_PROGRESS_SEGMENTS_LABELS,
+      ...PROGRESS_SEGMENTS_LABELS,
       ...labels,
     });
     const { segments, total, rest: free, scale, text } = resolved;

@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { CHART_FRAME_LABELS } from "./ChartFrame";
 
 export const api: ComponentApi = {
   parts: [
@@ -43,7 +44,7 @@ export const api: ComponentApi = {
         {
           name: "formatValue",
           type: "(value: number) => string",
-          default: "Russian digit groups",
+          defaultNote: { en: "Russian digit groups", ru: "русские группы разрядов" },
           en: "Display of a value in the legend, the tooltip and the table («8,4 млн ₽»).",
           ru: "Вид значения в легенде, подсказке и таблице («8,4 млн ₽»).",
         },
@@ -57,7 +58,7 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<ChartFrameLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -167,7 +168,7 @@ export const api: ComponentApi = {
         {
           name: "height",
           type: 'number | "fill"',
-          default: "240, 160 under 30rem",
+          defaultNote: { en: "`240`, `160` under `30rem`", ru: "`240`, `160` уже `30rem`" },
           en: "Height of the plot area in px. `fill` takes the free height of a stretched panel (a `PageContent.Cell` with `rows`), the default height at least.",
           ru: "Высота области графика в px. `fill` занимает свободную высоту растянутой панели (`PageContent.Cell` с `rows`), но не меньше высоты по умолчанию.",
         },
@@ -264,38 +265,19 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "empty",
-      default: "Нет данных за период",
-      en: "Title of the empty state.",
-      ru: "Заголовок пустого состояния.",
-    },
-    {
-      key: "error",
-      default: "Не удалось загрузить график",
-      en: "Title of the error state.",
-      ru: "Заголовок состояния ошибки.",
-    },
-    {
-      key: "retry",
-      default: "Повторить",
+  labels: labelRows(CHART_FRAME_LABELS, {
+    empty: { en: "Title of the empty state.", ru: "Заголовок пустого состояния." },
+    error: { en: "Title of the error state.", ru: "Заголовок состояния ошибки." },
+    retry: {
       en: "Text of the retry button in the error state.",
       ru: "Текст кнопки повтора в состоянии ошибки.",
     },
-    {
-      key: "legend",
-      default: "Ряды графика",
-      en: "Accessible name of the legend.",
-      ru: "Доступное имя легенды.",
-    },
-    {
-      key: "category",
-      default: "Период",
+    legend: { en: "Accessible name of the legend.", ru: "Доступное имя легенды." },
+    category: {
       en: "Header of the first column of `ChartFrame.Table` (what a row is).",
       ru: "Заголовок первого столбца `ChartFrame.Table` (что такое строка).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -326,15 +308,15 @@ export const api: ComponentApi = {
       },
       {
         en: "A legend entry is a button with `aria-pressed` — pressed while its series is shown; the legend list is named by `labels.legend`. A hidden series differs by the swatch's shape (a ring) and a quiet name, never by color alone.",
-        ru: "Запись легенды — кнопка с `aria-pressed`: нажата, когда ряд показан. Скрытый ряд отличается формой образца (кольцо) и приглушённым названием, а не только цветом.",
+        ru: "Запись легенды — кнопка с `aria-pressed`: нажата, когда ряд показан; список легенды назван `labels.legend`. Скрытый ряд отличается формой образца (кольцо) и приглушённым названием, а не только цветом.",
       },
       {
         en: "`ChartFrame.Table` is a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.",
-        ru: "`ChartFrame.Table` — визуально скрытая таблица с теми же данными, что и график, с именем из заголовка: строка на точку, столбец на показанный ряд.",
+        ru: "`ChartFrame.Table` — визуально скрытая таблица с теми же данными, что и график, с именем из заголовка: строка на точку, столбец на показанный ряд, значения через `formatValue`.",
       },
       {
         en: "A `ChartFrame.Tooltip` with `point` is `aria-hidden` and passive (no focus, no presses; `Escape` hides it until the point moves): it repeats what the plot speaks — give a focusable plot an `aria-valuetext`, like the slider in the tooltip example.",
-        ru: "`ChartFrame.Tooltip` с `point` скрыт от вспомогательных технологий и пассивен (без фокуса, `Escape` прячет его до следующей точки): он повторяет то, что озвучивает сам график.",
+        ru: "`ChartFrame.Tooltip` с `point` — `aria-hidden` и пассивен (без фокуса и нажатий; `Escape` прячет его до следующей точки): он повторяет то, что озвучивает сам график, — дайте фокусируемому графику `aria-valuetext`, как ползунку в примере с подсказкой.",
       },
       {
         en: 'The empty state is `role="status"`, the error `role="alert"` with the retry button.',
@@ -342,7 +324,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The drawing is the library's: hide a decorative SVG (`aria-hidden`) when `ChartFrame.Table` carries the data; marks you make focusable need their own `aria-label`.",
-        ru: "Сам рисунок графика — забота библиотеки: скрывайте декоративный SVG (`aria-hidden`), когда данные есть в `ChartFrame.Table`.",
+        ru: "Сам рисунок графика — забота библиотеки: скрывайте декоративный SVG (`aria-hidden`), когда данные есть в `ChartFrame.Table`; фокусируемым меткам нужен свой `aria-label`.",
       },
     ],
   },

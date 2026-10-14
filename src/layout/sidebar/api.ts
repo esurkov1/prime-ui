@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { SIDEBAR_LABELS } from "./Sidebar";
 
 const MODE = '"expanded" | "compact" | "hidden"';
 
@@ -21,15 +22,15 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Sidebar.Root",
-      en: "`forwardRef` → `HTMLDivElement`. The rail wrapper with the `<nav>` inside; owns the mode and the off-canvas panel and passes the tier to items.",
+      en: "`ref` → `HTMLDivElement`. The rail wrapper with the `<nav>` inside; owns the mode and the off-canvas panel and passes the tier to items.",
       ru: "Обёртка рельса с `<nav>` внутри: хранит режим и выезжающую панель, передаёт ярус пунктам.",
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; counters and row actions one tier down. The rail width does not change.",
-          ru: "Ярус пунктов: высота 28 · 32 · 36 · 40 · 48, кегль, иконка; счётчики и действия в строке на ярус меньше. Ширина рельса не меняется.",
+          en: "Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; coloured counts and row actions one tier down, plain counts keep the item size. The rail width does not change.",
+          ru: "Ярус пунктов: высота 28 · 32 · 36 · 40 · 48, кегль, иконка; цветные счётчики и действия в строке на ярус меньше, простые счётчики — размера пункта. Ширина рельса не меняется.",
         },
         {
           name: "mode",
@@ -111,8 +112,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Brand",
-      en: "`forwardRef` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays.",
-      ru: "Блок продукта: `Sidebar.BrandLogo`, название и приглушённая строка; ссылка при `href`, единственный дочерний элемент при `asChild`, иначе `<div>`. В компактном режиме остаётся логотип.",
+      en: "`ref` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays.",
+      ru: "Блок продукта: `Sidebar.BrandLogo`, название и приглушённая строка; ссылка `<a>` при `href`, единственный дочерний элемент при `asChild`, иначе `<div>`. В компактном режиме остаётся логотип.",
       props: [
         {
           name: "description",
@@ -150,7 +151,7 @@ export const api: ComponentApi = {
     {
       name: "Sidebar.BrandLogo",
       en: "`ref` → `HTMLSpanElement`. The product mark (`aria-hidden`): a square of the item height − 8 (at most 32) on the icon axis in every mode; its child fills it.",
-      ru: "Знак продукта: квадрат высотой пункта − 8 (не больше 32) на оси иконок в любом режиме; дочерний элемент заполняет его.",
+      ru: "Знак продукта (`aria-hidden`): квадрат высотой пункта − 8 (не больше 32) на оси иконок в любом режиме; дочерний элемент заполняет его.",
       props: [
         {
           name: "children",
@@ -169,7 +170,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Content",
-      en: "`forwardRef` → `HTMLElement`. The scrolling middle: a `ScrollContainer` with edge fades and no scrollbar; rows scrolled into view stop clear of the fades.",
+      en: "`ref` → `HTMLElement`. The scrolling middle: a `ScrollContainer` with edge fades and no scrollbar; rows scrolled into view stop clear of the fades.",
       ru: "Прокручиваемая середина: `ScrollContainer` с затуханием краёв и без скроллбара; прокрученные в зону видимости пункты не уходят под затухание.",
       props: [
         {
@@ -216,8 +217,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Item",
-      en: '`forwardRef` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode. With `Sidebar.ItemAction` the element and the action sit side by side in a row `<div>`.',
-      ru: "Кнопка, ссылка при `href` или единственный дочерний элемент при `asChild`; в компактном режиме — подсказка с подписью. С `Sidebar.ItemAction` элемент и действие стоят рядом в строке `<div>`.",
+      en: '`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode. With `Sidebar.ItemAction` the element and the action sit side by side in a row `<div>`.',
+      ru: '`<button type="button">`, ссылка `<a>` при `href` или единственный дочерний элемент при `asChild`; в компактном режиме — подсказка с подписью. С `Sidebar.ItemAction` элемент и действие стоят рядом в строке `<div>`.',
       props: [
         {
           name: "current",
@@ -231,13 +232,25 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Not interactive: `disabled` / `aria-disabled`, `data-disabled`; a link loses its `href`.",
-          ru: "Неактивный пункт: `disabled` / `aria-disabled`; ссылка теряет `href`.",
+          ru: "Неактивный пункт: `disabled` / `aria-disabled`, `data-disabled`; ссылка теряет `href`.",
         },
         {
           name: "href",
           type: "string",
           en: "Renders an `<a>` (with `target`, `rel`).",
           ru: "Рендерит `<a>` (с `target`, `rel`).",
+        },
+        {
+          name: "target",
+          type: "string",
+          en: "Where the `<a>` opens (`href` only).",
+          ru: "Где открывается `<a>` (только с `href`).",
+        },
+        {
+          name: "rel",
+          type: "string",
+          en: "Relationship of the `<a>` (`href` only).",
+          ru: "Отношение ссылки `<a>` (только с `href`).",
         },
         {
           name: "asChild",
@@ -263,7 +276,7 @@ export const api: ComponentApi = {
     {
       name: "Sidebar.ItemIcon",
       en: '`ref` → `HTMLSpanElement`. An icon (`aria-hidden`). Before the label it leads and stays on the icon axis in every mode; after the label it is a quiet trailing glyph (`data-edge="end"`, 14, muted), e.g. ↗ for an external link, hidden in compact mode.',
-      ru: "Иконка. До подписи — ведущая, на оси иконок в любом режиме; после подписи — тихий знак в конце (14, приглушённый), например ↗ у внешней ссылки; в компактном режиме скрыт.",
+      ru: 'Иконка (`aria-hidden`). До подписи — ведущая, на оси иконок в любом режиме; после подписи — тихий знак в конце (`data-edge="end"`, 14, приглушённый), например ↗ у внешней ссылки; в компактном режиме скрыт.',
       props: [
         {
           name: "children",
@@ -315,7 +328,7 @@ export const api: ComponentApi = {
     {
       name: "Sidebar.ItemShortcut",
       en: "`ref` → `HTMLSpanElement`. Key hint at the end (`aria-hidden`); hidden in compact mode.",
-      ru: "Подсказка клавиш в конце; скрыта в компактном режиме.",
+      ru: "Подсказка клавиш в конце (`aria-hidden`); скрыта в компактном режиме.",
       props: [
         {
           name: "children",
@@ -394,8 +407,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.SubTrigger",
-      en: '`forwardRef` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. On the compact rail it opens the flyout (`aria-haspopup="dialog"`).',
-      ru: 'Строка родителя: кнопка-раскрывашка (`aria-expanded`, `aria-controls`) с шевроном в конце строки. В компактном рельсе открывает всплывающую панель (`aria-haspopup="dialog"`).',
+      en: '`ref` → `HTMLButtonElement`. The parent row: a disclosure `<button>` (`aria-expanded`, `aria-controls`) with a chevron at the end of the row. On the compact rail it opens the flyout (`aria-haspopup="dialog"`).',
+      ru: 'Строка родителя: кнопка-раскрывашка `<button>` (`aria-expanded`, `aria-controls`) с шевроном в конце строки. В компактном рельсе открывает всплывающую панель (`aria-haspopup="dialog"`).',
       props: [
         {
           name: "children",
@@ -426,7 +439,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Account",
-      en: "`forwardRef` → `HTMLButtonElement`. The signed-in person at the bottom of `Sidebar.Footer`: avatar, name, a muted line and a ↕ chevron. A button, so it is a `Dropdown.Trigger` child; in compact mode only the avatar stays, with the name as a tooltip.",
+      en: "`ref` → `HTMLButtonElement`. The signed-in person at the bottom of `Sidebar.Footer`: avatar, name, a muted line and a ↕ chevron. A button, so it is a `Dropdown.Trigger` child; in compact mode only the avatar stays, with the name as a tooltip.",
       ru: "Пользователь внизу `Sidebar.Footer`: аватар, имя, приглушённая строка и шеврон ↕. Это кнопка, поэтому её можно положить в `Dropdown.Trigger`; в компактном режиме остаётся аватар, имя — в подсказке.",
       props: [
         {
@@ -451,8 +464,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Toggle",
-      en: "`forwardRef` → `HTMLButtonElement`. Toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.",
-      ru: "Переключатель: развернуть ↔ компактный на десктопе, закрыть выезжающую панель; подпись и иконка — из состояния и `labels`.",
+      en: "`ref` → `HTMLButtonElement`. Toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.",
+      ru: "Переключатель: развернуть ↔ компактный на десктопе (скрытый → развёрнутый), закрыть выезжающую панель; подпись, иконка, `aria-expanded` и `aria-controls` — из состояния и `labels`.",
       props: [
         {
           name: "variant",
@@ -469,70 +482,27 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  functions: [
     {
       name: "useSidebar()",
-      en: "Hook for custom parts inside `Sidebar.Root` (throws outside). Returns the fields below.",
-      ru: "Хук для своих частей внутри `Sidebar.Root` (вне него — ошибка). Возвращает поля ниже.",
-      props: [
-        {
-          name: "mode · setMode",
-          type: "SidebarMode · (mode: SidebarMode) => void",
-          en: "Desktop mode.",
-          ru: "Режим на десктопе.",
-        },
-        {
-          name: "open · setOpen",
-          type: "boolean · (open: boolean) => void",
-          en: "Off-canvas panel.",
-          ru: "Выезжающая панель.",
-        },
-        {
-          name: "toggle",
-          type: "() => void",
-          en: "The action of `Sidebar.Toggle`.",
-          ru: "Действие `Sidebar.Toggle`.",
-        },
-        {
-          name: "offCanvas",
-          type: "boolean",
-          en: 'The sidebar is an off-canvas panel now (`offCanvas="always"`, or `"auto"` under 768px).',
-          ru: 'Сейчас панель выезжающая (`offCanvas="always"` или `"auto"` уже 768px).',
-        },
-        {
-          name: "size · navId · labels",
-          type: "ControlSize · string · SidebarLabels",
-          en: "Tier, id of the `<nav>` (for `aria-controls` on your own menu button), resolved strings.",
-          ru: "Ярус, id `<nav>` (для `aria-controls` своей кнопки меню), строки.",
-        },
-      ],
+      type: "() => { mode: SidebarMode; setMode: (mode: SidebarMode) => void; open: boolean; setOpen: (open: boolean) => void; toggle: () => void; offCanvas: boolean; size: ControlSize; navId: string; labels: SidebarLabels }",
+      en: 'Hook for custom parts inside `Sidebar.Root` (throws outside): the desktop `mode`, the off-canvas `open` state, `toggle` (the action of `Sidebar.Toggle`), `offCanvas` (the sidebar is an off-canvas panel: `offCanvas="always"`, or `"auto"` under 768px), the tier, the `navId` of the `<nav>` (for `aria-controls` on your own menu button) and the resolved strings.',
+      ru: 'Хук для своих частей внутри `Sidebar.Root` (вне него — ошибка): режим `mode` на десктопе, состояние `open` выезжающей панели, `toggle` (действие `Sidebar.Toggle`), `offCanvas` (панель сейчас выезжающая: `offCanvas="always"` или `"auto"` уже 768px), ярус, `navId` у `<nav>` (для `aria-controls` своей кнопки меню) и строки.',
     },
   ],
-  labels: [
-    {
-      key: "navigation",
-      default: "Навигация",
-      en: "`aria-label` of the `<nav>`.",
-      ru: "`aria-label` у `<nav>`.",
-    },
-    {
-      key: "collapse",
-      default: "Свернуть панель",
-      en: "Toggle label while expanded.",
-      ru: "Подпись Toggle в развёрнутом режиме.",
-    },
-    {
-      key: "expand",
-      default: "Развернуть панель",
+  labels: labelRows(SIDEBAR_LABELS, {
+    navigation: { en: "`aria-label` of the `<nav>`.", ru: "`aria-label` у `<nav>`." },
+    collapse: { en: "Toggle label while expanded.", ru: "Подпись Toggle в развёрнутом режиме." },
+    expand: {
       en: "Toggle label while compact or hidden.",
       ru: "Подпись Toggle в компактном или скрытом режиме.",
     },
-    {
-      key: "close",
-      default: "Закрыть навигацию",
+    close: {
       en: "Toggle label off-canvas and the scrim label.",
       ru: "Подпись Toggle на узком экране и подложки.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -576,7 +546,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'On the compact rail a SubTrigger and the `…` row of a folded group have `aria-haspopup="dialog"`; the flyout is a non-modal dialog named by the parent (the `…` row by the group label).',
-        ru: 'В компактном рельсе родительский пункт и строка `…` свёрнутой группы — `aria-haspopup="dialog"`; всплывающая панель названа ими.',
+        ru: 'В компактном рельсе родительский пункт и строка `…` свёрнутой группы — `aria-haspopup="dialog"`; всплывающая панель — немодальный диалог, названный родителем (строка `…` — подписью группы).',
       },
       {
         en: "On the rail a collapsible group heading stays the same disclosure button (folding it there brings the `…` row); hovering it shows the whole name in a tooltip.",
@@ -603,7 +573,7 @@ export const api: ComponentApi = {
         ru: "Выезжающая панель: подложка, ловушка фокуса и Escape; подложка — кнопка с `labels.close`.",
       },
       {
-        en: "Toggle: `aria-expanded`, `aria-controls` → nav, label from `labels`.",
+        en: "Toggle: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.",
         ru: "Toggle: `aria-expanded`, `aria-controls` на `<nav>`, подпись из `labels`.",
       },
     ],

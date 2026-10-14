@@ -1,5 +1,9 @@
-import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
-import { USE_UPLOAD_QUEUE_PART } from "../../hooks/useUploadQueue.api";
+import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import {
+  UPLOAD_QUEUE_OPTIONS_TYPE,
+  USE_UPLOAD_QUEUE_FUNCTION,
+} from "../../hooks/useUploadQueue.api";
+import { FILE_UPLOAD_LABELS } from "./FileUpload";
 
 const FILE_TYPE = "readonly FileUploadFile[]";
 
@@ -47,7 +51,7 @@ const SET_PROPS: ApiProp[] = [
   {
     name: "formatSize",
     type: "(bytes: number) => string",
-    default: "Russian digits, Б · КБ · МБ · ГБ",
+    defaultNote: { en: "Russian digits, Б · КБ · МБ · ГБ", ru: "русские цифры, Б · КБ · МБ · ГБ" },
     en: "Display of a file size («820 КБ», «1,2 МБ»).",
     ru: "Показ размера файла («820 КБ», «1,2 МБ»).",
   },
@@ -77,7 +81,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the zone padding, icon, title, button, label, hint and the rows. Without it the tier of its host (a form, a panel), else `m`. Tiles keep their own size.",
           ru: "Ярус отступов зоны, иконки, заголовка, кнопки, подписи, подсказки и строк. Без него — ярус хоста (форма, панель), иначе `m`. Плитки держат свой размер.",
         },
@@ -195,19 +199,33 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.Body",
-      en: "`ref` → `HTMLDivElement`. A centered column for a custom zone body; nested buttons and links stay interactive (drag-over follows enter / leave depth, so crossing children never flickers it). Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. A centered column for a custom zone body; nested buttons and links stay interactive (drag-over follows enter / leave depth, so crossing children never flickers it).",
       ru: "Колонка по центру для своего содержимого зоны; вложенные кнопки и ссылки остаются интерактивными (перетаскивание учитывает глубину входа и выхода, поэтому дети не дают мерцания).",
-      props: [],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "FileUpload.Icon",
-      en: "`ref` → `HTMLSpanElement`. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid. Native `<span>` props.",
+      en: "`ref` → `HTMLSpanElement`. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid.",
       ru: "Круглый подкрашенный слот иконки (`aria-hidden`): акцентный при перетаскивании, danger при ошибке.",
-      props: [],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (the `Icon`), `className` and the other span attributes.",
+          ru: "`children` (`Icon`), `className` и остальные атрибуты span.",
+        },
+      ],
     },
     {
       name: "FileUpload.Title",
-      en: "`ref` → `HTMLParagraphElement`. The zone title `<p>`. Native `<p>` props.",
+      en: "`ref` → `HTMLParagraphElement`. The zone title `<p>`.",
       ru: "Заголовок зоны `<p>`.",
       props: [
         {
@@ -217,13 +235,26 @@ export const api: ComponentApi = {
           en: "`muted` — secondary color, regular weight (an instruction line in custom bodies).",
           ru: "`muted` — вторичный цвет, обычное начертание (строка-инструкция в своём содержимом зоны).",
         },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLParagraphElement>",
+          en: "`children`, `className` and the other paragraph attributes.",
+          ru: "`children`, `className` и остальные атрибуты абзаца.",
+        },
       ],
     },
     {
       name: "FileUpload.Description",
-      en: "`ref` → `HTMLParagraphElement`. The secondary zone line (formats, size limit), the kit Hint of the zone tier. Native `<p>` props.",
+      en: "`ref` → `HTMLParagraphElement`. The secondary zone line (formats, size limit), the kit Hint of the zone tier.",
       ru: "Вторая строка зоны (форматы, лимит размера) — Hint кита в ярусе зоны.",
-      props: [],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLParagraphElement>",
+          en: "`children`, `className` and the other paragraph attributes.",
+          ru: "`children`, `className` и остальные атрибуты абзаца.",
+        },
+      ],
     },
     {
       name: "FileUpload.Queue",
@@ -254,13 +285,13 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.Item",
-      en: "`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part.",
       ru: "Строка файла: бейдж формата · имя над описанием · действия, затем полоса прогресса; дети встают по своим частям.",
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the padding, text and the format badge. Without it the tier of its host, else `m`.",
           ru: "Ярус отступов, текста и бейджа формата. Без него — ярус хоста, иначе `m`.",
         },
@@ -270,6 +301,12 @@ export const api: ComponentApi = {
           default: "false",
           en: "A failed upload: danger wash and ring, danger description.",
           ru: "Неудачная загрузка: красная подложка и кольцо, красное описание.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children` (the item parts), `className` and the other div attributes.",
+          ru: "`children` (части элемента), `className` и остальные атрибуты div.",
         },
       ],
     },
@@ -322,9 +359,16 @@ export const api: ComponentApi = {
     },
     {
       name: "FileUpload.ItemName · FileUpload.ItemDescription · FileUpload.ItemActions",
-      en: "`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row. Native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.",
       ru: "Имя файла (одна строка с обрезкой), его описание (размер, прогресс, ошибка; danger в строке с ошибкой) и кнопки в конце строки.",
-      props: [],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "FileUpload.ItemProgress",
@@ -354,7 +398,7 @@ export const api: ComponentApi = {
         {
           name: "aria-label",
           type: "string",
-          default: "«Загрузка файла»",
+          default: '"Загрузка файла"',
           en: "Accessible name of the bar (not the wrapper); name the file.",
           ru: "Доступное имя полосы (не обёртки); назовите файл.",
         },
@@ -366,172 +410,95 @@ export const api: ComponentApi = {
         },
       ],
     },
-    USE_UPLOAD_QUEUE_PART,
   ],
-  labels: [
-    {
-      key: "title",
-      default: "Выберите файл или перетащите его сюда",
-      en: "Title of the built-in zone body.",
-      ru: "Заголовок встроенной зоны.",
-    },
-    {
-      key: "description",
-      default: "JPEG, PNG, PDF, MP4 до 50 МБ",
+  types: [UPLOAD_QUEUE_OPTIONS_TYPE],
+  functions: [USE_UPLOAD_QUEUE_FUNCTION],
+  labels: labelRows(FILE_UPLOAD_LABELS, {
+    title: { en: "Title of the built-in zone body.", ru: "Заголовок встроенной зоны." },
+    description: {
       en: "Description of the built-in body; an empty string hides it.",
       ru: "Описание встроенной зоны; пустая строка скрывает его.",
     },
-    {
-      key: "browse",
-      default: "Выбрать файл",
+    browse: {
       en: 'Text of the browse button: decorative in the built-in zone body, the control itself with `trigger="button"`.',
       ru: 'Текст кнопки выбора: декоративной во встроенной зоне, самой кнопки при `trigger="button"`.',
     },
-    {
-      key: "optional",
-      default: "необязательно",
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-    {
-      key: "add",
-      default: "Добавить",
+    add: {
       en: 'Text of the add tile (`trigger="tile"`).',
       ru: 'Текст плитки добавления (`trigger="tile"`).',
     },
-    {
-      key: "addLabel",
-      default: "Добавить файлы",
+    addLabel: {
       en: "Accessible name of the add tile's file input.",
       ru: "Имя поля выбора файлов в плитке добавления.",
     },
-    {
-      key: "empty",
-      default: "Нажмите или перетащите файлы",
+    empty: {
       en: "Text of the add tile of an empty set (it spans the row).",
       ru: "Текст плитки добавления в пустом наборе (она во всю строку).",
     },
-    {
-      key: "emptyHint",
-      default: "Можно несколько сразу",
+    emptyHint: {
       en: "Second line of the empty add tile without `max` (with it the counter stands there).",
       ru: "Вторая строка пустой плитки добавления без `max` (с ним там счётчик).",
     },
-    {
-      key: "full",
-      default: "Лимит файлов",
+    full: {
       en: "Text of the add tile when `max` is reached.",
       ru: "Текст плитки добавления, когда достигнут `max`.",
     },
-    {
-      key: "count",
-      default: "{count} из {max}",
+    count: {
       en: "Counter on the add tile (with `max`).",
       ru: "Счётчик на плитке добавления (при `max`).",
     },
-    {
-      key: "cover",
-      default: "Обложка",
-      en: "Pill of the first tile with `cover`.",
-      ru: "Плашка первой плитки при `cover`.",
-    },
-    {
-      key: "queued",
-      default: "В очереди",
+    cover: { en: "Pill of the first tile with `cover`.", ru: "Плашка первой плитки при `cover`." },
+    queued: {
       en: "A file waiting for a free slot (a row's status, a tile's name and its empty ring).",
       ru: "Файл ждёт свободного места (статус строки, имя плитки и её пустого кольца).",
     },
-    {
-      key: "uploading",
-      default: "Загрузка {percent}%",
-      en: "A file in flight.",
-      ru: "Файл загружается.",
-    },
-    {
-      key: "failed",
-      default: "Не удалось загрузить",
-      en: "A failed file whose upload gave no reason.",
-      ru: "Загрузка упала без причины.",
-    },
-    {
-      key: "progress",
-      default: "Загрузка: {name}",
-      en: "Name of a row's progress bar.",
-      ru: "Имя полосы прогресса строки.",
-    },
-    {
-      key: "cancel",
-      default: "Отменить загрузку: {name}",
+    uploading: { en: "A file in flight.", ru: "Файл загружается." },
+    failed: { en: "A failed file whose upload gave no reason.", ru: "Загрузка упала без причины." },
+    progress: { en: "Name of a row's progress bar.", ru: "Имя полосы прогресса строки." },
+    cancel: {
       en: "Name of the disk that cancels a tile's upload in flight.",
       ru: "Имя диска, отменяющего идущую загрузку плитки.",
     },
-    {
-      key: "retry",
-      default: "Повторить загрузку: {name}",
+    retry: {
       en: "Name of the retry button of a failed row (the retry disk of a failed tile).",
       ru: "Имя кнопки повтора у неудачной строки (диска повтора у неудачной плитки).",
     },
-    {
-      key: "remove",
-      default: "Убрать {name}",
+    remove: {
       en: "Name of the remove button of a file (it also stops an upload).",
       ru: "Имя кнопки «Убрать» у файла (она же прерывает загрузку).",
     },
-    {
-      key: "open",
-      default: "Открыть {name}",
+    open: {
       en: "Name of a tile's link to the file (`href`); a row's link is named by the file name.",
       ru: "Имя ссылки плитки на файл (`href`); ссылку строки называет имя файла.",
     },
-    {
-      key: "removed",
-      default: "{name}: убран",
-      en: "Live region: a file was removed.",
-      ru: "Live-область: файл убран.",
-    },
-    {
-      key: "coverChanged",
-      default: "Обложка: {name}",
+    removed: { en: "Live region: a file was removed.", ru: "Live-область: файл убран." },
+    coverChanged: {
       en: "Live region: a reorder put another file first, the new cover (`cover`).",
       ru: "Live-область: перестановка поставила первым другой файл — новую обложку (`cover`).",
     },
-    {
-      key: "changeFailed",
-      default: "Не удалось сохранить изменение, файлы на прежних местах",
+    changeFailed: {
       en: "Live region: the `onValueChange` promise of a change rejected and the set is as it was.",
       ru: "Live-область: промис `onValueChange` отклонён, набор вернулся.",
     },
-    {
-      key: "uploaded",
-      default: "{name}: загружен",
-      en: "Live region: a file finished uploading.",
-      ru: "Live-область: файл загружен.",
-    },
-    {
-      key: "uploadFailed",
-      default: "{name}: {reason}",
+    uploaded: { en: "Live region: a file finished uploading.", ru: "Live-область: файл загружен." },
+    uploadFailed: {
       en: "Live region: a file failed to upload; `{reason}` is its error or `failed`.",
       ru: "Live-область: файл не загрузился; `{reason}` — его ошибка или `failed`.",
     },
-    {
-      key: "tileImage",
-      default: "Фото {position}: {name}{status}",
+    tileImage: {
       en: "Name of an image tile; `{name}` is the file's `alt` or name, `{status}` is ` · state` while it uploads.",
-      ru: "Имя плитки изображения; `{name}` — `alt` или имя файла, `{status}` — ` · состояние`, пока файл грузится.",
+      ru: "Имя плитки изображения; `{name}` — `alt` или имя файла, `{status}` — ` · state`, пока файл грузится.",
     },
-    {
-      key: "tileVideo",
-      default: "Видео {position}: {name}{status}",
+    tileVideo: {
       en: "Name of a video tile; the tokens of `tileImage`.",
       ru: "Имя плитки видео; токены как у `tileImage`.",
     },
-    {
-      key: "tileFile",
-      default: "Файл {position}: {name}{status}",
-      en: "Name of the tile of any other file.",
-      ru: "Имя плитки любого другого файла.",
-    },
-  ],
+    tileFile: { en: "Name of the tile of any other file.", ru: "Имя плитки любого другого файла." },
+  }),
   accessibility: {
     keyboard: [
       {
@@ -563,7 +530,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'The zone is a `<label>` around a visually hidden but focusable `<input type="file">`. With `label` the input is named by it (`aria-labelledby`) and described by the hint or error; without it the zone text names the input — give a custom body without text an `aria-label` on Root.',
-        ru: 'Зона — `<label>` вокруг визуально скрытого, но фокусируемого `<input type="file">`. С `label` input назван подписью (`aria-labelledby`) и описан подсказкой или ошибкой; без неё имя даёт текст зоны.',
+        ru: 'Зона — `<label>` вокруг визуально скрытого, но фокусируемого `<input type="file">`. С `label` input назван подписью (`aria-labelledby`) и описан подсказкой или ошибкой; без неё имя даёт текст зоны — своему телу без текста дайте `aria-label` на Root.',
       },
       {
         en: '`trigger="button"`: the kit Button takes the focus, named by the field label and its own text (or `aria-label`, required when it is an icon alone) and described by the hint or error; the input leaves the tab order.',
@@ -583,15 +550,15 @@ export const api: ComponentApi = {
       },
       {
         en: "A row in flight has its progress bar named by the file; a polite live region speaks a file that finished, the reason of one that failed, a removed file, the new cover after a reorder («Обложка: name», `labels.coverChanged`) and a refused change (`labels.changeFailed`); a file whose change is saved has `aria-busy`.",
-        ru: "У строки в пути полоса прогресса, названная именем файла; live-область объявляет загруженный, упавший и убранный файл, новую обложку после перестановки и отклонённое изменение (`labels.changeFailed`).",
+        ru: "У строки в пути полоса прогресса, названная именем файла; вежливая live-область объявляет загруженный файл, причину ошибки, убранный файл, новую обложку после перестановки («Обложка: name», `labels.coverChanged`) и отклонённое изменение (`labels.changeFailed`); у файла, изменение которого сохраняется, — `aria-busy`.",
       },
       {
         en: "Tiles are `<li>` of a Dnd.Sortable `<ul>`, named «Фото 2: склад.jpg · Загрузка 45%» («Видео …», «Файл …»; the file's `alt` in place of its name), with `aria-roledescription` and `aria-keyshortcuts`; the position and format on a tile are hidden (the name says them); the disk is a circle button («Отменить загрузку: …» described by the state, «В очереди» / «Загрузка 45%», `aria-busy`, its ring `aria-hidden`; on a failure «Повторить загрузку: …» described by the reason); without a remove handler the disk is no button but a `progressbar` (`aria-valuenow`) while the file is queued or uploading; Dnd's live region announces moves.",
-        ru: 'Плитки (`layout="grid" | "strip"`) — `<li>` в `<ul>` от Dnd.Sortable с именем «Фото 2: склад.jpg · Загрузка 45%» («Видео …», «Файл …»), `aria-roledescription` и `aria-keyshortcuts`; номер и формат на плитке скрыты от чтения; кольцо диска — `progressbar`, сам диск — кнопка «Отменить загрузку: …»; перенос объявляет live-область Dnd.',
+        ru: "Плитки — `<li>` в `<ul>` от Dnd.Sortable с именем «Фото 2: склад.jpg · Загрузка 45%» («Видео …», «Файл …»; `alt` файла вместо имени), с `aria-roledescription` и `aria-keyshortcuts`; номер и формат на плитке скрыты (их говорит имя); диск — круглая кнопка («Отменить загрузку: …» с описанием состояния «В очереди» / «Загрузка 45%», `aria-busy`, кольцо `aria-hidden`; после ошибки — «Повторить загрузку: …» с описанием причины); без обработчика удаления диск не кнопка, а `progressbar` (`aria-valuenow`), пока файл в очереди или грузится; перенос объявляет live-область Dnd.",
       },
       {
         en: 'A file with `href`: in a row its name is a link (`<a target="_blank">`, named by the name); a tile holds a link over its middle named «Открыть name» (`labels.open`), a Tab stop after the tile itself.',
-        ru: "Пока изменение сохраняется (промис из `onValueChange`), у затронутых файлов `aria-busy`, их кнопка удаления крутится.",
+        ru: 'Файл с `href`: в строке его имя — ссылка (`<a target="_blank">` с именем файла); у плитки ссылка поверх середины «Открыть name» (`labels.open`) — остановка Tab после самой плитки.',
       },
       {
         en: "Touch: a tile drag starts after a hold; the buttons on a tile are always shown, never hover-only.",

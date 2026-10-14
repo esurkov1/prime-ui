@@ -52,7 +52,7 @@ Columns are data (`DataTableColumn<Row>[]`), not child parts. The one part, `Dat
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### DataTable
-Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.
+Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an optional toolbar, a scrolling `<table>` and a footer (range, Pagination, infinite-scroll status); passes its tier to the controls inside.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -94,7 +94,7 @@ Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an option
 | `hasMore` | `boolean` | `false` | More rows can be loaded from the server. |
 | `loadingMore` | `boolean` | `false` | A server batch is loading: footer status, `aria-busy`. |
 | `onLoadMore` | `() => void \| Promise<void>` | — | Called at the end when every loaded row is shown and `hasMore` is set. A returned promise shows the loading status until it settles. |
-| `scrollHeight` | `number \| string \| "fill"` | `360 with paging="infinite"` | Max height of the scroll viewport (number = px); `"fill"` — the table takes the height of its flex / grid parent (or a sized block), the rows scroll inside, infinite paging follows it. |
+| `scrollHeight` | `number \| string \| "fill"` | `360` with `paging="infinite"`, else none | Max height of the scroll viewport (number = px); `"fill"` — the table takes the height of its flex / grid parent (or a sized block), the rows scroll inside, infinite paging follows it. |
 | `stickyHeader` | `boolean` | `false` | The head sticks while the body scrolls (with `scrollHeight`); on screens lower than 480px it scrolls with the rows. |
 | `stickyFirstColumn` | `boolean` | `false` | The first visible column (with the selection and toggle columns) sticks while scrolling sideways; the start edge shadow falls from its end edge. |
 | `showHeader` | `boolean` | `true` | Render `<thead>`. |
@@ -106,15 +106,16 @@ Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an option
 | `highlightColumnOnHover` | `boolean` | `false` | Column wash under the pointer (head and cells). |
 | `getRowHref` | `(row: Row) => string` | — | The row is a link: a real `<a>` in the key cell (first visible column), and the same link covers the whole row. Keep controls out of the key cell. |
 | `onRowClick` | `(row: Row, index: number, event: DataTableRowClickEvent) => void` | — | Opens a row in place (a drawer, a panel) on a click, Enter or Space; never from a control inside the row. With `getRowHref` it gets plain clicks: `event.preventDefault()` routes in the app. |
-| `isRowClickable` | `(row: Row) => boolean` | `every row` | Which rows open (`getRowHref` and `onRowClick` alike); `false` for a total or a service row — no link, no focus, no cursor. |
+| `isRowClickable` | `(row: Row) => boolean` | every row | Which rows open (`getRowHref` and `onRowClick` alike); `false` for a total or a service row — no link, no focus, no cursor. |
 | `getRowGroup` | `(row: Row) => string \| number` | — | Group key of a row: each group gets a header row and its own `<tbody>`. Groups keep the order in which they first appear in `rows`; a sort orders the rows inside each group; a group split by paging repeats its header. |
-| `renderGroupHeader` | `(group: DataTableGroup<Row>) => ReactNode` | `the group key` | Content of a group header; `group.rows` holds every row of the group (all pages) for totals. Children are laid out start / end in the visible width. |
+| `renderGroupHeader` | `(group: DataTableGroup<Row>) => ReactNode` | the group key | Content of a group header; `group.rows` holds every row of the group (all pages) for totals. Children are laid out start / end in the visible width. |
 | `stickyGroupHeaders` | `boolean` | `false` | Group headers stick under the head (or the top edge) while their rows scroll. |
 | `collapsedGroups` | `(string \| number)[]` | — | Collapsed group keys, controlled. Any prop of this triad makes groups fold: a chevron toggle leads each header, rows fold like sub-rows. «Select all» and paging still count collapsed rows. |
 | `defaultCollapsedGroups` | `(string \| number)[]` | — | Initially collapsed group keys, uncontrolled; `[]` — every group open but foldable. |
 | `onCollapsedGroupsChange` | `(collapsedGroups: (string \| number)[]) => void` | — | The collapsed group keys changed (a group header toggle). |
 | `labels` | `Partial<DataTableLabels>` | — | Built-in strings, see Labels. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the root `<div>`. |
+| `className` | `string` | — | Class on the root `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | The other attributes of the root `<div>`. |
 
 ### DataTable.ColumnsMenu
 `ref` → `HTMLButtonElement` (the trigger). The column chooser of the table it sits in: a Button opening a Dropdown with a check item per column. Writes the table's hidden columns; throws outside a DataTable `toolbar`.
@@ -125,10 +126,12 @@ Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an option
 | `align` | `"auto" \| "start" \| "center" \| "end"` | `"auto"` | Alignment to the trigger. `auto` lines the panel up with the trigger edge that has more room beyond it; `start`, `center` or `end` fix it. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children">` | — | `className`, `aria-label` and the other attributes of the trigger button. |
 
-### DataTableColumn<Row>
+### Types
+
+#### `DataTableColumn<Row>`
 One column of `columns`: data, not a part.
 
-| Prop | Type | Default | Description |
+| Field | Type | Default | Description |
 |---|---|---|---|
 | `id` | `string` | — (required) | Unique column id (sort state, `data-column-id`). |
 | `header` | `ReactNode` | — (required) | Head content. |
@@ -137,7 +140,7 @@ One column of `columns`: data, not a part.
 | `sortable` | `boolean` | — | The head becomes a sort button with `aria-sort`. |
 | `sortAccessor` | `(row: Row) => unknown` | — | Value to sort by instead of `accessor`. |
 | `sortComparator` | `(a: Row, b: Row, order: DataTableOrder) => number` | — | Custom comparison. |
-| `align` | `"start" \| "center" \| "end"` | `"start" ("end" with numeric)` | Cell alignment; heads do not follow it. |
+| `align` | `"start" \| "center" \| "end"` | `"start"` (`"end"` with `numeric`) | Cell alignment; heads do not follow it. |
 | `headerAlign` | `"start" \| "center" \| "end"` | `"start"` | Head alignment; the sort icon stays at the end edge. |
 | `numeric` | `boolean` | — | Tabular figures, no wrapping, end alignment unless `align` is set. |
 | `truncate` | `boolean` | — | One line with an ellipsis; width from `maxWidth` (or `width`); string values get a `title`. |

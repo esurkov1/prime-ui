@@ -22,7 +22,7 @@ export type SliderLabels = {
   optional: string;
 };
 
-const SLIDER_LABELS: SliderLabels = { optional: "необязательно" };
+export const SLIDER_LABELS: SliderLabels = { optional: "необязательно" };
 
 export type SliderProps = FieldRootDomProps &
   Omit<FieldFrameProps, "focusRing"> & {

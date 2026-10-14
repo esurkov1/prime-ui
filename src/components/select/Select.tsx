@@ -21,6 +21,7 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import {
   enabledOptions,
   handleListboxKeyDown,
@@ -73,7 +74,7 @@ export type {
 } from "./SelectItem";
 export type { SelectLabels } from "./selectContext";
 
-const SELECT_LABELS: SelectLabels = {
+export const SELECT_LABELS: SelectLabels = {
   search: "Поиск",
   empty: "Ничего не найдено",
   emptyHint: "Попробуйте изменить запрос",
@@ -195,7 +196,7 @@ function SelectRoot(props: SelectRootProps) {
   } = props;
   const multiple = props.multiple === true;
   const disabled = useInheritedDisabled(disabledProp);
-  const labels = React.useMemo(() => ({ ...SELECT_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(SELECT_LABELS, labelsProp);
   const ids = useFieldFrame(id, { hint, error, invalid });
 
   const [stored, setStored] = useControllableState<string | string[] | undefined>({

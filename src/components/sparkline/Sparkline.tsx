@@ -58,7 +58,7 @@ export type SparklineSummary = "latest" | "sum" | "average";
  */
 export type SparklineLayout = "default" | "compact";
 
-const SPARKLINE_LABELS: SparklineLabels = {
+export const SPARKLINE_LABELS: SparklineLabels = {
   point: "{label}: {value}",
   period: "{first} – {last}",
   empty: "Нет данных",

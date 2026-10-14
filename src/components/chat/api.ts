@@ -1,4 +1,6 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { CHAT_LABELS } from "./Chat";
+import { CHAT_PINNED_LABELS } from "./ChatPinned";
 
 export const api: ComponentApi = {
   parts: [
@@ -62,8 +64,8 @@ export const api: ComponentApi = {
         {
           name: "labels",
           type: "Partial<ChatLabels>",
-          en: "System strings, see Labels.",
-          ru: "Системные строки, см. Labels.",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -179,7 +181,7 @@ export const api: ComponentApi = {
         {
           name: "defaultValue",
           type: "string",
-          default: "the last item",
+          defaultNote: { en: "the last item", ru: "последний" },
           en: "The one shown first (uncontrolled): the newest.",
           ru: "Показанное сначала (неуправляемое): самое новое.",
         },
@@ -204,8 +206,8 @@ export const api: ComponentApi = {
         {
           name: "labels",
           type: "Partial<ChatPinnedLabels>",
-          en: "System strings, see Labels.",
-          ru: "Системные строки, см. Labels.",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -279,7 +281,7 @@ export const api: ComponentApi = {
         {
           name: "now",
           type: "Date",
-          default: "new Date()",
+          defaultNote: { en: "today", ru: "сегодня" },
           en: "«Today» for the dates.",
           ru: "«Сегодня» для дат.",
         },
@@ -313,14 +315,17 @@ export const api: ComponentApi = {
         {
           name: "quickReaction",
           type: "string | false",
-          default: "«👍»",
+          default: '"👍"',
           en: "The reaction of a double tap (and `L`) on a message: puts it or takes it back through `onReactionToggle`. `false` — off.",
           ru: "Реакция двойного касания (и `L`) по сообщению: ставит или снимает её через `onReactionToggle`. `false` — выключено.",
         },
         {
           name: "reactionOptions",
           type: "readonly { emoji: string; label: string }[]",
-          default: "👍 🔥 🤣 👌 🤔 😢 😱, then 7 more",
+          defaultNote: {
+            en: "👍 🔥 🤣 👌 🤔 😢 😱, then 7 more",
+            ru: "👍 🔥 🤣 👌 🤔 😢 😱, затем ещё 7",
+          },
           en: "The reactions of the bar above a message (long press, long hover or `R`): the first seven in a row, «⌄» opens the rest. `label` names each toggle button.",
           ru: "Реакции панели над сообщением (долгое нажатие, долгое наведение или `R`): первые семь в ряд, «⌄» раскрывает остальные. `label` называет каждую кнопку.",
         },
@@ -423,108 +428,75 @@ export const api: ComponentApi = {
     },
   ],
   labels: [
-    {
-      key: "typing",
-      default: "печатает…",
-      en: "The status line of the header while the other side types.",
-      ru: "Строка статуса в шапке, пока собеседник пишет.",
-    },
-    {
-      key: "search",
-      default: "Поиск по переписке",
-      en: "The search button and the name of the search field.",
-      ru: "Кнопка поиска и имя поля поиска.",
-    },
-    {
-      key: "searchPlaceholder",
-      default: "Поиск по сообщениям",
-      en: "The placeholder of the search field.",
-      ru: "Подсказка в поле поиска.",
-    },
-    {
-      key: "matches",
-      default: "{index} из {count}",
-      en: "The place of the current match, counted from the newest.",
-      ru: "Место текущего совпадения, считая от самого нового.",
-    },
-    {
-      key: "noMatches",
-      default: "Нет совпадений",
-      en: "The search found nothing.",
-      ru: "Поиск ничего не нашёл.",
-    },
-    {
-      key: "previousMatch",
-      default: "Предыдущее совпадение",
-      en: "The button that goes to the older match.",
-      ru: "Кнопка перехода к более старому совпадению.",
-    },
-    {
-      key: "nextMatch",
-      default: "Следующее совпадение",
-      en: "The button that goes to the newer match.",
-      ru: "Кнопка перехода к более новому совпадению.",
-    },
-    {
-      key: "messages",
-      default: "Переписка",
-      en: "The name of the list when the header has no `Chat.Title`.",
-      ru: "Имя ленты, если в шапке нет `Chat.Title`.",
-    },
-    {
-      key: "selectedCount",
-      default: "Выбрано: {count}",
-      en: "The count of the selection bar.",
-      ru: "Счётчик панели выбора.",
-    },
-    {
-      key: "cancel",
-      default: "Отмена",
-      en: "The selection bar's button that leaves selection.",
-      ru: "Кнопка панели выбора, которая выходит из выбора.",
-    },
-    {
-      key: "scrollToEnd",
-      default: "К последним сообщениям",
-      en: "The name of the round button that goes to the newest message.",
-      ru: "Имя круглой кнопки перехода к последнему сообщению.",
-    },
-    {
-      key: "newMessages",
-      default: "Новых сообщений: {count}. К последним сообщениям",
-      en: "The name of that button while new messages wait below.",
-      ru: "Имя этой кнопки, пока внизу ждут новые сообщения.",
-    },
-    {
-      key: "pinned",
-      default: "Закреплённое сообщение",
-      en: "`Chat.Pinned labels`: the title with one pinned message.",
-      ru: "`Chat.Pinned labels`: заголовок при одном закреплённом.",
-    },
-    {
-      key: "pinnedOf",
-      default: "Закреплённое {index} из {count}",
-      en: "`Chat.Pinned labels`: the title with several, the newest last.",
-      ru: "`Chat.Pinned labels`: заголовок при нескольких, самое новое — последнее.",
-    },
-    {
-      key: "unpin",
-      default: "Открепить",
-      en: "`Chat.Pinned labels`: the name of the unpin button.",
-      ru: "`Chat.Pinned labels`: имя кнопки открепления.",
-    },
-    {
-      key: "unread",
-      default: "Непрочитанные сообщения",
-      en: "The text of the «unread» band: `Chat.Root labels` for rows from `items`, `Chat.Unread labels` for a hand-placed band.",
-      ru: "Текст полосы непрочитанных: `Chat.Root labels` для строк из `items`, `Chat.Unread labels` для полосы, поставленной вручную.",
-    },
-    {
-      key: "loading",
-      default: "Загрузка сообщений",
-      en: "Announced politely while the conversation loads for the first time (`Chat.Messages loading`).",
-      ru: "Вежливо объявляется, пока переписка загружается впервые (`Chat.Messages loading`).",
-    },
+    ...labelRows(CHAT_LABELS, {
+      selectedCount: { en: "The count of the selection bar.", ru: "Счётчик панели выбора." },
+      cancel: {
+        en: "The selection bar's button that leaves selection.",
+        ru: "Кнопка панели выбора, которая выходит из выбора.",
+      },
+      scrollToEnd: {
+        en: "The name of the round button that goes to the newest message.",
+        ru: "Имя круглой кнопки перехода к последнему сообщению.",
+      },
+      newMessages: {
+        en: "The name of that button while new messages wait below.",
+        ru: "Имя этой кнопки, пока внизу ждут новые сообщения.",
+      },
+      typing: {
+        en: "The status line of the header while the other side types.",
+        ru: "Строка статуса в шапке, пока собеседник пишет.",
+      },
+      search: {
+        en: "The search button and the name of the search field.",
+        ru: "Кнопка поиска и имя поля поиска.",
+      },
+      searchPlaceholder: {
+        en: "The placeholder of the search field.",
+        ru: "Подсказка в поле поиска.",
+      },
+      matches: {
+        en: "The place of the current match, counted from the newest.",
+        ru: "Место текущего совпадения, считая от самого нового.",
+      },
+      noMatches: { en: "The search found nothing.", ru: "Поиск ничего не нашёл." },
+      previousMatch: {
+        en: "The button that goes to the older match.",
+        ru: "Кнопка перехода к более старому совпадению.",
+      },
+      nextMatch: {
+        en: "The button that goes to the newer match.",
+        ru: "Кнопка перехода к более новому совпадению.",
+      },
+      messages: {
+        en: "The name of the list when the header has no `Chat.Title`.",
+        ru: "Имя ленты, если в шапке нет `Chat.Title`.",
+      },
+      unread: {
+        en: "The text of the «unread» band: `Chat.Root labels` for rows from `items`, `Chat.Unread labels` for a hand-placed band.",
+        ru: "Текст полосы непрочитанных: `Chat.Root labels` для строк из `items`, `Chat.Unread labels` для полосы, поставленной вручную.",
+      },
+      loading: {
+        en: "Announced politely while the conversation loads for the first time (`Chat.Messages loading`).",
+        ru: "Вежливо объявляется, пока переписка загружается впервые (`Chat.Messages loading`).",
+      },
+    }),
+    ...labelRows(CHAT_PINNED_LABELS, {
+      pinned: {
+        en: "`Chat.Pinned labels`: the title with one pinned message.",
+        ru: "`Chat.Pinned labels`: заголовок при одном закреплённом.",
+        part: "Chat.Pinned",
+      },
+      pinnedOf: {
+        en: "`Chat.Pinned labels`: the title with several, the newest last.",
+        ru: "`Chat.Pinned labels`: заголовок при нескольких, самое новое — последнее.",
+        part: "Chat.Pinned",
+      },
+      unpin: {
+        en: "`Chat.Pinned labels`: the name of the unpin button.",
+        ru: "`Chat.Pinned labels`: имя кнопки открепления.",
+        part: "Chat.Pinned",
+      },
+    }),
   ],
   accessibility: {
     keyboard: [
@@ -572,7 +544,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'The list is `role="log"`: new messages are announced politely; its name is `Chat.Title` (`aria-labelledby`), else `labels.messages`, or your `aria-label`. It is one tab stop; the messages carry `aria-posinset` / `aria-setsize`, so the keyboard reaches rows the window does not render. In selection mode it is a `listbox` with `aria-multiselectable`, the messages `option`s with `aria-selected`.',
-        ru: 'Лента — `role="log"`: новые сообщения вежливо объявляются; её имя — `Chat.Title` (`aria-labelledby`), без заголовка — `labels.messages`. В режиме выбора — `listbox` с `aria-multiselectable`, сообщения — `option` с `aria-selected`.',
+        ru: 'Лента — `role="log"`: новые сообщения вежливо объявляются; её имя — `Chat.Title` (`aria-labelledby`), без заголовка — `labels.messages` или ваш `aria-label`. Это одна остановка Tab; сообщения несут `aria-posinset` / `aria-setsize`, поэтому клавиатура доходит до строк вне окна отрисовки. В режиме выбора — `listbox` с `aria-multiselectable`, сообщения — `option` с `aria-selected`.',
       },
       {
         en: "`Chat.SearchButton` is a toggle (`aria-pressed`); the search field takes the focus as it opens and keeps it while the chat steps through matches; the place of the match («2 из 5», «Нет совпадений») is announced politely.",
@@ -584,7 +556,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The «к последним» button is named «К последним сообщениям», with the count «Новых сообщений: N. …»; the badge is `aria-hidden`.",
-        ru: "Кнопка «К последним сообщениям» со счётчиком «Новых сообщений: N»; значок счётчика скрыт от скринридеров.",
+        ru: "Кнопка «к последним» называется «К последним сообщениям», со счётчиком «Новых сообщений: N. …»; значок — `aria-hidden`.",
       },
       {
         en: "`Chat.SelectionBar` is a `toolbar` named by the count «Выбрано: N», which is announced politely as it changes.",
@@ -592,6 +564,10 @@ export const api: ComponentApi = {
       },
       {
         en: "The quick reaction (double tap, `L`) is announced politely.",
+        ru: "Быстрая реакция (двойное касание, `L`) объявляется вежливо.",
+      },
+      {
+        en: "One sound at a time on the page: a voice message, a video note and a chat video pause each other.",
         ru: "На странице звучит одно: голосовое, видеосообщение или видео из чата ставят друг друга на паузу.",
       },
       {
@@ -600,7 +576,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While `loading` the messages' region is `aria-busy`, the placeholders are `aria-hidden`, and «Загрузка сообщений» (`labels.loading`) is announced politely.",
-        ru: "Первая загрузка (`loading`): область ленты — `aria-busy`, заглушки скрыты от скринридеров, «Загрузка сообщений» (`labels.loading`) объявляется вежливо.",
+        ru: "Первая загрузка (`loading`): область ленты — `aria-busy`, заглушки — `aria-hidden`, «Загрузка сообщений» (`labels.loading`) объявляется вежливо.",
       },
       {
         en: "A message reached by a jump or the current search match is not announced as such: a reply's target takes the focus, a search keeps it in its field; the others stepping back is visual only.",

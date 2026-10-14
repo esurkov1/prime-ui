@@ -1,5 +1,6 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { formattingProp, TEXT_FORMATTING_LABEL_ROWS } from "../../internal/textFormatting.api";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { formattingProp, TEXT_FORMATTING_LABEL_DOCS } from "../../internal/textFormatting.api";
+import { COMPOSER_LABELS } from "./Composer";
 
 export const api: ComponentApi = {
   parts: [
@@ -86,7 +87,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the field, the buttons and the bar text. Without it the tier of its host, else `m`.",
           ru: "Ярус поля, кнопок и текста плашки. Без него — ярус хоста, иначе `m`.",
         },
@@ -107,7 +108,7 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<ComposerLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "children",
@@ -125,8 +126,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Composer.Context",
-      en: "`ref` → `HTMLDivElement`. The bar above the field: a reply or edit glyph, `Composer.Title` over `Composer.Description` behind an accent rule, and a close button; it describes the field; when it appears, the caret moves to the field. + native `<div>` props.",
-      ru: "Плашка над полем: значок ответа или правки, заголовок и цитата за акцентной чертой, кнопка закрытия. Описывает поле; появившись, ставит курсор в поле.",
+      en: "`ref` → `HTMLDivElement`. The bar above the field: a reply or edit glyph, `Composer.Title` over `Composer.Description` behind an accent rule, and a close button; it describes the field; when it appears, the caret moves to the field.",
+      ru: "Плашка над полем: значок ответа или правки, `Composer.Title` над `Composer.Description` за акцентной чертой, кнопка закрытия. Описывает поле; появившись, ставит курсор в поле.",
       props: [
         {
           name: "mode",
@@ -153,17 +154,30 @@ export const api: ComponentApi = {
           en: "`Composer.Title` and `Composer.Description`.",
           ru: "`Composer.Title` и `Composer.Description`.",
         },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
+        },
       ],
     },
     {
       name: "Composer.Title · Composer.Description",
-      en: "`ref` → `HTMLDivElement`. The first line of the bar in the accent text color, medium weight («Ответ Анне», «Редактирование») / the quoted message in the secondary color; both one line, cut with an ellipsis. + native `<div>` props.",
+      en: "`ref` → `HTMLDivElement`. The first line of the bar in the accent text color, medium weight («Ответ Анне», «Редактирование») / the quoted message in the secondary color; both one line, cut with an ellipsis.",
       ru: "Первая строка плашки акцентным цветом, средней насыщенности («Ответ Анне», «Редактирование») / цитируемое сообщение вторичным цветом; обе в одну строку с многоточием.",
-      props: [],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: "`children`, `className` and the other div attributes.",
+          ru: "`children`, `className` и остальные атрибуты div.",
+        },
+      ],
     },
     {
       name: "Composer.Attach",
-      en: '`ref` → `HTMLDivElement`. The paperclip at the start of the row. Alone it opens the file picker (FileUpload `trigger="button"`); with `Composer.Item` children it opens a menu where every item picks its own file types. Files go to the root\'s `queue`. + native `<div>` props.',
+      en: '`ref` → `HTMLDivElement`. The paperclip at the start of the row. Alone it opens the file picker (FileUpload `trigger="button"`); with `Composer.Item` children it opens a menu where every item picks its own file types. Files go to the root\'s `queue`.',
       ru: 'Скрепка в начале строки. Без детей открывает выбор файлов (FileUpload `trigger="button"`); с `Composer.Item` открывает меню, где каждый пункт выбирает свои типы файлов. Файлы уходят в `queue` корня.',
       props: [
         {
@@ -183,6 +197,12 @@ export const api: ComponentApi = {
           type: "ReactNode",
           en: "`Composer.Item` kinds of attachment.",
           ru: "Пункты `Composer.Item` — виды вложений.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
         },
       ],
     },
@@ -210,193 +230,126 @@ export const api: ComponentApi = {
           en: "Muted and skipped by the arrow keys.",
           ru: "Приглушён, стрелки его пропускают.",
         },
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onSelect" | "type">',
+          en: "`children`, `className` and the other button attributes.",
+          ru: "`children`, `className` и остальные атрибуты кнопки.",
+        },
       ],
     },
     {
       name: "Composer.ItemIcon",
-      en: "`ref` → `HTMLSpanElement`. The leading glyph of a menu item (`Dropdown.ItemIcon`, `aria-hidden`). + native `<span>` props.",
+      en: "`ref` → `HTMLSpanElement`. The leading glyph of a menu item (`Dropdown.ItemIcon`, `aria-hidden`).",
       ru: "Значок пункта меню (`Dropdown.ItemIcon`, `aria-hidden`).",
-      props: [],
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (the `Icon`), `className` and the other span attributes.",
+          ru: "`children` (`Icon`), `className` и остальные атрибуты span.",
+        },
+      ],
     },
   ],
-  labels: [
-    {
-      key: "region",
-      default: "Новое сообщение",
-      en: "Accessible name of the composer form.",
-      ru: "Имя формы.",
-    },
-    {
-      key: "placeholder",
-      default: "Сообщение",
+  labels: labelRows(COMPOSER_LABELS, {
+    region: { en: "Accessible name of the composer form.", ru: "Имя формы." },
+    placeholder: {
       en: "Placeholder and accessible name of the field.",
       ru: "Плейсхолдер и имя поля.",
     },
-    {
-      key: "send",
-      default: "Отправить",
-      en: "Name of the send button.",
-      ru: "Имя кнопки отправки.",
-    },
-    {
-      key: "save",
-      default: "Сохранить",
+    send: { en: "Name of the send button.", ru: "Имя кнопки отправки." },
+    save: {
       en: "Name of the send button while a message is edited.",
       ru: "Имя кнопки при правке сообщения.",
     },
-    {
-      key: "recordVoice",
-      default: "Записать голосовое",
+    recordVoice: {
       en: "Name of the record button in voice mode.",
       ru: "Имя кнопки записи голоса.",
     },
-    {
-      key: "recordVideo",
-      default: "Записать видеосообщение",
-      en: "Name of the record button in video mode.",
-      ru: "Имя кнопки записи видео.",
-    },
-    {
-      key: "recordHint",
-      default: "Удерживайте, чтобы записать; нажмите, чтобы записывать без удержания",
+    recordVideo: { en: "Name of the record button in video mode.", ru: "Имя кнопки записи видео." },
+    recordHint: {
       en: "Description of the record button: how to record.",
       ru: "Описание кнопки записи.",
     },
-    {
-      key: "recordSwitchHint",
-      default:
-        "Нажмите или удерживайте, чтобы записать; двойное нажатие или стрелки вверх и вниз переключают голос и видео",
+    recordSwitchHint: {
       en: "Description of the record button when it also switches voice and video.",
       ru: "Описание кнопки записи, когда она переключает голос и видео.",
     },
-    {
-      key: "recordModeVoice",
-      default: "Голосовое сообщение",
+    recordModeVoice: {
       en: "Announced when the record button switches to voice messages.",
       ru: "Объявляется, когда кнопка записи переключается на голосовые.",
     },
-    {
-      key: "recordModeVideo",
-      default: "Видеосообщение",
+    recordModeVideo: {
       en: "Announced when the record button switches to video messages.",
       ru: "Объявляется, когда кнопка записи переключается на видеосообщения.",
     },
-    {
-      key: "sendRecording",
-      default: "Отправить запись",
-      en: "Name of the button while recording.",
-      ru: "Имя кнопки во время записи.",
-    },
-    {
-      key: "cancelRecording",
-      default: "Удалить запись",
+    sendRecording: { en: "Name of the button while recording.", ru: "Имя кнопки во время записи." },
+    cancelRecording: {
       en: "Name of the button that throws a recording away.",
       ru: "Имя кнопки удаления записи.",
     },
-    {
-      key: "pauseRecording",
-      default: "Приостановить запись",
+    pauseRecording: {
       en: "Name of the button that pauses a hands-free recording.",
       ru: "Имя кнопки паузы записи без удержания.",
     },
-    {
-      key: "resumeRecording",
-      default: "Продолжить запись",
+    resumeRecording: {
       en: "Name of the button that resumes a paused recording.",
       ru: "Имя кнопки, продолжающей приостановленную запись.",
     },
-    {
-      key: "slideToCancel",
-      default: "Влево — отмена",
+    slideToCancel: {
       en: "Hint while a recording is held.",
       ru: "Подсказка при записи с удержанием.",
     },
-    {
-      key: "recordingStarted",
-      default: "Идёт запись",
+    recordingStarted: {
       en: "Announced when a recording starts.",
       ru: "Объявляется в начале записи.",
     },
-    {
-      key: "recordingLocked",
-      default: "Запись продолжается без удержания",
+    recordingLocked: {
       en: "Announced when a held recording is locked and goes on hands-free.",
       ru: "Объявляется, когда запись с удержанием закреплена и идёт без него.",
     },
-    {
-      key: "recordingCanceled",
-      default: "Запись удалена",
+    recordingCanceled: {
       en: "Announced when a recording is thrown away.",
       ru: "Объявляется при удалении записи.",
     },
-    {
-      key: "recordingPaused",
-      default: "Запись приостановлена",
+    recordingPaused: {
       en: "Announced when a recording is paused.",
       ru: "Объявляется, когда запись приостановлена.",
     },
-    {
-      key: "recordingResumed",
-      default: "Запись продолжена",
+    recordingResumed: {
       en: "Announced when a paused recording goes on.",
       ru: "Объявляется, когда приостановленная запись продолжается.",
     },
-    {
-      key: "recordingSent",
-      default: "Запись отправлена",
+    recordingSent: {
       en: "Announced when a recording is handed over.",
       ru: "Объявляется при отправке записи.",
     },
-    {
-      key: "recordDenied",
-      default: "Нет доступа к микрофону или камере — разрешите его в настройках браузера",
+    recordDenied: {
       en: "Error when the browser refuses the microphone or the camera.",
       ru: "Ошибка: браузер не дал доступ к микрофону или камере.",
     },
-    {
-      key: "recordMissing",
-      default: "Микрофон или камера не найдены",
-      en: "Error when there is no device.",
-      ru: "Ошибка: нет устройства.",
-    },
-    {
-      key: "recordFailed",
-      default: "Не удалось начать запись",
+    recordMissing: { en: "Error when there is no device.", ru: "Ошибка: нет устройства." },
+    recordFailed: {
       en: "Error when a recording fails to start for another reason.",
       ru: "Ошибка: запись не началась по другой причине.",
     },
-    {
-      key: "attach",
-      default: "Прикрепить",
-      en: "Name of the paperclip.",
-      ru: "Имя скрепки.",
-    },
-    {
-      key: "attachments",
-      default: "Вложения",
-      en: "Accessible name of the strip of attachments.",
-      ru: "Имя ленты вложений.",
-    },
-    {
-      key: "sendAsFiles",
-      default: "Отправить как файлы, без сжатия",
+    attach: { en: "Name of the paperclip.", ru: "Имя скрепки." },
+    attachments: { en: "Accessible name of the strip of attachments.", ru: "Имя ленты вложений." },
+    sendAsFiles: {
       en: "The option that sends the attached photos and videos as files.",
       ru: "Флажок, который отправляет прикреплённые фото и видео файлами.",
     },
-    ...TEXT_FORMATTING_LABEL_ROWS,
-    {
-      key: "cancelReply",
-      default: "Отменить ответ",
+    ...TEXT_FORMATTING_LABEL_DOCS,
+    cancelReply: {
       en: "Name of the close button of a reply bar.",
       ru: "Имя кнопки закрытия ответа.",
     },
-    {
-      key: "cancelEdit",
-      default: "Отменить редактирование",
+    cancelEdit: {
       en: "Name of the close button of an edit bar.",
       ru: "Имя кнопки закрытия правки.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -413,7 +366,7 @@ export const api: ComponentApi = {
       {
         keys: "↑",
         en: "In an empty field opens your last message for editing (`onEditLast`).",
-        ru: "В пустом поле открывает последнее своё сообщение для правки.",
+        ru: "В пустом поле открывает последнее своё сообщение для правки (`onEditLast`).",
       },
       {
         keys: "Escape",
@@ -459,7 +412,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'The composer is a `<form>` named «Новое сообщение»; the field is a `<textarea>` named «Сообщение» with `enterkeyhint="send"` (`enter` on touch).',
-        ru: "Композер — `<form>` с именем «Новое сообщение»; поле — `<textarea>` с именем «Сообщение».",
+        ru: 'Композер — `<form>` с именем «Новое сообщение»; поле — `<textarea>` с именем «Сообщение» и `enterkeyhint="send"` (`enter` на сенсорных).',
       },
       {
         en: "A reply / edit bar describes the field (`aria-describedby`); when it appears after the first render the caret moves to the field. Its close button is «Отменить ответ» / «Отменить редактирование». A send that went through closes it.",
@@ -467,7 +420,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'The formatting toolbar is `role="toolbar"` with one Tab stop and arrow keys; every button has `aria-keyshortcuts` and a tooltip with its keys (`⌘B` on Apple systems, `Ctrl+B` elsewhere).',
-        ru: 'Панель форматирования — `role="toolbar"` с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами.',
+        ru: 'Панель форматирования — `role="toolbar"` с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами (`⌘B` на системах Apple, `Ctrl+B` на остальных).',
       },
       {
         en: "The action button is named by what it does — «Отправить», «Сохранить», «Записать голосовое», «Записать видеосообщение», «Отправить запись» — and described by how to record. While sending it is `aria-busy` and the field is read-only.",
@@ -479,7 +432,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'While recording the paperclip and the field are `inert` under the bar; the bar\'s buttons are «Удалить запись» and «Приостановить запись» / «Продолжить запись» (`aria-keyshortcuts="Space"`), the action button «Отправить запись». Deleting brings the focus back to the action button. Pause and resume are announced. The timer and the waveform are decorative. While a finger holds a recording only `Escape` works (it throws the recording away); the delete and pause buttons keep their own Enter and Space.',
-        ru: 'Во время записи скрепка и поле `inert` под полосой записи; у её кнопок имена «Удалить запись» и «Приостановить запись» / «Продолжить запись» (`aria-keyshortcuts="Space"`), после удаления фокус возвращается на кнопку действия. Пауза и продолжение объявляются в live-области. Таймер и волна декоративны. Пока палец держит запись, клавиши не действуют.',
+        ru: 'Во время записи скрепка и поле `inert` под полосой записи; у её кнопок имена «Удалить запись» и «Приостановить запись» / «Продолжить запись» (`aria-keyshortcuts="Space"`), после удаления фокус возвращается на кнопку действия. Пауза и продолжение объявляются в live-области. Таймер и волна декоративны. Пока палец держит запись, действует только `Escape` (выбрасывает запись); у кнопок удаления и паузы свои Enter и Space.',
       },
       {
         en: "The attachments are one `<ul>` named «Вложения» (FileUpload.Queue `layout=\"strip\"`): every tile is «Фото N: name» / «Видео N: name» / «Файл N: name» with its upload state, `aria-keyshortcuts` for `Alt + ←` / `→` and `Delete`, a remove button «Убрать name»; the upload disk is a `progressbar` while the file goes up. Moves are announced by Dnd's live region, finished and failed files by the queue's. «Отправить как файлы, без сжатия» is a labelled Checkbox.",

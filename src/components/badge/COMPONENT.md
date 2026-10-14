@@ -51,9 +51,10 @@ Badge.Root          <span>: fill, tier dimensions
 | `onPress` | `(event: MouseEvent<HTMLButtonElement>) => void` | — | Makes the body a `<button>` covering the whole badge (a toggle chip, a filter value); gets the event, so Alt / Shift clicks can mean more. |
 | `pressed` | `boolean` | — | Toggle state of a pressable badge: `aria-pressed` on the body, `data-pressed` on the root. |
 | `disabled` | `boolean` | — | Muted look for every variant, `aria-disabled`; the body button, remove and action get native `disabled`. |
+| `className` | `string` | — | Class on the badge. |
 | `labels` | `Partial<BadgeLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Text, `Badge.Dot`, `Badge.Icon`, one `Badge.Action`. Only `Badge.Icon` children (no remove or action) make a square icon-only badge. |
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className`, `aria-label` (icon-only) and the other span attributes. |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `aria-label` (icon-only) and the other span attributes. |
 
 ### Badge.Icon
 `ref` → `HTMLSpanElement`. A `<span>` holding one icon at the tier icon size. At the first or last position it becomes a full-height edge segment.
@@ -61,14 +62,16 @@ Badge.Root          <span>: fill, tier dimensions
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | The icon (`Icon`). |
-| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
+| `className` | `string` | — | Class on the icon box. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
 
 ### Badge.Dot
 `ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment. Alone (a marker on an icon, before a label) it takes the host tier and the color set on it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
+| `className` | `string` | — | Class on the dot. |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | The other span attributes. |
 
 ### Badge.Action
 `ref` → `HTMLButtonElement`. A `<button>` segment at the end, revealed on hover and focus (always shown on touch); the width never changes. One per badge, not together with `onRemove`.

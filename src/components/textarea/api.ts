@@ -1,26 +1,27 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import {
-  FIELD_COMMIT_LABELS,
-  FIELD_COPY_LABELS,
+  FIELD_COMMIT_LABEL_DOCS,
+  FIELD_COPY_LABEL_DOCS,
   fieldActionPart,
   fieldCommitProp,
   fieldCopyPart,
 } from "../../internal/field.api";
-import { formattingProp, TEXT_FORMATTING_LABEL_ROWS } from "../../internal/textFormatting.api";
+import { formattingProp, TEXT_FORMATTING_LABEL_DOCS } from "../../internal/textFormatting.api";
+import { TEXTAREA_LABELS } from "./Textarea";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Textarea.Root",
       en: "`ref` → `HTMLTextAreaElement`. Renders the label row, the field box with the native `<textarea>` and the support row. Field-root rule for a leaf without a `Field` part: `className` goes to the field frame; `id`, `ref` and the native `<textarea>` props to the textarea.",
-      ru: "Подпись, поле с нативным `<textarea>` и строка поддержки; нативные пропсы уходят в `<textarea>`.",
+      ru: "Рендерит строку подписи, рамку с нативным `<textarea>` и строку поддержки. Правило корня поля для листа без части `Field`: `className` — на рамку поля; `id`, `ref` и нативные пропсы `<textarea>` — на textarea.",
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier for text, padding, radius, label and hint. One line of text sits exactly like an Input of the same size. Without it the tier of its host (LoginForm, Popover, a panel with a size), else `m`.",
-          ru: "Ярус: кегль, отступы, радиус, подпись и подсказка. Одна строка стоит как Input того же яруса.",
+          ru: "Ярус: кегль, отступы, радиус, подпись и подсказка. Одна строка стоит как Input того же яруса. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "label",
@@ -58,19 +59,19 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger inset ring on the field box, `aria-invalid` on the textarea. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо, `aria-invalid`, `data-invalid`.",
+          ru: "Красное внутреннее кольцо на рамке поля, `aria-invalid` на textarea. Непустой `error` включает его.",
         },
         {
           name: "focusRing",
           type: "boolean",
           default: "true",
           en: '`false` hides only the visual focus ring on the field box (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay.',
-          ru: "`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются.",
+          ru: '`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются. Атрибут — `data-focus-ring="false"`.',
         },
         {
           name: "counter",
           type: "ReactNode",
-          en: "Right side of the support row, usually `<Textarea.Counter />`.",
+          en: "Right side of the support row, usually `<Textarea.Counter current max />`.",
           ru: "Правая часть строки поддержки, обычно `<Textarea.Counter current max />`.",
         },
         {
@@ -110,7 +111,7 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the `<textarea>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Явный id поля; иначе генерируется. Связывает подпись, подсказку и ошибку.",
+          ru: "Id `<textarea>`; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-describedby",
@@ -142,7 +143,7 @@ export const api: ComponentApi = {
           name: "…rest",
           type: 'Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size" | "children">',
           en: "`value`, `defaultValue`, `onChange`, `placeholder`, `rows`, `maxLength`, `name`, `disabled`, `readOnly`, `aria-label`…",
-          ru: "`value`, `defaultValue`, `onChange`, `placeholder`, `rows`, `maxLength`, `disabled`, `readOnly`…",
+          ru: "`value`, `defaultValue`, `onChange`, `placeholder`, `rows`, `maxLength`, `name`, `disabled`, `readOnly`, `aria-label`…",
         },
       ],
     },
@@ -163,7 +164,7 @@ export const api: ComponentApi = {
           type: "number",
           required: true,
           en: 'Limit; `current > max` turns the counter danger (`data-invalid="true"`). Add `maxLength` on the root for a hard limit.',
-          ru: "Лимит; при `current > max` счётчик красный. Для жёсткого лимита добавьте `maxLength`.",
+          ru: 'Лимит; при `current > max` счётчик красный (`data-invalid="true"`). Для жёсткого лимита добавьте `maxLength` на корень.',
         },
         {
           name: "…rest",
@@ -182,23 +183,19 @@ export const api: ComponentApi = {
       ru: "в верхнем углу поля",
     }),
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(TEXTAREA_LABELS, {
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-    {
-      key: "counter",
-      default: "{current} из {max} символов",
+    counter: {
       en: "Screen-reader text of `Textarea.Counter`; `{current}` and `{max}` are replaced.",
       ru: "Озвучка `Textarea.Counter`; `{current}` и `{max}` подставляются.",
     },
-    ...FIELD_COPY_LABELS,
-    ...FIELD_COMMIT_LABELS,
-    ...TEXT_FORMATTING_LABEL_ROWS,
-  ],
+    ...FIELD_COPY_LABEL_DOCS,
+    ...FIELD_COMMIT_LABEL_DOCS,
+    ...TEXT_FORMATTING_LABEL_DOCS,
+  }),
   accessibility: {
     keyboard: [
       {
@@ -247,19 +244,19 @@ export const api: ComponentApi = {
       },
       {
         en: '`Textarea.Counter` shows `12/280` visually and announces `labels.counter` (`aria-live="polite"`).',
-        ru: '`Textarea.Counter` показывает «12/280», а скринридер читает `labels.counter` через `aria-live="polite"`.',
+        ru: '`Textarea.Counter` показывает `12/280`, а скринридер читает `labels.counter` через `aria-live="polite"`.',
       },
       {
         en: "`Textarea.Action` and `Textarea.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied`. A press on them never moves focus into the textarea.",
-        ru: "`Textarea.Action` и `Textarea.CopyButton` — кнопки с именем и подсказкой; копирование объявляет `labels.copied`.",
+        ru: "`Textarea.Action` и `Textarea.CopyButton` — кнопки (или ссылка с `asChild`) с именем из подписи и подсказкой; копирование объявляет `labels.copied`. Нажатие на них не переводит фокус в textarea.",
       },
       {
         en: 'With `onCommit` the textarea carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.',
-        ru: "С `onCommit` поле ставит `aria-busy`, пока идёт сохранение, а живой регион говорит `labels.saving` и `labels.saved`.",
+        ru: 'С `onCommit` textarea ставит `aria-busy="true"`, пока идёт сохранение, а вежливая live-область говорит `labels.saving`, затем `labels.saved`.',
       },
       {
         en: 'The formatting toolbar is `role="toolbar"` named `labels.formatting`, `aria-controls` the textarea, with one Tab stop and arrow keys; every button has `aria-keyshortcuts` and a tooltip with its keys (`⌘B` on Apple systems, `Ctrl+B` elsewhere). A press on a tool keeps the focus and the selection in the field.',
-        ru: 'Панель форматирования — `role="toolbar"` с именем `labels.formatting` и `aria-controls` на поле, с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами. Нажатие на кнопку оставляет фокус и выделение в поле.',
+        ru: 'Панель форматирования — `role="toolbar"` с именем `labels.formatting` и `aria-controls` на поле, с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами (`⌘B` на системах Apple, `Ctrl+B` на остальных). Нажатие на кнопку оставляет фокус и выделение в поле.',
       },
     ],
   },

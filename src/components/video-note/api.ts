@@ -1,12 +1,13 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { mediaPlayerLabels, mediaPlayerProps } from "../../internal/mediaPlayer.api";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { mediaPlayerLabelDocs, mediaPlayerProps } from "../../internal/mediaPlayer.api";
+import { VIDEO_NOTE_LABELS } from "./VideoNote";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "VideoNote",
       en: '`ref` → `HTMLDivElement` (the `role="group"` root). A round video message: a still first frame that plays with sound on a press. Inside `Message.Root` it is the message itself, without a bubble. Its props are VoicePlayer\'s (`MediaPlayerProps`) plus `poster`.',
-      ru: 'Корень `role="group"`. Круглое видеосообщение: неподвижный первый кадр, который по нажатию играет со звуком. Внутри `Message.Root` это само сообщение, без пузыря. Пропсы — те же, что у VoicePlayer (`MediaPlayerProps`), плюс `poster`.',
+      ru: "Круглое видеосообщение: неподвижный первый кадр, который по нажатию играет со звуком. Внутри `Message.Root` это само сообщение, без пузыря. Пропсы — те же, что у VoicePlayer (`MediaPlayerProps`), плюс `poster`.",
       props: [
         ...mediaPlayerProps({
           media: { en: "Video", ru: "видео" },
@@ -55,19 +56,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: mediaPlayerLabels({
-    player: "Видеосообщение",
-    play: "Воспроизвести видеосообщение",
-    unplayed: "Не просмотрено",
-    transfer: "The transfer of the note",
-    own: [
-      {
-        key: "duration",
-        default: "Длительность {duration}",
-        en: "The play disk's description before playback (during it, `position`).",
-        ru: "Описание диска воспроизведения до начала (во время — `position`).",
-      },
-    ],
+  labels: labelRows(VIDEO_NOTE_LABELS, {
+    ...mediaPlayerLabelDocs({ en: "The transfer of the note", ru: "Передача кружка" }),
+    duration: {
+      en: "The play disk's description before playback (during it, `position`).",
+      ru: "Описание диска воспроизведения до начала (во время — `position`).",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -84,12 +78,12 @@ export const api: ComponentApi = {
       {
         keys: "ArrowRight · ArrowUp",
         en: "On the disk: 5 seconds forward (`ArrowRight` mirrored in RTL).",
-        ru: "На диске — вперёд на 5 секунд.",
+        ru: "На диске — вперёд на 5 секунд (`ArrowRight` зеркально в RTL).",
       },
       {
         keys: "ArrowLeft · ArrowDown",
         en: "On the disk: 5 seconds back (`ArrowLeft` mirrored in RTL).",
-        ru: "На диске — назад на 5 секунд.",
+        ru: "На диске — назад на 5 секунд (`ArrowLeft` зеркально в RTL).",
       },
       {
         keys: "PageUp · PageDown",
@@ -109,11 +103,11 @@ export const api: ComponentApi = {
       },
       {
         en: "The play disk is a button named `labels.play` / `labels.pause`, described by the duration (`labels.duration`) or the position (`labels.position`) and `labels.unplayed`; the pills are `aria-hidden`, and the press area over the whole circle is a pointer aid only (`aria-hidden`).",
-        ru: "Диск воспроизведения — кнопка `labels.play` / `labels.pause`, её описание — длительность (`labels.duration`) или позиция (`labels.position`) и `labels.unplayed`; плашки скрыты от чтения. Нажатие в любом месте кружка — только помощь указателю.",
+        ru: "Диск воспроизведения — кнопка `labels.play` / `labels.pause`, её описание — длительность (`labels.duration`) или позиция (`labels.position`) и `labels.unplayed`; плашки скрыты (`aria-hidden`), а область нажатия на весь кружок — только помощь указателю (`aria-hidden`).",
       },
       {
         en: 'While the note is on its way, failed or not fetched, the play button itself is the transfer, named by the direction (`cancelUpload` / `cancelDownload` described by `uploadProgress` / `downloadProgress`, `retryUpload` / `retryDownload` described by `notSent` / `notReceived`, `download`); its ring is `aria-hidden`; a refused action is announced (`role="status"`).',
-        ru: 'Пока кружок в пути, не удался или не скачан, диск `inert`, а на его месте диск передачи: кнопка с именем по направлению (`cancelUpload` / `cancelDownload`, `retryUpload` / `retryDownload` с описанием `notSent` / `notReceived`, `download`) и кольцо `role="progressbar"`; отказ объявляется (`role="status"`).',
+        ru: 'Пока кружок в пути, не удался или не скачан, сама кнопка воспроизведения — передача с именем по направлению (`cancelUpload` / `cancelDownload` с описанием `uploadProgress` / `downloadProgress`, `retryUpload` / `retryDownload` с описанием `notSent` / `notReceived`, `download`); её кольцо `aria-hidden`; отказ объявляется (`role="status"`).',
       },
       {
         en: "The transcript button is named `labels.transcribe` / `labels.hideTranscript`, with `aria-expanded` and `aria-controls`; a failed request is announced with `labels.transcribeFailed`.",
@@ -121,7 +115,7 @@ export const api: ComponentApi = {
       },
       {
         en: "`disabled` (own or a `Fieldset`'s) disables the disk, the transcript button and the transfer actions natively.",
-        ru: "`disabled` (или выключенный `Fieldset`) выключает диск, кнопку расшифровки и действия передачи нативным `disabled`.",
+        ru: "`disabled` (или выключенный `Fieldset`) нативно выключает диск, кнопку расшифровки и действия передачи.",
       },
     ],
   },

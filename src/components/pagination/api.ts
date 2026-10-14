@@ -1,11 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { PAGINATION_LABELS } from "./Pagination";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Pagination",
-      en: "`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with ghost `Button`s: previous, page numbers with ellipses, next.",
-      ru: "`<nav>` с именем из `labels.nav` и ghost-кнопками: назад, номера страниц с многоточием, вперёд.",
+      en: "`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with `Button`s: ghost previous and next, ghost page numbers with ellipses, the current page soft accent.",
+      ru: "`<nav>` с именем из `labels.nav` и кнопками `Button`: ghost «назад» и «вперёд», ghost-номера страниц с многоточием, текущая — soft accent.",
       props: [
         {
           name: "totalPages",
@@ -37,8 +38,8 @@ export const api: ComponentApi = {
           name: "siblingCount",
           type: "number",
           default: "1",
-          en: "Pages on each side of the current one before an ellipsis (when `totalPages > 7`).",
-          ru: "Сколько номеров по бокам от текущей до многоточия (при `totalPages > 7`).",
+          en: "Pages on each side of the current one before an ellipsis (when `totalPages > 2·siblingCount+5`).",
+          ru: "Сколько номеров по бокам от текущей до многоточия (при `totalPages > 2·siblingCount+5`).",
         },
         {
           name: "size",
@@ -69,38 +70,19 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "nav",
-      default: "Навигация по страницам",
-      en: "`aria-label` of the `<nav>`.",
-      ru: "`aria-label` навигации.",
-    },
-    {
-      key: "previous",
-      default: "Предыдущая страница",
-      en: "Name of the previous-page arrow.",
-      ru: "Имя стрелки «назад».",
-    },
-    {
-      key: "next",
-      default: "Следующая страница",
-      en: "Name of the next-page arrow.",
-      ru: "Имя стрелки «вперёд».",
-    },
-    {
-      key: "page",
-      default: "Страница {page}",
+  labels: labelRows(PAGINATION_LABELS, {
+    nav: { en: "`aria-label` of the `<nav>`.", ru: "`aria-label` у `<nav>`." },
+    previous: { en: "Name of the previous-page arrow.", ru: "Имя стрелки «назад»." },
+    next: { en: "Name of the next-page arrow.", ru: "Имя стрелки «вперёд»." },
+    page: {
       en: "Name of a page button; `{page}` is replaced.",
       ru: "Имя кнопки страницы; `{page}` заменяется номером.",
     },
-    {
-      key: "of",
-      default: "из",
+    of: {
       en: "Hidden word between the current and the total page in the compact view.",
       ru: "Скрытое слово между текущей и общей страницей в компактном виде.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -122,7 +104,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The edge arrows are `disabled`; the ellipsis is `aria-hidden`.",
-        ru: "Стрелки на краях отключены (`disabled`), многоточие скрыто от скринридеров.",
+        ru: "Стрелки на краях отключены (`disabled`), многоточие — `aria-hidden`.",
       },
       {
         en: "The compact view reads «3 из 12» through the visually hidden `labels.of`.",

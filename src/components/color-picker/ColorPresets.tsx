@@ -45,7 +45,7 @@ export type ColorPresetsLabels = {
   empty: string;
 };
 
-const COLOR_PRESETS_LABELS: ColorPresetsLabels = {
+export const COLOR_PRESETS_LABELS: ColorPresetsLabels = {
   trigger: "Цвет",
   list: "Цвета",
   empty: "Без цвета",

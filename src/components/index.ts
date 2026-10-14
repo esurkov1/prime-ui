@@ -27,7 +27,14 @@ export type {
   AvatarStatusProps,
 } from "./avatar/Avatar";
 export { Avatar } from "./avatar/Avatar";
-export * from "./badge/Badge";
+export type {
+  BadgeActionProps,
+  BadgeDotProps,
+  BadgeIconProps,
+  BadgeLabels,
+  BadgeRootProps,
+} from "./badge/Badge";
+export { Badge } from "./badge/Badge";
 export type {
   BannerActionsProps,
   BannerContentProps,
@@ -620,7 +627,19 @@ export type {
   SwitchRootProps,
 } from "./switch/Switch";
 export { Switch } from "./switch/Switch";
-export * from "./tabs/Tabs";
+export type {
+  TabsCountProps,
+  TabsDescriptionProps,
+  TabsIconProps,
+  TabsItemProps,
+  TabsLabelProps,
+  TabsLabels,
+  TabsListProps,
+  TabsPanelProps,
+  TabsRootProps,
+  TabsSeparatorProps,
+} from "./tabs/Tabs";
+export { Tabs } from "./tabs/Tabs";
 export type {
   TagSelectLabels,
   TagSelectOption,

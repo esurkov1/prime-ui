@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_LIST_LABELS } from "./FieldList";
 
 export const api: ComponentApi = {
   parts: [
@@ -144,44 +145,32 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "remove",
-      default: "Удалить {row}",
+  labels: labelRows(FIELD_LIST_LABELS, {
+    remove: {
       en: "`aria-label` of a row's remove button; `{row}` is the row's name.",
       ru: "`aria-label` кнопки удаления строки; `{row}` — имя строки.",
     },
-    {
-      key: "reorder",
-      default: "Переместить {row}",
+    reorder: {
       en: "`aria-label` of a row's handle (`reorderable`); `{row}` is the row's name.",
       ru: "`aria-label` ручки строки (`reorderable`); `{row}` — имя строки.",
     },
-    {
-      key: "row",
-      default: "строку {index}",
+    row: {
       en: "Name of a row without `getLabel` text; `{index}` counts from 1.",
       ru: "Имя строки без текста `getLabel`; `{index}` — номер с 1.",
     },
-    {
-      key: "namedRow",
-      default: "«{label}»",
+    namedRow: {
       en: "Name of a row with `getLabel` text; `{label}` is that text.",
       ru: "Имя строки с текстом `getLabel`; `{label}` — этот текст.",
     },
-    {
-      key: "locked",
-      default: "Закреплена",
+    locked: {
       en: "Spoken name of the lock of a pinned row in a list without `reorderable`.",
       ru: "Имя замка закреплённой строки в списке без `reorderable`.",
     },
-    {
-      key: "maxReached",
-      default: "Не больше {max}",
+    maxReached: {
       en: "Text beside the disabled add button once the list holds `max` rows.",
       ru: "Текст у выключенной кнопки добавления, когда строк уже `max`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -203,7 +192,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "The rows are an `<ol>` named by the list `label` (`aria-labelledby`); the list gives each row its position.",
-        ru: "Строки — `<ol>`, названный подписью списка (`label`); номер строки даёт сам список.",
+        ru: "Строки — `<ol>`, названный подписью списка `label` (`aria-labelledby`); номер строки даёт сам список.",
       },
       {
         en: "The heading row is `aria-hidden`: each field in a cell carries its column heading as its own label, read but not shown on wide rows.",
@@ -219,7 +208,7 @@ export const api: ComponentApi = {
       },
       {
         en: "A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is an image named «Закреплена».",
-        ru: "Закреплённая строка — замок вместо ручки, без кнопки удаления; в списке без перестановки замок назван «Закреплена».",
+        ru: "Закреплённая строка — замок вместо ручки, без кнопки удаления; без `reorderable` замок — изображение с именем «Закреплена».",
       },
     ],
   },

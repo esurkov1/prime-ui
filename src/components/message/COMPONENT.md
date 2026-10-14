@@ -68,13 +68,13 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `direction` | `"incoming" \| "outgoing"` | `"incoming"` | `incoming` — on the start side, a surface one step off the chat; `outgoing` — on the end side, in the accent hue (`--prime-color-message-outgoing-*`), everything inside recolors with it. |
 | `position` | `"single" \| "first" \| "middle" \| "last"` | `"single"` | The place in a run of one author (`Chat.Messages items` sets it): `single` and `last` end a run with the tail (and a group chat's avatar); `single` and `first` show the author's header. |
 | `time` | `Date \| string` | — | When it was sent: a `Date` shown with `formatTime` (and put in `<time dateTime>`), or the text to show. |
-| `formatTime` | `(date: Date) => string` | `«09:05»` | Display of a `Date` time. |
+| `formatTime` | `(date: Date) => string` | «09:05» | Display of a `Date` time. |
 | `edited` | `boolean` | `false` | The text was edited: `labels.edited` before the time. |
 | `status` | `"sending" \| "sent" \| "read" \| "failed"` | — | Delivery of an outgoing message: a clock, one check, two checks (accent), or a danger mark; the glyphs cross-fade from one state to the next. Named for assistive tech by `labels`. |
 | `onRetry` | `() => void \| Promise<void>` | — | Sends a failed message again: a ghost danger button beside the bubble. A returned promise shows `sending` until it settles; a rejection leaves it failed. |
 | `onReactionToggle` | `(emoji: string) => void \| Promise<unknown>` | — | Puts or takes back the reader's reaction (a chip, a double tap, `L`, the reaction bar). Shown at once; a returned promise keeps it pending, a rejection drops it back. Without it reactions are read-only. |
 | `value` | `string` | — | The message id for selection, jumps, read receipts, search, pins and `Message.Reply target` (`Chat.Messages items` sets the item's key). Keep it when the server confirms a sent message. |
-| `labels` | `Partial<MessageLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<MessageLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "role">` | — | `id`, `aria-label` to replace «{author}, {time}», `className` and the other attributes of the row. |
 
 ### Message.Avatar
@@ -146,7 +146,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `onCancel` | `(index: number) => void \| Promise<void>` | — | Cancel the transfer in flight: the disk's cross. A returned promise keeps the disk pending (a spinner, `aria-busy`, no second press); a rejection leaves the transfer as it was and announces `cancelFailed`. |
 | `onRetry` | `(index: number) => void \| Promise<void>` | — | Transfer it again after a failure: the danger disk's retry; a promise works the same (`retryFailed` on a rejection). |
 | `onDownload` | `(index: number) => void \| Promise<void>` | — | Fetch a `remote` content: the download arrow; set `transfer` to `loading` with `transferDirection="download"` as it starts. A promise works the same (`downloadFailed` on a rejection). |
-| `labels` | `Partial<GalleryLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<GalleryLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
 ### Message.File
@@ -156,7 +156,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 |---|---|---|---|
 | `name` | `string` | — (required) | The file name with its extension (the format tile reads it). |
 | `fileSize` | `number` | — | Bytes, shown as «1,2 МБ». |
-| `formatSize` | `(bytes: number) => string` | `Russian digits, Б · КБ · МБ · ГБ` | Display of `fileSize`. |
+| `formatSize` | `(bytes: number) => string` | Russian digits, Б · КБ · МБ · ГБ | Display of `fileSize`. |
 | `href` | `string` | — | Where to get it: the tile becomes the download link «Скачать {name}». |
 | `preview` | `string` | — | A picture of the file (an image, the first page) in the tile in place of the format. |
 | `transfer` | `"remote" \| "queued" \| "loading" \| "failed" \| "done"` | — | The transfer of the file, either way (`TransferState`): `queued` / `loading` — the cancel cross and the share ring; `failed` — retry; `remote` — download; `done` — the disk fades out. |
@@ -165,7 +165,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `onCancel` | `() => void \| Promise<void>` | — | Cancel the transfer in flight: the disk's cross. A returned promise keeps the disk pending (a spinner, `aria-busy`, no second press); a rejection leaves the transfer as it was and announces `cancelFailed`. |
 | `onRetry` | `() => void \| Promise<void>` | — | Transfer it again after a failure: the danger disk's retry; a promise works the same (`retryFailed` on a rejection). |
 | `onDownload` | `() => void \| Promise<void>` | — | Fetch a `remote` content: the download arrow; set `transfer` to `loading` with `transferDirection="download"` as it starts. A promise works the same (`downloadFailed` on a rejection). |
-| `labels` | `Partial<MessageFileLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<MessageFileLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
 ### Message.Location
@@ -178,7 +178,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `title` | `string` | — | The place. |
 | `address` | `string` | — | Its address. |
 | `live` | `boolean` | `false` | A location shared live (still under reduced motion). |
-| `labels` | `Partial<MessageLocationLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<MessageLocationLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
 ### Message.Contact
@@ -190,7 +190,8 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `phone` | `string` | — | The phone, as written. |
 | `src` | `string` | — | The person's photo; without it the initials. |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"blue"` | Hue of the initials. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "color">` | — | `children` — `Button.Root` actions («Написать», «Добавить»); `className`. |
+| `children` | `ReactNode` | — | `Button.Root` actions in a row under the person («Написать», «Добавить»). |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "color">` | — | `className` and the other div attributes. |
 
 ### Message.LinkPreview
 `ref` → `HTMLAnchorElement`. The card of a linked page across the bubble's full width (at least the card width): an accent wash with a bar, the site, title, description (3 lines) and a 16 : 9 picture; long words and URLs wrap; the whole card opens the page in a new tab.
@@ -210,7 +211,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `items` | `MessageReaction[]` | — (required) | `{ emoji, count, selected?, users? }` — `count` is the total, `selected` the reader's own reaction, `users` (`{ id, name, src?, color? }[]`, in the order they put it) who put it; without `users` the chip shows the count. |
-| `labels` | `Partial<MessageReactionsLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<MessageReactionsLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
 ### Message.Actions
@@ -373,11 +374,14 @@ The list-level settings a message reads — the group chat's author header and a
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
+#### Message.Root
+
 | Key | Default | Used for |
 |---|---|---|
 | `message` | `"{author}, {time}"` | The name of a message for assistive tech. |
 | `you` | `"Вы"` | The author of an outgoing message. |
 | `edited` | `"изменено"` | The mark of an edited message in its meta. |
+| `spoiler` | `"Скрытый текст"` | `Message.Text`: the name of a `\|\|spoiler\|\|` while it is hidden. |
 | `sending` | `"Отправляется"` | Name of the clock status. |
 | `sent` | `"Отправлено"` | Name of the one-check status. |
 | `read` | `"Прочитано"` | Name of the two-check status. |
@@ -385,36 +389,82 @@ The list-level settings a message reads — the group chat's author header and a
 | `retry` | `"Повторить отправку"` | The retry button beside a failed message. |
 | `menu` | `"Действия с сообщением"` | The name of the context menu. |
 | `select` | `"Выбрать"` | The menu item that starts selection mode with the message. |
-| `reaction` | `"{emoji}: {count}"` | `Message.Reactions`: the name of a chip without `users`. |
-| `reactionUsers` | `"{emoji} {count}: {users}"` | `Message.Reactions`: the name of a chip with `users`; `{users}` — their names. |
-| `moreUsers` | `"ещё {count}"` | `Message.Reactions`: the last item of `{users}` when not everyone is listed. |
-| `reactions` | `"Реакции"` | `Message.Reactions`: the name of the row. |
 | `reactionAdded` | `"Реакция {emoji} поставлена"` | Announced when the quick reaction (a double tap, `L`) is put. |
 | `reactionRemoved` | `"Реакция {emoji} снята"` | Announced when the quick reaction is taken back. |
 | `reactionBar` | `"Реакции"` | The name of the reaction bar. |
 | `moreReactions` | `"Все реакции"` | The «⌄» of the reaction bar that shows every reaction. |
-| `spoiler` | `"Скрытый текст"` | `Message.Text`: the name of a `\|\|spoiler\|\|` while it is hidden. |
-| `typing` | `"Собеседник печатает"` | `Message.Typing`: the text read while the other side types. |
-| `reply` | `"Ответ на сообщение"` | `Message.Reply labels`: the hidden prefix read before the quote. |
-| `forwarded` | `"Переслано от {author}"` | `Message.Forwarded labels`: the header; `{author}` — the original author. |
+
+#### Message.Forwarded
+
+| Key | Default | Used for |
+|---|---|---|
+| `forwarded` | `"Переслано от {author}"` | `Message.Forwarded`: the header; `{author}` — the original author. |
+
+#### Message.Reply
+
+| Key | Default | Used for |
+|---|---|---|
+| `reply` | `"Ответ на сообщение"` | `Message.Reply`: the hidden prefix read before the quote. |
+
+#### Message.Media
+
+| Key | Default | Used for |
+|---|---|---|
 | `open` | `"Открыть: {name}"` | `Message.Media`: the name of a tile that opens the viewer; `{name}` is `alt`, else `photo` / `video`. |
 | `photo` | `"фото"` | `Message.Media`: `{name}` of a photo without `alt`. |
 | `video` | `"видео"` | `Message.Media`: `{name}` of a video without `alt`. |
-| `cancelUpload` | `"Отменить отправку"` | `Message.Media` / `Message.File`: the cross while sending. |
-| `cancelDownload` | `"Отменить загрузку"` | `Message.Media` / `Message.File`: the cross while receiving. |
-| `retryUpload` | `"Повторить отправку"` | `Message.Media` / `Message.File`: the retry after a failed send. |
-| `retryDownload` | `"Повторить загрузку"` | `Message.Media` / `Message.File`: the retry after a failed receive. |
-| `uploadProgress` | `"Отправка {percent}%"` | `Message.Media` / `Message.File`: the share while sending — the description of the cross. |
-| `downloadProgress` | `"Загрузка {percent}%"` | `Message.Media` / `Message.File`: the share while receiving — the description of the cross. |
-| `notSent` | `"Не отправилось"` | `Message.Media` / `Message.File`: why a send failed — the retry's description. |
-| `notReceived` | `"Не загрузилось"` | `Message.Media` / `Message.File`: why a receive failed — the retry's description. |
-| `download` | `"Скачать {name}"` | `Message.Media` / `Message.File`: the download arrow of a `remote` tile or file, and a file's `href` link; `{name}` is the file name, a tile's `alt` or `photo` / `video`. |
-| `cancelFailed` | `"Не удалось отменить"` | `Message.Media` / `Message.File`: announced when `onCancel` rejected. |
-| `retryFailed` | `"Не удалось повторить"` | `Message.Media` / `Message.File`: announced when `onRetry` rejected. |
-| `downloadFailed` | `"Не удалось скачать"` | `Message.Media` / `Message.File`: announced when `onDownload` rejected. |
+| `cancelUpload` | `"Отменить отправку"` | `Message.Media`: the cross while sending. |
+| `cancelDownload` | `"Отменить загрузку"` | `Message.Media`: the cross while receiving. |
+| `retryUpload` | `"Повторить отправку"` | `Message.Media`: the retry after a failed send. |
+| `retryDownload` | `"Повторить загрузку"` | `Message.Media`: the retry after a failed receive. |
+| `uploadProgress` | `"Отправка {percent}%"` | `Message.Media`: the share while sending — the description of the cross. |
+| `downloadProgress` | `"Загрузка {percent}%"` | `Message.Media`: the share while receiving — the description of the cross. |
+| `notSent` | `"Не отправилось"` | `Message.Media`: why a send failed — the retry's description. |
+| `notReceived` | `"Не загрузилось"` | `Message.Media`: why a receive failed — the retry's description. |
+| `download` | `"Скачать {name}"` | `Message.Media`: the download arrow of a `remote` tile; `{name}` is its `alt` or `photo` / `video`. |
+| `cancelFailed` | `"Не удалось отменить"` | `Message.Media`: announced when `onCancel` rejected. |
+| `retryFailed` | `"Не удалось повторить"` | `Message.Media`: announced when `onRetry` rejected. |
+| `downloadFailed` | `"Не удалось скачать"` | `Message.Media`: announced when `onDownload` rejected. |
+
+#### Message.File
+
+| Key | Default | Used for |
+|---|---|---|
 | `transferred` | `"{done} из {total}"` | `Message.File`: the line under the name while it transfers. |
+| `cancelUpload` | `"Отменить отправку"` | `Message.File`: the cross while sending. |
+| `cancelDownload` | `"Отменить загрузку"` | `Message.File`: the cross while receiving. |
+| `retryUpload` | `"Повторить отправку"` | `Message.File`: the retry after a failed send. |
+| `retryDownload` | `"Повторить загрузку"` | `Message.File`: the retry after a failed receive. |
+| `uploadProgress` | `"Отправка {percent}%"` | `Message.File`: the share while sending — the description of the cross. |
+| `downloadProgress` | `"Загрузка {percent}%"` | `Message.File`: the share while receiving — the description of the cross. |
+| `notSent` | `"Не отправилось"` | `Message.File`: why a send failed — the retry's description. |
+| `notReceived` | `"Не загрузилось"` | `Message.File`: why a receive failed — the retry's description. |
+| `download` | `"Скачать {name}"` | `Message.File`: the download arrow of a `remote` file and the `href` link; `{name}` is the file name. |
+| `cancelFailed` | `"Не удалось отменить"` | `Message.File`: announced when `onCancel` rejected. |
+| `retryFailed` | `"Не удалось повторить"` | `Message.File`: announced when `onRetry` rejected. |
+| `downloadFailed` | `"Не удалось скачать"` | `Message.File`: announced when `onDownload` rejected. |
+
+#### Message.Location
+
+| Key | Default | Used for |
+|---|---|---|
 | `openMap` | `"Открыть на карте: {place}"` | `Message.Location`: the name of the map link. |
 | `live` | `"Трансляция"` | `Message.Location`: the mark of a live location. |
+
+#### Message.Reactions
+
+| Key | Default | Used for |
+|---|---|---|
+| `reaction` | `"{emoji}: {count}"` | `Message.Reactions`: the name of a chip without `users`. |
+| `reactionUsers` | `"{emoji} {count}: {users}"` | `Message.Reactions`: the name of a chip with `users`; `{users}` — their names. |
+| `moreUsers` | `"ещё {count}"` | `Message.Reactions`: the last item of `{users}` when not everyone is listed. |
+| `reactions` | `"Реакции"` | `Message.Reactions`: the name of the row. |
+
+#### Message.Typing
+
+| Key | Default | Used for |
+|---|---|---|
+| `typing` | `"Собеседник печатает"` | `Message.Typing`: the text read while the other side types. |
 
 ## Examples
 | Example | Shows |

@@ -27,6 +27,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
@@ -103,7 +104,7 @@ export type GanttLabels = {
   empty: string;
 };
 
-const DEFAULT_LABELS: GanttLabels = {
+export const GANTT_LABELS: GanttLabels = {
   rowsHeader: "Название",
   timeline: "Шкала времени",
   scale: "Масштаб",
@@ -292,7 +293,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   ref,
   ...rest
 }: GanttProps<Row, Bar>) {
-  const labels = React.useMemo(() => ({ ...DEFAULT_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(GANTT_LABELS, labelsProp);
   const depth = useNestedSurfaceDepth();
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const mergedRootRef = useMergedRefs(rootRef, ref);

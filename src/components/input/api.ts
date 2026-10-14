@@ -1,11 +1,12 @@
-import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import {
-  FIELD_COMMIT_LABELS,
-  FIELD_COPY_LABELS,
+  FIELD_COMMIT_LABEL_DOCS,
+  FIELD_COPY_LABEL_DOCS,
   fieldActionPart,
   fieldCommitProp,
   fieldCopyPart,
 } from "../../internal/field.api";
+import { INPUT_LABELS } from "./Input";
 
 const side = (en: string, ru: string): ApiProp => ({
   name: "side",
@@ -25,9 +26,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier for height, padding, radius, text, label and hint. Without it the field takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. Also provided to nested controls via the control-size context.",
-          ru: "Ярус поля: высота, отступы, радиус, кегль поля, подписи и подсказки. Без него поле берёт ярус контейнера (LoginForm, Popover, панель с размером), иначе `m`.",
+          ru: "Ярус поля: высота, отступы, радиус, кегль поля, подписи и подсказки. Без него поле берёт ярус контейнера (LoginForm, Popover, панель с размером), иначе `m`. Передаётся и вложенным контролам через контекст размера.",
         },
         {
           name: "label",
@@ -66,19 +67,19 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger inset ring on the field, `aria-invalid` on the input. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо, `aria-invalid`, `data-invalid`.",
+          ru: "Красное внутреннее кольцо на поле, `aria-invalid` на input. Непустой `error` включает его.",
         },
         {
           name: "focusRing",
           type: "boolean",
           default: "true",
           en: '`false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay.',
-          ru: "`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются.",
+          ru: '`false` скрывает только кольцо фокуса на `Input.Wrapper` (`data-focus-ring="false"`); фокус, клавиатура, ARIA и кольцо ошибки остаются.',
         },
         {
           name: "counter",
           type: "ReactNode",
-          en: "Right side of the support row, usually `<Input.Counter />`.",
+          en: "Right side of the support row, usually `<Input.Counter current max />`.",
           ru: "Правая часть строки поддержки, обычно `<Input.Counter current max />`.",
         },
         {
@@ -86,13 +87,13 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Always render the support row (min height = hint line height), so an appearing error does not shift the layout.",
-          ru: "Строка поддержки есть всегда, поэтому ошибка не сдвигает вёрстку.",
+          ru: "Строка поддержки есть всегда (минимальная высота — строка подсказки), поэтому ошибка не сдвигает вёрстку.",
         },
         {
           name: "id",
           type: "string",
           en: "Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Явный id поля; иначе генерируется. Связывает подпись, подсказку и ошибку.",
+          ru: "Id `<input>`; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "strength",
@@ -133,7 +134,7 @@ export const api: ComponentApi = {
     {
       name: "Input.Wrapper",
       en: "`ref` → `HTMLDivElement`. The visible field: fill, hover, focus ring, invalid ring; `data-size` and `data-invalid` come from the root.",
-      ru: "Видимое поле: заливка, наведение, фокус, ошибка; `data-size` и `data-invalid` приходят из контекста.",
+      ru: "Видимое поле: заливка, наведение, кольцо фокуса, кольцо ошибки; `data-size` и `data-invalid` приходят от корня.",
       props: [
         {
           name: "children",
@@ -153,7 +154,7 @@ export const api: ComponentApi = {
     {
       name: "Input.Field",
       en: "`ref` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root, `disabled` also from a disabled `Fieldset` around it.",
-      ru: "Нативный `<input>` с id, aria-связями и `aria-invalid` из контекста; `disabled` — также от неактивного `Fieldset` вокруг.",
+      ru: "Нативный `<input>`; `id`, `aria-invalid` и `aria-describedby` приходят от корня; `disabled` — также от неактивного `Fieldset` вокруг.",
       props: [
         {
           name: "onValueChange",
@@ -177,7 +178,7 @@ export const api: ComponentApi = {
           name: "…rest",
           type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "id">',
           en: "`value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`…",
-          ru: "`value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`…",
+          ru: "`value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`…",
         },
       ],
     },
@@ -192,7 +193,7 @@ export const api: ComponentApi = {
           type: "ReactNode",
           required: true,
           en: "An icon; kit icons without an explicit `size` take the field tier.",
-          ru: "Иконка; без `size` берёт ярус поля.",
+          ru: "Иконка; иконки кита без явного `size` берут ярус поля.",
         },
         {
           name: "…rest",
@@ -247,13 +248,13 @@ export const api: ComponentApi = {
     {
       name: "Input.ClearButton",
       en: "`ref` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.",
-      ru: "Сегмент очистки на всю высоту поля у конца. Рендерите его, только пока есть значение.",
+      ru: "Сегмент очистки на всю высоту поля у конца, с именем `labels.clear` и `aria-controls` на input. Рендерите его, только пока есть значение.",
       props: [
         {
           name: "onClick",
           type: "MouseEventHandler<HTMLButtonElement>",
           en: "Clear the value here. Afterwards focus returns to the input unless `event.preventDefault()` was called.",
-          ru: "Очистите значение здесь; затем фокус вернётся в поле (если не вызван `preventDefault`).",
+          ru: "Очистите значение здесь; затем фокус вернётся в поле, если не вызван `event.preventDefault()`.",
         },
         {
           name: "…rest",
@@ -270,7 +271,7 @@ export const api: ComponentApi = {
     {
       name: "Input.RevealButton",
       en: '`ref` → `HTMLButtonElement`. A full-height toggle segment that shows a `type="password"` field as text and back (`aria-pressed`, named by `labels.reveal`); the focus, caret and selection stay in the field.',
-      ru: "Сегмент-переключатель, который показывает пароль текстом и прячет обратно (`aria-pressed`, имя `labels.reveal`); фокус, курсор и выделение остаются в поле.",
+      ru: 'Сегмент-переключатель, который показывает поле `type="password"` текстом и прячет обратно (`aria-pressed`, имя `labels.reveal`); фокус, курсор и выделение остаются в поле.',
       props: [
         {
           name: "…rest",
@@ -301,7 +302,7 @@ export const api: ComponentApi = {
           type: "number",
           required: true,
           en: 'Limit; `current > max` turns the counter danger (`data-invalid="true"`).',
-          ru: "Лимит; при `current > max` счётчик красный (`data-invalid`).",
+          ru: 'Лимит; при `current > max` счётчик красный (`data-invalid="true"`).',
         },
         {
           name: "…rest",
@@ -312,64 +313,31 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(INPUT_LABELS, {
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-    {
-      key: "clear",
-      default: "Очистить",
-      en: "Accessible name of `Input.ClearButton`.",
-      ru: "Имя `Input.ClearButton`.",
-    },
-    ...FIELD_COPY_LABELS,
-    {
-      key: "reveal",
-      default: "Показать пароль",
+    clear: { en: "Accessible name of `Input.ClearButton`.", ru: "Имя `Input.ClearButton`." },
+    ...FIELD_COPY_LABEL_DOCS,
+    reveal: {
       en: "Accessible name of `Input.RevealButton`;`aria-pressed` says whether the password is shown.",
       ru: "Имя `Input.RevealButton`; `aria-pressed` говорит, показан ли пароль.",
     },
-    ...FIELD_COMMIT_LABELS,
-    {
-      key: "counter",
-      default: "{current} из {max} символов",
+    ...FIELD_COMMIT_LABEL_DOCS,
+    counter: {
       en: "Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced.",
       ru: "Озвучка `Input.Counter`; `{current}` и `{max}` подставляются.",
     },
-    {
-      key: "strength",
-      default: "Надёжность пароля",
+    strength: {
       en: "Accessible name of the `strength` meter and the spoken prefix of the level word.",
       ru: "Имя шкалы `strength` и озвучиваемое начало слова уровня.",
     },
-    {
-      key: "strengthWeak",
-      default: "Слабый",
-      en: "Level word for strength 1.",
-      ru: "Слово уровня 1.",
-    },
-    {
-      key: "strengthEasy",
-      default: "Лёгкий",
-      en: "Level word for strength 2.",
-      ru: "Слово уровня 2.",
-    },
-    {
-      key: "strengthMedium",
-      default: "Средний",
-      en: "Level word for strength 3.",
-      ru: "Слово уровня 3.",
-    },
-    {
-      key: "strengthHard",
-      default: "Сложный",
-      en: "Level word for strength 4.",
-      ru: "Слово уровня 4.",
-    },
-  ],
+    strengthWeak: { en: "Level word for strength 1.", ru: "Слово уровня 1." },
+    strengthEasy: { en: "Level word for strength 2.", ru: "Слово уровня 2." },
+    strengthMedium: { en: "Level word for strength 3.", ru: "Слово уровня 3." },
+    strengthHard: { en: "Level word for strength 4.", ru: "Слово уровня 4." },
+  }),
   accessibility: {
     keyboard: [
       {
@@ -396,7 +364,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "`label` renders a `<label htmlFor>` bound to the input. Without `label`, set `aria-label` on `Input.Field`. A placeholder never replaces the label.",
-        ru: "`label` — настоящий `<label htmlFor>`; без него задайте `aria-label` на `Input.Field`. Плейсхолдер не заменяет подпись.",
+        ru: "`label` — настоящий `<label htmlFor>`, связанный с input; без `label` задайте `aria-label` на `Input.Field`. Плейсхолдер не заменяет подпись.",
       },
       {
         en: 'Hint and error are linked through `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.',
@@ -412,19 +380,19 @@ export const api: ComponentApi = {
       },
       {
         en: "`Input.Action` and `Input.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied` through a polite live region.",
-        ru: "`Input.Action` и `Input.CopyButton` — кнопки с именем и подсказкой; копирование объявляет `labels.copied` через живой регион.",
+        ru: "`Input.Action` и `Input.CopyButton` — кнопки (или ссылка с `asChild`) с именем из подписи и подсказкой; копирование объявляет `labels.copied` через вежливую live-область.",
       },
       {
         en: "`Input.RevealButton` is a toggle: a constant name `labels.reveal`, `aria-pressed` and `aria-controls` on the input; a pointer press keeps the focus in the field.",
-        ru: "`Input.RevealButton` — переключатель с `aria-pressed` и постоянным именем `labels.reveal`.",
+        ru: "`Input.RevealButton` — переключатель: постоянное имя `labels.reveal`, `aria-pressed` и `aria-controls` на input; нажатие указателем оставляет фокус в поле.",
       },
       {
         en: 'With `onCommit` the input carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.',
-        ru: "С `onCommit` поле ставит `aria-busy`, пока идёт сохранение, а живой регион говорит `labels.saving` и `labels.saved`.",
+        ru: 'С `onCommit` поле ставит `aria-busy="true"`, пока идёт сохранение, а вежливая live-область говорит `labels.saving`, затем `labels.saved`.',
       },
       {
         en: '`Input.Counter` shows `14/40` visually and announces `labels.counter` through `aria-live="polite"`.',
-        ru: '`Input.Counter` показывает «14/40», а скринридер читает `labels.counter` через `aria-live="polite"`.',
+        ru: '`Input.Counter` показывает `14/40`, а скринридер читает `labels.counter` через `aria-live="polite"`.',
       },
     ],
   },

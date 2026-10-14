@@ -81,6 +81,8 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 | `draft` | `string` | — | The reader's unsent text: the preview shows «Черновик:» in danger and the text. |
 | `onClick` | `(event: MouseEvent<HTMLButtonElement>) => void` | — | Runs before the dialog opens; `preventDefault()` keeps it closed. |
 | `href` | `string` | — | Renders an `<a>` instead of a `<button>` (a dialog with its own URL). |
+| `target` | `string` | — | Where the `<a>` opens (`href` only). |
+| `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
 | `children` | `ReactNode` | — | `ChatList.ItemIcon`, `ChatList.ItemText`, `ChatList.ItemDescription`, `ChatList.ItemMenu`. |
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and the native attributes of the row element. |
 

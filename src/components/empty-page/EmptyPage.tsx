@@ -21,13 +21,13 @@ export type EmptyPageLabels = {
   retry: string;
 };
 
-const DEFAULT_LABELS: EmptyPageLabels = { retry: "Повторить" };
+export const EMPTY_PAGE_LABELS: EmptyPageLabels = { retry: "Повторить" };
 
 type Ctx = { tone: EmptyPageTone; labels: EmptyPageLabels };
 
 const EmptyPageContext = React.createContext<Ctx>({
   tone: "neutral",
-  labels: DEFAULT_LABELS,
+  labels: EMPTY_PAGE_LABELS,
 });
 
 export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -59,7 +59,7 @@ function EmptyPageRoot({
   children,
   ...rest
 }: EmptyPageRootProps) {
-  const context: Ctx = { tone, labels: { ...DEFAULT_LABELS, ...labels } };
+  const context: Ctx = { tone, labels: { ...EMPTY_PAGE_LABELS, ...labels } };
   return (
     <div
       className={cx(styles.root, layout !== "compact" && enterMotion.enterBaseChildren, className)}

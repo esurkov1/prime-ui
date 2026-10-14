@@ -1,5 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import { contentLabelRows, contentParts } from "./content.api";
+import {
+  MESSAGE_FORWARDED_LABELS,
+  MESSAGE_LABELS,
+  MESSAGE_REACTIONS_LABELS,
+  MESSAGE_REPLY_LABELS,
+} from "./MessageParts";
+import { MESSAGE_TYPING_LABELS } from "./MessageTyping";
 
 const COLORS =
   '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"';
@@ -34,7 +41,7 @@ export const api: ComponentApi = {
         {
           name: "formatTime",
           type: "(date: Date) => string",
-          default: "«09:05»",
+          defaultNote: { en: "«09:05»", ru: "«09:05»" },
           en: "Display of a `Date` time.",
           ru: "Показ времени из `Date`.",
         },
@@ -72,8 +79,8 @@ export const api: ComponentApi = {
         {
           name: "labels",
           type: "Partial<MessageLabels>",
-          en: "System strings, see Labels.",
-          ru: "Системные строки, см. Labels.",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -249,8 +256,8 @@ export const api: ComponentApi = {
         {
           name: "labels",
           type: "Partial<MessageReactionsLabels>",
-          en: "System strings, see Labels.",
-          ru: "Системные строки, см. Labels.",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -327,138 +334,90 @@ export const api: ComponentApi = {
     },
   ],
   labels: [
-    {
-      key: "message",
-      default: "{author}, {time}",
-      en: "The name of a message for assistive tech.",
-      ru: "Имя сообщения для скринридера.",
-    },
-    {
-      key: "you",
-      default: "Вы",
-      en: "The author of an outgoing message.",
-      ru: "Автор исходящего сообщения.",
-    },
-    {
-      key: "edited",
-      default: "изменено",
-      en: "The mark of an edited message in its meta.",
-      ru: "Отметка изменённого сообщения в мете.",
-    },
-    {
-      key: "sending",
-      default: "Отправляется",
-      en: "Name of the clock status.",
-      ru: "Имя статуса «часы».",
-    },
-    {
-      key: "sent",
-      default: "Отправлено",
-      en: "Name of the one-check status.",
-      ru: "Имя статуса «одна галочка».",
-    },
-    {
-      key: "read",
-      default: "Прочитано",
-      en: "Name of the two-check status.",
-      ru: "Имя статуса «две галочки».",
-    },
-    {
-      key: "failed",
-      default: "Не отправлено",
-      en: "Name of the failed status.",
-      ru: "Имя статуса ошибки.",
-    },
-    {
-      key: "retry",
-      default: "Повторить отправку",
-      en: "The retry button beside a failed message.",
-      ru: "Кнопка повтора рядом с неотправленным.",
-    },
-    {
-      key: "menu",
-      default: "Действия с сообщением",
-      en: "The name of the context menu.",
-      ru: "Имя контекстного меню.",
-    },
-    {
-      key: "select",
-      default: "Выбрать",
-      en: "The menu item that starts selection mode with the message.",
-      ru: "Пункт меню, который начинает выбор с этого сообщения.",
-    },
-    {
-      key: "reaction",
-      default: "{emoji}: {count}",
-      en: "`Message.Reactions`: the name of a chip without `users`.",
-      ru: "`Message.Reactions`: имя чипа без `users`.",
-    },
-    {
-      key: "reactionUsers",
-      default: "{emoji} {count}: {users}",
-      en: "`Message.Reactions`: the name of a chip with `users`; `{users}` — their names.",
-      ru: "`Message.Reactions`: имя чипа с `users`; `{users}` — их имена.",
-    },
-    {
-      key: "moreUsers",
-      default: "ещё {count}",
-      en: "`Message.Reactions`: the last item of `{users}` when not everyone is listed.",
-      ru: "`Message.Reactions`: последний элемент `{users}`, когда перечислены не все.",
-    },
-    {
-      key: "reactions",
-      default: "Реакции",
-      en: "`Message.Reactions`: the name of the row.",
-      ru: "`Message.Reactions`: имя ряда.",
-    },
-    {
-      key: "reactionAdded",
-      default: "Реакция {emoji} поставлена",
-      en: "Announced when the quick reaction (a double tap, `L`) is put.",
-      ru: "Объявление, когда быстрая реакция (двойное касание, `L`) поставлена.",
-    },
-    {
-      key: "reactionRemoved",
-      default: "Реакция {emoji} снята",
-      en: "Announced when the quick reaction is taken back.",
-      ru: "Объявление, когда быстрая реакция снята.",
-    },
-    {
-      key: "reactionBar",
-      default: "Реакции",
-      en: "The name of the reaction bar.",
-      ru: "Имя панели реакций.",
-    },
-    {
-      key: "moreReactions",
-      default: "Все реакции",
-      en: "The «⌄» of the reaction bar that shows every reaction.",
-      ru: "Кнопка «⌄» панели реакций, которая показывает все реакции.",
-    },
-    {
-      key: "spoiler",
-      default: "Скрытый текст",
-      en: "`Message.Text`: the name of a `||spoiler||` while it is hidden.",
-      ru: "`Message.Text`: имя `||спойлера||`, пока он скрыт.",
-    },
-    {
-      key: "typing",
-      default: "Собеседник печатает",
-      en: "`Message.Typing`: the text read while the other side types.",
-      ru: "`Message.Typing`: текст, который читается, пока собеседник пишет.",
-    },
-    {
-      key: "reply",
-      default: "Ответ на сообщение",
-      en: "`Message.Reply labels`: the hidden prefix read before the quote.",
-      ru: "`Message.Reply labels`: скрытая приставка перед цитатой.",
-    },
-    {
-      key: "forwarded",
-      default: "Переслано от {author}",
-      en: "`Message.Forwarded labels`: the header; `{author}` — the original author.",
-      ru: "`Message.Forwarded labels`: заголовок; `{author}` — автор оригинала.",
-    },
+    ...labelRows(MESSAGE_LABELS, {
+      message: {
+        en: "The name of a message for assistive tech.",
+        ru: "Имя сообщения для скринридера.",
+      },
+      you: { en: "The author of an outgoing message.", ru: "Автор исходящего сообщения." },
+      edited: {
+        en: "The mark of an edited message in its meta.",
+        ru: "Отметка изменённого сообщения в мете.",
+      },
+      spoiler: {
+        en: "`Message.Text`: the name of a `||spoiler||` while it is hidden.",
+        ru: "`Message.Text`: имя `||spoiler||`, пока он скрыт.",
+      },
+      sending: { en: "Name of the clock status.", ru: "Имя статуса «часы»." },
+      sent: { en: "Name of the one-check status.", ru: "Имя статуса «одна галочка»." },
+      read: { en: "Name of the two-check status.", ru: "Имя статуса «две галочки»." },
+      failed: { en: "Name of the failed status.", ru: "Имя статуса ошибки." },
+      retry: {
+        en: "The retry button beside a failed message.",
+        ru: "Кнопка повтора рядом с неотправленным.",
+      },
+      menu: { en: "The name of the context menu.", ru: "Имя контекстного меню." },
+      select: {
+        en: "The menu item that starts selection mode with the message.",
+        ru: "Пункт меню, который начинает выбор с этого сообщения.",
+      },
+      reactionAdded: {
+        en: "Announced when the quick reaction (a double tap, `L`) is put.",
+        ru: "Объявление, когда быстрая реакция (двойное касание, `L`) поставлена.",
+      },
+      reactionRemoved: {
+        en: "Announced when the quick reaction is taken back.",
+        ru: "Объявление, когда быстрая реакция снята.",
+      },
+      reactionBar: { en: "The name of the reaction bar.", ru: "Имя панели реакций." },
+      moreReactions: {
+        en: "The «⌄» of the reaction bar that shows every reaction.",
+        ru: "Кнопка «⌄» панели реакций, которая показывает все реакции.",
+      },
+    }),
+    ...labelRows(MESSAGE_REACTIONS_LABELS, {
+      reaction: {
+        en: "`Message.Reactions`: the name of a chip without `users`.",
+        ru: "`Message.Reactions`: имя чипа без `users`.",
+        part: "Message.Reactions",
+      },
+      reactionUsers: {
+        en: "`Message.Reactions`: the name of a chip with `users`; `{users}` — their names.",
+        ru: "`Message.Reactions`: имя чипа с `users`; `{users}` — их имена.",
+        part: "Message.Reactions",
+      },
+      moreUsers: {
+        en: "`Message.Reactions`: the last item of `{users}` when not everyone is listed.",
+        ru: "`Message.Reactions`: последний элемент `{users}`, когда перечислены не все.",
+        part: "Message.Reactions",
+      },
+      reactions: {
+        en: "`Message.Reactions`: the name of the row.",
+        ru: "`Message.Reactions`: имя ряда.",
+        part: "Message.Reactions",
+      },
+    }),
+    ...labelRows(MESSAGE_TYPING_LABELS, {
+      typing: {
+        en: "`Message.Typing`: the text read while the other side types.",
+        ru: "`Message.Typing`: текст, который читается, пока собеседник пишет.",
+        part: "Message.Typing",
+      },
+    }),
+    ...labelRows(MESSAGE_REPLY_LABELS, {
+      reply: {
+        en: "`Message.Reply`: the hidden prefix read before the quote.",
+        ru: "`Message.Reply`: скрытая приставка перед цитатой.",
+        part: "Message.Reply",
+      },
+    }),
+    ...labelRows(MESSAGE_FORWARDED_LABELS, {
+      forwarded: {
+        en: "`Message.Forwarded`: the header; `{author}` — the original author.",
+        ru: "`Message.Forwarded`: заголовок; `{author}` — автор оригинала.",
+        part: "Message.Forwarded",
+      },
+    }),
     ...contentLabelRows,
   ],
   accessibility: {
@@ -466,7 +425,7 @@ export const api: ComponentApi = {
       {
         keys: "Enter · Shift+F10 · ContextMenu",
         en: "Opens the menu of the focused message (`ContextMenu` is the menu key); in a chat's selection mode `Enter` / `Space` toggle it and Shift extends the range from the anchor",
-        ru: "Открывает меню сообщения в фокусе (ContextMenu — клавиша меню); в режиме выбора чата `Enter` / `Space` переключают выбор, Shift расширяет диапазон от якоря",
+        ru: "Открывает меню сообщения в фокусе (`ContextMenu` — клавиша меню); в режиме выбора чата `Enter` / `Space` переключают выбор, Shift расширяет диапазон от якоря",
       },
       {
         keys: "R",
@@ -492,7 +451,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'Every message is a `role="article"` named «{author}, {time}» (`labels.message`); an outgoing one is «Вы»; the author names every message of a run, its header shown or not. In a list it carries `aria-posinset` / `aria-setsize`; in a chat\'s selection mode it is an `option` with `aria-selected`.',
-        ru: 'Каждое сообщение — `role="article"` с именем «{автор}, {время}» (`labels.message`); для исходящих автор — «Вы»; автор называет сообщение, даже когда его шапка скрыта в серии. В ленте Chat с режимом выбора — `option` с `aria-selected`.',
+        ru: 'Каждое сообщение — `role="article"` с именем «{автор}, {время}» (`labels.message`); для исходящих автор — «Вы»; автор называет каждое сообщение серии, показана его шапка или нет. В ленте оно несёт `aria-posinset` / `aria-setsize`; в режиме выбора чата — `option` с `aria-selected`.',
       },
       {
         en: "The delivery status is an image named «Отправляется», «Отправлено», «Прочитано» or «Не отправлено».",
@@ -508,15 +467,15 @@ export const api: ComponentApi = {
       },
       {
         en: "The author's header is text; the hue of the name means nothing on its own, `Message.AuthorIcon` is `aria-hidden` — say what it means in the `tag`.",
-        ru: "Шапка автора — текст; цвет имени ничего не значит сам по себе, значок `Message.AuthorIcon` скрыт от скринридеров, смысл — в `tag`.",
+        ru: "Шапка автора — текст; цвет имени ничего не значит сам по себе, значок `Message.AuthorIcon` — `aria-hidden`, смысл скажите в `tag`.",
       },
       {
         en: "`Message.Typing` is a polite `status` with «Собеседник печатает» (`labels.typing`); its dots are decorative.",
-        ru: "`Message.Typing` — вежливый `status` «Собеседник печатает»; точки декоративны.",
+        ru: "`Message.Typing` — вежливый `status` «Собеседник печатает» (`labels.typing`); точки декоративны.",
       },
       {
         en: "Reactions are a group of buttons with `aria-pressed`; a chip is named «{emoji}: {count}», with `users` «{emoji} {count}: {users}» («❤️ 3: Анна, Пётр, Мария», «ещё N» when not everyone is listed); its avatars are `aria-hidden`; without `onReactionToggle` the chips are `disabled`. The reaction bar is a `toolbar` of toggle buttons named by the reaction («Нравится», «Огонь»…); its «⌄» is `aria-expanded`. The quick reaction is announced in the list's polite live region.",
-        ru: "Реакции — группа кнопок с `aria-pressed`; имя чипа — «{emoji}: {count}», а с `users` — с именами: «❤️ 3: Анна, Пётр, Мария»; аватары в чипе скрыты от скринридеров. Панель реакций — `toolbar` из кнопок-переключателей, названных по реакции («Нравится», «Огонь»…). Быстрая реакция объявляется в вежливой области ленты.",
+        ru: "Реакции — группа кнопок с `aria-pressed`; имя чипа — «{emoji}: {count}», а с `users` — «{emoji} {count}: {users}» («❤️ 3: Анна, Пётр, Мария», «ещё N», когда перечислены не все); аватары в чипе — `aria-hidden`; без `onReactionToggle` чипы `disabled`. Панель реакций — `toolbar` из кнопок-переключателей, названных по реакции («Нравится», «Огонь»…); её «⌄» — `aria-expanded`. Быстрая реакция объявляется в вежливой области ленты.",
       },
       {
         en: "`VideoNote` and `VoicePlayer` carry their own ARIA (see their pages); inside a message their transcript is a plain paragraph, selectable and marked by the chat's search.",
@@ -524,7 +483,7 @@ export const api: ComponentApi = {
       },
       {
         en: "Media tiles are buttons «Открыть: {alt}» that open the album in MediaViewer, the focus returning to the tile on close; a transfer is the round cancel, retry or download button, the share its accessible description; a refused retry or cancel is announced politely; a done transfer's disk is `inert`.",
-        ru: "Плитки медиа — кнопки «Открыть: {alt}», открывающие альбом в MediaViewer, фокус после закрытия возвращается на плитку; передача — круглая кнопка отмены, повтора или скачивания с долей в описании; отказ объявляется вежливо.",
+        ru: "Плитки медиа — кнопки «Открыть: {alt}», открывающие альбом в MediaViewer, фокус после закрытия возвращается на плитку; передача — круглая кнопка отмены, повтора или скачивания с долей в описании; отказ объявляется вежливо; диск завершённой передачи — `inert`.",
       },
       {
         en: "`Message.Actions` are plain buttons and links (`Button.Root`, `asChild`) with visible labels, in row order; in a chat's selection mode they take no presses.",
@@ -532,7 +491,7 @@ export const api: ComponentApi = {
       },
       {
         en: "Color is never the only signal: the status is named, the own reaction is `aria-pressed`, a selected message is `aria-selected` with a check, the author is text.",
-        ru: "Цвет никогда не единственный признак: статус назван, своя реакция — `aria-pressed`, автор — текстом.",
+        ru: "Цвет никогда не единственный признак: статус назван, своя реакция — `aria-pressed`, выбранное сообщение — `aria-selected` с галочкой, автор — текстом.",
       },
     ],
   },

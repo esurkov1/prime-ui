@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { EXAMPLE_FRAME_LABELS } from "./ExampleFrame";
 
 const VIEWPORT = '"desktop" | "tablet" | "mobile"';
 
@@ -7,7 +8,7 @@ export const api: ComponentApi = {
     {
       name: "ExampleFrame",
       en: "`ref` → `HTMLDivElement`. The documentation frame: a toolbar (pane switch, theme toggle, copy button, device switch) above the preview stage or the code pane.",
-      ru: "Рамка документации: панель (вид, тема, копирование, ширина) над превью или кодом.",
+      ru: "Рамка документации: панель (переключатель вида, тема, кнопка копирования, переключатель устройства) над сценой превью или панелью кода.",
       props: [
         {
           name: "code",
@@ -95,61 +96,27 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "paneSwitch",
-      default: "Вид примера",
+  labels: labelRows(EXAMPLE_FRAME_LABELS, {
+    paneSwitch: {
       en: "`aria-label` of the Preview / Code switch.",
       ru: "`aria-label` переключателя «Превью / Код».",
     },
-    { key: "preview", default: "Превью", en: "Preview pane option.", ru: "Вариант «превью»." },
-    { key: "code", default: "Код", en: "Code pane option.", ru: "Вариант «код»." },
-    {
-      key: "viewportSwitch",
-      default: "Ширина превью",
+    preview: { en: "Preview pane option.", ru: "Вариант «превью»." },
+    code: { en: "Code pane option.", ru: "Вариант «код»." },
+    viewportSwitch: {
       en: "`aria-label` of the device switch.",
       ru: "`aria-label` переключателя устройств.",
     },
-    { key: "desktop", default: "Десктоп", en: "Desktop width option.", ru: "Ширина десктопа." },
-    { key: "tablet", default: "Планшет", en: "Tablet width option.", ru: "Ширина планшета." },
-    { key: "mobile", default: "Телефон", en: "Phone width option.", ru: "Ширина телефона." },
-    {
-      key: "copy",
-      default: "Копировать код",
-      en: "Copy button `aria-label`.",
-      ru: "`aria-label` кнопки копирования.",
-    },
-    {
-      key: "copied",
-      default: "Скопировано",
-      en: "Copy button after success.",
-      ru: "Кнопка копирования после успеха.",
-    },
-    {
-      key: "copyError",
-      default: "Не удалось скопировать",
-      en: "Copy button after a failure.",
-      ru: "Кнопка копирования после ошибки.",
-    },
-    {
-      key: "themeDark",
-      default: "Включить тёмную тему",
-      en: "Theme toggle in the light theme.",
-      ru: "Переключатель темы в светлой теме.",
-    },
-    {
-      key: "themeLight",
-      default: "Включить светлую тему",
-      en: "Theme toggle in the dark theme.",
-      ru: "Переключатель темы в тёмной теме.",
-    },
-    {
-      key: "codeRegion",
-      default: "Код примера",
-      en: "`aria-label` of the code pane.",
-      ru: "`aria-label` области кода.",
-    },
-  ],
+    desktop: { en: "Desktop width option.", ru: "Ширина десктопа." },
+    tablet: { en: "Tablet width option.", ru: "Ширина планшета." },
+    mobile: { en: "Phone width option.", ru: "Ширина телефона." },
+    copy: { en: "Copy button `aria-label`.", ru: "`aria-label` кнопки копирования." },
+    copied: { en: "Copy button after success.", ru: "Кнопка копирования после успеха." },
+    copyError: { en: "Copy button after a failure.", ru: "Кнопка копирования после ошибки." },
+    themeDark: { en: "Theme toggle in the light theme.", ru: "Переключатель темы в светлой теме." },
+    themeLight: { en: "Theme toggle in the dark theme.", ru: "Переключатель темы в тёмной теме." },
+    codeRegion: { en: "`aria-label` of the code pane.", ru: "`aria-label` области кода." },
+  }),
   accessibility: {
     keyboard: [
       {
@@ -166,7 +133,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "The pane and device switches are radio groups named by `labels.paneSwitch` and `labels.viewportSwitch`.",
-        ru: "Переключатели вида и ширины — радиогруппы с `aria-label` из `labels.paneSwitch` и `labels.viewportSwitch`.",
+        ru: "Переключатели вида и ширины — радиогруппы с именами из `labels.paneSwitch` и `labels.viewportSwitch`.",
       },
       {
         en: "The theme and copy buttons are icon-only Buttons with `aria-label`; after copying the label becomes `labels.copied`.",

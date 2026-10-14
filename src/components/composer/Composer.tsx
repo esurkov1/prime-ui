@@ -23,6 +23,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import { type MediaKind, mediaKind } from "@/internal/mediaKind";
 import { Ring } from "@/internal/ring";
 import { type ControlSize, stepDown } from "@/internal/states";
@@ -107,7 +108,7 @@ export type ComposerLabels = TextFormattingLabels & {
   cancelEdit: string;
 };
 
-const COMPOSER_LABELS: ComposerLabels = {
+export const COMPOSER_LABELS: ComposerLabels = {
   region: "Новое сообщение",
   placeholder: "Сообщение",
   send: "Отправить",
@@ -330,7 +331,7 @@ function ComposerRoot({
 }: ComposerRootProps) {
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
-  const labels = React.useMemo(() => ({ ...COMPOSER_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(COMPOSER_LABELS, labelsProp);
   const [value, setValue] = useControllableState({
     value: valueProp,
     defaultValue,

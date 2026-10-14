@@ -1,5 +1,11 @@
-import type { ApiLabel, ApiPart, ComponentApi } from "../../../scripts/docs/componentApi";
-import { TRANSFER_INDEX_HANDLER_PROPS, transferLabels } from "../../internal/transfer.api";
+import {
+  type ApiPart,
+  type ComponentApi,
+  type LabelDocs,
+  labelRows,
+} from "../../../scripts/docs/componentApi";
+import { TRANSFER_INDEX_HANDLER_PROPS, transferLabelDocs } from "../../internal/transfer.api";
+import { GALLERY_LABELS, type GalleryLabels } from "./Gallery";
 
 /** The props of a gallery, shared with `Message.Media` (which is a gallery its message shapes). */
 export const galleryProps: ApiPart["props"] = [
@@ -59,31 +65,35 @@ export const galleryProps: ApiPart["props"] = [
   {
     name: "labels",
     type: "Partial<GalleryLabels>",
-    en: "System strings, see Labels.",
-    ru: "Системные строки, см. Labels.",
+    en: "Built-in strings, see Labels.",
+    ru: "Системные строки, см. «Доступность».",
   },
 ];
 
-export const galleryLabels = (scope: string): ApiLabel[] => [
-  {
-    key: "open",
-    default: "Открыть: {name}",
-    en: `${scope}: the name of a tile that opens the viewer; \`{name}\` is \`alt\`, else \`photo\` / \`video\`.`,
-    ru: `${scope}: имя плитки, открывающей просмотр; \`{name}\` — \`alt\`, иначе \`photo\` / \`video\`.`,
-  },
-  {
-    key: "photo",
-    default: "фото",
-    en: `${scope}: \`{name}\` of a photo without \`alt\`.`,
-    ru: `${scope}: \`{name}\` фото без \`alt\`.`,
-  },
-  {
-    key: "video",
-    default: "видео",
-    en: `${scope}: \`{name}\` of a video without \`alt\`.`,
-    ru: `${scope}: \`{name}\` видео без \`alt\`.`,
-  },
-];
+/** The descriptions of Gallery's own strings; `scope` names the part, `part` takes them. */
+export const galleryLabelDocs = (
+  scope: string,
+  part?: string,
+): LabelDocs<Pick<GalleryLabels, "open" | "photo" | "video">> => {
+  const owner = part ? { part } : {};
+  return {
+    open: {
+      en: `${scope}: the name of a tile that opens the viewer; \`{name}\` is \`alt\`, else \`photo\` / \`video\`.`,
+      ru: `${scope}: имя плитки, открывающей просмотр; \`{name}\` — \`alt\`, иначе \`photo\` / \`video\`.`,
+      ...owner,
+    },
+    photo: {
+      en: `${scope}: \`{name}\` of a photo without \`alt\`.`,
+      ru: `${scope}: \`{name}\` фото без \`alt\`.`,
+      ...owner,
+    },
+    video: {
+      en: `${scope}: \`{name}\` of a video without \`alt\`.`,
+      ru: `${scope}: \`{name}\` видео без \`alt\`.`,
+      ...owner,
+    },
+  };
+};
 
 export const api: ComponentApi = {
   parts: [
@@ -108,18 +118,14 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    ...galleryLabels("Gallery"),
-    ...transferLabels("Gallery", "Скачать {name}").map((row) =>
-      row.key === "download"
-        ? {
-            ...row,
-            en: "Gallery: the download arrow of a `remote` tile; `{name}` is its `alt` or `photo` / `video`.",
-            ru: "Gallery: стрелка загрузки у плитки в состоянии `remote`; `{name}` — её `alt` или `photo` / `video`.",
-          }
-        : row,
-    ),
-  ],
+  labels: labelRows(GALLERY_LABELS, {
+    ...galleryLabelDocs("Gallery"),
+    ...transferLabelDocs("Gallery"),
+    download: {
+      en: "Gallery: the download arrow of a `remote` tile; `{name}` is its `alt` or `photo` / `video`.",
+      ru: "Gallery: стрелка загрузки у плитки в состоянии `remote`; `{name}` — её `alt` или `photo` / `video`.",
+    },
+  }),
   accessibility: {
     keyboard: [
       {
@@ -130,17 +136,17 @@ export const api: ComponentApi = {
       {
         keys: "Enter · Space",
         en: "Opens the album in the viewer at this tile, or presses a transfer disk; in the viewer `←` `→` page and `Escape` closes, the focus returning to the tile",
-        ru: "Открывает альбом в просмотрщике на этой плитке или нажимает диск передачи; в просмотрщике ← → листают, Escape закрывает и возвращает фокус на плитку",
+        ru: "Открывает альбом в просмотрщике на этой плитке или нажимает диск передачи; в просмотрщике `←` `→` листают, `Escape` закрывает и возвращает фокус на плитку",
       },
     ],
     aria: [
       {
         en: 'A tile is a button «Открыть: {alt}» (`labels.open`; without `alt` — «фото» or «видео») with `aria-haspopup="dialog"`; its picture is then decorative. The viewer is MediaViewer\'s dialog with its own names; on close the focus returns to the tile.',
-        ru: 'Плитка — кнопка «Открыть: {alt}» с `aria-haspopup="dialog"`; без `alt` — «фото» или «видео». Просмотрщик — диалог MediaViewer со своими именами; после закрытия фокус возвращается на плитку.',
+        ru: 'Плитка — кнопка «Открыть: {alt}» (`labels.open`; без `alt` — «фото» или «видео») с `aria-haspopup="dialog"`; картинка в ней декоративна. Просмотрщик — диалог MediaViewer со своими именами; после закрытия фокус возвращается на плитку.',
       },
       {
         en: "With `viewer={false}` and no open handlers a picture is an image with its own `alt`; the play mark and the length of a video are `aria-hidden`.",
-        ru: "С `viewer={false}` и без обработчиков открытия картинка — изображение со своим `alt`; метка воспроизведения и длительность видео скрыты от скринридеров.",
+        ru: "С `viewer={false}` и без обработчиков открытия картинка — изображение со своим `alt`; метка воспроизведения и длительность видео — `aria-hidden`.",
       },
       {
         en: "A transfer disk is the cancel, retry or download button; the share is its accessible description («Отправка 42%»), the reason of a failure the retry's description; a refused cancel, retry or download is announced politely.",

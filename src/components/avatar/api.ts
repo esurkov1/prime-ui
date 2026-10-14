@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { AVATAR_STATUS_LABELS } from "./Avatar";
 
 export const api: ComponentApi = {
   parts: [
@@ -136,22 +137,16 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "online",
-      default: "В сети",
-      en: "Name of the `online` dot.",
-      ru: "Имя точки `online`.",
-    },
-    {
-      key: "offline",
-      default: "Не в сети",
+  labels: labelRows(AVATAR_STATUS_LABELS, {
+    online: { en: "Name of the `online` dot.", ru: "Имя точки `online`.", part: "Avatar.Status" },
+    offline: {
       en: "Name of the `offline` dot.",
       ru: "Имя точки `offline`.",
+      part: "Avatar.Status",
     },
-    { key: "away", default: "Отошёл", en: "Name of the `away` dot.", ru: "Имя точки `away`." },
-    { key: "busy", default: "Занят", en: "Name of the `busy` dot.", ru: "Имя точки `busy`." },
-  ],
+    away: { en: "Name of the `away` dot.", ru: "Имя точки `away`.", part: "Avatar.Status" },
+    busy: { en: "Name of the `busy` dot.", ru: "Имя точки `busy`.", part: "Avatar.Status" },
+  }),
   accessibility: {
     keyboard: [],
     aria: [

@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { GANTT_LABELS } from "./Gantt";
 
 const SCALE = '"day" | "week" | "month"';
 
@@ -7,7 +8,7 @@ export const api: ComponentApi = {
     {
       name: "Gantt",
       en: '`ref` → `HTMLDivElement` (the surface). A schedule: a toolbar with the zoom and «Сегодня», then a `role="grid"` of rows with bars on a time axis. `aria-label` / `aria-labelledby` name the grid; the other attributes go to the surface.',
-      ru: '`ref` → `HTMLDivElement` (поверхность). График: панель с масштабом и «Сегодня», под ней `role="grid"` строк с полосами на шкале времени. `aria-label` / `aria-labelledby` называют сетку, остальные атрибуты уходят на поверхность.',
+      ru: 'График: панель с масштабом и «Сегодня», под ней `role="grid"` строк с полосами на шкале времени. `aria-label` / `aria-labelledby` называют сетку, остальные атрибуты уходят на поверхность.',
       props: [
         {
           name: "rows",
@@ -95,7 +96,7 @@ export const api: ComponentApi = {
         {
           name: "today",
           type: "Date",
-          default: "new Date()",
+          defaultNote: { en: "today", ru: "сегодня" },
           en: "The day of the today line; the chart opens with it a third into the view and «Сегодня» scrolls back to it.",
           ru: "День линии «сегодня»; график открывается с ним на трети ширины, а «Сегодня» прокручивает к нему.",
         },
@@ -167,7 +168,7 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<GanttLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -177,11 +178,13 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  types: [
     {
       name: "GanttBar",
       en: "One bar of `getRowBars`: data, not a part. Dates are calendar days with an exclusive `end`; `start` equal to `end` is a milestone. Extend the type with your own fields: callbacks get your object back.",
       ru: "Одна полоса из `getRowBars`: данные, а не часть разметки. Даты — календарные дни, `end` не включается; `start`, равный `end`, — веха. Расширяйте тип своими полями: колбэки получают ваш объект.",
-      props: [
+      fields: [
         {
           name: "id",
           type: "string",
@@ -239,107 +242,62 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "rowsHeader",
-      default: "Название",
-      en: "Heading of the first column.",
-      ru: "Заголовок первой колонки.",
-    },
-    {
-      key: "timeline",
-      default: "Шкала времени",
+  labels: labelRows(GANTT_LABELS, {
+    rowsHeader: { en: "Heading of the first column.", ru: "Заголовок первой колонки." },
+    timeline: {
       en: "Accessible name of the time axis column.",
       ru: "Доступное имя колонки шкалы.",
     },
-    {
-      key: "scale",
-      default: "Масштаб",
+    scale: {
       en: "Accessible name of the zoom switch.",
       ru: "Доступное имя переключателя масштаба.",
     },
-    { key: "day", default: "День", en: "Zoom segment: days.", ru: "Сегмент масштаба: дни." },
-    { key: "week", default: "Неделя", en: "Zoom segment: weeks.", ru: "Сегмент масштаба: недели." },
-    {
-      key: "month",
-      default: "Месяц",
-      en: "Zoom segment: months.",
-      ru: "Сегмент масштаба: месяцы.",
-    },
-    {
-      key: "today",
-      default: "Сегодня",
+    day: { en: "Zoom segment: days.", ru: "Сегмент масштаба: дни." },
+    week: { en: "Zoom segment: weeks.", ru: "Сегмент масштаба: недели." },
+    month: { en: "Zoom segment: months.", ru: "Сегмент масштаба: месяцы." },
+    today: {
       en: "The button that scrolls to today and the chip on the today line.",
       ru: "Кнопка прокрутки к сегодняшнему дню и метка на его линии.",
     },
-    {
-      key: "bar",
-      default: "{label}: {start} — {end}",
+    bar: {
       en: "Accessible name of a bar; `{start}` and `{end}` are its first and last day, spoken in full.",
       ru: "Доступное имя полосы; `{start}` и `{end}` — первый и последний день полностью.",
     },
-    {
-      key: "milestone",
-      default: "{label}: {date}",
-      en: "Accessible name of a milestone.",
-      ru: "Доступное имя вехи.",
-    },
-    {
-      key: "progress",
-      default: "выполнено {progress}%",
+    milestone: { en: "Accessible name of a milestone.", ru: "Доступное имя вехи." },
+    progress: {
       en: "Added to a bar's name when it has `progress`.",
       ru: "Добавляется к имени полосы с `progress`.",
     },
-    {
-      key: "editHint",
-      default:
-        "Shift + стрелки сдвигают на день, Ctrl + Shift + стрелки меняют окончание на день; с Alt — на неделю или месяц масштаба",
+    editHint: {
       en: "Description of an editable bar: the editing keys.",
       ru: "Описание редактируемой полосы: клавиши правки.",
     },
-    {
-      key: "duration",
-      default: "{days} дн.",
+    duration: {
       en: "Duration of a bar in its tooltip («5 – 18 октября · 14 дн.»).",
       ru: "Длительность полосы в подсказке («5 – 18 октября · 14 дн.»).",
     },
-    {
-      key: "changeFailed",
-      default: "Сроки не изменены: {label}",
+    changeFailed: {
       en: "Announced when `onBarChange` rejects and the bar returns to its dates.",
       ru: "Озвучивается, когда `onBarChange` отклонён и полоса вернулась к своим датам.",
     },
-    {
-      key: "newBar",
-      default: "Новая задача",
+    newBar: {
       en: "Label of the ghost of a bar being created and of its announcement.",
       ru: "Подпись призрака создаваемой полосы и её объявления.",
     },
-    {
-      key: "createHint",
-      default: "N — создать задачу",
+    createHint: {
       en: "Description of a row header when bars can be created.",
       ru: "Описание заголовка строки, когда полосы можно создавать.",
     },
-    {
-      key: "createFailed",
-      default: "Задача не создана",
+    createFailed: {
       en: "Announced when `onBarCreate` rejects and the ghost fades out.",
       ru: "Озвучивается, когда `onBarCreate` отклонён и призрак тает.",
     },
-    {
-      key: "loading",
-      default: "Загрузка графика…",
+    loading: {
       en: "Screen-reader status while skeleton rows are shown.",
       ru: "Статус для скринридера, пока видны скелетоны.",
     },
-    {
-      key: "empty",
-      default: "Нет задач за этот период.",
-      en: "Default empty-state text.",
-      ru: "Текст пустого состояния по умолчанию.",
-    },
-  ],
+    empty: { en: "Default empty-state text.", ru: "Текст пустого состояния по умолчанию." },
+  }),
   accessibility: {
     keyboard: [
       {
@@ -405,7 +363,7 @@ export const api: ComponentApi = {
       },
       {
         en: "A bar is a `<button>` named «Задача: 6 июля 2026 — 10 июля 2026» (with «выполнено 50%» when it has progress); a milestone «Релиз: 20 июля 2026». The Tooltip with the dates opens on hover and on focus and closes as soon as the chart scrolls (scrollbar, wheel, touch); the next hover or focus opens it again. It points at the visible part of the bar and stays inside the timeline, never over the label column or the header; a bar with less than `--prime-space-6` in view shows none.",
-        ru: "Полоса — `<button>` с именем «Задача: 6 июля 2026 — 10 июля 2026», с процентом выполнения; веха — «Релиз: 20 июля 2026». Подсказка с датами и длительностью («5 – 18 октября · 14 дн.») открывается и при наведении, и при фокусе; `renderBarTooltip` добавляет строки под датами, но не заменяет их. При перетаскивании подсказка показывает новые даты, а полоса идёт точно за указателем и прилипает к целым дням.",
+        ru: "Полоса — `<button>` с именем «Задача: 6 июля 2026 — 10 июля 2026» (с «выполнено 50%», если есть прогресс); веха — «Релиз: 20 июля 2026». Подсказка с датами открывается при наведении и при фокусе и закрывается, как только график прокручивается (полоса прокрутки, колесо, касание); следующее наведение или фокус открывают её снова. Она указывает на видимую часть полосы и остаётся внутри шкалы времени, не заходя на колонку подписей и шапку; полоса, видимая меньше чем на `--prime-space-6`, подсказки не показывает.",
       },
       {
         en: "An editable bar has `aria-keyshortcuts` and is described by `labels.editHint`; the new dates after an editing key are announced in a polite status, a refused change with `labels.changeFailed`.",
@@ -421,7 +379,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'A row header is a focusable cell; with `onBarCreate` it is described by `labels.createHint` and has `aria-keyshortcuts="N"`. A new bar is announced, a refused one with `labels.createFailed`; the ghost is `aria-hidden`.',
-        ru: 'Заголовок строки — фокусируемая ячейка; при `onBarCreate` описан `labels.createHint` и `aria-keyshortcuts="N"`. Новая полоса объявляется, отказ — `labels.createFailed`; призрак новой полосы скрыт.',
+        ru: 'Заголовок строки — фокусируемая ячейка; при `onBarCreate` описан `labels.createHint` и `aria-keyshortcuts="N"`. Новая полоса объявляется, отказ — `labels.createFailed`; призрак новой полосы — `aria-hidden`.',
       },
       {
         en: "With `getRowHref` the header's stop in the grid is a real `<a>` named by the row's content inside the `rowheader`: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work, Space follows it like Enter, and the arrows rove from it as from any cell. With `onRowClick` alone the header itself opens the row by a click, Enter or Space; a click on a control inside it never does.",

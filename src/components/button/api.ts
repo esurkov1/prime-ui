@@ -1,11 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BUTTON_LABELS } from "./Button";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Button.Root",
       en: "`ref` → `HTMLButtonElement`. The `<button>`, or the single child with `asChild`; sets variant, tone and size and passes the tier to nested icons.",
-      ru: "Кнопка или слот для одного дочернего элемента при `asChild`; задаёт подачу, тон и размер, передаёт ярус вложенным иконкам.",
+      ru: "`<button>` или единственный дочерний элемент при `asChild`; задаёт подачу, тон и размер, передаёт ярус вложенным иконкам.",
       props: [
         {
           name: "variant",
@@ -31,7 +32,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Control tier: height 28 · 32 · 36 · 40 · 48, padding, text, icon, radius. Without it the button takes the tier of its host (LoginForm, Popover, a field, a panel with a size), else `m`.",
           ru: "Ярус контрола: высота 28 · 32 · 36 · 40 · 48, отступы, кегль, иконка. Совпадает с Input и Select того же размера. Без него кнопка берёт ярус контейнера (LoginForm, Popover, поле, панель с размером), иначе `m`.",
         },
@@ -46,7 +47,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Shows a `Spinner` in place of the leading icon or over the label, sets `aria-busy`, blocks clicks; width does not change. With `asChild` no spinner is added — the child owns its content.",
-          ru: "Спиннер вместо ведущей иконки или по центру над подписью, `aria-busy` и запрет нажатия. Ширина не меняется.",
+          ru: "`Spinner` вместо ведущей иконки или по центру над подписью, `aria-busy` и запрет нажатия; ширина не меняется. С `asChild` спиннер не добавляется — содержимым владеет ребёнок.",
         },
         {
           name: "pressed",
@@ -77,14 +78,14 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<ButtonLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "asChild",
           type: "boolean",
           default: "false",
           en: "Merges Button props and styles onto the single child element instead of rendering `<button>`. `disabled`/`loading` become `aria-disabled`.",
-          ru: "Передать стили и пропсы единственному дочернему элементу вместо `<button>`.",
+          ru: "Передаёт пропсы и стили Button единственному дочернему элементу вместо `<button>`. `disabled`/`loading` становятся `aria-disabled`.",
         },
         {
           name: "type",
@@ -106,8 +107,14 @@ export const api: ComponentApi = {
           ru: "Подпись и `Button.Icon`. Только `Button.Icon` — квадратная кнопка, ей нужен `aria-label`. Новая подпись перетекает по буквам.",
         },
         {
+          name: "aria-label",
+          type: "string",
+          en: 'The name of a button without a visible label; required with `shape="circle"`.',
+          ru: 'Имя кнопки без видимой подписи; обязателен при `shape="circle"`.',
+        },
+        {
           name: "…rest",
-          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size">',
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "size" | "aria-pressed">',
           en: "`onClick`, `className`, `aria-*`, `data-*` and the other button attributes.",
           ru: "`onClick`, `className`, `aria-*`, `data-*` и остальные атрибуты кнопки.",
         },
@@ -123,25 +130,29 @@ export const api: ComponentApi = {
           type: "ReactNode",
           required: true,
           en: 'The icon, e.g. `<Icon name="action.copy" />`; `Icon` without `size` takes the button tier. A new icon (another `name`) cross-fades in and plays its gesture once (`fast`).',
-          ru: 'Иконка, например `<Icon name="action.copy" />`; без `size` берёт ярус кнопки. Новая иконка (другой `name`) перетекает на место старой и один раз играет свой жест (`fast`).',
+          ru: 'Иконка, например `<Icon name="action.copy" />`; `Icon` без `size` берёт ярус кнопки. Новая иконка (другой `name`) перетекает на место старой и один раз играет свой жест (`fast`).',
+        },
+        {
+          name: "className",
+          type: "string",
+          en: "Class on the icon box.",
+          ru: "Класс на блоке иконки.",
         },
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
-          en: "`className` and the other span attributes.",
-          ru: "`className` и остальные атрибуты span.",
+          en: "The other span attributes.",
+          ru: "Остальные атрибуты span.",
         },
       ],
     },
   ],
-  labels: [
-    {
-      key: "holdHint",
-      default: "Удерживайте, чтобы подтвердить",
+  labels: labelRows(BUTTON_LABELS, {
+    holdHint: {
       en: "Description of a `holdToConfirm` button for assistive tech (`aria-describedby`).",
       ru: "Описание кнопки `holdToConfirm` для скринридеров (`aria-describedby`).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -158,7 +169,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'Native `<button>`, `type="button"` by default, so it never submits a form by accident.',
-        ru: 'Нативный `<button type="button">`: случайно не отправит форму.',
+        ru: 'Нативный `<button>`, по умолчанию `type="button"`: случайно не отправит форму.',
       },
       {
         en: "Icon-only buttons need `aria-label`; `Button.Icon` is `aria-hidden`.",
@@ -170,7 +181,7 @@ export const api: ComponentApi = {
       },
       {
         en: '`shape="circle"` requires `aria-label`; its `progress` ring is `aria-hidden`, the share goes in the label or description («Отменить отправку», described by «Отправка 45%»).',
-        ru: '`shape="circle"` требует `aria-label`; кольцо `progress` скрыто (`aria-hidden`), долю называет подпись или `aria-describedby`.',
+        ru: '`shape="circle"` требует `aria-label`; кольцо `progress` скрыто (`aria-hidden`), долю называет подпись или описание («Отменить отправку» с описанием «Отправка 45%»).',
       },
       {
         en: '`loading` sets `aria-busy="true"` and blocks the press; `progress` sets `aria-busy` and keeps the button pressable.',
@@ -178,7 +189,7 @@ export const api: ComponentApi = {
       },
       {
         en: "`holdToConfirm` describes the gesture through `aria-describedby` (`labels.holdHint`); `Space` / `Enter` hold like a pointer.",
-        ru: "`holdToConfirm`: жест описан скринридеру через `aria-describedby` («Удерживайте, чтобы подтвердить»); Пробел и Enter удерживаются как указатель.",
+        ru: "`holdToConfirm` описывает жест через `aria-describedby` (`labels.holdHint`); `Space` / `Enter` удерживаются как указатель.",
       },
       {
         en: "A changed label is announced once: the animated letters are hidden, the name is the new text.",

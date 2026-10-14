@@ -71,27 +71,37 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the dialog panel. |
 
 ### CommandMenu.Title · CommandMenu.Description
-`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` / `<p>` above the search row; they name and describe the dialog. + native props except `id`.
+`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` / `<p>` above the search row; they name and describe the dialog.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `children`, `className` and the other attributes except `id`. |
 
 ### CommandMenu.Input
-`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list, showing `CommandMenu.Root` `search`; takes focus on open. + native input props except `value` / `defaultValue`.
+`ref` → `HTMLInputElement`. The search row: a search icon and `<input role="combobox">` controlling the list, showing `CommandMenu.Root` `search`; takes focus on open.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `placeholder` | `string` | `labels.search` | Placeholder; also the default accessible name comes from `labels.search`. |
+| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "size" \| "type" \| "role" \| "value" \| "defaultValue">` | — | `className` and the other input attributes except `value` / `defaultValue`. |
 
 ### CommandMenu.List
-`ref` → `HTMLElement`. The scrolling `role="listbox"` under the search row; draws the load states of Root: skeleton rows, more rows loading at the end, the error with a retry. + native props.
+`ref` → `HTMLElement`. The scrolling `role="listbox"` under the search row; draws the load states of Root: skeleton rows, more rows loading at the end, the error with a retry.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "role" \| "id">` | — | `children`, `className` and the other attributes. |
 
 ### CommandMenu.Group
-`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while none of its items match. + native `<div>` props.
+`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while none of its items match.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — | Heading of the group (caption, muted); also its accessible name. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children`, `className` and the other div attributes. |
 
 ### CommandMenu.Item
-`ref` → `HTMLButtonElement`. `<button role="option">`; the active item has `aria-selected` and the highlight fill. + native button props.
+`ref` → `HTMLButtonElement`. `<button role="option">`; the active item has `aria-selected` and the highlight fill.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -100,26 +110,52 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `onSelect` | `() => void` | — | Runs the command: a click, or Enter while the item is active. |
 | `disabled` | `boolean` | `false` | Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, does not run. |
 | `persistent` | `boolean` | `false` | Shown whatever the query and never counted as a match (`CommandMenu.Empty` still shows); the arrows reach it after the matches. One «create from the query» item at the end of the list. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "role" \| "id" \| "onSelect">` | — | `children`, `className` and the other button attributes. |
 
-### CommandMenu.ItemIcon · CommandMenu.ItemShortcut
-`ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). The `aria-hidden` leading glyph / a `Kbd` key hint at the end of the item — a hint, not a handler. + native props.
+### CommandMenu.ItemIcon
+`ref` → `HTMLSpanElement`. The `aria-hidden` leading glyph of the item.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the `Icon`), `className` and the other span attributes. |
+
+### CommandMenu.ItemShortcut
+`ref` → `HTMLElement` (the `<kbd>`). A `Kbd` key hint at the end of the item — a hint, not a handler.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | The keys («⌘K»). |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children">` | — | `className` and the other attributes. |
 
 ### CommandMenu.ItemText
-`ref` → `HTMLSpanElement`. A `<span>` column: the title with an ellipsis and an optional description line. + native `<span>` props.
+`ref` → `HTMLSpanElement`. A `<span>` column: the title with an ellipsis and an optional description line.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `description` | `ReactNode` | — | Second line (path, details): caption, muted. |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the title), `className` and the other span attributes. |
 
 ### CommandMenu.Empty
 `ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty` and `labels.emptyHint`, text only. An action for the query is a `persistent` `CommandMenu.Item` at the end of the list.
 
-### CommandMenu.Footer · CommandMenu.FooterHint
-`ref` → `HTMLDivElement` / `HTMLSpanElement`. A bottom row of hints with a hairline above / one hint: every entry of `keys` in its own `Kbd`, then the label (`children`). + native props.
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role" \| "children">` | — | `className` and the other div attributes. |
+
+### CommandMenu.Footer
+`ref` → `HTMLDivElement`. A bottom row of `CommandMenu.FooterHint`s with a hairline above.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `keys` | `ReactNode[]` | — (required) | FooterHint: the keys (text or icons). |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
+
+### CommandMenu.FooterHint
+`ref` → `HTMLSpanElement`. One hint: every entry of `keys` in its own `Kbd`, then the label (`children`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `keys` | `ReactNode[]` | — (required) | The keys (text or icons). |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the label), `className` and the other span attributes. |
 
 ## Variants
 One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radius`, `shadow-modal`, `--prime-modal-width-l` wide, placed in the top part of the viewport so the search row never jumps while the list filters.

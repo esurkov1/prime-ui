@@ -107,14 +107,14 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 |---|---|---|---|
 | `trigger` | `"dropzone" \| "button" \| "tile"` | `"dropzone"` | `dropzone`: the drop area. `button`: a compact picker button, no zone and no drop (a composer paperclip). `tile`: an add tile as the last cell of the files. |
 | `variant` | `"dashed" \| "solid"` | `"dashed"` | The look of the drop zone: `dashed` shows the drop line; `solid` keeps only the fill (cards, modals). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the zone padding, icon, title, button, label, hint and the rows. Without it the tier of its host (a form, a panel), else `m`. Tiles keep their own size. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the zone padding, icon, title, button, label, hint and the rows. Without it the tier of its host (a form, a panel), else `m`. Tiles keep their own size. |
 | `value` | `readonly FileUploadFile[]` | — | Files in their order (controlled): `{ id, name, size?, type?, src?, alt?, href? }` — on the server or uploads of `queue` by id. `src`: picture or video; `alt` spoken for the name; `href` links name or tile to the file. |
 | `defaultValue` | `readonly FileUploadFile[]` | `[]` | Initial files (uncontrolled). |
 | `onValueChange` | `(value: readonly FileUploadFile[]) => void \| Promise<void>` | — | The set changed (a reorder, a removal, files added to `queue`), with the whole new list. Return the save's promise: the touched files wait busy, a rejection puts the set back and is announced. |
 | `queue` | `Pick<UploadQueue, "items" \| "retry" \| "remove"> & Partial<Pick<UploadQueue, "add" \| "move">>` | — | The uploads: `useUploadQueue(…)` or an object of that shape. Each file on its way shows its upload; removing a file aborts it. With `add`, picked and dropped files go into the queue. |
 | `layout` | `"list" \| "grid" \| "strip"` | `"list"` | `list`: a row per file. `grid`: square tiles that wrap to the set's width and reorder. `strip`: one sideways-scrolling row of tiles (an attachment tray). |
 | `cover` | `boolean` | `false` | Tiles only: the first file is the cover («Обложка», 2 × 2 in a `grid`). Reordering a file to the first place makes it the cover. |
-| `formatSize` | `(bytes: number) => string` | `Russian digits, Б · КБ · МБ · ГБ` | Display of a file size («820 КБ», «1,2 МБ»). |
+| `formatSize` | `(bytes: number) => string` | Russian digits, Б · КБ · МБ · ГБ | Display of a file size («820 КБ», «1,2 МБ»). |
 | `label` | `ReactNode` | — | Field label above the trigger; names the file input and the list of files. |
 | `required` | `boolean` | — | Red `*` after the label and native `required` on the input. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |
@@ -135,20 +135,33 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`. The zone reads `--file-upload-padding` and `--file-upload-radius` from that class (a round zone around an avatar). |
 
 ### FileUpload.Body
-`ref` → `HTMLDivElement`. A centered column for a custom zone body; nested buttons and links stay interactive (drag-over follows enter / leave depth, so crossing children never flickers it). Native `<div>` props.
+`ref` → `HTMLDivElement`. A centered column for a custom zone body; nested buttons and links stay interactive (drag-over follows enter / leave depth, so crossing children never flickers it).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### FileUpload.Icon
-`ref` → `HTMLSpanElement`. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid. Native `<span>` props.
+`ref` → `HTMLSpanElement`. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the `Icon`), `className` and the other span attributes. |
 
 ### FileUpload.Title
-`ref` → `HTMLParagraphElement`. The zone title `<p>`. Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The zone title `<p>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"default" \| "muted"` | `"default"` | `muted` — secondary color, regular weight (an instruction line in custom bodies). |
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### FileUpload.Description
-`ref` → `HTMLParagraphElement`. The secondary zone line (formats, size limit), the kit Hint of the zone tier. Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The secondary zone line (formats, size limit), the kit Hint of the zone tier.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### FileUpload.Queue
 `ref` → `HTMLUListElement`. The files of a set with no picker of its own — a tray whose paperclip lives elsewhere: the same rows or tiles `FileUpload.Root` draws, in a `<ul>` (nothing while empty).
@@ -161,18 +174,19 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `queue` | `Pick<UploadQueue, "items" \| "retry" \| "remove"> & Partial<Pick<UploadQueue, "add" \| "move">>` | — | The uploads: `useUploadQueue(…)` or an object of that shape. Each file on its way shows its upload; removing a file aborts it. With `add`, picked and dropped files go into the queue. |
 | `layout` | `"list" \| "grid" \| "strip"` | `"list"` | `list`: a row per file. `grid`: square tiles that wrap to the set's width and reorder. `strip`: one sideways-scrolling row of tiles (an attachment tray). |
 | `cover` | `boolean` | `false` | Tiles only: the first file is the cover («Обложка», 2 × 2 in a `grid`). Reordering a file to the first place makes it the cover. |
-| `formatSize` | `(bytes: number) => string` | `Russian digits, Б · КБ · МБ · ГБ` | Display of a file size («820 КБ», «1,2 МБ»). |
+| `formatSize` | `(bytes: number) => string` | Russian digits, Б · КБ · МБ · ГБ | Display of a file size («820 КБ», «1,2 МБ»). |
 | `disabled` | `boolean` | `false` | Read-only files: no reorder, no remove. |
 | `labels` | `Partial<FileUploadLabels>` | — | Row and tile strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLUListElement>, "children" \| "defaultValue">` | — | `className`, `aria-label` (name the list) and the other attributes of the `<ul>`. |
 
 ### FileUpload.Item
-`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part. Native `<div>` props.
+`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the padding, text and the format badge. Without it the tier of its host, else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the padding, text and the format badge. Without it the tier of its host, else `m`. |
 | `invalid` | `boolean` | `false` | A failed upload: danger wash and ring, danger description. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the item parts), `className` and the other div attributes. |
 
 ### FileUpload.FormatBadge
 `ref` → `HTMLSpanElement`. The file format as a square kit Badge of the row tier (`aria-hidden`: the row's name is trimmed of the extension and the accessible name carries it whole).
@@ -192,7 +206,11 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "color">` | — | `className` and the other attributes of the thumbnail frame. |
 
 ### FileUpload.ItemName · FileUpload.ItemDescription · FileUpload.ItemActions
-`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row. Native `<div>` props.
+`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### FileUpload.ItemProgress
 `ref` → `HTMLDivElement` (the wrapper). Upload progress across the row: the kit ProgressBar.
@@ -202,16 +220,25 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `value` | `number` | — (required) | Uploaded amount. |
 | `max` | `number` | — | Total amount (ProgressBar default). |
 | `tone` | `"accent" \| "neutral" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Fill color: `success` for a finished file, `danger` where a failed one stopped. |
-| `aria-label` | `string` | `«Загрузка файла»` | Accessible name of the bar (not the wrapper); name the file. |
+| `aria-label` | `string` | `"Загрузка файла"` | Accessible name of the bar (not the wrapper); name the file. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the wrapper. |
 
-### useUploadQueue
-`useUploadQueue<TResult>({ upload, concurrency })` → `{ items, add, retry, remove, clear, move }`. The upload queue of FileUpload: `concurrency` files go at once through `upload`, the rest wait as `queued`; each has its progress, error and retry.
+### Types
 
-| Prop | Type | Default | Description |
+#### `UploadQueueOptions<TResult>`
+The argument of `useUploadQueue(options)`.
+
+| Field | Type | Default | Description |
 |---|---|---|---|
 | `upload` | `(file: File, context: { id: string; signal: AbortSignal; onProgress: (progress: number) => void }) => Promise<TResult>` | — (required) | Sends one file: progress through `onProgress` (0…1), stop on `signal`, resolve with the answer (`result`), reject to fail. `id` is the item: after-upload work runs here once the request resolves. |
 | `concurrency` | `number` | `3` | How many files upload at once; the rest wait as `queued`. |
+
+### Functions
+
+#### `useUploadQueue(options)`
+`<TResult>(options: UploadQueueOptions<TResult>) => UploadQueue<TResult>`
+
+The upload queue of FileUpload: `concurrency` files go at once through `upload`, the rest wait as `queued`; each has its progress, error and retry. Returns `{ items, add, retry, remove, clear, move }`.
 
 ## Variants
 

@@ -57,7 +57,7 @@ export const api: ComponentApi = {
     {
       name: "Stepper.Item",
       en: '`ref` → `HTMLButtonElement`. One step: an `<li>` with a `<button>` (and, between horizontal steps, the decorative chevron in front of it); `aria-current="step"` when active.',
-      ru: 'Один шаг: `<li>` с кнопкой; у активного — `aria-current="step"`.',
+      ru: 'Один шаг: `<li>` с `<button>` (между горизонтальными шагами перед ней — декоративный шеврон); у активного — `aria-current="step"`.',
       props: [
         {
           name: "status",
@@ -88,7 +88,7 @@ export const api: ComponentApi = {
     {
       name: "Stepper.Indicator",
       en: "`ref` → `HTMLSpanElement`. The circle (`aria-hidden`): the item number, or a check when completed.",
-      ru: "Кружок: номер пункта или галочка у пройденного.",
+      ru: "Кружок (`aria-hidden`): номер пункта или галочка у пройденного.",
       props: [
         {
           name: "children",
@@ -133,7 +133,7 @@ export const api: ComponentApi = {
     {
       name: "Stepper.Arrow",
       en: "`ref` → `SVGSVGElement`. Trailing chevron (`aria-hidden`) for vertical items that open a page or panel.",
-      ru: "Шеврон в конце вертикального пункта, который открывает страницу или панель.",
+      ru: "Шеврон (`aria-hidden`) в конце вертикального пункта, который открывает страницу или панель.",
       props: [
         {
           name: "…rest",
@@ -161,7 +161,7 @@ export const api: ComponentApi = {
       },
       {
         en: "Separators, indicator and arrow are `aria-hidden`; the name comes from Title (and Description).",
-        ru: "Шевроны, индикатор и `Stepper.Arrow` скрыты (`aria-hidden`); имя шага — заголовок и описание.",
+        ru: "Разделители, индикатор и стрелка скрыты (`aria-hidden`); имя шага — заголовок и описание.",
       },
       {
         en: "Give the `<ol>` an `aria-label` when there are several steppers on a page.",

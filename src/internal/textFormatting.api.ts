@@ -1,4 +1,5 @@
-import type { ApiLabel, ApiProp } from "../../scripts/docs/componentApi";
+import type { ApiProp, LabelDocs } from "../../scripts/docs/componentApi";
+import type { TextFormattingLabels } from "./textFormatting";
 
 /** The `formatting` row of a field with the formatting toolbar (Composer, Textarea). */
 export function formattingProp(defaultValue: "true" | "false"): ApiProp {
@@ -12,24 +13,17 @@ export function formattingProp(defaultValue: "true" | "false"): ApiProp {
   };
 }
 
-/** The names of the formatting toolbar and its tools (`TextFormattingLabels`). */
-export const TEXT_FORMATTING_LABEL_ROWS: ApiLabel[] = [
-  {
-    key: "formatting",
-    default: "Форматирование",
+/** The descriptions of the names of the formatting toolbar and its tools (`TextFormattingLabels`). */
+export const TEXT_FORMATTING_LABEL_DOCS: LabelDocs<TextFormattingLabels> = {
+  formatting: {
     en: "Accessible name of the formatting toolbar.",
     ru: "Имя панели форматирования.",
   },
-  { key: "bold", default: "Жирный", en: "Bold tool.", ru: "Жирный." },
-  { key: "italic", default: "Курсив", en: "Italic tool.", ru: "Курсив." },
-  { key: "strikethrough", default: "Зачёркнутый", en: "Strikethrough tool.", ru: "Зачёркнутый." },
-  { key: "code", default: "Моноширинный", en: "Code tool.", ru: "Код." },
-  {
-    key: "spoiler",
-    default: "Скрытый текст",
-    en: "Spoiler tool (`||…||`).",
-    ru: "Скрытый текст (`||…||`).",
-  },
-  { key: "link", default: "Ссылка", en: "Link tool.", ru: "Ссылка." },
-  { key: "quote", default: "Цитата", en: "Quote tool.", ru: "Цитата." },
-];
+  bold: { en: "Bold tool.", ru: "Жирный." },
+  italic: { en: "Italic tool.", ru: "Курсив." },
+  strikethrough: { en: "Strikethrough tool.", ru: "Зачёркнутый." },
+  code: { en: "Code tool.", ru: "Код." },
+  spoiler: { en: "Spoiler tool (`||…||`).", ru: "Скрытый текст (`||…||`)." },
+  link: { en: "Link tool.", ru: "Ссылка." },
+  quote: { en: "Quote tool.", ru: "Цитата." },
+};

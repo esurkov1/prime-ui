@@ -26,6 +26,7 @@ import { cx } from "@/internal/cx";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import type { FieldRootDomProps } from "@/internal/FieldFrame";
 import { fieldSurfaceClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 import { SwatchChip } from "@/internal/swatch";
@@ -373,7 +374,7 @@ function ColorPickerRoot({
   children,
 }: ColorPickerRootProps) {
   const [format, setFormat] = React.useState<ColorValueFormat>(defaultFormat);
-  const labels = React.useMemo(() => ({ ...COLOR_PICKER_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(COLOR_PICKER_LABELS, labelsProp);
   const contextValue = React.useMemo(() => ({ format, setFormat, labels }), [format, labels]);
 
   return (

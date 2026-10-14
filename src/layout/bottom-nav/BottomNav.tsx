@@ -15,7 +15,7 @@ export type BottomNavLabels = {
   nav: string;
 };
 
-const BOTTOM_NAV_LABELS: BottomNavLabels = {
+export const BOTTOM_NAV_LABELS: BottomNavLabels = {
   nav: "Основные разделы",
 };
 

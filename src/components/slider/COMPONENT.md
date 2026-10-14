@@ -51,7 +51,7 @@ Slider                 field frame (FieldFrame): className, ref, rest
 | `min` | `number` | `0` | Lower bound. |
 | `max` | `number` | `100` | Upper bound. |
 | `step` | `number` | `1` | Step of the keyboard and of the snapping; fractions allowed. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the track thickness T (thumb 4.5T × 3T), the label, the value and the hint. Without it the tier of its host (a form, a panel), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the track thickness T (thumb 4.5T × 3T), the label, the value and the hint. Without it the tier of its host (a form, a panel), else `m`. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"accent"` | Color of the filled part of the track. |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `vertical` — the track stands upright, minimum at the bottom: a level beside a button, a mixer column. |
 | `disabled` | `boolean` | — | Muted track and thumb, dimmed label and value, no interaction. |

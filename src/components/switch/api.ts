@@ -5,7 +5,7 @@ export const api: ComponentApi = {
     {
       name: "Switch.Root",
       en: '`ref` → `HTMLInputElement` (the native `input type="checkbox" role="switch"`). Renders the field `<div>`, the `<label>` row with the input and the track, and the support row. `className` goes to the field `<div>`, native input props to the input.',
-      ru: 'Поле: строка-`<label>` с нативным input (`role="switch"`) и дорожкой, под ней подсказка или ошибка.',
+      ru: "Рендерит `<div>` поля, строку-`<label>` с input и дорожкой и строку поддержки. `className` — на `<div>` поля, нативные пропсы input — на input.",
       props: [
         {
           name: "checked",
@@ -36,9 +36,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the track (24×16 … 44×24), the text and the gap. Without it the tier of its host (a form, a panel), else `m`.",
-          ru: "Ярус дорожки (24×16 … 44×24), текста и отступа.",
+          ru: "Ярус дорожки (24×16 … 44×24), текста и отступа. Без него — ярус хоста (форма, панель), иначе `m`.",
         },
         {
           name: "hint",
@@ -57,27 +57,27 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger ring on the off track and `aria-invalid`. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо у выключенной дорожки, `aria-invalid`.",
+          ru: "Ошибка без текста: красное кольцо у выключенной дорожки, `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "disabled",
           type: "boolean",
           default: "false",
           en: "No toggling; muted track (on = `accent-soft`), dimmed text and hint.",
-          ru: "Без переключения; приглушённая дорожка, текст и подсказка.",
+          ru: "Без переключения; приглушённая дорожка (включённая — `accent-soft`), текст и подсказка.",
         },
         {
           name: "readOnly",
           type: "boolean",
           default: "false",
           en: "The state is shown and focusable but does not change (`aria-readonly`); no hover or press.",
-          ru: "Состояние видно и фокусируется, но не меняется (`aria-readonly`).",
+          ru: "Состояние видно и фокусируется, но не меняется (`aria-readonly`); без наведения и нажатия.",
         },
         {
           name: "id",
           type: "string",
           en: "Id of the input (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id input; иначе генерируется. Связывает подпись, подсказку и ошибку.",
+          ru: "Id input; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-describedby",
@@ -101,15 +101,22 @@ export const api: ComponentApi = {
           name: "…rest",
           type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "checked" | "defaultChecked" | "onChange">',
           en: "`name`, `value`, `required`, `aria-label`, `aria-labelledby`… on the native input.",
-          ru: "`name`, `value`, `required`, `aria-label`… на нативном input.",
+          ru: "`name`, `value`, `required`, `aria-label`, `aria-labelledby`… на нативном input.",
         },
       ],
     },
     {
       name: "Switch.Label",
       en: "`ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.",
-      ru: "Видимый текст в колонке текста строки-подписи.",
-      props: [],
+      ru: "Видимый текст в колонке текста строки-подписи. Нативные пропсы `<span>`.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children`, `className` and the other span attributes.",
+          ru: "`children`, `className` и остальные атрибуты span.",
+        },
+      ],
     },
   ],
   labels: [],
@@ -125,7 +132,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'A native `<input type="checkbox" role="switch">` (its native checked state is the switch state), visually hidden over the track and wrapped by the `<label>` row.',
-        ru: 'Нативный `<input type="checkbox" role="switch">` без `aria-checked`: состояние переключателя — нативное `checked` поля, его и читает скринридер; поле скрыто поверх дорожки и обёрнут строкой-`<label>`.',
+        ru: 'Нативный `<input type="checkbox" role="switch">` (его нативное отмеченное состояние и есть состояние переключателя), визуально скрыт поверх дорожки и обёрнут строкой-`<label>`.',
       },
       {
         en: "`aria-invalid`, `aria-readonly` and `aria-describedby` (your ids + the hint or the error) are set on the input.",
@@ -137,7 +144,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While a change is saved (`loading` or a pending promise) the input has `aria-busy`; the thumb's spinner is hidden from assistive tech. A refused save puts the state back — say why with `error`.",
-        ru: "Пока изменение сохраняется (`loading` или промис из `onCheckedChange`), на input `aria-busy`, а спиннер в бегунке скрыт от чтения с экрана; при отказе состояние возвращается, причину покажите через `error`.",
+        ru: "Пока изменение сохраняется (`loading` или ожидающий промис), на input `aria-busy`, а спиннер в бегунке скрыт от вспомогательных технологий; при отказе состояние возвращается, причину покажите через `error`.",
       },
     ],
   },

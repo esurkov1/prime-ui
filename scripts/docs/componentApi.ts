@@ -86,18 +86,28 @@ export type ComponentApi = {
 };
 
 /**
- * Label rows from the runtime defaults: `labelRows(BUTTON_LABELS, { holdHint: { en, ru } })`.
- * TypeScript requires a description for every key, and the default text comes from the code.
+ * The descriptions of every key of a labels type, each with the part that takes it: the second
+ * argument of `labelRows`, and the shared descriptions a donor's `*.api.ts` exports for the keys
+ * it brings (`LabelDocs<TransferLabels>`).
  */
-export function labelRows<Defaults extends Record<string, string>>(
-  defaults: Defaults,
-  docs: { [Key in keyof Defaults]: ApiText & { part?: string } },
-): ApiLabel[] {
-  return Object.keys(defaults).map((key) => ({
-    key,
-    default: defaults[key],
-    ...docs[key],
-  }));
+export type LabelDocs<Labels> = { [Key in keyof Labels]: ApiText & { part?: string } };
+
+/**
+ * Label rows from the runtime defaults: `labelRows(BUTTON_LABELS, { holdHint: { en, ru } })`.
+ * TypeScript requires a description for every key, and the default text comes from the code. A
+ * key that holds a record of strings (a name per palette colour) shows its values joined by ` · `.
+ */
+export function labelRows<
+  Defaults extends Record<string, string | Readonly<Record<string, string>>>,
+>(defaults: Defaults, docs: LabelDocs<Defaults>): ApiLabel[] {
+  return Object.keys(defaults).map((key) => {
+    const value = defaults[key];
+    return {
+      key,
+      default: typeof value === "string" ? value : Object.values(value).join(" · "),
+      ...docs[key],
+    };
+  });
 }
 
 export const GENERATED_NOTE =

@@ -80,7 +80,7 @@ export type KanbanLabels = {
   columnMoveFailed: string;
 };
 
-export const defaultKanbanLabels: KanbanLabels = {
+export const KANBAN_LABELS: KanbanLabels = {
   count: "Карточек: {count}",
   countLimit: "Карточек: {count} из {limit}",
   empty: "Нет карточек",
@@ -310,7 +310,7 @@ function KanbanBoard<T>({
   ref,
   ...rest
 }: KanbanRootProps<T>) {
-  const labels = { ...defaultKanbanLabels, ...labelsProp };
+  const labels = { ...KANBAN_LABELS, ...labelsProp };
   const kind = `kanban-${React.useId()}`;
   const columnKind = `${kind}-column`;
   const controller = useDragController();

@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BOTTOM_NAV_LABELS } from "./BottomNav";
 
 export const api: ComponentApi = {
   parts: [
@@ -25,7 +26,7 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<BottomNavLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -38,7 +39,7 @@ export const api: ComponentApi = {
     {
       name: "BottomNav.Item",
       en: '`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`: the icon (20) above a short label (10).',
-      ru: "Кнопка, ссылка при `href` или единственный дочерний элемент при `asChild`: иконка (20) над короткой подписью (10).",
+      ru: '`<button type="button">`, ссылка `<a>` при `href` или единственный дочерний элемент при `asChild`: иконка (20) над короткой подписью (10).',
       props: [
         {
           name: "current",
@@ -52,13 +53,25 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Not interactive: `disabled` / `aria-disabled`, `data-disabled`, out of the Tab order; an `href` link loses its `href`, an `asChild` child keeps its own and only its clicks are blocked.",
-          ru: "Неактивный пункт: `disabled` / `aria-disabled`, `data-disabled`, вне порядка Tab; ссылка из `href` теряет его, у потомка `asChild` ссылка остаётся, но клики гасятся.",
+          ru: "Неактивный пункт: `disabled` / `aria-disabled`, `data-disabled`, вне порядка Tab; ссылка из `href` теряет `href`, у потомка `asChild` ссылка остаётся, но клики гасятся.",
         },
         {
           name: "href",
           type: "string",
           en: "Renders an `<a>` (with `target`, `rel`).",
           ru: "Рендерит `<a>` (с `target`, `rel`).",
+        },
+        {
+          name: "target",
+          type: "string",
+          en: "Where the `<a>` opens (`href` only).",
+          ru: "Где открывается `<a>` (только с `href`).",
+        },
+        {
+          name: "rel",
+          type: "string",
+          en: "Relationship of the `<a>` (`href` only).",
+          ru: "Отношение ссылки `<a>` (только с `href`).",
         },
         {
           name: "asChild",
@@ -84,7 +97,7 @@ export const api: ComponentApi = {
     {
       name: "BottomNav.ItemIcon",
       en: "`ref` → `HTMLSpanElement`. The item glyph (`aria-hidden`, 20) above the label.",
-      ru: "Значок пункта (20, скрыт от скринридеров) над подписью.",
+      ru: "Значок пункта (`aria-hidden`, 20) над подписью.",
       props: [
         {
           name: "children",
@@ -163,14 +176,9 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "nav",
-      default: "Основные разделы",
-      en: "`aria-label` of the `<nav>` landmark.",
-      ru: "`aria-label` ориентира `<nav>`.",
-    },
-  ],
+  labels: labelRows(BOTTOM_NAV_LABELS, {
+    nav: { en: "`aria-label` of the `<nav>` landmark.", ru: "`aria-label` ориентира `<nav>`." },
+  }),
   accessibility: {
     keyboard: [
       {
@@ -199,11 +207,11 @@ export const api: ComponentApi = {
       },
       {
         en: "`BottomNav.Action` is a button without text, named by its required `aria-label`; it sits inside the landmark, before or after the items (where it is placed).",
-        ru: "`BottomNav.Action` — кнопка без текста, её имя — обязательный `aria-label`; она внутри ориентира после пунктов.",
+        ru: "`BottomNav.Action` — кнопка без текста, её имя — обязательный `aria-label`; она внутри ориентира, до или после пунктов (где написана).",
       },
       {
         en: "A disabled item is a `disabled` button, an `aria-disabled` link without `href`, or an `aria-disabled` `asChild` child out of the Tab order (`tabIndex={-1}`).",
-        ru: "Недоступный пункт — `disabled` у кнопки или `aria-disabled` у ссылки без `href`.",
+        ru: "Недоступный пункт — `disabled` у кнопки, `aria-disabled` у ссылки без `href` или `aria-disabled` у потомка `asChild` вне порядка Tab (`tabIndex={-1}`).",
       },
     ],
   },

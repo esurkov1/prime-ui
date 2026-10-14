@@ -1,19 +1,20 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_OPTIONAL_LABEL, fieldGroupProps } from "../../internal/field.api";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_OPTIONAL_LABEL_DOCS, fieldGroupProps } from "../../internal/field.api";
+import { BUTTON_GROUP_LABELS } from "./ButtonGroup";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "ButtonGroup.Root",
       en: '`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="group">` with the segments · support row; sets the tier and orientation of every segment and passes the tier to nested icons. The frame hugs the group unless `fullWidth`.',
-      ru: 'Поле: подпись · `<div role="group">` с сегментами · строка поддержки; задаёт ярус и направление всех сегментов и передаёт ярус иконкам.',
+      ru: 'Поле: подпись · `<div role="group">` с сегментами · строка поддержки; задаёт ярус и направление всех сегментов и передаёт ярус иконкам. Рамка облегает группу, если не задан `fullWidth`.',
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Control tier of every segment: height 28 · 32 · 36 · 40 · 48, padding, text, icon. Without it the tier of its host (a toolbar, a panel), else `m`.",
-          ru: "Ярус всех сегментов: высота 28 · 32 · 36 · 40 · 48, отступы, кегль, иконка.",
+          ru: "Ярус всех сегментов: высота 28 · 32 · 36 · 40 · 48, отступы, кегль, иконка. Без него — ярус хоста (панель, тулбар), иначе `m`.",
         },
         {
           name: "orientation",
@@ -52,7 +53,7 @@ export const api: ComponentApi = {
           name: "pressed",
           type: "boolean",
           en: 'Toggle state: `aria-pressed` and `data-state="active" | "inactive"`. Leave it out for a plain action segment.',
-          ru: "Состояние переключателя: `aria-pressed` и `data-state`. Не задавайте для обычного действия.",
+          ru: 'Состояние переключателя: `aria-pressed` и `data-state="active" | "inactive"`. Не задавайте для обычного действия.',
         },
         {
           name: "type",
@@ -84,7 +85,7 @@ export const api: ComponentApi = {
     {
       name: "ButtonGroup.Icon",
       en: "`ref` → `HTMLSpanElement`. Decorative icon wrapper (`aria-hidden`) sized to the group tier.",
-      ru: "Иконка размера яруса группы; скрыта от скринридеров.",
+      ru: "Декоративная обёртка иконки (`aria-hidden`) размера яруса группы.",
       props: [
         {
           name: "children",
@@ -102,7 +103,7 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [FIELD_OPTIONAL_LABEL],
+  labels: labelRows(BUTTON_GROUP_LABELS, FIELD_OPTIONAL_LABEL_DOCS),
   accessibility: {
     keyboard: [
       {
@@ -123,7 +124,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.',
-        ru: "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`, `required` — `aria-required`.",
+        ru: 'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`, `required` — `aria-required="true"`.',
       },
       {
         en: "Toggle segments expose `aria-pressed`; in a toggle set pass `pressed={false}` to the inactive ones.",

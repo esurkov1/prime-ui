@@ -158,7 +158,7 @@ export const api: ComponentApi = {
         {
           name: "formatDuration",
           type: "(seconds: number) => string",
-          default: "m:ss (h:mm:ss from an hour)",
+          defaultNote: { en: "`m:ss` (`h:mm:ss` from an hour)", ru: "`m:ss` (`h:mm:ss` от часа)" },
           en: "Display of the duration badge.",
           ru: "Показ длительности.",
         },
@@ -213,11 +213,11 @@ export const api: ComponentApi = {
       },
       {
         en: 'A selectable tile is a `<button role="checkbox">` with `aria-checked`, named by `aria-label` or the image `alt`; its indicator is `aria-hidden`, and the state is not only color (the check).',
-        ru: 'Выбираемая плитка — `<button role="checkbox">` с `aria-checked`; галочка `Checkbox.Indicator` скрыта от чтения, выбор не передаётся только цветом.',
+        ru: 'Выбираемая плитка — `<button role="checkbox">` с `aria-checked`, названная `aria-label` или `alt` изображения; её индикатор — `aria-hidden`, а состояние передаётся не только цветом (галочка).',
       },
       {
         en: "Name a `Thumbnail.Video` with `aria-label`; the play mark is decorative, the duration is text. Under `prefers-reduced-motion` an `autoPlay` clip stands still.",
-        ru: "`Thumbnail.Video` назовите `aria-label`; знак воспроизведения и длительность — подсказки на тени `media`. При `prefers-reduced-motion` ролик с `autoPlay` стоит на первом кадре.",
+        ru: "`Thumbnail.Video` назовите `aria-label`; знак воспроизведения декоративен, длительность — текст. При `prefers-reduced-motion` ролик с `autoPlay` стоит на первом кадре.",
       },
     ],
   },

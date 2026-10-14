@@ -99,7 +99,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `onSearchChange` | `(search: string \| null) => void` | — | The search opened (`""`), changed its query or closed (`null`). |
 | `current` | `string \| null` | `null` | A message to bring into view (a link, a notification): on change the chat brings it to the middle and the message itself blinks. The focus stays where it is. |
 | `typing` | `boolean` | `false` | The other side is typing: `Chat.Description` cross-fades into «печатает…» and the list ends with the typing bubble (`Message.Typing`), which gives way at once to the reply that ends it. |
-| `labels` | `Partial<ChatLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<ChatLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">` | — | `className` and the other attributes of the frame. |
 
 ### Chat.Header
@@ -152,11 +152,11 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 |---|---|---|---|
 | `items` | `readonly { value: string; text: string }[]` | — (required) | The pinned messages, oldest first: the `value` of each `Message.Root` and one line of it («Фото», «Голосовое сообщение» for media). |
 | `value` | `string` | — | The pinned message shown (controlled). |
-| `defaultValue` | `string` | `the last item` | The one shown first (uncontrolled): the newest. |
+| `defaultValue` | `string` | the last item | The one shown first (uncontrolled): the newest. |
 | `onValueChange` | `(value: string) => void` | — | The shown message changed: a press stepped to the next older one (the oldest wraps to the newest). |
 | `onSelect` | `(value: string) => void` | — | A press on the bar, after the chat has jumped to the message: load it when it is not in the list yet. |
 | `onRemove` | `(value: string) => void` | — | Unpin the shown message: a ghost close button at the end. Without it no button. |
-| `labels` | `Partial<ChatPinnedLabels>` | — | System strings, see Labels. |
+| `labels` | `Partial<ChatPinnedLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "onSelect">` | — | `className` and the other attributes. |
 
 ### Chat.Messages
@@ -173,13 +173,13 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `isService` | `(item: T) => boolean` | — | An event of the chat, not a message: it stands alone and breaks the runs around it. |
 | `unread` | `string` | — | The key of the first unread item: the «Непрочитанные сообщения» band stands above it. |
 | `groupWindow` | `number` | `5` | Messages of one author further apart than this many minutes start a new run. |
-| `now` | `Date` | `new Date()` | «Today» for the dates. |
+| `now` | `Date` | today | «Today» for the dates. |
 | `formatDate` | `(date: Date, now: Date) => string` | `formatMessageDate` | The label of a date. |
 | `loading` | `boolean` | `false` | The first load: bubble-shaped `Skeleton`s on both sides stand in the list's place (`aria-busy`, `labels.loading` announced), then cross-fade into the messages; none of them counts as new. |
 | `hasOlder` | `boolean` | `false` | Older history exists: a bubble-shaped placeholder stands above the first message and `onLoadOlder` runs when the reader reaches the top. |
 | `onLoadOlder` | `() => void \| Promise<void>` | — | Load older messages and prepend them (while `hasOlder`); the reader's place is kept. |
-| `quickReaction` | `string \| false` | `«👍»` | The reaction of a double tap (and `L`) on a message: puts it or takes it back through `onReactionToggle`. `false` — off. |
-| `reactionOptions` | `readonly { emoji: string; label: string }[]` | `👍 🔥 🤣 👌 🤔 😢 😱, then 7 more` | The reactions of the bar above a message (long press, long hover or `R`): the first seven in a row, «⌄» opens the rest. `label` names each toggle button. |
+| `quickReaction` | `string \| false` | `"👍"` | The reaction of a double tap (and `L`) on a message: puts it or takes it back through `onReactionToggle`. `false` — off. |
+| `reactionOptions` | `readonly { emoji: string; label: string }[]` | 👍 🔥 🤣 👌 🤔 😢 😱, then 7 more | The reactions of the bar above a message (long press, long hover or `R`): the first seven in a row, «⌄» opens the rest. `label` names each toggle button. |
 | `reader` | `MessageUser` | — | The reader (`{ id, name: «Вы», src?, color? }`): a reaction they put shows them among the chip's avatars at once, before the data comes back; matched by `id`. |
 | `onNewMessage` | `(value: string, details: { direction: "incoming" \| "outgoing" }) => void` | — | A message was added at the end after mount, sent or received: for a sound, a counter, a title badge. Not called for the first render, history or a message put back in the middle. |
 | `onRead` | `(values: string[]) => void` | — | Incoming messages the reader has seen (at least half on screen while the page is visible); batched per frame, each `value` once per mount. Send read receipts from here. |
@@ -290,6 +290,7 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 - The «к последним» button is named «К последним сообщениям», with the count «Новых сообщений: N. …»; the badge is `aria-hidden`.
 - `Chat.SelectionBar` is a `toolbar` named by the count «Выбрано: N», which is announced politely as it changes.
 - The quick reaction (double tap, `L`) is announced politely.
+- One sound at a time on the page: a voice message, a video note and a chat video pause each other.
 - «Печатает…» in the header is visible text; in the list the typing bubble is a polite `status` «Собеседник печатает».
 - While `loading` the messages' region is `aria-busy`, the placeholders are `aria-hidden`, and «Загрузка сообщений» (`labels.loading`) is announced politely.
 - A message reached by a jump or the current search match is not announced as such: a reply's target takes the focus, a search keeps it in its field; the others stepping back is visual only.
@@ -297,8 +298,14 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
+#### Chat.Root
+
 | Key | Default | Used for |
 |---|---|---|
+| `selectedCount` | `"Выбрано: {count}"` | The count of the selection bar. |
+| `cancel` | `"Отмена"` | The selection bar's button that leaves selection. |
+| `scrollToEnd` | `"К последним сообщениям"` | The name of the round button that goes to the newest message. |
+| `newMessages` | `"Новых сообщений: {count}. К последним сообщениям"` | The name of that button while new messages wait below. |
 | `typing` | `"печатает…"` | The status line of the header while the other side types. |
 | `search` | `"Поиск по переписке"` | The search button and the name of the search field. |
 | `searchPlaceholder` | `"Поиск по сообщениям"` | The placeholder of the search field. |
@@ -307,15 +314,16 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `previousMatch` | `"Предыдущее совпадение"` | The button that goes to the older match. |
 | `nextMatch` | `"Следующее совпадение"` | The button that goes to the newer match. |
 | `messages` | `"Переписка"` | The name of the list when the header has no `Chat.Title`. |
-| `selectedCount` | `"Выбрано: {count}"` | The count of the selection bar. |
-| `cancel` | `"Отмена"` | The selection bar's button that leaves selection. |
-| `scrollToEnd` | `"К последним сообщениям"` | The name of the round button that goes to the newest message. |
-| `newMessages` | `"Новых сообщений: {count}. К последним сообщениям"` | The name of that button while new messages wait below. |
+| `unread` | `"Непрочитанные сообщения"` | The text of the «unread» band: `Chat.Root labels` for rows from `items`, `Chat.Unread labels` for a hand-placed band. |
+| `loading` | `"Загрузка сообщений"` | Announced politely while the conversation loads for the first time (`Chat.Messages loading`). |
+
+#### Chat.Pinned
+
+| Key | Default | Used for |
+|---|---|---|
 | `pinned` | `"Закреплённое сообщение"` | `Chat.Pinned labels`: the title with one pinned message. |
 | `pinnedOf` | `"Закреплённое {index} из {count}"` | `Chat.Pinned labels`: the title with several, the newest last. |
 | `unpin` | `"Открепить"` | `Chat.Pinned labels`: the name of the unpin button. |
-| `unread` | `"Непрочитанные сообщения"` | The text of the «unread» band: `Chat.Root labels` for rows from `items`, `Chat.Unread labels` for a hand-placed band. |
-| `loading` | `"Загрузка сообщений"` | Announced politely while the conversation loads for the first time (`Chat.Messages loading`). |
 
 ## Examples
 | Example | Shows |

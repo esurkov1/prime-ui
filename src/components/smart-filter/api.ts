@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { SMART_FILTER_LABELS } from "./SmartFilter";
 
 export const api: ComponentApi = {
   parts: [
@@ -120,11 +121,13 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  types: [
     {
       name: "SmartFilterField",
       en: "One entry of `fields`: data, not a part. Selected values missing from `options` stay visible so they can be removed.",
       ru: "Один элемент `fields`: данные, а не часть. Выбранные значения, которых нет в `options`, остаются видны, чтобы их можно было убрать.",
-      props: [
+      fields: [
         {
           name: "key",
           type: "string",
@@ -170,160 +173,86 @@ export const api: ComponentApi = {
         {
           name: "formatValue",
           type: "(value: number) => string",
-          default: "Russian digit groups",
+          defaultNote: { en: "Russian digit groups", ru: "русские группы разрядов" },
           en: "`range` fields: a bound in the chip («1 000 ₽»).",
           ru: "Поля `range`: граница в теге («1 000 ₽»).",
         },
       ],
     },
+  ],
+  functions: [
     {
-      name: "matchesSmartFilter · resolveSmartFilterValues · isSmartFilterRange",
-      en: "Helpers. `matchesSmartFilter(entry, item)` checks one item's value on the client. `resolveSmartFilterValues(entry, all)` turns a fixed field into the list of values to ask a server for. `isSmartFilterRange(entry)` tells a range from a selection.",
-      ru: "Помощники. `matchesSmartFilter(entry, item)` проверяет значение записи на клиенте. `resolveSmartFilterValues(entry, all)` превращает фиксированное поле в список значений для сервера. `isSmartFilterRange(entry)` отличает диапазон от выбора.",
-      props: [],
+      name: "matchesSmartFilter(entry, item)",
+      type: "(entry: SmartFilterFieldValue | undefined, item: string | number | Date | null | undefined) => boolean",
+      en: "Checks one item's value against a field's entry on the client; an empty entry matches everything.",
+      ru: "Проверяет значение одной записи по условию поля на клиенте; пустое условие пропускает всё.",
+    },
+    {
+      name: "resolveSmartFilterValues(entry, all)",
+      type: "(entry: SmartFilterFieldValue | undefined, all: readonly string[]) => string[]",
+      en: "Turns a fixed field's entry into the list of values to ask a server for.",
+      ru: "Превращает условие фиксированного поля в список значений для запроса к серверу.",
+    },
+    {
+      name: "isSmartFilterRange(entry)",
+      type: "(entry: SmartFilterFieldValue | undefined) => entry is SmartFilterRange<number> | SmartFilterRange<Date>",
+      en: "Tells a range entry from a selection.",
+      ru: "Отличает условие-диапазон от выбора.",
     },
   ],
-  labels: [
-    {
-      key: "filter",
-      default: "Фильтр",
-      en: "Filter button and panel name.",
-      ru: "Кнопка фильтра и имя панели.",
-    },
-    {
-      key: "searchPlaceholder",
-      default: "Поиск",
+  labels: labelRows(SMART_FILTER_LABELS, {
+    filter: { en: "Filter button and panel name.", ru: "Кнопка фильтра и имя панели." },
+    searchPlaceholder: {
       en: "Placeholder and name of the search.",
       ru: "Плейсхолдер и имя поиска.",
     },
-    {
-      key: "clearSearch",
-      default: "Очистить поиск",
-      en: "Name of the search clear button.",
-      ru: "Имя кнопки очистки поиска.",
-    },
-    {
-      key: "searchText",
-      default: "Искать «{query}»",
+    clearSearch: { en: "Name of the search clear button.", ru: "Имя кнопки очистки поиска." },
+    searchText: {
       en: "The text search row while typing.",
       ru: "Строка текстового поиска при вводе.",
     },
-    {
-      key: "noMatches",
-      default: "{fields} — нет совпадений",
+    noMatches: {
       en: "Fields with nothing found while typing (compact EmptyPage).",
       ru: "Поля без совпадений при вводе (компактный EmptyPage).",
     },
-    {
-      key: "hint",
-      default: "Нажмите значение, чтобы показать только его; «−» справа — скрыть",
-      en: "Panel footer hint.",
-      ru: "Подсказка в подвале панели.",
-    },
-    {
-      key: "count",
-      default: "Фильтров: {count}",
-      en: "Panel footer counter.",
-      ru: "Счётчик в подвале панели.",
-    },
-    { key: "reset", default: "Сбросить", en: "Panel footer reset.", ru: "Сброс в подвале панели." },
-    {
-      key: "more",
-      default: "Ещё {count}",
-      en: "Collapsed values of a field.",
-      ru: "Свёрнутые значения поля.",
-    },
-    {
-      key: "add",
-      default: "Добавить фильтр",
-      en: "Chips row: opens the panel.",
-      ru: "Ряд тегов: открывает панель.",
-    },
-    {
-      key: "clearAll",
-      default: "Сбросить все",
-      en: "Chips row: clears every field.",
-      ru: "Ряд тегов: сбрасывает все поля.",
-    },
-    {
-      key: "showValue",
-      default: "Показать только {value}",
-      en: "Title of a value.",
-      ru: "Подсказка значения.",
-    },
-    {
-      key: "hideValue",
-      default: "Скрыть {value}",
-      en: "Name of the «−» of a value.",
-      ru: "Имя «−» у значения.",
-    },
-    {
-      key: "unhideValue",
-      default: "Не скрывать {value}",
-      en: "Name of the «−» of a hidden value.",
-      ru: "Имя «−» у скрытого значения.",
-    },
-    {
-      key: "not",
-      default: "НЕ",
-      en: "Prefix of a hidden value.",
-      ru: "Префикс скрытого значения.",
-    },
-    {
-      key: "chipInclude",
-      default: "{field}: {value}",
-      en: "Text of a «show» tag.",
-      ru: "Текст тега «показать».",
-    },
-    {
-      key: "chipExclude",
-      default: "{field}: не {value}",
-      en: "Text of a «hide» tag.",
-      ru: "Текст тега «скрыть».",
-    },
-    {
-      key: "remove",
-      default: "Убрать фильтр «{value}»",
-      en: "Name of a tag's remove button.",
-      ru: "Имя кнопки удаления тега.",
-    },
-    {
-      key: "from",
-      default: "от",
+    hint: { en: "Panel footer hint.", ru: "Подсказка в подвале панели." },
+    count: { en: "Panel footer counter.", ru: "Счётчик в подвале панели." },
+    reset: { en: "Panel footer reset.", ru: "Сброс в подвале панели." },
+    more: { en: "Collapsed values of a field.", ru: "Свёрнутые значения поля." },
+    add: { en: "Chips row: opens the panel.", ru: "Ряд тегов: открывает панель." },
+    clearAll: { en: "Chips row: clears every field.", ru: "Ряд тегов: сбрасывает все поля." },
+    showValue: { en: "Title of a value.", ru: "Подсказка значения." },
+    hideValue: { en: "Name of the «−» of a value.", ru: "Имя «−» у значения." },
+    unhideValue: { en: "Name of the «−» of a hidden value.", ru: "Имя «−» у скрытого значения." },
+    not: { en: "Prefix of a hidden value.", ru: "Префикс скрытого значения." },
+    chipInclude: { en: "Text of a «show» tag.", ru: "Текст тега «показать»." },
+    chipExclude: { en: "Text of a «hide» tag.", ru: "Текст тега «скрыть»." },
+    remove: { en: "Name of a tag's remove button.", ru: "Имя кнопки удаления тега." },
+    from: {
       en: "Placeholder of a range's lower bound.",
       ru: "Плейсхолдер нижней границы диапазона.",
     },
-    {
-      key: "to",
-      default: "до",
+    to: {
       en: "Placeholder of a range's upper bound.",
       ru: "Плейсхолдер верхней границы диапазона.",
     },
-    {
-      key: "fromLabel",
-      default: "{field}, от",
+    fromLabel: {
       en: "Accessible name of the lower bound input.",
       ru: "Доступное имя поля нижней границы.",
     },
-    {
-      key: "toLabel",
-      default: "{field}, до",
+    toLabel: {
       en: "Accessible name of the upper bound input.",
       ru: "Доступное имя поля верхней границы.",
     },
-    {
-      key: "rangeFrom",
-      default: "от {value}",
+    rangeFrom: {
       en: "Chip value of a range with only the lower bound.",
       ru: "Значение тега диапазона только с нижней границей.",
     },
-    {
-      key: "rangeTo",
-      default: "до {value}",
+    rangeTo: {
       en: "Chip value of a range with only the upper bound.",
       ru: "Значение тега диапазона только с верхней границей.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

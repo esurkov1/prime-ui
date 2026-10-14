@@ -22,7 +22,7 @@ export type ButtonGroupLabels = {
   optional: string;
 };
 
-const BUTTON_GROUP_LABELS: ButtonGroupLabels = { optional: "необязательно" };
+export const BUTTON_GROUP_LABELS: ButtonGroupLabels = { optional: "необязательно" };
 
 export type ButtonGroupRootProps = Omit<FieldRootDomProps, "dir"> &
   Omit<FieldFrameProps, "focusRing"> & {

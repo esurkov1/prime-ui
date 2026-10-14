@@ -5,7 +5,7 @@ export const api: ComponentApi = {
     {
       name: "Checkbox.Root",
       en: "`ref` → `HTMLInputElement` (the native checkbox). Renders the field `<div>`, the `<label>` row with the input and the box, and the support row. Field-root rule for a leaf: `className` goes to the field `<div>`; `id`, `ref` and native input props to the input.",
-      ru: "Поле: строка-`<label>` с нативным input и квадратом, под ней подсказка или ошибка; нативные пропсы уходят в input.",
+      ru: "Рендерит `<div>` поля, строку-`<label>` с нативным input и квадратом и строку поддержки. Правило корня поля для листа: `className` — на `<div>` поля; `id`, `ref` и нативные пропсы input — на input.",
       props: [
         {
           name: "checked",
@@ -31,14 +31,14 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Mixed state (a partial «select all»): a bar instead of the check; wins over `checked` visually and sets the native `indeterminate`.",
-          ru: "Частичный выбор («выбрать все»): полоска вместо галочки; важнее `checked`.",
+          ru: "Частичный выбор («выбрать все»): полоска вместо галочки; визуально важнее `checked` и ставит нативный `indeterminate`.",
         },
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the box, the text and the gap. Without it the tier of its host (a form, a panel, a table), else `m`.",
-          ru: "Ярус квадрата, текста и отступа.",
+          ru: "Ярус квадрата, текста и отступа. Без него — ярус хоста (форма, панель, таблица), иначе `m`.",
         },
         {
           name: "shape",
@@ -64,7 +64,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger ring on the unchecked box and `aria-invalid`. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо у неотмеченного квадрата, `aria-invalid`.",
+          ru: "Ошибка без текста: красное кольцо у неотмеченного квадрата, `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "disabled",
@@ -78,13 +78,13 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "The state is shown and focusable but does not change (`aria-readonly`); no hover or press. The native checkbox ignores `readOnly`, so the root guards the toggle.",
-          ru: "Состояние видно и фокусируется, но не меняется (`aria-readonly`).",
+          ru: "Состояние видно и фокусируется, но не меняется (`aria-readonly`); без наведения и нажатия. Нативный чекбокс не знает `readOnly`, поэтому переключение сторожит корень.",
         },
         {
           name: "id",
           type: "string",
           en: "Id of the input (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id input; иначе генерируется. Связывает подпись, подсказку и ошибку.",
+          ru: "Id input; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-describedby",
@@ -108,20 +108,27 @@ export const api: ComponentApi = {
           name: "…rest",
           type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "checked" | "defaultChecked" | "onChange">',
           en: "`name`, `value`, `required`, `aria-label`, `onBlur`… on the native input.",
-          ru: "`name`, `value`, `required`, `aria-label`… на нативном input.",
+          ru: "`name`, `value`, `required`, `aria-label`, `onBlur`… на нативном input.",
         },
       ],
     },
     {
       name: "Checkbox.Label",
       en: "`ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.",
-      ru: "Видимый текст в колонке текста строки-подписи.",
-      props: [],
+      ru: "Видимый текст в колонке текста строки-подписи. Нативные пропсы `<span>`.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children`, `className` and the other span attributes.",
+          ru: "`children`, `className` и остальные атрибуты span.",
+        },
+      ],
     },
     {
       name: "Checkbox.Indicator",
       en: '`ref` → `HTMLSpanElement`. The box alone, without an input (`aria-hidden`, no focus or clicks) for rows that carry the state themselves: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`.',
-      ru: "Квадрат без input (`aria-hidden`) для строк, которые сами несут состояние: `option` + `aria-selected`, `menuitemcheckbox` + `aria-checked`.",
+      ru: 'Квадрат без input (`aria-hidden`, без фокуса и кликов) для строк, которые сами несут состояние: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`.',
       props: [
         {
           name: "checked",
@@ -155,7 +162,7 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           en: "Box tier; without it the nearest control size (the Select or menu it sits in), else `m`.",
-          ru: "Ярус квадрата; без него — ярус ближайшего контрола, иначе `m`.",
+          ru: "Ярус квадрата; без него — ярус ближайшего контрола (Select или меню, в котором он стоит), иначе `m`.",
         },
         {
           name: "…rest",
@@ -175,7 +182,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'A native `<input type="checkbox">` (visually hidden over the box, so validation bubbles point at it), wrapped by the `<label>` row.',
-        ru: 'Нативный `<input type="checkbox">` скрыт поверх квадрата и обёрнут строкой-`<label>`.',
+        ru: 'Нативный `<input type="checkbox">` визуально скрыт поверх квадрата (подсказки валидации указывают на него) и обёрнут строкой-`<label>`.',
       },
       {
         en: "`aria-invalid` is set when invalid; `aria-describedby` = your ids + the hint or the error id.",

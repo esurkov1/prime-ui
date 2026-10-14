@@ -19,6 +19,7 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 import { type ColorPreset, SwatchChip } from "@/internal/swatch";
 
@@ -31,7 +32,7 @@ export type ColorFieldLabels = ColorPickerLabels & {
   presets: string;
 };
 
-const COLOR_FIELD_LABELS: ColorFieldLabels = {
+export const COLOR_FIELD_LABELS: ColorFieldLabels = {
   ...COLOR_PICKER_LABELS,
   optional: "необязательно",
   presets: "Готовые цвета",
@@ -111,7 +112,7 @@ export function ColorField({
   ...rest
 }: ColorFieldProps) {
   const disabled = useInheritedDisabled(disabledProp);
-  const labels = React.useMemo(() => ({ ...COLOR_FIELD_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(COLOR_FIELD_LABELS, labelsProp);
   const ids = useFieldFrame(id, { hint, error, invalid: invalidProp }, ariaDescribedBy);
   const textId = `${ids.controlId}-value`;
   const [open, setOpen] = React.useState(false);

@@ -139,6 +139,8 @@ No keyboard interaction.
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
+#### Avatar.Status
+
 | Key | Default | Used for |
 |---|---|---|
 | `online` | `"В сети"` | Name of the `online` dot. |

@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { COLOR_FIELD_LABELS } from "./ColorField";
 
 export const api: ComponentApi = {
   parts: [
@@ -81,7 +82,7 @@ export const api: ComponentApi = {
           name: "invalid",
           type: "boolean",
           en: "Danger ring and `aria-invalid` without a message. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо и `aria-invalid`.",
+          ru: "Ошибка без текста: красное кольцо и `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "disabled",
@@ -95,7 +96,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "true",
           en: '`false` hides only the visual focus ring (`data-focus-ring="false"`); focus, keyboard and ARIA are unchanged.',
-          ru: "`false` прячет только видимое кольцо фокуса; фокус, клавиатура и ARIA не меняются.",
+          ru: '`false` прячет только видимое кольцо фокуса; фокус, клавиатура и ARIA не меняются. Атрибут — `data-focus-ring="false"`.',
         },
         {
           name: "name",
@@ -107,13 +108,13 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the field button; hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id кнопки поля; иначе генерируется.",
+          ru: "Id кнопки поля; иначе генерируется. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-label",
           type: "string",
           en: "Accessible name without a visible `label`; the current hex is appended.",
-          ru: "Имя без видимой подписи; к нему добавляется текущий hex.",
+          ru: "Имя без видимой `label`; к нему добавляется текущий hex.",
         },
         {
           name: "aria-labelledby",
@@ -142,80 +143,32 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
-      en: "Marker after the label when `optional`.",
-      ru: "Пометка после подписи при `optional`.",
-    },
-    {
-      key: "presets",
-      default: "Готовые цвета",
-      en: "Accessible name of the preset swatches in the panel.",
-      ru: "Имя группы готовых цветов в панели.",
-    },
-    {
-      key: "hue",
-      default: "Оттенок, градусы",
-      en: "Hue slider and the hue cell of the channels.",
-      ru: "Ползунок и ячейка оттенка.",
-    },
-    {
-      key: "alpha",
-      default: "Непрозрачность, проценты",
-      en: "Opacity slider (`alpha`) and the opacity cell.",
-      ru: "Ползунок и ячейка непрозрачности.",
-    },
-    {
-      key: "hex",
-      default: "Hex",
-      en: "Hex cell of the channels.",
-      ru: "Ячейка hex в строке каналов.",
-    },
-    {
-      key: "eyeDropper",
-      default: "Пипетка",
-      en: "Eyedropper button of the channels.",
-      ru: "Кнопка пипетки.",
-    },
-    {
-      key: "format",
-      default: "Формат значений цвета",
+  labels: labelRows(COLOR_FIELD_LABELS, {
+    format: {
       en: "Value format select (the ColorPicker labels are shared).",
       ru: "Выбор формата значений (общие строки ColorPicker).",
     },
-    {
-      key: "saturation",
-      default: "Насыщенность, проценты",
-      en: "Saturation cell.",
-      ru: "Ячейка насыщенности.",
+    eyeDropper: { en: "Eyedropper button of the channels.", ru: "Кнопка пипетки." },
+    hex: { en: "Hex cell of the channels.", ru: "Ячейка hex в строке каналов." },
+    hue: { en: "Hue slider and the hue cell of the channels.", ru: "Ползунок и ячейка оттенка." },
+    saturation: { en: "Saturation cell.", ru: "Ячейка насыщенности." },
+    lightness: { en: "Lightness cell.", ru: "Ячейка яркости." },
+    alpha: {
+      en: "Opacity slider (`alpha`) and the opacity cell.",
+      ru: "Ползунок непрозрачности (`alpha`) и ячейка непрозрачности.",
     },
-    {
-      key: "lightness",
-      default: "Яркость, проценты",
-      en: "Lightness cell.",
-      ru: "Ячейка яркости.",
+    red: { en: "Red cell.", ru: "Ячейка красного." },
+    green: { en: "Green cell.", ru: "Ячейка зелёного." },
+    blue: { en: "Blue cell.", ru: "Ячейка синего." },
+    optional: {
+      en: "Marker after the label when `optional`.",
+      ru: "Пометка после подписи при `optional`.",
     },
-    {
-      key: "red",
-      default: "Красный, 0–255",
-      en: "Red cell.",
-      ru: "Ячейка красного.",
+    presets: {
+      en: "Accessible name of the preset swatches in the panel.",
+      ru: "Имя группы готовых цветов в панели.",
     },
-    {
-      key: "green",
-      default: "Зелёный, 0–255",
-      en: "Green cell.",
-      ru: "Ячейка зелёного.",
-    },
-    {
-      key: "blue",
-      default: "Синий, 0–255",
-      en: "Blue cell.",
-      ru: "Ячейка синего.",
-    },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

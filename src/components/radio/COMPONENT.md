@@ -42,7 +42,7 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 | `defaultValue` | `string` | — | Initial value when uncontrolled. |
 | `onValueChange` | `(value: string) => void` | — | Called with the value of the newly chosen option. |
 | `name` | `string` | — | Native `name` shared by the radios; generated when omitted. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of every circle, text, the label and the hint. Without it the group takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. |
 | `label` | `ReactNode` | — | Group heading above the options; names the radiogroup through `aria-labelledby`. Without it, pass `aria-label`. |
 | `required` | `boolean` | `false` | Red `*` after the label, native `required` on the radios and `aria-required` on the group. |
 | `optional` | `boolean` | `false` | Muted marker right after the label text (`labels.optional`). |
@@ -54,6 +54,7 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 | `labels` | `Partial<RadioGroupLabels>` | — | Built-in strings, see Labels. |
 | `id` | `string` | — | Id of the `role="radiogroup"` element (generated when omitted); also the default `name`. |
 | `aria-label / aria-labelledby / aria-describedby` | `string` | — | Name and description of the radiogroup (`aria-describedby` is merged before the hint / error ids). |
+| `children` | `ReactNode` | — | The `Radio.Root` options. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange" \| "dir">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`. |
 
 ### Radio.Root
@@ -70,6 +71,10 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 
 ### Radio.Label
 `ref` → `HTMLSpanElement`. The visible text in the text column of the option row. Native `<span>` props.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ## Variants
 No `variant` / `tone` / `color`.

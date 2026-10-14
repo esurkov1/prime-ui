@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { SPINNER_LABELS } from "./Spinner";
 
 export const api: ComponentApi = {
   parts: [
@@ -11,7 +12,7 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           en: "Explicit size on the icon scale: 14 · 16 · 20 · 24 · 32. Without it the spinner follows its host like `Icon`: the host's `--prime-icon-size`, else the nearest control tier, else 16.",
-          ru: "Размер по шкале иконок: 14 · 16 · 20 · 24 · 32. Без него — как у `Icon`: размер иконки хоста, иначе ярус ближайшего контрола, иначе 16.",
+          ru: "Размер по шкале иконок: 14 · 16 · 20 · 24 · 32. Без него — как у `Icon`: `--prime-icon-size` хоста, иначе ярус ближайшего контрола, иначе 16.",
         },
         {
           name: "tone",
@@ -35,14 +36,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "loading",
-      default: "Загрузка",
+  labels: labelRows(SPINNER_LABELS, {
+    loading: {
       en: 'Visually hidden text inside `role="status"`.',
       ru: 'Текст для скринридеров внутри `role="status"`.',
     },
-  ],
+  }),
   accessibility: {
     keyboard: [],
     aria: [

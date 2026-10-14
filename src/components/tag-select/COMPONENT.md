@@ -70,6 +70,7 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `id` | `string` | — | Id of the input; generated when omitted. |
 | `labels` | `Partial<TagSelectLabels>` | — | Built-in strings, see Labels (`colorNames` merges by key). |
 | `aria-label · aria-labelledby` | `string` | — | Name of the input and the list when there is no `label`. |
+| `className` | `string` | — | Class on the field frame `<div>`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ## Variants
@@ -152,7 +153,7 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | `name` | `"Название тега"` | Accessible name of the tag name field in the menu. |
 | `delete` | `"Удалить"` | Delete button in the menu. |
 | `colors` | `"Цвета"` | Heading of the color list in the menu. |
-| `colorNames` | `"По умолчанию · Красный · Оранжевый · …"` | Names of the palette colors in the menu, by `PaletteColor` key. |
+| `colorNames` | `"По умолчанию · Красный · Оранжевый · Жёлтый · Зелёный · Синий · Фиолетовый · Розовый · Голубой · Бирюзовый"` | Names of the palette colors in the menu, by `PaletteColor` key. |
 | `optional` | `"необязательно"` | Muted marker after the label when `optional`. |
 
 ## Examples

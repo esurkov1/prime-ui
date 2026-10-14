@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DND_LABELS } from "./labels";
 
 export const api: ComponentApi = {
   parts: [
@@ -24,7 +25,7 @@ export const api: ComponentApi = {
     {
       name: "Dnd.Sortable",
       en: "Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target: renders the items through `renderItem` and draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`.",
-      ru: "Обобщённый `Dnd.Sortable<T>`; `ref` → `HTMLElement`. Список и его цель сброса: рендерит элементы через `renderItem`, рисует зазор и оптимистичный порядок. Ставит `data-axis` и `data-dragging`.",
+      ru: "Список и его цель сброса: рендерит элементы через `renderItem`, рисует зазор и оптимистичный порядок. Ставит `data-axis` и `data-dragging`.",
       props: [
         {
           name: "items",
@@ -38,12 +39,12 @@ export const api: ComponentApi = {
           type: "(item: T) => string",
           required: true,
           en: "Stable unique id; must match `Dnd.SortableItem id`.",
-          ru: "Стабильный уникальный id; совпадает с `id` у `Dnd.SortableItem`.",
+          ru: "Стабильный уникальный id; совпадает с `Dnd.SortableItem id`.",
         },
         {
           name: "getLabel",
           type: "(item: T) => string",
-          default: "the id",
+          defaultNote: { en: "the `id`", ru: "`id`" },
           en: "Spoken by the live region.",
           ru: "Что произносит live-область.",
         },
@@ -91,7 +92,7 @@ export const api: ComponentApi = {
         {
           name: "kind",
           type: "string",
-          default: "unique per list",
+          defaultNote: { en: "unique per list", ru: "своё у каждого списка" },
           en: "Lists sharing a `kind` exchange items (a board): by pointer at an exact position, by keyboard with Alt + the arrows across the axis. Name each list: the name is spoken on a move.",
           ru: "Списки с общим `kind` обмениваются элементами (доска): мышью на точное место, с клавиатуры — Alt + стрелки поперёк оси. Назовите каждый список: имя произносится при переносе.",
         },
@@ -99,7 +100,7 @@ export const api: ComponentApi = {
           name: "canDrop",
           type: "(id: string) => boolean | string",
           en: "Refuses an item by id: `false`, or a string that says why (spoken and shown under the carried copy). The list turns `danger` before the release.",
-          ru: "Отказывает элементу по id: `false` или строка с причиной (озвучивается и видна под переносимой копией). Список краснеет до отпускания.",
+          ru: "Отказывает элементу по id: `false` или строка с причиной (озвучивается и видна под переносимой копией). Список становится `danger` до отпускания.",
         },
         {
           name: "empty",
@@ -121,6 +122,12 @@ export const api: ComponentApi = {
           ru: "Содержимое перед элементами, которое не перемещается и не становится местом сброса: строка-заголовок группы в `tbody`.",
         },
         {
+          name: "aria-label",
+          type: "string",
+          en: "Accessible name of the list.",
+          ru: "Доступное имя списка.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "children">',
           en: "`className` (the list layout), `aria-label` (the name of the list) and the other attributes of the list element.",
@@ -131,7 +138,7 @@ export const api: ComponentApi = {
     {
       name: "Dnd.SortableItem",
       en: "`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<div>` otherwise; throws outside `Dnd.Sortable`. One item of the list; presses on buttons, fields and links inside never start a drag.",
-      ru: "`ref` → `HTMLElement`. `<li>` в `ul` / `ol`, `<tr>` в `tbody`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Один элемент списка; нажатия на кнопки, поля и ссылки внутри не начинают перетаскивание.",
+      ru: "`<li>` в `ul` / `ol`, `<tr>` в `tbody`, иначе `<div>`; вне `Dnd.Sortable` — ошибка. Один элемент списка; нажатия на кнопки, поля и ссылки внутри не начинают перетаскивание.",
       props: [
         {
           name: "id",
@@ -155,17 +162,29 @@ export const api: ComponentApi = {
           ru: "Держит своё место: не сдвигается, и ничто не ставится так, чтобы его сместить. Его `Dnd.Handle` становится замком. Закреплённая первая строка, системная колонка.",
         },
         {
+          name: "className",
+          type: "string",
+          en: "The row look: fill, radius, padding.",
+          ru: "Вид строки: заливка, радиус, отступы.",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The row content.",
+          ru: "Содержимое строки.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "id">',
-          en: "`className` (the row look: fill, radius, padding), `aria-labelledby` / `aria-describedby` (the visible title and description) and the other attributes.",
-          ru: "`className` (вид строки: заливка, радиус, отступы), `aria-labelledby` / `aria-describedby` (видимые заголовок и описание) и остальные атрибуты.",
+          en: "`aria-labelledby` / `aria-describedby` (the visible title and description) and the other attributes.",
+          ru: "`aria-labelledby` / `aria-describedby` (видимые заголовок и описание) и остальные атрибуты.",
         },
       ],
     },
     {
       name: "Dnd.Handle",
       en: "`ref` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button; a press always starts the drag, Alt + arrows on it move its item. In a `locked` item it is a lock instead.",
-      ru: "`ref` → `HTMLButtonElement`. Ручка: ghost-кнопка `xs` с одной иконкой; нажатие всегда начинает перетаскивание, Alt + стрелки двигают её элемент. В элементе с `locked` вместо неё замок.",
+      ru: "Ручка: ghost-кнопка `xs` с одной иконкой; нажатие всегда начинает перетаскивание, Alt + стрелки двигают её элемент. В элементе с `locked` вместо неё замок.",
       props: [
         {
           name: "aria-label",
@@ -185,7 +204,7 @@ export const api: ComponentApi = {
     {
       name: "Dnd.Draggable",
       en: "Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. An item carried onto a `Dnd.DropZone`; stays in place, faded, while carried. Has no keyboard path: offer a button or a menu for the same move.",
-      ru: "Обобщённый `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. Элемент, который переносят на `Dnd.DropZone`; на время переноса остаётся на месте полупрозрачным. Клавиатурного пути нет — дайте кнопку или меню для того же действия.",
+      ru: "Элемент, который переносят на `Dnd.DropZone`; на время переноса остаётся на месте полупрозрачным. Клавиатурного пути нет — дайте кнопку или меню для того же действия.",
       props: [
         {
           name: "kind",
@@ -210,7 +229,7 @@ export const api: ComponentApi = {
         {
           name: "label",
           type: "string",
-          default: "the id",
+          defaultNote: { en: "the `id`", ru: "`id`" },
           en: "Spoken by the live region.",
           ru: "Что произносит live-область.",
         },
@@ -248,6 +267,18 @@ export const api: ComponentApi = {
           ru: "Всегда в конце.",
         },
         {
+          name: "className",
+          type: "string",
+          en: "Class on the item.",
+          ru: "Класс на элементе.",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The item content.",
+          ru: "Содержимое элемента.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "id" | "onDragStart" | "onDragEnd">',
           en: "`className` and the other attributes.",
@@ -258,7 +289,7 @@ export const api: ComponentApi = {
     {
       name: "Dnd.DropZone",
       en: "Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element; state is mirrored by `data-dnd-over`, `data-dnd-reject`, `data-dnd-flash`. Where zones overlap, the innermost wins.",
-      ru: "Обобщённый `Dnd.DropZone<TData>`. Рендерит элемент `as`; состояние — `data-dnd-over`, `data-dnd-reject`, `data-dnd-flash`. При наложении зон побеждает внутренняя.",
+      ru: "Рендерит элемент `as`; состояние — `data-dnd-over`, `data-dnd-reject`, `data-dnd-flash`. При наложении зон побеждает внутренняя.",
       props: [
         {
           name: "accepts",
@@ -278,7 +309,7 @@ export const api: ComponentApi = {
           name: "canDrop",
           type: "(item: DragItem<TData>) => boolean | string",
           en: "Refuses an item: `false`, or a string that says why (spoken, and shown under the carried copy); the zone turns `danger` before the release.",
-          ru: "Отказывает элементу: `false` или строка с причиной (озвучивается и видна под переносимой копией); зона краснеет до отпускания.",
+          ru: "Отказывает элементу: `false` или строка с причиной (озвучивается и видна под переносимой копией); зона становится `danger` до отпускания.",
         },
         {
           name: "onEnter · onLeave",
@@ -308,83 +339,71 @@ export const api: ComponentApi = {
           ru: "Элемент.",
         },
         {
+          name: "className",
+          type: "string",
+          en: "The zone look.",
+          ru: "Вид зоны.",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The zone content.",
+          ru: "Содержимое зоны.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "onDrop">',
-          en: "`className` (the zone's own look) and the other attributes.",
-          ru: "`className` (вид зоны) и остальные атрибуты.",
+          en: "The other attributes.",
+          ru: "Остальные атрибуты.",
         },
       ],
     },
+  ],
+  functions: [
     {
-      name: "moveBefore",
-      en: "`moveBefore(items, id, beforeId, getId)` returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.",
-      ru: "`moveBefore(items, id, beforeId, getId)` возвращает `items`, где `id` стоит перед `beforeId` (`null` — в конце): тело любого `onReorder`.",
-      props: [],
+      name: "moveBefore(items, id, beforeId, getId)",
+      type: "<T>(items: readonly T[], id: string, beforeId: string | null, getId: (item: T) => string) => T[]",
+      en: "Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body of every `onReorder`.",
+      ru: "Возвращает `items`, где `id` стоит перед `beforeId` (`null` — в конце): тело любого `onReorder`.",
     },
   ],
-  labels: [
-    { key: "handle", default: "Перетащить", en: "Name of `Dnd.Handle`.", ru: "Имя `Dnd.Handle`." },
-    {
-      key: "locked",
-      default: "Закреплено",
+  labels: labelRows(DND_LABELS, {
+    handle: { en: "Name of `Dnd.Handle`.", ru: "Имя `Dnd.Handle`." },
+    locked: {
       en: "Name of the lock a `Dnd.Handle` shows in a `locked` item.",
       ru: "Имя замка, который показывает `Dnd.Handle` в элементе с `locked`.",
     },
-    {
-      key: "roleDescription",
-      default: "перетаскиваемый элемент",
+    roleDescription: {
       en: "`aria-roledescription` of every draggable item.",
       ru: "`aria-roledescription` каждого перетаскиваемого элемента.",
     },
-    {
-      key: "grabbed",
-      default: "{label}: взят",
-      en: "Live region: picked up.",
-      ru: "Live-область: взят.",
-    },
-    {
-      key: "dropped",
-      default: "{label}: перемещён",
-      en: "Live region: dropped on a target.",
-      ru: "Live-область: брошен на цель.",
-    },
-    {
-      key: "returned",
-      default: "{label}: возвращён на место",
+    grabbed: { en: "Live region: picked up.", ru: "Live-область: взят." },
+    dropped: { en: "Live region: dropped on a target.", ru: "Live-область: брошен на цель." },
+    returned: {
       en: "Live region: released over nothing.",
       ru: "Live-область: отпущен мимо целей.",
     },
-    {
-      key: "cancelled",
-      default: "{label}: перемещение отменено",
+    cancelled: {
       en: "Live region: cancelled (Escape, interruption).",
       ru: "Live-область: отменено (Escape, прерывание).",
     },
-    {
-      key: "moved",
-      default: "{label}: позиция {position} из {total}",
+    moved: {
       en: "Live region: moved with the keyboard.",
       ru: "Live-область: сдвинут с клавиатуры.",
     },
-    {
-      key: "movedTo",
-      default: "{label}: «{list}», позиция {position} из {total}",
+    movedTo: {
       en: "Live region: moved to a linked list with the keyboard; `{list}` is its accessible name.",
       ru: "Live-область: перенесён с клавиатуры в связанный список; `{list}` — его имя.",
     },
-    {
-      key: "refused",
-      default: "{label}: «{list}» не принимает элемент",
+    refused: {
       en: "Live region: a linked list refused a keyboard move (`canDrop` answered `false`).",
       ru: "Live-область: связанный список не принял перенос с клавиатуры (`canDrop` вернул `false`).",
     },
-    {
-      key: "refusedReason",
-      default: "{label}: {reason}",
+    refusedReason: {
       en: "Live region: a target refused the item and said why (`canDrop` answered a string).",
       ru: "Live-область: цель отказала и назвала причину (`canDrop` вернул строку).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -415,7 +434,7 @@ export const api: ComponentApi = {
       },
       {
         en: "Every draggable item has `aria-roledescription` and `aria-keyshortcuts` (with the across keys in linked lists) and is in the tab order (`tabIndex={0}`); with `handle` the grip takes focus instead. The clone is `aria-hidden`.",
-        ru: "У каждого перетаскиваемого элемента `aria-roledescription` и `aria-keyshortcuts`; клон в полёте — `aria-hidden`.",
+        ru: "У каждого перетаскиваемого элемента `aria-roledescription` и `aria-keyshortcuts` (в связанных списках — с клавишами переноса), он в порядке Tab (`tabIndex={0}`); с `handle` фокус берёт ручка. Клон — `aria-hidden`.",
       },
       {
         en: "In lists sharing a `kind`, Alt + the across arrows move the item to the same row of the neighbouring list in document order; focus follows the item.",
@@ -427,7 +446,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'A `locked` item has no role description or shortcuts; its `Dnd.Handle` is a lock: a `<span role="img">` named `labels.locked` with the `status.locked` icon at the grip\'s size (no ref).',
-        ru: "У закреплённого элемента (`locked`) нет `aria-roledescription` и сочетаний; его `Dnd.Handle` — замок с именем «Закреплено».",
+        ru: 'У элемента с `locked` нет описания роли и сочетаний; его `Dnd.Handle` — замок: `<span role="img">` с именем `labels.locked` и иконкой `status.locked` размера ручки (без ref).',
       },
       {
         en: "Touch: a drag starts after a hold; a finger that moves first scrolls the page.",

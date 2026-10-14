@@ -1,11 +1,19 @@
-import type { ApiPart } from "../../scripts/docs/componentApi";
+import type { ApiFunction, ApiType } from "../../scripts/docs/componentApi";
 
 /** `useUploadQueue`: one description for the FileUpload page. */
-export const USE_UPLOAD_QUEUE_PART: ApiPart = {
-  name: "useUploadQueue",
-  en: "`useUploadQueue<TResult>({ upload, concurrency })` → `{ items, add, retry, remove, clear, move }`. The upload queue of FileUpload: `concurrency` files go at once through `upload`, the rest wait as `queued`; each has its progress, error and retry.",
-  ru: "`useUploadQueue<TResult>({ upload, concurrency })` → `{ items, add, retry, remove, clear, move }`. Очередь загрузки FileUpload: по `concurrency` файлов уходят через `upload`, остальные ждут как `queued`; у каждого прогресс, ошибка и повтор.",
-  props: [
+export const USE_UPLOAD_QUEUE_FUNCTION: ApiFunction = {
+  name: "useUploadQueue(options)",
+  type: "<TResult>(options: UploadQueueOptions<TResult>) => UploadQueue<TResult>",
+  en: "The upload queue of FileUpload: `concurrency` files go at once through `upload`, the rest wait as `queued`; each has its progress, error and retry. Returns `{ items, add, retry, remove, clear, move }`.",
+  ru: "Очередь загрузки FileUpload: по `concurrency` файлов уходят через `upload`, остальные ждут как `queued`; у каждого прогресс, ошибка и повтор. Возвращает `{ items, add, retry, remove, clear, move }`.",
+};
+
+/** The options of `useUploadQueue`. */
+export const UPLOAD_QUEUE_OPTIONS_TYPE: ApiType = {
+  name: "UploadQueueOptions<TResult>",
+  en: "The argument of `useUploadQueue(options)`.",
+  ru: "Аргумент `useUploadQueue(options)`.",
+  fields: [
     {
       name: "upload",
       type: "(file: File, context: { id: string; signal: AbortSignal; onProgress: (progress: number) => void }) => Promise<TResult>",

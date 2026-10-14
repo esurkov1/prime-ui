@@ -70,7 +70,7 @@ export const api: ComponentApi = {
     {
       name: "Accordion.Item",
       en: '`ref` → `HTMLDivElement`. One section; `data-state="open" | "closed"`.',
-      ru: "Один раздел.",
+      ru: 'Один раздел; `data-state="open" | "closed"`.',
       props: [
         {
           name: "value",
@@ -110,7 +110,7 @@ export const api: ComponentApi = {
     {
       name: "Accordion.Trigger",
       en: "`ref` → `HTMLButtonElement`. The `<button>` that toggles the item; draws a chevron after its children that turns when open.",
-      ru: "Кнопка раздела; после содержимого рисует шеврон, который поворачивается при открытии.",
+      ru: "Кнопка `<button>` раздела; после содержимого рисует шеврон, который поворачивается при открытии.",
       props: [
         {
           name: "children",
@@ -129,7 +129,7 @@ export const api: ComponentApi = {
     {
       name: "Accordion.Icon",
       en: "`ref` → `HTMLSpanElement`. Decorative leading icon (`aria-hidden`) of the trigger; the content then lines up with the label.",
-      ru: "Декоративная иконка перед подписью; содержимое выравнивается по подписи.",
+      ru: "Декоративная иконка (`aria-hidden`) перед подписью; содержимое выравнивается по подписи.",
       props: [
         {
           name: "children",
@@ -187,7 +187,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The panel is a `<section>` with `aria-labelledby`; closed content is `inert`, so it leaves the tab order and the accessibility tree.",
-        ru: "Содержимое — `<section>` с `aria-labelledby`; закрытое — `inert` и `aria-hidden`, его поля выходят из порядка Tab.",
+        ru: "Содержимое — `<section>` с `aria-labelledby`; закрытое — `inert`: уходит из порядка Tab и дерева доступности.",
       },
       {
         en: "The chevron and `Accordion.Icon` are `aria-hidden`.",

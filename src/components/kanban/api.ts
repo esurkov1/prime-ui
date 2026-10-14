@@ -1,11 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { KANBAN_LABELS } from "./Kanban";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Kanban.Root",
       en: "Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of columns that scrolls sideways inside itself, each a labelled list of cards under a header. Mounts its own `Dnd.Root` unless one is above it. Give it a height.",
-      ru: "Обобщённый `Kanban.Root<T>`; `ref` → `HTMLDivElement`. Доска: полоса колонок с собственной горизонтальной прокруткой, каждая — подписанный список карточек под шапкой. Сама монтирует `Dnd.Root`, если его нет выше. Задайте ей высоту.",
+      ru: "Доска: полоса колонок с собственной горизонтальной прокруткой, каждая — подписанный список карточек под шапкой. Сама монтирует `Dnd.Root`, если его нет выше. Задайте ей высоту.",
       props: [
         {
           name: "columns",
@@ -31,7 +32,7 @@ export const api: ComponentApi = {
         {
           name: "getLabel",
           type: "(item: T) => string",
-          default: "the id",
+          defaultNote: { en: "the `id`", ru: "`id`" },
           en: "Spoken by the live region.",
           ru: "Что произносит live-область.",
         },
@@ -155,7 +156,7 @@ export const api: ComponentApi = {
     {
       name: "Kanban.Item",
       en: "`ref` → `HTMLLIElement`. One card; return it from `renderItem` (it takes its id from there). Dragged by the whole card and focusable; presses on buttons, fields and links inside never start a drag.",
-      ru: "`ref` → `HTMLLIElement`. Одна карточка; возвращается из `renderItem` (id берёт оттуда). Перетаскивается целиком и фокусируется; нажатия на кнопки, поля и ссылки внутри не начинают перетаскивание.",
+      ru: "Одна карточка; возвращается из `renderItem` (id берёт оттуда). Перетаскивается целиком и фокусируется; нажатия на кнопки, поля и ссылки внутри не начинают перетаскивание.",
       props: [
         {
           name: "disabled",
@@ -175,7 +176,7 @@ export const api: ComponentApi = {
     {
       name: "Kanban.ItemHeader",
       en: "`ref` → `HTMLDivElement`. Optional top row of a card: the key or project at the start, the last child (a priority `Badge`, an assignee) at the end.",
-      ru: "`ref` → `HTMLDivElement`. Необязательная верхняя строка карточки: ключ или проект в начале, последний элемент (`Badge` приоритета, исполнитель) — в конце.",
+      ru: "Необязательная верхняя строка карточки: ключ или проект в начале, последний элемент (`Badge` приоритета, исполнитель) — в конце.",
       props: [
         {
           name: "…rest",
@@ -238,62 +239,38 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "count",
-      default: "Карточек: {count}",
-      en: "Spoken name of the count badge.",
-      ru: "Озвучиваемое имя счётчика.",
-    },
-    {
-      key: "countLimit",
-      default: "Карточек: {count} из {limit}",
+  labels: labelRows(KANBAN_LABELS, {
+    count: { en: "Spoken name of the count badge.", ru: "Озвучиваемое имя счётчика." },
+    countLimit: {
       en: "Spoken name of the count badge of a column with a `limit`.",
       ru: "Озвучиваемое имя счётчика колонки с `limit`.",
     },
-    {
-      key: "empty",
-      default: "Нет карточек",
-      en: "Text of an empty column.",
-      ru: "Текст пустой колонки.",
-    },
-    {
-      key: "emptyHint",
-      default: "Перетащите сюда карточку",
+    empty: { en: "Text of an empty column.", ru: "Текст пустой колонки." },
+    emptyHint: {
       en: "Hint under the empty-column text, while cards can be dropped (not on a `disabled` board).",
       ru: "Подсказка под текстом пустой колонки, пока в неё можно положить карточку (не на доске `disabled`).",
     },
-    {
-      key: "full",
-      default: "Колонка «{column}» заполнена ({limit})",
+    full: {
       en: "Why a full column refuses a card: spoken, and shown under the carried card.",
       ru: "Почему заполненная колонка не принимает карточку: озвучивается и видна под переносимой карточкой.",
     },
-    {
-      key: "moveColumn",
-      default: "Переместить колонку «{column}»",
+    moveColumn: {
       en: "Name of the column grip (`reorderableColumns`).",
       ru: "Имя ручки колонки (`reorderableColumns`).",
     },
-    {
-      key: "column",
-      default: "Колонка «{column}»",
+    column: {
       en: "A column as the live region names it when it is carried or moved («Колонка «Демо»: позиция 2 из 4»).",
       ru: "Колонка в объявлениях live-области, когда её переносят («Колонка «Демо»: позиция 2 из 4»).",
     },
-    {
-      key: "moveFailed",
-      default: "Не удалось переместить «{label}», карточка вернулась на место",
+    moveFailed: {
       en: "Spoken when the `onValueChange` promise rejects; `{label}` is `getLabel(item)`.",
       ru: "Озвучивается, когда промис `onValueChange` отклонён; `{label}` — `getLabel(item)`.",
     },
-    {
-      key: "columnMoveFailed",
-      default: "Не удалось переместить колонку «{column}», она вернулась на место",
+    columnMoveFailed: {
       en: "Spoken when the `onColumnOrderChange` promise rejects.",
       ru: "Озвучивается, когда промис `onColumnOrderChange` отклонён.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -329,7 +306,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The column grip is a button named «Переместить колонку «…»» with `aria-keyshortcuts`; a keyboard column move is announced with its position («Колонка «…»: позиция 2 из 4», `labels.column`). A locked column has a lock named «Закреплено» instead.",
-        ru: "Ручка колонки — кнопка с именем «Переместить колонку «…»» и `aria-keyshortcuts`; перенос колонки с клавиатуры объявляется позицией. У закреплённой колонки вместо ручки — замок с именем «Закреплено».",
+        ru: "Ручка колонки — кнопка с именем «Переместить колонку «…»» и `aria-keyshortcuts`; перенос колонки с клавиатуры объявляется позицией («Колонка «…»: позиция 2 из 4», `labels.column`). У закреплённой колонки вместо ручки — замок с именем «Закреплено».",
       },
       {
         en: 'A live region (`role="status"`) announces grabbed, dropped, «position N of M», a move to another column by its title and a refusal with its reason (`labels`, Dnd\'s labels).',
@@ -341,7 +318,7 @@ export const api: ComponentApi = {
       },
       {
         en: "With `getItemHref` a real `<a>` named by `getLabel` covers the card and is its tab stop: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on the card, Space follows it like Enter, Alt + arrows move the card from it and a press on it drags the card; the release of a drag never follows it. Controls inside the card stand above the link. With `onItemClick` alone the card opens by a click, Enter or Space; a control inside the card never opens it, and a card that opens stays a tab stop on a `disabled` board.",
-        ru: "С `getItemHref` карточку накрывает настоящая ссылка `<a>` с именем из `getLabel` — она и остановка Tab; Alt + стрелки с неё переносят карточку, нажатие тащит её, а отпускание после перетаскивания не переходит по ссылке. С `onItemClick` сама карточка открывается кликом, Enter и Space; контролы внутри карточки её не открывают.",
+        ru: "С `getItemHref` карточку накрывает настоящая ссылка `<a>` с именем из `getLabel` — она и остановка Tab; Alt + стрелки с неё переносят карточку, нажатие тащит её, а отпускание после перетаскивания не переходит по ссылке. Клик, ⌘/Ctrl-клик, средний клик и «открыть в новой вкладке» работают по всей карточке, Space переходит по ссылке как Enter; контролы внутри карточки стоят над ссылкой. С одним `onItemClick` карточка открывается кликом, Enter или Space; контрол внутри её не открывает, а открываемая карточка остаётся остановкой Tab на доске с `disabled`.",
       },
       {
         en: "Touch: a drag starts after a hold; a finger that moves first scrolls the board.",
@@ -353,7 +330,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While a move is saved the card or column has `aria-busy` (its spinner is hidden from assistive tech); a refused save is announced (`labels.moveFailed`, `labels.columnMoveFailed`).",
-        ru: "Пока перенос сохраняется (промис из `onValueChange` / `onColumnOrderChange`), у карточки или колонки `aria-busy`; отказ сервера объявляется (`labels.moveFailed`, `labels.columnMoveFailed`), а карточка или колонка плавно возвращается.",
+        ru: "Пока перенос сохраняется, у карточки или колонки `aria-busy` (её спиннер скрыт от вспомогательных технологий); отказ объявляется (`labels.moveFailed`, `labels.columnMoveFailed`).",
       },
     ],
   },

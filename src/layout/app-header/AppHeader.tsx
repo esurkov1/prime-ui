@@ -16,7 +16,7 @@ export type AppHeaderLabels = {
   menu: string;
 };
 
-const APP_HEADER_LABELS: AppHeaderLabels = {
+export const APP_HEADER_LABELS: AppHeaderLabels = {
   menu: "Открыть меню",
 };
 
@@ -115,7 +115,10 @@ function AppHeaderDescription({ className, ...rest }: AppHeaderDescriptionProps)
 }
 AppHeaderDescription.displayName = "AppHeader.Description";
 
-export type AppHeaderSeparatorProps = Omit<DividerProps, "orientation" | "children">;
+export type AppHeaderSeparatorProps = Omit<
+  DividerProps,
+  "orientation" | "children" | "align" | "size"
+>;
 
 /** A short vertical line between groups in a zone (a back button | the path), with air on both sides. */
 function AppHeaderSeparator({ className, ...rest }: AppHeaderSeparatorProps) {
@@ -128,8 +131,8 @@ export type AppHeaderToolsProps = DivProps;
 /**
  * The page's tools in the header — a `PageToolbar.Root` (sections, period, filters, the primary
  * action): the header's second row, the full width under the title row, so the toolbar lays
- * itself out from that width (one row when wide, two when narrow). Root moves it there wherever
- * it is written.
+ * itself out from that width (one row when wide, two when narrow). Root moves it there when it is
+ * a direct child.
  */
 function AppHeaderTools({ className, ...rest }: AppHeaderToolsProps) {
   return <div {...rest} className={cx(styles.tools, className)} />;

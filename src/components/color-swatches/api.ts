@@ -1,11 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { COLOR_SWATCHES_LABELS } from "./ColorSwatches";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "ColorSwatches",
       en: '`ref` → `HTMLDivElement` (the field frame). The field frame (label → swatches → hint | error) around a `role="radiogroup"` of swatch buttons with a roving tab stop.',
-      ru: "Рамка поля (подпись → образцы → подсказка или ошибка) вокруг `radiogroup` из кнопок-образцов.",
+      ru: 'Рамка поля (подпись → образцы → подсказка или ошибка) вокруг `role="radiogroup"` из кнопок-образцов с одной остановкой Tab.',
       props: [
         {
           name: "value",
@@ -36,15 +37,15 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: 'host tier, else "m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the swatches (height 20 · 24 · 28 · 32 · 40); the label and hint keep the host tier. Without it the swatches take the host tier too.",
-          ru: "Ярус образцов: высота = высота контрола − 8 (20 · 24 · 28 · 32 · 40), зазор яруса; ширина — по колонке. Подпись и подсказка остаются в ярусе окружения, иначе `m`.",
+          ru: "Ярус образцов (высота 20 · 24 · 28 · 32 · 40); подпись и подсказка остаются в ярусе хоста. Без него образцы тоже берут ярус хоста.",
         },
         {
           name: "label",
           type: "ReactNode",
           en: "Label above the swatches; names the radiogroup (`aria-labelledby`).",
-          ru: "Подпись над образцами; называет radiogroup.",
+          ru: "Подпись над образцами; называет radiogroup (`aria-labelledby`).",
         },
         {
           name: "required",
@@ -74,7 +75,7 @@ export const api: ComponentApi = {
           name: "invalid",
           type: "boolean",
           en: "Danger inner edge on every swatch and `aria-invalid`. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красная кромка у каждого образца, `aria-invalid`.",
+          ru: "Ошибка без текста: красная кромка у каждого образца, `aria-invalid`. Непустой `error` включает его.",
         },
         {
           name: "disabled",
@@ -101,13 +102,13 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the radiogroup; hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Id группы; иначе генерируется.",
+          ru: "Id группы; иначе генерируется. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-label",
           type: "string",
           en: "Accessible name when there is no visible `label` (else `labels.group`).",
-          ru: "Имя без видимой подписи (иначе `labels.group`).",
+          ru: "Имя без видимой `label` (иначе `labels.group`).",
         },
         {
           name: "aria-labelledby",
@@ -136,26 +137,20 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "group",
-      default: "Цвет",
+  labels: labelRows(COLOR_SWATCHES_LABELS, {
+    group: {
       en: "Accessible name of the group without a visible `label` and `aria-label`.",
-      ru: "Имя группы без видимой подписи и `aria-label`.",
+      ru: "Имя группы без видимой `label` и `aria-label`.",
     },
-    {
-      key: "empty",
-      default: "Без цвета",
+    empty: {
       en: "Name of the «no color» swatch (`allowEmpty`).",
       ru: "Имя образца «без цвета» (`allowEmpty`).",
     },
-    {
-      key: "optional",
-      default: "необязательно",
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

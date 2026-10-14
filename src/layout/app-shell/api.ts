@@ -45,7 +45,7 @@ export const api: ComponentApi = {
           type: '"contained" | "full"',
           default: '"full"',
           en: "`full` — the whole panel with gutters; `contained` — a centred column up to `--prime-layout-content-max-width`.",
-          ru: "`full` — вся панель с отступами; `contained` — колонка по центру до ширины контента.",
+          ru: "`full` — вся панель с отступами; `contained` — колонка по центру до `--prime-layout-content-max-width`.",
         },
         {
           name: "…rest",
@@ -73,6 +73,13 @@ export const api: ComponentApi = {
       en: "`ref` → the `<main>`. Root + Nav + the header + Main + Footer in one; main scrolls to the top when `scrollResetKey` changes.",
       ru: "Root, Nav, шапка, Main и Footer одним компонентом; main прокручивается наверх при смене `scrollResetKey`.",
       props: [
+        {
+          name: "fillViewport",
+          type: "boolean",
+          default: "false",
+          en: "As on `AppShell.Root`: only `<main>` scrolls.",
+          ru: "Как у `AppShell.Root`: прокручивается только `<main>`.",
+        },
         {
           name: "nav",
           type: "ReactNode",
@@ -127,8 +134,8 @@ export const api: ComponentApi = {
         ru: "Main — ориентир `<main>`; шапку `<header>` даёт AppHeader, ориентиры навигации — Sidebar и BottomNav (`<nav>`).",
       },
       {
-        en: "Give the page one `<h1>` (PageContent.Title).",
-        ru: "На странице один `<h1>` (PageContent.Title).",
+        en: "One `<h1>` per page: `AppHeader.Title` on app pages, `PageContent.Title` on a document page (whose header then has no title).",
+        ru: "Один `<h1>` на странице: `AppHeader.Title` на страницах приложения, `PageContent.Title` на странице-документе (тогда в шапке нет заголовка).",
       },
     ],
   },

@@ -1,12 +1,13 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { mediaPlayerLabels, mediaPlayerProps } from "../../internal/mediaPlayer.api";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { mediaPlayerLabelDocs, mediaPlayerProps } from "../../internal/mediaPlayer.api";
+import { VOICE_PLAYER_LABELS } from "./VoicePlayer";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "VoicePlayer",
       en: '`ref` → `HTMLDivElement` (the `role="group"` root). A voice message: the play disk, the waveform as the seek slider and the time row with the playback speed. Its props are VideoNote\'s (`MediaPlayerProps`) plus `waveform` and the rate triad.',
-      ru: 'Корень `role="group"`. Голосовое сообщение: диск воспроизведения, волна как ползунок перемотки и строка времени со скоростью. Пропсы — те же, что у VideoNote (`MediaPlayerProps`), плюс `waveform` и тройка скорости.',
+      ru: "Голосовое сообщение: диск воспроизведения, волна как ползунок перемотки и строка времени со скоростью. Пропсы — те же, что у VideoNote (`MediaPlayerProps`), плюс `waveform` и тройка скорости.",
       props: [
         ...mediaPlayerProps({
           media: { en: "Audio", ru: "аудио" },
@@ -73,32 +74,25 @@ export const api: ComponentApi = {
         },
       ],
     },
+  ],
+  functions: [
     {
-      name: "getWaveform",
-      en: "`getWaveform(source, bars = 48)`: the 0…1 peaks of a `Blob` or URL with no stored levels, for `waveform`.",
-      ru: "`getWaveform(source, bars = 48)`: пики 0…1 записи (`Blob` или URL) без сохранённых уровней, для `waveform`.",
-      props: [],
+      name: "getWaveform(source, bars)",
+      type: "(source: Blob | string, bars?: number) => Promise<number[]>",
+      en: "The 0…1 peaks of a `Blob` or URL with no stored levels, for `waveform`; `bars` defaults to 48. Rejects when the audio cannot be fetched or decoded.",
+      ru: "Пики 0…1 записи (`Blob` или URL) без сохранённых уровней, для `waveform`; `bars` по умолчанию 48. Отклоняется, если звук не загрузить или не декодировать.",
     },
   ],
-  labels: mediaPlayerLabels({
-    player: "Голосовое сообщение",
-    play: "Воспроизвести голосовое сообщение",
-    unplayed: "Не прослушано",
-    transfer: "The transfer of the recording",
-    own: [
-      {
-        key: "seek",
-        default: "Перемотка",
-        en: "Name of the waveform slider (its `aria-valuetext` is `position`).",
-        ru: "Название ползунка-волны (его `aria-valuetext` — `position`).",
-      },
-      {
-        key: "rate",
-        default: "Скорость воспроизведения: {rate}",
-        en: "Name of the rate chip; `{rate}` as shown on it.",
-        ru: "Название чипа скорости; `{rate}` — как на чипе.",
-      },
-    ],
+  labels: labelRows(VOICE_PLAYER_LABELS, {
+    ...mediaPlayerLabelDocs({ en: "The transfer of the recording", ru: "Передача записи" }),
+    seek: {
+      en: "Name of the waveform slider (its `aria-valuetext` is `position`).",
+      ru: "Название ползунка-волны (его `aria-valuetext` — `position`).",
+    },
+    rate: {
+      en: "Name of the rate chip; `{rate}` as shown on it.",
+      ru: "Название чипа скорости; `{rate}` — как на чипе.",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -140,7 +134,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'The disk is named `labels.play` while paused and `labels.pause` while playing. While the recording is sent, received or not fetched the same button is the transfer, named by the direction — `cancelUpload` / `cancelDownload` described by `uploadProgress` / `downloadProgress` (`aria-busy`), after a failure `retryUpload` / `retryDownload` described by `notSent` / `notReceived`, `download` for a remote one; its ring is `aria-hidden`; a refused cancel, retry or download is announced (`role="status"`).',
-        ru: 'Кнопка называется `labels.play` на паузе и `labels.pause` во время воспроизведения. Пока запись в пути, не удалась или не скачана, кнопка `inert`, а на её месте диск передачи: кнопка с именем по направлению (`cancelUpload` / `cancelDownload`, `retryUpload` / `retryDownload` с описанием `notSent` / `notReceived`, `download`) и кольцо `role="progressbar"`; отказ объявляется.',
+        ru: 'Диск называется `labels.play` на паузе и `labels.pause` во время воспроизведения. Пока запись отправляется, загружается или не скачана, та же кнопка — передача с именем по направлению: `cancelUpload` / `cancelDownload` с описанием `uploadProgress` / `downloadProgress` (`aria-busy`), после ошибки `retryUpload` / `retryDownload` с описанием `notSent` / `notReceived`, `download` для удалённой; её кольцо `aria-hidden`; отказ отмены, повтора или скачивания объявляется (`role="status"`).',
       },
       {
         en: 'The waveform is `role="slider"` with `aria-valuemin`, `aria-valuemax` (seconds), `aria-valuenow` and `aria-valuetext` from `labels.position`.',
@@ -156,7 +150,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'The transcript button is named `labels.transcribe` / `labels.hideTranscript`, with `aria-expanded` and `aria-controls` on the text area; while asked, the button is `aria-busy` and the area stays closed. The text is a plain paragraph, read and selected as normal text; a failed request is announced with `labels.transcribeFailed` (`role="status"`).',
-        ru: "Кнопка расшифровки называется `labels.transcribe` или `labels.hideTranscript`, несёт `aria-expanded` и `aria-controls` на область текста; пока идёт запрос — `aria-busy` на кнопке и области. Текст читается как обычный абзац; ошибка запроса объявляется `labels.transcribeFailed`.",
+        ru: 'Кнопка расшифровки называется `labels.transcribe` или `labels.hideTranscript`, несёт `aria-expanded` и `aria-controls` на область текста; пока идёт запрос, кнопка `aria-busy`, а область остаётся закрытой. Текст читается и выделяется как обычный абзац; ошибка запроса объявляется `labels.transcribeFailed` (`role="status"`).',
       },
     ],
   },

@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DESCRIPTION_LIST_LABELS } from "./DescriptionList";
 
 export const api: ComponentApi = {
   parts: [
@@ -11,8 +12,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
-          en: "Label and value type and the gap between pairs; without it the list takes the tier of its host (a Card, a Drawer, a form).",
-          ru: "Шрифт подписи и значения и зазор между парами; без него список берёт ярус хоста (Card, Drawer, форма).",
+          en: "Label and value type and the gap between pairs; without it the list takes the tier of a sized host (a Drawer, a Modal).",
+          ru: "Шрифт подписи и значения и зазор между парами; без него список берёт ярус хоста с размером (Drawer, Modal).",
         },
         {
           name: "orientation",
@@ -25,7 +26,7 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<DescriptionListLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. «Доступность».",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -89,20 +90,16 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "empty",
-      default: "—",
+  labels: labelRows(DESCRIPTION_LIST_LABELS, {
+    empty: {
       en: "Visible mark of an empty value (muted, hidden from assistive tech).",
       ru: "Видимая метка пустого значения (приглушённая, скрыта от скринридеров).",
     },
-    {
-      key: "emptyText",
-      default: "Не указано",
+    emptyText: {
       en: "What assistive tech reads for an empty value.",
       ru: "Что читают скринридеры у пустого значения.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

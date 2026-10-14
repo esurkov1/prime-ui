@@ -15,6 +15,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { highlightChildren } from "@/internal/HighlightMatch";
+import { useLabels } from "@/internal/labels";
 import { type Store, useCreateStore, useLoadMore, useStoreSlice } from "@/internal/listbox";
 import { MenuGroup } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
@@ -39,7 +40,7 @@ export type CommandMenuLabels = {
   retry: string;
 };
 
-const COMMAND_MENU_LABELS: CommandMenuLabels = {
+export const COMMAND_MENU_LABELS: CommandMenuLabels = {
   search: "Поиск",
   empty: "Ничего не найдено",
   emptyHint: "Попробуйте изменить запрос",
@@ -309,7 +310,7 @@ function CommandMenuRoot({
   children,
   ...rest
 }: CommandMenuRootProps) {
-  const labels = React.useMemo(() => ({ ...COMMAND_MENU_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(COMMAND_MENU_LABELS, labelsProp);
   const [isOpen, setOpen] = useControllableState({
     value: open,
     defaultValue: defaultOpen,

@@ -17,7 +17,7 @@ import {
   type DragOutcome,
 } from "./dragSession";
 import { type Point, type Rect, rectOf } from "./geometry";
-import { type DndLabels, defaultDndLabels } from "./labels";
+import { DND_LABELS, type DndLabels } from "./labels";
 import { useStoreSelector } from "./store";
 import { useDragSource } from "./useDragSource";
 import { useDropTarget } from "./useDropTarget";
@@ -43,8 +43,8 @@ export type DndRootProps = {
  */
 function DndRoot({ labels, children }: DndRootProps) {
   // The controller outlives renders and reads the current strings when it needs them.
-  const labelsRef = React.useRef<DndLabels>(defaultDndLabels);
-  labelsRef.current = { ...defaultDndLabels, ...labels };
+  const labelsRef = React.useRef<DndLabels>(DND_LABELS);
+  labelsRef.current = { ...DND_LABELS, ...labels };
   const [controller] = React.useState(() => createDragController(() => labelsRef.current));
   const message = useStoreSelector(controller.store, (state) => state.announcement.message);
 
@@ -194,7 +194,6 @@ export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "child
    * gap into a row across every column, and the carried copy keeps every cell's width.
    */
   as?: "div" | "ul" | "ol" | "tbody";
-  /** Accessible name of the list. */
   "aria-label"?: string;
   /**
    * Content in front of the items that never moves and takes no drop position (the heading row of

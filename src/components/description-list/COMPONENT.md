@@ -38,7 +38,7 @@ DescriptionList.Root                 <dl>; size (host tier), orientation; a size
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Label and value type and the gap between pairs; without it the list takes the tier of its host (a Card, a Drawer, a form). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Label and value type and the gap between pairs; without it the list takes the tier of a sized host (a Drawer, a Modal). |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `horizontal` — the label in a column beside its value (one third of the width), stacking below 24rem of the list's own width; `vertical` — the label above its value at any width. |
 | `labels` | `Partial<DescriptionListLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDListElement>` | — | `className`, `id`, `data-*` and the other attributes of the element. |
@@ -89,7 +89,7 @@ No motion: the list is static text; a row action has the Button's own press and 
 - The list fills its container; pairs are separated by air (8 · 12 · 16 by tier), not lines.
 - A horizontal pair: label column one third, value two thirds, 16 apart; values wrap anywhere, labels wrap too.
 - A row action sits at the end of the value, centred on its first line; it does not make the row taller.
-- Inside a `Card.Body` or a `Drawer` the list takes the host tier; do not pass `size` there.
+- Inside a `Drawer` or a `Modal` the list takes the host tier; do not pass `size` there. A `Card` gives no tier: the list is `m` unless `size` is set.
 
 ## Accessibility
 

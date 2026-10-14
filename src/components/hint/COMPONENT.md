@@ -31,7 +31,7 @@ Hint.Root      <p> with the text
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Hint.Root
-`ref` → `HTMLParagraphElement`. A `<p>` with the support text; provides its tier to nested icons. + native `<p>` props (`id`, `role`, `className`, …).
+`ref` → `HTMLParagraphElement`. A `<p>` with the support text; provides its tier to nested icons.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -39,9 +39,14 @@ Hint.Root      <p> with the text
 | `invalid` | `boolean` | `false` | Error styling: danger text that drops in (fade + 4 px from above). |
 | `disabled` | `boolean` | `false` | Disabled text color, next to a disabled control. |
 | `children` | `ReactNode` | — | Text, optionally with `Hint.Icon` first. |
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `id`, `role`, `className` and the other paragraph attributes. |
 
 ### Hint.Icon
-`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding a glyph: 14 px for xs–m, 16 px for l and xl, centred on the first line. + native `<span>` props.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` holding a glyph: 14 px for xs–m, 16 px for l and xl, centred on the first line.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the glyph), `className` and the other span attributes. |
 
 ## Variants
 Hint has no `variant` or `tone`; its states are flags.

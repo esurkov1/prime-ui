@@ -21,6 +21,11 @@ export type MessageLocationLabels = {
   live: string;
 };
 
+export const MESSAGE_LOCATION_LABELS: MessageLocationLabels = {
+  openMap: "Открыть на карте: {place}",
+  live: "Трансляция",
+};
+
 export type MessageLocationProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   /** A map picture of the place (your static map service: the kit ships no map). */
   src: string;
@@ -51,7 +56,7 @@ export function MessageLocation({
   ref,
   ...rest
 }: MessageLocationProps) {
-  const labels = { openMap: "Открыть на карте: {place}", live: "Трансляция", ...labelsProp };
+  const labels = { ...MESSAGE_LOCATION_LABELS, ...labelsProp };
   const { spacer } = useMessagePart();
   const map = (
     <>
@@ -113,7 +118,6 @@ export type MessageContactProps = Omit<React.HTMLAttributes<HTMLDivElement>, "co
   src?: string;
   /** Hue of the initials. Default `blue`. */
   color?: PaletteColor;
-  /** Actions under the card: `Button.Root`s («Написать», «Добавить»). */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };

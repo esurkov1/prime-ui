@@ -23,7 +23,7 @@ import { Pagination } from "prime-ui-kit";
 ```
 Pagination              <nav aria-label={labels.nav}>; size and compact mode
 ├─ previous             ghost icon-only Button (nav.chevronLeft)
-├─ pages                ghost Buttons with numbers; «…» for skipped ranges (aria-hidden)
+├─ pages                ghost Buttons with numbers, the current one soft accent; «…» for skipped ranges (aria-hidden)
 ├─ summary              «3 / 12» in the compact view
 └─ next                 ghost icon-only Button (nav.chevronRight)
 ```
@@ -33,7 +33,7 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Pagination
-`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with ghost `Button`s: previous, page numbers with ellipses, next.
+`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with `Button`s: ghost previous and next, ghost page numbers with ellipses, the current page soft accent.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -41,7 +41,7 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 | `value` | `number` | — | Current page (1-based), controlled; clamped to `1…totalPages`. |
 | `defaultValue` | `number` | `1` | Initial page, uncontrolled. |
 | `onValueChange` | `(page: number) => void` | — | Called when a page button or an arrow picks another page. |
-| `siblingCount` | `number` | `1` | Pages on each side of the current one before an ellipsis (when `totalPages > 7`). |
+| `siblingCount` | `number` | `1` | Pages on each side of the current one before an ellipsis (when `totalPages > 2·siblingCount+5`). |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Control tier of the buttons: height 28 · 32 · 36 · 40 · 48. |
 | `compact` | `boolean \| "auto"` | `false` | `true` — arrows + «current / total» instead of numbers; `"auto"` — fills the parent and turns compact below 22rem of its width. |
 | `labels` | `Partial<PaginationLabels>` | — | Built-in strings, see Labels. |

@@ -37,7 +37,7 @@ DigitInput            field frame: label row → cells → support row (hint | e
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `length` | `number` | `4` | Number of cells. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier: the cell is a square on its own scale, two steps above the control heights (36 · 40 · 48 · 56 · 64); label and hint follow the field tier. Without it the tier of its host (LoginForm, a panel), else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier: the cell is a square on its own scale, two steps above the control heights (36 · 40 · 48 · 56 · 64); label and hint follow the field tier. Without it the tier of its host (LoginForm, a panel), else `m`. |
 | `label` | `ReactNode` | — | Label above the cells; names the group (`aria-labelledby`) and focuses the first cell on click. Without it the group is named by `labels.group`. |
 | `required` | `boolean` | — | Red `*` after the label and native `required` on every cell. |
 | `optional` | `boolean` | — | Muted marker right after the label text (`labels.optional`). |

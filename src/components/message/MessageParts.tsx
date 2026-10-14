@@ -254,6 +254,8 @@ export type MessageReplyLabels = {
   reply: string;
 };
 
+export const MESSAGE_REPLY_LABELS: MessageReplyLabels = { reply: "Ответ на сообщение" };
+
 export type MessageReplyProps = Omit<React.HTMLAttributes<HTMLElement>, "color" | "onClick"> & {
   /** Who wrote the quoted message. */
   author: React.ReactNode;
@@ -285,7 +287,7 @@ export function MessageReply({
   ref,
   ...rest
 }: MessageReplyProps) {
-  const { reply } = { reply: "Ответ на сообщение", ...labels };
+  const { reply } = { ...MESSAGE_REPLY_LABELS, ...labels };
   const { reveal } = useMessageList();
   const body = (
     <>
@@ -330,6 +332,10 @@ export type MessageForwardedLabels = {
   forwarded: string;
 };
 
+export const MESSAGE_FORWARDED_LABELS: MessageForwardedLabels = {
+  forwarded: "Переслано от {author}",
+};
+
 export type MessageForwardedProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   /** Who wrote the original message. */
   from: string;
@@ -339,7 +345,7 @@ export type MessageForwardedProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
 
 /** «Переслано от Анны»: the header of a forwarded message, the original author in bold. */
 export function MessageForwarded({ from, labels, className, ...rest }: MessageForwardedProps) {
-  const { forwarded } = { forwarded: "Переслано от {author}", ...labels };
+  const { forwarded } = { ...MESSAGE_FORWARDED_LABELS, ...labels };
   const [before, after = ""] = forwarded.split("{author}");
   return (
     <div className={cx(styles.forwarded, className)} data-message-fit="" {...rest}>
@@ -434,7 +440,7 @@ export type MessageReactionsLabels = {
   reactions: string;
 };
 
-const REACTIONS_LABELS: MessageReactionsLabels = {
+export const MESSAGE_REACTIONS_LABELS: MessageReactionsLabels = {
   reaction: "{emoji}: {count}",
   reactionUsers: "{emoji} {count}: {users}",
   moreUsers: "ещё {count}",
@@ -688,7 +694,7 @@ export function MessageReactions({
   className,
   ...rest
 }: MessageReactionsProps) {
-  const labels = { ...REACTIONS_LABELS, ...labelsProp };
+  const labels = { ...MESSAGE_REACTIONS_LABELS, ...labelsProp };
   const { toggleReaction, optimistic, rowSpacer } = React.useContext(RootContext);
   const { reader } = useMessageList();
   const shown = applyOptimistic(items, optimistic, reader);

@@ -13,6 +13,7 @@ import {
 import { type FieldCommitHandler, FieldCommitStatus, useFieldCommit } from "@/internal/FieldCommit";
 import { FieldCounter, FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 import { TEXT_FORMATTING_LABELS, type TextFormattingLabels } from "@/internal/textFormatting";
 import { useTextFormatting } from "@/internal/textFormattingToolbar";
@@ -39,7 +40,7 @@ export type TextareaLabels = TextFormattingLabels & {
   saved: string;
 };
 
-const TEXTAREA_LABELS: TextareaLabels = {
+export const TEXTAREA_LABELS: TextareaLabels = {
   optional: "необязательно",
   counter: "{current} из {max} символов",
   copy: "Копировать",
@@ -154,7 +155,7 @@ function TextareaRoot({
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
-  const labels = React.useMemo(() => ({ ...TEXTAREA_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(TEXTAREA_LABELS, labelsProp);
 
   const innerRef = React.useRef<HTMLTextAreaElement | null>(null);
   const setRefs = useMergedRefs(innerRef, ref);

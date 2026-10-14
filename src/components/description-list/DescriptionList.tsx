@@ -17,7 +17,10 @@ export type DescriptionListLabels = {
   emptyText: string;
 };
 
-const DEFAULT_LABELS: DescriptionListLabels = { empty: "—", emptyText: "Не указано" };
+export const DESCRIPTION_LIST_LABELS: DescriptionListLabels = {
+  empty: "—",
+  emptyText: "Не указано",
+};
 
 /**
  * `horizontal` — the label beside its value, stacking when the list is narrower than 24rem;
@@ -27,7 +30,10 @@ export type DescriptionListOrientation = "horizontal" | "vertical";
 
 type Ctx = { size: ControlSize; labels: DescriptionListLabels };
 
-const DescriptionListContext = React.createContext<Ctx>({ size: "m", labels: DEFAULT_LABELS });
+const DescriptionListContext = React.createContext<Ctx>({
+  size: "m",
+  labels: DESCRIPTION_LIST_LABELS,
+});
 
 export type DescriptionListRootProps = React.HTMLAttributes<HTMLDListElement> & {
   /** Text and spacing tier. Default: the host tier (a Card, a Drawer form), else `m`. */
@@ -55,7 +61,9 @@ function DescriptionListRoot({
       className={cx(styles.root, className)}
       {...toDataAttributes({ size, orientation })}
     >
-      <DescriptionListContext.Provider value={{ size, labels: { ...DEFAULT_LABELS, ...labels } }}>
+      <DescriptionListContext.Provider
+        value={{ size, labels: { ...DESCRIPTION_LIST_LABELS, ...labels } }}
+      >
         <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
       </DescriptionListContext.Provider>
     </dl>

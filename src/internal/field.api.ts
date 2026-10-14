@@ -1,4 +1,6 @@
-import type { ApiLabel, ApiPart, ApiProp } from "../../scripts/docs/componentApi";
+import type { ApiPart, ApiProp, LabelDocs } from "../../scripts/docs/componentApi";
+import type { FieldCopyLabels } from "./FieldAction";
+import type { FieldCommitLabels } from "./FieldCommit";
 
 /**
  * Field props of a framed group control (SegmentedControl, ButtonGroup): the group element is
@@ -56,7 +58,7 @@ export function fieldGroupProps(control: string, labelsType: string): ApiProp[] 
       name: "id",
       type: "string",
       en: `Id of the \`${control}\` element (generated when omitted); hint id is \`<id>-hint\`, error id \`<id>-error\`.`,
-      ru: `Id элемента \`${control}\`; иначе генерируется.`,
+      ru: `Id элемента \`${control}\`; иначе генерируется. Id подсказки — \`<id>-hint\`, ошибки — \`<id>-error\`.`,
     },
     {
       name: "labels",
@@ -67,12 +69,12 @@ export function fieldGroupProps(control: string, labelsType: string): ApiProp[] 
   ];
 }
 
-/** The `optional` label row of a framed field. */
-export const FIELD_OPTIONAL_LABEL: ApiLabel = {
-  key: "optional",
-  default: "необязательно",
-  en: "Marker after the label when `optional`.",
-  ru: "Пометка после подписи при `optional`.",
+/** The description of the `optional` label of a framed field. */
+export const FIELD_OPTIONAL_LABEL_DOCS: LabelDocs<{ optional: string }> = {
+  optional: {
+    en: "Marker after the label when `optional`.",
+    ru: "Пометка после подписи при `optional`.",
+  },
 };
 
 /** `onCommit` of a text field (Input, Textarea); `keys` names the commit key. */
@@ -140,7 +142,7 @@ export function fieldCopyPart(name: string, where: { en: string; ru: string }): 
       {
         name: "value",
         type: "string",
-        default: "the field's value",
+        defaultNote: { en: "the field's value", ru: "значение поля" },
         en: "Text to copy instead of the field's current value.",
         ru: "Текст для копирования вместо текущего значения поля.",
       },
@@ -149,39 +151,27 @@ export function fieldCopyPart(name: string, where: { en: string; ru: string }): 
   };
 }
 
-/** Label rows shared by the copy button and the inline save. */
-export const FIELD_COPY_LABELS: ApiLabel[] = [
-  {
-    key: "copy",
-    default: "Копировать",
-    en: "Name and tooltip of the copy button.",
-    ru: "Имя и подсказка кнопки копирования.",
-  },
-  {
-    key: "copied",
-    default: "Скопировано",
+/** The descriptions of the copy button's strings (`FieldCopyLabels`). */
+export const FIELD_COPY_LABEL_DOCS: LabelDocs<FieldCopyLabels> = {
+  copy: { en: "Name and tooltip of the copy button.", ru: "Имя и подсказка кнопки копирования." },
+  copied: {
     en: "Name, tooltip and announcement once the value is copied.",
     ru: "Имя, подсказка и объявление после копирования.",
   },
-  {
-    key: "copyError",
-    default: "Не удалось скопировать",
+  copyError: {
     en: "Name, tooltip and announcement when the clipboard refuses.",
     ru: "Имя, подсказка и объявление, если буфер недоступен.",
   },
-];
+};
 
-export const FIELD_COMMIT_LABELS: ApiLabel[] = [
-  {
-    key: "saving",
-    default: "Сохранение",
+/** The descriptions of the inline save's strings (`FieldCommitLabels`). */
+export const FIELD_COMMIT_LABEL_DOCS: LabelDocs<FieldCommitLabels> = {
+  saving: {
     en: "Announced while an `onCommit` save is pending.",
     ru: "Объявляется, пока идёт сохранение `onCommit`.",
   },
-  {
-    key: "saved",
-    default: "Сохранено",
+  saved: {
     en: "Announced once an `onCommit` save succeeds.",
     ru: "Объявляется после успешного сохранения `onCommit`.",
   },
-];
+};

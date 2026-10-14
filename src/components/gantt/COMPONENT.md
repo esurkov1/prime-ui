@@ -56,7 +56,7 @@ Gantt                          surface (layer of the ladder), size container
 | `defaultScale` | `"day" \| "week" \| "month"` | `"week"` | Initial zoom, uncontrolled. |
 | `onScaleChange` | `(scale: GanttScale) => void` | — | The zoom switch changed. The day in the middle of the view stays in the middle. |
 | `range` | `{ start: Date; end: Date }` | — | The time axis, snapped to whole units. Default: every bar and today with room on both sides (a week of days, two weeks, a month), at least 35 days / 14 weeks / 12 months. |
-| `today` | `Date` | `new Date()` | The day of the today line; the chart opens with it a third into the view and «Сегодня» scrolls back to it. |
+| `today` | `Date` | today | The day of the today line; the chart opens with it a third into the view and «Сегодня» scrolls back to it. |
 | `locale` | `Locale` | `ru` | date-fns locale of the header, tooltips and spoken dates. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of rows, bars, header and toolbar controls: one-lane rows 28 · 32 · 44 · 48 · 52 px; a day is 32 · 40 · 48 px wide at `day`. |
 | `readOnly` | `boolean` | `false` | No moving, resizing or creating; bars still select and show their dates. |
@@ -70,10 +70,12 @@ Gantt                          surface (layer of the ladder), size container
 | `labels` | `Partial<GanttLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "onSelect">` | — | `aria-label` (the grid's name), `className` and the other div attributes. |
 
-### GanttBar
+### Types
+
+#### `GanttBar`
 One bar of `getRowBars`: data, not a part. Dates are calendar days with an exclusive `end`; `start` equal to `end` is a milestone. Extend the type with your own fields: callbacks get your object back.
 
-| Prop | Type | Default | Description |
+| Field | Type | Default | Description |
 |---|---|---|---|
 | `id` | `string` | — (required) | Unique across the chart. |
 | `start` | `Date` | — (required) | First day. |

@@ -108,7 +108,7 @@ In an optimistic chat the send returns at once: add the message to the list with
 | `onRecordModeChange` | `(mode: "voice" \| "video") => void` | — | A double click / double tap on the record button (or ↑ / ↓ on it) switched voice and video. |
 | `queue` | `Pick<UploadQueue, "items" \| "add" \| "retry" \| "remove" \| "clear" \| "move">` | — | Attachments, usually `useUploadQueue(…)`: the paperclip, a paste and a drop add to it, and a tray above the row shows them as one reorderable strip of tiles. Without `queue` paste and drop of files do nothing. |
 | `formatting` | `boolean` | `true` | Selecting text shows a floating toolbar of seven Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. `false` turns both off. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the field, the buttons and the bar text. Without it the tier of its host, else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the field, the buttons and the bar text. Without it the tier of its host, else `m`. |
 | `disabled` | `boolean` | `false` | A closed conversation: the field, the paperclip and the button are disabled; nothing is pasted or dropped. A disabled `Fieldset` around it sets it too (`data-disabled` included). |
 | `inputRef` | `Ref<HTMLTextAreaElement>` | — | The message `<textarea>`: focus it after «Ответить» in a message menu. |
 | `labels` | `Partial<ComposerLabels>` | — | Built-in strings, see Labels. |
@@ -116,7 +116,7 @@ In an optimistic chat the send returns at once: add the message to the list with
 | `…rest` | `Omit<FormHTMLAttributes<HTMLFormElement>, "children" \| "defaultValue" \| "onSubmit">` | — | `className`, `aria-*`, `onKeyDown` and the other attributes of the `<form>`. |
 
 ### Composer.Context
-`ref` → `HTMLDivElement`. The bar above the field: a reply or edit glyph, `Composer.Title` over `Composer.Description` behind an accent rule, and a close button; it describes the field; when it appears, the caret moves to the field. + native `<div>` props.
+`ref` → `HTMLDivElement`. The bar above the field: a reply or edit glyph, `Composer.Title` over `Composer.Description` behind an accent rule, and a close button; it describes the field; when it appears, the caret moves to the field.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -124,18 +124,24 @@ In an optimistic chat the send returns at once: add the message to the list with
 | `value` | `string` | — | The id of the message answered or edited: `onSend` receives it as `replyTo` (`reply`) or `editOf` (`edit`). |
 | `onDismiss` | `() => void` | — | Stop replying or editing: the close button, Escape in the field, and a send that went through. Without it the bar has no close button. |
 | `children` | `ReactNode` | — | `Composer.Title` and `Composer.Description`. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
 ### Composer.Title · Composer.Description
-`ref` → `HTMLDivElement`. The first line of the bar in the accent text color, medium weight («Ответ Анне», «Редактирование») / the quoted message in the secondary color; both one line, cut with an ellipsis. + native `<div>` props.
+`ref` → `HTMLDivElement`. The first line of the bar in the accent text color, medium weight («Ответ Анне», «Редактирование») / the quoted message in the secondary color; both one line, cut with an ellipsis.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Composer.Attach
-`ref` → `HTMLDivElement`. The paperclip at the start of the row. Alone it opens the file picker (FileUpload `trigger="button"`); with `Composer.Item` children it opens a menu where every item picks its own file types. Files go to the root's `queue`. + native `<div>` props.
+`ref` → `HTMLDivElement`. The paperclip at the start of the row. Alone it opens the file picker (FileUpload `trigger="button"`); with `Composer.Item` children it opens a menu where every item picks its own file types. Files go to the root's `queue`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `accept` | `string` | — | File types of the picker without a menu. |
 | `aria-label` | `string` | — | Name of the button. Default `labels.attach`. |
 | `children` | `ReactNode` | — | `Composer.Item` kinds of attachment. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other div attributes. |
 
 ### Composer.Item
 `ref` → `HTMLButtonElement`. A kind of attachment in the paperclip menu, a `Dropdown.Item` (`role="menuitem"`): `Composer.ItemIcon` and the label. + native button props.
@@ -145,9 +151,14 @@ In an optimistic chat the send returns at once: add the message to the list with
 | `accept` | `string` | — | File types this item picks (`"image/*,video/*"`; `""` for any file). Without it the item only runs `onSelect`. |
 | `onSelect` | `() => void` | — | The item's own action (a poll, a location); runs after the picker opens when `accept` is set. |
 | `disabled` | `boolean` | `false` | Muted and skipped by the arrow keys. |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onSelect" \| "type">` | — | `children`, `className` and the other button attributes. |
 
 ### Composer.ItemIcon
-`ref` → `HTMLSpanElement`. The leading glyph of a menu item (`Dropdown.ItemIcon`, `aria-hidden`). + native `<span>` props.
+`ref` → `HTMLSpanElement`. The leading glyph of a menu item (`Dropdown.ItemIcon`, `aria-hidden`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the `Icon`), `className` and the other span attributes. |
 
 ## Variants
 Composer has no `variant`; what the row shows follows its state.

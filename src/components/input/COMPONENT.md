@@ -51,7 +51,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier for height, padding, radius, text, label and hint. Without it the field takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. Also provided to nested controls via the control-size context. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier for height, padding, radius, text, label and hint. Without it the field takes the tier of its host (LoginForm, Popover, a panel with a size), else `m`. Also provided to nested controls via the control-size context. |
 | `label` | `ReactNode` | — | Label above the field, rendered as `<label htmlFor>`. Without it, give `Input.Field` an `aria-label`. |
 | `required` | `boolean` | `false` | Red `*` after the label (`aria-hidden`) and native `required` on `Input.Field`. |
 | `optional` | `boolean` | `false` | Muted marker right after the label text (`labels.optional`). |
@@ -59,7 +59,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger inset ring on the field, `aria-invalid` on the input. A non-empty `error` implies it. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
-| `counter` | `ReactNode` | — | Right side of the support row, usually `<Input.Counter />`. |
+| `counter` | `ReactNode` | — | Right side of the support row, usually `<Input.Counter current max />`. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row (min height = hint line height), so an appearing error does not shift the layout. |
 | `id` | `string` | — | Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `strength` | `boolean` | `false` | A password strength meter for new-password fields: a stepped `ProgressBar` under the field and the level word (weak … hard) in the support row. Follows the value of `Input.Field`. |
@@ -127,7 +127,7 @@ The trailing side has a fixed CSS `order`, independent of JSX order: value · en
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | `the field's value` | Text to copy instead of the field's current value. |
+| `value` | `string` | the field's value | Text to copy instead of the field's current value. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children" \| "aria-label">` | — | `onClick`, `disabled` and the other button attributes. |
 
 ### Input.RevealButton

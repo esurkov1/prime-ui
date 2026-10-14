@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { SPARKLINE_LABELS } from "./Sparkline";
 
 export const api: ComponentApi = {
   parts: [
@@ -59,7 +60,7 @@ export const api: ComponentApi = {
         {
           name: "highlight",
           type: "number",
-          default: "the latest point with a value",
+          defaultNote: { en: "the latest point with a value", ru: "последняя точка со значением" },
           en: 'Index of the point at rest with `summary="latest"` (the current month): the headline returns to it; `bars` draw the other bars quieter. Not allowed with `sum` / `average`.',
           ru: 'Индекс точки в покое при `summary="latest"` (текущий месяц): заголовок возвращается к ней; в `bars` остальные столбики тише. Не сочетается с `sum` / `average`.',
         },
@@ -97,7 +98,7 @@ export const api: ComponentApi = {
         {
           name: "formatValue",
           type: "(value: number) => string",
-          default: "Russian digit groups",
+          defaultNote: { en: "Russian digit groups", ru: "русские группы разрядов" },
           en: "Display of a value in the headline, the tooltip, the reference description and the spoken point («312 400 ₽»).",
           ru: "Вид значения в заголовке, подсказке, описании ориентира и в озвучке точки («312 400 ₽»).",
         },
@@ -105,7 +106,7 @@ export const api: ComponentApi = {
           name: "labels",
           type: "Partial<SparklineLabels>",
           en: "Built-in strings, see Labels.",
-          ru: "Встроенные строки, см. Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "…rest",
@@ -116,32 +117,24 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "point",
-      default: "{label}: {value}",
+  labels: labelRows(SPARKLINE_LABELS, {
+    point: {
       en: "Spoken value of the chosen point (`aria-valuetext`); `{label}` and `{value}` are replaced.",
       ru: "Озвучка выбранной точки (`aria-valuetext`); `{label}` и `{value}` подставляются.",
     },
-    {
-      key: "period",
-      default: "{first} – {last}",
+    period: {
       en: "The date line of a `sum` / `average` headline at rest; `{first}` and `{last}` are the labels of the first and the last point.",
       ru: "Дата заголовка `sum` / `average` в покое; `{first}` и `{last}` — подписи первой и последней точки.",
     },
-    {
-      key: "empty",
-      default: "Нет данных",
+    empty: {
       en: "Shown and spoken in place of the value of a point with `value: null`.",
       ru: "Показывается и озвучивается вместо значения точки с `value: null`.",
     },
-    {
-      key: "reference",
-      default: "Ориентир: {value}",
+    reference: {
       en: "Description of the chart with a `reference` line (`aria-describedby`); `{value}` is replaced.",
       ru: "Описание графика с линией `reference` (`aria-describedby`); `{value}` подставляется.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
@@ -164,7 +157,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'The plot is `role="slider"` named by `label`; `aria-valuetext` speaks the point («8 окт: 312 400 ₽», `labels.point`); a point with no data speaks `labels.empty` («8 окт: Нет данных»). At rest with `sum` / `average` it speaks the period and the summary («9 сен – 8 окт: 8 914 000 ₽»). With `reference` the slider is described by `labels.reference` («Ориентир: 3%», `aria-describedby`). The headline follows the point under the pointer or the arrows, in text.',
-        ru: 'График — `role="slider"` с именем из `label`; `aria-valuetext` озвучивает точку: «8 окт: 312 400 ₽»; в покое с `summary="sum"` — период: «9 сен – 8 окт: 8 914 000 ₽».',
+        ru: 'График — `role="slider"` с именем из `label`; `aria-valuetext` озвучивает точку: «8 окт: 312 400 ₽»; точка без данных — `labels.empty` («8 окт: Нет данных»); `labels.point` задаёт формат точки. В покое с `sum` / `average` — период и итог: «9 сен – 8 окт: 8 914 000 ₽». С `reference` слайдер описан `labels.reference` («Ориентир: 3%», `aria-describedby`). Заголовок следует за точкой под указателем или стрелками, текстом.',
       },
       {
         en: "The headline with the value and change reads as plain text.",
@@ -180,11 +173,11 @@ export const api: ComponentApi = {
       },
       {
         en: '`layout="compact"`: no visible title; `label` is only the slider\'s name, the point still goes to `aria-valuetext`.',
-        ru: '`layout="compact"`: видимого заголовка нет, `label` — только имя слайдера, значение точки — в `aria-valuetext`. Указатель и клавиши на графике не открывают строку DataTable (`role="slider"`, `data-row-click-ignore`).',
+        ru: '`layout="compact"`: видимого заголовка нет, `label` — только имя слайдера, значение точки — в `aria-valuetext`.',
       },
       {
         en: "The tooltip is `aria-hidden`: it repeats `aria-valuetext` for sighted users. The plot carries `data-row-click-ignore` (and is a slider), so its pointer and keys never open a DataTable row.",
-        ru: "Подсказка у курсора при ведении скрыта от вспомогательных технологий (`aria-hidden`): она повторяет `aria-valuetext`.",
+        ru: "Подсказка — `aria-hidden`: она повторяет `aria-valuetext` для зрячих. График несёт `data-row-click-ignore` (и он слайдер), поэтому указатель и клавиши на нём не открывают строку DataTable.",
       },
     ],
   },

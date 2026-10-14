@@ -16,7 +16,7 @@ export type NativeSelectLabels = {
   optional: string;
 };
 
-const NATIVE_SELECT_LABELS: NativeSelectLabels = { optional: "необязательно" };
+export const NATIVE_SELECT_LABELS: NativeSelectLabels = { optional: "необязательно" };
 
 export type NativeSelectProps = FieldFrameProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size" | "multiple" | "children"> & {
