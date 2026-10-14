@@ -167,10 +167,10 @@ export const api: ComponentApi = {
           ru: "Выбранные или брошенные файлы (из `accept`, не больше `max`); input сбрасывается, тот же файл можно выбрать снова. Не вызывается, когда их берёт `queue.add`.",
         },
         {
-          name: "inputRef",
-          type: "Ref<HTMLInputElement>",
-          en: "The hidden file input, e.g. to open the picker from a button.",
-          ru: "Скрытый input файла, например чтобы открыть выбор с кнопки.",
+          name: "picker",
+          type: "Ref<{ open: (options?: { accept?: string }) => void }>",
+          en: "Opens the file picker from code (a custom body button, a menu item): `open()`, or `open({ accept })` for one pick of other types that also filter its files. A disabled or full field does not open.",
+          ru: "Открывает выбор файла из кода (кнопка в своём теле зоны, пункт меню): `open()` или `open({ accept })` — один выбор других типов, по ним же отбираются файлы. Неактивное или заполненное поле не открывается.",
         },
         {
           name: "id",

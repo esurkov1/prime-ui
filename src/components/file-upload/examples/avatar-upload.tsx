@@ -1,11 +1,11 @@
-/** A round zone around an Avatar that takes images and shows a preview; buttons open the same input — `inputRef`, `accept`, `className`. */
-import { Avatar, Button, FileUpload, Typography } from "prime-ui-kit";
+/** A round zone around an Avatar that takes images and shows a preview; buttons open the same picker — `picker`, `accept`, `className`. */
+import { Avatar, Button, FileUpload, type FileUploadPicker, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
 export default function FileUploadAvatarUploadExample() {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const picker = React.useRef<FileUploadPicker>(null);
   const [preview, setPreview] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -17,7 +17,7 @@ export default function FileUploadAvatarUploadExample() {
   return (
     <div className={styles.avatarRow}>
       <FileUpload.Root
-        inputRef={inputRef}
+        picker={picker}
         accept="image/png,image/jpeg"
         variant="solid"
         className={styles.avatarZone}
@@ -41,7 +41,7 @@ export default function FileUploadAvatarUploadExample() {
           </Typography>
         </div>
         <div className={styles.avatarActions}>
-          <Button.Root variant="soft" tone="neutral" onClick={() => inputRef.current?.click()}>
+          <Button.Root variant="soft" tone="neutral" onClick={() => picker.current?.open()}>
             {preview ? "Заменить" : "Загрузить"}
           </Button.Root>
           {preview ? (

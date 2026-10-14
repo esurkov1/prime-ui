@@ -6,6 +6,7 @@ import {
   Crossfade,
   EmptyPage,
   FileUpload,
+  type FileUploadPicker,
   formatDateValue,
   formatFileSize,
   Icon,
@@ -268,7 +269,7 @@ export default function FileUploadScreenExample() {
   const [index, setIndex] = React.useState(0);
 
   const queue = useUploadQueue({ upload: sendFile, concurrency: 2 });
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const picker = React.useRef<FileUploadPicker>(null);
   const tiles = React.useRef(new Map<string, HTMLElement>());
   const moving = React.useRef(new Set<string>());
 
@@ -420,7 +421,7 @@ export default function FileUploadScreenExample() {
                 </Select.Root>
               </PageToolbar.View>
               <PageToolbar.Actions>
-                <Button.Root onClick={() => inputRef.current?.click()}>
+                <Button.Root onClick={() => picker.current?.open()}>
                   <Button.Icon>
                     <Icon name="action.upload" />
                   </Button.Icon>
@@ -443,7 +444,7 @@ export default function FileUploadScreenExample() {
             accept="image/*,video/*"
             multiple
             queue={queue}
-            inputRef={inputRef}
+            picker={picker}
           />
 
           <PageContent.Section

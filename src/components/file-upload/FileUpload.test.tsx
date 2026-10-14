@@ -6,7 +6,12 @@ import { Button } from "@/components/button/Button";
 import { type UploadItem, useUploadQueue } from "@/hooks/useUploadQueue";
 import { Icon } from "@/icons";
 
-import { FileUpload, type FileUploadFile, type FileUploadRootProps } from "./FileUpload";
+import {
+  FileUpload,
+  type FileUploadFile,
+  type FileUploadPicker,
+  type FileUploadRootProps,
+} from "./FileUpload";
 
 function makeDataTransferWithFiles(files: File[]): DataTransfer {
   // jsdom has no DataTransfer; an iterable `files` is enough for Array.from
@@ -167,10 +172,34 @@ describe("FileUpload", () => {
     expect(input).toHaveAttribute("multiple");
   });
 
-  it("forwards inputRef to the file input", () => {
-    const ref = React.createRef<HTMLInputElement>();
-    render(<FileUpload.Root inputRef={ref} />);
-    expect(ref.current?.type).toBe("file");
+  it("picker.open() opens the input; open({ accept }) narrows that one pick and its files", () => {
+    const picker = React.createRef<FileUploadPicker>();
+    const onFilesChange = vi.fn();
+    const { container } = render(
+      <FileUpload.Root picker={picker} accept=".pdf" onFilesChange={onFilesChange} />,
+    );
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const click = vi.spyOn(input, "click");
+    act(() => picker.current?.open({ accept: "image/*" }));
+    expect(click).toHaveBeenCalledTimes(1);
+    expect(input.accept).toBe("image/*");
+    const photo = new File(["x"], "склад.jpg", { type: "image/jpeg" });
+    const scan = new File(["x"], "договор.pdf", { type: "application/pdf" });
+    fireEvent.change(input, { target: { files: [photo, scan] } });
+    expect(onFilesChange).toHaveBeenLastCalledWith([photo]);
+    act(() => picker.current?.open());
+    expect(input.accept).toBe(".pdf");
+    fireEvent.change(input, { target: { files: [photo, scan] } });
+    expect(onFilesChange).toHaveBeenLastCalledWith([scan]);
+  });
+
+  it("picker.open() does nothing on a disabled field", () => {
+    const picker = React.createRef<FileUploadPicker>();
+    const { container } = render(<FileUpload.Root picker={picker} disabled />);
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const click = vi.spyOn(input, "click");
+    act(() => picker.current?.open());
+    expect(click).not.toHaveBeenCalled();
   });
 
   it("renders custom children instead of default", () => {

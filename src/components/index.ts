@@ -316,6 +316,7 @@ export type {
   FileUploadItemTextProps,
   FileUploadLabels,
   FileUploadLayout,
+  FileUploadPicker,
   FileUploadQueueProps,
   FileUploadQueueSource,
   FileUploadRootProps,

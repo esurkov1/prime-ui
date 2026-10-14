@@ -1058,6 +1058,15 @@ function FileUploadQueueSet({
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 
+/** Opens the root's file picker from code (`FileUpload.Root` `picker`). */
+export type FileUploadPicker = {
+  /**
+   * Opens the picker; `accept` narrows this one pick (a «Фото» item of a menu) and the files it
+   * takes. Nothing happens while the field is disabled or its set is full.
+   */
+  open: (options?: { accept?: string }) => void;
+};
+
 export type FileUploadRootProps = FieldRootDomProps &
   FieldFrameProps &
   FieldFocusRingProps &
@@ -1066,8 +1075,7 @@ export type FileUploadRootProps = FieldRootDomProps &
     size?: ControlSize;
     trigger?: FileUploadTrigger;
     variant?: FileUploadVariant;
-    /** Access to the hidden file input (open the picker programmatically). */
-    inputRef?: React.Ref<HTMLInputElement>;
+    picker?: React.Ref<FileUploadPicker>;
     accept?: string;
     multiple?: boolean;
     /** Most files in the set: the add tile counts them; files past it are not taken. */
@@ -1112,7 +1120,7 @@ function FileUploadField({
   size: sizeProp,
   trigger = "dropzone",
   variant = "dashed",
-  inputRef,
+  picker,
   accept,
   multiple,
   max,
@@ -1148,7 +1156,10 @@ function FileUploadField({
   // Enter / leave pairs fire for every child the pointer crosses; the field is left at depth 0.
   const dragDepth = React.useRef(0);
   const ownInput = React.useRef<HTMLInputElement | null>(null);
-  const setInputRef = useMergedRefs(ownInput, inputRef);
+  /** The types of the pick in progress: `open({ accept })` narrows one pick, else `accept`. */
+  const pickAccept = React.useRef<string | undefined>(accept);
+  /** Set by `picker.open` just before it clicks the input: the next pick's own types. */
+  const requestedAccept = React.useRef<{ accept: string | undefined } | null>(null);
 
   const count = set.files.length;
   const room = max === undefined ? Number.POSITIVE_INFINITY : Math.max(0, max - count);
@@ -1158,17 +1169,30 @@ function FileUploadField({
   const button = trigger === "button";
   const tile = trigger === "tile";
 
-  const addFiles = (picked: readonly File[]) => {
+  const addFiles = (picked: readonly File[], types: string | undefined = accept) => {
     if (disabled) return;
-    const files = picked.filter((file) => acceptsFile(file, accept)).slice(0, room);
+    const files = picked.filter((file) => acceptsFile(file, types)).slice(0, room);
     if (files.length === 0) return;
     if (queue?.add) set.addToQueue(files);
     else onFilesChange?.(files);
   };
 
+  React.useImperativeHandle(
+    picker,
+    () => ({
+      open: (options = {}) => {
+        const input = ownInput.current;
+        if (!input || disabled || full) return;
+        requestedAccept.current = { accept: options.accept ?? accept };
+        input.click();
+      },
+    }),
+    [accept, disabled, full],
+  );
+
   const input = (
     <input
-      ref={setInputRef}
+      ref={ownInput}
       id={ids.controlId}
       type="file"
       className={cx(visuallyHiddenClass, styles.input)}
@@ -1181,7 +1205,16 @@ function FileUploadField({
       // the add tile is only marked off and its click opens no picker.
       aria-disabled={(tile && full) || undefined}
       onClick={(event) => {
-        if (tile && full) event.preventDefault();
+        if (tile && full) {
+          event.preventDefault();
+          return;
+        }
+        // The types of this pick: `picker.open({ accept })`, else the field's own.
+        const requested = requestedAccept.current;
+        requestedAccept.current = null;
+        pickAccept.current = requested ? requested.accept : accept;
+        if (pickAccept.current === undefined) event.currentTarget.removeAttribute("accept");
+        else event.currentTarget.accept = pickAccept.current;
       }}
       // The button is the control: the input only holds the files.
       tabIndex={button ? -1 : undefined}
@@ -1191,7 +1224,7 @@ function FileUploadField({
       aria-describedby={button ? undefined : ids.describedBy}
       aria-invalid={(!button && ids.invalid) || undefined}
       onChange={(event) => {
-        addFiles(Array.from(event.target.files ?? []));
+        addFiles(Array.from(event.target.files ?? []), pickAccept.current);
         event.target.value = "";
       }}
     />

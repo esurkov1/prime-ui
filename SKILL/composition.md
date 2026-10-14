@@ -537,7 +537,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - A work screen titles itself in the app header: `AppHeader.Title` «Медиатека» with an `AppHeader.Description` naming the object; main has no `PageContent.Header`.
 - Sections, search, order and «Загрузить» are one `PageToolbar` panel in `AppHeader.Tools`: search is a `SmartFilter.Toolbar` with `fields={[]}`, sections a `SegmentedControl` with `SegmentedControl.Count`.
-- Uploads are `useUploadQueue` + `FileUpload.Root trigger="tile" layout="grid"`: progress, «В очереди», the failure reason and retry are built in, the add tile is also the drop zone; «Загрузить» opens the same `inputRef`.
+- Uploads are `useUploadQueue` + `FileUpload.Root trigger="tile" layout="grid"`: progress, «В очереди», the failure reason and retry are built in, the add tile is also the drop zone; «Загрузить» opens the same picker (`picker.current?.open()`).
 - A finished file leaves the queue for the library: its address is `item.result` of the server's answer, not the queue's `preview`.
 - The library grid is a CSS grid of `Thumbnail` with `fullWidth` and one `ratio`; a video is `Thumbnail.Video`, which draws the duration and the play mark itself. `Gallery` does not fit here: it is an album of up to 10.
 - A tile either opens or selects: when browsing it is `Thumbnail.Root asChild` with a button, when selecting — `checked` / `onCheckedChange`; «Выбрать» turns the mode on.
