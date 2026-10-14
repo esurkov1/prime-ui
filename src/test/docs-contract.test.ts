@@ -36,7 +36,13 @@ import {
   slotOrder,
 } from "../../playground/pageStandard";
 import { type ApiPart, applyApiToDoc, type ComponentApi } from "../../scripts/docs/componentApi";
-import { EVENTS, NATIVE_EVENTS, RENAMED } from "../../scripts/docs/vocabulary";
+import {
+  EVENTS,
+  KEPT,
+  NATIVE_EVENTS,
+  RENAMED,
+  SELECTION_MODE_VALUE,
+} from "../../scripts/docs/vocabulary";
 import { NotificationProvider } from "../components/notification/NotificationStore";
 import {
   apiTexts,
@@ -530,7 +536,12 @@ function apiOffenders(rel: string, api: ComponentApi): Record<string, string[]> 
       }
       if (prop.name === "error" && !props.has("hint")) out.support.push(`${at}: ${where}`);
       const renamed = RENAMED.props[where] ?? RENAMED.props[`*.${prop.name}`];
-      if (renamed && prop.name !== "…rest") out.vocabulary.push(`${at}: ${where} → ${renamed}`);
+      if (renamed && prop.name !== "…rest" && !KEPT[where]) {
+        out.vocabulary.push(`${at}: ${where} → ${renamed}`);
+      }
+      if (literalValues(prop.type).includes(SELECTION_MODE_VALUE)) {
+        out.vocabulary.push(`${at}: ${where} → \`multiple?: boolean\` (one vs many is a flag)`);
+      }
       if (/^on[A-Z]/.test(prop.name)) {
         for (const event of prop.name.split(" · ")) {
           if (!/^on\w+Change$/.test(event) && !EVENTS.has(event) && !NATIVE_EVENTS.has(event)) {
@@ -800,14 +811,21 @@ describe("docs contract", () => {
 
       it("a slot required by a prop names the prop in its JSDoc (slot-prop)", () => {
         const offenders: string[] = [];
-        for (const { slot, by } of requiredSlots(page.kind, page.api.parts[0])) {
+        for (const { slot, by, shownBy } of requiredSlots(page.kind, page.api.parts[0])) {
           if (by === "kind") continue;
           const example = page.examples.find((item) => "slot" in item && item.slot === slot);
           if (!example) continue;
           const file = `${rel}/examples/${slot}.tsx`;
           const tokens = codeTokens(jsdocOf(read(file)) ?? "");
-          const named = tokens.some((token) => token === by || token.startsWith(`${by}=`));
-          if (!named) offenders.push(`${file}: names no \`${by}\``);
+          const named = tokens.some((token) =>
+            shownBy.some((prop) => token === prop || token.startsWith(`${prop}=`)),
+          );
+          if (!named) {
+            const props = shownBy.map((prop) => `\`${prop}\``);
+            offenders.push(
+              `${file}: names ${props.length === 1 ? "no" : "none of"} ${props.join(", ")}`,
+            );
+          }
         }
         ratchet("slot-prop", offenders, scope);
       });
@@ -946,6 +964,21 @@ describe("docs contract", () => {
         }
       });
     });
+  });
+});
+
+describe("vocabulary exceptions", () => {
+  it("every kept name is a documented prop", () => {
+    const documented = new Set(
+      dirs.flatMap(({ base, dir }) =>
+        (apiOf(base, dir)?.parts ?? []).flatMap((part) =>
+          part.name
+            .split(" · ")
+            .flatMap((name) => part.props.map((prop) => `${name}.${prop.name}`)),
+        ),
+      ),
+    );
+    expect(Object.keys(KEPT).filter((where) => !documented.has(where))).toEqual([]);
   });
 });
 
