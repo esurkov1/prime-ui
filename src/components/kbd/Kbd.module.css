@@ -6,20 +6,13 @@
  * the tier icon (`--prime-icon-size` from the chip tier), a raw svg too (`iconSlotClass`).
  */
 .root {
-  box-sizing: border-box;
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  gap: var(--chip-gap);
-  height: var(--chip-h);
-  min-width: var(--chip-h);
-  padding-inline: var(--chip-px);
-  border-radius: var(--chip-radius);
   background: var(--prime-color-fill-subtle-active);
   color: var(--prime-color-text-secondary);
   font-family: var(--prime-font-family-mono);
-  font-size: var(--chip-text);
   line-height: 1;
   font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
