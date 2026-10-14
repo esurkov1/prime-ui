@@ -2,11 +2,17 @@
  * Palette hue (`PaletteColor`, `--prime-color-palette-<hue>-*`) as four local variables. Put `.hue`
  * on the element that carries `data-color`; its CSS reads `--hue-soft`, `--hue-text`, `--hue-solid`
  * and `--hue-solid-fg`. No `data-color` → gray.
+ * Gray soft is a wash of the text ink over whatever the element stands on — a layer at any depth,
+ * a field, a track, a thumb, a tinted host — so it steps off its ground everywhere, in both themes.
  * `--hue-chart` is the hue as a data mark (a ProgressBar share, a legend swatch): `HUE_CHART` in
  * `palette.ts` is its source (a chart library takes colors in JS); `palette.test.ts` keeps the two equal.
  */
 .hue {
-  --hue-soft: var(--prime-color-palette-gray-soft);
+  --hue-soft: color-mix(
+    in srgb,
+    var(--prime-color-text-primary) var(--prime-tint-soft),
+    transparent
+  );
   --hue-text: var(--prime-color-palette-gray-text);
   --hue-solid: var(--prime-color-palette-gray-solid);
   --hue-solid-fg: var(--prime-color-palette-gray-solid-fg);

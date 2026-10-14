@@ -6,35 +6,30 @@
  * Design rules (see docs/foundation.md):
  * - Depth comes from fills, not borders. `border.subtle` is a hairline, `border.control` is transparent
  *   (it becomes visible only under `prefers-contrast: more`).
- * - Every size is on the 4px grid. Controls share one size axis: xs 28 · s 32 · m 36 · l 40 · xl 48.
+ * - Every size is on the 4px grid (foundation §1 rule 2); the few deliberate exceptions are the
+ *   `OFF_GRID` list of `scripts/build-tokens.ts`, which fails the build on any other.
+ *   Controls share one size axis: xs 28 · s 32 · m 36 · l 40 · xl 48.
+ * - Values are references (`{color.gray.925}`, also inside a `color-mix()` or a shadow), never a
+ *   raw color or a `var()`: the build resolves and checks every one.
  * - A nested radius equals the outer radius minus the padding between them.
  * - Surfaces are a ladder (`color.layer`, see `layers.ts`): the page and four nested layers, each one
  *   ΔL step from its parent. Which row applies is the surface's `data-depth`; `globals.css` maps it
  *   to the context variables components read (`--prime-color-layer-current`, `--prime-color-field-bg`,
  *   `--prime-color-fill-muted`, `--prime-color-control-selected`…).
  */
+import { hueRef, hues } from "./hues";
 import { LIGHT_LAYERS, layerTokens } from "./layers";
 
-const hues = ["blue", "green", "orange", "red", "yellow", "purple", "sky", "pink", "teal"] as const;
-type Hue = (typeof hues)[number];
-const hueRef: Record<Hue, string> = {
-  blue: "cobalt",
-  green: "green",
-  orange: "orange",
-  red: "red",
-  yellow: "yellow",
-  purple: "purple",
-  sky: "sky",
-  pink: "pink",
-  teal: "teal",
-};
+export type PaletteRoles = { soft?: string; text: string; solid: string; solidFg: string };
 
-/** Light palette for Badge / Avatar colors: soft fill + readable text + solid fill. */
+/**
+ * Light palette for Badge / Avatar colors: soft fill + readable text + solid fill. Gray has no
+ * `soft`: `internal/palette.module.css` washes the text ink (`--prime-tint-soft`) over whatever the
+ * chip stands on, so it steps off every layer, field, track and tinted host.
+ */
 function lightPalette() {
-  const out: Record<string, { soft: string; text: string; solid: string; solidFg: string }> = {
+  const out: Record<string, PaletteRoles> = {
     gray: {
-      /** Translucent: a gray chip stays visible on fields, tiles and tracks. */
-      soft: "color-mix(in srgb, var(--prime-ref-color-gray-925) 10%, transparent)",
       text: "{color.gray.700}",
       solid: "{color.gray.600}",
       solidFg: "{color.white}",
@@ -71,16 +66,19 @@ export const semanticTokens = {
     layer: layerTokens(LIGHT_LAYERS),
     bg: {
       inverse: "{color.gray.925}",
-      scrim: "rgba(17, 19, 24, 0.44)",
+      scrim: "color-mix(in srgb, {color.gray.925} 44%, transparent)",
       /** Soft shade over an edge that hides scrolled content (DataTable columns). */
-      edgeShadow: "rgba(17, 19, 24, 0.14)",
+      edgeShadow: "color-mix(in srgb, {color.gray.925} 14%, transparent)",
       /**
-       * Translucent glass over content (floating BottomNav), always with a strong backdrop blur:
-       * dense, as the iOS tab bar — the content shows through as soft shapes.
+       * Translucent glass over content (floating BottomNav), always with a strong backdrop blur
+       * (`--prime-glass-saturation` lifts the colors under it): dense, as the iOS tab bar — the
+       * content shows through as soft shapes.
        */
-      glass: "color-mix(in srgb, var(--prime-ref-color-gray-0) 72%, transparent)",
+      glass: "color-mix(in srgb, {color.white} 72%, transparent)",
       /** The light that catches on the rim of a glass surface: the line that makes it read as glass. */
-      glassEdge: "rgba(255, 255, 255, 0.85)",
+      glassEdge: "color-mix(in srgb, {color.white} 85%, transparent)",
+      /** Glass made opaque, where the person asked for less transparency: the floating layer's fill. */
+      glassSolid: "{color.layer.floating.bg}",
     },
     /**
      * Over a photo the picture is the ground, not the theme: one look in both themes. `shade` sits
@@ -90,17 +88,17 @@ export const semanticTokens = {
      * white frame.
      */
     media: {
-      shade: "rgba(17, 19, 24, 0.56)",
-      shadeFg: "{color.gray.0}",
+      shade: "color-mix(in srgb, {color.gray.925} 56%, transparent)",
+      shadeFg: "{color.white}",
       /**
        * A round disk over media (play, cancel, retry, download — Button `shade`, the play mark):
        * lighter than `shade` under a softer blur, so the frame shows through; its white glyph
        * keeps 3:1 (a graphical object) even over a white frame. Pills keep `shade` / `pill`:
        * they carry text, which needs the denser ground.
        */
-      disk: "rgba(17, 19, 24, 0.48)",
-      pill: "rgba(17, 19, 24, 0.72)",
-      pillFg: "rgba(255, 255, 255, 0.8)",
+      disk: "color-mix(in srgb, {color.gray.925} 48%, transparent)",
+      pill: "color-mix(in srgb, {color.gray.925} 72%, transparent)",
+      pillFg: "color-mix(in srgb, {color.white} 80%, transparent)",
       /** The ground of a full-screen media viewer: near black, so any picture reads at its truest. */
       stage: "{color.gray.950}",
     },
@@ -111,14 +109,19 @@ export const semanticTokens = {
      */
     fill: {
       /** Ghost hover, row hover. */
-      subtle: "rgba(17, 19, 24, 0.04)",
-      subtleActive: "rgba(17, 19, 24, 0.07)",
+      subtle: "color-mix(in srgb, {color.gray.925} 4%, transparent)",
+      subtleActive: "color-mix(in srgb, {color.gray.925} 7%, transparent)",
       /** The faintest wash: hover of a tab in the tab strip, below the selected tab's step. */
-      faint: "rgba(17, 19, 24, 0.04)",
+      faint: "color-mix(in srgb, {color.gray.925} 4%, transparent)",
       /** Unchecked checkbox, switch track, slider track. */
-      strong: "color-mix(in srgb, var(--prime-ref-color-gray-925) 15%, transparent)",
-      strongHover: "color-mix(in srgb, var(--prime-ref-color-gray-925) 22%, transparent)",
+      strong: "color-mix(in srgb, {color.gray.925} 15%, transparent)",
+      strongHover: "color-mix(in srgb, {color.gray.925} 22%, transparent)",
     },
+    /**
+     * Dark ink for a mark on a light color that is not a theme surface (the check on a light
+     * swatch, text on a yellow solid): one value in both themes.
+     */
+    inkOnLight: "{color.gray.925}",
     text: {
       primary: "{color.gray.925}",
       secondary: "{color.gray.700}",
@@ -126,7 +129,7 @@ export const semanticTokens = {
       /** gray.600: keeps AA on the field wash over every host, including the canvas. */
       placeholder: "{color.gray.600}",
       disabled: "{color.gray.400}",
-      inverse: "{color.gray.0}",
+      inverse: "{color.white}",
     },
     border: {
       /** Zone separators inside floating layers (dialog header/footer): only just visible. */
@@ -177,7 +180,7 @@ export const semanticTokens = {
     /** The field fill at rest, hover and focus comes from the ladder (`--prime-color-field-bg*`). */
     field: {
       /** A disabled field: a faint wash on whatever it sits on. */
-      bgDisabled: "color-mix(in srgb, var(--prime-ref-color-gray-925) 4%, transparent)",
+      bgDisabled: "color-mix(in srgb, {color.gray.925} 4%, transparent)",
     },
     focus: {
       ring: "{color.cobalt.700}",
@@ -192,11 +195,11 @@ export const semanticTokens = {
      */
     tooltip: {
       bg: "{color.gray.925}",
-      text: "{color.gray.0}",
+      text: "{color.white}",
       /** Secondary text on the chip (a shortcut, a second line). */
       muted: "{color.gray.300}",
       /** A key cap or chip on the chip: a light wash over the dark fill. */
-      fill: "rgba(255, 255, 255, 0.14)",
+      fill: "color-mix(in srgb, {color.white} 14%, transparent)",
     },
     palette: lightPalette(),
     /**
@@ -217,23 +220,23 @@ export const semanticTokens = {
         accentFg: "{color.white}",
         /** A failed send, a failed upload: AA on `bg`. */
         danger: "{color.red.700}",
-        fill: "color-mix(in srgb, var(--prime-ref-color-cobalt-700) 10%, transparent)",
-        fillHover: "color-mix(in srgb, var(--prime-ref-color-cobalt-700) 16%, transparent)",
-        track: "color-mix(in srgb, var(--prime-ref-color-cobalt-700) 28%, transparent)",
+        fill: "color-mix(in srgb, {color.cobalt.700} 10%, transparent)",
+        fillHover: "color-mix(in srgb, {color.cobalt.700} 16%, transparent)",
+        track: "color-mix(in srgb, {color.cobalt.700} 28%, transparent)",
         /**
          * A reaction chip that is not the reader's: a neutral dark wash over `bg`, precomposed
          * (opaque), so the ring of its avatars matches it.
          */
-        chip: "color-mix(in srgb, var(--prime-ref-color-gray-925) 8%, var(--prime-ref-color-cobalt-100))",
-        chipHover:
-          "color-mix(in srgb, var(--prime-ref-color-gray-925) 12%, var(--prime-ref-color-cobalt-100))",
+        chip: "color-mix(in srgb, {color.gray.925} 8%, {color.cobalt.100})",
+        chipHover: "color-mix(in srgb, {color.gray.925} 12%, {color.cobalt.100})",
       },
     },
     /**
      * Data visualisation (foundation §3, SKILL/foundations.md «Charts»). Categories wear these,
      * statuses wear the tones.
      * - `1`…`8`: categorical series in one fixed order — blue, orange, teal, yellow, pink, green,
-     *   purple, red. Assign in order, never cycle; a ninth series folds into `other`. Palette hues
+     *   purple, red; each keeps 3:1 on every layer ground of its theme (`chartColors.test.ts`).
+     *   Assign in order, never cycle; a ninth series folds into `other`. Palette hues
      *   (`color` props) map onto the same steps (`--hue-chart`), so a category keeps its color in a
      *   chart and in a ProgressBar share.
      * - `other`: the «Прочее» share. `grid`: gridlines. `axis`: the axis line and ticks (axis
@@ -408,6 +411,11 @@ export const semanticTokens = {
     m: "{icon.20}",
     l: "{icon.24}",
     xl: "{icon.32}",
+    /**
+     * The one amplitude of an icon gesture (`src/icons/glyphMotion.module.css`): a step in the
+     * glyph's own 24-unit drawing, so it reads the same at every icon size.
+     */
+    gestureShift: "4px",
   },
 
   border: {
@@ -426,13 +434,16 @@ export const semanticTokens = {
 
   shadow: {
     /** Cards on canvas: a whisper, depth mostly comes from the fill. */
-    raised: "0 1px 2px rgba(17, 19, 24, 0.04)",
+    raised: "0 1px 2px color-mix(in srgb, {color.gray.925} 4%, transparent)",
     /** Menus, popovers, tooltips, datepicker. */
-    overlay: "0 0 0 1px rgba(17, 19, 24, 0.04), 0 12px 32px -8px rgba(17, 19, 24, 0.18)",
+    overlay:
+      "0 0 0 1px color-mix(in srgb, {color.gray.925} 4%, transparent), 0 12px 32px -8px color-mix(in srgb, {color.gray.925} 18%, transparent)",
     /** Modals and drawers. */
-    modal: "0 0 0 1px rgba(17, 19, 24, 0.04), 0 32px 64px -16px rgba(17, 19, 24, 0.30)",
+    modal:
+      "0 0 0 1px color-mix(in srgb, {color.gray.925} 4%, transparent), 0 32px 64px -16px color-mix(in srgb, {color.gray.925} 30%, transparent)",
     /** Slider thumb: one crisp outer edge plus a short contact shadow. */
-    thumb: "0 0 0 1px rgba(17, 19, 24, 0.08), 0 1px 3px rgba(17, 19, 24, 0.16)",
+    thumb:
+      "0 0 0 1px color-mix(in srgb, {color.gray.925} 8%, transparent), 0 1px 3px color-mix(in srgb, {color.gray.925} 16%, transparent)",
   },
 
   motion: {
@@ -464,12 +475,104 @@ export const semanticTokens = {
       scale: "0.98",
       scaleCompact: "0.96",
     },
+    /**
+     * Scale magnitudes. Below 1, where a part starts as it enters (and ends as it leaves);
+     * above 1, how far a part grows.
+     * - `mark`: a glyph or a dot drawn in place (a check, a swapped icon, a radio dot).
+     * - `pop`: a small part that pops in (a reaction, a button that appears in a row).
+     * - `settle`: a tile part or a disk that settles into place.
+     * - `enter`: a block entering in place (a bar, a bubble) — foundation §7 rule 7.
+     * - `lift`: a picked-up item (a drag source).
+     * - `hover`: a small target under a fine pointer (a swatch, a slider thumb).
+     * - `emphasis`: a glyph a pointer or focus singles out (a reaction).
+     * - `grab`: a thumb held by the pointer.
+     * - `burst`: the peak of a one-shot pick (a reaction chosen).
+     * - `pulse`: a ring that spreads out of a live mark and fades.
+     */
+    scale: {
+      mark: "0.6",
+      pop: "0.8",
+      settle: "0.9",
+      enter: "0.96",
+      lift: "1.02",
+      hover: "1.1",
+      emphasis: "1.2",
+      grab: "1.25",
+      burst: "1.4",
+      pulse: "2",
+    },
+    /**
+     * Fades and color changes (`opacity`, `color`, `background-color`, `box-shadow`…): the same
+     * clock as `duration`, but reduced motion keeps it (foundation §7 rule 12: movement may go,
+     * opacity and color feedback stay). Movement — `transform`, the height glide — takes `duration`.
+     */
+    fade: {
+      xfast: "{duration.150}",
+      fast: "{duration.230}",
+      base: "{duration.380}",
+      slow: "{duration.570}",
+    },
+    /**
+     * How long a hold-to-confirm press lasts (Button `holdToConfirm`): a gesture time, not motion,
+     * so reduced motion keeps it.
+     */
+    holdConfirm: "{duration.1200}",
   },
 
+  /**
+   * Stacking. `sticky`, `overlay` and `toast` are the page levels. The rest are local steps, in
+   * rising order, for the parts stacked inside one component; they never compete with the page.
+   * `below` a part drawn under its host's content, `base` the content's own level, then `raised`,
+   * `above`, `top`, `cover` and `front` for each part laid over the last: a hover wash or a handle
+   * is `raised`; the marks over a picture (play, duration, check) are `top`; a control spread over
+   * those marks is `cover`; a transfer in front of a whole tile is `front`. A component with sticky
+   * parts names them from the same steps (DataTable: first column, group row, header, corner).
+   */
   z: {
+    below: "{zIndex.below}",
+    base: "{zIndex.0}",
+    raised: "{zIndex.1}",
+    above: "{zIndex.2}",
+    top: "{zIndex.3}",
+    cover: "{zIndex.4}",
+    front: "{zIndex.5}",
     sticky: "{zIndex.sticky}",
     overlay: "{zIndex.overlay}",
     toast: "{zIndex.toast}",
+  },
+
+  /**
+   * Opacity of content that steps back while it stays in place.
+   * - `busy`: a change in flight (a save, a check, a reorder), a picture under a transfer, a target
+   *   that is full; the content quiets down and comes back when the answer arrives.
+   * - `disabled`: a color sample that cannot wear the disabled text color (a swatch).
+   * - `ghost`: the copy a drag source leaves at its place.
+   */
+  opacity: {
+    busy: "0.6",
+    disabled: "0.5",
+    ghost: "0.4",
+  },
+
+  /**
+   * Tint ladder: how much of a hue a wash takes (`color-mix(in srgb, <hue> var(--prime-tint-*),
+   * transparent)`). `faint` a whisper, `soft` a resting chip or selection, `hover` its hover,
+   * `active` its press or a selected chip, `line` a track or a ring, `strong` a fill that must read
+   * over pictures, `heavy` a near-solid edge.
+   */
+  tint: {
+    faint: "8%",
+    soft: "12%",
+    hover: "18%",
+    active: "24%",
+    line: "32%",
+    strong: "48%",
+    heavy: "72%",
+  },
+
+  /** Glass (`color.bg.glass`): how much the backdrop filter lifts the colors seen through it. */
+  glass: {
+    saturation: "1.8",
   },
 
   /**
@@ -654,8 +757,9 @@ export const semanticTokens = {
   },
 
   /**
-   * A media album (`Gallery`): the size cap of its box — an album is at most this wide, a lone
-   * portrait this tall — the narrowest it stands over a caption, and the gap between its tiles.
+   * A media album (`Gallery`, the pictures of a message): the size cap of its box — an album is at
+   * most this wide, a lone portrait this tall — the narrowest it stands over a caption, and the gap
+   * between its tiles.
    */
   gallery: {
     maxSize: "22.5rem",
@@ -665,10 +769,6 @@ export const semanticTokens = {
   },
 
   /**
-   * The full-screen media viewer (`MediaViewer`): the gap between two pages while one slides into
-   * the other, and the inset of its bars from the screen edges (the safe areas are added on top).
-   */
-  /**
    * A round disk over media (`--prime-color-media-disk`): the backdrop blur behind it — gentle,
    * so the frame under the disk stays recognisable.
    */
@@ -676,6 +776,19 @@ export const semanticTokens = {
     blur: "{space.1}",
   },
 
+  /**
+   * A shade over media that carries text (`--prime-color-media-shade` / `-pill`: a pill, a bar, a
+   * caption over a picture): the backdrop blur behind it — denser than the disk's, so the text
+   * keeps its ground over any frame.
+   */
+  mediaShade: {
+    blur: "{space.2}",
+  },
+
+  /**
+   * The full-screen media viewer (`MediaViewer`): the gap between two pages while one slides into
+   * the other, and the inset of its bars from the screen edges (the safe areas are added on top).
+   */
   mediaViewer: {
     pageGap: "{space.6}",
     inset: "{space.4}",
@@ -685,8 +798,8 @@ export const semanticTokens = {
 
   /**
    * Chat bubble geometry (`Message`): the corner radius (one on every corner of every bubble), the
-   * padding, the gap inside a group of one author and between groups,
-   * the width cap of a bubble, and the diameter of a video message.
+   * padding, the gap inside a group of one author and between groups, the width cap of a bubble.
+   * Its pictures are capped by `gallery.maxSize`.
    */
   message: {
     radius: "{radius.14}",
@@ -697,8 +810,10 @@ export const semanticTokens = {
     maxWidth: "30rem",
     /** The content width of a card in a bubble (file, contact, location): one width for all. */
     cardWidth: "16rem",
-    mediaMaxHeight: "22.5rem",
+    /** The round video a person is recording (the Composer preview). */
     videoNote: "14.5rem",
+    /** The box of a sent round video message (`VideoNote`): its diameter, at most the row. */
+    videoNoteBox: "16.75rem",
     /**
      * A message changing size (a reaction row, a transcript that opens): the bubble's box, its
      * parts and the messages around glide in one calm stroke, between `fast` and `base`; zeroed
@@ -877,6 +992,15 @@ export const semanticTokens = {
     cellPaddingX: "{space.3}",
   },
 
+  /**
+   * Page frame and content widths. The gutters are the side air of the page per viewport step;
+   * `globals.css` publishes the one that applies as `--prime-layout-gutter`.
+   * Content widths, for a block that holds its own width (a form, a column, a preview):
+   * - `tileMinWidth`: the narrowest column of an auto-fit grid of tiles.
+   * - `minWidth`: the narrowest screen the kit supports (320): a block that must fit everywhere.
+   * - `narrowWidth`: a phone-wide column (a feed, a list beside a pane).
+   * - `formWidthS` / `formWidthM`: a form of a few short fields / of wider fields.
+   */
   layout: {
     sidebarWidth: "15.5rem",
     sidebarCollapsedWidth: "{space.14}",
@@ -885,5 +1009,10 @@ export const semanticTokens = {
     gutterL: "{space.8}",
     contentMaxWidth: "75rem",
     readingMaxWidth: "42rem",
+    tileMinWidth: "12rem",
+    minWidth: "20rem",
+    narrowWidth: "22.5rem",
+    formWidthS: "27.5rem",
+    formWidthM: "35rem",
   },
 } as const;

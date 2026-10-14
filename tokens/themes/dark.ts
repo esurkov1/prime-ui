@@ -2,26 +2,14 @@
  * Dark theme. Not an inversion: the surface ladder rises in lightness from a near-black page
  * (`layers.ts`), accent and status colors move to lighter steps so text keeps WCAG AA on dark fills.
  */
+import { hueRef, hues } from "../hues";
 import { DARK_LAYERS, layerTokens } from "../layers";
+import type { PaletteRoles } from "../semantic";
 
-const hues = ["blue", "green", "orange", "red", "yellow", "purple", "sky", "pink", "teal"] as const;
-type Hue = (typeof hues)[number];
-const hueRef: Record<Hue, string> = {
-  blue: "cobalt",
-  green: "green",
-  orange: "orange",
-  red: "red",
-  yellow: "yellow",
-  purple: "purple",
-  sky: "sky",
-  pink: "pink",
-  teal: "teal",
-};
-
+/** Gray soft is mixed into the surface by `internal/palette.module.css` in both themes. */
 function darkPalette() {
-  const out: Record<string, { soft: string; text: string; solid: string; solidFg: string }> = {
+  const out: Record<string, PaletteRoles> = {
     gray: {
-      soft: "color-mix(in srgb, var(--prime-ref-color-gray-100) 12%, transparent)",
       text: "{color.gray.300}",
       solid: "{color.gray.300}",
       solidFg: "{color.gray.950}",
@@ -30,7 +18,7 @@ function darkPalette() {
   for (const hue of hues) {
     const r = hueRef[hue];
     out[hue] = {
-      soft: `color-mix(in srgb, var(--prime-ref-color-${r}-500) 16%, transparent)`,
+      soft: `color-mix(in srgb, {color.${r}.500} 16%, transparent)`,
       text: `{color.${r}.300}`,
       solid: `{color.${r}.400}`,
       solidFg: "{color.gray.950}",
@@ -44,18 +32,18 @@ export const darkThemeOverrides = {
     layer: layerTokens(DARK_LAYERS),
     bg: {
       inverse: "{color.gray.100}",
-      scrim: "rgba(0, 0, 0, 0.6)",
+      scrim: "color-mix(in srgb, {color.black} 60%, transparent)",
       /** Darker than the scrim's share: a shade on a 900 surface needs more ink to read. */
-      edgeShadow: "rgba(0, 0, 0, 0.5)",
-      glass: "color-mix(in srgb, var(--prime-ref-color-gray-875) 76%, transparent)",
-      glassEdge: "rgba(255, 255, 255, 0.28)",
+      edgeShadow: "color-mix(in srgb, {color.black} 50%, transparent)",
+      glass: "color-mix(in srgb, {color.gray.875} 76%, transparent)",
+      glassEdge: "color-mix(in srgb, {color.white} 28%, transparent)",
     },
     fill: {
-      subtle: "rgba(233, 235, 240, 0.05)",
-      subtleActive: "rgba(233, 235, 240, 0.09)",
-      faint: "rgba(233, 235, 240, 0.02)",
-      strong: "color-mix(in srgb, var(--prime-ref-color-gray-100) 16%, transparent)",
-      strongHover: "color-mix(in srgb, var(--prime-ref-color-gray-100) 22%, transparent)",
+      subtle: "color-mix(in srgb, {color.gray.100} 5%, transparent)",
+      subtleActive: "color-mix(in srgb, {color.gray.100} 9%, transparent)",
+      faint: "color-mix(in srgb, {color.gray.100} 2%, transparent)",
+      strong: "color-mix(in srgb, {color.gray.100} 16%, transparent)",
+      strongHover: "color-mix(in srgb, {color.gray.100} 22%, transparent)",
     },
     text: {
       primary: "{color.gray.100}",
@@ -77,14 +65,14 @@ export const darkThemeOverrides = {
       hover: "{color.cobalt.500}",
       fg: "{color.white}",
       soft: "{color.cobalt.950}",
-      softHover: "color-mix(in srgb, var(--prime-ref-color-cobalt-500) 28%, transparent)",
+      softHover: "color-mix(in srgb, {color.cobalt.500} 28%, transparent)",
       text: "{color.cobalt.400}",
     },
     danger: {
       default: "{color.red.600}",
       hover: "{color.red.500}",
       fg: "{color.white}",
-      soft: "color-mix(in srgb, var(--prime-ref-color-red-500) 16%, transparent)",
+      soft: "color-mix(in srgb, {color.red.500} 16%, transparent)",
       text: "{color.red.300}",
       border: "{color.red.400}",
     },
@@ -92,23 +80,23 @@ export const darkThemeOverrides = {
       default: "{color.green.400}",
       hover: "{color.green.300}",
       fg: "{color.gray.950}",
-      soft: "color-mix(in srgb, var(--prime-ref-color-green-500) 16%, transparent)",
+      soft: "color-mix(in srgb, {color.green.500} 16%, transparent)",
       text: "{color.green.300}",
     },
     warning: {
       default: "{color.orange.400}",
       fg: "{color.gray.950}",
-      soft: "color-mix(in srgb, var(--prime-ref-color-orange-500) 16%, transparent)",
+      soft: "color-mix(in srgb, {color.orange.500} 16%, transparent)",
       text: "{color.orange.300}",
     },
     info: {
       default: "{color.sky.400}",
       fg: "{color.gray.950}",
-      soft: "color-mix(in srgb, var(--prime-ref-color-sky-500) 16%, transparent)",
+      soft: "color-mix(in srgb, {color.sky.500} 16%, transparent)",
       text: "{color.sky.300}",
     },
     field: {
-      bgDisabled: "color-mix(in srgb, var(--prime-ref-color-gray-100) 4%, transparent)",
+      bgDisabled: "color-mix(in srgb, {color.gray.100} 4%, transparent)",
     },
     focus: {
       ring: "{color.cobalt.400}",
@@ -121,7 +109,7 @@ export const darkThemeOverrides = {
       bg: "{color.gray.100}",
       text: "{color.gray.925}",
       muted: "{color.gray.600}",
-      fill: "rgba(17, 19, 24, 0.08)",
+      fill: "color-mix(in srgb, {color.gray.925} 8%, transparent)",
     },
     palette: darkPalette(),
     /** The outgoing bubble is the accent itself in dark, as messengers do; text on it is light. */
@@ -133,13 +121,12 @@ export const darkThemeOverrides = {
         accent: "{color.white}",
         accentFg: "{color.cobalt.700}",
         danger: "{color.red.100}",
-        fill: "rgba(255, 255, 255, 0.14)",
-        fillHover: "rgba(255, 255, 255, 0.2)",
-        track: "rgba(255, 255, 255, 0.36)",
+        fill: "color-mix(in srgb, {color.white} 14%, transparent)",
+        fillHover: "color-mix(in srgb, {color.white} 20%, transparent)",
+        track: "color-mix(in srgb, {color.white} 36%, transparent)",
         /** A light wash over `bg`, precomposed (opaque) for the avatar ring. */
-        chip: "color-mix(in srgb, var(--prime-ref-color-white) 14%, var(--prime-ref-color-cobalt-700))",
-        chipHover:
-          "color-mix(in srgb, var(--prime-ref-color-white) 20%, var(--prime-ref-color-cobalt-700))",
+        chip: "color-mix(in srgb, {color.white} 14%, {color.cobalt.700})",
+        chipHover: "color-mix(in srgb, {color.white} 20%, {color.cobalt.700})",
       },
     },
     /** Own steps for the dark grounds, validated as a set; the scale rises from the ground. */
@@ -167,8 +154,10 @@ export const darkThemeOverrides = {
   },
   shadow: {
     raised: "none",
-    overlay: "0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 40px -8px rgba(0, 0, 0, 0.6)",
-    modal: "0 0 0 1px rgba(255, 255, 255, 0.06), 0 32px 72px -16px rgba(0, 0, 0, 0.75)",
-    thumb: "0 1px 3px rgba(0, 0, 0, 0.5)",
+    overlay:
+      "0 0 0 1px color-mix(in srgb, {color.white} 6%, transparent), 0 16px 40px -8px color-mix(in srgb, {color.black} 60%, transparent)",
+    modal:
+      "0 0 0 1px color-mix(in srgb, {color.white} 6%, transparent), 0 32px 72px -16px color-mix(in srgb, {color.black} 75%, transparent)",
+    thumb: "0 1px 3px color-mix(in srgb, {color.black} 50%, transparent)",
   },
 } as const;

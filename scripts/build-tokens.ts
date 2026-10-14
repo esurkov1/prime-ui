@@ -1,7 +1,16 @@
 /**
- * `bun run tokens:build` — `tokens/*.ts` → `src/styles/{tokens,theme-light,theme-dark}.css`.
+ * `bun run tokens:build` — `tokens/*.ts` → `src/styles/{tokens,theme-light,theme-dark}.css` and
+ * `src/internal/tokenDefaults.ts`.
  * Light is `semantic.ts` itself; dark is `semantic.ts` with `themes/dark.ts` laid over it, and its
  * file keeps only what differs from light.
+ *
+ * The source checks itself before anything is written:
+ * - every `{path}` reference — a whole value or one inside a `color-mix()` or a shadow — names a
+ *   primitive or a semantic token;
+ * - a semantic value holds no raw color and no `var()`: colors are references (the computed surface
+ *   ladder `color.layer` is the one exception);
+ * - every semantic length of a size, a padding or a gap is on the 4px grid, unless `OFF_GRID` names
+ *   it with its reason.
  */
 import { rename, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -31,19 +40,126 @@ const primitives = flatten(primitiveTokens);
 const semantic = flatten(semanticTokens);
 const darkOverrides = flatten(darkThemeOverrides);
 
+const errors: string[] = [];
+
 const unknown = Object.keys(darkOverrides).filter((key) => !(key in semantic));
 if (unknown.length > 0) {
-  throw new Error(`Dark theme overrides unknown semantic paths:\n- ${unknown.join("\n- ")}`);
+  errors.push(`Dark theme overrides unknown semantic paths:\n- ${unknown.join("\n- ")}`);
 }
 
-/** `{path}` → `var(--prime-ref-…)` (a primitive) or `var(--prime-…)` (a semantic token). */
+const REFERENCE = /\{([^{}]+)\}/g;
+
+/** Every `{path}` → `var(--prime-ref-…)` (a primitive) or `var(--prime-…)` (a semantic token). */
 function resolve(value: string): string {
-  const ref = /^\{(.+)\}$/.exec(value)?.[1];
-  if (ref === undefined) return value;
-  if (ref in primitives) return `var(${toVarName(ref, REF_PREFIX)})`;
-  if (ref in semantic) return `var(${toVarName(ref, SYS_PREFIX)})`;
-  throw new Error(`Unknown token reference: ${value}`);
+  return value.replace(REFERENCE, (match, ref: string) => {
+    if (ref in primitives) return `var(${toVarName(ref, REF_PREFIX)})`;
+    if (ref in semantic) return `var(${toVarName(ref, SYS_PREFIX)})`;
+    errors.push(`Unknown token reference: ${match}`);
+    return match;
+  });
 }
+
+/** A value with every reference replaced by its final literal (for the checks and JS defaults). */
+function literal(value: string, theme: FlatTokens = semantic): string {
+  return value.replace(REFERENCE, (match, ref: string) => {
+    if (ref in primitives) return literal(primitives[ref], theme);
+    if (ref in theme) return literal(theme[ref], theme);
+    return match;
+  });
+}
+
+// ─── Source checks ──────────────────────────────────────────────────────────
+
+/** The surface ladder is computed (OKLab, `layers.ts`): its colors are hex by design. */
+const COMPUTED = /^color\.layer\./;
+const RAW_COLOR = /var\(|#[0-9a-f]{3,8}\b|\b(rgba?|hsla?|oklch|oklab|lab|lch)\(/i;
+
+for (const [source, tokens] of [
+  ["semantic.ts", semantic],
+  ["themes/dark.ts", darkOverrides],
+] as const) {
+  for (const [key, value] of Object.entries(tokens)) {
+    if (COMPUTED.test(key)) continue;
+    if (RAW_COLOR.test(value)) {
+      errors.push(`${source} ${key}: a raw color or var() — write a {reference}: ${value}`);
+    }
+  }
+}
+
+/** A length the 4px grid governs: a size, a padding, a gap, an inset, an offset, a track. */
+function onGridKind(key: string): boolean {
+  const segments = key.split(".");
+  const last = segments[segments.length - 1];
+  // Type sizes and line heights follow the type scale (foundation §5); radii follow the nesting
+  // rule (§1 rule 5); a blur is a filter radius, not a box.
+  if (segments[0] === "font" || segments[0] === "text") return false;
+  if (/radius|blur|lineHeight|(text|label|hint)Size/i.test(last)) return false;
+  if (["space", "avatar", "icon"].includes(segments[0])) return true;
+  return /height|width|size|padding|gap|inset|offset|area|gutter|track|thumb|choice|icon|space|shift/i.test(
+    last,
+  );
+}
+
+/**
+ * The deliberate exceptions to the 4px grid (foundation §1 rule 2), each with its reason. A length
+ * named here that lands on the grid, or one off the grid missing from here, fails the build.
+ */
+const OFF_GRID: Record<string, string> = {
+  "border.width": "the 1px hairline",
+  "focus.width": "the 2px focus ring",
+  "focus.offset": "the 2px gap between a control and its ring",
+  "focus.offsetInset": "the ring drawn 2px inside a field's edge",
+  "icon.xs": "a 14px glyph: the icon scale meets the type scale at its smallest step",
+  "control.xs.icon": "the 14px glyph of the xs tier",
+  "control.xs.choice": "the 14px checkbox of the xs tier, paired with its 12px text",
+  "control.m.choice": "an 18px checkbox: the optical size next to 14px text",
+  "control.s.track": "a 5px line between the xs and m tracks",
+  "control.m.track": "a 6px line",
+  "control.l.track": "a 7px line between the m and xl tracks",
+  "badge.s.paddingX": "6px: the optical side air of a 20px chip with 12px text",
+  "badge.m.icon": "the 14px glyph of an m chip",
+  "badge.l.paddingX": "10px: the optical side air of a 28px chip with 13px text",
+  "bottomNav.floatingHeight": "46px: the iOS 26 tab bar at three quarters",
+  "bottomNav.floatingIconSize": "an 18px glyph in the floating capsule",
+  "bottomNav.floatingItemGap": "2px between the glyph and the 9px label",
+  "gallery.gap": "a 2px seam between the tiles of an album",
+  "tooltip.xs.paddingX": "6px: the side air of a 24px chip with 12px text",
+  "tooltip.s.paddingY": "6px: the block air that makes the s chip 28px",
+  "tooltip.m.paddingX": "10px: the side air of a 32px chip with 13px text",
+  "tooltip.m.paddingY": "6px: the block air that makes the m chip 32px",
+  "tooltip.arrowWidth": "a 10px arrow base",
+  "tooltip.arrowHeight": "a 5px arrow depth",
+};
+
+const px = (length: string): number | null => {
+  const match = /^(-?[\d.]+)(rem|px)$/.exec(length.trim());
+  if (!match) return null;
+  return Number(match[1]) * (match[2] === "rem" ? 16 : 1);
+};
+
+for (const [key, value] of Object.entries(semantic)) {
+  if (!onGridKind(key)) continue;
+  const length = px(literal(value));
+  if (length === null) continue;
+  const onGrid = length % 4 === 0;
+  if (!onGrid && !(key in OFF_GRID)) {
+    errors.push(
+      `${key} = ${length}px is off the 4px grid: put it on the grid or name it in OFF_GRID`,
+    );
+  }
+  if (onGrid && key in OFF_GRID) {
+    errors.push(`${key} = ${length}px is on the 4px grid: take it out of OFF_GRID`);
+  }
+}
+for (const key of Object.keys(OFF_GRID)) {
+  if (!(key in semantic)) errors.push(`OFF_GRID names a token that does not exist: ${key}`);
+}
+
+if (errors.length > 0) {
+  throw new Error(`Token source check failed:\n${errors.join("\n")}`);
+}
+
+// ─── CSS ────────────────────────────────────────────────────────────────────
 
 function cssBlock(selector: string, tokens: FlatTokens, prefix: string): string {
   const lines = Object.entries(tokens)
@@ -57,6 +173,49 @@ const darkOnly = Object.fromEntries(
   Object.entries(dark).filter(([key, value]) => semantic[key] !== value),
 );
 
+// ─── JS defaults ────────────────────────────────────────────────────────────
+
+/**
+ * Tokens that JS needs as a number before (or without) the CSS: a layer's exit timeout, an
+ * off-screen size estimate, a gesture clock. One theme-independent value each.
+ */
+const JS_DEFAULTS = [
+  "gallery.maxSize",
+  "message.videoNoteBox",
+  "motion.duration.base",
+  "motion.duration.fast",
+  "motion.duration.slow",
+  "motion.duration.xfast",
+  "motion.holdConfirm",
+  "panel.offset",
+  "space.2",
+  "space.6",
+];
+
+/** `230ms` → 230, `0.5rem` → 8 (px at the default root size), `24px` → 24. */
+function toNumber(key: string): number {
+  const value = literal(semantic[key]).trim();
+  const ms = /^([\d.]+)ms$/.exec(value);
+  if (ms) return Number(ms[1]);
+  const length = px(value);
+  if (length !== null) return length;
+  throw new Error(`JS_DEFAULTS: ${key} = ${value} is neither a duration nor a length`);
+}
+
+function tokenDefaultsModule(): string {
+  const lines = JS_DEFAULTS.map((key) => `  "${toVarName(key, SYS_PREFIX)}": ${toNumber(key)},`);
+  return `${HEADER}/**
+ * Token values as numbers at the default root size (16px): px for lengths, ms for durations. For
+ * JS that needs a token before the CSS can be read (server render, a test without the styles) or
+ * where a number must agree with the CSS (an off-screen estimate, a gesture clock). Live values
+ * come from the CSS (\`readCssLengthPx\`, \`readCssDurationMs\`), with these as their defaults.
+ */
+export const TOKEN_DEFAULTS = {
+${lines.join("\n")}
+} as const;
+`;
+}
+
 /**
  * Write to a temp file and rename over the target: a running dev server never reads a half-written
  * theme (a partial file drops tokens such as `--prime-control-m-gap` until the next reload, and
@@ -68,7 +227,8 @@ async function writeAtomic(file: string, content: string) {
   await rename(tmp, file);
 }
 
-const stylesDir = path.resolve(import.meta.dirname, "../src/styles");
+const srcDir = path.resolve(import.meta.dirname, "../src");
+const stylesDir = path.join(srcDir, "styles");
 await Promise.all([
   writeAtomic(path.join(stylesDir, "tokens.css"), cssBlock(":root", primitives, REF_PREFIX)),
   writeAtomic(
@@ -79,4 +239,5 @@ await Promise.all([
     path.join(stylesDir, "theme-dark.css"),
     cssBlock(':root[data-theme="dark"],\n[data-theme="dark"]', darkOnly, SYS_PREFIX),
   ),
+  writeAtomic(path.join(srcDir, "internal", "tokenDefaults.ts"), tokenDefaultsModule()),
 ]);
