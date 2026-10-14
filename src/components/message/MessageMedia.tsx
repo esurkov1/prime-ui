@@ -2,13 +2,11 @@ import { Gallery, type GalleryProps, galleryLayoutOf } from "@/components/galler
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 
 import styles from "./MessageMedia.module.css";
 
 export type MessageMediaProps = Omit<GalleryProps, "children">;
-
-/** `--prime-message-media-max-height` at the default root size, for the off-screen estimate. */
-const MEDIA_MAX_PX = 22.5 * 16;
 
 /**
  * A photo, a video or an album in a message: a `Gallery` the message shapes. Alone in a message
@@ -42,6 +40,7 @@ defineMessagePart(MessageMedia, {
   sized: true,
   estimate: ({ items }: MessageMediaProps) => {
     const { ratio, widthFactor } = galleryLayoutOf(items);
-    return (MEDIA_MAX_PX * widthFactor) / ratio;
+    // The gallery cap at the default root size.
+    return (TOKEN_DEFAULTS["--prime-gallery-max-size"] * widthFactor) / ratio;
   },
 });

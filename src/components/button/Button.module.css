@@ -43,9 +43,9 @@
   cursor: pointer;
   user-select: none;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -198,18 +198,18 @@
    color, so the button reads on any host fill; no solid treatment (the type forbids it). */
 .root[data-tone="inherit"] {
   --btn-fg: currentColor;
-  --btn-bg-hover: color-mix(in srgb, currentColor 12%, transparent);
-  --btn-bg-active: color-mix(in srgb, currentColor 18%, transparent);
+  --btn-bg-hover: color-mix(in srgb, currentColor var(--prime-tint-soft), transparent);
+  --btn-bg-active: color-mix(in srgb, currentColor var(--prime-tint-hover), transparent);
 }
 
 .root[data-tone="inherit"][data-variant="soft"] {
-  --btn-bg: color-mix(in srgb, currentColor 12%, transparent);
-  --btn-bg-hover: color-mix(in srgb, currentColor 18%, transparent);
-  --btn-bg-active: color-mix(in srgb, currentColor 24%, transparent);
+  --btn-bg: color-mix(in srgb, currentColor var(--prime-tint-soft), transparent);
+  --btn-bg-hover: color-mix(in srgb, currentColor var(--prime-tint-hover), transparent);
+  --btn-bg-active: color-mix(in srgb, currentColor var(--prime-tint-active), transparent);
 }
 
 .root[data-tone="inherit"][data-variant="outline"] {
-  --btn-line: color-mix(in srgb, currentColor 32%, transparent);
+  --btn-line: color-mix(in srgb, currentColor var(--prime-tint-line), transparent);
 }
 
 /* shade: the media disk ground — translucent, under a gentle blur, so the frame shows through —
@@ -303,11 +303,11 @@
 /* inherit stays on its host: a faded host color, the soft wash fades with it. */
 .root[data-tone="inherit"][data-disabled="true"] {
   --btn-bg: transparent;
-  --btn-fg: color-mix(in srgb, currentColor 48%, transparent);
+  --btn-fg: color-mix(in srgb, currentColor var(--prime-tint-strong), transparent);
 }
 
 .root[data-tone="inherit"][data-variant="soft"][data-disabled="true"] {
-  --btn-bg: color-mix(in srgb, currentColor 12%, transparent);
+  --btn-bg: color-mix(in srgb, currentColor var(--prime-tint-soft), transparent);
 }
 
 /* asChild: non-button hosts cannot be natively disabled. */
@@ -398,7 +398,7 @@
 .fillTrack {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: var(--prime-z-below);
   overflow: hidden;
   border-radius: inherit;
   pointer-events: none;
@@ -408,11 +408,11 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: color-mix(in srgb, var(--btn-fg) 18%, transparent);
+  background: color-mix(in srgb, var(--btn-fg) var(--prime-tint-hover), transparent);
   opacity: 0;
   translate: calc(var(--btn-fill-dir) * 100%) 0;
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit),
     translate 0s linear var(--prime-motion-duration-fast);
 }
 
@@ -421,20 +421,20 @@
   translate: calc(var(--btn-fill-dir) * (1 - var(--btn-progress)) * 100%) 0;
   transition:
     translate var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* A hold is a warning clock: a denser wash than progress, readable on soft danger in both themes. */
 .root[data-hold] .fill {
-  background: color-mix(in srgb, var(--btn-fg) 32%, transparent);
+  background: color-mix(in srgb, var(--btn-fg) var(--prime-tint-line), transparent);
 }
 
 .root[data-hold="holding"] .fill {
   opacity: 1;
   translate: 0 0;
   transition:
-    translate var(--btn-hold-duration) linear,
-    opacity var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
+    translate var(--prime-motion-hold-confirm) linear,
+    opacity var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
 .root:is([data-hold="done"], [data-hold="confirming"]) .fill {
@@ -457,7 +457,7 @@
 }
 
 .root > .ring {
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root > .ring[data-shown="false"] {

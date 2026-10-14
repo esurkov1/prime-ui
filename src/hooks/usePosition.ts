@@ -3,6 +3,7 @@ import * as React from "react";
 import { useAnchorRectResolver, useFloatingBoundaryResolver } from "@/internal/AnchorRectContext";
 import { getRootFontSizePx } from "@/internal/layoutPxFromPrimitives";
 import { getScrollContainers } from "@/internal/scrollAncestors";
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 
 export type PositionSide = "top" | "right" | "bottom" | "left";
 /** `auto` picks `start` or `end` by the room around the anchor (see `computeFloatingPosition`). */
@@ -31,8 +32,6 @@ const FLOAT_MAX_WIDTH_VAR = "--float-max-w";
 const FLOAT_ARROW_VAR = "--float-arrow";
 
 const MIN_MENU_ESTIMATE = 176;
-const FALLBACK_VIEWPORT_PAD_PX = 8;
-const FALLBACK_PANEL_OFFSET_PX = 4;
 /** Smallest scroll height of a panel on a very small viewport. */
 const MIN_FLOATING_MAX_HEIGHT = 120;
 /** Before the layer has a height, a `top` panel is placed with a rough guess; the next frame fixes it. */
@@ -62,7 +61,7 @@ export function readCssLengthPx(name: string, fallbackPx: number): number {
 
 /** Minimum distance from a floating panel to the viewport edge: `--prime-space-2`. */
 export function getViewportPadPx(): number {
-  return readCssLengthPx("--prime-space-2", FALLBACK_VIEWPORT_PAD_PX);
+  return readCssLengthPx("--prime-space-2", TOKEN_DEFAULTS["--prime-space-2"]);
 }
 
 export type ComputeFloatingOptions = {
@@ -122,7 +121,7 @@ export function computeFloatingPosition(
   opts: ComputeFloatingOptions,
 ): ComputedFloatPosition {
   const { align, offset, flip, matchAnchorWidth, arrowInset, boundary } = opts;
-  const pad = opts.viewportPad ?? FALLBACK_VIEWPORT_PAD_PX;
+  const pad = opts.viewportPad ?? TOKEN_DEFAULTS["--prime-space-2"];
   // The box to stay in: the viewport, or the boundary inside it.
   const minX = boundary ? Math.max(0, boundary.left) : 0;
   const minY = boundary ? Math.max(0, boundary.top) : 0;
@@ -280,7 +279,7 @@ export function usePosition(
       if (!anchor || !layer) return;
       if (remeasure || !metricsRef.current) {
         metricsRef.current = {
-          offset: readCssLengthPx(offsetToken, FALLBACK_PANEL_OFFSET_PX),
+          offset: readCssLengthPx(offsetToken, TOKEN_DEFAULTS["--prime-panel-offset"]),
           pad: getViewportPadPx(),
           arrow: arrowInset?.(layer),
         };

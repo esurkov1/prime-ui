@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
+
 export type UseSwipeDismissOptions = {
   enabled: boolean;
   onDismiss: () => void;
@@ -28,14 +30,13 @@ const NO_DRAG = "input, textarea, select, [contenteditable], [role='slider']";
 export const SWIPE_OFFSET_VAR = "--swipe-offset";
 
 /**
- * Farthest a panel moves against its closing direction (= `--prime-space-6`): the panel CSS
- * continues its fill this far past the screen edge, so it never comes away from the edge.
+ * A drag against the closing direction moves the panel ever more stiffly, never past
+ * `--prime-space-6`: the panel CSS continues its fill this far past the screen edge, so it never
+ * comes away from the edge.
  */
-const OVERPULL_PX = 24;
-
-/** A drag against the closing direction moves the panel ever more stiffly, never past the cap. */
 function rubberBand(distance: number): number {
-  return -OVERPULL_PX * (1 - 1 / (1 + Math.abs(distance) / OVERPULL_PX));
+  const cap = TOKEN_DEFAULTS["--prime-space-6"];
+  return -cap * (1 - 1 / (1 + Math.abs(distance) / cap));
 }
 
 /**

@@ -96,7 +96,7 @@ One look. The circle is the video; the play disk and the pills stand on the medi
 | transcript failed | `onTranscribe` rejects | the area closes, `onTranscriptExpandedChange(false)`, `labels.transcribeFailed` announced; the next open asks again |
 
 ## Layout & spacing
-- The circle is one square box: `min(--prime-message-video-note × 1.15, 100cqi)` wide with `aspect-ratio: 1`; everything in it fills it, so it stays a perfect circle at every width from 320px.
+- The circle is one square box: `min(--prime-message-video-note-box, 100cqi)` wide with `aspect-ratio: 1`; everything in it fills it, so it stays a perfect circle at every width from 320px.
 - The duration pill stands at the bottom-start corner, the message's meta pill at the bottom-end corner, the transcript button at the top-end corner of the square — where the circle leaves room — the place a voice message has it, at the end of its top row.
 - The duration and the meta read like a voice message's time row: the caption size and regular weight in the muted tone of the media pill (`--prime-color-media-pill-fg` on `--prime-color-media-pill`), AA over a white frame.
 - The transcript opens under the circle in a block of the message's fill (`--prime-message-padding-*`, `--prime-message-radius`). In a chat, opening and closing it is one motion of the message: the height and the width change together and the text fades in or out where it stands, the circle never moves. The text is selectable, and the chat search marks its matches in it.

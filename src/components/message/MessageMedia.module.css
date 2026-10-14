@@ -1,6 +1,6 @@
 /*
- * Message.Media — a Gallery shaped by its message. The gallery's cap is the media cap of a chat,
- * within 85% of the message row (the row is a size container, so the width never depends on the
+ * Message.Media — a Gallery shaped by its message. The gallery's own cap
+ * (`--prime-gallery-max-size`) is the media cap of a chat, within 85% of the message row (the row is a size container, so the width never depends on the
  * bubble that fits it). It draws no radius of its own: alone in a message the shell rounds and
  * clips it; with a caption the bubble does. The root is the positioned box of the message's meta
  * pill (the gallery's `children`). An album paints the neutral surface of an incoming message (its
@@ -8,8 +8,6 @@
  * never the outgoing fill.
  */
 .media.media {
-  --gallery-size: var(--prime-message-media-max-height);
-
   /* The media sets the bubble's width: the row (85cqi) is its limit, never the bubble, which it
      bleeds over — a caption wraps to it and never widens the bubble. */
   inline-size: min(calc(var(--gallery-size) * var(--gallery-factor, 1)), 85cqi);
