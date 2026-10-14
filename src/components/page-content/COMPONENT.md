@@ -253,7 +253,7 @@ One `PageContent.Title` (`<h1>`) per page; a topic inside Body is a `PageContent
 - Actions placed outside Header → put `PageContent.Actions` inside `PageContent.Header` so it aligns with the title and wraps.
 - Several `PageContent.Title` on one page → one `<h1>`; a topic of the page is a `PageContent.Section` with its `<h2>`.
 - A hand-made `<section>` + `Typography as="h2"` + own gap CSS → `PageContent.Section label`.
-- Each row of cards in its own auto-fit grid → the rows stand 24 apart instead of 16; put every tile of the screen in one `PageContent.Grid`.
+- Each row of cards in its own grid → the rows stand 24 apart instead of 16; put every tile of the screen in one `PageContent.Grid`.
 - Margins between blocks in Body → Body already sets the 24 gap and the 40 around a Section.
 - Computing a height from `100vh` minus the header for a full-height table or chat → `PageContent.Root fill` and a filling child.
 - A list + detail built with window media queries → `PageContent.Split` follows its own width.

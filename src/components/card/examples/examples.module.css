@@ -1,6 +1,9 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-14) * 4)), 1fr));
+  grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(100%, var(--prime-layout-tile-min-width)), 1fr)
+    );
   gap: var(--prime-space-4);
   width: 100%;
   min-width: 0;
