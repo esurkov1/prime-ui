@@ -1,6 +1,6 @@
 /*
  * Chip tiers (`--prime-badge-<tier>-*`: 16 · 20 · 24 · 28 · 32) shared by Badge and Kbd. Put
- * `.tier` on the element that carries `data-tier` (see components/badge/tier.ts); its CSS reads
+ * `.tier` on the element that carries `data-tier` (`useChipTier` in `chipTier.ts`); its CSS reads
  * `--chip-h`, `--chip-px`, `--chip-gap`, `--chip-radius`, `--chip-text`, and nested kit icons take
  * `--prime-icon-size`. No `data-tier` → `m`.
  */

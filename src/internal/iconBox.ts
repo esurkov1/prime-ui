@@ -11,4 +11,11 @@ export function iconBoxClass(size: ControlSize | undefined, tier: ControlSize | 
   return cx(styles.box, styles[size ?? tier ?? "m"], size === undefined && styles.inherit);
 }
 
+/**
+ * A slot that holds a glyph the kit does not draw (a raw `<svg>` of an app's own icon set): the
+ * svg takes the host's `--prime-icon-size`, like a kit `Icon` in the same place. A kit `Icon`
+ * keeps its own box (the slot rule has no specificity).
+ */
+export const iconSlotClass: string = styles.slot;
+
 export { styles as iconBoxStyles };

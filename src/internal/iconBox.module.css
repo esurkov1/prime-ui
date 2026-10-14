@@ -50,6 +50,13 @@
   --icon-box: var(--prime-icon-size, var(--prime-control-xl-icon));
 }
 
+/* A glyph slot (`iconSlotClass`): a raw svg in it takes the host icon size. */
+:where(.slot) > :where(svg) {
+  flex: 0 0 auto;
+  width: var(--prime-icon-size);
+  height: var(--prime-icon-size);
+}
+
 /*
  * The icon tile: a 40px filled box of a role around one glyph — the mark of a dialog header
  * (Modal / Drawer / Sheet `Icon`) or a sign-in form. Put `.tile` on the box and the role in

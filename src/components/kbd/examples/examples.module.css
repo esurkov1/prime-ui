@@ -16,22 +16,3 @@
   gap: var(--prime-space-3);
   width: min(100%, var(--prime-layout-form-width-s));
 }
-
-/* shortcut-list.tsx: action left, keys right. */
-.list {
-  display: grid;
-  gap: var(--prime-space-3);
-  width: min(100%, var(--prime-layout-form-width-s));
-  margin: 0;
-}
-
-.listRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-4);
-}
-
-.listRow dd {
-  margin: 0;
-}
