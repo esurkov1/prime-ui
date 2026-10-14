@@ -6,6 +6,8 @@ import { Crossfade } from "@/components/crossfade/Crossfade";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Typography } from "@/components/typography/Typography";
+import { REDUCED_MOTION_QUERY } from "@/hooks/breakpoints";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Icon } from "@/icons";
 
 import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
@@ -95,21 +97,9 @@ function EasingCurve({ name, value }: { name: string; value: string }) {
   );
 }
 
-function useReducedMotion(): boolean {
-  const [reduced, setReduced] = React.useState(false);
-  React.useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduced(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return reduced;
-}
-
 function useLiveVar(varName: string): string {
   const [value, setValue] = React.useState("");
-  const reduced = useReducedMotion();
+  const reduced = useMediaQuery(REDUCED_MOTION_QUERY);
   // biome-ignore lint/correctness/useExhaustiveDependencies: `reduced` changes the computed value
   React.useEffect(() => {
     setValue(getComputedStyle(document.documentElement).getPropertyValue(varName).trim());
@@ -416,7 +406,7 @@ const FREQUENCY_COLUMNS: DataTableColumn<FrequencyRow>[] = [
 ];
 
 export default function MotionPage() {
-  const reduced = useReducedMotion();
+  const reduced = useMediaQuery(REDUCED_MOTION_QUERY);
   return (
     <DocPage
       title="Движение"
@@ -562,8 +552,9 @@ export default function MotionPage() {
             </Typography>
             . При <code>prefers-reduced-motion: reduce</code> файл <code>globals.css</code> обнуляет
             все <code>--prime-motion-duration-*</code> и <code>--prime-motion-stagger</code>, а{" "}
-            <code>--prime-motion-press-scale*</code> становится 1 — CSS-переходы срабатывают
-            мгновенно, кнопки не сжимаются.
+            <code>--prime-motion-press-scale*</code> становится 1 — перемещения срабатывают
+            мгновенно, кнопки не сжимаются. Затухания на <code>--prime-motion-fade-*</code>{" "}
+            остаются: смена прозрачности и цвета не укачивает, а отклик состояния виден.
           </>
         }
       >

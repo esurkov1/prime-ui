@@ -1,5 +1,3 @@
 [
-  "src/components/command-menu/examples/states.tsx: names no `loading`",
-  "src/components/data-table/examples/controlled.tsx: names no `onHiddenColumnsChange`",
-  "src/components/example-frame/examples/controlled.tsx: names no `onViewportChange`"
+  "src/components/command-menu/examples/states.tsx: names no `loading`"
 ]

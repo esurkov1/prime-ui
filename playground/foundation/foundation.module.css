@@ -538,7 +538,7 @@
    paint over the menu's shadow where it overlaps the card. */
 .layerMenu {
   position: relative;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   display: grid;
   gap: 0;
   align-self: start;

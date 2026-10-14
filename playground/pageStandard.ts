@@ -232,31 +232,44 @@ export const PROP_SLOTS: { props: string[]; slot: SlotId }[] = [
 
 export type SlotRequirement = {
   slot: SlotId;
-  /** `kind` when the kind requires it, else the root prop that does. */
+  /** `kind` when the kind requires it, else the first root prop that does. */
   by: string;
+  /**
+   * The root props the slot's example may name to show why it is there: every prop that requires
+   * the slot (`disabled` or `loading` for states; `x` or `onXChange` of every triad for
+   * controlled). Empty when the kind requires the slot.
+   */
+  shownBy: string[];
 };
 
 /**
- * Every slot a page of `kind` must have, with the reason (the kind or the root prop). A triad on
+ * Every slot a page of `kind` must have, with the reason (the kind or the root props). A triad on
  * the root (`x` / `defaultX` / `onXChange`, scanned like the API vocabulary) requires
  * `controlled-open` for `open` and `controlled` for any other state.
  */
 export function requiredSlots(kind: PageKind, root: ApiPart | undefined): SlotRequirement[] {
   const rootProps = (root?.props ?? []).map((prop) => prop.name);
-  const required = new Map<SlotId, string>();
+  const required = new Map<SlotId, SlotRequirement>();
   for (const entry of KIND_SLOTS[kind]) {
-    if (entry.required && entry.slot !== SCENARIOS) required.set(entry.slot, "kind");
+    if (entry.required && entry.slot !== SCENARIOS) {
+      required.set(entry.slot, { slot: entry.slot, by: "kind", shownBy: [] });
+    }
   }
+  const requireBy = (slot: SlotId, props: string[]) => {
+    const current = required.get(slot);
+    if (current?.by === "kind") return;
+    if (current) current.shownBy.push(...props);
+    else required.set(slot, { slot, by: props[0], shownBy: [...props] });
+  };
   for (const { props, slot } of PROP_SLOTS) {
-    const prop = props.find((name) => rootProps.includes(name));
-    if (prop && !required.has(slot)) required.set(slot, prop);
+    const present = props.filter((name) => rootProps.includes(name));
+    if (present.length > 0) requireBy(slot, present);
   }
   for (const state of root ? triadsOf(root) : []) {
     const slot: SlotId = state === "open" ? "controlled-open" : "controlled";
-    const by = `on${state.charAt(0).toUpperCase()}${state.slice(1)}Change`;
-    if (!required.has(slot)) required.set(slot, by);
+    requireBy(slot, [`on${state.charAt(0).toUpperCase()}${state.slice(1)}Change`, state]);
   }
-  return [...required].map(([slot, by]) => ({ slot, by }));
+  return [...required.values()];
 }
 
 /** The preview layouts a kind's pages use: what a component-specific scenario may pick. */

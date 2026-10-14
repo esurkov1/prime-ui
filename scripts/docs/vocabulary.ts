@@ -10,7 +10,6 @@ export const RENAMED = {
   parts: {} as Record<string, string>,
   /** `Part.prop` (or `*.prop` for every part) → the canonical name. */
   props: {
-    "*.type": "`multiple` for one vs many (a `type` prop names no selection mode)",
     "*.fillWidth": "`fullWidth`",
     "*.leadingIcon": "an `X.Icon` part",
     "*.trailingIcon": "an `X.Icon` part after the label",
@@ -26,6 +25,19 @@ export const RENAMED = {
     error: "`danger` (a status tone)",
     active: "`current`",
   } as Record<string, string>,
+};
+
+/**
+ * A literal union holding `multiple` is a selection mode spelled as an enum: one vs many is the
+ * `multiple?: boolean` flag (CLAUDE.md §1, selection mode). A `mode` that is
+ * structurally different (Datepicker `single | range`) holds no `multiple`.
+ */
+export const SELECTION_MODE_VALUE = "multiple";
+
+/** `Part.prop` names the rules above would rename, kept on purpose — each with its reason. */
+export const KEPT: Record<string, string> = {
+  "NotificationCard.icon":
+    "the static rendering of a `notify()` record, whose `icon` is data (CLAUDE.md §1 icons)",
 };
 
 /** Event props beyond the triads (`onXChange`) and native DOM events, each with one meaning. */
