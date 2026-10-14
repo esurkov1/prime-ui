@@ -111,7 +111,7 @@ PageToolbar has no variants: the layout follows the toolbar's width.
 No keyboard interaction.
 
 ### ARIA
-- A plain `<div>`: name it with `aria-label` when a page has more than one panel.
+- A plain `<div>`: when a page has more than one panel, give each `role="group"` and an `aria-label` (a name on a `<div>` without a role is ignored by assistive tech).
 - Slots move only visually (`order`); the Tab order is the JSX order. Write the slots in the reading order of the wide layout — Tools, Sections, View, Actions, Chips. In the narrow layout the action is shown beside the tools but reached after the view.
 - An icon-only primary action on a narrow page carries `aria-label`.
 

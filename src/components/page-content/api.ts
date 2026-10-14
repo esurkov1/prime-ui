@@ -133,6 +133,13 @@ export const api: ComponentApi = {
           ru: "Строка пояснения под заголовком, вторичным body-s.",
         },
         {
+          name: "layout",
+          type: '"stack" | "aside"',
+          default: '"stack"',
+          en: "`stack` — the heading over the content; `aside` — a ~16rem heading column beside it (a settings page), above it once the content would get narrower than 30rem.",
+          ru: "`stack` — заголовок над содержимым; `aside` — колонка заголовка ~16rem рядом с ним (страница настроек), над ним, когда содержимому осталось бы меньше 30rem.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "title">',
           en: "`children` (the content; `PageContent.Actions` goes to the heading row), `className` and the other section attributes.",

@@ -218,7 +218,7 @@
 }
 
 .root[data-interactive="true"]:active {
-  transform: scale(0.98);
+  transform: scale(var(--prime-motion-press-scale));
 }
 
 /* Selected: an accent ring over the picture (above the image, like `ring`). */

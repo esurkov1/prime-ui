@@ -477,7 +477,7 @@ function CommandMenuInput({
 
   return (
     <div className={cx(menu.searchRow, styles.inputRow)} data-focus-ring="false">
-      <Icon name="action.search" size="m" />
+      <Icon name="action.search" />
       <input
         {...rest}
         type="search"

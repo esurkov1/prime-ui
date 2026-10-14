@@ -108,6 +108,7 @@ PageContent.Root | PageContent.Page        column; Root adds maxWidth and fill, 
 |---|---|---|---|
 | `label` | `ReactNode` | — (required) | The visible heading (`h2`); it also names the section. |
 | `description` | `ReactNode` | — | One line of context under the heading, in secondary body-s. |
+| `layout` | `"stack" \| "aside"` | `"stack"` | `stack` — the heading over the content; `aside` — a ~16rem heading column beside it (a settings page), above it once the content would get narrower than 30rem. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title">` | — | `children` (the content; `PageContent.Actions` goes to the heading row), `className` and the other section attributes. |
 
 ### PageContent.Grid
