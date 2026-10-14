@@ -55,15 +55,29 @@ export const api: ComponentApi = {
     },
     {
       name: "Label.Icon",
-      en: "`ref` → `HTMLSpanElement`. A muted, non-shrinking icon slot (`aria-hidden`) before the text; kit icons take the label size. Native `<span>` props.",
-      ru: "Приглушённая иконка перед текстом (`aria-hidden`); иконки кита берут размер подписи.",
-      props: [],
+      en: "`ref` → `HTMLSpanElement`. A muted, non-shrinking icon slot (`aria-hidden`) before the text; kit icons take the label size.",
+      ru: "Приглушённый несжимаемый слот `<span>` иконки (`aria-hidden`) перед текстом; иконки кита берут размер подписи.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children`, `className` and the other span attributes.",
+          ru: "`children`, `className` и остальные атрибуты span.",
+        },
+      ],
     },
     {
       name: "Label.Description",
-      en: "`ref` → `HTMLSpanElement`. Regular-weight muted text in the same line (units, context); part of the accessible name. Native `<span>` props.",
-      ru: "Приглушённое уточнение в той же строке (единицы, контекст); входит в имя поля.",
-      props: [],
+      en: "`ref` → `HTMLSpanElement`. Regular-weight muted text in the same line (units, context); part of the accessible name.",
+      ru: "Приглушённый `<span>` обычного начертания в той же строке (единицы, контекст); входит в доступное имя.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children`, `className` and the other span attributes.",
+          ru: "`children`, `className` и остальные атрибуты span.",
+        },
+      ],
     },
   ],
   labels: labelRows(LABEL_LABELS, {
@@ -77,7 +91,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'Bind with `htmlFor` to a native control, or set `id` on the label and `aria-labelledby` on a custom control (a `role="radiogroup"`, a `fieldset` of cells).',
-        ru: "Свяжите подпись с нативным контролом через `htmlFor`, с кастомным — через `id` и `aria-labelledby` на контроле.",
+        ru: 'Свяжите подпись с нативным контролом через `htmlFor`, с кастомным (`role="radiogroup"`, `fieldset` из ячеек) — через `id` на подписи и `aria-labelledby` на контроле.',
       },
       {
         en: "The `*` is `aria-hidden`; requiredness must come from the control (`required`).",
@@ -85,7 +99,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The optional marker and `Label.Description` are visible text and part of the accessible name; `Label.Icon` is `aria-hidden`.",
-        ru: "Пометка «необязательно» и `Label.Description` — видимый текст и входят в имя поля; `Label.Icon` скрыт.",
+        ru: "Пометка «необязательно» и `Label.Description` — видимый текст и входят в имя поля; `Label.Icon` — `aria-hidden`.",
       },
     ],
   },

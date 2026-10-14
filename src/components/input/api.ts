@@ -67,19 +67,19 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger inset ring on the field, `aria-invalid` on the input. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо, `aria-invalid`, `data-invalid`. Непустой `error` включает его.",
+          ru: "Красное внутреннее кольцо на поле, `aria-invalid` на input. Непустой `error` включает его.",
         },
         {
           name: "focusRing",
           type: "boolean",
           default: "true",
           en: '`false` hides only the visual focus ring on `Input.Wrapper` (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay.',
-          ru: '`false` скрывает только кольцо фокуса; фокус, клавиатура, ARIA и кольцо ошибки остаются. Атрибут — `data-focus-ring="false"`.',
+          ru: '`false` скрывает только кольцо фокуса на `Input.Wrapper` (`data-focus-ring="false"`); фокус, клавиатура, ARIA и кольцо ошибки остаются.',
         },
         {
           name: "counter",
           type: "ReactNode",
-          en: "Right side of the support row, usually `<Input.Counter />`.",
+          en: "Right side of the support row, usually `<Input.Counter current max />`.",
           ru: "Правая часть строки поддержки, обычно `<Input.Counter current max />`.",
         },
         {
@@ -93,7 +93,7 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the `<input>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Явный id поля; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
+          ru: "Id `<input>`; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "strength",
@@ -154,7 +154,7 @@ export const api: ComponentApi = {
     {
       name: "Input.Field",
       en: "`ref` → `HTMLInputElement`. The native `<input>`; `id`, `aria-invalid` and `aria-describedby` come from the root, `disabled` also from a disabled `Fieldset` around it.",
-      ru: "Нативный `<input>` с id, aria-связями и `aria-invalid` из контекста; `disabled` — также от неактивного `Fieldset` вокруг.",
+      ru: "Нативный `<input>`; `id`, `aria-invalid` и `aria-describedby` приходят от корня; `disabled` — также от неактивного `Fieldset` вокруг.",
       props: [
         {
           name: "onValueChange",
@@ -178,7 +178,7 @@ export const api: ComponentApi = {
           name: "…rest",
           type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "id">',
           en: "`value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`…",
-          ru: "`value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`…",
+          ru: "`value`, `defaultValue`, `onChange`, `type`, `disabled`, `readOnly`, `maxLength`, `placeholder`…",
         },
       ],
     },
@@ -248,13 +248,13 @@ export const api: ComponentApi = {
     {
       name: "Input.ClearButton",
       en: "`ref` → `HTMLButtonElement`. A full-height clear segment at the end edge, named by `labels.clear`, with `aria-controls` on the input. Render it only while the field has a value.",
-      ru: "Сегмент очистки на всю высоту поля у конца. Рендерите его, только пока есть значение.",
+      ru: "Сегмент очистки на всю высоту поля у конца, с именем `labels.clear` и `aria-controls` на input. Рендерите его, только пока есть значение.",
       props: [
         {
           name: "onClick",
           type: "MouseEventHandler<HTMLButtonElement>",
           en: "Clear the value here. Afterwards focus returns to the input unless `event.preventDefault()` was called.",
-          ru: "Очистите значение здесь; затем фокус вернётся в поле (если не вызван `preventDefault`).",
+          ru: "Очистите значение здесь; затем фокус вернётся в поле, если не вызван `event.preventDefault()`.",
         },
         {
           name: "…rest",
@@ -271,7 +271,7 @@ export const api: ComponentApi = {
     {
       name: "Input.RevealButton",
       en: '`ref` → `HTMLButtonElement`. A full-height toggle segment that shows a `type="password"` field as text and back (`aria-pressed`, named by `labels.reveal`); the focus, caret and selection stay in the field.',
-      ru: "Сегмент-переключатель, который показывает пароль текстом и прячет обратно (`aria-pressed`, имя `labels.reveal`); фокус, курсор и выделение остаются в поле.",
+      ru: 'Сегмент-переключатель, который показывает поле `type="password"` текстом и прячет обратно (`aria-pressed`, имя `labels.reveal`); фокус, курсор и выделение остаются в поле.',
       props: [
         {
           name: "…rest",
@@ -302,7 +302,7 @@ export const api: ComponentApi = {
           type: "number",
           required: true,
           en: 'Limit; `current > max` turns the counter danger (`data-invalid="true"`).',
-          ru: "Лимит; при `current > max` счётчик красный (`data-invalid`).",
+          ru: 'Лимит; при `current > max` счётчик красный (`data-invalid="true"`).',
         },
         {
           name: "…rest",
@@ -364,7 +364,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "`label` renders a `<label htmlFor>` bound to the input. Without `label`, set `aria-label` on `Input.Field`. A placeholder never replaces the label.",
-        ru: "`label` — настоящий `<label htmlFor>`; без него задайте `aria-label` на `Input.Field`. Плейсхолдер не заменяет подпись.",
+        ru: "`label` — настоящий `<label htmlFor>`, связанный с input; без `label` задайте `aria-label` на `Input.Field`. Плейсхолдер не заменяет подпись.",
       },
       {
         en: 'Hint and error are linked through `aria-describedby`; the error replaces the hint and sets `aria-invalid="true"`.',
@@ -380,19 +380,19 @@ export const api: ComponentApi = {
       },
       {
         en: "`Input.Action` and `Input.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied` through a polite live region.",
-        ru: "`Input.Action` и `Input.CopyButton` — кнопки с именем и подсказкой; копирование объявляет `labels.copied` через живой регион.",
+        ru: "`Input.Action` и `Input.CopyButton` — кнопки (или ссылка с `asChild`) с именем из подписи и подсказкой; копирование объявляет `labels.copied` через вежливую live-область.",
       },
       {
         en: "`Input.RevealButton` is a toggle: a constant name `labels.reveal`, `aria-pressed` and `aria-controls` on the input; a pointer press keeps the focus in the field.",
-        ru: "`Input.RevealButton` — переключатель с `aria-pressed` и постоянным именем `labels.reveal`.",
+        ru: "`Input.RevealButton` — переключатель: постоянное имя `labels.reveal`, `aria-pressed` и `aria-controls` на input; нажатие указателем оставляет фокус в поле.",
       },
       {
         en: 'With `onCommit` the input carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.',
-        ru: "С `onCommit` поле ставит `aria-busy`, пока идёт сохранение, а живой регион говорит `labels.saving` и `labels.saved`.",
+        ru: 'С `onCommit` поле ставит `aria-busy="true"`, пока идёт сохранение, а вежливая live-область говорит `labels.saving`, затем `labels.saved`.',
       },
       {
         en: '`Input.Counter` shows `14/40` visually and announces `labels.counter` through `aria-live="polite"`.',
-        ru: '`Input.Counter` показывает «14/40», а скринридер читает `labels.counter` через `aria-live="polite"`.',
+        ru: '`Input.Counter` показывает `14/40`, а скринридер читает `labels.counter` через `aria-live="polite"`.',
       },
     ],
   },

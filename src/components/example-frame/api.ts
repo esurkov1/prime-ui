@@ -133,7 +133,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "The pane and device switches are radio groups named by `labels.paneSwitch` and `labels.viewportSwitch`.",
-        ru: "Переключатели вида и ширины — радиогруппы с `aria-label` из `labels.paneSwitch` и `labels.viewportSwitch`.",
+        ru: "Переключатели вида и ширины — радиогруппы с именами из `labels.paneSwitch` и `labels.viewportSwitch`.",
       },
       {
         en: "The theme and copy buttons are icon-only Buttons with `aria-label`; after copying the label becomes `labels.copied`.",

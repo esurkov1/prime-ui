@@ -118,7 +118,6 @@ export type MessageContactProps = Omit<React.HTMLAttributes<HTMLDivElement>, "co
   src?: string;
   /** Hue of the initials. Default `blue`. */
   color?: PaletteColor;
-  /** Actions under the card: `Button.Root`s («Написать», «Добавить»). */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };

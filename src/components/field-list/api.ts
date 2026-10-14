@@ -192,7 +192,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "The rows are an `<ol>` named by the list `label` (`aria-labelledby`); the list gives each row its position.",
-        ru: "Строки — `<ol>`, названный подписью списка (`label`); номер строки даёт сам список.",
+        ru: "Строки — `<ol>`, названный подписью списка `label` (`aria-labelledby`); номер строки даёт сам список.",
       },
       {
         en: "The heading row is `aria-hidden`: each field in a cell carries its column heading as its own label, read but not shown on wide rows.",
@@ -208,7 +208,7 @@ export const api: ComponentApi = {
       },
       {
         en: "A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is an image named «Закреплена».",
-        ru: "Закреплённая строка — замок вместо ручки, без кнопки удаления; в списке без перестановки замок назван «Закреплена».",
+        ru: "Закреплённая строка — замок вместо ручки, без кнопки удаления; без `reorderable` замок — изображение с именем «Закреплена».",
       },
     ],
   },

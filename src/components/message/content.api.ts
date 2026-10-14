@@ -143,10 +143,16 @@ export const contentParts: ApiPart[] = [
         ru: "Цвет инициалов.",
       },
       {
+        name: "children",
+        type: "ReactNode",
+        en: "`Button.Root` actions in a row under the person («Написать», «Добавить»).",
+        ru: "Действия `Button.Root` строкой под контактом («Написать», «Добавить»).",
+      },
+      {
         name: "…rest",
         type: 'Omit<HTMLAttributes<HTMLDivElement>, "color">',
-        en: "`children` — `Button.Root` actions («Написать», «Добавить»); `className`.",
-        ru: "`children` — действия `Button.Root` («Написать», «Добавить»); `className`.",
+        en: "`className` and the other div attributes.",
+        ru: "`className` и остальные атрибуты div.",
       },
     ],
   },

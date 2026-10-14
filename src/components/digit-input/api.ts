@@ -26,7 +26,7 @@ export const api: ComponentApi = {
           name: "label",
           type: "ReactNode",
           en: "Label above the cells; names the group (`aria-labelledby`) and focuses the first cell on click. Without it the group is named by `labels.group`.",
-          ru: "Подпись над ячейками; называет группу и по клику фокусирует первую ячейку. Без неё имя — `labels.group`.",
+          ru: "Подпись над ячейками; называет группу (`aria-labelledby`) и по клику фокусирует первую ячейку. Без неё имя — `labels.group`.",
         },
         {
           name: "required",
@@ -166,7 +166,7 @@ export const api: ComponentApi = {
   labels: labelRows(DIGIT_INPUT_LABELS, {
     group: {
       en: "Accessible name of the group when there is no visible `label`.",
-      ru: "Имя группы, когда нет видимой подписи.",
+      ru: "Имя группы, когда нет видимой `label`.",
     },
     cell: {
       en: "Accessible name of each cell; `{index}` (1-based) and `{length}` are replaced.",
@@ -208,7 +208,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'The cells sit in a `<fieldset>` (`role="group"`) named by the `label` (`aria-labelledby`) or `labels.group`; clicking the label focuses the first cell.',
-        ru: 'Ячейки — в `<fieldset>` (`role="group"`), названном подписью (`aria-labelledby`) или `labels.group`; клик по подписи фокусирует первую ячейку.',
+        ru: 'Ячейки — в `<fieldset>` (`role="group"`), названном `label` (`aria-labelledby`) или `labels.group`; клик по подписи фокусирует первую ячейку.',
       },
       {
         en: 'Each cell is named by `labels.cell` («Цифра 1 из 6») and has `autocomplete="one-time-code"` and `inputmode="numeric"`, so SMS codes are suggested on phones.',
@@ -220,7 +220,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While a code is checked the group has `aria-busy`; the reason of a refused code is spoken by a polite live region.",
-        ru: "Пока код проверяется (промис из `onComplete`), у группы `aria-busy`, ячейки только для чтения; причина отказа объявляется вежливой live-областью.",
+        ru: "Пока код проверяется, у группы `aria-busy`; причина отказа объявляется вежливой live-областью.",
       },
       {
         en: "Paste and autofill of the whole code into any cell fill all cells.",

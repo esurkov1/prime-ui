@@ -26,7 +26,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: 'Renders `<a role="link" aria-disabled="true" tabIndex={-1}>` without `href` and swallows the click; `id`, `aria-*` and the other native props stay.',
-          ru: 'Рендерит `<a role="link" aria-disabled="true">` без `href`, вне порядка Tab и без клика; `id`, `aria-*` и прочие атрибуты сохраняются.',
+          ru: 'Рендерит `<a role="link" aria-disabled="true" tabIndex={-1}>` без `href` и гасит клик; `id`, `aria-*` и прочие атрибуты сохраняются.',
         },
         {
           name: "asChild",
@@ -71,7 +71,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'The disabled state is a non-focusable `<a role="link" aria-disabled="true">` without `href`; it keeps `id` and `aria-*`.',
-        ru: 'Неактивная ссылка — `<a role="link" aria-disabled="true">` без `href`, вне порядка фокуса.',
+        ru: 'Неактивная ссылка — нефокусируемая `<a role="link" aria-disabled="true">` без `href`; она сохраняет `id` и `aria-*`.',
       },
       {
         en: "With `asChild` the child gives the role and name: a router link, or a `<button>` for an action.",

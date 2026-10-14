@@ -169,7 +169,7 @@ export const PART_REFS = {
   "EmptyPage.Root": ["HTMLDivElement"],
   "EmptyPage.Icon": ["HTMLDivElement"],
   "EmptyPage.Title": ["Element"],
-  "EmptyPage.Description": ["Element"],
+  "EmptyPage.Description": ["HTMLParagraphElement"],
   "EmptyPage.Actions": ["HTMLDivElement"],
   "EmptyPage.RetryButton": ["HTMLButtonElement"],
   ExampleFrame: ["HTMLDivElement"],

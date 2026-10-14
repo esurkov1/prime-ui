@@ -357,7 +357,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "The field is a `<button>` named by the label and the value (or `aria-label` + value); hint and error in `aria-describedby`, an error sets `aria-invalid`.",
-        ru: "Поле — кнопка с именем из подписи и значения; подсказка и ошибка — в `aria-describedby`, ошибка ставит `aria-invalid`.",
+        ru: "Поле — `<button>` с именем из подписи и значения (или `aria-label` и значения); подсказка и ошибка — в `aria-describedby`, ошибка ставит `aria-invalid`.",
       },
       {
         en: 'The popover is a `role="dialog"` with a focus trap; focus lands on the picked or today\'s day.',
@@ -369,7 +369,7 @@ export const api: ComponentApi = {
       },
       {
         en: "One polite live region announces the visible months («Сентябрь 2026 — Октябрь 2026») when they change; the step prompt is a polite live region too; on open the popover focuses the picked (or today's) day (`data-autofocus`); presets are a named group of buttons with `aria-pressed`.",
-        ru: "Заголовок месяца и подсказка шага — вежливые live-области; пресеты — группа кнопок с `aria-pressed`.",
+        ru: "Одна вежливая live-область объявляет видимые месяцы («Сентябрь 2026 — Октябрь 2026») при смене; подсказка шага — тоже вежливая live-область; при открытии поповер ставит фокус на выбранный (или сегодняшний) день (`data-autofocus`); пресеты — именованная группа кнопок с `aria-pressed`.",
       },
     ],
   },

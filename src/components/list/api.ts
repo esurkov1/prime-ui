@@ -231,7 +231,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: "`<ul>` named by `aria-label` (or `aria-labelledby` to a visible heading); each row is an `<li>` with a button or link.",
-        ru: "Список — `<ul>` с именем из `aria-label`; каждая строка — `<li>` с кнопкой или ссылкой.",
+        ru: "Список — `<ul>` с именем из `aria-label` (или `aria-labelledby` на видимый заголовок); каждая строка — `<li>` с кнопкой или ссылкой.",
       },
       {
         en: 'The open record: `aria-current="true"` on a button (a selection inside the screen), `aria-current="page"` on a link (`href`, `asChild`) — the link points at the current URL. A router link may set it itself.',
@@ -243,11 +243,11 @@ export const api: ComponentApi = {
       },
       {
         en: "Arrow keys do not move between rows: rows are ordinary Tab stops, as in the Sidebar.",
-        ru: "Недоступная строка: `disabled` у кнопки, `aria-disabled` и `tabindex=-1` у ссылки — вне порядка Tab.",
+        ru: "Стрелки не переводят между строками: строки — обычные остановки Tab, как в Sidebar.",
       },
       {
         en: "With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.",
-        ru: "С `onReorder` перед строкой стоит ручка «Переместить {label}»; новое место объявляется вежливо, сохраняемая строка — `aria-busy`.",
+        ru: "С `onReorder` у каждой строки ручка «Переместить {label}» (`labels.reorderItem`, `{label}` — текст строки) и `aria-keyshortcuts`; новое место объявляется вежливо («Новый лид: позиция 2 из 5»), сохраняемая строка — `aria-busy`.",
       },
     ],
   },

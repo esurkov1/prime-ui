@@ -392,17 +392,23 @@ export const api: ComponentApi = {
           ru: "Системные строки, см. «Доступность».",
         },
         {
+          name: "className",
+          type: "string",
+          en: "Class on the root `<div>`.",
+          ru: "Класс на корневом `<div>`.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
-          en: "`className` and the other attributes of the root `<div>`.",
-          ru: "`className` и остальные атрибуты корневого `<div>`.",
+          en: "The other attributes of the root `<div>`.",
+          ru: "Остальные атрибуты корневого `<div>`.",
         },
       ],
     },
     {
       name: "DataTable.ColumnsMenu",
       en: "`ref` → `HTMLButtonElement` (the trigger). The column chooser of the table it sits in: a Button opening a Dropdown with a check item per column. Writes the table's hidden columns; throws outside a DataTable `toolbar`.",
-      ru: "`ref` → `HTMLButtonElement` (кнопка). Выбор колонок той таблицы, в которой стоит: кнопка открывает Dropdown с пунктом-флажком на каждую колонку. Меняет скрытые колонки таблицы; вне `toolbar` DataTable бросает ошибку.",
+      ru: "Выбор колонок той таблицы, в которой стоит: кнопка открывает Dropdown с пунктом-флажком на каждую колонку. Меняет скрытые колонки таблицы; вне `toolbar` DataTable бросает ошибку.",
       props: [
         {
           name: "side",
@@ -602,7 +608,7 @@ export const api: ComponentApi = {
       {
         keys: "Tab",
         en: "Moves through the toolbar (`DataTable.ColumnsMenu`), sort buttons, row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination.",
-        ru: "Переходит по кнопкам сортировки, флажкам, переключателям, ссылкам строк и строкам, которые открываются на месте.",
+        ru: "Переходит по панели (`DataTable.ColumnsMenu`), кнопкам сортировки, ручкам строк, флажкам, переключателям раскрытия, ссылкам строк, строкам, которые открываются на месте, и Pagination.",
       },
       {
         keys: "Enter · Space",
@@ -633,11 +639,11 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'Native `<table>` semantics; head cells are `scope="col"` (the empty handle-column cell is a `<td>`); sortable heads hold a `<button>` and expose `aria-sort`; the whole head cell shows the inset focus ring.',
-        ru: 'Нативная `<table>`; заголовки — `scope="col"`, у сортируемых — `<button>` и `aria-sort`.',
+        ru: 'Семантика нативной `<table>`; заголовки — `scope="col"` (пустая ячейка колонки ручек — `<td>`); у сортируемых — `<button>` и `aria-sort`; вся ячейка заголовка показывает внутреннее кольцо фокуса.',
       },
       {
         en: 'A link row has one link for assistive tech: the `<a>` in the key cell, named by its text. Its copies over the other cells are `aria-hidden` and `tabindex="-1"`, so the pointer can use the whole row. An in-place row is focusable itself (`tabindex="0"`) and reads as its cells. Either way the focused row shows a ring around all its cells.',
-        ru: "Строка-ссылка: в ключевой ячейке настоящий `<a>` с именем из её текста; копии ссылки в остальных ячейках скрыты (`aria-hidden`, `tabindex=-1`). Строка, которая открывается на месте, получает фокус; фокус обводит всю строку.",
+        ru: 'Строка-ссылка: в ключевой ячейке настоящий `<a>` с именем из её текста; копии ссылки в остальных ячейках скрыты (`aria-hidden`, `tabindex="-1"`), поэтому указатель работает по всей строке. Строка, которая открывается на месте, сама фокусируется (`tabindex="0"`) и читается как свои ячейки; фокус обводит всю строку.',
       },
       {
         en: "A row never opens from a control inside it (links, buttons, fields, `label`, `summary`, ARIA widgets, `data-row-click-ignore`), from a text selection, or from a React event that bubbled out of a portal (a ⋯ menu item).",

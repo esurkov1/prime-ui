@@ -41,7 +41,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### LoginForm.Root
-`ref` → `HTMLDivElement`. The sign-in card: card fill, radius and shadow, the tier rhythm; provides its size to the parts. Native `<div>` props.
+`ref` → `HTMLDivElement`. The sign-in card: card fill, radius and shadow, the tier rhythm; provides its size to the parts.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -49,12 +49,26 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | `align` | `"start" \| "center"` | `"start"` | `start` — the Modal header layout (rounded accent tile left, title over description right); `center` — a round logo above centered text. |
 | `flat` | `boolean` | `false` | Removes the card shadow (inside a Modal or on a plain page). No border either way. |
 | `className` | `string` | — | Class on the card. |
+| `children` | `ReactNode` | — | The parts: Header, Body. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
 ### LoginForm.Header
 `ref` → `HTMLElement`. `<header>` with the logo, title and description, laid out by Root `align`. Native props.
 
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Logo, Title, Description. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | The other header attributes. |
+
 ### LoginForm.Logo
-`ref` → `HTMLDivElement`. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label` — then it is the product mark image (`role="img"`). Native `<div>` props.
+`ref` → `HTMLDivElement`. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label` — then it is the product mark image (`role="img"`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The product mark or an `Icon`. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | The other div attributes. |
 
 ### LoginForm.Title
 `ref` → `HTMLHeadingElement`. The heading (kit Typography, text role by the tier).
@@ -62,21 +76,54 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `as` | `"h1" \| "h2" \| "h3"` | `"h1"` | Heading level; `h2` when the page already has an `h1`. |
+| `children` | `ReactNode` | — | The heading text. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | The other heading attributes. |
 
 ### LoginForm.Description
-`ref` → `HTMLParagraphElement`. The secondary line under the title (kit Typography, secondary tone). Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The secondary line under the title (kit Typography, secondary tone).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The line text. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "children">` | — | The other paragraph attributes. |
 
 ### LoginForm.Body
-`ref` → `HTMLDivElement`. Everything under the header: provider buttons, divider, form, footer. Native `<div>` props.
+`ref` → `HTMLDivElement`. Everything under the header: provider buttons, divider, form, footer.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | Actions, `Divider`, Form, Footer. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | The other div attributes. |
 
 ### LoginForm.Form
 `ref` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props.
 
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The fields and the Actions. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `FormHTMLAttributes<HTMLFormElement>` | — | The other form (`onSubmit`, `action`) attributes. |
+
 ### LoginForm.Actions
-`ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action. Native `<div>` props.
+`ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The buttons. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | The other div attributes. |
 
 ### LoginForm.Footer
-`ref` → `HTMLParagraphElement`. The secondary line with a `LinkButton` («Нет аккаунта? Зарегистрироваться»); follows Root `align`. Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The secondary line with a `LinkButton` («Нет аккаунта? Зарегистрироваться»); follows Root `align`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — | The line with a `LinkButton`. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `Omit<HTMLAttributes<HTMLParagraphElement>, "children">` | — | The other paragraph attributes. |
 
 ## Variants
 
@@ -127,7 +174,9 @@ Root carries `data-size`, `data-align` and `data-flat`.
 ### Keyboard
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-No keyboard interaction.
+| Key | Action |
+|---|---|
+| `Enter` | In a field of the form, submits it. |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

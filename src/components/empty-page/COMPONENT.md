@@ -54,12 +54,19 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 | `tone` | `"neutral" \| "accent" \| "danger"` | the root's `tone` | `neutral` — no data yet, `accent` — a first run and a call to start, `danger` — a failed load. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the icon), `className` and the other div attributes. |
 
-### EmptyPage.Title · EmptyPage.Description
-`ref` → the element. `<h2>` (or `as`) and `<p>`, both capped at the reading width.
+### EmptyPage.Title
+`ref` → the element. An `<h2>` (or `as`) capped at the reading width.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `as` | `"h2" \| "h3" \| "h4" \| "p"` | `"h2"` | Title: tag that fits the outline; the look does not change. `p` inside menus, lists and table cells. |
+| `as` | `"h2" \| "h3" \| "h4" \| "p"` | `"h2"` | Tag that fits the outline; the look does not change. `p` inside menus, lists and table cells. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `id` (for `aria-labelledby`), `className` and the other attributes. |
+
+### EmptyPage.Description
+`ref` → `HTMLParagraphElement`. A `<p>` capped at the reading width.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `id` (for `aria-labelledby`), `className` and the other attributes. |
 
 ### EmptyPage.Actions

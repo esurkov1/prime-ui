@@ -64,17 +64,30 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "EmptyPage.Title · EmptyPage.Description",
-      en: "`ref` → the element. `<h2>` (or `as`) and `<p>`, both capped at the reading width.",
-      ru: "`<h2>` (или `as`) и `<p>`, обе ограничены шириной чтения.",
+      name: "EmptyPage.Title",
+      en: "`ref` → the element. An `<h2>` (or `as`) capped at the reading width.",
+      ru: "`<h2>` (или `as`), ограничен шириной чтения.",
       props: [
         {
           name: "as",
           type: '"h2" | "h3" | "h4" | "p"',
           default: '"h2"',
-          en: "Title: tag that fits the outline; the look does not change. `p` inside menus, lists and table cells.",
-          ru: "Title: тег по структуре страницы; вид не меняется. `p` внутри меню, списков и ячеек таблицы.",
+          en: "Tag that fits the outline; the look does not change. `p` inside menus, lists and table cells.",
+          ru: "Тег по структуре страницы; вид не меняется. `p` внутри меню, списков и ячеек таблицы.",
         },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLElement>",
+          en: "`children`, `id` (for `aria-labelledby`), `className` and the other attributes.",
+          ru: "`children`, `id` (для `aria-labelledby`), `className` и остальные атрибуты.",
+        },
+      ],
+    },
+    {
+      name: "EmptyPage.Description",
+      en: "`ref` → `HTMLParagraphElement`. A `<p>` capped at the reading width.",
+      ru: "`<p>`, ограничен шириной чтения.",
+      props: [
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",

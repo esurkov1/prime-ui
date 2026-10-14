@@ -425,7 +425,7 @@ export const api: ComponentApi = {
       {
         keys: "Enter · Shift+F10 · ContextMenu",
         en: "Opens the menu of the focused message (`ContextMenu` is the menu key); in a chat's selection mode `Enter` / `Space` toggle it and Shift extends the range from the anchor",
-        ru: "Открывает меню сообщения в фокусе (ContextMenu — клавиша меню); в режиме выбора чата `Enter` / `Space` переключают выбор, Shift расширяет диапазон от якоря",
+        ru: "Открывает меню сообщения в фокусе (`ContextMenu` — клавиша меню); в режиме выбора чата `Enter` / `Space` переключают выбор, Shift расширяет диапазон от якоря",
       },
       {
         keys: "R",
@@ -451,7 +451,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'Every message is a `role="article"` named «{author}, {time}» (`labels.message`); an outgoing one is «Вы»; the author names every message of a run, its header shown or not. In a list it carries `aria-posinset` / `aria-setsize`; in a chat\'s selection mode it is an `option` with `aria-selected`.',
-        ru: 'Каждое сообщение — `role="article"` с именем «{автор}, {время}» (`labels.message`); для исходящих автор — «Вы»; автор называет сообщение, даже когда его шапка скрыта в серии. В ленте Chat с режимом выбора — `option` с `aria-selected`.',
+        ru: 'Каждое сообщение — `role="article"` с именем «{автор}, {время}» (`labels.message`); для исходящих автор — «Вы»; автор называет каждое сообщение серии, показана его шапка или нет. В ленте оно несёт `aria-posinset` / `aria-setsize`; в режиме выбора чата — `option` с `aria-selected`.',
       },
       {
         en: "The delivery status is an image named «Отправляется», «Отправлено», «Прочитано» or «Не отправлено».",
@@ -467,15 +467,15 @@ export const api: ComponentApi = {
       },
       {
         en: "The author's header is text; the hue of the name means nothing on its own, `Message.AuthorIcon` is `aria-hidden` — say what it means in the `tag`.",
-        ru: "Шапка автора — текст; цвет имени ничего не значит сам по себе, значок `Message.AuthorIcon` скрыт от скринридеров, смысл — в `tag`.",
+        ru: "Шапка автора — текст; цвет имени ничего не значит сам по себе, значок `Message.AuthorIcon` — `aria-hidden`, смысл скажите в `tag`.",
       },
       {
         en: "`Message.Typing` is a polite `status` with «Собеседник печатает» (`labels.typing`); its dots are decorative.",
-        ru: "`Message.Typing` — вежливый `status` «Собеседник печатает»; точки декоративны.",
+        ru: "`Message.Typing` — вежливый `status` «Собеседник печатает» (`labels.typing`); точки декоративны.",
       },
       {
         en: "Reactions are a group of buttons with `aria-pressed`; a chip is named «{emoji}: {count}», with `users` «{emoji} {count}: {users}» («❤️ 3: Анна, Пётр, Мария», «ещё N» when not everyone is listed); its avatars are `aria-hidden`; without `onReactionToggle` the chips are `disabled`. The reaction bar is a `toolbar` of toggle buttons named by the reaction («Нравится», «Огонь»…); its «⌄» is `aria-expanded`. The quick reaction is announced in the list's polite live region.",
-        ru: "Реакции — группа кнопок с `aria-pressed`; имя чипа — «{emoji}: {count}», а с `users` — с именами: «❤️ 3: Анна, Пётр, Мария»; аватары в чипе скрыты от скринридеров. Панель реакций — `toolbar` из кнопок-переключателей, названных по реакции («Нравится», «Огонь»…). Быстрая реакция объявляется в вежливой области ленты.",
+        ru: "Реакции — группа кнопок с `aria-pressed`; имя чипа — «{emoji}: {count}», а с `users` — «{emoji} {count}: {users}» («❤️ 3: Анна, Пётр, Мария», «ещё N», когда перечислены не все); аватары в чипе — `aria-hidden`; без `onReactionToggle` чипы `disabled`. Панель реакций — `toolbar` из кнопок-переключателей, названных по реакции («Нравится», «Огонь»…); её «⌄» — `aria-expanded`. Быстрая реакция объявляется в вежливой области ленты.",
       },
       {
         en: "`VideoNote` and `VoicePlayer` carry their own ARIA (see their pages); inside a message their transcript is a plain paragraph, selectable and marked by the chat's search.",
@@ -483,7 +483,7 @@ export const api: ComponentApi = {
       },
       {
         en: "Media tiles are buttons «Открыть: {alt}» that open the album in MediaViewer, the focus returning to the tile on close; a transfer is the round cancel, retry or download button, the share its accessible description; a refused retry or cancel is announced politely; a done transfer's disk is `inert`.",
-        ru: "Плитки медиа — кнопки «Открыть: {alt}», открывающие альбом в MediaViewer, фокус после закрытия возвращается на плитку; передача — круглая кнопка отмены, повтора или скачивания с долей в описании; отказ объявляется вежливо.",
+        ru: "Плитки медиа — кнопки «Открыть: {alt}», открывающие альбом в MediaViewer, фокус после закрытия возвращается на плитку; передача — круглая кнопка отмены, повтора или скачивания с долей в описании; отказ объявляется вежливо; диск завершённой передачи — `inert`.",
       },
       {
         en: "`Message.Actions` are plain buttons and links (`Button.Root`, `asChild`) with visible labels, in row order; in a chat's selection mode they take no presses.",
@@ -491,7 +491,7 @@ export const api: ComponentApi = {
       },
       {
         en: "Color is never the only signal: the status is named, the own reaction is `aria-pressed`, a selected message is `aria-selected` with a check, the author is text.",
-        ru: "Цвет никогда не единственный признак: статус назван, своя реакция — `aria-pressed`, автор — текстом.",
+        ru: "Цвет никогда не единственный признак: статус назван, своя реакция — `aria-pressed`, выбранное сообщение — `aria-selected` с галочкой, автор — текстом.",
       },
     ],
   },

@@ -114,7 +114,8 @@ Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an 
 | `defaultCollapsedGroups` | `(string \| number)[]` | — | Initially collapsed group keys, uncontrolled; `[]` — every group open but foldable. |
 | `onCollapsedGroupsChange` | `(collapsedGroups: (string \| number)[]) => void` | — | The collapsed group keys changed (a group header toggle). |
 | `labels` | `Partial<DataTableLabels>` | — | Built-in strings, see Labels. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the root `<div>`. |
+| `className` | `string` | — | Class on the root `<div>`. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | The other attributes of the root `<div>`. |
 
 ### DataTable.ColumnsMenu
 `ref` → `HTMLButtonElement` (the trigger). The column chooser of the table it sits in: a Button opening a Dropdown with a check item per column. Writes the table's hidden columns; throws outside a DataTable `toolbar`.

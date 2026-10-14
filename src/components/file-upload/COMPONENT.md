@@ -135,20 +135,33 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`. The zone reads `--file-upload-padding` and `--file-upload-radius` from that class (a round zone around an avatar). |
 
 ### FileUpload.Body
-`ref` → `HTMLDivElement`. A centered column for a custom zone body; nested buttons and links stay interactive (drag-over follows enter / leave depth, so crossing children never flickers it). Native `<div>` props.
+`ref` → `HTMLDivElement`. A centered column for a custom zone body; nested buttons and links stay interactive (drag-over follows enter / leave depth, so crossing children never flickers it).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### FileUpload.Icon
-`ref` → `HTMLSpanElement`. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid. Native `<span>` props.
+`ref` → `HTMLSpanElement`. A round tinted icon slot (`aria-hidden`) that turns accent on drag-over and danger when invalid.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the `Icon`), `className` and the other span attributes. |
 
 ### FileUpload.Title
-`ref` → `HTMLParagraphElement`. The zone title `<p>`. Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The zone title `<p>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"default" \| "muted"` | `"default"` | `muted` — secondary color, regular weight (an instruction line in custom bodies). |
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### FileUpload.Description
-`ref` → `HTMLParagraphElement`. The secondary zone line (formats, size limit), the kit Hint of the zone tier. Native `<p>` props.
+`ref` → `HTMLParagraphElement`. The secondary zone line (formats, size limit), the kit Hint of the zone tier.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### FileUpload.Queue
 `ref` → `HTMLUListElement`. The files of a set with no picker of its own — a tray whose paperclip lives elsewhere: the same rows or tiles `FileUpload.Root` draws, in a `<ul>` (nothing while empty).
@@ -167,12 +180,13 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `Omit<HTMLAttributes<HTMLUListElement>, "children" \| "defaultValue">` | — | `className`, `aria-label` (name the list) and the other attributes of the `<ul>`. |
 
 ### FileUpload.Item
-`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part. Native `<div>` props.
+`ref` → `HTMLDivElement`. A file row: format badge · name over description · actions, then the progress bar; children are placed by their part.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the padding, text and the format badge. Without it the tier of its host, else `m`. |
 | `invalid` | `boolean` | `false` | A failed upload: danger wash and ring, danger description. |
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the item parts), `className` and the other div attributes. |
 
 ### FileUpload.FormatBadge
 `ref` → `HTMLSpanElement`. The file format as a square kit Badge of the row tier (`aria-hidden`: the row's name is trimmed of the extension and the accessible name carries it whole).
@@ -192,7 +206,11 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "color">` | — | `className` and the other attributes of the thumbnail frame. |
 
 ### FileUpload.ItemName · FileUpload.ItemDescription · FileUpload.ItemActions
-`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row. Native `<div>` props.
+`ref` → `HTMLDivElement`. The file name (one line, truncated), its description (size, progress, error; danger in an invalid row) and the buttons at the end of the row.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### FileUpload.ItemProgress
 `ref` → `HTMLDivElement` (the wrapper). Upload progress across the row: the kit ProgressBar.

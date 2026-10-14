@@ -194,7 +194,6 @@ export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "child
    * gap into a row across every column, and the carried copy keeps every cell's width.
    */
   as?: "div" | "ul" | "ol" | "tbody";
-  /** Accessible name of the list. */
   "aria-label"?: string;
   /**
    * Content in front of the items that never moves and takes no drop position (the heading row of

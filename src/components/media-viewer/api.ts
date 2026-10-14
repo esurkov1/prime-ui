@@ -201,7 +201,7 @@ export const api: ComponentApi = {
       {
         keys: "+ · -",
         en: "Zoom the picture in (`=` too) and out a step; `0` brings it back to the fit.",
-        ru: "Приближают и отдаляют картинку на шаг; `0` возвращает к вписанному размеру.",
+        ru: "Приближают (и `=`) и отдаляют картинку на шаг; `0` возвращает к вписанному размеру.",
       },
       {
         keys: "Space · K",

@@ -190,7 +190,8 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `phone` | `string` | — | The phone, as written. |
 | `src` | `string` | — | The person's photo; without it the initials. |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"blue"` | Hue of the initials. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "color">` | — | `children` — `Button.Root` actions («Написать», «Добавить»); `className`. |
+| `children` | `ReactNode` | — | `Button.Root` actions in a row under the person («Написать», «Добавить»). |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "color">` | — | `className` and the other div attributes. |
 
 ### Message.LinkPreview
 `ref` → `HTMLAnchorElement`. The card of a linked page across the bubble's full width (at least the card width): an accent wash with a bar, the site, title, description (3 lines) and a 16 : 9 picture; long words and URLs wrap; the whole card opens the page in a new tab.
