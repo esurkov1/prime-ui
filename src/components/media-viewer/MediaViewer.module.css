@@ -1,30 +1,36 @@
 /*
  * MediaViewer: a full-screen dark island. The backdrop and the slides are moved by the engine
  * (inline `transform` / `opacity`, once per frame); everything here is the static frame and the
- * chrome, which fades and drifts aside together (`data-chrome`).
+ * chrome, which fades and drifts aside together (`data-chrome`). Every part over the media stands
+ * on the media shade (`internal/mediaPill`, joined in TSX): the root takes its light ink, the
+ * caption, the control bar, the level panel and the error card its ground; here they are placed.
  */
 
 .root {
   --viewer-inset: var(--prime-media-viewer-inset);
-  --viewer-top: calc(env(safe-area-inset-top, 0px) + var(--viewer-inset));
-  --viewer-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--viewer-inset));
-  --viewer-start: calc(env(safe-area-inset-left, 0px) + var(--viewer-inset));
-  --viewer-end: calc(env(safe-area-inset-right, 0px) + var(--viewer-inset));
-  /* The filmstrip's height: its thumbnails (Thumbnail `l`) and the gap above them. */
-  --viewer-strip: 0px;
+  --viewer-top: calc(env(safe-area-inset-top) + var(--viewer-inset));
+  --viewer-bottom: calc(env(safe-area-inset-bottom) + var(--viewer-inset));
+  --viewer-start: calc(env(safe-area-inset-left) + var(--viewer-inset));
+  --viewer-end: calc(env(safe-area-inset-right) + var(--viewer-inset));
+  /* Where the bottom bar stands: over the filmstrip when there is one. */
+  --viewer-above-strip: var(--viewer-bottom);
 
   position: fixed;
   inset: 0;
   z-index: var(--prime-z-overlay);
   overflow: hidden;
-  color: var(--prime-color-media-shade-fg);
   outline: none;
   /* Paging sideways must not swipe the browser back, nor bounce the page under the viewer. */
   overscroll-behavior: contain;
 }
 
+/* The filmstrip's height: its thumbnails (Thumbnail `l`) and the gap above them. */
 .root[data-thumbnails] {
-  --viewer-strip: calc(var(--prime-thumbnail-l-height) + var(--viewer-inset));
+  --viewer-above-strip: calc(
+    var(--viewer-bottom) +
+    var(--prime-thumbnail-l-height) +
+    var(--viewer-inset)
+  );
 }
 
 .backdrop {
@@ -64,7 +70,8 @@
 }
 
 .media,
-.placeholder {
+.placeholder,
+.skeleton {
   position: absolute;
   inset: 0;
   display: block;
@@ -86,7 +93,7 @@ img.media[data-loaded] {
 /* The small copy is stretched to the box: soft until the full picture arrives. */
 .placeholder {
   filter: blur(var(--prime-space-2));
-  transform: scale(1.02);
+  scale: var(--prime-motion-scale-lift);
 }
 
 /* A playing video with the view cleared hides the pointer too, as a player does; a move brings
@@ -109,7 +116,7 @@ img.media[data-loaded] {
   }
 }
 
-/* ─── Centre: a play disk, a spinner, an error ───────────────────────────── */
+/* ─── Centre: a play disk, an error ──────────────────────────────────────── */
 
 .center {
   position: relative;
@@ -132,7 +139,7 @@ img.media[data-loaded] {
   pointer-events: none;
 }
 
-/* The spinner and the error share the middle cell: one fades out as the other comes in. */
+/* The play disk and the error share the middle cell. */
 .slot {
   grid-area: 1 / 1;
 }
@@ -142,14 +149,11 @@ img.media[data-loaded] {
 
   padding: var(--prime-space-4);
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-media-pill);
-  color: var(--prime-color-media-pill-fg);
   text-align: center;
 }
 
 .errorText {
   margin: 0;
-  color: var(--prime-color-media-shade-fg);
 }
 
 /* ─── Chrome ─────────────────────────────────────────────────────────────── */
@@ -173,7 +177,7 @@ img.media[data-loaded] {
 }
 
 .root[data-chrome="hidden"] .top {
-  translate: 0 calc(-1 * var(--prime-space-2));
+  translate: 0 calc(var(--prime-space-2) * -1);
 }
 
 .root[data-chrome="hidden"] .bottom,
@@ -204,9 +208,10 @@ img.media[data-loaded] {
   pointer-events: auto;
 }
 
-/* Joined with the media pill in TSX; two classes so its size wins over the pill's. */
+/* Joined with the media pill and the control `s` tier in TSX; two classes so its size wins over
+   the pill's: as tall as the round buttons beside it. */
 .top .counter {
-  min-block-size: var(--prime-control-s-height);
+  min-block-size: var(--field-h);
   padding-inline: var(--prime-space-3);
   font-size: var(--prime-text-body-s-size);
 }
@@ -218,10 +223,11 @@ img.media[data-loaded] {
   margin-inline-start: auto;
 }
 
+/* Centred on the middle of the stage by half its own height. */
 .nav {
   position: absolute;
   inset-block-start: 50%;
-  margin-block-start: calc(-1 * var(--prime-control-m-height) / 2);
+  margin-block-start: calc(var(--field-h) / -2);
 }
 
 .previous {
@@ -241,7 +247,7 @@ img.media[data-loaded] {
 
 .bottom {
   position: absolute;
-  inset-block-end: calc(var(--viewer-bottom) + var(--viewer-strip));
+  inset-block-end: var(--viewer-above-strip);
   inset-inline: var(--viewer-start) var(--viewer-end);
   display: flex;
   flex-direction: column;
@@ -259,16 +265,12 @@ img.media[data-loaded] {
   margin: 0;
   padding: var(--prime-space-2) var(--prime-space-3);
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-media-pill);
-  color: var(--prime-color-media-shade-fg);
   text-align: center;
   overflow-wrap: anywhere;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
   overflow: hidden;
-  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
-  backdrop-filter: blur(var(--prime-media-shade-blur));
 }
 
 .controls {
@@ -278,20 +280,15 @@ img.media[data-loaded] {
   inline-size: min(var(--prime-media-viewer-bar-width), 100%);
   padding: var(--prime-space-1);
   border-radius: var(--prime-radius-full);
-  background: var(--prime-color-media-pill);
-  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
-  backdrop-filter: blur(var(--prime-media-shade-blur));
 }
 
-/* Play · time · seek · length · sound · level, as a native player's bar. */
+/* Play · time · seek · length · sound · level, as a native player's bar. The time is the caption
+   role in the muted light ink (joined in TSX). */
 .time {
   flex: none;
   min-inline-size: 4ch;
   text-align: center;
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
   font-variant-numeric: tabular-nums;
-  color: var(--prime-color-media-pill-fg);
 }
 
 /* Two classes: a Slider's own root takes the full width, the bar shares it out. */
@@ -318,13 +315,10 @@ img.media[data-loaded] {
   display: flex;
   justify-content: center;
   box-sizing: border-box;
-  /* As wide as the sound button under it: one column. */
-  min-inline-size: var(--prime-control-s-height);
+  /* As wide as the sound button under it (the same control tier): one column. */
+  min-inline-size: var(--field-h);
   padding: var(--prime-space-3) var(--prime-space-2);
   border-radius: var(--prime-radius-full);
-  background: var(--prime-color-media-pill);
-  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
-  backdrop-filter: blur(var(--prime-media-shade-blur));
   opacity: 0;
   visibility: hidden;
   translate: -50% var(--prime-space-1);
@@ -334,7 +328,7 @@ img.media[data-loaded] {
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     translate var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
     scale var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
-    visibility 0s linear var(--prime-motion-fade-fast);
+    visibility var(--prime-motion-instant) linear var(--prime-motion-fade-fast);
 }
 
 /* The gap between the panel and the button belongs to the panel: the pointer crosses it. */
@@ -351,7 +345,7 @@ img.media[data-loaded] {
   visibility: visible;
   translate: -50% 0;
   scale: 1;
-  transition-delay: 0s;
+  transition-delay: var(--prime-motion-instant);
 }
 
 /* ─── Filmstrip ──────────────────────────────────────────────────────────── */

@@ -256,8 +256,8 @@ export const api: ComponentApi = {
         ru: "Панель видео на паузе видна всегда; во время воспроизведения уходит через 2,5 с без движения указателя и возвращается от любого движения, клавиши или касания — но не пока указатель над ней, фокус внутри или открыта громкость.",
       },
       {
-        en: "The level is an upright Slider in a panel over the sound button: it opens on hover, on focus (Tab) and on a tap; Escape closes the panel, not the viewer. A mouse click on the button mutes; a click on the video plays and pauses it.",
-        ru: "Громкость — вертикальный Slider во всплывающей панели над кнопкой звука: открывается наведением, фокусом (Tab) или касанием; Escape закрывает панель, а не просмотр. Клик мышью по кнопке выключает звук; клик по видео запускает и ставит на паузу.",
+        en: "The level is an upright Slider in a panel over the sound button: it opens on hover, on focus (Tab) and on a tap; Escape or a press elsewhere closes the panel, not the viewer (Escape returns focus to the button). A mouse click on the button mutes; a click on the video plays and pauses it.",
+        ru: "Громкость — вертикальный Slider во всплывающей панели над кнопкой звука: открывается наведением, фокусом (Tab) или касанием; Escape или нажатие мимо закрывают панель, а не просмотр (Escape возвращает фокус на кнопку). Клик мышью по кнопке выключает звук; клик по видео запускает и ставит на паузу.",
       },
       {
         en: "The page under the viewer is `inert`, scroll is locked; on close focus returns to the opener.",

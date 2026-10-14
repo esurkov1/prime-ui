@@ -1,4 +1,4 @@
-/** A video among the photos of a site visit starts once its page settles; its bar has play, time, seek, the sound button and its level, and it has no zoom — `type`, `autoPlay`. */
+/** A video among the photos of a site visit starts by default once its page settles; its bar has play, time, seek, the sound button and its level, and it has no zoom — `type`. */
 import { Icon, MediaViewer, type MediaViewerItem, Thumbnail } from "prime-ui-kit";
 import * as React from "react";
 

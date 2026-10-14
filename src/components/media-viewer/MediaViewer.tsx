@@ -2,20 +2,22 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
-import { Spinner } from "@/components/spinner/Spinner";
+import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
+import { type ImageStatus, useImageStatus } from "@/hooks/useImageStatus";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion, usePresence } from "@/hooks/usePresence";
-import { Icon } from "@/icons";
+import { Icon, type IconName } from "@/icons";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import pill from "@/internal/mediaPill.module.css";
 import { motionDurationMs } from "@/internal/motionTiming";
-import { activeElement } from "@/internal/overlay/focus";
+import { captureOpener } from "@/internal/overlay/focus";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import { Portal } from "@/internal/Portal";
 import textRole from "@/internal/textRole.module.css";
@@ -56,45 +58,24 @@ export const MEDIA_VIEWER_LABELS: MediaViewerLabels = {
   position: "{current} из {duration}",
 };
 
+/** The viewer's props; each is described in `api.ts`. `ref` is the `role="dialog"` element. */
 export type MediaViewerProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /** The photos and videos to page through, in order. */
   items: readonly MediaViewerItem[];
-  /** Controlled visibility; together with `onOpenChange`. */
   open?: boolean;
-  /** Initial visibility, uncontrolled. Default `false`. */
   defaultOpen?: boolean;
-  /** Called on every open and close: the close button, Escape, a swipe, a click past the media. */
   onOpenChange?: (open: boolean) => void;
-  /** The item on screen (controlled); together with `onIndexChange`. */
   index?: number;
-  /** The item shown first, uncontrolled. Default `0`. */
   defaultIndex?: number;
-  /** The page turned: a swipe, an arrow, a key, a thumbnail. */
   onIndexChange?: (index: number) => void;
-  /** Past the last item comes the first (with three items or more). Default `false`. */
   loop?: boolean;
-  /** How far a picture zooms, times its fitted size. Default `4`. */
   maxZoom?: number;
-  /** A filmstrip of every item at the bottom. Default `false`. */
   thumbnails?: boolean;
-  /**
-   * A video starts as soon as its page settles on screen; where the browser refuses sound, it
-   * starts muted. `false` — it waits for a press. Default `true`.
-   */
   autoPlay?: boolean;
-  /** Escape closes the viewer. Default `true`. */
   closeOnEscape?: boolean;
-  /** A vertical swipe, or a click on the stage past the media, closes the viewer. Default `true`. */
   closeOnOutsideClick?: boolean;
-  /**
-   * The element item `index` opens from and closes into (its thumbnail). Without it the viewer
-   * finds the picture in the element that opened it; with neither, it fades.
-   */
   getOrigin?: (index: number) => Element | null;
-  /** Actions for the item on screen, in the top bar before the close button. */
   renderActions?: (item: MediaViewerItem, index: number) => React.ReactNode;
   labels?: Partial<MediaViewerLabels>;
-  /** The `role="dialog"` element. */
   ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -142,24 +123,6 @@ function hideOrigin(origin: Origin | null): () => void {
   };
 }
 
-/** The last element pressed on the page while the viewer is closed: the opener on a click. */
-function useLastPress(active: boolean) {
-  const press = React.useRef<{ element: Element; time: number } | null>(null);
-  React.useEffect(() => {
-    if (!active) return;
-    const onPress = (event: PointerEvent) => {
-      if (event.target instanceof Element)
-        press.current = { element: event.target, time: Date.now() };
-    };
-    document.addEventListener("pointerdown", onPress, true);
-    return () => document.removeEventListener("pointerdown", onPress, true);
-  }, [active]);
-  return press;
-}
-
-/** A press this recent opened the viewer; an older one did not (a key did). */
-const PRESS_OPENS_MS = 1000;
-
 /**
  * A full-screen viewer for photos and videos: pages slide under the finger and settle with a
  * spring, a pinch or a double tap zooms about the point, a zoomed picture pans with iOS momentum
@@ -190,16 +153,16 @@ export function MediaViewer({
   const [mounted, setMounted] = React.useState(open);
   if (open && !mounted) setMounted(true);
 
-  const press = useLastPress(!open);
-  // Read while rendering the open transition, like the modal layer reads its opener.
+  // Read while rendering the open transition, like the modal layer reads its opener: the element
+  // a press landed on (the picture inside a tile), else the focused control a key opened it from.
   const openerRef = React.useRef<Element | null>(null);
   const openedIndexRef = React.useRef(index);
   const wasOpen = React.useRef(false);
   if (open !== wasOpen.current) {
     wasOpen.current = open;
     if (open) {
-      const recent = press.current && Date.now() - press.current.time < PRESS_OPENS_MS;
-      openerRef.current = recent ? (press.current?.element ?? null) : activeElement();
+      const opener = captureOpener();
+      openerRef.current = opener.target ?? opener.element;
       openedIndexRef.current = index;
     }
   }
@@ -437,6 +400,8 @@ function ViewerDialog({
   const canPrevious = looping || index > 0;
   const canNext = looping || index < count - 1;
   const zoomable = (item.type ?? "image") === "image";
+  // One glyph slot: `Button.Icon` cross-fades the change in place.
+  const zoomGlyph: IconName = zoomed ? "action.zoomOut" : "action.zoomIn";
 
   /**
    * The keys of the video on screen, as in every player: Space / K play and pause (Space on a
@@ -519,7 +484,7 @@ function ViewerDialog({
       aria-modal="true"
       aria-label={ariaLabel ?? labels.viewer}
       tabIndex={-1}
-      className={cx(styles.root, className)}
+      className={cx(styles.root, pill.ink, className)}
       data-theme="dark"
       data-state={open ? "open" : "closed"}
       data-phase={phase}
@@ -567,7 +532,7 @@ function ViewerDialog({
 
         <div className={styles.top} data-viewer-chrome="">
           {count > 1 ? (
-            <span className={cx(pill.pill, styles.counter)}>
+            <span className={cx(pill.pill, fieldTierClass, styles.counter)} data-size="s">
               {formatLabel(labels.counter, { current: index + 1, total: count })}
             </span>
           ) : null}
@@ -581,7 +546,7 @@ function ViewerDialog({
                 onClick={() => engine.zoomBy(zoomed ? null : 2)}
               >
                 <Button.Icon>
-                  <Icon name={zoomed ? "action.zoomOut" : "action.zoomIn"} />
+                  <Icon name={zoomGlyph} />
                 </Button.Icon>
               </Button.Root>
             ) : null}
@@ -743,6 +708,67 @@ type ViewerSlideProps = {
 
 type LoadStatus = "loading" | "loaded" | "error";
 
+/**
+ * The full picture of a page. It counts as loaded only once it is decoded (`useImageStatus`
+ * `decode`): it never paints half-ready or blank for a frame, and a picture already in the cache
+ * (a neighbour seen before) is ready before the first paint. Loaded, it tells the page its own
+ * ratio (when the item gave none) and fades in over the thumbnail, which goes once it is covered.
+ */
+function ViewerImage({
+  item,
+  onStatus,
+  onRatio,
+  onCovered,
+}: {
+  item: MediaViewerItem;
+  onStatus: (status: LoadStatus) => void;
+  onRatio: (ratio: number) => void;
+  onCovered: () => void;
+}) {
+  const imageRef = React.useRef<HTMLImageElement | null>(null);
+  const report = React.useCallback(
+    (status: ImageStatus) => {
+      if (status !== "idle") onStatus(status);
+    },
+    [onStatus],
+  );
+  const image = useImageStatus(report, { decode: true });
+  const ref = useMergedRefs(imageRef, image.ref);
+  const loaded = image.status === "loaded";
+
+  const latest = React.useRef({ onRatio, onCovered, width: item.width });
+  React.useLayoutEffect(() => {
+    latest.current = { onRatio, onCovered, width: item.width };
+  });
+  React.useEffect(() => {
+    const element = imageRef.current;
+    if (!loaded || !element) return;
+    const { onRatio: ratio, onCovered: covered, width } = latest.current;
+    if (!width && element.naturalWidth > 0 && element.naturalHeight > 0) {
+      ratio(element.naturalWidth / element.naturalHeight);
+    }
+    // Under reduced motion nothing fades: the thumbnail goes at once.
+    if (prefersReducedMotion()) covered();
+  }, [loaded]);
+
+  return (
+    <img
+      ref={ref}
+      className={styles.media}
+      src={item.src}
+      alt={item.alt ?? ""}
+      decoding="async"
+      draggable={false}
+      data-loaded={loaded || undefined}
+      onLoad={image.onLoad}
+      onError={image.onError}
+      onTransitionEnd={(event) => {
+        if (event.propertyName === "opacity" && loaded) onCovered();
+      }}
+    />
+  );
+}
+
 function ViewerSlide({
   engine,
   item,
@@ -769,8 +795,6 @@ function ViewerSlide({
   // The thumbnail stands in until the full picture has fully shown over it, never a frame less.
   const [covered, setCovered] = React.useState(false);
   const [attempt, setAttempt] = React.useState(0);
-  const onRatioRef = React.useRef(onRatio);
-  onRatioRef.current = onRatio;
 
   React.useLayoutEffect(() => {
     const slide = slideRef.current;
@@ -780,44 +804,20 @@ function ViewerSlide({
     return () => engine.setSlot(at, null);
   });
 
-  /**
-   * The picture counts as loaded only once it is decoded: it never paints half-ready or blank for a
-   * frame. A picture already in the cache (a neighbour seen before) is ready before the first paint.
-   */
-  const ready = React.useCallback(
-    (image: HTMLImageElement) => {
-      const settle = () => {
-        if (!image.isConnected) return;
-        if (!item.width && image.naturalWidth > 0 && image.naturalHeight > 0) {
-          onRatioRef.current(image.naturalWidth / image.naturalHeight);
-        }
-        setStatus("loaded");
-        if (prefersReducedMotion()) setCovered(true);
-      };
-      if (typeof image.decode === "function") image.decode().then(settle, settle);
-      else settle();
-    },
-    [item.width],
-  );
-
-  const imageRef = React.useCallback(
-    (image: HTMLImageElement | null) => {
-      if (image?.complete && image.naturalWidth > 0) ready(image);
-    },
-    [ready],
-  );
-
   const boxStyle = {
     "--viewer-box-width": `${box.width}px`,
     "--viewer-box-height": `${box.height}px`,
   } as React.CSSProperties;
 
-  // The spinner and the error fade out as they leave; both stand in one cell, so they cross-fade.
-  const busy = usePresence(status === "loading" && !item.thumbnail, { exitDuration: "fast" });
+  // Without a thumbnail to stand in, the picture's own box holds a Skeleton until the picture has
+  // faded in over it (`base`); the error fades out as it leaves.
+  const placeholder = usePresence(status === "loading" && !item.thumbnail, {
+    exitDuration: "base",
+  });
   const failed = usePresence(status === "error", { exitDuration: "fast" });
 
   const caption = item.caption ? (
-    <p className={cx(textRole.bodyS, styles.caption)}>{item.caption}</p>
+    <p className={cx(textRole.bodyS, pill.shade, styles.caption)}>{item.caption}</p>
   ) : null;
   const retry = () => {
     setStatus("loading");
@@ -859,35 +859,18 @@ function ViewerSlide({
       ) : (
         <>
           <div ref={zoomRef} className={styles.zoom} style={boxStyle} data-viewer-media="">
+            {placeholder.mounted ? <Skeleton shape="block" className={styles.skeleton} /> : null}
             {item.thumbnail && !covered ? (
               <img className={styles.placeholder} src={item.thumbnail} alt="" draggable={false} />
             ) : null}
-            <img
+            <ViewerImage
               key={attempt}
-              ref={imageRef}
-              className={styles.media}
-              src={item.src}
-              alt={item.alt ?? ""}
-              decoding="async"
-              draggable={false}
-              data-loaded={status === "loaded" || undefined}
-              onLoad={(event) => ready(event.currentTarget)}
-              onError={() => setStatus("error")}
-              onTransitionEnd={(event) => {
-                if (event.propertyName === "opacity" && status === "loaded") setCovered(true);
-              }}
+              item={item}
+              onStatus={setStatus}
+              onRatio={onRatio}
+              onCovered={() => setCovered(true)}
             />
           </div>
-          {busy.mounted ? (
-            <div
-              className={cx(styles.center, styles.slot, enterMotion.enter)}
-              data-hidden={busy.state === "closed" || undefined}
-              aria-hidden={busy.state === "closed" || undefined}
-              onTransitionEnd={busy.onExitEnd}
-            >
-              <Spinner size="xl" />
-            </div>
-          ) : null}
           {caption ? (
             <div className={styles.bottom} data-viewer-chrome="">
               {caption}
@@ -897,7 +880,13 @@ function ViewerSlide({
       )}
       {failed.mounted ? (
         <div
-          className={cx(styles.center, styles.slot, styles.error, enterMotion.enterBase)}
+          className={cx(
+            styles.center,
+            styles.slot,
+            pill.shade,
+            styles.error,
+            enterMotion.enterBase,
+          )}
           data-viewer-chrome=""
           data-hidden={failed.state === "closed" || undefined}
           inert={failed.state === "closed"}
@@ -1144,12 +1133,13 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
     };
   }, [stopGlide]);
 
-  // A new width re-centres an attached row.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new width moves every thumbnail
+  // A new width re-centres an attached row and mounts what the new width brings into view.
   React.useLayoutEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
     if (!follow.current.detached) write(targetOf(positionRef.current));
-    onScroll();
-  }, [width, write, targetOf, onScroll]);
+    showAt(Math.abs(scroller.scrollLeft), width);
+  }, [width, write, targetOf, showAt]);
   // Thumbnails that just mounted take their emphasis before they paint — never the scroll.
   React.useLayoutEffect(() => {
     emphasize(positionRef.current);
@@ -1160,6 +1150,7 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
     const entry = items[at] as MediaViewerItem;
     const video = (entry.type ?? "image") === "video";
     const src = entry.thumbnail ?? (video ? entry.poster : entry.src);
+    const fallbackGlyph: IconName = video ? "action.video" : "object.image";
     thumbs.push(
       <Thumbnail.Root
         key={at}
@@ -1177,7 +1168,7 @@ function Filmstrip({ engine, items, index, labels, onSelect }: FilmstripProps) {
         >
           {src ? <Thumbnail.Image src={src} /> : null}
           <Thumbnail.Fallback>
-            <Icon name={video ? "action.video" : "object.image"} />
+            <Icon name={fallbackGlyph} />
           </Thumbnail.Fallback>
         </button>
       </Thumbnail.Root>,

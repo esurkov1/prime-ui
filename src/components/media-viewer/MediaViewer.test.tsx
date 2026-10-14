@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -299,6 +300,77 @@ describe("MediaViewer", () => {
     expect(video.muted).toBe(false);
     expect(video.volume).toBeCloseTo(0.4);
     play.mockRestore();
+  });
+
+  it("the level panel is a layer above the viewer: Escape closes the level, not the viewer", () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
+    render(
+      <MediaViewer
+        items={[{ type: "video", src: "/walkthrough.mp4", alt: "Обход" }]}
+        defaultOpen
+        autoPlay={false}
+      />,
+    );
+    const mute = screen.getByRole("button", { name: "Выключить звук" });
+    const sound = mute.parentElement as HTMLElement;
+    act(() => mute.focus());
+    expect(sound).toHaveAttribute("data-open");
+    act(() => screen.getByRole("slider", { name: "Громкость" }).focus());
+    fireEvent.keyDown(document.activeElement as Element, { key: "Escape" });
+    expect(sound).not.toHaveAttribute("data-open");
+    expect(mute).toHaveFocus();
+    expect(dialog()).toBeInTheDocument();
+    // A press elsewhere closes an open level too.
+    fireEvent.pointerEnter(sound, { pointerType: "mouse" });
+    expect(sound).toHaveAttribute("data-open");
+    fireEvent.pointerDown(stage());
+    expect(sound).not.toHaveAttribute("data-open");
+    expect(dialog()).toBeInTheDocument();
+    play.mockRestore();
+  });
+
+  it("keyboard: pages, zoom, the video keys and Tab through the chrome", async () => {
+    const user = userEvent.setup();
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
+    const pause = vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => {});
+    const onIndexChange = vi.fn();
+    render(
+      <MediaViewer
+        items={[...ITEMS, { type: "video", src: "/walkthrough.mp4", alt: "Обход" }]}
+        defaultOpen
+        autoPlay={false}
+        onIndexChange={onIndexChange}
+      />,
+    );
+    fireEvent.load(within(current()).getByRole("img", { name: "Разгрузка у ворот 3" }));
+    fireEvent.keyDown(dialog(), { key: "+" });
+    expect(dialog()).toHaveAttribute("data-zoomed");
+    fireEvent.keyDown(dialog(), { key: "-" });
+    fireEvent.keyDown(dialog(), { key: "-" });
+    expect(dialog()).not.toHaveAttribute("data-zoomed");
+    fireEvent.keyDown(dialog(), { key: "End" });
+    expect(onIndexChange).toHaveBeenLastCalledWith(3);
+    fireEvent.keyDown(dialog(), { key: "ArrowLeft" });
+    expect(onIndexChange).toHaveBeenLastCalledWith(2);
+    fireEvent.keyDown(dialog(), { key: "Home" });
+    expect(onIndexChange).toHaveBeenLastCalledWith(0);
+    fireEvent.keyDown(dialog(), { key: "End" });
+    const video = dialog().querySelector("video") as HTMLVideoElement;
+    Object.defineProperty(video, "duration", { configurable: true, value: 60 });
+    video.currentTime = 20;
+    fireEvent.keyDown(stage(), { key: "k", code: "KeyK" });
+    expect(play).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(stage(), { key: "ArrowLeft", shiftKey: true });
+    expect(video.currentTime).toBe(15);
+    fireEvent.keyDown(stage(), { key: "ArrowDown" });
+    expect(video.volume).toBeCloseTo(0.9);
+    // Tab moves through the chrome and stays inside the dialog both ways.
+    await user.tab();
+    expect(dialog()).toContainElement(document.activeElement as HTMLElement);
+    await user.tab({ shift: true });
+    expect(dialog()).toContainElement(document.activeElement as HTMLElement);
+    play.mockRestore();
+    pause.mockRestore();
   });
 
   it("answers the player keys on a video page: Space, M, Shift + arrows, up and down", () => {

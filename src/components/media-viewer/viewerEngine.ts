@@ -285,10 +285,6 @@ export class ViewerEngine {
     }
   }
 
-  get isZoomed(): boolean {
-    return this.zoomed;
-  }
-
   /** Paints the current state: after React mounted or moved a slide. */
   paint = (): void => {
     const width = this.area.width + this.gap;
