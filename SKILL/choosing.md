@@ -55,8 +55,8 @@ contacts, specs, prices by period) → FieldList: one row per record, the headin
 | any color as a field of a form (swatch + hex, picker in a popover) | ColorField |
 | any color in a panel of its own (hex, eyedropper, channels) | ColorPicker |
 
-**Data.** Status, count, removable value or applied filter → Badge (`onRemove` to remove, `onPress` to
-toggle). Person or organization → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a
+**Data.** Status, count, removable value or applied filter → Badge (`tone` for a status, `color` for a
+category, `onRemove` to remove, `pressed` / `onPressedChange` to toggle). Person or organization → Avatar. Object (product, vehicle, file, cover) → Thumbnail with a
 `ratio` — never a round Avatar for things. Keyboard shortcut → Kbd. One block of related
 numbers/content → Card (pick the template; a whole tile that opens its details → `Card.Root asChild`
 with a link). Read-only properties of one record («label — value») → DescriptionList, never a
@@ -108,11 +108,10 @@ show → EmptyPage; a region that failed to load → EmptyPage `tone="danger"` w
 loading, data, empty and error, or showing one record at a time → its content in
 `Crossfade state={status}`, with a Skeleton as the loading state (DataTable's body does both by itself).
 
-**Overlays.** See the pairs below. Global search over commands and pages (⌘K) → CommandMenu. A short
-task that ends by itself (a date, an action on a record, a short note) raised from the bottom edge →
-Sheet. Menus, selects, pickers and Modal turn into bottom sheets below 640px by themselves — never
-build your own. A photo, a scan or a video opened full screen from its thumbnail (a Gallery tile, a
-Thumbnail button) → MediaViewer, never a Modal with an `<img>`.
+**Overlays.** See the pairs below. Global search over commands and pages (⌘K) → CommandMenu. Menus,
+selects, pickers and Modal turn into bottom sheets below 640px by themselves — never build your own.
+A photo, a scan or a video opened full screen from its thumbnail (a Gallery tile, a Thumbnail button)
+→ MediaViewer, never a Modal with an `<img>`.
 
 **Phone navigation.** App navigation is Sidebar on a wide screen and `BottomNav` in `AppShell.Footer`
 on a phone for 2–6 main sections (the shell hides it by itself while the Sidebar rail is on screen;
@@ -122,31 +121,30 @@ Drawer menu.
 **App frame.** Sidebar collapse control: `Sidebar.Toggle variant="header"` next to `Sidebar.Brand` in
 `Sidebar.Header` — at the header's end while expanded, a small round button on the rail's edge while
 compact (the default for a branded rail); `Sidebar.Toggle` (`variant="item"`) in `Sidebar.Footer` when
-the rail has no brand header. On phones neither replaces `AppHeader.MenuButton` that
-opens the off-canvas Sidebar (`open` / `onOpenChange`). The bar at the top of the panel is the page's
-`AppHeader`: the page title (`AppHeader.Title` + a line of data), the page's own buttons and its
-tools — a `PageToolbar` in `AppHeader.Tools` when the page has several tools above its data (sections,
-search and filters, a view switch, the primary action) that must rearrange on a phone; one search or one
-filter above a single table goes into the DataTable `toolbar` instead. Only a document page (settings,
-a long form, help) has its title in main, `PageContent.Header`, and no title in the header. A record
-opened from a table: its own page → DataTable `getRowHref`; in place → `onRowClick` + Drawer; a list
-worked through record by record (mail, chat, tickets) → `PageContent.Split` with a `List` of the records
-(`current` on the open one). Sections of a long rail → `Sidebar.Group
-collapsible`; a section with sub-pages → `Sidebar.Sub`; the signed-in user → `Sidebar.Account` in a
-`Dropdown.Trigger` at the bottom of `Sidebar.Footer`.
+the rail has no brand header. On phones the off-canvas Sidebar opens from the menu button the
+`AppHeader` draws by itself; a trigger of your own reads `useAppShellNav()`. The bar at the top of the
+panel is the page's `AppHeader`: the page title (`AppHeader.Title` + a line of data), the page's own
+buttons and its tools — [where the tools and filters go](composition.md#where-the-filters-go). Only a
+document page (settings, a long form, help) has its title in main, `PageContent.Header`, and no title
+in the header. A record opened from a table: its own page → DataTable `getRowHref`; in place →
+`onRowClick` + Drawer; a list worked through record by record → `PageContent.Split` with a `List` of
+the records (tickets, letters, invoices; `current` on the open one) or a `ChatList` of the
+conversations. Sections of a long rail → `Sidebar.Group collapsible`; a section with sub-pages →
+`Sidebar.Sub`; the signed-in user → `Sidebar.Account` in a `Dropdown.Trigger` at the bottom of
+`Sidebar.Footer`.
 
 ## 3. Pairs that are easy to confuse
 
 | Pair | Rule |
 |---|---|
-| List / Sidebar / Tabs / Card list / DataTable | List: the records of a list + detail screen (dialogs, tickets, mail), one open at a time (`current`), each row a button or a link with a text line, a preview, meta and a count. Sidebar: the sections of the **app**. Tabs: panels of **one screen**. `Card.List` (`variant="list"`): static facts in a card, nothing opens. DataTable: many records compared by columns, sorted, filtered, selected in bulk. |
+| List / ChatList / Sidebar / Tabs / Card list / DataTable | List: the records of a list + detail screen that are not conversations (tickets, letters, invoices), one open at a time (`current`), each row a button or a link with a text line, a preview, meta and a count. ChatList: the conversations of a messenger or an inbox. Sidebar: the sections of the **app**. Tabs: panels of **one screen**. `Card.List` (`variant="list"`): static facts in a card, nothing opens. DataTable: many records compared by columns, sorted, filtered, selected in bulk. |
 | FieldList / DataTable / Fieldset / TagSelect | FieldList: records of one shape a person **edits** in a form, a row of fields each, added and removed by hand, up to four short fields per row. DataTable: records a person **reads**, sorts, filters and selects; edits open a Drawer. Fieldset: **one** record's fields under a heading. TagSelect: values **picked** from options, shown as tags. One value in several units is none of them — fields in one row under one heading. |
 | Tabs / SegmentedControl | Tabs switch **panels of content** (navigation inside a screen). SegmentedControl switches a **value or mode** of the same content (period, view mode, filter). |
 | Modal / Drawer / Sheet / Popover / Tooltip | Modal: blocking decision or a short form (≤ 4 fields) that needs full attention. Drawer: long form, filters, record details beside the page, while keeping page context. Sheet: a short task that ends by itself — a pick, an action, a short note — raised from the bottom edge. Popover: small non-modal panel anchored to a control (quick edit, explanation with a link). Tooltip: a few words naming or explaining a control, no interactive content. |
 | Select / NativeSelect | Select: the kit's floating list — icons, descriptions, groups, search, `multiple`, `clearable`. NativeSelect: a plain text list where the OS picker is better (phones) or the value must post with a form by `name`. |
 | Select / Dropdown / CommandMenu / TagSelect | Select picks a **value** for a field (form data). Dropdown runs **actions** (Edit, Duplicate, Delete). CommandMenu searches commands and pages across the app (locally or on the server) — it is not a field. TagSelect picks **several values** as tags. |
-| SmartFilter / Select in a toolbar | One field with a few options → SegmentedControl or Select in the table toolbar. Several fields, search, include / exclude → SmartFilter. |
-| Badge / Button | A badge labels or holds a value (status, filter, keyword): `onRemove` drops it, `onPress` toggles it. A command (save, open, go) is always a Button. |
+| SmartFilter / SegmentedControl / Select | Search and filters over a list → SmartFilter (`fields={[]}` for a search alone), even with one field. A switch of what the same data shows (sections with counts, a period, a view) → SegmentedControl, or a Select when the options are many. |
+| Badge / Button | A badge labels or holds a value (status, filter, keyword): `onRemove` drops it, `pressed` toggles it. A command (save, open, go) is always a Button. |
 | Banner / Notification / Hint | Banner: persistent message in the page flow about a page/section state (sync failed, trial ends). Notification: transient toast about the result of an action (saved, failed). Hint / `error`: help or validation text under one field. |
 | ProgressBar / ProgressCircle / Spinner | ProgressBar: a share with width to spare and words beside it (an upload row, an import, a quota line). ProgressCircle: a share on the data scale (24–80) where width is short or a ring reads better (a KPI goal, a ring breakdown, a named import card); `value={null}` while the share is unknown, `spin` while a share grows, an icon in the centre. Spinner: an anonymous «busy» on the icon scale inside a control or a status line, no share, no name of its own. A ring you can press (cancel, retry, download a transfer) → Button `shape="circle"` with `progress`, not any of the three. |
 | Button / LinkButton | Button does something (submit, open, delete). LinkButton goes somewhere (a URL, «Подробнее», «Все заказы»). |
@@ -163,7 +161,7 @@ collapsible`; a section with sub-pages → `Sidebar.Sub`; the signed-in user →
 | Stepper / Tabs | Stepper for a sequential process with completion status; Tabs for non-sequential views. |
 | Gantt / Timeline / Kanban / DataTable | Gantt: records with a start and an end compared across time (who is busy when, a plan with phases and milestones), moved, stretched and drawn by hand (`onBarChange`, `onBarCreate`). Timeline: a history of events at points in time, read top to bottom. Kanban: work items moved between statuses, time does not matter. DataTable: many records compared by many attributes, sorted, filtered and selected — dates are only columns. |
 | DescriptionList / DataTable / Card | DescriptionList: the properties of **one** record as «label — value» pairs (requisites, deal terms, a summary before a confirm). DataTable: **many** records with the same properties. Card: the bounded block they sit in, or one headline number (`mini`, `stat-trend`) — a DescriptionList inside a `Card.Body`, never a Card per property. |
-| ConfirmDialog / Modal / `holdToConfirm` / undo | A row or item in a list that can be restored → delete at once and offer «Отменить» in the Notification. One standalone destructive action that is easy to redo by hand, no list (clear a draft, revoke a token) → `Button.Root holdToConfirm` with the action in `onConfirm`. Irreversible loss of work or a weighty action (delete a project, send an invoice) → ConfirmDialog (`onConfirm` returns the request; pending, failure and dismiss rules are built in). Unsaved changes in a Modal or Drawer form → `Modal.Guard` / `Drawer.Guard dirty`. A form, a choice or more than a sentence of content → Modal; never a Modal hand-built as a confirm. |
+| ConfirmDialog / Modal / `holdToConfirm` / undo | Which of them an action deserves is its cost: [ux.md → friction](ux.md#5-friction-matches-the-cost-of-a-mistake). ConfirmDialog only asks a question (`onConfirm` returns the request; pending, failure and dismiss rules are built in); a form, a choice or more than a sentence of content → Modal; never a Modal hand-built as a confirm. |
 | Composer / Textarea | Composer: the message input of a conversation — Enter sends, attachments, a reply or edit bar, voice and round video. Textarea: long text saved with a form (a description, a comment field) by its submit button. |
 | Chat / Message / Gallery | Chat: a conversation — the header, search, pinned, the one message list (dates, runs, selection, jumps, read receipts, typing) and the Composer in its footer; a list without the rest is `Chat.Root` with `Chat.Messages`. Message: one message and its content parts — a row of that list, or a bubble on its own (a quoted reply in a ticket). Gallery: an album of photos and videos laid out by their ratios — `Message.Media` in a message, `Gallery` anywhere else (a post, a comment, a report). |
 | Message / Timeline / Notification | Message: what people say to each other in a conversation, in bubbles. Timeline: what happened to a record (status changes, an audit log). Notification: the result of the user's own action, for a few seconds. A chat event («Анна добавила Олега») is `Chat.Service`, not a Notification. |

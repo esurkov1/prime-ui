@@ -66,21 +66,45 @@ for (const api of apis) {
   }
 }
 
-/** The exported names of the main entry, for the scope of a ```tsx good block. */
-function kitNames(): string[] {
-  const source =
-    read("src/index.ts") + read("src/components/index.ts") + read("src/layout/index.ts");
-  const names = new Set<string>();
-  for (const m of source.matchAll(/^export \{([^}]*)\} from/gm)) {
-    for (const item of m[1].split(",")) {
-      const name =
-        item
-          .trim()
-          .split(/\s+as\s+/)
-          .pop() ?? "";
-      if (/^[A-Za-z]\w*$/.test(name)) names.add(name);
-    }
+/** A module specifier of `from` resolved to a repository file. */
+function resolveModule(from: string, specifier: string): string | null {
+  const base = path.posix.join(path.posix.dirname(from), specifier);
+  for (const candidate of [`${base}.ts`, `${base}.tsx`, `${base}/index.ts`]) {
+    if (fs.existsSync(path.join(root, candidate))) return candidate;
   }
+  return null;
+}
+
+/**
+ * The value exports of the main entry, for the scope of a ```tsx good block: the names of its
+ * `export { … } from` lines and of the modules it re-exports whole (`export * from`).
+ */
+function kitNames(): string[] {
+  const names = new Set<string>();
+  const seen = new Set<string>();
+  const visit = (file: string) => {
+    if (seen.has(file)) return;
+    seen.add(file);
+    const source = read(file);
+    for (const m of source.matchAll(/^export \{([^}]*)\} from/gm)) {
+      for (const item of m[1].split(",")) {
+        const name =
+          item
+            .trim()
+            .split(/\s+as\s+/)
+            .pop() ?? "";
+        if (/^[A-Za-z]\w*$/.test(name)) names.add(name);
+      }
+    }
+    for (const m of source.matchAll(/^export (?:async )?(?:function|const|class) ([A-Za-z]\w*)/gm)) {
+      names.add(m[1]);
+    }
+    for (const m of source.matchAll(/^export \* from "([^"]+)";$/gm)) {
+      const target = resolveModule(file, m[1]);
+      if (target) visit(target);
+    }
+  };
+  visit("src/index.ts");
   return [...names].sort();
 }
 

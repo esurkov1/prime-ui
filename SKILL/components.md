@@ -3,9 +3,9 @@
 Index of every kit component, grouped like the playground menu — by the task the user has (the same
 categories as [choosing.md](choosing.md)). Each row links to the full reference
 (`COMPONENT.md`: API, variants, states, a11y, mistakes) and to copyable scenarios (`examples/`).
-Paths are relative to this folder in the kit repository; in a consumer project prefix them with
-`node_modules/prime-ui-kit/` instead of `../`. Whole screens built from these components are the `screen.tsx` example of
-their main component, indexed in [composition.md](composition.md#screens).
+Whole screens built from these components are the `screen.tsx` example of their main component,
+indexed in [composition.md](composition.md#screens). The tables below are generated from each
+component's purpose line.
 
 <!-- components:start -->
 ## Foundations (`foundations`)

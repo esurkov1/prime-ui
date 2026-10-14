@@ -15,8 +15,8 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 - Omit `size` for the default `m` — never write `size="m"`.
 - Set `size` on the root (`Input.Root size="s"`, `Select.Root size="s"`) — not on `Input.Field` or `Select.Trigger`.
-- One tier for a whole region: `<ControlSizeProvider value="s">` around a dense toolbar — not `size="s"` on one control to make it fit. Select, NativeSelect, TagSelect, Datepicker, Tabs and SmartFilter do not read the host tier: give them the same `size` yourself.
-- Inside a host (Popover, Banner, LoginForm, the DataTable `toolbar`) leave `Button.Root`, `Input.Root`, `Textarea.Root`, `Checkbox.Root`, `DigitInput` and the other host-reading controls without `size` — the host passes its tier ([full list](api-contract.md)).
+- One tier for a whole region: `<ControlSizeProvider value="s">` around a dense toolbar — not `size="s"` on one control to make it fit.
+- Inside a sized host (Popover, Banner, LoginForm, the DataTable `toolbar`) leave the kit controls without `size` — the host passes its tier ([the host tier](api-contract.md#size-and-the-host-tier)).
 - A control in a table cell or a card header row is one tier down: `<Button.Root size="s" variant="ghost" tone="neutral">`.
 
 ## Structure
@@ -28,9 +28,9 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 ## Fields
 
 - Frame a field with props on the root: `<Input.Root label="Почта" hint="…" error="…" required>` — not a separate `Label` / `Hint` next to it.
-- Mark the minority: `required` when most fields are optional, `optional` when most are required — not both everywhere.
+- Mark the minority, never both everywhere ([the rule](api-contract.md#forms)).
 - Placeholder is an example value (`name@company.ru`) — never the label.
-- Checkbox, Switch, Radio: the text is the part `<Checkbox.Label>`, `hint` / `error` sit on `Checkbox.Root` — not a `label` prop.
+- Checkbox, Switch, Radio: the text is the part `<Checkbox.Label>`, `hint` / `error` sit on `Checkbox.Root` — and a radio choice's on `Radio.Group` ([choice controls](api-contract.md#choice-controls)) — not a `label` prop.
 - Show `error` after blur or on submit; `<form noValidate onSubmit>` + `<Button.Root type="submit" loading>` — not validation on every keystroke.
 - Groups of fields: `<Fieldset label="Контакты" disabled={saving}>` with the submit `<Button.Root loading>` outside it — not a hand-reset `<fieldset>` with a `Typography` heading, not `disabled` on every field while saving. One choice with a heading (`Radio.Group label`) needs no Fieldset.
 - Uploads: `const queue = useUploadQueue({ upload })` → `<FileUpload.Root queue={queue} />` (`FileUpload.Queue` when the picker lives elsewhere) — progress, «В очереди», the reason of a failure, retry and remove come with it (three at once by default, `concurrency`); not a hand-kept list of files with own progress bars. A photo appears at once from its local preview.
@@ -49,7 +49,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Uncontrolled by default: `defaultValue`, `defaultChecked`, `defaultOpen`.
 - Controlled triads, same names everywhere: `value` / `onValueChange`, `checked` / `onCheckedChange`, `open` / `onOpenChange` — not `onChange(event)` (except the native `Input.Field` / Textarea `onChange`), `isOpen`, `onToggle`.
 - Selection count is `multiple` (`Select.Root multiple`) — not `type="multiple"`.
-- A slow or risky action is an async event: return the request's Promise from `onConfirm`, `onCommit`, `onReorder`, `onBarChange`, `onSend`, a Switch's `onCheckedChange`, a Slider's `onCommit`, a DigitInput's `onComplete`, a Kanban or FileUpload change, a Badge `onRemove`, TagSelect `onCreate`… — the component shows pending, keeps the change on resolve and rolls it back on reject; not `true` / `false`, not your own pending flag, no `onBeforeX`.
+- A slow or risky action is an async event: return the request's Promise from `onConfirm`, `onCommit`, `onReorder`, `onBarChange`, `onSend`, a Switch's `onCheckedChange`, a Slider's `onCommit`, a DigitInput's `onComplete`, a Kanban or FileUpload change, a Badge `onRemove`, TagSelect `onCreate`… — the component shows pending, keeps the change on resolve and undoes it on reject (each component's COMPONENT.md says how); not `true` / `false`, not your own pending flag, no `onBeforeX`.
 - A Select that saves on pick: return the save's Promise from `onValueChange` — the value shows at once with a Spinner on the trigger and a rejection rolls it back (`labels.changeFailed`); never reset the value by hand. A «Новый клиент» row in the list is `Select.Action` (`onSelect`), never a fake `Select.Item` with a sentinel value or a button under the field.
 - An option reads its parts by element type: put `Avatar.Root`, `Thumbnail.Root`, `Badge.Root` and `Select.Item*` straight in the item and call your helper as a function (`{clientAvatar(c)}`), not as `<ClientAvatar />`; anything else trailing goes in `Select.ItemMeta`.
 - Create from a search: one `persistent` `CommandMenu.Item` at the end («Создать клиента «{query}»», while the query is not empty) — it stays when a namesake matches; `CommandMenu.Empty` holds only the text.
@@ -86,7 +86,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 ## Cards and surfaces
 
 - `Card.Root` only for a bounded block with its own title: a KPI tile (`variant="stat-trend"`), a settings panel (`variant="panel"`), side facts — not around a whole section, a form field or a page.
-- Never a card in a card, and never a `DataTable` inside a Card — the table is already a filled block.
+- Never a `DataTable` inside a Card — the table is already a filled block; a card in a card only sparingly ([the rule](foundations.md#card-in-a-card)).
 - Section without a card: `<PageContent.Section label="…">` + the content (a link or button beside the heading in `PageContent.Actions`) — not a hand-made `<section>` + `Typography as="h2"` + own gap.
 - The tiles of a screen (KPI cards, charts, panels): one `<PageContent.Grid>` with a `<PageContent.Cell span>` per tile — not an `auto-fit` grid per row (the rows would stand 24 apart instead of 16).
 - Depth from fill, not lines: no borders around blocks; `<Divider />` only inside a block.
@@ -95,15 +95,15 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 
 ## Tables
 
-- A list page is `<DataTable columns rows getRowKey toolbar={…}>` with `<SmartFilter.Root fields value onValueChange>` + `<SmartFilter.Toolbar />` + `<SmartFilter.Chips />` in `toolbar`; filter rows with `matchesSmartFilter` — not a search Input and a row of Selects above the table.
+- A list page is a `<DataTable columns rows getRowKey>` under the page's `<SmartFilter.Root fields value onValueChange>` with `<SmartFilter.Toolbar />` + `<SmartFilter.Chips />` in its `PageToolbar` ([where the filters go](composition.md#where-the-filters-go)); filter rows with `matchesSmartFilter` — not a search Input and a row of Selects above the table.
 - Search over a table or a list page is always SmartFilter, even with no filter fields yet (`fields={[]}` is a plain search that grows into filters). A search `Input` only outside a filtered list: inside a picker, a settings section, a panel.
 - Paging is built in: `paging="pages"` (default) with `pageSize`, `paging="infinite"` for feeds, `paging="none"` for short lists — not a separate `<Pagination>` under a DataTable.
 - Long lists are virtualized inside the kit: pass the whole array to `DataTable` (with `scrollHeight` or `paging="infinite"`; over 100 rows — grouped, `onReorder` and `renderExpanded` bodies render every row, keep those short or paged), `TagSelect options`, `Chat.Messages items`, `Gantt rows` — never slice it by hand, never wrap a kit list in react-window / react-virtual or your own windowing. Big remote data is still paged or loaded on scroll by the server (`source="server"`, `onLoadMore`).
 - Data the server sorts and pages (thousands of records): `source="server"` + `rowCount`, controlled `sort` / `page` as the request, `page` back to 1 on a new search or filter, old rows kept with `loading` while the next page loads — not a server page passed to the default client mode, and not `rows={[]}` between pages.
-- Categories (sources, platforms, regions) get `color` and the same order of `chartColors` in charts; statuses and meanings get `tone` — never paint categories with tones.
+- Categories (sources, platforms, regions, teams) get `color` and the same order of `chartColors` in charts; statuses and meanings get `tone` — never paint a status with a palette hue or a category with a tone.
 - A chart with axes or several series: `<ChartFrame.Root series rows state>` around the library (or your SVG) with `ChartFrame.Plot renderPlot` and `Legend`; `rows` is the data table screen readers get — not a hand-made Card with a grey box while loading and a legend of colored dots.
 - A tooltip on your own SVG chart: `<ChartFrame.Tooltip point={{ x, y }} items>` with the pointer in plot coordinates — not a `foreignObject` or a div placed and clamped by hand; it flips only when out of room.
-- Amounts, counts and dates are `numeric` columns; statuses are `Badge.Root color` from one status → color map.
+- Amounts, counts and dates are `numeric` columns; statuses are `Badge.Root tone` from one status → tone map.
 - Rows people order by hand: `onReorder(id, beforeId)` (apply it with `moveBefore`, return the save's Promise) — not a Dnd list rebuilt next to the table.
 - A short list of records people order by hand (stages, priorities) is `<List.Root onReorder>` with `List.Item value` — not up / down buttons or a hand-made `Dnd.Sortable`.
 - Groups that fold: pass `defaultCollapsedGroups={[]}` (or the controlled `collapsedGroups` + `onCollapsedGroupsChange`) — not your own button in `renderGroupHeader` or filtering `rows`. One heatmap over several columns: the same `scale: { min, max }` on each.
@@ -130,14 +130,14 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - A long history (thousands of messages): nothing to switch on — `Chat.Messages` renders only the rows around the view and keeps the reader's place. With children, every top-level child is one row (a `Message.Root`, or a fragment / your own row component keyed by the message `value`); give pictures their `width` / `height` so a row's size is final before load; jumps, search, selection and the keyboard still reach every message. Not a hand-rolled window, `content-visibility` on rows or a measured bubble.
 - A message's layout is CSS: the bubble fits its content and the time sits at the end of the last line (or of the reactions row). Every size change of a message (reactions, a transcript, an edit, an upload) plays as one built-in stroke, width and height together; a reaction grows the message upward with the time still, the rows above gliding as one block. Never size, measure or animate a bubble yourself; an own content part declares itself with the kit's part contract instead of a wrapper.
 - One sound at a time is built in: a voice message, a video message and a chat video pause each other; `playing` / `onPlayingChange` on `VoicePlayer` or `VideoNote` when the app needs to know. A round video never plays or loops before a press. A recorded voice message without levels gets them from `getWaveform(blob)` once, stored with the message.
-- Transcripts: `transcript="…"` on `VoicePlayer` or `VideoNote` when the text is known, or `onTranscribe={() => api.transcribe(id)}` returning a Promise of the text; the button, the skeleton, the bubble's one-stroke growth and the rollback on a rejection are built in. Store the resolved text with the message. Not a `Message.Text` under the voice message, not a disclosure of your own.
+- Transcripts: `transcript="…"` on `VoicePlayer` or `VideoNote` when the text is known, or `onTranscribe={() => api.transcribe(id)}` returning a Promise of the text; the button and its pending state, the bubble's one-stroke growth and the rollback on a rejection are built in. Store the resolved text with the message. Not a `Message.Text` under the voice message, not a disclosure of your own.
 
 ## Overlays
 
 - Blocking decision or ≤ 4 fields → `Modal` (`<Modal.Content size="s">` for a confirm); long form, filters, details → `Drawer`; a short task that ends by itself (a date, an action, a note) → `Sheet`; small panel at a control → `Popover`; list of actions → `Dropdown`; a field value → `Select`; a name for an icon button → `Tooltip`; ⌘K → `CommandMenu`; a photo, a scan or a video full screen from its thumbnail → `MediaViewer` (an album in a grid is `Gallery`, which opens it for you; a standalone viewer keeps `open` and `index` in two states) — not a Modal with an `<img>`.
 - A record's drawer or modal shows its person or object as `Drawer.Icon` / `Modal.Icon` around `Avatar.Root` / `Thumbnail.Root`. A confirm that asks for input (a reason) is a `Modal size="s"` with the field, `Modal.Confirm` and `Modal.Guard busy` — `ConfirmDialog` is a question only.
 - Never a hand-made `div` backdrop, dialog, menu or tooltip.
-- Every Modal and Drawer has all three zones: `Header` (title, ×) · `Body` (content, scrolls) · `Footer` (actions). Details: `<Drawer.Footer><Drawer.Close><Button.Root variant="outline" tone="neutral">Закрыть</Button.Root></Drawer.Close></Drawer.Footer>`, plus the main action last; a form: «Отмена» + submit. Not a drawer that ends with the body, not Save at the bottom of the body. A `Sheet` (from the bottom edge) is the opposite: no footer by default — a pick or a swipe ends it — and its header is optional: keep it when the content needs a title, drop it (× and hairline go too) when the content speaks for itself, with `aria-label` on `Sheet.Content`. Never `Drawer.Content side="bottom"`.
+- Every Modal and Drawer has its `Header` (title, ×); `Body` (content, scrolls) and `Footer` (actions) are there when it has content and actions. Actions always go into the `Footer`: details `<Drawer.Footer><Drawer.Close><Button.Root variant="outline" tone="neutral">Закрыть</Button.Root></Drawer.Close></Drawer.Footer>`, plus the main action last; a form: «Отмена» + submit — not Save at the bottom of the body. A `Sheet` (from the bottom edge) is the opposite: no footer by default — a pick or a swipe ends it — and its header is optional: keep it when the content needs a title, drop it (× and hairline go too) when the content speaks for itself, with `aria-label` on `Sheet.Content`. Never `Drawer.Content side="bottom"`.
 - Content inside a Drawer, a Sheet or a Card is the host's own: a calendar is `Datepicker.Panel` straight in the body, across its width — no card, no padded box around it.
 - A destructive confirm is `<ConfirmDialog.Root title description confirmLabel onConfirm={remove}>` with a `ConfirmDialog.Trigger` — not a Modal assembled as a confirm with your own pending state; a reversible delete offers «Отменить» in the notification instead.
 - Overlays close smoothly only if they stay mounted: render the `Root` always and drive visibility with `open` alone — never `{open && <Drawer.Root>}`, never a changing `key` on the Root. The kit keeps the last content on screen while the exit plays.
@@ -153,7 +153,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - One ring in the kit: a share → `ProgressCircle value` (`null` while unknown, `spin` while it grows); an anonymous busy mark → `Spinner`; a ring you press → circle Button `progress`. Never your own `@keyframes` ring or conic gradient.
 - A single destructive action that is easy to redo by hand (clear a draft, revoke a token), no list and no dialog: `<Button.Root tone="danger" variant="soft" holdToConfirm onConfirm={remove}>` — the action in `onConfirm`, not `onClick`. A row in a list: delete at once and offer «Отменить» in the notification.
 - Counts: a number child of `Badge` rolls its digits — not a string you re-render with your own fade.
-- New password: `<Input.Root strength>`; steps of a whole: `<ProgressBar steps value={2} max={5} />`; a trend tile: `<Sparkline data label formatValue />`.
+- New password: `<Input.Root strength>`; steps of a whole: `<ProgressBar label="Шаги настройки" steps value={2} max={5} />`; a trend tile: `<Sparkline data label formatValue />`.
 - A rare milestone only: `celebrate({ origin: event.currentTarget })` — never for a saved form.
 - No motion on keyboard-driven or high-frequency actions; tokens only, no bounce. Full guide: [motion.md](motion.md).
 
@@ -172,8 +172,8 @@ State change is continuous in the whole kit: every region that changes what it s
 ## Sidebar
 
 - Brand header: `Sidebar.Header` > `Sidebar.Brand href description` (with `Sidebar.BrandLogo`) + `<Sidebar.Toggle variant="header" />` — not a Toggle in the footer when the rail has a brand.
-- Off-canvas: `offCanvas="auto"` (default, below 768px) with `open` / `onOpenChange` and a menu button that opens it; `offCanvas="always"` for navigation behind a menu at any width; `offCanvas="never"` for a rail that always stays.
-- Every item has `Sidebar.ItemIcon` (compact mode shows only icons) and is a link: `href` or `asChild` with the router `NavLink`; `current` marks the page.
+- Off-canvas: `offCanvas="auto"` (default, below 768px), `"always"` for navigation behind a menu at any width, `"never"` for a rail that always stays; the AppHeader draws the menu button that opens it — no menu state of your own; another trigger reads `useAppShellNav()`.
+- Every item is a link (`href` or `asChild` with the router `NavLink`; `current` marks the page), with a `Sidebar.ItemIcon` on the [top-level items and sub-list parents](layouts.md#sidebar-icons).
 - The signed-in user: `Sidebar.Account` inside `Dropdown.Trigger` at the end of `Sidebar.Footer`.
 - Structure: everyday places on top without a label, categories as `Sidebar.Group label collapsible` (one short word, 3–7 items), views of one section as `Sidebar.Sub` (one level, the parent only discloses) — not every group folded, not a sub-list inside a sub-list.
 - Counts: plain `Sidebar.ItemCount` for information; `color` only when it needs action — it becomes a dot on the rail and on folded parents.
@@ -183,9 +183,9 @@ State change is continuous in the whole kit: every region that changes what it s
 
 Full rules: [responsive.md](responsive.md).
 
-- The page panel is `<PageToolbar.Root>` with, in this order, `Tools` (`SmartFilter.Toolbar`: search, then filter), `Sections` (a `fullWidth` SegmentedControl), `View`, `Actions`, `Chips` — the active filters sit under the top row, never under the sections; on a phone the primary action takes its own row by itself when the search would be squeezed; not a hand-made flex row of tabs, search and buttons.
+- The page panel is `<PageToolbar.Root>` with `Tools` (`SmartFilter.Toolbar`), `Sections` (a `fullWidth` SegmentedControl), `View`, `Actions`, `Chips` — it orders and wraps them itself ([the page panel](responsive.md#page-panel--pagetoolbar)); not a hand-made flex row of tabs, search and buttons.
 - Rearrange, never hide: every desktop function is on the phone, in another place or a menu — not `display: none` below a breakpoint.
-- Breakpoints 640 · 768 · 1024 · 1280 only for the app frame; inside a page — intrinsic grids (`auto-fill, minmax`) and container queries.
+- Breakpoints only in [their scope](responsive.md#breakpoints); inside a page — [intrinsic grids](responsive.md#intrinsic-grids) and container queries.
 - A wide table scrolls inside itself; offer `DataTable.ColumnsMenu` in its `toolbar` — never drop columns by breakpoint, never hand-build the chooser.
 - A row that opens a record page is `getRowHref` (a real link: ⌘-click, new tab), a row that opens a drawer is `onRowClick` — never `navigate()` in `onRowClick`, never your own `event.target` checks for buttons in the row.
 - A list + detail screen is `PageContent.Split` in a `PageContent.Root fill` page, its records a `List` (`current` on the open one) — never ghost Buttons with a soft current; a full-height table is `scrollHeight="fill"` — never a height computed from `100vh`.
@@ -198,7 +198,7 @@ Full rules: [responsive.md](responsive.md).
 
 - Gaps are `gap` on the parent with `--prime-space-N` (N × 4px): 8 in a row of buttons, 16 tile → tile, 20 field → field, 32 group → group; `PageContent` already spaces blocks 24 and sections 40 — not margins, not outer padding.
 - Tokens only: `var(--prime-space-4)`, `var(--prime-color-text-secondary)`, `var(--prime-radius-m)` — never raw `px` / `rem` / hex, never `--prime-ref-*`, never inline `style`.
-- Text through `Typography` roles (`title-m`, `title-s`, `body-m`, `caption`) and `tone="secondary" | "muted"` — not `font-size` or `color` in CSS.
+- Text through `Typography` roles (`title-m`, `title-s`, `body-m`, `caption`) and its `tone` — not `font-size` or `color` in CSS ([text colour](foundations.md#text-colour)).
 
 ## UX — what goes on the screen
 
@@ -207,11 +207,11 @@ Full rules: [responsive.md](responsive.md).
 - Every label carries something new: once per column, never numbered, never repeating its heading; no hint that explains what the layout shows (a lock already says «закреплено»).
 - Buttons say the verb and the object («Выставить счёт»), errors say how to fix it («Формат: +7 912 404-18-20»), empty states offer the next step — not «ОК», «Ошибка», «Нет данных».
 - Money, numbers and dates through `Intl` (`ru-RU`); «ёлочки», `…`, a non-breaking space before a unit — not `toFixed` and string glue.
-- Friction matches the cost: a reversible action at once with «Отменить» in a `Notification`; `ConfirmDialog` only for irreversible or weighty ones, naming the thing and the loss — not «Вы уверены?» on every delete.
+- Friction matches the cost of a mistake ([the ladder](ux.md#5-friction-matches-the-cost-of-a-mistake)) — not «Вы уверены?» on every delete.
 - A disabled control says why when the reason is not on screen; an action without permission is hidden.
 - Tabs, filters, search, page and the open record live in the URL.
 - Changing a screen that exists: audit it against [ux.md](ux.md), [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md) first, fix the shape, then make the change.
-- Before handing over, look at it in a browser: both themes, 1280 and 375 px, every text read aloud.
+- Before handing over, look at it in a browser ([the visual check](ux.md#9-look-at-it-before-handing-it-over)).
 
 ## Anti-slop
 
@@ -228,8 +228,8 @@ import { applyTheme } from "prime-ui-kit";
 applyTheme("light");
 ```
 
-The frame itself (providers, `AppShell` with `Sidebar` and the phone menu button) is built once too:
-copy it from [layouts.md](layouts.md#app-frame-once-per-app).
+The frame itself (providers, `AppShell` with the `Sidebar`) is built once too: copy it from
+[layouts.md](layouts.md#app-frame-once-per-app).
 
 A document page (a form) — its title is in main, its header carries none:
 
@@ -265,7 +265,7 @@ A region with all its states — loading, data, empty, error — that flow into 
 shape for every block that fetches data (a table uses DataTable `loading` / `empty` / `loadError` instead):
 
 ```tsx
-import { Button, Card, Crossfade, EmptyPage, Icon, Skeleton, Typography } from "prime-ui-kit";
+import { Card, Crossfade, EmptyPage, Icon, Skeleton, Typography } from "prime-ui-kit";
 import styles from "./InvoicesCard.module.css";
 // .rows { display: grid; gap: var(--prime-space-3); margin: 0; padding: 0; list-style: none; }
 // .row { display: flex; align-items: center; justify-content: space-between; gap: var(--prime-space-4); }
@@ -276,7 +276,8 @@ type Invoice = { id: string; client: string; amount: string };
 type InvoicesCardProps = {
   status: "loading" | "ready" | "error";
   invoices: Invoice[];
-  onRetry: () => void;
+  /** Loads the invoices again; the retry button stays busy until the Promise settles. */
+  onRetry: () => Promise<void>;
 };
 
 const PLACEHOLDER_ROWS = ["a", "b", "c"];
@@ -329,8 +330,9 @@ export function InvoicesCard({ status, invoices, onRetry }: InvoicesCardProps) {
             </EmptyPage.Root>
           ) : null}
           {state === "error" ? (
-            <EmptyPage.Root size="s" role="alert" aria-labelledby="invoices-error">
-              <EmptyPage.Icon tone="danger">
+            // tone="danger": the danger tile, and the region announces itself (role="alert").
+            <EmptyPage.Root size="s" tone="danger" aria-labelledby="invoices-error">
+              <EmptyPage.Icon>
                 <Icon name="status.danger" />
               </EmptyPage.Icon>
               <EmptyPage.Title as="h3" id="invoices-error">
@@ -338,9 +340,7 @@ export function InvoicesCard({ status, invoices, onRetry }: InvoicesCardProps) {
               </EmptyPage.Title>
               <EmptyPage.Description>Сервер не ответил. Данные не потеряны.</EmptyPage.Description>
               <EmptyPage.Actions>
-                <Button.Root variant="soft" tone="neutral" onClick={onRetry}>
-                  Повторить
-                </Button.Root>
+                <EmptyPage.RetryButton onRetry={onRetry} />
               </EmptyPage.Actions>
             </EmptyPage.Root>
           ) : null}

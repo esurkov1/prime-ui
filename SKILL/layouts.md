@@ -1,8 +1,10 @@
 # Layouts — app frame, page wrappers, auth
 
-Every screen sits in one frame: `AppShell.Root` with Nav / `AppHeader` / Main (the content panel is the page,
-the nav rail one layer above it). The `AppHeader` belongs to the page — it carries the page title and
-the page's tools ([composition.md](composition.md#1-page-skeleton)); `PageContent` holds the body.
+Every screen sits in one frame: `AppShell.Root` with the Sidebar in `AppShell.Nav`, a header row and
+`AppShell.Main` (the content panel is the page, the nav rail one layer above it). The frame is the
+app's; the header row and the body are the page's — a screen renders its own `AppHeader.Root` (the
+page title and the page's tools, [composition.md](composition.md#1-page-skeleton)) and its body in
+`PageContent`.
 `AppShell.Main` carries the page gutters and `PageContent` spaces the page — blocks 24, a titled
 `PageContent.Section` 40, tiles in a `PageContent.Grid` 16 on both axes — so your code adds **no outer padding and no margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
 Main's top air under the header is part of the frame — 24, then 32 from 1024px: the page's first block
@@ -13,41 +15,32 @@ The page recipes are whole, working screens — the `screen.tsx` example of thei
 
 ## App frame (once per app)
 
-Every `Sidebar.Item` gets a `Sidebar.ItemIcon` (in compact mode only icons remain) and is a link:
-`href`, or `asChild` with the router's `NavLink`; `current` marks the current page (`aria-current`), a
-router link sets it itself. Counters go in `Sidebar.ItemCount`. Below 768px the Sidebar becomes an
-off-canvas panel — the app must render a menu button that opens it, otherwise navigation is unreachable
-on phones. `AppHeader` is the top bar of the panel on every width, and its row is the page's: the
-frame gives it the menu button (`AppHeader.MenuButton` shows itself below 768px, the Sidebar's own
-breakpoint); each page gives it its title, a line of data, its own buttons and its tools. The row is
-as high as the Sidebar brand row, so the brand and the title read as one line. Nothing app-wide goes
-into it — no global search, no notifications: the header row is per page.
+The frame is the root layout and nothing else: the providers, `AppShell.Root`, the Sidebar in
+`AppShell.Nav` and `AppShell.Main` around the page. It holds no header content and no menu state:
+
+- **The header row belongs to the page.** An `AppHeader.Root` anywhere inside the shell — the page's
+  own one, rendered at the top of its body — shows in the shell's header row; the latest one on
+  screen wins, so every page brings its own. Its row is as high as the Sidebar brand row, so the brand
+  and the title read as one line. Nothing app-wide goes into it — no global search, no notifications.
+- **The phone menu comes with the frame.** Below 768px the Sidebar becomes an off-canvas panel
+  (`offCanvas="auto"`) and the AppHeader leads with the menu button that opens it by itself — never a
+  menu state or a menu button wired by hand. A trigger outside the rail (a BottomNav «Ещё», your own
+  button) reads the shell's navigation with `useAppShellNav()` (`open`, `setOpen`, `navId`; see
+  [the app frame screen](../src/layout/app-shell/examples/screen.tsx)).
+- **Every Sidebar item is a link** (`href`, or `asChild` with the router's `NavLink`); `current`
+  marks the current page (`aria-current`), a router link sets it itself. Icons and counts follow the
+  [navigation structure](#navigation-structure-the-sidebars-content).
 
 ```tsx
-import { AppHeader, AppShell, Icon, NotificationProvider, Sidebar } from "prime-ui-kit";
-import { type ReactNode, useState } from "react";
+import { AppShell, Icon, NotificationProvider, Sidebar } from "prime-ui-kit";
+import type { ReactNode } from "react";
 
-type AppLayoutProps = {
-  /** The page title — the page's h1; leave it out on a document page (its title is in main). */
-  title?: ReactNode;
-  /** One line of data under the title. */
-  description?: ReactNode;
-  /** The path up on a nested record: a `Breadcrumb.Root`. */
-  path?: ReactNode;
-  /** The page's own buttons in the title row. */
-  actions?: ReactNode;
-  /** The page's tools: a `PageToolbar.Root`. */
-  tools?: ReactNode;
-  children: ReactNode;
-};
-
-export function AppLayout({ title, description, path, actions, tools, children }: AppLayoutProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
+export function AppFrame({ children }: { children: ReactNode }) {
   return (
     <NotificationProvider>
       <AppShell.Root fillViewport>
         <AppShell.Nav>
-          <Sidebar.Root open={menuOpen} onOpenChange={setMenuOpen}>
+          <Sidebar.Root>
             <Sidebar.Header>
               <Sidebar.Brand href="/" description="Интернет-магазин">
                 <Sidebar.BrandLogo>
@@ -58,7 +51,7 @@ export function AppLayout({ title, description, path, actions, tools, children }
               <Sidebar.Toggle variant="header" />
             </Sidebar.Header>
             <Sidebar.Content>
-              <Sidebar.Group label="Продажи">
+              <Sidebar.Group>
                 <Sidebar.Item href="/" current>
                   <Sidebar.ItemIcon>
                     <Icon name="nav.dashboard" />
@@ -90,25 +83,6 @@ export function AppLayout({ title, description, path, actions, tools, children }
             </Sidebar.Footer>
           </Sidebar.Root>
         </AppShell.Nav>
-        <AppHeader.Root>
-          <AppHeader.Start>
-            <AppHeader.MenuButton aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} />
-            {path ? (
-              <>
-                {path}
-                <AppHeader.Separator />
-              </>
-            ) : null}
-            {title ? (
-              <AppHeader.Title>
-                {title}
-                {description ? <AppHeader.Description>{description}</AppHeader.Description> : null}
-              </AppHeader.Title>
-            ) : null}
-          </AppHeader.Start>
-          {actions ? <AppHeader.Actions>{actions}</AppHeader.Actions> : null}
-          {tools ? <AppHeader.Tools>{tools}</AppHeader.Tools> : null}
-        </AppHeader.Root>
         <AppShell.Main>{children}</AppShell.Main>
       </AppShell.Root>
     </NotificationProvider>
@@ -116,10 +90,38 @@ export function AppLayout({ title, description, path, actions, tools, children }
 }
 ```
 
-Each page renders `AppLayout` with its own header content:
-`<AppLayout title="Заказы" description="128 в работе · 6 ждут оплаты" tools={<OrdersToolbar />}>`.
-A document page (settings, a long form, help) passes no `title` and opens its body with
+Every page renders its header and its body; the header shows in the frame's header row:
+
+```tsx
+import { AppHeader, PageContent } from "prime-ui-kit";
+
+export function OrdersPage() {
+  return (
+    <>
+      <AppHeader.Root>
+        <AppHeader.Start>
+          <AppHeader.Title>
+            Заказы
+            <AppHeader.Description>128 в работе · 6 ждут оплаты</AppHeader.Description>
+          </AppHeader.Title>
+        </AppHeader.Start>
+      </AppHeader.Root>
+      <PageContent.Root as="section">
+        <PageContent.Body>{/* the page's blocks */}</PageContent.Body>
+      </PageContent.Root>
+    </>
+  );
+}
+```
+
+A document page (settings, a long form, help) renders an `AppHeader.Root` without a title — only
+its own buttons, and on a phone the menu button the header draws — and opens its body with
 `PageContent.Header`.
+
+With React Router the frame's `children` is `<Outlet />` and every item is `Sidebar.Item asChild`
+around a `NavLink` ([the router example](../src/layout/sidebar/examples/router.tsx)). The same frame
+as one component is `AppShell.Template` (`nav`, `footer`, the page as children); give it the
+pathname as `scrollResetKey`, so a new page opens at the top.
 
 Phone navigation for 2–6 main sections is a `BottomNav.Root` in `AppShell.Footer` (the last child of
 `AppShell.Root`, or the Template `footer` prop) — never in Main, never `position: fixed`, never behind
@@ -127,23 +129,21 @@ your own media query. The shell hides the footer while the Sidebar rail is on sc
 while the Sidebar is off-canvas, so the bar and the rail never appear together.
 
 Next.js App Router: the package is marked `"use client"`, but a server component cannot dot into it
-(`<Button.Root>`) or pass it callbacks. Put `AppLayout` and every screen in a file that starts with
+(`<Button.Root>`) or pass it callbacks. Put the frame and every screen in a file that starts with
 `"use client"` and render them from `app/layout.tsx` and the pages; import `bundle.css` in the root
 layout and put `data-theme` on `<html>` there.
 
 A nested record page puts the path up before its title in the header — `Breadcrumb` (the list it
 belongs to), `AppHeader.Separator`, `AppHeader.Title` with the record's name and its status as
-the description ([the detail page](../src/components/description-list/examples/screen.tsx)). With
-`offCanvas="always"` pass `show="always"` to the menu button.
+the description ([the detail page](../src/components/description-list/examples/screen.tsx)).
 
 ### The page's tools in the header
 
 The page's tools — its own search and filters, sections, the period or view, the primary action —
 go into `AppHeader.Tools` as a `PageToolbar.Root`: the header's second row, full width, sticky with
-it. The toolbar lays itself out from that width (one row when wide, stacked rows on a phone, the
-primary action on its own row when the search would be squeezed), so the tools wrap under the title
-instead of squeezing it. `AppHeader.Actions` keeps the page's other buttons (export, a more menu) in
-the title row.
+it. The toolbar lays itself out from that width ([the page panel](responsive.md#page-panel--pagetoolbar)),
+so the tools wrap under the title instead of squeezing it. `AppHeader.Actions` keeps the page's
+other buttons (export, a more menu) in the title row.
 
 ```tsx
 import { AppHeader, Button, Icon, PageToolbar, SegmentedControl } from "prime-ui-kit";
@@ -187,33 +187,30 @@ export function DealsHeader({ view, onViewChange }: DealsHeaderProps) {
 }
 ```
 
-With React Router put `<Outlet />` as the child and pass `NavLink` through `Sidebar.Item asChild`
-(see `src/layout/sidebar/examples/router.tsx`).
-
 ## Navigation structure (the sidebar's content)
 
 The sidebar is the product's map: people scan it, remember where things are and come back. Build it
-from what people do, not from how the backend is split. The full guide with the reasoning is in
+from what people do, not from how the backend is split. The criteria — how many items, what folds,
+when a count gets a colour — are in
 [Sidebar COMPONENT.md → Building the navigation](../src/layout/sidebar/COMPONENT.md#building-the-navigation).
 
-| Level | Kit part | Rule |
-|---|---|---|
-| Everyday places | `Sidebar.Group` without `label` at the top | 2–4 items (Обзор, Входящие); never folded |
-| Category of work | `Sidebar.Group label collapsible` | 3–7 items by frequency; label is one short word with a distinct start (the rail shows its first letters); fold only long or rarely used groups |
-| Views of one section | `Sidebar.Sub` | 2–6 children; the parent only discloses (overview page = first child); one level only |
-| Meta | `Sidebar.Footer` | help, settings, then `Sidebar.Account` with its menu last |
+| Level | Kit part |
+|---|---|
+| Everyday places | `Sidebar.Group` without `label` at the top, never folded |
+| Category of work | `Sidebar.Group label collapsible` |
+| Views of one section | `Sidebar.Sub`, one level only |
+| Meta | `Sidebar.Footer`: help, settings, then `Sidebar.Account` with its menu last |
 
-- Icons on every top-level item and sub-list parent, distinct shapes; none on sub-list children.
-- `Sidebar.ItemCount` plain for information (12 new); `color` only when it asks for action (3
-  unanswered, 2 overdue) — it becomes a dot on the rail and on every folded parent, so keep it rare:
-  red for blocked or overdue, blue for new or unread.
-- `persistKey` on `Sidebar.Root` keeps the rail mode and folded groups across reloads; give groups an
-  `id` when labels are translated.
+### Sidebar icons
+
+An icon on every top-level item and every sub-list parent, each a distinct shape (the compact rail
+shows only icons); none on the children of a sub-list.
 
 ## Page wrapper
 
-- App pages (dashboard, list, detail, a board): `PageContent.Root as="section"` — the full width of the panel; the
-  page's title and tools are in its `AppHeader`, the body starts with its first block.
+- App pages (dashboard, list, detail, a board): `PageContent.Root as="section"` — the full width of
+  the panel; the page's title and tools are in its `AppHeader`, its blocks go into
+  `PageContent.Body` ([the page skeleton](composition.md#1-page-skeleton)).
 - Document pages — settings and long forms: `PageContent.Root maxWidth="wide"` with `PageContent.Header`
   (the page's h1) and a `PageContent.Section layout="aside"`
   (heading column + panel) per section ([the settings page](../src/components/page-content/examples/screen.tsx)), or `maxWidth="readable"` for a single
@@ -227,7 +224,8 @@ from what people do, not from how the backend is split. The full guide with the 
   at a time below it with `PageContent.BackButton` first in the detail's header; `open` is «a record
   is chosen». Each pane gives its last child the free height: a Card with its own `ScrollContainer`
   (`anchor="end"` for a thread). The records in the list pane are a `List` (`current` on the open
-  one). Details that open over a table and close again are a Drawer instead.
+  one), the conversations of a messenger a `ChatList`. Details that open over a table and close
+  again are a Drawer instead.
 
 ## Which screen to start from
 

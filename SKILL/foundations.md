@@ -1,6 +1,6 @@
 # Foundations — do it this way
 
-Condensed from the kit's design contract (`docs/foundation.md` in the kit repository). Use semantic
+Condensed from the kit's design contract, [foundation.md](../docs/foundation.md). Use semantic
 tokens `--prime-*` only.
 
 ## 1. 4px grid
@@ -29,7 +29,7 @@ Things that belong together sit closer than things that do not.
 |---|---|---|
 | label → field | 4–8 | built into fields (`label` prop) — do not add |
 | field → hint/error | 4 | built into fields — do not add |
-| a hand-built field (your own control + `Label.Root` + `Hint.Root`) | label 4–8, hint 4 | `--prime-control-<size>-label-gap`, `--prime-control-<size>-hint-gap` |
+| a hand-built field (your own control + `Label.Root` + `Hint.Root`) | label 4–8, hint 4 | [the recipe](api-contract.md#your-own-control-without-a-frame) |
 | group heading → its fields | 16 | `--prime-space-4` |
 | field → field in a form | 20 | `--prime-space-5` |
 | inline controls in a row (buttons, filters) | 8 | `--prime-space-2` |
@@ -69,12 +69,19 @@ gutters — do not add your own outer padding.
   nest components, never set backgrounds yourself.
 - Separate blocks by fill and air. Hairlines (`Divider`) only inside a block: list rows, table rows,
   between a form and its footer.
-- A card inside a card becomes the next layer automatically — use it sparingly; usually a section
-  heading inside one card is better. The ladder stops at layer 4.
-- Your own bounded block is a `Card` (it takes the right layer wherever it lands). A plain tile with
-  no controls inside may use `background: var(--prime-color-layer-nested)` and
-  `border-radius: var(--prime-card-radius)`; never a transparent box with a border, never a
-  hard-coded `--prime-color-layer-2-bg`.
+
+### Card in a card
+
+Allowed — a card inside a card becomes the next layer by itself — but avoided by default: a section
+heading inside one card usually reads better. Never a card around a `DataTable` (it already is a
+filled block), a single field or a whole page. The ladder stops at layer 4.
+
+### Your own bounded block
+
+A `Card` (it takes the right layer wherever it lands). The one background you may set yourself: a
+plain tile with no controls inside on `background: var(--prime-color-layer-nested)` with
+`border-radius: var(--prime-card-radius)`. Never a transparent box with a border, never a
+hard-coded `--prime-color-layer-<n>-*`.
 
 ## 5. Nested radius
 
@@ -109,8 +116,8 @@ A chart color does one job, and the job picks the colors:
   `green` → `chart-6`, `purple` → `chart-7`, `red` → `chart-8`, `gray` → `chart-other`), so a
   ProgressBar share and a line in a chart library match. `sky` has no chart step (it sits too close to
   blue).
-- The palette is validated in both themes (OKLCH lightness band, chroma, colour-blind and
-  normal-vision separation of neighbours, ≥ 3:1 on the layer grounds). In scatter-like charts, where
+- The tokens and their contrast guarantee are in
+  [foundation.md → Chart palette](../docs/foundation.md#chart-palette). In scatter-like charts, where
   any two marks can meet, keep to the first three series or facet.
 - A chart library takes the colors as strings: `chartColors.series[i]`, `chartColors.grid`,
   `chartColors.axis`, `chartColors.scale[i]` (each a `var(--prime-color-chart-*)`, so the theme
@@ -145,8 +152,13 @@ A chart color does one job, and the job picks the colors:
 `variant` is required on `Typography`. Weights only 400/500/600. Numbers in tables, prices, dates:
 tabular (the kit does it in DataTable `numeric` columns and `Card.Value`; your own amounts take
 `font-variant-numeric: tabular-nums`). Reading text max width `--prime-layout-reading-max-width`
-(`PageContent.Root maxWidth="readable"`). Secondary text uses `tone="secondary"`/`"muted"` on
-`Typography`, not a lighter custom color.
+(`PageContent.Root maxWidth="readable"`).
+
+### Text colour
+
+Text takes its colour from `Typography tone` (`secondary`, `muted`, `accent`, `success`, `warning`,
+`danger`) or from the kit part it sits in — never `color` in your CSS. A `--prime-color-*` token in
+your CSS colours only what is not text: a fill, a tile, a line.
 
 ## 8. Hierarchy through air
 
@@ -156,17 +168,10 @@ level of air: a page with uniform 16px gaps everywhere reads as a list of unrela
 ## 9. Responsive
 
 - Flexbox for rows/stacks, Grid for two-dimensional layouts; spacing via `gap`.
-- Must work from 320px and at 400% zoom; the full rules are in [responsive.md](responsive.md).
-- Viewport breakpoints 640 · 768 · 1024 · 1280 (`max-width: 639px` for "below 640"), only for the app
-  frame. Components adapt to their own container — do not re-implement that.
-- Touch follows input, not width: your `:hover` styles only inside `@media (hover: hover)`; nothing is
-  hover-only; the kit keeps field text at 16px and gives small controls a 44px hit area on coarse
-  pointers — do not wrap kit fields to change that.
+- Every screen works from 320px and at 400% zoom: [responsive.md](responsive.md) holds the rules —
+  the [breakpoints and their scope](responsive.md#breakpoints), the
+  [intrinsic grids](responsive.md#intrinsic-grids), what the kit adapts by itself and touch.
 - Flex children with text: `min-width: 0` + ellipsis or `overflow-wrap: anywhere`.
-- Wide tables on phones: they scroll inside themselves with edge shadows; `stickyFirstColumn`, a column
-  chooser through `hiddenColumns`; never let the page scroll sideways.
-- Card grids on a page: `PageContent.Grid` + `PageContent.Cell span` (folds by its own width); inside one block: `repeat(auto-fill, minmax(min(100%, …), 1fr))`.
-- A page panel with sections, filter and search, view and the primary action is `PageToolbar`.
 - Sticky parts come from the kit: `AppHeader` (with the `PageToolbar` in `AppHeader.Tools`), the
   DataTable head and `stickyFirstColumn`, the Gantt header and first column — each sticks inside its
   own scroller, and the top ones let go on screens lower than 480px. Never a `position: sticky` bar of your own.

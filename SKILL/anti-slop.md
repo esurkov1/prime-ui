@@ -12,13 +12,16 @@ Two status labels, one a Badge and one a styled `span`; three cards with three d
 // bad
 <span className={styles.paid}>Оплачен</span>
 <Badge.Root color="orange">Ожидает</Badge.Root>
-
-// good — one component, one hue per meaning everywhere
-<Badge.Root color="green">Оплачен</Badge.Root>
-<Badge.Root color="orange">Ожидает</Badge.Root>
 ```
 
-Map statuses to colors once (`const STATUS_COLOR: Record<Status, PaletteColor>`) and reuse it.
+```tsx good
+// good — one component; a status wears a tone, the same one everywhere
+<Badge.Root tone="success">Оплачен</Badge.Root>
+<Badge.Root tone="warning">Ожидает</Badge.Root>
+```
+
+Map statuses to tones once (`const STATUS_TONE: Record<Status, …>`) and reuse it; `color` is for
+categories (a team, a tag).
 
 ## 2. Inline styles, raw values, primitive tokens
 
@@ -35,7 +38,7 @@ Map statuses to colors once (`const STATUS_COLOR: Record<Status, PaletteColor>`)
 .row { display: flex; gap: var(--prime-space-3); }
 ```
 
-Text color goes through `Typography tone="secondary"`, not CSS.
+Text colour is not CSS: [foundations.md → Text colour](foundations.md#text-colour).
 
 ## 3. Borders instead of fill; card in a card
 
@@ -47,10 +50,17 @@ Text color goes through `Typography tone="secondary"`, not CSS.
 ```tsx partial
 // bad — a card around a card around a table
 <Card.Root><Card.Root><DataTable columns={columns} rows={rows} /></Card.Root></Card.Root>
+```
 
+```tsx good
 // good — DataTable already is a filled block; a titled section is enough
+// declare: const payments: { id: string; client: string }[]
 <PageContent.Section label="Последние оплаты">
-  <DataTable columns={columns} rows={rows} />
+  <DataTable
+    columns={[{ id: "client", header: "Клиент", accessor: "client" }]}
+    rows={payments}
+    getRowKey={(row) => row.id}
+  />
 </PageContent.Section>
 ```
 
@@ -68,8 +78,13 @@ on different hosts does the same: on a white host the "white card" is already th
 
 /* good — a whole surface lifts; a part touching the edge goes two steps; colors come from context */
 .tile { position: relative; transition: box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard); }
-.tile:hover { z-index: 1; box-shadow: var(--prime-shadow-overlay); } /* above its neighbours, or they cover the shadow */
-.row:hover { background: var(--prime-color-fill-muted-hover); }
+@media (hover: hover) and (pointer: fine) {
+  /* above its neighbours, or they cover the shadow */
+  .tile:hover { z-index: var(--prime-z-raised); box-shadow: var(--prime-shadow-overlay); }
+}
+@media (hover: hover) {
+  .row:hover { background: var(--prime-color-fill-muted-hover); }
+}
 ```
 
 Build the tile as a `Card` (it takes the right layer wherever it lands). Check every hover on the page
@@ -81,10 +96,18 @@ and inside a card, in both themes: rest, hover and the neighbour must be three d
 // bad
 <Input.Root size="s">…</Input.Root>
 <Button.Root>Найти</Button.Root>
+```
 
-// good
-<Input.Root size="s">…</Input.Root>
-<Button.Root size="s">Найти</Button.Root>
+```tsx good
+// good — one tier for the row
+<ControlSizeProvider value="s">
+  <Input.Root>
+    <Input.Wrapper>
+      <Input.Field type="search" aria-label="Поиск по счетам" />
+    </Input.Wrapper>
+  </Input.Root>
+  <Button.Root>Найти</Button.Root>
+</ControlSizeProvider>
 ```
 
 ## 5. Placeholder instead of label
@@ -96,7 +119,9 @@ and inside a card, in both themes: rest, hover and the neighbour must be three d
     <Input.Field placeholder="Email" />
   </Input.Wrapper>
 </Input.Root>
+```
 
+```tsx good
 // good
 <Input.Root label="Почта">
   <Input.Wrapper>
@@ -123,8 +148,14 @@ The most common shape bug of generated forms: rules for one field applied to a l
   </div>
 ))}
 <Typography variant="body-s">Первые три всегда первыми. Остальные можно перетаскивать.</Typography>
+```
 
+```tsx good
 // good — one row per record, the headings once, compact columns for the small attributes
+// declare: const specs: { id: string; icon: string; name: string; value: string; color: string | null; pinned: boolean }[]
+// declare: function setSpecs(next: typeof specs): void
+// declare: function newSpec(): (typeof specs)[number]
+// declare: function iconOf(key: string): Parameters<typeof Icon>[0]["name"]
 <FieldList
   label="Характеристики"
   columns={[
@@ -145,13 +176,17 @@ The most common shape bug of generated forms: rules for one field applied to a l
     <>
       <Select.Root value={spec.icon} onValueChange={(icon) => row.update({ icon })}>
         <Select.Trigger>
-          <Select.TriggerIcon><Icon name={spec.icon} /></Select.TriggerIcon>
+          <Select.TriggerIcon>
+            <Icon name={iconOf(spec.icon)} />
+          </Select.TriggerIcon>
         </Select.Trigger>
         <Select.Content>…</Select.Content>
       </Select.Root>
       <Input.Root>…</Input.Root>
       <Input.Root>…</Input.Root>
-      <ColorPresets.Root value={spec.color} onValueChange={…}>…</ColorPresets.Root>
+      <ColorPresets.Root value={spec.color} onValueChange={(color) => row.update({ color })}>
+        …
+      </ColorPresets.Root>
     </>
   )}
 />
@@ -164,7 +199,9 @@ The same for one value in several units — one heading, the fields in a row, th
 <Input.Root label="Депозит, $" optional>…<Input.InlineAffix side="end">$</Input.InlineAffix>…</Input.Root>
 <Input.Root label="Депозит, ฿" optional>…</Input.Root>
 <Input.Root label="Депозит, ₽" optional>…</Input.Root>
+```
 
+```tsx good
 // good — a group heading, three fields in one row, each named for assistive tech
 <Fieldset label="Депозит">
   <div className={styles.row}>
@@ -201,11 +238,11 @@ The same for one value in several units — one heading, the fields in a row, th
 | `<span className={styles.pill}>Новый</span>` | `<Badge.Root color="blue">Новый</Badge.Root>` |
 | `<div className={styles.box}>` with bg + radius | `<Card.Root variant="panel">` |
 | `<a className={styles.link}>` | `<LinkButton href="…">` |
-| a list of `<button>`s for navigation | `Sidebar.Item href`, `Tabs.Item` |
+| a list of `<button>`s for navigation | links: `Sidebar.Item href` for the app's sections, `BottomNav.Item` on a phone, `List.Item asChild` around a link for the records of a list |
 | `<Button.Root onClick={() => location.assign(url)}>` | `<Button.Root asChild><a href={url}>…</a></Button.Root>` or `LinkButton` |
 | a hand-built spinner, shimmer, grey placeholder box or «Loading…» text | `loading` on Button / Select / DataTable; a region: `Skeleton` of its content inside `Crossfade`; no shape to hold: `Spinner` |
 | `{loading ? <Spinner /> : <List />}` — a state that flips | `<Crossfade state={status}>` around the region, `Skeleton` while loading |
-| a search Input + a row of filter Selects above a table | `SmartFilter` in the DataTable `toolbar` |
+| a search Input + a row of filter Selects above a table | `SmartFilter` in the page's `PageToolbar` ([where the filters go](composition.md#where-the-filters-go)) |
 | a grid of «label: value» text pairs for one record | `DescriptionList.Root` + `DescriptionList.Item` |
 | a Modal hand-built as «Удалить?» with your own pending flag | `ConfirmDialog.Root` with an async `onConfirm` |
 | a `<fieldset>` reset by hand, or `disabled` on every field while saving | `<Fieldset label disabled={saving}>` |
@@ -227,10 +264,26 @@ The same for one value in several units — one heading, the fields in a row, th
 .table :global(th) svg { color: var(--prime-color-accent-default); }
 ```
 
-```tsx partial
+```tsx good
 // good — content drives the height, cell controls one tier down, kit draws dividers and sort icons
-<DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} />
-// in a column cell: <Button.Root size="s" variant="ghost" tone="neutral">Настроить</Button.Root>
+// declare: const projects: { id: string; name: string }[]
+<DataTable
+  columns={[
+    { id: "name", header: "Проект", accessor: "name" },
+    {
+      id: "actions",
+      header: "Действия",
+      hideHeader: true,
+      cell: () => (
+        <Button.Root size="s" variant="ghost" tone="neutral">
+          Настроить
+        </Button.Root>
+      ),
+    },
+  ]}
+  rows={projects}
+  getRowKey={(row) => row.id}
+/>
 ```
 
 ## 8. Decoration and filler
@@ -254,12 +307,42 @@ import { Archive } from "lucide-react";
 <Button.Icon><Archive /></Button.Icon>
 <svg viewBox="0 0 24 24"><path d="M3 6h18" /></svg>
 .button:hover .icon { transform: rotate(90deg); }
+```
 
-// good — the semantic name first, then the full animated set, createIcon only for the rest
-<Button.Icon><Icon name="action.settings" /></Button.Icon>
+The semantic name first, then the full animated set, `createIcon` only for the rest:
+
+```tsx
+import { Tractor } from "lucide-react";
+import { Button, createIcon, Icon } from "prime-ui-kit";
 import { ArchiveIcon } from "prime-ui-kit/icons";
-<Button.Icon><ArchiveIcon /></Button.Icon>
-const IconTractor = createIcon(Tractor); // only a glyph neither set has
+
+// Only a glyph neither set has: wrapped once, at module level.
+const IconTractor = createIcon(Tractor);
+
+export function FleetActions() {
+  return (
+    <>
+      <Button.Root variant="soft" tone="neutral">
+        <Button.Icon>
+          <Icon name="action.settings" />
+        </Button.Icon>
+        Настройки
+      </Button.Root>
+      <Button.Root variant="soft" tone="neutral">
+        <Button.Icon>
+          <ArchiveIcon />
+        </Button.Icon>
+        В архив
+      </Button.Root>
+      <Button.Root variant="soft" tone="neutral">
+        <Button.Icon>
+          <IconTractor />
+        </Button.Icon>
+        Техника
+      </Button.Root>
+    </>
+  );
+}
 ```
 
 ## 9. Hand-made overlays
@@ -268,9 +351,15 @@ const IconTractor = createIcon(Tractor); // only a glyph neither set has
 // bad
 {open && <div className={styles.backdrop}><div className={styles.dialog}>…</div></div>}
 <div className={styles.tooltip} hidden={!hover}>Копировать</div>
+```
 
-// good
-<Modal.Root open={open} onOpenChange={setOpen}>…</Modal.Root>
+```tsx good
+// good — kept mounted, driven by `open`; the tooltip names the icon button
+// declare: const open: boolean
+// declare: function setOpen(open: boolean): void
+<Modal.Root open={open} onOpenChange={setOpen}>
+  …
+</Modal.Root>
 <Tooltip.Root>
   <Tooltip.Trigger>
     <Button.Root variant="ghost" tone="neutral" aria-label="Копировать ссылку">

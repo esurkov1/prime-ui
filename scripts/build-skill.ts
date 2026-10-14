@@ -6,7 +6,8 @@
  * An installed skill is a folder on its own, so the build copies `SKILL/` together with every
  * `COMPONENT.md` and `examples/` into `reference/components/<dir>/` and `reference/layout/<dir>/`
  * (the same tree, so the docs' own cross-links keep working) and rewrites `../src/` to
- * `reference/`, with `src/icon-set.ts` (the names of the full glyph set) next to them. It fails when
+ * `reference/`, with `src/icon-set.ts` (the names of the full glyph set) and `docs/foundation.md`
+ * (the design contract, linked as `../docs/foundation.md`) next to them. It fails when
  * any relative link in the built skill points at nothing, or at a heading its file does not have
  * (`scripts/docs/links.ts`).
  */
@@ -42,6 +43,12 @@ for (const base of ["components", "layout"]) {
 
 // The full animated glyph set: its export list is the name catalogue the skill links to.
 fs.copyFileSync(path.join(root, "src", "icon-set.ts"), path.join(out, "reference", "icon-set.ts"));
+// The design contract: the skill links its tables (motion tokens, the chart palette) instead of
+// keeping a second copy.
+fs.copyFileSync(
+  path.join(root, "docs", "foundation.md"),
+  path.join(out, "reference", "foundation.md"),
+);
 
 /** Every markdown file of the built skill, recursively. */
 function markdownFiles(dir: string): string[] {
@@ -56,7 +63,12 @@ function markdownFiles(dir: string): string[] {
 for (const file of fs.readdirSync(out).filter((name) => name.endsWith(".md"))) {
   const full = path.join(out, file);
   const text = fs.readFileSync(full, "utf8");
-  fs.writeFileSync(full, text.replaceAll("](../src/", "](reference/"));
+  fs.writeFileSync(
+    full,
+    text
+      .replaceAll("](../src/", "](reference/")
+      .replaceAll("](../docs/foundation.md", "](reference/foundation.md"),
+  );
 }
 
 const broken: string[] = [];

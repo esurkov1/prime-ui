@@ -16,7 +16,7 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 
 | Concept | API | Notes |
 |---|---|---|
-| Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`; an overlay `Content` (Modal, Drawer, Popover, Dropdown, Tooltip) takes `size` for its width. Without `size` these take the tier of a sized host (Popover, Banner, LoginForm, DataTable toolbar, `ControlSizeProvider`), else `m`: Input, Textarea, DigitInput, Checkbox, Radio, Switch, Slider, FileUpload, ColorSwatches, ColorPresets, SegmentedControl, Button, ButtonGroup, LinkButton, Label, Badge, Spinner, Skeleton, DescriptionList, Composer, `Icon`, `Checkbox.Indicator`. Select, NativeSelect, TagSelect, Datepicker, Tabs and SmartFilter do **not** read the host — give them `size` yourself. |
+| Size | `size` | Default `m`, on the root only; parts read it from the root. Avatar adds `2xl`. An overlay's `Content` takes its own `size`: the width of a Modal or Drawer, the tier of a Popover, Dropdown or Tooltip. Without `size` a component takes [the host tier](#size-and-the-host-tier). |
 | Treatment | `variant` | `solid · soft · outline · ghost`; Button also takes `shade` (the media shade with a blur, a button over media); structural variants are component-specific (Card templates, FileUpload `dashed \| solid`). Tabs has no variant. |
 | Meaning | `tone` | Button: `accent \| neutral \| success \| danger` (`success` for a done action), plus `inherit` (with `ghost \| soft \| outline`) for an action on a colored host — it takes the host's text color; never recolor a Button with a CSS override. Destructive is `danger`, never `error`. |
 | Decoration | `color` | Badge, Avatar, Thumbnail, Icon, `SegmentedControl.Item`, `Tabs.Count` / `SegmentedControl.Count`, `Sidebar.ItemCount` / `BottomNav.ItemCount`, `FileUpload.FormatBadge`, `Timeline.Item`, `Message.Author` / `Message.Reply` / `Message.Contact`; in data: TagSelect options, Kanban columns, Gantt bars. |
@@ -26,15 +26,24 @@ import type { ControlSize, PaletteColor, TextTone, Tone, Variant } from "prime-u
 | Other state | `x` / `defaultX` / `onXChange(x)` | Badge `pressed`; Button `pressed`; ChartFrame `hiddenSeries`; Chat `selected`, `search`; ChatList `search`; ColorPicker `format`; CommandMenu `search`; Composer `recordMode`; DataTable `hiddenColumns`, `page`, `sort`, `selected`, `expanded`, `collapsedGroups`; ExampleFrame `viewport`, `colorScheme`; Gallery `index`; Gantt `scale`; Kanban `columnOrder`; MediaViewer `index`; Message.Media `index`; Select `search`; SmartFilter `search`; VideoNote `playing`, `transcriptExpanded`; VoicePlayer `rate`, `playing`, `transcriptExpanded`; Sidebar `mode`. |
 | Checked | `checked` / `defaultChecked` / `onCheckedChange(checked)` | Checkbox, Dropdown.CheckboxItem, Switch, Thumbnail. |
 | Open | `open` / `defaultOpen` / `onOpenChange(open)` | ColorPresets, CommandMenu, ConfirmDialog, Datepicker, Drawer, Dropdown, Gallery, MediaViewer, Message.Media, Modal, PageContent.Split, Popover, Select, Sheet, TagSelect, Tooltip, Sidebar, Sidebar.Group, Sidebar.Sub. |
-| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay: Modal, Drawer, Sheet, CommandMenu, Popover, Dropdown, MediaViewer. A destructive confirm is `ConfirmDialog` (it turns outside click off itself; Escape is held while `onConfirm` runs); a form holds closing with `Modal.Guard` / `Drawer.Guard` / `Sheet.Guard`. |
+| Dismiss | `closeOnOutsideClick` (default `true`), `closeOnEscape` (default `true`) | Both on every overlay that opens a layer: the dialogs, the floating panels, the panels of Select, TagSelect, Datepicker and ColorPresets, the off-canvas Sidebar and the reaction bar of a message. `ConfirmDialog` takes both with `closeOnOutsideClick` default `false` (Escape is held while `onConfirm` runs). Tooltip and Notification take neither. A form holds closing with `Modal.Guard` / `Drawer.Guard` / `Sheet.Guard`. |
 | Selection mode | `multiple` | One vs many (Select, Accordion) — never `type`. `mode` only for structurally different values (Datepicker `single \| range`). |
 | Status words | `selected`, `current`, `pressed` | `current` marks a navigation location (`Sidebar.Item`, `Breadcrumb.Item`) and sets `aria-current`; `pressed` a toggle button. |
 | Flags | `disabled`, `readOnly`, `required`, `optional`, `loading`, `fullWidth` | Same names everywhere. |
 | Focus ring | `focusRing` (default `true`) | Fields only; `false` only where focus is obvious otherwise. |
 | System strings | `labels?: Partial<XLabels>` | aria labels, counters, default texts; Russian defaults; values as `{token}` templates. Visible content goes in children or props. |
 | Structure | `X.Root` + `X.Part` | Only for components with parts. Leaves are single exports: `Typography`, `Kbd`, `Divider`, `Spinner`, `Skeleton`, `Crossfade`, `LinkButton`, `NativeSelect`, `DigitInput`, `Slider`, `TagSelect`, `ColorSwatches`, `CodeBlock`, `ProgressBar`, `ProgressCircle`, `Sparkline`, `Pagination`, `DataTable`, `Gantt`, `Fieldset`, `VisuallyHidden`, `ColorField`, `ExampleFrame`, `VoicePlayer`, `VideoNote`, `ScrollContainer`, `Gallery`, `MediaViewer`. This is the one list; other files link here. A group of roots is `X.Group` (`Radio.Group`, `Avatar.Group`). |
+| Slots | `X.Trigger`, `X.Close`, `X.Confirm`, `X.Anchor` | Your own button inside, exactly one element child; the slot renders no element and takes no `className` — style the child. A trigger the kit draws itself (`Select.Trigger`, `Accordion.Trigger`) is a real part with `className`. |
 | Icons in parts | `X.Icon`, `X.ItemIcon` | `Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`, `Dropdown.ItemIcon`… — never an `icon` prop on a component. Only data arrays (`notify()`, `options`) carry `icon: ReactNode`. |
 | DOM state | `data-size`, `data-variant`, `data-tone`, `data-color`, `data-invalid`, `data-disabled`, `data-loading`, `data-state` | Style your wrappers from these, not from class names of kit internals. |
+
+### Size and the host tier
+
+A component without `size` takes the tier of the sized kit host around it — a `ControlSizeProvider`,
+a Popover or Dropdown `Content`, a Banner, a LoginForm, the DataTable `toolbar`, an EmptyPage — else
+`m`. Set the tier once on the region (`<ControlSizeProvider value="s">` around a dense toolbar), never
+`size` on one control to make it fit. A control nested in another component's row is one tier down
+by hand: buttons and menus in table cells `s`, a switch in a card header `s`.
 
 ## Controlled vs uncontrolled
 
@@ -65,7 +74,9 @@ export function PeriodFilter() {
   `onSortChange` / `onPageChange` start the fetch, `rowCount` is the server total, and the owner keeps
   the old rows with `loading` until the answer replaces them.
 - Native events (`onChange`, `onBlur`, `onFocus`, `onKeyDown`, `onPaste`…) go on the part that renders
-  the native control: `Input.Field`, not `Input.Root` (a field root's attributes go to its frame).
+  the native control: `Input.Field`, not `Input.Root`. A field root sends its `className`, `ref` and
+  native attributes to its frame (the label, control and support row) and its `id` to the control —
+  the one root whose attributes do not land on the control itself.
 - There are no `onBeforeX` / `onAfterX` props. To refuse a change, control the value and do not apply
   it. A slow or destructive action is an async event — return a Promise from it: the component shows
   the pending state on the affected element and keeps the old state; resolve = applied, reject = not
@@ -104,8 +115,7 @@ export function PeriodFilter() {
   Textarea, Select, NativeSelect, TagSelect, Datepicker, DigitInput, FileUpload,
   ColorField, ColorSwatches, SegmentedControl, ButtonGroup and `Radio.Group`, and Slider (ColorPicker: `label`, `hint`, `error` on `ColorPicker.HexInput`). The label row, hint row and
   spacing come with it — never put a `Label` or `Hint` next to a field that has `label`.
-- Checkbox, Switch and Radio: the root renders the `<label>` with the input; the visible text is the
-  `X.Label` part; `hint` and `error` are props of `X.Root` (`Radio.Root` takes `hint`).
+- Checkbox, Switch and Radio: [choice controls](#choice-controls) below.
 - `required` → red `*` after the label + native `required`. `optional` → muted «необязательно».
 - Placeholder is an example (`name@company.ru`), never the label.
 - Units and prefixes in affixes are hidden from screen readers — put the meaning into the label or hint
@@ -124,10 +134,6 @@ export function PeriodFilter() {
   children of Root — never put a wrapper between `Card.Root` and `Card.Body` / `Card.Footer`).
 - Fields side by side in a grid row: `align-items: start`. Input and Textarea have `reserveSupportRow`
   to keep bottoms aligned when only one shows an error; other fields do not.
-- Your own control without a frame: `Label` (with `id`; `htmlFor` when the control is a native input)
-  above, the control, then `Hint` (`invalid` for the error) below, in a grid with
-  `--prime-control-m-label-gap` / `--prime-control-m-hint-gap`; the control references the label with
-  `aria-labelledby`.
 
 ```tsx
 import { Button, Input, Select } from "prime-ui-kit";
@@ -159,14 +165,80 @@ export function InviteForm() {
 (`.form { display: grid; gap: var(--prime-space-5); }`.) A full create form with groups, validation,
 loading and a toast: [the Drawer screen](../src/components/drawer/examples/screen.tsx).
 
+### Choice controls
+
+Checkbox, Switch and Radio: the root renders the `<label>` with the input and the visible text is
+the `X.Label` part. `hint` and `error` are props of `Checkbox.Root` / `Switch.Root`; a radio choice
+carries its support row on `Radio.Group` (with the group's `label`), and a `Radio.Root` takes only a
+`hint` of its own option.
+
+```tsx
+import { Checkbox, Radio } from "prime-ui-kit";
+
+export function PaymentTerms({ termsError }: { termsError?: string }) {
+  return (
+    <>
+      <Radio.Group label="Способ оплаты" defaultValue="invoice" hint="Можно сменить до подписания">
+        <Radio.Root value="invoice">
+          <Radio.Label>По счёту</Radio.Label>
+        </Radio.Root>
+        <Radio.Root value="card" hint="Комиссия банка 1,5%">
+          <Radio.Label>Картой</Radio.Label>
+        </Radio.Root>
+      </Radio.Group>
+      <Checkbox.Root name="terms" required hint="Условия придут на почту" error={termsError}>
+        <Checkbox.Label>Принимаю условия договора</Checkbox.Label>
+      </Checkbox.Root>
+    </>
+  );
+}
+```
+
+### Your own control without a frame
+
+A control the kit has no field for (a calendar panel, a canvas) gets the frame from `Label` and
+`Hint`: the label above with an `id` (`htmlFor` when the control is a native input), the hint below
+with an `id`, the control pointing at both.
+
+```tsx
+import { Datepicker, Hint, Label } from "prime-ui-kit";
+import { useId } from "react";
+import styles from "./SigningDate.module.css";
+// .field { display: grid; gap: var(--prime-control-m-label-gap); }
+// .control { display: grid; gap: var(--prime-control-m-hint-gap); }
+
+export function SigningDate({ error }: { error?: string }) {
+  const labelId = useId();
+  const hintId = useId();
+  return (
+    <div className={styles.field}>
+      <Label.Root id={labelId} required>
+        Дата подписания
+      </Label.Root>
+      <div className={styles.control}>
+        <Datepicker.Panel
+          mode="single"
+          role="group"
+          aria-labelledby={labelId}
+          aria-describedby={hintId}
+        />
+        <Hint.Root id={hintId} invalid={Boolean(error)}>
+          {error ?? "Не раньше завтрашнего дня"}
+        </Hint.Root>
+      </div>
+    </div>
+  );
+}
+```
+
 ## Loading without DataTable
 
 DataTable (`loading`), Select (`loading`) and Button (`loading`, `progress`) have built-in states. For
 any other card or region that loads: wrap its content in `Crossfade state={status}` with
 `aria-busy={status === "loading"}`, and render a `Skeleton` in the geometry of the data while it loads
 (same rows, gaps and heights). A `Spinner` only where there is no shape to hold. Show the error in
-place (a `Banner` for the page, `EmptyPage` with `EmptyPage.Icon tone="danger"` and a retry for a
-region). Never draw your own spinners or shimmer blocks. See
+place (a `Banner` for the page; for a region `EmptyPage tone="danger"` — it announces itself — with
+`EmptyPage.RetryButton`). Never draw your own spinners or shimmer blocks. See
 [the screen states](../src/components/crossfade/examples/screen.tsx) and [motion.md](motion.md).
 
 ## Secondary actions
@@ -180,6 +252,11 @@ region). Never draw your own spinners or shimmer blocks. See
   `Link`, `Sidebar.Item href` or `asChild`. Never `onClick={() => location.assign(…)}`.
 
 ## Destructive actions
+
+Which step an action deserves — undo, a held press, a confirm — is
+[ux.md → friction](ux.md#5-friction-matches-the-cost-of-a-mistake); this is how each is built.
+A standalone destructive action that is easy to redo by hand is `Button.Root holdToConfirm` with the
+action in `onConfirm` ([the recipe](motion.md#5-recipes)).
 
 `tone="danger"`. A standalone trigger that opens a confirm (danger zone) is `variant="outline"`; inside
 a bar of other actions (DataTable bulk bar, card actions) it is `soft`; in a Dropdown it is the last item
@@ -222,15 +299,17 @@ it saves).
 | `applyTheme(scheme, element?)` | switch `data-theme` without a transition flash |
 | `NotificationProvider`, `useNotifications()` | toasts; provider once at the app root, `notify({ tone, title, description, action })` |
 | `Tooltip.Provider` | shared delay for many tooltips |
-| `ControlSizeProvider` | one `size` for a region (dense toolbar, compact form) — for the components that read the host tier (see Size above); pass `size` to the others |
+| `ControlSizeProvider` | one `size` for a region (dense toolbar, compact form): [the host tier](#size-and-the-host-tier) |
 | `celebrate({ origin })` | a short confetti burst for a rare milestone; nothing under reduced motion — see [motion.md](motion.md) |
-| `getPasswordStrength(value)` | the 0–4 estimate behind `Input.Root strength`; replace it with `getStrength` |
+| `getPasswordStrength(value)` | the 0–4 estimate behind `Input.Root strength`; to replace it, pass your own `getStrength` to `Input.Root` |
 | `COLOR_PRESETS` | the kit's 16 palette colors for `ColorSwatches` / `ColorPresets` `presets` |
 | `datepickerPresets`, `DEFAULT_DATEPICKER_PRESETS`, `formatDatepickerValue` | quick ranges and value display for `Datepicker` |
+| `formatDateValue(date, { withTime })` | a date as the local `yyyy-MM-dd` (`THH:mm`) value — whenever a date goes to a form or a query; never `toISOString().slice(…)`, which shifts it to UTC |
 | `moveBefore(items, id, beforeId, getId)` | apply a `Dnd` reorder to your array in `onReorder`; `canDrop` returns `true` or the reason it refuses (a string, announced and shown at the carried copy) |
 | `useUploadQueue({ upload, concurrency })` | the upload queue behind FileUpload `queue`: `upload(file, { signal, onProgress })` is yours, the queue runs it a few at a time, aborts on remove, retries |
 | `groupMessages(messages, options)`, `formatMessageDate`, `formatMessageTime`, `hueOf(id)` | turn chat data into dated runs of one author (positions, the date separators — `Chat.Messages items` does it for you), format their dates and times, and give a person a palette hue stable per id |
 | `useSidebar()` | Sidebar state for custom parts inside `Sidebar.Root` |
+| `useAppShellNav()` | the shell's navigation for a trigger outside the rail (a BottomNav «Ещё», your own menu button): `open`, `setOpen`, `navId` for `aria-controls`; `null` outside a shell |
 | `matchesSmartFilter`, `resolveSmartFilterValues` | apply a SmartFilter value to your rows |
 | `Icon`, `createIcon` | kit icon set and domain glyphs — see Icons below |
 | `chartColors` | the chart palette as CSS values for a chart library: `series` 1…8 in order, `other`, `grid`, `axis`, `scale` — follows the theme |
@@ -267,7 +346,9 @@ Every glyph comes from the kit, in this order:
    once at module level with `createIcon` so it sizes, tones and plays like a kit icon:
    `const IconTractor = createIcon(Tractor);` → `<IconTractor />`.
 
-Never a raw `lucide-react` component, another icon library, an inline `<svg>` or an icon font. Icon-only buttons need `aria-label`;
+Never a raw `lucide-react` component, another icon library, an inline `<svg>` or an icon font. An
+icon-only button is square (`shape="circle"` only for media and transfer actions) and needs
+`aria-label`;
 decorative icons inside kit slots (`Button.Icon`, `Input.Icon`, `Sidebar.ItemIcon`) are hidden
 automatically. An icon that carries information alone (a «system» or «pinned» mark) takes `label`:
 it becomes `role="img"` with that name, and inside `Tooltip.Trigger` it is focusable. A category
@@ -279,7 +360,9 @@ host owns the icon (hovering a card does not play the icons of its buttons); out
 icon plays when it is hovered itself. Keyboard focus, disabled and loading hosts and reduced motion
 stay still. A `createIcon` glyph gets a soft pop. Never animate an icon yourself (no hover rotate,
 spin or bounce in your CSS). `animated={false}` keeps one icon still — for a glyph repeated in every
-row of a long list, where a gesture on each row hover would be noise ([motion.md](motion.md)).
+row of a long list, where a gesture on each row hover would be noise ([motion.md](motion.md)). A mark
+that follows a state instead takes `drawn`: `drawn={done}` draws the stroke in when it turns `true`
+and out when it turns `false` (a check on a finished step) and plays no hover gesture.
 
 ## Styling your own wrappers
 

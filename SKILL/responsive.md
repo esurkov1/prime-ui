@@ -22,15 +22,16 @@ single function. Most of it is built into the components; this file says what th
 
 ## Breakpoints
 
-The kit has one set: **640 · 768 · 1024 · 1280**. Use them only in media queries of the app frame;
+The kit has one set: **640 · 768 · 1024 · 1280**. Use them only in media queries of the app frame and
+of an overlay's form (a panel that becomes a bottom sheet on a phone) — the kit's own scope;
 everything inside a page breaks by its container.
 
 | Width | Typical | What changes |
 |---|---|---|
 | < 640 | phone | one column; floating layers become bottom sheets; Modal is a bottom sheet; Drawer full width; `BottomNav` in `AppShell.Footer` |
-| 640–767 | small tablet | gutters 24; two-column grids by `auto-fill`; the Sidebar is still off-canvas, so BottomNav stays |
+| 640–767 | small tablet | gutters 24; intrinsic grids reach two columns; the Sidebar is still off-canvas, so BottomNav stays |
 | 768–1023 | tablet | Sidebar on-canvas (`offCanvas="auto"`) |
-| 1024–1279 | laptop | gutters 32; list + details side by side when the content asks for it |
+| 1024–1279 | laptop | gutters 32 |
 | ≥ 1280 | desktop | extra columns or a side panel; tables and dashboards use every pixel |
 
 - Write "below 640" as `@media (max-width: 639px)`, "from 640" as `@media (min-width: 640px)`.
@@ -41,6 +42,19 @@ everything inside a page breaks by its container.
 - Required minimum: `<meta name="viewport" content="width=device-width, initial-scale=1">`, no
   `user-scalable=no`, no horizontal page scroll at 320px.
 
+## Intrinsic grids
+
+A layout inside a page needs no breakpoint: it takes its columns from the room it has.
+
+- The tiles of a page (KPI cards, charts, panels) are one `PageContent.Grid` with a
+  `PageContent.Cell span` per tile: it folds by its own width (below 30rem every tile takes the row,
+  then small tiles pair up, from 64rem each its span).
+- A grid inside one block (thumbnails, short fields of one record) is the block's own
+  `grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--prime-layout-tile-min-width)), 1fr))`
+  — `auto-fill`, so a lone item keeps its column width instead of stretching across the row.
+- A main column with a side column: flex-wrap with a large `flex-grow` on the main one; the side one
+  drops below when the main one runs out of room.
+
 ## What the kit already does
 
 Use these as they are; never wrap them in your own breakpoints.
@@ -48,10 +62,10 @@ Use these as they are; never wrap them in your own breakpoints.
 | Need | Built in |
 |---|---|
 | app frame | AppShell gutters 16 → 24 → 32; `AppHeader` un-sticks on screens lower than 480px, respects safe areas and, below 36rem of its width, drops the title icon, the title and its line of data truncate |
-| app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by `AppHeader.MenuButton`, which shows itself below 768px; `BottomNav` in `AppShell.Footer` for 2–6 app sections on phones — flat or a floating glass capsule (`floating`) with an optional round `BottomNav.Action`, icons with or without labels (`iconOnly`); the shell hides it by itself while the Sidebar rail is on screen (from 768px with `offCanvas="auto"`) |
-| page panel | `PageToolbar` — search and filter first, one row when wide, stacked rows when narrow (below) |
-| page header | `AppHeader`: the page's tools wrap under the title (`AppHeader.Tools`), the primary action takes its own row when the search would be squeezed; a document page's `PageContent.Header`: actions wrap under the title |
-| switchers | SegmentedControl and Tabs never wrap: they scroll inside themselves (hidden scrollbar, faded edges, a vertical wheel scrolls them sideways), the active item is scrolled into view, stretched items tend to equal width, the indicator moves only after a person's choice; Tabs collapse icons and descriptions first |
+| app navigation | Sidebar: on-canvas from 768px, an off-canvas panel below (`offCanvas="auto"`) opened by the menu button the AppHeader draws by itself while the Sidebar is off-canvas; `BottomNav` in `AppShell.Footer` for 2–6 app sections on phones — flat or a floating glass capsule (`floating`) with an optional round `BottomNav.Action`, icons with or without labels (`iconOnly`); the shell hides it by itself while the Sidebar rail is on screen (from 768px with `offCanvas="auto"`) |
+| page panel | `PageToolbar` — search and filter first, one row when wide, stacked rows when narrow, the primary action on its own row when the search would get less than 18rem beside it ([below](#page-panel--pagetoolbar)) |
+| page header | `AppHeader`: the page's tools wrap under the title (`AppHeader.Tools`); a document page's `PageContent.Header`: actions wrap under the title |
+| switchers | [Switchers](#switchers) never wrap or truncate: they scroll inside themselves |
 | tables | DataTable scrolls inside itself, edge shadows show hidden columns, `stickyFirstColumn`, `DataTable.ColumnsMenu` for a column chooser, the toolbar stacks below a 30rem table, sticky head off on short screens |
 | floating layers | Popover (opened from a Trigger), Dropdown, Select (and Datepicker, ColorPresets) never wider than the viewport − 16, 8 from the edges, flip when out of room; below 640 they open as a bottom sheet — scrim, grab handle, swipe down to close, page scroll locked; Tooltip and TagSelect stay anchored |
 | dialogs | Modal is a bottom sheet with a handle below 640 (swipe down closes it while `closeOnOutsideClick` allows); footer actions stack on phones and in a dialog narrower than 360px; `Sheet` is a bottom sheet for a short task at every width (centred at 560 on a tablet or desktop) and closes with a swipe down from its handle or header; a Drawer has no swipe — buttons, Escape and the scrim close it |
@@ -66,34 +80,18 @@ Use these as they are; never wrap them in your own breakpoints.
 
 ## Page panel — `PageToolbar`
 
-One strip at the top of the page holds up to five slots, each in a fixed place. The order is a rule:
-search and filter first, then the sections, the view and the primary action last; the active filters
-always sit right under the search and filter. Every row is 12 from the next; a slot alone in its row
-stretches to the full width. Write the slots in JSX in that order — it is the Tab order.
+One strip at the top of the page — on an app page, the page's tools row in `AppHeader.Tools` — holds
+up to five slots. It renders them in one fixed order whatever the JSX order (that is also the Tab
+order) and lays them out from its own width; how each slot moves at every width is in
+[PageToolbar COMPONENT.md → Layout by width](../src/components/page-toolbar/COMPONENT.md#layout-by-width).
 
-| Slot | Holds | Place |
-|---|---|---|
-| `PageToolbar.Tools` | search + filter button: `SmartFilter.Toolbar` | first, the stretchy item of the top row |
-| `PageToolbar.Sections` | sections of the page: a `fullWidth` SegmentedControl with counts | after the Tools when wide; its own row under the chips when narrow |
-| `PageToolbar.View` | period, table / cards, columns | by content when wide; its own row when narrow |
-| `PageToolbar.Actions` | the primary action («Создать», «Сохранить 3 изменения») | top row, at the end, always |
-| `PageToolbar.Chips` | active filters: `SmartFilter.Chips` | right under the search and filter, only while there are chips |
-
-```text
-Wide (toolbar ≥ 56rem) — one row, chips under the search:
-[ Search ————————— ][ Filter ][ Sections ][ Period ][ + Create ]
-[ Город: Москва × ][ + Добавить фильтр ]
-
-Narrow — rows, every one 12 from the next:
-[ Search ———————————— ][ Filter ]   [ + ]
-[ Город: Москва × ][ + Добавить фильтр ]
-[ Section 1 ][ Section 2 ][ Section 3 ] —— stretch ——
-[ ⏱ 7 дней ———————————————————————————— ⌄ ]
-
-Narrow, no search — the sections take the first row:
-[ Overview ][ Activity ][ Resources ]
-[ ⏱ 24 часа ———————————————————————————————— ⌄ ]
-```
+| Slot | Holds |
+|---|---|
+| `PageToolbar.Tools` | search + filter button: `SmartFilter.Toolbar` |
+| `PageToolbar.Sections` | sections of the page: a `fullWidth` SegmentedControl with counts |
+| `PageToolbar.View` | period, table / cards, columns |
+| `PageToolbar.Actions` | the primary action («Создать», «Сохранить 3 изменения») |
+| `PageToolbar.Chips` | active filters: `SmartFilter.Chips` |
 
 ```tsx
 import {
@@ -168,17 +166,14 @@ export function OrdersPanel() {
 }
 ```
 
-- Write the slots in the reading order of the wide layout; the toolbar reorders them visually.
 - One tier for the whole panel (default `m`): never `size` on one control inside — wrapped rows must
-  stay level. A denser page wraps the toolbar in `<ControlSizeProvider value="s">` and gives
-  `SmartFilter.Root` and `Select.Root` `size="s"` too — they do not read the host tier.
-- The primary action never leaves the top row. On a phone it may become icon-only with `aria-label`;
-  it never disappears.
+  stay level. A denser page wraps the toolbar in `<ControlSizeProvider value="s">`; every kit control
+  inside takes that tier.
+- The primary action is always there: on a phone it may take its own row or become icon-only with
+  `aria-label`; it never disappears.
 - Section totals go into `SegmentedControl.Count`, not into stat cards above the table.
 - A long form saves through the panel's action with a count («Сохранить 3 изменения»), never a sticky
   bar at the bottom of a phone screen.
-- The search first, the filter button after it at its own width (`SmartFilter.Toolbar` lays them out);
-  chips under the panel, one tier smaller, wrapping, with «Сбросить все».
 - Do not duplicate search: if the panel has one, the list below filters by it.
 
 ## Switchers
@@ -187,9 +182,14 @@ export function OrdersPanel() {
   narrow (a `fullWidth` SegmentedControl inside `PageToolbar.Sections` — the toolbar decides).
 - Sections of a page → SegmentedControl in `PageToolbar.Sections`; panels inside a card or a section →
   Tabs (the folder look belongs to its panel).
-- Items that do not fit scroll inside the switcher — never wrap to a second line, never truncate. The
-  switcher is a sideways `ScrollContainer`: its hidden edges fade, a vertical mouse wheel scrolls it
-  sideways, touch pans it.
+- Every switcher — Tabs, SegmentedControl, a horizontal ButtonGroup and BottomNav — scrolls inside
+  itself when its items do not fit: never a second line, never a truncated item. Its hidden edges
+  fade, a vertical mouse wheel scrolls it sideways, touch pans it, the current item is scrolled into
+  view, and the indicator moves only after a person's choice. A SegmentedControl whose items all have
+  icons collapses to icons (each named by its tooltip) before it scrolls.
+- Your duty as its host: give the switcher a bounded width. A flex or grid child that holds one sets
+  `min-width: 0`, otherwise the switcher grows the row instead of scrolling
+  ([foundation §9](../docs/foundation.md#9-layout-and-responsiveness)).
 - A long page split into sections (settings, dashboard): the switcher scrolls to the section and marks
   the current one.
 
@@ -208,11 +208,8 @@ export function OrdersPanel() {
 `toolbar`; the key column `hideable: false`); `stickyFirstColumn` for the name. On phones a table / cards switch in `PageToolbar.View` is fine — silently dropping columns
 by breakpoint is not. Never ask to rotate the phone.
 
-**Card grids.** The tiles of a page are `PageContent.Grid` + `PageContent.Cell span`: it folds by its own
-width (below 30rem every tile takes the row, then small tiles pair up, from 64rem each its span),
-not by the window. Tiles of a row share one height; a card with a list shows 6–8 rows and scrolls inside
-(`ScrollContainer`). A grid inside one block (thumbnails, fields) is the block's own
-`repeat(auto-fill, minmax(min(100%, …), 1fr))`.
+**Card grids.** [Intrinsic grids](#intrinsic-grids), never a breakpoint. Tiles of a row share one
+height; a card with a list shows 6–8 rows and scrolls inside (`ScrollContainer`).
 
 **Forms.** One column on phones. Pairs («от / до», two buttons) wrap with
 `flex: 1 1 calc(var(--prime-space-24) * 2)` instead of shrinking. Labels above fields (the kit's
@@ -232,7 +229,7 @@ images with `srcset` + `sizes` (Thumbnail and Avatar already reserve their box).
 | minimum touch target (WCAG 2.5.8 AA) | 24 × 24px or a free 24px circle |
 | recommended target for primary actions and `(pointer: coarse)` | 44 × 44px |
 | reflow without horizontal scroll (WCAG 1.4.10) | 320px wide = 1280px at 400% zoom |
-| text contrast | 4.5:1; large (≥ 24px) 3:1 |
+| text contrast | 4.5:1; large text (≥ 24px, or ≥ 18.66px bold) 3:1 |
 
 - Nothing important only on hover: whatever hover shows is reachable by focus and visible (or a tap
   away) under `(hover: none)`. Your own hover styles go inside `@media (hover: hover)`.
@@ -260,7 +257,7 @@ Target CLS ≤ 0.1: nothing moves while loading or when a filter changes.
 Drag the window through 320, 390, 768, 1024, 1280 and 1920px — continuously, not only at these points.
 
 - [ ] No horizontal page scroll at any width (tables and switchers scroll inside themselves).
-- [ ] The primary action is in the top row of the panel at every width.
+- [ ] The primary action is on screen at every width — never hidden ([the page panel](#page-panel--pagetoolbar)).
 - [ ] Every item alone in its row stretches; items of stretched switchers are equal.
 - [ ] All controls in a row share one height; no «staircase» after a wrap.
 - [ ] Text never overlaps and is cut only at its own block's edge; cut text has a tooltip or `title`.

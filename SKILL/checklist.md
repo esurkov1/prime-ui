@@ -1,113 +1,81 @@
 # Checklist before handing over a screen
 
-Answer every item yes or no. Any «no» is fixed before handing over.
+Answer every item yes or no. Any «no» is fixed before handing over. Each item links to the rule it
+checks.
 
 ## Composition
-- [ ] The screen starts from the closest screen in [composition.md](composition.md#screens) (list, detail,
-      settings, form in a Drawer, dashboard, states, messenger) and keeps its skeleton.
-- [ ] The page titles itself in its `AppHeader`: `AppHeader.Title`, a line of data in
-      `AppHeader.Description`, the page's tools in `AppHeader.Tools` (`PageToolbar`); main has no
-      `PageContent.Header`. Only a document page (settings, a long form, help) has `PageContent.Header`
-      and no title in the header. Blocks in `PageContent.Body`.
-- [ ] The header row holds only what this page needs: no global search, no app-wide buttons.
-- [ ] Cards only for standalone blocks; no card around a table, a single field or the whole page.
+- [ ] The screen starts from the closest working screen and keeps its skeleton ([screens](composition.md#screens)).
+- [ ] An app page titles itself in its `AppHeader`; only a document page has `PageContent.Header` ([page skeleton](composition.md#1-page-skeleton)).
+- [ ] The header row holds only this page's title, buttons and tools — nothing app-wide ([page skeleton](composition.md#1-page-skeleton)).
+- [ ] A Card only for a standalone titled block — never around a table, a single field or the page ([surfaces](composition.md#4-surfaces)).
 
 ## UX ([ux.md](ux.md))
-- [ ] I wrote the brief first: who and what for, the data and its shape, the main action, the states, the narrow screen.
-- [ ] Every entity is laid out by its shape: one record is one row or one block, never split over lines;
-      records a person edits are a `FieldList`, records a person reads a `DataTable`.
-- [ ] Labels on a form of rows ≤ columns + the list label: no label repeated per row, none numbered
-      («Пункт 1»), none repeating its heading; a unit in one place (the field's affix).
-- [ ] No text that explains the layout; every hint says what the person cannot see.
-- [ ] Buttons say the verb and the object; errors say how to fix it; empty states offer the next step.
-- [ ] Money, numbers and dates through `Intl` with `ru-RU`; «ёлочки», `…`, a non-breaking space before units.
-- [ ] Friction matches the cost: reversible → do it and offer «Отменить»; irreversible → `ConfirmDialog`
-      naming the thing and the loss; bulk → the count.
-- [ ] A disabled control says why when the reason is off screen; an action without permission is hidden.
-- [ ] Defaults prefill what the system knows; each field has the control and `inputMode` its data needs;
-      rare settings sit behind a disclosure.
-- [ ] Tabs, filters, search, page and the open record are in the URL.
-- [ ] I looked at the screen in a browser: both themes, 1280 and 375 px, the longest real values, an
-      empty list, an error on every field.
+- [ ] I wrote the five-line brief before the JSX ([brief](ux.md#1-brief-before-code)).
+- [ ] Every entity is laid out by its shape: a record is one row or one block ([data shape](ux.md#2-the-shape-of-the-data-decides-the-layout)).
+- [ ] Labels on a form of rows ≤ columns + the list label; none repeated, numbered or repeating its heading ([label economy](ux.md#3-label-economy)).
+- [ ] No text explains the layout; every hint says what the person cannot see ([label economy](ux.md#3-label-economy)).
+- [ ] Buttons say the verb and the object, errors say how to fix it, empty states offer the next step ([words](ux.md#4-words)).
+- [ ] Money, numbers and dates go through `Intl` with `ru-RU`, in Russian typography ([words](ux.md#4-words)).
+- [ ] The friction of every action matches the cost of a mistake ([friction](ux.md#5-friction-matches-the-cost-of-a-mistake)).
+- [ ] A disabled control says why when the reason is off screen; an action without permission is hidden ([nothing to guess](ux.md#6-nothing-to-guess)).
+- [ ] A request a value starts — a simulated one too — is cancelled when the value changes again ([nothing to guess](ux.md#6-nothing-to-guess)).
+- [ ] Tabs, filters, search, page and the open record are in the URL ([nothing to guess](ux.md#6-nothing-to-guess)).
+- [ ] Defaults prefill what the system knows; each field has the control and `inputMode` of its data ([ask less](ux.md#7-ask-less)).
+- [ ] I looked at the screen in a browser, filled badly ([the visual check](ux.md#9-look-at-it-before-handing-it-over)).
 
 ## Grid and spacing
-- [ ] Every spacing, size and gap in my CSS is a `--prime-space-*` (or another `--prime-*`) token on the 4px grid.
-- [ ] Spacing is `gap` on the parent; no margins on children; no outer padding duplicating `AppShell.Main` / `PageContent.Body`.
-- [ ] Proximity holds: inline controls 8, tile→tile 16 (one `PageContent.Grid`), field→field 20, block→block 24, group→group 32, section→section 40 (`PageContent.Section`).
-- [ ] Inside a group things are visibly closer than between groups.
+- [ ] Every length in my CSS is a `--prime-*` token on the 4px grid ([grid](foundations.md#1-4px-grid)).
+- [ ] Spacing is `gap` on the parent; no margins, no outer padding of my own ([rhythm](composition.md#2-rhythm--the-4px-grid)).
+- [ ] The proximity scale holds: closer inside a group than between groups ([proximity](foundations.md#2-proximity-scale)).
 
 ## Sizes and alignment
-- [ ] Default size `m`, unless the whole region is deliberately dense (`s`) or prominent (`l`).
-- [ ] Every row of controls uses one size; their heights line up.
-- [ ] Icon-only buttons are square (round `shape="circle"` only for media and transfer actions) and have
-      `aria-label`.
-- [ ] Controls inside table cells are one tier below the table; no CSS sets table row or cell heights.
+- [ ] Default size `m`; a tier changes for a whole region, never for one control ([the host tier](api-contract.md#size-and-the-host-tier)).
+- [ ] Every row of controls uses one size and its heights line up ([density](composition.md#5-density-and-size)).
+- [ ] Controls in table cells are one tier below the table; no CSS sets row or cell heights ([size axis](foundations.md#3-size-axis)).
+- [ ] Icon-only buttons are square (round only for media and transfers) and named ([icons](api-contract.md#icons)).
 
 ## Text
-- [ ] Every text goes through a kit component or `Typography` with a role; no custom font sizes/weights.
-- [ ] One page title, one `<h1>` (`AppHeader.Title`, or `PageContent.Title` on a document page);
-      headings descend without skipping levels (`Card.Title as="h2"` directly under the page title).
-- [ ] Secondary text uses `tone="secondary"`/`"muted"`; numbers in tables and prices are tabular.
-- [ ] No filler copy, no emoji, no text that restates the heading.
+- [ ] Every text goes through a kit part or a `Typography` role ([typography](foundations.md#7-typography)).
+- [ ] One page title, one `<h1>`; headings descend without skipping levels ([hierarchy](composition.md#3-hierarchy--air-first-then-type)).
+- [ ] Text colour comes from `tone`; numbers in tables and prices are tabular ([text colour](foundations.md#text-colour)).
+- [ ] No filler copy, no emoji, no text that restates the heading ([decoration](anti-slop.md#8-decoration-and-filler)).
 
 ## Tokens and surfaces
-- [ ] No raw px/rem/hex, no `--prime-ref-*`, no inline `style`, no overrides of kit internals
-      (allowed: `@media` conditions and length props a COMPONENT.md documents, like DataTable column `width`).
-- [ ] Every scroll region is a `ScrollContainer` (no `overflow: auto` of my own); kit components are not
-      wrapped in another one.
-- [ ] Blocks are separated by fill and air, not borders; no card inside a card without reason.
-- [ ] My own bounded blocks are `Card`s (or plain tiles on `--prime-color-layer-nested` +
-      `--prime-card-radius`); no hard-coded `--prime-color-layer-<n>-*`.
-- [ ] Hover never merges: a whole clickable card lifts (`--prime-shadow-overlay`) instead of a wash;
-      a part touching its surface's edge hovers with `--prime-color-fill-muted-hover`;
-      `--prime-color-fill-subtle` only on transparent, padded rows and ghost controls. Checked in both
-      themes, on the page and inside a card.
+- [ ] No raw values, `--prime-ref-*`, inline `style` or overrides of kit internals ([styling](api-contract.md#styling-your-own-wrappers)).
+- [ ] Every scroll region is a `ScrollContainer`; kit components are not wrapped in another one ([ready components](anti-slop.md#7-div-instead-of-a-ready-component)).
+- [ ] Blocks are separated by fill and air; a card in a card only as a deliberate next layer ([card in a card](foundations.md#card-in-a-card)).
+- [ ] My own bounded blocks are `Card`s or the plain nested tile ([your own block](foundations.md#your-own-bounded-block)).
+- [ ] No hover merges with its neighbour, in both themes, on the page and in a card ([hover](anti-slop.md#3a-hover-that-merges-with-the-neighbour)).
 
 ## Reuse
-- [ ] Every repeated-looking element is one component (kit or `shared/ui`), not copies.
-- [ ] No `div` where a kit component exists (Divider, Kbd, Badge, Card, LinkButton, Typography).
-- [ ] Every overlay (Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu, Select, MediaViewer) is a kit component.
-- [ ] Properties of one record are a `DescriptionList`, uploads go through `useUploadQueue`, a chat is
-      `Chat` (`Chat.Messages` of `Message.Root`, `Chat.Footer` with `Composer.Root`), an album is `Gallery`,
-      a schedule is `Gantt` — no hand-made copies of them.
+- [ ] Every repeated-looking element is one component, not copies ([missing components](composition.md#14-when-the-kit-has-no-ready-component)).
+- [ ] No `div` where a kit component exists ([ready components](anti-slop.md#7-div-instead-of-a-ready-component)).
+- [ ] Every overlay is a kit component ([overlays](composition.md#10-overlays)).
+- [ ] Record properties, uploads, a chat, an album and a schedule are the kit's components ([choosing](choosing.md#2-inside-a-category)).
 
 ## Hierarchy
-- [ ] One primary action per area (an empty state's action replaces the header's, not duplicates it);
-      others `soft`/`ghost`/`outline` neutral; destructive is `tone="danger"`.
-- [ ] The same action has the same label everywhere on the screen.
-- [ ] Primary action is last in action rows (forms, modals).
+- [ ] One primary action per area, last in its row; the rest `soft` / `ghost` / `outline` neutral ([actions](composition.md#6-actions)).
+- [ ] The same action has the same label and variant everywhere on the screen ([secondary actions](api-contract.md#secondary-actions)).
 
 ## States
-- [ ] Hover / focus-visible come from the kit (nothing removed).
-- [ ] Disabled controls use `disabled`; async actions use `loading` (no hand-made spinners).
-- [ ] Fields show `hint` and `error` (a non-empty `error` is already invalid); only the minority is marked `required` or `optional`.
-- [ ] Data blocks have loading, empty and error states (DataTable `loading` / `empty` / `loadError`, EmptyPage).
-- [ ] Every region swaps its states through `Crossfade` (nothing flips, the page below does not jump);
-      loading is a `Skeleton` in the data's geometry, a `Spinner` only where there is no shape to hold.
-- [ ] While a form saves, its submit button is `loading` and its fields are disabled by `Fieldset
-      disabled` (the submit button outside the Fieldset).
-- [ ] Destructive irreversible actions confirm in a `ConfirmDialog` (async `onConfirm`), reversible ones
-      offer «Отменить» instead; a form that stays on screen after saving says
-      «Сохранено» on its button, a form that goes away (closes, navigates) shows a Notification; failures
-      always show a Notification or a field `error` (instant toggles show one only on failure).
-- [ ] Overlays are always mounted and driven by `open` only (no `{open && …}`, no changing `key`), so they
-      close smoothly.
-- [ ] No hand-written animation on kit parts; custom motion uses motion tokens, `transform`/`opacity` only.
-- [ ] Every glyph comes from the kit — `<Icon name>`, else `prime-ui-kit/icons`, `createIcon` only for one
-      neither has; no raw `lucide-react` in JSX, no other icon library, no inline `<svg>`, no icon
-      animated by hand.
-- [ ] Every state change moves through the kit ([motion.md](motion.md)): a changed button label is new
-      children (it morphs), a long action is `progress`, a counter is a number (it rolls), a new password
-      has `strength`, an accepted code is `success`; nothing moves on frequent or keyboard actions.
+- [ ] Hover and focus-visible come from the kit, nothing removed ([focus](foundations.md#10-focus-and-motion)).
+- [ ] Busy controls use `loading`, unavailable ones `disabled` — no hand-made spinners ([loading](api-contract.md#loading-without-datatable)).
+- [ ] Fields show `hint` and `error`; only the minority is marked `required` or `optional` ([forms](api-contract.md#forms)).
+- [ ] Every data block has its loading, empty and error states ([feedback](composition.md#9-feedback)).
+- [ ] Every region swaps its states through `Crossfade`, loading is a `Skeleton` of the data ([continuity](foundations.md#11-state-changes-are-continuous)).
+- [ ] While a form saves, its submit is `loading` and its fields sit in a `Fieldset disabled` ([forms](api-contract.md#forms)).
+- [ ] A save that stays says «Сохранено» on its button, one that goes away notifies, a failure always shows ([feedback](composition.md#9-feedback)).
+- [ ] Overlays stay mounted and are driven by `open` only ([motion mistakes](motion.md#6-mistakes)).
+- [ ] No hand-written animation on kit parts; my own motion uses the motion tokens ([your own motion](motion.md#4-rules-for-your-own-motion)).
+- [ ] Every glyph comes from the kit, none animated by hand ([icons](api-contract.md#icons)).
+- [ ] Every state change moves through the kit ([what the kit animates](motion.md#1-what-the-kit-already-animates--do-not-rebuild-it)).
 
 ## Themes and widths
-- [ ] Screen checked with `data-theme="dark"`: no hard-coded colors, everything readable.
-- [ ] Screen works at 320px: no horizontal page scroll, grids collapse, toolbars rearrange (`PageToolbar`) and switchers scroll, long text truncates or wraps.
-- [ ] The responsive checklist in [responsive.md](responsive.md#checklist-before-handing-a-screen-over) passes: widths 320 · 390 · 768 · 1024 · 1280 · 1920, the primary action in the top row, one height per row, no hover-only functions, zoom 400%.
-- [ ] Below 768px `AppHeader.MenuButton` opens the Sidebar; the page title stays in the header on every width, the page's tools wrap under it.
+- [ ] The screen passes the responsive checklist in both themes ([responsive](responsive.md#checklist-before-handing-a-screen-over)).
+- [ ] On a phone the Sidebar opens from the menu button the header draws; the page title stays in the header ([app frame](layouts.md#app-frame-once-per-app)).
 
 ## Keyboard and a11y
-- [ ] Every action is reachable by Tab in a logical order and works with Enter/Space.
-- [ ] Every field has a label (visible, or `aria-label` for toolbar search); icons are `aria-hidden` or labelled.
-- [ ] Meaning is never color-only (status badges have text, errors have a message).
-- [ ] Custom `labels` are passed where default Russian strings do not fit the context.
+- [ ] Every action is reachable by Tab in reading order and works with Enter / Space ([interaction](responsive.md#interaction-and-accessibility)).
+- [ ] Every field has a label (visible, or `aria-label` for a toolbar search) ([forms](api-contract.md#forms)).
+- [ ] Meaning is never colour alone ([tone and color](foundations.md#6-tone-and-color)).
+- [ ] Custom `labels` replace the default Russian strings where they do not fit ([system strings](api-contract.md#shared-vocabulary-exported-types)).

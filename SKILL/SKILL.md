@@ -32,8 +32,8 @@ region, `Skeleton` while it loads).
    the main action, the states, the narrow screen); the shape of the data decides the layout, every
    label must carry something new, friction matches the cost of a mistake.
 2. **The app frame, once per app** — [layouts.md](layouts.md): styles, theme, providers, `AppShell`
-   with `Sidebar` and `AppHeader`, page wrappers, auth screens. A screen you deliver renders only its
-   page: its header content (title, a line of data, its tools) and its body.
+   with the `Sidebar`, page wrappers, auth screens. A screen you deliver renders its page: its
+   `AppHeader.Root` (title, a line of data, its tools) and its body.
 3. **Choose** — [choosing.md](choosing.md): the category by task, then the component, then the pairs
    that are easy to confuse.
 4. **Read the component** — [components.md](components.md) links each `COMPONENT.md` (API, variants,
@@ -51,8 +51,8 @@ region, `Skeleton` while it loads).
 8. **Narrow screens** — [responsive.md](responsive.md): every screen works from 320px, the page panel is
    `PageToolbar`, nothing is hidden on phones, touch follows `(hover)` / `(pointer)`.
 9. **Check** — [checklist.md](checklist.md) and [anti-slop.md](anti-slop.md), then look at the screen
-   in a browser: both themes, 1280 and 375 px ([ux.md](ux.md#9-look-at-it-before-handing-it-over)). Fix
-   every «no», then hand over.
+   in a browser ([ux.md](ux.md#9-look-at-it-before-handing-it-over)). Fix every «no», then hand
+   over.
 
 ## Where things are
 
@@ -89,7 +89,7 @@ project under `node_modules/prime-ui-kit/src/`.
 
 ```tsx
 import "prime-ui-kit/bundle.css"; // tokens, light + dark themes, component styles
-import "prime-ui-kit/fonts.css"; // optional: Golos Text + JetBrains Mono from Google Fonts
+import "prime-ui-kit/fonts.css"; // optional: Golos Text + JetBrains Mono, metric-matched fallbacks
 import "prime-ui-kit/reset.css"; // optional: minimal document reset (skip if the app has one)
 import { applyTheme } from "prime-ui-kit";
 
@@ -97,10 +97,10 @@ applyTheme("light"); // sets data-theme on <html>; "dark" for the dark theme
 ```
 
 Wrap the app in `NotificationProvider` if it shows toasts. Styles, `applyTheme`, `NotificationProvider`
-and `AppShell` belong to the app root, once. A screen component you deliver renders only its page
-(`PageContent…`) and assumes the root exists. If the project has no app frame yet, also deliver it as
-a separate `AppLayout` from [layouts.md](layouts.md#app-frame-once-per-app) — never inline the frame
-into a page.
+and `AppShell` belong to the app root, once. A screen component you deliver renders its page — its
+`AppHeader.Root` and its `PageContent` body — and assumes the root exists. If the project has no app
+frame yet, also deliver it as a separate root layout from
+[layouts.md](layouts.md#app-frame-once-per-app) — never inline the frame into a page.
 
 Icons: every glyph comes from the kit, and every kit icon is animated — its gesture plays when its
 button, link, tab, menu item or row is hovered or pressed, which gives the screen life with no code.
@@ -115,7 +115,7 @@ Take a semantic `<Icon name="…" />` first, else a glyph from the full animated
    lengths or hex (a raw length only in `@media` / `@container` conditions), no `--prime-ref-*`, no
    inline `style`.
 3. Depth from fill, not lines: Card on the panel, field inside the Card. No borders to separate blocks,
-   no card around a table, no card in a card.
+   no card around a table ([surfaces](foundations.md#4-fill-not-lines)).
 4. One size per row. Default `m` everywhere (omit `size`); change the tier for a whole region.
 5. Air is hierarchy: tighter inside a group, wider between groups, widest between sections — spacing via
    `gap` on the parent, never margins.
