@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   DEFAULT_ALIGN,
   DEFAULT_SIDE,
@@ -12,6 +13,7 @@ import { useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { useInheritedDisabled } from "@/internal/disabledContext";
+import { useFieldCell } from "@/internal/fieldCell";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { gridIndex } from "@/internal/rovingFocus";
 import { Slot } from "@/internal/slot";
@@ -50,6 +52,9 @@ const COLOR_PRESETS_LABELS: ColorPresetsLabels = {
 
 /** Viewport width below which l / xl grids wrap to half the columns (foundation §9 breakpoint). */
 const NARROW_QUERY = "(max-width: 479px)";
+
+/** On a touch screen swatches grow to the touch target; this many still fit a 320px panel. */
+const COARSE_COLUMNS = 5;
 
 type Ctx = {
   value: string | null;
@@ -118,7 +123,16 @@ function ColorPresetsRoot({
     onChange: onOpenChange,
   });
   const triggerRef = React.useRef<HTMLElement | null>(null);
-  const labels = React.useMemo(() => ({ ...COLOR_PRESETS_LABELS, ...labelsProp }), [labelsProp]);
+  // In a FieldList cell the column heading names the trigger, unless `labels.trigger` is given.
+  const cellLabel = useFieldCell()?.label;
+  const labels = React.useMemo(
+    () => ({
+      ...COLOR_PRESETS_LABELS,
+      ...(cellLabel ? { trigger: cellLabel } : null),
+      ...labelsProp,
+    }),
+    [labelsProp, cellLabel],
+  );
   const options = useSwatchOptions(presets, allowEmpty, labels.empty);
   // Up to 8 presets (+ "no color") fit one row; more wrap into rows of 8.
   const columns = Math.max(
@@ -284,7 +298,14 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
   const narrow = useNarrowViewport();
   // l / xl rows of more than 4 do not fit a 320px screen: wrap to half the columns.
   const wraps = narrow && (size === "l" || size === "xl") && columns > 4;
-  const cols = wraps ? Math.ceil(columns / 2) : columns;
+  // Touch-size swatches (the CSS grows them on a coarse pointer) take fewer columns; the arrow keys
+  // walk the same grid, so the count lives here and reaches the CSS as `--cpr-columns`.
+  const coarse = useMediaQuery("(pointer: coarse)");
+  const cols = coarse
+    ? Math.min(columns, COARSE_COLUMNS)
+    : wraps
+      ? Math.ceil(columns / 2)
+      : columns;
 
   const selectedIndex = options.findIndex((o) => sameColor(o.value, value));
   const [active, setActive] = React.useState(Math.max(0, selectedIndex));

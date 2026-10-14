@@ -270,7 +270,7 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 - Field + trigger row: gap `--prime-space-2`, `align-items: flex-end` so the trigger aligns with the field box under a label.
 - Panel parts gap: 12px (`--prime-space-3`) from `ColorPicker.Panel`.
 - ColorPresets.Content `align="auto"`: a trigger near the end of the screen lines up the panel's end edge and the panel grows toward the start, and the other way near the start; a fixed `align` still flips at the screen edge.
-- ColorPresets grid: one row for up to 8 presets (+ «no color»), else rows of 8 (`columns` overrides); below 480px viewport width the `l` / `xl` grids wrap to half the columns.
+- ColorPresets grid: one row for up to 8 presets (+ «no color»), else rows of 8 (`columns` overrides); below 480px viewport width the `l` / `xl` grids wrap to half the columns. On a coarse pointer every swatch grows to the 44 px touch target and the grid takes at most 5 columns, so it still fits a 320px panel; the arrow keys walk the same columns.
 
 ## Accessibility
 
@@ -306,7 +306,7 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | `red` | `"Красный, 0–255"` | Red channel field. |
 | `green` | `"Зелёный, 0–255"` | Green channel field. |
 | `blue` | `"Синий, 0–255"` | Blue channel field. |
-| `trigger` | `"Цвет"` | ColorPresets trigger name prefix: «<trigger>: <color name>». |
+| `trigger` | `"Цвет"` | ColorPresets trigger name prefix: «<trigger>: <color name>»; in a FieldList cell the column heading. |
 | `list` | `"Цвета"` | ColorPresets swatch list name when `Content` has no `label`. |
 | `empty` | `"Без цвета"` | ColorPresets «no color» swatch and the trigger name for an empty value. |
 

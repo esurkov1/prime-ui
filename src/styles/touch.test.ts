@@ -127,6 +127,9 @@ describe("touch and input", () => {
     expect(read("components/datepicker/Datepicker.module.css")).toContain(
       "--dp-cell: max(var(--dp-cell-tier), var(--prime-control-touch-target));",
     );
+    expect(read("components/color-picker/ColorPresets.module.css")).toMatch(
+      /@media \(pointer: coarse\) \{\s*\.grid \{\s*--swatch-base: max\(/,
+    );
     expect(read("components/color-swatches/ColorSwatches.module.css")).toMatch(
       /@media \(pointer: coarse\) \{\s*\.grid \{\s*--swatch-base: max\(/,
     );

@@ -430,8 +430,8 @@ export const api: ComponentApi = {
     {
       key: "trigger",
       default: "Цвет",
-      en: "ColorPresets trigger name prefix: «<trigger>: <color name>».",
-      ru: "Префикс имени триггера ColorPresets: «<trigger>: <цвет>».",
+      en: "ColorPresets trigger name prefix: «<trigger>: <color name>»; in a FieldList cell the column heading.",
+      ru: "Префикс имени триггера ColorPresets: «<trigger>: <цвет>»; в ячейке FieldList — заголовок столбца.",
     },
     {
       key: "list",

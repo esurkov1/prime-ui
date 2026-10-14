@@ -95,3 +95,14 @@
   gap: var(--swatch-gap);
   outline: none;
 }
+
+/* Touch: every swatch is a touch target itself (a hit area beyond it would cover its neighbours in
+   the dense grid); the panel takes fewer columns (`COARSE_COLUMNS`) so it still fits 320px. */
+@media (pointer: coarse) {
+  .grid {
+    --swatch-base: max(
+      var(--swatch-base-item),
+      calc(var(--prime-control-touch-target) + var(--prime-space-2))
+    );
+  }
+}
