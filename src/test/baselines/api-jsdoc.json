@@ -225,8 +225,6 @@
   "src/components/confirm-dialog/ConfirmDialog.tsx: ConfirmDialogRootProps.onConfirm",
   "src/components/confirm-dialog/ConfirmDialog.tsx: ConfirmDialogRootProps.title",
   "src/components/confirm-dialog/ConfirmDialog.tsx: ConfirmDialogRootProps.tone",
-  "src/components/crossfade/Crossfade.tsx: CrossfadeProps.fill",
-  "src/components/crossfade/Crossfade.tsx: CrossfadeProps.state",
   "src/components/data-table/ColumnsMenu.tsx: DataTableColumnsMenuProps.align",
   "src/components/data-table/ColumnsMenu.tsx: DataTableColumnsMenuProps.side",
   "src/components/data-table/DataTable.tsx: DataTableProps.collapsedGroups",

@@ -1,35 +1,14 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import { withMotion } from "@/test/motion";
 
 import { leaveInPlace } from "./leaveInPlace";
 
-type FakeAnimation = { keyframes: Keyframe[]; finish: () => void };
-
-function stubAnimate() {
-  const made: FakeAnimation[] = [];
-  const animate = vi.fn(function (this: HTMLElement, keyframes: Keyframe[]) {
-    const listeners = new Map<string, () => void>();
-    const animation = {
-      keyframes,
-      addEventListener: (type: string, listener: () => void) => listeners.set(type, listener),
-      finish: () => listeners.get("finish")?.(),
-    };
-    made.push(animation);
-    return animation as unknown as Animation;
-  });
-  HTMLElement.prototype.animate = animate as unknown as HTMLElement["animate"];
-  // Tests run with reduced motion on; this one covers the motion itself.
-  vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
-  return made;
-}
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-  delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
-});
-
 describe("leaveInPlace", () => {
   it("leaves an inert, hidden copy in the node's place that closes up and goes", async () => {
-    const made = stubAnimate();
+    const motion = withMotion();
+    document.documentElement.style.setProperty("--prime-motion-scale-enter", "0.96");
+    document.documentElement.style.setProperty("--prime-motion-easing-exit", "ease-out");
     const parent = document.createElement("div");
     const first = document.createElement("span");
     const leaving = document.createElement("span");
@@ -49,15 +28,22 @@ describe("leaveInPlace", () => {
     expect(ghost).toHaveAttribute("data-leaving");
     expect(ghost.id).toBe("");
     expect(ghost.inert).toBe(true);
-    expect(made[0]?.keyframes[1]).toMatchObject({ opacity: 0, width: "0px" });
+    const [animation] = motion.on(ghost);
+    // The shared exit: the entering scale from the tokens, `fast` on the exit curve.
+    expect((animation.keyframes as Keyframe[])[1]).toMatchObject({
+      opacity: 0,
+      width: "0px",
+      transform: "scale(0.96)",
+    });
+    expect(animation.options).toMatchObject({ easing: "ease-out", fill: "forwards" });
 
-    made[0]?.finish();
+    animation.finish();
     expect(parent.children).toHaveLength(2);
     parent.remove();
   });
 
   it("does nothing when the node stays (a replayed unmount)", async () => {
-    stubAnimate();
+    withMotion();
     const parent = document.createElement("ul");
     const row = document.createElement("li");
     parent.append(row);
@@ -65,6 +51,18 @@ describe("leaveInPlace", () => {
     leaveInPlace(row, "block");
     await Promise.resolve();
     expect(parent.children).toHaveLength(1);
+    parent.remove();
+  });
+
+  it("does nothing under reduced motion (the test default)", async () => {
+    const parent = document.createElement("ul");
+    const row = document.createElement("li");
+    parent.append(row);
+    document.body.append(parent);
+    leaveInPlace(row, "block");
+    row.remove();
+    await Promise.resolve();
+    expect(parent.children).toHaveLength(0);
     parent.remove();
   });
 });

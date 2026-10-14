@@ -1,5 +1,4 @@
 import * as React from "react";
-import { readCssDurationMs } from "@/hooks/usePresence";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -8,6 +7,7 @@ import { fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { iconLayout } from "@/internal/iconLayout";
 import { MorphText } from "@/internal/MorphText";
+import { readCssDurationMs } from "@/internal/motionTiming";
 import { Ring } from "@/internal/ring";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone, Variant } from "@/internal/states";

@@ -1,31 +1,83 @@
 /*
- * Enter motion for parts that appear in place (foundation §7, rules 7 and 11): an error line, a new
- * table row, an empty state, a drop gap. One-shot keyframes, opacity + a small shift, `enter`
- * easing; durations come from tokens, so reduced motion collapses them globally.
+ * Enter and exit motion for parts that appear or leave in place (foundation §7, rules 7 and 11):
+ * an error line, a new table row, an empty state, a drop gap, a pill that rises and leaves. One-shot
+ * keyframes; the movement (a small shift, an optional scale) runs on a movement clock, the fade on
+ * the matching fade clock, so reduced motion stills the movement and keeps the fade (rule 12).
  *
  *   .enter      fast · small parts (hint, error line, row, gap)
  *   .enterBase  base · blocks (empty state, detail panel)
  *   .enterBaseChildren  base · on a host whose children all enter (EmptyPage outside compact)
+ *   .enterFade  fast · opacity only (a part that must not move: a value, a glyph row)
+ *   .exit       fast · the mirror of `.enter` for a part kept mounted while it leaves
+ *               (`usePresence`); it holds the end state until the host unmounts it
+ *   .exitFade   fast · opacity only
  *
- * The host may set `--enter-shift` (default `--prime-space-1`, a rise from below; a negative value
- * drops in from above) and `animation-delay` in `--prime-motion-stagger` steps for a first render.
+ * The host may set:
+ *   --enter-shift     the offset it comes from and leaves to (default `--prime-space-1`, from
+ *                     below; a negative value drops in from above)
+ *   --enter-scale     the scale it comes from and leaves to (default 1; a block entering in place
+ *                     takes `--prime-motion-scale-enter`, a small part that pops takes
+ *                     `--prime-motion-scale-pop`)
+ *   --enter-duration  the movement clock (a `--prime-motion-duration-*` token)
+ * and `animation-delay` in `--prime-motion-stagger` steps for a first render.
  *
- * `backwards`: the start holds through a delay, and once played nothing stays applied, so a part
- * that entered keeps no transform effect (no compositing layer, stacking context or containing
- * block) for the rest of its life.
+ * Enter is `backwards`: the start holds through a delay, and once played nothing stays applied, so
+ * a part that entered keeps no transform effect (no compositing layer, stacking context or
+ * containing block) for the rest of its life. Exit is `forwards`: the part stays gone until the
+ * host removes it.
  */
 .enter {
-  animation: primeEnter var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) backwards;
+  animation:
+    primeEnterMove var(--enter-duration, var(--prime-motion-duration-fast))
+    var(--prime-motion-easing-enter) backwards,
+    primeEnterFade var(--prime-motion-fade-fast) var(--prime-motion-easing-enter) backwards;
 }
 
 .enterBase,
 .enterBaseChildren > * {
-  animation: primeEnter var(--prime-motion-duration-base) var(--prime-motion-easing-enter) backwards;
+  animation:
+    primeEnterMove var(--enter-duration, var(--prime-motion-duration-base))
+    var(--prime-motion-easing-enter) backwards,
+    primeEnterFade var(--prime-motion-fade-base) var(--prime-motion-easing-enter) backwards;
 }
 
-@keyframes primeEnter {
+.enterFade {
+  animation: primeEnterFade var(--prime-motion-fade-fast) var(--prime-motion-easing-enter) backwards;
+}
+
+.exit {
+  animation:
+    primeExitMove var(--enter-duration, var(--prime-motion-duration-fast))
+    var(--prime-motion-easing-exit) forwards,
+    primeExitFade var(--prime-motion-fade-fast) var(--prime-motion-easing-exit) forwards;
+  pointer-events: none;
+}
+
+.exitFade {
+  animation: primeExitFade var(--prime-motion-fade-fast) var(--prime-motion-easing-exit) forwards;
+  pointer-events: none;
+}
+
+@keyframes primeEnterMove {
+  from {
+    transform: translateY(var(--enter-shift, var(--prime-space-1))) scale(var(--enter-scale, 1));
+  }
+}
+
+@keyframes primeEnterFade {
   from {
     opacity: 0;
-    transform: translateY(var(--enter-shift, var(--prime-space-1)));
+  }
+}
+
+@keyframes primeExitMove {
+  to {
+    transform: translateY(var(--enter-shift, var(--prime-space-1))) scale(var(--enter-scale, 1));
+  }
+}
+
+@keyframes primeExitFade {
+  to {
+    opacity: 0;
   }
 }

@@ -1,12 +1,14 @@
-import { motionDurationMs, prefersReducedMotion } from "@/hooks/usePresence";
+import { prefersReducedMotion } from "@/hooks/usePresence";
+import { motionTiming, motionToken } from "@/internal/motionTiming";
 
 /**
  * The exit of a part the owner removed (a chip, a queue row): React drops the node at once, so a
- * copy of it stays in the flow at the same spot and closes up — it fades, settles a little smaller
- * and shrinks to nothing along `axis`, taking its gap with it, so the neighbours glide into the
- * place instead of jumping. Call it from a layout-effect cleanup, while the node is still drawn;
- * the copy is placed after the commit, and only if the node really left (Strict Mode replays an
- * unmount on a node that stays). Inert and hidden from assistive tech; gone when the motion ends.
+ * copy of it stays in the flow at the same spot and closes up — it fades, settles to the entering
+ * scale (`--prime-motion-scale-enter`) and shrinks to nothing along `axis` (`fast` · `exit`),
+ * taking its gap with it, so the neighbours glide into the place instead of jumping. Call it from
+ * a layout-effect or ref cleanup, while the node is still drawn; the copy is placed after the
+ * commit, and only if the node really left (Strict Mode replays an unmount on a node that stays).
+ * Inert and hidden from assistive tech; gone when the motion ends.
  */
 export function leaveInPlace(node: HTMLElement, axis: "inline" | "block") {
   const parent = node.parentElement;
@@ -41,9 +43,8 @@ export function leaveInPlace(node: HTMLElement, axis: "inline" | "block") {
     parent.insertBefore(ghost, next?.parentNode === parent ? next : null);
     const size = axis === "inline" ? "width" : "height";
     const margin = axis === "inline" ? "marginInlineEnd" : "marginBlockEnd";
-    const easing = getComputedStyle(document.documentElement)
-      .getPropertyValue("--prime-motion-easing-exit")
-      .trim();
+    // The token as written: WAAPI cannot take `var()`. Without the CSS the copy keeps its size.
+    const scale = motionToken("--prime-motion-scale-enter") || "1";
     const animation = ghost.animate(
       [
         {
@@ -57,18 +58,14 @@ export function leaveInPlace(node: HTMLElement, axis: "inline" | "block") {
         },
         {
           opacity: 0,
-          transform: "scale(0.96)",
+          transform: `scale(${scale})`,
           [size]: "0px",
           [margin]: `${-gap}px`,
           [padStart]: "0px",
           [padEnd]: "0px",
         },
       ],
-      {
-        duration: motionDurationMs("fast"),
-        ...(easing ? { easing } : {}),
-        fill: "forwards",
-      },
+      { ...motionTiming("fast", "exit"), fill: "forwards" },
     );
     const remove = () => ghost.remove();
     animation.addEventListener("finish", remove, { once: true });

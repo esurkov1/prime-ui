@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { motionDurationMs } from "@/hooks/usePresence";
+import { motionDurationMs } from "@/internal/motionTiming";
 
 /** How close to an edge counts as reaching it: the next batch is asked for before the edge shows. */
 const EDGE_PX = 120;

@@ -2,7 +2,8 @@ import * as React from "react";
 
 import { LIVE_REGION_ATTR } from "@/hooks/useInertSiblings";
 import { readCssLengthPx } from "@/hooks/usePosition";
-import { exitTimeoutMs, prefersReducedMotion } from "@/hooks/usePresence";
+import { prefersReducedMotion } from "@/hooks/usePresence";
+import { exitTimeoutMs } from "@/internal/motionTiming";
 import { Portal } from "@/internal/Portal";
 
 import {

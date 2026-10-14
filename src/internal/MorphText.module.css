@@ -1,14 +1,17 @@
 /*
  * MorphText — a label that changes in place (foundation §7 rule 8). At rest a plain inline text.
  * While a change plays, the start and end both labels share stay still; the changed part between
- * them holds its old width and glides to the new one (`base` · `emphasized`); the old letters leave upward (`fast` · `exit`), the new ones rise from below
- * (`base` · `emphasized`), one sixth of `--prime-motion-stagger` apart. Letters are one-shot
- * keyframes; a change during a change restarts from what is on screen. Reduced motion collapses
- * the durations (and the component skips the morph entirely).
+ * them holds its old width and glides to the new one (`base` · `emphasized`) — the "text width"
+ * exception of foundation §7 rule 5, listed in `src/styles/motion-perf.test.ts`. The old letters
+ * leave upward (`fast` · `exit`), the new ones rise from below (`base` · `emphasized`), one sixth
+ * of `--prime-motion-stagger` apart. Letters are one-shot keyframes; a change during a change
+ * restarts from what is on screen. Reduced motion collapses the durations (and the component skips
+ * the morph entirely).
  *
- * The letters animate only `transform` and `opacity`, so they run on the compositor; the blur that
- * bridges the two words is one animation per layer (a blur cannot be composited, and per letter it
- * would restyle every letter on every frame).
+ * The letters animate only `transform` and `opacity`, so they run on the compositor. The blur that
+ * bridges the two words is the `--prime-motion-blur` row of foundation §7 (a change of shape hidden
+ * while two states swap in place): one `filter` animation per layer, since a blur cannot be
+ * composited and per letter it would restyle every letter on every frame.
  */
 .root {
   display: inline-block;
@@ -75,14 +78,14 @@
 @keyframes primeMorphOut {
   to {
     opacity: 0;
-    transform: translateY(-0.5em);
+    transform: translateY(calc(var(--prime-space-2) * -1));
   }
 }
 
 @keyframes primeMorphIn {
   from {
     opacity: 0;
-    transform: translateY(0.5em);
+    transform: translateY(var(--prime-space-2));
   }
 }
 

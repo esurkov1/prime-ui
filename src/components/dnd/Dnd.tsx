@@ -5,6 +5,7 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { motionTiming } from "@/internal/motionTiming";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { DragControllerContext, useDragController } from "./context";
@@ -21,7 +22,6 @@ import { type DndLabels, defaultDndLabels } from "./labels";
 import { useStoreSelector } from "./store";
 import { useDragSource } from "./useDragSource";
 import { useDropTarget } from "./useDropTarget";
-import { motionTiming } from "./useFlipList";
 import { useSortableList } from "./useSortableList";
 
 export type { DragItem, DragOutcome } from "./dragSession";

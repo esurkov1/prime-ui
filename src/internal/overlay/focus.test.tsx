@@ -5,6 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 import { MediaViewer } from "@/components/media-viewer/MediaViewer";
 import { Modal } from "@/components/modal/Modal";
 
+import { handoffFocus } from "./focus";
+
 /**
  * Safari does not focus a button on a click: focus stays on the `tabindex="-1"` region around it
  * (or the body). A press is fired without moving focus, as Safari does.
@@ -77,5 +79,49 @@ describe("opener of a modal layer", () => {
     // Opened by a key: the ring shows where focus lands.
     expect(focus).not.toHaveBeenCalledWith(expect.objectContaining({ focusVisible: false }));
     expect(opener).not.toHaveAttribute("data-focus-quiet");
+  });
+});
+
+describe("handoffFocus", () => {
+  function Parts() {
+    return (
+      <>
+        <div data-testid="leaving">
+          <button type="button">Повторить</button>
+        </div>
+        <div data-testid="next">
+          <p>Нет данных</p>
+          <button type="button">Создать</button>
+        </div>
+        <div data-testid="plain">
+          <p>Счёт оплачен</p>
+        </div>
+        <button type="button">Снаружи</button>
+      </>
+    );
+  }
+
+  it("moves focus from the leaving part to the first tab stop of the next one", () => {
+    render(<Parts />);
+    screen.getByRole("button", { name: "Повторить" }).focus();
+    expect(handoffFocus(screen.getByTestId("leaving"), screen.getByTestId("next"))).toBe(true);
+    expect(screen.getByRole("button", { name: "Создать" })).toHaveFocus();
+  });
+
+  it("focuses the next part itself when it has no tab stop", () => {
+    render(<Parts />);
+    screen.getByRole("button", { name: "Повторить" }).focus();
+    const plain = screen.getByTestId("plain");
+    expect(handoffFocus(screen.getByTestId("leaving"), plain)).toBe(true);
+    expect(plain).toHaveFocus();
+    expect(plain).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("leaves focus alone when it is not in the leaving part", () => {
+    render(<Parts />);
+    const outside = screen.getByRole("button", { name: "Снаружи" });
+    outside.focus();
+    expect(handoffFocus(screen.getByTestId("leaving"), screen.getByTestId("next"))).toBe(false);
+    expect(outside).toHaveFocus();
   });
 });

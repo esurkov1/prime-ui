@@ -1,7 +1,6 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
-import { motionDurationMs } from "@/hooks/usePresence";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -12,6 +11,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { motionDurationMs } from "@/internal/motionTiming";
 import type { ControlSize, Tone } from "@/internal/states";
 import { isPromiseLike } from "@/internal/usePendingChanges";
 

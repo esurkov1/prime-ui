@@ -1,7 +1,8 @@
 import * as React from "react";
 
-import { motionDurationMs, prefersReducedMotion } from "@/hooks/usePresence";
+import { prefersReducedMotion } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
+import { exitTimeoutMs } from "@/internal/motionTiming";
 
 import styles from "./glyphSwap.module.css";
 
@@ -29,7 +30,7 @@ function typeName(type: unknown): string {
  * What a glyph is: the element type with its `name` prop (an `<Icon name>`) and its key. Text and
  * numbers are one glyph whose words change in place (a percent ticking up never cross-fades).
  */
-export function glyphKey(node: React.ReactNode): string {
+function glyphKey(node: React.ReactNode): string {
   if (node === null || node === undefined || typeof node === "boolean") return "";
   if (typeof node === "string" || typeof node === "number") return "text";
   if (React.isValidElement<{ name?: unknown }>(node)) {
@@ -40,11 +41,12 @@ export function glyphKey(node: React.ReactNode): string {
 }
 
 /**
- * A glyph that changes cross-fades in place (foundation §7 rule 7): the outgoing one shrinks to 0.6
- * and fades, the incoming one grows from 0.6 (`fast` · standard) and plays its own gesture once
+ * A glyph that changes cross-fades in place (foundation §7 rule 7): the outgoing one shrinks to
+ * `--prime-motion-scale-mark` and fades, the incoming one grows from it (`fast` · standard) and plays its own gesture once
  * (`data-play`, `icons/glyphMotion`). Both share one grid cell, so the box keeps the glyph's size.
- * A change of the same glyph (new words, new props) updates in place. Reduced motion swaps at once
- * and plays no gesture. Used by `Button.Icon` and the centre of ProgressCircle.
+ * A change of the same glyph (new words, new props) updates in place. Reduced motion drops the old
+ * glyph at once, fades the new one in without the scale and plays no gesture. The one glyph slot
+ * of the kit: every glyph that changes in place goes through it.
  */
 export function GlyphSwap({
   children,
@@ -79,7 +81,7 @@ export function GlyphSwap({
     if (!leavingIds) return;
     const timer = window.setTimeout(
       () => setState((s) => ({ ...s, leaving: [] })),
-      motionDurationMs("fast"),
+      exitTimeoutMs("fast"),
     );
     return () => window.clearTimeout(timer);
   }, [leavingIds]);

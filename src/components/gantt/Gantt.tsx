@@ -14,7 +14,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
-import { exitTimeoutMs, prefersReducedMotion } from "@/hooks/usePresence";
+import { prefersReducedMotion } from "@/hooks/usePresence";
 import { useStateSwap } from "@/hooks/useStateSwap";
 import { useVirtualRows } from "@/hooks/useVirtualRows";
 import {
@@ -27,6 +27,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
+import { exitTimeoutMs } from "@/internal/motionTiming";
 import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";

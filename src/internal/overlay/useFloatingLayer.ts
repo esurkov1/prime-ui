@@ -3,9 +3,10 @@ import * as React from "react";
 import { COMPACT_QUERY } from "@/hooks/breakpoints";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { type PositionOptions, type PositionSide, usePosition } from "@/hooks/usePosition";
-import { type MotionDurationToken, type Presence, usePresence } from "@/hooks/usePresence";
+import { type Presence, usePresence } from "@/hooks/usePresence";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
+import type { MotionDurationToken } from "@/internal/motionTiming";
 
 import { focusBack, focusInto, getFocusable } from "./focus";
 import { type DismissReason, type LayerEntry, useLayer } from "./layerStack";

@@ -1,13 +1,13 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 
-import { motionDurationMs, prefersReducedMotion } from "@/hooks/usePresence";
+import { prefersReducedMotion } from "@/hooks/usePresence";
+import { motionDurationMs, motionTiming } from "@/internal/motionTiming";
 
 import styles from "./Dnd.module.css";
 import type { DragController, DragItem, DragPreview } from "./dragSession";
 import type { Point, Rect } from "./geometry";
 import { layoutRect } from "./geometry";
-import { motionTiming } from "./useFlipList";
 
 function translate(point: Point, grab: Point): string {
   return `translate3d(${Math.round(point.x - grab.x)}px, ${Math.round(point.y - grab.y)}px, 0)`;

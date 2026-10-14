@@ -1,37 +1,9 @@
 import * as React from "react";
 
-import { motionDurationMs, prefersReducedMotion } from "@/hooks/usePresence";
+import { prefersReducedMotion } from "@/hooks/usePresence";
+import { motionTiming } from "@/internal/motionTiming";
 
 import { layoutRect, ownNodes } from "./geometry";
-
-/** Timings read this frame: every list of a board settles in the same commit. */
-const timingCache = new Map<string, KeyframeAnimationOptions>();
-
-/**
- * WAAPI timing from the motion tokens (`--prime-motion-duration-<token>`,
- * `--prime-motion-easing-<curve>`), read at animation time so theme and app overrides apply;
- * WAAPI cannot take `var()`. Read once per frame: a computed style read of the root forces a style
- * pass, and each list of a board would otherwise force its own after the previous list's glides.
- */
-export function motionTiming(
-  duration: "fast" | "base",
-  curve: "standard" | "enter" | "exit" = "standard",
-): KeyframeAnimationOptions {
-  const key = `${duration}|${curve}`;
-  const cached = timingCache.get(key);
-  if (cached) return { ...cached };
-  const easing = getComputedStyle(document.documentElement)
-    .getPropertyValue(`--prime-motion-easing-${curve}`)
-    .trim();
-  const timing = easing
-    ? { duration: motionDurationMs(duration), easing }
-    : { duration: motionDurationMs(duration) };
-  if (timingCache.size === 0 && typeof requestAnimationFrame === "function") {
-    requestAnimationFrame(() => timingCache.clear());
-  }
-  timingCache.set(key, timing);
-  return { ...timing };
-}
 
 type Box = { left: number; top: number; width: number; height: number };
 

@@ -3,7 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Icon } from "@/icons";
 
-import { GlyphSwap, glyphKey } from "./glyphSwap";
+import { withMotion } from "@/test/motion";
+
+import { GlyphSwap } from "./glyphSwap";
 
 const layers = (container: HTMLElement) =>
   Array.from(container.firstElementChild?.children ?? []) as HTMLElement[];
@@ -11,24 +13,39 @@ const layers = (container: HTMLElement) =>
 describe("GlyphSwap", () => {
   afterEach(() => {
     vi.useRealTimers();
-    vi.unstubAllGlobals();
   });
 
-  it("knows a glyph by its type, its icon name and its key; text is one glyph", () => {
-    expect(glyphKey(<Icon name="action.close" />)).not.toBe(glyphKey(<Icon name="action.play" />));
-    expect(glyphKey(<Icon name="action.close" />)).toBe(glyphKey(<Icon name="action.close" />));
-    expect(glyphKey("45%")).toBe(glyphKey(46));
-    expect(glyphKey(null)).toBe("");
+  it("knows a glyph by its type, its icon name and its key", () => {
+    withMotion();
+    const { container, rerender } = render(
+      <GlyphSwap>
+        <Icon name="action.close" />
+      </GlyphSwap>,
+    );
+    // The same icon with new props is the same glyph: it updates in place.
+    rerender(
+      <GlyphSwap>
+        <Icon name="action.close" size="s" />
+      </GlyphSwap>,
+    );
+    expect(layers(container)).toHaveLength(1);
+    // Another key is another glyph.
+    rerender(
+      <GlyphSwap>
+        <Icon key="next" name="action.close" />
+      </GlyphSwap>,
+    );
+    expect(layers(container)).toHaveLength(2);
+  });
+
+  it("renders no layer for nothing", () => {
+    const { container } = render(<GlyphSwap>{null}</GlyphSwap>);
+    expect(layers(container)).toHaveLength(0);
   });
 
   it("cross-fades a new glyph: the old one leaves hidden, the new one enters and gestures", () => {
     // Tests run with reduced motion (`src/test/setup.ts`); this one moves.
-    vi.stubGlobal("matchMedia", (query: string) => ({
-      matches: false,
-      media: query,
-      addEventListener() {},
-      removeEventListener() {},
-    }));
+    withMotion();
     vi.useFakeTimers();
     const { container, rerender } = render(
       <GlyphSwap>

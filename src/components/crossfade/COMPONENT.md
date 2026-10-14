@@ -40,7 +40,7 @@ Crossfade          <div>; holds the region's height while it changes
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Crossfade
-`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and glides to the new height; still on the first render, instant under reduced motion.
+`ref` → `HTMLDivElement`. A region that cross-fades its content when `state` changes and glides to the new height; still on the first render. Under reduced motion the old content goes at once and the height jumps; the new content still fades in.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -69,12 +69,13 @@ Crossfade has no variants: one treatment, keyed by `state`.
 |---|---|---|
 | first render | mount | one layer, `data-state="open"`, no motion |
 | swapping | `state` changes | previous layer `data-state="closed"`, `aria-hidden`, `inert`, absolutely placed, fades out over `fast` with `exit` easing and unmounts on `animationend` (timeout fallback); the new layer fades in over `base` with `enter` easing |
-| resizing | the new state has another height | root `data-resizing="true"`: height glides from the old to the new value over `base` with `standard` easing, clipped with a `--prime-focus-space` margin, then returns to `auto` |
-| reduced motion | `prefers-reduced-motion: reduce` | instant swap: no leaving layer, no glide |
+| resizing | the new state has another height | root `data-resizing="true"`: height glides from the old to the new value over `base` with `standard` easing (a swap mid-glide starts from the height on screen), clipped with a `--prime-focus-space` margin, then returns to `auto` |
+| reduced motion | `prefers-reduced-motion: reduce` | the old layer goes before it is painted and the height does not glide; the new layer still fades in (the fade clock, foundation §7 rule 12) |
+| focus handoff | focus was in the old state when `state` changed | focus moves into the new layer: its first tab stop, else the layer itself (`tabindex="-1"`); focus elsewhere stays |
 | empty | the current state renders nothing (`null`, `false`, `""`) | no current layer; once nothing is leaving the root is `:empty` and `display: none` — no box and no gap in its grid or flex parent |
 | filling | `fill` | `data-fill="true"`; the root is a one-cell grid (`flex: 1`, `height: 100%`, `min-height: 0`), layers stretch to it |
 
-Motion is opacity only, so nothing shifts under the pointer; the leaving content keeps its instance (no remount, no repeated effects) until it is gone.
+Motion is opacity only, so nothing shifts under the pointer; the leaving content keeps its instance (no remount, no repeated effects) until it is gone. Each state is a block formatting context, so it measures the same in flow and laid over as it leaves.
 
 ## Layout & spacing
 - No padding, gap or fill of its own: it sits where the swapped content would sit (inside `Card.Body`, a page section, a panel).
@@ -94,7 +95,7 @@ No keyboard interaction.
 
 - Renders a plain `<div>`; pass `aria-busy` while the region loads and `aria-live` or `role` when its changes must be announced.
 - The leaving layer is `aria-hidden` and `inert`: screen readers and Tab never reach content that is going away.
-- Move focus yourself when the focused control was in the old state (e.g. the retry button of an error).
+- Focus in the old state (the retry button of an error) moves into the new one: its first tab stop, or the new content itself; focus elsewhere on the page stays where it is.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -115,6 +116,7 @@ No `labels`.
 - A spinner block for content of known shape → a `Skeleton` of that shape; a spinner is for loading with no shape to hold (a button, a status line).
 - Wrapping a DataTable to animate its loading / empty / error → the table body already cross-fades; use its props.
 - Hand-written `opacity` transitions or `height` animations for a state swap → Crossfade owns both, with tokens and reduced motion.
+- An effect that moves focus out of a state that is going away (the retry button of an error) → Crossfade hands focus to the new state itself.
 - `height: 100%` on the content of a full-height region → `fill` on the Crossfade; its layers stretch.
 - Rendering an optional block conditionally outside Crossfade (`{notice && <Banner />}`) → it pops in and out; keep the Crossfade and pass `null` when there is nothing to show.
 

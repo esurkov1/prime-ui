@@ -741,8 +741,8 @@ button.reply:focus-visible {
  * Every message holds the row's place: a disclosure (`internal/Disclosure`) closed until the first
  * reaction and closed again after the last one — laid out at once (`--disclosure-duration: 0s`);
  * the message's morph plays the change. Inside a bubble it ends the bubble and takes back its gap;
- * under a picture or a circle it stands on the message's side. The clip reaches past the row by the
- * focus space, so a chip's ring is never cut.
+ * under a picture or a circle it stands on the message's side. The disclosure's clip keeps the
+ * focus space past its edge, so a chip's ring is never cut.
  */
 .reactionsSlot {
   --disclosure-duration: 0s;
@@ -752,11 +752,6 @@ button.reply:focus-visible {
 
 .bubble > .reactionsSlot {
   margin-block-start: calc(-1 * var(--prime-space-1));
-}
-
-.reactionsClip {
-  margin: calc(-1 * var(--prime-focus-space));
-  padding: var(--prime-focus-space);
 }
 
 .reactions {

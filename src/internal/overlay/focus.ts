@@ -135,3 +135,18 @@ export function activeElement(): HTMLElement | null {
   const el = document.activeElement;
   return el instanceof HTMLElement && el !== document.body ? el : null;
 }
+
+/**
+ * Focus is in a part that is going away (a region's old state, a dismissed message), still in the
+ * document: it moves to `next` — its `[data-autofocus]`, else its first tab stop, else `next`
+ * itself (made focusable with `tabindex="-1"`) — so it never falls to the page. Call it before the
+ * part leaves the document. Does nothing when focus is elsewhere; returns whether focus moved.
+ */
+export function handoffFocus(leaving: Element | null, next: HTMLElement | null): boolean {
+  if (!leaving || !next?.isConnected || !leaving.contains(document.activeElement)) return false;
+  const target =
+    next.querySelector<HTMLElement>("[data-autofocus]") ?? getFocusable(next)[0] ?? next;
+  if (target === next && !next.hasAttribute("tabindex")) next.tabIndex = -1;
+  target.focus({ preventScroll: true });
+  return true;
+}

@@ -35,22 +35,11 @@ describe("transcript", () => {
     expect(region?.textContent).toBe("");
   });
 
-  it("close is simultaneous: the height and the text's fade run on one clock, both ways", () => {
-    const disclosure = css("src/internal/disclosure.module.css");
+  it("lays out at once: the message's morph plays the change", () => {
+    // The height and the text's fade share Disclosure's one clock (Disclosure.test); a message
+    // changes size in one layout, so the transcript's clock is zero.
     const transcript = css("src/internal/transcript.module.css");
-    // A message changes size in one layout for now: the transcript's clock is zero.
     expect(rule(transcript, ".disclosure")).toMatch(/--disclosure-duration: 0s;/);
-    const flat = (block: string) => block.replace(/\s+/g, " ");
-    const clock =
-      "var(--disclosure-duration, var(--prime-motion-duration-base)) var(--disclosure-ease, var(--prime-motion-easing-standard))";
-    // Closed and open state carry the same row transition; the content's fade has the same clock
-    // and no delay — the text never waits for the height, or the height for the text.
-    expect(flat(rule(disclosure, ".root"))).toContain(`grid-template-rows ${clock}`);
-    expect(flat(rule(disclosure, '.root[data-state="open"]'))).toContain(
-      `grid-template-rows ${clock}`,
-    );
-    expect(flat(rule(disclosure, ".clip > *"))).toContain(`opacity ${clock}`);
-    expect(rule(disclosure, ".clip > *")).not.toMatch(/delay/);
   });
 
   it("opens and closes without reading layout or computed style", () => {

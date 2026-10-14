@@ -1,6 +1,5 @@
 [
   "CLAUDE.md: docs/componentApi.ts",
   "src/components/popover/Popover.module.css: surface.module.css (no such file)",
-  "src/hooks/usePresence.ts: §7 \"Overlay contract\" is not in that section",
   "src/internal/overlayMotion.module.css: §7 \"Overlay contract\" is not in that section"
 ]
