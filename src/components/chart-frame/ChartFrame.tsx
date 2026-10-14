@@ -1,6 +1,7 @@
 import * as React from "react";
 import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useElementSize } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
@@ -362,27 +363,7 @@ function ChartFramePlot({
 }: ChartFramePlotProps) {
   const { state, series, labels, onRetry, plotRef } = useChartFrame("Plot");
   const mergedRef = useMergedRefs(plotRef, ref);
-  const [size, setSize] = React.useState<{ width: number; height: number } | null>(null);
-  const measure = renderPlot !== undefined;
-
-  React.useLayoutEffect(() => {
-    const node = plotRef.current;
-    if (!node || !measure) return;
-    const update = (width: number, nextHeight: number) => {
-      const next = { width: Math.round(width), height: Math.round(nextHeight) };
-      setSize((prev) =>
-        prev && prev.width === next.width && prev.height === next.height ? prev : next,
-      );
-    };
-    const rect = node.getBoundingClientRect();
-    update(rect.width, rect.height);
-    if (typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(([entry]) => {
-      if (entry) update(entry.contentRect.width, entry.contentRect.height);
-    });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [measure, plotRef.current]);
+  const size = useElementSize(plotRef, { enabled: renderPlot !== undefined });
 
   const plot =
     renderPlot !== undefined

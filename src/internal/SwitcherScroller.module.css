@@ -1,0 +1,14 @@
+/*
+ * The one scroller of every switcher (foundation §9: Tabs, SegmentedControl, a horizontal
+ * ButtonGroup, BottomNav): one row that scrolls sideways inside itself — never wraps, never
+ * truncates — with a hidden bar and soft edges (ScrollContainer). It is the positioned box of the
+ * row, so the selection indicator and a revealed item measure their offsets in it. Zero
+ * specificity: the host lays the row out (flex or grid, gaps) with its own class.
+ */
+:where(.root) {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  min-width: 0;
+  max-width: 100%;
+}
