@@ -69,45 +69,20 @@ export type TextareaRootProps = Omit<
   "size" | "children"
 > &
   FieldFocusRingProps & {
-    /**
-     * Saves the field on its own (inline editing): fires with the value on blur and Mod+Enter when it
-     * differs from the last committed one; Escape reverts to it. Return a Promise to show a spinner
-     * in the field's corner while it runs (the field stays editable, Tab moves on); a rejection puts
-     * the committed value back — show why through `error`. Success shows a brief check.
-     */
     onCommit?: FieldCommitHandler;
-    /** Actions in the field's top end corner: `Textarea.CopyButton`, `Textarea.Action`. */
     children?: React.ReactNode;
-    /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;
-    /** Invalid state: danger ring and `aria-invalid`. A non-empty `error` implies it. */
     invalid?: boolean;
     label?: React.ReactNode;
-    /** Shows the muted optional marker after the label text (`labels.optional`). */
     optional?: boolean;
     hint?: React.ReactNode;
-    /** Error message; replaces the hint in the same slot and implies `invalid`. */
     error?: React.ReactNode;
-    /** Right-aligned slot of the support row, e.g. `<Textarea.Counter current={n} max={500} />`. */
     counter?: React.ReactNode;
-    /** Always render the support row so an appearing error does not shift the layout. */
     reserveSupportRow?: boolean;
-    /** Height follows the content. `false` → fixed height with native vertical resize. */
     autoResize?: boolean;
-    /** Minimum height in lines (default 3); with `autoResize={false}` the fixed height. */
     rows?: number;
-    /**
-     * With `autoResize`: the field grows up to this many lines, then scrolls inside (a chat
-     * composer: `rows={1} maxRows={8}`). Without it the field grows without a limit.
-     */
     maxRows?: number;
-    /** Called with the new string value; native `onChange` still fires. */
     onValueChange?: (value: string) => void;
-    /**
-     * Markdown formatting, as in Composer: selecting text shows a floating toolbar (bold, italic,
-     * strikethrough, code, spoiler, link, quote) and enables the hotkeys; each writes Markdown around
-     * the selection.
-     */
     formatting?: boolean;
     labels?: Partial<TextareaLabels>;
     /** The native `<textarea>`. */
@@ -370,7 +345,6 @@ export type TextareaCopyButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "children" | "aria-label"
 > & {
-  /** Text to copy; the field's current value when omitted. */
   value?: string;
   ref?: React.Ref<HTMLButtonElement>;
 };

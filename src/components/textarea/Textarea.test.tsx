@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -252,9 +253,29 @@ describe("Textarea onCommit (inline save)", () => {
 });
 
 describe("Textarea edge actions", () => {
+  it("Tab reaches the field, then the buttons in its corner; Enter breaks the line", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <Root label="Комментарий" defaultValue="Счёт 418">
+          <Textarea.CopyButton />
+        </Root>
+      </form>,
+    );
+    const textarea = screen.getByLabelText("Комментарий");
+    await user.tab();
+    expect(textarea).toHaveFocus();
+    await user.keyboard("{End}{Enter}оплачен");
+    expect(textarea).toHaveValue("Счёт 418\nоплачен");
+    expect(onSubmit).not.toHaveBeenCalled();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Копировать" })).toHaveFocus();
+  });
+
   it("CopyButton and Action sit in the field and copy the text", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { clipboard: { writeText } });
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
     const onClick = vi.fn();
     render(
       <Textarea.Root label="Ответ" readOnly defaultValue="Счёт отправлен">
@@ -360,15 +381,47 @@ describe("Textarea formatting", () => {
     expect(field()).toHaveFocus();
   });
 
-  it("the arrow keys move between the tools", () => {
+  it("each hotkey writes its Markdown around the selection", async () => {
+    const user = userEvent.setup();
+    const formatted = async (press: () => Promise<void>) => {
+      const { unmount } = render(
+        <Root aria-label="Текст" formatting defaultValue="Смета готова" />,
+      );
+      select(0, 5);
+      await press();
+      const value = field().value;
+      unmount();
+      return value;
+    };
+    expect(await formatted(() => user.keyboard("{Control>}{Shift>}x{/Shift}{/Control}"))).toBe(
+      "~~Смета~~ готова",
+    );
+    expect(await formatted(() => user.keyboard("{Control>}e{/Control}"))).toBe("`Смета` готова");
+    expect(await formatted(() => user.keyboard("{Meta>}{Shift>}h{/Shift}{/Meta}"))).toBe(
+      "||Смета|| готова",
+    );
+    expect(await formatted(() => user.keyboard("{Control>}k{/Control}"))).toBe(
+      "[Смета](https://) готова",
+    );
+    expect(await formatted(() => user.keyboard("{Control>}{Shift>}9{/Shift}{/Control}"))).toBe(
+      "> Смета готова",
+    );
+  });
+
+  it("the arrow keys, Home and End move between the tools", async () => {
+    const user = userEvent.setup();
     render(<Root aria-label="Текст" formatting defaultValue="Смета готова" />);
     select(0, 5);
-    const bold = screen.getByRole("button", { name: "Жирный" });
-    bold.focus();
-    fireEvent.keyDown(bold, { key: "ArrowRight" });
-    expect(screen.getByRole("button", { name: "Курсив" })).toHaveFocus();
-    fireEvent.keyDown(screen.getByRole("button", { name: "Курсив" }), { key: "End" });
-    expect(screen.getByRole("button", { name: "Цитата" })).toHaveFocus();
+    const tool = (name: string) => screen.getByRole("button", { name });
+    tool("Жирный").focus();
+    await user.keyboard("{ArrowRight}");
+    expect(tool("Курсив")).toHaveFocus();
+    await user.keyboard("{End}");
+    expect(tool("Цитата")).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(tool("Ссылка")).toHaveFocus();
+    await user.keyboard("{Home}");
+    expect(tool("Жирный")).toHaveFocus();
   });
 
   it("Escape collapses the selection before it reverts an onCommit field", () => {
