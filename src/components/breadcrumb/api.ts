@@ -5,15 +5,15 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Breadcrumb.Root",
-      en: "`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and collapses the middle levels on narrow containers.",
-      ru: "`<nav aria-label>` со списком `<ol>`: рисует шевроны между уровнями, задаёт размер и сворачивает средние уровни в узком контейнере.",
+      en: "`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and, on narrow containers, collapses the middle levels into a «…» menu button that lists them.",
+      ru: "`<nav aria-label>` со списком `<ol>`: рисует шевроны между уровнями, задаёт размер и в узком контейнере сворачивает средние уровни в кнопку «…» с меню этих уровней.",
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Text of the links, the current page and the ellipsis; chevrons and icons take the same tier.",
-          ru: "Кегль ссылок, текущей страницы и многоточия; шевроны и иконки — того же яруса.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Text of the links, the current page and the ellipsis; chevrons, icons and the collapse menu take the same tier. Without it the tier of its host, else `m`.",
+          ru: "Кегль ссылок, текущей страницы и многоточия; шевроны, иконки и меню свёрнутых уровней — того же яруса. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "labels",
@@ -89,18 +89,27 @@ export const api: ComponentApi = {
   labels: labelRows(BREADCRUMB_LABELS, {
     nav: { en: "`aria-label` of the `nav` landmark.", ru: "`aria-label` области `nav`." },
     ellipsis: {
-      en: "Hidden text of `Breadcrumb.Ellipsis`.",
-      ru: "Скрытый текст `Breadcrumb.Ellipsis`.",
+      en: "Name of the collapse menu button and hidden text of `Breadcrumb.Ellipsis`.",
+      ru: "Имя кнопки меню свёрнутых уровней и скрытый текст `Breadcrumb.Ellipsis`.",
     },
   }),
   accessibility: {
     keyboard: [
       {
         keys: "Tab",
-        en: "Moves focus between the level links; the current page is not focusable.",
-        ru: "Переводит фокус между ссылками уровней; текущая страница не фокусируется.",
+        en: "Moves focus between the level links and the «…» of a collapsed path; the current page is not focusable.",
+        ru: "Переводит фокус между ссылками уровней и «…» свёрнутого пути; текущая страница не фокусируется.",
       },
-      { keys: "Enter", en: "Follows the link.", ru: "Переходит по ссылке." },
+      {
+        keys: "Enter",
+        en: "Follows the link; on the «…» opens the menu of the hidden levels.",
+        ru: "Переходит по ссылке; на «…» открывает меню скрытых уровней.",
+      },
+      {
+        keys: "ArrowDown · ArrowUp · Escape",
+        en: "In the menu of hidden levels: move between them, close it and return to the «…».",
+        ru: "В меню скрытых уровней: переход между ними, закрытие с возвратом к «…».",
+      },
     ],
     aria: [
       {
@@ -112,8 +121,8 @@ export const api: ComponentApi = {
         ru: 'Текущая страница — `aria-current="page"`; шевроны и знак «…» скрыты (`aria-hidden`).',
       },
       {
-        en: "Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» reads as `labels.ellipsis`.",
-        ru: "Свёрнутые средние уровни уходят из раскладки и порядка Tab (без невидимых остановок фокуса); автоматическое «…» читается как `labels.ellipsis`.",
+        en: 'Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» is a menu button (`aria-haspopup="menu"`) named by `labels.ellipsis`, and its menu lists them as links.',
+        ru: 'Свёрнутые средние уровни уходят из раскладки и порядка Tab (без невидимых остановок фокуса); автоматическое «…» — кнопка меню (`aria-haspopup="menu"`) с именем из `labels.ellipsis`, а её меню перечисляет эти уровни ссылками.',
       },
       {
         en: "Icon-only links need `aria-label` on the Item.",

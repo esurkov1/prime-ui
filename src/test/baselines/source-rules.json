@@ -1,7 +1,6 @@
 [
   "src/components/avatar/Avatar.tsx: root default size = \"m\"",
   "src/components/banner/Banner.tsx: root default size = \"m\"",
-  "src/components/breadcrumb/Breadcrumb.tsx: root default size = \"m\"",
   "src/components/chat-list/ChatList.tsx: root default size = \"m\"",
   "src/components/chat/MessageList.tsx: biome-ignore useExhaustiveDependencies",
   "src/components/chat/MessageList.tsx: biome-ignore useExhaustiveDependencies #2",

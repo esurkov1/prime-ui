@@ -5,8 +5,6 @@
   "src/components/banner/Banner.tsx: BannerRootProps.tone",
   "src/components/banner/Banner.tsx: BannerRootProps.variant",
   "src/components/breadcrumb/Breadcrumb.tsx: BreadcrumbItemProps.\"aria-label\"",
-  "src/components/breadcrumb/Breadcrumb.tsx: BreadcrumbRootProps.labels",
-  "src/components/breadcrumb/Breadcrumb.tsx: BreadcrumbRootProps.size",
   "src/components/button-group/ButtonGroup.tsx: ButtonGroupItemProps.pressed",
   "src/components/button-group/ButtonGroup.tsx: ButtonGroupRootProps.children",
   "src/components/button-group/ButtonGroup.tsx: ButtonGroupRootProps.fullWidth",

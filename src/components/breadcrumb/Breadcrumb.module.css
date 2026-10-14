@@ -1,7 +1,8 @@
 /*
  * Breadcrumb — Graphite.
  * Previous segments muted, current page primary/medium. Each segment truncates with ellipsis;
- * on narrow containers the middle segments collapse into «…» (announced as `labels.ellipsis`).
+ * on narrow containers the middle segments collapse into a «…» menu button (named by
+ * `labels.ellipsis`) that lists them.
  */
 
 .root {
@@ -85,29 +86,14 @@
   white-space: nowrap;
 }
 
+/* A level without a link; previous levels are LinkButtons in the muted trail tone. */
 .text {
   display: block;
   color: var(--prime-color-text-muted);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-/* Previous levels are LinkButtons in the muted trail color; hover / focus brings primary text. */
-.item > .link {
-  color: var(--prime-color-text-muted);
-}
-
-.item > a.link:focus-visible {
-  color: var(--prime-color-text-primary);
-  text-decoration-color: transparent;
-}
-
-@media (hover: hover) {
-  .item > a.link:hover {
-    color: var(--prime-color-text-primary);
-    text-decoration-color: transparent;
-  }
-}
-
-.current {
+.text[aria-current="page"] {
   color: var(--prime-color-text-primary);
   font-weight: var(--prime-font-weight-medium);
 }
@@ -143,7 +129,7 @@
   }
 
   /* The middle levels (after the first and the auto «…», before the last) leave the layout and
-   * the tab order; the «…» names them for screen readers. */
+   * the tab order; the «…» menu lists them, so they stay reachable. */
   .root[data-collapsible="true"] .item:nth-child(n + 3):not(:last-child) {
     display: none;
   }

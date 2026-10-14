@@ -35,7 +35,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overflow",
       description:
-        "Длинный путь: уровни обрезаются, а в контейнере 320px средние сворачиваются в «…», которое скринридер называет «Скрытые разделы» — `Breadcrumb.Item`, `current`.",
+        "Длинный путь: уровни обрезаются, а в контейнере 320px средние сворачиваются в меню «…», которое их перечисляет — `Breadcrumb.Item`, `current`.",
     },
     {
       scenario: "ellipsis",
