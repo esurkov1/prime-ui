@@ -338,7 +338,9 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   and the root of an example is never a pure flex column (`display`, `flex-direction: column`,
   `gap`, `align-items` alone) — the slot's preview layout stacks (`example-css`). A scenario that
   needs another preview takes `layout` in its section entry, one of its kind's layouts. A bounded
-  block is `Card.Root` — CSS only places it.
+  block is `Card.Root` — CSS only places it. The one exception is a component that draws no item
+  look and leaves it to the consumer's class (Dnd): its examples paint that class
+  (`PAINTED_EXAMPLES` in `src/test/docs-contract.test.ts`).
 - No inline `style={{}}`, no playground imports; the file copies into a consumer project unchanged.
 
 ### Examples vs screens — who shows what

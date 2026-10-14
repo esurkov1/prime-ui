@@ -127,6 +127,15 @@ const DOCUMENT_SCREENS: Record<string, string> = {
   "field-list": "an order form: a document of fields edited in place",
 };
 
+/**
+ * Components whose examples paint their items: the component draws no item look, its API leaves
+ * the look to the consumer's class, so the examples show that class. Their example CSS may paint
+ * and their matrices may import it.
+ */
+const PAINTED_EXAMPLES: Record<string, string> = {
+  dnd: "Dnd is the drag mechanism: a row's fill, radius and padding are the consumer's class (Dnd COMPONENT.md)",
+};
+
 /** A dir whose main export is not its PascalCase name. */
 const MAIN_SYMBOL: Record<string, string> = { notification: "NotificationProvider" };
 
@@ -596,6 +605,17 @@ describe("docs contract", () => {
     }
   });
 
+  it("keeps PAINTED_EXAMPLES to components whose examples paint", () => {
+    for (const dir of Object.keys(PAINTED_EXAMPLES)) {
+      const rel = dirs.find((item) => item.dir === dir)?.rel;
+      expect(rel, dir).toBeDefined();
+      const painted = walk(`${rel}/examples`, /\.css$/).flatMap((file) =>
+        layoutCssOffenders(file, read(file)),
+      );
+      expect(painted.length, `${dir}: its examples no longer paint — remove it`).toBeGreaterThan(0);
+    }
+  });
+
   it("gives every layer-stack overlay the dismiss props", () => {
     const offenders: string[] = [];
     for (const { base, dir, rel } of dirs) {
@@ -684,9 +704,9 @@ describe("docs contract", () => {
     });
 
     it("example styles only place things (example-css)", () => {
-      const offenders = walk(`${rel}/examples`, /\.css$/).flatMap((file) =>
-        layoutCssOffenders(file, read(file)),
-      );
+      const offenders = PAINTED_EXAMPLES[dir]
+        ? []
+        : walk(`${rel}/examples`, /\.css$/).flatMap((file) => layoutCssOffenders(file, read(file)));
       // The root of an example is never a pure flex stack: the slot's preview layout stacks.
       const cssPath = `${rel}/examples/examples.module.css`;
       if (fs.existsSync(path.join(root, cssPath))) {
@@ -840,7 +860,9 @@ describe("docs contract", () => {
         for (const example of page.examples) {
           if (!exampleLayout(page.kind, example).startsWith("matrix")) continue;
           const file = `${rel}/examples/${exampleFile(example)}.tsx`;
-          if (read(file).includes("examples.module.css")) offenders.push(`${file}: imports CSS`);
+          if (read(file).includes("examples.module.css") && !PAINTED_EXAMPLES[dir]) {
+            offenders.push(`${file}: imports CSS`);
+          }
         }
         ratchet("matrix-css", offenders, scope);
       });
