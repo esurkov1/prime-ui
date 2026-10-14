@@ -9,13 +9,15 @@
   --fu-pad: var(--prime-space-6);
   --fu-stack: var(--prime-space-4);
   --fu-copy-gap: var(--prime-space-1);
-  --fu-title: var(--prime-control-m-text-size);
-  --fu-title-line-height: var(--prime-control-m-line-height);
-  --fu-icon-box: var(--prime-control-m-height);
+  /* The tier of the zone comes from fieldTier (`fieldTierClass` in TSX). */
+  --fu-title: var(--field-text);
+  --fu-title-line-height: var(--field-lh);
+  --fu-icon-box: var(--field-h);
   --fu-radius: var(--prime-radius-l);
   /* The add tile's line: a translucent fill stays visible on the gray field fill of any surface. */
   --fu-line: var(--prime-color-fill-strong);
   --fu-line-hover: var(--prime-color-text-placeholder);
+  --fu-ring: var(--prime-color-focus-ring);
   position: relative;
   box-sizing: border-box;
   display: flex;
@@ -41,36 +43,24 @@
 .root[data-size="xs"] {
   --fu-pad: var(--prime-space-4);
   --fu-stack: var(--prime-space-2);
-  --fu-title: var(--prime-control-xs-text-size);
-  --fu-title-line-height: var(--prime-control-xs-line-height);
-  --fu-icon-box: var(--prime-control-xs-height);
   --fu-radius: var(--prime-radius-m);
 }
 
 .root[data-size="s"] {
   --fu-pad: var(--prime-space-5);
   --fu-stack: var(--prime-space-3);
-  --fu-title: var(--prime-control-s-text-size);
-  --fu-title-line-height: var(--prime-control-s-line-height);
-  --fu-icon-box: var(--prime-control-s-height);
   --fu-radius: var(--prime-radius-m);
 }
 
 .root[data-size="l"] {
   --fu-pad: var(--prime-space-8);
   --fu-stack: var(--prime-space-5);
-  --fu-title: var(--prime-control-l-text-size);
-  --fu-title-line-height: var(--prime-control-l-line-height);
-  --fu-icon-box: var(--prime-control-l-height);
 }
 
 .root[data-size="xl"] {
   --fu-pad: var(--prime-space-10);
   --fu-stack: var(--prime-space-6);
   --fu-copy-gap: var(--prime-space-2);
-  --fu-title: var(--prime-control-xl-text-size);
-  --fu-title-line-height: var(--prime-control-xl-line-height);
-  --fu-icon-box: var(--prime-control-xl-height);
   --fu-radius: var(--prime-radius-xl);
 }
 
@@ -93,6 +83,7 @@
 .root[data-invalid="true"] {
   --fu-line: var(--prime-color-danger-border);
   --fu-line-hover: var(--prime-color-danger-border);
+  --fu-ring: var(--prime-color-danger-border);
 }
 
 .root[data-state="active"] {
@@ -112,14 +103,11 @@
   background: var(--prime-color-accent-soft);
 }
 
-/* `focusRing={false}` on the root (`data-focus-ring` on the field) hides only this ring. */
+/* `focusRing={false}` on the root (`data-focus-ring` on the field) hides only this ring; an
+   invalid zone rings in danger (`--fu-ring`). */
 .root:has(.input:focus-visible):not(:where([data-focus-ring="false"] *)) {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline: var(--prime-focus-width) solid var(--fu-ring);
   outline-offset: var(--prime-focus-offset-inset);
-}
-
-.root[data-invalid="true"]:has(.input:focus-visible) {
-  outline-color: var(--prime-color-danger-border);
 }
 
 /* ---- Body: a centered column (drag-over follows enter / leave depth, so children never flicker it) ---- */
@@ -179,9 +167,9 @@
   overflow-wrap: anywhere;
 }
 
-.title[data-tone="muted"] {
+/* The color of a toned title comes from textTone; an instruction line reads regular. */
+.title[data-tone="secondary"] {
   font-weight: var(--prime-font-weight-regular);
-  color: var(--prime-color-text-secondary);
 }
 
 .root[data-disabled="true"] .title {
@@ -192,11 +180,12 @@
 .item {
   --fu-item-pad: var(--prime-space-3);
   --fu-item-gap: var(--prime-space-3);
-  --fu-item-name: var(--prime-control-m-text-size);
-  --fu-item-name-line-height: var(--prime-control-m-line-height);
-  --fu-item-meta: var(--prime-control-m-hint-size);
-  --fu-item-meta-line-height: var(--prime-control-m-hint-line-height);
-  --fu-item-badge: var(--prime-control-m-height);
+  /* The tier of the row comes from fieldTier (`fieldTierClass` in TSX). */
+  --fu-item-name: var(--field-text);
+  --fu-item-name-line-height: var(--field-lh);
+  --fu-item-meta: var(--field-hint-size);
+  --fu-item-meta-line-height: var(--field-hint-lh);
+  --fu-item-badge: var(--field-h);
   --fu-item-badge-radius: var(--prime-radius-m);
   --fu-item-radius: var(--prime-radius-l);
   box-sizing: border-box;
@@ -214,6 +203,10 @@
   border-radius: var(--fu-item-radius);
   background: var(--prime-color-fill-subtle);
   font-family: var(--prime-font-family-sans);
+  /* A failed upload turns the row danger, and a retry turns it back: both glide. */
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* Without a badge or a preview the name starts at the edge. */
@@ -228,11 +221,6 @@
 .item[data-size="xs"] {
   --fu-item-pad: var(--prime-space-2);
   --fu-item-gap: var(--prime-space-2);
-  --fu-item-name: var(--prime-control-xs-text-size);
-  --fu-item-name-line-height: var(--prime-control-xs-line-height);
-  --fu-item-meta: var(--prime-control-xs-hint-size);
-  --fu-item-meta-line-height: var(--prime-control-xs-hint-line-height);
-  --fu-item-badge: var(--prime-control-xs-height);
   --fu-item-badge-radius: var(--prime-radius-s);
   --fu-item-radius: var(--prime-radius-m);
 }
@@ -240,32 +228,17 @@
 .item[data-size="s"] {
   --fu-item-pad: var(--prime-space-2);
   --fu-item-gap: var(--prime-space-2);
-  --fu-item-name: var(--prime-control-s-text-size);
-  --fu-item-name-line-height: var(--prime-control-s-line-height);
-  --fu-item-meta: var(--prime-control-s-hint-size);
-  --fu-item-meta-line-height: var(--prime-control-s-hint-line-height);
-  --fu-item-badge: var(--prime-control-s-height);
   --fu-item-badge-radius: var(--prime-radius-s);
   --fu-item-radius: var(--prime-radius-m);
 }
 
 .item[data-size="l"] {
   --fu-item-pad: var(--prime-space-4);
-  --fu-item-name: var(--prime-control-l-text-size);
-  --fu-item-name-line-height: var(--prime-control-l-line-height);
-  --fu-item-meta: var(--prime-control-l-hint-size);
-  --fu-item-meta-line-height: var(--prime-control-l-hint-line-height);
-  --fu-item-badge: var(--prime-control-l-height);
 }
 
 .item[data-size="xl"] {
   --fu-item-pad: var(--prime-space-4);
   --fu-item-gap: var(--prime-space-4);
-  --fu-item-name: var(--prime-control-xl-text-size);
-  --fu-item-name-line-height: var(--prime-control-xl-line-height);
-  --fu-item-meta: var(--prime-control-xl-hint-size);
-  --fu-item-meta-line-height: var(--prime-control-xl-hint-line-height);
-  --fu-item-badge: var(--prime-control-xl-height);
   --fu-item-badge-radius: var(--prime-radius-l);
   --fu-item-radius: var(--prime-radius-xl);
 }
@@ -517,25 +490,20 @@
 
   display: grid;
   place-items: center;
-  inline-size: var(--prime-control-xs-height);
-  block-size: var(--prime-control-xs-height);
+  inline-size: var(--field-h);
+  block-size: var(--field-h);
   border-radius: var(--prime-radius-m);
   background: var(--prime-color-fill-muted);
 }
 
-/* Quiet text: the tile is an offer, not a heading — caption size, muted, the count a step fainter. */
+/* Quiet text: the tile is an offer, not a heading — the caption role (textRole), the count a step
+   fainter. */
 .addText {
   margin-block-start: var(--prime-space-1);
-  font-size: var(--prime-text-caption-size);
   font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
 }
 
 .addHint {
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-disabled);
   font-variant-numeric: tabular-nums;
 }

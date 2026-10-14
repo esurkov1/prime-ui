@@ -31,6 +31,11 @@
   cursor: pointer;
   outline: none;
   appearance: none;
+  /* The field surface's own fades, and the text glides between the placeholder and a value. */
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* The empty placeholder option is the one shown. Matched by class, never by `[value]`: an

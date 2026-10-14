@@ -237,10 +237,10 @@ export const api: ComponentApi = {
       props: [
         {
           name: "tone",
-          type: '"default" | "muted"',
+          type: '"default" | "secondary"',
           default: '"default"',
-          en: "`muted` — secondary color, regular weight (an instruction line in custom bodies).",
-          ru: "`muted` — вторичный цвет, обычное начертание (строка-инструкция в своём содержимом зоны).",
+          en: "`secondary` — secondary color, regular weight (an instruction line in custom bodies).",
+          ru: "`secondary` — вторичный цвет, обычное начертание (строка-инструкция в своём содержимом зоны).",
         },
         {
           name: "…rest",

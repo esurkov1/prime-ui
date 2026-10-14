@@ -168,8 +168,8 @@ A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-
 | focus-visible | keyboard | inset focus ring; none with `focusRing` off (`data-focus-ring="false"`) |
 | invalid | `invalid`, `error` | `data-invalid`, `aria-invalid`, inset `danger-border` ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled`, `field-bg-disabled`, cannot open |
-| today | the current day | `data-today`, `aria-current="date"`, accent text |
-| selected / band | value | day `aria-pressed`, `data-edge`; cell `data-band="selected" \| "preview"`, `data-band-start` / `-end` |
+| today | the current day | `aria-current="date"`, accent text |
+| selected / band | value | day `aria-pressed` (accent text), `data-edge`; cell `data-band="selected" \| "preview"`, `data-band-start` / `-end` |
 | day disabled | `isDayDisabled`, `disableFuture` | native `disabled`, muted |
 
 Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` · `stacked`). The footer row carries `data-time` with `withTime`; a footer field never shrinks below its whole date and time — the fields wrap above the actions, and in a footer narrower than 22rem with time they stand one under the other. The popover follows the overlay contract: an outside press or Escape closes it, focus is trapped while open, the wheel over the panel does not scroll the page. The panel of `Datepicker.Root` mounts only while the popover is open, so every opening starts from the current value; nothing is rendered for it while closed.

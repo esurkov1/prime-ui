@@ -318,11 +318,10 @@ describe("Datepicker.Panel — value and draft", () => {
 });
 
 describe("Datepicker.Panel — сегодня", () => {
-  it("сегодня помечен aria-current=date и data-today, другие дни — нет", () => {
+  it("сегодня помечен aria-current=date, другие дни — нет", () => {
     render(<Datepicker.Panel mode="single" today={TODAY} />);
     const today = screen.getByRole("button", { name: "7 октября 2026" });
     expect(today).toHaveAttribute("aria-current", "date");
-    expect(today).toHaveAttribute("data-today", "true");
     expect(screen.getByRole("button", { name: "8 октября 2026" })).not.toHaveAttribute(
       "aria-current",
     );

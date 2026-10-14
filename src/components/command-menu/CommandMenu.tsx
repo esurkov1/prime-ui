@@ -34,6 +34,7 @@ import { MenuGroup } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { RegionSwap } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 import { usePendingAction } from "@/internal/usePendingChanges";
 
 import styles from "./CommandMenu.module.css";
@@ -652,7 +653,9 @@ function CommandMenuItemText({
     <span className={cx(styles.itemText, className)} {...rest}>
       <span className={styles.itemLabel}>{highlightChildren(children, search)}</span>
       {description ? (
-        <span className={styles.itemDescription}>{highlightChildren(description, search)}</span>
+        <span className={cx(textRole.caption, styles.itemDescription)}>
+          {highlightChildren(description, search)}
+        </span>
       ) : null}
     </span>
   );

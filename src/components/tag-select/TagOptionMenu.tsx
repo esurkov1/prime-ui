@@ -152,8 +152,8 @@ export function TagOptionMenu({
                     onClick={() => onUpdate(value, { color: hue })}
                   >
                     <Badge.Root color={hue}>{labels.colorNames[hue]}</Badge.Root>
-                    <span className={styles.colorCheck} aria-hidden="true">
-                      {color === hue ? <Icon name="action.check" /> : null}
+                    <span className={cx(menu.check, styles.colorCheck)} aria-hidden="true">
+                      <Icon name="action.check" />
                     </span>
                   </button>
                 ))}

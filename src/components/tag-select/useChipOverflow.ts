@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { useResizeEffect } from "@/hooks/useElementSize";
+
 type ChipOverflowOptions = {
   /** The visible chip row (its width and column gap). */
   rowRef: React.RefObject<HTMLElement | null>;
@@ -31,9 +33,10 @@ export function useChipOverflow({
     const row = rowRef.current;
     const measure = measureRef.current;
     if (!row || !measure) return;
+    // The measure row holds one node per chip, then the «+N» sample.
     const nodes = Array.from(measure.children) as HTMLElement[];
-    const more = nodes.pop();
-    const widths = nodes.map((node) => node.offsetWidth);
+    const more = nodes.at(-1);
+    const widths = nodes.slice(0, chips.length).map((node) => node.offsetWidth);
     const gap = Number.parseFloat(getComputedStyle(row).columnGap) || 0;
     const input = inputRef.current;
     const inputReserve =
@@ -54,22 +57,14 @@ export function useChipOverflow({
       next = Math.max(1, next);
     }
     setVisible((prev) => (prev === next ? prev : next));
-  }, [rowRef, measureRef, inputRef, inputCollapsed]);
+  }, [rowRef, measureRef, inputRef, inputCollapsed, chips]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: recount when the chips change
+  // Recount when the chips change, and when the row or the measured chips change size.
   React.useLayoutEffect(() => {
     recompute();
-  }, [recompute, chips]);
-
-  React.useEffect(() => {
-    const row = rowRef.current;
-    const measure = measureRef.current;
-    if (!row || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => recompute());
-    observer.observe(row);
-    if (measure) observer.observe(measure);
-    return () => observer.disconnect();
-  }, [rowRef, measureRef, recompute]);
+  }, [recompute]);
+  useResizeEffect(rowRef, recompute);
+  useResizeEffect(measureRef, recompute);
 
   return Math.min(visible, count);
 }

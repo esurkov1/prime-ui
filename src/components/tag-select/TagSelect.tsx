@@ -38,6 +38,7 @@ import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 import { isPromiseLike, usePendingChanges, usePendingKeys } from "@/internal/usePendingChanges";
 
 import { TagOptionMenu } from "./TagOptionMenu";
@@ -807,7 +808,9 @@ export function TagSelect({
         ref={scrollerRef}
         className={cx(menu.tier, menu.menu, styles.panel)}
       >
-        {labels.panelHint ? <div className={styles.panelHint}>{labels.panelHint}</div> : null}
+        {labels.panelHint ? (
+          <div className={cx(textRole.caption, styles.panelHint)}>{labels.panelHint}</div>
+        ) : null}
         {showCreate ? (
           <OptionRow
             id={optionDomId(listboxId, CREATE_VALUE)}

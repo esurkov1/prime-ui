@@ -30,6 +30,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { extensionOf, formatColor } from "@/internal/fileFormat";
 import { splitFileName } from "@/internal/fileName";
 import { formatFileSize } from "@/internal/fileSize";
@@ -40,6 +41,8 @@ import { MorphText } from "@/internal/MorphText";
 import { mediaKind } from "@/internal/mediaKind";
 import { RollingNumber } from "@/internal/RollingNumber";
 import type { ControlSize, PaletteColor, TextTone, Tone } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
+import textTone from "@/internal/textTone.module.css";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
 import styles from "./FileUpload.module.css";
@@ -199,14 +202,14 @@ function FileUploadIcon({ className, ...rest }: FileUploadIconProps) {
 FileUploadIcon.displayName = "FileUpload.Icon";
 
 export type FileUploadTitleProps = ParagraphProps & {
-  tone?: Extract<TextTone, "default" | "muted">;
+  tone?: Extract<TextTone, "default" | "secondary">;
 };
 
 function FileUploadTitle({ className, tone = "default", ...rest }: FileUploadTitleProps) {
   return (
     <p
-      className={cx(styles.title, className)}
-      data-tone={tone === "muted" ? tone : undefined}
+      className={cx(textTone.tone, styles.title, className)}
+      data-tone={tone === "default" ? undefined : tone}
       {...rest}
     />
   );
@@ -239,7 +242,7 @@ function FileUploadItem({
   return (
     <ControlSizeProvider value={size}>
       <div
-        className={cx(styles.item, className)}
+        className={cx(fieldTierClass, styles.item, className)}
         {...toDataAttributes({ size, invalid: invalid || undefined })}
         {...rest}
       />
@@ -745,7 +748,13 @@ function FileSetView({
     return (
       <>
         {files.length > 0 || addTile ? (
-          <ul {...listProps} ref={setListRef} className={cx(styles.queue, listProps.className)}>
+          <ul
+            // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+            role="list"
+            {...listProps}
+            ref={setListRef}
+            className={cx(styles.queue, listProps.className)}
+          >
             {files.map((file) => (
               <FileRow
                 key={file.id}
@@ -769,6 +778,8 @@ function FileSetView({
 
   const list = (
     <Dnd.Sortable
+      // `list-style: none` drops the list semantics in WebKit; the role keeps them.
+      role="list"
       {...(listProps as React.HTMLAttributes<HTMLElement>)}
       ref={setListRef as React.Ref<HTMLElement>}
       as="ul"
@@ -1247,7 +1258,7 @@ function FileUploadField({
     control = (
       // biome-ignore lint/a11y/noLabelWithoutControl: the file input (`input`) is its first child
       <label
-        className={styles.root}
+        className={cx(fieldTierClass, styles.root)}
         {...toDataAttributes({
           size,
           variant,
@@ -1288,18 +1299,20 @@ function FileUploadField({
         {/* biome-ignore lint/a11y/noLabelWithoutControl: the file input (`input`) is its first child */}
         <label className={styles.addTarget}>
           {input}
-          <span className={styles.addIcon} aria-hidden="true">
+          <span className={cx(fieldTierClass, styles.addIcon)} data-size="xs" aria-hidden="true">
             <Icon name="action.add" />
           </span>
-          <span className={styles.addText}>
+          <span className={cx(textRole.caption, styles.addText)}>
             <MorphText>{full ? labels.full : empty ? labels.empty : labels.add}</MorphText>
           </span>
           {countText !== null ? (
-            <span className={styles.addHint}>
+            <span className={cx(textRole.caption, styles.addHint)}>
               <RollingNumber>{countText}</RollingNumber>
             </span>
           ) : empty ? (
-            <span className={cx(styles.addHint, enterMotion.enter)}>{labels.emptyHint}</span>
+            <span className={cx(textRole.caption, styles.addHint, enterMotion.enter)}>
+              {labels.emptyHint}
+            </span>
           ) : null}
         </label>
       </li>

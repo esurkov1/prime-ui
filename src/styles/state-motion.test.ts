@@ -42,14 +42,19 @@ describe("state motion", () => {
         if (rule.parents.some((parent) => parent.startsWith("@keyframes"))) continue;
         for (const selector of rule.selector.split(",").map((item) => item.trim())) {
           if (!STATE_SELECTOR.test(selector)) continue;
+          // A state inside `:has()` is a state of the element it is attached to
+          // (`.select:has(> .option:checked)` styles `.select`).
+          const subject = selector.replace(/:has\(([^()]*)\)/g, (_, inner: string) =>
+            STATE_SELECTOR.test(inner) ? ":has-state" : "",
+          );
           // The element the state styles: the last compound's first class.
           const last =
-            selector
+            subject
               .split(/\s+|>|\+|~/)
               .filter(Boolean)
               .at(-1) ?? "";
           const base = last.match(/^\.([\w-]+)/)?.[0];
-          if (!base || !STATE_SELECTOR.test(last)) continue;
+          if (!base || !(STATE_SELECTOR.test(last) || last.includes(":has-state"))) continue;
           const moving = transitions.get(base);
           for (const decl of rule.decls) {
             if (

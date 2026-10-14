@@ -176,6 +176,13 @@
 
 /* ─── Option ─────────────────────────────────────────────────────────────── */
 
+/* With `menu.item` (TSX): the row's fades; a rich row also glides into its selected fill. */
+.item {
+  transition:
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
+
 .item[data-selected="true"] {
   font-weight: var(--prime-font-weight-medium);
 }

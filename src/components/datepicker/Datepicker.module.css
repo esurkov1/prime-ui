@@ -5,48 +5,17 @@
 
 /* ─── Tier variables ────────────────────────────────────────────────────── */
 
-.panel,
-.trigger {
-  --dp-cell-tier: var(--prime-control-m-item-height);
-  --dp-cell: var(--dp-cell-tier);
-  --dp-text: var(--prime-control-m-text-size);
-  --dp-lh: var(--prime-control-m-line-height);
+/* The panel carries the menu tier (`menu.tier` in TSX): a day cell is the tier's menu row, the
+   text the row text. Touch: a day is a cell of a dense grid, so its hit area cannot grow past its
+   neighbours (an overlapping hit area would take a tap meant for the next day); the cell itself
+   grows to the touch target with the menu row, and narrower than seven of them the columns shrink. */
+.panel {
+  --dp-cell: var(--menu-item-h);
   --dp-radius: var(--prime-panel-item-radius);
 }
 
-[data-size="xs"]:is(.panel, .trigger) {
-  --dp-cell-tier: var(--prime-control-xs-item-height);
-  --dp-text: var(--prime-control-xs-text-size);
-  --dp-lh: var(--prime-control-xs-line-height);
+.panel:is([data-size="xs"], [data-size="s"]) {
   --dp-radius: var(--prime-radius-s);
-}
-
-[data-size="s"]:is(.panel, .trigger) {
-  --dp-cell-tier: var(--prime-control-s-item-height);
-  --dp-text: var(--prime-control-s-text-size);
-  --dp-lh: var(--prime-control-s-line-height);
-  --dp-radius: var(--prime-radius-s);
-}
-
-[data-size="l"]:is(.panel, .trigger) {
-  --dp-cell-tier: var(--prime-control-l-item-height);
-  --dp-text: var(--prime-control-l-text-size);
-  --dp-lh: var(--prime-control-l-line-height);
-}
-
-[data-size="xl"]:is(.panel, .trigger) {
-  --dp-cell-tier: var(--prime-control-xl-item-height);
-  --dp-text: var(--prime-control-xl-text-size);
-  --dp-lh: var(--prime-control-xl-line-height);
-}
-
-/* Touch: a day is a cell of a dense grid, so its hit area cannot grow past its neighbours (an
-   overlapping hit area would take a tap meant for the next day). The cell itself grows to the touch
-   target, like a menu row; narrower than seven of them, the columns still shrink. */
-@media (pointer: coarse) {
-  .panel {
-    --dp-cell: max(var(--dp-cell-tier), var(--prime-control-touch-target));
-  }
 }
 
 /* ─── Trigger (field) ───────────────────────────────────────────────────── */
@@ -103,8 +72,8 @@
   min-width: 0;
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
-  font-size: var(--dp-text);
-  line-height: var(--dp-lh);
+  font-size: var(--menu-text);
+  line-height: var(--menu-lh);
 }
 
 .panel[data-layout="stacked"] {
@@ -122,6 +91,7 @@
   border-inline-end: var(--prime-border-width) solid var(--prime-color-border-subtle);
 }
 
+/* The caption role comes from textRole, in the medium weight of a group heading. */
 .presetTitle {
   display: flex;
   align-items: center;
@@ -129,10 +99,7 @@
   margin: 0;
   padding-inline: var(--prime-panel-item-padding-x);
   color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
   font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
 }
 
 /* Narrow: presets become a sideways ScrollContainer row of soft Buttons above the calendar. */
@@ -178,13 +145,11 @@
   height: var(--dp-cell);
 }
 
+/* The title-s role comes from textRole. */
 .monthTitle {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  font-size: var(--prime-text-title-s-size);
-  font-weight: var(--prime-text-title-s-weight);
-  line-height: var(--prime-text-title-s-line-height);
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -218,26 +183,24 @@
 /*
  * Seven day columns, each one cell wide at most; the room left over goes into the six gaps
  * between them, so the first and the last column stand at the month's edges, under the month
- * arrows. Narrower than seven cells, the gaps are 0 and the columns shrink.
+ * arrows. Narrower than seven cells, the gaps are 0 (`0%`: max() takes a typed zero) and the
+ * columns shrink.
  */
 .row {
-  --dp-col-gap: max(0px, calc((100cqi - 7 * var(--dp-cell)) / 6));
+  --dp-col-gap: max(0%, calc((100cqi - 7 * var(--dp-cell)) / 6));
 
   display: grid;
   grid-template-columns: repeat(7, minmax(0, var(--dp-cell)));
   column-gap: var(--dp-col-gap);
 }
 
+/* The caption role comes from textRole. */
 .weekday {
   display: grid;
   place-items: center;
   height: var(--prime-panel-group-label-height);
   padding: 0;
   color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-regular);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
 }
 
 .weekday[data-weekend="true"] {
@@ -335,17 +298,17 @@
   cursor: not-allowed;
 }
 
-.cell[data-band="selected"] .day:not([data-edge="true"]) {
+.day[aria-pressed="true"]:not([data-edge="true"]) {
   color: var(--prime-color-accent-text);
 }
 
 /* Today: accent text + semibold; `aria-current="date"` names it for assistive tech. */
-.day[data-today="true"] {
+.day[aria-current="date"] {
   color: var(--prime-color-accent-text);
   font-weight: var(--prime-font-weight-semibold);
 }
 
-.day[data-today="true"]:disabled {
+.day[aria-current="date"]:disabled {
   color: var(--prime-color-text-disabled);
 }
 
@@ -368,12 +331,10 @@
   user-select: none;
 }
 
+/* The caption role comes from textRole. */
 .hint {
   margin: 0;
   color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
 }
 
 /* ─── Footer ─────────────────────────────────────────────────────────────── */

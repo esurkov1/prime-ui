@@ -155,7 +155,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `tone` | `"default" \| "muted"` | `"default"` | `muted` — secondary color, regular weight (an instruction line in custom bodies). |
+| `tone` | `"default" \| "secondary"` | `"default"` | `secondary` — secondary color, regular weight (an instruction line in custom bodies). |
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### FileUpload.Description
@@ -286,7 +286,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `default` | primary text, medium weight | the main line of the zone | yes |
-| `muted` | secondary text, regular weight | an instruction sentence with an inline `LinkButton asChild` button | |
+| `secondary` | secondary text, regular weight | an instruction sentence with an inline `LinkButton asChild` button | |
 
 ### tone (FileUpload.ItemProgress)
 | Value | Looks like | Use when | Default |
@@ -418,12 +418,12 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | [file-cards.tsx](examples/file-cards.tsx) | Materials of a warehouse inspection as cards: photos and documents in one grid, each with its picture or format and the name with the size in megabytes as the report gives it; new files upload in their cards and the order is set by drag or Alt + arrows — `trigger`, `layout`, `defaultValue`, `queue`, `formatSize`. |
 | [attachment-tray.tsx](examples/attachment-tray.tsx) | A reply to a client with a paperclip instead of a drop zone: the icon-only picker button, and the attachments as one scrolling row of tiles above the message — `trigger`, `aria-label`, `FileUpload.Queue`, `layout`. |
 | [saving.tsx](examples/saving.tsx) | Published listing photos with no picker, every change saved on the server: a moved or removed photo waits busy, and a change the server refuses puts the set back — `FileUpload.Queue`, `onValueChange`, `value`, `cover`. |
-| [custom-body.tsx](examples/custom-body.tsx) | A custom body: a muted title with a browse link and the formats line and source buttons instead of the built-in one; the gallery button picks only images — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`, `picker`. |
+| [custom-body.tsx](examples/custom-body.tsx) | A custom body: a secondary title with a browse link and the formats line and source buttons instead of the built-in one; the gallery button picks only images — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`, `picker`. |
 | [avatar-upload.tsx](examples/avatar-upload.tsx) | A round zone around an Avatar that takes images and shows a preview; buttons open the same picker — `picker`, `accept`, `className`. |
 | [row-parts.tsx](examples/row-parts.tsx) | Rows the set does not draw, built from parts: order documents with a download button, a photo with its preview, a report still being prepared and one that failed with a retry — `FileUpload.Item`, `FileUpload.FormatBadge`, `FileUpload.ItemPreview`, `FileUpload.ItemActions`, `FileUpload.ItemProgress`, `invalid`, `tone`. |
 | [controlled.tsx](examples/controlled.tsx) | Documents of a deal in one list: the files already on the server and new uploads after them, saved on every change, and a button brings back the saved set — `value`, `onValueChange`, `queue`. |
 | [in-form.tsx](examples/in-form.tsx) | A contract upload form: submit checks the required scan, its error shakes in and leaves once a file is picked or removed — `required`, `error`, `name`, `value`. |
-| [narrow.tsx](examples/narrow.tsx) | In a phone-width column the zone text wraps, a long file name truncates, and a gallery goes three across and then two, the cover keeping two columns and the remove buttons shown without hover. |
+| [narrow.tsx](examples/narrow.tsx) | In a phone-width column the zone text wraps, a long file name truncates, and a gallery goes three across and then two, the cover keeping two columns and the remove buttons shown without hover — `layout`, `cover`. |
 | [screen.tsx](examples/screen.tsx) | A media library of a catalog object as a work screen: the title, the object and a PageToolbar with sections, search, order and upload in the app header; uploads in FileUpload tiles through a queue; a grid of Thumbnails that open MediaViewer out of the tile or are picked for bulk download and delete; a Skeleton first load and a filtered empty state in a Crossfade — `trigger`, `layout`. |
 
 ## Mistakes

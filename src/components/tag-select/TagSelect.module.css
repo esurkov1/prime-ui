@@ -232,9 +232,6 @@
   min-height: var(--prime-panel-group-label-height);
   padding-inline: var(--prime-panel-item-padding-x);
   color: var(--prime-color-text-muted);
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
 }
 
 /* A row with the «⋯» menu: a pick button across the row and the menu button at the end. */
@@ -321,8 +318,12 @@
   width: 100%;
 }
 
+/* A color row is a plain button among the menu rows: its own hover fill, gliding like a row's. */
 .colorRow {
   justify-content: space-between;
+  transition:
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {
@@ -336,13 +337,14 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
+/* The menu check of the chosen color (`aria-pressed`) fades in; the others keep its column. */
 .colorCheck {
-  display: inline-flex;
-  flex-shrink: 0;
-  width: var(--menu-icon);
-  height: var(--menu-icon);
-  color: var(--prime-color-accent-text);
-  --prime-icon-size: var(--menu-icon);
+  opacity: 0;
+  transition: opacity var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
+
+.colorRow[aria-pressed="true"] .colorCheck {
+  opacity: 1;
 }
 
 /* A long list: the height of the options not rendered. */
