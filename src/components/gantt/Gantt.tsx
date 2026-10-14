@@ -16,7 +16,6 @@ import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
-import { useStateSwap } from "@/hooks/useStateSwap";
 import { useVirtualRows } from "@/hooks/useVirtualRows";
 import {
   AnchorRectProvider,
@@ -30,10 +29,10 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { exitTimeoutMs } from "@/internal/motionTiming";
+import { RegionSwap, useSwapIn } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import swapMotion from "@/internal/swapMotion.module.css";
 
 import styles from "./Gantt.module.css";
 import { GanttRow, type GanttRowContext, type GanttGhost as Ghost } from "./GanttRow";
@@ -1167,8 +1166,9 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
 
   // ─── Region state ───
   const bodyState = model.length > 0 ? "rows" : loading ? "loading" : "empty";
-  const bodySwapped = useStateSwap(bodyState);
-  const scaleSwapped = useStateSwap(scale);
+  // A new zoom fades the grid in place: laid over, the old grid would show other dates at the
+  // scroll offset of the new one.
+  const scaleSwap = useSwapIn(scale);
   const fillHeight = scrollHeight === "fill";
   const hasAvatar = renderRowAvatar !== undefined;
 
@@ -1272,15 +1272,19 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     nameFor,
     labels,
   };
-  const cellRefs = React.useRef(new Map<string, (node: HTMLElement | null) => void>());
+  const cellRefs = React.useRef(new Map<string, React.RefCallback<HTMLElement>>());
   const rowContext = React.useMemo<GanttRowContext>(
     () => ({
       register: (id) => {
         let ref = cellRefs.current.get(id);
         if (!ref) {
+          // A cell of a leaving body (RegionSwap) unregisters only itself, never its successor.
           ref = (node) => {
-            if (node) cellNodes.current.set(id, node);
-            else cellNodes.current.delete(id);
+            if (!node) return;
+            cellNodes.current.set(id, node);
+            return () => {
+              if (cellNodes.current.get(id) === node) cellNodes.current.delete(id);
+            };
           };
           cellRefs.current.set(id, ref);
         }
@@ -1480,13 +1484,13 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
                 <FloatingBoundaryProvider value={timelineBoundary}>
                   <Tooltip.Provider>
                     <div
-                      key={scaleSwapped ? scale : undefined}
+                      key={scaleSwap.key}
                       role="grid"
                       aria-label={ariaLabel}
                       aria-labelledby={ariaLabelledBy}
                       aria-rowcount={bodyState === "rows" ? model.length + 1 : undefined}
                       aria-busy={loading || pending.size > 0 || undefined}
-                      className={cx(styles.grid, scaleSwapped && swapMotion.swapIn)}
+                      className={cx(styles.grid, scaleSwap.className)}
                       style={gridStyle}
                       onKeyDown={onGridKeyDown}
                     >
@@ -1548,21 +1552,24 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
                         </div>
                       </div>
 
-                      <div
-                        key={bodySwapped ? bodyState : undefined}
-                        role="rowgroup"
-                        className={cx(styles.body, bodySwapped && swapMotion.swapIn)}
-                        data-state={bodyState}
-                        aria-hidden={bodyState === "loading" || undefined}
-                        style={
-                          bodyState === "rows"
-                            ? ({ "--rows-height": `${virtual.totalSize}px` } as React.CSSProperties)
-                            : undefined
-                        }
-                      >
-                        {bodyState === "empty" ? null : backdrop}
-                        {body}
-                      </div>
+                      <RegionSwap state={bodyState}>
+                        <div
+                          role="rowgroup"
+                          className={styles.body}
+                          data-state={bodyState}
+                          aria-hidden={bodyState === "loading" || undefined}
+                          style={
+                            bodyState === "rows"
+                              ? ({
+                                  "--rows-height": `${virtual.totalSize}px`,
+                                } as React.CSSProperties)
+                              : undefined
+                          }
+                        >
+                          {bodyState === "empty" ? null : backdrop}
+                          {body}
+                        </div>
+                      </RegionSwap>
                     </div>
                   </Tooltip.Provider>
                 </FloatingBoundaryProvider>

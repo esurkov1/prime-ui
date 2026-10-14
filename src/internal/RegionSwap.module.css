@@ -18,10 +18,11 @@
 }
 
 /* While the height glides the content may be taller than the root: clip it, but keep room for
-   focus rings (foundation §7). */
+   focus rings (foundation §7). Only the block axis glides, so only it clips: content wider than
+   the region (a timeline in a scroller) keeps its scroll width. */
 .root[data-resizing="true"] {
   height: var(--swap-height);
-  overflow: clip;
+  overflow-y: clip;
   overflow-clip-margin: var(--prime-focus-space);
 }
 

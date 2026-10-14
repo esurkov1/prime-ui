@@ -14,8 +14,8 @@ const PROFIT: SparklinePoint[] = [
   { label: "авг", value: 280_000 },
   { label: "сен", value: 470_000 },
   { label: "окт", value: 390_000 },
-  { label: "ноя", value: 0 },
-  { label: "дек", value: 0 },
+  { label: "ноя", value: null },
+  { label: "дек", value: null },
 ];
 
 /** October is the current month: November and December are still empty. */

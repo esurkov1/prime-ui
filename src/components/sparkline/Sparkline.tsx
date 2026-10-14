@@ -1,12 +1,11 @@
 import * as React from "react";
-import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
+import { RegionSwap } from "@/internal/RegionSwap";
 import { RollingNumber } from "@/internal/RollingNumber";
-import swap from "@/internal/swapMotion.module.css";
 
 import { Badge } from "../badge/Badge";
 import { Skeleton } from "../skeleton/Skeleton";
@@ -199,8 +198,7 @@ export function Sparkline({
   const [series, setSeries] = React.useState({ data, version: 0 });
   if (series.data !== data) setSeries({ data, version: series.version + 1 });
   const version = series.data === data ? series.version : series.version + 1;
-  const swapped = useStateSwap(loading ? "loading" : version);
-  const swapClass = swapped ? swap.swapIn : undefined;
+  const stateKey = loading ? "loading" : "data";
 
   // Scale and paths once per series: scrubbing re-renders the cursor and the headline only.
   const geometry = React.useMemo(() => {
@@ -229,7 +227,7 @@ export function Sparkline({
     const { paths } = geometry;
     if (!paths) return null;
     return (
-      <div key={version} className={cx(styles.drawing, swapClass)} aria-hidden="true">
+      <div className={styles.drawing} aria-hidden="true">
         <svg
           className={styles.svg}
           viewBox="0 0 100 100"
@@ -263,7 +261,7 @@ export function Sparkline({
         ))}
       </div>
     );
-  }, [geometry, variant, version, swapClass, gradientId]);
+  }, [geometry, variant, gradientId]);
 
   const fromPointer = (event: React.PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -308,29 +306,6 @@ export function Sparkline({
       : (pointer ??
         (plotNode ? { x: x(index) * plotNode.offsetWidth, y: plotNode.offsetHeight / 2 } : null));
 
-  if (loading) {
-    return (
-      <div
-        {...rest}
-        ref={ref}
-        className={cx(styles.root, className)}
-        data-layout={layoutAttr}
-        aria-busy="true"
-      >
-        {compact ? null : (
-          <>
-            <div className={styles.head}>
-              <span className={styles.label}>{label}</span>
-              <Skeleton shape="text" size="s" className={cx(styles.dateSkeleton, swapClass)} />
-            </div>
-            <Skeleton shape="block" className={cx(styles.valueSkeleton, swapClass)} />
-          </>
-        )}
-        <Skeleton shape="block" className={cx(styles.plotSkeleton, swapClass)} />
-      </div>
-    );
-  }
-
   return (
     <div
       {...rest}
@@ -339,137 +314,161 @@ export function Sparkline({
       data-scrubbing={active !== null || undefined}
       data-variant={variant}
       data-layout={layoutAttr}
+      aria-busy={loading || undefined}
     >
       {compact ? null : (
         <>
           <div className={styles.head}>
             <span className={styles.label}>{label}</span>
-            <span className={styles.date}>{headDate}</span>
+            <RegionSwap state={stateKey} className={styles.date}>
+              {loading ? (
+                <Skeleton shape="text" size="s" className={styles.dateSkeleton} />
+              ) : (
+                headDate
+              )}
+            </RegionSwap>
           </div>
-          <div className={styles.valueRow}>
-            <span className={styles.value} data-empty={restValue === null || undefined}>
-              {/* Scrubbing changes the value every move: plain digits; a settled value rolls. */}
-              {atRest ? <RollingNumber>{headValue}</RollingNumber> : headValue}
-            </span>
-            {delta !== null ? (
-              <Badge.Root color={delta < 0 ? "red" : "green"} className={styles.change}>
-                <Badge.Icon className={styles.trend} data-down={delta < 0 || undefined}>
-                  <Icon name="status.trendUp" />
-                </Badge.Icon>
-                {`${delta > 0 ? "+" : delta < 0 ? "−" : ""}${PERCENT.format(Math.abs(delta))}%`}
-              </Badge.Root>
-            ) : null}
-          </div>
+          <RegionSwap state={stateKey}>
+            {loading ? (
+              <Skeleton shape="block" className={styles.valueSkeleton} />
+            ) : (
+              <div className={styles.valueRow}>
+                <span className={styles.value} data-empty={restValue === null || undefined}>
+                  {/* Scrubbing changes the value every move: plain digits; a settled value rolls. */}
+                  {atRest ? <RollingNumber>{headValue}</RollingNumber> : headValue}
+                </span>
+                {delta !== null ? (
+                  <Badge.Root tone={delta < 0 ? "danger" : "success"} className={styles.change}>
+                    <Badge.Icon className={styles.trend} data-down={delta < 0 || undefined}>
+                      <Icon name="status.trendUp" />
+                    </Badge.Icon>
+                    {`${delta > 0 ? "+" : delta < 0 ? "−" : ""}${PERCENT.format(Math.abs(delta))}%`}
+                  </Badge.Root>
+                ) : null}
+              </div>
+            )}
+          </RegionSwap>
         </>
       )}
-      <div
-        ref={plotRef}
-        // A control of its own inside a row: the slider role already keeps a DataTable row from
-        // opening; the attribute says so for any host that reads it.
-        data-row-click-ignore=""
-        className={styles.plot}
-        role="slider"
-        tabIndex={0}
-        aria-label={label}
-        aria-describedby={reference === undefined ? undefined : referenceId}
-        aria-valuemin={0}
-        aria-valuemax={Math.max(last, 0)}
-        aria-valuenow={index}
-        aria-valuetext={
-          point
-            ? formatLabel(labels.point, {
-                label: headDate ?? "",
-                value: restAggregate ? headValue : valueText,
-              })
-            : undefined
-        }
-        onPointerDown={(event) => {
-          if (event.pointerType !== "mouse") event.currentTarget.setPointerCapture(event.pointerId);
-          fromPointer(event);
-        }}
-        onPointerMove={fromPointer}
-        onPointerLeave={() => setActive(null)}
-        onPointerUp={(event) => {
-          if (event.pointerType !== "mouse") setActive(null);
-        }}
-        onPointerCancel={() => setActive(null)}
-        onKeyDown={(event) => {
-          const next =
-            event.key === "ArrowLeft" || event.key === "ArrowDown"
-              ? index - 1
-              : event.key === "ArrowRight" || event.key === "ArrowUp"
-                ? index + 1
-                : event.key === "Home"
-                  ? 0
-                  : event.key === "End"
-                    ? last
-                    : null;
-          if (next === null) return;
-          event.preventDefault();
-          setPointer(null);
-          setActive(Math.max(0, Math.min(last, next)));
-        }}
-        onBlur={() => setActive(null)}
-      >
-        {geometry.reference !== null ? (
-          <span
-            className={styles.reference}
-            style={{ "--sparkline-ref": geometry.reference } as React.CSSProperties}
-            aria-hidden="true"
-          />
-        ) : null}
-        {bars ? (
-          <div key={version} className={cx(styles.bars, swapClass)} aria-hidden="true">
-            <span
-              className={styles.baseline}
-              style={{ "--sparkline-zero": geometry.zero } as React.CSSProperties}
-            />
-            {data.map((p, i) => (
-              <span
-                // biome-ignore lint/suspicious/noArrayIndexKey: one bar per point, in order
-                key={i}
-                className={styles.slot}
-                {...toDataAttributes({
-                  current: i === index || undefined,
-                  quiet:
-                    (active !== null || highlight !== undefined) && i !== index ? true : undefined,
-                })}
-              >
-                {p.value === null ? null : (
-                  <span
-                    className={styles.bar}
-                    data-negative={p.value < 0 || undefined}
-                    style={
-                      {
-                        "--sparkline-top": Math.min(y(p.value), geometry.zero),
-                        "--sparkline-height": Math.abs(geometry.zero - y(p.value)),
-                      } as React.CSSProperties
-                    }
-                  />
-                )}
-              </span>
-            ))}
-          </div>
+      <RegionSwap state={stateKey}>
+        {loading ? (
+          <Skeleton shape="block" className={styles.plotSkeleton} />
         ) : (
-          drawing
-        )}
-        {point && !bars ? (
-          <span
-            className={styles.cursor}
-            data-hidden={restAggregate || undefined}
-            aria-hidden="true"
-            style={
-              {
-                "--sparkline-x": x(index),
-                "--sparkline-y": shownValue === null ? 0.5 : y(shownValue),
-              } as React.CSSProperties
+          <div
+            ref={plotRef}
+            // A control of its own inside a row: the slider role already keeps a DataTable row from
+            // opening; the attribute says so for any host that reads it.
+            data-row-click-ignore=""
+            className={styles.plot}
+            role="slider"
+            tabIndex={0}
+            aria-label={label}
+            aria-describedby={reference === undefined ? undefined : referenceId}
+            aria-valuemin={0}
+            aria-valuemax={Math.max(last, 0)}
+            aria-valuenow={index}
+            aria-valuetext={
+              point
+                ? formatLabel(labels.point, {
+                    label: headDate ?? "",
+                    value: restAggregate ? headValue : valueText,
+                  })
+                : undefined
             }
+            onPointerDown={(event) => {
+              if (event.pointerType !== "mouse")
+                event.currentTarget.setPointerCapture(event.pointerId);
+              fromPointer(event);
+            }}
+            onPointerMove={fromPointer}
+            onPointerLeave={() => setActive(null)}
+            onPointerUp={(event) => {
+              if (event.pointerType !== "mouse") setActive(null);
+            }}
+            onPointerCancel={() => setActive(null)}
+            onKeyDown={(event) => {
+              const next =
+                event.key === "ArrowLeft" || event.key === "ArrowDown"
+                  ? index - 1
+                  : event.key === "ArrowRight" || event.key === "ArrowUp"
+                    ? index + 1
+                    : event.key === "Home"
+                      ? 0
+                      : event.key === "End"
+                        ? last
+                        : null;
+              if (next === null) return;
+              event.preventDefault();
+              setPointer(null);
+              setActive(Math.max(0, Math.min(last, next)));
+            }}
+            onBlur={() => setActive(null)}
           >
-            <span className={styles.guide} />
-            <span className={styles.dot} data-empty={shownValue === null || undefined} />
-          </span>
-        ) : null}
-      </div>
+            {geometry.reference !== null ? (
+              <span
+                className={styles.reference}
+                style={{ "--sparkline-ref": geometry.reference } as React.CSSProperties}
+                aria-hidden="true"
+              />
+            ) : null}
+            <RegionSwap state={version} fill>
+              {bars ? (
+                <div className={styles.bars} aria-hidden="true">
+                  <span
+                    className={styles.baseline}
+                    style={{ "--sparkline-zero": geometry.zero } as React.CSSProperties}
+                  />
+                  {data.map((p, i) => (
+                    <span
+                      // biome-ignore lint/suspicious/noArrayIndexKey: one bar per point, in order
+                      key={i}
+                      className={styles.slot}
+                      {...toDataAttributes({
+                        current: i === index || undefined,
+                        quiet:
+                          (active !== null || highlight !== undefined) && i !== index
+                            ? true
+                            : undefined,
+                      })}
+                    >
+                      {p.value === null ? null : (
+                        <span
+                          className={styles.bar}
+                          data-negative={p.value < 0 || undefined}
+                          style={
+                            {
+                              "--sparkline-top": Math.min(y(p.value), geometry.zero),
+                              "--sparkline-height": Math.abs(geometry.zero - y(p.value)),
+                            } as React.CSSProperties
+                          }
+                        />
+                      )}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                drawing
+              )}
+            </RegionSwap>
+            {point && !bars ? (
+              <span
+                className={styles.cursor}
+                data-hidden={restAggregate || undefined}
+                aria-hidden="true"
+                style={
+                  {
+                    "--sparkline-x": x(index),
+                    "--sparkline-y": shownValue === null ? 0.5 : y(shownValue),
+                  } as React.CSSProperties
+                }
+              >
+                <span className={styles.guide} />
+                <span className={styles.dot} data-empty={shownValue === null || undefined} />
+              </span>
+            ) : null}
+          </div>
+        )}
+      </RegionSwap>
       {reference !== undefined ? (
         // Hidden text still feeds `aria-describedby` and is not read twice in the page flow.
         <span id={referenceId} hidden>

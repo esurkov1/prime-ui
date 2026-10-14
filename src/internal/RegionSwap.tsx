@@ -185,3 +185,26 @@ export function RegionSwap({
     </div>
   );
 }
+
+type SwapIn = {
+  /** Key of the swapped content: it remounts under a new state. `undefined` before the first swap. */
+  key: string | undefined;
+  /** The fade-in of the new state (`swapMotion.swapIn`); `undefined` before the first swap. */
+  className: string | undefined;
+};
+
+/**
+ * The region swap in place, for a host whose states cannot be laid over each other: a table body
+ * (rows leave the table's layout when positioned) or the phrasing content of a button. The new
+ * state remounts under `key` and fades in through `className`; nothing fades out and the height
+ * does not glide. Nothing moves on the first render. Every other region is a `RegionSwap`.
+ */
+export function useSwapIn(state: string | number): SwapIn {
+  const [initial] = React.useState(state);
+  const [swapped, setSwapped] = React.useState(false);
+  // Derived during render: the swapped content mounts with its fade in the same commit.
+  if (!swapped && state !== initial) setSwapped(true);
+  return swapped || state !== initial
+    ? { key: String(state), className: swapMotion.swapIn }
+    : { key: undefined, className: undefined };
+}

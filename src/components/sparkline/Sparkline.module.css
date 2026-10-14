@@ -4,7 +4,8 @@
  * + dot), lone points and the reference line are HTML over it, so dots stay round and dashes even
  * at any width. Scrubbing moves the cursor with the pointer at once (direct manipulation); when it
  * ends the cursor glides back to the point at rest (`base` · emphasized) and the guide fades out.
- * The trend arrow turns half a turn between up and down. A new series cross-fades in (swapMotion).
+ * The trend arrow turns half a turn between up and down. Loading and a new series cross-fade in
+ * (RegionSwap; the series swap fills the plot).
  */
 .root {
   display: flex;
@@ -90,9 +91,9 @@
   outline-offset: var(--prime-focus-offset);
 }
 
+/* The drawing and the bars fill the plot's swap layer (RegionSwap `fill`). */
 .drawing {
-  position: absolute;
-  inset: 0;
+  position: relative;
 }
 
 .svg {
@@ -200,8 +201,7 @@
 }
 
 /* Direct manipulation: while scrubbing the cursor sits under the pointer, no easing. */
-.root[data-scrubbing] .cursor,
-.root[data-scrubbing] .dot {
+.root[data-scrubbing] .cursor {
   transition: none;
 }
 
@@ -216,8 +216,7 @@
  * full fill; the others go quiet (`fast` opacity: scrubbing is high-frequency, no movement).
  */
 .bars {
-  position: absolute;
-  inset: 0;
+  position: relative;
   display: flex;
   gap: var(--prime-space-1);
 }
@@ -283,7 +282,7 @@
 
 /* Loading: the date, the value line and the plot as Skeletons of their own geometry. */
 .dateSkeleton {
-  width: calc(var(--prime-space-16) * 1);
+  width: var(--prime-space-16);
 }
 
 .valueSkeleton {

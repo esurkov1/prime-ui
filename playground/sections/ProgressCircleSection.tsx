@@ -59,6 +59,11 @@ export const page: ComponentPageConfig = {
       description:
         "Кольцо долей категорий с легендой рядом, в цветах категорий на графиках — `color`, `legend`, `formatValue`.",
     },
+    {
+      scenario: "on-color",
+      title: "На цветной подложке",
+      description: "Кольцо на цветной подложке берёт цвет её текста — `tone`.",
+    },
   ],
   api,
 };

@@ -286,7 +286,7 @@ describe("Sparkline", () => {
 
   it("shows a tooltip beside the scrubbed point and hides it when scrubbing ends", () => {
     render(<Sparkline data={DATA} label="Выручка" formatValue={(v) => `${v} ₽`} />);
-    const tooltip = () => document.body.querySelector("[data-state='open']");
+    const tooltip = () => document.body.querySelector("[data-depth='floating'][data-state='open']");
     expect(tooltip()).toBeNull();
     fireEvent.keyDown(plot(), { key: "Home" });
     expect(tooltip()).toHaveTextContent("6 окт300 ₽");
@@ -300,10 +300,14 @@ describe("Sparkline", () => {
   it("shows the tooltip in compact and over bars", () => {
     const { rerender } = render(<Sparkline data={DATA} label="Выручка" layout="compact" />);
     fireEvent.keyDown(plot(), { key: "End" });
-    expect(document.body.querySelector("[data-state='open']")).toHaveTextContent("8 окт297");
+    expect(
+      document.body.querySelector("[data-depth='floating'][data-state='open']"),
+    ).toHaveTextContent("8 окт297");
     rerender(<Sparkline data={DATA} label="Выручка" variant="bars" />);
     fireEvent.keyDown(plot(), { key: "Home" });
-    expect(document.body.querySelector("[data-state='open']")).toHaveTextContent("6 окт300");
+    expect(
+      document.body.querySelector("[data-depth='floating'][data-state='open']"),
+    ).toHaveTextContent("6 окт300");
   });
 
   describe("summary", () => {
@@ -337,7 +341,8 @@ describe("Sparkline", () => {
     const area = plot();
     area.getBoundingClientRect = () =>
       ({ left: 100, width: 200, top: 100, height: 80, right: 300, bottom: 180 }) as DOMRect;
-    const chip = () => document.body.querySelector<HTMLElement>("[data-state='open']");
+    const chip = () =>
+      document.body.querySelector<HTMLElement>("[data-depth='floating'][data-state='open']");
     fireEvent.pointerMove(area, { clientX: 120, clientY: 150 });
     // The anchor is the pointer itself: right of it by `--prime-space-4` (`usePosition`).
     expect(chip()?.style.left).toBe("136px");
@@ -358,9 +363,11 @@ describe("Sparkline", () => {
     area.getBoundingClientRect = () =>
       ({ left: 0, width: 200, top: 0, height: 80, right: 200, bottom: 80 }) as DOMRect;
     fireEvent.pointerMove(area, { clientX: 20, clientY: 40 });
-    expect(document.body.querySelector("[data-state='open']")).not.toBeNull();
+    expect(
+      document.body.querySelector("[data-depth='floating'][data-state='open']"),
+    ).not.toBeNull();
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(document.body.querySelector("[data-state='open']")).toBeNull();
+    expect(document.body.querySelector("[data-depth='floating'][data-state='open']")).toBeNull();
     expect(area).toHaveAttribute("aria-valuenow", "2");
   });
 });

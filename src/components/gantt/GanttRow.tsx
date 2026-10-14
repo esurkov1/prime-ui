@@ -39,7 +39,7 @@ export type GanttTrackEvent =
  * row re-renders only when its own props change — scrolling mounts new rows and leaves the rest.
  */
 export type GanttRowContext = {
-  register: (id: string) => (node: HTMLElement | null) => void;
+  register: (id: string) => React.RefCallback<HTMLElement>;
   focus: (id: string) => void;
   select: (barId: string, rowIndex: number) => void;
   /** `onRowClick` of the row at `rowIndex`. */

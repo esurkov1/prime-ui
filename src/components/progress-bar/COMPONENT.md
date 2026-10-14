@@ -43,7 +43,7 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Line thickness 4 → 8 px (`--prime-control-<tier>-track`, shared with Slider) and label type. Without it the tier of its host, else `m`. |
 | `label` | `string` | — | Visible label above the line and its accessible name; a value bar without it needs `aria-label`. |
 | `showValue` | `boolean` | `false` | Shows the rounded filled percentage at the end of the label row (`aria-hidden`); `bar` layout only. |
 | `loading` | `boolean` | `false` | The data is on its way: a Skeleton in the bar's geometry cross-fades into the data; the label stays. Pass the last known `value` or `segments` (or `0` / `[]`). |
@@ -113,6 +113,7 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 | `showValue` | secondary `NN%` at the end of the header | uploads, quotas — the user tracks the number | `false` |
 | `legend` | rows of swatch · name · value · share under the bar | a distribution the reader compares in numbers | `false` |
 | `loading` | a Skeleton bar (and legend or row lines) in the same geometry | the data is on its way | `false` |
+| `steps` | `max` equal cells (2–12), each filled whole | a level out of a few: password strength, an onboarding step | `false` |
 
 ## States
 | State | Driven by | DOM |
@@ -121,7 +122,7 @@ ProgressBar              <div>; size, tone (value mode), aria-busy while loading
 | value | `value`, `max` | native `value` / `max`; the drawn pill slides by `translate` over `slow` + `standard`, RTL aware |
 | segments | `segments`, `max`, `segmentGap` | `data-segment-gap` on the group, `data-tone` or `data-color` per part; widths animate by `flex-grow` over `slow` |
 | rows | `layout="rows"`, `scale` | `data-layout="rows"` on the root, an `<ol>`; each bar slides like the value pill |
-| loading | `loading` | `aria-busy` on the root; Skeletons in place of the bar, the legend or the rows; the data cross-fades in (`swapMotion`) |
+| loading | `loading` | `aria-busy` on the root; Skeletons in place of the bar, the legend or the rows; the data cross-fades in and the height glides (`RegionSwap`) |
 | steps | `steps` (value mode) | `data-steps="true"` on the bar; `max` cells (2–12), filled ones `data-filled`; a cell fills from its start edge (`base` · emphasized), cells of one change go half a stagger step apart — from the start when filling, from the end when emptying |
 | empty segments | `segments` empty or all `0` | only the track; accessible text `labels.empty` / `labels.allEmpty` |
 | reduced motion | `prefers-reduced-motion` | fill, widths and cells change instantly |

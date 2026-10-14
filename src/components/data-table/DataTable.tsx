@@ -6,16 +6,15 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
-import { useStateSwap } from "@/hooks/useStateSwap";
 import { rowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
 import { exitTimeoutMs } from "@/internal/motionTiming";
+import { useSwapIn } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
-import swapMotion from "@/internal/swapMotion.module.css";
 import { DataTableColumnsMenu } from "./ColumnsMenu";
 import { DataTableColumnsContext, type DataTableColumnsContextValue } from "./context";
 import styles from "./DataTable.module.css";
@@ -647,12 +646,10 @@ export function DataTable<Row>({
   const showSkeleton = !hasError && loading && displayedCount === 0;
   const showEmpty = !hasError && !loading && displayedCount === 0;
   const bodyState = hasError ? "error" : showSkeleton ? "loading" : showEmpty ? "empty" : "rows";
-  /* Body state swaps (loading → rows → empty / error) cross-fade: the body remounts under its
-     state key and fades in; the first render, sorting and paging stay still (same state). A
-     replaced server page (`rowArrival.batch`) cross-fades the same way. */
-  const stateSwapped = useStateSwap(bodyState);
-  const bodySwapped = stateSwapped || rowArrival.batch > 0;
-  const bodyKey = bodySwapped ? `${bodyState}-${rowArrival.batch}` : undefined;
+  /* Body state swaps (loading → rows → empty / error) fade in place: rows cannot be laid over a
+     table, so the body remounts under its state key and fades in; the first render, sorting and
+     paging stay still (same state). A replaced server page (`rowArrival.batch`) swaps the same way. */
+  const { key: bodyKey, className: swapClass } = useSwapIn(`${bodyState}-${rowArrival.batch}`);
   const totalColumns =
     columns.length + (reorder.enabled ? 1 : 0) + (selectable ? 1 : 0) + (expandEnabled ? 1 : 0);
   const fillHeight = scrollHeight === "fill";
@@ -879,7 +876,6 @@ export function DataTable<Row>({
         : reorder.enabled
           ? [{ key: "", rows: entries(0, flat.rows.length) }]
           : [];
-  const swapClass = bodySwapped ? swapMotion.swapIn : undefined;
 
   const groupHeader = (segment: Segment) => {
     if (!groups) return null;

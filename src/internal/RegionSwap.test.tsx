@@ -6,7 +6,7 @@ import { cssRule, cssValue } from "@/test/css";
 import { withMotion } from "@/test/motion";
 
 import { exitTimeoutMs } from "./motionTiming";
-import { RegionSwap } from "./RegionSwap";
+import { RegionSwap, useSwapIn } from "./RegionSwap";
 import swapMotion from "./swapMotion.module.css";
 
 const CSS = "src/internal/RegionSwap.module.css";
@@ -337,6 +337,36 @@ describe("RegionSwap", () => {
     expect(onSwap.mock.calls).toEqual([["ready"]]);
   });
 
+  describe("useSwapIn", () => {
+    function Body({ state }: { state: string }) {
+      const swap = useSwapIn(state);
+      return (
+        <p key={swap.key} className={swap.className}>
+          {state}
+        </p>
+      );
+    }
+
+    it("stays still on the first render and while the state holds", () => {
+      const { rerender } = render(<Body state="loading" />);
+      expect(screen.getByText("loading")).not.toHaveClass(swapMotion.swapIn);
+      rerender(<Body state="loading" />);
+      expect(screen.getByText("loading")).not.toHaveClass(swapMotion.swapIn);
+    });
+
+    it("remounts a new state with the fade-in and keeps fading every later one", () => {
+      const { rerender } = render(<Body state="loading" />);
+      const first = screen.getByText("loading");
+      rerender(<Body state="rows" />);
+      const rows = screen.getByText("rows");
+      expect(rows).toHaveClass(swapMotion.swapIn);
+      expect(rows).not.toBe(first);
+      rerender(<Body state="loading" />);
+      expect(screen.getByText("loading")).toHaveClass(swapMotion.swapIn);
+      expect(screen.getByText("loading")).not.toBe(first);
+    });
+  });
+
   describe("CSS", () => {
     it("an empty root has no box; a filling root stretches its layers", () => {
       expect(cssValue(cssRule(CSS, ".root:empty"), "display")).toBe("none");
@@ -347,6 +377,7 @@ describe("RegionSwap", () => {
     it("glides the height through --swap-height, clipped with room for focus rings", () => {
       const resizing = cssRule(CSS, '.root[data-resizing="true"]');
       expect(cssValue(resizing, "height")).toBe("var(--swap-height)");
+      expect(cssValue(resizing, "overflow-y")).toBe("clip");
       expect(cssValue(resizing, "overflow-clip-margin")).toBe("var(--prime-focus-space)");
       expect(cssValue(cssRule(CSS, ".root"), "transition")).toBe(
         "height var(--prime-motion-duration-base) var(--prime-motion-easing-standard)",

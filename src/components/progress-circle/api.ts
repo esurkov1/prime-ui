@@ -128,8 +128,8 @@ export const api: ComponentApi = {
         ru: "Вращение не останавливается и при reduced motion (оборот вдвое медленнее): это единственный знак, что работа идёт.",
       },
       {
-        en: 'Segments mode: the svg is `role="group"`; with `aria-label` it is described by the distribution («Видео: 38%, Документы: 21%») or by the legend, without it the distribution is its name.',
-        ru: 'Режим сегментов: svg с `role="group"`; с `aria-label` его описание — доли («Видео: 38%, Документы: 21%») или легенда, без него доли — имя.',
+        en: 'Segments mode: the svg is `role="group"`; with `aria-label` it is named by it and the text in the centre («Хранилище, 72%») and described by the distribution («Видео: 38%, Документы: 21%») or by the legend, without it the distribution is its name.',
+        ru: 'Режим сегментов: svg с `role="group"`; с `aria-label` его имя — подпись и текст в центре («Хранилище, 72%»), описание — доли («Видео: 38%, Документы: 21%») или легенда, без него доли — имя.',
       },
       {
         en: "A category color always sits beside its name in the legend, so color is never the only cue.",

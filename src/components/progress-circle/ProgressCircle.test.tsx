@@ -40,12 +40,15 @@ describe("ProgressCircle", () => {
 
   it.each(["s", "m", "l", "xl"] as const)("sets data-size=%s", (size: ControlSize) => {
     render(<ProgressCircle value={50} size={size} />);
-    expect(screen.getByRole("progressbar").parentElement).toHaveAttribute("data-size", size);
+    expect(screen.getByRole("progressbar").closest("[data-size]")).toHaveAttribute(
+      "data-size",
+      size,
+    );
   });
 
   it("defaults data-tone to accent and reflects tone", () => {
     const { rerender } = render(<ProgressCircle value={50} />);
-    const root = () => screen.getByRole("progressbar").parentElement;
+    const root = () => screen.getByRole("progressbar").closest("[data-size]");
     expect(root()).toHaveAttribute("data-tone", "accent");
     rerender(<ProgressCircle value={50} tone="danger" />);
     expect(root()).toHaveAttribute("data-tone", "danger");
@@ -71,12 +74,15 @@ describe("ProgressCircle", () => {
 
   it("merges className on root", () => {
     render(<ProgressCircle value={5} className="custom-circle" />);
-    expect(screen.getByRole("progressbar").parentElement).toHaveClass("custom-circle");
+    expect(screen.getByRole("progressbar").closest("[data-size]")).toHaveClass("custom-circle");
   });
 
   it("supports every tone in value mode", () => {
     render(<ProgressCircle value={50} tone="info" />);
-    expect(screen.getByRole("progressbar").parentElement).toHaveAttribute("data-tone", "info");
+    expect(screen.getByRole("progressbar").closest("[data-size]")).toHaveAttribute(
+      "data-tone",
+      "info",
+    );
   });
 
   it("draws from the kit ring at the data weight", () => {
@@ -105,7 +111,10 @@ describe("ProgressCircle", () => {
 
   it("tone inherit takes the host's color", () => {
     render(<ProgressCircle value={50} tone="inherit" />);
-    expect(screen.getByRole("progressbar").parentElement).toHaveAttribute("data-tone", "inherit");
+    expect(screen.getByRole("progressbar").closest("[data-size]")).toHaveAttribute(
+      "data-tone",
+      "inherit",
+    );
   });
 
   it("an icon in the centre is shown from s; a new icon cross-fades in (one glyph at rest)", () => {
@@ -133,6 +142,22 @@ describe("ProgressCircle", () => {
   });
 
   describe("segments", () => {
+    it("joins the centre text to the name of a named ring", () => {
+      render(
+        <ProgressCircle
+          aria-label="Хранилище"
+          segments={[
+            { label: "Видео", value: 40 },
+            { label: "Документы", value: 32 },
+          ]}
+          max={100}
+        >
+          72%
+        </ProgressCircle>,
+      );
+      expect(screen.getByRole("group", { name: "Хранилище, 72%" })).toBeInTheDocument();
+    });
+
     const tasks = [
       { value: 30, label: "Errors", tone: "danger" as const },
       { value: 70, label: "OK", tone: "success" as const },
