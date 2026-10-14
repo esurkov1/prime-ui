@@ -73,6 +73,11 @@ export const page: ComponentPageConfig = {
       description:
         "На ширине телефона шапка держит действия и сокращает заголовок, пузыри занимают до 85% чата, длинные ссылки переносятся, альбом держит раскладку — `Chat.Root`, `Chat.Header`, `Chat.Messages`, `Chat.Footer`.",
     },
+    {
+      slot: "screen",
+      description:
+        "Чат поддержки: диалоги с поиском рядом с перепиской, история подгружается сверху, сообщения всех видов, ответ и правка из меню, «печатает…» в обе стороны и непрочитанные по тому, что увидено — `items`, `renderMessage`, `hasOlder`, `onLoadOlder`, `typing`.",
+    },
   ],
   api,
   accessibility: {

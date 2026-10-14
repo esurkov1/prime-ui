@@ -5,9 +5,9 @@ import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { PageContent } from "@/components/page-content/PageContent";
 import { Typography } from "@/components/typography/Typography";
+import type { ComponentPageConfig } from "../components/ComponentPage";
 import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import { renderInlineCode } from "../components/PlaygroundApiTable";
-import { COMPOSITION_PATTERNS } from "./patterns";
 
 const SKILL_COMPOSITION = "https://github.com/esurkov1/prime-ui/blob/main/SKILL/composition.md";
 
@@ -67,13 +67,23 @@ const TYPE: Row[] = [
   { what: "главное число KPI", value: "—", how: "`Card.Value` (сам подстраивает размер)" },
 ];
 
-/** Composition principles: how a screen is assembled from the kit; patterns linked below. */
+/** Every component page with a `screen` example: the screen's page, in the sidebar's spirit. */
+const SCREENS = Object.values(
+  import.meta.glob<{ page: ComponentPageConfig }>("../sections/*Section.tsx", { eager: true }),
+)
+  .flatMap(({ page }) => {
+    const screen = page.examples.find((example) => "slot" in example && example.slot === "screen");
+    return screen && page.nav ? [{ page, nav: page.nav, description: screen.description }] : [];
+  })
+  .sort((a, b) => a.page.title.localeCompare(b.page.title));
+
+/** Composition principles: how a screen is assembled from the kit; the screens linked below. */
 export default function CompositionPage() {
   const navigate = useNavigate();
   return (
     <DocPage
-      title="Композиция"
-      description="Как собрать экран из кита так, будто его неделями шлифовал автор: каркас, ритм, иерархия, поверхности, действия, формы, данные и состояния. Ниже — готовые экраны: каждый пример один и тот же файл для плейграунда и для скилла агентов."
+      title="Принципы"
+      description="Как собрать экран из кита так, будто его неделями шлифовал автор: каркас, ритм, иерархия, поверхности, действия, формы, данные и состояния. Ниже — готовые экраны: каждый живёт на странице своего главного компонента примером «Экран»."
     >
       <DocBlock title="Каркас экрана">
         <DocList>
@@ -217,22 +227,22 @@ export default function CompositionPage() {
       <DocBlock
         title="Экраны"
         description={renderInlineCode(
-          "Каждый экран — один файл в `SKILL/patterns/`: превью и код здесь, ссылка из `SKILL/composition.md` для агентов.",
+          "Каждый экран — пример `screen.tsx` на странице своего главного компонента: превью и код там, указатель для агентов — `SKILL/composition.md`.",
         )}
       >
         <PageContent.Grid>
-          {COMPOSITION_PATTERNS.map((pattern) => (
-            <PageContent.Cell key={pattern.file} span={4}>
+          {SCREENS.map(({ page, nav, description }) => (
+            <PageContent.Cell key={page.dir} span={4}>
               <Card.Root variant="cta">
-                <Card.Title>{pattern.title}</Card.Title>
-                <Card.Description>{renderInlineCode(pattern.description)}</Card.Description>
+                <Card.Title>{page.title}</Card.Title>
+                <Card.Description>{renderInlineCode(description)}</Card.Description>
                 <Card.Footer>
                   <LinkButton
-                    href={`/${pattern.segment}`}
+                    href={`/${nav.segment}`}
                     size="s"
                     onClick={(event) => {
                       event.preventDefault();
-                      navigate(`/${pattern.segment}`);
+                      navigate(`/${nav.segment}`);
                     }}
                   >
                     Открыть

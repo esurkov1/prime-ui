@@ -15,9 +15,8 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | learn what happened, how far along it is, or watch a region load and change state; say it to a screen reader | Status and loading — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, Crossfade, EmptyPage, VisuallyHidden |
 | move between places: app sections, panels of a screen, the records of a list, the path, pages, steps | Navigation — Tabs, Breadcrumb, Pagination, List, Stepper, Sidebar, BottomNav |
 | see something on top of the page, or a photo or video full screen | Overlays — Tooltip, Popover, Dropdown, Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer |
-| get the app frame and the structure of a page | Page — AppShell, AppHeader, PageContent, PageToolbar, Divider, ScrollContainer |
+| get the app frame and the structure of a page, or a whole ready-made screen block (sign-in, sign-up, password reset, code) | Page — AppShell, AppHeader, PageContent, PageToolbar, Divider, ScrollContainer, LoginForm |
 | drag things by hand | Interaction — Dnd (a status board: Kanban in Data display) |
-| show a whole ready-made screen block (sign-in, sign-up, password reset, code) | Composition — LoginForm |
 | style text | Foundations — Typography |
 
 ## 2. Inside a category

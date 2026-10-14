@@ -1,4 +1,4 @@
-/** A list page: header with one primary action, SmartFilter in the table toolbar, DataTable with statuses, row actions, pages and a filtered empty state. */
+/** A list page: header with one primary action, SmartFilter in the table toolbar, DataTable with statuses, row actions, pages and a filtered empty state — `toolbar`, `empty`, `stickyFirstColumn`. */
 import {
   Avatar,
   Badge,
@@ -18,7 +18,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./list-page.module.css";
+import styles from "./screen.module.css";
 
 type Status = "draft" | "sent" | "paid" | "overdue";
 
@@ -250,7 +250,7 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
   },
 ];
 
-export default function ListPagePattern() {
+export default function DataTableScreenExample() {
   const [filter, setFilter] = React.useState<SmartFilterValue>({});
   const [search, setSearch] = React.useState("");
 

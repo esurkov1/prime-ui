@@ -13,9 +13,7 @@
       "bin/*.js",
       "tokens/**/*.ts",
       "vitest.config.ts",
-      "tsconfig.dts.json",
-      "SKILL/patterns/*.tsx",
-      "SKILL/patterns/*.css"
+      "tsconfig.dts.json"
     ]
   },
   "linter": {

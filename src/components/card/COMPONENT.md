@@ -201,6 +201,7 @@ No `labels`.
 | [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
 | [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem — `variant`. |
+| [screen.tsx](examples/screen.tsx) | A dashboard: the period switch in the header, a KPI row that cross-fades to the new period, a revenue trend to scrub, invoiced against paid in a ChartFrame with a legend, panels with plan progress and the receivables split, and a short table with a link to the full list — `variant`. |
 
 ## Mistakes
 - A `<div>` with a border styled as a card → use `Card.Root`; depth comes from fill, not lines.

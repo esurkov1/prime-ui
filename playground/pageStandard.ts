@@ -28,6 +28,9 @@ export type PageKind = (typeof PAGE_KINDS)[number];
  * - navigation: active item, orientation, overflow, controlled value;
  * - composite: the full typical scenario first, then features, states, narrow width;
  * - layout: the region in a page context and its responsive behaviour.
+ *
+ * The `screen` slot closes the page of a component that a whole screen is built around (field,
+ * overlay, navigation, composite, layout): one working page, full width, in an app-panel stage.
  */
 
 /** Cross-cutting example slots. A slot has one file name, one Russian title and one content rule. */
@@ -48,6 +51,7 @@ export const SLOT_IDS = [
   "controlled-open",
   "in-form",
   "narrow",
+  "screen",
 ] as const;
 export type SlotId = (typeof SLOT_IDS)[number];
 
@@ -85,6 +89,11 @@ export const SLOT_TITLES: Record<SlotId, string> = {
   "in-form": "В форме",
   /** Behaviour in a narrow container (≤ 360px): wrapping, stacking, scrolling. */
   narrow: "Узкая ширина",
+  /**
+   * A whole working screen built around the component (list page, dashboard, messenger…): the page
+   * a consumer starts from. Its own `screen.module.css` lays the page out.
+   */
+  screen: "Экран",
 };
 
 /** Position of component-specific scenarios inside a kind's slot order. */
@@ -145,6 +154,7 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: "controlled-open", layout: "stack-narrow" },
     { slot: "in-form", required: true, layout: "stack" },
     { slot: "narrow", layout: "stack" },
+    { slot: "screen", layout: "full" },
   ],
   overlay: [
     { slot: "overview", required: true, layout: "default" },
@@ -158,6 +168,7 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: "controlled", layout: "row" },
     { slot: "controlled-open", layout: "row" },
     { slot: "in-form", layout: "default" },
+    { slot: "screen", layout: "full" },
   ],
   navigation: [
     { slot: "overview", required: true, layout: "stack" },
@@ -170,6 +181,7 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: SCENARIOS, layout: "stack" },
     { slot: "controlled", layout: "stack" },
     { slot: "narrow", layout: "stack" },
+    { slot: "screen", layout: "full" },
   ],
   composite: [
     { slot: "overview", required: true, layout: "stack" },
@@ -180,6 +192,7 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: "states", layout: "stack" },
     { slot: "controlled", layout: "stack" },
     { slot: "narrow", required: true, layout: "stack" },
+    { slot: "screen", layout: "full" },
   ],
   layout: [
     { slot: "overview", required: true, layout: "full" },
@@ -190,6 +203,7 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: "controlled", layout: "full" },
     { slot: "controlled-open", layout: "full" },
     { slot: "narrow", layout: "full" },
+    { slot: "screen", layout: "full" },
   ],
 };
 

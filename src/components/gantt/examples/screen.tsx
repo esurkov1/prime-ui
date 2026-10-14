@@ -1,5 +1,6 @@
-/** A team schedule: PageToolbar with search, filters and team sections over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer. */
+/** A team schedule as a work screen: the title and a PageToolbar with search, filters, team sections and the primary action in the app header over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onSelect`. */
 import {
+  AppHeader,
   Avatar,
   Badge,
   Button,
@@ -29,7 +30,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./schedule.module.css";
+import styles from "./screen.module.css";
 
 type Hue = NonNullable<GanttBar["color"]>;
 type TeamId = "rollout" | "analytics" | "support";
@@ -275,7 +276,7 @@ const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve,
 /** `yyyy-MM-dd` from the Datepicker's hidden input → a local calendar day. */
 const parseDay = (value: FormDataEntryValue) => new Date(`${value}T00:00`);
 
-export default function SchedulePattern() {
+export default function GanttScreenExample() {
   const { notify } = useNotifications();
   const formId = React.useId();
   const [people, setPeople] = React.useState(PEOPLE);
@@ -440,15 +441,14 @@ export default function SchedulePattern() {
   const detail = selected?.bar;
 
   return (
-    <PageContent.Root fill>
-      <PageContent.Header>
-        <PageContent.Title>Загрузка команды</PageContent.Title>
-        <PageContent.Description>
-          Кто из команды внедрения чем занят у клиентов: проекты, отпуска и вехи запусков.
-        </PageContent.Description>
-      </PageContent.Header>
-      <PageContent.Body>
-        <div className={styles.board}>
+    <>
+      {/* A work screen: in an app this header fills the shell's `header` slot and carries the page —
+          the only h1 and the page's tools; main has no PageContent.Header. */}
+      <AppHeader.Root>
+        <AppHeader.Start>
+          <AppHeader.Title as="h1">Загрузка команды</AppHeader.Title>
+        </AppHeader.Start>
+        <AppHeader.Tools>
           <SmartFilter.Root
             fields={FIELDS}
             value={filter}
@@ -456,7 +456,7 @@ export default function SchedulePattern() {
             search={search}
             onSearchChange={setSearch}
           >
-            <PageToolbar.Root aria-label="График команды">
+            <PageToolbar.Root aria-label="Загрузка команды">
               <PageToolbar.Tools>
                 <SmartFilter.Toolbar />
               </PageToolbar.Tools>
@@ -498,7 +498,11 @@ export default function SchedulePattern() {
               </PageToolbar.Chips>
             </PageToolbar.Root>
           </SmartFilter.Root>
+        </AppHeader.Tools>
+      </AppHeader.Root>
 
+      <PageContent.Root fill>
+        <PageContent.Body>
           <Gantt<Person, Assignment>
             aria-label="Загрузка команды внедрения"
             className={styles.chart}
@@ -564,159 +568,159 @@ export default function SchedulePattern() {
               </EmptyPage.Root>
             }
           />
-        </div>
 
-        <Modal.Root open={draft !== null} onOpenChange={closeDraft}>
-          <Modal.Content size="s">
-            <Modal.Header>
-              <Modal.Title>Новая задача</Modal.Title>
-              <Modal.Description>
-                {draftPerson && draft?.dates
-                  ? `${draftPerson.name} · ${formatPeriod(draft.dates)}`
-                  : "Сотрудник увидит задачу в своём графике."}
-              </Modal.Description>
-            </Modal.Header>
-            <Modal.Body>
-              <Modal.Guard busy={saving} />
-              <form id={formId} noValidate onSubmit={submit}>
-                <Fieldset aria-label="Задача" disabled={saving}>
-                  <Input.Root id={`${formId}-title`} label="Задача" required error={errors.title}>
-                    <Input.Wrapper>
-                      <Input.Field name="title" placeholder="Обучение пользователей" autoFocus />
-                    </Input.Wrapper>
-                  </Input.Root>
-                  <Select.Root
-                    name="client"
-                    label="Клиент"
-                    required
-                    placeholder="Выберите клиента"
-                    error={errors.client}
-                    id={`${formId}-client`}
-                  >
-                    <Select.Trigger>
-                      <Select.Value />
-                    </Select.Trigger>
-                    <Select.Content>
-                      {(Object.keys(CLIENTS) as ClientId[]).map((value) => (
-                        <Select.Item key={value} value={value}>
-                          {CLIENTS[value].name}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Root>
-                  {draft?.personId ? null : (
-                    <>
-                      <Select.Root
-                        name="person"
-                        label="Сотрудник"
-                        required
-                        placeholder="Выберите сотрудника"
-                        error={errors.person}
-                        id={`${formId}-person`}
-                      >
-                        <Select.Trigger>
-                          <Select.Value />
-                        </Select.Trigger>
-                        <Select.Content searchable>
-                          {people.map((person) => (
-                            <Select.Item key={person.id} value={person.id} keywords={person.role}>
-                              {person.name}
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Root>
-                      <Datepicker.Root
-                        mode="range"
-                        name="period"
-                        label="Период"
-                        required
-                        fullWidth
-                        placeholder="Начало и конец работ"
-                        error={errors.period}
-                        id={`${formId}-period`}
-                      />
-                    </>
-                  )}
-                </Fieldset>
-              </form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Modal.Close>
-                <Button.Root variant="outline" tone="neutral">
-                  Отмена
-                </Button.Root>
-              </Modal.Close>
-              <Button.Root type="submit" form={formId} loading={saving}>
-                Назначить
-              </Button.Root>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal.Root>
-
-        <Drawer.Root open={detailOpen} onOpenChange={setDetailOpen}>
-          <Drawer.Content size="s">
-            <Drawer.Header>
-              <Drawer.Title>{detail?.label}</Drawer.Title>
-              <Drawer.Description>{detail ? KIND[detail.kind] : null}</Drawer.Description>
-            </Drawer.Header>
-            <Drawer.Body>
-              {selected && detail ? (
-                <DescriptionList.Root orientation="vertical">
-                  <DescriptionList.Item label="Сотрудник">
-                    {selected.person.name} · {selected.person.role}
-                  </DescriptionList.Item>
-                  <DescriptionList.Item label="Клиент">
-                    {detail.client ? (
-                      <Badge.Root color={CLIENTS[detail.client].color}>
-                        {CLIENTS[detail.client].name}
-                      </Badge.Root>
-                    ) : (
-                      "Без клиента"
+          <Modal.Root open={draft !== null} onOpenChange={closeDraft}>
+            <Modal.Content size="s">
+              <Modal.Header>
+                <Modal.Title>Новая задача</Modal.Title>
+                <Modal.Description>
+                  {draftPerson && draft?.dates
+                    ? `${draftPerson.name} · ${formatPeriod(draft.dates)}`
+                    : "Сотрудник увидит задачу в своём графике."}
+                </Modal.Description>
+              </Modal.Header>
+              <Modal.Body>
+                <Modal.Guard busy={saving} />
+                <form id={formId} noValidate onSubmit={submit}>
+                  <Fieldset aria-label="Задача" disabled={saving}>
+                    <Input.Root id={`${formId}-title`} label="Задача" required error={errors.title}>
+                      <Input.Wrapper>
+                        <Input.Field name="title" placeholder="Обучение пользователей" autoFocus />
+                      </Input.Wrapper>
+                    </Input.Root>
+                    <Select.Root
+                      name="client"
+                      label="Клиент"
+                      required
+                      placeholder="Выберите клиента"
+                      error={errors.client}
+                      id={`${formId}-client`}
+                    >
+                      <Select.Trigger>
+                        <Select.Value />
+                      </Select.Trigger>
+                      <Select.Content>
+                        {(Object.keys(CLIENTS) as ClientId[]).map((value) => (
+                          <Select.Item key={value} value={value}>
+                            {CLIENTS[value].name}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                    {draft?.personId ? null : (
+                      <>
+                        <Select.Root
+                          name="person"
+                          label="Сотрудник"
+                          required
+                          placeholder="Выберите сотрудника"
+                          error={errors.person}
+                          id={`${formId}-person`}
+                        >
+                          <Select.Trigger>
+                            <Select.Value />
+                          </Select.Trigger>
+                          <Select.Content searchable>
+                            {people.map((person) => (
+                              <Select.Item key={person.id} value={person.id} keywords={person.role}>
+                                {person.name}
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Root>
+                        <Datepicker.Root
+                          mode="range"
+                          name="period"
+                          label="Период"
+                          required
+                          fullWidth
+                          placeholder="Начало и конец работ"
+                          error={errors.period}
+                          id={`${formId}-period`}
+                        />
+                      </>
                     )}
-                  </DescriptionList.Item>
-                  <DescriptionList.Item label={detail.kind === "milestone" ? "Дата" : "Период"}>
-                    {formatPeriod(detail)}
-                    {detail.kind === "milestone" ? null : ` · ${lengthInDays(detail)} дн.`}
-                  </DescriptionList.Item>
-                  {detail.progress === undefined ? null : (
-                    <DescriptionList.Item label="Выполнено">
-                      <ProgressBar
-                        value={Math.round(detail.progress * 100)}
-                        showValue
-                        aria-label="Выполнено"
-                      />
-                    </DescriptionList.Item>
-                  )}
-                </DescriptionList.Root>
-              ) : null}
-            </Drawer.Body>
-            <Drawer.Footer>
-              <Drawer.Close>
-                <Button.Root variant="outline" tone="neutral">
-                  Закрыть
+                  </Fieldset>
+                </form>
+              </Modal.Body>
+              <Modal.Footer>
+                <Modal.Close>
+                  <Button.Root variant="outline" tone="neutral">
+                    Отмена
+                  </Button.Root>
+                </Modal.Close>
+                <Button.Root type="submit" form={formId} loading={saving}>
+                  Назначить
                 </Button.Root>
-              </Drawer.Close>
-              {detail && !detail.readOnly ? (
-                <ConfirmDialog.Root
-                  title={`Снять задачу «${detail.label}»?`}
-                  description={`${selected?.person.name} освободится на эти дни. Задачу можно будет назначить заново.`}
-                  confirmLabel="Снять задачу"
-                  onConfirm={removeSelected}
-                >
-                  <ConfirmDialog.Trigger>
-                    <Button.Root variant="soft" tone="danger">
-                      <Button.Icon>
-                        <Icon name="action.delete" />
-                      </Button.Icon>
-                      Снять задачу
-                    </Button.Root>
-                  </ConfirmDialog.Trigger>
-                </ConfirmDialog.Root>
-              ) : null}
-            </Drawer.Footer>
-          </Drawer.Content>
-        </Drawer.Root>
-      </PageContent.Body>
-    </PageContent.Root>
+              </Modal.Footer>
+            </Modal.Content>
+          </Modal.Root>
+
+          <Drawer.Root open={detailOpen} onOpenChange={setDetailOpen}>
+            <Drawer.Content size="s">
+              <Drawer.Header>
+                <Drawer.Title>{detail?.label}</Drawer.Title>
+                <Drawer.Description>{detail ? KIND[detail.kind] : null}</Drawer.Description>
+              </Drawer.Header>
+              <Drawer.Body>
+                {selected && detail ? (
+                  <DescriptionList.Root orientation="vertical">
+                    <DescriptionList.Item label="Сотрудник">
+                      {selected.person.name} · {selected.person.role}
+                    </DescriptionList.Item>
+                    <DescriptionList.Item label="Клиент">
+                      {detail.client ? (
+                        <Badge.Root color={CLIENTS[detail.client].color}>
+                          {CLIENTS[detail.client].name}
+                        </Badge.Root>
+                      ) : (
+                        "Без клиента"
+                      )}
+                    </DescriptionList.Item>
+                    <DescriptionList.Item label={detail.kind === "milestone" ? "Дата" : "Период"}>
+                      {formatPeriod(detail)}
+                      {detail.kind === "milestone" ? null : ` · ${lengthInDays(detail)} дн.`}
+                    </DescriptionList.Item>
+                    {detail.progress === undefined ? null : (
+                      <DescriptionList.Item label="Выполнено">
+                        <ProgressBar
+                          value={Math.round(detail.progress * 100)}
+                          showValue
+                          aria-label="Выполнено"
+                        />
+                      </DescriptionList.Item>
+                    )}
+                  </DescriptionList.Root>
+                ) : null}
+              </Drawer.Body>
+              <Drawer.Footer>
+                <Drawer.Close>
+                  <Button.Root variant="outline" tone="neutral">
+                    Закрыть
+                  </Button.Root>
+                </Drawer.Close>
+                {detail && !detail.readOnly ? (
+                  <ConfirmDialog.Root
+                    title={`Снять задачу «${detail.label}»?`}
+                    description={`${selected?.person.name} освободится на эти дни. Задачу можно будет назначить заново.`}
+                    confirmLabel="Снять задачу"
+                    onConfirm={removeSelected}
+                  >
+                    <ConfirmDialog.Trigger>
+                      <Button.Root variant="soft" tone="danger">
+                        <Button.Icon>
+                          <Icon name="action.delete" />
+                        </Button.Icon>
+                        Снять задачу
+                      </Button.Root>
+                    </ConfirmDialog.Trigger>
+                  </ConfirmDialog.Root>
+                ) : null}
+              </Drawer.Footer>
+            </Drawer.Content>
+          </Drawer.Root>
+        </PageContent.Body>
+      </PageContent.Root>
+    </>
   );
 }

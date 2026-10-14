@@ -3,7 +3,7 @@
 Answer every item yes or no. Any «no» is fixed before handing over.
 
 ## Composition
-- [ ] The screen starts from the closest pattern in [composition.md](composition.md) (list, detail,
+- [ ] The screen starts from the closest screen in [composition.md](composition.md#screens) (list, detail,
       settings, form in a Drawer, dashboard, states, messenger) and keeps its skeleton.
 - [ ] One `PageContent.Header` with title, one-line description and actions; blocks in `PageContent.Body`.
 - [ ] Cards only for standalone blocks; no card around a table, a single field or the whole page.

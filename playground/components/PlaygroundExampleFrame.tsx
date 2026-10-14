@@ -43,7 +43,7 @@ export function PlaygroundExampleFrame(props: PlaygroundExampleFrameProps) {
 type SourceFrameProps = Omit<PlaygroundExampleFrameProps, "code" | "children"> & {
   /** A registry entry: the file's component and its source, loaded together. */
   entry: Promise<SourceEntry>;
-  /** Wraps the rendered file inside the stage (a pattern sits in an app-panel stage). */
+  /** Wraps the rendered file inside the stage (a `screen` example sits in an app-panel stage). */
   stage?: (preview: React.ReactNode) => React.ReactNode;
 };
 
@@ -57,7 +57,7 @@ function LoadedSourceFrame({ entry, stage, ...rest }: SourceFrameProps) {
   );
 }
 
-/** The frame of one example or pattern file: a quiet placeholder until module and source load. */
+/** The frame of one example file: a quiet placeholder until module and source load. */
 export function PlaygroundSourceFrame(props: SourceFrameProps) {
   return (
     <React.Suspense fallback={<div className="playgroundFramePending" aria-hidden="true" />}>

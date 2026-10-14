@@ -212,6 +212,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [dismiss.tsx](examples/dismiss.tsx) | An import closes only from its buttons, and not at all while it runs — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the state and opens the drawer from a link, without a trigger — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A settings form in the panel: the footer button submits the form and an empty name shakes the field and keeps it open until it is filled — `Drawer.Body`, `Drawer.Footer`, `error`. |
+| [screen.tsx](examples/screen.tsx) | A create form in a Drawer: grouped fields, errors on submit with focus on the first invalid field, a loading submit, a toast and the new row in the list — `Drawer.Guard`, `busy`, `dirty`. |
 
 ## Mistakes
 - A drawer without `Drawer.Footer` → add one: «Закрыть» for details, «Отмена» + the submit button for a form. The header × alone is not the end of the panel.

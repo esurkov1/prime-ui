@@ -3,14 +3,14 @@ import type { ComponentPageConfig } from "../components/ComponentPage";
 import { LogIn } from "../icons";
 
 export const page: ComponentPageConfig = {
-  category: "composition",
+  category: "page",
   nav: {
     segment: "login-form",
     label: "Login Form",
     summary: "Карточка входа: логотип, провайдеры, поля, ссылки",
     keywords: ["вход", "логин", "авторизация", "регистрация", "пароль", "sign in", "login", "auth"],
     icon: LogIn,
-    order: 4,
+    order: 7,
   },
   dir: "login-form",
   title: "LoginForm",

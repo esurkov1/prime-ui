@@ -1,7 +1,6 @@
 /**
- * Shared helpers of the docs contracts (docs-contract, patterns-contract, skill-docs): repository
- * paths, file walking, and the checks every copyable source (an example, a pattern) and its
- * layout CSS must pass.
+ * Shared helpers of the docs contracts (docs-contract, skill-docs): repository paths, file walking,
+ * and the checks every copyable source (an example, a screen) and its layout CSS must pass.
  */
 import fs from "node:fs";
 import path from "node:path";

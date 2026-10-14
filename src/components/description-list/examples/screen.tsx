@@ -1,4 +1,4 @@
-/** A detail page: breadcrumb and status in the header, actions by weight, a main column with the line items and a side column with the client and the history. */
+/** A detail page: breadcrumb and status in the header, actions by weight, a main column with the line items and a side column with the client and the history — `orientation`. */
 import {
   Avatar,
   Badge,
@@ -16,7 +16,7 @@ import {
   Typography,
 } from "prime-ui-kit";
 
-import styles from "./detail-page.module.css";
+import styles from "./screen.module.css";
 
 type Line = { id: string; name: string; quantity: number; unit: string; price: number };
 
@@ -72,7 +72,7 @@ const COLUMNS: DataTableColumn<Line>[] = [
   },
 ];
 
-export default function DetailPagePattern() {
+export default function DescriptionListScreenExample() {
   return (
     <PageContent.Page aria-labelledby="invoice-title">
       <PageContent.Header>

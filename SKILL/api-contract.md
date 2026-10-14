@@ -157,7 +157,7 @@ export function InviteForm() {
 ```
 
 (`.form { display: grid; gap: var(--prime-space-5); }`.) A full create form with groups, validation,
-loading and a toast: [patterns/form-drawer.tsx](patterns/form-drawer.tsx).
+loading and a toast: [the Drawer screen](../src/components/drawer/examples/screen.tsx).
 
 ## Loading without DataTable
 
@@ -167,7 +167,7 @@ any other card or region that loads: wrap its content in `Crossfade state={statu
 (same rows, gaps and heights). A `Spinner` only where there is no shape to hold. Show the error in
 place (a `Banner` for the page, `EmptyPage` with `EmptyPage.Icon tone="danger"` and a retry for a
 region). Never draw your own spinners or shimmer blocks. See
-[patterns/screen-states.tsx](patterns/screen-states.tsx) and [motion.md](motion.md).
+[the screen states](../src/components/crossfade/examples/screen.tsx) and [motion.md](motion.md).
 
 ## Secondary actions
 

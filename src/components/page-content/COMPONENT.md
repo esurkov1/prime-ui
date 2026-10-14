@@ -254,6 +254,7 @@ One `PageContent.Title` (`<h1>`) per page; a topic inside Body is a `PageContent
 | [sections.tsx](examples/sections.tsx) | A page with titled sections: tiles of one screen close together, a new topic set off by air, a link at the end of the heading, a heading column beside a panel — `PageContent.Section`, `label`, `description`, `PageContent.Actions`, `layout`. |
 | [list-detail.tsx](examples/list-detail.tsx) | A support inbox as list + detail on a full-height page: side by side on a wide panel, one pane at a time with a back button on a narrow one — `PageContent.Split`, `PageContent.BackButton`, `fill`. |
 | [narrow.tsx](examples/narrow.tsx) | In a phone-width column the page actions wrap under the heading instead of squeezing it. |
+| [screen.tsx](examples/screen.tsx) | A settings page: sections with a heading column and a panel, a form saved by its own button, switches that apply at once and a danger zone with a confirm — `layout`, `maxWidth`. |
 
 ## Mistakes
 - Padding on `PageContent.Root` to imitate gutters → gutters come from `AppShell.Main`.

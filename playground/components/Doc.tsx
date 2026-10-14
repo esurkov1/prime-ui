@@ -1,5 +1,5 @@
 /**
- * Building blocks of every playground document (component, foundation, composition pages): the
+ * Building blocks of every playground document (component and foundation pages): the
  * page shell, a titled block, a table and a bulleted list — one copy each, built from the kit.
  */
 import * as React from "react";

@@ -1,4 +1,4 @@
-/** A support messenger on `Chat`: dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, dates and runs from data, every kind of message, search, pinned messages, replies and edits from the menu with a jump to the quoted message, read receipts and unread counts from what was seen, the typing signal both ways, and the Composer whose messages rise into the list while the client answers. */
+/** A support messenger on Chat:dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, dates and runs from data, every kind of message, search, pinned messages, replies and edits from the menu with a jump to the quoted message, read receipts and unread counts from what was seen, the typing signal both ways, and the Composer whose messages rise into the list while the client answers — `items`, `renderMessage`, `hasOlder`, `onLoadOlder`, `typing`. */
 import {
   Avatar,
   Button,
@@ -26,7 +26,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./chat.module.css";
+import styles from "./screen.module.css";
 
 type Content =
   | { kind: "text"; text: string }
@@ -517,7 +517,7 @@ const ChatComposer = React.memo(function ChatComposer({
   );
 });
 
-export default function ChatPattern() {
+export default function ChatScreenExample() {
   const [dialogId, setDialogId] = React.useState<string | null>("vector");
   const [messages, setMessages] = React.useState<ChatMessage[]>(HISTORY);
   const [hasOlder, setHasOlder] = React.useState(true);

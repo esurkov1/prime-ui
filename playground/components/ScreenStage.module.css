@@ -1,6 +1,6 @@
 /*
- * Composition pages: the preview imitates the app's content panel — the page with the AppShell
- * gutters — so patterns render in the context they ship to.
+ * The stage of a `screen` example: the preview imitates the app's content panel — the page with the
+ * AppShell gutters — so a screen renders in the context it ships to.
  */
 
 /* Query container: the gutters follow the preview width (desktop / tablet / phone switch). */
@@ -19,8 +19,11 @@
   color: var(--prime-color-text-primary);
 }
 
-/* A page that fills the panel's height: a viewport-high column for `PageContent.Root fill`. */
-.screen[data-fill] {
+/*
+ * A screen that fills the panel's height (`PageContent.Root fill`, `AppShell.Root fillViewport`
+ * among its top-level elements): a viewport-high column it can take the height of.
+ */
+.screen:has(> [data-fill], > [data-fill-viewport]) {
   display: flex;
   flex-direction: column;
   height: min(calc(var(--prime-space-24) * 7), 100dvh);

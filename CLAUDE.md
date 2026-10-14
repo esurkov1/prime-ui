@@ -60,7 +60,7 @@ bun run verify:tokens       # tokens:build shows no diff (generated API docs: th
   control moves into its new state; a region that changes what it shows (loading / data / empty /
   error, another record) cross-fades and glides its height (`Crossfade`, or `useStateSwap` +
   `swapMotion` inside a component); a loading region is a `Skeleton` in the data's geometry. Every
-  component with region states and every example or pattern that loads follows this.
+  component with region states and every example (screens included) that loads follows this.
 - A11y minimum: every interactive component works from the keyboard, has explicit ARIA, a visible focus
   ring in both themes, never conveys meaning by color alone, and has keyboard tests.
 - Responsive is part of the code (foundation §9, `SKILL/responsive.md`): every component works from
@@ -254,7 +254,10 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   description of the example names.
 - Exactly one `export default function <Component><Scenario>Example()` (`ButtonOverviewExample`).
 - Imports: kit only from `"prime-ui-kit"`, then `import * as React from "react"` (only this form) when
-  hooks are needed, then `./examples.module.css` (the only CSS an example may import).
+  hooks are needed, then `./examples.module.css` (the only CSS an example may import). The one
+  exception is the `screen` example (`examples/screen.tsx`, a whole page): it imports its own
+  `./screen.module.css` instead — a page's layout is larger than `examples.module.css` should hold —
+  which also leaves surfaces and text color to the kit (no `color` / `background`).
 - Icons from the kit first: `<Icon name="…" />` for any glyph the registry has (`src/icons`). A direct
   `lucide-react` import only for a domain glyph listed in `DOMAIN_GLYPHS` (docs contract) with a
   reason; a generic glyph goes into the registry instead. The contract fails otherwise.
@@ -278,24 +281,26 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   slot's preview layout provides them). A bounded block is `Card.Root` — CSS only places it.
 - No inline `style={{}}`, no playground imports; the file copies into a consumer project unchanged.
 
-### Examples vs patterns — who shows what
+### Examples vs screens — who shows what
 
 - **A component example** shows one component, one scenario, with the least around it: no page
   heading, no shell, no neighbours that are not the point. Every capability of a component (every
   message kind, card kind, column option, state) is shown in that component's own examples — its page
   is complete on its own.
-- **A pattern** (`SKILL/patterns/`, the playground «Композиция») is a whole screen and answers «how to
+- **A screen** (the `screen` slot «Экран» of its main component: `examples/screen.tsx` +
+  `examples/screen.module.css`, the last example on that page) is a whole page and answers «how to
   compose»: layout, toolbar, view switch, details in a Drawer, loading / empty / error, the phone. It
-  never re-demos a component's capabilities; it uses them where the screen needs them. A pattern that
-  is one component plus a heading is an example, not a pattern.
-- **Nothing is lost when moving**: before a capability leaves a pattern, it is shown in the component's
+  never re-demos a component's capabilities; it uses them where the screen needs them. A screen that
+  is one component plus a heading is an example, not a screen. Its rules for the skill live in
+  `SKILL/composition.md` (the screens index and a section per screen).
+- **Nothing is lost when moving**: before a capability leaves a screen, it is shown in the component's
   examples (add or extend one there in the same change).
 - **One title per screen, two kinds of page.** A work screen (a board, a messenger, a schedule, a
   dense register) gives its height to the work: `AppHeader.Title as="h1"` with the tools in
   `AppHeader.Tools` (`PageToolbar`), no `PageContent.Header`. An overview or document page (home,
   dashboard, settings, a record, a list page) has its title and a data-carrying description in
   `PageContent.Header`, and the AppHeader shows no title (menu, path, search, app actions). Never the
-  same title twice; never no h1. `src/test/patterns-contract.test.ts` guards the pattern side.
+  same title twice; never no h1. The docs contract renders every screen and checks its one h1.
 
 ## 5. Playground page
 
@@ -341,9 +346,13 @@ export const page: ComponentPageConfig = {
   `sizes` «Размеры» · `states` «Состояния» · `with-icon` «С иконкой» · `structure` «Структура» ·
   `group` «Группа» · `orientation` «Ориентация» · `placement` «Расположение» · `overflow`
   «Переполнение» · `validation` «Валидация» · `dismiss` «Закрытие» · `controlled` «Управляемое
-  значение» · `controlled-open` «Управляемое открытие» · `in-form` «В форме» · `narrow` «Узкая ширина».
+  значение» · `controlled-open` «Управляемое открытие» · `in-form` «В форме» · `narrow` «Узкая ширина» ·
+  `screen` «Экран».
   `overview` is always first: typical usage with defaults, what a consumer copies first. One scenario —
-  one example; no `surfaces` example (the playground's surface switch checks contrast).
+  one example; no `surfaces` example (the playground's surface switch checks contrast). `screen` is
+  always last: a whole working page built around the component (field, overlay, navigation, composite
+  and layout kinds), full width in an app-panel stage; a screen that fills the panel's height
+  (`PageContent.Root fill`, `AppShell.Root fillViewport` at its top level) gets a viewport-high stage.
 - `KIND_SLOTS` fixes which slots a kind allows, their order, the position of component-specific
   scenarios and each slot's preview layout. Required: `overview` everywhere; `states` for controls;
   `sizes`, `states`, `validation`, `in-form` for fields; `narrow` for composites. Prop-driven
@@ -414,8 +423,9 @@ A component change is done only when all of these agree. Do them in the same cha
    cross-component decision changes. `ux.md` holds what goes on a screen (the brief, data shape →
    layout, label economy, copy, friction). A UX bug seen in a screen built with the skill becomes three
    things in one change: a rule with bad → good in `ux.md` or `anti-slop.md`, a line in
-   `checklist.md`, and a case in `evals/prime-ui-kit/evals.json` (run with the skill-creator evals). A new or changed screen pattern goes to `SKILL/patterns/` with an
-   entry in `playground/composition/patterns.ts` and a row in `SKILL/composition.md`.
+   `checklist.md`, and a case in `evals/prime-ui-kit/evals.json` (run with the skill-creator evals). A new or changed screen is the `screen` example of its
+   main component (section entry, COMPONENT.md row) with a row in the screens index of
+   `SKILL/composition.md` and its section of rules there.
 9. **README.md** — when the public surface changes (new component, export, count, install step).
 
 Every page follows the standard; the docs contract has no exclusion list. Do not add one.
@@ -451,15 +461,14 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `playground/sections/<Name>Section.tsx` | one page per component: data only, `export const page: ComponentPageConfig` |
 | `playground/foundation/` | token pages (Typography's component docs live here) |
 | `scripts/` | `build-tokens.ts`, `bundle-lib.ts`, `build-docs.ts` + `docs/componentApi.ts` (api schema, markdown) |
-| `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component (shared helpers in `contract-utils.ts`) |
+| `src/test/docs-contract.test.ts` | docs / examples / playground / api contract for every component, incl. the render smoke test of every screen (shared helpers in `contract-utils.ts`) |
 | `src/test/part-refs.test.tsx` | refs of every part: a typed check, runtime cases for merged or redirected refs |
 | `SKILL/` | agent skill for consumer projects: `SKILL.md` (entry and workflow), `ux` (what goes on a screen: brief, data shape → layout, label economy, copy, friction), `choosing`, `components` (index), `composition` (screen assembly guide), `layouts`, `responsive` (narrow screens, touch, `PageToolbar`), `api-contract`, `foundations`, `anti-slop`, `checklist` |
 | `evals/prime-ui-kit/` | skill evals (skill-creator `evals.json`): prompts with checkable expectations for the UX bugs the skill must not repeat; `files/` holds the screens the «change an existing screen» cases start from. Not shipped |
-| `SKILL/patterns/` | composition patterns: one working screen per file (`<name>.tsx` + `<name>.module.css`, `export default function <Name>Pattern`); the one source for the skill and the playground «Композиция» pages |
-| `playground/composition/` | composition pages: `patterns.ts` (page text per pattern), `PatternPage.tsx`, `CompositionPage.tsx` (principles), `patternRegistry.ts` (glob loader) |
-| `src/test/patterns-contract.test.ts` | pattern canon, links from `SKILL/composition.md`, playground list, render smoke test |
+| `src/<base>/<dir>/examples/screen.tsx` | whole screens: the `screen` example of a component (+ `screen.module.css`), indexed with their rules in `SKILL/composition.md`; the playground shows them in `playground/components/ScreenStage.tsx` |
+| `playground/composition/CompositionPage.tsx` | the «Принципы» guidance page (in the foundations group): how a screen is assembled, links to every screen |
 | `src/test/skill-docs.test.ts` | SKILL tsx snippets typecheck against the kit (fragments: ```tsx partial); SKILL and `llms.txt` links resolve |
-| `llms.txt` | entry point for LLMs (llms.txt convention): links to `SKILL/cheatsheet.md`, `SKILL.md`, components / choosing / composition, patterns, foundation |
+| `llms.txt` | entry point for LLMs (llms.txt convention): links to `SKILL/cheatsheet.md`, `SKILL.md`, components / choosing / composition (with the screens index), foundation |
 
 ## Release
 

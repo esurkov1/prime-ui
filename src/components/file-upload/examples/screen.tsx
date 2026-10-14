@@ -1,4 +1,4 @@
-/** A media library of a catalog object: PageToolbar with sections, search, order and upload; uploads in FileUpload tiles through a queue; a grid of Thumbnails that open MediaViewer out of the tile or are picked for bulk download and delete; a Skeleton first load and a filtered empty state in a Crossfade. */
+/** A media library of a catalog object: PageToolbar with sections, search, order and upload; uploads in FileUpload tiles through a queue; a grid of Thumbnails that open MediaViewer out of the tile or are picked for bulk download and delete; a Skeleton first load and a filtered empty state in a Crossfade — `trigger`, `layout`. */
 import {
   Button,
   ConfirmDialog,
@@ -24,7 +24,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./media-library.module.css";
+import styles from "./screen.module.css";
 
 type Kind = "photo" | "video" | "document";
 type Section = "all" | Kind;
@@ -253,7 +253,7 @@ const toViewerItem = (media: Media): MediaViewerItem => ({
   caption: `${media.name} · ${formatFileSize(media.size)} · ${DAY.format(new Date(media.added))}`,
 });
 
-export default function MediaLibraryPattern() {
+export default function FileUploadScreenExample() {
   const { notify } = useNotifications();
   const [loading, setLoading] = React.useState(true);
   const [library, setLibrary] = React.useState<Media[]>([]);

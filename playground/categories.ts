@@ -15,10 +15,8 @@
  *   steps.
  * - **overlays** — something on top of the page, from tooltip to modal surfaces.
  * - **page** — the frame and structure of a screen: app shell, page column, page panel, dividers,
- *   scroll regions.
+ *   scroll regions, and ready-made screen blocks (LoginForm).
  * - **interaction** — direct manipulation: drag and drop.
- * - **composition** — whole screens built from the kit (`SKILL/patterns/`), the rules behind them,
- *   and ready-made screen blocks (LoginForm).
  * - **infrastructure** — demo tooling, not product UI.
  */
 export const PLAYGROUND_NAV_CATEGORIES = [
@@ -33,7 +31,6 @@ export const PLAYGROUND_NAV_CATEGORIES = [
   { id: "overlays", label: "Оверлеи" },
   { id: "page", label: "Страница" },
   { id: "interaction", label: "Взаимодействие" },
-  { id: "composition", label: "Композиция" },
   { id: "infrastructure", label: "Инфраструктура" },
 ] as const;
 

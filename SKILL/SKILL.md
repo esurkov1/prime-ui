@@ -37,8 +37,9 @@ region, `Skeleton` while it loads).
    that are easy to confuse.
 4. **Read the component** — [components.md](components.md) links each `COMPONENT.md` (API, variants,
    states, a11y, mistakes) and its `examples/`. Never guess a prop; copy structure from an example.
-5. **Compose the screen** — [composition.md](composition.md): start from the closest working screen in
-   [patterns/](patterns/) and keep its skeleton; rhythm, hierarchy, surfaces and type in
+5. **Compose the screen** — [composition.md](composition.md): start from the closest working screen (the
+   [screens index](composition.md#screens): the `examples/screen.tsx` of its main component) and keep
+   its skeleton; rhythm, hierarchy, surfaces and type in
    [foundations.md](foundations.md).
 6. **Write the JSX** — [api-contract.md](api-contract.md): prop names, controlled state, events (async
    events return the request's Promise), forms and their submit flow (`Fieldset disabled`), uploads
@@ -64,7 +65,7 @@ project under `node_modules/prime-ui-kit/src/`.
 | Component reference | `reference/components/<dir>/COMPONENT.md` | `node_modules/prime-ui-kit/src/components/<dir>/COMPONENT.md` |
 | Copyable scenarios | `reference/components/<dir>/examples/*.tsx` | `node_modules/prime-ui-kit/src/components/<dir>/examples/*.tsx` |
 | AppShell, Sidebar, AppHeader, BottomNav | `reference/layout/<dir>/…` | `node_modules/prime-ui-kit/src/layout/<dir>/…` |
-| Whole screens | `patterns/*.tsx` | `node_modules/prime-ui-kit/dist/skill/patterns/*.tsx` |
+| Whole screens | `reference/<base>/<dir>/examples/screen.tsx` | `node_modules/prime-ui-kit/src/<base>/<dir>/examples/screen.tsx` |
 
 ## Files of this skill
 
@@ -75,8 +76,7 @@ project under `node_modules/prime-ui-kit/src/`.
 | [layouts.md](layouts.md) | once per app — the app frame, page wrappers, auth screens |
 | [choosing.md](choosing.md) | unsure which component fits (Gantt / Timeline / Kanban / DataTable, Message / Composer, FileUpload list / grid / gallery / strip, ColorField / ColorPicker…); how to confirm a destructive action |
 | [components.md](components.md) | finding a component and its `COMPONENT.md` / `examples/` |
-| [composition.md](composition.md) | building any screen — the patterns table, the rules of assembly, what to do when the kit lacks a component |
-| [patterns/](patterns/) | starting a screen — list, detail, settings, form in a Drawer, dashboard, states, messenger |
+| [composition.md](composition.md) | building any screen — the screens index (list, detail, settings, form in a Drawer, dashboard, states, messenger, board, app frame, media library, schedule, record editor) and what each one teaches, the rules of assembly, what to do when the kit lacks a component |
 | [foundations.md](foundations.md) | grid, proximity scale, sizes, surfaces, type, tone and color |
 | [api-contract.md](api-contract.md) | writing JSX — prop names, sizes and host tiers, controlled state, forms, helpers, icons |
 | [motion.md](motion.md) | every screen — loading / empty / error that flow, what the kit animates, when to move, recipes |

@@ -302,18 +302,13 @@ accessibility, examples and common mistakes.
 | [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — search and filter, sections, view options and the primary action — one row when wide, stacked rows when narrow. |
 | [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator, horizontal or vertical, with or without a label. |
 | [**ScrollContainer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/scroll-container/COMPONENT.md) | A scroll region with the kit's thin scrollbar that shrinks correctly inside flex and grid parents; a chat pinned to its end, edge events for loading more. |
+| [**LoginForm**](https://github.com/esurkov1/prime-ui/blob/main/src/components/login-form/COMPONENT.md) | A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation. |
 
 ### Interaction (`interaction`)
 
 | Component | What it is for |
 |---|---|
 | [**Dnd**](https://github.com/esurkov1/prime-ui/blob/main/src/components/dnd/COMPONENT.md) | Pointer-driven drag and drop: reorderable lists, draggable items and drop zones, with touch and keyboard support. |
-
-### Composition (`composition`)
-
-| Component | What it is for |
-|---|---|
-| [**LoginForm**](https://github.com/esurkov1/prime-ui/blob/main/src/components/login-form/COMPONENT.md) | A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation. |
 
 ### Foundations (`foundations`)
 
@@ -369,9 +364,9 @@ with the kit the way its author would: the screen-building process, the design r
 the API cheat sheet, how to choose between similar components, what to do when a component is missing,
 page recipes (dashboard, list with table, settings, forms, detail page, screen states, messenger, auth), anti-patterns
 and a review checklist. The package ships it built as one self-contained folder,
-`node_modules/prime-ui-kit/dist/skill/`: `SKILL.md`, the guides, the screen `patterns/`, and every
-component's `COMPONENT.md` and `examples/` under `reference/`, so it always matches the installed
-version.
+`node_modules/prime-ui-kit/dist/skill/`: `SKILL.md`, the guides, and every component's `COMPONENT.md`
+and `examples/` under `reference/` (whole screens included, as `examples/screen.tsx`), so it always
+matches the installed version.
 
 ### Install the skill
 

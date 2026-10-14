@@ -6,8 +6,6 @@ import {
 } from "./categories";
 import type { ComponentPageConfig } from "./components/ComponentPage";
 import CompositionPage from "./composition/CompositionPage";
-import { PatternPage } from "./composition/PatternPage";
-import { COMPOSITION_PATTERNS, type CompositionPattern } from "./composition/patterns";
 import ColorsPage from "./foundation/ColorsPage";
 import ElevationPage from "./foundation/ElevationPage";
 import FocusPage from "./foundation/FocusPage";
@@ -20,22 +18,15 @@ import TypographyPage from "./foundation/TypographyPage";
 import {
   Blocks,
   BookOpen,
-  CircleDashed,
-  FileText,
   Focus,
   Gauge,
   type Glyph,
   Layers,
-  LayoutDashboard,
-  LayoutTemplate,
   Palette,
-  PanelRightOpen,
   Ruler,
-  Settings,
   Shapes,
   Space,
   SquareRoundCorner,
-  Table,
   Type,
 } from "./icons";
 import IntroPage from "./pages/IntroPage";
@@ -43,7 +34,7 @@ import IntroPage from "./pages/IntroPage";
 /**
  * Playground pages: the single source for routes, sidebar navigation and the ⌘K search index.
  * Component pages come from `sections/*Section.tsx` (each a `ComponentPageConfig` with its category
- * and nav entry); foundation and composition pages are listed here.
+ * and nav entry); foundation pages (with the composition principles) are listed here.
  */
 type PageBase = {
   segment: string;
@@ -132,33 +123,6 @@ const FOUNDATION_PAGES: PageDef[] = [
     icon: Focus,
     Page: FocusPage,
   },
-];
-
-const PATTERN_ICONS: Record<string, Glyph> = {
-  "list-page": Table,
-  "detail-page": FileText,
-  "settings-page": Settings,
-  "form-drawer": PanelRightOpen,
-  dashboard: LayoutDashboard,
-  "screen-states": CircleDashed,
-};
-
-/** A composition page: the pattern file is the source, `patterns.ts` adds the page text. */
-function patternPage(pattern: CompositionPattern): PageDef {
-  function Page() {
-    return <PatternPage pattern={pattern} />;
-  }
-  return {
-    segment: pattern.segment,
-    label: pattern.label,
-    description: pattern.title,
-    keywords: pattern.keywords,
-    icon: PATTERN_ICONS[pattern.file] ?? LayoutTemplate,
-    Page,
-  };
-}
-
-const COMPOSITION_PAGES: PageDef[] = [
   {
     segment: "composition",
     label: "Principles",
@@ -167,7 +131,6 @@ const COMPOSITION_PAGES: PageDef[] = [
     icon: Blocks,
     Page: CompositionPage,
   },
-  ...COMPOSITION_PATTERNS.map(patternPage),
 ];
 
 const SECTIONS = Object.values(
@@ -192,7 +155,6 @@ function componentPages(category: PlaygroundCategoryId): PageDef[] {
 
 const LISTED_PAGES: Partial<Record<PlaygroundCategoryId, PageDef[]>> = {
   foundations: FOUNDATION_PAGES,
-  composition: COMPOSITION_PAGES,
 };
 
 export type PlaygroundPageEntry = PageDef & {

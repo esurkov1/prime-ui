@@ -142,6 +142,7 @@ No `labels`.
 | [contained.tsx](examples/contained.tsx) | A shell without navigation whose main column is centred and capped for long reads — `contentWidth`. |
 | [footer.tsx](examples/footer.tsx) | A phone app without a Sidebar: the bar in the footer stays at the bottom while main scrolls under it — `AppShell.Footer`. |
 | [template.tsx](examples/template.tsx) | Root, nav, header and main in one component; main scrolls back to the top whenever the page changes — `AppShell.Template` with `scrollResetKey`. |
+| [screen.tsx](examples/screen.tsx) | The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone, the AppHeader with the menu button, the title and search that opens the CommandMenu, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`. |
 
 ## Mistakes
 - Adding padding around the page content → Main already has the gutters.

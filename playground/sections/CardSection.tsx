@@ -62,6 +62,11 @@ export const page: ComponentPageConfig = {
       description:
         "Карточка — контейнер размера: split складывает ячейки уже 22rem, а значение тренда уменьшается уже 20rem — `variant`.",
     },
+    {
+      slot: "screen",
+      description:
+        "Дашборд: переключатель периода, ряд KPI, который перетекает к новому периоду, тренд выручки, график счетов в ChartFrame, панели с прогрессом и короткая таблица со ссылкой на весь список — `variant`.",
+    },
   ],
   api,
   accessibility: {

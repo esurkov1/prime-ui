@@ -42,6 +42,11 @@ export const page: ComponentPageConfig = {
       description:
         "Root, навигация, шапка и main одним компонентом; main прокручивается наверх при каждой смене страницы — `AppShell.Template` со `scrollResetKey`.",
     },
+    {
+      slot: "screen",
+      description:
+        "Каркас приложения для компьютера и телефона: боковая панель на широком экране, нижняя панель разделов на телефоне, шапка с поиском и страница, которая сменяется вместе с разделом — `fillViewport`, `scrollResetKey`.",
+    },
   ],
   api,
   accessibility: {

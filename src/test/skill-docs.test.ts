@@ -132,7 +132,7 @@ describe("SKILL links", () => {
     const text = read("llms.txt");
     expect(text).toMatch(/^# prime-ui-kit\n\n> /);
     const urls = [...text.matchAll(/\]\((https:[^)\s]+)\)/g)].map((m) => m[1]);
-    const files = urls.map((url) => url.match(GITHUB)?.[1]);
+    const files = urls.map((url) => url.match(GITHUB)?.[1].split("#")[0]);
     expect(files.filter((file) => file === undefined).length, "non-repository link").toBe(0);
     const missing = files.filter((file) => file && !fs.existsSync(path.join(root, file)));
     expect(missing).toEqual([]);
@@ -142,7 +142,6 @@ describe("SKILL links", () => {
       "SKILL/components.md",
       "SKILL/choosing.md",
       "SKILL/composition.md",
-      "SKILL/patterns",
       "docs/foundation.md",
     ]) {
       expect(files, required).toContain(required);

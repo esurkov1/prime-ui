@@ -4,8 +4,8 @@ Index of every kit component, grouped like the playground menu — by the task t
 categories as [choosing.md](choosing.md)). Each row links to the full reference
 (`COMPONENT.md`: API, variants, states, a11y, mistakes) and to copyable scenarios (`examples/`).
 Paths are relative to this folder in the kit repository; in a consumer project prefix them with
-`node_modules/prime-ui-kit/` instead of `../`. Whole screens built from these components are in
-[composition.md](composition.md) and [patterns/](patterns/).
+`node_modules/prime-ui-kit/` instead of `../`. Whole screens built from these components are the `screen.tsx` example of
+their main component, indexed in [composition.md](composition.md#screens).
 
 ## Actions (`actions`)
 
@@ -135,7 +135,7 @@ Floating layers above the page, from tooltip to modal.
 
 ## Page (`page`)
 
-The frame and structure of a screen: app shell, app header, page column, page panel, separators, scroll regions.
+The frame and structure of a screen: app shell, app header, page column, page panel, separators, scroll regions, and ready-made screen blocks (sign-in).
 
 | Component | Purpose | Docs |
 |---|---|---|
@@ -145,6 +145,7 @@ The frame and structure of a screen: app shell, app header, page column, page pa
 | PageToolbar | The panel at the top of a page — search and filter, sections, view options and the primary action — laid out from its own width: one row when wide, stacked rows when narrow, the active filters right under the search. | [COMPONENT.md](../src/components/page-toolbar/COMPONENT.md) · [examples](../src/components/page-toolbar/examples/) |
 | Divider | A hairline separator inside one surface, horizontal or vertical, with or without a label. | [COMPONENT.md](../src/components/divider/COMPONENT.md) · [examples](../src/components/divider/examples/) |
 | ScrollContainer | The kit's one scroll region: a thin scrollbar or none (`scrollbar="hidden"`), soft edges where content is hidden (`edges` fade / shadow), `snap`, `lock`, correct shrinking inside flex and grid parents; pinned to the end for chats (`anchor="end"`), edge events for loading more (`onReachStart` / `onReachEnd`). | [COMPONENT.md](../src/components/scroll-container/COMPONENT.md) · [examples](../src/components/scroll-container/examples/) |
+| LoginForm | A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation. | [COMPONENT.md](../src/components/login-form/COMPONENT.md) · [examples](../src/components/login-form/examples/) |
 
 ## Interaction (`interaction`)
 
@@ -153,14 +154,6 @@ Direct manipulation: drag and drop (Kanban builds a board on it).
 | Component | Purpose | Docs |
 |---|---|---|
 | Dnd | Pointer-driven drag and drop: reorderable lists, draggable items and drop zones, with touch and keyboard support. | [COMPONENT.md](../src/components/dnd/COMPONENT.md) · [examples](../src/components/dnd/examples/) |
-
-## Composition (`composition`)
-
-Ready-made screen blocks; whole screens are in [composition.md](composition.md) and [patterns/](patterns/).
-
-| Component | Purpose | Docs |
-|---|---|---|
-| LoginForm | A sign-in card with a logo, title, provider buttons and a form; covers sign-in, sign-up, password reset and code confirmation. | [COMPONENT.md](../src/components/login-form/COMPONENT.md) · [examples](../src/components/login-form/examples/) |
 
 ## Foundations (`foundations`)
 

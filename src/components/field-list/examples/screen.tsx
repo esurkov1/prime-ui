@@ -1,4 +1,4 @@
-/** A record editor: a plan's name, its specs, selling points and prices in one form — repeating records as FieldList rows with the headings once, a base price pinned above its changes, one value in three currencies in one row. */
+/** A record editor: a plan's name, its specs and prices in one form saved from the page header — repeating records as FieldList rows with the headings once, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. */
 import {
   Button,
   Card,
@@ -15,7 +15,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./record-editor.module.css";
+import styles from "./screen.module.css";
 
 type Spec = {
   id: string;
@@ -25,7 +25,6 @@ type Spec = {
   color: string;
   pinned?: boolean;
 };
-type Point = { id: string; text: string };
 type Period = { id: string; from: string; price: string; base?: boolean };
 
 const SPEC_COLUMNS: FieldListColumn[] = [
@@ -73,14 +72,6 @@ const SPECS: Spec[] = [
   { id: "sso", icon: "object.key", name: "Вход через SSO", value: "SAML, OIDC", color: "#14b8a6" },
 ];
 
-const POINT_COLUMNS: FieldListColumn[] = [{ label: "Преимущество" }];
-
-const POINTS: Point[] = [
-  { id: "space", text: "Вся команда в одном пространстве" },
-  { id: "files", text: "Документы и вложения без ограничений по типу" },
-  { id: "api", text: "API и вебхуки для своих интеграций" },
-];
-
 const PRICE_COLUMNS: FieldListColumn[] = [{ label: "Действует" }, { label: "Цена", width: "m" }];
 
 const MONTHS = [
@@ -104,10 +95,9 @@ const SETUP_FEE = [
 const SAVE_MS = 900;
 const SAVED_MS = 2000;
 
-export default function RecordEditorPattern() {
+export default function FieldListScreenExample() {
   const formId = React.useId();
   const [specs, setSpecs] = React.useState(SPECS);
-  const [points, setPoints] = React.useState(POINTS);
   const [periods, setPeriods] = React.useState(PERIODS);
   const [nameError, setNameError] = React.useState<string>();
   const [saving, setSaving] = React.useState(false);
@@ -236,36 +226,6 @@ export default function RecordEditorPattern() {
                       <ColorPresets.Content />
                     </ColorPresets.Root>
                   </>
-                )}
-              />
-            </Card.Body>
-          </Card.Root>
-        </PageContent.Section>
-
-        <PageContent.Section layout="aside" label="Преимущества">
-          <Card.Root variant="panel">
-            <Card.Body>
-              <FieldList
-                aria-label="Преимущества"
-                disabled={saving}
-                columns={POINT_COLUMNS}
-                reorderable
-                max={6}
-                value={points}
-                onValueChange={setPoints}
-                getId={(point) => point.id}
-                getLabel={(point) => point.text}
-                createItem={() => ({ id: crypto.randomUUID(), text: "" })}
-                addLabel="Добавить преимущество"
-                renderItem={(point, row) => (
-                  <Input.Root>
-                    <Input.Wrapper>
-                      <Input.Field
-                        value={point.text}
-                        onChange={(event) => row.update({ text: event.target.value })}
-                      />
-                    </Input.Wrapper>
-                  </Input.Root>
                 )}
               />
             </Card.Body>

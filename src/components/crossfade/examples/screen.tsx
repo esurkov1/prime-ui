@@ -1,4 +1,4 @@
-/** Screen states: a page-level error in a Banner with a retry, a region loading with a Skeleton of its rows and a table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states. */
+/** Screen states: a page-level error in a Banner with a retry, a region loading with a Skeleton of its rows and a table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states — `state`. */
 import {
   Banner,
   Button,
@@ -15,7 +15,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./screen-states.module.css";
+import styles from "./screen.module.css";
 
 type Status = "error" | "loading" | "ready";
 type Payment = { id: string; payer: string; purpose: string; amount: number };
@@ -49,7 +49,7 @@ const COLUMNS: DataTableColumn<Payment>[] = [
   },
 ];
 
-export default function ScreenStatesPattern() {
+export default function CrossfadeScreenExample() {
   const { notify } = useNotifications();
   const [status, setStatus] = React.useState<Status>("error");
 

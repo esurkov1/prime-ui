@@ -10,7 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(rootDir, "src"),
-      // Composition patterns (SKILL/patterns) import the kit by its package name; subpath first.
+      // Examples import the kit by its package name; subpath first.
       "prime-ui-kit/color-picker": path.resolve(rootDir, "src/color-picker.ts"),
       "prime-ui-kit/icons": path.resolve(rootDir, "src/icon-set.ts"),
       "prime-ui-kit": path.resolve(rootDir, "src/index.ts"),
@@ -20,7 +20,7 @@ export default defineConfig({
     /** Heavy jsdom and many files: without a cap, machines with many CPUs sometimes fail to start
      * workers in time ("Timeout waiting for worker to respond") and single tests hit testTimeout. */
     maxWorkers: 4,
-    /** A whole screen (the chat pattern, the chat example) mounts in seconds on a 2-CPU CI runner. */
+    /** A whole screen (the chat screen) mounts in seconds on a 2-CPU CI runner. */
     testTimeout: 15_000,
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],

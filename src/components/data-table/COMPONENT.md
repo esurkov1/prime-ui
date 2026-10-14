@@ -348,6 +348,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | [states.tsx](examples/states.tsx) | Loading skeleton, an empty period and a load error with a retry: the head stays, only the body changes — `loading`, `loadingRows`, `empty`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | Sort and page owned by the parent (a URL or a store): a header click goes asc → desc → none, a new sort returns to page 1 — `sort`, `onSortChange`, `page`, `onPageChange`. |
 | [narrow.tsx](examples/narrow.tsx) | A 320 px support queue: columns scroll inside the table with the first one pinned, the toolbar and footer reflow and the pager turns compact — `stickyFirstColumn`, `size`. |
+| [screen.tsx](examples/screen.tsx) | A list page: header with one primary action, SmartFilter in the table toolbar, DataTable with statuses, row actions, pages and a filtered empty state — `toolbar`, `empty`, `stickyFirstColumn`. |
 
 ## Mistakes
 - No `getRowKey` with `selectable`, expansion or sorting → selection follows positions, not records.

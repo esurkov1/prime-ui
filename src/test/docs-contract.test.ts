@@ -2,12 +2,15 @@
  * Docs contract: every exported component ships a COMPONENT.md and examples/ that stay in sync
  * with the playground and import the kit only by its package name, and follow the page standard
  * (`playground/pageStandard.ts`): kind, slots, order, the example file canon and the COMPONENT.md
- * template.
+ * template. A `screen` example (a whole page) keeps the same canon with its own `screen.module.css`
+ * and renders a page with one h1.
  */
 import fs from "node:fs";
 import path from "node:path";
 
+import { render, screen } from "@testing-library/react";
 import * as lucide from "lucide-react";
+import * as React from "react";
 import * as iconSet from "@/icon-set";
 import { iconRegistry } from "@/icons/registry";
 import type { ComponentPageConfig } from "../../playground/components/ComponentPage";
@@ -22,6 +25,7 @@ import {
   slotOrder,
 } from "../../playground/pageStandard";
 import { applyApiToDoc, type ComponentApi } from "../../scripts/docs/componentApi";
+import { NotificationProvider } from "../components/notification/NotificationStore";
 import {
   checkLayoutCss,
   checkSourceCanon,
@@ -77,7 +81,7 @@ const ACCESSIBILITY_HEADINGS = ["### Keyboard", "### ARIA", "### Labels"];
 const dirs = exportedDirs();
 
 /**
- * Lucide glyphs examples and patterns may still import directly: domain glyphs the kit registry
+ * Lucide glyphs examples may still import directly: domain glyphs the kit registry
  * does not carry. Every entry needs a reason; a glyph the registry has never belongs here.
  */
 const DOMAIN_GLYPHS: Record<string, string> = {};
@@ -108,6 +112,15 @@ const lucideImports = (source: string) =>
   );
 
 const apiModules = import.meta.glob<{ api: ComponentApi }>("../{components,layout}/*/api.ts");
+
+/** The `screen` example of every component that has one: a whole page. */
+const screenModules = import.meta.glob<{ default: React.ComponentType }>(
+  "../{components,layout}/*/examples/screen.tsx",
+);
+
+/** The one CSS module an example may import: a screen lays a whole page out in its own. */
+const exampleCss = (stem: string) =>
+  stem === "screen" ? "./screen.module.css" : "./examples.module.css";
 
 /** H2 section `## <title>` of a markdown document, without the heading line. */
 function docSection(doc: string, title: string): string {
@@ -161,7 +174,7 @@ describe("docs contract", () => {
       checkSourceCanon(
         file,
         source,
-        (spec) => ALLOWED_IMPORTS.test(spec) || spec === "./examples.module.css",
+        (spec) => ALLOWED_IMPORTS.test(spec) || spec === exampleCss(stem),
       );
       expect(source.match(/^export default function \w+Example\(/gm)?.length).toBe(1);
       expect(source, `${file}: function name`).toMatch(
@@ -170,7 +183,20 @@ describe("docs contract", () => {
     });
 
     it("example styles use semantic tokens only", () => {
-      for (const file of walk(`${rel}/examples`, /\.css$/)) checkLayoutCss(file, read(file));
+      for (const file of walk(`${rel}/examples`, /\.css$/)) {
+        // A screen lays out a page on the panel: surfaces and text color come from the kit.
+        const forbidden = file.endsWith("/screen.module.css")
+          ? ["color", "background(-color)?"]
+          : [];
+        checkLayoutCss(file, read(file), forbidden);
+      }
+    });
+
+    const screenModule = screenModules[`../${base}/${dir}/examples/screen.tsx`];
+    it.runIf(screenModule)("the screen renders a page with one h1", async () => {
+      const { default: Screen } = await screenModule();
+      render(React.createElement(NotificationProvider, null, React.createElement(Screen)));
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     });
 
     describe("page standard", () => {
@@ -318,7 +344,7 @@ describe("docs contract", () => {
 describe("kit icons first", () => {
   const byGlyph = registryNamesByGlyph();
   const glyphs = lucide as unknown as Record<string, unknown>;
-  /** Examples, composition patterns and the code in SKILL docs: everything a consumer copies. */
+  /** Examples (screens included) and the code in SKILL docs: everything a consumer copies. */
   const sources = [
     ...dirs.flatMap(({ rel }) => walk(`${rel}/examples`, /\.tsx$/)),
     ...walk("SKILL", /\.(tsx|md)$/),

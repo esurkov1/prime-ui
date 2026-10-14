@@ -1,4 +1,4 @@
-/** A create form in a Drawer: grouped fields, errors on submit with focus on the first invalid field, a loading submit, a toast and the new row in the list. */
+/** A create form in a Drawer: grouped fields, errors on submit with focus on the first invalid field, a loading submit, a toast and the new row in the list — `Drawer.Guard`, `busy`, `dirty`. */
 import {
   Badge,
   Button,
@@ -17,7 +17,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./form-drawer.module.css";
+import styles from "./screen.module.css";
 
 type Client = { id: string; name: string; kind: "company" | "person"; manager: string };
 type Errors = Partial<Record<"name" | "inn" | "email", string>>;
@@ -57,7 +57,7 @@ function validate(data: FormData): Errors {
   return errors;
 }
 
-export default function FormDrawerPattern() {
+export default function DrawerScreenExample() {
   const { notify } = useNotifications();
   const formId = React.useId();
   const [clients, setClients] = React.useState(CLIENTS);

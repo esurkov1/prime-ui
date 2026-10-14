@@ -1,4 +1,4 @@
-/** The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone, the AppHeader with the menu button, the title and search that opens the CommandMenu, and a simple home page that swaps with the current section. */
+/** The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone, the AppHeader with the menu button, the title and search that opens the CommandMenu, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`. */
 import {
   AppHeader,
   AppShell,
@@ -15,7 +15,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./app-shell.module.css";
+import styles from "./screen.module.css";
 
 type SectionId = "today" | "deals" | "clients" | "tasks" | "reports" | "settings";
 type Section = { id: SectionId; label: string; icon: IconName };
@@ -93,7 +93,7 @@ const PAGES: Record<Exclude<SectionId, "today">, { description: string; rows: Ro
 
 const isMore = (id: SectionId) => MORE.some((section) => section.id === id);
 
-export default function AppShellPattern() {
+export default function AppShellScreenExample() {
   const [current, setCurrent] = React.useState<SectionId>("today");
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);

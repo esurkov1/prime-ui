@@ -1,0 +1,14 @@
+/* Schedule: a work screen — the header carries the title and the tools, the page fills the app
+   panel (`AppShell.Root fillViewport` + `PageContent.Root fill`) and the chart takes the free
+   height. */
+
+/* On a short screen the chart keeps room for a few rows; the page scrolls instead. */
+.chart {
+  min-height: calc(var(--prime-space-24) * 3);
+}
+
+/* First column: the name over the role. */
+.person {
+  display: grid;
+  min-width: 0;
+}

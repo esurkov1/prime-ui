@@ -7,8 +7,8 @@ and `PageContent` spaces the page — blocks 24, a titled `PageContent.Section` 
 Main's top space under the header is part of the frame — 24, then 32 from 1024px: a page header starts
 there; never cancel it with a negative margin or a padding override.
 
-The page recipes are whole, working screens in [patterns/](patterns/) — start from the closest one
-([the list](composition.md#patterns)) and keep its skeleton. The rules behind them are in [composition.md](composition.md).
+The page recipes are whole, working screens — the `screen.tsx` example of their main component
+([the list](composition.md#screens)): start from the closest one and keep its skeleton. The rules behind them are in [composition.md](composition.md).
 
 ## App frame (once per app)
 
@@ -102,7 +102,7 @@ Next.js App Router: the package is marked `"use client"`, but a server component
 layout and put `data-theme` on `<html>` there.
 
 A nested record page keeps its `Breadcrumb` at the top of `PageContent.Header`, above the title
-([patterns/detail-page.tsx](patterns/detail-page.tsx)) — not in `AppHeader`. `AppHeader.Actions` holds at most notifications, the account and one primary action; page
+([the detail page](../src/components/description-list/examples/screen.tsx)) — not in `AppHeader`. `AppHeader.Actions` holds at most notifications, the account and one primary action; page
 actions stay in `PageContent.Actions`. With `offCanvas="always"` pass `show="always"` to the menu button.
 
 ### The page title in the header
@@ -183,7 +183,7 @@ from what people do, not from how the backend is split. The full guide with the 
 
 - App pages with actions (dashboard, list, detail): `PageContent.Page` — the full width of the panel.
 - Settings and long forms: `PageContent.Root maxWidth="wide"` with a `PageContent.Section layout="aside"`
-  (heading column + panel) per section ([patterns/settings-page.tsx](patterns/settings-page.tsx)), or `maxWidth="readable"` for a single
+  (heading column + panel) per section ([the settings page](../src/components/page-content/examples/screen.tsx)), or `maxWidth="readable"` for a single
   narrow column of fields.
 - Long reading text (terms, help): `PageContent.Root maxWidth="readable"`.
 - A page as high as the panel (a log, a board, a chat): `AppShell.Root fillViewport` +
@@ -196,9 +196,9 @@ from what people do, not from how the backend is split. The full guide with the 
   (`anchor="end"` for a thread). The records in the list pane are a `List` (`current` on the open
   one). Details that open over a table and close again are a Drawer instead.
 
-## Which pattern to start from
+## Which screen to start from
 
-The table of screens and their patterns lives in [composition.md](composition.md#patterns).
+The table of screens lives in [composition.md](composition.md#screens).
 
 A short form (≤ 4 fields: rename, invite, confirm with a reason) belongs in a `Modal` with the same
 form rules: `Modal.Body` holds the `<form id>`, `Modal.Footer` holds Cancel + submit with `form={id}`

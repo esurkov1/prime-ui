@@ -148,6 +148,7 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | [states.tsx](examples/states.tsx) | The same list editable and disabled while the request saves it: fields, handles and buttons turn off together — `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the lines: it sums them under the list and puts the saved lines back on reset — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | The invoice lines in a 320 px column: the headings give way, each row stacks its fields with their own labels and rows stand a group apart — `columns`. |
+| [screen.tsx](examples/screen.tsx) | A record editor: a plan's name, its specs and prices in one form saved from the page header — repeating records as FieldList rows with the headings once, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. |
 
 ## Mistakes
 - A `label` above every field of every row («Иконка», «Параметр», «Значение» four times) → a FieldList: the headings stand once, the fields take them as hidden labels.

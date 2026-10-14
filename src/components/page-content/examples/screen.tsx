@@ -1,4 +1,4 @@
-/** A settings page: sections with a heading column and a panel, a form saved by its own button, switches that apply at once and a danger zone with a confirm. */
+/** A settings page: sections with a heading column and a panel, a form saved by its own button, switches that apply at once and a danger zone with a confirm — `layout`, `maxWidth`. */
 import {
   Button,
   Card,
@@ -13,7 +13,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./settings-page.module.css";
+import styles from "./screen.module.css";
 
 const TIMEZONES = [
   { value: "Europe/Kaliningrad", label: "Калининград (UTC+2)" },
@@ -45,7 +45,7 @@ const ALERTS = [
   },
 ];
 
-export default function SettingsPagePattern() {
+export default function PageContentScreenExample() {
   const [innError, setInnError] = React.useState<string>();
   const [saving, setSaving] = React.useState(false);
   const [saved, setSaved] = React.useState(false);

@@ -14,7 +14,7 @@ Read the cheatsheet first, then the skill entry point. Never guess a prop: if a 
 - [Components index](https://github.com/esurkov1/prime-ui/blob/main/SKILL/components.md): every component by category, with links to its COMPONENT.md and examples
 - [Choosing a component](https://github.com/esurkov1/prime-ui/blob/main/SKILL/choosing.md): category by task, then the component, then pairs that are easy to confuse
 - [Composition](https://github.com/esurkov1/prime-ui/blob/main/SKILL/composition.md): page skeleton, spacing rhythm, hierarchy, surfaces, actions, forms, tables, feedback, overlays, narrow screens, what to do when the kit lacks a component
-- [Screen patterns](https://github.com/esurkov1/prime-ui/tree/main/SKILL/patterns): whole working pages to start from — list, detail, settings, form in a Drawer, dashboard, loading / empty / error states, messenger, a sales pipeline board, the app frame for desktop and phone, a media library, a resource schedule, a record editor with repeating rows
+- [Screens](https://github.com/esurkov1/prime-ui/blob/main/SKILL/composition.md#screens): whole working pages to start from, each the `examples/screen.tsx` of its main component — list, detail, settings, form in a Drawer, dashboard, loading / empty / error states, messenger, a sales pipeline board, the app frame for desktop and phone, a media library, a resource schedule, a record editor with repeating rows
 - [Layouts](https://github.com/esurkov1/prime-ui/blob/main/SKILL/layouts.md): the app frame (AppShell + Sidebar, once per app), page wrappers, auth screens
 
 ## Rules

@@ -1,4 +1,4 @@
-/** A dashboard: the period switch in the header, a KPI row that cross-fades to the new period, a revenue trend to scrub, invoiced against paid in a ChartFrame with a legend, panels with plan progress and the receivables split, and a short table with a link to the full list. */
+/** A dashboard: the period switch in the header, a KPI row that cross-fades to the new period, a revenue trend to scrub, invoiced against paid in a ChartFrame with a legend, panels with plan progress and the receivables split, and a short table with a link to the full list — `variant`. */
 import {
   Badge,
   Button,
@@ -21,7 +21,7 @@ import {
 } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./dashboard.module.css";
+import styles from "./screen.module.css";
 
 type Period = "week" | "month" | "quarter";
 type Payment = { id: string; client: string; date: string; amount: number; late: boolean };
@@ -152,7 +152,7 @@ const COLUMNS: DataTableColumn<Payment>[] = [
   },
 ];
 
-export default function DashboardPattern() {
+export default function CardScreenExample() {
   const [period, setPeriod] = React.useState<Period>("month");
 
   return (

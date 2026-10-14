@@ -228,6 +228,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry and cross-fades the cards in; an empty column keeps its drop area; a read-only board drags nothing — `loading`, `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The placement lives in the parent: every move arrives with its source, target and position to save, and a button resets the board — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen a column takes 85% of the board and snaps into place, so the next one peeks; the strip scrolls inside the board, never the page. |
+| [screen.tsx](examples/screen.tsx) | A sales pipeline as a work screen: the title, search, filter, the board / list switch and the one primary action in the app header, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemClick`. |
 
 ## Mistakes
 - Returning something other than `Kanban.Item` from `renderItem` → the card does not drag and Alt + arrows do nothing.

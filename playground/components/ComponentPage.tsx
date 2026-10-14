@@ -10,6 +10,7 @@ import { DocBlock, DocList, DocPage, DocTable } from "./Doc";
 import { PlaygroundApiTable, renderInlineCode } from "./PlaygroundApiTable";
 import { DemoApiTitle, DemoDescription } from "./PlaygroundDemoTypography";
 import { PlaygroundSourceFrame } from "./PlaygroundExampleFrame";
+import { screenStage } from "./ScreenStage";
 
 /** A cross-cutting slot: file `<slot>.tsx`, title from the vocabulary. */
 export type SlotExample = { slot: SlotId; description: string };
@@ -108,11 +109,13 @@ const LABEL_COLUMNS: DataTableColumn<ApiLabel>[] = [
 ];
 
 function ExampleBlock({ page, example }: { page: ComponentPageConfig; example: ComponentExample }) {
+  const slot = "slot" in example ? example.slot : null;
   return (
     <DocBlock title={exampleTitle(example)} description={renderInlineCode(example.description)}>
       <PlaygroundSourceFrame
         entry={getExample(page.base ?? "components", page.dir, exampleFile(example))}
-        previewLayout={slotLayout(page.kind, "slot" in example ? example.slot : null)}
+        previewLayout={slotLayout(page.kind, slot)}
+        stage={slot === "screen" ? screenStage : undefined}
       />
     </DocBlock>
   );
