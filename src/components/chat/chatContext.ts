@@ -42,8 +42,8 @@ export type ChatContextValue = {
   /** The current match, counted from the newest (`0` — the newest). */
   matchIndex: number;
   setMatchIndex: (index: number) => void;
-  /** The message the list brings into view: the current match while searching, else `current`. */
-  current: string | null;
+  /** The message the list jumps to: the current match while searching, else `jumpTo`. */
+  jumpTo: string | null;
   /** The other side types. */
   typing: boolean;
   /** Brings a message into view and blinks it (a pinned message's press). */

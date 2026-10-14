@@ -1,6 +1,5 @@
 [
   "src/components/card/Card.module.css: sets --avatar-ring, private to src/components/avatar/Avatar.module.css",
-  "src/components/composer/Composer.module.css: sets --ring-stroke, private to src/internal/ring.module.css",
   "src/components/drawer/Drawer.module.css: sets --dialog-padding, private to src/components/modal/DialogParts.module.css",
   "src/components/kanban/Kanban.module.css: :global(html)",
   "src/components/list/List.module.css: sets --avatar-slot-size, private to src/components/avatar/Avatar.module.css",

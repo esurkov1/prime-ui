@@ -231,11 +231,11 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | `…rest` | `Omit<DropdownContentProps, "side" \| "align" \| "matchTriggerWidth">` | — | `children` (the items), `className`. |
 
 ### Message.Typing
-`ref` → `HTMLDivElement` (`role="status"`). «Печатает…»: an incoming bubble of three dots at the end of the list while the other side types (`Chat.Root typing` puts it there). Keep it mounted and switch `active`.
+`ref` → `HTMLDivElement` (`role="status"`). «Печатает…»: an incoming bubble of three dots at the end of the list while the other side types (`Chat.Root typing` puts it there). Keep it mounted and switch `open`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `active` | `boolean` | `true` | The other side is typing. Keep the part mounted and switch this, so it can leave smoothly. |
+| `open` | `boolean` | `true` | The bubble is open: the other side is typing. Keep the part mounted and switch this, so it folds open and closed. |
 | `children` | `ReactNode` | — | `Message.Avatar` of who types, in a group chat (`Chat.Messages type="group"`). |
 | `labels` | `Partial<MessageTypingLabels>` | — | `typing` — the text read for assistive tech. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
@@ -294,7 +294,7 @@ The fill moves between the two in a color transition (`fast`, both ways); the av
 | `edited` | «изменено» before the time |
 | `Message.Location live` | a breathing pin and a «Трансляция» badge |
 | `Message.Text plain` | a string without Markdown |
-| `Message.Typing active` | the typing bubble shows; off, it leaves closing its height |
+| `Message.Typing open` | the typing bubble shows; off, it leaves closing its height |
 
 The list-level settings a message reads — the group chat's author header and avatar gutter (`type`), the quick reaction, the reaction bar's options, the reader — are props of `Chat.Messages`.
 
@@ -306,7 +306,7 @@ The list-level settings a message reads — the group chat's author header and a
 | new at the end | the chat's list decided it (`data-enter="incoming"` / `"outgoing"`) | the message column floats up `--prime-space-3` from below and fades in (`fast`, enter easing, `transform` + `opacity` only; the row box clips it); never on a first render, history or a status change. See Chat |
 | pointed at / stepping back | the chat's jump, search or selection (`data-pointed`, `data-selected` on the message; `data-pointing`, `data-selecting` on the list) | nothing is drawn on the message: it stays at full strength while the others — the bubble, picture or circle with its tail and reactions, the avatar, the retry — step back to `--prime-message-dim-opacity` with a slight desaturation (selection: `fast`, both ways; the current search match: while it is current); a jump instead blinks the message itself three times, `base` each, the others stay still. Reduced motion: no blink |
 | search match | the chat's search query | every case-insensitive match in `Message.Text` and the transcripts under a soft accent wash (`<mark>`) |
-| typing | `Message.Typing active` | an incoming bubble of three dots rising and fading in turn on the loading loop (reduced motion slows it); enters floating up while its height opens (`fast`), leaves closing its height (`fast`) — or at once when a reply arrives at the end of the list in the same update; its block axis clips, so a closed row leaves nothing under the list |
+| typing | `Message.Typing open` | an incoming bubble of three dots rising and fading in turn on the loading loop (reduced motion slows it); enters floating up while its height opens (`fast`), leaves closing its height (`fast`) — or at once when a reply arrives at the end of the list in the same update; its block axis clips, so a closed row leaves nothing under the list |
 | status change | `status` | the ticks cross-fade and scale (`base`, `emphasized`), interruptible |
 | retrying | `onRetry` returns a promise | `sending` ticks and a `loading` retry button until it settles |
 | inline keyboard | `Message.Actions` children | `data-actions` on the message column: the rows under the bubble, the bubble at least as wide as them, no tail |
@@ -474,7 +474,7 @@ The list-level settings a message reads — the group chat's author header and a
 | [structure.tsx](examples/structure.tsx) | Optional parts of a bubble in their order: the author, a forwarded header, a reply quote, the text and reactions — `Message.Author`, `Message.Forwarded`, `Message.Reply`, `Message.Reactions`. |
 | [kinds.tsx](examples/kinds.tsx) | Every kind of message in its shell, both directions, single and in runs: text bubbles, pictures and circles as blocks, a caption bubble, voice, file, contact, place and link cards, reactions inside a bubble and under a picture — `Message.Media`, `VideoNote`, `Message.File`, `Message.Contact`, `Message.Location`, `Message.LinkPreview`, `VoicePlayer`. |
 | [author.tsx](examples/author.tsx) | A group chat's run of one author: the first message opens with the name in the author's hue, a crown and the member's tag, the last one shows the avatar in the gutter; another author with initials only, a long name that ellipsizes before its tag, a header on a pill over a photo, and your own reply — `Message.Author`, `tag`, `Message.AuthorIcon`, `Message.Avatar`, `position`, `hueOf`. |
-| [typing.tsx](examples/typing.tsx) | The typing signal: an incoming bubble of three dots that enters like a message and leaves closing its height; switch it, keep it mounted — `Message.Typing`, `active`. |
+| [typing.tsx](examples/typing.tsx) | The typing signal: an incoming bubble of three dots that enters like a message and leaves closing its height; switch it, keep it mounted — `Message.Typing`, `open`. |
 | [status.tsx](examples/status.tsx) | Delivery of outgoing messages: a clock while sending, one check when sent, two when read, and a failed one with a retry that resolves after a second; the time comes as a date and reads to the second — `status`, `onRetry`, `formatTime`. |
 | [text-formatting.tsx](examples/text-formatting.tsx) | The Markdown the Composer writes, rendered safely: bold, italic, strike, code, a code block, links and a quote; long words and URLs wrap; a pasted error log stays as typed, its stars and underscores kept — `Message.Text`, `edited`, `plain`. |
 | [reactions.tsx](examples/reactions.tsx) | Reactions under a message: each chip shows who reacted — up to three avatars, from four on two and «+N» — and a press on a chip, or a double tap on the message, puts or takes back your own at once while the request runs behind it — `Message.Reactions`, `users`, `onReactionToggle`. |
@@ -505,7 +505,7 @@ The list-level settings a message reads — the group chat's author header and a
 - A rounded wrapper or a backing of your own around `Message.Media` → the message shell rounds and clips it.
 - Measuring a bubble or animating its height yourself → the bubble fits its content in CSS and the kit owns every size change of a message.
 - A context menu on a hover-only «…» button → `Message.Menu`: right click, long press and the keyboard open it.
-- «печатает…» as a text row you add and remove → `<Message.Typing active={typing} />` kept mounted, or `Chat.Root typing`.
+- «печатает…» as a text row you add and remove → `<Message.Typing open={typing} />` kept mounted, or `Chat.Root typing`.
 - Pausing other players by hand → one sound at a time is built into `VoicePlayer`, `VideoNote` and chat videos.
 - A transcript as a separate `Message.Text`, or a height animation of your own around it → `transcript` / `onTranscribe` on `VoicePlayer` and `VideoNote`: the text opens inside the same message, in one stroke with its height.
 - A list, dates, search or selection built around messages → [Chat](../chat/COMPONENT.md).

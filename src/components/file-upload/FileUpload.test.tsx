@@ -193,6 +193,24 @@ describe("FileUpload", () => {
     expect(onFilesChange).toHaveBeenLastCalledWith([scan]);
   });
 
+  it('trigger="none" draws nothing of its own: the hidden input is the picker of `picker.open`', () => {
+    const picker = React.createRef<FileUploadPicker>();
+    const onFilesChange = vi.fn();
+    const { container } = render(
+      <FileUpload.Root trigger="none" picker={picker} multiple onFilesChange={onFilesChange} />,
+    );
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(input).toHaveAttribute("tabindex", "-1");
+    expect(input).toHaveAttribute("aria-hidden", "true");
+    const click = vi.spyOn(input, "click");
+    act(() => picker.current?.open({ accept: "image/*" }));
+    expect(click).toHaveBeenCalledTimes(1);
+    const photo = new File(["x"], "склад.jpg", { type: "image/jpeg" });
+    fireEvent.change(input, { target: { files: [photo] } });
+    expect(onFilesChange).toHaveBeenLastCalledWith([photo]);
+  });
+
   it("picker.open() does nothing on a disabled field", () => {
     const picker = React.createRef<FileUploadPicker>();
     const { container } = render(<FileUpload.Root picker={picker} disabled />);

@@ -1,4 +1,4 @@
-/** On a phone-width chat the row keeps the paperclip, the field and the button; Enter makes a new line on touch screens and the button sends. */
+/** On a phone-width chat the row keeps the paperclip, the field and the button; Enter makes a new line on touch screens and the button sends — `Composer.Attach`, `onSend`. */
 import { Composer, useUploadQueue } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

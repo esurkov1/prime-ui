@@ -1,11 +1,6 @@
 [
   "src/components/avatar/Avatar.tsx: root default size = \"m\"",
   "src/components/chat-list/ChatList.tsx: root default size = \"m\"",
-  "src/components/chat/MessageList.tsx: biome-ignore useExhaustiveDependencies",
-  "src/components/chat/MessageList.tsx: biome-ignore useExhaustiveDependencies #2",
-  "src/components/chat/MessageList.tsx: biome-ignore useExhaustiveDependencies #3",
-  "src/components/composer/Composer.tsx: biome-ignore useExhaustiveDependencies",
-  "src/components/composer/Composer.tsx: local promise check",
   "src/components/confirm-dialog/ConfirmDialog.tsx: imports modal/DialogParts (not its main module or types.ts)",
   "src/components/confirm-dialog/ConfirmDialog.tsx: imports modal/ModalDialog (not its main module or types.ts)",
   "src/components/data-table/DataTable.tsx: biome-ignore useExhaustiveDependencies",

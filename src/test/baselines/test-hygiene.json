@@ -1,7 +1,5 @@
 [
   "src/components/chat-list/ChatList.virtual.test.tsx: queries [class*=",
-  "src/components/composer/Composer.test.tsx: queries [class*=",
-  "src/components/composer/Composer.test.tsx: reads a .module.css as text",
   "src/components/data-table/DataTable.test.tsx: reads a .module.css as text",
   "src/components/gantt/Gantt.test.tsx: queries [class*=",
   "src/components/list/List.test.tsx: reads a .module.css as text",

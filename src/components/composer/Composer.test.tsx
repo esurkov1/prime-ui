@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -7,12 +5,7 @@ import { Modal } from "@/components/modal/Modal";
 import { type UploadItem, useUploadQueue } from "@/hooks/useUploadQueue";
 import { DisabledProvider } from "@/internal/disabledContext";
 import { Composer, type ComposerQueue } from "./Composer";
-
-/** The shared tile's sheet: the strip is one row of fixed tiles. */
-const tileCss = readFileSync(
-  path.resolve(process.cwd(), "src/internal/attachmentTile.module.css"),
-  "utf8",
-);
+import styles from "./Composer.module.css";
 
 const field = () => screen.getByRole("textbox", { name: "Сообщение" });
 
@@ -85,7 +78,7 @@ describe("Composer.Root", () => {
     textarea.focus();
     fireEvent.change(textarea, { target: { value: "  Счёт отправлен  " } });
     fireEvent.keyDown(textarea, { key: "Enter" });
-    expect(onSend).toHaveBeenCalledWith({ text: "Счёт отправлен", media: [], files: [] });
+    expect(onSend).toHaveBeenCalledWith({ text: "Счёт отправлен", albums: [], files: [] });
     expect(textarea).toHaveValue("");
     expect(textarea).toHaveFocus();
   });
@@ -150,7 +143,7 @@ describe("Composer.Root", () => {
     const queue = fakeQueue([doneItem("akt.pdf")]);
     render(<Composer.Root onSend={onSend} queue={queue} />);
     fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
-    expect(onSend).toHaveBeenCalledWith({ text: "", media: [], files: queue.items });
+    expect(onSend).toHaveBeenCalledWith({ text: "", albums: [], files: queue.items });
     expect(queue.clear).toHaveBeenCalled();
   });
 
@@ -269,12 +262,12 @@ describe("Composer.Context", () => {
     await waitFor(() => expect(field()).toHaveFocus());
   });
 
-  it("a send carries the bar's value as replyTo / editOf and closes the bar", async () => {
+  it("a send carries the bar's message id as replyTo / editOf and closes the bar", async () => {
     const onSend = vi.fn();
     const onDismiss = vi.fn();
     const { rerender } = render(
       <Composer.Root onSend={onSend} defaultValue="Пришлю сегодня">
-        <Composer.Context value="m7" onDismiss={onDismiss}>
+        <Composer.Context messageId="m7" onDismiss={onDismiss}>
           <Composer.Title>Ответ Анне</Composer.Title>
         </Composer.Context>
       </Composer.Root>,
@@ -282,7 +275,7 @@ describe("Composer.Context", () => {
     fireEvent.keyDown(field(), { key: "Enter" });
     expect(onSend).toHaveBeenLastCalledWith({
       text: "Пришлю сегодня",
-      media: [],
+      albums: [],
       files: [],
       replyTo: "m7",
     });
@@ -292,7 +285,7 @@ describe("Composer.Context", () => {
     const slowSend = vi.fn(() => new Promise<void>((r) => (resolve = r)));
     rerender(
       <Composer.Root onSend={slowSend} defaultValue="">
-        <Composer.Context mode="edit" value="m9" onDismiss={onDismiss}>
+        <Composer.Context mode="edit" messageId="m9" onDismiss={onDismiss}>
           <Composer.Title>Редактирование</Composer.Title>
         </Composer.Context>
       </Composer.Root>,
@@ -301,7 +294,7 @@ describe("Composer.Context", () => {
     fireEvent.click(screen.getByRole("button", { name: "Сохранить" }));
     expect(slowSend).toHaveBeenLastCalledWith({
       text: "Акт к пятнице",
-      media: [],
+      albums: [],
       files: [],
       editOf: "m9",
     });
@@ -554,12 +547,14 @@ describe("attachments", () => {
     ]);
     fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
     const message = onSend.mock.calls[0]?.[0] as {
-      media: { id: string; type: string }[];
+      albums: { id: string; type: string }[][];
       files: UploadItem[];
     };
-    expect(message.media.map((item) => [item.id, item.type])).toEqual([
-      ["обзор.mp4", "video"],
-      ["склад.jpg", "image"],
+    expect(message.albums.map((album) => album.map((item) => [item.id, item.type]))).toEqual([
+      [
+        ["обзор.mp4", "video"],
+        ["склад.jpg", "image"],
+      ],
     ]);
     expect(message.files.map((item) => item.id)).toEqual(["счёт.pdf", "акт.pdf"]);
   });
@@ -610,7 +605,7 @@ describe("attachments", () => {
     vi.restoreAllMocks();
     expect(trayNames()).toEqual(["Фото 1: 2.jpg", "Фото 2: 1.jpg", "Фото 3: 3.jpg"]);
     fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
-    expect(onSend.mock.calls[0]?.[0].media.map((item: UploadItem) => item.id)).toEqual([
+    expect(onSend.mock.calls[0]?.[0].albums[0].map((item: UploadItem) => item.id)).toEqual([
       "2.jpg",
       "1.jpg",
       "3.jpg",
@@ -631,9 +626,21 @@ describe("attachments", () => {
     expect(before).toEqual(["Фото 1: склад.jpg", "Файл 2: акт.pdf"]);
     fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
     const message = onSend.mock.calls[0]?.[0];
-    expect(message.media).toEqual([]);
+    expect(message.albums).toEqual([]);
     expect(message.files.map((item: UploadItem) => item.id)).toEqual(["склад.jpg", "акт.pdf"]);
     expect(message.files[0]).not.toHaveProperty("type");
+  });
+
+  it("splits photos and videos into albums of ten, the most a Gallery lays out", () => {
+    const onSend = vi.fn();
+    const photos = Array.from({ length: 23 }, (_, index) =>
+      mediaItem(`склад-${index + 1}.jpg`, "image/jpeg"),
+    );
+    render(<Composer.Root queue={fakeQueue(photos)} onSend={onSend} />);
+    fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
+    const { albums } = onSend.mock.calls[0]?.[0] as { albums: UploadItem[][] };
+    expect(albums.map((album) => album.length)).toEqual([10, 10, 3]);
+    expect(albums[1]?.[0]?.id).toBe("склад-11.jpg");
   });
 
   it("without photos or videos there is no «как файлы» option", () => {
@@ -679,7 +686,6 @@ describe("attachments", () => {
     // The scroller around it: sideways, faded edges.
     expect(strip.parentElement).toHaveAttribute("data-edges", "fade");
     expect(trayNames()).toHaveLength(40);
-    expect(tileCss).toMatch(/\.strip > \* \{[^}]*flex: none;/);
   });
 
   it("a preview URL is revoked when its tile is removed and when the message is sent", async () => {
@@ -957,7 +963,7 @@ describe("recording", () => {
         toFake: ["setInterval", "clearInterval", "requestAnimationFrame", "cancelAnimationFrame"],
       });
       const onSendVoice = await start();
-      const timer = () => form().querySelector('[class*="timer"]');
+      const timer = () => form().querySelector(`.${styles.timer}`);
       const frame = (to: number) => {
         now = to;
         act(() => {
@@ -1116,7 +1122,7 @@ describe("recording", () => {
       await granted();
       expect(button.className).toBe(className);
       expect(button.getAttribute("data-icon-only")).toBe(iconOnly);
-      expect(form().querySelector('[class*="level"]')).toBeNull();
+      expect(form().querySelector(`.${styles.wave}`)).toBeNull();
     });
   });
 
@@ -1140,7 +1146,7 @@ describe("recording", () => {
       });
     }
     expect(renders).toBe(settled);
-    const timer = form().querySelector('[class*="timer"]');
+    const timer = form().querySelector(`.${styles.timer}`);
     expect(timer).toHaveTextContent("0:03,0");
     expect(fakeContext.roundRect).toHaveBeenCalled();
     vi.useRealTimers();
@@ -1319,7 +1325,7 @@ describe("recording", () => {
         key: " ",
       });
       expect(form()).toHaveAttribute("data-recording", "locked");
-      expect(form().querySelector('[class*="preview"]')).not.toBeNull();
+      expect(form().querySelector(`.${styles.preview}`)).not.toBeNull();
       expect(getUserMedia).toHaveBeenCalledWith({
         audio: true,
         video: { facingMode: "user", aspectRatio: 1 },
@@ -1329,7 +1335,7 @@ describe("recording", () => {
       now = 4000;
       fireEvent.click(sendRecording(), { detail: 0 });
       expect(onSendVideoNote).toHaveBeenCalledTimes(1);
-      expect(form().querySelector('[class*="preview"]')).toBeNull();
+      expect(form().querySelector(`.${styles.preview}`)).toBeNull();
     });
   });
 });

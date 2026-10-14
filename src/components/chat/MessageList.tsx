@@ -12,6 +12,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion, usePresence } from "@/hooks/usePresence";
 import { useScrollRegion } from "@/hooks/useScrollRegion";
+import { useStableValue } from "@/hooks/useStableValue";
 import { useVirtualRows } from "@/hooks/useVirtualRows";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
@@ -35,6 +36,8 @@ import {
 } from "@/internal/messageList";
 import { MessageHighlightContext } from "@/internal/messagePart";
 import { createReadReceipts, type ReadReceipts } from "@/internal/readReceipts";
+import { rovingIndex } from "@/internal/rovingFocus";
+import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 import { useRangeSelection } from "@/internal/useRangeSelection";
 
 import styles from "./Chat.module.css";
@@ -111,12 +114,12 @@ export type MessageListProps = React.HTMLAttributes<HTMLDivElement> & {
    */
   onRead?: (values: string[]) => void;
   /**
-   * The current message of a search or a jump: when it changes the list brings it into view in
-   * its scroller and points at it: the other messages step back and forth around it, or, while a
-   * search `highlight` is on, stay back while it is current. Focus stays where it is (the search
-   * field).
+   * The message to jump to — a search's current match or a jump: when it changes the list brings
+   * it into view in its scroller and points at it: the other messages step back and forth around
+   * it, or, while a search `highlight` is on, stay back while it is current. Focus stays where it
+   * is (the search field).
    */
-  current?: string | null;
+  jumpTo?: string | null;
   /** A search query: every match in `Message.Text` and transcripts is marked. */
   highlight?: string;
   /** The messages whose text holds `highlight`, in list order (oldest first), as they change. */
@@ -137,15 +140,6 @@ const POINT_LIMIT_MS = 2000;
 
 /** A jump further than this many views lands at once (then settles), nearer ones glide. */
 const GLIDE_VIEWS = 2;
-
-/** The element that scrolls the list: its ScrollContainer, or the nearest scrolling ancestor. */
-function scrollerOf(list: HTMLElement | null): HTMLElement | null {
-  for (let node = list?.parentElement ?? null; node; node = node.parentElement) {
-    const { overflowY } = getComputedStyle(node);
-    if (overflowY === "auto" || overflowY === "scroll") return node;
-  }
-  return null;
-}
 
 // ─── Rows ─────────────────────────────────────────────────────────────────────
 
@@ -237,6 +231,11 @@ function rowsOf(children: React.ReactNode): { rows: Row[]; tail: React.ReactNode
 const sameList = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((value, index) => value === b[index]);
 
+/** The same rows by what the list's shape reads: their keys and messages, in order. */
+const sameShape = (a: readonly Row[], b: readonly Row[]) =>
+  a.length === b.length &&
+  a.every((row, index) => row.key === b[index].key && row.value === b[index].value);
+
 /** Extra rows the window renders above and below the view. */
 const OVERSCAN = 8;
 
@@ -262,7 +261,7 @@ export function MessageList({
   reader,
   onNewMessage,
   onRead,
-  current: currentProp,
+  jumpTo,
   highlight = "",
   onMatchesChange,
   revealRef,
@@ -337,12 +336,8 @@ export function MessageList({
   const rowsRef = React.useRef(rows);
   rowsRef.current = rows;
   // The list's shape: rows are new elements on every render of the owner, their keys decide.
-  const signature = rows.map((row) => `${row.key}\u0000${row.value ?? ""}`).join("\u0001");
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the signature stands for the rows
-  const messages = React.useMemo(
-    () => rowsRef.current.filter((row) => row.value !== undefined),
-    [signature],
-  );
+  const shape = useStableValue(rows, sameShape);
+  const messages = React.useMemo(() => shape.filter((row) => row.value !== undefined), [shape]);
   const valuesRef = React.useRef<readonly string[]>([]);
   valuesRef.current = messages.map((row) => row.value as string);
 
@@ -428,30 +423,26 @@ export function MessageList({
   );
 
   // ── window ──
-  const scrollerRef = React.useRef<HTMLElement | null>(null);
-  // Found once (a style read up the tree), again only when the group moved to another scroller.
-  React.useLayoutEffect(() => {
-    if (!region) scrollerRef.current = null;
-    else if (!scrollerRef.current?.contains(innerRef.current)) {
-      scrollerRef.current = scrollerOf(innerRef.current);
-    }
-  });
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the signature stands for the rows
-  const keys = React.useMemo(() => rowsRef.current.map((row) => row.key), [signature]);
+  // The region's own scroller, read when needed: it is attached after the list's first commit.
+  const scrollerRef = React.useMemo<React.RefObject<HTMLElement | null>>(
+    () => ({
+      get current() {
+        return regionRef.current?.element() ?? null;
+      },
+    }),
+    [],
+  );
+  const keys = React.useMemo(() => shape.map((row) => row.key), [shape]);
   const getKey = React.useCallback((index: number) => keys[index] ?? index, [keys]);
   const estimateSize = React.useCallback(
     (index: number) => rowsRef.current[index]?.estimate ?? ROW_ESTIMATE,
     [],
   );
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the signature stands for the rows
-  const stickyRows = React.useMemo(
-    () => rowsRef.current.flatMap((row, index) => (row.sticky ? [index] : [])),
-    [signature],
-  );
+  const stickyRows = useStableValue(rows.flatMap((row, index) => (row.sticky ? [index] : [])));
   /** Where the list starts in the scroller's content (content above it: a history skeleton). */
   const offset = React.useCallback(() => {
     const element = innerRef.current;
-    const scroller = scrollerRef.current;
+    const scroller = regionRef.current?.element() ?? null;
     if (!element || !scroller) return 0;
     return (
       element.getBoundingClientRect().top -
@@ -520,6 +511,18 @@ export function MessageList({
   // window renders it there (it is held), and once it is in the DOM the jump finishes on it.
   const pending = React.useRef<{ value: string; run: (article: HTMLElement) => void } | null>(null);
   /**
+   * A message that landed at once (a far jump): it stays rendered, and once every row around it
+   * has its own size it is centred again and let go.
+   */
+  const settling = React.useRef<HTMLElement | null>(null);
+  const settle = React.useCallback(
+    (article: HTMLElement) => {
+      settling.current = article;
+      keepRow("target", article.dataset.messageValue);
+    },
+    [keepRow],
+  );
+  /**
    * Brings a message into view in the list's own scroller (never the page) and runs `then` on
    * it. A near one glides there; a far one lands at once and is centred again once the rows around
    * it have laid out.
@@ -527,7 +530,7 @@ export function MessageList({
   const bringIntoView = React.useCallback(
     (value: string, then?: (article: HTMLElement) => void) => {
       const scroller = regionRef.current;
-      const view = scrollerRef.current;
+      const view = regionRef.current?.element() ?? null;
       const article = articleOf(value);
       if (!article) {
         const index = indexOfValue(value);
@@ -549,18 +552,12 @@ export function MessageList({
           : 0;
         const far = view !== null && distance > view.clientHeight * GLIDE_VIEWS;
         scroller.scrollToElement(article, far ? "auto" : "smooth");
-        if (far) {
-          requestAnimationFrame(() =>
-            requestAnimationFrame(() => {
-              if (article.isConnected) scroller.scrollToElement(article, "auto");
-            }),
-          );
-        }
+        if (far) settle(article);
       }
       then?.(article);
       return true;
     },
-    [articleOf, indexOfValue, offset, virtual.startOf, keepRow],
+    [articleOf, indexOfValue, offset, virtual.startOf, keepRow, settle],
   );
   // The held target has rendered: finish the jump on it, centred once its neighbours have laid out.
   React.useLayoutEffect(() => {
@@ -569,15 +566,17 @@ export function MessageList({
     const article = articleOf(jump.value);
     if (!article) return;
     pending.current = null;
-    const scroller = regionRef.current;
-    scroller?.scrollToElement(article, "auto");
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        if (article.isConnected) scroller?.scrollToElement(article, "auto");
-        keepRow("target", undefined);
-      }),
-    );
+    regionRef.current?.scrollToElement(article, "auto");
+    settle(article);
     jump.run(article);
+  });
+  // Every row in the window has its own size: the landed message is centred on the true offsets.
+  React.useLayoutEffect(() => {
+    const article = settling.current;
+    if (!article || !virtual.measured) return;
+    settling.current = null;
+    if (article.isConnected) regionRef.current?.scrollToElement(article, "auto");
+    keepRow("target", undefined);
   });
   const reveal = React.useCallback(
     (value: string, focus = false, flash = true) =>
@@ -592,18 +591,18 @@ export function MessageList({
   // blinks the message once. Moving to the next match moves the mark in one step (no flicker between).
   const searching = highlight.trim() !== "";
   React.useEffect(() => {
-    if (!currentProp) return;
+    if (!jumpTo) return;
     let live = true;
-    bringIntoView(currentProp, (article) => {
+    bringIntoView(jumpTo, (article) => {
       if (live) point(article, searching ? "current" : "blink");
     });
     return () => {
       live = false;
     };
-  }, [currentProp, searching, bringIntoView, point]);
+  }, [jumpTo, searching, bringIntoView, point]);
   React.useEffect(() => {
-    if (!currentProp || !searching) unpoint("current");
-  }, [currentProp, searching, unpoint]);
+    if (!jumpTo || !searching) unpoint("current");
+  }, [jumpTo, searching, unpoint]);
 
   /** Focus on a message and the least scroll of the list's own scroller to show it. */
   const focusMessage = React.useCallback(
@@ -614,7 +613,7 @@ export function MessageList({
         return;
       }
       article.focus({ preventScroll: true });
-      const scroller = scrollerRef.current;
+      const scroller = regionRef.current?.element() ?? null;
       if (!scroller) return;
       const box = scroller.getBoundingClientRect();
       const rect = article.getBoundingClientRect();
@@ -832,17 +831,8 @@ export function MessageList({
             if (!target.matches(ARTICLE)) return;
             const order = orderOf();
             const index = order.indexOf(target.dataset.messageValue ?? "");
-            const next =
-              event.key === "ArrowDown"
-                ? index + 1
-                : event.key === "ArrowUp"
-                  ? index - 1
-                  : event.key === "Home"
-                    ? 0
-                    : event.key === "End"
-                      ? order.length - 1
-                      : null;
-            if (next === null || order[next] === undefined) return;
+            const next = rovingIndex(event.key, index, order.length, "vertical", { wrap: false });
+            if (next === null) return;
             event.preventDefault();
             focusMessage(order[next]);
           }}
@@ -965,17 +955,25 @@ export function ChatSelectionBar({ className, children, ref, ...rest }: ChatSele
       role="toolbar"
       aria-label={count}
       className={cx(styles.selectionBar, enterMotion.enter, className)}
+      data-depth="floating"
       {...rest}
     >
-      <span className={styles.selectionCount} aria-live="polite">
-        {count}
-      </span>
-      <span className={styles.selectionActions}>
-        {children}
-        <Button.Root variant="ghost" tone="neutral" size="s" onClick={() => list.setSelected(null)}>
-          {labels.cancel}
-        </Button.Root>
-      </span>
+      <SurfaceDepthProvider value="floating">
+        <span className={styles.selectionCount} aria-live="polite">
+          {count}
+        </span>
+        <span className={styles.selectionActions}>
+          {children}
+          <Button.Root
+            variant="ghost"
+            tone="neutral"
+            size="s"
+            onClick={() => list.setSelected(null)}
+          >
+            {labels.cancel}
+          </Button.Root>
+        </span>
+      </SurfaceDepthProvider>
     </div>
   );
 }

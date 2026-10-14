@@ -30,7 +30,7 @@ export type GalleryLayout = {
 };
 
 /** At most this many items are laid out. */
-const GALLERY_MAX = 10;
+export const GALLERY_MAX = 10;
 
 /** The tallest an album of 2–4 is, in widths (the media cap is a square). */
 const MAX_H = 1;

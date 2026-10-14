@@ -48,11 +48,11 @@ export const api: ComponentApi = {
           ru: 'Поиск открыт (`""`), запрос изменён или поиск закрыт (`null`).',
         },
         {
-          name: "current",
+          name: "jumpTo",
           type: "string | null",
           default: "null",
-          en: "A message to bring into view (a link, a notification): on change the chat brings it to the middle and the message itself blinks. The focus stays where it is.",
-          ru: "Сообщение, к которому перейти (ссылка, уведомление): при смене чат приводит его в середину, и само сообщение мигает. Фокус остаётся на месте.",
+          en: "A message to jump to (a link, a notification): on change the chat brings it to the middle and the message itself blinks. The focus stays where it is; while the search is open its current match takes this place.",
+          ru: "Сообщение, к которому перейти (ссылка, уведомление): при смене чат приводит его в середину, и само сообщение мигает. Фокус остаётся на месте; пока открыт поиск, его место занимает текущее совпадение.",
         },
         {
           name: "typing",
@@ -255,9 +255,9 @@ export const api: ComponentApi = {
         },
         {
           name: "renderMessage",
-          type: "(item: T, entry: ChatMessageEntry) => ReactElement",
-          en: "Renders an item (with `items`): a `Message.Root` (`value` and `position` set for you) or a `Chat.Service`; `entry` is `{ position, showAuthor, showAvatar }`. Keep it stable (`useCallback`).",
-          ru: "Рисует элемент (с `items`): `Message.Root` (`value` и `position` ставятся сами) или `Chat.Service`; `entry` — `{ position, showAuthor, showAvatar }`. Держите её стабильной (`useCallback`).",
+          type: "(item: T, entry: ChatMessageEntry<T>) => ReactElement",
+          en: "Renders an item: a `Message.Root` or a `Chat.Service`; `entry` — `{ position, showAuthor, showAvatar, find }`, `find(key)` gives another item (a reply's original). Runs again only for an item whose data or place changed.",
+          ru: "Рисует элемент: `Message.Root` или `Chat.Service`; `entry` — `{ position, showAuthor, showAvatar, find }`, `find(key)` даёт другой элемент (оригинал ответа). Повторно — только для элемента с новыми данными или местом.",
         },
         {
           name: "isService",

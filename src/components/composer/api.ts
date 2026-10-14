@@ -30,9 +30,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onSend",
-          type: '(message: { text: string; media: readonly (UploadItem & { type: "image" | "video" })[]; files: readonly UploadItem[]; replyTo?: string; editOf?: string }) => void | Promise<unknown>',
-          en: "Sends the message (Enter, Mod+Enter, the button): trimmed `text`, the uploaded `media` and `files` and `replyTo` / `editOf`. Return a Promise to keep the text until it resolves; reject leaves everything as it was.",
-          ru: "Отправка (Enter, Mod+Enter, кнопка): `text` без пробелов по краям, загруженные `media` и `files`, `replyTo` / `editOf`. Promise держит текст до resolve; reject оставляет всё как было.",
+          type: '(message: { text: string; albums: readonly (readonly (UploadItem & { type: "image" | "video" })[])[]; files: readonly UploadItem[]; replyTo?: string; editOf?: string }) => void | Promise<unknown>',
+          en: "Sends the message (Enter, Mod+Enter, the button): trimmed `text`, photos and videos as `albums` of up to 10, `files`, `replyTo` / `editOf`. A Promise keeps the text until it resolves; reject changes nothing.",
+          ru: "Отправка (Enter, Mod+Enter, кнопка): `text` без пробелов по краям, фото и видео как `albums` до 10, `files`, `replyTo` / `editOf`. Promise держит текст до resolve; reject ничего не меняет.",
         },
         {
           name: "onActivityChange",
@@ -137,7 +137,7 @@ export const api: ComponentApi = {
           ru: "`reply` — ответ на сообщение; `edit` — правка своего: кнопка становится «Сохранить», запись не предлагается.",
         },
         {
-          name: "value",
+          name: "messageId",
           type: "string",
           en: "The id of the message answered or edited: `onSend` receives it as `replyTo` (`reply`) or `editOf` (`edit`).",
           ru: "Id сообщения, на которое отвечают или которое правят: `onSend` получает его как `replyTo` (`reply`) или `editOf` (`edit`).",

@@ -302,15 +302,15 @@ export const api: ComponentApi = {
     },
     {
       name: "Message.Typing",
-      en: '`ref` → `HTMLDivElement` (`role="status"`). «Печатает…»: an incoming bubble of three dots at the end of the list while the other side types (`Chat.Root typing` puts it there). Keep it mounted and switch `active`.',
-      ru: "«Печатает…»: входящий пузырь из трёх точек в конце ленты, пока собеседник пишет (`Chat.Root typing` ставит его сам). Держите смонтированным и переключайте `active`.",
+      en: '`ref` → `HTMLDivElement` (`role="status"`). «Печатает…»: an incoming bubble of three dots at the end of the list while the other side types (`Chat.Root typing` puts it there). Keep it mounted and switch `open`.',
+      ru: "«Печатает…»: входящий пузырь из трёх точек в конце ленты, пока собеседник пишет (`Chat.Root typing` ставит его сам). Держите смонтированным и переключайте `open`.",
       props: [
         {
-          name: "active",
+          name: "open",
           type: "boolean",
           default: "true",
-          en: "The other side is typing. Keep the part mounted and switch this, so it can leave smoothly.",
-          ru: "Собеседник пишет. Держите часть смонтированной и переключайте это, чтобы она уходила плавно.",
+          en: "The bubble is open: the other side is typing. Keep the part mounted and switch this, so it folds open and closed.",
+          ru: "Пузырь открыт: собеседник пишет. Держите часть смонтированной и переключайте это, чтобы она раскрывалась и закрывалась.",
         },
         {
           name: "children",

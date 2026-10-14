@@ -20,8 +20,6 @@ export const RENAMED = {
   } as Record<string, string>,
   /** `Part.prop` (or `*.prop` for every part) → the canonical name. */
   props: {
-    "Chat.Messages.current": "`jumpTo`",
-    "Composer.Context.value": "`messageId`",
     "Kanban.Root.onItemClick": "`onItemOpen`",
     "Gantt.onSelect": "`onItemOpen`",
     "Gantt.onRowClick": "`onItemOpen`",

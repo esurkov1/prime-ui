@@ -330,7 +330,8 @@
   margin-block-start: var(--prime-space-3);
   padding: var(--prime-space-2) var(--prime-space-3);
   border-radius: var(--prime-radius-l);
-  background: var(--prime-color-fill-muted);
+  /* A floating surface of the ladder (`data-depth="floating"`): it floats over the messages. */
+  background: var(--prime-color-layer-current);
   box-shadow: var(--prime-shadow-overlay);
 }
 

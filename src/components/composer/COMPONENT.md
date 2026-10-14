@@ -25,7 +25,7 @@ import { Composer, type ComposerActivity, type ComposerMessage, useUploadQueue }
 ## Anatomy
 ```
 Composer.Root                  <form>: the column below, one tier for every part
-├─ (video preview)             round camera preview (VideoNote geometry, Skeleton until the camera answers, progress ring to 60 s)
+├─ (video preview)             round camera preview (VideoNote geometry, Skeleton until the camera answers, progress ring to 60 s, `weight="band"`)
 ├─ (tray)                      Crossfade of `queue`: opens and closes with a fade and a height glide
 │  ├─ (strip)                  FileUpload.Queue layout="strip": one row of tiles — photos, videos and
 │  │                           files in tray order; format pill, remove ×, name · size band, upload disk + ring, reorder
@@ -53,10 +53,10 @@ Sending is an async event (`SKILL/api-contract.md`, Events):
 const queue = useUploadQueue({ upload: sendFile });
 <Composer.Root
   queue={queue}
-  onSend={({ text, media, files }) =>
+  onSend={({ text, albums, files }) =>
     api.post(chatId, {
       text,
-      album: media.map((item) => ({ type: item.type, id: item.result })),
+      albums: albums.map((album) => album.map((item) => ({ type: item.type, id: item.result }))),
       files: files.map((item) => item.result),
     })
   }
@@ -68,9 +68,9 @@ const queue = useUploadQueue({ upload: sendFile });
 
 `text` arrives trimmed. While the Promise runs the button is busy and the field read-only; resolve clears the field and the queue and closes the reply / edit bar (its `onDismiss`), reject leaves the text for another try.
 
-Every attachment is a tile of one strip, in the order attached and then reordered by the person. Photos and videos arrive as `media` in that order — send them as one album (`Message.Media`, up to ten per album, the text as its caption) — and the other files as `files` in that order, a `Message.File` each. Clearing the queue revokes its previews, so a sent album shows from `result` (the server's URL) or from your own `URL.createObjectURL(item.file)` — revoke it when its message is deleted or the chat unmounts.
+Every attachment is a tile of one strip, in the order attached and then reordered by the person. Photos and videos arrive as `albums` in that order, a new album every ten (the most a `Gallery` lays out) — send each as one `Message.Media` message, the text as the caption of the first — and the other files as `files` in that order, a `Message.File` each. Clearing the queue revokes its previews, so a sent album shows from `result` (the server's URL) or from your own `URL.createObjectURL(item.file)` — revoke it when its message is deleted or the chat unmounts.
 
-In an optimistic chat the send returns at once: add the message to the list with `status="sending"` under a client id, then patch its status as the server answers — the row keeps its key, so it never enters twice. Give the reply / edit bar the message id (`Composer.Context value`) and the send says what it answers or edits:
+In an optimistic chat the send returns at once: add the message to the list with `status="sending"` under a client id, then patch its status as the server answers — the row keeps its key, so it never enters twice. Give the reply / edit bar the message id (`Composer.Context messageId`) and the send says what it answers or edits:
 
 ```tsx partial
 <Composer.Root
@@ -78,7 +78,7 @@ In an optimistic chat the send returns at once: add the message to the list with
   onActivityChange={(activity) => chat.signal(activity)}
 >
   {replyTo ? (
-    <Composer.Context value={replyTo.id} onDismiss={() => setReplyTo(null)}>
+    <Composer.Context messageId={replyTo.id} onDismiss={() => setReplyTo(null)}>
       <Composer.Title>Ответ Анне</Composer.Title>
       <Composer.Description>{replyTo.text}</Composer.Description>
     </Composer.Context>
@@ -98,7 +98,7 @@ In an optimistic chat the send returns at once: add the message to the list with
 | `value` | `string` | — | The text of the message (controlled). |
 | `defaultValue` | `string` | `""` | Initial text, uncontrolled (a saved draft). |
 | `onValueChange` | `(value: string) => void` | — | Every change of the text: typing, formatting, the field cleared after a send. |
-| `onSend` | `(message: { text: string; media: readonly (UploadItem & { type: "image" \| "video" })[]; files: readonly UploadItem[]; replyTo?: string; editOf?: string }) => void \| Promise<unknown>` | — | Sends the message (Enter, Mod+Enter, the button): trimmed `text`, the uploaded `media` and `files` and `replyTo` / `editOf`. Return a Promise to keep the text until it resolves; reject leaves everything as it was. |
+| `onSend` | `(message: { text: string; albums: readonly (readonly (UploadItem & { type: "image" \| "video" })[])[]; files: readonly UploadItem[]; replyTo?: string; editOf?: string }) => void \| Promise<unknown>` | — | Sends the message (Enter, Mod+Enter, the button): trimmed `text`, photos and videos as `albums` of up to 10, `files`, `replyTo` / `editOf`. A Promise keeps the text until it resolves; reject changes nothing. |
 | `onActivityChange` | `(activity: "typing" \| "voice" \| "video" \| null) => void` | — | What the person is doing changed, for the other side's «печатает…»: `typing`, `voice` / `video` while recording, or `null`. Fires on a change only. |
 | `onSendVoice` | `(recording: { blob: Blob; durationMs: number; waveform: number[] }) => void \| Promise<unknown>` | — | A voice message was recorded: the `MediaRecorder` blob, its length and 48 loudness values 0…1 for its waveform. With it an empty field shows the record button (where the browser can record). |
 | `onSendVideoNote` | `(recording: { blob: Blob; durationMs: number; waveform: number[] }) => void \| Promise<unknown>` | — | A round video message was recorded (front camera and microphone), at most 60 s. With both record handlers a double click or tap on the record button (or ↑ / ↓ on it) switches voice and video. |
@@ -121,7 +121,7 @@ In an optimistic chat the send returns at once: add the message to the list with
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `mode` | `"reply" \| "edit"` | `"reply"` | `reply` — a reply to a message; `edit` — your message is being edited: the send button turns into «Сохранить» and the record button is not offered. |
-| `value` | `string` | — | The id of the message answered or edited: `onSend` receives it as `replyTo` (`reply`) or `editOf` (`edit`). |
+| `messageId` | `string` | — | The id of the message answered or edited: `onSend` receives it as `replyTo` (`reply`) or `editOf` (`edit`). |
 | `onDismiss` | `() => void` | — | Stop replying or editing: the close button, Escape in the field, and a send that went through. Without it the bar has no close button. |
 | `children` | `ReactNode` | — | `Composer.Title` and `Composer.Description`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
@@ -190,19 +190,19 @@ Composer has no `variant`; what the row shows follows its state.
 | State | Driven by | DOM |
 |---|---|---|
 | empty | no text, no attachments | with a record handler the button is the quiet ghost microphone (or camera), else a disabled send |
-| typing | text | the button turns into the accent send; the glyph turns and scales into the plane |
+| typing | text | the button turns into the accent send; the glyph cross-fades into the plane (`Button.Icon`) |
 | attachments | `queue.items` | the tray above the row: one strip of tiles in the order attached — photos and videos (MIME type, else the name's extension) as the local preview or first frame, other files as the sheet glyph, each with the format pill and a name · size (duration) band; while a file goes up a disk with the progress ring along its edge stands in the middle of a picture (dimmed under it) or in place of a file's sheet (name and size stay readable) (pressing it cancels, a failure turns it into a danger retry, done fades it away), remove ×, reorder by drag or `Alt + ←` / `→`; send is disabled while any is `queued` / `uploading` |
-| as files | the «Отправить как файлы, без сжатия» checkbox (shown with photos or videos) | the view stays the same (the strip); `onSend` gets every file in `files` and `media` empty; reset after a send |
+| as files | the «Отправить как файлы, без сжатия» checkbox (shown with photos or videos) | the view stays the same (the strip); `onSend` gets every file in `files` and `albums` empty; reset after a send |
 | sending | `onSend` returned a Promise | button `loading` (`aria-busy`), textarea `readonly`, text kept |
 | sent | the Promise resolved (or nothing returned) | field and queue cleared (the previews revoked, the tray fades and glides closed), the reply / edit bar's `onDismiss` called, focus stays in the field; `onActivityChange(null)` |
-| reply / edit | `Composer.Context` | bar above the field (enters with `enterMotion`); `mode="edit"` turns send into save; its `value` goes to `onSend` as `replyTo` / `editOf` |
+| reply / edit | `Composer.Context` | bar above the field (enters with `enterMotion`); `mode="edit"` turns send into save; its `messageId` goes to `onSend` as `replyTo` / `editOf` |
 | activity | typing, recording | `onActivityChange`: `typing` from the first keystroke until the text is sent, emptied or rests for 3 s; `voice` / `video` while the recording bar shows; `null` after, and on unmount while active. It fires on a change only: a server that expires the signal wants it repeated on your side while the value is not `null` |
 | selection | a non-empty selection while the field has focus | the floating toolbar fades in from below (`overlayMotion` floating, `data-side="top"`); a tool wraps the selection in its Markdown, a second press removes it |
 | files over | a file drag over the composer (with `queue`) | `data-dropping="true"`: an accent ring over the field; a drop adds the files to the queue. A pasted file with no type (a screenshot from some apps) takes its clipboard item's type. Without `queue` paste and drop of files do nothing |
-| recording, held | `data-recording="hold"` (a finger on the button; with voice and video both offered, from 200 ms of holding) | recording bar over the paperclip and the field with «Влево — отмена» sliding and fading with the finger — a slide of `--prime-space-24` throws the recording away; lock pill above the button, a lift of `--prime-space-12` locks; release sends |
+| recording, held | `data-recording="hold"` (a finger on the button; with voice and video both offered, from 200 ms of holding) | recording bar over the paperclip and the field with «Влево — отмена» sliding and fading with the finger — a slide of `--prime-space-24` throws the recording away; lock pill above the button (a floating surface, `data-depth="floating"`) rises in, a lift of `--prime-space-12` locks and it snaps away; release sends |
 | recording, locked | `data-recording="locked"` (a mouse click, Enter / Space, a tap shorter than 200 ms, or a slide up) | delete button · pause button · dot · timer · live waveform over the full free width; the button and Enter send; a video message sends itself at 60 s of recorded time |
-| recording, paused | Space or the pause button during a hands-free recording (`MediaRecorder.pause()`) | `data-paused` on the bar: the dot turns into a still pause glyph, the timer and the waveform stand, the video ring stops; Space or «Продолжить запись» resumes; a send hands over what was recorded, without the pause |
-| double-click window | with voice and video both offered, the 300 ms after a click or a tap | no `data-recording` yet: the button keeps its glyph and nothing is announced; with a granted microphone voice already records. A second press inside it discards that recording unseen and switches the mode (glyph swap, «Голосовое сообщение» / «Видеосообщение» announced); otherwise the bar cross-fades in with the timer counting from the first press |
+| recording, paused | Space or the pause button during a hands-free recording (`MediaRecorder.pause()`) | `data-paused` on the bar: the dot cross-fades into a still pause glyph (`GlyphSwap`), the timer and the waveform stand, the video ring stops; Space or «Продолжить запись» resumes; a send hands over what was recorded, without the pause |
+| double-click window | with voice and video both offered, the 300 ms after a click or a tap | no `data-recording` yet: the button keeps its glyph and nothing is announced; with a granted microphone voice already records. A second press inside it discards that recording unseen and switches the mode (glyph swap, «Голосовое сообщение» / «Видеосообщение» announced); otherwise the bar rises in over the field with the timer counting from the first press; when the recording ends it closes up in place |
 | starting | the press is answered, the device is not granted yet | already the recording bar with a running timer (it counts from the press) while the device is asked for in parallel; the waveform is a calm line of dots |
 | too short | a recording under 0.7 s | dropped: nothing is sent |
 | record error | the browser refused / found no device | the bar cross-fades back to the field; `Hint` with `role="alert"` above the row, cleared by typing or the next attempt |
@@ -302,19 +302,20 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | [sizes.tsx](examples/sizes.tsx) | One composer in every tier: field, buttons and the paperclip follow it — `size`. |
 | [attachments.tsx](examples/attachments.tsx) | Warehouse photos and documents for a client go through an upload queue: the paperclip opens the file picker for photos, videos and office documents, a paste or a drop adds files too, every attachment is a tile of one strip that drags into its order, and send waits until the uploads finish — `queue`, `Composer.Attach`, `accept`, `useUploadQueue`. |
 | [attach-menu.tsx](examples/attach-menu.tsx) | The paperclip as a menu of attachment kinds: photos and videos, documents, any file, and an invoice from the system that puts its link into the message and returns the focus to the field — `Composer.Item`, `Composer.ItemIcon`, `accept`, `onSelect`, `inputRef`. |
-| [reply-edit.tsx](examples/reply-edit.tsx) | Answering a client's message and correcting your own: the bar above the field quotes the message, Escape or the cross cancels, ↑ in an empty field opens your last message, send becomes save and hands over the message id — `Composer.Context`, `mode`, `value`, `onDismiss`, `onEditLast`. |
+| [reply-edit.tsx](examples/reply-edit.tsx) | Answering a client's message and correcting your own: the bar above the field quotes the message, Escape or the cross cancels, ↑ in an empty field opens your last message, send becomes save and hands over the message id — `Composer.Context`, `mode`, `messageId`, `onDismiss`, `onEditLast`. |
 | [typing.tsx](examples/typing.tsx) | The other side's status line follows what you do: typing, recording a voice or a video message, then nothing — `onActivityChange`. |
 | [formatting.tsx](examples/formatting.tsx) | Selected text gets a toolbar of bold, italic, strikethrough, code, spoiler, link and quote, each with its shortcut, written as Markdown around the selection — `formatting`. |
 | [voice.tsx](examples/voice.tsx) | Voice and round video messages: hold the button to record and release to send, slide left to cancel, slide up or tap to record hands-free; a double tap or double click switches voice and video — `onSendVoice`, `onSendVideoNote`, `recordMode`. |
 | [states.tsx](examples/states.tsx) | A closed conversation is disabled, a slow send keeps the text with a busy button until the server answers — `disabled`, `onSend`. |
 | [controlled.tsx](examples/controlled.tsx) | Every conversation keeps its own draft: switching the chat swaps the text, a template button fills it from outside — `value`, `onValueChange`. |
-| [narrow.tsx](examples/narrow.tsx) | On a phone-width chat the row keeps the paperclip, the field and the button; Enter makes a new line on touch screens and the button sends. |
+| [narrow.tsx](examples/narrow.tsx) | On a phone-width chat the row keeps the paperclip, the field and the button; Enter makes a new line on touch screens and the button sends — `Composer.Attach`, `onSend`. |
 
 ## Mistakes
 - A `<Textarea>` with a hand-made send button and an Enter handler → `Composer.Root`: Enter / Shift+Enter / touch, the async send, the clearing and the focus are built in.
 - Clearing the field in `onSend` before the server answers → return the Promise; the composer clears on resolve and keeps the text on reject.
 - Rendering the attachment rows yourself → pass `queue`; the tray, paste and drop come with it.
-- Sending photos as file messages → send `media` as one `Message.Media` album (its order is the tray's), `files` as `Message.File`.
+- Sending photos as file messages → send each of `albums` as one `Message.Media` message (its order is the tray's), `files` as `Message.File`.
+- Cutting `media` into albums of ten by hand → `albums` comes split.
 - Showing a sent photo from `item.preview` → the queue revokes it after the send; use `result` or your own object URL of `item.file`, revoked with its message.
 - Expecting HTML from the formatting → the text is Markdown (`**…**`, `_…_`, `~~…~~`, `` `…` ``, `||…||`, Markdown links, `> `); render it with the message component, never as HTML.
 - Hiding the reply bar by CSS → unmount `Composer.Context` in `onDismiss`; Escape and a sent message call the same handler.
@@ -325,5 +326,5 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 - An `aria-label` on the root to rename the field → use `labels.placeholder` (the field) and `labels.region` (the form).
 
 ## Related
-- **Built from:** [Textarea](../textarea/COMPONENT.md), [Button](../button/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (the paperclip; `FileUpload.Queue layout="strip"`, the tray), [Crossfade](../crossfade/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Hint](../hint/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), Icon (`action.*`, `format.*`, `nav.chevronLeft`, `nav.chevronUp`, `status.locked`), `useUploadQueue` (the `queue`), `internal/ring` (the video preview's ring), `internal/textFormatting` + `internal/textFormattingToolbar` (the formatting shared with Textarea `formatting`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Textarea](../textarea/COMPONENT.md), [Button](../button/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (the paperclip and the picker of the menu; `FileUpload.Queue layout="strip"`, the tray), [Gallery](../gallery/COMPONENT.md) (`GALLERY_MAX`, the size of an album in `albums`), [Crossfade](../crossfade/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Hint](../hint/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), Icon (`action.*`, `format.*`, `nav.chevronLeft`, `nav.chevronUp`, `status.locked`), `useUploadQueue` (the `queue`), `internal/ring` (the video preview's ring), `internal/textFormatting` + `internal/textFormattingToolbar` (the formatting shared with Textarea `formatting`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Message](../message/COMPONENT.md) — the bubbles the composer writes into; [VoicePlayer](../voice-player/COMPONENT.md) — plays a sent voice message; [Textarea](../textarea/COMPONENT.md), [Input](../input/COMPONENT.md)

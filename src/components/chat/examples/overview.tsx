@@ -4,8 +4,8 @@ import {
   Button,
   Card,
   Chat,
+  type ChatMessageEntry,
   Composer,
-  type ComposerMediaItem,
   type ComposerMessage,
   type ComposerRecording,
   Dropdown,
@@ -47,6 +47,7 @@ type ChatMessage = Content & {
   forwardedFrom?: string;
   replyTo?: string;
   reactions?: MessageReaction[];
+  pinned?: boolean;
 };
 
 const NOW = new Date(2026, 9, 8, 15, 0);
@@ -315,8 +316,6 @@ const READ_MS = 1200;
 const TYPING_MS = 1800;
 const HISTORY_MS = 900;
 const TRANSCRIBE_MS = 1400;
-/** An album holds up to ten photos and videos: more go as the next album. */
-const ALBUM_MAX = 10;
 
 const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
 
@@ -365,11 +364,6 @@ const excerpt = (message: ChatMessage) => {
 const transcribeVideoNote = () =>
   wait(TRANSCRIBE_MS).then(
     () => "Снимаю склад: стеллаж B, третий ряд. Коробки по заказу 4821 тут.",
-  );
-
-const albumsOf = (media: readonly ComposerMediaItem[]) =>
-  Array.from({ length: Math.ceil(media.length / ALBUM_MAX) }, (_, index) =>
-    media.slice(index * ALBUM_MAX, (index + 1) * ALBUM_MAX),
   );
 
 /** The media URLs a message plays from. */
@@ -478,20 +472,21 @@ const content = (message: ChatMessage, onCancel: () => void) => {
 };
 
 export default function ChatOverviewExample() {
-  const [messages, setMessages] = React.useState(() => [...ARCHIVE, ...HISTORY]);
+  // Everything a row shows lives in its message (a pin too): a row renders again only when its
+  // message changes.
+  const [messages, setMessages] = React.useState(() =>
+    [...ARCHIVE, ...HISTORY].map((message) =>
+      PINNED_FIRST.includes(message.id) ? { ...message, pinned: true } : message,
+    ),
+  );
   const [hasOlder, setHasOlder] = React.useState(true);
   const [selected, setSelected] = React.useState<readonly string[] | null>(null);
-  const [pinned, setPinned] = React.useState<readonly string[]>(PINNED_FIRST);
   const [typing, setTyping] = React.useState(false);
   const [replyTo, setReplyTo] = React.useState<ChatMessage | null>(null);
   const [editing, setEditing] = React.useState<ChatMessage | null>(null);
   const [draft, setDraft] = React.useState("");
   const replies = React.useRef(0);
   const queue = useUploadQueue({ upload: uploadFile });
-  // The newest messages for what a row looks up (a reply's original, the files to let go), without
-  // making every row render again when one message changes.
-  const messagesRef = React.useRef(messages);
-  messagesRef.current = messages;
 
   const patch = (id: string, next: Partial<ChatMessage>) =>
     setMessages((current) =>
@@ -549,15 +544,15 @@ export default function ChatOverviewExample() {
     };
   }, []);
 
-  // Photos and videos go as albums in the order of the tray, the text as their caption; other
-  // files as file messages.
-  const send = ({ text, media, files, replyTo: reply, editOf }: ComposerMessage) => {
+  // Photos and videos go as albums in the order of the tray, the text as the first one's caption;
+  // other files as file messages.
+  const send = ({ text, albums, files, replyTo: reply, editOf }: ComposerMessage) => {
     if (editOf) {
       patch(editOf, { kind: "text", text, edited: true } as Partial<ChatMessage>);
       setDraft("");
       return;
     }
-    albumsOf(media).forEach((album, index) => {
+    albums.forEach((album, index) => {
       post(
         {
           kind: "media",
@@ -573,7 +568,7 @@ export default function ChatOverviewExample() {
     });
     for (const item of files)
       post({ kind: "file", name: item.file.name, size: item.file.size }, reply);
-    if (text && media.length === 0) post({ kind: "text", text }, reply);
+    if (text && albums.length === 0) post({ kind: "text", text }, reply);
   };
 
   const sendRecording =
@@ -607,129 +602,123 @@ export default function ChatOverviewExample() {
     setHasOlder(false);
   };
 
-  const remove = (ids: readonly string[]) => {
-    for (const message of messagesRef.current) {
-      if (!ids.includes(message.id)) continue;
+  const remove = (removed: readonly ChatMessage[]) => {
+    for (const message of removed) {
       for (const url of sourcesOf(message)) {
         if (localUrls.current.delete(url)) URL.revokeObjectURL(url);
       }
     }
-    setMessages((current) => current.filter((message) => !ids.includes(message.id)));
-    setPinned((current) => current.filter((id) => !ids.includes(id)));
+    const ids = new Set(removed.map((message) => message.id));
+    setMessages((current) => current.filter((message) => !ids.has(message.id)));
   };
 
   const togglePin = (id: string) =>
-    setPinned((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
+    setMessages((current) =>
+      current.map((message) =>
+        message.id === id ? { ...message, pinned: !message.pinned } : message,
+      ),
     );
 
-  const pinnedItems = pinned.flatMap((id) => {
-    const message = messages.find((item) => item.id === id);
-    return message ? [{ value: id, text: excerpt(message) }] : [];
-  });
-
-  // Stable while the pins are: a reaction, a status or a keystroke in the composer renders again
-  // only the row whose data changed.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the handlers only call state setters
-  const renderMessage = React.useCallback(
-    (message: ChatMessage) => {
-      if (message.kind === "service") return <Chat.Service>{message.text}</Chat.Service>;
-      const own = message.from === "me";
-      const author = MEMBERS[message.from];
-      const original = message.replyTo
-        ? messagesRef.current.find((item) => item.id === message.replyTo)
-        : undefined;
-      return (
-        <Message.Root
-          direction={own ? "outgoing" : "incoming"}
-          time={message.sentAt}
-          status={message.status}
-          edited={message.edited}
-          onRetry={
-            message.status === "failed"
-              ? () => wait(900).then(() => patch(message.id, { status: "read" }))
-              : undefined
-          }
-          onReactionToggle={(emoji) =>
-            patch(message.id, { reactions: toggleOwn(message.reactions ?? [], emoji) })
-          }
-        >
-          {own ? null : (
-            <Message.Avatar>
-              <Avatar.Root color={hueOf(author.id)}>
-                {author.src ? <Avatar.Image src={author.src} alt="" /> : null}
-                <Avatar.Fallback>{initialsOf(author.name)}</Avatar.Fallback>
-              </Avatar.Root>
-            </Message.Avatar>
-          )}
-          {own ? null : (
-            <Message.Author color={hueOf(author.id)} tag={author.tag}>
-              {author.name}
-              {author.owner ? (
-                <Message.AuthorIcon>
-                  <Icon name="object.crown" />
-                </Message.AuthorIcon>
-              ) : null}
-            </Message.Author>
-          )}
-          {message.forwardedFrom ? <Message.Forwarded from={message.forwardedFrom} /> : null}
-          {original ? (
-            <Message.Reply
-              author={MEMBERS[original.from].name}
-              color={hueOf(original.from)}
-              target={original.id}
-            >
-              {excerpt(original)}
-            </Message.Reply>
-          ) : null}
-          {content(message, () => remove([message.id]))}
-          {message.reactions?.length ? <Message.Reactions items={message.reactions} /> : null}
-          <Message.Menu>
-            <Dropdown.Item
-              onSelect={() => {
-                setEditing(null);
-                setReplyTo(message);
-              }}
-            >
-              <Dropdown.ItemIcon>
-                <Icon name="action.reply" />
-              </Dropdown.ItemIcon>
-              Ответить
-            </Dropdown.Item>
-            {own && message.kind === "text" ? (
-              <Dropdown.Item onSelect={() => startEdit(message)}>
-                <Dropdown.ItemIcon>
-                  <Icon name="action.edit" />
-                </Dropdown.ItemIcon>
-                Изменить
-              </Dropdown.Item>
-            ) : null}
-            <Dropdown.Item onSelect={() => navigator.clipboard?.writeText(excerpt(message))}>
-              <Dropdown.ItemIcon>
-                <Icon name="action.copy" />
-              </Dropdown.ItemIcon>
-              Скопировать
-            </Dropdown.Item>
-            <Dropdown.Item onSelect={() => togglePin(message.id)}>
-              <Dropdown.ItemIcon>
-                <Icon name="action.pin" />
-              </Dropdown.ItemIcon>
-              {pinned.includes(message.id) ? "Открепить" : "Закрепить"}
-            </Dropdown.Item>
-            {own ? (
-              <Dropdown.Item tone="danger" onSelect={() => remove([message.id])}>
-                <Dropdown.ItemIcon>
-                  <Icon name="action.delete" />
-                </Dropdown.ItemIcon>
-                Удалить
-              </Dropdown.Item>
-            ) : null}
-          </Message.Menu>
-        </Message.Root>
-      );
-    },
-    [pinned],
+  const pinnedItems = messages.flatMap((message) =>
+    message.pinned ? [{ value: message.id, text: excerpt(message) }] : [],
   );
+
+  // A reaction, a status or a keystroke in the composer renders again only the row whose message
+  // changed; a reply's original comes from the list (`entry.find`).
+  const renderMessage = (message: ChatMessage, entry: ChatMessageEntry<ChatMessage>) => {
+    if (message.kind === "service") return <Chat.Service>{message.text}</Chat.Service>;
+    const own = message.from === "me";
+    const author = MEMBERS[message.from];
+    const original = message.replyTo ? entry.find(message.replyTo) : undefined;
+    return (
+      <Message.Root
+        direction={own ? "outgoing" : "incoming"}
+        time={message.sentAt}
+        status={message.status}
+        edited={message.edited}
+        onRetry={
+          message.status === "failed"
+            ? () => wait(900).then(() => patch(message.id, { status: "read" }))
+            : undefined
+        }
+        onReactionToggle={(emoji) =>
+          patch(message.id, { reactions: toggleOwn(message.reactions ?? [], emoji) })
+        }
+      >
+        {own ? null : (
+          <Message.Avatar>
+            <Avatar.Root color={hueOf(author.id)}>
+              {author.src ? <Avatar.Image src={author.src} alt="" /> : null}
+              <Avatar.Fallback>{initialsOf(author.name)}</Avatar.Fallback>
+            </Avatar.Root>
+          </Message.Avatar>
+        )}
+        {own ? null : (
+          <Message.Author color={hueOf(author.id)} tag={author.tag}>
+            {author.name}
+            {author.owner ? (
+              <Message.AuthorIcon>
+                <Icon name="object.crown" />
+              </Message.AuthorIcon>
+            ) : null}
+          </Message.Author>
+        )}
+        {message.forwardedFrom ? <Message.Forwarded from={message.forwardedFrom} /> : null}
+        {original ? (
+          <Message.Reply
+            author={MEMBERS[original.from].name}
+            color={hueOf(original.from)}
+            target={original.id}
+          >
+            {excerpt(original)}
+          </Message.Reply>
+        ) : null}
+        {content(message, () => remove([message]))}
+        {message.reactions?.length ? <Message.Reactions items={message.reactions} /> : null}
+        <Message.Menu>
+          <Dropdown.Item
+            onSelect={() => {
+              setEditing(null);
+              setReplyTo(message);
+            }}
+          >
+            <Dropdown.ItemIcon>
+              <Icon name="action.reply" />
+            </Dropdown.ItemIcon>
+            Ответить
+          </Dropdown.Item>
+          {own && message.kind === "text" ? (
+            <Dropdown.Item onSelect={() => startEdit(message)}>
+              <Dropdown.ItemIcon>
+                <Icon name="action.edit" />
+              </Dropdown.ItemIcon>
+              Изменить
+            </Dropdown.Item>
+          ) : null}
+          <Dropdown.Item onSelect={() => navigator.clipboard?.writeText(excerpt(message))}>
+            <Dropdown.ItemIcon>
+              <Icon name="action.copy" />
+            </Dropdown.ItemIcon>
+            Скопировать
+          </Dropdown.Item>
+          <Dropdown.Item onSelect={() => togglePin(message.id)}>
+            <Dropdown.ItemIcon>
+              <Icon name="action.pin" />
+            </Dropdown.ItemIcon>
+            {message.pinned ? "Открепить" : "Закрепить"}
+          </Dropdown.Item>
+          {own ? (
+            <Dropdown.Item tone="danger" onSelect={() => remove([message])}>
+              <Dropdown.ItemIcon>
+                <Icon name="action.delete" />
+              </Dropdown.ItemIcon>
+              Удалить
+            </Dropdown.Item>
+          ) : null}
+        </Message.Menu>
+      </Message.Root>
+    );
+  };
 
   return (
     <Card.Root className={styles.messenger}>
@@ -793,7 +782,7 @@ export default function ChatOverviewExample() {
               size="s"
               disabled={!selected?.length}
               onClick={() => {
-                remove(selected ?? []);
+                remove(messages.filter((message) => selected?.includes(message.id)));
                 setSelected(null);
               }}
             >
@@ -813,7 +802,7 @@ export default function ChatOverviewExample() {
           >
             <Composer.Attach />
             {replyTo ? (
-              <Composer.Context value={replyTo.id} onDismiss={() => setReplyTo(null)}>
+              <Composer.Context messageId={replyTo.id} onDismiss={() => setReplyTo(null)}>
                 <Composer.Title>Ответ {MEMBERS[replyTo.from].name}</Composer.Title>
                 <Composer.Description>{excerpt(replyTo)}</Composer.Description>
               </Composer.Context>
@@ -821,7 +810,7 @@ export default function ChatOverviewExample() {
             {editing ? (
               <Composer.Context
                 mode="edit"
-                value={editing.id}
+                messageId={editing.id}
                 onDismiss={() => {
                   setEditing(null);
                   setDraft("");

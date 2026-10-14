@@ -49,9 +49,11 @@ export type FileUploadVariant = "dashed" | "solid";
 
 /**
  * How files are added: `dropzone` — the drop area; `button` — a compact picker button (a paperclip)
- * with no zone and no drop; `tile` — an add tile at the end of the files, the whole set a drop target.
+ * with no zone and no drop; `tile` — an add tile at the end of the files, the whole set a drop
+ * target; `none` — no trigger of its own: the picker opens from code (`picker.open`), from a menu
+ * of another component.
  */
-export type FileUploadTrigger = "dropzone" | "button" | "tile";
+export type FileUploadTrigger = "dropzone" | "button" | "tile" | "none";
 
 /**
  * `list` — rows: badge or preview, name, size and status, a progress bar across the row. `grid` —
@@ -1168,6 +1170,9 @@ function FileUploadField({
     trigger === "tile" || value !== undefined || defaultValue !== undefined || queue !== undefined;
   const button = trigger === "button";
   const tile = trigger === "tile";
+  /** No control of its own: the input only holds the files a `picker.open` call picks. */
+  const none = trigger === "none";
+  const hiddenInput = button || none;
 
   const addFiles = (picked: readonly File[], types: string | undefined = accept) => {
     if (disabled) return;
@@ -1216,13 +1221,13 @@ function FileUploadField({
         if (pickAccept.current === undefined) event.currentTarget.removeAttribute("accept");
         else event.currentTarget.accept = pickAccept.current;
       }}
-      // The button is the control: the input only holds the files.
-      tabIndex={button ? -1 : undefined}
-      aria-hidden={button || undefined}
-      aria-label={button ? undefined : tile ? labels.addLabel : ariaLabel}
-      aria-labelledby={button || tile ? undefined : ids.labelledBy}
-      aria-describedby={button ? undefined : ids.describedBy}
-      aria-invalid={(!button && ids.invalid) || undefined}
+      // The button (or the caller's own control) is the control: the input only holds the files.
+      tabIndex={hiddenInput ? -1 : undefined}
+      aria-hidden={hiddenInput || undefined}
+      aria-label={hiddenInput ? undefined : tile ? labels.addLabel : ariaLabel}
+      aria-labelledby={hiddenInput || tile ? undefined : ids.labelledBy}
+      aria-describedby={hiddenInput ? undefined : ids.describedBy}
+      aria-invalid={(!hiddenInput && ids.invalid) || undefined}
       onChange={(event) => {
         addFiles(Array.from(event.target.files ?? []), pickAccept.current);
         event.target.value = "";
@@ -1231,7 +1236,9 @@ function FileUploadField({
   );
 
   let control: React.ReactNode = null;
-  if (button) {
+  if (none) {
+    control = input;
+  } else if (button) {
     const content = children ?? (
       <>
         <Button.Icon>
@@ -1332,8 +1339,8 @@ function FileUploadField({
     ) : null;
 
   // The drop zone and an add tile take files dropped anywhere on the field; a button takes none.
-  const drops = !button && !disabled;
-  const dropHandlers = button
+  const drops = !hiddenInput && !disabled;
+  const dropHandlers = hiddenInput
     ? {}
     : {
         onDragEnter: (event: React.DragEvent) => {
