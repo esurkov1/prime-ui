@@ -26,7 +26,6 @@
   "src/internal/MorphText.tsx: MorphTextProps is unused",
   "src/internal/ProgressLegend.tsx: ProgressLegendProps is unused",
   "src/internal/RollingNumber.tsx: RollingNumberProps is unused",
-  "src/internal/attachmentTile.tsx: AttachmentTileProps is test-only",
   "src/internal/edgeAutoScroll.ts: EDGE_ZONE_PX is test-only",
   "src/internal/edgeAutoScroll.ts: EdgePoint is unused",
   "src/internal/edgeAutoScroll.ts: MAX_SPEED_PX_PER_MS is test-only",

@@ -55,7 +55,6 @@
   "src/internal/FieldFrame.module.css: local @keyframes field-error-leave",
   "src/internal/FieldFrame.module.css: local @keyframes field-shake-even",
   "src/internal/FieldFrame.module.css: local @keyframes field-shake-odd",
-  "src/internal/attachmentTile.module.css: reduced-motion block globals.css already covers (.tile, .image, .tile > .media, .sheet, .remove)",
   "src/internal/richText.module.css: local @keyframes spoiler-reveal",
   "src/layout/sidebar/Sidebar.module.css: animates -webkit-text-fill-color",
   "src/layout/sidebar/Sidebar.module.css: animates -webkit-text-fill-color #2",

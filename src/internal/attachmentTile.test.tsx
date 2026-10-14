@@ -1,13 +1,15 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Dnd } from "@/components/dnd/Dnd";
 import type { UploadItem } from "@/hooks/useUploadQueue";
 
-import { AttachmentTile, type AttachmentTileProps } from "./attachmentTile";
+import { AttachmentTile } from "./attachmentTile";
+import pill from "./mediaPill.module.css";
 
-function Tile(props: Omit<AttachmentTileProps, "id">) {
+function Tile(props: Omit<React.ComponentProps<typeof AttachmentTile>, "id">) {
   return (
     <Dnd.Root>
       <Dnd.Sortable
@@ -41,6 +43,24 @@ describe("AttachmentTile", () => {
       const pill = tile.querySelector("[aria-hidden][data-dnd-mirror]") as HTMLElement;
       expect(pill).toHaveTextContent("PDF");
       expect(tile).toHaveTextContent("Акт сверки.pdf2 КБ");
+      unmount();
+    }
+  });
+
+  it("over a picture the pill and the band stand on the media shade; a file's do not", () => {
+    for (const kind of ["file", "image"] as const) {
+      const { unmount } = render(
+        <Tile kind={kind} src="blob:x" badge="JPG" name="Фасад.jpg" onRemove={() => {}} />,
+      );
+      const tile = screen.getByRole("listitem", { name: "Плитка" });
+      const tag = tile.querySelector("[aria-hidden][data-dnd-mirror]") as HTMLElement;
+      const band = screen.getByText("Фасад.jpg").parentElement as HTMLElement;
+      expect(tag.className.includes(pill.tag)).toBe(kind === "image");
+      expect(band.className.includes(pill.fade)).toBe(kind === "image");
+      // The remove button stands on the shade on every kind.
+      const remove = screen.getByRole("button").parentElement as HTMLElement;
+      expect(remove.className).toContain(pill.shade);
+      expect(remove).toHaveAttribute("data-size", "xs");
       unmount();
     }
   });

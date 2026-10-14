@@ -75,8 +75,6 @@
   "src/components/timeline/Timeline.module.css: reads --prime-text-title-m-tracking",
   "src/components/timeline/Timeline.module.css: reads --prime-text-title-m-tracking #2",
   "src/components/timeline/Timeline.module.css: reads --prime-text-title-s-tracking",
-  "src/internal/attachmentTile.module.css: reads --prime-text-caption-tracking",
-  "src/internal/attachmentTile.module.css: reads --prime-text-caption-tracking #2",
   "src/internal/chartTooltip.module.css: reads --prime-text-caption-tracking",
   "src/internal/mediaDisk.module.css: local [data-tone] color (.disk[data-tone=\"danger\"])",
   "src/internal/mediaPill.module.css: reads --prime-text-caption-tracking",

@@ -10,8 +10,11 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatClock } from "@/internal/formatClock";
 import { leaveInPlace } from "@/internal/leaveInPlace";
+import pill from "@/internal/mediaPill.module.css";
+import textRole from "@/internal/textRole.module.css";
 import { TransferOverlay } from "@/internal/transferDisk";
 import { useNearView } from "@/internal/useNearView";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -23,7 +26,7 @@ export { styles as attachmentTileStyles };
 /** What a tile shows: a picture, a video's first frame, or a file placeholder. */
 export type AttachmentTileKind = "image" | "video" | "file";
 
-export type AttachmentTileProps = Omit<
+type AttachmentTileProps = Omit<
   React.HTMLAttributes<HTMLElement>,
   "children" | "id" | "onKeyDown"
 > & {
@@ -110,6 +113,8 @@ export function AttachmentTile({
   const nodeRef = React.useRef<HTMLElement | null>(null);
   const setRef = useMergedRefs(nodeRef, ref);
   const inFlight = upload?.status === "queued" || upload?.status === "loading";
+  // Over a picture or a video the parts stand on the media shade; a file's are on the tile's fill.
+  const onMedia = kind !== "file";
   // A video tells its length once its metadata is read: the band shows it when no size is given.
   const [duration, setDuration] = React.useState<number | null>(null);
   const bandMeta = meta ?? (kind === "video" && duration !== null ? formatClock(duration) : null);
@@ -165,11 +170,16 @@ export function AttachmentTile({
       ) : null}
       {name || bandMeta ? (
         // Decorative: the tile's name carries the file name and its state.
-        <span className={styles.band} aria-hidden="true">
-          <span className={styles.name} title={nameTitle}>
+        <span
+          className={cx(textRole.caption, onMedia && pill.fade, styles.band)}
+          aria-hidden="true"
+        >
+          <span className={cx(onMedia && pill.ink, styles.name)} title={nameTitle}>
             {name}
           </span>
-          {bandMeta ? <span className={styles.meta}>{bandMeta}</span> : null}
+          {bandMeta ? (
+            <span className={cx(onMedia && pill.inkMuted, styles.meta)}>{bandMeta}</span>
+          ) : null}
         </span>
       ) : null}
       {upload ? (
@@ -192,12 +202,16 @@ export function AttachmentTile({
       ) : null}
       {badge !== undefined ? (
         // `data-dnd-mirror`: the carried copy shows the pill too, as it changes in flight.
-        <span className={cx(styles.chip, styles.badge)} aria-hidden="true" data-dnd-mirror="">
+        <span
+          className={cx(onMedia && pill.tag, styles.badge)}
+          aria-hidden="true"
+          data-dnd-mirror=""
+        >
           <ControlSizeProvider value="xs">{badge}</ControlSizeProvider>
         </span>
       ) : null}
       {onRemove && !inFlight ? (
-        <span className={cx(styles.chip, styles.remove)}>
+        <span className={cx(pill.shade, fieldTierClass, styles.chip, styles.remove)} data-size="xs">
           <Button.Root
             variant="ghost"
             tone="inherit"
