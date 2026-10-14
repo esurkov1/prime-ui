@@ -205,15 +205,6 @@
   outline-offset: var(--prime-focus-offset);
 }
 
-/*
- * Chips sit on the field's own wash (foundation §4): a gray chip is a text-ink wash over its ground
- * (the palette), hue chips take a translucent wash of their hue, so every chip clearly steps off
- * the field in both themes.
- */
-.control .chip:not([data-color="gray"], [data-disabled="true"]) {
-  background: color-mix(in srgb, currentColor var(--prime-tint-hover), transparent);
-}
-
 /* ─── Panel ──────────────────────────────────────────────────────────────── */
 
 /* Closed: stays mounted but out of layout and of the pointer's way. */

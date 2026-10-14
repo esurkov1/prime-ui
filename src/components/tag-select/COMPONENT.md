@@ -76,7 +76,7 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ## Variants
-No `variant` or `tone`. The control is the field look; chips are soft Badges on the field's wash (neutral chips a stronger wash, hue chips a wash of their hue); the list is the shared floating panel.
+No `variant` or `tone`. The control is the field look; chips are the kit's soft Badges, the palette's soft steps that read on any field fill; the list is the shared floating panel.
 
 ### size
 | Value | Looks like | Use when | Default |
