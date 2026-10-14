@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { prefersReducedMotion } from "@/hooks/usePresence";
+import { motionTiming } from "@/internal/motionTiming";
 
 import { useDragController } from "./context";
 import type { DragItem, DropVerdict } from "./dragSession";
@@ -34,8 +35,6 @@ export type DropTargetProps = {
   "data-dnd-over"?: true | undefined;
   "data-dnd-reject"?: true | undefined;
   "data-dnd-flash"?: true | undefined;
-  /** Ends the drop flash when its animation finishes. */
-  onAnimationEnd: (event: React.AnimationEvent<HTMLElement>) => void;
 };
 
 export type DropTargetHandle = {
@@ -97,12 +96,25 @@ export function useDropTarget<TValue, TData = unknown>(
       last = { value, canDrop: verdict === true, verdict };
       return last;
     };
+    /*
+     * The flash: the target's fill starts at the accent tint and fades back to its own (`slow`),
+     * `data-dnd-flash` while it runs. Still under reduced motion, and where `animate` is missing.
+     */
+    const flash = () => {
+      if (prefersReducedMotion() || typeof element.animate !== "function") return;
+      const tint = getComputedStyle(element).getPropertyValue("--prime-color-accent-soft").trim();
+      // One keyframe: the animation ends on the target's own fill, whatever it is.
+      const animation = element.animate([{ backgroundColor: tint }], motionTiming("slow"));
+      setFlashing(true);
+      const end = () => setFlashing(false);
+      animation.addEventListener("finish", end, { once: true });
+      animation.addEventListener("cancel", end, { once: true });
+    };
     const land = (value: TValue | null, canDrop: boolean, item: DragItem) => {
       setState(OUTSIDE);
       if (value === null || !canDrop) return;
       optionsRef.current.onDrop(value, typed(item));
-      // Under reduced motion the flash has no animation, so nothing would end it.
-      if (optionsRef.current.flashOnDrop && !prefersReducedMotion()) setFlashing(true);
+      if (optionsRef.current.flashOnDrop) flash();
     };
     return controller.registerTarget({
       id,
@@ -132,10 +144,6 @@ export function useDropTarget<TValue, TData = unknown>(
     });
   }, [controller, element, disabled, id]);
 
-  const onAnimationEnd = React.useCallback((event: React.AnimationEvent<HTMLElement>) => {
-    if (event.target === event.currentTarget) setFlashing(false);
-  }, []);
-
   return {
     id,
     element,
@@ -145,7 +153,6 @@ export function useDropTarget<TValue, TData = unknown>(
       "data-dnd-over": state.isOver || undefined,
       "data-dnd-reject": (state.isOver && !state.canDrop) || undefined,
       "data-dnd-flash": flashing || undefined,
-      onAnimationEnd,
     },
   };
 }

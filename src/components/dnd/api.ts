@@ -59,8 +59,8 @@ export const api: ComponentApi = {
           name: "renderItem",
           type: "(item: T, index: number) => ReactNode",
           required: true,
-          en: "Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release, so a shown position follows the gap.",
-          ru: "Возвращает `Dnd.SortableItem`. Во время перетаскивания `index` — место, которое элемент займёт при отпускании, поэтому показанная позиция следует за зазором.",
+          en: "Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release, so a shown position follows the gap; parts marked `data-dnd-mirror` stay in step on the carried copy.",
+          ru: "Возвращает `Dnd.SortableItem`. Во время перетаскивания `index` — место, которое элемент займёт при отпускании, поэтому показанная позиция следует за зазором; части с `data-dnd-mirror` обновляются и на переносимой копии.",
         },
         {
           name: "children",
@@ -93,8 +93,8 @@ export const api: ComponentApi = {
           name: "kind",
           type: "string",
           defaultNote: { en: "unique per list", ru: "своё у каждого списка" },
-          en: "Lists sharing a `kind` exchange items (a board): by pointer at an exact position, by keyboard with Alt + the arrows across the axis. Name each list: the name is spoken on a move.",
-          ru: "Списки с общим `kind` обмениваются элементами (доска): мышью на точное место, с клавиатуры — Alt + стрелки поперёк оси. Назовите каждый список: имя произносится при переносе.",
+          en: "Lists sharing a `kind` exchange items (a board): an item from another list arrives in `onReorder` with an `id` not in `items`. Alt + the arrows across the axis move it by keyboard. Name each list: it is spoken.",
+          ru: "Списки с общим `kind` обмениваются элементами (доска): элемент из другого списка приходит в `onReorder` с `id` не из `items`. Alt + поперечные стрелки переносят его с клавиатуры. Назовите каждый список: имя звучит.",
         },
         {
           name: "canDrop",
@@ -112,8 +112,8 @@ export const api: ComponentApi = {
           name: "as",
           type: '"div" | "ul" | "ol" | "tbody"',
           default: '"div"',
-          en: "Root element; `ul` / `ol` render items as `li`, `tbody` as table rows `tr`.",
-          ru: "Корневой элемент; при `ul` / `ol` элементы — `li`, при `tbody` — строки таблицы `tr`.",
+          en: "Root element; `ul` / `ol` render items as `li`, `tbody` as table rows `tr` (the gap is a row across every column, the carried copy keeps every cell's width).",
+          ru: "Корневой элемент; при `ul` / `ol` элементы — `li`, при `tbody` — строки таблицы `tr` (зазор — строка во все колонки, переносимая копия сохраняет ширину каждой ячейки).",
         },
         {
           name: "header",
@@ -321,8 +321,8 @@ export const api: ComponentApi = {
           name: "flashOnDrop",
           type: "boolean",
           default: "false",
-          en: "Flashes the zone after a drop.",
-          ru: "Зона вспыхивает после броска.",
+          en: "Flashes the zone after a drop, so the eye can follow where the item went.",
+          ru: "Зона вспыхивает после броска, чтобы взгляд проследил, куда ушёл элемент.",
         },
         {
           name: "disabled",

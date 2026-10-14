@@ -59,15 +59,15 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `getId` | `(item: T) => string` | — (required) | Stable unique id; must match `Dnd.SortableItem id`. |
 | `getLabel` | `(item: T) => string` | the `id` | Spoken by the live region. |
 | `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — (required) | Item `id` lands in front of `beforeId` (`null` = last), maybe from a linked list. Apply it with `moveBefore`; a returned promise keeps the item still and busy until it settles, a rejection moves it back. |
-| `renderItem` | `(item: T, index: number) => ReactNode` | — (required) | Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release, so a shown position follows the gap. |
+| `renderItem` | `(item: T, index: number) => ReactNode` | — (required) | Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release, so a shown position follows the gap; parts marked `data-dnd-mirror` stay in step on the carried copy. |
 | `children` | `ReactNode` | — | Content after the items that never moves and takes no drop position: an add tile at the end of a grid. Inside `ul` / `ol` it must be `li`. |
 | `axis` | `"x" \| "y" \| "grid"` | `"y"` | A column, a single row, or a wrapping grid (`display: grid`; the host sets the tracks and the cells' size, the gap takes a cell). Keyboard: Alt + ↑ / ↓ in a column, Alt + ← / → in a row and a grid. |
 | `handle` | `boolean` | `false` | Only `Dnd.Handle` starts a drag; the rest of the item stays free for clicks and text selection. |
 | `disabled` | `boolean` | `false` | No drag, no keyboard reorder. |
-| `kind` | `string` | unique per list | Lists sharing a `kind` exchange items (a board): by pointer at an exact position, by keyboard with Alt + the arrows across the axis. Name each list: the name is spoken on a move. |
+| `kind` | `string` | unique per list | Lists sharing a `kind` exchange items (a board): an item from another list arrives in `onReorder` with an `id` not in `items`. Alt + the arrows across the axis move it by keyboard. Name each list: it is spoken. |
 | `canDrop` | `(id: string) => boolean \| string` | — | Refuses an item by id: `false`, or a string that says why (spoken and shown under the carried copy). The list turns `danger` before the release. |
 | `empty` | `ReactNode` | — | Shown while the list has no items, inside a dashed drop slot while the list takes drops; fades out when a gap opens in the list, so the gap takes its place. |
-| `as` | `"div" \| "ul" \| "ol" \| "tbody"` | `"div"` | Root element; `ul` / `ol` render items as `li`, `tbody` as table rows `tr`. |
+| `as` | `"div" \| "ul" \| "ol" \| "tbody"` | `"div"` | Root element; `ul` / `ol` render items as `li`, `tbody` as table rows `tr` (the gap is a row across every column, the carried copy keeps every cell's width). |
 | `header` | `ReactNode` | — | Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`. |
 | `aria-label` | `string` | — | Accessible name of the list. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children">` | — | `className` (the list layout), `aria-label` (the name of the list) and the other attributes of the list element. |
@@ -119,7 +119,7 @@ Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element
 | `onDrop` | `(item: DragItem<TData>) => void` | — (required) | An accepted item landed. |
 | `canDrop` | `(item: DragItem<TData>) => boolean \| string` | — | Refuses an item: `false`, or a string that says why (spoken, and shown under the carried copy); the zone turns `danger` before the release. |
 | `onEnter · onLeave` | `(item) => void · () => void` | — | An accepted item came over / left. |
-| `flashOnDrop` | `boolean` | `false` | Flashes the zone after a drop. |
+| `flashOnDrop` | `boolean` | `false` | Flashes the zone after a drop, so the eye can follow where the item went. |
 | `disabled` | `boolean` | `false` | Not a target. |
 | `as` | `"div" \| "section" \| "li" \| "ul" \| "ol" \| "span"` | `"div"` | Element. |
 | `className` | `string` | — | The zone look. |
@@ -157,7 +157,7 @@ Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body
 | `locked` (item) | a lock where the grip would be; the item holds its place, nothing moves past it | a pinned first row, a system column | `false` |
 | `empty` | the list's own line inside a dashed drop slot while it is empty (no slot when the list is `disabled`); a gap opening takes its place | columns, lists that may run out | — |
 | `canDrop` → string | the refusal says why: live region and a chip under the clone | workflow rules a person must understand | — |
-| `flashOnDrop` | the zone flashes `accent-soft` after a drop | the eye must follow where the item went | `false` |
+| `flashOnDrop` | after a drop the zone's fill starts at `accent-soft` and fades back to its own | the eye must follow where the item went | `false` |
 
 ## States
 | State | Driven by | DOM |
@@ -174,7 +174,7 @@ Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body
 | moved from the keyboard | Alt + an arrow | the items glide to their new places over `base`, like during a drag |
 | disabled | `disabled` | `data-disabled` on the item (and on the list), no `aria-roledescription` |
 
-All motion is on the tokens (lift `fast`, glide and landing `base`, flash `slow`, the faded source and the refusal fill `fast`, `standard` easing; `data-dnd-flash` clears when the flash animation ends); under `prefers-reduced-motion` the lift, the gap fade, the glide, the flash and the reason chip's drop are off, while the faded source, the refusal fill, the reason chip's fade and the empty fade stay (they run on the fade clocks).
+All motion is on the tokens (lift `fast`, a transition from the clone's resting size; glide and landing `base`; flash `slow`, an animation of the zone's fill that `data-dnd-flash` marks while it runs; the faded source and the refusal fill `fast`; `standard` easing); under `prefers-reduced-motion` the lift, the gap fade, the glide, the flash and the reason chip's drop are off, while the faded source, the refusal fill, the reason chip's fade and the empty fade stay (they run on the fade clocks).
 
 An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefault()` in them keeps the drag from starting. Presses on buttons, fields, links and `[data-dnd-ignore]` inside an item never start a drag. The browser's own drag of an image or a link inside an item or a `Dnd.Draggable` is stopped in the capture phase, so `onDragStart` on `Dnd.Draggable` is the kit's event.
 

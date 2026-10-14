@@ -255,8 +255,7 @@ export type {
   DragItem,
   DragOutcome,
 } from "./dnd/Dnd";
-export { Dnd } from "./dnd/Dnd";
-export { moveBefore } from "./dnd/useSortableList";
+export { Dnd, moveBefore } from "./dnd/Dnd";
 export * from "./drawer/Drawer";
 export type {
   DropdownCheckboxItemProps,

@@ -24,16 +24,15 @@
    flies inside a copy of its table, which carries the lift. */
 .overlay .lift {
   box-shadow: var(--prime-shadow-modal);
+  transform: scale(var(--prime-motion-scale-lift));
   transform-origin: center;
-  animation: lift var(--prime-motion-duration-fast) var(--prime-motion-easing-standard) both;
+  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-@keyframes lift {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(var(--prime-motion-scale-lift));
+/* The clone rises from its resting size as it is picked up. */
+@starting-style {
+  .overlay .lift {
+    transform: none;
   }
 }
 
@@ -219,21 +218,8 @@ li.placeholder {
   outline-color: var(--prime-color-danger-default);
 }
 
-/* Where it went, after the overlay is gone. */
-.dropZone[data-dnd-flash] {
-  animation: dropFlash var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
-}
-
-@keyframes dropFlash {
-  from {
-    background: var(--prime-color-accent-soft);
-  }
-  to {
-    background: transparent;
-  }
-}
-
-/* A locked item: the lock stands where the grip would, the item holds its place. */
+/* A locked item: the lock stands where the grip would, the item holds its place — the square of
+   the grip's `xs` tier (`fieldTierClass` + `data-size`, joined in TSX). */
 .lock {
   --prime-icon-size: var(--prime-icon-xs);
 
@@ -241,8 +227,8 @@ li.placeholder {
   flex: none;
   align-items: center;
   justify-content: center;
-  inline-size: var(--prime-control-xs-height);
-  block-size: var(--prime-control-xs-height);
+  inline-size: var(--field-h);
+  block-size: var(--field-h);
   color: var(--prime-color-text-muted);
 }
 
