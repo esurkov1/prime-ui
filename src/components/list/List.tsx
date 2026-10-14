@@ -92,8 +92,8 @@ function ListRoot({ size = "m", onReorder, labels, className, children, ...rest 
     return (
       <ControlSizeProvider value={size}>
         <PresenceContext value={presence}>
-          {/* biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them */}
           <ul
+            // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
             role="list"
             {...rest}
             className={cx(styles.root, className)}

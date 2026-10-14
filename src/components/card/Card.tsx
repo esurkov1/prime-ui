@@ -151,9 +151,7 @@ export type CardDeltaProps = SpanProps & {
 
 function CardDelta({ className, tone = "neutral", ...rest }: CardDeltaProps) {
   // The status ink is the shared text tone; `neutral` keeps the secondary ink of `.delta`.
-  return (
-    <span {...rest} className={cx(styles.delta, textTone.tone, className)} data-tone={tone} />
-  );
+  return <span {...rest} className={cx(styles.delta, textTone.tone, className)} data-tone={tone} />;
 }
 CardDelta.displayName = "Card.Delta";
 

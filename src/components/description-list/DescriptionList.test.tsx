@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 
 import { DescriptionList } from "./DescriptionList";
@@ -85,7 +86,7 @@ describe("DescriptionList", () => {
           finance@severny-veter.ru
           <DescriptionList.ItemAction label="Написать" asChild>
             <a href="mailto:finance@severny-veter.ru">
-              <svg aria-hidden="true" />
+              <Icon name="action.send" />
             </a>
           </DescriptionList.ItemAction>
         </DescriptionList.Item>
