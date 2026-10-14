@@ -190,6 +190,8 @@ export const iconRegistry = {
   "format.link": Link2,
   "format.list": List,
   "format.quote": TextQuote,
+  /** Hidden text (a spoiler) in text formatting; `field.password.hide` masks a password. */
+  "format.spoiler": EyeOff,
   "format.strikethrough": Strikethrough,
   "format.underline": Underline,
   "object.activity": Activity,

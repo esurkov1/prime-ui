@@ -154,6 +154,18 @@
   display: none;
 }
 
+/* List-level actions (`Select.Action`): pinned under the scroller and the empty state, a faint
+   full-bleed hairline above them, never scrolled away. */
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  margin: var(--prime-panel-padding) calc(-1 * var(--prime-panel-padding))
+    calc(-1 * var(--prime-panel-padding));
+  padding: var(--prime-panel-padding);
+  border-top: var(--prime-border-width) solid var(--prime-color-border-faint);
+}
+
 /* ─── Option ─────────────────────────────────────────────────────────────── */
 
 .item[data-selected="true"] {

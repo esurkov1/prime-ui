@@ -24,6 +24,8 @@ export type ChatLabels = MessageListLabels & {
   messages: string;
   /** The band above the first unread message of `items` (`Chat.Messages unread`). */
   unread: string;
+  /** Announced while the conversation loads for the first time (`Chat.Messages loading`). */
+  loading: string;
 };
 
 /** What the parts of a chat share; `Chat.Root` owns it. */

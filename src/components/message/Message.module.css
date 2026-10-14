@@ -711,6 +711,30 @@ button.reply:focus-visible {
   color: inherit;
 }
 
+/* ─── Actions ───────────────────────────────────────────────────────────── */
+
+/*
+ * A bot's inline keyboard (`Message.Actions`): rows of buttons under the bubble, on the chat's own
+ * surface, at the message's width. The column is as wide as the wider of the bubble and the
+ * keyboard (up to the cap); the bubble then takes that width, so they line up. Buttons share a row
+ * equally (`flex: 1 1 0`); a row too narrow for their labels wraps them.
+ */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: stretch;
+  gap: var(--prime-space-1);
+  margin-block-start: var(--prime-space-1);
+}
+
+.actions > * {
+  flex: 1 1 0;
+}
+
+.column[data-actions] > .bubble {
+  min-inline-size: 100%;
+}
+
 /* ─── Reactions ─────────────────────────────────────────────────────────── */
 
 /*

@@ -530,10 +530,22 @@ export default function SchedulePattern() {
               setSelected({ bar, person: findPerson(row.id) });
               setDetailOpen(true);
             }}
+            renderBarTooltip={(bar) => (bar.client ? CLIENTS[bar.client].name : KIND[bar.kind])}
             toolbar={
-              <Typography as="span" variant="body-s" tone="muted">
-                {loading ? "Загружаем график…" : `Сотрудников: ${rows.length} из ${people.length}`}
-              </Typography>
+              <>
+                <Typography as="span" variant="body-s" tone="muted">
+                  {loading
+                    ? "Загружаем график…"
+                    : `Сотрудников: ${rows.length} из ${people.length}`}
+                </Typography>
+                {/* The legend of client hues: the bar's hue repeats its client, the tooltip names it. */}
+                {(Object.keys(CLIENTS) as ClientId[]).map((client) => (
+                  <Badge.Root key={client} color={CLIENTS[client].color}>
+                    <Badge.Dot />
+                    {CLIENTS[client].name}
+                  </Badge.Root>
+                ))}
+              </>
             }
             empty={
               <EmptyPage.Root size="s" role="status" aria-labelledby="schedule-empty">

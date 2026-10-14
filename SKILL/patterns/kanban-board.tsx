@@ -471,15 +471,9 @@ export default function KanbanBoardPattern() {
                 }}
                 renderColumnMeta={figures}
                 loading={loading}
+                onItemClick={(item) => openDeal(item.id)}
                 renderItem={(item) => (
-                  <Kanban.Item
-                    onClick={() => openDeal(item.id)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" && event.target === event.currentTarget) {
-                        openDeal(item.id);
-                      }
-                    }}
-                  >
+                  <Kanban.Item>
                     <Kanban.ItemTitle>{item.company}</Kanban.ItemTitle>
                     <Kanban.ItemDescription>
                       {RUBLES.format(item.amount)} · до {DAY.format(new Date(item.due))}

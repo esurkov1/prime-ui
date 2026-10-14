@@ -75,14 +75,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Chat.Header",
-      en: "`ref` → `HTMLDivElement`. The top of the chat: who it is with. A row of the leading element (an `Avatar`), the title over the description, and the actions at the end; anything that is not a title, a description or actions leads the row.",
-      ru: "Верх чата: с кем переписка. Ряд из ведущего элемента (`Avatar`), заголовка над описанием и действий в конце; всё, что не заголовок, описание или действия, встаёт в начало ряда.",
+      en: "`ref` → `HTMLDivElement`. The top of the chat: who it is with. The title over the description and the actions at the end; every other child (a back button, an `Avatar`) leads the row, side by side in the order written.",
+      ru: "Верх чата: с кем переписка. Заголовок над описанием и действия в конце; все остальные дети (кнопка «Назад», `Avatar`) встают в начало ряда друг за другом в порядке записи.",
       props: [
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`children` (an `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
-          ru: "`children` (`Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
+          en: "`children` (a `PageContent.BackButton`, an `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
+          ru: "`children` (`PageContent.BackButton`, `Avatar`, `Chat.Title`, `Chat.Description`, `Chat.Actions`), `className`.",
         },
       ],
     },
@@ -289,6 +289,13 @@ export const api: ComponentApi = {
           default: "formatMessageDate",
           en: "The label of a date.",
           ru: "Подпись даты.",
+        },
+        {
+          name: "loading",
+          type: "boolean",
+          default: "false",
+          en: "The first load: bubble-shaped `Skeleton`s on both sides stand in the list's place (`aria-busy`, `labels.loading` announced), then cross-fade into the messages; none of them counts as new.",
+          ru: "Первая загрузка: на месте ленты — `Skeleton` в форме пузырей с обеих сторон (`aria-busy`, объявляется `labels.loading`), затем они плавно сменяются сообщениями; ни одно не считается новым.",
         },
         {
           name: "hasOlder",
@@ -511,6 +518,12 @@ export const api: ComponentApi = {
       default: "Непрочитанные сообщения",
       en: "The text of the «unread» band: `Chat.Root labels` for rows from `items`, `Chat.Unread labels` for a hand-placed band.",
       ru: "Текст полосы непрочитанных: `Chat.Root labels` для строк из `items`, `Chat.Unread labels` для полосы, поставленной вручную.",
+    },
+    {
+      key: "loading",
+      default: "Загрузка сообщений",
+      en: "Announced politely while the conversation loads for the first time (`Chat.Messages loading`).",
+      ru: "Вежливо объявляется, пока переписка загружается впервые (`Chat.Messages loading`).",
     },
   ],
 };

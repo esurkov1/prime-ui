@@ -56,8 +56,8 @@
 }
 
 /*
- * [lead: the avatar] [title over description] [actions]. Anything that is not the title, the
- * description or the actions leads the row.
+ * [lead: back button, avatar] [title over description] [actions]. `Chat.Header` sorts its children:
+ * anything that is not the title, the description or the actions goes into `.lead`, side by side.
  */
 .header {
   display: grid;
@@ -71,12 +71,16 @@
   padding: var(--prime-space-3) var(--prime-space-3) var(--prime-space-2) var(--prime-space-4);
 }
 
-.header > * {
+.lead {
+  display: flex;
   grid-area: lead;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
 }
 
 /* Without a leading element the text starts the row (no empty column and gap before it). */
-.header:not(:has(> :not(.title, .description, .actions))) {
+.header:not(:has(> .lead)) {
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
     "title actions"
@@ -142,15 +146,87 @@
   padding: var(--prime-space-2) var(--prime-space-2) var(--prime-space-3);
 }
 
+/* The region of the messages: the list, or the placeholders of a first load cross-fading into it. */
+.messages {
+  flex: 1 1 auto;
+}
+
+/*
+ * A bubble on its way, in the message's geometry: the bubble's radius, one or two lines of body
+ * text inside its padding, a width out of the bubble's cap. Older history and a first load share it.
+ */
+.skeletonBubble {
+  --chat-skeleton-lines: 1;
+
+  inline-size: min(100%, calc(var(--prime-space-24) * 2));
+  block-size: calc(
+    var(--prime-message-padding-y) *
+    2 +
+    var(--prime-text-body-m-line-height) *
+    var(--chat-skeleton-lines)
+  );
+  min-block-size: 0;
+  border-radius: var(--prime-message-radius);
+}
+
 /* Older history on its way: a bubble-shaped placeholder above the first message. */
 .older {
   display: flex;
   padding: var(--prime-space-3) var(--prime-space-2);
 }
 
-.olderBubble {
-  inline-size: min(100%, calc(var(--prime-space-24) * 2));
-  block-size: var(--prime-space-10);
+/* A first load: the placeholders stand at the end of the list, as the messages will. */
+.loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-block-size: 0;
+  overflow: clip;
+  padding: var(--prime-space-2) var(--prime-space-2) var(--prime-space-3);
+}
+
+.loadingRow {
+  container-type: inline-size;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--prime-space-2);
+  padding-block: calc(var(--prime-message-group-gap) / 2);
+  padding-inline: var(--prime-space-2);
+}
+
+.loadingRow[data-direction="outgoing"] {
+  justify-content: flex-end;
+}
+
+/* A change of side starts a new run: the larger gap above it. */
+.loadingRow[data-direction="incoming"] + [data-direction="outgoing"],
+.loadingRow[data-direction="outgoing"] + [data-direction="incoming"] {
+  margin-block-start: calc(var(--prime-message-gap) - var(--prime-message-group-gap));
+}
+
+.loadingRow .skeletonBubble {
+  margin-inline: var(--prime-message-tail-width) 0;
+}
+
+.loadingRow[data-direction="outgoing"] .skeletonBubble {
+  margin-inline: 0 var(--prime-message-tail-width);
+}
+
+.loadingRow[data-lines="2"] .skeletonBubble {
+  --chat-skeleton-lines: 2;
+}
+
+/* Widths out of the bubble's cap (`--prime-message-max-width`, 85% of the row), varied per row. */
+.loadingRow:nth-child(3n + 1) .skeletonBubble {
+  inline-size: min(var(--prime-message-max-width), 56cqi);
+}
+
+.loadingRow:nth-child(3n + 2) .skeletonBubble {
+  inline-size: min(var(--prime-message-max-width), 72cqi);
+}
+
+.loadingRow:nth-child(3n) .skeletonBubble {
+  inline-size: min(var(--prime-message-max-width), 40cqi);
 }
 
 /* The list takes its host's width: rows are containers and never size from their content. */

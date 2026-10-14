@@ -9,6 +9,7 @@
 - Free-form text longer than one line: comments, descriptions, reviews, support requests, notes.
 - A plain growing input (`rows={1} maxRows={8}`) when a full chat composer with attachments, reply and voice is not needed.
 - Text with a length limit shown to the user (`Textarea.Counter`).
+- Text that is later shown with its Markdown (an announcement, a comment, a task description): `formatting` adds the toolbar and hotkeys Composer has.
 
 ## When not to use
 - A single-line value (name, e-mail, search) → use [Input](../input/COMPONENT.md).
@@ -26,6 +27,7 @@ import { Textarea } from "prime-ui-kit";
 Textarea.Root       label row → field box with the native <textarea> → support row (hint | error · counter)
 ├─ Textarea.CopyButton   children: copies the text from the top end corner (kit-rendered)
 └─ Textarea.Action       children: the consumer's named icon action with a tooltip (button or asChild link)
+(toolbar)           with `formatting`: floating role="toolbar" over a selection — 7 ghost Buttons with Tooltip + Kbd
 Textarea.Counter    goes into Textarea.Root `counter` (right side of the support row)
 ```
 Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the whole field and takes native `<textarea>` props directly. Its children are only the corner actions: they sit in the top end corner as full-height segments flush with the box edges, in JSX order, after the commit status of `onCommit`.
@@ -56,6 +58,7 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `id` | `string` | — | Id of the `<textarea>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`. |
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
 | `onCommit` | `(value: string) => void \| Promise<void>` | — | Inline save: fires with a changed value on blur and Mod+Enter; Escape reverts. Return a Promise: the field shows a spinner and stays editable; a rejection restores the value — show why through `error`. |
+| `formatting` | `boolean` | `false` | Selecting text shows a floating toolbar of seven Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. Off: plain text. |
 | `children` | `ReactNode` | — | Actions in the field's top end corner: `Textarea.CopyButton`, `Textarea.Action`. |
 | `labels` | `Partial<TextareaLabels>` | — | Built-in strings, see Labels. |
 | `className` | `string` | — | Class on the field frame `<div>` (label, field box, support row), as on every field root. |
@@ -112,6 +115,7 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `focusRing={false}` | No focus ring; focus fill and caret remain | A single composer field where focus is obvious | `true` |
+| `formatting` | A floating toolbar over a selection (bold, italic, strikethrough, code, spoiler, link, quote) and the Mod-hotkeys; each writes Markdown around the selection | The text is shown later with its Markdown (Message renders the same subset) | `false` |
 | `reserveSupportRow` | Empty support row of hint height | Live validation, fields side by side | `false` |
 | `required` / `optional` | Red `*` / muted «необязательно» after the label | Mark the minority of the form | — / `false` |
 
@@ -135,6 +139,7 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 | saving | `onCommit` returned a pending Promise | `aria-busy="true"` on the textarea, a `Spinner` in the top end corner (`data-commit="pending"`); the field stays editable; a live region says `labels.saving` |
 | saved | the Promise resolved (or `onCommit` returned nothing) | the spinner cross-fades into a success check (`data-commit="saved"`) that fades out; the live region says `labels.saved` |
 | save refused | the Promise rejected | the committed text is put back (unless the person typed on); the owner shows why through `error` |
+| selection | `formatting` and a non-empty selection while the focus is in the field or its toolbar (not disabled or read-only) | the floating toolbar fades in from below above the field's start edge (`overlayMotion` floating, `data-side="top"`); a tool wraps the selection in its Markdown, a second press removes it; the edit is typed into the field, so `Mod+Z` takes it back |
 | copied | `Textarea.CopyButton` pressed | the copy glyph cross-fades into a check, the name becomes `labels.copied` (or `labels.copyError`) |
 
 Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+Enter (Ctrl or ⌘ with Enter — a plain Enter is a line break) commit a changed text, Escape puts the committed text back and is consumed. An unchanged text never fires. Return a Promise for a server save: pending shows a spinner while the field stays editable and Tab moves on, reject restores the text, resolve shows the check.
@@ -146,6 +151,7 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 - Field → field in a form: `--prime-space-5`; group → actions: `--prime-space-8`.
 - Width is always `100%` of the parent; set the width with the layout column.
 - Long words wrap (`overflow-wrap: anywhere`), so the field never overflows horizontally.
+- With `formatting` the toolbar floats `--prime-space-2` above the field box's start edge on the floating layer, over whatever is above the field; it takes no room in the layout.
 
 ## Accessibility
 
@@ -154,7 +160,10 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 |---|---|
 | `Tab` | Focuses the field, then the buttons in its corner; Enter inserts a line break instead of submitting the form. |
 | `Mod+Enter` | With `onCommit`: saves a changed text; focus stays in the field. |
-| `Escape` | With `onCommit`: puts the committed text back. |
+| `Escape` | With `formatting`: first clears a selection with the toolbar. With `onCommit`: puts the committed text back. |
+| `Mod + B` · `Mod + I` · `Mod + Shift + X` · `Mod + E` · `Mod + Shift + H` · `Mod + K` · `Mod + Shift + 9` | With `formatting`: bold, italic, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works. |
+| `←` · `→` | Move between the formatting buttons. |
+| `Home` · `End` | Jump to the first / last formatting button. |
 
 ### ARIA
 - `label` renders `<label htmlFor>` bound to the textarea; without it set `aria-label`. A placeholder never replaces the label.
@@ -163,6 +172,7 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 - `Textarea.Counter` shows `12/280` visually and announces `labels.counter` (`aria-live="polite"`).
 - `Textarea.Action` and `Textarea.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied`. A press on them never moves focus into the textarea.
 - With `onCommit` the textarea carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.
+- The formatting toolbar is `role="toolbar"` named `labels.formatting`, `aria-controls` the textarea, with one Tab stop and arrow keys; every button has `aria-keyshortcuts` and a tooltip with its keys (`⌘B` on Apple systems, `Ctrl+B` elsewhere). A press on a tool keeps the focus and the selection in the field.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -176,6 +186,14 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 | `copyError` | `"Не удалось скопировать"` | Name, tooltip and announcement when the clipboard refuses. |
 | `saving` | `"Сохранение"` | Announced while an `onCommit` save is pending. |
 | `saved` | `"Сохранено"` | Announced once an `onCommit` save succeeds. |
+| `formatting` | `"Форматирование"` | Accessible name of the formatting toolbar. |
+| `bold` | `"Жирный"` | Bold tool. |
+| `italic` | `"Курсив"` | Italic tool. |
+| `strikethrough` | `"Зачёркнутый"` | Strikethrough tool. |
+| `code` | `"Моноширинный"` | Code tool. |
+| `spoiler` | `"Скрытый текст"` | Spoiler tool (`\|\|…\|\|`). |
+| `link` | `"Ссылка"` | Link tool. |
+| `quote` | `"Цитата"` | Quote tool. |
 
 ## Examples
 | Example | Shows |
@@ -188,6 +206,7 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single reply composer where the caret and the lighter fill show focus — `focusRing`. |
 | [edge-actions.tsx](examples/edge-actions.tsx) | A read-only generated reply with copying and a link to the template in the field's corner — `Textarea.CopyButton`, `Textarea.Action`. |
 | [inline-edit.tsx](examples/inline-edit.tsx) | A record card note that saves on blur and Mod+Enter, reverts on Escape and shows the server's refusal — `onCommit`, `error`. |
+| [formatting.tsx](examples/formatting.tsx) | A long announcement where a selection gets the formatting toolbar and its hotkeys, written as Markdown around it — `formatting`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the text; the counter follows it and `maxLength` stops extra input — `value`, `onValueChange`, `Textarea.Counter`, `maxLength`. |
 | [in-form.tsx](examples/in-form.tsx) | Support request form: the description is checked on submit, its error leaves as soon as the text is long enough and does not shift the form, a sent request turns the button green — `required`, `error`, `reserveSupportRow`. |
 
@@ -200,7 +219,8 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 - Only a placeholder, no label → add `label` or `aria-label`.
 - A copy `Button` under a read-only result → `Textarea.CopyButton` as a child of the root.
 - Other children than `Textarea.CopyButton` / `Textarea.Action` → the root renders the textarea itself; children are only the corner actions.
+- `formatting` on text that is shown as plain text → the reader sees `**` and `||`; turn it on only where the text is rendered with its Markdown.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (corner actions), [Spinner](../spinner/COMPONENT.md) (`onCommit`)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (corner actions, formatting tools), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [Button](../button/COMPONENT.md) and [Kbd](../kbd/COMPONENT.md) (formatting tools), Icon (`format.*`); `internal/textFormatting` + `internal/textFormattingToolbar` (the formatting shared with Composer)
 - **See also:** [Input](../input/COMPONENT.md) — the same field contract for one line; [Composer](../composer/COMPONENT.md) — a chat message input built on Textarea; [CodeBlock](../code-block/COMPONENT.md)

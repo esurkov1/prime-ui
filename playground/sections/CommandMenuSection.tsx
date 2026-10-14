@@ -52,7 +52,7 @@ export const page: ComponentPageConfig = {
       scenario: "server-search",
       title: "Поиск на сервере",
       description:
-        "Заказы ищутся на сервере: родитель грузит результаты по запросу и следующую порцию в конце списка, а если ничего не нашлось, палитра предлагает создать заказ — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`, `CommandMenu.Empty`.",
+        "Заказы ищутся на сервере: родитель грузит результаты по запросу и следующую порцию в конце списка, а один постоянный пункт в конце создаёт заказ из запроса, нашлось что-то или нет — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`, `persistent`.",
     },
     {
       scenario: "load-error",

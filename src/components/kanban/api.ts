@@ -102,6 +102,18 @@ export const api: ComponentApi = {
           ru: "Рисует одну карточку; возвращает `Kanban.Item`.",
         },
         {
+          name: "getItemHref",
+          type: "(item: T) => string",
+          en: "The card is a link: a real `<a>` named by `getLabel` covers it and is its tab stop — a click, ⌘/Ctrl-click, a middle click, a new tab. A press on it still drags the card; a drag never follows it.",
+          ru: "Карточка — ссылка: настоящий `<a>` с именем из `getLabel` накрывает её и служит остановкой Tab — клик, ⌘/Ctrl-клик, средняя кнопка, новая вкладка. Нажатие по-прежнему тащит карточку; перетаскивание не ведёт по ссылке.",
+        },
+        {
+          name: "onItemClick",
+          type: "(item: T, event: KanbanItemClickEvent) => void",
+          en: "Opens a card in place (a Drawer): a click, Enter or Space; never from a control inside it or after a drag. With `getItemHref` it gets plain clicks: `event.preventDefault()` routes in the app.",
+          ru: "Открывает карточку на месте (Drawer): клик, Enter или Space; не от контрола внутри и не после перетаскивания. С `getItemHref` получает обычные клики: `event.preventDefault()` — переход роутером.",
+        },
+        {
           name: "renderColumnActions",
           type: "(column: KanbanColumn) => ReactNode",
           en: "Trailing actions of a column header (add a card, a menu); kit controls inside take the `s` tier.",
@@ -137,8 +149,8 @@ export const api: ComponentApi = {
           name: "disabled",
           type: "boolean",
           default: "false",
-          en: "Read-only board: no drag, no keyboard moves, no column grips; clicks on cards still work.",
-          ru: "Доска только для чтения: без перетаскивания, переноса с клавиатуры и ручек колонок; клики по карточкам работают.",
+          en: "Read-only board: no drag, no keyboard moves, no column grips; `onItemClick` and `getItemHref` still open cards.",
+          ru: "Доска только для чтения: без перетаскивания, переноса с клавиатуры и ручек колонок; `onItemClick` и `getItemHref` по-прежнему открывают карточки.",
         },
         {
           name: "labels",
@@ -169,8 +181,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "id">',
-          en: "`children` (the card parts), `className`, `onClick` and the other attributes.",
-          ru: "`children` (части карточки), `className`, `onClick` и остальные атрибуты.",
+          en: "`children` (the card parts), `className` and the other attributes; `onClick` / `onKeyDown` run before `onItemClick` opens the card — `preventDefault()` keeps it closed.",
+          ru: "`children` (части карточки), `className` и остальные атрибуты; `onClick` / `onKeyDown` выполняются раньше, чем `onItemClick` открывает карточку, — `preventDefault()` оставляет её закрытой.",
         },
       ],
     },

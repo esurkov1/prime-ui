@@ -14,6 +14,7 @@ import { formatClock } from "@/internal/formatClock";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { TransferOverlay } from "@/internal/transferDisk";
 import { useNearView } from "@/internal/useNearView";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./attachmentTile.module.css";
 
@@ -37,6 +38,10 @@ export type AttachmentTileProps = Omit<
   nameTitle?: string;
   /** The size, at the end of the bottom band; a video without it shows its duration. */
   meta?: string;
+  /** The file's address: the tile's middle becomes a link that opens it in a new tab. */
+  href?: string;
+  /** Name of the `href` link («Открыть договор.pdf»). */
+  openLabel?: string;
   /**
    * The pill at the top start — the format (JPG, PDF) or a word such as «Обложка»; decorative, the
    * name says it. On a picture or a video it stands on the media shade; a file passes a kit Badge.
@@ -85,6 +90,8 @@ export function AttachmentTile({
   name,
   nameTitle,
   meta,
+  href,
+  openLabel,
   badge,
   upload,
   uploadState = null,
@@ -143,6 +150,19 @@ export function AttachmentTile({
           <Icon name="object.file" size="xl" animated={false} />
         </span>
       )}
+      {href ? (
+        // Over the middle, under the band (it lets the pointer through) and the chips: a press
+        // that does not travel opens the file, one that does drags the tile.
+        <a
+          className={styles.open}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          draggable={false}
+        >
+          <VisuallyHidden>{openLabel}</VisuallyHidden>
+        </a>
+      ) : null}
       {name || bandMeta ? (
         // Decorative: the tile's name carries the file name and its state.
         <span className={styles.band} aria-hidden="true">

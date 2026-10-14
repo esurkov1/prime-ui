@@ -183,6 +183,7 @@ part, icon or shared mechanic, it uses it — never its own copy. Before writing
 | a bounded block in an example (panel, card) | `Card` (`Card.Root` + `Card.Body`) — never a hand-drawn card in CSS |
 | a person / object picture | `Avatar` / `Thumbnail`; image load state via `src/hooks/useImageStatus` |
 | a table, pagination, row selection | `DataTable`, `Pagination`, `Checkbox` |
+| a list of conversations (the dialogs pane of a messenger or an inbox) | `ChatList` — never `List` with a hand-made count, preview or «печатает…» |
 | a selectable list of rows (dialogs, tickets, mail — the list side of a list + detail) | `List` (`current`, `List.ItemIcon` / `ItemText` / `ItemDescription` / `ItemMeta` / `ItemCount`) — never ghost Buttons with a soft current |
 | screen-reader-only text | `src/internal/VisuallyHidden` |
 | appearance of a part | `src/internal/enterMotion.module.css` (`.enter`, `.enterBase`) |
@@ -307,7 +308,7 @@ export const page: ComponentPageConfig = {
   field — Input, Textarea, DigitInput, Select, NativeSelect, TagSelect, Datepicker, ColorPicker,
   ColorField, FileUpload; overlay — Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu,
   Notification, MediaViewer; navigation — Tabs, Accordion, Stepper, Breadcrumb, Pagination, List; composite — DataTable, Kanban,
-  Gantt, Dnd, SmartFilter, Timeline, Card, DescriptionList, LoginForm, EmptyPage, Composer, Chat, Message, ChartFrame; layout — AppShell, AppHeader, Sidebar, BottomNav, PageContent,
+  Gantt, Dnd, SmartFilter, Timeline, Card, DescriptionList, LoginForm, EmptyPage, Composer, Chat, ChatList, Message, ChartFrame; layout — AppShell, AppHeader, Sidebar, BottomNav, PageContent,
   PageToolbar, ScrollContainer, ExampleFrame, Crossfade).
 - **Slots** (`SLOTS` in `pageStandard.ts`, file = slot id): `overview` «Обзор» · `variants` «Варианты» ·
   `sizes` «Размеры» · `states` «Состояния» · `with-icon` «С иконкой» · `structure` «Структура» ·

@@ -193,7 +193,12 @@ function FormatSelect({ className, ...rest }: ColorPickerFormatSelectProps) {
 
   return (
     <div {...rest} className={cx(styles.formatSelectWrap, className)}>
-      <Select.Root value={format} onValueChange={(value) => isFormat(value) && setFormat(value)}>
+      <Select.Root
+        value={format}
+        onValueChange={(value) => {
+          if (isFormat(value)) setFormat(value);
+        }}
+      >
         <Select.Trigger aria-label={labels.format}>
           <Select.Value />
         </Select.Trigger>

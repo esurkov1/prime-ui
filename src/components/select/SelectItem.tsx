@@ -245,3 +245,77 @@ export function SelectItem({
   );
 }
 SelectItem.displayName = "Select.Item";
+
+// ─── Action ──────────────────────────────────────────────────────────────────
+
+/** The highlight value of a `Select.Action`: never a value an option can have. */
+const ACTION_PREFIX = "__prime_select_action";
+
+export const isActionValue = (value: string) => value.startsWith(ACTION_PREFIX);
+
+export type SelectActionProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "onSelect" | "role" | "id" | "children"
+> & {
+  /** Runs the action: a click, or Enter / Space while it is highlighted; the list then closes. */
+  onSelect: () => void;
+  /** Muted, skipped by the keyboard, not runnable. */
+  disabled?: boolean;
+  /** The action text; an optional `Select.ItemIcon` in front. */
+  children: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * A list-level action («Новый клиент»): pinned under the scroller, never filtered by the search,
+ * the last stop of the arrow keys. The listbox owns it (`aria-owns`), so it is an option of the
+ * list for assistive tech.
+ */
+export function SelectAction({
+  onSelect,
+  disabled = false,
+  className,
+  children,
+  onClick,
+  onMouseMove,
+  ref,
+  ...rest
+}: SelectActionProps) {
+  const { highlight, listboxId, setOpen, size } = useSelectContext();
+  const value = `${ACTION_PREFIX}${React.useId()}`;
+  const isHighlighted = useStoreSlice(highlight, (current) => current === value);
+  const parts = splitItemChildren(children);
+
+  return (
+    // biome-ignore lint/a11y/useFocusableInteractive: focus stays on the listbox / search (aria-activedescendant)
+    // biome-ignore lint/a11y/useKeyWithClickEvents: the keyboard is handled on the listbox
+    <div
+      {...rest}
+      ref={ref}
+      id={optionDomId(listboxId, value)}
+      role="option"
+      aria-disabled={disabled || undefined}
+      className={cx(menu.item, className)}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented || disabled) return;
+        onSelect();
+        setOpen(false);
+      }}
+      onMouseMove={(event) => {
+        onMouseMove?.(event);
+        if (!disabled && !isHighlighted) highlight.set(value);
+      }}
+      {...toDataAttributes({
+        value,
+        action: true,
+        highlighted: isHighlighted,
+        disabled,
+      })}
+    >
+      {sizeMedia(parts.leading, size)}
+      <span className={styles.itemText}>{parts.body}</span>
+    </div>
+  );
+}
+SelectAction.displayName = "Select.Action";

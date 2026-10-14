@@ -40,6 +40,12 @@ export const page: ComponentPageConfig = {
         "Сделки менеджеров по месяцам тепловой картой: каждое число закрашивает свою ячейку по шкале графиков и остаётся читаемым в ней — `scale`, `numeric`.",
     },
     {
+      scenario: "trend",
+      title: "Тренд в ячейке",
+      description:
+        "Клиенты с выручкой по месяцам: компактный Sparkline в ячейке каждой строки рядом с суммой за полгода — `cell`, `width`.",
+    },
+    {
       scenario: "content-width",
       title: "Ширина таблицы и колонок",
       description:
@@ -103,7 +109,7 @@ export const page: ComponentPageConfig = {
       scenario: "groups",
       title: "Группы строк",
       description:
-        "Платежи по месяцам с итогом месяца в строке-заголовке; заголовки остаются сверху, пока прокручиваются их строки — `getRowGroup`, `renderGroupHeader`, `stickyGroupHeaders`.",
+        "Платежи по месяцам с итогом месяца в строке-заголовке; заголовки остаются сверху, пока прокручиваются их строки, прошлый месяц свёрнут — `getRowGroup`, `renderGroupHeader`, `stickyGroupHeaders`, `defaultCollapsedGroups`.",
     },
     {
       scenario: "columns-visibility",
@@ -156,7 +162,7 @@ export const page: ComponentPageConfig = {
       {
         keys: "Enter · Space",
         action:
-          "Сортирует по колонке, раскрывает строку или открывает строку в фокусе (`onRowClick`); на ссылке строки Enter переходит по ней.",
+          "Сортирует по колонке, раскрывает строку или группу, открывает строку в фокусе (`onRowClick`); на ссылке строки Enter переходит по ней.",
       },
       { keys: "Space", action: "Отмечает строку на флажке под фокусом." },
       { keys: "Shift + Space", action: "Отмечает диапазон от последней отмеченной строки." },
@@ -175,6 +181,7 @@ export const page: ComponentPageConfig = {
       "После смены выбора вежливая область объявляет `labels.selectedCount`; выбранные строки — `aria-selected`.",
       "Ручка строки — кнопка с именем `labels.reorderRow` и `aria-keyshortcuts`; взятие, сброс и ход с клавиатуры объявляются вежливой областью («Этап: позиция 2 из 6»). Пока ход сохраняется, строка — `aria-busy`; при сортировке ручки неактивны, подсказка — `labels.reorderSorted`.",
       "Переключатель раскрытия — кнопка с `aria-expanded`, `aria-controls` (детали или вложенные строки) и `labels.expand` / `labels.collapse`.",
+      "Переключатель группы (сворачиваемые группы) — кнопка в заголовке группы с `aria-expanded`, `aria-controls` (строки открытой группы) и `labels.expandGroup` / `labels.collapseGroup` с `{group}`.",
       'Загрузка: `aria-busy` на таблице и статус `labels.loading`; ошибка — `role="alert"`; пустое состояние — `role="status"`.',
     ],
   },

@@ -1,4 +1,5 @@
 import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { formattingProp, TEXT_FORMATTING_LABEL_ROWS } from "../../internal/textFormatting.api";
 
 export const api: ComponentApi = {
   parts: [
@@ -81,13 +82,7 @@ export const api: ComponentApi = {
           en: "Attachments, usually `useUploadQueue(…)`: the paperclip, a paste and a drop add to it, and a tray above the row shows them as one reorderable strip of tiles. Without `queue` paste and drop of files do nothing.",
           ru: "Вложения, обычно `useUploadQueue(…)`: сюда добавляют скрепка, вставка и перетаскивание, а лоток над строкой показывает их одной лентой плиток с перестановкой. Без `queue` вставка и перетаскивание файлов ничего не делают.",
         },
-        {
-          name: "formatting",
-          type: "boolean",
-          default: "true",
-          en: "Selecting text shows a floating toolbar (bold, italic, strikethrough, code, link, quote) and enables the hotkeys; each writes Markdown around the selection. `false` turns both off.",
-          ru: "Выделение текста показывает плавающую панель (жирный, курсив, зачёркнутый, код, ссылка, цитата) и включает сочетания клавиш; каждое пишет Markdown вокруг выделения. `false` выключает и то, и другое.",
-        },
+        formattingProp("true"),
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
@@ -388,48 +383,7 @@ export const api: ComponentApi = {
       en: "The option that sends the attached photos and videos as files.",
       ru: "Флажок, который отправляет прикреплённые фото и видео файлами.",
     },
-    {
-      key: "formatting",
-      default: "Форматирование",
-      en: "Accessible name of the formatting toolbar.",
-      ru: "Имя панели форматирования.",
-    },
-    {
-      key: "bold",
-      default: "Жирный",
-      en: "Bold tool.",
-      ru: "Жирный.",
-    },
-    {
-      key: "italic",
-      default: "Курсив",
-      en: "Italic tool.",
-      ru: "Курсив.",
-    },
-    {
-      key: "strikethrough",
-      default: "Зачёркнутый",
-      en: "Strikethrough tool.",
-      ru: "Зачёркнутый.",
-    },
-    {
-      key: "code",
-      default: "Моноширинный",
-      en: "Code tool.",
-      ru: "Код.",
-    },
-    {
-      key: "link",
-      default: "Ссылка",
-      en: "Link tool.",
-      ru: "Ссылка.",
-    },
-    {
-      key: "quote",
-      default: "Цитата",
-      en: "Quote tool.",
-      ru: "Цитата.",
-    },
+    ...TEXT_FORMATTING_LABEL_ROWS,
     {
       key: "cancelReply",
       default: "Отменить ответ",

@@ -24,7 +24,11 @@ type StateRowsProps<Row> = {
   skeletonRows: number;
 };
 
-/** The body of the loading (skeleton rows), empty and error states. */
+/**
+ * The body of the loading (skeleton rows), empty and error states. The empty and error content sits
+ * in a sticky box of the visible width, so a wide table centres it in the viewport, not across
+ * every column.
+ */
 export function StateRows<Row>({
   state,
   columns,
@@ -42,8 +46,10 @@ export function StateRows<Row>({
     return (
       <tr>
         <td colSpan={totalColumns} className={cx(styles.stateCell, styles.stateError)}>
-          <div className={styles.stateContent} role="alert">
-            {error}
+          <div className={styles.stateBox}>
+            <div className={styles.stateContent} role="alert">
+              {error}
+            </div>
           </div>
         </td>
       </tr>
@@ -54,13 +60,15 @@ export function StateRows<Row>({
     return (
       <tr>
         <td colSpan={totalColumns} className={styles.stateCell}>
-          {empty == null || typeof empty === "string" ? (
-            <EmptyPage.Root layout="compact" size={size} role="status">
-              <EmptyPage.Description>{empty ?? emptyLabel}</EmptyPage.Description>
-            </EmptyPage.Root>
-          ) : (
-            <div className={styles.stateContent}>{empty}</div>
-          )}
+          <div className={styles.stateBox}>
+            {empty == null || typeof empty === "string" ? (
+              <EmptyPage.Root layout="compact" size={size} role="status">
+                <EmptyPage.Description>{empty ?? emptyLabel}</EmptyPage.Description>
+              </EmptyPage.Root>
+            ) : (
+              <div className={styles.stateContent}>{empty}</div>
+            )}
+          </div>
         </td>
       </tr>
     );

@@ -1,4 +1,4 @@
-/** Payments grouped by month with the month's total in its header row; headers stay on top while their rows scroll — `getRowGroup`, `renderGroupHeader`, `stickyGroupHeaders`. */
+/** Payments grouped by month with the month's total in its header row; headers stay on top while their rows scroll, a past month folds away — `getRowGroup`, `renderGroupHeader`, `stickyGroupHeaders`, `defaultCollapsedGroups`. */
 import { DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 
 type Payment = { id: string; month: string; client: string; date: string; amount: number };
@@ -65,6 +65,7 @@ export default function DataTableGroupsExample() {
         </>
       )}
       stickyGroupHeaders
+      defaultCollapsedGroups={["Август 2026"]}
       stickyHeader
       paging="none"
       scrollHeight={320}

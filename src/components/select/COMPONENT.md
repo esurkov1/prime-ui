@@ -43,8 +43,17 @@ Select.Root                       field frame: label · control · hint/error; v
     │   ├── Select.Separator      full-bleed Divider
     │   └── skeleton rows         `loading` with no items, `loadingMore` at the end
     ├── empty state               compact EmptyPage
+    ├── role="group"              pinned under the list, owned by the listbox (`aria-owns`)
+    │   └── Select.Action         role="option": [Select.ItemIcon] [text]; never filtered
     └── load error                compact EmptyPage, role="alert", retry Button (`loadError`, `onRetry`)
 ```
+
+An item reads its parts by element type, among its direct children (fragments are opened):
+`Select.ItemIcon`, `Avatar.Root`, `Thumbnail.Root` lead; `Select.ItemText`, `Select.ItemDescription`
+make the text column; `Select.ItemMeta`, `Badge.Root` trail. A wrapper component is a different
+type and lands in the text column: call your helper as a function (`{clientAvatar(client)}`), not as
+an element (`<ClientAvatar client={client} />`). Any other trailing element (a Kbd, a price with
+an icon) goes inside `Select.ItemMeta`.
 
 ## API
 
@@ -57,7 +66,7 @@ Select.Root                       field frame: label · control · hint/error; v
 |---|---|---|---|
 | `value` | `string \| string[]` | — | Controlled value; `string[]` with `multiple`. |
 | `defaultValue` | `string \| string[]` | — | Initial value, uncontrolled. |
-| `onValueChange` | `(value: string) => void \| (value: string[]) => void` | — | Called with the picked value (`""` after clearing), or the new list with `multiple`. |
+| `onValueChange` | `(value: string) => void \| Promise<void> · (value: string[]) => void \| Promise<void>` | — | The picked value (`""` after clearing) or, with `multiple`, the new list. A promise: the value shows at once with a trigger Spinner, picks wait; reject rolls back and announces `labels.changeFailed`. |
 | `multiple` | `boolean` | `false` | Several values: checkboxes in the list, the list stays open on a pick, labels joined in the trigger. |
 | `open` | `boolean` | — | Controlled open state of the list. |
 | `defaultOpen` | `boolean` | `false` | Initial open state, uncontrolled. |
@@ -113,7 +122,7 @@ Select.Root                       field frame: label · control · hint/error; v
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `searchable` | `boolean` | `false` | A search field on top; items filter by label, description and `keywords` — or the owner loads them by the query (`search`, `filter={false}` on Root). |
-| `children` | `ReactNode` | — (required) | Items, groups, separators. |
+| `children` | `ReactNode` | — (required) | Items, groups, separators; `Select.Action` children stand under the list. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "hidden" \| "onKeyDown" \| "onAnimationEnd">` | — | `className` and the other attributes of the panel. |
 
 ### Select.Item
@@ -144,6 +153,16 @@ Select.Root                       field frame: label · control · hint/error; v
 |---|---|---|---|
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the divider. |
 
+### Select.Action
+`ref` → `HTMLDivElement`. A list-level action («Новый клиент»), a direct child of `Select.Content`: a `role="option"` row pinned under the list, never filtered, the last stop of the arrows; highlighted while the search finds nothing.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `onSelect` | `() => void` | — (required) | Runs the action: a click, or Enter / Space while it is highlighted; the list then closes and the value stays. |
+| `disabled` | `boolean` | `false` | Muted, skipped by the keyboard, not runnable. |
+| `children` | `ReactNode` | — (required) | The action text; an optional `Select.ItemIcon` in front. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "onSelect" \| "role" \| "id" \| "children">` | — | `className` and the other attributes of the row. |
+
 ## Variants
 No `variant` or `tone`. The trigger is the field look (fill, inset control border, tier radius); the panel is the shared floating surface with menu rows.
 
@@ -166,8 +185,10 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | `filter={false}` | every item shows whatever the query; the query is still marked in the labels | The owner searches on the server (`search`, `onSearchChange`) | `true` |
 | `searchable` (Content) | search row with a faint hairline at the top of the list | More than ~10 options | `false` |
 | rich options | `Thumbnail.Root` or `Select.ItemDescription` in an item: a two-line row; `Avatar.Root` before the text and `Badge.Root` after it keep one line; the trigger the same with `renderValue` | Products, people, delivery tariffs | |
+| `Select.Action` | a row under the list behind a faint full-bleed hairline, with an optional leading icon; stays whatever the query | One list-level action: «Новый клиент», «Пригласить в команду» | |
+| async `onValueChange` | the picked value at once, a Spinner instead of the chevron until the promise settles | The choice saves on the server right away | |
 
-**Combinations** — `renderValue` is single-mode only; with `multiple` the trigger shows the joined labels. `error` implies `invalid`; `loadError` is a different thing — the options failed to load — and never marks the field invalid. `Select.ItemDescription` is searchable. A status Badge can follow `Select.Value` inside the trigger; it takes the tier one step down by itself. An `Avatar.Root` or `Thumbnail.Root` in a row or `renderValue` takes the tier media size (`xs` · `xs` · `s` · `s` · `m` for `xs`–`xl`) unless it sets `size`. A server search: `searchable` + `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; keep the selected option among the items (or draw it with `renderValue`) so the trigger knows its label.
+**Combinations** — `renderValue` is single-mode only; with `multiple` the trigger shows the joined labels. `error` implies `invalid`; `loadError` is a different thing — the options failed to load — and never marks the field invalid. `Select.ItemDescription` is searchable. A status Badge can follow `Select.Value` inside the trigger; it takes the tier one step down by itself. An `Avatar.Root` or `Thumbnail.Root` in a row or `renderValue` takes the tier media size (`xs` · `xs` · `s` · `s` · `m` for `xs`–`xl`) unless it sets `size`. A server search: `searchable` + `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; keep the selected option among the items (or draw it with `renderValue`) so the trigger knows its label. `Select.Action` is a direct child of `Select.Content`; when the search finds nothing, the empty text and the action show together (text above, action pinned below) and the action takes the highlight, so Enter runs it — never repeat the action inside the empty state. A promise from `onValueChange` works in single and `multiple` mode: picks and the clear segment wait until it settles; on a rejection show the reason through `error` (and rethrow, so the value rolls back).
 
 ## States
 | State | Driven by | DOM |
@@ -177,11 +198,12 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the trigger; error text below; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled="true"` |
 | loading | `loading` | `data-loading="true"`, `aria-busy` on the trigger and the list; with no item on screen, `aria-hidden` skeleton rows (`data-skeleton`) in the list; `labels.loading` in a polite live region |
+| saving | a pending promise from `onValueChange` | the new value shows; Spinner instead of the chevron, `data-loading="true"` and `aria-busy` on the trigger, `aria-busy` on the list; picks and clear wait; a rejection restores the value and puts `labels.changeFailed` in a polite `role="status"` region |
 | loading more | `loadingMore` | skeleton rows after the items; the end of the list is watched while `hasMore` (`onLoadMore` once per batch) |
 | load error | `loadError` | the list is `hidden`; a compact EmptyPage with `role="alert"` and a retry Button (`onRetry`) |
 | state swap | loading ↔ items ↔ load error | the new content fades in (`swapMotion`), the first render stays still |
 | searching | typing in the search | panel `data-searching="true"`; groups without matches and separators hide; the match in an option's title, description and plain text is a `<mark>` in `accent-text` (not in the trigger); the query clears when the list closes (`onSearchChange("")`) |
-| nothing to show | no option matches (and not loading) | a compact EmptyPage with `role="status"`: `labels.empty`, plus `labels.emptyHint` while a query is typed |
+| nothing to show | no option matches (and not loading) | a compact EmptyPage with `role="status"`: `labels.empty`, plus `labels.emptyHint` while a query is typed; a `Select.Action` stays under it, highlighted |
 | sheet | viewport below 640px | a scrim and a full-width bottom sheet with an `aria-hidden` grab handle around the panel; the sheet carries `data-state`, the panel keeps its role and ref; page scroll locked; a swipe down from the handle closes it |
 | option highlighted / selected / disabled | keyboard and pointer / value / `disabled` | `data-highlighted`, `data-selected` + `aria-selected`, `data-disabled` + `aria-disabled`; highlight is a fill only |
 
@@ -234,8 +256,8 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | Key | Action |
 |---|---|
 | `Enter` · `Space` · `ArrowDown` · `ArrowUp` | On the trigger open the list; focus moves into the search or the list. |
-| `ArrowDown` · `ArrowUp` · `Home` · `End` | In the list move the highlight over the enabled options, wrapping. |
-| `Enter` · `Space` | Pick the highlighted option; a single pick closes the list and returns focus to the trigger. |
+| `ArrowDown` · `ArrowUp` · `Home` · `End` | In the list move the highlight over the enabled options, wrapping; a `Select.Action` is the last stop after the options. |
+| `Enter` · `Space` | Pick the highlighted option; a single pick closes the list and returns focus to the trigger. On a `Select.Action`, run it and close the list. |
 | `A–Я` | Typeahead: the highlight jumps to the option starting with the letter or the typed prefix. |
 | `Delete` · `Backspace` | On the trigger with `clearable` clear the value. |
 | `Enter` | With a load error in the open list, retries (`onRetry`). |
@@ -248,6 +270,8 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 - The hint and the error are linked by `aria-describedby`; the error sets `aria-invalid`; loading sets `aria-busy`.
 - While loading the list is `aria-busy` and `labels.loading` is announced politely; skeleton rows are hidden from screen readers; a load error is `role="alert"`.
 - The highlight reaching the last option asks for the next batch the same way scrolling does.
+- `Select.Action` rows are `role="option"` in a `role="group"` under the scroller; the listbox owns the group through `aria-owns`, and the highlight reaches them through `aria-activedescendant`.
+- While an `onValueChange` promise is pending the trigger is `aria-busy`; a rejection announces `labels.changeFailed` in a polite `role="status"` region.
 - With `name`, hidden inputs carry the value into a native form submit; native trigger events (`onFocus`, `onBlur`, `onKeyDown`) reach the button.
 - An outside press closes the list without moving focus back: focus follows the pointer (foundation §8).
 
@@ -263,6 +287,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | `retry` | `"Повторить"` | The retry button under `loadError` (`onRetry`). |
 | `clear` | `"Очистить"` | Tooltip of the clear segment. |
 | `optional` | `"необязательно"` | Muted marker after the label when `optional`. |
+| `changeFailed` | `"Не удалось сохранить выбор"` | Announced when the `onValueChange` promise rejects and the value rolls back. |
 
 ## Examples
 | Example | Shows |
@@ -275,8 +300,10 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | [multiple.tsx](examples/multiple.tsx) | Several values: checkboxes in the list, the list stays open on a pick, labels joined in the trigger — `multiple`. |
 | [searchable.tsx](examples/searchable.tsx) | A long list with a search field: options match their label and keywords, groups and the separator hide while searching — `searchable`, `keywords`, `Select.Group`. |
 | [server-search.tsx](examples/server-search.tsx) | A client out of thousands: the parent searches on the server as the query changes and loads the next page at the end of the list — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`. |
+| [create-action.tsx](examples/create-action.tsx) | A client search with a pinned "new client" action: it stays under the list whatever the query, the arrows reach it after the last client, and it opens the form that adds and picks the new client — `Select.Action`, `searchable`. |
 | [load-error.tsx](examples/load-error.tsx) | The options failed to load: the list says so in place and a retry loads them again — `loadError`, `onRetry`, `loading`. |
 | [clearable.tsx](examples/clearable.tsx) | An optional field that can be reset: a clear segment before the chevron, Delete or Backspace on the trigger — `clearable`. |
+| [saving.tsx](examples/saving.tsx) | A choice that saves on the server at once: the picked value shows with a spinner on the trigger, and a refused save rolls it back and says why — `onValueChange`, `error`. |
 | [rich-options.tsx](examples/rich-options.tsx) | Options with a picture, a second line and a price; the trigger draws the picked option with the same parts — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`. |
 | [people.tsx](examples/people.tsx) | People in the rows and the trigger: an avatar sized to the tier before the name, a role badge after it — `Avatar.Root`, `Badge.Root`, `renderValue`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: the plan drives the price under the field and a button resets it — `value`, `onValueChange`. |
@@ -294,7 +321,11 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 - A spinner or «Загрузка…» item drawn by hand while options load → set `loading` (skeleton rows) and `loadingMore`.
 - A failed load shown through the field `error` → use `loadError` + `onRetry`; `error` is for validation.
 - An Avatar wrapped in `Select.ItemIcon` → put `Avatar.Root` as a direct child of the item; it takes the tier size.
+- `<ClientAvatar />` or `<RoleBadge />` (your own component) inside an item → the item reads parts by element type and puts an unknown component in the text column; call the helper as a function (`{clientAvatar(client)}`) so `Avatar.Root` / `Badge.Root` is the direct child.
+- A custom trailing element (a Kbd, an icon with a price) as a bare child → wrap it in `Select.ItemMeta`.
+- A «Новый клиент» row faked as a `Select.Item` with a sentinel value, or a button under the field → use `Select.Action`: never filtered, reached by the arrows, never a value.
+- Saving the choice in `onValueChange` and resetting the value by hand on failure → return the promise; the Select shows the value, waits and rolls back by itself.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (list), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` in `multiple`), [Spinner](../spinner/COMPONENT.md) (`loading` in the trigger), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [EmptyPage](../empty-page/COMPONENT.md) (empty state, load error), [Button](../button/COMPONENT.md) (retry), [Divider](../divider/COMPONENT.md) (`Separator`), [Thumbnail](../thumbnail/COMPONENT.md) and [Avatar](../avatar/COMPONENT.md) (row media), [Badge](../badge/COMPONENT.md) (row badge), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading announcement), `Icon` (chevron, clear, check, search, retry), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md) (list), [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` in `multiple`), [Spinner](../spinner/COMPONENT.md) (`loading` and saving in the trigger), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [EmptyPage](../empty-page/COMPONENT.md) (empty state, load error), [Button](../button/COMPONENT.md) (retry), [Divider](../divider/COMPONENT.md) (`Separator`), [Thumbnail](../thumbnail/COMPONENT.md) and [Avatar](../avatar/COMPONENT.md) (row media), [Badge](../badge/COMPONENT.md) (row badge), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading and save-failure announcements), `Icon` (chevron, clear, check, search, retry), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame)
 - **See also:** [NativeSelect](../native-select/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Radio](../radio/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

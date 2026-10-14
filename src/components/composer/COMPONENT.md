@@ -38,7 +38,7 @@ Composer.Root                  <form>: the column below, one tier for every part
    ├─ Composer.Attach          paperclip: FileUpload trigger="button", or a Dropdown of kinds
    │  └─ Composer.Item         a kind of attachment (accept), with Composer.ItemIcon
    ├─ (field)                  Textarea.Root rows={1} maxRows={8}, no focus ring (the caret shows focus)
-   │  └─ (toolbar)             floating role="toolbar" over a selection: 6 ghost Buttons with Tooltip + Kbd
+   │  └─ (toolbar)             floating role="toolbar" over a selection: 7 ghost Buttons with Tooltip + Kbd
    ├─ (recording bar)          over the paperclip and the field cells: delete · pause Buttons · pulsing
    │                           dot (a pause glyph while paused) · timer · live waveform canvas (locked),
    │                           or dot · timer · «Влево — отмена» (held)
@@ -107,7 +107,7 @@ In an optimistic chat the send returns at once: add the message to the list with
 | `defaultRecordMode` | `"voice" \| "video"` | `"voice"` | Initial record mode, uncontrolled. |
 | `onRecordModeChange` | `(mode: "voice" \| "video") => void` | — | A double click / double tap on the record button (or ↑ / ↓ on it) switched voice and video. |
 | `queue` | `Pick<UploadQueue, "items" \| "add" \| "retry" \| "remove" \| "clear" \| "move">` | — | Attachments, usually `useUploadQueue(…)`: the paperclip, a paste and a drop add to it, and a tray above the row shows them as one reorderable strip of tiles. Without `queue` paste and drop of files do nothing. |
-| `formatting` | `boolean` | `true` | Selecting text shows a floating toolbar (bold, italic, strikethrough, code, link, quote) and enables the hotkeys; each writes Markdown around the selection. `false` turns both off. |
+| `formatting` | `boolean` | `true` | Selecting text shows a floating toolbar of seven Markdown tools and enables their hotkeys; a tool wraps the selection, a second press unwraps it. `false` turns both off. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `host tier, else "m"` | Tier of the field, the buttons and the bar text. Without it the tier of its host, else `m`. |
 | `disabled` | `boolean` | `false` | A closed conversation: the field, the paperclip and the button are disabled; nothing is pasted or dropped. A disabled `Fieldset` around it sets it too (`data-disabled` included). |
 | `inputRef` | `Ref<HTMLTextAreaElement>` | — | The message `<textarea>`: focus it after «Ответить» in a message menu. |
@@ -170,7 +170,7 @@ Composer has no `variant`; what the row shows follows its state.
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `formatting` | a floating toolbar over a selection; Mod-hotkeys | always, unless the chat shows plain text only | `true` |
+| `formatting` | a floating toolbar over a selection (bold, italic, strikethrough, code, spoiler, link, quote); Mod-hotkeys | always, unless the chat shows plain text only | `true` |
 | `disabled` | the field, paperclip and button disabled | a closed conversation, no permission to write | `false` |
 | `queue` | the tray above the field: one strip of tiles — photos, videos and files; paste and drop take files | the chat accepts files | — |
 | `onSendVoice` / `onSendVideoNote` | an empty field offers the record button | the chat takes voice / video messages | — |
@@ -218,7 +218,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | `Mod + Enter` | Always sends, on a touch screen too. |
 | `↑` | In an empty field opens your last message for editing (`onEditLast`). |
 | `Escape` | Clears a selection with the toolbar, then cancels the reply or edit; while recording throws the recording away and stops there, so an enclosing Modal or Drawer stays open. |
-| `Mod + B` · `Mod + I` · `Mod + Shift + X` · `Mod + E` · `Mod + K` · `Mod + Shift + 9` | Bold, italic, strikethrough, code, link and quote for the selection; the physical key counts, so any layout works. |
+| `Mod + B` · `Mod + I` · `Mod + Shift + X` · `Mod + E` · `Mod + Shift + H` · `Mod + K` · `Mod + Shift + 9` | Bold, italic, strikethrough, code, spoiler, link and quote for the selection; the physical key counts, so any layout works. |
 | `Enter` · `Space` | On the record button: record hands-free at once. During a hands-free recording, wherever the focus is in the composer: Enter sends the recording (a paused one too), Space pauses and resumes it — the timer and the waveform stand, the dot turns into a pause glyph. |
 | `↑` · `↓` | On the record button, with voice and video both offered: switches voice and video (`aria-keyshortcuts`, named in the button's description). |
 | `←` · `→` | Move between the formatting buttons. |
@@ -272,6 +272,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | `italic` | `"Курсив"` | Italic tool. |
 | `strikethrough` | `"Зачёркнутый"` | Strikethrough tool. |
 | `code` | `"Моноширинный"` | Code tool. |
+| `spoiler` | `"Скрытый текст"` | Spoiler tool (`\|\|…\|\|`). |
 | `link` | `"Ссылка"` | Link tool. |
 | `quote` | `"Цитата"` | Quote tool. |
 | `cancelReply` | `"Отменить ответ"` | Name of the close button of a reply bar. |
@@ -285,7 +286,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 | [attachments.tsx](examples/attachments.tsx) | Warehouse photos and documents for a client go through an upload queue: the paperclip opens the file picker, a paste or a drop adds files too, every attachment is a tile of one strip that drags into its order, and send waits until the uploads finish — `queue`, `Composer.Attach`, `useUploadQueue`. |
 | [reply-edit.tsx](examples/reply-edit.tsx) | Answering a client's message and correcting your own: the bar above the field quotes the message, Escape or the cross cancels, ↑ in an empty field opens your last message, send becomes save and hands over the message id — `Composer.Context`, `mode`, `value`, `onDismiss`, `onEditLast`. |
 | [typing.tsx](examples/typing.tsx) | The other side's status line follows what you do: typing, recording a voice or a video message, then nothing — `onActivityChange`. |
-| [formatting.tsx](examples/formatting.tsx) | Selected text gets a toolbar of bold, italic, strikethrough, code, link and quote, each with its shortcut, written as Markdown around the selection — `formatting`. |
+| [formatting.tsx](examples/formatting.tsx) | Selected text gets a toolbar of bold, italic, strikethrough, code, spoiler, link and quote, each with its shortcut, written as Markdown around the selection — `formatting`. |
 | [voice.tsx](examples/voice.tsx) | Voice and round video messages: hold the button to record and release to send, slide left to cancel, slide up or tap to record hands-free; a double tap or double click switches voice and video — `onSendVoice`, `onSendVideoNote`, `recordMode`. |
 | [states.tsx](examples/states.tsx) | A closed conversation is disabled, a slow send keeps the text with a busy button until the server answers — `disabled`, `onSend`. |
 | [controlled.tsx](examples/controlled.tsx) | Every conversation keeps its own draft: switching the chat swaps the text, a template button fills it from outside — `value`, `onValueChange`. |
@@ -297,7 +298,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 - Rendering the attachment rows yourself → pass `queue`; the tray, paste and drop come with it.
 - Sending photos as file messages → send `media` as one `Message.Media` album (its order is the tray's), `files` as `Message.File`.
 - Showing a sent photo from `item.preview` → the queue revokes it after the send; use `result` or your own object URL of `item.file`, revoked with its message.
-- Expecting HTML from the formatting → the text is Markdown (`**…**`, `_…_`, `~~…~~`, `` `…` ``, Markdown links, `> `); render it with the message component, never as HTML.
+- Expecting HTML from the formatting → the text is Markdown (`**…**`, `_…_`, `~~…~~`, `` `…` ``, `||…||`, Markdown links, `> `); render it with the message component, never as HTML.
 - Hiding the reply bar by CSS → unmount `Composer.Context` in `onDismiss`; Escape and a sent message call the same handler.
 - Keeping the replied message in a closure of `onSend` → give the bar its `value`; `onSend` gets `replyTo` / `editOf`.
 - Sending «печатает» from `onValueChange` on every keystroke → use `onActivityChange`: it fires on a change only and ends the signal on rest, send and clear.
@@ -306,5 +307,5 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 - An `aria-label` on the root to rename the field → use `labels.placeholder` (the field) and `labels.region` (the form).
 
 ## Related
-- **Built from:** [Textarea](../textarea/COMPONENT.md), [Button](../button/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (the paperclip; `FileUpload.Queue layout="strip"`, the tray), [Crossfade](../crossfade/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Hint](../hint/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), Icon (`action.*`, `format.*`, `nav.chevronLeft`, `nav.chevronUp`, `status.locked`), `useUploadQueue` (the `queue`), `internal/ring` (the video preview's ring)
+- **Built from:** [Textarea](../textarea/COMPONENT.md), [Button](../button/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (the paperclip; `FileUpload.Queue layout="strip"`, the tray), [Crossfade](../crossfade/COMPONENT.md), [Checkbox](../checkbox/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Hint](../hint/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), Icon (`action.*`, `format.*`, `nav.chevronLeft`, `nav.chevronUp`, `status.locked`), `useUploadQueue` (the `queue`), `internal/ring` (the video preview's ring), `internal/textFormatting` + `internal/textFormattingToolbar` (the formatting shared with Textarea `formatting`)
 - **See also:** [Message](../message/COMPONENT.md) — the bubbles the composer writes into; [VoicePlayer](../voice-player/COMPONENT.md) — plays a sent voice message; [Textarea](../textarea/COMPONENT.md), [Input](../input/COMPONENT.md)

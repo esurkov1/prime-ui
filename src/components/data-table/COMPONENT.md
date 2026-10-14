@@ -110,6 +110,9 @@ Generic over `Row`; `ref` → `HTMLDivElement`. A card-fill block with an option
 | `getRowGroup` | `(row: Row) => string \| number` | — | Group key of a row: each group gets a header row and its own `<tbody>`. Groups keep the order in which they first appear in `rows`; a sort orders the rows inside each group; a group split by paging repeats its header. |
 | `renderGroupHeader` | `(group: DataTableGroup<Row>) => ReactNode` | `the group key` | Content of a group header; `group.rows` holds every row of the group (all pages) for totals. Children are laid out start / end in the visible width. |
 | `stickyGroupHeaders` | `boolean` | `false` | Group headers stick under the head (or the top edge) while their rows scroll. |
+| `collapsedGroups` | `(string \| number)[]` | — | Collapsed group keys, controlled. Any prop of this triad makes groups fold: a chevron toggle leads each header, rows fold like sub-rows. «Select all» and paging still count collapsed rows. |
+| `defaultCollapsedGroups` | `(string \| number)[]` | — | Initially collapsed group keys, uncontrolled; `[]` — every group open but foldable. |
+| `onCollapsedGroupsChange` | `(collapsedGroups: (string \| number)[]) => void` | — | The collapsed group keys changed (a group header toggle). |
 | `labels` | `Partial<DataTableLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the root `<div>`. |
 
@@ -214,12 +217,15 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | `highlightColumnOnHover` | `fill-subtle-active` wash on the hovered column | comparison tables | `false` |
 | `stickyHeader` · `stickyFirstColumn` | opaque sticky head / first column with a hairline edge; on screens lower than 480px the head scrolls with the rows | long / wide tables in a `scrollHeight` window | `false` |
 | `stickyGroupHeaders` | group header rows stick under the head while their rows scroll | long grouped tables in a `scrollHeight` window | `false` |
+| `collapsedGroups` · `defaultCollapsedGroups` · `onCollapsedGroupsChange` | any of the three makes groups fold: a chevron toggle leads each group header, a collapsed group shows its header alone | long grouped tables where people work one group at a time; `defaultCollapsedGroups={[]}` starts with every group open | off |
 | column `hideable` | `false`: the column stays even when listed in `hiddenColumns`; checked and disabled in `DataTable.ColumnsMenu` | the key column that names the row | `true` |
 | `showHeader` | head row shown | off only for self-explanatory key/value tables | `true` |
 | `fullWidth` | spans the container; `false` = content width | `false` for short lookup tables in wide layouts | `true` |
 | column `numeric` | tabular figures, end-aligned, no wrap | numbers, money | — |
 | column `truncate` | one line with an ellipsis and a `title` | long names in narrow columns | — |
 | column `scale` | each cell shaded by its value on the five-step chart scale, the value kept in the cell | a heatmap: counts by person × month, load by day | — |
+
+`scale: true` gives each column its own range (its minimum to maximum over all rows), so the same value can take different shades in two columns. Several columns that read as one heatmap (one column per month) share a scale when each gets the same fixed `{ min, max }` — both ends, since an open end is still the column's own: `scale: { min: 0, max: 25 }` on every month column ([heatmap.tsx](examples/heatmap.tsx)).
 
 ## States
 | State | Driven by | DOM |
@@ -228,8 +234,8 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | loading more | `loadingMore`, or a pending promise from `onLoadMore` | `aria-busy`; footer `labels.loadingMore`; no new request until it settles (after a rejection, until the rows change) |
 | refreshing | `loading` with rows on screen (a refetch, another server page or sort) | the rows, head, toolbar and footer stay; `aria-busy` on the table, `data-loading` on the root — no skeleton |
 | new server page | `source="server"` and `rows` replaced (not appended) | the body remounts with the swap fade (`swapMotion`), the viewport scrolls to its top; no per-row enter |
-| empty | no rows and not loading | compact EmptyPage with `empty` or `labels.empty` (`role="status"`), or the `empty` node |
-| error | `error` | body replaced by a `role="alert"` message in `danger-text`; range and infinite status hidden |
+| empty | no rows and not loading | compact EmptyPage with `empty` or `labels.empty` (`role="status"`), or the `empty` node; centred in the visible width, not across every column of a wide table |
+| error | `error` | body replaced by a `role="alert"` message in `danger-text`, centred in the visible width; range and infinite status hidden |
 | sorted | `sort` / `defaultSort` | `aria-sort` and `data-sorted` on the head; the sort icon: unsorted `text-disabled`, hover `text-muted`, sorted `text-secondary` — never accent |
 | selected | `selected` / `defaultSelected` | `aria-selected` rows with `accent-soft` fill; polite `labels.selectedCount` |
 | expanded | `expanded` / `defaultExpanded` | `data-expanded` on the parent row (one step darker); toggle `aria-expanded`, chevron turns 90° |
@@ -239,6 +245,7 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | hidden columns | `hiddenColumns` / `defaultHiddenColumns`, `DataTable.ColumnsMenu` | the listed columns (except `hideable: false`) are not rendered in the head, rows, skeleton or state rows; widths are measured again; a sort by a hidden column keeps the row order |
 | opening rows | `getRowHref` / `onRowClick`, `isRowClickable` | `data-clickable` (pointer, pressed wash) on rows that open; link rows: `data-link`, an `<a data-row-link>` in every content cell; in-place rows: `tabindex="0"`. Focus (the link, or the row) rings the whole row with the hover wash |
 | grouped | `getRowGroup` | one `<tbody>` per group run on screen, opened by a `<th scope="rowgroup">` row one ladder step off the table; `data-sticky` on it with `stickyGroupHeaders` |
+| collapsed group | `collapsedGroups` / `defaultCollapsedGroups` | `data-collapsed` on the group header row, its toggle `aria-expanded="false"` with the chevron at rest; the group's `<tbody>` holds the header alone, its rows only lay out the column widths in the hidden measuring body. Its rows fold away and back like sub-rows (`data-fold`, `base`), whether a toggle or the owner changed the keys. «Select all» still takes the rows of collapsed groups; paging still counts them |
 | reorderable | `onReorder` (not with `getRowChildren` / `renderExpanded`) | `data-reorderable` on the root; a leading handle column (drag by the handle, a touch hold, Alt + ↑ / ↓ on it); each run of rows (the page, or each group) is a `Dnd.Sortable` `<tbody>`, so with `getRowGroup` rows move inside their group; a row put last on a page stands in front of the first row of the next page; a lifted row leaves a dashed gap row across every column, its neighbours glide (`base`), the copy flies in a one-row table at the row's column widths and sets down on its new place; a keyboard move glides the same way |
 | saving a move | `onReorder` returned a pending promise | the row stays in its new place, `aria-busy`, its cells at 60% and a Spinner in its handle cell; a rejection glides it back |
 | reorder off | a sort by a column | the handles are disabled with a Tooltip (`labels.reorderSorted`); no drag, no Alt + arrows |
@@ -258,7 +265,9 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - `DataTable.ColumnsMenu` is an outline neutral Button one tier below the table (the `view.columns` icon, `labels.columns`); its Dropdown lists every column and ends with `labels.showAllColumns`. A `hideable: false` column stays checked and disabled, and the last visible column cannot be hidden. With `align="auto"` a trigger near the end of the screen lines up the panel's end edge and the panel grows toward the start, and the other way near the start.
 - Row height per `size` is public: `--prime-table-row-height-xs` · `-s` · `-m` · `-l` · `-xl` (36 · 36 · 44 · 52 · 52). A placeholder outside the table that stands in its geometry (a heatmap, a matrix skeleton) uses the same token.
 - A row that opens keeps controls out of its key cell (that cell is the link); controls in other cells stand above the row's link. Mark a custom widget with `data-row-click-ignore`.
-- Group headers: the name at the start, totals at the end (`renderGroupHeader` returns both, the kit lays them out across the visible width), head-tier text in `text-secondary`, row height = the head height.
+- Group headers: the name at the start, totals at the end (`renderGroupHeader` returns both, the kit lays them out across the visible width), head-tier text in `text-secondary`, row height = the head height. With collapsible groups the chevron toggle (the expand toggle's ghost Button) leads the header at the cell padding.
+- The empty and error content stands in a sticky box of the visible width: a wide table centres it in the viewport, and it stays there while the table scrolls sideways.
+- A trend per row: a compact [Sparkline](../sparkline/COMPONENT.md) (`layout="compact"`) in a cell fits the row height; its pointer and keys never open the row.
 - Long data needs no slicing: past 100 rows a body in a bounded viewport (`scrollHeight`, `"fill"`, `paging="infinite"`) renders only the rows around the view; spacer rows keep the scrollbar exact, the focused row stays rendered, rows carry `aria-rowindex` and the table `aria-rowcount`. Grouped (`getRowGroup`), reorderable (`onReorder`) and `renderExpanded` bodies, and a table the page scrolls, render every row. The browser's find-in-page sees only rendered rows: give a long table a search in `toolbar`.
 - `scrollHeight="fill"` needs a parent with a height: a flex or grid column with `min-height: 0`, `PageContent.Root fill` in an `AppShell.Root fillViewport`, or a sized pane.
 - The sticky head stops sticking on screens lower than 480px (landscape phones), so it never takes a large share of the height.
@@ -272,7 +281,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | Key | Action |
 |---|---|
 | `Tab` | Moves through the toolbar (`DataTable.ColumnsMenu`), sort buttons, row handles, checkboxes, expand toggles, row links, rows that open in place and Pagination. |
-| `Enter` · `Space` | Sorts by the column, toggles the row, or opens the focused row (`onRowClick`); Enter on a row link follows it. |
+| `Enter` · `Space` | Sorts by the column, toggles the row or the group, or opens the focused row (`onRowClick`); Enter on a row link follows it. |
 | `Space` | Toggles the focused row checkbox. |
 | `Shift + Space` | Selects the range from the last toggled row. |
 | `Alt + ↑` · `Alt + ↓` | On a row handle (`onReorder`), moves the row one place up or down. |
@@ -288,6 +297,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - After a selection change a polite live region announces `labels.selectedCount`; selected rows carry `aria-selected`.
 - A row handle is a button named by `labels.reorderRow` with `aria-keyshortcuts`; a pick-up, a drop and a keyboard move are announced in a polite live region («Договор: позиция 2 из 6»). While its move is saved the row is `aria-busy`; while the table is sorted the handles are disabled and a tooltip gives `labels.reorderSorted`.
 - The expand toggle is a button with `aria-expanded`, `aria-controls` (detail row or sub-rows) and `labels.expand` / `labels.collapse`.
+- A group toggle (collapsible groups) is a button in the group header with `aria-expanded`, `aria-controls` (the group's rows, while open; not on reorderable rows, which carry no id) and `labels.expandGroup` / `labels.collapseGroup` with `{group}`.
 - Loading sets `aria-busy` and a `labels.loading` status; the error is `role="alert"`; the default empty state is `role="status"`.
 
 ### Labels
@@ -309,6 +319,8 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | `showAllColumns` | `"Показать все"` | The `DataTable.ColumnsMenu` item that shows every column again. |
 | `reorderRow` | `"Переместить строку {label}"` | `aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`. |
 | `reorderSorted` | `"Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки"` | Tooltip of the disabled handles while the table is sorted by a column. |
+| `expandGroup` | `"Развернуть группу {group}"` | Name of the toggle of a collapsed group; `{group}` is the group key. |
+| `collapseGroup` | `"Свернуть группу {group}"` | Name of the toggle of an expanded group; `{group}` is the group key. |
 
 ## Examples
 | Example | Shows |
@@ -317,6 +329,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | [sizes.tsx](examples/sizes.tsx) | Every density: rows from 36 to 52 px, the head at the control height of the tier — `size`. |
 | [numeric.tsx](examples/numeric.tsx) | An inventory report: number columns align to the end in tabular figures, a long name stays on one line with a title — `numeric`, `truncate`, `maxWidth`. |
 | [heatmap.tsx](examples/heatmap.tsx) | Deals closed per manager and month as a heatmap: each count shades its cell on the chart scale and stays readable in it — `scale`, `numeric`. |
+| [trend.tsx](examples/trend.tsx) | Clients with revenue by month as a compact Sparkline in a cell of each row, next to the half-year total — `cell`, `width`. |
 | [content-width.tsx](examples/content-width.tsx) | A short lookup table sized by its content with a centered column, and a `grow` column that takes the free width and wraps — `fullWidth`, `align`, `grow`. |
 | [appearance.tsx](examples/appearance.tsx) | Row styling: zebra rows without lines, a column wash under the pointer, a headless key/value list — `striped`, `rowDividers`, `highlightColumnOnHover`, `columnDividers`, `showHeader`. |
 | [toolbar.tsx](examples/toolbar.tsx) | A campaign list with search, a status filter and export above the table; the empty text when nothing matches — `toolbar`, `empty`. |
@@ -327,7 +340,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | [row-link.tsx](examples/row-link.tsx) | Invoices whose rows are links: ⌘-click or a middle click opens a new tab, a plain click routes inside the app, the totals row and the ⋯ menu never open a row — `getRowHref`, `onRowClick`, `isRowClickable`. |
 | [row-open.tsx](examples/row-open.tsx) | Deals that open in a side panel: a click, or Enter and Space on the focused row; the panel keeps the last deal while it slides away — `onRowClick`. |
 | [reorder.tsx](examples/reorder.tsx) | Pipeline stages put in order by the handle or Alt + ↑ / ↓; each move is saved with a spinner in its handle, and sorting by a column turns the handles off — `onReorder`, `getRowLabel`. |
-| [groups.tsx](examples/groups.tsx) | Payments grouped by month with the month's total in its header row; headers stay on top while their rows scroll — `getRowGroup`, `renderGroupHeader`, `stickyGroupHeaders`. |
+| [groups.tsx](examples/groups.tsx) | Payments grouped by month with the month's total in its header row; headers stay on top while their rows scroll, a past month folds away — `getRowGroup`, `renderGroupHeader`, `stickyGroupHeaders`, `defaultCollapsedGroups`. |
 | [columns-visibility.tsx](examples/columns-visibility.tsx) | Orders with the column chooser in the toolbar; the choice outlives a reload in local storage, the order number always stays — `DataTable.ColumnsMenu`, `hiddenColumns`, `onHiddenColumnsChange`, `hideable`. |
 | [infinite-scroll.tsx](examples/infinite-scroll.tsx) | An audit log that reveals loaded rows in batches and then asks the server for more — `paging`, `infiniteBatchSize`, `hasMore`, `loadingMore`, `onLoadMore`. |
 | [server.tsx](examples/server.tsx) | A CRM deal list the server sorts, pages and searches; a new search returns to page 1 — `source`, `rowCount`, `sort`, `page`, `loading`. |
@@ -355,6 +368,8 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - Checking `event.target` in `onRowClick` to skip a button or a menu in the row → the table already ignores controls and portals; mark a custom widget with `data-row-click-ignore`.
 - A totals row that opens like a record → `isRowClickable`.
 - Group headers faked with sub-rows or a row in `rows` → use `getRowGroup` + `renderGroupHeader`.
+- A fold button of your own in `renderGroupHeader`, or filtering a group's rows out of `rows` to hide them → pass `defaultCollapsedGroups={[]}` (or the controlled pair): the toggle, its names, the fold motion and «select all» are built in.
+- Columns of one heatmap with `scale: true` each → the same value gets another shade per column; give every column the same `{ min, max }`.
 - Computing the table height from the window → `scrollHeight="fill"` in a parent with a height.
 - Showing your own spinner while `onLoadMore` runs → return its promise; the table shows the status.
 - A server page passed with the default `source` → the table re-sorts it and counts pages from that one page; set `source="server"` and `rowCount`.
@@ -363,4 +378,4 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 
 ## Related
 - **Built from:** [Checkbox](../checkbox/COMPONENT.md), [Button](../button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md) (`DataTable.ColumnsMenu`), [Pagination](../pagination/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [VisuallyHidden](../visually-hidden/COMPONENT.md) (loading status, selection announcement), [Skeleton](../skeleton/COMPONENT.md) (loading rows, in the table tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable as="tbody"`, `Dnd.Handle`), [Tooltip](../tooltip/COMPONENT.md) and [Spinner](../spinner/COMPONENT.md) (handle hint and busy state), Icon (sort arrows, the expand chevron, the `DataTable.ColumnsMenu` trigger); `useVirtualRows` (the window of a long body)
-- **See also:** [SmartFilter](../smart-filter/COMPONENT.md), [PageToolbar](../page-toolbar/COMPONENT.md), [Gantt](../gantt/COMPONENT.md), [Kanban](../kanban/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md)
+- **See also:** [Sparkline](../sparkline/COMPONENT.md) (`layout="compact"` in a cell), [SmartFilter](../smart-filter/COMPONENT.md), [PageToolbar](../page-toolbar/COMPONENT.md), [Gantt](../gantt/COMPONENT.md), [Kanban](../kanban/COMPONENT.md), [Badge](../badge/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md)

@@ -871,19 +871,31 @@ tbody + tbody > .groupRow > .groupCell {
   border-top: var(--dt-divider-width) solid var(--dt-divider-color);
 }
 
-/* Name at the start, totals at the end of the visible width: it stays in view while the table
-   scrolls sideways (the root is the inline-size container). */
+/* Toggle (collapsible groups), then the name at the start and totals at the end of the visible
+   width: it stays in view while the table scrolls sideways (the root is the inline-size container). */
 .groupContent {
   position: sticky;
   inset-inline-start: 0;
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-2) var(--prime-space-4);
+  gap: var(--prime-space-2);
   width: 100cqi;
   max-width: 100%;
   padding: 0 var(--dt-pad-x);
+}
+
+.groupLabel {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-2) var(--prime-space-4);
+  min-width: 0;
+}
+
+.groupCell [aria-expanded="true"] .chevron {
+  transform: rotate(90deg);
 }
 
 .groupCell[data-sticky="true"] {
@@ -1013,8 +1025,20 @@ tbody + tbody > .groupRow > .groupCell {
 /* The default empty state is EmptyPage `compact` (its own padding); a custom `empty` / `error`
    goes into `.stateContent`. Both end up with space-10 × space-4 around the content. */
 .stateCell {
-  padding: var(--prime-space-5) var(--prime-space-1);
+  padding: var(--prime-space-5) 0;
   background: var(--dt-surface);
+}
+
+/* The state cell spans every column; its content box is the visible width and sticks to the start
+   edge (like a group header), so a wide table centres the message in the viewport, not across the
+   columns scrolled out of view (the root is the inline-size container). */
+.stateBox {
+  position: sticky;
+  inset-inline-start: 0;
+  box-sizing: border-box;
+  width: 100cqi;
+  max-width: 100%;
+  padding-inline: var(--prime-space-1);
 }
 
 .stateContent {

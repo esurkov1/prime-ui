@@ -4,6 +4,8 @@ Every screen sits in one frame: `AppShell.Root` with Nav / `AppHeader` / Main (t
 the nav rail one layer above it) → `PageContent` (header + body). `AppShell.Main` carries the page gutters
 and `PageContent.Body` spaces its blocks 40 apart, so your code adds **no outer padding and no
 margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
+Main's top space under the header is part of the frame — 24, then 40 from 1024px: a page header starts
+there; never cancel it with a negative margin or a padding override.
 
 The page recipes are whole, working screens in [patterns/](patterns/) — start from the closest one
 ([the list](composition.md#patterns)) and keep its skeleton. The rules behind them are in [composition.md](composition.md).

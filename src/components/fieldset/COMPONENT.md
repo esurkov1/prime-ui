@@ -14,6 +14,7 @@
 - One choice among options with a heading → [Radio](../radio/COMPONENT.md) `Radio.Group label`, a [SegmentedControl](../segmented-control/COMPONENT.md) or [ButtonGroup](../button-group/COMPONENT.md) `label`.
 - A bounded block with a surface (a settings panel) → [Card](../card/COMPONENT.md) `Card.Root`; a Fieldset inside it groups the fields.
 - A page section with a title and actions → [PageContent](../page-content/COMPONENT.md) sections.
+- A group of settings with a title and a trailing control (a «Сбросить» button, a master switch) → `Card.Root variant="panel"` with `Card.Header` (`Card.Title` + the control) and the Fieldset in `Card.Body`, named by the title (`aria-labelledby`), as the settings page pattern names its Fieldset by the section heading.
 - A single field's label → the field's own `label`.
 
 ## Import

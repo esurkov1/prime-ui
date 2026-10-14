@@ -518,6 +518,81 @@ describe("Kanban", () => {
     expect(screen.getAllByRole("status")).toHaveLength(1);
   });
 
+  it("opens a card in place: click, Enter, Space; never from a control inside it", () => {
+    const onItemClick = vi.fn();
+    render(
+      <Board
+        onItemClick={onItemClick}
+        renderItem={(task) => (
+          <Kanban.Item data-testid={`card-${task.id}`}>
+            <Kanban.ItemTitle>{task.title}</Kanban.ItemTitle>
+            <button type="button">В архив</button>
+          </Kanban.Item>
+        )}
+      />,
+    );
+    const card = screen.getByTestId("card-b");
+    fireEvent.click(within(card).getByText("Отчёт по складу"));
+    expect(onItemClick).toHaveBeenCalledTimes(1);
+    expect(onItemClick.mock.calls[0][0]).toBe(TASKS[1]);
+    expect(onItemClick.mock.calls[0][1].type).toBe("click");
+    act(() => card.focus());
+    fireEvent.keyDown(card, { key: "Enter" });
+    fireEvent.keyDown(card, { key: " " });
+    expect(onItemClick).toHaveBeenCalledTimes(3);
+    expect(onItemClick.mock.calls[2][1].type).toBe("keydown");
+    // A held key, Alt + a key (a move) and a control inside the card never open it.
+    fireEvent.keyDown(card, { key: "Enter", repeat: true });
+    fireEvent.keyDown(card, { key: "Enter", altKey: true });
+    fireEvent.click(within(card).getByRole("button", { name: "В архив" }));
+    expect(onItemClick).toHaveBeenCalledTimes(3);
+  });
+
+  it("a card that opens stays a tab stop on a read-only board", () => {
+    const onItemClick = vi.fn();
+    render(<Board disabled onItemClick={onItemClick} />);
+    const card = screen.getByTestId("card-a");
+    expect(card).toHaveAttribute("tabindex", "0");
+    act(() => card.focus());
+    fireEvent.keyDown(card, { key: "Enter" });
+    expect(onItemClick).toHaveBeenCalledWith(TASKS[0], expect.anything());
+  });
+
+  it("getItemHref: a link named by getLabel covers the card, takes Tab and moves it with Alt + arrows", () => {
+    const onItemClick = vi.fn((_task: Task, event: React.SyntheticEvent) => event.preventDefault());
+    const onValueChange = vi.fn();
+    render(
+      <Board
+        getItemHref={(task) => `#/tasks/${task.id}`}
+        onItemClick={onItemClick}
+        onValueChange={onValueChange}
+      />,
+    );
+    const card = screen.getByTestId("card-b");
+    const link = within(card).getByRole("link", { name: "Отчёт по складу" });
+    expect(link).toHaveAttribute("href", "#/tasks/b");
+    expect(card).toHaveAttribute("tabindex", "-1");
+    fireEvent.click(link);
+    expect(onItemClick).toHaveBeenCalledTimes(1);
+    expect(onItemClick.mock.calls[0][0]).toBe(TASKS[1]);
+    // A modified click is the browser's (new tab); Space clicks the link like Enter.
+    fireEvent.click(link, { metaKey: true });
+    expect(onItemClick).toHaveBeenCalledTimes(1);
+    act(() => link.focus());
+    fireEvent.keyDown(link, { key: " " });
+    expect(onItemClick).toHaveBeenCalledTimes(2);
+    fireEvent.keyDown(link, { key: "ArrowRight", altKey: true });
+    expect(onValueChange).toHaveBeenCalledWith(
+      { todo: ["a"], doing: ["c", "b"], done: [] },
+      { id: "b", from: "todo", to: "doing", index: 1 },
+    );
+    // After a move to another column the card holds the focus: Enter there follows the link.
+    const moved = screen.getByTestId("card-b");
+    act(() => moved.focus());
+    fireEvent.keyDown(moved, { key: "Enter" });
+    expect(onItemClick).toHaveBeenCalledTimes(3);
+  });
+
   it("throws when Kanban.Item is rendered outside renderItem", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<Kanban.Item>x</Kanban.Item>)).toThrow(/renderItem/);
@@ -571,6 +646,42 @@ describe("Kanban pointer drag", () => {
       { id: "b", from: "todo", to: "doing", index: 0 },
     );
     expect(titles("В работе")).toEqual(["Отчёт по складу", "Онбординг"]);
+  });
+
+  it("a drag never opens the card, nor follows its link; a click does", () => {
+    const onItemClick = vi.fn((_task: Task, event: React.SyntheticEvent) => event.preventDefault());
+    render(<Board onItemClick={onItemClick} />);
+    stubLayout();
+    const card = screen.getByTestId("card-b");
+    fireEvent.pointerDown(card, { ...POINTER, clientX: 10, clientY: 25 });
+    fireEvent.pointerMove(window, { ...POINTER, clientX: 310, clientY: 5 });
+    fireEvent.pointerUp(window, { ...POINTER, clientX: 310, clientY: 5 });
+    fireEvent.click(screen.getByTestId("card-b"));
+    expect(onItemClick).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("card-b"));
+    expect(onItemClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("a press on a card's link drags the card; the release follows no link", () => {
+    const onItemClick = vi.fn();
+    const onValueChange = vi.fn();
+    render(
+      <Board
+        getItemHref={(task) => `#/tasks/${task.id}`}
+        onItemClick={onItemClick}
+        onValueChange={onValueChange}
+      />,
+    );
+    stubLayout();
+    const link = within(screen.getByTestId("card-b")).getByRole("link");
+    fireEvent.pointerDown(link, { ...POINTER, clientX: 10, clientY: 25 });
+    fireEvent.pointerMove(window, { ...POINTER, clientX: 310, clientY: 5 });
+    fireEvent.pointerUp(window, { ...POINTER, clientX: 310, clientY: 5 });
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    const click = fireEvent.click(within(screen.getByTestId("card-b")).getByRole("link"));
+    // The click was cancelled: the browser does not navigate.
+    expect(click).toBe(false);
+    expect(onItemClick).not.toHaveBeenCalled();
   });
 
   it("drops into an empty column", () => {

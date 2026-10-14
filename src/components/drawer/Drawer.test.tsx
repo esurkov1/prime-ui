@@ -1,9 +1,11 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Avatar } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { Dropdown } from "@/components/dropdown/Dropdown";
+import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { swipe } from "@/test/mobile";
 
 import { Drawer, type DrawerContentProps, type DrawerRootProps } from "./Drawer";
@@ -147,6 +149,47 @@ describe("Drawer", () => {
       "data-tone",
       "accent",
     );
+  });
+
+  it("Drawer.Icon around an Avatar or a Thumbnail draws no tile: data-media, no tone", () => {
+    render(
+      <Drawer.Root defaultOpen>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Icon tone="accent" data-testid="avatar-slot">
+              <Avatar.Root>
+                <Avatar.Fallback>АС</Avatar.Fallback>
+              </Avatar.Root>
+            </Drawer.Icon>
+            <Drawer.Title>Анна Соколова</Drawer.Title>
+          </Drawer.Header>
+        </Drawer.Content>
+      </Drawer.Root>,
+    );
+    const slot = screen.getByTestId("avatar-slot");
+    expect(slot).toHaveAttribute("data-media", "true");
+    expect(slot).not.toHaveAttribute("data-tone");
+    expect(slot).toHaveAttribute("aria-hidden", "true");
+    cleanup();
+
+    render(
+      <Drawer.Root defaultOpen>
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Icon data-testid="thumb-slot">
+              <Thumbnail.Root />
+            </Drawer.Icon>
+            <Drawer.Icon data-testid="icon-slot">
+              <svg />
+            </Drawer.Icon>
+            <Drawer.Title>Склад №3</Drawer.Title>
+          </Drawer.Header>
+        </Drawer.Content>
+      </Drawer.Root>,
+    );
+    expect(screen.getByTestId("thumb-slot")).toHaveAttribute("data-media", "true");
+    expect(screen.getByTestId("icon-slot")).not.toHaveAttribute("data-media");
+    expect(screen.getByTestId("icon-slot")).toHaveAttribute("data-tone", "neutral");
   });
 
   it("right-aligns footer actions by default", () => {

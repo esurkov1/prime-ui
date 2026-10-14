@@ -1,4 +1,4 @@
-/** Orders searched on the server: the parent loads results for the query and the next page at the end of the list; with nothing found the palette offers to create an order — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`, `CommandMenu.Empty`. */
+/** Orders searched on the server: the parent loads results for the query and the next page at the end of the list; one persistent item at the end creates an order from the query, found or not — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`, `persistent`. */
 import { Button, CommandMenu, Icon } from "prime-ui-kit";
 import * as React from "react";
 
@@ -69,14 +69,7 @@ export default function CommandMenuServerSearchExample() {
       >
         <CommandMenu.Input placeholder="Номер заказа или клиент" />
         <CommandMenu.List>
-          <CommandMenu.Empty>
-            <CommandMenu.Item value={`создать заказ ${search}`} onSelect={close}>
-              <CommandMenu.ItemIcon>
-                <Icon name="action.add" />
-              </CommandMenu.ItemIcon>
-              Создать заказ для «{search}»
-            </CommandMenu.Item>
-          </CommandMenu.Empty>
+          <CommandMenu.Empty />
           {orders.map((order) => (
             <CommandMenu.Item key={order.id} value={order.id} onSelect={close}>
               <CommandMenu.ItemText description={`${order.client} · ${order.total}`}>
@@ -84,6 +77,15 @@ export default function CommandMenuServerSearchExample() {
               </CommandMenu.ItemText>
             </CommandMenu.Item>
           ))}
+          {/* One create item at the end: it stays when an order of the same name is found. */}
+          {search.trim() ? (
+            <CommandMenu.Item persistent value={`создать заказ ${search}`} onSelect={close}>
+              <CommandMenu.ItemIcon>
+                <Icon name="action.add" />
+              </CommandMenu.ItemIcon>
+              Создать заказ для «{search.trim()}»
+            </CommandMenu.Item>
+          ) : null}
         </CommandMenu.List>
       </CommandMenu.Root>
     </>

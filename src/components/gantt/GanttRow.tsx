@@ -3,6 +3,7 @@
 import type { Locale } from "date-fns";
 import * as React from "react";
 
+import { isPlainClick, opensRow } from "@/components/data-table/rowEvents";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Icon } from "@/icons";
@@ -41,6 +42,11 @@ export type GanttRowContext = {
   register: (id: string) => (node: HTMLElement | null) => void;
   focus: (id: string) => void;
   select: (barId: string, rowIndex: number) => void;
+  /** `onRowClick` of the row at `rowIndex`. */
+  openRow: (
+    rowIndex: number,
+    event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
+  ) => void;
   commit: (barId: string, rowIndex: number, dates: GanttDates) => void;
   nameFor: (bar: GanttBar, dates: GanttDates) => string;
   formatDuration: (days: number) => string;
@@ -70,6 +76,11 @@ export type GanttRowProps = {
   row: unknown;
   renderRow?: (row: unknown) => React.ReactNode;
   renderRowAvatar?: (row: unknown) => React.ReactNode;
+  renderBarTooltip?: (bar: GanttBar, row: unknown) => React.ReactNode;
+  /** `getRowHref(row)`: the header is a link. */
+  href: string | undefined;
+  /** `onRowClick` is set: the header opens the row. */
+  clickable: boolean;
   ghost: GanttGhost | undefined;
   ghostLane: number;
   hover: { x: number; span: number } | null;
@@ -103,6 +114,9 @@ function GanttRowView({
   row,
   renderRow,
   renderRowAvatar,
+  renderBarTooltip,
+  href,
+  clickable,
   ghost,
   ghostLane,
   hover,
@@ -125,6 +139,19 @@ function GanttRowView({
   const on = (event: GanttTrackEvent) => (native: React.SyntheticEvent) =>
     ctx.track(event, index, native);
 
+  const content = (
+    <>
+      {renderRowAvatar ? <span className={styles.rowAvatar}>{renderRowAvatar(row)}</span> : null}
+      <span className={styles.rowLabel}>{renderRow ? renderRow(row) : label}</span>
+    </>
+  );
+  // The header's grid stop: roving focus, and the create key when bars can be drawn.
+  const stopProps = {
+    "aria-describedby": creatable ? createHintId : undefined,
+    "aria-keyshortcuts": creatable ? "N" : undefined,
+    onFocus: () => ctx.focus(navId),
+  };
+
   return (
     <div
       ref={measureRef}
@@ -133,19 +160,60 @@ function GanttRowView({
       className={styles.row}
       style={{ "--lanes": laneCount, "--row-top": `${top}px` } as React.CSSProperties}
     >
-      <div
-        ref={ctx.register(navId)}
-        role="rowheader"
-        tabIndex={tabStop === navId ? 0 : -1}
-        className={styles.rowHeader}
-        data-nav-id={navId}
-        aria-describedby={creatable ? createHintId : undefined}
-        aria-keyshortcuts={creatable ? "N" : undefined}
-        onFocus={() => ctx.focus(navId)}
-      >
-        {renderRowAvatar ? <span className={styles.rowAvatar}>{renderRowAvatar(row)}</span> : null}
-        <span className={styles.rowLabel}>{renderRow ? renderRow(row) : label}</span>
-      </div>
+      {href === undefined ? (
+        <div
+          ref={ctx.register(navId)}
+          role="rowheader"
+          tabIndex={tabStop === navId ? 0 : -1}
+          className={styles.rowHeader}
+          data-nav-id={navId}
+          data-clickable={clickable || undefined}
+          {...stopProps}
+          onClick={
+            clickable
+              ? (event) => {
+                  if (opensRow(event)) ctx.openRow(index, event);
+                }
+              : undefined
+          }
+          onKeyDown={
+            clickable
+              ? (event) => {
+                  if (event.target !== event.currentTarget || event.repeat) return;
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  event.preventDefault();
+                  ctx.openRow(index, event);
+                }
+              : undefined
+          }
+        >
+          {content}
+        </div>
+      ) : (
+        <div role="rowheader" className={styles.rowHeader} data-clickable="">
+          {/* The row's link is the header's stop in the grid; its hit area fills the header. */}
+          <a
+            ref={ctx.register(navId)}
+            href={href}
+            tabIndex={tabStop === navId ? 0 : -1}
+            className={styles.rowLink}
+            data-nav-id={navId}
+            {...stopProps}
+            onClick={(event) => {
+              // The browser keeps the modified clicks (new tab, new window).
+              if (clickable && isPlainClick(event)) ctx.openRow(index, event);
+            }}
+            onKeyDown={(event) => {
+              // Space activates the link like Enter does: the header is one cell of a grid.
+              if (event.key !== " " || event.repeat) return;
+              event.preventDefault();
+              event.currentTarget.click();
+            }}
+          >
+            {content}
+          </a>
+        </div>
+      )}
       <div
         role="gridcell"
         className={styles.track}
@@ -185,6 +253,7 @@ function GanttRowView({
               locale={locale}
               nameFor={(shown) => ctx.nameFor(bar, shown)}
               formatDuration={ctx.formatDuration}
+              renderTip={renderBarTooltip ? () => renderBarTooltip(bar, row) : undefined}
               editable={editableAtAll && !bar.readOnly && !pending.has(bar.id)}
               pending={pending.has(bar.id)}
               active={tabStop === bar.id}

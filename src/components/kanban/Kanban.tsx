@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Crossfade } from "@/components/crossfade/Crossfade";
+import { isPlainClick, opensRow } from "@/components/data-table/rowEvents";
 import { DragControllerContext, useDragController } from "@/components/dnd/context";
 import { Dnd } from "@/components/dnd/Dnd";
 import { motionTiming } from "@/components/dnd/useFlipList";
@@ -50,6 +51,9 @@ export type KanbanMove = { id: string; from: string; to: string; index: number }
 /** One applied column move: column `id` now stands at `index`. */
 export type KanbanColumnMove = { id: string; index: number };
 
+/** What opened a card: a click on it, or Enter / Space on the focused card. */
+export type KanbanItemClickEvent = React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>;
+
 /** How columns stand on the board: filled wells, or bare columns of cards. */
 export type KanbanVariant = "well" | "plain";
 
@@ -94,6 +98,17 @@ type BoardContextValue = {
   disabled: boolean;
   /** Cards whose move the owner is still saving. */
   pending: ReadonlySet<string>;
+  /** `getItemHref` of a card, `undefined` when cards are not links. */
+  hrefOf: (id: string) => string | undefined;
+  /** `onItemClick` of a card, `null` when cards do not open in place. */
+  openItem: ((id: string, event: KanbanItemClickEvent) => void) | null;
+  /** The card's name (`getLabel`, else its id): the name of its link. */
+  labelOf: (id: string) => string;
+  /**
+   * Whether this click is the release of a drag (taken once). Dnd swallows the click on the element
+   * it lifted; a card dropped in another column is a new element, so the board keeps its own note.
+   */
+  takeDragClick: () => boolean;
 };
 
 const BoardContext = React.createContext<BoardContextValue | null>(null);
@@ -137,6 +152,18 @@ export type KanbanRootProps<T> = Omit<
   reorderableColumns?: boolean;
   /** Renders one card; return a `Kanban.Item`. */
   renderItem: (item: T) => React.ReactNode;
+  /**
+   * The card is a link: a real `<a>` named by `getLabel` covers the card and is its tab stop, so a
+   * click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on it. A drag never
+   * follows it; Alt + arrows still move the card from it.
+   */
+  getItemHref?: (item: T) => string;
+  /**
+   * Opens a card in place: a click on it (never on a control inside it, never after a drag) or
+   * Enter / Space on the focused card. With `getItemHref` it gets the plain clicks only — call
+   * `event.preventDefault()` there to route in the app instead of loading the page.
+   */
+  onItemClick?: (item: T, event: KanbanItemClickEvent) => void;
   /** Renders the trailing actions of a column header (add a card, a menu). */
   renderColumnActions?: (column: KanbanColumn) => React.ReactNode;
   /**
@@ -260,6 +287,8 @@ function KanbanBoard<T>({
   onColumnOrderChange,
   reorderableColumns = false,
   renderItem,
+  getItemHref,
+  onItemClick,
   renderColumnActions,
   renderColumnMeta,
   canDrop,
@@ -381,9 +410,56 @@ function KanbanBoard<T>({
   };
 
   const locked = disabled || loading;
-  const context = React.useMemo(
-    () => ({ disabled: locked, pending: pendingCards }),
-    [locked, pendingCards],
+  const latest = React.useRef({ byId, getItemHref, onItemClick, getLabel });
+  latest.current = { byId, getItemHref, onItemClick, getLabel };
+  const links = getItemHref !== undefined;
+  const opens = onItemClick !== undefined;
+  // A drag that ended: the next click is its release, unless a new press or a key comes first.
+  const dragClick = React.useRef(false);
+  React.useEffect(() => {
+    if (!links && !opens) return;
+    const clear = () => {
+      dragClick.current = false;
+    };
+    const off = controller.subscribeOverlay((event) => {
+      if (event.type === "end") dragClick.current = true;
+    });
+    window.addEventListener("pointerdown", clear, true);
+    window.addEventListener("keydown", clear, true);
+    return () => {
+      off();
+      window.removeEventListener("pointerdown", clear, true);
+      window.removeEventListener("keydown", clear, true);
+    };
+  }, [controller, links, opens]);
+  // Stable while the props are: the cards read the latest data and callbacks themselves.
+  const context = React.useMemo<BoardContextValue>(
+    () => ({
+      disabled: locked,
+      pending: pendingCards,
+      hrefOf: (id) => {
+        const { byId: items, getItemHref: href } = latest.current;
+        const item = items.get(id);
+        return links && item !== undefined ? href?.(item) : undefined;
+      },
+      openItem: opens
+        ? (id, event) => {
+            const item = latest.current.byId.get(id);
+            if (item !== undefined) latest.current.onItemClick?.(item, event);
+          }
+        : null,
+      labelOf: (id) => {
+        const item = latest.current.byId.get(id);
+        const label = latest.current.getLabel;
+        return item !== undefined && label ? label(item) : id;
+      },
+      takeDragClick: () => {
+        const was = dragClick.current;
+        dragClick.current = false;
+        return was;
+      },
+    }),
+    [locked, pendingCards, links, opens],
   );
 
   return (
@@ -609,25 +685,89 @@ export type KanbanItemProps = Omit<React.HTMLAttributes<HTMLElement>, "id"> & {
 
 /**
  * One card: an `<li>` on a filled surface; drags by the whole card, moves with Alt + arrows. While
- * the owner saves its move it is busy: dimmed under a spinner, still.
+ * the owner saves its move it is busy: dimmed under a spinner, still. With `getItemHref` a link
+ * covers it; with `onItemClick` a click, Enter or Space opens it.
  */
-function KanbanItem({ disabled = false, className, children, ...rest }: KanbanItemProps) {
+function KanbanItem({
+  disabled = false,
+  className,
+  children,
+  onClick,
+  onKeyDown,
+  ...rest
+}: KanbanItemProps) {
   const id = React.useContext(ItemIdContext);
   const board = React.useContext(BoardContext);
+  const linkRef = React.useRef<HTMLAnchorElement | null>(null);
   if (id === null || board === null) {
     throw new Error("Kanban.Item must be returned from Kanban.Root renderItem");
   }
   const pending = board.pending.has(id);
+  const href = board.hrefOf(id);
+  const { openItem } = board;
+  // A link card: the link is the tab stop, the card is focused only after a keyboard move to
+  // another column. An in-place card stays a tab stop on a read-only board too.
+  const focus = href !== undefined ? { tabIndex: -1 } : openItem ? { tabIndex: 0 } : null;
   return (
     <Dnd.SortableItem
       id={id}
       disabled={disabled || pending}
       aria-busy={pending || undefined}
+      {...focus}
       {...rest}
       data-kanban-item={id}
       data-pending={pending || undefined}
+      data-link={href !== undefined || undefined}
+      data-clickable={(href === undefined && openItem !== null) || undefined}
       className={cx(styles.item, className)}
+      onClick={(event: React.MouseEvent<HTMLElement>) => {
+        onClick?.(event);
+        if (event.defaultPrevented || href !== undefined || !openItem || !opensRow(event)) return;
+        // The release of a drag never opens the card.
+        if (board.takeDragClick()) return;
+        openItem(id, event);
+      }}
+      onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
+        onKeyDown?.(event);
+        if (event.defaultPrevented || event.target !== event.currentTarget || event.repeat) return;
+        if (event.key !== "Enter" && event.key !== " ") return;
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+        if (href !== undefined) {
+          event.preventDefault();
+          linkRef.current?.click();
+        } else if (openItem) {
+          event.preventDefault();
+          openItem(id, event);
+        }
+      }}
     >
+      {href !== undefined ? (
+        // A press on the link drags the card like a press anywhere on it (`data-dnd-handle`).
+        // biome-ignore lint/a11y/useAnchorContent: named by `aria-label` (the card's `getLabel`); the card's content stays readable beside it
+        <a
+          ref={linkRef}
+          href={href}
+          className={styles.itemLink}
+          aria-label={board.labelOf(id)}
+          draggable={false}
+          data-dnd-handle=""
+          onClick={(event) => {
+            // The release of a drag follows no link.
+            if (board.takeDragClick()) {
+              event.preventDefault();
+              return;
+            }
+            // The browser keeps the modified clicks (new tab, new window).
+            if (openItem && isPlainClick(event)) openItem(id, event);
+          }}
+          onKeyDown={(event) => {
+            // Space opens the card like Enter does.
+            if (event.key !== " " || event.repeat) return;
+            event.preventDefault();
+            event.currentTarget.click();
+          }}
+        />
+      ) : null}
       <ControlSizeProvider value="m">{children}</ControlSizeProvider>
       {pending ? (
         <Spinner

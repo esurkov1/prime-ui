@@ -278,6 +278,10 @@ export const ICON_CATALOG: Record<IconName, { meaning: string; keywords: string[
     meaning: "Цитата",
     keywords: ["цитата", "кавычки", "блок", "quote", "blockquote", "editor"],
   },
+  "format.spoiler": {
+    meaning: "Скрытый текст (спойлер)",
+    keywords: ["спойлер", "скрытый", "скрыть", "spoiler", "hidden", "mask", "editor"],
+  },
   "format.strikethrough": {
     meaning: "Зачёркнутый текст",
     keywords: ["зачёркивание", "зачеркнуть", "strikethrough", "strike", "editor"],

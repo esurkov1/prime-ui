@@ -21,6 +21,7 @@ import {
   Card,
   ChartFrame,
   Chat,
+  ChatList,
   ColorPresets,
   ColorSwatches,
   CommandMenu,
@@ -211,6 +212,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(Message.Contact);
     takesRef(Message.LinkPreview);
     takesRef(Message.Reactions);
+    takesRef(Message.Actions);
     takesRef(Message.Menu);
     takesRef(Message.AuthorIcon);
     takesRef(Chat.Root);
@@ -227,6 +229,12 @@ describe("part refs: every part declares ref", () => {
     takesRef(Chat.Service);
     takesRef(Chat.Unread);
     takesRef(Chat.Footer);
+    takesRef(ChatList.Root);
+    takesRef(ChatList.Item);
+    takesRef(ChatList.ItemIcon);
+    takesRef(ChatList.ItemText);
+    takesRef(ChatList.ItemDescription);
+    takesRef(ChatList.ItemMenu);
     takesRef(Gallery);
     takesRef(Label.Icon);
     takesRef(Label.Description);
@@ -265,6 +273,7 @@ describe("part refs: every part declares ref", () => {
     takesRef(Select.ItemMeta);
     takesRef(Select.Group);
     takesRef(Select.Separator);
+    takesRef(Select.Action);
     takesRef(Sidebar.Header);
     takesRef(Sidebar.BrandLogo);
     takesRef(Sidebar.Footer);
@@ -598,6 +607,52 @@ const CASES: Case[] = [
     ),
   ],
   ["VoicePlayer", "DIV", (ref) => <VoicePlayer ref={ref} src="/voice.ogg" duration={12} />],
+  [
+    "ChatList.Root",
+    "DIV",
+    (ref) => (
+      <ChatList.Root
+        ref={ref}
+        items={["granit"]}
+        getKey={(item) => item}
+        renderItem={() => (
+          <ChatList.Item>
+            <ChatList.ItemText>ООО «Гранит»</ChatList.ItemText>
+          </ChatList.Item>
+        )}
+      />
+    ),
+  ],
+  [
+    "ChatList.Item",
+    "BUTTON",
+    (ref) => (
+      <ChatList.Root
+        items={["granit"]}
+        getKey={(item) => item}
+        renderItem={() => (
+          <ChatList.Item ref={ref}>
+            <ChatList.ItemText>ООО «Гранит»</ChatList.ItemText>
+          </ChatList.Item>
+        )}
+      />
+    ),
+  ],
+  [
+    "ChatList.ItemText",
+    "SPAN",
+    (ref) => (
+      <ChatList.Root
+        items={["granit"]}
+        getKey={(item) => item}
+        renderItem={() => (
+          <ChatList.Item>
+            <ChatList.ItemText ref={ref}>ООО «Гранит»</ChatList.ItemText>
+          </ChatList.Item>
+        )}
+      />
+    ),
+  ],
   [
     "Chat.Messages",
     "DIV",

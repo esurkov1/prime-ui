@@ -1,4 +1,4 @@
-/** Documents of a deal: a drop zone, the files already attached as rows, and new files uploading through a queue with progress, a reason and a retry — `label`, `hint`, `multiple`, `defaultValue`, `queue`. */
+/** Documents of a deal: a drop zone, the files already attached as rows whose names open them, and new files uploading through a queue with progress, a reason and a retry — `label`, `hint`, `multiple`, `defaultValue`, `href`, `queue`. */
 import { FileUpload, type FileUploadFile, type UploadContext, useUploadQueue } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -6,8 +6,19 @@ import styles from "./examples.module.css";
 const MAX_SIZE = 10 * 1024 * 1024;
 
 const ATTACHED: readonly FileUploadFile[] = [
-  { id: "deal-contract", name: "Договор № 48-П.pdf", size: 1_840_000, type: "application/pdf" },
-  { id: "deal-estimate", name: "Смета.xlsx", size: 240_000 },
+  {
+    id: "deal-contract",
+    name: "Договор № 48-П.pdf",
+    size: 1_840_000,
+    type: "application/pdf",
+    href: "https://files.example.com/deals/48-P/contract.pdf",
+  },
+  {
+    id: "deal-estimate",
+    name: "Смета.xlsx",
+    size: 240_000,
+    href: "https://files.example.com/deals/48-P/estimate.xlsx",
+  },
 ];
 
 /** A stand-in for the server: sends a file in a few steps and answers with its address. */

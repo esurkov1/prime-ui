@@ -79,12 +79,12 @@ No DOM, no ref. State and dismiss policy.
 `ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`. + native `<div>` props.
 
 ### Sheet.Icon
-`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill.
+`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around an `Avatar.Root` or a `Thumbnail.Root` (the record's picture) no tile — `data-media`, the avatar sized to 40 px.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color. |
-| `children` | `ReactNode` | — (required) | Icon glyph (sized to the m icon). |
+| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color; not used around a picture. |
+| `children` | `ReactNode` | — (required) | An icon glyph (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Sheet.Title · Sheet.Description
@@ -135,7 +135,7 @@ Sheet has no `variant`, `side` or `size`: it always rises from the bottom edge, 
 | `fill` | equal-width buttons in one row | two equal answers | |
 
 ### tone (Icon)
-`neutral` (default) · `accent` · `success` · `warning` · `danger` · `info` — soft tile fill and icon color, as in Modal.
+`neutral` (default) · `accent` · `success` · `warning` · `danger` · `info` — soft tile fill and icon color, as in Modal. Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` (found by element type) — there is no tile and no tone: `data-media`, the avatar sized to 40 px.
 
 ## States
 | State | Driven by | DOM |

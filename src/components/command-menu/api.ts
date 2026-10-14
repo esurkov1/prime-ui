@@ -209,6 +209,13 @@ export const api: ComponentApi = {
           en: "Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, does not run.",
           ru: "Недоступна сейчас: видна приглушённой с `aria-disabled`, стрелки её пропускают, не выполняется.",
         },
+        {
+          name: "persistent",
+          type: "boolean",
+          default: "false",
+          en: "Shown whatever the query and never counted as a match (`CommandMenu.Empty` still shows); the arrows reach it after the matches. One «create from the query» item at the end of the list.",
+          ru: "Виден при любом запросе и не считается совпадением (`CommandMenu.Empty` всё равно показывается); стрелки доходят до него после совпадений. Один пункт «Создать из запроса» в конце списка.",
+        },
       ],
     },
     {
@@ -232,8 +239,8 @@ export const api: ComponentApi = {
     },
     {
       name: "CommandMenu.Empty",
-      en: '`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty`, `labels.emptyHint`, and `children` as an action — a button or a `CommandMenu.Item`.',
-      ru: 'Компактный EmptyPage (`role="status"`), пока ничего не найдено и не грузится: `labels.empty`, `labels.emptyHint` и `children` как действие — кнопка или `CommandMenu.Item`.',
+      en: '`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty` and `labels.emptyHint`, text only. An action for the query is a `persistent` `CommandMenu.Item` at the end of the list.',
+      ru: 'Компактный EmptyPage (`role="status"`), пока ничего не найдено и не грузится: `labels.empty` и `labels.emptyHint`, только текст. Действие для запроса — `persistent` `CommandMenu.Item` в конце списка.',
       props: [],
     },
     {

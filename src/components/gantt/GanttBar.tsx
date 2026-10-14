@@ -51,6 +51,8 @@ export type GanttBarViewProps = {
   nameFor: (dates: GanttDates) => string;
   /** «14 дн.» — the duration in the tooltip. */
   formatDuration: (days: number) => string;
+  /** `renderBarTooltip`: extra tooltip content under the dates line. */
+  renderTip?: () => React.ReactNode;
   editable: boolean;
   pending: boolean;
   /** The roving tab stop of the chart. */
@@ -99,6 +101,7 @@ export function GanttBarView({
   locale,
   nameFor,
   formatDuration,
+  renderTip,
   editable,
   pending,
   active,
@@ -369,6 +372,7 @@ export function GanttBarView({
               {milestone ? null : ` · ${formatDuration(daysBetween(shown.start, shown.end))}`}
               {progress === undefined ? null : ` · ${progress}%`}
             </span>
+            {renderTip ? <div className={styles.tipExtra}>{renderTip()}</div> : null}
           </Tooltip.Content>
         ) : null}
       </Tooltip.Root>

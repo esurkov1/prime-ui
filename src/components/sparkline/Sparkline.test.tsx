@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+import { DataTable } from "@/components/data-table/DataTable";
 
 import { Sparkline, type SparklinePoint } from "./Sparkline";
 
@@ -110,5 +112,66 @@ describe("Sparkline", () => {
   it("speaks a point through labels", () => {
     render(<Sparkline data={DATA} label="Выручка" labels={{ point: "{value} на {label}" }} />);
     expect(plot()).toHaveAttribute("aria-valuetext", "297 на 8 окт");
+  });
+
+  describe("compact", () => {
+    it("draws the plot alone: label only names the slider, the point is in aria-valuetext", () => {
+      const { container } = render(
+        <Sparkline data={DATA} label="Выручка" layout="compact" formatValue={(v) => `${v} ₽`} />,
+      );
+      expect(container.firstElementChild).toHaveAttribute("data-layout", "compact");
+      expect(screen.queryByText("Выручка")).not.toBeInTheDocument();
+      expect(screen.queryByText("8 окт")).not.toBeInTheDocument();
+      expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+      expect(plot()).toHaveAttribute("aria-valuetext", "8 окт: 297 ₽");
+      // The dot rests on the latest point.
+      const cursor = container.querySelector<HTMLElement>("[style*='--sparkline-x']");
+      expect(cursor?.style.getPropertyValue("--sparkline-x")).toBe("1");
+      fireEvent.keyDown(plot(), { key: "Home" });
+      expect(plot()).toHaveAttribute("aria-valuetext", "6 окт: 300 ₽");
+    });
+
+    it("loads as the plot skeleton alone", () => {
+      const { container } = render(
+        <Sparkline data={[]} label="Выручка" layout="compact" loading />,
+      );
+      expect(container.firstElementChild).toHaveAttribute("aria-busy", "true");
+      expect(screen.queryByText("Выручка")).not.toBeInTheDocument();
+      expect(container.firstElementChild?.childElementCount).toBe(1);
+    });
+
+    it("scrubbing and keys on the plot never open a DataTable row", () => {
+      type Client = { id: string; name: string; trend: SparklinePoint[] };
+      const onRowClick = vi.fn();
+      render(
+        <DataTable<Client>
+          rows={[{ id: "c1", name: "Гранит", trend: DATA }]}
+          columns={[
+            { id: "name", header: "Клиент", accessor: "name" },
+            {
+              id: "trend",
+              header: "По месяцам",
+              cell: (row) => <Sparkline data={row.trend} label="Выручка" layout="compact" />,
+            },
+          ]}
+          getRowKey={(row) => row.id}
+          onRowClick={onRowClick}
+        />,
+      );
+      const area = plot();
+      area.getBoundingClientRect = () => ({ left: 0, width: 100, top: 0, height: 20 }) as DOMRect;
+      fireEvent.pointerDown(area, { clientX: 0, pointerType: "mouse" });
+      fireEvent.pointerUp(area, { clientX: 0, pointerType: "mouse" });
+      fireEvent.click(area);
+      area.focus();
+      fireEvent.keyDown(area, { key: "Enter" });
+      fireEvent.keyDown(area, { key: " " });
+      fireEvent.keyDown(area, { key: "ArrowLeft" });
+      expect(onRowClick).not.toHaveBeenCalled();
+      expect(area).toHaveAttribute("data-row-click-ignore");
+      // The row itself still opens.
+      fireEvent.click(screen.getByRole("cell", { name: "Гранит" }));
+      expect(onRowClick).toHaveBeenCalledTimes(1);
+    });
   });
 });

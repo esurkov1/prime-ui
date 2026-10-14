@@ -29,7 +29,7 @@ Modal.Root                    state and dismiss policy (no DOM)
     ├── (grab handle)         below 640px only: aria-hidden bar, a drag starts here
     ├── Modal.Guard           no DOM: holds the dialog (busy / dirty) from inside
     ├── Modal.Header          grid: [Icon] [Title + Description] [Actions] [close button]
-    │   ├── Modal.Icon        40 tile with a tone fill
+    │   ├── Modal.Icon        40 tile with a tone fill; no tile around an Avatar.Root / Thumbnail.Root
     │   ├── Modal.Title       <h2>, names the dialog
     │   ├── Modal.Description <p>, describes the dialog
     │   └── Modal.Actions     row of tier-s controls before the close button
@@ -84,12 +84,12 @@ No DOM, no ref. State and dismiss policy.
 `ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`. + native `<div>` props.
 
 ### Modal.Icon
-`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill.
+`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around an `Avatar.Root` or a `Thumbnail.Root` (the record's picture) no tile — `data-media`, the avatar sized to 40 px.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color. |
-| `children` | `ReactNode` | — (required) | Icon glyph (sized to the m icon). |
+| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color; not used around a picture. |
+| `children` | `ReactNode` | — (required) | An icon glyph (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Modal.Title · Modal.Description
@@ -154,6 +154,8 @@ With a `Modal.Meta` the footer is a row in any layout: the status takes the free
 | `warning` | `warning-soft` tile, warning icon | Risky but reversible | |
 | `danger` | `danger-soft` tile, danger icon | Delete confirmations | |
 | `info` | `info-soft` tile, info icon | Informational notices | |
+
+Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` (found by element type) — there is no tile and no tone: `data-media`, the avatar sized to 40 px.
 
 ### Flags
 | Value | Looks like | Use when | Default |

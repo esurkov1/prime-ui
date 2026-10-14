@@ -170,6 +170,26 @@ describe("FileUpload", () => {
     expect(screen.queryByText(/Выберите файл или перетащите/i)).not.toBeInTheDocument();
   });
 
+  it("href makes a row's name and a tile links that open the file in a new tab", () => {
+    const files: FileUploadFile[] = [
+      { id: "contract", name: "Договор.pdf", href: "https://files.example.com/contract.pdf" },
+      { id: "estimate", name: "Смета.xlsx" },
+    ];
+    const { unmount } = render(<FileUpload.Queue aria-label="Документы" defaultValue={files} />);
+    const link = screen.getByRole("link", { name: "Договор" });
+    expect(link).toHaveAttribute("href", "https://files.example.com/contract.pdf");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(screen.queryByRole("link", { name: "Смета" })).toBeNull();
+    unmount();
+
+    render(<FileUpload.Queue aria-label="Документы" layout="grid" defaultValue={files} />);
+    const tile = screen.getByRole("link", { name: "Открыть Договор.pdf" });
+    expect(tile).toHaveAttribute("href", "https://files.example.com/contract.pdf");
+    expect(tile.closest("li")).toHaveAttribute("data-dnd-item", "contract");
+    expect(screen.getAllByRole("link")).toHaveLength(1);
+  });
+
   it("renders file item row with a decorative kit Badge and a progress bar", () => {
     render(
       <FileUpload.Item>

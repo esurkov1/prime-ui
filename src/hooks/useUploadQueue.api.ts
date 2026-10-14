@@ -8,10 +8,10 @@ export const USE_UPLOAD_QUEUE_PART: ApiPart = {
   props: [
     {
       name: "upload",
-      type: "(file: File, context: { signal: AbortSignal; onProgress: (progress: number) => void }) => Promise<TResult>",
+      type: "(file: File, context: { id: string; signal: AbortSignal; onProgress: (progress: number) => void }) => Promise<TResult>",
       required: true,
-      en: "Sends one file. Report the share sent with `onProgress` (0…1), stop on `signal`; resolve with the server's answer (kept as `result`), reject to fail the item with the rejection's message as the reason.",
-      ru: "Отправляет один файл. Долю сообщайте через `onProgress` (0…1), по `signal` прерывайте; разрешите промис ответом сервера (станет `result`), отклоните — элемент станет ошибкой с сообщением отказа.",
+      en: "Sends one file: progress through `onProgress` (0…1), stop on `signal`, resolve with the answer (`result`), reject to fail. `id` is the item: after-upload work runs here once the request resolves.",
+      ru: "Отправляет файл: прогресс через `onProgress` (0…1), прерывание по `signal`, ответ — `result`, отказ — ошибка. `id` — элемент: работа после загрузки идёт здесь, когда запрос ответил.",
     },
     {
       name: "concurrency",

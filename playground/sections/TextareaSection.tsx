@@ -8,7 +8,14 @@ export const page: ComponentPageConfig = {
     segment: "textarea",
     label: "Textarea",
     summary: "Многострочное поле со счётчиком символов",
-    keywords: ["текстовая область", "многострочное", "maxLength", "onValueChange"],
+    keywords: [
+      "текстовая область",
+      "многострочное",
+      "maxLength",
+      "onValueChange",
+      "форматирование",
+      "markdown",
+    ],
     icon: TextAlignStart,
     order: 2,
   },
@@ -60,6 +67,12 @@ export const page: ComponentPageConfig = {
         "Заметка карточки сохраняется при выходе из поля и по Mod+Enter, Escape отменяет правку, отказ сервера показан ошибкой — `onCommit`, `error`.",
     },
     {
+      scenario: "formatting",
+      title: "Форматирование",
+      description:
+        "Длинное объявление: над выделенным текстом появляется панель оформления с сочетаниями клавиш, оформление пишется Markdown вокруг выделения — `formatting`.",
+    },
+    {
       slot: "controlled",
       description:
         "Текстом владеет родитель; счётчик следует за ним, `maxLength` не даёт ввести лишнее — `value`, `onValueChange`, `Textarea.Counter`, `maxLength`.",
@@ -82,7 +95,21 @@ export const page: ComponentPageConfig = {
         keys: "Mod+Enter",
         action: "С `onCommit`: сохраняет изменённый текст, фокус остаётся в поле.",
       },
-      { keys: "Escape", action: "С `onCommit`: возвращает сохранённый текст." },
+      {
+        keys: "Escape",
+        action:
+          "С `formatting`: сначала снимает выделение с панелью. С `onCommit`: возвращает сохранённый текст.",
+      },
+      {
+        keys: "Mod + B · Mod + I · Mod + Shift + X · Mod + E · Mod + Shift + H · Mod + K · Mod + Shift + 9",
+        action:
+          "С `formatting`: жирный, курсив, зачёркнутый, код, скрытый текст, ссылка и цитата для выделения; работает в любой раскладке.",
+      },
+      { keys: "← · →", action: "Переходят по кнопкам панели форматирования." },
+      {
+        keys: "Home · End",
+        action: "Переходят к первой / последней кнопке панели форматирования.",
+      },
     ],
     aria: [
       "`label` — настоящий `<label htmlFor>`; без него задайте `aria-label`. Плейсхолдер не заменяет подпись.",
@@ -91,6 +118,7 @@ export const page: ComponentPageConfig = {
       '`Textarea.Counter` показывает «12/280», а скринридер читает `labels.counter` через `aria-live="polite"`.',
       "`Textarea.Action` и `Textarea.CopyButton` — кнопки с именем и подсказкой; копирование объявляет `labels.copied`.",
       "С `onCommit` поле ставит `aria-busy`, пока идёт сохранение, а живой регион говорит `labels.saving` и `labels.saved`.",
+      'Панель форматирования — `role="toolbar"` с именем `labels.formatting` и `aria-controls` на поле, с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами. Нажатие на кнопку оставляет фокус и выделение в поле.',
     ],
   },
 };

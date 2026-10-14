@@ -269,7 +269,8 @@
    shadow reaches past the gap, and the next card (positioned, later in the DOM) would cover it. */
 @media (hover: hover) {
   /* `[data-dnd-hover]`: a card dropped under the mouse lands straight into this look (Dnd). */
-  .item:not([data-disabled]):is(:hover, [data-dnd-hover]) {
+  /* A card that opens lifts on a read-only board too. */
+  .item:is(:not([data-disabled]), [data-clickable], [data-link]):is(:hover, [data-dnd-hover]) {
     z-index: 1;
     box-shadow: var(--prime-shadow-overlay);
   }
@@ -277,6 +278,65 @@
 
 .item[data-disabled]:not([data-pending]) {
   color: var(--prime-color-text-secondary);
+}
+
+/*
+ * A card that opens (`onItemClick`, `getItemHref`) keeps the grab cursor while it drags; on a
+ * read-only board it shows the pointer.
+ */
+.item[data-clickable][data-disabled] {
+  cursor: pointer;
+}
+
+/*
+ * `getItemHref`: a link over the whole card, above its content, so a click, ⌘-click, a middle click
+ * or the context menu anywhere on the card is the link's. Controls inside the card stand above it;
+ * a custom widget joins them with `data-row-click-ignore`.
+ */
+.itemLink {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  outline: none;
+  cursor: inherit;
+  -webkit-touch-callout: none;
+}
+
+.item[data-disabled] > .itemLink {
+  cursor: pointer;
+}
+
+.item:has(> .itemLink:focus-visible) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset);
+}
+
+/* Zero specificity: a control's own `position` / `z-index` always wins. */
+:where(.item[data-link])
+  :where(
+    a[href]:not(.itemLink),
+    button,
+    input,
+    select,
+    textarea,
+    label,
+    summary,
+    [tabindex]:not([tabindex="-1"]),
+    [role="button"],
+    [role="link"],
+    [role="checkbox"],
+    [role="switch"],
+    [role="menuitem"],
+    [role="option"],
+    [role="tab"],
+    [role="slider"],
+    [role="combobox"],
+    [role="textbox"],
+    [data-row-click-ignore]
+  ) {
+  position: relative;
+  z-index: 2;
 }
 
 /*

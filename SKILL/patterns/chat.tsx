@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Chat,
+  ChatList,
   Composer,
   type ComposerActivity,
   type ComposerMediaItem,
@@ -11,14 +12,13 @@ import {
   type ComposerRecording,
   Dropdown,
   type GalleryItem,
+  hueOf,
   Icon,
-  List,
   Message,
   type MessageReaction,
   type MessageStatus,
   type MessageUser,
   PageContent,
-  ScrollContainer,
   type UploadContext,
   useUploadQueue,
   VideoNote,
@@ -50,7 +50,14 @@ type ChatMessage = Content & {
   reactions?: MessageReaction[];
 };
 
-type Dialog = { id: string; name: string; initials: string; unread: number };
+type Dialog = {
+  id: string;
+  name: string;
+  initials: string;
+  unread: number;
+  preview: string;
+  at: Date;
+};
 
 const NOW = new Date(2026, 9, 8, 15, 0);
 const at = (day: number, hour: number, minute: number) => new Date(2026, 9, day, hour, minute);
@@ -86,9 +93,30 @@ const photo = (seed: string, width: number, height: number, alt: string): Galler
 });
 
 const DIALOGS: Dialog[] = [
-  { id: "vector", name: "ООО «Вектор»", initials: "ВК", unread: 2 },
-  { id: "granit", name: "ООО «Гранит»", initials: "ГР", unread: 0 },
-  { id: "kozlov", name: "ИП Козлов", initials: "ИК", unread: 1 },
+  {
+    id: "vector",
+    name: "ООО «Вектор»",
+    initials: "ВК",
+    unread: 2,
+    preview: "Ок, жду акт",
+    at: at(8, 14, 31),
+  },
+  {
+    id: "granit",
+    name: "ООО «Гранит»",
+    initials: "ГР",
+    unread: 0,
+    preview: "Акт сверки подписан",
+    at: at(7, 16, 5),
+  },
+  {
+    id: "kozlov",
+    name: "ИП Козлов",
+    initials: "ИК",
+    unread: 1,
+    preview: "Подключите ЭДО",
+    at: at(6, 11, 40),
+  },
 ];
 
 /** Older history, loaded when the conversation is scrolled to its start. */
@@ -239,6 +267,7 @@ const MESSAGE_SEND_MS = 700;
 const MESSAGE_READ_MS = 1500;
 const CLIENT_TYPING_MS = 1800;
 const HISTORY_MS = 900;
+const DIALOG_MS = 800;
 const TRANSCRIBE_MS = 1400;
 
 /** A stand-in for the file server: sends an attachment in a few steps. */
@@ -521,6 +550,13 @@ export default function ChatPattern() {
     };
   }, []);
   const dialog = DIALOGS.find((item) => item.id === dialogId) ?? DIALOGS[0];
+  /** The dialog whose history has arrived: opening another one loads it first. */
+  const [loadedId, setLoadedId] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (!dialogId) return;
+    const timer = window.setTimeout(() => setLoadedId(dialogId), DIALOG_MS);
+    return () => window.clearTimeout(timer);
+  }, [dialogId]);
 
   const loadOlder = async () => {
     if (!hasOlder) return;
@@ -728,27 +764,36 @@ export default function ChatPattern() {
         >
           <PageContent.List aria-label="Диалоги">
             <Card.Root className={styles.paneCard}>
-              <ScrollContainer className={styles.pane}>
-                <List.Root className={styles.dialogs}>
-                  {DIALOGS.map((item) => (
-                    <List.Item
-                      key={item.id}
-                      current={item.id === dialogId}
-                      onClick={() => setDialogId(item.id)}
+              <ChatList.Root
+                items={DIALOGS}
+                getKey={(item) => item.id}
+                value={dialogId}
+                onValueChange={setDialogId}
+                now={NOW}
+                renderItem={(item) => {
+                  // The open dialog shows its live last message; the others their stored one.
+                  const last = item.id === dialogId ? messages[messages.length - 1] : undefined;
+                  return (
+                    <ChatList.Item
+                      time={last?.sentAt ?? item.at}
+                      status={last?.from === "me" ? last.status : undefined}
+                      unread={unread[item.id] ?? 0}
+                      typing={item.id === dialogId && clientTyping}
                     >
-                      <List.ItemIcon>
-                        <Avatar.Root color="blue">
+                      <ChatList.ItemIcon>
+                        <Avatar.Root color={hueOf(item.id)}>
                           <Avatar.Fallback>{item.initials}</Avatar.Fallback>
+                          {item.id === "vector" ? <Avatar.Status status="online" /> : null}
                         </Avatar.Root>
-                      </List.ItemIcon>
-                      <List.ItemText>{item.name}</List.ItemText>
-                      {(unread[item.id] ?? 0) > 0 ? (
-                        <List.ItemCount color="blue">{unread[item.id]}</List.ItemCount>
-                      ) : null}
-                    </List.Item>
-                  ))}
-                </List.Root>
-              </ScrollContainer>
+                      </ChatList.ItemIcon>
+                      <ChatList.ItemText>{item.name}</ChatList.ItemText>
+                      <ChatList.ItemDescription author={last?.from === "me" ? "Вы" : undefined}>
+                        {last ? excerpt(last) : item.preview}
+                      </ChatList.ItemDescription>
+                    </ChatList.Item>
+                  );
+                }}
+              />
             </Card.Root>
           </PageContent.List>
 
@@ -757,7 +802,7 @@ export default function ChatPattern() {
               <Chat.Root typing={clientTyping} selected={selected} onSelectedChange={setSelected}>
                 <Chat.Header>
                   <PageContent.BackButton />
-                  <Avatar.Root color="blue">
+                  <Avatar.Root color={hueOf(dialog.id)}>
                     <Avatar.Fallback>{dialog.initials}</Avatar.Fallback>
                     <Avatar.Status status="online" />
                   </Avatar.Root>
@@ -770,6 +815,7 @@ export default function ChatPattern() {
                 <Chat.Search />
                 <Chat.Pinned items={pinnedItems} onRemove={togglePin} />
                 <Chat.Messages
+                  loading={loadedId !== dialogId}
                   reader={ME}
                   items={messages}
                   getKey={(message) => message.id}

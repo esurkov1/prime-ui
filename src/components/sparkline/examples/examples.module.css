@@ -5,6 +5,18 @@
   width: min(100%, var(--prime-modal-width-s));
 }
 
+/* compact: a client list, the name and its trend on one line per client. */
+.list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(var(--prime-space-24), 1fr);
+  align-items: center;
+  gap: var(--prime-space-3) var(--prime-space-4);
+}
+
+.listRow {
+  display: contents;
+}
+
 /* The period switch above the chart inside the card body. */
 .body {
   display: flex;

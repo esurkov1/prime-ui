@@ -19,6 +19,8 @@ export type SelectLabels = {
   clear: string;
   /** Muted marker after the label when `optional`. */
   optional: string;
+  /** Announced when the `onValueChange` promise rejects and the value rolls back. */
+  changeFailed: string;
 };
 
 export const normalize = (text: string) => text.trim().toLocaleLowerCase();
@@ -81,6 +83,8 @@ export type SelectContextValue = {
   clear: () => void;
   clearable: boolean;
   loading: boolean;
+  /** A promise from `onValueChange` is pending: the trigger is busy, picks wait. */
+  saving: boolean;
   loadingMore: boolean;
   hasMore: boolean;
   onLoadMore: (() => void | Promise<void>) | undefined;

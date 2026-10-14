@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { parseInline, parseRichText, RichText, safeHref } from "./richText";
@@ -46,6 +46,14 @@ describe("parseInline", () => {
         children: [{ type: "text", text: "https://prime.app/i/2" }],
       },
       { type: "text", text: "." },
+    ]);
+  });
+
+  it("parses a spoiler with markup inside, never across a space at its edges", () => {
+    expect(parseInline("код ||**4821**|| и || нет||")).toEqual([
+      { type: "text", text: "код " },
+      { type: "spoiler", children: [{ type: "bold", children: [{ type: "text", text: "4821" }] }] },
+      { type: "text", text: " и || нет||" },
     ]);
   });
 
@@ -108,5 +116,49 @@ describe("RichText highlight", () => {
   it("marks nothing without a query", () => {
     const { container } = render(<RichText source="Счёт INV-2048" highlight="  " />);
     expect(container.querySelector("mark")).toBeNull();
+  });
+});
+
+describe("RichText spoiler", () => {
+  it("is a button named «Скрытый текст» that hides its words until pressed", () => {
+    const { container } = render(<RichText source="Пароль: ||Prime-2048|| до пятницы" />);
+    const spoiler = screen.getByRole("button", { name: "Скрытый текст" });
+    expect(spoiler).toHaveAttribute("tabindex", "0");
+    expect(spoiler).toHaveAttribute("data-state", "masked");
+    expect(spoiler.firstElementChild).toHaveAttribute("aria-hidden", "true");
+    fireEvent.click(spoiler);
+    expect(screen.queryByRole("button")).toBeNull();
+    const revealed = container.querySelector('[data-state="revealed"]');
+    expect(revealed?.textContent).toBe("Prime-2048");
+    expect(revealed).not.toHaveAttribute("aria-hidden");
+  });
+
+  it("Enter and Space reveal it and move the focus onto the text", () => {
+    const { container } = render(<RichText source="||первый|| и ||второй||" />);
+    const [first, second] = screen.getAllByRole("button", { name: "Скрытый текст" });
+    first.focus();
+    fireEvent.keyDown(first, { key: "Enter" });
+    expect(container.querySelector('[data-state="revealed"]')).toHaveFocus();
+    second.focus();
+    const space = fireEvent.keyDown(second, { key: " " });
+    expect(space).toBe(false);
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("keeps links and search marks out of the mask, then shows them", () => {
+    const { container } = render(
+      <RichText source="||[счёт](https://prime.app/i/1) к оплате||" highlight="счёт" />,
+    );
+    expect(container.querySelector("a")).toBeNull();
+    expect(container.querySelector("mark")).toBeNull();
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button"));
+    expect(screen.getByRole("link", { name: "счёт" })).toBeInTheDocument();
+    expect(container.querySelector("mark")?.textContent).toBe("счёт");
+  });
+
+  it("takes its name from labels", () => {
+    render(<RichText source="||секрет||" labels={{ spoiler: "Спойлер" }} />);
+    expect(screen.getByRole("button", { name: "Спойлер" })).toBeInTheDocument();
   });
 });

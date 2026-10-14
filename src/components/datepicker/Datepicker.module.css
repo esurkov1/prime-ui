@@ -317,6 +317,8 @@
   color: inherit;
   font: inherit;
   font-variant-numeric: tabular-nums;
+  /* The kit's control reset makes a button's text inherit the start alignment: center the number. */
+  text-align: center;
   cursor: pointer;
   transition:
     background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),

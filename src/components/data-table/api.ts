@@ -364,6 +364,24 @@ export const api: ComponentApi = {
           ru: "Заголовки групп остаются под шапкой (или у верхнего края), пока прокручиваются их строки.",
         },
         {
+          name: "collapsedGroups",
+          type: "(string | number)[]",
+          en: "Collapsed group keys, controlled. Any prop of this triad makes groups fold: a chevron toggle leads each header, rows fold like sub-rows. «Select all» and paging still count collapsed rows.",
+          ru: "Свёрнутые группы, управляемо. Любой проп этой тройки делает группы сворачиваемыми: шеврон в заголовке, строки сворачиваются как вложенные. «Выбрать все» и страницы учитывают свёрнутые строки.",
+        },
+        {
+          name: "defaultCollapsedGroups",
+          type: "(string | number)[]",
+          en: "Initially collapsed group keys, uncontrolled; `[]` — every group open but foldable.",
+          ru: "Изначально свёрнутые группы без контроля; `[]` — все открыты, но сворачиваются.",
+        },
+        {
+          name: "onCollapsedGroupsChange",
+          type: "(collapsedGroups: (string | number)[]) => void",
+          en: "The collapsed group keys changed (a group header toggle).",
+          ru: "Смена свёрнутых групп (переключатель в заголовке группы).",
+        },
+        {
           name: "labels",
           type: "Partial<DataTableLabels>",
           en: "Built-in strings, see Labels.",
@@ -591,6 +609,18 @@ export const api: ComponentApi = {
       default: "Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки",
       en: "Tooltip of the disabled handles while the table is sorted by a column.",
       ru: "Подсказка неактивных ручек, пока таблица отсортирована по колонке.",
+    },
+    {
+      key: "expandGroup",
+      default: "Развернуть группу {group}",
+      en: "Name of the toggle of a collapsed group; `{group}` is the group key.",
+      ru: "Имя переключателя свёрнутой группы; `{group}` — ключ группы.",
+    },
+    {
+      key: "collapseGroup",
+      default: "Свернуть группу {group}",
+      en: "Name of the toggle of an expanded group; `{group}` is the group key.",
+      ru: "Имя переключателя развёрнутой группы; `{group}` — ключ группы.",
     },
   ],
 };

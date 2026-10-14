@@ -152,21 +152,22 @@ export function dialogParts(name: "Modal" | "Drawer" | "Sheet", footerDefault: s
     },
     {
       name: `${name}.Icon`,
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around an `Avatar.Root` or a `Thumbnail.Root` (the record's picture) no tile — `data-media`, the avatar sized to 40 px.",
+      ru: "`aria-hidden` плашка 40 px с заливкой тона; вокруг `Avatar.Root` или `Thumbnail.Root` (картинка записи) плашки нет — `data-media`, аватар 40 px.",
       props: [
         {
           name: "tone",
           type: '"neutral" | "accent" | "success" | "warning" | "danger" | "info"',
           default: '"neutral"',
-          en: "Soft fill and icon color.",
-          ru: "Мягкая заливка плашки и цвет иконки.",
+          en: "Soft fill and icon color; not used around a picture.",
+          ru: "Мягкая заливка плашки и цвет иконки; у картинки не действует.",
         },
         {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "Icon glyph (sized to the m icon).",
-          ru: "Иконка 20 px.",
+          en: "An icon glyph (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`.",
+          ru: "Иконка 20 px или картинка записи: `Avatar.Root` (под размер плашки) или `Thumbnail.Root`.",
         },
         {
           name: "…rest",

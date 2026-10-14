@@ -305,6 +305,13 @@
   white-space: nowrap;
 }
 
+/* `href`: the name is a link to the file; it keeps the name's type and ellipsis (inline text). */
+.itemLink {
+  display: inline;
+  font-size: inherit;
+  line-height: inherit;
+}
+
 .itemDescription {
   grid-area: description;
   min-width: 0;

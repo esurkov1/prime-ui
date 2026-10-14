@@ -120,6 +120,17 @@ export type {
 } from "./chat/Chat";
 export { Chat, formatMessageDate, groupMessages } from "./chat/Chat";
 export type {
+  ChatListItemDescriptionProps,
+  ChatListItemIconProps,
+  ChatListItemMenuProps,
+  ChatListItemProps,
+  ChatListItemTextProps,
+  ChatListLabels,
+  ChatListMediaKind,
+  ChatListRootProps,
+} from "./chat-list/ChatList";
+export { ChatList, formatChatTime } from "./chat-list/ChatList";
+export type {
   CheckboxIndicatorProps,
   CheckboxLabelProps,
   CheckboxRootProps,
@@ -168,7 +179,6 @@ export type {
   ComposerContextMode,
   ComposerContextProps,
   ComposerDescriptionProps,
-  ComposerFormat,
   ComposerItemIconProps,
   ComposerItemProps,
   ComposerLabels,
@@ -306,6 +316,7 @@ export type {
   GanttDates,
   GanttLabels,
   GanttProps,
+  GanttRowClickEvent,
   GanttScale,
 } from "./gantt/Gantt";
 export { Gantt } from "./gantt/Gantt";
@@ -331,6 +342,7 @@ export type {
   KanbanColumn,
   KanbanColumnMove,
   KanbanItemBadgesProps,
+  KanbanItemClickEvent,
   KanbanItemCountProps,
   KanbanItemDescriptionProps,
   KanbanItemFooterProps,
@@ -362,6 +374,7 @@ export type {
   ListItemMetaProps,
   ListItemProps,
   ListItemTextProps,
+  ListLabels,
   ListRootProps,
 } from "./list/List";
 export { List } from "./list/List";
@@ -385,6 +398,7 @@ export type {
 export { MediaViewer } from "./media-viewer/MediaViewer";
 export { formatMessageTime } from "./message/formatMessageTime";
 export type {
+  MessageActionsProps,
   MessageAuthorIconProps,
   MessageAuthorProps,
   MessageAvatarProps,
@@ -522,6 +536,7 @@ export type {
 } from "./segmented-control/SegmentedControl";
 export { SegmentedControl } from "./segmented-control/SegmentedControl";
 export type {
+  SelectActionProps,
   SelectContentProps,
   SelectGroupProps,
   SelectItemDescriptionProps,
@@ -567,6 +582,7 @@ export {
 } from "./smart-filter/SmartFilter";
 export type {
   SparklineLabels,
+  SparklineLayout,
   SparklinePoint,
   SparklineProps,
   SparklineVariant,
@@ -604,6 +620,7 @@ export type {
   TextareaCounterProps,
   TextareaLabels,
   TextareaRootProps,
+  TextFormat,
 } from "./textarea/Textarea";
 export { Textarea } from "./textarea/Textarea";
 export type {

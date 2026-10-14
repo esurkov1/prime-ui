@@ -8,8 +8,8 @@ const SET_PROPS: ApiProp[] = [
   {
     name: "value",
     type: FILE_TYPE,
-    en: "Files in their order (controlled): `{ id, name, size?, type?, src?, alt? }` — on the server, or uploads of `queue` by their ids. `type` is the MIME type; `src` a picture or a video; `alt` is spoken in place of the name.",
-    ru: "Файлы по порядку (управляемое): `{ id, name, size?, type?, src?, alt? }` — на сервере или загрузки `queue` по их id. `type` — MIME-тип; `src` — картинка или видео; `alt` озвучивается вместо имени.",
+    en: "Files in their order (controlled): `{ id, name, size?, type?, src?, alt?, href? }` — on the server or uploads of `queue` by id. `src`: picture or video; `alt` spoken for the name; `href` links name or tile to the file.",
+    ru: "Файлы по порядку (управляемое): `{ id, name, size?, type?, src?, alt?, href? }` — на сервере или загрузки `queue` по id. `src` — картинка или видео; `alt` — вместо имени; `href` — имя или плитка ведут к файлу.",
   },
   {
     name: "defaultValue",
@@ -476,6 +476,12 @@ export const api: ComponentApi = {
       default: "Убрать {name}",
       en: "Name of the remove button of a file (it also stops an upload).",
       ru: "Имя кнопки «Убрать» у файла (она же прерывает загрузку).",
+    },
+    {
+      key: "open",
+      default: "Открыть {name}",
+      en: "Name of a tile's link to the file (`href`); a row's link is named by the file name.",
+      ru: "Имя ссылки плитки на файл (`href`); ссылку строки называет имя файла.",
     },
     {
       key: "removed",

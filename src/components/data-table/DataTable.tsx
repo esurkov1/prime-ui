@@ -46,7 +46,7 @@ export type {
   DataTableSortState,
 } from "./types";
 
-/** System strings; `{from}`, `{to}`, `{total}`, `{label}`, `{count}` are replaced. */
+/** System strings; `{from}`, `{to}`, `{total}`, `{label}`, `{count}`, `{group}` are replaced. */
 export type DataTableLabels = {
   /** Screen-reader announcement while skeleton rows are shown. */
   loading: string;
@@ -76,6 +76,10 @@ export type DataTableLabels = {
   reorderRow: string;
   /** Tooltip of the handles while the table is sorted by a column (reordering is off). */
   reorderSorted: string;
+  /** `aria-label` of the toggle of a collapsed group; `{group}` is the group key. */
+  expandGroup: string;
+  /** `aria-label` of the toggle of an expanded group; `{group}` is the group key. */
+  collapseGroup: string;
 };
 
 const DEFAULT_LABELS: DataTableLabels = {
@@ -93,6 +97,8 @@ const DEFAULT_LABELS: DataTableLabels = {
   showAllColumns: "Показать все",
   reorderRow: "Переместить строку {label}",
   reorderSorted: "Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки",
+  expandGroup: "Развернуть группу {group}",
+  collapseGroup: "Свернуть группу {group}",
 };
 
 export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
@@ -226,10 +232,22 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   renderGroupHeader?: (group: DataTableGroup<Row>) => React.ReactNode;
   /** Group header rows stick under the head while their rows scroll. */
   stickyGroupHeaders?: boolean;
+  /**
+   * Keys of the collapsed groups, controlled. Passing any of `collapsedGroups`,
+   * `defaultCollapsedGroups`, `onCollapsedGroupsChange` makes groups fold: each group header gets
+   * a disclosure toggle and its rows fold away and back.
+   */
+  collapsedGroups?: (string | number)[];
+  /** Initially collapsed group keys, uncontrolled (`[]` — every group open, but foldable). */
+  defaultCollapsedGroups?: (string | number)[];
+  /** The collapsed group keys changed (a group header toggle). */
+  onCollapsedGroupsChange?: (collapsedGroups: (string | number)[]) => void;
 };
 
 const EMPTY_KEYS: React.Key[] = [];
 const EMPTY_IDS: string[] = [];
+const EMPTY_GROUPS: (string | number)[] = [];
+const NO_GROUPS: ReadonlySet<string | number> = new Set();
 const SKELETON_ROWS = 5;
 const NO_KEYS: ReadonlySet<React.Key> = new Set();
 const INFINITE_SCROLL_HEIGHT = 360;
@@ -319,6 +337,9 @@ export function DataTable<Row>({
   getRowGroup,
   renderGroupHeader,
   stickyGroupHeaders = false,
+  collapsedGroups,
+  defaultCollapsedGroups,
+  onCollapsedGroupsChange,
   ref,
   ...rest
 }: DataTableProps<Row>) {
@@ -509,6 +530,59 @@ export function DataTable<Row>({
     }
   }, []);
 
+  // ─── Collapsible groups ───
+  // Groups fold once the owner passes any of the triad (like `Chat` selection): no extra flag.
+  const foldGroups =
+    Boolean(getRowGroup) &&
+    (collapsedGroups !== undefined ||
+      defaultCollapsedGroups !== undefined ||
+      onCollapsedGroupsChange !== undefined);
+  const [collapsedKeys, setCollapsedKeys] = useControllableState<(string | number)[]>({
+    value: collapsedGroups,
+    defaultValue: defaultCollapsedGroups ?? EMPTY_GROUPS,
+    onChange: onCollapsedGroupsChange,
+  });
+  const collapsedSet = React.useMemo<ReadonlySet<string | number>>(
+    () => (foldGroups ? new Set(collapsedKeys) : NO_GROUPS),
+    [foldGroups, collapsedKeys],
+  );
+  /*
+   * Whatever changed the collapsed keys (a toggle, or the owner of a controlled table), a group
+   * that closes keeps its rows drawn while they fold away (`closing`), and the rows of a group that
+   * opens fold in (`opened`); both clear after the `base` clock, like the sub-rows of a row.
+   */
+  const [groupFold, setGroupFold] = React.useState(() => ({
+    collapsed: collapsedSet,
+    closing: NO_GROUPS,
+    opened: null as string | number | null,
+  }));
+  if (groupFold.collapsed !== collapsedSet) {
+    const closing = new Set(groupFold.closing);
+    let opened = groupFold.opened;
+    for (const key of collapsedSet) if (!groupFold.collapsed.has(key)) closing.add(key);
+    for (const key of groupFold.collapsed) {
+      if (collapsedSet.has(key)) continue;
+      closing.delete(key);
+      opened = key;
+    }
+    setGroupFold({ collapsed: collapsedSet, closing: closing.size ? closing : NO_GROUPS, opened });
+  }
+  React.useEffect(() => {
+    if (groupFold.closing.size === 0 && groupFold.opened === null) return;
+    const timer = window.setTimeout(
+      () => setGroupFold((state) => ({ ...state, closing: NO_GROUPS, opened: null })),
+      exitTimeoutMs("base"),
+    );
+    return () => window.clearTimeout(timer);
+  }, [groupFold.closing, groupFold.opened]);
+  const toggleGroup = React.useCallback(
+    (key: string | number) =>
+      setCollapsedKeys((keys) =>
+        keys.includes(key) ? keys.filter((k) => k !== key) : [...keys, key],
+      ),
+    [setCollapsedKeys],
+  );
+
   const flat = React.useMemo(
     () =>
       flatten(sortedRows, {
@@ -527,9 +601,17 @@ export function DataTable<Row>({
         lastExpandedKey,
         collectKeys: selectable,
         groupOf: getRowGroup,
+        foldGroups,
+        collapsedGroups: collapsedSet,
+        closingGroups: groupFold.closing,
+        openedGroup: groupFold.opened,
       }),
     [
       getRowGroup,
+      foldGroups,
+      collapsedSet,
+      groupFold.closing,
+      groupFold.opened,
       sortedRows,
       pageOffset,
       end,
@@ -752,6 +834,7 @@ export function DataTable<Row>({
         expanded={item.expanded}
         animate={item.animate}
         folding={item.folding}
+        foldable={item.foldable}
         detailAnimate={lastExpandedKey === item.key}
         selected={selectable && selection.selectedSet.has(item.key)}
         childControls={item.childKeys.map(rowDomId).join(" ")}
@@ -781,27 +864,50 @@ export function DataTable<Row>({
     ];
   };
 
-  // Grouped rows: one `<tbody>` per group run on screen, headed by its group row.
-  const segments: { key: string | number; rows: { item: FlatRow<Row>; index: number }[] }[] = [];
+  // Grouped rows: one `<tbody>` per group run on screen, headed by its group row (a collapsed
+  // group's body holds the header alone).
+  type Segment = { key: string | number; rows: { item: FlatRow<Row>; index: number }[] };
+  const entries = (start: number, end: number) =>
+    flat.rows.slice(start, end).map((item, offset) => ({ item, index: start + offset }));
   // Reorderable rows are one sortable `<tbody>` per run (the page, or each group: rows move inside
   // their group), so the segments are needed without groups too.
-  if ((groups || reorder.enabled) && bodyState === "rows") {
-    flat.rows.forEach((item, index) => {
-      const last = segments[segments.length - 1];
-      if (item.groupStart !== undefined || !last) {
-        segments.push({ key: item.groupStart ?? "", rows: [{ item, index }] });
-      } else {
-        last.rows.push({ item, index });
-      }
-    });
-  }
+  const segments: Segment[] =
+    bodyState !== "rows"
+      ? []
+      : groups
+        ? flat.runs.map((run) => ({ key: run.key, rows: entries(run.start, run.end) }))
+        : reorder.enabled
+          ? [{ key: "", rows: entries(0, flat.rows.length) }]
+          : [];
   const swapClass = bodySwapped ? swapMotion.swapIn : undefined;
 
-  const groupHeader = (key: string | number) => {
+  const groupHeader = (segment: Segment) => {
     if (!groups) return null;
+    const { key } = segment;
     const group = groups.get(key);
+    const collapsed = collapsedSet.has(key);
     return (
-      <GroupRow totalColumns={totalColumns} sticky={stickyGroupHeaders}>
+      <GroupRow
+        totalColumns={totalColumns}
+        sticky={stickyGroupHeaders}
+        size={size}
+        toggle={
+          foldGroups
+            ? {
+                collapsed,
+                label: formatLabel(collapsed ? labels.expandGroup : labels.collapseGroup, {
+                  group: String(key),
+                }),
+                // Reorderable rows carry no DOM id.
+                controls:
+                  collapsed || reorder.enabled
+                    ? undefined
+                    : segment.rows.map(({ item }) => rowDomId(item.key)).join(" "),
+                onToggle: () => toggleGroup(key),
+              }
+            : undefined
+        }
+      >
         {renderGroupHeader && group ? renderGroupHeader(group) : String(key)}
       </GroupRow>
     );
@@ -903,7 +1009,7 @@ export function DataTable<Row>({
                           onReorder={reorder.reorderIn(segment.rows)}
                           getRowLabel={getRowLabel}
                           renderRow={renderRow}
-                          header={groupHeader(segment.key)}
+                          header={groupHeader(segment)}
                           className={swapClass}
                         />
                       ))}
@@ -912,7 +1018,7 @@ export function DataTable<Row>({
                     <React.Fragment key={bodyKey}>
                       {segments.map((segment) => (
                         <tbody key={`group-${String(segment.key)}`} className={swapClass}>
-                          {groupHeader(segment.key)}
+                          {groupHeader(segment)}
                           {segment.rows.map(({ item, index }) => renderRow(item, index))}
                         </tbody>
                       ))}
@@ -952,6 +1058,7 @@ export function DataTable<Row>({
                       columns={columns}
                       selectable={selectable}
                       expandEnabled={expandEnabled}
+                      reorderable={reorder.enabled}
                     />
                   ) : null}
                 </table>

@@ -5,8 +5,10 @@
  */
 import * as React from "react";
 
+import { Avatar } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useModalLayer } from "@/hooks/useModalLayer";
 import { Icon } from "@/icons";
@@ -300,15 +302,34 @@ export function DialogShellProvider({
 // ─── Icon ─────────────────────────────────────────────────────────────────────
 
 export type DialogIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /** Soft fill + text color of the role. Default `neutral`. */
+  /** Soft fill + text color of the role. Default `neutral`. Not used around a picture. */
   tone?: Tone;
+  /**
+   * An `Icon` in a filled box of the role, or the record's picture — an `Avatar.Root` (sized to
+   * the box) or a `Thumbnail.Root` — with no box of its own.
+   */
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-export function DialogIcon({ tone = "neutral", children, className, ...rest }: DialogIconProps) {
+/** A person or an object stands for itself: a picture child needs no filled box around it. */
+function isMedia(children: React.ReactNode): boolean {
   return (
-    <span {...rest} className={cx(styles.icon, className)} data-tone={tone} aria-hidden="true">
+    React.isValidElement(children) &&
+    (children.type === Avatar.Root || children.type === Thumbnail.Root)
+  );
+}
+
+export function DialogIcon({ tone = "neutral", children, className, ...rest }: DialogIconProps) {
+  const media = isMedia(children);
+  return (
+    <span
+      {...rest}
+      className={cx(styles.icon, className)}
+      data-tone={media ? undefined : tone}
+      data-media={media || undefined}
+      aria-hidden="true"
+    >
       {children}
     </span>
   );

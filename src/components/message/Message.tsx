@@ -350,13 +350,15 @@ function partsOf(children: React.ReactNode) {
   const author = items.find((child) => isElement(child, MessageAuthor));
   const menu = items.find((child) => isElement(child, MessageMenu));
   const reactions = items.find((child) => isElement(child, MessageReactions));
+  const actions = items.filter((child) => isElement(child, MessageActions));
   const body = items.filter(
     (child) =>
       !(
         isElement(child, MessageAvatar) ||
         isElement(child, MessageAuthor) ||
         isElement(child, MessageMenu) ||
-        isElement(child, MessageReactions)
+        isElement(child, MessageReactions) ||
+        isElement(child, MessageActions)
       ),
   );
   const specs = body.map((child) => messagePartOf(child.type));
@@ -365,7 +367,7 @@ function partsOf(children: React.ReactNode) {
     : body.length === 1 && specs[0]?.shell === "media"
       ? "media"
       : "bubble";
-  return { avatar, author, menu, reactions, body, specs, shell };
+  return { avatar, author, menu, reactions, actions, body, specs, shell };
 }
 
 /** What a chat's search looks in: the text its content parts declare. */
@@ -392,16 +394,36 @@ function estimateOf(
   shell: MessageShell,
   reactions: boolean,
   author: boolean,
+  actionRows: number,
 ): number {
   let size = (shell === "bubble" ? 16 : 0) + (author && shell === "bubble" ? 20 : 0);
   body.forEach((element, index) => {
     const spec = specs[index];
     size += spec?.estimate?.(element.props as never) ?? PART_ESTIMATE.get(element.type) ?? 40;
   });
-  return Math.round(size + (reactions ? 36 : 0) + 8);
+  return Math.round(size + (reactions ? 36 : 0) + actionRows * ACTIONS_ESTIMATE + 8);
 }
 
 const NO_REACTIONS: readonly MessageReaction[] = [];
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+
+export type MessageActionsProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/**
+ * A row of a bot's inline keyboard under the message: `Button.Root` children sharing the row
+ * equally, at the message's width (the bubble widens to the keyboard when it is wider). Several
+ * make several rows, in the order written. A row too narrow for its buttons wraps them.
+ */
+function MessageActions({ className, ...rest }: MessageActionsProps) {
+  return <div className={cx(styles.actions, className)} {...rest} />;
+}
+MessageActions.displayName = "Message.Actions";
+
+/** Block size of one row of `Message.Actions` with its gap (px), for the off-screen estimate. */
+const ACTIONS_ESTIMATE = 40;
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
@@ -527,7 +549,8 @@ function MessageRoot({
   };
 
   // ── parts ──
-  const { avatar, author, menu, reactions, body, specs, shell } = partsOf(children);
+  const { avatar, author, menu, reactions, actions, body, specs, shell } = partsOf(children);
+  const hasActions = actions.length > 0;
   // A group chat heads the first message of a run with its author and ends the run with the
   // avatar, the gutter kept on every incoming row; a direct chat shows neither. A message on its
   // own is a group of what it is given: the parts it holds, by its place in the run.
@@ -543,10 +566,12 @@ function MessageRoot({
   const metaMode: "inline" | "overlay" | "block" =
     shell !== "bubble" ? "overlay" : (metaSpec?.meta ?? "block");
   // The last bubble of a run curls a tail out of its corner on the author's side — a bubble of
-  // fill only: never a picture (with a caption or not) or a circle.
+  // fill only: never a picture (with a caption or not) or a circle. An inline keyboard closes the
+  // message under the bubble instead.
   const tail =
     shell === "bubble" &&
     (position === "single" || position === "last") &&
+    !hasActions &&
     !specs.some((spec) => spec?.picture);
   const sized = specs.some((spec) => spec?.sized);
   const bleedStart = shell === "bubble" && specs[0]?.bleed === true;
@@ -750,6 +775,7 @@ function MessageRoot({
     <div
       ref={columnRef}
       className={styles.column}
+      data-actions={hasActions || undefined}
       onPointerEnter={(event) => {
         if (event.pointerType !== "mouse" || !canReact || bar !== null) return;
         if (!window.matchMedia?.("(hover: hover)").matches) return;
@@ -798,6 +824,7 @@ function MessageRoot({
         {tail ? <span className={styles.bubbleTail} data-depth={depth} aria-hidden="true" /> : null}
       </SurfaceDepthProvider>
       {shell === "bubble" ? null : reactionsPart}
+      {actions}
       {/* First the hug, then the morph: the morph's new layout is the hugged one. */}
       <BubbleHug bubble={bubbleRef} />
       <MorphSnapshot morph={morph} />
@@ -1019,13 +1046,15 @@ MessageRoot.displayName = "Message.Root";
 // The list reads a message row from its props alone: its value, side, estimated height and text.
 defineRowKind(MessageRoot, {
   message: (props) => {
-    const { body, specs, shell, reactions, author } = partsOf((props as MessageRootProps).children);
+    const { body, specs, shell, reactions, author, actions } = partsOf(
+      (props as MessageRootProps).children,
+    );
     const reacted =
       ((reactions?.props as MessageReactionsProps | undefined)?.items.length ?? 0) > 0;
     return {
       value: (props as MessageRootProps).value,
       direction: (props as MessageRootProps).direction ?? "incoming",
-      estimate: estimateOf(body, specs, shell, reacted, author !== undefined),
+      estimate: estimateOf(body, specs, shell, reacted, author !== undefined, actions.length),
       text: searchTextOf(body, specs),
     };
   },
@@ -1045,6 +1074,7 @@ export const Message = {
   Contact: MessageContact,
   LinkPreview: MessageLinkPreview,
   Reactions: MessageReactions,
+  Actions: MessageActions,
   Menu: MessageMenu,
   Typing: MessageTyping,
 };

@@ -15,6 +15,7 @@
 - An action that can be undone → do it at once and offer «Отменить» in a [Notification](../notification/COMPONENT.md).
 - A hold-to-confirm right on the button (no dialog) → `holdToConfirm` on [Button](../button/COMPONENT.md).
 - Unsaved changes in a Modal or Drawer form → `Modal.Guard` / `Drawer.Guard dirty` (it opens this dialog itself).
+- A confirm that asks for input (a reason for a refusal, a comment) → [Modal](../modal/COMPONENT.md) `size="s"` with the field in `Modal.Body`, the action button in `Modal.Confirm`, and `Modal.Guard busy` while it is sent.
 
 ## Import
 ```tsx

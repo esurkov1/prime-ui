@@ -18,8 +18,15 @@ export const api: ComponentApi = {
           name: "label",
           type: "string",
           required: true,
-          en: "Visible title above the value and the accessible name of the chart.",
-          ru: "Видимое название над значением и доступное имя графика.",
+          en: 'Visible title above the value and the accessible name of the chart; with `layout="compact"` only the accessible name.',
+          ru: 'Видимое название над значением и доступное имя графика; при `layout="compact"` — только доступное имя.',
+        },
+        {
+          name: "layout",
+          type: '"default" | "compact"',
+          default: '"default"',
+          en: "`default` — the headline over an 80 px plot; `compact` — the plot alone at an `xs` control height with the dot at rest, for a DataTable cell; the point stays in `aria-valuetext`.",
+          ru: "`default` — заголовок над графиком 80 px; `compact` — только график высотой с контрол `xs` и точкой покоя, для ячейки DataTable; точка — в `aria-valuetext`.",
         },
         {
           name: "variant",

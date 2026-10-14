@@ -5,6 +5,7 @@ import { Button } from "@/components/button/Button";
 import { DragControllerContext } from "@/components/dnd/context";
 import { Dnd } from "@/components/dnd/Dnd";
 import { Hint } from "@/components/hint/Hint";
+import { LinkButton } from "@/components/link-button/LinkButton";
 import { ProgressBar } from "@/components/progress-bar/ProgressBar";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
@@ -72,6 +73,11 @@ export type FileUploadFile = {
   src?: string;
   /** What the picture shows: spoken in place of the name, never drawn. */
   alt?: string;
+  /**
+   * The file's address on the server: the row's name or the whole tile becomes a link that opens it
+   * in a new tab (the server's `Content-Disposition` decides open or download).
+   */
+  href?: string;
 };
 
 export type FileUploadLabels = {
@@ -111,6 +117,8 @@ export type FileUploadLabels = {
   retry: string;
   /** Name of the remove button of a file: `{name}`. */
   remove: string;
+  /** Name of a tile's link to the file (`href`): `{name}`. */
+  open: string;
   /** Live region: a file was removed: `{name}`. */
   removed: string;
   /** Live region: a reorder put another file first, the new cover: `{name}`. */
@@ -148,6 +156,7 @@ const FILE_UPLOAD_LABELS: FileUploadLabels = {
   cancel: "Отменить загрузку: {name}",
   retry: "Повторить загрузку: {name}",
   remove: "Убрать {name}",
+  open: "Открыть {name}",
   removed: "{name}: убран",
   coverChanged: "Обложка: {name}",
   changeFailed: "Не удалось сохранить изменение, файлы на прежних местах",
@@ -804,6 +813,8 @@ function FileSetView({
             nameTitle={file.name}
             // A video shows its duration where a size would stand.
             meta={kind === "video" || file.size === undefined ? undefined : formatSize(file.size)}
+            href={file.href}
+            openLabel={formatLabel(labels.open, { name: file.name })}
             badge={
               cover && index === 0 ? (
                 // A new cover: the word comes in where the format stood.
@@ -923,7 +934,21 @@ function FileRow({
         )}
         <FileUploadItemName title={file.name}>
           {/* The extension stands in the badge; a picture row has none, so it keeps it. */}
-          {picture ? file.name : splitFileName(file.name).base}
+          {file.href ? (
+            <LinkButton
+              href={file.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              tone="neutral"
+              className={styles.itemLink}
+            >
+              {picture ? file.name : splitFileName(file.name).base}
+            </LinkButton>
+          ) : picture ? (
+            file.name
+          ) : (
+            splitFileName(file.name).base
+          )}
         </FileUploadItemName>
         {parts.length > 0 ? (
           <FileUploadItemDescription>

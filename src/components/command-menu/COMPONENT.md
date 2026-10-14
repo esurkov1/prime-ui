@@ -28,12 +28,13 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 ├── CommandMenu.Description      optional <p>
 ├── CommandMenu.Input            search icon + role="combobox" field, faint hairline below
 ├── CommandMenu.List             role="listbox", scrolls; skeleton rows while loading / loading more
-│   ├── CommandMenu.Empty        compact EmptyPage while nothing matches; may hold a CommandMenu.Item
-│   └── CommandMenu.Group        role="group", named by `label`
-│       └── CommandMenu.Item     <button role="option">
-│           ├── CommandMenu.ItemIcon
-│           ├── CommandMenu.ItemText       title + description line
-│           └── CommandMenu.ItemShortcut   Kbd at the end
+│   ├── CommandMenu.Empty        compact EmptyPage while nothing matches; text only
+│   ├── CommandMenu.Group        role="group", named by `label`
+│   │   └── CommandMenu.Item     <button role="option">
+│   │       ├── CommandMenu.ItemIcon
+│   │       ├── CommandMenu.ItemText       title + description line
+│   │       └── CommandMenu.ItemShortcut   Kbd at the end
+│   └── CommandMenu.Item persistent        optional, last: «Создать «{query}»», shown whatever the query
 ├── load error                   after the List: compact EmptyPage, role="alert", retry Button
 └── CommandMenu.Footer           key hints, hairline above
     └── CommandMenu.FooterHint   Kbd per key + label
@@ -98,6 +99,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `keywords` | `string` | — | Extra words for the query (synonyms, English names). |
 | `onSelect` | `() => void` | — | Runs the command: a click, or Enter while the item is active. |
 | `disabled` | `boolean` | `false` | Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, does not run. |
+| `persistent` | `boolean` | `false` | Shown whatever the query and never counted as a match (`CommandMenu.Empty` still shows); the arrows reach it after the matches. One «create from the query» item at the end of the list. |
 
 ### CommandMenu.ItemIcon · CommandMenu.ItemShortcut
 `ref` → `HTMLSpanElement` / `HTMLElement` (the `<kbd>`). The `aria-hidden` leading glyph / a `Kbd` key hint at the end of the item — a hint, not a handler. + native props.
@@ -110,7 +112,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `description` | `ReactNode` | — | Second line (path, details): caption, muted. |
 
 ### CommandMenu.Empty
-`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty`, `labels.emptyHint`, and `children` as an action — a button or a `CommandMenu.Item`.
+`ref` → `HTMLDivElement`. A compact EmptyPage (`role="status"`) shown while nothing matches and nothing loads: `labels.empty` and `labels.emptyHint`, text only. An action for the query is a `persistent` `CommandMenu.Item` at the end of the list.
 
 ### CommandMenu.Footer · CommandMenu.FooterHint
 `ref` → `HTMLDivElement` / `HTMLSpanElement`. A bottom row of hints with a hairline above / one hint: every entry of `keys` in its own `Kbd`, then the label (`children`). + native props.
@@ -141,7 +143,7 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | `closeOnOutsideClick={false}` | the scrim does not close it | A required pick | |
 | `closeOnEscape={false}` | Escape does nothing | A required pick that must not be skipped | |
 
-**Combinations** — one palette per app; open it with ⌘K / Ctrl+K and a visible button. Add a Footer with key hints when keyboard use is not obvious. A server search: `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; a failed request `loadError` + `onRetry`. A «create from the query» action is a `CommandMenu.Item` inside `CommandMenu.Empty`: it shows only while nothing matches, the arrows and Enter reach it, and it never counts as a match.
+**Combinations** — one palette per app; open it with ⌘K / Ctrl+K and a visible button. Add a Footer with key hints when keyboard use is not obvious. A server search: `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; a failed request `loadError` + `onRetry`. Creating from the query is ONE `persistent` `CommandMenu.Item` at the end of the List («Создать клиента «{query}»», rendered while the query is not empty): it stays when a namesake matches (the query may be a new client of the same name), it never counts as a match, and the arrows reach it after the matches; while nothing matches it is the active item, so Enter runs it. `CommandMenu.Empty` then holds only the text — never put the action in both places.
 
 ## States
 | State | Driven by | DOM |
@@ -150,7 +152,8 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | active item | arrows, Home, End, pointer move | `aria-selected="true"`, `data-highlighted="true"`: a fill only, no movement |
 | filtered out | the query | `hidden` on items and on groups without matches |
 | matched text | the query | the first match in the item's text children and in `ItemText` is wrapped in a `<mark>` in `accent-text`, no fill (same as SmartFilter) |
-| nothing found | the query | `CommandMenu.Empty` with `role="status"`; hidden while loading or after a load error. A `CommandMenu.Item` inside it (create from the query) is reached by the arrows and Enter and never counts as a match |
+| nothing found | the query | `CommandMenu.Empty` with `role="status"`; hidden while loading or after a load error. A `persistent` item stays beside it and is the active one |
+| persistent item | `persistent` | always shown (not `hidden` by the query), excluded from the match count, walked after the matches |
 | query | `search` / `defaultSearch` / `onSearchChange` on Root | the search field's value; cleared when the palette closes |
 | loading | `loading` | `aria-busy` on the list and the field; with no item on screen, `aria-hidden` skeleton rows (`data-skeleton`); `labels.loading` in a polite live region |
 | loading more | `loadingMore` | skeleton rows after the items; the end of the list is watched while `hasMore` (`onLoadMore` once per batch) |
@@ -204,7 +207,7 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | [structure.tsx](examples/structure.tsx) | Optional parts: a visible title and description, a description line and a key hint in items, and a footer with key hints — `CommandMenu.Title`, `CommandMenu.ItemText`, `CommandMenu.ItemShortcut`, `CommandMenu.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: rows, text, icons and the search row follow it; match the density of the app — `size`. |
 | [states.tsx](examples/states.tsx) | A disabled item stays visible but muted and is skipped by the arrows, and an empty result speaks in the words of the task — `disabled`, `labels`. |
-| [server-search.tsx](examples/server-search.tsx) | Orders searched on the server: the parent loads results for the query and the next page at the end of the list; with nothing found the palette offers to create an order — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`, `CommandMenu.Empty`. |
+| [server-search.tsx](examples/server-search.tsx) | Orders searched on the server: the parent loads results for the query and the next page at the end of the list; one persistent item at the end creates an order from the query, found or not — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`, `persistent`. |
 | [load-error.tsx](examples/load-error.tsx) | The results failed to load: the palette says so instead of the list, and a retry asks again with the button loading until the server answers; the first retry fails too, the second brings the results — `loadError`, `onRetry`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A required pick during an import: a stray click on the scrim does not close the palette, only Escape or a choice — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the query: it shows the text outside and a command resets it; the palette clears it on close — `search`, `onSearchChange`. |
@@ -218,7 +221,8 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 - No name for the dialog → add `CommandMenu.Title` (visually hidden if needed) or `aria-label`.
 - Server results squeezed through `keywords` so the kit filter keeps them → set `filter={false}`.
 - A hand-drawn spinner or «Загрузка…» item → set `loading` (skeleton rows) and `loadingMore`.
-- A «Создать …» action placed beside the results with a hand-made visibility check → put it in `CommandMenu.Empty` as a `CommandMenu.Item`.
+- A «Создать …» action shown only while nothing matches (inside `CommandMenu.Empty`, or behind a hand-made check) → one `persistent` `CommandMenu.Item` at the end of the List: it must stay when a namesake matches.
+- The create action both in `CommandMenu.Empty` and in the list → one `persistent` item; `Empty` holds only the text.
 
 ## Related
 - **Built from:** [Modal](../modal/COMPONENT.md) (dialog, scrim, focus, Title / Description), [ScrollContainer](../scroll-container/COMPONENT.md) (`List`), [EmptyPage](../empty-page/COMPONENT.md) (`Empty`, load error), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [Button](../button/COMPONENT.md) (retry), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`, `FooterHint`), `Icon` (search glyph, retry)

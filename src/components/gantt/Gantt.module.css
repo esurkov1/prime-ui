@@ -534,6 +534,54 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
+/*
+ * A header that opens its row (`onRowClick`, `getRowHref`): a pointer cursor and, under a mouse, a
+ * wash under the content — on its own layer, since the header must stay opaque over the axis.
+ */
+.rowHeader[data-clickable] {
+  cursor: pointer;
+}
+
+.rowHeader[data-clickable]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--prime-color-fill-subtle-active);
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .rowHeader[data-clickable]:hover::before {
+    opacity: 1;
+  }
+}
+
+/* `getRowHref`: the link holds the header's content and its hit area fills the header. */
+.rowLink {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--prime-space-2);
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+}
+
+.rowLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.rowHeader:has(> .rowLink:focus-visible) {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
 /* Start edge cue: a short soft shadow from the column's end edge over the scrolled axis. */
 .rowHeader::after,
 .corner::after {
@@ -939,6 +987,11 @@
 
 .tipMeta {
   font-variant-numeric: tabular-nums;
+}
+
+/* `renderBarTooltip`: the owner's lines under the dates. */
+.tipExtra {
+  margin-block-start: var(--prime-space-1);
 }
 
 /* ---------- Loading and empty ---------- */

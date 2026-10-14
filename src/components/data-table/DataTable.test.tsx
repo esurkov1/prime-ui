@@ -12,6 +12,7 @@ import { Kbd } from "@/components/kbd/Kbd";
 import swapMotion from "@/internal/swapMotion.module.css";
 
 import { DataTable, type DataTableColumn } from "./DataTable";
+import styles from "./DataTable.module.css";
 
 type Row = { id: number; name: string; score: number };
 
@@ -1570,6 +1571,163 @@ describe("DataTable row groups", () => {
     );
     expect(screen.getAllByRole("rowheader").map((cell) => cell.textContent)).toEqual(["Сентябрь"]);
     expect(screen.getByText("Лето")).toBeInTheDocument();
+  });
+
+  it("groups fold only when the owner passes the collapsed-groups triad", () => {
+    const { rerender } = render(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowGroup={(row) => row.month}
+        paging="none"
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /группу/ })).toBeNull();
+    rerender(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowGroup={(row) => row.month}
+        defaultCollapsedGroups={[]}
+        paging="none"
+      />,
+    );
+    expect(screen.getAllByRole("button", { name: /Свернуть группу/ })).toHaveLength(2);
+  });
+
+  it("a group toggle folds its rows away and back, with aria-expanded and aria-controls", async () => {
+    const user = userEvent.setup();
+    const onCollapsedGroupsChange = vi.fn();
+    render(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowGroup={(row) => row.month}
+        defaultCollapsedGroups={["Сентябрь"]}
+        onCollapsedGroupsChange={onCollapsedGroupsChange}
+        stickyGroupHeaders
+        paging="none"
+      />,
+    );
+    // A collapsed group: its header stays, its rows are only measured (column widths).
+    expect(screen.getAllByRole("rowheader").map((cell) => cell.textContent)).toEqual([
+      "Октябрь",
+      "Сентябрь",
+    ]);
+    expect(screen.queryByRole("cell", { name: "Лето" })).toBeNull();
+    expect(screen.getByText("Лето").closest("tbody")).toHaveAttribute("aria-hidden", "true");
+    const open = screen.getByRole("button", { name: "Развернуть группу Сентябрь" });
+    expect(open).toHaveAttribute("aria-expanded", "false");
+    expect(open).not.toHaveAttribute("aria-controls");
+
+    await user.click(open);
+    expect(onCollapsedGroupsChange).toHaveBeenLastCalledWith([]);
+    const close = screen.getByRole("button", { name: "Свернуть группу Сентябрь" });
+    expect(close).toHaveAttribute("aria-expanded", "true");
+    const row = screen.getByRole("cell", { name: "Лето" }).closest("tr") as HTMLElement;
+    // The rows fold in like expanded sub-rows.
+    expect(row).toHaveAttribute("data-fold", "opening");
+    expect(close.getAttribute("aria-controls")?.split(" ")).toContain(row.id);
+    expect(screen.getAllByRole("rowheader")[1]).toHaveAttribute("data-sticky", "true");
+
+    // Keyboard: Space / Enter on the focused toggle.
+    close.focus();
+    await user.keyboard(" ");
+    expect(onCollapsedGroupsChange).toHaveBeenLastCalledWith(["Сентябрь"]);
+    // It folds shut first, then unmounts.
+    expect(screen.getByRole("cell", { name: "Лето" }).closest("tr")).toHaveAttribute(
+      "data-fold",
+      "closed",
+    );
+    await waitFor(() => expect(screen.queryByRole("cell", { name: "Лето" })).toBeNull());
+    const reopen = screen.getByRole("button", { name: "Развернуть группу Сентябрь" });
+    expect(reopen).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("cell", { name: "Лето" })).toBeInTheDocument();
+  });
+
+  it("controlled: the owner's keys decide, a toggle only asks", async () => {
+    const user = userEvent.setup();
+    const onCollapsedGroupsChange = vi.fn();
+    const { rerender } = render(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowGroup={(row) => row.month}
+        collapsedGroups={[]}
+        onCollapsedGroupsChange={onCollapsedGroupsChange}
+        paging="none"
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Свернуть группу Октябрь" }));
+    expect(onCollapsedGroupsChange).toHaveBeenLastCalledWith(["Октябрь"]);
+    expect(screen.getByRole("cell", { name: "Гранит" })).toBeInTheDocument();
+    rerender(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowGroup={(row) => row.month}
+        collapsedGroups={["Октябрь"]}
+        onCollapsedGroupsChange={onCollapsedGroupsChange}
+        paging="none"
+      />,
+    );
+    // A change from the owner folds the rows away too.
+    expect(screen.getByRole("cell", { name: "Гранит" }).closest("tr")).toHaveAttribute(
+      "data-fold",
+      "closed",
+    );
+    await waitFor(() => expect(screen.queryByRole("cell", { name: "Гранит" })).toBeNull());
+    expect(screen.getByRole("button", { name: "Развернуть группу Октябрь" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  });
+
+  it("«select all» takes the rows of collapsed groups too", async () => {
+    const user = userEvent.setup();
+    const onSelectedChange = vi.fn();
+    render(
+      <DataTable
+        rows={PAYMENTS}
+        columns={paymentColumns}
+        getRowKey={(row) => row.id}
+        getRowGroup={(row) => row.month}
+        defaultCollapsedGroups={["Сентябрь"]}
+        selectable
+        onSelectedChange={onSelectedChange}
+        paging="none"
+      />,
+    );
+    await user.click(screen.getByRole("checkbox", { name: "Выбрать все строки" }));
+    expect(onSelectedChange).toHaveBeenLastCalledWith(["p1", "p3", "p2", "p4"]);
+  });
+});
+
+describe("DataTable state content", () => {
+  it("empty and error content sit in a sticky box of the visible width", () => {
+    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
+    expect(css).toMatch(
+      /\.stateBox \{[^}]*position: sticky;[^}]*inset-inline-start: 0;[^}]*width: 100cqi;/,
+    );
+    const box = (node: Element) => {
+      const parent = node.parentElement as HTMLElement;
+      expect(parent).toHaveClass(styles.stateBox as string);
+      expect(parent.parentElement?.tagName).toBe("TD");
+    };
+    const { rerender } = render(
+      <DataTable rows={[]} columns={columns} empty={<p>Ничего не найдено</p>} />,
+    );
+    box(screen.getByText("Ничего не найдено").parentElement as HTMLElement);
+    rerender(<DataTable rows={[]} columns={columns} />);
+    box(screen.getByRole("status"));
+    rerender(<DataTable rows={[]} columns={columns} error="Не удалось загрузить" />);
+    box(screen.getByRole("alert"));
   });
 });
 

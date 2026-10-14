@@ -28,6 +28,8 @@ export type UploadItem<TResult = unknown> = {
 };
 
 export type UploadContext = {
+  /** The item's id: the same id `add` returned and the files of the set carry. */
+  id: string;
   /** Aborted when the item is removed (or the queue unmounts): stop the request. */
   signal: AbortSignal;
   /** Reports the share sent, 0…1. */
@@ -37,7 +39,9 @@ export type UploadContext = {
 export type UploadQueueOptions<TResult> = {
   /**
    * Sends one file. Resolve with what the server answered (kept as `result`); reject to mark the
-   * item failed — the rejection's message is shown as the reason.
+   * item failed — the rejection's message is shown as the reason. Work that must follow the upload
+   * (attach the file to a record, save the set) runs here after the request resolves:
+   * `context.id` is the item, and the item is `failed` if that work rejects.
    */
   upload: (file: File, context: UploadContext) => Promise<TResult>;
   /** How many files upload at once; the rest wait as `queued`. Default 3. */
@@ -114,7 +118,7 @@ export function useUploadQueue<TResult = unknown>(
       };
       // A synchronous throw in `upload` is a failure like a rejection.
       new Promise<TResult>((resolve) =>
-        resolve(optionsRef.current.upload(item.file, { signal, onProgress })),
+        resolve(optionsRef.current.upload(item.file, { id: item.id, signal, onProgress })),
       ).then(
         (result) => {
           if (signal.aborted) return;

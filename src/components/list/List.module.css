@@ -240,3 +240,37 @@
   flex: none;
   font-variant-numeric: tabular-nums;
 }
+
+/* --- Reorder (`onReorder`) ------------------------------------------------------- */
+
+/* The sortable list keeps the list's own rhythm, not Dnd's default gap. */
+.root[data-reorderable="true"] {
+  gap: var(--prime-space-1);
+}
+
+/* The grip sits before the row element, centred on the row; a spinner stands in while saving. */
+.sortableRow {
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+.grip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--prime-control-xs-height);
+  block-size: var(--prime-control-xs-height);
+}
+
+/* A row whose move is being saved quiets down until the answer, both ways eased. */
+.sortableRow > .item {
+  transition:
+    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.sortableRow[aria-busy="true"] > .item {
+  opacity: 0.6;
+}

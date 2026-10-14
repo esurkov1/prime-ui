@@ -28,6 +28,8 @@ export type MessageLabels = {
   you: string;
   /** Marks an edited message in its meta. */
   edited: string;
+  /** The name of a `||spoiler||` in the text while it is hidden. */
+  spoiler: string;
   sending: string;
   sent: string;
   read: string;
@@ -52,6 +54,7 @@ export const MESSAGE_LABELS: MessageLabels = {
   message: "{author}, {time}",
   you: "Вы",
   edited: "изменено",
+  spoiler: "Скрытый текст",
   sending: "Отправляется",
   sent: "Отправлено",
   read: "Прочитано",
@@ -196,6 +199,7 @@ export type MessageTextProps = Omit<React.HTMLAttributes<HTMLDivElement>, "child
  */
 export function MessageText({ plain = false, className, children, ...rest }: MessageTextProps) {
   const { spacer } = useMessagePart();
+  const { labels } = React.useContext(RootContext);
   const highlight = useMessageHighlight().trim();
   return (
     <div
@@ -205,7 +209,12 @@ export function MessageText({ plain = false, className, children, ...rest }: Mes
       {...rest}
     >
       {typeof children === "string" && !plain ? (
-        <RichText source={children} end={spacer} highlight={highlight} />
+        <RichText
+          source={children}
+          end={spacer}
+          highlight={highlight}
+          labels={{ spoiler: labels.spoiler }}
+        />
       ) : (
         <p className={styles.paragraph}>
           {typeof children === "string" && highlight ? (

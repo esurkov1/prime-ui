@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { applyFormat, diffRange, formatForKey, shortcutText } from "./format";
+import { applyFormat, diffRange, formatForKey, shortcutText } from "./textFormatting";
 
 const sel = (text: string, start: number, end = start) => ({ text, start, end });
 
@@ -10,11 +10,15 @@ describe("applyFormat", () => {
     expect(applyFormat(sel("срок", 0, 4), "italic")).toEqual(sel("_срок_", 1, 5));
     expect(applyFormat(sel("срок", 0, 4), "strikethrough")).toEqual(sel("~~срок~~", 2, 6));
     expect(applyFormat(sel("npm ci", 0, 6), "code")).toEqual(sel("`npm ci`", 1, 7));
+    expect(applyFormat(sel("сумма 120 000 ₽", 6, 15), "spoiler")).toEqual(
+      sel("сумма ||120 000 ₽||", 8, 17),
+    );
   });
 
   it("unwraps markers around or inside the selection", () => {
     expect(applyFormat(sel("**срок**", 2, 6), "bold")).toEqual(sel("срок", 0, 4));
     expect(applyFormat(sel("a **срок** b", 2, 10), "bold")).toEqual(sel("a срок b", 2, 6));
+    expect(applyFormat(sel("||пароль||", 2, 8), "spoiler")).toEqual(sel("пароль", 0, 6));
   });
 
   it("puts the caret between new markers when nothing is selected", () => {
@@ -70,16 +74,19 @@ describe("formatForKey", () => {
     expect(formatForKey(key("KeyE", { ctrl: true }))).toBe("code");
     expect(formatForKey(key("KeyK", { ctrl: true }))).toBe("link");
     expect(formatForKey(key("Digit9", { ctrl: true, shift: true }))).toBe("quote");
+    expect(formatForKey({ ...key("KeyH", { meta: true, shift: true }), key: "Р" })).toBe("spoiler");
   });
 
   it("ignores keys without Mod and other combinations", () => {
     expect(formatForKey(key("KeyB", {}))).toBeNull();
     expect(formatForKey(key("KeyX", { ctrl: true }))).toBeNull();
     expect(formatForKey(key("KeyB", { ctrl: true, alt: true }))).toBeNull();
+    expect(formatForKey(key("KeyH", { ctrl: true }))).toBeNull();
   });
 
   it("names the shortcut for the platform", () => {
     expect(shortcutText("strikethrough", true)).toBe("⌘⇧X");
     expect(shortcutText("bold", false)).toBe("Ctrl+B");
+    expect(shortcutText("spoiler", false)).toBe("Ctrl+Shift+H");
   });
 });

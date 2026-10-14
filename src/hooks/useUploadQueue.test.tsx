@@ -90,6 +90,27 @@ describe("useUploadQueue", () => {
     expect(result.current.items[0]?.progress).toBe(1);
   });
 
+  it("passes the item id to upload, so work after the request knows its item", async () => {
+    const attached: string[] = [];
+    const { result } = renderHook(() =>
+      useUploadQueue({
+        upload: async (_file, { id }) => {
+          await Promise.resolve();
+          // After the request: attach the uploaded file to the record by its item id.
+          attached.push(id);
+          return id;
+        },
+      }),
+    );
+    let ids: string[] = [];
+    act(() => {
+      ids = result.current.add([file("a.pdf"), file("b.pdf")]).map((item) => item.id);
+    });
+    await flush();
+    expect(attached).toEqual(ids);
+    expect(result.current.items.map((item) => item.result)).toEqual(ids);
+  });
+
   it("marks a rejected upload failed with its reason and retries it", async () => {
     const server = fakeUploads();
     const { result } = renderHook(() => useUploadQueue({ upload: server.upload }));

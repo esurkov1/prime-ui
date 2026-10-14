@@ -1,7 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
+
+import { moveBefore } from "@/components/dnd/useSortableList";
 
 import { List } from "./List";
 
@@ -200,5 +202,102 @@ describe("List", () => {
     expect(button).toHaveClass("custom");
     expect(button).toHaveAttribute("data-id", "granit");
     expect(button).toHaveAttribute("type", "button");
+  });
+});
+
+const STAGES = [
+  { id: "lead", name: "Лид" },
+  { id: "talks", name: "Переговоры" },
+  { id: "contract", name: "Договор" },
+];
+
+function Funnel({ onMove }: { onMove?: (id: string, beforeId: string | null) => unknown }) {
+  const [stages, setStages] = React.useState(STAGES);
+  return (
+    <List.Root
+      aria-label="Этапы воронки"
+      onReorder={async (id, beforeId) => {
+        await onMove?.(id, beforeId);
+        setStages((current) => moveBefore(current, id, beforeId, (stage) => stage.id));
+      }}
+    >
+      {stages.map((stage) => (
+        <List.Item key={stage.id} value={stage.id}>
+          <List.ItemText>{stage.name}</List.ItemText>
+        </List.Item>
+      ))}
+    </List.Root>
+  );
+}
+
+const order = () =>
+  Array.from(document.querySelectorAll<HTMLElement>("li[data-dnd-item]")).map(
+    (row) => row.dataset.dndItem,
+  );
+
+describe("List onReorder", () => {
+  it("gives every row a named handle beside the row button", () => {
+    render(<Funnel />);
+    const handle = screen.getByRole("button", { name: "Переместить Лид" });
+    const row = handle.closest("li");
+    expect(row?.parentElement).toBe(screen.getByRole("list", { name: "Этапы воронки" }));
+    expect(row).toContainElement(screen.getByRole("button", { name: "Лид" }));
+    expect(order()).toEqual(["lead", "talks", "contract"]);
+  });
+
+  it("moves a row with Alt+↓ / ↑ and reports the move by value", async () => {
+    const onMove = vi.fn();
+    render(<Funnel onMove={onMove} />);
+    await act(async () => {
+      fireEvent.keyDown(screen.getByRole("button", { name: "Переместить Лид" }), {
+        key: "ArrowDown",
+        altKey: true,
+      });
+    });
+    expect(onMove).toHaveBeenLastCalledWith("lead", "contract");
+    expect(order()).toEqual(["talks", "lead", "contract"]);
+
+    await act(async () => {
+      fireEvent.keyDown(screen.getByRole("button", { name: "Переместить Договор" }), {
+        key: "ArrowUp",
+        altKey: true,
+      });
+    });
+    expect(onMove).toHaveBeenLastCalledWith("contract", "lead");
+    expect(order()).toEqual(["talks", "contract", "lead"]);
+  });
+
+  it("keeps the row in place busy while saving; a rejection moves it back", async () => {
+    let reject: (reason: unknown) => void = () => {};
+    const onMove = () =>
+      new Promise<void>((_, fail) => {
+        reject = fail;
+      });
+    render(<Funnel onMove={onMove} />);
+    await act(async () => {
+      fireEvent.keyDown(screen.getByRole("button", { name: "Переместить Лид" }), {
+        key: "ArrowDown",
+        altKey: true,
+      });
+    });
+    expect(order()).toEqual(["talks", "lead", "contract"]);
+    expect(document.querySelector('li[data-dnd-item="lead"]')).toHaveAttribute("aria-busy", "true");
+    expect(screen.queryByRole("button", { name: "Переместить Лид" })).toBeNull();
+
+    await act(async () => {
+      reject(new Error("Сервер недоступен"));
+    });
+    expect(order()).toEqual(["lead", "talks", "contract"]);
+    expect(document.querySelector('li[data-dnd-item="lead"]')).not.toHaveAttribute("aria-busy");
+    expect(screen.getByRole("button", { name: "Переместить Лид" })).toBeInTheDocument();
+  });
+
+  it("names the handle from labels", () => {
+    render(
+      <List.Root aria-label="Этапы" onReorder={() => {}} labels={{ reorderItem: "Этап {label}" }}>
+        <List.Item value="lead">Лид</List.Item>
+      </List.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Этап Лид" })).toBeInTheDocument();
   });
 });

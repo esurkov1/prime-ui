@@ -15,6 +15,18 @@ export const api: ComponentApi = {
           ru: "Ярус строк: высота, кегль, размер иконки и аватара; счётчики — на ярус меньше.",
         },
         {
+          name: "onReorder",
+          type: "(id: string, beforeId: string | null) => void | Promise<void>",
+          en: "Rows reorder by a leading handle (drag, touch hold, Alt + ↑ / ↓): item `value` `id` goes before `beforeId` (`null` = last). Apply with `moveBefore`; a returned promise keeps the row busy, a rejection moves it back.",
+          ru: "Перестановка за ведущую ручку (перетаскивание, удержание, Alt + ↑ / ↓): строка `id` (`value`) встаёт перед `beforeId` (`null` — в конец). Применяйте через `moveBefore`; промис держит строку занятой, отказ возвращает её.",
+        },
+        {
+          name: "labels",
+          type: "Partial<ListLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
+        },
+        {
           name: "aria-label",
           type: "string",
           en: "Name of the list for screen readers («Диалоги»), when no visible heading names it.",
@@ -39,6 +51,12 @@ export const api: ComponentApi = {
       en: "`ref` → `HTMLElement` (the `<button>`, `<a>` or `asChild` element, not the `<li>`). `<li>` holding a full-width row: a button, a link (`href`) or your router link (`asChild`).",
       ru: "`<li>` со строкой во всю ширину: кнопка, ссылка (`href`) или ссылка роутера (`asChild`).",
       props: [
+        {
+          name: "value",
+          type: "string",
+          en: "Stable id of the row; required in a reorderable list (`onReorder` reports it).",
+          ru: "Стабильный id строки; обязателен в переставляемом списке (его сообщает `onReorder`).",
+        },
         {
           name: "current",
           type: "boolean",
@@ -173,5 +191,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [],
+  labels: [
+    {
+      key: "reorderItem",
+      default: "Переместить {label}",
+      en: "`aria-label` of a row's drag handle (`onReorder`); `{label}` is the row's text line.",
+      ru: "`aria-label` ручки строки (`onReorder`); `{label}` — текст строки.",
+    },
+  ],
 };

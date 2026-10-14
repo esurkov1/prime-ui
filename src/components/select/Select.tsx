@@ -38,10 +38,13 @@ import { focusInto } from "@/internal/overlay/focus";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import type { ControlSize } from "@/internal/states";
 import swapMotion from "@/internal/swapMotion.module.css";
+import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Select.module.css";
 import {
+  isActionValue,
+  SelectAction,
   SelectItem,
   SelectItemDescription,
   SelectItemIcon,
@@ -60,6 +63,7 @@ import {
 } from "./selectContext";
 
 export type {
+  SelectActionProps,
   SelectItemDescriptionProps,
   SelectItemIconProps,
   SelectItemMetaProps,
@@ -76,6 +80,7 @@ const SELECT_LABELS: SelectLabels = {
   retry: "Повторить",
   clear: "Очистить",
   optional: "необязательно",
+  changeFailed: "Не удалось сохранить выбор",
 };
 
 // ─── Root ────────────────────────────────────────────────────────────────────
@@ -131,8 +136,12 @@ type SelectSingleProps = {
   multiple?: false;
   value?: string;
   defaultValue?: string;
-  /** Picked value; `""` after clearing. */
-  onValueChange?: (value: string) => void;
+  /**
+   * Picked value; `""` after clearing. Return the save's promise: the value shows at once with a
+   * Spinner on the trigger and picks wait; resolve keeps it, reject rolls it back and announces
+   * `labels.changeFailed`.
+   */
+  onValueChange?: (value: string) => void | Promise<void>;
 };
 
 type SelectMultipleProps = {
@@ -140,7 +149,8 @@ type SelectMultipleProps = {
   multiple: true;
   value?: string[];
   defaultValue?: string[];
-  onValueChange?: (value: string[]) => void;
+  /** The new list; a promise as in single mode. */
+  onValueChange?: (value: string[]) => void | Promise<void>;
 };
 
 export type SelectRootProps = SelectRootBase & (SelectSingleProps | SelectMultipleProps);
@@ -187,11 +197,36 @@ function SelectRoot(props: SelectRootProps) {
   const labels = React.useMemo(() => ({ ...SELECT_LABELS, ...labelsProp }), [labelsProp]);
   const ids = useFieldFrame(id, { hint, error, invalid });
 
-  const [value, setValue] = useControllableState<string | string[] | undefined>({
+  const [stored, setStored] = useControllableState<string | string[] | undefined>({
     value: props.value,
     defaultValue: props.defaultValue ?? (multiple ? [] : undefined),
-    onChange: props.onValueChange as ((value: string | string[] | undefined) => void) | undefined,
   });
+  // A value the owner is still saving is drawn ahead of its answer.
+  const changes = usePendingChanges(stored, takeNext);
+  const value = changes.shown;
+  const saving = changes.pending.length > 0;
+  const [announcement, setAnnouncement] = React.useState("");
+  const onValueChange = props.onValueChange as
+    | ((value: string | string[]) => void | Promise<void>)
+    | undefined;
+
+  /** Hands the new value to the owner; a promise holds it pending, picks wait until it settles. */
+  const commit = (next: string | string[]) => {
+    if (saving || Object.is(next, value)) return;
+    const outcome = onValueChange?.(next);
+    if (!isPromiseLike(outcome)) {
+      setStored(next);
+      return;
+    }
+    setAnnouncement("");
+    changes.track(next, outcome, {
+      onResolve: () => setStored(next),
+      onReject: () => setAnnouncement(labels.changeFailed),
+    });
+  };
+  const commitRef = React.useRef(commit);
+  commitRef.current = commit;
+
   const selected = React.useMemo(
     () => (Array.isArray(value) ? value : value ? [value] : []),
     [value],
@@ -221,22 +256,22 @@ function SelectRoot(props: SelectRootProps) {
   const pick = React.useCallback(
     (optionValue: string) => {
       if (multiple) {
-        setValue((prev) => {
-          const list = Array.isArray(prev) ? prev : [];
-          return list.includes(optionValue)
+        const list = Array.isArray(value) ? value : [];
+        commitRef.current(
+          list.includes(optionValue)
             ? list.filter((item) => item !== optionValue)
-            : [...list, optionValue];
-        });
+            : [...list, optionValue],
+        );
         return;
       }
-      setValue(optionValue);
+      commitRef.current(optionValue);
       // Focus goes back to the trigger (the floating layer's close policy).
       setOpen(false);
     },
-    [multiple, setValue, setOpen],
+    [multiple, value, setOpen],
   );
 
-  const clear = React.useCallback(() => setValue(multiple ? [] : ""), [multiple, setValue]);
+  const clear = React.useCallback(() => commitRef.current(multiple ? [] : ""), [multiple]);
 
   const context = React.useMemo<SelectContextValue>(
     () => ({
@@ -253,6 +288,7 @@ function SelectRoot(props: SelectRootProps) {
       clear,
       clearable,
       loading,
+      saving,
       loadingMore,
       hasMore,
       onLoadMore,
@@ -286,6 +322,7 @@ function SelectRoot(props: SelectRootProps) {
       clear,
       clearable,
       loading,
+      saving,
       loadingMore,
       hasMore,
       onLoadMore,
@@ -323,10 +360,15 @@ function SelectRoot(props: SelectRootProps) {
             <input key={item} type="hidden" name={name} value={item} disabled={disabled} />
           ))
         : null}
+      <VisuallyHidden role="status" aria-live="polite">
+        {announcement}
+      </VisuallyHidden>
     </FieldFrame>
   );
 }
 SelectRoot.displayName = "Select.Root";
+
+const takeNext = (_current: string | string[] | undefined, next: string | string[]) => next;
 
 // ─── Trigger ─────────────────────────────────────────────────────────────────
 
@@ -359,13 +401,16 @@ function SelectTrigger({
     describedBy,
     triggerRef,
     loading,
+    saving,
     clearable,
     selected,
     clear,
     labels,
   } = useSelectContext();
   const mergedRef = useMergedRefs(triggerRef, ref);
-  const showClear = clearable && selected.length > 0 && !disabled && !loading;
+  // Options loading and a value saving look the same: a Spinner in place of the chevron.
+  const busy = loading || saving;
+  const showClear = clearable && selected.length > 0 && !disabled && !busy;
 
   return (
     <button
@@ -380,7 +425,7 @@ function SelectTrigger({
       aria-invalid={invalid || undefined}
       aria-required={required || undefined}
       aria-describedby={[ariaDescribedBy, describedBy].filter(Boolean).join(" ") || undefined}
-      aria-busy={loading || undefined}
+      aria-busy={busy || undefined}
       disabled={disabled}
       className={cx(fieldTriggerClass, styles.trigger, className)}
       onClick={(event) => {
@@ -402,7 +447,7 @@ function SelectTrigger({
         state: isOpen ? "open" : "closed",
         size,
         invalid: invalid || undefined,
-        loading: loading || undefined,
+        loading: busy || undefined,
         disabled: disabled || undefined,
         "focus-ring": focusRing ? undefined : false,
       })}
@@ -426,7 +471,7 @@ function SelectTrigger({
         </span>
       ) : null}
       <span className={styles.chevron} aria-hidden="true">
-        {loading ? <Spinner aria-hidden="true" /> : <Icon name="nav.chevronDown" />}
+        {busy ? <Spinner aria-hidden="true" /> : <Icon name="nav.chevronDown" />}
       </span>
     </button>
   );
@@ -551,6 +596,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     query,
     setQuery,
     loading,
+    saving,
     loadingMore,
     hasMore,
     onLoadMore,
@@ -562,6 +608,13 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
   } = useSelectContext();
 
   const listboxRef = React.useRef<HTMLElement | null>(null);
+  // `Select.Action` children stand under the scroller; everything else is the list.
+  const items: React.ReactNode[] = [];
+  const actions: React.ReactNode[] = [];
+  for (const child of React.Children.toArray(children)) {
+    (React.isValidElement(child) && child.type === SelectAction ? actions : items).push(child);
+  }
+  const actionsId = `${listboxId}-actions`;
   // Focus moves to the search (or the list) on open and back to the trigger after Escape, a pick
   // in single mode and Tab (which then moves on from the trigger); an outside press only closes.
   const floating = useFloatingLayer({
@@ -622,22 +675,30 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     const inSearch = event.target instanceof HTMLInputElement;
     // In the search field Space, Home and End edit the text.
     if (inSearch && [" ", "Home", "End"].includes(event.key)) return;
-    const items = enabledOptions(listboxRef.current);
+    // The options, then the actions under the scroller: the arrows walk both.
+    const stops = enabledOptions(panelRef.current);
     const printable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
     if (printable && !inSearch && (event.key !== " " || typeahead.isTyping())) {
       event.preventDefault();
-      const match = typeahead.find(event.key, items, highlight.get());
+      const match = typeahead.find(event.key, stops, highlight.get());
       if (match) {
         highlight.set(match.dataset.value);
         match.scrollIntoView?.({ block: "nearest" });
       }
       return;
     }
-    handleListboxKeyDown(event, { items, highlight, onSelect: pick });
+    handleListboxKeyDown(event, {
+      items: stops,
+      highlight,
+      onSelect: (value) => {
+        if (isActionValue(value)) document.getElementById(optionDomId(listboxId, value))?.click();
+        else pick(value);
+      },
+    });
   };
 
   // Closed, the items still render (hidden, in place) so the trigger knows their labels.
-  if (!floating.mounted) return <div hidden>{children}</div>;
+  if (!floating.mounted) return <div hidden>{items}</div>;
 
   const activeDescendant =
     isOpen && highlighted !== undefined ? optionDomId(listboxId, highlighted) : undefined;
@@ -680,14 +741,15 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
         aria-multiselectable={multiple || undefined}
         aria-labelledby={triggerId}
         aria-activedescendant={searchable ? undefined : activeDescendant}
-        aria-busy={loading || loadingMore || undefined}
+        aria-busy={loading || loadingMore || saving || undefined}
+        aria-owns={actions.length > 0 && region !== "error" ? actionsId : undefined}
         tabIndex={-1}
         hidden={region === "error" ? true : undefined}
         data-autofocus={searchable || region === "error" ? undefined : ""}
         className={cx(styles.listbox, swapClass)}
       >
         {/* Items render while loading too: they register, and the first match ends the state. */}
-        {children}
+        {items}
         {region === "loading" ? <SkeletonRows count={LOADING_ROWS} /> : null}
         {region === "ready" && hasMore ? (
           <div ref={sentinelRef} aria-hidden="true" className={menu.loadSentinel} />
@@ -701,6 +763,14 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
             <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description>
           ) : null}
         </EmptyPage.Root>
+      ) : null}
+      {actions.length > 0 && region !== "error" ? (
+        // Owned by the listbox (`aria-owns`): its options for assistive tech, pinned under the
+        // scroller and the empty state for the eye.
+        // biome-ignore lint/a11y/useSemanticElements: a group of options inside a listbox, not a form fieldset
+        <div id={actionsId} role="group" className={styles.actions}>
+          {actions}
+        </div>
       ) : null}
       {region === "error" ? (
         <EmptyPage.Root layout="compact" size={size} role="alert" className={swapClass}>
@@ -720,7 +790,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
       <VisuallyHidden aria-live="polite">
         {loading || loadingMore ? labels.loading : ""}
       </VisuallyHidden>
-      <HighlightOnOpen listboxRef={listboxRef} highlight={highlight} />
+      <HighlightOnOpen listboxRef={listboxRef} panelRef={panelRef} highlight={highlight} />
     </FloatingPanel>
   );
 }
@@ -728,13 +798,16 @@ SelectContent.displayName = "Select.Content";
 
 /**
  * Lives inside the open panel, after the list: on open it highlights (and shows) the first
- * selected option; while searching, the first match; closing clears the highlight.
+ * selected option; while searching, the first match (the first `Select.Action` when nothing
+ * matches, so Enter runs it); closing clears the highlight.
  */
 function HighlightOnOpen({
   listboxRef,
+  panelRef,
   highlight,
 }: {
   listboxRef: React.RefObject<HTMLElement | null>;
+  panelRef: React.RefObject<HTMLElement | null>;
   highlight: Store<string | undefined>;
 }) {
   const { isOpen, query, selected, registry } = useSelectContext();
@@ -751,9 +824,10 @@ function HighlightOnOpen({
     return () => highlight.set(undefined);
   }, [isOpen, listboxRef, highlight]);
 
+  // The panel lists the options first, then the actions.
   React.useLayoutEffect(() => {
-    if (query !== "") highlight.set(enabledOptions(listboxRef.current)[0]?.dataset.value);
-  }, [query, listboxRef, highlight]);
+    if (query !== "") highlight.set(enabledOptions(panelRef.current)[0]?.dataset.value);
+  }, [query, panelRef, highlight]);
 
   // Results that arrive later (a server search) take the highlight when it has none among them.
   // biome-ignore lint/correctness/useExhaustiveDependencies: `version` changes when options (de)register
@@ -761,9 +835,9 @@ function HighlightOnOpen({
     if (query === "") return;
     const options = enabledOptions(listboxRef.current);
     if (!options.some((item) => item.dataset.value === highlight.get())) {
-      highlight.set(options[0]?.dataset.value);
+      highlight.set((options[0] ?? enabledOptions(panelRef.current)[0])?.dataset.value);
     }
-  }, [version, query, listboxRef, highlight]);
+  }, [version, query, listboxRef, panelRef, highlight]);
 
   return null;
 }
@@ -801,4 +875,5 @@ export const Select = {
   ItemMeta: SelectItemMeta,
   Group: SelectGroup,
   Separator: SelectSeparator,
+  Action: SelectAction,
 };

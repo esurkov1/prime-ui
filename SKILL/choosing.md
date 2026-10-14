@@ -11,7 +11,7 @@ confuse. Links: [components.md](components.md). Whole screens: [composition.md](
 | type a value (text, number, code, file, photos), group the fields of a form | Inputs — Input, Textarea, DigitInput, FileUpload, Label, Hint, Fieldset |
 | pick from options, toggle, set a range, filter, a date or a color | Selection — Checkbox, Radio, Switch, SegmentedControl, Slider, Select, NativeSelect, TagSelect, SmartFilter, Datepicker, ColorField, ColorPicker, ColorSwatches |
 | see data: status labels, people, objects, numbers and their trend, properties of a record, rows, a board, a schedule, events, code, disclosed sections | Data display — Badge, Avatar, Thumbnail, Kbd, Card, DescriptionList, DataTable, Kanban, Gantt, Timeline, CodeBlock, Accordion, Sparkline, ChartFrame |
-| hold a conversation: read and send chat messages of every kind | Messages — Chat, Message, Gallery, VoicePlayer, VideoNote, Composer |
+| hold a conversation: pick a dialog, read and send chat messages of every kind | Messages — Chat, ChatList, Message, Gallery, VoicePlayer, VideoNote, Composer |
 | learn what happened, how far along it is, or watch a region load and change state; say it to a screen reader | Status and loading — Banner, Notification, ProgressBar, ProgressCircle, Spinner, Skeleton, Crossfade, EmptyPage, VisuallyHidden |
 | move between places: app sections, panels of a screen, the records of a list, the path, pages, steps | Navigation — Tabs, Breadcrumb, Pagination, List, Stepper, Sidebar, BottomNav |
 | see something on top of the page, or a photo or video full screen | Overlays — Tooltip, Popover, Dropdown, Modal, ConfirmDialog, Drawer, Sheet, CommandMenu, MediaViewer |
@@ -74,7 +74,10 @@ never a Timeline or a list of Cards styled as bubbles. Code → CodeBlock. A num
 `Chat.Messages` (from `items` with `renderMessage`, or `Message.Root` children) and `Chat.Footer`
 with the Composer — never a hand-built header, ScrollContainer and list. A list of messages without
 the rest (comments as a chat, a read-only history) → `Chat.Root` with `Chat.Messages` alone; one
-message on its own → `Message.Root`. A group chat → `Chat.Messages type="group"`: `Message.Author`
+message on its own → `Message.Root`. The list of conversations beside the chat (the dialogs pane of a
+messenger or an inbox) → `ChatList` (`items`, `renderItem` with `ChatList.Item`, `value`): unread
+counts, «печатает…», drafts, ticks, a row menu and search come with it — never `List` with a hand-made
+count and preview; `List` stays for records that are not conversations (tickets, letters, invoices). A group chat → `Chat.Messages type="group"`: `Message.Author`
 (`tag`, `Message.AuthorIcon`) and `Message.Avatar` on every message, the list shows them on the
 first and the last of a run. A voice message → `VoicePlayer` inside `Message.Root`; a call recording
 outside a chat → `VoicePlayer` alone. A round video message → `VideoNote` inside `Message.Root`

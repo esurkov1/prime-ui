@@ -101,8 +101,10 @@ type DataTableRowProps<Row> = {
   expandable: boolean;
   expanded: boolean;
   animate: boolean;
-  /** A sub-row of a row that is collapsing: it folds away before it unmounts. */
+  /** A row of a collapsing parent or group: it folds away before it unmounts. */
   folding?: boolean;
+  /** The row folds open and shut: a sub-row, or a row of a collapsible group. */
+  foldable?: boolean;
   /** The detail panel opened by the latest expand: it drops in. */
   detailAnimate: boolean;
   selected: boolean;
@@ -127,6 +129,7 @@ function DataTableRowImpl<Row>({
   expanded,
   animate,
   folding = false,
+  foldable = depth > 0,
   detailAnimate,
   selected,
   childControls,
@@ -150,15 +153,16 @@ function DataTableRowImpl<Row>({
   ]
     .filter(Boolean)
     .join(" ");
-  // Sub-rows fold open and shut like the detail panel: every cell's content sits in a grid track
-  // (0fr ↔ 1fr). Top-level rows that arrive keep the drop-in (`enterMotion`).
+  // Sub-rows and rows of a collapsible group fold open and shut like the detail panel: every cell's
+  // content sits in a grid track (0fr ↔ 1fr). Other top-level rows that arrive keep the drop-in
+  // (`enterMotion`).
   const sub = depth > 0;
-  const [unfolding, setUnfolding] = React.useState(sub && animate);
-  const fold = !sub ? undefined : folding ? "closed" : unfolding ? "opening" : "open";
-  const enter = animate && !sub && enterMotion.enterBase;
+  const [unfolding, setUnfolding] = React.useState(foldable && animate);
+  const fold = !foldable ? undefined : folding ? "closed" : unfolding ? "opening" : "open";
+  const enter = animate && !foldable && enterMotion.enterBase;
   const lead = cx(styles.cell, enter, shared.stickyFirstColumn && styles.stickyLead);
   const folded = (node: React.ReactNode) =>
-    sub ? (
+    foldable ? (
       <div className={styles.fold}>
         <div className={styles.foldItem}>
           <div className={styles.foldPad}>{node}</div>
@@ -222,6 +226,7 @@ function DataTableRowImpl<Row>({
             rowKey={rowKey}
             rowLabel={rowLabel}
             className={lead}
+            wrap={folded}
           />
         ) : null}
         {shared.selectable ? (
@@ -336,26 +341,56 @@ function DataTableRowImpl<Row>({
 /** A body row (plus its detail panel); re-renders only when its own props change. */
 export const DataTableRow = React.memo(DataTableRowImpl) as typeof DataTableRowImpl;
 
+/** The disclosure toggle of a collapsible group (`collapsedGroups`). */
+export type GroupToggle = {
+  collapsed: boolean;
+  /** `labels.expandGroup` / `labels.collapseGroup` with `{group}` filled in. */
+  label: string;
+  /** Ids of the group's rows on screen (while expanded). */
+  controls: string | undefined;
+  onToggle: () => void;
+};
+
 type GroupRowProps = {
   totalColumns: number;
   sticky: boolean;
+  size: ControlSize;
+  toggle?: GroupToggle | undefined;
   children: React.ReactNode;
 };
 
 /**
  * The header row of a group (`getRowGroup`): a `<th scope="rowgroup">` across every column at the
- * head of its own `<tbody>`. Its content stays in the visible width while the table scrolls sideways.
+ * head of its own `<tbody>`, led by a disclosure toggle when groups fold. Its content stays in the
+ * visible width while the table scrolls sideways.
  */
-export function GroupRow({ totalColumns, sticky, children }: GroupRowProps) {
+export function GroupRow({ totalColumns, sticky, size, toggle, children }: GroupRowProps) {
   return (
-    <tr className={styles.groupRow}>
+    <tr className={styles.groupRow} data-collapsed={toggle?.collapsed ? "true" : undefined}>
       <th
         scope="rowgroup"
         colSpan={totalColumns}
         className={styles.groupCell}
         data-sticky={sticky ? "true" : undefined}
       >
-        <div className={styles.groupContent}>{children}</div>
+        <div className={styles.groupContent}>
+          {toggle ? (
+            <Button.Root
+              variant="ghost"
+              tone="neutral"
+              size={TOGGLE_SIZE[size]}
+              aria-expanded={!toggle.collapsed}
+              aria-controls={toggle.controls || undefined}
+              aria-label={toggle.label}
+              onClick={toggle.onToggle}
+            >
+              <Button.Icon>
+                <Icon name="nav.chevronRight" className={styles.chevron} />
+              </Button.Icon>
+            </Button.Root>
+          ) : null}
+          <div className={styles.groupLabel}>{children}</div>
+        </div>
       </th>
     </tr>
   );
@@ -366,17 +401,20 @@ type MeasureBodyProps<Row> = {
   columns: DataTableColumn<Row>[];
   selectable: boolean;
   expandEnabled: boolean;
+  /** A leading column of row handles (`onReorder`). */
+  reorderable: boolean;
 };
 
 /**
- * Sub-rows of collapsed rows, laid out invisibly so the columns are already as wide as they will
- * be once a row opens; never shown or reachable.
+ * Sub-rows of collapsed rows and rows of collapsed groups, laid out invisibly so the columns are
+ * already as wide as they will be once a row or group opens; never shown or reachable.
  */
 export function MeasureBody<Row>({
   rows,
   columns,
   selectable,
   expandEnabled,
+  reorderable,
 }: MeasureBodyProps<Row>) {
   return (
     <tbody className={styles.measureBody} aria-hidden="true" inert>
@@ -385,8 +423,9 @@ export function MeasureBody<Row>({
           key={String(key)}
           className={styles.row}
           style={{ "--dt-depth": depth } as React.CSSProperties}
-          data-level={depth}
+          data-level={depth > 0 ? depth : undefined}
         >
+          {reorderable ? <td className={cx(styles.cell, styles.handleCell)} /> : null}
           {selectable ? <td className={cx(styles.cell, styles.selectCell)} /> : null}
           {expandEnabled ? <td className={cx(styles.cell, styles.toggleCell)} /> : null}
           {columns.map((column, columnIndex) => (

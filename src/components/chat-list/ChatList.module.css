@@ -1,0 +1,235 @@
+/*
+ * ChatList — the conversation list of a messenger, built from List: a column that fills its host
+ * (the search field on top, the rows scrolling below). No surface of its own: put it in a Card or
+ * a page pane. Rows are `List.Item`s — their fill, current state, focus ring and touch height are
+ * List's; this file lays out what a dialog adds: the name with its glyphs, the time with the
+ * delivery ticks, the preview that cross-fades to «печатает…» or a draft, the counts.
+ *
+ * Rows stand 4px apart by a margin inside their `<li>` (not the list's gap), so the virtual
+ * window measures each row with its space and the spacers stand for exactly what they replace.
+ */
+
+.root {
+  container: chat-list / inline-size;
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.search {
+  flex: none;
+  padding: var(--prime-space-2) var(--prime-space-2) var(--prime-space-1);
+}
+
+.scroller {
+  flex: 1 1 auto;
+  min-block-size: 0;
+}
+
+.scroller .list {
+  gap: 0;
+  padding: var(--prime-space-1) var(--prime-space-2);
+}
+
+.list .item {
+  margin-block-end: var(--prime-space-1);
+}
+
+.spacer {
+  display: block;
+  flex: none;
+}
+
+/* --- Row --------------------------------------------------------------------------- */
+
+/* A row with a menu keeps the long press for it: no callout, no text selection. */
+.item[data-menu="true"] {
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* First line: the name truncates, its glyphs stay whole after it. */
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+.name {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Glyphs two steps below the row tier (the `Icon size` the row's own glyphs take). */
+.glyph {
+  --prime-icon-size: var(--prime-icon-xs);
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--prime-color-text-muted);
+}
+
+.root[data-size="l"] .glyph {
+  --prime-icon-size: var(--prime-icon-s);
+}
+
+.root[data-size="xl"] .glyph {
+  --prime-icon-size: var(--prime-icon-m);
+}
+
+/* The time with the ticks of the reader's last message before it. */
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+/* The four ticks share one box and cross-fade: clock → ✓ → ✓✓, or the failure mark. */
+.status {
+  display: inline-grid;
+  flex: none;
+  color: var(--prime-color-text-muted);
+}
+
+.tick {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.status[data-status="sending"] .tick[data-tick="sending"],
+.status[data-status="sent"] .tick[data-tick="sent"],
+.status[data-status="read"] .tick[data-tick="read"],
+.status[data-status="failed"] .tick[data-tick="failed"] {
+  opacity: 1;
+}
+
+.status[data-status="read"] {
+  color: var(--prime-color-accent-text);
+}
+
+.status[data-status="failed"] {
+  color: var(--prime-color-danger-text);
+}
+
+/*
+ * Second line: the preview, the draft and «печатает…» stand in one cell and cross-fade, each
+ * truncated on its own. An unread dialog's preview is a step brighter.
+ */
+.preview {
+  display: grid;
+}
+
+.layer {
+  grid-area: 1 / 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.layer[data-layer="typing"] {
+  color: var(--prime-color-accent-text);
+}
+
+.preview[data-shown="preview"] > [data-layer="preview"],
+.preview[data-shown="draft"] > [data-layer="draft"],
+.preview[data-shown="typing"] > [data-layer="typing"] {
+  opacity: 1;
+}
+
+.item[data-unread="true"] .preview {
+  color: var(--prime-color-text-secondary);
+}
+
+.author {
+  color: var(--prime-color-text-secondary);
+}
+
+.kind {
+  color: var(--prime-color-accent-text);
+}
+
+.draft {
+  color: var(--prime-color-danger-text);
+}
+
+/* The counts and the pin under the time. */
+.badges {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--prime-space-1);
+}
+
+.pop {
+  display: inline-flex;
+  align-items: center;
+}
+
+.count,
+.mention {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Placeholders ------------------------------------------------------------------ */
+
+.placeholder {
+  cursor: default;
+}
+
+.placeholderName {
+  inline-size: 55%;
+}
+
+.placeholderPreview {
+  inline-size: 80%;
+}
+
+.placeholderTime {
+  display: block;
+  inline-size: var(--prime-space-8);
+}
+
+/* --- Row menu ---------------------------------------------------------------------- */
+
+/* The point the menu opens from: where the pointer was, or under the row from the keyboard. */
+.anchor {
+  position: absolute;
+  inset-inline-start: var(--anchor-x);
+  inset-block-start: var(--anchor-y);
+  inline-size: 0;
+  block-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  pointer-events: none;
+}
+
+/* --- Narrow container -------------------------------------------------------------- */
+
+/* A squeezed pane keeps the names and the counts: the preview line and the time step out. */
+@container chat-list (max-width: 239px) {
+  .preview,
+  .meta {
+    display: none;
+  }
+
+  /* Alone at the end of the row, the counts stand on its middle. */
+  .badges {
+    margin-block: auto;
+  }
+}

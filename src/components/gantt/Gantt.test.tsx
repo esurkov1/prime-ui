@@ -421,6 +421,90 @@ describe("Gantt", () => {
     }
   });
 
+  it("adds renderBarTooltip under the title and the dates line, which always stay", () => {
+    vi.useFakeTimers();
+    try {
+      timelineLayout({ left: 300, right: 400 });
+      const renderBarTooltip = vi.fn((item: GanttBar, person: Person) => (
+        <span>
+          {item.id} · {person.name} · 16 ч
+        </span>
+      ));
+      render(<Chart renderBarTooltip={renderBarTooltip} />);
+      act(() => bar(/^Аудит склада/).focus());
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      const tip = screen.getByRole("tooltip");
+      expect(tip).toHaveTextContent("Аудит склада");
+      expect(tip).toHaveTextContent(formatSpan(PEOPLE[0].bars[0], ru));
+      expect(tip).toHaveTextContent("a1 · Анна Котова · 16 ч");
+      expect(renderBarTooltip).toHaveBeenCalledWith(PEOPLE[0].bars[0], PEOPLE[0]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("opens a row from its header: click, Enter, Space; never from a control inside it", () => {
+    const onRowClick = vi.fn();
+    render(
+      <Chart
+        onRowClick={onRowClick}
+        renderRow={(person) => (
+          <>
+            {person.name}
+            <button type="button">Написать</button>
+          </>
+        )}
+      />,
+    );
+    const header = screen.getByRole("rowheader", { name: /Ольга Белова/ });
+    expect(header).toHaveAttribute("data-clickable");
+    fireEvent.click(header);
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+    expect(onRowClick.mock.calls[0][0]).toBe(PEOPLE[2]);
+    expect(onRowClick.mock.calls[0][1].type).toBe("click");
+    act(() => header.focus());
+    fireEvent.keyDown(header, { key: "Enter" });
+    fireEvent.keyDown(header, { key: " " });
+    expect(onRowClick).toHaveBeenCalledTimes(3);
+    expect(onRowClick.mock.calls[2][1].type).toBe("keydown");
+    // A held key, a control inside the header and a bar never open the row.
+    fireEvent.keyDown(header, { key: "Enter", repeat: true });
+    fireEvent.click(within(header).getByRole("button", { name: "Написать" }));
+    fireEvent.click(bar(/^Аудит склада/));
+    expect(onRowClick).toHaveBeenCalledTimes(3);
+  });
+
+  it("makes the row header a link with getRowHref: the grid stop, plain clicks to onRowClick", () => {
+    const onRowClick = vi.fn((_person: Person, event: React.SyntheticEvent) =>
+      event.preventDefault(),
+    );
+    render(<Chart getRowHref={(person) => `#/team/${person.id}`} onRowClick={onRowClick} />);
+    const header = screen.getByRole("rowheader", { name: "Анна Котова" });
+    const link = within(header).getByRole("link", { name: "Анна Котова" });
+    expect(link).toHaveAttribute("href", "#/team/anna");
+    // ← from the first bar reaches the link: it is the row header's stop in the grid.
+    const audit = bar(/^Аудит склада/);
+    act(() => audit.focus());
+    fireEvent.keyDown(audit, { key: "ArrowLeft" });
+    expect(link).toHaveFocus();
+    expect(link.tabIndex).toBe(0);
+    fireEvent.keyDown(link, { key: "ArrowDown" });
+    expect(
+      within(screen.getByRole("rowheader", { name: "Илья Гордеев" })).getByRole("link"),
+    ).toHaveFocus();
+    fireEvent.click(link);
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+    expect(onRowClick.mock.calls[0][0]).toBe(PEOPLE[0]);
+    // A modified click is the browser's (new tab); Space clicks the link like Enter.
+    fireEvent.click(link, { metaKey: true });
+    fireEvent.click(link, { ctrlKey: true });
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(link, { key: " " });
+    expect(onRowClick).toHaveBeenCalledTimes(2);
+  });
+
   it("sizes the grid, head, rows and backdrop from the axis length, not from the viewport", () => {
     // jsdom has no layout: the contract lives in the CSS. A max-content grid let engines drop the
     // fixed axis basis, and the head fill, row lines and washes stopped at the viewport width.

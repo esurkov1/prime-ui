@@ -329,34 +329,62 @@ describe("CommandMenu — focus, query and disabled items", () => {
   });
 });
 
-describe("CommandMenu — an item inside Empty", () => {
-  it("does not loop: the item shows while nothing matches and runs on Enter", async () => {
+describe("CommandMenu — a persistent item", () => {
+  const onCreate = vi.fn();
+  function Harness() {
+    const [query, setQuery] = React.useState("");
+    return (
+      <CommandMenu.Root open onOpenChange={vi.fn()} search={query} onSearchChange={setQuery}>
+        <CommandMenu.Input aria-label="Поиск команд" />
+        <CommandMenu.List>
+          <CommandMenu.Empty />
+          {query.trim() ? (
+            <CommandMenu.Item
+              persistent
+              value={`создать ${query}`}
+              onSelect={() => onCreate(query)}
+            >
+              Создать «{query}»
+            </CommandMenu.Item>
+          ) : null}
+          <CommandMenu.Item value="alpha">Alpha</CommandMenu.Item>
+          <CommandMenu.Item value="alpha beta">Alpha beta</CommandMenu.Item>
+        </CommandMenu.List>
+      </CommandMenu.Root>
+    );
+  }
+
+  it("shows with the empty text while nothing matches, takes the highlight and runs on Enter", async () => {
+    onCreate.mockClear();
     const user = userEvent.setup();
-    const onCreate = vi.fn();
-    function Harness() {
-      const [query, setQuery] = React.useState("");
-      return (
-        <CommandMenu.Root open onOpenChange={vi.fn()} search={query} onSearchChange={setQuery}>
-          <CommandMenu.Input aria-label="Поиск команд" />
-          <CommandMenu.List>
-            <CommandMenu.Item value="alpha">Alpha</CommandMenu.Item>
-            <CommandMenu.Empty>
-              <CommandMenu.Item value={`создать ${query}`} onSelect={() => onCreate(query)}>
-                Создать «{query}»
-              </CommandMenu.Item>
-            </CommandMenu.Empty>
-          </CommandMenu.List>
-        </CommandMenu.Root>
-      );
-    }
     render(<Harness />);
     const input = screen.getByRole("combobox", { name: "Поиск команд" });
     await user.type(input, "zeta");
-    expect(screen.getByRole("status")).toHaveTextContent("Ничего не найдено");
+    // Never a match: the empty state still shows, the text only.
+    const empty = screen.getByRole("status");
+    expect(empty).toHaveTextContent("Ничего не найдено");
     const create = screen.getByRole("option", { name: "Создать «zeta»" });
+    expect(empty).not.toContainElement(create);
     expect(create).toHaveAttribute("aria-selected", "true");
     await user.keyboard("{Enter}");
     expect(onCreate).toHaveBeenCalledWith("zeta");
+  });
+
+  it("stays when a namesake matches; the arrows reach it after the matches", async () => {
+    onCreate.mockClear();
+    const user = userEvent.setup();
+    render(<Harness />);
+    const input = screen.getByRole("combobox", { name: "Поиск команд" });
+    await user.type(input, "alpha");
+    expect(screen.queryByText("Ничего не найдено")).not.toBeInTheDocument();
+    const create = screen.getByRole("option", { name: "Создать «alpha»" });
+    expect(create).toBeVisible();
+    // The first match is active, not the create item rendered before it.
+    expect(screen.getByRole("option", { name: "Alpha" })).toHaveAttribute("aria-selected", "true");
+    await user.keyboard("{ArrowDown}{ArrowDown}");
+    expect(create).toHaveAttribute("aria-selected", "true");
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("option", { name: "Alpha" })).toHaveAttribute("aria-selected", "true");
   });
 });
 

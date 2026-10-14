@@ -59,7 +59,7 @@ type ItemEntry = {
   haystack: string;
   disabled: boolean;
   groupId: string;
-  /** An item inside `CommandMenu.Empty`: shown with it, never counted as a match. */
+  /** Shown whatever the query, never counted as a match, walked after the matches. */
   persistent: boolean;
 };
 
@@ -89,9 +89,9 @@ type CommandMenuContextValue = LoadProps & {
   /** The active option; items subscribe to their own slice of it. */
   active: Store<string | null>;
   registerItem: (id: string, item: ItemRegistration) => () => void;
-  /** Items shown (matches, and the items of a shown `Empty`), disabled ones too. */
+  /** Items shown (matches and persistent items), disabled ones too. */
   visible: ReadonlySet<string>;
-  /** Items that match the query, without the items of `Empty`. */
+  /** Items that match the query, without the persistent ones. */
   matchCount: number;
   /** Enabled shown items in render order: what the arrows walk. */
   navigable: string[];
@@ -108,8 +108,6 @@ const [CommandMenuProvider, useCommandMenuContext] =
   createComponentContext<CommandMenuContextValue>("CommandMenu");
 
 const CommandMenuGroupContext = React.createContext("");
-/** Items rendered inside `CommandMenu.Empty` (a «Создать …» action) do not count as matches. */
-const CommandMenuEmptyContext = React.createContext(false);
 
 const optionId = (id: string) => `${id}-option`;
 
@@ -157,9 +155,11 @@ function CommandMenuState({
   // biome-ignore lint/correctness/useExhaustiveDependencies: `version` changes when items (de)register
   const { visible, navigable, matchCount } = React.useMemo(() => {
     const query = search.trim().toLowerCase();
+    // Persistent items (create from the query) stand at the end of the list: the arrows reach
+    // them after the matches, whenever the matches arrived.
     const shown = [...itemsRef.current.entries()]
       .filter(([, item]) => item.persistent || !filter || item.haystack.includes(query))
-      .sort(([, a], [, b]) => a.order - b.order);
+      .sort(([, a], [, b]) => Number(a.persistent) - Number(b.persistent) || a.order - b.order);
     return {
       visible: new Set(shown.map(([id]) => id)),
       navigable: shown.filter(([, item]) => !item.disabled).map(([id]) => id),
@@ -639,6 +639,11 @@ export type CommandMenuItemProps = Omit<
   keywords?: string;
   /** Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, not runnable. */
   disabled?: boolean;
+  /**
+   * Shown whatever the query and never counted as a match (the match count, `CommandMenu.Empty`);
+   * the arrows reach it after the matches. For one «create from the query» item at the end.
+   */
+  persistent?: boolean;
   /** Runs the command: a click, or Enter while the item is active. */
   onSelect?: () => void;
   ref?: React.Ref<HTMLButtonElement>;
@@ -649,6 +654,7 @@ function CommandMenuItem({
   value,
   keywords = "",
   disabled = false,
+  persistent = false,
   onSelect,
   onClick,
   onPointerMove,
@@ -658,7 +664,6 @@ function CommandMenuItem({
 }: CommandMenuItemProps) {
   const id = React.useId();
   const groupId = React.useContext(CommandMenuGroupContext);
-  const persistent = React.useContext(CommandMenuEmptyContext);
   const { registerItem, active: activeStore, visible, search } = useCommandMenuContext();
   const nodeRef = React.useRef<HTMLButtonElement>(null);
   const mergedRef = useMergedRefs(nodeRef, ref);
@@ -761,29 +766,25 @@ CommandMenuItemShortcut.displayName = "CommandMenu.ItemShortcut";
 
 // ─── Empty / Footer ──────────────────────────────────────────────────────────
 
-export type CommandMenuEmptyProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
+export type CommandMenuEmptyProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "role" | "children"
+> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
 /**
  * Shown only while nothing matches the query and nothing loads: `labels.empty` and
- * `labels.emptyHint`; `children` is an action under them — a button, or a `CommandMenu.Item`
- * («Создать «…»») that the arrows and Enter reach and that never counts as a match.
+ * `labels.emptyHint`, text only. An action for the query («Создать «…»») is a `persistent`
+ * `CommandMenu.Item` at the end of the list, never a child of `Empty`.
  */
-function CommandMenuEmpty({ children, ...rest }: CommandMenuEmptyProps) {
+function CommandMenuEmpty(props: CommandMenuEmptyProps) {
   const { matchCount, labels, region } = useCommandMenuContext();
   if (matchCount > 0 || region !== "ready") return null;
   return (
-    <EmptyPage.Root layout="compact" role="status" {...rest}>
+    <EmptyPage.Root layout="compact" role="status" {...props}>
       <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
       {labels.emptyHint ? <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description> : null}
-      {children ? (
-        <EmptyPage.Actions>
-          <CommandMenuEmptyContext.Provider value={true}>
-            {children}
-          </CommandMenuEmptyContext.Provider>
-        </EmptyPage.Actions>
-      ) : null}
     </EmptyPage.Root>
   );
 }

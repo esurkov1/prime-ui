@@ -164,3 +164,9 @@
 .textarea:disabled::placeholder {
   color: var(--prime-color-text-disabled);
 }
+
+/* ── Formatting: the box that anchors the toolbar over the field (internal/textFormattingToolbar) ── */
+.anchor {
+  position: relative;
+  min-width: 0;
+}

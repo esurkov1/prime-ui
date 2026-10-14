@@ -103,6 +103,19 @@
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
+/* `href`: the whole tile under its chips is a link to the file; its ring follows the tile's corners. */
+.open {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  -webkit-user-drag: none;
+}
+
+.open:focus-visible {
+  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
+  outline-offset: var(--prime-focus-offset-inset);
+}
+
 /* The bottom band: the name (one line) and the size or the duration at the end, tabular. */
 .band {
   position: absolute;

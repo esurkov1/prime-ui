@@ -1191,3 +1191,186 @@ describe("Select typeahead", () => {
     }
   });
 });
+
+// ─── Async onValueChange ─────────────────────────────────────────────────────
+
+function deferred() {
+  let resolve: () => void = () => {};
+  let reject: (reason?: unknown) => void = () => {};
+  const promise = new Promise<void>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
+describe("Select onValueChange returning a promise", () => {
+  function SavingSelect({
+    onValueChange,
+    multiple = false,
+  }: {
+    onValueChange: (value: string | string[]) => Promise<void>;
+    multiple?: boolean;
+  }) {
+    const items = (
+      <Select.Content>
+        <Select.Item value="one">One</Select.Item>
+        <Select.Item value="two">Two</Select.Item>
+      </Select.Content>
+    );
+    const trigger = (
+      <Select.Trigger>
+        <Select.Value />
+      </Select.Trigger>
+    );
+    return multiple ? (
+      <Select.Root multiple placeholder="Pick" onValueChange={onValueChange}>
+        {trigger}
+        {items}
+      </Select.Root>
+    ) : (
+      <Select.Root placeholder="Pick" onValueChange={onValueChange}>
+        {trigger}
+        {items}
+      </Select.Root>
+    );
+  }
+
+  it("shows the picked value at once with a busy trigger; resolve keeps it", async () => {
+    const save = deferred();
+    const onValueChange = vi.fn(() => save.promise);
+    render(<SavingSelect onValueChange={onValueChange} />);
+    const trigger = screen.getByRole("combobox");
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByRole("option", { name: "One" }));
+
+    expect(onValueChange).toHaveBeenCalledWith("one");
+    expect(trigger).toHaveTextContent("One");
+    expect(trigger).toHaveAttribute("aria-busy", "true");
+
+    save.resolve();
+    await waitFor(() => expect(trigger).not.toHaveAttribute("aria-busy"));
+    expect(trigger).toHaveTextContent("One");
+  });
+
+  it("a rejection rolls the value back and announces labels.changeFailed", async () => {
+    const save = deferred();
+    render(<SavingSelect onValueChange={() => save.promise} />);
+    const trigger = screen.getByRole("combobox");
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByRole("option", { name: "Two" }));
+    expect(trigger).toHaveTextContent("Two");
+
+    save.reject(new Error("offline"));
+    await waitFor(() => expect(trigger).toHaveTextContent("Pick"));
+    expect(trigger).not.toHaveAttribute("aria-busy");
+    expect(screen.getByRole("status")).toHaveTextContent("Не удалось сохранить выбор");
+  });
+
+  it("multiple: picks wait while a save is pending (no double submit), reject rolls back", async () => {
+    const save = deferred();
+    const onValueChange = vi.fn(() => save.promise);
+    render(<SavingSelect multiple onValueChange={onValueChange} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("option", { name: "One" }));
+    fireEvent.click(screen.getByRole("option", { name: "Two" }));
+
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(onValueChange).toHaveBeenCalledWith(["one"]);
+    expect(screen.getByRole("option", { name: "One" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("option", { name: "Two" })).toHaveAttribute("aria-selected", "false");
+
+    save.reject(new Error("offline"));
+    await waitFor(() =>
+      expect(screen.getByRole("option", { name: "One" })).toHaveAttribute("aria-selected", "false"),
+    );
+  });
+
+  it("a synchronous handler applies the value as before", () => {
+    const onValueChange = vi.fn();
+    render(<BasicSelect onChange={onValueChange} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("option", { name: "Two" }));
+    expect(onValueChange).toHaveBeenCalledWith("two");
+    expect(screen.getByRole("combobox")).toHaveTextContent("Two");
+    expect(screen.getByRole("combobox")).not.toHaveAttribute("aria-busy");
+  });
+});
+
+// ─── Select.Action ───────────────────────────────────────────────────────────
+
+describe("Select.Action", () => {
+  function ClientSelect({ onCreate }: { onCreate: () => void }) {
+    return (
+      <Select.Root placeholder="Клиент" labels={{ search: "Найти клиента" }}>
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content searchable>
+          <Select.Item value="romashka">Ромашка</Select.Item>
+          <Select.Item value="vector">Вектор</Select.Item>
+          <Select.Action onSelect={onCreate}>
+            <Select.ItemIcon>+</Select.ItemIcon>
+            Новый клиент
+          </Select.Action>
+        </Select.Content>
+      </Select.Root>
+    );
+  }
+
+  it("stands outside the scroller, owned by the listbox", () => {
+    render(<ClientSelect onCreate={() => {}} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const listbox = screen.getByRole("listbox");
+    const action = screen.getByRole("option", { name: "Новый клиент" });
+    expect(listbox).not.toContainElement(action);
+    const group = action.closest('[role="group"]');
+    expect(group).not.toBeNull();
+    expect(listbox).toHaveAttribute("aria-owns", group?.id);
+  });
+
+  it("is never filtered: shows with the empty state and takes the highlight", () => {
+    const onCreate = vi.fn();
+    render(<ClientSelect onCreate={onCreate} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const search = screen.getByRole("textbox", { name: "Найти клиента" });
+    fireEvent.change(search, { target: { value: "zzz" } });
+
+    expect(screen.queryByRole("option", { name: "Ромашка" })).not.toBeInTheDocument();
+    expect(screen.getByText("Ничего не найдено")).toBeInTheDocument();
+    const action = screen.getByRole("option", { name: "Новый клиент" });
+    expect(action).toHaveAttribute("data-highlighted", "true");
+
+    fireEvent.keyDown(search, { key: "Enter" });
+    expect(onCreate).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("the arrows reach it after the last option; Enter runs it and closes the list", () => {
+    const onCreate = vi.fn();
+    render(<ClientSelect onCreate={onCreate} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    const search = screen.getByRole("textbox", { name: "Найти клиента" });
+    fireEvent.keyDown(search, { key: "ArrowDown" });
+    fireEvent.keyDown(search, { key: "ArrowDown" });
+    fireEvent.keyDown(search, { key: "ArrowDown" });
+    const action = screen.getByRole("option", { name: "Новый клиент" });
+    expect(action).toHaveAttribute("data-highlighted", "true");
+    expect(search).toHaveAttribute("aria-activedescendant", action.id);
+
+    fireEvent.keyDown(search, { key: "Enter" });
+    expect(onCreate).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox")).toHaveTextContent("Клиент");
+  });
+
+  it("a click runs onSelect and closes without changing the value", () => {
+    const onCreate = vi.fn();
+    render(<ClientSelect onCreate={onCreate} />);
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("option", { name: "Новый клиент" }));
+    expect(onCreate).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox")).toHaveTextContent("Клиент");
+  });
+});

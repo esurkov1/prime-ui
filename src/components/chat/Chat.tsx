@@ -13,6 +13,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import type { Selection } from "@/internal/messageList";
+import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Chat.module.css";
 import { ChatPinned } from "./ChatPinned";
@@ -47,6 +48,7 @@ const CHAT_LABELS: ChatLabels = {
   nextMatch: "Следующее совпадение",
   messages: "Переписка",
   unread: "Непрочитанные сообщения",
+  loading: "Загрузка сообщений",
 };
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -186,12 +188,39 @@ export type ChatHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/** The children as a flat list: fragments opened, `null`, booleans and empty strings dropped. */
+function flattenChildren(nodes: React.ReactNode, prefix = ""): React.ReactNode[] {
+  return React.Children.toArray(nodes).flatMap((node) => {
+    if (!React.isValidElement(node)) return [node];
+    const key = `${prefix}${node.key ?? ""}`;
+    if (node.type === React.Fragment) {
+      return flattenChildren((node.props as { children?: React.ReactNode }).children, `${key}/`);
+    }
+    return [prefix ? React.cloneElement(node, { key }) : node];
+  });
+}
+
 /**
- * The top of the chat: who it is with. A row of the leading element (an `Avatar`), the title over
- * the description, and the actions at the end.
+ * The top of the chat: who it is with. A row of the leading elements (a back button, an `Avatar`),
+ * the title over the description, and the actions at the end. Children are sorted by type:
+ * `Chat.Title`, `Chat.Description` and `Chat.Actions` take their places, everything else leads
+ * the row side by side, in the order written.
  */
-function ChatHeader({ className, ...rest }: ChatHeaderProps) {
-  return <div className={cx(styles.header, className)} {...rest} />;
+function ChatHeader({ className, children, ...rest }: ChatHeaderProps) {
+  const lead: React.ReactNode[] = [];
+  const text: React.ReactNode[] = [];
+  for (const child of flattenChildren(children)) {
+    const own =
+      React.isValidElement(child) &&
+      (child.type === ChatTitle || child.type === ChatDescription || child.type === ChatActions);
+    (own ? text : lead).push(child);
+  }
+  return (
+    <div className={cx(styles.header, className)} {...rest}>
+      {lead.length > 0 ? <div className={styles.lead}>{lead}</div> : null}
+      {text}
+    </div>
+  );
 }
 ChatHeader.displayName = "Chat.Header";
 
@@ -401,6 +430,11 @@ export type ChatMessagesProps<T = unknown> = Omit<
    * incoming messages keep the avatar's gutter. Default `direct`.
    */
   type?: "direct" | "group";
+  /**
+   * The first load of the conversation: bubble-shaped placeholders stand in the list's place
+   * (`aria-busy`, `labels.loading` announced), then cross-fade into the messages.
+   */
+  loading?: boolean;
   /** Older history exists: a placeholder stands above the first message and `onLoadOlder` runs at the top. */
   hasOlder?: boolean;
   /** The reader reached the top while `hasOlder`: load older messages and prepend them. */
@@ -536,8 +570,42 @@ function useItemRows<T>(
  * and `Message.Typing` close the list). Only the rows around the view render; the list opens at
  * the end and keeps the reader's place.
  */
+/** The placeholders of a first load, oldest first: the side and the lines of each bubble. */
+const LOADING_ROWS = [
+  { direction: "incoming", lines: 1 },
+  { direction: "incoming", lines: 2 },
+  { direction: "outgoing", lines: 1 },
+  { direction: "incoming", lines: 1 },
+  { direction: "outgoing", lines: 2 },
+  { direction: "outgoing", lines: 1 },
+] as const;
+
+/**
+ * A conversation on its way: bubbles in the messages' geometry on alternating sides, standing at
+ * the end of the list like the messages they stand for (a group chat keeps the avatar's gutter).
+ */
+function ChatLoading({ group }: { group: boolean }) {
+  return (
+    <div className={styles.loading} aria-hidden="true">
+      {LOADING_ROWS.map((row, index) => (
+        <div
+          // biome-ignore lint/suspicious/noArrayIndexKey: a fixed set of placeholders
+          key={index}
+          className={styles.loadingRow}
+          data-direction={row.direction}
+          data-lines={row.lines}
+        >
+          {group && row.direction === "incoming" ? <Skeleton shape="circle" size="m" /> : null}
+          <Skeleton shape="block" className={styles.skeletonBubble} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ChatMessages<T>({
   type = "direct",
+  loading = false,
   hasOlder = false,
   onLoadOlder,
   items,
@@ -581,35 +649,53 @@ function ChatMessages<T>({
     chat.selected === undefined
       ? {}
       : { selected: chat.selected, onSelectedChange: chat.setSelected };
+  // The list mounts once the first load is done: what it shows then is its first render — no
+  // message enters, none is reported new.
   return (
-    <ScrollContainer
-      anchor="end"
-      edges="none"
-      onReachStart={hasOlder ? onLoadOlder : undefined}
-      className={styles.scroller}
-    >
-      {hasOlder ? (
-        <div className={styles.older} aria-hidden="true">
-          <Skeleton shape="block" className={styles.olderBubble} />
-        </div>
-      ) : null}
-      <MessageList
-        {...rest}
-        {...selection}
-        aria-label={name}
-        aria-labelledby={ariaLabelledBy ?? (ariaLabel || !chat.hasTitle ? undefined : chat.titleId)}
-        group={type === "group"}
-        current={chat.current}
-        highlight={chat.search ?? ""}
-        onMatchesChange={chat.setMatches}
-        revealRef={chat.revealRef}
-        labels={chat.labels}
+    <>
+      <Crossfade
+        state={loading ? "loading" : "ready"}
+        fill
+        className={styles.messages}
+        aria-busy={loading || undefined}
       >
-        {rows}
-        {children}
-        {ownTyping ? null : <Message.Typing active={chat.typing} />}
-      </MessageList>
-    </ScrollContainer>
+        {loading ? (
+          <ChatLoading group={type === "group"} />
+        ) : (
+          <ScrollContainer
+            anchor="end"
+            edges="none"
+            onReachStart={hasOlder ? onLoadOlder : undefined}
+            className={styles.scroller}
+          >
+            {hasOlder ? (
+              <div className={styles.older} aria-hidden="true">
+                <Skeleton shape="block" className={styles.skeletonBubble} />
+              </div>
+            ) : null}
+            <MessageList
+              {...rest}
+              {...selection}
+              aria-label={name}
+              aria-labelledby={
+                ariaLabelledBy ?? (ariaLabel || !chat.hasTitle ? undefined : chat.titleId)
+              }
+              group={type === "group"}
+              current={chat.current}
+              highlight={chat.search ?? ""}
+              onMatchesChange={chat.setMatches}
+              revealRef={chat.revealRef}
+              labels={chat.labels}
+            >
+              {rows}
+              {children}
+              {ownTyping ? null : <Message.Typing active={chat.typing} />}
+            </MessageList>
+          </ScrollContainer>
+        )}
+      </Crossfade>
+      <VisuallyHidden live="polite">{loading ? chat.labels.loading : ""}</VisuallyHidden>
+    </>
   );
 }
 ChatMessages.displayName = "Chat.Messages";

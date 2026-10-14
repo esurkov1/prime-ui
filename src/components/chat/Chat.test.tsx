@@ -188,6 +188,69 @@ describe("Chat: the conversation assembled", () => {
     expect(onSelectedChange).toHaveBeenCalledWith(["m3"]);
   });
 
+  it("puts every child that is not the text or the actions side by side in one lead", () => {
+    render(
+      <Chat.Root>
+        <Chat.Header data-testid="header">
+          <button type="button">Назад</button>
+          <React.Fragment key="who">
+            <span data-testid="avatar">ИБ</span>
+            <span>Клиент</span>
+          </React.Fragment>
+          <Chat.Title>ООО «Вектор»</Chat.Title>
+          <Chat.Description>в сети</Chat.Description>
+          <Chat.Actions>
+            <Chat.SearchButton />
+          </Chat.Actions>
+        </Chat.Header>
+        <Chat.Messages />
+      </Chat.Root>,
+    );
+    const header = screen.getByTestId("header");
+    const lead = header.firstElementChild as HTMLElement;
+    // One wrapper holds the back button and the avatar, in the order written.
+    expect(within(lead).getByRole("button", { name: "Назад" })).toBeInTheDocument();
+    expect(within(lead).getByTestId("avatar")).toBeInTheDocument();
+    expect(lead.children).toHaveLength(3);
+    // The title, the description and the actions stay direct children of the header.
+    expect(screen.getByRole("heading", { name: "ООО «Вектор»" }).parentElement).toBe(header);
+    expect(header.children).toHaveLength(4);
+  });
+
+  it("has no lead without a leading child", () => {
+    render(
+      <Chat.Root>
+        <Chat.Header data-testid="header">
+          <Chat.Title>ООО «Вектор»</Chat.Title>
+        </Chat.Header>
+        <Chat.Messages />
+      </Chat.Root>,
+    );
+    expect(screen.getByTestId("header").children).toHaveLength(1);
+  });
+
+  it("stands placeholders in the list's place while loading, busy and announced, then shows the list", () => {
+    const view = (loading: boolean) => (
+      <Chat.Root>
+        <Chat.Messages aria-label="Переписка с ООО «Вектор»" loading={loading}>
+          <Message.Root value="a" time="10:00">
+            <Message.Text>Счёт оплачен</Message.Text>
+          </Message.Root>
+        </Chat.Messages>
+      </Chat.Root>
+    );
+    const { rerender } = render(view(true));
+    expect(screen.queryByRole("log")).toBeNull();
+    expect(screen.queryByText("Счёт оплачен")).toBeNull();
+    expect(document.querySelector('[aria-busy="true"]')).not.toBeNull();
+    expect(screen.getByRole("status")).toHaveTextContent("Загрузка сообщений");
+    rerender(view(false));
+    expect(screen.getByRole("log", { name: "Переписка с ООО «Вектор»" })).toBeInTheDocument();
+    expect(screen.getByText("Счёт оплачен")).toBeInTheDocument();
+    expect(document.querySelector('[aria-busy="true"]')).toBeNull();
+    expect(screen.queryByText("Загрузка сообщений")).toBeNull();
+  });
+
   it("names the list by its title, or by its label without one", () => {
     render(
       <Chat.Root>

@@ -7,10 +7,8 @@ import { Crossfade } from "@/components/crossfade/Crossfade";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { FileUpload } from "@/components/file-upload/FileUpload";
 import { Hint } from "@/components/hint/Hint";
-import { Kbd } from "@/components/kbd/Kbd";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Textarea } from "@/components/textarea/Textarea";
-import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
@@ -26,22 +24,13 @@ import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { type MediaKind, mediaKind } from "@/internal/mediaKind";
-import overlayMotion from "@/internal/overlayMotion.module.css";
 import { Ring } from "@/internal/ring";
-import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, stepDown } from "@/internal/states";
-import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 import swapMotion from "@/internal/swapMotion.module.css";
+import { TEXT_FORMATTING_LABELS, type TextFormattingLabels } from "@/internal/textFormatting";
+import { useTextFormatting } from "@/internal/textFormattingToolbar";
 import { VisuallyHidden, visuallyHiddenClass } from "@/internal/VisuallyHidden";
 import styles from "./Composer.module.css";
-import {
-  applyFormat,
-  type ComposerFormat,
-  diffRange,
-  FORMAT_SHORTCUTS,
-  formatForKey,
-  shortcutText,
-} from "./format";
 import { drawLiveWave, type LiveWaveSize, type LiveWaveStyle } from "./liveWave";
 import {
   type ComposerRecording,
@@ -54,10 +43,10 @@ import {
   VIDEO_MAX_MS,
 } from "./useRecorder";
 
-export type { ComposerFormat } from "./format";
 export type { ComposerRecording, ComposerRecordMode } from "./useRecorder";
 
-export type ComposerLabels = {
+/** Every built-in string; the formatting toolbar's names are shared with Textarea. */
+export type ComposerLabels = TextFormattingLabels & {
   /** Accessible name of the composer `<form>`. */
   region: string;
   /** Placeholder and accessible name of the message field. */
@@ -112,14 +101,6 @@ export type ComposerLabels = {
   attachments: string;
   /** The option that sends the attached photos and videos as files, uncompressed. */
   sendAsFiles: string;
-  /** Accessible name of the formatting toolbar. */
-  formatting: string;
-  bold: string;
-  italic: string;
-  strikethrough: string;
-  code: string;
-  link: string;
-  quote: string;
   /** Name of the close button of a reply bar. */
   cancelReply: string;
   /** Name of the close button of an edit bar. */
@@ -155,13 +136,7 @@ const COMPOSER_LABELS: ComposerLabels = {
   attach: "Прикрепить",
   attachments: "Вложения",
   sendAsFiles: "Отправить как файлы, без сжатия",
-  formatting: "Форматирование",
-  bold: "Жирный",
-  italic: "Курсив",
-  strikethrough: "Зачёркнутый",
-  code: "Моноширинный",
-  link: "Ссылка",
-  quote: "Цитата",
+  ...TEXT_FORMATTING_LABELS,
   cancelReply: "Отменить ответ",
   cancelEdit: "Отменить редактирование",
 };
@@ -221,15 +196,6 @@ const [ComposerProvider, useComposerContext] = createComponentContext<{
   attachSlot: HTMLElement | null;
 }>("Composer");
 
-const FORMATS: readonly { format: ComposerFormat; icon: IconName }[] = [
-  { format: "bold", icon: "format.bold" },
-  { format: "italic", icon: "format.italic" },
-  { format: "strikethrough", icon: "format.strikethrough" },
-  { format: "code", icon: "format.code" },
-  { format: "link", icon: "format.link" },
-  { format: "quote", icon: "format.quote" },
-];
-
 /** A press shorter than this is a tap: it locks a recording. */
 const HOLD_MS = 200;
 /**
@@ -244,10 +210,6 @@ const EMPTY_UPLOADS: readonly UploadItem[] = [];
 const MAX_ROWS = 8;
 /** `typing` ends this long after the last keystroke. */
 const TYPING_IDLE_MS = 3000;
-
-const isApplePlatform = () =>
-  typeof navigator !== "undefined" &&
-  /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
 
 const isPromise = (value: unknown): value is PromiseLike<unknown> =>
   typeof (value as PromiseLike<unknown> | undefined)?.then === "function";
@@ -385,11 +347,9 @@ function ComposerRoot({
   const setTextareaRef = useMergedRefs(textareaRef, inputRef);
   const [pending, setPending] = React.useState(false);
   const [announcement, setAnnouncement] = React.useState("");
-  const [apple, setApple] = React.useState(false);
   // Recording is feature-detected after mount: the server and the first paint never offer it.
   const [support, setSupport] = React.useState({ voice: false, video: false });
   React.useEffect(() => {
-    setApple(isApplePlatform());
     setSupport({ voice: canRecord("voice"), video: canRecord("video") });
   }, []);
 
@@ -906,53 +866,14 @@ function ComposerRoot({
   const preview = usePresence(recording && recorder.mode === "video", { exitDuration: "fast" });
 
   // ── Formatting ──
-  const [selected, setSelected] = React.useState(false);
-  const [focusInside, setFocusInside] = React.useState(false);
-  const pendingSelection = React.useRef<{ start: number; end: number } | null>(null);
-  const toolbarOpen = formatting && !disabled && !recording && selected && focusInside;
-  const toolbar = usePresence(toolbarOpen, { exitDuration: "fast" });
-  const [toolIndex, setToolIndex] = React.useState(0);
-  const toolRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
-
-  const syncSelection = () => {
-    const el = textareaRef.current;
-    setSelected(Boolean(el && el.selectionStart !== el.selectionEnd));
-  };
-
-  React.useLayoutEffect(() => {
-    const target = pendingSelection.current;
-    const el = textareaRef.current;
-    if (!target || !el || el.value !== value) return;
-    pendingSelection.current = null;
-    el.setSelectionRange(target.start, target.end);
-    syncSelection();
+  const format = useTextFormatting({
+    textareaRef,
+    enabled: formatting,
+    toolbar: !disabled && !recording,
+    labels,
+    size,
+    controlsId: fieldId,
   });
-
-  const applyFormatting = (format: ComposerFormat) => {
-    const el = textareaRef.current;
-    if (!el || disabled || el.readOnly) return;
-    const before = { text: el.value, start: el.selectionStart, end: el.selectionEnd };
-    const next = applyFormat(before, format);
-    const change = diffRange(before.text, next.text);
-    el.focus();
-    el.setSelectionRange(change.start, change.end);
-    // Typed as one edit, the change stays on the field's undo stack (Mod+Z takes it back).
-    let typed = false;
-    try {
-      typed =
-        typeof document.execCommand === "function" &&
-        document.execCommand(change.insert ? "insertText" : "delete", false, change.insert);
-    } catch {
-      typed = false;
-    }
-    if (typed && el.value === next.text) {
-      el.setSelectionRange(next.start, next.end);
-      syncSelection();
-      return;
-    }
-    pendingSelection.current = { start: next.start, end: next.end };
-    setValue(next.text);
-  };
 
   // ── Drop ──
   const [dropping, setDropping] = React.useState(false);
@@ -962,13 +883,7 @@ function ComposerRoot({
 
   // ── Field keys ──
   const onFieldKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.nativeEvent.isComposing) return;
-    const format = formatting ? formatForKey(event) : null;
-    if (format) {
-      event.preventDefault();
-      applyFormatting(format);
-      return;
-    }
+    if (event.nativeEvent.isComposing || format.onKeyDown(event)) return;
     const mod = event.metaKey || event.ctrlKey;
     if (event.key === "Enter") {
       if (mod || (!event.shiftKey && !event.altKey && !touch)) {
@@ -978,13 +893,6 @@ function ComposerRoot({
       return;
     }
     if (event.key === "Escape") {
-      const el = event.currentTarget;
-      if (toolbarOpen) {
-        event.preventDefault();
-        el.setSelectionRange(el.selectionEnd, el.selectionEnd);
-        setSelected(false);
-        return;
-      }
       if (bar?.dismiss) {
         event.preventDefault();
         bar.dismiss();
@@ -1163,17 +1071,7 @@ function ComposerRoot({
           <div className={styles.row} data-composer-row="">
             <div ref={setAttachSlot} className={styles.start} inert={recording} />
             {/* The field is the kit Textarea; this box anchors the toolbar. */}
-            {/* biome-ignore lint/a11y/noStaticElementInteractions: focus tracking only (bubbled focus / blur); the textarea is the control */}
-            <div
-              inert={recording}
-              className={styles.field}
-              onFocus={() => setFocusInside(true)}
-              onBlur={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-                  setFocusInside(false);
-                }
-              }}
-            >
+            <div inert={recording} className={styles.field} {...format.anchorProps}>
               <Textarea.Root
                 ref={setTextareaRef}
                 id={fieldId}
@@ -1196,7 +1094,7 @@ function ComposerRoot({
                   noteTyping(next);
                   if (recorder.error) recorder.clearError();
                 }}
-                onSelect={syncSelection}
+                onSelect={format.onSelect}
                 onKeyDown={onFieldKeyDown}
                 onPaste={(event) => {
                   const files = pastedFiles(event.clipboardData);
@@ -1205,57 +1103,7 @@ function ComposerRoot({
                   addFiles(files);
                 }}
               />
-              {toolbar.mounted ? (
-                <SurfaceDepthProvider value="floating">
-                  <div
-                    role="toolbar"
-                    aria-label={labels.formatting}
-                    aria-controls={fieldId}
-                    className={cx(styles.toolbar, overlayMotion.floating)}
-                    data-depth="floating"
-                    data-side="top"
-                    data-state={toolbar.state}
-                    onAnimationEnd={toolbar.onExitEnd}
-                    // The field keeps its focus and its selection while a tool is pressed.
-                    onPointerDown={(event) => event.preventDefault()}
-                    onKeyDown={(event) => {
-                      const next = rovingIndex(event.key, toolIndex, FORMATS.length, "horizontal");
-                      if (next === null) return;
-                      event.preventDefault();
-                      setToolIndex(next);
-                      toolRefs.current[next]?.focus();
-                    }}
-                  >
-                    <Tooltip.Provider>
-                      {FORMATS.map(({ format, icon }, index) => (
-                        <Tooltip.Root key={format}>
-                          <Tooltip.Trigger>
-                            <Button.Root
-                              ref={(node) => {
-                                toolRefs.current[index] = node;
-                              }}
-                              variant="ghost"
-                              tone="neutral"
-                              size={stepDown(size)}
-                              aria-label={labels[format]}
-                              aria-keyshortcuts={`${apple ? "Meta" : "Control"}+${FORMAT_SHORTCUTS[format].shift ? "Shift+" : ""}${FORMAT_SHORTCUTS[format].key}`}
-                              tabIndex={index === toolIndex ? 0 : -1}
-                              onClick={() => applyFormatting(format)}
-                            >
-                              <Button.Icon>
-                                <Icon name={icon} />
-                              </Button.Icon>
-                            </Button.Root>
-                          </Tooltip.Trigger>
-                          <Tooltip.Content size={stepDown(size)} side="top">
-                            {labels[format]} <Kbd>{shortcutText(format, apple)}</Kbd>
-                          </Tooltip.Content>
-                        </Tooltip.Root>
-                      ))}
-                    </Tooltip.Provider>
-                  </div>
-                </SurfaceDepthProvider>
-              ) : null}
+              {format.toolbar}
             </div>
             {recordBar.mounted ? (
               <div

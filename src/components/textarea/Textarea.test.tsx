@@ -264,3 +264,117 @@ describe("Textarea edge actions", () => {
     expect(down.defaultPrevented).toBe(false);
   });
 });
+
+describe("Textarea formatting", () => {
+  const field = () => screen.getByRole("textbox") as HTMLTextAreaElement;
+  const select = (start: number, end: number) => {
+    // React holds `onSelect` back while a mouse button is down; a test above leaves one pressed.
+    fireEvent.mouseUp(field());
+    field().focus();
+    field().setSelectionRange(start, end);
+    fireEvent.select(field());
+  };
+
+  it("is off by default: no toolbar, the hotkeys stay native", () => {
+    render(<Root aria-label="Текст" defaultValue="Срок до пятницы" />);
+    select(0, 4);
+    expect(screen.queryByRole("toolbar")).toBeNull();
+    fireEvent.keyDown(field(), { key: "b", code: "KeyB", ctrlKey: true });
+    expect(field()).toHaveValue("Срок до пятницы");
+  });
+
+  it("the hotkeys wrap the selection, uncontrolled and controlled", () => {
+    const onValueChange = vi.fn();
+    render(
+      <Root
+        aria-label="Текст"
+        formatting
+        defaultValue="Срок до пятницы"
+        onValueChange={onValueChange}
+      />,
+    );
+    select(5, 15);
+    fireEvent.keyDown(field(), { key: "b", code: "KeyB", ctrlKey: true });
+    expect(field()).toHaveValue("Срок **до пятницы**");
+    expect(onValueChange).toHaveBeenLastCalledWith("Срок **до пятницы**");
+    expect([field().selectionStart, field().selectionEnd]).toEqual([7, 17]);
+    fireEvent.keyDown(field(), { key: "Р", code: "KeyH", metaKey: true, shiftKey: true });
+    expect(field()).toHaveValue("Срок **||до пятницы||**");
+  });
+
+  it("works with a controlled value", () => {
+    function Controlled() {
+      const [value, setValue] = React.useState("Итог: 120 000 ₽");
+      return <Root aria-label="Текст" formatting value={value} onValueChange={setValue} />;
+    }
+    render(<Controlled />);
+    select(6, 15);
+    fireEvent.keyDown(field(), { key: "i", code: "KeyI", ctrlKey: true });
+    expect(field()).toHaveValue("Итог: _120 000 ₽_");
+  });
+
+  it("a selection shows a named toolbar; a tool formats and keeps the field focused", () => {
+    render(<Root aria-label="Текст" formatting defaultValue="Смета готова" />);
+    expect(screen.queryByRole("toolbar")).toBeNull();
+    select(0, 5);
+    const toolbar = screen.getByRole("toolbar", { name: "Форматирование" });
+    expect(toolbar).toHaveAttribute("aria-controls", field().id);
+    const tools = screen.getAllByRole("button");
+    expect(tools.map((tool) => tool.getAttribute("aria-label"))).toEqual([
+      "Жирный",
+      "Курсив",
+      "Зачёркнутый",
+      "Моноширинный",
+      "Скрытый текст",
+      "Ссылка",
+      "Цитата",
+    ]);
+    expect(tools.filter((tool) => tool.tabIndex === 0)).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "Скрытый текст" })).toHaveAttribute(
+      "aria-keyshortcuts",
+      "Control+Shift+H",
+    );
+    const press = new MouseEvent("pointerdown", { bubbles: true, cancelable: true });
+    screen.getByRole("button", { name: "Скрытый текст" }).dispatchEvent(press);
+    expect(press.defaultPrevented).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Скрытый текст" }));
+    expect(field()).toHaveValue("||Смета|| готова");
+    expect(field()).toHaveFocus();
+  });
+
+  it("the arrow keys move between the tools", () => {
+    render(<Root aria-label="Текст" formatting defaultValue="Смета готова" />);
+    select(0, 5);
+    const bold = screen.getByRole("button", { name: "Жирный" });
+    bold.focus();
+    fireEvent.keyDown(bold, { key: "ArrowRight" });
+    expect(screen.getByRole("button", { name: "Курсив" })).toHaveFocus();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Курсив" }), { key: "End" });
+    expect(screen.getByRole("button", { name: "Цитата" })).toHaveFocus();
+  });
+
+  it("Escape collapses the selection before it reverts an onCommit field", () => {
+    const onCommit = vi.fn();
+    render(<Root aria-label="Текст" formatting defaultValue="Смета" onCommit={onCommit} />);
+    select(0, 5);
+    expect(screen.getByRole("toolbar")).toBeInTheDocument();
+    const press = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+    act(() => {
+      field().dispatchEvent(press);
+    });
+    expect(press.defaultPrevented).toBe(true);
+    expect(field().selectionStart).toBe(field().selectionEnd);
+  });
+
+  it("no toolbar on a read-only or disabled field", () => {
+    const { rerender } = render(
+      <Root aria-label="Текст" formatting readOnly defaultValue="Смета готова" />,
+    );
+    select(0, 5);
+    expect(screen.queryByRole("toolbar")).toBeNull();
+    fireEvent.keyDown(field(), { key: "b", code: "KeyB", ctrlKey: true });
+    expect(field()).toHaveValue("Смета готова");
+    rerender(<Root aria-label="Текст" formatting disabled defaultValue="Смета готова" />);
+    expect(screen.queryByRole("toolbar")).toBeNull();
+  });
+});

@@ -32,7 +32,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Документы сделки: зона, уже приложенные файлы строками и новые файлы через очередь загрузки с прогрессом, причиной ошибки и повтором — `label`, `hint`, `multiple`, `defaultValue`, `queue`.",
+        "Документы сделки: зона, уже приложенные файлы строками, имя открывает файл, и новые файлы через очередь загрузки с прогрессом, причиной ошибки и повтором — `label`, `hint`, `multiple`, `defaultValue`, `href`, `queue`.",
     },
     {
       slot: "variants",

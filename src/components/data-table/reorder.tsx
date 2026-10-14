@@ -74,8 +74,11 @@ export function useRowReorder<Row>(options: RowReorderOptions<Row>) {
       if (beforeId === null) {
         // Last on screen is in front of the first row after the run (the next page), if it is one
         // of the same group; otherwise last of all.
+        // Found by the row itself: rows of a collapsed group are not on screen, so a position on
+        // screen is not a position in the data.
         const last = entries[entries.length - 1];
-        const at = last ? current.offset + last.index + 1 : -1;
+        const found = last ? current.orderedRows.indexOf(last.item.row, current.offset) : -1;
+        const at = found >= 0 ? found + 1 : -1;
         const next = at >= 0 ? current.orderedRows[at] : undefined;
         const group = current.getRowGroup;
         if (
@@ -231,13 +234,15 @@ type HandleCellProps = {
   rowKey: React.Key;
   rowLabel: string | undefined;
   className?: string | undefined;
+  /** Wraps the content like the row's other cells (the fold of a collapsible group's row). */
+  wrap?: (node: React.ReactNode) => React.ReactNode;
 };
 
 /**
  * The leading cell of a reorderable row: the grip (Alt + ↑ / ↓ from the keyboard), a spinner while
  * the owner saves this row's move, and, while the table is sorted, a disabled grip that says why.
  */
-export function ReorderHandleCell({ reorder, rowKey, rowLabel, className }: HandleCellProps) {
+export function ReorderHandleCell({ reorder, rowKey, rowLabel, className, wrap }: HandleCellProps) {
   const label = formatLabel(reorder.handleLabel, { label: rowLabel ?? "" }).trim();
   let content: React.ReactNode;
   if (reorder.pending.has(rowKey)) {
@@ -254,5 +259,5 @@ export function ReorderHandleCell({ reorder, rowKey, rowLabel, className }: Hand
   } else {
     content = <Dnd.Handle aria-label={label} />;
   }
-  return <td className={cx(className, styles.handleCell)}>{content}</td>;
+  return <td className={cx(className, styles.handleCell)}>{wrap ? wrap(content) : content}</td>;
 }

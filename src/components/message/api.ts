@@ -261,6 +261,19 @@ export const api: ComponentApi = {
       ],
     },
     {
+      name: "Message.Actions",
+      en: "`ref` → `HTMLDivElement`. A row of a bot's inline keyboard under the bubble: `Button.Root` children share it equally at the message's width (the bubble widens to it). Several make several rows; such a message has no tail.",
+      ru: "Ряд встроенной клавиатуры бота под пузырём: дети `Button.Root` делят его поровну по ширине сообщения (пузырь расширяется до неё). Несколько частей — несколько рядов; у такого сообщения нет хвостика.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement>",
+          en: '`children` — the `Button.Root`s of the row (`variant="soft" tone="neutral"`, `asChild` for a link); `className`.',
+          ru: '`children` — `Button.Root` ряда (`variant="soft" tone="neutral"`, `asChild` для ссылки); `className`.',
+        },
+      ],
+    },
+    {
       name: "Message.Menu",
       en: "`ref` → `HTMLDivElement`. The context menu: a `Dropdown.Content` of the `Dropdown.Item`s you write; the kit adds «Выбрать» when the chat has a selection. Opens on right click, long press and from the keyboard.",
       ru: "Контекстное меню: `Dropdown.Content` из ваших `Dropdown.Item`; кит добавляет «Выбрать», если у чата есть выбор. Открывается по правому клику, долгому нажатию и с клавиатуры.",
@@ -421,6 +434,12 @@ export const api: ComponentApi = {
       default: "Все реакции",
       en: "The «⌄» of the reaction bar that shows every reaction.",
       ru: "Кнопка «⌄» панели реакций, которая показывает все реакции.",
+    },
+    {
+      key: "spoiler",
+      default: "Скрытый текст",
+      en: "`Message.Text`: the name of a `||spoiler||` while it is hidden.",
+      ru: "`Message.Text`: имя `||спойлера||`, пока он скрыт.",
     },
     {
       key: "typing",

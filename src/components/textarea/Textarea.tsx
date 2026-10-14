@@ -14,10 +14,15 @@ import { type FieldCommitHandler, FieldCommitStatus, useFieldCommit } from "@/in
 import { FieldCounter, FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
+import { TEXT_FORMATTING_LABELS, type TextFormattingLabels } from "@/internal/textFormatting";
+import { useTextFormatting } from "@/internal/textFormattingToolbar";
 
 import styles from "./Textarea.module.css";
 
-export type TextareaLabels = {
+export type { TextFormat } from "@/internal/textFormatting";
+
+/** Every built-in string; the formatting toolbar's names are shared with Composer. */
+export type TextareaLabels = TextFormattingLabels & {
   /** Muted marker after the label when `optional`. */
   optional: string;
   /** Screen-reader text of `Textarea.Counter`; `{current}` and `{max}` are replaced. */
@@ -42,6 +47,7 @@ const TEXTAREA_LABELS: TextareaLabels = {
   copyError: "Не удалось скопировать",
   saving: "Сохранение",
   saved: "Сохранено",
+  ...TEXT_FORMATTING_LABELS,
 };
 
 const [TextareaProvider, useTextareaContext] = createComponentContext<{
@@ -96,6 +102,12 @@ export type TextareaRootProps = Omit<
   maxRows?: number;
   /** Called with the new string value; native `onChange` still fires. */
   onValueChange?: (value: string) => void;
+  /**
+   * Markdown formatting, as in Composer: selecting text shows a floating toolbar (bold, italic,
+   * strikethrough, code, spoiler, link, quote) and enables the hotkeys; each writes Markdown around
+   * the selection.
+   */
+  formatting?: boolean;
   labels?: Partial<TextareaLabels>;
   /** The native `<textarea>`. */
   ref?: React.Ref<HTMLTextAreaElement>;
@@ -130,7 +142,9 @@ function TextareaRoot({
   onFocus,
   onBlur,
   onKeyDown,
+  onSelect,
   onCommit,
+  formatting = false,
   labels: labelsProp,
   "aria-describedby": ariaDescribedBy,
   children,
@@ -152,6 +166,14 @@ function TextareaRoot({
   const hasCommit = onCommit !== undefined;
   const commit = useFieldCommit(innerRef, onCommit);
   const hasEdge = hasCommit || React.Children.count(children) > 0;
+  const format = useTextFormatting({
+    textareaRef: innerRef,
+    enabled: formatting,
+    toolbar: !disabled && !readOnly,
+    labels,
+    size,
+    controlsId: ids.controlId,
+  });
 
   // The auto-resize mirror copies the text; sync it on mount and on controlled value changes.
   React.useLayoutEffect(() => {
@@ -201,9 +223,14 @@ function TextareaRoot({
         onBlur?.(event);
         if (hasCommit) commit.commit();
       }}
+      onSelect={(event) => {
+        onSelect?.(event);
+        format.onSelect();
+      }}
       onKeyDown={(event) => {
         onKeyDown?.(event);
-        if (!hasCommit || event.defaultPrevented || event.nativeEvent.isComposing) return;
+        if (event.defaultPrevented || format.onKeyDown(event)) return;
+        if (!hasCommit || event.nativeEvent.isComposing) return;
         if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
           event.preventDefault();
           commit.commit();
@@ -219,6 +246,40 @@ function TextareaRoot({
     </div>
   ) : (
     textarea
+  );
+
+  const control = (
+    // biome-ignore lint/a11y/noStaticElementInteractions: pointer convenience only; the textarea itself is the focus target
+    <div
+      className={cx(fieldSurfaceClass, styles.control)}
+      onMouseDown={focusFromPadding}
+      style={
+        {
+          "--textarea-rows": rows,
+          "--textarea-max-rows": maxRows,
+        } as React.CSSProperties
+      }
+      {...toDataAttributes({
+        size,
+        invalid: ids.invalid || undefined,
+        disabled: disabled || undefined,
+        readonly: readOnly || undefined,
+        "focus-ring": focusRing ? undefined : false,
+        capped: (autoResize && maxRows !== undefined) || undefined,
+      })}
+    >
+      {hasEdge ? (
+        <>
+          <div className={styles.body}>{body}</div>
+          <div className={styles.edge}>
+            {hasCommit ? <FieldCommitStatus state={commit.state} labels={labels} /> : null}
+            {children}
+          </div>
+        </>
+      ) : (
+        body
+      )}
+    </div>
   );
 
   return (
@@ -238,37 +299,15 @@ function TextareaRoot({
           optionalLabel={labels.optional}
           className={cx(fieldTierClass, styles.root, className)}
         >
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer convenience only; the textarea itself is the focus target */}
-          <div
-            className={cx(fieldSurfaceClass, styles.control)}
-            onMouseDown={focusFromPadding}
-            style={
-              {
-                "--textarea-rows": rows,
-                "--textarea-max-rows": maxRows,
-              } as React.CSSProperties
-            }
-            {...toDataAttributes({
-              size,
-              invalid: ids.invalid || undefined,
-              disabled: disabled || undefined,
-              readonly: readOnly || undefined,
-              "focus-ring": focusRing ? undefined : false,
-              capped: (autoResize && maxRows !== undefined) || undefined,
-            })}
-          >
-            {hasEdge ? (
-              <>
-                <div className={styles.body}>{body}</div>
-                <div className={styles.edge}>
-                  {hasCommit ? <FieldCommitStatus state={commit.state} labels={labels} /> : null}
-                  {children}
-                </div>
-              </>
-            ) : (
-              body
-            )}
-          </div>
+          {formatting ? (
+            // The toolbar floats over the box; the box clips its corner actions, so it cannot hold it.
+            <div className={styles.anchor} {...format.anchorProps}>
+              {control}
+              {format.toolbar}
+            </div>
+          ) : (
+            control
+          )}
         </FieldFrame>
       </ControlSizeProvider>
     </TextareaProvider>

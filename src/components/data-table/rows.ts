@@ -98,13 +98,16 @@ export type FlatRow<Row> = {
   expanded: boolean;
   /** Mounted by the latest expand, or newly added to `rows`: plays the enter animation. */
   animate: boolean;
-  /** A sub-row of a row that is collapsing: still drawn while it folds away. */
+  /** A row of a collapsing parent or group: still drawn while it folds away. */
   folding: boolean;
-  /** Top-level row that opens a group on screen (`groupOf`): the group's key. */
-  groupStart?: string | number;
+  /** The row folds open and shut: a sub-row, or a row of a collapsible group. */
+  foldable: boolean;
 };
 
 export type MeasureRow<Row> = { row: Row; key: React.Key; depth: number };
+
+/** A run of rows of one group on screen: its key and the range of its rows in `rows`. */
+export type GroupRun = { key: string | number; start: number; end: number };
 
 export type FlattenOptions<Row> = {
   /** Top-level rows in `[start, end)` are rendered; the rest only contribute keys. */
@@ -127,8 +130,16 @@ export type FlattenOptions<Row> = {
   lastExpandedKey: React.Key | null;
   /** Collect every key of the data (all pages, all depths) for «select all». */
   collectKeys: boolean;
-  /** Group key of a top-level row: the first rendered row of each group run opens it. */
+  /** Group key of a top-level row: consecutive rows of one group on screen make a run. */
   groupOf?: (row: Row) => string | number;
+  /** Groups fold (`collapsedGroups`): their rows fold open and shut. */
+  foldGroups?: boolean;
+  /** Collapsed groups: their rows are not drawn (only measured for the column widths). */
+  collapsedGroups?: ReadonlySet<string | number>;
+  /** Groups collapsed a moment ago: their rows stay drawn (folding) until the fold ends. */
+  closingGroups?: ReadonlySet<string | number>;
+  /** Group whose latest expand mounted its rows: they fold open. */
+  openedGroup?: string | number | null;
 };
 
 export type Flattened<Row> = {
@@ -141,6 +152,8 @@ export type Flattened<Row> = {
   measure: MeasureRow<Row>[];
   /** Every row id in the data: the scope of «select all» (empty without `collectKeys`). */
   keys: React.Key[];
+  /** Group runs on screen in order (`groupOf`); a collapsed group's run holds no rows. */
+  runs: GroupRun[];
 };
 
 /**
@@ -149,7 +162,7 @@ export type Flattened<Row> = {
  */
 export function flatten<Row>(data: Row[], options: FlattenOptions<Row>): Flattened<Row> {
   const { getRowKey, getRowChildren, sortColumn, order, expanded, arrived } = options;
-  const result: Flattened<Row> = { rows: [], measure: [], keys: [] };
+  const result: Flattened<Row> = { rows: [], measure: [], keys: [], runs: [] };
 
   const childrenOf = (row: Row): Row[] => {
     const list = getRowChildren?.(row) ?? [];
@@ -192,6 +205,7 @@ export function flatten<Row>(data: Row[], options: FlattenOptions<Row>): Flatten
       expanded: isExpanded,
       animate,
       folding: parentFolding,
+      foldable: depth > 0 || Boolean(options.foldGroups),
     });
     if (options.collectKeys) result.keys.push(key);
 
@@ -210,20 +224,27 @@ export function flatten<Row>(data: Row[], options: FlattenOptions<Row>): Flatten
     });
   };
 
-  let previousGroup: { key: string | number } | null = null;
+  let run: GroupRun | undefined;
   data.forEach((row, index) => {
     const key = keyOf(row, index, null);
     if (index >= options.start && index < options.end) {
-      const at = result.rows.length;
-      visit(row, key, 0, false, false);
-      if (options.groupOf) {
-        const group = options.groupOf(row);
-        const first = result.rows[at];
-        if (first && (previousGroup === null || previousGroup.key !== group)) {
-          first.groupStart = group;
-        }
-        previousGroup = { key: group };
+      const group = options.groupOf?.(row);
+      if (group !== undefined && run?.key !== group) {
+        run = { key: group, start: result.rows.length, end: result.rows.length };
+        result.runs.push(run);
       }
+      const closing = group !== undefined && Boolean(options.closingGroups?.has(group));
+      if (group !== undefined && !closing && options.collapsedGroups?.has(group)) {
+        // A collapsed group's row: measured for the column widths, counted for «select all».
+        result.measure.push({ row, key, depth: 0 });
+        if (options.collectKeys) {
+          result.keys.push(key);
+          collect(childrenOf(row), key);
+        }
+      } else {
+        visit(row, key, 0, group !== undefined && options.openedGroup === group, closing);
+      }
+      if (run) run.end = result.rows.length;
     } else if (options.collectKeys) {
       result.keys.push(key);
       collect(childrenOf(row), key);

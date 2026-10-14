@@ -45,6 +45,12 @@ export const page: ComponentPageConfig = {
         "Карточка записи: статус и меню ⋯ стоят в шапке перед крестиком, на ярус меньше — `Drawer.Actions`.",
     },
     {
+      scenario: "client-card",
+      title: "Аватар в шапке",
+      description:
+        "Карточка клиента из списка: аватар контакта стоит в шапке вместо плашки с иконкой, ниже — реквизиты — `Drawer.Icon`, `Avatar.Root`.",
+    },
+    {
       scenario: "guard",
       title: "Удержание формы",
       description:

@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 **A calm, precise React 19 UI kit for product interfaces** — admin panels, dashboards, settings, forms
-and data tables. 78 components on one design contract, one API vocabulary and one set of tokens, so
+and data tables. 79 components on one design contract, one API vocabulary and one set of tokens, so
 every screen you build looks like it was drawn by the same hand.
 
 - **Graphite design language.** Depth from fill, not lines — a surface ladder where every nested
@@ -249,6 +249,7 @@ accessibility, examples and common mistakes.
 | [**VoicePlayer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/voice-player/COMPONENT.md) | A voice message player: a round play disk, a waveform that is the seek slider, and the time with the playback speed; one sound at a time, `getWaveform` for audio without levels. |
 | [**VideoNote**](https://github.com/esurkov1/prime-ui/blob/main/src/components/video-note/COMPONENT.md) | A round video message: a still first frame with the play disk, played with sound on a press; the same player API as VoicePlayer — transcript, transfer either way, one sound at a time. |
 | [**Composer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/composer/COMPONENT.md) | The message input of a chat: a growing field, Enter to send, attachments, reply / edit bar, Markdown formatting, voice and video messages with pause, the typing signal. |
+| [**ChatList**](https://github.com/esurkov1/prime-ui/blob/main/src/components/chat-list/COMPONENT.md) | The conversation list of a messenger: avatars with presence, names, times, the last message with its author or media word, unread / muted / mention counts, typing and drafts, a row menu, search, rows that glide to a new order, long lists rendered around the view. |
 
 ### Status and loading (`status`)
 
@@ -337,6 +338,7 @@ accessibility, examples and common mistakes.
 | `getPasswordStrength(value)` | The kit's 0–4 password estimate behind `Input.Root strength`; replace it with `getStrength`. |
 | `useUploadQueue({ upload, concurrency })` | The upload queue behind FileUpload `queue`: your `upload(file, { signal, onProgress })` runs a few at a time, with progress, abort on remove and retry. |
 | `groupMessages`, `formatMessageDate`, `formatMessageTime`, `hueOf` | Chat data → dated runs of one author (`Chat.Messages items` runs it for you), the date and time labels, and a palette hue stable per person. |
+| `formatChatTime(date, now)` | The time of a dialog's last message as `ChatList` shows it: «14:32» today, «пн» this week, «12 мар», «12.03.2025». |
 | `getWaveform` | The 0…1 levels of a recorded voice message (a `Blob` or a URL) for `VoicePlayer waveform`, decoded with the Web Audio API. |
 | `moveBefore(items, id, beforeId, getId)` | Applies a `Dnd` or DataTable `onReorder` to your array. |
 | `matchesSmartFilter`, `resolveSmartFilterValues` | Apply a SmartFilter value to your rows. |

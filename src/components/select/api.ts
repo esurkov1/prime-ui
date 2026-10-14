@@ -29,9 +29,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onValueChange",
-          type: "(value: string) => void | (value: string[]) => void",
-          en: 'Called with the picked value (`""` after clearing), or the new list with `multiple`.',
-          ru: 'Вызывается с выбранным значением (`""` после очистки) или новым списком при `multiple`.',
+          type: "(value: string) => void | Promise<void> · (value: string[]) => void | Promise<void>",
+          en: 'The picked value (`""` after clearing) or, with `multiple`, the new list. A promise: the value shows at once with a trigger Spinner, picks wait; reject rolls back and announces `labels.changeFailed`.',
+          ru: 'Выбранное значение (`""` после очистки) или новый список при `multiple`. Обещание: значение встаёт сразу со спиннером, выборы ждут; отказ возвращает прежнее и объявляет `labels.changeFailed`.',
         },
         {
           name: "multiple",
@@ -273,8 +273,8 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "Items, groups, separators.",
-          ru: "Пункты, группы, разделители.",
+          en: "Items, groups, separators; `Select.Action` children stand under the list.",
+          ru: "Пункты, группы, разделители; `Select.Action` встаёт под списком.",
         },
         {
           name: "…rest",
@@ -356,6 +356,40 @@ export const api: ComponentApi = {
         },
       ],
     },
+    {
+      name: "Select.Action",
+      en: '`ref` → `HTMLDivElement`. A list-level action («Новый клиент»), a direct child of `Select.Content`: a `role="option"` row pinned under the list, never filtered, the last stop of the arrows; highlighted while the search finds nothing.',
+      ru: "Действие уровня списка («Новый клиент»), прямой ребёнок `Select.Content`: строка под прокруткой (и под пустым состоянием), поиск её не фильтрует, стрелки доходят до неё после последнего пункта. Когда поиск ничего не нашёл, подсветка встаёт на неё — Enter запускает действие.",
+      props: [
+        {
+          name: "onSelect",
+          type: "() => void",
+          required: true,
+          en: "Runs the action: a click, or Enter / Space while it is highlighted; the list then closes and the value stays.",
+          ru: "Запускает действие: клик или Enter / Space на подсвеченной строке; затем список закрывается, значение не меняется.",
+        },
+        {
+          name: "disabled",
+          type: "boolean",
+          default: "false",
+          en: "Muted, skipped by the keyboard, not runnable.",
+          ru: "Приглушено, клавиатура пропускает, не запускается.",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "The action text; an optional `Select.ItemIcon` in front.",
+          ru: "Текст действия; при необходимости `Select.ItemIcon` перед ним.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "onSelect" | "role" | "id" | "children">',
+          en: "`className` and the other attributes of the row.",
+          ru: "`className` и остальные атрибуты строки.",
+        },
+      ],
+    },
   ],
   labels: [
     {
@@ -399,6 +433,12 @@ export const api: ComponentApi = {
       default: "необязательно",
       en: "Muted marker after the label when `optional`.",
       ru: "Приглушённая пометка после подписи при `optional`.",
+    },
+    {
+      key: "changeFailed",
+      default: "Не удалось сохранить выбор",
+      en: "Announced when the `onValueChange` promise rejects and the value rolls back.",
+      ru: "Объявляется, когда обещание из `onValueChange` отклонено и значение вернулось.",
     },
   ],
 };

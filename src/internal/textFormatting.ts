@@ -1,19 +1,56 @@
 /**
- * Markdown formatting of a plain-text message (the Composer's toolbar and hotkeys): pure functions
- * over the text and its selection, so the component only applies the result to its textarea.
+ * Markdown formatting of a plain text (the formatting toolbar and hotkeys of Composer and Textarea,
+ * `useTextFormatting`): pure functions over the text and its selection, so a component only applies
+ * the result to its textarea. `internal/richText` renders the same subset.
  */
 
 /** A formatting command: what the toolbar button or the hotkey applies to the selection. */
-export type ComposerFormat = "bold" | "italic" | "strikethrough" | "code" | "link" | "quote";
+export type TextFormat =
+  | "bold"
+  | "italic"
+  | "strikethrough"
+  | "code"
+  | "spoiler"
+  | "link"
+  | "quote";
+
+/** Names of the formatting toolbar and of its tools, one per format. */
+export type TextFormattingLabels = Record<TextFormat, string> & {
+  /** Accessible name of the formatting toolbar. */
+  formatting: string;
+};
+
+export const TEXT_FORMATTING_LABELS: TextFormattingLabels = {
+  formatting: "Форматирование",
+  bold: "Жирный",
+  italic: "Курсив",
+  strikethrough: "Зачёркнутый",
+  code: "Моноширинный",
+  spoiler: "Скрытый текст",
+  link: "Ссылка",
+  quote: "Цитата",
+};
+
+/** Every format in toolbar order. */
+export const TEXT_FORMATS: readonly TextFormat[] = [
+  "bold",
+  "italic",
+  "strikethrough",
+  "code",
+  "spoiler",
+  "link",
+  "quote",
+];
 
 /** Text with its selection, `start <= end` (a caret when equal). */
 export type TextSelection = { text: string; start: number; end: number };
 
-const MARKERS: Record<"bold" | "italic" | "strikethrough" | "code", string> = {
+const MARKERS: Record<"bold" | "italic" | "strikethrough" | "code" | "spoiler", string> = {
   bold: "**",
   italic: "_",
   strikethrough: "~~",
   code: "`",
+  spoiler: "||",
 };
 
 const FENCE = "```";
@@ -101,7 +138,7 @@ function toggleQuote({ text, start, end }: TextSelection): TextSelection {
 }
 
 /** The text and selection after `format` is applied to the selection. */
-export function applyFormat(selection: TextSelection, format: ComposerFormat): TextSelection {
+export function applyFormat(selection: TextSelection, format: TextFormat): TextSelection {
   switch (format) {
     case "link":
       return insertLink(selection);
@@ -141,7 +178,11 @@ export function diffRange(
   };
 }
 
-/** The format a key press asks for: Mod+B · Mod+I · Mod+Shift+X · Mod+E · Mod+K · Mod+Shift+9. */
+/**
+ * The format a key press asks for: Mod+B · Mod+I · Mod+Shift+X · Mod+E · Mod+Shift+H · Mod+K ·
+ * Mod+Shift+9. The spoiler is not Telegram's Mod+Shift+P: Firefox and Edge reserve it for a private
+ * window and never hand it to the page.
+ */
 export function formatForKey(event: {
   key: string;
   code: string;
@@ -149,7 +190,7 @@ export function formatForKey(event: {
   ctrlKey: boolean;
   shiftKey: boolean;
   altKey: boolean;
-}): ComposerFormat | null {
+}): TextFormat | null {
   if (!(event.metaKey || event.ctrlKey) || event.altKey) return null;
   // `code` is the physical key: the shortcut works on any layout (Russian «и» is KeyB).
   const shift = event.shiftKey;
@@ -162,6 +203,8 @@ export function formatForKey(event: {
       return shift ? "strikethrough" : null;
     case "KeyE":
       return shift ? null : "code";
+    case "KeyH":
+      return shift ? "spoiler" : null;
     case "KeyK":
       return shift ? null : "link";
     case "Digit9":
@@ -172,17 +215,18 @@ export function formatForKey(event: {
 }
 
 /** Shortcut of every format, by modifier names: rendered as `⌘B` on Apple systems, `Ctrl+B` elsewhere. */
-export const FORMAT_SHORTCUTS: Record<ComposerFormat, { shift: boolean; key: string }> = {
+export const FORMAT_SHORTCUTS: Record<TextFormat, { shift: boolean; key: string }> = {
   bold: { shift: false, key: "B" },
   italic: { shift: false, key: "I" },
   strikethrough: { shift: true, key: "X" },
   code: { shift: false, key: "E" },
+  spoiler: { shift: true, key: "H" },
   link: { shift: false, key: "K" },
   quote: { shift: true, key: "9" },
 };
 
 /** `⌘⇧X` on Apple systems, `Ctrl+Shift+X` elsewhere. */
-export function shortcutText(format: ComposerFormat, apple: boolean): string {
+export function shortcutText(format: TextFormat, apple: boolean): string {
   const { shift, key } = FORMAT_SHORTCUTS[format];
   if (apple) return `⌘${shift ? "⇧" : ""}${key}`;
   return `Ctrl+${shift ? "Shift+" : ""}${key}`;

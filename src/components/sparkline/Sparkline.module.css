@@ -193,6 +193,31 @@
   cursor: default;
 }
 
+/*
+ * Compact (`layout="compact"`): the plot alone for a table cell or a list row. Plot and dot fit the
+ * height of an `xs` control (the dot's radius is room above and below the plot), so a DataTable row
+ * of any tier keeps its height. The dot stays on the point at rest; the guide line shows only while
+ * scrubbing. A cell sized by its content still gets a readable plot (`min-inline-size`).
+ */
+.root[data-layout="compact"] {
+  min-inline-size: var(--prime-space-24);
+}
+
+.root[data-layout="compact"] .plot {
+  --sparkline-h: calc(var(--prime-control-xs-height) - var(--sparkline-dot));
+
+  margin-block: calc(var(--sparkline-dot) / 2);
+}
+
+.root[data-layout="compact"] .guide {
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-layout="compact"][data-scrubbing] .guide {
+  opacity: 1;
+}
+
 /* Loading: the date, the value line and the plot as Skeletons of their own geometry. */
 .dateSkeleton {
   width: calc(var(--prime-space-16) * 1);
@@ -210,4 +235,10 @@
   min-height: 0;
   margin-block-start: var(--prime-space-2);
   border-radius: var(--prime-radius-s);
+}
+
+/* Compact loading: the plot Skeleton at the compact plot's height. */
+.root[data-layout="compact"] .plotSkeleton {
+  height: var(--prime-control-xs-height);
+  margin-block-start: 0;
 }

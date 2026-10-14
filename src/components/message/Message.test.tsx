@@ -5,6 +5,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
+import { Button } from "@/components/button/Button";
 import { ChatSeparator, ChatService, ChatUnread } from "@/components/chat/ChatRows";
 import { ChatSelectionBar, MessageList } from "@/components/chat/MessageList";
 import { Dropdown } from "@/components/dropdown/Dropdown";
@@ -542,6 +543,55 @@ describe("Message", () => {
     expect(article).toHaveFocus();
     await userEvent.keyboard("{Shift>}{F10}{/Shift}");
     expect(await screen.findByRole("menuitem", { name: "Ответить" })).toBeInTheDocument();
+  });
+
+  it("puts an inline keyboard under the bubble: rows in order, Tab reaches each button, no tail", async () => {
+    const onConfirm = vi.fn();
+    render(
+      <Chat>
+        <Message.Root value="bot" time="15:02">
+          <Message.Actions data-testid="row-1">
+            <Button.Root variant="soft" tone="neutral" onClick={onConfirm}>
+              Подтвердить заказ
+            </Button.Root>
+            <Button.Root variant="soft" tone="neutral">
+              Изменить
+            </Button.Root>
+          </Message.Actions>
+          <Message.Text>Заказ № 4821 собран.</Message.Text>
+          <Message.Actions data-testid="row-2">
+            <Button.Root variant="soft" tone="neutral" asChild>
+              <a href="https://vector.example/invoices/4821">Открыть счёт</a>
+            </Button.Root>
+          </Message.Actions>
+        </Message.Root>
+      </Chat>,
+    );
+    const message = screen.getByRole("article");
+    const bubble = message.querySelector("[data-message-bubble]") as HTMLElement;
+    const rows = [screen.getByTestId("row-1"), screen.getByTestId("row-2")];
+    // Both rows stand after the bubble, in the column, in the order written.
+    for (const row of rows) {
+      expect(row.parentElement).toBe(bubble.parentElement);
+      expect(bubble.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(bubble.contains(row)).toBe(false);
+    }
+    expect(rows[0]?.compareDocumentPosition(rows[1] as Node)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(bubble.parentElement).toHaveAttribute("data-actions");
+    expect(bubble).not.toHaveAttribute("data-tail");
+    // The keyboard: Tab goes from the message to each button, then to the link.
+    await userEvent.tab();
+    expect(message).toHaveFocus();
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "Подтвердить заказ" })).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "Изменить" })).toHaveFocus();
+    await userEvent.tab();
+    expect(screen.getByRole("link", { name: "Открыть счёт" })).toHaveFocus();
   });
 
   it("moves between messages with the arrows and keeps one tab stop", async () => {

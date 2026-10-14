@@ -30,7 +30,7 @@ Drawer.Root                    state and dismiss policy (no DOM)
 └─ Drawer.Content              portal + scrim + role="dialog" panel at the side
    ├─ Drawer.Guard             no DOM: holds the drawer (busy / dirty) from inside
    ├─ Drawer.Header            grid: [Icon] [Title + Description] [Actions] [close Button]
-   │  ├─ Drawer.Icon
+   │  ├─ Drawer.Icon           tone tile around an Icon, or an Avatar.Root / Thumbnail.Root with no tile
    │  ├─ Drawer.Title          <h2>
    │  ├─ Drawer.Description    <p>
    │  └─ Drawer.Actions        row of tier-s controls before the close button
@@ -82,12 +82,12 @@ No DOM, no ref. State and dismiss policy.
 `ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`. + native `<div>` props.
 
 ### Drawer.Icon
-`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill.
+`ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around an `Avatar.Root` or a `Thumbnail.Root` (the record's picture) no tile — `data-media`, the avatar sized to 40 px.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color. |
-| `children` | `ReactNode` | — (required) | Icon glyph (sized to the m icon). |
+| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color; not used around a picture. |
+| `children` | `ReactNode` | — (required) | An icon glyph (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Drawer.Title · Drawer.Description
@@ -146,7 +146,7 @@ Below 640px of viewport every size is full width and loses its corners.
 | `fill` | equal-width buttons in one row | one full-width action («Понятно») | |
 
 ### tone (Icon)
-`neutral` (default) · `accent` · `success` · `warning` · `danger` · `info` — soft tile fill and icon color, as in Modal.
+`neutral` (default) · `accent` · `success` · `warning` · `danger` · `info` — soft tile fill and icon color, as in Modal. Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` (found by element type) — there is no tile and no tone: `data-media`, the avatar sized to 40 px, so a person's or an object's card shows its picture in the header.
 
 ## States
 | State | Driven by | DOM |
@@ -206,6 +206,7 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 | [sizes.tsx](examples/sizes.tsx) | Every panel width, 360 to 800 px; below 640 px of viewport the panel takes the full width — `size`. |
 | [placement.tsx](examples/placement.tsx) | The panel slides from the right for details and from the left for filters, rounded only on the edge facing the page — `side`. |
 | [header-actions.tsx](examples/header-actions.tsx) | A record card: its status and a ⋯ menu sit in the header before the close button, one tier smaller — `Drawer.Actions`. |
+| [client-card.tsx](examples/client-card.tsx) | A client card from the list: the contact's avatar heads the panel in place of an icon tile, then the details — `Drawer.Icon`, `Avatar.Root`. |
 | [guard.tsx](examples/guard.tsx) | A form that holds the drawer from inside: after an edit Escape, the scrim and Cancel ask before discarding, the footer says so, and saving locks every way out — `Drawer.Guard`, `Drawer.Meta`. |
 | [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Drawer.Body`. |
 | [dismiss.tsx](examples/dismiss.tsx) | An import closes only from its buttons, and not at all while it runs — `closeOnOutsideClick`, `closeOnEscape`. |
@@ -226,4 +227,4 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Drawer.Body`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Drawer.Guard` discard confirm), `Icon` (the close glyph)
-- **See also:** [Modal](../modal/COMPONENT.md) (the same header, body, footer and `Guard` in the centre), [Sheet](../sheet/COMPONENT.md) (the same parts raised from the bottom edge for a short task), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm), [Sidebar](../../layout/sidebar/COMPONENT.md), [Popover](../popover/COMPONENT.md)
+- **See also:** [Modal](../modal/COMPONENT.md) (the same header, body, footer and `Guard` in the centre), [Sheet](../sheet/COMPONENT.md) (the same parts raised from the bottom edge for a short task), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm), [Sidebar](../../layout/sidebar/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Avatar](../avatar/COMPONENT.md) (a person's picture in `Drawer.Icon`)

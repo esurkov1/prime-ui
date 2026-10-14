@@ -6,6 +6,7 @@ import {
   fieldCommitProp,
   fieldCopyPart,
 } from "../../internal/field.api";
+import { formattingProp, TEXT_FORMATTING_LABEL_ROWS } from "../../internal/textFormatting.api";
 
 export const api: ComponentApi = {
   parts: [
@@ -118,6 +119,7 @@ export const api: ComponentApi = {
           ru: "Добавляется перед id подсказки и ошибки.",
         },
         fieldCommitProp({ en: "Mod+Enter", ru: "Mod+Enter" }),
+        formattingProp("false"),
         {
           name: "children",
           type: "ReactNode",
@@ -194,5 +196,6 @@ export const api: ComponentApi = {
     },
     ...FIELD_COPY_LABELS,
     ...FIELD_COMMIT_LABELS,
+    ...TEXT_FORMATTING_LABEL_ROWS,
   ],
 };

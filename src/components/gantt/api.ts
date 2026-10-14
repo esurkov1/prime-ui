@@ -50,6 +50,24 @@ export const api: ComponentApi = {
           ru: "Картинка перед содержимым строки (`Avatar`). Уже 36rem ширины графика колонка оставляет только её; имя остаётся для вспомогательных технологий.",
         },
         {
+          name: "getRowHref",
+          type: "(row: Row) => string",
+          en: "The row header is a link: a real `<a>` fills the first column and is the row's stop in the grid, so a click, ⌘/Ctrl-click, a middle click and «open in new tab» work on it; Space follows it like Enter.",
+          ru: "Заголовок строки — ссылка: настоящий `<a>` заполняет первую колонку и служит её остановкой в сетке; работают клик, ⌘/Ctrl-клик, средняя кнопка и новая вкладка, Space — как Enter.",
+        },
+        {
+          name: "onRowClick",
+          type: "(row: Row, event: GanttRowClickEvent) => void",
+          en: "Opens a row in place (a profile in a Drawer): a click on its header, Enter or Space; never from a control inside it. With `getRowHref` it gets plain clicks: `event.preventDefault()` routes in the app.",
+          ru: "Открывает строку на месте (профиль в Drawer): клик по заголовку, Enter или Space; не от контрола внутри. С `getRowHref` получает обычные клики: `event.preventDefault()` — переход роутером приложения.",
+        },
+        {
+          name: "renderBarTooltip",
+          type: "(bar: Bar, row: Row) => ReactNode",
+          en: "Extra lines of a bar's tooltip (a client, hours, an owner), under its title and the dates line — those always stay, the dates and the duration are what the bar means on the axis.",
+          ru: "Дополнительные строки подсказки полосы (клиент, часы, ответственный) — под её названием и строкой дат; они остаются всегда: даты и длительность — то, что полоса значит на шкале.",
+        },
+        {
           name: "scale",
           type: SCALE,
           en: "Zoom, controlled: a column per day (months over days), per week (months over weeks) or per month (years over months).",

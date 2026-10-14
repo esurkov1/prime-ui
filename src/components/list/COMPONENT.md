@@ -8,6 +8,7 @@
 ## When to use
 - The list side of a list + detail screen (`PageContent.Split` → `PageContent.List`): dialogs, tickets, letters, invoices worked through one by one; the open one is `current`.
 - A short column of records that each open something — a page (`href`, `asChild` with a router link) or a detail pane (`onClick`).
+- A short list the team puts in order (funnel stages, queues, priorities) — `onReorder`, a `value` per item.
 
 ## When not to use
 - App sections → use [Sidebar](../../layout/sidebar/COMPONENT.md) (wide) and [BottomNav](../../layout/bottom-nav/COMPONENT.md) (phone).
@@ -23,8 +24,9 @@ import { List } from "prime-ui-kit";
 
 ## Anatomy
 ```
-List.Root                   <ul aria-label>; size → row tier (ControlSizeProvider)
+List.Root                   <ul aria-label>; size → row tier (ControlSizeProvider); onReorder → Dnd.Sortable <ul>
 └─ List.Item                <li> with a full-width <button> | <a href> | asChild element; current, disabled
+   │                         value; with onReorder: Dnd.Handle (or a Spinner while saving) before the row element
    ├─ List.ItemIcon         leading Avatar.Root / Icon (aria-hidden); after the text — a trailing glyph
    ├─ List.ItemText         primary line, truncates
    ├─ List.ItemDescription  second line, muted, truncates
@@ -42,6 +44,8 @@ List.Root                   <ul aria-label>; size → row tier (ControlSizeProvi
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: height, text, icon and avatar size; counts take one tier down. |
+| `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — | Rows reorder by a leading handle (drag, touch hold, Alt + ↑ / ↓): item `value` `id` goes before `beforeId` (`null` = last). Apply with `moveBefore`; a returned promise keeps the row busy, a rejection moves it back. |
+| `labels` | `Partial<ListLabels>` | — | Built-in strings, see Labels. |
 | `aria-label` | `string` | — | Name of the list for screen readers («Диалоги»), when no visible heading names it. |
 | `children` | `ReactNode` | — | `List.Item`s. |
 | `…rest` | `HTMLAttributes<HTMLUListElement>` | — | `className` and the other `ul` attributes. |
@@ -51,6 +55,7 @@ List.Root                   <ul aria-label>; size → row tier (ControlSizeProvi
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `value` | `string` | — | Stable id of the row; required in a reorderable list (`onReorder` reports it). |
 | `current` | `boolean` | `false` | The open record: the selected fill and `aria-current` — `"true"` on a button, `"page"` on a link. |
 | `onClick` | `(event: MouseEvent<HTMLButtonElement>) => void` | — | Opens the record; not called while `disabled`. |
 | `href` | `string` | — | Renders an `<a>` instead of a `<button>`; dropped while `disabled`. |
@@ -128,7 +133,9 @@ A second line or an avatar makes a row taller than the one-line height; the vert
 | pressed | `:active` | `fill-subtle-active` |
 | current | `current` | `aria-current="true"` (button) or `"page"` (link); `fill-muted-hover` fill, primary text |
 | focus-visible | keyboard | the focus ring inside the row edge |
-| disabled | `disabled` | `disabled` on a button; `aria-disabled="true"`, no `href` on a link, `tabindex="-1"` on an `asChild` element; `data-disabled="true"`; disabled text |
+| disabled | `disabled` | `disabled` on a button; `aria-disabled="true"`, no `href` on a link, `tabindex="-1"` on an `asChild` element; `data-disabled="true"`; disabled text; in a reorderable list the handle is disabled and the row holds its place |
+| reorderable | `onReorder` | `data-reorderable="true"` on the root (a `Dnd.Sortable` `<ul>`); each `<li>` is a sortable item (`data-dnd-item` = `value`) with a leading `Dnd.Handle`; drag by the handle (a touch hold on touch), Alt + ↑ / ↓ from the handle or the row; a lifted row leaves a dashed gap, its neighbours glide, the copy follows the pointer and sets down in its new place |
+| saving a move | `onReorder` returned a pending promise | the row stays in its new place, `aria-busy="true"`, a `Spinner` stands in for the handle, the row content dims to 0.6 (`--prime-motion-duration-fast` both ways); a rejection glides the row back |
 
 Root attribute: `data-size`. The fill changes on `background-color` with `--prime-motion-duration-xfast` both ways (0 under reduced motion).
 
@@ -138,6 +145,7 @@ Root attribute: `data-size`. The fill changes on `background-color` with `--prim
 - Row: leading icon · body (text over description) · trail. Beside two lines the trail stacks — meta on top, count below; beside one line they sit in a row.
 - Text and description truncate with an ellipsis; give a long `List.ItemText` a `title` with the full text.
 - On a coarse pointer a row is at least the touch target (44px).
+- Reorderable (`onReorder`): an `xs` handle box sits before each row, 4px from it; the row keeps its own padding and fill.
 
 ## Accessibility
 
@@ -146,17 +154,21 @@ Root attribute: `data-size`. The fill changes on `background-color` with `--prim
 |---|---|
 | `Tab` | Moves focus between rows; a disabled row is skipped. |
 | `Enter` · `Space` | Opens the record; a link row takes Enter only. |
+| `Alt + ↑` · `Alt + ↓` | With `onReorder`, moves the row one place up or down (from its handle or the row). |
 
 ### ARIA
 - `<ul>` named by `aria-label` (or `aria-labelledby` to a visible heading); each row is an `<li>` with a button or link.
 - The open record: `aria-current="true"` on a button (a selection inside the screen), `aria-current="page"` on a link (`href`, `asChild`) — the link points at the current URL. A router link may set it itself.
 - The row's name is its text, description, meta and count, in that order; the leading icon or avatar is `aria-hidden` — the text names the row.
 - Arrow keys do not move between rows: rows are ordinary Tab stops, as in the Sidebar.
+- With `onReorder` each row gets a handle named «Переместить {label}» (`labels.reorderItem`, `{label}` is the row's text line) and `aria-keyshortcuts`; the new place is announced politely («Новый лид: позиция 2 из 5»), a row being saved is `aria-busy`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-No `labels`.
+| Key | Default | Used for |
+|---|---|---|
+| `reorderItem` | `"Переместить {label}"` | `aria-label` of a row's drag handle (`onReorder`); `{label}` is the row's text line. |
 
 ## Examples
 | Example | Shows |
@@ -167,6 +179,7 @@ No `labels`.
 | [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients and icons of queues; the slot sizes the avatar to the row tier — `List.ItemIcon`. |
 | [overflow.tsx](examples/overflow.tsx) | A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate. |
 | [as-link.tsx](examples/as-link.tsx) | Rows as links to the invoice pages: a plain link, or your router link through the slot — `href`, `asChild`. |
+| [reorder.tsx](examples/reorder.tsx) | Funnel stages in the team's order: a stage moves by its handle or Alt+arrows and is saved on the server — `onReorder`, `value`. |
 
 ## Mistakes
 - Rows hand-drawn from `Button.Root variant="ghost"` with a `soft` current → `List.Item current`.
@@ -174,7 +187,9 @@ No `labels`.
 - A list as app navigation → Sidebar; as tabs of a screen → Tabs.
 - Several rows `current` at once → one open record; bulk selection belongs to DataTable.
 - A long list without a scroller → wrap it in `ScrollContainer` inside the pane.
+- Up / down buttons on rows or a hand-made `Dnd.Sortable` of rows to order them → `List.Root onReorder` with a `value` on every item.
+- `onReorder` that rolls the order back itself on an error → return the promise; a rejection moves the row back.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`)
+- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, `Dnd.Handle`), [Spinner](../spinner/COMPONENT.md) (a move being saved)
 - **See also:** [PageContent](../page-content/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Tabs](../tabs/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md), [Avatar](../avatar/COMPONENT.md)

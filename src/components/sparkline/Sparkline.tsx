@@ -30,13 +30,24 @@ const SPARKLINE_LABELS: SparklineLabels = { point: "{label}: {value}" };
 const NUMBER = new Intl.NumberFormat("ru-RU");
 const PERCENT = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 });
 
+/**
+ * `default`: the headline (title · date, value · change) over the plot. `compact`: the plot alone at
+ * the height of an `xs` control, for a table cell or a list row.
+ */
+export type SparklineLayout = "default" | "compact";
+
 export type SparklineProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   /** Points in order, oldest first; at least two draw a line. */
   data: SparklinePoint[];
-  /** Visible title above the value and the accessible name of the chart. */
+  /**
+   * Visible title above the value and the accessible name of the chart; with `layout="compact"`
+   * only the accessible name.
+   */
   label: string;
   /** Default `line`. */
   variant?: SparklineVariant;
+  /** Default `default`. */
+  layout?: SparklineLayout;
   /**
    * Index of the point at rest (the current month): the headline shows it when nobody scrubs, and
    * `bars` draw the other bars quieter. Default: the latest point.
@@ -69,12 +80,14 @@ function changeAt(data: SparklinePoint[], index: number): number | null {
  * A small chart with its headline: the value at rest (the latest point or `highlight`), its change
  * against the point before and its date. Scrubbing (pointer, touch, or the arrow keys on the chart)
  * shows any point; the header follows instantly, the trend arrow turns, and leaving glides back to
- * the point at rest. `bars` draw signed values from a zero line.
+ * the point at rest. `bars` draw signed values from a zero line. `layout="compact"` is the plot
+ * alone (a table cell): the shown point is spoken through the slider's `aria-valuetext`.
  */
 export function Sparkline({
   data,
   label,
   variant = "line",
+  layout = "default",
   highlight,
   loading = false,
   formatValue = (value) => NUMBER.format(value),
@@ -119,15 +132,27 @@ export function Sparkline({
 
   const change = changeAt(data, index);
   const valueText = point ? formatValue(point.value) : "";
+  const compact = layout === "compact";
+  const layoutAttr = compact ? layout : undefined;
 
   if (loading) {
     return (
-      <div {...rest} ref={ref} className={cx(styles.root, className)} aria-busy="true">
-        <div className={styles.head}>
-          <span className={styles.label}>{label}</span>
-          <Skeleton shape="text" size="s" className={cx(styles.dateSkeleton, swapClass)} />
-        </div>
-        <Skeleton shape="block" className={cx(styles.valueSkeleton, swapClass)} />
+      <div
+        {...rest}
+        ref={ref}
+        className={cx(styles.root, className)}
+        data-layout={layoutAttr}
+        aria-busy="true"
+      >
+        {compact ? null : (
+          <>
+            <div className={styles.head}>
+              <span className={styles.label}>{label}</span>
+              <Skeleton shape="text" size="s" className={cx(styles.dateSkeleton, swapClass)} />
+            </div>
+            <Skeleton shape="block" className={cx(styles.valueSkeleton, swapClass)} />
+          </>
+        )}
         <Skeleton shape="block" className={cx(styles.plotSkeleton, swapClass)} />
       </div>
     );
@@ -140,26 +165,34 @@ export function Sparkline({
       className={cx(styles.root, className)}
       data-scrubbing={active !== null || undefined}
       data-variant={variant}
+      data-layout={layoutAttr}
     >
-      <div className={styles.head}>
-        <span className={styles.label}>{label}</span>
-        <span className={styles.date}>{point?.label}</span>
-      </div>
-      <div className={styles.valueRow}>
-        <span className={styles.value}>
-          {/* Scrubbing changes the value every move: plain digits; a settled value rolls. */}
-          {active === null ? <RollingNumber>{valueText}</RollingNumber> : valueText}
-        </span>
-        {change !== null ? (
-          <Badge.Root color={change < 0 ? "red" : "green"} className={styles.change}>
-            <Badge.Icon className={styles.trend} data-down={change < 0 || undefined}>
-              <Icon name="status.trendUp" />
-            </Badge.Icon>
-            {`${change > 0 ? "+" : change < 0 ? "−" : ""}${PERCENT.format(Math.abs(change))}%`}
-          </Badge.Root>
-        ) : null}
-      </div>
+      {compact ? null : (
+        <>
+          <div className={styles.head}>
+            <span className={styles.label}>{label}</span>
+            <span className={styles.date}>{point?.label}</span>
+          </div>
+          <div className={styles.valueRow}>
+            <span className={styles.value}>
+              {/* Scrubbing changes the value every move: plain digits; a settled value rolls. */}
+              {active === null ? <RollingNumber>{valueText}</RollingNumber> : valueText}
+            </span>
+            {change !== null ? (
+              <Badge.Root color={change < 0 ? "red" : "green"} className={styles.change}>
+                <Badge.Icon className={styles.trend} data-down={change < 0 || undefined}>
+                  <Icon name="status.trendUp" />
+                </Badge.Icon>
+                {`${change > 0 ? "+" : change < 0 ? "−" : ""}${PERCENT.format(Math.abs(change))}%`}
+              </Badge.Root>
+            ) : null}
+          </div>
+        </>
+      )}
       <div
+        // A control of its own inside a row: the slider role already keeps a DataTable row from
+        // opening; the attribute says so for any host that reads it.
+        data-row-click-ignore=""
         className={styles.plot}
         role="slider"
         tabIndex={0}

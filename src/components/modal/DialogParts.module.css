@@ -110,6 +110,19 @@
   );
 }
 
+/*
+ * The record's picture (`Avatar.Root`, `Thumbnail.Root`): no box of its own, the picture is the
+ * mark. An avatar fills the 40px box; a thumbnail keeps its `m` height (40) and its ratio.
+ */
+.icon[data-media="true"] {
+  --avatar-slot-size: var(--prime-avatar-l);
+
+  width: auto;
+  min-width: var(--prime-space-10);
+  border-radius: 0;
+  background: none;
+}
+
 /* Raw SVG children (lucide etc.) follow the icon tier too. */
 .icon > svg {
   flex: 0 0 auto;

@@ -111,22 +111,6 @@
   pointer-events: none;
 }
 
-/* ── Formatting toolbar: a floating panel over the field while text is selected ── */
-.toolbar {
-  position: absolute;
-  z-index: var(--prime-z-overlay);
-  inset-block-end: calc(100% + var(--prime-space-2));
-  inset-inline-start: 0;
-  display: flex;
-  gap: var(--prime-space-0);
-  max-width: 100%;
-  padding: var(--prime-panel-padding);
-  border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-layer-current);
-  box-shadow: var(--prime-shadow-overlay);
-  cursor: default;
-}
-
 /* ── Send / record button ── */
 .action {
   position: relative;

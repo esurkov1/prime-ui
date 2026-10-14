@@ -1,4 +1,4 @@
-/** Selected text gets a toolbar of bold, italic, strikethrough, code, link and quote, each with its shortcut, written as Markdown around the selection — `formatting`. */
+/** Selected text gets a toolbar of bold, italic, strikethrough, code, spoiler, link and quote, each with its shortcut, written as Markdown around the selection — `formatting`. */
 import { Composer } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

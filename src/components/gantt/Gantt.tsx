@@ -62,6 +62,9 @@ import { useEdgeAutoScroll } from "./useEdgeAutoScroll";
 
 export type { GanttBar, GanttDates, GanttScale } from "./ganttModel";
 
+/** What opened a row: a click on its header, or Enter / Space on the focused header. */
+export type GanttRowClickEvent = React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>;
+
 /** System strings; `{label}`, `{start}`, `{end}`, `{date}`, `{progress}` are replaced. */
 export type GanttLabels = {
   /** Heading of the first column. */
@@ -140,6 +143,22 @@ export type GanttProps<Row, Bar extends GanttBar = GanttBar> = Omit<
   renderRow?: (row: Row) => React.ReactNode;
   /** A picture before the row content (an `Avatar`); on a narrow chart the column keeps only it. */
   renderRowAvatar?: (row: Row) => React.ReactNode;
+  /**
+   * The row header is a link: a real `<a>` fills the first column and is the row's stop in the
+   * grid, so a click, ⌘/Ctrl-click, a middle click and «open in new tab» work on it.
+   */
+  getRowHref?: (row: Row) => string;
+  /**
+   * Opens a row in place: a click on its header (never on a control inside it, never from a
+   * portal) or Enter / Space on the focused header. With `getRowHref` it gets the plain clicks
+   * only — call `event.preventDefault()` there to route in the app instead of loading the page.
+   */
+  onRowClick?: (row: Row, event: GanttRowClickEvent) => void;
+  /**
+   * Extra content of a bar's tooltip, under its title and the dates line (which always stay: the
+   * dates are what the bar means on the axis). A client, hours, an owner.
+   */
+  renderBarTooltip?: (bar: Bar, row: Row) => React.ReactNode;
   /** Zoom, controlled. */
   scale?: GanttScale;
   /** Initial zoom, uncontrolled. */
@@ -247,6 +266,9 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   getRowBars,
   renderRow,
   renderRowAvatar,
+  getRowHref,
+  onRowClick,
+  renderBarTooltip,
   scale: scaleProp,
   defaultScale = "week",
   onScaleChange,
@@ -1233,6 +1255,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     focusCell: setActiveId as (id: string) => void,
     model,
     onSelect,
+    onRowClick,
     commit,
     nameFor,
     labels,
@@ -1242,6 +1265,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     focusCell: setActiveId,
     model,
     onSelect,
+    onRowClick,
     commit,
     nameFor,
     labels,
@@ -1265,6 +1289,10 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
         const item = latest.current.model[rowIndex];
         const bar = item?.bars.find((candidate) => candidate.id === barId);
         if (item && bar) latest.current.onSelect?.(bar, item.row);
+      },
+      openRow: (rowIndex, event) => {
+        const item = latest.current.model[rowIndex];
+        if (item) latest.current.onRowClick?.(item.row, event);
       },
       commit: (barId, rowIndex, dates) => {
         const item = latest.current.model[rowIndex];
@@ -1367,6 +1395,11 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
           row={item.row}
           renderRow={renderRow as ((row: unknown) => React.ReactNode) | undefined}
           renderRowAvatar={renderRowAvatar as ((row: unknown) => React.ReactNode) | undefined}
+          renderBarTooltip={
+            renderBarTooltip as ((bar: GanttBar, row: unknown) => React.ReactNode) | undefined
+          }
+          href={getRowHref?.(item.row)}
+          clickable={onRowClick !== undefined}
           ghost={ghosts.get(item.key)}
           ghostLane={ghostLane}
           hover={hover}

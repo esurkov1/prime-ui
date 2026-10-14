@@ -10,6 +10,7 @@
 - A trend next to a number where the shape matters more than exact axes.
 - Values with a sign by period — profit, net new customers (`variant="bars"`: up when positive, down when negative), with the current period highlighted (`highlight`).
 - A detail page header that shows how a value moved.
+- A trend per record in a table cell or a list row (`layout="compact"`): revenue by month per client.
 
 ## When not to use
 - Exact values on axes, several series, or a legend → a full chart library on the kit's chart palette (`chartColors`); Sparkline has no axes.
@@ -31,6 +32,7 @@ Sparkline              <div>; the headline and the chart; aria-busy while loadin
    ├─ line:            svg line and area + cursor (guide line and dot, aria-hidden)
    └─ bars:            zero line (chart axis) + a slot per point with its bar (aria-hidden)
 loading:               Skeletons of the date, the value line and the plot
+compact:               the plot alone (no head, no value row); loading — the plot Skeleton
 ```
 
 ## API
@@ -43,7 +45,8 @@ loading:               Skeletons of the date, the value line and the plot
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `data` | `SparklinePoint[]` | — (required) | Points oldest first, `{ label, value }`; `label` names the point («8 окт»). Two or more draw a line. A new array cross-fades the line in. |
-| `label` | `string` | — (required) | Visible title above the value and the accessible name of the chart. |
+| `label` | `string` | — (required) | Visible title above the value and the accessible name of the chart; with `layout="compact"` only the accessible name. |
+| `layout` | `"default" \| "compact"` | `"default"` | `default` — the headline over an 80 px plot; `compact` — the plot alone at an `xs` control height with the dot at rest, for a DataTable cell; the point stays in `aria-valuetext`. |
 | `variant` | `"line" \| "bars"` | `"line"` | `line` — a line over a soft area; `bars` — a bar per point standing on a zero line: up when positive, down (danger) when negative, the value end rounded. |
 | `highlight` | `number` | `the latest point` | Index of the point at rest (the current month): the headline shows it when nobody scrubs and leaving the chart returns to it; `bars` draw the other bars quieter. |
 | `loading` | `boolean` | `false` | The series is on its way: Skeletons of the date, the value and the plot that cross-fade into the data; the title stays, the root is `aria-busy` and the chart is not focusable yet. |
@@ -58,6 +61,12 @@ loading:               Skeletons of the date, the value line and the plot
 |---|---|---|---|
 | `line` | an accent line over a soft area, a dot on the shown point | a continuous trend (daily revenue) | yes |
 | `bars` | a bar per point from a zero line (`--prime-color-chart-axis`): accent up, danger down, value end rounded | values by period, especially with a sign (monthly profit) | |
+
+### layout
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `default` | the headline (title · date, value · change) over an 80 px plot | a dashboard tile, a page header | yes |
+| `compact` | the plot alone at the height of an `xs` control (28 px), the dot on the point at rest, the guide line only while scrubbing; at least 96 px wide | a DataTable cell or a list row: one trend per record next to its name or total | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -76,6 +85,7 @@ Put it in a `Card` for a dashboard tile.
 | settle | pointer leaves, touch ends, focus leaves | back to the point at rest |
 | change hidden | the first point, the previous value is 0, or the sign flips | no change Badge: a percentage would mean nothing |
 | new series | a new `data` array | the chart cross-fades in (swap motion); the trend arrow turns half a turn between up and down |
+| compact | `layout="compact"` | `data-layout="compact"` on the root; no headline: `label` names the slider, the point is spoken through `aria-valuetext`; the guide fades in while scrubbing (`fast`) |
 | loading | `loading` | `aria-busy` on the root; Skeletons in place of the date, the value and the plot; no slider until the data comes; the data cross-fades in |
 
 ## Layout & spacing
@@ -83,6 +93,7 @@ Put it in a `Card` for a dashboard tile.
 - Bars share the width equally, 4 px apart; the zero line sits where 0 falls on the scale (the bottom when every value is positive).
 - In a dashboard, wrap it in `Card.Root` + `Card.Body`; several cards go in a grid.
 - When the value row does not fit (a narrow card), the change badge wraps under the value.
+- `layout="compact"` fits a DataTable row of any tier (plot and dot within an `xs` control height) and takes the cell width, at least `--prime-space-24`; give the column a `width` for an even plot per row. Put the number next to it in its own column: the compact plot shows no value.
 
 ## Accessibility
 
@@ -98,6 +109,7 @@ Put it in a `Card` for a dashboard tile.
 - The headline with the value and change reads as plain text.
 - The change carries a sign and an arrow, never color alone; a negative bar goes down, not only red.
 - While `loading` the root is `aria-busy` and the chart is not in the tab order yet.
+- `layout="compact"`: no visible title; `label` is only the slider's name, the point still goes to `aria-valuetext`. The plot carries `data-row-click-ignore` (and is a slider), so its pointer and keys never open a DataTable row.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -112,6 +124,7 @@ Put it in a `Card` for a dashboard tile.
 | [overview.tsx](examples/overview.tsx) | Revenue for 30 days in a dashboard card: drag across the chart, the headline follows and the trend arrow turns — `data`, `label`, `formatValue`. |
 | [variants.tsx](examples/variants.tsx) | The same week as a line and as bars from zero — `variant`. |
 | [states.tsx](examples/states.tsx) | While the series loads the date, the value and the plot are Skeletons in their own places; the title stays — `loading`. |
+| [compact.tsx](examples/compact.tsx) | Revenue by month per client in a list: the plot alone at a row's height with the dot on the current month, the label is the chart's accessible name — `layout`, `label`. |
 | [signed-bars.tsx](examples/signed-bars.tsx) | Monthly profit with a sign: losses go below the zero line, the current month rests highlighted and any bar shows its value under the pointer or the arrows — `variant`, `highlight`. |
 | [period.tsx](examples/period.tsx) | Another period swaps the series: the line cross-fades in and the headline digits roll to the new total — `data`. |
 
@@ -121,7 +134,8 @@ Put it in a `Card` for a dashboard tile.
 - A Sparkline without a container width (inside an inline flex row) → give it a width or put it in a `Card`.
 - A separate tooltip over the bars → the headline already shows the scrubbed point; a floating tooltip would cover the next bar.
 - A grey box while the series loads → `loading`.
+- A full Sparkline squeezed into a table cell, or its headline hidden with CSS → `layout="compact"`.
 
 ## Related
 - **Built from:** [Badge](../badge/COMPONENT.md) (change), [Skeleton](../skeleton/COMPONENT.md) (loading), `Icon` (trend arrow)
-- **See also:** [Card](../card/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)
+- **See also:** [DataTable](../data-table/COMPONENT.md) (a compact Sparkline per row), [Card](../card/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)
