@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { REDUCED_MOTION_QUERY } from "./breakpoints";
+
 export type PresenceState = "open" | "closed";
 export type MotionDurationToken = "xfast" | "fast" | "base" | "slow";
 
@@ -18,7 +20,7 @@ export function prefersReducedMotion(): boolean {
   return (
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    window.matchMedia(REDUCED_MOTION_QUERY).matches
   );
 }
 

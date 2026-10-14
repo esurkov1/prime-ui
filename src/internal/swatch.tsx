@@ -172,3 +172,41 @@ export function markContrast(value: string): "light" | "dark" {
   // Equal contrast against white (L=1) and black (L=0) at L ≈ 0.179.
   return l > 0.179 ? "dark" : "light";
 }
+
+/**
+ * Columns of a grid of `count` swatches in `width`: as many tier-sized swatches as fit, then spread
+ * evenly over the rows that needs (16 in a row of 14 → two rows of 8, not 14 + 2).
+ */
+export function balancedColumns(count: number, width: number, cell: number, gap: number): number {
+  if (count < 1 || width <= 0 || cell <= 0) return Math.max(1, count);
+  const fit = Math.max(1, Math.floor((width + gap) / (cell + gap)));
+  const rows = Math.ceil(count / Math.min(count, fit));
+  return Math.ceil(count / rows);
+}
+
+/**
+ * `--swatch-columns` of a swatch grid: balanced rows at its current width (none before the first
+ * measure). `cellSelector` finds a swatch, whose height is the tier size (ColorSwatches, ColorPresets).
+ */
+export function useBalancedColumns(
+  gridRef: React.RefObject<HTMLElement | null>,
+  count: number,
+  cellSelector: string,
+): number | undefined {
+  const [columns, setColumns] = React.useState<number>();
+  React.useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid || typeof ResizeObserver === "undefined") return;
+    const measure = () => {
+      // The swatch height is the tier size; the width stretches with the column.
+      const cell = grid.querySelector<HTMLElement>(cellSelector)?.offsetHeight ?? 0;
+      const gap = Number.parseFloat(getComputedStyle(grid).columnGap) || 0;
+      setColumns(cell > 0 ? balancedColumns(count, grid.clientWidth, cell, gap) : undefined);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(grid);
+    return () => observer.disconnect();
+  }, [gridRef, count, cellSelector]);
+  return columns;
+}

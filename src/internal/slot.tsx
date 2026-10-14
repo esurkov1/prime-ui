@@ -61,7 +61,19 @@ function blockDisabledClick(event: React.MouseEvent) {
   event.stopPropagation();
 }
 
-export type SlotProps = { children?: React.ReactNode; ref?: React.Ref<HTMLElement> } & AnyProps;
+/** What a slot reads from its child: the child's own `ref` (React 19: a regular prop). */
+type SlotChildProps<E extends HTMLElement> = AnyProps & { ref?: React.Ref<E> };
+
+export type SlotProps<E extends HTMLElement = HTMLElement> = {
+  children?: React.ReactNode;
+  ref?: React.Ref<E>;
+} & AnyProps;
+
+/**
+ * The props of a slot part (`Trigger`, `Close`, `Confirm`, `Anchor`): exactly one element, which
+ * takes the part's behaviour. A slot part renders no DOM of its own, so it has no `className`.
+ */
+export type SlotPartProps = { children: React.ReactElement };
 
 /**
  * Merges its own props onto the single React child element.
@@ -74,22 +86,46 @@ export type SlotProps = { children?: React.ReactNode; ref?: React.Ref<HTMLElemen
  * - `on*` handlers — both fire, child first; a child `preventDefault()` skips the slot handler
  * - All other props — a defined child prop overrides the slot prop
  * - `ref` — merged with the child's ref
- * - `aria-disabled` on the slot — clicks (pointer and keyboard-activated) are stopped in the capture
- *   phase, so the child's own `onClick` never runs and a link does not navigate
+ * - `aria-disabled` on the slot — the child leaves the Tab order (`tabIndex -1`), a link loses its
+ *   `href` (it stays a `link` by role), and clicks (pointer and keyboard-activated) are stopped in
+ *   the capture phase, so the child's own `onClick` never runs and nothing navigates
  */
-export function Slot({ children, ref, ...slotProps }: SlotProps) {
-  const child = React.isValidElement(children) ? (children as React.ReactElement<AnyProps>) : null;
-  // React 19: a ref is a regular prop; reading `element.ref` is removed and logs an error.
-  const childRef = (child?.props.ref as React.Ref<HTMLElement> | undefined) ?? undefined;
-  const composedRef = useMergedRefs<HTMLElement>(ref, childRef);
+export function Slot<E extends HTMLElement = HTMLElement>({
+  children,
+  ref,
+  ...slotProps
+}: SlotProps<E>) {
+  const child = React.isValidElement<SlotChildProps<E>>(children) ? children : null;
+  const composedRef = useMergedRefs<E>(ref, child?.props.ref);
 
   if (!child) return <>{children}</>;
 
   const merged = mergeProps(slotProps, child.props);
   const disabled = slotProps["aria-disabled"] === true || slotProps["aria-disabled"] === "true";
-  if (disabled) merged.onClickCapture = blockDisabledClick;
+  if (disabled) {
+    if (merged.href !== undefined) {
+      merged.href = undefined;
+      merged.role ??= "link";
+    }
+    merged.tabIndex = -1;
+    merged.onClickCapture = blockDisabledClick;
+  }
 
-  return React.cloneElement(child, { ...merged, ref: composedRef } as AnyProps);
+  return React.cloneElement(child, { ...merged, ref: composedRef });
 }
 
 Slot.displayName = "Slot";
+
+/**
+ * The one element child of an `asChild` part, whose own children the part wraps
+ * (`React.cloneElement(child, undefined, …child.props.children)`). Throws a named error otherwise.
+ */
+export function slotChild(
+  children: React.ReactNode,
+  part: string,
+): React.ReactElement<{ children?: React.ReactNode }> {
+  if (!React.isValidElement<{ children?: React.ReactNode }>(children)) {
+    throw new Error(`[prime-ui-kit] ${part} asChild needs a single element child.`);
+  }
+  return children;
+}

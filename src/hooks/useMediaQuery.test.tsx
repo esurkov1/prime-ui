@@ -1,7 +1,8 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { COMPACT_QUERY, useMediaQuery } from "./useMediaQuery";
+import { COMPACT_QUERY } from "./breakpoints";
+import { useMediaQuery } from "./useMediaQuery";
 
 const original = window.matchMedia;
 

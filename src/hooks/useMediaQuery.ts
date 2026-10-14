@@ -1,10 +1,7 @@
 import * as React from "react";
 
-/** Viewport below the first breakpoint (foundation §9): overlays become bottom sheets. */
-export const COMPACT_QUERY = "(max-width: 639px)";
-
 /**
- * Whether a media query matches, kept in sync with the viewport. `false` on the server, while
+ * Whether a media query matches (the constants of `./breakpoints`), kept in sync with the viewport. `false` on the server, while
  * `enabled` is off, and where `matchMedia` is missing.
  */
 export function useMediaQuery(query: string, enabled = true): boolean {

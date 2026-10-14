@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { COMPACT_QUERY, useMediaQuery } from "@/hooks/useMediaQuery";
+import { COMPACT_QUERY } from "@/hooks/breakpoints";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { type PositionOptions, type PositionSide, usePosition } from "@/hooks/usePosition";
 import { type MotionDurationToken, type Presence, usePresence } from "@/hooks/usePresence";
 import { useScrollLock } from "@/hooks/useScrollLock";
