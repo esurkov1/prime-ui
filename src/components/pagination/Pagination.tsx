@@ -4,6 +4,7 @@ import { Button } from "@/components/button/Button";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
@@ -61,11 +62,7 @@ export type PaginationProps = Omit<
   /** Pages on each side of the current one before an ellipsis. */
   siblingCount?: number;
   size?: ControlSize;
-  /**
-   * Arrows + «current / total» instead of page numbers. `"auto"` fills the parent and switches to
-   * the compact view when the container is narrow.
-   */
-  compact?: boolean | "auto";
+  compact?: boolean;
   labels?: Partial<PaginationLabels>;
 };
 
@@ -75,13 +72,14 @@ export function Pagination({
   onValueChange,
   totalPages,
   siblingCount = 1,
-  size = "m",
+  size: sizeProp,
   compact = false,
   labels: labelsProp,
   className,
   ...rest
 }: PaginationProps) {
   const [page, setPage] = useControllableState({ value, defaultValue, onChange: onValueChange });
+  const { size, provide } = useHostTier(sizeProp);
   if (totalPages < 1) return null;
 
   const labels = { ...PAGINATION_LABELS, ...labelsProp };
@@ -89,9 +87,10 @@ export function Pagination({
   const go = (next: number) => {
     if (next !== current) setPage(next);
   };
-  const mode = compact === "auto" ? "auto" : compact ? "true" : "false";
+  // By default the nav fills its parent and turns compact when it is narrow; `compact` forces it.
+  const mode = compact ? "compact" : "auto";
 
-  return (
+  return provide(
     <nav
       {...rest}
       aria-label={labels.nav}
@@ -102,7 +101,6 @@ export function Pagination({
         <Button.Root
           variant="ghost"
           tone="neutral"
-          size={size}
           disabled={current <= 1}
           onClick={() => go(current - 1)}
           aria-label={labels.previous}
@@ -112,7 +110,7 @@ export function Pagination({
           </Button.Icon>
         </Button.Root>
 
-        {mode !== "true"
+        {mode === "auto"
           ? pageRange(current, totalPages, siblingCount).map((item, i, all) =>
               item === "…" ? (
                 <span
@@ -125,12 +123,12 @@ export function Pagination({
               ) : (
                 <Button.Root
                   key={item}
-                  variant={item === current ? "soft" : "ghost"}
-                  tone={item === current ? "accent" : "neutral"}
-                  size={size}
-                  className={cx(styles.page, styles.pageItem)}
+                  variant="ghost"
+                  tone="neutral"
+                  density="tight"
+                  current={item === current}
+                  className={styles.pageItem}
                   onClick={() => go(item)}
-                  aria-current={item === current ? "page" : undefined}
                   aria-label={formatLabel(labels.page, { page: item })}
                 >
                   {item}
@@ -139,19 +137,16 @@ export function Pagination({
             )
           : null}
 
-        {mode !== "false" ? (
-          <span className={styles.summary}>
-            <span className={styles.summaryCurrent}>{current}</span>
-            <span aria-hidden="true">/</span>
-            <VisuallyHidden>{labels.of}</VisuallyHidden>
-            <span>{totalPages}</span>
-          </span>
-        ) : null}
+        <span className={styles.summary}>
+          <span className={styles.summaryCurrent}>{current}</span>
+          <span aria-hidden="true">/</span>
+          <VisuallyHidden>{labels.of}</VisuallyHidden>
+          <span>{totalPages}</span>
+        </span>
 
         <Button.Root
           variant="ghost"
           tone="neutral"
-          size={size}
           disabled={current >= totalPages}
           onClick={() => go(current + 1)}
           aria-label={labels.next}
@@ -161,6 +156,6 @@ export function Pagination({
           </Button.Icon>
         </Button.Root>
       </div>
-    </nav>
+    </nav>,
   );
 }

@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Pagination",
-      en: "`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with `Button`s: ghost previous and next, ghost page numbers with ellipses, the current page soft accent.",
-      ru: "`<nav>` с именем из `labels.nav` и кнопками `Button`: ghost «назад» и «вперёд», ghost-номера страниц с многоточием, текущая — soft accent.",
+      en: "`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with `Button`s: ghost previous and next, ghost page numbers with ellipses, the current page in the Button `current` state.",
+      ru: "`<nav>` с именем из `labels.nav` и кнопками `Button`: ghost «назад» и «вперёд», ghost-номера страниц с многоточием, текущая — в состоянии `current` у Button.",
       props: [
         {
           name: "totalPages",
@@ -44,16 +44,16 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Control tier of the buttons: height 28 · 32 · 36 · 40 · 48.",
-          ru: "Ярус кнопок: высота 28 · 32 · 36 · 40 · 48, как у Button и Input.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Control tier of the buttons: height 28 · 32 · 36 · 40 · 48. Without it the tier of its host, else `m`.",
+          ru: "Ярус кнопок: высота 28 · 32 · 36 · 40 · 48, как у Button и Input. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "compact",
-          type: 'boolean | "auto"',
+          type: "boolean",
           default: "false",
-          en: '`true` — arrows + «current / total» instead of numbers; `"auto"` — fills the parent and turns compact below 22rem of its width.',
-          ru: '`true` — стрелки и «текущая / всего» вместо номеров; `"auto"` — на всю ширину родителя и компактно уже 22rem.',
+          en: "Always arrows + «current / total» instead of numbers. Without it the nav fills its parent and shows that view only below 22rem of its width.",
+          ru: "Всегда стрелки и «текущая / всего» вместо номеров. Без него навигация на всю ширину родителя и так выглядит только уже 22rem.",
         },
         {
           name: "labels",

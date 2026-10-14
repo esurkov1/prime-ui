@@ -1076,7 +1076,6 @@ export function DataTable<Row>({
             ) : null}
 
             <Footer
-              size={size}
               range={
                 showRange
                   ? formatLabel(labels.range, {
