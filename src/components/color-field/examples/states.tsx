@@ -4,9 +4,21 @@ import { ColorField } from "prime-ui-kit/color-picker";
 export default function ColorFieldStatesExample() {
   return (
     <>
-      <ColorField label="default" defaultValue="#30a46c" />
-      <ColorField label="invalid" defaultValue="#f5f5f5" invalid />
-      <ColorField label="disabled" defaultValue="#30a46c" disabled />
+      <div>
+        <div>
+          <ColorField label="default" defaultValue="#30a46c" />
+        </div>
+      </div>
+      <div>
+        <div>
+          <ColorField label="invalid" defaultValue="#f5f5f5" invalid />
+        </div>
+      </div>
+      <div>
+        <div>
+          <ColorField label="disabled" defaultValue="#30a46c" disabled />
+        </div>
+      </div>
     </>
   );
 }

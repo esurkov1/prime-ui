@@ -5,11 +5,10 @@
   width: min(100%, var(--prime-layout-form-width-s));
 }
 
-/* Field → field 20. */
+/* The fields (a Fieldset), then the actions — group → actions 32. */
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-5);
+  display: grid;
+  gap: var(--prime-space-8);
 }
 
 /* A row of actions at the end. */

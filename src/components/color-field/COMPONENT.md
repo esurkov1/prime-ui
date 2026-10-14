@@ -85,6 +85,8 @@ ColorField                       field frame: label · field button · hint | er
 | `alpha` | an opacity slider under the hue; the hex gets two more digits | the color may be translucent (overlays, shadows) | `false` |
 | `disabled` | disabled fill, the color shown at half opacity, does not open | not editable now | `false` |
 | `invalid` / `error` | danger ring (+ the message) | validation failed | — |
+| `required` / `optional` | red `*` / muted «необязательно» after the label; a required field reads `labels.required` after its name | mark the minority of the form | `false` / — |
+| `focusRing` | `false`: no focus ring on the field button; the focus fill stays | a single color control where focus is obvious; never in a regular form (WCAG 2.4.7) | `true` |
 
 **Combinations**
 - Recommended: `label` + `name` inside a form; `presets` with the brand palette; `alpha` only where transparency means something.
@@ -163,5 +165,5 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`. A c
 - Expecting a `Color` object in `onValueChange` → the field speaks hex strings; use ColorPicker parts for `Color`.
 
 ## Related
-- **Built from:** [ColorPicker](../color-picker/COMPONENT.md) (area, sliders, channel strip, swatches), [Popover](../popover/COMPONENT.md), [ColorSwatches](../color-swatches/COMPONENT.md) (`presets`), [Button](../button/COMPONENT.md) (eyedropper), `Icon` (chevron), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [ColorPicker](../color-picker/COMPONENT.md) (area, sliders, channel strip with the eyedropper, the `presets` swatches), [Popover](../popover/COMPONENT.md), `Icon` (chevron), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (field frame), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ColorSwatches](../color-swatches/COMPONENT.md), [ColorPicker](../color-picker/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md)

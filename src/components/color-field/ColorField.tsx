@@ -72,25 +72,16 @@ const FALLBACK_COLOR = "#000000";
 export type ColorFieldProps = FieldRootDomProps &
   FieldFrameProps &
   FieldFocusRingProps & {
-    /** Controlled color: a CSS color string (hex, `rgb()`, `hsl()`). */
     value?: string;
     defaultValue?: string;
-    /** Called with the new color as hex: `#RRGGBB`, or `#RRGGBBAA` when `alpha` lowers the opacity. */
     onValueChange?: (value: string) => void;
-    /** Ready colors under the channels: `{ value, label }`, picked in one click. */
     presets?: readonly ColorPreset[];
-    /** Adds the opacity slider; the value then carries alpha. */
     alpha?: boolean;
-    /** Field tier; the panel uses the same tier. */
     size?: ControlSize;
     disabled?: boolean;
-    /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
     invalid?: boolean;
-    /** Form field name: a hidden input submits the hex value. */
     name?: string;
-    /** Id of the field button; generated when omitted. */
     id?: string;
-    /** Accessible name when there is no `label`; the current value is appended. */
     "aria-label"?: string;
     "aria-labelledby"?: string;
     "aria-describedby"?: string;

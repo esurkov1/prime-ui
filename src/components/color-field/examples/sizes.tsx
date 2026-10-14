@@ -7,7 +7,11 @@ export default function ColorFieldSizesExample() {
   return (
     <>
       {SIZES.map((size) => (
-        <ColorField key={size} size={size} label={size} defaultValue="#0090ff" />
+        <div key={size}>
+          <div>
+            <ColorField size={size} label={size} defaultValue="#0090ff" />
+          </div>
+        </div>
       ))}
     </>
   );
