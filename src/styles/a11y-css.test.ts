@@ -15,6 +15,12 @@ import { ratchet } from "../test/ratchet";
 
 const STATES = ["data-pressed", "aria-pressed", "aria-current"];
 
+/** States a component shows by its content instead of a selector, with the reason. */
+const SHOWN_BY_CONTENT: Record<string, string> = {
+  "src/components/input: aria-pressed":
+    "Input.RevealButton swaps its glyph (eye ⇄ eye-off) with the state",
+};
+
 /** The stylesheets a component's sources import, internal ones included. */
 function stylesheetsOf(dir: string, sources: string[]): string[] {
   const sheets = new Set(walk(dir, /\.css$/).filter((file) => !file.includes("/examples/")));
@@ -33,6 +39,7 @@ function stylesheetsOf(dir: string, sources: string[]): string[] {
 describe("a11y state in CSS", () => {
   it("ARIA and data states a component sets are styled, and bare lists keep their role", () => {
     const offenders: string[] = [];
+    const shown = new Set<string>();
     const dirs = [
       ...walk("src/components", /COMPONENT\.md$/),
       ...walk("src/layout", /COMPONENT\.md$/),
@@ -46,8 +53,9 @@ describe("a11y state in CSS", () => {
         .join("\n");
       for (const state of STATES) {
         const sets = new RegExp(`["']?${state}["']?\\s*[=:]`).test(tsx);
-        if (sets && !selectors.includes(`[${state}`))
-          offenders.push(`${dir}: sets ${state}, no selector`);
+        if (!sets || selectors.includes(`[${state}`)) continue;
+        if (SHOWN_BY_CONTENT[`${dir}: ${state}`]) shown.add(`${dir}: ${state}`);
+        else offenders.push(`${dir}: sets ${state}, no selector`);
       }
       const bareList = sheets.some((file) =>
         cssRules(file).some((rule) =>
@@ -58,6 +66,7 @@ describe("a11y state in CSS", () => {
         offenders.push(`${dir}: list-style none without role="list"`);
       }
     }
+    expect(Object.keys(SHOWN_BY_CONTENT).filter((key) => !shown.has(key))).toEqual([]);
     ratchet("a11y-css", offenders);
   });
 });
