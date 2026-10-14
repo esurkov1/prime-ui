@@ -1,4 +1,3 @@
 [
-  "src/components/chat/api.ts: Chat.Messages.type → `multiple` for one vs many (a `type` prop names no selection mode)",
-  "src/components/notification/api.ts: NotificationCard.icon → an `X.Icon` part"
+  "src/components/chat/api.ts: Chat.Messages.type → `multiple` for one vs many (a `type` prop names no selection mode)"
 ]
