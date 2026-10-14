@@ -1,5 +1,5 @@
 /** Theme settings: the color goes with the form, a too light color shakes in an error on save that leaves once the color changes — `value`, `error`. */
-import { Button, Input, Typography } from "prime-ui-kit";
+import { Button, Fieldset, Input, Typography } from "prime-ui-kit";
 import { ColorPicker, parseColor } from "prime-ui-kit/color-picker";
 import * as React from "react";
 
@@ -23,27 +23,29 @@ export default function ColorPickerInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <Input.Root label="Название темы" required>
-        <Input.Wrapper>
-          <Input.Field name="theme" defaultValue="Осенняя распродажа" />
-        </Input.Wrapper>
-      </Input.Root>
-      <ColorPicker.Root
-        value={color}
-        onValueChange={(next) => {
-          setColor(next);
-          setError(undefined);
-          setSaved(false);
-        }}
-      >
-        <ColorPicker.HexInput label="Цвет кнопок" error={error} />
-      </ColorPicker.Root>
-      <input type="hidden" name="buttonColor" value={color.toString("hex")} />
-      {saved ? (
-        <Typography as="p" variant="body-s" tone="secondary" role="status">
-          Тема сохранена.
-        </Typography>
-      ) : null}
+      <Fieldset>
+        <Input.Root label="Название темы" required>
+          <Input.Wrapper>
+            <Input.Field name="theme" defaultValue="Осенняя распродажа" />
+          </Input.Wrapper>
+        </Input.Root>
+        <ColorPicker.Root
+          value={color}
+          onValueChange={(next) => {
+            setColor(next);
+            setError(undefined);
+            setSaved(false);
+          }}
+        >
+          <ColorPicker.HexInput label="Цвет кнопок" error={error} />
+        </ColorPicker.Root>
+        <input type="hidden" name="buttonColor" value={color.toString("hex")} />
+        {saved ? (
+          <Typography as="p" variant="body-s" tone="secondary" role="status">
+            Тема сохранена.
+          </Typography>
+        ) : null}
+      </Fieldset>
       <div className={styles.actions}>
         <Button.Root type="submit">Сохранить тему</Button.Root>
       </div>

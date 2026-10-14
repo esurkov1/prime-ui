@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { useResizeEffect } from "@/hooks/useElementSize";
 import { CheckMark } from "@/internal/CheckMark";
 import { cx } from "@/internal/cx";
 import press from "@/internal/press.module.css";
@@ -124,6 +125,13 @@ export const swatchTriggerClass = cx(styles.trigger, press.press);
  * with `data-base="item"`; on a coarse pointer at least the touch target.
  */
 export const swatchTierClass = styles.tier;
+
+/**
+ * A grid of swatches, joined next to `swatchTierClass`: one row of `--swatch-count` swatches (the
+ * host sets it) while the width allows, then `--swatch-columns` (`useBalancedColumns`) balanced
+ * rows. `data-stretch` makes the swatches share the whole width, each across its column.
+ */
+export const swatchGridClass = styles.grid;
 
 /**
  * Defines `--swatch-checker`, the kit's transparency checkerboard as a background layer, for a host
@@ -259,20 +267,16 @@ export function useBalancedColumns(
   cellSelector: string,
 ): number | undefined {
   const [columns, setColumns] = React.useState<number>();
-  React.useLayoutEffect(() => {
+  const measure = React.useCallback(() => {
     const grid = gridRef.current;
-    if (!grid || typeof ResizeObserver === "undefined") return;
-    const measure = () => {
-      // The swatch height is the tier size; the width stretches with the column.
-      const cell = grid.querySelector<HTMLElement>(cellSelector)?.offsetHeight ?? 0;
-      const gap = Number.parseFloat(getComputedStyle(grid).columnGap) || 0;
-      setColumns(cell > 0 ? balancedColumns(count, grid.clientWidth, cell, gap) : undefined);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(grid);
-    return () => observer.disconnect();
+    if (!grid) return;
+    // The swatch height is the tier size; the width stretches with the column.
+    const cell = grid.querySelector<HTMLElement>(cellSelector)?.offsetHeight ?? 0;
+    const gap = Number.parseFloat(getComputedStyle(grid).columnGap) || 0;
+    setColumns(cell > 0 ? balancedColumns(count, grid.clientWidth, cell, gap) : undefined);
   }, [gridRef, count, cellSelector]);
+  React.useLayoutEffect(measure, [measure]);
+  useResizeEffect(gridRef, measure);
   return columns;
 }
 

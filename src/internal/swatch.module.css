@@ -88,6 +88,35 @@
   --swatch-gap: var(--prime-control-xl-gap);
 }
 
+/*
+ * ---- Grid ----
+ * One row of `--swatch-count` swatches (set by the host) while the width allows; narrower it wraps,
+ * and `--swatch-columns` (measured, `useBalancedColumns`) splits the rows evenly (16 → 8 + 8,
+ * never 14 + 2); until it measures, `auto-fill` / `auto-fit` fills the rows greedily.
+ * `data-stretch`: the preferred size is still one row, but the grid takes the container width
+ * wherever it is known and every swatch stretches across its column (the height stays the tier's).
+ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--swatch-columns, auto-fill), var(--swatch-size));
+  justify-content: start;
+  gap: var(--swatch-gap);
+  box-sizing: border-box;
+  inline-size: calc(
+    var(--swatch-count) *
+    var(--swatch-size) +
+    (var(--swatch-count) - 1) *
+    var(--swatch-gap)
+  );
+  max-inline-size: 100%;
+}
+
+.grid[data-stretch="true"] {
+  --swatch-inline-size: 100%;
+  grid-template-columns: repeat(var(--swatch-columns, auto-fit), minmax(var(--swatch-size), 1fr));
+  min-inline-size: 100%;
+}
+
 /* Touch: a swatch is a cell of a dense grid and its `::after` draws the inner edge, so its hit area
    cannot grow invisibly past its neighbours. The swatch itself grows to the touch target, like a
    menu row; the grid takes fewer columns or wraps into more rows. */

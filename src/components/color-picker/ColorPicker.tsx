@@ -7,11 +7,11 @@ import {
   type ColorSliderProps as AriaColorSliderProps,
   ColorThumb as AriaColorThumb,
   type ColorThumbProps as AriaColorThumbProps,
-  SliderOutput as AriaSliderOutput,
   SliderTrack as AriaSliderTrack,
   type SliderTrackProps as AriaSliderTrackProps,
   type Color,
   ColorPickerStateContext,
+  ColorSliderStateContext,
   composeRenderProps,
   parseColor,
 } from "react-aria-components";
@@ -83,7 +83,6 @@ export const COLOR_PICKER_LABELS: ColorPickerLabels = {
 };
 
 export type ColorPickerRootProps = {
-  /** Controlled color: a CSS color string or a `Color` from `parseColor`. */
   value?: string | Color;
   defaultValue?: string | Color;
   onValueChange?: (color: Color) => void;
@@ -99,7 +98,6 @@ export type ColorPickerHexInputProps = FieldRootDomProps &
   FieldFocusRingProps & {
     label?: React.ReactNode;
     hint?: React.ReactNode;
-    /** Error message in the hint slot; implies `invalid`. */
     error?: React.ReactNode;
   };
 
@@ -326,10 +324,6 @@ function ChannelStrip({ className, focusRing, ...rest }: ColorPickerChannelStrip
 }
 
 export type ColorPickerPanelProps = React.HTMLAttributes<HTMLDivElement> & {
-  /**
-   * `none` (default) — layout only, for use inside Popover / Card that already provide a surface.
-   * `raised` — standalone floating panel: raised background, panel radius/padding, overlay shadow.
-   */
   surface?: "none" | "raised";
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -418,7 +412,8 @@ export type ColorPickerThumbProps = AriaColorThumbProps & { ref?: React.Ref<HTML
 function Area({ className, disabled, ...props }: ColorPickerAreaProps) {
   return (
     <AriaColorArea
-      className={composeRenderProps(className, (c) => cx(styles.area, c))}
+      className={composeRenderProps(className, (c) => cx(fieldTierClass, styles.area, c))}
+      data-size="l"
       isDisabled={useInheritedDisabled(disabled)}
       {...props}
     />
@@ -479,16 +474,21 @@ function Swatches(props: ColorPickerSwatchesProps) {
 Swatches.displayName = "ColorPicker.Swatches";
 
 export type ColorPickerSliderMetaProps = DivProps & {
-  /** The channel name. */
   label: React.ReactNode;
 };
 
-/** Slider heading: the label and the current channel value. */
+/**
+ * Slider heading: the label and the current channel value. The value is an `<output>` of its own:
+ * React Aria's `SliderOutput` inside a color slider points `for` at an id no input carries.
+ */
 function SliderMeta({ label, className, ...rest }: ColorPickerSliderMetaProps) {
+  const slider = React.useContext(ColorSliderStateContext);
   return (
     <div {...rest} className={cx(styles.sliderHeader, className)}>
       <span className={styles.sliderLabel}>{label}</span>
-      <AriaSliderOutput className={styles.sliderValue} />
+      <output className={styles.sliderValue} aria-live="off">
+        {slider?.getThumbValueLabel(0)}
+      </output>
     </div>
   );
 }

@@ -1,16 +1,15 @@
 /* Layout of the ColorSwatches scenarios: semantic tokens only. */
 
-/* in-form.tsx: field → field 20, group → actions 32. */
+/* in-form.tsx: the field column (a Fieldset, fields 20 apart) → actions 32. */
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-5);
+  gap: var(--prime-space-8);
   width: min(100%, var(--prime-layout-form-width-s));
 }
 
 .actions {
   display: flex;
-  margin-top: var(--prime-space-3);
 }
 
 /* wrapping.tsx: a narrow column. */

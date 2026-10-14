@@ -27,6 +27,7 @@ import {
   type SwatchOption,
   sameColor,
   swatchClass,
+  swatchGridClass,
   swatchTierClass,
   swatchTriggerClass,
   useBalancedColumns,
@@ -71,7 +72,6 @@ type Ctx = {
 const [ColorPresetsProvider, useColorPresetsContext] = createComponentContext<Ctx>("ColorPresets");
 
 export type ColorPresetsRootProps = {
-  /** Controlled color; `null` — no color. */
   value?: string | null;
   defaultValue?: string | null;
   onValueChange?: (value: string | null) => void;
@@ -80,15 +80,11 @@ export type ColorPresetsRootProps = {
   onOpenChange?: (open: boolean) => void;
   closeOnEscape?: boolean;
   closeOnOutsideClick?: boolean;
-  /** Swatches in panel order. Default: `COLOR_PRESETS` (16). */
   presets?: readonly ColorPreset[];
-  /** Grid columns. Default: one row for up to 8 presets (+ "no color"), else 8; 16 → 8 × 2. */
   columns?: number;
   size?: ControlSize;
   disabled?: boolean;
-  /** Adds the "no color" swatch after the presets (value `null`); hue rows stay aligned. */
   allowEmpty?: boolean;
-  /** Close the panel after a pick (focus returns to the trigger). Default `true`. */
   closeOnSelect?: boolean;
   labels?: Partial<ColorPresetsLabels>;
   children: React.ReactNode;
@@ -212,8 +208,8 @@ export type ColorPresetsSwatchProps = Omit<React.HTMLAttributes<HTMLSpanElement>
 };
 
 /**
- * The current color as a small square for a custom trigger (e.g. inside `Button.Root`). Sized from
- * the host's `--prime-icon-size`; `aria-hidden` — the trigger carries the name.
+ * The current color as a small square for a custom trigger (e.g. inside `Button.Root`), at the
+ * host's icon size; `aria-hidden` — the trigger carries the name.
  */
 function Swatch(props: ColorPresetsSwatchProps) {
   const { value } = useColorPresetsContext();
@@ -222,7 +218,6 @@ function Swatch(props: ColorPresetsSwatchProps) {
 Swatch.displayName = "ColorPresets.Swatch";
 
 export type ColorPresetsTriggerProps = {
-  /** One element that opens the panel: `ColorPresets.SwatchButton`, or e.g. `Button.Root` with `ColorPresets.Swatch`. */
   children: React.ReactElement;
 };
 
@@ -275,7 +270,6 @@ export type ColorPresetsContentProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "role"
 > & {
-  /** Visible heading above the grid; also the list's accessible name (else `labels.list`). */
   label?: React.ReactNode;
   align?: PositionAlign;
   side?: PositionSide;
@@ -351,12 +345,12 @@ function SwatchList({ label }: { label?: React.ReactNode }) {
         aria-label={label != null ? undefined : labels.list}
         aria-labelledby={label != null ? labelId : undefined}
         ref={gridRef}
-        className={cx(swatchTierClass, styles.grid)}
+        className={cx(swatchTierClass, swatchGridClass, styles.grid)}
         data-size={size}
         data-base="item"
         style={
           {
-            "--cpr-columns": Math.min(columns, options.length),
+            "--swatch-count": Math.min(columns, options.length),
             "--swatch-columns": balanced,
           } as React.CSSProperties
         }

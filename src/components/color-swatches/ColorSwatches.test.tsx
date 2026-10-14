@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { COLOR_SWATCHES_LABELS, ColorSwatches } from "./ColorSwatches";
@@ -69,6 +70,39 @@ describe("ColorSwatches", () => {
     expect(screen.getByRole("radio", { name: "Синий" })).toHaveAttribute("aria-checked", "true");
     fireEvent.keyDown(document.activeElement as Element, { key: "Home" });
     expect(red).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("keyboard: Tab enters on the selected swatch; the arrows move by visual rows and select", async () => {
+    const user = userEvent.setup();
+    const six = [
+      ...presets,
+      { value: "#f59e0b", label: "Янтарный" },
+      { value: "#14b8a6", label: "Бирюзовый" },
+      { value: "#a855f7", label: "Фиолетовый" },
+    ];
+    render(<ColorSwatches presets={six} defaultValue="#22c55e" aria-label="Цвет этапа" />);
+    const radios = screen.getAllByRole("radio");
+    // Two visual rows of three: the grid wraps to its width.
+    radios.forEach((radio, index) => {
+      Object.defineProperty(radio, "offsetTop", { configurable: true, value: index < 3 ? 0 : 40 });
+    });
+    const swatch = (name: string) => screen.getByRole("radio", { name });
+
+    await user.tab();
+    expect(swatch("Зелёный")).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(swatch("Красный")).toHaveFocus();
+    expect(swatch("Красный")).toHaveAttribute("aria-checked", "true");
+    await user.keyboard("{ArrowDown}");
+    expect(swatch("Янтарный")).toHaveFocus();
+    expect(swatch("Янтарный")).toHaveAttribute("aria-checked", "true");
+    await user.keyboard("{ArrowUp}");
+    expect(swatch("Красный")).toHaveAttribute("aria-checked", "true");
+    await user.keyboard("{ArrowRight}");
+    expect(swatch("Зелёный")).toHaveAttribute("aria-checked", "true");
+    // One tab stop: Tab leaves the group.
+    await user.tab();
+    expect(document.body).toHaveFocus();
   });
 
   it("adds a no-color swatch with allowEmpty and submits through a hidden input", () => {

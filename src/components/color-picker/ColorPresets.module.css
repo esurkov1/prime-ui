@@ -21,20 +21,10 @@
 
 /*
  * The shared swatch tier on the menu item base (`data-base="item"`, swatches 16 · 20 · 24 · 28 · 32;
- * at least the touch target on a coarse pointer). The grid is `--cpr-columns` swatches wide while
- * the panel has room; narrower it wraps, and `--swatch-columns` (measured) splits the rows evenly.
+ * at least the touch target on a coarse pointer) and the shared swatch grid: `columns` swatches
+ * wide while the panel has room, narrower it wraps into balanced rows. The listbox takes no
+ * outline of its own: focus sits on a swatch.
  */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(var(--swatch-columns, auto-fill), var(--swatch-size));
-  justify-content: start;
-  gap: var(--swatch-gap);
-  inline-size: calc(
-    var(--cpr-columns) *
-    var(--swatch-size) +
-    (var(--cpr-columns) - 1) *
-    var(--swatch-gap)
-  );
-  max-inline-size: 100%;
   outline: none;
 }

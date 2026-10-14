@@ -22,6 +22,7 @@ import {
   SwatchContent,
   sameColor,
   swatchClass,
+  swatchGridClass,
   swatchTierClass,
   useBalancedColumns,
   usePaletteOptions,
@@ -204,8 +205,9 @@ function SwatchGrid({
         aria-describedby={ids.describedBy}
         aria-required={required || undefined}
         aria-invalid={ids.invalid || undefined}
-        className={cx(swatchTierClass, styles.grid)}
+        className={cx(swatchTierClass, swatchGridClass, styles.grid)}
         data-base="control"
+        data-stretch="true"
         style={
           {
             "--swatch-count": options.length,

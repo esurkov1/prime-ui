@@ -102,9 +102,10 @@
   top: 50%;
 }
 
-/* ---- Saturation / lightness area ---- */
+/* ---- Saturation / lightness area: tier `l` (`fieldTierClass`, set in TSX), its choice box the
+   thumb ---- */
 .area {
-  --cp-thumb: var(--prime-control-l-choice);
+  --cp-thumb: var(--field-choice);
   box-sizing: border-box;
   width: 100%;
   aspect-ratio: 4 / 3;
@@ -127,7 +128,7 @@
 
 /* ---- Channel strip: eyedropper + equal grid columns, one field per channel ----
  * Each cell is a field row (foundation §9 "Field affixes"): the value and its unit are one
- * end-aligned group separated by the compact (xs) tier gap, so number–unit spacing is identical in every cell.
+ * end-aligned group separated by one tight step, so number–unit spacing is identical in every cell.
  * Column widths come from the grid, never from fixed widths on the cells. */
 .channelStrip {
   display: grid;
@@ -157,7 +158,7 @@
   display: flex;
   align-items: baseline;
   align-self: stretch;
-  gap: var(--prime-control-xs-gap);
+  gap: var(--prime-space-1);
   min-width: 0;
   padding-block: calc((var(--prime-control-m-height) - var(--field-lh)) / 2);
   padding-inline: var(--prime-space-2) var(--prime-space-1);
@@ -182,7 +183,7 @@
 }
 
 .channelCellHex {
-  padding-inline: var(--prime-control-s-field-padding-x);
+  padding-inline: var(--field-px);
 }
 
 .channelCellHex .channelInput {
