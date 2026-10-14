@@ -23,13 +23,13 @@ describe("Ring", () => {
     expect(svg).not.toHaveAttribute("data-spin");
   });
 
-  it("draws the track of a surface with track surface, and no track with false", () => {
+  it("draws the track of a surface with track surface, and no track with none", () => {
     const { container, rerender } = render(<Ring value={0.4} track="surface" />);
     expect(svgOf(container)).toHaveAttribute("data-track", "surface");
     expect(svgOf(container).querySelectorAll("circle")).toHaveLength(2);
     rerender(<Ring value={0.4} />);
     expect(svgOf(container)).not.toHaveAttribute("data-track");
-    rerender(<Ring value={0.4} track={false} />);
+    rerender(<Ring value={0.4} track="none" />);
     expect(svgOf(container).querySelectorAll("circle")).toHaveLength(1);
   });
 
