@@ -3,11 +3,19 @@ import { DigitInput } from "prime-ui-kit";
 
 export default function DigitInputStatesExample() {
   return (
-    <>
-      <DigitInput label="default" defaultValue="42" />
-      <DigitInput label="disabled" defaultValue="42" disabled />
-      <DigitInput label="invalid" defaultValue="4271" invalid />
-      <DigitInput label="success" defaultValue="4821" success hint="Код подтверждён" />
-    </>
+    <div>
+      <div>
+        <DigitInput label="default" defaultValue="42" />
+      </div>
+      <div>
+        <DigitInput label="disabled" defaultValue="42" disabled />
+      </div>
+      <div>
+        <DigitInput label="invalid" defaultValue="4271" invalid />
+      </div>
+      <div>
+        <DigitInput label="success" defaultValue="4821" success hint="Код подтверждён" />
+      </div>
+    </div>
   );
 }

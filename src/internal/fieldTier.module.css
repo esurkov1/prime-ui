@@ -11,14 +11,17 @@
  *   --field-hint-size / --field-hint-lh     support row text      --field-hint-gap   field → hint
  *   --field-hint-icon                       icon of a support row
  *   --field-choice                          box of a checkbox / radio
- *   --field-item-h                          a menu / list row of the tier
  *   --field-step-h                          a control one tier down (`stepDown`: a row action)
  *   --field-compact-h                       a fixed small control (`compactTier`: a corner close)
  *   --field-track                           thickness of a line (a slider, a progress track)
+ *   --field-code / --field-code-radius      cell of a one-time code (DigitInput): two steps above
+ *                                           the control height, since a code is the one thing on
+ *                                           its screen (xs 36 · s 40 · m 48 · l 56 · xl 64)
  * No other stylesheet maps `--prime-control-<tier>-*`: hosts read these variables. The text
  * classes below set a text from the tier on the element that joins them:
  *   .labelText  field label (Label)   .hintText  support row (Hint, counter)
  *   .inputText  an editable value outside a field box (a search row, a channel cell)
+ * and `.codeCell` sizes a cell of a one-time code from `--field-code` (DigitInput).
  * A CSS module class (not generated CSS): hosts take it with `fieldTierClass` and the text classes
  * in TSX (never a cross-file `composes`, which the bundler cannot order), so it ships with the
  * components.
@@ -41,10 +44,11 @@
   --field-hint-gap: var(--prime-control-m-hint-gap);
   --field-hint-icon: var(--prime-icon-xs);
   --field-choice: var(--prime-control-m-choice);
-  --field-item-h: var(--prime-control-m-item-height);
   --field-step-h: var(--prime-control-s-height);
   --field-compact-h: var(--prime-control-xs-height);
   --field-track: var(--prime-control-m-track);
+  --field-code: var(--prime-control-xl-height);
+  --field-code-radius: var(--prime-control-xl-radius);
   /* Resolved on the same element as the tier rows below, so it follows the tier. */
   --field-input-text: var(--field-text);
   --field-input-lh: var(--field-lh);
@@ -79,10 +83,11 @@
   --field-hint-lh: var(--prime-control-xs-hint-line-height);
   --field-hint-gap: var(--prime-control-xs-hint-gap);
   --field-choice: var(--prime-control-xs-choice);
-  --field-item-h: var(--prime-control-xs-item-height);
   --field-step-h: var(--prime-control-xs-height);
   --field-compact-h: var(--prime-control-xs-height);
   --field-track: var(--prime-control-xs-track);
+  --field-code: var(--prime-control-m-height);
+  --field-code-radius: var(--prime-control-m-radius);
 }
 
 .tier[data-size="s"] {
@@ -102,10 +107,11 @@
   --field-hint-lh: var(--prime-control-s-hint-line-height);
   --field-hint-gap: var(--prime-control-s-hint-gap);
   --field-choice: var(--prime-control-s-choice);
-  --field-item-h: var(--prime-control-s-item-height);
   --field-step-h: var(--prime-control-xs-height);
   --field-compact-h: var(--prime-control-xs-height);
   --field-track: var(--prime-control-s-track);
+  --field-code: var(--prime-control-l-height);
+  --field-code-radius: var(--prime-control-l-radius);
 }
 
 .tier[data-size="l"] {
@@ -126,10 +132,11 @@
   --field-hint-gap: var(--prime-control-l-hint-gap);
   --field-hint-icon: var(--prime-icon-s);
   --field-choice: var(--prime-control-l-choice);
-  --field-item-h: var(--prime-control-l-item-height);
   --field-step-h: var(--prime-control-m-height);
   --field-compact-h: var(--prime-control-s-height);
   --field-track: var(--prime-control-l-track);
+  --field-code: var(--prime-space-14);
+  --field-code-radius: var(--prime-radius-l);
 }
 
 .tier[data-size="xl"] {
@@ -150,10 +157,11 @@
   --field-hint-gap: var(--prime-control-xl-hint-gap);
   --field-hint-icon: var(--prime-icon-s);
   --field-choice: var(--prime-control-xl-choice);
-  --field-item-h: var(--prime-control-xl-item-height);
   --field-step-h: var(--prime-control-l-height);
   --field-compact-h: var(--prime-control-s-height);
   --field-track: var(--prime-control-xl-track);
+  --field-code: var(--prime-space-16);
+  --field-code-radius: var(--prime-radius-xl);
 }
 
 /*
@@ -200,4 +208,20 @@
 .inputText {
   font-size: var(--field-input-text);
   line-height: var(--field-input-lh);
+}
+
+/* A cell of a one-time code: a square of the code-cell row, its corner from the same row. On a
+   coarse pointer an xs or s cell grows itself to the touch target: an input cannot take taps
+   through a hit area drawn around it. */
+.codeCell {
+  --code-cell: var(--field-code);
+  width: var(--code-cell);
+  height: var(--code-cell);
+  border-radius: var(--field-code-radius);
+}
+
+@media (pointer: coarse) {
+  .codeCell {
+    --code-cell: max(var(--field-code), var(--prime-control-touch-target));
+  }
 }

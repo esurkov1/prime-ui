@@ -1,41 +1,38 @@
 /*
- * Switch track on the shared choice layout and states (internal/ChoiceField.module.css): this file
- * is the track and thumb geometry. Track/thumb from `--prime-switch-<tier>-*`.
+ * Switch track on the shared choice layout and states (internal/ChoiceField.module.css, its track
+ * mode): this file is the track and thumb geometry. Track/thumb from `--prime-switch-<tier>-*`.
  * Thumb inset = (height − thumb) / 2, travel = width − height.
  */
 .root {
-  --sw-w: var(--prime-switch-m-width);
-  --sw-h: var(--prime-switch-m-height);
-  --sw-thumb: var(--prime-switch-m-thumb);
-  --sw-inset: calc((var(--sw-h) - var(--sw-thumb)) / 2);
-  --sw-travel: calc(var(--sw-w) - var(--sw-h));
-  /* The track fill changes at the thumb's pace; a disabled «on» keeps a soft accent. */
-  --choice-bg-duration: var(--prime-motion-duration-base);
-  --choice-bg-disabled-checked: var(--prime-color-accent-soft);
+  --switch-w: var(--prime-switch-m-width);
+  --switch-h: var(--prime-switch-m-height);
+  --switch-thumb: var(--prime-switch-m-thumb);
+  --switch-inset: calc((var(--switch-h) - var(--switch-thumb)) / 2);
+  --switch-travel: calc(var(--switch-w) - var(--switch-h));
 }
 
 .root[data-size="xs"] {
-  --sw-w: var(--prime-switch-xs-width);
-  --sw-h: var(--prime-switch-xs-height);
-  --sw-thumb: var(--prime-switch-xs-thumb);
+  --switch-w: var(--prime-switch-xs-width);
+  --switch-h: var(--prime-switch-xs-height);
+  --switch-thumb: var(--prime-switch-xs-thumb);
 }
 
 .root[data-size="s"] {
-  --sw-w: var(--prime-switch-s-width);
-  --sw-h: var(--prime-switch-s-height);
-  --sw-thumb: var(--prime-switch-s-thumb);
+  --switch-w: var(--prime-switch-s-width);
+  --switch-h: var(--prime-switch-s-height);
+  --switch-thumb: var(--prime-switch-s-thumb);
 }
 
 .root[data-size="l"] {
-  --sw-w: var(--prime-switch-l-width);
-  --sw-h: var(--prime-switch-l-height);
-  --sw-thumb: var(--prime-switch-l-thumb);
+  --switch-w: var(--prime-switch-l-width);
+  --switch-h: var(--prime-switch-l-height);
+  --switch-thumb: var(--prime-switch-l-thumb);
 }
 
 .root[data-size="xl"] {
-  --sw-w: var(--prime-switch-xl-width);
-  --sw-h: var(--prime-switch-xl-height);
-  --sw-thumb: var(--prime-switch-xl-thumb);
+  --switch-w: var(--prime-switch-xl-width);
+  --switch-h: var(--prime-switch-xl-height);
+  --switch-thumb: var(--prime-switch-xl-thumb);
 }
 
 .track {
@@ -43,23 +40,23 @@
   box-sizing: border-box;
   flex-shrink: 0;
   display: block;
-  width: var(--sw-w);
-  height: var(--sw-h);
+  width: var(--switch-w);
+  height: var(--switch-h);
   border-radius: var(--prime-radius-full);
 }
 
 .thumb {
   /* A spinner inside sizes itself from here, a ring inside the thumb's edge. */
-  --prime-icon-size: calc(var(--sw-thumb) - var(--prime-space-1));
+  --prime-icon-size: calc(var(--switch-thumb) - var(--prime-space-1));
 
   position: absolute;
-  top: var(--sw-inset);
-  left: var(--sw-inset);
+  top: var(--switch-inset);
+  left: var(--switch-inset);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--sw-thumb);
-  height: var(--sw-thumb);
+  width: var(--switch-thumb);
+  height: var(--switch-thumb);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-control-thumb);
   box-shadow: var(--prime-shadow-raised);
@@ -69,7 +66,7 @@
 }
 
 .root[data-state="checked"] .thumb {
-  transform: translateX(var(--sw-travel));
+  transform: translateX(var(--switch-travel));
   color: var(--prime-color-accent-default);
 }
 
@@ -81,8 +78,4 @@
    which already stands in the new position; the press does nothing until the answer. */
 .track[data-loading="true"] {
   cursor: progress;
-}
-
-.spinner {
-  --enter-shift: 0;
 }

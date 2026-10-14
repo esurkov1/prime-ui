@@ -2,25 +2,23 @@
 import { Button } from "prime-ui-kit";
 import { ColorPicker } from "prime-ui-kit/color-picker";
 
-import styles from "./examples.module.css";
-
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function ColorPickerSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map((size) => (
-        <ColorPicker.Root key={size} defaultValue="#0090ff" size={size}>
-          <div className={styles.fieldRow}>
+        <div key={size}>
+          <ColorPicker.Root defaultValue="#0090ff" size={size}>
             <ColorPicker.HexInput label={size} />
             <Button.Root variant="soft" tone="neutral" aria-label="Открыть палитру">
               <Button.Icon>
                 <ColorPicker.TriggerSwatch />
               </Button.Icon>
             </Button.Root>
-          </div>
-        </ColorPicker.Root>
+          </ColorPicker.Root>
+        </div>
       ))}
-    </>
+    </div>
   );
 }

@@ -1,35 +1,11 @@
 /*
  * ColorSwatches — inline color choice on the shared swatch (internal/swatch.module.css): the tier
  * on the grid with the control-height base (swatches 20 · 24 · 28 · 32 · 40; at least the touch
- * target on a coarse pointer, so the grid wraps into more rows). The swatches share
- * the container width: each stretches across its column and a row wraps only when they no longer
- * fit; the arrow keys move by the visual rows.
- *
- * Width: the preferred size is one row of tier-sized swatches (`--swatch-count`, set by the
- * component), so a host that sizes to its content gets one row; `min` / `max` 100% make it exactly
- * the container width wherever that width is known, wider or narrower.
- *
- * Rows: the component measures the width and sets `--swatch-columns` so a wrap splits the swatches
- * evenly (16 → 8 + 8, never 14 + 2); until it measures, `auto-fit` fills the rows greedily.
- * The swatch height is the tier's whatever the column width: `size` sets the swatches only, the
- * label and hint follow the form around.
+ * target on a coarse pointer, so the grid wraps into more rows), and the shared swatch grid in its
+ * stretch mode: the swatches share the container width, each across its column, and a row wraps
+ * into balanced rows only when they no longer fit; the arrow keys move by the visual rows.
+ * `size` sets the swatches only: the label and hint follow the form around.
  */
-.grid {
-  /* Every swatch stretches across its column; the height stays the tier's. */
-  --swatch-inline-size: 100%;
-  display: grid;
-  grid-template-columns: repeat(var(--swatch-columns, auto-fit), minmax(var(--swatch-size), 1fr));
-  gap: var(--swatch-gap);
-  box-sizing: border-box;
-  inline-size: calc(
-    var(--swatch-count) *
-    var(--swatch-size) +
-    (var(--swatch-count) - 1) *
-    var(--swatch-gap)
-  );
-  min-inline-size: 100%;
-  max-inline-size: 100%;
-}
 
 /* Invalid: the inner edge of every swatch turns danger (the message says why). */
 .grid[data-invalid="true"] > *::after {

@@ -1,10 +1,5 @@
 [
   "src/components/modal/DialogParts.module.css: px in @container (use rem)",
   "src/components/popover/Popover.module.css: raw length in --po-gap",
-  "src/components/popover/Popover.module.css: raw length in --po-pad",
-  "src/components/radio/Radio.module.css: numeric scale() in transform",
-  "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-bottom",
-  "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-end",
-  "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-start",
-  "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-top"
+  "src/components/popover/Popover.module.css: raw length in --po-pad"
 ]

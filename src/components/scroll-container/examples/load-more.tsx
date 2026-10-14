@@ -35,15 +35,15 @@ export default function ScrollContainerLoadMoreExample() {
         <Card.Title>Журнал заказов</Card.Title>
       </Card.Header>
       <ScrollContainer onReachEnd={loadMore} tabIndex={0} aria-label="Заказы">
-        <ul className={styles.list}>
+        <Card.List>
           {ORDERS.slice(0, shown).map((order) => (
-            <li key={order.id}>
+            <Card.ListItem key={order.id}>
               <Typography as="span" variant="body-m" tone="secondary">
                 Заказ № {order.id} · {order.amount}
               </Typography>
-            </li>
+            </Card.ListItem>
           ))}
-        </ul>
+        </Card.List>
         {loading ? <Skeleton lines={3} className={styles.older} /> : null}
       </ScrollContainer>
     </Card.Root>

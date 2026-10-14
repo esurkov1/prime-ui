@@ -1,4 +1,4 @@
-/** Every state side by side, each labelled by its prop — `checked`, `readOnly`, `invalid`, `loading`, `disabled`. */
+/** Every state side by side, each labelled by its prop — `defaultChecked`, `readOnly`, `invalid`, `loading`, `disabled`. */
 import { Switch } from "prime-ui-kit";
 
 export default function SwitchStatesExample() {
@@ -12,7 +12,7 @@ export default function SwitchStatesExample() {
         </div>
         <div>
           <Switch.Root defaultChecked>
-            <Switch.Label>checked</Switch.Label>
+            <Switch.Label>defaultChecked</Switch.Label>
           </Switch.Root>
         </div>
         <div>
@@ -39,7 +39,7 @@ export default function SwitchStatesExample() {
         </div>
         <div>
           <Switch.Root disabled defaultChecked>
-            <Switch.Label>disabled · checked</Switch.Label>
+            <Switch.Label>disabled · defaultChecked</Switch.Label>
           </Switch.Root>
         </div>
       </div>

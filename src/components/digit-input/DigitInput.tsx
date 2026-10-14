@@ -1,10 +1,11 @@
 import * as React from "react";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
-import { useControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
+import enterMotion from "@/internal/enterMotion.module.css";
 import {
   type FieldFocusRingProps,
   FieldFrame,
@@ -12,8 +13,9 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
-import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { fieldCodeCellClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 import { isPromiseLike } from "@/internal/usePendingChanges";
 
@@ -51,42 +53,20 @@ function reasonOf(error: unknown, fallback: string): string {
 export type DigitInputProps = FieldRootDomProps &
   FieldFrameProps &
   FieldFocusRingProps & {
-    /** Number of cells. */
     length?: number;
-    /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;
-    /**
-     * Cells share the container width and grow with it (height stays the tier height, so they become
-     * wider than tall). Default `false`: square cells of the tier size, centered.
-     */
     fullWidth?: boolean;
-    /** Name of the hidden input that carries the joined code in a native form submit. */
     name?: string;
-    /** Splits the cells into groups of this size with a wider gap between them (`3` → 123 456). */
     groupSize?: number;
-    /** Hides the digits (PIN): cells are `type="password"`. */
     mask?: boolean;
-    /** Focuses the first empty cell on mount. */
     autoFocus?: boolean;
     value?: string;
     defaultValue?: string;
     onValueChange?: (value: string) => void;
-    /**
-     * Called once when the last empty cell is filled. Return the check's promise: the cells wait
-     * read-only and quiet (`aria-busy`); resolve — the `success` look; reject — the code clears,
-     * the field shakes in the reason (the rejection's message, else `labels.failed`) as its error,
-     * and the reason is announced. Typing again takes the error away.
-     */
     onComplete?: (value: string) => void | Promise<void>;
     disabled?: boolean;
-    /** Invalid state: danger ring on every cell. A non-empty `error` implies it. */
     invalid?: boolean;
-    /**
-     * The code was accepted (after the server checked it): the cells turn success one after
-     * another. Say it in words too (`hint`), never by color alone.
-     */
     success?: boolean;
-    /** Id of the first cell (the label points at it); generated when omitted. */
     id?: string;
     "aria-describedby"?: string;
     labels?: Partial<DigitInputLabels>;
@@ -122,9 +102,10 @@ export function DigitInput({
   className,
   ...rest
 }: DigitInputProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
   const disabled = useInheritedDisabled(disabledProp);
-  const labels = { ...DIGIT_INPUT_LABELS, ...labelsProp };
+  const labels = useLabels(DIGIT_INPUT_LABELS, labelsProp);
   const [verification, setVerification] = React.useState<Verification | null>(null);
   /** Checks in flight: only the answer for the code on screen counts. */
   const attemptRef = React.useRef(0);
@@ -246,7 +227,7 @@ export function DigitInput({
     commit(nextCells.join(""));
   };
 
-  return (
+  return tier.provide(
     <FieldFrame
       {...rest}
       size={size}
@@ -302,6 +283,9 @@ export function DigitInput({
               inputRefs.current[index] = el;
             }}
             id={index === 0 ? ids.controlId : undefined}
+            // One tab stop: the focused cell, else the entry cell. Tab leaves the code instead of
+            // landing on a cell past the entry, which would send focus back.
+            tabIndex={index === (focusIndex ?? entryIndex) ? 0 : -1}
             type={mask ? "password" : "text"}
             inputMode="numeric"
             autoComplete="one-time-code"
@@ -312,7 +296,12 @@ export function DigitInput({
             disabled={disabled}
             readOnly={verifying}
             required={required}
-            className={cx(fieldSurfaceClass, styles.cell)}
+            className={cx(
+              fieldSurfaceClass,
+              fieldCodeCellClass,
+              styles.cell,
+              cell ? enterMotion.enterInk : undefined,
+            )}
             // The row's gliding ring replaces each cell's own.
             data-focus-ring="false"
             style={{ "--digit-i": index } as React.CSSProperties}
@@ -370,6 +359,6 @@ export function DigitInput({
           {verification?.state === "refused" ? verification.reason : ""}
         </VisuallyHidden>
       </fieldset>
-    </FieldFrame>
+    </FieldFrame>,
   );
 }

@@ -1,6 +1,6 @@
 /* Layout of the DigitInput scenarios: semantic tokens only. */
 
-/* full-width.tsx, in-form.tsx: a phone-width column, code above the action (group → action 24). */
+/* full-width.tsx: a phone-width column, code above the action (group → action 24). */
 .panel {
   display: flex;
   flex-direction: column;

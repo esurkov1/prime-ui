@@ -106,7 +106,7 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 ## Layout & spacing
 - The swatches take the container width in equal columns: each one stretches across its column (the height stays the tier's). A row wraps only when they no longer fit, and then the swatches split evenly over the rows (16 → 8 + 8, never 14 + 2); no column count to set. In a content-sized container they stand in one row at the tier size.
 - On a coarse pointer the swatches grow to the 44 px touch target (a dense grid cannot grow an invisible hit area past its neighbours) and wrap into more rows.
-- The keyboard focus ring sits outside the swatches; kit hosts (Modal / Drawer body, panels, cards) already keep `--prime-focus-space` padding, so the ring is never clipped. In your own `overflow` container, keep that padding.
+- The keyboard focus ring sits outside the swatches; kit hosts (Modal / Drawer body, panels, cards) already keep room for it, so the ring is never clipped. In your own clipping container, keep the same room.
 - Label → swatches and swatches → hint use the tier `label-gap` / `hint-gap`; field → field 20.
 
 ## Accessibility
@@ -144,7 +144,7 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 | [overview.tsx](examples/overview.tsx) | The kit palette inline under a field label, one color chosen — `label`, `defaultValue`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size: the swatch height 20 to 40 px with the tier gap, the label stays the form's — `size`. |
 | [states.tsx](examples/states.tsx) | A default palette next to an invalid and a disabled one — `invalid`, `disabled`. |
-| [wrapping.tsx](examples/wrapping.tsx) | In a narrow column the swatches wrap by themselves into even rows and the arrows move by the visual rows. |
+| [wrapping.tsx](examples/wrapping.tsx) | Twelve stage colors in a narrow column wrap by themselves into even rows, and the arrows move by the visual rows — `presets`. |
 | [palette.tsx](examples/palette.tsx) | A pipeline stage takes a kit palette hue, so its badge and column read the same in both themes — `mode`, `palette`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the color, «no color» included, and names it in the hint — `value`, `onValueChange`, `allowEmpty`. |
 | [in-form.tsx](examples/in-form.tsx) | A calendar event form: the color is submitted by `name` and required on save: submitting an empty title or no color shakes the field, picking or typing clears the error — `name`, `required`, `error`. |

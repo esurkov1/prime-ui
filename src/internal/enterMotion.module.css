@@ -8,6 +8,8 @@
  *   .enterBase  base · blocks (empty state, detail panel)
  *   .enterBaseChildren  base · on a host whose children all enter (EmptyPage outside compact)
  *   .enterFade  fast · opacity only (a part that must not move: a value, a glyph row)
+ *   .enterInk   fast · the text ink only (a character typed into a field whose fill stays: a
+ *               code cell)
  *   .exit       fast · the mirror of `.enter` for a part kept mounted while it leaves
  *               (`usePresence`); it holds the end state until the host unmounts it
  *   .exitFade   fast · opacity only
@@ -47,6 +49,10 @@
   animation: primeEnterFade var(--prime-motion-fade-fast) var(--prime-motion-easing-enter) backwards;
 }
 
+.enterInk {
+  animation: primeEnterInk var(--prime-motion-fade-fast) var(--prime-motion-easing-enter) backwards;
+}
+
 .exit {
   animation:
     primeExitMove var(--enter-duration, var(--prime-motion-duration-fast))
@@ -69,6 +75,12 @@
 @keyframes primeEnterFade {
   from {
     opacity: 0;
+  }
+}
+
+@keyframes primeEnterInk {
+  from {
+    color: transparent;
   }
 }
 

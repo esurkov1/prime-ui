@@ -95,9 +95,8 @@
 
 /*
  * ---- Visual control states ----
- * Fills read variables with defaults, so a host only tunes them on its root: `--choice-bg-hover`,
- * `--choice-bg-disabled-checked`, `--choice-bg-duration` (pace of the fill change). Read-only,
- * disabled and busy take no hover or press. Press is `press.pressPartCompact` under the row's
+ * A sliding control joins `.track` next to `.visual` (Switch). Read-only, disabled and busy take
+ * no hover or press. Press is `press.pressPartCompact` under the row's
  * `press.pressHost` (joined in TSX); hosts never restyle `.visual` itself, so file order is free.
  */
 .visual {
@@ -160,4 +159,11 @@
 .visual[data-disabled="true"][data-state="checked"],
 .visual[data-disabled="true"][data-state="indeterminate"] {
   background: var(--choice-bg-disabled-checked, var(--prime-color-fill-muted));
+}
+
+/* A track (Switch): the fill changes at the thumb's pace, and a disabled «on» keeps a soft accent,
+   so the state still reads apart from the thumb's position. */
+.track {
+  --choice-bg-duration: var(--prime-motion-duration-base);
+  --choice-bg-disabled-checked: var(--prime-color-accent-soft);
 }

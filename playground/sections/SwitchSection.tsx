@@ -29,7 +29,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Все состояния рядом, каждое подписано своим пропом — `checked`, `readOnly`, `invalid`, `loading`, `disabled`.",
+        "Все состояния рядом, каждое подписано своим пропом — `defaultChecked`, `readOnly`, `invalid`, `loading`, `disabled`.",
     },
     {
       scenario: "settings-row",

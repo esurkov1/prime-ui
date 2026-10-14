@@ -123,7 +123,7 @@ Each fires once per approach — again after the position leaves the zone or the
 | content fits | the content is no larger than the region along its axis (re-measured on resize of the region or a child, and when children change); never with `anchor="end"`, `onReachStart` or `onReachEnd` — a region that follows its content always stays a scroller | `data-fits`, `overflow: hidden`: a region that cannot scroll is no scroller, so the browser never composites a layer for a sub-pixel overflow; text or inline content straight inside keeps it a scroller |
 | keyboard focus | `tabIndex={0}` on a region without focusable content | inset focus ring (`--prime-focus-offset-inset`) |
 
-The scrollbar thumb uses `fill-strong`, darkening to `fill-strong-hover` on hover (WebKit). The fade and the shadow follow the scroll at once: scrolling is high-frequency, so nothing animates. A fade region sets `scroll-padding` of the fade depth on its scroll axes, so focus, `scrollIntoView` and a snapped child land clear of the fade. The depth is `--scroll-fade-depth` (`--prime-space-8`), the one public hook of the region: a switcher that draws its own edge overlays sets it to their width.
+The scrollbar thumb uses `fill-strong` and stays still on hover in every engine. The fade and the shadow follow the scroll at once: scrolling is high-frequency, so nothing animates. A fade region sets `scroll-padding` of the fade depth on its scroll axes, so focus, `scrollIntoView` and a snapped child land clear of the fade. The depth is `--scroll-fade-depth` (`--prime-space-8`), the one public hook of the region: a switcher that draws its own edge overlays sets it to their width.
 
 ## Layout & spacing
 - Sets `min-width: 0` and `min-height: 0`, so it shrinks inside a flex or grid parent; give the parent (or the container) a height.
@@ -157,7 +157,7 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A feed that scrolls on its own inside a fixed-height card, with the kit's thin scrollbar. |
+| [overview.tsx](examples/overview.tsx) | A feed that scrolls on its own inside a fixed-height card, with the kit's thin scrollbar — `ScrollContainer`. |
 | [variants.tsx](examples/variants.tsx) | A strip that scrolls sideways and a wide schedule that scrolls both ways — `axis`. |
 | [edges.tsx](examples/edges.tsx) | Hidden edges fade over any background, take a soft shadow on a filled surface, or stay plain — `edges`. |
 | [scrollbar.tsx](examples/scrollbar.tsx) | The kit's quiet thin bar on a list and no bar on a strip of chips, where the faded edges show the overflow — `scrollbar`. |

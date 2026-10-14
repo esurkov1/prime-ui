@@ -38,10 +38,14 @@ export default function ScrollContainerAutoScrollExample() {
               setTasks((current) => moveBefore(current, id, beforeId, (task) => task.id))
             }
             renderItem={(task) => (
-              <Dnd.SortableItem id={task.id} className={styles.task}>
-                <Typography as="span" variant="body-m" truncate>
-                  {task.title}
-                </Typography>
+              <Dnd.SortableItem id={task.id}>
+                <Card.Root>
+                  <Card.Body>
+                    <Typography as="span" variant="body-m" truncate>
+                      {task.title}
+                    </Typography>
+                  </Card.Body>
+                </Card.Root>
               </Dnd.SortableItem>
             )}
           />

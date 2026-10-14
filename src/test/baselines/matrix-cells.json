@@ -1,10 +1,6 @@
 [
   "src/components/accordion/examples/sizes.tsx: not rows of labelled cells",
   "src/components/accordion/examples/variants.tsx: not rows of labelled cells",
-  "src/components/color-picker/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/color-picker/examples/states.tsx: not rows of labelled cells",
-  "src/components/digit-input/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/digit-input/examples/states.tsx: not rows of labelled cells",
   "src/components/drawer/examples/sizes.tsx: not rows of labelled cells",
   "src/components/dropdown/examples/sizes.tsx: not rows of labelled cells",
   "src/components/dropdown/examples/states.tsx: not rows of labelled cells",

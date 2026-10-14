@@ -25,8 +25,7 @@ export const choiceInputClass = styles.input;
 
 /**
  * Class of the visual control (box, circle, track): fill, hover, press, checked, focus ring,
- * invalid and disabled come from the field state. A host tunes the fills with `--choice-bg*`.
- * Outside a field (`Checkbox.Indicator`) the element's own `data-state` / `data-disabled` drive it.
+ * invalid and disabled come from the field state. Outside a field (`Checkbox.Indicator`) the element's own `data-state` / `data-disabled` drive it.
  */
 export const choiceVisualClass = cx(styles.visual, press.pressPartCompact);
 
@@ -35,6 +34,12 @@ export const choiceVisualClass = cx(styles.visual, press.pressPartCompact);
  * centred in it. The host sets only its corner radius and draws the mark or the dot.
  */
 export const choiceBoxClass = styles.box;
+
+/**
+ * The track of a sliding control (Switch), joined next to `choiceVisualClass`: the fill changes at
+ * the thumb's pace, and a disabled «on» keeps a soft accent.
+ */
+export const choiceTrackClass = styles.track;
 
 type ChoiceMarks = {
   required: boolean;

@@ -82,7 +82,8 @@ No `variant` or `tone`.
 | `groupSize` | an extra gap before every group (`3` → 123 456) | codes of six digits and longer | — |
 | `mask` | dots instead of digits | PIN codes | `false` |
 | `required` / `optional` | red `*` / muted «необязательно» after the label | mark the minority of the form | — |
-| `focusRing={false}` | no focus ring; the focus fill and the caret remain | a single code on a screen where focus is obvious | `true` |
+| `focusRing` | `false`: no focus ring; the focus fill and the caret remain | a single code on a screen where focus is obvious | `true` |
+| `autoFocus` | the entry cell takes focus on mount | the code is the one task of its step (a verification screen) | `false` |
 
 **Combinations**
 - Recommended: `onComplete` returning the check's promise — the field waits, shows success or clears and shows the reason; or, checking by hand, `error` set after a rejected code and cleared in `onValueChange`.
@@ -94,7 +95,7 @@ No `variant` or `tone`.
 | State | Driven by | DOM |
 |---|---|---|
 | hover | — | cell fill darkens (not on focused or disabled cells) |
-| focus | keyboard / click | focused cell: focus fill and its content selected so a new digit replaces it; one inset ring for the row appears on the cell and glides to the next one (`fast` · emphasized) instead of each cell drawing its own; the code has no gaps, so focusing a cell past the first empty one moves focus to that entry cell |
+| focus | keyboard / click | focused cell: focus fill and its content selected so a new digit replaces it; one inset ring for the row appears on the cell and glides to the next one (`fast` · emphasized) instead of each cell drawing its own; the code has no gaps, so focusing a cell past the first empty one moves focus to that entry cell; the code is one tab stop (the focused cell, else the entry cell) |
 | filled cell | a digit in the cell | `data-filled="true"` on the cell; the digit fades in as it lands |
 | checking | `onComplete` returned a pending promise | `aria-busy` and `data-pending="true"` on the fieldset, cells `readonly` and quiet to 0.6 (`fast`, both ways); typing waits for the answer |
 | refused | that promise rejected | the code clears and focus goes to the first cell; the reason (the rejection's message, else `labels.failed`) becomes the error (unless you pass `error`) and shakes in, a polite live region speaks it; typing again takes it away |
@@ -110,6 +111,7 @@ No `variant` or `tone`.
 ## Layout & spacing
 - The field hugs its cells (label left-aligned above them); with `fullWidth` it fills the container.
 - The code is always one row: in a container narrower than the row the cells narrow and keep the tier height, so no digit or group wraps to a second line.
+- On a coarse pointer an `xs` or `s` cell grows to the 44 px touch target itself (an input takes no taps through a hit area drawn around it).
 - Label → cells: tier `label-gap`; cells → hint: tier `hint-gap` — the same rhythm as every field.
 - Put the submit button below or next to the code; with the same `size` it lines up with the cells.
 
@@ -124,7 +126,7 @@ No `variant` or `tone`.
 | `Backspace` | Clears the cell; on an empty cell moves to the previous one. |
 | `ArrowLeft` · `ArrowRight` | Moves between filled cells and the entry cell. |
 | `Home` · `End` | Jumps to the first cell / the entry cell. |
-| `Tab` | Leaves the code. |
+| `Tab` | Enters the code at the entry cell; from any cell, leaves it. |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

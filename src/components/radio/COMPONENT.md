@@ -123,7 +123,7 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 
 ## Layout & spacing
 - Group label → options: the tier `label-gap`; options → hint / error: the tier `hint-gap` (the same rhythm as fields).
-- Options inside a group: gap `--prime-space-2`; group → group: `--prime-space-8`.
+- Options inside a group: gap `--prime-space-2`; groups in a form stand in a [Fieldset](../fieldset/COMPONENT.md), which sets the rhythm between them.
 - An option hint aligns with the text column, not with the circle.
 - Long labels wrap; horizontal rows wrap at narrow widths.
 

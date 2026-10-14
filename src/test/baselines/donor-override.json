@@ -3,8 +3,6 @@
   "src/components/modal/DialogParts.module.css: sets --avatar-slot-size, private to src/components/avatar/Avatar.module.css",
   "src/components/sheet/Sheet.module.css: sets --dialog-padding, private to src/components/modal/DialogParts.module.css",
   "src/components/spinner/Spinner.module.css: sets --ring-track, private to src/internal/ring.module.css",
-  "src/components/switch/Switch.module.css: sets --choice-bg-disabled-checked, private to src/internal/ChoiceField.module.css",
-  "src/components/switch/Switch.module.css: sets --choice-bg-duration, private to src/internal/ChoiceField.module.css",
   "src/internal/FieldFrame.module.css: sets --label-dimmed, private to src/components/label/Label.module.css",
   "src/internal/menu.module.css: sets --menu-desc, private to src/components/dropdown/Dropdown.module.css",
   "src/internal/menu.module.css: sets --menu-desc, private to src/components/dropdown/Dropdown.module.css #2",

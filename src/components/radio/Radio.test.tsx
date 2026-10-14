@@ -122,6 +122,46 @@ describe("Radio", () => {
     screen.getByRole("radio", { name: "A" }).focus();
     await user.keyboard("{ArrowDown}");
     expect(screen.getByRole("radio", { name: "B" })).toBeChecked();
+    await user.keyboard("{ArrowUp}");
+    expect(screen.getByRole("radio", { name: "A" })).toBeChecked();
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("radio", { name: "B" })).toBeChecked();
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getByRole("radio", { name: "A" })).toBeChecked();
+  });
+
+  it("Tab focuses the selected option; Space selects the focused one", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <>
+        <Radio.Group defaultValue="b" aria-label="Тариф">
+          <Radio.Root value="a">
+            <Radio.Label>A</Radio.Label>
+          </Radio.Root>
+          <Radio.Root value="b">
+            <Radio.Label>B</Radio.Label>
+          </Radio.Root>
+        </Radio.Group>
+        <Radio.Group aria-label="Период" onValueChange={onValueChange}>
+          <Radio.Root value="month">
+            <Radio.Label>Месяц</Radio.Label>
+          </Radio.Root>
+          <Radio.Root value="year">
+            <Radio.Label>Год</Radio.Label>
+          </Radio.Root>
+        </Radio.Group>
+      </>,
+    );
+    await user.tab();
+    expect(screen.getByRole("radio", { name: "B" })).toHaveFocus();
+    await user.tab();
+    const month = screen.getByRole("radio", { name: "Месяц" });
+    expect(month).toHaveFocus();
+    expect(month).not.toBeChecked();
+    await user.keyboard(" ");
+    expect(month).toBeChecked();
+    expect(onValueChange).toHaveBeenCalledWith("month");
   });
 
   it("disables an option and ignores label activation", async () => {

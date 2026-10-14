@@ -276,11 +276,11 @@ No `variant` / `tone` / `color`.
 There is no `disabled` on `ColorPicker.Root` — disable parts individually. Controlled: `value` + `onValueChange` (both components), `open` + `onOpenChange` (ColorPresets). Uncontrolled: `defaultValue`, `defaultOpen`.
 
 ## Layout & spacing
-- Panel width comes from the layout (e.g. `calc(var(--prime-panel-min-width) * 1.5)` fits the area and four channel fields).
-- Field + trigger row: gap `--prime-space-2`, `align-items: flex-end` so the trigger aligns with the field box under a label.
+- Panel width comes from the layout: a popover or a column wide enough for the area and four channel fields.
+- Field + trigger row: a small gap, `align-items: flex-end` so the trigger aligns with the field box under a label.
 - Panel parts gap: 12px (`--prime-space-3`) from `ColorPicker.Panel`.
 - ColorPresets.Content `align="auto"`: a trigger near the end of the screen lines up the panel's end edge and the panel grows toward the start, and the other way near the start; a fixed `align` still flips at the screen edge.
-- ColorPresets grid: one row for up to 8 presets (+ «no color»), else rows of 8 (`columns` overrides); below 480px viewport width the `l` / `xl` grids wrap to half the columns. On a coarse pointer every swatch grows to the 44 px touch target and the grid takes at most 5 columns, so it still fits a 320px panel; the arrow keys walk the same columns.
+- ColorPresets grid: one row for up to 8 presets (+ «no color»), else rows of 8 (`columns` overrides); a panel narrower than the row wraps the swatches into balanced rows (16 → 8 + 8, never 14 + 2). On a coarse pointer every swatch grows to the 44 px touch target and the grid wraps into more rows, so it still fits a 320px panel; the arrow keys walk the rows on screen.
 
 ## Accessibility
 
@@ -372,5 +372,5 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 - `<ColorPresets.Trigger />` with no child → put `ColorPresets.SwatchButton` (or your Button) inside it.
 
 ## Related
-- **Built from:** [Input](../input/COMPONENT.md) (`HexInput`), [Select](../select/COMPONENT.md) (`FormatSelect`), [Button](../button/COMPONENT.md) (`EyeDropperButton`), [ColorSwatches](../color-swatches/COMPONENT.md) (`Swatches`), [Popover](../popover/COMPONENT.md) (`ColorPresets.Root`, `ColorPresets.Content`), `Icon` (pipette), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Input](../input/COMPONENT.md) (`HexInput`), [Label](../label/COMPONENT.md) and [Hint](../hint/COMPONENT.md) (the `HexInput` label, hint and error), [Select](../select/COMPONENT.md) (`FormatSelect`), [Button](../button/COMPONENT.md) (`EyeDropperButton`), [ColorSwatches](../color-swatches/COMPONENT.md) (`Swatches`), [Popover](../popover/COMPONENT.md) (`ColorPresets.Root`, `ColorPresets.Content`), `Icon` (pipette), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ColorField](../color-field/COMPONENT.md), [ColorSwatches](../color-swatches/COMPONENT.md), [TagSelect](../tag-select/COMPONENT.md)

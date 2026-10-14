@@ -29,15 +29,15 @@ export default function ScrollContainerEdgesExample() {
             </Typography>
           </Card.Header>
           <ScrollContainer edges={edges}>
-            <ul className={styles.list}>
+            <Card.List>
               {EVENTS.map((event) => (
-                <li key={event}>
+                <Card.ListItem key={event}>
                   <Typography as="span" variant="body-m" tone="secondary">
                     {event}
                   </Typography>
-                </li>
+                </Card.ListItem>
               ))}
-            </ul>
+            </Card.List>
           </ScrollContainer>
         </Card.Root>
       ))}

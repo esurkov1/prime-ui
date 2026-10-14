@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type * as React from "react";
 import { I18nProvider } from "react-aria-components";
 import { describe, expect, it, vi } from "vitest";
@@ -30,6 +31,40 @@ describe("ColorPicker", () => {
     expect(screen.getAllByRole("slider", { name: "Палитра цветов" }).length).toBeGreaterThanOrEqual(
       1,
     );
+  });
+
+  it("keyboard on a slider: arrows step, PageUp / PageDown take larger steps; SliderMeta shows the value", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      withLocale(
+        <ColorPicker.Root defaultValue="hsl(100, 50%, 50%)" onValueChange={onValueChange}>
+          <ColorPicker.Slider channel="hue" colorSpace="hsl">
+            <ColorPicker.SliderMeta label="Оттенок" />
+            <ColorPicker.SliderTrack>
+              <ColorPicker.Thumb />
+            </ColorPicker.SliderTrack>
+          </ColorPicker.Slider>
+        </ColorPicker.Root>,
+      ),
+    );
+    const slider = screen.getByRole("slider", { name: "Оттенок" });
+    const hue = () => Number((slider as HTMLInputElement).value);
+    const output = screen.getByText("100°");
+    // The value is an output of its own: no `for` pointing at an id nothing carries.
+    expect(output.tagName).toBe("OUTPUT");
+    expect(output).not.toHaveAttribute("for");
+
+    slider.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(hue()).toBe(101);
+    await user.keyboard("{PageUp}");
+    const afterPageUp = hue();
+    expect(afterPageUp).toBeGreaterThan(102);
+    await user.keyboard("{PageDown}");
+    expect(hue()).toBeLessThan(afterPageUp);
+    expect(screen.getByText(`${hue()}°`).tagName).toBe("OUTPUT");
+    expect(onValueChange).toHaveBeenCalled();
   });
 
   it("format, defaultFormat and onFormatChange: the owner keeps the format", () => {

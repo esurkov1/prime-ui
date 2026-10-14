@@ -1,5 +1,4 @@
 [
   "src/components/dropdown/Dropdown.module.css: .item flips background",
-  "src/components/dropdown/Dropdown.module.css: .item flips background #2",
-  "src/components/scroll-container/ScrollContainer.module.css: .root flips background-color"
+  "src/components/dropdown/Dropdown.module.css: .item flips background #2"
 ]
