@@ -7,6 +7,7 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
 import type { PaletteColor } from "@/internal/states";
 
@@ -56,7 +57,7 @@ export function MessageLocation({
   ref,
   ...rest
 }: MessageLocationProps) {
-  const labels = { ...MESSAGE_LOCATION_LABELS, ...labelsProp };
+  const labels = useLabels(MESSAGE_LOCATION_LABELS, labelsProp);
   const { spacer } = useMessagePart();
   const map = (
     <>

@@ -11,6 +11,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch } from "@/internal/HighlightMatch";
 import { InteractiveElement } from "@/internal/interactiveElement";
+import { useLabels } from "@/internal/labels";
 import { useMessageList } from "@/internal/messageList";
 import { defineMessagePart, useMessageHighlight, useMessagePart } from "@/internal/messagePart";
 import { exitTimeoutMs } from "@/internal/motionTiming";
@@ -286,7 +287,7 @@ export function MessageReply({
   ref,
   ...rest
 }: MessageReplyProps) {
-  const { reply } = { ...MESSAGE_REPLY_LABELS, ...labels };
+  const { reply } = useLabels(MESSAGE_REPLY_LABELS, labels);
   const { reveal } = useMessageList();
   const body = (
     <>
@@ -342,7 +343,7 @@ export type MessageForwardedProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
 
 /** «Переслано от Анны»: the header of a forwarded message, the original author in bold. */
 export function MessageForwarded({ from, labels, className, ...rest }: MessageForwardedProps) {
-  const { forwarded } = { ...MESSAGE_FORWARDED_LABELS, ...labels };
+  const { forwarded } = useLabels(MESSAGE_FORWARDED_LABELS, labels);
   const [before, after = ""] = forwarded.split("{author}");
   return (
     <div className={cx(styles.forwarded, className)} data-message-fit="" {...rest}>
@@ -696,7 +697,7 @@ export function MessageReactions({
   className,
   ...rest
 }: MessageReactionsProps) {
-  const labels = { ...MESSAGE_REACTIONS_LABELS, ...labelsProp };
+  const labels = useLabels(MESSAGE_REACTIONS_LABELS, labelsProp);
   const { toggleReaction, optimistic, rowSpacer } = React.useContext(RootContext);
   const { reader } = useMessageList();
   const shown = applyOptimistic(items, optimistic, reader);

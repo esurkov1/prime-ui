@@ -3,6 +3,7 @@ import * as React from "react";
 import { LIVE_REGION_ATTR } from "@/hooks/useInertSiblings";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
+import { createComponentContext } from "@/internal/context";
 import { useLabels } from "@/internal/labels";
 import { exitTimeoutMs } from "@/internal/motionTiming";
 import { handoffFocus } from "@/internal/overlay/focus";
@@ -97,7 +98,9 @@ const TONES: readonly NotificationRecord["tone"][] = ["success", "danger", "warn
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
-const StoreContext = React.createContext<StoreValue | null>(null);
+const [StoreProvider, useStore] = createComponentContext<StoreValue>("useNotifications", {
+  parent: "NotificationProvider",
+});
 
 function newId(): string {
   return (
@@ -668,18 +671,16 @@ export function NotificationProvider({
   );
 
   return (
-    <StoreContext.Provider value={value}>
+    <StoreProvider value={value}>
       <NotificationLabelsContext.Provider value={labels}>
         {children}
         <NotificationToaster entries={entries} onDismiss={leave} onExited={exited} />
       </NotificationLabelsContext.Provider>
-    </StoreContext.Provider>
+    </StoreProvider>
   );
 }
 
 /** `notify`, `dismiss`, `dismissAll` and the live `items` list of the nearest `NotificationProvider`. */
 export function useNotifications(): StoreValue {
-  const ctx = React.useContext(StoreContext);
-  if (!ctx) throw new Error("useNotifications must be used within NotificationProvider");
-  return ctx;
+  return useStore();
 }

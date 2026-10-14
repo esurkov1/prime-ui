@@ -4,6 +4,7 @@ import { usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useLabels } from "@/internal/labels";
 import { defineRowKind, useMessageList } from "@/internal/messageList";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
@@ -36,7 +37,7 @@ export function MessageTyping({
   children,
   ...rest
 }: MessageTypingProps) {
-  const labels = { ...MESSAGE_TYPING_LABELS, ...labelsProp };
+  const labels = useLabels(MESSAGE_TYPING_LABELS, labelsProp);
   const list = useMessageList();
   const depth = useNestedSurfaceDepth();
   const presence = usePresence(open, { exitDuration: "fast" });

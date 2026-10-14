@@ -16,12 +16,14 @@ import { readCssLengthPx } from "@/hooks/usePosition";
 import { rowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
 import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
+import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
 import { highlightChildren } from "@/internal/HighlightMatch";
+import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
 import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
 import { useLongPress } from "@/internal/longPress";
@@ -147,7 +149,8 @@ type ChatListContextValue = {
   presence: Pick<ListPresence, "entering" | "leaving">;
 };
 
-const ChatListContext = React.createContext<ChatListContextValue | null>(null);
+const [ChatListProvider, useChatListContext] =
+  createComponentContext<ChatListContextValue>("ChatList");
 
 type RowContextValue = {
   key: string;
@@ -155,13 +158,12 @@ type RowContextValue = {
   measure?: (node: HTMLElement | null) => void;
 };
 
-const RowContext = React.createContext<RowContextValue | null>(null);
+const [RowProvider, useRowContext] = createComponentContext<RowContextValue>("ChatList.Item", {
+  parent: "ChatList.Root renderItem",
+});
 
 function useChatList(part: string): [ChatListContextValue, RowContextValue] {
-  const list = React.useContext(ChatListContext);
-  const row = React.useContext(RowContext);
-  if (!list || !row) throw new Error(`${part} is rendered by ChatList.Root renderItem`);
-  return [list, row];
+  return [useChatListContext(part), useRowContext(part)];
 }
 
 // ─── Parts of an item ─────────────────────────────────────────────────────────
@@ -430,7 +432,7 @@ function ChatListItem({
       ref: _ref,
       ...descRest
     } = descProps;
-    const hasText = descChildren !== undefined && descChildren !== null && descChildren !== "";
+    const hasText = hasContent(descChildren);
     preview = (
       <span
         {...descRest}
@@ -871,9 +873,9 @@ function ChatListRoot<T>({
     const item = items[index] as T;
     const key = keys[index] as string;
     return (
-      <RowContext key={key} value={{ key, measure }}>
+      <RowProvider key={key} value={{ key, measure }}>
         {renderItem(item)}
-      </RowContext>
+      </RowProvider>
     );
   };
 
@@ -961,7 +963,7 @@ function ChatListRoot<T>({
       : "";
 
   return tier.provide(
-    <ChatListContext value={context}>
+    <ChatListProvider value={context}>
       <div
         {...rest}
         ref={mergedRootRef}
@@ -1008,7 +1010,7 @@ function ChatListRoot<T>({
         </ScrollContainer>
         <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
       </div>
-    </ChatListContext>,
+    </ChatListProvider>,
   );
 }
 ChatListRoot.displayName = "ChatList.Root";
