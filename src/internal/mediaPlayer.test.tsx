@@ -187,4 +187,84 @@ describe.each(PLAYERS)("$name — the shared player behaviour", (player) => {
     expect(group()).not.toHaveAttribute("data-transfer");
     expect(disk()).toBeInTheDocument();
   });
+
+  it("the unplayed dot rises in when `unplayed` turns on and leaves when it clears", () => {
+    const { container, rerender } = render(player.render({}));
+    const dot = () => container.querySelector("[data-unplayed]");
+    expect(dot()).toBeNull();
+    rerender(player.render({ unplayed: true }));
+    expect(dot()).not.toBeNull();
+    expect(dot()?.className).toMatch(/enter/);
+    rerender(player.render({ unplayed: false }));
+    expect(dot()).toBeNull();
+  });
+
+  it("starts from the start out of the still state; on from where a pause left it", () => {
+    const { container } = render(player.render({}));
+    const media = container.querySelector("audio, video") as HTMLMediaElement;
+    media.currentTime = 12;
+    fireEvent.click(disk());
+    expect(media.currentTime).toBe(0);
+    fireEvent.click(screen.getByRole("button", { name: "Пауза" }));
+    fireEvent.keyDown(player.seeker(), { key: "End" });
+    fireEvent.keyDown(player.seeker(), { key: "ArrowLeft" });
+    fireEvent.click(disk());
+    expect(media.currentTime).toBe(25);
+  });
+});
+
+describe.each(PLAYERS)("$name — the keyboard seek", (player) => {
+  /** Renders a minute-long player; `key` presses a key on its seek and reads the position. */
+  const setup = (props: Partial<MediaPlayerProps> = { duration: 60 }) => {
+    const { container } = render(player.render(props));
+    const media = container.querySelector("audio, video") as HTMLMediaElement;
+    const key = (name: string) => {
+      fireEvent.keyDown(player.seeker(), { key: name });
+      return media.currentTime;
+    };
+    return { key };
+  };
+
+  it("arrows move 5 s; ArrowUp and ArrowDown go with ArrowRight and ArrowLeft", () => {
+    const { key } = setup();
+    expect(key("ArrowRight")).toBe(5);
+    expect(key("ArrowUp")).toBe(10);
+    expect(key("ArrowLeft")).toBe(5);
+    expect(key("ArrowDown")).toBe(0);
+  });
+
+  it("mirrors the horizontal arrows in RTL, never the vertical ones", () => {
+    const { key } = setup();
+    player.seeker().style.direction = "rtl";
+    expect(key("ArrowLeft")).toBe(5);
+    expect(key("ArrowUp")).toBe(10);
+    expect(key("ArrowRight")).toBe(5);
+  });
+
+  it("PageUp and PageDown move a tenth; Home and End go to the edges", () => {
+    const { key } = setup();
+    expect(key("PageUp")).toBe(6);
+    expect(key("PageUp")).toBe(12);
+    expect(key("PageDown")).toBe(6);
+    expect(key("End")).toBe(60);
+    expect(key("Home")).toBe(0);
+  });
+
+  it("clamps to the media and ignores other keys", () => {
+    const { key } = setup();
+    expect(key("End")).toBe(60);
+    expect(key("ArrowRight")).toBe(60);
+    expect(key("PageUp")).toBe(60);
+    expect(key("Home")).toBe(0);
+    expect(key("ArrowLeft")).toBe(0);
+    expect(key("PageDown")).toBe(0);
+    expect(key("ArrowRight")).toBe(5);
+    expect(key("Enter")).toBe(5);
+  });
+
+  it("does not seek while the length is unknown", () => {
+    const { key } = setup({ duration: undefined });
+    expect(key("ArrowRight")).toBe(0);
+    expect(key("End")).toBe(0);
+  });
 });

@@ -10,20 +10,15 @@ let active: HTMLMediaElement | null = null;
 const audible = (media: HTMLMediaElement) => !media.muted && media.volume > 0;
 
 /** `media` started playing (or got its sound back while playing): it takes the session. */
-export function claimPlayback(media: HTMLMediaElement): void {
+function claimPlayback(media: HTMLMediaElement): void {
   if (!audible(media)) return;
   if (active && active !== media) active.pause();
   active = media;
 }
 
 /** `media` paused, ended or went away: the session is free. */
-export function releasePlayback(media: HTMLMediaElement): void {
+function releasePlayback(media: HTMLMediaElement): void {
   if (active === media) active = null;
-}
-
-/** The media element now holding the session (tests and diagnostics). */
-export function activePlayback(): HTMLMediaElement | null {
-  return active;
 }
 
 /**

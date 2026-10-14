@@ -1,12 +1,12 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { render } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it } from "vitest";
 
+import { cssRule, cssValue } from "@/test/css";
+
 import { RING_DATA_STROKE, RING_PATH, Ring } from "./ring";
 
-const css = readFileSync(path.resolve(process.cwd(), "src/internal/ring.module.css"), "utf8");
+const CSS = "src/internal/ring.module.css";
 
 const svgOf = (container: HTMLElement) => container.querySelector("svg") as SVGSVGElement;
 
@@ -31,8 +31,8 @@ describe("Ring", () => {
     // Turning, even 0% shows: the arc's least length takes over.
     rerender(<Ring value={0} spin />);
     expect(svgOf(container)).not.toHaveAttribute("data-empty");
-    expect(css).toMatch(
-      /\.ring\[data-spin\] \{\s*--ring-arc: max\(var\(--ring-value, 0\), 0\.08\)/,
+    expect(cssValue(cssRule(CSS, ".ring[data-spin]"), "--ring-arc")).toBe(
+      "max(var(--ring-value, 0), 0.08)",
     );
   });
 
@@ -43,23 +43,39 @@ describe("Ring", () => {
     expect(svg).toHaveAttribute("data-spin", "true");
   });
 
-  it("turns as a transform of the svg, 3 loops a turn; reduced motion slows it, never stops it", () => {
-    expect(css).toMatch(
-      /animation: ringTurn calc\(var\(--prime-motion-loop\) \* 3\) linear infinite/,
+  it("turns its inner group, 3 loops a turn, so the svg keeps a host's own animation", () => {
+    const { container } = render(<Ring value={null} className="host" />);
+    const svg = svgOf(container);
+    expect(svg.firstElementChild?.tagName.toLowerCase()).toBe("g");
+    expect(cssValue(cssRule(CSS, ".ring[data-spin] > .turn"), "animation")).toBe(
+      "ringTurn calc(var(--prime-motion-loop) * 3) linear infinite",
     );
-    expect(css).toMatch(/@keyframes ringTurn \{\s*to \{\s*transform: rotate\(1turn\);/);
-    expect(css).toMatch(
-      /prefers-reduced-motion: reduce\) \{\s*\.ring\[data-spin\] \{\s*animation-duration: calc\(var\(--prime-motion-loop\) \* 6\)/,
-    );
+    expect(() => cssValue(cssRule(CSS, ".ring[data-spin]"), "animation")).toThrow();
+    // Reduced motion slows the turn, never stops it.
+    expect(
+      cssValue(
+        cssRule(CSS, ".ring[data-spin] > .turn", ["@media (prefers-reduced-motion: reduce)"]),
+        "animation-duration",
+      ),
+    ).toBe("calc(var(--prime-motion-loop) * 6)");
     // The share glides on the arc alone.
-    expect(css).toMatch(/stroke-dashoffset var\(--prime-motion-duration-base\)/);
+    expect(cssValue(cssRule(CSS, ".arc"), "transition")).toContain(
+      "stroke-dashoffset var(--prime-motion-duration-base)",
+    );
   });
 
-  it("weights: the line weight (two borders) and the data weight (1/12, never thinner)", () => {
-    expect(css).toMatch(/--ring-stroke: calc\(var\(--prime-border-width\) \* 2\)/);
-    expect(css).toMatch(
-      /\[data-weight="data"\] \{\s*--ring-stroke: max\(calc\(100% \/ 12\), calc\(var\(--prime-border-width\) \* 2\)\)/,
+  it("weights: line (two borders), data (1/12, never thinner) and band (one spacing step)", () => {
+    expect(cssValue(cssRule(CSS, ".ring"), "--ring-stroke")).toBe(
+      "calc(var(--prime-border-width) * 2)",
     );
+    expect(cssValue(cssRule(CSS, '.ring[data-weight="data"]'), "--ring-stroke")).toBe(
+      "max(calc(100% / 12), calc(var(--prime-border-width) * 2))",
+    );
+    expect(cssValue(cssRule(CSS, '.ring[data-weight="band"]'), "--ring-stroke")).toBe(
+      "var(--prime-space-1)",
+    );
+    const { container } = render(<Ring value={0.2} weight="band" />);
+    expect(svgOf(container)).toHaveAttribute("data-weight", "band");
     // 1/12 of the diameter along a circle of 11/12 of it, in percent of that circle.
     expect(RING_DATA_STROKE).toBeCloseTo(100 / (11 * Math.PI));
   });
@@ -72,7 +88,7 @@ describe("Ring", () => {
     expect(svg.style.getPropertyValue("--ring-value")).toBe("");
     expect(svg).toHaveAttribute("data-live", "true");
     expect(svg.querySelectorAll("circle")).toHaveLength(1);
-    expect(css).toMatch(/\.ring\[data-live\] \.arc \{\s*transition: none;/);
+    expect(cssValue(cssRule(CSS, ".ring[data-live] .arc"), "transition")).toBe("none");
   });
 
   it("takes a role from its host and then is no longer hidden", () => {

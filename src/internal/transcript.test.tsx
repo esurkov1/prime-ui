@@ -1,21 +1,12 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { VoicePlayer } from "@/components/voice-player/VoicePlayer";
+import { cssRule, cssValue } from "@/test/css";
+
 import { MessageHighlightContext, MessagePartProvider } from "./messagePart";
 
 const TEXT = "Отгрузка по счёту 2210 перенесена на пятницу.";
-
-const css = (file: string) => readFileSync(path.join(process.cwd(), file), "utf8");
-
-/** The declarations of one rule `selector { … }`. */
-const rule = (source: string, selector: string) => {
-  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return source.match(new RegExp(`(?:^|\\n)${escaped} \\{([^}]*)\\}`))?.[1] ?? "";
-};
 
 describe("transcript", () => {
   it("is a region that always exists; its text is rendered while it is open", () => {
@@ -38,8 +29,12 @@ describe("transcript", () => {
   it("lays out at once: the message's morph plays the change", () => {
     // The height and the text's fade share Disclosure's one clock (Disclosure.test); a message
     // changes size in one layout, so the transcript's clock is zero.
-    const transcript = css("src/internal/transcript.module.css");
-    expect(rule(transcript, ".disclosure")).toMatch(/--disclosure-duration: 0s;/);
+    expect(
+      cssValue(
+        cssRule("src/internal/transcript.module.css", ".disclosure"),
+        "--disclosure-duration",
+      ),
+    ).toBe("var(--prime-motion-instant)");
   });
 
   it("opens and closes without reading layout or computed style", () => {

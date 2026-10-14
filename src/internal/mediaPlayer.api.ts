@@ -46,8 +46,8 @@ export function mediaPlayerProps(what: {
       name: "unplayed",
       type: "boolean",
       default: "false",
-      en: `Nobody has played it yet: an accent dot ${what.dot.en} and \`labels.unplayed\` for screen readers. Clear it when \`onPlayingChange(true)\` comes; the dot leaves with a fade.`,
-      ru: `Ещё не воспроизведено: акцентная точка ${what.dot.ru} и \`labels.unplayed\` для экранного диктора. Снимите, когда придёт \`onPlayingChange(true)\`, — точка уходит с затуханием.`,
+      en: `Nobody has played it yet: an accent dot ${what.dot.en} and \`labels.unplayed\` for screen readers. Clear it when \`onPlayingChange(true)\` comes; the dot fades out and the row closes up in place.`,
+      ru: `Ещё не воспроизведено: акцентная точка ${what.dot.ru} и \`labels.unplayed\` для экранного диктора. Снимите, когда придёт \`onPlayingChange(true)\`, — точка растворяется, а ряд смыкается на месте.`,
     },
     {
       name: "disabled",

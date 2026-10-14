@@ -46,7 +46,7 @@ VideoNote              <div role="group">; data-playing · data-disabled · data
 |---|---|---|---|
 | `src` | `string` | — (required) | Video URL, loaded with `preload="metadata"`: nothing plays before a press. |
 | `duration` | `number` | — | Length in seconds, shown until the media reports its own. |
-| `unplayed` | `boolean` | `false` | Nobody has played it yet: an accent dot after the duration and `labels.unplayed` for screen readers. Clear it when `onPlayingChange(true)` comes; the dot leaves with a fade. |
+| `unplayed` | `boolean` | `false` | Nobody has played it yet: an accent dot after the duration and `labels.unplayed` for screen readers. Clear it when `onPlayingChange(true)` comes; the dot fades out and the row closes up in place. |
 | `disabled` | `boolean` | `false` | Nothing can be played: the play disk and the keyboard seek, the transcript button and the transfer actions are off (native `disabled`). A disabled `Fieldset` around it disables it too. |
 | `poster` | `string` | — | A still shown before the first frame; without it the first frame is drawn. Video only. |
 | `playing` | `boolean` | — | Playing with sound (controlled): `true` plays it (from the start or on from a pause), `false` pauses it. One sound plays on the page at a time. |

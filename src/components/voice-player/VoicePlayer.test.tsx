@@ -3,7 +3,7 @@ import * as React from "react";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Message } from "@/components/message/Message";
-import { claimPlayback, releasePlayback } from "@/internal/mediaSession";
+import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { MessagePartProvider, messagePartOf } from "@/internal/messagePart";
 
 import { getWaveform, VoicePlayer } from "./VoicePlayer";
@@ -96,26 +96,34 @@ describe("VoicePlayer", () => {
 
   it("another sound with volume pauses it; a muted preview does not", () => {
     const onPlayingChange = vi.fn();
-    render(<VoicePlayer src="/a.ogg" duration={10} onPlayingChange={onPlayingChange} />);
-    // Stand-ins for chat videos: a muted looping preview and a video with sound.
-    const muted = document.createElement("video");
-    muted.muted = true;
-    const video = document.createElement("video");
-    const session = (media: HTMLMediaElement) => {
-      media.addEventListener("play", () => claimPlayback(media));
-      media.addEventListener("pause", () => releasePlayback(media));
-    };
-    session(muted);
-    session(video);
+    // Chat videos beside it: a muted looping preview and a video with sound.
+    render(
+      <>
+        <VoicePlayer src="/a.ogg" duration={10} onPlayingChange={onPlayingChange} />
+        <Thumbnail.Root>
+          <Thumbnail.Video src="/preview.mp4" autoPlay data-testid="preview" />
+        </Thumbnail.Root>
+        <Thumbnail.Root>
+          <Thumbnail.Video src="/clip.mp4" controls data-testid="clip" />
+        </Thumbnail.Root>
+      </>,
+    );
+    const muted = screen.getByTestId("preview") as HTMLVideoElement;
+    const video = screen.getByTestId("clip") as HTMLVideoElement;
     fireEvent.click(screen.getByRole("button", { name: "Воспроизвести голосовое сообщение" }));
     act(() => {
       void muted.play();
     });
-    expect(screen.getByRole("group")).toHaveAttribute("data-playing", "true");
+    expect(screen.getByRole("group", { name: "Голосовое сообщение" })).toHaveAttribute(
+      "data-playing",
+      "true",
+    );
     act(() => {
       void video.play();
     });
-    expect(screen.getByRole("group")).not.toHaveAttribute("data-playing");
+    expect(screen.getByRole("group", { name: "Голосовое сообщение" })).not.toHaveAttribute(
+      "data-playing",
+    );
     expect(onPlayingChange).toHaveBeenLastCalledWith(false);
     // The voice again: the video pauses.
     fireEvent.click(screen.getByRole("button", { name: "Воспроизвести голосовое сообщение" }));

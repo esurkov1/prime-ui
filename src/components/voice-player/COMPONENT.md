@@ -51,7 +51,7 @@ VoicePlayer            <div role="group">; state in data-*
 |---|---|---|---|
 | `src` | `string` | — (required) | Audio URL, loaded with `preload="metadata"`: nothing plays before a press. |
 | `duration` | `number` | — | Length in seconds, shown until the media reports its own. |
-| `unplayed` | `boolean` | `false` | Nobody has played it yet: an accent dot after the time and `labels.unplayed` for screen readers. Clear it when `onPlayingChange(true)` comes; the dot leaves with a fade. |
+| `unplayed` | `boolean` | `false` | Nobody has played it yet: an accent dot after the time and `labels.unplayed` for screen readers. Clear it when `onPlayingChange(true)` comes; the dot fades out and the row closes up in place. |
 | `disabled` | `boolean` | `false` | Nothing can be played: the play disk, the waveform slider and the rate chip, the transcript button and the transfer actions are off (native `disabled`). A disabled `Fieldset` around it disables it too. |
 | `waveform` | `readonly number[]` | — | Levels 0…1 from data, resampled to the bars that fit the width. Without it: a calm flat row. Voice only: a circle shows a face, not levels. |
 | `rate` | `1 \| 1.5 \| 2` | — | Playback speed (controlled). Voice only: speech is listened to faster; a face is watched at its own pace. |
