@@ -92,9 +92,7 @@ export type DatepickerRootProps = DatepickerPanelProps &
   FieldFrameProps &
   FieldFocusRingProps & {
     size?: ControlSize;
-    /** Field text without a value; `labels.placeholder` by default. */
     placeholder?: string;
-    /** Text before the value in the field, e.g. «С». */
     valuePrefix?: string;
     open?: boolean;
     defaultOpen?: boolean;
@@ -102,20 +100,11 @@ export type DatepickerRootProps = DatepickerPanelProps &
     closeOnEscape?: boolean;
     closeOnOutsideClick?: boolean;
     disabled?: boolean;
-    /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
     invalid?: boolean;
-    /** Field stretches to the container width; otherwise it fits the text. */
     fullWidth?: boolean;
-    /** Popover alignment to the field. */
     align?: PositionAlign;
-    /** Id of the field button; generated when omitted. */
     id?: string;
-    /**
-     * Submits the value with a form through hidden inputs: `yyyy-MM-dd` (`yyyy-MM-ddTHH:mm` with
-     * `withTime`); a range submits two values under the name, `from` then `to` (empty when open).
-     */
     name?: string;
-    /** Accessible name when there is no `label`; the current value is appended. */
     "aria-label"?: string;
     "aria-labelledby"?: string;
     "aria-describedby"?: string;

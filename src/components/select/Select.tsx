@@ -95,44 +95,24 @@ type SelectRootBase = FieldRootDomProps &
     size?: ControlSize;
     disabled?: boolean;
     placeholder?: string;
-    /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
     invalid?: boolean;
-    /** Id of the trigger; generated when omitted. */
     id?: string;
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
     closeOnEscape?: boolean;
     closeOnOutsideClick?: boolean;
-    /** Clear segment in the trigger (and `Delete` / `Backspace` on it) while a value is selected. */
     clearable?: boolean;
-    /** Form field name: hidden inputs submit the value (one per value with `multiple`). */
     name?: string;
-    /** The search query (`Select.Content searchable`), controlled; cleared when the list closes. */
     search?: string;
-    /** The initial query, uncontrolled. Default `""`. */
     defaultSearch?: string;
-    /** Called with the new query: typing, and `""` when the list closes. */
     onSearchChange?: (search: string) => void;
-    /**
-     * The list filters its items by the query. `false` when the results come from a server: every
-     * item shows, highlighting of the query stays.
-     */
     filter?: boolean;
-    /**
-     * Options are loading: a Spinner instead of the chevron, `aria-busy`, skeleton rows in the list
-     * while no item matches (items on screen stay).
-     */
     loading?: boolean;
-    /** More options are loading at the end: skeleton rows after the items. */
     loadingMore?: boolean;
-    /** More options exist: reaching the end of the list calls `onLoadMore`. */
     hasMore?: boolean;
-    /** Asked once per round when the end of the list scrolls into view or the highlight reaches it. */
     onLoadMore?: () => void | Promise<void>;
-    /** The options failed to load: replaces the list with the message in `role="alert"`. */
     loadError?: React.ReactNode;
-    /** A retry button (`labels.retry`) under `loadError`; Enter in the open list runs it too. */
     onRetry?: () => void;
     labels?: Partial<SelectLabels>;
     className?: string;
@@ -143,20 +123,13 @@ type SelectSingleProps = {
   multiple?: false;
   value?: string;
   defaultValue?: string;
-  /**
-   * Picked value; `""` after clearing. Return the save's promise: the value shows at once with a
-   * Spinner on the trigger and picks wait; resolve keeps it, reject rolls it back and announces
-   * `labels.changeFailed`.
-   */
   onValueChange?: (value: string) => void | Promise<void>;
 };
 
 type SelectMultipleProps = {
-  /** `string[]` value, checkboxes in the list, the list stays open on a pick. */
   multiple: true;
   value?: string[];
   defaultValue?: string[];
-  /** The new list; a promise as in single mode. */
   onValueChange?: (value: string[]) => void | Promise<void>;
 };
 
@@ -509,12 +482,6 @@ SelectTrigger.displayName = "Select.Trigger";
 export type SelectValueItem = { value: string; label: string };
 
 export type SelectValueProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /**
-   * Single mode: renders the selected option in the trigger with the same parts as the row —
-   * leading `Avatar.Root` / `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, and a
-   * trailing `Badge.Root` / `Select.ItemMeta` at the end. Not called while empty (the placeholder
-   * shows) and not used in `multiple` mode.
-   */
   renderValue?: (item: SelectValueItem) => React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
@@ -596,10 +563,6 @@ export type SelectContentProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "hidden" | "onKeyDown" | "onAnimationEnd"
 > & {
-  /**
-   * A search field on top of the list; items filter by label, description and `keywords` (or the
-   * owner loads them: `Select.Root` `search`, `filter={false}`).
-   */
   searchable?: boolean;
   children: React.ReactNode;
   /** The floating panel. */

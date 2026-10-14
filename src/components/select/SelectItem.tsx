@@ -156,9 +156,7 @@ export type SelectItemProps = Omit<
   "role" | "id" | "children"
 > & {
   value: string;
-  /** Text shown in the trigger and used by typeahead; defaults to `Select.ItemText`, then plain text. */
   label?: string;
-  /** Extra words for the search (`Select.Content searchable`). */
   keywords?: string;
   disabled?: boolean;
   children: React.ReactNode;
@@ -256,11 +254,8 @@ export type SelectActionProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "onSelect" | "role" | "id" | "children"
 > & {
-  /** Runs the action: a click, or Enter / Space while it is highlighted; the list then closes. */
   onSelect: () => void;
-  /** Muted, skipped by the keyboard, not runnable. */
   disabled?: boolean;
-  /** The action text; an optional `Select.ItemIcon` in front. */
   children: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };

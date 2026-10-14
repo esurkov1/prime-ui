@@ -89,7 +89,6 @@ export const DATEPICKER_LABELS: DatepickerLabels = {
 };
 
 export type CalendarOptions = {
-  /** Tier: day cell = the tier's menu item height (`m` → 32 px), text = the tier's text. */
   size?: ControlSize;
   months?: 1 | 2;
   presets?: DatepickerPreset[] | false;
@@ -107,7 +106,6 @@ export type CalendarOptions = {
 
 export type RangeModeProps = {
   mode: "range";
-  /** Bounds in wall-clock time; `null` — the bound is not set. */
   value?: DatepickerRange;
   defaultValue?: DatepickerRange;
   onValueChange?: (value: DatepickerRange) => void;

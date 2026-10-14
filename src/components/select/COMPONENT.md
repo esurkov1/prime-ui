@@ -197,7 +197,9 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | `clearable` | × segment before the chevron while a value is set (full height, one hover wash) | The field is optional and can be reset | `false` |
 | `loading` | spinner instead of the chevron; skeleton rows in the option geometry while no item is on screen | Options load asynchronously | `false` |
 | `loadingMore` | skeleton rows after the items | The next page is loading (`hasMore` + `onLoadMore`) | `false` |
-| `filter={false}` | every item shows whatever the query; the query is still marked in the labels | The owner searches on the server (`search`, `onSearchChange`) | `true` |
+| `filter` | items filter by the query; off, every item shows whatever the query and the query is still marked in the labels | Off when the owner searches on the server (`search`, `onSearchChange`) | `true` |
+| `required` / `optional` | red `*` / muted «необязательно» after the label | Mark the minority of the form | `false` / — |
+| `focusRing` | `false`: no focus ring; the trigger keeps its focus fill | Only where focus shows otherwise; never on a form field (WCAG 2.4.7) | `true` |
 | `closeOnOutsideClick` | `false`: the list stays open on a press beside it; Escape, the trigger, a single pick and Tab still close it | A filter list the person compares with the page | `true` |
 | `closeOnEscape` | `false`: Escape leaves the list open | The list must close only by a pick or the trigger | `true` |
 | `searchable` (Content) | search row with a faint hairline at the top of the list | More than ~10 options | `false` |
@@ -211,7 +213,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | State | Driven by | DOM |
 |---|---|---|
 | empty | no value | `data-placeholder="true"` on Value, placeholder color |
-| open | `open` / click / arrows | trigger `data-state="open"`, `aria-expanded`; panel `data-state`, `data-side`; chevron turns 180° |
+| open | `open` / `defaultOpen` / click / arrows | trigger `data-state="open"`, `aria-expanded`; panel `data-state`, `data-side`; chevron turns 180° |
 | invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the trigger; error text below; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled="true"` |
 | loading | `loading` | `data-loading="true"`, `aria-busy` on the trigger and the list; with no item on screen, `aria-hidden` skeleton rows (`data-skeleton`) in the list; `labels.loading` in a polite live region |
@@ -226,7 +228,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 
 ## Layout & spacing
 - The trigger is 100% wide; set the width with the layout (grid column, max-width wrapper).
-- Label → field: tier `label-gap`; field → hint: tier `hint-gap`; field → field in a form: `--prime-space-5`.
+- Label → field: tier `label-gap`; field → hint: tier `hint-gap`; field → field in a form: the gap of a label-less `Fieldset`.
 - Panel: at least the trigger width and `--prime-panel-min-width`, at most twice that; max height `--prime-panel-max-height` (scrolls); flips near the viewport edge.
 - Long values truncate with an ellipsis in the trigger.
 - The clear segment's hit area grows to the 44 px touch target in height on a coarse pointer, like the clear segment of an Input.

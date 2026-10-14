@@ -199,7 +199,6 @@ function FileUploadIcon({ className, ...rest }: FileUploadIconProps) {
 FileUploadIcon.displayName = "FileUpload.Icon";
 
 export type FileUploadTitleProps = ParagraphProps & {
-  /** `muted` — secondary color, regular weight (an instruction line in custom bodies). */
   tone?: Extract<TextTone, "default" | "muted">;
 };
 
@@ -225,9 +224,7 @@ FileUploadDescription.displayName = "FileUpload.Description";
 // ─── File row ────────────────────────────────────────────────────────────────
 
 export type FileUploadItemProps = DivProps & {
-  /** Failed upload: danger wash and ring, danger description. */
   invalid?: boolean;
-  /** Typography, spacing and the format badge follow the control tier (default: the host tier, else `m`). */
   size?: ControlSize;
 };
 
@@ -255,7 +252,6 @@ export type FileUploadFormatBadgeProps = Omit<
   React.HTMLAttributes<HTMLSpanElement>,
   "children" | "color"
 > & {
-  /** File extension; shown upper-case, cut to 8 characters. */
   format: string;
   color?: PaletteColor;
   ref?: React.Ref<HTMLSpanElement>;
@@ -280,7 +276,6 @@ export type FileUploadItemPreviewProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "color"
 > & {
-  /** The picture: a URL, or the local preview of a file being uploaded. */
   src: string;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -333,9 +328,7 @@ FileUploadItemActions.displayName = "FileUpload.ItemActions";
 export type FileUploadItemProgressProps = Omit<DivProps, "children"> & {
   value: number;
   max?: number;
-  /** Fill color: `success` for a finished file, `danger` where a failed one stopped. Default `accent`. */
   tone?: Tone;
-  /** Accessible name of the bar; name the file. Default `FILE_UPLOAD_LABELS.upload`. */
   "aria-label"?: string;
 };
 
@@ -368,29 +361,13 @@ export type FileUploadQueueSource = Pick<UploadQueue, "items" | "retry" | "remov
 
 /** The props of the set itself, shared by `FileUpload.Root` and `FileUpload.Queue`. */
 type FileSetProps = {
-  /** Files in their order (controlled): on the server, or uploads of `queue` by their ids. */
   value?: readonly FileUploadFile[];
-  /** Initial files (uncontrolled). */
   defaultValue?: readonly FileUploadFile[];
-  /**
-   * The set changed: reordered, a file removed, files added to `queue`. Return
-   * the save's promise: the files it touches wait busy; a move or new files stand in
-   * their new places meanwhile, a removed file stays until the answer. Resolve — the change stands
-   * (a controlled owner applies `value` before resolving); reject — the set goes back (new files
-   * leave the queue) and `labels.changeFailed` is announced.
-   */
   onValueChange?: (value: readonly FileUploadFile[]) => void | Promise<void>;
-  /** The uploads: `useUploadQueue(…)`. Its files that are not in `value` follow it in its order. */
   queue?: FileUploadQueueSource;
   layout?: FileUploadLayout;
-  /**
-   * Tiles (`grid`, `strip`): the first file is the cover — «Обложка» in place of its format pill,
-   * two by two in a grid. A file reordered first becomes the cover, and that is announced.
-   */
   cover?: boolean;
-  /** Display of a file size. Default: Russian digits with Б · КБ · МБ · ГБ. */
   formatSize?: (bytes: number) => string;
-  /** Read-only set: no add tile, no reorder, no remove. */
   disabled?: boolean;
   labels?: Partial<FileUploadLabels>;
 };
@@ -1073,27 +1050,17 @@ export type FileUploadRootProps = FieldRootDomProps &
   FieldFrameProps &
   FieldFocusRingProps &
   FileSetProps & {
-    /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;
     trigger?: FileUploadTrigger;
     variant?: FileUploadVariant;
     picker?: React.Ref<FileUploadPicker>;
     accept?: string;
     multiple?: boolean;
-    /** Most files in the set: the add tile counts them; files past it are not taken. */
     max?: number;
-    /** Invalid state: danger line and `aria-invalid`. A non-empty `error` implies it. */
     invalid?: boolean;
-    /** Name of the file input inside a form. */
     name?: string;
-    /** Files picked or dropped (of `accept`, cut to `max`). Not called with `queue.add`: they go there. */
     onFilesChange?: (files: File[]) => void;
-    /** Id of the file input; generated when omitted. */
     id?: string;
-    /**
-     * A zone: a custom body (`FileUpload.Body`) instead of the built-in one. `trigger="button"`:
-     * the button's content (`Button.Icon` and text; an icon alone makes it icon-only).
-     */
     children?: React.ReactNode;
   };
 
