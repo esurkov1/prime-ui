@@ -283,7 +283,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   request, a new search or filter sets `page` to 1, and the old rows stay with `loading` until the
   answer comes ([server.tsx](../src/components/data-table/examples/server.tsx)).
 - Columns: `numeric` for amounts, counts and dates (end-aligned, tabular; `headerAlign="end"` to line the
-  head up); statuses as `Badge` from one status → color map; an avatar + two-line cell for people and
+  head up); statuses as `Badge` from one status → tone map; an avatar + two-line cell for people and
   companies; row menu last.
 - States in place: `loading` (+ `loadingRows`) while there are no rows, `empty` for nothing found
   (string → compact EmptyPage, or your own `EmptyPage size="s"` with «Сбросить фильтры»), `loadError`
@@ -419,7 +419,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - The page lives in the `AppHeader`: `AppHeader.Title` is the only heading, its `AppHeader.Description` is one line of figures («10 счетов · просрочено 2 на …»), not a sentence about the page; main has no `PageContent.Header`.
 - The tools are `AppHeader.Tools` → `SmartFilter.Root` around a `PageToolbar.Root`: `SmartFilter.Toolbar` in `PageToolbar.Tools`, `SmartFilter.Chips` in `PageToolbar.Chips`, export (an icon-only `soft` + `neutral` button) and the one primary action (`solid`, last) in `PageToolbar.Actions`. The table itself has no `toolbar`.
-- A status is a `Badge` with one color per meaning across the product (`STATUS` is one map); the text carries the meaning, the color repeats it.
+- A status is a `Badge` with one `tone` per meaning across the product (`STATUS` is one map); the text carries the meaning, the tone repeats it.
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
 - Row actions are a `Dropdown` behind an `action.more` icon of size `s`: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.
 - Empty after a filter is the table's `empty` with `EmptyPage size="s"` and a «Сбросить фильтры» action; the header and the filters stay in place.

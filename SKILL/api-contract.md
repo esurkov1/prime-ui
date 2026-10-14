@@ -262,7 +262,8 @@ action in `onConfirm` ([the recipe](motion.md#5-recipes)).
 a bar of other actions (DataTable bulk bar, card actions) it is `soft`; in a Dropdown it is the last item
 with `tone="danger"`; an inline remove in a media or file row is `ghost`. The confirm itself is
 [ConfirmDialog](../src/components/confirm-dialog/COMPONENT.md) — never a hand-built Modal: it is a
-Modal `s` with a solid danger confirm (`tone="accent"` for a weighty but safe action), no dismiss by a
+Modal `s` with a solid danger confirm (`tone="accent"` for an outward action that destroys nothing, like
+sending an invoice), no dismiss by a
 press outside, Cancel focused first. `onConfirm` returns the request's Promise: while it runs the confirm
 shows `loading` and Cancel, the close button and Escape are off; resolve closes the dialog (say «Удалено»
 with a Notification), reject keeps it open with `error` (the owner's reason) or `labels.error`.

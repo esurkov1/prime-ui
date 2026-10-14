@@ -94,8 +94,10 @@ Inner radius = outer radius − padding. Panel 12 with padding 4 → items 8. Us
 - `color` is decoration from the palette: `gray · blue · green · orange · red · yellow · purple · sky ·
   pink · teal` — Badge, Avatar, Thumbnail, SegmentedControl dots, count badges of Tabs,
   SegmentedControl, Sidebar and BottomNav, FileUpload format badges, Timeline dots, TagSelect tags,
-  Kanban column counts, Gantt bars, the author hue of a chat (`Message.Author`). Use one hue per meaning
-  across the product (e.g. «Оплачен» is always green): keep one `Record<Status, PaletteColor>` map.
+  Kanban column counts, Gantt bars, the author hue of a chat (`Message.Author`). A category keeps one
+  hue across the product: keep one `Record<Category, PaletteColor>` map.
+- A status wears a `tone` (a Badge `tone`: «Оплачен» is `success` everywhere), never a palette hue;
+  keep one status → tone map.
 - Never convey meaning by color alone: a status badge has text.
 
 ### Charts and categorical colors

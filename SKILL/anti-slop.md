@@ -310,15 +310,12 @@ import { Archive } from "lucide-react";
 .button:hover .icon { transform: rotate(90deg); }
 ```
 
-The semantic name first, then the full animated set, `createIcon` only for the rest:
+The semantic name first, then the full animated set; only a glyph neither has goes through
+`createIcon`, once at module level ([the order](api-contract.md#icons)):
 
 ```tsx
-import { Tractor } from "lucide-react";
-import { Button, createIcon, Icon } from "prime-ui-kit";
+import { Button, Icon } from "prime-ui-kit";
 import { ArchiveIcon } from "prime-ui-kit/icons";
-
-// Only a glyph neither set has: wrapped once, at module level.
-const IconTractor = createIcon(Tractor);
 
 export function FleetActions() {
   return (
@@ -334,12 +331,6 @@ export function FleetActions() {
           <ArchiveIcon />
         </Button.Icon>
         В архив
-      </Button.Root>
-      <Button.Root variant="soft" tone="neutral">
-        <Button.Icon>
-          <IconTractor />
-        </Button.Icon>
-        Техника
       </Button.Root>
     </>
   );
