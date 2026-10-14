@@ -460,7 +460,7 @@ Every page follows the standard; the docs contract has no exclusion list. Do not
 | `src/index.ts`, `src/components/index.ts`, `src/layout/index.ts` | public exports |
 | `playground/pageStandard.ts` | page kinds, slot vocabulary, `KIND_SLOTS`, `PROP_SLOTS` |
 | `playground/components/ComponentPage.tsx` | the one page renderer and `ComponentPageConfig` |
-| `playground/exampleRegistry.ts`, `sourceRegistry.ts` | glob loader of every example (lazy module + lazy raw source) |
+| `playground/exampleRegistry.ts` | glob loader of every example (lazy module + lazy raw source) |
 | `playground/playgroundPages.tsx`, `categories.ts` | routes, sidebar, search — built from the section configs by glob |
 | `playground/sections/<Name>Section.tsx` | one page per component: data only, `export const page: ComponentPageConfig` |
 | `playground/foundation/` | token pages (Typography's component docs live here) |
