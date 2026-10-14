@@ -7,8 +7,7 @@
  */
 .root {
   container: prime-app-header / inline-size;
-  position: sticky;
-  top: 0;
+  /* Sticks through `stickySurfaceClass` (joined in TSX), which also lets it go on a short screen. */
   z-index: var(--prime-z-sticky);
   box-sizing: border-box;
   flex: none;
@@ -18,14 +17,6 @@
   padding-inline: var(--shell-gutter, var(--prime-space-4));
   background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
-}
-
-/* A phone on its side (foundation §9: sticky headers stop below 480px of window height): a sticky
-   bar would eat a third of the height. */
-@media (max-height: 479px) {
-  .root {
-    position: static;
-  }
 }
 
 .row {
