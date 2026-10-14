@@ -17,6 +17,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import {
   ARTICLE,
   createSelectionStore,
@@ -653,7 +654,7 @@ export function MessageList({
   // The announcer keeps its own state: an announcement never re-renders the messages.
   const announcer = React.useRef<(text: string) => void>(() => {});
   const announce = React.useCallback((text: string) => announcer.current(text), []);
-  const labels = React.useMemo(() => ({ ...MESSAGE_LIST_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(MESSAGE_LIST_LABELS, labelsProp);
   const selecting = selected !== null;
 
   /** The selection as of the last commit: a drag commits several times before a render. */

@@ -12,6 +12,7 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import type { Selection } from "@/internal/messageList";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -102,7 +103,7 @@ function ChatRoot({
   ref,
   ...rest
 }: ChatRootProps) {
-  const labels = React.useMemo(() => ({ ...CHAT_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(CHAT_LABELS, labelsProp);
   const selectable =
     selectedProp !== undefined || defaultSelected !== undefined || onSelectedChange !== undefined;
   const [selectedState, setSelected] = useControllableState<Selection>({

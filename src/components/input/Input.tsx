@@ -25,6 +25,7 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import { MorphText } from "@/internal/MorphText";
 import type { ControlSize, Tone } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -178,7 +179,7 @@ function InputRoot({
   const [strengthValue, setStrengthValue] = React.useState("");
   const size = useControlSize(sizeProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid });
-  const labels = React.useMemo(() => ({ ...INPUT_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(INPUT_LABELS, labelsProp);
   const { invalid: isInvalid, controlId: inputId, describedBy } = ids;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const commit = useFieldCommit(inputRef, onCommit);

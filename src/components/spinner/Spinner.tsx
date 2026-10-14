@@ -1,9 +1,10 @@
-import * as React from "react";
+import type * as React from "react";
 
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { iconBoxClass } from "@/internal/iconBox";
+import { useLabels } from "@/internal/labels";
 import { Ring } from "@/internal/ring";
 import type { ControlSize, TextTone } from "@/internal/states";
 import toneStyles from "@/internal/textTone.module.css";
@@ -45,7 +46,7 @@ export function Spinner({
   ...rest
 }: SpinnerProps) {
   const controlSize = useOptionalControlSize();
-  const labels = React.useMemo(() => ({ ...SPINNER_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(SPINNER_LABELS, labelsProp);
   const size = sizeProp ?? controlSize ?? "m";
 
   return (

@@ -9,6 +9,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import mediaPill from "@/internal/mediaPill.module.css";
 import {
   defineRowKind,
@@ -502,7 +503,7 @@ function MessageRoot({
   ref,
   ...rest
 }: MessageRootProps) {
-  const labels = React.useMemo(() => ({ ...MESSAGE_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(MESSAGE_LABELS, labelsProp);
   const list = useMessageList();
   const row = useMessageRow();
   const autoValue = React.useId();

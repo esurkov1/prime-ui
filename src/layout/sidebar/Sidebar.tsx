@@ -16,6 +16,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useLabels } from "@/internal/labels";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import palette from "@/internal/palette.module.css";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -254,7 +255,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
     [persistKey],
   );
   const storedMode = persistKey ? readStored(persistKey).mode : undefined;
-  const labels = React.useMemo(() => ({ ...SIDEBAR_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(SIDEBAR_LABELS, labelsProp);
   const narrow = useMediaQuery(MOBILE_QUERY, offCanvasProp === "auto");
   const offCanvas = offCanvasProp === "always" || narrow;
 

@@ -27,6 +27,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
@@ -292,7 +293,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   ref,
   ...rest
 }: GanttProps<Row, Bar>) {
-  const labels = React.useMemo(() => ({ ...GANTT_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(GANTT_LABELS, labelsProp);
   const depth = useNestedSurfaceDepth();
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const mergedRootRef = useMergedRefs(rootRef, ref);

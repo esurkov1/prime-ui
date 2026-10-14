@@ -9,6 +9,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { MorphText } from "@/internal/MorphText";
 import {
   MEDIA_PLAYER_LABELS,
@@ -147,7 +148,7 @@ export function VoicePlayer(props: VoicePlayerProps) {
     ref,
     ...rest
   } = own;
-  const labels = React.useMemo(() => ({ ...VOICE_PLAYER_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(VOICE_PLAYER_LABELS, labelsProp);
   const { spacer } = useMessagePart();
   const [rate, setRate] = useControllableState<VoicePlayerRate>({
     value: rateProp,

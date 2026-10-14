@@ -22,6 +22,7 @@ import enterMotion from "@/internal/enterMotion.module.css";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
 import { highlightChildren } from "@/internal/HighlightMatch";
+import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { type ControlSize, stepDown } from "@/internal/states";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
@@ -774,7 +775,7 @@ function ChatListRoot<T>({
   ref,
   ...rest
 }: ChatListRootProps<T>) {
-  const labels = React.useMemo(() => ({ ...CHAT_LIST_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(CHAT_LIST_LABELS, labelsProp);
   const [value, setValue] = useControllableState<string | null>({
     value: valueProp,
     defaultValue,
