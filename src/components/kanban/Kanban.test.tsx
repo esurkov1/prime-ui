@@ -318,15 +318,19 @@ describe("Kanban", () => {
   it("marks the variant on the root, plain by default", () => {
     const { rerender } = render(<Board />);
     expect(screen.getByLabelText("Доска")).toHaveAttribute("data-variant", "plain");
+    rerender(<Board variant="line" />);
+    expect(screen.getByLabelText("Доска")).toHaveAttribute("data-variant", "line");
     rerender(<Board variant="well" />);
     expect(screen.getByLabelText("Доска")).toHaveAttribute("data-variant", "well");
   });
 
-  it("makes a plain card a surface one step above the board's host, a well card none", () => {
+  it("makes a plain or line card a surface one step above the board's host, a well card none", () => {
     const { rerender } = render(<Board />);
     const card = () => document.querySelector("[data-kanban-item]");
     expect(card()).toHaveAttribute("data-depth", "1");
     expect(card()).toHaveAttribute("data-surface");
+    rerender(<Board variant="line" />);
+    expect(card()).toHaveAttribute("data-depth", "1");
     rerender(<Board variant="well" />);
     expect(card()).not.toHaveAttribute("data-depth");
     expect(card()).not.toHaveAttribute("data-surface");

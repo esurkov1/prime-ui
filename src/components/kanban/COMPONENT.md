@@ -32,7 +32,7 @@ import {
 ```
 Kanban.Root                          board: horizontal strip of columns, its own Dnd.Root if none above
 └─ <ul> (Dnd.Sortable, axis x)       the columns in `columnOrder`
-   └─ <li> column (from `columns`)   no well, a header plate (`plain`) or a `fill-muted` well (`well`)
+   └─ <li> column (from `columns`)   no well with a header plate (`plain`) or a header line (`line`), or a `fill-muted` well (`well`)
       ├─ header                      title (h3) · count Badge (the stage color) · renderColumnActions(column) · [grip Dnd.Handle, a lock when `locked`]
       │  ├─ description              muted line under the title (`column.description`)
       │  └─ meta                     the stage's figures (`renderColumnMeta(column)`)
@@ -73,7 +73,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `renderColumnActions` | `(column: KanbanColumn) => ReactNode` | — | Trailing actions of a column header (add a card, a menu); kit controls inside take the `s` tier. |
 | `renderColumnMeta` | `(column: KanbanColumn) => ReactNode` | — | The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»). |
 | `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card). |
-| `variant` | `"plain" \| "well"` | `"plain"` | `plain`: no wells, the header and the cards stand on the host — a board as the page's main region. `well`: every column is a filled well holding its cards — columns read as bounded queues. |
+| `variant` | `"plain" \| "line" \| "well"` | `"plain"` | No wells: `plain` — a filled header plate over the cards, `line` — a bare header over a faint line; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues). |
 | `loading` | `boolean` | `false` | Columns show skeleton cards in the card geometry; the cards cross-fade in when it turns off. |
 | `disabled` | `boolean` | `false` | Read-only board: no drag, no keyboard moves, no column grips; `onItemClick` and `getItemHref` still open cards. |
 | `labels` | `Partial<KanbanLabels>` | — | Built-in strings, see Labels. |
@@ -127,6 +127,7 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `plain` | no wells: the column is its header — a filled plate as wide as the cards (title, count) — and its cards, which stand on the board's host, each a surface one ladder step off it (white on the light page), as a Card on the page | the board is the page's main region (a pipeline, a task board, a queue screen) or sits in a Card or Drawer — one level of nesting, cards are the only boxes | yes |
+| `line` | no wells, like `plain`, but the header is bare: title and count over a faint inset hairline as wide as the cards | the same places as `plain` when the headers should stay quiet — many columns, a calm board, the column headers are not the focus | |
 | `well` | every column is a filled well (`fill-muted`, radius `l`) holding its cards (the selected step of the well) | columns must read as bounded queues: WIP limits and capacity, many sparse or empty columns whose drop area must show, a dense board of many narrow columns | |
 
 Do not wrap a `plain` board's columns in your own boxes, and do not put a `well` board inside a filled box of your own — both are the double nesting the variants exist to avoid.
@@ -169,11 +170,11 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - Give the root a height (`className`): columns span it and every column body scrolls on its own; without one the columns take the height of the tallest.
 - The board is a size container. From 40rem of its own width columns keep a fixed 18rem; below it a column takes 85% of the board and snaps (`scroll-snap-type: x mandatory`), so the next column peeks. Snapping is off while a drag auto-scrolls the strip.
 - The strip scrolls sideways inside the board, never the page. Cards sit at the top of their column; the drop area runs to the bottom of the column, so a card can be released anywhere in it.
-- `plain`: column gap `--prime-space-3`, cards inset `--prime-space-1` (room for the focus ring); a card sets `data-depth` one above the board's host and paints `--prime-color-layer-current`, so it keeps its color in flight too. `well`: column gap `--prime-space-3`, cards inset `--prime-space-2` from the column edge, column radius `l`. Card gap `--prime-space-2`, card padding `--prime-space-3`, card radius `m`.
+- `plain` / `line`: column gap `--prime-space-3`, cards inset `--prime-space-1` (room for the focus ring); a card sets `data-depth` one above the board's host and paints `--prime-color-layer-current`, so it keeps its color in flight too. `well`: column gap `--prime-space-3`, cards inset `--prime-space-2` from the column edge, column radius `l`. Card gap `--prime-space-2`, card padding `--prime-space-3`, card radius `m`.
 - The column title is `title-m`; the header is at least a control `m` tall, its text starts where the card text does.
-- `well`: a faint inset hairline (`--prime-color-border-faint`, as in a dialog header) separates the header from the cards. `plain`: the header is a filled plate (`--prime-color-fill-muted`, `--prime-radius-l`) as wide as the cards, in place of the hairline.
+- `well` and `line`: a faint inset hairline (`--prime-color-border-faint`, as in a dialog header) separates the header from the cards. `plain`: the header is a filled plate (`--prime-color-fill-muted`, `--prime-radius-l`) as wide as the cards, in place of the hairline.
 - The header is a grid: the title, the count, the actions and the grip at the end on the first row; the description under the title on the second, the meta line under it (`--prime-space-1` above, caption, `text-secondary`).
-- A card is on `--prime-shadow-raised`: in `plain` the next layer of the board's host (`--prime-color-layer-current` of its own depth), in `well` `--prime-color-control-selected` (two ladder steps off its well; white in light).
+- A card is on `--prime-shadow-raised`: in `plain` / `line` the next layer of the board's host (`--prime-color-layer-current` of its own depth), in `well` `--prime-color-control-selected` (two ladder steps off its well; white in light).
 - `Kanban.ItemHeader` is a muted caption row over a faint hairline (`--prime-color-border-faint`); a card without it starts with its title or a full-width `Thumbnail` cover.
 - Header actions get the `s` tier; inside a card, kit controls take the `m` host tier (a `Badge` is `s`). Pick a small `Avatar` (`size="s"`).
 
@@ -217,7 +218,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A release board: cards move within and between columns by drag, a touch hold or Alt + arrows; a card shows its meta line, labels, comments and assignee — `Kanban.Root`, `Kanban.Item`, `renderItem`, `renderColumnActions`. |
-| [variants.tsx](examples/variants.tsx) | The same release board in both looks: columns without wells — a header plate and cards standing on the page — and columns as filled wells holding their cards — `variant`. |
+| [variants.tsx](examples/variants.tsx) | The same release board in three looks: no wells with a header plate, no wells with a header over a line, and columns as filled wells holding their cards — `variant`. |
 | [structure.tsx](examples/structure.tsx) | Cards take only the parts they need: a title alone, a meta line, labels, a footer with counts and an assignee — `Kanban.ItemTitle`, `Kanban.ItemDescription`, `Kanban.ItemBadges`, `Kanban.ItemFooter`, `Kanban.ItemCount`. |
 | [cards.tsx](examples/cards.tsx) | Three kinds of cards on one board: a plain note, a ticket with a header row of key and priority, a design task with a cover — `Kanban.ItemHeader`, `Thumbnail`, `Kanban.ItemFooter`. |
 | [limits.tsx](examples/limits.tsx) | A support queue with a work-in-progress limit and a workflow rule, its columns drawn as wells so each reads as a bounded queue: a full column and a blocked ticket are refused before the release with the reason under the card, from the keyboard too — `limit`, `canDrop`, `variant`. |
@@ -236,7 +237,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - A hover-only action on a card → touch has no hover; put the action in the card or open the card on click (`onItemClick`).
 - `onClick` / `onKeyDown` on `Kanban.Item` to open a card → `onItemClick` (click, Enter, Space, never after a drag) or `getItemHref` for a page of its own.
 - `getItemHref` without `getLabel` → the link is named by the card id; pass a human name.
-- Drawing your own box (a Card, a filled `div`) around each column, or around a `well` board → pick the `variant`: `plain` for one level of nesting, `well` when columns must read as bounded queues.
+- Drawing your own box (a Card, a filled `div`) around each column, or around a `well` board → pick the `variant`: `plain` or `line` for one level of nesting, `well` when columns must read as bounded queues.
 - Styling a card from an ancestor (`.board .card`) → the flying clone is portalled to `<body>` and loses it; put the class on `Kanban.Item`.
 - Keeping the column order in `columns` and reordering that array → pass `columnOrder` / `onColumnOrderChange`; `columns` stays the data.
 - Putting a system stage back first after every move → `locked: true` on that column.

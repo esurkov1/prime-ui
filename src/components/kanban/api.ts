@@ -133,10 +133,10 @@ export const api: ComponentApi = {
         },
         {
           name: "variant",
-          type: '"plain" | "well"',
+          type: '"plain" | "line" | "well"',
           default: '"plain"',
-          en: "`plain`: no wells, the header and the cards stand on the host — a board as the page's main region. `well`: every column is a filled well holding its cards — columns read as bounded queues.",
-          ru: "`plain`: без подложек, шапка и карточки стоят на фоне — доска как главная область страницы. `well`: каждая колонка — залитая подложка с карточками — колонки читаются ограниченными очередями.",
+          en: "No wells: `plain` — a filled header plate over the cards, `line` — a bare header over a faint line; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues).",
+          ru: "Без подложек: `plain` — шапка-плашка с фоном над карточками, `line` — шапка над тонкой линией; карточки стоят на фоне. `well`: каждая колонка — залитая подложка с карточками (ограниченные очереди).",
         },
         {
           name: "loading",

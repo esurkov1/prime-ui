@@ -1,11 +1,11 @@
-/** The same release board in both looks: columns without wells — a header plate and cards standing on the page — and columns as filled wells holding their cards — `variant`. */
+/** The same release board in three looks: no wells with a header plate, no wells with a header over a line, and columns as filled wells holding their cards — `variant`. */
 import { Badge, Kanban, type KanbanVariant, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
 type Task = { id: string; title: string; due: string; label: string };
 
-const VARIANTS: KanbanVariant[] = ["plain", "well"];
+const VARIANTS: KanbanVariant[] = ["plain", "line", "well"];
 
 const COLUMNS = [
   { id: "todo", title: "К выполнению", description: "Берём после планирования" },

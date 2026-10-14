@@ -1,5 +1,6 @@
 /*
- * Kanban — Graphite. A row of columns: bare (`plain`, cards are surfaces on the board's host) or
+ * Kanban — Graphite. A row of columns: without wells (`plain` with a header plate, `line` with a
+ * header over a faint line; cards are surfaces on the board's host) or
  * filled wells holding the cards (`well`); depth from fill, no lines.
  * The board scrolls sideways inside itself, each column body scrolls on its own. A grip in the
  * header moves a column (`reorderableColumns`); the strip of columns is a sortable list. Columns span the
@@ -59,23 +60,24 @@
 }
 
 /*
- * plain: no wells. The cards and the header carry the column: the cards widen to almost the full
+ * plain / line: no wells. The cards and the header carry the column: the cards widen to almost the full
  * column (the inset keeps only the focus ring inside), so the cards of neighbouring columns stand
  * closer than in wells.
  */
-.root[data-variant="plain"] {
+.root:is([data-variant="plain"], [data-variant="line"]) {
   --kanban-gap: var(--prime-space-3);
   --kanban-inset: var(--prime-space-1);
 }
 
-.root[data-variant="plain"] .column {
+.root:is([data-variant="plain"], [data-variant="line"]) .column {
   padding-block-start: 0;
   border-radius: 0;
   background: none;
 }
 
-/* Without a well the header carries the column: a filled plate as wide as the cards (one ladder
-   step off the board's surface, the well's fill), in place of the hairline. */
+/* plain: the header is a filled plate as wide as the cards (one ladder step off the board's surface,
+   the well's fill), in place of the hairline. line keeps the base header: bare, over the faint
+   inset hairline. */
 .root[data-variant="plain"] .header {
   min-block-size: var(--prime-control-l-height);
   margin-inline: var(--kanban-inset);
@@ -265,7 +267,7 @@
   transition: box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* plain: no well to be the thumb of — the card is a surface of its own on the board's host (white
+/* plain / line: no well to be the thumb of — the card is a surface of its own on the board's host (white
    on the light page, one step lighter on the dark one), as a Card on the page. Its `data-depth`
    points the context variables at its layer; `data-surface` marks it for this rule. */
 .item[data-surface] {

@@ -56,7 +56,7 @@ export type KanbanColumnMove = { id: string; index: number };
 export type KanbanItemClickEvent = React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>;
 
 /** How columns stand on the board: bare columns of cards, or filled wells. */
-export type KanbanVariant = "plain" | "well";
+export type KanbanVariant = "plain" | "line" | "well";
 
 /** System strings of the board. `{token}` values are substituted. */
 export type KanbanLabels = {
@@ -111,7 +111,7 @@ type BoardContextValue = {
    */
   takeDragClick: () => boolean;
   /**
-   * `plain`: the depth of a card, a surface one step above the board's host (it stands on it
+   * `plain` / `line`: the depth of a card, a surface one step above the board's host (it stands on it
    * directly). The attribute travels with the carried clone, so it keeps its color in flight.
    * `well`: none — the card is the selected thumb of its well.
    */
@@ -183,7 +183,10 @@ export type KanbanRootProps<T> = Omit<
    * shown under the carried card. The column turns `danger` before the release.
    */
   canDrop?: (id: string, columnId: string) => boolean | string;
-  /** `plain`: no wells, the header and the cards stand on the host; `well`: every column is a filled well. */
+  /**
+   * `plain`: no wells, the cards stand on the host under a filled header plate; `line`: no wells, a
+   * bare header over a faint line; `well`: every column is a filled well.
+   */
   variant?: KanbanVariant;
   /** Columns show skeleton cards; the cards cross-fade in when it turns off. */
   loading?: boolean;
@@ -315,7 +318,7 @@ function KanbanBoard<T>({
   const rootRef = useMergedRefs(boardRef, ref);
   const glideCards = useCardGlide(boardRef);
   const nestedDepth = useNestedSurfaceDepth();
-  const cardDepth = variant === "plain" ? nestedDepth : undefined;
+  const cardDepth = variant === "well" ? undefined : nestedDepth;
 
   const [storedValue, setValue] = useControllableState<KanbanValue>({
     value: valueProp,

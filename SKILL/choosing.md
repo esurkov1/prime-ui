@@ -63,7 +63,7 @@ numbers/content → Card (pick the template; a whole tile that opens its details
 with a link). Read-only properties of one record («label — value») → DescriptionList, never a
 hand-made grid of text pairs. Rows with columns, sorting, selection → DataTable.
 Items that flow through statuses and are moved by hand → Kanban (a single list to reorder, or items
-dropped onto folders or assignees → Dnd directly). Its look: `plain` (default) when the board is
+dropped onto folders or assignees → Dnd directly). Its look: `plain` (default; `line` for a quieter header over a line) when the board is
 the page's main region or sits in a Card / Drawer — headers and cards stand on the host, one level of
 nesting; `variant="well"` when columns must read as bounded queues (WIP limits, many sparse or empty
 columns, a dense board of narrow columns). Never your own box around a column.
