@@ -113,12 +113,19 @@ describe("touch and input", () => {
     expect(decl("src/internal/menu.module.css", ".tier", "--menu-item-h")).toBe(
       "max(var(--field-item-h), var(--prime-control-touch-target))",
     );
+    // Every small control of the kit that carries the hit area: dropping it from one fails here.
     for (const file of [
       "components/button/Button.tsx",
       "components/badge/Badge.tsx",
       "internal/ChoiceField.tsx",
+      "internal/FieldAction.tsx",
       "components/segmented-control/SegmentedControl.tsx",
       "components/select/Select.tsx",
+      "components/stepper/Stepper.tsx",
+      "components/chart-frame/ChartFrame.tsx",
+      "components/chat/ChatPinned.tsx",
+      "components/message/MessageReactionBar.tsx",
+      "components/voice-player/VoicePlayer.tsx",
     ]) {
       expect(read(file), file).toMatch(/touchTarget(Block)?Class/);
     }
