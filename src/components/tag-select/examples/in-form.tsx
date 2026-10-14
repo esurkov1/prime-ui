@@ -1,5 +1,5 @@
 /** A new task form: the required labels field is checked on submit, its error shakes the field and leaves once a label is added, a calm note confirms the task; the tags go with the form — `required`, `error`, `creatable`, `name`. */
-import { Button, Input, TagSelect, type TagSelectOption, Typography } from "prime-ui-kit";
+import { Button, Fieldset, Input, TagSelect, type TagSelectOption, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -29,37 +29,36 @@ export default function TagSelectInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <Typography as="h3" variant="title-m">
-        Новая задача
-      </Typography>
-      <Input.Root label="Название" required>
-        <Input.Wrapper>
-          <Input.Field name="title" placeholder="Коротко о задаче" />
-        </Input.Wrapper>
-      </Input.Root>
-      <TagSelect
-        label="Метки"
-        name="labels"
-        required
-        hint="Помогают фильтровать задачи"
-        error={error}
-        options={LABELS}
-        value={labels}
-        onValueChange={(next) => {
-          setLabels(next);
-          setError(undefined);
-          setSaved(false);
-        }}
-        creatable
-        placeholder="Добавить метку"
-      />
-      <TagSelect
-        label="Наблюдатели"
-        name="watchers"
-        optional
-        options={PEOPLE}
-        placeholder="Добавить человека"
-      />
+      <Fieldset label="Новая задача">
+        <Input.Root label="Название" required>
+          <Input.Wrapper>
+            <Input.Field name="title" placeholder="Коротко о задаче" />
+          </Input.Wrapper>
+        </Input.Root>
+        <TagSelect
+          label="Метки"
+          name="labels"
+          required
+          hint="Помогают фильтровать задачи"
+          error={error}
+          options={LABELS}
+          value={labels}
+          onValueChange={(next) => {
+            setLabels(next);
+            setError(undefined);
+            setSaved(false);
+          }}
+          creatable
+          placeholder="Добавить метку"
+        />
+        <TagSelect
+          label="Наблюдатели"
+          name="watchers"
+          optional
+          options={PEOPLE}
+          placeholder="Добавить человека"
+        />
+      </Fieldset>
       <div className={styles.actions}>
         {saved ? (
           <Typography as="p" variant="body-s" tone="secondary">

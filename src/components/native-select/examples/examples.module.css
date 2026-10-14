@@ -1,10 +1,10 @@
 /* Layout of the NativeSelect scenarios: semantic tokens only. */
 
-/* in-form.tsx: a narrow mobile form, field → field 20. */
+/* in-form.tsx: a narrow mobile form; the fields (a Fieldset) → actions 32 (foundation §1). */
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--prime-space-5);
+  gap: var(--prime-space-8);
   width: min(100%, var(--prime-layout-form-width-s));
 }
 

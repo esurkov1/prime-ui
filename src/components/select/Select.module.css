@@ -103,7 +103,9 @@
 
 /*
  * Clear: a full-height segment before the chevron, with the trigger's usual gap on both sides, so
- * its hover wash touches neither the value nor the chevron.
+ * its hover wash touches neither the value nor the chevron. Not the field action segment
+ * (`FieldActionButton`): that is a `<button>` flush with the field's end, and this one sits inside
+ * the trigger `<button>`, before the chevron.
  */
 .clear {
   align-self: stretch;
