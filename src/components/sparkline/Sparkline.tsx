@@ -5,6 +5,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { RegionSwap } from "@/internal/RegionSwap";
 import { RollingNumber } from "@/internal/RollingNumber";
 
@@ -147,7 +148,7 @@ export function Sparkline({
   ref,
   ...rest
 }: SparklineProps) {
-  const labels = { ...SPARKLINE_LABELS, ...labelsProp };
+  const labels = useLabels(SPARKLINE_LABELS, labelsProp);
   const last = data.length - 1;
   const bars = variant === "bars";
   const compact = layout === "compact";

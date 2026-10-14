@@ -19,6 +19,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch, matchIndex } from "@/internal/HighlightMatch";
+import { useLabels } from "@/internal/labels";
 import { usePartPresence } from "@/internal/partPresence";
 import { type ControlSize, stepDown } from "@/internal/states";
 
@@ -262,6 +263,7 @@ function SmartFilterRoot({
   ...rest
 }: SmartFilterRootProps) {
   const { size, provide } = useHostTier(sizeProp);
+  const mergedLabels = useLabels(SMART_FILTER_LABELS, labels);
   const [current, setCurrent] = useControllableState<SmartFilterValue>({
     value,
     defaultValue: defaultValue ?? EMPTY_VALUE,
@@ -287,7 +289,7 @@ function SmartFilterRoot({
     setOpen,
     search: text,
     setSearch: setText,
-    labels: { ...SMART_FILTER_LABELS, ...labels },
+    labels: mergedLabels,
     size,
     collapsedLimit,
   };

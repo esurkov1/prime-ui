@@ -5,6 +5,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import { RowAction } from "@/internal/RowAction";
 import type { ControlSize } from "@/internal/states";
 
@@ -60,15 +61,14 @@ function DescriptionListRoot({
   ...rest
 }: DescriptionListRootProps) {
   const { size, provide } = useHostTier(sizeProp);
+  const mergedLabels = useLabels(DESCRIPTION_LIST_LABELS, labels);
   return (
     <dl
       {...rest}
       className={cx(fieldTierClass, styles.root, className)}
       {...toDataAttributes({ size, orientation, align: align === "end" ? align : undefined })}
     >
-      <DescriptionListContext.Provider
-        value={{ size, labels: { ...DESCRIPTION_LIST_LABELS, ...labels } }}
-      >
+      <DescriptionListContext.Provider value={{ size, labels: mergedLabels }}>
         {provide(children)}
       </DescriptionListContext.Provider>
     </dl>

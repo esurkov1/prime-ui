@@ -4,6 +4,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
 import palette from "@/internal/palette.module.css";
 import {
@@ -105,6 +106,7 @@ export function ProgressBar(props: ProgressBarProps) {
   const labelId = React.useId();
   const descriptionId = React.useId();
   const { size, provide } = useHostTier(sizeProp);
+  const segmentLabels = useLabels(PROGRESS_SEGMENTS_LABELS, labels);
 
   const stepResolved = !segmentsProp && steps ? resolveValue(valueProp ?? 0, maxProp) : null;
   const stepCount = stepResolved
@@ -166,10 +168,7 @@ export function ProgressBar(props: ProgressBarProps) {
       </ol>
     );
   } else if (segmentsProp) {
-    const resolved = resolveSegments(segmentsProp, maxProp, {
-      ...PROGRESS_SEGMENTS_LABELS,
-      ...labels,
-    });
+    const resolved = resolveSegments(segmentsProp, maxProp, segmentLabels);
     const { segments, total, rest: free, text } = resolved;
     percent = resolved.percent;
     // Named: the legend (or the hidden distribution text) describes the group.

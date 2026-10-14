@@ -8,6 +8,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { useLabels } from "@/internal/labels";
 import { namedRole } from "@/internal/namedRole";
 import type { TagRef } from "@/internal/polymorphic";
 import textRole from "@/internal/textRole.module.css";
@@ -275,7 +276,7 @@ function PageContentSplit({
   const lastListFocus = React.useRef<HTMLElement | null>(null);
   const [entering, setEntering] = React.useState<"list" | "detail" | null>(null);
   const previousOpen = React.useRef(open);
-  const mergedLabels = React.useMemo(() => ({ ...PAGE_CONTENT_LABELS, ...labels }), [labels]);
+  const mergedLabels = useLabels(PAGE_CONTENT_LABELS, labels);
 
   // A narrow split swaps its panes: the new one enters, and focus follows it — into the detail,
   // or back to where it was in the list. A wide split moves nothing.

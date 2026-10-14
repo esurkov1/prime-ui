@@ -4,6 +4,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { GlyphSwap } from "@/internal/glyphSwap";
+import { useLabels } from "@/internal/labels";
 import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
 import palette from "@/internal/palette.module.css";
 import {
@@ -166,6 +167,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
   } = props;
   const descriptionId = React.useId();
   const { size, provide } = useHostTier(sizeProp);
+  const segmentLabels = useLabels(PROGRESS_SEGMENTS_LABELS, labels);
   const isText = typeof children === "string" || typeof children === "number";
   const showInner =
     !loading &&
@@ -182,10 +184,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
 
   if (segmentsProp) {
     const gap = segmentGap;
-    const resolved = resolveSegments(segmentsProp, maxProp, {
-      ...PROGRESS_SEGMENTS_LABELS,
-      ...labels,
-    });
+    const resolved = resolveSegments(segmentsProp, maxProp, segmentLabels);
     const { segments, total, rest: free, scale, text } = resolved;
     const unit = scale > 0 ? RING_PATH / scale : 0;
     const arcs: Arc[] = [];

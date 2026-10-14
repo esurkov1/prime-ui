@@ -7,6 +7,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
+import { useLabels } from "@/internal/labels";
 import type { TagRef } from "@/internal/polymorphic";
 import type { ControlSize, Tone } from "@/internal/states";
 import textRole from "@/internal/textRole.module.css";
@@ -79,11 +80,12 @@ function EmptyPageRoot({
   ...rest
 }: EmptyPageRootProps) {
   const { size, provide } = useHostTier(sizeProp);
+  const mergedLabels = useLabels(EMPTY_PAGE_LABELS, labels);
   const context: Ctx = {
     tone,
     size,
     compact: layout === "compact",
-    labels: { ...EMPTY_PAGE_LABELS, ...labels },
+    labels: mergedLabels,
   };
   return provide(
     <div

@@ -9,6 +9,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Pagination.module.css";
@@ -79,9 +80,9 @@ export function Pagination({
 }: PaginationProps) {
   const [page, setPage] = useControllableState({ value, defaultValue, onChange: onValueChange });
   const { size, provide } = useHostTier(sizeProp);
+  const labels = useLabels(PAGINATION_LABELS, labelsProp);
   if (totalPages < 1) return null;
 
-  const labels = { ...PAGINATION_LABELS, ...labelsProp };
   const current = Math.min(Math.max(1, page), totalPages);
   const go = (next: number) => {
     if (next !== current) setPage(next);
