@@ -2,9 +2,8 @@
  * Palette hue (`PaletteColor`, `--prime-color-palette-<hue>-*`) as four local variables. Put `.hue`
  * on the element that carries `data-color`; its CSS reads `--hue-soft`, `--hue-text`, `--hue-solid`
  * and `--hue-solid-fg`. No `data-color` → gray.
- * `--hue-chart` is the hue as a data mark (a ProgressBar share, a legend swatch): its step of the
- * categorical chart palette (`--prime-color-chart-*`), so a category has one color in charts and in
- * shares. Gray is `chart-other`; sky has no chart step (it sits too close to blue) and keeps its solid.
+ * `--hue-chart` is the hue as a data mark (a ProgressBar share, a legend swatch): `HUE_CHART` in
+ * `palette.ts` is its source (a chart library takes colors in JS); `palette.test.ts` keeps the two equal.
  */
 .hue {
   --hue-soft: var(--prime-color-palette-gray-soft);

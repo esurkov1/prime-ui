@@ -87,7 +87,7 @@ export type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
 };
 
 function CardTitle({ as: Tag = "h3", className, ...rest }: CardTitleProps) {
-  return <Tag className={cx(styles.title, className)} {...rest} />;
+  return <Tag className={cx(textRole.titleS, styles.title, className)} {...rest} />;
 }
 CardTitle.displayName = "Card.Title";
 
@@ -96,7 +96,7 @@ export type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement> & 
 };
 
 function CardDescription({ className, ...rest }: CardDescriptionProps) {
-  return <p className={cx(styles.description, className)} {...rest} />;
+  return <p className={cx(textRole.bodyS, styles.description, className)} {...rest} />;
 }
 CardDescription.displayName = "Card.Description";
 
@@ -134,14 +134,14 @@ CardIcon.displayName = "Card.Icon";
 export type CardLabelProps = SpanProps;
 
 function CardLabel({ className, ...rest }: CardLabelProps) {
-  return <span className={cx(styles.label, className)} {...rest} />;
+  return <span className={cx(textRole.bodyS, styles.label, className)} {...rest} />;
 }
 CardLabel.displayName = "Card.Label";
 
 export type CardValueProps = SpanProps;
 
 function CardValue({ className, ...rest }: CardValueProps) {
-  return <span className={cx(styles.value, className)} {...rest} />;
+  return <span className={cx(textRole.titleL, styles.value, className)} {...rest} />;
 }
 CardValue.displayName = "Card.Value";
 
@@ -180,7 +180,7 @@ export type CardListItemProps = React.HTMLAttributes<HTMLLIElement> & {
 };
 
 function CardListItem({ className, ...rest }: CardListItemProps) {
-  return <li className={cx(styles.listItem, className)} {...rest} />;
+  return <li className={cx(textRole.bodyM, styles.listItem, className)} {...rest} />;
 }
 CardListItem.displayName = "Card.ListItem";
 

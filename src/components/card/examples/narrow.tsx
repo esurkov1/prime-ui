@@ -1,4 +1,4 @@
-/** The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem. */
+/** The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem — `variant`. */
 import { Card, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

@@ -1,43 +1,66 @@
-/** A chart widget: a header with a short description and a period switch, a summary line and an edge-to-edge chart — `Card.Header`, `Card.Description`, `Card.Media`. */
-import { Card, SegmentedControl, Typography } from "prime-ui-kit";
+/** A chart widget: a header with a short description and a period switch, and a Sparkline with the period total over its chart — `Card.Header`, `Card.Description`, `Card.Body`. */
+import { Card, SegmentedControl, Sparkline, type SparklinePoint } from "prime-ui-kit";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
-const POINTS = [42, 48, 45, 60, 58, 72, 66, 80, 76, 88, 84, 96];
+type Period = "week" | "month";
 
-/** An area chart path in a 100 × 100 box; the SVG stretches over the whole `Card.Media`. */
-const LINE = POINTS.map(
-  (value, i) => `${i === 0 ? "M" : "L"}${(i * 100) / (POINTS.length - 1)} ${100 - value}`,
-).join(" ");
+const REVENUE: Record<Period, SparklinePoint[]> = {
+  week: [
+    { label: "6 окт", value: 412_000 },
+    { label: "7 окт", value: 468_000 },
+    { label: "8 окт", value: 445_000 },
+    { label: "9 окт", value: 603_000 },
+    { label: "10 окт", value: 581_000 },
+    { label: "11 окт", value: 214_000 },
+    { label: "12 окт", value: 187_000 },
+  ],
+  month: [
+    { label: "сен, 1 нед.", value: 2_480_000 },
+    { label: "сен, 2 нед.", value: 2_760_000 },
+    { label: "сен, 3 нед.", value: 2_610_000 },
+    { label: "сен, 4 нед.", value: 3_140_000 },
+    { label: "окт, 1 нед.", value: 2_910_000 },
+  ],
+};
+
+/** The same total for the period before: the badge at rest compares the headline with it. */
+const PREVIOUS: Record<Period, number> = {
+  week: 2_640_000,
+  month: 12_900_000,
+};
+
+const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
 
 export default function CardPanelChartExample() {
+  const [period, setPeriod] = React.useState<Period>("month");
+
   return (
     <div className={styles.panel}>
       <Card.Root variant="panel">
         <Card.Header>
           <Card.Title>Выручка</Card.Title>
           <Card.Description>Оплаченные счета, без возвратов</Card.Description>
-          <SegmentedControl.Root size="xs" defaultValue="month" aria-label="Период">
+          <SegmentedControl.Root
+            size="xs"
+            value={period}
+            onValueChange={(value) => setPeriod(value as Period)}
+            aria-label="Период"
+          >
             <SegmentedControl.Item value="week">Неделя</SegmentedControl.Item>
             <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
           </SegmentedControl.Root>
         </Card.Header>
         <Card.Body>
-          <Typography variant="body-s" tone="secondary">
-            С начала квартала: 12,6 млн ₽, план выполнен на 84%.
-          </Typography>
+          <Sparkline
+            data={REVENUE[period]}
+            label="Оплачено за период"
+            summary="sum"
+            compareTo={PREVIOUS[period]}
+            formatValue={formatRubles}
+          />
         </Card.Body>
-        <Card.Media>
-          <svg
-            className={styles.chart}
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path className={styles.chartFill} d={`${LINE} L100 100 L0 100 Z`} />
-            <path className={styles.chartLine} d={LINE} />
-          </svg>
-        </Card.Media>
       </Card.Root>
     </div>
   );

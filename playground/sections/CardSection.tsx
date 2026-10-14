@@ -38,7 +38,7 @@ export const page: ComponentPageConfig = {
       scenario: "panel-chart",
       title: "Виджет с графиком",
       description:
-        "Шапка с коротким описанием и переключателем периода, строка итога и график от края до края — `Card.Header`, `Card.Description`, `Card.Media`.",
+        "Шапка с коротким описанием и переключателем периода, под ней Sparkline с итогом за период над графиком — `Card.Header`, `Card.Description`, `Card.Body`.",
     },
     {
       scenario: "interactive",
@@ -60,7 +60,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "narrow",
       description:
-        "Карточка — контейнер размера: split складывает ячейки уже 22rem, а значение тренда уменьшается уже 20rem.",
+        "Карточка — контейнер размера: split складывает ячейки уже 22rem, а значение тренда уменьшается уже 20rem — `variant`.",
     },
   ],
   api,

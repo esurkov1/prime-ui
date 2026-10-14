@@ -196,11 +196,11 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | A company settings panel: a header, fields on the surface fill and buttons in the footer — `Card.Header`, `Card.Body`, `Card.Footer`. |
 | [variants.tsx](examples/variants.tsx) | KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change and a reference line — `variant`, `Card.Delta`, `Card.Meta`. |
 | [kpi-media.tsx](examples/kpi-media.tsx) | A KPI with a sparkline or a fill level in the bottom slot of `mini` — `Card.Media`. |
-| [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a short description and a period switch, a summary line and an edge-to-edge chart — `Card.Header`, `Card.Description`, `Card.Media`. |
+| [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a short description and a period switch, and a Sparkline with the period total over its chart — `Card.Header`, `Card.Description`, `Card.Body`. |
 | [interactive.tsx](examples/interactive.tsx) | Whole cards as links to their reports: one tab stop each, a lift on hover, a press and the focus ring — `asChild`. |
 | [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
-| [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem. |
+| [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem — `variant`. |
 
 ## Mistakes
 - A `<div>` with a border styled as a card → use `Card.Root`; depth comes from fill, not lines.
@@ -209,10 +209,11 @@ No `labels`.
 - Custom padding on a `panel` root → padding belongs to `Header` / `Body` / `Footer`.
 - A wrapper `<div>` around the label and the value of `mini` → put `Icon`, `Label`, `Value` straight into the root (or into a `split` cell); the template lays them out.
 - A chart SVG with only a `viewBox` → give it a CSS height.
+- A hand-drawn trend SVG in a chart widget → `Sparkline` in the `Body` (or `Media`); a chart with a legend and states → `ChartFrame`.
 - A clickable `<div>` card with `onClick` → `asChild` with a real `<a href>` (Cmd-click, a new tab) or a `<button>`.
 - Buttons or links inside an `asChild` card → nested interactive elements; move them out of the card.
 - The reference figures written into `Card.Delta` or `Card.Label` → `Card.Meta`.
 
 ## Related
 - **Built from:** —
-- **See also:** [PageContent](../page-content/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md) (record details inside a `Card.Body`), [Fieldset](../fieldset/COMPONENT.md) (groups of fields inside a settings card), [DataTable](../data-table/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)
+- **See also:** [PageContent](../page-content/COMPONENT.md), [DescriptionList](../description-list/COMPONENT.md) (record details inside a `Card.Body`), [Fieldset](../fieldset/COMPONENT.md) (groups of fields inside a settings card), [DataTable](../data-table/COMPONENT.md), [Badge](../badge/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Sparkline](../sparkline/COMPONENT.md) (a trend with its total inside a `panel`), [ChartFrame](../chart-frame/COMPONENT.md) (a full chart with legend and states)

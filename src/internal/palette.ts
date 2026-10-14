@@ -1,4 +1,25 @@
+import { chartColors } from "@/theme/chartColors";
+
 import { type PaletteColor, paletteColors } from "./states";
+
+/**
+ * A palette hue as a data mark: its step of the categorical chart palette, so a category has one
+ * color in charts and in shares. The one source of `--hue-chart` in `palette.module.css` (kept equal
+ * by `palette.test.ts`); as strings here, because a chart library takes its colors in JS. Gray is
+ * `chart-other`; sky has no chart step (it sits too close to blue) and keeps its solid.
+ */
+export const HUE_CHART: Record<PaletteColor, string> = {
+  blue: chartColors.series[0],
+  orange: chartColors.series[1],
+  teal: chartColors.series[2],
+  yellow: chartColors.series[3],
+  pink: chartColors.series[4],
+  green: chartColors.series[5],
+  purple: chartColors.series[6],
+  red: chartColors.series[7],
+  gray: chartColors.other,
+  sky: "var(--prime-color-palette-sky-solid)",
+};
 
 /** The hues a person may get: every palette color but the neutral gray. */
 const PERSON_HUES = paletteColors.filter((color) => color !== "gray");

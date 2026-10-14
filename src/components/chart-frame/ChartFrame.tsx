@@ -6,6 +6,7 @@ import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
 import { cx } from "@/internal/cx";
+import { HUE_CHART } from "@/internal/palette";
 import type { TagRef } from "@/internal/polymorphic";
 import { rovingIndex } from "@/internal/rovingFocus";
 import type { PaletteColor, Tone } from "@/internal/states";
@@ -81,23 +82,6 @@ const DEFAULT_LABELS: ChartFrameLabels = {
 
 const NUMBER = new Intl.NumberFormat("ru-RU");
 const defaultFormat = (value: number) => NUMBER.format(value);
-
-/**
- * A palette hue as its chart step — the same mapping as `--hue-chart` in `palette.module.css`;
- * here as strings, because a chart library takes its colors in JS.
- */
-const HUE_CHART: Record<PaletteColor, string> = {
-  blue: chartColors.series[0],
-  orange: chartColors.series[1],
-  teal: chartColors.series[2],
-  yellow: chartColors.series[3],
-  pink: chartColors.series[4],
-  green: chartColors.series[5],
-  purple: chartColors.series[6],
-  red: chartColors.series[7],
-  gray: chartColors.other,
-  sky: "var(--prime-color-palette-sky-solid)",
-};
 
 function seriesColor(series: ChartFrameSeries, index: number): string {
   if (series.color) return HUE_CHART[series.color];

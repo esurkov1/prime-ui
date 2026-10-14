@@ -112,11 +112,11 @@
 }
 
 .title {
-  composes: titleS from "../../internal/textRole.module.css";
   margin: 0;
   min-width: 0;
   color: var(--prime-color-text-primary);
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .root[data-variant="cta"] > .title {
@@ -127,7 +127,6 @@
 }
 
 .description {
-  composes: bodyS from "../../internal/textRole.module.css";
   margin: 0;
   color: var(--prime-color-text-secondary);
   overflow-wrap: anywhere;
@@ -153,7 +152,6 @@
 }
 
 .label {
-  composes: bodyS from "../../internal/textRole.module.css";
   max-width: 100%;
   overflow: hidden;
   color: var(--prime-color-text-secondary);
@@ -162,7 +160,6 @@
 }
 
 .value {
-  composes: titleL from "../../internal/textRole.module.css";
   min-width: 0;
   color: var(--prime-color-text-primary);
   font-variant-numeric: tabular-nums;
@@ -407,7 +404,6 @@
 }
 
 .listItem {
-  composes: bodyM from "../../internal/textRole.module.css";
   padding: var(--prime-space-3) var(--card-pad);
   color: var(--prime-color-text-primary);
   overflow-wrap: anywhere;
