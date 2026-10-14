@@ -356,7 +356,6 @@
   --prime-media-viewer-inset: var(--prime-ref-space-4);
   --prime-media-viewer-page-gap: var(--prime-ref-space-6);
   --prime-message-card-width: 16rem;
-  --prime-message-dim-opacity: 0.42;
   --prime-message-dim-saturation: 0.6;
   --prime-message-gap: var(--prime-ref-space-4);
   --prime-message-group-gap: var(--prime-ref-space-2);
@@ -409,6 +408,7 @@
   --prime-motion-scale-settle: 0.9;
   --prime-motion-stagger: var(--prime-ref-duration-80);
   --prime-opacity-busy: 0.6;
+  --prime-opacity-dim: 0.42;
   --prime-opacity-disabled: 0.5;
   --prime-opacity-ghost: 0.4;
   --prime-panel-content-padding: var(--prime-ref-space-4);

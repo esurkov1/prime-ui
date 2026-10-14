@@ -185,28 +185,19 @@
   flex: none;
 }
 
-/* The recording dot breathes (a status loop, like a spinner); still under reduced motion. */
+/* The recording dot breathes (`statusLoop.breathe`, joined in TSX); still under reduced motion. */
 .dot {
   flex: none;
   width: var(--prime-space-2);
   height: var(--prime-space-2);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-danger-default);
-  animation: composerPulse var(--prime-motion-duration-slow) var(--prime-motion-easing-standard)
-    infinite alternate;
 }
 
 /* The dot, or — paused — a still pause glyph in the same hue, swapped in place (`GlyphSwap`). */
 .status {
   flex: none;
   color: var(--prime-color-danger-default);
-}
-
-@keyframes composerPulse {
-  to {
-    opacity: 0.3;
-    transform: scale(var(--prime-motion-scale-pop));
-  }
 }
 
 /* `0:09,2`: tabular digits keep the width while the time runs. */

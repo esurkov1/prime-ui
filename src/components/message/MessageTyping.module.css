@@ -33,33 +33,10 @@
   background: var(--prime-color-layer-current);
 }
 
+/* A dot of the row: it rises and brightens in turn (`statusLoop.wave`, joined in TSX). */
 .dot {
   inline-size: var(--prime-space-2);
   block-size: var(--prime-space-2);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-text-muted);
-  opacity: 0.4;
-  animation: typingDot calc(var(--prime-motion-loop) * 2) var(--prime-motion-easing-standard)
-    infinite;
-}
-
-.dot:nth-child(2) {
-  animation-delay: calc(var(--prime-motion-loop) / 3);
-}
-
-.dot:nth-child(3) {
-  animation-delay: calc(var(--prime-motion-loop) * 2 / 3);
-}
-
-@keyframes typingDot {
-  0%,
-  60%,
-  100% {
-    opacity: 0.4;
-    transform: none;
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(calc(var(--prime-space-1) * -1));
-  }
 }

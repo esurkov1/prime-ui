@@ -557,11 +557,14 @@ export const semanticTokens = {
    *   that is full; the content quiets down and comes back when the answer arrives.
    * - `disabled`: a color sample that cannot wear the disabled text color (a swatch).
    * - `ghost`: the copy a drag source leaves at its place.
+   * - `dim`: content that steps back while the screen points at another (a chat's selection, its
+   *   current search match, the blink of a jump).
    */
   opacity: {
     busy: "0.6",
     disabled: "0.5",
     ghost: "0.4",
+    dim: "0.42",
   },
 
   /**
@@ -835,11 +838,10 @@ export const semanticTokens = {
      */
     morphDuration: "{duration.300}",
     /**
-     * Messages that step back: the unselected ones in selection mode, the others while the chat
-     * points at one (a jump blinks them, the current search match keeps them back). Opacity and a
-     * slight desaturation; the message pointed at or selected stays at full strength.
+     * Messages that step back (the unselected ones in selection mode, the others while the chat
+     * keeps a search match current) take `opacity.dim` and this slight desaturation; the message
+     * pointed at or selected stays at full strength.
      */
-    dimOpacity: "0.42",
     dimSaturation: "0.6",
     /**
      * The tail of the last bubble of a run: a curl out of its square bottom corner on the author's

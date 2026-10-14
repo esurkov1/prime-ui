@@ -6,6 +6,7 @@ import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useLabels } from "@/internal/labels";
 import { defineRowKind, useMessageList } from "@/internal/messageList";
+import statusLoop from "@/internal/statusLoop.module.css";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./Message.module.css";
@@ -70,9 +71,9 @@ export function MessageTyping({
           {list.group ? <div className={styles.gutter}>{children}</div> : null}
           <SurfaceDepthProvider value={depth}>
             <div className={typing.bubble} data-depth={depth} aria-hidden="true">
-              <span className={typing.dot} />
-              <span className={typing.dot} />
-              <span className={typing.dot} />
+              <span className={cx(typing.dot, statusLoop.wave)} />
+              <span className={cx(typing.dot, statusLoop.wave)} />
+              <span className={cx(typing.dot, statusLoop.wave)} />
             </div>
           </SurfaceDepthProvider>
           <VisuallyHidden>{open ? labels.typing : ""}</VisuallyHidden>

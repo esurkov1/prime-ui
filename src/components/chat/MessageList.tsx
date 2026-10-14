@@ -115,6 +115,18 @@ const STILL_POINT_MS = 1200;
 /** A blink whose end is never seen lets go after this. */
 const POINT_LIMIT_MS = 2000;
 
+/** Marks the message the list points at; a jump (`a` / `b`) also blinks it. */
+function mark(article: HTMLElement, pointing: string | undefined) {
+  article.dataset.pointed = "";
+  if (pointing === "a" || pointing === "b") article.dataset.blink = pointing;
+  else delete article.dataset.blink;
+}
+
+function unmark(article: HTMLElement) {
+  delete article.dataset.pointed;
+  delete article.dataset.blink;
+}
+
 /** A jump further than this many views lands at once (then settles), nearer ones glide. */
 const GLIDE_VIEWS = 2;
 
@@ -254,8 +266,9 @@ export function MessageList({
   const mergedRef = useMergedRefs(innerRef, ref);
   /**
    * The message the chat points at (CSS, from `data-pointing` on the list and `data-pointed` on
-   * the message). A jump blinks it (`a` / `b`, flipped so a repeated jump restarts) and lets go;
-   * the current search match keeps the others back.
+   * the message). A jump blinks it (`statusLoop.blink`: `data-blink` on the message from the
+   * list's `a` / `b`, flipped so a repeated jump restarts) and lets go; the current search match
+   * keeps the others back.
    * Kept by value, so a row that renders again while pointed at is marked again.
    */
   const pointed = React.useRef<string | null>(null);
@@ -268,7 +281,7 @@ export function MessageList({
       return;
     delete element.dataset.pointing;
     for (const article of element.querySelectorAll<HTMLElement>("[data-pointed]")) {
-      delete article.dataset.pointed;
+      unmark(article);
     }
     pointed.current = null;
   }, []);
@@ -277,17 +290,17 @@ export function MessageList({
       const element = innerRef.current;
       if (!element) return;
       for (const other of element.querySelectorAll<HTMLElement>("[data-pointed]")) {
-        if (other !== article) delete other.dataset.pointed;
+        if (other !== article) unmark(other);
       }
-      article.dataset.pointed = "";
       pointed.current = article.dataset.messageValue ?? null;
       const run = ++pointRun.current;
       element.dataset.pointing =
         mode === "current" ? "current" : element.dataset.pointing === "a" ? "b" : "a";
+      mark(article, element.dataset.pointing);
       if (mode === "current") return;
       // The blink's end lets go; under reduced motion (no blink), the time.
       const onEnd = (event: AnimationEvent) => {
-        if (!event.animationName?.includes("messagePointing")) return;
+        if (!event.animationName?.includes("statusBlink")) return;
         element.removeEventListener("animationend", onEnd);
         unpoint(run);
       };
@@ -374,7 +387,7 @@ export function MessageList({
         };
         article.addEventListener("animationend", clear);
       }
-      if (value === pointed.current) article.dataset.pointed = "";
+      if (value === pointed.current) mark(article, innerRef.current?.dataset.pointing);
       const watch = direction === "incoming" ? receiptsOf() : null;
       watch?.observe(article, value);
       return () => watch?.unobserve(article);

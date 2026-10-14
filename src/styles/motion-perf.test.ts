@@ -271,6 +271,7 @@ const KEYFRAME_HOMES = new Set([
   "src/internal/glyphSwap.module.css",
   "src/internal/MorphText.module.css",
   "src/internal/ring.module.css",
+  "src/internal/statusLoop.module.css",
   "src/icons/glyphMotion.module.css",
   "src/components/skeleton/Skeleton.module.css",
   "src/components/spinner/Spinner.module.css",

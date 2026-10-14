@@ -1,7 +1,1 @@
-[
-  "src/components/composer/Composer.module.css: local @keyframes composerPulse",
-  "src/components/message/Message.module.css: local @keyframes messagePointingA",
-  "src/components/message/Message.module.css: local @keyframes messagePointingB",
-  "src/components/message/MessageCards.module.css: local @keyframes livePulse",
-  "src/components/message/MessageTyping.module.css: local @keyframes typingDot"
-]
+[]

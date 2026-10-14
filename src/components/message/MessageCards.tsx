@@ -10,6 +10,7 @@ import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { defineMessagePart, useMessagePart } from "@/internal/messagePart";
 import type { PaletteColor } from "@/internal/states";
+import statusLoop from "@/internal/statusLoop.module.css";
 
 import styles from "./MessageCards.module.css";
 
@@ -61,7 +62,11 @@ export function MessageLocation({
       <Thumbnail.Root fullWidth ratio="16:9" size="xs" className={styles.map}>
         <Thumbnail.Image src={src} />
       </Thumbnail.Root>
-      <span className={styles.pin} data-live={live || undefined} aria-hidden="true">
+      <span
+        className={cx(styles.pin, live && statusLoop.pulse)}
+        data-live={live || undefined}
+        aria-hidden="true"
+      >
         <Icon name="object.mapPin" animated={false} />
       </span>
     </>

@@ -54,27 +54,8 @@ a.mapFrame:focus-visible {
   box-shadow: var(--prime-shadow-overlay);
 }
 
-/* A live location breathes: a ring leaves the pin and fades, over and over (a status, like a spinner). */
-.pin[data-live]::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: var(--prime-z-below);
-  border-radius: inherit;
-  background: var(--prime-color-accent-default);
-  animation: livePulse calc(var(--prime-motion-loop) * 3) var(--prime-motion-easing-enter) infinite;
-}
-
-@keyframes livePulse {
-  from {
-    opacity: 0.5;
-  }
-
-  to {
-    opacity: 0;
-    transform: scale(var(--prime-motion-scale-pulse));
-  }
-}
+/* A live location pulses: a ring leaves the pin and fades, over and over (`statusLoop.pulse`,
+   joined in TSX while live); the «Трансляция» badge still says it under reduced motion. */
 
 .place {
   display: grid;
@@ -206,12 +187,4 @@ a.mapFrame:focus-visible {
   justify-content: flex-end;
   font-size: var(--prime-text-caption-size);
   line-height: var(--prime-text-caption-line-height);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* The «Трансляция» badge still says it is live. */
-  .pin[data-live]::after {
-    animation: none;
-    opacity: 0;
-  }
 }

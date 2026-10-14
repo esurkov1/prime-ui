@@ -1117,7 +1117,7 @@ describe("Message shells and layout contract", () => {
     const back = ".root:not([data-selected]) > :is(.gutter, .column, .retry)";
     expect(all).toContain(`[data-message-list][data-selecting] ${back}`);
     expect(all).toContain('[data-message-list][data-pointing="current"] .root:not([data-pointed])');
-    expect(declares("opacity", "var(--prime-message-dim-opacity)")).toBe(true);
+    expect(declares("opacity", "var(--prime-opacity-dim)")).toBe(true);
     expect(declares("filter", "saturate(var(--prime-message-dim-saturation))")).toBe(true);
     // Nothing drawn on the message: no outline, wash or ring of a selected or pointed bubble.
     expect(all).not.toMatch(/data-(flash|current)/);

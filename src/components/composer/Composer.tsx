@@ -32,6 +32,7 @@ import { type MediaKind, mediaKind } from "@/internal/mediaKind";
 import { usePartPresence } from "@/internal/partPresence";
 import { Ring } from "@/internal/ring";
 import { type ControlSize, stepDown } from "@/internal/states";
+import statusLoop from "@/internal/statusLoop.module.css";
 import { TEXT_FORMATTING_LABELS, type TextFormattingLabels } from "@/internal/textFormatting";
 import { useTextFormatting } from "@/internal/textFormattingToolbar";
 import { type AsyncHandler, isPromiseLike } from "@/internal/usePendingChanges";
@@ -1124,7 +1125,11 @@ function ComposerRoot({
                   {recorder.paused ? (
                     <Icon name="action.pause" size={stepDown(size)} animated={false} />
                   ) : (
-                    <span key="dot" className={styles.dot} aria-hidden="true" />
+                    <span
+                      key="dot"
+                      className={cx(styles.dot, statusLoop.breathe)}
+                      aria-hidden="true"
+                    />
                   )}
                 </GlyphSwap>
                 <span ref={timerRef} className={styles.timer} aria-hidden="true" />

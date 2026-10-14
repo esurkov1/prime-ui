@@ -1,0 +1,128 @@
+/*
+ * Status loops (foundation §7): motion that says a state goes on — a recording, a live location,
+ * someone typing — and the blink of an element the screen points at. The one home of their
+ * keyframes (`src/styles/motion-perf.test.ts`): a host joins the class in TSX and only places and
+ * paints the part.
+ *
+ *   .breathe  a dot that breathes: fades and shrinks a little and back (`slow`, both ways); still
+ *             under reduced motion, where the duration collapses (a recording dot)
+ *   .pulse    a ring that leaves its mark and fades, over and over (three loops): an `::after` in
+ *             the element's own fill and shape (a live location's pin); none under reduced motion
+ *   .wave     a dot of a row that rises and brightens in turn (two loops; the second and third dot
+ *             a third of a loop later): someone typing
+ *   .blink    steps back to `--prime-opacity-dim` and forward three times (`base` each), once,
+ *             while its parent carries `data-blink="a"` or `"b"` — flipped on every call, so a
+ *             repeated call restarts it; a parent that is entering (`data-enter`) waits. Its clock
+ *             is zero under reduced motion
+ */
+
+.breathe {
+  animation: statusBreathe var(--prime-motion-duration-slow) var(--prime-motion-easing-standard)
+    infinite alternate;
+}
+
+@keyframes statusBreathe {
+  to {
+    opacity: 0.3;
+    transform: scale(var(--prime-motion-scale-pop));
+  }
+}
+
+.pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--prime-z-below);
+  border-radius: inherit;
+  background: inherit;
+  animation: statusPulse calc(var(--prime-motion-loop) * 3) var(--prime-motion-easing-enter)
+    infinite;
+}
+
+@keyframes statusPulse {
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(var(--prime-motion-scale-pulse));
+  }
+}
+
+.wave {
+  opacity: 0.4;
+  animation: statusWave calc(var(--prime-motion-loop) * 2) var(--prime-motion-easing-standard)
+    infinite;
+}
+
+.wave:nth-child(2) {
+  animation-delay: calc(var(--prime-motion-loop) / 3);
+}
+
+.wave:nth-child(3) {
+  animation-delay: calc(var(--prime-motion-loop) * 2 / 3);
+}
+
+@keyframes statusWave {
+  0%,
+  60%,
+  100% {
+    opacity: 0.4;
+    transform: none;
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(calc(var(--prime-space-1) * -1));
+  }
+}
+
+[data-blink="a"]:not([data-enter]) > .blink {
+  animation: statusBlinkA calc(var(--prime-motion-duration-base) * 3)
+    var(--prime-motion-easing-standard) both;
+}
+
+[data-blink="b"]:not([data-enter]) > .blink {
+  animation: statusBlinkB calc(var(--prime-motion-duration-base) * 3)
+    var(--prime-motion-easing-standard) both;
+}
+
+/* Two names for one blink: a changed name restarts the animation. */
+@keyframes statusBlinkA {
+  0%,
+  33.33%,
+  66.67%,
+  100% {
+    opacity: 1;
+  }
+
+  16.67%,
+  50%,
+  83.33% {
+    opacity: var(--prime-opacity-dim);
+  }
+}
+
+@keyframes statusBlinkB {
+  0%,
+  33.33%,
+  66.67%,
+  100% {
+    opacity: 1;
+  }
+
+  16.67%,
+  50%,
+  83.33% {
+    opacity: var(--prime-opacity-dim);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The live badge still says it is live. */
+  .pulse::after {
+    animation: none;
+    opacity: 0;
+  }
+}

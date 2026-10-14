@@ -328,7 +328,7 @@
 
 /*
  * Stepping back: nothing is drawn on a message to mark it — the others step back around it
- * (`--prime-message-dim-opacity`, a slight desaturation), the marked one stays at full strength.
+ * (`--prime-opacity-dim`, a slight desaturation), the marked one stays at full strength.
  * One attribute on the list decides it, and a descendant selector (no `:has()`) reaches what steps
  * back in each message: its column (the bubble or shape, its tail and reactions), the avatar and
  * the retry. Opacity and filter on those boxes only — composited, nothing is laid out again.
@@ -336,8 +336,9 @@
  *   (`fast`, both ways).
  * - The chat points at a message (`data-pointing` on the list, `data-pointed` on the message: a
  *   pinned message's jump, a reply's original, a forwarded original): the message itself steps
- *   back and comes forward three times, one `base` each, and stays forward (`a` / `b`, flipped so
- *   a repeated jump restarts the blink); the others stay still. The current match of a search
+ *   back and comes forward three times, one `base` each, and stays forward (`statusLoop.blink` on
+ *   the same three boxes; the list sets `data-blink` `a` / `b` on the message, flipped so a
+ *   repeated jump restarts the blink); the others stay still. The current match of a search
  *   keeps the others back while it is current (`current`).
  * Reduced motion: no blink — the others stand back for a moment (the list lets go).
  */
@@ -365,50 +366,8 @@
 [data-message-list][data-pointing="current"]
   .root:not([data-pointed])
   > :is(.gutter, .column, .retry) {
-  opacity: var(--prime-message-dim-opacity);
+  opacity: var(--prime-opacity-dim);
   filter: saturate(var(--prime-message-dim-saturation));
-}
-
-[data-message-list][data-pointing="a"]
-  .root[data-pointed]:not([data-enter])
-  > :is(.gutter, .column, .retry) {
-  animation: messagePointingA calc(var(--prime-motion-duration-base) * 3)
-    var(--prime-motion-easing-standard) both;
-}
-
-[data-message-list][data-pointing="b"]
-  .root[data-pointed]:not([data-enter])
-  > :is(.gutter, .column, .retry) {
-  animation: messagePointingB calc(var(--prime-motion-duration-base) * 3)
-    var(--prime-motion-easing-standard) both;
-}
-
-@keyframes messagePointingA {
-  0%,
-  33.33%,
-  66.67%,
-  100% {
-    opacity: 1;
-  }
-  16.67%,
-  50%,
-  83.33% {
-    opacity: var(--prime-message-dim-opacity);
-  }
-}
-
-@keyframes messagePointingB {
-  0%,
-  33.33%,
-  66.67%,
-  100% {
-    opacity: 1;
-  }
-  16.67%,
-  50%,
-  83.33% {
-    opacity: var(--prime-message-dim-opacity);
-  }
 }
 
 /* ─── Author, text ──────────────────────────────────────────────────────── */
@@ -958,7 +917,7 @@ button.reply:focus-visible {
   [data-message-list][data-pointing]
     .root:not([data-pointed], [data-enter])
     > :is(.gutter, .column, .retry) {
-    opacity: var(--prime-message-dim-opacity);
+    opacity: var(--prime-opacity-dim);
     filter: saturate(var(--prime-message-dim-saturation));
   }
 }

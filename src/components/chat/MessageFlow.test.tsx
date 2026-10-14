@@ -266,18 +266,22 @@ describe("The message list: jump, search, read receipts", () => {
     rerender(<Conversation rows={HISTORY} region={region} jumpTo="m1" />);
     expect(group()).toHaveAttribute("data-pointing", "a");
     expect(article("m1")).toHaveAttribute("data-pointed");
+    expect(article("m1")).toHaveAttribute("data-blink", "a");
+    expect(article("m2")).not.toHaveAttribute("data-blink");
     // Nothing is drawn on the message itself.
     expect(bubble("m1")).not.toHaveAttribute("data-flash");
     // A jump to the same message restarts the blink (the value flips, so CSS replays it).
     rerender(<Conversation rows={HISTORY} region={region} jumpTo={null} />);
     rerender(<Conversation rows={HISTORY} region={region} jumpTo="m1" />);
     expect(group()).toHaveAttribute("data-pointing", "b");
+    expect(article("m1")).toHaveAttribute("data-blink", "b");
     // Another animation ending (a message entering) leaves the blink running.
     animationEnd(bubble("m2"), "_messageEnter_x1");
     expect(group()).toHaveAttribute("data-pointing", "b");
-    animationEnd(bubble("m2"), "_messagePointingB_x1");
+    animationEnd(bubble("m2"), "_statusBlinkB_x1");
     expect(group()).not.toHaveAttribute("data-pointing");
     expect(article("m1")).not.toHaveAttribute("data-pointed");
+    expect(article("m1")).not.toHaveAttribute("data-blink");
   });
 
   it("onRead reports the incoming messages that were seen, once", () => {

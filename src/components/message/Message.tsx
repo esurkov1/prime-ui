@@ -29,6 +29,7 @@ import {
 } from "@/internal/messagePart";
 import { exitTimeoutMs } from "@/internal/motionTiming";
 import { flattenChildren } from "@/internal/parts";
+import statusLoop from "@/internal/statusLoop.module.css";
 import {
   type SurfaceDepth,
   SurfaceDepthProvider,
@@ -727,7 +728,7 @@ function MessageRoot({
     // row's empty width: a long hover, a long press, a right click and a double tap start here.
     <div
       ref={columnRef}
-      className={styles.column}
+      className={cx(styles.column, statusLoop.blink)}
       data-message-column=""
       data-actions={hasActions || undefined}
       onPointerEnter={(event) => {
@@ -907,9 +908,11 @@ function MessageRoot({
           <Checkbox.Indicator shape="circle" checked={selected} />
         </span>
       ) : null}
-      {gutter ? <div className={styles.gutter}>{showAvatar ? avatar : null}</div> : null}
+      {gutter ? (
+        <div className={cx(styles.gutter, statusLoop.blink)}>{showAvatar ? avatar : null}</div>
+      ) : null}
       {status === "failed" && onRetry ? (
-        <span className={styles.retry} data-morph-item="">
+        <span className={cx(styles.retry, statusLoop.blink)} data-morph-item="">
           <Button.Root
             variant="ghost"
             tone="danger"
