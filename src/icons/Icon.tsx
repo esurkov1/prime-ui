@@ -35,10 +35,20 @@ export function createIcon(glyph: SvgGlyph) {
     color,
     label,
     animated,
+    drawn,
     strokeWidth = 1.75,
     ...rest
   }: DomainIconProps) {
-    const root = useIconRoot({ className, size, tone, color, label, animated, motion: "generic" });
+    const root = useIconRoot({
+      className,
+      size,
+      tone,
+      color,
+      label,
+      animated,
+      drawn,
+      motion: "generic",
+    });
     return <SvgIcon strokeWidth={strokeWidth} {...root} {...rest} />;
   }
   DomainIcon.displayName = `Icon(${glyph.displayName ?? "Glyph"})`;

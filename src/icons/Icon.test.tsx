@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { iconBoxStyles } from "@/internal/iconBox";
+import { cssRule, cssValue } from "@/test/css";
 import * as iconSet from "../icon-set";
 import type { Glyph } from "./glyph";
 import { createIcon, Icon, type IconName } from "./index";
@@ -95,6 +96,24 @@ describe("icon gestures", () => {
     expect(screen.getByTestId("i")).toHaveAttribute("data-icon-motion", "glyph");
     rerender(<Icon name="action.search" animated={false} data-testid="i" />);
     expect(screen.getByTestId("i")).not.toHaveAttribute("data-icon-motion");
+  });
+
+  it("drawn follows a state: the draw parts draw in and out, and no hover gesture plays", () => {
+    const { rerender } = render(<Icon name="action.check" drawn={false} data-testid="i" />);
+    const icon = screen.getByTestId("i");
+    expect(icon).toHaveAttribute("data-drawn", "false");
+    expect(icon).not.toHaveAttribute("data-icon-motion");
+    rerender(<Icon name="action.check" drawn data-testid="i" />);
+    expect(icon).toHaveAttribute("data-drawn", "true");
+    hover(icon);
+    expect(icon).not.toHaveAttribute("data-play");
+    const CSS = "src/icons/glyphMotion.module.css";
+    expect(
+      cssValue(cssRule(CSS, '.root[data-drawn="false"] [data-motion="draw"]'), "stroke-dashoffset"),
+    ).toBe("1");
+    expect(
+      cssValue(cssRule(CSS, '.root[data-drawn="true"] [data-motion="draw"]'), "stroke-dashoffset"),
+    ).toBe("0");
   });
 
   it("plays once when its host is hovered and clears when the carrier ends", () => {

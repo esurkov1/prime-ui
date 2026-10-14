@@ -39,6 +39,12 @@ export type DomainIconProps = Omit<React.ComponentPropsWithoutRef<"svg">, "color
    * it still.
    */
   animated?: boolean;
+  /**
+   * A mark that follows a state instead of playing a gesture: `true` draws the glyph's stroke in
+   * (its `draw` parts), `false` draws it out, both ways eased — a check that appears when a row is
+   * ticked. Undefined: the usual one-shot gesture. A drawn icon plays no hover gesture.
+   */
+  drawn?: boolean;
   ref?: React.Ref<SVGSVGElement>;
 };
 
@@ -56,13 +62,19 @@ export function useIconRoot({
   color,
   label,
   animated = true,
+  drawn,
   motion,
-}: Pick<DomainIconProps, "className" | "size" | "tone" | "color" | "label" | "animated"> & {
+}: Pick<
+  DomainIconProps,
+  "className" | "size" | "tone" | "color" | "label" | "animated" | "drawn"
+> & {
   /** `glyph` — parts carry their own `data-motion`; `generic` — the whole drawing pops. */
   motion: "glyph" | "generic";
 }) {
   const tier = useOptionalControlSize();
-  useIconPlay(animated);
+  // A state-driven mark never plays the hover gesture: its stroke follows the state.
+  const plays = animated && drawn === undefined;
+  useIconPlay(plays);
   return {
     className: cx(
       styles.root,
@@ -77,7 +89,8 @@ export function useIconRoot({
     role: label === undefined ? undefined : "img",
     "aria-label": label,
     "aria-hidden": label === undefined ? true : undefined,
-    "data-icon-motion": animated ? motion : undefined,
+    "data-icon-motion": plays ? motion : undefined,
+    "data-drawn": drawn === undefined ? undefined : String(drawn),
   } as const;
 }
 
@@ -93,10 +106,20 @@ export function defineGlyph(source: string, body: React.ReactNode): Glyph {
     color,
     label,
     animated,
+    drawn,
     strokeWidth = 1.75,
     ...rest
   }: DomainIconProps) {
-    const root = useIconRoot({ className, size, tone, color, label, animated, motion: "glyph" });
+    const root = useIconRoot({
+      className,
+      size,
+      tone,
+      color,
+      label,
+      animated,
+      drawn,
+      motion: "glyph",
+    });
     return (
       // biome-ignore lint/a11y/noSvgWithoutTitle: `root` makes it aria-hidden, or role="img" named by `label`
       <svg
