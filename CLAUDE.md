@@ -278,6 +278,25 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   slot's preview layout provides them). A bounded block is `Card.Root` — CSS only places it.
 - No inline `style={{}}`, no playground imports; the file copies into a consumer project unchanged.
 
+### Examples vs patterns — who shows what
+
+- **A component example** shows one component, one scenario, with the least around it: no page
+  heading, no shell, no neighbours that are not the point. Every capability of a component (every
+  message kind, card kind, column option, state) is shown in that component's own examples — its page
+  is complete on its own.
+- **A pattern** (`SKILL/patterns/`, the playground «Композиция») is a whole screen and answers «how to
+  compose»: layout, toolbar, view switch, details in a Drawer, loading / empty / error, the phone. It
+  never re-demos a component's capabilities; it uses them where the screen needs them. A pattern that
+  is one component plus a heading is an example, not a pattern.
+- **Nothing is lost when moving**: before a capability leaves a pattern, it is shown in the component's
+  examples (add or extend one there in the same change).
+- **One title per screen, two kinds of page.** A work screen (a board, a messenger, a schedule, a
+  dense register) gives its height to the work: `AppHeader.Title as="h1"` with the tools in
+  `AppHeader.Tools` (`PageToolbar`), no `PageContent.Header`. An overview or document page (home,
+  dashboard, settings, a record, a list page) has its title and a data-carrying description in
+  `PageContent.Header`, and the AppHeader shows no title (menu, path, search, app actions). Never the
+  same title twice; never no h1. `src/test/patterns-contract.test.ts` guards the pattern side.
+
 ## 5. Playground page
 
 Every component page is the same: **title → description → examples by slots → API → Accessibility**
