@@ -1,0 +1,34 @@
+/* Layout of the FieldList scenarios: semantic tokens only. */
+
+/* A form: the list, then its submit button at the start, a group apart. */
+.form {
+  display: grid;
+  gap: var(--prime-space-8);
+  width: 100%;
+  min-width: 0;
+}
+
+.submit {
+  justify-self: start;
+}
+
+/* A 320 px column: the rows stack into blocks and every field shows its label. */
+.narrow {
+  inline-size: min(100%, calc(var(--prime-space-20) * 4));
+}
+
+/* The total of the lines and the reset beside it. */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--prime-space-3);
+}
+
+.stack {
+  display: grid;
+  gap: var(--prime-space-6);
+  width: 100%;
+  min-width: 0;
+}

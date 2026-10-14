@@ -11,10 +11,10 @@ import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeConte
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { DisabledProvider, useInheritedDisabled } from "@/internal/disabledContext";
-import { FieldCellContext, type FieldCell } from "@/internal/fieldCell";
-import { fieldTierClass } from "@/internal/fieldClasses";
-import { FieldFrame, type FieldRootDomProps, useFieldFrame } from "@/internal/FieldFrame";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { FieldFrame, type FieldRootDomProps, useFieldFrame } from "@/internal/FieldFrame";
+import { type FieldCell, FieldCellContext } from "@/internal/fieldCell";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import type { ControlSize } from "@/internal/states";
@@ -172,6 +172,8 @@ export function FieldList<T extends object>({
   labels: labelsProp,
   className,
   ref,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
   ...rest
 }: FieldListProps<T>) {
   const size = useControlSize(sizeProp);
@@ -183,6 +185,11 @@ export function FieldList<T extends object>({
     onChange: onValueChange as ((next: readonly T[]) => void) | undefined,
   });
   const ids = useFieldFrame(undefined, { label, hint, error });
+  // The list is named by the visible label, else by the consumer's `aria-labelledby` / `aria-label`.
+  const listName = {
+    "aria-labelledby": ids.labelledBy ?? ariaLabelledBy,
+    "aria-label": ids.labelledBy || ariaLabelledBy ? undefined : ariaLabel,
+  };
   const addRef = React.useRef<HTMLButtonElement>(null);
   const rows = React.useRef(new Map<string, HTMLElement>());
   // Rows the add button made enter; rows a remove took out leave in place.
@@ -338,14 +345,11 @@ export function FieldList<T extends object>({
         {content}
       </Dnd.SortableItem>
     ) : (
-      <li key={id} {...(rowProps as React.HTMLAttributes<HTMLLIElement>)} ref={rowProps.ref}>
+      <li key={id} {...rowProps}>
         {content}
       </li>
     );
   };
-
-  const listClass = styles.rows;
-  const listLabel = ids.labelledBy;
 
   return (
     <ControlSizeProvider value={size}>
@@ -396,8 +400,8 @@ export function FieldList<T extends object>({
                   as="ol"
                   handle
                   disabled={disabled}
-                  className={listClass}
-                  aria-labelledby={listLabel}
+                  className={styles.rows}
+                  {...listName}
                   items={items}
                   getId={getId}
                   getLabel={(item) => rowName(item, items.indexOf(item))}
@@ -408,7 +412,7 @@ export function FieldList<T extends object>({
                 />
               </ReorderSession>
             ) : (
-              <ol className={listClass} aria-labelledby={listLabel}>
+              <ol className={styles.rows} {...listName}>
                 {items.map(renderRow)}
               </ol>
             )}

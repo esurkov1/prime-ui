@@ -1,0 +1,181 @@
+import { FIELD_ROOT_REST } from "@/internal/field.api";
+import type { ComponentApi } from "../../../scripts/docs/componentApi";
+
+export const api: ComponentApi = {
+  parts: [
+    {
+      name: "FieldList",
+      en: "Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editable list of records of one shape: column headings once, a row of fields per record (`<ol>`), remove per row, add under the rows; rows stack under 480 px.",
+      ru: "Редактируемый список однотипных записей: заголовки столбцов один раз над строками, строка полей на запись (`<ol>`), кнопка удаления у строки и кнопка добавления под строками; в контейнере уже 480 px строки складываются в блоки.",
+      props: [
+        {
+          name: "columns",
+          type: "readonly FieldListColumn[]",
+          required: true,
+          en: "The columns in cell order: `label` (the heading; it names the field of the column in every row), `width` (`fill` | `compact` | `s` | `m`), `required` (a `*` after the heading).",
+          ru: "Столбцы в порядке ячеек: `label` (заголовок; он же имя поля столбца в каждой строке), `width` (`fill` | `compact` | `s` | `m`), `required` (`*` после заголовка).",
+        },
+        {
+          name: "renderItem",
+          type: "(item: T, row: FieldListRow<T>) => ReactNode",
+          required: true,
+          en: "The cells of a row, one element per column (a fragment): kit fields without `label`. `row` has `index`, `update(patch)` and `remove()`.",
+          ru: "Ячейки строки, по элементу на столбец (фрагмент): поля кита без `label`. `row` — `index`, `update(patch)` и `remove()`.",
+        },
+        {
+          name: "getId",
+          type: "(item: T) => string",
+          required: true,
+          en: "Stable unique id of an item: the row key and the drag id.",
+          ru: "Стабильный уникальный id записи: ключ строки и id перетаскивания.",
+        },
+        {
+          name: "value",
+          type: "readonly T[]",
+          en: "The rows (controlled).",
+          ru: "Строки (управляемо).",
+        },
+        {
+          name: "defaultValue",
+          type: "readonly T[]",
+          default: "[]",
+          en: "The first rows (uncontrolled).",
+          ru: "Начальные строки (неуправляемо).",
+        },
+        {
+          name: "onValueChange",
+          type: "(value: T[]) => void",
+          en: "The new list after an edit (`row.update`), an added, removed or moved row.",
+          ru: "Новый список после правки (`row.update`), добавления, удаления или переноса строки.",
+        },
+        {
+          name: "createItem",
+          type: "() => T",
+          en: "A new empty item; with it the add button shows under the rows and focus goes to the new row's first field.",
+          ru: "Новая пустая запись; с ней под строками есть кнопка добавления, а фокус уходит в первое поле новой строки.",
+        },
+        {
+          name: "addLabel",
+          type: "string",
+          en: "Text of the add button: what is added («Добавить позицию»).",
+          ru: "Текст кнопки добавления: что добавляется («Добавить позицию»).",
+        },
+        {
+          name: "getLabel",
+          type: "(item: T) => string",
+          en: "The row's own text (its title field) for the remove button, the handle and drag announcements; else the row number.",
+          ru: "Текст строки (её поле-название) для кнопки удаления, ручки и объявлений перетаскивания; иначе — номер строки.",
+        },
+        {
+          name: "getLocked",
+          type: "(item: T) => boolean",
+          en: "Pinned rows: a lock in the lead column, no remove button, they hold their place while others move.",
+          ru: "Закреплённые строки: замок в ведущем столбце, без кнопки удаления, держат место при перестановке.",
+        },
+        {
+          name: "reorderable",
+          type: "boolean",
+          default: "false",
+          en: "Rows move by a leading handle: drag, a touch hold, Alt + ↑ / ↓.",
+          ru: "Строки переносятся за ведущую ручку: перетаскивание, удержание, Alt + ↑ / ↓.",
+        },
+        {
+          name: "min",
+          type: "number",
+          default: "0",
+          en: "The fewest rows: at this count the remove buttons are disabled.",
+          ru: "Наименьшее число строк: при нём кнопки удаления выключены.",
+        },
+        {
+          name: "max",
+          type: "number",
+          en: "The most rows: at this count the add button is disabled with `labels.maxReached` beside it.",
+          ru: "Наибольшее число строк: при нём кнопка добавления выключена, рядом — `labels.maxReached`.",
+        },
+        {
+          name: "label",
+          type: "ReactNode",
+          en: "Heading of the list; names the `<ol>`. Omit it inside a `Fieldset` whose legend names the list.",
+          ru: "Подпись списка, имя `<ol>`. Не нужна внутри `Fieldset`, чья легенда уже называет список.",
+        },
+        {
+          name: "aria-label",
+          type: "string",
+          en: "Name of the `<ol>` when no visible `label` names it (a section heading above the list).",
+          ru: "Имя `<ol>`, если его не называет видимый `label` (заголовок раздела над списком).",
+        },
+        {
+          name: "hint",
+          type: "ReactNode",
+          en: "Help text under the list; hidden while `error` shows.",
+          ru: "Подсказка под списком; скрыта, пока показан `error`.",
+        },
+        {
+          name: "error",
+          type: "ReactNode",
+          en: "A problem of the list as a whole («Добавьте хотя бы одну позицию»); a field's own error goes on that field.",
+          ru: "Ошибка списка целиком («Добавьте хотя бы одну позицию»); ошибка поля — на самом поле.",
+        },
+        {
+          name: "disabled",
+          type: "boolean",
+          default: "false",
+          en: "Disables every field, handle and button; a disabled `Fieldset` around it sets it too.",
+          ru: "Выключает все поля, ручки и кнопки; выключенный `Fieldset` вокруг делает то же.",
+        },
+        {
+          name: "size",
+          type: '"xs" | "s" | "m" | "l" | "xl"',
+          default: '"m"',
+          en: "Tier of the headings, buttons and the kit fields that read the host tier. Without it the host tier, else `m`.",
+          ru: "Ярус заголовков, кнопок и полей кита, читающих ярус хозяина. Без него — ярус хозяина, иначе `m`.",
+        },
+        {
+          name: "labels",
+          type: "Partial<FieldListLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
+        },
+        FIELD_ROOT_REST,
+      ],
+    },
+  ],
+  labels: [
+    {
+      key: "remove",
+      default: "Удалить {row}",
+      en: "`aria-label` of a row's remove button; `{row}` is the row's name.",
+      ru: "`aria-label` кнопки удаления строки; `{row}` — имя строки.",
+    },
+    {
+      key: "reorder",
+      default: "Переместить {row}",
+      en: "`aria-label` of a row's handle (`reorderable`); `{row}` is the row's name.",
+      ru: "`aria-label` ручки строки (`reorderable`); `{row}` — имя строки.",
+    },
+    {
+      key: "row",
+      default: "строку {index}",
+      en: "Name of a row without `getLabel` text; `{index}` counts from 1.",
+      ru: "Имя строки без текста `getLabel`; `{index}` — номер с 1.",
+    },
+    {
+      key: "namedRow",
+      default: "«{label}»",
+      en: "Name of a row with `getLabel` text; `{label}` is that text.",
+      ru: "Имя строки с текстом `getLabel`; `{label}` — этот текст.",
+    },
+    {
+      key: "locked",
+      default: "Закреплена",
+      en: "Spoken name of the lock of a pinned row in a list without `reorderable`.",
+      ru: "Имя замка закреплённой строки в списке без `reorderable`.",
+    },
+    {
+      key: "maxReached",
+      default: "Не больше {max}",
+      en: "Text beside the disabled add button once the list holds `max` rows.",
+      ru: "Текст у выключенной кнопки добавления, когда строк уже `max`.",
+    },
+  ],
+};

@@ -107,6 +107,12 @@ export const page: ComponentPageConfig = {
         "Люди в строках и триггере: аватар по ярусу перед именем, бейдж роли после него — `Avatar.Root`, `Badge.Root`, `renderValue`.",
     },
     {
+      scenario: "icon-only",
+      title: "Только иконка",
+      description:
+        "Выбор иконки шириной в саму иконку: в триггере только выбранный значок и шеврон, значение по-прежнему читается вслух — `Select.TriggerIcon`.",
+    },
+    {
       slot: "controlled",
       description:
         "Значением владеет родитель: тариф меняет цену под полем, кнопка сбрасывает его — `value`, `onValueChange`.",

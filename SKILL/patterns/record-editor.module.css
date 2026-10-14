@@ -1,0 +1,18 @@
+/* Record editor: the sections are PageContent.Section layout="aside"; here only the panels' insides. */
+
+/* Two groups in one panel, a group apart. */
+.groups {
+  display: grid;
+  gap: var(--prime-space-8);
+}
+
+/* One value in three currencies: one row while there is room, the unit inside each field. */
+.currencies {
+  display: grid;
+  grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, calc(var(--prime-space-24) + var(--prime-space-8))), 1fr)
+    );
+  align-items: start;
+  gap: var(--prime-space-3);
+}

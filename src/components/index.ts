@@ -285,6 +285,14 @@ export type {
   ExampleFrameViewport,
 } from "./example-frame/ExampleFrame";
 export { ExampleFrame } from "./example-frame/ExampleFrame";
+export type {
+  FieldListColumn,
+  FieldListColumnWidth,
+  FieldListLabels,
+  FieldListProps,
+  FieldListRow,
+} from "./field-list/FieldList";
+export { FieldList } from "./field-list/FieldList";
 export type { FieldsetProps } from "./fieldset/Fieldset";
 export { Fieldset } from "./fieldset/Fieldset";
 export type {
