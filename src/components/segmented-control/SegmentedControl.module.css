@@ -133,6 +133,18 @@
   flex: 1 1 auto;
 }
 
+/* Touch: each segment's hit area grows to the touch target in height (`touchTargetBlockClass`).
+   The scrolling viewport clips at its padding box, so on a coarse pointer it reaches out by the
+   growth on both sides (padding in, margin out): the track keeps its height. */
+@media (pointer: coarse) {
+  .viewport {
+    --seg-touch-grow: max(0px, calc((var(--prime-control-touch-target) - var(--seg-height)) / 2));
+
+    margin-block: calc(-1 * var(--seg-touch-grow));
+    padding-block: var(--seg-touch-grow);
+  }
+}
+
 /* Edge fades while the row scrolls: overlays in the track color on the still root. Not a
    `mask-image` on the viewport — a mask over a moving thumb makes browsers drop segment text
    while the thumb glides. */
@@ -179,8 +191,9 @@
   opacity: 1;
 }
 
-/* As wide as its segments; `overflow: clip` keeps the thumb (and any rounding of its geometry)
-   out of the viewport's scroll area, so moving the selection never makes the row scroll. */
+/* As wide as its segments; `overflow-x: clip` keeps the thumb (and any rounding of its geometry)
+   out of the viewport's scroll area, so moving the selection never makes the row scroll. The block
+   axis stays visible for the segments' touch hit areas. */
 .list {
   position: relative;
   isolation: isolate;
@@ -188,7 +201,7 @@
   flex: none;
   flex-wrap: nowrap;
   gap: var(--seg-item-gap);
-  overflow: clip;
+  overflow-x: clip;
 }
 
 /* Full width: the list fills the viewport and never gets narrower than its segments — when they

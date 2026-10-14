@@ -97,6 +97,7 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 
 ## Layout & spacing
 - The swatches take the container width in equal columns: each one stretches across its column (the height stays the tier's). A row wraps only when they no longer fit, and then the swatches split evenly over the rows (16 → 8 + 8, never 14 + 2); no column count to set. In a content-sized container they stand in one row at the tier size.
+- On a coarse pointer the swatches grow to the 44 px touch target (a dense grid cannot grow an invisible hit area past its neighbours) and wrap into more rows.
 - The keyboard focus ring sits outside the swatches; kit hosts (Modal / Drawer body, panels, cards) already keep `--prime-focus-space` padding, so the ring is never clipped. In your own `overflow` container, keep that padding.
 - Label → swatches and swatches → hint use the tier `label-gap` / `hint-gap`; field → field 20.
 

@@ -158,6 +158,7 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 ## Layout & spacing
 - In a form it is a field: label → track `label-gap`, track → support row `hint-gap`, field → field `--prime-space-5` like every field.
 - Width is content-based by default; segments never wrap. In a narrow container the row scrolls horizontally with fading edges.
+- On a coarse pointer each segment's hit area grows to the 44 px touch target in height; the track keeps its tier height.
 - In a toolbar: gap `--prime-space-3` between controls; keep every control at one size.
 - Caption under a group: gap `--prime-space-2`.
 - `fullWidth` inside modals and mobile sheets. Single-line segments are `flex: 1 1 0` with `min-width: max-content`: short labels share the spare width equally, a long label keeps its own width, nothing truncates; when the labels do not fit, the row scrolls.

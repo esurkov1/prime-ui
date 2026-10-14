@@ -7,7 +7,8 @@
 
 .panel,
 .trigger {
-  --dp-cell: var(--prime-control-m-item-height);
+  --dp-cell-tier: var(--prime-control-m-item-height);
+  --dp-cell: var(--dp-cell-tier);
   --dp-text: var(--prime-control-m-text-size);
   --dp-lh: var(--prime-control-m-line-height);
   --dp-icon: var(--prime-control-m-icon);
@@ -18,7 +19,7 @@
 }
 
 [data-size="xs"]:is(.panel, .trigger) {
-  --dp-cell: var(--prime-control-xs-item-height);
+  --dp-cell-tier: var(--prime-control-xs-item-height);
   --dp-text: var(--prime-control-xs-text-size);
   --dp-lh: var(--prime-control-xs-line-height);
   --dp-icon: var(--prime-control-xs-icon);
@@ -28,7 +29,7 @@
 }
 
 [data-size="s"]:is(.panel, .trigger) {
-  --dp-cell: var(--prime-control-s-item-height);
+  --dp-cell-tier: var(--prime-control-s-item-height);
   --dp-text: var(--prime-control-s-text-size);
   --dp-lh: var(--prime-control-s-line-height);
   --dp-icon: var(--prime-control-s-icon);
@@ -38,7 +39,7 @@
 }
 
 [data-size="l"]:is(.panel, .trigger) {
-  --dp-cell: var(--prime-control-l-item-height);
+  --dp-cell-tier: var(--prime-control-l-item-height);
   --dp-text: var(--prime-control-l-text-size);
   --dp-lh: var(--prime-control-l-line-height);
   --dp-icon: var(--prime-control-l-icon);
@@ -47,12 +48,21 @@
 }
 
 [data-size="xl"]:is(.panel, .trigger) {
-  --dp-cell: var(--prime-control-xl-item-height);
+  --dp-cell-tier: var(--prime-control-xl-item-height);
   --dp-text: var(--prime-control-xl-text-size);
   --dp-lh: var(--prime-control-xl-line-height);
   --dp-icon: var(--prime-control-xl-icon);
   --dp-field-h: var(--prime-control-l-height);
   --dp-field-text: var(--prime-control-l-text-size);
+}
+
+/* Touch: a day is a cell of a dense grid, so its hit area cannot grow past its neighbours (an
+   overlapping hit area would take a tap meant for the next day). The cell itself grows to the touch
+   target, like a menu row; narrower than seven of them, the columns still shrink. */
+@media (pointer: coarse) {
+  .panel {
+    --dp-cell: max(var(--dp-cell-tier), var(--prime-control-touch-target));
+  }
 }
 
 /* ─── Trigger (field) ───────────────────────────────────────────────────── */

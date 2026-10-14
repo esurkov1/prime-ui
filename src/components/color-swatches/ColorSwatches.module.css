@@ -29,6 +29,18 @@
   max-inline-size: 100%;
 }
 
+/* Touch: a swatch is a cell of a dense grid and its `::after` draws the inner edge, so its hit area
+   cannot grow invisibly past its neighbours. The swatch itself grows to the touch target, like a
+   menu row; the grid wraps into more rows. */
+@media (pointer: coarse) {
+  .grid {
+    --swatch-base: max(
+      var(--swatch-base-control),
+      calc(var(--prime-control-touch-target) + var(--prime-space-2))
+    );
+  }
+}
+
 /* Every swatch stretches across its column; the height stays the tier's. */
 .grid > * {
   width: 100%;

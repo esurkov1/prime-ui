@@ -6,6 +6,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { touchTargetBlockClass } from "@/internal/touchTarget";
+
 import { SegmentedControl } from "./SegmentedControl";
 
 const segmentedModuleCssPath = path.join(
@@ -41,6 +43,15 @@ describe("SegmentedControl — размеры (регрессия CSS)", () => {
     expect(css).toContain("--seg-height: calc(var(--seg-control-height) - 2 * var(--seg-pad))");
     expect(css).toContain("--seg-item-radius: calc(var(--seg-radius) - var(--seg-pad))");
     expect(css).not.toContain("prime-sys");
+  });
+
+  it("каждый сегмент растит зону касания по высоте, а область прокрутки её не обрезает", () => {
+    renderSegmented();
+    for (const item of screen.getAllByRole("radio")) {
+      expect(item).toHaveClass(touchTargetBlockClass);
+    }
+    const css = readFileSync(segmentedModuleCssPath, "utf8");
+    expect(css).toMatch(/@media \(pointer: coarse\) \{\s*\.viewport \{[^}]*padding-block:/);
   });
 });
 
@@ -295,11 +306,12 @@ describe("SegmentedControl — thumb and parts", () => {
     expect(thumb).toHaveAttribute("data-visible", "true");
   });
 
-  it("the track clips the thumb, so moving the selection never grows the scroll area", () => {
+  it("the track clips the thumb inline, so moving the selection never grows the scroll area", () => {
     const css = readFileSync(segmentedModuleCssPath, "utf8");
     const block = css.match(/\.list\s*\{[^}]*\}/s)?.[0] ?? "";
     expect(block).toContain("position: relative;");
-    expect(block).toContain("overflow: clip;");
+    // Inline only: the block axis stays visible for the segments' touch hit areas.
+    expect(block).toContain("overflow-x: clip;");
   });
 
   it("the thumb glides only after a user change, and never under reduced motion", () => {

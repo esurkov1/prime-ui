@@ -118,8 +118,17 @@ describe("touch and input", () => {
       "components/button/Button.tsx",
       "components/badge/Badge.tsx",
       "internal/ChoiceField.tsx",
+      "components/segmented-control/SegmentedControl.tsx",
+      "components/select/Select.tsx",
     ]) {
       expect(read(file), file).toMatch(/touchTarget(Block)?Class/);
     }
+    // Dense grids grow the cell itself: an invisible hit area would cover the neighbours.
+    expect(read("components/datepicker/Datepicker.module.css")).toContain(
+      "--dp-cell: max(var(--dp-cell-tier), var(--prime-control-touch-target));",
+    );
+    expect(read("components/color-swatches/ColorSwatches.module.css")).toMatch(
+      /@media \(pointer: coarse\) \{\s*\.grid \{\s*--swatch-base: max\(/,
+    );
   });
 });

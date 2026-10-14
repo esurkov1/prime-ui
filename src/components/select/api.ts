@@ -232,8 +232,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "`Select.TriggerIcon`, `Select.Value`, optionally a Badge after it.",
-          ru: "`Select.TriggerIcon`, `Select.Value`, при необходимости Badge после него.",
+          en: "`Select.TriggerIcon`, `Select.Value`, optionally a Badge after it. A `Select.TriggerIcon` alone makes an icon-only trigger (the value read, not shown).",
+          ru: "`Select.TriggerIcon`, `Select.Value`, при необходимости Badge после него. Один `Select.TriggerIcon` — триггер только с иконкой (значение читается, но не видно).",
         },
       ],
     },

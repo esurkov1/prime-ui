@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+import { touchTargetBlockClass } from "@/internal/touchTarget";
 
 import { Select } from "./Select";
 
@@ -428,6 +429,22 @@ describe("Select (composable)", () => {
     expect(screen.getByText("🌐")).toBeInTheDocument();
   });
 
+  it("draws an icon-only trigger from a lone TriggerIcon and still reads the value", () => {
+    render(
+      <Select.Root label="Иконка" defaultValue="truck">
+        <Select.Trigger>
+          <Select.TriggerIcon>🚚</Select.TriggerIcon>
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="truck">Доставка</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    const trigger = screen.getByRole("combobox", { name: "Иконка" });
+    expect(trigger).toHaveAttribute("data-icon-only", "true");
+    expect(trigger).toHaveTextContent("Доставка");
+  });
+
   it("listbox has aria-labelledby pointing to trigger id", () => {
     render(<BasicSelect />);
     fireEvent.click(screen.getByRole("combobox"));
@@ -576,6 +593,11 @@ describe("Select (search, clear, loading, empty)", () => {
     );
     fireEvent.keyDown(search, { key: "Enter" });
     expect(onChange).toHaveBeenCalledWith("spb");
+  });
+
+  it("clearable: сегмент очистки растит зону касания по высоте", () => {
+    const { container } = render(<SearchSelect />);
+    expect(container.querySelector("[data-select-clear]")).toHaveClass(touchTargetBlockClass);
   });
 
   it("clearable: Delete на триггере сбрасывает значение", () => {

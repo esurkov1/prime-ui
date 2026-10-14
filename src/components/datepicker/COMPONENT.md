@@ -156,6 +156,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 - Label → field: the tier `label-gap`; field → field in a form: `--prime-space-5`.
 - `align="auto"`: a field near the end of the screen lines up the popover's end edge and the panel grows toward the start, and the other way near the start; a fixed `align` still flips at the screen edge.
 - Months gap `--prime-space-6`. `Datepicker.Panel` has no fill, padding or radius — the host is its container; it shows 1–2 months by the host's width with day columns spread across it. An embedded panel measures its parent; narrower than one month → compact cells and footer fields above the buttons. Works from 320 px.
+- On a coarse pointer the day cells grow to the 44 px touch target (a dense grid cannot grow an invisible hit area past its neighbours); narrower than seven of them, the columns shrink.
 - Values are wall-clock local dates; convert time zones in the app.
 
 ## Accessibility

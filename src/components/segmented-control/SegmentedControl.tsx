@@ -16,6 +16,7 @@ import {
 import palette from "@/internal/palette.module.css";
 import { rovingIndex } from "@/internal/rovingFocus";
 import type { ControlSize, PaletteColor } from "@/internal/states";
+import { touchTargetBlockClass } from "@/internal/touchTarget";
 
 import { Badge } from "../badge/Badge";
 import { ScrollContainer } from "../scroll-container/ScrollContainer";
@@ -457,7 +458,7 @@ function SegmentedControlItem({
       })}
       tabIndex={isTabStop ? 0 : -1}
       disabled={isDisabled}
-      className={cx(palette.hue, styles.item, className)}
+      className={cx(palette.hue, styles.item, touchTargetBlockClass, className)}
       onClick={(event) => {
         onClick?.(event);
         if (!isDisabled && !event.defaultPrevented) ctx.onSelect(value);

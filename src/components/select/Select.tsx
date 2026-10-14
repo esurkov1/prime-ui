@@ -38,6 +38,7 @@ import { focusInto } from "@/internal/overlay/focus";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import type { ControlSize } from "@/internal/states";
 import swapMotion from "@/internal/swapMotion.module.css";
+import { touchTargetBlockClass } from "@/internal/touchTarget";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 import { VisuallyHidden, visuallyHiddenClass } from "@/internal/VisuallyHidden";
 
@@ -465,9 +466,10 @@ function SelectTrigger({
       </span>
       {showClear ? (
         // A segment, not a button: interactive content inside a <button> is invalid. The keyboard
-        // clears with Delete / Backspace on the trigger.
+        // clears with Delete / Backspace on the trigger. A touch target in height, like the clear
+        // segment of a field (`FieldAction`).
         <span
-          className={styles.clear}
+          className={cx(styles.clear, touchTargetBlockClass)}
           aria-hidden="true"
           title={labels.clear}
           data-select-clear=""

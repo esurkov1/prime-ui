@@ -30,7 +30,7 @@ import { Select } from "prime-ui-kit";
 ```
 Select.Root                       field frame: label · control · hint/error; value, open, search
 ├── Select.Trigger                <button role="combobox">: [icon] [value] [clear] [chevron]
-│   ├── Select.TriggerIcon        optional leading glyph
+│   ├── Select.TriggerIcon        optional leading glyph; alone (no Select.Value) — an icon-only trigger
 │   └── Select.Value              picked label or placeholder (renderValue for a rich trigger)
 └── Select.Content                portaled panel while open; closed, the items render hidden in place so the trigger knows their labels
     ├── search row                with `searchable`
@@ -103,7 +103,7 @@ an icon) goes inside `Select.ItemMeta`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `children` | `ReactNode` | — | `Select.TriggerIcon`, `Select.Value`, optionally a Badge after it. |
+| `children` | `ReactNode` | — | `Select.TriggerIcon`, `Select.Value`, optionally a Badge after it. A `Select.TriggerIcon` alone makes an icon-only trigger (the value read, not shown). |
 
 ### Select.Value
 `ref` → `HTMLSpanElement`. The picked label (labels joined with `multiple`) with an ellipsis, or the placeholder.
@@ -212,6 +212,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 - Label → field: tier `label-gap`; field → hint: tier `hint-gap`; field → field in a form: `--prime-space-5`.
 - Panel: at least the trigger width and `--prime-panel-min-width`, at most twice that; max height `--prime-panel-max-height` (scrolls); flips near the viewport edge.
 - Long values truncate with an ellipsis in the trigger.
+- The clear segment's hit area grows to the 44 px touch target in height on a coarse pointer, like the clear segment of an Input.
 - A rich row and its trigger use the same parts in the same order: leading media (`Avatar.Root`,
   `Thumbnail.Root`) → `Select.ItemText` (+ `Select.ItemDescription`) → trailing `Badge.Root` /
   `Select.ItemMeta`. In a row the trailing part sits before the check; in the trigger, at the end
@@ -306,6 +307,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | [saving.tsx](examples/saving.tsx) | A choice that saves on the server at once: the picked value shows with a spinner on the trigger, and a refused save rolls it back and says why — `onValueChange`, `error`. |
 | [rich-options.tsx](examples/rich-options.tsx) | Options with a picture, a second line and a price; the trigger draws the picked option with the same parts — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`. |
 | [people.tsx](examples/people.tsx) | People in the rows and the trigger: an avatar sized to the tier before the name, a role badge after it — `Avatar.Root`, `Badge.Root`, `renderValue`. |
+| [icon-only.tsx](examples/icon-only.tsx) | An icon picker as wide as its glyph: the trigger holds only the picked icon and the chevron, the value is still read aloud — `Select.TriggerIcon`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: the plan drives the price under the field and a button resets it — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the list: a button opens it from code, a pick or Escape closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Regional settings form: the required country is checked on submit, the error shakes the field and leaves once a country is picked, a calm note confirms the save — `required`, `error`, `hint`. |
