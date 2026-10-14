@@ -32,17 +32,20 @@
  * edge: the clip reaches past the edge by the toggle's half-width and ring, beside the header only.
  */
 
+/* The row metrics of the tier come from the one tier table (`fieldTierClass` on the root and the
+   flyout). */
 .root,
 .flyout {
-  --sb-h: var(--prime-control-m-height);
-  --sb-icon: var(--prime-control-m-icon);
-  --sb-text: var(--prime-control-m-text-size);
-  --sb-line-height: var(--prime-control-m-line-height);
-  --sb-radius: var(--prime-control-m-radius);
-  --sb-gap: var(--prime-control-m-gap);
+  --sb-h: var(--field-h);
+  --sb-icon: var(--field-icon);
+  --sb-text: var(--field-text);
+  --sb-line-height: var(--field-lh);
+  --sb-radius: var(--field-radius);
+  --sb-gap: var(--field-gap);
   /* Inline actions are one tier down. The account avatar is the avatar of the tier (capped so it
-     fits the compact rail) in an even frame: inset = gap to the text = the tier gap. */
-  --sb-action-h: var(--prime-control-s-height);
+     fits the compact rail: `tierMappings.railAvatar`) in an even frame: inset = gap to the text =
+     the tier gap. */
+  --sb-action-h: var(--field-step-h);
   --sb-avatar: var(--prime-avatar-m);
   --sb-account-inset: var(--sb-gap);
   --sb-account-rail-inset: calc((var(--sb-compact) - 2 * var(--sb-pad) - var(--sb-avatar)) / 2);
@@ -63,49 +66,21 @@
 
 .root[data-size="xs"],
 .flyout[data-size="xs"] {
-  --sb-h: var(--prime-control-xs-height);
-  --sb-icon: var(--prime-control-xs-icon);
-  --sb-text: var(--prime-control-xs-text-size);
-  --sb-line-height: var(--prime-control-xs-line-height);
-  --sb-radius: var(--prime-control-xs-radius);
-  --sb-gap: var(--prime-control-xs-gap);
-  --sb-action-h: var(--prime-control-xs-height);
   --sb-avatar: var(--prime-avatar-xs);
 }
 
 .root[data-size="s"],
 .flyout[data-size="s"] {
-  --sb-h: var(--prime-control-s-height);
-  --sb-icon: var(--prime-control-s-icon);
-  --sb-text: var(--prime-control-s-text-size);
-  --sb-line-height: var(--prime-control-s-line-height);
-  --sb-radius: var(--prime-control-s-radius);
-  --sb-gap: var(--prime-control-s-gap);
-  --sb-action-h: var(--prime-control-xs-height);
   --sb-avatar: var(--prime-avatar-s);
 }
 
 .root[data-size="l"],
 .flyout[data-size="l"] {
-  --sb-h: var(--prime-control-l-height);
-  --sb-icon: var(--prime-control-l-icon);
-  --sb-text: var(--prime-control-l-text-size);
-  --sb-line-height: var(--prime-control-l-line-height);
-  --sb-radius: var(--prime-control-l-radius);
-  --sb-gap: var(--prime-control-l-gap);
-  --sb-action-h: var(--prime-control-m-height);
   --sb-avatar: var(--prime-avatar-m);
 }
 
 .root[data-size="xl"],
 .flyout[data-size="xl"] {
-  --sb-h: var(--prime-control-xl-height);
-  --sb-icon: var(--prime-control-xl-icon);
-  --sb-text: var(--prime-control-xl-text-size);
-  --sb-line-height: var(--prime-control-xl-line-height);
-  --sb-radius: var(--prime-control-xl-radius);
-  --sb-gap: var(--prime-control-xl-gap);
-  --sb-action-h: var(--prime-control-l-height);
   --sb-avatar: var(--prime-avatar-l);
 }
 
@@ -115,13 +90,14 @@
   --sb-expanded: var(--prime-layout-sidebar-width);
   --sb-width: var(--sb-expanded);
   --sb-header-h: calc(var(--sb-h) + var(--prime-space-2));
-  /* Header toggle: an xs icon button inline; on the edge it shrinks to 3/4 and turns round. */
-  --sb-toggle: var(--prime-control-xs-height);
+  /* Header toggle: an icon button of the compact tier inline; on the edge it shrinks to 3/4 and
+     turns round. */
+  --sb-toggle: var(--field-compact-h);
   --sb-edge-scale: 0.75;
   --sb-edge-ring: var(--prime-space-1);
   --sb-edge-reach: calc(var(--sb-toggle) * var(--sb-edge-scale) / 2 + var(--sb-edge-ring));
   /* The clip reaches past the edge only beside the header, where the toggle rides it. */
-  --sb-notch: 0px;
+  --sb-notch: var(--prime-space-0);
   --sb-notch-top: var(--prime-space-3);
   --sb-notch-bottom: calc(var(--prime-space-3) + var(--sb-header-h));
   /* Brand logo: a square on the icon axis, never wider than the compact rail allows. */
@@ -171,8 +147,8 @@
 }
 
 .root[data-mode="hidden"] {
-  --sb-width: 0px;
-  --sb-notch: 0px;
+  --sb-width: var(--prime-space-0);
+  --sb-notch: var(--prime-space-0);
 }
 
 /* The expanded layout in every mode: rows lay out once, never per frame or per mode. */
@@ -217,7 +193,7 @@
   flex: 1 1 auto;
   flex-direction: column;
   gap: var(--prime-space-4);
-  margin-inline: calc(-1 * var(--sb-pad));
+  margin-inline: calc(var(--sb-pad) * -1);
   padding-block: var(--prime-space-4);
   padding-inline: var(--sb-pad);
   /* Rows scrolled into view (the current page, focus) stop clear of the edge fades. */
@@ -308,7 +284,7 @@
  * once, ready for a hover. Fewer running transitions: fewer layers and transition events per move.
  */
 .root:not([data-off-canvas]) :is(.item, .account, .brand) {
-  clip-path: inset(calc(-1 * var(--prime-space-1)));
+  clip-path: inset(calc(var(--prime-space-1) * -1));
 }
 
 .root[data-panel-mode="compact"]:not([data-off-canvas]) :is(.item, .account, .brand)::before {
@@ -327,16 +303,16 @@
     [data-active-path]
   ) {
   clip-path: inset(
-    calc(-1 * var(--prime-space-1)) calc(100% - var(--sb-rail-box)) calc(-1 * var(--prime-space-1))
-      calc(-1 * var(--prime-space-1))
+    calc(var(--prime-space-1) * -1) calc(100% - var(--sb-rail-box)) calc(var(--prime-space-1) * -1)
+      calc(var(--prime-space-1) * -1)
   );
 }
 
 @media (hover: hover) {
   .root[data-panel-mode="compact"]:not([data-off-canvas]) :is(.item, .account):hover {
     clip-path: inset(
-      calc(-1 * var(--prime-space-1)) calc(100% - var(--sb-rail-box))
-        calc(-1 * var(--prime-space-1)) calc(-1 * var(--prime-space-1))
+      calc(var(--prime-space-1) * -1) calc(100% - var(--sb-rail-box))
+        calc(var(--prime-space-1) * -1) calc(var(--prime-space-1) * -1)
     );
   }
 }
@@ -475,7 +451,8 @@
 
 /*
  * A constant height: nothing below a heading ever moves. On the rail the chevron fades out and
- * the heading keeps as much of its text as the rail holds, cut with an ellipsis.
+ * the heading keeps as much of its text as the rail holds, cut with an ellipsis. The caption role
+ * comes from `textRole.caption` (joined in TSX), in the medium weight.
  */
 .groupLabel {
   position: relative;
@@ -494,11 +471,8 @@
   border-radius: var(--sb-radius);
   background-color: transparent;
   color: var(--prime-color-text-muted);
-  font: inherit;
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
+  font-family: inherit;
   font-weight: var(--prime-font-weight-medium);
-  letter-spacing: var(--prime-text-caption-tracking);
   text-align: start;
   white-space: nowrap;
 }
@@ -589,7 +563,7 @@
   transition:
     translate var(--sb-duration) var(--sb-ease),
     scale var(--sb-duration) var(--sb-ease),
-    max-width 0s linear;
+    max-width var(--prime-motion-instant) linear;
 }
 
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .groupText {
@@ -600,7 +574,7 @@
   transition:
     translate var(--sb-duration) var(--sb-ease),
     scale var(--sb-duration) var(--sb-ease),
-    max-width 0s linear var(--sb-duration);
+    max-width var(--prime-motion-instant) linear var(--sb-duration);
 }
 
 .root:not([data-off-canvas]) .groupLabel::after {
@@ -897,7 +871,7 @@
 }
 
 .row:focus-within .trail {
-  translate: calc(-1 * var(--sb-action-shift)) 0;
+  translate: calc(var(--sb-action-shift) * -1) 0;
 }
 
 /* The trail moves aside on hover only for a fine pointer (foundation: hover transforms). */
@@ -908,7 +882,7 @@
   }
 
   .row:hover .trail {
-    translate: calc(-1 * var(--sb-action-shift)) 0;
+    translate: calc(var(--sb-action-shift) * -1) 0;
   }
 }
 
@@ -920,7 +894,7 @@
   }
 
   .row .trail {
-    translate: calc(-1 * var(--sb-action-shift)) 0;
+    translate: calc(var(--sb-action-shift) * -1) 0;
   }
 }
 
@@ -963,7 +937,7 @@
 }
 
 .subRow::before {
-  inset-block-start: calc(-1 * var(--sub-gap));
+  inset-block-start: calc(var(--sub-gap) * -1);
   width: var(--sub-elbow);
   height: calc(var(--sub-gap) + var(--sb-h) / 2);
   border-block-end: var(--prime-border-width) solid var(--sub-line);
@@ -972,7 +946,7 @@
 }
 
 .subRow:first-child::before {
-  inset-block-start: calc(-1 * (var(--sub-gap) + var(--sub-reach)));
+  inset-block-start: calc((var(--sub-gap) + var(--sub-reach)) * -1);
   height: calc(var(--sub-gap) + var(--sub-reach) + var(--sb-h) / 2);
 }
 
@@ -994,27 +968,11 @@
  * taller because they carry the icon axis; a flyout has none. The rail row names the flyout.
  */
 .flyout {
-  --sb-h: var(--prime-control-m-item-height);
+  --sb-h: var(--field-item-h);
   --sb-item-pad: var(--prime-panel-item-padding-x);
 
   padding: var(--prime-panel-padding);
   color: var(--prime-color-text-primary);
-}
-
-.flyout[data-size="xs"] {
-  --sb-h: var(--prime-control-xs-item-height);
-}
-
-.flyout[data-size="s"] {
-  --sb-h: var(--prime-control-s-item-height);
-}
-
-.flyout[data-size="l"] {
-  --sb-h: var(--prime-control-l-item-height);
-}
-
-.flyout[data-size="xl"] {
-  --sb-h: var(--prime-control-xl-item-height);
 }
 
 .flyout .groupItems {
@@ -1081,8 +1039,6 @@
 }
 
 .accountAvatar {
-  --avatar-slot-size: var(--sb-avatar);
-
   display: inline-flex;
   flex: none;
   transition: translate var(--sb-duration) var(--sb-ease);
@@ -1133,9 +1089,9 @@
 /* --- Header toggle ------------------------------------------------------------------ */
 
 /*
- * One kit Button for both places. Expanded: a ghost icon button at the end of the header row.
- * Compact: it rides the rail edge — moved half out, 3/4 size, round, cut out of the content by a
- * ring in the rail color; the chevrons turn to point out. It is placed from the panel's start by `translate`
+ * One kit Button for both places, a disk (`shape="circle"`) of the compact tier. Expanded: a ghost
+ * icon button at the end of the header row. Compact: it rides the rail edge — moved half out, 3/4
+ * size, cut out of the content by a ring in the rail color; the chevrons turn to point out. It is placed from the panel's start by `translate`
  * to where the edge will be, with the rail's duration and easing, so it travels exactly with the
  * edge and never needs a layout per frame. Hidden, it stays at the place of the last visible mode
  * and fades; coming back from hidden it starts at its final place and fades in as the edge
@@ -1143,7 +1099,7 @@
  */
 .root .headerToggle {
   --sb-toggle-move: var(--sb-duration);
-  --sb-toggle-hide: 0s;
+  --sb-toggle-hide: var(--prime-motion-instant);
 
   position: absolute;
   inset-block-start: calc(var(--prime-space-3) + (var(--sb-header-h) - var(--sb-toggle)) / 2);
@@ -1155,7 +1111,6 @@
   max-width: none;
   height: var(--sb-toggle);
   padding: 0;
-  border-radius: var(--sb-radius);
   color: var(--prime-color-text-muted);
   box-shadow: 0 0 0 0 var(--prime-color-layer-current);
   opacity: 1;
@@ -1165,8 +1120,7 @@
     translate var(--sb-toggle-move) var(--sb-ease),
     scale var(--sb-duration) var(--sb-ease),
     opacity var(--sb-duration) var(--sb-ease),
-    visibility 0s linear var(--sb-toggle-hide),
-    border-radius var(--sb-duration) var(--sb-ease),
+    visibility var(--prime-motion-instant) linear var(--sb-toggle-hide),
     box-shadow var(--sb-duration) var(--sb-ease),
     background-color var(--prime-motion-fade-fast) var(--sb-ease),
     color var(--prime-motion-fade-fast) var(--sb-ease);
@@ -1187,9 +1141,6 @@
 }
 
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .headerToggle {
-  /* Half its size, not a huge "full" radius: the corner rounds evenly over the whole move instead
-     of snapping round in the first frames. */
-  border-radius: calc(var(--sb-toggle) / 2);
   box-shadow: 0 0 0 var(--sb-edge-ring) var(--prime-color-layer-current);
   translate: calc(var(--sb-compact) - var(--sb-toggle) / 2) 0;
   scale: var(--sb-edge-scale);
@@ -1220,7 +1171,7 @@
 
 /* Back from hidden: already at its final place while it fades in. */
 .root[data-from-hidden] .headerToggle {
-  --sb-toggle-move: 0s;
+  --sb-toggle-move: var(--prime-motion-instant);
 }
 
 /* --- Compact (desktop only) ---------------------------------------------------- */
@@ -1257,7 +1208,7 @@
 /* Inline at the end of the header row of the off-canvas panel (whatever its width). */
 .root[data-off-canvas] .headerToggle {
   inset-inline: auto 0;
-  translate: calc(-1 * var(--sb-pad)) 0;
+  translate: calc(var(--sb-pad) * -1) 0;
 }
 
 .root[data-off-canvas] .panel {
@@ -1273,7 +1224,7 @@
   visibility: hidden;
   transition:
     transform var(--sb-duration) var(--sb-ease),
-    visibility 0s linear var(--sb-duration);
+    visibility var(--prime-motion-instant) linear var(--sb-duration);
 }
 
 .root[data-state="open"] .panel {

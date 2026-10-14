@@ -1,4 +1,4 @@
-/* Layout for the Sidebar examples: small "app windows" (the page with a rail one layer above it). Semantic tokens only. */
+/* Layout for the Sidebar examples: small app windows. The preview stage is the page, the rail one layer above it; a window only sizes and clips. Semantic tokens only. */
 
 .stage {
   box-sizing: border-box;
@@ -6,12 +6,6 @@
   width: 100%;
   height: calc(var(--prime-space-24) * 4);
   overflow: hidden;
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-layer-current);
-  /* The window is a page on the preview's page: a hairline keeps its edge visible. */
-  box-shadow:
-    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
-    var(--prime-shadow-raised);
 }
 
 /* A window tall enough for a full rail: header, groups, footer and the account. */
@@ -29,41 +23,17 @@
   height: 100%;
 }
 
-/* Content plane next to the rail, like AppShell: the page itself, edge to edge. */
+/* The page plane next to the rail, like AppShell.Main. */
 .content {
   box-sizing: border-box;
   flex: 1 1 auto;
   min-width: 0;
   padding: var(--prime-space-4);
-  background: var(--prime-color-layer-current);
-}
-
-/* The product mark inside `Sidebar.BrandLogo`: an accent tile with a glyph. */
-.logo {
-  display: grid;
-  place-items: center;
-  border-radius: var(--prime-radius-m);
-  background: var(--prime-color-accent-default);
-  color: var(--prime-color-accent-fg);
 }
 
 /* custom-part.tsx: an own block in the footer, inset like the item labels. */
 .footerBlock {
   padding: var(--prime-space-2);
-}
-
-.sizes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(calc(var(--prime-space-24) * 2.5), 1fr));
-  gap: var(--prime-space-4);
-  width: 100%;
-}
-
-.sizeColumn {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-2);
-  min-width: 0;
 }
 
 .column {

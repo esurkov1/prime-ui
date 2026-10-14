@@ -142,7 +142,7 @@
   --shell-floating-end: calc(
     var(--prime-space-16) +
     var(--prime-bottom-nav-floating-height) +
-    env(safe-area-inset-bottom, 0px)
+    env(safe-area-inset-bottom, var(--prime-space-0))
   );
 }
 

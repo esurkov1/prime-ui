@@ -887,6 +887,32 @@ describe("Sidebar.Sub", () => {
     expect(parent).toHaveAttribute("aria-expanded", "true");
   });
 
+  it("Space on the parent opens and closes the children", async () => {
+    const user = userEvent.setup();
+    render(<Nested />);
+    const parent = screen.getByRole("button", { name: "Задачи" });
+    parent.focus();
+    await user.keyboard(" ");
+    expect(parent).toHaveAttribute("aria-expanded", "true");
+    await user.keyboard(" ");
+    expect(parent).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("Tab moves through the items and skips a disabled one", async () => {
+    const user = userEvent.setup();
+    render(
+      <Sidebar.Root offCanvas="never">
+        <Sidebar.Item href="/home">Главная</Sidebar.Item>
+        <Sidebar.Item disabled>Архив</Sidebar.Item>
+        <Sidebar.Item href="/settings">Настройки</Sidebar.Item>
+      </Sidebar.Root>,
+    );
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByRole("link", { name: "Главная" }));
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByRole("link", { name: "Настройки" }));
+  });
+
   it("a current child opens the parent and marks the active path", () => {
     render(<Nested current />);
     const parent = screen.getByRole("button", { name: "Задачи" });
@@ -917,6 +943,25 @@ describe("Sidebar.Sub", () => {
       fireEvent.keyDown(document, { key: "Escape" });
       expect(parent).toHaveAttribute("aria-expanded", "false");
       expect(document.activeElement).toBe(parent);
+    });
+
+    it("ArrowUp, Home and End move focus between the flyout items", async () => {
+      const user = userEvent.setup();
+      render(<Nested mode="compact" />);
+      const parent = screen.getByRole("button", { name: "Задачи" });
+      parent.focus();
+      fireEvent.keyDown(parent, { key: "Enter" });
+      const flyout = screen.getByRole("dialog", { name: "Задачи" });
+      const backlog = within(flyout).getByRole("link", { name: "Бэклог" });
+      const review = within(flyout).getByRole("link", { name: "На проверке" });
+      expect(document.activeElement).toBe(backlog);
+
+      await user.keyboard("{End}");
+      expect(document.activeElement).toBe(review);
+      await user.keyboard("{Home}");
+      expect(document.activeElement).toBe(backlog);
+      await user.keyboard("{ArrowUp}");
+      expect(document.activeElement).toBe(review);
     });
 
     it("ArrowRight opens it and ArrowLeft brings focus back to the parent", () => {

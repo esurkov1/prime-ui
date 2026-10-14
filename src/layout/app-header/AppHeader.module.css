@@ -15,7 +15,8 @@
   min-width: 0;
   /* The page gutter (`--prime-layout-gutter`): in the shell's header row it lines up with the page
      in main; a header in a frame inside the page takes that frame's (the small gutter). */
-  padding-block: max(var(--prime-space-3), env(safe-area-inset-top, 0px)) var(--prime-space-3);
+  padding-block: max(var(--prime-space-3), env(safe-area-inset-top, var(--prime-space-0)))
+    var(--prime-space-3);
   padding-inline: var(--prime-layout-gutter);
   background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);

@@ -18,9 +18,7 @@ export default function SidebarCollapsibleGroupsExample() {
         <Sidebar.Header>
           <Sidebar.Brand href="#home" description="Отдел продаж">
             <Sidebar.BrandLogo>
-              <span className={styles.logo}>
-                <Icon name="nav.layoutGrid" />
-              </span>
+              <Icon name="nav.layoutGrid" />
             </Sidebar.BrandLogo>
             Прайм CRM
           </Sidebar.Brand>

@@ -28,7 +28,7 @@
   width: 100%;
   min-height: var(--prime-bottom-nav-height);
   padding-inline: var(--prime-bottom-nav-padding-x);
-  padding-block-end: env(safe-area-inset-bottom, 0px);
+  padding-block-end: env(safe-area-inset-bottom, var(--prime-space-0));
   background: var(--prime-color-layer-current);
   box-shadow: inset 0 var(--prime-border-width) 0 var(--prime-color-border-faint);
 }
@@ -68,7 +68,10 @@
 
   position: absolute;
   inset-inline: var(--prime-bottom-nav-floating-inset);
-  bottom: calc(var(--prime-bottom-nav-floating-inset) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(
+    var(--prime-bottom-nav-floating-inset) +
+    env(safe-area-inset-bottom, var(--prime-space-0))
+  );
   gap: var(--prime-bottom-nav-floating-gap);
   width: auto;
   min-height: 0;
@@ -119,6 +122,13 @@
  */
 .root[data-floating="true"] > .bar::before,
 .root[data-floating="true"] > .action::before {
+  /* The faded middle of the rim. */
+  --bn-rim-fade: color-mix(
+    in srgb,
+    var(--prime-color-bg-glass-edge) var(--prime-tint-active),
+    transparent
+  );
+
   content: "";
   position: absolute;
   inset: 0;
@@ -128,8 +138,8 @@
   background: linear-gradient(
     135deg,
     var(--prime-color-bg-glass-edge),
-    color-mix(in srgb, var(--prime-color-bg-glass-edge) var(--prime-tint-active), transparent) 30%,
-    color-mix(in srgb, var(--prime-color-bg-glass-edge) var(--prime-tint-active), transparent) 70%,
+    var(--bn-rim-fade) 30%,
+    var(--bn-rim-fade) 70%,
     var(--prime-color-bg-glass-edge)
   );
   -webkit-mask:
@@ -219,13 +229,14 @@
 }
 
 .icon {
-  --prime-icon-size: var(--prime-bottom-nav-icon-size);
+  --bn-icon: var(--prime-bottom-nav-icon-size);
+  --prime-icon-size: var(--bn-icon);
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--prime-icon-size);
-  height: var(--prime-icon-size);
+  width: var(--bn-icon);
+  height: var(--bn-icon);
 }
 
 /* A label is never cut: the column is at least as wide as it, and the row scrolls instead. */
@@ -239,7 +250,7 @@
 /* On the icon's top-end corner, half outside it (the icon is 20: its corner is 10 off centre). */
 .count {
   position: absolute;
-  inset-block-start: calc(-1 * var(--prime-space-1));
+  inset-block-start: calc(var(--prime-space-1) * -1);
   inset-inline-start: calc(50% + var(--prime-space-1));
   pointer-events: none;
 }
@@ -291,7 +302,7 @@
 }
 
 .root[data-floating="true"] .icon {
-  --prime-icon-size: var(--prime-bottom-nav-floating-icon-size);
+  --bn-icon: var(--prime-bottom-nav-floating-icon-size);
 }
 
 .root[data-floating="true"] .label {

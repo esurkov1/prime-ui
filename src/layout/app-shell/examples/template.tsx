@@ -1,4 +1,4 @@
-/** Root, nav, header and main in one component; main scrolls back to the top whenever the page changes — `AppShell.Template` with `scrollResetKey`. */
+/** Root, nav, header and main in one component; main scrolls back to the top whenever the page changes — `AppShell.Template`, `scrollResetKey`. */
 import { AppHeader, AppShell, Icon, PageContent, Sidebar, Typography } from "prime-ui-kit";
 import * as React from "react";
 
