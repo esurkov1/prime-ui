@@ -25,6 +25,7 @@ import { ICON_CATALOG, ICON_GROUPS, type IconGroupId } from "./iconCatalog";
 import SNIPPET_BASIC from "./snippets/icon-basic.tsx?raw";
 import SNIPPET_BUTTON from "./snippets/icon-button.tsx?raw";
 import SNIPPET_DOMAIN from "./snippets/icon-domain.tsx?raw";
+import SNIPPET_DRAWN from "./snippets/icon-drawn.tsx?raw";
 import SNIPPET_SET from "./snippets/icon-set.tsx?raw";
 import SNIPPET_SIZE from "./snippets/icon-size.tsx?raw";
 import SNIPPET_STILL from "./snippets/icon-still.tsx?raw";
@@ -315,6 +316,7 @@ export default function IconsPage() {
           <CodeBlock code={SNIPPET_SIZE} aria-label="Размер и цвет иконки" />
           <CodeBlock code={SNIPPET_SET} aria-label="Полный набор глифов" />
           <CodeBlock code={SNIPPET_STILL} aria-label="Иконка без анимации" />
+          <CodeBlock code={SNIPPET_DRAWN} aria-label="Иконка-знак состояния" />
           <CodeBlock code={SNIPPET_DOMAIN} aria-label="Доменная иконка" />
         </div>
       </DocBlock>
@@ -337,6 +339,11 @@ export default function IconsPage() {
           <li>
             Отключённый хозяин не запускает жест; <code>animated=&#123;false&#125;</code> оставляет
             иконку неподвижной.
+          </li>
+          <li>
+            <code>drawn</code> делает иконку знаком состояния: <code>true</code> прорисовывает
+            штрих, <code>false</code> стирает его, плавно в обе стороны; жеста при наведении у такой
+            иконки нет.
           </li>
           <li>Иконки из createIcon играют мягкий общий всплеск всего рисунка.</li>
         </DocList>
