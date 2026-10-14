@@ -116,6 +116,15 @@
   display: none;
 }
 
+/*
+ * Palette density (CommandMenu): a row carries a title and a description under it, so it takes
+ * the vertical padding a single line does not need and a wider gap after its icon.
+ */
+.itemPalette {
+  gap: var(--prime-space-3);
+  padding-block: var(--prime-space-1);
+}
+
 /* Leading glyph: the row icon size; a kit Icon inside follows `--prime-icon-size`. */
 .itemIcon {
   --prime-icon-size: var(--menu-icon);
@@ -179,6 +188,11 @@
   min-width: 0;
 }
 
+/* A group whose rows are all filtered out: `hidden` must win over `display: flex`. */
+.group[hidden] {
+  display: none;
+}
+
 .groupLabel {
   display: flex;
   flex-shrink: 0;
@@ -193,13 +207,15 @@
   letter-spacing: var(--prime-text-caption-tracking);
 }
 
-/* A Divider between rows: full bleed across the panel padding. */
-.separator[role]:not([data-orientation="vertical"]) {
+/*
+ * A Divider between rows: the panel padding above and below it, and full bleed across the panel's
+ * inline padding through the Divider's own bleed contract (`--divider-bleed`).
+ */
+.separator {
+  --divider-bleed: var(--prime-panel-padding);
+
   flex-shrink: 0;
-  align-self: stretch;
-  width: auto;
   margin-block: var(--prime-panel-padding);
-  margin-inline: calc(-1 * var(--prime-panel-padding));
 }
 
 /* ─── Search row ─────────────────────────────────────────────────────────── */

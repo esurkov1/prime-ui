@@ -7,6 +7,7 @@ import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Spinner } from "@/components/spinner/Spinner";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useLoadMore } from "@/hooks/useLoadMore";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
@@ -26,9 +27,9 @@ import {
   enabledOptions,
   handleListboxKeyDown,
   optionDomId,
+  revealHighlighted,
   type Store,
   useCreateStore,
-  useLoadMore,
   useStoreSlice,
   useTypeahead,
 } from "@/internal/listbox";
@@ -660,7 +661,7 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     enabled: region === "ready" && hasMore && Boolean(onLoadMore) && !loading && !loadingMore,
     onLoadMore,
     scrollRef: listboxRef,
-    rearm: version,
+    round: version,
   });
 
   // The highlight reached the last option (arrows, End, pointer): ask for more, as scrolling does.
@@ -692,24 +693,32 @@ function SelectContent({ searchable = false, className, children, ...rest }: Sel
     if (inSearch && [" ", "Home", "End"].includes(event.key)) return;
     // The options, then the actions under the scroller: the arrows walk both.
     const stops = enabledOptions(panelRef.current);
+    const ids = stops.map((stop) => stop.dataset.value ?? "");
+    const stopOf = (id: string) => stops.find((stop) => stop.dataset.value === id);
     const printable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
     if (printable && !inSearch && (event.key !== " " || typeahead.isTyping())) {
       event.preventDefault();
-      const match = typeahead.find(event.key, stops, highlight.get());
-      if (match) {
-        highlight.set(match.dataset.value);
-        match.scrollIntoView?.({ block: "nearest" });
+      const match = typeahead.find(
+        event.key,
+        ids,
+        highlight.get(),
+        (id) => stopOf(id)?.dataset.label ?? id,
+      );
+      if (match !== undefined) {
+        highlight.set(match);
+        revealHighlighted(stopOf(match));
       }
       return;
     }
-    handleListboxKeyDown(event, {
-      items: stops,
+    const moved = handleListboxKeyDown(event, {
+      ids,
       highlight,
-      onSelect: (value) => {
+      activate: (value) => {
         if (isActionValue(value)) document.getElementById(optionDomId(listboxId, value))?.click();
         else pick(value);
       },
     });
+    if (moved !== null) revealHighlighted(stopOf(moved));
   };
 
   // Closed, the items still render (hidden, in place) so the trigger knows their labels.

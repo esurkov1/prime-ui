@@ -19,21 +19,30 @@ const NEXT: Record<RovingOrientation, readonly string[]> = {
 };
 
 /**
- * Next index in a wrapping row of `count` items, or `null` when `key` does not navigate.
- * Arrows wrap around the ends; Home / End jump to the first / last item. A current index of `-1`
- * (nothing focused yet) moves to the first item on "next" and to the last on "previous".
+ * Next index in a row of `count` items, or `null` when `key` does not navigate. Arrows move one
+ * step and wrap around the ends (a tablist, a menu, a palette); with `wrap: false` they stop at the
+ * first and the last item (a long list whose ends are its edges: messages, conversations). Home /
+ * End jump to the first / last item. A current index of `-1` (nothing focused yet) moves to the
+ * first item on "next" and to the last on "previous".
  */
 export function rovingIndex(
   key: string,
   index: number,
   count: number,
   orientation: RovingOrientation = "both",
+  { wrap = true }: { wrap?: boolean } = {},
 ): number | null {
   if (count <= 0) return null;
   if (key === "Home") return 0;
   if (key === "End") return count - 1;
-  if (NEXT[orientation].includes(key)) return index < 0 ? 0 : (index + 1) % count;
-  if (PREV[orientation].includes(key)) return index < 0 ? count - 1 : (index - 1 + count) % count;
+  if (NEXT[orientation].includes(key)) {
+    if (index < 0) return 0;
+    return wrap ? (index + 1) % count : Math.min(index + 1, count - 1);
+  }
+  if (PREV[orientation].includes(key)) {
+    if (index < 0) return count - 1;
+    return wrap ? (index - 1 + count) % count : Math.max(index - 1, 0);
+  }
   return null;
 }
 

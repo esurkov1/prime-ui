@@ -17,6 +17,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useLabels } from "@/internal/labels";
+import { nodeText } from "@/internal/nodeText";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import palette from "@/internal/palette.module.css";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -185,15 +186,6 @@ function isElementOf<P>(
   type: React.ElementType,
 ): node is React.ReactElement<P> {
   return React.isValidElement(node) && node.type === type;
-}
-
-function textOf(node: React.ReactNode): string {
-  if (typeof node === "string" || typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(textOf).join("");
-  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
-    return textOf(node.props.children);
-  }
-  return "";
 }
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -461,7 +453,7 @@ function SidebarGroup({
   const rail = useRail();
   const disclosure = collapsible && label !== undefined;
   const [open, setOpen] = usePersistedOpen(
-    disclosure ? `group:${rest.id ?? textOf(label)}` : "",
+    disclosure ? `group:${rest.id ?? nodeText(label)}` : "",
     openProp,
     defaultOpen,
     onOpenChange,
@@ -493,7 +485,7 @@ function SidebarGroup({
       >
         {label === undefined ? null : (
           // On the rail the heading shows its first letters; the tooltip gives the whole name.
-          <CompactTooltip text={textOf(label)}>
+          <CompactTooltip text={nodeText(label)}>
             <div id={labelId} className={styles.groupLabel}>
               <span className={styles.groupText}>{label}</span>
             </div>
@@ -504,7 +496,7 @@ function SidebarGroup({
     );
   }
 
-  const text = textOf(label);
+  const text = nodeText(label);
   return (
     // biome-ignore lint/a11y/useSemanticElements: a nav group of links, not a form fieldset
     <div
@@ -802,7 +794,7 @@ function splitItemChildren(children: React.ReactNode, end?: React.ReactNode): It
   }
   const trail = count !== null || shortcut !== null || endIcons.length > 0;
   return {
-    text: textOf(label).trim(),
+    text: nodeText(label).trim(),
     label,
     action,
     content: (
@@ -1479,7 +1471,7 @@ const SidebarAccount = React.forwardRef<HTMLButtonElement, SidebarAccountProps>(
     const name = nodes.filter((node) => node !== avatar);
 
     return (
-      <CompactTooltip text={textOf(name).trim()}>
+      <CompactTooltip text={nodeText(name).trim()}>
         <button
           {...rest}
           ref={ref}

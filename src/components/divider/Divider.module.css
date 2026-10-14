@@ -52,10 +52,12 @@
   --divider-lh: var(--prime-control-xl-line-height);
 }
 
-/* Horizontal dividers span the row inside flex columns (menus, cards). */
+/* Horizontal dividers span the row inside flex columns (menus, cards); a host bleeds the line
+   across its own inline padding with `--divider-bleed` (a menu panel). */
 .root:not([data-orientation="vertical"]) {
-  width: 100%;
+  width: calc(100% + 2 * var(--divider-bleed, var(--prime-space-0)));
   min-width: 0;
+  margin-inline: calc(var(--divider-bleed, var(--prime-space-0)) * -1);
 }
 
 .root::before,

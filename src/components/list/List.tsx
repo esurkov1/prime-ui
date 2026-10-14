@@ -8,6 +8,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
+import { nodeText } from "@/internal/nodeText";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 
@@ -262,15 +263,6 @@ function splitItemChildren(children: React.ReactNode) {
   );
 }
 
-/** The plain text of a node tree. */
-function plainText(node: React.ReactNode): string {
-  if (typeof node === "string" || typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(plainText).join("");
-  if (React.isValidElement<{ children?: React.ReactNode }>(node))
-    return plainText(node.props.children);
-  return "";
-}
-
 /** What a row is called by its handle and in drag announcements: its text line. */
 function itemLabel({ asChild, children }: Pick<ListItemProps, "asChild" | "children">): string {
   const content =
@@ -282,7 +274,7 @@ function itemLabel({ asChild, children }: Pick<ListItemProps, "asChild" | "child
   const source = text
     ? text
     : nodes.filter((node) => typeof node === "string" || typeof node === "number");
-  return plainText(source).trim();
+  return nodeText(source).trim();
 }
 
 // ─── Item ─────────────────────────────────────────────────────────────────────
