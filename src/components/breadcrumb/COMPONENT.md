@@ -22,7 +22,7 @@ import { Breadcrumb } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels; auto-collapse
+Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels; auto-collapse into a «…» menu
 ├─ Breadcrumb.Item        <li>: a link (href → LinkButton), text, or the current page (current)
 └─ Breadcrumb.Ellipsis    <li> with «…» for levels skipped on purpose
 ```
@@ -32,11 +32,11 @@ Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Breadcrumb.Root
-`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and collapses the middle levels on narrow containers.
+`ref` → `HTMLElement` (the `<nav>`). `<nav aria-label>` with an `<ol>`; draws the chevrons between levels, sets the size and, on narrow containers, collapses the middle levels into a «…» menu button that lists them.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text of the links, the current page and the ellipsis; chevrons and icons take the same tier. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Text of the links, the current page and the ellipsis; chevrons, icons and the collapse menu take the same tier. Without it the tier of its host, else `m`. |
 | `labels` | `Partial<BreadcrumbLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | `Breadcrumb.Item`s and `Breadcrumb.Ellipsis`, in order; no separators by hand. |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other `nav` attributes; an `aria-label` here overrides `labels.nav`. |
@@ -73,7 +73,7 @@ Breadcrumb.Root           <nav aria-label> + <ol>; size; chevrons between levels
 ### Item kind
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| link (`href`) | muted text, medium weight; primary text on hover and focus, no underline | every ancestor level | |
+| link (`href`) | a `LinkButton` in the muted trail tone (`tone="muted"`): muted text, primary on hover and focus, no underline | every ancestor level | |
 | text (no `href`, no `current`) | muted text | a level without its own page | yes |
 | current (`current`) | primary text, medium weight | the last item — this page | |
 | icon link (`href` + `aria-label`, `Icon` child) | icon at the tier icon size | a «home» root | |
@@ -86,7 +86,8 @@ Use links for every ancestor and `current` on the last item; `s` above a `headin
 | current | `current` | `aria-current="page"` on the text span, or on the link when the item has `href` |
 | hover / focus-visible on links | pointer / keyboard | text → primary; focus ring from LinkButton |
 | truncation | width | each level truncates with an ellipsis, max width `2 × --prime-space-24` (192; `--prime-space-24 + --prime-space-6`, 120, when its container is below 30rem — its own for 3+ levels, the nearest one above for 1–2); the last item shrinks last |
-| auto-collapse | 3+ levels and a container `< 30rem` | `data-collapsible="true"`; middle levels are `display: none` and replaced by «… ›», whose hidden text (`labels.ellipsis`) names them |
+| auto-collapse | 3+ levels and a container `< 30rem` | `data-collapsible="true"`; middle levels are `display: none` and replaced by «… ›»: a ghost menu button (`Dropdown.Trigger`, named by `labels.ellipsis`) whose menu lists them — links stay links, a level without `href` is a disabled row |
+| collapse menu open | a press, `Enter` or `ArrowDown` on the «…» | `aria-expanded="true"` on the button; a `role="menu"` panel at the tier size |
 
 Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 
@@ -103,15 +104,16 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 
 | Key | Action |
 |---|---|
-| `Tab` | Moves focus between the level links; the current page is not focusable. |
-| `Enter` | Follows the link. |
+| `Tab` | Moves focus between the level links and the «…» of a collapsed path; the current page is not focusable. |
+| `Enter` | Follows the link; on the «…» opens the menu of the hidden levels. |
+| `ArrowDown` · `ArrowUp` · `Escape` | In the menu of hidden levels: move between them, close it and return to the «…». |
 
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - `nav` landmark with `aria-label` from `labels.nav`; an ordered list.
 - The current page has `aria-current="page"`; the chevrons are `aria-hidden` spans inside the levels, so every list item is a level.
-- Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» reads as `labels.ellipsis`.
+- Collapsed middle levels leave the layout and the tab order (no invisible focus stops); the automatic «…» is a menu button (`aria-haspopup="menu"`) named by `labels.ellipsis`, and its menu lists them as links.
 - Icon-only links need `aria-label` on the Item.
 
 ### Labels
@@ -120,7 +122,7 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 | Key | Default | Used for |
 |---|---|---|
 | `nav` | `"Навигационная цепочка"` | `aria-label` of the `nav` landmark. |
-| `ellipsis` | `"Скрытые разделы"` | Hidden text of `Breadcrumb.Ellipsis`. |
+| `ellipsis` | `"Скрытые разделы"` | Name of the collapse menu button and hidden text of `Breadcrumb.Ellipsis`. |
 
 ## Examples
 | Example | Shows |
@@ -128,7 +130,7 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 | [overview.tsx](examples/overview.tsx) | The path to this page: links to the levels above and the current page last — `href`, `current`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; text and chevrons follow the control tier — `size`. |
 | [with-icon.tsx](examples/with-icon.tsx) | The root level as a home icon; a link without text is named for screen readers — `aria-label`. |
-| [overflow.tsx](examples/overflow.tsx) | A long path: levels truncate, and in a 320px container the middle ones collapse into «…», which screen readers announce as hidden levels — `Breadcrumb.Item`, `current`. |
+| [overflow.tsx](examples/overflow.tsx) | A long path: levels truncate, and in a 320px container the middle ones collapse into a «…» menu that lists them — `Breadcrumb.Item`, `current`. |
 | [ellipsis.tsx](examples/ellipsis.tsx) | Levels skipped on purpose shown as «…» whose hidden text names them for screen readers — `Breadcrumb.Ellipsis`, `labels`. |
 
 ## Mistakes
@@ -138,5 +140,5 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 - Home icon link without `aria-label` → add `aria-label="Главная"`.
 
 ## Related
-- **Built from:** [LinkButton](../link-button/COMPONENT.md), Icon (`nav.chevronRight`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [LinkButton](../link-button/COMPONENT.md) (`tone="muted"`), [Button](../button/COMPONENT.md) and [Dropdown](../dropdown/COMPONENT.md) (the collapse menu), Icon (`nav.chevronRight`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Tabs](../tabs/COMPONENT.md), [PageContent](../page-content/COMPONENT.md), [Stepper](../stepper/COMPONENT.md)

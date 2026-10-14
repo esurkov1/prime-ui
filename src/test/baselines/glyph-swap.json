@@ -8,6 +8,5 @@
   "src/components/gantt/Gantt.tsx: useStateSwap outside the engine #2",
   "src/components/progress-bar/ProgressBar.tsx: useStateSwap outside the engine",
   "src/components/progress-circle/ProgressCircle.tsx: useStateSwap outside the engine",
-  "src/components/sparkline/Sparkline.tsx: useStateSwap outside the engine",
-  "src/layout/sidebar/Sidebar.tsx: glyph name ternary"
+  "src/components/sparkline/Sparkline.tsx: useStateSwap outside the engine"
 ]

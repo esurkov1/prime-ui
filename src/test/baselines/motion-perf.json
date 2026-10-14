@@ -1,5 +1,4 @@
 [
-  "src/components/accordion/Accordion.module.css: grid-template-rows 0fr fold outside Disclosure",
   "src/components/chat/Chat.module.css: local @keyframes chatJumpIn",
   "src/components/chat/Chat.module.css: local @keyframes chatJumpOut",
   "src/components/composer/Composer.module.css: local @keyframes composerLockIn",
@@ -41,13 +40,11 @@
   "src/components/notification/Notification.module.css: local @keyframes ntfCountdown",
   "src/components/progress-circle/ProgressCircle.module.css: animates stroke-dasharray",
   "src/components/skeleton/Skeleton.module.css: reduced-motion block globals.css already covers (.root)",
-  "src/components/stepper/Stepper.module.css: reduced-motion block globals.css already covers (.indicator)",
   "src/components/timeline/Timeline.module.css: reduced-motion block globals.css already covers (.row, .dot, .title)",
   "src/internal/FieldFrame.module.css: local @keyframes field-shake-even",
   "src/internal/FieldFrame.module.css: local @keyframes field-shake-odd",
   "src/internal/richText.module.css: local @keyframes spoiler-reveal",
   "src/layout/sidebar/Sidebar.module.css: animates -webkit-text-fill-color",
   "src/layout/sidebar/Sidebar.module.css: animates -webkit-text-fill-color #2",
-  "src/layout/sidebar/Sidebar.module.css: animates border-radius",
-  "src/layout/sidebar/Sidebar.module.css: grid-template-rows 0fr fold outside Disclosure"
+  "src/layout/sidebar/Sidebar.module.css: animates border-radius"
 ]

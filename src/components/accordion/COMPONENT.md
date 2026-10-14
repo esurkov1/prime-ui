@@ -26,10 +26,10 @@ import { Accordion } from "prime-ui-kit";
 ```
 Accordion.Root                frame (grouped) or column of cards (separate)
 └─ Accordion.Item             one section; data-state open / closed
-   ├─ Accordion.Header        <h3> around the trigger
+   ├─ Accordion.Header        heading around the trigger (<h3>, or the level of `as`)
    │  └─ Accordion.Trigger    <button>: children, then the chevron (Icon nav.chevronDown)
    │     └─ Accordion.Icon    optional leading icon
-   └─ Accordion.Content       <section> region; clip <div> → padded body <div>
+   └─ Accordion.Content       <section> region (the kit fold); clip <div> → padded body <div>
 ```
 
 ## API
@@ -46,7 +46,7 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 | `defaultValue` | `string \| string[]` | — | Initially open item(s) (uncontrolled). |
 | `onValueChange` | `(value: string) => void \| (value: string[]) => void` | — | Called with the new open item, or the new list with `multiple`. |
 | `collapsible` | `boolean` | `true` | Without `multiple`: `false` keeps the open item open on a second click. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of trigger height, text, icon and padding. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of trigger height, text, icon and padding. Without it the tier of its host, else `m`. |
 | `layout` | `"grouped" \| "separate"` | `"grouped"` | `grouped` — one surface with hairlines between items; `separate` — every item is its own card. |
 | `children` | `ReactNode` | — | `Accordion.Item`s. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" \| "onChange">` | — | `className` and the other div attributes. |
@@ -61,10 +61,11 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
 ### Accordion.Header
-`ref` → `HTMLHeadingElement`. The `<h3>` around the trigger.
+`ref` → `HTMLHeadingElement`. The heading around the trigger (`<h3>` unless `as` says otherwise).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `as` | `"h2" \| "h3" \| "h4" \| "h5" \| "h6"` | `"h3"` | Heading level in the page outline: one below the heading of the section that holds the accordion. |
 | `…rest` | `HTMLAttributes<HTMLHeadingElement>` | — | `className` and the other heading attributes. |
 
 ### Accordion.Trigger
@@ -125,13 +126,14 @@ Accordion.Root                frame (grouped) or column of cards (separate)
 | hover / active | pointer | trigger `fill-muted-hover` (two ladder steps off the accordion's layer, so it never lands on the host's color at the edges) / `fill-strong` |
 | focus-visible | keyboard | inset focus ring inside the trigger |
 
-Root: `data-size`, `data-layout`. The panel height transitions through `grid-template-rows: 0fr → 1fr` (no JS measuring, follows content that resizes while open) and the body fades in while settling by `--prime-space-1`; open uses `base` + `enter`, close `fast` + `exit`. The chevron rotates over `base`. Instant under `prefers-reduced-motion`.
+Root: `data-size`, `data-layout`. The panel is the kit fold (`Disclosure`): its height glides (no JS measuring, follows content that resizes while open) and the body fades in while settling by one space step; open uses `base` + `enter`, close `fast` + `exit`. The chevron rotates over `base`. Instant under `prefers-reduced-motion`.
 
 ## Layout & spacing
 - Takes the full width of its parent (`width: 100%`); the parent sets the measure.
-- Panel content is a flex column with `--prime-space-3` gap; it reserves `--prime-focus-space` at the top so focus rings of fields inside are not clipped.
+- Panel content is a flex column with `--prime-space-3` gap; its padding (`--acc-pad-y` above and below, `--acc-pad-x` at the sides) keeps it clear of the trigger's hover fill and leaves room for the focus rings of fields inside.
 - The root is a layer of the surface ladder (`data-depth`): fields inside panels take that layer's fill automatically.
-- Stack several accordions or an accordion and other blocks with the page gap (`--prime-space-8` between groups).
+- Stack several accordions or an accordion and other blocks with the page gap between groups.
+- On a coarse pointer a trigger is at least the touch target high.
 
 ## Accessibility
 
@@ -146,7 +148,7 @@ Root: `data-size`, `data-layout`. The panel height transitions through `grid-tem
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- The trigger is a native `<button>` inside an `<h3>` with `aria-expanded` and `aria-controls`.
+- The trigger is a native `<button>` inside a heading (`<h3>`, or the level of `as`) with `aria-expanded` and `aria-controls`.
 - The panel is a `<section>` with `aria-labelledby`; closed content is `inert`, so it leaves the tab order and the accessibility tree.
 - The chevron and `Accordion.Icon` are `aria-hidden`.
 
@@ -158,7 +160,7 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A FAQ where one answer is open at a time — `defaultValue`. |
+| [overview.tsx](examples/overview.tsx) | A FAQ where one answer is open at a time and every question heads its section — `defaultValue`, `as`. |
 | [variants.tsx](examples/variants.tsx) | One surface with hairlines between items, or every item as its own card — `layout`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: trigger height, text, icon and padding grow together — `size`. |
 | [states.tsx](examples/states.tsx) | A disabled section that cannot be opened, next to regular ones — `disabled`. |
@@ -169,6 +171,7 @@ No `labels`.
 
 ## Mistakes
 - Trigger without `Accordion.Header` → wrap it so the section has a heading.
+- A heading level that skips the outline (an `<h3>` under a page `<h1>`) → set `as` one level below the heading above the accordion.
 - `value={["a"]}` without `multiple` → arrays only with `multiple`.
 - Adding a chevron icon to the trigger → the trigger draws one itself.
 - Expecting `className` on Content to style the `<section>` → it styles the inner padded block.

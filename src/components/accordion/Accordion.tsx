@@ -2,12 +2,15 @@ import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { iconSlotClass } from "@/internal/iconBox";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./Accordion.module.css";
 
@@ -15,9 +18,7 @@ type AccordionBaseProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "defaultValue" | "onChange"
 > & {
-  /** Trigger, icon and content spacing tier. Default `m`. */
   size?: ControlSize;
-  /** `grouped` — one frame without gaps (default); `separate` — every item is its own card. */
   layout?: "grouped" | "separate";
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -28,7 +29,6 @@ export type AccordionSingleProps = AccordionBaseProps & {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** When `false`, the open item cannot be closed by clicking it. Default `true`. */
   collapsible?: boolean;
 };
 
@@ -38,7 +38,6 @@ export type AccordionMultipleProps = AccordionBaseProps & {
   value?: string[];
   defaultValue?: string[];
   onValueChange?: (value: string[]) => void;
-  /** Every item of a multiple accordion closes on its own click. */
   collapsible?: never;
 };
 
@@ -104,13 +103,14 @@ function AccordionRoot(props: AccordionRootProps) {
     defaultValue: _defaultValue,
     onValueChange: _onValueChange,
     collapsible: _collapsible,
-    size = "m",
+    size: sizeProp,
     layout = "grouped",
     className,
     children,
     ...rest
   } = props;
   const depth = useNestedSurfaceDepth();
+  const tier = useHostTier(sizeProp);
 
   return (
     <AccordionProvider value={contextValue}>
@@ -118,11 +118,9 @@ function AccordionRoot(props: AccordionRootProps) {
         {...rest}
         className={cx(styles.root, className)}
         data-depth={depth}
-        {...toDataAttributes({ size, layout })}
+        {...toDataAttributes({ size: tier.size, layout })}
       >
-        <SurfaceDepthProvider value={depth}>
-          <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-        </SurfaceDepthProvider>
+        <SurfaceDepthProvider value={depth}>{tier.provide(children)}</SurfaceDepthProvider>
       </div>
     </AccordionProvider>
   );
@@ -171,12 +169,16 @@ function AccordionItem({
 }
 AccordionItem.displayName = "Accordion.Item";
 
+/** The level of an item's heading in the page outline. */
+export type AccordionHeadingLevel = "h2" | "h3" | "h4" | "h5" | "h6";
+
 export type AccordionHeaderProps = React.HTMLAttributes<HTMLHeadingElement> & {
+  as?: AccordionHeadingLevel;
   ref?: React.Ref<HTMLHeadingElement>;
 };
 
-function AccordionHeader({ className, ...rest }: AccordionHeaderProps) {
-  return <h3 className={cx(styles.header, className)} {...rest} />;
+function AccordionHeader({ as: Heading = "h3", className, ...rest }: AccordionHeaderProps) {
+  return <Heading {...rest} className={cx(styles.header, className)} />;
 }
 AccordionHeader.displayName = "Accordion.Header";
 
@@ -201,7 +203,7 @@ function AccordionTrigger({ className, children, onClick, ...rest }: AccordionTr
         state: item.open ? "open" : "closed",
         disabled: item.disabled || undefined,
       })}
-      className={cx(styles.trigger, className)}
+      className={cx(styles.trigger, touchTargetRowClass, className)}
       onClick={(event) => {
         onClick?.(event);
         if (!event.defaultPrevented) toggleItem(item.value);
@@ -222,7 +224,7 @@ export type AccordionIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "ch
 /** Decorative leading icon of a trigger; the content lines up with the label after it. */
 function AccordionIcon({ className, children, ...rest }: AccordionIconProps) {
   return (
-    <span className={cx(styles.icon, className)} aria-hidden="true" {...rest}>
+    <span {...rest} className={cx(styles.icon, iconSlotClass, className)} aria-hidden="true">
       {children}
     </span>
   );
@@ -235,19 +237,23 @@ export type AccordionContentProps = React.HTMLAttributes<HTMLElement> & {
 
 function AccordionContent({ className, children, ...rest }: AccordionContentProps) {
   const item = useAccordionItem();
+  // The kit fold: the height glides and the body fades in place; `.content` sets its clocks. Its
+  // ref only serves `appear`, so the section keeps the consumer's ref.
+  const fold = useDisclosure({ open: item.open });
 
   return (
     <section
+      {...rest}
       id={item.contentId}
       aria-labelledby={item.triggerId}
       // `inert` takes closed content out of the tab order and the accessibility tree.
       inert={!item.open}
-      data-state={item.open ? "open" : "closed"}
-      className={styles.content}
-      {...rest}
+      data-state={fold.root["data-state"]}
+      data-mounted={fold.root["data-mounted"]}
+      className={cx(fold.root.className, styles.content)}
     >
-      {/* The clip animates the height; the padded inner block carries `className`. */}
-      <div className={styles.contentClip}>
+      {/* The padded inner block carries `className`. */}
+      <div className={fold.clip.className}>
         <div className={cx(styles.contentInner, className)}>{children}</div>
       </div>
     </section>

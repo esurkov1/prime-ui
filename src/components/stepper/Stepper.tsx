@@ -1,21 +1,43 @@
 import * as React from "react";
 
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { GlyphSwap } from "@/internal/glyphSwap";
+import { useLabels } from "@/internal/labels";
+import press from "@/internal/press.module.css";
 import type { ControlSize } from "@/internal/states";
+import { touchTargetClass, touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./Stepper.module.css";
 
-/** Item state: derived from the Root `value` (before → `completed`, equal → `active`, after → `pending`) unless set on the item. */
-export type StepperItemStatus = "pending" | "active" | "completed" | "danger";
+/** Item state: derived from the Root `value` (before → `completed`, equal → `current`, after → `pending`) unless set on the item. */
+export type StepperItemStatus = "pending" | "current" | "completed" | "danger";
+
+export type StepperLabels = {
+  /** Spoken after the name of a completed step (the check is only seen). */
+  completed: string;
+  /** Spoken after the name of a step that needs attention (the colour and the glyph are only seen). */
+  danger: string;
+};
+
+export const STEPPER_LABELS: StepperLabels = {
+  completed: "пройден",
+  danger: "требует внимания",
+};
+
+type StepperOrientation = "horizontal" | "vertical";
 
 type StepperRootContextValue = {
   value: number;
   select: (index: number) => void;
+  orientation: StepperOrientation;
+  arrows: boolean;
+  labels: StepperLabels;
 };
 
 const [StepperRootProvider, useStepperRootContext] =
@@ -31,7 +53,7 @@ const StepperIndexContext = React.createContext<number | null>(null);
 
 function deriveStatus(index: number, current: number): StepperItemStatus {
   if (index < current) return "completed";
-  if (index === current) return "active";
+  if (index === current) return "current";
   return "pending";
 }
 
@@ -41,15 +63,13 @@ export type StepperRootProps = Omit<
   React.OlHTMLAttributes<HTMLOListElement>,
   "defaultValue" | "onChange"
 > & {
-  /** Default `vertical`. A horizontal stepper stacks vertically in containers narrower than 480px. */
-  orientation?: "horizontal" | "vertical";
-  /** Current step (0-based), controlled. */
+  orientation?: StepperOrientation;
   value?: number;
-  /** Initial step when uncontrolled. Default `0`. */
   defaultValue?: number;
-  /** Called with the item index when an item is clicked. */
   onValueChange?: (index: number) => void;
+  arrows?: boolean;
   size?: ControlSize;
+  labels?: Partial<StepperLabels>;
   ref?: React.Ref<HTMLOListElement>;
 };
 
@@ -58,7 +78,9 @@ function StepperRoot({
   value: valueProp,
   defaultValue = 0,
   onValueChange,
-  size = "m",
+  arrows = false,
+  size: sizeProp,
+  labels: labelsProp,
   children,
   className,
   ...rest
@@ -68,7 +90,12 @@ function StepperRoot({
     defaultValue,
     onChange: onValueChange,
   });
-  const contextValue = React.useMemo(() => ({ value, select: setValue }), [value, setValue]);
+  const labels = useLabels(STEPPER_LABELS, labelsProp);
+  const tier = useHostTier(sizeProp);
+  const contextValue = React.useMemo(
+    () => ({ value, select: setValue, orientation, arrows, labels }),
+    [value, setValue, orientation, arrows, labels],
+  );
 
   let nextIndex = 0;
   const items: React.ReactNode[] = [];
@@ -88,15 +115,15 @@ function StepperRoot({
 
   return (
     <StepperRootProvider value={contextValue}>
-      <ControlSizeProvider value={size}>
+      {tier.provide(
         <ol
           {...rest}
           className={cx(styles.root, className)}
-          {...toDataAttributes({ orientation, size })}
+          {...toDataAttributes({ orientation, size: tier.size })}
         >
           {items}
-        </ol>
-      </ControlSizeProvider>
+        </ol>,
+      )}
     </StepperRootProvider>
   );
 }
@@ -105,7 +132,6 @@ StepperRoot.displayName = "Stepper.Root";
 // ─── Item ─────────────────────────────────────────────────────────────────────
 
 export type StepperItemProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type"> & {
-  /** Overrides the status derived from the Root `value` (e.g. `danger`). */
   status?: StepperItemStatus;
   ref?: React.Ref<HTMLButtonElement>;
 };
@@ -118,34 +144,49 @@ function StepperItem({
   onClick,
   ...rest
 }: StepperItemProps) {
-  const { value, select } = useStepperRootContext();
+  const { value, select, orientation, arrows, labels } = useStepperRootContext();
   const index = React.useContext(StepperIndexContext);
   if (index === null) {
     throw new Error("Stepper.Item must be a direct child of Stepper.Root");
   }
   const status = statusProp ?? deriveStatus(index, value);
   const itemContext = React.useMemo(() => ({ index, status }), [index, status]);
+  // The check and the danger glyph are only seen: the status is spoken with the name.
+  const spokenStatus =
+    status === "completed" ? labels.completed : status === "danger" ? labels.danger : null;
 
   return (
     <StepperItemProvider value={itemContext}>
       <li className={styles.item}>
         {/* Decorative chevron in front of the step; CSS shows it only between horizontal steps. */}
         <span className={styles.separator} aria-hidden="true">
-          <Icon name="nav.chevronRight" className={styles.separatorIcon} strokeWidth={2} />
+          <Icon name="nav.chevronRight" strokeWidth={2} />
         </span>
         <button
           {...rest}
           type="button"
           disabled={disabled}
-          className={cx(styles.step, className)}
+          className={cx(
+            styles.step,
+            press.press,
+            orientation === "vertical" ? touchTargetRowClass : touchTargetClass,
+            className,
+          )}
           {...toDataAttributes({ status, disabled: disabled || undefined })}
-          aria-current={status === "active" ? "step" : undefined}
+          aria-current={status === "current" ? "step" : undefined}
           onClick={(event) => {
             onClick?.(event);
             if (!event.defaultPrevented) select(index);
           }}
         >
           {children}
+          {spokenStatus === null ? null : <VisuallyHidden>{`, ${spokenStatus}`}</VisuallyHidden>}
+          {/* A vertical row that opens a page or panel ends with a chevron (`arrows`). */}
+          {arrows && orientation === "vertical" ? (
+            <span className={styles.arrow} aria-hidden="true">
+              <Icon name="nav.chevronRight" strokeWidth={2} />
+            </span>
+          ) : null}
         </button>
       </li>
     </StepperItemProvider>
@@ -158,9 +199,15 @@ StepperItem.displayName = "Stepper.Item";
 type SpanProps = React.HTMLAttributes<HTMLSpanElement> & { ref?: React.Ref<HTMLSpanElement> };
 
 export type StepperIndicatorProps = SpanProps & {
-  /** Replaces the default content (the item number, or a check when completed). */
   children?: React.ReactNode;
 };
+
+/** The default glyph of a status: the step number, a check, or the danger mark. */
+function statusGlyph(status: StepperItemStatus, index: number): React.ReactNode {
+  if (status === "completed") return <Icon name="action.check" strokeWidth={2} />;
+  if (status === "danger") return <Icon name="status.danger" />;
+  return index + 1;
+}
 
 function StepperIndicator({ children, className, ...rest }: StepperIndicatorProps) {
   const { status, index } = useStepperItemContext();
@@ -171,12 +218,7 @@ function StepperIndicator({ children, className, ...rest }: StepperIndicatorProp
       data-status={status}
       aria-hidden="true"
     >
-      {children ??
-        (status === "completed" ? (
-          <Icon name="action.check" className={styles.check} strokeWidth={2} />
-        ) : (
-          index + 1
-        ))}
+      <GlyphSwap>{children ?? statusGlyph(status, index)}</GlyphSwap>
     </span>
   );
 }
@@ -204,23 +246,6 @@ function StepperDescription({ className, ...rest }: StepperDescriptionProps) {
 }
 StepperDescription.displayName = "Stepper.Description";
 
-export type StepperArrowProps = Omit<React.SVGAttributes<SVGSVGElement>, "children" | "color"> & {
-  ref?: React.Ref<SVGSVGElement>;
-};
-
-/** Trailing chevron for vertical items that open a page or panel. */
-function StepperArrow({ className, ...rest }: StepperArrowProps) {
-  return (
-    <Icon
-      {...rest}
-      name="nav.chevronRight"
-      className={cx(styles.arrow, className)}
-      strokeWidth={2}
-    />
-  );
-}
-StepperArrow.displayName = "Stepper.Arrow";
-
 export const Stepper = {
   Root: StepperRoot,
   Item: StepperItem,
@@ -228,5 +253,4 @@ export const Stepper = {
   Content: StepperContent,
   Title: StepperTitle,
   Description: StepperDescription,
-  Arrow: StepperArrow,
 };

@@ -1,18 +1,22 @@
 import * as React from "react";
+
+import { Button } from "@/components/button/Button";
+import { Dropdown } from "@/components/dropdown/Dropdown";
+import { LinkButton } from "@/components/link-button/LinkButton";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 
-import { LinkButton } from "../link-button/LinkButton";
 import styles from "./Breadcrumb.module.css";
 
 export type BreadcrumbLabels = {
   /** `aria-label` of the `nav` landmark. */
   nav: string;
-  /** Accessible text of `Breadcrumb.Ellipsis` (skipped levels). */
+  /** Name of the «…» that stands for skipped levels (the collapse menu, `Breadcrumb.Ellipsis`). */
   ellipsis: string;
 };
 
@@ -29,14 +33,12 @@ const BreadcrumbContext = React.createContext<BreadcrumbContextValue>({
 });
 
 export type BreadcrumbRootProps = React.HTMLAttributes<HTMLElement> & {
-  /** Text of the links, the current page and the ellipsis; the chevrons take the same tier. */
   size?: ControlSize;
-  /** Built-in strings. */
   labels?: Partial<BreadcrumbLabels>;
   ref?: React.Ref<HTMLElement>;
 };
 
-/** From this many levels the middle ones collapse into «…» on narrow containers. */
+/** From this many levels the middle ones collapse into a «…» menu on narrow containers. */
 const COLLAPSIBLE_MIN_ITEMS = 3;
 
 /**
@@ -46,14 +48,14 @@ const COLLAPSIBLE_MIN_ITEMS = 3;
  */
 const FirstLevelContext = React.createContext(true);
 
-/** The chevron in front of a level; decorative, and absent before the first level. */
+/** The chevron in front of a level; decorative (placeholder colour), absent before the first. */
 function Separator() {
   const { size } = React.useContext(BreadcrumbContext);
   const first = React.useContext(FirstLevelContext);
   if (first) return null;
   return (
     <span aria-hidden="true" className={styles.separator}>
-      <Icon name="nav.chevronRight" size={size} tone="secondary" />
+      <Icon name="nav.chevronRight" size={size} />
     </span>
   );
 }
@@ -61,19 +63,17 @@ function Separator() {
 function BreadcrumbRoot({
   children,
   className,
-  size = "m",
+  size: sizeProp,
   labels: labelsProp,
   ...rest
 }: BreadcrumbRootProps) {
-  const nav = labelsProp?.nav ?? BREADCRUMB_LABELS.nav;
-  const ellipsis = labelsProp?.ellipsis ?? BREADCRUMB_LABELS.ellipsis;
-  const contextValue = React.useMemo(
-    () => ({ size, labels: { nav, ellipsis } }),
-    [size, nav, ellipsis],
-  );
+  const tier = useHostTier(sizeProp);
+  const labels = useLabels(BREADCRUMB_LABELS, labelsProp);
+  const contextValue = React.useMemo(() => ({ size: tier.size, labels }), [tier.size, labels]);
 
+  const levels = React.Children.toArray(children);
   // Each level learns whether it is the first; keys stay the children's own.
-  const items = React.Children.toArray(children).map((child, index) => (
+  const items = levels.map((child, index) => (
     <FirstLevelContext.Provider
       key={React.isValidElement(child) ? child.key : index}
       value={index === 0}
@@ -85,21 +85,21 @@ function BreadcrumbRoot({
 
   return (
     <BreadcrumbContext.Provider value={contextValue}>
-      <ControlSizeProvider value={size}>
+      {tier.provide(
         <nav
-          aria-label={nav}
+          aria-label={labels.nav}
           {...rest}
           className={cx(styles.root, className)}
-          {...toDataAttributes({ size, collapsible })}
+          {...toDataAttributes({ size: tier.size, collapsible })}
         >
           <ol className={styles.list}>
             {collapsible ? (
               <>
                 {items[0]}
                 {/* Shown only on narrow widths (container query) in place of the middle levels,
-                    which are then `display: none`; it names them for screen readers. */}
+                    which are then `display: none`: a menu of those levels keeps them reachable. */}
                 <FirstLevelContext.Provider value={false}>
-                  <BreadcrumbEllipsis className={styles.autoCollapse} />
+                  <CollapseMenu levels={levels.slice(1, -1)} />
                 </FirstLevelContext.Provider>
                 {items.slice(1)}
               </>
@@ -107,12 +107,52 @@ function BreadcrumbRoot({
               items
             )}
           </ol>
-        </nav>
-      </ControlSizeProvider>
+        </nav>,
+      )}
     </BreadcrumbContext.Provider>
   );
 }
 BreadcrumbRoot.displayName = "Breadcrumb.Root";
+
+/**
+ * The «…» of a collapsed path: a menu button whose items are the hidden middle levels — a link
+ * level stays a link, a level without one is a disabled row.
+ */
+function CollapseMenu({ levels }: { levels: React.ReactNode[] }) {
+  const { size, labels } = React.useContext(BreadcrumbContext);
+  const entries = levels.filter(
+    (level): level is React.ReactElement<BreadcrumbItemProps> =>
+      React.isValidElement(level) && level.type === BreadcrumbItem,
+  );
+  return (
+    <li className={cx(styles.item, styles.ellipsis, styles.autoCollapse)}>
+      <Separator />
+      <Dropdown.Root>
+        <Dropdown.Trigger>
+          <Button.Root variant="ghost" tone="neutral" density="inline" aria-label={labels.ellipsis}>
+            …
+          </Button.Root>
+        </Dropdown.Trigger>
+        <Dropdown.Content size={size} align="start">
+          {entries.map((level, index) => {
+            const { href, children, "aria-label": name } = level.props;
+            return href ? (
+              <Dropdown.Item key={level.key ?? index} asChild>
+                <a href={href} aria-label={name}>
+                  {children}
+                </a>
+              </Dropdown.Item>
+            ) : (
+              <Dropdown.Item key={level.key ?? index} disabled aria-label={name}>
+                {children}
+              </Dropdown.Item>
+            );
+          })}
+        </Dropdown.Content>
+      </Dropdown.Root>
+    </li>
+  );
+}
 
 export type BreadcrumbItemProps = Omit<React.LiHTMLAttributes<HTMLLIElement>, "aria-label"> & {
   href?: string;
@@ -135,10 +175,11 @@ function BreadcrumbItem({
     <li {...rest} className={cx(styles.item, className)}>
       <Separator />
       {href ? (
+        // A previous level: the kit link in the muted trail tone (primary on hover and focus).
         <LinkButton
           href={href}
           size={size}
-          className={styles.link}
+          tone="muted"
           aria-label={ariaLabel}
           aria-current={current ? "page" : undefined}
         >
@@ -146,7 +187,7 @@ function BreadcrumbItem({
         </LinkButton>
       ) : (
         <span
-          className={cx(styles.text, current && styles.current)}
+          className={styles.text}
           aria-current={current ? "page" : undefined}
           title={typeof children === "string" ? children : undefined}
         >

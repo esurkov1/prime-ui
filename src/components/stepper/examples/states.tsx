@@ -1,5 +1,5 @@
-/** Statuses that come from the server, a failed step with its own indicator and a locked step — `status`, `disabled`. */
-import { Icon, Stepper } from "prime-ui-kit";
+/** Statuses that come from the server, a failed step marked by a glyph and a locked step — `status`, `disabled`. */
+import { Stepper } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -15,15 +15,13 @@ export default function StepperStatesExample() {
           </Stepper.Content>
         </Stepper.Item>
         <Stepper.Item status="danger">
-          <Stepper.Indicator>
-            <Icon name="status.danger" />
-          </Stepper.Indicator>
+          <Stepper.Indicator />
           <Stepper.Content>
             <Stepper.Title>Ошибка доставки</Stepper.Title>
             <Stepper.Description>Проверьте адрес получателя</Stepper.Description>
           </Stepper.Content>
         </Stepper.Item>
-        <Stepper.Item status="active">
+        <Stepper.Item status="current">
           <Stepper.Indicator />
           <Stepper.Content>
             <Stepper.Title>Подтверждение</Stepper.Title>

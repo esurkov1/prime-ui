@@ -20,7 +20,8 @@ export const page: ComponentPageConfig = {
   examples: [
     {
       slot: "overview",
-      description: "Вопросы и ответы, открыт один ответ за раз — `defaultValue`.",
+      description:
+        "Вопросы и ответы: открыт один ответ за раз, каждый вопрос — заголовок раздела — `defaultValue`, `as`.",
     },
     {
       slot: "variants",

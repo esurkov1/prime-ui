@@ -1,4 +1,4 @@
-/** The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone, the AppHeader with the menu button, the page title with a line of data, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`. */
+/** The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone whose More item opens the Sidebar, the AppHeader with the menu button it draws by itself, the page title with a line of data, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`, `useAppShellNav`. */
 import {
   AppHeader,
   AppShell,
@@ -11,6 +11,7 @@ import {
   PageContent,
   Sidebar,
   Typography,
+  useAppShellNav,
 } from "prime-ui-kit";
 import * as React from "react";
 
@@ -92,19 +93,33 @@ const PAGES: Record<Exclude<SectionId, "today">, { description: string; rows: Ro
 
 const isMore = (id: SectionId) => MORE.some((section) => section.id === id);
 
+/** «Ещё» opens the Sidebar as a panel: it reads the shell's navigation, so it renders inside the shell. */
+function MoreItem({ current }: { current: boolean }) {
+  const nav = useAppShellNav();
+  return (
+    <BottomNav.Item
+      current={current}
+      aria-expanded={nav?.open}
+      aria-controls={nav?.navId}
+      onClick={() => nav?.setOpen(true)}
+    >
+      <BottomNav.ItemIcon>
+        <Icon name="action.more" />
+      </BottomNav.ItemIcon>
+      Ещё
+    </BottomNav.Item>
+  );
+}
+
 export default function AppShellScreenExample() {
   const [current, setCurrent] = React.useState<SectionId>("today");
-  const [menuOpen, setMenuOpen] = React.useState(false);
   const [done, setDone] = React.useState<ReadonlySet<string>>(() => new Set(["t1"]));
 
   const openTasks = TASKS.length - done.size;
   const section = SECTIONS.find((item) => item.id === current) ?? SECTIONS[0];
 
-  // One handler for every way into a section: the Sidebar and the bar.
-  const go = (id: SectionId) => {
-    setCurrent(id);
-    setMenuOpen(false);
-  };
+  // One handler for every way into a section: the Sidebar (an item closes its panel) and the bar.
+  const go = (id: SectionId) => setCurrent(id);
 
   const toggleTask = (id: string, checked: boolean) =>
     setDone((prev) => {
@@ -137,7 +152,7 @@ export default function AppShellScreenExample() {
       fillViewport
       scrollResetKey={current}
       nav={
-        <Sidebar.Root open={menuOpen} onOpenChange={setMenuOpen}>
+        <Sidebar.Root>
           <Sidebar.Header>
             <Sidebar.Brand description="Отдел продаж">
               <Sidebar.BrandLogo>
@@ -155,8 +170,8 @@ export default function AppShellScreenExample() {
       }
       header={
         <AppHeader.Root>
+          {/* On a phone the header leads with the menu button that opens the Sidebar by itself. */}
           <AppHeader.Start>
-            <AppHeader.MenuButton aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} />
             {/* Every page titles itself here: the only h1 and a line of data under it. */}
             <AppHeader.Title>
               {section.label}
@@ -183,16 +198,7 @@ export default function AppShellScreenExample() {
             </BottomNav.Item>
           ))}
           {/* The rest of the map lives in the Sidebar: «Ещё» opens it as a panel. */}
-          <BottomNav.Item
-            current={isMore(current)}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(true)}
-          >
-            <BottomNav.ItemIcon>
-              <Icon name="action.more" />
-            </BottomNav.ItemIcon>
-            Ещё
-          </BottomNav.Item>
+          <MoreItem current={isMore(current)} />
         </BottomNav.Root>
       }
     >

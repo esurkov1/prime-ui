@@ -1,8 +1,10 @@
 /*
  * Stepper — Graphite. Semantic `ol` of step buttons.
- * Indicator: pending = fill-muted, active = accent with soft halo, completed = accent-soft + check,
- * danger = danger-soft. Horizontal: chevron separators between steps, stacks vertically under 480px
- * of container width. Vertical: full-width rows, active row on fill-subtle.
+ * Indicator: pending = fill-muted, current = accent with soft halo, completed = accent-soft + check,
+ * danger = danger-soft + the danger glyph. Horizontal: one row with chevron separators between
+ * steps (steps shrink and their titles wrap, the row never wraps, so no chevron starts a line);
+ * stacks vertically under 480px of container width. Vertical: full-width rows, the current row on
+ * fill-subtle.
  */
 
 .root {
@@ -91,6 +93,9 @@
 
 /* ---------- Layout ---------- */
 
+/* The row wraps only in a narrow container, where every step takes a row of its own (below): a
+   step grows from nothing up to its content, so the steps always fit one row and a cramped one
+   wraps its title instead of sending a step (and its chevron) to the next line. */
 .root[data-orientation="horizontal"] {
   display: flex;
   flex-wrap: wrap;
@@ -113,13 +118,17 @@
 
 .root[data-orientation="horizontal"] .item {
   display: flex;
-  flex: 0 1 auto;
+  flex: 1 1 0;
   align-items: center;
+  max-width: max-content;
   gap: var(--st-root-h-gap);
 }
 
-/* Each step carries the chevron that leads to it: shown between horizontal steps only. */
+/* Each step carries the chevron that leads to it: shown between horizontal steps only. The kit
+   Icon inside takes the stepper's own glyph scale through `--prime-icon-size`. */
 .separator {
+  --prime-icon-size: var(--st-chevron);
+
   display: none;
   flex-shrink: 0;
   align-items: center;
@@ -128,13 +137,6 @@
 
 .root[data-orientation="horizontal"] .item:not(:first-child) > .separator {
   display: flex;
-}
-
-/* Kit Icons below take the stepper's own glyph scale, not the control tier (two classes win). */
-.separator > .separatorIcon {
-  flex-shrink: 0;
-  width: var(--st-chevron);
-  height: var(--st-chevron);
 }
 
 /* ---------- Step ---------- */
@@ -157,7 +159,7 @@
   transition:
     background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-orientation="horizontal"] .step {
@@ -168,7 +170,7 @@
 }
 
 @media (hover: hover) {
-  .root[data-orientation="horizontal"] .step:hover:not(:disabled) {
+  .root[data-orientation="horizontal"] .step:hover:not(:disabled):not([aria-disabled="true"]) {
     color: var(--prime-color-text-primary);
   }
 }
@@ -182,12 +184,8 @@
   padding: var(--st-v-pad);
 }
 
-.step:active:not(:disabled) {
-  transform: scale(var(--prime-motion-press-scale));
-}
-
 @media (hover: hover) {
-  .root[data-orientation="vertical"] .step:hover:not(:disabled) {
+  .root[data-orientation="vertical"] .step:hover:not(:disabled):not([aria-disabled="true"]) {
     background: var(--prime-color-fill-subtle);
   }
 }
@@ -196,12 +194,12 @@
   background: var(--prime-color-fill-subtle-active);
 }
 
-.step[data-status="active"],
+.step[data-status="current"],
 .step[data-status="completed"] {
   color: var(--prime-color-text-primary);
 }
 
-.root[data-orientation="vertical"] .step[data-status="active"] {
+.root[data-orientation="vertical"] .step[data-status="current"] {
   background: var(--prime-color-fill-subtle);
 }
 
@@ -225,7 +223,11 @@
 
 /* ---------- Indicator ---------- */
 
+/* The glyph inside (a check, the danger mark, a consumer's icon) takes `--st-check`; a status
+   change cross-fades it (`GlyphSwap`). */
 .indicator {
+  --prime-icon-size: var(--st-check);
+
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -246,7 +248,7 @@
     box-shadow var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
-.indicator[data-status="active"] {
+.indicator[data-status="current"] {
   background: var(--prime-color-accent-default);
   color: var(--prime-color-accent-fg);
   box-shadow: 0 0 0 var(--prime-space-1) var(--prime-color-accent-soft);
@@ -271,12 +273,6 @@
   background: var(--prime-color-fill-muted);
   color: var(--prime-color-text-disabled);
   box-shadow: none;
-}
-
-.indicator > .check {
-  display: block;
-  width: var(--st-check);
-  height: var(--st-check);
 }
 
 /* ---------- Text ---------- */
@@ -305,10 +301,12 @@
   overflow-wrap: anywhere;
 }
 
-.step > .arrow {
+/* The trailing chevron of a vertical row that opens a page or panel (`arrows`). */
+.arrow {
+  --prime-icon-size: var(--st-chevron);
+
+  display: inline-flex;
   flex-shrink: 0;
-  width: var(--st-chevron);
-  height: var(--st-chevron);
   color: var(--prime-color-text-placeholder);
 }
 
@@ -317,6 +315,7 @@
 @container (max-width: 30rem) {
   .root[data-orientation="horizontal"] .item {
     flex-basis: 100%;
+    max-width: none;
   }
 
   .root[data-orientation="horizontal"] .item:not(:first-child) > .separator {
@@ -326,11 +325,5 @@
   .root[data-orientation="horizontal"] .step {
     width: 100%;
     padding: var(--st-v-pad);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .indicator {
-    transition: none;
   }
 }

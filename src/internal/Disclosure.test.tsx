@@ -115,12 +115,15 @@ describe("Disclosure", () => {
   describe("CSS", () => {
     it("opens and closes on one clock each, the fade with the fold; nothing moves before mount", () => {
       expect(cssRule(CSS, ".root").decls.some(({ prop }) => prop === "transition")).toBe(false);
+      // The height runs on the clock unless the host gives it a timing of its own.
       expect(cssValue(cssRule(CSS, ".root[data-mounted]"), "transition")).toMatch(
-        /^grid-template-rows var\(--disclosure-close-clock\)/,
+        /^grid-template-rows var\(--disclosure-height-close, var\(--disclosure-close-clock\)\)/,
       );
       expect(
         cssValue(cssRule(CSS, '.root[data-mounted][data-state="open"]'), "transition"),
-      ).toMatch(/^grid-template-rows var\(--disclosure-open-clock\)/);
+      ).toMatch(
+        /^grid-template-rows var\(--disclosure-height-open, var\(--disclosure-open-clock\)\)/,
+      );
       expect(cssValue(cssRule(CSS, ".root[data-mounted] > .clip > *"), "transition")).toBe(
         "opacity var(--disclosure-close-clock),\n    translate var(--disclosure-close-clock)",
       );

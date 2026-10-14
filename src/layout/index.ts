@@ -16,10 +16,11 @@ export type {
   AppShellFooterProps,
   AppShellMainProps,
   AppShellNavProps,
+  AppShellNavState,
   AppShellRootProps,
   AppShellTemplateProps,
 } from "./app-shell/AppShell";
-export { AppShell } from "./app-shell/AppShell";
+export { AppShell, useAppShellNav } from "./app-shell/AppShell";
 export type {
   BottomNavActionProps,
   BottomNavItemCountProps,

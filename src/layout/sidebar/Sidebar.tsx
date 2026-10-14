@@ -6,25 +6,39 @@ import { Button } from "@/components/button/Button";
 import { Popover } from "@/components/popover/Popover";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import { OFF_CANVAS_QUERY } from "@/hooks/breakpoints";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
-import { Icon } from "@/icons";
+import { usePresence } from "@/hooks/usePresence";
+import { Icon, type IconName } from "@/icons";
 import { AnchorRectProvider, type AnchorRectResolver } from "@/internal/AnchorRectContext";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { GlyphSwap } from "@/internal/glyphSwap";
+import { iconSlotClass } from "@/internal/iconBox";
+import { InteractiveElement } from "@/internal/interactiveElement";
 import { useLabels } from "@/internal/labels";
 import { nodeText } from "@/internal/nodeText";
 import { LayerProvider } from "@/internal/overlay/layerStack";
-import palette from "@/internal/palette.module.css";
+import overlayMotion from "@/internal/overlayMotion.module.css";
+import press from "@/internal/press.module.css";
 import { RowAction } from "@/internal/RowAction";
 import { rovingIndex } from "@/internal/rovingFocus";
-import { Slot } from "@/internal/slot";
+import sheet from "@/internal/sheet.module.css";
+import { Slot, slotChild } from "@/internal/slot";
 import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { touchTargetRowClass } from "@/internal/touchTarget";
+import {
+  type AppShellNavState,
+  useAppShellNav,
+  useAppShellNavPublisher,
+} from "@/layout/app-shell/AppShell";
 
 import styles from "./Sidebar.module.css";
 
@@ -38,7 +52,7 @@ export type SidebarLabels = {
   collapse: string;
   /** Toggle label while the rail is compact or hidden. */
   expand: string;
-  /** Toggle label inside the off-canvas panel, and the scrim's label. */
+  /** Toggle label while the off-canvas panel is open. */
   close: string;
 };
 
@@ -48,9 +62,6 @@ export const SIDEBAR_LABELS: SidebarLabels = {
   expand: "Развернуть панель",
   close: "Закрыть навигацию",
 };
-
-/** Below this width an `offCanvas="auto"` sidebar leaves the layout and becomes an off-canvas panel. */
-const MOBILE_QUERY = "(max-width: 767.98px)";
 
 /** Hover intent before a compact flyout opens, and the grace period to travel into it. */
 const FLYOUT_OPEN_DELAY_MS = 120;
@@ -77,6 +88,9 @@ type SidebarContextValue = {
 };
 
 const [SidebarProvider, useSidebar] = createComponentContext<SidebarContextValue>("Sidebar");
+
+/** True inside `Sidebar.Root`: a `Sidebar.Toggle` outside it works from the shell's navigation. */
+const InSidebarContext = React.createContext(false);
 
 // ─── Persisted state ──────────────────────────────────────────────────────────
 
@@ -105,7 +119,11 @@ function writeStored(key: string, update: (stored: SidebarStored) => SidebarStor
   }
 }
 
-const SIDEBAR_MODES: readonly SidebarMode[] = ["expanded", "compact", "hidden"];
+/**
+ * The modes a reload restores. Never `hidden`: the way back from it is a toggle outside the rail,
+ * which a page may not have — a restored hidden rail would strand the person.
+ */
+const STORED_MODES: readonly SidebarMode[] = ["expanded", "compact"];
 
 /**
  * An uncontrolled open state that `persistKey` remembers: the stored value wins over
@@ -192,47 +210,39 @@ function isElementOf<P>(
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export type SidebarRootProps = React.ComponentPropsWithoutRef<"div"> & {
-  /** Item tier: height, icon and text of `--prime-control-<size>-*`. */
   size?: ControlSize;
   mode?: SidebarMode;
   defaultMode?: SidebarMode;
   onModeChange?: (mode: SidebarMode) => void;
-  /** The off-canvas panel (while the sidebar is off-canvas, see `offCanvas`). */
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /**
-   * When the rail becomes an off-canvas panel with a scrim and a focus trap, opened by `open`:
-   * `auto` below 768px, `always` at any width (navigation behind a menu button), `never`.
-   */
   offCanvas?: "auto" | "always" | "never";
-  /**
-   * Remembers the state across reloads in `localStorage` under this key: the mode and which
-   * collapsible groups and sub-lists are open (by their `id`, else their label text). Controlled
-   * `mode` / `open` are not stored.
-   */
+  closeOnOutsideClick?: boolean;
+  closeOnEscape?: boolean;
   persistKey?: string;
   labels?: Partial<SidebarLabels>;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function SidebarRoot(
-  {
-    children,
-    className,
-    size = "m",
-    mode: modeProp,
-    defaultMode = "expanded",
-    onModeChange,
-    open: openProp,
-    defaultOpen = false,
-    onOpenChange,
-    offCanvas: offCanvasProp = "auto",
-    persistKey,
-    labels: labelsProp,
-    ...rest
-  },
+function SidebarRoot({
+  children,
+  className,
+  size: sizeProp,
+  mode: modeProp,
+  defaultMode = "expanded",
+  onModeChange,
+  open: openProp,
+  defaultOpen = false,
+  onOpenChange,
+  offCanvas: offCanvasProp = "auto",
+  closeOnOutsideClick = true,
+  closeOnEscape = true,
+  persistKey,
+  labels: labelsProp,
   ref,
-) {
+  ...rest
+}: SidebarRootProps) {
   const persist = React.useMemo<SidebarPersist | null>(
     () =>
       persistKey
@@ -249,19 +259,30 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   );
   const storedMode = persistKey ? readStored(persistKey).mode : undefined;
   const labels = useLabels(SIDEBAR_LABELS, labelsProp);
-  const narrow = useMediaQuery(MOBILE_QUERY, offCanvasProp === "auto");
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
+  const narrow = useMediaQuery(OFF_CANVAS_QUERY, offCanvasProp === "auto");
   const offCanvas = offCanvasProp === "always" || narrow;
 
   const [mode, setMode] = useControllableState<SidebarMode>({
     value: modeProp,
-    defaultValue: storedMode && SIDEBAR_MODES.includes(storedMode) ? storedMode : defaultMode,
+    defaultValue: storedMode && STORED_MODES.includes(storedMode) ? storedMode : defaultMode,
     onChange: onModeChange,
   });
+
+  // While hidden the panel keeps the look of the last visible mode: it clips out (and back in) as one piece.
+  const lastVisibleRef = React.useRef<Exclude<SidebarMode, "hidden">>(
+    mode === "hidden" ? "expanded" : mode,
+  );
+  if (mode !== "hidden") lastVisibleRef.current = mode;
+
+  // A hidden rail is stored as the mode it left: a reload brings the rail back.
+  const lastVisible = lastVisibleRef.current;
   React.useEffect(() => {
     if (persistKey && modeProp === undefined) {
-      writeStored(persistKey, (stored) => ({ ...stored, mode }));
+      writeStored(persistKey, (stored) => ({ ...stored, mode: lastVisible }));
     }
-  }, [persistKey, modeProp, mode]);
+  }, [persistKey, modeProp, lastVisible]);
   const [openState, setOpen] = useControllableState<boolean>({
     value: openProp,
     defaultValue: defaultOpen,
@@ -274,19 +295,6 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
     if (!offCanvas) setOpen(false);
   }, [offCanvas, setOpen]);
 
-  // Disclosures that open on mount (the current page inside) appear in place, without motion.
-  const [ready, setReady] = React.useState(false);
-  React.useEffect(() => {
-    const id = requestAnimationFrame(() => setReady(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  // While hidden the panel keeps the look of the last visible mode: it clips out (and back in) as one piece.
-  const lastVisibleRef = React.useRef<Exclude<SidebarMode, "hidden">>(
-    mode === "hidden" ? "expanded" : mode,
-  );
-  if (mode !== "hidden") lastVisibleRef.current = mode;
-
   // The mode before the current one: coming back from hidden, the header toggle starts in place.
   const modeRef = React.useRef(mode);
   const previousModeRef = React.useRef(mode);
@@ -298,10 +306,12 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   const close = React.useCallback(() => setOpen(false), [setOpen]);
   const { ref: panelRef, layer } = useModalLayer<HTMLElement>({
     open,
-    closeOnEscape: true,
-    closeOnOutsideClick: true,
+    closeOnEscape,
+    closeOnOutsideClick,
     onDismiss: close,
   });
+  // The scrim of the off-canvas panel fades in and out with it (`overlayMotion`).
+  const scrim = usePresence(open);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const mergedRootRef = useMergedRefs<HTMLDivElement>(ref, rootRef);
 
@@ -336,6 +346,20 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
   // The rail is a surface beside the page: one layer above it (white on the light gray page).
   const depth = useNestedSurfaceDepth();
 
+  // The shell around (if any) relays the navigation to its triggers outside the rail: the
+  // AppHeader menu button, a Toggle in the header, a BottomNav «Ещё».
+  const publishNav = useAppShellNavPublisher();
+  const expanded = offCanvas ? open : mode === "expanded";
+  const shellNav = React.useMemo<AppShellNavState>(
+    () => ({ navId, offCanvas, open, setOpen, expanded, toggle }),
+    [navId, offCanvas, open, setOpen, expanded, toggle],
+  );
+  React.useLayoutEffect(() => {
+    if (!publishNav) return;
+    publishNav(shellNav);
+    return () => publishNav(null);
+  }, [publishNav, shellNav]);
+
   const context = React.useMemo<SidebarContextValue>(
     () => ({ persist, mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels }),
     [persist, mode, setMode, open, setOpen, toggle, offCanvas, size, navId, labels],
@@ -343,49 +367,49 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
 
   return (
     <SidebarProvider value={context}>
-      <div
-        {...rest}
-        ref={mergedRootRef}
-        className={cx(styles.root, className)}
-        data-depth={depth}
-        {...toDataAttributes({
-          size,
-          mode,
-          "panel-mode": mode === "hidden" ? lastVisibleRef.current : mode,
-          "from-hidden": (mode !== "hidden" && previousModeRef.current === "hidden") || undefined,
-          "off-canvas": offCanvas || undefined,
-          state: offCanvas ? (open ? "open" : "closed") : undefined,
-          ready: ready || undefined,
-        })}
-      >
-        {offCanvas ? (
-          <button
-            type="button"
-            className={styles.scrim}
-            aria-label={labels.close}
-            tabIndex={-1}
-            onClick={close}
-          />
-        ) : null}
-        <nav
-          ref={panelRef}
-          id={navId}
-          className={styles.panel}
-          aria-label={labels.navigation}
-          inert={(offCanvas && !open) || (!offCanvas && mode === "hidden") || undefined}
+      <InSidebarContext.Provider value={true}>
+        <div
+          {...rest}
+          ref={mergedRootRef}
+          className={cx(styles.root, className)}
+          data-depth={depth}
+          {...toDataAttributes({
+            size,
+            mode,
+            "panel-mode": mode === "hidden" ? lastVisibleRef.current : mode,
+            "from-hidden": (mode !== "hidden" && previousModeRef.current === "hidden") || undefined,
+            "off-canvas": offCanvas || undefined,
+            state: offCanvas ? (open ? "open" : "closed") : undefined,
+          })}
         >
-          <LayerProvider value={offCanvas ? layer : null}>
-            <AnchorRectProvider value={offCanvas ? null : anchorRect}>
-              <SurfaceDepthProvider value={depth}>
-                <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-              </SurfaceDepthProvider>
-            </AnchorRectProvider>
-          </LayerProvider>
-        </nav>
-      </div>
+          {/* A press on the scrim is a press outside the panel: the layer dismisses it
+              (`closeOnOutsideClick`). */}
+          {offCanvas && scrim.mounted ? (
+            <div
+              role="presentation"
+              className={cx(sheet.scrim, overlayMotion.scrim)}
+              data-state={scrim.state}
+              onAnimationEnd={scrim.onExitEnd}
+            />
+          ) : null}
+          <nav
+            ref={panelRef}
+            id={navId}
+            className={styles.panel}
+            aria-label={labels.navigation}
+            inert={(offCanvas && !open) || (!offCanvas && mode === "hidden") || undefined}
+          >
+            <LayerProvider value={offCanvas ? layer : null}>
+              <AnchorRectProvider value={offCanvas ? null : anchorRect}>
+                <SurfaceDepthProvider value={depth}>{tier.provide(children)}</SurfaceDepthProvider>
+              </AnchorRectProvider>
+            </LayerProvider>
+          </nav>
+        </div>
+      </InSidebarContext.Provider>
     </SidebarProvider>
   );
-});
+}
 SidebarRoot.displayName = "Sidebar.Root";
 
 // ─── Regions ──────────────────────────────────────────────────────────────────
@@ -397,25 +421,17 @@ function SidebarHeader({ className, ...rest }: SidebarHeaderProps) {
 }
 SidebarHeader.displayName = "Sidebar.Header";
 
-export type SidebarContentProps = React.HTMLAttributes<HTMLElement>;
+export type SidebarContentProps = React.HTMLAttributes<HTMLElement> & {
+  ref?: React.Ref<HTMLElement>;
+};
 
 /**
  * Scrolling middle region: a ScrollContainer with edge fades and no scrollbar (a classic bar
  * would take width and move the icons; the rail scrolls by wheel, touch and focus).
  */
-const SidebarContent = React.forwardRef<HTMLElement, SidebarContentProps>(function SidebarContent(
-  { className, ...rest },
-  ref,
-) {
-  return (
-    <ScrollContainer
-      {...rest}
-      ref={ref}
-      scrollbar="hidden"
-      className={cx(styles.content, className)}
-    />
-  );
-});
+function SidebarContent({ className, ...rest }: SidebarContentProps) {
+  return <ScrollContainer {...rest} scrollbar="hidden" className={cx(styles.content, className)} />;
+}
 SidebarContent.displayName = "Sidebar.Content";
 
 export type SidebarFooterProps = React.ComponentProps<"div">;
@@ -474,6 +490,10 @@ function SidebarGroup({
   // leaving the rail ends it, so entering the rail grows the row with the rail.
   const [swap, setSwap] = React.useState(rail);
   if (swap && !rail) setSwap(false);
+  // The kit fold for the items and for the rail row; both stand still on mount, so a group that
+  // opens for the current page appears open.
+  const bodyFold = useDisclosure({ open });
+  const railFold = useDisclosure({ open: folded });
 
   if (!disclosure) {
     return (
@@ -511,9 +531,11 @@ function SidebarGroup({
         <button
           id={labelId}
           type="button"
-          className={cx(styles.groupLabel, styles.groupTrigger)}
+          className={cx(styles.groupLabel, styles.groupTrigger, touchTargetRowClass)}
           aria-expanded={open}
           aria-controls={bodyId}
+          // The chevron turns on the fold's clock once it moves (still on mount).
+          data-mounted={bodyFold.root["data-mounted"]}
           // On the rail too it folds and unfolds the group (folded, the `…` row takes its place);
           // hovering it shows the whole name, which the rail cuts.
           onClick={() => {
@@ -534,12 +556,13 @@ function SidebarGroup({
         {...toDataAttributes({ swap: (swap && rail) || undefined })}
       >
         <div
-          className={cx(styles.disclosure, styles.groupRail)}
-          data-state={folded ? "open" : "closed"}
+          className={cx(railFold.root.className, styles.groupRail)}
+          data-state={railFold.root["data-state"]}
+          data-mounted={railFold.root["data-mounted"]}
           inert={!folded || undefined}
           aria-hidden={!folded || undefined}
         >
-          <div className={styles.disclosureClip}>
+          <div className={railFold.clip.className}>
             <div className={styles.groupItems}>
               <Popover.Root
                 open={flyout.open}
@@ -562,7 +585,7 @@ function SidebarGroup({
                       {...toDataAttributes({ "active-path": active || undefined })}
                       {...flyout.triggerHandlers}
                     >
-                      <span className={styles.icon} aria-hidden="true">
+                      <span className={cx(styles.icon, iconSlotClass)} aria-hidden="true">
                         <Icon name="action.more" />
                       </span>
                       <AttentionDot hue={hue} shown={folded} />
@@ -581,11 +604,12 @@ function SidebarGroup({
         <div
           ref={bodyRef}
           id={bodyId}
-          className={styles.disclosure}
-          data-state={open ? "open" : "closed"}
+          className={bodyFold.root.className}
+          data-state={bodyFold.root["data-state"]}
+          data-mounted={bodyFold.root["data-mounted"]}
           inert={!open || undefined}
         >
-          <div className={styles.disclosureClip}>
+          <div className={bodyFold.clip.className}>
             <div className={styles.groupItems}>{children}</div>
           </div>
         </div>
@@ -607,7 +631,9 @@ export type SidebarItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "
  * a quiet trailing glyph (an external link) that hides in compact mode.
  */
 function SidebarItemIcon({ className, ...rest }: SidebarItemIconProps) {
-  return <span {...rest} className={cx(styles.icon, className)} aria-hidden="true" />;
+  return (
+    <span {...rest} className={cx(styles.icon, iconSlotClass, className)} aria-hidden="true" />
+  );
 }
 SidebarItemIcon.displayName = "Sidebar.ItemIcon";
 
@@ -650,7 +676,7 @@ function SidebarItemCount({ children, color, variant, className, ...rest }: Side
         {children}
       </Badge.Root>
       <ControlSizeProvider value="l">
-        <Badge.Dot className={cx(palette.hue, styles.dot)} data-color={hue} />
+        <Badge.Dot color={hue} className={styles.dot} />
       </ControlSizeProvider>
     </>
   );
@@ -693,8 +719,8 @@ function AttentionDot({
   return (
     <ControlSizeProvider value="l">
       <Badge.Dot
-        className={cx(palette.hue, styles.dot, inline && styles.dotInline)}
-        data-color={hue}
+        color={hue}
+        className={cx(styles.dot, inline && styles.dotInline)}
         data-attention={shown ? "shown" : "hidden"}
       />
     </ControlSizeProvider>
@@ -717,32 +743,32 @@ function SidebarItemShortcut({ children, className, ...rest }: SidebarItemShortc
 }
 SidebarItemShortcut.displayName = "Sidebar.ItemShortcut";
 
-export type SidebarItemActionProps = Omit<
+type SidebarItemActionBaseProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "children" | "onClick" | "aria-label"
 > & {
-  /** Accessible name and tooltip of the action («Создать задачу»). */
   label: string;
-  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
-  /** The glyph; a plus by default. */
-  children?: React.ReactNode;
   ref?: React.Ref<HTMLButtonElement>;
 };
+
+/** A button that runs `onClick`, or with `asChild` the one link it renders as (a page, `mailto:`). */
+export type SidebarItemActionProps = SidebarItemActionBaseProps &
+  (
+    | {
+        asChild?: false;
+        onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+        children?: React.ReactNode;
+      }
+    | { asChild: true; onClick?: never; children: React.ReactElement }
+  );
 
 /**
  * A small action at the end of the row (create, add): the kit row action (`internal/RowAction`, a
  * ghost icon Button one tier down), shown on hover and focus of the row. It sits next to the item
- * element, never inside it.
+ * element, never inside it. With `asChild` it is a link with the same look.
  */
-function SidebarItemAction({
-  label,
-  onClick,
-  disabled,
-  children,
-  className,
-  ...rest
-}: SidebarItemActionProps) {
+function SidebarItemAction({ label, children, className, ...rest }: SidebarItemActionProps) {
   const { size } = useSidebar();
   return (
     <RowAction
@@ -751,15 +777,12 @@ function SidebarItemAction({
       size={size}
       side="right"
       className={cx(styles.action, className)}
-      disabled={disabled}
-      onClick={onClick}
     >
       {children ?? <Icon name="action.add" />}
     </RowAction>
   );
 }
 SidebarItemAction.displayName = "Sidebar.ItemAction";
-
 type ItemParts = {
   /** Plain text of the label (tooltip, flyout title). */
   text: string;
@@ -856,58 +879,51 @@ function withAction(element: React.ReactElement, action: React.ReactElement | nu
 // ─── Item ─────────────────────────────────────────────────────────────────────
 
 type SidebarItemOwnProps = {
-  /** Current page: `aria-current="page"`. Links rendered by a router may set it themselves. */
   current?: boolean;
   disabled?: boolean;
-  /** Render the single child element (e.g. a router link) as the item; its children are the content. */
   asChild?: boolean;
-  /**
-   * Label and parts: `Sidebar.ItemIcon` (leading, or trailing after the label),
-   * `Sidebar.ItemCount`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`.
-   */
   children?: React.ReactNode;
 };
 
 export type SidebarItemProps = SidebarItemOwnProps &
-  Omit<React.ComponentPropsWithoutRef<"button">, keyof SidebarItemOwnProps> & {
-    /** Renders an `<a>` instead of a `<button>`. */
+  Omit<React.HTMLAttributes<HTMLElement>, keyof SidebarItemOwnProps> & {
     href?: string;
     target?: string;
     rel?: string;
+    ref?: React.Ref<HTMLElement>;
   };
 
-const SidebarItem = React.forwardRef<HTMLElement, SidebarItemProps>(function SidebarItem(
-  {
-    current = false,
-    disabled = false,
-    asChild = false,
-    href,
-    className,
-    children,
-    onClick,
-    type,
-    ...rest
-  },
-  ref,
-) {
+/**
+ * A row of the navigation: a link (`href`), a button, or the consumer's element (`asChild`, a
+ * router link) — the kit's interactive element with its disabled guard. Activating it closes the
+ * compact flyout and the off-canvas panel, unless `onClick` prevents the default.
+ */
+function SidebarItem({
+  current = false,
+  disabled = false,
+  asChild = false,
+  href,
+  target,
+  rel,
+  className,
+  children,
+  onClick,
+  ...rest
+}: SidebarItemProps) {
   const { offCanvas, setOpen } = useSidebar();
   const flyout = React.useContext(FlyoutContext);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    if (disabled) {
-      event.preventDefault();
-      return;
-    }
-    onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+    onClick?.(event);
     if (event.defaultPrevented) return;
-    // Navigating closes the compact flyout and the off-canvas panel.
     flyout?.close();
-    if (offCanvas && (href !== undefined || asChild)) setOpen(false);
+    if (offCanvas) setOpen(false);
   };
 
   const shared = {
     ...rest,
-    className: cx(styles.item, className),
+    disabled,
+    className: cx(styles.item, touchTargetRowClass, press.press, className),
     onClick: handleClick,
     "aria-current": current ? ("page" as const) : rest["aria-current"],
     ...toDataAttributes({
@@ -916,44 +932,33 @@ const SidebarItem = React.forwardRef<HTMLElement, SidebarItemProps>(function Sid
     }),
   };
 
-  const child =
-    asChild && React.isValidElement<{ children?: React.ReactNode }>(children) ? children : null;
+  const child = asChild ? slotChild(children, "Sidebar.Item") : null;
   const parts = splitItemChildren(child ? child.props.children : children);
 
   let element: React.ReactElement;
   if (child) {
     element = (
-      <Slot {...shared} ref={ref} aria-disabled={disabled || undefined}>
+      <InteractiveElement {...shared} element="slot">
         {React.cloneElement(child, undefined, parts.content)}
-      </Slot>
+      </InteractiveElement>
     );
   } else if (href !== undefined) {
     element = (
-      <a
-        {...(shared as React.ComponentPropsWithoutRef<"a">)}
-        ref={ref as React.Ref<HTMLAnchorElement>}
-        href={disabled ? undefined : href}
-        aria-disabled={disabled || undefined}
-      >
+      <InteractiveElement {...shared} element="link" href={href} target={target} rel={rel}>
         {parts.content}
-      </a>
+      </InteractiveElement>
     );
   } else {
     element = (
-      <button
-        {...shared}
-        ref={ref as React.Ref<HTMLButtonElement>}
-        type={type ?? "button"}
-        disabled={disabled}
-      >
+      <InteractiveElement {...shared} element="button">
         {parts.content}
-      </button>
+      </InteractiveElement>
     );
   }
 
   const tooltipText = parts.text || (rest["aria-label"] ?? "");
   return withAction(<CompactTooltip text={tooltipText}>{element}</CompactTooltip>, parts.action);
-});
+}
 SidebarItem.displayName = "Sidebar.Item";
 
 // ─── Sub-list ─────────────────────────────────────────────────────────────────
@@ -970,14 +975,14 @@ type SubContextValue = {
   flyout: RailFlyoutState;
   /** Hue of a child count that needs attention, for the parent's dot while folded. */
   hue: PaletteColor | null;
+  /** The fold moves (one frame after mount): the parent's chevron turns with it. */
+  moving: boolean;
 };
 
 const [SubProvider, useSubContext] = createComponentContext<SubContextValue>("Sidebar.Sub");
 
 export type SidebarSubProps = React.ComponentProps<"div"> & {
-  /** Children shown (controlled). */
   open?: boolean;
-  /** Initial open state (uncontrolled). A sub-list also opens by itself when a child becomes current. */
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 };
@@ -1185,6 +1190,8 @@ function SidebarSub({
     isElementOf<SidebarSubContentProps>(node, SidebarSubContent),
   ) as React.ReactElement<SidebarSubContentProps> | undefined;
   const hue = content ? attentionHue(content.props.children) : null;
+  // The fold of the inline children moves once mounted: the parent's chevron turns on its clock.
+  const moving = useDisclosure({ open }).root["data-mounted"] !== undefined;
 
   const context = React.useMemo<SubContextValue>(
     () => ({
@@ -1196,8 +1203,9 @@ function SidebarSub({
       active,
       flyout,
       hue,
+      moving,
     }),
-    [open, setOpen, id, active, flyout, hue],
+    [open, setOpen, id, active, flyout, hue, moving],
   );
 
   return (
@@ -1208,7 +1216,7 @@ function SidebarSub({
           if (!next) flyout.close(false);
         }}
       >
-        <div {...rest} className={cx(styles.sub, className)} data-state={open ? "open" : "closed"}>
+        <div {...rest} className={className} data-state={open ? "open" : "closed"}>
           {children}
         </div>
         {rail && content ? (
@@ -1226,99 +1234,96 @@ export type SidebarSubTriggerProps = Omit<
   React.ComponentPropsWithoutRef<"button">,
   "aria-expanded" | "aria-controls"
 > & {
-  /** Label and parts, as in `Sidebar.Item`: `Sidebar.ItemIcon`, `Sidebar.ItemCount`. */
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
 /**
  * The parent row: a disclosure button with a chevron at the end. Expanded it shows / hides the
  * children; on the rail it opens the flyout (hover, click, `Enter` · `Space` · `→`).
  */
-const SidebarSubTrigger = React.forwardRef<HTMLButtonElement, SidebarSubTriggerProps>(
-  function SidebarSubTrigger(
-    {
-      className,
-      children,
-      disabled = false,
-      onClick,
-      onKeyDown,
-      onPointerEnter,
-      onPointerLeave,
-      ...rest
-    },
-    ref,
-  ) {
-    const sub = useSubContext();
-    const rail = useRail();
-    const parts = splitItemChildren(
-      children,
-      <Icon name="nav.chevronDown" className={styles.chevron} />,
-    );
-    const { flyout } = sub;
-    const mergedRef = useMergedRefs<HTMLButtonElement>(ref, flyout.triggerRef);
+function SidebarSubTrigger({
+  className,
+  children,
+  disabled = false,
+  onClick,
+  onKeyDown,
+  onPointerEnter,
+  onPointerLeave,
+  ref,
+  ...rest
+}: SidebarSubTriggerProps) {
+  const sub = useSubContext();
+  const rail = useRail();
+  const parts = splitItemChildren(
+    children,
+    <Icon name="nav.chevronDown" className={styles.chevron} />,
+  );
+  const { flyout } = sub;
+  const mergedRef = useMergedRefs<HTMLButtonElement>(ref, flyout.triggerRef);
 
-    const button = (
-      <button
-        {...rest}
-        ref={mergedRef}
-        id={sub.triggerId}
-        type="button"
-        disabled={disabled}
-        className={cx(styles.item, className)}
-        aria-expanded={rail ? flyout.open : sub.open}
-        aria-controls={rail ? undefined : sub.contentId}
-        aria-haspopup={rail ? "dialog" : undefined}
-        {...toDataAttributes({
-          "active-path": sub.active || undefined,
-          disabled: disabled || undefined,
-        })}
-        onClick={(event) => {
-          onClick?.(event);
-          if (event.defaultPrevented) return;
-          if (rail) flyout.triggerHandlers.onClick();
-          else sub.setOpen((prev) => !prev);
-        }}
-        onKeyDown={(event) => {
-          onKeyDown?.(event);
-          if (event.defaultPrevented) return;
-          const { key } = event;
-          if (rail) {
-            flyout.triggerHandlers.onKeyDown(event);
-            return;
-          }
-          if (key === "ArrowRight" && !sub.open) {
-            event.preventDefault();
-            sub.setOpen(true);
-          } else if (key === "ArrowLeft" && sub.open) {
-            event.preventDefault();
-            sub.setOpen(false);
-          }
-        }}
-        onPointerEnter={(event) => {
-          onPointerEnter?.(event);
-          if (rail) flyout.triggerHandlers.onPointerEnter(event);
-        }}
-        onPointerLeave={(event) => {
-          onPointerLeave?.(event);
-          flyout.triggerHandlers.onPointerLeave(event);
-        }}
-      >
-        {parts.content}
-        {/* Folded — inline, or always on the rail where the children live in the flyout. */}
-        <AttentionDot hue={sub.hue} shown={rail || !sub.open} />
-      </button>
-    );
+  const button = (
+    <button
+      {...rest}
+      ref={mergedRef}
+      id={sub.triggerId}
+      type="button"
+      disabled={disabled}
+      className={cx(styles.item, touchTargetRowClass, press.press, className)}
+      aria-expanded={rail ? flyout.open : sub.open}
+      aria-controls={rail ? undefined : sub.contentId}
+      aria-haspopup={rail ? "dialog" : undefined}
+      {...toDataAttributes({
+        "active-path": sub.active || undefined,
+        disabled: disabled || undefined,
+        mounted: sub.moving || undefined,
+      })}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
+        if (rail) flyout.triggerHandlers.onClick();
+        else sub.setOpen((prev) => !prev);
+      }}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (event.defaultPrevented) return;
+        const { key } = event;
+        if (rail) {
+          flyout.triggerHandlers.onKeyDown(event);
+          return;
+        }
+        if (key === "ArrowRight" && !sub.open) {
+          event.preventDefault();
+          sub.setOpen(true);
+        } else if (key === "ArrowLeft" && sub.open) {
+          event.preventDefault();
+          sub.setOpen(false);
+        }
+      }}
+      onPointerEnter={(event) => {
+        onPointerEnter?.(event);
+        if (rail) flyout.triggerHandlers.onPointerEnter(event);
+      }}
+      onPointerLeave={(event) => {
+        onPointerLeave?.(event);
+        flyout.triggerHandlers.onPointerLeave(event);
+      }}
+    >
+      {parts.content}
+      {/* Folded — inline, or always on the rail where the children live in the flyout. */}
+      <AttentionDot hue={sub.hue} shown={rail || !sub.open} />
+    </button>
+  );
 
-    return (
-      <CompactTooltip
-        text={parts.text || (rest["aria-label"] ?? "")}
-        canOpen={() => !flyout.pointerInside.current && !flyout.open}
-      >
-        <Popover.Anchor>{button}</Popover.Anchor>
-      </CompactTooltip>
-    );
-  },
-);
+  return (
+    <CompactTooltip
+      text={parts.text || (rest["aria-label"] ?? "")}
+      canOpen={() => !flyout.pointerInside.current && !flyout.open}
+    >
+      <Popover.Anchor>{button}</Popover.Anchor>
+    </CompactTooltip>
+  );
+}
 SidebarSubTrigger.displayName = "Sidebar.SubTrigger";
 
 /** Child rows on the guide line: each row draws its own branch of the line. */
@@ -1343,6 +1348,7 @@ function SidebarSubContent({ className, children, ref, ...rest }: SidebarSubCont
   const rail = useRail();
   // On the rail the children live in the flyout; the inline copy stays folded and inert.
   const shown = sub.open && !rail;
+  const fold = useDisclosure({ open: shown });
   return (
     // biome-ignore lint/a11y/useSemanticElements: a nav group of links, not a form fieldset
     <div
@@ -1351,11 +1357,12 @@ function SidebarSubContent({ className, children, ref, ...rest }: SidebarSubCont
       id={sub.contentId}
       role="group"
       aria-labelledby={sub.triggerId}
-      className={styles.disclosure}
-      data-state={shown ? "open" : "closed"}
+      className={fold.root.className}
+      data-state={fold.root["data-state"]}
+      data-mounted={fold.root["data-mounted"]}
       inert={!shown || undefined}
     >
-      <div className={styles.disclosureClip}>
+      <div className={fold.clip.className}>
         <div className={cx(styles.subList, className)}>{subRows(children)}</div>
       </div>
     </div>
@@ -1378,24 +1385,29 @@ function SidebarBrandLogo({ className, ...rest }: SidebarBrandLogoProps) {
 SidebarBrandLogo.displayName = "Sidebar.BrandLogo";
 
 export type SidebarBrandProps = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
-  /** Muted second line under the name (workspace, plan). */
   description?: React.ReactNode;
-  /** Renders an `<a>` (usually home). */
   href?: string;
-  /** Render the single child element (e.g. a router link) as the brand; its children are the content. */
   asChild?: boolean;
-  /** `Sidebar.BrandLogo` and the product name. */
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLElement>;
 };
 
-/** Product block in `Sidebar.Header`: logo, name and a muted line; in compact only the logo stays. */
-const SidebarBrand = React.forwardRef<HTMLElement, SidebarBrandProps>(function SidebarBrand(
-  { description, href, asChild = false, className, children, onClick, ...rest },
-  ref,
-) {
+/**
+ * Product block in `Sidebar.Header`: logo, name and a muted line; in compact only the logo stays.
+ * A link with `href`, the consumer's element with `asChild`, a button with only `onClick` (one way
+ * to reach it from the keyboard), else a static block. Activating it closes the off-canvas panel.
+ */
+function SidebarBrand({
+  description,
+  href,
+  asChild = false,
+  className,
+  children,
+  onClick,
+  ...rest
+}: SidebarBrandProps) {
   const { offCanvas, setOpen } = useSidebar();
-  const child =
-    asChild && React.isValidElement<{ children?: React.ReactNode }>(children) ? children : null;
+  const child = asChild ? slotChild(children, "Sidebar.Brand") : null;
   const nodes = React.Children.toArray(child ? child.props.children : children);
   const logo = nodes.find((node) => isElementOf(node, SidebarBrandLogo));
   const name = nodes.filter((node) => !isElementOf(node, SidebarBrandLogo));
@@ -1423,75 +1435,74 @@ const SidebarBrand = React.forwardRef<HTMLElement, SidebarBrandProps>(function S
   // stays in the link (faded, not removed), so it keeps its accessible name in every mode.
   if (child) {
     return (
-      <Slot {...shared} ref={ref}>
+      <InteractiveElement {...shared} element="slot">
         {React.cloneElement(child, undefined, content)}
-      </Slot>
+      </InteractiveElement>
     );
   }
   if (href !== undefined) {
     return (
-      <a
-        {...(shared as React.ComponentPropsWithoutRef<"a">)}
-        ref={ref as React.Ref<HTMLAnchorElement>}
-        href={href}
-      >
+      <InteractiveElement {...shared} element="link" href={href}>
         {content}
-      </a>
+      </InteractiveElement>
+    );
+  }
+  if (onClick !== undefined) {
+    return (
+      <InteractiveElement {...shared} element="button">
+        {content}
+      </InteractiveElement>
     );
   }
   return (
-    <div {...rest} ref={ref as React.Ref<HTMLDivElement>} className={shared.className}>
+    <InteractiveElement {...rest} className={shared.className} element="static">
       {content}
-    </div>
+    </InteractiveElement>
   );
-});
+}
 SidebarBrand.displayName = "Sidebar.Brand";
 
 // ─── Account ──────────────────────────────────────────────────────────────────
 
 export type SidebarAccountProps = Omit<React.ComponentPropsWithoutRef<"button">, "children"> & {
-  /** Muted second line under the name (email, role). */
   description?: React.ReactNode;
-  /** An `Avatar.Root` (sized to the tier by the slot) and the person's name. */
   children?: React.ReactNode;
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
 /**
  * The signed-in person at the bottom of the rail: avatar, name, a muted line and a chevron. A
  * button, so it can be a `Dropdown.Trigger` child; in compact mode only the avatar stays.
  */
-const SidebarAccount = React.forwardRef<HTMLButtonElement, SidebarAccountProps>(
-  function SidebarAccount({ description, className, children, type, ...rest }, ref) {
-    const nodes = React.Children.toArray(children);
-    const avatar = nodes.find((node) => isElementOf(node, Avatar.Root));
-    const name = nodes.filter((node) => node !== avatar);
+function SidebarAccount({ description, className, children, type, ...rest }: SidebarAccountProps) {
+  const nodes = React.Children.toArray(children);
+  const avatar = nodes.find((node) => isElementOf(node, Avatar.Root));
+  const name = nodes.filter((node) => node !== avatar);
 
-    return (
-      <CompactTooltip text={nodeText(name).trim()}>
-        <button
-          {...rest}
-          ref={ref}
-          type={type ?? "button"}
-          className={cx(styles.account, className)}
-        >
-          {/* The slot sizes the avatar to the tier (`--avatar-slot-size`); the name says who it is. */}
-          {avatar ? (
-            <span className={styles.accountAvatar} aria-hidden="true">
-              {avatar}
-            </span>
-          ) : null}
-          <span className={styles.accountText}>
-            <span className={styles.accountName}>{name}</span>
-            {description == null ? null : (
-              <span className={styles.accountDescription}>{description}</span>
-            )}
+  return (
+    <CompactTooltip text={nodeText(name).trim()}>
+      <button
+        {...rest}
+        type={type ?? "button"}
+        className={cx(styles.account, touchTargetRowClass, press.press, className)}
+      >
+        {/* The slot sizes the avatar to the tier (`--avatar-slot-size`); the name says who it is. */}
+        {avatar ? (
+          <span className={styles.accountAvatar} aria-hidden="true">
+            {avatar}
           </span>
-          <Icon name="nav.chevronsUpDown" className={styles.accountChevron} />
-        </button>
-      </CompactTooltip>
-    );
-  },
-);
+        ) : null}
+        <span className={styles.accountText}>
+          <span className={styles.accountName}>{name}</span>
+          {description == null ? null : (
+            <span className={styles.accountDescription}>{description}</span>
+          )}
+        </span>
+        <Icon name="nav.chevronsUpDown" className={styles.accountChevron} />
+      </button>
+    </CompactTooltip>
+  );
+}
 SidebarAccount.displayName = "Sidebar.Account";
 
 // ─── Toggle ───────────────────────────────────────────────────────────────────
@@ -1500,77 +1511,120 @@ export type SidebarToggleProps = Omit<
   React.ComponentPropsWithoutRef<"button">,
   "children" | "aria-label" | "aria-expanded" | "aria-controls"
 > & {
-  /**
-   * `item` — a row in the rail. `header` — a small icon button at the end of `Sidebar.Header`
-   * while expanded that moves onto the rail's outer edge as a round button in compact mode.
-   */
   variant?: "item" | "header";
+  ref?: React.Ref<HTMLButtonElement>;
 };
 
 /**
- * Toggles expanded ↔ compact on desktop (hidden → expanded) and closes the panel off-canvas. Its
- * label comes from `labels`.
+ * Toggles expanded ↔ compact on desktop (hidden → expanded) and opens / closes the panel
+ * off-canvas. Inside the rail it reads the Sidebar; anywhere else in an `AppShell` (a header, a
+ * page toolbar) it reads the navigation the shell relays — the way back to a hidden rail. Its
+ * label comes from the Sidebar `labels`.
  */
-const SidebarToggle = React.forwardRef<HTMLButtonElement, SidebarToggleProps>(
-  function SidebarToggle({ variant = "item", className, onClick, ...rest }, ref) {
-    const { mode, offCanvas, open, toggle, navId, labels } = useSidebar();
-    const expanded = offCanvas ? open : mode === "expanded";
-    const label = offCanvas ? labels.close : expanded ? labels.collapse : labels.expand;
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      onClick?.(event);
-      if (!event.defaultPrevented) toggle();
-    };
-
-    if (variant === "header") {
-      // One element for both places: it rides the rail edge and changes shape with transforms.
-      const onEdge = !offCanvas && mode === "compact";
-      return (
-        <Tooltip.Root>
-          <Tooltip.Trigger>
-            <Button.Root
-              {...rest}
-              ref={ref}
-              variant={onEdge ? "soft" : "ghost"}
-              tone="neutral"
-              size="xs"
-              className={cx(styles.headerToggle, className)}
-              aria-expanded={expanded}
-              aria-controls={navId}
-              aria-label={label}
-              onClick={handleClick}
-            >
-              <Button.Icon>
-                <Icon name="nav.chevronsLeft" className={styles.headerToggleIcon} />
-              </Button.Icon>
-            </Button.Root>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="right">{label}</Tooltip.Content>
-        </Tooltip.Root>
-      );
-    }
-
-    return (
-      <CompactTooltip text={label}>
-        <button
-          {...rest}
-          ref={ref}
-          type="button"
-          className={cx(styles.item, className)}
-          aria-expanded={expanded}
-          aria-controls={navId}
-          aria-label={label}
-          onClick={handleClick}
-        >
-          <SidebarItemIcon>
-            <Icon name={expanded ? "nav.sidebarCollapse" : "nav.sidebarExpand"} />
-          </SidebarItemIcon>
-          <span className={styles.label}>{label}</span>
-        </button>
-      </CompactTooltip>
-    );
-  },
-);
+function SidebarToggle(props: SidebarToggleProps) {
+  const inSidebar = React.useContext(InSidebarContext);
+  return inSidebar ? <RailToggle {...props} /> : <ShellToggle {...props} />;
+}
 SidebarToggle.displayName = "Sidebar.Toggle";
+
+/** The glyph of an item toggle: the panel folds while it is in view, unfolds otherwise. */
+const toggleGlyph = (expanded: boolean): IconName =>
+  expanded ? "nav.sidebarCollapse" : "nav.sidebarExpand";
+
+/** The toggle in the rail: the Sidebar's own state, the rail's tooltip and edge motion. */
+function RailToggle({ variant = "item", className, onClick, ref, ...rest }: SidebarToggleProps) {
+  const { mode, offCanvas, open, toggle, navId, labels } = useSidebar();
+  const expanded = offCanvas ? open : mode === "expanded";
+  const label = offCanvas ? labels.close : expanded ? labels.collapse : labels.expand;
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    if (!event.defaultPrevented) toggle();
+  };
+
+  if (variant === "header") {
+    // One element for both places: it rides the rail edge and changes shape with transforms.
+    const onEdge = !offCanvas && mode === "compact";
+    return (
+      <Tooltip.Root>
+        <Tooltip.Trigger>
+          <Button.Root
+            {...rest}
+            ref={ref}
+            variant={onEdge ? "soft" : "ghost"}
+            tone="neutral"
+            size="xs"
+            className={cx(styles.headerToggle, className)}
+            aria-expanded={expanded}
+            aria-controls={navId}
+            aria-label={label}
+            onClick={handleClick}
+          >
+            <Button.Icon>
+              <Icon name="nav.chevronsLeft" className={styles.headerToggleIcon} />
+            </Button.Icon>
+          </Button.Root>
+        </Tooltip.Trigger>
+        <Tooltip.Content side="right">{label}</Tooltip.Content>
+      </Tooltip.Root>
+    );
+  }
+
+  return (
+    <CompactTooltip text={label}>
+      <button
+        {...rest}
+        ref={ref}
+        type="button"
+        className={cx(styles.item, touchTargetRowClass, press.press, className)}
+        aria-expanded={expanded}
+        aria-controls={navId}
+        aria-label={label}
+        onClick={handleClick}
+      >
+        <SidebarItemIcon>
+          <GlyphSwap>
+            <Icon name={toggleGlyph(expanded)} />
+          </GlyphSwap>
+        </SidebarItemIcon>
+        <span className={styles.label}>{label}</span>
+      </button>
+    </CompactTooltip>
+  );
+}
+
+/**
+ * The toggle outside the rail: a soft icon Button that works from the shell's navigation; nothing
+ * outside a shell with a Sidebar.
+ */
+function ShellToggle({ variant: _variant, onClick, ref, ...rest }: SidebarToggleProps) {
+  const nav = useAppShellNav();
+  if (!nav) return null;
+  const label = nav.expanded
+    ? nav.offCanvas
+      ? SIDEBAR_LABELS.close
+      : SIDEBAR_LABELS.collapse
+    : SIDEBAR_LABELS.expand;
+  return (
+    <Button.Root
+      {...rest}
+      ref={ref}
+      variant="soft"
+      tone="neutral"
+      aria-expanded={nav.expanded}
+      aria-controls={nav.navId}
+      aria-label={label}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) nav.toggle();
+      }}
+    >
+      {/* The Button glyph cross-fades by itself. */}
+      <Button.Icon>
+        <Icon name={toggleGlyph(nav.expanded)} />
+      </Button.Icon>
+    </Button.Root>
+  );
+}
 
 export const Sidebar = {
   Root: SidebarRoot,

@@ -2,7 +2,7 @@
  * The stage of a `screen` example: the preview imitates the app's content panel — the page with the
  * AppShell gutters and top air — so a screen renders in the context it ships to. A screen that opens
  * with its own `AppHeader.Root` gets it as the shell gives it: at the panel's top edge, across the
- * panel, with the panel's gutters (`--shell-gutter`), and the page under it starts at the shell's
+ * panel, with the panel's gutters (`--prime-layout-gutter`), and the page under it starts at the shell's
  * top air (`--stage-top`, AppShell's `--shell-top`).
  */
 
@@ -17,7 +17,7 @@
 .screen {
   --stage-gutter: var(--prime-layout-gutter-l);
   --stage-top: var(--prime-space-8);
-  --shell-gutter: var(--stage-gutter);
+  --prime-layout-gutter: var(--stage-gutter);
 
   box-sizing: border-box;
   min-width: 0;

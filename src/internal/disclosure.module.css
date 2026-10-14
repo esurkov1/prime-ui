@@ -13,6 +13,10 @@
  *   --disclosure-ease            opening (default `standard`)
  *   --disclosure-close-duration  closing (default: the opening's)
  *   --disclosure-close-ease      closing (default: the opening's)
+ * Two parts sharing one grid cell may cross-fade instead of folding (the Sidebar's folded group and
+ * its rail row): the height of one then follows the other, through the timing of its own height:
+ *   --disclosure-height-open     the height opening: `duration easing delay` (default: the clock)
+ *   --disclosure-height-close    the height closing (default: the closing clock)
  * Reduced motion zeroes the duration tokens: it opens and closes at once. Nothing moves before
  * `data-mounted` (one frame after mount, `useDisclosure`).
  */
@@ -38,14 +42,14 @@
 
 .root[data-mounted] {
   transition:
-    grid-template-rows var(--disclosure-close-clock),
+    grid-template-rows var(--disclosure-height-close, var(--disclosure-close-clock)),
     visibility var(--prime-motion-instant) linear
     var(--disclosure-close-duration, var(--disclosure-duration, var(--prime-motion-duration-base)));
 }
 
 .root[data-mounted][data-state="open"] {
   transition:
-    grid-template-rows var(--disclosure-open-clock),
+    grid-template-rows var(--disclosure-height-open, var(--disclosure-open-clock)),
     visibility var(--prime-motion-instant);
 }
 

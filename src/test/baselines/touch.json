@@ -1,7 +1,1 @@
-[
-  "src/components/accordion/Accordion.module.css: hover :not(:disabled) ignores aria-disabled",
-  "src/components/accordion/Accordion.module.css: hover :not(:disabled) ignores aria-disabled #2",
-  "src/components/stepper/Stepper.module.css: hover :not(:disabled) ignores aria-disabled",
-  "src/components/stepper/Stepper.module.css: hover :not(:disabled) ignores aria-disabled #2",
-  "src/layout/sidebar/Sidebar.module.css: hover transform without (pointer: fine)"
-]
+[]

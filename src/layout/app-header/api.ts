@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "AppHeader.Root",
-      en: "`ref` → `HTMLElement`. The page's sticky `<header>` bar at the top of the content panel: only what the current page needs — its title, tools and own buttons. As high as the Sidebar brand row, lined up with the page. Icon buttons inside are `soft`, not `ghost`.",
-      ru: "Липкая полоса `<header>` страницы вверху панели содержимого: только то, что нужно текущей странице, — её заголовок, инструменты и кнопки. Высотой со строку бренда Sidebar, выровнена со страницей. Иконочные кнопки — `soft`, не `ghost`.",
+      en: "`ref` → `HTMLElement`. The page's sticky `<header>`: its title, tools and own buttons. In an `AppShell` it renders in the shell's header row and, while the Sidebar is off-canvas, leads with the menu button. Icon buttons inside are `soft`.",
+      ru: "Липкая полоса `<header>` страницы: заголовок, инструменты и кнопки. В `AppShell` рендерится в строке шапки каркаса и, пока Sidebar выезжающий, начинается с кнопки меню. Иконочные кнопки — `soft`.",
       props: [
         {
           name: "labels",
@@ -89,8 +89,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Tools",
-      en: "`ref` → `HTMLDivElement`. The page's tools in the header (a `PageToolbar.Root`): the header's second row, full width under the title row, as a direct child of `AppHeader.Root`.",
-      ru: "Инструменты страницы в шапке (`PageToolbar.Root`): вторая строка шапки во всю ширину под строкой заголовка, прямой потомок `AppHeader.Root`.",
+      en: "`ref` → `HTMLDivElement`. The page's tools in the header (a `PageToolbar.Root`): the header's second row, full width under the title row, wherever it is written in `AppHeader.Root` — directly, in a fragment or inside a component of the page.",
+      ru: "Инструменты страницы в шапке (`PageToolbar.Root`): вторая строка шапки во всю ширину под строкой заголовка, где бы её ни написали внутри `AppHeader.Root` — напрямую, во фрагменте или внутри компонента страницы.",
       props: [
         {
           name: "…rest",
@@ -115,27 +115,23 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.MenuButton",
-      en: "`ref` → `HTMLButtonElement`. A soft neutral icon `Button` named by `labels.menu` that opens the off-canvas Sidebar; wire `onClick` and `aria-expanded`.",
-      ru: "Иконочная `Button` (soft, neutral) с именем из `labels.menu`, открывает Sidebar поверх страницы; передайте `onClick` и `aria-expanded`.",
+      en: "`ref` → `HTMLButtonElement`. The menu button the header draws by itself, placed elsewhere: a soft icon `Button` named by `labels.menu` that opens the shell's off-canvas Sidebar. Nothing while the Sidebar is a rail, or outside a shell.",
+      ru: "Кнопка меню, которую шапка рисует сама, в другом месте: мягкая `Button`-иконка с именем из `labels.menu`, открывает выезжающий Sidebar каркаса. Ничего, пока Sidebar — рельс, или вне каркаса.",
       props: [
         {
-          name: "show",
-          type: '"narrow" | "always"',
-          default: '"narrow"',
-          en: '`narrow` — only below 768px, where a Sidebar with `offCanvas="auto"` leaves the layout; `always` — on every width (`offCanvas="always"`).',
-          ru: '`narrow` — только уже 768px, где Sidebar с `offCanvas="auto"` уходит из раскладки; `always` — на любой ширине (`offCanvas="always"`).',
-        },
-        {
           name: "…rest",
-          type: "ButtonHTMLAttributes<HTMLButtonElement>",
-          en: "`onClick`, `aria-expanded`, `aria-label` (replaces `labels.menu`), `className` and the other button attributes.",
-          ru: "`onClick`, `aria-expanded`, `aria-label` (заменяет `labels.menu`), `className` и остальные атрибуты кнопки.",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "children" | "aria-expanded" | "aria-controls">',
+          en: "`onClick` (runs first; `preventDefault()` stops the toggle), `aria-label` (replaces `labels.menu`), `className` and the other button attributes.",
+          ru: "`onClick` (выполняется первым; `preventDefault()` отменяет переключение), `aria-label` (заменяет `labels.menu`), `className` и остальные атрибуты кнопки.",
         },
       ],
     },
   ],
   labels: labelRows(APP_HEADER_LABELS, {
-    menu: { en: "Name of `AppHeader.MenuButton`.", ru: "Имя `AppHeader.MenuButton`." },
+    menu: {
+      en: "Name of the menu button (drawn by the header or `AppHeader.MenuButton`).",
+      ru: "Имя кнопки меню (её рисует шапка или `AppHeader.MenuButton`).",
+    },
   }),
   accessibility: {
     keyboard: [
@@ -156,8 +152,8 @@ export const api: ComponentApi = {
         ru: "Root — ориентир `<header>` (banner), когда стоит на верхнем уровне страницы.",
       },
       {
-        en: "MenuButton is named by `labels.menu`; pass `aria-expanded` (whether the Sidebar is open).",
-        ru: "MenuButton названа `labels.menu`; передайте `aria-expanded` — открыт ли Sidebar.",
+        en: "The menu button is named by `labels.menu`; `aria-expanded` (whether the Sidebar panel is open) and `aria-controls` (its `<nav>`) come from the shell.",
+        ru: "Кнопка меню названа `labels.menu`; `aria-expanded` (открыта ли панель Sidebar) и `aria-controls` (её `<nav>`) приходят от каркаса.",
       },
       {
         en: "The name of `AppHeader.Title` is the page heading `<h1>`; the description sits next to it, outside its accessible name. One `<h1>` per page: in the header on app pages, `PageContent.Title` on a document page (whose header has no title).",

@@ -39,7 +39,6 @@ export function PlaygroundLayout() {
         header={
           <AppHeader.Root>
             <AppHeader.Start>
-              <AppHeader.MenuButton aria-expanded={navOpen} onClick={() => setNavOpen(true)} />
               {/* Where you are, not a second title: the page heading is the h1 below. */}
               <Breadcrumb.Root>
                 {category ? <Breadcrumb.Item>{category.label}</Breadcrumb.Item> : null}

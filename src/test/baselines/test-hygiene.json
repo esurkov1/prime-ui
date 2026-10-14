@@ -1,5 +1,4 @@
 [
-  "src/components/breadcrumb/Breadcrumb.test.tsx: reads a .module.css as text",
   "src/components/chat-list/ChatList.virtual.test.tsx: queries [class*=",
   "src/components/composer/Composer.test.tsx: queries [class*=",
   "src/components/composer/Composer.test.tsx: reads a .module.css as text",

@@ -347,7 +347,6 @@ export const PART_REFS = {
   "Stepper.Content": ["HTMLSpanElement"],
   "Stepper.Title": ["HTMLSpanElement"],
   "Stepper.Description": ["HTMLSpanElement"],
-  "Stepper.Arrow": ["SVGSVGElement"],
   "Switch.Root": ["HTMLInputElement"],
   "Switch.Label": ["HTMLSpanElement"],
   "Tabs.Root": ["HTMLDivElement"],

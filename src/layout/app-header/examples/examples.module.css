@@ -12,7 +12,7 @@
     var(--prime-shadow-raised);
 }
 
-/* narrow.tsx: the same window, phone-wide, so the title and its line of data truncate. */
+/* narrow.tsx: an app window, phone-wide, so the title and its line of data truncate. */
 .phone {
   width: min(100%, var(--prime-layout-narrow-width));
   margin-inline: auto;

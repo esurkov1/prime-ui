@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "AppShell.Root",
-      en: "`ref` → `HTMLDivElement`. Grid of the nav column (Sidebar, a surface one layer above the page) and the content panel (the page itself); every child that is not `AppShell.Nav` goes into the panel.",
-      ru: "Сетка: колонка навигации (Sidebar, поверхность на слой выше страницы) и панель содержимого (сама страница); всё, кроме `AppShell.Nav`, попадает в панель.",
+      en: "`ref` → `HTMLDivElement`. Grid of the nav column and the content panel (the page itself); every child but `AppShell.Nav` goes into the panel. Owns the navigation its Sidebar publishes (`useAppShellNav`) and the header row an `AppHeader.Root` anywhere in it renders in.",
+      ru: "Сетка: колонка навигации и панель содержимого (сама страница); всё, кроме `AppShell.Nav`, попадает в панель. Хранит навигацию, которую публикует Sidebar (`useAppShellNav`), и строку шапки, где рендерится `AppHeader.Root` из любого места каркаса.",
       props: [
         {
           name: "fillViewport",
@@ -89,8 +89,8 @@ export const api: ComponentApi = {
         {
           name: "header",
           type: "ReactNode",
-          en: "The top bar of the panel, an `AppHeader.Root`; no header when omitted.",
-          ru: "Верхняя полоса панели — `AppHeader.Root`; без него шапки нет.",
+          en: "The default header row, an `AppHeader.Root`: a page that renders its own header replaces it while that page is on screen.",
+          ru: "Шапка по умолчанию — `AppHeader.Root`: страница со своей шапкой заменяет её, пока эта страница на экране.",
         },
         {
           name: "footer",
@@ -123,6 +123,59 @@ export const api: ComponentApi = {
           ru: "Пропсы Root: `fillViewport`, `className` и атрибуты div.",
         },
       ],
+    },
+  ],
+  types: [
+    {
+      name: "AppShellNavState",
+      en: "The navigation of the shell, as its Sidebar publishes it.",
+      ru: "Навигация каркаса, как её публикует Sidebar.",
+      fields: [
+        {
+          name: "navId",
+          type: "string",
+          en: "`id` of the navigation landmark, for `aria-controls`.",
+          ru: "`id` ориентира навигации — для `aria-controls`.",
+        },
+        {
+          name: "offCanvas",
+          type: "boolean",
+          en: 'The navigation is an off-canvas panel now (a phone, or `offCanvas="always"`).',
+          ru: 'Навигация сейчас — выезжающая панель (телефон или `offCanvas="always"`).',
+        },
+        {
+          name: "open",
+          type: "boolean",
+          en: "The off-canvas panel is open.",
+          ru: "Выезжающая панель открыта.",
+        },
+        {
+          name: "setOpen",
+          type: "(open: boolean) => void",
+          en: "Opens or closes the off-canvas panel.",
+          ru: "Открывает или закрывает выезжающую панель.",
+        },
+        {
+          name: "expanded",
+          type: "boolean",
+          en: "The navigation is in view: the off-canvas panel open, or the rail expanded.",
+          ru: "Навигация видна: выезжающая панель открыта или рельс развёрнут.",
+        },
+        {
+          name: "toggle",
+          type: "() => void",
+          en: "Opens or closes the off-canvas panel; on screen, expands or folds the rail.",
+          ru: "Открывает или закрывает выезжающую панель; на экране разворачивает или сворачивает рельс.",
+        },
+      ],
+    },
+  ],
+  functions: [
+    {
+      name: "useAppShellNav()",
+      type: "() => AppShellNavState | null",
+      en: "The navigation of the nearest `AppShell.Root` for a trigger outside the rail (a BottomNav «Ещё», an own menu button); `null` outside a shell or without a Sidebar in it.",
+      ru: "Навигация ближайшего `AppShell.Root` для кнопки вне рельса («Ещё» в BottomNav, своя кнопка меню); `null` вне каркаса или без Sidebar в нём.",
     },
   ],
   labels: [],

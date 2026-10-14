@@ -1,6 +1,5 @@
 [
   "src/hooks/breakpoints.ts: HOVER_QUERY is unused",
-  "src/hooks/breakpoints.ts: OFF_CANVAS_QUERY is test-only",
   "src/hooks/useDraft.ts: useDraft is test-only",
   "src/hooks/useEdgeOverflow.ts: EdgeOverflow is unused",
   "src/hooks/useEdgeOverflow.ts: EdgeOverflowAxis is unused",
@@ -18,7 +17,6 @@
   "src/internal/AnchorRectContext.tsx: AnchorRect is unused",
   "src/internal/ChartTooltip.tsx: ChartTooltipProps is unused",
   "src/internal/Disclosure.tsx: DisclosureProps is unused",
-  "src/internal/Disclosure.tsx: useDisclosure is test-only",
   "src/internal/MorphText.tsx: MorphTextProps is unused",
   "src/internal/ProgressLegend.tsx: ProgressLegendProps is unused",
   "src/internal/RollingNumber.tsx: RollingNumberProps is unused",

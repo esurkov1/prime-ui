@@ -22,15 +22,15 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Sidebar.Root",
-      en: "`ref` → `HTMLDivElement`. The rail wrapper with the `<nav>` inside; owns the mode and the off-canvas panel and passes the tier to items.",
-      ru: "Обёртка рельса с `<nav>` внутри: хранит режим и выезжающую панель, передаёт ярус пунктам.",
+      en: "`ref` → `HTMLDivElement`. The rail wrapper with the `<nav>` inside; owns the mode and the off-canvas panel and passes the tier to items. In an `AppShell` it publishes its navigation to the shell (`useAppShellNav`).",
+      ru: "Обёртка рельса с `<nav>` внутри: хранит режим и выезжающую панель, передаёт ярус пунктам. В `AppShell` публикует навигацию каркасу (`useAppShellNav`).",
       props: [
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; coloured counts and row actions one tier down, plain counts keep the item size. The rail width does not change.",
-          ru: "Ярус пунктов: высота 28 · 32 · 36 · 40 · 48, кегль, иконка; цветные счётчики и действия в строке на ярус меньше, простые счётчики — размера пункта. Ширина рельса не меняется.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; coloured counts and row actions one tier down, plain counts keep the item size. The rail width does not change. Without it the tier of its host, else `m`.",
+          ru: "Ярус пунктов: высота 28 · 32 · 36 · 40 · 48, кегль, иконка; цветные счётчики и действия в строке на ярус меньше, простые счётчики — размера пункта. Ширина рельса не меняется. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "mode",
@@ -67,8 +67,8 @@ export const api: ComponentApi = {
         {
           name: "onOpenChange",
           type: "(open: boolean) => void",
-          en: "Off-canvas open / close: Toggle, scrim, Escape, navigation, leaving the narrow viewport.",
-          ru: "Открытие и закрытие панели: Toggle, подложка, Escape, переход, выход из узкого экрана.",
+          en: "Off-canvas open / close: Toggle, the AppHeader menu button, scrim, Escape, an activated item, leaving the narrow viewport.",
+          ru: "Открытие и закрытие панели: Toggle, кнопка меню AppHeader, подложка, Escape, нажатый пункт, выход из узкого экрана.",
         },
         {
           name: "offCanvas",
@@ -78,10 +78,24 @@ export const api: ComponentApi = {
           ru: "Когда рельс становится выезжающей панелью, которую открывает `open`: `auto` — уже 768px (окно браузера); `always` — на любой ширине; `never` — всегда рельс.",
         },
         {
+          name: "closeOnOutsideClick",
+          type: "boolean",
+          default: "true",
+          en: "A press on the scrim (outside the off-canvas panel) closes the panel.",
+          ru: "Нажатие на подложку (вне выезжающей панели) закрывает панель.",
+        },
+        {
+          name: "closeOnEscape",
+          type: "boolean",
+          default: "true",
+          en: "Escape closes the off-canvas panel.",
+          ru: "Escape закрывает выезжающую панель.",
+        },
+        {
           name: "persistKey",
           type: "string",
-          en: "`localStorage` key that keeps the mode and the open groups and sub-lists across reloads (keyed by `id`, else label text). Wins over `defaultMode` / `defaultOpen`.",
-          ru: "Ключ `localStorage`, под которым режим и открытые группы и вложенные списки переживают перезагрузку (по `id`, иначе по тексту подписи). Главнее `defaultMode` / `defaultOpen`.",
+          en: "`localStorage` key that keeps the mode (never `hidden`: the mode it left) and the open groups and sub-lists (by `id`, else label text) across reloads. Wins over `defaultMode` / `defaultOpen`.",
+          ru: "Ключ `localStorage` для режима (не `hidden`: режим до скрытия) и открытых групп и вложенных списков (по `id` или тексту подписи) между перезагрузками. Главнее `defaultMode` / `defaultOpen`.",
         },
         {
           name: "labels",
@@ -112,8 +126,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Brand",
-      en: "`ref` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays.",
-      ru: "Блок продукта: `Sidebar.BrandLogo`, название и приглушённая строка; ссылка `<a>` при `href`, единственный дочерний элемент при `asChild`, иначе `<div>`. В компактном режиме остаётся логотип.",
+      en: "`ref` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, a `<button>` with only `onClick`, else a `<div>`. Activating it closes the off-canvas panel. In compact mode only the logo stays.",
+      ru: "Блок продукта: `Sidebar.BrandLogo`, название и приглушённая строка; ссылка `<a>` при `href`, единственный дочерний элемент при `asChild`, кнопка `<button>` только с `onClick`, иначе `<div>`. Нажатие закрывает выезжающую панель. В компактном режиме остаётся логотип.",
       props: [
         {
           name: "description",
@@ -143,8 +157,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
-          en: "`onClick`, `aria-*`, `className` and the other attributes.",
-          ru: "`onClick`, `aria-*`, `className` и остальные атрибуты.",
+          en: "`onClick` (runs first; `preventDefault()` keeps the panel open; without `href` it makes the brand a button), `aria-*`, `className` and the other attributes.",
+          ru: "`onClick` (выполняется первым; `preventDefault()` оставляет панель открытой; без `href` делает бренд кнопкой), `aria-*`, `className` и остальные атрибуты.",
         },
       ],
     },
@@ -217,8 +231,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Item",
-      en: '`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode. With `Sidebar.ItemAction` the element and the action sit side by side in a row `<div>`.',
-      ru: '`<button type="button">`, ссылка `<a>` при `href` или единственный дочерний элемент при `asChild`; в компактном режиме — подсказка с подписью. С `Sidebar.ItemAction` элемент и действие стоят рядом в строке `<div>`.',
+      en: '`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode; activating it closes the flyout and the off-canvas panel. With `Sidebar.ItemAction` both sit in a row `<div>`.',
+      ru: '`<button type="button">`, ссылка `<a>` при `href` или единственный дочерний элемент при `asChild`; в компактном режиме — подсказка с подписью. Нажатие закрывает всплывающую панель рельса и выезжающую панель. С `Sidebar.ItemAction` элемент и действие стоят рядом в строке `<div>`.',
       props: [
         {
           name: "current",
@@ -267,9 +281,9 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: "ButtonHTMLAttributes<HTMLButtonElement>",
-          en: "`onClick`, `aria-*`, `className` and the other attributes.",
-          ru: "`onClick`, `aria-*`, `className` и остальные атрибуты.",
+          type: "HTMLAttributes<HTMLElement>",
+          en: "`onClick` (runs first; `preventDefault()` keeps the flyout and the panel open), `aria-*`, `className` and the other attributes.",
+          ru: "`onClick` (выполняется первым; `preventDefault()` оставляет панели открытыми), `aria-*`, `className` и остальные атрибуты.",
         },
       ],
     },
@@ -347,8 +361,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.ItemAction",
-      en: "`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. Shows on hover and focus of the row (always on touch); hidden on the compact rail.",
-      ru: "Действие в строке (создать, добавить): призрачная кнопка-иконка `Button` на ярус меньше с подсказкой, рядом с элементом пункта — не внутри. Видно при наведении и фокусе строки (на сенсорных — всегда); в компактном рельсе скрыто.",
+      en: "`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it; with `asChild` a link with the same look. Shows on hover and focus of the row (always on touch); hidden on the compact rail.",
+      ru: "Действие в строке (создать, добавить): призрачная кнопка-иконка `Button` на ярус меньше с подсказкой, рядом с элементом пункта — не внутри; с `asChild` — ссылка того же вида. Видно при наведении и фокусе строки (на сенсорных — всегда); в компактном рельсе скрыто.",
       props: [
         {
           name: "label",
@@ -360,9 +374,15 @@ export const api: ComponentApi = {
         {
           name: "onClick",
           type: "(event: MouseEvent<HTMLButtonElement>) => void",
-          required: true,
-          en: "The action.",
-          ru: "Действие.",
+          en: "The action; required without `asChild`.",
+          ru: "Действие; обязательно без `asChild`.",
+        },
+        {
+          name: "asChild",
+          type: "boolean",
+          default: "false",
+          en: "Renders the single child (a link: another page, `mailto:`) as the action; its children are the glyph.",
+          ru: "Рендерит единственный дочерний элемент (ссылку: другая страница, `mailto:`) как действие; его дети — знак.",
         },
         {
           name: "disabled",
@@ -373,8 +393,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: 'The glyph; `<Icon name="action.add" />` by default.',
-          ru: 'Знак; по умолчанию `<Icon name="action.add" />`.',
+          en: 'The glyph (`<Icon name="action.add" />` by default), or with `asChild` the link around it.',
+          ru: 'Знак (по умолчанию `<Icon name="action.add" />`) или с `asChild` ссылка вокруг него.',
         },
         {
           name: "…rest",
@@ -427,7 +447,7 @@ export const api: ComponentApi = {
     {
       name: "Sidebar.SubContent",
       en: '`ref` → `HTMLDivElement`. `<div role="group">` named by the trigger: the child `Sidebar.Item`s on a faint guide line under the parent icon, labels aligned with the parent label. Height animates; closed content is inert. On the compact rail the same children render in the flyout.',
-      ru: '`<div role="group">`, названная родителем: дочерние `Sidebar.Item` на тонкой направляющей под иконкой родителя, подписи выровнены по подписи родителя. Высота анимируется; свёрнутое содержимое inert. В компактном рельсе те же пункты рендерятся во всплывающей панели.',
+      ru: '`<div role="group">`, названная родителем: дочерние `Sidebar.Item` на тонкой направляющей под иконкой родителя, подписи выровнены по подписи родителя. Высота плавно меняется; свёрнутое содержимое inert. В компактном рельсе те же пункты рендерятся во всплывающей панели.',
       props: [
         {
           name: "…rest",
@@ -464,15 +484,15 @@ export const api: ComponentApi = {
     },
     {
       name: "Sidebar.Toggle",
-      en: "`ref` → `HTMLButtonElement`. Toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.",
-      ru: "Переключатель: развернуть ↔ компактный на десктопе (скрытый → развёрнутый), закрыть выезжающую панель; подпись, иконка, `aria-expanded` и `aria-controls` — из состояния и `labels`.",
+      en: "`ref` → `HTMLButtonElement`. Expanded ↔ compact on desktop (hidden → expanded), open ↔ closed off-canvas; label, icon and ARIA from state and `labels`. Outside the rail, in an `AppShell`, a soft icon `Button` on the shell's navigation — the way back to a hidden rail.",
+      ru: "Развёрнутый ↔ компактный на десктопе (скрытый → развёрнутый), открыть ↔ закрыть выезжающую панель; подпись, иконка и ARIA — из состояния и `labels`. Вне рельса, в `AppShell`, — мягкая кнопка-иконка `Button` на навигации каркаса, путь к скрытому рельсу.",
       props: [
         {
           name: "variant",
           type: '"item" | "header"',
           default: '"item"',
-          en: "`item` — a row in the rail. `header` — an icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode.",
-          ru: "`item` — пункт в рельсе. `header` — кнопка-иконка «‹‹» в конце `Sidebar.Header`, в компактном режиме переезжает на кромку рельса.",
+          en: "In the rail: `item` — a row; `header` — an icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode.",
+          ru: "В рельсе: `item` — пункт; `header` — кнопка-иконка «‹‹» в конце `Sidebar.Header`, в компактном режиме переезжает на кромку рельса.",
         },
         {
           name: "…rest",
@@ -499,8 +519,8 @@ export const api: ComponentApi = {
       ru: "Подпись Toggle в компактном или скрытом режиме.",
     },
     close: {
-      en: "Toggle label off-canvas and the scrim label.",
-      ru: "Подпись Toggle на узком экране и подложки.",
+      en: "Toggle label while the off-canvas panel is open.",
+      ru: "Подпись Toggle, пока выезжающая панель открыта.",
     },
   }),
   accessibility: {
@@ -569,12 +589,12 @@ export const api: ComponentApi = {
         ru: "Аватар аккаунта скрыт от скринридеров; кнопку называют имя и приглушённая строка.",
       },
       {
-        en: "Off-canvas: scrim, focus trap and Escape; the scrim is a button labelled `labels.close`.",
-        ru: "Выезжающая панель: подложка, ловушка фокуса и Escape; подложка — кнопка с `labels.close`.",
+        en: "Off-canvas: a decorative scrim (a press on it is a press outside, `closeOnOutsideClick`), focus trap and Escape (`closeOnEscape`); focus returns to the opener.",
+        ru: "Выезжающая панель: декоративная подложка (нажатие на неё — нажатие снаружи, `closeOnOutsideClick`), ловушка фокуса и Escape (`closeOnEscape`); фокус возвращается к открывшей кнопке.",
       },
       {
-        en: "Toggle: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.",
-        ru: "Toggle: `aria-expanded`, `aria-controls` на `<nav>`, подпись из `labels`.",
+        en: "Toggle, the AppHeader menu button and `useAppShellNav` triggers: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.",
+        ru: "Toggle, кнопка меню AppHeader и свои кнопки через `useAppShellNav`: `aria-expanded`, `aria-controls` на `<nav>`, подпись из `labels`.",
       },
     ],
   },

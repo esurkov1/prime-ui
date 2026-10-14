@@ -1,9 +1,10 @@
 /*
- * AppHeader — the bar at the top of the content panel. One row as high as the Sidebar brand row
- * (control height + 8, inside 12 of air above and below), so the brand and the title share one
- * line across the two planes. It sits on the panel surface with no divider (depth from fill), is
- * sticky, keeps the top safe-area inset and the shell gutters, and lays itself out from its own
- * width: below 36rem the title icon goes, the title and its line of data truncate.
+ * AppHeader — the bar at the top of the content panel. Its title row is as high as the Sidebar
+ * brand row (control height + 8, inside 12 of air above and below), so the brand and the title
+ * share one line across the two planes; the page tools, when the page has them, are a second row
+ * under it. It sits on the panel surface with no divider (depth from fill), is sticky, keeps the
+ * top safe-area inset and the page gutter, and lays itself out from its own width: below 36rem the
+ * title icon goes, the title and its line of data truncate.
  */
 .root {
   container: prime-app-header / inline-size;
@@ -12,9 +13,10 @@
   box-sizing: border-box;
   flex: none;
   min-width: 0;
-  /* The shell gutters, so the header lines up with the page in main; 16 outside a shell. */
+  /* The page gutter (`--prime-layout-gutter`): in the shell's header row it lines up with the page
+     in main; a header in a frame inside the page takes that frame's (the small gutter). */
   padding-block: max(var(--prime-space-3), env(safe-area-inset-top, 0px)) var(--prime-space-3);
-  padding-inline: var(--shell-gutter, var(--prime-space-4));
+  padding-inline: var(--prime-layout-gutter);
   background: var(--prime-color-layer-current);
   color: var(--prime-color-text-primary);
 }
@@ -60,7 +62,8 @@
   min-width: 0;
 }
 
-/* A tile shaped like the soft neutral buttons on the bar: control m square, radius and fill. */
+/* A tile shaped like the soft neutral buttons on the bar: control m square, radius and fill. The
+   glyph slot (`iconSlotClass`) sizes a bare `<svg>` (an app's own icon set) like the kit Icon. */
 .icon {
   --prime-icon-size: var(--prime-control-m-icon);
 
@@ -73,12 +76,6 @@
   border-radius: var(--prime-control-m-radius);
   background: var(--prime-color-fill-subtle);
   color: var(--prime-color-text-secondary);
-}
-
-/* A bare `<svg>` (an app's own icon set) gets the same box as the kit Icon. */
-.icon > svg {
-  width: var(--prime-icon-size);
-  height: var(--prime-icon-size);
 }
 
 .titleText {
@@ -101,16 +98,6 @@
 
 .description {
   color: var(--prime-color-text-muted);
-}
-
-/* ─── Menu button ───────────────────────────────────────────────────────── */
-
-/* Matches Sidebar `offCanvas="auto"`: from 768px the rail is back and the button leaves — the
-   inverse of `OFF_CANVAS_QUERY` (src/hooks/breakpoints.ts). */
-@media (min-width: 768px) {
-  .menuButton[data-show="narrow"] {
-    display: none;
-  }
 }
 
 /* ─── Narrow header ─────────────────────────────────────────────────────── */

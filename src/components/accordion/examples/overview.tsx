@@ -1,4 +1,4 @@
-/** A FAQ where one answer is open at a time — `defaultValue`. */
+/** A FAQ where one answer is open at a time and every question heads its section — `defaultValue`, `as`. */
 import { Accordion } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -27,7 +27,7 @@ export default function AccordionOverviewExample() {
       <Accordion.Root defaultValue="delivery">
         {FAQ.map((item) => (
           <Accordion.Item key={item.value} value={item.value}>
-            <Accordion.Header>
+            <Accordion.Header as="h2">
               <Accordion.Trigger>{item.question}</Accordion.Trigger>
             </Accordion.Header>
             <Accordion.Content>{item.answer}</Accordion.Content>

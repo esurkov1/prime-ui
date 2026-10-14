@@ -1,10 +1,8 @@
 [
-  "src/components/accordion/Accordion.module.css: .icon svg",
   "src/components/banner/Banner.module.css: .icon svg",
   "src/components/card/Card.module.css: .icon svg",
   "src/components/empty-page/EmptyPage.module.css: .iconWrap svg",
   "src/components/login-form/LoginForm.module.css: .logo > svg, .logo > img",
   "src/components/notification/Notification.module.css: .iconWrap svg",
-  "src/internal/menu.module.css: .itemIcon > svg",
-  "src/layout/sidebar/Sidebar.module.css: .icon > :global(svg)"
+  "src/internal/menu.module.css: .itemIcon > svg"
 ]

@@ -1,6 +1,4 @@
 [
-  "src/components/accordion/api.ts: keyboard Tab — Tab",
-  "src/components/breadcrumb/api.ts: keyboard Enter — Enter",
   "src/components/card/api.ts: keyboard Tab — Tab",
   "src/components/chart-frame/api.ts: keyboard Enter · Space — Enter",
   "src/components/chart-frame/api.ts: keyboard Tab — Tab",
@@ -116,7 +114,6 @@
   "src/components/sparkline/api.ts: keyboard Tab — Tab",
   "src/components/sparkline/api.ts: keyboard ← · → · ↓ · ↑ — ↑",
   "src/components/sparkline/api.ts: keyboard ← · → · ↓ · ↑ — ↓",
-  "src/components/stepper/api.ts: keyboard Enter · Space — Space",
   "src/components/switch/api.ts: keyboard Space — Space",
   "src/components/switch/api.ts: keyboard Tab — Tab",
   "src/components/tag-select/api.ts: keyboard Space — Space",
@@ -129,7 +126,6 @@
   "src/components/textarea/api.ts: keyboard Tab — Tab",
   "src/components/textarea/api.ts: keyboard ← · → — ←",
   "src/components/tooltip/api.ts: keyboard Tab — Tab",
-  "src/layout/app-header/api.ts: keyboard Enter · Space — Space",
   "src/layout/sidebar/api.ts: keyboard ArrowDown · ArrowUp · Home · End — ArrowUp",
   "src/layout/sidebar/api.ts: keyboard ArrowDown · ArrowUp · Home · End — End",
   "src/layout/sidebar/api.ts: keyboard ArrowDown · ArrowUp · Home · End — Home",

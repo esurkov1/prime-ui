@@ -1,9 +1,9 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
+
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Breadcrumb } from "./Breadcrumb";
 
@@ -149,17 +149,86 @@ describe("Breadcrumb", () => {
     );
     const nav = screen.getByRole("navigation", { name: "Навигационная цепочка" });
     expect(nav).toHaveAttribute("data-collapsible", "true");
-    // Three levels and the auto ellipsis, which names the skipped levels for screen readers.
+    // Three levels and the auto «…», a menu button named after the skipped levels.
     expect(container.querySelectorAll("li")).toHaveLength(4);
-    expect(container.querySelectorAll("li")[1]).toHaveTextContent("Скрытые разделы");
+    const more = screen.getByRole("button", { name: "Скрытые разделы" });
+    expect(container.querySelectorAll("li")[1]).toContainElement(more);
+    expect(more).toHaveAttribute("aria-haspopup", "menu");
     expect(screen.getByRole("link", { name: "A" })).toBeInTheDocument();
   });
 
+  it("the «…» menu lists the hidden middle levels, links stay links", async () => {
+    const user = userEvent.setup();
+    render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Item href="/orders">Orders</Breadcrumb.Item>
+        <Breadcrumb.Item>Archive</Breadcrumb.Item>
+        <Breadcrumb.Item current>Order</Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    await user.click(screen.getByRole("button", { name: "Скрытые разделы" }));
+    const menu = screen.getByRole("menu");
+    const items = within(menu).getAllByRole("menuitem");
+    expect(items.map((item) => item.textContent)).toEqual(["Orders", "Archive"]);
+    expect(items[0]).toHaveAttribute("href", "/orders");
+    expect(items[0]).toHaveFocus();
+    expect(items[1]).toBeDisabled();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Скрытые разделы" })).toHaveFocus();
+  });
+
+  it("Enter on the focused «…» opens the menu; arrows move between the hidden levels", async () => {
+    const user = userEvent.setup();
+    render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Item href="/sales">Sales</Breadcrumb.Item>
+        <Breadcrumb.Item href="/orders">Orders</Breadcrumb.Item>
+        <Breadcrumb.Item current>Order</Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    screen.getByRole("button", { name: "Скрытые разделы" }).focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("menuitem", { name: "Sales" })).toHaveFocus();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("menuitem", { name: "Orders" })).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(screen.getByRole("menuitem", { name: "Sales" })).toHaveFocus();
+  });
+
   it("CSS: collapsed middle levels are display: none (never focusable while invisible)", () => {
-    const css = readFileSync(join(__dirname, "Breadcrumb.module.css"), "utf8");
-    const query = css.slice(css.indexOf("@container"));
-    expect(query).toMatch(/\.item:nth-child\(n \+ 3\):not\(:last-child\)\s*\{\s*display:\s*none;/);
-    expect(query).not.toMatch(/clip-path/);
+    const rule = cssRule(
+      "src/components/breadcrumb/Breadcrumb.module.css",
+      '.root[data-collapsible="true"] .item:nth-child(n + 3):not(:last-child)',
+      ["@container (max-width: 30rem)"],
+    );
+    expect(cssValue(rule, "display")).toBe("none");
+  });
+
+  it("the separator takes the trail's placeholder colour, the links the muted tone", () => {
+    render(
+      <Breadcrumb.Root>
+        <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        <Breadcrumb.Item current>Order</Breadcrumb.Item>
+      </Breadcrumb.Root>,
+    );
+    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("data-tone", "muted");
+    const separator = screen.getByText("Order").closest("li")?.querySelector("svg");
+    expect(separator).not.toHaveAttribute("data-tone");
+  });
+
+  it("the root takes the host tier when it has no size", () => {
+    render(
+      <ControlSizeProvider value="s">
+        <Breadcrumb.Root>
+          <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+        </Breadcrumb.Root>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByRole("navigation")).toHaveAttribute("data-size", "s");
+    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("data-size", "s");
   });
 
   it("does not collapse short paths", () => {
@@ -186,6 +255,9 @@ describe("Breadcrumb", () => {
     );
     await user.tab();
     expect(screen.getByRole("link", { name: "Home" })).toHaveFocus();
+    // The auto «…» (CSS shows it only in a narrow container; jsdom applies no stylesheet).
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Скрытые разделы" })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole("link", { name: "Orders" })).toHaveFocus();
     await user.tab();
