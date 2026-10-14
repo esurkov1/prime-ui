@@ -1,8 +1,11 @@
 import type * as React from "react";
 
-import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
+import { fieldLabelTextClass, fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Label.module.css";
@@ -16,53 +19,87 @@ export const LABEL_LABELS: LabelLabels = { optional: "необязательно
 
 export type LabelRootProps = Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "size"> & {
   disabled?: boolean;
-  /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
   size?: ControlSize;
-  /** Appends a red `*` (decorative, `aria-hidden`). Put native `required` on the control itself. */
   required?: boolean;
-  /** Appends the muted optional marker (`labels.optional`). */
   optional?: boolean;
+  secondary?: boolean;
   labels?: Partial<LabelLabels>;
   ref?: React.Ref<HTMLLabelElement>;
 };
 
 function LabelRoot({
   className,
-  disabled,
+  disabled: disabledProp,
   children,
   size: sizeProp,
   required,
   optional,
-  labels,
+  secondary,
+  labels: labelsProp,
   ref,
   ...rest
 }: LabelRootProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
+  const labels = useLabels(LABEL_LABELS, labelsProp);
   return (
     // biome-ignore lint/a11y/noLabelWithoutControl: field label primitive; association via htmlFor or wrapping control is caller responsibility
     <label
       ref={ref}
-      className={cx(styles.root, className)}
+      className={cx(fieldTierClass, fieldLabelTextClass, styles.root, className)}
       aria-disabled={disabled || undefined}
       {...rest}
-      {...toDataAttributes({ disabled: disabled || undefined, size })}
+      {...toDataAttributes({
+        disabled: disabled || undefined,
+        secondary: secondary || undefined,
+        size: tier.size,
+      })}
     >
       {/* `Label.Icon` (and any kit icon inside) takes the label tier. */}
-      <ControlSizeProvider value={size}>
-        {children}
-        {required ? (
-          <span className={styles.asterisk} aria-hidden="true">
-            *
-          </span>
-        ) : null}
-        {optional ? (
-          <span className={styles.optional}>{labels?.optional ?? LABEL_LABELS.optional}</span>
-        ) : null}
-      </ControlSizeProvider>
+      {tier.provide(
+        <>
+          {children}
+          <LabelMarks required={required} optional={optional} optionalLabel={labels.optional} />
+        </>,
+      )}
     </label>
   );
 }
 LabelRoot.displayName = "Label.Root";
+
+/**
+ * The marks after a field name: the red `*` of a required field (decorative, `aria-hidden`; the
+ * control carries `required`) or the muted optional marker (visible text, part of the name). The
+ * one copy of the kit — Label and the choice rows (Checkbox, Switch) draw them. Inside a Label the
+ * marks dim with it; elsewhere `disabled` dims them.
+ */
+export function LabelMarks({
+  required,
+  optional,
+  optionalLabel,
+  disabled,
+}: {
+  required?: boolean;
+  optional?: boolean;
+  optionalLabel: string;
+  disabled?: boolean;
+}) {
+  const dim = disabled || undefined;
+  return (
+    <>
+      {required ? (
+        <span className={styles.asterisk} aria-hidden="true" data-disabled={dim}>
+          *
+        </span>
+      ) : null}
+      {optional ? (
+        <span className={styles.optional} data-disabled={dim}>
+          {optionalLabel}
+        </span>
+      ) : null}
+    </>
+  );
+}
 
 export type LabelIconProps = React.HTMLAttributes<HTMLSpanElement> & {
   ref?: React.Ref<HTMLSpanElement>;

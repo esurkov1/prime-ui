@@ -7,7 +7,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
-import type { ControlSize } from "@/internal/states";
+import { type ControlSize, compactTier } from "@/internal/states";
 
 import type { DataTableLabels } from "./DataTable";
 import styles from "./DataTable.module.css";
@@ -47,18 +47,6 @@ function renderCell<Row>(row: Row, column: DataTableColumn<Row>, withTitle: bool
     </span>
   );
 }
-
-/**
- * Expand toggles are a fixed small control, not a step down of the table tier (`stepDown` would
- * give `s` in an `m` table): `xs` up to `m`, `s` for `l` and `xl`.
- */
-const TOGGLE_SIZE: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "xs",
-  l: "s",
-  xl: "s",
-};
 
 /** Everything a row needs that is the same for every row (memoized by the table). */
 export type RowShared<Row> = {
@@ -253,7 +241,7 @@ function DataTableRowImpl<Row>({
                 <Button.Root
                   variant="ghost"
                   tone="neutral"
-                  size={TOGGLE_SIZE[size]}
+                  size={compactTier(size)}
                   aria-expanded={expanded}
                   aria-controls={controls || undefined}
                   aria-label={formatLabel(expanded ? labels.collapse : labels.expand, {
@@ -378,7 +366,7 @@ export function GroupRow({ totalColumns, sticky, size, toggle, children }: Group
             <Button.Root
               variant="ghost"
               tone="neutral"
-              size={TOGGLE_SIZE[size]}
+              size={compactTier(size)}
               aria-expanded={!toggle.collapsed}
               aria-controls={toggle.controls || undefined}
               aria-label={toggle.label}

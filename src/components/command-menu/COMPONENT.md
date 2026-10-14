@@ -265,5 +265,5 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 - The create action both in `CommandMenu.Empty` and in the list → one `persistent` item; `Empty` holds only the text.
 
 ## Related
-- **Built from:** [Modal](../modal/COMPONENT.md) (dialog, scrim, focus, Title / Description), [ScrollContainer](../scroll-container/COMPONENT.md) (`List`), [EmptyPage](../empty-page/COMPONENT.md) (`Empty`, load error), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [Button](../button/COMPONENT.md) (retry), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`, `FooterHint`), `Icon` (search glyph, retry)
+- **Built from:** [Modal](../modal/COMPONENT.md) (dialog, scrim, focus, Title / Description), [ScrollContainer](../scroll-container/COMPONENT.md) (`List`), [EmptyPage](../empty-page/COMPONENT.md) (`Empty`, load error), [Skeleton](../skeleton/COMPONENT.md) (loading rows), [Button](../button/COMPONENT.md) (retry), [Kbd](../kbd/COMPONENT.md) (`ItemShortcut`, `FooterHint`), `Icon` (search glyph, retry), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Dropdown](../dropdown/COMPONENT.md), [Select](../select/COMPONENT.md), [Modal](../modal/COMPONENT.md)

@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Skeleton } from "@/components/skeleton/Skeleton";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
@@ -25,7 +26,6 @@ import { defineMessagePart, useInMessage, useMessagePart } from "@/internal/mess
 import { Ring } from "@/internal/ring";
 import { nextSurfaceDepth, useSurfaceDepth } from "@/internal/surfaceDepth";
 import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./VideoNote.module.css";
 

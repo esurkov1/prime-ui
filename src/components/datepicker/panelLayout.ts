@@ -3,15 +3,6 @@ import * as React from "react";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import type { ControlSize } from "@/internal/states";
 
-/** Buttons and fields inside the panel sit one tier below the panel (m → s, 32 = the day cell). */
-export const STEP_DOWN: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "s",
-  l: "m",
-  xl: "l",
-};
-
 /** Panel geometry in px, the same numbers the CSS lays out with. */
 export type PanelMetrics = {
   /** Day cell: `--prime-control-<tier>-item-height`. */

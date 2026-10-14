@@ -13,7 +13,7 @@
   min-width: 0;
 }
 
-/* With `fieldSurfaceClass` (set in TSX). */
+/* With `fieldSurfaceClass` and `fieldInputTextClass` (the editable text, set in TSX). */
 .select {
   box-sizing: border-box;
   display: block;
@@ -27,9 +27,7 @@
   border: 0;
   border-radius: var(--field-radius);
   font-family: var(--prime-font-family-sans);
-  font-size: var(--field-input-text);
   font-weight: var(--prime-font-weight-regular);
-  line-height: var(--field-input-lh);
   cursor: pointer;
   outline: none;
   appearance: none;

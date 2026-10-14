@@ -9,14 +9,11 @@
  *   .pressHost + .pressPartCompact  the host is pressed, a part inside it gives (the box of a
  *                                   checkbox row, the glyph of a nav item)
  *
- * The individual `scale` property composes with any `transform` of the host. A host that declares
- * its own `transition` lists `scale var(--prime-motion-duration-fast)
- * var(--prime-motion-easing-standard)` in it too (one `transition` wins the cascade).
+ * The individual `scale` property composes with any `transform` of the host. The default
+ * `transition` has zero specificity, so a host that declares its own wins in any bundle order and
+ * lists `scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard)` in it too.
  */
-.press,
-.pressCompact,
-.pressPart,
-.pressPartCompact {
+:where(.press, .pressCompact, .pressPart, .pressPartCompact) {
   transition: scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 

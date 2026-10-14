@@ -96,6 +96,8 @@ function SwitchRoot({
       state={checked ? "checked" : "unchecked"}
       disabled={disabled}
       readOnly={readOnly}
+      busy={busy}
+      required={inputRest.required}
       hint={hint}
       error={error}
       className={cx(styles.root, className)}

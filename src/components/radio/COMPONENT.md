@@ -171,5 +171,5 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 - Eight or more options → use `Select`.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (group label), [Hint](../hint/COMPONENT.md) (`hint`, `error`, option hints); option rows are native `<label>` elements
+- **Built from:** [Label](../label/COMPONENT.md) (group label), [Hint](../hint/COMPONENT.md) (`hint`, `error`, option hints), [VisuallyHidden](../visually-hidden/COMPONENT.md); option rows are native `<label>` elements
 - **See also:** [Checkbox](../checkbox/COMPONENT.md), [Switch](../switch/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Select](../select/COMPONENT.md)

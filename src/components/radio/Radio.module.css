@@ -1,15 +1,9 @@
 /*
  * Radio circle on the shared choice layout and states (internal/ChoiceField.module.css): this file
- * is the circle geometry and the thumb-colored dot (40%) that pops in when checked.
+ * is the circle corner and the thumb-colored dot (40%) that pops in when checked.
  */
+/* With `choiceBoxClass` (the box geometry, set in TSX): only the round corner. */
 .control {
-  box-sizing: border-box;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--prime-choice-size);
-  height: var(--prime-choice-size);
   border-radius: var(--prime-radius-full);
 }
 

@@ -226,5 +226,5 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 - `formatting` on text that is shown as plain text → the reader sees `**` and `||`; turn it on only where the text is rendered with its Markdown.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (corner actions, formatting tools), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [Button](../button/COMPONENT.md) and [Kbd](../kbd/COMPONENT.md) (formatting tools), Icon (`format.*`); `internal/textFormatting` + `internal/textFormattingToolbar` (the formatting shared with Composer)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Tooltip](../tooltip/COMPONENT.md) (corner actions, formatting tools), [Spinner](../spinner/COMPONENT.md) (`onCommit`), [Button](../button/COMPONENT.md) and [Kbd](../kbd/COMPONENT.md) (formatting tools), Icon (`format.*`); `internal/textFormatting` + `internal/textFormattingToolbar` (the formatting shared with Composer), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md) — the same field contract for one line; [Composer](../composer/COMPONENT.md) — a chat message input built on Textarea; [CodeBlock](../code-block/COMPONENT.md)

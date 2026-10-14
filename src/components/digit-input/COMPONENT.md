@@ -167,5 +167,5 @@ No `variant` or `tone`.
 - A hand-made «checking…» state, a disabled field and a manual reset after a wrong code → return the check's promise from `onComplete`.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [LoginForm](../login-form/COMPONENT.md)

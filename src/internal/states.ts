@@ -12,6 +12,29 @@ export function stepDown(size: ControlSize, n = 1): ControlSize {
   return controlSizes[Math.max(0, controlSizes.indexOf(size) - n)] ?? "xs";
 }
 
+/**
+ * The tier of a fixed small control inside a host (a corner close, a row toggle, a tile check, a
+ * close on a tab): `xs` up to `m`, `s` for `l` and `xl`. Not a step down: in an `m` host a step
+ * down would give `s`, and the control would read as one of the host's own actions.
+ */
+export function compactTier(size: ControlSize): ControlSize {
+  return size === "l" || size === "xl" ? "s" : "xs";
+}
+
+/**
+ * Named tier mappings: one per metric a host must match, each with the reason it is not a step.
+ * A component never declares its own `Record<ControlSize, ControlSize>`.
+ */
+export const tierMappings = {
+  /** An Avatar or Thumbnail leading a Select row: the media stays inside the row height. */
+  rowMedia: { xs: "xs", s: "xs", m: "s", l: "s", xl: "m" },
+  /**
+   * The Skeleton tier whose line height equals the legend row of a label tier
+   * (16 · 16 · 20 · 20 · 20), so a loading legend keeps the height of the loaded one.
+   */
+  legendSkeleton: { xs: "xs", s: "xs", m: "m", l: "m", xl: "m" },
+} as const satisfies Record<string, Record<ControlSize, ControlSize>>;
+
 /** Visual treatment. */
 export const variants = ["solid", "soft", "outline", "ghost"] as const;
 export type Variant = (typeof variants)[number];
@@ -46,6 +69,9 @@ export const dataStates = [
   "inactive",
 ] as const;
 export type DataState = (typeof dataStates)[number];
+
+/** The state of a check: a checkbox box, a check mark, a choice row. */
+export type CheckState = Extract<DataState, "checked" | "unchecked" | "indeterminate">;
 
 /**
  * Text color (Typography, Icon). `default` is primary text, `secondary` and `muted` are the

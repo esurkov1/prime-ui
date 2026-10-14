@@ -10,6 +10,7 @@ import { List, type ListItemProps } from "@/components/list/List";
 import type { MessageStatus } from "@/components/message/Message";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
@@ -24,8 +25,7 @@ import { formatLabel } from "@/internal/formatLabel";
 import { highlightChildren } from "@/internal/HighlightMatch";
 import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
-import { type ControlSize, stepDown } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
+import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 
 import styles from "./ChatList.module.css";
 import { formatChatTime } from "./formatChatTime";
@@ -418,7 +418,7 @@ function ChatListItem({
   );
 
   // ── first line ──
-  const glyphSize = stepDown(list.size, 2);
+  const glyphSize = compactTier(list.size);
   const textProps = parts.text?.props;
   const title = (
     <List.ItemText {...textProps} className={cx(styles.title, textProps?.className)}>

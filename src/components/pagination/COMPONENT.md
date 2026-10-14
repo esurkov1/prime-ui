@@ -132,5 +132,5 @@ Pagination              <nav aria-label={labels.nav}>; size and compact mode
 - A pager under a DataTable → the table renders its own.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md), Icon (`nav.chevronLeft`, `nav.chevronRight`)
+- **Built from:** [Button](../button/COMPONENT.md), Icon (`nav.chevronLeft`, `nav.chevronRight`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [DataTable](../data-table/COMPONENT.md), [Select](../select/COMPONENT.md), [Stepper](../stepper/COMPONENT.md)

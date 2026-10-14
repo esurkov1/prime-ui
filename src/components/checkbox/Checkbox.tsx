@@ -7,8 +7,8 @@ import {
   ChoiceField,
   ChoiceLabel,
   type ChoiceLabelProps,
+  choiceBoxClass,
   choiceInputClass,
-  choiceTierClass,
   choiceVisualClass,
 } from "@/internal/ChoiceField";
 import { useControlSize } from "@/internal/ControlSizeContext";
@@ -16,6 +16,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { useFieldFrame } from "@/internal/FieldFrame";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Checkbox.module.css";
@@ -89,6 +90,7 @@ function CheckboxRoot({
       state={indeterminate ? "indeterminate" : checked ? "checked" : "unchecked"}
       disabled={disabled}
       readOnly={readOnly}
+      required={inputRest.required}
       hint={hint}
       error={error}
       className={cx(styles.root, className)}
@@ -111,7 +113,7 @@ function CheckboxRoot({
             aria-describedby={ids.describedBy}
           />
           <span
-            className={cx(choiceVisualClass, styles.control)}
+            className={cx(choiceVisualClass, choiceBoxClass, styles.control)}
             data-shape={shape}
             aria-hidden="true"
           >
@@ -166,8 +168,9 @@ function CheckboxIndicator({
     <span
       aria-hidden="true"
       className={cx(
-        choiceTierClass,
+        fieldTierClass,
         choiceVisualClass,
+        choiceBoxClass,
         styles.control,
         styles.indicator,
         className,

@@ -8,7 +8,12 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
-import { FieldFrame, type FieldFrameProps, useFieldFrame } from "@/internal/FieldFrame";
+import {
+  type FieldFocusRingProps,
+  FieldFrame,
+  type FieldFrameProps,
+  useFieldFrame,
+} from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
 
@@ -74,7 +79,8 @@ export function formatDatepickerValue(
 }
 
 export type DatepickerRootProps = DatepickerPanelProps &
-  FieldFrameProps & {
+  FieldFrameProps &
+  FieldFocusRingProps & {
     size?: ControlSize;
     /** Field text without a value; `labels.placeholder` by default. */
     placeholder?: string;
@@ -130,7 +136,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
     onOpenChange,
     disabled: disabledProp = false,
     invalid: invalidProp,
-    focusRing = true,
+    focusRing,
     fullWidth = false,
     align = DEFAULT_ALIGN,
     id,
@@ -199,7 +205,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
               "full-width": fullWidth || undefined,
               invalid: ids.invalid || undefined,
               disabled: disabled || undefined,
-              "focus-ring": focusRing ? undefined : false,
+              "focus-ring": focusRing,
             })}
           >
             <Icon name="field.calendar" className={styles.triggerIcon} />

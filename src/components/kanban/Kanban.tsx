@@ -9,6 +9,7 @@ import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Spinner } from "@/components/spinner/Spinner";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion } from "@/hooks/usePresence";
@@ -20,7 +21,6 @@ import { motionTiming } from "@/internal/motionTiming";
 import type { PaletteColor } from "@/internal/states";
 import { type SurfaceDepth, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Kanban.module.css";
 

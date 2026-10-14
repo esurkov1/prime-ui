@@ -25,7 +25,7 @@ export type ButtonGroupLabels = {
 export const BUTTON_GROUP_LABELS: ButtonGroupLabels = { optional: "необязательно" };
 
 export type ButtonGroupRootProps = Omit<FieldRootDomProps, "dir"> &
-  Omit<FieldFrameProps, "focusRing"> & {
+  FieldFrameProps & {
     orientation?: ButtonGroupOrientation;
     /** Tier. Default: the tier of the surrounding control (a toolbar, a panel), else `m`. */
     size?: ControlSize;

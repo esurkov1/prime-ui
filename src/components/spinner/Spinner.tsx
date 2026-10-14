@@ -1,5 +1,5 @@
 import type * as React from "react";
-
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -8,7 +8,6 @@ import { useLabels } from "@/internal/labels";
 import { Ring } from "@/internal/ring";
 import type { ControlSize, TextTone } from "@/internal/states";
 import toneStyles from "@/internal/textTone.module.css";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Spinner.module.css";
 

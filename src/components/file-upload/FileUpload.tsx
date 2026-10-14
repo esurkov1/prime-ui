@@ -8,6 +8,7 @@ import { Hint } from "@/components/hint/Hint";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { ProgressBar } from "@/components/progress-bar/ProgressBar";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+import { VisuallyHidden, visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import type { UploadItem, UploadQueue } from "@/hooks/useUploadQueue";
@@ -39,7 +40,6 @@ import { mediaKind } from "@/internal/mediaKind";
 import { RollingNumber } from "@/internal/RollingNumber";
 import type { ControlSize, PaletteColor, TextTone, Tone } from "@/internal/states";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
-import { VisuallyHidden, visuallyHiddenClass } from "@/internal/VisuallyHidden";
 
 import styles from "./FileUpload.module.css";
 
@@ -1056,7 +1056,7 @@ function FileUploadQueueSet({
 // ─── Root ────────────────────────────────────────────────────────────────────
 
 export type FileUploadRootProps = FieldRootDomProps &
-  Omit<FieldFrameProps, "focusRing"> &
+  FieldFrameProps &
   FileSetProps & {
     /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;

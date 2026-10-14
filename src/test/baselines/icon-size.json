@@ -6,7 +6,6 @@
   "src/components/button/Button.module.css: .glyph > svg",
   "src/components/card/Card.module.css: .icon svg",
   "src/components/empty-page/EmptyPage.module.css: .iconWrap svg",
-  "src/components/hint/Hint.module.css: .icon > svg",
   "src/components/input/Input.module.css: .icon > svg",
   "src/components/kbd/Kbd.module.css: .root :where(svg)",
   "src/components/login-form/LoginForm.module.css: .logo > svg, .logo > img",

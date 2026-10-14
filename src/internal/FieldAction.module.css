@@ -5,6 +5,8 @@
  * wash. Neighbouring segments sit edge to edge. The host drops its end padding.
  */
 .action {
+  /* The glyph (a kit Icon) a step under the field icon. */
+  --prime-icon-size: calc(var(--field-icon) - var(--prime-space-1));
   flex-shrink: 0;
   display: inline-flex;
   align-self: stretch;
@@ -24,12 +26,6 @@
   transition:
     background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
-}
-
-.action svg {
-  display: block;
-  width: calc(var(--field-icon) - var(--prime-space-1));
-  height: calc(var(--field-icon) - var(--prime-space-1));
 }
 
 @media (hover: hover) {
@@ -58,29 +54,7 @@
   cursor: not-allowed;
 }
 
-/* Copy → check: both glyphs stay mounted and cross-fade in place. */
-.copyGlyphs {
-  display: grid;
-}
-
-.copyGlyphs > svg {
-  grid-area: 1 / 1;
-  transition:
-    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-enter),
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
-}
-
-.copyGlyphs > [data-glyph="check"],
-.copyGlyphs[data-copy-state="copied"] > [data-glyph="copy"] {
-  opacity: 0;
-  transform: scale(var(--prime-motion-press-scale-compact));
-}
-
-.copyGlyphs[data-copy-state="copied"] > [data-glyph="check"] {
-  opacity: 1;
-  transform: none;
-}
-
-.copyGlyphs[data-copy-state="copied"] {
+/* Copied: the check (`GlyphSwap` in the segment) takes the success color, hovered or not. */
+.action[data-copy-state="copied"] > * {
   color: var(--prime-color-success-text);
 }

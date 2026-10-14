@@ -1,38 +1,50 @@
 import type * as React from "react";
 
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { fieldHintTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Hint.module.css";
 
 export type HintRootProps = React.HTMLAttributes<HTMLParagraphElement> & {
-  /** Tier of the paired field. */
   size?: ControlSize;
-  /** Error message styling (`danger-text`); the message drops in. */
   invalid?: boolean;
-  /** Dimmed text next to a disabled control. */
   disabled?: boolean;
   ref?: React.Ref<HTMLParagraphElement>;
 };
 
-function HintRoot({ className, size = "m", invalid, disabled, children, ...rest }: HintRootProps) {
-  return (
-    <ControlSizeProvider value={size}>
-      <p
-        {...rest}
-        className={cx(styles.root, invalid && enterMotion.enter, className)}
-        {...toDataAttributes({
-          size,
-          invalid: invalid || undefined,
-          disabled: disabled || undefined,
-        })}
-      >
-        {children}
-      </p>
-    </ControlSizeProvider>
+function HintRoot({
+  className,
+  size: sizeProp,
+  invalid,
+  disabled: disabledProp,
+  children,
+  ...rest
+}: HintRootProps) {
+  const tier = useHostTier(sizeProp);
+  const disabled = useInheritedDisabled(disabledProp);
+  return tier.provide(
+    <p
+      {...rest}
+      className={cx(
+        fieldTierClass,
+        fieldHintTextClass,
+        styles.root,
+        invalid && enterMotion.enter,
+        className,
+      )}
+      {...toDataAttributes({
+        size: tier.size,
+        invalid: invalid || undefined,
+        disabled: disabled || undefined,
+      })}
+    >
+      {children}
+    </p>,
   );
 }
 HintRoot.displayName = "Hint.Root";

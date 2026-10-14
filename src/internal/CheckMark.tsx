@@ -1,8 +1,7 @@
 import { cx } from "@/internal/cx";
+import type { CheckState } from "@/internal/states";
 
 import styles from "./CheckMark.module.css";
-
-export type CheckMarkState = "checked" | "unchecked" | "indeterminate";
 
 /**
  * The kit's check and indeterminate bar, drawn in with a stroke reveal (foundation §7 rule 8: a
@@ -11,7 +10,7 @@ export type CheckMarkState = "checked" | "unchecked" | "indeterminate";
  * Shared by Checkbox and the color swatches. Own SVG instead of `Icon`: the motion needs
  * `pathLength` on the paths.
  */
-export function CheckMark({ state, className }: { state: CheckMarkState; className?: string }) {
+export function CheckMark({ state, className }: { state: CheckState; className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"

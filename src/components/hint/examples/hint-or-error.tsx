@@ -1,4 +1,4 @@
-/** After a check the error replaces the hint in the same element, without a layout jump, and is announced — `invalid`, `role`. */
+/** After a check the error replaces the hint in the same element, without a layout jump, and a polite region reads it — `invalid`, `aria-live`. */
 import { Button, Hint } from "prime-ui-kit";
 import * as React from "react";
 
@@ -17,7 +17,7 @@ export default function HintHintOrErrorExample() {
           Сбросить
         </Button.Root>
       </div>
-      <Hint.Root invalid={invalid} role={invalid ? "alert" : undefined}>
+      <Hint.Root invalid={invalid} aria-live="polite">
         {invalid
           ? "Заполните название перед публикацией."
           : "Черновик можно сохранить без названия."}

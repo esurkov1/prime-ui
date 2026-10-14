@@ -2,21 +2,31 @@
 import { Badge, Button, Typography, VisuallyHidden } from "prime-ui-kit";
 import * as React from "react";
 
+const UNPAID_INVOICES = 3;
+
 export default function VisuallyHiddenOverviewExample() {
-  const [archived, setArchived] = React.useState(0);
+  const [unpaid, setUnpaid] = React.useState(UNPAID_INVOICES);
+  const [announcement, setAnnouncement] = React.useState("");
+
+  const archive = () => {
+    const left = Math.max(0, unpaid - 1);
+    setUnpaid(left);
+    setAnnouncement(`Счёт перенесён в архив. Ждут оплаты: ${left}`);
+  };
 
   return (
     <>
       <Typography as="span" variant="body-m">
-        Счета к оплате <Badge.Root color="orange">3</Badge.Root>
-        <VisuallyHidden>: три счёта ждут оплаты</VisuallyHidden>
+        Счета к оплате{" "}
+        <Badge.Root color="orange" aria-hidden="true">
+          {unpaid}
+        </Badge.Root>
+        <VisuallyHidden>, ждут оплаты: {unpaid}</VisuallyHidden>
       </Typography>
-      <Button.Root variant="soft" tone="neutral" onClick={() => setArchived((count) => count + 1)}>
+      <Button.Root variant="soft" tone="neutral" disabled={unpaid === 0} onClick={archive}>
         В архив
       </Button.Root>
-      <VisuallyHidden live="polite">
-        {archived > 0 ? `Счетов в архиве: ${archived}` : ""}
-      </VisuallyHidden>
+      <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
     </>
   );
 }

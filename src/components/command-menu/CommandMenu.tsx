@@ -6,6 +6,7 @@ import { Kbd } from "@/components/kbd/Kbd";
 import { Modal } from "@/components/modal/Modal";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useStateSwap } from "@/hooks/useStateSwap";
@@ -23,7 +24,6 @@ import { focusInto } from "@/internal/overlay/focus";
 import type { ControlSize } from "@/internal/states";
 import swapMotion from "@/internal/swapMotion.module.css";
 import { isPromiseLike } from "@/internal/usePendingChanges";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./CommandMenu.module.css";
 
@@ -598,9 +598,7 @@ function CommandMenuList({ className, children, ref, ...rest }: CommandMenuListP
           ) : null}
         </EmptyPage.Root>
       ) : null}
-      <VisuallyHidden aria-live="polite">
-        {loading || loadingMore ? labels.loading : ""}
-      </VisuallyHidden>
+      <VisuallyHidden live="polite">{loading || loadingMore ? labels.loading : ""}</VisuallyHidden>
     </>
   );
 }

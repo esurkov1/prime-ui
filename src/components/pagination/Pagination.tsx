@@ -1,13 +1,13 @@
 import type * as React from "react";
 
 import { Button } from "@/components/button/Button";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
 import type { ControlSize } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./Pagination.module.css";
 

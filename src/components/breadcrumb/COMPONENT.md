@@ -138,5 +138,5 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 - Home icon link without `aria-label` → add `aria-label="Главная"`.
 
 ## Related
-- **Built from:** [LinkButton](../link-button/COMPONENT.md), Icon (`nav.chevronRight`)
+- **Built from:** [LinkButton](../link-button/COMPONENT.md), Icon (`nav.chevronRight`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Tabs](../tabs/COMPONENT.md), [PageContent](../page-content/COMPONENT.md), [Stepper](../stepper/COMPONENT.md)

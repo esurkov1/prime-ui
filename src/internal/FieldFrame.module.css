@@ -1,37 +1,16 @@
 /*
  * Field frame of every framed field (Input, Textarea, Select, TagSelect, Datepicker, groups…):
- * label → `label-gap` → field → `hint-gap` → support row.
+ * label → `--field-label-gap` → field → `--field-hint-gap` → support row. The tier is the field
+ * tier (`fieldTierClass` with `data-size` on the root, joined in TSX).
  */
 .root {
-  --ff-label-gap: var(--prime-control-m-label-gap);
-  --ff-hint-gap: var(--prime-control-m-hint-gap);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--ff-label-gap);
+  gap: var(--field-label-gap);
   min-width: 0;
   max-width: 100%;
   font-family: var(--prime-font-family-sans);
-}
-
-.root[data-size="xs"] {
-  --ff-label-gap: var(--prime-control-xs-label-gap);
-  --ff-hint-gap: var(--prime-control-xs-hint-gap);
-}
-
-.root[data-size="s"] {
-  --ff-label-gap: var(--prime-control-s-label-gap);
-  --ff-hint-gap: var(--prime-control-s-hint-gap);
-}
-
-.root[data-size="l"] {
-  --ff-label-gap: var(--prime-control-l-label-gap);
-  --ff-hint-gap: var(--prime-control-l-hint-gap);
-}
-
-.root[data-size="xl"] {
-  --ff-label-gap: var(--prime-control-xl-label-gap);
-  --ff-hint-gap: var(--prime-control-xl-hint-gap);
 }
 
 .label {
@@ -41,10 +20,10 @@
 /*
  * A field in a FieldList cell (`fieldCell`): its label is the column heading, read but not shown
  * while the heading row is on screen (the sr-only class is joined in TSX). When the list stacks its
- * rows into blocks in a narrow container, the heading row goes and each field shows its label.
- * `prime-field-list` is the container FieldList sets (`FIELD_LIST_CONTAINER`).
+ * rows into blocks in a narrow container (479px), the heading row goes and each field shows its
+ * label. `prime-field-list` is the container FieldList sets.
  */
-@container prime-field-list (max-width: 479px) {
+@container prime-field-list (max-width: 29.9375rem) {
   .label.cellLabel {
     position: static;
     width: auto;
@@ -91,7 +70,7 @@
  * (foundation §7, rule 14). Only the control moves: the label stays and the message drops in on its
  * own (Hint). `translate` composes with the control's press scale; two names restart the keyframes
  * on the next error; reduced motion collapses the duration to nothing. A choice row (Checkbox,
- * Switch) shakes itself: `shakeSelf` with its own `data-shake`.
+ * Switch) shakes its control cell: `shakeSelf` with its own `data-shake`.
  */
 .root[data-shake] > .body > :not(.support),
 .shakeSelf[data-shake] {
@@ -105,74 +84,48 @@
 
 @keyframes field-shake-odd {
   12% {
-    translate: calc(-1 * var(--prime-space-2)) 0;
+    translate: calc(var(--prime-space-2) * -1) 0;
   }
   32% {
     translate: var(--prime-space-2) 0;
   }
   52% {
-    translate: calc(-1 * var(--prime-space-1)) 0;
+    translate: calc(var(--prime-space-1) * -1) 0;
   }
   72% {
     translate: var(--prime-space-1) 0;
   }
   88% {
-    translate: calc(-0.5 * var(--prime-space-1)) 0;
+    translate: calc(var(--prime-space-1) * -0.5) 0;
   }
 }
 
 @keyframes field-shake-even {
   12% {
-    translate: calc(-1 * var(--prime-space-2)) 0;
+    translate: calc(var(--prime-space-2) * -1) 0;
   }
   32% {
     translate: var(--prime-space-2) 0;
   }
   52% {
-    translate: calc(-1 * var(--prime-space-1)) 0;
+    translate: calc(var(--prime-space-1) * -1) 0;
   }
   72% {
     translate: var(--prime-space-1) 0;
   }
   88% {
-    translate: calc(-0.5 * var(--prime-space-1)) 0;
+    translate: calc(var(--prime-space-1) * -0.5) 0;
   }
 }
 
 .body {
   display: flex;
   flex-direction: column;
-  gap: var(--ff-hint-gap);
+  gap: var(--field-hint-gap);
   min-width: 0;
 }
 
-/* Support row: hint | error (same slot) · counter (right). Tier from `data-size`. */
-.support,
-.counter {
-  --ff-hint-size: var(--prime-control-m-hint-size);
-  --ff-hint-line-height: var(--prime-control-m-hint-line-height);
-}
-
-:is(.support, .counter)[data-size="xs"] {
-  --ff-hint-size: var(--prime-control-xs-hint-size);
-  --ff-hint-line-height: var(--prime-control-xs-hint-line-height);
-}
-
-:is(.support, .counter)[data-size="s"] {
-  --ff-hint-size: var(--prime-control-s-hint-size);
-  --ff-hint-line-height: var(--prime-control-s-hint-line-height);
-}
-
-:is(.support, .counter)[data-size="l"] {
-  --ff-hint-size: var(--prime-control-l-hint-size);
-  --ff-hint-line-height: var(--prime-control-l-hint-line-height);
-}
-
-:is(.support, .counter)[data-size="xl"] {
-  --ff-hint-size: var(--prime-control-xl-hint-size);
-  --ff-hint-line-height: var(--prime-control-xl-hint-line-height);
-}
-
+/* Support row: hint | error (same slot) · counter (right). */
 .support {
   display: flex;
   align-items: flex-start;
@@ -182,19 +135,24 @@
 }
 
 .support[data-reserve="true"] {
-  min-height: var(--ff-hint-line-height);
+  min-height: var(--field-hint-lh);
 }
 
-.supportText {
+/* Nothing to show: the row stays (its slot is the live region) but takes no room, gap included. */
+.support[data-empty="true"] {
+  margin-block-start: calc(var(--field-hint-gap) * -1);
+}
+
+/* The text slot (`FieldSupport`), a polite live region; the hint or error in it is `.supportText`. */
+.supportSlot {
   flex: 1 1 auto;
   min-width: 0;
 }
 
+/* With `fieldHintTextClass` (set in TSX): the support row text of the tier. */
 .counter {
   display: block;
   flex-shrink: 0;
-  font-size: var(--ff-hint-size);
-  line-height: var(--ff-hint-line-height);
   font-variant-numeric: tabular-nums;
   color: var(--prime-color-text-muted);
   white-space: nowrap;
@@ -203,20 +161,4 @@
 
 .counter[data-invalid="true"] {
   color: var(--prime-color-danger-text);
-}
-
-/*
- * A fixed error leaves as it came: it fades and lifts back up over `fast` with `exit` easing, then
- * the hint takes the slot (`useLeavingError`).
- */
-.leaving[data-state="closed"] {
-  animation: field-error-leave var(--prime-motion-duration-fast) var(--prime-motion-easing-exit)
-    both;
-}
-
-@keyframes field-error-leave {
-  to {
-    opacity: 0;
-    transform: translateY(calc(-1 * var(--prime-space-1)));
-  }
 }

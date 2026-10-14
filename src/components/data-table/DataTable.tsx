@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
@@ -15,7 +16,6 @@ import { exitTimeoutMs } from "@/internal/motionTiming";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import swapMotion from "@/internal/swapMotion.module.css";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 import { DataTableColumnsMenu } from "./ColumnsMenu";
 import { DataTableColumnsContext, type DataTableColumnsContextValue } from "./context";
 import styles from "./DataTable.module.css";
@@ -1073,7 +1073,7 @@ export function DataTable<Row>({
               </ScrollContainer>
             </div>
 
-            {showSkeleton ? <VisuallyHidden role="status">{labels.loading}</VisuallyHidden> : null}
+            {showSkeleton ? <VisuallyHidden live="polite">{labels.loading}</VisuallyHidden> : null}
 
             {selectable ? (
               <VisuallyHidden live="polite">{selection.announcement}</VisuallyHidden>

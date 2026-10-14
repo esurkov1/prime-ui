@@ -10,14 +10,14 @@ import { Kbd } from "@/components/kbd/Kbd";
 import { LinkButton } from "@/components/link-button/LinkButton";
 import { Popover } from "@/components/popover/Popover";
 import { Typography } from "@/components/typography/Typography";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch, matchIndex } from "@/internal/HighlightMatch";
-import type { ControlSize } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
+import { type ControlSize, stepDown } from "@/internal/states";
 
 import {
   canExcludeValue,
@@ -704,18 +704,6 @@ const tagSizeOf = (size: ControlSize): ControlSize => (size === "xs" ? "s" : siz
 const COLOR = { none: "gray", include: "blue", exclude: "red" } as const;
 
 /**
- * The LinkButton tier whose text size equals the Badge text of a tag tier (Badge 12 · 12 · 12 ·
- * 13 · 14, LinkButton 12 · 13 · 14 · 16 · …), so a text action reads as part of the tag row.
- */
-const TIER_BELOW: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "xs",
-  l: "s",
-  xl: "m",
-};
-
-/**
  * A value is a pressable Badge: gray, blue = shown, red with «НЕ» = hidden. A press shows it; the «−»
  * Badge.Action (revealed on hover and focus, kept while hidden) hides it. Alt+click and Shift+Enter
  * hide too. A single-value field has no «−»: a press picks the value.
@@ -835,7 +823,8 @@ function SmartFilterChips({ className, ...rest }: SmartFilterChipsProps) {
         </Badge.Icon>
         {labels.add}
       </Badge.Root>
-      <LinkButton asChild tone="neutral" size={TIER_BELOW[tagSize]} className={styles.clearAll}>
+      {/* Two tiers below the tag row: the LinkButton text equals the Badge text of the tag. */}
+      <LinkButton asChild tone="neutral" size={stepDown(tagSize, 2)} className={styles.clearAll}>
         <button type="button" onClick={clearAll}>
           {labels.clearAll}
         </button>

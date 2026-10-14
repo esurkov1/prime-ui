@@ -6,7 +6,7 @@
 > Field label (native `<label>`) with required and optional markers.
 
 ## When to use
-- Above a control that has no built-in `label` prop: a custom control, or a hand-built field where you wire the ids yourself.
+- Above a control that has no built-in `label` prop (an embedded `Datepicker.Panel`, a custom control), where you wire the ids yourself.
 - When a label needs an icon (`Label.Icon`) or an inline clarification (`Label.Description`).
 
 ## When not to use
@@ -37,10 +37,11 @@ Label.Root            <label>: text, then the required `*` or the optional marke
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Size of the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500. Without it the tier of its host, else `m`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Size of the paired field: xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500. Without it the tier of its host, else `m`; the label provides its tier to the icons inside. |
 | `required` | `boolean` | — | Appends a red `*` (`aria-hidden`). Put native `required` on the control itself. |
 | `optional` | `boolean` | — | Appends the muted optional marker (`labels.optional`). |
-| `disabled` | `boolean` | — | Disabled color for the text and the markers, `aria-disabled`. |
+| `disabled` | `boolean` | — | Disabled color for the text and the markers, `aria-disabled`. A disabled `Fieldset` around the label sets it too. |
+| `secondary` | `boolean` | — | Quieter: secondary text on one line, cut with an ellipsis — a column heading under the group's own label (FieldList). |
 | `labels` | `Partial<LabelLabels>` | — | Built-in strings, see Labels. |
 | `htmlFor` | `string` | — | Id of a native control. For a custom control give the label an `id` and set `aria-labelledby` on the control. |
 | `…rest` | `Omit<LabelHTMLAttributes<HTMLLabelElement>, "size">` | — | `id`, `className` and the other label attributes. |
@@ -78,7 +79,8 @@ Label has no `variant` or `tone`.
 |---|---|---|---|
 | `required` | Red `*` right after the text | Most fields are optional — mark the required ones | — |
 | `optional` | Muted regular «необязательно» right after the text | Most fields are required — mark the optional ones | — |
-| `disabled` | Text, `*`, marker, description and icon in disabled color | The paired control is disabled | — |
+| `disabled` | Text, `*`, marker, description and icon in disabled color | The paired control is disabled (a disabled `Fieldset` around sets it) | — |
+| `secondary` | Secondary text on one line, cut with an ellipsis | A column heading under the group's own label (FieldList) | — |
 
 **Combinations**
 - Recommended: mark the minority of fields in a form; `Label.Description` for units («₽, без НДС»).
@@ -88,13 +90,14 @@ Label has no `variant` or `tone`.
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| disabled | `disabled` | `data-disabled="true"`, `aria-disabled="true"` |
-| size | `size` | `data-size` |
+| disabled | `disabled`, or a disabled `Fieldset` around it | `data-disabled="true"`, `aria-disabled="true"` |
+| secondary | `secondary` | `data-secondary="true"` |
+| size | `size`, else the host tier | `data-size` |
 
-The label has no hover or focus state; clicking it focuses the control bound with `htmlFor`.
+The label has no hover or focus state; clicking it focuses the control bound with `htmlFor`. Its color eases between the states.
 
 ## Layout & spacing
-- Label → field: the tier `label-gap` (`--prime-control-<size>-label-gap`: `--prime-space-1` on xs/s, `--prime-space-2` on m–xl) — the same gap fields use for their built-in label.
+- Label → field: the tier `--field-label-gap` (4 on xs/s, 8 on m–xl) — the same gap fields use for their built-in label. The text comes from the field tier (`--field-label-size`, `--field-label-lh`).
 - Inline-flex, wraps long text (`overflow-wrap: anywhere`); markers are separated by `--prime-space-1`.
 
 ## Accessibility
@@ -121,7 +124,7 @@ No keyboard interaction.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A standalone label above a hand-built field, linked to its input through `htmlFor` and `id`. |
+| [overview.tsx](examples/overview.tsx) | A label above a calendar that has no label of its own, naming it through `id` and `aria-labelledby` — `id`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size; the label takes the size of the field below it — `size`. |
 | [states.tsx](examples/states.tsx) | A default label next to a disabled one; the markers dim with the text — `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A muted icon before the text, sized by the label — `Label.Icon`. |

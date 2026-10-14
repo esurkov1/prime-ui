@@ -52,7 +52,7 @@ Switch.Root          field grid; ref and input props go to the native input (rol
 | `aria-describedby` | `string` | — | Merged before the hint/error ids. |
 | `children` | `ReactNode` | — | `Switch.Label`. Without it only the track renders — name it with `aria-label` or `aria-labelledby`. |
 | `className` | `string` | — | Class on the field `<div>`. |
-| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "type" \| "size" \| "checked" \| "defaultChecked" \| "onChange">` | — | `name`, `value`, `required`, `aria-label`, `aria-labelledby`… on the native input. |
+| `…rest` | `Omit<InputHTMLAttributes<HTMLInputElement>, "type" \| "size" \| "checked" \| "defaultChecked" \| "onChange">` | — | `name`, `value`, `required` (also a red `*` after the text), `aria-label`, `aria-labelledby`… on the native input. |
 
 ### Switch.Label
 `ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.
@@ -151,5 +151,5 @@ No `labels`.
 - Setting `checked` in `onCheckedChange` and flipping it back when the request fails, or a separate «saving» flag → return the request's promise; set `checked` only after it succeeds.
 
 ## Related
-- **Built from:** [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Spinner](../spinner/COMPONENT.md) (saving); the row is a native `<label>`
+- **Built from:** [Hint](../hint/COMPONENT.md) (`hint`, `error`), [Spinner](../spinner/COMPONENT.md) (saving), [VisuallyHidden](../visually-hidden/COMPONENT.md); the row is a native `<label>`
 - **See also:** [Checkbox](../checkbox/COMPONENT.md), [Radio](../radio/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

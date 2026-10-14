@@ -171,5 +171,5 @@ Motion: the color of the icon and the label changes over `fast`. Floating, the s
 - Hiding the bar with your own media query → the shell already hides the footer while the Sidebar rail is on screen.
 
 ## Related
-- **Built from:** [Badge](../../components/badge/COMPONENT.md), VisuallyHidden (internal), [Button](../../components/button/COMPONENT.md) (`shape="circle"`, the action disk)
+- **Built from:** [Badge](../../components/badge/COMPONENT.md), [VisuallyHidden](../../components/visually-hidden/COMPONENT.md), [Button](../../components/button/COMPONENT.md) (`shape="circle"`, the action disk)
 - **See also:** [AppShell](../app-shell/COMPONENT.md), [Sidebar](../sidebar/COMPONENT.md), [Tabs](../../components/tabs/COMPONENT.md)

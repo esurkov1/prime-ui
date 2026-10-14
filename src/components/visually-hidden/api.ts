@@ -21,9 +21,9 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: "HTMLAttributes<HTMLSpanElement>",
-          en: "`id` (to point `aria-describedby` at it), `className` and the other span attributes.",
-          ru: "`id` (для `aria-describedby`), `className` и остальные атрибуты.",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "role" | "aria-live" | "aria-atomic" | "aria-relevant">',
+          en: "`id` (to point `aria-describedby` at it), `className` and the other span attributes; the region attributes come only from `live`.",
+          ru: "`id` (для `aria-describedby`), `className` и остальные атрибуты; атрибуты области задаёт только `live`.",
         },
       ],
     },

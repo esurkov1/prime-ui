@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useStateSwap } from "@/hooks/useStateSwap";
@@ -14,7 +14,6 @@ import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceD
 import swap from "@/internal/swapMotion.module.css";
 import textRole from "@/internal/textRole.module.css";
 import { touchTargetClass } from "@/internal/touchTarget";
-import { visuallyHiddenClass } from "@/internal/VisuallyHidden";
 import { chartColors } from "@/theme/chartColors";
 
 import { Crossfade } from "../crossfade/Crossfade";

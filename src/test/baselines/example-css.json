@@ -65,8 +65,6 @@
   "src/components/kanban/examples/screen.module.css: white-space #2",
   "src/components/kbd/examples/examples.module.css: component token",
   "src/components/kbd/examples/examples.module.css: component token #2",
-  "src/components/label/examples/overview.tsx: root .field is a flex stack",
-  "src/components/label/examples/structure.tsx: root .structure is a flex stack",
   "src/components/media-viewer/examples/examples.module.css: component token",
   "src/components/media-viewer/examples/examples.module.css: component token #2",
   "src/components/native-select/examples/examples.module.css: component token",

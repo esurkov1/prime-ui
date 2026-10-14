@@ -173,7 +173,7 @@ A tab is at least the control height of the tier, so a one-line list lines up wi
 | `Tabs.Icon` + `Tabs.Label` | muted icon before the label; the active tab's leading icon turns accent | sections with recognizable icons | |
 | `Tabs.Count` | soft badge after the label, tabular numbers | showing how many items a section has | |
 | `Tabs.Description` (two-line) | label (+ count) on line 1, `body-s` muted text on line 2; `<strong>` is primary / medium | dashboards with a summary per section | |
-| `onRemove` on Item | a ghost close button (`action.close`, two tiers below) at the end of the tab: on the active tab, on hover and focus, always on touch screens; the tab also closes by `Delete` / `Backspace` and a middle click, and closing the active tab selects its neighbour | open documents the user closes, like browser tabs | |
+| `onRemove` on Item | a ghost close button (`action.close`, `xs`; `s` in `l` and `xl` tabs) at the end of the tab: on the active tab, on hover and focus, always on touch screens; the tab also closes by `Delete` / `Backspace` and a middle click, and closing the active tab selects its neighbour | open documents the user closes, like browser tabs | |
 
 Avoid icons or descriptions on only some tabs (uneven rows; without an icon on every tab the list cannot collapse to icons) and Tabs used as a filter — use SegmentedControl.
 

@@ -5,6 +5,7 @@ import {
   ChoiceField,
   ChoiceLabel,
   type ChoiceLabelProps,
+  choiceBoxClass,
   choiceInputClass,
   choiceVisualClass,
 } from "@/internal/ChoiceField";
@@ -193,6 +194,7 @@ function RadioRoot({
       size={group.size}
       state={checked ? "checked" : "unchecked"}
       disabled={disabled}
+      groupOption
       hint={hint}
       className={cx(styles.root, className)}
       control={
@@ -212,7 +214,10 @@ function RadioRoot({
             aria-invalid={ids.invalid || undefined}
             aria-describedby={ids.describedBy}
           />
-          <span className={cx(choiceVisualClass, styles.control)} aria-hidden="true">
+          <span
+            className={cx(choiceVisualClass, choiceBoxClass, styles.control)}
+            aria-hidden="true"
+          >
             <span className={styles.dot} />
           </span>
         </>

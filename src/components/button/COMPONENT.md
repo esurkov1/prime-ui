@@ -213,5 +213,5 @@ Other data attributes: `data-pressed`, `data-variant`, `data-tone`, `data-size`,
 - Rebuilding a progress label with a new word every tick («Загрузка…» / «Скачивание…») → keep the words, change only the number; digits update in place, words morph.
 
 ## Related
-- **Built from:** [Spinner](../spinner/COMPONENT.md), `internal/ring` (the circle's progress ring), `internal/glyphSwap` (the icon cross-fade), `internal/MorphText` (the label morph)
+- **Built from:** [Spinner](../spinner/COMPONENT.md), `internal/ring` (the circle's progress ring), `internal/glyphSwap` (the icon cross-fade), `internal/MorphText` (the label morph), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ButtonGroup](../button-group/COMPONENT.md), [LinkButton](../link-button/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md), [ProgressCircle](../progress-circle/COMPONENT.md)

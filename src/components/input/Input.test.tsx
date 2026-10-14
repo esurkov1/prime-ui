@@ -571,7 +571,7 @@ describe("Input focusRing", () => {
 });
 
 describe("Input support row", () => {
-  it("renders nothing under the field without hint, error, counter or reserve", () => {
+  it("keeps an empty support row without hint, error, counter or reserve", () => {
     render(
       <Input.Root label="Имя">
         <Input.Wrapper>
@@ -579,8 +579,10 @@ describe("Input support row", () => {
         </Input.Wrapper>
       </Input.Root>,
     );
-    const wrapper = screen.getByRole("textbox").parentElement;
-    expect(wrapper?.nextElementSibling).toBeNull();
+    // The row stays mounted for its live region but shows nothing and takes no room.
+    const row = screen.getByRole("textbox").parentElement?.nextElementSibling;
+    expect(row).toHaveAttribute("data-empty", "true");
+    expect(row).toHaveTextContent("");
   });
 
   it("reserveSupportRow keeps an empty row of the field tier", () => {

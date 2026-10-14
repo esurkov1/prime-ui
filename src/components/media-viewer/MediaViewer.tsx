@@ -4,6 +4,7 @@ import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Spinner } from "@/components/spinner/Spinner";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
@@ -19,7 +20,6 @@ import { activeElement } from "@/internal/overlay/focus";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import { Portal } from "@/internal/Portal";
 import textRole from "@/internal/textRole.module.css";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./MediaViewer.module.css";
 import { findItemMedia, originShape } from "./originShape";
@@ -639,7 +639,7 @@ function ViewerDialog({
           />
         ) : null}
 
-        <VisuallyHidden aria-live="polite">{announcement}</VisuallyHidden>
+        <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
       </LayerProvider>
     </div>
   );

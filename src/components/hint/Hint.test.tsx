@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { Fieldset } from "@/components/fieldset/Fieldset";
+import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 
 import { Hint } from "./Hint";
 
@@ -73,5 +74,27 @@ describe("Hint", () => {
   it("merges className on root", () => {
     render(<Hint.Root className="custom-hint">H</Hint.Root>);
     expect(screen.getByText("H")).toHaveClass("custom-hint");
+  });
+
+  it("takes the tier of its host without a size of its own", () => {
+    render(
+      <ControlSizeProvider value="l">
+        <Hint.Root>
+          Host tier
+          <ControlSizeDump />
+        </Hint.Root>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByText("Host tier")).toHaveAttribute("data-size", "l");
+    expect(screen.getByTestId("control-size-dump")).toHaveTextContent("l");
+  });
+
+  it("dims inside a disabled Fieldset", () => {
+    render(
+      <Fieldset label="Реквизиты" disabled>
+        <Hint.Root>Как в уставе</Hint.Root>
+      </Fieldset>,
+    );
+    expect(screen.getByText("Как в уставе")).toHaveAttribute("data-disabled", "true");
   });
 });

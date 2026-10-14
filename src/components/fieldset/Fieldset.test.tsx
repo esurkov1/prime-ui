@@ -156,4 +156,121 @@ describe("Fieldset", () => {
     expect(screen.getByRole("group", { name: "Контакты" })).toBeDisabled();
     expect(screen.getByRole("switch", { name: "Рассылка" })).toBeDisabled();
   });
+
+  it("dims the label and the hint of every field kind inside a disabled group", () => {
+    render(
+      <Fieldset label="Реквизиты" disabled>
+        <Input.Root label="Название" hint="Как в уставе">
+          <Input.Wrapper>
+            <Input.Field />
+          </Input.Wrapper>
+        </Input.Root>
+        <Textarea.Root label="Комментарий" hint="Видят все участники" />
+        <NativeSelect label="Город" hint="Город доставки">
+          <option value="msk">Москва</option>
+        </NativeSelect>
+        <Select.Root label="Менеджер" hint="Ответственный за сделку">
+          <Select.Trigger>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="anna">Анна</Select.Item>
+          </Select.Content>
+        </Select.Root>
+        <Datepicker.Root mode="single" label="Дата" hint="Дата отгрузки" />
+        <TagSelect label="Теги" hint="До пяти тегов" options={[{ value: "vip", label: "VIP" }]} />
+        <Checkbox.Root hint="Письмо уйдёт сразу">
+          <Checkbox.Label>Пригласить</Checkbox.Label>
+        </Checkbox.Root>
+        <Radio.Group label="Тип" hint="Влияет на реквизиты">
+          <Radio.Root value="company">
+            <Radio.Label>Компания</Radio.Label>
+          </Radio.Root>
+        </Radio.Group>
+        <Slider label="Скидка" hint="Не больше 30%" defaultValue={10} />
+        <SegmentedControl.Root label="Чей расход" hint="Для отчёта" defaultValue="company">
+          <SegmentedControl.Item value="company">Компании</SegmentedControl.Item>
+          <SegmentedControl.Item value="personal">Личный</SegmentedControl.Item>
+        </SegmentedControl.Root>
+      </Fieldset>,
+    );
+    for (const label of ["Название", "Комментарий", "Город", "Менеджер", "Дата", "Теги"]) {
+      expect(screen.getByText(label).closest("label"), label).toHaveAttribute(
+        "data-disabled",
+        "true",
+      );
+    }
+    for (const label of ["Тип", "Скидка", "Чей расход"]) {
+      expect(screen.getByText(label), label).toHaveAttribute("data-disabled", "true");
+    }
+    for (const hint of [
+      "Как в уставе",
+      "Видят все участники",
+      "Город доставки",
+      "Ответственный за сделку",
+      "Дата отгрузки",
+      "До пяти тегов",
+      "Письмо уйдёт сразу",
+      "Влияет на реквизиты",
+      "Не больше 30%",
+      "Для отчёта",
+    ]) {
+      expect(screen.getByText(hint), hint).toHaveAttribute("data-disabled", "true");
+    }
+  });
+
+  it("Tab moves through the group's fields and skips a disabled group", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <>
+        <Fieldset label="Реквизиты">
+          <Input.Root label="ИНН">
+            <Input.Wrapper>
+              <Input.Field />
+            </Input.Wrapper>
+          </Input.Root>
+          <Input.Root label="КПП">
+            <Input.Wrapper>
+              <Input.Field />
+            </Input.Wrapper>
+          </Input.Root>
+        </Fieldset>
+        <Button.Root>Сохранить</Button.Root>
+      </>,
+    );
+    await user.tab();
+    expect(screen.getByLabelText("ИНН")).toHaveFocus();
+    await user.tab();
+    expect(screen.getByLabelText("КПП")).toHaveFocus();
+    rerender(
+      <>
+        <Fieldset label="Реквизиты" disabled>
+          <Input.Root label="ИНН">
+            <Input.Wrapper>
+              <Input.Field />
+            </Input.Wrapper>
+          </Input.Root>
+        </Fieldset>
+        <Button.Root>Сохранить</Button.Root>
+      </>,
+    );
+    screen.getByRole("button", { name: "Сохранить" }).blur();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Сохранить" })).toHaveFocus();
+  });
+
+  it("without a label it is the plain field column: no legend, the fields at the form rhythm", () => {
+    render(
+      <Fieldset>
+        <Input.Root label="Почта">
+          <Input.Wrapper>
+            <Input.Field />
+          </Input.Wrapper>
+        </Input.Root>
+      </Fieldset>,
+    );
+    const group = screen.getByRole("group");
+    expect(group.querySelector("legend")).toBeNull();
+    expect(group).toContainElement(screen.getByLabelText("Почта"));
+  });
 });

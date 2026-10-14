@@ -1,6 +1,6 @@
 /* Layout of the Hint scenarios: semantic tokens only. */
 
-/* overview.tsx, hint-or-error.tsx: label → control → support row with the m-tier gaps. */
+/* overview.tsx, hint-or-error.tsx: control → support row at the m-tier hint gap. */
 .field {
   display: grid;
   justify-items: start;

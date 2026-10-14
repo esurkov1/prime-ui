@@ -133,5 +133,5 @@ No motion: the list is static text; a row action has the Button's own press and 
 - A viewport media query to stack the pairs → the list adapts to its own width already.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (`ItemAction`), [Tooltip](../tooltip/COMPONENT.md) (the action's `label`)
+- **Built from:** [Button](../button/COMPONENT.md) (`ItemAction`), [Tooltip](../tooltip/COMPONENT.md) (the action's `label`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Card](../card/COMPONENT.md) (the surface the list usually sits in), [Drawer](../drawer/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Timeline](../timeline/COMPONENT.md)

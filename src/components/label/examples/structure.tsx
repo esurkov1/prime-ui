@@ -5,7 +5,7 @@ import styles from "./examples.module.css";
 
 export default function LabelStructureExample() {
   return (
-    <div className={styles.structure}>
+    <>
       <div className={styles.field}>
         <Label.Root required>ИНН</Label.Root>
         <Typography as="span" variant="caption" tone="muted">
@@ -27,6 +27,6 @@ export default function LabelStructureExample() {
           Label.Description
         </Typography>
       </div>
-    </div>
+    </>
   );
 }

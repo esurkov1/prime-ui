@@ -23,8 +23,9 @@ import { Select } from "@/components/select/Select";
 import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
-import type { FieldRootDomProps } from "@/internal/FieldFrame";
+import type { FieldFocusRingProps, FieldRootDomProps } from "@/internal/FieldFrame";
 import { fieldSurfaceClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
@@ -86,20 +87,15 @@ export type ColorPickerRootProps = {
   children: React.ReactNode;
 };
 
-export type ColorPickerHexInputProps = FieldRootDomProps & {
-  /** Tier. Default: the tier of the surrounding control (a panel, a popover), else `m`. */
-  size?: ControlSize;
-  label?: React.ReactNode;
-  hint?: React.ReactNode;
-  /** Error message in the hint slot; implies `invalid`. */
-  error?: React.ReactNode;
-  /**
-   * Draws the focus ring on the focused field (default). `false` sets `data-focus-ring="false"` and
-   * hides only the visual ring — focus, keyboard and ARIA are unchanged, the error ring still shows.
-   * Turn it off only where focus is otherwise obvious; WCAG 2.4.7.
-   */
-  focusRing?: boolean;
-};
+export type ColorPickerHexInputProps = FieldRootDomProps &
+  FieldFocusRingProps & {
+    /** Tier. Default: the tier of the surrounding control (a panel, a popover), else `m`. */
+    size?: ControlSize;
+    label?: React.ReactNode;
+    hint?: React.ReactNode;
+    /** Error message in the hint slot; implies `invalid`. */
+    error?: React.ReactNode;
+  };
 
 export { parseColor };
 
@@ -291,24 +287,17 @@ function StripHexField() {
   );
 }
 
-export type ColorPickerChannelStripProps = DivProps & {
-  /**
-   * Draws the focus ring on the focused field (default). `false` sets `data-focus-ring="false"` and
-   * hides only the visual ring — focus, keyboard and ARIA are unchanged, the error ring still shows.
-   * Turn it off only where focus is otherwise obvious; WCAG 2.4.7.
-   */
-  focusRing?: boolean;
-};
+export type ColorPickerChannelStripProps = DivProps & FieldFocusRingProps;
 
 /** Channel row: eyedropper on the left, then the cells of the current format. */
-function ChannelStrip({ className, focusRing = true, ...rest }: ColorPickerChannelStripProps) {
+function ChannelStrip({ className, focusRing, ...rest }: ColorPickerChannelStripProps) {
   const { format } = useColorPickerContext();
 
   return (
     <div
       {...rest}
       className={cx(styles.channelStrip, className)}
-      data-focus-ring={focusRing ? undefined : "false"}
+      {...toDataAttributes({ "focus-ring": focusRing })}
     >
       <div className={styles.channelStripLead}>
         <EyeDropperButton className={styles.channelStripEyedropperBtn} />
@@ -499,7 +488,7 @@ function SliderMeta({ label, className, ...rest }: ColorPickerSliderMetaProps) {
   );
 }
 
-function HexInput({ label, hint, error, focusRing = true, ...rest }: ColorPickerHexInputProps) {
+function HexInput({ label, hint, error, focusRing, ...rest }: ColorPickerHexInputProps) {
   const { labels } = useColorPickerContext();
   const { inputRef, text, setText, commit } = useColorDraft(toHexText, parseHex);
 

@@ -6,6 +6,7 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import palette from "@/internal/palette.module.css";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
+import { touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./Timeline.module.css";
 
@@ -134,7 +135,7 @@ function TimelineItem({
   const rowProps = {
     ...rest,
     ref: rowRef,
-    className: cx(palette.hue, styles.row, className),
+    className: cx(palette.hue, styles.row, interactive && touchTargetRowClass, className),
     ...toDataAttributes({
       color: tone ? undefined : color,
       tone,

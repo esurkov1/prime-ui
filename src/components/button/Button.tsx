@@ -1,4 +1,5 @@
 import * as React from "react";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -13,7 +14,6 @@ import { Slot } from "@/internal/slot";
 import type { ControlSize, Tone, Variant } from "@/internal/states";
 import { touchTargetClass } from "@/internal/touchTarget";
 import { isPromiseLike } from "@/internal/usePendingChanges";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import { Spinner } from "../spinner/Spinner";
 import styles from "./Button.module.css";

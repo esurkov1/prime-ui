@@ -269,5 +269,5 @@ ECharts and Chart.js take the same `width`, `height` and `series[i].color`; thei
 - A hand-drawn chart with its tooltip placed by hand (a `foreignObject`, clamped coordinates) → `ChartFrame.Tooltip` with `point`: it flips only when out of room and never jumps at the middle.
 
 ## Related
-- **Built from:** [Crossfade](../crossfade/COMPONENT.md) (state swap), [Skeleton](../skeleton/COMPONENT.md) (loading), [EmptyPage](../empty-page/COMPONENT.md) (empty, error, retry), `Icon`, `chartColors`, `ChartTooltip` (the chart tooltip shared with Sparkline)
+- **Built from:** [Crossfade](../crossfade/COMPONENT.md) (state swap), [Skeleton](../skeleton/COMPONENT.md) (loading), [EmptyPage](../empty-page/COMPONENT.md) (empty, error, retry), `Icon`, `chartColors`, `ChartTooltip` (the chart tooltip shared with Sparkline), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Sparkline](../sparkline/COMPONENT.md), [Card](../card/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

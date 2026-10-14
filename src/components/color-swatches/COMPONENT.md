@@ -147,5 +147,5 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 - Dozens of presets → use ColorPicker.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [ColorField](../color-field/COMPONENT.md), [ColorPicker](../color-picker/COMPONENT.md) (`ColorPresets`, `ColorPicker.Swatches`), [Radio](../radio/COMPONENT.md)

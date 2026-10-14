@@ -10,7 +10,7 @@ import { toDataAttributes } from "./data-attributes";
 import styles from "./ProgressLegend.module.css";
 import palette from "./palette.module.css";
 import { type ProgressSegment, segmentFill } from "./progressSegments";
-import type { ControlSize } from "./states";
+import { type ControlSize, tierMappings } from "./states";
 
 export type ProgressLegendProps = {
   segments: ProgressSegment[];
@@ -54,15 +54,6 @@ export function ProgressLegend({
   );
 }
 
-/** Skeleton tier whose line height equals the legend row of a label tier (16 · 16 · 20 · 20 · 20). */
-const SKELETON_TIER: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "m",
-  l: "m",
-  xl: "m",
-};
-
 /** The legend while the distribution loads: one text line per expected row. */
 export function ProgressLegendSkeleton({
   rows,
@@ -73,7 +64,7 @@ export function ProgressLegendSkeleton({
   size: ControlSize;
   className?: string;
 }) {
-  const tier = SKELETON_TIER[size];
+  const tier = tierMappings.legendSkeleton[size];
   return (
     <div className={cx(styles.skeleton, className)} data-size={size}>
       {Array.from({ length: Math.max(1, rows) }, (_, index) => (

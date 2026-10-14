@@ -1,10 +1,9 @@
 /*
- * Field label. Tier T uses `--prime-control-<T>-label-*` (foundation §6):
- * xs/s 12/16 · m 13/20 · l/xl 14/20, weight 500, primary text.
+ * Field label. The text comes from the field tier of `data-size` (`fieldTierClass` +
+ * `fieldLabelTextClass`, joined in TSX; foundation §6): xs/s 12/16 · m 13/20 · l/xl 14/20,
+ * weight 500, primary text.
  */
 .root {
-  --prime-label-size: var(--prime-control-m-label-size);
-  --prime-label-line-height: var(--prime-control-m-label-line-height);
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
@@ -12,31 +11,21 @@
   min-width: 0;
   max-width: 100%;
   font-family: var(--prime-font-family-sans);
-  font-size: var(--prime-label-size);
-  line-height: var(--prime-label-line-height);
-  font-weight: var(--prime-font-weight-medium);
   color: var(--prime-color-text-primary);
   overflow-wrap: anywhere;
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-.root[data-size="xs"] {
-  --prime-label-size: var(--prime-control-xs-label-size);
-  --prime-label-line-height: var(--prime-control-xs-label-line-height);
-}
-
-.root[data-size="s"] {
-  --prime-label-size: var(--prime-control-s-label-size);
-  --prime-label-line-height: var(--prime-control-s-label-line-height);
-}
-
-.root[data-size="l"] {
-  --prime-label-size: var(--prime-control-l-label-size);
-  --prime-label-line-height: var(--prime-control-l-label-line-height);
-}
-
-.root[data-size="xl"] {
-  --prime-label-size: var(--prime-control-xl-label-size);
-  --prime-label-line-height: var(--prime-control-xl-label-line-height);
+/*
+ * Secondary: one step quieter than a field label above it, on one line cut with an ellipsis — a
+ * column heading under the group's own label (FieldList).
+ */
+.root[data-secondary="true"] {
+  display: block;
+  overflow: hidden;
+  color: var(--prime-color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /*
@@ -54,15 +43,23 @@
   flex-shrink: 0;
   align-items: center;
   color: var(--label-dimmed, var(--prime-color-text-muted));
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
+/* The marks (`LabelMarks`): in a Label they dim with it, elsewhere by their own `data-disabled`. */
 .asterisk {
   color: var(--label-dimmed, var(--prime-color-danger-text));
   font-weight: var(--prime-font-weight-medium);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .description,
 .optional {
   font-weight: var(--prime-font-weight-regular);
   color: var(--label-dimmed, var(--prime-color-text-muted));
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
+}
+
+:is(.asterisk, .optional)[data-disabled="true"] {
+  color: var(--prime-color-text-disabled);
 }

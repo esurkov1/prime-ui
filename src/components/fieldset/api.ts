@@ -10,8 +10,8 @@ export const api: ComponentApi = {
         {
           name: "label",
           type: "ReactNode",
-          en: "Group heading in the native `<legend>` (`title-s`); it names the group for assistive tech. Without it give the fieldset an `aria-label` when the group needs a name.",
-          ru: "Заголовок группы в нативном `<legend>` (`title-s`); он же имя группы для вспомогательных технологий. Без него задайте `aria-label`, если группе нужно имя.",
+          en: "Group heading in the native `<legend>` (`title-s`), the group name. Without it the fieldset is the plain field column of a form; give it an `aria-label` when the group needs a name.",
+          ru: "Заголовок группы в нативном `<legend>` (`title-s`), имя группы. Без него это просто колонка полей формы; задайте `aria-label`, если группе нужно имя.",
         },
         {
           name: "description",

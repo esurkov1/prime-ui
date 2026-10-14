@@ -1,8 +1,6 @@
 export type { ControlSizeProviderProps } from "../internal/ControlSizeContext";
 export { ControlSizeProvider, useOptionalControlSize } from "../internal/ControlSizeContext";
 export type { ProgressScale, ProgressSegment } from "../internal/progressSegments";
-export type { VisuallyHiddenProps } from "../internal/VisuallyHidden";
-export { VisuallyHidden } from "../internal/VisuallyHidden";
 export * from "../layout";
 export type {
   AccordionContentProps,
@@ -697,6 +695,8 @@ export type {
 export { Typography } from "./typography/Typography";
 export type { VideoNoteLabels, VideoNoteProps } from "./video-note/VideoNote";
 export { VideoNote } from "./video-note/VideoNote";
+export type { VisuallyHiddenProps } from "./visually-hidden/VisuallyHidden";
+export { VisuallyHidden } from "./visually-hidden/VisuallyHidden";
 export type {
   VoicePlayerLabels,
   VoicePlayerProps,

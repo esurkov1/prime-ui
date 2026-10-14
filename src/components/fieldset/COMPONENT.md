@@ -9,6 +9,7 @@
 - A long form split into groups («Реквизиты», «Контакты», «Уведомления»), each with a heading 16 above its fields.
 - Disabling every field of a form while its request runs: `disabled` on the group instead of `disabled` on each field.
 - A group that needs a native name for assistive tech (`<legend>`), e.g. a set of switches under one heading.
+- Without `label`: the plain field column of a form — the fields 20 apart and one `disabled` for all of them, instead of a hand-made stack.
 
 ## When not to use
 - One choice among options with a heading → [Radio](../radio/COMPONENT.md) `Radio.Group label`, a [SegmentedControl](../segmented-control/COMPONENT.md) or [ButtonGroup](../button-group/COMPONENT.md) `label`.
@@ -40,7 +41,7 @@ A leaf: everything is a prop or a child. A row of two fields inside is the consu
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `label` | `ReactNode` | — | Group heading in the native `<legend>` (`title-s`); it names the group for assistive tech. Without it give the fieldset an `aria-label` when the group needs a name. |
+| `label` | `ReactNode` | — | Group heading in the native `<legend>` (`title-s`), the group name. Without it the fieldset is the plain field column of a form; give it an `aria-label` when the group needs a name. |
 | `description` | `ReactNode` | — | Secondary text under the heading (`body-s`, secondary), linked through `aria-describedby`. |
 | `disabled` | `boolean` | `false` | Disables every control inside, native and kit (they take their own disabled look, ARIA and keyboard); nested groups inherit it. Use it while the form's request runs. |
 | `children` | `ReactNode` | — (required) | The fields, stacked 20 apart; a row of two fields is the consumer's grid. |
@@ -56,7 +57,7 @@ Fieldset has no `variant`, `tone` or `size`: fields keep their own tier (or the 
 
 **Combinations**
 - Recommended: groups 32 apart in the form, a `label` on each; `disabled={saving}` on every group and `loading` on the submit button outside them.
-- Allowed but rare: no `label` — a group only for `disabled`; give it an `aria-label` when the group itself needs a name.
+- Allowed: no `label` — the plain field column of a form (the rhythm and `disabled` without a heading); give it an `aria-label` when the group itself needs a name.
 - Pointless: a description without a heading.
 - Forbidden: a border, padding or fill added to the group — the group is made by proximity; use a Card when it needs a surface.
 
@@ -69,7 +70,7 @@ A Button inside a disabled group is disabled too (it reads the same context), so
 
 ## Layout & spacing
 - Heading → fields `--prime-space-4` (16); heading → description `--prime-space-1` (4); description → fields `--prime-space-4`; field → field `--prime-space-5` (20).
-- Group → group `--prime-space-8` (32) — set by the form around the groups.
+- Group → group 32 — set by the form around the groups.
 - `width: 100%`, `min-width: 0` (the native fieldset's `min-content` minimum is reset), so long values never widen the form.
 
 ## Accessibility

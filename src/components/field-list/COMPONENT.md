@@ -165,5 +165,5 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - A grip, a remove button and an add button drawn by hand around a `.map()` of fields → FieldList.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (add, remove), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`), [Label](../label/COMPONENT.md) (headings), `Icon` (lock), the field frame (label, hint, error)
+- **Built from:** [Button](../button/COMPONENT.md) (add, remove), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`), [Label](../label/COMPONENT.md) (headings), `Icon` (lock), the field frame (label, hint, error), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md) (icon-only trigger), [ColorPicker](../color-picker/COMPONENT.md) (`ColorPresets`), [Fieldset](../fieldset/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

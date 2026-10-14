@@ -237,5 +237,5 @@ A `tone` wins over `color`. Say the status in the label too, never only by color
 - Expecting the page to scroll to today → «Сегодня» scrolls only the chart.
 
 ## Related
-- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Button](../button/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), Icon (`action.add` in the create cue)
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md), [Tooltip](../tooltip/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md), [Button](../button/COMPONENT.md), [Skeleton](../skeleton/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Spinner](../spinner/COMPONENT.md), Icon (`action.add` in the create cue), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Timeline](../timeline/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Kanban](../kanban/COMPONENT.md), [Datepicker](../datepicker/COMPONENT.md), [Avatar](../avatar/COMPONENT.md)

@@ -196,5 +196,5 @@ Badge.Root          <span>: fill, tier dimensions
 - Removing the badge from your list first and putting it back when the request fails → return the request's promise and remove it after it succeeds; the badge waits meanwhile.
 
 ## Related
-- **Built from:** `Icon` (remove ×, `Badge.Action` −), [Spinner](../spinner/COMPONENT.md) (removing)
+- **Built from:** `Icon` (remove ×, `Badge.Action` −), [Spinner](../spinner/COMPONENT.md) (removing), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [TagSelect](../tag-select/COMPONENT.md), [Select](../select/COMPONENT.md) (row badges), [SegmentedControl](../segmented-control/COMPONENT.md) (`Count`, color dots), [SmartFilter](../smart-filter/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Avatar](../avatar/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

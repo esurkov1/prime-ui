@@ -273,5 +273,5 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 - `canDrop` returning `false` where the rule is not obvious → return the reason as a string.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md), `Icon` (`action.drag` for the grip, `status.locked` for a locked item's lock)
+- **Built from:** [Button](../button/COMPONENT.md), `Icon` (`action.drag` for the grip, `status.locked` for a locked item's lock), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Kanban](../kanban/COMPONENT.md), [DataTable](../data-table/COMPONENT.md) (`onReorder`), [FileUpload](../file-upload/COMPONENT.md), [ScrollContainer](../scroll-container/COMPONENT.md), [Card](../card/COMPONENT.md)

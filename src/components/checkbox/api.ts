@@ -107,8 +107,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "checked" | "defaultChecked" | "onChange">',
-          en: "`name`, `value`, `required`, `aria-label`, `onBlur`… on the native input.",
-          ru: "`name`, `value`, `required`, `aria-label`, `onBlur`… на нативном input.",
+          en: "`name`, `value`, `required` (also a red `*` after the text), `aria-label`, `onBlur`… on the native input.",
+          ru: "`name`, `value`, `required` (ещё и красная `*` после текста), `aria-label`, `onBlur`… на нативном input.",
         },
       ],
     },
@@ -193,8 +193,8 @@ export const api: ComponentApi = {
         ru: "Без видимого текста задайте `aria-label` на `Checkbox.Root` — он попадёт на input.",
       },
       {
-        en: "`required` goes to the native input; no asterisk is drawn — state it in the text or the hint.",
-        ru: "`required` уходит в нативный input; звёздочка не рисуется — скажите об этом в тексте или подсказке.",
+        en: "`required` goes to the native input and draws a red `*` after the text; the `*` is `aria-hidden`, the input reports the requirement.",
+        ru: "`required` уходит в нативный input и рисует красную `*` после текста; `*` скрыта (`aria-hidden`), обязательность сообщает input.",
       },
       {
         en: "`Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked`.",

@@ -100,8 +100,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "checked" | "defaultChecked" | "onChange">',
-          en: "`name`, `value`, `required`, `aria-label`, `aria-labelledby`… on the native input.",
-          ru: "`name`, `value`, `required`, `aria-label`, `aria-labelledby`… на нативном input.",
+          en: "`name`, `value`, `required` (also a red `*` after the text), `aria-label`, `aria-labelledby`… on the native input.",
+          ru: "`name`, `value`, `required` (ещё и красная `*` после текста), `aria-label`, `aria-labelledby`… на нативном input.",
         },
       ],
     },

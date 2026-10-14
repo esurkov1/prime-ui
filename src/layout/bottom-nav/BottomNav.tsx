@@ -2,11 +2,11 @@ import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
+import { visuallyHiddenClass } from "@/components/visually-hidden/VisuallyHidden";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { Slot } from "@/internal/slot";
 import type { PaletteColor, Variant } from "@/internal/states";
-import { visuallyHiddenClass } from "@/internal/VisuallyHidden";
 
 import styles from "./BottomNav.module.css";
 

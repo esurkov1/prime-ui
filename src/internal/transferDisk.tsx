@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { Spinner } from "@/components/spinner/Spinner";
+import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { mediaDiskClass } from "@/internal/mediaDisk";
@@ -13,7 +14,6 @@ import {
   type TransferState,
 } from "@/internal/transfer";
 import { isPromiseLike } from "@/internal/usePendingChanges";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./transferDisk.module.css";
 
@@ -179,7 +179,7 @@ export function useTransferDisk({
         {description ? <VisuallyHidden id={descriptionId}>{description}</VisuallyHidden> : null}
         {/* Only where a refusal has words to announce; a host with its own live region gives none. */}
         {labels.cancelFailed || labels.retryFailed || labels.downloadFailed ? (
-          <VisuallyHidden role="status">{notice}</VisuallyHidden>
+          <VisuallyHidden live="polite">{notice}</VisuallyHidden>
         ) : null}
       </>
     ),
