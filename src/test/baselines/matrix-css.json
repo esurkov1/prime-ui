@@ -26,7 +26,6 @@
   "src/components/list/examples/states.tsx: imports CSS",
   "src/components/list/examples/with-icon.tsx: imports CSS",
   "src/components/notification/examples/sizes.tsx: imports CSS",
-  "src/components/smart-filter/examples/sizes.tsx: imports CSS",
   "src/components/stepper/examples/sizes.tsx: imports CSS",
   "src/components/stepper/examples/states.tsx: imports CSS",
   "src/components/stepper/examples/with-icon.tsx: imports CSS",

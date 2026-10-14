@@ -21,7 +21,6 @@
   "src/components/list/List.tsx: root default size = \"m\"",
   "src/components/modal/ModalDialog.tsx: root default size = \"m\"",
   "src/components/popover/Popover.tsx: root default size = \"m\"",
-  "src/components/progress-circle/ProgressCircle.tsx: root default size = \"m\"",
   "src/components/sheet/Sheet.tsx: imports modal/DialogGuard (not its main module or types.ts)",
   "src/components/sheet/Sheet.tsx: imports modal/DialogParts (not its main module or types.ts)",
   "src/components/tag-select/useChipOverflow.ts: biome-ignore useExhaustiveDependencies",

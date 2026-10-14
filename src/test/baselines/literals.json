@@ -19,8 +19,6 @@
   "src/components/notification/Notification.module.css: raw length in --ntf-safe-top",
   "src/components/popover/Popover.module.css: raw length in --po-gap",
   "src/components/popover/Popover.module.css: raw length in --po-pad",
-  "src/components/progress-bar/ProgressBar.module.css: numeric scale() in transform",
-  "src/components/progress-bar/ProgressBar.module.css: numeric scale() in transform #2",
   "src/components/radio/Radio.module.css: numeric scale() in transform",
   "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-bottom",
   "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-end",

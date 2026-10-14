@@ -31,7 +31,6 @@
   "src/components/modal/DialogParts.module.css: reads --prime-text-title-m-weight",
   "src/components/popover/Popover.module.css: reads --prime-text-title-s-tracking",
   "src/components/popover/Popover.module.css: reads --prime-text-title-s-weight",
-  "src/components/progress-circle/ProgressCircle.module.css: local [data-tone] color (.root[data-tone=\"inherit\"] .inner)",
   "src/components/tabs/Tabs.module.css: local [data-tone] color (.root[data-tone=\"accent\"] .tab[aria-selected=\"true\"])",
   "src/components/tag-select/TagSelect.module.css: reads --prime-text-caption-tracking",
   "src/components/timeline/Timeline.module.css: local [data-tone] color (.value[data-tone=\"accent\"])",
