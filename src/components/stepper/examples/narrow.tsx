@@ -1,4 +1,4 @@
-/** A horizontal stepper in a phone-width container stacks one step per row and hides the chevrons. */
+/** A horizontal stepper in a phone-width container stacks one step per row and hides the chevrons — `orientation`. */
 import { Stepper } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

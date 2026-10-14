@@ -11,7 +11,6 @@ export const RENAMED = {
     "PageContent.List": "a `PageContent.Panel` (list and detail are panels of the split)",
     "PageContent.Detail": "a `PageContent.Panel` (list and detail are panels of the split)",
     "PageContent.Page": '`PageContent.Root as="section"`',
-    "Stepper.Arrow": "nothing: the root draws its own separators and indicators",
     "Timeline.Title": "`Timeline.ItemTitle`",
     "Timeline.Meta": "`Timeline.ItemMeta`",
     "Timeline.MetaPrimary": "`Timeline.ItemMeta`",

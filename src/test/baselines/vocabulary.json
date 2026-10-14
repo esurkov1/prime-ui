@@ -13,8 +13,6 @@
   "src/components/page-content/api.ts: PageContent.Detail → a `PageContent.Panel` (list and detail are panels of the split)",
   "src/components/page-content/api.ts: PageContent.List → a `PageContent.Panel` (list and detail are panels of the split)",
   "src/components/page-content/api.ts: PageContent.Page → `PageContent.Root as=\"section\"`",
-  "src/components/stepper/api.ts: Stepper.Arrow → nothing: the root draws its own separators and indicators",
-  "src/components/stepper/api.ts: Stepper.Item.status \"active\" → `current`",
   "src/components/timeline/api.ts: Timeline.GapMeta → `Timeline.Description` of a gap",
   "src/components/timeline/api.ts: Timeline.Meta → `Timeline.ItemMeta`",
   "src/components/timeline/api.ts: Timeline.MetaPrimary → `Timeline.ItemMeta`",

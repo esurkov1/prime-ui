@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+
 import { Stepper } from "./Stepper";
 
 function Step({ title, description }: { title: string; description?: string }) {
@@ -43,11 +45,11 @@ describe("Stepper", () => {
     expect(screen.getByText("Step one")).toBeInTheDocument();
   });
 
-  it("with value=1 marks step 0 completed, 1 active, 2 pending", () => {
+  it("with value=1 marks step 0 completed, 1 current, 2 pending", () => {
     render(<ThreeStepStepper value={1} />);
     const buttons = screen.getAllByRole("button");
     expect(buttons[0]).toHaveAttribute("data-status", "completed");
-    expect(buttons[1]).toHaveAttribute("data-status", "active");
+    expect(buttons[1]).toHaveAttribute("data-status", "current");
     expect(buttons[2]).toHaveAttribute("data-status", "pending");
     expect(buttons[0].querySelector("svg")).toBeTruthy();
     expect(within(buttons[1]).getByText("2")).toBeInTheDocument();
@@ -152,6 +154,83 @@ describe("Stepper", () => {
     expect(screen.getByRole("button", { name: /Second/ })).toHaveFocus();
     await user.keyboard("{Enter}");
     expect(onValueChange).toHaveBeenCalledWith(1);
+  });
+
+  it("Space on a focused step selects it", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<ThreeStepStepper onValueChange={onValueChange} />);
+    screen.getByRole("button", { name: /Third/ }).focus();
+    await user.keyboard(" ");
+    expect(onValueChange).toHaveBeenCalledWith(2);
+  });
+
+  it("speaks a completed or danger status with the step name, not by the circle alone", () => {
+    render(
+      <Stepper.Root value={2}>
+        <Stepper.Item>
+          <Step title="Paid" />
+        </Stepper.Item>
+        <Stepper.Item status="danger">
+          <Step title="Delivery" />
+        </Stepper.Item>
+        <Stepper.Item>
+          <Step title="Review" />
+        </Stepper.Item>
+      </Stepper.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Paid, пройден" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Delivery, требует внимания" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Review" })).toHaveAttribute("aria-current", "step");
+  });
+
+  it("labels override the spoken statuses", () => {
+    render(
+      <Stepper.Root value={1} labels={{ completed: "done" }}>
+        <Stepper.Item>
+          <Step title="Paid" />
+        </Stepper.Item>
+        <Stepper.Item>
+          <Step title="Review" />
+        </Stepper.Item>
+      </Stepper.Root>,
+    );
+    expect(screen.getByRole("button", { name: "Paid, done" })).toBeInTheDocument();
+  });
+
+  it("a danger step shows the danger glyph instead of its number", () => {
+    render(
+      <Stepper.Root value={0}>
+        <Stepper.Item status="danger">
+          <Step title="Delivery" />
+        </Stepper.Item>
+      </Stepper.Root>,
+    );
+    const button = screen.getByRole("button", { name: /Delivery/ });
+    expect(within(button).queryByText("1")).not.toBeInTheDocument();
+    expect(button.querySelector('[data-status="danger"] svg')).toBeInTheDocument();
+  });
+
+  it("`arrows` ends every vertical row with a hidden chevron, never a horizontal one", () => {
+    const { rerender } = render(<ThreeStepStepper arrows />);
+    for (const button of screen.getAllByRole("button")) {
+      const last = button.lastElementChild;
+      expect(last).toHaveAttribute("aria-hidden", "true");
+      expect(last?.querySelector("svg")).toBeInTheDocument();
+    }
+    rerender(<ThreeStepStepper arrows orientation="horizontal" />);
+    for (const button of screen.getAllByRole("button")) {
+      expect(button.lastElementChild?.querySelector("svg")).toBeNull();
+    }
+  });
+
+  it("the root takes the host tier when it has no size", () => {
+    render(
+      <ControlSizeProvider value="xs">
+        <ThreeStepStepper />
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByRole("list")).toHaveAttribute("data-size", "xs");
   });
 
   it("disabled steps do not select", () => {

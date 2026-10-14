@@ -97,7 +97,6 @@
   "src/components/slider/COMPONENT.md: neither Variants nor States has `optional`",
   "src/components/slider/COMPONENT.md: neither Variants nor States has `required`",
   "src/components/sparkline/COMPONENT.md: Built from misses scroll-container",
-  "src/components/stepper/COMPONENT.md: names --prime-space-8, not in its CSS",
   "src/components/switch/COMPONENT.md: Built from misses label",
   "src/components/switch/COMPONENT.md: names --prime-space-4, not in its CSS",
   "src/components/switch/COMPONENT.md: names --prime-space-5, not in its CSS",

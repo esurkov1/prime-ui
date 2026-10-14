@@ -41,7 +41,6 @@
   "src/components/notification/Notification.module.css: local @keyframes ntfCountdown",
   "src/components/progress-circle/ProgressCircle.module.css: animates stroke-dasharray",
   "src/components/skeleton/Skeleton.module.css: reduced-motion block globals.css already covers (.root)",
-  "src/components/stepper/Stepper.module.css: reduced-motion block globals.css already covers (.indicator)",
   "src/components/tabs/Tabs.module.css: reduced-motion block globals.css already covers (.content, .remove)",
   "src/components/timeline/Timeline.module.css: reduced-motion block globals.css already covers (.row, .dot, .title)",
   "src/internal/FieldFrame.module.css: local @keyframes field-shake-even",

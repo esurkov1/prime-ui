@@ -122,7 +122,6 @@
   "src/components/sparkline/api.ts: keyboard Tab — Tab",
   "src/components/sparkline/api.ts: keyboard ← · → · ↓ · ↑ — ↑",
   "src/components/sparkline/api.ts: keyboard ← · → · ↓ · ↑ — ↓",
-  "src/components/stepper/api.ts: keyboard Enter · Space — Space",
   "src/components/switch/api.ts: keyboard Space — Space",
   "src/components/switch/api.ts: keyboard Tab — Tab",
   "src/components/tabs/api.ts: keyboard Tab — Tab",

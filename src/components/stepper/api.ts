@@ -1,11 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { STEPPER_LABELS } from "./Stepper";
 
 export const api: ComponentApi = {
   parts: [
     {
       name: "Stepper.Root",
-      en: "`ref` → `HTMLOListElement`. `<ol>` of items; owns the current step, numbers the items and adds chevrons between horizontal ones.",
-      ru: "Список `<ol>`: хранит текущий шаг, нумерует пункты и ставит шевроны между горизонтальными.",
+      en: "`ref` → `HTMLOListElement`. `<ol>` of items; owns the current step, numbers the items and draws the chevrons between horizontal ones and, with `arrows`, at the end of vertical rows.",
+      ru: "Список `<ol>`: хранит текущий шаг, нумерует пункты и рисует шевроны между горизонтальными, а с `arrows` — в конце вертикальных строк.",
       props: [
         {
           name: "value",
@@ -30,15 +31,28 @@ export const api: ComponentApi = {
           name: "orientation",
           type: '"horizontal" | "vertical"',
           default: '"vertical"',
-          en: "Column of rows, or a row with chevrons that stacks below a 480px container.",
-          ru: "Столбец строк или ряд с шевронами, который уже 480px встаёт в столбец.",
+          en: "Column of rows, or one row with chevrons (steps shrink and wrap their titles) that stacks below a 480px container.",
+          ru: "Столбец строк или один ряд с шевронами (шаги сжимаются и переносят заголовки), который уже 480px встаёт в столбец.",
+        },
+        {
+          name: "arrows",
+          type: "boolean",
+          default: "false",
+          en: "Every vertical row ends with a chevron: each step opens a page or panel. Horizontal steps already have their chevrons.",
+          ru: "Каждая вертикальная строка заканчивается шевроном: шаг открывает страницу или панель. У горизонтальных шагов шевроны уже есть.",
         },
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Indicator 20 · 24 · 28 · 32 · 36, title in the control text of the tier.",
-          ru: "Индикатор 20 · 24 · 28 · 32 · 36, заголовок кеглем контрола яруса.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Indicator 20 · 24 · 28 · 32 · 36, title in the control text of the tier. Without it the tier of its host, else `m`.",
+          ru: "Индикатор 20 · 24 · 28 · 32 · 36, заголовок кеглем контрола яруса. Без него — ярус хоста, иначе `m`.",
+        },
+        {
+          name: "labels",
+          type: "Partial<StepperLabels>",
+          en: "Built-in strings, see Labels.",
+          ru: "Системные строки, см. «Доступность».",
         },
         {
           name: "children",
@@ -56,14 +70,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Stepper.Item",
-      en: '`ref` → `HTMLButtonElement`. One step: an `<li>` with a `<button>` (and, between horizontal steps, the decorative chevron in front of it); `aria-current="step"` when active.',
-      ru: 'Один шаг: `<li>` с `<button>` (между горизонтальными шагами перед ней — декоративный шеврон); у активного — `aria-current="step"`.',
+      en: '`ref` → `HTMLButtonElement`. One step: an `<li>` with a `<button>` (and, between horizontal steps, the decorative chevron in front of it); `aria-current="step"` on the current one; a completed or danger step adds its status to its name.',
+      ru: 'Один шаг: `<li>` с `<button>` (между горизонтальными шагами перед ней — декоративный шеврон); у текущего — `aria-current="step"`; пройденный шаг и шаг с ошибкой добавляют статус к имени.',
       props: [
         {
           name: "status",
-          type: '"pending" | "active" | "completed" | "danger"',
-          en: "Overrides the status derived from `value` (before → `completed`, equal → `active`, after → `pending`).",
-          ru: "Переопределяет статус из `value` (до — `completed`, равен — `active`, после — `pending`).",
+          type: '"pending" | "current" | "completed" | "danger"',
+          en: "Overrides the status derived from `value` (before → `completed`, equal → `current`, after → `pending`).",
+          ru: "Переопределяет статус из `value` (до — `completed`, равен — `current`, после — `pending`).",
         },
         {
           name: "disabled",
@@ -74,8 +88,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: "`Stepper.Indicator`, `Stepper.Content`, optional `Stepper.Arrow`.",
-          ru: "`Stepper.Indicator`, `Stepper.Content`, необязательная `Stepper.Arrow`.",
+          en: "`Stepper.Indicator` and `Stepper.Content`.",
+          ru: "`Stepper.Indicator` и `Stepper.Content`.",
         },
         {
           name: "…rest",
@@ -87,14 +101,14 @@ export const api: ComponentApi = {
     },
     {
       name: "Stepper.Indicator",
-      en: "`ref` → `HTMLSpanElement`. The circle (`aria-hidden`): the item number, or a check when completed.",
-      ru: "Кружок (`aria-hidden`): номер пункта или галочка у пройденного.",
+      en: "`ref` → `HTMLSpanElement`. The circle (`aria-hidden`): the item number, a check when completed, the danger mark on a danger step; a status change cross-fades the glyph.",
+      ru: "Кружок (`aria-hidden`): номер пункта, галочка у пройденного, значок ошибки у шага с ошибкой; при смене статуса значок сменяется плавно.",
       props: [
         {
           name: "children",
           type: "ReactNode",
-          en: 'Replaces the default content, e.g. `<Icon name="status.danger" />`.',
-          ru: 'Заменяет содержимое по умолчанию, например `<Icon name="status.danger" />`.',
+          en: 'Replaces the default content, e.g. `<Icon name="status.info" />`.',
+          ru: 'Заменяет содержимое по умолчанию, например `<Icon name="status.info" />`.',
         },
         {
           name: "…rest",
@@ -130,21 +144,17 @@ export const api: ComponentApi = {
         },
       ],
     },
-    {
-      name: "Stepper.Arrow",
-      en: "`ref` → `SVGSVGElement`. Trailing chevron (`aria-hidden`) for vertical items that open a page or panel.",
-      ru: "Шеврон (`aria-hidden`) в конце вертикального пункта, который открывает страницу или панель.",
-      props: [
-        {
-          name: "…rest",
-          type: 'Omit<SVGAttributes<SVGSVGElement>, "children">',
-          en: "`className` and the other svg attributes.",
-          ru: "`className` и остальные атрибуты svg.",
-        },
-      ],
-    },
   ],
-  labels: [],
+  labels: labelRows(STEPPER_LABELS, {
+    completed: {
+      en: "Spoken after the name of a completed step; the check is only seen.",
+      ru: "Произносится после имени пройденного шага; галочку видно только глазами.",
+    },
+    danger: {
+      en: "Spoken after the name of a step that needs attention; its colour and glyph are only seen.",
+      ru: "Произносится после имени шага, требующего внимания; цвет и значок видно только глазами.",
+    },
+  }),
   accessibility: {
     keyboard: [
       {
@@ -156,12 +166,12 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: 'Semantic `<ol>`; each item is a `<button>` inside an `<li>`; the active one has `aria-current="step"`.',
-        ru: 'Семантический `<ol>`; каждый шаг — `<button>` внутри `<li>`, у активного — `aria-current="step"`.',
+        en: 'Semantic `<ol>`; each item is a `<button>` inside an `<li>`; the current one has `aria-current="step"`.',
+        ru: 'Семантический `<ol>`; каждый шаг — `<button>` внутри `<li>`, у текущего — `aria-current="step"`.',
       },
       {
-        en: "Separators, indicator and arrow are `aria-hidden`; the name comes from Title (and Description).",
-        ru: "Разделители, индикатор и стрелка скрыты (`aria-hidden`); имя шага — заголовок и описание.",
+        en: "Separators, indicator and arrows are `aria-hidden`; the name comes from Title and Description, and a completed or danger step adds `labels.completed` or `labels.danger` to it.",
+        ru: "Разделители, индикатор и стрелки скрыты (`aria-hidden`); имя шага — заголовок и описание, а пройденный шаг и шаг с ошибкой добавляют к нему `labels.completed` или `labels.danger`.",
       },
       {
         en: "Give the `<ol>` an `aria-label` when there are several steppers on a page.",

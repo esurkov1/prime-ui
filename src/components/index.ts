@@ -5,6 +5,7 @@ export * from "../layout";
 export type {
   AccordionContentProps,
   AccordionHeaderProps,
+  AccordionHeadingLevel,
   AccordionIconProps,
   AccordionItemProps,
   AccordionMultipleProps,
@@ -611,12 +612,12 @@ export { Sparkline } from "./sparkline/Sparkline";
 export type { SpinnerLabels, SpinnerProps } from "./spinner/Spinner";
 export { Spinner } from "./spinner/Spinner";
 export type {
-  StepperArrowProps,
   StepperContentProps,
   StepperDescriptionProps,
   StepperIndicatorProps,
   StepperItemProps,
   StepperItemStatus,
+  StepperLabels,
   StepperRootProps,
   StepperTitleProps,
 } from "./stepper/Stepper";
