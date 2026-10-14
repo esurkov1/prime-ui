@@ -238,7 +238,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `open` | `boolean` | `true` | The bubble is open: the other side is typing. Keep the part mounted and switch this, so it folds open and closed. |
-| `children` | `ReactNode` | — | `Message.Avatar` of who types, in a group chat (`Chat.Messages type="group"`). |
+| `children` | `ReactNode` | — | `Message.Avatar` of who types, in a group chat (`Chat.Messages group`). |
 | `labels` | `Partial<MessageTypingLabels>` | — | `typing` — the text read for assistive tech. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes. |
 
@@ -303,7 +303,7 @@ The list-level settings a message reads — the group chat's author header and a
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| author header | `Message.Author` in a group chat (`Chat.Messages type="group"`) on `single` / `first`; any message on its own | the header line at the top of the bubble; over a picture or a circle on the media pill at the top-start corner; hidden on `middle` / `last` and in a direct chat (the author still names the message) |
+| author header | `Message.Author` in a group chat (`Chat.Messages group`) on `single` / `first`; any message on its own | the header line at the top of the bubble; over a picture or a circle on the media pill at the top-start corner; hidden on `middle` / `last` and in a direct chat (the author still names the message) |
 | avatar | `Message.Avatar` in a group chat on `single` / `last` | the avatar in the gutter at the bubble's bottom; the gutter stays empty on the others |
 | new at the end | the chat's list decided it (`data-enter="incoming"` / `"outgoing"`) | the message column floats up `--prime-space-3` from below and fades in (`fast`, enter easing, `transform` + `opacity` only; the row box clips it); never on a first render, history or a status change. See Chat |
 | pointed at / stepping back | the chat's jump, search or selection (`data-pointed`, `data-selected` on the message; `data-pointing`, `data-selecting` on the list) | nothing is drawn on the message: it stays at full strength while the others — the bubble, picture or circle with its tail and reactions, the avatar, the retry — step back to `--prime-message-dim-opacity` with a slight desaturation (selection: `fast`, both ways; the current search match: while it is current); a jump instead blinks the message itself three times, `base` each, the others stay still. Reduced motion: no blink |

@@ -329,8 +329,8 @@ export const api: ComponentApi = {
         {
           name: "children",
           type: "ReactNode",
-          en: '`Message.Avatar` of who types, in a group chat (`Chat.Messages type="group"`).',
-          ru: '`Message.Avatar` того, кто пишет, в групповом чате (`Chat.Messages type="group"`).',
+          en: "`Message.Avatar` of who types, in a group chat (`Chat.Messages group`).",
+          ru: "`Message.Avatar` того, кто пишет, в групповом чате (`Chat.Messages group`).",
         },
         {
           name: "labels",

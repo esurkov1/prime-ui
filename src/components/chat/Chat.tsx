@@ -57,23 +57,13 @@ export const CHAT_LABELS: ChatLabels = {
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export type ChatRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultValue"> & {
-  /**
-   * Selection mode (controlled): the `value`s of the selected messages, `null` while not selecting.
-   * Any of the triad lets a message's menu start selection («Выбрать»).
-   */
   selected?: Selection;
-  /** Initial selection (uncontrolled). */
   defaultSelected?: Selection;
-  /** The selection changed: a message toggled, selection started (`[value]`) or ended (`null`). */
   onSelectedChange?: (selected: Selection) => void;
-  /** The search query (controlled); `null` — the search bar is closed. */
   search?: string | null;
-  /** The initial search (uncontrolled). Default `null`. */
   defaultSearch?: string | null;
-  /** The search opened, changed its query or closed (`null`). */
   onSearchChange?: (search: string | null) => void;
   jumpTo?: string | null;
-  /** The other side is typing: the header's status turns into «печатает…» and the list ends with the typing bubble. */
   typing?: boolean;
   labels?: Partial<ChatLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -212,7 +202,6 @@ function ChatHeader({ className, children, ...rest }: ChatHeaderProps) {
 ChatHeader.displayName = "Chat.Header";
 
 export type ChatTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
-  /** Heading level that fits the page outline (the look does not change). Default `h2`. */
   as?: "h2" | "h3" | "h4";
   ref?: React.Ref<HTMLHeadingElement>;
 };
@@ -405,7 +394,6 @@ export type ChatMessageEntry<T = unknown> = {
 
 export type ChatMessagesProps<T = unknown> = Omit<
   MessageListProps,
-  | "group"
   | "selected"
   | "defaultSelected"
   | "onSelectedChange"
@@ -415,45 +403,18 @@ export type ChatMessagesProps<T = unknown> = Omit<
   | "revealRef"
   | "labels"
 > & {
-  /**
-   * `direct` — a conversation of two; `group` — many authors: the first message of an author's run
-   * shows the author's header (`Message.Author`), the last one the avatar (`Message.Avatar`), and
-   * incoming messages keep the avatar's gutter. Default `direct`.
-   */
-  type?: "direct" | "group";
-  /**
-   * The first load of the conversation: bubble-shaped placeholders stand in the list's place
-   * (`aria-busy`, `labels.loading` announced), then cross-fade into the messages.
-   */
   loading?: boolean;
-  /** Older history exists: a placeholder stands above the first message and `onLoadOlder` runs at the top. */
   hasOlder?: boolean;
-  /** The reader reached the top while `hasOlder`: load older messages and prepend them. */
   onLoadOlder?: () => void | Promise<void>;
-  /** Messages as application data, in time order: the list adds the dates and runs itself. */
   items?: readonly T[];
-  /** A stable key of an item (with `items`): it is also its message's `value`. */
   getKey?: (item: T) => string;
-  /** Who wrote an item (an id, with `items`): a change of author starts a new run. */
   getAuthor?: (item: T) => string;
-  /** When an item was sent (with `items`): a new day gets a date. */
   getDate?: (item: T) => Date;
-  /** An event of the chat, not a message: it stands alone and breaks the runs around it. */
   isService?: (item: T) => boolean;
-  /**
-   * Renders an item (with `items`): a `Message.Root` (its `value` and `position` are set for you)
-   * or a `Chat.Service`. Called again only for items whose data or place changed — whatever a row
-   * shows comes from its item; another message (a reply's original) comes from `entry.find`. An
-   * inline function is fine: the latest one renders.
-   */
   renderMessage?: (item: T, entry: ChatMessageEntry<T>) => React.ReactElement;
-  /** The key of the first unread item: the «Непрочитанные» band stands above it. */
   unread?: string;
-  /** Messages of one author further apart than this many minutes start a new run. Default 5. */
   groupWindow?: number;
-  /** «Today» for the dates. Default: now. */
   now?: Date;
-  /** The label of a date. Default «Сегодня», «Вчера», «12 марта». */
   formatDate?: (date: Date, now: Date) => string;
 };
 
@@ -598,7 +559,7 @@ function ChatLoading({ group }: { group: boolean }) {
  * the end and keeps the reader's place.
  */
 function ChatMessages<T>({
-  type = "direct",
+  group = false,
   loading = false,
   hasOlder = false,
   onLoadOlder,
@@ -654,7 +615,7 @@ function ChatMessages<T>({
         aria-busy={loading || undefined}
       >
         {loading ? (
-          <ChatLoading group={type === "group"} />
+          <ChatLoading group={group} />
         ) : (
           <ScrollContainer
             anchor="end"
@@ -674,7 +635,7 @@ function ChatMessages<T>({
               aria-labelledby={
                 ariaLabelledBy ?? (ariaLabel || !chat.hasTitle ? undefined : chat.titleId)
               }
-              group={type === "group"}
+              group={group}
               jumpTo={chat.jumpTo}
               highlight={chat.search ?? ""}
               onMatchesChange={chat.setMatches}

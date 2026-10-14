@@ -1,4 +1,4 @@
-/** A complete team messenger over two thousand messages: the header whose status turns into typing, search with highlight, pinned messages, history that loads above, author headers with tags in a group chat, every kind of message, transcripts, reactions, the menu with reply, edit, pin and select, jumps, the new-messages button and the Composer whose messages rise into the list — `Chat.Root`, `Chat.Header`, `Chat.Search`, `Chat.Pinned`, `Chat.Messages`, `type`, `items`, `renderMessage`, `typing`, `selected`, `Chat.Footer`. */
+/** A complete team messenger over two thousand messages: the header whose status turns into typing, search with highlight, pinned messages, history that loads above, author headers with tags in a group chat, every kind of message, transcripts, reactions, the menu with reply, edit, pin and select, jumps, the new-messages button and the Composer whose messages rise into the list — `Chat.Root`, `Chat.Header`, `Chat.Search`, `Chat.Pinned`, `Chat.Messages`, `group`, `items`, `renderMessage`, `typing`, `selected`, `Chat.Footer`. */
 import {
   Avatar,
   Button,
@@ -759,7 +759,7 @@ export default function ChatOverviewExample() {
         <Chat.Search />
         <Chat.Pinned items={pinnedItems} onRemove={togglePin} />
         <Chat.Messages
-          type="group"
+          group
           reader={ME}
           items={messages}
           getKey={(message) => message.id}

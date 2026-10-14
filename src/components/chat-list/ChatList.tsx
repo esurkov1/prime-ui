@@ -169,7 +169,6 @@ function useChatList(part: string): [ChatListContextValue, RowContextValue] {
 // ─── Parts of an item ─────────────────────────────────────────────────────────
 
 export type ChatListItemIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /** Before the name: an `Avatar.Root` (sized by the row). After it: a small `Icon`. */
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
@@ -194,11 +193,8 @@ function ChatListItemText(_props: ChatListItemTextProps): React.ReactNode {
 ChatListItemText.displayName = "ChatList.ItemText";
 
 export type ChatListItemDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & {
-  /** Who wrote the last message: «Вы», a member of a group. Shown as «{author}: » before it. */
   author?: string;
-  /** The last message is not text: its word («Фото», «Голосовое сообщение») leads the preview. */
   kind?: ChatListMediaKind;
-  /** Length of a voice or video message, seconds: «Голосовое сообщение 0:42». */
   duration?: number;
   ref?: React.Ref<HTMLSpanElement>;
 };
@@ -265,29 +261,14 @@ const flipRows = (list: HTMLElement) =>
 const flipRowKey = (row: HTMLElement) => row.dataset.dndItem;
 
 type ChatListItemOwnProps = {
-  /** When the last message was sent: a `Date` (shown with the root's `formatTime`) or the text to show. */
   time?: Date | string;
-  /** Delivery of the reader's own last message: ✓ sent, ✓✓ read, the clock, or failed. */
   status?: MessageStatus;
-  /** Unread messages: the count at the end of the row. Default 0. */
   unread?: number;
-  /** The reader is mentioned among the unread: an «@» beside the count. */
   mention?: boolean;
-  /** Notifications are off: a muted glyph beside the name and a gray count. */
   muted?: boolean;
-  /** Pinned by the reader: a pin at the end of the row while nothing is unread. */
   pinned?: boolean;
-  /**
-   * The other side types: the preview turns into «печатает…» in the accent, and back. A name
-   * («Анна») for a group: «Анна печатает…».
-   */
   typing?: boolean | string;
-  /** The reader's unsent text: the preview shows «Черновик:» and the text. */
   draft?: string;
-  /**
-   * `ChatList.ItemIcon` (the avatar; after the name — a glyph), `ChatList.ItemText`,
-   * `ChatList.ItemDescription`, `ChatList.ItemMenu`.
-   */
   children?: React.ReactNode;
 };
 
@@ -615,37 +596,21 @@ export type ChatListRootProps<T = unknown> = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "defaultValue" | "children"
 > & {
-  /** Dialogs as application data, in the order to show (pinned first, then by the last message). */
   items: readonly T[];
-  /** A stable key of a dialog: the `value` of its row. */
   getKey: (item: T) => string;
-  /** Renders a dialog: a `ChatList.Item` with its parts. */
   renderItem: (item: T) => React.ReactElement;
-  /** The open dialog (controlled); `null` — none. */
   value?: string | null;
-  /** The dialog open at first (uncontrolled). Default `null`. */
   defaultValue?: string | null;
-  /** The reader opened a dialog: a click, a tap, Enter or Space on its row. */
   onValueChange?: (value: string) => void;
-  /** The search query (controlled). Any of the triad shows the search field. */
   search?: string;
-  /** The initial query (uncontrolled). */
   defaultSearch?: string;
-  /** The query changed: filter `items` by it (the list marks the matches). */
   onSearchChange?: (search: string) => void;
-  /** The first load: placeholder rows in the rows' geometry, then a cross-fade into the dialogs. */
   loading?: boolean;
-  /** More dialogs exist: a placeholder row ends the list and `onLoadMore` runs near the end. */
   hasMore?: boolean;
-  /** The reader scrolled near the end while `hasMore`: load the next dialogs and append them. */
   onLoadMore?: () => void | Promise<void>;
-  /** The empty state without a search. Default: «Нет диалогов». */
   empty?: React.ReactNode;
-  /** Row tier: height, text, avatar, the search field. Default: the host's tier, else `m`. */
   size?: ControlSize;
-  /** «Now» for the times. Default: the moment of the render. */
   now?: Date;
-  /** Display of a `Date` time. Default `formatChatTime`: «14:32», «пн», «12 мар». */
   formatTime?: (date: Date, now: Date) => string;
   labels?: Partial<ChatListLabels>;
   ref?: React.Ref<HTMLDivElement>;

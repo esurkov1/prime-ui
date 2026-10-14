@@ -223,11 +223,11 @@ export const api: ComponentApi = {
       ru: "Лента сообщений в своей прокрутке, рендерит только строки рядом с видимой областью. Строки — из `items` (даты, серии и полоса непрочитанного — сами) или из детей; конец ленты и место чтения она держит сама.",
       props: [
         {
-          name: "type",
-          type: '"direct" | "group"',
-          default: '"direct"',
-          en: "`direct` — a conversation of two; `group` — many authors, with the author's header and avatar on each run.",
-          ru: "`direct` — переписка двоих; `group` — много авторов, с шапкой автора и аватаром у каждой серии.",
+          name: "group",
+          type: "boolean",
+          default: "false",
+          en: "A group chat of many authors: the first message of a run shows the author's header, the last one the avatar, and incoming messages keep the avatar's gutter. Without it a conversation of two.",
+          ru: "Групповой чат многих авторов: первое сообщение серии показывает шапку автора, последнее — аватар, входящие держат место под аватар. Без него — переписка двоих.",
         },
         {
           name: "items",

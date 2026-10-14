@@ -250,50 +250,23 @@ export type ComposerRootProps = Omit<
   React.FormHTMLAttributes<HTMLFormElement>,
   "children" | "defaultValue" | "onSubmit"
 > & {
-  /** The text of the message (controlled). */
   value?: string;
-  /** Initial text, uncontrolled (a saved draft). */
   defaultValue?: string;
-  /** Every change of the text: typing, formatting, the field cleared after a send. */
   onValueChange?: (value: string) => void;
-  /**
-   * Sends the message: Enter, Mod+Enter or the send button. Return a Promise to keep the text
-   * while it runs (the send button is busy, the field read-only): resolve clears the field and the
-   * attachments and closes the reply / edit bar (its `onDismiss`), reject leaves everything as it was.
-   */
   onSend?: AsyncHandler<[message: ComposerMessage], unknown>;
-  /**
-   * What the person is doing changed: `typing` from the first keystroke until the text is sent,
-   * cleared or rests for 3 s; `voice` / `video` while a recording shows; `null` — nothing. Fires on
-   * a change only (and `null` on unmount while active): send the signal to the other side from here.
-   */
   onActivityChange?: (activity: ComposerActivity | null) => void;
-  /** A voice message was recorded. With it (or `onSendVideoNote`) an empty field shows the record button. */
   onSendVoice?: AsyncHandler<[recording: ComposerRecording], unknown>;
-  /**
-   * A round video message was recorded. With it a double click / double tap (or ↑ ↓) on the record
-   * button switches voice and video.
-   */
   onSendVideoNote?: AsyncHandler<[recording: ComposerRecording], unknown>;
-  /** ↑ in an empty field: open your last message for editing. */
   onEditLast?: () => void;
-  /** What the record button records (controlled); `video` needs `onSendVideoNote`. */
   recordMode?: ComposerRecordMode;
-  /** Initial record mode, uncontrolled. */
   defaultRecordMode?: ComposerRecordMode;
-  /** A double click / double tap (or ↑ ↓) on the record button switched voice and video. */
   onRecordModeChange?: (mode: ComposerRecordMode) => void;
-  /** Attachments: the files of the paperclip, a paste and a drop go into it and show above the field. */
   queue?: ComposerQueue;
-  /** The formatting toolbar on a text selection and the formatting hotkeys. */
   formatting?: boolean;
-  /** Tier. Default: the tier of the surrounding control, else `m`. */
   size?: ControlSize;
   disabled?: boolean;
   labels?: Partial<ComposerLabels>;
-  /** The message `<textarea>` (focus it after «Ответить» in a message menu). */
   inputRef?: React.Ref<HTMLTextAreaElement>;
-  /** `Composer.Attach` (the start of the row) and `Composer.Context` (above the field). */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLFormElement>;
 };
@@ -1269,15 +1242,9 @@ function VideoPreview({
 // ─── Context (reply / edit bar) ──────────────────────────────────────────────
 
 export type ComposerContextProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** `reply` — a reply to a message; `edit` — your message is being edited (send saves). */
   mode?: ComposerContextMode;
   messageId?: string;
-  /**
-   * Stop replying or editing: the close button, Escape in the field, and a send that went through.
-   * Without it no close button.
-   */
   onDismiss?: () => void;
-  /** `Composer.Title` and `Composer.Description`. */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -1382,9 +1349,7 @@ ComposerDescription.displayName = "Composer.Description";
 const AttachPickContext = React.createContext<((accept: string) => void) | null>(null);
 
 export type ComposerAttachProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /** File types of the picker without a menu. */
   accept?: string;
-  /** `Composer.Item` kinds of attachment: with them the paperclip opens a menu. */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -1464,9 +1429,7 @@ export type ComposerItemProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "onSelect" | "type"
 > & {
-  /** File types this item picks («image/*,video/*»). Without it the item only runs `onSelect`. */
   accept?: string;
-  /** The item's own action (a poll, a location), after the picker opens when `accept` is set. */
   onSelect?: () => void;
   ref?: React.Ref<HTMLButtonElement>;
 };

@@ -43,21 +43,11 @@ export type ChatPinnedProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "defaultValue" | "onSelect"
 > & {
-  /** The pinned messages, oldest first. Without any the bar is not rendered. */
   items: readonly ChatPinnedItem[];
-  /** The pinned message shown (controlled). */
   value?: string;
-  /** The one shown first (uncontrolled). Default: the newest (the last item). */
   defaultValue?: string;
-  /** The shown pinned message changed: a press went on to the next older one. */
   onValueChange?: (value: string) => void;
-  /**
-   * A press on the bar, after the chat has brought the message into view and blinked it:
-   * load it when it is not in the list yet. The bar then moves on to the next older
-   * pinned message, the oldest wraps to the newest.
-   */
   onSelect?: (value: string) => void;
-  /** Unpin the shown message: the close button. Without it no button. */
   onRemove?: (value: string) => void;
   labels?: Partial<ChatPinnedLabels>;
   ref?: React.Ref<HTMLDivElement>;
