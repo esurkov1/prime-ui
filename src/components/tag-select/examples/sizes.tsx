@@ -11,7 +11,7 @@ const OPTIONS: TagSelectOption[] = [
 
 export default function TagSelectSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map((size) => (
         <TagSelect
           key={size}
@@ -22,6 +22,6 @@ export default function TagSelectSizesExample() {
           labels={{ panelHint: "Выберите метку" }}
         />
       ))}
-    </>
+    </div>
   );
 }

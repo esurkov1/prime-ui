@@ -5,7 +5,7 @@ const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function NativeSelectSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map((size) => (
         <NativeSelect key={size} size={size} label={size} defaultValue="week">
           <option value="day">За день</option>
@@ -13,6 +13,6 @@ export default function NativeSelectSizesExample() {
           <option value="month">За месяц</option>
         </NativeSelect>
       ))}
-    </>
+    </div>
   );
 }

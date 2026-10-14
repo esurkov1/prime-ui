@@ -5,7 +5,7 @@ const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function SelectSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map((size) => (
         <Select.Root key={size} size={size} label={size} defaultValue="week">
           <Select.Trigger>
@@ -18,6 +18,6 @@ export default function SelectSizesExample() {
           </Select.Content>
         </Select.Root>
       ))}
-    </>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 /** Every size tier: rows, text, icons and the search row follow it; match the density of the app — `size`. */
-import { Button, CommandMenu, type ControlSize, Icon } from "prime-ui-kit";
+import { Button, CommandMenu, type ControlSize, Icon, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 const SIZES: ControlSize[] = ["xs", "s", "m", "l", "xl"];
@@ -12,20 +12,25 @@ export default function CommandMenuSizesExample() {
 
   return (
     <>
-      {SIZES.map((tier) => (
-        <Button.Root
-          key={tier}
-          size={tier}
-          variant="soft"
-          tone="neutral"
-          onClick={() => {
-            setSize(tier);
-            setOpen(true);
-          }}
-        >
-          {tier}
-        </Button.Root>
-      ))}
+      <div>
+        {SIZES.map((tier) => (
+          <div key={tier}>
+            <Button.Root
+              variant="soft"
+              tone="neutral"
+              onClick={() => {
+                setSize(tier);
+                setOpen(true);
+              }}
+            >
+              Найти файл
+            </Button.Root>
+            <Typography as="span" variant="caption" tone="muted">
+              {tier}
+            </Typography>
+          </div>
+        ))}
+      </div>
       <CommandMenu.Root
         open={open}
         onOpenChange={setOpen}

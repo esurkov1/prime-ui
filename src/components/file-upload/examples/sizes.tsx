@@ -1,8 +1,6 @@
 /** Every tier of the zone and of its file rows: padding, icon, button, text and the format badge follow it — `size`. */
 import { FileUpload, type FileUploadFile } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 const CONTRACT: readonly FileUploadFile[] = [
@@ -11,7 +9,7 @@ const CONTRACT: readonly FileUploadFile[] = [
 
 export default function FileUploadSizesExample() {
   return (
-    <div className={styles.column}>
+    <div>
       {SIZES.map((size) => (
         <FileUpload.Root
           key={size}

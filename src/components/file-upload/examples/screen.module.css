@@ -7,14 +7,14 @@
   gap: var(--prime-space-2);
 }
 
-/* As many ~8rem tiles as fit: two across from 320px, more as the panel grows. */
+/* As many ~8rem tiles as fit: two across from 320px, more as the panel grows. A tile is a grid,
+   not a list item, so it draws no marker. */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 2)), 1fr));
   gap: var(--prime-space-5) var(--prime-space-4);
   margin: 0;
   padding: 0;
-  list-style: none;
 }
 
 /* A tile: the picture, then the name over the size and date. */

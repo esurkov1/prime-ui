@@ -6,7 +6,7 @@ const INVOICE_DATE = new Date(2026, 9, 7);
 
 export default function DatepickerSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map((size) => (
         <Datepicker.Root
           key={size}
@@ -17,6 +17,6 @@ export default function DatepickerSizesExample() {
           fullWidth
         />
       ))}
-    </>
+    </div>
   );
 }

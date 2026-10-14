@@ -5,7 +5,7 @@ const CONTRACT_DATE = new Date(2026, 8, 15);
 
 export default function DatepickerStatesExample() {
   return (
-    <>
+    <div>
       <Datepicker.Root mode="single" label="empty" fullWidth />
       <Datepicker.Root mode="single" label="default" defaultValue={CONTRACT_DATE} fullWidth />
       <Datepicker.Root
@@ -23,6 +23,6 @@ export default function DatepickerStatesExample() {
         focusRing={false}
         fullWidth
       />
-    </>
+    </div>
   );
 }
