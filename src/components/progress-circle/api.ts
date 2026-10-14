@@ -11,9 +11,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Diameter 24 · 32 · 48 · 64 · 80 px; the stroke is 1/12 of it.",
-          ru: "Диаметр 24 · 32 · 48 · 64 · 80 px; толщина — 1/12 диаметра.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Diameter 24 · 32 · 48 · 64 · 80 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host.",
+          ru: "Диаметр 24 · 32 · 48 · 64 · 80 px; толщина — 1/12 диаметра. Без него кольцо берёт ярус хоста с размером.",
         },
         {
           name: "children",

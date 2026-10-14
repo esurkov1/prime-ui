@@ -8,7 +8,9 @@
  *   line — two border widths at every diameter: the weight of an icon's stroke (Spinner, a disk);
  *   data — 1/12 of the diameter, never under the line weight (ProgressCircle);
  *   band — one spacing step: a playback or recording band over the edge of a round video.
- * The fill (`--ring-fill`) is the only hook a host sets.
+ * The fill (`--ring-fill`) is the only hook a host sets. The track is the host's color at the
+ * line tint, or `fill-strong` with `data-track="surface"` (a ring on a surface, as a ProgressBar
+ * track).
  *
  * Motion (foundation §7): the share glides on the arc (`stroke-dashoffset`, `base` · standard);
  * the turn is the `rotate` of the inner group, so it runs on the compositor, the share keeps
@@ -36,6 +38,10 @@
 
 .ring[data-weight="band"] {
   --ring-stroke: var(--prime-space-1);
+}
+
+.ring[data-track="surface"] {
+  --ring-track: var(--prime-color-fill-strong);
 }
 
 .ring[data-spin] {

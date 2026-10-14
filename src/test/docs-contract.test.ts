@@ -298,7 +298,11 @@ function unrenderedNames(file: string, source: string): string[] {
   for (const token of codeTokens(jsdoc)) {
     let found = true;
     if (token.length === 1) continue;
-    if (/^[A-Z]\w*(\.[A-Z]\w*)?$/.test(token)) {
+    if (token === "children") {
+      // JSX content is the `children` prop: an element of the page's component that holds content.
+      const component = pascal(file.split("/").at(-3) ?? "");
+      found = new RegExp(`<${component}(\\.\\w+)?\\b[^>]*(?<!/)>\\s*(?!</)\\S`).test(body);
+    } else if (/^[A-Z]\w*(\.[A-Z]\w*)?$/.test(token)) {
       found = new RegExp(`\\b${token.replace(".", "\\.")}\\b`).test(body);
     } else if (/^[a-z][\w-]*$/.test(token)) {
       const esc = token.replace(/-/g, "\\-");
