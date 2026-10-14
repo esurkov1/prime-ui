@@ -1,4 +1,4 @@
-/** A nested page: a back button, a separator and the path instead of a title, actions on the record at the end — `AppHeader.Separator`, `AppHeader.Actions`. */
+/** A nested record: the path up, a separator and the record as the page title, the record's buttons at the end — `AppHeader.Separator`, `AppHeader.Actions`. */
 import { AppHeader, Breadcrumb, Button, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -8,21 +8,22 @@ export default function AppHeaderBreadcrumbsExample() {
     <div className={styles.window}>
       <AppHeader.Root>
         <AppHeader.Start>
-          <Button.Root variant="soft" tone="neutral" aria-label="Назад к клиентам">
-            <Button.Icon>
-              <Icon name="nav.chevronLeft" />
-            </Button.Icon>
-          </Button.Root>
-          <AppHeader.Separator />
           <Breadcrumb.Root>
             <Breadcrumb.Item href="#crm">CRM</Breadcrumb.Item>
             <Breadcrumb.Item href="#clients">Клиенты</Breadcrumb.Item>
-            <Breadcrumb.Item current>ООО «Север»</Breadcrumb.Item>
           </Breadcrumb.Root>
+          <AppHeader.Separator />
+          <AppHeader.Title>
+            ООО «Север»
+            <AppHeader.Description>Клиент с 2021 года · 4 сделки</AppHeader.Description>
+          </AppHeader.Title>
         </AppHeader.Start>
         <AppHeader.Actions>
           <Button.Root variant="soft" tone="neutral">
-            Экспорт
+            <Button.Icon>
+              <Icon name="action.send" />
+            </Button.Icon>
+            Написать
           </Button.Root>
           <Button.Root variant="soft" tone="neutral" aria-label="Ещё действия">
             <Button.Icon>

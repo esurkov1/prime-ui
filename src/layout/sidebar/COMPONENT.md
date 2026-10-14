@@ -372,14 +372,17 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Everything the app navigation holds: brand and collapse toggle, groups that fold, a nested list, counts, the footer and the account — `Sidebar.Brand`, `Sidebar.Group`, `Sidebar.Sub`, `Sidebar.ItemCount`, `Sidebar.Account`, `Sidebar.Toggle`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: item height, text, icon and counter follow the tier; the rail width stays — `size`. |
-| [structure.tsx](examples/structure.tsx) | Labelled groups and the optional item parts: a plain count, a coloured badge, a key hint, a trailing icon, a row action and a disabled section — `Sidebar.Group`, `Sidebar.ItemCount`, `color`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`, `disabled`. |
+| [structure.tsx](examples/structure.tsx) | Labelled groups and the optional item parts: a plain count, coloured and solid badges, a key hint, a trailing icon, row actions with the default and an own glyph and a disabled section — `Sidebar.Group`, `Sidebar.ItemCount`, `color`, `variant`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`, `disabled`. |
 | [brand-header.tsx](examples/brand-header.tsx) | A brand block with the collapse toggle at the end of the header; in compact mode the logo stays and the toggle moves onto the rail edge — `Sidebar.Brand`, `Sidebar.BrandLogo`, `description`, `variant`. |
-| [collapsible-groups.tsx](examples/collapsible-groups.tsx) | Group headings that fold their items away, with a chevron at the end of the heading; on the compact rail a folded group becomes one row whose items open in a flyout — `collapsible`, `defaultOpen`. |
+| [collapsible-groups.tsx](examples/collapsible-groups.tsx) | Group headings that fold their items away, one group open at a time, with a chevron at the end of the heading; on the compact rail a folded group becomes one row whose items open in a flyout — `collapsible`, `open`, `onOpenChange`. |
 | [nested-items.tsx](examples/nested-items.tsx) | A parent item with child items on a guide line: a current child opens it and marks the parent; on the compact rail the children open in a flyout — `Sidebar.Sub`, `Sidebar.SubTrigger`, `Sidebar.SubContent`. |
-| [account.tsx](examples/account.tsx) | Footer items above the signed-in person: avatar, name and email open the account menu; collapse the rail and only the avatar stays, on the icon axis — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`. |
-| [router.tsx](examples/router.tsx) | A router link as the item: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
+| [account.tsx](examples/account.tsx) | Footer items and the collapse row above the signed-in person: avatar, name and email open the account menu; collapse the rail from that row and only the avatar stays, on the icon axis — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`. |
+| [router.tsx](examples/router.tsx) | Router links as the brand and the items: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
+| [persist.tsx](examples/persist.tsx) | The first visit opens on the icon rail; the mode and the folded groups are remembered and come back after a reload — `persistKey`, `defaultMode`. |
+| [custom-part.tsx](examples/custom-part.tsx) | A part of your own in the footer reads the rail state: the storage meter shows on the full rail and in the off-canvas panel and steps aside on the icon rail — `useSidebar`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; every switch is one synchronous movement — `mode`, `onModeChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | Navigation behind a menu button at any width: the parent opens the off-canvas panel, the scrim, Escape, the header toggle or a navigation closes it — `offCanvas`, `open`, `onOpenChange`. |
+| [narrow.tsx](examples/narrow.tsx) | Below 768px the rail leaves the layout and slides in over the page from the menu button; from 768px it is the rail again, and the button leaves — `offCanvas`, `labels`. |
 
 ## Mistakes
 - `icon={…}` / `badge={…}` props → use the `Sidebar.ItemIcon` and `Sidebar.ItemCount` parts.

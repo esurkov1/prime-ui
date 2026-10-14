@@ -43,7 +43,12 @@ const RHYTHM: Row[] = [
   { what: "плитка → плитка, по обеим осям", value: "16", how: "даёт `PageContent.Grid`" },
   { what: "поле → поле, переключатель → переключатель", value: "20", how: "`--prime-space-5`" },
   { what: "основная колонка → боковая", value: "24", how: "`--prime-space-6`" },
-  { what: "шапка страницы → содержимое", value: "24", how: "даёт `PageContent`" },
+  {
+    what: "шапка приложения → первый блок страницы",
+    value: "12 + 24 (32 от 1024)",
+    how: "нижний воздух шапки + верхний `AppShell.Main`",
+  },
+  { what: "шапка страницы-документа → содержимое", value: "24", how: "даёт `PageContent.Header`" },
   { what: "блок → блок страницы", value: "24", how: "даёт `PageContent.Body`" },
   { what: "группа → группа в форме", value: "32", how: "`--prime-space-8`" },
   { what: "раздел → раздел (новая тема с h2)", value: "40", how: "даёт `PageContent.Section`" },
@@ -52,8 +57,8 @@ const RHYTHM: Row[] = [
 const TYPE: Row[] = [
   {
     what: "заголовок страницы (один, `h1`)",
-    value: "24",
-    how: "`PageContent.Title` — `heading-m`",
+    value: "14",
+    how: "`AppHeader.Title` — `title-s`; на странице-документе `PageContent.Title` (24, `heading-m`)",
   },
   {
     what: "раздел страницы без карточки",
@@ -89,12 +94,17 @@ export default function CompositionPage() {
         <DocList>
           <li>
             {renderInlineCode(
-              "Один раз на приложение — `AppShell.Root` + `Sidebar` в `AppShell.Nav`, сверху `AppHeader` (где вы, поиск ⌘K, кнопка меню на телефоне), страница — в `AppShell.Main`. Экран, который вы отдаёте, рендерит только свою страницу.",
+              "Один раз на приложение — `AppShell.Root` + `Sidebar` в `AppShell.Nav`, сверху `AppHeader`, страница — в `AppShell.Main`. Шапка принадлежит странице: в её строке только то, что нужно этой странице, — заголовок, её кнопки и инструменты; глобального поиска и кнопок всего приложения в ней нет.",
             )}
           </li>
           <li>
             {renderInlineCode(
-              "Страница — `PageContent.Page` (или `PageContent.Root maxWidth` для узкой колонки): `Header` с `Title`, одной строкой `Description` и `Actions`, затем `Body` с блоками.",
+              "Один заголовок — в шапке: `AppHeader.Title` и `AppHeader.Description` со строкой данных («128 в работе · 6 ждут оплаты»), путь `Breadcrumb` перед ним у вложенной записи, инструменты страницы — `PageToolbar` в `AppHeader.Tools`. В основной области — `PageContent.Page` с `Body`, без `PageContent.Header`.",
+            )}
+          </li>
+          <li>
+            {renderInlineCode(
+              "Исключение — страница-документ (настройки, длинная форма, справка): её большой заголовок — `PageContent.Header` с `Title`, `Description` и `Actions` в основной области, а в шапке заголовка нет. Никогда два заголовка, никогда без `h1`.",
             )}
           </li>
           <li>

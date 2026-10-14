@@ -3,7 +3,7 @@
 **Category:** page
 **Kind:** layout
 
-> The panel at the top of a page — sections, filter and search, view options and the primary action — laid out from its own width: one row when wide, stacked rows when narrow, search and filter always first with the active filters under them.
+> The panel at the top of a page — sections, filter and search, view options and the primary action — laid out from its own width: one row when wide, stacked rows when narrow, search and filter always first with the active filters under the top row.
 
 ## When to use
 - A list, registry or dashboard page whose top holds several of: sections with counts, a filter and search, a period or view switch, the primary action.
@@ -11,7 +11,7 @@
 - Any page that has to work from 320px with the same controls as on desktop — nothing is hidden, the slots only move.
 
 ## When not to use
-- A page with a title, a description and one or two buttons → [PageContent](../page-content/COMPONENT.md) `Header` with `Actions`.
+- One or two buttons of the page and nothing else → `AppHeader.Actions` in the [AppHeader](../../layout/app-header/COMPONENT.md) title row.
 - Tools that belong to one table → the DataTable `toolbar` slot.
 - Switching panels inside a card or a section → [Tabs](../tabs/COMPONENT.md).
 - App-level navigation → [Sidebar](../../layout/sidebar/COMPONENT.md).
@@ -28,7 +28,7 @@ PageToolbar.Root                 container: its own width picks the layout
 ├─ PageToolbar.Sections          sections of the page: a fullWidth SegmentedControl with counts
 ├─ PageToolbar.View              period, table / cards, columns
 ├─ PageToolbar.Actions           the primary action (and its secondary twin, e.g. «Отменить»)
-└─ PageToolbar.Chips             active filters: SmartFilter.Chips, a row right under the search
+└─ PageToolbar.Chips             active filters: SmartFilter.Chips, a row under the top row
 ```
 
 ## API
@@ -50,7 +50,7 @@ PageToolbar.Root                 container: its own width picks the layout
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### PageToolbar.Tools
-`ref` → `HTMLDivElement`. Search and filter button (`SmartFilter.Toolbar`): always the first slot and the stretchy one, the Chips right under it.
+`ref` → `HTMLDivElement`. Search and filter button (`SmartFilter.Toolbar`): always the first slot and the stretchy one; it gives way first when the row runs short.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -64,14 +64,14 @@ PageToolbar.Root                 container: its own width picks the layout
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### PageToolbar.Actions
-`ref` → `HTMLDivElement`. The primary action of the page: at the end of the top row at every width, never wraps down.
+`ref` → `HTMLDivElement`. The primary action of the page: at the end of the top row; on a phone, when the search would get less than 18rem beside it, its own full row right under the search.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### PageToolbar.Chips
-`ref` → `HTMLDivElement`. Active filters (`SmartFilter.Chips`) in their own row right under the search and filter; the row takes no space while it is empty.
+`ref` → `HTMLDivElement`. Active filters (`SmartFilter.Chips`) in their own row under the top row; the row takes no space while it is empty.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -83,26 +83,28 @@ PageToolbar has no variants: the layout follows the toolbar's width.
 ### Layout by width
 | Toolbar width | Looks like | Default |
 |---|---|---|
-| `≥ 56rem` | one row that never wraps: Tools (stretch, at least 18rem — a 9rem search and the filter button on one line) · Sections (content width) · View (content width) · Actions; Chips under it; short of room the Tools give way first, then the Sections shrink and scroll inside | |
+| `≥ 56rem` | one row that never wraps: Tools (stretch) · Sections (content width) · View (content width) · Actions; Chips under it; short of room the Tools give way first, down to 12rem, so the Sections keep their items and counts whole; only then the Sections shrink and scroll inside | |
 | `< 56rem` | rows: Tools (stretch) + Actions; Chips; Sections (full row); View (full row) | yes (mobile first) |
-| any | Chips right under the search and filter, only while there are chips | |
+| phone (Tools would get < 18rem beside the Actions) | rows: Tools (full row); Actions (full row, its buttons share it); Chips; Sections; View — the search is never squeezed; an icon-only action still fits beside the Tools | |
+| any | Chips under the top row, only while there are chips | |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | wide | container ≥ 56rem | one flex row, no wrapping; Chips rendered under the bar |
-| narrow | container < 56rem | a grid of real rows only (`order` + grid columns): a missing slot makes no row, every row is 12 from the next |
-| no Tools | Sections without Tools | the Sections take the Tools' place: first and stretchy, beside the action |
+| narrow | container < 56rem | one wrapping flex line of real rows only (`order` + full-row slots): a missing slot makes no row, every row is 12 from the next |
+| action on its own row | narrow, and the Tools (or the Sections in their place) would get less than 18rem beside the Actions | the Actions wrap under them and stretch across the row; an Actions slot alone in the toolbar keeps its buttons at the end |
+| no Tools | Sections without Tools; View without Tools and Sections | that slot takes the Tools' place: first and stretchy, beside the action, so the action stays at the top row's end |
 | alone in a row | Tools or Sections without Actions; View when narrow | that slot stretches to the full row; the View's controls share it equally |
 | no chips | `PageToolbar.Chips` empty (`SmartFilter.Chips` renders nothing) | the chips row takes no space |
 
 ## Layout & spacing
-- 8 inside a slot. No padding or fill of its own: it sits at the top of `PageContent.Body` (or replaces `PageContent.Header` on dense pages that keep their `h1` in the shell).
-- The order is fixed: search and filter first, then the sections, the view and the primary action; the active filters always sit right under the search and filter, never under the sections. The primary action is at the end of the top row at every width and never wraps down.
+- 8 inside a slot. No padding or fill of its own: on an app page it is the page's tools row in `AppHeader.Tools`, under the page title; tools of one table go into that table's `toolbar`.
+- The order is fixed: search and filter first, then the sections, the view and the primary action; the active filters sit under the top row, never under the sections. The primary action is at the end of the top row; on a phone, where the search would get less than 18rem beside it, it takes its own row right under the search — still above the sections and the view.
 - Every gap is one step: 12 between slots and between every pair of rows, at any width — no row is ever further from the next.
 - Sections take a `fullWidth` SegmentedControl: the toolbar decides when it stretches (content width when wide, the full row when narrow), its items tend to equal width and it scrolls inside itself when they do not fit.
 - All controls share one tier, so they share one height and wrapped rows stay level: leave `size` off the controls (default `m`); for a denser page wrap the toolbar in `<ControlSizeProvider value="s">`.
-- On a phone the primary action may drop its text and keep the icon with `aria-label`; never remove it.
+- On a phone the primary action takes its own row by itself; an icon-only action with `aria-label` stays beside the search instead. Never remove it.
 - The toolbar breaks by its own width, so it behaves the same with the sidebar open or closed.
 
 ## Accessibility
@@ -113,7 +115,7 @@ No keyboard interaction.
 ### ARIA
 - A plain `<div>`: when a page has more than one panel, give each `role="group"` and an `aria-label` (a name on a `<div>` without a role is ignored by assistive tech).
 - Slots move only visually (`order`); the Tab order is the JSX order. Write the slots in the reading order of the wide layout — Tools, Sections, View, Actions, Chips. In the narrow layout the action is shown beside the tools but reached after the view.
-- An icon-only primary action on a narrow page carries `aria-label`.
+- An icon-only primary action carries `aria-label`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -126,7 +128,7 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | The panel of an orders page: search and filter, sections with counts, the period and the primary action in one row; active filters right under the search — `PageToolbar.Tools`, `PageToolbar.Sections`, `PageToolbar.View`, `PageToolbar.Actions`, `PageToolbar.Chips`. |
 | [without-search.tsx](examples/without-search.tsx) | A dashboard panel without search on a tablet-width column: the sections fill the top row, the period selector alone in the bottom row stretches to the full width — `PageToolbar.Sections`, `PageToolbar.View`. |
 | [save-changes.tsx](examples/save-changes.tsx) | A settings page: sections of the form on the left, the save action with the number of changes at the end of the top row — never a sticky bar at the bottom of a phone screen — `PageToolbar.Actions`. |
-| [narrow.tsx](examples/narrow.tsx) | A phone-width column: search, filter and the primary action on top, the active filters under them, then the sections and the period, every row 12 apart — `PageToolbar.Root`. |
+| [narrow.tsx](examples/narrow.tsx) | A phone-width column: search and filter on top, the primary action on its own row under them, then the active filters, the sections and the period, every row 12 apart — `PageToolbar.Root`. |
 
 ## Mistakes
 - A hand-built flex row of tabs, search and buttons with `flex-wrap` → rows wrap «as they come», the action drifts down; use `PageToolbar`.

@@ -42,6 +42,11 @@
   color: var(--prime-color-accent-fg);
 }
 
+/* custom-part.tsx: an own block in the footer, inset like the item labels. */
+.footerBlock {
+  padding: var(--prime-space-2);
+}
+
 .sizes {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(calc(var(--prime-space-24) * 2.5), 1fr));

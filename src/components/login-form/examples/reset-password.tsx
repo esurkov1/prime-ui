@@ -2,7 +2,7 @@
 import { Button, Icon, Input, LoginForm } from "prime-ui-kit";
 import * as React from "react";
 
-import styles from "./examples.module.css";
+const MIN_LENGTH = 8;
 
 export default function LoginFormResetPasswordExample() {
   const [password, setPassword] = React.useState("");
@@ -10,51 +10,54 @@ export default function LoginFormResetPasswordExample() {
   const mismatch = confirm.length > 0 && confirm !== password;
 
   return (
-    <div className={styles.stage}>
-      <LoginForm.Root>
-        <LoginForm.Header>
-          <LoginForm.Logo>
-            <Icon name="status.locked" />
-          </LoginForm.Logo>
-          <LoginForm.Title>Создайте новый пароль</LoginForm.Title>
-          <LoginForm.Description>
-            Придумайте пароль и храните его в надёжном месте
-          </LoginForm.Description>
-        </LoginForm.Header>
-        <LoginForm.Body>
-          <LoginForm.Form onSubmit={(e) => e.preventDefault()}>
-            <Input.Root label="Новый пароль" required hint="Минимум 8 символов" strength>
-              <Input.Wrapper>
-                <Input.Field
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="********"
-                  value={password}
-                  onValueChange={setPassword}
-                />
-              </Input.Wrapper>
-            </Input.Root>
-            <Input.Root
-              label="Повторите новый пароль"
-              required
-              error={mismatch ? "Пароли не совпадают" : undefined}
-            >
-              <Input.Wrapper>
-                <Input.Field
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="********"
-                  value={confirm}
-                  onValueChange={setConfirm}
-                />
-              </Input.Wrapper>
-            </Input.Root>
-            <Button.Root type="submit" fullWidth disabled={mismatch || password.length < 6}>
-              Сохранить
-            </Button.Root>
-          </LoginForm.Form>
-        </LoginForm.Body>
-      </LoginForm.Root>
-    </div>
+    <LoginForm.Root>
+      <LoginForm.Header>
+        <LoginForm.Logo>
+          <Icon name="status.locked" />
+        </LoginForm.Logo>
+        <LoginForm.Title>Создайте новый пароль</LoginForm.Title>
+        <LoginForm.Description>
+          Придумайте пароль и храните его в надёжном месте
+        </LoginForm.Description>
+      </LoginForm.Header>
+      <LoginForm.Body>
+        <LoginForm.Form onSubmit={(e) => e.preventDefault()}>
+          <Input.Root
+            label="Новый пароль"
+            required
+            hint={`Минимум ${MIN_LENGTH} символов`}
+            strength
+          >
+            <Input.Wrapper>
+              <Input.Field
+                type="password"
+                autoComplete="new-password"
+                placeholder="********"
+                value={password}
+                onValueChange={setPassword}
+              />
+            </Input.Wrapper>
+          </Input.Root>
+          <Input.Root
+            label="Повторите новый пароль"
+            required
+            error={mismatch ? "Пароли не совпадают" : undefined}
+          >
+            <Input.Wrapper>
+              <Input.Field
+                type="password"
+                autoComplete="new-password"
+                placeholder="********"
+                value={confirm}
+                onValueChange={setConfirm}
+              />
+            </Input.Wrapper>
+          </Input.Root>
+          <Button.Root type="submit" fullWidth disabled={mismatch || password.length < MIN_LENGTH}>
+            Сохранить
+          </Button.Root>
+        </LoginForm.Form>
+      </LoginForm.Body>
+    </LoginForm.Root>
   );
 }

@@ -1,6 +1,6 @@
-/** A router link as the item: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. */
+/** Router links as the brand and the items: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. */
 import { Icon, Sidebar } from "prime-ui-kit";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 import styles from "./examples.module.css";
 
@@ -14,6 +14,18 @@ export default function SidebarRouterExample() {
   return (
     <div className={styles.stage}>
       <Sidebar.Root offCanvas="never">
+        <Sidebar.Header>
+          <Sidebar.Brand asChild description="Документация">
+            <Link to="/">
+              <Sidebar.BrandLogo>
+                <span className={styles.logo}>
+                  <Icon name="object.book" />
+                </span>
+              </Sidebar.BrandLogo>
+              Prime UI
+            </Link>
+          </Sidebar.Brand>
+        </Sidebar.Header>
         <Sidebar.Content>
           {LINKS.map((link) => (
             <Sidebar.Item key={link.to} asChild>

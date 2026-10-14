@@ -76,6 +76,13 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Busy action: `<Button.Root loading>` — not a hand-made spinner or «Загрузка…» text.
 - An action on a coloured host (a solid Banner, an accent strip): `<Button.Root variant="ghost" tone="inherit">` — it takes the host's text colour; never recolour a Button with a CSS override.
 
+## Page title and header
+
+- An app page titles itself in its header: `<AppHeader.Title>` + `<AppHeader.Description>` with a line of data («128 в работе · 6 ждут оплаты») — not a `PageContent.Header` in main and not a sentence about the page.
+- The page's tools — its own search and filter, sections, the view, the primary action — are a `<PageToolbar.Root>` in `<AppHeader.Tools>`; the page's other buttons in `<AppHeader.Actions>` — not a global search, notifications or app-wide buttons: the header row is per page.
+- A nested record: `Breadcrumb` + `<AppHeader.Separator />` + `<AppHeader.Title>` with the record's name — not a breadcrumb in main.
+- A document page (settings, a long form, help) is the only one with `<PageContent.Header>` + `PageContent.Title` in main, and then its header has no title — never two titles, never no `<h1>`.
+
 ## Cards and surfaces
 
 - `Card.Root` only for a bounded block with its own title: a KPI tile (`variant="stat-trend"`), a settings panel (`variant="panel"`), side facts — not around a whole section, a form field or a page.
@@ -176,7 +183,7 @@ State change is continuous in the whole kit: every region that changes what it s
 
 Full rules: [responsive.md](responsive.md).
 
-- The page panel is `<PageToolbar.Root>` with, in this order, `Tools` (`SmartFilter.Toolbar`: search, then filter), `Sections` (a `fullWidth` SegmentedControl), `View`, `Actions`, `Chips` — the active filters always sit right under the search, never under the sections; not a hand-made flex row of tabs, search and buttons.
+- The page panel is `<PageToolbar.Root>` with, in this order, `Tools` (`SmartFilter.Toolbar`: search, then filter), `Sections` (a `fullWidth` SegmentedControl), `View`, `Actions`, `Chips` — the active filters sit under the top row, never under the sections; on a phone the primary action takes its own row by itself when the search would be squeezed; not a hand-made flex row of tabs, search and buttons.
 - Rearrange, never hide: every desktop function is on the phone, in another place or a menu — not `display: none` below a breakpoint.
 - Breakpoints 640 · 768 · 1024 · 1280 only for the app frame; inside a page — intrinsic grids (`auto-fill, minmax`) and container queries.
 - A wide table scrolls inside itself; offer `DataTable.ColumnsMenu` in its `toolbar` — never drop columns by breakpoint, never hand-build the chooser.
@@ -224,7 +231,7 @@ applyTheme("light");
 The frame itself (providers, `AppShell` with `Sidebar` and the phone menu button) is built once too:
 copy it from [layouts.md](layouts.md#app-frame-once-per-app).
 
-A page with one primary action and a field frame:
+A document page (a form) — its title is in main, its header carries none:
 
 ```tsx
 import { Button, Icon, Input, PageContent } from "prime-ui-kit";

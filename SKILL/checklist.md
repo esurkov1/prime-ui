@@ -5,7 +5,11 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 ## Composition
 - [ ] The screen starts from the closest screen in [composition.md](composition.md#screens) (list, detail,
       settings, form in a Drawer, dashboard, states, messenger) and keeps its skeleton.
-- [ ] One `PageContent.Header` with title, one-line description and actions; blocks in `PageContent.Body`.
+- [ ] The page titles itself in its `AppHeader`: `AppHeader.Title`, a line of data in
+      `AppHeader.Description`, the page's tools in `AppHeader.Tools` (`PageToolbar`); main has no
+      `PageContent.Header`. Only a document page (settings, a long form, help) has `PageContent.Header`
+      and no title in the header. Blocks in `PageContent.Body`.
+- [ ] The header row holds only what this page needs: no global search, no app-wide buttons.
 - [ ] Cards only for standalone blocks; no card around a table, a single field or the whole page.
 
 ## UX ([ux.md](ux.md))
@@ -41,8 +45,8 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 
 ## Text
 - [ ] Every text goes through a kit component or `Typography` with a role; no custom font sizes/weights.
-- [ ] One page title (`PageContent.Title`, `<h1>`); headings descend without skipping levels
-      (`Card.Title as="h2"` directly under the page title).
+- [ ] One page title, one `<h1>` (`AppHeader.Title`, or `PageContent.Title` on a document page);
+      headings descend without skipping levels (`Card.Title as="h2"` directly under the page title).
 - [ ] Secondary text uses `tone="secondary"`/`"muted"`; numbers in tables and prices are tabular.
 - [ ] No filler copy, no emoji, no text that restates the heading.
 
@@ -100,7 +104,7 @@ Answer every item yes or no. Any «no» is fixed before handing over.
 - [ ] Screen checked with `data-theme="dark"`: no hard-coded colors, everything readable.
 - [ ] Screen works at 320px: no horizontal page scroll, grids collapse, toolbars rearrange (`PageToolbar`) and switchers scroll, long text truncates or wraps.
 - [ ] The responsive checklist in [responsive.md](responsive.md#checklist-before-handing-a-screen-over) passes: widths 320 · 390 · 768 · 1024 · 1280 · 1920, the primary action in the top row, one height per row, no hover-only functions, zoom 400%.
-- [ ] Below 768px `AppHeader.MenuButton` opens the Sidebar; the header holds the title or path on every width.
+- [ ] Below 768px `AppHeader.MenuButton` opens the Sidebar; the page title stays in the header on every width, the page's tools wrap under it.
 
 ## Keyboard and a11y
 - [ ] Every action is reachable by Tab in a logical order and works with Enter/Space.

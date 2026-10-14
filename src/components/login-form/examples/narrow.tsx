@@ -6,7 +6,7 @@ import styles from "./examples.module.css";
 export default function LoginFormNarrowExample() {
   return (
     <div className={styles.narrow}>
-      <LoginForm.Root size="s">
+      <LoginForm.Root>
         <LoginForm.Header>
           <LoginForm.Title>Вход в кабинет поставщика</LoginForm.Title>
           <LoginForm.Description>Пришлём ссылку для входа на рабочую почту</LoginForm.Description>

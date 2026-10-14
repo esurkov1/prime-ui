@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "AppHeader.Root",
-      en: "`ref` → `HTMLElement`. The sticky `<header>` bar at the top of the content panel, one row as high as the Sidebar brand row and lined up with the page. Icon buttons inside are `soft`, not `ghost`.",
-      ru: "Липкая полоса `<header>` вверху панели содержимого: одна строка высотой со строку бренда Sidebar, выровненная со страницей. Иконочные кнопки внутри — `soft`, не `ghost`.",
+      en: "`ref` → `HTMLElement`. The page's sticky `<header>` bar at the top of the content panel: only what the current page needs — its title, tools and own buttons. As high as the Sidebar brand row, lined up with the page. Icon buttons inside are `soft`, not `ghost`.",
+      ru: "Липкая полоса `<header>` страницы вверху панели содержимого: только то, что нужно текущей странице, — её заголовок, инструменты и кнопки. Высотой со строку бренда Sidebar, выровнена со страницей. Иконочные кнопки — `soft`, не `ghost`.",
       props: [
         {
           name: "labels",
@@ -16,15 +16,15 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLElement>",
-          en: "`children` (`AppHeader.Start`, `AppHeader.Search`, `AppHeader.Actions`, `AppHeader.Tools`), `className` and the other attributes.",
-          ru: "`children` (`AppHeader.Start`, `AppHeader.Search`, `AppHeader.Actions`, `AppHeader.Tools`), `className` и остальные атрибуты.",
+          en: "`children` (`AppHeader.Start`, `AppHeader.Actions`, `AppHeader.Tools`), `className` and the other attributes.",
+          ru: "`children` (`AppHeader.Start`, `AppHeader.Actions`, `AppHeader.Tools`), `className` и остальные атрибуты.",
         },
       ],
     },
     {
       name: "AppHeader.Start",
-      en: "`ref` → `HTMLDivElement`. The leading zone that takes the free width: the menu button, a back button, the title or a Breadcrumb.",
-      ru: "Начальная зона, забирает свободную ширину: кнопка меню, кнопка «назад», заголовок или Breadcrumb.",
+      en: "`ref` → `HTMLDivElement`. The leading zone that takes the free width: the menu button, the path up (a Breadcrumb) and the title.",
+      ru: "Начальная зона, забирает свободную ширину: кнопка меню, путь наверх (Breadcrumb) и заголовок.",
       props: [
         {
           name: "…rest",
@@ -36,16 +36,9 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Title",
-      en: '`ref` → `HTMLDivElement`. Where you are: an optional `AppHeader.Icon`, the name (title-s, truncates) and an optional `AppHeader.Description` under it. Not a heading unless `as="h1"`.',
-      ru: 'Где вы находитесь: необязательная `AppHeader.Icon`, название (title-s, обрезается) и под ним необязательное `AppHeader.Description`. Не заголовок, если не задан `as="h1"`.',
+      en: "`ref` → `HTMLDivElement`. The page title: an optional `AppHeader.Icon`, the name (title-s, truncates) and an optional `AppHeader.Description` under it. The name is the page heading `<h1>`; the description stays outside its accessible name.",
+      ru: "Заголовок страницы: необязательная `AppHeader.Icon`, название (title-s, обрезается) и под ним необязательное `AppHeader.Description`. Название — `<h1>` страницы; описание вне его доступного имени.",
       props: [
-        {
-          name: "as",
-          type: '"span" | "h1"',
-          default: '"span"',
-          en: "Tag of the name. `h1`: the header carries the page title — only the name is the heading, the description stays outside its accessible name; the look does not change.",
-          ru: "Тег названия. `h1`: шапка несёт заголовок страницы — заголовок только название, описание вне его доступного имени; вид не меняется.",
-        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
@@ -69,8 +62,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Description",
-      en: "`ref` → `HTMLSpanElement`. Muted caption under the title (a workspace, a period); hidden on a narrow header.",
-      ru: "Приглушённая подпись под названием (рабочее пространство, период); скрыта в узкой шапке.",
+      en: "`ref` → `HTMLSpanElement`. Muted line under the title that carries data («128 в работе · 6 ждут оплаты», a status and a date); truncates on a narrow header, never hides.",
+      ru: "Приглушённая строка под названием, которая несёт данные («128 в работе · 6 ждут оплаты», статус и срок); в узкой шапке обрезается, но не скрывается.",
       props: [
         {
           name: "…rest",
@@ -82,41 +75,14 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Separator",
-      en: "`ref` → `HTMLDivElement`. A short vertical `Divider` (20) between groups in a zone — a back button and the path — with 16 of air on each side.",
-      ru: "Короткий вертикальный `Divider` (20) между группами в зоне — кнопкой «назад» и путём — с воздухом 16 с каждой стороны.",
+      en: "`ref` → `HTMLDivElement`. A short vertical `Divider` (20) between groups in a zone — the path and the title — with 16 of air on each side.",
+      ru: "Короткий вертикальный `Divider` (20) между группами в зоне — путём и заголовком — с воздухом 16 с каждой стороны.",
       props: [
         {
           name: "…rest",
           type: 'Omit<DividerProps, "orientation" | "children">',
           en: "`className` and the other div attributes.",
           ru: "`className` и остальные атрибуты div.",
-        },
-      ],
-    },
-    {
-      name: "AppHeader.Search",
-      en: '`ref` → `HTMLButtonElement`. The global search entry: a `<button type="button">` drawn as a field (search icon, placeholder text, key hint) that opens your CommandMenu. Below 36rem of header width it folds into a square button named by its text.',
-      ru: "Вход в глобальный поиск: кнопка в виде поля (иконка поиска, текст-подсказка, клавиша), которая открывает ваш CommandMenu. Уже 36rem сворачивается в квадратную кнопку, названную своим текстом.",
-      props: [
-        {
-          name: "children",
-          type: "ReactNode",
-          required: true,
-          en: "The placeholder text; also the accessible name.",
-          ru: "Текст-подсказка; он же доступное имя.",
-        },
-        {
-          name: "shortcut",
-          type: "ReactNode",
-          default: '"⌘K"',
-          en: "The key hint at the end (a `Kbd`, hidden from assistive tech); `null` hides it. Bind the key yourself.",
-          ru: "Подсказка клавиши в конце (`Kbd`, скрыт от скринридеров); `null` убирает её. Сочетание назначаете сами.",
-        },
-        {
-          name: "…rest",
-          type: "ButtonHTMLAttributes<HTMLButtonElement>",
-          en: "`onClick`, `className` and the other button attributes.",
-          ru: "`onClick`, `className` и остальные атрибуты кнопки.",
         },
       ],
     },
@@ -135,8 +101,8 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Actions",
-      en: "`ref` → `HTMLDivElement`. The trailing row of buttons: notifications, the account, one primary action. Never wraps.",
-      ru: "Ряд кнопок в конце: уведомления, аккаунт, одно главное действие. Не переносится.",
+      en: "`ref` → `HTMLDivElement`. The trailing row of the page's own buttons in the title row (export, a more menu); the page's primary action goes into the PageToolbar in `AppHeader.Tools` when the page has tools. Never wraps.",
+      ru: "Ряд собственных кнопок страницы в конце строки заголовка (экспорт, меню «ещё»); главное действие страницы с инструментами — в PageToolbar в `AppHeader.Tools`. Не переносится.",
       props: [
         {
           name: "…rest",

@@ -10,14 +10,21 @@
   --bc-gap: var(--prime-space-1);
   --bc-item-max: calc(var(--prime-space-24) * 2);
 
-  /* Fill the available width: an inline-size container has no intrinsic width and would
-   * collapse to 0 inside shrink-wrapped / flex parents. */
-  container-type: inline-size;
-  inline-size: 100%;
+  /* Its own content width at most the row (a flex row — the AppHeader start — keeps room for what
+   * follows the path); the segments truncate. */
   min-width: 0;
+  max-inline-size: 100%;
   font-family: var(--prime-font-family-sans);
   font-size: var(--bc-text-size);
   line-height: var(--bc-line-height);
+}
+
+/* A path that can collapse is a size container: it fills the available width (an inline-size
+ * container has no intrinsic width and would shrink to 0 in a flex row) and folds its middle
+ * levels by that width. */
+.root[data-collapsible="true"] {
+  container-type: inline-size;
+  inline-size: 100%;
 }
 
 .root[data-size="xs"] {

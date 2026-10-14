@@ -137,7 +137,7 @@ A chart color does one job, and the job picks the colors:
 | `title-m` | 16/24 600 | page section heading (`PageContent.Section` draws it), modal title |
 | `title-l` | 18/24 600 | large block title |
 | `heading-s` | 20/28 600 | page sub-heading |
-| `heading-m` | 24/32 600 | page title (`PageContent.Title`) |
+| `heading-m` | 24/32 600 | the title of a document page (`PageContent.Title`); an app page titles itself in `AppHeader.Title` (`title-s`) |
 | `heading-l` | 30/36 600 | marketing / auth title |
 | `display-*` | 36–60 | hero numbers only |
 | `code` | 13/20 mono | identifiers, inline code |

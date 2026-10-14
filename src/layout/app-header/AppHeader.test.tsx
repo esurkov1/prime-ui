@@ -11,8 +11,8 @@ describe("AppHeader", () => {
         <AppHeader.Start>
           <AppHeader.Title>Заказы</AppHeader.Title>
         </AppHeader.Start>
-        <AppHeader.Search>Поиск</AppHeader.Search>
         <AppHeader.Actions>
+          <button type="button">Экспорт</button>
           <button type="button">Новый заказ</button>
         </AppHeader.Actions>
       </AppHeader.Root>,
@@ -22,7 +22,7 @@ describe("AppHeader", () => {
     expect(banner).toHaveClass("custom");
     expect(banner).toHaveTextContent("Заказы");
     const buttons = screen.getAllByRole("button");
-    expect(buttons.map((button) => button.textContent)).toEqual(["Поиск⌘K", "Новый заказ"]);
+    expect(buttons.map((button) => button.textContent)).toEqual(["Экспорт", "Новый заказ"]);
   });
 
   it("Title puts the icon first and the description under the name, whatever the order", () => {
@@ -41,27 +41,6 @@ describe("AppHeader", () => {
     expect(title.firstElementChild).toBe(icon);
     expect(icon).toHaveAttribute("aria-hidden", "true");
     expect(title).toHaveTextContent("ОбзорОтдел продаж");
-  });
-
-  it("Search is a button named by its text; the key hint is hidden and can be removed", async () => {
-    const onClick = vi.fn();
-    const { rerender } = render(<AppHeader.Search onClick={onClick}>Поиск</AppHeader.Search>);
-
-    const search = screen.getByRole("button", { name: "Поиск" });
-    expect(search).toHaveAttribute("type", "button");
-    expect(screen.getByText("⌘K")).toHaveAttribute("aria-hidden", "true");
-
-    search.focus();
-    await userEvent.keyboard("{Enter}");
-    await userEvent.keyboard(" ");
-    expect(onClick).toHaveBeenCalledTimes(2);
-
-    rerender(
-      <AppHeader.Search onClick={onClick} shortcut={null}>
-        Поиск
-      </AppHeader.Search>,
-    );
-    expect(screen.queryByText("⌘K")).not.toBeInTheDocument();
   });
 
   it("MenuButton is named by labels.menu, takes aria-expanded and reports show", async () => {
@@ -99,8 +78,8 @@ describe("AppHeader", () => {
           <AppHeader.MenuButton />
           <AppHeader.Title>Заказы</AppHeader.Title>
         </AppHeader.Start>
-        <AppHeader.Search>Поиск</AppHeader.Search>
         <AppHeader.Actions>
+          <button type="button">Экспорт</button>
           <button type="button">Создать</button>
         </AppHeader.Actions>
       </AppHeader.Root>,
@@ -109,16 +88,19 @@ describe("AppHeader", () => {
     await userEvent.tab();
     expect(screen.getByRole("button", { name: "Открыть меню" })).toHaveFocus();
     await userEvent.tab();
-    expect(screen.getByRole("button", { name: "Поиск" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Экспорт" })).toHaveFocus();
     await userEvent.tab();
     expect(screen.getByRole("button", { name: "Создать" })).toHaveFocus();
   });
 
-  it('Title as="h1" is the page heading; the description stays out of its name', () => {
+  it("Title's name is the page h1; the icon and the description stay out of its name", () => {
     render(
       <AppHeader.Root>
         <AppHeader.Start>
-          <AppHeader.Title as="h1">
+          <AppHeader.Title>
+            <AppHeader.Icon>
+              <svg />
+            </AppHeader.Icon>
             Сделки
             <AppHeader.Description>Отдел продаж · октябрь</AppHeader.Description>
           </AppHeader.Title>
@@ -126,25 +108,17 @@ describe("AppHeader", () => {
       </AppHeader.Root>,
     );
     const heading = screen.getByRole("heading", { level: 1 });
+    expect(screen.getAllByRole("heading")).toHaveLength(1);
     expect(heading).toHaveAccessibleName("Сделки");
     expect(screen.getByText("Отдел продаж · октябрь")).toBeInTheDocument();
     expect(heading).not.toContainElement(screen.getByText("Отдел продаж · октябрь"));
-  });
-
-  it("Title is no heading by default", () => {
-    render(
-      <AppHeader.Root>
-        <AppHeader.Title>Сделки</AppHeader.Title>
-      </AppHeader.Root>,
-    );
-    expect(screen.queryByRole("heading")).toBeNull();
   });
 
   it("the page tools are the second row: after the title row in the DOM and the Tab order", async () => {
     const { container } = render(
       <AppHeader.Root>
         <AppHeader.Start>
-          <AppHeader.Title as="h1">Сделки</AppHeader.Title>
+          <AppHeader.Title>Сделки</AppHeader.Title>
         </AppHeader.Start>
         <AppHeader.Tools data-testid="tools">
           <button type="button">Период</button>

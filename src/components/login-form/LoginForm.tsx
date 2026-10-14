@@ -99,10 +99,18 @@ export type LoginFormLogoProps = {
   ref?: React.Ref<HTMLDivElement>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-/** Tile for the product mark or an icon (rounded accent square by default, round when `align="center"`). Decorative unless it has an `aria-label`. */
+/**
+ * Tile for the product mark or an icon (rounded accent square by default, round when
+ * `align="center"`). Decorative unless it has an `aria-label`: then it is an image of the product
+ * mark (`role="img"`), since a plain `<div>` cannot carry a name.
+ */
 function LoginFormLogo({ className, children, ...rest }: LoginFormLogoProps) {
   return (
-    <div className={cx(styles.logo, className)} {...rest}>
+    <div
+      role={rest["aria-label"] ? "img" : undefined}
+      className={cx(styles.logo, className)}
+      {...rest}
+    >
       {children}
     </div>
   );

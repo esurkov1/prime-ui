@@ -1,4 +1,4 @@
-/** Labelled groups and the optional item parts: a plain count, a coloured badge, a key hint, a trailing icon, a row action and a disabled section — `Sidebar.Group`, `Sidebar.ItemCount`, `color`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`, `disabled`. */
+/** Labelled groups and the optional item parts: a plain count, coloured and solid badges, a key hint, a trailing icon, row actions with the default and an own glyph and a disabled section — `Sidebar.Group`, `Sidebar.ItemCount`, `color`, `variant`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`, `disabled`. */
 import { Icon, Kbd, Sidebar } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -29,7 +29,9 @@ export default function SidebarStructureExample() {
                 <Icon name="object.bell" />
               </Sidebar.ItemIcon>
               Уведомления
-              <Sidebar.ItemCount color="red">7</Sidebar.ItemCount>
+              <Sidebar.ItemCount color="red" variant="solid">
+                7
+              </Sidebar.ItemCount>
             </Sidebar.Item>
           </Sidebar.Group>
           <Sidebar.Group label="Работа">
@@ -54,6 +56,9 @@ export default function SidebarStructureExample() {
               </Sidebar.ItemIcon>
               Интеграции
               <Sidebar.ItemCount color="orange">!</Sidebar.ItemCount>
+              <Sidebar.ItemAction label="Синхронизировать интеграции" onClick={() => {}}>
+                <Icon name="action.refresh" />
+              </Sidebar.ItemAction>
             </Sidebar.Item>
           </Sidebar.Group>
           <Sidebar.Group label="Администрирование">

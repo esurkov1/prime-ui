@@ -2,12 +2,16 @@ import * as React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { Breadcrumb } from "@/components/breadcrumb/Breadcrumb";
+import { Button } from "@/components/button/Button";
+import { Kbd } from "@/components/kbd/Kbd";
+import { Icon } from "@/icons";
 import { AppHeader, AppShell } from "@/layout";
 
 import { PLAYGROUND_NAV_CATEGORIES } from "./categories";
 import { PlaygroundChromeSidebar } from "./components/PlaygroundChromeSidebar";
 import { PlaygroundHeaderControls } from "./components/PlaygroundHeaderControls";
 import { PlaygroundSearch, usePlaygroundSearchHotkey } from "./components/PlaygroundSearch";
+import styles from "./PlaygroundLayout.module.css";
 import { PLAYGROUND_INTRO, PLAYGROUND_PAGES, pageRoute } from "./playgroundPages";
 
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
@@ -42,14 +46,24 @@ export function PlaygroundLayout() {
                 <Breadcrumb.Item current>{page.label}</Breadcrumb.Item>
               </Breadcrumb.Root>
             </AppHeader.Start>
-            <AppHeader.Search
-              aria-haspopup="dialog"
-              shortcut={isMac ? "⌘K" : "Ctrl K"}
-              onClick={() => setSearchOpen(true)}
-            >
-              Поиск по компонентам
-            </AppHeader.Search>
             <AppHeader.Actions>
+              {/* The docs site's own search over its pages — not a part of the kit's header. */}
+              <Button.Root
+                variant="soft"
+                tone="neutral"
+                aria-label="Поиск по компонентам"
+                aria-haspopup="dialog"
+                className={styles.search}
+                onClick={() => setSearchOpen(true)}
+              >
+                <Button.Icon>
+                  <Icon name="action.search" />
+                </Button.Icon>
+                <span className={styles.searchText}>Поиск по компонентам</span>
+                <Kbd className={styles.searchKbd} aria-hidden="true">
+                  {isMac ? "⌘K" : "Ctrl K"}
+                </Kbd>
+              </Button.Root>
               <PlaygroundHeaderControls />
             </AppHeader.Actions>
           </AppHeader.Root>

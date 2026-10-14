@@ -44,6 +44,27 @@ describe("LoginForm", () => {
     expect(screen.getByRole("heading", { level: 2 })).toBeInTheDocument();
   });
 
+  it("keeps the logo decorative unless it is named; a named logo is an image", () => {
+    const { rerender } = render(
+      <LoginForm.Root>
+        <LoginForm.Logo data-testid="logo">
+          <svg />
+        </LoginForm.Logo>
+      </LoginForm.Root>,
+    );
+    expect(screen.getByTestId("logo")).not.toHaveAttribute("role");
+    expect(screen.queryByRole("img")).toBeNull();
+
+    rerender(
+      <LoginForm.Root>
+        <LoginForm.Logo aria-label="Маршрут">
+          <svg />
+        </LoginForm.Logo>
+      </LoginForm.Root>,
+    );
+    expect(screen.getByRole("img", { name: "Маршрут" })).toBeInTheDocument();
+  });
+
   it("sets data-size (default m) and data-flat on the root", () => {
     const { rerender } = render(<Sample />);
     expect(screen.getByTestId("root")).toHaveAttribute("data-size", "m");

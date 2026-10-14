@@ -1,14 +1,5 @@
-/** The app frame: Sidebar in the nav column, breadcrumbs in the AppHeader, the page in main; only main scrolls — `fillViewport`. */
-import {
-  AppHeader,
-  AppShell,
-  Breadcrumb,
-  Button,
-  Icon,
-  PageContent,
-  Sidebar,
-  Typography,
-} from "prime-ui-kit";
+/** The app frame: Sidebar in the nav column, the page title and its action in the AppHeader, the page in main; only main scrolls — `fillViewport`. */
+import { AppHeader, AppShell, Button, Icon, PageContent, Sidebar, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -48,31 +39,25 @@ export default function AppShellOverviewExample() {
         </AppShell.Nav>
         <AppHeader.Root>
           <AppHeader.Start>
-            <Breadcrumb.Root>
-              <Breadcrumb.Item href="#crm">CRM</Breadcrumb.Item>
-              <Breadcrumb.Item current>Обзор</Breadcrumb.Item>
-            </Breadcrumb.Root>
+            <AppHeader.Title>
+              Обзор
+              <AppHeader.Description>Октябрь · 37 сделок в работе</AppHeader.Description>
+            </AppHeader.Title>
           </AppHeader.Start>
+          <AppHeader.Actions>
+            <Button.Root>
+              <Button.Icon>
+                <Icon name="action.add" />
+              </Button.Icon>
+              Новая сделка
+            </Button.Root>
+          </AppHeader.Actions>
         </AppHeader.Root>
         <AppShell.Main>
           <PageContent.Page>
-            <PageContent.Header>
-              {/* In a real app this is PageContent.Title (the page h1). */}
-              <Typography as="h2" variant="heading-m">
-                Обзор
-              </Typography>
-              <PageContent.Actions>
-                <Button.Root>
-                  <Button.Icon>
-                    <Icon name="action.add" />
-                  </Button.Icon>
-                  Новая сделка
-                </Button.Root>
-              </PageContent.Actions>
-            </PageContent.Header>
             <PageContent.Body>
               <Typography variant="body-m" tone="secondary">
-                Выручка за месяц — 4,8 млн ₽, 37 сделок в работе.
+                Выручка за месяц — 4,8 млн ₽, на 12% больше, чем в сентябре.
               </Typography>
             </PageContent.Body>
           </PageContent.Page>

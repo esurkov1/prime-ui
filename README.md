@@ -117,7 +117,7 @@ components.
 ## Quick start
 
 ```tsx
-import { AppShell, Button, Input, PageContent, Sidebar } from "prime-ui-kit";
+import { AppHeader, AppShell, Button, Input, PageContent, Sidebar } from "prime-ui-kit";
 
 export function App() {
   return (
@@ -130,11 +130,15 @@ export function App() {
           </Sidebar.Content>
         </Sidebar.Root>
       }
+      header={
+        <AppHeader.Root>
+          <AppHeader.Start>
+            <AppHeader.Title>New client</AppHeader.Title>
+          </AppHeader.Start>
+        </AppHeader.Root>
+      }
     >
       <PageContent.Page>
-        <PageContent.Header>
-          <PageContent.Title>New client</PageContent.Title>
-        </PageContent.Header>
         <PageContent.Body>
           <Input.Root label="Email" required hint="We will send an invitation">
             <Input.Wrapper>
@@ -297,7 +301,7 @@ accessibility, examples and common mistakes.
 | Component | What it is for |
 |---|---|
 | [**AppShell**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-shell/COMPONENT.md) | The app frame: a content panel that is the page itself and a navigation rail one layer above it. |
-| [**AppHeader**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-header/COMPONENT.md) | The bar at the top of the app: where you are, ⌘K search, a few actions and the phone menu button; it may carry the page title and tools. |
+| [**AppHeader**](https://github.com/esurkov1/prime-ui/blob/main/src/layout/app-header/COMPONENT.md) | The page's bar at the top of the app: the page title with a line of data, the page's own buttons and tools, the phone menu button. |
 | [**PageContent**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-content/COMPONENT.md) | Page structure inside the main column: title, page actions, titled sections and a bento tile grid; full-height pages and list + detail. |
 | [**PageToolbar**](https://github.com/esurkov1/prime-ui/blob/main/src/components/page-toolbar/COMPONENT.md) | The panel at the top of a page — search and filter, sections, view options and the primary action — one row when wide, stacked rows when narrow. |
 | [**Divider**](https://github.com/esurkov1/prime-ui/blob/main/src/components/divider/COMPONENT.md) | A hairline separator, horizontal or vertical, with or without a label. |

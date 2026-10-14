@@ -1,12 +1,24 @@
 /** Root, nav, header and main in one component; main scrolls back to the top whenever the page changes — `AppShell.Template` with `scrollResetKey`. */
-import { AppShell, Icon, PageContent, Sidebar, Typography } from "prime-ui-kit";
+import { AppHeader, AppShell, Icon, PageContent, Sidebar, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
 const PAGES = [
-  { id: "mailings", label: "Рассылки", icon: "field.email", text: "3 активные кампании." },
-  { id: "calendar", label: "Календарь", icon: "field.calendar", text: "5 событий на неделе." },
+  {
+    id: "mailings",
+    label: "Рассылки",
+    icon: "field.email",
+    text: "3 активные кампании",
+    note: "Последняя рассылка ушла вчера в 10:00, её открыли 42% получателей.",
+  },
+  {
+    id: "calendar",
+    label: "Календарь",
+    icon: "field.calendar",
+    text: "5 событий на неделе",
+    note: "Ближайшее — созвон с ООО «Север» сегодня в 15:00.",
+  },
 ] as const;
 
 export default function AppShellTemplateExample() {
@@ -38,15 +50,23 @@ export default function AppShellTemplateExample() {
             </Sidebar.Content>
           </Sidebar.Root>
         }
+        header={
+          <AppHeader.Root>
+            <AppHeader.Start>
+              <AppHeader.Title>
+                {page.label}
+                <AppHeader.Description>{page.text}</AppHeader.Description>
+              </AppHeader.Title>
+            </AppHeader.Start>
+          </AppHeader.Root>
+        }
       >
         <PageContent.Page>
-          <PageContent.Header>
-            {/* In a real app this is PageContent.Title (the page h1). */}
-            <Typography as="h2" variant="heading-m">
-              {page.label}
+          <PageContent.Body>
+            <Typography variant="body-m" tone="secondary">
+              {page.note}
             </Typography>
-            <PageContent.Description>{page.text}</PageContent.Description>
-          </PageContent.Header>
+          </PageContent.Body>
         </PageContent.Page>
       </AppShell.Template>
     </div>

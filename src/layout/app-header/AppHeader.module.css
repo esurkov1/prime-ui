@@ -3,7 +3,7 @@
  * (control height + 8, inside 12 of air above and below), so the brand and the title share one
  * line across the two planes. It sits on the panel surface with no divider (depth from fill), is
  * sticky, keeps the top safe-area inset and the shell gutters, and lays itself out from its own
- * width: below 36rem the search folds into a square button and the description goes.
+ * width: below 36rem the title icon goes, the title and its line of data truncate.
  */
 .root {
   container: prime-app-header / inline-size;
@@ -111,51 +111,12 @@
 }
 
 .titleName {
-  /* An `h1` name (`as="h1"`) keeps the bar's type and no margins. */
+  /* The `h1` name keeps the bar's type and no margins. */
   margin: 0;
 }
 
 .description {
   color: var(--prime-color-text-muted);
-}
-
-/* ─── Search ────────────────────────────────────────────────────────────── */
-
-.search {
-  display: flex;
-  flex: 0 1 calc(var(--prime-space-24) * 3);
-  align-items: center;
-  gap: var(--field-gap);
-  min-width: 0;
-  height: var(--field-h);
-  margin: 0;
-  padding-inline: var(--field-px);
-  border: 0;
-  border-radius: var(--field-radius);
-  color: var(--prime-color-text-placeholder);
-  font: inherit;
-  font-size: var(--field-text);
-  line-height: var(--field-lh);
-  text-align: start;
-  cursor: pointer;
-}
-
-.searchIcon {
-  --prime-icon-size: var(--field-icon);
-
-  flex: none;
-}
-
-.searchText {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.searchKbd {
-  flex: none;
 }
 
 /* ─── Menu button ───────────────────────────────────────────────────────── */
@@ -170,29 +131,8 @@
 /* ─── Narrow header ─────────────────────────────────────────────────────── */
 
 @container prime-app-header (max-width: 35.99rem) {
-  /* The name keeps the room: the tile and the caption go first. */
-  .description,
+  /* The name keeps the room: the tile goes; the line of data stays under it and truncates. */
   .icon {
-    display: none;
-  }
-
-  /* The search folds into a square button; its text stays as the hidden name. */
-  .search {
-    flex: none;
-    justify-content: center;
-    width: var(--field-h);
-    padding-inline: 0;
-  }
-
-  .searchText {
-    position: absolute;
-    width: var(--prime-border-width);
-    height: var(--prime-border-width);
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-
-  .searchKbd {
     display: none;
   }
 }

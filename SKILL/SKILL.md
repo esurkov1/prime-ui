@@ -32,7 +32,8 @@ region, `Skeleton` while it loads).
    the main action, the states, the narrow screen); the shape of the data decides the layout, every
    label must carry something new, friction matches the cost of a mistake.
 2. **The app frame, once per app** — [layouts.md](layouts.md): styles, theme, providers, `AppShell`
-   with `Sidebar` and `AppHeader`, page wrappers, auth screens. A screen you deliver renders only its page.
+   with `Sidebar` and `AppHeader`, page wrappers, auth screens. A screen you deliver renders only its
+   page: its header content (title, a line of data, its tools) and its body.
 3. **Choose** — [choosing.md](choosing.md): the category by task, then the component, then the pairs
    that are easy to confuse.
 4. **Read the component** — [components.md](components.md) links each `COMPONENT.md` (API, variants,
@@ -122,7 +123,8 @@ Take a semantic `<Icon name="…" />` first, else a glyph from the full animated
 7. Labels above fields, always — once per column for records in rows (`FieldList`), never numbered
    («Пункт 1»), never repeating their heading. Placeholder is an example value, never the label.
 8. Text through `Typography` roles (`title-m` section, `title-s` group, `body-m` text, `caption` meta;
-   the page title is `PageContent.Title`). No custom font sizes.
+   the page title is `AppHeader.Title` in the page's header, `PageContent.Title` only on a
+   document page). No custom font sizes.
 9. Overlays (Modal, ConfirmDialog, Drawer, Sheet, Popover, Dropdown, Tooltip, CommandMenu, Select,
    MediaViewer) come from the kit — never hand-made — and stay mounted: drive them with `open`,
    never `{open && …}`.

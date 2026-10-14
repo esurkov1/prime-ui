@@ -2,12 +2,10 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { Divider, type DividerProps } from "@/components/divider/Divider";
-import { Kbd } from "@/components/kbd/Kbd";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { stickySurfaceClass } from "@/internal/sticky";
 import textRole from "@/internal/textRole.module.css";
 
@@ -32,9 +30,10 @@ export type AppHeaderRootProps = HeaderProps & {
 };
 
 /**
- * The bar at the very top of the content panel: where you are, global search, a few actions.
- * One row as high as the Sidebar brand row, so the two read as one line; sticky; lays itself out
- * from its own width (narrow: the search folds into an icon, the title truncates).
+ * The page's bar at the very top of the content panel: its row holds only what the current page
+ * needs — the page title, the page's tools, per-page buttons. One row as high as the Sidebar brand
+ * row, so the two read as one line; sticky; lays itself out from its own width (narrow: the
+ * description goes, the title truncates).
  */
 function AppHeaderRoot({ labels, className, children, ...rest }: AppHeaderRootProps) {
   const value = React.useMemo(() => ({ ...APP_HEADER_LABELS, ...labels }), [labels]);
@@ -63,24 +62,15 @@ function AppHeaderStart({ className, ...rest }: AppHeaderStartProps) {
 }
 AppHeaderStart.displayName = "AppHeader.Start";
 
-export type AppHeaderTitleProps = DivProps & {
-  /**
-   * Tag of the name: `h1` when the header carries the page title (no `PageContent.Header` in
-   * main) — the description stays outside the heading's name. Default `span`.
-   */
-  as?: "span" | "h1";
-};
+export type AppHeaderTitleProps = DivProps;
 
 /**
  * Where you are: an optional `AppHeader.Icon`, the name and an optional `AppHeader.Description`
- * under it — the same anatomy as the Sidebar brand. The name truncates.
+ * under it — the same anatomy as the Sidebar brand. The name is the page's `<h1>` (an app page
+ * titles itself in the header); the description stays outside the heading's name. The name
+ * truncates.
  */
-function AppHeaderTitle({
-  as: NameTag = "span",
-  className,
-  children,
-  ...rest
-}: AppHeaderTitleProps) {
+function AppHeaderTitle({ className, children, ...rest }: AppHeaderTitleProps) {
   const items = React.Children.toArray(children);
   const isIcon = (child: React.ReactNode) =>
     React.isValidElement(child) && child.type === AppHeaderIcon;
@@ -94,7 +84,7 @@ function AppHeaderTitle({
     <div {...rest} className={cx(styles.title, className)}>
       {icon}
       <div className={styles.titleText}>
-        <NameTag className={cx(textRole.titleS, styles.titleName)}>{name}</NameTag>
+        <h1 className={cx(textRole.titleS, styles.titleName)}>{name}</h1>
         {description}
       </div>
     </div>
@@ -132,40 +122,6 @@ function AppHeaderSeparator({ className, ...rest }: AppHeaderSeparatorProps) {
   return <Divider {...rest} orientation="vertical" className={cx(styles.separator, className)} />;
 }
 AppHeaderSeparator.displayName = "AppHeader.Separator";
-
-export type AppHeaderSearchProps = Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "type" | "children"
-> & {
-  /** Placeholder text; also the button's name when the header is narrow and the field folds. */
-  children: React.ReactNode;
-  /** Key hint at the end. Default `⌘K`; `null` hides it. */
-  shortcut?: React.ReactNode;
-  ref?: React.Ref<HTMLButtonElement>;
-};
-
-/**
- * Global search entry: looks like a field, works as a button that opens your CommandMenu (wire
- * `onClick` and the shortcut). On a narrow header it folds into a square search button.
- */
-function AppHeaderSearch({ children, shortcut = "⌘K", className, ...rest }: AppHeaderSearchProps) {
-  return (
-    <button
-      type="button"
-      {...rest}
-      className={cx(fieldTierClass, fieldSurfaceClass, styles.search, className)}
-    >
-      <Icon name="action.search" className={styles.searchIcon} />
-      <span className={styles.searchText}>{children}</span>
-      {shortcut == null ? null : (
-        <Kbd className={styles.searchKbd} aria-hidden="true">
-          {shortcut}
-        </Kbd>
-      )}
-    </button>
-  );
-}
-AppHeaderSearch.displayName = "AppHeader.Search";
 
 export type AppHeaderToolsProps = DivProps;
 
@@ -227,7 +183,6 @@ export const AppHeader = {
   Icon: AppHeaderIcon,
   Description: AppHeaderDescription,
   Separator: AppHeaderSeparator,
-  Search: AppHeaderSearch,
   Tools: AppHeaderTools,
   Actions: AppHeaderActions,
   MenuButton: AppHeaderMenuButton,

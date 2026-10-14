@@ -1,4 +1,4 @@
-/** The header carries the page: the title is the page heading, the page tools (sections, the period, the primary action) are its second row and lay themselves out from its width — `AppHeader.Title`, `as`, `AppHeader.Tools`. */
+/** The header carries the page: the title is the page heading with a line of data, the page tools (sections, the period, the primary action) are its second row and lay themselves out from its width — `AppHeader.Title`, `AppHeader.Tools`. */
 import { AppHeader, Button, Icon, PageToolbar, SegmentedControl, Select } from "prime-ui-kit";
 import * as React from "react";
 
@@ -24,18 +24,11 @@ export default function AppHeaderPageTitleExample() {
     <div className={styles.window}>
       <AppHeader.Root>
         <AppHeader.Start>
-          <AppHeader.Title as="h1">
+          <AppHeader.Title>
             Сделки
-            <AppHeader.Description>Отдел продаж</AppHeader.Description>
+            <AppHeader.Description>24 сделки в работе · 8,2 млн ₽</AppHeader.Description>
           </AppHeader.Title>
         </AppHeader.Start>
-        <AppHeader.Actions>
-          <Button.Root variant="soft" tone="neutral" aria-label="Уведомления">
-            <Button.Icon>
-              <Icon name="object.bell" />
-            </Button.Icon>
-          </Button.Root>
-        </AppHeader.Actions>
         <AppHeader.Tools>
           <PageToolbar.Root aria-label="Сделки">
             <PageToolbar.Sections>

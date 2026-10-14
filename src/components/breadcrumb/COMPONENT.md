@@ -85,13 +85,14 @@ Use links for every ancestor and `current` on the last item; `s` above a `headin
 |---|---|---|
 | current | `current` | `aria-current="page"` on the text span, or on the link when the item has `href` |
 | hover / focus-visible on links | pointer / keyboard | text → primary; focus ring from LinkButton |
-| truncation | width | each level truncates with an ellipsis, max width `2 × --prime-space-24` (192; `--prime-space-24 + --prime-space-6`, 120, in a container below 30rem); the last item shrinks last |
+| truncation | width | each level truncates with an ellipsis, max width `2 × --prime-space-24` (192; `--prime-space-24 + --prime-space-6`, 120, when its container is below 30rem — its own for 3+ levels, the nearest one above for 1–2); the last item shrinks last |
 | auto-collapse | 3+ levels and a container `< 30rem` | `data-collapsible="true"`; middle levels are `display: none` and replaced by «… ›», whose hidden text (`labels.ellipsis`) names them |
 
 Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 
 ## Layout & spacing
-- The root is a size container (`container-type: inline-size`, `inline-size: 100%`): inside a flex row give it `flex: 1 1 auto; min-width: 0`.
+- A path of 1–2 levels takes its content width (at most the row), so in a flex row — the `AppHeader` start, before `AppHeader.Separator` and the title — what follows stands right after it. A path of 3+ levels is a size container (`container-type: inline-size`, `inline-size: 100%`) that folds its middle levels by its own width: inside a flex row give it `flex: 1 1 auto; min-width: 0`.
+- In an `AppHeader` the path up holds the list a record belongs to (1–2 levels); the record itself is the `AppHeader.Title` after the separator, not the breadcrumb's `current` item.
 - Above a page title: `gap: var(--prime-space-2)` between the trail and the title row.
 - The list never wraps. Chevrons sit inside each level after the first, in the placeholder text color, at the tier icon size.
 
@@ -124,7 +125,7 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; text and chevrons follow the control tier — `size`. |
 | [with-icon.tsx](examples/with-icon.tsx) | The root level as a home icon; a link without text is named for screen readers — `aria-label`. |
 | [overflow.tsx](examples/overflow.tsx) | A long path: levels truncate, and in a 320px container the middle ones collapse into «…», which screen readers announce as hidden levels — `Breadcrumb.Item`, `current`. |
-| [ellipsis.tsx](examples/ellipsis.tsx) | Levels skipped on purpose shown as «…» with hidden text for screen readers — `Breadcrumb.Ellipsis`. |
+| [ellipsis.tsx](examples/ellipsis.tsx) | Levels skipped on purpose shown as «…» whose hidden text names them for screen readers — `Breadcrumb.Ellipsis`, `labels`. |
 
 ## Mistakes
 - Separators by hand between items → the root draws the chevrons.

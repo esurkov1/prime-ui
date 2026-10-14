@@ -1,25 +1,6 @@
 /* Layout helpers for the LoginForm examples. Semantic tokens only. */
 
-/* Centers one card on the stage (the card itself is capped at the modal width). */
-.stage {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  min-width: 0;
-}
-
-/* Several cards side by side, wrapping on narrow stages. */
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: center;
-  gap: var(--prime-space-6);
-  width: 100%;
-  min-width: 0;
-}
-
-/* A field with a link under it, aligned to the field's end edge. */
+/* overview.tsx: a field with a link under it, aligned to the field's end edge. */
 .withLink {
   display: flex;
   flex-direction: column;
@@ -31,7 +12,7 @@
   align-self: stretch;
 }
 
-/* narrow.tsx: a phone-width stage. */
+/* narrow.tsx: a phone-width stage (320). */
 .narrow {
   display: flex;
   justify-content: center;

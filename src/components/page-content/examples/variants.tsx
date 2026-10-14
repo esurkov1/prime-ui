@@ -4,24 +4,17 @@ import { Card, PageContent, Typography } from "prime-ui-kit";
 import styles from "./examples.module.css";
 
 const WIDTHS = [
-  { value: "full", title: "Сделки", text: "Колонка занимает всю ширину main." },
-  { value: "wide", title: "Дашборд продаж", text: "Не шире ширины контента, по центру." },
-  {
-    value: "readable",
-    title: "Условия использования",
-    text: "Не шире колонки для чтения, по центру.",
-  },
+  { value: "full", text: "Сделки: колонка занимает всю ширину main." },
+  { value: "wide", text: "Дашборд продаж: не шире ширины контента, по центру." },
+  { value: "readable", text: "Условия использования: не шире колонки для чтения, по центру." },
 ] as const;
 
 export default function PageContentVariantsExample() {
   return (
     <div className={styles.main}>
       <div className={styles.stack}>
-        {WIDTHS.map(({ value, title, text }) => (
+        {WIDTHS.map(({ value, text }) => (
           <PageContent.Root key={value} maxWidth={value}>
-            <PageContent.Header>
-              <PageContent.Title>{title}</PageContent.Title>
-            </PageContent.Header>
             <PageContent.Body>
               <Card.Root>
                 <Card.Body>

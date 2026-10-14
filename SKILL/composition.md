@@ -13,57 +13,99 @@ playground page. What each screen teaches is in [Screen rules](#screen-rules) at
 
 | Screen | Main component | File | Shows |
 |---|---|---|---|
-| [List page](#list-page) | data-table | [screen.tsx](../src/components/data-table/examples/screen.tsx) | header with one primary action, SmartFilter in the DataTable toolbar, statuses, row menu, pages, filtered empty state |
-| [Detail page](#detail-page) | description-list | [screen.tsx](../src/components/description-list/examples/screen.tsx) | Breadcrumb + status in the header, actions by weight, main column + side column of Cards, Timeline |
+| [List page](#list-page) | data-table | [screen.tsx](../src/components/data-table/examples/screen.tsx) | the title, a line of figures, SmartFilter search and filters, export and one primary action in the AppHeader; statuses, row menu, pages, filtered empty state |
+| [Detail page](#detail-page) | description-list | [screen.tsx](../src/components/description-list/examples/screen.tsx) | a nested record: Breadcrumb, the title with status and due date and the record's actions by weight in the AppHeader; main column + side column of Cards, Timeline |
 | [Settings page](#settings-page) | page-content | [screen.tsx](../src/components/page-content/examples/screen.tsx) | heading column + panel per section, form with its own save, Switches that apply at once, danger zone with a confirm |
-| [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
-| [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a plan card edited on a page: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), selling points as one reorderable column, the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
-| [Dashboard](#dashboard) | card | [screen.tsx](../src/components/card/examples/screen.tsx) | period switch, KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
-| [Screen states](#screen-states) | crossfade | [screen.tsx](../src/components/crossfade/examples/screen.tsx) | page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
-| [Messenger](#messenger) | chat | [screen.tsx](../src/components/chat/examples/screen.tsx) | PageContent.Split of a `ChatList` (live last message, ticks, unread counts, «печатает…») and a `Chat`: `Chat.Header` with the back button, avatar, title, the status that turns into «печатает…» (`typing`) and the search button, `Chat.Search`, `Chat.Pinned`, `Chat.Messages` from `items` + a stable `renderMessage` (dates, runs, the unread band and service events from the data, history loaded above with `hasOlder` / `onLoadOlder`), every kind of Message (photos, file, contact, voice in a VoicePlayer with a transcript, round video), reactions, reply and edit from the menu through `Composer.Context value` (`replyTo` / `editOf`), the jump to the quoted message (`Message.Reply target`), optimistic sends whose messages rise from the composer while the client's answer slides in, «печатает…» both ways (`onActivityChange` → `Chat.Root typing`), unread counts from `onNewMessage` and `onRead`, selection with `Chat.SelectionBar`, delivery ticks, the Composer in `Chat.Footer` |
-| [Sales pipeline board](#sales-pipeline-board) | kanban | [screen.tsx](../src/components/kanban/examples/screen.tsx) | header with one primary action, PageToolbar with SmartFilter search and a board / list SegmentedControl, Crossfade between a `plain` Kanban (stages without wells, deal cards on the page) and a DataTable of the same deals, column totals in `renderColumnMeta`, moves saved through an `onValueChange` promise that the server can refuse, movable stages with locked first and last, the deal in a Drawer with a DescriptionList and stage actions, skeleton first load |
-| [App frame](#app-frame) | app-shell | [screen.tsx](../src/layout/app-shell/examples/screen.tsx) | Sidebar rail on a wide screen, floating BottomNav in `AppShell.Footer` on a phone («Ещё» opens the Sidebar panel), AppHeader with the menu button, title and search to CommandMenu, counts on items, a home page that cross-fades between sections |
-| [Media library](#media-library) | file-upload | [screen.tsx](../src/components/file-upload/examples/screen.tsx) | PageToolbar with sections and counts, search (`SmartFilter` with `fields={[]}`), order and «Загрузить»; uploads through `useUploadQueue` in `FileUpload` tiles (`trigger="tile"`, `layout="grid"`) with progress, a failure and retry, a done file moving into the library; a grid of `Thumbnail` / `Thumbnail.Video` tiles that open `MediaViewer` out of the tile (`getOrigin`, `thumbnails`, `renderActions`) or, in selection mode, are picked (`checked`) for bulk download and a `ConfirmDialog` delete; a Skeleton first load and a filtered `EmptyPage` in a `Crossfade` |
-| [Resource schedule](#resource-schedule) | gantt | [screen.tsx](../src/components/gantt/examples/screen.tsx) | full-height `Gantt` (`scrollHeight="fill"`) under a `PageToolbar` with search, role / client filters and team sections; people with avatars, client hues, lanes for overlaps, locked absences and milestones; moves saved through an async `onBarChange` or refused and glided back, new work drawn with `onBarCreate` and named in a Modal (cancel fades the ghost), `onSelect` details in a Drawer with a `DescriptionList` and a confirmed removal, `loading` and filtered `empty` |
+| [Form in a Drawer](#form-in-a-drawer) | drawer | [screen.tsx](../src/components/drawer/examples/screen.tsx) | the title, counts, search and the Drawer trigger in the AppHeader; Drawer form: groups, errors on submit, focus on the first invalid field, loading, toast |
+| [Record editor](#record-editor) | field-list | [screen.tsx](../src/components/field-list/examples/screen.tsx) | a document page (a long form): the title, a line of description and «Сохранить тариф» in `PageContent.Header`; a plan card edited in aside sections: name and description, specs in a `FieldList` (icon-only `Select` and `ColorPresets` in compact columns, pinned rows, reorder), the price and its changes by month in one list with the base row pinned, a setup fee in three currencies in one row under one heading, save with «Сохранено» on the button |
+| [Dashboard](#dashboard) | card | [screen.tsx](../src/components/card/examples/screen.tsx) | title + a line of data in `AppHeader`, period switch and report in its `PageToolbar`; KPI row that cross-fades to the new period, a Sparkline revenue trend, invoiced vs paid in a ChartFrame, panels with progress and a split, short table + link to the list |
+| [Screen states](#screen-states) | crossfade | [screen.tsx](../src/components/crossfade/examples/screen.tsx) | title + the statement date in `AppHeader`, page error in a Banner with retry, region loading with a Skeleton, Crossfade between states, table error in place, first-run EmptyPage |
+| [Messenger](#messenger) | chat | [screen.tsx](../src/components/chat/examples/screen.tsx) | title + the unread count in `AppHeader`; a full-height PageContent.Split of a `ChatList` with its search (live last message, ticks, unread counts, «печатает…») and a `Chat`: `Chat.Header` with the back button, avatar, title, the status that turns into «печатает…» (`typing`) and the search button, `Chat.Search`, `Chat.Messages` from `items` + a stable `renderMessage` (dates, runs and the unread band from the data, history loaded above with `hasOlder` / `onLoadOlder`, a first load in skeletons), text, a photo, a file and sent voice, reply and edit from the menu through `Composer.Context value` (`replyTo` / `editOf`), the jump to the quoted message (`Message.Reply target`), optimistic sends whose messages rise from the composer while the client's answer slides in, «печатает…» both ways (`onActivityChange` → `Chat.Root typing`), unread counts from `onNewMessage` and `onRead`, the Composer with attachments in `Chat.Footer` |
+| [Sales pipeline board](#sales-pipeline-board) | kanban | [screen.tsx](../src/components/kanban/examples/screen.tsx) | AppHeader titles the page (`h1` + a Description with the open deals and their sum) and carries a PageToolbar with SmartFilter search, a board / list SegmentedControl and the one primary action; Crossfade between a `plain` Kanban (stages without wells, deal cards on the page) and a DataTable of the same deals, column totals in `renderColumnMeta`, moves saved through an `onValueChange` promise that the server can refuse, the deal in a Drawer with a DescriptionList and stage actions, skeleton first load |
+| [App frame](#app-frame) | app-shell | [screen.tsx](../src/layout/app-shell/examples/screen.tsx) | Sidebar rail on a wide screen, floating BottomNav in `AppShell.Footer` on a phone («Ещё» opens the Sidebar panel), AppHeader with the menu button and the page title (`h1`) with a line of data, counts on items, a home page that cross-fades between sections |
+| [Media library](#media-library) | file-upload | [screen.tsx](../src/components/file-upload/examples/screen.tsx) | AppHeader titles the page (`h1` + a Description with the object) and carries a PageToolbar with sections and counts, search (`SmartFilter` with `fields={[]}`), order and «Загрузить»; uploads through `useUploadQueue` in `FileUpload` tiles (`trigger="tile"`, `layout="grid"`) with progress, a failure and retry, a done file moving into the library; a grid of `Thumbnail` / `Thumbnail.Video` tiles that open `MediaViewer` out of the tile (`getOrigin`, `thumbnails`, `renderActions`) or, in selection mode, are picked (`checked`) for bulk download and a `ConfirmDialog` delete; a Skeleton first load and a filtered `EmptyPage` in a `Crossfade` |
+| [Resource schedule](#resource-schedule) | gantt | [screen.tsx](../src/components/gantt/examples/screen.tsx) | AppHeader titles the page (`h1` + a Description with the people shown) and carries a `PageToolbar` with search, role / client filters, team sections and «Назначить» over a full-height `Gantt` (`scrollHeight="fill"`); people with avatars, client hues, lanes for overlaps, locked absences and milestones; moves saved through an async `onBarChange` or refused and glided back, new work drawn with `onBarCreate` and named in a Modal (cancel fades the ghost), `onSelect` details in a Drawer with a `DescriptionList` and a confirmed removal, `loading` and filtered `empty` |
 
 Pick the closest one, rename the domain, keep the skeleton. Change structure only when the task needs
 it, and then by the rules below.
 
 ## 1. Page skeleton
 
+**One title per page, and it lives in the page's header.** Every app page titles itself in the
+app header: `AppHeader.Title` is the page's only `<h1>`, an `AppHeader.Description` under it
+is one line that carries data («Среда, 14 октября · 3 задачи», «Отправлен · оплатить до 14 октября»),
+and a nested record puts the path up (`Breadcrumb` + `AppHeader.Separator`) before it. The header row
+belongs to the page: it holds only what the current page needs — its title, its own buttons in
+`AppHeader.Actions`, and its tools as a `PageToolbar.Root` in `AppHeader.Tools` (the page's own
+search and filters, sections, the view, the primary action). Main has no `PageContent.Header`.
+
+**A document page** — settings, a long form, an article or help text — is the one exception: its big
+title is `PageContent.Header` in main (`PageContent.Title` is the `<h1>`, one sentence of
+`PageContent.Description`, the page's save action in `PageContent.Actions`), and the header carries
+no title. Never two titles; never no `<h1>`.
+
 ```
 AppShell.Root                      once per app (layouts.md#app-frame-once-per-app)
 ├─ AppShell.Nav → Sidebar          navigation rail, one layer above the page
-├─ AppHeader.Root                  menu button / title or path / ⌘K search / app actions
-└─ AppShell.Main                   gutters; the page renders here
+├─ AppHeader.Root                  the page's header: only what this page needs
+│  ├─ AppHeader.Start
+│  │  ├─ AppHeader.MenuButton      opens the Sidebar below 768px
+│  │  ├─ Breadcrumb + Separator    only on a nested record: the path up
+│  │  └─ AppHeader.Title           the one h1 + AppHeader.Description: a line of data
+│  ├─ AppHeader.Actions            the page's own buttons (export, a more menu)
+│  └─ AppHeader.Tools              second row → PageToolbar.Root: search and filter, sections,
+│                                  view, the primary action; Chips under them
+└─ AppShell.Main                   gutters + top air (24, 32 from 1024px); the page renders here
    └─ PageContent.Page | Root      the page you deliver
-      ├─ PageContent.Header        24 above the body
-      │  ├─ Breadcrumb             only below a top-level section; first child → 8 above the title
-      │  ├─ PageContent.Title      the one h1
-      │  ├─ PageContent.Description one sentence of context (or a status Badge + the key fact)
-      │  └─ PageContent.Actions    page buttons; wrap under the title on narrow screens
-      └─ PageContent.Body          blocks 24 apart: Banner, the tile grid, a table, Cards
+      └─ PageContent.Body          blocks 24 apart, starting at main's top air
          ├─ PageContent.Grid       every tile of the screen, 16 on both axes
          │  └─ PageContent.Cell    span (of 12), rows; the tile fills it
          └─ PageContent.Section    a new topic: h2 label (+ Actions), 40 from its neighbours
+
+Document page: the header without a title, and in main
+   └─ PageContent.Root maxWidth="wide" | "readable"
+      ├─ PageContent.Header        the one h1, a sentence of description, the page's save action; 24 above the body
+      └─ PageContent.Body
 ```
 
-- A screen component renders only its page. Styles, `applyTheme`, `NotificationProvider` and
-  `AppShell` live at the app root.
+- A screen component renders its page: its `AppHeader.Root` (through the shell's `header`) and its
+  body. Styles, `applyTheme`, `NotificationProvider` and `AppShell` live at the app root.
 - `PageContent.Page` for app pages (full panel width); `PageContent.Root maxWidth="wide"` for
   settings, `maxWidth="readable"` for one narrow column of text or fields.
-- No outer padding, no margins: `AppShell.Main` has the gutters, `PageContent` has header → body 24,
-  block → block 24, section → section 40 and tile → tile 16. Your CSS lays out only the inside of a block.
+- No outer padding, no margins: `AppShell.Main` has the gutters and the top air under the header,
+  `PageContent` has block → block 24, section → section 40, tile → tile 16 (and header → body 24 on
+  a document page). Your CSS lays out only the inside of a block.
 
 ```tsx
-import { Button, Dropdown, Icon, PageContent } from "prime-ui-kit";
+import {
+  AppHeader,
+  Button,
+  Dropdown,
+  Icon,
+  PageToolbar,
+  SmartFilter,
+  type SmartFilterField,
+  type SmartFilterValue,
+} from "prime-ui-kit";
 
-export function OrdersHeader() {
+type OrdersHeaderProps = {
+  fields: SmartFilterField[];
+  filter: SmartFilterValue;
+  onFilterChange: (value: SmartFilterValue) => void;
+  search: string;
+  onSearchChange: (search: string) => void;
+};
+
+export function OrdersHeader({ fields, filter, onFilterChange, search, onSearchChange }: OrdersHeaderProps) {
   return (
-    <PageContent.Header>
-      <PageContent.Title>Заказы</PageContent.Title>
-      <PageContent.Description>Все заказы магазина за выбранный период.</PageContent.Description>
-      <PageContent.Actions>
+    <AppHeader.Root>
+      <AppHeader.Start>
+        <AppHeader.Title>
+          Заказы
+          <AppHeader.Description>128 в работе · 6 ждут оплаты</AppHeader.Description>
+        </AppHeader.Title>
+      </AppHeader.Start>
+      <AppHeader.Actions>
         <Dropdown.Root>
           <Dropdown.Trigger>
             <Button.Root variant="soft" tone="neutral" aria-label="Другие действия">
@@ -77,12 +119,34 @@ export function OrdersHeader() {
             <Dropdown.Item>Импорт из CSV</Dropdown.Item>
           </Dropdown.Content>
         </Dropdown.Root>
-        <Button.Root variant="soft" tone="neutral">
-          Экспорт
-        </Button.Root>
-        <Button.Root>Создать заказ</Button.Root>
-      </PageContent.Actions>
-    </PageContent.Header>
+      </AppHeader.Actions>
+      <AppHeader.Tools>
+        <SmartFilter.Root
+          fields={fields}
+          value={filter}
+          onValueChange={onFilterChange}
+          search={search}
+          onSearchChange={onSearchChange}
+        >
+          <PageToolbar.Root aria-label="Заказы">
+            <PageToolbar.Tools>
+              <SmartFilter.Toolbar />
+            </PageToolbar.Tools>
+            <PageToolbar.Actions>
+              <Button.Root>
+                <Button.Icon>
+                  <Icon name="action.add" />
+                </Button.Icon>
+                Создать заказ
+              </Button.Root>
+            </PageToolbar.Actions>
+            <PageToolbar.Chips>
+              <SmartFilter.Chips />
+            </PageToolbar.Chips>
+          </PageToolbar.Root>
+        </SmartFilter.Root>
+      </AppHeader.Tools>
+    </AppHeader.Root>
   );
 }
 ```
@@ -100,7 +164,8 @@ Every gap is a `--prime-space-N` token (N × 4px) set as `gap` on the parent. Cl
 | tile → tile, both axes (KPI, charts, panels) | 16 | `PageContent.Grid` |
 | field → field, switch → switch | 20 | `--prime-space-5` |
 | main column → side column | 24 | `--prime-space-6` |
-| page header → body | 24 | `PageContent` |
+| app header → the page's first block | 12 + 24, 12 + 32 from 1024px | the header's bottom air + `AppShell.Main` top air |
+| page header → body (a document page) | 24 | `PageContent.Header` |
 | block → block on a page | 24 | `PageContent.Body` |
 | group → group in a form | 32 | `--prime-space-8` |
 | section → section (a new topic with an `h2`) | 40 | `PageContent.Section` |
@@ -116,7 +181,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 | Text | Use |
 |---|---|
-| page title | `PageContent.Title` (`heading-m`, the only `h1`) |
+| page title | `AppHeader.Title` (the only `h1`); on a document page `PageContent.Title` (`heading-m`) instead |
 | section heading without a card | `PageContent.Section label` (an `h2` in `title-m`) |
 | card / panel title | `Card.Title as="h2"` (under the page title) |
 | heading of a group of fields | `Fieldset label` (`title-s` in the `<legend>`) |
@@ -154,12 +219,12 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 
 ## 6. Actions
 
-- **One primary per area** (page header, card, dialog, form): `solid`, last in its row. Secondary:
+- **One primary per area** (the page, card, dialog, form): `solid`, last in its row. Secondary:
   `soft` + `tone="neutral"`. Dismiss / revert: `ghost` + `neutral` in pages and cards, `outline` +
   `neutral` in Modal / Drawer footers. Rare actions: a `Dropdown` behind an `action.more` icon button —
   `soft` + `neutral` in a header row (it has a shape beside the other buttons), `ghost` size `s` in a
   table cell.
-- Placement: page actions in `PageContent.Actions`; card actions in `Card.Footer`; dialog actions in
+- Placement: the page's primary action in `PageToolbar.Actions` in `AppHeader.Tools`, its other buttons in `AppHeader.Actions` (a document page: `PageContent.Actions`); card actions in `Card.Footer`; dialog actions in
   `Modal.Footer` / `Drawer.Footer`; row actions in the last column; bulk actions in the table toolbar.
 - An empty state's action replaces the header's primary, it does not duplicate it.
 - Destructive: `tone="danger"`; a standalone trigger is `outline`, in a menu it is the last item, the
@@ -256,11 +321,11 @@ turns them off itself; a form in a Modal or Drawer holds closing with `Modal.Gua
 - Layouts are intrinsic: `repeat(auto-fit, minmax(min(100%, …), 1fr))` grids and flex-wrap with a large
   `flex-grow` on the main column — no breakpoints needed, and they work in any container. Media queries
   only for app-frame decisions (the phone menu header) at 640 · 768 · 1024 · 1280.
-- From 320px: header actions wrap under the title (built in), side columns drop below the main one,
+- From 320px: the page's tools wrap under the header title and the primary action takes its own row when the search would be squeezed (built in), side columns drop below the main one,
   pairs of fields stack, tables scroll inside themselves, dialogs stack their footers (built in).
 - A page with search and filter, sections, a view switch and the primary action gets `PageToolbar`:
-  search and filter first with the active filters right under them, one row when wide, stacked rows
-  12 apart when narrow, the primary action always top right.
+  search and filter first with the active filters under the top row, one row when wide, stacked rows
+  12 apart when narrow; the primary action at the top row's end, on its own row on a phone.
 - Rearrange, never hide: every function of the desktop screen is on the phone — in another place or a
   menu. App sections on phones: `BottomNav` in `AppShell.Footer`; a short task from the bottom
   edge: `Sheet`.
@@ -342,8 +407,8 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [data-table/examples/screen.tsx](../src/components/data-table/examples/screen.tsx)
 
-- The header is `PageContent.Header`: the title, one sentence of description, `PageContent.Actions` on the right. One primary action (`solid`); the rest are `soft` with `tone="neutral"`; the primary goes last.
-- Filters live in the table's `toolbar`: `SmartFilter.Toolbar` and `SmartFilter.Chips` inside `DataTable`, not as a separate card above it.
+- The page lives in the `AppHeader`: `AppHeader.Title` is the only heading, its `AppHeader.Description` is one line of figures («10 счетов · просрочено 2 на …»), not a sentence about the page; main has no `PageContent.Header`.
+- The tools are `AppHeader.Tools` → `SmartFilter.Root` around a `PageToolbar.Root`: `SmartFilter.Toolbar` in `PageToolbar.Tools`, `SmartFilter.Chips` in `PageToolbar.Chips`, export (an icon-only `soft` + `neutral` button) and the one primary action (`solid`, last) in `PageToolbar.Actions`. The table itself has no `toolbar`.
 - A status is a `Badge` with one color per meaning across the product (`STATUS` is one map); the text carries the meaning, the color repeats it.
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
 - Row actions are a `Dropdown` behind an `action.more` icon of size `s`: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.
@@ -353,9 +418,9 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [description-list/examples/screen.tsx](../src/components/description-list/examples/screen.tsx)
 
-- `Breadcrumb` is the first child of `PageContent.Header`: it joins the title column 8 px above `PageContent.Title`. Top-level pages have no breadcrumb.
-- The status is a `Badge` next to the fact that matters now («Оплатить до…»), in `PageContent.Description`, not a separate plate.
-- Actions by weight: one primary (`solid`, last), the secondary `soft` + `tone="neutral"`, rare and destructive ones in a `Dropdown` behind an `action.more` icon (also `soft`, so the button has a shape beside its neighbours); voiding is `tone="danger"` at the bottom of the menu.
+- A nested record titles itself in the `AppHeader`: `AppHeader.Start` holds the path up (`Breadcrumb` with the list, «Счета»), an `AppHeader.Separator` and `AppHeader.Title` with the record's name; main has no `PageContent.Header`. Top-level pages have no breadcrumb.
+- The status is words next to the fact that matters now, in `AppHeader.Description` («Отправлен · оплатить до 14 октября»), not a separate plate.
+- The record's actions are the header's tools row: `AppHeader.Tools` → `PageToolbar.Root` → `PageToolbar.Actions`, by weight: one primary (`solid`, last), the secondary `soft` + `tone="neutral"`, rare and destructive ones in a `Dropdown` behind an `action.more` icon (also `soft`, so the button has a shape beside its neighbours); voiding is `tone="danger"` at the bottom of the menu.
 - Columns are a CSS module on flex-wrap without breakpoints: the main one grows, the side one holds ~18rem and drops below when the main one runs out of room.
 - A section without a frame is `PageContent.Section label`: an h2 heading 16 px above the table; `Card variant="panel"` only for standalone blocks of the side column. A table is already a filled block — never put it in a card.
 - «Label → value» pairs about the client are `DescriptionList.Root orientation="vertical"` with `DescriptionList.Item label`; amounts are tabular figures, the total is larger (`title-m`) and ends where the «Сумма» column ends (the table cell inset).
@@ -376,7 +441,8 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [drawer/examples/screen.tsx](../src/components/drawer/examples/screen.tsx)
 
-- The opening button is the page's primary action in `PageContent.Actions`; `Drawer.Trigger` wraps it as a slot.
+- The page lives in the `AppHeader`: `AppHeader.Title` with the counts in `AppHeader.Description`, the search (`SmartFilter` with `fields={[]}`) in `PageToolbar.Tools`; main has no `PageContent.Header`.
+- The opening button is the page's primary action in `PageToolbar.Actions`; `Drawer.Trigger` wraps it as a slot.
 - The form is tied to the footer button through `form={formId}`: `Drawer.Footer` is outside the `<form>`, and submitting still works, by Enter too.
 - Groups are a `Fieldset` without a frame with a `title-s` heading 16 px above the fields; 32 px of air between groups, no dividers. `Fieldset disabled` turns all the fields off while the request runs.
 - Validation on submit: errors in each field's `error`, focus on the first invalid field; mark the minority: required fields are the majority, so `optional` stands only on the optional ones.
@@ -388,8 +454,9 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [field-list/examples/screen.tsx](../src/components/field-list/examples/screen.tsx)
 
+- A record editor is a document page — a long form read top to bottom in aside sections, like Settings — so its title stays in content: `PageContent.Header` with the title, one line of description and the primary action; the app header only says where you are and holds no second title.
 - The shape of the data decides the layout: records a person adds and removes are a `FieldList`, one row per record; the column headings stand once above the rows, and the fields in the cells take them as their labels.
-- No label in every row and no numbered one («Преимущество 1»): a one-column list has no headings at all — its section names it.
+- No label in every row and no numbered one («Преимущество 1»): a one-column list has no headings at all — its section names it ([reorder.tsx](../src/components/field-list/examples/reorder.tsx)).
 - Small attributes of a record go in compact columns of its row: the icon is a `Select` with only `Select.TriggerIcon`, the color `ColorPresets`; the first specs are pinned (`getLocked`) — the lock says so itself, without explanatory text.
 - The base price and its changes are one list: the base row is pinned first and shows when it applies, the changes are rows with a month and a price; the ruble sign is in the field (`Input.InlineAffix`), not in every heading.
 - One value in three currencies is three fields in one row under one group heading, each with its own name for screen readers and the currency inside the field.
@@ -399,7 +466,8 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [card/examples/screen.tsx](../src/components/card/examples/screen.tsx)
 
-- The period is a `SegmentedControl` in `PageContent.Actions`: it changes the values on this same screen. Tabs (`Tabs`) are for different content, not for a period.
+- The header carries the page: `AppHeader.Title` «Обзор» with an `AppHeader.Description` line of data (what and as of when), the page's tools in `AppHeader.Tools` as a `PageToolbar.Root`; main has no `PageContent.Header`, its body starts with the tiles.
+- The period is a `SegmentedControl` in `PageToolbar.View`, the report a `soft` + `neutral` button in `PageToolbar.Actions`: the period changes the values on this same screen. Tabs (`Tabs`) are for different content, not for a period.
 - Every tile of the screen is one `PageContent.Grid`: KPI `Card variant="stat-trend"` in `PageContent.Cell span={3}`, 16 px on both axes; `Card.Delta` with a `tone` by the meaning of the change: overdue growing is `danger`, its decline `success`.
 - Another period — other values: each KPI tile is wrapped in `Crossfade state={period}` and flows instead of blinking.
 - A trend over days is a `Sparkline` in a `Card` in a full-width cell: the last value, the change and a line you can scrub with a finger; a new series appears by itself.
@@ -413,6 +481,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [crossfade/examples/screen.tsx](../src/components/crossfade/examples/screen.tsx)
 
+- The header carries the page: `AppHeader.Title` with an `AppHeader.Description` line of data — the accounts and the date of the statement the screen stands on; main has no `PageContent.Header`.
 - An error that concerns the whole page is a `Banner tone="danger"` as the first block of `PageContent.Body` with a «Повторить» action; the action's result is a `Notification`.
 - A region's error is in the region's place: `error` on the `DataTable` (the table head stays), not a pop-up.
 - Table loading is `loading` + `loadingRows` (a skeleton of rows); card loading is a `Skeleton` in the shape of its rows and `aria-busy` on the card, and the block's height does not change. The state change is smooth: the card's region is in `Crossfade state={status}`, the table body changes by itself.
@@ -424,28 +493,29 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [chat/examples/screen.tsx](../src/components/chat/examples/screen.tsx)
 
+- A work screen: the title «Поддержка» is `AppHeader.Title` with the unread count in `AppHeader.Description`; main has no `PageContent.Header`.
 - Layout: `PageContent.Split` in a `fill` page: the dialog list `ChatList` (last message, ticks, unread, «печатает…») and the conversation beside it; on a narrow panel one pane at a time with `PageContent.BackButton` in `Chat.Header`.
 - Search over the dialogs is the field of `ChatList` itself: `search` and `onSearchChange`; you filter the list (by name and last message), and the list shows the match in rows, the number found and an empty result itself. Never put a field of your own above the list.
-- The conversation is `Chat.Root` in the pane's card: the header, `Chat.Search`, `Chat.Pinned`, `Chat.Messages` and `Chat.Footer` with the Composer. Never assemble your own header, `ScrollContainer` and feed — the chat links search, jumps, selection and «печатает…» itself.
-- Messages are data: `items` with `getKey`, `getAuthor`, `getDate`, service events through `isService`, the first unread is `unread`; the feed computes dates, runs, tails and the avatar place. `renderMessage` in `useCallback`: only the changed message re-renders.
+- The conversation is `Chat.Root` in the pane's card: the header, `Chat.Search`, `Chat.Messages` and `Chat.Footer` with the Composer. Never assemble your own header, `ScrollContainer` and feed — the chat links search, jumps, selection and «печатает…» itself.
+- Messages are data: `items` with `getKey`, `getAuthor`, `getDate` (service events through `isService`), the first unread is `unread`; the feed computes dates, runs, tails and the avatar place. `renderMessage` in `useCallback`: only the changed message re-renders.
 - History is `hasOlder` and `onLoadOlder` with a promise: while it runs, a bubble-shaped `Skeleton` placeholder stands on top, and the view does not jump.
-- Each kind of message is its own part of `Message`: text with markup, photos and albums, `VideoNote`, `VoicePlayer`, a file, a location, a contact, a link preview; everything stands on the bubble.
+- Each kind of message is its own part of `Message`: text with markup, photos and albums, a file, a `VoicePlayer`; the screen renders the kinds its domain has. The others (`VideoNote`, a location, a contact, a link preview, reactions, a forwarded header) are shown on the Message, VoicePlayer and VideoNote pages; pinned messages and selection on the Chat page.
 - Sending is a `Composer` with `onSend` without waiting: the message is in the feed at once with a clock under a stable id, then one tick, then two. Your own message rises from the input, the client's answer slides in from the side — the feed animates new messages itself; history and status changes are not animated.
 - Reply and edit from `Message.Menu` open `Composer.Context` with `value`: `onSend` gets `replyTo` / `editOf`, the plate closes itself after sending; ↑ in an empty field is `onEditLast`. A quote in a bubble is `Message.Reply target`: a scroll to the original with a flash.
 - «Печатает…»: your own signal is `Composer onActivityChange` into the socket, the other side's is `Chat.Root typing`: the line in the header and the bubble at the end of the feed together.
 - Unread: `onNewMessage` adds an incoming message to the dialog's count, `onRead` subtracts what the reader really saw. Scrolled up — the round «to the latest» button counts the new ones itself.
-- Pinned messages are `Chat.Pinned`: a press jumps to the message and steps to the previous pinned one; search is `Chat.SearchButton` and `Chat.Search`.
+- Search in the conversation is `Chat.SearchButton` and `Chat.Search`; pinned messages, when the domain has them, are `Chat.Pinned` between them and the feed.
 
 ### Sales pipeline board
 
 [kanban/examples/screen.tsx](../src/components/kanban/examples/screen.tsx)
 
-- Search, filters and the view switch are in a `PageToolbar` inside `SmartFilter.Root`; the one primary action «Новая сделка» is in `PageContent.Actions`.
+- The page titles itself in the app header: `AppHeader.Title` with an `AppHeader.Description` that carries data («7 сделок в работе · 6 461 750 ₽», counted over the filtered deals); main has no `PageContent.Header`.
+- Search, filters, the view switch and the one primary action «Новая сделка» are one `PageToolbar` inside `SmartFilter.Root`, in `AppHeader.Tools`.
 - The board and the list are the same data: `Kanban` and `DataTable` replace each other through `Crossfade`, the filter is `matchesSmartFilter`.
 - The board is the main area of the page, so its `variant` is the default, `plain`: stages without wells, headers and deal cards stand right on the page — one level of nesting, no frames of your own around the columns.
 - The placement of deals is `value` as `{ [stage]: id[] }`; `onValueChange` returns the request's promise and applies `value` only after the answer; a server refusal returns the card to its place.
-- Stage totals are in `renderColumnMeta` («2 сделки · 3 575 000 ₽»), the stage color is the column's `color`, the stage rule its `description`.
-- Stages are reordered by a handle (`reorderableColumns`, `columnOrder`); the system stages «Новая» and «Выиграна» are `locked`.
+- Stage totals are in `renderColumnMeta` («2 сделки · 3 575 000 ₽»), the stage color is the column's `color`.
 - A deal opens through `onItemClick` of `Kanban.Root` (click, Enter, Space; never after a drag) in a `Drawer` with a `DescriptionList`; no `onClick` / `onKeyDown` of your own on the card; a deal with its own page — `getItemHref`. The stage change is available in the panel too — dragging is not the only way; `Drawer.Guard busy` holds the panel while saving.
 - The first load is `loading` on `Kanban` and `DataTable`: skeletons in the geometry of cards and rows.
 
@@ -456,16 +526,17 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - The frame is `AppShell.Template` (or `AppShell.Root`): `nav` is `Sidebar.Root`, `header` is `AppHeader.Root`, `footer` is `BottomNav.Root`; the page is the children. `scrollResetKey` is the current section (in a router, the pathname), so a new page opens at the top.
 - The kit decides the switch itself: below 768 px the `Sidebar` goes off the edge, `AppHeader.MenuButton` appears and `AppShell.Footer` shows the `BottomNav`; while the rail is on screen the footer is hidden. No media queries or `position: fixed` of your own.
 - `BottomNav` holds 2–6 main sections, one word each; the rest lives in the `Sidebar`, and «Ещё» opens it as a panel (`aria-expanded`). `floating` is a glass capsule; `AppShell.Main` leaves room under it itself.
-- One `h1` heading — `PageContent.Title`; `AppHeader.Title` only says where you are and stays a `span`.
+- Every page titles itself in the header: `AppHeader.Title` with the section's name and an `AppHeader.Description` that carries data («Среда, 14 октября · открытых задач: 3»); main has no `PageContent.Header`, its body starts with the page's blocks.
 - Counts: `Sidebar.ItemCount` (a plain number for information, `color="red"` when it needs action) and `BottomNav.ItemCount` only for what needs attention; the number is the same in both navigations.
-- `AppHeader.Search` and ⌘K open one `CommandMenu`; choosing a section in any navigation goes through one handler that closes both the panel and the search.
+- Choosing a section in either navigation goes through one handler that also closes the Sidebar panel.
 - A section change is a `Crossfade` by `state`: the page changes smoothly instead of jumping. Menu items in an app with a router are `asChild` + `NavLink`.
 
 ### Media library
 
 [file-upload/examples/screen.tsx](../src/components/file-upload/examples/screen.tsx)
 
-- Sections, search, order and «Загрузить» are one `PageToolbar` panel: search is a `SmartFilter.Toolbar` with `fields={[]}`, sections a `SegmentedControl` with `SegmentedControl.Count`.
+- A work screen titles itself in the app header: `AppHeader.Title` «Медиатека» with an `AppHeader.Description` naming the object; main has no `PageContent.Header`.
+- Sections, search, order and «Загрузить» are one `PageToolbar` panel in `AppHeader.Tools`: search is a `SmartFilter.Toolbar` with `fields={[]}`, sections a `SegmentedControl` with `SegmentedControl.Count`.
 - Uploads are `useUploadQueue` + `FileUpload.Root trigger="tile" layout="grid"`: progress, «В очереди», the failure reason and retry are built in, the add tile is also the drop zone; «Загрузить» opens the same `inputRef`.
 - A finished file leaves the queue for the library: its address is `item.result` of the server's answer, not the queue's `preview`.
 - The library grid is a CSS grid of `Thumbnail` with `fullWidth` and one `ratio`; a video is `Thumbnail.Video`, which draws the duration and the play mark itself. `Gallery` does not fit here: it is an album of up to 10.
@@ -478,8 +549,9 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 [gantt/examples/screen.tsx](../src/components/gantt/examples/screen.tsx)
 
-- A `fill` page: the `PageToolbar` and the chart stand in one column, `Gantt scrollHeight="fill"` takes the free height — the header and the first column stick inside the chart, the page never scrolls sideways.
-- The panel is a `PageToolbar` inside `SmartFilter.Root`: search and the role and client filter first, teams a `SegmentedControl` with counts in `PageToolbar.Sections`, the primary action «Назначить» in `PageToolbar.Actions`, the active filters `SmartFilter.Chips` right under the search. Zoom and «Сегодня» are built into `Gantt` — never add your own.
+- The page titles itself in the app header: `AppHeader.Title` with an `AppHeader.Description` that carries data («Сотрудников: 9 из 9»); main has no `PageContent.Header`.
+- A `fill` page: `Gantt scrollHeight="fill"` takes the free height — the header and the first column stick inside the chart, the page never scrolls sideways.
+- The panel is a `PageToolbar` inside `SmartFilter.Root`, in `AppHeader.Tools`: search and the role and client filter first, teams a `SegmentedControl` with counts in `PageToolbar.Sections`, the primary action «Назначить» in `PageToolbar.Actions`, the active filters `SmartFilter.Chips` right under the search. Zoom and «Сегодня» are built into `Gantt` — never add your own.
 - A row is a person: `renderRowAvatar` with an `Avatar`, `renderRow` with the name and role; on a narrow chart the column keeps only the avatar. Overlapping works lay themselves out in lanes, an absence is a `readOnly` bar, a milestone has `start` equal to `end`.
 - `onBarChange` returns a promise and changes the data only after the service answers: while it runs the bar is busy; a refusal (work on an absence) is `notify` and `throw`, and the bar returns to its previous dates by itself.
 - `onBarCreate`: a range drawn on an empty place holds a busy draft while a `Modal` with `Modal.Guard busy` asks for the name and the client; saving adds the bar and resolves the promise, cancel rejects it — the draft dissolves. Work over an absence is refused at once.

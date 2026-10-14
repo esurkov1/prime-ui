@@ -45,9 +45,6 @@ export default function PageContentListDetailExample() {
   return (
     <div className={styles.fillMain}>
       <PageContent.Root fill>
-        <PageContent.Header>
-          <PageContent.Title>Обращения</PageContent.Title>
-        </PageContent.Header>
         <PageContent.Body>
           <PageContent.Split
             open={dialogId !== null}

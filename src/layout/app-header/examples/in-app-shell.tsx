@@ -51,7 +51,6 @@ export default function AppHeaderInAppShellExample() {
               <AppHeader.Description>128 в работе</AppHeader.Description>
             </AppHeader.Title>
           </AppHeader.Start>
-          <AppHeader.Search>Поиск</AppHeader.Search>
         </AppHeader.Root>
         <AppShell.Main>
           <PageContent.Page>

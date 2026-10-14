@@ -87,7 +87,6 @@ describe("part refs: every part declares ref", () => {
     takesRef(AppHeader.Icon);
     takesRef(AppHeader.Description);
     takesRef(AppHeader.Separator);
-    takesRef(AppHeader.Search);
     takesRef(AppHeader.Tools);
     takesRef(AppHeader.Actions);
     takesRef(AppHeader.MenuButton);

@@ -123,13 +123,12 @@ Drawer menu.
 `Sidebar.Header` — at the header's end while expanded, a small round button on the rail's edge while
 compact (the default for a branded rail); `Sidebar.Toggle` (`variant="item"`) in `Sidebar.Footer` when
 the rail has no brand header. On phones neither replaces `AppHeader.MenuButton` that
-opens the off-canvas Sidebar (`open` / `onOpenChange`). The bar at the top of the panel (where you are,
-⌘K search, a few app actions) is `AppHeader`; the page's own heading and actions are `PageContent`, its
-data tools `PageToolbar`. Use `PageToolbar` when a page has several tools above its data — sections,
-search and filters, a view switch, an action — and they must rearrange on a phone; one search or one
-filter above a single table goes into the DataTable `toolbar` instead. A page that gives all its
-height to the work (a board, a chat) may let `AppHeader` carry the page instead: `AppHeader.Title
-as="h1"` and the PageToolbar in `AppHeader.Tools` — then main has no `PageContent.Header`. A record
+opens the off-canvas Sidebar (`open` / `onOpenChange`). The bar at the top of the panel is the page's
+`AppHeader`: the page title (`AppHeader.Title` + a line of data), the page's own buttons and its
+tools — a `PageToolbar` in `AppHeader.Tools` when the page has several tools above its data (sections,
+search and filters, a view switch, the primary action) that must rearrange on a phone; one search or one
+filter above a single table goes into the DataTable `toolbar` instead. Only a document page (settings,
+a long form, help) has its title in main, `PageContent.Header`, and no title in the header. A record
 opened from a table: its own page → DataTable `getRowHref`; in place → `onRowClick` + Drawer; a list
 worked through record by record (mail, chat, tickets) → `PageContent.Split` with a `List` of the records
 (`current` on the open one). Sections of a long rail → `Sidebar.Group

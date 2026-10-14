@@ -295,12 +295,16 @@ kebab-case by meaning. The canon (reference: `button/`, `input/`, `modal/`, `spi
   `SKILL/composition.md` (the screens index and a section per screen).
 - **Nothing is lost when moving**: before a capability leaves a screen, it is shown in the component's
   examples (add or extend one there in the same change).
-- **One title per screen, two kinds of page.** A work screen (a board, a messenger, a schedule, a
-  dense register) gives its height to the work: `AppHeader.Title as="h1"` with the tools in
-  `AppHeader.Tools` (`PageToolbar`), no `PageContent.Header`. An overview or document page (home,
-  dashboard, settings, a record, a list page) has its title and a data-carrying description in
-  `PageContent.Header`, and the AppHeader shows no title (menu, path, search, app actions). Never the
-  same title twice; never no h1. The docs contract renders every screen and checks its one h1.
+- **The title lives in the page's header.** Every app screen titles itself in its `AppHeader`:
+  `AppHeader.Title` (the page's `<h1>`) with an `AppHeader.Description` that carries data (a path — `Breadcrumb`
+  + `AppHeader.Separator` — before it on a nested record), the page's tools in `AppHeader.Tools` as
+  a `PageToolbar.Root` (its own search and filters, sections, view, the primary action), its other
+  buttons in `AppHeader.Actions`; main has no `PageContent.Header`. The header row belongs to the
+  page: nothing app-wide in it (no global search, no notifications). Only a document page (settings,
+  a long form, an article or help) has its big title in `PageContent.Header` in main, and then its
+  header has no title. Never two titles; never no h1. A screen renders its own `AppHeader.Root` and
+  its body (the app-shell screen renders the whole frame); the docs contract checks one h1 and that
+  only allow-listed document screens use `PageContent.Header`.
 
 ## 5. Playground page
 

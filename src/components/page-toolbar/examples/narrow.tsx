@@ -1,4 +1,4 @@
-/** A phone-width column: search, filter and the primary action on top, the active filters under them, then the sections and the period, every row 12 apart — `PageToolbar.Root`. */
+/** A phone-width column: search and filter on top, the primary action on its own row under them, then the active filters, the sections and the period, every row 12 apart — `PageToolbar.Root`. */
 import {
   Button,
   Icon,
@@ -38,7 +38,9 @@ const FIELDS: SmartFilterField[] = [
 export default function PageToolbarNarrowExample() {
   const [section, setSection] = React.useState("all");
   const [period, setPeriod] = React.useState("7d");
-  const [filter, setFilter] = React.useState<SmartFilterValue>({});
+  const [filter, setFilter] = React.useState<SmartFilterValue>({
+    city: { include: ["msk"], exclude: [] },
+  });
   const [search, setSearch] = React.useState("");
 
   return (
@@ -87,10 +89,11 @@ export default function PageToolbarNarrowExample() {
             </Select.Root>
           </PageToolbar.View>
           <PageToolbar.Actions>
-            <Button.Root aria-label="Новый заказ">
+            <Button.Root>
               <Button.Icon>
                 <Icon name="action.add" />
               </Button.Icon>
+              Новый заказ
             </Button.Root>
           </PageToolbar.Actions>
           <PageToolbar.Chips>

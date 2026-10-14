@@ -1,9 +1,17 @@
-/** Group headings that fold their items away, with a chevron at the end of the heading; on the compact rail a folded group becomes one row whose items open in a flyout — `collapsible`, `defaultOpen`. */
+/** Group headings that fold their items away, one group open at a time, with a chevron at the end of the heading; on the compact rail a folded group becomes one row whose items open in a flyout — `collapsible`, `open`, `onOpenChange`. */
 import { Icon, Sidebar } from "prime-ui-kit";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
 export default function SidebarCollapsibleGroupsExample() {
+  const [openGroup, setOpenGroup] = React.useState<string | null>("overview");
+  const groupProps = (id: string) => ({
+    collapsible: true,
+    open: openGroup === id,
+    onOpenChange: (open: boolean) => setOpenGroup(open ? id : null),
+  });
+
   return (
     <div className={`${styles.stage} ${styles.stageTall}`}>
       <Sidebar.Root offCanvas="never">
@@ -19,7 +27,7 @@ export default function SidebarCollapsibleGroupsExample() {
           <Sidebar.Toggle variant="header" />
         </Sidebar.Header>
         <Sidebar.Content>
-          <Sidebar.Group label="Обзор" collapsible>
+          <Sidebar.Group label="Обзор" {...groupProps("overview")}>
             <Sidebar.Item current>
               <Sidebar.ItemIcon>
                 <Icon name="nav.home" />
@@ -34,7 +42,7 @@ export default function SidebarCollapsibleGroupsExample() {
               <Sidebar.ItemCount color="red">7</Sidebar.ItemCount>
             </Sidebar.Item>
           </Sidebar.Group>
-          <Sidebar.Group label="Инструменты" collapsible>
+          <Sidebar.Group label="Инструменты" {...groupProps("tools")}>
             <Sidebar.Item>
               <Sidebar.ItemIcon>
                 <Icon name="object.tasks" />
@@ -55,7 +63,7 @@ export default function SidebarCollapsibleGroupsExample() {
               Клиенты
             </Sidebar.Item>
           </Sidebar.Group>
-          <Sidebar.Group label="Метрики" collapsible defaultOpen={false}>
+          <Sidebar.Group label="Метрики" {...groupProps("metrics")}>
             <Sidebar.Item>
               <Sidebar.ItemIcon>
                 <Icon name="object.chart" />

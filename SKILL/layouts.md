@@ -1,11 +1,12 @@
 # Layouts — app frame, page wrappers, auth
 
 Every screen sits in one frame: `AppShell.Root` with Nav / `AppHeader` / Main (the content panel is the page,
-the nav rail one layer above it) → `PageContent` (header + body). `AppShell.Main` carries the page gutters
-and `PageContent` spaces the page — blocks 24, a titled `PageContent.Section` 40, tiles in a
-`PageContent.Grid` 16 on both axes — so your code adds **no outer padding and no margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
-Main's top space under the header is part of the frame — 24, then 32 from 1024px: a page header starts
-there; never cancel it with a negative margin or a padding override.
+the nav rail one layer above it). The `AppHeader` belongs to the page — it carries the page title and
+the page's tools ([composition.md](composition.md#1-page-skeleton)); `PageContent` holds the body.
+`AppShell.Main` carries the page gutters and `PageContent` spaces the page — blocks 24, a titled
+`PageContent.Section` 40, tiles in a `PageContent.Grid` 16 on both axes — so your code adds **no outer padding and no margins**. Your CSS only lays out the inside of a block (grids, rows) with `gap` on `--prime-space-*`.
+Main's top air under the header is part of the frame — 24, then 32 from 1024px: the page's first block
+starts there; never cancel it with a negative margin or a padding override.
 
 The page recipes are whole, working screens — the `screen.tsx` example of their main component
 ([the list](composition.md#screens)): start from the closest one and keep its skeleton. The rules behind them are in [composition.md](composition.md).
@@ -16,18 +17,31 @@ Every `Sidebar.Item` gets a `Sidebar.ItemIcon` (in compact mode only icons remai
 `href`, or `asChild` with the router's `NavLink`; `current` marks the current page (`aria-current`), a
 router link sets it itself. Counters go in `Sidebar.ItemCount`. Below 768px the Sidebar becomes an
 off-canvas panel — the app must render a menu button that opens it, otherwise navigation is unreachable
-on phones. `AppHeader` is the top bar of the panel on every width: `AppHeader.MenuButton` shows itself
-below 768px (the Sidebar's own breakpoint), the title says where you are, `AppHeader.Search` opens the
-CommandMenu and folds into an icon on a narrow header. Its row is as high as the Sidebar brand row, so
-the brand and the title read as one line.
+on phones. `AppHeader` is the top bar of the panel on every width, and its row is the page's: the
+frame gives it the menu button (`AppHeader.MenuButton` shows itself below 768px, the Sidebar's own
+breakpoint); each page gives it its title, a line of data, its own buttons and its tools. The row is
+as high as the Sidebar brand row, so the brand and the title read as one line. Nothing app-wide goes
+into it — no global search, no notifications: the header row is per page.
 
 ```tsx
 import { AppHeader, AppShell, Icon, NotificationProvider, Sidebar } from "prime-ui-kit";
 import { type ReactNode, useState } from "react";
 
-type AppLayoutProps = { title: string; onSearch: () => void; children: ReactNode };
+type AppLayoutProps = {
+  /** The page title — the page's h1; leave it out on a document page (its title is in main). */
+  title?: ReactNode;
+  /** One line of data under the title. */
+  description?: ReactNode;
+  /** The path up on a nested record: a `Breadcrumb.Root`. */
+  path?: ReactNode;
+  /** The page's own buttons in the title row. */
+  actions?: ReactNode;
+  /** The page's tools: a `PageToolbar.Root`. */
+  tools?: ReactNode;
+  children: ReactNode;
+};
 
-export function AppLayout({ title, onSearch, children }: AppLayoutProps) {
+export function AppLayout({ title, description, path, actions, tools, children }: AppLayoutProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <NotificationProvider>
@@ -79,10 +93,21 @@ export function AppLayout({ title, onSearch, children }: AppLayoutProps) {
         <AppHeader.Root>
           <AppHeader.Start>
             <AppHeader.MenuButton aria-expanded={menuOpen} onClick={() => setMenuOpen(true)} />
-            <AppHeader.Title>{title}</AppHeader.Title>
+            {path ? (
+              <>
+                {path}
+                <AppHeader.Separator />
+              </>
+            ) : null}
+            {title ? (
+              <AppHeader.Title>
+                {title}
+                {description ? <AppHeader.Description>{description}</AppHeader.Description> : null}
+              </AppHeader.Title>
+            ) : null}
           </AppHeader.Start>
-          {/* Opens the app's CommandMenu; bind ⌘K to the same handler. */}
-          <AppHeader.Search onClick={onSearch}>Поиск заказов и клиентов</AppHeader.Search>
+          {actions ? <AppHeader.Actions>{actions}</AppHeader.Actions> : null}
+          {tools ? <AppHeader.Tools>{tools}</AppHeader.Tools> : null}
         </AppHeader.Root>
         <AppShell.Main>{children}</AppShell.Main>
       </AppShell.Root>
@@ -90,6 +115,11 @@ export function AppLayout({ title, onSearch, children }: AppLayoutProps) {
   );
 }
 ```
+
+Each page renders `AppLayout` with its own header content:
+`<AppLayout title="Заказы" description="128 в работе · 6 ждут оплаты" tools={<OrdersToolbar />}>`.
+A document page (settings, a long form, help) passes no `title` and opens its body with
+`PageContent.Header`.
 
 Phone navigation for 2–6 main sections is a `BottomNav.Root` in `AppShell.Footer` (the last child of
 `AppShell.Root`, or the Template `footer` prop) — never in Main, never `position: fixed`, never behind
@@ -101,21 +131,19 @@ Next.js App Router: the package is marked `"use client"`, but a server component
 `"use client"` and render them from `app/layout.tsx` and the pages; import `bundle.css` in the root
 layout and put `data-theme` on `<html>` there.
 
-A nested record page keeps its `Breadcrumb` at the top of `PageContent.Header`, above the title
-([the detail page](../src/components/description-list/examples/screen.tsx)) — not in `AppHeader`. `AppHeader.Actions` holds at most notifications, the account and one primary action; page
-actions stay in `PageContent.Actions`. With `offCanvas="always"` pass `show="always"` to the menu button.
+A nested record page puts the path up before its title in the header — `Breadcrumb` (the list it
+belongs to), `AppHeader.Separator`, `AppHeader.Title` with the record's name and its status as
+the description ([the detail page](../src/components/description-list/examples/screen.tsx)). With
+`offCanvas="always"` pass `show="always"` to the menu button.
 
-### The page title in the header
+### The page's tools in the header
 
-A page that wants all its height for the work (a board, a chat, a dense register) may drop the
-heading row in main and let the header carry the page — one or the other, never both:
-
-- `AppHeader.Title as="h1"` is the page's only `<h1>` (the description stays outside its name);
-  main then has no `PageContent.Header`.
-- The page's tools — sections, the period, filters, the page's primary action — go into
-  `AppHeader.Tools` as a `PageToolbar.Root`: the header's second row, full width, sticky with it. The
-  toolbar lays itself out from that width (one row when wide, two on a phone), so the tools wrap
-  under the title instead of squeezing it. `AppHeader.Actions` keeps notifications and the account.
+The page's tools — its own search and filters, sections, the period or view, the primary action —
+go into `AppHeader.Tools` as a `PageToolbar.Root`: the header's second row, full width, sticky with
+it. The toolbar lays itself out from that width (one row when wide, stacked rows on a phone, the
+primary action on its own row when the search would be squeezed), so the tools wrap under the title
+instead of squeezing it. `AppHeader.Actions` keeps the page's other buttons (export, a more menu) in
+the title row.
 
 ```tsx
 import { AppHeader, Button, Icon, PageToolbar, SegmentedControl } from "prime-ui-kit";
@@ -126,7 +154,10 @@ export function DealsHeader({ view, onViewChange }: DealsHeaderProps) {
   return (
     <AppHeader.Root>
       <AppHeader.Start>
-        <AppHeader.Title as="h1">Сделки</AppHeader.Title>
+        <AppHeader.Title>
+          Сделки
+          <AppHeader.Description>7 сделок в работе · 6 461 750 ₽</AppHeader.Description>
+        </AppHeader.Title>
       </AppHeader.Start>
       <AppHeader.Tools>
         <PageToolbar.Root aria-label="Сделки">
@@ -181,11 +212,13 @@ from what people do, not from how the backend is split. The full guide with the 
 
 ## Page wrapper
 
-- App pages with actions (dashboard, list, detail): `PageContent.Page` — the full width of the panel.
-- Settings and long forms: `PageContent.Root maxWidth="wide"` with a `PageContent.Section layout="aside"`
+- App pages (dashboard, list, detail, a board): `PageContent.Page` — the full width of the panel; the
+  page's title and tools are in its `AppHeader`, the body starts with its first block.
+- Document pages — settings and long forms: `PageContent.Root maxWidth="wide"` with `PageContent.Header`
+  (the page's h1) and a `PageContent.Section layout="aside"`
   (heading column + panel) per section ([the settings page](../src/components/page-content/examples/screen.tsx)), or `maxWidth="readable"` for a single
   narrow column of fields.
-- Long reading text (terms, help): `PageContent.Root maxWidth="readable"`.
+- Long reading text (terms, help): `PageContent.Root maxWidth="readable"` with `PageContent.Header`.
 - A page as high as the panel (a log, a board, a chat): `AppShell.Root fillViewport` +
   `PageContent.Root fill`; the body passes its free height to a filling child — DataTable
   `scrollHeight="fill"`, Crossfade `fill`, `PageContent.Split`. Never compute heights from `100vh`.

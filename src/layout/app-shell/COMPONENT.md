@@ -11,7 +11,7 @@
 
 ## When not to use
 - The navigation itself → use [Sidebar](../sidebar/COMPONENT.md) inside `AppShell.Nav`, [BottomNav](../bottom-nav/COMPONENT.md) inside `AppShell.Footer`.
-- The top bar (title, search, actions, the menu button) → use [AppHeader](../app-header/COMPONENT.md) as a child of Root.
+- The page's top bar (the page title, its tools, the menu button) → use [AppHeader](../app-header/COMPONENT.md) as a child of Root.
 - Page heading, actions and sections inside main → use [PageContent](../../components/page-content/COMPONENT.md).
 - A temporary side panel over the page → use [Drawer](../../components/drawer/COMPONENT.md).
 - A scroll region inside a page → use [ScrollContainer](../../components/scroll-container/COMPONENT.md).
@@ -98,7 +98,7 @@ Every child of Root that is not `AppShell.Nav` is placed into the content panel.
 |---|---|---|---|
 | with `AppShell.Nav` | Two columns: a rail one layer above the page + the panel that is the page | Apps with navigation | |
 | without Nav | Panel takes the full width | Single-page tools, auth screens | |
-| with `AppHeader.Root` | Sticky bar at the top of the panel | Title or breadcrumbs, global search, actions, the mobile menu button | |
+| with `AppHeader.Root` | Sticky bar at the top of the panel | The page title (or the path and the record), the page's tools and buttons, the mobile menu button | |
 | with `AppShell.Footer` | Sticky bar at the bottom of the panel, shown while no navigation column is on screen | BottomNav on a phone | |
 
 `AppShell.Template` with `nav={<Sidebar.Root …/>}` and `PageContent` inside is the standard app; `contentWidth="contained"` + `PageContent.Root maxWidth="readable"` for docs and articles.
@@ -138,11 +138,11 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | The app frame: Sidebar in the nav column, breadcrumbs in the AppHeader, the page in main; only main scrolls — `fillViewport`. |
+| [overview.tsx](examples/overview.tsx) | The app frame: Sidebar in the nav column, the page title and its action in the AppHeader, the page in main; only main scrolls — `fillViewport`. |
 | [contained.tsx](examples/contained.tsx) | A shell without navigation whose main column is centred and capped for long reads — `contentWidth`. |
 | [footer.tsx](examples/footer.tsx) | A phone app without a Sidebar: the bar in the footer stays at the bottom while main scrolls under it — `AppShell.Footer`. |
 | [template.tsx](examples/template.tsx) | Root, nav, header and main in one component; main scrolls back to the top whenever the page changes — `AppShell.Template` with `scrollResetKey`. |
-| [screen.tsx](examples/screen.tsx) | The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone, the AppHeader with the menu button, the title and search that opens the CommandMenu, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`. |
+| [screen.tsx](examples/screen.tsx) | The app frame for desktop and phone: the Sidebar rail on a wide screen, the floating BottomNav in the footer on a phone, the AppHeader with the menu button, the page title with a line of data, and a simple home page that swaps with the current section — `fillViewport`, `scrollResetKey`. |
 
 ## Mistakes
 - Adding padding around the page content → Main already has the gutters.

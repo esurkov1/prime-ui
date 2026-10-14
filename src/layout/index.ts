@@ -5,7 +5,6 @@ export type {
   AppHeaderLabels,
   AppHeaderMenuButtonProps,
   AppHeaderRootProps,
-  AppHeaderSearchProps,
   AppHeaderSeparatorProps,
   AppHeaderStartProps,
   AppHeaderTitleProps,

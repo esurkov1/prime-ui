@@ -54,7 +54,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 `ref` → `HTMLElement`. `<header>` with the logo, title and description, laid out by Root `align`. Native props.
 
 ### LoginForm.Logo
-`ref` → `HTMLDivElement`. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label`. Native `<div>` props.
+`ref` → `HTMLDivElement`. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label` — then it is the product mark image (`role="img"`). Native `<div>` props.
 
 ### LoginForm.Title
 `ref` → `HTMLHeadingElement`. The heading (kit Typography, text role by the tier).
@@ -119,7 +119,7 @@ Root carries `data-size`, `data-align` and `data-flat`.
 ## Layout & spacing
 - header → body `--prime-space-8` (gap on Root); provider buttons → divider → form `--prime-space-4`; field → field → submit `--prime-space-5`; submit → back action `--prime-space-3`; form → footer `--prime-space-6`.
 - Spacing is `gap` on parents; no margins between parts.
-- The card has no border and is capped at the small modal width. To center it on a page, wrap it in your own flex container on the page.
+- The card has no border, takes the full width up to the small modal width. To center it on a page, wrap it in your own flex container on the page.
 - The form is a layer of the surface ladder like Card (`data-depth`): on the page it is white in light with the raised whisper, fields inside are one step off it.
 
 ## Accessibility
@@ -129,6 +129,7 @@ No keyboard interaction.
 
 ### ARIA
 - The title is a real heading (`h1` by default) and the form is a native `<form>`: Enter submits.
+- The logo is decorative; with an `aria-label` it is the product mark image (`role="img"`).
 - Give `LoginForm.Form` an `aria-label` (or `aria-labelledby` pointing to the title id) so the form is a landmark.
 - Fields use `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) so password managers and OTP autofill work.
 - Server errors in a Banner need `role="alert"`; field errors come from the fields (`aria-invalid`, described by the error).
@@ -141,9 +142,9 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a centered header — `align`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. |
+| [overview.tsx](examples/overview.tsx) | Sign in with a provider button, e-mail and password, a «forgot password» link and a sign-up link under a centered header with the product's named mark — `align`, `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Padding, gaps and text roles of the card follow the tier; the fields and buttons take the same one — `size`. |
-| [structure.tsx](examples/structure.tsx) | The minimal form: no logo, description or footer, and no shadow for a host that already is a surface — `flat`. |
+| [structure.tsx](examples/structure.tsx) | The minimal form: no logo, description or footer, no shadow for a host that already is a surface and a second-level title under the host page's own heading — `flat`, `as`. |
 | [register.tsx](examples/register.tsx) | Sign-up: five fields in one column, a strength meter on the new password and a mismatch shown as the field error — `strength`, `error`, `LoginForm.Form`. |
 | [forgot-password.tsx](examples/forgot-password.tsx) | Password reset request: one field, the primary action and a quiet way back — `LoginForm.Actions`. |
 | [reset-password.tsx](examples/reset-password.tsx) | A new password after the e-mail link: a strength meter on the first field and a mismatch error under the second one — `strength`, `error`. |

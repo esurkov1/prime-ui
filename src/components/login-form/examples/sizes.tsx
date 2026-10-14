@@ -1,14 +1,12 @@
 /** Padding, gaps and text roles of the card follow the tier; the fields and buttons take the same one — `size`. */
 import { Button, Input, LoginForm } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
-const sizes = ["s", "m", "l"] as const;
+const SIZES = ["s", "m", "l"] as const;
 
 export default function LoginFormSizesExample() {
   return (
-    <div className={styles.row}>
-      {sizes.map((size) => (
+    <>
+      {SIZES.map((size) => (
         <LoginForm.Root key={size} size={size}>
           <LoginForm.Header>
             <LoginForm.Title>Войти в аккаунт</LoginForm.Title>
@@ -33,6 +31,6 @@ export default function LoginFormSizesExample() {
           </LoginForm.Body>
         </LoginForm.Root>
       ))}
-    </div>
+    </>
   );
 }

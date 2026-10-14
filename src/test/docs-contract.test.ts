@@ -118,6 +118,12 @@ const screenModules = import.meta.glob<{ default: React.ComponentType }>(
   "../{components,layout}/*/examples/screen.tsx",
 );
 
+/**
+ * Screens that are document pages (settings, a long form): the only ones whose title is
+ * `PageContent.Header` in main. Every other screen titles itself in its `AppHeader`.
+ */
+const DOCUMENT_SCREENS = new Set(["page-content", "field-list"]);
+
 /** The one CSS module an example may import: a screen lays a whole page out in its own. */
 const exampleCss = (stem: string) =>
   stem === "screen" ? "./screen.module.css" : "./examples.module.css";
@@ -197,6 +203,26 @@ describe("docs contract", () => {
       const { default: Screen } = await screenModule();
       render(React.createElement(NotificationProvider, null, React.createElement(Screen)));
       expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    });
+
+    it.runIf(screenModule)("the screen titles itself in one place", () => {
+      const file = `${rel}/examples/screen.tsx`;
+      const source = read(file);
+      // An app page titles itself in its header; only a document page keeps a content header.
+      expect(
+        source.includes("<AppHeader.Title") && source.includes("<PageContent.Title"),
+        `${file}: AppHeader.Title and PageContent.Title — two titles`,
+      ).toBe(false);
+      expect(
+        !source.includes("<PageContent.Header") || DOCUMENT_SCREENS.has(dir),
+        `${file}: PageContent.Header on a screen that is not a document page (DOCUMENT_SCREENS)`,
+      ).toBe(true);
+      for (const title of ["<AppHeader.Title", "<PageContent.Title"]) {
+        expect(
+          source.split(title).length - 1,
+          `${file}: ${title.slice(1)} written more than once — one title per screen`,
+        ).toBeLessThanOrEqual(1);
+      }
     });
 
     describe("page standard", () => {

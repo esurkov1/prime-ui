@@ -39,16 +39,19 @@ export const api: ComponentApi = {
     {
       name: "LoginForm.Header",
       en: "`ref` → `HTMLElement`. `<header>` with the logo, title and description, laid out by Root `align`. Native props.",
+      ru: "`<header>` с логотипом, заголовком и описанием, раскладка по `align` корня.",
       props: [],
     },
     {
       name: "LoginForm.Logo",
-      en: "`ref` → `HTMLDivElement`. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label`. Native `<div>` props.",
+      en: '`ref` → `HTMLDivElement`. A tile for the product mark or an icon (accent tile with `start`, round with `center`); decorative unless it has an `aria-label` — then it is the product mark image (`role="img"`). Native `<div>` props.',
+      ru: 'Плитка со знаком продукта или иконкой (акцентная плитка при `start`, круг при `center`); декоративна, пока нет `aria-label`, — с ним это изображение знака продукта (`role="img"`).',
       props: [],
     },
     {
       name: "LoginForm.Title",
       en: "`ref` → `HTMLHeadingElement`. The heading (kit Typography, text role by the tier).",
+      ru: "Заголовок (Typography кита, роль текста по ярусу).",
       props: [
         {
           name: "as",
@@ -62,26 +65,31 @@ export const api: ComponentApi = {
     {
       name: "LoginForm.Description",
       en: "`ref` → `HTMLParagraphElement`. The secondary line under the title (kit Typography, secondary tone). Native `<p>` props.",
+      ru: "Вторичная строка под заголовком (Typography кита, тон secondary).",
       props: [],
     },
     {
       name: "LoginForm.Body",
       en: "`ref` → `HTMLDivElement`. Everything under the header: provider buttons, divider, form, footer. Native `<div>` props.",
+      ru: "Всё под шапкой: кнопки провайдеров, разделитель, форма, подвал.",
       props: [],
     },
     {
       name: "LoginForm.Form",
       en: "`ref` → `HTMLFormElement`. The `<form>`: fields, then the submit button, with the field → field gap of the tier. Native form props.",
+      ru: "`<form>`: поля, затем кнопка отправки, с зазором поле → поле по ярусу.",
       props: [],
     },
     {
       name: "LoginForm.Actions",
       en: "`ref` → `HTMLDivElement`. A column of full-width buttons: provider buttons above the form, or the primary action with a `ghost` back action. Native `<div>` props.",
+      ru: "Колонка кнопок на всю ширину: кнопки провайдеров над формой или главное действие с `ghost`-действием назад.",
       props: [],
     },
     {
       name: "LoginForm.Footer",
       en: "`ref` → `HTMLParagraphElement`. The secondary line with a `LinkButton` («Нет аккаунта? Зарегистрироваться»); follows Root `align`. Native `<p>` props.",
+      ru: "Вторичная строка с `LinkButton` («Нет аккаунта? Зарегистрироваться»); следует `align` корня.",
       props: [],
     },
   ],
