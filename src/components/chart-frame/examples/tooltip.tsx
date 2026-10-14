@@ -1,5 +1,5 @@
 /** Invoices by week as grouped bars: the kit tooltip follows the pointer with a row per series, the arrows step through the weeks — `ChartFrame.Tooltip`, `items`, `point`. */
-import { ChartFrame, type ChartFrameSeries, chartColors } from "prime-ui-kit";
+import { ChartFrame, type ChartFrameSeries, chartColors, VisuallyHidden } from "prime-ui-kit";
 import * as React from "react";
 
 const SERIES: ChartFrameSeries[] = [
@@ -54,13 +54,6 @@ export default function ChartFrameTooltipExample() {
               : (pointer ?? { x: MARGIN.left + band * active + band / 2, y: height / 2 });
           return (
             <div
-              role="slider"
-              tabIndex={0}
-              aria-label="Неделя"
-              aria-valuemin={0}
-              aria-valuemax={WEEKS.length - 1}
-              aria-valuenow={active ?? 0}
-              aria-valuetext={`${(point ?? WEEKS[0]).label}: оплачены ${(point ?? WEEKS[0]).paid}, ждут оплаты ${(point ?? WEEKS[0]).pending}`}
               onPointerMove={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
                 const index = Math.floor((event.clientX - rect.left - MARGIN.left) / band);
@@ -68,18 +61,25 @@ export default function ChartFrameTooltipExample() {
                 setActive(index >= 0 && index < WEEKS.length ? index : null);
               }}
               onPointerLeave={() => setActive(null)}
-              onFocus={() => setActive((current) => current ?? 0)}
-              onBlur={() => setActive(null)}
-              onKeyDown={(event) => {
-                const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
-                if (!step) return;
-                event.preventDefault();
-                setPointer(null);
-                setActive((current) =>
-                  Math.min(Math.max((current ?? 0) + step, 0), WEEKS.length - 1),
-                );
-              }}
             >
+              {/* The keyboard path: a native range steps through the weeks with the arrows; the
+                  highlighted week and the tooltip show where it is. */}
+              <VisuallyHidden>
+                <input
+                  type="range"
+                  aria-label="Неделя"
+                  min={0}
+                  max={WEEKS.length - 1}
+                  value={active ?? 0}
+                  aria-valuetext={`${(point ?? WEEKS[0]).label}: оплачены ${(point ?? WEEKS[0]).paid}, ждут оплаты ${(point ?? WEEKS[0]).pending}`}
+                  onChange={(event) => {
+                    setPointer(null);
+                    setActive(Number(event.target.value));
+                  }}
+                  onFocus={() => setActive((current) => current ?? 0)}
+                  onBlur={() => setActive(null)}
+                />
+              </VisuallyHidden>
               <svg width={width} height={height} aria-hidden="true">
                 {TICKS.map((tick) => (
                   <g key={tick}>

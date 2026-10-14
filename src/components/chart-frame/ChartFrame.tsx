@@ -7,12 +7,15 @@ import { Icon } from "@/icons";
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import { formatNumber } from "@/internal/formatNumber";
+import { useLabels } from "@/internal/labels";
 import { HUE_CHART } from "@/internal/palette";
 import type { TagRef } from "@/internal/polymorphic";
 import press from "@/internal/press.module.css";
 import { RegionSwap, useSwapIn } from "@/internal/RegionSwap";
 import { rovingIndex } from "@/internal/rovingFocus";
-import type { PaletteColor, Tone } from "@/internal/states";
+import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import textRole from "@/internal/textRole.module.css";
 import textTone from "@/internal/textTone.module.css";
@@ -90,8 +93,7 @@ export const CHART_FRAME_LABELS: ChartFrameLabels = {
   category: "Период",
 };
 
-const NUMBER = new Intl.NumberFormat("ru-RU");
-const defaultFormat = (value: number) => NUMBER.format(value);
+const defaultFormat = (value: number) => formatNumber(value);
 
 function seriesColor(series: ChartFrameSeries, index: number): string {
   if (series.color) return HUE_CHART[series.color];
@@ -121,27 +123,13 @@ const [ChartFrameProvider, useChartFrame] =
 const EMPTY_IDS: string[] = [];
 
 export type ChartFrameRootProps = React.HTMLAttributes<HTMLElement> & {
-  /**
-   * What the chart region shows. `loading` — Skeletons in the geometry of the value, the plot and
-   * the legend values; `empty` — the empty state in the plot's place; `error` — the load error with
-   * a retry button (`onRetry`). Every change cross-fades. Default `ready`.
-   */
   state?: ChartFrameState;
-  /** The series in drawing order: the legend, tooltip rows, table columns and plot colors. */
   series?: ChartFrameSeries[];
   rows: ChartFrameRow[];
-  /** Ids of the series turned off in the legend (controlled). */
   hiddenSeries?: string[];
-  /** Initially hidden series (uncontrolled). Default none. */
   defaultHiddenSeries?: string[];
-  /** The legend turned a series on or off; the new list of hidden ids. */
   onHiddenSeriesChange?: (hiddenSeries: string[]) => void;
-  /** Display of a value in the legend, the tooltip and the table. Default: Russian digit groups. */
   formatValue?: (value: number) => string;
-  /**
-   * Loads the data again from the error state; shows the retry button. May return a Promise: the
-   * button waits for it.
-   */
   onRetry?: () => void | Promise<void>;
   labels?: Partial<ChartFrameLabels>;
   ref?: React.Ref<HTMLElement>;
@@ -169,6 +157,7 @@ function ChartFrameRoot({
   ...rest
 }: ChartFrameRootProps) {
   const depth = useNestedSurfaceDepth();
+  const labels = useLabels(CHART_FRAME_LABELS, labelsProp);
   const titleId = React.useId();
   const descriptionId = React.useId();
   const plotRef = React.useRef<HTMLDivElement | null>(null);
@@ -203,7 +192,7 @@ function ChartFrameRoot({
     series: resolved,
     toggle,
     formatValue,
-    labels: { ...CHART_FRAME_LABELS, ...labelsProp },
+    labels,
     onRetry,
     titleId,
     descriptionId,
@@ -252,7 +241,6 @@ ChartFrameHeader.displayName = "ChartFrame.Header";
 type ChartFrameTitleAs = "h2" | "h3" | "h4";
 
 export type ChartFrameTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
-  /** Heading level that fits the page outline; the look does not change. Default `h3`. */
   as?: ChartFrameTitleAs;
   ref?: React.Ref<HTMLHeadingElement>;
 };
@@ -331,32 +319,26 @@ function ChartFrameValue({ className, children, ...rest }: ChartFrameValueProps)
 ChartFrameValue.displayName = "ChartFrame.Value";
 
 export type ChartFrameDeltaProps = React.HTMLAttributes<HTMLSpanElement> & {
-  /** Color of the change: `success` — good, `danger` — bad, `neutral` (default). Independent of the sign. */
   tone?: Extract<Tone, "neutral" | "success" | "warning" | "danger">;
   ref?: React.Ref<HTMLSpanElement>;
 };
 
 /** The change of the headline value («+12% к сентябрю»); the sign is in the text, not only the color. */
 function ChartFrameDelta({ tone = "neutral", className, ...rest }: ChartFrameDeltaProps) {
-  // The status ink is the shared text tone; `neutral` keeps the secondary ink of `.delta`.
-  return <span {...rest} className={cx(styles.delta, textTone.tone, className)} data-tone={tone} />;
+  // The body-s role and the shared text tone; `neutral` keeps the secondary ink of `.delta`.
+  return (
+    <span
+      {...rest}
+      className={cx(textRole.bodyS, styles.delta, textTone.tone, className)}
+      data-tone={tone}
+    />
+  );
 }
 ChartFrameDelta.displayName = "ChartFrame.Delta";
 
 export type ChartFramePlotProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /**
-   * Height of the plot area in px. Default 240, 160 when the panel is narrower than 30rem. `fill` —
-   * the plot takes the free height of a stretched panel (a `PageContent.Cell` with `rows`), the
-   * default height at least.
-   */
   height?: number | "fill";
-  /**
-   * Renders the chart at the measured size — for libraries that need explicit `width` and
-   * `height` (Recharts without `ResponsiveContainer`, Chart.js, visx). Gets every series with its
-   * resolved color and visibility. Called once the area has a size.
-   */
   renderPlot?: (area: ChartFramePlotArea) => React.ReactNode;
-  /** A chart that sizes itself to its container (an SVG with `width="100%"`, `ResponsiveContainer`). */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -429,7 +411,8 @@ function ChartFramePlot({
             </EmptyPage.Root>
           </div>
         ) : (
-          <div className={styles.canvas}>{plot}</div>
+          // Caption type for the chart's text (axis labels inherit the role's tracking).
+          <div className={cx(textRole.caption, styles.canvas)}>{plot}</div>
         )}
       </Crossfade>
     </div>
@@ -437,8 +420,10 @@ function ChartFramePlot({
 }
 ChartFramePlot.displayName = "ChartFrame.Plot";
 
+/** A legend entry is a quiet chip one `xs` control high (the field tier at `xs`). */
+const ENTRY_TIER: ControlSize = "xs";
+
 export type ChartFrameLegendProps = React.HTMLAttributes<HTMLUListElement> & {
-  /** Entries only name the series; they do not turn them on and off. */
   readOnly?: boolean;
   ref?: React.Ref<HTMLUListElement>;
 };
@@ -469,6 +454,8 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
 
   return (
     <ul
+      // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+      role="list"
       aria-label={labels.legend}
       {...rest}
       className={cx(styles.legend, className)}
@@ -502,7 +489,9 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
         return (
           <li key={item.id} className={styles.legendItem}>
             {readOnly ? (
-              <span className={styles.entry}>{content}</span>
+              <span className={cx(fieldTierClass, styles.entry)} data-size={ENTRY_TIER}>
+                {content}
+              </span>
             ) : (
               // A legend entry names a series and toggles it; Button's command look (filled label,
               // tier padding) would read as an action, so the entry draws its own quiet chip.
@@ -511,10 +500,16 @@ function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLe
                   buttons.current[index] = node;
                 }}
                 type="button"
-                className={cx(styles.entry, styles.toggle, press.press, touchTargetClass)}
+                className={cx(
+                  fieldTierClass,
+                  styles.entry,
+                  styles.toggle,
+                  press.press,
+                  touchTargetClass,
+                )}
+                data-size={ENTRY_TIER}
                 aria-pressed={!item.hidden}
                 tabIndex={index === active ? 0 : -1}
-                data-hidden={item.hidden || undefined}
                 onClick={() => {
                   setFocusIndex(index);
                   toggle(item.id);
@@ -540,16 +535,8 @@ export type ChartFrameTooltipItem = {
 };
 
 export type ChartFrameTooltipProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** The point the rows belong to («Неделя 41», «8 окт»). */
   label?: string;
-  /** One row per series at that point; rows of hidden series are left out. */
   items: ChartFrameTooltipItem[];
-  /**
-   * A point of the plot in the coordinates `renderPlot` draws in (the pointer, or the point the
-   * arrow keys reached): the tooltip floats beside it like every kit layer — right of it, on the
-   * left only where the right has no room; `null` hides it. Without `point` the body renders in
-   * place for a chart library's tooltip hook, which positions it.
-   */
   point?: AnchorPoint | null;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -583,7 +570,11 @@ function ChartFrameTooltip({ label, items, point, className, ...rest }: ChartFra
       point={point}
     >
       {rows.length > 0 ? (
-        <ul className={styles.tooltipRows}>
+        <ul
+          // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+          role="list"
+          className={styles.tooltipRows}
+        >
           {rows.map((row) => (
             <li key={row.id} className={styles.tooltipRow}>
               <span
