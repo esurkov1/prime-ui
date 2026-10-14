@@ -7,11 +7,15 @@ export default function InputSizesExample() {
   return (
     <>
       {SIZES.map((size) => (
-        <Input.Root key={size} size={size} label={size} hint="Пришлём ссылку для входа">
-          <Input.Wrapper>
-            <Input.Field type="email" placeholder="name@company.ru" />
-          </Input.Wrapper>
-        </Input.Root>
+        <div key={size}>
+          <div>
+            <Input.Root size={size} label={size} hint="Пришлём ссылку для входа">
+              <Input.Wrapper>
+                <Input.Field type="email" placeholder="name@company.ru" />
+              </Input.Wrapper>
+            </Input.Root>
+          </div>
+        </div>
       ))}
     </>
   );

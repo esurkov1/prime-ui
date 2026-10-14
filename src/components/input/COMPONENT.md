@@ -179,7 +179,7 @@ Input has no `variant` or `tone`: there is one field treatment (fill, no visible
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `focusRing={false}` | No focus ring; the field still switches to the focus fill, caret visible | A single search field where focus is obvious | `true` |
+| `focusRing` | `false`: no focus ring; the field still switches to the focus fill, caret visible | A single search field where focus is obvious | `true` |
 | `reserveSupportRow` | Empty support row of hint height under the field | Fields validated on the fly; neighbouring fields in one grid row | `false` |
 | `required` / `optional` | Red `*` / muted «необязательно» after the label | Mark the minority: required when most are optional, optional when most are required | `false` |
 
@@ -219,7 +219,7 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 
 ## Layout & spacing
 - Label → field gap: tier `label-gap` (`--prime-space-1` on xs/s, `--prime-space-2` on m–xl). Field → support row: `--prime-space-1`.
-- Field → field in a form: `--prime-space-5` (20); group → actions: `--prime-space-8` (32).
+- Fields of a form stack in a label-less [Fieldset](../fieldset/COMPONENT.md) (20 apart); the form around the groups spaces them from its actions (32).
 - `Input.Root` is `width: 100%` and `min-width: 0`; there is no `fullWidth` prop — the width comes from the parent (grid column, flex item, capped wrapper).
 - Use `reserveSupportRow` on fields that share a grid row so their bottoms stay aligned when only one shows an error.
 - The value truncates with an ellipsis before icons and affixes; the field height never changes.
