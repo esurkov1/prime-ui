@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { HighlightMatch } from "./HighlightMatch";
+import { useLabels } from "./labels";
 import styles from "./richText.module.css";
 
 /*
@@ -38,46 +39,58 @@ export function safeHref(raw: string): string | null {
 /** Trailing punctuation that ends a sentence rather than a bare URL. */
 const URL_TAIL = /[.,;:!?)»"']+$/;
 
+/** A node and how many characters of the source it consumes, or `null` when the match is not one. */
+type RuleMatch = { node: RichInline; length: number } | null;
+
 type Rule = {
   re: RegExp;
-  build: (match: RegExpExecArray) => RichInline | null;
+  build: (match: RegExpExecArray) => RuleMatch;
 };
+
+/** A node that consumes the whole match. */
+const whole = (match: RegExpExecArray, node: RichInline): RuleMatch => ({
+  node,
+  length: match[0].length,
+});
 
 /*
  * Emphasis markers open after a start, a space or punctuation and close before an end, a space or
  * punctuation, so `snake_case_name` and `2*3*4` stay text.
  */
 const RULES: Rule[] = [
-  { re: /`([^`\n]+)`/y, build: (m) => ({ type: "code", text: m[1] }) },
+  { re: /`([^`\n]+)`/y, build: (m) => whole(m, { type: "code", text: m[1] }) },
   {
     re: /\[([^\]\n]+)\]\(([^)\s]+)\)/y,
     build: (m) => {
       const href = safeHref(m[2]);
-      return href ? { type: "link", href, children: parseInline(m[1]) } : null;
+      return href ? whole(m, { type: "link", href, children: parseInline(m[1]) }) : null;
     },
   },
   {
     re: /\*\*(?=\S)([\s\S]+?)(?<=\S)\*\*/y,
-    build: (m) => ({ type: "bold", children: parseInline(m[1]) }),
+    build: (m) => whole(m, { type: "bold", children: parseInline(m[1]) }),
   },
   {
     re: /\|\|(?=\S)([\s\S]+?)(?<=\S)\|\|/y,
-    build: (m) => ({ type: "spoiler", children: parseInline(m[1]) }),
+    build: (m) => whole(m, { type: "spoiler", children: parseInline(m[1]) }),
   },
   {
     re: /~~(?=\S)([\s\S]+?)(?<=\S)~~/y,
-    build: (m) => ({ type: "strike", children: parseInline(m[1]) }),
+    build: (m) => whole(m, { type: "strike", children: parseInline(m[1]) }),
   },
   {
     re: /_(?=\S)([\s\S]+?)(?<=\S)_(?![\p{L}\p{N}_])/uy,
-    build: (m) => ({ type: "italic", children: parseInline(m[1]) }),
+    build: (m) => whole(m, { type: "italic", children: parseInline(m[1]) }),
   },
   {
+    // A bare URL keeps the punctuation after it as text: it consumes only the address.
     re: /(?:https?:\/\/|www\.)[^\s<]+/y,
     build: (m) => {
       const text = m[0].replace(URL_TAIL, "");
       const href = safeHref(text.startsWith("www.") ? `https://${text}` : text);
-      return href ? { type: "link", href, children: [{ type: "text", text }] } : null;
+      return href
+        ? { node: { type: "link", href, children: [{ type: "text", text }] }, length: text.length }
+        : null;
     },
   },
 ];
@@ -104,16 +117,11 @@ export function parseInline(source: string): RichInline[] {
         rule.re.lastIndex = index;
         const match = rule.re.exec(source);
         if (!match) continue;
-        const node = rule.build(match);
-        if (!node) continue;
-        // A bare URL keeps the punctuation after it as text.
-        const length =
-          node.type === "link" && rule === RULES[RULES.length - 1]
-            ? (node.children[0] as { text: string }).text.length
-            : match[0].length;
+        const built = rule.build(match);
+        if (!built) continue;
         flush();
-        out.push(node);
-        index += length;
+        out.push(built.node);
+        index += built.length;
         matched = true;
         break;
       }
@@ -305,7 +313,7 @@ export type RichTextProps = {
 /** A message text with its Markdown subset rendered safely; `end` closes the last text line. */
 export function RichText({ source, end, highlight = "", labels: labelsProp }: RichTextProps) {
   const query = highlight.trim();
-  const labels = React.useMemo(() => ({ ...RICH_TEXT_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = useLabels(RICH_TEXT_LABELS, labelsProp);
   // Parsed once per text: a message re-renders on its hover, menu and reaction state.
   const blocks = React.useMemo(() => parseRichText(source), [source]);
   const last = blocks[blocks.length - 1];
