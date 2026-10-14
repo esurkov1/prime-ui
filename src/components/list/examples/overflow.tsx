@@ -1,4 +1,4 @@
-/** A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate. */
+/** A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate — `List.ItemText`, `List.ItemDescription`. */
 import { Card, List, ScrollContainer } from "prime-ui-kit";
 import * as React from "react";
 

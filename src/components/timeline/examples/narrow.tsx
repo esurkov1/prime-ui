@@ -1,4 +1,4 @@
-/** At 375 px the title wraps and the amount stays right; below 20rem of its own width the amount moves under the meta line. */
+/** At 375 px the title wraps and the amount stays right; below 20rem of its own width the amount moves under the meta line — `Timeline.ItemValue`. */
 import { Timeline } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

@@ -41,7 +41,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "narrow",
       description:
-        "В карточке 320 px список уже 24rem: подпись встаёт над значением, длинные значения переносятся.",
+        "В карточке 320 px список уже 24rem: подпись встаёт над значением, длинные значения переносятся — `DescriptionList.Item`, `label`.",
     },
     {
       slot: "screen",

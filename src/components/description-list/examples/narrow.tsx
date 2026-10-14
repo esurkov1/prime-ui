@@ -1,4 +1,4 @@
-/** In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap. */
+/** In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap — `DescriptionList.Item`, `label`. */
 import { Card, DescriptionList } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

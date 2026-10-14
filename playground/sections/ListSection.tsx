@@ -48,7 +48,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overflow",
       description:
-        "Длинный список в панели фиксированной высоты: он прокручивается в ScrollContainer, длинные названия и превью обрезаются.",
+        "Длинный список в панели фиксированной высоты: он прокручивается в ScrollContainer, длинные названия и превью обрезаются — `List.ItemText`, `List.ItemDescription`.",
     },
     {
       scenario: "as-link",

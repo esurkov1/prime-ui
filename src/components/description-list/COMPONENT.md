@@ -124,7 +124,7 @@ No motion: the list is static text; a row action has the Button's own press and 
 | [sizes.tsx](examples/sizes.tsx) | Every tier changes the label and value type and the gap between pairs — `size`. |
 | [structure.tsx](examples/structure.tsx) | Optional pieces of a pair: a Badge or a link as the value, a row action that is a link and an empty value with its own mark — `DescriptionList.ItemAction`, `asChild`, `labels`. |
 | [vertical.tsx](examples/vertical.tsx) | Labels above their values at any width, for a side panel of a record — `orientation`. |
-| [narrow.tsx](examples/narrow.tsx) | In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap. |
+| [narrow.tsx](examples/narrow.tsx) | In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap — `DescriptionList.Item`, `label`. |
 | [screen.tsx](examples/screen.tsx) | A nested record: the path, the title with its status and due date and the record's actions by weight in the app header, a main column with the line items and a side column with the client's details and the history — `orientation`. |
 
 ## Mistakes
