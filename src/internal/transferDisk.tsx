@@ -12,7 +12,7 @@ import {
   type TransferHandler,
   type TransferState,
 } from "@/internal/transfer";
-import { isPromiseLike } from "@/internal/usePendingChanges";
+import { isPromiseLike, usePendingKeys } from "@/internal/usePendingChanges";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./transferDisk.module.css";
@@ -86,15 +86,8 @@ export function useTransferDisk({
   disabled = false,
 }: Omit<TransferDiskProps, "look" | "size" | "className">): TransferDiskModel {
   const descriptionId = React.useId();
-  const [pending, setPending] = React.useState<Action | null>(null);
+  const { pending, track } = usePendingKeys<Action>();
   const [notice, setNotice] = React.useState("");
-  const alive = React.useRef(true);
-  React.useEffect(() => {
-    alive.current = true;
-    return () => {
-      alive.current = false;
-    };
-  }, []);
 
   const active = inFlight(state);
   const failed = state === "failed";
@@ -108,30 +101,21 @@ export function useTransferDisk({
         : action === "download"
           ? onDownload
           : undefined;
-  const busy = (action !== null && pending === action) || (active && cancelPending);
+  const busy = (action !== null && pending.has(action)) || (active && cancelPending);
 
   const run = () => {
     if (!handler || !action || busy || disabled) return;
     setNotice("");
-    const result = handler();
-    if (!isPromiseLike(result)) return;
-    setPending(action);
-    result.then(
-      () => {
-        if (alive.current) setPending(null);
-      },
-      () => {
-        if (!alive.current) return;
-        setPending(null);
-        const refused =
-          action === "cancel"
-            ? labels.cancelFailed
-            : action === "retry"
-              ? labels.retryFailed
-              : labels.downloadFailed;
-        setNotice(refused ?? "");
-      },
-    );
+    // A returned promise keeps the action pending until it settles; a rejection is announced.
+    const outcome = track(action, handler());
+    if (!isPromiseLike(outcome)) return;
+    const refused =
+      action === "cancel"
+        ? labels.cancelFailed
+        : action === "retry"
+          ? labels.retryFailed
+          : labels.downloadFailed;
+    outcome.then(undefined, () => setNotice(refused ?? ""));
   };
 
   // One glyph slot: the host's `Button.Icon` cross-fades a change of it in place.
