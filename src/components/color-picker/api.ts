@@ -216,8 +216,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ColorPresets.Root",
-      en: "No DOM. A quick color from a fixed palette: a square trigger and a popover grid of presets (Popover overlay contract).",
-      ru: "Быстрый цвет из палитры: квадратный триггер и поповер с сеткой пресетов.",
+      en: "A quick color from a fixed palette: a square trigger and a popover grid of presets. No DOM, except a field frame in a FieldList cell (the column heading as its label).",
+      ru: "Быстрый цвет из палитры: квадратный триггер и поповер с сеткой пресетов. Без DOM, кроме рамки поля в ячейке FieldList.",
       props: [
         {
           name: "value",

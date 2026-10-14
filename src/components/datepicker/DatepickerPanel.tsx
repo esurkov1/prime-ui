@@ -631,7 +631,7 @@ export function PanelView(props: PanelViewProps) {
         ) : null}
 
         {footer ? (
-          <div className={styles.footer}>
+          <div className={styles.footer} data-time={withTime || undefined}>
             <div className={styles.footerFields}>
               <FooterField
                 label={isRange ? labels.rangeStart : labels.date}

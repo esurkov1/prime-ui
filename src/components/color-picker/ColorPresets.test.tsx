@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
 import { DisabledProvider } from "@/internal/disabledContext";
+import { FieldCellContext } from "@/internal/fieldCell";
 import { primitiveTokens } from "../../../tokens/primitives";
 import { COLOR_PRESETS, ColorPresets, type ColorPresetsRootProps } from "./ColorPresets";
 
@@ -209,5 +210,24 @@ describe("ColorPresets", () => {
     expect(trigger).toHaveAccessibleName("Цвет: Жёлтый");
     fireEvent.keyDown(trigger, { key: "ArrowDown" });
     expect(screen.getByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("in a FieldList cell renders the column heading as the label of its trigger", () => {
+    const { container } = render(
+      <FieldCellContext.Provider value={{ label: "Цвет метки", hidden: "wide" }}>
+        <Picker defaultValue="#5068F5" />
+      </FieldCellContext.Provider>,
+    );
+    const trigger = screen.getByRole("button", { name: "Цвет метки: Синий" });
+    const label = container.querySelector("label");
+    expect(label).toHaveTextContent("Цвет метки");
+    expect(label).toHaveAttribute("for", trigger.id);
+    open();
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("outside a FieldList cell renders no label", () => {
+    const { container } = render(<Picker defaultValue="#5068F5" />);
+    expect(container.querySelector("label")).toBeNull();
   });
 });

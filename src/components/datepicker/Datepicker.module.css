@@ -409,6 +409,10 @@
 }
 
 .footer {
+  container-type: inline-size;
+}
+
+.footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -425,15 +429,16 @@
   flex: 1 1 calc(var(--prime-space-24) * 2);
   align-items: center;
   gap: var(--prime-space-2);
-  min-width: 0;
 }
 
+/* A field never shrinks below its whole date and time: the fields wrap above the actions
+   first, and on the narrowest footer they stand one under the other. */
 .field {
   box-sizing: border-box;
   display: flex;
   flex: 1 1 0;
   align-items: center;
-  min-width: 0;
+  min-width: min-content;
   height: var(--dp-field-h);
   margin: 0;
   padding: 0;
@@ -446,7 +451,7 @@
 
 .fieldDate {
   flex: 1 1 auto;
-  min-width: 0;
+  min-width: calc(10ch + 2 * var(--prime-space-2));
   padding-inline: var(--prime-space-2);
   overflow: hidden;
   color: var(--prime-color-text-primary);
@@ -503,6 +508,21 @@
   color: var(--prime-color-text-muted);
 }
 
+/* Date and time of both ends do not fit one narrow row: one field under the other. */
+@container (width < 22rem) {
+  .footer[data-time="true"] .footerFields {
+    flex-wrap: wrap;
+  }
+
+  .footer[data-time="true"] .field {
+    flex-basis: 100%;
+  }
+
+  .footer[data-time="true"] .dash {
+    display: none;
+  }
+}
+
 .footerActions {
   display: flex;
   flex-shrink: 0;
@@ -532,6 +552,18 @@
   width: auto;
   min-width: 0;
   max-width: calc(var(--dp-cell) * 20);
+}
+
+/* Below 640px of viewport the popover is a bottom sheet (`COMPACT_QUERY`): the sheet is the host,
+   so the months share its width as in an embedded panel — the day columns spread, each day stays
+   one cell — instead of a fit-content month in the corner of the sheet. */
+@media (max-width: 639px) {
+  .popover .month {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    max-width: calc(var(--dp-cell) * 20);
+  }
 }
 
 /* Narrower than one month: tighter gutters. */

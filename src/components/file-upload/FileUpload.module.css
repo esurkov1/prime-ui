@@ -13,7 +13,8 @@
   --fu-title-line-height: var(--prime-control-m-line-height);
   --fu-icon-box: var(--prime-control-m-height);
   --fu-radius: var(--prime-radius-l);
-  --fu-line: var(--prime-color-border-default);
+  /* The add tile's line: a translucent fill stays visible on the gray field fill of any surface. */
+  --fu-line: var(--prime-color-fill-strong);
   --fu-line-hover: var(--prime-color-text-placeholder);
   position: relative;
   box-sizing: border-box;

@@ -18,6 +18,7 @@
    chevron, for a column of a dense row (FieldList); the hidden value needs a positioned box. */
 .trigger[data-icon-only="true"] {
   position: relative;
+  align-self: start;
   width: auto;
 }
 

@@ -179,8 +179,13 @@
    `data-preview-stretch` / `data-stretch` come from ExampleFrame.tsx (a DOM read, not `:has()`). */
 .previewInner > [data-preview-stretch] {
   align-self: stretch;
-  width: 100%;
   margin-inline: auto;
+}
+
+/* The width is a zero-specificity default: a block with its own width (an example's 320 px
+   column, a form's measure) keeps it and stays centered. */
+:where(.previewInner) > :where([data-preview-stretch]) {
+  width: 100%;
 }
 
 /* Preview layouts: no wrapper divs needed in snippets. */
@@ -229,8 +234,10 @@
  * `--matrix-cell`: 320 for one column, 160 for two, 128 from three on. So a specimen without an
  * intrinsic width (Slider, a block with `container-type: inline-size` and `width: 100%`) fills a
  * sensible cell instead of collapsing, and small specimens sit in even, compact columns. The grid
- * is centered; a matrix wider than the stage scrolls. The children are opaque (an example component
- * renders the rows), so ExampleFrame.tsx reads the column count from the DOM into `--matrix-columns`.
+ * is centered both ways (the rows keep their own height, never stretched to the stage's minimum).
+ * The children are opaque (an example component renders the rows), so ExampleFrame.tsx reads the
+ * column count from the DOM into `--matrix-columns`, and sets `data-matrix-wrap` when the grid is
+ * wider than the stage (a phone frame): then each row wraps its cells, centered, under each other.
  */
 .previewInner[data-preview-layout="matrix"] {
   --matrix-columns: 1;
@@ -241,9 +248,26 @@
   display: grid;
   grid-template-columns: repeat(var(--matrix-columns), minmax(max-content, var(--matrix-cell)));
   align-items: end;
+  align-content: center;
   justify-content: safe center;
   gap: var(--prime-space-5) var(--prime-space-6);
-  overflow-x: auto;
+}
+
+.previewInner[data-preview-layout="matrix"][data-matrix-wrap] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.previewInner[data-preview-layout="matrix"][data-matrix-wrap] > * {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--prime-space-5) var(--prime-space-6);
+  max-width: 100%;
+  margin-inline: 0;
 }
 
 .previewInner[data-preview-layout="matrix"] > * {

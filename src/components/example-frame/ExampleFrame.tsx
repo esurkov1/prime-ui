@@ -82,10 +82,11 @@ const holdsStretch = (node: Node) =>
 /**
  * Facts about the opaque preview children that the stage layouts need: which direct child holds a
  * stretching block (`data-preview-stretch` on it and `data-stretch` on the stage) and, for
- * `matrix`, the cell count of the first row (`--matrix-columns`). Read from the DOM here, not by
- * `:has()` in CSS: a descendant `:has()` on the stage and on every element under it re-matches
- * on every DOM insert inside the example (a virtualized list restyled ~10k elements per frame).
- * A MutationObserver re-reads only when a change can matter.
+ * `matrix`, the cell count of the first row (`--matrix-columns`) and whether the column grid fits
+ * the stage (`data-matrix-wrap` when it does not: each row wraps its cells on its own). Read from
+ * the DOM here, not by `:has()` in CSS: a descendant `:has()` on the stage and on every element
+ * under it re-matches on every DOM insert inside the example (a virtualized list restyled ~10k
+ * elements per frame). A MutationObserver re-reads only when a change can matter.
  */
 function usePreviewFacts(
   stageRef: React.RefObject<HTMLDivElement | null>,
@@ -95,6 +96,23 @@ function usePreviewFacts(
   React.useLayoutEffect(() => {
     const stage = stageRef.current;
     if (!active || !stage) return;
+    // The width the column grid needs, measured when it overflowed; while the rows wrap the grid
+    // is not laid out, so the stage returns to it only once it is at least this wide again.
+    let gridWidth = 0;
+    const fitMatrix = (remeasure: boolean) => {
+      if (layout !== "matrix") {
+        stage.removeAttribute("data-matrix-wrap");
+        return;
+      }
+      if (stage.hasAttribute("data-matrix-wrap")) {
+        if (!remeasure && stage.clientWidth < gridWidth) return;
+        stage.removeAttribute("data-matrix-wrap");
+      }
+      if (stage.scrollWidth > stage.clientWidth + 1) {
+        gridWidth = stage.scrollWidth;
+        stage.setAttribute("data-matrix-wrap", "");
+      }
+    };
     // Stretching only latches on: a virtualized list mounts and unmounts its rows while it
     // scrolls, and a full-width card leaving the window must not narrow the stage under the reader.
     const read = () => {
@@ -115,6 +133,7 @@ function usePreviewFacts(
       } else {
         stage.style.removeProperty("--matrix-columns");
       }
+      fitMatrix(true);
     };
     read();
     const observer = new MutationObserver((records) => {
@@ -137,7 +156,15 @@ function usePreviewFacts(
       attributes: true,
       attributeFilter: ["data-full-width"],
     });
-    return () => observer.disconnect();
+    const resize =
+      layout === "matrix" && typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => fitMatrix(false))
+        : null;
+    resize?.observe(stage);
+    return () => {
+      observer.disconnect();
+      resize?.disconnect();
+    };
   }, [stageRef, layout, active]);
 }
 

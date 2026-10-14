@@ -327,6 +327,21 @@ describe("Datepicker.Root", () => {
     );
   });
 
+  it("a range without withTime shows days only, whatever time its dates carry", () => {
+    const value = { from: new Date(2026, 6, 1), to: new Date(2026, 7, 4) };
+    const today = new Date(2026, 9, 7);
+    const { rerender } = render(
+      <Datepicker.Root mode="range" value={value} today={today} aria-label="Период" />,
+    );
+    expect(screen.getByRole("button", { name: "Период: 1 июл — 4 авг" })).toBeInTheDocument();
+    rerender(
+      <Datepicker.Root mode="range" value={value} today={today} withTime aria-label="Период" />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Период: 1 июл 00:00 — 4 авг 00:00" }),
+    ).toBeInTheDocument();
+  });
+
   it("opening the popover focuses the picked day", async () => {
     render(
       <Datepicker.Root

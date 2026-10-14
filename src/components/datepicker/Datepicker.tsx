@@ -58,8 +58,10 @@ export function formatDatepickerValue(
   if (!to) return null;
   const fromDay = from ? startOfDay(from) : null;
   const lastDay = startOfDay(to);
+  // Without `withTime` a range is whole days whatever clock time its dates carry.
   const wholeDays =
-    (from == null || minutesOf(from) === DAY_START_MINUTES) && minutesOf(to) === DAY_END_MINUTES;
+    !props.withTime ||
+    ((from == null || minutesOf(from) === DAY_START_MINUTES) && minutesOf(to) === DAY_END_MINUTES);
   if (wholeDays && props.presets) {
     const preset = matchPreset(props.presets, fromDay, lastDay, today);
     if (preset) return preset.label;

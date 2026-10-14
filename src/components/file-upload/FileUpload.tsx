@@ -1172,7 +1172,13 @@ function FileUploadField({
       accept={accept}
       multiple={multiple}
       required={required}
-      disabled={disabled || (tile && full)}
+      disabled={disabled}
+      // A full set keeps its input enabled, so the field (its label) does not read as disabled:
+      // the add tile is only marked off and its click opens no picker.
+      aria-disabled={(tile && full) || undefined}
+      onClick={(event) => {
+        if (tile && full) event.preventDefault();
+      }}
       // The button is the control: the input only holds the files.
       tabIndex={button ? -1 : undefined}
       aria-hidden={button || undefined}

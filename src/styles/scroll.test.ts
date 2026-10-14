@@ -17,8 +17,6 @@ const ALLOWED: Record<string, string> = {
     "a native <textarea> scrolls its own text; nothing can wrap the inside of the control",
   "components/code-block/CodeBlock.module.css":
     "a <pre> that paints its own fill (a fade would dissolve it, a shadow paints the layer fill) and admits no scroll wrapper inside",
-  "components/example-frame/ExampleFrame.module.css":
-    "the preview stage is one filled surface for every preview layout; only the matrix grid scrolls sideways",
 };
 
 function cssFiles(dir: string): string[] {

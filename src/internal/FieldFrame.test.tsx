@@ -53,6 +53,13 @@ describe("FieldFrame", () => {
     expect(screen.getByRole("radiogroup", { name: "Роль" })).toBeInTheDocument();
   });
 
+  it("marks a group frame, so one disabled option does not dim the group label", () => {
+    const { container, rerender } = render(<Frame group />);
+    expect(container.firstElementChild).toHaveAttribute("data-group", "true");
+    rerender(<Frame />);
+    expect(container.firstElementChild).not.toHaveAttribute("data-group");
+  });
+
   it("renders no support row without hint, error, counter or reserve", () => {
     render(<Frame />);
     // The body holds the control alone.

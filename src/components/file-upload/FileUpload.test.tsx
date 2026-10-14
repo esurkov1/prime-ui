@@ -721,7 +721,11 @@ describe('FileUpload.Root trigger="tile", a value', () => {
 
   it("at max the add tile says so and takes nothing", () => {
     render(<Photos max={3} />);
-    expect(screen.getByLabelText("Добавить файлы")).toBeDisabled();
+    const input = screen.getByLabelText("Добавить файлы");
+    // Marked off, not disabled: a disabled input would dim the whole field's label.
+    expect(input).not.toBeDisabled();
+    expect(input).toHaveAttribute("aria-disabled", "true");
+    expect(fireEvent.click(input)).toBe(false);
     expect(screen.getByText("Лимит файлов")).toBeInTheDocument();
     expect(screen.getByLabelText("Добавить файлы").closest("label")).toHaveTextContent("3 из 3");
   });

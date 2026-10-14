@@ -1,6 +1,19 @@
+import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { colorToRgb, markContrast } from "./swatch";
+import { colorToRgb, markContrast, useSwatchOptions } from "./swatch";
+
+describe("useSwatchOptions", () => {
+  it("gives the «no color» option a theme-following mark, the colors one by luminance", () => {
+    const presets = [
+      { value: "#ffffff", label: "Белый" },
+      { value: "#000000", label: "Чёрный" },
+    ];
+    const { result } = renderHook(() => useSwatchOptions(presets, true, "Без цвета"));
+    expect(result.current.map((option) => option.contrast)).toEqual(["dark", "light", "surface"]);
+    expect(result.current[2]).toMatchObject({ value: null, label: "Без цвета" });
+  });
+});
 
 describe("colorToRgb", () => {
   it("reads short and long hex, with or without alpha", () => {

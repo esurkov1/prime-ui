@@ -13,6 +13,7 @@ import { useControlSize } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { useInheritedDisabled } from "@/internal/disabledContext";
+import { FieldFrame, useFieldFrame } from "@/internal/FieldFrame";
 import { useFieldCell } from "@/internal/fieldCell";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { gridIndex } from "@/internal/rovingFocus";
@@ -67,6 +68,8 @@ type Ctx = {
   disabled: boolean;
   labels: ColorPresetsLabels;
   triggerRef: React.RefObject<HTMLElement | null>;
+  /** In a FieldList cell: the trigger id the cell label points at. */
+  triggerId: string | undefined;
 };
 
 const [ColorPresetsProvider, useColorPresetsContext] = createComponentContext<Ctx>("ColorPresets");
@@ -123,8 +126,12 @@ function ColorPresetsRoot({
     onChange: onOpenChange,
   });
   const triggerRef = React.useRef<HTMLElement | null>(null);
-  // In a FieldList cell the column heading names the trigger, unless `labels.trigger` is given.
-  const cellLabel = useFieldCell()?.label;
+  // In a FieldList cell the column heading names the trigger, unless `labels.trigger` is given,
+  // and the field frame shows it as the label when the list stacks its rows (`fieldCell`).
+  const cell = useFieldCell();
+  const cellLabel = cell?.label;
+  const ids = useFieldFrame(undefined, {});
+  const triggerId = cell ? ids.controlId : undefined;
   const labels = React.useMemo(
     () => ({
       ...COLOR_PRESETS_LABELS,
@@ -168,15 +175,26 @@ function ColorPresetsRoot({
       disabled,
       labels,
       triggerRef,
+      triggerId,
     }),
-    [value, select, close, options, selectedLabel, columns, size, disabled, labels],
+    [value, select, close, options, selectedLabel, columns, size, disabled, labels, triggerId],
+  );
+
+  const popover = (
+    <Popover.Root open={open && !disabled} onOpenChange={setOpen}>
+      {children}
+    </Popover.Root>
   );
 
   return (
     <ColorPresetsProvider value={ctx}>
-      <Popover.Root open={open && !disabled} onOpenChange={setOpen}>
-        {children}
-      </Popover.Root>
+      {cell ? (
+        <FieldFrame size={size} ids={ids} disabled={disabled} optionalLabel="">
+          {popover}
+        </FieldFrame>
+      ) : (
+        popover
+      )}
     </ColorPresetsProvider>
   );
 }
@@ -207,11 +225,12 @@ export type ColorPresetsTriggerProps = {
  * `disabled` and handlers win (Slot merge rules).
  */
 function Trigger({ children }: ColorPresetsTriggerProps) {
-  const { disabled, labels, selectedLabel, triggerRef } = useColorPresetsContext();
+  const { disabled, labels, selectedLabel, triggerRef, triggerId } = useColorPresetsContext();
   return (
     <Popover.Trigger>
       <Slot
         ref={triggerRef}
+        {...(triggerId ? { id: triggerId } : null)}
         disabled={disabled || undefined}
         aria-label={`${labels.trigger}: ${selectedLabel}`}
         onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {

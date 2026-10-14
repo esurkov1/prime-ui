@@ -227,6 +227,7 @@ export function FieldFrame({
         size,
         invalid: ids.invalid || undefined,
         disabled: disabled || undefined,
+        group: group || undefined,
         shake,
       })}
     >

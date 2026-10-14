@@ -249,7 +249,7 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLElement>, "id">',
+          type: 'Omit<HTMLAttributes<HTMLElement>, "id" | "onDragStart" | "onDragEnd">',
           en: "`className` and the other attributes.",
           ru: "`className` и остальные атрибуты.",
         },

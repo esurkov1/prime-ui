@@ -2,7 +2,7 @@
  * Field trigger (foundation §4, §6, §8): the button-shaped field of Select, Datepicker and the
  * other pickers — the field surface and the field tier on one `<button>` with `data-size`.
  * Icons (leading, clear, chevron) sit centred between the edge and the text: edge→icon =
- * icon→text = field padX, so the gap is padX too. Press scales it; an open panel keeps the focus
+ * icon→text = field padX, so the gap is padX too. Press scales it; an open panel holds the hover
  * fill. Hosts take it with `fieldTriggerClass` in TSX (tier + surface + this layout) and add only
  * their width and parts. The layout rule has zero specificity, so a host's one-class rule
  * (`display`, `width`) wins whichever order the bundle emits the files in.
@@ -44,7 +44,11 @@
   transform: scale(var(--prime-motion-press-scale));
 }
 
-/* An open panel keeps the focus fill, hovered or not (outranks the surface hover). */
+/*
+ * An open panel holds the hover fill, hovered or not (outranks the surface hover and focus fill).
+ * Never the focus fill: that is the surface's own color and reads only with the focus ring, which
+ * an open trigger does not draw once focus moves into the panel — the field would vanish.
+ */
 .trigger[data-state="open"]:not(:disabled) {
-  background: var(--prime-color-field-bg-focus);
+  background: var(--prime-color-field-bg-hover);
 }

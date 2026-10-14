@@ -42,8 +42,16 @@ export const COLOR_PRESETS: readonly ColorPreset[] = [
   { value: "#be185d", label: "Тёмно-розовый" },
 ];
 
-/** One selectable swatch: `null` is «no color». */
-export type SwatchOption = { value: string | null; label: string; contrast: "light" | "dark" };
+/**
+ * One selectable swatch: `null` is «no color». `contrast` picks the check mark: `light` / `dark`
+ * by the color's luminance; `surface` (the «no color» checkerboard, drawn from the surface's own
+ * fills) follows the theme with the primary text color.
+ */
+export type SwatchOption = {
+  value: string | null;
+  label: string;
+  contrast: "light" | "dark" | "surface";
+};
 
 /** The presets as swatch options, plus the «no color» option at the end when `allowEmpty`. */
 export function useSwatchOptions(
@@ -54,7 +62,7 @@ export function useSwatchOptions(
   return React.useMemo(
     () => [
       ...presets.map((preset) => ({ ...preset, contrast: markContrast(preset.value) })),
-      ...(allowEmpty ? [{ value: null, label: emptyLabel, contrast: "dark" as const }] : []),
+      ...(allowEmpty ? [{ value: null, label: emptyLabel, contrast: "surface" as const }] : []),
     ],
     [presets, allowEmpty, emptyLabel],
   );

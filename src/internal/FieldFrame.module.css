@@ -72,12 +72,15 @@
 
 /*
  * A disabled native control dims the label and the hint even when its host does not pass
- * `disabled` to the frame (`disabled` on `Input.Field`); the error keeps its color.
+ * `disabled` to the frame (`disabled` on `Input.Field`); the error keeps its color. A group frame
+ * (`data-group`: Radio.Group, SegmentedControl, FieldList) is left out: one disabled option of
+ * many must not dim the group's label; the group dims from its own `disabled` (Label, Hint).
  * The rightmost compound names a class (never `.label *`): a class-less target after a `:has()`
- * makes the browser's `:has()` invalidation whole-subtree for every anchor on the page. The label's
- * parts dim through `--label-dimmed` (Label).
+ * makes the browser's `:has()` invalidation whole-subtree for every anchor on the page; for the
+ * same reason the group exclusion is an attribute, never a `:not(:has())`. The label's parts dim
+ * through `--label-dimmed` (Label).
  */
-.root:has(> .body :is(input, textarea, select):disabled)
+.root:not([data-group="true"]):has(> .body :is(input, textarea, select):disabled)
 :is(.label, .supportText:not([data-invalid="true"])) {
   --label-dimmed: var(--prime-color-text-disabled);
   color: var(--prime-color-text-disabled);

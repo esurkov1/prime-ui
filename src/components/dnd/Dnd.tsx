@@ -562,7 +562,7 @@ export type DndDraggableProps<TData = unknown> = {
   className?: string;
   children?: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
-} & Omit<React.HTMLAttributes<HTMLElement>, "id">;
+} & Omit<React.HTMLAttributes<HTMLElement>, "id" | "onDragStart" | "onDragEnd">;
 
 /** Something to carry onto a `Dnd.DropZone`. The source stays in place, faded, until the drop. */
 function DndDraggable<TData = unknown>({

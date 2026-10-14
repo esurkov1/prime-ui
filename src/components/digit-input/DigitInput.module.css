@@ -4,11 +4,14 @@
  * xs 36 · s 40 · m 48 · l 56 · xl 64 (the label and support row keep the field tier). Digits are
  * tabular and grow with the cell.
  * The label row and the support row come from FieldFrame; the frame hugs the cells.
- * `fullWidth`: one row without wrapping, cells share the width (flex 1) and keep the tier height.
+ * A code is always one row: a container narrower than the row narrows the cells (they keep the
+ * tier height) instead of wrapping a digit or a group onto a second line.
+ * `fullWidth`: cells share the width (flex 1) and keep the tier height.
  * `groupSize`: the first cell of every group gets an extra gap before it.
  */
 .frame {
   width: fit-content;
+  max-width: 100%;
 }
 
 .frame[data-full-width="true"] {
@@ -23,7 +26,6 @@
   --digit-cell-line-height: var(--prime-text-heading-s-line-height);
   position: relative;
   display: flex;
-  flex-wrap: wrap;
   gap: var(--digit-gap);
   min-width: 0;
   min-inline-size: 0;
@@ -31,10 +33,6 @@
   padding: 0;
   border: 0;
   font-family: var(--prime-font-family-sans);
-}
-
-.root[data-full-width="true"] {
-  flex-wrap: nowrap;
 }
 
 .root[data-size="xs"] {
@@ -73,7 +71,7 @@
   -webkit-appearance: none;
   appearance: none;
   box-sizing: border-box;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   width: var(--digit-cell);
   height: var(--digit-cell);
   min-width: 0;

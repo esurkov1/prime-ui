@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -92,6 +95,24 @@ describe("ExampleFrame", () => {
     expect(stage.style.getPropertyValue("--matrix-columns")).toBe("3");
   });
 
+  it("wraps the rows of a matrix whose column grid is wider than the stage", () => {
+    // jsdom has no layout: the stage reports a grid 600 wide in a 343 frame.
+    const scroll = vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(600);
+    const client = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(343);
+    render(
+      <ExampleFrame code="" previewLayout="matrix">
+        <div data-testid="row">
+          <div>xs</div>
+          <div>xl</div>
+        </div>
+      </ExampleFrame>,
+    );
+    const stage = screen.getByTestId("row").parentElement as HTMLElement;
+    expect(stage).toHaveAttribute("data-matrix-wrap");
+    scroll.mockRestore();
+    client.mockRestore();
+  });
+
   it("puts the stage on the page (layer 0) by default", () => {
     render(
       <ExampleFrame code="">
@@ -148,5 +169,22 @@ describe("ExampleFrame", () => {
     expect(await screen.findByRole("button", { name: "Скопировано" })).toBe(button);
     expect(writeText).toHaveBeenCalledWith("const a = 1;");
     expect(icon).toHaveAttribute("data-copy-state", "copied");
+  });
+
+  it("stretches a preview block only by a zero-specificity width, so an example's own width wins", () => {
+    const css = readFileSync(
+      path.resolve(process.cwd(), "src/components/example-frame/ExampleFrame.module.css"),
+      "utf8",
+    );
+    const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(
+      ([, selector, body]) =>
+        selector.includes("[data-preview-stretch]") && /(^|[\s;])width\s*:/.test(body),
+    );
+    expect(rules.length).toBeGreaterThan(0);
+    for (const [, selector] of rules) {
+      for (const part of selector.replace(/\/\*[\s\S]*?\*\//g, "").split(",")) {
+        expect(part.trim()).toMatch(/^:where\(.+\) > :where\(.+\)$/);
+      }
+    }
   });
 });

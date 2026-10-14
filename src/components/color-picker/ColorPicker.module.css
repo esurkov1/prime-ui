@@ -143,6 +143,7 @@
   width: 100%;
   min-width: 0;
   height: var(--prime-control-m-height);
+  container-type: inline-size;
 }
 
 .channelStripLead {
@@ -204,6 +205,18 @@
 .channelSuffix {
   flex-shrink: 0;
   color: var(--prime-color-text-muted);
+}
+
+/* A strip narrower than four full cells (a 320–375px screen): the values keep their digits — the
+   cells drop the unit (the field's name still says it) and take the compact inset. */
+@container (max-width: 17.5rem) {
+  .channelCell:not(.channelCellHex) {
+    padding-inline: var(--prime-space-1);
+  }
+
+  .channelSuffix {
+    display: none;
+  }
 }
 
 /* ---- Standalone eyedropper: square, same height as a field ---- */

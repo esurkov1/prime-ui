@@ -149,3 +149,8 @@
 .swatch[data-contrast="dark"] .check {
   color: var(--prime-color-palette-yellow-solid-fg);
 }
+
+/* «No color»: the checkerboard is the surface's own fills, so the mark follows the theme. */
+.swatch[data-contrast="surface"] .check {
+  color: var(--prime-color-text-primary);
+}
