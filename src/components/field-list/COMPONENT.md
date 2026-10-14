@@ -123,9 +123,10 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 
 - The rows are an `<ol>` named by the list `label` (`aria-labelledby`); the list gives each row its position.
 - The heading row is `aria-hidden`: each field in a cell carries its column heading as its own label, read but not shown on wide rows.
+- The `<ol>` is described by the list's `hint` and `error` (`aria-describedby`), which speak for every row.
 - In a narrow container the heading row goes and each field's label shows above it.
 - The remove button is «Удалить {row}», the handle «Переместить {row}»: the row's name from `getLabel`, else its number.
-- A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is an image named «Закреплена».
+- A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is Dnd's lock (an image named «Закреплена»).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -165,5 +166,5 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 - A grip, a remove button and an add button drawn by hand around a `.map()` of fields → FieldList.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (add, remove), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`), [Label](../label/COMPONENT.md) (headings), `Icon` (lock), the field frame (label, hint, error), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Button](../button/COMPONENT.md) (add, remove), [Dnd](../dnd/COMPONENT.md) (`reorderable`: `Dnd.Sortable`, `Dnd.Handle`; the lock of a pinned row), [Label](../label/COMPONENT.md) (headings), the field frame (label, hint, error), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md) (icon-only trigger), [ColorPicker](../color-picker/COMPONENT.md) (`ColorPresets`), [Fieldset](../fieldset/COMPONENT.md), [DataTable](../data-table/COMPONENT.md)

@@ -197,9 +197,12 @@ describe("FieldList", () => {
     for (const button of screen.getAllByRole("button")) expect(button).toBeDisabled();
   });
 
-  it("shows the list error under the list and describes nothing else by it", () => {
-    render(<Lines error="Добавьте хотя бы одну позицию" />);
+  it("shows the list error under the list and describes the list by its hint and error", () => {
+    render(<Lines hint="Цены без НДС" error="Добавьте хотя бы одну позицию" />);
     expect(screen.getByText("Добавьте хотя бы одну позицию")).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Позиции счёта" })).toHaveAccessibleDescription(
+      /Добавьте хотя бы одну позицию/,
+    );
   });
 
   it("names the list by aria-label when no visible label names it", () => {

@@ -106,15 +106,6 @@
   height: var(--field-h);
 }
 
-.lock {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--field-icon);
-  height: var(--field-icon);
-  color: var(--prime-color-text-muted);
-}
-
 .add {
   display: flex;
   flex-wrap: wrap;
@@ -136,7 +127,8 @@
  * Narrow container: no heading row; a row is [lead] [its fields in one column] [remove], rows a
  * group apart so each record reads as one block.
  */
-@container prime-field-list (max-width: 479px) {
+/* The width FieldFrame shows a cell field's own label at (`FieldFrame.module.css`). */
+@container prime-field-list (max-width: 29.9375rem) {
   .head {
     display: none;
   }

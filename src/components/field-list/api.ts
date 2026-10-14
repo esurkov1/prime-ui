@@ -199,6 +199,10 @@ export const api: ComponentApi = {
         ru: "Заголовки столбцов видны один раз и скрыты от скринридеров (`aria-hidden`): каждое поле в ячейке получает подпись своего столбца как собственную, читаемую, но не видимую на широких строках.",
       },
       {
+        en: "The `<ol>` is described by the list's `hint` and `error` (`aria-describedby`), which speak for every row.",
+        ru: "`<ol>` описан `hint` и `error` списка (`aria-describedby`): они относятся ко всем строкам.",
+      },
+      {
         en: "In a narrow container the heading row goes and each field's label shows above it.",
         ru: "В узком контейнере заголовки уходят, и подпись каждого поля показывается над ним.",
       },
@@ -207,8 +211,8 @@ export const api: ComponentApi = {
         ru: "Кнопка удаления — «Удалить {row}», ручка — «Переместить {row}»: имя строки из `getLabel` или её номер.",
       },
       {
-        en: "A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is an image named «Закреплена».",
-        ru: "Закреплённая строка — замок вместо ручки, без кнопки удаления; без `reorderable` замок — изображение с именем «Закреплена».",
+        en: "A pinned row has a lock in place of the handle and no remove button; without `reorderable` the lock is Dnd's lock (an image named «Закреплена»).",
+        ru: "Закреплённая строка — замок вместо ручки, без кнопки удаления; без `reorderable` замок — замок Dnd (изображение с именем «Закреплена»).",
       },
     ],
   },
