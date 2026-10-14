@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { iconBoxStyles as styles } from "@/internal/iconBox";
 
 import { Spinner } from "./Spinner";
@@ -60,5 +61,10 @@ describe("Spinner", () => {
     expect(screen.getByTestId("s")).not.toHaveAttribute("data-tone");
     rerender(<Spinner data-testid="s" tone="muted" />);
     expect(screen.getByTestId("s")).toHaveAttribute("data-tone", "muted");
+  });
+
+  it("fades itself in when it appears", () => {
+    render(<Spinner data-testid="s" />);
+    expect(screen.getByTestId("s")).toHaveClass(enterMotion.enterFade);
   });
 });

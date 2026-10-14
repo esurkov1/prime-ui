@@ -1,4 +1,4 @@
-/** A loading status next to a short explanation; the spinner takes the text color. */
+/** A loading status next to a short explanation; the spinner takes the text color and names the wait — `labels`. */
 import { Spinner, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
