@@ -138,8 +138,10 @@
   background: var(--prime-color-layer-current);
   color: var(--prime-color-text-secondary);
   box-shadow: var(--prime-shadow-overlay);
-  translate: -50% calc(-1 * min(var(--composer-lift, 0px), var(--prime-space-12)) / 2);
+  translate: -50% calc(min(var(--composer-lift), var(--prime-space-12)) / -2);
   pointer-events: none;
+  /* The snap turns it accent as it leaves. */
+  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .lock[data-state="closed"] {
@@ -151,7 +153,7 @@
 
 .lockArrow {
   display: flex;
-  translate: 0 calc(-1 * min(var(--composer-lift, 0px), var(--prime-space-12)) / 2);
+  translate: 0 calc(min(var(--composer-lift), var(--prime-space-12)) / -2);
 }
 
 /*
@@ -229,7 +231,7 @@
   line-height: var(--field-lh);
   white-space: nowrap;
   color: var(--prime-color-text-secondary);
-  translate: calc(-1 * var(--composer-slide, 0px)) 0;
+  translate: calc(var(--composer-slide) * -1) 0;
   opacity: calc(1 - var(--composer-slide-progress, 0));
 }
 
@@ -285,8 +287,8 @@
   height: 100%;
   border-radius: var(--prime-radius-full);
   object-fit: cover;
-  /* A selfie camera reads as a mirror. */
-  transform: scaleX(-1);
+  /* A selfie camera reads as a mirror: the picture turned over about its vertical axis. */
+  rotate: y 180deg;
   opacity: 0;
   transition: opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
@@ -346,12 +348,4 @@
 
 .description {
   color: var(--prime-color-text-secondary);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* Status loops stand still (durations collapse to 0, an infinite loop would flicker); the
-     waveform still shows the level, without its scroll tween. */
-  .dot {
-    animation: none;
-  }
 }
