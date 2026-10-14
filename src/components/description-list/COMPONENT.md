@@ -40,6 +40,7 @@ DescriptionList.Root                 <dl>; size (host tier), orientation; a size
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Label and value type and the gap between pairs; without it the list takes the tier of a sized host (a Drawer, a Modal). |
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | `horizontal` — the label in a column beside its value (one third of the width), stacking below 24rem of the list's own width; `vertical` — the label above its value at any width. |
+| `align` | `"start" \| "end"` | `"start"` | `start` — values from the start of their column; `end` — each value at the end of its row in tabular figures, at any width: a summary of amounts (subtotal, tax, total). |
 | `labels` | `Partial<DescriptionListLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDListElement>` | — | `className`, `id`, `data-*` and the other attributes of the element. |
 
@@ -70,6 +71,13 @@ DescriptionList.Root                 <dl>; size (host tier), orientation; a size
 | `horizontal` | the label in a column (one third of the width) beside the value; stacked below 24rem of the list's width | record details in a card or a page | yes |
 | `vertical` | the label above its value at any width | a narrow side panel, a summary of a few long values | |
 
+### align
+
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `start` | each value from the start of its column | record details | yes |
+| `end` | the label at the start, the value at the end of the row in tabular figures, at any width | a summary of amounts: subtotal, tax, the amount due | |
+
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -80,8 +88,8 @@ DescriptionList.Root                 <dl>; size (host tier), orientation; a size
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| size / orientation | props, the host tier | `data-size`, `data-orientation` on the `<dl>` |
-| narrow | the list narrower than 24rem (container query) | each pair stacks: the label above its value |
+| size / orientation / align | props, the host tier | `data-size`, `data-orientation`, `data-align` (`end` only) on the `<dl>` |
+| narrow | the list narrower than 24rem (container query) | each pair stacks: the label above its value (not with `align="end"`) |
 | empty value | `children` is `null`, `""` or `false` | `data-empty` on the `<dd>`; muted `labels.empty`, spoken `labels.emptyText` |
 
 No motion: the list is static text; a row action has the Button's own press and hover.
@@ -124,14 +132,16 @@ No motion: the list is static text; a row action has the Button's own press and 
 | [sizes.tsx](examples/sizes.tsx) | Every tier changes the label and value type and the gap between pairs — `size`. |
 | [structure.tsx](examples/structure.tsx) | Optional pieces of a pair: a Badge or a link as the value, a row action that is a link and an empty value with its own mark — `DescriptionList.ItemAction`, `asChild`, `labels`. |
 | [vertical.tsx](examples/vertical.tsx) | Labels above their values at any width, for a side panel of a record — `orientation`. |
+| [totals.tsx](examples/totals.tsx) | The totals of an invoice: every amount at the end of its row in tabular figures, the amount due a step larger — `align`. |
 | [narrow.tsx](examples/narrow.tsx) | In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap — `DescriptionList.Item`, `label`. |
-| [screen.tsx](examples/screen.tsx) | A nested record: the path, the title with its status and due date and the record's actions by weight in the app header, a main column with the line items and a side column with the client's details and the history — `orientation`. |
+| [screen.tsx](examples/screen.tsx) | A nested record: the path, the title with its status and due date and the record's actions by weight in the app header, a main column with the line items and their totals and a side column with the client's details and the history — `align`, `orientation`. |
 
 ## Mistakes
 - A grid of `Typography` pairs or a two-column table for record details → `DescriptionList`: the `<dl>` semantics and the stacking come with it.
 - `""` or «—» typed by hand for a missing value → pass nothing; the list shows `labels.empty` and speaks `labels.emptyText`.
 - A copy button placed after the list or inside the label → `DescriptionList.ItemAction` inside the item, at the end of its value.
 - A viewport media query to stack the pairs → the list adapts to its own width already.
+- A hand-made `<dl>` with `justify-content: space-between` for invoice totals → `align="end"`.
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md) (`ItemAction`), [Tooltip](../tooltip/COMPONENT.md) (the action's `label`), [VisuallyHidden](../visually-hidden/COMPONENT.md)

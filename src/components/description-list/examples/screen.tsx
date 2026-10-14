@@ -1,4 +1,4 @@
-/** A nested record: the path, the title with its status and due date and the record's actions by weight in the app header, a main column with the line items and a side column with the client's details and the history — `orientation`. */
+/** A nested record: the path, the title with its status and due date and the record's actions by weight in the app header, a main column with the line items and their totals and a side column with the client's details and the history — `align`, `orientation`. */
 import {
   AppHeader,
   Avatar,
@@ -129,33 +129,25 @@ export default function DescriptionListScreenExample() {
                 paging="none"
                 highlightRowOnHover={false}
               />
-              {/* Totals line up with the «Сумма» column of the table above: a layout of its own. */}
-              <dl className={styles.totals}>
+              {/* The totals end where the «Сумма» column of the table above ends. */}
+              <DescriptionList.Root align="end" className={styles.totals}>
                 {TOTALS.map((row) => (
-                  <div key={row.label} className={styles.totalRow}>
-                    <dt>
-                      <Typography variant="body-m" tone="secondary">
-                        {row.label}
-                      </Typography>
-                    </dt>
-                    <dd>
-                      <Typography variant="body-m" className={styles.amount}>
-                        {row.value}
-                      </Typography>
-                    </dd>
-                  </div>
+                  <DescriptionList.Item key={row.label} label={row.label}>
+                    {row.value}
+                  </DescriptionList.Item>
                 ))}
-                <div className={styles.totalRow}>
-                  <dt>
-                    <Typography variant="title-m">К оплате</Typography>
-                  </dt>
-                  <dd>
-                    <Typography variant="title-m" className={styles.amount}>
-                      {MONEY.format(NET + VAT)}
+                <DescriptionList.Item
+                  label={
+                    <Typography as="span" variant="title-m">
+                      К оплате
                     </Typography>
-                  </dd>
-                </div>
-              </dl>
+                  }
+                >
+                  <Typography as="span" variant="title-m" numeric="tabular">
+                    {MONEY.format(NET + VAT)}
+                  </Typography>
+                </DescriptionList.Item>
+              </DescriptionList.Root>
             </PageContent.Section>
             <aside className={styles.aside} aria-label="Клиент и история">
               <Card.Root variant="panel">

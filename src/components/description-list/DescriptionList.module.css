@@ -3,13 +3,10 @@
  * list puts each label in a column beside its value (one third of the width) and stacks the pair
  * once the list is narrower than 24rem; a vertical list always stacks. Labels wear the tier's
  * label type in secondary ink, values the tier's text in primary ink and wrap anywhere. Air, not
- * lines, separates the pairs.
+ * lines, separates the pairs. The type comes from the tier table (`fieldTierClass` joined in TSX):
+ * labels read `--field-label-*`, values `--field-text` / `--field-lh`.
  */
 .root {
-  --dl-label-size: var(--prime-control-m-label-size);
-  --dl-label-line-height: var(--prime-control-m-label-line-height);
-  --dl-text-size: var(--prime-control-m-text-size);
-  --dl-line-height: var(--prime-control-m-line-height);
   --dl-row-gap: var(--prime-space-3);
 
   container-type: inline-size;
@@ -21,35 +18,13 @@
   font-family: var(--prime-font-family-sans);
 }
 
-.root[data-size="xs"] {
-  --dl-label-size: var(--prime-control-xs-label-size);
-  --dl-label-line-height: var(--prime-control-xs-label-line-height);
-  --dl-text-size: var(--prime-control-xs-text-size);
-  --dl-line-height: var(--prime-control-xs-line-height);
-  --dl-row-gap: var(--prime-space-2);
-}
-
+.root[data-size="xs"],
 .root[data-size="s"] {
-  --dl-label-size: var(--prime-control-s-label-size);
-  --dl-label-line-height: var(--prime-control-s-label-line-height);
-  --dl-text-size: var(--prime-control-s-text-size);
-  --dl-line-height: var(--prime-control-s-line-height);
   --dl-row-gap: var(--prime-space-2);
 }
 
-.root[data-size="l"] {
-  --dl-label-size: var(--prime-control-l-label-size);
-  --dl-label-line-height: var(--prime-control-l-label-line-height);
-  --dl-text-size: var(--prime-control-l-text-size);
-  --dl-line-height: var(--prime-control-l-line-height);
-  --dl-row-gap: var(--prime-space-4);
-}
-
+.root[data-size="l"],
 .root[data-size="xl"] {
-  --dl-label-size: var(--prime-control-xl-label-size);
-  --dl-label-line-height: var(--prime-control-xl-label-line-height);
-  --dl-text-size: var(--prime-control-xl-text-size);
-  --dl-line-height: var(--prime-control-xl-line-height);
   --dl-row-gap: var(--prime-space-4);
 }
 
@@ -71,11 +46,23 @@
   }
 }
 
+/* `align="end"`: the label at the start, the value at the end of the row at any width — a summary
+   of amounts reads down its end edge. */
+.root[data-align="end"] .item {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.root[data-align="end"] .value {
+  justify-content: flex-end;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
 .label {
   min-width: 0;
   color: var(--prime-color-text-secondary);
-  font-size: var(--dl-label-size);
-  line-height: var(--dl-label-line-height);
+  font-size: var(--field-label-size);
+  line-height: var(--field-label-lh);
   overflow-wrap: anywhere;
 }
 
@@ -86,8 +73,8 @@
   min-width: 0;
   margin: 0;
   color: var(--prime-color-text-primary);
-  font-size: var(--dl-text-size);
-  line-height: var(--dl-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
 }
 
 .text {
@@ -107,5 +94,5 @@
   flex-shrink: 0;
   align-self: flex-start;
   align-items: center;
-  height: var(--dl-line-height);
+  height: var(--field-lh);
 }

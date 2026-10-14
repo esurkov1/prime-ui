@@ -1,9 +1,10 @@
 import * as React from "react";
 
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { RowAction } from "@/internal/RowAction";
 import type { ControlSize } from "@/internal/states";
 
@@ -27,6 +28,12 @@ export const DESCRIPTION_LIST_LABELS: DescriptionListLabels = {
  */
 export type DescriptionListOrientation = "horizontal" | "vertical";
 
+/**
+ * `start` — values in their column from its start edge; `end` — each value at the end of its row
+ * in tabular figures, the label at the start (a summary of amounts).
+ */
+export type DescriptionListAlign = "start" | "end";
+
 type Ctx = { size: ControlSize; labels: DescriptionListLabels };
 
 const DescriptionListContext = React.createContext<Ctx>({
@@ -35,10 +42,9 @@ const DescriptionListContext = React.createContext<Ctx>({
 });
 
 export type DescriptionListRootProps = React.HTMLAttributes<HTMLDListElement> & {
-  /** Text and spacing tier. Default: the host tier (a Card, a Drawer form), else `m`. */
   size?: ControlSize;
-  /** Default `horizontal`. */
   orientation?: DescriptionListOrientation;
+  align?: DescriptionListAlign;
   labels?: Partial<DescriptionListLabels>;
   ref?: React.Ref<HTMLDListElement>;
 };
@@ -47,23 +53,23 @@ export type DescriptionListRootProps = React.HTMLAttributes<HTMLDListElement> & 
 function DescriptionListRoot({
   size: sizeProp,
   orientation = "horizontal",
+  align = "start",
   labels,
   className,
   children,
   ...rest
 }: DescriptionListRootProps) {
-  const hostSize = useOptionalControlSize();
-  const size = sizeProp ?? hostSize ?? "m";
+  const { size, provide } = useHostTier(sizeProp);
   return (
     <dl
       {...rest}
-      className={cx(styles.root, className)}
-      {...toDataAttributes({ size, orientation })}
+      className={cx(fieldTierClass, styles.root, className)}
+      {...toDataAttributes({ size, orientation, align: align === "end" ? align : undefined })}
     >
       <DescriptionListContext.Provider
         value={{ size, labels: { ...DESCRIPTION_LIST_LABELS, ...labels } }}
       >
-        <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
+        {provide(children)}
       </DescriptionListContext.Provider>
     </dl>
   );
@@ -71,12 +77,7 @@ function DescriptionListRoot({
 DescriptionListRoot.displayName = "DescriptionList.Root";
 
 export type DescriptionListItemProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /** The visible name of the value (`<dt>`). */
   label: React.ReactNode;
-  /**
-   * The value (`<dd>`) and an optional `DescriptionList.ItemAction`. No value (`null`, `""`,
-   * `false`) shows `labels.empty`.
-   */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -119,7 +120,6 @@ export type DescriptionListItemActionProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "children"
 > & {
-  /** Accessible name and tooltip of the action («Копировать», «Позвонить»). */
   label: string;
   children: React.ReactNode;
   asChild?: boolean;
