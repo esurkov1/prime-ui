@@ -96,7 +96,9 @@ function kitNames(): string[] {
         if (/^[A-Za-z]\w*$/.test(name)) names.add(name);
       }
     }
-    for (const m of source.matchAll(/^export (?:async )?(?:function|const|class) ([A-Za-z]\w*)/gm)) {
+    for (const m of source.matchAll(
+      /^export (?:async )?(?:function|const|class) ([A-Za-z]\w*)/gm,
+    )) {
       names.add(m[1]);
     }
     for (const m of source.matchAll(/^export \* from "([^"]+)";$/gm)) {
