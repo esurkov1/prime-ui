@@ -20,7 +20,7 @@ import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch, matchIndex } from "@/internal/HighlightMatch";
 import { usePartPresence } from "@/internal/partPresence";
-import { type ControlSize, stepDown, tierMappings } from "@/internal/states";
+import { type ControlSize, stepDown } from "@/internal/states";
 
 import {
   canExcludeValue,
@@ -702,8 +702,8 @@ type ValueToggleProps = {
   onMode: (mode: SmartFilterMode) => void;
 };
 
-/** Tags stay readable: the value-tag tier of the row. */
-const tagSizeOf = (size: ControlSize): ControlSize => tierMappings.valueTag[size];
+/** Tags stay readable: an xs Badge is too small for «Поле: значение», so the floor is s. */
+const tagSizeOf = (size: ControlSize): ControlSize => (size === "xs" ? "s" : size);
 
 /**
  * A value is a pressable Badge: gray, pressed (the selected look) = shown, red with «НЕ» = hidden.
