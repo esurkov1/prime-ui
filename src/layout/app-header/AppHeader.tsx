@@ -117,12 +117,15 @@ AppHeaderDescription.displayName = "AppHeader.Description";
 
 export type AppHeaderSeparatorProps = Omit<
   DividerProps,
-  "orientation" | "children" | "align" | "size"
+  "orientation" | "children" | "align" | "size" | "inset"
 >;
 
-/** A short vertical line between groups in a zone (a back button | the path), with air on both sides. */
+/**
+ * A short vertical line between groups in a zone (a back button | the path), with air on both
+ * sides: the inset vertical Divider, one text line tall.
+ */
 function AppHeaderSeparator({ className, ...rest }: AppHeaderSeparatorProps) {
-  return <Divider {...rest} orientation="vertical" className={cx(styles.separator, className)} />;
+  return <Divider {...rest} orientation="vertical" inset className={className} />;
 }
 AppHeaderSeparator.displayName = "AppHeader.Separator";
 
