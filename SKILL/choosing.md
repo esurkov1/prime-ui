@@ -91,7 +91,7 @@ the transcript and the `transfer` set); only VoicePlayer has `waveform` and a ra
 comment, a report) → `Gallery`; one picture of an object → `Thumbnail`. A video with controls →
 `Message.Media` or `Thumbnail.Video`, not VideoNote. «Печатает…» → `Chat.Root typing` (or
 `Message.Typing`), never a text row; a jump to a message → `Message.Reply target`, `Chat.Pinned` or
-`Chat.Root current`, never `scrollIntoView`; search inside a chat → `Chat.Search`. Files, photos,
+`Chat.Root jumpTo`, never `scrollIntoView`; search inside a chat → `Chat.Search`. Files, photos,
 places and contacts sent in a chat → the `Message` parts, not FileUpload rows or Cards.
 
 **Status and loading.** See the pair below. Progress of a single task → ProgressBar `value`; parts of a whole →
