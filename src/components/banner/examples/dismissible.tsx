@@ -1,18 +1,34 @@
-/** The parent owns visibility: the close button calls back and the parent unmounts the banner; the button name comes from labels — `onDismiss`, `labels`. */
-import { Banner, Button, Icon } from "prime-ui-kit";
+/** The parent owns visibility: the close button calls back, the banner closes up and focus moves to the restore button; the button name comes from labels — `onDismiss`, `labels`. */
+import { Banner, Button, Crossfade, Icon } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
 export default function BannerDismissibleExample() {
   const [visible, setVisible] = React.useState(true);
+  const bannerRef = React.useRef<HTMLDivElement>(null);
+  const restoreRef = React.useRef<HTMLButtonElement>(null);
+  const toggled = React.useRef(false);
+
+  // The pressed button leaves with its block: focus goes to the control that takes its place.
+  React.useEffect(() => {
+    if (!toggled.current) return;
+    if (visible) bannerRef.current?.querySelector("button")?.focus();
+    else restoreRef.current?.focus();
+  }, [visible]);
+
+  const toggle = (next: boolean) => {
+    toggled.current = true;
+    setVisible(next);
+  };
 
   return (
-    <div className={styles.stack}>
+    <Crossfade state={visible ? "banner" : "restore"} className={styles.region}>
       {visible ? (
         <Banner.Root
+          ref={bannerRef}
           tone="accent"
-          onDismiss={() => setVisible(false)}
+          onDismiss={() => toggle(false)}
           labels={{ dismiss: "Скрыть объявление" }}
         >
           <Banner.Content>
@@ -24,15 +40,10 @@ export default function BannerDismissibleExample() {
           </Banner.Content>
         </Banner.Root>
       ) : (
-        <Button.Root
-          variant="outline"
-          tone="neutral"
-          className={styles.restore}
-          onClick={() => setVisible(true)}
-        >
+        <Button.Root ref={restoreRef} variant="outline" tone="neutral" onClick={() => toggle(true)}>
           Вернуть баннер
         </Button.Root>
       )}
-    </div>
+    </Crossfade>
   );
 }

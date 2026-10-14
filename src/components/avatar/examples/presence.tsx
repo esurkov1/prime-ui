@@ -1,4 +1,4 @@
-/** A presence dot on the avatar edge, announced by its state name — `Avatar.Status`, `labels`. */
+/** A presence dot on the avatar edge: each state has its own shape and color and is announced by its name — `Avatar.Status`, `labels`. */
 import { Avatar, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

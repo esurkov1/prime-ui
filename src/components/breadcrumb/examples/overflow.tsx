@@ -1,4 +1,4 @@
-/** A long path: levels truncate, and in a 320px container the middle ones collapse into «…», which screen readers announce as hidden levels. */
+/** A long path: levels truncate, and in a 320px container the middle ones collapse into «…», which screen readers announce as hidden levels — `Breadcrumb.Item`, `current`. */
 import { Breadcrumb } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

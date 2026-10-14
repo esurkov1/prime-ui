@@ -1,10 +1,13 @@
 import * as React from "react";
 
 import { Button } from "@/components/button/Button";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import enterMotion from "@/internal/enterMotion.module.css";
+import { leaveInPlace } from "@/internal/leaveInPlace";
 import type { ControlSize, Tone, Variant } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
@@ -52,7 +55,10 @@ export type BannerRootProps = React.HTMLAttributes<HTMLDivElement> & {
    * page content column.
    */
   placement?: "inset" | "page";
-  /** Renders a close button and calls this on its click. */
+  /**
+   * Renders a close button and calls this on its click. The parent unmounts the banner; it closes
+   * up in place, and the parent moves focus somewhere sensible.
+   */
   onDismiss?: () => void;
   labels?: Partial<BannerLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -67,8 +73,19 @@ function BannerRoot({
   labels,
   className,
   children,
+  ref,
   ...rest
 }: BannerRootProps) {
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const mergedRef = useMergedRefs(rootRef, ref);
+  // Unmounted by its parent (dismissed, condition gone): a copy closes up in place, so the content
+  // below glides up instead of jumping.
+  React.useLayoutEffect(() => {
+    const node = rootRef.current;
+    return () => {
+      if (node) leaveInPlace(node, "block");
+    };
+  }, []);
   const dismissLabel = labels?.dismiss ?? BANNER_LABELS.dismiss;
   const context = React.useMemo<BannerContextValue>(
     () => ({ onDismiss, size, dismissLabel }),
@@ -81,7 +98,8 @@ function BannerRoot({
   return (
     <div
       {...rest}
-      className={cx(styles.root, className)}
+      ref={mergedRef}
+      className={cx(styles.root, enterMotion.enter, className)}
       data-depth={depth}
       {...toDataAttributes({ variant, tone, size, placement })}
     >

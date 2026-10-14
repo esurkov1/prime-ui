@@ -1,4 +1,4 @@
-/** Below 36rem of its own width the banner moves the actions under the text. */
+/** Below 36rem of its own width the banner moves the actions under the text — `Banner.Actions`. */
 import { Banner, Button, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

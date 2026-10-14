@@ -123,7 +123,7 @@ Root attributes: `data-size`, `data-collapsible` (`"true"` / `"false"`).
 | [overview.tsx](examples/overview.tsx) | The path to this page: links to the levels above and the current page last — `href`, `current`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; text and chevrons follow the control tier — `size`. |
 | [with-icon.tsx](examples/with-icon.tsx) | The root level as a home icon; a link without text is named for screen readers — `aria-label`. |
-| [overflow.tsx](examples/overflow.tsx) | A long path: levels truncate, and in a 320px container the middle ones collapse into «…», which screen readers announce as hidden levels. |
+| [overflow.tsx](examples/overflow.tsx) | A long path: levels truncate, and in a 320px container the middle ones collapse into «…», which screen readers announce as hidden levels — `Breadcrumb.Item`, `current`. |
 | [ellipsis.tsx](examples/ellipsis.tsx) | Levels skipped on purpose shown as «…» with hidden text for screen readers — `Breadcrumb.Ellipsis`. |
 
 ## Mistakes

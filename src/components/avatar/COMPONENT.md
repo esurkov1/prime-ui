@@ -67,7 +67,7 @@ Avatar.Group           overlapping row, gives its size to members
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `status` | `"online" \| "offline" \| "away" \| "busy"` | — (required) | Presence state: green, gray, warning or danger dot. |
+| `status` | `"online" \| "offline" \| "away" \| "busy"` | — (required) | Presence state, told by shape and color: `online` a full green dot, `away` a warning crescent, `busy` a danger dot with a bar, `offline` a hollow gray ring. |
 | `labels` | `Partial<AvatarStatusLabels>` | — | Accessible names of the states, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
@@ -129,7 +129,7 @@ No keyboard interaction.
 
 ### ARIA
 - `Avatar.Image` `alt`: empty when the name is written next to it, otherwise the name. Without a photo and without a name nearby, put `aria-label` on `Avatar.Root`.
-- `Avatar.Status` is `role="img"` with `aria-label` from `labels`.
+- `Avatar.Status` is `role="img"` with `aria-label` from `labels`. Every state has its own shape (full dot, crescent, dot with a bar, hollow ring), so presence never rests on color alone.
 - `Avatar.Group` is `role="group"`; give it `aria-label`. Give `Avatar.Overflow` an `aria-label` («Ещё 3 участника»).
 
 ### Labels
@@ -148,8 +148,8 @@ No keyboard interaction.
 | [overview.tsx](examples/overview.tsx) | A photo with initials underneath while it loads, and initials alone — `Avatar.Image`, `Avatar.Fallback`. |
 | [variants.tsx](examples/variants.tsx) | Every palette hue of the fallback; derive it from a stable user id — `color`. |
 | [sizes.tsx](examples/sizes.tsx) | Every diameter, 20 to 64 px; initials take 40% of it — `size`. |
-| [states.tsx](examples/states.tsx) | A loaded photo, a broken URL that falls back to initials, and an icon fallback for a guest. |
-| [presence.tsx](examples/presence.tsx) | A presence dot on the avatar edge, announced by its state name — `Avatar.Status`, `labels`. |
+| [states.tsx](examples/states.tsx) | A loaded photo, a broken URL that falls back to initials, and an icon fallback for a guest — `Avatar.Image`, `Avatar.Fallback`. |
+| [presence.tsx](examples/presence.tsx) | A presence dot on the avatar edge: each state has its own shape and color and is announced by its name — `Avatar.Status`, `labels`. |
 | [team-group.tsx](examples/team-group.tsx) | Project members as an overlapping row with a «+N» cell; the group size goes to every member — `Avatar.Group`, `Avatar.Overflow`, `size`. |
 | [src-from-state.tsx](examples/src-from-state.tsx) | A new photo source restarts loading; initials show until the new photo arrives — `src`. |
 

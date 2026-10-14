@@ -1,4 +1,4 @@
-/** A loaded photo, a broken URL that falls back to initials, and an icon fallback for a guest. */
+/** A loaded photo, a broken URL that falls back to initials, and an icon fallback for a guest — `Avatar.Image`, `Avatar.Fallback`. */
 import { Avatar, Icon, Typography } from "prime-ui-kit";
 
 const PHOTO = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=128&h=128&fit=crop";

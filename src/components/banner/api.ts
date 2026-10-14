@@ -38,8 +38,8 @@ export const api: ComponentApi = {
         {
           name: "onDismiss",
           type: "() => void",
-          en: "Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner.",
-          ru: "Рендерит кнопку закрытия (в углу или последней в `Banner.Actions`) и вызывается по клику; родитель убирает баннер.",
+          en: "Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner, which closes up in place, and moves focus to a sensible place.",
+          ru: "Рендерит кнопку закрытия (в углу или последней в `Banner.Actions`) и вызывается по клику; родитель убирает баннер — он схлопывается на месте — и переводит фокус в разумное место.",
         },
         {
           name: "labels",

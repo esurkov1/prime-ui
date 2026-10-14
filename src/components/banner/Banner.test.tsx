@@ -1,5 +1,8 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+
+import enterMotion from "@/internal/enterMotion.module.css";
 
 import { Banner } from "./Banner";
 import styles from "./Banner.module.css";
@@ -74,6 +77,37 @@ describe("Banner", () => {
 
     fireEvent.click(dismiss);
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("reaches the close button with Tab and dismisses with Enter and Space", async () => {
+    const user = userEvent.setup();
+    const onDismiss = vi.fn();
+    render(
+      <Banner.Root onDismiss={onDismiss} labels={{ dismiss: "Скрыть объявление" }}>
+        <Banner.Content>
+          <Banner.Title>Тёмная тема</Banner.Title>
+        </Banner.Content>
+      </Banner.Root>,
+    );
+
+    await user.tab();
+    const close = screen.getByRole("button", { name: "Скрыть объявление" });
+    expect(close).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    await user.keyboard(" ");
+    expect(onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it("enters on mount and passes its ref to the block", () => {
+    const ref = { current: null as HTMLDivElement | null };
+    const { container } = render(
+      <Banner.Root ref={ref}>
+        <Banner.Content>X</Banner.Content>
+      </Banner.Root>,
+    );
+    expect(ref.current).toBe(container.firstElementChild);
+    expect(ref.current).toHaveClass(enterMotion.enter);
   });
 
   it("takes the close button name from labels", () => {

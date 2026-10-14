@@ -339,6 +339,15 @@ const CASES: Case[] = [
   ],
   ["ScrollContainer", "DIV", (ref) => <ScrollContainer ref={ref} />],
   [
+    "Banner.Root",
+    "DIV",
+    (ref) => (
+      <Banner.Root ref={ref}>
+        <Banner.Content>X</Banner.Content>
+      </Banner.Root>
+    ),
+  ],
+  [
     "PageContent.List",
     "DIV",
     (ref) => (

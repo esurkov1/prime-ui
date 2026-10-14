@@ -78,8 +78,8 @@ export const api: ComponentApi = {
           name: "status",
           type: '"online" | "offline" | "away" | "busy"',
           required: true,
-          en: "Presence state: green, gray, warning or danger dot.",
-          ru: "Состояние: зелёная, серая, жёлтая или красная точка.",
+          en: "Presence state, told by shape and color: `online` a full green dot, `away` a warning crescent, `busy` a danger dot with a bar, `offline` a hollow gray ring.",
+          ru: "Состояние формой и цветом: `online` — сплошная зелёная точка, `away` — жёлтый полумесяц, `busy` — красная точка с чертой, `offline` — серое пустое кольцо.",
         },
         {
           name: "labels",

@@ -26,7 +26,7 @@
   width: min(100%, calc(var(--prime-space-20) * 4));
 }
 
-/* dismiss.tsx */
-.restore {
-  align-self: flex-start;
+/* dismissible.tsx: the swapped region takes the row's width. */
+.region {
+  width: 100%;
 }

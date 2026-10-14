@@ -46,7 +46,7 @@ Banner.Root                 <div>; variant, tone, size, placement
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"info"` | Semantic color of the message. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Spacing, icon and title follow the control tier; the description is one step smaller. |
 | `placement` | `"inset" \| "page"` | `"inset"` | `inset` — rounded block in the flow or in a card; `page` — edge-to-edge strip above a page, content aligned to the page column. |
-| `onDismiss` | `() => void` | — | Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner. |
+| `onDismiss` | `() => void` | — | Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner, which closes up in place, and moves focus to a sensible place. |
 | `labels` | `Partial<BannerLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` (`alert`, `status`, `region`), `aria-label` and the other div attributes. |
 
@@ -117,7 +117,7 @@ Banner.Root                 <div>; variant, tone, size, placement
 | dismissible | `onDismiss` | corner ghost Button (`xs`, `s` on `l` / `xl`), or the last outline Button in `Banner.Actions` |
 | narrow | own width < 36rem (a banner with `Banner.Actions` is a size container) | actions move under the text |
 
-No `open` prop: the parent mounts and unmounts the banner.
+No `open` prop: the parent mounts and unmounts the banner. A mounted banner enters (a short fade and rise); an unmounted one closes up in place, so the content below glides up instead of jumping. To swap the banner for another block in the same spot (a «restore» button), wrap both in [Crossfade](../crossfade/COMPONENT.md).
 
 ## Layout & spacing
 - `width: 100%`; text column capped at `--prime-layout-reading-max-width`.
@@ -134,7 +134,7 @@ No `open` prop: the parent mounts and unmounts the banner.
 ### ARIA
 - The banner has no role of its own: give an error after an action `role="alert"`, a calm status `role="status"`, a page strip `role="region"` with `aria-label`.
 - The icon is `aria-hidden`: the title carries the meaning, not the color.
-- The close button is named by `labels.dismiss`; after dismissing, move focus somewhere sensible.
+- The close button is named by `labels.dismiss`. It leaves with the banner, so after dismissing the parent moves focus to a sensible place: the control that takes the banner's spot, or the next heading or action of the section (see `dismissible.tsx`).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -150,9 +150,9 @@ No `open` prop: the parent mounts and unmounts the banner.
 | [variants.tsx](examples/variants.tsx) | Every treatment on every tone: soft by default, solid for urgent, outline for calm — `variant`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier: padding, icon and title follow the control tier, the description is one step smaller — `size`. |
 | [structure.tsx](examples/structure.tsx) | Optional parts: a one-line title, a title with a description, and actions where the close button joins the row — `Banner.Description`, `Banner.Actions`, `onDismiss`. |
-| [dismissible.tsx](examples/dismissible.tsx) | The parent owns visibility: the close button calls back and the parent unmounts the banner; the button name comes from labels — `onDismiss`, `labels`. |
+| [dismissible.tsx](examples/dismissible.tsx) | The parent owns visibility: the close button calls back, the banner closes up and focus moves to the restore button; the button name comes from labels — `onDismiss`, `labels`. |
 | [page-strip.tsx](examples/page-strip.tsx) | An edge-to-edge strip above a page and a rounded block inside a card — `placement`. |
-| [narrow.tsx](examples/narrow.tsx) | Below 36rem of its own width the banner moves the actions under the text. |
+| [narrow.tsx](examples/narrow.tsx) | Below 36rem of its own width the banner moves the actions under the text — `Banner.Actions`. |
 
 ## Mistakes
 - A hand-made × next to the banner → pass `onDismiss`.
@@ -162,4 +162,4 @@ No `open` prop: the parent mounts and unmounts the banner.
 
 ## Related
 - **Built from:** [Button](../button/COMPONENT.md) (close button), Icon (`action.close`)
-- **See also:** [Notification](../notification/COMPONENT.md), [Hint](../hint/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md)
+- **See also:** [Crossfade](../crossfade/COMPONENT.md), [Notification](../notification/COMPONENT.md), [Hint](../hint/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md), [Badge](../badge/COMPONENT.md)

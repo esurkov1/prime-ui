@@ -33,13 +33,14 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "states",
-      description: "Загруженное фото, битая ссылка с переходом на инициалы и иконка для гостя.",
+      description:
+        "Загруженное фото, битая ссылка с переходом на инициалы и иконка для гостя — `Avatar.Image`, `Avatar.Fallback`.",
     },
     {
       scenario: "presence",
       title: "Присутствие",
       description:
-        "Точка присутствия на краю аватара, читается названием состояния — `Avatar.Status`, `labels`.",
+        "Точка присутствия на краю аватара: у каждого состояния своя форма и цвет, читается названием состояния — `Avatar.Status`, `labels`.",
     },
     {
       scenario: "team-group",
@@ -59,7 +60,7 @@ export const page: ComponentPageConfig = {
     keyboard: [],
     aria: [
       "`alt` у `Avatar.Image` пустой, когда имя написано рядом, иначе — имя. Без фото и без имени рядом — `aria-label` на `Avatar.Root`.",
-      '`Avatar.Status` — `role="img"` с `aria-label` из `labels`.',
+      '`Avatar.Status` — `role="img"` с `aria-label` из `labels`. У каждого состояния своя форма (сплошная точка, полумесяц, точка с чертой, пустое кольцо): присутствие не передаётся одним цветом.',
       '`Avatar.Group` — `role="group"`, задайте ему `aria-label`; `Avatar.Overflow` — `aria-label` («Ещё 3 участника»).',
     ],
   },
