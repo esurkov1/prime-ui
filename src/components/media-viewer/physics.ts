@@ -57,11 +57,6 @@ export function decayVelocity(velocity: number, dt: number): number {
   return velocity * DECELERATION_RATE ** dt;
 }
 
-/** Where momentum from `velocity` comes to rest, measured from where it starts. */
-export function projectMomentum(velocity: number): number {
-  return (velocity * DECELERATION_RATE) / (1 - DECELERATION_RATE);
-}
-
 /**
  * Distance shown for `overshoot` px dragged past an edge of a `dimension`-long viewport: the iOS
  * curve, 1 : 1 at first, ever stiffer, never past the dimension.

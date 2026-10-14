@@ -2,6 +2,10 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { MessagePartProvider } from "@/internal/messagePart";
+import press from "@/internal/press.module.css";
+import { cssRule, cssValue } from "@/test/css";
+
 import { Gallery, type GalleryItem } from "./Gallery";
 import { type GalleryTile, itemRatio, layoutGallery } from "./layout";
 
@@ -197,19 +201,63 @@ describe("Gallery", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("presses as one album: the press lands on the root, never on a tile", () => {
+  it("presses as one album: the root gives, never a tile", () => {
     const { container } = render(<Gallery items={[photo(0), photo(1)]} />);
     const root = container.firstElementChild as HTMLElement;
     const tile = screen.getByRole("button", { name: "Открыть: Стеллаж 2" });
+    expect(root.className).toContain(press.press);
+    expect(tile.closest("[data-gallery-tile]")?.className).not.toContain(press.press);
+  });
+
+  it("in a message the message takes the press: pointer, Enter or Space on a tile", () => {
+    const onPress = vi.fn();
+    const { container } = render(
+      <MessagePartProvider value={{ spacer: null, overlay: null, neutralDepth: 1, press: onPress }}>
+        <Gallery items={[photo(0), photo(1)]} />
+      </MessagePartProvider>,
+    );
+    expect((container.firstElementChild as HTMLElement).className).not.toContain(press.press);
+    const tile = screen.getByRole("button", { name: "Открыть: Стеллаж 2" });
     fireEvent.pointerDown(tile);
-    expect(root).toHaveAttribute("data-pressed");
-    expect(tile.closest("[data-gallery-tile]")).not.toHaveAttribute("data-pressed");
+    expect(onPress).toHaveBeenLastCalledWith(true);
     fireEvent.pointerUp(tile);
-    expect(root).not.toHaveAttribute("data-pressed");
-    fireEvent.keyDown(tile, { key: "Enter" });
-    expect(root).toHaveAttribute("data-pressed");
-    fireEvent.keyUp(tile, { key: "Enter" });
-    expect(root).not.toHaveAttribute("data-pressed");
+    expect(onPress).toHaveBeenLastCalledWith(false);
+    fireEvent.keyDown(tile, { key: " " });
+    expect(onPress).toHaveBeenLastCalledWith(true);
+    fireEvent.keyUp(tile, { key: " " });
+    expect(onPress).toHaveBeenLastCalledWith(false);
+  });
+
+  it("keyboard: Tab moves through the tiles; Space opens the album at the focused one", async () => {
+    const user = userEvent.setup();
+    const onIndexChange = vi.fn();
+    render(<Gallery items={[photo(0), photo(1)]} onIndexChange={onIndexChange} />);
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Открыть: Стеллаж 1" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Открыть: Стеллаж 2" })).toHaveFocus();
+    await user.keyboard(" ");
+    expect(onIndexChange).toHaveBeenLastCalledWith(1);
+    expect(await screen.findByRole("dialog")).toHaveTextContent("2 из 2");
+  });
+
+  it("maxSize: the host's length caps the width and the gallery draws no radius of its own", () => {
+    const { container, rerender } = render(<Gallery items={[photo(0)]} />);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).not.toHaveAttribute("data-max-size");
+    rerender(<Gallery items={[photo(0)]} maxSize="85cqi" />);
+    expect(root).toHaveAttribute("data-max-size", "true");
+    expect(root.style.getPropertyValue("--gallery-limit")).toBe("85cqi");
+    const capped = cssRule("src/components/gallery/Gallery.module.css", ".root[data-max-size]");
+    expect(cssValue(capped, "border-radius")).toBe("0");
+    expect(cssValue(capped, "max-inline-size")).toBe("none");
+  });
+
+  it("lays out at most ten items: one cap, in the layout", () => {
+    const many = Array.from({ length: 12 }, (_, i) => photo(i));
+    render(<Gallery items={many} />);
+    expect(screen.getAllByRole("button", { name: /^Открыть/ })).toHaveLength(10);
+    expect(layoutGallery(many.map(() => 1)).tiles).toHaveLength(10);
   });
 
   it("lays its children over every tile", () => {

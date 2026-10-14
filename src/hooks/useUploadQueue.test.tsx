@@ -241,5 +241,32 @@ describe("useUploadQueue", () => {
     expect(item?.status).toBe("loading");
     expect(item?.preview).toMatch(/^blob:/);
     expect(server.calls.filter((call) => !call.context.signal.aborted)).toHaveLength(1);
+    expect(created).toHaveLength(1);
+    expect(revoked).toEqual([]);
+  });
+
+  it("hidden and shown again (its effects unmount and remount), it keeps the queue with live previews", async () => {
+    const server = fakeUploads();
+    let mode: "visible" | "hidden" = "visible";
+    const { result, rerender } = renderHook(() => useUploadQueue({ upload: server.upload }), {
+      wrapper: ({ children }) => <React.Activity mode={mode}>{children}</React.Activity>,
+    });
+    act(() => {
+      result.current.add([file("a.jpg", "image/jpeg"), file("b.pdf")]);
+    });
+    expect(result.current.items[0]?.preview).toBe("blob:preview-1");
+    mode = "hidden";
+    rerender();
+    await flush();
+    expect(revoked).toEqual(["blob:preview-1"]);
+    expect(server.calls[0]?.context.signal.aborted).toBe(true);
+    mode = "visible";
+    rerender();
+    await flush();
+    // The same items; a new preview for the picture, none for the document; the cut upload resumes.
+    expect(result.current.items.map((item) => item.file.name)).toEqual(["a.jpg", "b.pdf"]);
+    expect(result.current.items[0]?.preview).toBe("blob:preview-2");
+    expect(result.current.items[1]?.preview).toBeUndefined();
+    expect(server.calls.filter((call) => !call.context.signal.aborted)).toHaveLength(2);
   });
 });

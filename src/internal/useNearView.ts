@@ -1,12 +1,16 @@
 import * as React from "react";
 
+import { useScrollRegion } from "@/components/scroll-container/useScrollEdges";
+
 /**
- * `true` once the element has come near the view of its scroller (half a viewport ahead) and from
- * then on: heavy media (a video's first frame) mounts only then. Without IntersectionObserver it is
- * `true` at once.
+ * `true` once the element has come near the view of its scroller (half a view ahead) and from
+ * then on: heavy media (a video's first frame) mounts only then. Inside a `ScrollContainer` the
+ * scroller is the observer's root, so a tile below the fold of a chat waits for the chat's scroll,
+ * not the page's; elsewhere the viewport. Without IntersectionObserver it is `true` at once.
  */
 export function useNearView(ref: React.RefObject<Element | null>): boolean {
   const [near, setNear] = React.useState(false);
+  const region = useScrollRegion();
   React.useEffect(() => {
     const node = ref.current;
     if (near || !node) return;
@@ -18,10 +22,10 @@ export function useNearView(ref: React.RefObject<Element | null>): boolean {
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) setNear(true);
       },
-      { rootMargin: "50%" },
+      { root: region?.element() ?? null, rootMargin: "50%" },
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [near, ref]);
+  }, [near, ref, region]);
   return near;
 }

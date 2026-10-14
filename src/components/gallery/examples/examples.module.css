@@ -1,4 +1,4 @@
-/* overview.tsx: the switcher above the gallery it re-lays out, one column. */
+/* album-sizes.tsx: the switcher above the gallery it re-lays out, one column. */
 .stage {
   display: flex;
   flex-direction: column;

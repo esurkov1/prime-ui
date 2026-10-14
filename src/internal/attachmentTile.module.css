@@ -116,7 +116,12 @@
   outline-offset: var(--prime-focus-offset-inset);
 }
 
-/* The bottom band: the name (one line) and the size or the duration at the end, tabular. */
+/*
+ * The bottom band: the name (one line) and the size or the duration at the end, tabular, in the
+ * caption role (`textRole.caption`, joined in TSX). On a picture or a video it stands on the media
+ * shade's gradient in its light ink (`internal/mediaPill` `.fade`, `.ink`, `.inkMuted`); on a file
+ * on the tile's fill in the text roles.
+ */
 .band {
   position: absolute;
   inset-inline: 0;
@@ -129,9 +134,6 @@
   padding: var(--prime-space-4) var(--prime-space-2) var(--prime-space-2);
   border-end-start-radius: inherit;
   border-end-end-radius: inherit;
-  font-size: var(--prime-text-caption-size);
-  line-height: var(--prime-text-caption-line-height);
-  letter-spacing: var(--prime-text-caption-tracking);
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
@@ -142,12 +144,10 @@
   min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--prime-color-text-secondary);
 }
 
 .meta {
   flex: none;
-  color: var(--prime-color-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -155,22 +155,16 @@
   padding-block-start: var(--prime-space-1);
 }
 
-/* On a picture or a video the band stands on a soft gradient of the media shade, white text. */
-.tile:not([data-kind="file"]) > .band {
-  background: linear-gradient(transparent, var(--prime-color-media-shade));
+.tile[data-kind="file"] > .band > .name {
+  color: var(--prime-color-text-secondary);
 }
 
-.tile:not([data-kind="file"]) > .band > .name {
-  color: var(--prime-color-media-shade-fg);
-}
-
-.tile:not([data-kind="file"]) > .band > .meta {
-  color: var(--prime-color-media-shade-fg);
-  opacity: 0.75;
+.tile[data-kind="file"] > .band > .meta {
+  color: var(--prime-color-text-muted);
 }
 
 /* A change the owner is still saving: the content quiets down, its delete button spins. */
-.tile[data-pending] :is(.image, .media, .sheet, .band) {
+.tile[data-pending] :is(.sheet, .band) {
   opacity: var(--prime-opacity-busy);
 }
 
@@ -178,47 +172,29 @@
   cursor: progress;
 }
 
-/* A shade on the picture under the pill or the remove button: one control `xs` square. */
+/* A shade on the picture under the remove button (`.shade` of the media pill, joined in TSX): one
+   control `xs` square of its tier (`data-size`). */
 .chip {
   position: absolute;
-  z-index: var(--prime-z-raised);
+  z-index: var(--prime-z-top);
   inset-block-start: var(--prime-space-2);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  min-inline-size: var(--prime-control-xs-height);
-  block-size: var(--prime-control-xs-height);
-  border-radius: var(--prime-control-xs-radius);
-  background: var(--prime-color-media-shade);
-  color: var(--prime-color-media-shade-fg);
-  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
-  backdrop-filter: blur(var(--prime-media-shade-blur));
+  min-inline-size: var(--field-h);
+  block-size: var(--field-h);
+  border-radius: var(--field-radius);
 }
 
-/* The pill: the format or «Обложка», a small quiet tag, well under the remove button's size. */
+/* The pill: the format or «Обложка», a small quiet tag (the media pill's `.tag` on a picture or a
+   video; a kit Badge with its own palette on a file), well under the remove button's size. */
 .badge {
+  position: absolute;
+  z-index: var(--prime-z-top);
   inset-block-start: var(--prime-space-2);
   inset-inline-start: var(--prime-space-2);
-  min-inline-size: var(--prime-space-5);
-  block-size: var(--prime-space-5);
-  padding-inline: var(--prime-space-1);
-  border-radius: var(--prime-radius-s);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-space-5);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: var(--prime-text-caption-tracking);
+  display: inline-flex;
   pointer-events: none;
-}
-
-/* On a file the pill is a kit Badge with its own palette: no shade under it. */
-.tile[data-kind="file"] > .badge {
-  min-inline-size: 0;
-  padding-inline: 0;
-  background: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
 }
 
 .remove {
@@ -228,14 +204,16 @@
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* The delete button comes in with the pointer or the focus; on touch (no hover) it stays. */
-@media (hover: hover) {
-  /* A busy tile keeps its spinning delete button in view. */
-  .tile:not(:hover, :focus-within, [data-pending]) .remove {
+/* The delete button comes in with the pointer or the focus; on touch (no hover) it stays. A busy
+   tile keeps its spinning delete button in view. */
+@media (hover: hover) and (pointer: fine) {
+  .tile:not(:hover):not(:focus-within):not([data-pending]) .remove {
     opacity: 0;
     transform: scale(var(--prime-motion-scale-settle));
   }
+}
 
+@media (hover: hover) {
   /* Hover lifts the tile on the overlay shadow instead of washing the picture. */
   .tile:not([data-disabled]):is(:hover, [data-dnd-hover]) {
     z-index: var(--prime-z-raised);
@@ -256,12 +234,13 @@
 /* ─── On its way up (an upload queue) ───────────────────────────────────── */
 
 /*
- * Until the upload is done a picture quiets down under the disk (centred on the tile) and returns
- * to full after it. A file's disk takes the place of its sheet instead: the sheet fades and shrinks
- * out under it and comes back, the band stays fully readable below.
+ * Until the upload is done — and while a change of the tile is being saved — a picture quiets down
+ * (under the disk, centred on the tile) and returns to full after it: one rule for both. A file's
+ * disk takes the place of its sheet instead: the sheet fades and shrinks out under it and comes
+ * back, the band stays fully readable below.
  */
-.tile:is([data-upload="queued"], [data-upload="loading"], [data-upload="failed"]) .image,
-.tile:is([data-upload="queued"], [data-upload="loading"], [data-upload="failed"]) .media {
+.tile:is([data-pending], [data-upload="queued"], [data-upload="loading"], [data-upload="failed"])
+:is(.image, .media) {
   opacity: var(--prime-opacity-busy);
 }
 
@@ -270,11 +249,11 @@
   transform: scale(var(--prime-motion-scale-settle));
 }
 
-/* Over the content, under the pill and the remove button (later in the tile, same layer). */
+/* Over the content and the band, under the pill and the remove button. */
 .uploadLayer {
   position: absolute;
   inset: 0;
-  z-index: var(--prime-z-raised);
+  z-index: var(--prime-z-above);
   border-radius: inherit;
   pointer-events: none;
 }
@@ -300,14 +279,4 @@
 /* A tile that arrived after the first render. */
 .arrived {
   --enter-shift: var(--prime-space-2);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tile,
-  .image,
-  .tile > .media,
-  .sheet,
-  .remove {
-    transition: none;
-  }
 }

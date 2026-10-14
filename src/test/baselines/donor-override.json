@@ -17,7 +17,6 @@
   "src/components/switch/Switch.module.css: sets --choice-bg-disabled-checked, private to src/internal/ChoiceField.module.css",
   "src/components/switch/Switch.module.css: sets --choice-bg-duration, private to src/internal/ChoiceField.module.css",
   "src/components/tabs/Tabs.module.css: doubled class in .list.list",
-  "src/components/video-note/VideoNote.module.css: sets --ring-stroke, private to src/internal/ring.module.css",
   "src/internal/FieldFrame.module.css: sets --label-dimmed, private to src/components/label/Label.module.css",
   "src/internal/attachmentTile.module.css: :global(html)",
   "src/internal/chipTier.module.css: sets --chip-gap, private to src/components/badge/Badge.module.css",

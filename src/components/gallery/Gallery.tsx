@@ -4,14 +4,16 @@ import { MediaViewer, type MediaViewerItem } from "@/components/media-viewer/Med
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { Icon } from "@/icons";
+import { Icon, type IconName } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { MediaPlayMark } from "@/internal/mediaDisk";
 import pill from "@/internal/mediaPill.module.css";
 import { useMessagePart } from "@/internal/messagePart";
+import press from "@/internal/press.module.css";
 import {
   TRANSFER_LABELS,
   type TransferDirection,
@@ -24,7 +26,7 @@ import { TransferOverlay } from "@/internal/transferDisk";
 import { useNearView } from "@/internal/useNearView";
 
 import styles from "./Gallery.module.css";
-import { GALLERY_MAX, type GalleryLayout, itemRatio, layoutGallery } from "./layout";
+import { type GalleryLayout, itemRatio, layoutGallery } from "./layout";
 
 export type GalleryItem = {
   /** Default `image`. */
@@ -63,47 +65,29 @@ export const GALLERY_LABELS: GalleryLabels = {
   download: "Скачать {name}",
 };
 
+/** The album's props; each is described in `api.ts`. */
 export type GalleryProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** One photo or video, or an album of 2–10 laid out by their aspect ratios. More are not shown. */
   items: readonly GalleryItem[];
-  /**
-   * The album opens in the kit's `MediaViewer` (default `true`): a tile opens it at that item, the
-   * whole album its set, out of the tile and back into it. `false` — no viewer of the kit: open your
-   * own from `onOpenChange` and `onIndexChange`.
-   */
+  maxSize?: string;
   viewer?: boolean;
-  /** The viewer is open (controlled). */
   open?: boolean;
-  /** Initially open (uncontrolled). Default `false`. */
   defaultOpen?: boolean;
-  /** A tile opened the viewer (`true`), or the viewer closed (`false`). */
   onOpenChange?: (open: boolean) => void;
-  /** The item the viewer shows (controlled); a tile sets it to its own. */
   index?: number;
-  /** The item shown first (uncontrolled). Default `0`. */
   defaultIndex?: number;
-  /** A tile was activated, or the viewer turned its page: the item now shown. */
   onIndexChange?: (index: number) => void;
-  /**
-   * Cancel the transfer of a tile (the disk with the cross in its middle). A returned promise keeps
-   * the disk pending; a rejection leaves the transfer running and is announced.
-   */
   onCancel?: (index: number) => void | Promise<void>;
-  /** Transfer a failed tile again; a promise works the same. */
   onRetry?: (index: number) => void | Promise<void>;
-  /** Fetch a `remote` tile (the download arrow); a promise works the same. */
   onDownload?: (index: number) => void | Promise<void>;
   labels?: Partial<GalleryLabels>;
-  /** Laid over the gallery, above every tile (a caption pill, a message's time). */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
 
 /** The layout of `items`: their ratios read once, nothing measured. */
 export function galleryLayoutOf(items: readonly GalleryItem[]): GalleryLayout {
-  const list = items.slice(0, GALLERY_MAX);
-  const single = list.length === 1;
-  return layoutGallery(list.map((item) => itemRatio(item.width, item.height, single)));
+  const single = items.length === 1;
+  return layoutGallery(items.map((item) => itemRatio(item.width, item.height, single)));
 }
 
 /** Rounds a fraction for a custom property (a stable string, no float noise). */
@@ -120,7 +104,7 @@ type TileProps = {
   onOpen?: (index: number) => void;
   /** The viewer opens out of this tile and closes back into it. */
   tileRef?: (element: HTMLDivElement | null) => void;
-  /** A press on the tile starts (`true`) or ends: the album presses as one, never the tile. */
+  /** In a message: a press on the tile starts (`true`) or ends, and the message gives under it. */
   onPress?: (pressed: boolean) => void;
   onCancel?: (index: number) => void | Promise<void>;
   onRetry?: (index: number) => void | Promise<void>;
@@ -129,8 +113,8 @@ type TileProps = {
 
 /**
  * One tile: the picture (lazy, async decode) or a video's first frame (mounted once the tile nears
- * the view), a play mark and the length; a button over it when it opens a viewer; the transfer
- * disk over it while it is on its way.
+ * the view of its scroller), a play mark and the length; a button over it when it opens a viewer;
+ * the transfer disk over it while it is on its way.
  */
 function GalleryTileView({
   item,
@@ -151,7 +135,9 @@ function GalleryTileView({
   const [metaDuration, setMetaDuration] = React.useState<number | null>(null);
   const name = item.alt || (video ? labels.video : labels.photo);
   const transfer = item.transfer;
+  const covered = transferCovers(transfer);
   const length = metaDuration ?? item.duration ?? null;
+  const fallbackGlyph: IconName = video ? "action.video" : "object.image";
 
   return (
     <div ref={mergedRef} className={styles.tile} style={style} data-gallery-tile="">
@@ -171,12 +157,13 @@ function GalleryTileView({
           <Thumbnail.Image src={item.src} alt={onOpen ? "" : (item.alt ?? "")} />
         )}
         <Thumbnail.Fallback>
-          <Icon name={video ? "action.video" : "object.image"} />
+          <Icon name={fallbackGlyph} />
         </Thumbnail.Fallback>
       </Thumbnail.Root>
       {video ? (
         <>
-          <MediaPlayMark className={styles.play} />
+          {/* A transfer takes the middle: the mark gives it up and comes back once it is done. */}
+          <MediaPlayMark shown={!covered} className={styles.play} />
           {length !== null ? (
             <span className={cx(pill.pill, styles.length)} aria-hidden="true">
               {formatClock(length)}
@@ -191,20 +178,24 @@ function GalleryTileView({
           aria-label={formatLabel(labels.open, { name })}
           aria-haspopup="dialog"
           onClick={() => onOpen(index)}
-          onPointerDown={() => onPress?.(true)}
-          onPointerUp={() => onPress?.(false)}
-          onPointerCancel={() => onPress?.(false)}
-          onPointerLeave={() => onPress?.(false)}
-          onKeyDown={(event) => {
-            if (event.key === " " || event.key === "Enter") onPress?.(true);
-          }}
-          onKeyUp={() => onPress?.(false)}
-          onBlur={() => onPress?.(false)}
+          {...(onPress
+            ? {
+                onPointerDown: () => onPress(true),
+                onPointerUp: () => onPress(false),
+                onPointerCancel: () => onPress(false),
+                onPointerLeave: () => onPress(false),
+                onKeyDown: (event: React.KeyboardEvent) => {
+                  if (event.key === " " || event.key === "Enter") onPress(true);
+                },
+                onKeyUp: () => onPress(false),
+                onBlur: () => onPress(false),
+              }
+            : {})}
         />
       ) : null}
       {/* Mounted through `done`: the ring fills, then the disk fades and shrinks away. */}
       {transfer ? (
-        <span className={styles.transfer} data-covered={transferCovers(transfer) || undefined}>
+        <span className={styles.transfer} data-covered={covered || undefined}>
           <TransferOverlay
             state={transfer}
             progress={item.transferProgress}
@@ -233,7 +224,8 @@ function GalleryTileView({
  * shared transfer disk.
  */
 export function Gallery({
-  items: itemsProp,
+  items,
+  maxSize,
   viewer = true,
   open: openProp,
   defaultOpen = false,
@@ -248,11 +240,9 @@ export function Gallery({
   className,
   style,
   children,
-  ref,
   ...rest
 }: GalleryProps) {
-  const labels = { ...GALLERY_LABELS, ...labelsProp };
-  const items = itemsProp.slice(0, GALLERY_MAX);
+  const labels = useLabels(GALLERY_LABELS, labelsProp);
   const layout = galleryLayoutOf(items);
   const [open, setOpen] = useControllableState({
     value: openProp,
@@ -264,24 +254,10 @@ export function Gallery({
     defaultValue: defaultIndex,
     onChange: onIndexChange,
   });
-  // A press on a tile presses the whole album — or, in a message, the whole bubble (the message
-  // takes it): a tile never scales alone inside the album's rounded clip.
+  // A press on a tile presses the whole album (`press.press` on the root: a tile never scales
+  // alone inside the album's rounded clip) — or, in a message, the whole bubble: the message
+  // takes the press.
   const part = useMessagePart();
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const mergedRootRef = useMergedRefs(rootRef, ref);
-  const press = React.useCallback(
-    (pressed: boolean) => {
-      if (part.press) {
-        part.press(pressed);
-        return;
-      }
-      const root = rootRef.current;
-      if (!root) return;
-      if (pressed) root.dataset.pressed = "";
-      else delete root.dataset.pressed;
-    },
-    [part],
-  );
   // The tiles the viewer opens out of and closes back into.
   const tiles = React.useRef<(HTMLDivElement | null)[]>([]);
   const opens = viewer || onOpenChange !== undefined || onIndexChange !== undefined;
@@ -289,9 +265,10 @@ export function Gallery({
     setIndex(at);
     setOpen(true);
   };
+  const shownCount = layout.tiles.length;
   const viewerItems = React.useMemo<MediaViewerItem[]>(
     () =>
-      items.map((item) => ({
+      items.slice(0, shownCount).map((item) => ({
         type: item.type,
         src: item.src,
         thumbnail: item.type === "video" ? undefined : item.src,
@@ -300,25 +277,28 @@ export function Gallery({
         width: item.width,
         height: item.height,
       })),
-    [items],
+    [items, shownCount],
   );
 
   return (
     <div
       {...rest}
-      ref={mergedRootRef}
-      className={cx(styles.root, className)}
+      className={cx(styles.root, part.press ? undefined : press.press, className)}
       style={
         {
           "--gallery-ratio": frac(layout.ratio),
           "--gallery-factor": frac(layout.widthFactor),
+          ...(maxSize === undefined ? {} : { "--gallery-limit": maxSize }),
           ...style,
         } as React.CSSProperties
       }
-      {...toDataAttributes({ count: items.length })}
+      {...toDataAttributes({
+        count: shownCount,
+        "max-size": maxSize === undefined ? undefined : true,
+      })}
     >
-      {layout.tiles.map((tile, index) => {
-        const item = items[index] as GalleryItem;
+      {layout.tiles.map((tile, at) => {
+        const item = items[at] as GalleryItem;
         const tileStyle = {
           "--x": frac(tile.x),
           "--y": frac(tile.y),
@@ -332,15 +312,15 @@ export function Gallery({
         return (
           <GalleryTileView
             // biome-ignore lint/suspicious/noArrayIndexKey: a tile is its place in the album
-            key={index}
+            key={at}
             item={item}
-            index={index}
+            index={at}
             style={tileStyle}
             labels={labels}
             onOpen={opens ? openAt : undefined}
-            onPress={press}
+            onPress={part.press}
             tileRef={(element) => {
-              tiles.current[index] = element;
+              tiles.current[at] = element;
             }}
             onCancel={onCancel}
             onRetry={onRetry}

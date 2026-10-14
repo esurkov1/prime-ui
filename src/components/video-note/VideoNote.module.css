@@ -13,7 +13,7 @@
  * fade-in is on an element promoted from the start; per frame only `--ring-value` changes,
  * on the ring alone. The ring shows only during a playback.
  * Motion: press scale on the circle (`fast`), the ring and the play disk fade both ways. Reduced
- * motion: no fades.
+ * motion stills the press; the fades stay (the kit's clocks, globals.css).
  */
 .root {
   display: inline-flex;
@@ -21,17 +21,13 @@
   min-inline-size: 0;
 }
 
+/* The press is `press.press`, joined in TSX (`data-disabled` while nothing can play). */
 .circle {
   position: relative;
   flex: none;
   inline-size: min(var(--prime-message-video-note-box), 100cqi);
   aspect-ratio: 1;
   border-radius: var(--prime-radius-full);
-  transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.circle:has(> .hit:not([data-disabled]):active) {
-  transform: scale(var(--prime-motion-press-scale));
 }
 
 .media {
@@ -87,22 +83,18 @@
   opacity: 1;
 }
 
-/* The playback ring (`internal/ring`, `live`: the share written every frame, no track) over the
-   circle's edge, in the accent at a band of one spacing step; only while the note plays with
-   sound. */
+/* The playback ring (`internal/ring`, `live`: the share written every frame, no track; the `band`
+   weight) over the circle's edge, in the accent; only during a playback. */
 .ring {
+  --ring-fill: var(--prime-color-accent-default);
+
   position: absolute;
   inset: 0;
   opacity: 0;
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit);
 }
 
-.circle > .ring {
-  --ring-stroke: var(--prime-space-1);
-  --ring-fill: var(--prime-color-accent-default);
-}
-
-.circle:is([data-state="playing"], [data-state="paused"]) .ring {
+.circle:not([data-state="idle"]) .ring {
   opacity: 1;
   transition-timing-function: var(--prime-motion-easing-enter);
 }
@@ -146,13 +138,6 @@
   inset-inline-start: 0;
 }
 
-.dot {
-  inline-size: calc(var(--prime-space-3) / 2);
-  block-size: calc(var(--prime-space-3) / 2);
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-accent-default);
-}
-
 /* The transcript button in the top-end corner of the square, outside the circle's edge. */
 .transcribe {
   position: absolute;
@@ -166,18 +151,4 @@
   padding: var(--prime-message-padding-y) var(--prime-message-padding-x);
   border-radius: var(--prime-message-radius);
   background: var(--message-fill, var(--prime-color-layer-current));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .circle:has(> .hit:active) {
-    transform: none;
-  }
-
-  .circle,
-  .media,
-  .video,
-  .ring,
-  .play {
-    transition: none;
-  }
 }

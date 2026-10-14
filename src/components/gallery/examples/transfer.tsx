@@ -10,36 +10,45 @@ const photo = (seed: string, alt: string): GalleryItem => ({
 });
 
 const START: GalleryItem[] = [
-  { ...photo("waybill", "Накладная"), transfer: "loading", transferProgress: 0.35 },
+  { ...photo("waybill", "Накладная"), transfer: "loading", transferProgress: 0.25 },
   { ...photo("damage", "Повреждённая коробка"), transfer: "failed" },
   { ...photo("seal", "Пломба"), transfer: "remote", transferDirection: "download" },
 ];
 
-const STEP_MS = 400;
+/** A stand-in transfer moves a quarter per step. */
+const STEP_MS = 800;
+const STEP = 0.25;
+
+/** One step of every item in flight; a full one is done. */
+const advance = (item: GalleryItem): GalleryItem => {
+  if (item.transfer !== "loading") return item;
+  const share = Math.min(1, (item.transferProgress ?? 0) + STEP);
+  return { ...item, transferProgress: share, transfer: share >= 1 ? "done" : "loading" };
+};
 
 export default function GalleryTransferExample() {
   const [items, setItems] = React.useState(START);
+  const inFlight = items.some((item) => item.transfer === "loading");
+
+  // One clock for every transfer: a cancel takes its item out of `loading`, and the step skips it.
+  React.useEffect(() => {
+    if (!inFlight) return;
+    const timer = window.setInterval(() => setItems((current) => current.map(advance)), STEP_MS);
+    return () => window.clearInterval(timer);
+  }, [inFlight]);
 
   const patch = (index: number, next: Partial<GalleryItem>) =>
     setItems((current) => current.map((item, i) => (i === index ? { ...item, ...next } : item)));
 
-  /** A stand-in transfer: four steps, then done. */
-  const run = (index: number, direction: "upload" | "download") => {
-    let share = 0;
+  const start = (index: number, direction: "upload" | "download") =>
     patch(index, { transfer: "loading", transferProgress: 0, transferDirection: direction });
-    const timer = window.setInterval(() => {
-      share = Math.min(1, share + 0.25);
-      patch(index, { transferProgress: share, ...(share >= 1 ? { transfer: "done" } : {}) });
-      if (share >= 1) window.clearInterval(timer);
-    }, STEP_MS);
-  };
 
   return (
     <Gallery
       items={items}
       onCancel={(index) => patch(index, { transfer: "failed" })}
-      onRetry={(index) => run(index, "upload")}
-      onDownload={(index) => run(index, "download")}
+      onRetry={(index) => start(index, "upload")}
+      onDownload={(index) => start(index, "download")}
     />
   );
 }

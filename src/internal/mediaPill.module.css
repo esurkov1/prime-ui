@@ -1,45 +1,68 @@
 /*
- * A dark translucent pill over a picture or a video (the media shade, one look in both themes):
- * the duration of a video tile or a video circle, the play and mute marks. Decorative — the host
- * names what it says. Position is the host's.
+ * The media shade: the dark translucent ground over a picture or a video, one look in both themes,
+ * and the parts cut from it. The one home of `--prime-color-media-shade*` and
+ * `--prime-color-media-pill*` (`src/styles/shared-css.test.ts`): a host joins these classes in TSX
+ * and only places the part. Decorative unless the host gives the part its own role or name.
  *
- *   .pill   caption text (a duration), a dot or a glyph may follow
- *   .mark   a round mark of a glyph (`--pill-size`, default a control `s` height)
+ *   .shade  the ground of a part over media: the dense fill that keeps text AA over any frame,
+ *           the light ink and the blur (a viewer's caption, its control bar and level panel, an
+ *           error card, a chip under a glyph); the host gives the shape
+ *   .pill   a rounded caption pill on the shade (a duration, a counter, a message's time): the
+ *           caption size in the muted light ink, tabular numbers; a dot or a glyph may follow
+ *   .tag    a small square-cornered caption tag on the shade (a file's format over a picture)
+ *   .ink    the light ink alone: text standing on media with no ground of its own
+ *   .inkMuted  the muted light ink: secondary text on the shade (a time beside a seek, a size)
+ *   .fade   a gradient into the shade toward the block end (a band of text along a picture's
+ *           bottom edge)
  */
+.shade,
 .pill,
-.mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.tag {
   box-sizing: border-box;
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-media-shade);
+  background: var(--prime-color-media-pill);
   color: var(--prime-color-media-shade-fg);
-  pointer-events: none;
   -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
   backdrop-filter: blur(var(--prime-media-shade-blur));
 }
 
-/* The caption of a voice message's time row: the same size, weight and muted tone, on a pill
-   dense enough to keep it AA over any frame. */
-.pill {
-  gap: var(--prime-space-1);
-  min-block-size: calc(var(--prime-text-caption-line-height) + var(--prime-space-1));
-  padding-inline: var(--prime-space-2);
-  background: var(--prime-color-media-pill);
-  color: var(--prime-color-media-pill-fg);
+.pill,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-regular);
   line-height: var(--prime-text-caption-line-height);
   letter-spacing: var(--prime-text-caption-tracking);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  pointer-events: none;
 }
 
-.mark {
-  --pill-size: var(--prime-control-s-height);
-  --prime-icon-size: var(--prime-icon-s);
+.pill {
+  gap: var(--prime-space-1);
+  min-block-size: calc(var(--prime-text-caption-line-height) + var(--prime-space-1));
+  padding-inline: var(--prime-space-2);
+  border-radius: var(--prime-radius-full);
+  color: var(--prime-color-media-pill-fg);
+  font-weight: var(--prime-font-weight-regular);
+}
 
-  inline-size: var(--pill-size);
-  block-size: var(--pill-size);
+.tag {
+  min-inline-size: var(--prime-space-5);
+  block-size: var(--prime-space-5);
+  padding-inline: var(--prime-space-1);
+  border-radius: var(--prime-radius-s);
+  font-weight: var(--prime-font-weight-medium);
+}
+
+.ink {
+  color: var(--prime-color-media-shade-fg);
+}
+
+.inkMuted {
+  color: var(--prime-color-media-pill-fg);
+}
+
+.fade {
+  background: linear-gradient(transparent, var(--prime-color-media-shade));
 }

@@ -4,7 +4,7 @@ import type { TransferLabels } from "./transfer";
 const STATE_TYPE = '"remote" | "queued" | "loading" | "failed" | "done"';
 
 /** The `transfer` state row: `what` names the thing transferred and how its host takes the disk. */
-function transferStateProp(what: { en: string; ru: string }): ApiProp {
+function stateProp(what: { en: string; ru: string }): ApiProp {
   return {
     name: "transfer",
     type: STATE_TYPE,
@@ -55,7 +55,7 @@ function handlerProps(index: boolean): ApiProp[] {
 
 /** The transfer props of a part that transfers its content (VoicePlayer, VideoNote, Message.File). */
 export function transferProps(what: { en: string; ru: string }): ApiProp[] {
-  return [transferStateProp(what), PROGRESS_PROP, DIRECTION_PROP, ...handlerProps(false)];
+  return [stateProp(what), PROGRESS_PROP, DIRECTION_PROP, ...handlerProps(false)];
 }
 
 /** The per-tile handlers of Message.Media (its state, share and direction live on the items). */

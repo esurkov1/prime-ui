@@ -23,7 +23,7 @@ import { Gallery, type GalleryItem } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Gallery                      <div>, aspect-ratio from the layout; data-count, data-pressed while a tile is pressed
+Gallery                      <div>, aspect-ratio from the layout; data-count, data-max-size with `maxSize`
 ├─ tile × 1–10               a box at fractions of the gallery, inset by half a gap at inner edges
 │  ├─ Thumbnail              the picture (lazy, async decode) or a video's first frame (near the view)
 │  ├─ play mark · length     the media disk and a pill over a video tile (aria-hidden)
@@ -46,6 +46,7 @@ An item (`GalleryItem`) is `type` (`"image"` by default, or `"video"`), `src`, a
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `items` | `GalleryItem[]` | — (required) | `{ type?, src, poster?, alt?, width?, height?, duration?, transfer?, transferProgress?, transferDirection? }`; `width` / `height` give the ratio (default 4 : 3). The first 10 are shown. |
+| `maxSize` | `string` | — | Caps the width at this CSS length instead of the host's width (`85cqi` of a chat row); the gallery then draws no radius — the host shapes and clips it. |
 | `viewer` | `boolean` | `true` | A tile (a press, Enter or Space) opens the album in the kit's `MediaViewer` at that item. `false` — no viewer of the kit: open your own from `onOpenChange` and `onIndexChange`. |
 | `open` | `boolean` | — | The viewer is open (controlled). |
 | `defaultOpen` | `boolean` | `false` | Initially open (uncontrolled). |
@@ -82,7 +83,9 @@ Decided by the items, not a prop: the number of items and their ratios.
 |---|---|---|
 | loading | an image that has not loaded | the Thumbnail's own placeholder in the tile's final box; nothing moves when it loads |
 | video near the view | a video tile entering the view | the `<video preload="metadata">` mounts and shows its first frame; the length comes from the item's `duration` first, then from the metadata |
-| pressed | a press on a tile (pointer, or Enter / Space held) | the whole album gives in a little (`data-pressed` on the root, `--prime-motion-press-scale`, `fast`); inside a message the bubble presses instead |
+| pressed | a press on a tile (pointer, or Enter / Space held) | the whole album gives in a little (`:active` on the root, `--prime-motion-press-scale`, `fast`); inside a message the bubble presses instead |
+| on its way | an item's `transfer` before `done` | the picture dims under the transfer disk; a video's play mark fades out of the middle and back once the transfer is done |
+| open | `open` · `defaultOpen` · a tile | `MediaViewer` shows the album at `index`, flying out of the tile and back into it on close |
 | transferring | `transfer` `queued` / `loading` on an item | the picture dims to 0.6 under the shared transfer disk with its progress ring (an indeterminate arc while `transferProgress` is left out; `transferDirection` changes only the words); pressing the disk cancels; the play mark gives way (`fast`) |
 | failed | `transfer="failed"` | the disk turns danger with a retry arrow, described by the reason |
 | remote | `transfer="remote"` | the download arrow on the disk; the picture dims under it |
@@ -92,8 +95,8 @@ Decided by the items, not a prop: the number of items and their ratios.
 ## Layout & spacing
 - The gallery is as wide as its host allows, up to `--prime-gallery-max-size` (22.5rem); a lone portrait is narrower, its height reaching the cap. Its height is its width over the layout's ratio.
 - Tiles are `--prime-gallery-gap` (2px) apart; the gaps are the gallery's own background, transparent by default (a host may paint it: a message paints the incoming surface).
-- The outer corners are rounded (`--prime-radius-l`); a host that clips it itself (a message) sets the radius to 0 through `className`.
-- From 320px up the album keeps its layout: tiles scale with the gallery, never rearrange.
+- The outer corners are rounded (`--prime-radius-l`). A host that shapes and clips it itself (a message) passes `maxSize`: the gallery takes that length as its cap instead of its host's width and draws no radius of its own.
+- At any width the album keeps its layout: tiles scale with the gallery, never rearrange.
 
 ## Accessibility
 
@@ -136,8 +139,10 @@ Decided by the items, not a prop: the number of items and their ratios.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | One album of mixed photos and a video, re-laid out for every count from one to ten: the switcher picks how many items the gallery holds, the layout cross-fades into the next, and a tile opens the album in the viewer — `items`, `width`, `height`, `type`. |
+| [overview.tsx](examples/overview.tsx) | An album of photos of different shapes and a video, laid out by their ratios before anything loads; a tile opens the album in the viewer — `items`, `width`, `height`, `type`. |
+| [album-sizes.tsx](examples/album-sizes.tsx) | One album re-laid out for every count from one to ten: the switcher picks how many items the gallery holds and the layout cross-fades into the next — `items`. |
 | [transfer.tsx](examples/transfer.tsx) | Items on their way, one look both ways: an upload with its ring and cancel, a failed one with a retry, a received one waiting to be fetched — the picture dims under the disk until it is done — `transfer`, `transferProgress`, `transferDirection`, `onCancel`, `onRetry`, `onDownload`. |
+| [controlled.tsx](examples/controlled.tsx) | The album with a viewer of the screen's own: a tile reports its item, and the inspection card beside it shows which photo is open — `viewer`, `index`, `onIndexChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The viewer owned by the screen: a button opens the album at its third item, the page the viewer shows is kept, and closing returns the focus to where it came from — `open`, `onOpenChange`, `index`, `onIndexChange`. |
 
 ## Mistakes
@@ -151,5 +156,5 @@ Decided by the items, not a prop: the number of items and their ratios.
 - More than ten items in one gallery → items after the tenth are not shown; split them into several albums of up to ten.
 
 ## Related
-- **Built from:** [Thumbnail](../thumbnail/COMPONENT.md) (`Thumbnail.Image`, `Thumbnail.Video`), [MediaViewer](../media-viewer/COMPONENT.md) (the album full-screen), [Button](../button/COMPONENT.md) (the transfer disk), Icon (`action.play`, `action.video`, `object.image`); `internal/transferDisk` (the transfer of a tile), `internal/mediaDisk` (the play mark), `internal/mediaPill` (the length), `internal/useNearView` (a video mounts near the view), `internal/formatClock`, `internal/messagePart` (the press goes to the message), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Thumbnail](../thumbnail/COMPONENT.md) (`Thumbnail.Image`, `Thumbnail.Video`), [MediaViewer](../media-viewer/COMPONENT.md) (the album full-screen), [Button](../button/COMPONENT.md) (the transfer disk), [Spinner](../spinner/COMPONENT.md) (a pending transfer disk), [ScrollContainer](../scroll-container/COMPONENT.md) (its scroller is the view a video waits for), Icon (`action.play`, `action.video`, `object.image`); `internal/transferDisk` (the transfer of a tile), `internal/mediaDisk` (the play mark), `internal/mediaPill` (the length), `internal/useNearView` (a video mounts near the view), `internal/press` (the album's press), `internal/formatClock`, `internal/messagePart` (the press goes to the message)
 - **See also:** [Message](../message/COMPONENT.md) — `Message.Media` is a Gallery in a message; [MediaViewer](../media-viewer/COMPONENT.md) — the viewer on its own; [Thumbnail](../thumbnail/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md), [VideoNote](../video-note/COMPONENT.md)

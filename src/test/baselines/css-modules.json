@@ -25,8 +25,6 @@
   "src/components/field-list/FieldList.module.css: --fl-m is never read",
   "src/components/field-list/FieldList.module.css: --fl-s is never read",
   "src/components/input/Input.module.css: * 1 factor in margin-inline-start",
-  "src/components/media-viewer/MediaViewer.module.css: * 1 factor in margin-block-start",
-  "src/components/media-viewer/MediaViewer.module.css: * 1 factor in translate",
   "src/components/message/Message.module.css: * 1 factor in inline-size",
   "src/components/message/Message.module.css: * 1 factor in inset-inline",
   "src/components/message/Message.module.css: * 1 factor in inset-inline-start",

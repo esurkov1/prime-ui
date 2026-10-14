@@ -1,14 +1,24 @@
 /*
- * The play disk of every player (`mediaPlayer.tsx` `PlayDisk`): one `Button shape="circle"`
- * (control `l`) for every state — play ⇄ pause, the transfer's ×, retry or download arrow with the
- * share as its `progress` ring. Looks: `solid` — the accent disk (VoicePlayer; an outgoing bubble
- * recolours it); `shade` — the media shade with a blur (VideoNote, over its video). Press, hover,
- * focus ring, the glyph cross-fade and the ring are the Button's.
+ * The shared parts of every player (`mediaPlayer.tsx`).
  *
- *   .slot  the disk's box
+ *   .slot  the play disk's box (`PlayDisk`): one `Button shape="circle"` (control `l`) for every
+ *          state — play ⇄ pause, the transfer's ×, retry or download arrow with the share as its
+ *          `progress` ring. Looks: `solid` — the accent disk (VoicePlayer; an outgoing bubble
+ *          recolours it); `shade` — the media shade with a blur (VideoNote, over its video). Press,
+ *          hover, focus ring, the glyph cross-fade and the ring are the Button's.
+ *   .dot   the unplayed dot (`UnplayedDot`): accent, a step and a half of the 4px grid across; it
+ *          rises in and closes up in place (`internal/partPresence`).
  */
 .slot {
   position: relative;
   display: inline-grid;
   flex: none;
+}
+
+.dot {
+  flex-shrink: 0;
+  inline-size: calc(var(--prime-space-3) / 2);
+  block-size: calc(var(--prime-space-3) / 2);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-accent-default);
 }

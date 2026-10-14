@@ -51,7 +51,7 @@ VoicePlayer            <div role="group">; state in data-*
 |---|---|---|---|
 | `src` | `string` | — (required) | Audio URL, loaded with `preload="metadata"`: nothing plays before a press. |
 | `duration` | `number` | — | Length in seconds, shown until the media reports its own. |
-| `unplayed` | `boolean` | `false` | Nobody has played it yet: an accent dot after the time and `labels.unplayed` for screen readers. Clear it when `onPlayingChange(true)` comes; the dot leaves with a fade. |
+| `unplayed` | `boolean` | `false` | Nobody has played it yet: an accent dot after the time and `labels.unplayed` for screen readers. Clear it when `onPlayingChange(true)` comes; the dot fades out and the row closes up in place. |
 | `disabled` | `boolean` | `false` | Nothing can be played: the play disk, the waveform slider and the rate chip, the transcript button and the transfer actions are off (native `disabled`). A disabled `Fieldset` around it disables it too. |
 | `waveform` | `readonly number[]` | — | Levels 0…1 from data, resampled to the bars that fit the width. Without it: a calm flat row. Voice only: a circle shows a face, not levels. |
 | `rate` | `1 \| 1.5 \| 2` | — | Playback speed (controlled). Voice only: speech is listened to faster; a face is watched at its own pace. |
@@ -88,7 +88,7 @@ One look. Colors are semantic roles only (`accent-default`, `accent-fg`, `fill-s
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `unplayed` | an accent dot after the time; it rises in with a fade and sinks out the same way | the recipient has not listened yet | |
+| `unplayed` | an accent dot after the time; it rises in, and fades as the row closes up in place when it clears | the recipient has not listened yet | |
 | `disabled` | muted disk, no played bars, disabled time | the recording cannot be played (deleted, expired) | |
 
 ## States
@@ -196,5 +196,5 @@ One look. Colors are semantic roles only (`accent-default`, `accent-fg`, `fill-s
 - `onTranscribe` that resolves `undefined` or returns `true` → resolve the text itself, or return nothing and pass `transcript` when it comes.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (the play disk, `shape="circle"`; the transcript button), [Spinner](../spinner/COMPONENT.md), Icon (`action.play`, `action.pause`, `action.transcribe`, `nav.chevronUp`); `internal/disabledContext` (a disabled `Fieldset`), `internal/mediaPlayer` (the playing triad, the transcript button and the transfer shared with VideoNote), `internal/transferDisk` (the transfer's logic on the play disk: `useTransferDisk`), `internal/transcript` + `internal/Disclosure` (the transcript), `internal/mediaSession` (one sound at a time), [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Button](../button/COMPONENT.md) (the play disk, `shape="circle"`; the transcript button), [Spinner](../spinner/COMPONENT.md), Icon (`action.play`, `action.pause`, `action.transcribe`, `nav.chevronUp`); `internal/disabledContext` (a disabled `Fieldset`), `internal/mediaPlayer` (the playing triad, the transcript button and the transfer shared with VideoNote), `internal/transferDisk` (the transfer's logic on the play disk: `useTransferDisk`), `internal/transcript` + `internal/Disclosure` (the transcript), `internal/mediaSession` (one sound at a time), `internal/audio` (`getWaveform`'s decoding and peaks, shared with the Composer's recorder), `internal/press` (the rate chip's press), [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [VideoNote](../video-note/COMPONENT.md) — the round video message, the same player contract; [Message](../message/COMPONENT.md) — the bubble a voice message sits in; [Composer](../composer/COMPONENT.md) — records the voice message; [Slider](../slider/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md)

@@ -136,6 +136,7 @@ Content parts in short: `Message.Media` — a [Gallery](../gallery/COMPONENT.md)
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `items` | `GalleryItem[]` | — (required) | `{ type?, src, poster?, alt?, width?, height?, duration?, transfer?, transferProgress?, transferDirection? }`; `width` / `height` give the ratio (default 4 : 3). The first 10 are shown. |
+| `maxSize` | `string` | — | Caps the width at this CSS length instead of the host's width (`85cqi` of a chat row); the gallery then draws no radius — the host shapes and clips it. |
 | `viewer` | `boolean` | `true` | A tile (a press, Enter or Space) opens the album in the kit's `MediaViewer` at that item. `false` — no viewer of the kit: open your own from `onOpenChange` and `onIndexChange`. |
 | `open` | `boolean` | — | The viewer is open (controlled). |
 | `defaultOpen` | `boolean` | `false` | Initially open (uncontrolled). |

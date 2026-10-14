@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -9,8 +6,8 @@ import { Fieldset } from "@/components/fieldset/Fieldset";
 import { Message } from "@/components/message/Message";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { VoicePlayer } from "@/components/voice-player/VoicePlayer";
-import { activePlayback } from "@/internal/mediaSession";
 import { MessagePartProvider, messagePartOf } from "@/internal/messagePart";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { VideoNote } from "./VideoNote";
 
@@ -43,6 +40,35 @@ const badge = (container: HTMLElement, name: string) =>
   container.querySelector(`[data-badge="${name}"]`);
 
 const circleButton = () => screen.getByRole("button", { name: /видеосообщение|Пауза/ });
+
+describe("VideoNote keyboard", () => {
+  it("Tab reaches the disk; arrows, PageUp / PageDown, Home / End seek from it", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<VideoNote src={SRC} duration={60} />);
+    const video = container.querySelector("video") as HTMLVideoElement;
+    await user.tab();
+    const disk = circleButton();
+    expect(disk).toHaveFocus();
+    fireEvent.keyDown(disk, { key: "ArrowRight" });
+    expect(video.currentTime).toBe(5);
+    fireEvent.keyDown(disk, { key: "ArrowUp" });
+    expect(video.currentTime).toBe(10);
+    fireEvent.keyDown(disk, { key: "ArrowLeft" });
+    expect(video.currentTime).toBe(5);
+    fireEvent.keyDown(disk, { key: "ArrowDown" });
+    expect(video.currentTime).toBe(0);
+    fireEvent.keyDown(disk, { key: "PageUp" });
+    expect(video.currentTime).toBe(6);
+    fireEvent.keyDown(disk, { key: "PageDown" });
+    expect(video.currentTime).toBe(0);
+    fireEvent.keyDown(disk, { key: "End" });
+    expect(video.currentTime).toBe(60);
+    fireEvent.keyDown(disk, { key: "Home" });
+    expect(video.currentTime).toBe(0);
+    // From rest a seek leaves the note paused where it went.
+    expect(disk).toHaveAttribute("data-state", "paused");
+  });
+});
 
 describe("VideoNote", () => {
   it("is a group with the circle's button named by the play label, described by the duration", () => {
@@ -108,7 +134,12 @@ describe("VideoNote", () => {
     const onPlayingChange = vi.fn();
     const onEnded = vi.fn();
     const { container } = render(
-      <VideoNote src={SRC} duration={10} onPlayingChange={onPlayingChange} onEnded={onEnded} />,
+      <>
+        <VideoNote src={SRC} duration={10} onPlayingChange={onPlayingChange} onEnded={onEnded} />
+        <Thumbnail.Root>
+          <Thumbnail.Video src="/clip.mp4" controls data-testid="clip" />
+        </Thumbnail.Root>
+      </>,
     );
     const video = container.querySelector("video") as HTMLVideoElement;
     const ring = container.querySelector<SVGSVGElement>("svg[data-live]");
@@ -123,11 +154,17 @@ describe("VideoNote", () => {
     expect(onPlayingChange).toHaveBeenLastCalledWith(false);
     expect(circleButton()).toHaveAttribute("data-state", "idle");
     expect(video.currentTime).toBe(0);
-    expect(activePlayback()).not.toBe(video);
     expect(circleButton()).toHaveAccessibleName(PLAY);
     expect(circleButton()).toHaveAccessibleDescription("Длительность 0:10");
     expect(ring?.style.getPropertyValue("--ring-value")).toBe("0");
     expect(play).toHaveBeenCalledTimes(1);
+    // The session is free: another sound starting now pauses nothing.
+    const pause = vi.mocked(HTMLMediaElement.prototype.pause);
+    pause.mockClear();
+    act(() => {
+      void (screen.getByTestId("clip") as HTMLVideoElement).play();
+    });
+    expect(pause).not.toHaveBeenCalled();
   });
 
   it("disabled: no play by press, key or triad; its buttons are off; a disabled Fieldset does it too", async () => {
@@ -287,7 +324,7 @@ describe("VideoNote", () => {
       expect(voice()).not.toHaveAttribute("data-playing");
       fireEvent.click(screen.getByRole("button", { name: PLAY }));
       expect(clip.paused).toBe(true);
-      expect(activePlayback()).toBe(note);
+      expect(note.paused).toBe(false);
       fireEvent.click(screen.getByRole("button", { name: "Воспроизвести голосовое сообщение" }));
       expect(note.paused).toBe(true);
       expect(voice()).toHaveAttribute("data-playing", "true");
@@ -362,43 +399,53 @@ describe("VideoNote transcript", () => {
 });
 
 describe("VideoNote geometry", () => {
-  const css = readFileSync(
-    path.join(process.cwd(), "src/components/video-note/VideoNote.module.css"),
-    "utf8",
-  );
-  const block = (selector: string) =>
-    css.match(new RegExp(`\\n\\.${selector} \\{([^}]*)\\}`))?.[1] ?? "";
+  const CSS = "src/components/video-note/VideoNote.module.css";
+  const props = (selector: string) =>
+    cssRules(CSS)
+      .filter((rule) => rule.selector === selector && rule.parents.length === 0)
+      .flatMap((rule) => rule.decls.map((decl) => decl.prop));
 
   it("the circle is square at every width: one box, a min() width and `aspect-ratio: 1`", () => {
-    const circle = block("circle");
-    expect(circle).toMatch(/aspect-ratio: 1;/);
-    expect(circle).toMatch(/inline-size: min\(var\(--prime-message-video-note-box\), 100cqi\);/);
-    for (const sized of [circle, block("root")]) {
-      expect(sized).not.toMatch(
-        /(^|\n)\s*(height|block-size|min-block-size|max-block-size|max-inline-size):/,
-      );
+    const circle = cssRule(CSS, ".circle");
+    expect(cssValue(circle, "aspect-ratio")).toBe("1");
+    expect(cssValue(circle, "inline-size")).toBe(
+      "min(var(--prime-message-video-note-box), 100cqi)",
+    );
+    for (const sized of [".circle", ".root"]) {
+      for (const prop of ["height", "block-size", "min-block-size", "max-block-size"]) {
+        expect(props(sized)).not.toContain(prop);
+      }
+      expect(props(sized)).not.toContain("max-inline-size");
     }
-    for (const part of ["media", "fill", "hit"]) expect(block(part)).toMatch(/inset: 0;/);
+    for (const part of [".media", ".fill", ".hit"]) {
+      expect(cssValue(cssRule(CSS, part), "inset")).toBe("0");
+    }
   });
 
-  it("clips on a stable layer: the clip never transforms, scales or changes per state", () => {
-    const media = block("media");
-    expect(media).toMatch(/overflow: hidden;/);
-    expect(media).toMatch(/border-radius: var\(--prime-radius-full\);/);
-    expect(media).toMatch(/transform: translateZ\(0\);/);
-    expect(media).not.toMatch(/transition/);
-    expect(css).not.toMatch(/\.media[^{]*\{[^}]*(scale|will-change: transform)/);
+  it("clips on a stable layer: the clip never transforms, scales or changes size per state", () => {
+    const media = cssRule(CSS, ".media");
+    expect(cssValue(media, "overflow")).toBe("hidden");
+    expect(cssValue(media, "border-radius")).toBe("var(--prime-radius-full)");
+    expect(cssValue(media, "transform")).toBe("translateZ(0)");
+    const onMedia = cssRules(CSS).filter((rule) => /\.media\b/.test(rule.selector));
+    for (const rule of onMedia) {
+      for (const decl of rule.decls) {
+        expect(decl.prop).not.toMatch(/^(scale|will-change)$/);
+        if (decl.prop === "transition") expect(decl.value).toMatch(/^opacity /);
+      }
+    }
   });
 
   it("the duration pill reads like the voice message's time: muted caption, regular weight", () => {
-    const pill = readFileSync(
-      path.join(process.cwd(), "src/internal/mediaPill.module.css"),
-      "utf8",
+    // The last word of every rule that names `.pill` (alone or in a list).
+    const pill = new Map(
+      cssRules("src/internal/mediaPill.module.css")
+        .filter((rule) => rule.selector.split(/\s*,\s*/).includes(".pill"))
+        .flatMap((rule) => rule.decls.map((decl) => [decl.prop, decl.value] as const)),
     );
-    const rule = pill.match(/\n\.pill \{([^}]*)\}/)?.[1] ?? "";
-    expect(rule).toMatch(/color: var\(--prime-color-media-pill-fg\);/);
-    expect(rule).toMatch(/font-weight: var\(--prime-font-weight-regular\);/);
-    expect(rule).toMatch(/font-size: var\(--prime-text-caption-size\);/);
+    expect(pill.get("color")).toBe("var(--prime-color-media-pill-fg)");
+    expect(pill.get("font-weight")).toBe("var(--prime-font-weight-regular)");
+    expect(pill.get("font-size")).toBe("var(--prime-text-caption-size)");
   });
 
   it("is a round part: the message's outline hook and meta overlay sit on the circle", () => {

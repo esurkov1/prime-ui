@@ -24,10 +24,12 @@ export const RING_DATA_STROKE = RING_PATH / (11 * Math.PI);
  * - `line` — a ring inside a control (Spinner, the ring of a circle Button, a transfer disk): the
  *   kit's line weight, two border widths — the weight of an icon's stroke at the control's tier,
  *   at every diameter.
+ * - `band` — a band of one spacing step over the edge of a round video (the playback ring of
+ *   VideoNote, the recording ring of the Composer).
  */
-export type RingWeight = "data" | "line";
+type RingWeight = "data" | "line" | "band";
 
-export type RingProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
+type RingProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
   /**
    * The share drawn, `0…1`; `null` — under way, the share unknown: a quarter arc that always
    * turns. Ignored with `live`.
@@ -89,10 +91,11 @@ export function RingCap({
  * it. An SVG without a viewBox: the circle is placed in CSS (`r`, the stroke from `weight`), so
  * the stroke is exact at every diameter; lengths are percent of the circle (`RING_PATH`). The arc
  * starts at 12 o'clock and runs clockwise with round ends; its share is one variable
- * (`--ring-value`) and glides by itself (`base`, on the paint of the arc), while the turn is a
- * transform of the whole svg (compositor) — so a share grows while the ring turns. Colors:
- * `--ring-fill` (default `currentColor`) and `--ring-track` (default `currentColor` at 32%).
- * Decorative (`aria-hidden`) unless the host gives it a role.
+ * (`--ring-value`) and glides by itself (`base`, on the paint of the arc), while the turn is the
+ * `rotate` of its inner group (compositor) — so a share grows while the ring turns, and a host's
+ * own animation of the svg (a region swap) runs beside it. The fill is `--ring-fill` (default
+ * `currentColor`); the track is `currentColor` at the line tint. Decorative (`aria-hidden`)
+ * unless the host gives it a role.
  */
 export function Ring({
   value,

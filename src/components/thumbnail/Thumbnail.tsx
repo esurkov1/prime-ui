@@ -15,8 +15,10 @@ import {
 } from "@/internal/imageSlot";
 import { MediaPlayMark } from "@/internal/mediaDisk";
 import { firstFrame } from "@/internal/mediaFrame";
+import pill from "@/internal/mediaPill.module.css";
 import { useMediaSession } from "@/internal/mediaSession";
 import palette from "@/internal/palette.module.css";
+import press from "@/internal/press.module.css";
 import { Slot } from "@/internal/slot";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 
@@ -27,32 +29,20 @@ export type ThumbnailRatio = "1:1" | "4:3" | "3:2" | "16:9" | "3:4";
 
 const slot = createImageSlot("Thumbnail", { image: styles.image, fallback: styles.fallback });
 
+/** The frame's props; each is described in `api.ts`. */
 export type ThumbnailRootProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "color" | "defaultChecked" | "onChange"
 > & {
-  /** Height tier: 24 · 32 · 40 · 48 · 64; width follows `ratio`. Default `m`. */
   size?: ControlSize;
-  /** Aspect ratio, width ÷ height. Default `1:1`. */
   ratio?: ThumbnailRatio;
-  /** Fallback fill and icon color (`--prime-color-palette-<hue>-*`). Default `gray`. */
   color?: PaletteColor;
-  /** Fallback fill: `soft` tint with a hue icon, or `solid` hue with a contrasting icon. */
   variant?: "soft" | "solid";
-  /** Fills the container width (cards, galleries); the height follows `ratio`. */
   fullWidth?: boolean;
-  /** A faint inner ring around the frame, for photos with a white background on a light surface. */
   ring?: boolean;
-  /**
-   * Puts the frame on its one child — a `<button>` that opens a viewer, an `<a>` to the object —
-   * which takes the parts as its children: hover lift, press and focus ring come with it.
-   */
   asChild?: boolean;
-  /** Selected (controlled): the tile becomes a checkbox with a check in its corner. */
   checked?: boolean;
-  /** Initially selected (uncontrolled); makes the tile selectable. */
   defaultChecked?: boolean;
-  /** Selection changed; makes the tile selectable. */
   onCheckedChange?: (checked: boolean) => void;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -94,8 +84,9 @@ function ThumbnailRoot({
     defaultValue: defaultChecked ?? false,
     onChange: onCheckedChange,
   });
+  const interactive = asChild || selectable;
   const frame = {
-    className: cx(styles.root, palette.hue, className),
+    className: cx(styles.root, palette.hue, interactive && press.press, className),
     ...toDataAttributes({
       size,
       ratio,
@@ -103,7 +94,7 @@ function ThumbnailRoot({
       variant,
       "full-width": fullWidth || undefined,
       ring: ring || undefined,
-      interactive: asChild || selectable || undefined,
+      interactive: interactive || undefined,
       checked: selectable ? checked : undefined,
     }),
   };
@@ -155,7 +146,6 @@ function ThumbnailRoot({
 ThumbnailRoot.displayName = "Thumbnail.Root";
 
 export type ThumbnailImageProps = ImageSlotImageProps & {
-  /** `cover` (default) crops to fill; `contain` shows the whole image on the fallback fill. */
   fit?: "cover" | "contain";
 };
 
@@ -170,18 +160,10 @@ export type ThumbnailVideoProps = Omit<
   "src" | "poster" | "controls" | "autoPlay" | "muted" | "loop" | "children"
 > & {
   src: string;
-  /** A still to show before playing; without it the first frame is drawn (`preload="metadata"`). */
   poster?: string;
-  /** The native controls: a video message or a clip to watch in place. */
   controls?: boolean;
-  /**
-   * Plays muted, in a loop, inline, with no controls: a GIF-like clip. Off under reduced motion
-   * (the first frame stands still).
-   */
   autoPlay?: boolean;
-  /** `cover` (default) crops to fill; `contain` letterboxes on the fallback fill. */
   fit?: "cover" | "contain";
-  /** Display of the duration badge. Default `m:ss` (`h:mm:ss` from an hour). */
   formatDuration?: (seconds: number) => string;
   ref?: React.Ref<HTMLVideoElement>;
 };
@@ -214,10 +196,7 @@ function ThumbnailVideoInner({
   // A video played with sound is the one sound of the page (`internal/mediaSession`).
   useMediaSession(sessionRef);
   const videoRef = useMergedRefs<HTMLVideoElement | null>(mute, sessionRef, ref);
-  const media = useImageStatus<HTMLVideoElement>(report, {
-    onLoad: onLoadedData,
-    onError,
-  });
+  const media = useImageStatus<HTMLVideoElement>(report, { onError });
   const [duration, setDuration] = React.useState<number | null>(null);
   const [playing, setPlaying] = React.useState(false);
   // Read once: a clip that starts moving later, when the setting changes, would be a surprise.
@@ -237,11 +216,18 @@ function ThumbnailVideoInner({
         className={cx(styles.image, styles.video, className)}
         data-fit={fit}
         data-status={media.status}
-        onLoadedData={media.onLoad}
+        // Without a poster the first frame is the picture: loaded once it is drawn. With a poster
+        // the poster is the picture, and `preload="metadata"` may never draw a frame: loaded once
+        // the metadata is in.
+        onLoadedData={(event) => {
+          if (!poster) media.onLoad(event);
+          onLoadedData?.(event);
+        }}
         onError={media.onError}
         onLoadedMetadata={(event) => {
           const seconds = event.currentTarget.duration;
           if (Number.isFinite(seconds)) setDuration(seconds);
+          if (poster) media.onLoad(event);
           onLoadedMetadata?.(event);
         }}
         onPlay={(event) => {
@@ -253,10 +239,11 @@ function ThumbnailVideoInner({
           onPause?.(event);
         }}
       />
-      {/* A still frame says it is a video; the native controls say it themselves. */}
-      {!controls && !loops && !playing ? <MediaPlayMark className={styles.play} /> : null}
+      {/* A still frame says it is a video; the native controls (or a clip that loops) say it
+          themselves. The mark fades out while the video plays and back on a pause. */}
+      {!controls && !loops ? <MediaPlayMark shown={!playing} className={styles.play} /> : null}
       {!controls && duration !== null ? (
-        <span className={styles.duration}>{formatDuration(duration)}</span>
+        <span className={cx(pill.pill, styles.duration)}>{formatDuration(duration)}</span>
       ) : null}
     </>
   );

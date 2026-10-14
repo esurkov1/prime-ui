@@ -1,4 +1,4 @@
-/** No image (an icon or a short label on the fill) and an image that fails and falls back by itself. */
+/** No image (an icon or a short label on the fill) and an image that fails and falls back by itself — `Thumbnail.Fallback`, `Thumbnail.Image`. */
 import { Icon, Thumbnail, Typography } from "prime-ui-kit";
 
 export default function ThumbnailStatesExample() {

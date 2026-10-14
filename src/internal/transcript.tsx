@@ -1,34 +1,26 @@
 import * as React from "react";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
-import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { Disclosure } from "@/internal/Disclosure";
 import { HighlightMatch } from "@/internal/HighlightMatch";
 import { useMessageHighlight, useMessagePart } from "@/internal/messagePart";
 import type { SurfaceDepth } from "@/internal/surfaceDepth";
-import { isPromiseLike } from "@/internal/usePendingChanges";
+import textRole from "@/internal/textRole.module.css";
+import { type AsyncHandler, isPromiseLike } from "@/internal/usePendingChanges";
 
 import styles from "./transcript.module.css";
 
 /**
- * The transcript of a voice or video message (VoicePlayer, VideoNote): a button that
- * opens the text under the media, the text itself, and its request when the text is not known yet.
+ * The transcript of a voice or video message (VoicePlayer, VideoNote): a button that opens the
+ * text under the media, the text itself, and its request when the text is not known yet (each
+ * prop is described in `transcript.api.ts`). An `onTranscribe` that returns nothing keeps the
+ * button spinning until the owner passes `transcript`.
  */
 export type TranscriptProps = {
-  /** The text of the recording, when it is known. With it or `onTranscribe` the button shows. */
   transcript?: string;
-  /**
-   * Asks for the text when `transcript` is not known yet, on the first open. Return a Promise of the
-   * text: only the button spins and the area stays closed until it resolves, then it opens with the
-   * text; a rejection announces `transcribeFailed`. Returning nothing keeps the button spinning
-   * until the owner passes `transcript`.
-   */
-  // biome-ignore lint/suspicious/noConfusingVoidType: a handler that returns nothing must fit.
-  onTranscribe?: () => Promise<string> | void;
-  /** The transcript is open (controlled). */
+  onTranscribe?: AsyncHandler<[], string>;
   transcriptExpanded?: boolean;
-  /** Initially open (uncontrolled). Default `false`. */
   defaultTranscriptExpanded?: boolean;
   onTranscriptExpandedChange?: (expanded: boolean) => void;
 };
@@ -181,7 +173,7 @@ export function useTranscript(
             (it fades in where it stands, and out where it stood, as the bubble glides). */}
         {open ? (
           <div className={cx(styles.block, className)} data-depth={depth} data-morph-item="">
-            <p className={styles.text}>
+            <p className={cx(textRole.bodyM, styles.text)}>
               <span data-message-selectable="">
                 {highlight ? <HighlightMatch text={text} query={highlight} all /> : text}
               </span>
@@ -205,22 +197,4 @@ export function useTranscript(
     },
     region,
   };
-}
-
-/**
- * The button's glyph: the transcript mark («→A») while closed, a chevron up while open; they
- * cross-fade. The request's spinner is the Button's own `loading` (`internal/mediaPlayer`
- * `TranscriptButton`).
- */
-export function TranscriptGlyph({ expanded }: { expanded: boolean }) {
-  return (
-    <span className={styles.glyphs} aria-hidden="true">
-      <span className={styles.glyph} data-shown={!expanded}>
-        <Icon name="action.transcribe" />
-      </span>
-      <span className={styles.glyph} data-shown={expanded}>
-        <Icon name="nav.chevronUp" />
-      </span>
-    </span>
-  );
 }

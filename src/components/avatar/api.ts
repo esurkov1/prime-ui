@@ -32,8 +32,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Avatar.Image",
-      en: '`ref` → `HTMLImageElement`. The photo; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).',
-      ru: 'Фото; скрыто, пока грузится и после ошибки, — видна подложка. Новый `src` начинает загрузку заново. Грузится лениво и декодируется вне главного потока (`loading="lazy"`, `decoding="async"`; оба можно переопределить).',
+      en: '`ref` → `HTMLImageElement`. The photo; hidden while it loads and after an error, so the Fallback shows through. A new `src` fades in over the last one. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).',
+      ru: 'Фото; скрыто, пока грузится и после ошибки, — видна подложка. Новый `src` проявляется поверх прежнего. Грузится лениво и декодируется вне главного потока (`loading="lazy"`, `decoding="async"`; оба можно переопределить).',
       props: [
         {
           name: "src",

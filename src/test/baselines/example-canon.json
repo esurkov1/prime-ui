@@ -31,7 +31,6 @@
   "src/components/smart-filter/examples/ranges.tsx: toISOString().slice",
   "src/components/spinner/examples/overview.tsx: JSDoc tail",
   "src/components/stepper/examples/narrow.tsx: JSDoc tail",
-  "src/components/thumbnail/examples/states.tsx: JSDoc tail",
   "src/components/timeline/examples/narrow.tsx: JSDoc tail",
   "src/layout/app-shell/examples/template.tsx: JSDoc tail"
 ]

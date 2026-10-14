@@ -6,13 +6,16 @@
  *
  * Stroke (`--ring-stroke`), by `data-weight`:
  *   line — two border widths at every diameter: the weight of an icon's stroke (Spinner, a disk);
- *   data — 1/12 of the diameter, never under the line weight (ProgressCircle).
+ *   data — 1/12 of the diameter, never under the line weight (ProgressCircle);
+ *   band — one spacing step: a playback or recording band over the edge of a round video.
+ * The fill (`--ring-fill`) is the only hook a host sets.
  *
  * Motion (foundation §7): the share glides on the arc (`stroke-dashoffset`, `base` · standard);
- * the turn is a transform of the whole svg, so it runs on the compositor and the share keeps
- * growing while the ring turns. One turn = 3 × `--prime-motion-loop`; reduced motion makes it
- * twice as slow and never stops it — the turn is the only sign that something is under way.
- * While turning the arc is never shorter than 8%, so a turning 0% still shows.
+ * the turn is the `rotate` of the inner group, so it runs on the compositor, the share keeps
+ * growing while the ring turns, and the svg itself stays free for its host's own animation (a
+ * region swap). One turn = 3 × `--prime-motion-loop`; reduced motion makes it twice as slow and
+ * never stops it — the turn is the only sign that something is under way. While turning the arc
+ * is never shorter than 8%, so a turning 0% still shows.
  */
 .ring {
   --ring-stroke: calc(var(--prime-border-width) * 2);
@@ -31,16 +34,12 @@
   --ring-stroke: max(calc(100% / 12), calc(var(--prime-border-width) * 2));
 }
 
-.ring[data-spin] {
-  --ring-arc: max(var(--ring-value, 0), 0.08);
-
-  animation: ringTurn calc(var(--prime-motion-loop) * 3) linear infinite;
+.ring[data-weight="band"] {
+  --ring-stroke: var(--prime-space-1);
 }
 
-@keyframes ringTurn {
-  to {
-    transform: rotate(1turn);
-  }
+.ring[data-spin] {
+  --ring-arc: max(var(--ring-value, 0), 0.08);
 }
 
 /* Arcs start at 12 o'clock and run clockwise. */
@@ -48,6 +47,17 @@
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
   transform-box: view-box;
+}
+
+/* The turn: the individual `rotate` composes with the group's quarter turn back. */
+.ring[data-spin] > .turn {
+  animation: ringTurn calc(var(--prime-motion-loop) * 3) linear infinite;
+}
+
+@keyframes ringTurn {
+  to {
+    rotate: 1turn;
+  }
 }
 
 .circle {
@@ -94,7 +104,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ring[data-spin] {
+  .ring[data-spin] > .turn {
     animation-duration: calc(var(--prime-motion-loop) * 6);
   }
 }

@@ -3,7 +3,7 @@ import * as React from "react";
 import { Button } from "@/components/button/Button";
 import { Spinner } from "@/components/spinner/Spinner";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
-import { Icon } from "@/icons";
+import { Icon, type IconName } from "@/icons";
 import { cx } from "@/internal/cx";
 import { mediaDiskClass } from "@/internal/mediaDisk";
 import { Ring } from "@/internal/ring";
@@ -13,7 +13,7 @@ import {
   type TransferHandler,
   type TransferState,
 } from "@/internal/transfer";
-import { isPromiseLike } from "@/internal/usePendingChanges";
+import { isPromiseLike, usePendingKeys } from "@/internal/usePendingChanges";
 
 import styles from "./transferDisk.module.css";
 
@@ -48,7 +48,7 @@ export type TransferDiskProps = {
 
 type Action = "cancel" | "retry" | "download";
 
-export type TransferDiskModel = {
+type TransferDiskModel = {
   /** What a press does now, or `null` when the disk only shows the state. */
   action: Action | null;
   /** The handler of `action` was given. */
@@ -86,15 +86,8 @@ export function useTransferDisk({
   disabled = false,
 }: Omit<TransferDiskProps, "look" | "size" | "className">): TransferDiskModel {
   const descriptionId = React.useId();
-  const [pending, setPending] = React.useState<Action | null>(null);
+  const { pending, track } = usePendingKeys<Action>();
   const [notice, setNotice] = React.useState("");
-  const alive = React.useRef(true);
-  React.useEffect(() => {
-    alive.current = true;
-    return () => {
-      alive.current = false;
-    };
-  }, []);
 
   const active = inFlight(state);
   const failed = state === "failed";
@@ -108,47 +101,32 @@ export function useTransferDisk({
         : action === "download"
           ? onDownload
           : undefined;
-  const busy = (action !== null && pending === action) || (active && cancelPending);
+  const busy = (action !== null && pending.has(action)) || (active && cancelPending);
 
   const run = () => {
     if (!handler || !action || busy || disabled) return;
     setNotice("");
-    const result = handler();
-    if (!isPromiseLike(result)) return;
-    setPending(action);
-    result.then(
-      () => {
-        if (alive.current) setPending(null);
-      },
-      () => {
-        if (!alive.current) return;
-        setPending(null);
-        const refused =
-          action === "cancel"
-            ? labels.cancelFailed
-            : action === "retry"
-              ? labels.retryFailed
-              : labels.downloadFailed;
-        setNotice(refused ?? "");
-      },
-    );
+    // A returned promise keeps the action pending until it settles; a rejection is announced.
+    const outcome = track(action, handler());
+    if (!isPromiseLike(outcome)) return;
+    const refused =
+      action === "cancel"
+        ? labels.cancelFailed
+        : action === "retry"
+          ? labels.retryFailed
+          : labels.downloadFailed;
+    outcome.then(undefined, () => setNotice(refused ?? ""));
   };
 
-  const glyph = busy ? (
-    <Spinner />
-  ) : (
-    <Icon
-      name={
-        remote
-          ? "action.download"
-          : failed
-            ? onRetry
-              ? "action.refresh"
-              : "status.failed"
-            : "action.close"
-      }
-    />
-  );
+  // One glyph slot: the host's `Button.Icon` cross-fades a change of it in place.
+  const glyphName: IconName = remote
+    ? "action.download"
+    : failed
+      ? onRetry
+        ? "action.refresh"
+        : "status.failed"
+      : "action.close";
+  const glyph = busy ? <Spinner /> : <Icon name={glyphName} />;
   const name =
     action === "cancel" ? labels.cancel : action === "retry" ? labels.retry : labels.download;
   // The ring: empty while queued (it turns at its least arc), the share while loading (`null`
@@ -239,6 +217,7 @@ export function TransferDisk({
         // disk in the same colors, with the same ring.
         <span
           className={cx(mediaDiskClass, styles.still)}
+          data-size={size}
           data-variant={variant}
           data-tone={tone}
           {...(inFlight(state)
@@ -265,14 +244,12 @@ export function TransferDisk({
   );
 }
 
-export type TransferOverlayProps = TransferDiskProps;
-
 /**
  * The transfer disk centred over a box (an attachment tile, a picture in a chat message, a video
  * circle). The host positions it (`position: absolute; inset: 0`) and dims its content while the
  * transfer is not done; only the disk takes the pointer.
  */
-export function TransferOverlay({ className, ...props }: TransferOverlayProps) {
+export function TransferOverlay({ className, ...props }: TransferDiskProps) {
   return (
     <span className={cx(styles.overlay, className)} data-state={props.state}>
       <TransferDisk {...props} />

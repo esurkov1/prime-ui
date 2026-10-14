@@ -81,6 +81,15 @@ function revokePreview(url: string | undefined) {
   if (url && typeof URL.revokeObjectURL === "function") URL.revokeObjectURL(url);
 }
 
+/** The item as the queue hands it out: with its preview URL, while it has one. */
+function withPreview<TResult>(
+  item: UploadItem<TResult>,
+  previews: ReadonlyMap<string, string>,
+): UploadItem<TResult> {
+  const preview = previews.get(item.id);
+  return preview === undefined ? item : { ...item, preview };
+}
+
 /**
  * An upload queue for FileUpload: files wait their turn, `concurrency` of them go
  * at once through your `upload`, each with its progress, its error and a retry. Removing a file
@@ -90,14 +99,41 @@ function revokePreview(url: string | undefined) {
 export function useUploadQueue<TResult = unknown>(
   options: UploadQueueOptions<TResult>,
 ): UploadQueue<TResult> {
-  const [items, setItems] = React.useState<readonly UploadItem<TResult>[]>([]);
-  const itemsRef = React.useRef(items);
-  itemsRef.current = items;
+  /** The queue without previews: a preview is a resource of the mounted queue, not of the data. */
+  const [entries, setItems] = React.useState<readonly UploadItem<TResult>[]>([]);
   const optionsRef = React.useRef(options);
-  optionsRef.current = options;
+  React.useLayoutEffect(() => {
+    optionsRef.current = options;
+  });
   /** The uploads in flight, by item id: the one truth about what is running. */
   const running = React.useRef(new Map<string, AbortController>());
+  /** The preview URL of each image or video item, by id: created once, revoked when it leaves. */
+  const previews = React.useRef(new Map<string, string>());
+  /** What the items show of the previews: a copy of the map, renewed when it changes. */
+  const [shown, setShown] = React.useState<ReadonlyMap<string, string>>(() => new Map());
   const prefix = React.useId();
+
+  // Previews follow the items: an item that left has its URL revoked; an item without one (the
+  // queue mounted again after an unmount revoked them) gets a new one.
+  React.useLayoutEffect(() => {
+    const map = previews.current;
+    const ids = new Set(entries.map((item) => item.id));
+    let changed = false;
+    for (const [id, url] of map) {
+      if (ids.has(id)) continue;
+      revokePreview(url);
+      map.delete(id);
+      changed = true;
+    }
+    for (const item of entries) {
+      if (map.has(item.id)) continue;
+      const url = createPreview(item.file);
+      if (url === undefined) continue;
+      map.set(item.id, url);
+      changed = true;
+    }
+    if (changed) setShown(new Map(map));
+  }, [entries]);
 
   const update = React.useCallback((id: string, patch: Partial<UploadItem<TResult>>) => {
     setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)));
@@ -140,7 +176,7 @@ export function useUploadQueue<TResult = unknown>(
     const limit = Math.max(1, optionsRef.current.concurrency ?? DEFAULT_CONCURRENCY);
     let free = limit - running.current.size;
     if (free <= 0) return;
-    const waiting = items.filter(
+    const waiting = entries.filter(
       (item) =>
         (item.status === "queued" || item.status === "loading") && !running.current.has(item.id),
     );
@@ -153,43 +189,32 @@ export function useUploadQueue<TResult = unknown>(
     }
   });
 
-  // Unmount aborts and revokes. A remount (Strict Mode replays one) draws new previews; the cut
-  // uploads start again from the effect above.
+  // Unmount aborts and revokes. On a remount the previews come back from the sync above and the
+  // cut uploads start again from the effect before this one.
   React.useEffect(() => {
-    const current = itemsRef.current;
-    if (current.some((item) => item.preview === "")) {
-      setItems((list) =>
-        list.map((item) =>
-          item.preview === "" ? { ...item, preview: createPreview(item.file) } : item,
-        ),
-      );
-    }
-    const map = running.current;
+    const uploads = running.current;
+    const urls = previews.current;
     return () => {
-      for (const controller of map.values()) controller.abort();
-      map.clear();
-      for (const item of itemsRef.current) revokePreview(item.preview);
-      // Marked for a remount; an unmounted queue is never read again.
-      itemsRef.current = itemsRef.current.map((item) =>
-        item.preview ? { ...item, preview: "" } : item,
-      );
-      setItems(itemsRef.current);
+      for (const controller of uploads.values()) controller.abort();
+      uploads.clear();
+      for (const url of urls.values()) revokePreview(url);
+      urls.clear();
     };
   }, []);
 
   const add = React.useCallback(
     (files: readonly File[]) => {
-      const added = files.map(
-        (file): UploadItem<TResult> => ({
-          id: `${prefix}upload-${++sequence}`,
-          file,
-          status: "queued",
-          progress: 0,
-          preview: createPreview(file),
-        }),
-      );
-      if (added.length > 0) setItems((current) => [...current, ...added]);
-      return added;
+      const added = files.map((file): UploadItem<TResult> => {
+        const id = `${prefix}upload-${++sequence}`;
+        const preview = createPreview(file);
+        if (preview !== undefined) previews.current.set(id, preview);
+        return { id, file, status: "queued", progress: 0 };
+      });
+      if (added.length > 0) {
+        setItems((current) => [...current, ...added]);
+        setShown(new Map(previews.current));
+      }
+      return added.map((item) => withPreview(item, previews.current));
     },
     [prefix],
   );
@@ -204,18 +229,16 @@ export function useUploadQueue<TResult = unknown>(
     );
   }, []);
 
+  // The previews of removed items are revoked by the sync of the previews.
   const remove = React.useCallback((id: string) => {
     running.current.get(id)?.abort();
     running.current.delete(id);
-    const item = itemsRef.current.find((entry) => entry.id === id);
-    revokePreview(item?.preview);
     setItems((current) => current.filter((entry) => entry.id !== id));
   }, []);
 
   const clear = React.useCallback(() => {
     for (const controller of running.current.values()) controller.abort();
     running.current.clear();
-    for (const item of itemsRef.current) revokePreview(item.preview);
     setItems([]);
   }, []);
 
@@ -229,6 +252,11 @@ export function useUploadQueue<TResult = unknown>(
       return next.every((entry, index) => entry === current[index]) ? current : next;
     });
   }, []);
+
+  const items = React.useMemo(
+    () => entries.map((item) => withPreview(item, shown)),
+    [entries, shown],
+  );
 
   return React.useMemo(
     () => ({ items, add, retry, remove, clear, move }),

@@ -30,7 +30,7 @@ export type GalleryLayout = {
 };
 
 /** At most this many items are laid out. */
-export const GALLERY_MAX = 10;
+const GALLERY_MAX = 10;
 
 /** The tallest an album of 2–4 is, in widths (the media cap is a square). */
 const MAX_H = 1;
@@ -110,7 +110,7 @@ function two([a, b]: [number, number]): GalleryLayout {
 function three([a, b, c]: [number, number, number]): GalleryLayout {
   if (orientationOf(a) === "n") {
     // A tall first one at the start, the other two stacked beside it.
-    const third = Math.min(MAX_H * 0.5, (b * 1) / (c + b));
+    const third = Math.min(MAX_H * 0.5, b / (c + b));
     const second = MAX_H - third;
     const right = Math.max(MIN_W, Math.min(0.5, Math.min(third * c, second * b)));
     const left = Math.min(MAX_H * a, 1 - right);
@@ -235,14 +235,17 @@ function rows(ratios: readonly number[]): GalleryLayout {
   return normalise(rects, 1, y);
 }
 
-/** The layout of `ratios` (width ÷ height of each item, in order). */
+/**
+ * The layout of `ratios` (width ÷ height of each item, in order): the only place the album is
+ * capped — items past `GALLERY_MAX` get no tile.
+ */
 export function layoutGallery(ratios: readonly number[]): GalleryLayout {
-  const list = ratios.slice(0, GALLERY_MAX);
-  switch (list.length) {
+  const laid = ratios.slice(0, GALLERY_MAX);
+  switch (laid.length) {
     case 0:
       return { ratio: 1, widthFactor: 1, tiles: [] };
     case 1: {
-      const ratio = list[0] as number;
+      const ratio = laid[0] as number;
       return {
         ratio,
         widthFactor: Math.min(1, ratio),
@@ -250,12 +253,12 @@ export function layoutGallery(ratios: readonly number[]): GalleryLayout {
       };
     }
     case 2:
-      return two(list as [number, number]);
+      return two(laid as [number, number]);
     case 3:
-      return three(list as [number, number, number]);
+      return three(laid as [number, number, number]);
     case 4:
-      return four(list as [number, number, number, number]);
+      return four(laid as [number, number, number, number]);
     default:
-      return rows(list);
+      return rows(laid);
   }
 }

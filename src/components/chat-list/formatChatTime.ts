@@ -1,3 +1,5 @@
+import { formatTimeOfDay } from "@/internal/formatClock";
+
 const WEEKDAYS = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
 const MONTHS = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
 
@@ -11,7 +13,7 @@ const dayOf = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date
  */
 export function formatChatTime(date: Date, now: Date): string {
   const days = Math.round((dayOf(now).getTime() - dayOf(date).getTime()) / 86_400_000);
-  if (days <= 0) return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  if (days <= 0) return formatTimeOfDay(date);
   if (days < 7) return WEEKDAYS[date.getDay()] ?? "";
   if (date.getFullYear() === now.getFullYear()) {
     return `${date.getDate()} ${MONTHS[date.getMonth()]}`;

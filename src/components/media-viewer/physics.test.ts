@@ -7,7 +7,6 @@ import {
   emphasized,
   fitBox,
   panLimit,
-  projectMomentum,
   releaseVelocity,
   rubberBand,
   rubberClamp,
@@ -69,11 +68,21 @@ describe("media viewer physics", () => {
     }
   });
 
-  it("coasts with iOS momentum", () => {
+  it("coasts with iOS momentum: a flick of 1 px/ms comes to rest about 500 px on", () => {
     expect(decayVelocity(1, 0)).toBe(1);
     expect(decayVelocity(1, 100)).toBeCloseTo(0.998 ** 100);
-    expect(projectMomentum(1)).toBeCloseTo(499);
-    expect(projectMomentum(-1)).toBeCloseTo(-499);
+    // The distance a coast covers, frame by frame, until it is still.
+    const coast = (start: number) => {
+      let velocity = start;
+      let distance = 0;
+      while (Math.abs(velocity) > 1e-4) {
+        velocity = decayVelocity(velocity, 1);
+        distance += velocity;
+      }
+      return distance;
+    };
+    expect(coast(1)).toBeCloseTo(499, 0);
+    expect(coast(-1)).toBeCloseTo(-499, 0);
   });
 
   it("reads the release velocity over the last stretch only", () => {

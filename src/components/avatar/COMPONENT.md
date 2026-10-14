@@ -47,7 +47,7 @@ Avatar.Group           overlapping row, gives its size to members
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `aria-label` (when no name is shown) and the other div attributes. |
 
 ### Avatar.Image
-`ref` → `HTMLImageElement`. The photo; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).
+`ref` → `HTMLImageElement`. The photo; hidden while it loads and after an error, so the Fallback shows through. A new `src` fades in over the last one. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -157,7 +157,7 @@ No keyboard interaction.
 | [states.tsx](examples/states.tsx) | A loaded photo, a broken URL that falls back to initials, and an icon fallback for a guest — `Avatar.Image`, `Avatar.Fallback`. |
 | [presence.tsx](examples/presence.tsx) | A presence dot on the avatar edge: each state has its own shape and color and is announced by its name — `Avatar.Status`, `labels`. |
 | [team-group.tsx](examples/team-group.tsx) | Project members as an overlapping row with a «+N» cell; the group size goes to every member — `Avatar.Group`, `Avatar.Overflow`, `size`. |
-| [src-from-state.tsx](examples/src-from-state.tsx) | A new photo source restarts loading; initials show until the new photo arrives — `src`. |
+| [src-from-state.tsx](examples/src-from-state.tsx) | A new photo source loads over the last photo and cross-fades in; initials show only until a first photo arrives — `src`. |
 
 ## Mistakes
 - `Avatar.Image` without `Avatar.Fallback` → a failed photo leaves an empty circle; add initials.

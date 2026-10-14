@@ -54,7 +54,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "color" \| "defaultChecked" \| "onChange">` | — | `className`, `aria-label` + `role` for a fallback-only thumbnail, and the other attributes of the frame. |
 
 ### Thumbnail.Image
-`ref` → `HTMLImageElement`. The picture; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).
+`ref` → `HTMLImageElement`. The picture; hidden while it loads and after an error, so the Fallback shows through. A new `src` fades in over the last one. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -64,12 +64,12 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | `…rest` | `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" \| "alt">` | — | `className`, `onLoad`, `onError` and the other img attributes. |
 
 ### Thumbnail.Video
-`ref` → `HTMLVideoElement`. A video in the frame (`preload="metadata"`, `playsInline`); the Fallback shows until its first frame. Without `controls` it shows the duration, and a play mark while it is still (not looping, not playing).
+`ref` → `HTMLVideoElement`. A video in the frame (`preload="metadata"`, `playsInline`); the Fallback shows until its first frame (with a `poster`, its metadata). Without `controls`: the duration pill and a play mark that fades while it plays.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `src` | `string` | — (required) | Video URL. Without a `poster` the first frame is asked for (`#t=0.001` is added when the URL has no fragment). |
-| `poster` | `string` | — | A still shown before playing. |
+| `poster` | `string` | — | A still shown before playing; with it the video counts as loaded once its metadata is in. |
 | `controls` | `boolean` | `false` | Native controls: a video message or a clip to watch in place; no play mark or duration of the kit. |
 | `autoPlay` | `boolean` | `false` | A GIF-like clip: plays muted, in a loop, inline. Off under `prefers-reduced-motion` (read once): the first frame stands still with the play mark. |
 | `fit` | `"cover" \| "contain"` | `"cover"` | `cover` crops to fill; `contain` letterboxes on the fallback fill. |
@@ -132,15 +132,15 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | loaded | image `load` | `data-status="loaded"`, the image fades in; Fallback `aria-hidden` |
 | error | image `error` | `data-status="error"`, image hidden, Fallback visible |
 | frame | props | `data-size`, `data-ratio`, `data-color`, `data-variant`, `data-full-width`, `data-ring` |
-| video loading | `Thumbnail.Video` mounted | `data-status="loading"` until the first frame (`loadeddata`), then `loaded`; `error` falls back like an image |
-| video still | no `controls`, not playing | a play mark in the centre (from `m`): the still media disk (`internal/mediaDisk`) — the look and size of the shade circle Button over media (40, a 20 glyph, `--prime-color-media-disk` under `--prime-media-disk-blur`), at 60% of a lower frame's height; the duration at the end corner (from `l` and `fullWidth`) on `--prime-color-media-shade` |
-| hover / press / focus | `asChild` or selectable | `data-interactive`: lift on `--prime-shadow-overlay` (`@media (hover: hover)`), scale 0.98 while pressed (`fast`), focus ring |
-| selected | `checked` | `aria-checked="true"`, `data-checked="true"`: an accent ring over the picture and a checked indicator; the indicator is always shown, never hover-only |
+| video loading | `Thumbnail.Video` mounted | `data-status="loading"` until the first frame (`loadeddata`) — with a `poster`, until its metadata (`loadedmetadata`) — then `loaded`; `error` falls back like an image |
+| video still / playing | no `controls`, not looping | a play mark in the centre (from `m`): the still media disk (`internal/mediaDisk`) — the look and size of the shade circle Button over media (the control `l` height, a glyph of half of it, `--prime-color-media-disk` under `--prime-media-disk-blur`), at 60% of a lower frame's height; it fades and shrinks away while the video plays (`data-shown="false"`) and comes back on a pause. The duration at the end corner (from `l` and `fullWidth`) is the media pill (`internal/mediaPill`) |
+| hover / press / focus | `asChild` or selectable | `data-interactive`: lift on `--prime-shadow-overlay` (`@media (hover: hover)`), the kit's press (`--prime-motion-press-scale`, `fast`), focus ring |
+| selected | `checked` · `defaultChecked` | `aria-checked="true"`, `data-checked="true"`: an accent ring over the picture and a checked indicator; the indicator is always shown, never hover-only |
 
 ## Layout & spacing
-- Thumbnail + text in a row: flex, `align-items: center`, gap `--prime-space-3`; the text column `min-width: 0` with `truncate`.
+- Thumbnail + text in a row: flex, `align-items: center`, the row's gap; the text column `min-width: 0` with `truncate`.
 - In a table the row grows to the thumbnail; never shrink the thumbnail to the row.
-- Card covers: `fullWidth` inside the card body, gap `--prime-space-3` to the title.
+- Card covers: `fullWidth` inside the card body, the body's gap to the title.
 - No outline by default: the fill separates the preview.
 
 ## Accessibility
@@ -173,7 +173,7 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | A vehicle next to its name: the photo with an icon fallback underneath — `Thumbnail.Image`, `Thumbnail.Fallback`, `ratio`. |
 | [variants.tsx](examples/variants.tsx) | The fallback fill: a soft tint or a solid hue, in a color that means something — `variant`, `color`. |
 | [sizes.tsx](examples/sizes.tsx) | Every height tier, 24 to 64 px; `m` fits a two-line table cell — `size`. |
-| [states.tsx](examples/states.tsx) | No image (an icon or a short label on the fill) and an image that fails and falls back by itself. |
+| [states.tsx](examples/states.tsx) | No image (an icon or a short label on the fill) and an image that fails and falls back by itself — `Thumbnail.Fallback`, `Thumbnail.Image`. |
 | [ratios.tsx](examples/ratios.tsx) | Every aspect ratio at the same height; keep one ratio per list — `ratio`. |
 | [fit.tsx](examples/fit.tsx) | A supplier's wide banner in a square frame: cropped to fill or shown whole on the fill — `fit`. |
 | [ring.tsx](examples/ring.tsx) | A faint inner ring for a white-background photo on a light surface, where the edge would vanish — `ring`. |
@@ -192,5 +192,5 @@ No `labels`.
 - A bare `<video>` sized in CSS next to thumbnails → `Thumbnail.Video` in the same frame.
 
 ## Related
-- **Built from:** [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` of a selectable tile), `internal/mediaDisk` (the play mark, one look with the shade circle [Button](../button/COMPONENT.md))
+- **Built from:** [Checkbox](../checkbox/COMPONENT.md) (`Checkbox.Indicator` of a selectable tile), `internal/mediaDisk` (the play mark, one look with the shade circle Button), `internal/mediaPill` (the duration), `internal/imageSlot` (the picture and its fallback; a new picture cross-fades over the last), `internal/press` (the press of a pressable tile)
 - **See also:** [Avatar](../avatar/COMPONENT.md), [Card](../card/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Select](../select/COMPONENT.md), [FileUpload](../file-upload/COMPONENT.md) (`FileUpload.ItemPreview` is a Thumbnail; its tiles draw videos with `Thumbnail.Video`)

@@ -2,12 +2,17 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { Slider } from "@/components/slider/Slider";
-import { Icon } from "@/icons";
+import { Icon, type IconName } from "@/icons";
+import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatClock } from "@/internal/formatClock";
 import { formatLabel } from "@/internal/formatLabel";
 import { firstFrame } from "@/internal/mediaFrame";
+import pill from "@/internal/mediaPill.module.css";
 import { type PlaybackState, PlayDisk } from "@/internal/mediaPlayer";
 import { useMediaSession } from "@/internal/mediaSession";
+import { useLayer } from "@/internal/overlay/layerStack";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./MediaViewer.module.css";
 import type { MediaViewerItem, MediaViewerLabels } from "./types";
@@ -53,6 +58,9 @@ type ViewerVideoProps = {
   /** Caption and other parts of the bottom bar, above the controls. */
   caption: React.ReactNode;
 };
+
+/** The time beside the seek: the caption role in the muted light ink of the media shade. */
+const timeClass = cx(textRole.caption, pill.inkMuted, styles.time);
 
 /** A level the sound button brings back after a mute at zero. */
 const UNMUTE_LEVEL = 0.5;
@@ -194,6 +202,8 @@ export function ViewerVideo({
   }, [active, toggle, controlsRef]);
 
   const state: PlaybackState = playing ? "playing" : time > 0 ? "paused" : "idle";
+  // One glyph slot: `Button.Icon` cross-fades the change in place.
+  const playGlyph: IconName = playing ? "action.pause" : "action.play";
   const position = formatLabel(labels.position, {
     current: formatClock(time),
     duration: formatClock(duration),
@@ -242,7 +252,7 @@ export function ViewerVideo({
       </div>
       <div className={styles.bottom} data-viewer-chrome="">
         {caption}
-        <div className={styles.controls}>
+        <div className={cx(pill.shade, styles.controls)}>
           <Button.Root
             variant="ghost"
             tone="neutral"
@@ -252,10 +262,10 @@ export function ViewerVideo({
             onClick={toggle}
           >
             <Button.Icon>
-              <Icon name={playing ? "action.pause" : "action.play"} fill="currentColor" />
+              <Icon name={playGlyph} fill="currentColor" />
             </Button.Icon>
           </Button.Root>
-          <span className={styles.time} aria-hidden="true">
+          <span className={timeClass} aria-hidden="true">
             {formatClock(time)}
           </span>
           <Slider
@@ -275,7 +285,7 @@ export function ViewerVideo({
               setTime(next);
             }}
           />
-          <span className={styles.time} aria-hidden="true">
+          <span className={timeClass} aria-hidden="true">
             {formatClock(duration)}
           </span>
           <SoundControl sound={sound} onSoundChange={onSoundChange} labels={labels} />
@@ -288,7 +298,8 @@ export function ViewerVideo({
 /**
  * The sound button with its level: an upright Slider in a small panel above the button. A hovering
  * pointer opens it by resting on the button, a finger by a tap, the keyboard by moving focus in;
- * a mouse click on the button mutes and unmutes. Escape or a press elsewhere closes it.
+ * a mouse click on the button mutes and unmutes. Open, it is a layer above the viewer's
+ * (`useLayer`): Escape or a press elsewhere closes the level, not the viewer.
  */
 function SoundControl({
   sound,
@@ -305,6 +316,17 @@ function SoundControl({
   const leaveTimer = React.useRef(0);
   const [open, setOpen] = React.useState(false);
   const silent = sound.muted || sound.volume === 0;
+  const muteGlyph: IconName = silent ? "status.muted" : "status.sound";
+
+  useLayer(open, {
+    refs: [rootRef],
+    dismiss: "pointerdown",
+    onDismiss: (reason) => {
+      // The focus goes back to the button first: its focus would open the level again.
+      if (reason === "escape") buttonRef.current?.focus();
+      setOpen(false);
+    },
+  });
 
   const show = () => {
     window.clearTimeout(leaveTimer.current);
@@ -319,18 +341,8 @@ function SoundControl({
 
   React.useEffect(() => () => window.clearTimeout(leaveTimer.current), []);
 
-  // A press anywhere else closes a panel a finger opened.
-  React.useEffect(() => {
-    if (!open) return;
-    const onPress = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", onPress, true);
-    return () => document.removeEventListener("pointerdown", onPress, true);
-  }, [open]);
-
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: hover, focus and Escape of the button and its level together; the controls inside are the button and the slider
+    // biome-ignore lint/a11y/noStaticElementInteractions: hover and focus of the button and its level together; the controls inside are the button and the slider
     <div
       ref={rootRef}
       className={styles.sound}
@@ -344,13 +356,6 @@ function SoundControl({
       onFocus={show}
       onBlur={(event) => {
         if (!rootRef.current?.contains(event.relatedTarget as Node)) setOpen(false);
-      }}
-      onKeyDown={(event) => {
-        if (event.key !== "Escape" || !open) return;
-        // This Escape closes the level, not the viewer.
-        event.preventDefault();
-        setOpen(false);
-        buttonRef.current?.focus();
       }}
     >
       <Button.Root
@@ -373,10 +378,10 @@ function SoundControl({
         }}
       >
         <Button.Icon>
-          <Icon name={silent ? "status.muted" : "status.sound"} />
+          <Icon name={muteGlyph} />
         </Button.Icon>
       </Button.Root>
-      <div className={styles.level}>
+      <div className={cx(pill.shade, fieldTierClass, styles.level)} data-size="s">
         <Slider
           orientation="vertical"
           size="xs"

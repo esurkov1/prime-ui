@@ -21,6 +21,7 @@ function fakeRegion(atEnd = true) {
   const listeners = new Set<() => void>();
   const state = { atEnd };
   const region: ScrollRegion & { set: (next: boolean) => void } = {
+    element: () => null,
     atEnd: () => state.atEnd,
     subscribe: (listener) => {
       listeners.add(listener);
