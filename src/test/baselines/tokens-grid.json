@@ -1,0 +1,14 @@
+[
+  "--prime-badge-l-padding-x: 10px",
+  "--prime-badge-s-padding-x: 6px",
+  "--prime-bottom-nav-floating-height: 46px",
+  "--prime-bottom-nav-floating-item-gap: 2px",
+  "--prime-focus-width: 2px",
+  "--prime-gallery-gap: 2px",
+  "--prime-tooltip-arrow-height: 5px",
+  "--prime-tooltip-arrow-width: 10px",
+  "--prime-tooltip-m-padding-x: 10px",
+  "--prime-tooltip-m-padding-y: 6px",
+  "--prime-tooltip-s-padding-y: 6px",
+  "--prime-tooltip-xs-padding-x: 6px"
+]

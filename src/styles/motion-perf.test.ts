@@ -3,6 +3,9 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { cssAtRules, cssRules, moduleCssFiles } from "../test/css";
+import { numbered, ratchet } from "../test/ratchet";
+
 /**
  * Rendering-cost guards over the CSS (foundation §7: motion is `transform` / `opacity`, plus
  * color / fill / shadow for state).
@@ -14,6 +17,10 @@ import { describe, expect, it } from "vitest";
  *   indicator that cannot scale without stretching its label); a new one needs a reason, and a
  *   fixed one leaves the list.
  * - No permanent `will-change` outside the ratchet: every promoted element holds a GPU layer.
+ * - Ratchets (`motion-perf`): a `grid-template-rows: 0fr` fold outside the shared Disclosure, an
+ *   animated property outside the sanctioned set (transform, opacity, color, fill, shadow…) and
+ *   the layout exceptions above, a local `@keyframes` outside the shared motion modules,
+ *   `ease-in`, and a reduced-motion block that only repeats what globals.css already zeroes.
  * - No `:has()` before a class-less target (`X:has(…) *`, `X:has(…) > :not(.a)`): Blink then
  *   invalidates the whole subtree of every `:has()` anchor on the page whenever anything inside
  *   one changes — a virtualized list restyled ~10k elements per frame. Give the target a class,
@@ -253,5 +260,77 @@ describe("motion and rendering cost", () => {
     expect(featured(lastCompound(".a:has(> .b) > .c"))).toBe(true);
     expect(featured(lastCompound(".a:has(.b) :is(.c, .d:not([data-x]))"))).toBe(true);
     expect(featured(lastCompound(".a:has(+ .b)::after"))).toBe(true);
+  });
+});
+
+/** Properties that may animate: compositor-only, or color / fill / shadow for state. */
+const SANCTIONED =
+  /^(transform|translate|scale|rotate|opacity|color|background-color|border-color|outline-color|outline-offset|fill|stroke|stroke-dashoffset|box-shadow|filter|backdrop-filter|visibility|text-decoration-color|clip-path|--[\w-]+)$/;
+
+/** Shared motion modules: the only stylesheets that define keyframes. */
+const KEYFRAME_HOMES = new Set([
+  "src/internal/enterMotion.module.css",
+  "src/internal/overlayMotion.module.css",
+  "src/internal/swapMotion.module.css",
+  "src/internal/disclosure.module.css",
+  "src/internal/glyphSwap.module.css",
+  "src/internal/ring.module.css",
+  "src/icons/glyphMotion.module.css",
+  "src/components/skeleton/Skeleton.module.css",
+  "src/components/spinner/Spinner.module.css",
+]);
+
+/** The animated properties of a `transition` / `transition-property` / keyframe value. */
+function transitioned(prop: string, value: string): string[] {
+  if (prop === "transition-property") return splitTop(value, /,/);
+  if (prop === "transition") return splitTop(value, /,/).map((item) => item.split(/\s+/)[0] ?? "");
+  return [];
+}
+
+describe("motion guards (ratchet)", () => {
+  it("follows the motion rules of foundation §7 (motion-perf)", () => {
+    const offenders: string[] = [];
+    for (const file of moduleCssFiles().filter((item) => !item.includes("/examples/"))) {
+      const layout = LAYOUT_TRANSITIONS[file] ?? [];
+      for (const rule of cssRules(file)) {
+        const inKeyframes = rule.parents.some((parent) => parent.startsWith("@keyframes"));
+        const reduced = rule.parents.some((parent) => parent.includes("prefers-reduced-motion"));
+        for (const decl of rule.decls) {
+          if (
+            decl.prop === "grid-template-rows" &&
+            /\b0fr\b/.test(decl.value) &&
+            file !== "src/internal/disclosure.module.css"
+          ) {
+            offenders.push(`${file}: grid-template-rows 0fr fold outside Disclosure`);
+          }
+          const animated = inKeyframes ? [decl.prop] : transitioned(decl.prop, decl.value);
+          for (const name of animated) {
+            if (name && name !== "none" && !SANCTIONED.test(name) && !layout.includes(name)) {
+              offenders.push(`${file}: animates ${name}`);
+            }
+          }
+          if (/\bease-in\b(?!-out)/.test(decl.value)) offenders.push(`${file}: ease-in`);
+        }
+        if (
+          reduced &&
+          rule.decls.length > 0 &&
+          rule.decls.every(
+            ({ prop, value }) =>
+              /^(transition|animation)(-duration|-delay)?$/.test(prop) &&
+              /^(none|0m?s)$/.test(value),
+          )
+        ) {
+          offenders.push(
+            `${file}: reduced-motion block globals.css already covers (${rule.selector})`,
+          );
+        }
+      }
+      if (!KEYFRAME_HOMES.has(file)) {
+        for (const at of cssAtRules(file)) {
+          if (at.name === "keyframes") offenders.push(`${file}: local @keyframes ${at.params}`);
+        }
+      }
+    }
+    ratchet("motion-perf", numbered(offenders));
   });
 });

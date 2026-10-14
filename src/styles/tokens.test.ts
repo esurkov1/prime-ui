@@ -5,6 +5,9 @@ import { describe, expect, it } from "vitest";
 
 import { paletteColors } from "@/internal/states";
 
+import { read as readRepo, walk } from "../test/contract-utils";
+import { ratchet } from "../test/ratchet";
+
 const stylesRoot = path.resolve(process.cwd(), "src/styles");
 const read = (file: string) => readFileSync(path.join(stylesRoot, file), "utf8");
 
@@ -98,5 +101,60 @@ describe("generated token styles", () => {
     for (const rem of values) {
       expect((rem * 16) % 4).toBe(0);
     }
+  });
+
+  it("reads only generated tokens and declared context variables (tokens-reads)", () => {
+    const generated = ["tokens.css", "theme-light.css", "theme-dark.css"].map(read).join("\n");
+    const css = walk("src", /\.css$/).filter(
+      (file) => !/^src\/styles\/(tokens|theme-light|theme-dark)\.css$/.test(file),
+    );
+    const code = walk("src", /\.tsx?$/).filter(
+      (file) => !/\.test\.tsx?$|\/api\.ts$|\.api\.ts$|\/examples\//.test(file),
+    );
+    // The context list: the variables globals.css and controls.css declare for every subtree
+    // (`--prime-color-layer-current`, the field context…). A component never invents a
+    // `--prime-*` name of its own, in CSS or from TS.
+    const declared = new Set(
+      [generated, readRepo("src/styles/globals.css"), readRepo("src/styles/controls.css")].flatMap(
+        (text) => [...text.matchAll(/(--prime-[\w-]+)\s*:/g)].map((m) => m[1]),
+      ),
+    );
+    const offenders = new Set<string>();
+    for (const file of [...css, ...code]) {
+      const text = readRepo(file);
+      const reads = file.endsWith(".css")
+        ? [...text.matchAll(/var\((--prime-[\w-]+)/g)]
+        : [...text.matchAll(/["'`(](--prime-[\w-]*[\w])["'`),]/g)];
+      for (const m of reads) {
+        if (!declared.has(m[1]) && !m[1].endsWith("-")) offenders.add(`${file}: ${m[1]}`);
+      }
+    }
+    ratchet("tokens-reads", [...offenders]);
+  });
+
+  it("keeps semantic heights, widths, paddings and gaps on the 4px grid (tokens-grid)", () => {
+    const tokens = read("tokens.css");
+    const theme = read("theme-light.css");
+    const refs = new Map(
+      [...tokens.matchAll(/^\s+(--prime-ref-[\w-]+):\s*([^;]+);/gm)].map((m) => [m[1], m[2]]),
+    );
+    const px = (value: string): number | null => {
+      const ref = value.match(/^var\((--prime-ref-[\w-]+)\)$/)?.[1];
+      const raw = ref ? (refs.get(ref) ?? "") : value;
+      if (raw === "0") return 0;
+      const rem = raw.match(/^(-?\d*\.?\d+)rem$/)?.[1];
+      if (rem) return Number(rem) * 16;
+      const pixels = raw.match(/^(-?\d*\.?\d+)px$/)?.[1];
+      return pixels ? Number(pixels) : null;
+    };
+    const offenders: string[] = [];
+    for (const m of theme.matchAll(/^\s+(--prime-[\w-]+):\s*([^;]+);/gm)) {
+      const [, name, value] = m;
+      if (!/-(height|width|padding(-[a-z]+)?|gap)$/.test(name)) continue;
+      if (/(text|line-height|border|icon|radius|font|stroke|ring)/.test(name)) continue;
+      const value_ = px(value.trim());
+      if (value_ !== null && value_ % 4 !== 0) offenders.push(`${name}: ${value_}px`);
+    }
+    ratchet("tokens-grid", offenders);
   });
 });
