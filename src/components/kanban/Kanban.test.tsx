@@ -315,11 +315,21 @@ describe("Kanban", () => {
     expect(header.nextElementSibling).toHaveTextContent("Счёт для «Севера»");
   });
 
-  it("marks the variant on the root, well by default", () => {
+  it("marks the variant on the root, plain by default", () => {
     const { rerender } = render(<Board />);
-    expect(screen.getByLabelText("Доска")).toHaveAttribute("data-variant", "well");
-    rerender(<Board variant="plain" />);
     expect(screen.getByLabelText("Доска")).toHaveAttribute("data-variant", "plain");
+    rerender(<Board variant="well" />);
+    expect(screen.getByLabelText("Доска")).toHaveAttribute("data-variant", "well");
+  });
+
+  it("makes a plain card a surface one step above the board's host, a well card none", () => {
+    const { rerender } = render(<Board />);
+    const card = () => document.querySelector("[data-kanban-item]");
+    expect(card()).toHaveAttribute("data-depth", "1");
+    expect(card()).toHaveAttribute("data-surface");
+    rerender(<Board variant="well" />);
+    expect(card()).not.toHaveAttribute("data-depth");
+    expect(card()).not.toHaveAttribute("data-surface");
   });
 
   it("has no column grips unless reorderableColumns is set", () => {

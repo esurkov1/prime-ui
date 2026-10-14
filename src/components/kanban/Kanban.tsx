@@ -18,6 +18,7 @@ import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
 import type { PaletteColor } from "@/internal/states";
+import { type SurfaceDepth, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -54,8 +55,8 @@ export type KanbanColumnMove = { id: string; index: number };
 /** What opened a card: a click on it, or Enter / Space on the focused card. */
 export type KanbanItemClickEvent = React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>;
 
-/** How columns stand on the board: filled wells, or bare columns of cards. */
-export type KanbanVariant = "well" | "plain";
+/** How columns stand on the board: bare columns of cards, or filled wells. */
+export type KanbanVariant = "plain" | "well";
 
 /** System strings of the board. `{token}` values are substituted. */
 export type KanbanLabels = {
@@ -109,6 +110,12 @@ type BoardContextValue = {
    * it lifted; a card dropped in another column is a new element, so the board keeps its own note.
    */
   takeDragClick: () => boolean;
+  /**
+   * `plain`: the depth of a card, a surface one step above the board's host (it stands on it
+   * directly). The attribute travels with the carried clone, so it keeps its color in flight.
+   * `well`: none — the card is the selected thumb of its well.
+   */
+  cardDepth: SurfaceDepth | undefined;
 };
 
 const BoardContext = React.createContext<BoardContextValue | null>(null);
@@ -176,7 +183,7 @@ export type KanbanRootProps<T> = Omit<
    * shown under the carried card. The column turns `danger` before the release.
    */
   canDrop?: (id: string, columnId: string) => boolean | string;
-  /** `well`: every column is a filled well; `plain`: no wells, the cards and the header carry the column. */
+  /** `plain`: no wells, the header and the cards stand on the host; `well`: every column is a filled well. */
   variant?: KanbanVariant;
   /** Columns show skeleton cards; the cards cross-fade in when it turns off. */
   loading?: boolean;
@@ -292,7 +299,7 @@ function KanbanBoard<T>({
   renderColumnActions,
   renderColumnMeta,
   canDrop,
-  variant = "well",
+  variant = "plain",
   loading = false,
   disabled = false,
   labels: labelsProp,
@@ -307,6 +314,8 @@ function KanbanBoard<T>({
   const boardRef = React.useRef<HTMLDivElement | null>(null);
   const rootRef = useMergedRefs(boardRef, ref);
   const glideCards = useCardGlide(boardRef);
+  const nestedDepth = useNestedSurfaceDepth();
+  const cardDepth = variant === "plain" ? nestedDepth : undefined;
 
   const [storedValue, setValue] = useControllableState<KanbanValue>({
     value: valueProp,
@@ -458,8 +467,9 @@ function KanbanBoard<T>({
         dragClick.current = false;
         return was;
       },
+      cardDepth,
     }),
-    [locked, pendingCards, links, opens],
+    [locked, pendingCards, links, opens, cardDepth],
   );
 
   return (
@@ -489,6 +499,7 @@ function KanbanBoard<T>({
             renderItem={(column, columnIndex) => (
               <KanbanColumnView
                 column={column}
+                cardDepth={cardDepth}
                 cards={idsOf(column.id).flatMap((id) => {
                   const item = byId.get(id);
                   return item === undefined ? [] : [item];
@@ -518,6 +529,7 @@ function KanbanBoard<T>({
 
 type KanbanColumnViewProps<T> = {
   column: KanbanColumn;
+  cardDepth: SurfaceDepth | undefined;
   cards: readonly T[];
   skeletons: number;
   kind: string;
@@ -540,6 +552,7 @@ const hasContent = (node: React.ReactNode) => node != null && node !== false && 
 
 function KanbanColumnView<T>({
   column,
+  cardDepth,
   cards,
   skeletons,
   kind,
@@ -629,8 +642,14 @@ function KanbanColumnView<T>({
           {loading ? (
             <div className={styles.list}>
               {Array.from({ length: skeletons }, (_, index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder cards
-                <div key={index} className={cx(styles.item, styles.skeleton)} aria-hidden="true">
+                <div
+                  // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder cards
+                  key={index}
+                  className={cx(styles.item, styles.skeleton)}
+                  data-depth={cardDepth}
+                  data-surface={cardDepth !== undefined || undefined}
+                  aria-hidden="true"
+                >
                   <Skeleton lines={2} />
                   <div className={styles.footer}>
                     <Skeleton shape="block" className={styles.skeletonBadge} />
@@ -716,6 +735,8 @@ function KanbanItem({
       {...focus}
       {...rest}
       data-kanban-item={id}
+      data-depth={board.cardDepth}
+      data-surface={board.cardDepth !== undefined || undefined}
       data-pending={pending || undefined}
       data-link={href !== undefined || undefined}
       data-clickable={(href === undefined && openItem !== null) || undefined}

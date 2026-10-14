@@ -443,6 +443,8 @@ export default function KanbanBoardPattern() {
           </SmartFilter.Root>
           <Crossfade state={view}>
             {view === "board" ? (
+              // `plain` (the default): the board is the page's main region, so the stages are no
+              // boxes — their headers and the deal cards stand on the page, one level of nesting.
               <Kanban.Root
                 aria-label="Воронка продаж"
                 className={styles.board}

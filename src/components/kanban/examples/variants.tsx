@@ -1,11 +1,11 @@
-/** The same release board in both looks: columns as filled wells, and bare columns where the header and wider cards carry each column — `variant`. */
-import { Kanban, type KanbanVariant, Typography } from "prime-ui-kit";
+/** The same release board in both looks: bare columns whose header and cards stand on the page, and columns as filled wells holding their cards — `variant`. */
+import { Badge, Kanban, type KanbanVariant, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-type Task = { id: string; title: string; due: string };
+type Task = { id: string; title: string; due: string; label: string };
 
-const VARIANTS: KanbanVariant[] = ["well", "plain"];
+const VARIANTS: KanbanVariant[] = ["plain", "well"];
 
 const COLUMNS = [
   { id: "todo", title: "К выполнению", description: "Берём после планирования" },
@@ -14,10 +14,15 @@ const COLUMNS = [
 ];
 
 const TASKS: Task[] = [
-  { id: "PRJ-214", title: "Экспорт счетов в CSV для бухгалтерии", due: "14 окт" },
-  { id: "PRJ-221", title: "Фильтр заказов по складу", due: "17 окт" },
-  { id: "PRJ-198", title: "Повторная отправка приглашений в команду", due: "10 окт" },
-  { id: "PRJ-176", title: "Онбординг нового проекта", due: "3 окт" },
+  { id: "PRJ-214", title: "Экспорт счетов в CSV для бухгалтерии", due: "14 окт", label: "Финансы" },
+  { id: "PRJ-221", title: "Фильтр заказов по складу", due: "17 окт", label: "Заказы" },
+  {
+    id: "PRJ-198",
+    title: "Повторная отправка приглашений в команду",
+    due: "10 окт",
+    label: "Команда",
+  },
+  { id: "PRJ-176", title: "Онбординг нового проекта", due: "3 окт", label: "Проекты" },
 ];
 
 const PLACEMENT = {
@@ -45,6 +50,9 @@ export default function KanbanVariantsExample() {
               <Kanban.ItemDescription>
                 {task.id} · до {task.due}
               </Kanban.ItemDescription>
+              <Kanban.ItemBadges>
+                <Badge.Root>{task.label}</Badge.Root>
+              </Kanban.ItemBadges>
             </Kanban.Item>
           )}
         />

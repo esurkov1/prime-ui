@@ -1,5 +1,6 @@
 /*
- * Kanban — Graphite. A row of filled column wells holding filled cards; depth from fill, no lines.
+ * Kanban — Graphite. A row of columns: bare (`plain`, cards are surfaces on the board's host) or
+ * filled wells holding the cards (`well`); depth from fill, no lines.
  * The board scrolls sideways inside itself, each column body scrolls on its own. A grip in the
  * header moves a column (`reorderableColumns`); the strip of columns is a sortable list. Columns span the
  * board height and their cards sit at the top, so a card drops anywhere in a column, not only on
@@ -52,36 +53,26 @@
   min-height: 0;
   padding-block-start: var(--prime-space-3);
   border-radius: var(--prime-radius-l);
-  /* A well one ladder step off the surface around the board (its control fill, foundation §4). */
+  /* well: one ladder step off the surface around the board (its control fill, foundation §4). */
   background: var(--prime-color-fill-muted);
   scroll-snap-align: start;
 }
 
 /*
- * plain: no wells. The cards and the header carry the column: the cards widen to almost the full
- * column (the inset keeps only the focus ring inside), so the cards of neighbouring columns stand
- * closer than in wells.
+ * plain: no wells, one level of nesting. The header and the cards stand on the board's host: the
+ * cards are surfaces one ladder step off it (`data-depth` on each card) and widen to almost the
+ * full column (the inset keeps only the focus ring inside); air between the columns separates them,
+ * so their gap is wider than between wells.
  */
 .root[data-variant="plain"] {
-  --kanban-gap: var(--prime-space-3);
+  --kanban-gap: var(--prime-space-4);
   --kanban-inset: var(--prime-space-1);
 }
 
 .root[data-variant="plain"] .column {
-  padding-block-start: 0;
+  padding-block-start: var(--prime-space-1);
   border-radius: 0;
   background: none;
-}
-
-/* Without a well the header carries the column: a filled plate as wide as the cards (one ladder
-   step off the board's surface, the well's fill), in place of the hairline. */
-.root[data-variant="plain"] .header {
-  min-block-size: var(--prime-control-l-height);
-  margin-inline: var(--kanban-inset);
-  padding-block: var(--prime-space-3);
-  padding-inline: var(--prime-space-3) var(--prime-space-2);
-  border-radius: var(--prime-radius-l);
-  background: var(--prime-color-fill-muted);
 }
 
 @container (width < 40rem) {
@@ -262,6 +253,13 @@
   box-shadow: var(--prime-shadow-raised);
   list-style: none;
   transition: box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* plain: no well to be the thumb of — the card is a surface of its own on the board's host (white
+   on the light page, one step lighter on the dark one), as a Card on the page. Its `data-depth`
+   points the context variables at its layer; `data-surface` marks it for this rule. */
+.item[data-surface] {
+  background: var(--prime-color-layer-current);
 }
 
 /* Hover lifts the card instead of washing it: a wash is one ladder step, the column's own color
