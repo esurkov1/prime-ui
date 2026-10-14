@@ -4,6 +4,5 @@
   "src/components/checkbox/examples/without-label.tsx: JSDoc tail",
   "src/components/code-block/examples/narrow.tsx: JSDoc tail",
   "src/components/color-swatches/examples/wrapping.tsx: JSDoc tail",
-  "src/components/description-list/examples/screen.tsx: raw <dl>",
   "src/components/scroll-container/examples/overview.tsx: JSDoc tail"
 ]

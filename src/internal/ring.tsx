@@ -37,8 +37,12 @@ type RingProps = Omit<React.SVGAttributes<SVGSVGElement>, "children"> & {
   value: number | null;
   /** The ring turns at any share (one turn = 3 × `--prime-motion-loop`); the arc never under 8%. */
   spin?: boolean;
-  /** A faint full circle under the arc. Default `true`. */
-  track?: boolean;
+  /**
+   * A full circle under the arc. `true` (default) — faint, in the host's color (a ring on a
+   * colored host or over media); `"surface"` — the track of a line on a surface
+   * (`fill-strong`, as ProgressBar's); `false` — none.
+   */
+  track?: boolean | "surface";
   /** Default `line`. */
   weight?: RingWeight;
   /**
@@ -123,6 +127,7 @@ export function Ring({
       style={live ? style : ({ ...style, "--ring-value": share } as React.CSSProperties)}
       {...toDataAttributes({
         weight,
+        track: track === "surface" ? track : undefined,
         spin: turning || undefined,
         // An empty arc still at rest draws nothing (a round cap would leave a dot).
         empty: (!live && !turning && share === 0) || undefined,

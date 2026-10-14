@@ -1,6 +1,5 @@
 [
   "src/components/color-picker/examples/panel.tsx: dangling for",
   "src/components/color-picker/examples/states.tsx: dangling for",
-  "src/components/page-content/examples/list-detail.tsx: aria-label on a generic div",
   "src/components/tooltip/examples/non-interactive-trigger.tsx: aria-label on a generic div"
 ]

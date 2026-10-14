@@ -3,6 +3,8 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
 import palette from "@/internal/palette.module.css";
 import {
@@ -24,18 +26,9 @@ import styles from "./ProgressBar.module.css";
 export type ProgressBarLabels = ProgressSegmentsLabels;
 
 export type ProgressBarProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /**
-   * Visible label above the bar and its accessible name. A `value` bar needs a name: `label`, or
-   * `aria-label` when the text around it already says what is loading.
-   */
   label?: string;
   size?: ControlSize;
-  /** Shows the rounded filled percentage at the end of the label row (`bar` layout). */
   showValue?: boolean;
-  /**
-   * The data is on its way: a Skeleton in the bar's geometry (and of the legend or rows), which
-   * cross-fades into the data. The label stays; the root is `aria-busy`.
-   */
   loading?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 } & ProgressBarModeProps;
@@ -45,24 +38,17 @@ type SegmentsModeProps = Extract<ProgressModeProps, { segments: unknown }>;
 /** Value mode may draw its scale as steps; segments draw one bar or one bar per row. */
 type ProgressBarModeProps =
   | (Extract<ProgressModeProps, { value: number }> & {
-      /**
-       * Draws the scale as `max` equal cells (2–12), each filled whole: a level out of a few
-       * (password strength, a step of onboarding). `value` rounds to a whole cell.
-       */
       steps?: boolean;
       layout?: never;
       scale?: never;
     })
   | (SegmentsModeProps & { steps?: never } & (
         | {
-            /** `bar`: every part in one bar. Default. */
             layout?: "bar";
             scale?: never;
           }
         | {
-            /** `rows`: a ranking — one row per part, «label · value · share» over its own bar. */
             layout: "rows";
-            /** What a full bar and 100% mean. Default `sum`. */
             scale?: ProgressScale;
             segmentGap?: never;
             legend?: never;
@@ -120,6 +106,7 @@ export function ProgressBar(props: ProgressBarProps) {
   const labelId = React.useId();
   const descriptionId = React.useId();
   const { size, provide } = useHostTier(sizeProp);
+  const segmentLabels = useLabels(PROGRESS_SEGMENTS_LABELS, labels);
 
   const stepResolved = !segmentsProp && steps ? resolveValue(valueProp ?? 0, maxProp) : null;
   const stepCount = stepResolved
@@ -155,7 +142,12 @@ export function ProgressBar(props: ProgressBarProps) {
         ))}
       </div>
     ) : (
-      <ol className={styles.rows} {...nameProps}>
+      <ol
+        // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+        role="list"
+        className={styles.rows}
+        {...nameProps}
+      >
         {rows.map(({ segment, ratio, percent: share }, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: rows in source order
           <li key={i} className={styles.row}>
@@ -176,10 +168,7 @@ export function ProgressBar(props: ProgressBarProps) {
       </ol>
     );
   } else if (segmentsProp) {
-    const resolved = resolveSegments(segmentsProp, maxProp, {
-      ...PROGRESS_SEGMENTS_LABELS,
-      ...labels,
-    });
+    const resolved = resolveSegments(segmentsProp, maxProp, segmentLabels);
     const { segments, total, rest: free, text } = resolved;
     percent = resolved.percent;
     // Named: the legend (or the hidden distribution text) describes the group.
@@ -276,7 +265,7 @@ export function ProgressBar(props: ProgressBarProps) {
 
   return provide(
     <div
-      className={cx(styles.root, className)}
+      className={cx(fieldTierClass, styles.root, className)}
       aria-busy={loading || undefined}
       {...rest}
       {...toDataAttributes({ size, tone, layout: layout === "rows" ? "rows" : undefined })}

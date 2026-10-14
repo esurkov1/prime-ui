@@ -269,7 +269,7 @@
 }
 
 .root[data-layout="compact"] .plot {
-  --sparkline-h: calc(var(--prime-control-xs-height) - var(--sparkline-dot));
+  --sparkline-h: calc(var(--field-h) - var(--sparkline-dot));
 
   margin-block: calc(var(--sparkline-dot) / 2);
 }
@@ -301,6 +301,6 @@
 
 /* Compact loading: the plot Skeleton at the compact plot's height. */
 .root[data-layout="compact"] .plotSkeleton {
-  height: var(--prime-control-xs-height);
+  height: var(--field-h);
   margin-block-start: 0;
 }

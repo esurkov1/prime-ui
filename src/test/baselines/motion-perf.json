@@ -5,6 +5,5 @@
   "src/components/message/Message.module.css: local @keyframes messagePointingB",
   "src/components/message/MessageCards.module.css: local @keyframes livePulse",
   "src/components/message/MessageTyping.module.css: local @keyframes typingDot",
-  "src/components/progress-circle/ProgressCircle.module.css: animates stroke-dasharray",
   "src/components/skeleton/Skeleton.module.css: reduced-motion block globals.css already covers (.root)"
 ]

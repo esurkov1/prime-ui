@@ -339,6 +339,29 @@ describe("SmartFilter", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     await user.keyboard("{Enter}");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    // Focus leaves the search and comes back: the panel opens again, Escape closes it.
+    await user.tab({ shift: true });
+    await user.tab();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("Tab walks a value and its «−»; Enter and Space show the value, a second press clears it", async () => {
+    const onValue = vi.fn();
+    render(<Harness onValue={onValue} />);
+    const user = userEvent.setup();
+    openPanel();
+    const dialog = within(screen.getByRole("dialog"));
+    dialog.getByRole("button", { name: "GET" }).focus();
+    await user.tab();
+    expect(dialog.getByRole("button", { name: "Скрыть GET" })).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(dialog.getByRole("button", { name: "GET" })).toHaveFocus();
+    await user.keyboard(" ");
+    expect(onValue).toHaveBeenLastCalledWith({ method: { include: ["GET"], exclude: [] } });
+    await user.keyboard("{Enter}");
+    expect(onValue).toHaveBeenLastCalledWith({});
   });
 
   it("collapses a long field to «ещё N» and expands it", () => {

@@ -6,8 +6,11 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
+import { useLabels } from "@/internal/labels";
 import type { TagRef } from "@/internal/polymorphic";
 import type { ControlSize, Tone } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 import { usePendingAction } from "@/internal/usePendingChanges";
 
 import styles from "./EmptyPage.module.css";
@@ -24,26 +27,43 @@ export type EmptyPageLabels = {
 
 export const EMPTY_PAGE_LABELS: EmptyPageLabels = { retry: "Повторить" };
 
-type Ctx = { tone: EmptyPageTone; labels: EmptyPageLabels };
+/**
+ * The type scale of the state by tier: the title and the description grow with the tier; the
+ * `compact` state of a menu or a list is the quiet body-s / caption pair at any tier.
+ */
+const TITLE_ROLE: Record<ControlSize, string | undefined> = {
+  xs: textRole.titleS,
+  s: textRole.titleS,
+  m: textRole.titleM,
+  l: textRole.titleL,
+  xl: textRole.headingS,
+};
+
+const DESCRIPTION_ROLE: Record<ControlSize, string | undefined> = {
+  xs: textRole.caption,
+  s: textRole.bodyS,
+  m: textRole.bodyM,
+  l: textRole.bodyM,
+  xl: textRole.bodyL,
+};
+
+type Ctx = {
+  tone: EmptyPageTone;
+  size: ControlSize;
+  compact: boolean;
+  labels: EmptyPageLabels;
+};
 
 const EmptyPageContext = React.createContext<Ctx>({
   tone: "neutral",
+  size: "m",
+  compact: false,
   labels: EMPTY_PAGE_LABELS,
 });
 
 export type EmptyPageRootProps = React.HTMLAttributes<HTMLDivElement> & {
   size?: ControlSize;
-  /**
-   * `default` — a block sized by its content.
-   * `fill` — stretches to the parent's height and centers the content (inside a table, a scroll area, a card).
-   * `compact` — a quiet state inside a menu, listbox or command list: panel padding, body-s title,
-   * caption description, a small icon and no entrance motion.
-   */
   layout?: EmptyPageLayout;
-  /**
-   * `danger` — the region's load failed: the icon tile turns danger and the root announces itself
-   * (`role="alert"`, unless you pass a `role`). Default `neutral`.
-   */
   tone?: EmptyPageTone;
   labels?: Partial<EmptyPageLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -60,7 +80,13 @@ function EmptyPageRoot({
   ...rest
 }: EmptyPageRootProps) {
   const { size, provide } = useHostTier(sizeProp);
-  const context: Ctx = { tone, labels: { ...EMPTY_PAGE_LABELS, ...labels } };
+  const mergedLabels = useLabels(EMPTY_PAGE_LABELS, labels);
+  const context: Ctx = {
+    tone,
+    size,
+    compact: layout === "compact",
+    labels: mergedLabels,
+  };
   return provide(
     <div
       className={cx(styles.root, layout !== "compact" && enterMotion.enterBaseChildren, className)}
@@ -79,22 +105,20 @@ function EmptyPageRoot({
 EmptyPageRoot.displayName = "EmptyPage.Root";
 
 export type EmptyPageIconProps = React.HTMLAttributes<HTMLDivElement> & {
-  /**
-   * Tile fill: `neutral`, `accent` — an invitation to start, `danger` — a failure. Default: the
-   * root's `tone`.
-   */
   tone?: Extract<Tone, "neutral" | "accent" | "danger">;
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/** The kit's icon tile on the tier scale (the `compact` state takes the smallest tile). */
 function EmptyPageIcon({ tone: toneProp, className, ...rest }: EmptyPageIconProps) {
-  const { tone: rootTone } = React.useContext(EmptyPageContext);
+  const { tone: rootTone, size, compact } = React.useContext(EmptyPageContext);
   return (
     // The tile is decorative: the title says what the state is.
     <div
       aria-hidden="true"
-      className={cx(styles.iconWrap, className)}
+      className={cx(iconBoxStyles.tile, iconSlotClass, styles.iconWrap, className)}
       data-tone={toneProp ?? rootTone}
+      data-size={compact ? "xs" : size}
       {...rest}
     />
   );
@@ -104,17 +128,18 @@ EmptyPageIcon.displayName = "EmptyPage.Icon";
 type EmptyPageTitleAs = "h2" | "h3" | "h4" | "p";
 
 export type EmptyPageTitleProps = React.HTMLAttributes<HTMLElement> & {
-  /**
-   * Tag that fits the outline; the look does not change. `p` inside menus, lists and table cells,
-   * where a heading would break the page outline.
-   */
   as?: EmptyPageTitleAs;
   ref?: React.Ref<HTMLElement>;
 };
 
 function EmptyPageTitle({ as: Tag = "h2", className, ref, ...rest }: EmptyPageTitleProps) {
+  const { size, compact } = React.useContext(EmptyPageContext);
   return (
-    <Tag ref={ref as TagRef<EmptyPageTitleAs>} className={cx(styles.title, className)} {...rest} />
+    <Tag
+      ref={ref as TagRef<EmptyPageTitleAs>}
+      className={cx(compact ? textRole.bodyS : TITLE_ROLE[size], styles.title, className)}
+      {...rest}
+    />
   );
 }
 EmptyPageTitle.displayName = "EmptyPage.Title";
@@ -124,7 +149,17 @@ export type EmptyPageDescriptionProps = React.HTMLAttributes<HTMLParagraphElemen
 };
 
 function EmptyPageDescription({ className, ...rest }: EmptyPageDescriptionProps) {
-  return <p className={cx(styles.description, className)} {...rest} />;
+  const { size, compact } = React.useContext(EmptyPageContext);
+  return (
+    <p
+      className={cx(
+        compact ? textRole.caption : DESCRIPTION_ROLE[size],
+        styles.description,
+        className,
+      )}
+      {...rest}
+    />
+  );
 }
 EmptyPageDescription.displayName = "EmptyPage.Description";
 
@@ -141,11 +176,6 @@ export type EmptyPageRetryButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "onClick" | "type"
 > & {
-  /**
-   * Loads the region again. May return a Promise: while it is pending the button shows its loading
-   * state and cannot be pressed twice. Resolve — the owner swaps the region to its data; reject —
-   * the error state stays and the button is ready again.
-   */
   onRetry: () => void | Promise<void>;
   ref?: React.Ref<HTMLButtonElement>;
 };

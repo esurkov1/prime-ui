@@ -8,6 +8,8 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { useLabels } from "@/internal/labels";
+import { namedRole } from "@/internal/namedRole";
 import type { TagRef } from "@/internal/polymorphic";
 import textRole from "@/internal/textRole.module.css";
 
@@ -22,10 +24,6 @@ export type PageContentRootAs = "div" | "section";
 export type PageContentRootProps = React.HTMLAttributes<HTMLElement> & {
   as?: PageContentRootAs;
   maxWidth?: PageContentMaxWidth;
-  /**
-   * The page takes the height of the panel (`AppShell.Root fillViewport`): the body gets what the
-   * header leaves, for a full-height table, board, chat or `PageContent.Split`.
-   */
   fill?: boolean;
   ref?: React.Ref<HTMLElement>;
 };
@@ -106,7 +104,6 @@ PageContentTitle.displayName = "PageContent.Title";
 export type PageContentDescriptionMeasure = "readable" | "full";
 
 export type PageContentDescriptionProps = React.HTMLAttributes<HTMLParagraphElement> & {
-  /** `readable` — max ~65ch; `full` — the full width of the parent (e.g. an already padded `main`). */
   measure?: PageContentDescriptionMeasure;
   ref?: React.Ref<HTMLParagraphElement>;
 };
@@ -137,14 +134,8 @@ PageContentBody.displayName = "PageContent.Body";
 export type PageContentSectionLayout = "stack" | "aside";
 
 export type PageContentSectionProps = Omit<React.HTMLAttributes<HTMLElement>, "title"> & {
-  /** The visible heading of the section (an `h2`). */
   label: React.ReactNode;
-  /** One line of context under the heading. */
   description?: React.ReactNode;
-  /**
-   * `stack` — the heading over the content; `aside` — a heading column beside the content (a
-   * settings page), dropping above it once the content would get narrower than 30rem.
-   */
   layout?: PageContentSectionLayout;
   ref?: React.Ref<HTMLElement>;
 };
@@ -209,9 +200,7 @@ export type PageContentCellSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 
 export type PageContentCellRows = 1 | 2 | 3 | 4;
 
 export type PageContentCellProps = DivProps & {
-  /** Columns of 12 on a wide grid; a medium grid rounds to half or full, a narrow one to full. */
   span?: PageContentCellSpan;
-  /** Rows the cell spans; its child fills the height. */
   rows?: PageContentCellRows;
 };
 
@@ -257,14 +246,8 @@ const isHidden = (node: HTMLElement | null) =>
   node === null || getComputedStyle(node).display === "none";
 
 export type PageContentSplitProps = DivProps & {
-  /**
-   * The detail is open (a record is chosen). On a narrow split it takes the place of the list;
-   * on a wide one both panes stay. Controlled.
-   */
   open?: boolean;
-  /** Initial open state, uncontrolled. */
   defaultOpen?: boolean;
-  /** `PageContent.BackButton` closes the detail: `false`. */
   onOpenChange?: (open: boolean) => void;
   labels?: Partial<PageContentLabels>;
 };
@@ -293,7 +276,7 @@ function PageContentSplit({
   const lastListFocus = React.useRef<HTMLElement | null>(null);
   const [entering, setEntering] = React.useState<"list" | "detail" | null>(null);
   const previousOpen = React.useRef(open);
-  const mergedLabels = React.useMemo(() => ({ ...PAGE_CONTENT_LABELS, ...labels }), [labels]);
+  const mergedLabels = useLabels(PAGE_CONTENT_LABELS, labels);
 
   // A narrow split swaps its panes: the new one enters, and focus follows it — into the detail,
   // or back to where it was in the list. A wide split moves nothing.
@@ -370,6 +353,8 @@ function PageContentPanel({
     <div
       tabIndex={-1}
       {...rest}
+      // A named pane is a region landmark: a name on a plain `<div>` reaches no one.
+      role={namedRole(rest, "region")}
       ref={mergedRef}
       className={cx(
         styles.pane,

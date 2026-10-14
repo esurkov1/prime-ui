@@ -3,12 +3,10 @@
  * (`aria-current="page"`, the selected look) and the numbers use its `tight` density. This file
  * only lays them out and sizes the ellipsis and the compact summary to the tier. By default the
  * nav fills its parent and is a size container: below 22rem the numbers give way to
- * «current / total» (`compact` forces that view), so it fits 320px.
+ * «current / total» (`compact` forces that view), so it fits 320px. The height and the text of the
+ * tier come from the tier table (`fieldTierClass` joined in TSX: `--field-h`, `--field-text`).
  */
 .root {
-  --pg-size: var(--prime-control-m-height);
-  --pg-text-size: var(--prime-control-m-text-size);
-  --pg-line-height: var(--prime-control-m-line-height);
   --pg-gap: var(--prime-space-1);
 
   display: inline-flex;
@@ -17,28 +15,10 @@
 }
 
 .root[data-size="xs"] {
-  --pg-size: var(--prime-control-xs-height);
-  --pg-text-size: var(--prime-control-xs-text-size);
-  --pg-line-height: var(--prime-control-xs-line-height);
-  --pg-gap: 0;
-}
-
-.root[data-size="s"] {
-  --pg-size: var(--prime-control-s-height);
-  --pg-text-size: var(--prime-control-s-text-size);
-  --pg-line-height: var(--prime-control-s-line-height);
-}
-
-.root[data-size="l"] {
-  --pg-size: var(--prime-control-l-height);
-  --pg-text-size: var(--prime-control-l-text-size);
-  --pg-line-height: var(--prime-control-l-line-height);
+  --pg-gap: var(--prime-space-0);
 }
 
 .root[data-size="xl"] {
-  --pg-size: var(--prime-control-xl-height);
-  --pg-text-size: var(--prime-control-xl-text-size);
-  --pg-line-height: var(--prime-control-xl-line-height);
   --pg-gap: var(--prime-space-2);
 }
 
@@ -69,11 +49,11 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  min-width: var(--pg-size);
-  height: var(--pg-size);
+  min-width: var(--field-h);
+  height: var(--field-h);
   color: var(--prime-color-text-muted);
-  font-size: var(--pg-text-size);
-  line-height: var(--pg-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   user-select: none;
 }
 
@@ -82,8 +62,8 @@
   align-items: center;
   gap: var(--prime-space-1);
   padding-inline: var(--prime-space-2);
-  font-size: var(--pg-text-size);
-  line-height: var(--pg-line-height);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   color: var(--prime-color-text-muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

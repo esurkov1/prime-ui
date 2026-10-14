@@ -1,8 +1,10 @@
 import * as React from "react";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { GlyphSwap } from "@/internal/glyphSwap";
+import { useLabels } from "@/internal/labels";
 import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
 import palette from "@/internal/palette.module.css";
 import {
@@ -31,19 +33,9 @@ const LOADING_ROWS = 3;
 export type ProgressCircleLabels = ProgressSegmentsLabels;
 
 type ValueModeProps = {
-  /**
-   * Current value, clamped to `0…max`; `null` — under way, the share unknown: a quarter arc that
-   * always turns, no `aria-valuenow`.
-   */
   value: number | null;
-  /** Top of the scale. Default `100`. */
   max?: number;
-  /**
-   * Fill color. Default `accent`. `inherit` — the arc in the host's text color over a 32% track of
-   * it, for a ring on a colored host or over media.
-   */
   tone?: Tone | "inherit";
-  /** The ring turns at any share (a sync whose share grows). Default `false`; `null` always turns. */
   spin?: boolean;
   segments?: never;
   segmentGap?: never;
@@ -57,18 +49,8 @@ type SegmentsModeProps = Extract<ProgressModeProps, { segments: ProgressSegment[
 };
 
 export type ProgressCircleProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /** Default `m`. */
   size?: ControlSize;
-  /**
-   * Centered content: a number, a percent or an `<Icon>`. A changed icon (another `name`) cross-
-   * fades into the new one. Not rendered on `xs`; text only from `m`. A string or number child
-   * stays available as `aria-valuetext`.
-   */
   children?: React.ReactNode;
-  /**
-   * The data is on its way: a Skeleton ring of the same size (and legend rows), which cross-fades
-   * into the data. The root is `aria-busy`.
-   */
   loading?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 } & (ValueModeProps | SegmentsModeProps);
@@ -76,11 +58,16 @@ export type ProgressCircleProps = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
 type Fill = ReturnType<typeof segmentFill>;
 type Arc = { start: number; length: number; fill?: Fill; rest?: boolean };
 
-/** One arc of `length` from `start` (`RING_PATH` units along the circle, clockwise from the top). */
+/**
+ * One arc of `length` from `start` (`RING_PATH` units along the circle, clockwise from the top):
+ * the circle turns to its start (`rotate`) and its dash shows `length` (`stroke-dashoffset` over a
+ * full-length dash), so a change of weights glides on the two compositor- and paint-only
+ * properties, as the ring's own arc and caps do.
+ */
 function arcStyle(start: number, length: number): React.CSSProperties {
   return {
-    strokeDasharray: `${Math.max(length, 0)} ${RING_PATH}`,
-    strokeDashoffset: -start,
+    rotate: `${(start / RING_PATH) * 360}deg`,
+    strokeDashoffset: RING_PATH - Math.max(length, 0),
   };
 }
 
@@ -162,7 +149,7 @@ function Cap({ position, fill }: { position: number; fill?: Fill }) {
  */
 export function ProgressCircle(props: ProgressCircleProps) {
   const {
-    size = "m",
+    size: sizeProp,
     children,
     className,
     loading = false,
@@ -179,6 +166,8 @@ export function ProgressCircle(props: ProgressCircleProps) {
     ...rest
   } = props;
   const descriptionId = React.useId();
+  const { size, provide } = useHostTier(sizeProp);
+  const segmentLabels = useLabels(PROGRESS_SEGMENTS_LABELS, labels);
   const isText = typeof children === "string" || typeof children === "number";
   const showInner =
     !loading &&
@@ -195,10 +184,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
 
   if (segmentsProp) {
     const gap = segmentGap;
-    const resolved = resolveSegments(segmentsProp, maxProp, {
-      ...PROGRESS_SEGMENTS_LABELS,
-      ...labels,
-    });
+    const resolved = resolveSegments(segmentsProp, maxProp, segmentLabels);
     const { segments, total, rest: free, scale, text } = resolved;
     const unit = scale > 0 ? RING_PATH / scale : 0;
     const arcs: Arc[] = [];
@@ -238,7 +224,7 @@ export function ProgressCircle(props: ProgressCircleProps) {
       <Ring
         value={0}
         weight="data"
-        track={gap === "none" || total === 0}
+        track={gap === "none" || total === 0 ? "surface" : false}
         className={styles.svg}
         role="group"
         {...a11y}
@@ -256,6 +242,8 @@ export function ProgressCircle(props: ProgressCircleProps) {
         value={unknown ? null : ratio}
         spin={spin}
         weight="data"
+        // `inherit` keeps the ring's own track, a tint of the host's color.
+        track={tone === "inherit" ? true : "surface"}
         className={styles.svg}
         role="progressbar"
         aria-valuenow={unknown ? undefined : value}
@@ -274,7 +262,11 @@ export function ProgressCircle(props: ProgressCircleProps) {
       </RegionSwap>
       {loading ? null : description}
       {showInner ? (
-        <div className={styles.inner} aria-hidden={valueText !== undefined ? true : undefined}>
+        <div
+          // The text of the hole is primary ink; `inherit` takes the host's color, like its ring.
+          className={cx(styles.inner, tone !== "inherit" && styles.ink)}
+          aria-hidden={valueText !== undefined ? true : undefined}
+        >
           <GlyphSwap>{children}</GlyphSwap>
         </div>
       ) : null}
@@ -288,18 +280,18 @@ export function ProgressCircle(props: ProgressCircleProps) {
 
   // With a legend the root is a row: the ring and the legend beside it (below when narrow).
   if (legend) {
-    return (
+    return provide(
       <div className={cx(styles.root, className)} {...rootProps}>
         <div className={styles.ring}>{body}</div>
         <RegionSwap state={loading ? "loading" : "data"} className={styles.legend}>
           {legendNode}
         </RegionSwap>
-      </div>
+      </div>,
     );
   }
-  return (
+  return provide(
     <div className={cx(styles.root, className)} {...rootProps}>
       {body}
-    </div>
+    </div>,
   );
 }

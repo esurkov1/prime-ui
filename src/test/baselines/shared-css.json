@@ -1,17 +1,10 @@
 [
   "src/components/accordion/Accordion.module.css: control tier tokens outside fieldTier",
   "src/components/button/Button.module.css: media shade outside mediaPill",
-  "src/components/card/Card.module.css: control tier tokens outside fieldTier",
   "src/components/color-picker/ColorPicker.module.css: control tier tokens outside fieldTier",
-  "src/components/description-list/DescriptionList.module.css: control tier tokens outside fieldTier",
   "src/components/digit-input/DigitInput.module.css: control tier tokens outside fieldTier",
-  "src/components/empty-page/EmptyPage.module.css: control tier tokens outside fieldTier",
-  "src/components/login-form/LoginForm.module.css: control tier tokens outside fieldTier",
   "src/components/modal/DialogParts.module.css: control tier tokens outside fieldTier",
-  "src/components/pagination/Pagination.module.css: control tier tokens outside fieldTier",
   "src/components/popover/Popover.module.css: control tier tokens outside fieldTier",
-  "src/components/progress-bar/ProgressBar.module.css: control tier tokens outside fieldTier",
   "src/components/slider/Slider.module.css: control tier tokens outside fieldTier",
-  "src/components/sparkline/Sparkline.module.css: control tier tokens outside fieldTier",
   "src/internal/menu.module.css: control tier tokens outside fieldTier"
 ]

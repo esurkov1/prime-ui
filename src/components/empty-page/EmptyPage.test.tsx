@@ -98,6 +98,21 @@ describe("EmptyPage", () => {
     expect(screen.getByTestId("a")).toHaveAttribute("data-tone", "neutral");
     expect(screen.getByTestId("b")).toHaveAttribute("data-tone", "danger");
   });
+
+  it("puts the icon tile on the tier scale; the compact state takes the smallest tile", () => {
+    render(
+      <>
+        <EmptyPage.Root size="l">
+          <EmptyPage.Icon data-testid="large">i</EmptyPage.Icon>
+        </EmptyPage.Root>
+        <EmptyPage.Root size="l" layout="compact">
+          <EmptyPage.Icon data-testid="compact">i</EmptyPage.Icon>
+        </EmptyPage.Root>
+      </>,
+    );
+    expect(screen.getByTestId("large")).toHaveAttribute("data-size", "l");
+    expect(screen.getByTestId("compact")).toHaveAttribute("data-size", "xs");
+  });
 });
 
 describe("EmptyPage error state", () => {

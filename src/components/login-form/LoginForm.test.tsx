@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
 import { Input } from "@/components/input/Input";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 
 import { LoginForm } from "./LoginForm";
 
@@ -79,6 +80,15 @@ describe("LoginForm", () => {
       </LoginForm.Root>,
     );
     expect(screen.getByTestId("root")).toHaveAttribute("data-flat", "true");
+  });
+
+  it("takes the tier of a sized host without its own size", () => {
+    render(
+      <ControlSizeProvider value="s">
+        <Sample />
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByTestId("root")).toHaveAttribute("data-size", "s");
   });
 
   it("sets data-align (default start) from align", () => {

@@ -282,8 +282,8 @@ export const api: ComponentApi = {
         ru: "`PageContent.Section` — `<section>`, названный своим `<h2>` (`label`) через `aria-labelledby`.",
       },
       {
-        en: 'Name both `PageContent.Panel`s with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).',
-        ru: 'Назовите обе `PageContent.Panel` через `aria-label`. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера. Панели получают фокус только из кода (`tabindex="-1"`, без кольца).',
+        en: 'Name both `PageContent.Panel`s with `aria-label`: a named pane is `role="region"`, a landmark. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).',
+        ru: 'Назовите обе `PageContent.Panel` через `aria-label`: названная панель — `role="region"`, ориентир. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера. Панели получают фокус только из кода (`tabindex="-1"`, без кольца).',
       },
       {
         en: "`PageContent.BackButton` is named by `labels.back` and is shown only while the split shows one pane.",

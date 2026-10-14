@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Card } from "@/components/card/Card";
 import { Typography, type TypographyRole } from "@/components/typography/Typography";
-import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { iconBoxStyles } from "@/internal/iconBox";
@@ -10,6 +10,10 @@ import type { ControlSize } from "@/internal/states";
 
 import styles from "./LoginForm.module.css";
 
+/*
+ * The type scale of the form by tier (its own scale, like a heading level per tier): the title,
+ * the description and the footer line grow with the tier.
+ */
 const TITLE_ROLE: Record<ControlSize, TypographyRole> = {
   xs: "title-s",
   s: "title-m",
@@ -41,14 +45,8 @@ const useLoginFormSize = (): ControlSize => useOptionalControlSize() ?? "m";
 const AlignContext = React.createContext<"center" | "start">("start");
 
 export type LoginFormRootProps = {
-  /** Tier of spacing and type; fields and buttons inside without their own `size` take it. Default `m`. */
   size?: ControlSize;
-  /**
-   * Header layout. `start` (default): the Modal-header layout — a rounded accent tile on the left,
-   * title over description on its right. `center`: round logo above centered text.
-   */
   align?: "center" | "start";
-  /** Removes the card shadow, e.g. inside a modal or on a plain page. No border in either case. */
   flat?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -56,7 +54,7 @@ export type LoginFormRootProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 function LoginFormRoot({
-  size = "m",
+  size: sizeProp,
   align = "start",
   flat = false,
   className,
@@ -66,6 +64,7 @@ function LoginFormRoot({
 }: LoginFormRootProps) {
   // The surface is a Card (layer fill, radius, depth, whisper); the root caps its width and the
   // content lays out the form's rhythm inside the card's padding.
+  const { size, provide } = useHostTier(sizeProp);
   return (
     <div
       ref={ref}
@@ -75,9 +74,7 @@ function LoginFormRoot({
     >
       <Card.Root flat={flat}>
         <div className={styles.content}>
-          <AlignContext value={align}>
-            <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-          </AlignContext>
+          <AlignContext value={align}>{provide(children)}</AlignContext>
         </div>
       </Card.Root>
     </div>
@@ -128,7 +125,6 @@ function LoginFormLogo({ className, children, ...rest }: LoginFormLogoProps) {
 LoginFormLogo.displayName = "LoginForm.Logo";
 
 export type LoginFormTitleProps = {
-  /** Heading element. Default `h1`; use `h2` when the form sits inside a page that already has an `h1`. */
   as?: "h1" | "h2" | "h3";
   className?: string;
   children?: React.ReactNode;

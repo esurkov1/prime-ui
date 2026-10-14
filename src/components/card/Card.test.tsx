@@ -64,6 +64,7 @@ describe("Card", () => {
         </Card.List>
       </Card.Root>,
     );
+    expect(screen.getByRole("list")).toHaveAttribute("role", "list");
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
   });
 
@@ -117,8 +118,27 @@ describe("Card", () => {
     expect(link).toHaveAttribute("data-variant", "mini");
     expect(link).toHaveAttribute("data-depth");
     expect(link).toHaveClass("extra");
-    link.focus();
-    expect(link).toHaveFocus();
+  });
+
+  it("is one Tab stop with asChild: focus moves onto the whole link and on past it", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <button type="button">До</button>
+        <Card.Root asChild variant="mini">
+          <a href="#orders">
+            <Card.Label>Заказы</Card.Label>
+            <Card.Value>128</Card.Value>
+          </a>
+        </Card.Root>
+        <button type="button">После</button>
+      </>,
+    );
+    screen.getByRole("button", { name: "До" }).focus();
+    await user.tab();
+    expect(screen.getByRole("link", { name: /Заказы/ })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "После" })).toHaveFocus();
   });
 
   it("works as a button: Enter and Space activate it", async () => {

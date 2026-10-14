@@ -77,6 +77,18 @@ describe("DescriptionList", () => {
     expect(action).toHaveFocus();
     await user.keyboard("{Enter}");
     expect(onClick).toHaveBeenCalledTimes(1);
+    await user.keyboard(" ");
+    expect(onClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("puts each value at the end of its row with align end", () => {
+    const { container } = render(
+      <DescriptionList.Root align="end">
+        <DescriptionList.Item label="НДС 20%">76 000 ₽</DescriptionList.Item>
+      </DescriptionList.Root>,
+    );
+    expect(container.querySelector("dl")).toHaveAttribute("data-align", "end");
+    expect(screen.getByRole("definition")).toHaveTextContent("76 000 ₽");
   });
 
   it("a row action may be a link with the button look (asChild)", () => {

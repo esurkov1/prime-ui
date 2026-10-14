@@ -23,6 +23,16 @@ describe("Ring", () => {
     expect(svg).not.toHaveAttribute("data-spin");
   });
 
+  it("draws the track of a surface with track surface, and no track with false", () => {
+    const { container, rerender } = render(<Ring value={0.4} track="surface" />);
+    expect(svgOf(container)).toHaveAttribute("data-track", "surface");
+    expect(svgOf(container).querySelectorAll("circle")).toHaveLength(2);
+    rerender(<Ring value={0.4} />);
+    expect(svgOf(container)).not.toHaveAttribute("data-track");
+    rerender(<Ring value={0.4} track={false} />);
+    expect(svgOf(container).querySelectorAll("circle")).toHaveLength(1);
+  });
+
   it("clamps the share and hides an empty arc at rest", () => {
     const { container, rerender } = render(<Ring value={1.7} />);
     expect(svgOf(container).style.getPropertyValue("--ring-value")).toBe("1");

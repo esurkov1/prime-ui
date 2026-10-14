@@ -173,7 +173,7 @@ describe("Pagination", () => {
     expect(screen.getByRole("button", { name: "Page 1" })).toBeInTheDocument();
   });
 
-  it("works from the keyboard: Tab reaches the buttons, Enter picks a page", async () => {
+  it("works from the keyboard: Tab reaches the buttons, Enter and Space pick a page", async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();
     render(<Pagination defaultValue={1} totalPages={5} onValueChange={onValueChange} />);
@@ -181,6 +181,10 @@ describe("Pagination", () => {
     expect(screen.getByRole("button", { name: "Страница 1" })).toHaveFocus();
     await user.tab();
     await user.keyboard("{Enter}");
-    expect(onValueChange).toHaveBeenCalledWith(2);
+    expect(onValueChange).toHaveBeenLastCalledWith(2);
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Страница 3" })).toHaveFocus();
+    await user.keyboard(" ");
+    expect(onValueChange).toHaveBeenLastCalledWith(3);
   });
 });

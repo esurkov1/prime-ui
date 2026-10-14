@@ -8,14 +8,8 @@
 .root {
   --card-pad: var(--prime-card-padding-m);
   --card-gap: var(--prime-card-gap);
-  --card-icon: var(--prime-icon-m);
-  --card-icon-box: var(--prime-control-l-height);
-  /* Faint zone hairline, inset by the side padding — same language as Modal/Drawer. */
-  --card-hairline: linear-gradient(
-    var(--prime-color-border-faint),
-    var(--prime-color-border-faint)
-  );
-  --card-hairline-size: calc(100% - 2 * var(--card-pad)) var(--prime-border-width);
+  /* Zone hairlines (`hairline` joined in TSX) are inset by the side padding, as in Modal/Drawer. */
+  --hairline-inset: var(--card-pad);
 
   container-type: inline-size;
   box-sizing: border-box;
@@ -27,6 +21,9 @@
   color: var(--prime-color-text-primary);
   font-family: var(--prime-font-family-sans);
   text-align: start;
+  transition:
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* The whisper exists only on a card that sits on the page (`--prime-layer-shadow` of depth 1). */
@@ -46,9 +43,6 @@
   text-decoration: none;
   cursor: pointer;
   appearance: none;
-  transition:
-    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -113,36 +107,10 @@
   text-wrap: balance;
 }
 
-.root[data-variant="cta"] > .title {
-  font-size: var(--prime-text-title-m-size);
-  line-height: var(--prime-text-title-m-line-height);
-  letter-spacing: var(--prime-text-title-m-tracking);
-  font-weight: var(--prime-text-title-m-weight);
-}
-
 .description {
   margin: 0;
   color: var(--prime-color-text-secondary);
   overflow-wrap: anywhere;
-}
-
-.icon {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: var(--card-icon-box);
-  height: var(--card-icon-box);
-  border-radius: var(--prime-radius-m);
-  background: var(--prime-color-accent-soft);
-  color: var(--prime-color-accent-text);
-}
-
-.icon svg {
-  display: block;
-  width: var(--card-icon);
-  height: var(--card-icon);
 }
 
 .label {
@@ -158,22 +126,6 @@
   color: var(--prime-color-text-primary);
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
-}
-
-/* `stat-trend`: the value is the tile's headline. Paired with a lead in the header row (a badge
-   or an icon on the left), it is a compact heading-m at the end of that row. */
-.root[data-variant="stat-trend"] .value {
-  font-size: var(--prime-text-heading-l-size);
-  line-height: var(--prime-text-heading-l-line-height);
-  letter-spacing: var(--prime-text-heading-l-tracking);
-  font-weight: var(--prime-text-heading-l-weight);
-}
-
-.root[data-variant="stat-trend"] > .header > .value {
-  font-size: var(--prime-text-heading-m-size);
-  line-height: var(--prime-text-heading-m-line-height);
-  letter-spacing: var(--prime-text-heading-m-tracking);
-  font-weight: var(--prime-text-heading-m-weight);
 }
 
 /* Everything after the title (a control, a caption, a header-row value) keeps its size at the end. */
@@ -221,17 +173,18 @@
   grid-row: 1 / span 2;
 }
 
-/* body-s at medium weight: written out, a composed role plus a weight override is order-dependent. */
 .delta {
   display: inline-flex;
   align-items: center;
   gap: var(--prime-space-1);
-  font-size: var(--prime-text-body-s-size);
-  line-height: var(--prime-text-body-s-line-height);
-  font-weight: var(--prime-font-weight-medium);
-  letter-spacing: var(--prime-text-body-s-tracking);
   color: var(--prime-color-text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+/* body-s (joined in TSX) at medium weight: `[data-tone]` (always set) outranks the role class in
+   any bundle order. */
+.delta[data-tone] {
+  font-weight: var(--prime-font-weight-medium);
 }
 
 /* The reference line of a KPI: quiet caption at the bottom of the tile. */
@@ -348,11 +301,11 @@
   padding-bottom: 0;
 }
 
-/* Header followed by content: faint inset hairline under the header (charts stay edge-to-edge). */
+/* Header followed by content: air above the hairline that heads the content (a chart right under
+   the header breaks the hairline run and stays edge-to-edge). */
 .root[data-variant="panel"] > .header:has(+ .body),
 .root[data-variant="list"] > .header:has(+ .list) {
   padding-bottom: var(--prime-space-4);
-  background: var(--card-hairline) center bottom / var(--card-hairline-size) no-repeat;
 }
 
 .root[data-variant="panel"] > .header + .body {
@@ -370,7 +323,6 @@
 .root[data-variant="list"] > .footer {
   justify-content: flex-end;
   padding: var(--prime-space-4) var(--card-pad) var(--card-pad);
-  background: var(--card-hairline) center top / var(--card-hairline-size) no-repeat;
 }
 
 /* ---------- list ---------- */
@@ -391,16 +343,13 @@
   overflow-wrap: anywhere;
 }
 
-.listItem + .listItem {
-  background: var(--card-hairline) center top / var(--card-hairline-size) no-repeat;
-}
-
 /* ---------- cta ---------- */
 
 /* Title + text is the header, the footer sits under a full-width hairline. */
 .root[data-variant="cta"] > .footer {
+  --hairline-inset: 0%;
+
   padding-top: var(--prime-space-4);
-  background: var(--card-hairline) center top / 100% var(--prime-border-width) no-repeat;
 }
 
 /* ---------- split ---------- */
@@ -455,19 +404,20 @@
 
 /* ---------- Responsive (own width; container = the card, so only descendants adapt) ---------- */
 
+/* The `stat-trend` headline (heading-l, joined in TSX) follows the card's width: heading-m in a
+   narrow tile, display-s in a wide one. The three roles share weight and tracking, so only the
+   size and the line height move (`.value.headline` outranks the role class in any order). */
 @container (max-width: 20rem) {
-  .root[data-variant="stat-trend"] .value {
+  .value.headline {
     font-size: var(--prime-text-heading-m-size);
     line-height: var(--prime-text-heading-m-line-height);
-    letter-spacing: var(--prime-text-heading-m-tracking);
   }
 }
 
 @container (min-width: 36rem) {
-  .root[data-variant="stat-trend"] .value {
+  .value.headline {
     font-size: var(--prime-text-display-s-size);
     line-height: var(--prime-text-display-s-line-height);
-    letter-spacing: var(--prime-text-display-s-tracking);
   }
 }
 

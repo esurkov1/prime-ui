@@ -3,21 +3,27 @@
  * under a header or above a footer — a card, a dialog, a board column. It is a background image,
  * so it takes no room and moves nothing. Join `.top` or `.bottom` in TSX (never cross-file
  * `composes`); the host sets `--hairline-inset` to its side padding to inset the line from both
- * edges (0 runs it edge to edge). It composes with the host's own fill: only the image longhands
- * are set, never the `background` shorthand.
+ * edges (`0%`, the default, runs it edge to edge: the inset is a length or a percentage, never the
+ * unitless `0` of `--prime-space-0`, which `calc` cannot take beside `100%`). It composes with the
+ * host's own fill: only the image longhands are set, never the `background` shorthand.
+ *
+ * `.between` draws the line only where one zone follows another: join it on every zone of a run
+ * (a header, its body, the rows of a list) and each one that comes right after a sibling with
+ * `.between` gets the line at its top. A zone without it (an edge-to-edge chart) breaks the run.
  */
 .top,
-.bottom {
+.bottom,
+.between + .between {
   background-image: linear-gradient(
     var(--prime-color-border-faint),
     var(--prime-color-border-faint)
   );
   background-repeat: no-repeat;
-  background-size: calc(100% - 2 * var(--hairline-inset, var(--prime-space-0)))
-    var(--prime-border-width);
+  background-size: calc(100% - 2 * var(--hairline-inset, 0%)) var(--prime-border-width);
 }
 
-.top {
+.top,
+.between + .between {
   background-position: center top;
 }
 

@@ -3,7 +3,9 @@ import { Icon } from "@/icons";
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { RegionSwap } from "@/internal/RegionSwap";
 import { RollingNumber } from "@/internal/RollingNumber";
 
@@ -70,56 +72,27 @@ const formatNumber = (value: number) => NUMBER.format(value);
 
 type SparklineRest =
   | {
-      /** Default `latest`. */
       summary?: "latest";
-      /**
-       * Index of the point at rest (the current month): the headline shows it when nobody scrubs,
-       * and `bars` draw the other bars quieter. Default: the latest point with a value.
-       */
       highlight?: number;
     }
   | {
       summary: "sum" | "average";
-      /** A total or a mean is no point: there is nothing to highlight at rest. */
       highlight?: never;
     };
 
 export type SparklineProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> &
   SparklineRest & {
-    /** Points in order, oldest first; two present points in a row draw a line. */
     data: SparklinePoint[];
-    /**
-     * Visible title above the value and the accessible name of the chart; with `layout="compact"`
-     * only the accessible name.
-     */
     label: string;
-    /** Default `area`. */
     variant?: SparklineVariant;
-    /** Shape of the line between points (`area`, `line`). Default `smooth`. */
     curve?: SparklineCurve;
-    /** Default `default`. */
     layout?: SparklineLayout;
-    /** What a scrubbed point's change badge compares with. Default `previous`. */
     change?: SparklineChange;
-    /**
-     * The same summary for the previous period («прошлые 30 дней»): the change badge at rest compares
-     * the headline with it. Without it a `sum` / `average` headline shows no change at rest.
-     */
     compareTo?: number;
-    /**
-     * The value axis spans at least `min`…`max`: one scale for several sparklines (a table column)
-     * or a meaningful floor. Data outside widens the scale, never gets cut.
-     */
     min?: number;
     max?: number;
-    /** A dashed horizontal line at this value: a plan, a target, an average. */
     reference?: number;
-    /**
-     * The series is on its way: Skeletons of the value, the date and the plot, which cross-fade into
-     * the data. The title stays; the root is `aria-busy`.
-     */
     loading?: boolean;
-    /** Display of a value («312 400 ₽»). Default: the number with Russian digit groups. */
     formatValue?: (value: number) => string;
     labels?: Partial<SparklineLabels>;
     ref?: React.Ref<HTMLDivElement>;
@@ -175,7 +148,7 @@ export function Sparkline({
   ref,
   ...rest
 }: SparklineProps) {
-  const labels = { ...SPARKLINE_LABELS, ...labelsProp };
+  const labels = useLabels(SPARKLINE_LABELS, labelsProp);
   const last = data.length - 1;
   const bars = variant === "bars";
   const compact = layout === "compact";
@@ -310,10 +283,12 @@ export function Sparkline({
     <div
       {...rest}
       ref={ref}
-      className={cx(styles.root, className)}
+      // The compact plot is as tall as an `xs` control: the tier table resolves `--field-h`.
+      className={cx(compact && fieldTierClass, styles.root, className)}
       data-scrubbing={active !== null || undefined}
       data-variant={variant}
       data-layout={layoutAttr}
+      data-size={compact ? "xs" : undefined}
       aria-busy={loading || undefined}
     >
       {compact ? null : (

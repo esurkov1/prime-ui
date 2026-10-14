@@ -3,12 +3,7 @@
   "src/components/accordion/examples/states.tsx: imports CSS",
   "src/components/accordion/examples/variants.tsx: imports CSS",
   "src/components/accordion/examples/with-icon.tsx: imports CSS",
-  "src/components/card/examples/variants.tsx: imports CSS",
   "src/components/color-picker/examples/sizes.tsx: imports CSS",
   "src/components/color-picker/examples/states.tsx: imports CSS",
-  "src/components/description-list/examples/sizes.tsx: imports CSS",
-  "src/components/dnd/examples/states.tsx: imports CSS",
-  "src/components/empty-page/examples/sizes.tsx: imports CSS",
-  "src/components/empty-page/examples/variants.tsx: imports CSS",
-  "src/components/smart-filter/examples/sizes.tsx: imports CSS"
+  "src/components/dnd/examples/states.tsx: imports CSS"
 ]

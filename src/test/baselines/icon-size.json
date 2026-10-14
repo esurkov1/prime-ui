@@ -1,5 +1,3 @@
 [
-  "src/components/card/Card.module.css: .icon svg",
-  "src/components/empty-page/EmptyPage.module.css: .iconWrap svg",
   "src/internal/menu.module.css: .itemIcon > svg"
 ]

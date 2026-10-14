@@ -45,7 +45,7 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Diameter 24 · 32 · 48 · 64 · 80 px; the stroke is 1/12 of it. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Diameter 24 · 32 · 48 · 64 · 80 px; the stroke is 1/12 of it. Without it the ring takes the tier of a sized host. |
 | `children` | `ReactNode` | — | Content in the center (number, percent, `Icon`): text from `m`, an icon from `s`, nothing on `xs`. A string or number also becomes `aria-valuetext`. |
 | `aria-label` | `string` | — | Accessible name of the ring (set on the svg). Always pass it. |
 | `loading` | `boolean` | `false` | The data is on its way: a Skeleton ring of the same diameter and stroke (and legend lines) that cross-fades into the data; the inner content waits, the root is `aria-busy`. |
@@ -67,7 +67,7 @@ with legend:             <div data-legend> — a row: the ring box + <ul> legend
 |---|---|---|---|
 | `xs` | 24 diameter, no inner content | inline in text or table cells | |
 | `s` | 32 diameter, an icon 16 in the center, no text | list rows, compact cards | |
-| `m` | 48 diameter, inner text 12/16, icon 20 | KPI tiles | yes |
+| `m` | 48 diameter, inner text 12/16, icon 20 | KPI tiles | the host tier, else `m` |
 | `l` | 64 diameter, inner text 16/24, icon 24 | dashboard cards | |
 | `xl` | 80 diameter, inner text 18/24, icon 32 | hero metrics, breakdowns | |
 
@@ -121,7 +121,7 @@ The stroke is always 1/12 of the diameter (the kit ring's `data` weight). These 
 Always controlled: pass the current `value` or `segments`.
 
 ## Layout & spacing
-- `display: inline-flex`, never shrinks (with `legend` the root is a block `flex` row); a caption sits next to it with `--prime-space-3` or under it with `--prime-space-2`.
+- `display: inline-flex`, never shrinks (with `legend` the root is a block `flex` row); a caption sits 12 beside it or 8 under it (a gap on their parent).
 - Diameters sit on the 4px grid (`--prime-space-6…20`); the ring is placed in CSS (an svg without a viewBox), lengths along it are percent of the circle.
 - Inner content sits in the hole (5/6 of the diameter, clipped), primary, medium weight, tabular numbers.
 - With `legend` the root is a wrapping row: the ring and the legend `--prime-space-5` (20) apart; the legend takes the rest of the row (basis 192) and drops below the ring when that does not fit.

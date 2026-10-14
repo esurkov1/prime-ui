@@ -1,11 +1,13 @@
 /*
  * ProgressCircle — the ring version of ProgressBar, drawn from the kit ring (`internal/ring`,
  * `data` weight: the stroke is 1/12 of the diameter), so it keeps one proportion at every tier;
- * `--pc-size` sets the diameter from rem tokens. Colors go to the ring as `--ring-fill` /
- * `--ring-track`.
+ * `--pc-size` sets the diameter from rem tokens. The tone goes to the ring as `--ring-fill`; the
+ * track is the ring's surface track (`track="surface"`), or its own tint with `tone="inherit"`.
  * Value mode: track + one round-capped arc; `null` or `spin` turns the ring (the ring's motion).
  * Segments mode: parts clockwise from the top with flat joints and round caps at both ends of the
- * filled share, or separate round arcs with `hairline`.
+ * filled share, or separate round arcs with `hairline`. A part is a full-length dash turned to its
+ * start (`rotate`) and cut to its length (`stroke-dashoffset`), so weights glide on paint and the
+ * compositor only.
  */
 
 .root {
@@ -116,11 +118,10 @@
   --pc-fill: var(--hue-chart);
 }
 
-/* The tone's colors on the ring; `inherit` keeps the ring's own. Three selectors deep: the ring's
+/* The tone's fill on the ring; `inherit` keeps the ring's own. Three selectors deep: the ring's
    color defaults never win over a tone. */
 .root:not([data-tone="inherit"]) .svg {
   --ring-fill: var(--pc-fill);
-  --ring-track: var(--pc-rest);
 }
 
 .segment,
@@ -140,9 +141,12 @@
 .segment,
 .segmentRound,
 .restRound {
+  stroke-dasharray: 100 100;
+  transform-origin: 50% 50%;
+  transform-box: view-box;
   transition:
     stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    stroke-dasharray var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    rotate var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
     stroke var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
@@ -163,7 +167,6 @@
   width: calc(var(--pc-size) * 5 / 6);
   height: calc(var(--pc-size) * 5 / 6);
   overflow: hidden;
-  color: var(--prime-color-text-primary);
   font-size: var(--pc-text-size);
   line-height: var(--pc-line-height);
   font-weight: var(--prime-font-weight-medium);
@@ -171,6 +174,7 @@
   text-align: center;
 }
 
-.root[data-tone="inherit"] .inner {
-  color: inherit;
+/* The text of the hole (joined in TSX unless `tone="inherit"`, which keeps the host's color). */
+.ink {
+  color: var(--prime-color-text-primary);
 }

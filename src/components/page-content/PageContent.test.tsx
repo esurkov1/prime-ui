@@ -1,14 +1,14 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import enterMotion from "@/internal/enterMotion.module.css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { PageContent } from "./PageContent";
+
+const CSS = "src/components/page-content/PageContent.module.css";
 
 describe("PageContent", () => {
   it("renders title, description, and body", () => {
@@ -112,17 +112,20 @@ describe("PageContent", () => {
   });
 
   it("CSS: blocks 24 apart, a section 40 from its neighbours, tiles 16 on both axes", () => {
-    const css = readFileSync(join(__dirname, "PageContent.module.css"), "utf8");
-    expect(css).toMatch(/\.body \{[^}]*gap: var\(--prime-space-6\)/);
-    expect(css).toMatch(
-      /\.body > \.section:not\(:first-child\),\n\.body > \.section \+ \* \{\s*margin-block-start: var\(--prime-space-4\);/,
-    );
-    expect(css).toMatch(
-      /\.grid \{[^}]*container: prime-grid \/ inline-size;[^}]*gap: var\(--prime-space-4\)/,
-    );
-    expect(css).toMatch(/@container prime-grid \(min-width: 30rem\)/);
-    expect(css).toMatch(/@container prime-grid \(min-width: 40rem\)/);
-    expect(css).toMatch(/@container prime-grid \(min-width: 64rem\)/);
+    expect(cssValue(cssRule(CSS, ".body"), "gap")).toBe("var(--prime-space-6)");
+    expect(
+      cssValue(
+        cssRule(CSS, ".body > .section:not(:first-child), .body > .section + *"),
+        "margin-block-start",
+      ),
+    ).toBe("var(--prime-space-4)");
+    const grid = cssRule(CSS, ".grid");
+    expect(cssValue(grid, "container")).toBe("prime-grid / inline-size");
+    expect(cssValue(grid, "gap")).toBe("var(--prime-space-4)");
+    for (const width of ["30rem", "40rem", "64rem"]) {
+      const query = `@container prime-grid (min-width: ${width})`;
+      expect(cssRules(CSS).some((rule) => rule.parents[0] === query)).toBe(true);
+    }
   });
 
   it("sets data-measure on Description when measure is full", () => {
@@ -157,10 +160,9 @@ describe("PageContent", () => {
       </PageContent.Root>,
     );
     expect(container.firstChild).toHaveAttribute("data-fill", "true");
-    const css = readFileSync(join(__dirname, "PageContent.module.css"), "utf8");
-    expect(css).toMatch(
-      /\.root\[data-fill="true"\] > \.body \{\s*flex: 1 1 auto;\s*min-height: 0;/,
-    );
+    const body = cssRule(CSS, '.root[data-fill="true"] > .body');
+    expect(cssValue(body, "flex")).toBe("1 1 auto");
+    expect(cssValue(body, "min-height")).toBe("0");
   });
 });
 
@@ -238,6 +240,13 @@ describe("PageContent.Split", () => {
     await user.keyboard("{Enter}");
     expect(item).toHaveFocus();
     expect(screen.getByLabelText("Диалоги")).toHaveClass(enterMotion.enterBase);
+    // Space on the back button closes the detail the same way.
+    await user.keyboard("{Enter}");
+    expect(screen.getByLabelText("Переписка")).toHaveFocus();
+    await user.keyboard("{Tab}");
+    await user.keyboard(" ");
+    expect(screen.getByTestId("split")).not.toHaveAttribute("data-open");
+    expect(item).toHaveFocus();
   });
 
   it("wide: both panes stay, nothing moves and focus stays where it is", async () => {
@@ -255,13 +264,21 @@ describe("PageContent.Split", () => {
   });
 
   it("CSS: one pane at a time below 48rem of its own width, the back button only then", () => {
-    const css = readFileSync(join(__dirname, "PageContent.module.css"), "utf8");
-    expect(css).toMatch(/\.split \{[^}]*container: prime-split \/ inline-size/);
-    expect(css).toMatch(
-      /\.split:not\(\[data-open="true"\]\) > \.panes > \.detail,\n\.split\[data-open="true"\] > \.panes > \.list \{\s*display: none;/,
-    );
-    expect(css).toMatch(
-      /@container prime-split \(min-width: 48rem\) \{[\s\S]*\.backButton \{\s*display: none;/,
-    );
+    expect(cssValue(cssRule(CSS, ".split"), "container")).toBe("prime-split / inline-size");
+    expect(
+      cssValue(
+        cssRule(
+          CSS,
+          '.split:not([data-open="true"]) > .panes > .detail, .split[data-open="true"] > .panes > .list',
+        ),
+        "display",
+      ),
+    ).toBe("none");
+    expect(
+      cssValue(
+        cssRule(CSS, ".backButton", ["@container prime-split (min-width: 48rem)"]),
+        "display",
+      ),
+    ).toBe("none");
   });
 });

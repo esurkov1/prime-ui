@@ -23,6 +23,13 @@ export const api: ComponentApi = {
           ru: "`horizontal` — подпись колонкой рядом со значением (треть ширины), столбиком, когда сам список уже 24rem; `vertical` — подпись над значением при любой ширине.",
         },
         {
+          name: "align",
+          type: '"start" | "end"',
+          default: '"start"',
+          en: "`start` — values from the start of their column; `end` — each value at the end of its row in tabular figures, at any width: a summary of amounts (subtotal, tax, total).",
+          ru: "`start` — значения от начала своей колонки; `end` — каждое значение в конце строки табличными цифрами при любой ширине: сводка сумм (без налога, налог, итог).",
+        },
+        {
           name: "labels",
           type: "Partial<DescriptionListLabels>",
           en: "Built-in strings, see Labels.",

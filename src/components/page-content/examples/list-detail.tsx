@@ -88,13 +88,13 @@ export default function PageContentListDetailExample() {
                 <ScrollContainer anchor="end" className={styles.pane}>
                   <Crossfade state={shown?.id ?? "none"}>
                     {shown ? (
-                      <ul className={styles.notes}>
+                      <div className={styles.notes}>
                         {shown.notes.map((text) => (
-                          <li key={text}>
-                            <Typography variant="body-m">{text}</Typography>
-                          </li>
+                          <Typography key={text} variant="body-m">
+                            {text}
+                          </Typography>
                         ))}
-                      </ul>
+                      </div>
                     ) : (
                       <Typography variant="body-m" tone="muted" className={styles.hint}>
                         История обращения откроется здесь.

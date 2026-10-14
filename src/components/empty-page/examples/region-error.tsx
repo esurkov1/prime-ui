@@ -1,5 +1,5 @@
 /** A data region that failed to load: the error state takes the region, the retry shows its loading until the data cross-fades in; its text comes from labels — `tone`, `layout`, `EmptyPage.RetryButton`, `onRetry`, `labels`. */
-import { Button, Card, Crossfade, EmptyPage, Icon, Skeleton, Typography } from "prime-ui-kit";
+import { Button, Card, Crossfade, DescriptionList, EmptyPage, Icon, Skeleton } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -72,18 +72,13 @@ export default function EmptyPageRegionErrorExample() {
               </EmptyPage.Actions>
             </EmptyPage.Root>
           ) : (
-            <ul className={styles.list}>
+            <DescriptionList.Root align="end">
               {INVOICES.map((invoice) => (
-                <li key={invoice.id} className={styles.row}>
-                  <Typography as="span" variant="body-m">
-                    {invoice.client}
-                  </Typography>
-                  <Typography as="span" variant="body-m" tone="secondary">
-                    {invoice.amount}
-                  </Typography>
-                </li>
+                <DescriptionList.Item key={invoice.id} label={invoice.client}>
+                  {invoice.amount}
+                </DescriptionList.Item>
               ))}
-            </ul>
+            </DescriptionList.Root>
           )}
         </Crossfade>
       </Card.Body>

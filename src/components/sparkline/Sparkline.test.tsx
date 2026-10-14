@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { DataTable } from "@/components/data-table/DataTable";
@@ -38,6 +39,27 @@ describe("Sparkline", () => {
     expect(plot()).toHaveAttribute("aria-valuenow", "2");
     fireEvent.keyDown(plot(), { key: "Home" });
     fireEvent.blur(plot());
+    expect(plot()).toHaveAttribute("aria-valuenow", "2");
+  });
+
+  it("takes focus with Tab, steps with ↓ and ↑ as on a slider and rests again when Tab leaves", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <Sparkline data={DATA} label="Выручка" />
+        <button type="button">Дальше</button>
+      </>,
+    );
+    await user.tab();
+    expect(plot()).toHaveFocus();
+    await user.keyboard("{ArrowDown}");
+    expect(plot()).toHaveAttribute("aria-valuenow", "1");
+    await user.keyboard("{ArrowDown}");
+    expect(plot()).toHaveAttribute("aria-valuenow", "0");
+    await user.keyboard("{ArrowUp}");
+    expect(plot()).toHaveAttribute("aria-valuenow", "1");
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Дальше" })).toHaveFocus();
     expect(plot()).toHaveAttribute("aria-valuenow", "2");
   });
 

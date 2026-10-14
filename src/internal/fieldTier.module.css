@@ -14,6 +14,7 @@
  *   --field-item-h                          a menu / list row of the tier
  *   --field-step-h                          a control one tier down (`stepDown`: a row action)
  *   --field-compact-h                       a fixed small control (`compactTier`: a corner close)
+ *   --field-track                           thickness of a line (a slider, a progress track)
  * No other stylesheet maps `--prime-control-<tier>-*`: hosts read these variables. The text
  * classes below set a text from the tier on the element that joins them:
  *   .labelText  field label (Label)   .hintText  support row (Hint, counter)
@@ -43,6 +44,7 @@
   --field-item-h: var(--prime-control-m-item-height);
   --field-step-h: var(--prime-control-s-height);
   --field-compact-h: var(--prime-control-xs-height);
+  --field-track: var(--prime-control-m-track);
   /* Resolved on the same element as the tier rows below, so it follows the tier. */
   --field-input-text: var(--field-text);
   --field-input-lh: var(--field-lh);
@@ -80,6 +82,7 @@
   --field-item-h: var(--prime-control-xs-item-height);
   --field-step-h: var(--prime-control-xs-height);
   --field-compact-h: var(--prime-control-xs-height);
+  --field-track: var(--prime-control-xs-track);
 }
 
 .tier[data-size="s"] {
@@ -102,6 +105,7 @@
   --field-item-h: var(--prime-control-s-item-height);
   --field-step-h: var(--prime-control-xs-height);
   --field-compact-h: var(--prime-control-xs-height);
+  --field-track: var(--prime-control-s-track);
 }
 
 .tier[data-size="l"] {
@@ -125,6 +129,7 @@
   --field-item-h: var(--prime-control-l-item-height);
   --field-step-h: var(--prime-control-m-height);
   --field-compact-h: var(--prime-control-s-height);
+  --field-track: var(--prime-control-l-track);
 }
 
 .tier[data-size="xl"] {
@@ -148,6 +153,7 @@
   --field-item-h: var(--prime-control-xl-item-height);
   --field-step-h: var(--prime-control-l-height);
   --field-compact-h: var(--prime-control-s-height);
+  --field-track: var(--prime-control-xl-track);
 }
 
 /*

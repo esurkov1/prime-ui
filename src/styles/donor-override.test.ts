@@ -35,7 +35,10 @@ const PUBLIC_HOOKS = [
 
 const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);
 
-/** Shared tables whose variables every host reads: the one tier table (`--field-*`). */
+/**
+ * Tables that publish variables for hosts to read (CLAUDE.md §2: hosts read the tier variables of
+ * fieldTier): what they set is their output, not a donor's private variable.
+ */
 const PUBLISHERS = new Set(["src/internal/fieldTier.module.css"]);
 
 const files = moduleCssFiles().filter((file) => !file.includes("/examples/"));

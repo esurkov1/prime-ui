@@ -1,8 +1,4 @@
 [
-  "src/components/login-form/examples/forgot-password.tsx: fields with a submit and no <form>",
-  "src/components/login-form/examples/reset-password.tsx: fields with a submit and no <form>",
-  "src/components/login-form/examples/verification-code.tsx: fields with a submit and no <form>",
   "src/components/modal/examples/enter-key.tsx: fields with a submit and no <form>",
-  "src/components/modal/examples/enter-key.tsx: solid danger primary in an overlay (ConfirmDialog)",
-  "src/components/page-toolbar/examples/save-changes.tsx: fields with a submit and no <form>"
+  "src/components/modal/examples/enter-key.tsx: solid danger primary in an overlay (ConfirmDialog)"
 ]
