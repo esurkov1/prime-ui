@@ -14,7 +14,7 @@ import styles from "./FieldAction.module.css";
  * field padding on both sides, a hover wash over the whole segment, the touch hit area. The field
  * hosts style it through `data-field-action`.
  */
-export const fieldActionClass = cx(styles.action, touchTargetBlockClass);
+const fieldActionClass = cx(styles.action, touchTargetBlockClass);
 
 export type FieldActionButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -29,8 +29,8 @@ export type FieldActionButtonProps = Omit<
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-/** A named icon action at the field's edge with a tooltip. */
-export function FieldActionButton({
+/** The segment element itself: the shared class, `data-field-action` and the accessible name. */
+function segment({
   label,
   asChild = false,
   className,
@@ -46,24 +46,31 @@ export function FieldActionButton({
     "aria-label": label,
     "data-field-action": "",
   };
+  return asChild ? (
+    <Slot {...shared} ref={ref as React.Ref<HTMLElement>} aria-disabled={disabled || undefined}>
+      {children}
+    </Slot>
+  ) : (
+    <button {...shared} ref={ref} type={type} disabled={disabled}>
+      {children}
+    </button>
+  );
+}
+
+/**
+ * A segment without a tooltip, for a kit control whose glyph says it all (Input's clear and
+ * reveal): the name stays accessible, nothing floats over the field.
+ */
+export function FieldActionSegment(props: FieldActionButtonProps) {
+  return segment(props);
+}
+
+/** A named icon action at the field's edge with a tooltip. */
+export function FieldActionButton(props: FieldActionButtonProps) {
   return (
     <Tooltip.Root>
-      <Tooltip.Trigger>
-        {asChild ? (
-          <Slot
-            {...shared}
-            ref={ref as React.Ref<HTMLElement>}
-            aria-disabled={disabled || undefined}
-          >
-            {children}
-          </Slot>
-        ) : (
-          <button {...shared} ref={ref} type={type} disabled={disabled}>
-            {children}
-          </button>
-        )}
-      </Tooltip.Trigger>
-      <Tooltip.Content>{label}</Tooltip.Content>
+      <Tooltip.Trigger>{segment(props)}</Tooltip.Trigger>
+      <Tooltip.Content>{props.label}</Tooltip.Content>
     </Tooltip.Root>
   );
 }

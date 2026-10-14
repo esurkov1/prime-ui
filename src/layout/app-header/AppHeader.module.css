@@ -20,7 +20,8 @@
   color: var(--prime-color-text-primary);
 }
 
-/* A phone on its side: a sticky bar would eat a third of the height. */
+/* A phone on its side (foundation §9: sticky headers stop below 480px of window height): a sticky
+   bar would eat a third of the height. */
 @media (max-height: 479px) {
   .root {
     position: static;
@@ -110,15 +111,11 @@
 }
 
 .titleName {
-  composes: titleS from "../../internal/textRole.module.css";
-
   /* An `h1` name (`as="h1"`) keeps the bar's type and no margins. */
   margin: 0;
 }
 
 .description {
-  composes: caption from "../../internal/textRole.module.css";
-
   color: var(--prime-color-text-muted);
 }
 

@@ -9,8 +9,8 @@ import { useInheritedDisabled } from "@/internal/disabledContext";
 import {
   FieldActionButton,
   type FieldActionButtonProps,
+  FieldActionSegment,
   FieldCopyButton,
-  fieldActionClass,
 } from "@/internal/FieldAction";
 import {
   type FieldCommit,
@@ -472,16 +472,13 @@ export type InputClearButtonProps = Omit<
  * Trailing clear action. Render it only when the field has a value; clicking returns focus
  * to the input after `onClick` runs (clear the value in `onClick`).
  */
-function InputClearButton({ className, onClick, ref, ...rest }: InputClearButtonProps) {
+function InputClearButton({ onClick, ref, ...rest }: InputClearButtonProps) {
   const { inputId, inputRef, labels } = useInputContext();
   return (
-    <button
+    <FieldActionSegment
       {...rest}
       ref={ref}
-      type="button"
-      className={cx(fieldActionClass, className)}
-      data-field-action=""
-      aria-label={labels.clear}
+      label={labels.clear}
       aria-controls={inputId}
       onClick={(event) => {
         onClick?.(event);
@@ -489,7 +486,7 @@ function InputClearButton({ className, onClick, ref, ...rest }: InputClearButton
       }}
     >
       <Icon name="action.close" />
-    </button>
+    </FieldActionSegment>
   );
 }
 InputClearButton.displayName = "Input.ClearButton";
@@ -544,22 +541,13 @@ export type InputRevealButtonProps = Omit<
  * Shows a `type="password"` field as text and back (`aria-pressed`). A pointer press keeps the focus
  * in the field; the caret and selection survive the switch.
  */
-function InputRevealButton({
-  className,
-  onClick,
-  onMouseDown,
-  ref,
-  ...rest
-}: InputRevealButtonProps) {
+function InputRevealButton({ onClick, onMouseDown, ref, ...rest }: InputRevealButtonProps) {
   const { inputId, inputRef, labels, revealed, setRevealed, selectionRef } = useInputContext();
   return (
-    <button
+    <FieldActionSegment
       {...rest}
       ref={ref}
-      type="button"
-      className={cx(fieldActionClass, className)}
-      data-field-action=""
-      aria-label={labels.reveal}
+      label={labels.reveal}
       aria-pressed={revealed}
       aria-controls={inputId}
       onMouseDown={(event) => {
@@ -580,7 +568,7 @@ function InputRevealButton({
       }}
     >
       <Icon name={revealed ? "field.password.hide" : "field.password.show"} />
-    </button>
+    </FieldActionSegment>
   );
 }
 InputRevealButton.displayName = "Input.RevealButton";

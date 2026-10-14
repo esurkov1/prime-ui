@@ -1092,8 +1092,9 @@ tbody + tbody > .groupRow > .groupCell {
   min-width: 0;
 }
 
-/* Short landscape screens: a sticky head would take a large share of the height, so it scrolls
-   with the rows (a sticky first column still sticks sideways). */
+/* Short landscape screens (foundation §9: sticky headers stop below 480px of window height): a
+   sticky head would take a large share of the window, so it scrolls with the rows (a sticky first
+   column still sticks sideways). */
 @media (max-height: 479px) {
   .root[data-sticky-header="true"] .headCell {
     top: auto;

@@ -10,8 +10,19 @@ const CITIES = [
   { value: "kzn", label: "Казань" },
 ];
 
+/** One tab stop: arrows move the focused row (wrapping), Home / End jump to the ends. */
+function nextIndex(key: string, index: number, count: number): number | null {
+  if (key === "ArrowDown") return (index + 1) % count;
+  if (key === "ArrowUp") return (index - 1 + count) % count;
+  if (key === "Home") return 0;
+  if (key === "End") return count - 1;
+  return null;
+}
+
 export default function CheckboxIndicatorExample() {
   const [selected, setSelected] = React.useState<string[]>(["msk"]);
+  const [active, setActive] = React.useState(0);
+  const optionRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
   const toggle = (value: string) =>
     setSelected((current) =>
@@ -24,16 +35,27 @@ export default function CheckboxIndicatorExample() {
       aria-label="Города доставки"
       aria-multiselectable
       className={styles.optionList}
+      onKeyDown={(event) => {
+        const next = nextIndex(event.key, active, CITIES.length);
+        if (next === null) return;
+        event.preventDefault();
+        setActive(next);
+        optionRefs.current[next]?.focus();
+      }}
     >
-      {CITIES.map((city) => {
+      {CITIES.map((city, index) => {
         const isSelected = selected.includes(city.value);
         return (
           <div
             key={city.value}
+            ref={(node) => {
+              optionRefs.current[index] = node;
+            }}
             role="option"
             aria-selected={isSelected}
-            tabIndex={0}
+            tabIndex={index === active ? 0 : -1}
             className={styles.option}
+            onFocus={() => setActive(index)}
             onClick={() => toggle(city.value)}
             onKeyDown={(event) => {
               if (event.key === " " || event.key === "Enter") {

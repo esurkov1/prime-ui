@@ -9,6 +9,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { stickySurfaceClass } from "@/internal/sticky";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./AppHeader.module.css";
 
@@ -93,7 +94,7 @@ function AppHeaderTitle({
     <div {...rest} className={cx(styles.title, className)}>
       {icon}
       <div className={styles.titleText}>
-        <NameTag className={styles.titleName}>{name}</NameTag>
+        <NameTag className={cx(textRole.titleS, styles.titleName)}>{name}</NameTag>
         {description}
       </div>
     </div>
@@ -120,7 +121,7 @@ export type AppHeaderDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & 
 
 /** Muted second line under the title (a workspace, a period); hidden on a narrow header. */
 function AppHeaderDescription({ className, ...rest }: AppHeaderDescriptionProps) {
-  return <span {...rest} className={cx(styles.description, className)} />;
+  return <span {...rest} className={cx(textRole.caption, styles.description, className)} />;
 }
 AppHeaderDescription.displayName = "AppHeader.Description";
 

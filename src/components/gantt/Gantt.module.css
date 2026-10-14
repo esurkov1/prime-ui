@@ -920,7 +920,8 @@
 /*
  * The bar being created: an accent outline of a bar while it is drawn (the tooltip says its dates),
  * a pulsing Skeleton fill while `onBarCreate` runs, fading out on a refusal. On success the real
- * bar renders in the same place and lane, so nothing flashes.
+ * bar renders in the same place and lane, so nothing flashes. Its width follows the drag like a
+ * bar's resize: a scale would stretch the outline and the dates.
  */
 .ghost {
   position: absolute;
@@ -1062,7 +1063,8 @@
   }
 }
 
-/* Short landscape screens: a sticky head would take a large share of the height. */
+/* Short landscape screens (foundation §9: sticky headers stop below 480px of window height): the
+   chart's scroller is bounded by the window, and a size container would need a fixed height. */
 @media (max-height: 479px) {
   .head {
     position: relative;
