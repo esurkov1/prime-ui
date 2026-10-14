@@ -62,20 +62,51 @@
  * (Modal / Drawer / Sheet `Icon`) or a sign-in form. Put `.tile` on the box and the role in
  * `data-tone` (`neutral` · `accent` · `success` · `warning` · `danger` · `info`); the glyph inside
  * (a kit `Icon`) takes the m icon size from `--prime-icon-size`.
+ *
+ * A tile that grows with its host (the mark of an empty state) takes the host tier in
+ * `data-size`: xs 32 · s 40 · m 48 · l 56 · xl 64, with the glyph and the radius to match.
  */
 .tile {
   --prime-icon-size: var(--prime-icon-m);
+  --icon-tile-box: var(--prime-space-10);
+  --icon-tile-radius: var(--prime-radius-l);
 
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: var(--prime-space-10);
-  height: var(--prime-space-10);
-  border-radius: var(--prime-radius-l);
+  width: var(--icon-tile-box);
+  height: var(--icon-tile-box);
+  border-radius: var(--icon-tile-radius);
   /* The fill and the glyph colour of the role travel as one pair. */
   background: var(--icon-tile-fill, var(--prime-color-fill-muted));
   color: var(--icon-tile-ink, var(--prime-color-text-secondary));
+}
+
+.tile[data-size="xs"] {
+  --prime-icon-size: var(--prime-icon-s);
+  --icon-tile-box: var(--prime-space-8);
+  --icon-tile-radius: var(--prime-radius-m);
+}
+
+.tile[data-size="s"] {
+  --icon-tile-radius: var(--prime-radius-m);
+}
+
+.tile[data-size="m"] {
+  --prime-icon-size: var(--prime-icon-l);
+  --icon-tile-box: var(--prime-space-12);
+}
+
+.tile[data-size="l"] {
+  --prime-icon-size: var(--prime-icon-l);
+  --icon-tile-box: var(--prime-space-14);
+}
+
+.tile[data-size="xl"] {
+  --prime-icon-size: var(--prime-icon-xl);
+  --icon-tile-box: var(--prime-space-16);
+  --icon-tile-radius: var(--prime-radius-xl);
 }
 
 .tile[data-tone="accent"] {
