@@ -24,6 +24,11 @@
   height: calc(var(--prime-space-24) * 2);
 }
 
+/* narrow.tsx: the app shell fills the window frame instead of the viewport. */
+.shell {
+  height: 100%;
+}
+
 /* Content plane next to the rail, like AppShell: the page itself, edge to edge. */
 .content {
   box-sizing: border-box;

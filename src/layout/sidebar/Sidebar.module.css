@@ -25,8 +25,8 @@
  * - While hidden the panel keeps the look of the last visible mode (`data-panel-mode`) and is
  *   clipped out as one piece.
  *
- * Disclosures (collapsible groups, sub-lists) animate their height through a grid track
- * (0fr → 1fr) on the same clock, so groups that open for the rail open with it.
+ * Disclosures (collapsible groups, sub-lists) are the kit fold on the same clock, so groups that
+ * open for the rail open with it.
  *
  * The root clips with `clip-path`, not `overflow`, so the header toggle can sit across the outer
  * edge: the clip reaches past the edge by the toggle's half-width and ring, beside the header only.
@@ -55,6 +55,10 @@
   --sb-item-pad: calc((var(--sb-rail-box) - var(--sb-icon)) / 2);
   --sb-ease: var(--prime-motion-easing-standard);
   --sb-duration: var(--prime-motion-duration-base);
+  /* Groups and sub-lists fold on the rail's clock (the kit fold, `internal/Disclosure`): the rail
+     opens collapsed groups and closes sub-lists as it moves. */
+  --disclosure-duration: var(--sb-duration);
+  --disclosure-ease: var(--sb-ease);
 }
 
 .root[data-size="xs"],
@@ -131,9 +135,8 @@
     var(--sb-item-pad)
   );
 
-  /* The rail is a layer of its own beside the page (`data-depth`): fields inside take its fill; avatar
-     rings match the rail. */
-  --avatar-ring: var(--prime-color-layer-current);
+  /* The rail is a layer of its own beside the page (`data-depth`): fields inside take its fill and
+     avatar rings its colour. */
 
   position: relative;
   box-sizing: border-box;
@@ -548,6 +551,12 @@
   rotate: 180deg;
 }
 
+/* Still until its fold moves (one frame after mount): a group that opens for the current page
+   shows its chevron turned at once. */
+.groupTrigger:not([data-mounted]) .groupChevron {
+  transition: none;
+}
+
 /*
  * On the rail the heading keeps its layout: its text slides a little toward the edge, and the
  * cut that ends the rows ends it too — travelling with the rail, softened by a fade into the
@@ -620,59 +629,6 @@
   padding-block-start: var(--prime-space-1);
 }
 
-/* --- Disclosure (collapsible group, sub-list) ---------------------------------- */
-
-/* On the rail's clock (the rail opens collapsed groups and closes sub-lists as it moves). */
-.disclosure {
-  display: grid;
-  grid-template-rows: 0fr;
-  min-width: 0;
-  visibility: hidden;
-  transition:
-    grid-template-rows var(--sb-duration) var(--sb-ease),
-    visibility 0s linear var(--sb-duration);
-}
-
-.disclosure[data-state="open"] {
-  grid-template-rows: 1fr;
-  visibility: visible;
-  transition:
-    grid-template-rows var(--sb-duration) var(--sb-ease),
-    visibility 0s;
-}
-
-/*
- * The clip reaches into the rail padding and below the last row, so focus rings and the raised
- * shadow of a current row are not cut while the height is animating or at rest.
- */
-.disclosureClip {
-  min-width: 0;
-  min-height: 0;
-  margin-inline: calc(-1 * var(--sb-pad));
-  margin-block-end: calc(-1 * var(--prime-space-1));
-  padding-inline: var(--sb-pad);
-  padding-block-end: var(--prime-space-1);
-  overflow: hidden;
-}
-
-.disclosureClip > * {
-  opacity: 0;
-  translate: 0 calc(-1 * var(--prime-space-1));
-  transition:
-    opacity var(--sb-duration) var(--sb-ease),
-    translate var(--sb-duration) var(--sb-ease);
-}
-
-.disclosure[data-state="open"] > .disclosureClip > * {
-  opacity: 1;
-  translate: 0 0;
-}
-
-/* Disclosures that open on mount (the current page inside) appear in place. */
-.root:not([data-ready]) :is(.disclosure, .disclosureClip > *, .chevron, .groupChevron) {
-  transition: none;
-}
-
 /*
  * A collapsible group's items and its rail `…` row share one grid cell, as high as the taller of
  * the two. Folded or unfolded by the heading on the rail (`data-swap`), the row never animates its
@@ -686,20 +642,14 @@
   min-width: 0;
 }
 
-.groupBody > .disclosure {
+.groupBody > * {
   grid-area: 1 / 1;
 }
 
+/* The rail row takes its height at once and keeps it until the items have grown past it. */
 .groupBody[data-swap] > .groupRail {
-  transition:
-    grid-template-rows 0s linear var(--sb-duration),
-    visibility 0s linear var(--sb-duration);
-}
-
-.groupBody[data-swap] > .groupRail[data-state="open"] {
-  transition:
-    grid-template-rows 0s,
-    visibility 0s;
+  --disclosure-height-open: var(--prime-motion-instant);
+  --disclosure-height-close: var(--prime-motion-instant) linear var(--sb-duration);
 }
 
 /* --- Item -------------------------------------------------------------------- */
@@ -713,7 +663,8 @@
   gap: var(--sb-gap);
   width: 100%;
   min-width: 0;
-  min-height: var(--sb-h);
+  /* The touch row (`touchTargetRowClass`) grows a short row to the touch target. */
+  min-height: max(var(--sb-h), var(--touch-row-min, var(--sb-h)));
   margin: 0;
   padding-block: 0;
   padding-inline: var(--sb-item-pad);
@@ -730,9 +681,10 @@
   white-space: nowrap;
   cursor: pointer;
   isolation: isolate;
+  /* `scale` is the kit press (`internal/press`). */
   transition:
     color var(--prime-motion-fade-xfast) var(--sb-ease),
-    transform var(--prime-motion-duration-fast) var(--sb-ease),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     clip-path var(--sb-duration) var(--sb-ease);
 }
 
@@ -752,8 +704,6 @@
 
 .item:active:not([data-disabled="true"], :disabled) {
   --sb-fill: var(--prime-color-fill-subtle-active);
-
-  transform: scale(var(--prime-motion-press-scale));
 }
 
 /* The current item: two ladder steps off the rail, so it stays apart from the `fill-subtle` hover. */
@@ -778,7 +728,10 @@
   cursor: not-allowed;
 }
 
+/* A glyph slot (`iconSlotClass`): a kit Icon or a raw svg takes the tier icon. */
 .icon {
+  --prime-icon-size: var(--sb-icon);
+
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -787,11 +740,6 @@
   height: var(--sb-icon);
   color: var(--prime-color-text-muted);
   transition: color var(--prime-motion-fade-xfast) var(--sb-ease);
-}
-
-.icon > :global(svg) {
-  width: 100%;
-  height: 100%;
 }
 
 @media (hover: hover) {
@@ -808,6 +756,8 @@
 
 /* A trailing icon (external link) stays quiet: one step smaller, muted. */
 .item .icon[data-edge="end"] {
+  --prime-icon-size: var(--prime-icon-xs);
+
   width: var(--prime-icon-xs);
   height: var(--prime-icon-xs);
   color: var(--prime-color-text-muted);
@@ -847,16 +797,15 @@
 }
 
 /*
- * `Badge.Dot` (l tier, 8px) on the icon corner, cut out of the icon by a canvas ring: it stands for
- * a coloured count on the rail and fades in while the count fades out. `[data-size]` outranks
- * Badge's own `.dot` display whatever order the modules load in.
+ * `Badge.Dot` (l tier, 8px, the solid step of its `color`) on the icon corner, cut out of the icon
+ * by a canvas ring: it stands for a coloured count on the rail and fades in while the count fades
+ * out.
  */
-.dot[data-size] {
+.dot {
   position: absolute;
   inset-block-start: calc(50% - var(--sb-icon) / 2 - var(--prime-space-1) / 2);
   inset-inline-start: calc(var(--sb-item-pad) + var(--sb-icon) - var(--prime-space-1));
-  display: inline-flex;
-  color: var(--hue-solid);
+  border-radius: var(--prime-radius-full);
   box-shadow: 0 0 0 calc(2 * var(--prime-border-width)) var(--prime-color-layer-current);
   opacity: 0;
   scale: var(--sb-edge-scale);
@@ -866,19 +815,19 @@
     scale var(--sb-duration) var(--sb-ease);
 }
 
-.root[data-panel-mode="compact"]:not([data-off-canvas]) .dot[data-size]:not([data-attention]) {
+.root[data-panel-mode="compact"]:not([data-off-canvas]) .dot:not([data-attention]) {
   opacity: 1;
   scale: 1;
 }
 
 /* A folded parent's dot: shown while something inside needs attention and is out of sight. */
-.dot[data-size][data-attention="shown"] {
+.dot[data-attention="shown"] {
   opacity: 1;
   scale: 1;
 }
 
 /* After a group heading's text, on its line. */
-.dot[data-size].dotInline {
+.dotInline {
   position: static;
   flex: none;
   box-shadow: none;
@@ -913,6 +862,12 @@
   rotate: 180deg;
 }
 
+/* Still until the sub-list's fold moves (one frame after mount): a sub-list that opens for the
+   current page shows its chevron turned at once. */
+.item:not([data-mounted]) > .chevron {
+  transition: none;
+}
+
 /* --- Inline action -------------------------------------------------------------- */
 
 /* A row holds the item element and its action side by side (no button inside a button). */
@@ -945,7 +900,8 @@
   translate: calc(-1 * var(--sb-action-shift)) 0;
 }
 
-@media (hover: hover) {
+/* The trail moves aside on hover only for a fine pointer (foundation: hover transforms). */
+@media (hover: hover) and (pointer: fine) {
   .row:hover > .action {
     opacity: 1;
     pointer-events: auto;
@@ -956,8 +912,8 @@
   }
 }
 
-/* Without hover nothing reveals the action, so it stays shown. */
-@media (hover: none) {
+/* Without a fine hovering pointer nothing reveals the action, so it stays shown. */
+@media (hover: none), (pointer: coarse) {
   .row > .action {
     opacity: 1;
     pointer-events: auto;
@@ -1089,7 +1045,9 @@
   gap: var(--sb-account-inset);
   width: 100%;
   min-width: 0;
-  min-height: calc(var(--sb-avatar) + 2 * var(--sb-account-inset));
+  --sb-account-h: calc(var(--sb-avatar) + 2 * var(--sb-account-inset));
+
+  min-height: max(var(--sb-account-h), var(--touch-row-min, var(--sb-account-h)));
   margin: 0;
   padding-block: 0;
   padding-inline: var(--sb-account-inset);
@@ -1102,8 +1060,9 @@
   white-space: nowrap;
   cursor: pointer;
   isolation: isolate;
+  /* `scale` is the kit press (`internal/press`). */
   transition:
-    transform var(--prime-motion-duration-fast) var(--sb-ease),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     clip-path var(--sb-duration) var(--sb-ease);
 }
 
@@ -1119,8 +1078,6 @@
 
 .account:active {
   --sb-fill: var(--prime-color-fill-subtle-active);
-
-  transform: scale(var(--prime-motion-press-scale));
 }
 
 .accountAvatar {
@@ -1288,19 +1245,7 @@
 
 /* --- Off-canvas (offCanvas="always", or "auto" below 768px) ---------------------- */
 
-.scrim {
-  position: fixed;
-  inset: 0;
-  z-index: var(--prime-z-overlay);
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: var(--prime-color-bg-scrim);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--sb-duration) var(--sb-ease);
-}
-
+/* The scrim behind the panel is the kit modal scrim (`internal/sheet`, `overlayMotion`). */
 .root[data-off-canvas] {
   width: 0;
   background: none;
@@ -1335,9 +1280,4 @@
   transform: none;
   visibility: visible;
   transition: transform var(--sb-duration) var(--sb-ease);
-}
-
-.root[data-state="open"] .scrim {
-  opacity: 1;
-  pointer-events: auto;
 }

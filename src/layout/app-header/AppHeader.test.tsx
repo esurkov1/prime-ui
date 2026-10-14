@@ -1,8 +1,25 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { AppShell } from "../app-shell/AppShell";
+import { Sidebar } from "../sidebar/Sidebar";
 import { AppHeader } from "./AppHeader";
+
+/** A shell whose Sidebar is an off-canvas panel (a phone), with the page in main. */
+function PhoneShell({ children }: { children: React.ReactNode }) {
+  return (
+    <AppShell.Root>
+      <AppShell.Nav>
+        <Sidebar.Root offCanvas="always">
+          <Sidebar.Item href="#orders">Заказы</Sidebar.Item>
+        </Sidebar.Root>
+      </AppShell.Nav>
+      <AppShell.Main>{children}</AppShell.Main>
+    </AppShell.Root>
+  );
+}
 
 describe("AppHeader", () => {
   it("renders a banner with the zones in order and merges className", () => {
@@ -43,50 +60,93 @@ describe("AppHeader", () => {
     expect(title).toHaveTextContent("ОбзорОтдел продаж");
   });
 
-  it("MenuButton is named by labels.menu, takes aria-expanded and reports show", async () => {
-    const onClick = vi.fn();
-    const { rerender } = render(
-      <AppHeader.Root>
-        <AppHeader.MenuButton aria-expanded={false} onClick={onClick} />
-      </AppHeader.Root>,
+  it("draws the menu button while the shell's Sidebar is off-canvas: it opens the panel", async () => {
+    const user = userEvent.setup();
+    render(
+      <PhoneShell>
+        <AppHeader.Root>
+          <AppHeader.Start>
+            <AppHeader.Title>Заказы</AppHeader.Title>
+          </AppHeader.Start>
+        </AppHeader.Root>
+      </PhoneShell>,
     );
-
     const menu = screen.getByRole("button", { name: "Открыть меню" });
+    const nav = screen.getByRole("navigation", { hidden: true });
     expect(menu).toHaveAttribute("aria-expanded", "false");
-    expect(menu).toHaveAttribute("data-show", "narrow");
+    expect(menu).toHaveAttribute("aria-controls", nav.id);
+    // It leads the start zone, before the title.
+    expect(menu.nextElementSibling).toContainElement(screen.getByRole("heading", { level: 1 }));
 
-    await userEvent.tab();
-    expect(menu).toHaveFocus();
-    await userEvent.keyboard("{Enter}");
+    menu.focus();
+    await user.keyboard("{Enter}");
+    expect(nav.parentElement).toHaveAttribute("data-state", "open");
+    expect(menu).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("Space on the menu button opens the panel too; a placed MenuButton replaces the drawn one", async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <PhoneShell>
+        <AppHeader.Root labels={{ menu: "Навигация" }}>
+          <AppHeader.Start>
+            <AppHeader.Title>Заказы</AppHeader.Title>
+          </AppHeader.Start>
+          <AppHeader.Actions>
+            <AppHeader.MenuButton onClick={onClick} />
+          </AppHeader.Actions>
+        </AppHeader.Root>
+      </PhoneShell>,
+    );
+    const menus = screen.getAllByRole("button", { name: "Навигация" });
+    expect(menus).toHaveLength(1);
+    menus[0]?.focus();
+    await user.keyboard(" ");
     expect(onClick).toHaveBeenCalledTimes(1);
+    expect(menus[0]).toHaveAttribute("aria-expanded", "true");
+  });
 
+  it("no menu button while the rail is on screen, nor outside a shell", () => {
+    const { rerender } = render(
+      <AppShell.Root>
+        <AppShell.Nav>
+          <Sidebar.Root offCanvas="never">
+            <Sidebar.Item>Обзор</Sidebar.Item>
+          </Sidebar.Root>
+        </AppShell.Nav>
+        <AppHeader.Root>
+          <AppHeader.MenuButton />
+        </AppHeader.Root>
+      </AppShell.Root>,
+    );
+    expect(screen.queryByRole("button", { name: "Открыть меню" })).not.toBeInTheDocument();
     rerender(
-      <AppHeader.Root labels={{ menu: "Навигация" }}>
-        <AppHeader.MenuButton show="always" />
+      <AppHeader.Root>
+        <AppHeader.MenuButton />
       </AppHeader.Root>,
     );
-    expect(screen.getByRole("button", { name: "Навигация" })).toHaveAttribute(
-      "data-show",
-      "always",
-    );
+    expect(screen.queryByRole("button", { name: "Открыть меню" })).not.toBeInTheDocument();
   });
 
   it("Tab follows the reading order across the zones", async () => {
     render(
-      <AppHeader.Root>
-        <AppHeader.Start>
-          <AppHeader.MenuButton />
-          <AppHeader.Title>Заказы</AppHeader.Title>
-        </AppHeader.Start>
-        <AppHeader.Actions>
-          <button type="button">Экспорт</button>
-          <button type="button">Создать</button>
-        </AppHeader.Actions>
-      </AppHeader.Root>,
+      <PhoneShell>
+        <AppHeader.Root>
+          <AppHeader.Start>
+            <AppHeader.Title>Заказы</AppHeader.Title>
+          </AppHeader.Start>
+          <AppHeader.Actions>
+            <button type="button">Экспорт</button>
+            <button type="button">Создать</button>
+          </AppHeader.Actions>
+        </AppHeader.Root>
+      </PhoneShell>,
     );
 
-    await userEvent.tab();
-    expect(screen.getByRole("button", { name: "Открыть меню" })).toHaveFocus();
+    // The closed panel before it is `inert` (jsdom does not skip inert content, so start at the
+    // header).
+    screen.getByRole("button", { name: "Открыть меню" }).focus();
     await userEvent.tab();
     expect(screen.getByRole("button", { name: "Экспорт" })).toHaveFocus();
     await userEvent.tab();
@@ -133,6 +193,34 @@ describe("AppHeader", () => {
     expect(tools).toBe(screen.getByTestId("tools"));
     expect(row).toContainElement(screen.getByRole("button", { name: "Уведомления" }));
     expect(row).not.toContainElement(screen.getByRole("button", { name: "Период" }));
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "Уведомления" })).toHaveFocus();
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "Период" })).toHaveFocus();
+  });
+
+  it("tools inside a component of the page still form the second row", async () => {
+    function DealsTools() {
+      return (
+        <AppHeader.Tools data-testid="tools">
+          <button type="button">Период</button>
+        </AppHeader.Tools>
+      );
+    }
+    const { container } = render(
+      <AppHeader.Root>
+        <AppHeader.Start>
+          <AppHeader.Title>Сделки</AppHeader.Title>
+        </AppHeader.Start>
+        <DealsTools />
+        <AppHeader.Actions>
+          <button type="button">Уведомления</button>
+        </AppHeader.Actions>
+      </AppHeader.Root>,
+    );
+    const header = container.querySelector("header") as HTMLElement;
+    expect(header.lastElementChild).toBe(screen.getByTestId("tools"));
+    expect(header.children).toHaveLength(2);
     await userEvent.tab();
     expect(screen.getByRole("button", { name: "Уведомления" })).toHaveFocus();
     await userEvent.tab();

@@ -10,6 +10,5 @@
   "src/components/slider/Slider.module.css: hover :not(:disabled) ignores aria-disabled",
   "src/components/tabs/Tabs.tsx: switcher without SwitcherScroller",
   "src/internal/swatch.module.css: hover :not(:disabled) ignores aria-disabled",
-  "src/layout/bottom-nav/BottomNav.tsx: switcher without SwitcherScroller",
-  "src/layout/sidebar/Sidebar.module.css: hover transform without (pointer: fine)"
+  "src/layout/bottom-nav/BottomNav.tsx: switcher without SwitcherScroller"
 ]

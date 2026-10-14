@@ -2,8 +2,9 @@
  * App shell: two full-height planes edge to edge — the content plane is the page itself (layer 0 of
  * the surface ladder: gray in light, near black in dark) and the navigation column beside it is a
  * surface one layer above (Sidebar sets its own `data-depth`). No inset, radius, shadow or border:
- * the boundary is the fill change. Gutters inside the content plane: 16 → 24 from 640px → 32 from 1024px; top air
- * 24 → 32 from 1024px.
+ * the boundary is the fill change. Gutters inside the content plane are the page gutter
+ * `--prime-layout-gutter` (16 → 24 from 640px → 32 from 1024px, globals.css); top air 24 → 32 from
+ * 1024px.
  */
 
 /*
@@ -13,7 +14,6 @@
  * a page (an example) starts clean.
  */
 .root {
-  --shell-gutter: var(--prime-layout-gutter-s);
   --shell-top: var(--prime-space-6);
   --shell-rail-end: initial;
   --shell-footer-display: initial;
@@ -38,15 +38,8 @@
   overflow: hidden;
 }
 
-@media (min-width: 640px) {
-  .root {
-    --shell-gutter: var(--prime-layout-gutter-m);
-  }
-}
-
 @media (min-width: 1024px) {
   .root {
-    --shell-gutter: var(--prime-layout-gutter-l);
     --shell-top: var(--prime-space-8);
   }
 }
@@ -115,26 +108,26 @@
   /* The bottom air: the rail on screen › a floating BottomNav › a fill page › the default. */
   padding-block: var(--shell-top)
     var(--shell-rail-end, var(--shell-floating-end, var(--shell-fill-end, var(--prime-space-16))));
-  /* Default: the whole panel, only the responsive gutters. */
-  padding-inline: var(--shell-gutter);
+  /* Default: the whole panel, only the page gutters. */
+  padding-inline: var(--prime-layout-gutter);
 }
 
-/* The gutters belong to the shell's own zones: a header or a nested frame inside the page (an
-   example, a preview) starts from its own default instead of inheriting them. */
+/* The page gutter belongs to the shell's own zones (main and the header row): a frame nested in
+   the page (an example, a preview) starts from the small gutter instead of the viewport's. */
 .main > * {
-  --shell-gutter: initial;
+  --prime-layout-gutter: var(--prime-layout-gutter-s);
 }
 
 /* A page that fills the panel's height (`PageContent.Root fill`): no long scroll tail under it,
    the bottom air matches the side gutters. */
 .main:has(> [data-fill="true"]) {
-  --shell-fill-end: var(--shell-gutter);
+  --shell-fill-end: var(--prime-layout-gutter);
 }
 
 /* Long-read pages: a centered column up to the content max width. */
 .main[data-content-width="contained"] {
   padding-inline: max(
-    var(--shell-gutter),
+    var(--prime-layout-gutter),
     calc((100% - var(--prime-layout-content-max-width)) / 2)
   );
 }
@@ -156,15 +149,11 @@
 /*
  * The navigation column is on screen (a Sidebar rail, not an off-canvas panel): it navigates, so
  * the footer with the phone bar leaves and main drops the room it kept for the capsule. Without a
- * column, or while the Sidebar is off-canvas (`offCanvas="auto"` below 768px, `"always"`), the bar
- * stays at any width — navigation is never left behind a hidden bar.
+ * column, or while the Sidebar is off-canvas (`offCanvas="auto"` below 768px, `"always"`; the
+ * shell sets `data-off-canvas` from the navigation the Sidebar publishes), the bar stays at any
+ * width — navigation is never left behind a hidden bar.
  */
-.root[data-nav="true"] {
+.root[data-nav="true"]:not([data-off-canvas]) {
   --shell-rail-end: var(--prime-space-16);
   --shell-footer-display: none;
-}
-
-.root[data-nav="true"]:has(> .nav [data-off-canvas]) {
-  --shell-rail-end: initial;
-  --shell-footer-display: initial;
 }

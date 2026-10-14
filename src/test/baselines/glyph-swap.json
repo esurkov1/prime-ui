@@ -15,6 +15,5 @@
   "src/components/progress-circle/ProgressCircle.tsx: useStateSwap outside the engine",
   "src/components/select/Select.tsx: key={swapped",
   "src/components/select/Select.tsx: useStateSwap outside the engine",
-  "src/components/sparkline/Sparkline.tsx: useStateSwap outside the engine",
-  "src/layout/sidebar/Sidebar.tsx: glyph name ternary"
+  "src/components/sparkline/Sparkline.tsx: useStateSwap outside the engine"
 ]

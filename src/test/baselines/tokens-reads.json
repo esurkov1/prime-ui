@@ -15,6 +15,5 @@
   "src/internal/iconBox.ts: --prime-icon-size",
   "src/internal/swatch.module.css: --prime-icon-size",
   "src/internal/swatch.tsx: --prime-icon-size",
-  "src/layout/app-header/AppHeader.module.css: --prime-icon-size",
   "src/layout/bottom-nav/BottomNav.module.css: --prime-icon-size"
 ]

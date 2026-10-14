@@ -5,9 +5,18 @@ import { Divider, type DividerProps } from "@/components/divider/Divider";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
-import { toDataAttributes } from "@/internal/data-attributes";
+import { iconSlotClass } from "@/internal/iconBox";
+import { useLabels } from "@/internal/labels";
+import { flattenChildren, isPart, splitParts } from "@/internal/parts";
+import {
+  type OutletStore,
+  useMovedToOutlet,
+  useOutletEntries,
+  useOutletStore,
+} from "@/internal/slot";
 import { stickySurfaceClass } from "@/internal/sticky";
 import textRole from "@/internal/textRole.module.css";
+import { useAppShellHeaderOutlet, useAppShellNav } from "@/layout/app-shell/AppShell";
 
 import styles from "./AppHeader.module.css";
 
@@ -22,6 +31,15 @@ export const APP_HEADER_LABELS: AppHeaderLabels = {
 
 const LabelsContext = React.createContext<AppHeaderLabels>(APP_HEADER_LABELS);
 
+/**
+ * The menu button of a header: a part placed by the consumer claims the place, else the bar draws
+ * one itself at the start of its row.
+ */
+const MenuClaimContext = React.createContext<(() => () => void) | null>(null);
+
+/** The outlet of the header's second row: `AppHeader.Tools` written inside a wrapper moves there. */
+const ToolsOutletContext = React.createContext<OutletStore | null>(null);
+
 type HeaderProps = React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> };
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
@@ -30,35 +48,90 @@ export type AppHeaderRootProps = HeaderProps & {
 };
 
 /**
- * The page's bar at the very top of the content panel: its row holds only what the current page
- * needs — the page title, the page's tools, per-page buttons. One row as high as the Sidebar brand
- * row, so the two read as one line; sticky; lays itself out from its own width (narrow: the
- * description goes, the title truncates).
+ * The page's bar at the very top of the content panel: a title row as high as the Sidebar brand
+ * row (so the two read as one line) with only what the current page needs — the page title, the
+ * page's own buttons — and the page tools (`AppHeader.Tools`) as a second row under it. Sticky;
+ * lays itself out from its own width (narrow: the title icon goes, the title and its line of data
+ * truncate). Inside an `AppShell` a header the page renders moves into the shell's header row, and
+ * while the Sidebar is off-canvas the row starts with the menu button that opens it.
  */
-function AppHeaderRoot({ labels, className, children, ...rest }: AppHeaderRootProps) {
-  const value = React.useMemo(() => ({ ...APP_HEADER_LABELS, ...labels }), [labels]);
-  // The page tools are the header's second row, under the title row.
-  const items = React.Children.toArray(children);
-  const isTools = (child: React.ReactNode) =>
-    React.isValidElement(child) && child.type === AppHeaderTools;
+function AppHeaderRoot(props: AppHeaderRootProps) {
+  const outlet = useAppShellHeaderOutlet();
+  if (outlet) return <MovingHeader outlet={outlet} {...props} />;
+  return <HeaderBar {...props} />;
+}
+AppHeaderRoot.displayName = "AppHeader.Root";
+
+/** A header written inside a shell: it renders in the shell's header row. */
+function MovingHeader({ outlet, ...props }: AppHeaderRootProps & { outlet: OutletStore }) {
+  const bar = <HeaderBar {...props} />;
+  const moved = useMovedToOutlet(outlet, bar);
+  return moved ? null : bar;
+}
+
+function HeaderBar({ labels: labelsProp, className, children, ...rest }: AppHeaderRootProps) {
+  const labels = useLabels(APP_HEADER_LABELS, labelsProp);
+  const nav = useAppShellNav();
+  const [claims, setClaims] = React.useState(0);
+  const claim = React.useCallback(() => {
+    setClaims((count) => count + 1);
+    return () => setClaims((count) => count - 1);
+  }, []);
+
+  // The page tools are the header's second row, after the title row in the DOM and the Tab order:
+  // written directly (or in a fragment) they are placed at once; inside a wrapper they move.
+  const tools = useOutletStore();
+  const { parts: placedTools, rest: row } = splitParts(flattenChildren(children), AppHeaderTools);
+  // The menu button the bar draws itself leads the start zone (or the row without one).
+  const menu = nav?.offCanvas && claims === 0 ? <MenuButtonBody /> : null;
+  const startsRow = row.some((node) => isPart(node, AppHeaderStart));
+
   return (
-    <LabelsContext.Provider value={value}>
-      <ControlSizeProvider value="m">
-        <header {...rest} className={cx(styles.root, stickySurfaceClass, className)}>
-          <div className={styles.row}>{items.filter((child) => !isTools(child))}</div>
-          {items.filter(isTools)}
-        </header>
-      </ControlSizeProvider>
+    <LabelsContext.Provider value={labels}>
+      <MenuClaimContext.Provider value={claim}>
+        <AutoMenuContext.Provider value={startsRow ? menu : null}>
+          <ControlSizeProvider value="m">
+            <header {...rest} className={cx(styles.root, stickySurfaceClass, className)}>
+              <ToolsOutletContext.Provider value={tools}>
+                <div className={styles.row}>
+                  {startsRow ? null : menu}
+                  {row}
+                </div>
+              </ToolsOutletContext.Provider>
+              {placedTools}
+              <MovedTools store={tools} />
+            </header>
+          </ControlSizeProvider>
+        </AutoMenuContext.Provider>
+      </MenuClaimContext.Provider>
     </LabelsContext.Provider>
   );
 }
-AppHeaderRoot.displayName = "AppHeader.Root";
+
+/**
+ * The tools that moved out of the title row. A leaf of its own: an update of a moved part
+ * re-renders it alone, never the bar around the part.
+ */
+function MovedTools({ store }: { store: OutletStore }) {
+  return useOutletEntries(store).map(({ id, node }) => (
+    <React.Fragment key={id}>{node}</React.Fragment>
+  ));
+}
+
+/** The menu button the bar draws itself, for the start zone to lead with. */
+const AutoMenuContext = React.createContext<React.ReactNode>(null);
 
 export type AppHeaderStartProps = DivProps;
 
 /** The leading zone: the menu button, a back button, the title or breadcrumbs. Takes the free width. */
-function AppHeaderStart({ className, ...rest }: AppHeaderStartProps) {
-  return <div {...rest} className={cx(styles.start, className)} />;
+function AppHeaderStart({ className, children, ...rest }: AppHeaderStartProps) {
+  const menu = React.useContext(AutoMenuContext);
+  return (
+    <div {...rest} className={cx(styles.start, className)}>
+      {menu}
+      {children}
+    </div>
+  );
 }
 AppHeaderStart.displayName = "AppHeader.Start";
 
@@ -71,14 +144,8 @@ export type AppHeaderTitleProps = DivProps;
  * truncates.
  */
 function AppHeaderTitle({ className, children, ...rest }: AppHeaderTitleProps) {
-  const items = React.Children.toArray(children);
-  const isIcon = (child: React.ReactNode) =>
-    React.isValidElement(child) && child.type === AppHeaderIcon;
-  const isDescription = (child: React.ReactNode) =>
-    React.isValidElement(child) && child.type === AppHeaderDescription;
-  const icon = items.filter(isIcon);
-  const description = items.filter(isDescription);
-  const name = items.filter((child) => !isIcon(child) && !isDescription(child));
+  const { parts: icon, rest: text } = splitParts(children, AppHeaderIcon);
+  const { parts: description, rest: name } = splitParts(text, AppHeaderDescription);
 
   return (
     <div {...rest} className={cx(styles.title, className)}>
@@ -101,7 +168,9 @@ export type AppHeaderIconProps = React.HTMLAttributes<HTMLSpanElement> & {
  * Not a Thumbnail: its tiers (32 · 40) miss the control height the buttons beside it have.
  */
 function AppHeaderIcon({ className, ...rest }: AppHeaderIconProps) {
-  return <span aria-hidden="true" {...rest} className={cx(styles.icon, className)} />;
+  return (
+    <span aria-hidden="true" {...rest} className={cx(styles.icon, iconSlotClass, className)} />
+  );
 }
 AppHeaderIcon.displayName = "AppHeader.Icon";
 
@@ -109,7 +178,7 @@ export type AppHeaderDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & 
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** Muted second line under the title (a workspace, a period); hidden on a narrow header. */
+/** Muted line of data under the title (a period, a count); on a narrow header it truncates. */
 function AppHeaderDescription({ className, ...rest }: AppHeaderDescriptionProps) {
   return <span {...rest} className={cx(textRole.caption, styles.description, className)} />;
 }
@@ -134,13 +203,26 @@ export type AppHeaderToolsProps = DivProps;
 /**
  * The page's tools in the header — a `PageToolbar.Root` (sections, period, filters, the primary
  * action): the header's second row, the full width under the title row, so the toolbar lays
- * itself out from that width (one row when wide, two when narrow). Root moves it there when it is
- * a direct child.
+ * itself out from that width (one row when wide, two when narrow). Root places it there wherever
+ * it is written — directly, in a fragment or inside a component of the page.
  */
-function AppHeaderTools({ className, ...rest }: AppHeaderToolsProps) {
-  return <div {...rest} className={cx(styles.tools, className)} />;
+function AppHeaderTools(props: AppHeaderToolsProps) {
+  const outlet = React.useContext(ToolsOutletContext);
+  if (outlet) return <MovingTools outlet={outlet} {...props} />;
+  return <ToolsRow {...props} />;
 }
 AppHeaderTools.displayName = "AppHeader.Tools";
+
+function ToolsRow({ className, ...rest }: AppHeaderToolsProps) {
+  return <div {...rest} className={cx(styles.tools, className)} />;
+}
+
+/** Tools written inside the title row (in a wrapper): they render in the second row. */
+function MovingTools({ outlet, ...props }: AppHeaderToolsProps & { outlet: OutletStore }) {
+  const row = <ToolsRow {...props} />;
+  const moved = useMovedToOutlet(outlet, row);
+  return moved ? null : row;
+}
 
 export type AppHeaderActionsProps = DivProps;
 
@@ -152,27 +234,41 @@ AppHeaderActions.displayName = "AppHeader.Actions";
 
 export type AppHeaderMenuButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "type" | "children"
+  "type" | "children" | "aria-expanded" | "aria-controls"
 > & {
-  /**
-   * `narrow` (default): shown below 768px, where an `offCanvas="auto"` Sidebar leaves the layout;
-   * `always`: on every width (`offCanvas="always"`).
-   */
-  show?: "narrow" | "always";
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-/** Opens the off-canvas Sidebar: an icon button named by `labels.menu`; wire `onClick` and `aria-expanded`. */
-function AppHeaderMenuButton({ show = "narrow", className, ...rest }: AppHeaderMenuButtonProps) {
+/**
+ * Opens the off-canvas Sidebar of the shell: an icon button named by `labels.menu`, with
+ * `aria-expanded` and `aria-controls` from the shell. The bar draws one itself; this part moves it
+ * to another place in the header. Renders nothing while the Sidebar is a rail on screen, or
+ * outside a shell with a Sidebar.
+ */
+function AppHeaderMenuButton(props: AppHeaderMenuButtonProps) {
+  const claim = React.useContext(MenuClaimContext);
+  React.useLayoutEffect(() => claim?.(), [claim]);
+  return <MenuButtonBody {...props} />;
+}
+AppHeaderMenuButton.displayName = "AppHeader.MenuButton";
+
+function MenuButtonBody({ className, onClick, ...rest }: AppHeaderMenuButtonProps) {
   const labels = React.useContext(LabelsContext);
+  const nav = useAppShellNav();
+  if (!nav?.offCanvas) return null;
   return (
     <Button.Root
       variant="soft"
       tone="neutral"
       aria-label={labels.menu}
       {...rest}
-      className={cx(styles.menuButton, className)}
-      {...toDataAttributes({ show })}
+      aria-expanded={nav.open}
+      aria-controls={nav.navId}
+      className={className}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) nav.setOpen(!nav.open);
+      }}
     >
       <Button.Icon>
         <Icon name="nav.menu" />
@@ -180,7 +276,6 @@ function AppHeaderMenuButton({ show = "narrow", className, ...rest }: AppHeaderM
     </Button.Root>
   );
 }
-AppHeaderMenuButton.displayName = "AppHeader.MenuButton";
 
 export const AppHeader = {
   Root: AppHeaderRoot,

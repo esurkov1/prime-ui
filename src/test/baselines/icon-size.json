@@ -9,6 +9,5 @@
   "src/components/segmented-control/SegmentedControl.module.css: .icon > :global(svg)",
   "src/components/tabs/Tabs.module.css: .icon svg",
   "src/internal/menu.module.css: .itemIcon > svg",
-  "src/layout/bottom-nav/BottomNav.module.css: .icon > svg",
-  "src/layout/sidebar/Sidebar.module.css: .icon > :global(svg)"
+  "src/layout/bottom-nav/BottomNav.module.css: .icon > svg"
 ]

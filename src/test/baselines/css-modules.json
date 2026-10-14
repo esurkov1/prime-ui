@@ -51,13 +51,9 @@
   "src/layout/sidebar/Sidebar.module.css: * 1 factor in clip-path #3",
   "src/layout/sidebar/Sidebar.module.css: * 1 factor in inset-block-start",
   "src/layout/sidebar/Sidebar.module.css: * 1 factor in inset-block-start #2",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in margin-block-end",
   "src/layout/sidebar/Sidebar.module.css: * 1 factor in margin-inline",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in margin-inline #2",
   "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate",
   "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #2",
   "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #3",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #4",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #5",
-  "src/layout/sidebar/Sidebar.tsx: styles.sub is not in src/layout/sidebar/Sidebar.module.css"
+  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #4"
 ]

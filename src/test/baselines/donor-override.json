@@ -114,6 +114,5 @@
   "src/layout/bottom-nav/BottomNav.module.css: sets --btn-bg, private to src/components/button/Button.module.css #2",
   "src/layout/bottom-nav/BottomNav.module.css: sets --btn-bg-active, private to src/components/button/Button.module.css",
   "src/layout/bottom-nav/BottomNav.module.css: sets --field-h, private to src/components/button/Button.module.css",
-  "src/layout/sidebar/Sidebar.module.css: sets --avatar-ring, private to src/components/avatar/Avatar.module.css",
   "src/layout/sidebar/Sidebar.module.css: sets --avatar-slot-size, private to src/components/avatar/Avatar.module.css"
 ]

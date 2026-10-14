@@ -10,6 +10,7 @@ import {
   useNestedSurfaceDepth,
   useStageDepth,
 } from "@/internal/surfaceDepth";
+import { AppShellBoundary } from "@/layout/app-shell/AppShell";
 import { suspendTransitions } from "@/theme/applyTheme";
 
 import { Button } from "../button/Button";
@@ -262,8 +263,12 @@ export function ExampleFrame({
               data-depth={stageDepth}
             >
               {/* The stage is a page of its own (or the layer the docs ask for); surfaces inside
-                  count from it. Never wrap `children` in an element: the layouts use `> *`. */}
-              <SurfaceDepthProvider value={stageDepth}>{children}</SurfaceDepthProvider>
+                  count from it, and a header or a Sidebar in it stays in the preview instead of
+                  joining an app shell around the frame. Never wrap `children` in an element: the
+                  layouts use `> *`. */}
+              <SurfaceDepthProvider value={stageDepth}>
+                <AppShellBoundary>{children}</AppShellBoundary>
+              </SurfaceDepthProvider>
             </div>
           </div>
         </div>

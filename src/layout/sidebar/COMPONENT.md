@@ -54,7 +54,7 @@ import { Sidebar, useSidebar } from "prime-ui-kit";
 ```
 Sidebar.Root                       rail wrapper; renders <nav> inside; size tier for items
 ├─ Sidebar.Header                  one fixed-height row
-│  ├─ Sidebar.Brand                logo + name + muted line (link / div / asChild)
+│  ├─ Sidebar.Brand                logo + name + muted line (link / button / div / asChild)
 │  │  └─ Sidebar.BrandLogo         the mark, on the icon axis
 │  └─ Sidebar.Toggle variant="header"  «‹‹» at the header end → round button on the rail edge
 ├─ Sidebar.Content                 scrolling middle (ScrollContainer, edge fades, no scrollbar)
@@ -71,7 +71,7 @@ Sidebar.Root                       rail wrapper; renders <nav> inside; size tier
 │        └─ Sidebar.SubContent     child Items on a guide line (a flyout on the compact rail)
 └─ Sidebar.Footer                  bottom items, the item Toggle, the account
    └─ Sidebar.Account              avatar + name + muted line; a Dropdown.Trigger child
-useSidebar()                       state hook for custom parts inside Root
+useSidebar()                       state hook for custom parts inside Root (useAppShellNav outside it, in a shell)
 ```
 
 ## API
@@ -79,19 +79,21 @@ useSidebar()                       state hook for custom parts inside Root
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Sidebar.Root
-`ref` → `HTMLDivElement`. The rail wrapper with the `<nav>` inside; owns the mode and the off-canvas panel and passes the tier to items.
+`ref` → `HTMLDivElement`. The rail wrapper with the `<nav>` inside; owns the mode and the off-canvas panel and passes the tier to items. In an `AppShell` it publishes its navigation to the shell (`useAppShellNav`).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; coloured counts and row actions one tier down, plain counts keep the item size. The rail width does not change. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Item tier: height 28 · 32 · 36 · 40 · 48, text, icon; coloured counts and row actions one tier down, plain counts keep the item size. The rail width does not change. Without it the tier of its host, else `m`. |
 | `mode` | `"expanded" \| "compact" \| "hidden"` | — | Desktop mode (controlled): full rail, icon rail with tooltips and flyouts, or hidden. |
 | `defaultMode` | `"expanded" \| "compact" \| "hidden"` | `"expanded"` | Initial mode (uncontrolled). |
 | `onModeChange` | `(mode: SidebarMode) => void` | — | Called with the new mode (Toggle, `useSidebar().setMode`). |
 | `open` | `boolean` | — | Off-canvas panel on narrow viewports (controlled). |
 | `defaultOpen` | `boolean` | `false` | Initial off-canvas state (uncontrolled). |
-| `onOpenChange` | `(open: boolean) => void` | — | Off-canvas open / close: Toggle, scrim, Escape, navigation, leaving the narrow viewport. |
+| `onOpenChange` | `(open: boolean) => void` | — | Off-canvas open / close: Toggle, the AppHeader menu button, scrim, Escape, an activated item, leaving the narrow viewport. |
 | `offCanvas` | `"auto" \| "always" \| "never"` | `"auto"` | When the rail becomes an off-canvas panel opened by `open`: `auto` — below 768px (viewport); `always` — at any width; `never` — always a rail. |
-| `persistKey` | `string` | — | `localStorage` key that keeps the mode and the open groups and sub-lists across reloads (keyed by `id`, else label text). Wins over `defaultMode` / `defaultOpen`. |
+| `closeOnOutsideClick` | `boolean` | `true` | A press on the scrim (outside the off-canvas panel) closes the panel. |
+| `closeOnEscape` | `boolean` | `true` | Escape closes the off-canvas panel. |
+| `persistKey` | `string` | — | `localStorage` key that keeps the mode (never `hidden`: the mode it left) and the open groups and sub-lists (by `id`, else label text) across reloads. Wins over `defaultMode` / `defaultOpen`. |
 | `labels` | `Partial<SidebarLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
@@ -103,7 +105,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children`, `className` and the other div attributes. |
 
 ### Sidebar.Brand
-`ref` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, else a `<div>`. In compact mode only the logo stays.
+`ref` → the rendered element. Product block: `Sidebar.BrandLogo`, the name and a muted line; an `<a>` with `href`, the single child with `asChild`, a `<button>` with only `onClick`, else a `<div>`. Activating it closes the off-canvas panel. In compact mode only the logo stays.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -111,7 +113,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `href` | `string` | — | Renders an `<a>` (usually home); navigating closes the off-canvas panel. |
 | `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `Link`) as the brand; its children are the logo and the name. |
 | `children` | `ReactNode` | — | `Sidebar.BrandLogo` and the product name. |
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `onClick` (runs first; `preventDefault()` keeps the panel open; without `href` it makes the brand a button), `aria-*`, `className` and the other attributes. |
 
 ### Sidebar.BrandLogo
 `ref` → `HTMLSpanElement`. The product mark (`aria-hidden`): a square of the item height − 8 (at most 32) on the icon axis in every mode; its child fills it.
@@ -141,7 +143,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children` (Items, Subs), `className` and the other div attributes. |
 
 ### Sidebar.Item
-`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode. With `Sidebar.ItemAction` the element and the action sit side by side in a row `<div>`.
+`ref` → the rendered element. `<button type="button">`, `<a>` with `href`, or the single child with `asChild`; a tooltip with its label in compact mode; activating it closes the flyout and the off-canvas panel. With `Sidebar.ItemAction` both sit in a row `<div>`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -152,7 +154,7 @@ useSidebar()                       state hook for custom parts inside Root
 | `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
 | `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `NavLink`) as the item; its children are the label and parts. |
 | `children` | `ReactNode` | — | Label (also the compact tooltip) and parts: `Sidebar.ItemIcon` (before the label — leading, after it — trailing), `Sidebar.ItemCount`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`. |
-| `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `onClick` (runs first; `preventDefault()` keeps the flyout and the panel open), `aria-*`, `className` and the other attributes. |
 
 ### Sidebar.ItemIcon
 `ref` → `HTMLSpanElement`. An icon (`aria-hidden`). Before the label it leads and stays on the icon axis in every mode; after the label it is a quiet trailing glyph (`data-edge="end"`, 14, muted), e.g. ↗ for an external link, hidden in compact mode.
@@ -181,14 +183,15 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Sidebar.ItemAction
-`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it. Shows on hover and focus of the row (always on touch); hidden on the compact rail.
+`ref` → `HTMLButtonElement`. A row action (create, add): a ghost icon `Button` one tier down with a tooltip, next to the item element — never inside it; with `asChild` a link with the same look. Shows on hover and focus of the row (always on touch); hidden on the compact rail.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `string` | — (required) | Accessible name and tooltip («Создать задачу»). |
-| `onClick` | `(event: MouseEvent<HTMLButtonElement>) => void` | — (required) | The action. |
+| `onClick` | `(event: MouseEvent<HTMLButtonElement>) => void` | — | The action; required without `asChild`. |
+| `asChild` | `boolean` | `false` | Renders the single child (a link: another page, `mailto:`) as the action; its children are the glyph. |
 | `disabled` | `boolean` | — | Not available. |
-| `children` | `ReactNode` | — | The glyph; `<Icon name="action.add" />` by default. |
+| `children` | `ReactNode` | — | The glyph (`<Icon name="action.add" />` by default), or with `asChild` the link around it. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "onClick" \| "aria-label">` | — | `className` and the other attributes of the Button. |
 
 ### Sidebar.Sub
@@ -226,11 +229,11 @@ useSidebar()                       state hook for custom parts inside Root
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children">` | — | `onClick`, `aria-*`, `className` and the other button attributes. |
 
 ### Sidebar.Toggle
-`ref` → `HTMLButtonElement`. Toggle: expanded ↔ compact on desktop (hidden → expanded), closes the off-canvas panel; label, icon, `aria-expanded` and `aria-controls` come from state and `labels`.
+`ref` → `HTMLButtonElement`. Expanded ↔ compact on desktop (hidden → expanded), open ↔ closed off-canvas; label, icon and ARIA from state and `labels`. Outside the rail, in an `AppShell`, a soft icon `Button` on the shell's navigation — the way back to a hidden rail.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"item" \| "header"` | `"item"` | `item` — a row in the rail. `header` — an icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode. |
+| `variant` | `"item" \| "header"` | `"item"` | In the rail: `item` — a row; `header` — an icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "aria-label" \| "aria-expanded" \| "aria-controls">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `className` and the other button attributes. |
 
 ### Functions
@@ -287,14 +290,18 @@ The rail width does not depend on `size`.
 | `collapsible` (Group) | the heading is a button with a chevron at its end; items fold away; folded on the rail, one `…` row opens them in a flyout | long navigation with sections | off |
 | `current` (Item) | `fill-muted-hover` fill (a `fill-subtle-active` wash in a flyout), primary text and icon | the current page | off |
 | `disabled` (Item) | `text-disabled`, no hover, `cursor: not-allowed` | an unavailable section | off |
+| `closeOnOutsideClick` (Root) | a press on the scrim closes the off-canvas panel | default; turn off when only the toggle or an item may close it | on |
+| `closeOnEscape` (Root) | Escape closes the off-canvas panel | default; turn off with `closeOnOutsideClick` for a panel only its toggle closes | on |
+| `asChild` (ItemAction) | the row action is the consumer's link with the button look | the action opens a page or `mailto:` | off |
 
-Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand; on phones (`offCanvas="auto"`) or always (`offCanvas="always"`) pair it with `AppHeader.MenuButton` (`open` / `onOpenChange`). One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
+Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header, or `Sidebar.Toggle` in the footer for a rail without a brand. Inside an `AppShell` the Sidebar publishes its navigation to the shell: on phones (`offCanvas="auto"`) or always (`offCanvas="always"`) the `AppHeader` draws the menu button that opens the panel by itself, a `Sidebar.Toggle` outside the rail brings back a hidden one, and other triggers (a BottomNav «Ещё») read `useAppShellNav()`. One current item at a time; give every top-level item an icon when the rail can go compact (child items need none).
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | mode | `mode` / `defaultMode` | Root `data-mode`, `data-panel-mode` (the last visible mode while hidden); `<nav inert>` while hidden |
-| off-canvas | `offCanvas="always"`, or `"auto"` + viewport < 768px | Root `data-off-canvas`, `data-state="open" \| "closed"`; `<nav inert>` while closed |
+| off-canvas | `offCanvas="always"`, or `"auto"` + viewport < 768px | Root `data-off-canvas`, `data-state="open" \| "closed"`; `<nav inert>` while closed; the kit scrim (`role="presentation"`) while open; in an `AppShell` the shell Root `data-off-canvas` |
+| dismiss | `closeOnOutsideClick`, `closeOnEscape` | a press on the scrim / Escape closes the open panel, or not |
 | current | `current` or a router's `aria-current` | Item `aria-current="page"`, `data-state="active"` |
 | active path | a child of a Sub (or an item of a Group) is current | SubTrigger (or the `…` row of a folded Group) `data-active-path`; a closed Sub opens, a closed Group opens off the compact rail |
 | group open | Group `open` / `defaultOpen` (`collapsible`) | heading `aria-expanded`; region `data-state`, `inert` while closed |
@@ -304,11 +311,11 @@ Put `<Sidebar.Toggle variant="header" />` next to `Sidebar.Brand` in the header,
 | persisted | `persistKey` on Root | the mode and the open state of collapsible groups and sub-lists are read from and written to `localStorage` |
 | disabled | `disabled` | Item `disabled` / `aria-disabled`, `data-disabled` |
 
-`persistKey` stores collapsible groups and sub-lists by their `id`, else by their label text — give an `id` when labels are translated or change. The stored state wins over `defaultMode` / `defaultOpen`; controlled `mode` / `open` are not stored, and unavailable storage is ignored.
+`persistKey` stores collapsible groups and sub-lists by their `id`, else by their label text — give an `id` when labels are translated or change. The stored state wins over `defaultMode` / `defaultOpen`; controlled `mode` / `open` are not stored, and unavailable storage is ignored. A hidden rail is stored as the mode it left, so a reload never strands a person on a hidden rail.
 
 On the active path a SubTrigger takes the current fill. On the compact rail a SubTrigger opens its flyout on hover after a short intent delay, as well as on click and from the keyboard.
 
-Leaving the narrow viewport closes the off-canvas panel; navigating from an `href` / `asChild` item (or the brand) closes it too. Navigating from a flyout closes the flyout.
+Leaving the narrow viewport closes the off-canvas panel; activating an item (a link, a button or an `asChild` element) or the brand closes it too, unless its `onClick` prevents the default. Activating an item in a flyout closes the flyout.
 
 ## Layout & spacing
 - Panel padding: `--prime-space-3` block, `--prime-space-2` inline; regions 8 apart; groups 16 apart, items 4 apart.
@@ -324,7 +331,7 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
   so the row is the avatar + 2 × gap high (48 at m). On the compact rail the start inset becomes the
   one that centres the avatar on the icon axis, as part of the rail motion.
 - Compact flyout: the kit Popover (flush) to the right, aligned with the parent row, with the metrics of a kit menu — rows of the tier's menu item height (32 at m), the panel padding, no title (the row names it), no guide line; current child is a `fill-subtle-active` wash.
-- Motion: two layers on one clock. `Sidebar.Root` is the spacer: it reserves the rail width in the page, paints the rail and clips the panel to its own box; its width is the only layout that moves (the page column follows). The `<nav>` panel inside is positioned at the expanded width in every mode and never lays out again, so nothing re-wraps and nothing switches at the end. Every part is a plain CSS transition over `base` with the `standard` (ease-in-out) easing, started by the same mode change and ending with the rail: text fades through its fill colour (paint-only, no compositor layer per label), chevrons through their stroke, trailing boxes (a coloured count, a key hint) through `opacity`; coloured counts turn into dots; the account avatar slides onto the icon axis; the header toggle rides the edge by `translate` / `scale`. Rows stay full width: a row with a fill or a ring (current, on the active path, hovered, open, focused) draws them on a pseudo-element whose end edge travels to the icon box and clips its content there, so it always ends rail padding before the moving edge and is a rounded square around the icon at rest. Group headings keep their height and layout: their text slides toward the edge and scales down by transform while the moving cut ends it with a fade; the text box narrows only once the rail has closed (under the cut, never seen), so the dot and the chevron after it stay in place and fade. The `…` row of a folded group grows in and out on the same clock (grid track height), as do the attention dots (opacity and scale). Hidden keeps the look of the last visible mode and is clipped as one piece; the header toggle stays at its place and fades, and coming back from hidden it fades in at its final place. Collapsible groups that open for the rail and sub-lists that close for it move on the same clock (grid track height); chevrons rotate (base). All durations are tokens: under reduced motion every mode change is instant.
+- Motion: two layers on one clock. `Sidebar.Root` is the spacer: it reserves the rail width in the page, paints the rail and clips the panel to its own box; its width is the only layout that moves (the page column follows). The `<nav>` panel inside is positioned at the expanded width in every mode and never lays out again, so nothing re-wraps and nothing switches at the end. Every part is a plain CSS transition over `base` with the `standard` (ease-in-out) easing, started by the same mode change and ending with the rail: text fades through its fill colour (paint-only, no compositor layer per label), chevrons through their stroke, trailing boxes (a coloured count, a key hint) through `opacity`; coloured counts turn into dots; the account avatar slides onto the icon axis; the header toggle rides the edge by `translate` / `scale`. Rows stay full width: a row with a fill or a ring (current, on the active path, hovered, open, focused) draws them on a pseudo-element whose end edge travels to the icon box and clips its content there, so it always ends rail padding before the moving edge and is a rounded square around the icon at rest. Group headings keep their height and layout: their text slides toward the edge and scales down by transform while the moving cut ends it with a fade; the text box narrows only once the rail has closed (under the cut, never seen), so the dot and the chevron after it stay in place and fade. The `…` row of a folded group grows in and out on the same clock (the kit fold), as do the attention dots (opacity and scale). Hidden keeps the look of the last visible mode and is clipped as one piece; the header toggle stays at its place and fades, and coming back from hidden it fades in at its final place. Collapsible groups that open for the rail and sub-lists that close for it move on the same clock (the kit fold, `Disclosure`); chevrons rotate (base); a group or a sub-list that opens for the current page on mount stands open, without motion. All durations are tokens: under reduced motion every mode change is instant.
 - Layers of a row on the rail (compact tooltips, the sub-list flyout, a `Dropdown` around `Sidebar.Account`) anchor to the visible part of the row — the icon box — not to its full-width box. The brand has no compact tooltip: the logo speaks for itself and a tooltip would cover the edge toggle.
 - Off-canvas panel width: min(sidebar width, 100% − `--prime-space-12`).
 - Inside `AppShell.Nav` the rail takes the full height. The root is `height: 100%` and the panel is
@@ -356,8 +363,8 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 - In compact mode the brand's name fades out but still names the link.
 - A row action is its own button next to the item (never nested), named by `label` with a tooltip.
 - The account avatar is hidden from screen readers; the name and the muted line name the button.
-- Off-canvas: scrim, focus trap and Escape; the scrim is a button labelled `labels.close`.
-- Toggle: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.
+- Off-canvas: a decorative scrim (a press on it is a press outside, `closeOnOutsideClick`), focus trap and Escape (`closeOnEscape`); focus returns to the opener.
+- Toggle, the AppHeader menu button and `useAppShellNav` triggers: `aria-expanded`, `aria-controls` → the `<nav>`, label from `labels`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -367,7 +374,7 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 | `navigation` | `"Навигация"` | `aria-label` of the `<nav>`. |
 | `collapse` | `"Свернуть панель"` | Toggle label while expanded. |
 | `expand` | `"Развернуть панель"` | Toggle label while compact or hidden. |
-| `close` | `"Закрыть навигацию"` | Toggle label off-canvas and the scrim label. |
+| `close` | `"Закрыть навигацию"` | Toggle label while the off-canvas panel is open. |
 
 ## Examples
 | Example | Shows |
@@ -382,9 +389,10 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 | [router.tsx](examples/router.tsx) | Router links as the brand and the items: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
 | [persist.tsx](examples/persist.tsx) | The first visit opens on the icon rail; the mode and the folded groups are remembered and come back after a reload — `persistKey`, `defaultMode`. |
 | [custom-part.tsx](examples/custom-part.tsx) | A part of your own in the footer reads the rail state: the storage meter shows on the full rail and in the off-canvas panel and steps aside on the icon rail — `useSidebar`. |
+| [dismiss.tsx](examples/dismiss.tsx) | An off-canvas panel only its own toggle closes: a press on the scrim and Escape leave it open, a picked item still closes it — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the rail mode: expanded, an icon rail with tooltips, or hidden; every switch is one synchronous movement — `mode`, `onModeChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | Navigation behind a menu button at any width: the parent opens the off-canvas panel, the scrim, Escape, the header toggle or a navigation closes it — `offCanvas`, `open`, `onOpenChange`. |
-| [narrow.tsx](examples/narrow.tsx) | Below 768px the rail leaves the layout and slides in over the page from the menu button; from 768px it is the rail again, and the button leaves — `offCanvas`, `labels`. |
+| [narrow.tsx](examples/narrow.tsx) | Below 768px the rail leaves the layout and slides in over the page from the menu button the header draws by itself; from 768px it is the rail again, and the button leaves — `AppShell`, `labels`. |
 
 ## Mistakes
 - `icon={…}` / `badge={…}` props → use the `Sidebar.ItemIcon` and `Sidebar.ItemCount` parts.
@@ -403,5 +411,5 @@ Leaving the narrow viewport closes the off-canvas panel; navigating from an `hre
 - Your own `localStorage` code for the rail mode → `persistKey` keeps the mode and the folded groups.
 
 ## Related
-- **Built from:** [ScrollContainer](../../components/scroll-container/COMPONENT.md), [Badge](../../components/badge/COMPONENT.md), [Tooltip](../../components/tooltip/COMPONENT.md), [Popover](../../components/popover/COMPONENT.md) (compact flyout), [Button](../../components/button/COMPONENT.md) (header toggle, row action), [Avatar](../../components/avatar/COMPONENT.md) slot, Icon (`nav.sidebarCollapse`, `nav.sidebarExpand`, `nav.chevronsLeft`, `nav.chevronDown`, `nav.chevronsUpDown`, `action.add`, `action.more`)
+- **Built from:** [AppShell](../app-shell/COMPONENT.md) (publishes the navigation), [ScrollContainer](../../components/scroll-container/COMPONENT.md), [Badge](../../components/badge/COMPONENT.md), [Tooltip](../../components/tooltip/COMPONENT.md), [Popover](../../components/popover/COMPONENT.md) (compact flyout), [Button](../../components/button/COMPONENT.md) (header toggle, row action), [Avatar](../../components/avatar/COMPONENT.md) slot, Icon (`nav.sidebarCollapse`, `nav.sidebarExpand`, `nav.chevronsLeft`, `nav.chevronDown`, `nav.chevronsUpDown`, `action.add`, `action.more`)
 - **See also:** [AppShell](../app-shell/COMPONENT.md), [Dropdown](../../components/dropdown/COMPONENT.md) (account menu), [Drawer](../../components/drawer/COMPONENT.md), [Kbd](../../components/kbd/COMPONENT.md)

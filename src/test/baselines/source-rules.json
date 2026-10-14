@@ -74,7 +74,5 @@
   "src/components/timeline/Timeline.tsx: root default size = \"m\"",
   "src/components/tooltip/Tooltip.tsx: root default size = \"m\"",
   "src/hooks/useMergedRefs.ts: biome-ignore useExhaustiveDependencies",
-  "src/internal/readReceipts.ts: as unknown as",
-  "src/layout/app-shell/AppShell.tsx: biome-ignore useExhaustiveDependencies",
-  "src/layout/sidebar/Sidebar.tsx: root default size = \"m\""
+  "src/internal/readReceipts.ts: as unknown as"
 ]

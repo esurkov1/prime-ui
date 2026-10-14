@@ -8,6 +8,7 @@ import { Avatar } from "@/components/avatar/Avatar";
 import { Dropdown } from "@/components/dropdown/Dropdown";
 import { Icon } from "@/icons";
 
+import { AppShell } from "../app-shell/AppShell";
 import { Sidebar, type SidebarMode, useSidebar } from "./Sidebar";
 
 function mockViewport(mobile: boolean) {
@@ -250,11 +251,35 @@ describe("Sidebar", () => {
     expect(rootOf(nav)).not.toHaveAttribute("data-from-hidden");
   });
 
-  it("hidden → Toggle expands", () => {
-    render(<Basic offCanvas="never" defaultMode="hidden" />);
+  it("hidden: a Toggle outside the rail, in the shell, brings it back", async () => {
+    const user = userEvent.setup();
+    render(
+      <AppShell.Root>
+        <AppShell.Nav>
+          <Basic offCanvas="never" defaultMode="hidden" />
+        </AppShell.Nav>
+        <AppShell.Main>
+          <Sidebar.Toggle />
+        </AppShell.Main>
+      </AppShell.Root>,
+    );
     const nav = screen.getByRole("navigation", { hidden: true });
-    fireEvent.click(screen.getByRole("button", { name: "Развернуть панель", hidden: true }));
+    // The toggle inside the hidden rail is inert; the one in the page is the way back.
+    const toggle = within(screen.getByRole("main")).getByRole("button", {
+      name: "Развернуть панель",
+    });
+    expect(toggle).toHaveAttribute("aria-controls", nav.id);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    toggle.focus();
+    await user.keyboard("{Enter}");
     expect(rootOf(nav)).toHaveAttribute("data-mode", "expanded");
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(toggle).toHaveAccessibleName("Свернуть панель");
+  });
+
+  it("a Toggle outside a shell with a Sidebar renders nothing", () => {
+    render(<Sidebar.Toggle />);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
   it("shows a tooltip with the item label in compact mode only", () => {
@@ -311,9 +336,46 @@ describe("Sidebar", () => {
         </Sidebar.Root>,
       );
       const nav = screen.getByRole("navigation");
-      const scrim = screen.getAllByRole("button", { name: "Закрыть навигацию" })[0];
+      const scrim = rootOf(nav).querySelector('[role="presentation"]') as HTMLElement;
+      expect(scrim).toHaveAttribute("data-state", "open");
+      fireEvent.pointerDown(scrim);
       fireEvent.click(scrim);
       expect(rootOf(nav)).toHaveAttribute("data-state", "closed");
+    });
+
+    it("keeps the panel open with closeOnOutsideClick / closeOnEscape off", () => {
+      mockViewport(true);
+      render(
+        <Sidebar.Root defaultOpen closeOnOutsideClick={false} closeOnEscape={false}>
+          <Sidebar.Item href="#a">A</Sidebar.Item>
+        </Sidebar.Root>,
+      );
+      const nav = screen.getByRole("navigation");
+      const scrim = rootOf(nav).querySelector('[role="presentation"]') as HTMLElement;
+      fireEvent.pointerDown(scrim);
+      fireEvent.click(scrim);
+      fireEvent.keyDown(document, { key: "Escape" });
+      expect(rootOf(nav)).toHaveAttribute("data-state", "open");
+    });
+
+    it("a button item closes the panel too; preventDefault in onClick keeps it", () => {
+      mockViewport(true);
+      const { rerender } = render(
+        <Sidebar.Root defaultOpen>
+          <Sidebar.Item onClick={() => {}}>A</Sidebar.Item>
+        </Sidebar.Root>,
+      );
+      const nav = screen.getByRole("navigation");
+      fireEvent.click(screen.getByRole("button", { name: "A" }));
+      expect(rootOf(nav)).toHaveAttribute("data-state", "closed");
+
+      rerender(
+        <Sidebar.Root open>
+          <Sidebar.Item onClick={(event) => event.preventDefault()}>A</Sidebar.Item>
+        </Sidebar.Root>,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "A" }));
+      expect(rootOf(nav)).toHaveAttribute("data-state", "open");
     });
 
     it("closes after navigating and from the toggle", () => {
@@ -475,6 +537,24 @@ describe("Sidebar item parts", () => {
     fireEvent.click(action);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it("ItemAction with asChild is a link with the same look", () => {
+    render(
+      <Sidebar.Root offCanvas="never">
+        <Sidebar.Item href="/clients">
+          Клиенты
+          <Sidebar.ItemAction label="Новый клиент" asChild>
+            <a href="/clients/new">
+              <Icon name="action.add" />
+            </a>
+          </Sidebar.ItemAction>
+        </Sidebar.Item>
+      </Sidebar.Root>,
+    );
+    const action = screen.getByRole("link", { name: "Новый клиент" });
+    expect(action).toHaveAttribute("href", "/clients/new");
+    expect(screen.getByRole("link", { name: "Клиенты" })).not.toContainElement(action);
+  });
 });
 
 describe("Sidebar.Brand and Sidebar.Account", () => {
@@ -495,6 +575,35 @@ describe("Sidebar.Brand and Sidebar.Account", () => {
     expect(link).toHaveAttribute("href", "/");
     expect(link).toHaveTextContent("Отдел продаж");
     expect(screen.getByTestId("logo").parentElement).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("Brand with only onClick is a button that runs it and closes the off-canvas panel", () => {
+    mockViewport(true);
+    const onClick = vi.fn();
+    render(
+      <Sidebar.Root defaultOpen>
+        <Sidebar.Header>
+          <Sidebar.Brand onClick={onClick}>Прайм CRM</Sidebar.Brand>
+        </Sidebar.Header>
+      </Sidebar.Root>,
+    );
+    const nav = screen.getByRole("navigation");
+    fireEvent.click(screen.getByRole("button", { name: "Прайм CRM" }));
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(rootOf(nav)).toHaveAttribute("data-state", "closed");
+  });
+
+  it("Brand without href or onClick is a static block", () => {
+    render(
+      <Sidebar.Root offCanvas="never">
+        <Sidebar.Header>
+          <Sidebar.Brand>Прайм CRM</Sidebar.Brand>
+        </Sidebar.Header>
+      </Sidebar.Root>,
+    );
+    expect(screen.queryByRole("button", { name: "Прайм CRM" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Прайм CRM" })).not.toBeInTheDocument();
+    expect(screen.getByText("Прайм CRM")).toBeInTheDocument();
   });
 
   it("Brand shows no tooltip on the compact rail and keeps its accessible name", () => {
@@ -923,6 +1032,37 @@ describe("Sidebar persistKey", () => {
     expect(groupHeading()).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(screen.getByRole("button", { name: "Развернуть панель" }));
     expect(subTrigger()).toHaveAttribute("aria-expanded", "true");
+    window.localStorage.clear();
+  });
+
+  it("never restores a hidden rail: a reload brings back the mode it left", () => {
+    window.localStorage.clear();
+    function HidingApp() {
+      const { setMode } = useSidebar();
+      return (
+        <button type="button" onClick={() => setMode("hidden")}>
+          hide
+        </button>
+      );
+    }
+    const first = render(
+      <Sidebar.Root offCanvas="never" persistKey="test-sidebar" defaultMode="compact">
+        <HidingApp />
+      </Sidebar.Root>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "hide" }));
+    expect(first.container.firstElementChild).toHaveAttribute("data-mode", "hidden");
+    first.unmount();
+    expect(JSON.parse(window.localStorage.getItem("test-sidebar") ?? "{}").mode).toBe("compact");
+
+    // A hidden mode written by anything else is not restored either.
+    window.localStorage.setItem("test-sidebar", JSON.stringify({ mode: "hidden" }));
+    const { container } = render(
+      <Sidebar.Root offCanvas="never" persistKey="test-sidebar">
+        <Sidebar.Item>A</Sidebar.Item>
+      </Sidebar.Root>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-mode", "expanded");
     window.localStorage.clear();
   });
 
