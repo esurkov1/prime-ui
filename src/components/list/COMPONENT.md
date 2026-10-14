@@ -25,7 +25,7 @@ import { List } from "prime-ui-kit";
 
 ## Anatomy
 ```
-List.Root                   <ul aria-label>; size → row tier (ControlSizeProvider); onReorder → Dnd.Sortable <ul>
+List.Root                   <ul aria-label>; size (else the host tier) → row tier; onReorder → Dnd.Sortable <ul>
 └─ List.Item                <li> with a full-width <button> | <a href> | asChild element; current, disabled
    │                         value; with onReorder: Dnd.Handle (busy while saving) before the row element
    ├─ List.ItemIcon         leading Avatar.Root / Icon (aria-hidden); after the text — a trailing glyph
@@ -44,7 +44,7 @@ List.Root                   <ul aria-label>; size → row tier (ControlSizeProvi
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: height, text, icon and avatar size; counts take one tier down. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Row tier: height, text, icon and avatar size; counts take one tier down. Without it the tier of its host, else `m`. |
 | `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — | Rows reorder by a leading handle (drag, touch hold, Alt + ↑ / ↓): item `value` `id` goes before `beforeId` (`null` = last). Apply with `moveBefore`; a returned promise keeps the row busy, a rejection moves it back. |
 | `labels` | `Partial<ListLabels>` | — | Built-in strings, see Labels. |
 | `aria-label` | `string` | — | Name of the list for screen readers («Обращения»), when no visible heading names it. |
@@ -68,7 +68,7 @@ List.Root                   <ul aria-label>; size → row tier (ControlSizeProvi
 | `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `className` and native attributes of the row element (`target`, `rel` on a link). |
 
 ### List.ItemIcon
-`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` sized to the tier, or an `Icon`. After the text it is a trailing glyph.
+`ref` → `HTMLSpanElement`. Leading `aria-hidden` slot: an `Avatar.Root` (without its own `size` it takes the row tier), or an `Icon`. After the text it is a trailing glyph.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -184,14 +184,14 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 | [overview.tsx](examples/overview.tsx) | A support ticket queue with the client, the last update and the open count; a click opens a ticket and makes it the current row — `current`, `onClick`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: row height, text, icon and count follow the tier — `size`. |
 | [states.tsx](examples/states.tsx) | The open record, a regular row and an unavailable one — `current`, `disabled`. |
-| [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients and icons of queues; the slot sizes the avatar to the row tier — `List.ItemIcon`. |
+| [with-icon.tsx](examples/with-icon.tsx) | Leading avatars of clients and icons of queues; an avatar takes the row tier — `List.ItemIcon`. |
 | [overflow.tsx](examples/overflow.tsx) | A long inbox in a pane of a fixed height: the list scrolls in a ScrollContainer and long names and previews truncate — `List.ItemText`, `List.ItemDescription`. |
 | [as-link.tsx](examples/as-link.tsx) | Rows as links to the invoice pages: a plain link, or your router link through the slot — `href`, `asChild`. |
 | [reorder.tsx](examples/reorder.tsx) | Funnel stages in the team's order: a stage moves by its handle or Alt+arrows and is saved on the server — `onReorder`, `value`. |
 
 ## Mistakes
 - Rows hand-drawn from `Button.Root variant="ghost"` with a `soft` current → `List.Item current`.
-- An `Avatar.Root size="s"` in `List.ItemIcon` to fit the row → leave `size` out; the slot sizes the avatar to the tier.
+- An `Avatar.Root size="s"` in `List.ItemIcon` to fit the row → leave `size` out; an avatar without its own `size` takes the row tier.
 - A list as app navigation → Sidebar; as tabs of a screen → Tabs.
 - Several rows `current` at once → one open record; bulk selection belongs to DataTable.
 - A long list without a scroller → wrap it in `ScrollContainer` inside the pane.
@@ -199,5 +199,5 @@ Root attributes: `data-size`, `role="list"` (the list style reset would drop the
 - `onReorder` that rolls the order back itself on an error → return the promise; a rejection moves the row back.
 
 ## Related
-- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`)
-- **See also:** [PageContent](../page-content/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Tabs](../tabs/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md), [Avatar](../avatar/COMPONENT.md)
+- **Built from:** [Badge](../badge/COMPONENT.md) (`List.ItemCount`), [Avatar](../avatar/COMPONENT.md) (`List.ItemIcon` gives an avatar the row tier), [Dnd](../dnd/COMPONENT.md) (`onReorder`: `Dnd.Sortable`, the busy `Dnd.Handle`)
+- **See also:** [PageContent](../page-content/COMPONENT.md), [Sidebar](../../layout/sidebar/COMPONENT.md), [Tabs](../tabs/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [Card](../card/COMPONENT.md)

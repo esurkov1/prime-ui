@@ -43,7 +43,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "with-icon",
       description:
-        "Аватары клиентов и иконки очередей в начале строки; слот подгоняет аватар под ярус — `List.ItemIcon`.",
+        "Аватары клиентов и иконки очередей в начале строки; аватар берёт ярус строки — `List.ItemIcon`.",
     },
     {
       slot: "overflow",

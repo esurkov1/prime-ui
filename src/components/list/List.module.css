@@ -6,15 +6,9 @@
  * makes it taller. On a coarse pointer a row is at least the touch target (`touchTargetRowClass`).
  */
 
+/* The row tier (height, text, icon, gap, padding, radius) is the field tier table: the root joins
+   `fieldTierClass` and the rows read `--field-*`. */
 .root {
-  --list-h: var(--prime-control-m-height);
-  --list-text: var(--prime-control-m-text-size);
-  --list-lh: var(--prime-control-m-line-height);
-  --list-icon: var(--prime-control-m-icon);
-  --list-avatar: var(--prime-avatar-m);
-  --list-gap: var(--prime-control-m-gap);
-  --list-pad-x: var(--prime-control-m-field-padding-x);
-  --list-radius: var(--prime-control-m-radius);
   --list-desc: var(--prime-text-body-s-size);
   --list-desc-lh: var(--prime-text-body-s-line-height);
 
@@ -33,52 +27,11 @@
   list-style: none;
 }
 
-.root[data-size="xs"] {
-  --list-h: var(--prime-control-xs-height);
-  --list-text: var(--prime-control-xs-text-size);
-  --list-lh: var(--prime-control-xs-line-height);
-  --list-icon: var(--prime-control-xs-icon);
-  --list-avatar: var(--prime-avatar-xs);
-  --list-gap: var(--prime-control-xs-gap);
-  --list-pad-x: var(--prime-control-xs-field-padding-x);
-  --list-radius: var(--prime-control-xs-radius);
-  --list-desc: var(--prime-text-caption-size);
-  --list-desc-lh: var(--prime-text-caption-line-height);
-}
-
+/* On xs and s the second line steps down to the caption. */
+.root[data-size="xs"],
 .root[data-size="s"] {
-  --list-h: var(--prime-control-s-height);
-  --list-text: var(--prime-control-s-text-size);
-  --list-lh: var(--prime-control-s-line-height);
-  --list-icon: var(--prime-control-s-icon);
-  --list-avatar: var(--prime-avatar-s);
-  --list-gap: var(--prime-control-s-gap);
-  --list-pad-x: var(--prime-control-s-field-padding-x);
-  --list-radius: var(--prime-control-s-radius);
   --list-desc: var(--prime-text-caption-size);
   --list-desc-lh: var(--prime-text-caption-line-height);
-}
-
-.root[data-size="l"] {
-  --list-h: var(--prime-control-l-height);
-  --list-text: var(--prime-control-l-text-size);
-  --list-lh: var(--prime-control-l-line-height);
-  --list-icon: var(--prime-control-l-icon);
-  --list-avatar: var(--prime-avatar-l);
-  --list-gap: var(--prime-control-l-gap);
-  --list-pad-x: var(--prime-control-l-field-padding-x);
-  --list-radius: var(--prime-control-l-radius);
-}
-
-.root[data-size="xl"] {
-  --list-h: var(--prime-control-xl-height);
-  --list-text: var(--prime-control-xl-text-size);
-  --list-lh: var(--prime-control-xl-line-height);
-  --list-icon: var(--prime-control-xl-icon);
-  --list-avatar: var(--prime-avatar-xl);
-  --list-gap: var(--prime-control-xl-gap);
-  --list-pad-x: var(--prime-control-xl-field-padding-x);
-  --list-radius: var(--prime-control-xl-radius);
 }
 
 .row {
@@ -93,20 +46,20 @@
   display: flex;
   flex: 1 1 auto;
   align-items: center;
-  gap: var(--list-gap);
+  gap: var(--field-gap);
   width: 100%;
   min-width: 0;
-  min-height: max(var(--list-h), var(--touch-row-min, var(--prime-space-0)));
+  min-height: max(var(--field-h), var(--touch-row-min, var(--prime-space-0)));
   margin: 0;
-  padding-block: calc((var(--list-h) - var(--list-lh)) / 2);
-  padding-inline: var(--list-pad-x);
+  padding-block: calc((var(--field-h) - var(--field-lh)) / 2);
+  padding-inline: var(--field-px);
   border: 0;
-  border-radius: var(--list-radius);
+  border-radius: var(--field-radius);
   background: transparent;
   color: var(--prime-color-text-secondary);
   font: inherit;
-  font-size: var(--list-text);
-  line-height: var(--list-lh);
+  font-size: var(--field-text);
+  line-height: var(--field-lh);
   text-align: start;
   text-decoration: none;
   cursor: pointer;
@@ -148,10 +101,10 @@
 
 /* --- Parts ----------------------------------------------------------------------- */
 
-/* The leading picture: an icon at the tier size, or an avatar the slot sizes to the tier. */
+/* The leading picture: an icon at the tier size, or an avatar of the tier (List.ItemIcon gives an
+   `Avatar.Root` without its own `size` the row tier). */
 .icon {
-  --prime-icon-size: var(--list-icon);
-  --avatar-slot-size: var(--list-avatar);
+  --prime-icon-size: var(--field-icon);
 
   display: inline-flex;
   flex: none;
@@ -162,8 +115,8 @@
 
 /* A trailing glyph stays quiet: the icon size, never an avatar. */
 .icon[data-edge="end"] {
-  width: var(--list-icon);
-  height: var(--list-icon);
+  width: var(--field-icon);
+  height: var(--field-icon);
 }
 
 .item[data-disabled="true"] .icon,
@@ -247,16 +200,17 @@
 .sortableRow {
   align-items: center;
   gap: var(--prime-space-1);
-  border-radius: var(--list-radius);
+  border-radius: var(--field-radius);
 }
 
+/* The grip box is the xs control height on every tier: it carries the field tier at `xs`. */
 .grip {
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  inline-size: var(--prime-control-xs-height);
-  block-size: var(--prime-control-xs-height);
+  inline-size: var(--field-h);
+  block-size: var(--field-h);
 }
 
 /* A row whose move is being saved quiets down until the answer, both ways eased. */

@@ -1,13 +1,13 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { Avatar } from "@/components/avatar/Avatar";
 import { moveBefore } from "@/components/dnd/useSortableList";
-
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { cssRule, cssValue } from "@/test/css";
 
 import { List } from "./List";
 import styles from "./List.module.css";
@@ -193,6 +193,42 @@ describe("List", () => {
     expect(screen.getByText("12").closest("[data-tier]")).toHaveAttribute("data-tier", "m");
   });
 
+  it("gives a leading avatar the row tier unless it has its own size", () => {
+    render(
+      <List.Root size="l" aria-label="Клиенты">
+        <List.Item>
+          <List.ItemIcon>
+            <Avatar.Root data-testid="tier">
+              <Avatar.Fallback>ИБ</Avatar.Fallback>
+            </Avatar.Root>
+          </List.ItemIcon>
+          Ирина Белова
+        </List.Item>
+        <List.Item>
+          <List.ItemIcon>
+            <Avatar.Root size="xs" data-testid="own">
+              <Avatar.Fallback>ПО</Avatar.Fallback>
+            </Avatar.Root>
+          </List.ItemIcon>
+          Павел Орлов
+        </List.Item>
+      </List.Root>,
+    );
+    expect(screen.getByTestId("tier")).toHaveAttribute("data-size", "l");
+    expect(screen.getByTestId("own")).toHaveAttribute("data-size", "xs");
+  });
+
+  it("takes the host tier without its own size", () => {
+    render(
+      <ControlSizeProvider value="s">
+        <List.Root aria-label="Очереди">
+          <List.Item>Входящие</List.Item>
+        </List.Root>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByRole("list")).toHaveAttribute("data-size", "s");
+  });
+
   it("sends ref, className and native attributes to the row element", () => {
     const ref = React.createRef<HTMLElement>();
     render(
@@ -364,7 +400,7 @@ describe("List onReorder", () => {
   });
 
   it("CSS: a sortable row has the row radius (the carried copy and its gap take it)", () => {
-    const css = readFileSync(join(__dirname, "List.module.css"), "utf8");
-    expect(css).toMatch(/\.sortableRow \{[^}]*border-radius: var\(--list-radius\);/);
+    const row = cssRule("src/components/list/List.module.css", ".sortableRow");
+    expect(cssValue(row, "border-radius")).toBe("var(--field-radius)");
   });
 });
