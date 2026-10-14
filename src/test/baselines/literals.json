@@ -1,6 +1,5 @@
 [
   "src/components/datepicker/Datepicker.module.css: raw length in --dp-col-gap",
-  "src/components/dnd/Dnd.module.css: numeric scale() in transform",
   "src/components/modal/DialogParts.module.css: px in @container (use rem)",
   "src/components/popover/Popover.module.css: raw length in --po-gap",
   "src/components/popover/Popover.module.css: raw length in --po-pad",

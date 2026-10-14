@@ -1,8 +1,6 @@
 /** Every density: rows from 36 to 52 px, the head at the control height of the tier — `size`. */
 import { Badge, DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
 type Invoice = { id: string; client: string; paid: boolean; amount: number };
 
 const INVOICES: Invoice[] = [
@@ -36,21 +34,23 @@ const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function DataTableSizesExample() {
   return (
-    <div className={styles.specimens}>
+    <>
       {SIZES.map((size) => (
-        <div key={size} className={styles.specimen}>
-          <DataTable
-            size={size}
-            columns={COLUMNS}
-            rows={INVOICES}
-            getRowKey={(row) => row.id}
-            paging="none"
-          />
-          <Typography as="span" variant="caption" tone="muted">
-            {size}
-          </Typography>
+        <div key={size}>
+          <div>
+            <DataTable
+              size={size}
+              columns={COLUMNS}
+              rows={INVOICES}
+              getRowKey={(row) => row.id}
+              paging="none"
+            />
+            <Typography as="span" variant="caption" tone="muted">
+              {size}
+            </Typography>
+          </div>
         </div>
       ))}
-    </div>
+    </>
   );
 }

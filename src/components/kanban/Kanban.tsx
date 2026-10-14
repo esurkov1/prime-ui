@@ -2,8 +2,7 @@ import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Crossfade } from "@/components/crossfade/Crossfade";
-import { useDragController } from "@/components/dnd/context";
-import { Dnd } from "@/components/dnd/Dnd";
+import { Dnd, useDragAnnouncer, useSortableItemBusy } from "@/components/dnd/Dnd";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
@@ -13,13 +12,16 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import hairline from "@/internal/hairline.module.css";
 import { hasContent } from "@/internal/hasContent";
+import { namedRole } from "@/internal/namedRole";
 import { isPlainClick, opensRow } from "@/internal/rowLink";
 import rowLink from "@/internal/rowLink.module.css";
 import type { PaletteColor } from "@/internal/states";
 import { type SurfaceDepth, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import textRole from "@/internal/textRole.module.css";
 import { useFlipList } from "@/internal/useFlipList";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
@@ -100,8 +102,6 @@ const SKELETON_CARDS = [3, 2, 1];
 
 type BoardContextValue = {
   disabled: boolean;
-  /** Cards whose move the owner is still saving. */
-  pending: ReadonlySet<string>;
   /** `getItemHref` of a card, `undefined` when cards are not links. */
   hrefOf: (id: string) => string | undefined;
   /** `onItemOpen` of a card, `null` when cards do not open in place. */
@@ -127,64 +127,26 @@ export type KanbanRootProps<T> = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "defaultValue"
 > & {
-  /** Every column; `columnOrder` decides their order (array order by default). */
   columns: readonly KanbanColumn[];
-  /** Every card the board can show; `value` decides where each one stands. */
   items: readonly T[];
-  /** Stable unique id of a card. */
   getId: (item: T) => string;
-  /** Spoken by the live region. Defaults to the id. */
   getLabel?: (item: T) => string;
-  /** Card ids per column (controlled). */
   value?: KanbanValue;
-  /** Initial card ids per column (uncontrolled). */
   defaultValue?: KanbanValue;
-  /**
-   * A card moved: the new placement first, then what moved. Return a promise to save on a server:
-   * the card stays in its new place, busy, until it settles; reject — it glides back.
-   */
   onValueChange?: (value: KanbanValue, move: KanbanMove) => void | Promise<void>;
-  /** Column ids in their order (controlled). */
   columnOrder?: readonly string[];
-  /** Initial column ids in their order (uncontrolled). Defaults to the order of `columns`. */
   defaultColumnOrder?: readonly string[];
-  /**
-   * A column moved: the new order first, then what moved. Return a promise to save on a server:
-   * the column stays in its new place, busy, until it settles; reject — it glides back.
-   */
   onColumnOrderChange?: (order: readonly string[], move: KanbanColumnMove) => void | Promise<void>;
-  /** A grip in every column header moves the column by pointer, touch and keyboard. */
   reorderableColumns?: boolean;
-  /** Renders one card; return a `Kanban.Item`. */
   renderItem: (item: T) => React.ReactNode;
-  /**
-   * The card is a link: a real `<a>` named by `getLabel` covers the card and is its tab stop, so a
-   * click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on it. A drag never
-   * follows it; Alt + arrows still move the card from it.
-   */
   getItemHref?: (item: T) => string;
   onItemOpen?: (item: T, event: KanbanItemOpenEvent) => void;
   columnTitleAs?: KanbanColumnTitleAs;
-  /** Renders the trailing actions of a column header (add a card, a menu). */
   renderColumnActions?: (column: KanbanColumn) => React.ReactNode;
-  /**
-   * Renders the meta line under a column's title (a stage's figures: «12 сделок · 4,8 млн ₽»).
-   * It describes the column's list, like `description`.
-   */
   renderColumnMeta?: (column: KanbanColumn) => React.ReactNode;
-  /**
-   * Refuses a card in a column (a workflow rule): `false`, or a string that says why — spoken and
-   * shown under the carried card. The column turns `danger` before the release.
-   */
   canDrop?: (id: string, columnId: string) => boolean | string;
-  /**
-   * `plain`: no wells, the cards stand on the host under a filled header plate; `line`: no wells, a
-   * bare header over a faint line; `well`: every column is a filled well.
-   */
   variant?: KanbanVariant;
-  /** Columns show skeleton cards; the cards cross-fade in when it turns off. */
   loading?: boolean;
-  /** No drag, no keyboard moves. */
   disabled?: boolean;
   labels?: Partial<KanbanLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -268,7 +230,8 @@ function KanbanBoard<T>({
 }: KanbanRootProps<T>) {
   const labels = { ...KANBAN_LABELS, ...labelsProp };
   const kind = `kanban-${React.useId()}`;
-  const controller = useDragController();
+  // The board is inside its own `Dnd.Root`: the session's live region is always there.
+  const announce = useDragAnnouncer();
   const [board, setBoard] = React.useState<HTMLDivElement | null>(null);
   const rootRef = useMergedRefs(setBoard, ref);
   // A refused card move glides back: every card that moved glides from where it stood.
@@ -287,10 +250,6 @@ function KanbanBoard<T>({
   // Moves the owner is still saving are drawn ahead of its answer.
   const cardChanges = usePendingChanges(storedValue, placeCard);
   const value = cardChanges.shown;
-  const pendingCards = React.useMemo(
-    () => new Set(cardChanges.pending.map((change) => change.id)),
-    [cardChanges.pending],
-  );
 
   const [storedOrder, setOrder] = useControllableState<readonly string[]>({
     value: columnOrderProp,
@@ -350,7 +309,7 @@ function KanbanBoard<T>({
       onResolve: apply,
       onReject: () => {
         glideCards();
-        controller.announce(formatLabel(labels.moveFailed, { label: labelOf(id) }));
+        announce?.(formatLabel(labels.moveFailed, { label: labelOf(id) }));
       },
     });
     return outcome;
@@ -372,7 +331,7 @@ function KanbanBoard<T>({
     // The glide back is the column list's own (Dnd rolls its drawn order back).
     columnChanges.track(change, outcome, {
       onResolve: apply,
-      onReject: () => controller.announce(formatLabel(labels.columnMoveFailed, { column: title })),
+      onReject: () => announce?.(formatLabel(labels.columnMoveFailed, { column: title })),
     });
     return outcome;
   };
@@ -386,7 +345,6 @@ function KanbanBoard<T>({
   const context = React.useMemo<BoardContextValue>(
     () => ({
       disabled: locked,
-      pending: pendingCards,
       hrefOf: (id) => {
         const { byId: items, getItemHref: href } = latest.current;
         const item = items.get(id);
@@ -405,7 +363,7 @@ function KanbanBoard<T>({
       },
       cardDepth,
     }),
-    [locked, pendingCards, links, opens, cardDepth],
+    [locked, links, opens, cardDepth],
   );
 
   return (
@@ -414,6 +372,8 @@ function KanbanBoard<T>({
         ref={rootRef}
         aria-busy={loading || undefined}
         {...rest}
+        // A named board is a group: a name on a bare `<div>` reaches no assistive tech.
+        role={namedRole(rest, "group")}
         className={cx(styles.root, className)}
         data-variant={variant}
         data-loading={loading || undefined}
@@ -534,7 +494,7 @@ function KanbanColumnView<T>({
           className={cx(styles.header, hairline.bottom)}
           data-reorderable={reorderable || undefined}
         >
-          <Title id={headingId} className={styles.title}>
+          <Title id={headingId} className={cx(textRole.titleM, styles.title)}>
             {column.title}
           </Title>
           {loading ? null : (
@@ -556,12 +516,12 @@ function KanbanColumnView<T>({
             />
           ) : null}
           {column.description ? (
-            <p id={descriptionId} className={styles.description}>
+            <p id={descriptionId} className={cx(textRole.caption, styles.description)}>
               {column.description}
             </p>
           ) : null}
           {showMeta ? (
-            <div id={metaId} className={styles.meta}>
+            <div id={metaId} className={cx(textRole.caption, styles.meta)}>
               {meta}
             </div>
           ) : null}
@@ -627,7 +587,6 @@ function KanbanColumnView<T>({
 // ---------------------------------------------------------------------------------------------
 
 export type KanbanItemProps = Omit<React.HTMLAttributes<HTMLElement>, "id"> & {
-  /** This card cannot be dragged or moved. */
   disabled?: boolean;
   ref?: React.Ref<HTMLElement>;
 };
@@ -651,8 +610,6 @@ function KanbanItem({
   if (id === null || board === null) {
     throw new Error("Kanban.Item must be returned from Kanban.Root renderItem");
   }
-  // Dnd makes a card whose move is saved busy and still; the card draws its spinner.
-  const pending = board.pending.has(id);
   const href = board.hrefOf(id);
   const { openItem } = board;
   // A link card: the link is the tab stop, the card is focused only after a keyboard move to
@@ -715,11 +672,17 @@ function KanbanItem({
         />
       ) : null}
       <ControlSizeProvider value="m">{children}</ControlSizeProvider>
-      {pending ? <Spinner size="s" aria-hidden="true" className={styles.itemSpinner} /> : null}
+      <KanbanItemSpinner />
     </Dnd.SortableItem>
   );
 }
 KanbanItem.displayName = "Kanban.Item";
+
+/** Dnd makes a card whose move is saved busy and still; the card draws its spinner. */
+function KanbanItemSpinner() {
+  const busy = useSortableItemBusy();
+  return busy ? <Spinner size="s" aria-hidden="true" className={styles.itemSpinner} /> : null;
+}
 
 export type KanbanItemHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
@@ -730,7 +693,19 @@ export type KanbanItemHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
  * and the last child (a priority, an assignee) at the end.
  */
 function KanbanItemHeader({ className, ...rest }: KanbanItemHeaderProps) {
-  return <div className={cx(styles.itemHeader, hairline.bottom, className)} {...rest} />;
+  return (
+    <div
+      className={cx(
+        fieldTierClass,
+        textRole.caption,
+        styles.itemHeader,
+        hairline.bottom,
+        className,
+      )}
+      data-size="xs"
+      {...rest}
+    />
+  );
 }
 KanbanItemHeader.displayName = "Kanban.ItemHeader";
 
@@ -740,7 +715,7 @@ export type KanbanItemTitleProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 /** The card title: medium body text, wraps up to three lines. */
 function KanbanItemTitle({ className, ...rest }: KanbanItemTitleProps) {
-  return <span className={cx(styles.itemTitle, className)} {...rest} />;
+  return <span className={cx(textRole.bodyM, styles.itemTitle, className)} {...rest} />;
 }
 KanbanItemTitle.displayName = "Kanban.ItemTitle";
 
@@ -750,7 +725,7 @@ export type KanbanItemDescriptionProps = React.HTMLAttributes<HTMLSpanElement> &
 
 /** The muted meta line: id, due date. */
 function KanbanItemDescription({ className, ...rest }: KanbanItemDescriptionProps) {
-  return <span className={cx(styles.itemDescription, className)} {...rest} />;
+  return <span className={cx(textRole.caption, styles.itemDescription, className)} {...rest} />;
 }
 KanbanItemDescription.displayName = "Kanban.ItemDescription";
 
@@ -770,7 +745,7 @@ export type KanbanItemFooterProps = React.HTMLAttributes<HTMLDivElement> & {
 
 /** The bottom row: `Kanban.ItemCount`s at the start, anything else (an assignee) at the end. */
 function KanbanItemFooter({ className, ...rest }: KanbanItemFooterProps) {
-  return <div className={cx(styles.footer, className)} {...rest} />;
+  return <div className={cx(fieldTierClass, styles.footer, className)} data-size="xs" {...rest} />;
 }
 KanbanItemFooter.displayName = "Kanban.ItemFooter";
 

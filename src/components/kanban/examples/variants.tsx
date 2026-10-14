@@ -1,8 +1,6 @@
 /** The same release board in three looks: no wells with a header plate, no wells with a header over a line, and columns as filled wells holding their cards — `variant`. */
 import { Badge, Kanban, type KanbanVariant, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
 type Task = { id: string; title: string; due: string; label: string };
 
 const VARIANTS: KanbanVariant[] = ["plain", "line", "well"];
@@ -37,7 +35,6 @@ export default function KanbanVariantsExample() {
       <div>
         <Kanban.Root
           aria-label={`Задачи релиза: ${variant}`}
-          className={styles.board}
           variant={variant}
           columns={COLUMNS}
           items={TASKS}

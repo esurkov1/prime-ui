@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -59,6 +60,8 @@ afterEach(() => {
 describe("Kanban", () => {
   it("draws every column as a list named by its heading, with its cards and count", () => {
     render(<Board />);
+    // The named board is a group.
+    expect(screen.getByRole("group", { name: "Доска" })).toHaveAttribute("data-variant");
     expect(titles("К выполнению")).toEqual(["Счёт для «Севера»", "Отчёт по складу"]);
     expect(titles("В работе")).toEqual(["Онбординг"]);
     expect(screen.getByRole("heading", { name: "В работе" })).toBeInTheDocument();
@@ -137,6 +140,28 @@ describe("Kanban", () => {
       { id: "a", from: "todo", to: "todo", index: 1 },
     );
     expect(titles("К выполнению")).toEqual(["Отчёт по складу", "Счёт для «Севера»"]);
+  });
+
+  it("reorders inside a column with Alt+↑", () => {
+    const onValueChange = vi.fn();
+    render(<Board onValueChange={onValueChange} />);
+    fireEvent.keyDown(screen.getByTestId("card-b"), { key: "ArrowUp", altKey: true });
+    expect(onValueChange).toHaveBeenCalledWith(
+      { todo: ["b", "a"], doing: ["c"], done: [] },
+      { id: "b", from: "todo", to: "todo", index: 0 },
+    );
+    expect(titles("К выполнению")).toEqual(["Отчёт по складу", "Счёт для «Севера»"]);
+  });
+
+  it("Tab moves through the cards, column by column", async () => {
+    const user = userEvent.setup();
+    render(<Board />);
+    await user.tab();
+    expect(screen.getByTestId("card-a")).toHaveFocus();
+    await user.tab();
+    expect(screen.getByTestId("card-b")).toHaveFocus();
+    await user.tab();
+    expect(screen.getByTestId("card-c")).toHaveFocus();
   });
 
   it("a full column refuses a keyboard move and says so", () => {
@@ -695,6 +720,19 @@ describe("Kanban pointer drag", () => {
       { id: "b", from: "todo", to: "doing", index: 0 },
     );
     expect(titles("В работе")).toEqual(["Отчёт по складу", "Онбординг"]);
+  });
+
+  it("Escape cancels a drag in flight: the card stays where it stood", () => {
+    const onValueChange = vi.fn();
+    render(<Board onValueChange={onValueChange} />);
+    stubLayout();
+    fireEvent.pointerDown(screen.getByTestId("card-b"), { ...POINTER, clientX: 10, clientY: 25 });
+    fireEvent.pointerMove(window, { ...POINTER, clientX: 310, clientY: 5 });
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.pointerUp(window, { ...POINTER, clientX: 310, clientY: 5 });
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(titles("К выполнению")).toEqual(["Счёт для «Севера»", "Отчёт по складу"]);
+    expect(screen.getByRole("status")).toHaveTextContent("отменено");
   });
 
   it("a drag never opens the card, nor follows its link; a click does", () => {

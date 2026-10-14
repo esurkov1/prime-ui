@@ -1,10 +1,11 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RollingNumber } from "@/internal/RollingNumber";
-import { DND_CARRYING_ATTRIBUTE, Dnd, DndLock } from "./Dnd";
+import { withMotion } from "@/test/motion";
+import { DND_CARRYING_ATTRIBUTE, Dnd, DndLock, moveBefore } from "./Dnd";
 import { insertionBefore } from "./geometry";
-import { moveBefore } from "./useSortableList";
 
 const ROW_HEIGHT = 20;
 const POINTER = { pointerId: 1, pointerType: "mouse", button: 0 };
@@ -106,6 +107,22 @@ const order = () =>
   );
 
 describe("Dnd.Sortable", () => {
+  it("Tab moves to the items, or with `handle` to their grips", async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<Sortable initial={rows("a", "b")} />);
+    await user.tab();
+    expect(screen.getByTestId("row-a")).toHaveFocus();
+    // The control inside the item is the next stop, then the next item.
+    await user.tab();
+    await user.tab();
+    expect(screen.getByTestId("row-b")).toHaveFocus();
+    unmount();
+    render(<Sortable initial={rows("a", "b")} handle />);
+    await user.tab();
+    expect(screen.getByTestId("grip-a")).toHaveFocus();
+    expect(screen.getByTestId("row-a")).not.toHaveAttribute("tabindex");
+  });
+
   it("drags a row in front of the next one and opens a gap there", () => {
     const onReorder = vi.fn();
     render(<Sortable initial={rows("a", "b", "c")} onReorder={onReorder} />);
@@ -410,43 +427,33 @@ describe("Dnd.Draggable + Dnd.DropZone", () => {
     expect(onDrop).not.toHaveBeenCalled();
   });
 
-  it("flashes after a drop until the flash animation ends", async () => {
-    vi.stubGlobal("matchMedia", (query: string) => ({ matches: false, media: query }));
-    const animation = { cancel: () => {}, addEventListener: () => {} };
-    Object.defineProperty(HTMLElement.prototype, "animate", {
-      configurable: true,
-      value: () => animation,
-    });
-    try {
-      render(
-        <Dnd.Root>
-          <Dnd.Draggable kind="card" id="c1" data-testid="card">
-            Card
-          </Dnd.Draggable>
-          <Dnd.DropZone accepts="card" data-testid="zone" flashOnDrop onDrop={() => {}}>
-            <span data-testid="inner">Zone</span>
-          </Dnd.DropZone>
-        </Dnd.Root>,
-      );
-      pressOn(screen.getByTestId("card"), 10, 10);
-      moveTo(300, 100);
-      releaseAt(300, 100);
-      const zone = screen.getByTestId("zone");
-      expect(zone).toHaveAttribute("data-dnd-flash");
-      // An animation of a child is not the zone's flash.
-      fireEvent.animationEnd(screen.getByTestId("inner"));
-      expect(zone).toHaveAttribute("data-dnd-flash");
-      fireEvent.animationEnd(zone);
-      expect(zone).not.toHaveAttribute("data-dnd-flash");
-      // The overlay lands in a microtask after the drop.
-      await act(async () => {});
-    } finally {
-      vi.unstubAllGlobals();
-      Reflect.deleteProperty(HTMLElement.prototype, "animate");
-    }
+  it("flashes after a drop: the zone's fill fades from the accent tint, then the flag clears", async () => {
+    const motion = withMotion();
+    render(
+      <Dnd.Root>
+        <Dnd.Draggable kind="card" id="c1" data-testid="card">
+          Card
+        </Dnd.Draggable>
+        <Dnd.DropZone accepts="card" data-testid="zone" flashOnDrop onDrop={() => {}}>
+          Zone
+        </Dnd.DropZone>
+      </Dnd.Root>,
+    );
+    pressOn(screen.getByTestId("card"), 10, 10);
+    moveTo(300, 100);
+    releaseAt(300, 100);
+    const zone = screen.getByTestId("zone");
+    expect(zone).toHaveAttribute("data-dnd-flash");
+    const [flash] = motion.on(zone);
+    // One keyframe: the fill starts at the tint and ends on the zone's own.
+    expect(flash?.keyframes).toEqual([{ backgroundColor: expect.any(String) }]);
+    // The overlay lands in a microtask after the drop.
+    await act(async () => {});
+    act(() => flash?.finish());
+    expect(zone).not.toHaveAttribute("data-dnd-flash");
   });
 
-  it("does not flash under reduced motion (no animation would end it)", () => {
+  it("does not flash under reduced motion", () => {
     render(
       <Dnd.Root>
         <Dnd.Draggable kind="card" id="c1" data-testid="card">

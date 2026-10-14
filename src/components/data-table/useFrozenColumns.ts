@@ -113,7 +113,12 @@ export function useFrozenColumns(
   /** Real rows are on screen (not loading, empty or error). */
   ready: boolean,
 ) {
-  const frozen = React.useRef<Frozen & { columnsKey: string }>({ widths: null, columnsKey });
+  /** The widths, and the columns and rows they were last checked against. */
+  const frozen = React.useRef<Frozen & { columnsKey: string; rowsKey: unknown }>({
+    widths: null,
+    columnsKey,
+    rowsKey: undefined,
+  });
 
   React.useEffect(() => {
     const root = rootRef.current;
@@ -142,7 +147,6 @@ export function useFrozenColumns(
   // When the rows or columns change: freeze once real rows are laid out; widen a column whose
   // content no longer fits (a longer value, a deeper row). Loading, empty and error states keep
   // the widths.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `rowsKey` is the trigger — new rendered rows may no longer fit the frozen widths.
   React.useLayoutEffect(() => {
     const table = tableRef.current;
     if (!table) return;
@@ -151,10 +155,14 @@ export function useFrozenColumns(
       unfreeze(table, frozen.current);
     }
     if (!ready) return;
+    const newRows = frozen.current.rowsKey !== rowsKey;
+    frozen.current.rowsKey = rowsKey;
     if (!frozen.current.widths) {
       freeze(table, frozen.current);
       return;
     }
+    // Rows already checked against these widths fit them.
+    if (!newRows) return;
     for (const cell of table.querySelectorAll<HTMLTableCellElement>(":scope > tbody > tr > td")) {
       if (cell.scrollWidth > cell.clientWidth + 1) {
         freeze(table, frozen.current);

@@ -72,8 +72,8 @@ Generic `Kanban.Root<T>`; `ref` → `HTMLDivElement`. The board: a strip of colu
 | `onItemOpen` | `(item: T, event: KanbanItemOpenEvent) => void` | — | Opens a card in place (a Drawer): a click, Enter or Space; never from a control inside it or after a drag. With `getItemHref` it gets plain clicks: `event.preventDefault()` routes in the app. |
 | `columnTitleAs` | `"h2" \| "h3" \| "h4"` | `"h3"` | Heading level of the column titles in the page outline; the look does not change. |
 | `renderColumnActions` | `(column: KanbanColumn) => ReactNode` | — | Trailing actions of a column header (add a card, a menu); kit controls inside take the `s` tier. |
-| `renderColumnMeta` | `(column: KanbanColumn) => ReactNode` | — | The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»). |
-| `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card). |
+| `renderColumnMeta` | `(column: KanbanColumn) => ReactNode` | — | The meta line under a column's title and description: the stage's figures («12 сделок · 4,8 млн ₽»). Like `description`, it describes the column's list. |
+| `canDrop` | `(id: string, columnId: string) => boolean \| string` | — | A workflow rule: refuses card `id` in column `columnId` — `false`, or a string that says why (spoken and shown under the carried card). The column turns `danger` before the release. |
 | `variant` | `"plain" \| "line" \| "well"` | `"plain"` | No wells: `plain` — a filled header plate over the cards, `line` — a bare header over a faint line; cards stand on the host. `well`: every column is a filled well holding its cards (bounded queues). |
 | `loading` | `boolean` | `false` | Columns show skeleton cards in the card geometry; the cards cross-fade in when it turns off. |
 | `disabled` | `boolean` | `false` | Read-only board: no drag, no keyboard moves, no column grips; `onItemOpen` and `getItemHref` still open cards. |
@@ -150,7 +150,7 @@ Do not wrap a `plain` board's columns in your own boxes, and do not put a `well`
 | State | Driven by | DOM |
 |---|---|---|
 | idle | — | cards show `cursor: grab`; under a mouse the card lifts to `--prime-shadow-overlay` (`@media (hover: hover)` only) — no wash: a wash is one ladder step, the column's own color |
-| carried | a drag | Dnd: the clone lifts on `--prime-shadow-modal`, a dashed accent gap opens where the card lands, cards glide aside |
+| carried | a drag | Dnd: the clone lifts on Dnd's carry shadow, a dashed accent gap opens where the card lands, cards glide aside |
 | column carried | a drag by the column grip | the same for the whole column: its clone lifts with its cards, a column-sized gap opens in the strip, the columns glide aside |
 | over a column | pointer over another column | the gap opens there; an empty column's slot fades out |
 | refused | `limit` reached, `canDrop` returns `false` or a reason | `data-dnd-reject` on the `<ul>`: `danger-soft` fill; the reason in a chip under the carried card |
@@ -201,6 +201,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 - The count is spoken as text («Карточек: 3 из 5»), not only by colour; a full column also reads `count / limit`.
 - With `getItemHref` a real `<a>` named by `getLabel` covers the card and is its tab stop: a click, ⌘/Ctrl-click, a middle click and «open in new tab» work anywhere on the card, Space follows it like Enter, Alt + arrows move the card from it and a press on it drags the card; the release of a drag never follows it. Controls inside the card stand above the link. With `onItemOpen` alone the card opens by a click, Enter or Space; a control inside the card never opens it, and a card that opens stays a tab stop on a `disabled` board.
 - Touch: a drag starts after a hold; a finger that moves first scrolls the board.
+- A board named by `aria-label` or `aria-labelledby` is a `group` with that name; an unnamed one has no role.
 - While loading the root has `aria-busy`; skeletons are hidden from assistive tech.
 - While a move is saved the card or column has `aria-busy` (its spinner is hidden from assistive tech, a column's busy grip says so itself); a refused save is announced (`labels.moveFailed`, `labels.columnMoveFailed`).
 
@@ -230,7 +231,7 @@ A card's own `onKeyDown` runs before the board's: `preventDefault()` in it keeps
 | [columns.tsx](examples/columns.tsx) | A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. |
 | [saving.tsx](examples/saving.tsx) | Every move is saved on the server: the card waits busy in its new place, and an invoice the server refuses to close glides back to its column — `onValueChange`. |
 | [item-link.tsx](examples/item-link.tsx) | Tickets that open: each card is a link to its page, so ⌘-click or a middle click opens a new tab, a plain click, Enter or Space opens it in place, and a drag only moves it — `getItemHref`, `onItemOpen`. |
-| [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry and cross-fades the cards in; an empty column keeps its drop area; a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `disabled`. |
+| [states.tsx](examples/states.tsx) | Loading draws skeleton cards in the card geometry; an empty column keeps its drop area and a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The placement lives in the parent: every move arrives with its source, target and position to save, and a button resets the board — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | On a phone-width screen a column takes 85% of the board and snaps into place, so the next one peeks; the strip scrolls inside the board, never the page — `Kanban.Root`, `columns`. |
 | [screen.tsx](examples/screen.tsx) | A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in the app header, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemOpen`. |

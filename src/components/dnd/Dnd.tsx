@@ -6,6 +6,7 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { motionTiming } from "@/internal/motionTiming";
 import { namedRole } from "@/internal/namedRole";
 import type { AsyncHandler } from "@/internal/usePendingChanges";
@@ -28,6 +29,7 @@ import { useSortableList } from "./useSortableList";
 
 export type { DragItem, DragOutcome } from "./dragSession";
 export type { DndLabels } from "./labels";
+export { moveBefore } from "./useSortableList";
 
 /**
  * Set on a `Dnd.Sortable` while an item of its kind is carried: the list may take it. A host scopes
@@ -40,7 +42,6 @@ export const DND_CARRYING_ATTRIBUTE = "data-dnd-carrying";
 // ---------------------------------------------------------------------------------------------
 
 export type DndRootProps = {
-  /** Built-in strings (live region, handle, role description). Russian defaults. */
   labels?: Partial<DndLabels>;
   children?: React.ReactNode;
 };
@@ -110,6 +111,14 @@ const ItemContext = React.createContext<ItemContextValue>({
   keys: null,
 });
 
+/**
+ * Whether the owner is still saving the move of the `Dnd.SortableItem` around (its `onReorder`
+ * promise): for a host that draws the busy state inside the item itself (a card's spinner).
+ */
+export function useSortableItemBusy(): boolean {
+  return React.useContext(ItemContext).busy;
+}
+
 /** Stops the browser's own drag of an image or a link inside an item: the kit drag owns the press. */
 function preventNativeDrag(event: React.DragEvent<HTMLElement>) {
   event.preventDefault();
@@ -131,7 +140,8 @@ export function DndLock({ className, "aria-label": ariaLabel, ...rest }: DndLock
       {...rest}
       role="img"
       aria-label={ariaLabel ?? controller.labels().locked}
-      className={cx(styles.lock, className)}
+      className={cx(fieldTierClass, styles.lock, className)}
+      data-size="xs"
       data-dnd-lock=""
     >
       <Icon name="status.locked" />
@@ -214,53 +224,20 @@ const ACROSS: Record<"x" | "y" | "grid", string> = {
 const SortableContext = React.createContext<SortableContextValue | null>(null);
 
 export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "children"> & {
-  /** Items in their current order. */
   items: readonly T[];
-  /** Stable unique id of an item. */
   getId: (item: T) => string;
-  /** Spoken by the live region ("Задача 3: позиция 2 из 5"). Defaults to the id. */
   getLabel?: (item: T) => string;
-  /**
-   * Called when an item lands in front of `beforeId` (`null` = last). A returned promise keeps the
-   * item drawn in its new place until it settles; a rejection glides it back.
-   */
   onReorder: AsyncHandler<[id: string, beforeId: string | null]>;
-  /**
-   * Renders one item; return a `Dnd.SortableItem`. During a drag `index` is the place the item will
-   * have on release. Parts marked `data-dnd-mirror` stay in step on the carried copy.
-   */
   renderItem: (item: T, index: number) => React.ReactNode;
-  /** Layout of the list: a column, a row, or a wrapping grid (reading order, Alt + ← / →). */
   axis?: "x" | "y" | "grid";
-  /** Only `Dnd.Handle` starts a drag; the rest of the item stays free for clicks and text selection. */
   handle?: boolean;
   disabled?: boolean;
-  /**
-   * Drag kind. Lists sharing a `kind` exchange items: an item dropped from another list arrives in
-   * `onReorder` with an `id` that is not in `items` (move it into this list), and Alt + the arrows
-   * across the axis move an item to the neighbouring list of the kind (document order). Defaults to
-   * a unique value per list, so lists stay separate.
-   */
   kind?: string;
-  /**
-   * Refuses an item (by id) the list would otherwise take: `false`, or a string that says why — it
-   * is spoken and shown under the carried copy. The list turns `danger` before the release.
-   */
   canDrop?: (id: string) => boolean | string;
-  /** Shown while the list has no items; a gap opening in the list takes its place. */
   empty?: React.ReactNode;
-  /**
-   * Root element: `ul` / `ol` turn items into `li`; `tbody` turns them into table rows (`tr`), the
-   * gap into a row across every column, and the carried copy keeps every cell's width.
-   */
   as?: "div" | "ul" | "ol" | "tbody";
   "aria-label"?: string;
-  /**
-   * Content in front of the items that never moves and takes no drop position (the heading row of
-   * a group of table rows).
-   */
   header?: React.ReactNode;
-  /** Content after the items that never moves and takes no drop position (an add tile). */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLElement>;
 };
@@ -438,13 +415,8 @@ function previewIndex(
 }
 
 export type DndSortableItemProps = {
-  /** Must match `getId` of the item. */
   id: string;
   disabled?: boolean;
-  /**
-   * Holds its place: it does not drag or move, and nothing is put where it would shift it (a
-   * pinned first row, a system column). Its `Dnd.Handle` shows a lock.
-   */
   locked?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -638,15 +610,11 @@ function DndPlaceholder({
 // ---------------------------------------------------------------------------------------------
 
 export type DndDraggableProps<TData = unknown> = {
-  /** What is dragged; a `Dnd.DropZone` accepts it by kind. */
   kind: string;
   id: string;
-  /** Payload handed to the drop target. */
   data?: TData;
-  /** Spoken by the live region. Defaults to the id. */
   label?: string;
   disabled?: boolean;
-  /** Only `Dnd.Handle` starts a drag. */
   handle?: boolean;
   as?: "div" | "li" | "span" | "article" | "section";
   onDragStart?: (item: DragItem<TData>, point: Point, origin: Rect) => void;
@@ -717,17 +685,11 @@ DndDraggable.displayName = "Dnd.Draggable";
 // ---------------------------------------------------------------------------------------------
 
 export type DndDropZoneProps<TData = unknown> = {
-  /** Drag kinds this zone takes, or a predicate over the dragged item. */
   accepts: string | readonly string[] | ((item: DragItem) => boolean);
   onDrop: (item: DragItem<TData>) => void;
-  /**
-   * Refuses an item the zone would otherwise take: `false`, or a string that says why (spoken and
-   * shown under the carried copy). The zone turns `danger` before the release.
-   */
   canDrop?: (item: DragItem<TData>) => boolean | string;
   onEnter?: (item: DragItem<TData>) => void;
   onLeave?: () => void;
-  /** Flashes the zone after a drop, so the eye can follow where the item went. */
   flashOnDrop?: boolean;
   disabled?: boolean;
   as?: "div" | "section" | "li" | "ul" | "ol" | "span";
@@ -748,7 +710,6 @@ function DndDropZone<TData = unknown>({
   as: Tag = "div",
   className,
   children,
-  onAnimationEnd,
   ref: forwardedRef,
   ...rest
 }: DndDropZoneProps<TData>) {
@@ -769,10 +730,6 @@ function DndDropZone<TData = unknown>({
       ref={ref}
       {...rest}
       {...targetData}
-      onAnimationEnd={(event: React.AnimationEvent<HTMLElement>) => {
-        onAnimationEnd?.(event);
-        targetData.onAnimationEnd(event);
-      }}
       className={cx(styles.dropZone, className)}
       data-disabled={disabled || undefined}
     >

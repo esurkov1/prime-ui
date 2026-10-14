@@ -186,6 +186,7 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
     header: "Клиент",
     accessor: "client",
     sortable: true,
+    minWidth: "16rem",
     cell: (row) => (
       <span className={styles.client}>
         <Avatar.Root size="s" color="gray">
