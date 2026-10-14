@@ -1,4 +1,4 @@
-/** Saving a form: the button shows loading, then a success toast or an error toast with a retry action — `notify`, `action`. */
+/** Saving a form: the button shows loading, then a success toast or an error toast whose retry sends the form again with what it holds now — `notify`, `action`. */
 import { Button, Card, Input, NotificationProvider, useNotifications } from "prime-ui-kit";
 import * as React from "react";
 
@@ -8,6 +8,7 @@ function ReportsForm() {
   const { notify } = useNotifications();
   const [saving, setSaving] = React.useState(false);
   const [email, setEmail] = React.useState("team@prime.dev");
+  const formRef = React.useRef<HTMLFormElement>(null);
 
   const save = () => {
     setSaving(true);
@@ -24,7 +25,7 @@ function ReportsForm() {
           tone: "danger",
           title: "Не удалось сохранить",
           description: "Укажите корректный адрес почты.",
-          action: { label: "Повторить", onClick: save },
+          action: { label: "Повторить", onClick: () => formRef.current?.requestSubmit() },
         });
       }
     }, 700);
@@ -33,6 +34,7 @@ function ReportsForm() {
   return (
     <Card.Root className={styles.formCard}>
       <form
+        ref={formRef}
         className={styles.form}
         onSubmit={(event) => {
           event.preventDefault();

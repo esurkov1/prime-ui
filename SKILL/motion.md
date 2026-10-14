@@ -165,7 +165,7 @@ hint that states the rule in words.
 **Removing a row with undo.** Remove the row from the data, show a notification with an «Отменить»
 action, put the row back on undo — undo beats a confirm dialog for reversible deletes. When the delete
 reaches the server only after the chance to undo has passed, send it from the notification's
-`onDismiss`.
+`onDismiss` for every reason but `action` — the «Отменить» action closes its toast by itself.
 
 **A rare achievement.** Say it in words (a `Banner`, the progress label turning success), then call
 `celebrate({ origin: element })` once. Only for something that happens rarely — a quarter closed, the

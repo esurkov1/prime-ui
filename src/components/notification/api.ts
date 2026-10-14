@@ -28,9 +28,9 @@ const CONTENT = [
   {
     name: "size",
     type: '"xs" | "s" | "m" | "l" | "xl"',
-    default: '"m"',
-    en: "Padding, icon and text tier of the card.",
-    ru: "Ярус отступов, иконки и текста карточки.",
+    defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
+    en: "Padding, icon and text tier of the card. Without it the tier of the host (a toast of `notify()` sits outside any host: `m`).",
+    ru: "Ярус отступов, иконки и текста карточки. Без него — ярус хоста (уведомление из `notify()` вне хоста: `m`).",
   },
   {
     name: "icon",
@@ -47,8 +47,8 @@ const CONTENT = [
   {
     name: "action",
     type: "{ label: string; onClick: () => void }",
-    en: "One soft button under the text, one tier below the card.",
-    ru: "Одна мягкая кнопка под текстом, на ярус меньше карточки.",
+    en: "One soft button under the text, one tier below the card; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`).",
+    ru: "Одна мягкая кнопка под текстом, на ярус меньше карточки; у уведомления из `notify()` после своего `onClick` закрывает его (причина `action`).",
   },
 ];
 
@@ -70,8 +70,8 @@ export const api: ComponentApi = {
           name: "max",
           type: "number",
           default: "5",
-          en: "Max toasts per stack; older ones are dropped.",
-          ru: "Максимум уведомлений в стопке; старые убираются.",
+          en: "Max toasts per stack; a newer toast pushes the oldest out through its exit (reason `overflow`).",
+          ru: "Максимум уведомлений в стопке; новое вытесняет самое старое, и оно уходит со своей анимацией (причина `overflow`).",
         },
         {
           name: "labels",
@@ -145,9 +145,9 @@ export const api: ComponentApi = {
         },
         {
           name: "onDismiss",
-          type: "() => void",
-          en: "The toast left: its timer ran out, the close button, a swipe, `dismiss()`, or a newer toast pushed it out of a full stack. Called once — the place to commit an action the toast offered to undo.",
-          ru: "Уведомление ушло: истёк таймер, крестик, свайп, `dismiss()` или его вытеснило новое. Вызывается один раз — здесь применяют действие, которое уведомление предлагало отменить.",
+          type: '(reason: "timeout" | "close" | "swipe" | "action" | "dismiss" | "overflow") => void',
+          en: "The toast left, with the reason: its timer ran out, the close button, a swipe, its action, `dismiss()` / `dismissAll()`, or a newer toast pushed it out of a full stack. Called once — the place to commit an action the toast offered to undo (every reason but `action`).",
+          ru: "Уведомление ушло, с причиной: истёк таймер, крестик, свайп, его действие, `dismiss()` / `dismissAll()` или его вытеснило новое. Вызывается один раз — здесь применяют действие, которое уведомление предлагало отменить (при любой причине, кроме `action`).",
         },
       ],
     },
@@ -208,6 +208,10 @@ export const api: ComponentApi = {
       {
         en: "The icon and the countdown are `aria-hidden`; the close button is named by `labels.close`.",
         ru: "Иконка скрыта (`aria-hidden`); кнопка закрытия названа `labels.close`.",
+      },
+      {
+        en: "Focus never leaves with a toast: a card that goes while it holds focus hands it to the front card still open in its stack, else back to where focus came from.",
+        ru: "Фокус не уходит вместе с уведомлением: карточка, которая уходит с фокусом, передаёт его передней открытой карточке стопки, иначе — туда, откуда фокус пришёл.",
       },
       {
         en: "A toast is a non-modal live region, not a layer of the overlay stack: Escape and a press elsewhere belong to the page and to the topmost open layer, so a toast takes no `closeOnEscape` / `closeOnOutsideClick` — it leaves by its timer, the close button, a swipe or `dismiss()`.",

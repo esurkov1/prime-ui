@@ -12,7 +12,6 @@
   "src/components/input: sets aria-pressed, no selector",
   "src/components/list: list-style none without role=\"list\"",
   "src/components/media-viewer: sets aria-current, no selector",
-  "src/components/notification: list-style none without role=\"list\"",
   "src/components/pagination: sets aria-current, no selector",
   "src/components/progress-bar: list-style none without role=\"list\"",
   "src/components/stepper: list-style none without role=\"list\"",

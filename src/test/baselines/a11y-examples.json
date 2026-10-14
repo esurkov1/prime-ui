@@ -23,7 +23,6 @@
   "src/components/kanban/examples/states.tsx: aria-label on a generic div",
   "src/components/kanban/examples/structure.tsx: aria-label on a generic div",
   "src/components/kanban/examples/variants.tsx: aria-label on a generic div",
-  "src/components/notification/examples/placement.tsx: dangling aria-controls",
   "src/components/page-content/examples/list-detail.tsx: aria-label on a generic div",
   "src/components/page-content/examples/screen.tsx: dangling aria-controls",
   "src/components/page-toolbar/examples/narrow.tsx: aria-label on a generic div",

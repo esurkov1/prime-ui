@@ -7,7 +7,6 @@
   "src/components/kanban/api.ts: Kanban.Root.onItemClick → `onItemOpen`",
   "src/components/message/api.ts: Message.Typing.active → `current` (a navigation location) or `selected` (a choice)",
   "src/components/notification/api.ts: NotificationCard.icon → an `X.Icon` part",
-  "src/components/notification/api.ts: notify(options).icon → an `X.Icon` part",
   "src/components/page-content/api.ts: PageContent.Detail → a `PageContent.Panel` (list and detail are panels of the split)",
   "src/components/page-content/api.ts: PageContent.List → a `PageContent.Panel` (list and detail are panels of the split)",
   "src/components/page-content/api.ts: PageContent.Page → `PageContent.Root as=\"section\"`",

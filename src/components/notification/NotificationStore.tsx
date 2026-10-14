@@ -3,11 +3,14 @@ import * as React from "react";
 import { LIVE_REGION_ATTR } from "@/hooks/useInertSiblings";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { prefersReducedMotion } from "@/hooks/usePresence";
+import { useLabels } from "@/internal/labels";
 import { exitTimeoutMs } from "@/internal/motionTiming";
+import { handoffFocus } from "@/internal/overlay/focus";
 import { Portal } from "@/internal/Portal";
 
 import {
   NOTIFICATION_LABELS,
+  type NotificationDismissReason,
   type NotificationLabels,
   NotificationLabelsContext,
   type NotificationOptions,
@@ -131,7 +134,7 @@ function NotificationStack({
 }: {
   position: NotificationPosition;
   items: NotificationEntry[];
-  onDismiss: (id: string) => void;
+  onDismiss: (id: string, reason: NotificationDismissReason) => void;
   onExited: (id: string) => void;
 }) {
   const labels = React.useContext(NotificationLabelsContext);
@@ -142,6 +145,8 @@ function NotificationStack({
   const listRef = React.useRef<HTMLOListElement>(null);
   const hoveredRef = React.useRef(false);
   const focusedRef = React.useRef(false);
+  /** Where focus came into the stack from: it goes back there when the last card it held leaves. */
+  const returnRef = React.useRef<HTMLElement | null>(null);
   const top = isTop(position);
   const step = React.useMemo(space2Px, []);
 
@@ -223,6 +228,14 @@ function NotificationStack({
         ? flowHeight - step
         : frontHeight + Math.min(active.length - 1, PEEK_VISIBLE - 1) * step;
 
+  // A card that leaves while it holds focus hands it to the front card still open, else back to
+  // where focus came from.
+  const nextFocus = React.useCallback((leaving: HTMLElement): HTMLElement | null => {
+    const cards = Array.from(listRef.current?.children ?? []) as HTMLElement[];
+    const open = cards.find((card) => card !== leaving && card.dataset.state === "open");
+    return open ?? returnRef.current;
+  }, []);
+
   React.useLayoutEffect(() => {
     for (const [id, layout] of layouts) lastLayoutRef.current.set(id, layout);
     const ids = new Set(items.map((n) => n.id));
@@ -234,13 +247,19 @@ function NotificationStack({
   return (
     <ol
       ref={listRef}
+      // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list role in WebKit.
+      role="list"
       className={styles.stack}
       aria-label={labels[REGION_LABEL_KEY[position]]}
       data-expanded={String(expanded)}
       style={{ "--ntf-stack-height": `${stackHeight}px` } as React.CSSProperties}
       onMouseEnter={() => handleHover(true)}
       onMouseLeave={() => handleHover(false)}
-      onFocus={() => {
+      onFocus={(event) => {
+        const from = event.relatedTarget;
+        if (from instanceof HTMLElement && !event.currentTarget.contains(from)) {
+          returnRef.current = from;
+        }
         focusedRef.current = true;
         syncExpanded();
       }}
@@ -268,6 +287,7 @@ function NotificationStack({
             onDismiss={onDismiss}
             onExited={onExited}
             onHeight={reportHeight}
+            nextFocus={nextFocus}
           />
         );
       })}
@@ -289,6 +309,7 @@ const NotificationStackItem = React.memo(function NotificationStackItem({
   onDismiss,
   onExited,
   onHeight,
+  nextFocus,
 }: {
   item: NotificationRecord;
   position: NotificationPosition;
@@ -299,12 +320,26 @@ const NotificationStackItem = React.memo(function NotificationStackItem({
   hidden: boolean;
   closing: boolean;
   expanded: boolean;
-  onDismiss: (id: string) => void;
+  onDismiss: (id: string, reason: NotificationDismissReason) => void;
   onExited: (id: string) => void;
   onHeight: (id: string, height: number) => void;
+  nextFocus: (leaving: HTMLElement) => HTMLElement | null;
 }) {
   const ref = React.useRef<HTMLLIElement>(null);
   const { id } = item;
+
+  // Focus never leaves with the card: on dismiss (the exit starts) and on removal (reduced motion
+  // removes at once; the node is still in the document during this cleanup).
+  React.useLayoutEffect(() => {
+    const node = ref.current;
+    if (closing && node) handoffFocus(node, nextFocus(node));
+  }, [closing, nextFocus]);
+  React.useLayoutEffect(() => {
+    const node = ref.current;
+    return () => {
+      if (node) handoffFocus(node, nextFocus(node));
+    };
+  }, [nextFocus]);
 
   // Measure before paint so offsets are right on the first frame; follow later size changes.
   React.useLayoutEffect(() => {
@@ -379,7 +414,7 @@ const NotificationStackItem = React.memo(function NotificationStackItem({
       // Keep going the way the finger went, off the edge, while the store fades the card out.
       el.dataset.swipe = "out";
       el.style.transform = `translate${axis.toUpperCase()}(calc(${amount * sign}px + ${sign * 100}%))`;
-      onDismiss(id);
+      onDismiss(id, "swipe");
       return;
     }
     // Glide back to rest (instant under reduced motion — the tokens collapse to 0).
@@ -441,7 +476,7 @@ function NotificationToaster({
   onExited,
 }: {
   entries: NotificationEntry[];
-  onDismiss: (id: string) => void;
+  onDismiss: (id: string, reason: NotificationDismissReason) => void;
   onExited: (id: string) => void;
 }) {
   const grouped = React.useMemo(() => {
@@ -511,14 +546,21 @@ export function NotificationProvider({
   max = 5,
   labels: labelsProp,
 }: NotificationProviderProps) {
-  const labels = React.useMemo<NotificationLabels>(
-    () => ({ ...NOTIFICATION_LABELS, ...labelsProp }),
-    [labelsProp],
-  );
+  const labels = useLabels(NOTIFICATION_LABELS, labelsProp);
   const [entries, setEntries] = React.useState<NotificationEntry[]>([]);
 
+  // The entries as of the last change, newest first: read and written synchronously, so several
+  // `notify()` / `dismiss()` calls in one event see each other before React renders.
   const entriesRef = React.useRef(entries);
-  entriesRef.current = entries;
+  const update = React.useCallback(
+    (change: (entries: NotificationEntry[]) => NotificationEntry[]) => {
+      entriesRef.current = change(entriesRef.current);
+      setEntries(entriesRef.current);
+    },
+    [],
+  );
+  /** Ids whose `onDismiss` already ran: a toast is announced once, whatever closes it next. */
+  const announcedRef = React.useRef(new Set<string>());
   const exitTimersRef = React.useRef(new Map<string, number>());
 
   React.useEffect(() => {
@@ -530,59 +572,63 @@ export function NotificationProvider({
   }, []);
 
   // Phase 2: drop the entry once its exit transition ended (or the token-based timeout fired).
-  const remove = React.useCallback((id: string) => {
-    const timer = exitTimersRef.current.get(id);
-    if (timer !== undefined) {
-      clearTimeout(timer);
-      exitTimersRef.current.delete(id);
-    }
-    setEntries((prev) => prev.filter((n) => n.id !== id));
-  }, []);
-
-  /** Calls `onDismiss` of every toast that leaves, once per toast. */
-  const announceLeave = React.useCallback((ids: Iterable<string>) => {
-    const target = new Set(ids);
-    for (const entry of entriesRef.current) {
-      if (!target.has(entry.id) || entry.dismissing) continue;
-      entry.onDismiss?.();
-    }
-  }, []);
-
-  // Phase 1: mark as dismissing so the card plays its exit; under reduced motion remove at once.
-  const startExit = React.useCallback(
-    (ids: string[]) => {
-      if (ids.length === 0) return;
-      announceLeave(ids);
+  const remove = React.useCallback(
+    (ids: readonly string[]) => {
       const target = new Set(ids);
-      if (prefersReducedMotion()) {
-        for (const id of ids) {
-          const timer = exitTimersRef.current.get(id);
-          if (timer !== undefined) clearTimeout(timer);
-          exitTimersRef.current.delete(id);
-        }
-        setEntries((prev) => prev.filter((n) => !target.has(n.id)));
-        return;
-      }
-      setEntries((prev) =>
-        prev.map((n) => (target.has(n.id) && !n.dismissing ? { ...n, dismissing: true } : n)),
-      );
-      // Exit (fade + slide off the edge, or the swipe continuing) runs on `fast`, quicker than enter.
-      const timeout = exitTimeoutMs("fast");
       for (const id of ids) {
-        if (exitTimersRef.current.has(id)) continue;
-        exitTimersRef.current.set(
-          id,
-          window.setTimeout(() => remove(id), timeout),
-        );
+        const timer = exitTimersRef.current.get(id);
+        if (timer !== undefined) clearTimeout(timer);
+        exitTimersRef.current.delete(id);
+        announcedRef.current.delete(id);
       }
+      update((list) => list.filter((n) => !target.has(n.id)));
     },
-    [remove, announceLeave],
+    [update],
   );
 
-  const dismiss = React.useCallback((id: string) => startExit([id]), [startExit]);
+  // Phase 1: announce the leave once and mark the toast dismissing, so the card plays its exit;
+  // under reduced motion it goes at once.
+  const startExit = React.useCallback(
+    (ids: readonly string[], reason: NotificationDismissReason) => {
+      const leaving = entriesRef.current.filter(
+        (n) => ids.includes(n.id) && !announcedRef.current.has(n.id),
+      );
+      if (leaving.length === 0) return;
+      for (const entry of leaving) announcedRef.current.add(entry.id);
+      const target = new Set(leaving.map((n) => n.id));
+      if (prefersReducedMotion()) {
+        remove([...target]);
+      } else {
+        update((list) => list.map((n) => (target.has(n.id) ? { ...n, dismissing: true } : n)));
+        // Exit (fade + slide off the edge, or the swipe continuing) runs on `fast`, quicker than
+        // enter.
+        const timeout = exitTimeoutMs("fast");
+        for (const id of target) {
+          exitTimersRef.current.set(
+            id,
+            window.setTimeout(() => remove([id]), timeout),
+          );
+        }
+      }
+      for (const entry of leaving) entry.onDismiss?.(reason);
+    },
+    [remove, update],
+  );
+
+  const dismiss = React.useCallback((id: string) => startExit([id], "dismiss"), [startExit]);
+  /** A toast's own way out: its close button, timer, swipe or action. */
+  const leave = React.useCallback(
+    (id: string, reason: NotificationDismissReason) => startExit([id], reason),
+    [startExit],
+  );
+  const exited = React.useCallback((id: string) => remove([id]), [remove]);
 
   const dismissAll = React.useCallback(
-    () => startExit(entriesRef.current.filter((n) => !n.dismissing).map((n) => n.id)),
+    () =>
+      startExit(
+        entriesRef.current.filter((n) => !n.dismissing).map((n) => n.id),
+        "dismiss",
+      ),
     [startExit],
   );
 
@@ -600,27 +646,18 @@ export function NotificationProvider({
         closable: options.closable ?? true,
         createdAt: Date.now(),
       };
-
-      // A full stack drops its oldest toasts: they leave too.
+      update((list) => [record, ...list]);
+      // A full stack pushes out its oldest toasts: they leave through the same exit.
       const stack = entriesRef.current.filter(
         (n) => n.position === record.position && n.tone === record.tone && !n.dismissing,
       );
-      announceLeave(stack.slice(max - 1).map((n) => n.id));
-
-      setEntries((prev) => {
-        const sameStack = prev.filter(
-          (n) => n.position === record.position && n.tone === record.tone && !n.dismissing,
-        );
-        // Other stacks and cards still playing their exit stay as they are.
-        const rest = prev.filter(
-          (n) => n.position !== record.position || n.tone !== record.tone || n.dismissing,
-        );
-        return [...rest, ...[record, ...sameStack].slice(0, max)];
-      });
-
+      startExit(
+        stack.slice(max).map((n) => n.id),
+        "overflow",
+      );
       return id;
     },
-    [position, max, announceLeave],
+    [position, max, update, startExit],
   );
 
   const publicItems = React.useMemo(() => entries.filter((n) => !n.dismissing), [entries]);
@@ -634,7 +671,7 @@ export function NotificationProvider({
     <StoreContext.Provider value={value}>
       <NotificationLabelsContext.Provider value={labels}>
         {children}
-        <NotificationToaster entries={entries} onDismiss={dismiss} onExited={remove} />
+        <NotificationToaster entries={entries} onDismiss={leave} onExited={exited} />
       </NotificationLabelsContext.Provider>
     </StoreContext.Provider>
   );

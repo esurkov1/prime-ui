@@ -3,8 +3,10 @@ import * as React from "react";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Icon, type IconName } from "@/icons";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { iconSlotClass } from "@/internal/iconBox";
 import {
   type ControlSize,
   compactTier,
@@ -62,8 +64,22 @@ export type NotificationTone = Extract<Tone, "info" | "success" | "warning" | "d
 
 export type NotificationAction = {
   label: string;
+  /** Runs the action; a toast of `notify()` then leaves with the reason `action`. */
   onClick: () => void;
 };
+
+/**
+ * Why a toast left: its timer ran out (`timeout`), the close button (`close`), a swipe (`swipe`),
+ * its action button (`action`), a `dismiss()` / `dismissAll()` call (`dismiss`), or a newer toast
+ * pushed it out of a full stack (`overflow`).
+ */
+export type NotificationDismissReason =
+  | "timeout"
+  | "close"
+  | "swipe"
+  | "action"
+  | "dismiss"
+  | "overflow";
 
 /** What a toast shows; shared by `notify()` and the static `NotificationCard`. */
 type NotificationContent = {
@@ -91,11 +107,10 @@ export type NotificationOptions = NotificationContent & {
   /** Shows the close button. Default `true`. */
   closable?: boolean;
   /**
-   * The toast left: its timer ran out, the close button, a swipe, `dismiss()`, or a newer toast
-   * pushed it out of a full stack. Called once. The place to commit an action the toast offered to
-   * undo («Удалено» with «Отменить»).
+   * The toast left, with the reason. Called once. The place to commit an action the toast offered
+   * to undo («Удалено» with «Отменить»): every reason but `action`.
    */
-  onDismiss?: () => void;
+  onDismiss?: (reason: NotificationDismissReason) => void;
 };
 
 export type NotificationRecord = NotificationOptions & {
@@ -133,6 +148,8 @@ type CardViewProps = NotificationContent &
     className?: string;
     /** Close button handler; no button without it. */
     onClose?: () => void;
+    /** Runs after the action's own `onClick`: a live toast leaves. */
+    onAction?: () => void;
     /** The auto-close countdown line; none when undefined. */
     countdown?: Countdown;
     stackDepth?: number;
@@ -150,21 +167,24 @@ function CardView({
   tone = "info",
   title,
   description,
-  size = "m",
+  size: sizeProp,
   icon,
   badge,
   action,
   className,
   onClose,
+  onAction,
   countdown,
   stackDepth = 0,
   stackExpanded = false,
   ...rest
 }: CardViewProps) {
   const labels = React.useContext(NotificationLabelsContext);
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
   const liveRole = tone === "danger" || tone === "warning" ? "alert" : "status";
 
-  return (
+  return tier.provide(
     <article
       {...rest}
       className={cx(styles.card, className)}
@@ -179,7 +199,7 @@ function CardView({
         "stack-expanded": stackExpanded,
       })}
     >
-      <div className={styles.iconWrap} aria-hidden="true">
+      <div className={cx(styles.iconWrap, iconSlotClass)} aria-hidden="true">
         {icon ?? <Icon name={TONE_ICON[tone]} />}
       </div>
       <div className={styles.content}>
@@ -198,7 +218,10 @@ function CardView({
               variant="soft"
               tone="neutral"
               size={stepDown(size)}
-              onClick={action.onClick}
+              onClick={() => {
+                action.onClick();
+                onAction?.();
+              }}
             >
               {action.label}
             </Button.Root>
@@ -235,7 +258,7 @@ function CardView({
           />
         </div>
       ) : null}
-    </article>
+    </article>,
   );
 }
 
@@ -270,7 +293,7 @@ function useDocumentHidden(): boolean {
 type ToastCardProps = {
   item: NotificationRecord;
   paused: boolean;
-  onDismiss: (id: string) => void;
+  onDismiss: (id: string, reason: NotificationDismissReason) => void;
   stackDepth: number;
   stackExpanded: boolean;
 };
@@ -291,10 +314,15 @@ export function ToastCard({ item, paused, onDismiss, stackDepth, stackExpanded }
       icon={item.icon}
       badge={item.badge}
       action={item.action}
-      onClose={item.closable ? () => onDismiss(item.id) : undefined}
+      onClose={item.closable ? () => onDismiss(item.id, "close") : undefined}
+      onAction={() => onDismiss(item.id, "action")}
       countdown={
         timed
-          ? { duration: item.duration, paused: paused || hidden, onEnd: () => onDismiss(item.id) }
+          ? {
+              duration: item.duration,
+              paused: paused || hidden,
+              onEnd: () => onDismiss(item.id, "timeout"),
+            }
           : undefined
       }
       stackDepth={stackDepth}

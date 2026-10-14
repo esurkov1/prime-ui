@@ -1,4 +1,4 @@
-/** Delete at once and offer to undo: the row leaves the list, the toast brings it back, and the deletion is sent only when the toast leaves without an undo — `onDismiss`, `action`. */
+/** Delete at once and offer to undo: the row leaves the list, the toast's action brings it back and closes it, and the deletion is sent when the toast leaves for any other reason — `onDismiss`, `action`. */
 import { Button, NotificationProvider, Typography, useNotifications } from "prime-ui-kit";
 import * as React from "react";
 
@@ -7,27 +7,19 @@ import styles from "./examples.module.css";
 const TASKS = ["Подготовить договор", "Выставить счёт №318", "Созвониться с юристом"];
 
 function TaskList() {
-  const { notify, dismiss } = useNotifications();
+  const { notify } = useNotifications();
   const [tasks, setTasks] = React.useState(TASKS);
   const [sent, setSent] = React.useState<string[]>([]);
 
   const remove = (task: string) => {
     setTasks((list) => list.filter((item) => item !== task));
-    let undone = false;
-    const id = notify({
+    notify({
       title: "Задача удалена",
       description: task,
-      action: {
-        label: "Отменить",
-        onClick: () => {
-          undone = true;
-          setTasks((list) => [...list, task]);
-          dismiss(id);
-        },
-      },
-      // The toast is gone: without an undo the deletion goes to the server now.
-      onDismiss: () => {
-        if (!undone) setSent((list) => [...list, task]);
+      action: { label: "Отменить", onClick: () => setTasks((list) => [...list, task]) },
+      // The toast left without an undo: the deletion goes to the server now.
+      onDismiss: (reason) => {
+        if (reason !== "action") setSent((list) => [...list, task]);
       },
     });
   };

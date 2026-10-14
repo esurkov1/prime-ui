@@ -41,7 +41,6 @@
   "src/components/message/Message.tsx: local promise check",
   "src/components/message/Message.tsx: local promise check #2",
   "src/components/modal/ModalDialog.tsx: root default size = \"m\"",
-  "src/components/notification/Notification.tsx: root default size = \"m\"",
   "src/components/pagination/Pagination.tsx: root default size = \"m\"",
   "src/components/popover/Popover.tsx: root default size = \"m\"",
   "src/components/progress-bar/ProgressBar.tsx: root default size = \"m\"",
