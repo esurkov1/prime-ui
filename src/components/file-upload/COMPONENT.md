@@ -60,7 +60,7 @@ FileUpload.Root                 field frame: label → trigger → files → hin
 FileUpload.Queue                the same files with no trigger of their own (a tray whose paperclip lives elsewhere)
 
 FileUpload.Item                 a file row the set does not draw (own actions, a server-side job)
-├─ FileUpload.FormatBadge       square kit Badge with the extension
+├─ FileUpload.FormatBadge       square kit Thumbnail labelled with the extension
 │  or FileUpload.ItemPreview    square kit Thumbnail of an image file
 ├─ FileUpload.ItemText          one line, truncated (the set passes the name without its extension when a format badge shows it)
 ├─ FileUpload.ItemDescription   size, progress or error
@@ -155,7 +155,7 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `tone` | `"default" \| "muted"` | `"default"` | `muted` — secondary color, regular weight (an instruction line in custom bodies). |
+| `tone` | `"default" \| "secondary"` | `"default"` | `secondary` — secondary color, regular weight (an instruction line in custom bodies). |
 | `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `children`, `className` and the other paragraph attributes. |
 
 ### FileUpload.Description
@@ -191,13 +191,13 @@ A rejection of `upload` fails the file with its message as the reason; retry que
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `children` (the item parts), `className` and the other div attributes. |
 
 ### FileUpload.FormatBadge
-`ref` → `HTMLSpanElement`. The file format as a square kit Badge of the row tier (`aria-hidden`: the row's name is trimmed of the extension and the accessible name carries it whole).
+`ref` → `HTMLDivElement`. The file format as the short label of a square kit Thumbnail of the row tier, where an image file shows its picture (`aria-hidden`: the accessible name carries the extension).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `format` | `string` | — (required) | File extension; shown upper-case, cut to 8 characters. |
-| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue of the badge. |
-| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children" \| "color">` | — | `className` and the other attributes of the badge. |
+| `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Palette hue of the tile. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "color">` | — | `className` and the other attributes of the tile. |
 
 ### FileUpload.ItemPreview
 `ref` → `HTMLDivElement`. An image file's picture in place of the format badge: a square kit Thumbnail of the row tier (`aria-hidden`: the name names the file), the image icon while it loads or if it fails.
@@ -286,7 +286,7 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `default` | primary text, medium weight | the main line of the zone | yes |
-| `muted` | secondary text, regular weight | an instruction sentence with an inline `LinkButton asChild` button | |
+| `secondary` | secondary text, regular weight | an instruction sentence with an inline `LinkButton asChild` button | |
 
 ### tone (FileUpload.ItemProgress)
 | Value | Looks like | Use when | Default |
@@ -303,6 +303,8 @@ The upload queue of FileUpload: `concurrency` files go at once through `upload`,
 | `invalid` (Item) | danger soft fill, danger ring, danger description | an upload failed | `false` |
 | `disabled` | disabled fill and text, drops ignored; the files read-only | uploading is unavailable, a published set | `false` |
 | `focusRing` | `false`: the zone and the add tile draw no focus ring; focus, keys and ARIA stay | the zone sits in a host that marks focus itself | `true` |
+| `multiple` | the picker takes several files at once | a set of files rather than one | — |
+| `required` / `optional` | red `*` / muted «необязательно» after the label | Mark the minority of the form | — |
 
 **Combinations**
 - Recommended: `variant="solid"` inside Card / Modal; `error` on Root explaining the rule; `queue` on the root with `useUploadQueue`; `trigger="tile"` + `layout="grid"` + `cover` for an image gallery; `trigger="button"` + `FileUpload.Queue layout="strip"` for a tray.
@@ -416,12 +418,12 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 | [file-cards.tsx](examples/file-cards.tsx) | Materials of a warehouse inspection as cards: photos and documents in one grid, each with its picture or format and the name with the size in megabytes as the report gives it; new files upload in their cards and the order is set by drag or Alt + arrows — `trigger`, `layout`, `defaultValue`, `queue`, `formatSize`. |
 | [attachment-tray.tsx](examples/attachment-tray.tsx) | A reply to a client with a paperclip instead of a drop zone: the icon-only picker button, and the attachments as one scrolling row of tiles above the message — `trigger`, `aria-label`, `FileUpload.Queue`, `layout`. |
 | [saving.tsx](examples/saving.tsx) | Published listing photos with no picker, every change saved on the server: a moved or removed photo waits busy, and a change the server refuses puts the set back — `FileUpload.Queue`, `onValueChange`, `value`, `cover`. |
-| [custom-body.tsx](examples/custom-body.tsx) | A custom body: a muted title with a browse link and the formats line and source buttons instead of the built-in one; the gallery button picks only images — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`, `picker`. |
+| [custom-body.tsx](examples/custom-body.tsx) | A custom body: a secondary title with a browse link and the formats line and source buttons instead of the built-in one; the gallery button picks only images — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`, `picker`. |
 | [avatar-upload.tsx](examples/avatar-upload.tsx) | A round zone around an Avatar that takes images and shows a preview; buttons open the same picker — `picker`, `accept`, `className`. |
 | [row-parts.tsx](examples/row-parts.tsx) | Rows the set does not draw, built from parts: order documents with a download button, a photo with its preview, a report still being prepared and one that failed with a retry — `FileUpload.Item`, `FileUpload.FormatBadge`, `FileUpload.ItemPreview`, `FileUpload.ItemActions`, `FileUpload.ItemProgress`, `invalid`, `tone`. |
 | [controlled.tsx](examples/controlled.tsx) | Documents of a deal in one list: the files already on the server and new uploads after them, saved on every change, and a button brings back the saved set — `value`, `onValueChange`, `queue`. |
 | [in-form.tsx](examples/in-form.tsx) | A contract upload form: submit checks the required scan, its error shakes in and leaves once a file is picked or removed — `required`, `error`, `name`, `value`. |
-| [narrow.tsx](examples/narrow.tsx) | In a phone-width column the zone text wraps, a long file name truncates, and a gallery goes three across and then two, the cover keeping two columns and the remove buttons shown without hover. |
+| [narrow.tsx](examples/narrow.tsx) | In a phone-width column the zone text wraps, a long file name truncates, and a gallery goes three across and then two, the cover keeping two columns and the remove buttons shown without hover — `layout`, `cover`. |
 | [screen.tsx](examples/screen.tsx) | A media library of a catalog object as a work screen: the title, the object and a PageToolbar with sections, search, order and upload in the app header; uploads in FileUpload tiles through a queue; a grid of Thumbnails that open MediaViewer out of the tile or are picked for bulk download and delete; a Skeleton first load and a filtered empty state in a Crossfade — `trigger`, `layout`. |
 
 ## Mistakes
@@ -444,5 +446,5 @@ Also `data-size`, `data-variant` on the zone, `data-size` on Item, `data-status`
 - Styling a tile from an ancestor (`.gallery li`) → the carried clone is portalled to `<body>` and loses it.
 
 ## Related
-- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [LinkButton](../link-button/COMPONENT.md) (a row's name with `href`), [Button](../button/COMPONENT.md) (browse button, `trigger="button"`, row and tile actions, the tile's upload disk `shape="circle"` `variant="shade"`), [Badge](../badge/COMPONENT.md) (`FormatBadge`), [Thumbnail](../thumbnail/COMPONENT.md) (`ItemPreview`, video tiles), [ProgressBar](../progress-bar/COMPONENT.md) (`ItemProgress`), [Dnd](../dnd/COMPONENT.md) and [ScrollContainer](../scroll-container/COMPONENT.md) (tiles), the shared attachment tile (`src/internal/attachmentTile`) and transfer disk (`src/internal/transferDisk`), `Icon`; the files of `queue` come from `useUploadQueue`, [VisuallyHidden](../visually-hidden/COMPONENT.md)
+- **Built from:** [Label](../label/COMPONENT.md) (`label`), [Hint](../hint/COMPONENT.md) (`hint`, `error`, `Description`), [LinkButton](../link-button/COMPONENT.md) (a row's name with `href`), [Button](../button/COMPONENT.md) (browse button, `trigger="button"`, row and tile actions, the tile's upload disk `shape="circle"` `variant="shade"`), [Badge](../badge/COMPONENT.md) (the cover pill), [Thumbnail](../thumbnail/COMPONENT.md) (`FormatBadge`, `ItemPreview`, video tiles), [ProgressBar](../progress-bar/COMPONENT.md) (`ItemProgress`), [Dnd](../dnd/COMPONENT.md) and [ScrollContainer](../scroll-container/COMPONENT.md) (tiles), the shared attachment tile (`src/internal/attachmentTile`) and transfer disk (`src/internal/transferDisk`, a [Spinner](../spinner/COMPONENT.md) while a transfer waits), `Icon`; the files of `queue` come from `useUploadQueue`, [VisuallyHidden](../visually-hidden/COMPONENT.md)
 - **See also:** [Composer](../composer/COMPONENT.md) (its attachment tray is `FileUpload.Queue layout="strip"`), [LinkButton](../link-button/COMPONENT.md) (an inline browse link in a custom body), [Avatar](../avatar/COMPONENT.md), [Thumbnail](../thumbnail/COMPONENT.md), [EmptyPage](../empty-page/COMPONENT.md)

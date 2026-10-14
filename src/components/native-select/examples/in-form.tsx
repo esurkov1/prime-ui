@@ -1,5 +1,5 @@
 /** A delivery form for phones: the native value goes into FormData, the required city is checked on submit, the error shakes the field and leaves once a city is picked, a calm note confirms the order — `name`, `required`, `error`. */
-import { Button, NativeSelect, Typography } from "prime-ui-kit";
+import { Button, Fieldset, NativeSelect, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -17,34 +17,33 @@ export default function NativeSelectInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <Typography as="h3" variant="title-m">
-        Доставка
-      </Typography>
-      <NativeSelect
-        name="city"
-        label="Город"
-        required
-        error={error}
-        placeholder="Выберите город"
-        onValueChange={() => {
-          setError(undefined);
-          setSaved(false);
-        }}
-      >
-        <option value="msk">Москва</option>
-        <option value="spb">Санкт-Петербург</option>
-        <option value="kzn">Казань</option>
-      </NativeSelect>
-      <NativeSelect
-        name="slot"
-        label="Время"
-        defaultValue="day"
-        onValueChange={() => setSaved(false)}
-      >
-        <option value="morning">09:00–12:00</option>
-        <option value="day">12:00–18:00</option>
-        <option value="evening">18:00–21:00</option>
-      </NativeSelect>
+      <Fieldset label="Доставка">
+        <NativeSelect
+          name="city"
+          label="Город"
+          required
+          error={error}
+          placeholder="Выберите город"
+          onValueChange={() => {
+            setError(undefined);
+            setSaved(false);
+          }}
+        >
+          <option value="msk">Москва</option>
+          <option value="spb">Санкт-Петербург</option>
+          <option value="kzn">Казань</option>
+        </NativeSelect>
+        <NativeSelect
+          name="slot"
+          label="Время"
+          defaultValue="day"
+          onValueChange={() => setSaved(false)}
+        >
+          <option value="morning">09:00–12:00</option>
+          <option value="day">12:00–18:00</option>
+          <option value="evening">18:00–21:00</option>
+        </NativeSelect>
+      </Fieldset>
       <div className={styles.actions}>
         {saved ? (
           <Typography as="p" variant="body-s" tone="secondary">

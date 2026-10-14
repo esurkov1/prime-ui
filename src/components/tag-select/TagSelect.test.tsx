@@ -47,7 +47,9 @@ describe("TagSelect", () => {
     render(<BasicTagSelect creatable onCreate={onCreate} />);
     const input = screen.getByRole("combobox");
     await user.click(input);
-    await user.keyboard("Новый тег");
+    await user.keyboard("Новый");
+    await user.keyboard(" ");
+    await user.keyboard("тег");
     expect(input).toHaveValue("Новый тег");
     await user.keyboard("{Enter}");
     expect(onCreate).toHaveBeenCalledWith("Новый тег");

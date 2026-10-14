@@ -18,7 +18,7 @@ import {
   type AttachmentTileKind,
   attachmentTileStyles as tileStyles,
 } from "@/internal/attachmentTile";
-import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
+import { ControlSizeProvider, useControlSize, useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
@@ -30,6 +30,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { extensionOf, formatColor } from "@/internal/fileFormat";
 import { splitFileName } from "@/internal/fileName";
 import { formatFileSize } from "@/internal/fileSize";
@@ -40,6 +41,8 @@ import { MorphText } from "@/internal/MorphText";
 import { mediaKind } from "@/internal/mediaKind";
 import { RollingNumber } from "@/internal/RollingNumber";
 import type { ControlSize, PaletteColor, TextTone, Tone } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
+import textTone from "@/internal/textTone.module.css";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
 
 import styles from "./FileUpload.module.css";
@@ -199,15 +202,14 @@ function FileUploadIcon({ className, ...rest }: FileUploadIconProps) {
 FileUploadIcon.displayName = "FileUpload.Icon";
 
 export type FileUploadTitleProps = ParagraphProps & {
-  /** `muted` — secondary color, regular weight (an instruction line in custom bodies). */
-  tone?: Extract<TextTone, "default" | "muted">;
+  tone?: Extract<TextTone, "default" | "secondary">;
 };
 
 function FileUploadTitle({ className, tone = "default", ...rest }: FileUploadTitleProps) {
   return (
     <p
-      className={cx(styles.title, className)}
-      data-tone={tone === "muted" ? tone : undefined}
+      className={cx(textTone.tone, styles.title, className)}
+      data-tone={tone === "default" ? undefined : tone}
       {...rest}
     />
   );
@@ -225,9 +227,7 @@ FileUploadDescription.displayName = "FileUpload.Description";
 // ─── File row ────────────────────────────────────────────────────────────────
 
 export type FileUploadItemProps = DivProps & {
-  /** Failed upload: danger wash and ring, danger description. */
   invalid?: boolean;
-  /** Typography, spacing and the format badge follow the control tier (default: the host tier, else `m`). */
   size?: ControlSize;
 };
 
@@ -238,40 +238,47 @@ function FileUploadItem({
   size: sizeProp,
   ...rest
 }: FileUploadItemProps) {
-  const size = useControlSize(sizeProp);
-  return (
-    <ControlSizeProvider value={size}>
-      <div
-        className={cx(styles.item, className)}
-        {...toDataAttributes({ size, invalid: invalid || undefined })}
-        {...rest}
-      />
-    </ControlSizeProvider>
+  const tier = useHostTier(sizeProp);
+  return tier.provide(
+    <div
+      className={cx(fieldTierClass, styles.item, className)}
+      {...toDataAttributes({ size: tier.size, invalid: invalid || undefined })}
+      {...rest}
+    />,
   );
 }
 FileUploadItem.displayName = "FileUpload.Item";
 
 export type FileUploadFormatBadgeProps = Omit<
-  React.HTMLAttributes<HTMLSpanElement>,
+  React.HTMLAttributes<HTMLDivElement>,
   "children" | "color"
 > & {
-  /** File extension; shown upper-case, cut to 8 characters. */
   format: string;
   color?: PaletteColor;
-  ref?: React.Ref<HTMLSpanElement>;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The file format as a square kit Badge (decorative: the name already carries the extension). */
+/**
+ * The file format as the short label of a square kit Thumbnail of the row tier, the box an image
+ * file's picture takes (decorative: the name already carries the extension).
+ */
 function FileUploadFormatBadge({
   format,
   color = "gray",
   className,
   ...rest
 }: FileUploadFormatBadgeProps) {
+  const size = useControlSize(undefined);
   return (
-    <Badge.Root {...rest} color={color} className={cx(styles.formatBadge, className)} aria-hidden>
-      {format.trim().slice(0, 8).toUpperCase()}
-    </Badge.Root>
+    <Thumbnail.Root
+      {...rest}
+      size={size}
+      color={color}
+      className={cx(styles.formatBadge, className)}
+      aria-hidden="true"
+    >
+      <Thumbnail.Fallback>{format.trim().slice(0, 8).toUpperCase()}</Thumbnail.Fallback>
+    </Thumbnail.Root>
   );
 }
 FileUploadFormatBadge.displayName = "FileUpload.FormatBadge";
@@ -280,7 +287,6 @@ export type FileUploadItemPreviewProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "color"
 > & {
-  /** The picture: a URL, or the local preview of a file being uploaded. */
   src: string;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -333,9 +339,7 @@ FileUploadItemActions.displayName = "FileUpload.ItemActions";
 export type FileUploadItemProgressProps = Omit<DivProps, "children"> & {
   value: number;
   max?: number;
-  /** Fill color: `success` for a finished file, `danger` where a failed one stopped. Default `accent`. */
   tone?: Tone;
-  /** Accessible name of the bar; name the file. Default `FILE_UPLOAD_LABELS.upload`. */
   "aria-label"?: string;
 };
 
@@ -368,29 +372,13 @@ export type FileUploadQueueSource = Pick<UploadQueue, "items" | "retry" | "remov
 
 /** The props of the set itself, shared by `FileUpload.Root` and `FileUpload.Queue`. */
 type FileSetProps = {
-  /** Files in their order (controlled): on the server, or uploads of `queue` by their ids. */
   value?: readonly FileUploadFile[];
-  /** Initial files (uncontrolled). */
   defaultValue?: readonly FileUploadFile[];
-  /**
-   * The set changed: reordered, a file removed, files added to `queue`. Return
-   * the save's promise: the files it touches wait busy; a move or new files stand in
-   * their new places meanwhile, a removed file stays until the answer. Resolve — the change stands
-   * (a controlled owner applies `value` before resolving); reject — the set goes back (new files
-   * leave the queue) and `labels.changeFailed` is announced.
-   */
   onValueChange?: (value: readonly FileUploadFile[]) => void | Promise<void>;
-  /** The uploads: `useUploadQueue(…)`. Its files that are not in `value` follow it in its order. */
   queue?: FileUploadQueueSource;
   layout?: FileUploadLayout;
-  /**
-   * Tiles (`grid`, `strip`): the first file is the cover — «Обложка» in place of its format pill,
-   * two by two in a grid. A file reordered first becomes the cover, and that is announced.
-   */
   cover?: boolean;
-  /** Display of a file size. Default: Russian digits with Б · КБ · МБ · ГБ. */
   formatSize?: (bytes: number) => string;
-  /** Read-only set: no add tile, no reorder, no remove. */
   disabled?: boolean;
   labels?: Partial<FileUploadLabels>;
 };
@@ -768,7 +756,13 @@ function FileSetView({
     return (
       <>
         {files.length > 0 || addTile ? (
-          <ul {...listProps} ref={setListRef} className={cx(styles.queue, listProps.className)}>
+          <ul
+            // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+            role="list"
+            {...listProps}
+            ref={setListRef}
+            className={cx(styles.queue, listProps.className)}
+          >
             {files.map((file) => (
               <FileRow
                 key={file.id}
@@ -792,8 +786,10 @@ function FileSetView({
 
   const list = (
     <Dnd.Sortable
-      {...(listProps as React.HTMLAttributes<HTMLElement>)}
-      ref={setListRef as React.Ref<HTMLElement>}
+      // `list-style: none` drops the list semantics in WebKit; the role keeps them.
+      role="list"
+      {...listProps}
+      ref={setListRef}
       as="ul"
       axis={strip ? "x" : "grid"}
       kind={kindId}
@@ -834,7 +830,10 @@ function FileSetView({
                   </span>
                 )
               ) : kind === "file" ? (
-                <FileUploadFormatBadge format={format || "—"} color={formatColor(format)} />
+                // Decorative: the tile's name carries the extension.
+                <Badge.Root color={formatColor(format)} aria-hidden="true">
+                  {(format || "—").slice(0, 8).toUpperCase()}
+                </Badge.Root>
               ) : format ? (
                 format.toUpperCase()
               ) : undefined
@@ -1073,27 +1072,17 @@ export type FileUploadRootProps = FieldRootDomProps &
   FieldFrameProps &
   FieldFocusRingProps &
   FileSetProps & {
-    /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;
     trigger?: FileUploadTrigger;
     variant?: FileUploadVariant;
     picker?: React.Ref<FileUploadPicker>;
     accept?: string;
     multiple?: boolean;
-    /** Most files in the set: the add tile counts them; files past it are not taken. */
     max?: number;
-    /** Invalid state: danger line and `aria-invalid`. A non-empty `error` implies it. */
     invalid?: boolean;
-    /** Name of the file input inside a form. */
     name?: string;
-    /** Files picked or dropped (of `accept`, cut to `max`). Not called with `queue.add`: they go there. */
     onFilesChange?: (files: File[]) => void;
-    /** Id of the file input; generated when omitted. */
     id?: string;
-    /**
-     * A zone: a custom body (`FileUpload.Body`) instead of the built-in one. `trigger="button"`:
-     * the button's content (`Button.Icon` and text; an icon alone makes it icon-only).
-     */
     children?: React.ReactNode;
   };
 
@@ -1149,7 +1138,8 @@ function FileUploadField({
   children,
   ...rest
 }: FileUploadRootProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
   const labels = useLabels(FILE_UPLOAD_LABELS, labelsProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid });
@@ -1280,7 +1270,7 @@ function FileUploadField({
     control = (
       // biome-ignore lint/a11y/noLabelWithoutControl: the file input (`input`) is its first child
       <label
-        className={styles.root}
+        className={cx(fieldTierClass, styles.root)}
         {...toDataAttributes({
           size,
           variant,
@@ -1290,25 +1280,23 @@ function FileUploadField({
         })}
       >
         {input}
-        <ControlSizeProvider value={size}>
-          {children ?? (
-            <FileUploadBody>
-              <FileUploadIcon>
-                <Icon name="action.upload" size={size} tone="secondary" />
-              </FileUploadIcon>
-              <div className={styles.copy}>
-                <FileUploadTitle>{labels.title}</FileUploadTitle>
-                {labels.description ? (
-                  <FileUploadDescription>{labels.description}</FileUploadDescription>
-                ) : null}
-              </div>
-              {/* Decorative: the whole zone is the target, so the «button» is a styled span. */}
-              <Button.Root asChild variant="soft" tone="neutral" size={size} disabled={disabled}>
-                <span>{labels.browse}</span>
-              </Button.Root>
-            </FileUploadBody>
-          )}
-        </ControlSizeProvider>
+        {children ?? (
+          <FileUploadBody>
+            <FileUploadIcon>
+              <Icon name="action.upload" size={size} tone="secondary" />
+            </FileUploadIcon>
+            <div className={styles.copy}>
+              <FileUploadTitle>{labels.title}</FileUploadTitle>
+              {labels.description ? (
+                <FileUploadDescription>{labels.description}</FileUploadDescription>
+              ) : null}
+            </div>
+            {/* Decorative: the whole zone is the target, so the «button» is a styled span. */}
+            <Button.Root asChild variant="soft" tone="neutral" size={size} disabled={disabled}>
+              <span>{labels.browse}</span>
+            </Button.Root>
+          </FileUploadBody>
+        )}
       </label>
     );
   }
@@ -1321,18 +1309,20 @@ function FileUploadField({
         {/* biome-ignore lint/a11y/noLabelWithoutControl: the file input (`input`) is its first child */}
         <label className={styles.addTarget}>
           {input}
-          <span className={styles.addIcon} aria-hidden="true">
+          <span className={cx(fieldTierClass, styles.addIcon)} data-size="xs" aria-hidden="true">
             <Icon name="action.add" />
           </span>
-          <span className={styles.addText}>
+          <span className={cx(textRole.caption, styles.addText)}>
             <MorphText>{full ? labels.full : empty ? labels.empty : labels.add}</MorphText>
           </span>
           {countText !== null ? (
-            <span className={styles.addHint}>
+            <span className={cx(textRole.caption, styles.addHint)}>
               <RollingNumber>{countText}</RollingNumber>
             </span>
           ) : empty ? (
-            <span className={cx(styles.addHint, enterMotion.enter)}>{labels.emptyHint}</span>
+            <span className={cx(textRole.caption, styles.addHint, enterMotion.enter)}>
+              {labels.emptyHint}
+            </span>
           ) : null}
         </label>
       </li>
@@ -1367,7 +1357,7 @@ function FileUploadField({
         },
       };
 
-  return (
+  return tier.provide(
     <FieldFrame
       {...rest}
       size={size}
@@ -1393,25 +1383,23 @@ function FileUploadField({
       >
         {control}
         {hasSet ? (
-          <ControlSizeProvider value={size}>
-            <FileSetView
-              set={set}
-              layout={layout}
-              cover={cover}
-              disabled={disabled}
-              formatSize={formatSize}
-              labels={labels}
-              addTile={addTile}
-              listProps={{
-                "aria-label": ids.labelledBy ? undefined : ariaLabel,
-                "aria-labelledby": ids.labelledBy,
-                "aria-describedby": tile ? ids.describedBy : undefined,
-              }}
-            />
-          </ControlSizeProvider>
+          <FileSetView
+            set={set}
+            layout={layout}
+            cover={cover}
+            disabled={disabled}
+            formatSize={formatSize}
+            labels={labels}
+            addTile={addTile}
+            listProps={{
+              "aria-label": ids.labelledBy ? undefined : ariaLabel,
+              "aria-labelledby": ids.labelledBy,
+              "aria-describedby": tile ? ids.describedBy : undefined,
+            }}
+          />
         ) : null}
       </div>
-    </FieldFrame>
+    </FieldFrame>,
   );
 }
 

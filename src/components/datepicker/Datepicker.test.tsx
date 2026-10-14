@@ -169,6 +169,41 @@ describe("Datepicker.Panel", () => {
   });
 });
 
+describe("Datepicker keyboard", () => {
+  const day = (name: string) => screen.getByRole("button", { name });
+
+  it("↑ · ↓ walk weeks, Home · End the week, PageUp the month", async () => {
+    const user = userEvent.setup();
+    render(<Datepicker.Panel mode="single" value={null} onValueChange={() => {}} today={TODAY} />);
+    act(() => day("7 октября 2026").focus());
+    await user.keyboard("{ArrowDown}");
+    expect(day("14 октября 2026")).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(day("7 октября 2026")).toHaveFocus();
+    await user.keyboard("{Home}");
+    expect(day("5 октября 2026")).toHaveFocus();
+    await user.keyboard("{End}");
+    expect(day("11 октября 2026")).toHaveFocus();
+    await user.keyboard("{PageUp}");
+    expect(day("11 сентября 2026")).toHaveFocus();
+    expect(screen.getByRole("table", { name: "Сентябрь 2026" })).toBeInTheDocument();
+  });
+
+  it("Enter on the field opens the calendar; Space on a day picks it", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Datepicker.Root mode="single" label="Срок" today={TODAY} onValueChange={onValueChange} />,
+    );
+    act(() => screen.getByRole("button", { name: /Срок/ }).focus());
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    act(() => day("9 октября 2026").focus());
+    await user.keyboard(" ");
+    expect(onValueChange.mock.calls[0][0]).toEqual(new Date(2026, 9, 9));
+  });
+});
+
 describe("Datepicker.Panel — keys outside the days", () => {
   it("an arrow on a month button stays the button's: the grid walks only from a day", () => {
     render(<Datepicker.Panel mode="single" value={null} onValueChange={() => {}} today={TODAY} />);
@@ -283,11 +318,10 @@ describe("Datepicker.Panel — value and draft", () => {
 });
 
 describe("Datepicker.Panel — сегодня", () => {
-  it("сегодня помечен aria-current=date и data-today, другие дни — нет", () => {
+  it("сегодня помечен aria-current=date, другие дни — нет", () => {
     render(<Datepicker.Panel mode="single" today={TODAY} />);
     const today = screen.getByRole("button", { name: "7 октября 2026" });
     expect(today).toHaveAttribute("aria-current", "date");
-    expect(today).toHaveAttribute("data-today", "true");
     expect(screen.getByRole("button", { name: "8 октября 2026" })).not.toHaveAttribute(
       "aria-current",
     );

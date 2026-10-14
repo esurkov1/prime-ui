@@ -3,7 +3,5 @@
   "src/components/field-list/FieldList.module.css: --fl-end is never read",
   "src/components/field-list/FieldList.module.css: --fl-lead is never read",
   "src/components/field-list/FieldList.module.css: --fl-m is never read",
-  "src/components/field-list/FieldList.module.css: --fl-s is never read",
-  "src/components/select/Select.module.css: * 1 factor in margin",
-  "src/components/select/Select.module.css: * 1 factor in margin #2"
+  "src/components/field-list/FieldList.module.css: --fl-s is never read"
 ]

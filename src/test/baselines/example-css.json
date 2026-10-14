@@ -34,7 +34,6 @@
   "src/components/dnd/examples/examples.module.css: text-align #3",
   "src/components/dnd/examples/examples.module.css: text-align #4",
   "src/components/empty-page/examples/examples.module.css: list-style",
-  "src/components/file-upload/examples/screen.module.css: list-style",
   "src/components/page-content/examples/examples.module.css: background",
   "src/components/page-content/examples/examples.module.css: background #2",
   "src/components/page-content/examples/examples.module.css: border-radius",

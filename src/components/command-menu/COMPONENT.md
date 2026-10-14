@@ -105,7 +105,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | — (required) | Text matched against the query together with `keywords`. |
+| `value` | `string` | — (required) | Text matched against the query together with `keywords`. With `""` the item shows only while the query is empty or `keywords` match. |
 | `keywords` | `string` | — | Extra words for the query (synonyms, English names). |
 | `onSelect` | `() => void` | — | Runs the command: a click, or Enter while the item is active. |
 | `disabled` | `boolean` | `false` | Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, does not run. |
@@ -173,11 +173,11 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `disabled` (Item) | muted row, `aria-disabled`, skipped by the arrows | The command is unavailable right now | `false` |
-| `filter={false}` | every item shows whatever the query; the query is still marked in the labels | The owner searches on the server (`search`, `onSearchChange`) | `true` |
+| `filter` | items filter by the query; off, every item shows whatever the query and the query is still marked in the labels | Off when the owner searches on the server (`search`, `onSearchChange`) | `true` |
 | `loading` | skeleton rows in the item geometry while no item is on screen; items on screen stay | Results load asynchronously | `false` |
 | `loadingMore` | skeleton rows after the items | The next page is loading (`hasMore` + `onLoadMore`) | `false` |
-| `closeOnOutsideClick={false}` | the scrim does not close it | A required pick | |
-| `closeOnEscape={false}` | Escape does nothing | A required pick that must not be skipped | |
+| `closeOnOutsideClick` | a click on the scrim closes it; off, the scrim does not | Off for a required pick | `true` |
+| `closeOnEscape` | Escape closes it; off, Escape does nothing | Off for a required pick that must not be skipped | `true` |
 
 **Combinations** — one palette per app; open it with ⌘K / Ctrl+K and a visible button. Add a Footer with key hints when keyboard use is not obvious. A server search: `search` / `onSearchChange` + `filter={false}` + `loading`; paging adds `hasMore`, `loadingMore`, `onLoadMore`; a failed request `loadError` + `onRetry`. Creating from the query is ONE `persistent` `CommandMenu.Item` at the end of the List («Создать клиента «{query}»», rendered while the query is not empty): it stays when a namesake matches (the query may be a new client of the same name), it never counts as a match, and the arrows reach it after the matches; while nothing matches it is the active item, so Enter runs it. `CommandMenu.Empty` then holds only the text — never put the action in both places.
 
@@ -246,7 +246,7 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | [overview.tsx](examples/overview.tsx) | A button or ⌘K opens the palette: the query filters the groups by value and keywords, Enter runs the active command — `CommandMenu.Item`, `keywords`. |
 | [structure.tsx](examples/structure.tsx) | Optional parts: a visible title and description, a description line and a key hint in items, and a footer with key hints — `CommandMenu.Title`, `CommandMenu.ItemText`, `CommandMenu.ItemShortcut`, `CommandMenu.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: rows, text, icons and the search row follow it; match the density of the app — `size`. |
-| [states.tsx](examples/states.tsx) | A disabled item stays visible but muted and is skipped by the arrows, and an empty result speaks in the words of the task — `disabled`, `labels`. |
+| [states.tsx](examples/states.tsx) | The palette while its first results load, with a disabled item that stays muted and is skipped by the arrows, and with an empty result in the words of the task — `loading`, `disabled`, `labels`. |
 | [server-search.tsx](examples/server-search.tsx) | Orders searched on the server: the parent loads results for the query and the next page at the end of the list; one persistent item at the end creates an order from the query, found or not — `search`, `onSearchChange`, `filter`, `loading`, `hasMore`, `loadingMore`, `onLoadMore`, `persistent`. |
 | [load-error.tsx](examples/load-error.tsx) | The results failed to load: the palette says so instead of the list, and a retry asks again with the button loading until the server answers; the first retry fails too, the second brings the results — `loadError`, `onRetry`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A required pick during an import: a stray click on the scrim does not close the palette, only Escape or a choice — `closeOnOutsideClick`, `closeOnEscape`. |

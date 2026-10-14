@@ -103,7 +103,9 @@
 
 /*
  * Clear: a full-height segment before the chevron, with the trigger's usual gap on both sides, so
- * its hover wash touches neither the value nor the chevron.
+ * its hover wash touches neither the value nor the chevron. Not the field action segment
+ * (`FieldActionButton`): that is a `<button>` flush with the field's end, and this one sits inside
+ * the trigger `<button>`, before the chevron.
  */
 .clear {
   align-self: stretch;
@@ -175,6 +177,13 @@
 }
 
 /* ─── Option ─────────────────────────────────────────────────────────────── */
+
+/* With `menu.item` (TSX): the row's fades; a rich row also glides into its selected fill. */
+.item {
+  transition:
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
+}
 
 .item[data-selected="true"] {
   font-weight: var(--prime-font-weight-medium);

@@ -75,7 +75,7 @@ One look, the Select trigger's: field fill, inset control border, tier radius; t
 | `optional` | muted «необязательно» | Most fields are required | |
 | `invalid` / `error` | danger inset ring (+ the message) | Validation failed | |
 | `disabled` | disabled fill and text | Not editable now | `false` |
-| `focusRing={false}` | no focus ring | Focus is obvious otherwise | `true` |
+| `focusRing` | `false`: no focus ring | Focus is obvious otherwise | `true` |
 
 ## States
 | State | Driven by | DOM |

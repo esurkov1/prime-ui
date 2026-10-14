@@ -613,6 +613,17 @@ describe("Select (search, clear, loading, empty)", () => {
     expect(trigger).toHaveTextContent("Город");
   });
 
+  it("clearable: Backspace on the trigger clears the value", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<SearchSelect onValueChange={onChange} />);
+    const trigger = screen.getByRole("combobox");
+    trigger.focus();
+    await user.keyboard("{Backspace}");
+    expect(onChange).toHaveBeenCalledWith("");
+    expect(trigger).toHaveTextContent("Город");
+  });
+
   it("controlled open: onOpenChange reports the trigger toggle", () => {
     const onOpenChange = vi.fn();
     const { rerender } = render(
@@ -1215,6 +1226,26 @@ describe("Select rich options", () => {
 });
 
 describe("Select typeahead", () => {
+  it("a Cyrillic letter typed in the open list highlights the option it starts", async () => {
+    const user = userEvent.setup();
+    render(
+      <Select.Root placeholder="Город">
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="msk">Москва</Select.Item>
+          <Select.Item value="smr">Самара</Select.Item>
+          <Select.Item value="tvr">Тверь</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+    await user.click(screen.getByRole("combobox"));
+    await user.keyboard("т");
+    const highlighted = screen.getAllByRole("option").find((o) => o.dataset.highlighted === "true");
+    expect(highlighted?.dataset.value).toBe("tvr");
+  });
+
   it("a letter highlights the next option whose title starts with it; repeats cycle", () => {
     render(<RichSelect />);
     fireEvent.click(screen.getByRole("combobox"));

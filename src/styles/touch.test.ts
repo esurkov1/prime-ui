@@ -122,16 +122,11 @@ describe("touch and input", () => {
     ]) {
       expect(read(file), file).toMatch(/touchTarget(Block)?Class/);
     }
-    // Dense grids grow the cell itself: an invisible hit area would cover the neighbours.
+    // Dense grids grow the cell itself: an invisible hit area would cover the neighbours. A
+    // Datepicker day is the menu row (`menu.tier` on the panel), which grows on touch (above).
     expect(
-      cssRules("src/components/datepicker/Datepicker.module.css").some((rule) =>
-        rule.decls.some(
-          ({ prop, value }) =>
-            prop === "--dp-cell" &&
-            value === "max(var(--dp-cell-tier), var(--prime-control-touch-target))",
-        ),
-      ),
-    ).toBe(true);
+      cssValue(cssRule("src/components/datepicker/Datepicker.module.css", ".panel"), "--dp-cell"),
+    ).toBe("var(--menu-item-h)");
     // The swatch donor grows every swatch grid (ColorSwatches, ColorPresets) on both bases.
     for (const selector of [".tier", '.tier[data-base="item"]']) {
       expect(decl("src/internal/swatch.module.css", selector, "--swatch-base"), selector).toMatch(

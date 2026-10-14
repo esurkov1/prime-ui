@@ -38,6 +38,7 @@ import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 import { isPromiseLike, usePendingChanges, usePendingKeys } from "@/internal/usePendingChanges";
 
 import { TagOptionMenu } from "./TagOptionMenu";
@@ -148,7 +149,6 @@ function canCreate(
 export type TagSelectProps = FieldRootDomProps &
   FieldFrameProps &
   FieldFocusRingProps & {
-    /** Available tags: value, label and chip color. */
     options: TagSelectOption[];
     value?: string[];
     defaultValue?: string[];
@@ -158,35 +158,16 @@ export type TagSelectProps = FieldRootDomProps &
     onOpenChange?: (open: boolean) => void;
     closeOnEscape?: boolean;
     closeOnOutsideClick?: boolean;
-    /** Allow adding a value that is not in `options`. */
     creatable?: boolean;
-    /**
-     * A new value was created (Create row or Enter), not picked from `options`. Return the save's
-     * promise: the new chip waits busy until it settles; reject — it leaves the selection and
-     * `labels.createFailed` is announced.
-     */
     onCreate?: (value: string) => void | Promise<void>;
     fallbackColor?: PaletteColor;
-    /**
-     * Enables the «⋯» row menu: tag name and color. `value` never changes. Return the save's
-     * promise: the new name or color shows at once and «⋯» spins until it settles; reject — the
-     * option goes back and `labels.updateFailed` is announced.
-     */
     onOptionUpdate?: (value: string, updates: TagSelectOptionUpdate) => void | Promise<void>;
-    /**
-     * Enables «Удалить» in the row menu; the value is also removed from the selection. A returned
-     * Promise holds the row pending (spinner on «⋯») and changes nothing until it resolves; a
-     * rejection keeps the option and the selection (the owner shows why).
-     */
     onOptionDelete?: (value: string) => void | Promise<void>;
     disabled?: boolean;
-    /** Form field name: one hidden input per selected value. */
     name?: string;
     placeholder?: string;
-    /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
     invalid?: boolean;
     size?: ControlSize;
-    /** Id of the text input; generated when omitted. */
     id?: string;
     labels?: Partial<TagSelectLabels>;
     className?: string;
@@ -827,7 +808,9 @@ export function TagSelect({
         ref={scrollerRef}
         className={cx(menu.tier, menu.menu, styles.panel)}
       >
-        {labels.panelHint ? <div className={styles.panelHint}>{labels.panelHint}</div> : null}
+        {labels.panelHint ? (
+          <div className={cx(textRole.caption, styles.panelHint)}>{labels.panelHint}</div>
+        ) : null}
         {showCreate ? (
           <OptionRow
             id={optionDomId(listboxId, CREATE_VALUE)}

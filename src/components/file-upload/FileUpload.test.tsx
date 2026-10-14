@@ -1,4 +1,5 @@
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -251,7 +252,7 @@ describe("FileUpload", () => {
     expect(screen.getAllByRole("link")).toHaveLength(1);
   });
 
-  it("renders file item row with a decorative kit Badge and a progress bar", () => {
+  it("renders file item row with a decorative format tile and a progress bar", () => {
     render(
       <FileUpload.Item>
         <FileUpload.FormatBadge format="pdf" color="red" />
@@ -261,7 +262,7 @@ describe("FileUpload", () => {
       </FileUpload.Item>,
     );
 
-    const badge = screen.getByText("PDF");
+    const badge = screen.getByText("PDF").closest("[data-color]");
     expect(badge).toHaveAttribute("data-color", "red");
     expect(badge).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByText("report.pdf")).toBeInTheDocument();
@@ -462,7 +463,7 @@ describe("FileUpload.Queue, a queue only", () => {
     );
     const list = screen.getByRole("list", { name: "Вложения" });
     expect(list.children).toHaveLength(2);
-    expect(screen.getByText("PDF")).toHaveAttribute("data-color", "red");
+    expect(screen.getByText("PDF").closest("[data-color]")).toHaveAttribute("data-color", "red");
     expect(screen.getByText("2 КБ · Загрузка 40%")).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "Загрузка: Отчёт.pdf" })).toHaveAttribute(
       "value",
@@ -1150,5 +1151,80 @@ describe("async onValueChange", () => {
       save.resolve();
     });
     expect(screen.queryByRole("listitem")).toBeNull();
+  });
+});
+
+describe("FileUpload keyboard", () => {
+  it("Tab reaches the file input of a zone, and every file of a set", async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<FileUpload.Root label="Договор" />);
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByLabelText("Договор"));
+    unmount();
+    render(<Photos />);
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByRole("listitem", { name: "Фото 1: Спереди" }));
+    await user.tab();
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByRole("listitem", { name: "Фото 2: Сбоку" }));
+  });
+
+  it("Enter and Space on the focused input open the system dialog", async () => {
+    const user = userEvent.setup();
+    render(<FileUpload.Root label="Договор" />);
+    const input = screen.getByLabelText("Договор");
+    const opened = vi.fn();
+    input.addEventListener("click", opened);
+    await user.tab();
+    expect(document.activeElement).toBe(input);
+    await user.keyboard("{Enter}");
+    await user.keyboard(" ");
+    expect(opened).toHaveBeenCalledTimes(2);
+  });
+
+  it("Backspace on a tile removes the file and focuses its neighbour", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<Photos onValueChange={onValueChange} />);
+    act(() => screen.getByRole("listitem", { name: "Фото 2: Сбоку" }).focus());
+    await user.keyboard("{Backspace}");
+    expect(onValueChange).toHaveBeenCalledWith([PHOTOS[0], PHOTOS[2]]);
+    expect(tiles()).toEqual(["Фото 1: Спереди", "Фото 2: Сзади"]);
+    expect(document.activeElement).toHaveAttribute("aria-label", "Фото 2: Сзади");
+  });
+
+  it("Escape cancels a tile drag in flight", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    // jsdom lays nothing out: the tiles stand in one row, 100 px each.
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const item = this.hasAttribute("data-dnd-item");
+      const left = item ? Array.from(this.parentElement?.children ?? []).indexOf(this) * 100 : 0;
+      const width = item ? 100 : 400;
+      return {
+        left,
+        top: 0,
+        width,
+        height: 100,
+        right: left + width,
+        bottom: 100,
+        x: left,
+        y: 0,
+        toJSON: () => ({}),
+      };
+    });
+    render(<Photos onValueChange={onValueChange} />);
+    const pointer = { pointerId: 1, pointerType: "mouse", button: 0 };
+    const tile = screen.getByRole("listitem", { name: "Фото 1: Спереди" });
+    fireEvent.pointerDown(tile, { ...pointer, clientX: 50, clientY: 50 });
+    fireEvent.pointerMove(window, { ...pointer, clientX: 120, clientY: 50 });
+    fireEvent.pointerMove(window, { ...pointer, clientX: 250, clientY: 50 });
+    expect(tile).toHaveAttribute("data-lifted");
+    await user.keyboard("{Escape}");
+    fireEvent.pointerUp(window, { ...pointer, clientX: 250, clientY: 50 });
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(tiles()).toEqual(["Фото 1: Спереди", "Фото 2: Сбоку", "Фото 3: Сзади"]);
   });
 });

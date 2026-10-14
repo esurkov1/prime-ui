@@ -181,7 +181,7 @@ export const PART_REFS = {
   "FileUpload.Description": ["HTMLParagraphElement"],
   "FileUpload.Queue": ["HTMLUListElement"],
   "FileUpload.Item": ["HTMLDivElement"],
-  "FileUpload.FormatBadge": ["HTMLSpanElement"],
+  "FileUpload.FormatBadge": ["HTMLDivElement"],
   "FileUpload.ItemPreview": ["HTMLDivElement"],
   "FileUpload.ItemText": ["HTMLDivElement"],
   "FileUpload.ItemDescription": ["HTMLDivElement"],

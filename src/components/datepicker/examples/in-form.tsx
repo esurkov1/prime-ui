@@ -1,5 +1,5 @@
 /** A leave request form: submit reads the period from the form data and checks it, the error shakes in and leaves once the period is fixed; an optional return date — `name`, `required`, `error`, `optional`. */
-import { Button, Datepicker, type DatepickerRange, Typography } from "prime-ui-kit";
+import { Button, Datepicker, type DatepickerRange, Fieldset, Typography } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -23,31 +23,39 @@ export default function DatepickerInFormExample() {
         setSent(complete);
       }}
     >
-      <Datepicker.Root
-        mode="range"
-        name="vacation"
-        label="Период отпуска"
-        required
-        hint="Не больше 28 дней подряд"
-        error={error}
-        value={period}
-        onValueChange={(next) => {
-          setPeriod(next);
-          setError(undefined);
-          setSent(false);
-        }}
-        months={2}
-        footer
-        placeholder="Выбрать период"
-        fullWidth
-      />
-      <Datepicker.Root mode="single" name="returnDate" label="Выход на работу" optional fullWidth />
-      {sent ? (
-        <Typography as="p" variant="body-s" tone="secondary" role="status">
-          Заявка отправлена на согласование.
-        </Typography>
-      ) : null}
+      <Fieldset>
+        <Datepicker.Root
+          mode="range"
+          name="vacation"
+          label="Период отпуска"
+          required
+          hint="Не больше 28 дней подряд"
+          error={error}
+          value={period}
+          onValueChange={(next) => {
+            setPeriod(next);
+            setError(undefined);
+            setSent(false);
+          }}
+          months={2}
+          footer
+          placeholder="Выбрать период"
+          fullWidth
+        />
+        <Datepicker.Root
+          mode="single"
+          name="returnDate"
+          label="Выход на работу"
+          optional
+          fullWidth
+        />
+      </Fieldset>
       <div className={styles.actions}>
+        {sent ? (
+          <Typography as="p" variant="body-s" tone="secondary" role="status">
+            Заявка отправлена на согласование.
+          </Typography>
+        ) : null}
         <Button.Root
           variant="ghost"
           tone="neutral"

@@ -133,6 +133,17 @@ describe("CommandMenu", () => {
     expect(onSelect).toHaveBeenCalledWith("beta");
   });
 
+  it("Home and End move the active item to the first and the last match", async () => {
+    const user = userEvent.setup();
+    render(<TestPalette />);
+    const alpha = screen.getByRole("option", { name: "Alpha" });
+    const beta = screen.getByRole("option", { name: "Beta" });
+    await user.keyboard("{End}");
+    expect(beta).toHaveAttribute("aria-selected", "true");
+    await user.keyboard("{Home}");
+    expect(alpha).toHaveAttribute("aria-selected", "true");
+  });
+
   it("Title называет диалог", () => {
     render(
       <CommandMenu.Root open onOpenChange={() => {}}>
@@ -508,6 +519,14 @@ describe("CommandMenu — server search", () => {
     expect(onRetry).toHaveBeenCalledTimes(1);
     await user.type(screen.getByRole("combobox", { name: "Поиск людей" }), "{Enter}");
     expect(onRetry).toHaveBeenCalledTimes(2);
+  });
+
+  it("with a load error Tab moves focus from the search field to the retry button", async () => {
+    const user = userEvent.setup();
+    render(<ServerPalette loadError="Не удалось загрузить людей" onRetry={vi.fn()} />);
+    expect(document.activeElement).toBe(screen.getByRole("combobox", { name: "Поиск людей" }));
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Повторить" }));
   });
 
   it("async onRetry: the button loads and nothing retries again until it settles", async () => {

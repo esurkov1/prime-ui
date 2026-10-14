@@ -76,7 +76,7 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ## Variants
-No `variant` or `tone`. The control is the field look; chips are soft Badges on the field's wash (neutral chips a stronger wash, hue chips a wash of their hue); the list is the shared floating panel.
+No `variant` or `tone`. The control is the field look; chips are the kit's soft Badges, the palette's soft steps that read on any field fill; the list is the shared floating panel.
 
 ### size
 | Value | Looks like | Use when | Default |
@@ -96,12 +96,14 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | `closeOnOutsideClick` | `false`: the list stays open on a press beside the field; Escape and Tab still close it | The person reads the page while tagging | `true` |
 | `closeOnEscape` | `false`: Escape leaves the list open | The list must close only by Tab or a press outside | `true` |
 | `invalid` / `error` | danger inset ring (+ the message) | Validation failed | |
+| `required` / `optional` | red `*` / muted «необязательно» after the label | Mark the minority of the form | `false` / — |
+| `focusRing` | `false`: no focus ring; the field keeps its focus fill | Only where focus shows otherwise; never on a form field (WCAG 2.4.7) | `true` |
 
 ## States
 | State | Driven by | DOM |
 |---|---|---|
 | collapsed / expanded | focus inside or the list open | `data-expanded="true"` on the control: every chip on up to three rows (then scroll with edge fades); the height animates. Focus leaving the field collapses it and clears the typed query |
-| open | focus, typing, arrows | `data-state="open"` on the control; list `data-state`, `data-side` |
+| open | `open` / `defaultOpen`, focus, typing, arrows | `data-state="open"` on the control; list `data-state`, `data-side` |
 | overflow | more chips than fit at rest | a «+N» Badge button with `labels.more` and the hidden labels in `title` |
 | invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the input; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | `data-disabled="true"`, native `disabled` on the input and the hidden `name` inputs; never expands |

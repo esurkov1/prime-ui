@@ -10,7 +10,7 @@ const OPTIONS: TagSelectOption[] = [
 
 export default function TagSelectStatesExample() {
   return (
-    <>
+    <div>
       <TagSelect
         label="default"
         options={OPTIONS}
@@ -26,6 +26,6 @@ export default function TagSelectStatesExample() {
         focusRing={false}
         placeholder="Добавить город"
       />
-    </>
+    </div>
   );
 }

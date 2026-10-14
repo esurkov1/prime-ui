@@ -12,8 +12,11 @@ import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
+import menu from "@/internal/menu.module.css";
 import { RegionSwap } from "@/internal/RegionSwap";
 import { type ControlSize, stepDown } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./Datepicker.module.css";
 import {
@@ -89,7 +92,6 @@ export const DATEPICKER_LABELS: DatepickerLabels = {
 };
 
 export type CalendarOptions = {
-  /** Tier: day cell = the tier's menu item height (`m` → 32 px), text = the tier's text. */
   size?: ControlSize;
   months?: 1 | 2;
   presets?: DatepickerPreset[] | false;
@@ -107,7 +109,6 @@ export type CalendarOptions = {
 
 export type RangeModeProps = {
   mode: "range";
-  /** Bounds in wall-clock time; `null` — the bound is not set. */
   value?: DatepickerRange;
   defaultValue?: DatepickerRange;
   onValueChange?: (value: DatepickerRange) => void;
@@ -262,12 +263,13 @@ export function DatepickerPanel(props: DatepickerPanelProps) {
     rest: { className, ...dom },
   } = splitCalendarOptions(other);
   const tier = useHostTier(sizeProp);
+  const labels = useLabels(DATEPICKER_LABELS, options.labels);
   return tier.provide(
     <PanelView
       {...options}
       {...value}
       size={tier.size}
-      labels={{ ...DATEPICKER_LABELS, ...options.labels }}
+      labels={labels}
       embedded
       className={className}
       dom={dom}
@@ -513,7 +515,7 @@ export function PanelView(props: PanelViewProps) {
     <div
       {...dom}
       ref={panelRef}
-      className={cx(styles.panel, className)}
+      className={cx(menu.tier, styles.panel, className)}
       data-size={size}
       data-embedded={embedded ? "true" : undefined}
       data-compact={compact ? "true" : undefined}
@@ -527,7 +529,7 @@ export function PanelView(props: PanelViewProps) {
           role="group"
           aria-label={labels.presetsTitle}
         >
-          <p className={styles.presetTitle} aria-hidden>
+          <p className={cx(textRole.caption, styles.presetTitle)} aria-hidden>
             {labels.presetsTitle}
           </p>
           {presets.map((preset) => {
@@ -582,7 +584,7 @@ export function PanelView(props: PanelViewProps) {
                 ) : (
                   <span className={styles.navSpacer} />
                 )}
-                <span className={styles.monthTitle}>{titles[mi]}</span>
+                <span className={cx(textRole.titleS, styles.monthTitle)}>{titles[mi]}</span>
                 {mi === visibleMonths.length - 1 ? (
                   <Button.Root
                     variant="ghost"
@@ -628,7 +630,7 @@ export function PanelView(props: PanelViewProps) {
         </div>
 
         {promptText ? (
-          <p className={styles.hint} aria-live="polite">
+          <p className={cx(textRole.caption, styles.hint)} aria-live="polite">
             {promptText}
           </p>
         ) : null}
@@ -759,7 +761,7 @@ const MonthGrid = React.memo(function MonthGrid({
               <th
                 key={w}
                 scope="col"
-                className={styles.weekday}
+                className={cx(textRole.caption, styles.weekday)}
                 data-weekend={weekday === 0 || weekday === 6 ? "true" : undefined}
               >
                 {w}
@@ -810,7 +812,6 @@ const MonthGrid = React.memo(function MonthGrid({
                     disabled={disabled}
                     tabIndex={roving ? 0 : -1}
                     data-edge={edge ? "true" : undefined}
-                    data-today={isToday ? "true" : undefined}
                     aria-pressed={inBand && !preview}
                     aria-current={isToday ? "date" : undefined}
                     aria-label={label}

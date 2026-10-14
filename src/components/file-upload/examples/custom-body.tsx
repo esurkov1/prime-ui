@@ -1,4 +1,4 @@
-/** A custom body: a muted title with a browse link and the formats line and source buttons instead of the built-in one; the gallery button picks only images — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`, `picker`. */
+/** A custom body: a secondary title with a browse link and the formats line and source buttons instead of the built-in one; the gallery button picks only images — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`, `picker`. */
 import { Button, FileUpload, type FileUploadPicker, Icon, LinkButton } from "prime-ui-kit";
 import * as React from "react";
 
@@ -15,7 +15,7 @@ export default function FileUploadCustomBodyExample() {
           <FileUpload.Icon>
             <Icon name="action.upload" tone="secondary" />
           </FileUpload.Icon>
-          <FileUpload.Title tone="muted">
+          <FileUpload.Title tone="secondary">
             Перетащите файлы сюда или{" "}
             <LinkButton asChild>
               <button type="button" onClick={openPicker}>

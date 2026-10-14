@@ -3,7 +3,7 @@ import { NativeSelect } from "prime-ui-kit";
 
 export default function NativeSelectStatesExample() {
   return (
-    <>
+    <div>
       <NativeSelect label="default" defaultValue="editor">
         <option value="viewer">Наблюдатель</option>
         <option value="editor">Редактор</option>
@@ -20,6 +20,6 @@ export default function NativeSelectStatesExample() {
         <option value="viewer">Наблюдатель</option>
         <option value="editor">Редактор</option>
       </NativeSelect>
-    </>
+    </div>
   );
 }

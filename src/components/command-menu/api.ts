@@ -214,8 +214,8 @@ export const api: ComponentApi = {
           name: "value",
           type: "string",
           required: true,
-          en: "Text matched against the query together with `keywords`.",
-          ru: "Текст, по которому ищет запрос, вместе с `keywords`.",
+          en: 'Text matched against the query together with `keywords`. With `""` the item shows only while the query is empty or `keywords` match.',
+          ru: 'Текст, по которому ищет запрос, вместе с `keywords`. С `""` пункт виден, только пока запрос пуст или совпали `keywords`.',
         },
         {
           name: "keywords",

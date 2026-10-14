@@ -34,6 +34,7 @@ import { MenuGroup } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { RegionSwap } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 import { usePendingAction } from "@/internal/usePendingChanges";
 
 import styles from "./CommandMenu.module.css";
@@ -199,40 +200,20 @@ export type CommandMenuRootProps = Omit<
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** The query (controlled); together with `onSearchChange`. Cleared when the palette closes. */
   search?: string;
-  /** The initial query, uncontrolled. Default `""`. */
   defaultSearch?: string;
-  /** Called with the new query (typing, and `""` when the palette closes). */
   onSearchChange?: (search: string) => void;
-  /**
-   * The palette filters its items by the query. `false` when the results come from a server:
-   * every item shows, highlighting of the query stays.
-   */
   filter?: boolean;
-  /** The first results are loading: skeleton rows while no item matches; `aria-busy`. */
   loading?: boolean;
-  /** More results are loading at the end: skeleton rows after the items. */
   loadingMore?: boolean;
-  /** More results exist: reaching the end of the list calls `onLoadMore`. */
   hasMore?: boolean;
-  /** Asked once per round when the end of the list scrolls into view or the arrows reach it. */
   onLoadMore?: () => void | Promise<void>;
-  /** The results failed to load: replaces the list with the message in `role="alert"`. */
   loadError?: React.ReactNode;
-  /**
-   * A retry button (`labels.retry`) under `loadError`; Enter in the search field runs it too.
-   * Return the request's promise: the button is loading and takes no second press until it
-   * settles; resolve — swap `loadError` for the results; reject — the error stays.
-   */
   onRetry?: () => void | Promise<void>;
-  /** Escape closes the palette. Default `true`. */
   closeOnEscape?: boolean;
-  /** A click on the scrim closes the palette. Default `true`. */
   closeOnOutsideClick?: boolean;
   size?: ControlSize;
   labels?: Partial<CommandMenuLabels>;
-  /** Name of the dialog when there is no `CommandMenu.Title`. */
   "aria-label"?: string;
   "aria-labelledby"?: string;
   "aria-describedby"?: string;
@@ -535,7 +516,6 @@ function CommandMenuList({ className, children, ref, ...rest }: CommandMenuListP
 CommandMenuList.displayName = "CommandMenu.List";
 
 export type CommandMenuGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
-  /** Visible heading of the group; names it for screen readers. */
   label?: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -562,18 +542,10 @@ export type CommandMenuItemProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "role" | "id" | "onSelect"
 > & {
-  /** Text matched with `keywords`; with `""` the item shows only while the query is empty or `keywords` match. */
   value: string;
-  /** Extra words for the query (synonyms, English names). */
   keywords?: string;
-  /** Unavailable right now: shown muted with `aria-disabled`, skipped by the arrows, not runnable. */
   disabled?: boolean;
-  /**
-   * Shown whatever the query and never counted as a match (the match count, `CommandMenu.Empty`);
-   * the arrows reach it after the matches. For one «create from the query» item at the end.
-   */
   persistent?: boolean;
-  /** Runs the command: a click, or Enter while the item is active. */
   onSelect?: () => void;
   ref?: React.Ref<HTMLButtonElement>;
 };
@@ -665,7 +637,6 @@ function CommandMenuItemIcon({ className, ...rest }: CommandMenuItemIconProps) {
 CommandMenuItemIcon.displayName = "CommandMenu.ItemIcon";
 
 export type CommandMenuItemTextProps = React.HTMLAttributes<HTMLSpanElement> & {
-  /** Second line (path, details): caption, muted. */
   description?: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
@@ -682,7 +653,9 @@ function CommandMenuItemText({
     <span className={cx(styles.itemText, className)} {...rest}>
       <span className={styles.itemLabel}>{highlightChildren(children, search)}</span>
       {description ? (
-        <span className={styles.itemDescription}>{highlightChildren(description, search)}</span>
+        <span className={cx(textRole.caption, styles.itemDescription)}>
+          {highlightChildren(description, search)}
+        </span>
       ) : null}
     </span>
   );
@@ -738,7 +711,6 @@ function CommandMenuFooter({ className, ...rest }: CommandMenuFooterProps) {
 CommandMenuFooter.displayName = "CommandMenu.Footer";
 
 export type CommandMenuFooterHintProps = React.HTMLAttributes<HTMLSpanElement> & {
-  /** Keys (text or icons), each in its own Kbd. */
   keys: React.ReactNode[];
   ref?: React.Ref<HTMLSpanElement>;
 };

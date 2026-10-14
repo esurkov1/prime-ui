@@ -123,11 +123,13 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Enter · Space · ArrowDown",
+        native: true,
         en: "Open the system list (browser and OS behaviour).",
         ru: "Открывают системный список (поведение браузера и ОС).",
       },
       {
         keys: "ArrowUp · ArrowDown",
+        native: true,
         en: "On the closed field change the value (in most browsers).",
         ru: "На закрытом поле меняют значение (в большинстве браузеров).",
       },

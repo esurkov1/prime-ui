@@ -9,7 +9,7 @@ const ROLES = [
 
 export default function SelectStatesExample() {
   return (
-    <>
+    <div>
       <Select.Root label="default" defaultValue="editor">
         <Select.Trigger>
           <Select.Value />
@@ -74,6 +74,6 @@ export default function SelectStatesExample() {
           ))}
         </Select.Content>
       </Select.Root>
-    </>
+    </div>
   );
 }

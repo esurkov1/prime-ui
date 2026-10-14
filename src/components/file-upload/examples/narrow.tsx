@@ -1,4 +1,4 @@
-/** In a phone-width column the zone text wraps, a long file name truncates, and a gallery goes three across and then two, the cover keeping two columns and the remove buttons shown without hover. */
+/** In a phone-width column the zone text wraps, a long file name truncates, and a gallery goes three across and then two, the cover keeping two columns and the remove buttons shown without hover — `layout`, `cover`. */
 import { FileUpload, type FileUploadFile } from "prime-ui-kit";
 import * as React from "react";
 

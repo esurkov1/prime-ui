@@ -28,14 +28,10 @@ export type NativeSelectProps = FieldFrameProps &
   FieldFocusRingProps &
   Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size" | "multiple" | "children"> & {
     size?: ControlSize;
-    /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
     invalid?: boolean;
-    /** First, empty option shown while nothing is picked. */
     placeholder?: string;
-    /** Called with the picked value; native `onChange` still fires. */
     onValueChange?: (value: string) => void;
     labels?: Partial<NativeSelectLabels>;
-    /** Native `<option>` and `<optgroup>` elements. */
     children: React.ReactNode;
     ref?: React.Ref<HTMLSelectElement>;
   };

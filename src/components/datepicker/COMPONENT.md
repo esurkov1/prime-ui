@@ -155,6 +155,7 @@ A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-
 | `withTime` | HH:mm inputs in the footer | timestamps (with `footer`) | `false` |
 | `yearless` | month title without a year, value «15 октября» | annual dates | `false` |
 | `fullWidth` | the field fills its container | form columns | `false` |
+| `required` / `optional` | red `*` / muted «необязательно» after the label | Mark the minority of the form | `false` / — |
 | `align` | popover at the field's start / center / end; `auto` takes the edge with more room | a field near the right edge → `end` | `auto` |
 | `closeOnOutsideClick` | `false`: a press beside the calendar keeps it open with its draft | a `footer` draft the person must apply or reset | `true` |
 | `closeOnEscape` | `false`: Escape leaves the calendar open | the calendar must close only by Apply or Reset | `true` |
@@ -163,12 +164,12 @@ A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-
 | State | Driven by | DOM |
 |---|---|---|
 | empty | no value | `data-empty="true"`, `labels.placeholder` (or `placeholder`) in placeholder color |
-| open | click, `open` | `data-state="open"`, `field-bg-hover` fill, the chevron turns |
-| focus-visible | keyboard | inset focus ring; none with `focusRing={false}` (`data-focus-ring="false"`) |
+| open | click, `open` / `defaultOpen` | `data-state="open"`, `field-bg-hover` fill, the chevron turns |
+| focus-visible | keyboard | inset focus ring; none with `focusRing` off (`data-focus-ring="false"`) |
 | invalid | `invalid`, `error` | `data-invalid`, `aria-invalid`, inset `danger-border` ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled`, `field-bg-disabled`, cannot open |
-| today | the current day | `data-today`, `aria-current="date"`, accent text |
-| selected / band | value | day `aria-pressed`, `data-edge`; cell `data-band="selected" \| "preview"`, `data-band-start` / `-end` |
+| today | the current day | `aria-current="date"`, accent text |
+| selected / band | value | day `aria-pressed` (accent text), `data-edge`; cell `data-band="selected" \| "preview"`, `data-band-start` / `-end` |
 | day disabled | `isDayDisabled`, `disableFuture` | native `disabled`, muted |
 
 Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` · `stacked`). The footer row carries `data-time` with `withTime`; a footer field never shrinks below its whole date and time — the fields wrap above the actions, and in a footer narrower than 22rem with time they stand one under the other. The popover follows the overlay contract: an outside press or Escape closes it, focus is trapped while open, the wheel over the panel does not scroll the page. The panel of `Datepicker.Root` mounts only while the popover is open, so every opening starts from the current value; nothing is rendered for it while closed.
@@ -177,9 +178,9 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 
 ## Layout & spacing
 - The field fits its text by default (`width: fit-content`, max 100%); in forms use `fullWidth`.
-- Label → field: the tier `label-gap`; field → field in a form: `--prime-space-5`.
+- Label → field: the tier `label-gap`; field → field in a form: the gap of a label-less `Fieldset`.
 - `align="auto"`: a field near the end of the screen lines up the popover's end edge and the panel grows toward the start, and the other way near the start; a fixed `align` still flips at the screen edge.
-- Months gap `--prime-space-6`. `Datepicker.Panel` has no fill, padding or radius — the host is its container; it shows 1–2 months by the host's width with day columns spread across it. An embedded panel measures its parent; narrower than one month → compact cells and footer fields above the buttons. Works from 320 px.
+- Months gap `--prime-space-6`. `Datepicker.Panel` has no fill, padding or radius — the host is its container; it shows 1–2 months by the host's width with day columns spread across it. An embedded panel measures its parent; narrower than one month → compact cells and footer fields above the buttons. Works in a 320 px column.
 - On a coarse pointer the day cells grow to the 44 px touch target (a dense grid cannot grow an invisible hit area past its neighbours); narrower than seven of them, the columns shrink.
 - Values are wall-clock local dates; convert time zones in the app.
 
@@ -256,5 +257,5 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 - Converting values to UTC inside the component → values are wall-clock dates; convert in the app.
 
 ## Related
-- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md) (month arrows, presets, Reset / Apply), [VisuallyHidden](../visually-hidden/COMPONENT.md) (month announcement), `Icon` (calendar, chevron), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
+- **Built from:** [Popover](../popover/COMPONENT.md), [Button](../button/COMPONENT.md) (month arrows, presets, Reset / Apply), [ScrollContainer](../scroll-container/COMPONENT.md) (the presets row when narrow), [VisuallyHidden](../visually-hidden/COMPONENT.md) (month announcement), `Icon` (calendar, chevron), [Label](../label/COMPONENT.md), [Hint](../hint/COMPONENT.md)
 - **See also:** [Input](../input/COMPONENT.md), [Select](../select/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

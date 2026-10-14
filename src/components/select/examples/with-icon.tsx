@@ -13,23 +13,25 @@ export default function SelectWithIconExample() {
   const selected = ACCESS.find((option) => option.value === access) ?? ACCESS[1];
 
   return (
-    <Select.Root label="Доступ к проекту" value={access} onValueChange={setAccess}>
-      <Select.Trigger>
-        <Select.TriggerIcon>
-          <Icon name={selected.icon} />
-        </Select.TriggerIcon>
-        <Select.Value />
-      </Select.Trigger>
-      <Select.Content>
-        {ACCESS.map((option) => (
-          <Select.Item key={option.value} value={option.value}>
-            <Select.ItemIcon>
-              <Icon name={option.icon} />
-            </Select.ItemIcon>
-            {option.label}
-          </Select.Item>
-        ))}
-      </Select.Content>
-    </Select.Root>
+    <div>
+      <Select.Root label="Доступ к проекту" value={access} onValueChange={setAccess}>
+        <Select.Trigger>
+          <Select.TriggerIcon>
+            <Icon name={selected.icon} />
+          </Select.TriggerIcon>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          {ACCESS.map((option) => (
+            <Select.Item key={option.value} value={option.value}>
+              <Select.ItemIcon>
+                <Icon name={option.icon} />
+              </Select.ItemIcon>
+              {option.label}
+            </Select.Item>
+          ))}
+        </Select.Content>
+      </Select.Root>
+    </div>
   );
 }
