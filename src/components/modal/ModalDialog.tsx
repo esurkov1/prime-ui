@@ -1,7 +1,7 @@
 import * as React from "react";
-
+import { COMPACT_QUERY } from "@/hooks/breakpoints";
 import { useEnterConfirm } from "@/hooks/useEnterConfirm";
-import { COMPACT_QUERY, useMediaQuery } from "@/hooks/useMediaQuery";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { type PresenceState, usePresence } from "@/hooks/usePresence";
 import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";

@@ -5,11 +5,25 @@ import { describe, expect, it } from "vitest";
 import { CodeBlock } from "./CodeBlock";
 
 describe("CodeBlock", () => {
-  it("renders highlighted code", () => {
+  it("renders highlighted code as text in spans", () => {
     const { container } = render(<CodeBlock code="const a = 1" colorScheme="light" />);
     const pre = container.querySelector("pre");
-    expect(pre).toBeTruthy();
-    expect(pre?.innerHTML).toContain("prime-tok-k");
+    expect(pre?.querySelector("code")?.textContent).toBe("const a = 1");
+    const spans = Array.from(pre?.querySelectorAll("code > span") ?? []);
+    expect(spans.map((span) => span.textContent)).toEqual(["const", "1"]);
+  });
+
+  it("never turns the source into markup", () => {
+    const { container } = render(<CodeBlock code={'const x = "<img src=x onerror=alert(1)>"'} />);
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.querySelector("code")?.textContent).toContain("<img");
+  });
+
+  it("a soft block scrolls through ScrollContainer and keeps its pre", () => {
+    const { container } = render(<CodeBlock code="const a = 1" />);
+    const pre = container.querySelector("pre");
+    expect(pre?.parentElement).toBe(container);
+    expect(pre).toHaveAttribute("data-variant", "soft");
   });
 
   it("follows the surrounding theme when colorScheme is omitted", () => {

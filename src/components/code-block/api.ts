@@ -4,8 +4,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "CodeBlock",
-      en: "`ref` → `HTMLPreElement`. Renders `<pre><code>`; the markup comes from the escaped, highlighted `code`.",
-      ru: "Рендерит `<pre><code>`; разметка — экранированный и подсвеченный `code`.",
+      en: "`ref` → `HTMLPreElement`. Renders `<pre><code>`: the tokens of `code` as text in coloured spans, never as HTML. A `soft` block scrolls sideways through ScrollContainer.",
+      ru: "Рендерит `<pre><code>`: токены `code` — текст в цветных span, никогда не HTML. Блок `soft` прокручивается вбок через ScrollContainer.",
       props: [
         {
           name: "code",
@@ -35,7 +35,7 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: 'Omit<HTMLAttributes<HTMLPreElement>, "children" | "dangerouslySetInnerHTML">',
+          type: 'Omit<HTMLAttributes<HTMLPreElement>, "children">',
           en: "`className`, `aria-label` and the other `<pre>` attributes.",
           ru: "`className`, `aria-label` и остальные атрибуты `<pre>`.",
         },

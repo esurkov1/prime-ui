@@ -31,10 +31,7 @@ export function createReadReceipts(onRead: (values: string[]) => void): ReadRece
   };
   const schedule = () => {
     if (frame !== 0) return;
-    frame =
-      typeof requestAnimationFrame === "function"
-        ? requestAnimationFrame(flush)
-        : (setTimeout(flush, 16) as unknown as number);
+    frame = requestAnimationFrame(flush);
   };
 
   const observer = new IntersectionObserver(
@@ -75,10 +72,7 @@ export function createReadReceipts(onRead: (values: string[]) => void): ReadRece
     disconnect() {
       observer.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
-      if (frame !== 0) {
-        if (typeof cancelAnimationFrame === "function") cancelAnimationFrame(frame);
-        clearTimeout(frame);
-      }
+      if (frame !== 0) cancelAnimationFrame(frame);
       values.clear();
       seen.clear();
     },

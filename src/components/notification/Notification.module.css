@@ -57,6 +57,7 @@
   right: calc(var(--ntf-edge) + var(--ntf-safe-right));
 }
 
+/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
 @media (max-width: 639px) {
   .zone {
     --ntf-edge: var(--prime-space-3);

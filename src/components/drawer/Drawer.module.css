@@ -69,6 +69,7 @@
 
 /* ─── Narrow viewport: full width, square ───────────────────────────────── */
 
+/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
 @media (max-width: 639px) {
   .panel {
     width: 100vw;

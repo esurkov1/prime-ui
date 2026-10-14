@@ -119,7 +119,7 @@ describe("List", () => {
     expect(disabled).toHaveAttribute("aria-disabled", "true");
   });
 
-  it("asChild renders the child element as the row and keeps its href", async () => {
+  it("asChild renders the child element as the row; a disabled one drops its href", async () => {
     const user = userEvent.setup();
     const onClick = vi.fn((event: React.MouseEvent) => event.preventDefault());
     render(
@@ -146,7 +146,7 @@ describe("List", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
 
     const disabled = screen.getByRole("link", { name: "Задача № 119" });
-    expect(disabled).toHaveAttribute("href", "/tasks/119");
+    expect(disabled).not.toHaveAttribute("href");
     expect(disabled).toHaveAttribute("aria-disabled", "true");
     expect(disabled).toHaveAttribute("tabindex", "-1");
     await user.click(disabled);

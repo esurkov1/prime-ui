@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { Slot } from "./slot";
+import { Slot, slotChild } from "./slot";
 
 describe("Slot", () => {
   it("chains handlers, the child's first", () => {
@@ -58,6 +59,28 @@ describe("Slot", () => {
     expect(event.defaultPrevented).toBe(true);
   });
 
+  it("aria-disabled takes a link child out of the Tab order and drops its href", () => {
+    render(
+      <Slot aria-disabled>
+        <a href="#next">Далее</a>
+      </Slot>,
+    );
+    const link = screen.getByRole("link", { name: "Далее" });
+    expect(link).not.toHaveAttribute("href");
+    expect(link).toHaveAttribute("tabindex", "-1");
+    expect(link).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("passes a typed ref to the child without a cast", () => {
+    const ref = React.createRef<HTMLAnchorElement>();
+    render(
+      <Slot ref={ref}>
+        <a href="#next">Далее</a>
+      </Slot>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLAnchorElement);
+  });
+
   it("keeps the merged ref stable between renders", () => {
     const ref = vi.fn();
     const { rerender } = render(
@@ -71,5 +94,18 @@ describe("Slot", () => {
       </Slot>,
     );
     expect(ref).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("slotChild", () => {
+  it("returns the one element child", () => {
+    const child = slotChild(<a href="#x">Счёт</a>, "Card.Root");
+    expect(child.props.children).toBe("Счёт");
+  });
+
+  it("names the part when the child is not one element", () => {
+    expect(() => slotChild("Счёт", "Card.Root")).toThrow(
+      "[prime-ui-kit] Card.Root asChild needs a single element child.",
+    );
   });
 });

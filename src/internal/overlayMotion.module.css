@@ -42,6 +42,7 @@
   animation: overlayDialogOut var(--prime-motion-duration-fast) var(--prime-motion-easing-exit) both;
 }
 
+/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
 @media (max-width: 639px) {
   .dialog[data-state="open"] {
     animation: overlaySheetIn var(--prime-motion-duration-slow) var(--prime-motion-easing-enter)

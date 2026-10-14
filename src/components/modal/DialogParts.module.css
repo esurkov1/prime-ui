@@ -316,6 +316,7 @@
  * sheet (viewport below 640), and in a dialog narrower than 360px. A small dialog on a desktop keeps
  * its row.
  */
+/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
 @media (max-width: 639px) {
   .footer[data-layout] {
     display: flex;

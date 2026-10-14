@@ -3,6 +3,7 @@ import * as React from "react";
 import { Spinner } from "@/components/spinner/Spinner";
 import { usePresence } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
+import { setControlValue, type ValueControl } from "@/internal/controlValue";
 import { cx } from "@/internal/cx";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
@@ -20,21 +21,6 @@ export type FieldCommitState = "idle" | "pending" | "saved";
 
 /** How long the check stays after a save before it fades out. */
 const SAVED_MS = 1600;
-
-type CommitControl = HTMLInputElement | HTMLTextAreaElement;
-
-/**
- * Writes a value into a native control the way typing does, so React's `onChange` (and the owner's
- * `onValueChange`) receive it whether the field is controlled or not.
- */
-export function setControlValue(control: CommitControl, value: string) {
-  const proto =
-    control instanceof HTMLTextAreaElement
-      ? HTMLTextAreaElement.prototype
-      : HTMLInputElement.prototype;
-  Object.getOwnPropertyDescriptor(proto, "value")?.set?.call(control, value);
-  control.dispatchEvent(new Event("input", { bubbles: true }));
-}
 
 function isThenable(value: unknown): value is PromiseLike<void> {
   return (
@@ -60,7 +46,7 @@ export type FieldCommit = {
  * person has typed on since. Unchanged values never fire. `onCommit` undefined → inert.
  */
 export function useFieldCommit(
-  controlRef: React.RefObject<CommitControl | null>,
+  controlRef: React.RefObject<ValueControl | null>,
   onCommit: FieldCommitHandler | undefined,
 ): FieldCommit {
   const [state, setState] = React.useState<FieldCommitState>("idle");

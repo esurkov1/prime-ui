@@ -5,6 +5,7 @@ import { Kbd } from "@/components/kbd/Kbd";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { usePresence } from "@/hooks/usePresence";
 import { Icon, type IconName } from "@/icons";
+import { setControlValue } from "./controlValue";
 import { cx } from "./cx";
 import overlayMotion from "./overlayMotion.module.css";
 import { rovingIndex } from "./rovingFocus";
@@ -42,14 +43,6 @@ const TOOL_ICONS: Record<TextFormat, IconName> = {
 const isApplePlatform = () =>
   typeof navigator !== "undefined" &&
   /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
-
-/** Puts `text` into the field as a person would type it: React's `onChange` sees the change. */
-function typeValue(el: HTMLTextAreaElement, text: string) {
-  const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")?.set;
-  if (setter) setter.call(el, text);
-  else el.value = text;
-  el.dispatchEvent(new Event("input", { bubbles: true }));
-}
 
 export type TextFormattingOptions = {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -114,7 +107,7 @@ export function useTextFormatting({
     } catch {
       typed = false;
     }
-    if (!typed || el.value !== next.text) typeValue(el, next.text);
+    if (!typed || el.value !== next.text) setControlValue(el, next.text);
     el.setSelectionRange(next.start, next.end);
     syncSelection();
   };

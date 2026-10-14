@@ -1,7 +1,12 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { isPromiseLike, usePendingChanges } from "./usePendingChanges";
+import {
+  isPromiseLike,
+  usePendingAction,
+  usePendingChanges,
+  usePendingKeys,
+} from "./usePendingChanges";
 
 const add = (value: readonly string[], item: string) =>
   value.includes(item) ? value : [...value, item];
@@ -48,5 +53,72 @@ describe("usePendingChanges", () => {
     expect(isPromiseLike(Promise.resolve())).toBe(true);
     expect(isPromiseLike(undefined)).toBe(false);
     expect(isPromiseLike({ ok: false })).toBe(false);
+  });
+});
+
+describe("usePendingKeys", () => {
+  it("holds a key while its promise is pending and returns the outcome", async () => {
+    const save = deferred();
+    const { result } = renderHook(() => usePendingKeys<string>());
+    let outcome: unknown;
+    act(() => {
+      outcome = result.current.track("row-1", save.promise);
+    });
+    expect(outcome).toBe(save.promise);
+    expect(result.current.pending.has("row-1")).toBe(true);
+    await act(async () => {
+      save.resolve();
+      await save.promise;
+    });
+    expect(result.current.pending.size).toBe(0);
+  });
+
+  it("drops the key on a rejection and holds nothing for a sync outcome", async () => {
+    const save = deferred();
+    const { result } = renderHook(() => usePendingKeys<string>());
+    act(() => {
+      result.current.track("row-1", undefined);
+      result.current.track("row-2", save.promise);
+    });
+    expect([...result.current.pending]).toEqual(["row-2"]);
+    await act(async () => {
+      save.reject(new Error("Нет связи"));
+      await save.promise.catch(() => {});
+    });
+    expect(result.current.pending.size).toBe(0);
+  });
+});
+
+describe("usePendingAction", () => {
+  it("runs once at a time and is pending until the promise settles", async () => {
+    const load = deferred();
+    const handler = vi.fn(() => load.promise);
+    const { result } = renderHook(() => usePendingAction(handler));
+    act(() => {
+      result.current.run?.();
+      result.current.run?.();
+    });
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(result.current.pending).toBe(true);
+    await act(async () => {
+      load.reject(new Error("Нет связи"));
+      await load.promise.catch(() => {});
+    });
+    expect(result.current.pending).toBe(false);
+    act(() => result.current.run?.());
+    expect(handler).toHaveBeenCalledTimes(2);
+  });
+
+  it("has no run without a handler and never pends for a sync one", () => {
+    const { result, rerender } = renderHook(
+      ({ handler }: { handler?: () => void }) => usePendingAction(handler),
+      { initialProps: {} },
+    );
+    expect(result.current.run).toBeUndefined();
+    const sync = vi.fn();
+    rerender({ handler: sync });
+    act(() => result.current.run?.());
+    expect(sync).toHaveBeenCalledTimes(1);
+    expect(result.current.pending).toBe(false);
   });
 });

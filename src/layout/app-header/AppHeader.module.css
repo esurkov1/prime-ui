@@ -121,7 +121,8 @@
 
 /* ─── Menu button ───────────────────────────────────────────────────────── */
 
-/* Matches Sidebar `offCanvas="auto"`: from 768px the rail is back and the button leaves. */
+/* Matches Sidebar `offCanvas="auto"`: from 768px the rail is back and the button leaves — the
+   inverse of `OFF_CANVAS_QUERY` (src/hooks/breakpoints.ts). */
 @media (min-width: 768px) {
   .menuButton[data-show="narrow"] {
     display: none;

@@ -485,7 +485,7 @@
 }
 
 /* Touch screens and narrow viewports: at least 16px, or iOS zooms into the focused time; the
-   field widens to keep `00:00` whole. */
+   field widens to keep `00:00` whole. The width is `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
 @media (pointer: coarse), (max-width: 639px) {
   .fieldTime {
     width: max(calc(var(--dp-field-h) * 1.75), calc(5ch + 2 * var(--prime-space-2)));
@@ -561,6 +561,7 @@
 /* Below 640px of viewport the popover is a bottom sheet (`COMPACT_QUERY`): the sheet is the host,
    so the months share its width as in an embedded panel — the day columns spread, each day stays
    one cell — instead of a fit-content month in the corner of the sheet. */
+/* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
 @media (max-width: 639px) {
   .popover .month {
     flex: 1 1 0;

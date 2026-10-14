@@ -351,7 +351,7 @@ function ListItem({
   let element: React.ReactElement;
   if (child) {
     element = (
-      // A disabled child keeps its own `href` / `to`: out of the Tab order like the other kinds.
+      // A disabled child leaves the Tab order and loses a plain `href` (Slot), like the other kinds.
       <Slot
         {...shared}
         ref={ref}

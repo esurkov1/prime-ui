@@ -1,7 +1,6 @@
 import * as React from "react";
 
 import { useAnchorRectResolver, useFloatingBoundaryResolver } from "@/internal/AnchorRectContext";
-import { getRootFontSizePx } from "@/internal/layoutPxFromPrimitives";
 import { getScrollContainers } from "@/internal/scrollAncestors";
 import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 
@@ -43,6 +42,16 @@ const OPPOSITE: Record<PositionSide, PositionSide> = {
   left: "right",
   right: "left",
 };
+
+/** Root `font-size` without a `document` (SSR) or a valid computed px: the usual `:root` 16px. */
+const FALLBACK_ROOT_FONT_PX = 16;
+
+/** The computed root (`html`) `font-size` in px, so rem lengths convert without assuming 16. */
+function getRootFontSizePx(): number {
+  if (typeof document === "undefined") return FALLBACK_ROOT_FONT_PX;
+  const parsed = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : FALLBACK_ROOT_FONT_PX;
+}
 
 /**
  * Computed length of a CSS custom property on `:root` in px (rem/px values).
