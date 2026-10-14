@@ -35,9 +35,7 @@ describe("RowAction", () => {
   it("asChild is a link with the same look, its children the glyph", () => {
     render(
       <RowAction label="Написать" size="m" asChild>
-        <a href="mailto:finance@severny-veter.ru">
-          <svg aria-hidden="true" />
-        </a>
+        <a href="mailto:finance@severny-veter.ru">@</a>
       </RowAction>,
     );
     const link = screen.getByRole("link", { name: "Написать" });
