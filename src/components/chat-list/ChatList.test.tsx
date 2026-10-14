@@ -127,6 +127,10 @@ describe("ChatList", () => {
     expect(onValueChange).not.toHaveBeenCalled();
     await user.keyboard("{ArrowUp}{Enter}");
     expect(onValueChange).toHaveBeenCalledWith("vector");
+    await user.keyboard("{ArrowDown}");
+    await user.keyboard(" ");
+    expect(onValueChange).toHaveBeenLastCalledWith("granit");
+    await user.keyboard("{ArrowUp}");
     // The Tab stop follows the focus: Tab leaves the list.
     expect(row(/Вектор/)).toHaveAttribute("tabindex", "0");
     expect(row(/Гранит/)).toHaveAttribute("tabindex", "-1");
@@ -253,6 +257,14 @@ describe("ChatList", () => {
 
     row(/Гранит/).focus();
     await user.keyboard("{Shift>}{F10}{/Shift}");
+    expect(await screen.findByRole("menuitem", { name: "Удалить" })).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
+    expect(row(/Гранит/)).toHaveFocus();
+
+    await user.keyboard("{ContextMenu}");
     expect(await screen.findByRole("menuitem", { name: "Удалить" })).toBeInTheDocument();
     await user.keyboard("{Escape}");
     await act(async () => {

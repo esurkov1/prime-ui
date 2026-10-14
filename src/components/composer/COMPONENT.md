@@ -214,7 +214,7 @@ Motion: the tray opens and closes as a Crossfade (fade and height glide, the row
 - The row stands on its bottom edge with `--prime-space-2` gaps: the paperclip and the button stay by the last line as the field grows. Field → bar / attachments above: `--prime-space-2`.
 - The tray is never in the row: the strip (`--prime-space-24` square tiles, one row scrolling sideways with faded edges, so its height is one tile at any count) and the «как файлы» checkbox stack with `--prime-space-2` gaps above it.
 - The field grows from one line to eight and then scrolls inside; its padding centres one line exactly like an Input of the tier.
-- The composer takes its container's width and works from 320 px; it is a size container, the round video preview is `--prime-message-video-note` wide, at most 70% of its width, and needs that room above the composer (a chat history gives it).
+- The composer takes its container's width and works on the narrowest phone (320 px); it is a size container, the round video preview is `--prime-message-video-note` wide, at most 70% of its width, and needs that room above the composer (a chat history gives it).
 - The recording bar covers the paperclip and the field, so entering and leaving a recording never changes the row height; its waveform takes all the width between the timer and the send button, as tall as the button minus `--prime-space-2`, in VoicePlayer's bar geometry.
 - On touch the editable text is at least 16 px (no iOS zoom) and every button has the 44 px hit area.
 - The formatting toolbar floats above the field's start edge on the floating layer, over whatever is above the composer.

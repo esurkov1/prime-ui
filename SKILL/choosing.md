@@ -80,7 +80,7 @@ the rest (comments as a chat, a read-only history) → `Chat.Root` with `Chat.Me
 message on its own → `Message.Root`. The list of conversations beside the chat (the dialogs pane of a
 messenger or an inbox) → `ChatList` (`items`, `renderItem` with `ChatList.Item`, `value`): unread
 counts, «печатает…», drafts, ticks, a row menu and search come with it — never `List` with a hand-made
-count and preview; `List` stays for records that are not conversations (tickets, letters, invoices). A group chat → `Chat.Messages type="group"`: `Message.Author`
+count and preview; `List` stays for records that are not conversations (tickets, letters, invoices). A group chat → `Chat.Messages group`: `Message.Author`
 (`tag`, `Message.AuthorIcon`) and `Message.Avatar` on every message, the list shows them on the
 first and the last of a run. A voice message → `VoicePlayer` inside `Message.Root`; a call recording
 outside a chat → `VoicePlayer` alone. A round video message → `VideoNote` inside `Message.Root`

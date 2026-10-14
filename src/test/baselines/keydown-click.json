@@ -1,4 +1,3 @@
 [
-  "src/components/composer/Composer.test.tsx: Enter and Space start at once from the keyboard; the button then sends",
   "src/components/gantt/Gantt.test.tsx: makes the row header a link with getRowHref: the grid stop, plain clicks to onRowClick"
 ]

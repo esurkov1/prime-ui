@@ -75,10 +75,6 @@ const ChromeContext = React.createContext<ListChrome>({
 // ─── List ─────────────────────────────────────────────────────────────────────
 
 export type MessageListProps = React.HTMLAttributes<HTMLDivElement> & {
-  /**
-   * A group chat: incoming messages keep a gutter for the author's avatar, the first message of a
-   * run shows its author's header, the last one the avatar. Default `false`.
-   */
   group?: boolean;
   /**
    * Selection mode (controlled): the `value`s of the selected messages, `null` while not selecting.
@@ -89,29 +85,10 @@ export type MessageListProps = React.HTMLAttributes<HTMLDivElement> & {
   defaultSelected?: Selection;
   /** The selection changed: a message toggled, selection started (`[value]`) or ended (`null`). */
   onSelectedChange?: (selected: Selection) => void;
-  /** The emoji a double tap (or `L` on a focused message) puts or takes back. Default «👍»; `false` — off. */
   quickReaction?: string | false;
-  /**
-   * The reactions of the reaction bar (long press, a long hover, `R`): the first seven in its row,
-   * the rest behind «⌄». `label` names each for assistive tech.
-   */
   reactionOptions?: readonly MessageReactionOption[];
-  /**
-   * The reader (`{ id, name: "Вы", src }`): a reaction they put shows their avatar among
-   * `MessageReaction.users` at once, before the data comes back.
-   */
   reader?: MessageUser;
-  /**
-   * A message was added at the end after the list mounted — sent or received; never the first
-   * render, history loaded above or a message put back in the middle. For a sound, a counter,
-   * a title badge. The message enters on its own either way.
-   */
   onNewMessage?: (value: string, details: { direction: MessageDirection }) => void;
-  /**
-   * Incoming messages the reader has seen: at least half of each (or half the view) on screen
-   * while the page is visible. Batched per frame, each `value` once per mount. Send read receipts
-   * from here and set `status="read"` on the other side.
-   */
   onRead?: (values: string[]) => void;
   /**
    * The message to jump to — a search's current match or a jump: when it changes the list brings

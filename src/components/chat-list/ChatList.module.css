@@ -215,7 +215,7 @@
 /* --- Narrow container -------------------------------------------------------------- */
 
 /* A squeezed pane keeps the names and the counts: the preview line and the time step out. */
-@container chat-list (max-width: 239px) {
+@container chat-list (width < 15rem) {
   .preview,
   .meta {
     display: none;

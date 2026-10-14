@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Modal } from "@/components/modal/Modal";
@@ -20,7 +21,7 @@ function fakeQueue(items: UploadItem[] = []): ComposerQueue {
   };
 }
 
-/** A composer over a queue that really reorders (`move`), for the tray order. */
+/** A composer over a queue that really reorders (`move`) and removes, for the tray order. */
 function Ordered({
   initial,
   onSend,
@@ -31,6 +32,7 @@ function Ordered({
   const [items, setItems] = React.useState(initial);
   const queue: ComposerQueue = {
     ...fakeQueue(items),
+    remove: (id) => setItems((current) => current.filter((entry) => entry.id !== id)),
     move: (id, beforeId) =>
       setItems((current) => {
         const item = current.find((entry) => entry.id === id);
@@ -421,6 +423,30 @@ describe("formatting", () => {
     expect(field()).toHaveValue("Срок **~~до пятницы~~**");
   });
 
+  it("Mod+I, Mod+E, Mod+Shift+H and Mod+K format the selection", () => {
+    render(<Composer.Root defaultValue="срок" />);
+    select(0, 4);
+    fireEvent.keyDown(field(), { key: "i", code: "KeyI", ctrlKey: true });
+    expect(field()).toHaveValue("_срок_");
+    select(1, 5);
+    fireEvent.keyDown(field(), { key: "e", code: "KeyE", metaKey: true });
+    expect(field()).toHaveValue("_`срок`_");
+    select(2, 6);
+    fireEvent.keyDown(field(), { key: "H", code: "KeyH", ctrlKey: true, shiftKey: true });
+    expect(field()).toHaveValue("_`||срок||`_");
+    select(4, 8);
+    fireEvent.keyDown(field(), { key: "k", code: "KeyK", ctrlKey: true });
+    expect(field()).toHaveValue("_`||[срок](https://)||`_");
+  });
+
+  it("Mod+Shift+9 quotes the selection", async () => {
+    const user = userEvent.setup();
+    render(<Composer.Root defaultValue="Счёт оплачен" />);
+    select(0, 12);
+    await user.keyboard("{Control>}{Shift>}9{/Shift}{/Control}");
+    expect(field()).toHaveValue("> Счёт оплачен");
+  });
+
   it("the hotkeys work on a Russian layout", () => {
     render(<Composer.Root defaultValue="важно" />);
     select(0, 5);
@@ -446,6 +472,13 @@ describe("formatting", () => {
     bold.focus();
     fireEvent.keyDown(bold, { key: "ArrowRight" });
     expect(screen.getByRole("button", { name: "Курсив" })).toHaveFocus();
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "End" });
+    const buttons = screen
+      .getAllByRole("button", { name: /./ })
+      .filter((button) => screen.getByRole("toolbar", { name: "Форматирование" }).contains(button));
+    expect(buttons.at(-1)).toHaveFocus();
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Home" });
+    expect(bold).toHaveFocus();
   });
 
   it("formatting={false} leaves the keys alone", () => {
@@ -514,6 +547,20 @@ describe("attachments", () => {
     // One list: no rows of files beside the strip.
     expect(screen.getAllByRole("list")).toHaveLength(1);
     expect(screen.getByRole("list", { name: "Вложения" })).toHaveAttribute("data-axis", "x");
+  });
+
+  it("Delete and Backspace on a tile remove it; focus moves to its neighbour", () => {
+    render(
+      <Ordered initial={[doneItem("акт.pdf"), doneItem("счёт.pdf"), doneItem("смета.pdf")]} />,
+    );
+    const tile = (name: RegExp) => screen.getByRole("listitem", { name });
+    tile(/счёт\.pdf/).focus();
+    fireEvent.keyDown(tile(/счёт\.pdf/), { key: "Delete" });
+    expect(trayNames()).toEqual(["Файл 1: акт.pdf", "Файл 2: смета.pdf"]);
+    expect(document.activeElement).toBe(tile(/смета\.pdf/));
+    fireEvent.keyDown(tile(/смета\.pdf/), { key: "Backspace" });
+    expect(trayNames()).toEqual(["Файл 1: акт.pdf"]);
+    expect(document.activeElement).toBe(tile(/акт\.pdf/));
   });
 
   it("Alt+→ reorders the mixed tray; media keep their order in the album, files theirs", () => {
@@ -916,14 +963,14 @@ describe("recording", () => {
     const up = fireEvent.keyUp(sendRecording(), { key: " " });
     expect(up).toBe(false);
     expect(onSendVoice).not.toHaveBeenCalled();
-    fireEvent.click(sendRecording(), { detail: 0 });
+    fireEvent.keyDown(sendRecording(), { key: "Enter" });
     expect(onSendVoice).toHaveBeenCalledTimes(1);
   });
 
   describe("keys during a hands-free recording", () => {
     const start = async (onSendVoice = vi.fn()) => {
       render(<Composer.Root onSendVoice={onSendVoice} />);
-      fireEvent.click(recordButton(), { detail: 0 });
+      fireEvent.keyDown(recordButton(), { key: "Enter" });
       await granted();
       return onSendVoice;
     };

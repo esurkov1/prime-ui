@@ -104,7 +104,7 @@ export type MessageAvatarProps = React.HTMLAttributes<HTMLDivElement> & {
 
 /**
  * The author's picture in the gutter beside an incoming bubble of a group chat (`Chat.Messages
- * type="group"`): put an `Avatar` in it on every message; the message shows it on the last of a
+ * group`): put an `Avatar` in it on every message; the message shows it on the last of a
  * run and keeps the gutter empty on the others.
  */
 export function MessageAvatar({ className, ...rest }: MessageAvatarProps) {

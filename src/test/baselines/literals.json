@@ -1,9 +1,4 @@
 [
-  "src/components/chat-list/ChatList.module.css: px in @container (use rem)",
-  "src/components/composer/Composer.module.css: numeric scale() in transform",
-  "src/components/composer/Composer.module.css: raw length in translate",
-  "src/components/composer/Composer.module.css: raw length in translate #2",
-  "src/components/composer/Composer.module.css: raw length in translate #3",
   "src/components/datepicker/Datepicker.module.css: raw length in --dp-col-gap",
   "src/components/dnd/Dnd.module.css: numeric scale() in transform",
   "src/components/modal/DialogParts.module.css: px in @container (use rem)",

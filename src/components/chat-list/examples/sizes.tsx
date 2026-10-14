@@ -1,8 +1,6 @@
 /** Every size tier: row height, text, avatar, glyphs and the search field follow the tier — `size`. */
 import { Avatar, Card, ChatList, hueOf, Typography } from "prime-ui-kit";
 
-import styles from "./examples.module.css";
-
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 const NOW = new Date(2026, 9, 14, 15, 0);
@@ -28,12 +26,9 @@ const DIALOGS = [
 
 export default function ChatListSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map((size) => (
-        <div key={size} className={styles.tier}>
-          <Typography as="span" variant="caption" tone="muted">
-            {size}
-          </Typography>
+        <div key={size}>
           <Card.Root>
             <ChatList.Root
               size={size}
@@ -54,8 +49,11 @@ export default function ChatListSizesExample() {
               )}
             />
           </Card.Root>
+          <Typography as="span" variant="caption" tone="muted">
+            {size}
+          </Typography>
         </div>
       ))}
-    </>
+    </div>
   );
 }

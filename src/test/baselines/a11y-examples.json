@@ -1,5 +1,4 @@
 [
-  "src/components/chat/examples/screen.tsx: aria-label on a generic div",
   "src/components/color-picker/examples/panel.tsx: dangling for",
   "src/components/color-picker/examples/states.tsx: dangling for",
   "src/components/kanban/examples/cards.tsx: aria-label on a generic div",

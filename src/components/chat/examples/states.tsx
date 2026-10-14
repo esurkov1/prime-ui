@@ -1,8 +1,6 @@
 /** The first load of a conversation: bubble-shaped placeholders on both sides stand in the list's place, then cross-fade into the messages — `loading`. */
-import { Button, Card, Chat, Message } from "prime-ui-kit";
+import { Button, Card, Chat, Message, Typography } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./examples.module.css";
 
 const LOAD_MS = 1500;
 
@@ -67,8 +65,8 @@ export default function ChatStatesExample() {
   }, [loading]);
 
   return (
-    <div className={styles.live}>
-      <div className={styles.liveBar}>
+    <div>
+      <div>
         <Button.Root
           variant="soft"
           tone="neutral"
@@ -77,24 +75,27 @@ export default function ChatStatesExample() {
         >
           Открыть заново
         </Button.Root>
+        <Card.Root>
+          <Chat.Root>
+            <Chat.Messages aria-label="Переписка с ООО «Вектор»" loading={loading}>
+              {MESSAGES.map((message) => (
+                <Message.Root
+                  key={message.id}
+                  value={message.id}
+                  direction={message.direction}
+                  time={message.time}
+                  status={message.direction === "outgoing" ? "read" : undefined}
+                >
+                  <Message.Text>{message.text}</Message.Text>
+                </Message.Root>
+              ))}
+            </Chat.Messages>
+          </Chat.Root>
+        </Card.Root>
+        <Typography as="span" variant="caption" tone="muted">
+          loading
+        </Typography>
       </div>
-      <Card.Root className={styles.short}>
-        <Chat.Root>
-          <Chat.Messages aria-label="Переписка с ООО «Вектор»" loading={loading}>
-            {MESSAGES.map((message) => (
-              <Message.Root
-                key={message.id}
-                value={message.id}
-                direction={message.direction}
-                time={message.time}
-                status={message.direction === "outgoing" ? "read" : undefined}
-              >
-                <Message.Text>{message.text}</Message.Text>
-              </Message.Root>
-            ))}
-          </Chat.Messages>
-        </Chat.Root>
-      </Card.Root>
     </div>
   );
 }

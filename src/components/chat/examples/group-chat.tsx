@@ -1,4 +1,4 @@
-/** A team chat from data: the first message of an author's run opens with the name in the author's hue, a crown for the owner and the member's tag; the avatar — a photo, or initials — closes the run, which holds messages up to a quarter of an hour apart; the dates carry the weekday — `type`, `items`, `renderMessage`, `groupWindow`, `formatDate`, `Message.Author`, `tag`, `Message.AuthorIcon`, `hueOf`. */
+/** A team chat from data: the first message of an author's run opens with the name in the author's hue, a crown for the owner and the member's tag; the avatar — a photo, or initials — closes the run, which holds messages up to a quarter of an hour apart; the dates carry the weekday — `group`, `items`, `renderMessage`, `groupWindow`, `formatDate`, `Message.Author`, `tag`, `Message.AuthorIcon`, `hueOf`. */
 import { Avatar, Card, Chat, hueOf, Icon, Message } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -126,7 +126,7 @@ export default function ChatGroupChatExample() {
     <Card.Root className={styles.short}>
       <Chat.Root>
         <Chat.Messages
-          type="group"
+          group
           aria-label="Чат команды релиза"
           items={MESSAGES}
           getKey={(message) => message.id}
