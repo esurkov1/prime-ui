@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -152,9 +152,10 @@ function TextareaRoot({
   ref,
   ...rest
 }: TextareaRootProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
-  const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
+  const ids = useFieldFrame(id, { label, hint, error, invalid, required }, ariaDescribedBy);
   const labels = useLabels(TEXTAREA_LABELS, labelsProp);
 
   const innerRef = React.useRef<HTMLTextAreaElement | null>(null);
@@ -182,6 +183,25 @@ function TextareaRoot({
     mirrorRef.current.dataset.value = typeof value === "string" ? value : innerRef.current.value;
   }, [autoResize, value]);
 
+  // A form reset puts the default text back without an input event: the mirror and the
+  // consumer's value (a counter) follow it once the reset has run.
+  const onValueChangeRef = React.useRef(onValueChange);
+  onValueChangeRef.current = onValueChange;
+  React.useEffect(() => {
+    const form = innerRef.current?.form;
+    if (!form) return;
+    const onFormReset = () => {
+      queueMicrotask(() => {
+        const textarea = innerRef.current;
+        if (!textarea) return;
+        if (mirrorRef.current) mirrorRef.current.dataset.value = textarea.value;
+        onValueChangeRef.current?.(textarea.value);
+      });
+    };
+    form.addEventListener("reset", onFormReset);
+    return () => form.removeEventListener("reset", onFormReset);
+  }, []);
+
   // Clicking the padding of the field focuses the textarea (the box is a div, not a label,
   // so the counter and hints never leak into the accessible name).
   const focusFromPadding = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -201,7 +221,7 @@ function TextareaRoot({
       className={cx(styles.textarea, autoResize && styles.textareaAutoResize)}
       disabled={disabled}
       readOnly={readOnly}
-      required={required}
+      required={ids.required || undefined}
       aria-invalid={ids.invalid || undefined}
       aria-describedby={ids.describedBy}
       aria-busy={commit.state === "pending" || undefined}
@@ -285,7 +305,7 @@ function TextareaRoot({
 
   return (
     <TextareaProvider value={contextValue}>
-      <ControlSizeProvider value={size}>
+      {tier.provide(
         <FieldFrame
           size={size}
           ids={ids}
@@ -309,8 +329,8 @@ function TextareaRoot({
           ) : (
             control
           )}
-        </FieldFrame>
-      </ControlSizeProvider>
+        </FieldFrame>,
+      )}
     </TextareaProvider>
   );
 }
