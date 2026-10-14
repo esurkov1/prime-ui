@@ -76,7 +76,7 @@ pathname to `AppShell.Template scrollResetKey` and use `asChild` for router link
 
 ```tsx
 import "prime-ui-kit/bundle.css"; // tokens, light and dark themes, component styles
-import "prime-ui-kit/fonts.css"; // optional: Golos Text + JetBrains Mono from Google Fonts
+import "prime-ui-kit/fonts.css"; // optional: Golos Text + JetBrains Mono, metric-matched fallbacks
 import "prime-ui-kit/reset.css"; // optional: minimal document reset (skip if the app has its own)
 import { applyTheme } from "prime-ui-kit";
 
@@ -117,7 +117,7 @@ components.
 ## Quick start
 
 ```tsx
-import { AppHeader, AppShell, Button, Input, PageContent, Sidebar } from "prime-ui-kit";
+import { AppHeader, AppShell, Button, Icon, Input, PageContent, Sidebar } from "prime-ui-kit";
 
 export function App() {
   return (
@@ -126,26 +126,31 @@ export function App() {
       nav={
         <Sidebar.Root>
           <Sidebar.Content>
-            <Sidebar.Item current>Clients</Sidebar.Item>
+            <Sidebar.Item href="/clients" current>
+              <Sidebar.ItemIcon>
+                <Icon name="object.users" />
+              </Sidebar.ItemIcon>
+              Клиенты
+            </Sidebar.Item>
           </Sidebar.Content>
         </Sidebar.Root>
       }
       header={
         <AppHeader.Root>
           <AppHeader.Start>
-            <AppHeader.Title>New client</AppHeader.Title>
+            <AppHeader.Title>Новый клиент</AppHeader.Title>
           </AppHeader.Start>
         </AppHeader.Root>
       }
     >
       <PageContent.Root as="section">
         <PageContent.Body>
-          <Input.Root label="Email" required hint="We will send an invitation">
+          <Input.Root label="Рабочая почта" required hint="Отправим на неё приглашение">
             <Input.Wrapper>
               <Input.Field type="email" placeholder="name@company.ru" />
             </Input.Wrapper>
           </Input.Root>
-          <Button.Root>Invite</Button.Root>
+          <Button.Root>Пригласить клиента</Button.Root>
         </PageContent.Body>
       </PageContent.Root>
     </AppShell.Template>
@@ -333,6 +338,7 @@ accessibility, examples and common mistakes.
 | API | Purpose |
 |---|---|
 | `NotificationProvider` + `useNotifications()` | Toast queue: `notify`, `dismiss`, `dismissAll`. Place the provider once at the app root. |
+| `useAppShellNav()` | The app shell's navigation for a trigger outside the Sidebar rail (a BottomNav «Ещё», your own menu button). |
 | `ControlSizeProvider` | Default `size` for every control in a subtree (dense toolbars, compact forms). |
 | `Tooltip.Provider` | Shared open delay for a group of tooltips. |
 | `applyTheme(scheme, element?)` | Switch the theme without transition flashes. |
@@ -345,6 +351,7 @@ accessibility, examples and common mistakes.
 | `moveBefore(items, id, beforeId, getId)` | Applies a `Dnd` or DataTable `onReorder` to your array. |
 | `matchesSmartFilter`, `resolveSmartFilterValues` | Apply a SmartFilter value to your rows. |
 | `datepickerPresets`, `formatDatepickerValue` | Quick ranges and value display for `Datepicker`. |
+| `formatDateValue(date, { withTime })` | A date as the local `yyyy-MM-dd` (`THH:mm`) value for a form or a query. |
 | `chartColors` | The chart palette as CSS values for a chart library; follows the theme. |
 | `useTokenValue(token)` | A length token in px for geometry CSS cannot take (SVG, canvas). |
 | `<Icon name="…" />`, `createIcon(glyph)` | The kit icon set: Lucide drawings, each with a small gesture that plays when its host is hovered or pressed; `createIcon` turns any SVG icon component (a `lucide-react` glyph you install, an SVGR import) into a kit icon. |
@@ -370,9 +377,9 @@ with the kit the way its author would: the screen-building process, the design r
 the API cheat sheet, how to choose between similar components, what to do when a component is missing,
 page recipes (dashboard, list with table, settings, forms, detail page, screen states, messenger, auth), anti-patterns
 and a review checklist. The package ships it built as one self-contained folder,
-`node_modules/prime-ui-kit/dist/skill/`: `SKILL.md`, the guides, and every component's `COMPONENT.md`
-and `examples/` under `reference/` (whole screens included, as `examples/screen.tsx`), so it always
-matches the installed version.
+`node_modules/prime-ui-kit/dist/skill/`: `SKILL.md`, the guides, and under `reference/` every
+component's `COMPONENT.md` and `examples/` (whole screens included, as `examples/screen.tsx`) and the
+design contract, so it always matches the installed version.
 
 ### Install the skill
 
@@ -407,7 +414,7 @@ the kit, run the command again: it replaces the folder with the skill of the new
 | `prime-ui-kit/color-picker` | `ColorPicker`, `ColorField` and `parseColor` — the only code on the optional peer `react-aria-components`. |
 | `prime-ui-kit/icons` | The full animated glyph set as named components (`<BellIcon />`): Lucide drawings, one gesture each; only what you import is bundled. |
 | `prime-ui-kit/bundle.css` | Tokens, both themes, base rules (focus ring, reduced motion) and every component's CSS. |
-| `prime-ui-kit/fonts.css` | Optional: Golos Text and JetBrains Mono from Google Fonts. |
+| `prime-ui-kit/fonts.css` | Optional: Golos Text and JetBrains Mono from Google Fonts, with metric-matched local fallbacks, so text does not move when a face arrives. |
 | `prime-ui-kit/reset.css` | Optional: minimal document reset. |
 | `prime-ui-kit/tokens.css`, `theme-light.css`, `theme-dark.css` | The token layers alone (already inside `bundle.css`), for styling without components. |
 

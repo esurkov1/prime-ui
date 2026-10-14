@@ -254,6 +254,7 @@ The same for one value in several units — one heading, the fields in a row, th
 | an `<img>` with your own radius and loading box | `Thumbnail.Root` / `Avatar.Root` |
 | a lightbox, or a Modal with an `<img>` | `Gallery` (opens `MediaViewer` itself) or `MediaViewer` |
 | a `position: fixed` bottom tab bar | `BottomNav` in `AppShell.Footer` |
+| a menu state and a menu button wired by hand to open the phone Sidebar | nothing: the `AppHeader` draws the menu button; another trigger reads `useAppShellNav()` ([the app frame](layouts.md#app-frame-once-per-app)) |
 | a bottom panel built from a Drawer or a `div` | `Sheet` |
 
 ## 7a. Fighting the table
