@@ -2,6 +2,8 @@ import * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import hairline from "@/internal/hairline.module.css";
+import { iconBoxStyles, iconSlotClass } from "@/internal/iconBox";
 import press from "@/internal/press.module.css";
 import { Slot, slotChild } from "@/internal/slot";
 import type { Tone } from "@/internal/states";
@@ -17,17 +19,21 @@ type SpanProps = React.HTMLAttributes<HTMLSpanElement> & { ref?: React.Ref<HTMLS
 export type CardVariant = "panel" | "mini" | "stat-trend" | "split" | "cta" | "list" | "cover";
 
 export type CardRootProps = DivProps & {
-  /** Structural template: KPI tiles, lists, CTA, split, cover and titled panels. Default `panel`. */
   variant?: CardVariant;
-  /** No raised shadow: a flat tile on the page (dense grids where shadows add noise). */
   flat?: boolean;
-  /**
-   * The whole card is one link or button: pass that element as the only child and the card's
-   * parts inside it. It lifts on hover, presses and shows the focus ring. Nothing interactive
-   * may sit inside it.
-   */
   asChild?: boolean;
 };
+
+/** The template of the card around a part: it picks the part's text role and zone hairlines. */
+const VariantContext = React.createContext<CardVariant | null>(null);
+/** Whether a part sits in `Card.Header` (a header-row value is a step smaller). */
+const HeaderContext = React.createContext(false);
+
+/** `panel` and `list` are the zoned templates: their zones are parted by faint hairlines. */
+function useZoned(): boolean {
+  const variant = React.useContext(VariantContext);
+  return variant === "panel" || variant === "list";
+}
 
 function CardRoot({
   variant = "panel",
@@ -38,6 +44,13 @@ function CardRoot({
   ...rest
 }: CardRootProps) {
   const depth = useNestedSurfaceDepth();
+  const content = (inner: React.ReactNode) => (
+    <VariantContext.Provider value={variant}>
+      <HeaderContext.Provider value={false}>
+        <SurfaceDepthProvider value={depth}>{inner}</SurfaceDepthProvider>
+      </HeaderContext.Provider>
+    </VariantContext.Provider>
+  );
   const rootProps = {
     ...rest,
     className: cx(styles.root, asChild && press.press, className),
@@ -53,19 +66,11 @@ function CardRoot({
     const child = slotChild(children, "Card.Root");
     return (
       <Slot {...rootProps}>
-        {React.cloneElement(
-          child,
-          undefined,
-          <SurfaceDepthProvider value={depth}>{child.props.children}</SurfaceDepthProvider>,
-        )}
+        {React.cloneElement(child, undefined, content(child.props.children))}
       </Slot>
     );
   }
-  return (
-    <div {...rootProps}>
-      <SurfaceDepthProvider value={depth}>{children}</SurfaceDepthProvider>
-    </div>
-  );
+  return <div {...rootProps}>{content(children)}</div>;
 }
 CardRoot.displayName = "Card.Root";
 
@@ -73,20 +78,26 @@ export type CardHeaderProps = DivProps;
 
 /** The top row: the title first, anything after it (a control, a quiet caption) at the end. */
 function CardHeader({ className, ...rest }: CardHeaderProps) {
-  return <div className={cx(styles.header, className)} {...rest} />;
+  const zoned = useZoned();
+  return (
+    <HeaderContext.Provider value={true}>
+      <div className={cx(styles.header, zoned && hairline.between, className)} {...rest} />
+    </HeaderContext.Provider>
+  );
 }
 CardHeader.displayName = "Card.Header";
 
 export type CardHeadingLevel = "h2" | "h3" | "h4";
 
 export type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
-  /** Heading level that fits the page outline (the look does not change). */
   as?: CardHeadingLevel;
   ref?: React.Ref<HTMLHeadingElement>;
 };
 
 function CardTitle({ as: Tag = "h3", className, ...rest }: CardTitleProps) {
-  return <Tag className={cx(textRole.titleS, styles.title, className)} {...rest} />;
+  // The call to action leads with a step larger title.
+  const role = React.useContext(VariantContext) === "cta" ? textRole.titleM : textRole.titleS;
+  return <Tag className={cx(role, styles.title, className)} {...rest} />;
 }
 CardTitle.displayName = "Card.Title";
 
@@ -102,7 +113,8 @@ CardDescription.displayName = "Card.Description";
 export type CardBodyProps = DivProps;
 
 function CardBody({ className, ...rest }: CardBodyProps) {
-  return <div className={cx(styles.body, className)} {...rest} />;
+  const zoned = useZoned();
+  return <div className={cx(styles.body, zoned && hairline.between, className)} {...rest} />;
 }
 CardBody.displayName = "Card.Body";
 
@@ -116,17 +128,25 @@ CardMedia.displayName = "Card.Media";
 
 export type CardFooterProps = DivProps;
 
-/** The bottom row of buttons. */
+/** The bottom row of buttons: under a hairline in the zoned templates and in `cta`. */
 function CardFooter({ className, ...rest }: CardFooterProps) {
-  return <div className={cx(styles.footer, className)} {...rest} />;
+  const variant = React.useContext(VariantContext);
+  const ruled = variant === "panel" || variant === "list" || variant === "cta";
+  return <div className={cx(styles.footer, ruled && hairline.top, className)} {...rest} />;
 }
 CardFooter.displayName = "Card.Footer";
 
 export type CardIconProps = DivProps;
 
-/** The 40px accent tile of a KPI; holds one icon. */
+/** The accent icon tile of a KPI; holds one icon. */
 function CardIcon({ className, ...rest }: CardIconProps) {
-  return <div className={cx(styles.icon, className)} {...rest} />;
+  return (
+    <div
+      {...rest}
+      className={cx(iconBoxStyles.tile, iconSlotClass, styles.icon, className)}
+      data-tone="accent"
+    />
+  );
 }
 CardIcon.displayName = "Card.Icon";
 
@@ -140,18 +160,32 @@ CardLabel.displayName = "Card.Label";
 export type CardValueProps = SpanProps;
 
 function CardValue({ className, ...rest }: CardValueProps) {
-  return <span className={cx(textRole.titleL, styles.value, className)} {...rest} />;
+  const variant = React.useContext(VariantContext);
+  const inHeader = React.useContext(HeaderContext);
+  // `stat-trend`: the value is the tile's headline (a step smaller beside a lead in the header
+  // row); the headline follows the card's width (`.headline`).
+  const role =
+    variant !== "stat-trend" ? textRole.titleL : inHeader ? textRole.headingM : textRole.headingL;
+  const headline = variant === "stat-trend" && !inHeader;
+  return (
+    <span className={cx(role, styles.value, headline && styles.headline, className)} {...rest} />
+  );
 }
 CardValue.displayName = "Card.Value";
 
 export type CardDeltaProps = SpanProps & {
-  /** Color of the change: `success` — good, `danger` — bad, `neutral` (default). Independent of the sign. */
   tone?: Extract<Tone, "neutral" | "success" | "warning" | "danger">;
 };
 
 function CardDelta({ className, tone = "neutral", ...rest }: CardDeltaProps) {
   // The status ink is the shared text tone; `neutral` keeps the secondary ink of `.delta`.
-  return <span {...rest} className={cx(styles.delta, textTone.tone, className)} data-tone={tone} />;
+  return (
+    <span
+      {...rest}
+      className={cx(textRole.bodyS, styles.delta, textTone.tone, className)}
+      data-tone={tone}
+    />
+  );
 }
 CardDelta.displayName = "Card.Delta";
 
@@ -171,7 +205,15 @@ export type CardListProps = React.HTMLAttributes<HTMLUListElement> & {
 };
 
 function CardList({ className, ...rest }: CardListProps) {
-  return <ul className={cx(styles.list, className)} {...rest} />;
+  const zoned = useZoned();
+  return (
+    <ul
+      // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+      role="list"
+      className={cx(styles.list, zoned && hairline.between, className)}
+      {...rest}
+    />
+  );
 }
 CardList.displayName = "Card.List";
 
@@ -180,7 +222,9 @@ export type CardListItemProps = React.HTMLAttributes<HTMLLIElement> & {
 };
 
 function CardListItem({ className, ...rest }: CardListItemProps) {
-  return <li className={cx(textRole.bodyM, styles.listItem, className)} {...rest} />;
+  return (
+    <li className={cx(textRole.bodyM, styles.listItem, hairline.between, className)} {...rest} />
+  );
 }
 CardListItem.displayName = "Card.ListItem";
 

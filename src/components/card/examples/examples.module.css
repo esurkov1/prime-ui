@@ -28,14 +28,6 @@
   width: min(100%, calc(var(--prime-space-24) * 6));
 }
 
-.cover {
-  background: linear-gradient(
-    135deg,
-    var(--prime-color-accent-soft) 0%,
-    var(--prime-color-palette-sky-soft) 100%
-  );
-}
-
 .listRow {
   display: flex;
   align-items: center;
@@ -46,5 +38,4 @@
 
 .listMeta {
   flex: none;
-  font-variant-numeric: tabular-nums;
 }

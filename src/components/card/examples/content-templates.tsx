@@ -39,7 +39,13 @@ export default function CardContentTemplatesExample() {
                 <Typography as="span" variant="body-m" truncate>
                   {e.text}
                 </Typography>
-                <Typography as="span" variant="caption" tone="muted" className={styles.listMeta}>
+                <Typography
+                  as="span"
+                  variant="caption"
+                  tone="muted"
+                  numeric="tabular"
+                  className={styles.listMeta}
+                >
                   {e.time}
                 </Typography>
               </span>
@@ -50,7 +56,7 @@ export default function CardContentTemplatesExample() {
 
       <Card.Root variant="cover">
         <Card.Media aria-hidden>
-          <div className={styles.cover} />
+          <img src="https://picsum.photos/seed/autumn-campaign/640/320" alt="" />
         </Card.Media>
         <Card.Body>
           <Card.Title>Кампания «Осень»</Card.Title>

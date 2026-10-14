@@ -5,9 +5,14 @@
  * `composes`); the host sets `--hairline-inset` to its side padding to inset the line from both
  * edges (0 runs it edge to edge). It composes with the host's own fill: only the image longhands
  * are set, never the `background` shorthand.
+ *
+ * `.between` draws the line only where one zone follows another: join it on every zone of a run
+ * (a header, its body, the rows of a list) and each one that comes right after a sibling with
+ * `.between` gets the line at its top. A zone without it (an edge-to-edge chart) breaks the run.
  */
 .top,
-.bottom {
+.bottom,
+.between + .between {
   background-image: linear-gradient(
     var(--prime-color-border-faint),
     var(--prime-color-border-faint)
@@ -17,7 +22,8 @@
     var(--prime-border-width);
 }
 
-.top {
+.top,
+.between + .between {
   background-position: center top;
 }
 
