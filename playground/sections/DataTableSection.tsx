@@ -138,7 +138,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Скелетон загрузки, пустой период и ошибка с повтором: шапка остаётся, меняется только тело — `loading`, `loadingRows`, `empty`, `error`.",
+        "Скелетон загрузки, пустой период и ошибка с повтором: шапка остаётся, меняется только тело — `loading`, `loadingRows`, `empty`, `loadError`.",
     },
     {
       slot: "controlled",

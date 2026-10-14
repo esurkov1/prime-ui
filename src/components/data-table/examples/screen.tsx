@@ -230,7 +230,8 @@ const COLUMNS: DataTableColumn<Invoice>[] = [
   },
   {
     id: "actions",
-    header: "",
+    header: "Действия",
+    hideHeader: true,
     width: "3.5rem",
     align: "end",
     cell: (row) => (

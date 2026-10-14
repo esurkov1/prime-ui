@@ -287,7 +287,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | a form saved and still on screen | the submit button's text: «Сохранено» |
 | a state of the page or a section that persists (sync failed, trial ends, read-only) | `Banner` as the first block of `PageContent.Body` (or inside the Card it concerns) |
 | a problem with one field | the field's `error` |
-| a region failed to load | the region shows it in place: DataTable `error`, `EmptyPage` with `EmptyPage.Icon tone="danger"` and «Повторить» |
+| a region failed to load | the region shows it in place: DataTable `loadError`, `EmptyPage` with `EmptyPage.Icon tone="danger"` and «Повторить» |
 | a region is loading | DataTable `loading`; otherwise a `Skeleton` in the geometry of the content + `aria-busy` on the region; `Spinner` only when there is no shape to hold |
 | a region changes state (loading → data → empty → error, another record) | its content in `Crossfade state={status}` — always, so the change flows instead of flipping |
 | nothing here yet (first run) | `EmptyPage` with one action (`tone="accent"` icon for a call to start) |
@@ -483,7 +483,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - The header carries the page: `AppHeader.Title` with an `AppHeader.Description` line of data — the accounts and the date of the statement the screen stands on; main has no `PageContent.Header`.
 - An error that concerns the whole page is a `Banner tone="danger"` as the first block of `PageContent.Body` with a «Повторить» action; the action's result is a `Notification`.
-- A region's error is in the region's place: `error` on the `DataTable` (the table head stays), not a pop-up.
+- A region's error is in the region's place: `loadError` on the `DataTable` (the table head stays), not a pop-up.
 - Table loading is `loading` + `loadingRows` (a skeleton of rows); card loading is a `Skeleton` in the shape of its rows and `aria-busy` on the card, and the block's height does not change. The state change is smooth: the card's region is in `Crossfade state={status}`, the table body changes by itself.
 - Stale data beats emptiness: the balances are shown as of the previous date, and that is said on the right in `Card.Header`.
 - Empty on the first run is `EmptyPage size="s"` inside the panel: an icon with `tone="accent"`, what it is and why, one action. An empty filter result is the table's `empty`.

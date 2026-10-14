@@ -148,7 +148,7 @@ export const api: ComponentApi = {
           ru: "Пустое состояние: строка попадает в компактный EmptyPage, узел (например, полный `EmptyPage`) выводится как есть.",
         },
         {
-          name: "error",
+          name: "loadError",
           type: "ReactNode",
           en: 'Load error: replaces the body with the message in `role="alert"`.',
           ru: 'Ошибка загрузки: тело таблицы заменяется сообщением в `role="alert"`.',
@@ -499,6 +499,13 @@ export const api: ComponentApi = {
           default: '"start"',
           en: "Head alignment; the sort icon stays at the end edge.",
           ru: "Выравнивание заголовка; иконка сортировки всегда у конца ячейки.",
+        },
+        {
+          name: "hideHeader",
+          type: "boolean",
+          default: "false",
+          en: "`header` names the column for assistive tech only (an action column): the head cell looks empty.",
+          ru: "`header` называет колонку только для вспомогательных технологий (колонка действий): ячейка заголовка выглядит пустой.",
         },
         {
           name: "numeric",

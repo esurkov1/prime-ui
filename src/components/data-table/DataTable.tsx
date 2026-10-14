@@ -11,6 +11,7 @@ import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { exitTimeoutMs } from "@/internal/motionTiming";
 import { useSwapIn } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
@@ -216,8 +217,7 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   expanded?: React.Key[];
   defaultExpanded?: React.Key[];
   onExpandedChange?: (expanded: React.Key[]) => void;
-  /** Load error: replaces the body with a message in `role="alert"`. */
-  error?: React.ReactNode;
+  loadError?: React.ReactNode;
   /** Skeleton rows while `loading` without rows. Default `min(pageSize, 5)`. */
   loadingRows?: number;
   /** Panel above the table (search, filters, actions). Wraps on narrow widths. */
@@ -330,7 +330,7 @@ export function DataTable<Row>({
   expanded,
   defaultExpanded = EMPTY_KEYS,
   onExpandedChange,
-  error,
+  loadError,
   loadingRows,
   toolbar,
   getRowGroup,
@@ -342,10 +342,8 @@ export function DataTable<Row>({
   ref,
   ...rest
 }: DataTableProps<Row>) {
-  // Keyed by content: an inline `labels` object would otherwise re-render every row on each render.
-  const labelsKey = labelsProp ? JSON.stringify(labelsProp) : "";
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `labelsKey` is the content of `labelsProp`.
-  const labels = React.useMemo(() => ({ ...DATA_TABLE_LABELS, ...labelsProp }), [labelsKey]);
+  // Stable across inline `labels` objects: otherwise every row would re-render on each render.
+  const labels = useLabels(DATA_TABLE_LABELS, labelsProp);
   const infinite = paging === "infinite";
   const paged = paging === "pages";
   const server = source === "server";
@@ -642,7 +640,7 @@ export function DataTable<Row>({
   });
 
   // ─── States ───
-  const hasError = error != null && error !== false;
+  const hasError = loadError != null && loadError !== false;
   const showSkeleton = !hasError && loading && displayedCount === 0;
   const showEmpty = !hasError && !loading && displayedCount === 0;
   const bodyState = hasError ? "error" : showSkeleton ? "loading" : showEmpty ? "empty" : "rows";
@@ -1036,7 +1034,7 @@ export function DataTable<Row>({
                           selectable={selectable}
                           expandEnabled={expandEnabled}
                           reorderable={reorder.enabled}
-                          error={error}
+                          loadError={loadError}
                           empty={empty}
                           emptyLabel={labels.empty}
                           skeletonRows={Math.max(

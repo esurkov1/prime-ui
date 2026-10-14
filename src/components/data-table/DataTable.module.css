@@ -23,7 +23,7 @@
   --dt-text-size: var(--prime-control-m-text-size);
   --dt-text-line-height: var(--prime-control-m-line-height);
   --dt-choice: var(--prime-control-m-choice);
-  /* Expand toggle: square ghost button one tier below the table (m → xs, 28). */
+  /* Expand toggle: a square ghost button of the compact tier (`compactTier`: m → xs, 28). */
   --dt-toggle: var(--prime-control-xs-height);
   /* Sub-row indent per depth: an avatar of the tier + the cell gap, so a child's content starts
    * under the parent's text. Override `--dt-indent` on the root for other leading content. */
@@ -483,8 +483,7 @@
   border-inline-start-width: 0;
 }
 
-/* Row handle column: the grip only, centred on the row; a spinner stands in while the row's move
-   is saved. */
+/* Row handle column: the grip only, centred on the row; busy while the row's move is saved. */
 .handleCell {
   box-sizing: border-box;
   width: var(--dt-handle-w);
@@ -492,14 +491,6 @@
   max-width: var(--dt-handle-w);
   padding-inline: var(--dt-pad-x) 0;
   line-height: 0;
-}
-
-.handleSpinner {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  inline-size: var(--prime-control-xs-height);
-  block-size: var(--prime-control-xs-height);
 }
 
 /* A row whose move is being saved: its content quiets down until the answer, both ways eased. */
@@ -527,11 +518,9 @@
 }
 
 /*
- * Sub-rows fold open and shut like the detail panel: each cell's content runs through a grid track
- * (0fr ↔ 1fr) on the `base` clock, with the fade on the same curve. The row height and the
- * vertical padding live inside the track (`.foldPad`), and a closing row's divider thins to 0, so
- * a folded row takes no room before it unmounts. Clipping is on only while it moves (opening,
- * closed), so a focus ring at rest is never cut.
+ * Sub-rows fold open and shut like the detail panel: each cell's content is a Disclosure (the
+ * kit's fold, `base` clock). The row height and the vertical padding live inside it (`.foldPad`),
+ * and a closing row's divider thins to 0, so a folded row takes no room before it unmounts.
  */
 .row[data-fold] > .cell {
   height: auto;
@@ -541,45 +530,12 @@
     border-top-width var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
-.fold {
-  display: grid;
-  grid-template-rows: 1fr;
-  opacity: 1;
-  transition:
-    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
-}
-
-.foldItem {
-  min-height: 0;
-}
-
-.row:is([data-fold="opening"], [data-fold="closed"]) .foldItem {
-  overflow: hidden;
-}
-
 .foldPad {
   box-sizing: border-box;
   display: grid;
   align-content: center;
   min-height: var(--dt-row-height);
   padding-block: var(--dt-pad-y);
-}
-
-.row[data-fold="opening"] .fold {
-  animation: dt-fold-open var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
-}
-
-@keyframes dt-fold-open {
-  from {
-    grid-template-rows: 0fr;
-    opacity: 0;
-  }
-}
-
-.row[data-fold="closed"] .fold {
-  grid-template-rows: 0fr;
-  opacity: 0;
 }
 
 .row[data-fold="closed"] > .cell {
@@ -660,54 +616,22 @@
   --enter-shift: calc(-1 * var(--prime-space-1));
 }
 
-/* Detail panel under an expanded row: one ladder step off the table, content aligned with the first content column. */
+/*
+ * Detail panel under an expanded row: one ladder step off the table, content aligned with the
+ * first content column. It folds through a Disclosure: opening on the enter curve (a panel opened
+ * by an expand plays it as it mounts), closing on the standard one, then it unmounts
+ * (`usePresence`). The padding and the divider live inside the fold, so it really reaches 0 and
+ * the unmount moves nothing.
+ */
 .detailCell {
+  --disclosure-ease: var(--prime-motion-easing-enter);
+  --disclosure-close-ease: var(--prime-motion-easing-standard);
+
   padding: 0;
   background: var(--dt-step);
 }
 
-/*
- * Height runs through the grid track (0fr ↔ 1fr), like Accordion. Open: the panel opened by an
- * expand drops in (slow · enter); close: it folds on the same clock as it opened (base) and
- * unmounts after the transition (`usePresence`). The fade follows the height, so text and room
- * leave together. Nothing outside the track has a size of its own: the padding and the divider
- * live inside the clipped content, so the track really reaches 0 and the unmount moves nothing.
- */
-.detailMotion {
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  transition:
-    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
-}
-
-.detailRow[data-state="open"] .detailMotion {
-  grid-template-rows: 1fr;
-  opacity: 1;
-  transition:
-    grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
-    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-enter);
-}
-
-.detailRow[data-state="open"][data-animate="true"] .detailMotion {
-  animation: dt-detail-enter var(--prime-motion-duration-slow) var(--prime-motion-easing-enter);
-}
-
-@keyframes dt-detail-enter {
-  from {
-    grid-template-rows: 0fr;
-    opacity: 0;
-  }
-}
-
-/* The grid item: no padding or border of its own, so the 0fr track collapses it to nothing. */
-.detailClip {
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* Padded content (focus-space kept) and the divider, inside the clip. */
+/* Padded content (focus-space kept) and the divider, inside the fold. */
 .detailContent {
   padding: var(--prime-space-3) var(--dt-pad-x) var(--prime-space-4)
     calc(var(--dt-lead) + var(--dt-pad-x));
@@ -769,36 +693,6 @@
 
 .cellLink {
   outline: none;
-}
-
-/* Zero specificity: a control's own `position` / `z-index` always wins. */
-:where(.row[data-link="true"] > .cell)
-  :where(
-    a[href]:not([data-row-link]),
-    button,
-    input,
-    select,
-    textarea,
-    label,
-    summary,
-    [contenteditable="true"],
-    [contenteditable=""],
-    [tabindex]:not([tabindex="-1"]),
-    [role="button"],
-    [role="link"],
-    [role="checkbox"],
-    [role="radio"],
-    [role="switch"],
-    [role="menuitem"],
-    [role="option"],
-    [role="tab"],
-    [role="slider"],
-    [role="combobox"],
-    [role="textbox"],
-    [data-row-click-ignore]
-  ) {
-  position: relative;
-  z-index: var(--prime-z-raised);
 }
 
 /*

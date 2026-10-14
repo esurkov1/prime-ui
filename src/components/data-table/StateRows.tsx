@@ -18,7 +18,7 @@ type StateRowsProps<Row> = {
   expandEnabled: boolean;
   /** A leading column of row handles (`onReorder`). */
   reorderable?: boolean;
-  error: React.ReactNode;
+  loadError: React.ReactNode;
   empty: React.ReactNode;
   emptyLabel: string;
   skeletonRows: number;
@@ -37,7 +37,7 @@ export function StateRows<Row>({
   selectable,
   expandEnabled,
   reorderable = false,
-  error,
+  loadError,
   empty,
   emptyLabel,
   skeletonRows,
@@ -48,7 +48,7 @@ export function StateRows<Row>({
         <td colSpan={totalColumns} className={cx(styles.stateCell, styles.stateError)}>
           <div className={styles.stateBox}>
             <div className={styles.stateContent} role="alert">
-              {error}
+              {loadError}
             </div>
           </div>
         </td>

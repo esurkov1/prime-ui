@@ -5,14 +5,16 @@ import { Checkbox } from "@/components/checkbox/Checkbox";
 import { usePresence } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
+import { Disclosure } from "@/internal/Disclosure";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
+import { isPlainClick, opensRow } from "@/internal/rowLink";
+import rowLink from "@/internal/rowLink.module.css";
 import { type ControlSize, compactTier } from "@/internal/states";
 
 import type { DataTableLabels } from "./DataTable";
 import styles from "./DataTable.module.css";
 import { ReorderHandleCell, RowElement, type RowReorderShared } from "./reorder";
-import { isPlainClick, opensRow } from "./rowEvents";
 import { columnValue, type MeasureRow, scaleStep } from "./rows";
 import type { DataTableCellAlign, DataTableColumn, DataTableRowClickEvent } from "./types";
 import type { RowSelectionHandlers } from "./useRowSelection";
@@ -141,21 +143,18 @@ function DataTableRowImpl<Row>({
   ]
     .filter(Boolean)
     .join(" ");
-  // Sub-rows and rows of a collapsible group fold open and shut like the detail panel: every cell's
-  // content sits in a grid track (0fr ↔ 1fr). Other top-level rows that arrive keep the drop-in
-  // (`enterMotion`).
+  // Sub-rows and rows of a collapsible group fold open and shut like the detail panel: every
+  // cell's content is a Disclosure (a row that arrives with an expand opens; one that leaves folds
+  // before it unmounts). Other top-level rows that arrive keep the drop-in (`enterMotion`).
   const sub = depth > 0;
-  const [unfolding, setUnfolding] = React.useState(foldable && animate);
-  const fold = !foldable ? undefined : folding ? "closed" : unfolding ? "opening" : "open";
+  const fold = !foldable ? undefined : folding ? "closed" : "open";
   const enter = animate && !foldable && enterMotion.enterBase;
   const lead = cx(styles.cell, enter, shared.stickyFirstColumn && styles.stickyLead);
   const folded = (node: React.ReactNode) =>
     foldable ? (
-      <div className={styles.fold}>
-        <div className={styles.foldItem}>
-          <div className={styles.foldPad}>{node}</div>
-        </div>
-      </div>
+      <Disclosure open={!folding} appear={animate}>
+        <div className={styles.foldPad}>{node}</div>
+      </Disclosure>
     ) : (
       node
     );
@@ -169,7 +168,7 @@ function DataTableRowImpl<Row>({
         rowRef={measureRef}
         id={shared.rowDomId(rowKey)}
         aria-rowindex={ariaRowIndex}
-        className={styles.row}
+        className={cx(styles.row, href !== undefined && rowLink.host)}
         style={sub ? ({ "--dt-depth": depth } as React.CSSProperties) : undefined}
         data-stripe={shared.striped && index % 2 === 1 ? "alt" : undefined}
         data-clickable={opens ? "true" : undefined}
@@ -177,13 +176,6 @@ function DataTableRowImpl<Row>({
         tabIndex={focusable ? 0 : undefined}
         data-level={sub ? depth : undefined}
         data-fold={fold}
-        onAnimationEnd={
-          unfolding
-            ? (event) => {
-                if (event.animationName.includes("dt-fold-open")) setUnfolding(false);
-              }
-            : undefined
-        }
         data-expanded={expanded ? "true" : undefined}
         data-animate={animate ? "true" : undefined}
         aria-selected={shared.selectable ? selected : undefined}
@@ -211,7 +203,6 @@ function DataTableRowImpl<Row>({
         {shared.reorder ? (
           <ReorderHandleCell
             reorder={shared.reorder}
-            rowKey={rowKey}
             rowLabel={rowLabel}
             className={lead}
             wrap={folded}
@@ -310,15 +301,16 @@ function DataTableRowImpl<Row>({
           id={shared.detailDomId(rowKey)}
           className={styles.detailRow}
           data-state={detail.state}
-          data-animate={detailAnimate || animate ? "true" : undefined}
           inert={!expanded}
         >
           <td colSpan={shared.totalColumns} className={styles.detailCell}>
-            <div className={styles.detailMotion} onTransitionEnd={detail.onExitEnd}>
-              <div className={styles.detailClip}>
-                <div className={styles.detailContent}>{detailContent}</div>
-              </div>
-            </div>
+            <Disclosure
+              open={detail.state === "open"}
+              appear={detailAnimate || animate}
+              onTransitionEnd={detail.onExitEnd}
+            >
+              <div className={styles.detailContent}>{detailContent}</div>
+            </Disclosure>
           </td>
         </tr>
       ) : null}

@@ -165,7 +165,7 @@ State change is continuous in the whole kit: every region that changes what it s
 - Region loading: `<Skeleton>` in the geometry of the data — same rows, same gaps (`<Skeleton />` for a text line, `shape="circle"` for an avatar, `shape="control"` for a field, `shape="block"` for an image or chart) — not a spinner in an empty card, not a grey box or shimmer you draw.
 - `Spinner` only where there is no shape to hold (a running job, a status line); a busy button is `<Button.Root loading>`.
 - Refreshing data already on screen: keep it, set `aria-busy` — not back to a skeleton on every refetch.
-- Table states in place: `loading` (+ `loadingRows`), `empty`, `error` on `DataTable` — the head and toolbar stay.
+- Table states in place: `loading` (+ `loadingRows`), `empty`, `loadError` on `DataTable` — the head and toolbar stay.
 - First run of a page or region: `EmptyPage.Root` + `EmptyPage.Icon` + `EmptyPage.Title` + `EmptyPage.Description` + `EmptyPage.Actions` with one action — not «Здесь пока ничего нет».
 - Page-level persistent problem: `<Banner.Root tone="danger">` first in `PageContent.Body`; the result of an action: `useNotifications().notify({ tone, title })`.
 
@@ -262,7 +262,7 @@ export function ProfilePage() {
 ```
 
 A region with all its states — loading, data, empty, error — that flow into each other. Copy this
-shape for every block that fetches data (a table uses DataTable `loading` / `empty` / `error` instead):
+shape for every block that fetches data (a table uses DataTable `loading` / `empty` / `loadError` instead):
 
 ```tsx
 import { Button, Card, Crossfade, EmptyPage, Icon, Skeleton, Typography } from "prime-ui-kit";
