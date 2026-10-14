@@ -13,6 +13,7 @@ import {
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
 import { iconLayout } from "@/internal/iconLayout";
+import { useLabels } from "@/internal/labels";
 import press from "@/internal/press.module.css";
 import { SwitcherScroller } from "@/internal/SwitcherScroller";
 import type { ControlSize } from "@/internal/states";
@@ -31,21 +32,12 @@ export const BUTTON_GROUP_LABELS: ButtonGroupLabels = { optional: "необяз�
 export type ButtonGroupRootProps = Omit<FieldRootDomProps, "dir"> &
   FieldFrameProps & {
     orientation?: ButtonGroupOrientation;
-    /** Tier. Default: the tier of the surrounding control (a toolbar, a panel), else `m`. */
     size?: ControlSize;
-    /**
-     * Stretch the group to its container; horizontal segments tend to equal widths but never get
-     * narrower than their label — when they do not fit, the row scrolls.
-     */
     fullWidth?: boolean;
-    /** Invalid state: a danger ring on every segment and `aria-invalid` on the group. */
     invalid?: boolean;
-    /** Always render the support row so an appearing error does not shift the layout. */
     reserveSupportRow?: boolean;
-    /** Id of the `role="group"` element; generated when omitted. */
     id?: string;
     labels?: Partial<ButtonGroupLabels>;
-    /** `ButtonGroup.Item` segments. */
     children?: React.ReactNode;
   };
 
@@ -76,6 +68,7 @@ function ButtonGroupRoot({
 }: ButtonGroupRootProps) {
   const tier = useHostTier(sizeProp);
   const size = tier.size;
+  const labels = useLabels(BUTTON_GROUP_LABELS, labelsProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
   const horizontal = orientation !== "vertical";
   // A row is a switcher: it scrolls inside itself, never wraps (foundation §9). A column stacks.
@@ -91,7 +84,7 @@ function ButtonGroupRoot({
       hint={hint}
       error={error}
       reserveSupportRow={reserveSupportRow}
-      optionalLabel={labelsProp?.optional ?? BUTTON_GROUP_LABELS.optional}
+      optionalLabel={labels.optional}
       group
       className={cx(styles.field, className)}
       data-full-width={fullWidth || undefined}
@@ -121,7 +114,6 @@ function ButtonGroupRoot({
 ButtonGroupRoot.displayName = "ButtonGroup.Root";
 
 export type ButtonGroupItemProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  /** Toggle state of the segment: `aria-pressed` and `data-state="active" | "inactive"`. */
   pressed?: boolean;
   ref?: React.Ref<HTMLButtonElement>;
 };

@@ -1,5 +1,9 @@
 import * as React from "react";
 
+import { Badge } from "@/components/badge/Badge";
+import { Button } from "@/components/button/Button";
+import { Divider } from "@/components/divider/Divider";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
@@ -11,8 +15,10 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { iconSlotClass } from "@/internal/iconBox";
+import { useLabels } from "@/internal/labels";
 import { labelPlainText, useTextPartId, useTextParts } from "@/internal/parts";
 import press from "@/internal/press.module.css";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -27,10 +33,6 @@ import {
 import { type ControlSize, compactTier, type PaletteColor } from "@/internal/states";
 import { type AsyncHandler, isPromiseLike } from "@/internal/usePendingChanges";
 
-import { Badge } from "../badge/Badge";
-import { Button } from "../button/Button";
-import { Divider } from "../divider/Divider";
-import { Tooltip } from "../tooltip/Tooltip";
 import styles from "./Tabs.module.css";
 
 // ─── Shared ───────────────────────────────────────────────────────────────────
@@ -85,19 +87,11 @@ export type TabsRootProps = Omit<React.HTMLAttributes<HTMLDivElement>, "defaultV
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** Default `horizontal`. A vertical list stacks above the panel in containers narrower than 600px. */
   orientation?: TabsOrientation;
   size?: ControlSize;
-  /** Text and icon colour of the active tab. Default `neutral`: primary text, accent icon. */
   tone?: "neutral" | "accent";
-  /**
-   * Horizontal tabs fill the list and tend to equal widths, never narrower than their content.
-   * Default `true`; `false` sizes each tab to its content.
-   */
   fullWidth?: boolean;
-  /** Narrowest a horizontal tab with a label gets (px or a CSS length); never below its content. */
   minItemWidth?: number | string;
-  /** Widest a horizontal tab gets (px or a CSS length); a longer label ends with an ellipsis. */
   maxItemWidth?: number | string;
   labels?: Partial<TabsLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -137,7 +131,7 @@ function TabsRoot({
     defaultValue,
     onChange: onValueChange,
   });
-  const removeLabel = labels?.remove ?? TABS_LABELS.remove;
+  const resolvedLabels = useLabels(TABS_LABELS, labels);
   const userChangeRef = React.useRef(false);
 
   const select = React.useCallback(
@@ -157,11 +151,11 @@ function TabsRoot({
       orientation,
       size,
       rootId,
-      labels: { remove: removeLabel },
+      labels: resolvedLabels,
       panels,
       registerPanel,
     }),
-    [activeValue, select, orientation, size, rootId, removeLabel, panels, registerPanel],
+    [activeValue, select, orientation, size, rootId, resolvedLabels, panels, registerPanel],
   );
 
   // The defaults scale with the tier in CSS; a prop overrides them on the root.
@@ -176,7 +170,7 @@ function TabsRoot({
     <TabsProvider value={context}>
       <div
         {...rest}
-        className={cx(styles.root, className)}
+        className={cx(fieldTierClass, styles.root, className)}
         style={{ ...style, ...widths } as React.CSSProperties}
         {...toDataAttributes({ orientation, size, tone, "full-width": fullWidth })}
       >
@@ -428,17 +422,7 @@ export type TabsItemProps = Omit<
 > & {
   value: string;
   disabled?: boolean;
-  /**
-   * Makes the tab closable: a close button, `Delete` / `Backspace` on the focused tab and a middle
-   * click. Closing the active tab selects its neighbour; remove the item in this callback. Return a
-   * promise to confirm first (unsaved changes): while pending the close button shows loading and
-   * the tab stays selected; resolved — the neighbour takes over; rejected — nothing changes.
-   */
   onRemove?: AsyncHandler;
-  /**
-   * Plain text, or parts: `Tabs.Icon`, `Tabs.Label`, `Tabs.Count`, `Tabs.Description`.
-   * A `Tabs.Description` makes the item two-line and becomes its accessible description.
-   */
   children: React.ReactNode;
   ref?: React.Ref<HTMLButtonElement>;
 };
@@ -664,7 +648,6 @@ function TabsLabel({ children, className, ...rest }: TabsLabelProps) {
 TabsLabel.displayName = "Tabs.Label";
 
 export type TabsCountProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children" | "color"> & {
-  /** Badge hue. Default `gray`. */
   color?: PaletteColor;
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
@@ -682,7 +665,6 @@ function TabsCount({ color = "gray", children, className, ...rest }: TabsCountPr
 TabsCount.displayName = "Tabs.Count";
 
 export type TabsDescriptionProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /** Muted second line; wrap a key value in `<strong>` to emphasize it. */
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };

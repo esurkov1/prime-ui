@@ -8,6 +8,7 @@ import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 
@@ -89,10 +90,14 @@ function BreadcrumbRoot({
         <nav
           aria-label={labels.nav}
           {...rest}
-          className={cx(styles.root, className)}
+          className={cx(fieldTierClass, styles.root, className)}
           {...toDataAttributes({ size: tier.size, collapsible })}
         >
-          <ol className={styles.list}>
+          <ol
+            // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+            role="list"
+            className={styles.list}
+          >
             {collapsible ? (
               <>
                 {items[0]}
@@ -157,7 +162,6 @@ function CollapseMenu({ levels }: { levels: React.ReactNode[] }) {
 export type BreadcrumbItemProps = Omit<React.LiHTMLAttributes<HTMLLIElement>, "aria-label"> & {
   href?: string;
   current?: boolean;
-  /** For a link without visible text (e.g. only a «home» icon). Goes to the link. */
   "aria-label"?: string;
   ref?: React.Ref<HTMLLIElement>;
 };

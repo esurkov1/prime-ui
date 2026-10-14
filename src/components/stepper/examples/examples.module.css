@@ -1,10 +1,5 @@
 /* Layout of the Stepper scenarios: semantic tokens only. */
 
-/* The stepper measures its own width (container query), so its wrapper needs one. */
-.wide {
-  width: 100%;
-}
-
 /* A side column for a vertical stepper (288px), with anything under it a group gap away. */
 .column {
   display: grid;

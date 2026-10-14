@@ -1,5 +1,8 @@
 import * as React from "react";
-
+import { Button } from "@/components/button/Button";
+import { CodeBlock } from "@/components/code-block/CodeBlock";
+import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
+import { SegmentedControl } from "@/components/segmented-control/SegmentedControl";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useElementSize, useResizeEffect } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
@@ -16,11 +19,6 @@ import {
 import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 import { AppShellBoundary } from "@/layout/app-shell/AppShell";
 import { suspendTransitions } from "@/theme/applyTheme";
-
-import { Button } from "../button/Button";
-import { CodeBlock } from "../code-block/CodeBlock";
-import { ScrollContainer } from "../scroll-container/ScrollContainer";
-import { SegmentedControl } from "../segmented-control/SegmentedControl";
 import styles from "./ExampleFrame.module.css";
 
 type Pane = "preview" | "code";
@@ -184,23 +182,17 @@ function usePreviewFacts(
 }
 
 export type ExampleFrameProps = Omit<React.HTMLAttributes<HTMLDivElement>, "onCopy"> & {
-  /** Source shown on the code pane (TS/TSX highlighting) and copied by the copy button. */
   code: string;
   /** The outer `<div>`. */
   ref?: React.Ref<HTMLDivElement>;
-  /** Preview color scheme (controlled). */
   colorScheme?: ColorScheme;
   defaultColorScheme?: ColorScheme;
   onColorSchemeChange?: (scheme: ColorScheme) => void;
-  /** Preview width (desktop / tablet / mobile). Default `desktop`. */
   viewport?: ExampleFrameViewport;
   defaultViewport?: ExampleFrameViewport;
   onViewportChange?: (v: ExampleFrameViewport) => void;
-  /** Show the light / dark toggle in the toolbar. Default `true`. */
   showThemeToggle?: boolean;
-  /** Called after `code` was copied to the clipboard. */
   onCopy?: () => void;
-  /** How the preview lays out its children. Default `default`: one centered block. */
   previewLayout?: ExampleFramePreviewLayout;
   labels?: Partial<ExampleFrameLabels>;
 };

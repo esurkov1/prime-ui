@@ -32,7 +32,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "controlled",
       description:
-        "Рамки одной страницы делят ширину превью и тему: обе хранит родитель — `viewport`, `colorScheme`.",
+        "Рамки одной страницы делят ширину превью и тему: обе хранит родитель — `viewport`, `onViewportChange`, `colorScheme`.",
     },
   ],
   api,

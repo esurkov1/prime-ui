@@ -1,8 +1,8 @@
-/** Frames of one page share the preview width and theme: the parent owns both — `viewport`, `colorScheme`. */
+/** Frames of one page share the preview width and theme: the parent owns both — `viewport`, `onViewportChange`, `colorScheme`. */
 import { Button, ExampleFrame, type ExampleFrameViewport, Input } from "prime-ui-kit";
 import * as React from "react";
 
-const BUTTON_CODE = "<Button.Root>Сохранить</Button.Root>";
+const BUTTON_CODE = "<Button.Root>Создать счёт</Button.Root>";
 const INPUT_CODE = `<Input.Root label="Рабочая почта">
   <Input.Wrapper>
     <Input.Field placeholder="name@company.ru" />
@@ -22,7 +22,7 @@ export default function ExampleFrameControlledExample() {
         colorScheme={scheme}
         onColorSchemeChange={setScheme}
       >
-        <Button.Root>Сохранить</Button.Root>
+        <Button.Root>Создать счёт</Button.Root>
       </ExampleFrame>
       <ExampleFrame
         code={INPUT_CODE}

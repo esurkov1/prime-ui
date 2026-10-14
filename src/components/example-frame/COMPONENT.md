@@ -77,6 +77,11 @@ ExampleFrame               frame: toolbar + the pane (a region swap between prev
 | `light` | stage and code pane in the light theme | default | yes |
 | `dark` | stage and code pane in the dark theme (`data-theme="dark"`), switched without color transitions | checking dark mode | |
 
+### Flags
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `showThemeToggle` | the light / dark button in the toolbar; off, the frame keeps its `colorScheme` and shows no toggle | a page that owns the theme of its frames, or a demo that only reads in one scheme | on |
+
 Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above its host) with a `border-subtle` hairline and `radius-xl`; the stage and code pane are wells with `radius-l` (16 − 4 padding = 12). Both wells carry `data-theme`, so each is a page of its own: layer 0 of its scheme, and surfaces in the example count from there.
 
 ## States
@@ -136,7 +141,7 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A live example next to its source, with the pane, width, theme and copy controls — `code`, `previewLayout`. |
 | [initial-view.tsx](examples/initial-view.tsx) | A matrix frame that opens at phone width in the dark theme with no theme switch and counts code copies — `previewLayout`, `defaultViewport`, `defaultColorScheme`, `showThemeToggle`, `onCopy`. |
-| [controlled.tsx](examples/controlled.tsx) | Frames of one page share the preview width and theme: the parent owns both — `viewport`, `colorScheme`. |
+| [controlled.tsx](examples/controlled.tsx) | Frames of one page share the preview width and theme: the parent owns both — `viewport`, `onViewportChange`, `colorScheme`. |
 
 ## Mistakes
 - Wrapping several preview items in an extra `div` with flex styles → use `previewLayout="row"` or `"stack"`.

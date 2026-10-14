@@ -154,6 +154,8 @@ Colour all items or none; do not give an item and its Count the same hue; prefer
 | group disabled | root `disabled` | track `data-disabled="true"`, `aria-disabled`; every segment disabled; label and hint dimmed |
 | invalid | `invalid` or non-empty `error` | track `data-invalid="true"` + `aria-invalid="true"`, inset danger ring on the track; the error replaces the hint; the track shakes once when an error arrives |
 | required | `required` | red `*` after the label, `aria-required="true"` on the radiogroup |
+| optional | `optional` | a muted `labels.optional` marker after the label |
+| support row reserved | `reserveSupportRow` | the support row stays rendered while empty, so an error arriving shifts nothing |
 | focus-visible | keyboard | focus ring inside the segment |
 | collapsed | row wider than the container and every segment has an icon | row `data-collapse="icon"`: titles, counts and descriptions leave the row, segments turn square; a `VisuallyHidden` copy of the title names each segment and a `Tooltip` shows it |
 | overflow | row still wider than the container | root `data-overflow-start` / `data-overflow-end`: edge fades in the track color |
