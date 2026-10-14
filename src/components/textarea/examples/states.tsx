@@ -4,19 +4,35 @@ import { Textarea } from "prime-ui-kit";
 export default function TextareaStatesExample() {
   return (
     <>
-      <Textarea.Root label="default" placeholder="Причина возврата" />
-      <Textarea.Root
-        label="readOnly"
-        readOnly
-        defaultValue="Заявка закрыта 12 марта: товар принят на склад."
-      />
-      <Textarea.Root
-        label="disabled"
-        disabled
-        placeholder="Причина возврата"
-        hint="Станет доступно после выбора заказа"
-      />
-      <Textarea.Root label="invalid" invalid defaultValue="Не подошёл размер" />
+      <div>
+        <div>
+          <Textarea.Root label="default" placeholder="Причина возврата" />
+        </div>
+      </div>
+      <div>
+        <div>
+          <Textarea.Root
+            label="readOnly"
+            readOnly
+            defaultValue="Заявка закрыта 12 марта: товар принят на склад."
+          />
+        </div>
+      </div>
+      <div>
+        <div>
+          <Textarea.Root
+            label="disabled"
+            disabled
+            placeholder="Причина возврата"
+            hint="Станет доступно после выбора заказа"
+          />
+        </div>
+      </div>
+      <div>
+        <div>
+          <Textarea.Root label="invalid" invalid defaultValue="Не подошёл размер" />
+        </div>
+      </div>
     </>
   );
 }

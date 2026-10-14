@@ -1,17 +1,10 @@
 /* Layout of the Textarea scenarios: semantic tokens only. */
 
-/* in-form.tsx, validation.tsx: field → field 20, group → actions 32 (foundation §1). */
+/* in-form.tsx, validation.tsx: the fields (a Fieldset), then the actions — group → actions 32. */
 .form {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--prime-space-8);
   width: min(100%, var(--prime-layout-form-width-m));
-}
-
-.formFields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-5);
 }
 
 .formActions {

@@ -121,37 +121,18 @@ const [InputProvider, useInputContext] = createComponentContext<InputContextValu
 
 export type InputRootProps = FieldRootDomProps &
   FieldFocusRingProps & {
-    /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;
-    /** Invalid state: danger ring on the field and `aria-invalid` on the input. A non-empty `error` implies it. */
     invalid?: boolean;
     label?: React.ReactNode;
-    /** Shows a red `*` after the label and sets native `required` on `Input.Field`. */
     required?: boolean;
-    /** Shows the muted optional marker after the label text (`labels.optional`). */
     optional?: boolean;
     hint?: React.ReactNode;
-    /** Error message; replaces the hint in the same slot and implies `invalid`. */
     error?: React.ReactNode;
-    /** Right-aligned slot of the support row, e.g. `<Input.Counter current={n} max={50} />`. */
     counter?: React.ReactNode;
-    /** Always render the support row so an appearing error does not shift the layout. */
     reserveSupportRow?: boolean;
-    /** Explicit id for the underlying <input>; auto-generated if omitted. */
     id?: string;
-    /**
-     * A password strength meter under the field: four steps that fill as the value grows stronger,
-     * with the level word on the right of the support row. Use on new-password fields.
-     */
     strength?: boolean;
-    /** Replaces the kit's estimate (`getPasswordStrength`): return 0 (empty) … 4 (hard). */
     getStrength?: (value: string) => PasswordStrength;
-    /**
-     * Saves the field on its own (inline editing): fires with the value on blur and Enter when it
-     * differs from the last committed one; Escape reverts to it. Return a Promise to show a spinner
-     * at the field's edge while it runs (the field stays editable, Tab moves on); a rejection puts
-     * the committed value back — show why through `error`. Success shows a brief check.
-     */
     onCommit?: FieldCommitHandler;
     labels?: Partial<InputLabels>;
     children: React.ReactNode;
@@ -319,7 +300,6 @@ InputWrapper.displayName = "Input.Wrapper";
 // ---- InputField ----
 
 export type InputFieldProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "id"> & {
-  /** Called with the new string value; native `onChange` still fires. */
   onValueChange?: (value: string) => void;
   ref?: React.Ref<HTMLInputElement>;
 };
@@ -354,15 +334,17 @@ function InputField({
   const setRefs = useMergedRefs(inputRef, ref);
   const disabled = useInheritedDisabled(disabledProp);
 
-  // A reveal swaps `type`, which resets the caret: put the kept selection back.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs after each reveal toggle
+  const fieldType = type === "password" && revealed ? "text" : type;
+
+  // A reveal swaps `type`, which resets the caret: once the input carries the new type, put the
+  // kept selection back.
   React.useLayoutEffect(() => {
     const selection = selectionRef.current;
     const input = inputRef.current;
-    if (!selection || !input) return;
+    if (!selection || !input || input.type !== (fieldType ?? "text")) return;
     selectionRef.current = null;
     input.setSelectionRange(selection[0], selection[1]);
-  }, [revealed, selectionRef, inputRef]);
+  }, [fieldType, selectionRef, inputRef]);
 
   // A strength meter on the root follows the value: controlled, default, then every edit.
   const controlled = rest.value;
@@ -384,7 +366,7 @@ function InputField({
       aria-describedby={resolvedDescribedBy}
       disabled={disabled || undefined}
       required={required ?? (requiredCtx || undefined)}
-      type={type === "password" && revealed ? "text" : type}
+      type={fieldType}
       aria-busy={commit.state === "pending" || undefined}
       onChange={(event) => {
         onChange?.(event);
@@ -530,7 +512,6 @@ export type InputCopyButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "children" | "aria-label"
 > & {
-  /** Text to copy; the field's current value when omitted. */
   value?: string;
   ref?: React.Ref<HTMLButtonElement>;
 };

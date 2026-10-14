@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { useControllableState } from "@/hooks/useControllableState";
-import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
@@ -11,6 +11,7 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { useLabels } from "@/internal/labels";
 import { motionDurationMs } from "@/internal/motionTiming";
 import type { ControlSize, Tone } from "@/internal/states";
 import { isPromiseLike } from "@/internal/usePendingChanges";
@@ -29,37 +30,19 @@ export type SliderProps = FieldRootDomProps &
     value?: number;
     defaultValue?: number;
     onValueChange?: (value: number) => void;
-    /**
-     * The value the person settled on: fires once when the thumb is released (pointer) or after a
-     * key moved it, and only if the value differs from the last commit. Save here instead of on
-     * every `onValueChange` step. Return the save's promise: the thumb dims (`aria-busy`) until it
-     * settles; reject — the value glides back to the last saved one.
-     */
     onCommit?: (value: number) => void | Promise<void>;
-    /** Name of the range input, submitted with a form. */
     name?: string;
     min?: number;
     max?: number;
     step?: number;
     disabled?: boolean;
-    /** Invalid state: `aria-invalid` on the range input. A non-empty `error` implies it. */
     invalid?: boolean;
-    /** Shows the current value at the end of the label row (tabular numbers). */
     showValue?: boolean;
-    /** Formats the displayed value and `aria-valuetext` (e.g. `(v) => \`${v} °C\``). */
     formatValue?: (value: number) => string;
-    /** Tier. Default: the tier of the surrounding control (a form, a panel), else `m`. */
     size?: ControlSize;
-    /** Color of the filled part of the track. */
     tone?: Tone;
-    /**
-     * `vertical` — the track stands upright, minimum at the bottom, seven thumbs long at its tier
-     * (a level beside a button). Default `horizontal`.
-     */
     orientation?: "horizontal" | "vertical";
-    /** Id of the range input; generated when omitted. */
     id?: string;
-    /** Name of the range input when there is no `label`. */
     "aria-label"?: string;
     "aria-describedby"?: string;
     labels?: Partial<SliderLabels>;
@@ -67,11 +50,6 @@ export type SliderProps = FieldRootDomProps &
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
-/**
- * A single value on a range, framed like every field: label row (with the value), the track
- * with a glass thumb, then hint or error. `className`, `ref` and the rest go to the frame, `id`
- * and `aria-label` to the range input.
- */
 /** Keys that change the value of a range input. */
 const VALUE_KEYS = new Set([
   "ArrowLeft",
@@ -84,6 +62,11 @@ const VALUE_KEYS = new Set([
   "End",
 ]);
 
+/**
+ * A single value on a range, framed like every field: label row (with the value), the track
+ * with a glass thumb, then hint or error. `className`, `ref` and the rest go to the frame, `id`
+ * and `aria-label` to the range input.
+ */
 export function Slider({
   value: valueProp,
   defaultValue,
@@ -113,8 +96,10 @@ export function Slider({
   labels: labelsProp,
   ...rest
 }: SliderProps) {
-  const size = useControlSize(sizeProp);
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
+  const labels = useLabels(SLIDER_LABELS, labelsProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid }, ariaDescribedBy);
   const [value, setValue] = useControllableState({
     value: valueProp,
@@ -197,7 +182,7 @@ export function Slider({
       hint={hint}
       error={error}
       disabled={disabled}
-      optionalLabel={labelsProp?.optional ?? SLIDER_LABELS.optional}
+      optionalLabel={labels.optional}
       labelEnd={
         showValue ? (
           <output className={styles.value} htmlFor={ids.controlId} aria-hidden="true">
@@ -215,7 +200,7 @@ export function Slider({
         settling: settling || undefined,
       })}
     >
-      <ControlSizeProvider value={size}>
+      {tier.provide(
         <div className={styles.control}>
           <input
             id={ids.controlId}
@@ -254,8 +239,8 @@ export function Slider({
             <span className={styles.range} />
           </span>
           <span className={styles.thumb} aria-hidden="true" />
-        </div>
-      </ControlSizeProvider>
+        </div>,
+      )}
     </FieldFrame>
   );
 }

@@ -6,8 +6,5 @@
   "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-bottom",
   "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-end",
   "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-start",
-  "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-top",
-  "src/components/slider/Slider.module.css: numeric scale() in transform",
-  "src/components/slider/Slider.module.css: numeric scale() in transform #2",
-  "src/components/slider/Slider.module.css: numeric z-index"
+  "src/components/scroll-container/ScrollContainer.module.css: raw length in --fade-top"
 ]

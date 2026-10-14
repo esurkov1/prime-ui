@@ -73,7 +73,7 @@ Slider                 field frame (FieldFrame): className, ref, rest
 No `variant` / `color`.
 
 ### size
-Everything derives from the tier track thickness T (`--prime-control-<tier>-track`, shared with ProgressBar): the thumb is a 4.5T × 3T capsule, so the control scales as one shape.
+Everything derives from the tier track thickness T (`--field-track` of the field tier, shared with ProgressBar): the thumb is a 4.5T × 3T capsule, so the control scales as one shape.
 
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -108,6 +108,7 @@ Tone never carries meaning alone: the label names what the value means.
 |---|---|---|---|
 | `showValue` | the value at the right end of the label row, `text-secondary`, tabular nums | the number matters (price, temperature, percent) | `false` |
 | `disabled` | muted track, flat thumb, dimmed label and value | the setting is unavailable | — |
+| `required` / `optional` | red `*` / muted «необязательно» after the label | mark the minority of the form (a range always has a value, so `required` only marks it) | — |
 
 **Combinations**
 - `showValue` + `formatValue` for any value with a unit; `formatValue` alone only changes `aria-valuetext`.
@@ -132,8 +133,8 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 ## Layout & spacing
 - Fills its container; place it in a grid column to limit the width.
 - Label row → track: tier `label-gap`; label and value share a baseline, the value is pinned right. Track → hint / error: tier `hint-gap` (FieldFrame, like every field).
-- Between sliders in a form: `--prime-space-5`.
-- With a paired input: grid `minmax(0, 1fr)` + a fixed column, `align-items: end`, gap `--prime-space-4`.
+- Sliders of a form stack in a label-less [Fieldset](../fieldset/COMPONENT.md) (20 apart).
+- With a paired input: grid `minmax(0, 1fr)` + a fixed column, `align-items: end`, a 16 gap.
 
 ## Accessibility
 

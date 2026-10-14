@@ -1,5 +1,5 @@
 /** Live validation: an error shakes the field as it arrives, drops in and leaves as soon as the text is fixed; required and optional markers, a hint and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. */
-import { Button, Textarea } from "prime-ui-kit";
+import { Button, Fieldset, Textarea } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -18,7 +18,7 @@ export default function TextareaValidationExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={send}>
-      <div className={styles.formFields}>
+      <Fieldset>
         <Textarea.Root
           label="Описание задачи"
           required
@@ -48,7 +48,7 @@ export default function TextareaValidationExample() {
           }}
           error={commentError}
         />
-      </div>
+      </Fieldset>
       <div className={styles.formActions}>
         <Button.Root type="submit" variant="soft" tone="neutral">
           Отправить в бухгалтерию

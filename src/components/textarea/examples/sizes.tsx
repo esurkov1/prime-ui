@@ -7,13 +7,16 @@ export default function TextareaSizesExample() {
   return (
     <>
       {SIZES.map((size) => (
-        <Textarea.Root
-          key={size}
-          size={size}
-          label={size}
-          placeholder="Комментарий к заказу"
-          hint="Курьер увидит этот текст"
-        />
+        <div key={size}>
+          <div>
+            <Textarea.Root
+              size={size}
+              label={size}
+              placeholder="Комментарий к заказу"
+              hint="Курьер увидит этот текст"
+            />
+          </div>
+        </div>
       ))}
     </>
   );

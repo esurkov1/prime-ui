@@ -46,6 +46,46 @@ describe("ColorField", () => {
     expect(button).toHaveFocus();
   });
 
+  it("Space opens the panel; the arrows and Page keys move a slider; Tab cycles the panel", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      withLocale(<ColorField label="Цвет" defaultValue="#ff0000" onValueChange={onValueChange} />),
+    );
+    const button = screen.getByRole("button", { name: /Цвет/ });
+    button.focus();
+    await user.keyboard(" ");
+    const dialog = screen.getByRole("dialog");
+    const hue = screen.getByRole<HTMLInputElement>("slider", { name: "Оттенок, градусы" });
+    const hueValue = () => Number(hue.value);
+    act(() => hue.focus());
+    await user.keyboard("{ArrowRight}");
+    expect(hueValue()).toBe(1);
+    await user.keyboard("{ArrowUp}");
+    expect(hueValue()).toBe(2);
+    await user.keyboard("{ArrowLeft}");
+    expect(hueValue()).toBe(1);
+    await user.keyboard("{ArrowDown}");
+    expect(hueValue()).toBe(0);
+    await user.keyboard("{PageUp}");
+    const paged = hueValue();
+    expect(paged).toBeGreaterThan(1);
+    await user.keyboard("{PageDown}");
+    expect(hueValue()).toBe(0);
+    expect(onValueChange).toHaveBeenCalled();
+
+    // Tab walks the parts of the panel and wraps around inside it.
+    const visited = new Set<Element | null>();
+    for (let i = 0; i < 20; i += 1) {
+      await user.tab();
+      expect(dialog).toContainElement(document.activeElement as HTMLElement);
+      if (document.activeElement === hue) break;
+      visited.add(document.activeElement);
+    }
+    expect(hue).toHaveFocus();
+    expect(visited.size).toBeGreaterThan(1);
+  });
+
   it("emits the new color as hex and shows it in the field", () => {
     const onValueChange = vi.fn();
     render(

@@ -1,5 +1,5 @@
 /** A pipeline stage form: the color goes with the form by `name`, a calm note confirms the save — `name`, `required`. */
-import { Button, Card, Input, Typography } from "prime-ui-kit";
+import { Button, Card, Fieldset, Input, Typography } from "prime-ui-kit";
 import { ColorField } from "prime-ui-kit/color-picker";
 import * as React from "react";
 
@@ -18,18 +18,20 @@ export default function ColorFieldInFormExample() {
     <Card.Root className={styles.formCard}>
       <Card.Body>
         <form className={styles.form} noValidate onSubmit={submit}>
-          <Input.Root label="Название этапа" required>
-            <Input.Wrapper>
-              <Input.Field name="stage" defaultValue="Переговоры" />
-            </Input.Wrapper>
-          </Input.Root>
-          <ColorField
-            label="Цвет этапа"
-            required
-            name="stageColor"
-            defaultValue="#F76B15"
-            onValueChange={() => setSaved(undefined)}
-          />
+          <Fieldset>
+            <Input.Root label="Название этапа" required>
+              <Input.Wrapper>
+                <Input.Field name="stage" defaultValue="Переговоры" />
+              </Input.Wrapper>
+            </Input.Root>
+            <ColorField
+              label="Цвет этапа"
+              required
+              name="stageColor"
+              defaultValue="#F76B15"
+              onValueChange={() => setSaved(undefined)}
+            />
+          </Fieldset>
           <div className={styles.actions}>
             {saved ? (
               <Typography as="p" variant="body-s" tone="secondary" role="status">

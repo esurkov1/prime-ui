@@ -1,5 +1,4 @@
 [
   "src/components/button/examples/label-morph.tsx: `children`",
-  "src/components/checkbox/examples/states.tsx: `checked`",
   "src/components/switch/examples/states.tsx: `checked`"
 ]

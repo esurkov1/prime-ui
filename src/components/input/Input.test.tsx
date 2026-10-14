@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -820,7 +821,7 @@ describe("Input edge actions", () => {
 
   it("Input.CopyButton copies the value and says so", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { clipboard: { writeText } });
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
     render(
       <Input.Root label="ИНН">
         <Input.Wrapper>
@@ -832,6 +833,39 @@ describe("Input edge actions", () => {
     fireEvent.click(screen.getByRole("button", { name: "Копировать" }));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith("7701234567"));
     expect(await screen.findByRole("button", { name: "Скопировано" })).toBeInTheDocument();
+  });
+
+  it("Tab reaches the field, then its segments; Enter and Space run a segment", async () => {
+    const user = userEvent.setup();
+    function Search() {
+      const [value, setValue] = React.useState("счёт 418");
+      return (
+        <Input.Root label="Поиск">
+          <Input.Wrapper>
+            <Input.Field type="password" value={value} onValueChange={setValue} />
+            {value ? <Input.ClearButton onClick={() => setValue("")} /> : null}
+            <Input.RevealButton />
+          </Input.Wrapper>
+        </Input.Root>
+      );
+    }
+    render(<Search />);
+    const field = screen.getByLabelText<HTMLInputElement>("Поиск");
+    await user.tab();
+    expect(field).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Очистить" })).toHaveFocus();
+    await user.tab();
+    const reveal = screen.getByRole("button", { name: "Показать пароль" });
+    expect(reveal).toHaveFocus();
+    await user.keyboard(" ");
+    expect(reveal).toHaveAttribute("aria-pressed", "true");
+    await user.keyboard("{Enter}");
+    expect(reveal).toHaveAttribute("aria-pressed", "false");
+    await user.tab({ shift: true });
+    await user.keyboard(" ");
+    expect(field).toHaveValue("");
+    expect(field).toHaveFocus();
   });
 
   it("Input.RevealButton toggles a password field and keeps the selection", () => {

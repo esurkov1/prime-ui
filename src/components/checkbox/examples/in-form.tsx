@@ -1,5 +1,5 @@
 /** Consent in a sign-up form: the required tick and an optional subscription, a hint under the text, an error after a submit without the tick — `required`, `optional`, `hint`, `error`. */
-import { Button, Checkbox } from "prime-ui-kit";
+import { Button, Checkbox, Fieldset } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -15,20 +15,20 @@ export default function CheckboxInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <Checkbox.Root
-        name="terms"
-        required
-        error={error}
-        onCheckedChange={(checked) => checked && setError(undefined)}
-      >
-        <Checkbox.Label>Принимаю условия оферты</Checkbox.Label>
-      </Checkbox.Root>
-      <Checkbox.Root name="news" optional hint="Не чаще раза в месяц, отписаться можно в профиле">
-        <Checkbox.Label>Получать новости продукта</Checkbox.Label>
-      </Checkbox.Root>
-      <div className={styles.formActions}>
-        <Button.Root type="submit">Создать аккаунт</Button.Root>
-      </div>
+      <Fieldset>
+        <Checkbox.Root
+          name="terms"
+          required
+          error={error}
+          onCheckedChange={(checked) => checked && setError(undefined)}
+        >
+          <Checkbox.Label>Принимаю условия оферты</Checkbox.Label>
+        </Checkbox.Root>
+        <Checkbox.Root name="news" optional hint="Не чаще раза в месяц, отписаться можно в профиле">
+          <Checkbox.Label>Получать новости продукта</Checkbox.Label>
+        </Checkbox.Root>
+      </Fieldset>
+      <Button.Root type="submit">Создать аккаунт</Button.Root>
     </form>
   );
 }

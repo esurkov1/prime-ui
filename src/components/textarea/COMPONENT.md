@@ -114,7 +114,7 @@ Textarea has no `variant` or `tone`: one field treatment (fill, no visible borde
 ### Flags
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `focusRing={false}` | No focus ring; focus fill and caret remain | A single composer field where focus is obvious | `true` |
+| `focusRing` | `false`: no focus ring; focus fill and caret remain | A single composer field where focus is obvious | `true` |
 | `formatting` | A floating toolbar over a selection (bold, italic, strikethrough, code, spoiler, link, quote) and the Mod-hotkeys; each writes Markdown around the selection | The text is shown later with its Markdown (Message renders the same subset) | `false` |
 | `reserveSupportRow` | Empty support row of hint height | Live validation, fields side by side | `false` |
 | `required` / `optional` | Red `*` / muted «необязательно» after the label | Mark the minority of the form | — / `false` |
@@ -148,7 +148,7 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 
 ## Layout & spacing
 - Label → field: tier `label-gap` (`--prime-space-1` on xs/s, `--prime-space-2` on m–xl); field → support row: tier `hint-gap`.
-- Field → field in a form: `--prime-space-5`; group → actions: `--prime-space-8`.
+- Fields of a form stack in a label-less [Fieldset](../fieldset/COMPONENT.md) (20 apart); the form around the groups spaces them from its actions (32).
 - Width is always `100%` of the parent; set the width with the layout column.
 - Long words wrap (`overflow-wrap: anywhere`), so the field never overflows horizontally.
 - With `formatting` the toolbar floats `--prime-space-2` above the field box's start edge on the floating layer, over whatever is above the field; it takes no room in the layout.

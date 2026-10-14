@@ -1,8 +1,6 @@
 [
   "src/components/accordion/examples/sizes.tsx: not rows of labelled cells",
   "src/components/accordion/examples/variants.tsx: not rows of labelled cells",
-  "src/components/color-field/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/color-field/examples/states.tsx: not rows of labelled cells",
   "src/components/color-picker/examples/sizes.tsx: not rows of labelled cells",
   "src/components/color-picker/examples/states.tsx: not rows of labelled cells",
   "src/components/digit-input/examples/sizes.tsx: not rows of labelled cells",
@@ -10,12 +8,7 @@
   "src/components/drawer/examples/sizes.tsx: not rows of labelled cells",
   "src/components/dropdown/examples/sizes.tsx: not rows of labelled cells",
   "src/components/dropdown/examples/states.tsx: not rows of labelled cells",
-  "src/components/input/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/input/examples/states.tsx: not rows of labelled cells",
-  "src/components/input/examples/with-icon.tsx: not rows of labelled cells",
   "src/components/modal/examples/sizes.tsx: not rows of labelled cells",
   "src/components/popover/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/textarea/examples/sizes.tsx: not rows of labelled cells",
-  "src/components/textarea/examples/states.tsx: not rows of labelled cells",
   "src/components/tooltip/examples/sizes.tsx: not rows of labelled cells"
 ]
