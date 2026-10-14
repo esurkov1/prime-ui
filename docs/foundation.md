@@ -352,7 +352,7 @@ Every component is designed with its micro-animations, not only its static state
 8. **State moves, it does not swap.** Checkmark draws/scales in, switch thumb slides, selection indicator
    (tabs, segmented control) glides to the new item, chevrons rotate, progress fills, counters and fills
    ease. Two states cross-fade rather than flip when they replace each other in place: a region
-   swapping its content uses `Crossfade` (inside a component: `useStateSwap` + `swapMotion`), and its
+   swapping its content uses `Crossfade` (inside a component: `RegionSwap`), and its
    loading state is a `Skeleton` of the coming content (principle 7).
 9. **Interruptible.** Toggled state uses CSS transitions (retarget mid-flight), not keyframes. Keyframes only
    for one-shot enter/exit (overlay presence, spinner, skeleton) and one-shot gestures (icons, rule 13;
