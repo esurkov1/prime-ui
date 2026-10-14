@@ -141,37 +141,7 @@
 
 /* Rate chip: a small fill on the caption line; the label morphs between speeds. The press is
    `press.pressCompact`, joined in TSX. */
+/* The rate chip (a soft neutral Button, `density="inline"`) keeps its width in the caption row. */
 .rate {
   flex-shrink: 0;
-  margin: 0;
-  padding-block: 0;
-  padding-inline: var(--prime-space-1);
-  border: 0;
-  border-radius: var(--prime-radius-full);
-  background: var(--prime-color-fill-subtle);
-  color: var(--prime-color-text-secondary);
-  font: inherit;
-  font-weight: var(--prime-font-weight-medium);
-  cursor: pointer;
-  transition:
-    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-@media (hover: hover) {
-  .rate:hover:not(:disabled, [aria-disabled="true"]) {
-    background: var(--prime-color-fill-subtle-active);
-    color: var(--prime-color-text-primary);
-  }
-}
-
-.rate:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset);
-}
-
-.rate:disabled {
-  color: var(--prime-color-text-disabled);
-  cursor: not-allowed;
 }

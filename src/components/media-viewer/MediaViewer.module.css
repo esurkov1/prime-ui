@@ -380,3 +380,11 @@ img.media[data-loaded] {
 .thumb:focus-visible {
   opacity: 1;
 }
+
+/* The current thumbnail is ringed in the light ink of the media shade (`pill.inkValue`, joined in
+   TSX): where the viewer stands never rests on the emphasis alone. Keyboard focus keeps its own
+   ring over it. */
+.thumb[aria-current="true"] {
+  outline: var(--prime-focus-width) solid var(--media-ink);
+  outline-offset: var(--prime-focus-offset);
+}
