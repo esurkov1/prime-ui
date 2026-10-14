@@ -60,11 +60,7 @@
   "src/components/timeline/Timeline.module.css: reads --prime-text-title-m-tracking",
   "src/components/timeline/Timeline.module.css: reads --prime-text-title-m-tracking #2",
   "src/components/timeline/Timeline.module.css: reads --prime-text-title-s-tracking",
-  "src/internal/chartTooltip.module.css: reads --prime-text-caption-tracking",
-  "src/internal/mediaDisk.module.css: local [data-tone] color (.disk[data-tone=\"danger\"])",
   "src/internal/mediaPill.module.css: reads --prime-text-caption-tracking",
   "src/internal/menu.module.css: local [data-tone] color (.item[data-tone=\"danger\"]:not([data-disabled=\"true\"]), .item[data-tone=\"danger\"]:not([data-disabled=\"true\"]) .itemIcon)",
-  "src/internal/menu.module.css: reads --prime-text-caption-tracking",
-  "src/internal/transferDisk.module.css: local [data-tone] color (.still[data-variant=\"solid\"]:not([data-tone=\"danger\"]))",
   "src/layout/sidebar/Sidebar.module.css: reads --prime-text-caption-tracking"
 ]

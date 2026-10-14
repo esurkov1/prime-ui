@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { cx } from "./cx";
 import menu from "./menu.module.css";
+import textRole from "./textRole.module.css";
 
 export type MenuGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
   label?: React.ReactNode;
@@ -20,7 +21,7 @@ export function MenuGroup({ label, className, children, ...rest }: MenuGroupProp
       className={cx(menu.group, className)}
     >
       {label != null ? (
-        <div id={labelId} role="presentation" className={menu.groupLabel}>
+        <div id={labelId} role="presentation" className={cx(textRole.caption, menu.groupLabel)}>
           {label}
         </div>
       ) : null}

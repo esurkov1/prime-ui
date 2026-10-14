@@ -4,6 +4,7 @@ import type { AnchorPoint } from "@/hooks/usePosition";
 import { cx } from "@/internal/cx";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./chartTooltip.module.css";
 
@@ -49,7 +50,7 @@ function Body({
   ...rest
 }: ChartTooltipProps) {
   return (
-    <div {...rest} className={cx(styles.root, className)} data-depth="floating">
+    <div {...rest} className={cx(textRole.caption, styles.root, className)} data-depth="floating">
       {label !== undefined && label !== null ? <div className={styles.label}>{label}</div> : null}
       {children}
     </div>
@@ -99,7 +100,7 @@ function FloatingChartTooltip({
       floating={floating}
       size="m"
       surface={false}
-      className={cx(styles.root, className)}
+      className={cx(textRole.caption, styles.root, className)}
       data-depth="floating"
       aria-hidden="true"
     >

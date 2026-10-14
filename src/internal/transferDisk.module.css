@@ -40,17 +40,10 @@
   pointer-events: auto;
 }
 
-/* A disk with no action: the still media disk (`internal/mediaDisk`, the look of the shade circle
-   Button, its diameter from its `data-size`); `solid` takes the accent disk of a voice message. */
+/* A disk with no action: the still media disk (`internal/mediaDisk`, the look of the circle Button
+   in its `data-variant`, its diameter from its `data-size`, danger when the transfer failed). */
 .still {
   position: relative;
-}
-
-.still[data-variant="solid"]:not([data-tone="danger"]) {
-  background: var(--prime-color-accent-default);
-  color: var(--prime-color-accent-fg);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
 }
 
 .ring {

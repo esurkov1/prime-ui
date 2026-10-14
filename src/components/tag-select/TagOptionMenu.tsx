@@ -10,6 +10,7 @@ import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import menu from "@/internal/menu.module.css";
 import type { PaletteColor } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./TagSelect.module.css";
 
@@ -141,7 +142,7 @@ export function TagOptionMenu({
           {onUpdate ? (
             <>
               <Divider className={menu.separator} />
-              <div className={menu.groupLabel}>{labels.colors}</div>
+              <div className={cx(textRole.caption, menu.groupLabel)}>{labels.colors}</div>
               <div className={menu.tier} data-size="s">
                 {TAG_COLORS.map((hue) => (
                   <button

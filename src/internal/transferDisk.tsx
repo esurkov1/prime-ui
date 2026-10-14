@@ -219,7 +219,7 @@ export function TransferDisk({
           className={cx(mediaDiskClass, styles.still)}
           data-size={size}
           data-variant={variant}
-          data-tone={tone}
+          data-state={disk.failed ? "failed" : undefined}
           {...(inFlight(state)
             ? {
                 role: "progressbar",
