@@ -1,7 +1,5 @@
 /** Order details in a Drawer: the tab bar runs along the bottom of the header, the active tab is the body rising into it, and every panel is the body's own content — `Tabs.Root`, `Tabs.List`, `Tabs.Panel`. */
-import { Badge, Button, DescriptionList, Drawer, Input, Tabs, Typography } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
+import { Badge, Button, DescriptionList, Drawer, Fieldset, Input, Tabs } from "prime-ui-kit";
 
 const ITEMS = [
   { name: "Кресло «Орион», графит", amount: "2 × 18 900 ₽" },
@@ -10,9 +8,9 @@ const ITEMS = [
 ];
 
 const HISTORY = [
-  "3 октября, 10:14 — заказ оформлен",
-  "3 октября, 10:20 — оплата прошла",
-  "4 октября, 16:02 — передан на склад",
+  { time: "3 октября, 10:14", event: "Заказ оформлен" },
+  { time: "3 октября, 10:20", event: "Оплата прошла" },
+  { time: "4 октября, 16:02", event: "Передан на склад" },
 ];
 
 export default function TabsInDrawerExample() {
@@ -61,7 +59,7 @@ export default function TabsInDrawerExample() {
             </Tabs.Panel>
 
             <Tabs.Panel value="delivery">
-              <div className={styles.stack}>
+              <Fieldset aria-label="Доставка">
                 <Input.Root label="Адрес">
                   <Input.Wrapper>
                     <Input.Field defaultValue="Москва, Ленинградский проспект, 37, кв. 12" />
@@ -72,17 +70,17 @@ export default function TabsInDrawerExample() {
                     <Input.Field defaultValue="Позвонить за час" />
                   </Input.Wrapper>
                 </Input.Root>
-              </div>
+              </Fieldset>
             </Tabs.Panel>
 
             <Tabs.Panel value="history">
-              <div className={styles.stack}>
+              <DescriptionList.Root>
                 {HISTORY.map((entry) => (
-                  <Typography key={entry} variant="body-m" tone="secondary">
-                    {entry}
-                  </Typography>
+                  <DescriptionList.Item key={entry.time} label={entry.time}>
+                    {entry.event}
+                  </DescriptionList.Item>
                 ))}
-              </div>
+              </DescriptionList.Root>
             </Tabs.Panel>
           </Drawer.Body>
         </Tabs.Root>

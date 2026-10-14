@@ -296,9 +296,7 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
-  transition:
-    padding var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {
@@ -322,45 +320,35 @@
 /* ─── Badge.Action: a segment revealed at the end; the badge keeps its width ─ */
 
 /* The room for the segment is the segment plus the usual gap before it, like the remove segment.
-   Resting: the room is split evenly, so the text sits centred. Revealed: the text slides to the
-   start and the room opens at the end. The sum never changes. */
+   The room always stands at the end; the content moves by transform, so nothing reflows. Resting:
+   the content is shifted by half of (room − px), so it sits centred. Revealed: it slides back to
+   the start and the room is free for the segment. */
 .root[data-action] {
   --badge-action-room: calc(var(--badge-seg) + var(--chip-gap));
-  --badge-pad-start: calc((var(--chip-px) + var(--badge-action-room)) / 2);
-  --badge-pad-end: calc((var(--chip-px) + var(--badge-action-room)) / 2);
-  transition: padding var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  --badge-pad-end: var(--badge-action-room);
+  --badge-action-shift: calc((var(--badge-action-room) - var(--chip-px)) / 2);
+  --badge-action-dir: 1;
+}
+
+.root[data-action]:dir(rtl) {
+  --badge-action-dir: -1;
+}
+
+.root[data-action] > .body {
+  transform: translateX(calc(var(--badge-action-dir) * var(--badge-action-shift)));
+  transition:
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-action="persistent"],
 .root[data-action="reveal"]:focus-within {
-  --badge-pad-start: var(--chip-px);
-  --badge-pad-end: var(--badge-action-room);
+  --badge-action-shift: 0px;
 }
 
 @media (hover: hover) {
   .root[data-action="reveal"]:hover {
-    --badge-pad-start: var(--chip-px);
-    --badge-pad-end: var(--badge-action-room);
-  }
-}
-
-/* With a leading icon segment the start has no padding of its own: the room moves by
-   (room − px) / 2 at rest and fully to the end when revealed. */
-.root[data-action][data-icon-start="true"] {
-  --badge-pad-start: calc((var(--badge-action-room) - var(--chip-px)) / 2);
-  --badge-pad-end: calc((var(--badge-action-room) + var(--chip-px)) / 2);
-}
-
-.root[data-action="persistent"][data-icon-start="true"],
-.root[data-action="reveal"][data-icon-start="true"]:focus-within {
-  --badge-pad-start: 0px;
-  --badge-pad-end: var(--badge-action-room);
-}
-
-@media (hover: hover) {
-  .root[data-action="reveal"][data-icon-start="true"]:hover {
-    --badge-pad-start: 0px;
-    --badge-pad-end: var(--badge-action-room);
+    --badge-action-shift: 0px;
   }
 }
 
@@ -391,12 +379,7 @@
 /* Without hover nothing reveals the segment, so `reveal` shows it like `persistent`. */
 @media (hover: none) {
   .root[data-action="reveal"] {
-    --badge-pad-start: var(--chip-px);
-    --badge-pad-end: var(--badge-action-room);
-  }
-
-  .root[data-action="reveal"][data-icon-start="true"] {
-    --badge-pad-start: 0px;
+    --badge-action-shift: 0px;
   }
 
   .root[data-action="reveal"] .action {

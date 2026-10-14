@@ -209,7 +209,9 @@
 
 /* Glides only into a person's choice (click, arrows, closing the active tab): position (translate
    from TS) and size move to the new tab on one curve. Mount, resize, font loading, tab changes and
-   collapse place it without motion. */
+   collapse place it without motion. The size glides as `width` / `height`, not a scale: the
+   folder's corner radius and its flares would stretch (a documented exception in
+   src/styles/motion-perf.test.ts). */
 .indicator[data-animate="true"] {
   transition:
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),

@@ -305,7 +305,10 @@
 }
 
 /* A refused commit: the thumb and the fill glide back to the saved value. While a drag or a key
-   moves the value they follow it at once. */
+   moves the value they follow it at once. The glide stays on the inset and the size (a documented
+   exception in src/styles/motion-perf.test.ts): the thumb is placed as a share of the track, which
+   a `translate` (a share of the thumb) cannot express, its `transform` carries the hover and press
+   scale, and a `scaleX` would stretch the fill's round cap. It runs once per refused commit. */
 .root[data-settling="true"] .thumb {
   transition:
     inset-inline-start var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),

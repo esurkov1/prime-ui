@@ -93,7 +93,7 @@ function declarations(body: string): { property: string; value: string }[] {
 }
 
 const LAYOUT_PROPERTY =
-  /^(width|height|(min|max)-(width|height|inline-size|block-size)|inline-size|block-size|top|right|bottom|left|inset(-[a-z-]+)?|margin(-[a-z-]+)?|padding(-[a-z-]+)?|grid-template-(rows|columns)|border(-[a-z]+)*-width|gap|row-gap|column-gap|font-size|line-height)$/;
+  /^(width|height|(min|max)-(width|height|inline-size|block-size)|inline-size|block-size|top|right|bottom|left|inset(-[a-z-]+)?|margin(-[a-z-]+)?|padding(-[a-z-]+)?|grid-template-(rows|columns)|border(-[a-z]+)*-width|gap|row-gap|column-gap|font-size|line-height|flex(-grow|-shrink|-basis)?)$/;
 
 /**
  * Layout transitions that stay on purpose, per file. Ratchet: add only with a reason in the file,
@@ -140,8 +140,9 @@ const LAYOUT_TRANSITIONS: Record<string, string[]> = {
     "height",
   ],
   "src/components/gantt/Gantt.module.css": ["width"],
-  // The remove segment opening inside a chip.
-  "src/components/badge/Badge.module.css": ["padding"],
+  // Segment weights: each part's start depends on every weight before it, and a scale would
+  // stretch the hairline pills' round caps (foundation §7 rule 5: progress).
+  "src/components/progress-bar/ProgressBar.module.css": ["flex-grow"],
 };
 
 /** Permanent `will-change`, per file. Ratchet as above. */

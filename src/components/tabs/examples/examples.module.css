@@ -22,12 +22,6 @@
   max-width: calc(10 * var(--prime-control-m-height));
 }
 
-/* in-drawer.tsx: blocks of a panel in the drawer body, the full body width. */
-.stack {
-  display: grid;
-  gap: var(--prime-space-5);
-}
-
 /* The same column, which the reader can drag narrower to watch the tabs collapse and scroll. */
 .resizable {
   composes: frame;
