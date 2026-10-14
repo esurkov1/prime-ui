@@ -24,9 +24,16 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the label: type, gap and icon size. Match the content around the divider.",
-          ru: "Ярус подписи: шрифт, отступ и размер иконки. Совпадает с ярусом контента вокруг.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Tier of the label: type, gap and icon size. Without it the tier of the content around (a menu, a panel with a size), else `m`.",
+          ru: "Ярус подписи: шрифт, отступ и размер иконки. Без него — ярус контента вокруг (меню, панель с размером), иначе `m`.",
+        },
+        {
+          name: "inset",
+          type: "boolean",
+          default: "false",
+          en: "The line stands off its neighbours by the tier gap; a vertical one is one text line tall, centred in its row (a header, a toolbar).",
+          ru: "Линия отступает от соседей на отступ яруса; вертикальная — высотой в строку текста, по центру ряда (шапка, панель).",
         },
         {
           name: "children",
@@ -56,8 +63,8 @@ export const api: ComponentApi = {
         ru: 'Чисто визуальная линия (между строками, которые и так разделены) — `role="presentation"`.',
       },
       {
-        en: "The label is read as the separator's text; an icon-only divider needs `aria-label`.",
-        ru: "Подпись читается как текст разделителя; у разделителя с одной иконкой задайте `aria-label`.",
+        en: "A labelled separator is named by its label (`aria-labelledby`); an icon-only divider needs `aria-label`.",
+        ru: "Разделитель с подписью назван ею (`aria-labelledby`); разделителю с одной иконкой задайте `aria-label`.",
       },
     ],
   },

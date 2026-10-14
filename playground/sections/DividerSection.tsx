@@ -18,14 +18,15 @@ export const page: ComponentPageConfig = {
   description:
     "Волосяная линия внутри одной поверхности: между строками списка, группами кнопок, как заголовок секции или «или». Карточки и панели разделяют заливкой и воздухом, а не линией.",
   examples: [
-    { slot: "overview", description: "Линии между строками списка настроек." },
+    { slot: "overview", description: "Линии между строками карточки настроек — `Divider`." },
     {
       slot: "sizes",
       description: "Подпись на каждом ярусе — под размер контента вокруг — `size`.",
     },
     {
       slot: "with-icon",
-      description: "Иконка перед подписью и одна иконка на линии; размер задаёт разделитель.",
+      description:
+        "Иконка перед подписью и одна иконка на линии с именем `aria-label`; размер иконки задаёт разделитель — `Icon`, `aria-label`.",
     },
     {
       scenario: "align",
@@ -35,12 +36,14 @@ export const page: ComponentPageConfig = {
     {
       scenario: "vertical",
       title: "Вертикальный",
-      description: "Вертикальная линия между группами кнопок панели — `orientation`.",
+      description:
+        "Вертикальные линии между группами кнопок: одна на высоту ряда, другая с отступами, в строку текста — `orientation`, `inset`.",
     },
     {
       scenario: "or-separator",
       title: "Разделитель «или»",
-      description: "Линия «или» между двумя способами входа.",
+      description:
+        "Линия «или» между двумя способами входа; подпись даёт разделителю имя — `Divider`.",
     },
   ],
   api,

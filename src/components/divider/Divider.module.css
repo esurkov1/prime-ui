@@ -1,61 +1,29 @@
 /*
  * Divider — a hairline in `--prime-color-border-subtle`, optionally with content.
- * `data-size` follows the surrounding content tier: each tier has its own label type, gap and icon
- * from the control tier tokens, so xs → xl step visibly:
- *   xs 12/16 · gap 4 · icon 14   s 12/16 · gap 8 · icon 16   m 13/20 · gap 8 · icon 16
- *   l 14/20 · gap 8 · icon 20    xl 16/24 · gap 12 · icon 20
+ * `data-size` follows the content around it (the host tier, else `m`): the label type is a text
+ * role joined in TSX (xs · s caption 12/16, m body-s 13/20, l body-m 14/20, xl body-l 16/24); the
+ * gap and the icon come from the shared tier table (`internal/fieldTier`):
+ *   xs gap 4 · icon 14   s gap 8 · icon 16   m gap 8 · icon 16   l gap 8 · icon 20   xl gap 12 · icon 20
+ *
+ * Bleed: a host whose padding the line should cross (a menu panel) sets `--divider-bleed` to that
+ * padding; the line reaches past it on both sides (inline for a horizontal line, block for a
+ * vertical one).
  */
 .root {
-  --divider-gap: var(--prime-control-m-gap);
-  --divider-icon: var(--prime-control-m-icon);
-  --divider-text: var(--prime-control-m-label-size);
-  --divider-lh: var(--prime-control-m-label-line-height);
-  --divider-tracking: normal;
+  --divider-bleed-size: var(--divider-bleed, var(--prime-space-0));
 
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: var(--divider-gap);
+  gap: var(--field-gap);
   color: var(--prime-color-text-muted);
-  font-size: var(--divider-text);
-  line-height: var(--divider-lh);
-  letter-spacing: var(--divider-tracking);
 }
 
-.root[data-size="xs"] {
-  --divider-gap: var(--prime-control-xs-gap);
-  --divider-icon: var(--prime-control-xs-icon);
-  --divider-text: var(--prime-control-xs-label-size);
-  --divider-lh: var(--prime-control-xs-label-line-height);
-  --divider-tracking: var(--prime-text-caption-tracking);
-}
-
-.root[data-size="s"] {
-  --divider-gap: var(--prime-control-s-gap);
-  --divider-icon: var(--prime-control-s-icon);
-  --divider-text: var(--prime-control-s-label-size);
-  --divider-lh: var(--prime-control-s-label-line-height);
-  --divider-tracking: var(--prime-text-caption-tracking);
-}
-
-.root[data-size="l"] {
-  --divider-gap: var(--prime-control-l-gap);
-  --divider-icon: var(--prime-control-l-icon);
-  --divider-text: var(--prime-control-l-label-size);
-  --divider-lh: var(--prime-control-l-label-line-height);
-}
-
-.root[data-size="xl"] {
-  --divider-gap: var(--prime-control-xl-gap);
-  --divider-icon: var(--prime-control-xl-icon);
-  --divider-text: var(--prime-control-xl-text-size);
-  --divider-lh: var(--prime-control-xl-line-height);
-}
-
-/* Horizontal dividers span the row inside flex columns (menus, cards). */
+/* Horizontal dividers span the row inside flex columns (menus, cards), past the bleed. */
 .root:not([data-orientation="vertical"]) {
-  width: 100%;
+  width: calc(100% + 2 * var(--divider-bleed-size));
   min-width: 0;
+  margin-inline: calc(var(--prime-space-0) - var(--divider-bleed-size));
 }
 
 .root::before,
@@ -92,11 +60,11 @@
 
 /* A kit Icon in the label takes the divider's icon size (`--prime-icon-size`, like Button or Badge). */
 .content {
-  --prime-icon-size: var(--divider-icon);
+  --prime-icon-size: var(--field-icon);
 
   display: inline-flex;
   align-items: center;
-  gap: var(--divider-gap);
+  gap: var(--field-gap);
   min-width: 0;
   font-weight: var(--prime-font-weight-medium);
   overflow-wrap: anywhere;
@@ -107,6 +75,7 @@
   align-self: stretch;
   width: var(--prime-border-width);
   height: auto;
+  margin-block: calc(var(--prime-space-0) - var(--divider-bleed-size));
 }
 
 .root[data-orientation="vertical"]::before,
@@ -117,4 +86,17 @@
 
 .root[data-orientation="vertical"]:not(:empty) {
   width: auto;
+}
+
+/* Inset: the line stands off its neighbours by the tier gap on both sides; a vertical one is one
+   text line tall and centred in its row (a break between groups in a header or a toolbar). */
+.root[data-inset="true"]:not([data-orientation="vertical"]) {
+  margin-block: var(--field-gap);
+}
+
+.root[data-inset="true"][data-orientation="vertical"] {
+  align-self: center;
+  height: var(--field-lh);
+  margin-block: 0;
+  margin-inline: var(--field-gap);
 }

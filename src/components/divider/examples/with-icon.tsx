@@ -1,4 +1,4 @@
-/** An icon before the label and an icon alone on the line; the divider sizes it. */
+/** An icon before the label and an icon alone on the line named by `aria-label`; the divider sizes the icon — `Icon`, `aria-label`. */
 import { Divider, Icon, Typography } from "prime-ui-kit";
 
 export default function DividerWithIconExample() {

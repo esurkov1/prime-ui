@@ -1,24 +1,14 @@
 /* Layout of the Divider scenarios: semantic tokens only. */
 
-/* A column as wide as a short form: the lines need room to read as lines. */
-.column {
+/* overview.tsx: a settings card as wide as a short form, the lines need room to read as lines. */
+.card {
+  width: min(100%, var(--prime-layout-form-width-s));
+}
+
+/* A row with the line above it: the line and the row share the card's rhythm. */
+.entry {
   display: grid;
   gap: var(--prime-space-3);
-  width: min(100%, var(--prime-layout-form-width-s));
-}
-
-/* vertical.tsx: the row stretches the vertical line to the buttons' height. */
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
-
-/* overview.tsx */
-.list {
-  display: flex;
-  flex-direction: column;
-  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 .listRow {
@@ -26,5 +16,11 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--prime-space-4);
-  padding-block: var(--prime-space-3);
+}
+
+/* vertical.tsx: the toolbar row the vertical lines stand in. */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--prime-space-2);
 }
