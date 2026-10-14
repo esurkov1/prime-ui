@@ -69,7 +69,6 @@
   "src/components/field-list/api.ts: keyboard Alt + ↑ · Alt + ↓ — Alt + ↑",
   "src/components/field-list/api.ts: keyboard Enter · Space — Space",
   "src/components/field-list/api.ts: keyboard Tab — Tab",
-  "src/components/fieldset/api.ts: keyboard Tab — Tab",
   "src/components/file-upload/api.ts: keyboard Delete · Backspace — Backspace",
   "src/components/file-upload/api.ts: keyboard Enter · Space — Enter",
   "src/components/file-upload/api.ts: keyboard Enter · Space — Space",
