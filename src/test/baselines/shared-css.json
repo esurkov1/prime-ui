@@ -26,7 +26,6 @@
   "src/components/popover/Popover.module.css: control tier tokens outside fieldTier",
   "src/components/progress-bar/ProgressBar.module.css: control tier tokens outside fieldTier",
   "src/components/segmented-control/SegmentedControl.module.css: control tier tokens outside fieldTier",
-  "src/components/slider/Slider.module.css: control tier tokens outside fieldTier",
   "src/components/sparkline/Sparkline.module.css: control tier tokens outside fieldTier",
   "src/components/stepper/Stepper.module.css: control tier tokens outside fieldTier",
   "src/components/tabs/Tabs.module.css: control tier tokens outside fieldTier",
