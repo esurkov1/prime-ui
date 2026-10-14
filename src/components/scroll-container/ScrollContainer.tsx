@@ -19,8 +19,8 @@ export type ScrollContainerAxis = "vertical" | "horizontal" | "both";
 export type ScrollContainerEdges = "fade" | "shadow" | "none";
 
 export type ScrollContainerProps = React.HTMLAttributes<HTMLElement> & {
-  /** Root element. Default `div`; `AppShell.Main` renders `main`. */
-  as?: "div" | "main" | "aside" | "section" | "nav" | "article";
+  /** Root element. Default `div`; `AppShell.Main` renders `main`, CodeBlock `pre`. */
+  as?: "div" | "main" | "aside" | "section" | "nav" | "article" | "pre";
   /** Scroll axis. Default `vertical`. */
   axis?: ScrollContainerAxis;
   /** `overscroll-behavior`. Default `contain`: nested panels do not chain scroll into the page. */

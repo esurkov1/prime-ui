@@ -70,10 +70,10 @@ export const api: ComponentApi = {
         },
         {
           name: "as",
-          type: '"div" | "main" | "aside" | "section" | "nav" | "article"',
+          type: '"div" | "main" | "aside" | "section" | "nav" | "article" | "pre"',
           default: '"div"',
-          en: "Root element; a landmark tag when the region is one.",
-          ru: "Корневой элемент; тег-ориентир, если область им является.",
+          en: "Root element; a landmark tag when the region is one, `pre` for preformatted text (CodeBlock).",
+          ru: "Корневой элемент; тег-ориентир, если область им является, `pre` для преформатированного текста (CodeBlock).",
         },
         {
           name: "…rest",

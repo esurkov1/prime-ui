@@ -48,7 +48,7 @@ ScrollContainer   <div> (or the `as` tag); thin scrollbar, soft hidden edges
 | `onReachStart` | `() => void \| Promise<void>` | — | Fires within 120 px of the start, once per approach: load older content. A returned promise blocks repeats and sets `aria-busy`; content added above keeps the view. |
 | `onReachEnd` | `() => void \| Promise<void>` | — | The scroll position came within 120 px of the end: load the next page. Same once-per-approach and promise rules as `onReachStart`. |
 | `overscrollBehavior` | `"auto" \| "contain" \| "none"` | `"contain"` | CSS `overscroll-behavior`; `contain` stops scroll chaining into the page. |
-| `as` | `"div" \| "main" \| "aside" \| "section" \| "nav" \| "article"` | `"div"` | Root element; a landmark tag when the region is one. |
+| `as` | `"div" \| "main" \| "aside" \| "section" \| "nav" \| "article" \| "pre"` | `"div"` | Root element; a landmark tag when the region is one, `pre` for preformatted text (CodeBlock). |
 | `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className` (height, padding), `aria-label`, `tabIndex`, `role`, event handlers and the other attributes. |
 
 ## Variants

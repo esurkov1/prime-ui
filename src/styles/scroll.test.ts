@@ -15,8 +15,6 @@ const ALLOWED: Record<string, string> = {
   "components/scroll-container/ScrollContainer.module.css": "the primitive itself",
   "components/textarea/Textarea.module.css":
     "a native <textarea> scrolls its own text; nothing can wrap the inside of the control",
-  "components/code-block/CodeBlock.module.css":
-    "a <pre> that paints its own fill (a fade would dissolve it, a shadow paints the layer fill) and admits no scroll wrapper inside",
 };
 
 function cssFiles(dir: string): string[] {

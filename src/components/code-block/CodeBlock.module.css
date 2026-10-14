@@ -1,6 +1,6 @@
 /*
  * CodeBlock — monospace `code` role on the host layer's control fill (one ladder step off it), no
- * border.
+ * border. A soft block scrolls through ScrollContainer (`as="pre"`), which owns the overflow.
  * Token colors come from the palette, so they follow the theme; `data-theme` on the root
  * (from `colorScheme`) re-scopes the whole palette when a fixed scheme is requested.
  */
@@ -17,7 +17,6 @@
 .root[data-variant="soft"] {
   max-width: 100%;
   padding: var(--prime-space-3) var(--prime-space-4);
-  overflow-x: auto;
   border-radius: var(--prime-radius-m);
   background: var(--prime-color-fill-muted);
   font-size: var(--prime-text-code-size);
@@ -47,25 +46,25 @@
   font-family: inherit;
 }
 
-/* Syntax tokens from `highlightTsxHtml`. */
-.root :global(.prime-tok-k) {
+/* Syntax tokens from `highlightTsx`. */
+.keyword {
   color: var(--prime-color-palette-purple-text);
   font-weight: var(--prime-font-weight-medium);
 }
 
-.root :global(.prime-tok-s) {
+.string {
   color: var(--prime-color-palette-teal-text);
 }
 
-.root :global(.prime-tok-c) {
+.comment {
   color: var(--prime-color-text-muted);
   font-style: italic;
 }
 
-.root :global(.prime-tok-n) {
+.number {
   color: var(--prime-color-palette-orange-text);
 }
 
-.root :global(.prime-tok-x) {
+.tag {
   color: var(--prime-color-palette-blue-text);
 }

@@ -23,8 +23,8 @@ import { CodeBlock } from "prime-ui-kit";
 
 ## Anatomy
 ```
-CodeBlock        <pre>; variant, colorScheme (data-theme)
-└─ code          <code> with highlighted tokens from the `code` string
+CodeBlock        <pre> (a ScrollContainer when `soft`); variant, colorScheme (data-theme)
+└─ code          <code>: the tokens of the `code` string as text in coloured spans
 ```
 
 ## API
@@ -32,7 +32,7 @@ CodeBlock        <pre>; variant, colorScheme (data-theme)
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### CodeBlock
-`ref` → `HTMLPreElement`. Renders `<pre><code>`; the markup comes from the escaped, highlighted `code`.
+`ref` → `HTMLPreElement`. Renders `<pre><code>`: the tokens of `code` as text in coloured spans, never as HTML. A `soft` block scrolls sideways through ScrollContainer.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -40,7 +40,7 @@ CodeBlock        <pre>; variant, colorScheme (data-theme)
 | `variant` | `"soft" \| "ghost"` | `"soft"` | `soft` — a filled panel (one ladder step off its host) with padding and the `code` text role; `ghost` — bare `pre` that inherits type and background from its host. |
 | `colorScheme` | `"light" \| "dark"` | — | Fixes the theme for this block only (`data-theme`). Omit to follow the page theme. |
 | `tabIndex` | `number` | — | Default `0` for `soft` (a scrolling block stays reachable from the keyboard), none for `ghost`; pass `-1` when it never overflows. |
-| `…rest` | `Omit<HTMLAttributes<HTMLPreElement>, "children" \| "dangerouslySetInnerHTML">` | — | `className`, `aria-label` and the other `<pre>` attributes. |
+| `…rest` | `Omit<HTMLAttributes<HTMLPreElement>, "children">` | — | `className`, `aria-label` and the other `<pre>` attributes. |
 
 ## Variants
 
@@ -67,7 +67,7 @@ Syntax tokens: keywords purple (weight 500), strings teal, numbers orange, JSX t
 | focus-visible | keyboard focus on a `soft` block | inset focus ring |
 
 ## Layout & spacing
-- `max-width: 100%`; the block takes the column width and long lines scroll horizontally (`white-space: pre`, tab size 2).
+- `max-width: 100%`; the block takes the column width and long lines scroll horizontally inside it (`white-space: pre`, tab size 2), with the kit's thin scrollbar.
 - Heading / text → code block: `--prime-space-2` to `--prime-space-4`.
 - Constrain the column (`--prime-layout-reading-max-width` for docs), not the block.
 
@@ -104,5 +104,5 @@ No `labels`.
 - Wrapping a soft block in another box → the block is already a filled panel.
 
 ## Related
-- **Built from:** —
+- **Built from:** [ScrollContainer](../scroll-container/COMPONENT.md)
 - **See also:** [Kbd](../kbd/COMPONENT.md), [ExampleFrame](../example-frame/COMPONENT.md), [Typography](../typography/COMPONENT.md)
