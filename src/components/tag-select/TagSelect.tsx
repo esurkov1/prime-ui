@@ -686,8 +686,11 @@ export function TagSelect({
           }}
           onClick={(event) => {
             if (disabled) return;
+            const target = event.target as Element;
+            // A chip's remove button keeps focus in the field and does not open the list.
+            if (target.closest("[data-chip-value] button")) return;
             // A click on a chip focuses the chip (for the keyboard); elsewhere the input.
-            if (!(event.target as Element).closest("[data-chip-value]")) inputRef.current?.focus();
+            if (!target.closest("[data-chip-value]")) inputRef.current?.focus();
             if (hasPanelContent) setOpen(true);
           }}
           onFocus={() => setFocusWithin(true)}
@@ -722,30 +725,31 @@ export function TagSelect({
                 loading={creating.has(chip.value)}
                 onKeyDown={(event) => onChipKeyDown(event, index)}
                 onRemove={() => removeChip(chip)}
-                // Removing keeps focus in the field and does not open the list.
+                // Removing keeps focus in the field (the field ignores the click itself).
                 onMouseDown={(event) => {
                   if ((event.target as Element).closest("button")) event.preventDefault();
-                }}
-                onClick={(event) => {
-                  if ((event.target as Element).closest("button")) event.stopPropagation();
                 }}
               >
                 <span className={styles.chipLabel}>{chip.label}</span>
               </Badge.Root>
             ))}
             {hiddenChips.length > 0 ? (
-              // A real button; the click bubbles to the field, which expands and opens the list.
-              <Badge.Root
+              // A real button around the chip; the click bubbles to the field, which expands and
+              // opens the list.
+              <button
+                type="button"
+                className={styles.chipMoreButton}
                 disabled={disabled}
-                className={styles.chipMore}
                 title={hiddenChips.map((chip) => chip.label).join(", ")}
-                onPress={() => inputRef.current?.focus()}
+                onClick={() => inputRef.current?.focus()}
               >
-                <span aria-hidden="true">+{hiddenChips.length}</span>
-                <VisuallyHidden>
-                  {formatLabel(labels.more, { count: hiddenChips.length })}
-                </VisuallyHidden>
-              </Badge.Root>
+                <Badge.Root disabled={disabled} className={styles.chipMore}>
+                  <span aria-hidden="true">+{hiddenChips.length}</span>
+                  <VisuallyHidden>
+                    {formatLabel(labels.more, { count: hiddenChips.length })}
+                  </VisuallyHidden>
+                </Badge.Root>
+              </button>
             ) : null}
             <input
               ref={inputRef}

@@ -3,8 +3,12 @@ import * as React from "react";
 import { describe, expect, it } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Skeleton } from "./Skeleton";
+
+const CSS = "src/components/skeleton/Skeleton.module.css";
 
 describe("Skeleton", () => {
   it("is a decorative text line at tier m by default", () => {
@@ -52,5 +56,22 @@ describe("Skeleton", () => {
     expect(ref.current).toBe(root);
     expect(root).toHaveClass("cover");
     expect(root).toHaveAttribute("data-testid", "cover");
+  });
+
+  it("block fills its box, an absolutely placed media box too; every size yields to a className", () => {
+    const block = cssRule(CSS, ':where(.root[data-shape="block"])');
+    expect(cssValue(block, "width")).toBe("100%");
+    expect(cssValue(block, "height")).toBe("100%");
+    // The cap sits in :where() with the geometry, so a host box wider than its parent wins.
+    expect(cssValue(cssRule(CSS, ":where(.root)"), "max-width")).toBe("100%");
+    expect(cssRule(CSS, ".root").decls.some((decl) => decl.prop === "max-width")).toBe(false);
+  });
+
+  it("reads its geometry from the shared tier table", () => {
+    const { container } = render(<Skeleton shape="control" size="l" />);
+    expect(container.firstElementChild).toHaveClass(fieldTierClass);
+    expect(cssValue(cssRule(CSS, ':where(.root[data-shape="control"])'), "height")).toBe(
+      "var(--field-h)",
+    );
   });
 });

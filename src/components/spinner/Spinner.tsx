@@ -3,6 +3,7 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { iconBoxClass } from "@/internal/iconBox";
 import { useLabels } from "@/internal/labels";
 import { Ring } from "@/internal/ring";
@@ -21,12 +22,7 @@ export const SPINNER_LABELS: SpinnerLabels = {
 };
 
 export type SpinnerProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /**
-   * Explicit size on the icon scale (xs 14 · s 16 · m 20 · l 24 · xl 32). Without it the spinner
-   * follows its host like an `Icon`: the host's icon size, else the nearest control tier, else 16.
-   */
   size?: ControlSize;
-  /** Ring color; `default` inherits `currentColor`. */
   tone?: TextTone;
   labels?: Partial<SpinnerLabels>;
   ref?: React.Ref<HTMLSpanElement>;
@@ -35,7 +31,8 @@ export type SpinnerProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children
 /**
  * Indeterminate loading indicator: the kit ring (`internal/ring`) with the share unknown — a quarter
  * arc turning on a faint track, at the line weight. A `role="status"` region with `labels.loading`
- * for screen readers; pass `aria-hidden` when the host already says it is busy.
+ * for screen readers; pass `aria-hidden` when the host already says it is busy. It fades itself in
+ * (`enterMotion.enterFade`), so a host that shows it conditionally needs no motion of its own.
  */
 export function Spinner({
   size: sizeProp,
@@ -51,7 +48,13 @@ export function Spinner({
   return (
     <span
       role="status"
-      className={cx(styles.root, iconBoxClass(sizeProp, controlSize), toneStyles.tone, className)}
+      className={cx(
+        styles.root,
+        iconBoxClass(sizeProp, controlSize),
+        toneStyles.tone,
+        enterMotion.enterFade,
+        className,
+      )}
       {...toDataAttributes({ size, tone: tone === "default" ? undefined : tone })}
       {...rest}
     >

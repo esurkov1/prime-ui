@@ -1,5 +1,5 @@
-/** Hairlines between the rows of a settings list. */
-import { Divider, Typography } from "prime-ui-kit";
+/** Hairlines between the rows of a settings card — `Divider`. */
+import { Card, Divider, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -11,20 +11,22 @@ const ROWS = [
 
 export default function DividerOverviewExample() {
   return (
-    <div className={styles.list}>
-      {ROWS.map((row, index) => (
-        <div key={row.label}>
-          {index > 0 ? <Divider /> : null}
-          <div className={styles.listRow}>
-            <Typography as="span" variant="body-m">
-              {row.label}
-            </Typography>
-            <Typography as="span" variant="body-m" tone="secondary">
-              {row.value}
-            </Typography>
+    <Card.Root className={styles.card}>
+      <Card.Body>
+        {ROWS.map((row, index) => (
+          <div key={row.label} className={styles.entry}>
+            {index > 0 ? <Divider /> : null}
+            <div className={styles.listRow}>
+              <Typography as="span" variant="body-m">
+                {row.label}
+              </Typography>
+              <Typography as="span" variant="body-m" tone="secondary">
+                {row.value}
+              </Typography>
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </Card.Body>
+    </Card.Root>
   );
 }

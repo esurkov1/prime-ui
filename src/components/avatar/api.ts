@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Avatar.Root",
-      en: "`ref` → `HTMLDivElement`. The circle: diameter tier and fallback hue; tracks the image load for the Fallback.",
-      ru: "Круг: диаметр и оттенок подложки; следит за загрузкой фото для Fallback.",
+      en: '`ref` → `HTMLDivElement`. The circle: diameter tier and fallback hue; tracks the image load for the Fallback. Named by `aria-label`, it is one `role="img"`.',
+      ru: 'Круг: диаметр и оттенок подложки; следит за загрузкой фото для Fallback. С `aria-label` — одно изображение `role="img"`.',
       props: [
         {
           name: "size",
@@ -25,8 +25,8 @@ export const api: ComponentApi = {
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLDivElement>",
-          en: "`className`, `aria-label` (when no name is shown) and the other div attributes.",
-          ru: "`className`, `aria-label` (когда имя не показано) и остальные атрибуты div.",
+          en: '`className`, `aria-label` (when no name is shown: the avatar becomes `role="img"` of that name) and the other div attributes.',
+          ru: '`className`, `aria-label` (когда имя не показано: аватар становится `role="img"` с этим именем) и остальные атрибуты div.',
         },
       ],
     },
@@ -46,8 +46,8 @@ export const api: ComponentApi = {
           name: "alt",
           type: "string",
           default: '""',
-          en: "Empty when the name is written next to the avatar, otherwise the name.",
-          ru: "Пустой, когда имя написано рядом, иначе — имя.",
+          en: "Empty: the name is written next to the avatar or set once with `aria-label` on `Avatar.Root`.",
+          ru: "Пустой: имя написано рядом или задано один раз через `aria-label` на `Avatar.Root`.",
         },
         {
           name: "…rest",
@@ -118,8 +118,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Avatar.Overflow",
-      en: "`ref` → `HTMLDivElement`. The «+N» cell at the end of a group, the same diameter as its avatars.",
-      ru: "Ячейка «+N» в конце группы того же диаметра.",
+      en: '`ref` → `HTMLDivElement`. The «+N» cell at the end of a group, the same diameter as its avatars; named by `aria-label`, it is `role="img"`.',
+      ru: 'Ячейка «+N» в конце группы того же диаметра; с `aria-label` — `role="img"`.',
       props: [
         {
           name: "size",
@@ -151,16 +151,16 @@ export const api: ComponentApi = {
     keyboard: [],
     aria: [
       {
-        en: "`Avatar.Image` `alt`: empty when the name is written next to it, otherwise the name. Without a photo and without a name nearby, put `aria-label` on `Avatar.Root`.",
-        ru: "`alt` у `Avatar.Image` пустой, когда имя написано рядом, иначе — имя. Без фото и без имени рядом — `aria-label` на `Avatar.Root`.",
+        en: '`Avatar.Image` `alt` stays empty. Without the name written nearby, name the avatar once with `aria-label` on `Avatar.Root`: it becomes `role="img"` of that name, whether the photo, the initials or an icon shows.',
+        ru: '`alt` у `Avatar.Image` остаётся пустым. Без имени рядом назовите аватар один раз через `aria-label` на `Avatar.Root`: он становится `role="img"` с этим именем, что бы ни было видно — фото, инициалы или иконка.',
       },
       {
         en: '`Avatar.Status` is `role="img"` with `aria-label` from `labels`. Every state has its own shape (full dot, crescent, dot with a bar, hollow ring), so presence never rests on color alone.',
         ru: '`Avatar.Status` — `role="img"` с `aria-label` из `labels`. У каждого состояния своя форма (сплошная точка, полумесяц, точка с чертой, пустое кольцо): присутствие не передаётся одним цветом.',
       },
       {
-        en: '`Avatar.Group` is `role="group"`; give it `aria-label`. Give `Avatar.Overflow` an `aria-label` («Ещё 3 участника»).',
-        ru: '`Avatar.Group` — `role="group"`, задайте ему `aria-label`; `Avatar.Overflow` — `aria-label` («Ещё 3 участника»).',
+        en: '`Avatar.Group` is `role="group"`; give it `aria-label`. Give `Avatar.Overflow` an `aria-label` («Ещё 3 участника»): it becomes `role="img"`.',
+        ru: '`Avatar.Group` — `role="group"`, задайте ему `aria-label`; `Avatar.Overflow` — `aria-label` («Ещё 3 участника»): он становится `role="img"`.',
       },
     ],
   },

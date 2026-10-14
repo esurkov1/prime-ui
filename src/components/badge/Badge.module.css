@@ -1,12 +1,14 @@
 /*
- * Badge — the one chip of the kit: read-only label, counter, removable value, pressable toggle.
+ * Badge — the one chip of the kit: read-only label, status, counter, removable value, toggle.
  * Soft by default, no borders. Dimensions come from the chip tier (`internal/chipTier`, `--chip-*`),
- * colors from the palette hue (`internal/palette`, `--hue-*`). `data-tier` is the visual tier
- * (equals `data-size` unless the size was inherited from a control, see ./tier.ts).
+ * colors from the palette hue (`internal/palette`, `--hue-*`) or a status tone (below). `data-tier`
+ * is the visual tier (equals `data-size` unless the size was inherited from a control,
+ * `useChipTier`).
  *
  * Layout: [start segment?] body [end segment?]. An icon or dot at an edge, the remove button and
  * Badge.Action are segments — full height, flush with the edge, the glyph centred, the whole
- * segment is the hit area. A segment takes the side padding of the badge.
+ * segment is the hit area. A segment takes the side padding of the badge. The root never clips:
+ * the text clips inside its own box, so the segments' touch areas reach past the chip.
  */
 .root {
   --badge-lh: var(--prime-text-caption-line-height);
@@ -14,6 +16,9 @@
   /* Edge paddings are variables: an icon or dot at an edge turns into a segment and takes that side. */
   --badge-pad-start: var(--chip-px);
   --badge-pad-end: var(--chip-px);
+  --badge-bg: var(--hue-soft);
+  --badge-fg: var(--hue-text);
+  --badge-line: transparent;
 
   /* A segment holds its mark with equal space on both sides: (padding + gap) / 2 to the edge and
      the same to the text. The flex gap next to a segment is cancelled, so nothing is added. */
@@ -31,13 +36,19 @@
   max-width: 100%;
   padding-inline: var(--badge-pad-start) var(--badge-pad-end);
   border-radius: var(--chip-radius);
+  background-color: var(--badge-bg);
+  box-shadow: inset 0 0 0 var(--prime-border-width) var(--badge-line);
+  color: var(--badge-fg);
   font-size: var(--chip-text);
   line-height: var(--badge-lh);
   font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   vertical-align: middle;
-  overflow: hidden;
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* Bigger tiers get the matching line height and an 8px dot. */
@@ -52,11 +63,11 @@
 }
 
 .root[data-icon-start="true"] {
-  --badge-pad-start: 0px;
+  --badge-pad-start: var(--prime-space-0);
 }
 
 .root[data-icon-end="true"] {
-  --badge-pad-end: 0px;
+  --badge-pad-end: var(--prime-space-0);
 }
 
 .root[data-icon-only="true"] {
@@ -65,29 +76,71 @@
   padding-inline: 0;
 }
 
+/* A square tile of text (a file format «PDF», a short code): as wide as it is tall, the text
+   centred and clipped to the tile. */
+.root[data-shape="square"] {
+  justify-content: center;
+  width: var(--chip-h);
+  min-width: 0;
+  padding-inline: 0;
+  text-align: center;
+  text-overflow: clip;
+}
+
+/* ─── Status tones: the role colors in the hue's slots ──────────────────── */
+
+.root[data-tone="success"] {
+  --hue-soft: var(--prime-color-success-soft);
+  --hue-text: var(--prime-color-success-text);
+  --hue-solid: var(--prime-color-success-default);
+  --hue-solid-fg: var(--prime-color-success-fg);
+}
+
+.root[data-tone="warning"] {
+  --hue-soft: var(--prime-color-warning-soft);
+  --hue-text: var(--prime-color-warning-text);
+  --hue-solid: var(--prime-color-warning-default);
+  --hue-solid-fg: var(--prime-color-warning-fg);
+}
+
+.root[data-tone="danger"] {
+  --hue-soft: var(--prime-color-danger-soft);
+  --hue-text: var(--prime-color-danger-text);
+  --hue-solid: var(--prime-color-danger-default);
+  --hue-solid-fg: var(--prime-color-danger-fg);
+}
+
+.root[data-tone="info"] {
+  --hue-soft: var(--prime-color-info-soft);
+  --hue-text: var(--prime-color-info-text);
+  --hue-solid: var(--prime-color-info-default);
+  --hue-solid-fg: var(--prime-color-info-fg);
+}
+
 /* ─── Variants ──────────────────────────────────────────────────────────── */
 
 .root[data-variant="solid"] {
-  background: var(--hue-solid);
-  color: var(--hue-solid-fg);
-}
-
-.root[data-variant="soft"] {
-  background: var(--hue-soft);
-  color: var(--hue-text);
+  --badge-bg: var(--hue-solid);
+  --badge-fg: var(--hue-solid-fg);
 }
 
 .root[data-variant="outline"] {
-  background: transparent;
-  box-shadow: inset 0 0 0 var(--prime-border-width)
-    color-mix(in srgb, var(--hue-text) var(--prime-tint-line), transparent);
-  color: var(--hue-text);
+  --badge-bg: transparent;
+  --badge-line: color-mix(in srgb, var(--hue-text) var(--prime-tint-line), transparent);
+}
+
+/* A toggle that is on: the selected look (foundation §8, accent soft) over any hue and variant;
+   it glides in and out with the color transition. */
+.root[data-pressed="true"] {
+  --badge-bg: var(--prime-color-accent-soft);
+  --badge-fg: var(--prime-color-accent-text);
+  --badge-line: transparent;
 }
 
 .root[data-disabled="true"] {
-  background: var(--prime-color-fill-muted);
-  box-shadow: none;
-  color: var(--prime-color-text-disabled);
+  --badge-bg: var(--prime-color-fill-muted);
+  --badge-fg: var(--prime-color-text-disabled);
+  --badge-line: transparent;
 }
 
 /* ─── Parts ─────────────────────────────────────────────────────────────── */
@@ -119,16 +172,16 @@
   background: currentColor;
 }
 
+/* A dot of its own hue (`color`): the solid step, readable on any surface. */
+.dot[data-color]::before {
+  background: var(--hue-solid);
+}
+
 .icon {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--prime-icon-size);
-  height: var(--prime-icon-size);
-}
-
-.icon > * {
   width: var(--prime-icon-size);
   height: var(--prime-icon-size);
 }
@@ -149,12 +202,12 @@
 
 .icon[data-edge="start"],
 .dot[data-edge="start"] {
-  margin-inline-end: calc(-1 * var(--chip-gap));
+  margin-inline-end: calc(var(--prime-space-0) - var(--chip-gap));
 }
 
 .icon[data-edge="end"],
 .dot[data-edge="end"] {
-  margin-inline-start: calc(-1 * var(--chip-gap));
+  margin-inline-start: calc(var(--prime-space-0) - var(--chip-gap));
 }
 
 /* ─── Body and text ─────────────────────────────────────────────────────── */
@@ -175,6 +228,7 @@
  */
 .root[data-text-only="true"] {
   display: inline-block;
+  overflow: hidden;
   line-height: var(--chip-h);
   text-overflow: ellipsis;
 }
@@ -193,7 +247,7 @@
 
 /* The remove segment carries its own inner space, so the text runs up to it. */
 .root[data-removable="true"] {
-  --badge-pad-end: 0px;
+  --badge-pad-end: var(--prime-space-0);
 }
 
 .remove,
@@ -209,16 +263,11 @@
   /* Both sit at the end edge: the wash takes the chip's end corners itself. */
   border-start-end-radius: inherit;
   border-end-end-radius: inherit;
-  background: transparent;
+  background-color: transparent;
   color: color-mix(in srgb, currentColor var(--prime-tint-heavy), transparent);
   font: inherit;
   cursor: pointer;
   appearance: none;
-  transition:
-    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* Remove and Badge.Action are segments that take a hover wash, so the text keeps the usual gap
@@ -226,19 +275,15 @@
 .remove {
   flex: 0 0 auto;
   align-self: stretch;
-}
-
-/* Coarse pointers: the segments' touch hit area reaches past the chip, so the chip does not clip. */
-@media (pointer: coarse) {
-  .root:has(> .remove, > .action) {
-    overflow: visible;
-  }
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {
-  .remove:hover:not(:disabled),
-  .action:hover:not(:disabled) {
-    background: var(--prime-color-fill-subtle-active);
+  .remove:hover:not(:disabled, [aria-disabled="true"]),
+  .action:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--prime-color-fill-subtle-active);
     color: inherit;
   }
 }
@@ -270,16 +315,7 @@
   cursor: progress;
 }
 
-/* Any glyph — the default close / minus or a custom icon — sits at the tier icon size. */
-.remove > *,
-.action > * {
-  display: block;
-  flex: none;
-  width: var(--prime-icon-size);
-  height: var(--prime-icon-size);
-}
-
-/* ─── Pressable: the body is a button covering the whole badge ──────────── */
+/* ─── Toggle: the body is a button covering the whole badge ────────────── */
 
 .root[data-pressable="true"] {
   padding-inline: 0;
@@ -299,12 +335,10 @@
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
+/* The hover wash is a step of the badge's own text color over its fill. */
 @media (hover: hover) {
-  .root[data-pressable="true"]:hover:not([data-disabled="true"]) {
-    background-image: linear-gradient(
-      var(--prime-color-fill-subtle),
-      var(--prime-color-fill-subtle)
-    );
+  .root[data-pressable="true"]:hover:not([data-disabled="true"], [aria-disabled="true"]) {
+    background-color: color-mix(in srgb, var(--badge-fg) var(--prime-tint-faint), var(--badge-bg));
   }
 }
 
@@ -343,13 +377,7 @@
 
 .root[data-action="persistent"],
 .root[data-action="reveal"]:focus-within {
-  --badge-action-shift: 0px;
-}
-
-@media (hover: hover) {
-  .root[data-action="reveal"]:hover {
-    --badge-action-shift: 0px;
-  }
+  --badge-action-shift: var(--prime-space-0);
 }
 
 .action {
@@ -359,6 +387,11 @@
   opacity: 0;
   pointer-events: none;
   transform: translateX(var(--prime-space-1));
+  transition:
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-action="persistent"] .action,
@@ -368,7 +401,12 @@
   transform: none;
 }
 
-@media (hover: hover) {
+/* A fine pointer reveals the segment on hover; the slide is a hover transform. */
+@media (hover: hover) and (pointer: fine) {
+  .root[data-action="reveal"]:hover {
+    --badge-action-shift: var(--prime-space-0);
+  }
+
   .root[data-action="reveal"]:hover .action {
     opacity: 1;
     pointer-events: auto;
@@ -376,10 +414,11 @@
   }
 }
 
-/* Without hover nothing reveals the segment, so `reveal` shows it like `persistent`. */
-@media (hover: none) {
+/* Without a fine pointer nothing reveals the segment on hover, so `reveal` shows it like
+   `persistent`. */
+@media (hover: none), (pointer: coarse) {
   .root[data-action="reveal"] {
-    --badge-action-shift: 0px;
+    --badge-action-shift: var(--prime-space-0);
   }
 
   .root[data-action="reveal"] .action {

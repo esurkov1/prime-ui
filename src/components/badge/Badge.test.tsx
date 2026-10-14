@@ -6,8 +6,11 @@ import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { iconBoxStyles } from "@/internal/iconBox";
 import type { PaletteColor } from "@/internal/states";
+import { cssRule, cssValue } from "@/test/css";
 import { Badge } from "./Badge";
 import styles from "./Badge.module.css";
+
+const CSS = "src/components/badge/Badge.module.css";
 
 const colorsForMatrix: PaletteColor[] = ["gray", "red", "blue", "green", "orange"];
 const allColors: PaletteColor[] = [
@@ -139,6 +142,50 @@ describe("Badge", () => {
     expect(badgeOf("c")).toHaveAttribute("data-color", color);
   });
 
+  it("a status tone takes the role colors instead of a hue; neutral is gray", () => {
+    render(
+      <>
+        <Badge.Root tone="danger">Просрочен</Badge.Root>
+        <Badge.Root tone="neutral">Черновик</Badge.Root>
+      </>,
+    );
+    expect(badgeOf("Просрочен")).toHaveAttribute("data-tone", "danger");
+    expect(badgeOf("Просрочен")).not.toHaveAttribute("data-color");
+    expect(badgeOf("Черновик")).toHaveAttribute("data-color", "gray");
+    expect(cssValue(cssRule(CSS, '.root[data-tone="danger"]'), "--hue-soft")).toBe(
+      "var(--prime-color-danger-soft)",
+    );
+    // @ts-expect-error: a status tone and a category hue never go together
+    const both = <Badge.Root tone="success" color="red" />;
+    expect(both.props.tone).toBe("success");
+  });
+
+  it("shape square is a tile as wide as it is tall", () => {
+    render(<Badge.Root shape="square">PDF</Badge.Root>);
+    expect(badgeOf("PDF")).toHaveAttribute("data-shape", "square");
+    expect(cssValue(cssRule(CSS, '.root[data-shape="square"]'), "width")).toBe("var(--chip-h)");
+  });
+
+  it("a Dot of its own hue paints the solid step", () => {
+    const { container } = render(<Badge.Dot color="purple" />);
+    const dot = container.querySelector(`.${styles.dot}`);
+    expect(dot).toHaveAttribute("data-color", "purple");
+    expect(cssValue(cssRule(CSS, ".dot[data-color]::before"), "background")).toBe(
+      "var(--hue-solid)",
+    );
+  });
+
+  it("an icon-only badge named by aria-label is an image of that name", () => {
+    render(
+      <Badge.Root aria-label="Почта">
+        <Badge.Icon>
+          <span>@</span>
+        </Badge.Icon>
+      </Badge.Root>,
+    );
+    expect(screen.getByRole("img", { name: "Почта" })).toHaveAttribute("data-icon-only", "true");
+  });
+
   it("supports size xs", () => {
     render(<Badge.Root size="xs">9</Badge.Root>);
     const el = badgeOf("9");
@@ -241,7 +288,7 @@ describe("Badge", () => {
 
     it("in a flex row a text run sits in one block span; its outer spaces stay outside", () => {
       render(
-        <Badge.Root onPress={() => {}}>
+        <Badge.Root defaultPressed={false}>
           {"НЕ "}
           <span>billing</span>
         </Badge.Root>,
@@ -251,10 +298,10 @@ describe("Badge", () => {
       expect(button.closest(`.${styles.root}`)).not.toHaveAttribute("data-text-only");
     });
 
-    it("onPress makes the body a toggle button with aria-pressed", async () => {
-      const onPress = vi.fn();
+    it("the pressed triad makes the body a toggle button; controlled it only asks", async () => {
+      const onPressedChange = vi.fn();
       render(
-        <Badge.Root onPress={onPress} pressed>
+        <Badge.Root pressed onPressedChange={onPressedChange}>
           GET
         </Badge.Root>,
       );
@@ -262,13 +309,42 @@ describe("Badge", () => {
       expect(button).toHaveAttribute("aria-pressed", "true");
       expect(button.closest("[data-pressable]")).toHaveAttribute("data-pressed", "true");
       await userEvent.click(button);
-      expect(onPress).toHaveBeenCalledTimes(1);
+      expect(onPressedChange).toHaveBeenCalledWith(false);
+      expect(button).toHaveAttribute("aria-pressed", "true");
+    });
+
+    it("defaultPressed flips on click, Enter and Space", async () => {
+      const onPressedChange = vi.fn();
+      render(
+        <Badge.Root defaultPressed={false} onPressedChange={onPressedChange}>
+          Москва
+        </Badge.Root>,
+      );
+      const button = screen.getByRole("button", { name: "Москва" });
+      const root = button.closest(`.${styles.root}`);
+      expect(button).toHaveAttribute("aria-pressed", "false");
+      expect(root).not.toHaveAttribute("data-pressed");
+      const user = userEvent.setup();
+      await user.click(button);
+      expect(button).toHaveAttribute("aria-pressed", "true");
+      expect(root).toHaveAttribute("data-pressed", "true");
+      await user.keyboard("{Enter}");
+      expect(button).toHaveAttribute("aria-pressed", "false");
+      await user.keyboard(" ");
+      expect(button).toHaveAttribute("aria-pressed", "true");
+      expect(onPressedChange.mock.calls).toEqual([[true], [false], [true]]);
+    });
+
+    it("a read-only badge has no button and takes no click handler", () => {
+      // @ts-expect-error: a click on a span is no control; a pressable chip is the toggle
+      render(<Badge.Root onClick={() => {}}>Черновик</Badge.Root>);
+      expect(screen.queryByRole("button")).toBeNull();
     });
 
     it("Badge.Action sits outside the text and reports reveal or persistent", async () => {
       const onHide = vi.fn();
       const { rerender } = render(
-        <Badge.Root onPress={() => {}} data-testid="b">
+        <Badge.Root defaultPressed={false} data-testid="b">
           billing
           <Badge.Action label="Скрыть billing" onClick={onHide} />
         </Badge.Root>,
@@ -278,7 +354,7 @@ describe("Badge", () => {
       await userEvent.click(screen.getByRole("button", { name: "Скрыть billing" }));
       expect(onHide).toHaveBeenCalledTimes(1);
       rerender(
-        <Badge.Root onPress={() => {}} data-testid="b">
+        <Badge.Root defaultPressed={false} data-testid="b">
           billing
           <Badge.Action label="Скрыть billing" onClick={onHide} persistent disabled />
         </Badge.Root>,
@@ -289,7 +365,7 @@ describe("Badge", () => {
 
     it("tab order: body, then the action", async () => {
       render(
-        <Badge.Root onPress={() => {}}>
+        <Badge.Root defaultPressed={false}>
           GET
           <Badge.Action label="Скрыть GET" onClick={() => {}} />
         </Badge.Root>,

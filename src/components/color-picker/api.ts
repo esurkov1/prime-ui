@@ -277,14 +277,14 @@ export const api: ComponentApi = {
           ru: "Своё содержимое; по умолчанию иконка пипетки.",
         },
         {
-          name: "asChild · fullWidth · holdToConfirm · onConfirm · labels · loading · pressed · progress · shape",
+          name: "fullWidth · loading · pressed · defaultPressed · onPressedChange · current · density · align · progress · holdToConfirm · onConfirm · labels",
           type: "ButtonRootProps",
           en: "As on `Button.Root`.",
           ru: "Как у `Button.Root`.",
         },
         {
           name: "…rest",
-          type: 'Omit<ButtonRootProps, "variant" | "tone" | "size" | "aria-label">',
+          type: 'Omit<ButtonRootProps, "variant" | "tone" | "size" | "aria-label" | "shape" | "asChild">',
           en: "`onClick`, `className` and the other button attributes.",
           ru: "`onClick`, `className` и остальные атрибуты кнопки.",
         },

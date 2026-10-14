@@ -53,7 +53,7 @@ export default function SkeletonWithCrossfadeExample() {
                     <Typography as="span" variant="body-m">
                       {payment.payer}
                     </Typography>
-                    <Typography as="span" variant="body-m" className={styles.sum}>
+                    <Typography as="span" variant="body-m" numeric="tabular">
                       {payment.amount}
                     </Typography>
                   </li>

@@ -2,23 +2,28 @@ import * as React from "react";
 
 import { Spinner } from "@/components/spinner/Spinner";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
+import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { useChipTier } from "@/internal/chipTier";
 import chipTier from "@/internal/chipTier.module.css";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
-import { leaveInPlace } from "@/internal/leaveInPlace";
+import { GlyphSwap } from "@/internal/glyphSwap";
+import { iconSlotClass } from "@/internal/iconBox";
+import { namedRole } from "@/internal/namedRole";
 import palette from "@/internal/palette.module.css";
+import { usePartPresence } from "@/internal/partPresence";
+import { splitParts } from "@/internal/parts";
 import { RollingNumber } from "@/internal/RollingNumber";
-import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
+import type { ControlSize, PaletteColor, Tone, Variant } from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 import { isPromiseLike } from "@/internal/usePendingChanges";
 
 import styles from "./Badge.module.css";
 import { markEdgeIcons } from "./edgeIcons";
-import { useBadgeTier } from "./tier";
 
 export type BadgeLabels = {
   /** Accessible name of the remove button; include the badge text, e.g. «Убрать фильтр «Москва»». */
@@ -29,38 +34,27 @@ export type BadgeLabels = {
 
 export const BADGE_LABELS: BadgeLabels = { remove: "Удалить", removeFailed: "Не удалось удалить" };
 
-export type BadgeRootProps = {
-  /** Palette hue. Default `gray`. */
-  color?: PaletteColor;
-  /** Treatment. Default `soft`. */
-  variant?: Exclude<Variant, "ghost">;
-  /** Badge tier; without it the badge follows the surrounding control one tier down. */
-  size?: ControlSize;
-  /**
-   * Shows the remove segment at the end (an applied filter, a selected value). Return the save's
-   * promise to remove on a server: the badge waits dimmed with a spinner in the segment; resolve —
-   * take it out of your list before resolving, it leaves with its exit; reject — it stays and
-   * `labels.removeFailed` is announced.
-   */
-  onRemove?: () => void | Promise<void>;
-  /**
-   * The badge waits on a request (a value its owner is still creating): dimmed, `aria-busy`, a
-   * spinner in the remove segment, which takes no press. A promise from `onRemove` does this itself.
-   */
-  loading?: boolean;
-  /**
-   * Makes the body a button covering the whole badge (a toggle chip, a filter value). Receives the
-   * click, so Alt / Shift clicks can mean something else.
-   */
-  onPress?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  /** Toggle state of a pressable badge: `aria-pressed` and `data-pressed`. */
-  pressed?: boolean;
-  labels?: Partial<BadgeLabels>;
-  disabled?: boolean;
-  children?: React.ReactNode;
-  className?: string;
-  ref?: React.Ref<HTMLSpanElement>;
-} & React.HTMLAttributes<HTMLSpanElement>;
+/** A status the badge states (`tone`) or a category hue it carries (`color`), never both. */
+type BadgeHueProps =
+  | { color?: PaletteColor; tone?: never }
+  | { tone: Extract<Tone, "neutral" | "success" | "warning" | "danger" | "info">; color?: never };
+
+export type BadgeRootProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "onClick" | "color"> &
+  BadgeHueProps & {
+    variant?: Exclude<Variant, "ghost">;
+    size?: ControlSize;
+    shape?: "chip" | "square";
+    onRemove?: () => void | Promise<void>;
+    loading?: boolean;
+    pressed?: boolean;
+    defaultPressed?: boolean;
+    onPressedChange?: (pressed: boolean) => void;
+    labels?: Partial<BadgeLabels>;
+    disabled?: boolean;
+    children?: React.ReactNode;
+    className?: string;
+    ref?: React.Ref<HTMLSpanElement>;
+  };
 
 export type BadgeIconProps = {
   children: React.ReactNode;
@@ -69,23 +63,20 @@ export type BadgeIconProps = {
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
 export type BadgeDotProps = {
+  color?: PaletteColor;
   className?: string;
   ref?: React.Ref<HTMLSpanElement>;
-} & React.HTMLAttributes<HTMLSpanElement>;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, "color">;
 
 export type BadgeActionProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "onClick" | "children"
 > & {
-  /** Accessible name and tooltip of the action («Скрыть billing»). */
   label: string;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  /** Keeps the action shown, not only on hover and focus (e.g. while the state it sets is on). */
   persistent?: boolean;
   disabled?: boolean;
-  /** Toggle state of the action: `aria-pressed`. */
   pressed?: boolean;
-  /** The glyph; a minus by default. Sized to the tier icon. */
   children?: React.ReactNode;
   ref?: React.Ref<HTMLButtonElement>;
 };
@@ -127,12 +118,15 @@ function wrapText(items: React.ReactNode[]): React.ReactNode[] {
 }
 
 function BadgeRoot({
-  color = "gray",
+  color,
+  tone,
   variant = "soft",
   size: sizeProp,
+  shape = "chip",
   onRemove,
-  onPress,
-  pressed,
+  pressed: pressedProp,
+  defaultPressed,
+  onPressedChange,
   loading = false,
   labels,
   disabled: disabledProp,
@@ -141,57 +135,47 @@ function BadgeRoot({
   ref,
   ...rest
 }: BadgeRootProps) {
-  const { size, tier } = useBadgeTier(sizeProp);
+  const { size, tier } = useChipTier(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
-  const nodeRef = React.useRef<HTMLSpanElement | null>(null);
-  const rootRef = useMergedRefs(nodeRef, ref);
+  // A status tone takes its own role colors; `neutral` is the gray hue, as is no hue at all.
+  const hue: PaletteColor | undefined =
+    tone === undefined ? (color ?? "gray") : tone === "neutral" ? "gray" : undefined;
+  // Whatever unmounts the badge (its owner took it out after the remove segment, a list changed),
+  // it closes up in place and the badges after it glide.
+  const presence = usePartPresence<HTMLSpanElement>({ axis: "inline" });
+  const rootRef = useMergedRefs(presence.ref, ref);
+  // A toggle when any part of the pressed triad is given: the body is a button over the badge.
+  const toggle =
+    pressedProp !== undefined || defaultPressed !== undefined || onPressedChange !== undefined;
+  const [pressed, setPressed] = useControllableState({
+    value: pressedProp,
+    defaultValue: defaultPressed ?? false,
+    onChange: onPressedChange,
+  });
   /** A promise from `onRemove` is pending: the badge waits, the segment spins. */
   const [removing, setRemoving] = React.useState(false);
   const [failure, setFailure] = React.useState("");
-  /** The remove segment was pressed: if the badge now unmounts, the owner took it out. */
-  const leavingRef = React.useRef(false);
-
-  // The owner took the badge out after its remove segment: it leaves with its exit, the badges
-  // after it closing up.
-  React.useLayoutEffect(() => {
-    const node = nodeRef.current;
-    return () => {
-      if (leavingRef.current && node) leaveInPlace(node, "inline");
-    };
-  }, []);
 
   const busy = removing || loading;
 
   const remove = () => {
     if (busy || !onRemove) return;
-    leavingRef.current = true;
     setFailure("");
     const outcome = onRemove();
-    if (!isPromiseLike(outcome)) {
-      // A removal answered at once has committed by now; a badge still here was kept.
-      setTimeout(() => {
-        leavingRef.current = false;
-      });
-      return;
-    }
+    if (!isPromiseLike(outcome)) return;
     setRemoving(true);
     outcome.then(
+      () => setRemoving(false),
       () => {
-        leavingRef.current = false;
-        setRemoving(false);
-      },
-      () => {
-        leavingRef.current = false;
         setRemoving(false);
         setFailure(labels?.removeFailed ?? BADGE_LABELS.removeFailed);
       },
     );
   };
 
-  // Badge.Action lives at the end of the badge, outside the text body.
-  const items = React.Children.toArray(children);
-  const actionElement = items.find(isAction) ?? null;
-  const content = items.filter((child) => !isAction(child));
+  // Badge.Action lives at the end of the badge, outside the text body; one per badge.
+  const { parts: actions, rest: content } = splitParts<BadgeActionProps>(children, BadgeAction);
+  const actionElement = actions[0] ?? null;
   const trailing = Boolean(onRemove || actionElement);
   const iconOnly =
     !trailing &&
@@ -203,7 +187,7 @@ function BadgeRoot({
   });
   // A read-only badge of plain text is one element: the root itself lays the text out as a block
   // and ellipsizes it. Anything richer is a flex row, so its text runs are wrapped.
-  const textOnly = !trailing && !onPress && edges.children.every(isText);
+  const textOnly = !trailing && !toggle && edges.children.every(isText);
   const body = (
     <ControlSizeProvider value={tier}>
       {typeof children === "number" ? (
@@ -219,23 +203,34 @@ function BadgeRoot({
 
   return (
     <span
+      {...rest}
       ref={rootRef}
-      className={cx(styles.root, chipTier.tier, palette.hue, className)}
+      // An icon-only badge named by `aria-label` is an image of that name.
+      role={iconOnly ? namedRole(rest, "img") : rest.role}
+      className={cx(
+        styles.root,
+        chipTier.tier,
+        hue !== undefined && palette.hue,
+        presence.className,
+        className,
+      )}
       aria-disabled={disabled || undefined}
       aria-busy={busy || undefined}
       {...toDataAttributes({
-        color,
+        color: hue,
+        tone,
         variant,
         size,
         tier,
+        shape: shape === "square" ? "square" : undefined,
         "icon-only": iconOnly || undefined,
         "text-only": (textOnly && edges.children.length > 0) || undefined,
         "icon-start": edges.start || undefined,
         "icon-end": edges.end || undefined,
         removable: onRemove ? true : undefined,
         pending: busy || undefined,
-        pressable: onPress ? true : undefined,
-        pressed: onPress && pressed !== undefined ? pressed : undefined,
+        pressable: toggle || undefined,
+        pressed: (toggle && pressed) || undefined,
         action: actionElement
           ? actionElement.props.persistent
             ? "persistent"
@@ -243,15 +238,14 @@ function BadgeRoot({
           : undefined,
         disabled: disabled || undefined,
       })}
-      {...rest}
     >
-      {onPress ? (
+      {toggle ? (
         <button
           type="button"
           className={styles.body}
           aria-pressed={pressed}
           disabled={disabled}
-          onClick={onPress}
+          onClick={() => setPressed(!pressed)}
         >
           {body}
         </button>
@@ -271,7 +265,9 @@ function BadgeRoot({
           onClick={remove}
           disabled={disabled}
         >
-          {busy ? <Spinner aria-hidden="true" /> : <Icon name="action.close" />}
+          <GlyphSwap layerClassName={iconSlotClass}>
+            {busy ? <Spinner aria-hidden="true" /> : <Icon name="action.close" />}
+          </GlyphSwap>
         </button>
       ) : null}
       {/* Mounted once a removal waits (empty), so its refusal is spoken when it comes. */}
@@ -287,7 +283,7 @@ BadgeRoot.displayName = "Badge.Root";
 function BadgeIcon({ children, className, ...rest }: BadgeIconProps) {
   // `data-edge` comes from Badge.Root when the icon sits at an edge of the badge.
   return (
-    <span className={cx(styles.icon, className)} {...rest}>
+    <span className={cx(styles.icon, iconSlotClass, className)} {...rest}>
       {children}
     </span>
   );
@@ -296,14 +292,20 @@ function BadgeIcon({ children, className, ...rest }: BadgeIconProps) {
 BadgeIcon.displayName = "Badge.Icon";
 
 /**
- * A status dot in the current text color. Inside a badge it takes the badge tier; standalone (a
- * marker on an icon, before a label) it takes the tier of the surrounding control.
+ * A status dot in the current text color, or in the solid step of a palette hue (`color`). Inside
+ * a badge it takes the badge tier; standalone (a marker on an icon, before a label) it takes the
+ * tier of the surrounding control.
  */
-function BadgeDot({ className, ...rest }: BadgeDotProps) {
+function BadgeDot({ color, className, ...rest }: BadgeDotProps) {
   const size = useOptionalControlSize() ?? "m";
   // `data-edge` comes from Badge.Root when the dot sits at an edge of the badge.
   return (
-    <span className={cx(styles.dot, className)} data-size={size} aria-hidden="true" {...rest} />
+    <span
+      className={cx(styles.dot, color !== undefined && palette.hue, className)}
+      aria-hidden="true"
+      {...toDataAttributes({ size, color })}
+      {...rest}
+    />
   );
 }
 
@@ -329,7 +331,7 @@ function BadgeAction({
     <button
       {...rest}
       type="button"
-      className={cx(styles.action, touchTargetBlockClass, className)}
+      className={cx(styles.action, touchTargetBlockClass, iconSlotClass, className)}
       aria-label={label}
       title={label}
       aria-pressed={pressed}
@@ -342,9 +344,5 @@ function BadgeAction({
 }
 
 BadgeAction.displayName = "Badge.Action";
-
-function isAction(child: React.ReactNode): child is React.ReactElement<BadgeActionProps> {
-  return React.isValidElement(child) && child.type === BadgeAction;
-}
 
 export const Badge = { Root: BadgeRoot, Icon: BadgeIcon, Dot: BadgeDot, Action: BadgeAction };

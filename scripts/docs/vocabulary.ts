@@ -22,7 +22,6 @@ export const RENAMED = {
   } as Record<string, string>,
   /** `Part.prop` (or `*.prop` for every part) → the canonical name. */
   props: {
-    "Badge.Root.onPress": "the `pressed` / `defaultPressed` / `onPressedChange` triad",
     "Chat.Messages.current": "`jumpTo`",
     "Composer.Context.value": "`messageId`",
     "Kanban.Root.onItemClick": "`onItemOpen`",

@@ -26,8 +26,6 @@
   "src/components/datepicker/Datepicker.module.css: reads --prime-text-caption-tracking #2",
   "src/components/datepicker/Datepicker.module.css: reads --prime-text-caption-tracking #3",
   "src/components/datepicker/Datepicker.module.css: reads --prime-text-title-s-weight",
-  "src/components/divider/Divider.module.css: reads --prime-text-caption-tracking",
-  "src/components/divider/Divider.module.css: reads --prime-text-caption-tracking #2",
   "src/components/dropdown/Dropdown.module.css: reads --prime-text-caption-tracking",
   "src/components/empty-page/EmptyPage.module.css: local [data-tone] color (.iconWrap[data-tone=\"accent\"])",
   "src/components/empty-page/EmptyPage.module.css: local [data-tone] color (.iconWrap[data-tone=\"danger\"])",

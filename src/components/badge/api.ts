@@ -5,15 +5,21 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "Badge.Root",
-      en: "`ref` → `HTMLSpanElement`. The chip: fill, tier dimensions; a read-only badge is one `<span>`, `onPress` makes the body a `<button>`, `onRemove` adds a remove segment.",
-      ru: "Чип: заливка и размеры яруса; без действий — один `<span>`, `onPress` делает тело `<button>`, `onRemove` добавляет сегмент удаления.",
+      en: "`ref` → `HTMLSpanElement`. The chip: fill, tier dimensions; a read-only badge is one `<span>`, the `pressed` triad makes the body a toggle `<button>`, `onRemove` adds a remove segment.",
+      ru: "Чип: заливка и размеры яруса; без действий — один `<span>`, триада `pressed` делает тело переключателем `<button>`, `onRemove` добавляет сегмент удаления.",
       props: [
         {
           name: "color",
           type: '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"',
-          default: '"gray"',
-          en: "Palette hue. Categorizes; the text carries the meaning.",
-          ru: "Оттенок палитры. Категоризирует; смысл несёт текст.",
+          defaultNote: { en: '`"gray"` without `tone`', ru: '`"gray"` без `tone`' },
+          en: "Palette hue: a category (a team, a tag); the text carries the meaning. Not together with `tone`.",
+          ru: "Оттенок палитры: категория (команда, тег); смысл несёт текст. Не вместе с `tone`.",
+        },
+        {
+          name: "tone",
+          type: '"neutral" | "success" | "warning" | "danger" | "info"',
+          en: "A status in the role colors (paid, overdue, failed); `neutral` is the gray hue. Not together with `color`.",
+          ru: "Статус в ролевых цветах (оплачен, просрочен, ошибка); `neutral` — серый оттенок. Не вместе с `color`.",
         },
         {
           name: "variant",
@@ -29,6 +35,13 @@ export const api: ComponentApi = {
           ru: "Ярус бейджа, высота 16 · 20 · 24 · 28 · 32 px. Без него внутри контрола — на ступень ниже, вне контрола — `m`.",
         },
         {
+          name: "shape",
+          type: '"chip" | "square"',
+          default: '"chip"',
+          en: "`square` — a tile as wide as it is tall, the text centred: a file format («PDF»), a short code.",
+          ru: "`square` — плитка, ширина равна высоте, текст по центру: формат файла («PDF»), короткий код.",
+        },
+        {
           name: "onRemove",
           type: "() => void | Promise<void>",
           en: "Adds the full-height remove segment at the end; called on its click. Return the request's promise: the badge waits with a spinner; take it out of your list before resolving; on reject it stays.",
@@ -42,16 +55,22 @@ export const api: ComponentApi = {
           ru: "Бейдж ждёт запроса (значение, которое владелец ещё создаёт): приглушён, `aria-busy`, спиннер в сегменте удаления, нажатие не действует. Промис из `onRemove` делает то же сам.",
         },
         {
-          name: "onPress",
-          type: "(event: MouseEvent<HTMLButtonElement>) => void",
-          en: "Makes the body a `<button>` covering the whole badge (a toggle chip, a filter value); gets the event, so Alt / Shift clicks can mean more.",
-          ru: "Делает тело `<button>` во весь бейдж (переключатель, значение фильтра); получает событие, так что Alt / Shift могут значить другое.",
-        },
-        {
           name: "pressed",
           type: "boolean",
-          en: "Toggle state of a pressable badge: `aria-pressed` on the body, `data-pressed` on the root.",
-          ru: "Состояние нажатого бейджа: `aria-pressed` на теле, `data-pressed` на корне.",
+          en: "A toggle chip (a filter value): the body becomes a `<button>` over the whole badge with `aria-pressed`; on takes the selected look (accent soft).",
+          ru: "Чип-переключатель (значение фильтра): тело становится `<button>` во весь бейдж с `aria-pressed`; включённый — с заливкой выбора accent soft.",
+        },
+        {
+          name: "defaultPressed",
+          type: "boolean",
+          en: "The initial state of an uncontrolled toggle chip; a press flips it.",
+          ru: "Начальное состояние неуправляемого чипа-переключателя; нажатие меняет его.",
+        },
+        {
+          name: "onPressedChange",
+          type: "(pressed: boolean) => void",
+          en: "Fires with the new state when the toggle chip is pressed.",
+          ru: "Вызывается с новым состоянием при нажатии чипа-переключателя.",
         },
         {
           name: "disabled",
@@ -79,9 +98,9 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: "HTMLAttributes<HTMLSpanElement>",
-          en: "`aria-label` (icon-only) and the other span attributes.",
-          ru: "`aria-label` (для бейджа-иконки) и остальные атрибуты span.",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "onClick" | "color">',
+          en: "`aria-label` (an icon-only badge named by it is an image) and the other span attributes; no `onClick` — a pressable chip is the toggle.",
+          ru: "`aria-label` (бейдж-иконка с ним — изображение) и остальные атрибуты span; без `onClick` — нажимаемый чип это переключатель.",
         },
       ],
     },
@@ -113,9 +132,15 @@ export const api: ComponentApi = {
     },
     {
       name: "Badge.Dot",
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment. Alone (a marker on an icon, before a label) it takes the host tier and the color set on it.",
-      ru: "Точка `<span>` цвета текста, `aria-hidden`; у края становится сегментом. Отдельно (метка на иконке, перед подписью) берёт ярус контейнера и заданный на ней цвет.",
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` dot in the text color; at an edge it becomes a segment. Alone (a marker on an icon, before a label) it takes the host tier.",
+      ru: "Точка `<span>` цвета текста, `aria-hidden`; у края становится сегментом. Отдельно (метка на иконке, перед подписью) берёт ярус контейнера.",
       props: [
+        {
+          name: "color",
+          type: '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"',
+          en: "A dot of its own hue (the solid step) instead of the text color: a project color, an attention mark.",
+          ru: "Точка своего оттенка (насыщенная ступень) вместо цвета текста: цвет проекта, метка внимания.",
+        },
         {
           name: "className",
           type: "string",
@@ -124,7 +149,7 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: "HTMLAttributes<HTMLSpanElement>",
+          type: 'Omit<HTMLAttributes<HTMLSpanElement>, "color">',
           en: "The other span attributes.",
           ru: "Остальные атрибуты span.",
         },
@@ -198,13 +223,13 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "Tab",
-        en: "Focuses the body of a pressable badge, then its action or remove segment.",
-        ru: "Фокус на теле нажимаемого бейджа, затем на действии или удалении.",
+        en: "Focuses the body of a toggle chip, then its action or remove segment.",
+        ru: "Фокус на теле чипа-переключателя, затем на действии или удалении.",
       },
       {
         keys: "Enter · Space",
-        en: "Presses the focused body, remove or action button.",
-        ru: "Нажимает тело, удаление или действие в фокусе.",
+        en: "Presses the focused body (the toggle flips), remove or action button.",
+        ru: "Нажимает тело (переключатель меняет состояние), удаление или действие в фокусе.",
       },
     ],
     aria: [
@@ -213,8 +238,8 @@ export const api: ComponentApi = {
         ru: "Бейдж без действий — обычный текст в `<span>`, без роли.",
       },
       {
-        en: "`onPress` makes the body a `<button>` with `aria-pressed` when `pressed` is set; remove and `Badge.Action` are separate buttons with their own names.",
-        ru: "`onPress` делает тело `<button>` с `aria-pressed` при заданном `pressed`; удаление и `Badge.Action` — отдельные кнопки со своими именами.",
+        en: "The `pressed` triad makes the body a `<button>` with `aria-pressed`; remove and `Badge.Action` are separate buttons with their own names.",
+        ru: "Триада `pressed` делает тело `<button>` с `aria-pressed`; удаление и `Badge.Action` — отдельные кнопки со своими именами.",
       },
       {
         en: "Give every remove button a unique name with `labels.remove`; after removing, move focus to a neighbouring badge or the source field.",
@@ -225,8 +250,8 @@ export const api: ComponentApi = {
         ru: "Пока удаление сохраняется, у бейджа `aria-busy`, у сегмента `aria-disabled`; когда удаление ждёт, бейдж ставит вежливую live-область, которая объявит `labels.removeFailed`, если промис отклонён.",
       },
       {
-        en: "`Badge.Dot` is `aria-hidden`; icon-only badges need `aria-label`. Color never carries meaning alone.",
-        ru: "`Badge.Dot` скрыт (`aria-hidden`); бейджу-иконке нужен `aria-label`. Цвет никогда не несёт смысл один — оставляйте слово.",
+        en: '`Badge.Dot` is `aria-hidden`; an icon-only badge needs `aria-label` and then is `role="img"`. Color never carries meaning alone, a `tone` neither.',
+        ru: '`Badge.Dot` скрыт (`aria-hidden`); бейджу-иконке нужен `aria-label`, с ним он `role="img"`. Цвет никогда не несёт смысл один, `tone` тоже — оставляйте слово.',
       },
     ],
   },

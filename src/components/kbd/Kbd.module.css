@@ -1,7 +1,9 @@
 /*
  * Kbd — monospace key cap on a sunken wash, no border. Dimensions come from the chip tier shared
- * with Badge (`internal/chipTier`, `--chip-*`); `data-tier` is the visual tier (see badge/tier.ts).
+ * with Badge (`internal/chipTier`, `--chip-*`); `data-tier` is the visual tier (`useChipTier`).
  * The wash is a translucent fill so the key reads as inset on canvas, cards and panels alike.
+ * The key owns its line box: one line as tall as its text, centred in the cap; a kit `Icon` takes
+ * the tier icon (`--prime-icon-size` from the chip tier), a raw svg too (`iconSlotClass`).
  */
 .root {
   box-sizing: border-box;
@@ -23,15 +25,4 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   vertical-align: middle;
-}
-
-.root > * {
-  font-size: inherit;
-  line-height: inherit;
-}
-
-.root :where(svg) {
-  flex-shrink: 0;
-  width: var(--prime-icon-size);
-  height: var(--prime-icon-size);
 }

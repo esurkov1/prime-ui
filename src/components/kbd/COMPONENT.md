@@ -60,9 +60,9 @@ Minimum width equals the height, so single-character keys are square.
 | size | `size`, else the surrounding control, else `m` | `data-size` (nominal), `data-tier` (visual tier, drives every dimension) |
 
 ## Layout & spacing
-- Inline-flex, centered content, never shrinks, `vertical-align: middle`.
-- Keys of one chord: `gap: var(--prime-space-1)`; an optional «+» between them is `aria-hidden`.
-- In a hotkey list: action left, keys right (`justify-content: space-between`), rows `gap: var(--prime-space-3)`.
+- Inline-flex, centered content, never shrinks, `vertical-align: middle`. The key owns its line box; a kit `Icon` (or a raw svg) inside takes the tier icon size.
+- Keys of one chord sit 4px apart; an optional «+» between them is `aria-hidden`.
+- In a hotkey list: a `DescriptionList` — the action is the label, its keys the value.
 - In a field, put the key in `Input.InlineAffix side="end"`.
 
 ## Accessibility
@@ -89,8 +89,8 @@ No `labels`.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A shortcut as one key per `Kbd`; symbol keys get a name — `aria-label`, `title`. |
 | [sizes.tsx](examples/sizes.tsx) | Every badge tier, 16 to 32 px high — `size`. |
-| [in-controls.tsx](examples/in-controls.tsx) | Inside a button or a field the key takes the tier one step down; an explicit `size` overrides it. |
-| [shortcut-list.tsx](examples/shortcut-list.tsx) | A hotkey reference: action on the left, its keys on the right, an icon inside a key. |
+| [in-controls.tsx](examples/in-controls.tsx) | Inside a button or a field the key takes the tier one step down; an explicit size overrides it — `size`. |
+| [shortcut-list.tsx](examples/shortcut-list.tsx) | A hotkey reference: the action, then its keys, one of them with an icon inside — `aria-label`, `title`. |
 
 ## Mistakes
 - `<Kbd>⌘ + Shift + P</Kbd>` → one `Kbd` per key with an `aria-hidden` «+» between.
@@ -99,5 +99,5 @@ No `labels`.
 - A `<span>` styled as a key, or a `Badge` used for a key → use `Kbd`.
 
 ## Related
-- **Built from:** —
+- **Built from:** `internal/chipTier` (the Badge tiers)
 - **See also:** [Badge](../badge/COMPONENT.md) (same tiers), [CommandMenu](../command-menu/COMPONENT.md), [Dropdown](../dropdown/COMPONENT.md)

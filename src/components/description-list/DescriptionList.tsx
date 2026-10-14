@@ -1,12 +1,11 @@
 import * as React from "react";
 
-import { Button } from "@/components/button/Button";
-import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { ControlSizeProvider, useOptionalControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
-import { type ControlSize, stepDown } from "@/internal/states";
+import { RowAction } from "@/internal/RowAction";
+import type { ControlSize } from "@/internal/states";
 
 import styles from "./DescriptionList.module.css";
 
@@ -127,7 +126,7 @@ export type DescriptionListItemActionProps = Omit<
   ref?: React.Ref<HTMLButtonElement>;
 };
 
-/** A ghost icon Button one tier below the list, with its `label` as the tooltip. */
+/** The kit row action (`internal/RowAction`): a ghost icon Button one tier below the list. */
 function DescriptionListItemAction({
   label,
   children,
@@ -136,21 +135,9 @@ function DescriptionListItemAction({
 }: DescriptionListItemActionProps) {
   const { size } = React.useContext(DescriptionListContext);
   return (
-    <Tooltip.Root>
-      <Tooltip.Trigger>
-        <Button.Root
-          {...rest}
-          variant="ghost"
-          tone="neutral"
-          size={stepDown(size)}
-          className={cx(styles.action, className)}
-          aria-label={label}
-        >
-          <Button.Icon>{children}</Button.Icon>
-        </Button.Root>
-      </Tooltip.Trigger>
-      <Tooltip.Content>{label}</Tooltip.Content>
-    </Tooltip.Root>
+    <RowAction {...rest} label={label} size={size} className={cx(styles.action, className)}>
+      {children}
+    </RowAction>
   );
 }
 DescriptionListItemAction.displayName = "DescriptionList.ItemAction";

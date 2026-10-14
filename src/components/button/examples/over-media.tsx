@@ -1,4 +1,4 @@
-/** Buttons over a listing's cover stand on the media shade; a failed upload turns its disk danger — `variant`, `shape`, `tone`. */
+/** Buttons over a listing's cover: round actions on the media shade, a labelled one on glass; a failed upload turns its disk danger — `variant`, `shape`, `tone`. */
 import { Button, Icon, Thumbnail } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -31,6 +31,12 @@ export default function ButtonOverMediaExample() {
           </Button.Icon>
         </Button.Root>
       </div>
+      <Button.Root variant="glass" tone="neutral" className={styles.coverGallery}>
+        <Button.Icon>
+          <Icon name="object.image" />
+        </Button.Icon>
+        Все 12 фото
+      </Button.Root>
     </div>
   );
 }

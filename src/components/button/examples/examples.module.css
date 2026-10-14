@@ -34,7 +34,14 @@
   gap: var(--prime-space-3);
 }
 
-/* A listing cover with its round actions at the top end. */
+/* align.tsx: a column of full-width actions, as wide as a side panel. */
+.column {
+  display: grid;
+  gap: var(--prime-space-1);
+  width: min(100%, var(--prime-layout-form-width-s));
+}
+
+/* A listing cover with its round actions at the top end and a glass action at the bottom. */
 .cover {
   position: relative;
 }
@@ -46,6 +53,13 @@
   z-index: var(--prime-z-raised);
   display: flex;
   gap: var(--prime-space-2);
+}
+
+.coverGallery {
+  position: absolute;
+  inset-block-end: var(--prime-space-2);
+  inset-inline-start: var(--prime-space-2);
+  z-index: var(--prime-z-raised);
 }
 
 .hostText {

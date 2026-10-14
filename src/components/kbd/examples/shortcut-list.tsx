@@ -1,5 +1,5 @@
-/** A hotkey reference: action on the left, its keys on the right, an icon inside a key. */
-import { Icon, Kbd, Typography } from "prime-ui-kit";
+/** A hotkey reference: the action, then its keys, one of them with an icon inside — `aria-label`, `title`. */
+import { DescriptionList, Icon, Kbd } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
@@ -14,36 +14,24 @@ const SHORTCUTS = [
 
 export default function KbdShortcutListExample() {
   return (
-    <dl className={styles.list}>
+    <DescriptionList.Root>
       {SHORTCUTS.map((item) => (
-        <div key={item.action} className={styles.listRow}>
-          <dt>
-            <Typography as="span" variant="body-m">
-              {item.action}
-            </Typography>
-          </dt>
-          <dd className={styles.chord}>
+        <DescriptionList.Item key={item.action} label={item.action}>
+          <span className={styles.chord}>
             {item.keys.map((key) => (
               <Kbd key={key} aria-label={KEY_NAMES[key]} title={KEY_NAMES[key]}>
                 {key}
               </Kbd>
             ))}
-          </dd>
-        </div>
+          </span>
+        </DescriptionList.Item>
       ))}
-      <div className={styles.listRow}>
-        <dt>
-          <Typography as="span" variant="body-m">
-            Закрыть окно
-          </Typography>
-        </dt>
-        <dd className={styles.chord}>
-          <Kbd>
-            <Icon name="action.close" />
-            Esc
-          </Kbd>
-        </dd>
-      </div>
-    </dl>
+      <DescriptionList.Item label="Закрыть окно">
+        <Kbd>
+          <Icon name="action.close" />
+          Esc
+        </Kbd>
+      </DescriptionList.Item>
+    </DescriptionList.Root>
   );
 }

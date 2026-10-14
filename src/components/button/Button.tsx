@@ -1,16 +1,20 @@
 import * as React from "react";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
+import { useControllableState } from "@/hooks/useControllableState";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import { fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
+import { iconSlotClass } from "@/internal/iconBox";
 import { iconLayout } from "@/internal/iconLayout";
+import { InteractiveElement } from "@/internal/interactiveElement";
 import { MorphText } from "@/internal/MorphText";
 import { readCssDurationMs } from "@/internal/motionTiming";
+import press from "@/internal/press.module.css";
 import { Ring } from "@/internal/ring";
-import { Slot } from "@/internal/slot";
+import { slotChild } from "@/internal/slot";
 import type { ControlSize, Tone, Variant } from "@/internal/states";
 import { touchTargetClass } from "@/internal/touchTarget";
 import { isPromiseLike } from "@/internal/usePendingChanges";
@@ -18,45 +22,46 @@ import { isPromiseLike } from "@/internal/usePendingChanges";
 import { Spinner } from "../spinner/Spinner";
 import styles from "./Button.module.css";
 
-/**
- * `tone="inherit"` takes the host's text color (a close button on a solid Banner): fills are a
- * `currentColor` wash, so it has no `solid` treatment.
- */
+/** `tone="inherit"` takes the host's text color: fills are a `currentColor` wash, never solid. */
 type ButtonColorProps =
   | {
-      /**
-       * Visual treatment. Default `solid`. `shade` — the media shade with a blur and its light
-       * glyph, for a button that stands over a picture, a video or a video circle; with
-       * `tone="danger"` it turns the danger disk (a failed transfer).
-       */
-      variant?: Variant | "shade";
-      /**
-       * Semantic color. Default `accent`; `danger` for destructive actions; `success` for an action
-       * that is done («Оплачено»).
-       */
+      variant?: Variant | "shade" | "glass";
       tone?: Extract<Tone, "accent" | "neutral" | "success" | "danger">;
     }
   | {
       variant: Exclude<Variant, "solid">;
-      /** Takes the host's text color; for actions placed on a colored host. */
       tone: "inherit";
     };
 
-/**
- * `circle` is a disk with an icon only: its name is the `aria-label` (a visible label has no room).
- */
+/** `circle` is a disk with an icon only: its name is the `aria-label` (a visible label has no room). */
 type ButtonShapeProps =
   | {
-      /**
-       * Outline. Default `square` (the tier's radius). `circle` — a disk with only a `Button.Icon`:
-       * as wide as it is tall, full radius, the same tiers, tones and variants; its focus ring,
-       * touch area and press (`press-scale-compact`) follow the circle.
-       */
       shape?: "square";
     }
   | {
       shape: "circle";
       "aria-label": string;
+    };
+
+/**
+ * A `<button>` runs the long-action modes; with `asChild` the child (a link) owns its content, so
+ * it takes none of them.
+ */
+type ButtonElementProps =
+  | {
+      asChild?: false;
+      progress?: number | null;
+      holdToConfirm?: boolean;
+      onConfirm?: () => void | Promise<void>;
+      labels?: Partial<ButtonLabels>;
+    }
+  | {
+      asChild: true;
+      progress?: never;
+      holdToConfirm?: never;
+      onConfirm?: never;
+      labels?: never;
+      children: React.ReactElement;
     };
 
 export type ButtonLabels = {
@@ -74,42 +79,17 @@ export type ButtonRootProps = Omit<
   "size" | "aria-pressed"
 > &
   ButtonColorProps &
-  ButtonShapeProps & {
-    /** Tier. Default: the tier of the surrounding control (a form, a panel, a field), else `m`. */
+  ButtonShapeProps &
+  ButtonElementProps & {
     size?: ControlSize;
+    density?: "regular" | "tight" | "inline";
+    align?: "center" | "start";
     fullWidth?: boolean;
     loading?: boolean;
-    /**
-     * A toggle button: `true` on, `false` off (`aria-pressed`); the on state takes the selected look
-     * (accent soft fill). Leave it out for an ordinary action. For a set of toggles use ButtonGroup.
-     */
     pressed?: boolean;
-    /**
-     * Progress of a long action started by this button, `0…1`; `null` — under way, the share
-     * unknown. The button stays pressable (a cancel) and is `aria-busy`. On a square a fill grows
-     * inside it (`null`: a spinner takes the leading icon's place); on a circle a ring runs along
-     * its inner edge in the glyph's color and always turns. The label or description carries the
-     * number («Скачивание 42%»). Remove it when done: the fill or the ring fades where it is.
-     */
-    progress?: number | null;
-    /**
-     * The action needs a held press: the fill runs for 1.2 s and `onConfirm` fires at its end.
-     * Releasing earlier rolls the fill back and does nothing. Space and Enter hold too.
-     */
-    holdToConfirm?: boolean;
-    /**
-     * Fires when a `holdToConfirm` press completes; the action goes here, not in `onClick`. Return
-     * the request's promise: the full fill stays and the button is `loading` until it settles;
-     * resolve — the fill fades; reject — the fill rolls back.
-     */
-    onConfirm?: () => void | Promise<void>;
-    labels?: Partial<ButtonLabels>;
-    /**
-     * Merges Button props onto its single child element instead of rendering `<button>`.
-     * `disabled` / `loading` become `aria-disabled` (a link has no native `disabled`), `type` is
-     * dropped, and no spinner is added — the child owns its content.
-     */
-    asChild?: boolean;
+    defaultPressed?: boolean;
+    onPressedChange?: (pressed: boolean) => void;
+    current?: boolean;
     ref?: React.Ref<HTMLButtonElement>;
   };
 
@@ -175,6 +155,22 @@ function morphLabels(children: React.ReactNode): React.ReactNode[] {
   return out;
 }
 
+/**
+ * The spinner of a busy button takes the glyph of its leading (or only) `Button.Icon`: the icon
+ * cross-fades into the spinner and back (`GlyphSwap`), so the width never changes. Busy or not,
+ * the children pass through here, so every part keeps its key and the icon box stays mounted.
+ */
+function withBusyGlyph(children: React.ReactNode, busy: boolean): React.ReactNode[] {
+  let placed = !busy;
+  return React.Children.toArray(children).map((child) => {
+    if (placed || !React.isValidElement<ButtonIconProps>(child) || child.type !== ButtonIcon) {
+      return child;
+    }
+    placed = true;
+    return React.cloneElement(child, { children: <Spinner aria-hidden="true" /> });
+  });
+}
+
 function ButtonRoot({
   children,
   className,
@@ -182,10 +178,15 @@ function ButtonRoot({
   tone = "accent",
   shape = "square",
   size: sizeProp,
+  density = "regular",
+  align = "center",
   fullWidth,
   type = "button",
   loading: loadingProp = false,
-  pressed,
+  pressed: pressedProp,
+  defaultPressed,
+  onPressedChange,
+  current = false,
   progress,
   holdToConfirm = false,
   onConfirm,
@@ -198,8 +199,23 @@ function ButtonRoot({
 }: ButtonRootProps) {
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
-  const layout = iconLayout(children, ButtonIcon);
+  // With `asChild` the content is the child's own children (a link holding only a Button.Icon is
+  // an icon-only button too).
+  const layout = iconLayout(
+    asChild && React.isValidElement<{ children?: React.ReactNode }>(children)
+      ? children.props.children
+      : children,
+    ButtonIcon,
+  );
   const hold = useHoldToConfirm(holdToConfirm && !disabled && !loadingProp, onConfirm);
+  // A toggle when any part of the pressed triad is given; an ordinary action otherwise.
+  const toggle =
+    pressedProp !== undefined || defaultPressed !== undefined || onPressedChange !== undefined;
+  const [pressed, setPressed] = useControllableState({
+    value: pressedProp,
+    defaultValue: defaultPressed ?? false,
+    onChange: onPressedChange,
+  });
   // A held confirm whose promise is pending is a loading button.
   const loading = loadingProp || hold.phase === "confirming";
   const isDisabled = disabled || loading;
@@ -207,7 +223,8 @@ function ButtonRoot({
   const circle = shape === "circle";
   const inProgress = progress !== undefined;
   // A square with no share known marks the action with a spinner, like `loading`, yet stays pressable.
-  const spinner = loading || (progress === null && !circle);
+  const spinner = !asChild && (loading || (progress === null && !circle));
+  const spinnerInIcon = spinner && (layout.leadingIcon || layout.iconOnly);
   // The fill (square) or the ring (circle) stays mounted once used, so its exit can play: the
   // ring fades at the last share it drew.
   const [fillUsed, setFillUsed] = React.useState(false);
@@ -219,38 +236,54 @@ function ButtonRoot({
     tone,
     shape: circle ? "circle" : undefined,
     size,
+    density: density === "regular" ? undefined : density,
+    align: align === "start" ? "start" : undefined,
     // `disabled` only: a loading button is busy, not unavailable, and keeps its colors.
     disabled: disabled || undefined,
     loading,
-    pressed: pressed || undefined,
+    pressed: (toggle && pressed) || undefined,
+    current: current || undefined,
     "full-width": fullWidth,
     "icon-only": layout.iconOnly || undefined,
     "leading-icon": layout.leadingIcon || undefined,
     "trailing-icon": layout.trailingIcon || undefined,
-    spinner: (spinner && !asChild) || undefined,
     // Without a leading icon the spinner is centered over the hidden label: width stays put.
-    "loading-overlay":
-      (spinner && !asChild && !layout.leadingIcon && !layout.iconOnly) || undefined,
+    "loading-overlay": (spinner && !spinnerInIcon) || undefined,
     progress: (inProgress && progress !== null && !circle) || undefined,
     hold: holdToConfirm ? hold.phase : undefined,
   });
-  const classes = cx(fieldTierClass, touchTargetClass, styles.root, className);
+  const classes = cx(
+    fieldTierClass,
+    touchTargetClass,
+    circle || layout.iconOnly ? press.pressCompact : press.press,
+    styles.root,
+    className,
+  );
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    if (toggle && !event.defaultPrevented) setPressed(!pressed);
+  };
+  const state = {
+    "aria-pressed": toggle ? pressed : undefined,
+    "aria-current": current ? ("page" as const) : rest["aria-current"],
+  };
 
   if (asChild) {
     return (
       <ControlSizeProvider value={size}>
-        <Slot
+        <InteractiveElement
+          element="slot"
           {...rest}
-          ref={ref as React.Ref<HTMLElement>}
+          {...state}
+          ref={ref}
           className={classes}
-          aria-disabled={isDisabled || undefined}
+          disabled={isDisabled}
           aria-busy={loading || undefined}
-          aria-pressed={pressed}
-          onClick={isDisabled ? (event: React.MouseEvent) => event.preventDefault() : onClick}
+          onClick={handleClick as React.MouseEventHandler<HTMLElement>}
           {...dataAttrs}
         >
-          {children}
-        </Slot>
+          {slotChild(children, "Button.Root")}
+        </InteractiveElement>
       </ControlSizeProvider>
     );
   }
@@ -311,14 +344,14 @@ function ButtonRoot({
     <button
       {...rest}
       {...holdHandlers}
+      {...state}
       ref={ref}
       type={type}
       className={classes}
       disabled={isDisabled}
       aria-busy={loading || inProgress || rest["aria-busy"] || undefined}
-      aria-pressed={pressed}
       aria-describedby={describedBy}
-      onClick={onClick}
+      onClick={handleClick}
       style={
         inProgress && !circle
           ? ({
@@ -343,8 +376,10 @@ function ButtonRoot({
         />
       ) : null}
       <ControlSizeProvider value={size}>
-        {spinner ? <Spinner className={styles.spinner} aria-hidden="true" /> : null}
-        {morphLabels(children)}
+        {spinner && !spinnerInIcon ? (
+          <Spinner className={styles.spinner} aria-hidden="true" />
+        ) : null}
+        {morphLabels(withBusyGlyph(children, spinnerInIcon))}
       </ControlSizeProvider>
     </button>
   );
@@ -370,7 +405,7 @@ export type ButtonIconProps = {
 function ButtonIcon({ children, className, ...rest }: ButtonIconProps) {
   return (
     <span className={cx(styles.icon, className)} aria-hidden="true" {...rest}>
-      <GlyphSwap layerClassName={styles.glyph}>{children}</GlyphSwap>
+      <GlyphSwap layerClassName={cx(styles.glyph, iconSlotClass)}>{children}</GlyphSwap>
     </span>
   );
 }

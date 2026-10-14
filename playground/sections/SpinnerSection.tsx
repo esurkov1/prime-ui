@@ -20,19 +20,14 @@ export const page: ComponentPageConfig = {
   examples: [
     {
       slot: "overview",
-      description: "Статус загрузки рядом с коротким пояснением; спиннер берёт цвет текста.",
+      description:
+        "Статус загрузки рядом с коротким пояснением; спиннер берёт цвет текста и называет ожидание — `labels`.",
     },
     {
       slot: "variants",
       description: "Все цвета кольца; `default` следует за текстом вокруг — `tone`.",
     },
     { slot: "sizes", description: "Все размеры по шкале иконок, от 14 до 32 px — `size`." },
-    {
-      scenario: "loading-region",
-      title: "Загрузка блока",
-      description:
-        "Карточка грузит содержимое: область сообщает о загрузке, а спиннер скрыт от скринридеров — `aria-hidden`.",
-    },
   ],
   api,
 };

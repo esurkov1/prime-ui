@@ -1,26 +1,25 @@
 import type * as React from "react";
-
-import { useBadgeTier } from "@/components/badge/tier";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useChipTier } from "@/internal/chipTier";
 import chipTier from "@/internal/chipTier.module.css";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { iconSlotClass } from "@/internal/iconBox";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Kbd.module.css";
 
 export type KbdProps = Omit<React.HTMLAttributes<HTMLElement>, "size"> & {
-  /** Badge tier; without it the key follows the surrounding control one tier down, else `m`. */
   size?: ControlSize;
   ref?: React.Ref<HTMLElement>;
 };
 
 /** One keyboard key as a native `<kbd>`; passes its tier to a nested `Icon`. */
 export function Kbd({ children, className, size: sizeProp, ...rest }: KbdProps) {
-  const { size, tier } = useBadgeTier(sizeProp);
+  const { size, tier } = useChipTier(sizeProp);
   return (
     <kbd
-      className={cx(styles.root, chipTier.tier, className)}
+      className={cx(styles.root, chipTier.tier, iconSlotClass, className)}
       {...rest}
       {...toDataAttributes({ size, tier })}
     >

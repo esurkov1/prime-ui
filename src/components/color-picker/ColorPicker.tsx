@@ -519,7 +519,7 @@ HexInput.displayName = "ColorPicker.HexInput";
 
 export type ColorPickerEyeDropperButtonProps = Omit<
   React.ComponentPropsWithoutRef<typeof Button.Root>,
-  "variant" | "tone" | "size" | "aria-label"
+  "variant" | "tone" | "size" | "aria-label" | "shape" | "asChild"
 > & {
   ref?: React.Ref<HTMLButtonElement>;
 };

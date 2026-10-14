@@ -1,8 +1,6 @@
 [
   "src/components/accordion/Accordion.module.css: hover :not(:disabled) ignores aria-disabled",
   "src/components/accordion/Accordion.module.css: hover :not(:disabled) ignores aria-disabled #2",
-  "src/components/badge/Badge.module.css: hover :not(:disabled) ignores aria-disabled",
-  "src/components/badge/Badge.module.css: hover transform without (pointer: fine)",
   "src/components/button-group/ButtonGroup.module.css: hover :not(:disabled) ignores aria-disabled",
   "src/components/button-group/ButtonGroup.module.css: hover :not(:disabled) ignores aria-disabled #2",
   "src/components/button-group/ButtonGroup.tsx: switcher without SwitcherScroller",

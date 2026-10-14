@@ -7,8 +7,8 @@ export default function AvatarStatesExample() {
   return (
     <div>
       <div>
-        <Avatar.Root color="green">
-          <Avatar.Image src={PHOTO} alt="Михаил Котов" />
+        <Avatar.Root color="green" aria-label="Михаил Котов">
+          <Avatar.Image src={PHOTO} />
           <Avatar.Fallback>МК</Avatar.Fallback>
         </Avatar.Root>
         <Typography as="span" variant="caption" tone="muted">
@@ -16,8 +16,8 @@ export default function AvatarStatesExample() {
         </Typography>
       </div>
       <div>
-        <Avatar.Root color="orange">
-          <Avatar.Image src="https://example.com/missing-avatar.png" alt="Сергей Лебедев" />
+        <Avatar.Root color="orange" aria-label="Сергей Лебедев">
+          <Avatar.Image src="https://example.com/missing-avatar.png" />
           <Avatar.Fallback>СЛ</Avatar.Fallback>
         </Avatar.Root>
         <Typography as="span" variant="caption" tone="muted">

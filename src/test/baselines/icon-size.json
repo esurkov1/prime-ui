@@ -1,13 +1,10 @@
 [
   "src/components/accordion/Accordion.module.css: .icon svg",
-  "src/components/avatar/Avatar.module.css: .fallback > svg",
   "src/components/banner/Banner.module.css: .icon svg",
   "src/components/button-group/ButtonGroup.module.css: .icon > svg",
-  "src/components/button/Button.module.css: .glyph > svg",
   "src/components/card/Card.module.css: .icon svg",
   "src/components/empty-page/EmptyPage.module.css: .iconWrap svg",
   "src/components/input/Input.module.css: .icon > svg",
-  "src/components/kbd/Kbd.module.css: .root :where(svg)",
   "src/components/login-form/LoginForm.module.css: .logo > svg, .logo > img",
   "src/components/notification/Notification.module.css: .iconWrap svg",
   "src/components/segmented-control/SegmentedControl.module.css: .icon > :global(svg)",

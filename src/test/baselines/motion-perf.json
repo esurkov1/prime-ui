@@ -45,8 +45,6 @@
   "src/components/stepper/Stepper.module.css: reduced-motion block globals.css already covers (.indicator)",
   "src/components/tabs/Tabs.module.css: reduced-motion block globals.css already covers (.content, .remove)",
   "src/components/timeline/Timeline.module.css: reduced-motion block globals.css already covers (.row, .dot, .title)",
-  "src/icons/glyphMotion.module.css: animates stroke-dasharray",
-  "src/icons/glyphMotion.module.css: animates stroke-dasharray #2",
   "src/internal/FieldFrame.module.css: local @keyframes field-shake-even",
   "src/internal/FieldFrame.module.css: local @keyframes field-shake-odd",
   "src/internal/richText.module.css: local @keyframes spoiler-reveal",

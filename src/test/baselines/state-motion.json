@@ -1,9 +1,4 @@
 [
-  "src/components/badge/Badge.module.css: .action flips background",
-  "src/components/badge/Badge.module.css: .action flips color",
-  "src/components/badge/Badge.module.css: .remove flips background",
-  "src/components/badge/Badge.module.css: .remove flips color",
-  "src/components/badge/Badge.module.css: .root swaps background-image in a state",
   "src/components/card/Card.module.css: .root flips box-shadow",
   "src/components/card/Card.module.css: .root flips transform",
   "src/components/color-picker/ColorPresets.module.css: .trigger flips box-shadow",

@@ -3,7 +3,6 @@
   "src/components/empty-page/examples/compact.tsx: Button repeats its host's size=\"s\"",
   "src/components/empty-page/examples/narrow.tsx: Button repeats its host's size=\"s\"",
   "src/components/example-frame/examples/controlled.tsx: fields with a submit and no <form>",
-  "src/components/kbd/examples/in-controls.tsx: fields with a submit and no <form>",
   "src/components/list/examples/overview.tsx: List as conversations (ChatList)",
   "src/components/login-form/examples/forgot-password.tsx: fields with a submit and no <form>",
   "src/components/login-form/examples/reset-password.tsx: fields with a submit and no <form>",
@@ -11,6 +10,5 @@
   "src/components/modal/examples/enter-key.tsx: fields with a submit and no <form>",
   "src/components/modal/examples/enter-key.tsx: solid danger primary in an overlay (ConfirmDialog)",
   "src/components/page-toolbar/examples/save-changes.tsx: fields with a submit and no <form>",
-  "src/components/spinner/examples/loading-region.tsx: Spinner in a Card (a Skeleton holds the shape)",
   "src/components/textarea/examples/validation.tsx: fields with a submit and no <form>"
 ]

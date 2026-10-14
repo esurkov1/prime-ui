@@ -1,4 +1,4 @@
-/** Inside a button or a field the key takes the tier one step down; an explicit `size` overrides it. */
+/** Inside a button or a field the key takes the tier one step down; an explicit size overrides it — `size`. */
 import { Button, Input, Kbd } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -16,7 +16,7 @@ export default function KbdInControlsExample() {
         </span>
       </Button.Root>
       <Button.Root tone="neutral">
-        Отправить
+        Применить
         <Kbd size="xs" aria-label="Enter" title="Enter">
           ↵
         </Kbd>

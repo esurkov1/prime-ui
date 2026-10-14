@@ -12,7 +12,6 @@
   "src/internal/data-attributes.ts: no data-attributes.test",
   "src/internal/disabledContext.tsx: no disabledContext.test",
   "src/internal/fileFormat.ts: no fileFormat.test",
-  "src/internal/iconBox.ts: no iconBox.test",
   "src/internal/iconLayout.ts: no iconLayout.test",
   "src/internal/mergeRefs.ts: no mergeRefs.test",
   "src/internal/messageList.tsx: no messageList.test",

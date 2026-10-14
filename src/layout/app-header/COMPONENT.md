@@ -76,11 +76,11 @@ The name of `AppHeader.Title` (not the icon or the description) is the page's `<
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### AppHeader.Separator
-`ref` → `HTMLDivElement`. A short vertical `Divider` (20) between groups in a zone — the path and the title — with 16 of air on each side.
+`ref` → `HTMLDivElement`. The `inset` vertical `Divider` between groups in a zone — the path and the title: one text line tall, the tier gap on each side.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `Omit<DividerProps, "orientation" \| "children" \| "align" \| "size">` | — | `className` and the other div attributes. |
+| `…rest` | `Omit<DividerProps, "orientation" \| "children" \| "align" \| "size" \| "inset">` | — | `className` and the other div attributes. |
 
 ### AppHeader.Tools
 `ref` → `HTMLDivElement`. The page's tools in the header (a `PageToolbar.Root`): the header's second row, full width under the title row, as a direct child of `AppHeader.Root`.
@@ -133,7 +133,7 @@ The name of `AppHeader.Title` (not the icon or the description) is the page's `<
 - Row min height = control m + `--prime-space-2` (44), padding-block `--prime-space-3` (the top grows to the safe-area inset): 68 in all, the height of the Sidebar header, so the brand and the title share one line.
 - Inline padding: the shell gutters (16 → 24 → 32, the same as `AppShell.Main`) in the shell's panel, so the header lines up with the page; `--prime-space-4` elsewhere. Main's top air (24, 32 from 1024px) stands between the header and the page's first block.
 - Icon buttons are `soft` neutral (MenuButton is), never `ghost`: every button on the bar has a shape.
-- Gaps: `--prime-space-3` between zones, `--prime-space-2` inside Start and Actions; `AppHeader.Separator` adds `--prime-space-2` on each side (16 in all) and is 20 high.
+- Gaps: `--prime-space-3` between zones, `--prime-space-2` inside Start and Actions; `AppHeader.Separator` is the `inset` vertical Divider: the tier gap on each side (8 at `m`) and one text line tall (20 at `m`).
 - `AppHeader.Icon` is a 36 tile with the radius and fill of a soft neutral button m, so it lines up with the buttons on the bar.
 - On the panel surface with no divider or shadow (depth from fill); `z-index: --prime-z-sticky`.
 - Sticky at `top: 0` of its scroller (static on a viewport below 480px high). The shared sticky surface paints its fill one border width past the top edge, so no sub-pixel seam of the scrolling rows shows above it.

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { LinkButton } from "./LinkButton";
@@ -17,16 +18,21 @@ describe("LinkButton", () => {
     );
   });
 
-  it("sets aria-disabled and tabIndex when disabled", () => {
+  it("disabled drops href, so the link leaves the Tab order", async () => {
     render(
-      <LinkButton href="/here" disabled>
-        Gone
-      </LinkButton>,
+      <>
+        <LinkButton href="/here" disabled>
+          Gone
+        </LinkButton>
+        <LinkButton href="/next">Next</LinkButton>
+      </>,
     );
     const link = screen.getByRole("link", { name: "Gone" });
     expect(link).toHaveAttribute("aria-disabled", "true");
-    expect(link).toHaveAttribute("tabIndex", "-1");
+    expect(link).not.toHaveAttribute("href");
     expect(link).toHaveAttribute("data-disabled", "true");
+    await userEvent.tab();
+    expect(screen.getByRole("link", { name: "Next" })).toHaveFocus();
   });
 
   it("disabled keeps id, aria-label and ref, drops href and swallows the click", () => {
@@ -83,15 +89,28 @@ describe("LinkButton", () => {
     expect(screen.getByText("Nested")).toBeInTheDocument();
   });
 
-  it("defaults tone to accent and accepts neutral", () => {
+  it("defaults tone to accent and accepts neutral and muted", () => {
     const { rerender } = render(<LinkButton href="/t">T</LinkButton>);
     expect(screen.getByRole("link", { name: "T" })).toHaveAttribute("data-tone", "accent");
+    for (const tone of ["neutral", "muted"] as const) {
+      rerender(
+        <LinkButton href="/t" tone={tone}>
+          T
+        </LinkButton>,
+      );
+      expect(screen.getByRole("link", { name: "T" })).toHaveAttribute("data-tone", tone);
+    }
+  });
+
+  it("inline marks the link for running text", () => {
+    const { rerender } = render(<LinkButton href="/t">T</LinkButton>);
+    expect(screen.getByRole("link", { name: "T" })).not.toHaveAttribute("data-inline");
     rerender(
-      <LinkButton href="/t" tone="neutral">
+      <LinkButton href="/t" inline>
         T
       </LinkButton>,
     );
-    expect(screen.getByRole("link", { name: "T" })).toHaveAttribute("data-tone", "neutral");
+    expect(screen.getByRole("link", { name: "T" })).toHaveAttribute("data-inline", "true");
   });
 
   it("asChild puts the link look on a button that keeps its role and click", () => {
@@ -119,7 +138,18 @@ describe("LinkButton", () => {
     );
     const link = screen.getByRole("link", { name: "Счета" });
     expect(link).toHaveAttribute("aria-disabled", "true");
+    expect(link).not.toHaveAttribute("href");
+    expect(link).toHaveAttribute("tabIndex", "-1");
     fireEvent.click(link);
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("asChild needs one element child", () => {
+    expect(() =>
+      render(
+        // @ts-expect-error: asChild takes one element, not text
+        <LinkButton asChild>Счета</LinkButton>,
+      ),
+    ).toThrow("LinkButton asChild needs a single element child");
   });
 });

@@ -21,7 +21,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Фото с инициалами под ним, пока оно грузится, и одни инициалы — `Avatar.Image`, `Avatar.Fallback`.",
+        "Фото с инициалами под ним, пока оно грузится, и одни инициалы; имя задано на самом аватаре — `Avatar.Image`, `Avatar.Fallback`, `aria-label`.",
     },
     {
       slot: "variants",

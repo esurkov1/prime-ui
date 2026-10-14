@@ -1,20 +1,8 @@
 /* Layout of the Spinner scenarios: semantic tokens only. */
 
-/* overview.tsx: spinner and text in one line, icon → text gap of the m tier. */
+/* overview.tsx: spinner and text in one line, 8px apart (the m tier gap). */
 .status {
   display: inline-flex;
   align-items: center;
-  gap: var(--prime-control-m-gap);
-}
-
-/* loading-region.tsx: the Card's size and its centered body. */
-.region {
-  width: min(100%, var(--prime-layout-form-width-s));
-  min-height: calc(var(--prime-space-24) * 2);
-}
-
-.loading {
-  align-items: center;
-  justify-content: center;
-  gap: var(--prime-space-3);
+  gap: var(--prime-space-2);
 }

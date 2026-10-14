@@ -20,9 +20,10 @@ import { useLabels } from "@/internal/labels";
 import { nodeText } from "@/internal/nodeText";
 import { LayerProvider } from "@/internal/overlay/layerStack";
 import palette from "@/internal/palette.module.css";
+import { RowAction } from "@/internal/RowAction";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { Slot } from "@/internal/slot";
-import { type ControlSize, type PaletteColor, stepDown, type Variant } from "@/internal/states";
+import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 
 import styles from "./Sidebar.module.css";
@@ -730,8 +731,9 @@ export type SidebarItemActionProps = Omit<
 };
 
 /**
- * A small action at the end of the row (create, add): a ghost icon Button one tier down, shown on
- * hover and focus of the row. It sits next to the item element, never inside it.
+ * A small action at the end of the row (create, add): the kit row action (`internal/RowAction`, a
+ * ghost icon Button one tier down), shown on hover and focus of the row. It sits next to the item
+ * element, never inside it.
  */
 function SidebarItemAction({
   label,
@@ -743,23 +745,17 @@ function SidebarItemAction({
 }: SidebarItemActionProps) {
   const { size } = useSidebar();
   return (
-    <Tooltip.Root>
-      <Tooltip.Trigger>
-        <Button.Root
-          {...rest}
-          variant="ghost"
-          tone="neutral"
-          size={stepDown(size)}
-          className={cx(styles.action, className)}
-          aria-label={label}
-          disabled={disabled}
-          onClick={onClick}
-        >
-          <Button.Icon>{children ?? <Icon name="action.add" />}</Button.Icon>
-        </Button.Root>
-      </Tooltip.Trigger>
-      <Tooltip.Content side="right">{label}</Tooltip.Content>
-    </Tooltip.Root>
+    <RowAction
+      {...rest}
+      label={label}
+      size={size}
+      side="right"
+      className={cx(styles.action, className)}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {children ?? <Icon name="action.add" />}
+    </RowAction>
   );
 }
 SidebarItemAction.displayName = "Sidebar.ItemAction";

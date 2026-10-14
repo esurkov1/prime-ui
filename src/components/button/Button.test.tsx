@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type * as React from "react";
@@ -7,14 +5,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { DisabledProvider } from "@/internal/disabledContext";
+import press from "@/internal/press.module.css";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Button } from "./Button";
 import styles from "./Button.module.css";
 
-const css = readFileSync(
-  path.resolve(process.cwd(), "src/components/button/Button.module.css"),
-  "utf8",
-);
+const CSS = "src/components/button/Button.module.css";
 
 describe("Button", () => {
   it("takes the host tier without its own size; an explicit size wins", () => {
@@ -240,6 +237,45 @@ describe("Button asChild", () => {
     expect(screen.getByRole("link", { name: "Link" })).not.toHaveAttribute("type");
   });
 
+  it("takes none of the long-action modes and needs one element child", () => {
+    const progress = (
+      // @ts-expect-error: progress needs a <button>
+      <Button.Root asChild progress={0.5}>
+        <a href="/">Link</a>
+      </Button.Root>
+    );
+    const hold = (
+      // @ts-expect-error: holdToConfirm needs a <button>
+      <Button.Root asChild holdToConfirm>
+        <a href="/">Link</a>
+      </Button.Root>
+    );
+    expect(progress.props.asChild).toBe(true);
+    expect(hold.props.asChild).toBe(true);
+    expect(() =>
+      render(
+        // @ts-expect-error: asChild takes one element, not text
+        <Button.Root asChild>Ссылка</Button.Root>,
+      ),
+    ).toThrow("Button.Root asChild needs a single element child");
+  });
+
+  it("a disabled link child leaves the Tab order and loses its href", async () => {
+    render(
+      <>
+        <Button.Root asChild disabled>
+          <a href="/reports">Отчёты</a>
+        </Button.Root>
+        <Button.Root>Дальше</Button.Root>
+      </>,
+    );
+    const link = screen.getByRole("link", { name: "Отчёты" });
+    expect(link).not.toHaveAttribute("href");
+    expect(link).toHaveAttribute("tabIndex", "-1");
+    await userEvent.tab();
+    expect(screen.getByRole("button", { name: "Дальше" })).toHaveFocus();
+  });
+
   describe("Button layout", () => {
     it("marks icon-only, leading and trailing icon layouts", () => {
       render(
@@ -276,17 +312,39 @@ describe("Button asChild", () => {
       expect(button).toHaveAttribute("data-loading-overlay", "true");
     });
 
-    it("puts the automatic spinner in place of a leading icon", () => {
-      const { container } = render(
-        <Button.Root loading>
-          <Button.Icon>x</Button.Icon>
+    it("the leading icon's glyph cross-fades into the spinner and back", () => {
+      const { container, rerender } = render(
+        <Button.Root>
+          <Button.Icon>
+            <svg data-testid="glyph" />
+          </Button.Icon>
           Save
         </Button.Root>,
       );
-      expect(container.querySelectorAll(`.${styles.spinner}`)).toHaveLength(1);
-      expect(screen.getByRole("button", { name: "Save" })).not.toHaveAttribute(
-        "data-loading-overlay",
+      const icon = container.querySelector(`.${styles.icon}`);
+      rerender(
+        <Button.Root loading>
+          <Button.Icon>
+            <svg data-testid="glyph" />
+          </Button.Icon>
+          Save
+        </Button.Root>,
       );
+      const button = screen.getByRole("button", { name: "Save" });
+      // The same icon box holds the spinner: the width never changes, no overlay spinner.
+      expect(container.querySelector(`.${styles.icon}`)).toBe(icon);
+      expect(icon?.querySelector('[role="status"]')).not.toBeNull();
+      expect(container.querySelector(`.${styles.spinner}`)).toBeNull();
+      expect(button).not.toHaveAttribute("data-loading-overlay");
+      rerender(
+        <Button.Root>
+          <Button.Icon>
+            <svg data-testid="glyph" />
+          </Button.Icon>
+          Save
+        </Button.Root>,
+      );
+      expect(icon?.querySelector("[data-entering] [data-testid='glyph']")).not.toBeNull();
     });
 
     it("accepts size xs", () => {
@@ -327,16 +385,22 @@ describe("Button shape circle", () => {
   });
 
   it("follows the circle: full radius, compact press, round touch area, focus ring outline", () => {
-    expect(css).toMatch(
-      /\.root\[data-shape="circle"\] \{\s*width: var\(--field-h\);\s*padding-inline: 0;\s*border-radius: var\(--prime-radius-full\);/,
+    render(circle());
+    const button = screen.getByRole("button", { name: "Обновить" });
+    expect(button).toHaveClass(press.pressCompact);
+    expect(button).not.toHaveClass(press.press);
+    const disk = cssRule(CSS, '.root[data-shape="circle"]');
+    expect(cssValue(disk, "width")).toBe("var(--btn-h)");
+    expect(cssValue(disk, "border-radius")).toBe("var(--prime-radius-full)");
+    expect(
+      cssValue(
+        cssRule(CSS, '.root[data-shape="circle"]::after', ["@media (pointer: coarse)"]),
+        "border-radius",
+      ),
+    ).toBe("var(--prime-radius-full)");
+    expect(cssValue(cssRule(CSS, ".root:focus-visible"), "outline")).toMatch(
+      /^var\(--prime-focus-width\) solid/,
     );
-    expect(css).toMatch(
-      /\.root\[data-shape="circle"\]:active:not\(\[data-disabled="true"\], \[data-loading="true"\]\) \{\s*transform: scale\(var\(--prime-motion-press-scale-compact\)\);/,
-    );
-    expect(css).toMatch(
-      /\.root\[data-shape="circle"\]::after \{\s*border-radius: var\(--prime-radius-full\);/,
-    );
-    expect(css).toMatch(/\.root:focus-visible \{\s*outline: var\(--prime-focus-width\) solid/);
   });
 
   it("asChild makes a round link", () => {
@@ -351,6 +415,7 @@ describe("Button shape circle", () => {
     );
     const link = screen.getByRole("link", { name: "Скачать Счёт-2381.pdf" });
     expect(link).toHaveAttribute("data-shape", "circle");
+    expect(link).toHaveAttribute("data-icon-only", "true");
     expect(link).toHaveAttribute("data-size", "xl");
     expect(link).toHaveAttribute("href", "/files/2381.pdf");
   });
@@ -358,12 +423,25 @@ describe("Button shape circle", () => {
   it("variant shade: the media shade with a blur; danger turns the danger disk", () => {
     render(circle({ variant: "shade", tone: "danger" }));
     expect(screen.getByRole("button")).toHaveAttribute("data-variant", "shade");
-    expect(css).toMatch(
-      /\.root\[data-variant="shade"\] \{\s*--btn-bg: var\(--prime-color-media-disk\);[\s\S]*?backdrop-filter: blur\(var\(--prime-media-disk-blur\)\);/,
-    );
-    expect(css).toMatch(
-      /\.root\[data-variant="shade"\]\[data-tone="danger"\] \{\s*--btn-bg: var\(--prime-color-danger-default\);/,
-    );
+    const shade = cssRule(CSS, '.root[data-variant="shade"]');
+    expect(cssValue(shade, "--btn-bg")).toBe("var(--prime-color-media-disk)");
+    expect(cssValue(shade, "backdrop-filter")).toBe("blur(var(--prime-media-disk-blur))");
+    expect(
+      cssValue(cssRule(CSS, '.root[data-variant="shade"][data-tone="danger"]'), "--btn-bg"),
+    ).toBe("var(--prime-color-danger-default)");
+  });
+
+  it("variant glass: the glass of a floating bar, solid where transparency is reduced", () => {
+    render(circle({ variant: "glass", tone: "neutral" }));
+    expect(screen.getByRole("button")).toHaveAttribute("data-variant", "glass");
+    const glass = cssRule(CSS, '.root[data-variant="glass"]');
+    expect(cssValue(glass, "--btn-bg")).toBe("var(--prime-color-bg-glass)");
+    expect(cssValue(glass, "backdrop-filter")).toMatch(/^blur\(var\(--prime-glass-blur\)\)/);
+    const solid = cssRule(CSS, '.root[data-variant="glass"]', [
+      "@media (prefers-reduced-transparency: reduce)",
+    ]);
+    expect(cssValue(solid, "--btn-bg")).toBe("var(--prime-color-bg-glass-solid)");
+    expect(cssValue(solid, "backdrop-filter")).toBe("none");
   });
 
   it("a changed icon cross-fades in Button.Icon", () => {
@@ -425,7 +503,7 @@ describe("Button motion", () => {
       );
       const button = screen.getByRole("button", { name: "Импорт" });
       expect(button).toHaveAttribute("aria-busy", "true");
-      expect(button).toHaveAttribute("data-spinner", "true");
+      expect(button).toHaveAttribute("data-loading-overlay", "true");
       expect(button).not.toHaveAttribute("data-progress");
       expect(button).not.toBeDisabled();
       expect(container.querySelector(`.${styles.spinner}`)).not.toBeNull();
@@ -698,6 +776,110 @@ describe("Button — pressed", () => {
     );
     expect(screen.getByRole("button", { name: "Сохранить" })).not.toHaveAttribute("aria-pressed");
     expect(screen.getByRole("link", { name: "Избранное" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("defaultPressed toggles on click, Enter and Space and reports the new state", async () => {
+    const onPressedChange = vi.fn();
+    render(
+      <Button.Root variant="ghost" tone="neutral" defaultPressed onPressedChange={onPressedChange}>
+        Закрепить
+      </Button.Root>,
+    );
+    const button = screen.getByRole("button", { name: "Закрепить" });
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    const user = userEvent.setup();
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "false");
+    expect(button).not.toHaveAttribute("data-pressed");
+    await user.keyboard("{Enter}");
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    await user.keyboard(" ");
+    expect(button).toHaveAttribute("aria-pressed", "false");
+    expect(onPressedChange.mock.calls).toEqual([[false], [true], [false]]);
+  });
+
+  it("controlled pressed only asks; an onClick that prevents default keeps the state", async () => {
+    const onPressedChange = vi.fn();
+    const onClick = (event: React.MouseEvent) => event.preventDefault();
+    render(
+      <>
+        <Button.Root pressed={false} onPressedChange={onPressedChange}>
+          Уведомления
+        </Button.Root>
+        <Button.Root defaultPressed={false} onClick={onClick}>
+          Звук
+        </Button.Root>
+      </>,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Уведомления" }));
+    expect(onPressedChange).toHaveBeenCalledWith(true);
+    expect(screen.getByRole("button", { name: "Уведомления" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Звук" }));
+    expect(screen.getByRole("button", { name: "Звук" })).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("the selected look covers pressed and the current page", () => {
+    const selected = cssRule(
+      CSS,
+      '.root:is([data-pressed="true"], [data-current="true"], [aria-current="page"])[data-variant]',
+    );
+    expect(cssValue(selected, "--btn-bg")).toBe("var(--prime-color-accent-soft)");
+  });
+});
+
+describe("Button — current, density, align, host height", () => {
+  it("current marks the page of a set: aria-current and the selected look", () => {
+    render(
+      <>
+        <Button.Root variant="ghost" tone="neutral" current density="tight" aria-label="Страница 3">
+          3
+        </Button.Root>
+        <Button.Root variant="ghost" tone="neutral" density="tight" aria-label="Страница 4">
+          4
+        </Button.Root>
+      </>,
+    );
+    const page = screen.getByRole("button", { name: "Страница 3" });
+    expect(page).toHaveAttribute("aria-current", "page");
+    expect(page).toHaveAttribute("data-current", "true");
+    expect(page).toHaveAttribute("data-density", "tight");
+    expect(screen.getByRole("button", { name: "Страница 4" })).not.toHaveAttribute("aria-current");
+    const tight = cssRule(CSS, '.root[data-density="tight"]');
+    expect(cssValue(tight, "padding-inline")).toBe("var(--prime-space-1)");
+    expect(cssValue(tight, "font-variant-numeric")).toBe("tabular-nums");
+  });
+
+  it("density inline sits in a line of text; align start reads from the start edge", () => {
+    render(
+      <>
+        <Button.Root variant="soft" tone="neutral" density="inline">
+          1,5×
+        </Button.Root>
+        <Button.Root variant="ghost" tone="neutral" align="start" fullWidth>
+          Последние 7 дней
+        </Button.Root>
+      </>,
+    );
+    expect(screen.getByRole("button", { name: "1,5×" })).toHaveAttribute("data-density", "inline");
+    expect(screen.getByRole("button", { name: "Последние 7 дней" })).toHaveAttribute(
+      "data-align",
+      "start",
+    );
+    const inline = cssRule(CSS, '.root[data-density="inline"]');
+    expect(cssValue(inline, "height")).toBe("auto");
+    expect(cssValue(inline, "line-height")).toBe("inherit");
+    expect(cssValue(cssRule(CSS, '.root[data-align="start"]'), "justify-content")).toBe(
+      "flex-start",
+    );
+  });
+
+  it("a host sets the height through --prime-control-height, else the tier", () => {
+    const root = cssRule(CSS, ".root");
+    expect(cssValue(root, "--btn-h")).toBe("var(--prime-control-height, var(--field-h))");
+    expect(cssValue(root, "height")).toBe("var(--btn-h)");
   });
 });
 

@@ -4,77 +4,71 @@ import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeConte
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
-import { Slot } from "@/internal/slot";
+import { fieldTierClass } from "@/internal/fieldClasses";
+import { InteractiveElement } from "@/internal/interactiveElement";
+import { slotChild } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./LinkButton.module.css";
 
-export type LinkButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-  /** Tier. Default: the tier of the surrounding control or text host, else `m`. */
+type LinkButtonBaseProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
   size?: ControlSize;
-  /** `accent` — a regular link; `neutral` — quiet links in footers, metadata and dense navigation. */
-  tone?: Extract<Tone, "accent" | "neutral">;
+  tone?: Extract<Tone, "accent" | "neutral"> | "muted";
+  inline?: boolean;
   disabled?: boolean;
-  /**
-   * Merges the link look onto its single child instead of rendering `<a>`: a router link, or a
-   * `<button type="button">` for an inline action that is not navigation («выберите файл»).
-   * `disabled` becomes `aria-disabled` and swallows the click.
-   */
-  asChild?: boolean;
   ref?: React.Ref<HTMLAnchorElement>;
 };
+
+/** A link has a URL; with `asChild` the child (a router link, a `<button>`) owns its target. */
+export type LinkButtonProps = LinkButtonBaseProps &
+  (
+    | { asChild?: false; href: string }
+    | { asChild: true; href?: never; children: React.ReactElement }
+  );
 
 export function LinkButton({
   size: sizeProp,
   tone = "accent",
+  inline = false,
   disabled: disabledProp,
   asChild = false,
   children,
   className,
   href,
-  onClick,
   ref,
   ...rest
 }: LinkButtonProps) {
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
   const shared = {
-    className: cx(styles.root, className),
-    ...toDataAttributes({ size, tone, disabled: disabled || undefined }),
+    ...rest,
+    ref,
+    disabled,
+    className: cx(fieldTierClass, styles.root, className),
+    ...toDataAttributes({
+      size,
+      tone,
+      inline: inline || undefined,
+      disabled: disabled || undefined,
+    }),
   };
-  const swallowClick = (event: React.MouseEvent) => event.preventDefault();
 
   if (asChild) {
     return (
       <ControlSizeProvider value={size}>
-        <Slot
-          {...rest}
-          {...shared}
-          href={href}
-          ref={ref as React.Ref<HTMLElement>}
-          aria-disabled={disabled || undefined}
-          onClick={disabled ? swallowClick : onClick}
-        >
-          {children}
-        </Slot>
+        <InteractiveElement element="slot" {...shared}>
+          {slotChild(children, "LinkButton")}
+        </InteractiveElement>
       </ControlSizeProvider>
     );
   }
 
-  // A disabled link keeps its element, id and ARIA but loses `href`, the tab stop and the click.
+  // A disabled link keeps its element, id and ARIA but loses `href` (and with it the Tab stop) and
+  // the click. `href` is required here by the type; `asChild` is the branch without one.
   return (
-    <a
-      {...rest}
-      {...shared}
-      ref={ref}
-      href={disabled ? undefined : href}
-      role={disabled ? "link" : rest.role}
-      aria-disabled={disabled || undefined}
-      tabIndex={disabled ? -1 : rest.tabIndex}
-      onClick={disabled ? swallowClick : onClick}
-    >
+    <InteractiveElement element="link" href={href ?? ""} {...shared}>
       <ControlSizeProvider value={size}>{children}</ControlSizeProvider>
-    </a>
+    </InteractiveElement>
   );
 }
 

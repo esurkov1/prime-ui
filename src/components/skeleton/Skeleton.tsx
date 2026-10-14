@@ -1,8 +1,9 @@
 import type * as React from "react";
 
-import { useOptionalControlSize } from "@/internal/ControlSizeContext";
+import { useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Skeleton.module.css";
@@ -15,11 +16,8 @@ import styles from "./Skeleton.module.css";
 export type SkeletonShape = "text" | "control" | "circle" | "block";
 
 export type SkeletonProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /** Default `text`. */
   shape?: SkeletonShape;
-  /** Tier of the text line, control height or avatar size. Default: the host tier, else `m`. */
   size?: ControlSize;
-  /** `text` only: number of lines; the last of several is shorter. Default 1. */
   lines?: number;
   ref?: React.Ref<HTMLSpanElement>;
 };
@@ -35,15 +33,14 @@ export function Skeleton({
   className,
   ...rest
 }: SkeletonProps) {
-  const hostSize = useOptionalControlSize();
-  const size = sizeProp ?? hostSize ?? "m";
+  const size = useControlSize(sizeProp);
   const count = shape === "text" ? Math.max(1, Math.floor(lines)) : 0;
 
   return (
     <span
       aria-hidden="true"
       {...rest}
-      className={cx(styles.root, className)}
+      className={cx(fieldTierClass, styles.root, className)}
       {...toDataAttributes({ shape, size })}
     >
       {Array.from({ length: count }, (_, index) => (

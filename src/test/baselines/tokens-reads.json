@@ -3,7 +3,6 @@
   "src/components/button-group/ButtonGroup.module.css: --prime-icon-size",
   "src/components/button/Button.module.css: --prime-icon-size",
   "src/components/color-picker/ColorPresets.tsx: --prime-icon-size",
-  "src/components/kbd/Kbd.module.css: --prime-icon-size",
   "src/components/switch/Switch.module.css: --prime-switch-h",
   "src/components/switch/Switch.module.css: --prime-switch-inset",
   "src/components/switch/Switch.module.css: --prime-switch-thumb",

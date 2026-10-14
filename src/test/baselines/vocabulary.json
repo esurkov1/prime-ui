@@ -1,8 +1,5 @@
 [
-  "src/components/badge/api.ts: Badge.Root.onPress (not in the event vocabulary)",
-  "src/components/badge/api.ts: Badge.Root.onPress → the `pressed` / `defaultPressed` / `onPressedChange` triad",
   "src/components/button-group/api.ts: ButtonGroup.Item.type → `multiple` for one vs many (a `type` prop names no selection mode)",
-  "src/components/button/api.ts: Button.Root.type → `multiple` for one vs many (a `type` prop names no selection mode)",
   "src/components/chat/api.ts: Chat.Messages.type → `multiple` for one vs many (a `type` prop names no selection mode)",
   "src/components/composer/api.ts: Composer.Context.value → `messageId`",
   "src/components/file-upload/api.ts: FileUpload.ItemName → `FileUpload.ItemText`",

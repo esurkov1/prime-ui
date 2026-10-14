@@ -49,6 +49,12 @@ export const page: ComponentPageConfig = {
         "Длинное название в одну строку с многоточием; полный текст остаётся в подсказке — `truncate`, `title`.",
     },
     {
+      scenario: "numeric",
+      title: "Табличные цифры",
+      description:
+        "Суммы счетов в столбце встают цифра под цифрой благодаря табличным цифрам — `numeric`.",
+    },
+    {
       scenario: "article",
       title: "Статья",
       description:

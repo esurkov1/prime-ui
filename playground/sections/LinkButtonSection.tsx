@@ -20,11 +20,13 @@ export const page: ComponentPageConfig = {
   examples: [
     {
       slot: "overview",
-      description: "Ссылка внутри текста, того же кегля, что и текст — `href`.",
+      description:
+        "Ссылка внутри текста берёт его шрифт и держит подчёркивание — `href`, `inline`.",
     },
     {
       slot: "variants",
-      description: "Обычная ссылка и тихая для футеров и метаданных — `tone`.",
+      description:
+        "Обычная ссылка, тихая для футеров и метаданных и приглушённая для цепочек — `tone`.",
     },
     {
       slot: "sizes",

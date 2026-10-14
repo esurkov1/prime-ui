@@ -2,11 +2,13 @@ import * as React from "react";
 
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { iconSlotClass } from "@/internal/iconBox";
 import {
   createImageSlot,
   type ImageSlotFallbackProps,
   type ImageSlotImageProps,
 } from "@/internal/imageSlot";
+import { namedRole } from "@/internal/namedRole";
 import palette from "@/internal/palette.module.css";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 
@@ -15,7 +17,10 @@ import styles from "./Avatar.module.css";
 /** `xs` 20 · `s` 24 · `m` 32 · `l` 40 · `xl` 48 · `2xl` 64 (`--prime-avatar-*`). */
 export type AvatarSize = ControlSize | "2xl";
 
-const slot = createImageSlot("Avatar", { image: styles.image, fallback: styles.fallback });
+const slot = createImageSlot("Avatar", {
+  image: styles.image,
+  fallback: cx(styles.fallback, iconSlotClass),
+});
 
 /** Size of the surrounding `Avatar.Group`; members without their own `size` take it. */
 const AvatarGroupSizeContext = React.createContext<AvatarSize | undefined>(undefined);
@@ -23,19 +28,22 @@ const AvatarGroupSizeContext = React.createContext<AvatarSize | undefined>(undef
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export type AvatarRootProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** Default `m`, or the size of the surrounding `Avatar.Group`. */
   size?: AvatarSize;
-  /** Fallback color (`--prime-color-palette-<hue>-*`). Default `gray`. */
   color?: PaletteColor;
   ref?: React.Ref<HTMLDivElement>;
 };
 
+/**
+ * The person's picture. Named by `aria-label` it is one image of that name (`role="img"`), so the
+ * name holds whether the photo, the initials or an icon shows.
+ */
 function AvatarRoot({ size, color = "gray", className, children, ...rest }: AvatarRootProps) {
   const groupSize = React.useContext(AvatarGroupSizeContext);
 
   return (
     <slot.ImageSlotProvider>
       <div
+        role={namedRole(rest, "img")}
         className={cx(styles.root, palette.hue, className)}
         {...toDataAttributes({ size: size ?? groupSize ?? "m", color })}
         {...rest}
@@ -74,9 +82,7 @@ export const AVATAR_STATUS_LABELS: AvatarStatusLabels = {
 };
 
 export type AvatarStatusProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /** Presence shown as a dot on the avatar's bottom-end edge. */
   status: AvatarPresence;
-  /** Accessible names of the presence states (Russian defaults). */
   labels?: Partial<AvatarStatusLabels>;
   ref?: React.Ref<HTMLSpanElement>;
 };
@@ -99,7 +105,6 @@ AvatarStatus.displayName = "Avatar.Status";
 // ─── Group / Overflow ─────────────────────────────────────────────────────────
 
 export type AvatarGroupProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** Size of every member without its own `size`. Default `m`. */
   size?: AvatarSize;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -120,16 +125,19 @@ function AvatarGroup({ size = "m", className, role = "group", ...rest }: AvatarG
 AvatarGroup.displayName = "Avatar.Group";
 
 export type AvatarOverflowProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** Default `m`, or the size of the surrounding `Avatar.Group`. */
   size?: AvatarSize;
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The «+N» cell at the end of a group, the same diameter as its avatars. */
+/**
+ * The «+N» cell at the end of a group, the same diameter as its avatars; named by `aria-label`
+ * («Ещё 3 участника») it is an image of that name.
+ */
 function AvatarOverflow({ size, className, ...rest }: AvatarOverflowProps) {
   const groupSize = React.useContext(AvatarGroupSizeContext);
   return (
     <div
+      role={namedRole(rest, "img")}
       className={cx(styles.overflow, className)}
       {...toDataAttributes({ size: size ?? groupSize ?? "m" })}
       {...rest}

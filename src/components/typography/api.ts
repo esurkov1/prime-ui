@@ -41,6 +41,13 @@ export const api: ComponentApi = {
           ru: "Переопределяет трекинг роли шагом `--prime-font-tracking-*`.",
         },
         {
+          name: "numeric",
+          type: '"proportional" | "tabular"',
+          default: '"proportional"',
+          en: "`tabular` — every digit as wide as the others: amounts, times and counts line up in a column and keep their width.",
+          ru: "`tabular` — все цифры одной ширины: суммы, время и счётчики выравниваются в столбец и не меняют ширину.",
+        },
+        {
           name: "italic",
           type: "boolean",
           default: "false",

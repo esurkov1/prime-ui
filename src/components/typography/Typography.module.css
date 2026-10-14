@@ -1,18 +1,14 @@
 /*
  * Typography — one element per text role. The role class comes from `internal/textRole` (picked by
- * `variant`, mirrored in `data-variant`); tone from `internal/textTone`. Overrides below win over the
- * role by specificity.
+ * `variant`, mirrored in `data-variant`; the `code` role brings the mono family); tone from
+ * `internal/textTone`. The family is inherited from the page. Overrides below win over the role by
+ * specificity.
  */
 .root {
   margin: 0;
   color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-sans);
   font-style: normal;
   overflow-wrap: break-word;
-}
-
-.root[data-variant="code"] {
-  font-family: var(--prime-font-family-mono);
 }
 
 /*
@@ -54,6 +50,12 @@
 
 .root[data-tracking="wide"] {
   letter-spacing: var(--prime-font-tracking-wide);
+}
+
+/* Tabular figures: every digit as wide as the others, so amounts and times line up in a column
+   and a changing number keeps its width. */
+.root[data-numeric="tabular"] {
+  font-variant-numeric: tabular-nums;
 }
 
 .root[data-italic="true"] {

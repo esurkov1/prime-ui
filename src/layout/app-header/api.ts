@@ -76,12 +76,12 @@ export const api: ComponentApi = {
     },
     {
       name: "AppHeader.Separator",
-      en: "`ref` → `HTMLDivElement`. A short vertical `Divider` (20) between groups in a zone — the path and the title — with 16 of air on each side.",
-      ru: "Короткий вертикальный `Divider` (20) между группами в зоне — путём и заголовком — с воздухом 16 с каждой стороны.",
+      en: "`ref` → `HTMLDivElement`. The `inset` vertical `Divider` between groups in a zone — the path and the title: one text line tall, the tier gap on each side.",
+      ru: "Вертикальный `Divider` с `inset` между группами в зоне — путём и заголовком: высотой в строку текста, с отступом яруса с каждой стороны.",
       props: [
         {
           name: "…rest",
-          type: 'Omit<DividerProps, "orientation" | "children" | "align" | "size">',
+          type: 'Omit<DividerProps, "orientation" | "children" | "align" | "size" | "inset">',
           en: "`className` and the other div attributes.",
           ru: "`className` и остальные атрибуты div.",
         },

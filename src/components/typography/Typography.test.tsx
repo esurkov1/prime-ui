@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { cssRule, cssValue } from "@/test/css";
+
 import { Typography } from "./Typography";
 
 describe("Typography", () => {
@@ -111,5 +113,33 @@ describe("Typography", () => {
       </Typography>,
     );
     expect(screen.getByText("Long")).toHaveAttribute("data-truncate", "true");
+  });
+
+  it("numeric tabular sets tabular figures; proportional sets nothing", () => {
+    render(
+      <>
+        <Typography variant="body-m" numeric="tabular">
+          1 118,00
+        </Typography>
+        <Typography variant="body-m">96,50</Typography>
+      </>,
+    );
+    expect(screen.getByText("1 118,00")).toHaveAttribute("data-numeric", "tabular");
+    expect(screen.getByText("96,50")).not.toHaveAttribute("data-numeric");
+    expect(
+      cssValue(
+        cssRule("src/components/typography/Typography.module.css", '.root[data-numeric="tabular"]'),
+        "font-variant-numeric",
+      ),
+    ).toBe("tabular-nums");
+  });
+
+  it("takes the family from the page; the code role brings the mono family", () => {
+    expect(() =>
+      cssValue(cssRule("src/components/typography/Typography.module.css", ".root"), "font-family"),
+    ).toThrow();
+    expect(cssValue(cssRule("src/internal/textRole.module.css", ".code"), "font-family")).toBe(
+      "var(--prime-font-family-mono)",
+    );
   });
 });

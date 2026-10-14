@@ -8,7 +8,7 @@ export default function LinkButtonAsChildExample() {
   return (
     <Typography variant="body-m" tone="secondary">
       {sent ? "Письмо отправлено повторно." : "Не пришло письмо со счётом?"}{" "}
-      <LinkButton asChild>
+      <LinkButton asChild inline>
         <button type="button" onClick={() => setSent(true)}>
           Отправить ещё раз
         </button>
