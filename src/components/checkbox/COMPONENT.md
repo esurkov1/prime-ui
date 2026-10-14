@@ -28,7 +28,7 @@ Checkbox.Root          field grid; ref and input props go to the native input
 │  └─ Checkbox.Label   the visible text (optional)
 └─ hint | error        support text under the text column (`hint`, `error`)
 
-Checkbox.Indicator     the box alone, no input — a mark inside option / menu rows (used without Root)
+Checkbox.Indicator     the box alone, no input — a mark inside option / menu rows and toggle tiles (used without Root)
 ```
 `<Checkbox.Root aria-label="…" />` without `Checkbox.Label` is a valid bare control (table rows).
 
@@ -68,7 +68,7 @@ Checkbox.Indicator     the box alone, no input — a mark inside option / menu r
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ### Checkbox.Indicator
-`ref` → `HTMLSpanElement`. The box alone, without an input (`aria-hidden`, no focus or clicks) for rows that carry the state themselves: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`.
+`ref` → `HTMLSpanElement`. The box alone, without an input (`aria-hidden`, no focus or clicks) for rows that carry the state themselves: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`, a toggle `<button>` + `aria-pressed`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -130,7 +130,7 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 
 ## Layout & spacing
 - Grid `[box][text]`; the hint or error sits under the text column, not under the box.
-- Checkboxes in a vertical list: gap `--prime-space-3`; separate fields: `--prime-space-5`; group → actions `--prime-space-8`.
+- Checkboxes in a column: a label-less [Fieldset](../fieldset/COMPONENT.md) stacks them at the form rhythm (name it with `aria-label`); the form around the group spaces it from its actions.
 - Long labels wrap (`overflow-wrap: anywhere`); the field shrinks to its content with `max-width: 100%`.
 
 ## Accessibility
@@ -150,7 +150,7 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 - `aria-invalid` is set when invalid; `aria-describedby` = your ids + the hint or the error id.
 - Without visible text, pass `aria-label` on `Checkbox.Root` (it lands on the input).
 - `required` goes to the native input and draws a red `*` after the text; the `*` is `aria-hidden`, the input reports the requirement.
-- `Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked`.
+- `Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked` / `aria-pressed`.
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -162,12 +162,12 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A checkbox with its label; a click anywhere on the row toggles it. |
+| [overview.tsx](examples/overview.tsx) | A checkbox with its label; a click anywhere on the row toggles it — `Checkbox.Label`, `defaultChecked`. |
 | [variants.tsx](examples/variants.tsx) | The rounded square next to the circle, in three states — `shape`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size; the box and the text follow the control tier — `size`. |
-| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `checked`, `indeterminate`, `readOnly`, `invalid`, `disabled`. |
-| [without-label.tsx](examples/without-label.tsx) | Bare boxes in table rows, named by `aria-label` and submitted with `name` and `value`. |
-| [indicator.tsx](examples/indicator.tsx) | The box alone in a multi-select list: the option row carries `aria-selected`, the box only shows it — `Checkbox.Indicator`. |
+| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `defaultChecked`, `indeterminate`, `readOnly`, `invalid`, `disabled`. |
+| [without-label.tsx](examples/without-label.tsx) | Bare boxes in table rows, named for assistive tech and submitted with the form — `aria-label`, `name`, `value`. |
+| [indicator.tsx](examples/indicator.tsx) | The box alone on selectable tiles: the toggle button carries `aria-pressed`, the box only shows it — `Checkbox.Indicator`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the selection; «select all» turns indeterminate on a partial one — `checked`, `onCheckedChange`, `indeterminate`. |
 | [in-form.tsx](examples/in-form.tsx) | Consent in a sign-up form: the required tick and an optional subscription, a hint under the text, an error after a submit without the tick — `required`, `optional`, `hint`, `error`. |
 
@@ -180,5 +180,5 @@ Root also carries `data-size`; the box carries `data-shape`. Controlled: `checke
 - `style` on `Checkbox.Root` expecting to style the field → it goes to the hidden input; use `className`.
 
 ## Related
-- **Built from:** [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md); the row is a native `<label>`
+- **Built from:** [Label](../label/COMPONENT.md) (the `required` / `optional` marks), [Hint](../hint/COMPONENT.md) (`hint`, `error`), [VisuallyHidden](../visually-hidden/COMPONENT.md); the row is a native `<label>`
 - **See also:** [Radio](../radio/COMPONENT.md), [Switch](../switch/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md); `Checkbox.Indicator` inside [Select](../select/COMPONENT.md) and [TagSelect](../tag-select/COMPONENT.md) rows

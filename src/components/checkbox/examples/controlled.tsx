@@ -1,5 +1,5 @@
 /** The parent owns the selection; «select all» turns indeterminate on a partial one — `checked`, `onCheckedChange`, `indeterminate`. */
-import { Checkbox } from "prime-ui-kit";
+import { Checkbox, Fieldset } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -11,7 +11,7 @@ export default function CheckboxControlledExample() {
   const all = selected.length === DOCUMENTS.length;
 
   return (
-    <div className={styles.list}>
+    <Fieldset aria-label="Документы к отправке">
       <Checkbox.Root
         checked={all}
         indeterminate={selected.length > 0 && !all}
@@ -22,20 +22,22 @@ export default function CheckboxControlledExample() {
         </Checkbox.Label>
       </Checkbox.Root>
       <div className={styles.nested}>
-        {DOCUMENTS.map((document) => (
-          <Checkbox.Root
-            key={document}
-            checked={selected.includes(document)}
-            onCheckedChange={(checked) =>
-              setSelected((current) =>
-                checked ? [...current, document] : current.filter((item) => item !== document),
-              )
-            }
-          >
-            <Checkbox.Label>{document}</Checkbox.Label>
-          </Checkbox.Root>
-        ))}
+        <Fieldset aria-label="Документы">
+          {DOCUMENTS.map((document) => (
+            <Checkbox.Root
+              key={document}
+              checked={selected.includes(document)}
+              onCheckedChange={(checked) =>
+                setSelected((current) =>
+                  checked ? [...current, document] : current.filter((item) => item !== document),
+                )
+              }
+            >
+              <Checkbox.Label>{document}</Checkbox.Label>
+            </Checkbox.Root>
+          ))}
+        </Fieldset>
       </div>
-    </div>
+    </Fieldset>
   );
 }

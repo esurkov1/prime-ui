@@ -142,8 +142,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Checkbox.Indicator",
-      en: '`ref` → `HTMLSpanElement`. The box alone, without an input (`aria-hidden`, no focus or clicks) for rows that carry the state themselves: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`.',
-      ru: 'Квадрат без input (`aria-hidden`, без фокуса и кликов) для строк, которые сами несут состояние: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`.',
+      en: '`ref` → `HTMLSpanElement`. The box alone, without an input (`aria-hidden`, no focus or clicks) for rows that carry the state themselves: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`, a toggle `<button>` + `aria-pressed`.',
+      ru: 'Квадрат без input (`aria-hidden`, без фокуса и кликов) для строк, которые сами несут состояние: `role="option"` + `aria-selected`, `role="menuitemcheckbox"` + `aria-checked`, `<button>`-переключатель + `aria-pressed`.',
       props: [
         {
           name: "checked",
@@ -212,8 +212,8 @@ export const api: ComponentApi = {
         ru: "`required` уходит в нативный input и рисует красную `*` после текста; `*` скрыта (`aria-hidden`), обязательность сообщает input.",
       },
       {
-        en: "`Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked`.",
-        ru: "`Checkbox.Indicator` скрыт (`aria-hidden`); состояние несёт строка (`aria-selected` / `aria-checked`).",
+        en: "`Checkbox.Indicator` is `aria-hidden`; the host row carries `aria-selected` / `aria-checked` / `aria-pressed`.",
+        ru: "`Checkbox.Indicator` скрыт (`aria-hidden`); состояние несёт строка (`aria-selected` / `aria-checked` / `aria-pressed`).",
       },
     ],
   },

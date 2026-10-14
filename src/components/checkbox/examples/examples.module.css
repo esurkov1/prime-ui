@@ -6,67 +6,26 @@
   gap: var(--prime-space-3);
 }
 
-/* controlled.tsx: «select all» above its options. */
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-}
-
-/* Child options sit under the parent's text column. */
+/* controlled.tsx: child options sit under the parent's text column. */
 .nested {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
   padding-inline-start: calc(var(--prime-control-m-choice) + var(--prime-control-m-gap));
 }
 
-/* in-form.tsx: choices, then actions (group → actions 32). */
+/* in-form.tsx: the choices (a Fieldset), then the actions — group → actions 32. */
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-4);
+  display: grid;
+  justify-items: start;
+  gap: var(--prime-space-8);
   width: min(100%, var(--prime-layout-form-width-s));
 }
 
-.formActions {
-  display: flex;
-  margin-top: var(--prime-space-4);
-}
-
-/* indicator.tsx: a listbox panel with full-width option rows (panel tokens, row hover wash). */
-.optionList {
-  box-sizing: border-box;
+/* indicator.tsx: selectable tiles in a fluid grid. */
+.tiles {
   display: grid;
-  width: min(100%, var(--prime-layout-tile-min-width));
-  padding: var(--prime-panel-padding);
-  border-radius: var(--prime-panel-radius);
-  background: var(--prime-color-layer-floating-bg);
-  box-shadow: var(--prime-shadow-overlay);
-}
-
-.option {
-  display: flex;
-  align-items: center;
-  gap: var(--prime-control-m-gap);
-  min-height: var(--prime-control-m-item-height);
-  padding-inline: var(--prime-control-m-field-padding-x);
-  border-radius: var(--prime-panel-item-radius);
-  cursor: pointer;
-  transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
-}
-
-.option[aria-disabled="true"] {
-  cursor: default;
-}
-
-@media (hover: hover) {
-  .option:not([aria-disabled="true"]):hover {
-    background: var(--prime-color-fill-subtle);
-  }
-}
-
-.option:focus-visible {
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
+  grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--prime-layout-tile-min-width)), 1fr)
+    );
+  gap: var(--prime-space-4);
+  width: 100%;
 }

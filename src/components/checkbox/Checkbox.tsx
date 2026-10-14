@@ -38,21 +38,14 @@ export type CheckboxRootProps = Omit<
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-  /** Mixed state (e.g. «select all» with a partial selection); wins over `checked` visually. */
   indeterminate?: boolean;
-  /** Invalid state; a non-empty `error` implies it. */
   invalid?: boolean;
-  /** Help text under the label text. Hidden while `error` is shown. */
   hint?: React.ReactNode;
-  /** Error message in the hint slot; implies `invalid`. */
   error?: React.ReactNode;
-  /** Tier. Default: the tier of the surrounding control (a form, a panel, a table), else `m`. */
   size?: ControlSize;
-  /** Outline of the box: rounded square or full circle (a selection mark, like in messengers). */
   shape?: CheckboxShape;
   optional?: boolean;
   labels?: Partial<CheckboxLabels>;
-  /** `Checkbox.Label`; without it the bare box renders (give it an `aria-label`). */
   children?: React.ReactNode;
   /** The native checkbox input. */
   ref?: React.Ref<HTMLInputElement>;
@@ -158,19 +151,17 @@ CheckboxLabel.displayName = "Checkbox.Label";
 
 export type CheckboxIndicatorProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
   checked?: boolean;
-  /** Mixed state; wins over `checked` visually. */
   indeterminate?: boolean;
   disabled?: boolean;
-  /** Outline of the box: rounded square or full circle. */
   shape?: CheckboxShape;
-  /** Box tier; without it the nearest control size (e.g. the Select or menu it sits in), else `m`. */
   size?: ControlSize;
   ref?: React.Ref<HTMLSpanElement>;
 };
 
 /**
  * The checkbox box alone, without an input: a decorative mark for rows whose own element carries
- * the state (`role="option"` with `aria-selected`, `role="menuitemcheckbox"` with `aria-checked`).
+ * the state (`role="option"` with `aria-selected`, `role="menuitemcheckbox"` with `aria-checked`,
+ * a toggle `<button>` with `aria-pressed`).
  * Used outside `Checkbox.Root`; it is `aria-hidden` and takes no focus or clicks.
  */
 function CheckboxIndicator({

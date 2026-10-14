@@ -1,4 +1,4 @@
-/** Every state side by side, each labelled by its prop — `checked`, `indeterminate`, `readOnly`, `invalid`, `disabled`. */
+/** Every state side by side, each labelled by its prop — `defaultChecked`, `indeterminate`, `readOnly`, `invalid`, `disabled`. */
 import { Checkbox } from "prime-ui-kit";
 
 export default function CheckboxStatesExample() {

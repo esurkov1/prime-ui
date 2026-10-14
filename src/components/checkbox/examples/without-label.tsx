@@ -1,4 +1,4 @@
-/** Bare boxes in table rows, named by `aria-label` and submitted with `name` and `value`. */
+/** Bare boxes in table rows, named for assistive tech and submitted with the form — `aria-label`, `name`, `value`. */
 import { Checkbox } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

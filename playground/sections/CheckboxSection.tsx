@@ -20,7 +20,8 @@ export const page: ComponentPageConfig = {
   examples: [
     {
       slot: "overview",
-      description: "Флажок с подписью; клик по всей строке переключает его.",
+      description:
+        "Флажок с подписью; клик по всей строке переключает его — `Checkbox.Label`, `defaultChecked`.",
     },
     {
       slot: "variants",
@@ -30,19 +31,19 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Все состояния рядом, каждое подписано своим пропом — `checked`, `indeterminate`, `readOnly`, `invalid`, `disabled`.",
+        "Все состояния рядом, каждое подписано своим пропом — `defaultChecked`, `indeterminate`, `readOnly`, `invalid`, `disabled`.",
     },
     {
       scenario: "without-label",
       title: "Без подписи",
       description:
-        "Квадраты в строках таблицы с именем из `aria-label`, отправляются с `name` и `value`.",
+        "Квадраты в строках таблицы: имя для вспомогательных технологий, отправка вместе с формой — `aria-label`, `name`, `value`.",
     },
     {
       scenario: "indicator",
-      title: "Индикатор в строке списка",
+      title: "Индикатор на плитке выбора",
       description:
-        "Только квадрат в списке множественного выбора: строка несёт `aria-selected`, квадрат лишь показывает его — `Checkbox.Indicator`.",
+        "Только квадрат на плитках выбора: кнопка-переключатель несёт `aria-pressed`, квадрат лишь показывает его — `Checkbox.Indicator`.",
     },
     {
       slot: "controlled",

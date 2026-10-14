@@ -1,4 +1,4 @@
-/** A checkbox with its label; a click anywhere on the row toggles it. */
+/** A checkbox with its label; a click anywhere on the row toggles it — `Checkbox.Label`, `defaultChecked`. */
 import { Checkbox } from "prime-ui-kit";
 
 export default function CheckboxOverviewExample() {
