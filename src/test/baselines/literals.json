@@ -1,6 +1,4 @@
 [
-  "src/components/accordion/Accordion.module.css: raw duration in transition",
-  "src/components/accordion/Accordion.module.css: raw duration in transition #2",
   "src/components/banner/Banner.module.css: raw % in color-mix in box-shadow",
   "src/components/button-group/ButtonGroup.module.css: numeric z-index",
   "src/components/chat-list/ChatList.module.css: px in @container (use rem)",
@@ -130,7 +128,6 @@
   "src/layout/bottom-nav/BottomNav.module.css: raw % in color-mix in background #2",
   "src/layout/bottom-nav/BottomNav.module.css: raw length in bottom",
   "src/layout/bottom-nav/BottomNav.module.css: raw length in padding-block-end",
-  "src/layout/sidebar/Sidebar.module.css: numeric z-index",
   "src/layout/sidebar/Sidebar.module.css: raw duration in --sb-toggle-hide",
   "src/layout/sidebar/Sidebar.module.css: raw duration in --sb-toggle-move",
   "src/layout/sidebar/Sidebar.module.css: raw duration in transition",

@@ -1,5 +1,4 @@
 [
-  "src/components/accordion/Accordion.module.css: .icon svg",
   "src/components/banner/Banner.module.css: .icon svg",
   "src/components/button-group/ButtonGroup.module.css: .icon > svg",
   "src/components/card/Card.module.css: .icon svg",

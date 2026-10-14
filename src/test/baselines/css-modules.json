@@ -1,5 +1,4 @@
 [
-  "src/components/accordion/Accordion.module.css: * 1 factor in translate",
   "src/components/chat/Chat.module.css: * 1 factor in translate",
   "src/components/composer/Composer.module.css: * 1 factor in translate",
   "src/components/composer/Composer.module.css: * 1 factor in translate #2",

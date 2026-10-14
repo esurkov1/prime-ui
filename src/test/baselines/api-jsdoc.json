@@ -1,8 +1,4 @@
 [
-  "src/components/accordion/Accordion.tsx: AccordionBaseProps.layout",
-  "src/components/accordion/Accordion.tsx: AccordionBaseProps.size",
-  "src/components/accordion/Accordion.tsx: AccordionMultipleProps.collapsible",
-  "src/components/accordion/Accordion.tsx: AccordionSingleProps.collapsible",
   "src/components/banner/Banner.tsx: BannerRootProps.onDismiss",
   "src/components/banner/Banner.tsx: BannerRootProps.placement",
   "src/components/banner/Banner.tsx: BannerRootProps.size",

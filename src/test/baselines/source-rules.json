@@ -1,5 +1,4 @@
 [
-  "src/components/accordion/Accordion.tsx: root default size = \"m\"",
   "src/components/avatar/Avatar.tsx: root default size = \"m\"",
   "src/components/banner/Banner.tsx: root default size = \"m\"",
   "src/components/breadcrumb/Breadcrumb.tsx: root default size = \"m\"",

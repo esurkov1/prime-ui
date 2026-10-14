@@ -42,9 +42,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of trigger height, text, icon and padding.",
-          ru: "Ярус высоты заголовка, кегля, иконки и отступов.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Tier of trigger height, text, icon and padding. Without it the tier of its host, else `m`.",
+          ru: "Ярус высоты заголовка, кегля, иконки и отступов. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "layout",
@@ -96,9 +96,16 @@ export const api: ComponentApi = {
     },
     {
       name: "Accordion.Header",
-      en: "`ref` → `HTMLHeadingElement`. The `<h3>` around the trigger.",
-      ru: "Заголовок `<h3>` вокруг кнопки раздела.",
+      en: "`ref` → `HTMLHeadingElement`. The heading around the trigger (`<h3>` unless `as` says otherwise).",
+      ru: "Заголовок вокруг кнопки раздела (`<h3>`, если `as` не задаёт другой уровень).",
       props: [
+        {
+          name: "as",
+          type: '"h2" | "h3" | "h4" | "h5" | "h6"',
+          default: '"h3"',
+          en: "Heading level in the page outline: one below the heading of the section that holds the accordion.",
+          ru: "Уровень заголовка в структуре страницы: на ступень ниже заголовка раздела, где стоит аккордеон.",
+        },
         {
           name: "…rest",
           type: "HTMLAttributes<HTMLHeadingElement>",
@@ -182,8 +189,8 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: "The trigger is a native `<button>` inside an `<h3>` with `aria-expanded` and `aria-controls`.",
-        ru: "Заголовок — нативная `<button>` внутри `<h3>` с `aria-expanded` и `aria-controls`.",
+        en: "The trigger is a native `<button>` inside a heading (`<h3>`, or the level of `as`) with `aria-expanded` and `aria-controls`.",
+        ru: "Заголовок — нативная `<button>` внутри заголовка (`<h3>` или уровень из `as`) с `aria-expanded` и `aria-controls`.",
       },
       {
         en: "The panel is a `<section>` with `aria-labelledby`; closed content is `inert`, so it leaves the tab order and the accessibility tree.",

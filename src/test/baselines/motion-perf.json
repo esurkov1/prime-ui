@@ -1,5 +1,4 @@
 [
-  "src/components/accordion/Accordion.module.css: grid-template-rows 0fr fold outside Disclosure",
   "src/components/chat/Chat.module.css: local @keyframes chatJumpIn",
   "src/components/chat/Chat.module.css: local @keyframes chatJumpOut",
   "src/components/composer/Composer.module.css: local @keyframes composerLockIn",

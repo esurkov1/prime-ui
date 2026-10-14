@@ -1,6 +1,4 @@
 [
-  "src/components/accordion/Accordion.module.css: hover :not(:disabled) ignores aria-disabled",
-  "src/components/accordion/Accordion.module.css: hover :not(:disabled) ignores aria-disabled #2",
   "src/components/button-group/ButtonGroup.module.css: hover :not(:disabled) ignores aria-disabled",
   "src/components/button-group/ButtonGroup.module.css: hover :not(:disabled) ignores aria-disabled #2",
   "src/components/button-group/ButtonGroup.tsx: switcher without SwitcherScroller",

@@ -1,5 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 
 import { Accordion, type AccordionRootProps } from "./Accordion";
 
@@ -150,22 +153,85 @@ describe("Accordion", () => {
     expect(content).toHaveAttribute("data-state", "open");
   });
 
-  it("keyboard Enter opens item", () => {
+  it("Enter and Space on a focused trigger open and close the item", async () => {
+    const user = userEvent.setup();
     renderAccordion();
     const trigger = screen.getByRole("button", { name: /Section 1/ });
     trigger.focus();
-    fireEvent.keyDown(trigger, { key: "Enter" });
-    fireEvent.click(trigger);
+    await user.keyboard("{Enter}");
     expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await user.keyboard(" ");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("keyboard Space opens item", () => {
-    renderAccordion();
-    const trigger = screen.getByRole("button", { name: /Section 2/ });
-    trigger.focus();
-    fireEvent.keyDown(trigger, { key: " " });
-    fireEvent.click(trigger);
-    expect(trigger).toHaveAttribute("aria-expanded", "true");
+  it("Tab moves between triggers and skips a disabled one", async () => {
+    const user = userEvent.setup();
+    renderAccordion([
+      { value: "item-1", label: "Section 1", content: "Content 1" },
+      { value: "disabled", label: "Section 2", content: "Content 2" },
+      { value: "item-3", label: "Section 3", content: "Content 3" },
+    ]);
+    await user.tab();
+    expect(screen.getByRole("button", { name: /Section 1/ })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: /Section 3/ })).toHaveFocus();
+  });
+
+  it("Header renders the heading level from `as` (h3 by default)", () => {
+    render(
+      <Accordion.Root>
+        <Accordion.Item value="a">
+          <Accordion.Header as="h2">
+            <Accordion.Trigger>Section A</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>Content A</Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="b">
+          <Accordion.Header>
+            <Accordion.Trigger>Section B</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content>Content B</Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    expect(screen.getByRole("heading", { level: 2, name: "Section A" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "Section B" })).toBeInTheDocument();
+  });
+
+  it("Content owns its id, labelling and state over the consumer's attributes", () => {
+    render(
+      <Accordion.Root>
+        <Accordion.Item value="a">
+          <Accordion.Header>
+            <Accordion.Trigger>Section A</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content id="custom" aria-labelledby="other" data-state="open">
+            Content A
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>,
+    );
+    const trigger = screen.getByRole("button", { name: "Section A" });
+    const content = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+    expect(content).not.toBeNull();
+    expect(content).toHaveAttribute("aria-labelledby", trigger.id);
+    expect(content).toHaveAttribute("data-state", "closed");
+  });
+
+  it("the root takes the host tier when it has no size", () => {
+    const { container } = render(
+      <ControlSizeProvider value="s">
+        <Accordion.Root>
+          <Accordion.Item value="a">
+            <Accordion.Header>
+              <Accordion.Trigger>Section A</Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content>Content A</Accordion.Content>
+          </Accordion.Item>
+        </Accordion.Root>
+      </ControlSizeProvider>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-size", "s");
   });
 
   it("controlled mode: calls onValueChange", () => {
