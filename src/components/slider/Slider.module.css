@@ -134,9 +134,9 @@
   pointer-events: none;
   transition:
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* Native input: transparent, on top, its thumb matches `.thumb` so hit area = visual. */
@@ -145,7 +145,7 @@
   appearance: none;
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   width: 100%;
   height: 100%;
   margin: 0;
@@ -256,22 +256,24 @@
    The hover lift is for pointers only (foundation §7 rule 10); press works on touch too. */
 @media (hover: hover) and (pointer: fine) {
   .input:not(:disabled):hover ~ .thumb {
-    transform: scale(1.1);
-    background: color-mix(in srgb, var(--slider-thumb-bg) 44%, transparent);
+    transform: scale(var(--prime-motion-scale-hover));
+    background: color-mix(in srgb, var(--slider-thumb-bg) var(--prime-tint-strong), transparent);
     box-shadow:
-      0 0 0 var(--prime-border-width) color-mix(in srgb, var(--slider-thumb-bg) 72%, transparent),
+      0 0 0 var(--prime-border-width)
+      color-mix(in srgb, var(--slider-thumb-bg) var(--prime-tint-heavy), transparent),
       var(--prime-shadow-thumb);
-    backdrop-filter: blur(var(--slider-glass-blur)) saturate(1.6);
+    backdrop-filter: blur(var(--slider-glass-blur)) saturate(var(--prime-glass-saturation));
   }
 }
 
 .input:not(:disabled):active ~ .thumb {
-  transform: scale(1.25);
-  background: color-mix(in srgb, var(--slider-thumb-bg) 20%, transparent);
+  transform: scale(var(--prime-motion-scale-grab));
+  background: color-mix(in srgb, var(--slider-thumb-bg) var(--prime-tint-hover), transparent);
   box-shadow:
-    0 0 0 var(--prime-border-width) color-mix(in srgb, var(--slider-thumb-bg) 80%, transparent),
+    0 0 0 var(--prime-border-width)
+    color-mix(in srgb, var(--slider-thumb-bg) var(--prime-tint-heavy), transparent),
     var(--prime-shadow-thumb);
-  backdrop-filter: saturate(1.8);
+  backdrop-filter: saturate(var(--prime-glass-saturation));
 }
 
 .input:not(:disabled):active {
@@ -301,7 +303,7 @@
 
 /* Saving (`onCommit` returned a promise): the thumb quiets down until the answer, both ways eased. */
 .root[data-pending="true"] .thumb {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 /* A refused commit: the thumb and the fill glide back to the saved value. While a drag or a key
@@ -313,10 +315,10 @@
   transition:
     inset-inline-start var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     inset-block-end var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-settling="true"] .range {

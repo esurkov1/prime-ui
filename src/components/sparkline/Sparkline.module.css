@@ -155,7 +155,7 @@
   transform: translateX(calc(var(--sparkline-x) * 100%));
   transition:
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* A `sum` / `average` headline at rest stands for the whole period: no point is marked. */
@@ -171,7 +171,7 @@
   width: var(--prime-border-width);
   background: var(--prime-color-border-default);
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-scrubbing] .guide {
@@ -191,7 +191,7 @@
   transform: translateY(calc(var(--sparkline-y) * var(--sparkline-h)));
   transition:
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* A point with no data has no place on the line: the guide alone marks it. */
@@ -206,7 +206,7 @@
 }
 
 .root[data-scrubbing] .dot {
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /*
@@ -234,7 +234,7 @@
   position: relative;
   flex: 1 1 0;
   min-width: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .slot[data-quiet] {

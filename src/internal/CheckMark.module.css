@@ -21,12 +21,12 @@
   stroke-dashoffset: 1;
   transform-box: fill-box;
   transform-origin: center;
-  transform: scale(0.6);
+  transform: scale(var(--prime-motion-scale-mark));
   opacity: 0;
   transition:
     stroke-dashoffset var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit);
 }
 
 .svg[data-state="checked"] .check,
@@ -37,5 +37,5 @@
   transition:
     stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }

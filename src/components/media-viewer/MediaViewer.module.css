@@ -76,7 +76,7 @@
 /* The full picture fades in over its thumbnail (or over nothing) once it has decoded. */
 img.media {
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 img.media[data-loaded] {
@@ -117,7 +117,7 @@ img.media[data-loaded] {
   flex-direction: column;
   align-items: center;
   gap: var(--prime-space-3);
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* During the flight only the picture moves: the play disk comes after it lands, goes before it
@@ -159,7 +159,7 @@ img.media[data-loaded] {
 .bottom,
 .strip {
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     translate var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
@@ -267,8 +267,8 @@ img.media[data-loaded] {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
   overflow: hidden;
-  -webkit-backdrop-filter: blur(var(--prime-space-2));
-  backdrop-filter: blur(var(--prime-space-2));
+  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
+  backdrop-filter: blur(var(--prime-media-shade-blur));
 }
 
 .controls {
@@ -279,8 +279,8 @@ img.media[data-loaded] {
   padding: var(--prime-space-1);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-media-pill);
-  -webkit-backdrop-filter: blur(var(--prime-space-2));
-  backdrop-filter: blur(var(--prime-space-2));
+  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
+  backdrop-filter: blur(var(--prime-media-shade-blur));
 }
 
 /* Play · time · seek · length · sound · level, as a native player's bar. */
@@ -323,18 +323,18 @@ img.media[data-loaded] {
   padding: var(--prime-space-3) var(--prime-space-2);
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-media-pill);
-  -webkit-backdrop-filter: blur(var(--prime-space-2));
-  backdrop-filter: blur(var(--prime-space-2));
+  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
+  backdrop-filter: blur(var(--prime-media-shade-blur));
   opacity: 0;
   visibility: hidden;
   translate: -50% var(--prime-space-1);
-  scale: 0.96;
+  scale: var(--prime-motion-scale-enter);
   transform-origin: bottom center;
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     translate var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
     scale var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
-    visibility 0s linear var(--prime-motion-duration-fast);
+    visibility 0s linear var(--prime-motion-fade-fast);
 }
 
 /* The gap between the panel and the button belongs to the panel: the pointer crosses it. */

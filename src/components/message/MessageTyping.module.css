@@ -14,7 +14,7 @@
   opacity: 1;
   transition:
     grid-template-rows var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-xfast) var(--prime-motion-easing-exit);
+    opacity var(--prime-motion-fade-xfast) var(--prime-motion-easing-exit);
 }
 
 .root[data-state="open"] {

@@ -32,7 +32,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: var(--prime-z-above);
   border-radius: inherit;
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-fill-subtle-active);
   pointer-events: none;
@@ -99,11 +99,11 @@
 .image {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+  transition: opacity var(--prime-motion-fade-base) var(--prime-motion-easing-enter);
 }
 
 .image[data-fit="contain"] {
@@ -121,7 +121,7 @@
 .fallback {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: var(--prime-z-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,7 +156,7 @@
    `m`, no duration below `l`. */
 .root .play {
   position: absolute;
-  z-index: 3;
+  z-index: var(--prime-z-top);
   inset: 0;
   inline-size: auto;
   block-size: min(var(--prime-control-l-height), 60%);
@@ -165,15 +165,15 @@
 
 .duration {
   position: absolute;
-  z-index: 3;
+  z-index: var(--prime-z-top);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: var(--prime-color-media-shade);
   color: var(--prime-color-media-shade-fg);
   pointer-events: none;
-  -webkit-backdrop-filter: blur(var(--prime-space-2));
-  backdrop-filter: blur(var(--prime-space-2));
+  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
+  backdrop-filter: blur(var(--prime-media-shade-blur));
   inset-block-end: var(--prime-space-1);
   inset-inline-end: var(--prime-space-1);
   padding-inline: var(--prime-space-1);
@@ -201,7 +201,7 @@
   text-decoration: none;
   cursor: pointer;
   transition:
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -226,7 +226,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: var(--prime-z-above);
   border-radius: inherit;
   box-shadow: inset 0 0 0 var(--prime-focus-width) var(--prime-color-accent-default);
   pointer-events: none;
@@ -235,7 +235,7 @@
 /* The check in the start corner: always shown, so selection never depends on hover. */
 .check {
   position: absolute;
-  z-index: 3;
+  z-index: var(--prime-z-top);
   inset-block-start: var(--prime-space-1);
   inset-inline-start: var(--prime-space-1);
   display: inline-flex;

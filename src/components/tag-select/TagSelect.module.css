@@ -35,8 +35,8 @@
      rule 2). `height: auto` animates where the browser supports it, else it snaps. */
   interpolate-size: allow-keywords;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     height var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
@@ -199,7 +199,7 @@
 }
 
 .control .chip:not([data-color="gray"], [data-disabled="true"]) {
-  background: color-mix(in srgb, currentColor 16%, transparent);
+  background: color-mix(in srgb, currentColor var(--prime-tint-hover), transparent);
 }
 
 /* ─── Panel ──────────────────────────────────────────────────────────────── */
@@ -275,7 +275,7 @@
 /* The «⋯» button shows on the highlighted row, on focus and while its menu is open. */
 .menuTrigger {
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .option[data-highlighted="true"] .menuTrigger,

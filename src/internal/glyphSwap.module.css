@@ -21,7 +21,7 @@
   min-width: 0;
   max-width: 100%;
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -31,14 +31,14 @@
 
 .layer[data-leaving] {
   opacity: 0;
-  transform: scale(0.6);
+  transform: scale(var(--prime-motion-scale-mark));
   pointer-events: none;
 }
 
 @keyframes glyphIn {
   from {
     opacity: 0;
-    transform: scale(0.6);
+    transform: scale(var(--prime-motion-scale-mark));
   }
 }
 

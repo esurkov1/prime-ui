@@ -288,7 +288,11 @@
 }
 
 .cell[data-band="preview"] {
-  --dp-band: color-mix(in srgb, var(--prime-color-accent-soft) 60%, transparent);
+  --dp-band: color-mix(
+    in srgb,
+    var(--prime-color-accent-soft) var(--prime-tint-strong),
+    transparent
+  );
 
   background: var(--dp-band);
 }
@@ -331,8 +335,8 @@
   text-align: center;
   cursor: pointer;
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {

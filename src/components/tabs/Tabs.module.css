@@ -140,7 +140,7 @@
   min-width: 0;
   /* A host zone that lets the bar run edge to edge hands it its side padding
      (`--prime-bleed-inline`, a dialog header); elsewhere it is 0. */
-  margin-inline: calc(-1 * var(--prime-bleed-inline, 0px));
+  margin-inline: calc(-1 * var(--prime-bleed-inline));
   overflow: hidden;
   border-radius: var(--tabs-strip-radius);
   background: var(--prime-color-fill-muted-hover);
@@ -170,10 +170,7 @@
   padding-top: var(--tabs-rise);
   /* Edge to edge of a host zone, the end tabs stand clear of the zone's edge: their flares curve
      fully inside the strip, with a band of strip beyond them. 0 elsewhere (`min` with the bleed). */
-  padding-inline: min(
-    var(--prime-bleed-inline, 0px),
-    calc(var(--tabs-flare) + var(--prime-space-3))
-  );
+  padding-inline: min(var(--prime-bleed-inline), calc(var(--tabs-flare) + var(--prime-space-3)));
 }
 
 /* The column: sections stacked from the top, the folder meets the column's inline-end edge. */
@@ -198,7 +195,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   pointer-events: none;
   opacity: 0;
 }
@@ -217,7 +214,7 @@
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* The folder: the panel surface under the active tab, flaring into the panel at both sides. The
@@ -339,7 +336,7 @@
   text-align: start;
   white-space: nowrap;
   cursor: pointer;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /*
@@ -385,7 +382,7 @@
 /* The content row: icon, label, count — or the two-line grid. Pressing scales it as one. */
 .content {
   position: relative;
-  z-index: 2;
+  z-index: var(--prime-z-above);
   display: inline-flex;
   align-items: center;
   gap: var(--tabs-gap);
@@ -428,10 +425,10 @@
 }
 
 .item::before {
-  z-index: 0;
+  z-index: var(--prime-z-base);
   background: var(--prime-color-fill-faint);
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {
@@ -443,7 +440,7 @@
 
 /* The focus ring sits above the folder, in the same shape. */
 .tab::after {
-  z-index: 2;
+  z-index: var(--prime-z-above);
 }
 
 .tab:focus-visible::after {
@@ -483,11 +480,11 @@
   position: absolute;
   inset-inline-end: var(--prime-space-2);
   top: 50%;
-  z-index: 2;
+  z-index: var(--prime-z-above);
   display: flex;
   opacity: 0;
   transform: translateY(-50%);
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* Shown on the active tab, on hover and while the tab has focus — always on touch screens. */
@@ -518,7 +515,7 @@
   height: var(--tabs-icon);
   line-height: 0;
   color: var(--prime-color-text-muted);
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .icon svg {

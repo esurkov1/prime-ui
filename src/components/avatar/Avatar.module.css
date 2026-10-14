@@ -61,12 +61,12 @@
 .image {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   border-radius: inherit;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+  transition: opacity var(--prime-motion-fade-base) var(--prime-motion-easing-enter);
 }
 
 .image[data-status="loading"] {
@@ -80,7 +80,7 @@
 .fallback {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: var(--prime-z-base);
   border-radius: inherit;
   display: flex;
   align-items: center;
@@ -109,7 +109,7 @@
   position: absolute;
   inset-block-end: 0;
   inset-inline-end: 0;
-  z-index: 2;
+  z-index: var(--prime-z-above);
   box-sizing: border-box;
   display: flex;
   align-items: center;

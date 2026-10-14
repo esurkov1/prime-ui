@@ -18,7 +18,7 @@
   letter-spacing: var(--prime-text-caption-tracking);
   color: var(--prime-color-text-muted);
   overflow-wrap: anywhere;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-size="xs"] {

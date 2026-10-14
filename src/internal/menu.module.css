@@ -93,8 +93,8 @@
   user-select: none;
   outline: none;
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
 .item[data-highlighted="true"] {
@@ -215,7 +215,7 @@
   align-items: center;
   border-bottom: var(--prime-border-width) solid var(--prime-color-border-faint);
   color: var(--prime-color-text-muted);
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .searchRow:focus-within {

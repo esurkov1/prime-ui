@@ -16,8 +16,8 @@
   background: var(--prime-color-media-shade);
   color: var(--prime-color-media-shade-fg);
   pointer-events: none;
-  -webkit-backdrop-filter: blur(var(--prime-space-2));
-  backdrop-filter: blur(var(--prime-space-2));
+  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
+  backdrop-filter: blur(var(--prime-media-shade-blur));
 }
 
 /* The caption of a voice message's time row: the same size, weight and muted tone, on a pill

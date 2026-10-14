@@ -50,7 +50,7 @@
   overflow: hidden;
   border-radius: inherit;
   background: var(--hue-soft);
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* No format: the document glyph on the muted fill. */
@@ -80,13 +80,13 @@
    are the circle's. It adds a fade to the Button's own transitions. */
 .tile > .action {
   position: absolute;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   inset: 0;
   opacity: 0;
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -126,7 +126,7 @@
  */
 .disk {
   position: absolute;
-  z-index: 2;
+  z-index: var(--prime-z-above);
   inset: 0;
 }
 

@@ -171,7 +171,7 @@
 
 /* A series turned off in the legend: its marks stay mounted and fade, the axes keep their scale. */
 .plot :where([data-hidden]) {
-  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .plot :where([data-hidden="true"]) {
@@ -233,8 +233,8 @@
   cursor: pointer;
   appearance: none;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -261,7 +261,7 @@
   border-radius: var(--prime-radius-full);
   background: var(--chart-frame-swatch);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--chart-frame-swatch);
-  transition: background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 /* Hidden: the swatch is a ring (a shape change, not only a color one) and the name goes quiet. */

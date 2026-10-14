@@ -158,7 +158,7 @@
 @keyframes messageSelectIn {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(var(--prime-motion-scale-enter));
   }
 }
 
@@ -216,7 +216,7 @@
 
 .fill {
   position: absolute;
-  z-index: -1;
+  z-index: var(--prime-z-below);
   inset: 0;
   display: none;
   border-radius: inherit;
@@ -272,7 +272,7 @@
  */
 .bubble[data-shell="bubble"] > [data-message-bleed][data-count] {
   min-inline-size: min(var(--prime-gallery-min-size), 85cqi);
-  max-block-size: var(--prime-message-media-max-height);
+  max-block-size: var(--prime-gallery-max-size);
 }
 
 /* Media: a picture or an album without a caption is the shape — no padding, no backing. */
@@ -370,7 +370,7 @@
 .column,
 .retry {
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     filter var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -378,7 +378,7 @@
    as one surface — never the part alone inside the bubble's clip. */
 .column {
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     filter var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
@@ -483,7 +483,7 @@
 /* Over a picture or a circle: the header on the media pill at the top-start corner. */
 .authorPill {
   position: absolute;
-  z-index: 4;
+  z-index: var(--prime-z-cover);
   inset-block-start: var(--prime-space-2);
   inset-inline-start: var(--prime-space-2);
   max-inline-size: calc(100% - 2 * var(--prime-space-2));
@@ -531,14 +531,14 @@
   border: 0;
   border-inline-start: calc(var(--prime-border-width) * 3) solid var(--hue-text);
   border-radius: var(--prime-radius-s);
-  background: color-mix(in srgb, var(--hue-text) 10%, transparent);
+  background: color-mix(in srgb, var(--hue-text) var(--prime-tint-soft), transparent);
   color: var(--prime-color-text-primary);
   font: inherit;
   font-size: var(--prime-text-body-s-size);
   line-height: var(--prime-text-body-s-line-height);
   text-align: start;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -553,7 +553,7 @@ button.reply {
 
 @media (hover: hover) {
   button.reply:hover {
-    background: color-mix(in srgb, var(--hue-text) 16%, transparent);
+    background: color-mix(in srgb, var(--hue-text) var(--prime-tint-hover), transparent);
   }
 }
 
@@ -664,7 +664,7 @@ button.reply:focus-visible {
 .meta.metaOverlay {
   position: absolute;
   /* Above the picture's own layers (image, play mark, upload shade). */
-  z-index: 4;
+  z-index: var(--prime-z-cover);
   inset-block-end: var(--prime-space-2);
   inset-inline-end: var(--prime-space-2);
   color: var(--prime-color-media-pill-fg);
@@ -684,9 +684,9 @@ button.reply:focus-visible {
   display: inline-flex;
   grid-area: 1 / 1;
   opacity: 0;
-  transform: scale(0.8);
+  transform: scale(var(--prime-motion-scale-pop));
   transition:
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
@@ -830,7 +830,7 @@ button.reply:focus-visible {
   cursor: pointer;
   transition:
     --msg-chip-fill var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -903,7 +903,7 @@ button.reply:focus-visible {
   min-width: 0;
   overflow: hidden;
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     inline-size var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -939,20 +939,20 @@ button.reply:focus-visible {
 /* A reactor who joins fades and scales in from 0.9; one who leaves, the reverse. */
 .stackAvatar {
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-enter),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-enter),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-enter);
 }
 
 @starting-style {
   .stackAvatar[data-fresh] {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(var(--prime-motion-scale-settle));
   }
 }
 
 .stackAvatar[data-leaving] {
   opacity: 0;
-  transform: scale(0.9);
+  transform: scale(var(--prime-motion-scale-settle));
   transition-timing-function: var(--prime-motion-easing-exit);
 }
 
@@ -961,7 +961,7 @@ button.reply:focus-visible {
  * cleanly), half the circle high to stay readable at `xs`.
  */
 .reaction .stackOverflow {
-  background: color-mix(in srgb, currentColor 16%, var(--msg-chip-fill));
+  background: color-mix(in srgb, currentColor var(--prime-tint-hover), var(--msg-chip-fill));
   color: inherit;
   font-size: calc(var(--prime-avatar-xs) / 2);
 }

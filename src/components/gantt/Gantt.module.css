@@ -33,9 +33,9 @@
   --gantt-column-edge-depth: var(--prime-space-2);
   --gantt-edge-dir: to right;
 
-  --gantt-z-column: 2;
-  --gantt-z-head: 3;
-  --gantt-z-corner: 4;
+  --gantt-z-column: var(--prime-z-above);
+  --gantt-z-head: var(--prime-z-top);
+  --gantt-z-corner: var(--prime-z-cover);
 
   container-type: inline-size;
   display: flex;
@@ -208,7 +208,7 @@
   position: absolute;
   inset-block: 0;
   inset-inline-end: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   width: var(--gantt-edge-depth);
   pointer-events: none;
   background: linear-gradient(
@@ -217,7 +217,7 @@
     var(--prime-color-bg-edge-shadow)
   );
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-overflow-end="true"] .frame::after {
@@ -309,7 +309,7 @@
  */
 .tier:first-child {
   /* Quieter than any text role: a reference mark behind the data, never a heading. */
-  color: color-mix(in srgb, var(--prime-color-text-disabled) 55%, transparent);
+  color: color-mix(in srgb, var(--prime-color-text-disabled) var(--prime-tint-strong), transparent);
 }
 
 /* A month or a year keeps its name in view while its cell scrolls under the first column. */
@@ -351,7 +351,7 @@
 .tierCell[data-today="true"] .tierText {
   position: relative;
   inset-inline-start: auto;
-  z-index: 2;
+  z-index: var(--prime-z-above);
   /* The kit's chip radius, not a pill: one digit reads as a small rectangle, wider than tall. */
   padding-inline: var(--prime-space-2);
   border-radius: var(--prime-badge-s-radius);
@@ -369,7 +369,7 @@
   position: absolute;
   inset-block: 0;
   inset-inline-start: calc(var(--x) * var(--gantt-day));
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   width: 0;
   pointer-events: none;
 }
@@ -388,7 +388,7 @@
   top: calc((var(--gantt-tier-h) - var(--prime-badge-m-height)) / 2);
   /* A flag on the line: it starts at the line and its square corner sits on it. */
   inset-inline-start: calc(var(--prime-border-width) * -1);
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   display: inline-flex;
   align-items: center;
   height: var(--prime-badge-m-height);
@@ -480,7 +480,7 @@
 /* While loading, the column lines and the today line lie over the skeleton bars, so they stay
    whole; the weekend wash stays under them, so a bar keeps one even fill. */
 .body[data-state="loading"] .backdropLines {
-  z-index: 1;
+  z-index: var(--prime-z-raised);
 }
 
 .todayLine {
@@ -546,11 +546,11 @@
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: var(--prime-z-below);
   pointer-events: none;
   background: var(--prime-color-fill-subtle-active);
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {
@@ -597,7 +597,7 @@
     transparent
   );
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-overflow-start="true"] .rowHeader::after,
@@ -671,12 +671,12 @@
   transition:
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .bar[data-progress="true"] {
-  --bar-progress: color-mix(in oklab, var(--bar-solid) 32%, var(--bar-bg));
+  --bar-progress: color-mix(in oklab, var(--bar-solid) var(--prime-tint-line), var(--bar-bg));
 
   background: linear-gradient(
     var(--gantt-edge-dir),
@@ -722,7 +722,7 @@
 }
 
 .bar:focus-visible {
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
   outline-offset: var(--prime-focus-offset);
 }
@@ -730,7 +730,7 @@
 /* A bar is a whole surface: it lifts on hover instead of changing its fill (foundation §8). */
 @media (hover: hover) and (pointer: fine) {
   .bar:hover {
-    z-index: 1;
+    z-index: var(--prime-z-raised);
     box-shadow: var(--prime-shadow-raised);
   }
 }
@@ -744,12 +744,12 @@
  * or size) and stays lifted; on release it glides to the whole day it snapped to.
  */
 .bar[data-dragging] {
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   box-shadow: var(--prime-shadow-overlay);
   cursor: grabbing;
   transition:
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* Where a dragged edge lands at the week and month zoom: a faint accent tick on the snapped day. */
@@ -759,8 +759,11 @@
   inset-inline-start: calc(var(--x) * var(--gantt-day));
   width: calc(var(--prime-border-width) * 2);
   margin-inline-start: calc(var(--prime-border-width) * -1);
-  background: var(--prime-color-accent-default);
-  opacity: 0.5;
+  background: color-mix(
+    in srgb,
+    var(--prime-color-accent-default) var(--prime-tint-strong),
+    transparent
+  );
   pointer-events: none;
 }
 
@@ -769,7 +772,7 @@
 }
 
 .bar[data-pending="true"] {
-  opacity: 0.72;
+  opacity: var(--prime-opacity-busy);
   cursor: progress;
 }
 
@@ -861,7 +864,7 @@
   border-radius: var(--prime-radius-full);
   background: currentColor;
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .bar[data-dragging] .handle::after {
@@ -951,7 +954,7 @@
   transition:
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
     width var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit);
   outline: none;
 }
 

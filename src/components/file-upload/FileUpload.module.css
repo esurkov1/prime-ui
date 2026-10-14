@@ -34,8 +34,8 @@
   text-align: center;
   cursor: pointer;
   transition:
-    border-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    border-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-size="xs"] {
@@ -144,8 +144,8 @@
   background: var(--prime-color-fill-muted);
   color: var(--prime-color-text-muted);
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-state="active"] .icon {
@@ -358,11 +358,11 @@
 /* A row whose removal is being saved (`onRemove` returned a promise): its content quiets down
    while the remove button spins, both ways eased. */
 .queueRow .item > :not(.itemActions) {
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .queueRow[data-pending="true"] .item > :not(.itemActions) {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 /* The list's add tile (`trigger="tile"`): a dashed row at the end of the rows. */
@@ -494,9 +494,9 @@
   text-align: center;
   cursor: pointer;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    border-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    border-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .addTarget:has(input:focus-visible) {
@@ -548,7 +548,7 @@
 /* At the limit the tile stays to say so, but takes nothing. */
 .add[data-full] .addTarget {
   cursor: default;
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 @media (hover: hover) {

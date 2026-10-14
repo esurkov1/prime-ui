@@ -37,7 +37,7 @@
 }
 
 .trigger:disabled .swatch {
-  opacity: 0.5;
+  opacity: var(--prime-opacity-disabled);
 }
 
 /* The area and four channel fields fit; never wider than the viewport allows the popover. */

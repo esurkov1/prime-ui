@@ -141,11 +141,11 @@
 
 /* A column whose move is being saved: its heading quiets down until the answer, both ways eased. */
 .header > :not(.gripSpinner) {
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .column[data-pending] .header > :not(.gripSpinner) {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 .title {
@@ -264,7 +264,7 @@
   background: var(--prime-color-control-selected);
   box-shadow: var(--prime-shadow-raised);
   list-style: none;
-  transition: box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* plain / line: no well to be the thumb of — the card is a surface of its own on the board's host (white
@@ -281,7 +281,7 @@
   /* `[data-dnd-hover]`: a card dropped under the mouse lands straight into this look (Dnd). */
   /* A card that opens lifts on a read-only board too. */
   .item:is(:not([data-disabled]), [data-clickable], [data-link]):is(:hover, [data-dnd-hover]) {
-    z-index: 1;
+    z-index: var(--prime-z-raised);
     box-shadow: var(--prime-shadow-overlay);
   }
 }
@@ -306,7 +306,7 @@
 .itemLink {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   border-radius: inherit;
   outline: none;
   cursor: inherit;
@@ -346,7 +346,7 @@
     [data-row-click-ignore]
   ) {
   position: relative;
-  z-index: 2;
+  z-index: var(--prime-z-above);
 }
 
 /*
@@ -354,11 +354,11 @@
  * its content quiets down under a spinner until the answer, both ways eased (DataTable's busy row).
  */
 .item > * {
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .item[data-pending] > :not(.itemSpinner) {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 .item[data-pending] {

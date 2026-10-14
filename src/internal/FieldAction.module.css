@@ -22,8 +22,8 @@
   text-decoration: none;
   cursor: pointer;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .action svg {
@@ -66,7 +66,7 @@
 .copyGlyphs > svg {
   grid-area: 1 / 1;
   transition:
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-enter),
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
 }
 

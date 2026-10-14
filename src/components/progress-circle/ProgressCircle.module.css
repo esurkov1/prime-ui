@@ -111,7 +111,7 @@
 /* The host's text color: the arc in it over a 32% track of it (a colored host, media). */
 .root[data-tone="inherit"] {
   --pc-fill: currentColor;
-  --pc-rest: color-mix(in srgb, currentColor 32%, transparent);
+  --pc-rest: color-mix(in srgb, currentColor var(--prime-tint-line), transparent);
 }
 
 /* A category color: the hue's step of the chart palette (`palette.hue` on the same element). */
@@ -145,7 +145,7 @@
   transition:
     stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
     stroke-dasharray var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    stroke var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    stroke var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .cap {

@@ -14,14 +14,14 @@
   /* The turning ring is a compositor layer. Paint containment clips its animated bounds to the box
      (the ring is round, nothing is lost), so the turning square's corners never overlap what
      follows the spinner and promote it to layers of its own; it also makes the root a stacking
-     context in which the ring (z-index 1) is painted last, after the visually hidden label. */
+     context in which the ring (`--prime-z-raised`) is painted last, after the visually hidden label. */
   contain: paint;
 }
 
 /* Two classes: the ring's own defaults never win over the host's. */
 .root > .ring {
-  --ring-track: color-mix(in srgb, currentColor 18%, transparent);
+  --ring-track: color-mix(in srgb, currentColor var(--prime-tint-hover), transparent);
 
   position: relative;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
 }

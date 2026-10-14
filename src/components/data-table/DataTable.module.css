@@ -42,11 +42,11 @@
   --dt-divider-width: var(--prime-border-width);
   --dt-column-divider-width: var(--prime-border-width);
 
-  --dt-z-sticky-first-column: 1;
+  --dt-z-sticky-first-column: var(--prime-z-raised);
   /* A sticky group header rides over the sticky first column, under the head. */
-  --dt-z-sticky-group: 2;
-  --dt-z-sticky-header: 3;
-  --dt-z-sticky-corner: 4;
+  --dt-z-sticky-group: var(--prime-z-above);
+  --dt-z-sticky-header: var(--prime-z-top);
+  --dt-z-sticky-corner: var(--prime-z-cover);
 
   /* Edge cue: a soft shadow over the edge that hides columns, tuned per theme. */
   --dt-edge-depth: var(--prime-space-4);
@@ -222,11 +222,11 @@
   content: "";
   position: absolute;
   inset-block: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   width: var(--dt-edge-depth);
   pointer-events: none;
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .frame::before {
@@ -337,7 +337,7 @@
   cursor: pointer;
   user-select: none;
   vertical-align: middle;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .headCell[data-align="end"] .sortButton {
@@ -372,7 +372,7 @@
   flex-shrink: 0;
   /* Quiet by design: the header is chrome, the data is the content. */
   color: var(--prime-color-text-disabled);
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .sortButton:focus-visible .sortIcon {
@@ -409,8 +409,7 @@
   color: var(--prime-color-text-primary);
   text-align: start;
   vertical-align: middle;
-  transition: background-color var(--prime-motion-duration-xfast)
-    var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
 .cell[data-align="center"] {
@@ -506,12 +505,12 @@
 /* A row whose move is being saved: its content quiets down until the answer, both ways eased. */
 .root[data-reorderable="true"] .row > .cell {
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .row[aria-busy="true"] > .cell:not(.handleCell) {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 .chevron {
@@ -538,7 +537,7 @@
   height: auto;
   padding-block: 0;
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
     border-top-width var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
@@ -548,7 +547,7 @@
   opacity: 1;
   transition:
     grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .foldItem {
@@ -680,7 +679,7 @@
   opacity: 0;
   transition:
     grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .detailRow[data-state="open"] .detailMotion {
@@ -688,7 +687,7 @@
   opacity: 1;
   transition:
     grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-enter);
 }
 
 .detailRow[data-state="open"][data-animate="true"] .detailMotion {
@@ -799,7 +798,7 @@
     [data-row-click-ignore]
   ) {
   position: relative;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
 }
 
 /*
@@ -944,7 +943,7 @@ tbody + tbody > .groupRow > .groupCell {
   pointer-events: none;
   opacity: 0;
   background: linear-gradient(var(--dt-edge-dir), var(--dt-edge-shadow), transparent);
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-overflow-start="true"] .firstColumnSticky::after {

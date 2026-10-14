@@ -46,7 +46,7 @@
   border-radius: var(--prime-radius-l);
   background: var(--prime-color-fill-muted);
   list-style: none;
-  transition: box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .image {
@@ -60,7 +60,7 @@
   pointer-events: none;
   user-select: none;
   -webkit-user-drag: none;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* A video tile: a Thumbnail of the `m` tier (first frame, play mark; no duration of its own — the
@@ -73,7 +73,7 @@
   border-radius: inherit;
   pointer-events: none;
   user-select: none;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /*
@@ -99,7 +99,7 @@
   color: var(--prime-color-text-muted);
   pointer-events: none;
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -121,7 +121,7 @@
   position: absolute;
   inset-inline: 0;
   inset-block-end: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   box-sizing: border-box;
   display: flex;
   align-items: baseline;
@@ -171,7 +171,7 @@
 
 /* A change the owner is still saving: the content quiets down, its delete button spins. */
 .tile[data-pending] :is(.image, .media, .sheet, .band) {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 .tile[data-pending] {
@@ -181,7 +181,7 @@
 /* A shade on the picture under the pill or the remove button: one control `xs` square. */
 .chip {
   position: absolute;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   inset-block-start: var(--prime-space-2);
   display: inline-flex;
   align-items: center;
@@ -192,8 +192,8 @@
   border-radius: var(--prime-control-xs-radius);
   background: var(--prime-color-media-shade);
   color: var(--prime-color-media-shade-fg);
-  -webkit-backdrop-filter: blur(var(--prime-space-2));
-  backdrop-filter: blur(var(--prime-space-2));
+  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
+  backdrop-filter: blur(var(--prime-media-shade-blur));
 }
 
 /* The pill: the format or «Обложка», a small quiet tag, well under the remove button's size. */
@@ -224,7 +224,7 @@
 .remove {
   inset-inline-end: var(--prime-space-2);
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -233,12 +233,12 @@
   /* A busy tile keeps its spinning delete button in view. */
   .tile:not(:hover, :focus-within, [data-pending]) .remove {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(var(--prime-motion-scale-settle));
   }
 
   /* Hover lifts the tile on the overlay shadow instead of washing the picture. */
   .tile:not([data-disabled]):is(:hover, [data-dnd-hover]) {
-    z-index: 1;
+    z-index: var(--prime-z-raised);
     box-shadow: var(--prime-shadow-overlay);
   }
 
@@ -262,19 +262,19 @@
  */
 .tile:is([data-upload="queued"], [data-upload="loading"], [data-upload="failed"]) .image,
 .tile:is([data-upload="queued"], [data-upload="loading"], [data-upload="failed"]) .media {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 .tile:is([data-upload="queued"], [data-upload="loading"], [data-upload="failed"]) .sheet {
   opacity: 0;
-  transform: scale(0.9);
+  transform: scale(var(--prime-motion-scale-settle));
 }
 
 /* Over the content, under the pill and the remove button (later in the tile, same layer). */
 .uploadLayer {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   border-radius: inherit;
   pointer-events: none;
 }

@@ -127,7 +127,7 @@
   text-align: start;
   overflow-wrap: anywhere;
   cursor: pointer;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* The trigger reaches the surface's edges: a one-step wash would land on the host's color there, so
@@ -177,7 +177,7 @@
   margin-inline-start: auto;
   color: var(--prime-color-text-muted);
   transition:
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
@@ -249,7 +249,7 @@
   opacity: 0;
   translate: 0 calc(-1 * var(--prime-space-1));
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit),
     translate var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
 }
 
@@ -257,7 +257,7 @@
   opacity: 1;
   translate: 0 0;
   transition:
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter),
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-enter),
     translate var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
 }
 

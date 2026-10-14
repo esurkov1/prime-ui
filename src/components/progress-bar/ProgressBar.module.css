@@ -213,7 +213,7 @@
   translate: calc(var(--pb-dir) * (var(--pb-ratio) - 1) * 100%) 0;
   transition:
     translate var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
-    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 /*
@@ -243,7 +243,7 @@
   background: var(--pb-fill);
   transition:
     flex-grow var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
-    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 /* `hairline`: every part and the free rest are separate pills with a gap of ¾T. */
@@ -296,7 +296,7 @@
   transform-origin: left center;
   transition:
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
   transition-delay: calc(var(--pb-step-order) * var(--prime-motion-stagger) / 2);
 }
 

@@ -74,7 +74,7 @@
 /* ---- Thumbs (slider + area) ---- */
 .thumb,
 .thumbArea {
-  z-index: 2;
+  z-index: var(--prime-z-above);
   box-sizing: border-box;
   width: var(--cp-thumb, var(--prime-control-m-choice));
   height: var(--cp-thumb, var(--prime-control-m-choice));

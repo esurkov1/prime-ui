@@ -41,7 +41,7 @@ a.mapFrame:focus-visible {
   --prime-icon-size: var(--prime-icon-s);
 
   position: absolute;
-  z-index: 3;
+  z-index: var(--prime-z-top);
   inset: 0;
   display: grid;
   place-items: center;
@@ -59,7 +59,7 @@ a.mapFrame:focus-visible {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: var(--prime-z-below);
   border-radius: inherit;
   background: var(--prime-color-accent-default);
   animation: livePulse calc(var(--prime-motion-loop) * 3) var(--prime-motion-easing-enter) infinite;
@@ -73,7 +73,7 @@ a.mapFrame:focus-visible {
 
   to {
     opacity: 0;
-    transform: scale(2);
+    transform: scale(var(--prime-motion-scale-pulse));
   }
 }
 
@@ -167,7 +167,7 @@ a.mapFrame:focus-visible {
   line-height: var(--prime-text-body-s-line-height);
   text-decoration: none;
   overflow-wrap: anywhere;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {

@@ -548,12 +548,12 @@ describe("SegmentedControl — цвет пунктов", () => {
     await waitFor(() => expect(thumb).not.toHaveAttribute("data-color"));
   });
 
-  it("цвет бегунка анимируется тем же токеном движения, что и положение", () => {
+  it("цвет бегунка меняется на fade-такте той же длины, что и движение", () => {
     const css = readFileSync(segmentedModuleCssPath, "utf8");
     const rule = css.slice(css.indexOf('.thumb[data-animate="true"] {'));
     const block = rule.slice(0, rule.indexOf("}"));
-    expect(block).toMatch(/background-color var\(--prime-motion-duration-base\)/);
-    expect(block).toMatch(/box-shadow var\(--prime-motion-duration-base\)/);
+    expect(block).toMatch(/background-color var\(--prime-motion-fade-base\)/);
+    expect(block).toMatch(/box-shadow var\(--prime-motion-fade-base\)/);
   });
 });
 

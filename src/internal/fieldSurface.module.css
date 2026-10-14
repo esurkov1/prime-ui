@@ -21,8 +21,8 @@
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
   color: var(--prime-color-text-primary);
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {

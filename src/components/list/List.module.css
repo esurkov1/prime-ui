@@ -117,8 +117,8 @@
   text-decoration: none;
   cursor: pointer;
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
 /* Inside the row edge: a scrolling pane never cuts the ring. */
@@ -268,11 +268,11 @@
 /* A row whose move is being saved quiets down until the answer, both ways eased. */
 .sortableRow > .item {
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .sortableRow[aria-busy="true"] > .item {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
