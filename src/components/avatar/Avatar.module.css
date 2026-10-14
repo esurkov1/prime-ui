@@ -1,11 +1,10 @@
 /*
- * Avatar — circle sized by `--prime-avatar-<tier>`; fallback initials use palette hues.
- * A host slot may size the avatar to itself by setting `--avatar-slot-size`; it wins over the
- * `size` tier.
+ * Avatar — circle sized by `--prime-avatar-<tier>` (a host sizes it through `size`); fallback
+ * initials use palette hues.
  */
 .root,
 .overflow {
-  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-m));
+  --avatar-size: var(--prime-avatar-m);
 
   position: relative;
   box-sizing: border-box;
@@ -38,23 +37,23 @@
 }
 
 :is(.root, .overflow)[data-size="xs"] {
-  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-xs));
+  --avatar-size: var(--prime-avatar-xs);
 }
 
 :is(.root, .overflow)[data-size="s"] {
-  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-s));
+  --avatar-size: var(--prime-avatar-s);
 }
 
 :is(.root, .overflow)[data-size="l"] {
-  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-l));
+  --avatar-size: var(--prime-avatar-l);
 }
 
 :is(.root, .overflow)[data-size="xl"] {
-  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-xl));
+  --avatar-size: var(--prime-avatar-xl);
 }
 
 :is(.root, .overflow)[data-size="2xl"] {
-  --avatar-size: var(--avatar-slot-size, var(--prime-avatar-2xl));
+  --avatar-size: var(--prime-avatar-2xl);
 }
 
 /* ─── Parts ─────────────────────────────────────────────────────────────── */

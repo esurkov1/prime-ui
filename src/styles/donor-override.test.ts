@@ -7,7 +7,7 @@
  *   outside the public hooks. A variable only one directory sets and every reader takes without a
  *   fallback is that directory's output, not a host override: a tier table or a hue map (chipTier,
  *   fieldTier, menu, palette) is the one home of the values its hosts read. A donor's own hook is
- *   read with a fallback (`var(--avatar-slot-size, …)`), or the donor sets it too.
+ *   read with a fallback (`var(--avatar-ring, …)`), or the donor sets it too.
  * - `:global(html …)` only in Dnd (the drag cursor).
  *
  * In ratchet mode (`donor-override`): the overrides found when the guard landed are the baseline.
