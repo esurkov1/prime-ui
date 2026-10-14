@@ -1,8 +1,11 @@
 /*
  * Chip tiers (`--prime-badge-<tier>-*`: 16 · 20 · 24 · 28 · 32) shared by Badge and Kbd. Put
- * `.tier` on the element that carries `data-tier` (`useChipTier` in `chipTier.ts`); its CSS reads
- * `--chip-h`, `--chip-px`, `--chip-gap`, `--chip-radius`, `--chip-text`, and nested kit icons take
- * `--prime-icon-size`. No `data-tier` → `m`.
+ * `.tier` on the chip itself, the element that carries `data-tier` (`useChipTier` in
+ * `chipTier.ts`): it draws the chip box of the tier — height (and as much min-width), side
+ * padding, gap, radius, text size — and nested kit icons take `--prime-icon-size`. The box has no
+ * specificity, so a host's own rule wins in any file order (Badge moves its side padding onto
+ * edge segments); the host reads `--chip-px`, `--chip-gap`, `--chip-h` for its own parts.
+ * No `data-tier` → `m`.
  */
 .tier {
   --chip-h: var(--prime-badge-m-height);
@@ -11,6 +14,16 @@
   --chip-radius: var(--prime-badge-m-radius);
   --chip-text: var(--prime-badge-m-text-size);
   --prime-icon-size: var(--prime-badge-m-icon);
+}
+
+:where(.tier) {
+  box-sizing: border-box;
+  gap: var(--chip-gap);
+  height: var(--chip-h);
+  min-width: var(--chip-h);
+  padding-inline: var(--chip-px);
+  border-radius: var(--chip-radius);
+  font-size: var(--chip-text);
 }
 
 .tier[data-tier="xs"] {

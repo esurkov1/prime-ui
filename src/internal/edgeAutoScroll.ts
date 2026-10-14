@@ -11,16 +11,16 @@ import { type ScrollAxes, scrollAxes, scrollableAncestors } from "@/internal/scr
  */
 
 /** Distance from an edge where the scroller starts to move (`--prime-space-16`). */
-export const EDGE_ZONE_PX = 64;
+const EDGE_ZONE_PX = 64;
 /** Top speed, on the edge itself. */
-export const MAX_SPEED_PX_PER_MS = 1.1;
+const MAX_SPEED_PX_PER_MS = 1.1;
 /**
  * The longest step one frame may take: a frame that comes late (a busy main thread, a tab coming
  * back) moves as far as two frames at 60 Hz, never a jump.
  */
 const MAX_FRAME_MS = 32;
 
-export type EdgePoint = { x: number; y: number };
+type EdgePoint = { x: number; y: number };
 
 /**
  * How far in from a scroller's edges its zones start, in px, by logical side: a scroller with a

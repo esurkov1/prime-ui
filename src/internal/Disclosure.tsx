@@ -73,7 +73,7 @@ export function useDisclosure({ open, appear = false }: DisclosureOptions): Disc
   };
 }
 
-export type DisclosureProps = React.HTMLAttributes<HTMLDivElement> &
+type DisclosureProps = React.HTMLAttributes<HTMLDivElement> &
   DisclosureOptions & {
     ref?: React.Ref<HTMLDivElement>;
   };

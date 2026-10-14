@@ -44,48 +44,35 @@
 
 /*
  * ---- Tier of a swatch grid ----
- * A swatch is the base − 8. The base is the control height (28 · 32 · 36 · 40 · 48 → swatches
- * 20 · 24 · 28 · 32 · 40), or with `data-base="item"` the menu item height (24 · 28 · 32 · 36 · 40
- * → swatches 16 · 20 · 24 · 28 · 32); gap = control gap; radius steps with size.
+ * On the grid element, with the field tier (`fieldTierClass`, joined by `swatchTierClass`) and
+ * `data-size`. A swatch is the base − 8. The base is the control height `--field-h`
+ * (28 · 32 · 36 · 40 · 48 → swatches 20 · 24 · 28 · 32 · 40), or with `data-base="item"` the menu
+ * item height `--field-item-h` (24 · 28 · 32 · 36 · 40 → swatches 16 · 20 · 24 · 28 · 32); the gap
+ * between swatches is the tier gap; the radius steps with size.
  */
 .tier {
-  --swatch-base-control: var(--prime-control-m-height);
-  --swatch-base-item: var(--prime-control-m-item-height);
-  --swatch-base: var(--swatch-base-control);
+  --swatch-base: var(--field-h);
   --swatch-size: calc(var(--swatch-base) - var(--prime-space-2));
   --swatch-radius: var(--prime-radius-s);
-  --swatch-gap: var(--prime-control-m-gap);
+  --swatch-gap: var(--field-gap);
+}
+
+/* The grid spacing; no specificity, so the host lays the grid out in any file order. */
+:where(.tier) {
+  gap: var(--swatch-gap);
 }
 
 .tier[data-base="item"] {
-  --swatch-base: var(--swatch-base-item);
+  --swatch-base: var(--field-item-h);
 }
 
 .tier[data-size="xs"] {
-  --swatch-base-control: var(--prime-control-xs-height);
-  --swatch-base-item: var(--prime-control-xs-item-height);
   --swatch-radius: var(--prime-radius-xs);
-  --swatch-gap: var(--prime-control-xs-gap);
 }
 
-.tier[data-size="s"] {
-  --swatch-base-control: var(--prime-control-s-height);
-  --swatch-base-item: var(--prime-control-s-item-height);
-  --swatch-gap: var(--prime-control-s-gap);
-}
-
-.tier[data-size="l"] {
-  --swatch-base-control: var(--prime-control-l-height);
-  --swatch-base-item: var(--prime-control-l-item-height);
-  --swatch-radius: var(--prime-radius-m);
-  --swatch-gap: var(--prime-control-l-gap);
-}
-
+.tier[data-size="l"],
 .tier[data-size="xl"] {
-  --swatch-base-control: var(--prime-control-xl-height);
-  --swatch-base-item: var(--prime-control-xl-item-height);
   --swatch-radius: var(--prime-radius-m);
-  --swatch-gap: var(--prime-control-xl-gap);
 }
 
 /* Touch: a swatch is a cell of a dense grid and its `::after` draws the inner edge, so its hit area
@@ -94,14 +81,14 @@
 @media (pointer: coarse) {
   .tier {
     --swatch-base: max(
-      var(--swatch-base-control),
+      var(--field-h),
       calc(var(--prime-control-touch-target) + var(--prime-space-2))
     );
   }
 
   .tier[data-base="item"] {
     --swatch-base: max(
-      var(--swatch-base-item),
+      var(--field-item-h),
       calc(var(--prime-control-touch-target) + var(--prime-space-2))
     );
   }

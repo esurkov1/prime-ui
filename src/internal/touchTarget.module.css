@@ -22,7 +22,8 @@
   .targetBlock::after {
     content: "";
     position: absolute;
-    inset: min(0px, calc((100% - var(--prime-control-touch-target)) / 2));
+    /* Half the shortfall on each side; nothing once the control is the target size or larger. */
+    inset: calc(min(100% - var(--prime-control-touch-target), 0%) / 2);
   }
 
   .targetBlock::after {

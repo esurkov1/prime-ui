@@ -8,7 +8,7 @@ import { setControlValue, type ValueControl } from "@/internal/controlValue";
 import { cx } from "@/internal/cx";
 import enterMotion from "@/internal/enterMotion.module.css";
 import { GlyphSwap } from "@/internal/glyphSwap";
-import { isPromiseLike } from "@/internal/usePendingChanges";
+import { type AsyncHandler, isPromiseLike } from "@/internal/usePendingChanges";
 
 import styles from "./FieldCommit.module.css";
 
@@ -17,7 +17,7 @@ import styles from "./FieldCommit.module.css";
  * a Promise: while it is pending the field shows a spinner and stays editable; a rejection puts the
  * last committed value back (the owner shows why through `error` or a notification).
  */
-export type FieldCommitHandler = (value: string) => void | Promise<void>;
+export type FieldCommitHandler = AsyncHandler<[value: string]>;
 
 /** `idle` · `pending` (a Promise is running) · `saved` (a brief quiet confirmation). */
 type FieldCommitState = "idle" | "pending" | "saved";
@@ -93,7 +93,7 @@ export function useFieldCommit(
         setControlValue(control, committed.current);
       }
     };
-    let result: void | Promise<void>;
+    let result: ReturnType<FieldCommitHandler>;
     try {
       result = handler(value);
     } catch {

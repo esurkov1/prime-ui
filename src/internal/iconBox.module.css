@@ -2,7 +2,7 @@
  * The icon box shared by Icon and Spinner: `--icon-box` is the square side.
  * Explicit `size` → the global icon scale (`--prime-icon-*`: xs 14 · s 16 · m 20 · l 24 · xl 32).
  * No `size` (`.inherit`) → the host's `--prime-icon-size` (Button, Badge, Kbd, Divider…), else the
- * icon of the nearest control tier.
+ * control icon of the nearest control tier (`--field-icon`).
  */
 .box {
   flex: 0 0 auto;
@@ -30,24 +30,9 @@
   --icon-box: var(--prime-icon-xl);
 }
 
-.inherit.xs {
-  --icon-box: var(--prime-icon-size, var(--prime-control-xs-icon));
-}
-
-.inherit.s {
-  --icon-box: var(--prime-icon-size, var(--prime-control-s-icon));
-}
-
-.inherit.m {
-  --icon-box: var(--prime-icon-size, var(--prime-control-m-icon));
-}
-
-.inherit.l {
-  --icon-box: var(--prime-icon-size, var(--prime-control-l-icon));
-}
-
-.inherit.xl {
-  --icon-box: var(--prime-icon-size, var(--prime-control-xl-icon));
+/* The tier's control icon is `--field-icon`, joined from `fieldTier` by tier (`iconBoxClass`). */
+.inherit {
+  --icon-box: var(--prime-icon-size, var(--field-icon));
 }
 
 /* A glyph slot (`iconSlotClass`): a raw svg in it takes the host icon size. */

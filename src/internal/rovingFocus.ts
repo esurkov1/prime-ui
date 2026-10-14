@@ -4,7 +4,7 @@
  */
 
 /** Which arrow keys move along a single row. `both` accepts all four (a vertical list shown as a row). */
-export type RovingOrientation = "horizontal" | "vertical" | "both";
+type RovingOrientation = "horizontal" | "vertical" | "both";
 
 const PREV: Record<RovingOrientation, readonly string[]> = {
   horizontal: ["ArrowLeft"],

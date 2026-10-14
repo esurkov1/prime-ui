@@ -44,7 +44,7 @@ const isApplePlatform = () =>
   typeof navigator !== "undefined" &&
   /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
 
-export type TextFormattingOptions = {
+type TextFormattingOptions = {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   /** The hotkeys and the toolbar. */
   enabled: boolean;
@@ -57,7 +57,7 @@ export type TextFormattingOptions = {
   controlsId?: string;
 };
 
-export type TextFormatting = {
+type TextFormatting = {
   /** On the textarea's `onSelect`. */
   onSelect: () => void;
   /** Call first in the textarea's `onKeyDown`; `true` when the key was a formatting one and is used. */

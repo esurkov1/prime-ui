@@ -2,9 +2,6 @@
   "CLAUDE.md §9: src/internal/Portal",
   "CLAUDE.md §9: src/internal/context",
   "CLAUDE.md §9: src/internal/disclosure",
-  "CLAUDE.md §9: src/internal/highlightTsxHtml",
-  "CLAUDE.md §9: src/internal/layoutPxFromPrimitives",
-  "CLAUDE.md §9: src/internal/mergeRefs",
   "CLAUDE.md §9: src/internal/polymorphic",
   "CLAUDE.md §9: src/internal/textFormatting",
   "CLAUDE.md §9: src/internal/textFormattingToolbar"

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export type IconLayout = {
+type IconLayout = {
   /** Only icons: a square control without side padding. */
   iconOnly: boolean;
   /** An icon first, then text: the start side takes the optical padding. */

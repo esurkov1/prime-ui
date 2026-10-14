@@ -32,7 +32,7 @@
 .svg[data-state="checked"] .check,
 .svg[data-state="indeterminate"] .bar {
   stroke-dashoffset: 0;
-  transform: scale(1);
+  transform: none;
   opacity: 1;
   transition:
     stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-enter),

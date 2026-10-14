@@ -11,6 +11,8 @@
  *   .exit       fast · the mirror of `.enter` for a part kept mounted while it leaves
  *               (`usePresence`); it holds the end state until the host unmounts it
  *   .exitFade   fast · opacity only
+ *   .shake      base · an error arriving shakes the part once (rule 14); `.shakeParts` on a host
+ *               shakes its children instead, all but one marked `data-shake-still`
  *
  * The host may set:
  *   --enter-shift     the offset it comes from and leaves to (default `--prime-space-1`, from
@@ -79,5 +81,58 @@
 @keyframes primeExitFade {
   to {
     opacity: 0;
+  }
+}
+
+/*
+ * Error shake (foundation §7, rule 14): with `data-shake`, the part shakes once, sharply left and
+ * right, decaying to rest. `data-shake` alternates `odd` / `even`, so a new error restarts the
+ * keyframes. `translate` composes with a press scale; reduced motion stills it with the movement
+ * clock. FieldFrame shakes the control under its label (`.shakeParts` on the body, the support row
+ * stays), a choice row its control cell (`.shake`).
+ */
+.shake[data-shake],
+.shakeParts[data-shake] > :not([data-shake-still]) {
+  animation: primeShakeOdd var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
+.shake[data-shake="even"],
+.shakeParts[data-shake="even"] > :not([data-shake-still]) {
+  animation-name: primeShakeEven;
+}
+
+@keyframes primeShakeOdd {
+  12% {
+    translate: calc(var(--prime-space-2) * -1) 0;
+  }
+  32% {
+    translate: var(--prime-space-2) 0;
+  }
+  52% {
+    translate: calc(var(--prime-space-1) * -1) 0;
+  }
+  72% {
+    translate: var(--prime-space-1) 0;
+  }
+  88% {
+    translate: calc(var(--prime-space-1) * -0.5) 0;
+  }
+}
+
+@keyframes primeShakeEven {
+  12% {
+    translate: calc(var(--prime-space-2) * -1) 0;
+  }
+  32% {
+    translate: var(--prime-space-2) 0;
+  }
+  52% {
+    translate: calc(var(--prime-space-1) * -1) 0;
+  }
+  72% {
+    translate: var(--prime-space-1) 0;
+  }
+  88% {
+    translate: calc(var(--prime-space-1) * -0.5) 0;
   }
 }

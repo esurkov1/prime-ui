@@ -217,7 +217,7 @@ export function revealHighlighted(element: Element | null | undefined): void {
   element?.scrollIntoView({ block: "nearest" });
 }
 
-export type ListboxKeyContext = {
+type ListboxKeyContext = {
   /** The navigable items, in order. */
   ids: readonly string[];
   highlight: Store<string | undefined>;

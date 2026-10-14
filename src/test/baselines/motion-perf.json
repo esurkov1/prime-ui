@@ -19,9 +19,6 @@
   "src/components/progress-circle/ProgressCircle.module.css: animates stroke-dasharray",
   "src/components/skeleton/Skeleton.module.css: reduced-motion block globals.css already covers (.root)",
   "src/components/timeline/Timeline.module.css: reduced-motion block globals.css already covers (.row, .dot, .title)",
-  "src/internal/FieldFrame.module.css: local @keyframes field-shake-even",
-  "src/internal/FieldFrame.module.css: local @keyframes field-shake-odd",
-  "src/internal/richText.module.css: local @keyframes spoiler-reveal",
   "src/layout/sidebar/Sidebar.module.css: animates -webkit-text-fill-color",
   "src/layout/sidebar/Sidebar.module.css: animates -webkit-text-fill-color #2",
   "src/layout/sidebar/Sidebar.module.css: animates border-radius"

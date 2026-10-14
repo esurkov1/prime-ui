@@ -33,6 +33,11 @@ export const tierMappings = {
    * (16 · 16 · 20 · 20 · 20), so a loading legend keeps the height of the loaded one.
    */
   legendSkeleton: { xs: "xs", s: "xs", m: "m", l: "m", xl: "m" },
+  /**
+   * The label tier of a legend's text (ProgressBar, ProgressCircle): a legend is secondary to its
+   * indicator, so s and xl read the label of the tier below (xs · xs · m · l · l).
+   */
+  legendText: { xs: "xs", s: "xs", m: "m", l: "l", xl: "l" },
 } as const satisfies Record<string, Record<ControlSize, ControlSize>>;
 
 /** Visual treatment. */

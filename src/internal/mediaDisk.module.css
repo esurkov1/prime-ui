@@ -8,7 +8,8 @@
  * size container: its glyph is half its diameter at any size (20 on the 40 disk), so a host may
  * shrink the disk to fit a small frame.
  *
- *   .disk  the disk; `data-tone="danger"` — the danger disk of a failed transfer;
+ *   .disk  the disk; `data-variant="solid"` — the accent disk of the solid circle Button;
+ *          `data-state="failed"` — the danger disk of a failed transfer;
  *          `data-shown="false"` — faded and shrunk away (it comes back the same way)
  */
 .disk {
@@ -38,7 +39,16 @@
   scale: var(--prime-motion-scale-mark);
 }
 
-.disk[data-tone="danger"] {
+/* The look of a `variant="solid"` circle Button: the accent disk of a voice message, no blur. */
+.disk[data-variant="solid"] {
+  background: var(--prime-color-accent-default);
+  color: var(--prime-color-accent-fg);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* After the solid look: a failed transfer is the danger disk in either look. */
+.disk[data-state="failed"] {
   background: var(--prime-color-danger-default);
   color: var(--prime-color-danger-fg);
 }

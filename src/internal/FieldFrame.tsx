@@ -371,7 +371,6 @@ export function FieldFrame({
         invalid: ids.invalid || undefined,
         disabled: disabled || undefined,
         group: group || undefined,
-        shake,
       })}
     >
       {labelEnd != null ? (
@@ -382,10 +381,12 @@ export function FieldFrame({
       ) : (
         labelNode
       )}
-      <div className={styles.body}>
+      {/* An arriving error shakes the control; the label and the support row stay. */}
+      <div className={cx(styles.body, enterMotion.shakeParts)} data-shake={shake}>
         {children}
         <div
           className={styles.support}
+          data-shake-still=""
           {...toDataAttributes({
             size,
             reserve: reserveSupportRow || undefined,

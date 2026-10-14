@@ -5,9 +5,8 @@
  * The tier is the field tier (`fieldTierClass` with `data-size` on the field, or on
  * `Checkbox.Indicator` outside a field): `--field-choice` box, `--field-gap`, `--field-text` /
  * `--field-lh`. The label row is a subgrid of the root so descriptions align with the text column.
- * The control cell is one text line tall (or the control's height if taller), so the control is
- * optically centred on the first line. A component sets `--prime-choice-control-height` when its
- * control is not a square of `--field-choice` (Switch).
+ * The control cell is one text line tall, or as tall as its control (a Switch track) when that is
+ * taller, so the control is optically centred on the first line.
  */
 
 /* ---- Field ---- */
@@ -58,7 +57,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: max(var(--prime-choice-control-height, var(--field-choice)), var(--field-lh));
+  min-height: var(--field-lh);
 }
 
 /* Native input stays over the control (for validation bubbles) but is invisible. */
@@ -112,23 +111,23 @@
 }
 
 @media (hover: hover) {
-  .field:not([data-disabled="true"], [data-readonly="true"]) .row:hover .visual {
+  .field:not([data-disabled="true"]):not([data-readonly="true"]) .row:hover .visual {
     background: var(--prime-color-fill-strong-hover);
   }
 }
 
-:is(
-    .field:is([data-state="checked"], [data-state="indeterminate"]) .visual,
-    .visual:is([data-state="checked"], [data-state="indeterminate"])
-  ) {
+.field[data-state="checked"] .visual,
+.field[data-state="indeterminate"] .visual,
+.visual[data-state="checked"],
+.visual[data-state="indeterminate"] {
   background: var(--prime-color-accent-default);
 }
 
 @media (hover: hover) {
-  .field:is([data-state="checked"], [data-state="indeterminate"]):not(
-      [data-disabled="true"],
-      [data-readonly="true"]
-    )
+  .field[data-state="checked"]:not([data-disabled="true"]):not([data-readonly="true"])
+    .row:hover
+    .visual,
+  .field[data-state="indeterminate"]:not([data-disabled="true"]):not([data-readonly="true"])
     .row:hover
     .visual {
     background: var(--prime-color-accent-hover);
@@ -150,14 +149,15 @@
 }
 
 /* Disabled is not dimmed with opacity: the fills carry the state. */
-:is(.field[data-disabled="true"] .visual, .visual[data-disabled="true"]) {
+.field[data-disabled="true"] .visual,
+.visual[data-disabled="true"] {
   background: var(--prime-color-fill-muted);
   box-shadow: none;
 }
 
-:is(
-    .field[data-disabled="true"]:is([data-state="checked"], [data-state="indeterminate"]) .visual,
-    .visual[data-disabled="true"]:is([data-state="checked"], [data-state="indeterminate"])
-  ) {
+.field[data-disabled="true"][data-state="checked"] .visual,
+.field[data-disabled="true"][data-state="indeterminate"] .visual,
+.visual[data-disabled="true"][data-state="checked"],
+.visual[data-disabled="true"][data-state="indeterminate"] {
   background: var(--choice-bg-disabled-checked, var(--prime-color-fill-muted));
 }

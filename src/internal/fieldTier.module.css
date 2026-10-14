@@ -2,6 +2,7 @@
  * The one tier table of fields and controls (foundation §6). The element with `.tier` carries
  * `data-size`; the table resolves there and cascades to its parts:
  *   --field-h       control height            --field-icon    icon size
+ *   --field-item-h  row height of a menu / list (a menu row, a swatch on the item base)
  *   --field-px      field padding-x           --field-radius  corner radius
  *   --field-gap     tier gap (value ↔ unit)   --field-text    text size
  *   --field-lh      line height               --field-button-px  button / segment padding-x
@@ -20,6 +21,7 @@
  */
 .tier {
   --field-h: var(--prime-control-m-height);
+  --field-item-h: var(--prime-control-m-item-height);
   --field-px: var(--prime-control-m-field-padding-x);
   --field-gap: var(--prime-control-m-gap);
   --field-icon: var(--prime-control-m-icon);
@@ -54,6 +56,7 @@
 
 .tier[data-size="xs"] {
   --field-h: var(--prime-control-xs-height);
+  --field-item-h: var(--prime-control-xs-item-height);
   --field-px: var(--prime-control-xs-field-padding-x);
   --field-gap: var(--prime-control-xs-gap);
   --field-icon: var(--prime-control-xs-icon);
@@ -72,6 +75,7 @@
 
 .tier[data-size="s"] {
   --field-h: var(--prime-control-s-height);
+  --field-item-h: var(--prime-control-s-item-height);
   --field-px: var(--prime-control-s-field-padding-x);
   --field-gap: var(--prime-control-s-gap);
   --field-icon: var(--prime-control-s-icon);
@@ -90,6 +94,7 @@
 
 .tier[data-size="l"] {
   --field-h: var(--prime-control-l-height);
+  --field-item-h: var(--prime-control-l-item-height);
   --field-px: var(--prime-control-l-field-padding-x);
   --field-gap: var(--prime-control-l-gap);
   --field-icon: var(--prime-control-l-icon);
@@ -109,6 +114,7 @@
 
 .tier[data-size="xl"] {
   --field-h: var(--prime-control-xl-height);
+  --field-item-h: var(--prime-control-xl-item-height);
   --field-px: var(--prime-control-xl-field-padding-x);
   --field-gap: var(--prime-control-xl-gap);
   --field-icon: var(--prime-control-xl-icon);
@@ -124,6 +130,31 @@
   --field-hint-gap: var(--prime-control-xl-hint-gap);
   --field-hint-icon: var(--prime-icon-s);
   --field-choice: var(--prime-control-xl-choice);
+}
+
+/*
+ * The control icon of a tier as `--field-icon`, by class: for an element that carries no
+ * `data-size` of its own (an Icon or a Spinner without `size` takes the icon of the nearest
+ * `ControlSizeProvider`, `iconBoxClass`).
+ */
+.iconXs {
+  --field-icon: var(--prime-control-xs-icon);
+}
+
+.iconS {
+  --field-icon: var(--prime-control-s-icon);
+}
+
+.iconM {
+  --field-icon: var(--prime-control-m-icon);
+}
+
+.iconL {
+  --field-icon: var(--prime-control-l-icon);
+}
+
+.iconXl {
+  --field-icon: var(--prime-control-xl-icon);
 }
 
 /* Field label text: the label tier, weight 500 (foundation §6). */

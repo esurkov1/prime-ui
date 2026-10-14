@@ -13,7 +13,7 @@
  * draws its own `box-shadow` adds `var(--sticky-bleed)` to its list.
  */
 .surface {
-  --sticky-bleed: 0 calc(-1 * var(--prime-border-width)) 0 0
+  --sticky-bleed: 0 calc(var(--prime-border-width) * -1) 0 0
     var(--sticky-bg, var(--prime-color-layer-current));
 
   position: sticky;

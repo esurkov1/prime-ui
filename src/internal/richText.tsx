@@ -11,13 +11,13 @@ import styles from "./richText.module.css";
  * Links take only http(s), mailto and tel addresses; anything else stays text.
  */
 
-export type RichInline =
+type RichInline =
   | { type: "text"; text: string }
   | { type: "bold" | "italic" | "strike" | "spoiler"; children: RichInline[] }
   | { type: "code"; text: string }
   | { type: "link"; href: string; children: RichInline[] };
 
-export type RichBlock =
+type RichBlock =
   | { type: "text"; children: RichInline[] }
   | { type: "quote"; children: RichInline[] }
   | { type: "code"; text: string };
@@ -25,7 +25,7 @@ export type RichBlock =
 const SAFE_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 
 /** The address when it is a safe link, else `null`. */
-export function safeHref(raw: string): string | null {
+function safeHref(raw: string): string | null {
   const href = raw.trim();
   try {
     const url = new URL(href);
@@ -101,7 +101,7 @@ function canOpen(source: string, index: number): boolean {
 }
 
 /** Inline markup of one run of text. */
-export function parseInline(source: string): RichInline[] {
+function parseInline(source: string): RichInline[] {
   const out: RichInline[] = [];
   let text = "";
   let index = 0;
@@ -135,7 +135,7 @@ export function parseInline(source: string): RichInline[] {
 }
 
 /** Blocks of a message: runs of text, quotes (`> ` lines) and fenced code. */
-export function parseRichText(source: string): RichBlock[] {
+function parseRichText(source: string): RichBlock[] {
   const blocks: RichBlock[] = [];
   const lines = source.replace(/\r\n?/g, "\n").split("\n");
   type Run = { type: "text" | "quote"; lines: string[] };
@@ -185,7 +185,7 @@ function trimBreaks(nodes: RichInline[], start: boolean, end: boolean): RichInli
   return out.filter((node) => node.type !== "text" || node.text !== "");
 }
 
-export type RichTextLabels = {
+type RichTextLabels = {
   /** Accessible name of a masked spoiler: its text is not read until it is revealed. */
   spoiler: string;
 };
@@ -298,7 +298,7 @@ function renderInline(
   });
 }
 
-export type RichTextProps = {
+type RichTextProps = {
   source: string;
   /** Rendered at the very end of the last line (a chat bubble's meta reserve). */
   end?: React.ReactNode;

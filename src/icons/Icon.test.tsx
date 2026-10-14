@@ -5,6 +5,7 @@ import type * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import fieldTier from "@/internal/fieldTier.module.css";
 import { iconBoxStyles } from "@/internal/iconBox";
 import { cssRule, cssValue } from "@/test/css";
 import * as iconSet from "../icon-set";
@@ -37,14 +38,14 @@ describe("Icon", () => {
       </ControlSizeProvider>,
     );
     const el = screen.getByTestId("i");
-    expect(el).toHaveClass(iconBoxStyles.xs);
+    expect(el).toHaveClass(fieldTier.iconXs);
     expect(el).toHaveClass(iconBoxStyles.inherit);
   });
 
   it("defaults to the m control icon outside any control", () => {
     render(<Icon name="action.close" data-testid="i" />);
     const el = screen.getByTestId("i");
-    expect(el).toHaveClass(iconBoxStyles.m);
+    expect(el).toHaveClass(fieldTier.iconM);
     expect(el).toHaveClass(iconBoxStyles.inherit);
     expect(el).toHaveAttribute("aria-hidden", "true");
   });
@@ -72,7 +73,7 @@ describe("createIcon", () => {
     expect(el.tagName.toLowerCase()).toBe("svg");
     expect(el).toHaveAttribute("aria-hidden", "true");
     expect(el).toHaveAttribute("data-tone", "muted");
-    expect(el).toHaveClass(iconBoxStyles.l);
+    expect(el).toHaveClass(fieldTier.iconL);
     expect(el).toHaveClass(iconBoxStyles.inherit);
   });
 });

@@ -9,7 +9,6 @@
   --sw-thumb: var(--prime-switch-m-thumb);
   --sw-inset: calc((var(--sw-h) - var(--sw-thumb)) / 2);
   --sw-travel: calc(var(--sw-w) - var(--sw-h));
-  --prime-choice-control-height: var(--sw-h);
   /* The track fill changes at the thumb's pace; a disabled «on» keeps a soft accent. */
   --choice-bg-duration: var(--prime-motion-duration-base);
   --choice-bg-disabled-checked: var(--prime-color-accent-soft);

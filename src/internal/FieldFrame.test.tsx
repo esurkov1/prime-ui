@@ -169,7 +169,9 @@ describe("controlAria", () => {
 });
 
 describe("error shake", () => {
-  const root = (container: HTMLElement) => container.firstElementChild as HTMLElement;
+  /** The body under the label: it shakes its control, never the support row. */
+  const root = (container: HTMLElement) =>
+    container.querySelector("[data-shake-still]")?.parentElement as HTMLElement;
 
   it("does not shake for an error the field mounts with", () => {
     const { container } = render(<Frame error="Укажите роль" />);

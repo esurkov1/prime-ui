@@ -55,6 +55,15 @@ describe("TransferDisk", () => {
     );
   });
 
+  it("a still disk of a failed transfer is the danger disk", () => {
+    const { rerender } = render(<TransferDisk state="loading" progress={0.4} labels={LABELS} />);
+    const still = () => screen.getByRole("progressbar", { hidden: true });
+    expect(still()).not.toHaveAttribute("data-state");
+    rerender(<TransferDisk state="failed" progress={0.4} labels={LABELS} />);
+    const failed = document.querySelector("[data-variant][aria-hidden]");
+    expect(failed).toHaveAttribute("data-state", "failed");
+  });
+
   it("is the cancel in flight: a button reached by Tab, pressed by Enter and Space", async () => {
     const user = userEvent.setup();
     const onCancel = vi.fn();
