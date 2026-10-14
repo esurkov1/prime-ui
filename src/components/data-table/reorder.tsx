@@ -26,6 +26,8 @@ export type RowReorderOptions<Row> = {
   expandEnabled: boolean;
   /** Sorted by a column. */
   sorted: boolean;
+  /** The owner's `rows` as given: a move is made against this array. */
+  rows: readonly Row[];
   /** Every row in table order (sorted, grouped), the rows on screen a run of them. */
   orderedRows: readonly Row[];
   /** Where the rows on screen start in `orderedRows`. */
@@ -44,21 +46,23 @@ export type RowReorderOptions<Row> = {
  * rolls the drawn order back).
  */
 export function useRowReorder<Row>(options: RowReorderOptions<Row>) {
-  const { onReorder, expandEnabled, sorted, orderedRows, offset, getRowKey, getRowGroup } = options;
+  const { onReorder, expandEnabled, sorted, rows, orderedRows, offset, getRowKey, getRowGroup } =
+    options;
   const enabled = onReorder !== undefined && !expandEnabled;
   /**
-   * The table itself moved a row: the owner's next `rows` (the same rows, another order) is that
-   * move, not a new result set (`source="server"` would cross-fade it and scroll to the top).
+   * The `rows` the table itself moved a row in: the owner's next `rows` after them (the same rows,
+   * another order) is that move, not a new result set (`source="server"` would cross-fade it and
+   * scroll to the top). Any later change starts from other rows, so the move is never matched twice.
    */
-  const movedRef = React.useRef(false);
+  const movedFrom = React.useRef<readonly Row[] | null>(null);
 
   const keyOf = React.useCallback(
     (row: Row, index: number): React.Key => (getRowKey ? getRowKey(row, index) : index),
     [getRowKey],
   );
 
-  const latest = React.useRef({ onReorder, orderedRows, offset, getRowGroup, keyOf });
-  latest.current = { onReorder, orderedRows, offset, getRowGroup, keyOf };
+  const latest = React.useRef({ onReorder, rows, orderedRows, offset, getRowGroup, keyOf });
+  latest.current = { onReorder, rows, orderedRows, offset, getRowGroup, keyOf };
 
   /** The handler of one run of rows on screen (the page, or one group of it). */
   const reorderIn = React.useCallback((entries: readonly Entry<Row>[]) => {
@@ -86,30 +90,30 @@ export function useRowReorder<Row>(options: RowReorderOptions<Row>) {
           before = current.keyOf(next, at);
         }
       }
-      movedRef.current = true;
+      const from = current.rows;
+      movedFrom.current = from;
       const outcome = current.onReorder(key, before);
       if (!isPromiseLike(outcome)) return;
       Promise.resolve(outcome).catch(() => {
         // Refused: no new order follows.
-        movedRef.current = false;
+        if (movedFrom.current === from) movedFrom.current = null;
       });
       return outcome;
     };
   }, []);
 
   /**
-   * Whether `next` rows are the table's own move of `previous` (the same ids, another order). Pure:
-   * a render may run twice; the move is forgotten once the new rows are committed.
+   * Whether the owner's change from `previousRows` is the table's own move (the same ids, another
+   * order). Pure: a render may run twice.
    */
-  const isOwnMove = React.useCallback((previous: readonly unknown[], next: readonly unknown[]) => {
-    if (!movedRef.current || previous.length !== next.length) return false;
-    const set = new Set(previous);
-    return next.every((id) => set.has(id));
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new set of rows is the trigger.
-  React.useEffect(() => {
-    movedRef.current = false;
-  }, [orderedRows]);
+  const isOwnMove = React.useCallback(
+    (previousRows: readonly Row[], previous: readonly unknown[], next: readonly unknown[]) => {
+      if (movedFrom.current !== previousRows || previous.length !== next.length) return false;
+      const set = new Set(previous);
+      return next.every((id) => set.has(id));
+    },
+    [],
+  );
 
   const shared = React.useMemo<RowReorderShared | null>(
     () =>

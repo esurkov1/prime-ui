@@ -8,29 +8,29 @@
  * `--dt-pad-y` = (row height − control one tier down) / 2. A single line of text or a cell control one
  * tier down (m table → s button) keeps the row at its tier height; two-line cells with an avatar grow
  * the row with the same padding above and below.
+ *
+ * Tiers come from the shared tier table (`fieldTierClass` + `data-size`, joined in TSX), one per
+ * element, outermost first: the root is the table's tier (head, text, checkbox); the frame is the
+ * compact tier of the expand toggle (`compactTier`); the viewport is the `xs` tier of the row grip
+ * (`Dnd.Handle`); the table is the tier one step down, of the controls in the cells (`stepDown`).
+ * Each reads its `--field-h` into a table variable that the elements inside inherit.
  */
 
 .root {
   --dt-row-height: var(--prime-table-row-height-m);
-  --dt-head-height: var(--prime-control-m-height);
-  --dt-head-size: var(--prime-control-m-label-size);
-  --dt-head-line-height: var(--prime-control-m-label-line-height);
+  --dt-head-height: var(--field-h);
+  --dt-head-size: var(--field-label-size);
+  --dt-head-line-height: var(--field-label-lh);
   --dt-pad-x: var(--prime-table-cell-padding-x);
-  /* Control one tier down: the tallest single-row content (Button, Select, Input in a cell). */
-  --dt-cell-control: var(--prime-control-s-height);
-  --dt-pad-y: calc((var(--dt-row-height) - var(--dt-cell-control)) / 2);
   --dt-gap: var(--prime-space-2);
-  --dt-text-size: var(--prime-control-m-text-size);
-  --dt-text-line-height: var(--prime-control-m-line-height);
-  --dt-choice: var(--prime-control-m-choice);
-  /* Expand toggle: a square ghost button of the compact tier (`compactTier`: m → xs, 28). */
-  --dt-toggle: var(--prime-control-xs-height);
+  --dt-text-size: var(--field-text);
+  --dt-text-line-height: var(--field-lh);
+  --dt-choice: var(--field-choice);
   /* Sub-row indent per depth: an avatar of the tier + the cell gap, so a child's content starts
    * under the parent's text. Override `--dt-indent` on the root for other leading content. */
   --dt-indent: calc(var(--prime-avatar-m) + var(--dt-gap));
   /* Leading utility columns (selection, expand toggle); widths include padding. */
   --dt-select-w: calc(var(--dt-choice) + 2 * var(--dt-pad-x));
-  --dt-toggle-w: var(--dt-toggle);
 
   /* The table is a layer of the ladder (`data-depth`, foundation §4): one step off its host. */
   --dt-surface: var(--prime-color-layer-current);
@@ -66,85 +66,27 @@
   font-family: var(--prime-font-family-sans);
 }
 
-/* Header is one step below the cell text of the same tier; heights follow the control tiers. */
+/* Row heights per tier; the head and the text follow the tier table. */
 .root[data-size="xs"] {
   --dt-row-height: var(--prime-table-row-height-xs);
-  --dt-cell-control: var(--prime-control-xs-height);
-  --dt-head-height: var(--prime-control-xs-height);
-  --dt-head-size: var(--prime-control-xs-label-size);
-  --dt-head-line-height: var(--prime-control-xs-label-line-height);
   --dt-pad-x: var(--prime-space-2);
-  --dt-text-size: var(--prime-control-xs-text-size);
-  --dt-text-line-height: var(--prime-control-xs-line-height);
-  --dt-choice: var(--prime-control-xs-choice);
   --dt-indent: calc(var(--prime-avatar-xs) + var(--dt-gap));
 }
 
 .root[data-size="s"] {
   --dt-row-height: var(--prime-table-row-height-s);
-  --dt-cell-control: var(--prime-control-xs-height);
-  --dt-head-height: var(--prime-control-s-height);
-  --dt-head-size: var(--prime-control-s-label-size);
-  --dt-head-line-height: var(--prime-control-s-label-line-height);
-  --dt-text-size: var(--prime-control-s-text-size);
-  --dt-text-line-height: var(--prime-control-s-line-height);
-  --dt-choice: var(--prime-control-s-choice);
   --dt-indent: calc(var(--prime-avatar-s) + var(--dt-gap));
 }
 
 .root[data-size="l"] {
   --dt-row-height: var(--prime-table-row-height-l);
-  --dt-cell-control: var(--prime-control-m-height);
-  --dt-head-height: var(--prime-control-l-height);
-  --dt-head-size: var(--prime-control-l-label-size);
-  --dt-head-line-height: var(--prime-control-l-label-line-height);
-  --dt-text-size: var(--prime-control-l-text-size);
-  --dt-text-line-height: var(--prime-control-l-line-height);
-  --dt-choice: var(--prime-control-l-choice);
-  --dt-toggle: var(--prime-control-s-height);
   --dt-indent: calc(var(--prime-avatar-l) + var(--dt-gap));
 }
 
 .root[data-size="xl"] {
   --dt-row-height: var(--prime-table-row-height-xl);
-  --dt-cell-control: var(--prime-control-l-height);
-  --dt-head-height: var(--prime-control-xl-height);
-  --dt-head-size: var(--prime-control-xl-label-size);
-  --dt-head-line-height: var(--prime-control-xl-label-line-height);
   --dt-pad-x: var(--prime-space-4);
-  --dt-text-size: var(--prime-control-xl-text-size);
-  --dt-text-line-height: var(--prime-control-xl-line-height);
-  --dt-choice: var(--prime-control-xl-choice);
-  --dt-toggle: var(--prime-control-s-height);
   --dt-indent: calc(var(--prime-avatar-l) + var(--dt-gap));
-}
-
-/* Without a selection column the toggle column is first and carries the leading cell padding. */
-.root[data-expandable="true"]:not([data-selectable="true"]) {
-  --dt-toggle-w: calc(var(--dt-toggle) + var(--dt-pad-x));
-}
-
-.root[data-selectable="true"] {
-  --dt-lead: var(--dt-select-w);
-}
-
-.root[data-expandable="true"] {
-  --dt-lead: var(--dt-toggle-w);
-}
-
-.root[data-selectable="true"][data-expandable="true"] {
-  --dt-lead: calc(var(--dt-select-w) + var(--dt-toggle-w));
-}
-
-/* Reorderable rows (`onReorder`; never with expandable rows): the handle column leads. Its grip is
-   the fixed `xs` Dnd.Handle; the next cell's padding is the gap to it. */
-.root[data-reorderable="true"] {
-  --dt-handle-w: calc(var(--prime-control-xs-height) + var(--dt-pad-x));
-  --dt-lead: var(--dt-handle-w);
-}
-
-.root[data-reorderable="true"][data-selectable="true"] {
-  --dt-lead: calc(var(--dt-handle-w) + var(--dt-select-w));
 }
 
 /* Only while dragging across checkboxes: no native text selection. */
@@ -183,6 +125,9 @@
 
 /* Holds the edge shadows over the viewport; shrinks like the viewport inside a sized root. */
 .frame {
+  /* Expand toggle: a square ghost button of the compact tier (m → xs). */
+  --dt-toggle: var(--field-h);
+
   position: relative;
   display: flex;
   flex-direction: column;
@@ -193,6 +138,9 @@
 /* Full-bleed: head and rows touch the container edges; the root clips them to its radius.
  * Focusables at the edges (sort buttons, clickable cells) use the inset focus ring. */
 .viewport {
+  /* The row grip: the fixed `xs` Dnd.Handle. */
+  --dt-grip: var(--field-h);
+
   width: 100%;
   padding: 0;
   isolation: isolate;
@@ -250,6 +198,12 @@
 }
 
 .table {
+  /* Control one tier down: the tallest single-row content (Button, Select, Input in a cell). */
+  --dt-cell-control: var(--field-h);
+  --dt-pad-y: calc((var(--dt-row-height) - var(--dt-cell-control)) / 2);
+  --dt-toggle-w: var(--dt-toggle);
+  --dt-handle-w: calc(var(--dt-grip) + var(--dt-pad-x));
+
   width: max-content;
   border-collapse: separate;
   border-spacing: 0;
@@ -266,6 +220,35 @@
    below its content width (other columns keep their minimum). */
 .root[data-table-width="grow"] .table {
   width: 100%;
+}
+
+/* The leading utility columns (`--dt-lead`): the sticky first column stands after them and the
+   detail panel lines up with the first content column. */
+.root[data-selectable="true"] .table {
+  --dt-lead: var(--dt-select-w);
+}
+
+.root[data-expandable="true"] .table {
+  --dt-lead: var(--dt-toggle-w);
+}
+
+/* Reorderable rows (`onReorder`; never with expandable rows): the handle column leads. Its grip is
+   the fixed `xs` Dnd.Handle; the next cell's padding is the gap to it. */
+.root[data-reorderable="true"] .table {
+  --dt-lead: var(--dt-handle-w);
+}
+
+/* Without a selection column the toggle column is first and carries the leading cell padding. */
+.root[data-expandable="true"]:not([data-selectable="true"]) .table {
+  --dt-toggle-w: calc(var(--dt-toggle) + var(--dt-pad-x));
+}
+
+.root[data-selectable="true"][data-expandable="true"] .table {
+  --dt-lead: calc(var(--dt-select-w) + var(--dt-toggle-w));
+}
+
+.root[data-reorderable="true"][data-selectable="true"] .table {
+  --dt-lead: calc(var(--dt-handle-w) + var(--dt-select-w));
 }
 
 /* ---------- Head ---------- */
@@ -613,7 +596,7 @@
    on their cells). Sorting and paging swap rows instantly: they are frequent, and captured rows
    would escape the scroll viewport's clip in a view transition. */
 .row[data-animate="true"] {
-  --enter-shift: calc(-1 * var(--prime-space-1));
+  --enter-shift: calc(var(--prime-space-1) * -1);
 }
 
 /*
@@ -710,34 +693,34 @@
 .row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell {
   box-shadow:
     inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
-    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring);
+    inset 0 calc(var(--dt-ring) * -1) 0 var(--prime-color-focus-ring);
 }
 
 .row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell:first-child {
   box-shadow:
     inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
-    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring),
+    inset 0 calc(var(--dt-ring) * -1) 0 var(--prime-color-focus-ring),
     inset var(--dt-ring) 0 0 var(--prime-color-focus-ring);
 }
 
 .row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell:last-child {
   box-shadow:
     inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
-    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring),
-    inset calc(-1 * var(--dt-ring)) 0 0 var(--prime-color-focus-ring);
+    inset 0 calc(var(--dt-ring) * -1) 0 var(--prime-color-focus-ring),
+    inset calc(var(--dt-ring) * -1) 0 0 var(--prime-color-focus-ring);
 }
 
 .root:dir(rtl) .row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell:first-child {
   box-shadow:
     inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
-    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring),
-    inset calc(-1 * var(--dt-ring)) 0 0 var(--prime-color-focus-ring);
+    inset 0 calc(var(--dt-ring) * -1) 0 var(--prime-color-focus-ring),
+    inset calc(var(--dt-ring) * -1) 0 0 var(--prime-color-focus-ring);
 }
 
 .root:dir(rtl) .row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell:last-child {
   box-shadow:
     inset 0 var(--dt-ring) 0 var(--prime-color-focus-ring),
-    inset 0 calc(-1 * var(--dt-ring)) 0 var(--prime-color-focus-ring),
+    inset 0 calc(var(--dt-ring) * -1) 0 var(--prime-color-focus-ring),
     inset var(--dt-ring) 0 0 var(--prime-color-focus-ring);
 }
 
@@ -807,7 +790,7 @@ tbody + tbody > .groupRow > .groupCell {
   position: sticky;
   inset-inline-start: var(--dt-lead, 0);
   z-index: var(--dt-z-sticky-first-column);
-  box-shadow: inset calc(-1 * var(--prime-border-width)) 0 0 var(--dt-divider-color);
+  box-shadow: inset calc(var(--prime-border-width) * -1) 0 0 var(--dt-divider-color);
 }
 
 .root:dir(rtl) .firstColumnSticky {
@@ -817,7 +800,7 @@ tbody + tbody > .groupRow > .groupCell {
 /* A sticky head keeps the seam cover (`sticky.module.css`) beside the column edge. */
 .headCell.firstColumnSticky {
   box-shadow:
-    inset calc(-1 * var(--prime-border-width)) 0 0 var(--dt-divider-color),
+    inset calc(var(--prime-border-width) * -1) 0 0 var(--dt-divider-color),
     var(--sticky-bleed, 0 0 0 0 transparent);
 }
 

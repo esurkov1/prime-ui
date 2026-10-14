@@ -1,11 +1,11 @@
 /* List page: the header carries the title and the tools; this module lays out table cells only. */
 
-/* Client cell: avatar, then the name over the tax id. On a phone the table scrolls sideways. */
+/* Client cell: avatar, then the name over the tax id (the column's `minWidth` keeps it on its
+   lines; on a phone the table scrolls sideways). */
 .client {
   display: flex;
   align-items: center;
   gap: var(--prime-space-3);
-  white-space: nowrap;
 }
 
 .clientText {

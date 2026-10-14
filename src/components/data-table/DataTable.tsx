@@ -7,14 +7,15 @@ import { useEdgeOverflow } from "@/hooks/useEdgeOverflow";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { readCssLengthPx } from "@/hooks/usePosition";
 import { rowGaps, useVirtualRows } from "@/hooks/useVirtualRows";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import { exitTimeoutMs } from "@/internal/motionTiming";
 import { useSwapIn } from "@/internal/RegionSwap";
-import type { ControlSize } from "@/internal/states";
+import { type ControlSize, compactTier, stepDown } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
 import { DataTableColumnsMenu } from "./ColumnsMenu";
 import { DataTableColumnsContext, type DataTableColumnsContextValue } from "./context";
@@ -105,141 +106,63 @@ export type DataTableProps<Row> = Omit<React.HTMLAttributes<HTMLDivElement>, "ch
   /** The outer card-fill `<div>`. */
   ref?: React.Ref<HTMLDivElement>;
   columns: DataTableColumn<Row>[];
-  /**
-   * Ids of columns not rendered (head, body, skeleton, state rows), controlled. A column with
-   * `hideable: false` stays. `DataTable.ColumnsMenu` in `toolbar` changes it.
-   */
   hiddenColumns?: string[];
-  /** Initially hidden column ids, uncontrolled. */
   defaultHiddenColumns?: string[];
-  /** The hidden column ids changed (`DataTable.ColumnsMenu`); keep them to restore the choice. */
   onHiddenColumnsChange?: (hiddenColumns: string[]) => void;
   rows: Row[];
-  /**
-   * Who sorts and pages the rows. `client` — the table sorts `rows` and slices pages itself;
-   * `server` — `rows` is the one page (or the loaded batches) the owner fetched, already sorted:
-   * the table never re-sorts or slices them, `sort` / `page` drive the request and `rowCount`
-   * the Pagination and the range line.
-   */
   source?: "client" | "server";
-  /** Total rows on the server (`source="server"`): Pagination and «Показано … из {total}». */
   rowCount?: number;
   size?: ControlSize;
   className?: string;
   showHeader?: boolean;
   stickyHeader?: boolean;
   stickyFirstColumn?: boolean;
-  /**
-   * Stable row id (also for sub-rows from `getRowChildren`; `index` is the index among siblings).
-   * Selection and expansion are keyed by it. Without it the id is the row's position, which breaks
-   * when sorting — pass it whenever `selectable` or expansion is used.
-   */
   getRowKey?: (row: Row, index: number) => React.Key;
-  /** Human name of a row for the checkbox / expand toggle `aria-label`s (e.g. the person's name). */
   getRowLabel?: (row: Row) => string;
-  /**
-   * The row is a link: the key cell (first visible column) holds a real `<a>` and the same link
-   * covers every other cell, so a click, ⌘/Ctrl-click, a middle click and «open in new tab» work
-   * anywhere on the row; Tab stops on the link.
-   */
   getRowHref?: (row: Row) => string;
-  /**
-   * Opens a row in place: a click on the row (never on a control inside it, never from a portal)
-   * or Enter / Space on the focused row. With `getRowHref` it gets the plain clicks only — call
-   * `event.preventDefault()` there to route in the app instead of loading the page.
-   */
   onRowClick?: (row: Row, index: number, event: DataTableRowClickEvent) => void;
-  /** Which rows open (`getRowHref` / `onRowClick`); `false` for totals and service rows. */
   isRowClickable?: (row: Row) => boolean;
   loading?: boolean;
-  /** Empty-state content (e.g. `EmptyPage`); defaults to `labels.empty`. */
   empty?: React.ReactNode;
   labels?: Partial<DataTableLabels>;
-  /** Hairlines between rows. */
   rowDividers?: boolean;
-  /** Hairlines between content columns. */
   columnDividers?: boolean;
   sort?: DataTableSortState;
   defaultSort?: DataTableSortState;
   onSortChange?: (sort: DataTableSortState) => void;
-  /**
-   * `pages` — Pagination in the footer; `infinite` — rows are revealed while scrolling;
-   * `none` — every row at once.
-   */
   paging?: "pages" | "infinite" | "none";
   page?: number;
   defaultPage?: number;
   onPageChange?: (page: number) => void;
-  /** Rows per page (also the first batch in infinite scroll). */
   pageSize?: number;
   infiniteBatchSize?: number;
   hasMore?: boolean;
   loadingMore?: boolean;
-  /**
-   * Asks for the next batch. A returned promise shows the loading status until it settles; a
-   * rejected one stops asking until the rows change.
-   */
   onLoadMore?: () => void | Promise<void>;
-  /**
-   * Max height of the scroll viewport (number = px); `"fill"` — the table takes the height of
-   * its flex / grid parent and the rows scroll inside. 360 with `paging="infinite"`.
-   */
   scrollHeight?: number | string;
-  /** The table spans its container; `false` sizes it by its content. */
   fullWidth?: boolean;
   highlightRowOnHover?: boolean;
   highlightColumnOnHover?: boolean;
   striped?: boolean;
-  /**
-   * Built-in row selection: a leading checkbox column, header «select all» (indeterminate when
-   * partial), Shift+click range, press-and-drag across checkboxes, Space on a focused checkbox,
-   * `aria-selected` + `accent-soft` rows and a polite «Выбрано: N» announcement.
-   */
   selectable?: boolean;
   selected?: React.Key[];
   defaultSelected?: React.Key[];
   onSelectedChange?: (selected: React.Key[]) => void;
-  /**
-   * Rows reorder: a leading handle column (drag, a touch hold, Alt + ↑ / ↓). The row `id` now
-   * stands in front of `beforeId` (`getRowKey` values; `null` — last); on a page, a row put last
-   * stands in front of the first row of the next page. Return a promise to save on a server: the
-   * row stays in its new place with a busy handle, a rejection moves it back. Off while the table
-   * is sorted by a column; with `getRowGroup` rows move inside their group. Not combined with
-   * expandable rows (`getRowChildren`, `renderExpanded`).
-   */
   onReorder?: (id: React.Key, beforeId: React.Key | null) => void | Promise<void>;
-  /** Tree sub-rows: rendered under the parent with the same columns, indented by depth. */
   getRowChildren?: (row: Row) => Row[] | undefined;
-  /** Detail panel rendered in a full-width row under an expanded row. */
   renderExpanded?: (row: Row) => React.ReactNode;
-  /** Whether a row gets an expand toggle. Default: it has sub-rows, or `renderExpanded` is set. */
   isRowExpandable?: (row: Row) => boolean;
   expanded?: React.Key[];
   defaultExpanded?: React.Key[];
   onExpandedChange?: (expanded: React.Key[]) => void;
   loadError?: React.ReactNode;
-  /** Skeleton rows while `loading` without rows. Default `min(pageSize, 5)`. */
   loadingRows?: number;
-  /** Panel above the table (search, filters, actions). Wraps on narrow widths. */
   toolbar?: React.ReactNode;
-  /**
-   * Group key of a row: rows are drawn under a header row per group. Groups keep the order they
-   * first appear in `rows`; a sort orders the rows inside each group.
-   */
   getRowGroup?: (row: Row) => string | number;
-  /** Content of a group header row (name, totals); defaults to the group key. */
   renderGroupHeader?: (group: DataTableGroup<Row>) => React.ReactNode;
-  /** Group header rows stick under the head while their rows scroll. */
   stickyGroupHeaders?: boolean;
-  /**
-   * Keys of the collapsed groups, controlled. Passing any of `collapsedGroups`,
-   * `defaultCollapsedGroups`, `onCollapsedGroupsChange` makes groups fold: each group header gets
-   * a disclosure toggle and its rows fold away and back.
-   */
   collapsedGroups?: (string | number)[];
-  /** Initially collapsed group keys, uncontrolled (`[]` — every group open, but foldable). */
   defaultCollapsedGroups?: (string | number)[];
-  /** The collapsed group keys changed (a group header toggle). */
   onCollapsedGroupsChange?: (collapsedGroups: (string | number)[]) => void;
 };
 
@@ -287,7 +210,7 @@ export function DataTable<Row>({
   rows,
   source = "client",
   rowCount,
-  size = "m",
+  size: sizeProp,
   className,
   showHeader = true,
   stickyHeader = false,
@@ -344,6 +267,8 @@ export function DataTable<Row>({
 }: DataTableProps<Row>) {
   // Stable across inline `labels` objects: otherwise every row would re-render on each render.
   const labels = useLabels(DATA_TABLE_LABELS, labelsProp);
+  const tier = useHostTier(sizeProp);
+  const size = tier.size;
   const infinite = paging === "infinite";
   const paged = paging === "pages";
   const server = source === "server";
@@ -435,6 +360,7 @@ export function DataTable<Row>({
     expandEnabled: Boolean(getRowChildren || renderExpanded),
     // The order on screen is the column's, not the manual one.
     sorted: sortOrder !== undefined,
+    rows,
     orderedRows: sortedRows,
     offset: pageOffset,
     getRowKey,
@@ -465,7 +391,7 @@ export function DataTable<Row>({
     // The owner's rows after a move the table made: the same rows, nothing replaced.
     const change = !server
       ? null
-      : reorder.isOwnMove(previousIds, nextIds)
+      : reorder.isOwnMove(rowArrival.rows, previousIds, nextIds)
         ? "same"
         : rowsChange<unknown>(previousIds, nextIds);
     if (change === "replace") {
@@ -715,9 +641,8 @@ export function DataTable<Row>({
   const sameRows = useSameRows(flat);
   const firstRendered = virtual.rows[0]?.index;
   const lastRendered = virtual.rows.at(-1)?.index;
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the rendered range is the trigger, not a value read here.
   const renderedRows = React.useMemo(
-    () => ({ rows: sameRows }),
+    () => ({ rows: sameRows, first: firstRendered, last: lastRendered }),
     [sameRows, firstRendered, lastRendered],
   );
   useFrozenColumns(
@@ -910,11 +835,11 @@ export function DataTable<Row>({
   return (
     <ReorderRoot enabled={reorder.enabled}>
       <SurfaceDepthProvider value={depth}>
-        <ControlSizeProvider value={size}>
+        {tier.provide(
           <div
             {...rest}
             ref={mergedRootRef}
-            className={cx(styles.root, className)}
+            className={cx(fieldTierClass, styles.root, className)}
             data-depth={depth}
             {...toDataAttributes({
               size,
@@ -943,18 +868,20 @@ export function DataTable<Row>({
             ) : null}
 
             {/* The frame holds the edge shadows over the viewport; they never scroll with the table. */}
-            <div className={styles.frame}>
+            <div className={cx(fieldTierClass, styles.frame)} data-size={compactTier(size)}>
               <ScrollContainer
                 ref={scrollRef}
                 axis="both"
                 edges="none"
                 overscrollBehavior="none"
-                className={styles.viewport}
+                className={cx(fieldTierClass, styles.viewport)}
+                data-size="xs"
                 style={{ maxHeight: typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight }}
               >
                 <table
                   ref={tableRef}
-                  className={styles.table}
+                  className={cx(fieldTierClass, styles.table)}
+                  data-size={stepDown(size)}
                   aria-busy={loading || infiniteRows.loading || undefined}
                   aria-rowcount={virtualized ? flatRows.length + headRows : undefined}
                   {...columnHover}
@@ -1096,8 +1023,8 @@ export function DataTable<Row>({
                   : null
               }
             />
-          </div>
-        </ControlSizeProvider>
+          </div>,
+        )}
       </SurfaceDepthProvider>
     </ReorderRoot>
   );

@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
@@ -12,9 +9,12 @@ import { Kbd } from "@/components/kbd/Kbd";
 import rowLink from "@/internal/rowLink.module.css";
 import { stickySurfaceClass } from "@/internal/sticky";
 import swapMotion from "@/internal/swapMotion.module.css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { DataTable, type DataTableColumn } from "./DataTable";
 import styles from "./DataTable.module.css";
+
+const CSS = "src/components/data-table/DataTable.module.css";
 
 type Row = { id: number; name: string; score: number };
 
@@ -42,10 +42,14 @@ describe("DataTable", () => {
   });
 
   it("CSS: rows grow with content, sort icon sits at the end edge and stays quiet", () => {
-    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
-    expect(css).toMatch(/\.cell \{[^}]*padding: var\(--dt-pad-y\) var\(--dt-pad-x\)/);
-    expect(css).not.toMatch(/row-reverse/);
-    expect(css).not.toMatch(/\.sortIcon[^{]*\{[^}]*accent/);
+    expect(cssValue(cssRule(CSS, ".cell"), "padding")).toBe("var(--dt-pad-y) var(--dt-pad-x)");
+    const values = cssRules(CSS).flatMap((rule) => rule.decls.map((decl) => decl.value));
+    expect(values.some((value) => value.includes("row-reverse"))).toBe(false);
+    const sortIcon = cssRules(CSS).filter((rule) => rule.selector.includes(".sortIcon"));
+    expect(sortIcon.length).toBeGreaterThan(0);
+    for (const rule of sortIcon) {
+      expect(rule.decls.some((decl) => decl.value.includes("accent"))).toBe(false);
+    }
   });
 
   it("renders headers and rows", () => {
@@ -54,9 +58,9 @@ describe("DataTable", () => {
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("A")).toBeInTheDocument();
     expect(screen.getByText("C")).toBeInTheDocument();
-    expect(screen.getByText("Name").closest("div[data-size]")).not.toHaveAttribute(
-      "data-row-dividers",
-    );
+    const root = screen.getByText("Name").closest(`.${styles.root}`);
+    expect(root).toBeInTheDocument();
+    expect(root).not.toHaveAttribute("data-row-dividers");
   });
 
   it("marks sorted column header with aria-sort", () => {
@@ -97,7 +101,7 @@ describe("DataTable", () => {
 
   it("drops row dividers with rowDividers={false}", () => {
     render(<DataTable rows={rows.slice(0, 2)} columns={columns} rowDividers={false} />);
-    expect(screen.getByText("Name").closest("div[data-size]")).toHaveAttribute(
+    expect(screen.getByText("Name").closest(`.${styles.root}`)).toHaveAttribute(
       "data-row-dividers",
       "false",
     );
@@ -475,26 +479,34 @@ describe("DataTable", () => {
 });
 
 describe("DataTable CSS contract", () => {
-  const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
-  const block = (selector: string) => {
-    const start = css.indexOf(`\n${selector} {`);
-    expect(start).toBeGreaterThanOrEqual(0);
-    return css.slice(start, css.indexOf("}", start));
-  };
-
   it("is full-bleed: the viewport has no padding and the root clips to its radius", () => {
-    expect(block(".viewport")).toMatch(/padding:\s*0;/);
-    const root = block(".root");
-    expect(root).toMatch(/overflow:\s*(hidden|clip);/);
-    expect(root).toMatch(/border-radius:\s*var\(--prime-card-radius\)/);
-    expect(root).toMatch(/background:\s*var\(--dt-surface\)/);
-    expect(root).toMatch(/--dt-surface:\s*var\(--prime-color-layer-current\)/);
+    expect(cssValue(cssRule(CSS, ".viewport"), "padding")).toBe("0");
+    const root = cssRule(CSS, ".root");
+    expect(cssValue(root, "overflow")).toMatch(/^(hidden|clip)$/);
+    expect(cssValue(root, "border-radius")).toBe("var(--prime-card-radius)");
+    expect(cssValue(root, "background")).toBe("var(--dt-surface)");
+    expect(cssValue(root, "--dt-surface")).toBe("var(--prime-color-layer-current)");
   });
 
   it("uses the inset focus ring for edge focusables", () => {
-    expect(css).toMatch(
-      /\.headCell:has\(\.sortButton:focus-visible\)\s*\{[^}]*outline-offset:\s*var\(--prime-focus-offset-inset\)/,
+    const ring = cssRule(CSS, ".headCell:has(.sortButton:focus-visible)");
+    expect(cssValue(ring, "outline-offset")).toBe("var(--prime-focus-offset-inset)");
+  });
+
+  it("reads every tier from the tier table, one element per tier", () => {
+    const { container } = render(
+      <DataTable rows={rows.slice(0, 1)} columns={columns} size="l" onReorder={() => {}} />,
     );
+    const root = container.querySelector(`.${styles.root}`) as HTMLElement;
+    // The table's tier (head, text), the toggle's compact tier, the grip's `xs`, the cells' tier.
+    expect(root).toHaveAttribute("data-size", "l");
+    expect(root.querySelector(`.${styles.frame}`)).toHaveAttribute("data-size", "s");
+    expect(root.querySelector(`.${styles.viewport}`)).toHaveAttribute("data-size", "xs");
+    expect(root.querySelector("table")).toHaveAttribute("data-size", "m");
+    expect(cssValue(cssRule(CSS, ".root"), "--dt-head-height")).toBe("var(--field-h)");
+    expect(cssValue(cssRule(CSS, ".frame"), "--dt-toggle")).toBe("var(--field-h)");
+    expect(cssValue(cssRule(CSS, ".viewport"), "--dt-grip")).toBe("var(--field-h)");
+    expect(cssValue(cssRule(CSS, ".table"), "--dt-cell-control")).toBe("var(--field-h)");
   });
 
   describe("selection", () => {
@@ -1139,17 +1151,17 @@ describe("DataTable edge cue", () => {
   });
 
   it("CSS: edge shadows overlay the viewport; a sticky first column carries the start one", () => {
-    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
-    expect(css).toMatch(/\.root\[data-overflow-start="true"\] \.frame::before/);
-    expect(css).toMatch(/\.root\[data-overflow-end="true"\] \.frame::after/);
-    expect(css).toMatch(
-      /\.root\[data-sticky-first-column="true"\] \.frame::before \{[^}]*display: none/,
+    const shown = cssRule(
+      CSS,
+      '.root[data-overflow-start="true"] .frame::before, .root[data-overflow-end="true"] .frame::after',
     );
-    expect(css).toMatch(
-      /\.root\[data-overflow-start="true"\] \.firstColumnSticky::after \{[^}]*opacity: 1/,
-    );
+    expect(cssValue(shown, "opacity")).toBe("1");
+    const sticky = cssRule(CSS, '.root[data-sticky-first-column="true"] .frame::before');
+    expect(cssValue(sticky, "display")).toBe("none");
+    const column = cssRule(CSS, '.root[data-overflow-start="true"] .firstColumnSticky::after');
+    expect(cssValue(column, "opacity")).toBe("1");
     // Pseudo-elements never take layout space.
-    expect(css).toMatch(/\.frame::before,\n\.frame::after \{[^}]*position: absolute/);
+    expect(cssValue(cssRule(CSS, ".frame::before, .frame::after"), "position")).toBe("absolute");
   });
 
   it("the sticky head is the shared sticky surface (it lets go on a short screen)", () => {
@@ -1324,8 +1336,8 @@ describe("DataTable opening rows", () => {
     );
     expect(rowOf("Итого")).not.toHaveClass(rowLink.host);
     expect(screen.getAllByRole("link")[0].closest("tr")).toHaveClass(rowLink.host);
-    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
-    expect(css).toMatch(/\.row:is\(:focus-visible, :has\(\.rowLink:focus-visible\)\) > \.cell \{/);
+    const ring = cssRule(CSS, ".row:is(:focus-visible, :has(.rowLink:focus-visible)) > .cell");
+    expect(cssValue(ring, "box-shadow")).toContain("var(--prime-color-focus-ring)");
   });
 });
 
@@ -1415,16 +1427,15 @@ describe("DataTable fill height and row tokens", () => {
   });
 
   it("CSS: the filling table stretches in its parent; every size reads its row token", () => {
-    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
-    expect(css).toMatch(/\.root\[data-scroll-height="fill"\] \{[^}]*flex: 1 1 0%/);
+    expect(cssValue(cssRule(CSS, '.root[data-scroll-height="fill"]'), "flex")).toBe("1 1 0%");
     for (const size of ["xs", "s", "l", "xl"]) {
-      expect(css).toMatch(
-        new RegExp(
-          `\\.root\\[data-size="${size}"\\] \\{\\s*--dt-row-height: var\\(--prime-table-row-height-${size}\\)`,
-        ),
+      expect(cssValue(cssRule(CSS, `.root[data-size="${size}"]`), "--dt-row-height")).toBe(
+        `var(--prime-table-row-height-${size})`,
       );
     }
-    expect(css).toMatch(/--dt-row-height: var\(--prime-table-row-height-m\)/);
+    expect(cssValue(cssRule(CSS, ".root"), "--dt-row-height")).toBe(
+      "var(--prime-table-row-height-m)",
+    );
   });
 });
 
@@ -1471,11 +1482,14 @@ describe("DataTable heatmap columns", () => {
   });
 
   it("CSS: every step reads the chart scale; dark steps take its text colour", () => {
-    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
     for (const step of [1, 2, 3, 4, 5]) {
-      expect(css).toContain(`--dt-cell-bg: var(--prime-color-chart-scale-${step});`);
+      expect(cssValue(cssRule(CSS, `.cell[data-scale="${step}"]`), "--dt-cell-bg")).toBe(
+        `var(--prime-color-chart-scale-${step})`,
+      );
     }
-    expect(css).toMatch(/\[data-scale="5"\] \{[^}]*color: var\(--prime-color-chart-scale-fg\)/);
+    expect(cssValue(cssRule(CSS, '.cell[data-scale="5"]'), "color")).toBe(
+      "var(--prime-color-chart-scale-fg)",
+    );
   });
 });
 
@@ -1723,10 +1737,10 @@ describe("DataTable row groups", () => {
 
 describe("DataTable state content", () => {
   it("empty and error content sit in a sticky box of the visible width", () => {
-    const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
-    expect(css).toMatch(
-      /\.stateBox \{[^}]*position: sticky;[^}]*inset-inline-start: 0;[^}]*width: 100cqi;/,
-    );
+    const stateBox = cssRule(CSS, ".stateBox");
+    expect(cssValue(stateBox, "position")).toBe("sticky");
+    expect(cssValue(stateBox, "inset-inline-start")).toBe("0");
+    expect(cssValue(stateBox, "width")).toBe("100cqi");
     const box = (node: Element) => {
       const parent = node.parentElement as HTMLElement;
       expect(parent).toHaveClass(styles.stateBox as string);

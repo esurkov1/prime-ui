@@ -143,7 +143,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "controlled",
       description:
-        "Сортировка и страница у родителя (URL или стор): клик по заголовку — по возрастанию → по убыванию → без сортировки, новая сортировка возвращает на первую страницу — `sort`, `onSortChange`, `page`, `onPageChange`.",
+        "Сортировка, страница и выбор колонок у родителя (URL или стор): клик по заголовку — по возрастанию → по убыванию → без сортировки, новая сортировка возвращает на первую страницу — `sort`, `onSortChange`, `page`, `onPageChange`, `hiddenColumns`, `onHiddenColumnsChange`.",
     },
     {
       slot: "narrow",

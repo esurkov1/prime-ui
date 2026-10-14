@@ -58,8 +58,8 @@ export const api: ComponentApi = {
         {
           name: "getRowKey",
           type: "(row: Row, index: number) => Key",
-          en: "Stable row id (position by default); selection, expansion and the enter animation of new rows are keyed by it. Pass it whenever sorting, selection or expansion is used.",
-          ru: "Стабильный id строки (по умолчанию — позиция); по нему выбор, раскрытие и анимация новых строк. Нужен при сортировке, выборе и раскрытии.",
+          en: "Stable row id (position by default; sub-rows too, `index` among siblings); selection, expansion and the enter animation of new rows are keyed by it. Pass it whenever sorting, selection or expansion is used.",
+          ru: "Стабильный id строки (по умолчанию — позиция; и вложенной, `index` — среди соседей); по нему выбор, раскрытие и анимация новых строк. Нужен при сортировке, выборе и раскрытии.",
         },
         {
           name: "getRowLabel",
@@ -70,9 +70,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Density and control tier: rows from 36 · 36 · 44 · 52 · 52 px (`--prime-table-row-height-<size>`); passed to checkboxes, toggles, Pagination and nested controls.",
-          ru: "Плотность и ярус: строки от 36 · 36 · 44 · 52 · 52 px (`--prime-table-row-height-<size>`); передаётся флажкам, переключателям, Pagination и контролам в ячейках.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
+          en: "Density and control tier: rows from 36 · 36 · 44 · 52 · 52 px (`--prime-table-row-height-<size>`); passed to checkboxes, toggles, Pagination and nested controls. Without it the tier of the host.",
+          ru: "Плотность и ярус: строки от 36 · 36 · 44 · 52 · 52 px (`--prime-table-row-height-<size>`); передаётся флажкам, переключателям, Pagination и контролам в ячейках. Без него — ярус хоста.",
         },
         {
           name: "paging",
@@ -252,8 +252,8 @@ export const api: ComponentApi = {
         {
           name: "onLoadMore",
           type: "() => void | Promise<void>",
-          en: "Called at the end when every loaded row is shown and `hasMore` is set. A returned promise shows the loading status until it settles.",
-          ru: "Вызывается в конце, когда все загруженные строки показаны и `hasMore`. Пока возвращённый промис не завершён, виден статус догрузки.",
+          en: "Called at the end when every loaded row is shown and `hasMore` is set. A returned promise shows the loading status until it settles; a rejected one stops asking until the rows change.",
+          ru: "Вызывается в конце, когда все загруженные строки показаны и `hasMore`. Пока возвращённый промис не завершён, виден статус догрузки; после отказа таблица не просит снова, пока строки не изменятся.",
         },
         {
           name: "scrollHeight",

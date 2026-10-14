@@ -13,9 +13,7 @@ export type DataTableColumnsMenuProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "children"
 > & {
-  /** Side of the trigger the menu opens on. Default `bottom`. */
   side?: PositionSide;
-  /** Alignment to the trigger. Default `auto` (the edge with more room). */
   align?: PositionAlign;
   /** The trigger button. */
   ref?: React.Ref<HTMLButtonElement>;

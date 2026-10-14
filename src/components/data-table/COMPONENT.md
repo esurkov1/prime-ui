@@ -63,9 +63,9 @@ Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an 
 | `rows` | `Row[]` | — (required) | Data; sorted in memory when a sort is set. With `source="server"` — the page (or the loaded batches) as the server returned it. |
 | `source` | `"client" \| "server"` | `"client"` | Who sorts and pages the rows. `client`: the table sorts `rows` and slices pages. `server`: `rows` is one page, already sorted; `sort` / `page` changes are the request, `rowCount` drives Pagination. |
 | `rowCount` | `number` | `rows.length` | Total rows on the server (`source="server"`): the page count and «Показано {from}–{to} из {total}». |
-| `getRowKey` | `(row: Row, index: number) => Key` | — | Stable row id (position by default); selection, expansion and the enter animation of new rows are keyed by it. Pass it whenever sorting, selection or expansion is used. |
+| `getRowKey` | `(row: Row, index: number) => Key` | — | Stable row id (position by default; sub-rows too, `index` among siblings); selection, expansion and the enter animation of new rows are keyed by it. Pass it whenever sorting, selection or expansion is used. |
 | `getRowLabel` | `(row: Row) => string` | — | Human row name for the checkbox and toggle names (`{label}` in `labels`). |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Density and control tier: rows from 36 · 36 · 44 · 52 · 52 px (`--prime-table-row-height-<size>`); passed to checkboxes, toggles, Pagination and nested controls. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Density and control tier: rows from 36 · 36 · 44 · 52 · 52 px (`--prime-table-row-height-<size>`); passed to checkboxes, toggles, Pagination and nested controls. Without it the tier of the host. |
 | `paging` | `"pages" \| "infinite" \| "none"` | `"pages"` | `pages` — Pagination in the footer when there is more than one page; `infinite` — rows are revealed while scrolling; `none` — every row at once. |
 | `pageSize` | `number` | `10` | Rows per page; also the first batch with `paging="infinite"` (with `source="server"` every loaded row is shown). |
 | `page` | `number` | — | Current page (1-based), controlled. |
@@ -93,7 +93,7 @@ Generic `DataTable<Row>`; `ref` → `HTMLDivElement`. A card-fill block with an 
 | `infiniteBatchSize` | `number` | `20` | Rows revealed per scroll step. |
 | `hasMore` | `boolean` | `false` | More rows can be loaded from the server. |
 | `loadingMore` | `boolean` | `false` | A server batch is loading: footer status, `aria-busy`. |
-| `onLoadMore` | `() => void \| Promise<void>` | — | Called at the end when every loaded row is shown and `hasMore` is set. A returned promise shows the loading status until it settles. |
+| `onLoadMore` | `() => void \| Promise<void>` | — | Called at the end when every loaded row is shown and `hasMore` is set. A returned promise shows the loading status until it settles; a rejected one stops asking until the rows change. |
 | `scrollHeight` | `number \| string \| "fill"` | `360` with `paging="infinite"`, else none | Max height of the scroll viewport (number = px); `"fill"` — the table takes the height of its flex / grid parent (or a sized block), the rows scroll inside, infinite paging follows it. |
 | `stickyHeader` | `boolean` | `false` | The head sticks while the body scrolls (with `scrollHeight`); on screens lower than 480px it scrolls with the rows. |
 | `stickyFirstColumn` | `boolean` | `false` | The first visible column (with the selection and toggle columns) sticks while scrolling sideways; the start edge shadow falls from its end edge. |
@@ -160,6 +160,8 @@ One column of `columns`: data, not a part.
 | `m` | rows from 44, head 36 (13/20 head text), cells 14/20 | most tables | yes |
 | `l` | rows from 52, head 40, text 16/24 | spacious lists, large avatars | |
 | `xl` | rows from 52, head 48, text 16/24, cell padding 16 | large touch-friendly tables | |
+
+Without `size` the table takes the tier of its host (a sized form, panel or popover), else `m`.
 
 Row height is a minimum: cells pad vertically by (row height − control one tier down) / 2, so one text line or a control one tier down keeps the tier height and taller content grows the row. Checkboxes use the table tier; expand toggles are square ghost Buttons of a fixed small tier (`xs` for xs–m, `s` for l–xl).
 
@@ -235,13 +237,13 @@ Heads keep `start` whatever the cell alignment, with the sort icon at the end ed
 | State | Driven by | DOM |
 |---|---|---|
 | loading (no rows) | `loading` | skeleton rows (`data-skeleton`), `role="status"` with `labels.loading`, `aria-busy` on the table, `data-loading` on the root |
-| loading more | `loadingMore`, or a pending promise from `onLoadMore` | `aria-busy`; footer `labels.loadingMore`; no new request until it settles (after a rejection, until the rows change) |
+| loading more | `hasMore` with every loaded row shown calls `onLoadMore`; `loadingMore`, or its pending promise | `aria-busy`; footer `labels.loadingMore`; no new request until it settles (after a rejection, until the rows change) |
 | refreshing | `loading` with rows on screen (a refetch, another server page or sort) | the rows, head, toolbar and footer stay; `aria-busy` on the table, `data-loading` on the root — no skeleton |
 | new server page | `source="server"` and `rows` replaced (not appended) | the body remounts with the swap fade (`swapMotion`), the viewport scrolls to its top; no per-row enter |
 | empty | no rows and not loading | compact EmptyPage with `empty` or `labels.empty` (`role="status"`), or the `empty` node; centred in the visible width, not across every column of a wide table |
 | error | `loadError` | body replaced by a `role="alert"` message in `danger-text`, centred in the visible width; range and infinite status hidden |
 | sorted | `sort` / `defaultSort` | `aria-sort` and `data-sorted` on the head; the sort icon: unsorted `text-disabled`, hover `text-muted`, sorted `text-secondary` — never accent |
-| selected | `selected` / `defaultSelected` | `aria-selected` rows with `accent-soft` fill; polite `labels.selectedCount` |
+| selected | `selectable` with `selected` / `defaultSelected` | `data-selectable` on the root, a leading checkbox column; `aria-selected` rows with `accent-soft` fill; polite `labels.selectedCount` |
 | expanded | `expanded` / `defaultExpanded` | `data-expanded` on the parent row (one step darker); toggle `aria-expanded`, chevron turns 90° |
 | new rows | rows new in `rows` (by `getRowKey`) | `data-animate`: top-level cells drop in from above (`enterMotion`) |
 | sub-rows and detail panels | an expand / a collapse | both fold open and shut through the kit's Disclosure (`0fr ↔ 1fr`, the fade and a short slide on the same `base` clock; a detail opens on the enter curve); the row height and padding live inside the fold, so nothing is left to jump. Sub-rows: `data-fold` on the row (`open` · `closed`), every cell's content a Disclosure; a collapsed row's sub-rows stay mounted until the fold ends. Detail row: `data-state`; it unmounts after the close |
@@ -263,7 +265,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 - The root is a layer of the surface ladder (`data-depth`, one above its host): it fills its container on `--prime-color-layer-current`, radius 12, and clips full-bleed head and rows; zebra rows and the sticky column are one ladder step off it, the head two. On a card or in a modal it is the next layer by itself — never wrap it in a Card.
 - Toolbar padding `--prime-space-3` × cell padding, items `gap: --prime-space-2`; below 30rem of table width toolbar and footer stack.
 - The footer has a hairline on top: range on the left, Pagination on the right. The range shows only with more than one page or with infinite scroll.
-- Columns scroll sideways inside the table, never the page; pin the identifying column with `stickyFirstColumn`. Works from 320 px.
+- Columns scroll sideways inside the table, never the page; pin the identifying column with `stickyFirstColumn`. A 320 px column holds the table without breaking it.
 - While columns are hidden past an edge, that edge shows a `--prime-space-4` shadow (`--prime-color-bg-edge-shadow`) over the content; it takes no space and follows RTL. With `stickyFirstColumn` the start shadow falls from the pinned column's end edge.
 - Fewer columns, less scrolling: put `DataTable.ColumnsMenu` in `toolbar` (the key column `hideable: false`). The kit stores nothing: keep `onHiddenColumnsChange`'s list where the app keeps settings and pass it back as `hiddenColumns`. Never hide columns silently by width.
 - `DataTable.ColumnsMenu` is an outline neutral Button one tier below the table (the `view.columns` icon, `labels.columns`); its Dropdown lists every column and ends with `labels.showAllColumns`. A `hideable: false` column stays checked and disabled, and the last visible column cannot be hidden. With `align="auto"` a trigger near the end of the screen lines up the panel's end edge and the panel grows toward the start, and the other way near the start.
@@ -354,7 +356,7 @@ Root attributes: `data-size`, `data-row-dividers`, `data-column-dividers`, `data
 | [server.tsx](examples/server.tsx) | A CRM deal list the server sorts, pages and searches; a new search returns to page 1 — `source`, `rowCount`, `sort`, `page`, `loading`. |
 | [fill-height.tsx](examples/fill-height.tsx) | An audit log that fills the height of its panel and loads older entries while scrolling; the status shows while the request is pending — `scrollHeight`, `paging`, `onLoadMore`. |
 | [states.tsx](examples/states.tsx) | Loading skeleton, an empty period and a load error with a retry: the head stays, only the body changes — `loading`, `loadingRows`, `empty`, `loadError`. |
-| [controlled.tsx](examples/controlled.tsx) | Sort and page owned by the parent (a URL or a store): a header click goes asc → desc → none, a new sort returns to page 1 — `sort`, `onSortChange`, `page`, `onPageChange`. |
+| [controlled.tsx](examples/controlled.tsx) | Sort, page and the column choice owned by the parent (a URL or a store): a header click goes asc → desc → none, a new sort returns to page 1 — `sort`, `onSortChange`, `page`, `onPageChange`, `hiddenColumns`, `onHiddenColumnsChange`. |
 | [narrow.tsx](examples/narrow.tsx) | A 320 px support queue: columns scroll inside the table with the first one pinned, the toolbar and footer reflow and the pager turns compact — `stickyFirstColumn`, `size`. |
 | [screen.tsx](examples/screen.tsx) | A list page: the title, a line of figures, search, filters and the one primary action in the app header, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. |
 

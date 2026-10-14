@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { moveBefore } from "@/components/dnd/useSortableList";
+import { moveBefore } from "@/components/dnd/Dnd";
 import swapMotion from "@/internal/swapMotion.module.css";
 
 import { DataTable, type DataTableColumn, type DataTableSortState } from "./DataTable";
@@ -115,6 +115,20 @@ describe("DataTable onReorder", () => {
     });
     expect(onMove).toHaveBeenCalledWith("a", "c");
     expect(order()).toEqual(["b", "a", "c"]);
+  });
+
+  it("Escape cancels a row drag: the row goes back to its place", () => {
+    const onMove = vi.fn();
+    render(<Pipeline onMove={onMove} />);
+    fireEvent.pointerDown(handle("Лиды"), { ...POINTER, clientX: 10, clientY: 5 });
+    fireEvent.pointerMove(window, { ...POINTER, clientX: 10, clientY: 25 });
+    expect(document.querySelector("tr[data-dnd-gap]")).not.toBeNull();
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.pointerUp(window, { ...POINTER, clientX: 10, clientY: 25 });
+    expect(onMove).not.toHaveBeenCalled();
+    expect(document.querySelector("tr[data-dnd-gap]")).toBeNull();
+    expect(order()).toEqual(["a", "b", "c"]);
+    expect(announced("отменено")).toBe(true);
   });
 
   it("the handle, not the row, carries the move keys and the role description", () => {
