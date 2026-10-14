@@ -170,7 +170,7 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 
 ## Layout & spacing
 - The root is a flex column that fills its host's height: put it straight into a `Card.Root` or a `PageContent.List` pane with a height; the scroller takes the rest under the search field.
-- The search field stands on 8px sides; the rows on 8px sides and 4px between them (a margin inside each `<li>`, so the virtual window measures rows with their space).
+- One inset all round, the panel's 4px: the search field and the rows stand 4px from every edge of the host, so in a card (radius 12) their 8px corners follow the card's (nested radius = outer − padding). Rows stand 4px apart (a margin inside each `<li>`, so the virtual window measures rows with their space); the last row's margin is the inset below it.
 - A row: avatar · name and preview · time over the counts. The name and the preview truncate; glyphs, the time and the counts never do.
 - From 100 dialogs only the rows around the view render; spacers hold the rest of the height. The row with the Tab stop and the row with an open menu stay rendered.
 - The root is the `chat-list` container: below 240px the preview line and the time step out, the names and counts stay. At 320px (a phone) everything shows.

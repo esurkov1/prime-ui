@@ -1,4 +1,4 @@
-/** A support messenger on `Chat`: dialogs beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, dates and runs from data, every kind of message, search, pinned messages, replies and edits from the menu with a jump to the quoted message, read receipts and unread counts from what was seen, the typing signal both ways, and the Composer whose messages rise into the list while the client answers. */
+/** A support messenger on `Chat`: dialogs with a search over them beside the conversation (one pane at a time on a phone), history that loads above as you scroll up, dates and runs from data, every kind of message, search, pinned messages, replies and edits from the menu with a jump to the quoted message, read receipts and unread counts from what was seen, the typing signal both ways, and the Composer whose messages rise into the list while the client answers. */
 import {
   Avatar,
   Button,
@@ -550,6 +550,23 @@ export default function ChatPattern() {
     };
   }, []);
   const dialog = DIALOGS.find((item) => item.id === dialogId) ?? DIALOGS[0];
+  /** The search over the dialogs: by name and by the last message a row shows. */
+  const [dialogQuery, setDialogQuery] = React.useState("");
+  // The open dialog shows its live last message; the others their stored one.
+  const lastOf = (item: Dialog) =>
+    item.id === dialogId ? messages[messages.length - 1] : undefined;
+  const previewOf = (item: Dialog) => {
+    const last = lastOf(item);
+    return last ? excerpt(last) : item.preview;
+  };
+  const needle = dialogQuery.trim().toLowerCase();
+  const foundDialogs = needle
+    ? DIALOGS.filter(
+        (item) =>
+          item.name.toLowerCase().includes(needle) ||
+          previewOf(item).toLowerCase().includes(needle),
+      )
+    : DIALOGS;
   /** The dialog whose history has arrived: opening another one loads it first. */
   const [loadedId, setLoadedId] = React.useState<string | null>(null);
   React.useEffect(() => {
@@ -765,14 +782,15 @@ export default function ChatPattern() {
           <PageContent.List aria-label="Диалоги">
             <Card.Root className={styles.paneCard}>
               <ChatList.Root
-                items={DIALOGS}
+                items={foundDialogs}
                 getKey={(item) => item.id}
                 value={dialogId}
                 onValueChange={setDialogId}
+                search={dialogQuery}
+                onSearchChange={setDialogQuery}
                 now={NOW}
                 renderItem={(item) => {
-                  // The open dialog shows its live last message; the others their stored one.
-                  const last = item.id === dialogId ? messages[messages.length - 1] : undefined;
+                  const last = lastOf(item);
                   return (
                     <ChatList.Item
                       time={last?.sentAt ?? item.at}
@@ -788,7 +806,7 @@ export default function ChatPattern() {
                       </ChatList.ItemIcon>
                       <ChatList.ItemText>{item.name}</ChatList.ItemText>
                       <ChatList.ItemDescription author={last?.from === "me" ? "Вы" : undefined}>
-                        {last ? excerpt(last) : item.preview}
+                        {previewOf(item)}
                       </ChatList.ItemDescription>
                     </ChatList.Item>
                   );

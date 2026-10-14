@@ -22,9 +22,13 @@
   min-block-size: 0;
 }
 
+/*
+ * One inset all round, the panel's: in a card (radius 12) the rows and the field (radius 8) stand
+ * 4px from every edge, so their corners follow the card's (nested radius = outer − padding).
+ */
 .search {
   flex: none;
-  padding: var(--prime-space-2) var(--prime-space-2) var(--prime-space-1);
+  padding: var(--prime-panel-padding);
 }
 
 .scroller {
@@ -32,9 +36,15 @@
   min-block-size: 0;
 }
 
+/* The last row's own margin is the inset below it. */
 .scroller .list {
   gap: 0;
-  padding: var(--prime-space-1) var(--prime-space-2);
+  padding: var(--prime-panel-padding) var(--prime-panel-padding) 0;
+}
+
+/* The placeholder row of the next page keeps the rows' rhythm. */
+.scroller .list + .list {
+  padding-block-start: 0;
 }
 
 .list .item {
