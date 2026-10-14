@@ -125,7 +125,7 @@ Move between places: app navigation (side rail, bottom bar on phones), tabs, the
 | Stepper | Steps of a multi-step process with pending, current, completed and danger statuses. | [COMPONENT.md](../src/components/stepper/COMPONENT.md) · [examples](../src/components/stepper/examples/) |
 | Sidebar | App side navigation in three modes — expanded, compact, hidden — and an off-canvas panel on narrow screens. | [COMPONENT.md](../src/layout/sidebar/COMPONENT.md) · [examples](../src/layout/sidebar/examples/) |
 | BottomNav | Phone navigation: a bar of 2–6 main sections at the bottom of the screen, optionally with a round action beside it. | [COMPONENT.md](../src/layout/bottom-nav/COMPONENT.md) · [examples](../src/layout/bottom-nav/examples/) |
-| List | A selectable navigation list of rows: the master half of a list + detail screen (conversations, tickets, mail, records). | [COMPONENT.md](../src/components/list/COMPONENT.md) · [examples](../src/components/list/examples/) |
+| List | A selectable navigation list of rows: the master half of a list + detail screen (tickets, mail, records). | [COMPONENT.md](../src/components/list/COMPONENT.md) · [examples](../src/components/list/examples/) |
 
 ## Overlays (`overlays`)
 

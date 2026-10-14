@@ -1,59 +1,60 @@
-/** Support dialogs with a preview, the time and the unread count; a click opens a dialog and makes it the current row — `current`, `onClick`. */
+/** A support ticket queue with the client, the last update and the open count; a click opens a ticket and makes it the current row — `current`, `onClick`. */
 import { Card, List } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-const DIALOGS = [
+const TICKETS = [
   {
-    id: "granit",
+    id: "T-4821",
+    subject: "Счёт без НДС",
     client: "ООО «Гранит»",
-    preview: "Счёт № 4821 пришёл без НДС",
-    time: "15:02",
-    unread: 2,
+    updated: "15:02",
+    open: 2,
   },
   {
-    id: "leto",
+    id: "T-4817",
+    subject: "Перенос доставки на среду",
     client: "ООО «Лето»",
-    preview: "Можно перенести доставку на среду?",
-    time: "13:40",
-    unread: 0,
+    updated: "13:40",
+    open: 0,
   },
   {
-    id: "kozlov",
+    id: "T-4809",
+    subject: "Подключение ЭДО",
     client: "ИП Козлов",
-    preview: "Подключите, пожалуйста, ЭДО",
-    time: "вчера",
-    unread: 1,
+    updated: "вчера",
+    open: 1,
   },
   {
-    id: "sever",
+    id: "T-4796",
+    subject: "Акт сверки за сентябрь",
     client: "АО «Северсталь-Сервис»",
-    preview: "Акт сверки за сентябрь подписан",
-    time: "6 окт",
-    unread: 0,
+    updated: "6 окт",
+    open: 0,
   },
 ];
 
 export default function ListOverviewExample() {
-  const [dialogId, setDialogId] = React.useState("granit");
+  const [ticketId, setTicketId] = React.useState("T-4821");
 
   return (
     <Card.Root className={styles.pane}>
       <Card.Body>
-        <List.Root aria-label="Диалоги">
-          {DIALOGS.map((dialog) => (
+        <List.Root aria-label="Обращения">
+          {TICKETS.map((ticket) => (
             <List.Item
-              key={dialog.id}
-              current={dialog.id === dialogId}
-              onClick={() => setDialogId(dialog.id)}
+              key={ticket.id}
+              value={ticket.id}
+              current={ticket.id === ticketId}
+              onClick={() => setTicketId(ticket.id)}
             >
-              <List.ItemText>{dialog.client}</List.ItemText>
-              <List.ItemDescription>{dialog.preview}</List.ItemDescription>
-              <List.ItemMeta>{dialog.time}</List.ItemMeta>
-              {dialog.unread > 0 ? (
-                <List.ItemCount color="blue">{dialog.unread}</List.ItemCount>
-              ) : null}
+              <List.ItemText>{ticket.subject}</List.ItemText>
+              <List.ItemDescription>
+                {ticket.id} · {ticket.client}
+              </List.ItemDescription>
+              <List.ItemMeta>{ticket.updated}</List.ItemMeta>
+              {ticket.open > 0 ? <List.ItemCount color="blue">{ticket.open}</List.ItemCount> : null}
             </List.Item>
           ))}
         </List.Root>

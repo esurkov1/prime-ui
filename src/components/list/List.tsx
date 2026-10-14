@@ -1,16 +1,19 @@
 import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
-import { DragControllerContext } from "@/components/dnd/context";
 import { Dnd } from "@/components/dnd/Dnd";
-import { Spinner } from "@/components/spinner/Spinner";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { formatLabel } from "@/internal/formatLabel";
+import { InteractiveElement } from "@/internal/interactiveElement";
+import { type ListPresence, useListItemPresence, useListPresence } from "@/internal/listPresence";
 import { nodeText } from "@/internal/nodeText";
-import { Slot } from "@/internal/slot";
+import { flattenChildren, isPart } from "@/internal/parts";
+import { slotChild } from "@/internal/slot";
 import type { ControlSize, PaletteColor } from "@/internal/states";
+import { touchTargetRowClass } from "@/internal/touchTarget";
 
 import styles from "./List.module.css";
 
@@ -25,13 +28,18 @@ export const LIST_LABELS: ListLabels = {
   reorderItem: "Переместить {label}",
 };
 
-/** What a row of a reorderable list needs: the moves still being saved and the handle's name. */
-type ReorderContextValue = {
-  pending: ReadonlySet<string>;
-  handleLabel: string;
-};
+/** What a row of a reorderable list needs: the handle's name. */
+type ReorderContextValue = { handleLabel: string };
 
 const ReorderContext = React.createContext<ReorderContextValue | null>(null);
+
+/** The list's keyed presence (rows enter and close up) and the key of the row inside it. */
+const PresenceContext = React.createContext<ListPresence | null>(null);
+const RowKeyContext = React.createContext<string | null>(null);
+
+/** The presence key of a row: its `value`, else its React key. */
+const rowKey = (item: React.ReactElement<ListItemProps>, index: number): string =>
+  item.props.value ?? String(item.key ?? index);
 
 export type ListRootProps = Omit<React.HTMLAttributes<HTMLUListElement>, "children"> & {
   /** Row tier: height, text, icon and avatar size; counts take one tier down. Default `m`. */
@@ -51,77 +59,82 @@ export type ListRootProps = Omit<React.HTMLAttributes<HTMLUListElement>, "childr
 };
 
 /**
- * A selectable navigation list: the master half of a list + detail screen (conversations, tickets,
- * mail, records). Rows are buttons or links; the open record is `current`.
+ * A selectable navigation list: the master half of a list + detail screen (tickets, mail,
+ * records). Rows are buttons or links; the open record is `current`; rows the data adds or takes
+ * out rise in and close up in place.
  */
 function ListRoot({ size = "m", onReorder, labels, className, children, ...rest }: ListRootProps) {
-  const [pending, setPending] = React.useState<ReadonlySet<string>>(() => new Set());
   const handleLabel = labels?.reorderItem ?? LIST_LABELS.reorderItem;
-  const reorder = React.useMemo<ReorderContextValue>(
-    () => ({ pending, handleLabel }),
-    [pending, handleLabel],
-  );
+  const reorder = React.useMemo<ReorderContextValue>(() => ({ handleLabel }), [handleLabel]);
   const latest = React.useRef(onReorder);
   latest.current = onReorder;
+  // Dnd keeps a row in its new place, busy with a busy grip, until a returned promise settles,
+  // and glides it back on a rejection.
+  const move = React.useCallback(
+    (id: string, beforeId: string | null) => latest.current?.(id, beforeId),
+    [],
+  );
 
-  const move = React.useCallback((id: string, beforeId: string | null) => {
-    const outcome = latest.current?.(id, beforeId);
-    if (!(outcome instanceof Promise)) return;
-    setPending((set) => new Set(set).add(id));
-    const done = () =>
-      setPending((set) => {
-        const next = new Set(set);
-        next.delete(id);
-        return next;
-      });
-    outcome.then(done, done);
-    // Dnd keeps the row in its new place until the promise settles and glides it back on a rejection.
-    return outcome;
-  }, []);
+  // Other children (a host's own row wrappers, spacers) render as they are.
+  const nodes = flattenChildren(children);
+  const items = nodes.filter((node): node is React.ReactElement<ListItemProps> =>
+    isPart(node, ListItem),
+  );
+  // Rows rise in when the data adds them and close up in place when it takes them out.
+  const presence = useListPresence(items.map(rowKey));
+  const keyed = (item: React.ReactElement<ListItemProps>, index: number) => (
+    <RowKeyContext key={item.key ?? index} value={rowKey(item, index)}>
+      {item}
+    </RowKeyContext>
+  );
 
   if (onReorder === undefined) {
     return (
       <ControlSizeProvider value={size}>
-        <ul {...rest} className={cx(styles.root, className)} {...toDataAttributes({ size })}>
-          {children}
-        </ul>
+        <PresenceContext value={presence}>
+          {/* biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them */}
+          <ul
+            role="list"
+            {...rest}
+            className={cx(styles.root, className)}
+            {...toDataAttributes({ size })}
+          >
+            {nodes.map((node) =>
+              isPart<ListItemProps>(node, ListItem) ? keyed(node, items.indexOf(node)) : node,
+            )}
+          </ul>
+        </PresenceContext>
       </ControlSizeProvider>
     );
   }
 
-  const items = React.Children.toArray(children).filter(
-    (node): node is React.ReactElement<ListItemProps> => isPart(node, ListItem),
-  );
   const { ref, ...listRest } = rest;
   return (
     <ControlSizeProvider value={size}>
       <ReorderContext value={reorder}>
-        <ReorderSession>
-          <Dnd.Sortable
-            {...listRest}
-            ref={ref as React.Ref<HTMLElement>}
-            as="ul"
-            items={items}
-            getId={itemId}
-            getLabel={itemLabelOf}
-            onReorder={move}
-            renderItem={(item) => item}
-            handle
-            className={cx(styles.root, className)}
-            {...toDataAttributes({ size, reorderable: true })}
-          />
-        </ReorderSession>
+        <PresenceContext value={presence}>
+          <Dnd.Root>
+            <Dnd.Sortable
+              role="list"
+              {...listRest}
+              ref={ref as React.Ref<HTMLElement>}
+              as="ul"
+              items={items}
+              getId={itemId}
+              getLabel={itemLabelOf}
+              onReorder={move}
+              renderItem={(item) => keyed(item, items.indexOf(item))}
+              handle
+              className={cx(styles.root, className)}
+              {...toDataAttributes({ size, reorderable: true })}
+            />
+          </Dnd.Root>
+        </PresenceContext>
       </ReorderContext>
     </ControlSizeProvider>
   );
 }
 ListRoot.displayName = "List.Root";
-
-/** Mounts the drag session the rows need, unless the app already has one above the list. */
-function ReorderSession({ children }: { children: React.ReactNode }) {
-  const outer = React.useContext(DragControllerContext);
-  return outer ? children : <Dnd.Root>{children}</Dnd.Root>;
-}
 
 function itemId(item: React.ReactElement<ListItemProps>): string {
   const { value } = item.props;
@@ -198,9 +211,6 @@ function ListItemCount({ color = "gray", className, ...rest }: ListItemCountProp
   return <Badge.Root {...rest} color={color} className={cx(styles.count, className)} />;
 }
 ListItemCount.displayName = "List.ItemCount";
-
-const isPart = (node: React.ReactNode, type: React.ElementType): node is React.ReactElement =>
-  React.isValidElement(node) && node.type === type;
 
 /** Words apart in the accessible name; a flex container renders no space. */
 function spaced(nodes: React.ReactNode[]): React.ReactNode[] {
@@ -279,6 +289,12 @@ function itemLabel({ asChild, children }: Pick<ListItemProps, "asChild" | "child
 
 // ─── Item ─────────────────────────────────────────────────────────────────────
 
+/** A row outside a `List.Root` (a test, a story): nothing enters or leaves. */
+const NO_PRESENCE: Pick<ListPresence, "entering" | "leaving"> = {
+  entering: new Set(),
+  leaving: new Set(),
+};
+
 type ListItemOwnProps = {
   /** Stable id of the row; required in a reorderable list (`List.Root` `onReorder`). */
   value?: string;
@@ -319,83 +335,73 @@ function ListItem({
   onClick,
   type,
   ref,
+  target,
+  rel,
   ...rest
 }: ListItemProps) {
   const reorder = React.useContext(ReorderContext);
+  const presence = React.useContext(PresenceContext);
+  const key = React.useContext(RowKeyContext);
+  const rowRef = React.useRef<HTMLLIElement | null>(null);
+  const entered = useListItemPresence(
+    presence ?? NO_PRESENCE,
+    key ?? value ?? "",
+    rowRef as React.RefObject<HTMLElement | null>,
+  );
   const link = href !== undefined || asChild;
   const shared = {
     ...rest,
-    className: cx(styles.item, className),
-    onClick: (event: React.MouseEvent<HTMLElement>) => {
-      if (disabled) {
-        event.preventDefault();
-        return;
-      }
-      onClick?.(event as React.MouseEvent<HTMLButtonElement>);
-    },
+    ref,
+    disabled,
+    className: cx(styles.item, touchTargetRowClass, className),
+    onClick: onClick as React.MouseEventHandler<HTMLElement> | undefined,
     "aria-current": current ? (link ? ("page" as const) : ("true" as const)) : rest["aria-current"],
     ...toDataAttributes({ disabled: disabled || undefined }),
   };
 
-  const child =
-    asChild && React.isValidElement<{ children?: React.ReactNode }>(children) ? children : null;
-
   let element: React.ReactElement;
-  if (child) {
+  if (asChild) {
+    const child = slotChild(children, "List.Item");
     element = (
-      // A disabled child leaves the Tab order and loses a plain `href` (Slot), like the other kinds.
-      <Slot
-        {...shared}
-        ref={ref}
-        aria-disabled={disabled || undefined}
-        tabIndex={disabled ? -1 : rest.tabIndex}
-      >
+      <InteractiveElement {...shared} element="slot">
         {React.cloneElement(child, undefined, splitItemChildren(child.props.children))}
-      </Slot>
+      </InteractiveElement>
     );
   } else if (href !== undefined) {
     element = (
-      <a
-        {...(shared as React.ComponentPropsWithoutRef<"a">)}
-        ref={ref as React.Ref<HTMLAnchorElement>}
-        href={disabled ? undefined : href}
-        aria-disabled={disabled || undefined}
-      >
+      <InteractiveElement {...shared} element="link" href={href} target={target} rel={rel}>
         {splitItemChildren(children)}
-      </a>
+      </InteractiveElement>
     );
   } else {
     element = (
-      <button
-        {...shared}
-        ref={ref as React.Ref<HTMLButtonElement>}
-        type={type ?? "button"}
-        disabled={disabled}
-      >
+      <InteractiveElement {...shared} element="button" type={type ?? "button"}>
         {splitItemChildren(children)}
-      </button>
+      </InteractiveElement>
     );
   }
 
-  if (reorder === null || value === undefined) return <li className={styles.row}>{element}</li>;
+  const rowClass = cx(styles.row, entered && enterMotion.enter);
+  if (reorder === null || value === undefined) {
+    return (
+      <li ref={rowRef} className={rowClass}>
+        {element}
+      </li>
+    );
+  }
 
-  // A reorderable row: the grip beside the row element (a button cannot hold a button), a spinner
-  // in its place while the owner saves this row's move.
-  const busy = reorder.pending.has(value);
+  // A reorderable row: the grip beside the row element (a button cannot hold a button); Dnd makes
+  // the grip busy while the owner saves this row's move.
   const label = formatLabel(reorder.handleLabel, { label: itemLabel({ asChild, children }) });
   return (
     <Dnd.SortableItem
+      ref={rowRef}
       id={value}
-      disabled={busy || disabled}
-      aria-busy={busy || undefined}
-      className={cx(styles.row, styles.sortableRow)}
+      disabled={disabled}
+      className={cx(rowClass, styles.sortableRow)}
     >
       <span className={styles.grip}>
-        {busy ? (
-          <Spinner size="xs" />
-        ) : (
-          <Dnd.Handle aria-label={label.trim()} disabled={disabled} />
-        )}
+        <Dnd.Handle aria-label={label.trim()} disabled={disabled} />
       </span>
       {element}
     </Dnd.SortableItem>

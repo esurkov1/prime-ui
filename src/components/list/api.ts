@@ -30,8 +30,8 @@ export const api: ComponentApi = {
         {
           name: "aria-label",
           type: "string",
-          en: "Name of the list for screen readers («Диалоги»), when no visible heading names it.",
-          ru: "Имя списка для скринридеров («Диалоги»), если его не называет видимый заголовок.",
+          en: "Name of the list for screen readers («Обращения»), when no visible heading names it.",
+          ru: "Имя списка для скринридеров («Обращения»), если его не называет видимый заголовок.",
         },
         {
           name: "children",
