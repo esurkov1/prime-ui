@@ -497,15 +497,18 @@
 /* ─── Reply, forwarded ──────────────────────────────────────────────────── */
 
 .reply {
+  /* The quote's ink: the author's hue (internal/palette). */
+  --reply-ink: var(--hue-text);
+
   display: grid;
   min-width: 0;
   margin: 0;
   padding-block: var(--prime-space-1);
   padding-inline: var(--prime-space-2);
   border: 0;
-  border-inline-start: calc(var(--prime-border-width) * 3) solid var(--hue-text);
+  border-inline-start: calc(var(--prime-border-width) * 3) solid var(--reply-ink);
   border-radius: var(--prime-radius-s);
-  background: color-mix(in srgb, var(--hue-text) var(--prime-tint-soft), transparent);
+  background: color-mix(in srgb, var(--reply-ink) var(--prime-tint-soft), transparent);
   color: var(--prime-color-text-primary);
   font: inherit;
   font-size: var(--prime-text-body-s-size);
@@ -518,7 +521,7 @@
 
 /* In an outgoing bubble the quote takes the bubble's accent, whoever wrote the original. */
 .root[data-direction="outgoing"] .reply {
-  --hue-text: var(--prime-color-accent-text);
+  --reply-ink: var(--prime-color-accent-text);
 }
 
 button.reply {
@@ -527,7 +530,7 @@ button.reply {
 
 @media (hover: hover) {
   button.reply:hover {
-    background: color-mix(in srgb, var(--hue-text) var(--prime-tint-hover), transparent);
+    background: color-mix(in srgb, var(--reply-ink) var(--prime-tint-hover), transparent);
   }
 }
 
@@ -548,7 +551,7 @@ button.reply:focus-visible {
 }
 
 .replyAuthor {
-  color: var(--hue-text);
+  color: var(--reply-ink);
   font-weight: var(--prime-font-weight-semibold);
 }
 

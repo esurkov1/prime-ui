@@ -4,7 +4,10 @@
  * is added to the donor.
  * - No doubled-class selector (`.a.a`): a specificity hack to win over a donor.
  * - No custom property a stylesheet sets for another module to read (a donor's private variable),
- *   outside the public hooks.
+ *   outside the public hooks. A variable only one directory sets and every reader takes without a
+ *   fallback is that directory's output, not a host override: a tier table or a hue map (chipTier,
+ *   fieldTier, menu, palette) is the one home of the values its hosts read. A donor's own hook is
+ *   read with a fallback (`var(--avatar-slot-size, …)`), or the donor sets it too.
  * - `:global(html …)` only in Dnd (the drag cursor).
  *
  * In ratchet mode (`donor-override`): the overrides found when the guard landed are the baseline.
@@ -38,11 +41,27 @@ const files = moduleCssFiles().filter((file) => !file.includes("/examples/"));
 describe("donor overrides", () => {
   it("hosts configure donors only through their public API", () => {
     const readers = new Map<string, Set<string>>();
+    /** Variables some reader takes with a fallback: a hook of the reader, not an output. */
+    const optional = new Set<string>();
+    /** The directories that set each variable. */
+    const setterDirs = new Map<string, Set<string>>();
     for (const file of files) {
-      for (const m of read(file).matchAll(/var\((--[\w-]+)/g)) {
+      for (const m of read(file).matchAll(/var\((--[\w-]+)\s*(,)?/g)) {
         readers.set(m[1], new Set([...(readers.get(m[1]) ?? []), file]));
+        if (m[2]) optional.add(m[1]);
+      }
+      for (const rule of cssRules(file)) {
+        for (const { prop } of rule.decls) {
+          if (!prop.startsWith("--")) continue;
+          setterDirs.set(
+            prop,
+            new Set([...(setterDirs.get(prop) ?? []), path.posix.dirname(file)]),
+          );
+        }
       }
     }
+    const isOutput = (name: string) =>
+      !optional.has(name) && (setterDirs.get(name)?.size ?? 0) === 1;
     const offenders: string[] = [];
     for (const file of files) {
       const dir = path.posix.dirname(file);
@@ -63,6 +82,7 @@ describe("donor overrides", () => {
         for (const decl of rule.decls) {
           if (!decl.prop.startsWith("--") || decl.prop.startsWith("--prime-")) continue;
           if (PUBLIC_HOOKS.some((hook) => hook.test(decl.prop))) continue;
+          if (isOutput(decl.prop)) continue;
           const users = [...(readers.get(decl.prop) ?? [])];
           if (users.length === 0) continue; // unread: css-modules.test.ts
           if (users.every((user) => path.posix.dirname(user) !== dir)) {

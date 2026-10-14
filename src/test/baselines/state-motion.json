@@ -1,8 +1,6 @@
 [
   "src/components/card/Card.module.css: .root flips box-shadow",
   "src/components/composer/Composer.module.css: .lock flips color",
-  "src/components/dropdown/Dropdown.module.css: .item flips background",
-  "src/components/dropdown/Dropdown.module.css: .item flips background #2",
   "src/components/file-upload/FileUpload.module.css: .item flips background",
   "src/components/file-upload/FileUpload.module.css: .item flips box-shadow",
   "src/components/file-upload/FileUpload.module.css: .root flips outline-color",

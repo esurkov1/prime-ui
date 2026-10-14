@@ -14,6 +14,5 @@
   "src/components/kanban/examples/states.tsx: aria-label on a generic div",
   "src/components/kanban/examples/structure.tsx: aria-label on a generic div",
   "src/components/kanban/examples/variants.tsx: aria-label on a generic div",
-  "src/components/page-content/examples/list-detail.tsx: aria-label on a generic div",
-  "src/components/tooltip/examples/non-interactive-trigger.tsx: aria-label on a generic div"
+  "src/components/page-content/examples/list-detail.tsx: aria-label on a generic div"
 ]
