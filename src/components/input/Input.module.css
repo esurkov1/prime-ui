@@ -75,14 +75,9 @@
   opacity: 1;
 }
 
+/* The disabled text color comes from globals.css (every field of the kit). */
 .field:disabled {
-  color: var(--prime-color-text-disabled);
-  -webkit-text-fill-color: var(--prime-color-text-disabled);
   cursor: not-allowed;
-}
-
-.field:disabled::placeholder {
-  color: var(--prime-color-text-disabled);
 }
 
 .field[type="number"] {
@@ -111,7 +106,7 @@
   height: var(--field-icon);
   color: var(--prime-color-text-muted);
   pointer-events: none;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .icon > svg {
@@ -213,7 +208,7 @@
   flex-shrink: 0;
   color: var(--prime-color-text-secondary);
   font-weight: var(--prime-font-weight-medium);
-  transition: color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .strengthWord[data-tone="danger"] {

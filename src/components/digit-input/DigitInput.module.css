@@ -88,16 +88,16 @@
   text-align: center;
   outline: none;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* The code is being checked (`onComplete` returned a promise): the cells quiet down and take no
    typing until the answer, both ways eased. */
 .root[data-pending="true"] .cell {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
   cursor: progress;
 }
 
@@ -121,10 +121,6 @@
   color: var(--prime-color-danger-text);
 }
 
-.cell:disabled {
-  -webkit-text-fill-color: var(--prime-color-text-disabled);
-}
-
 /*
  * Motion. One focus ring for the row glides to the focused cell (`fast` · emphasized); it appears
  * in place (opacity) and never travels in from nowhere. A digit fades in as it lands. `success`
@@ -141,8 +137,8 @@
   pointer-events: none;
   transition:
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    outline-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    outline-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .ring[data-visible] {
