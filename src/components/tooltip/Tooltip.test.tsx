@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -248,6 +249,23 @@ describe("Tooltip", () => {
     });
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
     fireEvent.blur(trigger());
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
+
+  it("Tab onto the trigger opens it after the delay; Tab away hides it", async () => {
+    vi.useRealTimers();
+    const user = userEvent.setup();
+    render(
+      <>
+        <BasicTooltip delayDuration={50} />
+        <button type="button">Дальше</button>
+      </>,
+    );
+    await user.tab();
+    expect(trigger()).toHaveFocus();
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Tooltip text");
+    await user.tab();
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 

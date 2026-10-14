@@ -23,7 +23,8 @@ import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFl
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { Slot, type SlotPartProps, slotChild } from "@/internal/slot";
-import type { ControlSize, Tone } from "@/internal/states";
+import { type ControlSize, OVERLAY_CONTENT_SIZE, type Tone } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./Dropdown.module.css";
 
@@ -143,7 +144,7 @@ export type DropdownContentProps = Omit<React.HTMLAttributes<HTMLElement>, "role
 function DropdownContent({
   side = DEFAULT_SIDE,
   align = DEFAULT_ALIGN,
-  size = "m",
+  size = OVERLAY_CONTENT_SIZE,
   matchTriggerWidth = false,
   className,
   children,
@@ -272,7 +273,7 @@ function DropdownItem({
     role: "menuitem",
     tabIndex: -1,
     disabled,
-    className: cx(menu.item, styles.item, className),
+    className: cx(menu.item, menu.focusRow, styles.item, className),
     ...toDataAttributes({ tone, disabled: disabled || undefined }),
     // Enter and Space reach here as the native click (Enter only on a link).
     onClick: (event: React.MouseEvent<HTMLElement>) => {
@@ -343,7 +344,7 @@ function DropdownCheckboxItem({
       aria-checked={checked}
       tabIndex={-1}
       disabled={disabled}
-      className={cx(menu.item, styles.item, className)}
+      className={cx(menu.item, menu.focusRow, styles.item, className)}
       {...toDataAttributes({ disabled: disabled || undefined, checked: checked || undefined })}
       onClick={(event) => {
         onClick?.(event as React.MouseEvent<HTMLButtonElement>);
@@ -392,7 +393,7 @@ export type DropdownItemDescriptionProps = Omit<React.HTMLAttributes<HTMLSpanEle
  * unavailable («Доступно владельцу проекта»). Wraps instead of widening the menu past its limit.
  */
 function DropdownItemDescription({ className, ...rest }: DropdownItemDescriptionProps) {
-  return <span className={cx(styles.itemDescription, className)} {...rest} />;
+  return <span className={cx(menu.itemDescription, className)} {...rest} />;
 }
 DropdownItemDescription.displayName = "Dropdown.ItemDescription";
 
@@ -423,7 +424,7 @@ export type DropdownDescriptionProps = DivProps;
 
 /** Muted line under `Dropdown.Title` (an email, a quota); truncates with an ellipsis. */
 function DropdownDescription({ className, ...rest }: DropdownDescriptionProps) {
-  return <div className={cx(styles.description, className)} {...rest} />;
+  return <div className={cx(textRole.caption, styles.description, className)} {...rest} />;
 }
 DropdownDescription.displayName = "Dropdown.Description";
 

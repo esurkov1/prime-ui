@@ -8,6 +8,7 @@ import {
 } from "@/hooks/usePosition";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import {
   FloatingPanel,
   FloatingTrigger,
@@ -17,7 +18,7 @@ import { useAnchorName } from "@/internal/overlay/useAnchorName";
 import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import { Slot, type SlotPartProps } from "@/internal/slot";
-import type { ControlSize } from "@/internal/states";
+import { type ControlSize, OVERLAY_CONTENT_SIZE } from "@/internal/states";
 
 import styles from "./Popover.module.css";
 
@@ -146,7 +147,7 @@ export type PopoverContentProps = Omit<React.HTMLAttributes<HTMLDivElement>, "ro
 function PopoverContent({
   side = DEFAULT_SIDE,
   align = DEFAULT_ALIGN,
-  size = "m",
+  size = OVERLAY_CONTENT_SIZE,
   width = "auto",
   trapFocus = false,
   initialFocus,
@@ -208,7 +209,7 @@ function PopoverContent({
       aria-describedby={descriptionId ?? undefined}
       tabIndex={-1}
       data-flush={flush || undefined}
-      className={cx(styles.content, className)}
+      className={cx(fieldTierClass, styles.content, className)}
     >
       <PopoverSlotsContext.Provider value={slots}>{children}</PopoverSlotsContext.Provider>
     </FloatingPanel>

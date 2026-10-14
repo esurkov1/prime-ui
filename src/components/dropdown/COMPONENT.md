@@ -188,6 +188,7 @@ The panel is the shared floating surface: the floating layer of the ladder (`dat
 | State | Driven by | DOM |
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the menu (closed while the exit animation plays) and on the trigger, `aria-expanded` on the trigger |
+| dismiss | `closeOnEscape`, `closeOnOutsideClick` (both default `true`) | Escape and a press outside close the menu; `false` turns that way off |
 | side | `side` and the room next to the trigger | `data-side` (resolved) |
 | size | `size` on Content | `data-size` |
 | item hover / focus | a hovering pointer, arrow keys | subtle fill (danger-soft for `danger`), no movement; a tap leaves no hover fill |

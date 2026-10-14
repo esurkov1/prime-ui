@@ -110,7 +110,7 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| open / closed | hover (mouse, pen) or focus after `delayDuration`; `open` / `onOpenChange` | `data-state="open" \| "closed"` on the chip (closed during the exit) and on the trigger |
+| open / closed | hover (mouse, pen) or focus after `delayDuration`; `open` / `defaultOpen` / `onOpenChange` | `data-state="open" \| "closed"` on the chip (closed during the exit) and on the trigger |
 | closing | blur, a press on the trigger, Escape, pointer leaving (unless it moves onto the chip) | — |
 | warm group | another tooltip of the Provider was just shown | `data-instant="true"`: opens and leaves without motion |
 | side | `side` and the room around the trigger | `data-side` (resolved), `data-align` |
@@ -169,5 +169,5 @@ No `labels`.
 - A Provider per tooltip in a toolbar → one Provider around the toolbar, so neighbours open instantly.
 
 ## Related
-- **Built from:** —
+- **Built from:** the anchored floating panel (`internal/overlay/FloatingPanel`, whose scroller is a [ScrollContainer](../scroll-container/COMPONENT.md)) and the tooltip chip (`internal/overlay/tooltipSurface`)
 - **See also:** [Popover](../popover/COMPONENT.md), [Kbd](../kbd/COMPONENT.md), [Button](../button/COMPONENT.md), [Hint](../hint/COMPONENT.md)
