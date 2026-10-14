@@ -5,10 +5,11 @@ import { Label } from "@/components/label/Label";
 import { usePresence } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useFieldCell } from "@/internal/fieldCell";
 import { formatLabel } from "@/internal/formatLabel";
 import { RollingNumber } from "@/internal/RollingNumber";
 import type { ControlSize } from "@/internal/states";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
+import { VisuallyHidden, visuallyHiddenClass } from "@/internal/VisuallyHidden";
 
 import styles from "./FieldFrame.module.css";
 
@@ -81,6 +82,7 @@ export function useFieldFrame(
   ariaDescribedBy?: string,
 ): FieldIds {
   const generated = React.useId();
+  const cell = useFieldCell();
   const controlId = explicitId ?? generated;
   const labelId = `${controlId}-label`;
   const hintId = `${controlId}-hint`;
@@ -97,7 +99,8 @@ export function useFieldFrame(
     hintId,
     errorId,
     describedBy,
-    labelledBy: hasContent(label) ? labelId : undefined,
+    // In a FieldList cell the frame renders the column heading as the label when there is none.
+    labelledBy: hasContent(label) || cell ? labelId : undefined,
     showHint,
     showError,
     invalid: Boolean(invalid) || showError,
@@ -193,7 +196,11 @@ export function FieldFrame({
   const showSupport =
     showError || showHint || leaving != null || counter != null || reserveSupportRow;
   const shake = useErrorShake(ids.invalid, error);
-  const labelNode = hasContent(label) ? (
+  // In a FieldList cell: the column heading is the label when the field has none, read but not
+  // shown while the heading is on screen (`fieldCell`).
+  const cell = useFieldCell();
+  const shownLabel = hasContent(label) ? label : cell?.label;
+  const labelNode = hasContent(shownLabel) ? (
     <Label.Root
       id={ids.labelId}
       htmlFor={group ? undefined : ids.controlId}
@@ -202,9 +209,13 @@ export function FieldFrame({
       optional={optional}
       disabled={disabled}
       labels={{ optional: optionalLabel }}
-      className={styles.label}
+      className={cx(
+        styles.label,
+        cell && visuallyHiddenClass,
+        cell?.hidden === "wide" && styles.cellLabel,
+      )}
     >
-      {label}
+      {shownLabel}
     </Label.Root>
   ) : null;
 

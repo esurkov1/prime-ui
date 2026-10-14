@@ -8,8 +8,6 @@ import { DataTable, type DataTableColumn } from "@/components/data-table/DataTab
 import { PageContent } from "@/components/page-content/PageContent";
 import { Typography } from "@/components/typography/Typography";
 
-import { DemoDescription, DemoSectionTitle } from "./PlaygroundDemoTypography";
-
 /** Page shell: the h1, its lead and a column of blocks. */
 export function DocPage({
   title,
@@ -29,14 +27,12 @@ export function DocPage({
         <PageContent.Title>{title}</PageContent.Title>
         <PageContent.Description measure={measure}>{description}</PageContent.Description>
       </PageContent.Header>
-      <PageContent.Body>
-        <div className="demoExamples">{children}</div>
-      </PageContent.Body>
+      <PageContent.Body>{children}</PageContent.Body>
     </PageContent.Page>
   );
 }
 
-/** One block of a page: title (h2), optional lead, content. */
+/** One block of a page: a `PageContent.Section` — title (h2), optional lead, content. */
 export function DocBlock({
   title,
   description,
@@ -49,11 +45,9 @@ export function DocBlock({
   id?: string;
 }) {
   return (
-    <section className="demoBlock" aria-labelledby={id}>
-      <DemoSectionTitle id={id}>{title}</DemoSectionTitle>
-      {description ? <DemoDescription>{description}</DemoDescription> : null}
+    <PageContent.Section id={id} label={title} description={description}>
       {children}
-    </section>
+    </PageContent.Section>
   );
 }
 

@@ -48,9 +48,10 @@ Text color goes through `Typography tone="secondary"`, not CSS.
 // bad — a card around a card around a table
 <Card.Root><Card.Root><DataTable columns={columns} rows={rows} /></Card.Root></Card.Root>
 
-// good — DataTable already is a filled block; a section heading is enough
-<Typography as="h2" variant="title-m">Последние оплаты</Typography>
-<DataTable columns={columns} rows={rows} />
+// good — DataTable already is a filled block; a titled section is enough
+<PageContent.Section label="Последние оплаты">
+  <DataTable columns={columns} rows={rows} />
+</PageContent.Section>
 ```
 
 ## 3a. Hover that merges with the neighbour

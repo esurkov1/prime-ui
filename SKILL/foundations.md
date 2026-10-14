@@ -134,7 +134,7 @@ A chart color does one job, and the job picks the colors:
 | `body-m` | 14/20 | default text |
 | `body-l` | 16/24 | reading text |
 | `title-s` | 14/20 600 | card title, group heading inside a card or form |
-| `title-m` | 16/24 600 | page section heading without a card, modal title |
+| `title-m` | 16/24 600 | page section heading (`PageContent.Section` draws it), modal title |
 | `title-l` | 18/24 600 | large block title |
 | `heading-s` | 20/28 600 | page sub-heading |
 | `heading-m` | 24/32 600 | page title (`PageContent.Title`) |
@@ -165,7 +165,7 @@ level of air: a page with uniform 16px gaps everywhere reads as a list of unrela
 - Flex children with text: `min-width: 0` + ellipsis or `overflow-wrap: anywhere`.
 - Wide tables on phones: they scroll inside themselves with edge shadows; `stickyFirstColumn`, a column
   chooser through `hiddenColumns`; never let the page scroll sideways.
-- Card grids: `grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr))`.
+- Card grids on a page: `PageContent.Grid` + `PageContent.Cell span` (folds by its own width); inside one block: `repeat(auto-fill, minmax(min(100%, …), 1fr))`.
 - A page panel with sections, filter and search, view and the primary action is `PageToolbar`.
 - Sticky parts come from the kit: `AppHeader` (with the `PageToolbar` in `AppHeader.Tools`), the
   DataTable head and `stickyFirstColumn`, the Gantt header and first column — each sticks inside its

@@ -114,7 +114,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | Text | Use |
 |---|---|
 | page title | `PageContent.Title` (`heading-m`, the only `h1`) |
-| section heading without a card | `Typography as="h2" variant="title-m"` |
+| section heading without a card | `PageContent.Section label` (an `h2` in `title-m`) |
 | card / panel title | `Card.Title as="h2"` (under the page title) |
 | heading of a group of fields | `Fieldset label` (`title-s` in the `<legend>`) |
 | other group heading inside a card | `Typography as="h3" variant="title-s"` |

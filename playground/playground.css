@@ -20,26 +20,6 @@ body {
 
 /* --- Demo page structure ------------------------------------------------- */
 
-.demoExamples {
-  display: grid;
-  gap: var(--prime-space-10);
-  min-width: 0;
-}
-
-.demoBlock {
-  display: grid;
-  gap: var(--prime-space-3);
-  justify-items: stretch;
-  width: 100%;
-  min-width: 0;
-}
-
-.demoBlock > :not(h2):not(h3):not(.demoBlockDescription) {
-  justify-self: stretch;
-  width: 100%;
-  max-width: 100%;
-}
-
 .demoBlockDescription {
   max-width: var(--prime-layout-reading-max-width);
 }
@@ -58,29 +38,6 @@ body {
 }
 
 /* --- Intro page ---------------------------------------------------------- */
-
-.introPage {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-10);
-  width: 100%;
-  min-width: 0;
-}
-
-.introPageSection {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-3);
-  width: 100%;
-  min-width: 0;
-}
-
-.introFeatureGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--prime-space-16) * 4)), 1fr));
-  gap: var(--prime-space-3);
-  width: 100%;
-}
 
 /* Layout only: the text inside each item is Typography. */
 .introPageList {

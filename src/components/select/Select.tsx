@@ -39,7 +39,7 @@ import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import type { ControlSize } from "@/internal/states";
 import swapMotion from "@/internal/swapMotion.module.css";
 import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
-import { VisuallyHidden } from "@/internal/VisuallyHidden";
+import { VisuallyHidden, visuallyHiddenClass } from "@/internal/VisuallyHidden";
 
 import styles from "./Select.module.css";
 import {
@@ -408,6 +408,12 @@ function SelectTrigger({
     labels,
   } = useSelectContext();
   const mergedRef = useMergedRefs(triggerRef, ref);
+  // Only a `Select.TriggerIcon`, no `Select.Value`: a compact trigger (the glyph and the chevron)
+  // for a dense row; the value is still spoken from a hidden `Select.Value`.
+  const parts = React.Children.toArray(children);
+  const iconOnly =
+    parts.some((node) => React.isValidElement(node) && node.type === SelectTriggerIcon) &&
+    !parts.some((node) => React.isValidElement(node) && node.type === SelectValue);
   // Options loading and a value saving look the same: a Spinner in place of the chevron.
   const busy = loading || saving;
   const showClear = clearable && selected.length > 0 && !disabled && !busy;
@@ -450,9 +456,13 @@ function SelectTrigger({
         loading: busy || undefined,
         disabled: disabled || undefined,
         "focus-ring": focusRing ? undefined : false,
+        "icon-only": iconOnly || undefined,
       })}
     >
-      <span className={styles.triggerMain}>{children}</span>
+      <span className={styles.triggerMain}>
+        {children}
+        {iconOnly ? <SelectValue className={visuallyHiddenClass} /> : null}
+      </span>
       {showClear ? (
         // A segment, not a button: interactive content inside a <button> is invalid. The keyboard
         // clears with Delete / Backspace on the trigger.

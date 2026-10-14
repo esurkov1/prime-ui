@@ -14,6 +14,13 @@
   width: 100%;
 }
 
+/* Icon-only trigger (a `Select.TriggerIcon` and no `Select.Value`): as wide as the glyph and the
+   chevron, for a column of a dense row (FieldList); the hidden value needs a positioned box. */
+.trigger[data-icon-only="true"] {
+  position: relative;
+  width: auto;
+}
+
 .trigger:is([data-size="xs"], [data-size="s"]) {
   --sel-desc: var(--prime-text-caption-size);
   --sel-desc-lh: var(--prime-text-caption-line-height);

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/card/Card";
 import type { DataTableColumn } from "@/components/data-table/DataTable";
 import { LinkButton } from "@/components/link-button/LinkButton";
+import { PageContent } from "@/components/page-content/PageContent";
 import { Typography } from "@/components/typography/Typography";
 import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import { renderInlineCode } from "../components/PlaygroundApiTable";
@@ -219,26 +220,28 @@ export default function CompositionPage() {
           "Каждый экран — один файл в `SKILL/patterns/`: превью и код здесь, ссылка из `SKILL/composition.md` для агентов.",
         )}
       >
-        <div className="introFeatureGrid">
+        <PageContent.Grid>
           {COMPOSITION_PATTERNS.map((pattern) => (
-            <Card.Root key={pattern.file} variant="cta">
-              <Card.Title>{pattern.title}</Card.Title>
-              <Card.Description>{renderInlineCode(pattern.description)}</Card.Description>
-              <Card.Footer>
-                <LinkButton
-                  href={`/${pattern.segment}`}
-                  size="s"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    navigate(`/${pattern.segment}`);
-                  }}
-                >
-                  Открыть
-                </LinkButton>
-              </Card.Footer>
-            </Card.Root>
+            <PageContent.Cell key={pattern.file} span={4}>
+              <Card.Root variant="cta">
+                <Card.Title>{pattern.title}</Card.Title>
+                <Card.Description>{renderInlineCode(pattern.description)}</Card.Description>
+                <Card.Footer>
+                  <LinkButton
+                    href={`/${pattern.segment}`}
+                    size="s"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      navigate(`/${pattern.segment}`);
+                    }}
+                  >
+                    Открыть
+                  </LinkButton>
+                </Card.Footer>
+              </Card.Root>
+            </PageContent.Cell>
           ))}
-        </div>
+        </PageContent.Grid>
         <Typography variant="body-m" tone="secondary">
           Те же правила для агентов —{" "}
           <LinkButton href={SKILL_COMPOSITION} rel="noopener noreferrer" target="_blank">

@@ -38,6 +38,24 @@
   align-self: flex-start;
 }
 
+/*
+ * A field in a FieldList cell (`fieldCell`): its label is the column heading, read but not shown
+ * while the heading row is on screen (the sr-only class is joined in TSX). When the list stacks its
+ * rows into blocks in a narrow container, the heading row goes and each field shows its label.
+ * `prime-field-list` is the container FieldList sets (`FIELD_LIST_CONTAINER`).
+ */
+@container prime-field-list (max-width: 479px) {
+  .label.cellLabel {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+}
+
 /* Label · value on one baseline (Slider); the value keeps the end even without a label. */
 .labelRow {
   display: flex;

@@ -831,10 +831,10 @@
   gap: var(--prime-space-3);
 }
 
-/* Motion catalog: one component example per item, items apart like blocks. */
+/* Motion catalog: one component example per item, items apart like page blocks (24). */
 .motionItems {
   display: grid;
-  gap: var(--prime-space-10);
+  gap: var(--prime-space-6);
 }
 
 .motionItem {

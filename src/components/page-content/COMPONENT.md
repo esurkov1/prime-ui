@@ -173,7 +173,7 @@ PageContent.Root | PageContent.Page        column; Root adds maxWidth and fill, 
 | `readable` | Intro line wraps at the reading width | Default, most pages | yes |
 | `full` | Intro uses the full header width | The column is already narrow | |
 
-One `PageContent.Title` (`<h1>`) per page; sub-sections inside Body use `title-s` / `title-m` headings (`h2`). One primary button in Actions, the rest `soft` / `ghost` neutral.
+One `PageContent.Title` (`<h1>`) per page; a topic inside Body is a `PageContent.Section` (its `h2`). One primary button in Actions, the rest `soft` / `ghost` neutral.
 
 ### Flags
 | Flag | Looks like when on | Use when | Default |
