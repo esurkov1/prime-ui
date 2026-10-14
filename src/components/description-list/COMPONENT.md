@@ -58,7 +58,8 @@ DescriptionList.Root                 <dl>; size (host tier), orientation; a size
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `string` | — (required) | Accessible name and tooltip of the action. |
-| `children` | `ReactNode` | — (required) | The icon (`<Icon name="…" />`). |
+| `children` | `ReactNode` | — (required) | The icon (`<Icon name="…" />`); with `asChild`, the one link whose children are the icon. |
+| `asChild` | `boolean` | `false` | The action is the child link (`mailto:`, another page) with the button look. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children">` | — | `onClick`, `disabled`, `className` and the other button attributes. |
 
 ## Variants
@@ -121,7 +122,7 @@ No motion: the list is static text; a row action has the Button's own press and 
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A client's details in a card: labels beside values, a long address that wraps, an empty manager and a copy action — `DescriptionList.Item`, `label`, `DescriptionList.ItemAction`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier changes the label and value type and the gap between pairs — `size`. |
-| [structure.tsx](examples/structure.tsx) | Optional pieces of a pair: a Badge or a link as the value, a row action and an empty value with its own mark — `DescriptionList.ItemAction`, `labels`. |
+| [structure.tsx](examples/structure.tsx) | Optional pieces of a pair: a Badge or a link as the value, a row action that is a link and an empty value with its own mark — `DescriptionList.ItemAction`, `asChild`, `labels`. |
 | [vertical.tsx](examples/vertical.tsx) | Labels above their values at any width, for a side panel of a record — `orientation`. |
 | [narrow.tsx](examples/narrow.tsx) | In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap. |
 | [screen.tsx](examples/screen.tsx) | A nested record: the path, the title with its status and due date and the record's actions by weight in the app header, a main column with the line items and a side column with the client's details and the history — `orientation`. |

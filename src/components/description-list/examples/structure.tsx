@@ -1,4 +1,4 @@
-/** Optional pieces of a pair: a Badge or a link as the value, a row action and an empty value with its own mark — `DescriptionList.ItemAction`, `labels`. */
+/** Optional pieces of a pair: a Badge or a link as the value, a row action that is a link and an empty value with its own mark — `DescriptionList.ItemAction`, `asChild`, `labels`. */
 import { Badge, DescriptionList, Icon, LinkButton } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -15,11 +15,10 @@ export default function DescriptionListStructureExample() {
         </DescriptionList.Item>
         <DescriptionList.Item label="Почта">
           finance@severny-veter.ru
-          <DescriptionList.ItemAction
-            label="Написать"
-            onClick={() => window.open("mailto:finance@severny-veter.ru")}
-          >
-            <Icon name="action.send" />
+          <DescriptionList.ItemAction label="Написать" asChild>
+            <a href="mailto:finance@severny-veter.ru">
+              <Icon name="action.send" />
+            </a>
           </DescriptionList.ItemAction>
         </DescriptionList.Item>
         <DescriptionList.Item label="Скидка">{null}</DescriptionList.Item>

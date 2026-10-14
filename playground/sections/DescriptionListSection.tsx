@@ -30,7 +30,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "Необязательные части пары: Badge или ссылка в значении, действие строки и пустое значение со своей меткой — `DescriptionList.ItemAction`, `labels`.",
+        "Необязательные части пары: Badge или ссылка в значении, действие строки — ссылка и пустое значение со своей меткой — `DescriptionList.ItemAction`, `asChild`, `labels`.",
     },
     {
       scenario: "vertical",

@@ -78,6 +78,25 @@ describe("DescriptionList", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it("a row action may be a link with the button look (asChild)", () => {
+    render(
+      <DescriptionList.Root>
+        <DescriptionList.Item label="Почта">
+          finance@severny-veter.ru
+          <DescriptionList.ItemAction label="Написать" asChild>
+            <a href="mailto:finance@severny-veter.ru">
+              <svg aria-hidden="true" />
+            </a>
+          </DescriptionList.ItemAction>
+        </DescriptionList.Item>
+      </DescriptionList.Root>,
+    );
+    expect(screen.getByRole("link", { name: "Написать" })).toHaveAttribute(
+      "href",
+      "mailto:finance@severny-veter.ru",
+    );
+  });
+
   it("forwards refs and native attributes", () => {
     const listRef = React.createRef<HTMLDListElement>();
     const itemRef = React.createRef<HTMLDivElement>();
