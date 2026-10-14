@@ -1,5 +1,4 @@
 [
-  "src/components/card/api.ts: keyboard Tab — Tab",
   "src/components/chart-frame/api.ts: keyboard Enter · Space — Enter",
   "src/components/chart-frame/api.ts: keyboard Tab — Tab",
   "src/components/chart-frame/api.ts: keyboard ← · → · ↑ · ↓ — ←",
@@ -51,7 +50,6 @@
   "src/components/datepicker/api.ts: keyboard Home · End — Home",
   "src/components/datepicker/api.ts: keyboard PageUp · PageDown — PageUp",
   "src/components/datepicker/api.ts: keyboard ↑ · ↓ — ↑",
-  "src/components/description-list/api.ts: keyboard Enter · Space — Space",
   "src/components/digit-input/api.ts: keyboard ArrowLeft · ArrowRight — ArrowLeft",
   "src/components/digit-input/api.ts: keyboard ArrowLeft · ArrowRight — ArrowRight",
   "src/components/digit-input/api.ts: keyboard Tab — Tab",
