@@ -11,7 +11,6 @@
   "src/components/composer/Composer.module.css: .lock flips color",
   "src/components/datepicker/Datepicker.module.css: .field flips box-shadow",
   "src/components/datepicker/Datepicker.module.css: .fieldTime flips color",
-  "src/components/dnd/Dnd.module.css: .draggable flips opacity",
   "src/components/dropdown/Dropdown.module.css: .item flips background",
   "src/components/dropdown/Dropdown.module.css: .item flips background #2",
   "src/components/file-upload/FileUpload.module.css: .item flips background",
