@@ -113,7 +113,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .swatch:hover:not(:disabled) {
-    transform: scale(1.08);
+    transform: scale(var(--prime-motion-scale-hover));
   }
 }
 
@@ -131,7 +131,7 @@
 .swatch:disabled {
   cursor: not-allowed;
   filter: grayscale(1);
-  opacity: 0.5;
+  opacity: var(--prime-opacity-disabled);
 }
 
 /* ---- Check mark: light on dark colors, dark on light ones, in both themes ---- */
@@ -139,7 +139,7 @@
 .check {
   --check-stroke: 3;
   position: relative;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   width: var(--prime-icon-size);
   height: var(--prime-icon-size);
   color: var(--prime-color-control-thumb);
@@ -147,7 +147,7 @@
 }
 
 .swatch[data-contrast="dark"] .check {
-  color: var(--prime-color-palette-yellow-solid-fg);
+  color: var(--prime-color-ink-on-light);
 }
 
 /* «No color»: the checkerboard is the surface's own fills, so the mark follows the theme. */

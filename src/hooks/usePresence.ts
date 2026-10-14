@@ -1,15 +1,9 @@
 import * as React from "react";
 
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
+
 export type PresenceState = "open" | "closed";
 export type MotionDurationToken = "xfast" | "fast" | "base" | "slow";
-
-/** Token defaults (foundation §7) used when the CSS variable cannot be read. */
-const DURATION_FALLBACK_MS: Record<MotionDurationToken, number> = {
-  xfast: 150,
-  fast: 230,
-  base: 380,
-  slow: 570,
-};
 
 /** Slack over the token duration before the timeout fallback unmounts the layer. */
 const TIMEOUT_SLACK_MS = 50;
@@ -32,13 +26,19 @@ function parseDurationMs(raw: string): number | null {
   return null;
 }
 
+/**
+ * A duration token in ms, read from the document (respects theme and reduced-motion overrides);
+ * its token default when the CSS cannot be read.
+ */
+export function readCssDurationMs(name: keyof typeof TOKEN_DEFAULTS): number {
+  if (typeof document === "undefined") return TOKEN_DEFAULTS[name];
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
+  return parseDurationMs(raw) ?? TOKEN_DEFAULTS[name];
+}
+
 /** `--prime-motion-duration-<token>` in ms, read from the document (respects theme overrides). */
 export function motionDurationMs(token: MotionDurationToken): number {
-  if (typeof document === "undefined") return DURATION_FALLBACK_MS[token];
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(
-    `--prime-motion-duration-${token}`,
-  );
-  return parseDurationMs(raw) ?? DURATION_FALLBACK_MS[token];
+  return readCssDurationMs(`--prime-motion-duration-${token}`);
 }
 
 /** Timeout fallback for an exit animation of `token` length: the token duration plus slack. */

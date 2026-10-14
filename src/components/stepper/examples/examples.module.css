@@ -14,7 +14,7 @@
 
 /* A phone-width container (320px). */
 .narrow {
-  width: min(100%, calc(var(--prime-drawer-width-s) - var(--prime-space-10)));
+  width: min(100%, var(--prime-layout-min-width));
 }
 
 /* Back / Next under the stepper. */

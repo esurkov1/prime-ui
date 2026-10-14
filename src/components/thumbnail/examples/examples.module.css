@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   gap: var(--prime-space-3);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
   min-width: 0;
 }
 

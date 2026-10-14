@@ -372,9 +372,7 @@ describe("VideoNote geometry", () => {
   it("the circle is square at every width: one box, a min() width and `aspect-ratio: 1`", () => {
     const circle = block("circle");
     expect(circle).toMatch(/aspect-ratio: 1;/);
-    expect(circle).toMatch(
-      /inline-size: min\(calc\(var\(--prime-message-video-note\) \* 1\.15\), 100cqi\);/,
-    );
+    expect(circle).toMatch(/inline-size: min\(var\(--prime-message-video-note-box\), 100cqi\);/);
     for (const sized of [circle, block("root")]) {
       expect(sized).not.toMatch(
         /(^|\n)\s*(height|block-size|min-block-size|max-block-size|max-inline-size):/,

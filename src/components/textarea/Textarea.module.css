@@ -155,14 +155,9 @@
   opacity: 1;
 }
 
+/* The disabled text color comes from globals.css (every field of the kit). */
 .textarea:disabled {
-  color: var(--prime-color-text-disabled);
-  -webkit-text-fill-color: var(--prime-color-text-disabled);
   cursor: not-allowed;
-}
-
-.textarea:disabled::placeholder {
-  color: var(--prime-color-text-disabled);
 }
 
 /* ── Formatting: the box that anchors the toolbar over the field (internal/textFormattingToolbar) ── */

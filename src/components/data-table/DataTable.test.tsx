@@ -1310,7 +1310,9 @@ describe("DataTable opening rows", () => {
   it("CSS: controls stand above the link copies and the focused row rings all its cells", () => {
     const css = readFileSync(join(__dirname, "DataTable.module.css"), "utf8");
     expect(css).toMatch(/:where\(\.row\[data-link="true"\] > \.cell\)/);
-    expect(css).toMatch(/\[data-row-click-ignore\]\s*\) \{\s*position: relative;\s*z-index: 1;/);
+    expect(css).toMatch(
+      /\[data-row-click-ignore\]\s*\) \{\s*position: relative;\s*z-index: var\(--prime-z-raised\);/,
+    );
     expect(css).toMatch(/\.row:is\(:focus-visible, :has\(\.rowLink:focus-visible\)\) > \.cell \{/);
   });
 });

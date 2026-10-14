@@ -50,13 +50,13 @@
   align-items: center;
   justify-content: center;
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .glyph[data-shown="false"] {
   opacity: 0;
-  transform: scale(0.6);
+  transform: scale(var(--prime-motion-scale-mark));
 }
 
 @media (prefers-reduced-motion: reduce) {

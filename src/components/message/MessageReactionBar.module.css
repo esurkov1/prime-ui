@@ -40,7 +40,7 @@
 .bar[role="toolbar"][data-state] {
   animation: none;
   transition:
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
     grid-template-rows var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
@@ -48,13 +48,13 @@
 @starting-style {
   .bar[role="toolbar"][data-state="open"] {
     opacity: 0;
-    transform: translateY(var(--prime-space-1)) scale(0.96);
+    transform: translateY(var(--prime-space-1)) scale(var(--prime-motion-scale-enter));
   }
 }
 
 .bar[role="toolbar"][data-state="closed"] {
   opacity: 0;
-  transform: translateY(var(--prime-space-1)) scale(0.96);
+  transform: translateY(var(--prime-space-1)) scale(var(--prime-motion-scale-enter));
 }
 
 .bar[role="toolbar"][data-expanded] {
@@ -91,10 +91,10 @@
   --n: 8;
   animation: none;
   opacity: 0;
-  transform: scale(0.8);
+  transform: scale(var(--prime-motion-scale-pop));
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
   --out: max(0s, calc((var(--n) - var(--i, 0)) * var(--step) / 2));
   transition-delay: 0s, var(--out), var(--out);
@@ -123,14 +123,14 @@
   animation: reactionIn var(--prime-motion-duration-fast) var(--prime-motion-easing-enter) backwards;
   animation-delay: calc(var(--i, 0) * var(--step));
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 .bar[data-state="closed"] .reaction {
   opacity: 0;
-  transform: scale(0.9);
+  transform: scale(var(--prime-motion-scale-settle));
 }
 
 .glyph {
@@ -145,12 +145,13 @@
 
 @media (hover: hover) {
   .reaction[data-hovered] .glyph {
-    transform: translateY(calc(-1 * var(--prime-space-1) / 2)) scale(1.2);
+    transform: translateY(calc(-1 * var(--prime-space-1) / 2))
+      scale(var(--prime-motion-scale-emphasis));
   }
 }
 
 .reaction:focus-visible .glyph {
-  transform: scale(1.2);
+  transform: scale(var(--prime-motion-scale-emphasis));
 }
 
 .reaction:active .glyph {
@@ -186,13 +187,13 @@
 @keyframes reactionIn {
   from {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(var(--prime-motion-scale-pop));
   }
 }
 
 @keyframes reactionPick {
   50% {
-    transform: scale(1.4);
+    transform: scale(var(--prime-motion-scale-burst));
   }
 }
 

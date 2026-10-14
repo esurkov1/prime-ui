@@ -51,7 +51,7 @@
   height: var(--pl-swatch);
   border-radius: var(--prime-radius-full);
   background: var(--pl-fill);
-  transition: background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .swatch[data-tone="neutral"] {

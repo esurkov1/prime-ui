@@ -129,7 +129,7 @@ describe("TransferDisk", () => {
     expect(diskOf()).toHaveAttribute("inert");
     expect(screen.queryByRole("button")).toBeNull();
     expect(css).toMatch(
-      /\.disk\[data-state="done"\] \{\s*opacity: 0;\s*transform: scale\(0\.9\);[^}]*transition-delay: var\(--prime-motion-duration-base\)/,
+      /\.disk\[data-state="done"\] \{\s*opacity: 0;\s*transform: scale\(var\(--prime-motion-scale-settle\)\);[^}]*transition-delay: var\(--prime-motion-duration-base\)/,
     );
   });
 

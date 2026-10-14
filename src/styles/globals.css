@@ -71,6 +71,28 @@ input::-moz-focus-inner {
   cursor: not-allowed;
 }
 
+/* A disabled field's value and placeholder take the disabled text color; WebKit paints a disabled
+   value with its own dimmed fill unless `-webkit-text-fill-color` says otherwise. Not in the reset
+   layer (`controls.css`): a field's own `color: inherit` must not undo it. */
+input:not(
+    [type="checkbox"],
+    [type="radio"],
+    [type="range"],
+    [type="color"],
+    [type="file"]
+  ):disabled,
+textarea:disabled,
+select:disabled {
+  color: var(--prime-color-text-disabled);
+  -webkit-text-fill-color: var(--prime-color-text-disabled);
+}
+
+input:disabled::placeholder,
+textarea:disabled::placeholder {
+  color: var(--prime-color-text-disabled);
+  -webkit-text-fill-color: var(--prime-color-text-disabled);
+}
+
 /* Inline code inside running text (an identifier, a prop, a token): mono on a muted fill. Code in
    a block (CodeBlock, <pre>) and code set as text roles (Typography variant="code") stay plain. */
 :where(:not(pre) > code:not([data-variant])) {
@@ -88,6 +110,7 @@ input::-moz-focus-inner {
 
 /* Fill-based controls have no visible outline. Users who ask for more contrast get one. */
 @media (prefers-contrast: more) {
+  :root[data-theme],
   :root,
   [data-theme] {
     --prime-color-border-control: var(--prime-color-text-muted);
@@ -218,16 +241,52 @@ input::-moz-focus-inner {
   --prime-layer-shadow: none;
 }
 
-/* Theme switches are instant: a running color transition would start from the old theme and blink. */
-[data-theme-switching],
-[data-theme-switching] *,
-[data-theme-switching] *::before,
-[data-theme-switching] *::after {
-  /* biome-ignore lint/complexity/noImportantStyles: must beat component-module transitions for one frame */
-  transition: none !important;
+/*
+ * Context variables of the page frame, read by components and set by hosts:
+ *   layout-gutter   the side air of the page at this viewport (gutter s → m from 640 → l from 1024)
+ *   bleed-inline    the side padding of a host that lets a part reach its edges (a dialog header
+ *                   hands it to the tab strip inside); 0 everywhere else
+ */
+:root {
+  --prime-layout-gutter: var(--prime-layout-gutter-s);
+  --prime-bleed-inline: 0px;
 }
 
+@media (min-width: 640px) {
+  :root {
+    --prime-layout-gutter: var(--prime-layout-gutter-m);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --prime-layout-gutter: var(--prime-layout-gutter-l);
+  }
+}
+
+/* Theme switches are instant: a running color transition would start from the old theme and blink.
+   `applyTheme` sets the attribute, paints the new theme with every clock at 0 and takes it off in
+   the same task. A theme island inside declares the clocks again, so it is zeroed too. */
+:root[data-theme-switching],
+[data-theme-switching],
+[data-theme-switching] [data-theme] {
+  --prime-motion-duration-xfast: 0ms;
+  --prime-motion-duration-fast: 0ms;
+  --prime-motion-duration-base: 0ms;
+  --prime-motion-duration-slow: 0ms;
+  --prime-motion-fade-xfast: 0ms;
+  --prime-motion-fade-fast: 0ms;
+  --prime-motion-fade-base: 0ms;
+  --prime-motion-fade-slow: 0ms;
+  --prime-message-morph-duration: 0ms;
+}
+
+/* Reduced motion: movement goes — durations, stagger and press scale collapse — while fades and
+   color changes keep their clock (`--prime-motion-fade-*`, foundation §7 rule 12), and so do the
+   loading loop and gesture clocks (`--prime-motion-loop`, `--prime-motion-hold-confirm`). */
 @media (prefers-reduced-motion: reduce) {
+  /* `:root[data-theme]` outranks the light theme's own `:root[data-theme="light"]` block. */
+  :root[data-theme],
   :root,
   [data-theme] {
     --prime-motion-duration-xfast: 0ms;

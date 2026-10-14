@@ -49,20 +49,20 @@
   width: 100%;
   height: 100%;
   border-radius: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .play {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: var(--prime-z-top);
   margin: auto;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* A transfer not done yet: the picture dims under the disk, the play mark gives the middle up. */
 .tile:has(> .transfer[data-covered]) > .thumb {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 .tile:has(> .transfer[data-covered]) > .play {
@@ -71,7 +71,7 @@
 
 .length {
   position: absolute;
-  z-index: 3;
+  z-index: var(--prime-z-top);
   inset-block-start: var(--prime-space-2);
   inset-inline-start: var(--prime-space-2);
 }
@@ -79,7 +79,7 @@
 .open {
   position: absolute;
   inset: 0;
-  z-index: 4;
+  z-index: var(--prime-z-cover);
   margin: 0;
   padding: 0;
   border: 0;
@@ -95,7 +95,7 @@
 .transfer {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: var(--prime-z-front);
   pointer-events: none;
 }
 

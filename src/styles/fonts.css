@@ -2,3 +2,25 @@
    Golos Text: interface face with full Cyrillic; JetBrains Mono: code and IDs.
    Self-host them instead and the token stacks pick them up by family name. */
 @import url("https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* Metric-matched fallbacks: until a face arrives (`display=swap`), text is set in a local face
+   scaled to its width and line box, so nothing moves when it swaps in. The overrides are measured
+   from the faces' own tables (average advance of running text, hhea ascender / descender) against
+   Arial and Courier New; the token stacks name these families right after the real ones. */
+@font-face {
+  font-family: "Golos Text Fallback";
+  src: local("Arial"), local("ArialMT");
+  size-adjust: 108.89%;
+  ascent-override: 90%;
+  descent-override: 20.2%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Fallback";
+  src: local("Courier New"), local("CourierNewPSMT");
+  size-adjust: 99.98%;
+  ascent-override: 102.02%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}

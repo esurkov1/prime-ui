@@ -1,4 +1,5 @@
 import * as React from "react";
+import { readCssDurationMs } from "@/hooks/usePresence";
 import { ControlSizeProvider, useControlSize } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
@@ -66,9 +67,6 @@ export type ButtonLabels = {
 
 const BUTTON_LABELS: ButtonLabels = { holdHint: "Удерживайте, чтобы подтвердить" };
 
-/** How long a hold-to-confirm press lasts; a gesture time, not motion, so reduced motion keeps it. */
-const HOLD_MS = 1200;
-
 /** `cancel`: released before the end — the fill rolls back; `idle` after `done` only fades. */
 type HoldPhase = "idle" | "holding" | "confirming" | "done" | "cancel";
 
@@ -117,7 +115,8 @@ export type ButtonRootProps = Omit<
   };
 
 /**
- * A held press (pointer, Space or Enter) that confirms after `HOLD_MS`. Releasing, leaving the
+ * A held press (pointer, Space or Enter) that confirms after `--prime-motion-hold-confirm` (a
+ * gesture time: reduced motion keeps it). Releasing, leaving the
  * button or losing focus earlier cancels. A promise from `onConfirm` keeps the press `confirming`
  * until it settles: resolve ends it like a sync confirm, reject rolls the fill back.
  */
@@ -143,7 +142,7 @@ function useHoldToConfirm(enabled: boolean, onConfirm: (() => void | Promise<voi
         () => setPhase((current) => (current === "confirming" ? "idle" : current)),
         () => setPhase((current) => (current === "confirming" ? "cancel" : current)),
       );
-    }, HOLD_MS);
+    }, readCssDurationMs("--prime-motion-hold-confirm"));
   };
   const stop = () => {
     window.clearTimeout(timer.current);
@@ -322,14 +321,10 @@ function ButtonRoot({
       aria-describedby={describedBy}
       onClick={onClick}
       style={
-        (inProgress && !circle) || holdToConfirm
+        inProgress && !circle
           ? ({
               ...rest.style,
-              "--btn-progress":
-                inProgress && progress !== null && !circle
-                  ? Math.min(1, Math.max(0, progress))
-                  : undefined,
-              "--btn-hold-duration": holdToConfirm ? `${HOLD_MS}ms` : undefined,
+              "--btn-progress": progress !== null ? Math.min(1, Math.max(0, progress)) : undefined,
             } as React.CSSProperties)
           : rest.style
       }

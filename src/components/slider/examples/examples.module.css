@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-6);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 /* controlled.tsx: the slider takes the row, the number field a fixed column. */
@@ -14,7 +14,7 @@
   grid-template-columns: minmax(0, 1fr) var(--prime-space-24);
   align-items: end;
   gap: var(--prime-space-4);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 /* orientation.tsx: upright sliders side by side, a mixer row. */

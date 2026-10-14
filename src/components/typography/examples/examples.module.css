@@ -4,7 +4,7 @@
 .block {
   display: grid;
   gap: var(--prime-space-2);
-  max-width: var(--prime-modal-width-s);
+  max-width: var(--prime-layout-form-width-s);
   margin: 0;
   text-align: start;
 }

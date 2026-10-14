@@ -58,8 +58,8 @@
   text-decoration-line: underline;
   text-decoration-thickness: var(--prime-border-width);
   text-underline-offset: calc(var(--prime-space-1) - var(--prime-border-width));
-  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
-  transition: text-decoration-color var(--prime-motion-duration-fast)
+  text-decoration-color: color-mix(in srgb, currentColor var(--prime-tint-strong), transparent);
+  transition: text-decoration-color var(--prime-motion-fade-fast)
     var(--prime-motion-easing-standard);
 }
 
@@ -91,7 +91,7 @@
   background-color: var(--prime-color-fill-strong);
   cursor: pointer;
   user-select: none;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .spoiler[data-state="masked"] * {

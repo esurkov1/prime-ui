@@ -61,7 +61,7 @@
 /* Recording: the paperclip and the field fade out under the bar (and back in after it). */
 .start,
 .field {
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-recording] :is(.start, .field) {
@@ -114,7 +114,7 @@
 /* ── Send / record button ── */
 .action {
   position: relative;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   /* A held record button is dragged: no page scroll, no text selection under the finger. */
   touch-action: none;
 }
@@ -129,13 +129,13 @@
   grid-area: 1 / 1;
   display: flex;
   transition:
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
 .glyph[data-state="inactive"] {
   opacity: 0;
-  transform: scale(0.6) rotate(-30deg);
+  transform: scale(var(--prime-motion-scale-mark)) rotate(-30deg);
 }
 
 /*
@@ -184,7 +184,7 @@
 @keyframes composerLockOut {
   to {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(var(--prime-motion-scale-pop));
   }
 }
 
@@ -242,7 +242,7 @@
 @keyframes composerPulse {
   to {
     opacity: 0.3;
-    transform: scale(0.75);
+    transform: scale(var(--prime-motion-scale-pop));
   }
 }
 
@@ -313,14 +313,14 @@
 @keyframes composerPreviewIn {
   from {
     opacity: 0;
-    transform: translateY(var(--prime-space-4)) scale(0.6);
+    transform: translateY(var(--prime-space-4)) scale(var(--prime-motion-scale-mark));
   }
 }
 
 @keyframes composerPreviewOut {
   to {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(var(--prime-motion-scale-pop));
   }
 }
 
@@ -342,7 +342,7 @@
   /* A selfie camera reads as a mirror. */
   transform: scaleX(-1);
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .preview[data-ready="true"] .video {

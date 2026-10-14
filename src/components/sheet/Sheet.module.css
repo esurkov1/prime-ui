@@ -24,8 +24,7 @@
     var(--prime-color-bg-scrim) calc((1 - var(--swipe-progress, 0)) * 100%),
     transparent
   );
-  transition: background-color var(--prime-motion-duration-base)
-    var(--prime-motion-easing-emphasized);
+  transition: background-color var(--prime-motion-fade-base) var(--prime-motion-easing-emphasized);
 }
 
 .overlay:has(+ .panel[data-swiping]) {

@@ -41,7 +41,7 @@
 /* compact.tsx: a floating panel (menu / listbox) the compact empty state sits in. */
 .panel {
   box-sizing: border-box;
-  width: min(100%, var(--prime-panel-min-width));
+  width: min(100%, var(--prime-layout-tile-min-width));
   padding: var(--prime-panel-padding);
   border-radius: var(--prime-panel-radius);
   background: var(--prime-color-layer-floating-bg);

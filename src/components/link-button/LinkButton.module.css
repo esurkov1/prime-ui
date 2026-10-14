@@ -21,8 +21,8 @@
   text-underline-offset: calc(var(--prime-space-1) - var(--prime-border-width));
   cursor: pointer;
   transition:
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    text-decoration-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    text-decoration-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* `asChild` on a `<button>`: drop the native button chrome, keep the link look. */

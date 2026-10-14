@@ -26,7 +26,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-4);
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
 }
 
 .formActions {
@@ -38,7 +38,7 @@
 .optionList {
   box-sizing: border-box;
   display: grid;
-  width: min(100%, var(--prime-panel-min-width));
+  width: min(100%, var(--prime-layout-tile-min-width));
   padding: var(--prime-panel-padding);
   border-radius: var(--prime-panel-radius);
   background: var(--prime-color-layer-floating-bg);
@@ -53,8 +53,7 @@
   padding-inline: var(--prime-control-m-field-padding-x);
   border-radius: var(--prime-panel-item-radius);
   cursor: pointer;
-  transition: background-color var(--prime-motion-duration-xfast)
-    var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard);
 }
 
 .option[aria-disabled="true"] {

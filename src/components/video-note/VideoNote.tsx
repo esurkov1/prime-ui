@@ -24,6 +24,7 @@ import {
 import { defineMessagePart, useInMessage, useMessagePart } from "@/internal/messagePart";
 import { Ring } from "@/internal/ring";
 import { nextSurfaceDepth, useSurfaceDepth } from "@/internal/surfaceDepth";
+import { TOKEN_DEFAULTS } from "@/internal/tokenDefaults";
 import { VisuallyHidden } from "@/internal/VisuallyHidden";
 
 import styles from "./VideoNote.module.css";
@@ -303,13 +304,11 @@ export function VideoNote(props: VideoNoteProps) {
   return <VideoNoteInner key={props.src} {...props} />;
 }
 
-/** The circle's diameter at the default root size: `--prime-message-video-note` × 1.15. */
-const NOTE_PX = 14.5 * 16 * 1.15;
-
 defineMessagePart(VideoNote, {
   shell: "round",
   meta: "overlay",
   sized: true,
-  estimate: () => NOTE_PX,
+  // The circle's diameter at the default root size.
+  estimate: () => TOKEN_DEFAULTS["--prime-message-video-note-box"],
   text: ({ transcript }: VideoNoteProps) => transcript ?? "",
 });

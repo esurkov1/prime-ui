@@ -22,7 +22,7 @@
 
 /* flush.tsx: the panel has no padding; every row brings its own. */
 .flushPanel {
-  width: calc(var(--prime-panel-min-width) * 1.5);
+  width: var(--prime-layout-min-width);
 }
 
 .flushHead {

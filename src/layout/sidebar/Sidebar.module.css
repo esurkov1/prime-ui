@@ -279,14 +279,14 @@
   position: absolute;
   inset-block: 0;
   inset-inline: 0;
-  z-index: -1;
+  z-index: var(--prime-z-below);
   border-radius: inherit;
   background: var(--sb-fill, transparent);
   box-shadow: var(--sb-lift, none);
   pointer-events: none;
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
-    box-shadow var(--prime-motion-duration-fast) var(--sb-ease);
+    background-color var(--prime-motion-fade-xfast) var(--sb-ease),
+    box-shadow var(--prime-motion-fade-fast) var(--sb-ease);
 }
 
 :is(.item, .account, .brand):focus-visible {
@@ -350,16 +350,16 @@
 )::before {
   transition:
     inset-inline-end var(--sb-duration) var(--sb-ease),
-    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
-    box-shadow var(--prime-motion-duration-fast) var(--sb-ease);
+    background-color var(--prime-motion-fade-xfast) var(--sb-ease),
+    box-shadow var(--prime-motion-fade-fast) var(--sb-ease);
 }
 
 @media (hover: hover) {
   .root:not([data-off-canvas]) :is(.item, .account, .brand):hover::before {
     transition:
       inset-inline-end var(--sb-duration) var(--sb-ease),
-      background-color var(--prime-motion-duration-xfast) var(--sb-ease),
-      box-shadow var(--prime-motion-duration-fast) var(--sb-ease);
+      background-color var(--prime-motion-fade-xfast) var(--sb-ease),
+      box-shadow var(--prime-motion-fade-fast) var(--sb-ease);
   }
 }
 
@@ -510,8 +510,8 @@
 .groupTrigger {
   cursor: pointer;
   transition:
-    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
-    color var(--prime-motion-duration-xfast) var(--sb-ease);
+    background-color var(--prime-motion-fade-xfast) var(--sb-ease),
+    color var(--prime-motion-fade-xfast) var(--sb-ease);
 }
 
 @media (hover: hover) {
@@ -557,8 +557,8 @@
   clip-path: inset(0);
   transition:
     clip-path var(--sb-duration) var(--sb-ease),
-    background-color var(--prime-motion-duration-xfast) var(--sb-ease),
-    color var(--prime-motion-duration-xfast) var(--sb-ease);
+    background-color var(--prime-motion-fade-xfast) var(--sb-ease),
+    color var(--prime-motion-fade-xfast) var(--sb-ease);
 }
 
 .root[data-panel-mode="compact"]:not([data-off-canvas]) .groupLabel {
@@ -731,7 +731,7 @@
   cursor: pointer;
   isolation: isolate;
   transition:
-    color var(--prime-motion-duration-xfast) var(--sb-ease),
+    color var(--prime-motion-fade-xfast) var(--sb-ease),
     transform var(--prime-motion-duration-fast) var(--sb-ease),
     clip-path var(--sb-duration) var(--sb-ease);
 }
@@ -786,7 +786,7 @@
   width: var(--sb-icon);
   height: var(--sb-icon);
   color: var(--prime-color-text-muted);
-  transition: color var(--prime-motion-duration-xfast) var(--sb-ease);
+  transition: color var(--prime-motion-fade-xfast) var(--sb-ease);
 }
 
 .icon > :global(svg) {
@@ -900,7 +900,7 @@
   transition:
     stroke var(--sb-duration) var(--sb-ease),
     rotate var(--prime-motion-duration-base) var(--sb-ease),
-    color var(--prime-motion-duration-xfast) var(--sb-ease);
+    color var(--prime-motion-fade-xfast) var(--sb-ease);
 }
 
 @media (hover: hover) {
@@ -933,7 +933,7 @@
   inset-inline-end: var(--sb-action-inset);
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--prime-motion-duration-fast) var(--sb-ease);
+  transition: opacity var(--prime-motion-fade-fast) var(--sb-ease);
 }
 
 .row:focus-within > .action {
@@ -1150,7 +1150,7 @@
   line-height: var(--sb-line-height);
   font-weight: var(--prime-font-weight-medium);
   transition:
-    color var(--prime-motion-duration-xfast) var(--sb-ease),
+    color var(--prime-motion-fade-xfast) var(--sb-ease),
     -webkit-text-fill-color var(--sb-duration) var(--sb-ease);
 }
 
@@ -1211,8 +1211,8 @@
     visibility 0s linear var(--sb-toggle-hide),
     border-radius var(--sb-duration) var(--sb-ease),
     box-shadow var(--sb-duration) var(--sb-ease),
-    background-color var(--prime-motion-duration-fast) var(--sb-ease),
-    color var(--prime-motion-duration-fast) var(--sb-ease);
+    background-color var(--prime-motion-fade-fast) var(--sb-ease),
+    color var(--prime-motion-fade-fast) var(--sb-ease);
 }
 
 .root .headerToggle:focus-visible {

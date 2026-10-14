@@ -51,7 +51,7 @@
 .root [data-motion] {
   --icon-dx: 0;
   --icon-dy: 0;
-  --icon-shift: 4px;
+  --icon-shift: var(--prime-icon-gesture-shift);
   --icon-angle: 26deg;
   --icon-sign: 1;
   --icon-scale: 1.35;

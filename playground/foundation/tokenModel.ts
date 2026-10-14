@@ -45,7 +45,7 @@ export function semanticKeys(path: string): string[] {
   return node === undefined || typeof node === "string" ? [] : Object.keys(node);
 }
 
-/** Raw source value of a token for a theme (`{color.gray.50}`, `rgba(…)`, `2.75rem`). */
+/** Raw source value of a token for a theme (`{color.gray.50}`, `color-mix(…)`, `2.75rem`). */
 export function sourceValue(path: string, theme: "light" | "dark"): string | undefined {
   if (theme === "dark") {
     const dark = getAt(darkThemeOverrides as unknown as TokenTree, path);
@@ -68,8 +68,8 @@ export function refLabel(value: string | undefined): string {
   if (!value) return "—";
   const match = /^\{(?:color\.)?(.+)\}$/.exec(value);
   if (match) return match[1];
-  const mix = /var\(--prime-ref-color-([a-z]+)-(\d+)\)\s+(\d+%)/.exec(value);
-  if (mix) return `${mix[1]}.${mix[2]} · ${mix[3]}`;
+  const mix = /\{color\.([a-z.0-9]+)\}\s+(\d+%)/.exec(value);
+  if (mix) return `${mix[1]} · ${mix[2]}`;
   return value;
 }
 

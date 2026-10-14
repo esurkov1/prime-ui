@@ -272,7 +272,12 @@ const PALETTE_COLUMNS: DataTableColumn<string>[] = [
     id: "vars",
     header: "Переменные",
     cell: (hue) => (
-      <TokenName>{`--prime-color-palette-${hue}-{soft,text,solid,solid-fg}`}</TokenName>
+      // Gray soft is a wash of the text ink (`internal/palette.module.css`), not a token.
+      <TokenName>
+        {hue === "gray"
+          ? "--prime-color-palette-gray-{text,solid,solid-fg}"
+          : `--prime-color-palette-${hue}-{soft,text,solid,solid-fg}`}
+      </TokenName>
     ),
   },
 ];

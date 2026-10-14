@@ -129,9 +129,9 @@
   background: var(--prime-color-fill-strong);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
   transition:
-    background-color var(--choice-bg-duration, var(--prime-motion-duration-fast))
+    background-color var(--choice-bg-duration, var(--prime-motion-fade-fast))
     var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 

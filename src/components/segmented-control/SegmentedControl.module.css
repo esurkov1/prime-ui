@@ -45,7 +45,11 @@
   --seg-desc-line-height: var(--prime-control-m-hint-line-height);
   /* The thumb keeps a faint 1px ring (a wash of the text color, so it reads on the track in both
      themes); the track is fill only, like a Button beside it, so the two read as one height. */
-  --seg-thumb-ring: color-mix(in srgb, var(--prime-color-text-primary) 10%, transparent);
+  --seg-thumb-ring: color-mix(
+    in srgb,
+    var(--prime-color-text-primary) var(--prime-tint-soft),
+    transparent
+  );
 
   position: relative;
   box-sizing: border-box;
@@ -153,11 +157,11 @@
   content: "";
   position: absolute;
   inset-block: var(--seg-pad);
-  z-index: 2;
+  z-index: var(--prime-z-above);
   width: var(--prime-space-8);
   pointer-events: none;
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* Logical sides: `::before` fades the start edge, `::after` the end edge, in either direction. */
@@ -214,7 +218,7 @@
 
 .item {
   position: relative;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   box-sizing: border-box;
   display: inline-flex;
   flex: none;
@@ -239,7 +243,7 @@
   user-select: none;
   cursor: pointer;
   /* Same duration as the sliding thumb, so text and fill arrive together. */
-  transition: color var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 /* Full width: single-line segments tend to equal widths, not widths in proportion to their labels.
@@ -331,7 +335,11 @@
 
 /* Gray soft equals the track fill; a text wash keeps a neutral count visible on track and thumb. */
 .item .count[data-color="gray"] {
-  background: color-mix(in srgb, var(--prime-color-text-primary) 8%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--prime-color-text-primary) var(--prime-tint-faint),
+    transparent
+  );
 }
 
 .description {
@@ -384,7 +392,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 0;
+  z-index: var(--prime-z-base);
   border-radius: var(--seg-item-radius);
   background: var(--prime-color-control-selected);
   box-shadow:
@@ -402,7 +410,8 @@
 .thumb[data-color] {
   background: var(--hue-soft);
   box-shadow:
-    inset 0 0 0 var(--prime-border-width) color-mix(in srgb, var(--hue-text) 32%, transparent),
+    inset 0 0 0 var(--prime-border-width)
+    color-mix(in srgb, var(--hue-text) var(--prime-tint-line), transparent),
     var(--prime-shadow-raised);
 }
 
@@ -417,8 +426,8 @@
     top var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     height var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .root[data-disabled="true"] .thumb {

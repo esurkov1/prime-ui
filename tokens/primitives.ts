@@ -6,9 +6,10 @@
 export const primitiveTokens = {
   color: {
     white: "#ffffff",
-    /** Graphite: cool neutral, slight blue bias. 0–100 light surfaces, 750–950 dark surfaces. */
+    /** The ink of the dark theme's scrim, washes and shadows. */
+    black: "#000000",
+    /** Graphite: cool neutral, slight blue bias. White and 50–100 light surfaces, 750–950 dark. */
     gray: {
-      0: "#ffffff",
       50: "#f3f4f6",
       75: "#eef0f3",
       100: "#e8eaee",
@@ -97,8 +98,9 @@ export const primitiveTokens = {
     /**
      * Categorical chart hues: not ramps but one set, validated together (dataviz checks — OKLCH
      * lightness band, chroma floor, CVD and normal-vision separation of neighbours in the
-     * `color.chart` order, ≥ 3:1 on the layer grounds). Light steps for gray.0–50 grounds, dark steps
-     * for gray.950–850. Blue is cobalt (600 light, 500 dark). Change one only by re-running the checks.
+     * `color.chart` order, ≥ 3:1 on every layer ground — `src/theme/chartColors.test.ts` keeps the
+     * contrast). Light steps for the light ladder, dark steps for the dark one. Blue is cobalt (600
+     * light, 500 dark). Change one only by re-running the checks.
      */
     chart: {
       light: {
@@ -115,7 +117,8 @@ export const primitiveTokens = {
         teal: "#199e70",
         yellow: "#c98500",
         pink: "#d55181",
-        green: "#008300",
+        /** A step lighter than light's green: 3:1 holds up to the deepest layer (4). */
+        green: "#008a00",
         purple: "#9085e9",
         red: "#e66767",
       },
@@ -162,8 +165,9 @@ export const primitiveTokens = {
 
   font: {
     family: {
-      sans: '"Golos Text", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
-      mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+      /** `… Fallback`: the metric-matched local faces of the opt-in `fonts.css`. */
+      sans: '"Golos Text", "Golos Text Fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+      mono: '"JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
     },
     /** Modular scale, ~1.2 in the body range, ~1.25 for headings. */
     size: {
@@ -223,6 +227,7 @@ export const primitiveTokens = {
     300: "300ms",
     380: "380ms",
     570: "570ms",
+    1200: "1200ms",
   },
   easing: {
     /**
@@ -241,8 +246,16 @@ export const primitiveTokens = {
    * Stacking order. Every overlay (modal, drawer, popover, menu, listbox, tooltip) portals to
    * `<body>` when it opens and shares one level: the DOM order is the open order, so a layer opened
    * later — a Select inside a Modal, a Tooltip inside a Popover — is on top without its own number.
+   * `below`, `0`…`5` order the parts stacked inside one component (a mark over a picture).
    */
   zIndex: {
+    below: "-1",
+    0: "0",
+    1: "1",
+    2: "2",
+    3: "3",
+    4: "4",
+    5: "5",
     sticky: "100",
     overlay: "1000",
     toast: "10000",

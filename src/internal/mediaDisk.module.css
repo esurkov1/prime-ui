@@ -25,8 +25,8 @@
   -webkit-backdrop-filter: blur(var(--prime-media-disk-blur));
   backdrop-filter: blur(var(--prime-media-disk-blur));
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .disk[data-tone="danger"] {

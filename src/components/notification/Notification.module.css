@@ -94,7 +94,7 @@
   opacity: var(--ntf-opacity);
   transition:
     transform var(--prime-motion-duration-slow) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-slow) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-slow) var(--prime-motion-easing-standard);
 }
 
 .bottom .item {
@@ -133,7 +133,7 @@
   touch-action: pan-y;
   transition:
     transform var(--prime-motion-duration-slow) var(--prime-motion-easing-enter),
-    opacity var(--prime-motion-duration-base) var(--prime-motion-easing-enter);
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-enter);
 }
 
 .bottom .motion {
@@ -172,7 +172,7 @@
   transform: translateY(var(--ntf-edge-shift));
   transition:
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-exit),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit);
 }
 
 .item[data-stack-index="0"] .motion[data-state="closed"] {

@@ -8,6 +8,19 @@ import {
   layerLadder,
   lightnessOf,
 } from "../../tokens/layers";
+import { primitiveTokens } from "../../tokens/primitives";
+import { semanticTokens } from "../../tokens/semantic";
+import { darkThemeOverrides } from "../../tokens/themes/dark";
+
+/** `{color.gray.600}` → the primitive's hex. */
+function primitiveColor(ref: string): string {
+  const path = /^\{(.+)\}$/.exec(ref)?.[1];
+  if (path === undefined) throw new Error(`not a reference: ${ref}`);
+  let node: unknown = primitiveTokens;
+  for (const key of path.split(".")) node = (node as Record<string, unknown>)[key];
+  if (typeof node !== "string") throw new Error(`not a primitive color: ${ref}`);
+  return node;
+}
 
 const toLinear = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
 const luminance = (hex: string) => {
@@ -58,10 +71,9 @@ describe("surface ladder", () => {
   });
 
   it("keeps muted text at AA on every layer and every fill", () => {
-    const muted = { light: "#575e6d", dark: "#949bab" };
     for (const [theme, text] of [
-      [LIGHT_LAYERS, muted.light],
-      [DARK_LAYERS, muted.dark],
+      [LIGHT_LAYERS, primitiveColor(semanticTokens.color.text.muted)],
+      [DARK_LAYERS, primitiveColor(darkThemeOverrides.color.text.muted)],
     ] as const) {
       for (const layer of [...layerLadder(theme), floatingLayer(theme)]) {
         expect(contrast(text, layer.bg)).toBeGreaterThanOrEqual(4.5);

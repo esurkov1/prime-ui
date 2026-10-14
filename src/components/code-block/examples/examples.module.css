@@ -9,13 +9,16 @@
 /* color-scheme.tsx: two blocks side by side, stacked when narrow. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--prime-panel-min-width)), 1fr));
+  grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--prime-layout-tile-min-width)), 1fr)
+    );
   gap: var(--prime-space-4);
   width: 100%;
 }
 
 /* narrow.tsx: a column narrower than the line. */
 .narrow {
-  width: min(100%, var(--prime-modal-width-s));
+  width: min(100%, var(--prime-layout-form-width-s));
   min-width: 0;
 }

@@ -155,8 +155,8 @@
   text-align: start;
   cursor: pointer;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -241,9 +241,9 @@
   font-weight: var(--prime-font-weight-medium);
   font-variant-numeric: tabular-nums;
   transition:
-    background-color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    color var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    box-shadow var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    background-color var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
+    color var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .indicator[data-status="active"] {

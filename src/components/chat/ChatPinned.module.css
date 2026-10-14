@@ -28,7 +28,7 @@
   text-align: start;
   cursor: pointer;
   transition:
-    background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
@@ -60,8 +60,7 @@
   flex: 1 1 0;
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-fill-strong);
-  transition: background-color var(--prime-motion-duration-base)
-    var(--prime-motion-easing-emphasized);
+  transition: background-color var(--prime-motion-fade-base) var(--prime-motion-easing-emphasized);
 }
 
 .segment[data-current] {

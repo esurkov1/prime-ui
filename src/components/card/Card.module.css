@@ -49,7 +49,7 @@
   cursor: pointer;
   appearance: none;
   transition:
-    box-shadow var(--prime-motion-duration-fast) var(--prime-motion-easing-standard),
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 

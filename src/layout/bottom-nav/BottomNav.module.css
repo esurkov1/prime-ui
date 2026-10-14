@@ -77,8 +77,9 @@
 .root[data-floating="true"] > .bar,
 .root[data-floating="true"] > .action {
   box-shadow: var(--prime-shadow-overlay);
-  -webkit-backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
-  backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--prime-bottom-nav-blur))
+    saturate(var(--prime-glass-saturation));
+  backdrop-filter: blur(var(--prime-bottom-nav-blur)) saturate(var(--prime-glass-saturation));
   pointer-events: auto;
 }
 
@@ -91,14 +92,14 @@
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   padding: var(--prime-border-width);
   border-radius: inherit;
   background: linear-gradient(
     135deg,
     var(--prime-color-bg-glass-edge),
-    color-mix(in srgb, var(--prime-color-bg-glass-edge) 25%, transparent) 30%,
-    color-mix(in srgb, var(--prime-color-bg-glass-edge) 25%, transparent) 70%,
+    color-mix(in srgb, var(--prime-color-bg-glass-edge) var(--prime-tint-active), transparent) 30%,
+    color-mix(in srgb, var(--prime-color-bg-glass-edge) var(--prime-tint-active), transparent) 70%,
     var(--prime-color-bg-glass-edge)
   );
   -webkit-mask:
@@ -122,9 +123,9 @@
 @media (prefers-reduced-transparency: reduce) {
   .root[data-floating="true"] > .bar,
   .root[data-floating="true"] > .action[data-variant] {
-    --btn-bg: var(--prime-color-layer-floating-bg);
+    --btn-bg: var(--prime-color-bg-glass-solid);
 
-    background: var(--prime-color-layer-floating-bg);
+    background: var(--prime-color-bg-glass-solid);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
@@ -140,10 +141,14 @@
   bottom: var(--prime-bottom-nav-floating-padding);
   left: 0;
   border-radius: var(--prime-radius-full);
-  background: color-mix(in srgb, var(--prime-color-text-primary) 12%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--prime-color-text-primary) var(--prime-tint-soft),
+    transparent
+  );
   pointer-events: none;
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .selection[data-visible="true"] {
@@ -155,7 +160,7 @@
   transition:
     left var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
     width var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* ─── Item ───────────────────────────────────────────────────────────────── */
@@ -181,7 +186,7 @@
   cursor: pointer;
   outline: none;
   -webkit-tap-highlight-color: transparent;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* Holds the icon and the count's anchor; no fill of its own. */

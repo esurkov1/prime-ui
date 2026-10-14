@@ -17,7 +17,7 @@
 .ring {
   --ring-stroke: calc(var(--prime-border-width) * 2);
   --ring-fill: currentColor;
-  --ring-track: color-mix(in srgb, currentColor 32%, transparent);
+  --ring-track: color-mix(in srgb, currentColor var(--prime-tint-line), transparent);
   --ring-arc: var(--ring-value, 0);
 
   display: block;
@@ -58,7 +58,7 @@
 
 .track {
   stroke: var(--ring-track);
-  transition: stroke var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition: stroke var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .arc {
@@ -68,8 +68,8 @@
   stroke-dashoffset: calc(100 - var(--ring-arc) * 100);
   transition:
     stroke-dashoffset var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    stroke var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    stroke var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
+    opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .ring[data-empty] .arc {
@@ -90,7 +90,7 @@
   transform-box: view-box;
   transition:
     rotate var(--prime-motion-duration-base) var(--prime-motion-easing-standard),
-    fill var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+    fill var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 @media (prefers-reduced-motion: reduce) {

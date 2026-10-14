@@ -265,7 +265,7 @@
  */
 .jump {
   position: sticky;
-  z-index: 2;
+  z-index: var(--prime-z-above);
   inset-block-end: var(--prime-space-3);
   align-self: flex-end;
   block-size: 0;
@@ -307,20 +307,20 @@
 @keyframes chatJumpIn {
   from {
     opacity: 0;
-    transform: translateY(var(--prime-space-2)) scale(0.96);
+    transform: translateY(var(--prime-space-2)) scale(var(--prime-motion-scale-enter));
   }
 }
 
 @keyframes chatJumpOut {
   to {
     opacity: 0;
-    transform: translateY(var(--prime-space-2)) scale(0.96);
+    transform: translateY(var(--prime-space-2)) scale(var(--prime-motion-scale-enter));
   }
 }
 
 .selectionBar {
   position: sticky;
-  z-index: 2;
+  z-index: var(--prime-z-above);
   inset-block-end: 0;
   display: flex;
   flex-wrap: wrap;
@@ -366,7 +366,7 @@
 /* A date stays at the top while its day scrolls under it. */
 .separator:not(.service) {
   position: sticky;
-  z-index: 1;
+  z-index: var(--prime-z-raised);
   inset-block-start: 0;
 }
 

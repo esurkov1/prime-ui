@@ -24,7 +24,7 @@
 .circle {
   position: relative;
   flex: none;
-  inline-size: min(calc(var(--prime-message-video-note) * 1.15), 100cqi);
+  inline-size: min(var(--prime-message-video-note-box), 100cqi);
   aspect-ratio: 1;
   border-radius: var(--prime-radius-full);
   transition: transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
@@ -51,17 +51,17 @@
 
 /* On its way (the transfer disk in the middle): the circle dims, its marks give way. */
 .media {
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .circle[data-covered] .media {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 /* Disabled: the circle and its duration dim the way a covered circle does; the disk takes the
    Button's disabled look. */
 .root[data-disabled="true"] :is(.media, .duration) {
-  opacity: 0.6;
+  opacity: var(--prime-opacity-busy);
 }
 
 .fill {
@@ -80,7 +80,7 @@
   object-fit: cover;
   opacity: 0;
   will-change: opacity;
-  transition: opacity var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard);
 }
 
 .circle[data-frame="loaded"] .video {
@@ -94,7 +94,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-exit);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit);
 }
 
 .circle > .ring {
@@ -115,7 +115,7 @@
   display: grid;
   place-items: center;
   pointer-events: none;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .play > * {

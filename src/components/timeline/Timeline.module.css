@@ -200,7 +200,7 @@
   /* `--hue-solid` comes from `internal/palette` (`data-color`, default `blue` from TSX). */
   --tl-hue: var(--hue-solid);
   /* Decorative hues sit at reduced emphasis; tones and the highlighted row use full color. */
-  --tl-dot-color: color-mix(in srgb, var(--tl-hue) 55%, transparent);
+  --tl-dot-color: color-mix(in srgb, var(--tl-hue) var(--prime-tint-strong), transparent);
 
   appearance: none;
   box-sizing: border-box;
@@ -225,7 +225,7 @@
   line-height: var(--tl-title-line-height);
   text-align: start;
   text-decoration: none;
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .row[data-tone="neutral"] {
@@ -295,7 +295,7 @@
   height: var(--tl-dot);
   border-radius: 50%;
   background: var(--tl-dot-color);
-  transition: background-color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 /* ---------- Text ---------- */
@@ -306,7 +306,7 @@
   color: var(--tl-title-color, var(--prime-color-text-primary));
   font-weight: var(--prime-font-weight-medium);
   overflow-wrap: anywhere;
-  transition: color var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .meta {

@@ -114,7 +114,7 @@
   display: inline-flex;
   grid-area: 1 / 1;
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .status[data-status="sending"] .tick[data-tick="sending"],
@@ -147,7 +147,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .layer[data-layer="typing"] {
