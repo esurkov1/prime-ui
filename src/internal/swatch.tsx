@@ -2,6 +2,9 @@ import * as React from "react";
 
 import { CheckMark } from "@/internal/CheckMark";
 import { cx } from "@/internal/cx";
+import press from "@/internal/press.module.css";
+import { gridIndex } from "@/internal/rovingFocus";
+import type { PaletteColor } from "@/internal/states";
 
 import styles from "./swatch.module.css";
 
@@ -42,15 +45,33 @@ export const COLOR_PRESETS: readonly ColorPreset[] = [
   { value: "#be185d", label: "Тёмно-розовый" },
 ];
 
+/** Names of the palette hues, in the order a palette picker shows them. */
+export const PALETTE_COLOR_NAMES: Record<PaletteColor, string> = {
+  gray: "Серый",
+  red: "Красный",
+  orange: "Оранжевый",
+  yellow: "Жёлтый",
+  green: "Зелёный",
+  teal: "Бирюзовый",
+  sky: "Голубой",
+  blue: "Синий",
+  purple: "Фиолетовый",
+  pink: "Розовый",
+};
+
+/** Every palette hue in the picker order (the keys of `PALETTE_COLOR_NAMES`). */
+export const PALETTE_ORDER = Object.keys(PALETTE_COLOR_NAMES) as PaletteColor[];
+
 /**
  * One selectable swatch: `null` is «no color». `contrast` picks the check mark: `light` / `dark`
  * by the color's luminance; `surface` (the «no color» checkerboard, drawn from the surface's own
- * fills) follows the theme with the primary text color.
+ * fills) follows the theme with the primary text color; `hue` — a palette hue (`value` is its
+ * name), drawn from its solid step with its own foreground.
  */
 export type SwatchOption = {
   value: string | null;
   label: string;
-  contrast: "light" | "dark" | "surface";
+  contrast: "light" | "dark" | "surface" | "hue";
 };
 
 /** The presets as swatch options, plus the «no color» option at the end when `allowEmpty`. */
@@ -68,19 +89,55 @@ export function useSwatchOptions(
   );
 }
 
-/** Class of a selectable swatch (button or option) sized by `--swatch-size` / `--swatch-radius`. */
-export const swatchClass = styles.swatch;
+/** The palette hues as swatch options (`value` is the hue), plus «no color» when `allowEmpty`. */
+export function usePaletteOptions(
+  palette: readonly PaletteColor[],
+  allowEmpty: boolean,
+  emptyLabel: string,
+  names: Record<PaletteColor, string>,
+): SwatchOption[] {
+  return React.useMemo(
+    () => [
+      ...palette.map((hue) => ({ value: hue, label: names[hue], contrast: "hue" as const })),
+      ...(allowEmpty ? [{ value: null, label: emptyLabel, contrast: "surface" as const }] : []),
+    ],
+    [palette, allowEmpty, emptyLabel, names],
+  );
+}
+
+/**
+ * Class of a selectable swatch (button or option) sized by `--swatch-size` / `--swatch-radius`,
+ * with the press feedback; the donor owns its hover, focus and disabled look.
+ */
+export const swatchClass = cx(styles.swatch, press.press);
+
+/**
+ * The square swatch button of a trigger (ColorPresets): the field height of the tier on the same
+ * element (`fieldTierClass` + `data-size`), the inner edge that darkens on hover and while open
+ * (`data-state`), the press feedback and the shared disabled look.
+ */
+export const swatchTriggerClass = cx(styles.trigger, press.press);
 
 /**
  * Tier of a swatch grid, from `data-size` on the same element: `--swatch-radius`, `--swatch-gap`
- * and `--swatch-size` = `--swatch-base` − 8. The host picks the base: `--swatch-base-control`
- * (control height) or `--swatch-base-item` (menu item height).
+ * and `--swatch-size` = base − 8, where the base is the control height, or the menu item height
+ * with `data-base="item"`; on a coarse pointer at least the touch target.
  */
 export const swatchTierClass = styles.tier;
 
-/** Color layer of a swatch; `null` draws the "no color" checkerboard. */
-export function SwatchFill({ value }: { value: string | null }) {
+/**
+ * Defines `--swatch-checker`, the kit's transparency checkerboard as a background layer, for a host
+ * that lays a translucent color over it (ColorPicker's alpha track).
+ */
+export const checkerboardClass = styles.checkerboard;
+
+/**
+ * Color layer of a swatch; `null` draws the "no color" checkerboard; `hue` — the value is a palette
+ * hue on a swatch that carries `palette.hue` + `data-color`.
+ */
+export function SwatchFill({ value, hue = false }: { value: string | null; hue?: boolean }) {
   if (value == null) return <span aria-hidden className={styles.checker} />;
+  if (hue) return <span aria-hidden className={cx(styles.fill, styles.hueFill)} />;
   return (
     <svg className={styles.fill} aria-hidden="true" viewBox="0 0 1 1" preserveAspectRatio="none">
       <rect width="1" height="1" fill={value} />
@@ -92,10 +149,18 @@ export function SwatchFill({ value }: { value: string | null }) {
  * Inside a selectable swatch: the color layer and the contrasting check, which draws in when the
  * swatch is selected and retracts when it is not (`CheckMark`, the same mark as Checkbox).
  */
-export function SwatchContent({ value, selected }: { value: string | null; selected: boolean }) {
+export function SwatchContent({
+  value,
+  selected,
+  hue = false,
+}: {
+  value: string | null;
+  selected: boolean;
+  hue?: boolean;
+}) {
   return (
     <>
-      <SwatchFill value={value} />
+      <SwatchFill value={value} hue={hue} />
       <CheckMark state={selected ? "checked" : "unchecked"} className={styles.check} />
     </>
   );
@@ -209,4 +274,48 @@ export function useBalancedColumns(
     return () => observer.disconnect();
   }, [gridRef, count, cellSelector]);
   return columns;
+}
+
+/** Number of swatches in the first visual row (the swatches wrap to the container width). */
+function firstRowLength(items: Array<HTMLElement | null>): number {
+  const top = items[0]?.offsetTop;
+  const count = items.findIndex((item) => !item || item.offsetTop !== top);
+  return Math.max(1, count === -1 ? items.length : count);
+}
+
+/**
+ * Roving focus over a grid of `count` swatches (ColorSwatches, ColorPresets): `itemRef(index)` on
+ * each swatch; `move(event, from, columns?)` takes the arrows, Home and End from the focused swatch
+ * (else `from`), focuses the swatch they reach and returns its index — `null` for any other key.
+ * Without `columns` the rows are the visual ones (a grid that wraps to its width).
+ */
+export function useSwatchGrid(count: number) {
+  const items = React.useRef<Array<HTMLElement | null>>([]);
+  const itemRef = React.useCallback(
+    (index: number) => (node: HTMLElement | null) => {
+      items.current[index] = node;
+    },
+    [],
+  );
+  const move = React.useCallback(
+    (event: React.KeyboardEvent, from: number, columns?: number): number | null => {
+      const focused = document.activeElement;
+      const current = focused instanceof HTMLElement ? items.current.indexOf(focused) : -1;
+      const next = gridIndex(
+        event.key,
+        current === -1 ? from : current,
+        count,
+        columns ?? firstRowLength(items.current),
+      );
+      if (next === null) return null;
+      event.preventDefault();
+      items.current[next]?.focus();
+      return next;
+    },
+    [count],
+  );
+  const focus = React.useCallback((index: number) => {
+    items.current[index]?.focus({ preventScroll: true });
+  }, []);
+  return { itemRef, move, focus };
 }

@@ -19,7 +19,7 @@ export default function ColorPickerPanelExample() {
       <ColorPicker.Panel surface="raised" className={styles.panel}>
         <ColorPicker.FormatSelect />
         <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-          <ColorPicker.AreaThumb />
+          <ColorPicker.Thumb />
         </ColorPicker.Area>
         <ColorPicker.Slider channel="hue" colorSpace="hsl">
           <ColorPicker.SliderMeta label="Оттенок" />

@@ -18,6 +18,13 @@ function typeHex(text: string) {
 }
 
 describe("ColorField", () => {
+  it("a required field is described by the required word (its trigger is a button)", () => {
+    render(withLocale(<ColorField label="Цвет бренда" required defaultValue="#5b5bd6" />));
+    const button = screen.getByRole("button", { name: "Цвет бренда #5B5BD6" });
+    expect(button).toHaveAccessibleDescription(/обязательное поле/);
+    expect(button).not.toHaveAttribute("aria-required");
+  });
+
   it("names the field button by the label and the current hex", () => {
     render(withLocale(<ColorField label="Цвет бренда" defaultValue="#5b5bd6" />));
     const button = screen.getByRole("button", { name: "Цвет бренда #5B5BD6" });

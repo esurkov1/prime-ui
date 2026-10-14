@@ -17,20 +17,25 @@ import {
 } from "react-aria-components";
 
 import { Button } from "@/components/button/Button";
-import { ColorSwatches, type ColorSwatchesProps } from "@/components/color-swatches/ColorSwatches";
+import {
+  ColorSwatches,
+  type ColorSwatchesColorProps,
+} from "@/components/color-swatches/ColorSwatches";
 import { Input } from "@/components/input/Input";
 import { Select } from "@/components/select/Select";
+import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
 import type { FieldFocusRingProps, FieldRootDomProps } from "@/internal/FieldFrame";
-import { fieldSurfaceClass } from "@/internal/fieldClasses";
+import { fieldInputTextClass, fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
-import { SwatchChip } from "@/internal/swatch";
+import { checkerboardClass, SwatchChip } from "@/internal/swatch";
 
 import styles from "./ColorPicker.module.css";
 
@@ -81,16 +86,16 @@ export type ColorPickerRootProps = {
   value?: string | Color;
   defaultValue?: string | Color;
   onValueChange?: (color: Color) => void;
-  /** Initial value format of `FormatSelect` and `ChannelStrip`. */
+  format?: ColorValueFormat;
   defaultFormat?: ColorValueFormat;
+  onFormatChange?: (format: ColorValueFormat) => void;
+  size?: ControlSize;
   labels?: Partial<ColorPickerLabels>;
   children: React.ReactNode;
 };
 
 export type ColorPickerHexInputProps = FieldRootDomProps &
   FieldFocusRingProps & {
-    /** Tier. Default: the tier of the surrounding control (a panel, a popover), else `m`. */
-    size?: ControlSize;
     label?: React.ReactNode;
     hint?: React.ReactNode;
     /** Error message in the hint slot; implies `invalid`. */
@@ -100,11 +105,11 @@ export type ColorPickerHexInputProps = FieldRootDomProps &
 export { parseColor };
 
 /**
- * Transparency checkerboard under the alpha track (token colors, 8px cells). Inline because it is
- * layered under the gradient that React Aria computes per render.
+ * The kit's transparency checkerboard (`--swatch-checker` of `checkerboardClass` on the track) in
+ * 8px cells under the alpha gradient. Inline because it is layered under the gradient that React
+ * Aria computes per render.
  */
-const CHECKER_BG =
-  "repeating-conic-gradient(var(--prime-color-layer-current) 0deg 90deg, var(--prime-color-fill-strong) 90deg 180deg) 0% 0% / var(--prime-space-2) var(--prime-space-2)";
+const CHECKER_LAYER = "var(--swatch-checker) 0% 0% / var(--prime-space-2) var(--prime-space-2)";
 
 type ColorState = NonNullable<React.ContextType<typeof ColorPickerStateContext>>;
 
@@ -112,7 +117,7 @@ type ChannelLabelKey = Extract<ColorChannel, keyof ColorPickerLabels>;
 
 const [ColorPickerProvider, useColorPickerContext] = createComponentContext<{
   format: ColorValueFormat;
-  setFormat: (f: ColorValueFormat) => void;
+  setFormat: (format: ColorValueFormat) => void;
   labels: ColorPickerLabels;
 }>("ColorPicker");
 
@@ -123,8 +128,8 @@ function useColorState(): ColorState {
   return state;
 }
 
-/** Hex text of the current color (`#rrggbb`, or `#rrggbbaa` with alpha). */
-function toHexText(color: Color) {
+/** Hex text of a color: `#rrggbb`, or `#rrggbbaa` when it is not opaque. */
+export function toHexText(color: Color): string {
   return color.toString(color.getChannelValue("alpha") < 1 ? "hexa" : "hex");
 }
 
@@ -167,13 +172,14 @@ function onCommitKeyDown(commit: () => void) {
   };
 }
 
-const parseHex = (text: string): Color | null => {
+/** The color of a CSS color text (hex, `rgb()`, `hsl()`), or `null` for text it cannot read. */
+export function parseHex(text: string): Color | null {
   try {
     return parseColor(text);
   } catch {
     return null;
   }
-};
+}
 
 const FORMAT_LABELS: Record<ColorValueFormat, string> = { hsl: "HSL", rgb: "RGB", hex: "Hex" };
 
@@ -249,11 +255,11 @@ function ChannelField({
   );
 
   return (
-    <label className={cx(fieldSurfaceClass, styles.channelCell)}>
+    <label className={cx(fieldTierClass, fieldSurfaceClass, styles.channelCell)} data-size="s">
       <input
         ref={inputRef}
         aria-label={labels[channel]}
-        className={styles.channelInput}
+        className={cx(fieldInputTextClass, styles.channelInput)}
         inputMode="decimal"
         value={text}
         onBlur={commit}
@@ -270,13 +276,16 @@ function StripHexField() {
   const { inputRef, text, setText, commit } = useColorDraft(toHexText, parseHex);
 
   return (
-    <label className={cx(fieldSurfaceClass, styles.channelCell, styles.channelCellHex)}>
+    <label
+      className={cx(fieldTierClass, fieldSurfaceClass, styles.channelCell, styles.channelCellHex)}
+      data-size="s"
+    >
       <input
         ref={inputRef}
         aria-label={labels.hex}
         autoCapitalize="off"
         autoCorrect="off"
-        className={styles.channelInput}
+        className={cx(fieldInputTextClass, styles.channelInput)}
         spellCheck={false}
         value={text}
         onBlur={commit}
@@ -358,20 +367,31 @@ function ColorPickerRoot({
   value,
   defaultValue,
   onValueChange,
+  format: formatProp,
   defaultFormat = "hsl",
+  onFormatChange,
+  size: sizeProp,
   labels: labelsProp,
   children,
 }: ColorPickerRootProps) {
-  const [format, setFormat] = React.useState<ColorValueFormat>(defaultFormat);
+  const tier = useHostTier(sizeProp);
+  const [format, setFormat] = useControllableState<ColorValueFormat>({
+    value: formatProp,
+    defaultValue: defaultFormat,
+    onChange: onFormatChange,
+  });
   const labels = useLabels(COLOR_PICKER_LABELS, labelsProp);
-  const contextValue = React.useMemo(() => ({ format, setFormat, labels }), [format, labels]);
+  const contextValue = React.useMemo(
+    () => ({ format, setFormat, labels }),
+    [format, setFormat, labels],
+  );
 
-  return (
+  return tier.provide(
     <ColorPickerProvider value={contextValue}>
       <AriaColorPicker value={value} defaultValue={defaultValue} onChange={onValueChange}>
         {children}
       </AriaColorPicker>
-    </ColorPickerProvider>
+    </ColorPickerProvider>,
   );
 }
 ColorPickerRoot.displayName = "ColorPicker.Root";
@@ -415,14 +435,14 @@ function Area({ className, disabled, ...props }: ColorPickerAreaProps) {
 function SliderTrack({ className, style, ...props }: ColorPickerSliderTrackProps) {
   return (
     <AriaSliderTrack
-      className={composeRenderProps(className, (c) => cx(styles.sliderTrack, c))}
+      className={composeRenderProps(className, (c) => cx(checkerboardClass, styles.sliderTrack, c))}
       style={(renderProps) => {
         const fromUser = typeof style === "function" ? style(renderProps) : style;
         const baseBg = renderProps.defaultStyle.background;
         const layered =
           renderProps.isDisabled || baseBg === undefined
             ? baseBg
-            : `${String(baseBg)}, ${CHECKER_BG}`;
+            : `${String(baseBg)}, ${CHECKER_LAYER}`;
         return {
           ...renderProps.defaultStyle,
           ...fromUser,
@@ -434,6 +454,7 @@ function SliderTrack({ className, style, ...props }: ColorPickerSliderTrackProps
   );
 }
 
+/** The draggable thumb of `ColorPicker.Area` and of a `ColorPicker.SliderTrack`. */
 function Thumb({ className, ...props }: ColorPickerThumbProps) {
   return (
     <AriaColorThumb
@@ -443,18 +464,9 @@ function Thumb({ className, ...props }: ColorPickerThumbProps) {
   );
 }
 
-function AreaThumb({ className, ...props }: ColorPickerThumbProps) {
-  return (
-    <AriaColorThumb
-      className={composeRenderProps(className, (c) => cx(styles.thumbArea, c))}
-      {...props}
-    />
-  );
-}
-
 export type ColorPickerSwatchesProps = Omit<
-  ColorSwatchesProps,
-  "value" | "defaultValue" | "onValueChange" | "allowEmpty" | "name"
+  ColorSwatchesColorProps,
+  "mode" | "palette" | "value" | "defaultValue" | "onValueChange" | "allowEmpty" | "name"
 >;
 
 /**
@@ -538,8 +550,8 @@ function EyeDropperButton({
 }: ColorPickerEyeDropperButtonProps) {
   const { labels } = useColorPickerContext();
   const state = useColorState();
-  const EyeDropperApi = typeof window === "undefined" ? undefined : window.EyeDropper;
-  const supported = EyeDropperApi !== undefined;
+  // Read after hydration: the server renders the button unsupported, the browser says whether it is.
+  const supported = React.useSyncExternalStore(subscribeNever, eyeDropperSupported, () => false);
 
   return (
     <Button.Root
@@ -554,6 +566,7 @@ function EyeDropperButton({
       className={cx(styles.eyeDropperSquare, className)}
       onClick={(e) => {
         onClick?.(e);
+        const EyeDropperApi = window.EyeDropper;
         if (e.defaultPrevented || !EyeDropperApi) return;
         void new EyeDropperApi()
           .open()
@@ -571,6 +584,10 @@ function EyeDropperButton({
   );
 }
 EyeDropperButton.displayName = "ColorPicker.EyeDropperButton";
+
+/** The EyeDropper API never appears or goes while the page lives: nothing to subscribe to. */
+const subscribeNever = () => () => {};
+const eyeDropperSupported = () => window.EyeDropper !== undefined;
 
 export type ColorPickerTriggerSwatchProps = Omit<
   React.HTMLAttributes<HTMLSpanElement>,
@@ -594,7 +611,6 @@ export const ColorPicker = {
   ChannelStrip,
   HexInput,
   Area,
-  AreaThumb,
   Slider,
   SliderMeta,
   SliderTrack,

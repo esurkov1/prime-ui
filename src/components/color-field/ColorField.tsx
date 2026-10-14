@@ -1,14 +1,17 @@
 import * as React from "react";
-import { type Color, parseColor } from "react-aria-components";
+import type { Color } from "react-aria-components";
 
 import {
   COLOR_PICKER_LABELS,
   ColorPicker,
   type ColorPickerLabels,
+  parseHex,
+  toHexText,
 } from "@/components/color-picker/ColorPicker";
 import { Popover } from "@/components/popover/Popover";
 import { useControllableState } from "@/hooks/useControllableState";
 import { Icon } from "@/icons";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
@@ -21,21 +24,45 @@ import {
 } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
 import { useLabels } from "@/internal/labels";
+import { useOpenState } from "@/internal/overlay/useOpenState";
 import type { ControlSize } from "@/internal/states";
-import { type ColorPreset, SwatchChip } from "@/internal/swatch";
+import type { ColorPreset } from "@/internal/swatch";
 
 import styles from "./ColorField.module.css";
 
-export type ColorFieldLabels = ColorPickerLabels & {
+/** The picker strings the field's panel shows: the sliders and the channel strip. */
+type PanelLabelKey =
+  | "eyeDropper"
+  | "hex"
+  | "hue"
+  | "saturation"
+  | "lightness"
+  | "alpha"
+  | "red"
+  | "green"
+  | "blue";
+
+export type ColorFieldLabels = Pick<ColorPickerLabels, PanelLabelKey> & {
   /** Muted marker after the label when `optional`. */
   optional: string;
+  /** Read after the field name of a `required` field (its trigger is a button). */
+  required: string;
   /** Accessible name of the preset swatches in the panel (`presets`). */
   presets: string;
 };
 
 export const COLOR_FIELD_LABELS: ColorFieldLabels = {
-  ...COLOR_PICKER_LABELS,
+  eyeDropper: COLOR_PICKER_LABELS.eyeDropper,
+  hex: COLOR_PICKER_LABELS.hex,
+  hue: COLOR_PICKER_LABELS.hue,
+  saturation: COLOR_PICKER_LABELS.saturation,
+  lightness: COLOR_PICKER_LABELS.lightness,
+  alpha: COLOR_PICKER_LABELS.alpha,
+  red: COLOR_PICKER_LABELS.red,
+  green: COLOR_PICKER_LABELS.green,
+  blue: COLOR_PICKER_LABELS.blue,
   optional: "необязательно",
+  required: "обязательное поле",
   presets: "Готовые цвета",
 };
 
@@ -70,19 +97,9 @@ export type ColorFieldProps = FieldRootDomProps &
     labels?: Partial<ColorFieldLabels>;
   };
 
-/** The color of a CSS string, or `fallback` when it cannot be read. */
-function readColor(text: string, fallback: Color): Color {
-  try {
-    return parseColor(text);
-  } catch {
-    return fallback;
-  }
-}
-
 /** Hex of a color: alpha only when the field takes it and the color is not opaque. */
-function toHex(color: Color, alpha: boolean): string {
-  return color.toString(alpha && color.getChannelValue("alpha") < 1 ? "hexa" : "hex");
-}
+const toHex = (color: Color, alpha: boolean) =>
+  toHexText(alpha ? color : color.withChannelValue("alpha", 1));
 
 /**
  * A color field: the field frame around a button with the color swatch and its hex; a click opens
@@ -95,7 +112,7 @@ export function ColorField({
   onValueChange,
   presets,
   alpha = false,
-  size = "m",
+  size: sizeProp,
   disabled: disabledProp = false,
   invalid: invalidProp,
   focusRing,
@@ -113,11 +130,17 @@ export function ColorField({
   labels: labelsProp,
   ...rest
 }: ColorFieldProps) {
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
   const labels = useLabels(COLOR_FIELD_LABELS, labelsProp);
-  const ids = useFieldFrame(id, { hint, error, invalid: invalidProp }, ariaDescribedBy);
+  const ids = useFieldFrame(
+    id,
+    { label, hint, error, invalid: invalidProp, required },
+    ariaDescribedBy,
+  );
   const textId = `${ids.controlId}-value`;
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useOpenState({ disabled });
 
   const [value, setValue] = useControllableState<string>({
     value: valueProp,
@@ -126,11 +149,13 @@ export function ColorField({
   });
   // The picker edits a `Color` (it keeps the hue of a grey while dragging); the value is its hex.
   // A value from outside that is not the last one sent re-reads the color.
-  const [color, setColor] = React.useState(() => readColor(value, parseColor(FALLBACK_COLOR)));
+  const [color, setColor] = React.useState(
+    () => parseHex(value) ?? (parseHex(FALLBACK_COLOR) as Color),
+  );
   const [synced, setSynced] = React.useState(value);
   if (value !== synced) {
     setSynced(value);
-    setColor(readColor(value, color));
+    setColor(parseHex(value) ?? color);
   }
 
   const changeColor = (next: Color) => {
@@ -141,9 +166,8 @@ export function ColorField({
   };
 
   const text = toHex(color, alpha);
-  const hasLabel = label != null && label !== false;
 
-  return (
+  return tier.provide(
     <FieldFrame
       {...rest}
       size={size}
@@ -155,6 +179,7 @@ export function ColorField({
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}
+      requiredLabel={labels.required}
       className={className}
     >
       <ColorPicker.Root
@@ -163,20 +188,13 @@ export function ColorField({
         defaultFormat="hex"
         labels={labels}
       >
-        <Popover.Root open={open && !disabled} onOpenChange={setOpen}>
+        <Popover.Root open={open} onOpenChange={setOpen} openOnArrow>
           <Popover.Trigger>
             <button
               id={ids.controlId}
               type="button"
               disabled={disabled}
-              aria-label={ariaLabel ? `${ariaLabel}: ${text}` : undefined}
-              aria-labelledby={
-                ariaLabel
-                  ? undefined
-                  : (ariaLabelledBy ?? (hasLabel ? cx(ids.labelId, textId) : undefined))
-              }
-              aria-describedby={ids.describedBy}
-              aria-invalid={ids.invalid || undefined}
+              {...ids.controlAria({ role: "button", textId, text, ariaLabel, ariaLabelledBy })}
               className={cx(fieldTriggerClass, styles.trigger)}
               {...toDataAttributes({
                 size,
@@ -185,7 +203,7 @@ export function ColorField({
                 "focus-ring": focusRing,
               })}
             >
-              <SwatchChip value={color.toString("css")} className={styles.swatch} />
+              <ColorPicker.TriggerSwatch className={styles.swatch} />
               <span id={textId} className={styles.value}>
                 {text}
               </span>
@@ -195,7 +213,7 @@ export function ColorField({
           <Popover.Content size={size} trapFocus>
             <ColorPicker.Panel className={styles.panel}>
               <ColorPicker.Area colorSpace="hsl" xChannel="saturation" yChannel="lightness">
-                <ColorPicker.AreaThumb />
+                <ColorPicker.Thumb />
               </ColorPicker.Area>
               <ColorPicker.Slider channel="hue" colorSpace="hsl" aria-label={labels.hue}>
                 <ColorPicker.SliderTrack>
@@ -218,7 +236,7 @@ export function ColorField({
         </Popover.Root>
       </ColorPicker.Root>
       {name ? <input type="hidden" name={name} value={text} disabled={disabled} /> : null}
-    </FieldFrame>
+    </FieldFrame>,
   );
 }
 ColorField.displayName = "ColorField";

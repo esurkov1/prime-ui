@@ -32,6 +32,39 @@ describe("ColorPicker", () => {
     );
   });
 
+  it("format, defaultFormat and onFormatChange: the owner keeps the format", () => {
+    const onFormatChange = vi.fn();
+    const { rerender } = render(
+      withLocale(
+        <ColorPicker.Root defaultValue="#336699" format="hex" onFormatChange={onFormatChange}>
+          <ColorPicker.ChannelStrip />
+        </ColorPicker.Root>,
+      ),
+    );
+    expect(screen.getByRole("textbox", { name: "Hex" })).toBeInTheDocument();
+    rerender(
+      withLocale(
+        <ColorPicker.Root defaultValue="#336699" format="rgb" onFormatChange={onFormatChange}>
+          <ColorPicker.ChannelStrip />
+        </ColorPicker.Root>,
+      ),
+    );
+    expect(screen.getByRole("textbox", { name: "Красный, 0–255" })).toBeInTheDocument();
+  });
+
+  it("without EyeDropper support the eyedropper is disabled and hidden from assistive tech", () => {
+    const { container } = render(
+      withLocale(
+        <ColorPicker.Root defaultValue="#336699">
+          <ColorPicker.EyeDropperButton />
+        </ColorPicker.Root>,
+      ),
+    );
+    const button = container.querySelector('button[aria-label="Пипетка"]');
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("aria-hidden", "true");
+  });
+
   it("TriggerSwatch рендерит слой цвета без inline style", () => {
     const { container } = render(
       withLocale(

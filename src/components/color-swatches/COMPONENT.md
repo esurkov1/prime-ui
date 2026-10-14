@@ -38,10 +38,12 @@ ColorSwatches                 field frame: label → swatches → hint | error
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string \| null` | — | Controlled color; `null` — no color. |
-| `defaultValue` | `string \| null` | `null` | Initial color when uncontrolled. |
-| `onValueChange` | `(value: string \| null) => void` | — | Called with the preset `value` (as written in `presets`) or `null`. |
-| `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches in order: `{ value, label }`; the label is the swatch's accessible name and tooltip. |
+| `mode` | `"color" \| "palette"` | `"color"` | `color` — any CSS color from `presets`; `palette` — a kit palette hue (`PaletteColor`) from `palette`, drawn from its solid step in both themes. |
+| `value` | `string \| null · PaletteColor \| null` | — | Controlled color (a hue with `palette`); `null` — no color. |
+| `defaultValue` | `string \| null · PaletteColor \| null` | `null` | Initial color when uncontrolled. |
+| `onValueChange` | `(value: string \| null) => void · (value: PaletteColor \| null) => void` | — | Called with the preset `value` (as written in `presets`), the hue with `palette`, or `null`. |
+| `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | `color` mode: swatches in order, `{ value, label }`; the label is the swatch's accessible name and tooltip. |
+| `palette` | `readonly PaletteColor[]` | every hue | `palette` mode: the hues in order; each is named by `labels.colorNames`. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the swatches (height 20 · 24 · 28 · 32 · 40); the label and hint keep the host tier. Without it the swatches take the host tier too. |
 | `label` | `ReactNode` | — | Label above the swatches; names the radiogroup (`aria-labelledby`). |
 | `required` | `boolean` | — | Red `*` after the label and `aria-required` on the group. |
@@ -71,6 +73,12 @@ ColorSwatches                 field frame: label → swatches → hint | error
 | `xl` | Swatch 40, gap 12, radius 8 | Touch-first layouts | |
 
 **Sizes:** `size` sets the swatches only; the label and the hint keep the tier of the form around (else `m`), so larger swatches never enlarge the label. Without `size` the swatches take the host tier: an `m` form gets `m` swatches (28) on the same 4px rhythm as `m` fields.
+
+### mode
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `color` | the `presets` as CSS colors; the value is the preset `value` | any color: a brand, a calendar event | yes |
+| `palette` | the kit hues (`palette`) from their solid step, the check in the hue's own foreground; the value is the hue name | a color the kit draws elsewhere: a Badge, a Kanban column, a tag | |
 
 ### Flags
 | Value | Looks like | Use when | Default |
@@ -128,6 +136,7 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 | `group` | `"Цвет"` | Accessible name of the group without a visible `label` and `aria-label`. |
 | `empty` | `"Без цвета"` | Name of the «no color» swatch (`allowEmpty`). |
 | `optional` | `"необязательно"` | Marker after the label when `optional`. |
+| `colorNames` | `"Серый · Красный · Оранжевый · Жёлтый · Зелёный · Бирюзовый · Голубой · Синий · Фиолетовый · Розовый"` | Names of the palette hues (`mode="palette"`), by `PaletteColor` key; merges by key. |
 
 ## Examples
 | Example | Shows |
@@ -136,6 +145,7 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`.
 | [sizes.tsx](examples/sizes.tsx) | Every size: the swatch height 20 to 40 px with the tier gap, the label stays the form's — `size`. |
 | [states.tsx](examples/states.tsx) | A default palette next to an invalid and a disabled one — `invalid`, `disabled`. |
 | [wrapping.tsx](examples/wrapping.tsx) | In a narrow column the swatches wrap by themselves into even rows and the arrows move by the visual rows. |
+| [palette.tsx](examples/palette.tsx) | A pipeline stage takes a kit palette hue, so its badge and column read the same in both themes — `mode`, `palette`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the color, «no color» included, and names it in the hint — `value`, `onValueChange`, `allowEmpty`. |
 | [in-form.tsx](examples/in-form.tsx) | A calendar event form: the color is submitted by `name` and required on save: submitting an empty title or no color shakes the field, picking or typing clears the error — `name`, `required`, `error`. |
 

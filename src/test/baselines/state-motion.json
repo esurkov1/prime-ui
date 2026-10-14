@@ -1,8 +1,6 @@
 [
   "src/components/card/Card.module.css: .root flips box-shadow",
   "src/components/card/Card.module.css: .root flips transform",
-  "src/components/color-picker/ColorPresets.module.css: .trigger flips box-shadow",
-  "src/components/color-picker/ColorPresets.module.css: .trigger flips box-shadow #2",
   "src/components/composer/Composer.module.css: .lock flips color",
   "src/components/dropdown/Dropdown.module.css: .item flips background",
   "src/components/dropdown/Dropdown.module.css: .item flips background #2",

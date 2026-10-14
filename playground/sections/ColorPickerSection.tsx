@@ -25,7 +25,8 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "sizes",
-      description: "Все ярусы hex-поля с кнопкой-образцом того же яруса — `size`.",
+      description:
+        "Каждый ярус пикера: hex-поле и кнопка-образец внутри берут его у корня — `size`.",
     },
     {
       slot: "states",
@@ -64,7 +65,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "controlled",
       description:
-        "Цветом владеет родитель: образцы бренда и hex-поле меняют его, кнопка сбрасывает — `value`, `onValueChange`.",
+        "Цветом и форматом владеет родитель: образцы бренда и каналы меняют цвет, формат остаётся выбранным, кнопка сбрасывает оба — `value`, `onValueChange`, `format`, `onFormatChange`.",
     },
     {
       slot: "controlled-open",

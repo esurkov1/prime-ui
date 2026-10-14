@@ -1,7 +1,6 @@
 [
   "src/components/card/examples/screen.tsx: aria-label on a generic div",
   "src/components/chat/examples/screen.tsx: aria-label on a generic div",
-  "src/components/color-picker/examples/panel.tsx: dangling aria-controls",
   "src/components/color-picker/examples/panel.tsx: dangling for",
   "src/components/color-picker/examples/states.tsx: dangling for",
   "src/components/data-table/examples/screen.tsx: aria-label on a generic div",

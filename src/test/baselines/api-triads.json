@@ -1,4 +1,0 @@
-[
-  "src/components/color-picker/api.ts: ColorPicker.Root.defaultFormat without format",
-  "src/components/color-picker/api.ts: ColorPicker.Root.defaultFormat without onFormatChange"
-]

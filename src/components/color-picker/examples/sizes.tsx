@@ -1,4 +1,4 @@
-/** Every size of the hex field with a swatch button of the same tier — `size`. */
+/** Every tier of the picker: the hex field and a swatch button inside take it from the root — `size`. */
 import { Button } from "prime-ui-kit";
 import { ColorPicker } from "prime-ui-kit/color-picker";
 
@@ -10,10 +10,10 @@ export default function ColorPickerSizesExample() {
   return (
     <>
       {SIZES.map((size) => (
-        <ColorPicker.Root key={size} defaultValue="#0090ff">
+        <ColorPicker.Root key={size} defaultValue="#0090ff" size={size}>
           <div className={styles.fieldRow}>
-            <ColorPicker.HexInput label={size} size={size} />
-            <Button.Root variant="soft" tone="neutral" size={size} aria-label="Открыть палитру">
+            <ColorPicker.HexInput label={size} />
+            <Button.Root variant="soft" tone="neutral" aria-label="Открыть палитру">
               <Button.Icon>
                 <ColorPicker.TriggerSwatch />
               </Button.Icon>

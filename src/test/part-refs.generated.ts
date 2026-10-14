@@ -89,7 +89,6 @@ export const PART_REFS = {
   "ColorPicker.FormatSelect": ["HTMLDivElement"],
   "ColorPicker.ChannelStrip": ["HTMLDivElement"],
   "ColorPicker.Area": ["HTMLDivElement"],
-  "ColorPicker.AreaThumb": ["HTMLDivElement"],
   "ColorPicker.Thumb": ["HTMLDivElement"],
   "ColorPicker.Slider": ["HTMLDivElement"],
   "ColorPicker.SliderMeta": ["HTMLDivElement"],

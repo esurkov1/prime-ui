@@ -64,7 +64,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `label` | `ReactNode` | — | Field label; part of the button's accessible name together with the value. |
 | `hint` | `ReactNode` | — | Support text under the field (`aria-describedby`). |
 | `error` | `ReactNode` | — | Error message in place of the hint; implies `invalid`. |
-| `required` | `boolean` | `false` | Red `*` after the label. |
+| `required` | `boolean` | `false` | Red `*` after the label; the field button is described by `labels.required` (a button takes no `aria-required`). |
 | `optional` | `boolean` | — | Muted `labels.optional` after the label. |
 | `invalid` | `boolean` | — | Danger ring and `aria-invalid` without a message. |
 | `disabled` | `boolean` | `false` | The field cannot be opened. |

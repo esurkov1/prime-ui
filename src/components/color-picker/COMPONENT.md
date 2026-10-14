@@ -35,7 +35,7 @@ ColorPicker.Root                 shared Color + value format (no DOM)
 └─ ColorPicker.Panel             vertical stack, optional raised surface
    ├─ ColorPicker.FormatSelect   kit Select: HSL / RGB / Hex
    ├─ ColorPicker.Area           2D area (4:3)
-   │  └─ ColorPicker.AreaThumb
+   │  └─ ColorPicker.Thumb
    ├─ ColorPicker.Slider         one channel
    │  ├─ ColorPicker.SliderMeta  label + value row
    │  └─ ColorPicker.SliderTrack
@@ -63,7 +63,10 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `value` | `string \| Color` | — | Controlled color: a CSS color string or a `Color` from `parseColor`. |
 | `defaultValue` | `string \| Color` | — | Initial color when uncontrolled. |
 | `onValueChange` | `(color: Color) => void` | — | Called with the new `Color` (`color.toString("hex")` for a string). |
-| `defaultFormat` | `"hsl" \| "rgb" \| "hex"` | `"hsl"` | Initial value format of `FormatSelect` and `ChannelStrip`. |
+| `format` | `"hsl" \| "rgb" \| "hex"` | — | Controlled value format of `FormatSelect` and `ChannelStrip`. |
+| `defaultFormat` | `"hsl" \| "rgb" \| "hex"` | `"hsl"` | Initial value format, uncontrolled. |
+| `onFormatChange` | `(format: "hsl" \| "rgb" \| "hex") => void` | — | Called with the format picked in `FormatSelect`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the fields inside (`HexInput`, `FormatSelect`); without it the tier of its host (a panel, a popover), else `m`. |
 | `labels` | `Partial<ColorPickerLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | The parts. |
 
@@ -83,7 +86,6 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `label` | `ReactNode` | — | Field label; defaults to `labels.hex`. |
 | `hint` | `ReactNode` | — | Help text under the field. Hidden while `error` is shown. |
 | `error` | `ReactNode` | — | Error message in the hint slot; marks the field invalid. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier. Without it the tier of its host (a panel, a popover), else `m`. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring of the fields (`data-focus-ring="false"`); focus, keyboard and ARIA stay. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
@@ -110,15 +112,15 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the row `<div>`. |
 
 ### ColorPicker.Area
-`ref` → `HTMLDivElement`. React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Holds `ColorPicker.AreaThumb`.
+`ref` → `HTMLDivElement`. React Aria `ColorArea`: a two-channel square (e.g. saturation × lightness). Holds a `ColorPicker.Thumb`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `disabled` | `boolean` | — | Shows the color but takes no input (grayscale). |
 | `…rest` | `ColorAreaProps (react-aria-components)` | — | The other props of the React Aria `ColorArea` (`channel`, `colorSpace`, `aria-label`…). |
 
-### ColorPicker.AreaThumb · ColorPicker.Thumb
-`ref` → `HTMLDivElement`. React Aria `ColorThumb` of the area / of a slider track: a thumb-colored ring with the overlay shadow and a focus ring.
+### ColorPicker.Thumb
+`ref` → `HTMLDivElement`. React Aria `ColorThumb` of the area or of a slider track: a thumb-colored ring with the overlay shadow and a focus ring, sized by its host.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -176,6 +178,8 @@ No DOM and no ref, except a field frame in a FieldList cell (the column heading 
 | `open` | `boolean` | — | Controlled open state of the panel. |
 | `defaultOpen` | `boolean` | `false` | Initial open state. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called when the panel opens or closes. |
+| `closeOnEscape` | `boolean` | `true` | Escape closes the panel and returns focus to the trigger. |
+| `closeOnOutsideClick` | `boolean` | `true` | A press outside the panel and its trigger closes it; focus follows the pointer. |
 | `presets` | `readonly ColorPreset[]` | `COLOR_PRESETS` | Swatches in panel order. |
 | `columns` | `number` | — | Grid columns; default one row for up to 8 presets (+ «no color»), else 8. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the trigger, the swatches and the panel. Without it the tier of its host, else `m`. |
@@ -225,14 +229,14 @@ No `variant` / `tone` / `color`.
 | `none` | parts stacked with a 12px gap, no own background | inside a Popover or a Card | yes |
 | `raised` | the floating layer of the ladder (`data-depth="floating"`), panel radius and padding, `shadow-overlay`; fields take that layer's fill | a standalone panel on the page | |
 
-### defaultFormat (ColorPicker.Root)
+### format (ColorPicker.Root)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `hsl` | hue °, saturation %, lightness %, alpha % fields | designers tuning a hue | yes |
 | `rgb` | red, green, blue (0–255), alpha % | developer-facing tools | |
 | `hex` | one hex field | brand colors copied from guidelines | |
 
-### size (HexInput, ColorPresets)
+### size (ColorPicker.Root, ColorPresets)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `xs` | 28px field / trigger, 16px preset swatches | dense tables | |
@@ -248,6 +252,8 @@ No `variant` / `tone` / `color`.
 |---|---|---|---|
 | `allowEmpty` (ColorPresets) | checkerboard «Без цвета» swatch at the end | the color is optional | `false` |
 | `closeOnSelect={false}` (ColorPresets) | panel stays open after a pick | trying several colors in a row | `true` |
+| `closeOnOutsideClick={false}` (ColorPresets) | a press beside the panel keeps it open | comparing presets with the page | `true` |
+| `closeOnEscape={false}` (ColorPresets) | Escape leaves the panel open | the panel closes only by a pick or the trigger | `true` |
 | `disabled` (Area, Slider) | grayscale, no input | the part is locked | — |
 
 **Combinations**
@@ -324,6 +330,7 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | `group` | `"Цвет"` | Name of the swatch group without a visible `label` and `aria-label`. |
 | `empty` | `"Без цвета"` | Name of the «no color» swatch (never shown here: the picker has no `allowEmpty`). |
 | `optional` | `"необязательно"` | Marker after the label when `optional`. |
+| `colorNames` | `"Серый · Красный · Оранжевый · Жёлтый · Зелёный · Бирюзовый · Голубой · Синий · Фиолетовый · Розовый"` | Names of the palette hues (unused here: the picker swatches are colors). |
 
 #### ColorPicker.EyeDropperButton
 
@@ -343,14 +350,14 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A color field: a hex value and a swatch button that opens the picker panel — `ColorPicker.HexInput`, `ColorPicker.TriggerSwatch`. |
-| [sizes.tsx](examples/sizes.tsx) | Every size of the hex field with a swatch button of the same tier — `size`. |
+| [sizes.tsx](examples/sizes.tsx) | Every tier of the picker: the hex field and a swatch button inside take it from the root — `size`. |
 | [states.tsx](examples/states.tsx) | A disabled area, hue slider and preset trigger keep showing the color but take no input — `disabled`. |
 | [validation.tsx](examples/validation.tsx) | A button color checked live: a too light color shakes in an error that leaves once the color is darker; a hint under the other field, invalid text reverts on blur — `hint`, `error`. |
 | [panel.tsx](examples/panel.tsx) | The full raised panel and its part order: format, area, hue and alpha sliders, channels, brand swatches — `ColorPicker.Panel`, `surface`, `ColorPicker.Swatches`. |
 | [formats.tsx](examples/formats.tsx) | The channel strip in each value format; three pickers edit one color — `defaultFormat`, `ColorPicker.ChannelStrip`. |
 | [presets.tsx](examples/presets.tsx) | A quick color from the palette: a square trigger with «no color» and a Button trigger whose grid of four columns stays open after a pick — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`, `columns`, `closeOnSelect`. |
 | [presets-sizes.tsx](examples/presets-sizes.tsx) | The preset trigger in every size, a square of the control height next to an input of the same tier — `ColorPresets`, `size`. |
-| [controlled.tsx](examples/controlled.tsx) | The parent owns the color: brand swatches and the hex field edit it, a button resets it — `value`, `onValueChange`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent owns the color and its format: brand swatches and the channels edit it, the format stays as picked, a button resets both — `value`, `onValueChange`, `format`, `onFormatChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent opens the preset palette from its own button and keeps the chosen color — `open`, `onOpenChange`, `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Theme settings: the color goes with the form, a too light color shakes in an error on save that leaves once the color changes — `value`, `error`. |
 

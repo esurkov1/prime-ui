@@ -201,8 +201,8 @@ export const api: ComponentApi = {
           name: "required",
           type: "boolean",
           default: "false",
-          en: "Red `*` after the label.",
-          ru: "Красная `*` после подписи.",
+          en: "Red `*` after the label; the field button is described by `labels.required` (a button takes no `aria-required`).",
+          ru: "Красная `*` после подписи; кнопку поля описывает `labels.required` (у кнопки нет `aria-required`).",
         },
         {
           name: "optional",
