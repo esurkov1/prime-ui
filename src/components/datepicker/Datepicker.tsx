@@ -15,6 +15,7 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
+import { useLabels } from "@/internal/labels";
 import { useOpenState } from "@/internal/overlay/useOpenState";
 import type { ControlSize } from "@/internal/states";
 
@@ -168,7 +169,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
   const tier = useHostTier(sizeProp);
   const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
-  const labels = { ...DATEPICKER_LABELS, ...options.labels };
+  const labels = useLabels(DATEPICKER_LABELS, options.labels);
   const ids = useFieldFrame(
     id,
     { label, hint, error, invalid: invalidProp, required },

@@ -1,6 +1,6 @@
 /* Layout of the Textarea scenarios: semantic tokens only. */
 
-/* in-form.tsx: field → field 20, group → actions 32 (foundation §1). */
+/* in-form.tsx, validation.tsx: field → field 20, group → actions 32 (foundation §1). */
 .form {
   display: flex;
   flex-direction: column;

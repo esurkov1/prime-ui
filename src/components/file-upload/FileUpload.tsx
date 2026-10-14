@@ -34,6 +34,7 @@ import { extensionOf, formatColor } from "@/internal/fileFormat";
 import { splitFileName } from "@/internal/fileName";
 import { formatFileSize } from "@/internal/fileSize";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { MorphText } from "@/internal/MorphText";
 import { mediaKind } from "@/internal/mediaKind";
@@ -1039,7 +1040,7 @@ function FileUploadQueueSet({
   ...rest
 }: FileUploadQueueProps) {
   const disabled = useInheritedDisabled(disabledProp);
-  const labels = { ...FILE_UPLOAD_LABELS, ...labelsProp };
+  const labels = useLabels(FILE_UPLOAD_LABELS, labelsProp);
   const set = useFileSet({ value, defaultValue, onValueChange, queue, cover, disabled, labels });
   return (
     <FileSetView
@@ -1140,7 +1141,7 @@ function FileUploadField({
 }: FileUploadRootProps) {
   const size = useControlSize(sizeProp);
   const disabled = useInheritedDisabled(disabledProp);
-  const labels = { ...FILE_UPLOAD_LABELS, ...labelsProp };
+  const labels = useLabels(FILE_UPLOAD_LABELS, labelsProp);
   const ids = useFieldFrame(id, { label, hint, error, invalid });
   const set = useFileSet({ value, defaultValue, onValueChange, queue, cover, disabled, labels });
   const [dragOver, setDragOver] = React.useState(false);

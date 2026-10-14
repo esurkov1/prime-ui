@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/input/Input";
 import { Select } from "@/components/select/Select";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useDraft } from "@/hooks/useDraft";
 import { Icon } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
@@ -143,15 +144,7 @@ function useColorDraft(
   parse: (text: string, color: Color) => Color | null,
 ) {
   const state = useColorState();
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const [text, setText] = React.useState(() => read(state.color));
-  const fingerprint = state.color.toString("hexa");
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the RAC state object is stable; the color change is tracked by its fingerprint
-  React.useEffect(() => {
-    if (inputRef.current && document.activeElement === inputRef.current) return;
-    setText(read(state.color));
-  }, [fingerprint]);
+  const { inputRef, draft: text, setDraft: setText } = useDraft(read(state.color));
 
   const commit = () => {
     const next = parse(text.trim(), state.color);
