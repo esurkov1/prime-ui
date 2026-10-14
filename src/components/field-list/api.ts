@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "FieldList",
-      en: "Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editable list of records of one shape: column headings once, a row of fields per record (`<ol>`), remove per row, add under the rows; rows stack under 480 px.",
-      ru: "Редактируемый список однотипных записей: заголовки столбцов один раз над строками, строка полей на запись (`<ol>`), кнопка удаления у строки и кнопка добавления под строками; в контейнере уже 480 px строки складываются в блоки.",
+      en: "Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editable list of records of one shape: column headings once, a row of fields per record (`<ol>`), remove per row, add under the rows; rows stack in a container under 30rem.",
+      ru: "Редактируемый список однотипных записей: заголовки столбцов один раз над строками, строка полей на запись (`<ol>`), кнопка удаления у строки и кнопка добавления под строками; в контейнере уже 30rem строки складываются в блоки.",
       props: [
         {
           name: "columns",
@@ -126,7 +126,7 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
           en: "Tier of the headings, buttons and the kit fields that read the host tier. Without it the host tier, else `m`.",
           ru: "Ярус заголовков, кнопок и полей кита, читающих ярус хозяина. Без него — ярус хозяина, иначе `m`.",
         },
@@ -191,8 +191,8 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: "The rows are an `<ol>` named by the list `label` (`aria-labelledby`); the list gives each row its position.",
-        ru: "Строки — `<ol>`, названный подписью списка `label` (`aria-labelledby`); номер строки даёт сам список.",
+        en: 'The rows are an `<ol role="list">` named by the list `label` (`aria-labelledby`); the list gives each row its position, and the role keeps it under `list-style: none` in WebKit.',
+        ru: 'Строки — `<ol role="list">`, названный подписью списка `label` (`aria-labelledby`); номер строки даёт сам список, а роль сохраняет его при `list-style: none` в WebKit.',
       },
       {
         en: "The heading row is `aria-hidden`: each field in a cell carries its column heading as its own label, read but not shown on wide rows.",

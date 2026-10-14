@@ -6,6 +6,8 @@ import { describe, expect, it, vi } from "vitest";
 import { ColorPresets } from "@/components/color-picker/ColorPresets";
 import { Input } from "@/components/input/Input";
 import { Select } from "@/components/select/Select";
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import enterMotion from "@/internal/enterMotion.module.css";
 
 import { FieldList, type FieldListColumn, type FieldListProps } from "./FieldList";
 
@@ -154,6 +156,25 @@ describe("FieldList", () => {
     expect(screen.getByRole("button", { name: "Добавить позицию" })).toHaveFocus();
   });
 
+  it("a row the data adds rises in; the first rows stay still", async () => {
+    const user = userEvent.setup();
+    render(<Lines />);
+    for (const row of Array.from(rowsOf())) expect(row).not.toHaveClass(enterMotion.enter);
+    await user.click(screen.getByRole("button", { name: "Добавить позицию" }));
+    const rows = Array.from(rowsOf());
+    expect(rows[2]).toHaveClass(enterMotion.enter);
+    expect(rows[0]).not.toHaveClass(enterMotion.enter);
+  });
+
+  it("the heading row rises in with the first row of an empty list", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<Lines initial={[]} />);
+    expect(container.querySelector("[aria-hidden='true'] label")).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Добавить позицию" }));
+    const head = screen.getAllByText("Услуга")[0]?.closest("[aria-hidden='true']");
+    expect(head).toHaveClass(enterMotion.enter);
+  });
+
   it("names an untitled row by its number", () => {
     render(<Lines initial={[{ id: "x", service: "", price: "" }]} />);
     expect(screen.getByRole("button", { name: "Удалить строку 1" })).toBeInTheDocument();
@@ -189,6 +210,53 @@ describe("FieldList", () => {
       });
     });
     expect(onChange).toHaveBeenLastCalledWith([LINES[1], LINES[0]]);
+  });
+
+  it("moves a row up with Alt+↑ on its handle and keeps focus on the handle", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Lines reorderable onChange={onChange} />);
+    const handle = screen.getByRole("button", { name: "Переместить «Обучение»" });
+    handle.focus();
+    await user.keyboard("{Alt>}{ArrowUp}{/Alt}");
+    expect(onChange).toHaveBeenLastCalledWith([LINES[1], LINES[0]]);
+    expect(screen.getByRole("button", { name: "Переместить «Обучение»" })).toHaveFocus();
+  });
+
+  it("Tab walks a row's fields, then its remove button, then the next row", async () => {
+    const user = userEvent.setup();
+    render(<Lines />);
+    const services = screen.getAllByRole("textbox", { name: "Услуга" });
+    const prices = screen.getAllByRole("textbox", { name: "Цена" });
+    (services[0] as HTMLElement).focus();
+    await user.tab();
+    expect(prices[0]).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Удалить «Внедрение»" })).toHaveFocus();
+    await user.tab();
+    expect(services[1]).toHaveFocus();
+  });
+
+  it("Space on the add button adds a row; Space on a remove button removes its row", async () => {
+    const user = userEvent.setup();
+    render(<Lines />);
+    screen.getByRole("button", { name: "Добавить позицию" }).focus();
+    await user.keyboard(" ");
+    expect(rowsOf()).toHaveLength(3);
+    expect(screen.getAllByRole("textbox", { name: "Услуга" })[2]).toHaveFocus();
+    screen.getByRole("button", { name: "Удалить «Внедрение»" }).focus();
+    await user.keyboard(" ");
+    expect(rowsOf()).toHaveLength(2);
+    expect(screen.getByRole("button", { name: "Удалить «Обучение»" })).toHaveFocus();
+  });
+
+  it("takes the host tier without its own size", () => {
+    render(
+      <ControlSizeProvider value="s">
+        <Lines />
+      </ControlSizeProvider>,
+    );
+    for (const row of Array.from(rowsOf())) expect(row).toHaveAttribute("data-size", "s");
   });
 
   it("disables every field and button", () => {

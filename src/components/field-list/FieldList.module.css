@@ -3,7 +3,7 @@
  * One grid track list for the heading row and every row (`--fl-columns`, set per row so a row
  * carried by Dnd keeps its tracks): [lead: handle or lock] [the columns] [end: remove]. The column
  * headings stand once above the rows; the fields inside carry them as hidden labels (`fieldCell`).
- * In a narrow container (`prime-field-list`, < 480) the heading row goes, every row stacks its
+ * In a narrow container (`prime-field-list`, < 30rem) the heading row goes, every row stacks its
  * fields into one column and each field shows its label (FieldFrame).
  */
 /* A size container cannot take its width from its content: the list fills its column. */
@@ -20,35 +20,23 @@
   min-width: 0;
 }
 
-/* Tracks, from the field tier of the row (`fieldTierClass` + `data-size` on it). */
+/*
+ * Tracks, from the field tier of the row (`fieldTierClass` + `data-size` on it); FieldList.tsx
+ * lists them per column. The row's field height and label line are kept here, resolved on the row,
+ * for the lead box, which carries the `xs` tier of its own.
+ */
 .row {
-  --fl-lead: var(--prime-control-xs-height);
   --fl-end: var(--field-h);
   --fl-compact: calc(var(--field-h) * 2);
   --fl-s: calc(var(--prime-space-24) + var(--prime-space-12));
   --fl-m: calc(var(--prime-space-24) * 2);
-  --fl-label-lh: var(--prime-control-m-label-line-height);
+  --fl-row-h: var(--field-h);
+  --fl-label-lh: var(--field-label-lh);
   display: grid;
   grid-template-columns: var(--fl-columns);
   align-items: start;
   column-gap: var(--prime-space-3);
   min-width: 0;
-}
-
-.row[data-size="xs"] {
-  --fl-label-lh: var(--prime-control-xs-label-line-height);
-}
-
-.row[data-size="s"] {
-  --fl-label-lh: var(--prime-control-s-label-line-height);
-}
-
-.row[data-size="l"] {
-  --fl-label-lh: var(--prime-control-l-label-line-height);
-}
-
-.row[data-size="xl"] {
-  --fl-label-lh: var(--prime-control-xl-label-line-height);
 }
 
 .rows {
@@ -63,23 +51,7 @@
 
 /* The heading row sits at the label gap above the first row, as a label above its field. */
 .head {
-  margin-block-end: calc(var(--prime-control-m-label-gap) - var(--prime-space-3));
-}
-
-.head[data-size="xs"] {
-  margin-block-end: calc(var(--prime-control-xs-label-gap) - var(--prime-space-3));
-}
-
-.head[data-size="s"] {
-  margin-block-end: calc(var(--prime-control-s-label-gap) - var(--prime-space-3));
-}
-
-.head[data-size="l"] {
-  margin-block-end: calc(var(--prime-control-l-label-gap) - var(--prime-space-3));
-}
-
-.head[data-size="xl"] {
-  margin-block-end: calc(var(--prime-control-xl-label-gap) - var(--prime-space-3));
+  margin-block-end: calc(var(--field-label-gap) - var(--prime-space-3));
 }
 
 /* On wide rows the cells are the row's own grid items, under their headings. */
@@ -103,7 +75,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: var(--field-h);
+  height: var(--fl-row-h);
+}
+
+/* The lead box is one `xs` control wide (its own tier): the handle, the lock or nothing. */
+.lead {
+  inline-size: var(--field-h);
 }
 
 .add {
@@ -114,9 +91,10 @@
   min-width: 0;
 }
 
-/* The add button lines up with the first column of fields, past the lead column. */
+/* The add button lines up with the first column of fields, past the lead column (an `xs` box:
+   the indented add row carries the `xs` tier). */
 .addIndented {
-  padding-inline-start: calc(var(--prime-control-xs-height) + var(--prime-space-3));
+  padding-inline-start: calc(var(--field-h) + var(--prime-space-3));
 }
 
 .limit {
@@ -128,7 +106,7 @@
  * group apart so each record reads as one block.
  */
 /* The width FieldFrame shows a cell field's own label at (`FieldFrame.module.css`). */
-@container prime-field-list (max-width: 29.9375rem) {
+@container prime-field-list (width < 30rem) {
   .head {
     display: none;
   }
