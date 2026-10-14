@@ -60,7 +60,7 @@ ChatList.Root                 <div> column filling its host (container `chat-lis
 | `hasMore` | `boolean` | `false` | More dialogs exist: a placeholder row ends the list and `onLoadMore` runs near the end. |
 | `onLoadMore` | `() => void \| Promise<void>` | — | The reader came near the end while `hasMore`: append the next dialogs. A promise is awaited before the next call. |
 | `empty` | `ReactNode` | — | The empty state without a search (an `EmptyPage` with an action). Default: «Нет диалогов». |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Row tier: height, text, avatar, glyphs and the search field. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Row tier: height, text, avatar, glyphs and the search field. Without it the tier of the host. |
 | `now` | `Date` | — | «Now» for the times of the rows. Default: the moment of the render. |
 | `formatTime` | `(date: Date, now: Date) => string` | `formatChatTime` | Display of a row's `Date` time: «14:32» today, «пн» this week, «12 мар», «12.03.2025». |
 | `labels` | `Partial<ChatListLabels>` | — | Built-in strings, see Labels. |
@@ -165,7 +165,7 @@ The search field takes the tier too; counts are one tier down (the Badge's own r
 | loading | `loading` | six placeholder `List` rows (`inert`, `aria-hidden`), the scroller `aria-busy`; cross-fade into the list |
 | empty | `items` empty | `EmptyPage layout="compact"` («Нет диалогов» or `empty`); with a query «Ничего не найдено» |
 | more | `hasMore` | one placeholder row after the list; `onLoadMore` near the end (`aria-busy` while its promise runs) |
-| menu | right click, long press, Shift+F10 | the row's `ChatList.ItemMenu` in a `Dropdown` anchored at the point; `data-menu="true"` rows take no callout or text selection |
+| menu | right click, long press, Shift+F10 | the row's `ChatList.ItemMenu` in a `Dropdown` anchored to the row (`Dropdown.Anchor`) at the point pressed, or under the row from the keyboard (`anchorPoint`); focus returns to the row; the row stays rendered while the menu is open; `data-menu="true"` rows take no callout or text selection |
 | reorder | a new order of `items` | rows glide from their old places (`transform`, `--prime-motion-duration-base`); new rows rise in (`enterMotion`); rows removed with nothing else changed close up in place |
 
 Root attribute: `data-size`. Every motion honours reduced motion (durations collapse, glides and ghosts are skipped).
@@ -233,7 +233,6 @@ Root attribute: `data-size`. Every motion honours reduced motion (durations coll
 | `file` | `"Файл"` | Media word: `kind="file"`. |
 | `location` | `"Геопозиция"` | Media word: `kind="location"`. |
 | `contact` | `"Контакт"` | Media word: `kind="contact"`. |
-| `menu` | `"Действия с диалогом"` | `aria-label` of the point the row menu opens from. |
 
 ## Examples
 | Example | Shows |

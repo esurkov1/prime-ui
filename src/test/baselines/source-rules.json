@@ -1,6 +1,5 @@
 [
   "src/components/avatar/Avatar.tsx: root default size = \"m\"",
-  "src/components/chat-list/ChatList.tsx: root default size = \"m\"",
   "src/components/confirm-dialog/ConfirmDialog.tsx: imports modal/DialogParts (not its main module or types.ts)",
   "src/components/confirm-dialog/ConfirmDialog.tsx: imports modal/ModalDialog (not its main module or types.ts)",
   "src/components/data-table/DataTable.tsx: biome-ignore useExhaustiveDependencies",

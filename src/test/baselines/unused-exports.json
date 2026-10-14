@@ -28,7 +28,6 @@
   "src/internal/listPresence.ts: useListItemPresence is test-only",
   "src/internal/listPresence.ts: useListPresence is test-only",
   "src/internal/listbox.ts: ListboxKeyContext is unused",
-  "src/internal/longPress.ts: useLongPress is test-only",
   "src/internal/messageList.tsx: MessageRowDescription is unused",
   "src/internal/messageList.tsx: RowKind is unused",
   "src/internal/messageList.tsx: SelectionStore is unused",

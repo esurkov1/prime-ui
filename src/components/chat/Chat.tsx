@@ -15,6 +15,7 @@ import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
 import type { Selection } from "@/internal/messageList";
+import { flattenChildren } from "@/internal/parts";
 import textRole from "@/internal/textRole.module.css";
 
 import styles from "./Chat.module.css";
@@ -185,18 +186,6 @@ ChatRoot.displayName = "Chat.Root";
 export type ChatHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
-
-/** The children as a flat list: fragments opened, `null`, booleans and empty strings dropped. */
-function flattenChildren(nodes: React.ReactNode, prefix = ""): React.ReactNode[] {
-  return React.Children.toArray(nodes).flatMap((node) => {
-    if (!React.isValidElement(node)) return [node];
-    const key = `${prefix}${node.key ?? ""}`;
-    if (node.type === React.Fragment) {
-      return flattenChildren((node.props as { children?: React.ReactNode }).children, `${key}/`);
-    }
-    return [prefix ? React.cloneElement(node, { key }) : node];
-  });
-}
 
 /**
  * The top of the chat: who it is with. A row of the leading elements (a back button, an `Avatar`),

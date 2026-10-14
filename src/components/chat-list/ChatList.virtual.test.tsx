@@ -2,7 +2,10 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { Dropdown } from "@/components/dropdown/Dropdown";
+
 import { ChatList } from "./ChatList";
+import styles from "./ChatList.module.css";
 
 type Dialog = { id: string; name: string };
 
@@ -16,7 +19,7 @@ function sized(height = 440) {
   vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(height);
 }
 
-function Dialogs({ items = DIALOGS }: { items?: Dialog[] }) {
+function Dialogs({ items = DIALOGS, menu = false }: { items?: Dialog[]; menu?: boolean }) {
   return (
     <ChatList.Root
       items={items}
@@ -24,10 +27,26 @@ function Dialogs({ items = DIALOGS }: { items?: Dialog[] }) {
       renderItem={(item) => (
         <ChatList.Item>
           <ChatList.ItemText>{item.name}</ChatList.ItemText>
+          {menu ? (
+            <ChatList.ItemMenu>
+              <Dropdown.Item>Закрепить</Dropdown.Item>
+            </ChatList.ItemMenu>
+          ) : null}
         </ChatList.Item>
       )}
     />
   );
+}
+
+const scrollerOf = (container: HTMLElement) =>
+  container.querySelector(`.${styles.scroller}`) as HTMLElement;
+
+async function scrollTo(scroller: HTMLElement, top: number) {
+  scroller.scrollTop = top;
+  await act(async () => {
+    fireEvent.scroll(scroller);
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+  });
 }
 
 const rendered = () =>
@@ -49,13 +68,8 @@ describe("ChatList virtual rows", () => {
   it("follows the scroll of its own scroller", async () => {
     sized();
     const { container } = render(<Dialogs />);
-    const scroller = container.querySelector("ul")?.closest("[class*='scroller']") as HTMLElement;
     const first = rendered()[0] ?? 0;
-    scroller.scrollTop = 60 * 500;
-    await act(async () => {
-      fireEvent.scroll(scroller);
-      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
-    });
+    await scrollTo(scrollerOf(container), 60 * 500);
     const indexes = rendered();
     expect(indexes.some((index) => index > 300)).toBe(true);
     expect(indexes.length).toBeLessThan(40);
@@ -73,6 +87,24 @@ describe("ChatList virtual rows", () => {
     expect(screen.getByRole("button", { name: "Клиент 999" })).toHaveFocus();
     await user.keyboard("{ArrowUp}");
     expect(screen.getByRole("button", { name: "Клиент 998" })).toHaveFocus();
+  });
+
+  it("keeps a row rendered while its menu is open, and lets it go once the menu closes", async () => {
+    sized();
+    const user = userEvent.setup();
+    const { container } = render(<Dialogs menu />);
+    fireEvent.contextMenu(screen.getByRole("button", { name: "Клиент 3" }), {
+      clientX: 10,
+      clientY: 10,
+    });
+    expect(await screen.findByRole("menuitem", { name: "Закрепить" })).toBeInTheDocument();
+    await scrollTo(scrollerOf(container), 60 * 500);
+    expect(rendered()).toContain(3);
+    await user.keyboard("{Escape}");
+    await scrollTo(scrollerOf(container), 0);
+    await user.click(screen.getByRole("button", { name: "Клиент 5" }));
+    await scrollTo(scrollerOf(container), 60 * 500);
+    expect(rendered()).not.toContain(3);
   });
 
   it("renders every row of a short list", () => {

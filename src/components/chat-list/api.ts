@@ -95,9 +95,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Row tier: height, text, avatar, glyphs and the search field.",
-          ru: "Ярус строк: высота, кегль, аватар, значки и поле поиска.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
+          en: "Row tier: height, text, avatar, glyphs and the search field. Without it the tier of the host.",
+          ru: "Ярус строк: высота, кегль, аватар, значки и поле поиска. Без него — ярус хоста.",
         },
         {
           name: "now",
@@ -365,10 +365,6 @@ export const api: ComponentApi = {
     file: { en: 'Media word: `kind="file"`.', ru: 'Слово медиа: `kind="file"`.' },
     location: { en: 'Media word: `kind="location"`.', ru: 'Слово медиа: `kind="location"`.' },
     contact: { en: 'Media word: `kind="contact"`.', ru: 'Слово медиа: `kind="contact"`.' },
-    menu: {
-      en: "`aria-label` of the point the row menu opens from.",
-      ru: "`aria-label` точки, от которой открывается меню строки.",
-    },
   }),
   accessibility: {
     keyboard: [

@@ -65,34 +65,37 @@ const INCOMING = [
 const TYPING_MS = 1600;
 
 export default function ChatListLiveExample() {
-  const [dialogs, setDialogs] = React.useState(DIALOGS);
-  const [dialogId, setDialogId] = React.useState<string | null>("vector");
+  // The dialogs and the open one in one state: a message that arrives later reads which dialog is
+  // open then, not when it was sent.
+  const [inbox, setInbox] = React.useState<{ dialogs: Dialog[]; open: string | null }>({
+    dialogs: DIALOGS,
+    open: "vector",
+  });
+  const { dialogs, open: dialogId } = inbox;
   const [step, setStep] = React.useState(0);
   const [busy, setBusy] = React.useState(false);
 
-  const patch = (id: string, next: Partial<Dialog>) =>
-    setDialogs((current) => current.map((item) => (item.id === id ? { ...item, ...next } : item)));
+  const patch = (id: string, next: (item: Dialog, open: string | null) => Partial<Dialog>) =>
+    setInbox((current) => ({
+      ...current,
+      dialogs: current.dialogs.map((item) =>
+        item.id === id ? { ...item, ...next(item, current.open) } : item,
+      ),
+    }));
 
   const receive = () => {
     const message = INCOMING[step % INCOMING.length];
     if (!message) return;
     setStep(step + 1);
     setBusy(true);
-    patch(message.id, { typing: true });
+    patch(message.id, () => ({ typing: true }));
     window.setTimeout(() => {
-      setDialogs((current) =>
-        current.map((item) =>
-          item.id === message.id
-            ? {
-                ...item,
-                typing: false,
-                preview: message.text,
-                at: new Date(),
-                unread: item.id === dialogId ? 0 : item.unread + 1,
-              }
-            : item,
-        ),
-      );
+      patch(message.id, (item, open) => ({
+        typing: false,
+        preview: message.text,
+        at: new Date(),
+        unread: item.id === open ? 0 : item.unread + 1,
+      }));
       setBusy(false);
     }, TYPING_MS);
   };
@@ -111,10 +114,14 @@ export default function ChatListLiveExample() {
           items={shown}
           getKey={(item) => item.id}
           value={dialogId}
-          onValueChange={(id) => {
-            setDialogId(id);
-            patch(id, { unread: 0 });
-          }}
+          onValueChange={(id) =>
+            setInbox((current) => ({
+              open: id,
+              dialogs: current.dialogs.map((item) =>
+                item.id === id ? { ...item, unread: 0 } : item,
+              ),
+            }))
+          }
           renderItem={(item) => (
             <ChatList.Item time={item.at} unread={item.unread} typing={item.typing}>
               <ChatList.ItemIcon>
