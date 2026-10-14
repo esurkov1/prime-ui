@@ -1,11 +1,11 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import press from "@/internal/press.module.css";
+import textTone from "@/internal/textTone.module.css";
+import { cssRule, cssRules, cssValue } from "@/test/css";
 
 import { Timeline } from "./Timeline";
 import styles from "./Timeline.module.css";
@@ -86,6 +86,24 @@ describe("Timeline", () => {
     expect(dots).toHaveLength(1);
     expect(dots[0]).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("list")).not.toHaveAttribute("aria-labelledby");
+  });
+
+  it("takes the host tier without its own size; the heading's text role follows the tier", () => {
+    const { container } = render(
+      <ControlSizeProvider value="xs">
+        <Timeline.Root>
+          <Timeline.Group label="Недавно">
+            <Timeline.Item>
+              <Timeline.ItemTitle>Один</Timeline.ItemTitle>
+            </Timeline.Item>
+          </Timeline.Group>
+        </Timeline.Root>
+      </ControlSizeProvider>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("data-size", "xs");
+    // The bare list keeps its semantics under `list-style: none` (WebKit drops them otherwise).
+    expect(screen.getByRole("list", { name: "Недавно" })).toHaveAttribute("role", "list");
+    expect(screen.getByText("Недавно")).toHaveClass(styles.groupLabel);
   });
 
   it("keeps no selection: rows carry no state or aria-current", () => {
@@ -210,6 +228,8 @@ describe("Timeline", () => {
     expect(plain).toHaveClass(styles.value);
     expect(plain).toHaveAttribute("data-tone", "neutral");
     expect(screen.getByText("−689 ฿")).toHaveAttribute("data-tone", "danger");
+    // The tone colour is the shared text tone ladder.
+    expect(screen.getByText("−689 ฿")).toHaveClass(textTone.tone);
   });
 
   it("value takes a muted second line from an ItemMeta inside it", () => {
@@ -273,10 +293,16 @@ describe("Timeline", () => {
   });
 
   it("CSS highlights only the row under the pointer or with keyboard focus", () => {
-    const css = readFileSync(join(__dirname, "Timeline.module.css"), "utf8");
-    expect(css).toMatch(/^\.row:focus-visible \{/m);
-    expect(css).toMatch(/^@media \(hover: hover\) \{\s*\.row:hover \{/m);
-    expect(css).not.toMatch(/data-state|data-highlight/);
+    const file = "src/components/timeline/Timeline.module.css";
+    expect(cssValue(cssRule(file, ".row:focus-visible"), "background")).toBe(
+      "var(--prime-color-fill-subtle-active)",
+    );
+    expect(cssValue(cssRule(file, ".row:hover", ["@media (hover: hover)"]), "background")).toBe(
+      "var(--prime-color-fill-subtle-active)",
+    );
+    expect(cssRules(file).some((rule) => /data-state|data-highlight/.test(rule.selector))).toBe(
+      false,
+    );
   });
 
   it("link rows stay focusable without a click handler", () => {

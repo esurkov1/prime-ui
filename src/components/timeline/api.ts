@@ -38,9 +38,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px, dot column → text 8 · 12 · 16 · 16 · 20 px.",
-          ru: "Текст, точка и ритм строк: высота 40 · 52 · 64 · 68 · 76 px, от колонки точки до текста 8 · 12 · 16 · 16 · 20 px.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px, dot column → text 8 · 12 · 16 · 16 · 20 px. Without it the tier of its host, else `m`.",
+          ru: "Текст, точка и ритм строк: высота 40 · 52 · 64 · 68 · 76 px, от колонки точки до текста 8 · 12 · 16 · 16 · 20 px. Без него — ярус контейнера, иначе `m`.",
         },
         {
           name: "children",
@@ -210,8 +210,8 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: "Each group is an `<ol>` labelled by its heading (`aria-labelledby`); events are `<li>`.",
-        ru: "Каждая группа — `<ol>` с именем из заголовка (`aria-labelledby`); события — `<li>`.",
+        en: 'Each group is an `<ol role="list">` labelled by its heading (`aria-labelledby`); events are `<li>`. The role keeps the list semantics that WebKit drops under `list-style: none`.',
+        ru: 'Каждая группа — `<ol role="list">` с именем из заголовка (`aria-labelledby`); события — `<li>`. Роль сохраняет семантику списка, которую WebKit теряет при `list-style: none`.',
       },
       {
         en: "The dot is `aria-hidden`: put the status into the title or meta, not only the dot color.",

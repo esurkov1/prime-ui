@@ -23,8 +23,8 @@ import { Timeline } from "prime-ui-kit";
 
 ## Anatomy
 ```
-Timeline.Root                    size container, sets the tier
-└─ Timeline.Group label          labelled <ol>; the line runs from its first dot to its last
+Timeline.Root                    size container, sets the tier (size, else the host tier)
+└─ Timeline.Group label          labelled <ol role="list">; the line runs from its first dot to its last
    ├─ Timeline.Item              <li> + row (div | button | a | asChild element) with the dot
    │  ├─ Timeline.ItemTitle      first line
    │  ├─ Timeline.ItemMeta       second line (date); <strong> emphasizes a part
@@ -43,7 +43,7 @@ Timeline.Root                    size container, sets the tier
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px, dot column → text 8 · 12 · 16 · 16 · 20 px. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px, dot column → text 8 · 12 · 16 · 16 · 20 px. Without it the tier of its host, else `m`. |
 | `children` | `ReactNode` | — (required) | The `Timeline.Group`s. |
 | `className` | `string` | — | Class on the element. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | The other div attributes. |
@@ -166,7 +166,7 @@ Timeline keeps no state and has no persistent selection: every row is highlighte
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- Each group is an `<ol>` labelled by its heading (`aria-labelledby`); events are `<li>`.
+- Each group is an `<ol role="list">` labelled by its heading (`aria-labelledby`); events are `<li>`. The role keeps the list semantics that WebKit drops under `list-style: none`.
 - The dot is `aria-hidden`: put the status into the title or meta, not only the dot color.
 
 ### Labels
