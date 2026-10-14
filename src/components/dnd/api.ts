@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DND_LABELS } from "./labels";
 
 export const api: ComponentApi = {
   parts: [
@@ -322,69 +323,43 @@ export const api: ComponentApi = {
       props: [],
     },
   ],
-  labels: [
-    { key: "handle", default: "Перетащить", en: "Name of `Dnd.Handle`.", ru: "Имя `Dnd.Handle`." },
-    {
-      key: "locked",
-      default: "Закреплено",
+  labels: labelRows(DND_LABELS, {
+    handle: { en: "Name of `Dnd.Handle`.", ru: "Имя `Dnd.Handle`." },
+    locked: {
       en: "Name of the lock a `Dnd.Handle` shows in a `locked` item.",
       ru: "Имя замка, который показывает `Dnd.Handle` в элементе с `locked`.",
     },
-    {
-      key: "roleDescription",
-      default: "перетаскиваемый элемент",
+    roleDescription: {
       en: "`aria-roledescription` of every draggable item.",
       ru: "`aria-roledescription` каждого перетаскиваемого элемента.",
     },
-    {
-      key: "grabbed",
-      default: "{label}: взят",
-      en: "Live region: picked up.",
-      ru: "Live-область: взят.",
-    },
-    {
-      key: "dropped",
-      default: "{label}: перемещён",
-      en: "Live region: dropped on a target.",
-      ru: "Live-область: брошен на цель.",
-    },
-    {
-      key: "returned",
-      default: "{label}: возвращён на место",
+    grabbed: { en: "Live region: picked up.", ru: "Live-область: взят." },
+    dropped: { en: "Live region: dropped on a target.", ru: "Live-область: брошен на цель." },
+    returned: {
       en: "Live region: released over nothing.",
       ru: "Live-область: отпущен мимо целей.",
     },
-    {
-      key: "cancelled",
-      default: "{label}: перемещение отменено",
+    cancelled: {
       en: "Live region: cancelled (Escape, interruption).",
       ru: "Live-область: отменено (Escape, прерывание).",
     },
-    {
-      key: "moved",
-      default: "{label}: позиция {position} из {total}",
+    moved: {
       en: "Live region: moved with the keyboard.",
       ru: "Live-область: сдвинут с клавиатуры.",
     },
-    {
-      key: "movedTo",
-      default: "{label}: «{list}», позиция {position} из {total}",
+    movedTo: {
       en: "Live region: moved to a linked list with the keyboard; `{list}` is its accessible name.",
       ru: "Live-область: перенесён с клавиатуры в связанный список; `{list}` — его имя.",
     },
-    {
-      key: "refused",
-      default: "{label}: «{list}» не принимает элемент",
+    refused: {
       en: "Live region: a linked list refused a keyboard move (`canDrop` answered `false`).",
       ru: "Live-область: связанный список не принял перенос с клавиатуры (`canDrop` вернул `false`).",
     },
-    {
-      key: "refusedReason",
-      default: "{label}: {reason}",
+    refusedReason: {
       en: "Live region: a target refused the item and said why (`canDrop` answered a string).",
       ru: "Live-область: цель отказала и назвала причину (`canDrop` вернул строку).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

@@ -1,5 +1,6 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_OPTIONAL_LABEL, fieldGroupProps } from "../../internal/field.api";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_OPTIONAL_LABEL_DOCS, fieldGroupProps } from "../../internal/field.api";
+import { SEGMENTED_CONTROL_LABELS } from "./SegmentedControl";
 
 const PALETTE =
   '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"';
@@ -194,7 +195,7 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [FIELD_OPTIONAL_LABEL],
+  labels: labelRows(SEGMENTED_CONTROL_LABELS, FIELD_OPTIONAL_LABEL_DOCS),
   accessibility: {
     keyboard: [
       {

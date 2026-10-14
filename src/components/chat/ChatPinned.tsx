@@ -29,7 +29,7 @@ export type ChatPinnedLabels = {
   unpin: string;
 };
 
-const PINNED_LABELS: ChatPinnedLabels = {
+export const CHAT_PINNED_LABELS: ChatPinnedLabels = {
   pinned: "Закреплённое сообщение",
   pinnedOf: "Закреплённое {index} из {count}",
   unpin: "Открепить",
@@ -78,7 +78,7 @@ export function ChatPinned({
   className,
   ...rest
 }: ChatPinnedProps) {
-  const labels = { ...PINNED_LABELS, ...labelsProp };
+  const labels = { ...CHAT_PINNED_LABELS, ...labelsProp };
   const { jump } = useChat();
   const depth = useNestedSurfaceDepth();
   const [value, setValue] = useControllableState<string | undefined>({

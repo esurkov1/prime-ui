@@ -31,7 +31,7 @@ export type ColorFieldLabels = ColorPickerLabels & {
   presets: string;
 };
 
-const COLOR_FIELD_LABELS: ColorFieldLabels = {
+export const COLOR_FIELD_LABELS: ColorFieldLabels = {
   ...COLOR_PICKER_LABELS,
   optional: "необязательно",
   presets: "Готовые цвета",

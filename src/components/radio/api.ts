@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { RADIO_GROUP_LABELS } from "./Radio";
 
 export const api: ComponentApi = {
   parts: [
@@ -169,14 +170,12 @@ export const api: ComponentApi = {
       props: [],
     },
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(RADIO_GROUP_LABELS, {
+    optional: {
       en: "Marker after the group label when `optional`.",
       ru: "Пометка после подписи группы при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

@@ -55,7 +55,7 @@ export type ExampleFrameLabels = {
   codeRegion: string;
 };
 
-const EXAMPLE_FRAME_LABELS: ExampleFrameLabels = {
+export const EXAMPLE_FRAME_LABELS: ExampleFrameLabels = {
   paneSwitch: "Вид примера",
   preview: "Превью",
   code: "Код",

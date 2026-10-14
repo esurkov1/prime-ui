@@ -37,7 +37,7 @@ export type {
 export type { ChatLabels } from "./chatContext";
 export type { ChatSelectionBarProps } from "./MessageList";
 
-const CHAT_LABELS: ChatLabels = {
+export const CHAT_LABELS: ChatLabels = {
   ...MESSAGE_LIST_LABELS,
   typing: "печатает…",
   search: "Поиск по переписке",

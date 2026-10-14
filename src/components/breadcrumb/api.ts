@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BREADCRUMB_LABELS } from "./Breadcrumb";
 
 export const api: ComponentApi = {
   parts: [
@@ -85,20 +86,13 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "nav",
-      default: "Навигационная цепочка",
-      en: "`aria-label` of the `nav` landmark.",
-      ru: "`aria-label` области `nav`.",
-    },
-    {
-      key: "ellipsis",
-      default: "Скрытые разделы",
+  labels: labelRows(BREADCRUMB_LABELS, {
+    nav: { en: "`aria-label` of the `nav` landmark.", ru: "`aria-label` области `nav`." },
+    ellipsis: {
       en: "Hidden text of `Breadcrumb.Ellipsis`.",
       ru: "Скрытый текст `Breadcrumb.Ellipsis`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { COMMAND_MENU_LABELS } from "./CommandMenu";
 
 export const api: ComponentApi = {
   parts: [
@@ -258,38 +259,28 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "search",
-      default: "Поиск",
+  labels: labelRows(COMMAND_MENU_LABELS, {
+    search: {
       en: "Default placeholder and accessible name of `CommandMenu.Input`.",
       ru: "Плейсхолдер и имя поля поиска по умолчанию.",
     },
-    {
-      key: "empty",
-      default: "Ничего не найдено",
+    empty: {
       en: "`CommandMenu.Empty`: nothing matches the query.",
       ru: "Пустой результат: по запросу ничего нет.",
     },
-    {
-      key: "emptyHint",
-      default: "Попробуйте изменить запрос",
+    emptyHint: {
       en: 'Second line of `CommandMenu.Empty`; `""` hides it.',
       ru: "Вторая строка пустого результата; пустая строка скрывает её.",
     },
-    {
-      key: "loading",
-      default: "Загрузка…",
+    loading: {
       en: "Announced while `loading` or `loadingMore`.",
       ru: "Объявляется скринридером при `loading` или `loadingMore`.",
     },
-    {
-      key: "retry",
-      default: "Повторить",
+    retry: {
       en: "The retry button under `loadError` (`onRetry`).",
       ru: "Кнопка повтора под `loadError` (`onRetry`).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

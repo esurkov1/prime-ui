@@ -73,7 +73,7 @@ export type {
 } from "./SelectItem";
 export type { SelectLabels } from "./selectContext";
 
-const SELECT_LABELS: SelectLabels = {
+export const SELECT_LABELS: SelectLabels = {
   search: "Поиск",
   empty: "Ничего не найдено",
   emptyHint: "Попробуйте изменить запрос",

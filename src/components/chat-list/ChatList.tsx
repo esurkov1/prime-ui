@@ -89,7 +89,7 @@ export type ChatListLabels = {
   menu: string;
 };
 
-const CHAT_LIST_LABELS: ChatListLabels = {
+export const CHAT_LIST_LABELS: ChatListLabels = {
   list: "Диалоги",
   search: "Поиск по диалогам",
   searchPlaceholder: "Поиск",

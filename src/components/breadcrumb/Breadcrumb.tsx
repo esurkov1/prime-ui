@@ -17,7 +17,7 @@ export type BreadcrumbLabels = {
   ellipsis: string;
 };
 
-const DEFAULT_LABELS: BreadcrumbLabels = {
+export const BREADCRUMB_LABELS: BreadcrumbLabels = {
   nav: "Навигационная цепочка",
   ellipsis: "Скрытые разделы",
 };
@@ -26,7 +26,7 @@ type BreadcrumbContextValue = { size: ControlSize; labels: BreadcrumbLabels };
 
 const BreadcrumbContext = React.createContext<BreadcrumbContextValue>({
   size: "m",
-  labels: DEFAULT_LABELS,
+  labels: BREADCRUMB_LABELS,
 });
 
 export type BreadcrumbRootProps = React.HTMLAttributes<HTMLElement> & {
@@ -66,8 +66,8 @@ function BreadcrumbRoot({
   labels: labelsProp,
   ...rest
 }: BreadcrumbRootProps) {
-  const nav = labelsProp?.nav ?? DEFAULT_LABELS.nav;
-  const ellipsis = labelsProp?.ellipsis ?? DEFAULT_LABELS.ellipsis;
+  const nav = labelsProp?.nav ?? BREADCRUMB_LABELS.nav;
+  const ellipsis = labelsProp?.ellipsis ?? BREADCRUMB_LABELS.ellipsis;
   const contextValue = React.useMemo(
     () => ({ size, labels: { nav, ellipsis } }),
     [size, nav, ellipsis],

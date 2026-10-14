@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_LIST_LABELS } from "./FieldList";
 
 export const api: ComponentApi = {
   parts: [
@@ -144,44 +145,32 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "remove",
-      default: "Удалить {row}",
+  labels: labelRows(FIELD_LIST_LABELS, {
+    remove: {
       en: "`aria-label` of a row's remove button; `{row}` is the row's name.",
       ru: "`aria-label` кнопки удаления строки; `{row}` — имя строки.",
     },
-    {
-      key: "reorder",
-      default: "Переместить {row}",
+    reorder: {
       en: "`aria-label` of a row's handle (`reorderable`); `{row}` is the row's name.",
       ru: "`aria-label` ручки строки (`reorderable`); `{row}` — имя строки.",
     },
-    {
-      key: "row",
-      default: "строку {index}",
+    row: {
       en: "Name of a row without `getLabel` text; `{index}` counts from 1.",
       ru: "Имя строки без текста `getLabel`; `{index}` — номер с 1.",
     },
-    {
-      key: "namedRow",
-      default: "«{label}»",
+    namedRow: {
       en: "Name of a row with `getLabel` text; `{label}` is that text.",
       ru: "Имя строки с текстом `getLabel`; `{label}` — этот текст.",
     },
-    {
-      key: "locked",
-      default: "Закреплена",
+    locked: {
       en: "Spoken name of the lock of a pinned row in a list without `reorderable`.",
       ru: "Имя замка закреплённой строки в списке без `reorderable`.",
     },
-    {
-      key: "maxReached",
-      default: "Не больше {max}",
+    maxReached: {
       en: "Text beside the disabled add button once the list holds `max` rows.",
       ru: "Текст у выключенной кнопки добавления, когда строк уже `max`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { MEDIA_VIEWER_LABELS } from "./MediaViewer";
 
 export const api: ComponentApi = {
   parts: [
@@ -127,146 +128,64 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "viewer",
-      default: "Просмотр медиа",
+  labels: labelRows(MEDIA_VIEWER_LABELS, {
+    viewer: {
       en: "The name of the dialog when no `aria-label` is given.",
       ru: "Имя диалога, если не задан `aria-label`.",
     },
-    {
-      key: "close",
-      default: "Закрыть",
-      en: "The close button.",
-      ru: "Кнопка закрытия.",
-    },
-    {
-      key: "previous",
-      default: "Предыдущее",
-      en: "The arrow back.",
-      ru: "Стрелка назад.",
-    },
-    {
-      key: "next",
-      default: "Следующее",
-      en: "The arrow forward.",
-      ru: "Стрелка вперёд.",
-    },
-    {
-      key: "zoomIn",
-      default: "Увеличить",
-      en: "The zoom button at the fit.",
-      ru: "Кнопка масштаба без приближения.",
-    },
-    {
-      key: "zoomOut",
-      default: "Уменьшить",
+    close: { en: "The close button.", ru: "Кнопка закрытия." },
+    previous: { en: "The arrow back.", ru: "Стрелка назад." },
+    next: { en: "The arrow forward.", ru: "Стрелка вперёд." },
+    zoomIn: { en: "The zoom button at the fit.", ru: "Кнопка масштаба без приближения." },
+    zoomOut: {
       en: "The zoom button while zoomed: back to the fit.",
       ru: "Кнопка масштаба при приближении: обратно к вписанному размеру.",
     },
-    {
-      key: "counter",
-      default: "{current} из {total}",
+    counter: {
       en: "The counter in the top bar and the name of a page.",
       ru: "Счётчик в верхней панели и имя страницы.",
     },
-    {
-      key: "slide",
-      default: "слайд",
+    slide: {
       en: "What a page is to assistive tech (`aria-roledescription`).",
       ru: "Чем является страница для вспомогательных технологий (`aria-roledescription`).",
     },
-    {
-      key: "photo",
-      default: "Фото",
-      en: "`{name}` of a picture without `alt`.",
-      ru: "`{name}` картинки без `alt`.",
-    },
-    {
-      key: "video",
-      default: "Видео",
-      en: "`{name}` of a video without `alt`.",
-      ru: "`{name}` видео без `alt`.",
-    },
-    {
-      key: "thumbnails",
-      default: "Миниатюры",
-      en: "The filmstrip.",
-      ru: "Плёнка миниатюр.",
-    },
-    {
-      key: "show",
-      default: "Показать: {name}",
+    photo: { en: "`{name}` of a picture without `alt`.", ru: "`{name}` картинки без `alt`." },
+    video: { en: "`{name}` of a video without `alt`.", ru: "`{name}` видео без `alt`." },
+    thumbnails: { en: "The filmstrip.", ru: "Плёнка миниатюр." },
+    show: {
       en: "A thumbnail of the filmstrip; `{name}` is the item's `alt`, else `photo` / `video`.",
       ru: "Миниатюра плёнки; `{name}` — `alt` элемента, иначе `photo` / `video`.",
     },
-    {
-      key: "announcement",
-      default: "{name}, {current} из {total}",
-      en: "Read out when the page changes.",
-      ru: "Зачитывается при смене страницы.",
-    },
-    {
-      key: "loadError",
-      default: "Не удалось загрузить",
+    announcement: { en: "Read out when the page changes.", ru: "Зачитывается при смене страницы." },
+    loadError: {
       en: "A picture or a video that failed to load.",
       ru: "Картинка или видео не загрузились.",
     },
-    {
-      key: "retry",
-      default: "Повторить",
-      en: "Loads it again.",
-      ru: "Загрузить снова.",
-    },
-    {
-      key: "play",
-      default: "Воспроизвести",
+    retry: { en: "Loads it again.", ru: "Загрузить снова." },
+    play: {
       en: "The play disk and the play button of a video while it stands still.",
       ru: "Диск и кнопка воспроизведения видео, пока оно стоит.",
     },
-    {
-      key: "pause",
-      default: "Пауза",
+    pause: {
       en: "The play button of a video while it plays.",
       ru: "Кнопка воспроизведения, пока видео идёт.",
     },
-    {
-      key: "mute",
-      default: "Выключить звук",
-      en: "The sound button while the sound is on.",
-      ru: "Кнопка звука, пока звук включён.",
-    },
-    {
-      key: "unmute",
-      default: "Включить звук",
+    mute: { en: "The sound button while the sound is on.", ru: "Кнопка звука, пока звук включён." },
+    unmute: {
       en: "The sound button while the sound is off.",
       ru: "Кнопка звука, пока звук выключен.",
     },
-    {
-      key: "volume",
-      default: "Громкость",
-      en: "The sound level slider of a video.",
-      ru: "Ползунок громкости видео.",
-    },
-    {
-      key: "volumeValue",
-      default: "{value} %",
+    volume: { en: "The sound level slider of a video.", ru: "Ползунок громкости видео." },
+    volumeValue: {
       en: "The value of the level slider: `{value}` in percent.",
       ru: "Значение ползунка громкости: `{value}` в процентах.",
     },
-    {
-      key: "seek",
-      default: "Перемотка",
-      en: "The seek slider of a video.",
-      ru: "Ползунок перемотки видео.",
-    },
-    {
-      key: "position",
-      default: "{current} из {duration}",
+    seek: { en: "The seek slider of a video.", ru: "Ползунок перемотки видео." },
+    position: {
       en: "The value of the seek slider: `{current}` and `{duration}` as m:ss.",
       ru: "Значение ползунка перемотки: `{current}` и `{duration}` в формате m:ss.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

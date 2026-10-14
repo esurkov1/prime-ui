@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { PROGRESS_SEGMENTS_LABELS } from "../../internal/progressSegments";
 
 export const api: ComponentApi = {
   parts: [
@@ -139,20 +140,16 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "empty",
-      default: "Нет сегментов",
+  labels: labelRows(PROGRESS_SEGMENTS_LABELS, {
+    empty: {
       en: "Accessible text when `segments` is empty.",
       ru: "Текст для скринридеров, когда `segments` пуст.",
     },
-    {
-      key: "allEmpty",
-      default: "Все сегменты пусты",
+    allEmpty: {
       en: "Accessible text when every segment is 0.",
       ru: "Текст для скринридеров, когда все сегменты равны 0.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [],
     aria: [

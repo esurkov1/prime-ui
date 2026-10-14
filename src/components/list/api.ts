@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { LIST_LABELS } from "./List";
 
 export const api: ComponentApi = {
   parts: [
@@ -191,14 +192,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "reorderItem",
-      default: "Переместить {label}",
+  labels: labelRows(LIST_LABELS, {
+    reorderItem: {
       en: "`aria-label` of a row's drag handle (`onReorder`); `{label}` is the row's text line.",
       ru: "`aria-label` ручки строки (`onReorder`); `{label}` — текст строки.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

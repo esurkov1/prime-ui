@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { PAGINATION_LABELS } from "./Pagination";
 
 export const api: ComponentApi = {
   parts: [
@@ -69,38 +70,19 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "nav",
-      default: "Навигация по страницам",
-      en: "`aria-label` of the `<nav>`.",
-      ru: "`aria-label` навигации.",
-    },
-    {
-      key: "previous",
-      default: "Предыдущая страница",
-      en: "Name of the previous-page arrow.",
-      ru: "Имя стрелки «назад».",
-    },
-    {
-      key: "next",
-      default: "Следующая страница",
-      en: "Name of the next-page arrow.",
-      ru: "Имя стрелки «вперёд».",
-    },
-    {
-      key: "page",
-      default: "Страница {page}",
+  labels: labelRows(PAGINATION_LABELS, {
+    nav: { en: "`aria-label` of the `<nav>`.", ru: "`aria-label` навигации." },
+    previous: { en: "Name of the previous-page arrow.", ru: "Имя стрелки «назад»." },
+    next: { en: "Name of the next-page arrow.", ru: "Имя стрелки «вперёд»." },
+    page: {
       en: "Name of a page button; `{page}` is replaced.",
       ru: "Имя кнопки страницы; `{page}` заменяется номером.",
     },
-    {
-      key: "of",
-      default: "из",
+    of: {
       en: "Hidden word between the current and the total page in the compact view.",
       ru: "Скрытое слово между текущей и общей страницей в компактном виде.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

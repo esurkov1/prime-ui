@@ -148,7 +148,7 @@ export type SmartFilterLabels = {
   rangeTo: string;
 };
 
-const DEFAULT_LABELS: SmartFilterLabels = {
+export const SMART_FILTER_LABELS: SmartFilterLabels = {
   filter: "Фильтр",
   searchPlaceholder: "Поиск",
   clearSearch: "Очистить поиск",
@@ -285,7 +285,7 @@ function SmartFilterRoot({
     setOpen,
     search: text,
     setSearch: setText,
-    labels: { ...DEFAULT_LABELS, ...labels },
+    labels: { ...SMART_FILTER_LABELS, ...labels },
     size,
     collapsedLimit,
   };

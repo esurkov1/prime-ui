@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { KANBAN_LABELS } from "./Kanban";
 
 export const api: ComponentApi = {
   parts: [
@@ -238,62 +239,38 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "count",
-      default: "Карточек: {count}",
-      en: "Spoken name of the count badge.",
-      ru: "Озвучиваемое имя счётчика.",
-    },
-    {
-      key: "countLimit",
-      default: "Карточек: {count} из {limit}",
+  labels: labelRows(KANBAN_LABELS, {
+    count: { en: "Spoken name of the count badge.", ru: "Озвучиваемое имя счётчика." },
+    countLimit: {
       en: "Spoken name of the count badge of a column with a `limit`.",
       ru: "Озвучиваемое имя счётчика колонки с `limit`.",
     },
-    {
-      key: "empty",
-      default: "Нет карточек",
-      en: "Text of an empty column.",
-      ru: "Текст пустой колонки.",
-    },
-    {
-      key: "emptyHint",
-      default: "Перетащите сюда карточку",
+    empty: { en: "Text of an empty column.", ru: "Текст пустой колонки." },
+    emptyHint: {
       en: "Hint under the empty-column text, while cards can be dropped (not on a `disabled` board).",
       ru: "Подсказка под текстом пустой колонки, пока в неё можно положить карточку (не на доске `disabled`).",
     },
-    {
-      key: "full",
-      default: "Колонка «{column}» заполнена ({limit})",
+    full: {
       en: "Why a full column refuses a card: spoken, and shown under the carried card.",
       ru: "Почему заполненная колонка не принимает карточку: озвучивается и видна под переносимой карточкой.",
     },
-    {
-      key: "moveColumn",
-      default: "Переместить колонку «{column}»",
+    moveColumn: {
       en: "Name of the column grip (`reorderableColumns`).",
       ru: "Имя ручки колонки (`reorderableColumns`).",
     },
-    {
-      key: "column",
-      default: "Колонка «{column}»",
+    column: {
       en: "A column as the live region names it when it is carried or moved («Колонка «Демо»: позиция 2 из 4»).",
       ru: "Колонка в объявлениях live-области, когда её переносят («Колонка «Демо»: позиция 2 из 4»).",
     },
-    {
-      key: "moveFailed",
-      default: "Не удалось переместить «{label}», карточка вернулась на место",
+    moveFailed: {
       en: "Spoken when the `onValueChange` promise rejects; `{label}` is `getLabel(item)`.",
       ru: "Озвучивается, когда промис `onValueChange` отклонён; `{label}` — `getLabel(item)`.",
     },
-    {
-      key: "columnMoveFailed",
-      default: "Не удалось переместить колонку «{column}», она вернулась на место",
+    columnMoveFailed: {
       en: "Spoken when the `onColumnOrderChange` promise rejects.",
       ru: "Озвучивается, когда промис `onColumnOrderChange` отклонён.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

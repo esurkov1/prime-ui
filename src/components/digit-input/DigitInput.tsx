@@ -30,7 +30,7 @@ export type DigitInputLabels = {
   failed: string;
 };
 
-const DIGIT_INPUT_LABELS: DigitInputLabels = {
+export const DIGIT_INPUT_LABELS: DigitInputLabels = {
   group: "Код",
   cell: "Цифра {index} из {length}",
   optional: "необязательно",

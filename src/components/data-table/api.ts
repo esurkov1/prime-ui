@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DATA_TABLE_LABELS } from "./DataTable";
 
 export const api: ComponentApi = {
   parts: [
@@ -525,104 +526,69 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "loading",
-      default: "Загрузка данных…",
+  labels: labelRows(DATA_TABLE_LABELS, {
+    loading: {
       en: "Screen-reader status while skeleton rows are shown.",
       ru: "Статус для скринридера, пока видны скелетоны.",
     },
-    {
-      key: "empty",
-      default: "Нет данных для отображения.",
-      en: "Default empty-state text.",
-      ru: "Текст пустого состояния по умолчанию.",
-    },
-    {
-      key: "range",
-      default: "Показано {from}–{to} из {total}",
+    empty: { en: "Default empty-state text.", ru: "Текст пустого состояния по умолчанию." },
+    range: {
       en: "Footer range line; `{from}`, `{to}`, `{total}` are replaced.",
       ru: "Строка диапазона в подвале; `{from}`, `{to}`, `{total}` заменяются.",
     },
-    {
-      key: "loadingMore",
-      default: "Догружаем строки…",
+    loadingMore: {
       en: "Footer status while `loadingMore`.",
       ru: "Статус в подвале при `loadingMore`.",
     },
-    {
-      key: "scrollForMore",
-      default: "Прокрутите вниз для загрузки",
+    scrollForMore: {
       en: "Footer hint when more rows can appear by scrolling.",
       ru: "Подсказка в подвале, когда прокрутка добавит строки.",
     },
-    {
-      key: "selectAll",
-      default: "Выбрать все строки",
+    selectAll: {
       en: "Name of the head «select all» checkbox.",
       ru: "Имя флажка «выбрать все» в шапке.",
     },
-    {
-      key: "selectRow",
-      default: "Выбрать строку {label}",
+    selectRow: {
       en: "Name of a row checkbox; `{label}` is `getRowLabel(row)`, empty without it.",
       ru: "Имя флажка строки; `{label}` — `getRowLabel(row)`, без него пусто.",
     },
-    {
-      key: "selectedCount",
-      default: "Выбрано: {count}",
+    selectedCount: {
       en: "Polite announcement after the selection changes.",
       ru: "Вежливое объявление после смены выбора.",
     },
-    {
-      key: "expand",
-      default: "Развернуть строку {label}",
+    expand: {
       en: "Name of the toggle of a collapsed row.",
       ru: "Имя переключателя свёрнутой строки.",
     },
-    {
-      key: "collapse",
-      default: "Свернуть строку {label}",
+    collapse: {
       en: "Name of the toggle of an expanded row.",
       ru: "Имя переключателя раскрытой строки.",
     },
-    {
-      key: "columns",
-      default: "Колонки",
+    columns: {
       en: "Text of the `DataTable.ColumnsMenu` trigger; `{shown}` and `{total}` are column counts.",
       ru: "Текст кнопки `DataTable.ColumnsMenu`; `{shown}` и `{total}` — число колонок.",
     },
-    {
-      key: "showAllColumns",
-      default: "Показать все",
+    showAllColumns: {
       en: "The `DataTable.ColumnsMenu` item that shows every column again.",
       ru: "Пункт `DataTable.ColumnsMenu`, который возвращает все колонки.",
     },
-    {
-      key: "reorderRow",
-      default: "Переместить строку {label}",
+    reorderRow: {
       en: "`aria-label` of a row's drag handle (`onReorder`); `{label}` is `getRowLabel(row)`.",
       ru: "`aria-label` ручки строки (`onReorder`); `{label}` — `getRowLabel(row)`.",
     },
-    {
-      key: "reorderSorted",
-      default: "Порядок задан сортировкой. Сбросьте её, чтобы перемещать строки",
+    reorderSorted: {
       en: "Tooltip of the disabled handles while the table is sorted by a column.",
       ru: "Подсказка неактивных ручек, пока таблица отсортирована по колонке.",
     },
-    {
-      key: "expandGroup",
-      default: "Развернуть группу {group}",
+    expandGroup: {
       en: "Name of the toggle of a collapsed group; `{group}` is the group key.",
       ru: "Имя переключателя свёрнутой группы; `{group}` — ключ группы.",
     },
-    {
-      key: "collapseGroup",
-      default: "Свернуть группу {group}",
+    collapseGroup: {
       en: "Name of the toggle of an expanded group; `{group}` is the group key.",
       ru: "Имя переключателя развёрнутой группы; `{group}` — ключ группы.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

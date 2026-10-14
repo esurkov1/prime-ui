@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { TABS_LABELS } from "./Tabs";
 
 export const api: ComponentApi = {
   parts: [
@@ -274,14 +275,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "remove",
-      default: "Закрыть вкладку «{label}»",
+  labels: labelRows(TABS_LABELS, {
+    remove: {
       en: "Accessible name of the close button of a removable tab; `{label}` is the tab title (its value when the title is not text).",
       ru: "Имя кнопки закрытия вкладки; `{label}` — подпись вкладки (её значение, если подпись не текст).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

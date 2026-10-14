@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BOTTOM_NAV_LABELS } from "./BottomNav";
 
 export const api: ComponentApi = {
   parts: [
@@ -163,14 +164,9 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "nav",
-      default: "Основные разделы",
-      en: "`aria-label` of the `<nav>` landmark.",
-      ru: "`aria-label` ориентира `<nav>`.",
-    },
-  ],
+  labels: labelRows(BOTTOM_NAV_LABELS, {
+    nav: { en: "`aria-label` of the `<nav>` landmark.", ru: "`aria-label` ориентира `<nav>`." },
+  }),
   accessibility: {
     keyboard: [
       {

@@ -29,7 +29,7 @@ import { type GestureKind, ViewerEngine, type ViewerOrigin } from "./viewerEngin
 
 export type { MediaViewerItem, MediaViewerLabels } from "./types";
 
-const MEDIA_VIEWER_LABELS: MediaViewerLabels = {
+export const MEDIA_VIEWER_LABELS: MediaViewerLabels = {
   viewer: "Просмотр медиа",
   close: "Закрыть",
   previous: "Предыдущее",

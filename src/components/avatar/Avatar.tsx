@@ -66,7 +66,7 @@ export type AvatarPresence = "online" | "offline" | "away" | "busy";
 
 export type AvatarStatusLabels = Record<AvatarPresence, string>;
 
-const AVATAR_STATUS_LABELS: AvatarStatusLabels = {
+export const AVATAR_STATUS_LABELS: AvatarStatusLabels = {
   online: "В сети",
   offline: "Не в сети",
   away: "Отошёл",

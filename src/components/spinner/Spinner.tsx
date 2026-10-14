@@ -16,7 +16,7 @@ export type SpinnerLabels = {
   loading: string;
 };
 
-const SPINNER_LABELS: SpinnerLabels = {
+export const SPINNER_LABELS: SpinnerLabels = {
   loading: "Загрузка",
 };
 

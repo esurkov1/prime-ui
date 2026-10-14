@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { NATIVE_SELECT_LABELS } from "./NativeSelect";
 
 export const api: ComponentApi = {
   parts: [
@@ -112,14 +113,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(NATIVE_SELECT_LABELS, {
+    optional: {
       en: "Muted marker after the label when `optional`.",
       ru: "Приглушённая пометка после подписи при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

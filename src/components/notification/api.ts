@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { NOTIFICATION_LABELS } from "./Notification";
 
 const POSITION =
   '"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"';
@@ -180,50 +181,33 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "close",
-      default: "Закрыть уведомление",
-      en: "`aria-label` of the close button.",
-      ru: "`aria-label` кнопки закрытия.",
-    },
-    {
-      key: "regionTopLeft",
-      default: "Уведомления сверху слева",
+  labels: labelRows(NOTIFICATION_LABELS, {
+    close: { en: "`aria-label` of the close button.", ru: "`aria-label` кнопки закрытия." },
+    regionTopLeft: {
       en: "Name of the top-left toast list.",
       ru: "Имя списка уведомлений сверху слева.",
     },
-    {
-      key: "regionTopCenter",
-      default: "Уведомления сверху по центру",
+    regionTopCenter: {
       en: "Name of the top-center toast list.",
       ru: "Имя списка уведомлений сверху по центру.",
     },
-    {
-      key: "regionTopRight",
-      default: "Уведомления сверху справа",
+    regionTopRight: {
       en: "Name of the top-right toast list.",
       ru: "Имя списка уведомлений сверху справа.",
     },
-    {
-      key: "regionBottomLeft",
-      default: "Уведомления снизу слева",
+    regionBottomLeft: {
       en: "Name of the bottom-left toast list.",
       ru: "Имя списка уведомлений снизу слева.",
     },
-    {
-      key: "regionBottomCenter",
-      default: "Уведомления снизу по центру",
+    regionBottomCenter: {
       en: "Name of the bottom-center toast list.",
       ru: "Имя списка уведомлений снизу по центру.",
     },
-    {
-      key: "regionBottomRight",
-      default: "Уведомления снизу справа",
+    regionBottomRight: {
       en: "Name of the bottom-right toast list.",
       ru: "Имя списка уведомлений снизу справа.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

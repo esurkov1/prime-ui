@@ -103,7 +103,7 @@ export type GanttLabels = {
   empty: string;
 };
 
-const DEFAULT_LABELS: GanttLabels = {
+export const GANTT_LABELS: GanttLabels = {
   rowsHeader: "Название",
   timeline: "Шкала времени",
   scale: "Масштаб",
@@ -292,7 +292,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   ref,
   ...rest
 }: GanttProps<Row, Bar>) {
-  const labels = React.useMemo(() => ({ ...DEFAULT_LABELS, ...labelsProp }), [labelsProp]);
+  const labels = React.useMemo(() => ({ ...GANTT_LABELS, ...labelsProp }), [labelsProp]);
   const depth = useNestedSurfaceDepth();
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const mergedRootRef = useMergedRefs(rootRef, ref);

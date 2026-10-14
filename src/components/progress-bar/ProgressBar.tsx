@@ -6,8 +6,8 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { ProgressLegend, ProgressLegendSkeleton } from "@/internal/ProgressLegend";
 import palette from "@/internal/palette.module.css";
 import {
-  DEFAULT_PROGRESS_SEGMENTS_LABELS,
   formatProgressValue,
+  PROGRESS_SEGMENTS_LABELS,
   type ProgressModeProps,
   type ProgressScale,
   type ProgressSegmentsLabels,
@@ -181,7 +181,7 @@ export function ProgressBar(props: ProgressBarProps) {
     );
   } else if (segmentsProp) {
     const resolved = resolveSegments(segmentsProp, maxProp, {
-      ...DEFAULT_PROGRESS_SEGMENTS_LABELS,
+      ...PROGRESS_SEGMENTS_LABELS,
       ...labels,
     });
     const { segments, total, rest: free, text } = resolved;

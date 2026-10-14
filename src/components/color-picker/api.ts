@@ -1,4 +1,6 @@
-import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { COLOR_PICKER_LABELS } from "./ColorPicker";
+import { COLOR_PRESETS_LABELS } from "./ColorPresets";
 
 const focusRing: ApiProp = {
   name: "focusRing",
@@ -435,84 +437,41 @@ export const api: ComponentApi = {
     },
   ],
   labels: [
-    {
-      key: "format",
-      default: "Формат значений цвета",
-      en: "Name of `ColorPicker.FormatSelect`.",
-      ru: "Имя `ColorPicker.FormatSelect`.",
-    },
-    {
-      key: "eyeDropper",
-      default: "Пипетка",
-      en: "Name of `ColorPicker.EyeDropperButton`.",
-      ru: "Имя `ColorPicker.EyeDropperButton`.",
-    },
-    {
-      key: "hex",
-      default: "Hex",
-      en: "Hex field of `ChannelStrip` and the default `HexInput` label.",
-      ru: "Hex-поле `ChannelStrip` и подпись `HexInput` по умолчанию.",
-    },
-    {
-      key: "hue",
-      default: "Оттенок, градусы",
-      en: "Hue channel field.",
-      ru: "Поле оттенка.",
-    },
-    {
-      key: "saturation",
-      default: "Насыщенность, проценты",
-      en: "Saturation channel field.",
-      ru: "Поле насыщенности.",
-    },
-    {
-      key: "lightness",
-      default: "Яркость, проценты",
-      en: "Lightness channel field.",
-      ru: "Поле яркости.",
-    },
-    {
-      key: "alpha",
-      default: "Непрозрачность, проценты",
-      en: "Alpha channel field.",
-      ru: "Поле непрозрачности.",
-    },
-    {
-      key: "red",
-      default: "Красный, 0–255",
-      en: "Red channel field.",
-      ru: "Поле красного канала.",
-    },
-    {
-      key: "green",
-      default: "Зелёный, 0–255",
-      en: "Green channel field.",
-      ru: "Поле зелёного канала.",
-    },
-    {
-      key: "blue",
-      default: "Синий, 0–255",
-      en: "Blue channel field.",
-      ru: "Поле синего канала.",
-    },
-    {
-      key: "trigger",
-      default: "Цвет",
-      en: "ColorPresets trigger name prefix: «<trigger>: <color name>»; in a FieldList cell the column heading.",
-      ru: "Префикс имени триггера ColorPresets: «<trigger>: <цвет>»; в ячейке FieldList — заголовок столбца.",
-    },
-    {
-      key: "list",
-      default: "Цвета",
-      en: "ColorPresets swatch list name when `Content` has no `label`.",
-      ru: "Имя списка ColorPresets без `label` у `Content`.",
-    },
-    {
-      key: "empty",
-      default: "Без цвета",
-      en: "ColorPresets «no color» swatch and the trigger name for an empty value.",
-      ru: "Образец «без цвета» ColorPresets и имя триггера без значения.",
-    },
+    ...labelRows(COLOR_PICKER_LABELS, {
+      format: { en: "Name of `ColorPicker.FormatSelect`.", ru: "Имя `ColorPicker.FormatSelect`." },
+      eyeDropper: {
+        en: "Name of `ColorPicker.EyeDropperButton`.",
+        ru: "Имя `ColorPicker.EyeDropperButton`.",
+      },
+      hex: {
+        en: "Hex field of `ChannelStrip` and the default `HexInput` label.",
+        ru: "Hex-поле `ChannelStrip` и подпись `HexInput` по умолчанию.",
+      },
+      hue: { en: "Hue channel field.", ru: "Поле оттенка." },
+      saturation: { en: "Saturation channel field.", ru: "Поле насыщенности." },
+      lightness: { en: "Lightness channel field.", ru: "Поле яркости." },
+      alpha: { en: "Alpha channel field.", ru: "Поле непрозрачности." },
+      red: { en: "Red channel field.", ru: "Поле красного канала." },
+      green: { en: "Green channel field.", ru: "Поле зелёного канала." },
+      blue: { en: "Blue channel field.", ru: "Поле синего канала." },
+    }),
+    ...labelRows(COLOR_PRESETS_LABELS, {
+      trigger: {
+        en: "ColorPresets trigger name prefix: «<trigger>: <color name>»; in a FieldList cell the column heading.",
+        ru: "Префикс имени триггера ColorPresets: «<trigger>: <цвет>»; в ячейке FieldList — заголовок столбца.",
+        part: "ColorPresets.Root",
+      },
+      list: {
+        en: "ColorPresets swatch list name when `Content` has no `label`.",
+        ru: "Имя списка ColorPresets без `label` у `Content`.",
+        part: "ColorPresets.Root",
+      },
+      empty: {
+        en: "ColorPresets «no color» swatch and the trigger name for an empty value.",
+        ru: "Образец «без цвета» ColorPresets и имя триггера без значения.",
+        part: "ColorPresets.Root",
+      },
+    }),
   ],
   accessibility: {
     keyboard: [

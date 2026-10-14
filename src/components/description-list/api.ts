@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DESCRIPTION_LIST_LABELS } from "./DescriptionList";
 
 export const api: ComponentApi = {
   parts: [
@@ -89,20 +90,16 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "empty",
-      default: "—",
+  labels: labelRows(DESCRIPTION_LIST_LABELS, {
+    empty: {
       en: "Visible mark of an empty value (muted, hidden from assistive tech).",
       ru: "Видимая метка пустого значения (приглушённая, скрыта от скринридеров).",
     },
-    {
-      key: "emptyText",
-      default: "Не указано",
+    emptyText: {
       en: "What assistive tech reads for an empty value.",
       ru: "Что читают скринридеры у пустого значения.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

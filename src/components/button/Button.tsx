@@ -65,7 +65,7 @@ export type ButtonLabels = {
   holdHint: string;
 };
 
-const BUTTON_LABELS: ButtonLabels = { holdHint: "Удерживайте, чтобы подтвердить" };
+export const BUTTON_LABELS: ButtonLabels = { holdHint: "Удерживайте, чтобы подтвердить" };
 
 /** `cancel`: released before the end — the fill rolls back; `idle` after `done` only fades. */
 type HoldPhase = "idle" | "holding" | "confirming" | "done" | "cancel";

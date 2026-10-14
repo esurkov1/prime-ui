@@ -30,7 +30,7 @@ export type MessageFileLabels = {
   transferred: string;
 } & TransferLabels;
 
-const FILE_LABELS: MessageFileLabels = {
+export const MESSAGE_FILE_LABELS: MessageFileLabels = {
   transferred: "{done} из {total}",
   ...TRANSFER_LABELS,
   download: "Скачать {name}",
@@ -77,7 +77,7 @@ export function MessageFile({
   ref,
   ...rest
 }: MessageFileProps) {
-  const labels = { ...FILE_LABELS, ...labelsProp };
+  const labels = { ...MESSAGE_FILE_LABELS, ...labelsProp };
   const { spacer } = useMessagePart();
   const transferring = inFlight(transfer);
   const failed = transfer === "failed";

@@ -39,7 +39,7 @@ export type SidebarLabels = {
   close: string;
 };
 
-const defaultLabels: SidebarLabels = {
+export const SIDEBAR_LABELS: SidebarLabels = {
   navigation: "Навигация",
   collapse: "Свернуть панель",
   expand: "Развернуть панель",
@@ -254,7 +254,7 @@ const SidebarRoot = React.forwardRef<HTMLDivElement, SidebarRootProps>(function 
     [persistKey],
   );
   const storedMode = persistKey ? readStored(persistKey).mode : undefined;
-  const labels = React.useMemo(() => ({ ...defaultLabels, ...labelsProp }), [labelsProp]);
+  const labels = React.useMemo(() => ({ ...SIDEBAR_LABELS, ...labelsProp }), [labelsProp]);
   const narrow = useMediaQuery(MOBILE_QUERY, offCanvasProp === "auto");
   const offCanvas = offCanvasProp === "always" || narrow;
 

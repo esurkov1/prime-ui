@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { SPINNER_LABELS } from "./Spinner";
 
 export const api: ComponentApi = {
   parts: [
@@ -35,14 +36,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "loading",
-      default: "Загрузка",
+  labels: labelRows(SPINNER_LABELS, {
+    loading: {
       en: 'Visually hidden text inside `role="status"`.',
       ru: 'Текст для скринридеров внутри `role="status"`.',
     },
-  ],
+  }),
   accessibility: {
     keyboard: [],
     aria: [

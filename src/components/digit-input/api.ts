@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DIGIT_INPUT_LABELS } from "./DigitInput";
 
 export const api: ComponentApi = {
   parts: [
@@ -162,32 +163,24 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "group",
-      default: "Код",
+  labels: labelRows(DIGIT_INPUT_LABELS, {
+    group: {
       en: "Accessible name of the group when there is no visible `label`.",
       ru: "Имя группы, когда нет видимой подписи.",
     },
-    {
-      key: "cell",
-      default: "Цифра {index} из {length}",
+    cell: {
       en: "Accessible name of each cell; `{index}` (1-based) and `{length}` are replaced.",
       ru: "Имя каждой ячейки; `{index}` (с 1) и `{length}` подставляются.",
     },
-    {
-      key: "optional",
-      default: "необязательно",
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-    {
-      key: "failed",
-      default: "Неверный код",
+    failed: {
       en: "The error of a code whose `onComplete` promise rejected without a reason.",
       ru: "Ошибка кода, чей промис `onComplete` отклонён без причины.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

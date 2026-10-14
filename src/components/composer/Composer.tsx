@@ -107,7 +107,7 @@ export type ComposerLabels = TextFormattingLabels & {
   cancelEdit: string;
 };
 
-const COMPOSER_LABELS: ComposerLabels = {
+export const COMPOSER_LABELS: ComposerLabels = {
   region: "Новое сообщение",
   placeholder: "Сообщение",
   send: "Отправить",

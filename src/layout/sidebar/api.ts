@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { SIDEBAR_LABELS } from "./Sidebar";
 
 const MODE = '"expanded" | "compact" | "hidden"';
 
@@ -507,32 +508,18 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "navigation",
-      default: "Навигация",
-      en: "`aria-label` of the `<nav>`.",
-      ru: "`aria-label` у `<nav>`.",
-    },
-    {
-      key: "collapse",
-      default: "Свернуть панель",
-      en: "Toggle label while expanded.",
-      ru: "Подпись Toggle в развёрнутом режиме.",
-    },
-    {
-      key: "expand",
-      default: "Развернуть панель",
+  labels: labelRows(SIDEBAR_LABELS, {
+    navigation: { en: "`aria-label` of the `<nav>`.", ru: "`aria-label` у `<nav>`." },
+    collapse: { en: "Toggle label while expanded.", ru: "Подпись Toggle в развёрнутом режиме." },
+    expand: {
       en: "Toggle label while compact or hidden.",
       ru: "Подпись Toggle в компактном или скрытом режиме.",
     },
-    {
-      key: "close",
-      default: "Закрыть навигацию",
+    close: {
       en: "Toggle label off-canvas and the scrim label.",
       ru: "Подпись Toggle на узком экране и подложки.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

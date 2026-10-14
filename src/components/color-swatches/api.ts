@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { COLOR_SWATCHES_LABELS } from "./ColorSwatches";
 
 export const api: ComponentApi = {
   parts: [
@@ -136,26 +137,20 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "group",
-      default: "Цвет",
+  labels: labelRows(COLOR_SWATCHES_LABELS, {
+    group: {
       en: "Accessible name of the group without a visible `label` and `aria-label`.",
       ru: "Имя группы без видимой подписи и `aria-label`.",
     },
-    {
-      key: "empty",
-      default: "Без цвета",
+    empty: {
       en: "Name of the «no color» swatch (`allowEmpty`).",
       ru: "Имя образца «без цвета» (`allowEmpty`).",
     },
-    {
-      key: "optional",
-      default: "необязательно",
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

@@ -20,7 +20,7 @@ export type ListLabels = {
   reorderItem: string;
 };
 
-const LIST_LABELS: ListLabels = {
+export const LIST_LABELS: ListLabels = {
   reorderItem: "Переместить {label}",
 };
 

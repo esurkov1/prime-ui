@@ -297,8 +297,14 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
+#### Chat.Root
+
 | Key | Default | Used for |
 |---|---|---|
+| `selectedCount` | `"Выбрано: {count}"` | The count of the selection bar. |
+| `cancel` | `"Отмена"` | The selection bar's button that leaves selection. |
+| `scrollToEnd` | `"К последним сообщениям"` | The name of the round button that goes to the newest message. |
+| `newMessages` | `"Новых сообщений: {count}. К последним сообщениям"` | The name of that button while new messages wait below. |
 | `typing` | `"печатает…"` | The status line of the header while the other side types. |
 | `search` | `"Поиск по переписке"` | The search button and the name of the search field. |
 | `searchPlaceholder` | `"Поиск по сообщениям"` | The placeholder of the search field. |
@@ -307,15 +313,16 @@ Chat.Root                         <div> column, fills its host; owns selection, 
 | `previousMatch` | `"Предыдущее совпадение"` | The button that goes to the older match. |
 | `nextMatch` | `"Следующее совпадение"` | The button that goes to the newer match. |
 | `messages` | `"Переписка"` | The name of the list when the header has no `Chat.Title`. |
-| `selectedCount` | `"Выбрано: {count}"` | The count of the selection bar. |
-| `cancel` | `"Отмена"` | The selection bar's button that leaves selection. |
-| `scrollToEnd` | `"К последним сообщениям"` | The name of the round button that goes to the newest message. |
-| `newMessages` | `"Новых сообщений: {count}. К последним сообщениям"` | The name of that button while new messages wait below. |
+| `unread` | `"Непрочитанные сообщения"` | The text of the «unread» band: `Chat.Root labels` for rows from `items`, `Chat.Unread labels` for a hand-placed band. |
+| `loading` | `"Загрузка сообщений"` | Announced politely while the conversation loads for the first time (`Chat.Messages loading`). |
+
+#### Chat.Pinned
+
+| Key | Default | Used for |
+|---|---|---|
 | `pinned` | `"Закреплённое сообщение"` | `Chat.Pinned labels`: the title with one pinned message. |
 | `pinnedOf` | `"Закреплённое {index} из {count}"` | `Chat.Pinned labels`: the title with several, the newest last. |
 | `unpin` | `"Открепить"` | `Chat.Pinned labels`: the name of the unpin button. |
-| `unread` | `"Непрочитанные сообщения"` | The text of the «unread» band: `Chat.Root labels` for rows from `items`, `Chat.Unread labels` for a hand-placed band. |
-| `loading` | `"Загрузка сообщений"` | Announced politely while the conversation loads for the first time (`Chat.Messages loading`). |
 
 ## Examples
 | Example | Shows |

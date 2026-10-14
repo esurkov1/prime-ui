@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { CHAT_LIST_LABELS } from "./ChatList";
 
 export const api: ComponentApi = {
   parts: [
@@ -305,164 +306,58 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "list",
-      default: "Диалоги",
-      en: "`aria-label` of the list.",
-      ru: "`aria-label` списка.",
-    },
-    {
-      key: "search",
-      default: "Поиск по диалогам",
-      en: "`aria-label` of the search field.",
-      ru: "`aria-label` поля поиска.",
-    },
-    {
-      key: "searchPlaceholder",
-      default: "Поиск",
-      en: "Placeholder of the search field.",
-      ru: "Подсказка в поле поиска.",
-    },
-    {
-      key: "loading",
-      default: "Загрузка диалогов",
-      en: "Announced while `loading`.",
-      ru: "Объявляется при `loading`.",
-    },
-    {
-      key: "empty",
-      default: "Нет диалогов",
-      en: "The empty state without a search.",
-      ru: "Пустое состояние без поиска.",
-    },
-    {
-      key: "noResults",
-      default: "Ничего не найдено",
+  labels: labelRows(CHAT_LIST_LABELS, {
+    list: { en: "`aria-label` of the list.", ru: "`aria-label` списка." },
+    search: { en: "`aria-label` of the search field.", ru: "`aria-label` поля поиска." },
+    searchPlaceholder: { en: "Placeholder of the search field.", ru: "Подсказка в поле поиска." },
+    loading: { en: "Announced while `loading`.", ru: "Объявляется при `loading`." },
+    empty: { en: "The empty state without a search.", ru: "Пустое состояние без поиска." },
+    noResults: {
       en: "The empty state of a search; announced.",
       ru: "Пустой результат поиска; объявляется.",
     },
-    {
-      key: "results",
-      default: "Найдено: {count}",
+    results: {
       en: "Announced after a search changes the list; `{count}` — the dialogs found.",
       ru: "Объявляется после поиска; `{count}` — сколько найдено.",
     },
-    {
-      key: "typing",
-      default: "печатает…",
+    typing: {
       en: "The preview while the other side types.",
       ru: "Превью, пока собеседник печатает.",
     },
-    {
-      key: "typingName",
-      default: "{name} печатает…",
+    typingName: {
       en: "The preview while a member of a group types; `{name}` — who.",
       ru: "Превью, пока печатает участник группы; `{name}` — кто.",
     },
-    {
-      key: "draft",
-      default: "Черновик:",
-      en: "Before an unsent draft in the preview.",
-      ru: "Перед черновиком в превью.",
-    },
-    {
-      key: "unread",
-      default: "непрочитанных: {count}",
+    draft: { en: "Before an unsent draft in the preview.", ru: "Перед черновиком в превью." },
+    unread: {
       en: "Spoken for the unread count; `{count}` — the number.",
       ru: "Произносится вместо счётчика; `{count}` — число.",
     },
-    {
-      key: "mention",
-      default: "упоминание",
-      en: "Spoken for the «@» mark.",
-      ru: "Произносится вместо «@».",
-    },
-    {
-      key: "muted",
-      default: "Без звука",
-      en: "Name of the muted glyph.",
-      ru: "Имя значка без звука.",
-    },
-    {
-      key: "pinned",
-      default: "Закреплён",
-      en: "Name of the pin glyph.",
-      ru: "Имя значка булавки.",
-    },
-    {
-      key: "sending",
-      default: "Отправляется",
+    mention: { en: "Spoken for the «@» mark.", ru: "Произносится вместо «@»." },
+    muted: { en: "Name of the muted glyph.", ru: "Имя значка без звука." },
+    pinned: { en: "Name of the pin glyph.", ru: "Имя значка булавки." },
+    sending: {
       en: "Name of the delivery mark: on its way.",
       ru: "Имя отметки доставки: отправляется.",
     },
-    {
-      key: "sent",
-      default: "Отправлено",
-      en: "Name of the delivery mark: sent.",
-      ru: "Имя отметки доставки: отправлено.",
-    },
-    {
-      key: "read",
-      default: "Прочитано",
-      en: "Name of the delivery mark: read.",
-      ru: "Имя отметки доставки: прочитано.",
-    },
-    {
-      key: "failed",
-      default: "Не отправлено",
+    sent: { en: "Name of the delivery mark: sent.", ru: "Имя отметки доставки: отправлено." },
+    read: { en: "Name of the delivery mark: read.", ru: "Имя отметки доставки: прочитано." },
+    failed: {
       en: "Name of the delivery mark: failed.",
       ru: "Имя отметки доставки: не отправлено.",
     },
-    {
-      key: "photo",
-      default: "Фото",
-      en: 'Media word: `kind="photo"`.',
-      ru: 'Слово медиа: `kind="photo"`.',
-    },
-    {
-      key: "video",
-      default: "Видео",
-      en: 'Media word: `kind="video"`.',
-      ru: 'Слово медиа: `kind="video"`.',
-    },
-    {
-      key: "voice",
-      default: "Голосовое сообщение",
-      en: 'Media word: `kind="voice"`.',
-      ru: 'Слово медиа: `kind="voice"`.',
-    },
-    {
-      key: "videoNote",
-      default: "Видеосообщение",
-      en: 'Media word: `kind="videoNote"`.',
-      ru: 'Слово медиа: `kind="videoNote"`.',
-    },
-    {
-      key: "file",
-      default: "Файл",
-      en: 'Media word: `kind="file"`.',
-      ru: 'Слово медиа: `kind="file"`.',
-    },
-    {
-      key: "location",
-      default: "Геопозиция",
-      en: 'Media word: `kind="location"`.',
-      ru: 'Слово медиа: `kind="location"`.',
-    },
-    {
-      key: "contact",
-      default: "Контакт",
-      en: 'Media word: `kind="contact"`.',
-      ru: 'Слово медиа: `kind="contact"`.',
-    },
-    {
-      key: "menu",
-      default: "Действия с диалогом",
+    photo: { en: 'Media word: `kind="photo"`.', ru: 'Слово медиа: `kind="photo"`.' },
+    video: { en: 'Media word: `kind="video"`.', ru: 'Слово медиа: `kind="video"`.' },
+    voice: { en: 'Media word: `kind="voice"`.', ru: 'Слово медиа: `kind="voice"`.' },
+    videoNote: { en: 'Media word: `kind="videoNote"`.', ru: 'Слово медиа: `kind="videoNote"`.' },
+    file: { en: 'Media word: `kind="file"`.', ru: 'Слово медиа: `kind="file"`.' },
+    location: { en: 'Media word: `kind="location"`.', ru: 'Слово медиа: `kind="location"`.' },
+    contact: { en: 'Media word: `kind="contact"`.', ru: 'Слово медиа: `kind="contact"`.' },
+    menu: {
       en: "`aria-label` of the point the row menu opens from.",
       ru: "`aria-label` точки, от которой открывается меню строки.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

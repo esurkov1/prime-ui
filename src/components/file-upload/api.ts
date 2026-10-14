@@ -1,5 +1,6 @@
-import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import { USE_UPLOAD_QUEUE_PART } from "../../hooks/useUploadQueue.api";
+import { FILE_UPLOAD_LABELS } from "./FileUpload";
 
 const FILE_TYPE = "readonly FileUploadFile[]";
 
@@ -368,170 +369,92 @@ export const api: ComponentApi = {
     },
     USE_UPLOAD_QUEUE_PART,
   ],
-  labels: [
-    {
-      key: "title",
-      default: "Выберите файл или перетащите его сюда",
-      en: "Title of the built-in zone body.",
-      ru: "Заголовок встроенной зоны.",
-    },
-    {
-      key: "description",
-      default: "JPEG, PNG, PDF, MP4 до 50 МБ",
+  labels: labelRows(FILE_UPLOAD_LABELS, {
+    title: { en: "Title of the built-in zone body.", ru: "Заголовок встроенной зоны." },
+    description: {
       en: "Description of the built-in body; an empty string hides it.",
       ru: "Описание встроенной зоны; пустая строка скрывает его.",
     },
-    {
-      key: "browse",
-      default: "Выбрать файл",
+    browse: {
       en: 'Text of the browse button: decorative in the built-in zone body, the control itself with `trigger="button"`.',
       ru: 'Текст кнопки выбора: декоративной во встроенной зоне, самой кнопки при `trigger="button"`.',
     },
-    {
-      key: "optional",
-      default: "необязательно",
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-    {
-      key: "add",
-      default: "Добавить",
+    add: {
       en: 'Text of the add tile (`trigger="tile"`).',
       ru: 'Текст плитки добавления (`trigger="tile"`).',
     },
-    {
-      key: "addLabel",
-      default: "Добавить файлы",
+    addLabel: {
       en: "Accessible name of the add tile's file input.",
       ru: "Имя поля выбора файлов в плитке добавления.",
     },
-    {
-      key: "empty",
-      default: "Нажмите или перетащите файлы",
+    empty: {
       en: "Text of the add tile of an empty set (it spans the row).",
       ru: "Текст плитки добавления в пустом наборе (она во всю строку).",
     },
-    {
-      key: "emptyHint",
-      default: "Можно несколько сразу",
+    emptyHint: {
       en: "Second line of the empty add tile without `max` (with it the counter stands there).",
       ru: "Вторая строка пустой плитки добавления без `max` (с ним там счётчик).",
     },
-    {
-      key: "full",
-      default: "Лимит файлов",
+    full: {
       en: "Text of the add tile when `max` is reached.",
       ru: "Текст плитки добавления, когда достигнут `max`.",
     },
-    {
-      key: "count",
-      default: "{count} из {max}",
+    count: {
       en: "Counter on the add tile (with `max`).",
       ru: "Счётчик на плитке добавления (при `max`).",
     },
-    {
-      key: "cover",
-      default: "Обложка",
-      en: "Pill of the first tile with `cover`.",
-      ru: "Плашка первой плитки при `cover`.",
-    },
-    {
-      key: "queued",
-      default: "В очереди",
+    cover: { en: "Pill of the first tile with `cover`.", ru: "Плашка первой плитки при `cover`." },
+    queued: {
       en: "A file waiting for a free slot (a row's status, a tile's name and its empty ring).",
       ru: "Файл ждёт свободного места (статус строки, имя плитки и её пустого кольца).",
     },
-    {
-      key: "uploading",
-      default: "Загрузка {percent}%",
-      en: "A file in flight.",
-      ru: "Файл загружается.",
-    },
-    {
-      key: "failed",
-      default: "Не удалось загрузить",
-      en: "A failed file whose upload gave no reason.",
-      ru: "Загрузка упала без причины.",
-    },
-    {
-      key: "progress",
-      default: "Загрузка: {name}",
-      en: "Name of a row's progress bar.",
-      ru: "Имя полосы прогресса строки.",
-    },
-    {
-      key: "cancel",
-      default: "Отменить загрузку: {name}",
+    uploading: { en: "A file in flight.", ru: "Файл загружается." },
+    failed: { en: "A failed file whose upload gave no reason.", ru: "Загрузка упала без причины." },
+    progress: { en: "Name of a row's progress bar.", ru: "Имя полосы прогресса строки." },
+    cancel: {
       en: "Name of the disk that cancels a tile's upload in flight.",
       ru: "Имя диска, отменяющего идущую загрузку плитки.",
     },
-    {
-      key: "retry",
-      default: "Повторить загрузку: {name}",
+    retry: {
       en: "Name of the retry button of a failed row (the retry disk of a failed tile).",
       ru: "Имя кнопки повтора у неудачной строки (диска повтора у неудачной плитки).",
     },
-    {
-      key: "remove",
-      default: "Убрать {name}",
+    remove: {
       en: "Name of the remove button of a file (it also stops an upload).",
       ru: "Имя кнопки «Убрать» у файла (она же прерывает загрузку).",
     },
-    {
-      key: "open",
-      default: "Открыть {name}",
+    open: {
       en: "Name of a tile's link to the file (`href`); a row's link is named by the file name.",
       ru: "Имя ссылки плитки на файл (`href`); ссылку строки называет имя файла.",
     },
-    {
-      key: "removed",
-      default: "{name}: убран",
-      en: "Live region: a file was removed.",
-      ru: "Live-область: файл убран.",
-    },
-    {
-      key: "coverChanged",
-      default: "Обложка: {name}",
+    removed: { en: "Live region: a file was removed.", ru: "Live-область: файл убран." },
+    coverChanged: {
       en: "Live region: a reorder put another file first, the new cover (`cover`).",
       ru: "Live-область: перестановка поставила первым другой файл — новую обложку (`cover`).",
     },
-    {
-      key: "changeFailed",
-      default: "Не удалось сохранить изменение, файлы на прежних местах",
+    changeFailed: {
       en: "Live region: the `onValueChange` promise of a change rejected and the set is as it was.",
       ru: "Live-область: промис `onValueChange` отклонён, набор вернулся.",
     },
-    {
-      key: "uploaded",
-      default: "{name}: загружен",
-      en: "Live region: a file finished uploading.",
-      ru: "Live-область: файл загружен.",
-    },
-    {
-      key: "uploadFailed",
-      default: "{name}: {reason}",
+    uploaded: { en: "Live region: a file finished uploading.", ru: "Live-область: файл загружен." },
+    uploadFailed: {
       en: "Live region: a file failed to upload; `{reason}` is its error or `failed`.",
       ru: "Live-область: файл не загрузился; `{reason}` — его ошибка или `failed`.",
     },
-    {
-      key: "tileImage",
-      default: "Фото {position}: {name}{status}",
+    tileImage: {
       en: "Name of an image tile; `{name}` is the file's `alt` or name, `{status}` is ` · state` while it uploads.",
       ru: "Имя плитки изображения; `{name}` — `alt` или имя файла, `{status}` — ` · состояние`, пока файл грузится.",
     },
-    {
-      key: "tileVideo",
-      default: "Видео {position}: {name}{status}",
+    tileVideo: {
       en: "Name of a video tile; the tokens of `tileImage`.",
       ru: "Имя плитки видео; токены как у `tileImage`.",
     },
-    {
-      key: "tileFile",
-      default: "Файл {position}: {name}{status}",
-      en: "Name of the tile of any other file.",
-      ru: "Имя плитки любого другого файла.",
-    },
-  ],
+    tileFile: { en: "Name of the tile of any other file.", ru: "Имя плитки любого другого файла." },
+  }),
   accessibility: {
     keyboard: [
       {

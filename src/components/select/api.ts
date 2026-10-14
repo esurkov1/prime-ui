@@ -1,4 +1,5 @@
-import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { SELECT_LABELS } from "./Select";
 
 const spanRest: ApiProp = {
   name: "…rest",
@@ -395,56 +396,37 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "search",
-      default: "Поиск",
+  labels: labelRows(SELECT_LABELS, {
+    search: {
       en: "Placeholder and accessible name of the search field.",
       ru: "Плейсхолдер и имя поля поиска.",
     },
-    {
-      key: "empty",
-      default: "Ничего не найдено",
+    empty: {
       en: "Empty state: no items or nothing matches.",
       ru: "Пустое состояние: пунктов нет или ничего не найдено.",
     },
-    {
-      key: "emptyHint",
-      default: "Попробуйте изменить запрос",
+    emptyHint: {
       en: 'Second line of the empty state while searching; `""` hides it.',
       ru: "Вторая строка пустого состояния при поиске; пустая строка скрывает её.",
     },
-    {
-      key: "loading",
-      default: "Загрузка…",
+    loading: {
       en: "Announced while `loading` or `loadingMore`.",
       ru: "Объявляется скринридером при `loading` или `loadingMore`.",
     },
-    {
-      key: "retry",
-      default: "Повторить",
+    retry: {
       en: "The retry button under `loadError` (`onRetry`).",
       ru: "Кнопка повтора под `loadError` (`onRetry`).",
     },
-    {
-      key: "clear",
-      default: "Очистить",
-      en: "Tooltip of the clear segment.",
-      ru: "Всплывающая подпись сегмента очистки.",
-    },
-    {
-      key: "optional",
-      default: "необязательно",
+    clear: { en: "Tooltip of the clear segment.", ru: "Всплывающая подпись сегмента очистки." },
+    optional: {
       en: "Muted marker after the label when `optional`.",
       ru: "Приглушённая пометка после подписи при `optional`.",
     },
-    {
-      key: "changeFailed",
-      default: "Не удалось сохранить выбор",
+    changeFailed: {
       en: "Announced when the `onValueChange` promise rejects and the value rolls back.",
       ru: "Объявляется, когда обещание из `onValueChange` отклонено и значение вернулось.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

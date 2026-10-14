@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { GANTT_LABELS } from "./Gantt";
 
 const SCALE = '"day" | "week" | "month"';
 
@@ -239,107 +240,62 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "rowsHeader",
-      default: "Название",
-      en: "Heading of the first column.",
-      ru: "Заголовок первой колонки.",
-    },
-    {
-      key: "timeline",
-      default: "Шкала времени",
+  labels: labelRows(GANTT_LABELS, {
+    rowsHeader: { en: "Heading of the first column.", ru: "Заголовок первой колонки." },
+    timeline: {
       en: "Accessible name of the time axis column.",
       ru: "Доступное имя колонки шкалы.",
     },
-    {
-      key: "scale",
-      default: "Масштаб",
+    scale: {
       en: "Accessible name of the zoom switch.",
       ru: "Доступное имя переключателя масштаба.",
     },
-    { key: "day", default: "День", en: "Zoom segment: days.", ru: "Сегмент масштаба: дни." },
-    { key: "week", default: "Неделя", en: "Zoom segment: weeks.", ru: "Сегмент масштаба: недели." },
-    {
-      key: "month",
-      default: "Месяц",
-      en: "Zoom segment: months.",
-      ru: "Сегмент масштаба: месяцы.",
-    },
-    {
-      key: "today",
-      default: "Сегодня",
+    day: { en: "Zoom segment: days.", ru: "Сегмент масштаба: дни." },
+    week: { en: "Zoom segment: weeks.", ru: "Сегмент масштаба: недели." },
+    month: { en: "Zoom segment: months.", ru: "Сегмент масштаба: месяцы." },
+    today: {
       en: "The button that scrolls to today and the chip on the today line.",
       ru: "Кнопка прокрутки к сегодняшнему дню и метка на его линии.",
     },
-    {
-      key: "bar",
-      default: "{label}: {start} — {end}",
+    bar: {
       en: "Accessible name of a bar; `{start}` and `{end}` are its first and last day, spoken in full.",
       ru: "Доступное имя полосы; `{start}` и `{end}` — первый и последний день полностью.",
     },
-    {
-      key: "milestone",
-      default: "{label}: {date}",
-      en: "Accessible name of a milestone.",
-      ru: "Доступное имя вехи.",
-    },
-    {
-      key: "progress",
-      default: "выполнено {progress}%",
+    milestone: { en: "Accessible name of a milestone.", ru: "Доступное имя вехи." },
+    progress: {
       en: "Added to a bar's name when it has `progress`.",
       ru: "Добавляется к имени полосы с `progress`.",
     },
-    {
-      key: "editHint",
-      default:
-        "Shift + стрелки сдвигают на день, Ctrl + Shift + стрелки меняют окончание на день; с Alt — на неделю или месяц масштаба",
+    editHint: {
       en: "Description of an editable bar: the editing keys.",
       ru: "Описание редактируемой полосы: клавиши правки.",
     },
-    {
-      key: "duration",
-      default: "{days} дн.",
+    duration: {
       en: "Duration of a bar in its tooltip («5 – 18 октября · 14 дн.»).",
       ru: "Длительность полосы в подсказке («5 – 18 октября · 14 дн.»).",
     },
-    {
-      key: "changeFailed",
-      default: "Сроки не изменены: {label}",
+    changeFailed: {
       en: "Announced when `onBarChange` rejects and the bar returns to its dates.",
       ru: "Озвучивается, когда `onBarChange` отклонён и полоса вернулась к своим датам.",
     },
-    {
-      key: "newBar",
-      default: "Новая задача",
+    newBar: {
       en: "Label of the ghost of a bar being created and of its announcement.",
       ru: "Подпись призрака создаваемой полосы и её объявления.",
     },
-    {
-      key: "createHint",
-      default: "N — создать задачу",
+    createHint: {
       en: "Description of a row header when bars can be created.",
       ru: "Описание заголовка строки, когда полосы можно создавать.",
     },
-    {
-      key: "createFailed",
-      default: "Задача не создана",
+    createFailed: {
       en: "Announced when `onBarCreate` rejects and the ghost fades out.",
       ru: "Озвучивается, когда `onBarCreate` отклонён и призрак тает.",
     },
-    {
-      key: "loading",
-      default: "Загрузка графика…",
+    loading: {
       en: "Screen-reader status while skeleton rows are shown.",
       ru: "Статус для скринридера, пока видны скелетоны.",
     },
-    {
-      key: "empty",
-      default: "Нет задач за этот период.",
-      en: "Default empty-state text.",
-      ru: "Текст пустого состояния по умолчанию.",
-    },
-  ],
+    empty: { en: "Default empty-state text.", ru: "Текст пустого состояния по умолчанию." },
+  }),
   accessibility: {
     keyboard: [
       {

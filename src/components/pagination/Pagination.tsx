@@ -40,7 +40,7 @@ export type PaginationLabels = {
   of: string;
 };
 
-const DEFAULT_LABELS: PaginationLabels = {
+export const PAGINATION_LABELS: PaginationLabels = {
   nav: "Навигация по страницам",
   previous: "Предыдущая страница",
   next: "Следующая страница",
@@ -84,7 +84,7 @@ export function Pagination({
   const [page, setPage] = useControllableState({ value, defaultValue, onChange: onValueChange });
   if (totalPages < 1) return null;
 
-  const labels = { ...DEFAULT_LABELS, ...labelsProp };
+  const labels = { ...PAGINATION_LABELS, ...labelsProp };
   const current = Math.min(Math.max(1, page), totalPages);
   const go = (next: number) => {
     if (next !== current) setPage(next);

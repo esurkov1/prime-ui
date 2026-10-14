@@ -23,7 +23,7 @@ export type RadioGroupLabels = {
   optional: string;
 };
 
-const RADIO_GROUP_LABELS: RadioGroupLabels = { optional: "необязательно" };
+export const RADIO_GROUP_LABELS: RadioGroupLabels = { optional: "необязательно" };
 
 // ─── Group ───────────────────────────────────────────────────────────────────
 

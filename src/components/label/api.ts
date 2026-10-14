@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { LABEL_LABELS } from "./Label";
 
 export const api: ComponentApi = {
   parts: [
@@ -65,14 +66,12 @@ export const api: ComponentApi = {
       props: [],
     },
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(LABEL_LABELS, {
+    optional: {
       en: "Marker after the text when `optional`.",
       ru: "Пометка после текста при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [],
     aria: [

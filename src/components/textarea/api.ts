@@ -1,12 +1,13 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import {
-  FIELD_COMMIT_LABELS,
-  FIELD_COPY_LABELS,
+  FIELD_COMMIT_LABEL_DOCS,
+  FIELD_COPY_LABEL_DOCS,
   fieldActionPart,
   fieldCommitProp,
   fieldCopyPart,
 } from "../../internal/field.api";
-import { formattingProp, TEXT_FORMATTING_LABEL_ROWS } from "../../internal/textFormatting.api";
+import { formattingProp, TEXT_FORMATTING_LABEL_DOCS } from "../../internal/textFormatting.api";
+import { TEXTAREA_LABELS } from "./Textarea";
 
 export const api: ComponentApi = {
   parts: [
@@ -182,23 +183,19 @@ export const api: ComponentApi = {
       ru: "в верхнем углу поля",
     }),
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(TEXTAREA_LABELS, {
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-    {
-      key: "counter",
-      default: "{current} из {max} символов",
+    counter: {
       en: "Screen-reader text of `Textarea.Counter`; `{current}` and `{max}` are replaced.",
       ru: "Озвучка `Textarea.Counter`; `{current}` и `{max}` подставляются.",
     },
-    ...FIELD_COPY_LABELS,
-    ...FIELD_COMMIT_LABELS,
-    ...TEXT_FORMATTING_LABEL_ROWS,
-  ],
+    ...FIELD_COPY_LABEL_DOCS,
+    ...FIELD_COMMIT_LABEL_DOCS,
+    ...TEXT_FORMATTING_LABEL_DOCS,
+  }),
   accessibility: {
     keyboard: [
       {

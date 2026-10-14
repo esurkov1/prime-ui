@@ -1,6 +1,9 @@
-import type { ApiLabel, ApiPart } from "../../../scripts/docs/componentApi";
-import { transferLabels, transferProps } from "../../internal/transfer.api";
-import { galleryLabels, galleryProps } from "../gallery/api";
+import { type ApiLabel, type ApiPart, labelRows } from "../../../scripts/docs/componentApi";
+import { transferLabelDocs, transferProps } from "../../internal/transfer.api";
+import { galleryLabelDocs, galleryProps } from "../gallery/api";
+import { GALLERY_LABELS } from "../gallery/Gallery";
+import { MESSAGE_LOCATION_LABELS } from "./MessageCards";
+import { MESSAGE_FILE_LABELS } from "./MessageFile";
 
 /**
  * The content parts of a message (`Message.Media`, `.File`, `.Location`, `.Contact`,
@@ -179,33 +182,40 @@ export const contentParts: ApiPart[] = [
   },
 ];
 
+/** The label rows of the content parts, each on the part whose `labels` prop takes it. */
 export const contentLabelRows: ApiLabel[] = [
-  ...galleryLabels("`Message.Media`"),
-  ...transferLabels("`Message.Media` / `Message.File`", "Скачать {name}").map((row) =>
-    row.key === "download"
-      ? {
-          ...row,
-          en: "`Message.Media` / `Message.File`: the download arrow of a `remote` tile or file, and a file's `href` link; `{name}` is the file name, a tile's `alt` or `photo` / `video`.",
-          ru: "`Message.Media` / `Message.File`: стрелка загрузки у плитки или файла в состоянии `remote` и ссылка `href` файла; `{name}` — имя файла, `alt` плитки или `photo` / `video`.",
-        }
-      : row,
-  ),
-  {
-    key: "transferred",
-    default: "{done} из {total}",
-    en: "`Message.File`: the line under the name while it transfers.",
-    ru: "`Message.File`: строка под именем во время передачи.",
-  },
-  {
-    key: "openMap",
-    default: "Открыть на карте: {place}",
-    en: "`Message.Location`: the name of the map link.",
-    ru: "`Message.Location`: имя ссылки на карту.",
-  },
-  {
-    key: "live",
-    default: "Трансляция",
-    en: "`Message.Location`: the mark of a live location.",
-    ru: "`Message.Location`: отметка геопозиции в реальном времени.",
-  },
+  ...labelRows(GALLERY_LABELS, {
+    ...galleryLabelDocs("`Message.Media`", "Message.Media"),
+    ...transferLabelDocs("`Message.Media`", "Message.Media"),
+    download: {
+      en: "`Message.Media`: the download arrow of a `remote` tile; `{name}` is its `alt` or `photo` / `video`.",
+      ru: "`Message.Media`: стрелка загрузки у плитки в состоянии `remote`; `{name}` — её `alt` или `photo` / `video`.",
+      part: "Message.Media",
+    },
+  }),
+  ...labelRows(MESSAGE_FILE_LABELS, {
+    transferred: {
+      en: "`Message.File`: the line under the name while it transfers.",
+      ru: "`Message.File`: строка под именем во время передачи.",
+      part: "Message.File",
+    },
+    ...transferLabelDocs("`Message.File`", "Message.File"),
+    download: {
+      en: "`Message.File`: the download arrow of a `remote` file and the `href` link; `{name}` is the file name.",
+      ru: "`Message.File`: стрелка загрузки у файла в состоянии `remote` и ссылка `href`; `{name}` — имя файла.",
+      part: "Message.File",
+    },
+  }),
+  ...labelRows(MESSAGE_LOCATION_LABELS, {
+    openMap: {
+      en: "`Message.Location`: the name of the map link.",
+      ru: "`Message.Location`: имя ссылки на карту.",
+      part: "Message.Location",
+    },
+    live: {
+      en: "`Message.Location`: the mark of a live location.",
+      ru: "`Message.Location`: отметка геопозиции в реальном времени.",
+      part: "Message.Location",
+    },
+  }),
 ];

@@ -137,7 +137,7 @@ export type FileUploadLabels = {
   tileFile: string;
 };
 
-const FILE_UPLOAD_LABELS: FileUploadLabels = {
+export const FILE_UPLOAD_LABELS: FileUploadLabels = {
   title: "Выберите файл или перетащите его сюда",
   description: "JPEG, PNG, PDF, MP4 до 50 МБ",
   browse: "Выбрать файл",

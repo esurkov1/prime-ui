@@ -235,7 +235,7 @@ export type PageContentLabels = {
   back: string;
 };
 
-const PAGE_CONTENT_LABELS: PageContentLabels = {
+export const PAGE_CONTENT_LABELS: PageContentLabels = {
   back: "Назад к списку",
 };
 

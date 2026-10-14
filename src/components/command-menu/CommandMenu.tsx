@@ -39,7 +39,7 @@ export type CommandMenuLabels = {
   retry: string;
 };
 
-const COMMAND_MENU_LABELS: CommandMenuLabels = {
+export const COMMAND_MENU_LABELS: CommandMenuLabels = {
   search: "Поиск",
   empty: "Ничего не найдено",
   emptyHint: "Попробуйте изменить запрос",

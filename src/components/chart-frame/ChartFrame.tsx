@@ -72,7 +72,7 @@ export type ChartFrameLabels = {
   category: string;
 };
 
-const DEFAULT_LABELS: ChartFrameLabels = {
+export const CHART_FRAME_LABELS: ChartFrameLabels = {
   empty: "Нет данных за период",
   error: "Не удалось загрузить график",
   retry: "Повторить",
@@ -195,7 +195,7 @@ function ChartFrameRoot({
     series: resolved,
     toggle,
     formatValue,
-    labels: { ...DEFAULT_LABELS, ...labelsProp },
+    labels: { ...CHART_FRAME_LABELS, ...labelsProp },
     onRetry,
     titleId,
     descriptionId,

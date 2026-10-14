@@ -18,7 +18,7 @@ export type BannerLabels = {
   dismiss: string;
 };
 
-const BANNER_LABELS: BannerLabels = { dismiss: "Закрыть" };
+export const BANNER_LABELS: BannerLabels = { dismiss: "Закрыть" };
 
 /**
  * With `onDismiss` the close button is the small corner button, or — when the banner has

@@ -16,6 +16,5 @@
   "src/components/smart-filter/api.ts: isSmartFilterRange",
   "src/components/smart-filter/api.ts: matchesSmartFilter",
   "src/components/smart-filter/api.ts: resolveSmartFilterValues",
-  "src/components/voice-player/api.ts: getWaveform",
   "src/layout/sidebar/api.ts: useSidebar()"
 ]

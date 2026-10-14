@@ -61,7 +61,7 @@ export type InputLabels = {
   strengthHard: string;
 };
 
-const INPUT_LABELS: InputLabels = {
+export const INPUT_LABELS: InputLabels = {
   optional: "необязательно",
   clear: "Очистить",
   copy: "Копировать",

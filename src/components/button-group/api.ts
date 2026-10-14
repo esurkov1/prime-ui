@@ -1,5 +1,6 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { FIELD_OPTIONAL_LABEL, fieldGroupProps } from "../../internal/field.api";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { FIELD_OPTIONAL_LABEL_DOCS, fieldGroupProps } from "../../internal/field.api";
+import { BUTTON_GROUP_LABELS } from "./ButtonGroup";
 
 export const api: ComponentApi = {
   parts: [
@@ -102,7 +103,7 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [FIELD_OPTIONAL_LABEL],
+  labels: labelRows(BUTTON_GROUP_LABELS, FIELD_OPTIONAL_LABEL_DOCS),
   accessibility: {
     keyboard: [
       {

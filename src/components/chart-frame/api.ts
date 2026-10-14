@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { CHART_FRAME_LABELS } from "./ChartFrame";
 
 export const api: ComponentApi = {
   parts: [
@@ -264,38 +265,19 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "empty",
-      default: "Нет данных за период",
-      en: "Title of the empty state.",
-      ru: "Заголовок пустого состояния.",
-    },
-    {
-      key: "error",
-      default: "Не удалось загрузить график",
-      en: "Title of the error state.",
-      ru: "Заголовок состояния ошибки.",
-    },
-    {
-      key: "retry",
-      default: "Повторить",
+  labels: labelRows(CHART_FRAME_LABELS, {
+    empty: { en: "Title of the empty state.", ru: "Заголовок пустого состояния." },
+    error: { en: "Title of the error state.", ru: "Заголовок состояния ошибки." },
+    retry: {
       en: "Text of the retry button in the error state.",
       ru: "Текст кнопки повтора в состоянии ошибки.",
     },
-    {
-      key: "legend",
-      default: "Ряды графика",
-      en: "Accessible name of the legend.",
-      ru: "Доступное имя легенды.",
-    },
-    {
-      key: "category",
-      default: "Период",
+    legend: { en: "Accessible name of the legend.", ru: "Доступное имя легенды." },
+    category: {
       en: "Header of the first column of `ChartFrame.Table` (what a row is).",
       ru: "Заголовок первого столбца `ChartFrame.Table` (что такое строка).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

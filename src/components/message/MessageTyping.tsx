@@ -15,7 +15,7 @@ export type MessageTypingLabels = {
   typing: string;
 };
 
-const TYPING_LABELS: MessageTypingLabels = { typing: "Собеседник печатает" };
+export const MESSAGE_TYPING_LABELS: MessageTypingLabels = { typing: "Собеседник печатает" };
 
 export type MessageTypingProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   /**
@@ -41,7 +41,7 @@ export function MessageTyping({
   children,
   ...rest
 }: MessageTypingProps) {
-  const labels = { ...TYPING_LABELS, ...labelsProp };
+  const labels = { ...MESSAGE_TYPING_LABELS, ...labelsProp };
   const list = useMessageList();
   const depth = useNestedSurfaceDepth();
   const presence = usePresence(active, { exitDuration: "fast" });

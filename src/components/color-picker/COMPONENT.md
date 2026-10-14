@@ -298,6 +298,8 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
+#### ColorPicker.Root
+
 | Key | Default | Used for |
 |---|---|---|
 | `format` | `"Формат значений цвета"` | Name of `ColorPicker.FormatSelect`. |
@@ -310,6 +312,11 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 | `red` | `"Красный, 0–255"` | Red channel field. |
 | `green` | `"Зелёный, 0–255"` | Green channel field. |
 | `blue` | `"Синий, 0–255"` | Blue channel field. |
+
+#### ColorPresets.Root
+
+| Key | Default | Used for |
+|---|---|---|
 | `trigger` | `"Цвет"` | ColorPresets trigger name prefix: «<trigger>: <color name>»; in a FieldList cell the column heading. |
 | `list` | `"Цвета"` | ColorPresets swatch list name when `Content` has no `label`. |
 | `empty` | `"Без цвета"` | ColorPresets «no color» swatch and the trigger name for an empty value. |

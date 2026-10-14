@@ -42,7 +42,7 @@ export type VoicePlayerLabels = MediaPlayerLabels & {
   rate: string;
 };
 
-const VOICE_PLAYER_LABELS: VoicePlayerLabels = {
+export const VOICE_PLAYER_LABELS: VoicePlayerLabels = {
   player: "Голосовое сообщение",
   play: "Воспроизвести голосовое сообщение",
   unplayed: "Не прослушано",

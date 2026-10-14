@@ -1,5 +1,12 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import { contentLabelRows, contentParts } from "./content.api";
+import {
+  MESSAGE_FORWARDED_LABELS,
+  MESSAGE_LABELS,
+  MESSAGE_REACTIONS_LABELS,
+  MESSAGE_REPLY_LABELS,
+} from "./MessageParts";
+import { MESSAGE_TYPING_LABELS } from "./MessageTyping";
 
 const COLORS =
   '"gray" | "blue" | "green" | "orange" | "red" | "yellow" | "purple" | "sky" | "pink" | "teal"';
@@ -327,138 +334,90 @@ export const api: ComponentApi = {
     },
   ],
   labels: [
-    {
-      key: "message",
-      default: "{author}, {time}",
-      en: "The name of a message for assistive tech.",
-      ru: "Имя сообщения для скринридера.",
-    },
-    {
-      key: "you",
-      default: "Вы",
-      en: "The author of an outgoing message.",
-      ru: "Автор исходящего сообщения.",
-    },
-    {
-      key: "edited",
-      default: "изменено",
-      en: "The mark of an edited message in its meta.",
-      ru: "Отметка изменённого сообщения в мете.",
-    },
-    {
-      key: "sending",
-      default: "Отправляется",
-      en: "Name of the clock status.",
-      ru: "Имя статуса «часы».",
-    },
-    {
-      key: "sent",
-      default: "Отправлено",
-      en: "Name of the one-check status.",
-      ru: "Имя статуса «одна галочка».",
-    },
-    {
-      key: "read",
-      default: "Прочитано",
-      en: "Name of the two-check status.",
-      ru: "Имя статуса «две галочки».",
-    },
-    {
-      key: "failed",
-      default: "Не отправлено",
-      en: "Name of the failed status.",
-      ru: "Имя статуса ошибки.",
-    },
-    {
-      key: "retry",
-      default: "Повторить отправку",
-      en: "The retry button beside a failed message.",
-      ru: "Кнопка повтора рядом с неотправленным.",
-    },
-    {
-      key: "menu",
-      default: "Действия с сообщением",
-      en: "The name of the context menu.",
-      ru: "Имя контекстного меню.",
-    },
-    {
-      key: "select",
-      default: "Выбрать",
-      en: "The menu item that starts selection mode with the message.",
-      ru: "Пункт меню, который начинает выбор с этого сообщения.",
-    },
-    {
-      key: "reaction",
-      default: "{emoji}: {count}",
-      en: "`Message.Reactions`: the name of a chip without `users`.",
-      ru: "`Message.Reactions`: имя чипа без `users`.",
-    },
-    {
-      key: "reactionUsers",
-      default: "{emoji} {count}: {users}",
-      en: "`Message.Reactions`: the name of a chip with `users`; `{users}` — their names.",
-      ru: "`Message.Reactions`: имя чипа с `users`; `{users}` — их имена.",
-    },
-    {
-      key: "moreUsers",
-      default: "ещё {count}",
-      en: "`Message.Reactions`: the last item of `{users}` when not everyone is listed.",
-      ru: "`Message.Reactions`: последний элемент `{users}`, когда перечислены не все.",
-    },
-    {
-      key: "reactions",
-      default: "Реакции",
-      en: "`Message.Reactions`: the name of the row.",
-      ru: "`Message.Reactions`: имя ряда.",
-    },
-    {
-      key: "reactionAdded",
-      default: "Реакция {emoji} поставлена",
-      en: "Announced when the quick reaction (a double tap, `L`) is put.",
-      ru: "Объявление, когда быстрая реакция (двойное касание, `L`) поставлена.",
-    },
-    {
-      key: "reactionRemoved",
-      default: "Реакция {emoji} снята",
-      en: "Announced when the quick reaction is taken back.",
-      ru: "Объявление, когда быстрая реакция снята.",
-    },
-    {
-      key: "reactionBar",
-      default: "Реакции",
-      en: "The name of the reaction bar.",
-      ru: "Имя панели реакций.",
-    },
-    {
-      key: "moreReactions",
-      default: "Все реакции",
-      en: "The «⌄» of the reaction bar that shows every reaction.",
-      ru: "Кнопка «⌄» панели реакций, которая показывает все реакции.",
-    },
-    {
-      key: "spoiler",
-      default: "Скрытый текст",
-      en: "`Message.Text`: the name of a `||spoiler||` while it is hidden.",
-      ru: "`Message.Text`: имя `||спойлера||`, пока он скрыт.",
-    },
-    {
-      key: "typing",
-      default: "Собеседник печатает",
-      en: "`Message.Typing`: the text read while the other side types.",
-      ru: "`Message.Typing`: текст, который читается, пока собеседник пишет.",
-    },
-    {
-      key: "reply",
-      default: "Ответ на сообщение",
-      en: "`Message.Reply labels`: the hidden prefix read before the quote.",
-      ru: "`Message.Reply labels`: скрытая приставка перед цитатой.",
-    },
-    {
-      key: "forwarded",
-      default: "Переслано от {author}",
-      en: "`Message.Forwarded labels`: the header; `{author}` — the original author.",
-      ru: "`Message.Forwarded labels`: заголовок; `{author}` — автор оригинала.",
-    },
+    ...labelRows(MESSAGE_LABELS, {
+      message: {
+        en: "The name of a message for assistive tech.",
+        ru: "Имя сообщения для скринридера.",
+      },
+      you: { en: "The author of an outgoing message.", ru: "Автор исходящего сообщения." },
+      edited: {
+        en: "The mark of an edited message in its meta.",
+        ru: "Отметка изменённого сообщения в мете.",
+      },
+      spoiler: {
+        en: "`Message.Text`: the name of a `||spoiler||` while it is hidden.",
+        ru: "`Message.Text`: имя `||spoiler||`, пока он скрыт.",
+      },
+      sending: { en: "Name of the clock status.", ru: "Имя статуса «часы»." },
+      sent: { en: "Name of the one-check status.", ru: "Имя статуса «одна галочка»." },
+      read: { en: "Name of the two-check status.", ru: "Имя статуса «две галочки»." },
+      failed: { en: "Name of the failed status.", ru: "Имя статуса ошибки." },
+      retry: {
+        en: "The retry button beside a failed message.",
+        ru: "Кнопка повтора рядом с неотправленным.",
+      },
+      menu: { en: "The name of the context menu.", ru: "Имя контекстного меню." },
+      select: {
+        en: "The menu item that starts selection mode with the message.",
+        ru: "Пункт меню, который начинает выбор с этого сообщения.",
+      },
+      reactionAdded: {
+        en: "Announced when the quick reaction (a double tap, `L`) is put.",
+        ru: "Объявление, когда быстрая реакция (двойное касание, `L`) поставлена.",
+      },
+      reactionRemoved: {
+        en: "Announced when the quick reaction is taken back.",
+        ru: "Объявление, когда быстрая реакция снята.",
+      },
+      reactionBar: { en: "The name of the reaction bar.", ru: "Имя панели реакций." },
+      moreReactions: {
+        en: "The «⌄» of the reaction bar that shows every reaction.",
+        ru: "Кнопка «⌄» панели реакций, которая показывает все реакции.",
+      },
+    }),
+    ...labelRows(MESSAGE_REACTIONS_LABELS, {
+      reaction: {
+        en: "`Message.Reactions`: the name of a chip without `users`.",
+        ru: "`Message.Reactions`: имя чипа без `users`.",
+        part: "Message.Reactions",
+      },
+      reactionUsers: {
+        en: "`Message.Reactions`: the name of a chip with `users`; `{users}` — their names.",
+        ru: "`Message.Reactions`: имя чипа с `users`; `{users}` — их имена.",
+        part: "Message.Reactions",
+      },
+      moreUsers: {
+        en: "`Message.Reactions`: the last item of `{users}` when not everyone is listed.",
+        ru: "`Message.Reactions`: последний элемент `{users}`, когда перечислены не все.",
+        part: "Message.Reactions",
+      },
+      reactions: {
+        en: "`Message.Reactions`: the name of the row.",
+        ru: "`Message.Reactions`: имя ряда.",
+        part: "Message.Reactions",
+      },
+    }),
+    ...labelRows(MESSAGE_TYPING_LABELS, {
+      typing: {
+        en: "`Message.Typing`: the text read while the other side types.",
+        ru: "`Message.Typing`: текст, который читается, пока собеседник пишет.",
+        part: "Message.Typing",
+      },
+    }),
+    ...labelRows(MESSAGE_REPLY_LABELS, {
+      reply: {
+        en: "`Message.Reply`: the hidden prefix read before the quote.",
+        ru: "`Message.Reply`: скрытая приставка перед цитатой.",
+        part: "Message.Reply",
+      },
+    }),
+    ...labelRows(MESSAGE_FORWARDED_LABELS, {
+      forwarded: {
+        en: "`Message.Forwarded`: the header; `{author}` — the original author.",
+        ru: "`Message.Forwarded`: заголовок; `{author}` — автор оригинала.",
+        part: "Message.Forwarded",
+      },
+    }),
     ...contentLabelRows,
   ],
   accessibility: {

@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { APP_HEADER_LABELS } from "./AppHeader";
 
 export const api: ComponentApi = {
   parts: [
@@ -133,14 +134,9 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "menu",
-      default: "Открыть меню",
-      en: "Name of `AppHeader.MenuButton`.",
-      ru: "Имя `AppHeader.MenuButton`.",
-    },
-  ],
+  labels: labelRows(APP_HEADER_LABELS, {
+    menu: { en: "Name of `AppHeader.MenuButton`.", ru: "Имя `AppHeader.MenuButton`." },
+  }),
   accessibility: {
     keyboard: [
       {

@@ -132,18 +132,18 @@ Controlled with `value` + `onValueChange`; uncontrolled with `defaultValue`. A c
 
 | Key | Default | Used for |
 |---|---|---|
-| `optional` | `"необязательно"` | Marker after the label when `optional`. |
-| `presets` | `"Готовые цвета"` | Accessible name of the preset swatches in the panel. |
-| `hue` | `"Оттенок, градусы"` | Hue slider and the hue cell of the channels. |
-| `alpha` | `"Непрозрачность, проценты"` | Opacity slider (`alpha`) and the opacity cell. |
-| `hex` | `"Hex"` | Hex cell of the channels. |
-| `eyeDropper` | `"Пипетка"` | Eyedropper button of the channels. |
 | `format` | `"Формат значений цвета"` | Value format select (the ColorPicker labels are shared). |
+| `eyeDropper` | `"Пипетка"` | Eyedropper button of the channels. |
+| `hex` | `"Hex"` | Hex cell of the channels. |
+| `hue` | `"Оттенок, градусы"` | Hue slider and the hue cell of the channels. |
 | `saturation` | `"Насыщенность, проценты"` | Saturation cell. |
 | `lightness` | `"Яркость, проценты"` | Lightness cell. |
+| `alpha` | `"Непрозрачность, проценты"` | Opacity slider (`alpha`) and the opacity cell. |
 | `red` | `"Красный, 0–255"` | Red cell. |
 | `green` | `"Зелёный, 0–255"` | Green cell. |
 | `blue` | `"Синий, 0–255"` | Blue cell. |
+| `optional` | `"необязательно"` | Marker after the label when `optional`. |
+| `presets` | `"Готовые цвета"` | Accessible name of the preset swatches in the panel. |
 
 ## Examples
 | Example | Shows |

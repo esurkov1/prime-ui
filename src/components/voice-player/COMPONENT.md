@@ -75,8 +75,12 @@ VoicePlayer            <div role="group">; state in data-*
 | `labels` | `Partial<VoicePlayerLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "onPlay" \| "onPause" \| "onEnded" \| "onRateChange">` | — | `className`, `aria-label` (replaces `labels.player`), `data-*` and the other div attributes. |
 
-### getWaveform
-`getWaveform(source, bars = 48)`: the 0…1 peaks of a `Blob` or URL with no stored levels, for `waveform`.
+### Functions
+
+#### `getWaveform(source, bars)`
+`(source: Blob \| string, bars?: number) => Promise<number[]>`
+
+The 0…1 peaks of a `Blob` or URL with no stored levels, for `waveform`; `bars` defaults to 48. Rejects when the audio cannot be fetched or decoded.
 
 ## Variants
 One look. Colors are semantic roles only (`accent-default`, `accent-fg`, `fill-strong`, `text-muted`), so an outgoing chat bubble restyles the player by overriding them for its subtree.
@@ -150,11 +154,11 @@ One look. Colors are semantic roles only (`accent-default`, `accent-fg`, `fill-s
 |---|---|---|
 | `player` | `"Голосовое сообщение"` | Name of the player group. |
 | `play` | `"Воспроизвести голосовое сообщение"` | Name of the play disk while it does not play. |
-| `pause` | `"Пауза"` | Name of the play disk while it plays. |
-| `position` | `"{current} из {duration}"` | The position: `{current}` and `{duration}` as m:ss. |
 | `unplayed` | `"Не прослушано"` | Visually hidden text read while `unplayed`. |
 | `seek` | `"Перемотка"` | Name of the waveform slider (its `aria-valuetext` is `position`). |
 | `rate` | `"Скорость воспроизведения: {rate}"` | Name of the rate chip; `{rate}` as shown on it. |
+| `pause` | `"Пауза"` | Name of the play disk while it plays. |
+| `position` | `"{current} из {duration}"` | The position: `{current}` and `{duration}` as m:ss. |
 | `transcribe` | `"Расшифровать"` | Name of the transcript button while the text is closed. |
 | `hideTranscript` | `"Скрыть расшифровку"` | Name of the transcript button while the text is open. |
 | `transcribeFailed` | `"Не удалось расшифровать сообщение"` | Announced when `onTranscribe` rejects. |

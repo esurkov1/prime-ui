@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BUTTON_LABELS } from "./Button";
 
 export const api: ComponentApi = {
   parts: [
@@ -134,14 +135,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "holdHint",
-      default: "Удерживайте, чтобы подтвердить",
+  labels: labelRows(BUTTON_LABELS, {
+    holdHint: {
       en: "Description of a `holdToConfirm` button for assistive tech (`aria-describedby`).",
       ru: "Описание кнопки `holdToConfirm` для скринридеров (`aria-describedby`).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

@@ -152,7 +152,7 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 | `name` | `"Название тега"` | Accessible name of the tag name field in the menu. |
 | `delete` | `"Удалить"` | Delete button in the menu. |
 | `colors` | `"Цвета"` | Heading of the color list in the menu. |
-| `colorNames` | `"По умолчанию · Красный · Оранжевый · …"` | Names of the palette colors in the menu, by `PaletteColor` key. |
+| `colorNames` | `"По умолчанию · Красный · Оранжевый · Жёлтый · Зелёный · Синий · Фиолетовый · Розовый · Голубой · Бирюзовый"` | Names of the palette colors in the menu, by `PaletteColor` key. |
 | `optional` | `"необязательно"` | Muted marker after the label when `optional`. |
 
 ## Examples

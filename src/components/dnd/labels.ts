@@ -27,7 +27,7 @@ export type DndLabels = {
   refusedReason: string;
 };
 
-export const defaultDndLabels: DndLabels = {
+export const DND_LABELS: DndLabels = {
   handle: "Перетащить",
   locked: "Закреплено",
   roleDescription: "перетаскиваемый элемент",

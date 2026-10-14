@@ -82,7 +82,7 @@ export type DataTableLabels = {
   collapseGroup: string;
 };
 
-const DEFAULT_LABELS: DataTableLabels = {
+export const DATA_TABLE_LABELS: DataTableLabels = {
   loading: "Загрузка данных…",
   empty: "Нет данных для отображения.",
   range: "Показано {from}–{to} из {total}",
@@ -346,7 +346,7 @@ export function DataTable<Row>({
   // Keyed by content: an inline `labels` object would otherwise re-render every row on each render.
   const labelsKey = labelsProp ? JSON.stringify(labelsProp) : "";
   // biome-ignore lint/correctness/useExhaustiveDependencies: `labelsKey` is the content of `labelsProp`.
-  const labels = React.useMemo(() => ({ ...DEFAULT_LABELS, ...labelsProp }), [labelsKey]);
+  const labels = React.useMemo(() => ({ ...DATA_TABLE_LABELS, ...labelsProp }), [labelsKey]);
   const infinite = paging === "infinite";
   const paged = paging === "pages";
   const server = source === "server";

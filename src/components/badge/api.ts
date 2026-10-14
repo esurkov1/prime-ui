@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BADGE_LABELS } from "./Badge";
 
 export const api: ComponentApi = {
   parts: [
@@ -165,20 +166,16 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "remove",
-      default: "Удалить",
+  labels: labelRows(BADGE_LABELS, {
+    remove: {
       en: "Accessible name of the remove segment; include the badge text («Убрать фильтр «Москва»»).",
       ru: "Имя сегмента удаления; включите текст бейджа («Убрать фильтр «Москва»»).",
     },
-    {
-      key: "removeFailed",
-      default: "Не удалось удалить",
+    removeFailed: {
       en: "Spoken when the `onRemove` promise rejects and the badge stays; name the badge («Фильтр «Москва» не убран»).",
       ru: "Озвучивается, когда промис `onRemove` отклонён и бейдж остался; назовите бейдж («Фильтр «Москва» не убран»).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

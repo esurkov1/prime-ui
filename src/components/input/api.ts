@@ -1,11 +1,12 @@
-import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ApiProp, type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
 import {
-  FIELD_COMMIT_LABELS,
-  FIELD_COPY_LABELS,
+  FIELD_COMMIT_LABEL_DOCS,
+  FIELD_COPY_LABEL_DOCS,
   fieldActionPart,
   fieldCommitProp,
   fieldCopyPart,
 } from "../../internal/field.api";
+import { INPUT_LABELS } from "./Input";
 
 const side = (en: string, ru: string): ApiProp => ({
   name: "side",
@@ -312,64 +313,31 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "optional",
-      default: "необязательно",
+  labels: labelRows(INPUT_LABELS, {
+    optional: {
       en: "Marker after the label when `optional`.",
       ru: "Пометка после подписи при `optional`.",
     },
-    {
-      key: "clear",
-      default: "Очистить",
-      en: "Accessible name of `Input.ClearButton`.",
-      ru: "Имя `Input.ClearButton`.",
-    },
-    ...FIELD_COPY_LABELS,
-    {
-      key: "reveal",
-      default: "Показать пароль",
+    clear: { en: "Accessible name of `Input.ClearButton`.", ru: "Имя `Input.ClearButton`." },
+    ...FIELD_COPY_LABEL_DOCS,
+    reveal: {
       en: "Accessible name of `Input.RevealButton`;`aria-pressed` says whether the password is shown.",
       ru: "Имя `Input.RevealButton`; `aria-pressed` говорит, показан ли пароль.",
     },
-    ...FIELD_COMMIT_LABELS,
-    {
-      key: "counter",
-      default: "{current} из {max} символов",
+    ...FIELD_COMMIT_LABEL_DOCS,
+    counter: {
       en: "Screen-reader text of `Input.Counter`; `{current}` and `{max}` are replaced.",
       ru: "Озвучка `Input.Counter`; `{current}` и `{max}` подставляются.",
     },
-    {
-      key: "strength",
-      default: "Надёжность пароля",
+    strength: {
       en: "Accessible name of the `strength` meter and the spoken prefix of the level word.",
       ru: "Имя шкалы `strength` и озвучиваемое начало слова уровня.",
     },
-    {
-      key: "strengthWeak",
-      default: "Слабый",
-      en: "Level word for strength 1.",
-      ru: "Слово уровня 1.",
-    },
-    {
-      key: "strengthEasy",
-      default: "Лёгкий",
-      en: "Level word for strength 2.",
-      ru: "Слово уровня 2.",
-    },
-    {
-      key: "strengthMedium",
-      default: "Средний",
-      en: "Level word for strength 3.",
-      ru: "Слово уровня 3.",
-    },
-    {
-      key: "strengthHard",
-      default: "Сложный",
-      en: "Level word for strength 4.",
-      ru: "Слово уровня 4.",
-    },
-  ],
+    strengthWeak: { en: "Level word for strength 1.", ru: "Слово уровня 1." },
+    strengthEasy: { en: "Level word for strength 2.", ru: "Слово уровня 2." },
+    strengthMedium: { en: "Level word for strength 3.", ru: "Слово уровня 3." },
+    strengthHard: { en: "Level word for strength 4.", ru: "Слово уровня 4." },
+  }),
   accessibility: {
     keyboard: [
       {

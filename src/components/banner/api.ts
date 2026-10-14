@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { BANNER_LABELS } from "./Banner";
 
 export const api: ComponentApi = {
   parts: [
@@ -108,14 +109,9 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "dismiss",
-      default: "Закрыть",
-      en: "`aria-label` of the close button.",
-      ru: "`aria-label` кнопки закрытия.",
-    },
-  ],
+  labels: labelRows(BANNER_LABELS, {
+    dismiss: { en: "`aria-label` of the close button.", ru: "`aria-label` кнопки закрытия." },
+  }),
   accessibility: {
     keyboard: [
       {

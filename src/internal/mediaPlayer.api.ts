@@ -1,6 +1,7 @@
-import type { ApiLabel, ApiProp } from "../../scripts/docs/componentApi";
-import { TRANSCRIPT_LABEL_ROWS, transcriptProps } from "./transcript.api";
-import { transferLabels, transferProps } from "./transfer.api";
+import type { ApiProp, LabelDocs } from "../../scripts/docs/componentApi";
+import type { MediaPlayerLabels } from "./mediaPlayer";
+import { TRANSCRIPT_LABEL_DOCS, transcriptProps } from "./transcript.api";
+import { transferLabelDocs, transferProps } from "./transfer.api";
 
 type Text = { en: string; ru: string };
 
@@ -87,49 +88,29 @@ export function mediaPlayerProps(what: {
 }
 
 /**
- * The label rows every player shares, in one order: the keys and templates are the same, the
- * defaults name the media. `own` goes after the shared naming rows.
+ * The descriptions of the strings every player shares (`MediaPlayerLabels`): the keys and
+ * templates are the same, the defaults name the media; `transfer` names the transfer's scope.
  */
-export function mediaPlayerLabels(defaults: {
-  player: string;
-  play: string;
-  unplayed: string;
-  own: ApiLabel[];
-  transfer: string;
-}): ApiLabel[] {
-  return [
-    {
-      key: "player",
-      default: defaults.player,
-      en: "Name of the player group.",
-      ru: "Название группы плеера.",
-    },
-    {
-      key: "play",
-      default: defaults.play,
+export function mediaPlayerLabelDocs(transfer: Text): LabelDocs<MediaPlayerLabels> {
+  return {
+    player: { en: "Name of the player group.", ru: "Название группы плеера." },
+    play: {
       en: "Name of the play disk while it does not play.",
       ru: "Название диска воспроизведения, пока не играет.",
     },
-    {
-      key: "pause",
-      default: "Пауза",
+    pause: {
       en: "Name of the play disk while it plays.",
       ru: "Название диска воспроизведения во время игры.",
     },
-    {
-      key: "position",
-      default: "{current} из {duration}",
+    position: {
       en: "The position: `{current}` and `{duration}` as m:ss.",
       ru: "Позиция: `{current}` и `{duration}` в формате м:сс.",
     },
-    {
-      key: "unplayed",
-      default: defaults.unplayed,
+    unplayed: {
       en: "Visually hidden text read while `unplayed`.",
       ru: "Скрытый текст, читаемый, пока `unplayed`.",
     },
-    ...defaults.own,
-    ...TRANSCRIPT_LABEL_ROWS,
-    ...transferLabels(defaults.transfer),
-  ];
+    ...TRANSCRIPT_LABEL_DOCS,
+    ...transferLabelDocs(transfer),
+  };
 }

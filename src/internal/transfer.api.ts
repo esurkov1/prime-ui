@@ -1,9 +1,10 @@
-import type { ApiLabel, ApiProp } from "../../scripts/docs/componentApi";
+import type { ApiProp, ApiText, LabelDocs } from "../../scripts/docs/componentApi";
+import type { TransferLabels } from "./transfer";
 
 const STATE_TYPE = '"remote" | "queued" | "loading" | "failed" | "done"';
 
 /** The `transfer` state row: `what` names the thing transferred and how its host takes the disk. */
-export function transferStateProp(what: { en: string; ru: string }): ApiProp {
+function transferStateProp(what: { en: string; ru: string }): ApiProp {
   return {
     name: "transfer",
     type: STATE_TYPE,
@@ -60,81 +61,50 @@ export function transferProps(what: { en: string; ru: string }): ApiProp[] {
 /** The per-tile handlers of Message.Media (its state, share and direction live on the items). */
 export const TRANSFER_INDEX_HANDLER_PROPS: ApiProp[] = handlerProps(true);
 
-/** The transfer strings of the transfer disk; `scope` names the parts that read them. */
-export function transferLabels(scope: string, download = "Скачать"): ApiLabel[] {
-  const row = (key: string, value: string, en: string, ru: string): ApiLabel => ({
-    key,
-    default: value,
-    en: `${scope}: ${en}`,
-    ru: `${scope}: ${ru}`,
+/**
+ * The descriptions of the transfer strings of the transfer disk (`TransferLabels`); `scope` names
+ * the parts that read them, `part` the part whose `labels` prop takes them (the root without it).
+ */
+export function transferLabelDocs(
+  scope: string | ApiText,
+  part?: string,
+): LabelDocs<TransferLabels> {
+  const name = typeof scope === "string" ? { en: scope, ru: scope } : scope;
+  const row = (en: string, ru: string) => ({
+    en: `${name.en}: ${en}`,
+    ru: `${name.ru}: ${ru}`,
+    ...(part ? { part } : {}),
   });
-  return [
-    row("cancelUpload", "Отменить отправку", "the cross while sending.", "крестик при отправке."),
-    row(
-      "cancelDownload",
-      "Отменить загрузку",
-      "the cross while receiving.",
-      "крестик при получении.",
-    ),
-    row(
-      "retryUpload",
-      "Повторить отправку",
-      "the retry after a failed send.",
-      "повтор после неудачной отправки.",
-    ),
-    row(
-      "retryDownload",
-      "Повторить загрузку",
-      "the retry after a failed receive.",
-      "повтор после неудачного получения.",
-    ),
-    row(
-      "uploadProgress",
-      "Отправка {percent}%",
+  return {
+    cancelUpload: row("the cross while sending.", "крестик при отправке."),
+    cancelDownload: row("the cross while receiving.", "крестик при получении."),
+    retryUpload: row("the retry after a failed send.", "повтор после неудачной отправки."),
+    retryDownload: row("the retry after a failed receive.", "повтор после неудачного получения."),
+    uploadProgress: row(
       "the share while sending — the description of the cross.",
       "доля при отправке — описание крестика.",
     ),
-    row(
-      "downloadProgress",
-      "Загрузка {percent}%",
+    downloadProgress: row(
       "the share while receiving — the description of the cross.",
       "доля при получении — описание крестика.",
     ),
-    row(
-      "notSent",
-      "Не отправилось",
+    notSent: row(
       "why a send failed — the retry's description.",
       "почему не отправилось — описание повтора.",
     ),
-    row(
-      "notReceived",
-      "Не загрузилось",
+    notReceived: row(
       "why a receive failed — the retry's description.",
       "почему не загрузилось — описание повтора.",
     ),
-    row(
-      "download",
-      download,
-      "the download arrow of a `remote` content.",
-      "стрелка загрузки у `remote`.",
-    ),
-    row(
-      "cancelFailed",
-      "Не удалось отменить",
+    download: row("the download arrow of a `remote` content.", "стрелка загрузки у `remote`."),
+    cancelFailed: row(
       "announced when `onCancel` rejected.",
       "объявление, когда `onCancel` отклонён.",
     ),
-    row(
-      "retryFailed",
-      "Не удалось повторить",
-      "announced when `onRetry` rejected.",
-      "объявление, когда `onRetry` отклонён.",
-    ),
-    row(
-      "downloadFailed",
-      "Не удалось скачать",
+    retryFailed: row("announced when `onRetry` rejected.", "объявление, когда `onRetry` отклонён."),
+    downloadFailed: row(
       "announced when `onDownload` rejected.",
       "объявление, когда `onDownload` отклонён.",
     ),
-  ];
+  };
 }

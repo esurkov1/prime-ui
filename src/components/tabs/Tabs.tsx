@@ -27,7 +27,7 @@ export type TabsLabels = {
   remove: string;
 };
 
-const TABS_LABELS: TabsLabels = {
+export const TABS_LABELS: TabsLabels = {
   remove: "Закрыть вкладку «{label}»",
 };
 

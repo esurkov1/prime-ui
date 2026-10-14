@@ -35,7 +35,7 @@ export type ColorSwatchesLabels = {
   optional: string;
 };
 
-const COLOR_SWATCHES_LABELS: ColorSwatchesLabels = {
+export const COLOR_SWATCHES_LABELS: ColorSwatchesLabels = {
   group: "Цвет",
   empty: "Без цвета",
   optional: "необязательно",

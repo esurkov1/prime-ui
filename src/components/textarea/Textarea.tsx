@@ -39,7 +39,7 @@ export type TextareaLabels = TextFormattingLabels & {
   saved: string;
 };
 
-const TEXTAREA_LABELS: TextareaLabels = {
+export const TEXTAREA_LABELS: TextareaLabels = {
   optional: "необязательно",
   counter: "{current} из {max} символов",
   copy: "Копировать",

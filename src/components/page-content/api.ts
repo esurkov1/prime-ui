@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { PAGE_CONTENT_LABELS } from "./PageContent";
 
 export const api: ComponentApi = {
   parts: [
@@ -265,14 +266,12 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "back",
-      default: "Назад к списку",
+  labels: labelRows(PAGE_CONTENT_LABELS, {
+    back: {
       en: "Name of `PageContent.BackButton` (on `PageContent.Split`).",
       ru: "Имя `PageContent.BackButton` (у `PageContent.Split`).",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

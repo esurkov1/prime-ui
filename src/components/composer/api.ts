@@ -1,5 +1,6 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
-import { formattingProp, TEXT_FORMATTING_LABEL_ROWS } from "../../internal/textFormatting.api";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { formattingProp, TEXT_FORMATTING_LABEL_DOCS } from "../../internal/textFormatting.api";
+import { COMPOSER_LABELS } from "./Composer";
 
 export const api: ComponentApi = {
   parts: [
@@ -219,184 +220,104 @@ export const api: ComponentApi = {
       props: [],
     },
   ],
-  labels: [
-    {
-      key: "region",
-      default: "Новое сообщение",
-      en: "Accessible name of the composer form.",
-      ru: "Имя формы.",
-    },
-    {
-      key: "placeholder",
-      default: "Сообщение",
+  labels: labelRows(COMPOSER_LABELS, {
+    region: { en: "Accessible name of the composer form.", ru: "Имя формы." },
+    placeholder: {
       en: "Placeholder and accessible name of the field.",
       ru: "Плейсхолдер и имя поля.",
     },
-    {
-      key: "send",
-      default: "Отправить",
-      en: "Name of the send button.",
-      ru: "Имя кнопки отправки.",
-    },
-    {
-      key: "save",
-      default: "Сохранить",
+    send: { en: "Name of the send button.", ru: "Имя кнопки отправки." },
+    save: {
       en: "Name of the send button while a message is edited.",
       ru: "Имя кнопки при правке сообщения.",
     },
-    {
-      key: "recordVoice",
-      default: "Записать голосовое",
+    recordVoice: {
       en: "Name of the record button in voice mode.",
       ru: "Имя кнопки записи голоса.",
     },
-    {
-      key: "recordVideo",
-      default: "Записать видеосообщение",
-      en: "Name of the record button in video mode.",
-      ru: "Имя кнопки записи видео.",
-    },
-    {
-      key: "recordHint",
-      default: "Удерживайте, чтобы записать; нажмите, чтобы записывать без удержания",
+    recordVideo: { en: "Name of the record button in video mode.", ru: "Имя кнопки записи видео." },
+    recordHint: {
       en: "Description of the record button: how to record.",
       ru: "Описание кнопки записи.",
     },
-    {
-      key: "recordSwitchHint",
-      default:
-        "Нажмите или удерживайте, чтобы записать; двойное нажатие или стрелки вверх и вниз переключают голос и видео",
+    recordSwitchHint: {
       en: "Description of the record button when it also switches voice and video.",
       ru: "Описание кнопки записи, когда она переключает голос и видео.",
     },
-    {
-      key: "recordModeVoice",
-      default: "Голосовое сообщение",
+    recordModeVoice: {
       en: "Announced when the record button switches to voice messages.",
       ru: "Объявляется, когда кнопка записи переключается на голосовые.",
     },
-    {
-      key: "recordModeVideo",
-      default: "Видеосообщение",
+    recordModeVideo: {
       en: "Announced when the record button switches to video messages.",
       ru: "Объявляется, когда кнопка записи переключается на видеосообщения.",
     },
-    {
-      key: "sendRecording",
-      default: "Отправить запись",
-      en: "Name of the button while recording.",
-      ru: "Имя кнопки во время записи.",
-    },
-    {
-      key: "cancelRecording",
-      default: "Удалить запись",
+    sendRecording: { en: "Name of the button while recording.", ru: "Имя кнопки во время записи." },
+    cancelRecording: {
       en: "Name of the button that throws a recording away.",
       ru: "Имя кнопки удаления записи.",
     },
-    {
-      key: "pauseRecording",
-      default: "Приостановить запись",
+    pauseRecording: {
       en: "Name of the button that pauses a hands-free recording.",
       ru: "Имя кнопки паузы записи без удержания.",
     },
-    {
-      key: "resumeRecording",
-      default: "Продолжить запись",
+    resumeRecording: {
       en: "Name of the button that resumes a paused recording.",
       ru: "Имя кнопки, продолжающей приостановленную запись.",
     },
-    {
-      key: "slideToCancel",
-      default: "Влево — отмена",
+    slideToCancel: {
       en: "Hint while a recording is held.",
       ru: "Подсказка при записи с удержанием.",
     },
-    {
-      key: "recordingStarted",
-      default: "Идёт запись",
+    recordingStarted: {
       en: "Announced when a recording starts.",
       ru: "Объявляется в начале записи.",
     },
-    {
-      key: "recordingLocked",
-      default: "Запись продолжается без удержания",
+    recordingLocked: {
       en: "Announced when a held recording is locked and goes on hands-free.",
       ru: "Объявляется, когда запись с удержанием закреплена и идёт без него.",
     },
-    {
-      key: "recordingCanceled",
-      default: "Запись удалена",
+    recordingCanceled: {
       en: "Announced when a recording is thrown away.",
       ru: "Объявляется при удалении записи.",
     },
-    {
-      key: "recordingPaused",
-      default: "Запись приостановлена",
+    recordingPaused: {
       en: "Announced when a recording is paused.",
       ru: "Объявляется, когда запись приостановлена.",
     },
-    {
-      key: "recordingResumed",
-      default: "Запись продолжена",
+    recordingResumed: {
       en: "Announced when a paused recording goes on.",
       ru: "Объявляется, когда приостановленная запись продолжается.",
     },
-    {
-      key: "recordingSent",
-      default: "Запись отправлена",
+    recordingSent: {
       en: "Announced when a recording is handed over.",
       ru: "Объявляется при отправке записи.",
     },
-    {
-      key: "recordDenied",
-      default: "Нет доступа к микрофону или камере — разрешите его в настройках браузера",
+    recordDenied: {
       en: "Error when the browser refuses the microphone or the camera.",
       ru: "Ошибка: браузер не дал доступ к микрофону или камере.",
     },
-    {
-      key: "recordMissing",
-      default: "Микрофон или камера не найдены",
-      en: "Error when there is no device.",
-      ru: "Ошибка: нет устройства.",
-    },
-    {
-      key: "recordFailed",
-      default: "Не удалось начать запись",
+    recordMissing: { en: "Error when there is no device.", ru: "Ошибка: нет устройства." },
+    recordFailed: {
       en: "Error when a recording fails to start for another reason.",
       ru: "Ошибка: запись не началась по другой причине.",
     },
-    {
-      key: "attach",
-      default: "Прикрепить",
-      en: "Name of the paperclip.",
-      ru: "Имя скрепки.",
-    },
-    {
-      key: "attachments",
-      default: "Вложения",
-      en: "Accessible name of the strip of attachments.",
-      ru: "Имя ленты вложений.",
-    },
-    {
-      key: "sendAsFiles",
-      default: "Отправить как файлы, без сжатия",
+    attach: { en: "Name of the paperclip.", ru: "Имя скрепки." },
+    attachments: { en: "Accessible name of the strip of attachments.", ru: "Имя ленты вложений." },
+    sendAsFiles: {
       en: "The option that sends the attached photos and videos as files.",
       ru: "Флажок, который отправляет прикреплённые фото и видео файлами.",
     },
-    ...TEXT_FORMATTING_LABEL_ROWS,
-    {
-      key: "cancelReply",
-      default: "Отменить ответ",
+    ...TEXT_FORMATTING_LABEL_DOCS,
+    cancelReply: {
       en: "Name of the close button of a reply bar.",
       ru: "Имя кнопки закрытия ответа.",
     },
-    {
-      key: "cancelEdit",
-      default: "Отменить редактирование",
+    cancelEdit: {
       en: "Name of the close button of an edit bar.",
       ru: "Имя кнопки закрытия правки.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

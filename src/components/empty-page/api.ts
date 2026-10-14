@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { EMPTY_PAGE_LABELS } from "./EmptyPage";
 
 export const api: ComponentApi = {
   parts: [
@@ -116,14 +117,9 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "retry",
-      default: "Повторить",
-      en: "Text of `EmptyPage.RetryButton`.",
-      ru: "Текст `EmptyPage.RetryButton`.",
-    },
-  ],
+  labels: labelRows(EMPTY_PAGE_LABELS, {
+    retry: { en: "Text of `EmptyPage.RetryButton`.", ru: "Текст `EmptyPage.RetryButton`." },
+  }),
   accessibility: {
     keyboard: [
       {

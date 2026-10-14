@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { SPARKLINE_LABELS } from "./Sparkline";
 
 export const api: ComponentApi = {
   parts: [
@@ -116,32 +117,24 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "point",
-      default: "{label}: {value}",
+  labels: labelRows(SPARKLINE_LABELS, {
+    point: {
       en: "Spoken value of the chosen point (`aria-valuetext`); `{label}` and `{value}` are replaced.",
       ru: "Озвучка выбранной точки (`aria-valuetext`); `{label}` и `{value}` подставляются.",
     },
-    {
-      key: "period",
-      default: "{first} – {last}",
+    period: {
       en: "The date line of a `sum` / `average` headline at rest; `{first}` and `{last}` are the labels of the first and the last point.",
       ru: "Дата заголовка `sum` / `average` в покое; `{first}` и `{last}` — подписи первой и последней точки.",
     },
-    {
-      key: "empty",
-      default: "Нет данных",
+    empty: {
       en: "Shown and spoken in place of the value of a point with `value: null`.",
       ru: "Показывается и озвучивается вместо значения точки с `value: null`.",
     },
-    {
-      key: "reference",
-      default: "Ориентир: {value}",
+    reference: {
       en: "Description of the chart with a `reference` line (`aria-describedby`); `{value}` is replaced.",
       ru: "Описание графика с линией `reference` (`aria-describedby`); `{value}` подставляется.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

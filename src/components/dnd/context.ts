@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { type DragController, IDLE_SNAPSHOT } from "./dragSession";
-import { defaultDndLabels } from "./labels";
+import { DND_LABELS } from "./labels";
 
 // What a component with no `Dnd.Root` above it gets: an engine that never starts a drag and never
 // registers a target. A component that merely CONTAINS a draggable stays mountable anywhere; it just
@@ -15,7 +15,7 @@ const INERT: DragController = {
   registerTarget: () => () => {},
   beginPointerDrag: () => {},
   announce: () => {},
-  labels: () => defaultDndLabels,
+  labels: () => DND_LABELS,
   cancel: () => {},
   subscribeOverlay: () => () => {},
   resizeCarried: () => {},

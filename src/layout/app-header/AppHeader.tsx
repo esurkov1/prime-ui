@@ -16,7 +16,7 @@ export type AppHeaderLabels = {
   menu: string;
 };
 
-const APP_HEADER_LABELS: AppHeaderLabels = {
+export const APP_HEADER_LABELS: AppHeaderLabels = {
   menu: "Открыть меню",
 };
 

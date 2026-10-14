@@ -1,5 +1,11 @@
-import type { ApiLabel, ApiPart, ComponentApi } from "../../../scripts/docs/componentApi";
-import { TRANSFER_INDEX_HANDLER_PROPS, transferLabels } from "../../internal/transfer.api";
+import {
+  type ApiPart,
+  type ComponentApi,
+  type LabelDocs,
+  labelRows,
+} from "../../../scripts/docs/componentApi";
+import { TRANSFER_INDEX_HANDLER_PROPS, transferLabelDocs } from "../../internal/transfer.api";
+import { GALLERY_LABELS, type GalleryLabels } from "./Gallery";
 
 /** The props of a gallery, shared with `Message.Media` (which is a gallery its message shapes). */
 export const galleryProps: ApiPart["props"] = [
@@ -64,26 +70,30 @@ export const galleryProps: ApiPart["props"] = [
   },
 ];
 
-export const galleryLabels = (scope: string): ApiLabel[] => [
-  {
-    key: "open",
-    default: "Открыть: {name}",
-    en: `${scope}: the name of a tile that opens the viewer; \`{name}\` is \`alt\`, else \`photo\` / \`video\`.`,
-    ru: `${scope}: имя плитки, открывающей просмотр; \`{name}\` — \`alt\`, иначе \`photo\` / \`video\`.`,
-  },
-  {
-    key: "photo",
-    default: "фото",
-    en: `${scope}: \`{name}\` of a photo without \`alt\`.`,
-    ru: `${scope}: \`{name}\` фото без \`alt\`.`,
-  },
-  {
-    key: "video",
-    default: "видео",
-    en: `${scope}: \`{name}\` of a video without \`alt\`.`,
-    ru: `${scope}: \`{name}\` видео без \`alt\`.`,
-  },
-];
+/** The descriptions of Gallery's own strings; `scope` names the part, `part` takes them. */
+export const galleryLabelDocs = (
+  scope: string,
+  part?: string,
+): LabelDocs<Pick<GalleryLabels, "open" | "photo" | "video">> => {
+  const owner = part ? { part } : {};
+  return {
+    open: {
+      en: `${scope}: the name of a tile that opens the viewer; \`{name}\` is \`alt\`, else \`photo\` / \`video\`.`,
+      ru: `${scope}: имя плитки, открывающей просмотр; \`{name}\` — \`alt\`, иначе \`photo\` / \`video\`.`,
+      ...owner,
+    },
+    photo: {
+      en: `${scope}: \`{name}\` of a photo without \`alt\`.`,
+      ru: `${scope}: \`{name}\` фото без \`alt\`.`,
+      ...owner,
+    },
+    video: {
+      en: `${scope}: \`{name}\` of a video without \`alt\`.`,
+      ru: `${scope}: \`{name}\` видео без \`alt\`.`,
+      ...owner,
+    },
+  };
+};
 
 export const api: ComponentApi = {
   parts: [
@@ -108,18 +118,14 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    ...galleryLabels("Gallery"),
-    ...transferLabels("Gallery", "Скачать {name}").map((row) =>
-      row.key === "download"
-        ? {
-            ...row,
-            en: "Gallery: the download arrow of a `remote` tile; `{name}` is its `alt` or `photo` / `video`.",
-            ru: "Gallery: стрелка загрузки у плитки в состоянии `remote`; `{name}` — её `alt` или `photo` / `video`.",
-          }
-        : row,
-    ),
-  ],
+  labels: labelRows(GALLERY_LABELS, {
+    ...galleryLabelDocs("Gallery"),
+    ...transferLabelDocs("Gallery"),
+    download: {
+      en: "Gallery: the download arrow of a `remote` tile; `{name}` is its `alt` or `photo` / `video`.",
+      ru: "Gallery: стрелка загрузки у плитки в состоянии `remote`; `{name}` — её `alt` или `photo` / `video`.",
+    },
+  }),
   accessibility: {
     keyboard: [
       {

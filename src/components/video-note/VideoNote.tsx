@@ -38,7 +38,7 @@ export type VideoNoteLabels = MediaPlayerLabels & {
   duration: string;
 };
 
-const VIDEO_NOTE_LABELS: VideoNoteLabels = {
+export const VIDEO_NOTE_LABELS: VideoNoteLabels = {
   player: "Видеосообщение",
   play: "Воспроизвести видеосообщение",
   unplayed: "Не просмотрено",

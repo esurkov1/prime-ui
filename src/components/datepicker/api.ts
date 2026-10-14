@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { DATEPICKER_LABELS } from "./DatepickerPanel";
 
 export const api: ComponentApi = {
   parts: [
@@ -273,100 +274,43 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "placeholder",
-      default: "Выбрать дату",
-      en: "Field text without a value.",
-      ru: "Текст поля без значения.",
-    },
-    {
-      key: "pickStart",
-      default: "Выберите начальную дату",
+  labels: labelRows(DATEPICKER_LABELS, {
+    placeholder: { en: "Field text without a value.", ru: "Текст поля без значения." },
+    pickStart: {
       en: "Step prompt before the start of a range.",
       ru: "Подсказка до выбора начала периода.",
     },
-    {
-      key: "pickEnd",
-      default: "Выберите конечную дату",
+    pickEnd: {
       en: "Step prompt before the end of a range.",
       ru: "Подсказка до выбора конца периода.",
     },
-    {
-      key: "pickDate",
-      default: "Выберите дату",
-      en: "Step prompt of a single date.",
-      ru: "Подсказка для одной даты.",
-    },
-    { key: "reset", default: "Сбросить", en: "Footer reset button.", ru: "Кнопка сброса." },
-    { key: "apply", default: "Применить", en: "Footer apply button.", ru: "Кнопка применения." },
-    {
-      key: "prevMonth",
-      default: "Предыдущий месяц",
-      en: "Name of the previous-month arrow.",
-      ru: "Имя стрелки к предыдущему месяцу.",
-    },
-    {
-      key: "nextMonth",
-      default: "Следующий месяц",
-      en: "Name of the next-month arrow.",
-      ru: "Имя стрелки к следующему месяцу.",
-    },
-    {
-      key: "rangeStart",
-      default: "Начало периода",
-      en: "Name of the footer start field.",
-      ru: "Имя поля начала в нижней строке.",
-    },
-    {
-      key: "rangeEnd",
-      default: "Конец периода",
-      en: "Name of the footer end field.",
-      ru: "Имя поля конца в нижней строке.",
-    },
-    {
-      key: "date",
-      default: "Дата",
+    pickDate: { en: "Step prompt of a single date.", ru: "Подсказка для одной даты." },
+    reset: { en: "Footer reset button.", ru: "Кнопка сброса." },
+    apply: { en: "Footer apply button.", ru: "Кнопка применения." },
+    prevMonth: { en: "Name of the previous-month arrow.", ru: "Имя стрелки к предыдущему месяцу." },
+    nextMonth: { en: "Name of the next-month arrow.", ru: "Имя стрелки к следующему месяцу." },
+    rangeStart: { en: "Name of the footer start field.", ru: "Имя поля начала в нижней строке." },
+    rangeEnd: { en: "Name of the footer end field.", ru: "Имя поля конца в нижней строке." },
+    date: {
       en: "Name of the footer field of a single date.",
       ru: "Имя поля одной даты в нижней строке.",
     },
-    {
-      key: "timeStart",
-      default: "Время начала",
-      en: "Name of the start time input.",
-      ru: "Имя поля времени начала.",
-    },
-    {
-      key: "timeEnd",
-      default: "Время конца",
-      en: "Name of the end time input.",
-      ru: "Имя поля времени конца.",
-    },
-    {
-      key: "time",
-      default: "Время",
-      en: "Name of the time input of a single date.",
-      ru: "Имя поля времени одной даты.",
-    },
-    {
-      key: "until",
-      default: "до",
+    timeStart: { en: "Name of the start time input.", ru: "Имя поля времени начала." },
+    timeEnd: { en: "Name of the end time input.", ru: "Имя поля времени конца." },
+    time: { en: "Name of the time input of a single date.", ru: "Имя поля времени одной даты." },
+    until: {
       en: "Prefix of a range without a start: «до 6 окт».",
       ru: "Префикс периода без начала: «до 6 окт».",
     },
-    {
-      key: "presetsTitle",
-      default: "Период",
+    presetsTitle: {
       en: "Heading and group name of the presets column.",
       ru: "Заголовок и имя группы колонки периодов.",
     },
-    {
-      key: "optional",
-      default: "необязательно",
+    optional: {
       en: "Muted marker after the label when `optional`.",
       ru: "Приглушённая пометка после подписи при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {

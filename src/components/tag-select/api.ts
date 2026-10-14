@@ -1,4 +1,5 @@
-import type { ComponentApi } from "../../../scripts/docs/componentApi";
+import { type ComponentApi, labelRows } from "../../../scripts/docs/componentApi";
+import { TAG_SELECT_LABELS } from "./TagSelect";
 
 export const api: ComponentApi = {
   parts: [
@@ -183,86 +184,54 @@ export const api: ComponentApi = {
       ],
     },
   ],
-  labels: [
-    {
-      key: "panelHint",
-      default: "Выберите вариант или создайте новый",
+  labels: labelRows(TAG_SELECT_LABELS, {
+    panelHint: {
       en: 'Line above the list; `""` hides it.',
       ru: "Строка над списком; пустая строка скрывает её.",
     },
-    {
-      key: "create",
-      default: "Создать",
+    create: {
       en: "Action text before the preview of a new tag.",
       ru: "Текст действия перед превью нового тега.",
     },
-    {
-      key: "remove",
-      default: "Удалить {label}",
+    remove: {
       en: "Accessible name of a chip's remove button; `{label}` is the tag text.",
       ru: "Имя кнопки удаления чипа; `{label}` — текст тега.",
     },
-    {
-      key: "more",
-      default: "Показать ещё {count}",
+    more: {
       en: "Accessible name of the «+N» chip; `{count}` is the number of hidden tags.",
       ru: "Имя чипа «+N»; `{count}` — число скрытых тегов.",
     },
-    {
-      key: "removed",
-      default: "Удалено: {label}",
+    removed: {
       en: "Screen-reader announcement after a tag is removed.",
       ru: "Объявление для скринридера после удаления тега.",
     },
-    {
-      key: "createFailed",
-      default: "Не удалось создать тег «{label}»",
+    createFailed: {
       en: "Screen-reader announcement when the `onCreate` promise rejects and the new tag leaves.",
       ru: "Объявление для скринридера, когда промис `onCreate` отклонён и новый тег ушёл.",
     },
-    {
-      key: "updateFailed",
-      default: "Не удалось изменить тег «{label}»",
+    updateFailed: {
       en: "Screen-reader announcement when the `onOptionUpdate` promise rejects and the option goes back.",
       ru: "Объявление для скринридера, когда промис `onOptionUpdate` отклонён и опция вернулась.",
     },
-    {
-      key: "edit",
-      default: "Изменить тег {label}",
+    edit: {
       en: "Accessible name of a row's «⋯» menu button.",
       ru: "Имя кнопки меню «⋯» у строки.",
     },
-    {
-      key: "name",
-      default: "Название тега",
+    name: {
       en: "Accessible name of the tag name field in the menu.",
       ru: "Имя поля названия тега в меню.",
     },
-    {
-      key: "delete",
-      default: "Удалить",
-      en: "Delete button in the menu.",
-      ru: "Кнопка удаления в меню.",
-    },
-    {
-      key: "colors",
-      default: "Цвета",
-      en: "Heading of the color list in the menu.",
-      ru: "Заголовок списка цветов в меню.",
-    },
-    {
-      key: "colorNames",
-      default: "По умолчанию · Красный · Оранжевый · …",
+    delete: { en: "Delete button in the menu.", ru: "Кнопка удаления в меню." },
+    colors: { en: "Heading of the color list in the menu.", ru: "Заголовок списка цветов в меню." },
+    colorNames: {
       en: "Names of the palette colors in the menu, by `PaletteColor` key.",
       ru: "Названия цветов палитры в меню, по ключам `PaletteColor`.",
     },
-    {
-      key: "optional",
-      default: "необязательно",
+    optional: {
       en: "Muted marker after the label when `optional`.",
       ru: "Приглушённая пометка после подписи при `optional`.",
     },
-  ],
+  }),
   accessibility: {
     keyboard: [
       {
