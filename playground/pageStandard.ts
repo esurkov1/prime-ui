@@ -8,7 +8,8 @@
  *
  * The comparison slots (`variants`, `sizes`, `states`, `with-icon`) of every kind are matrices of
  * labelled cells: `matrix` for specimens with an intrinsic width, `matrix-wide` for specimens as
- * wide as their container (navigation, composites, page regions).
+ * wide as their container (navigation, composites). A layout region fills the box it is given,
+ * so its comparison slots are whole regions one under another (`stack`).
  */
 import type { ExampleFramePreviewLayout } from "@/components/example-frame/ExampleFrame";
 import type { ApiPart } from "../scripts/docs/componentApi";
@@ -204,9 +205,10 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
   ],
   layout: [
     { slot: "overview", required: true, layout: "full" },
-    // A layout region's variants are whole regions one under another, not cells.
+    // A layout region fills the box it is given, so its variants and sizes are whole regions one
+    // under another (each in a box the example sizes), not cells of a matrix.
     { slot: "variants", layout: "stack" },
-    { slot: "sizes", layout: "matrix-wide" },
+    { slot: "sizes", layout: "stack" },
     { slot: "structure", layout: "full" },
     { slot: SCENARIOS, layout: "full" },
     { slot: "dismiss", layout: "full" },

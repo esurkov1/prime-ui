@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Avatar } from "@/components/avatar/Avatar";
+import { Avatar, type AvatarRootProps } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Button } from "@/components/button/Button";
 import { Popover } from "@/components/popover/Popover";
@@ -19,6 +19,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { iconSlotClass } from "@/internal/iconBox";
 import { InteractiveElement } from "@/internal/interactiveElement";
@@ -31,8 +32,15 @@ import { RowAction } from "@/internal/RowAction";
 import { rovingIndex } from "@/internal/rovingFocus";
 import sheet from "@/internal/sheet.module.css";
 import { Slot, slotChild } from "@/internal/slot";
-import type { ControlSize, PaletteColor, Variant } from "@/internal/states";
+import {
+  type ControlSize,
+  compactTier,
+  type PaletteColor,
+  tierMappings,
+  type Variant,
+} from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import textRole from "@/internal/textRole.module.css";
 import { touchTargetRowClass } from "@/internal/touchTarget";
 import {
   type AppShellNavState,
@@ -371,7 +379,7 @@ function SidebarRoot({
         <div
           {...rest}
           ref={mergedRootRef}
-          className={cx(styles.root, className)}
+          className={cx(fieldTierClass, styles.root, className)}
           data-depth={depth}
           {...toDataAttributes({
             size,
@@ -444,13 +452,9 @@ SidebarFooter.displayName = "Sidebar.Footer";
 // ─── Group ────────────────────────────────────────────────────────────────────
 
 export type SidebarGroupProps = Omit<React.ComponentProps<"div">, "role"> & {
-  /** Group heading. In compact mode it folds away. */
   label?: React.ReactNode;
-  /** The heading becomes a disclosure button that shows and hides the items. Needs `label`. */
   collapsible?: boolean;
-  /** Items shown (controlled; `collapsible` only). */
   open?: boolean;
-  /** Initial open state (uncontrolled). */
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 };
@@ -507,7 +511,7 @@ function SidebarGroup({
         {label === undefined ? null : (
           // On the rail the heading shows its first letters; the tooltip gives the whole name.
           <CompactTooltip text={nodeText(label)}>
-            <div id={labelId} className={styles.groupLabel}>
+            <div id={labelId} className={cx(textRole.caption, styles.groupLabel)}>
               <span className={styles.groupText}>{label}</span>
             </div>
           </CompactTooltip>
@@ -531,7 +535,12 @@ function SidebarGroup({
         <button
           id={labelId}
           type="button"
-          className={cx(styles.groupLabel, styles.groupTrigger, touchTargetRowClass)}
+          className={cx(
+            textRole.caption,
+            styles.groupLabel,
+            styles.groupTrigger,
+            touchTargetRowClass,
+          )}
           aria-expanded={open}
           aria-controls={bodyId}
           // The chevron turns on the fold's clock once it moves (still on mount).
@@ -641,11 +650,8 @@ export type SidebarItemCountProps = Omit<
   React.HTMLAttributes<HTMLSpanElement>,
   "children" | "color"
 > & {
-  /** The number (or a short status). */
   children: React.ReactNode;
-  /** Badge hue: the count needs attention. Without `color` and `variant` it is a plain number. */
   color?: PaletteColor;
-  /** Badge treatment (default `soft` once `color` is set). */
   variant?: Exclude<Variant, "ghost">;
   /** The number `<span>` (the Badge when it has a hue). */
   ref?: React.Ref<HTMLSpanElement>;
@@ -728,7 +734,6 @@ function AttentionDot({
 }
 
 export type SidebarItemShortcutProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /** A key hint, e.g. `<Kbd>⌘K</Kbd>`. */
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
@@ -1142,7 +1147,7 @@ function RailFlyout({ flyout, children }: { flyout: RailFlyoutState; children: R
       side="right"
       size={size}
       flush
-      className={styles.flyout}
+      className={cx(fieldTierClass, styles.flyout)}
       onPointerEnter={(event) => {
         if (event.pointerType !== "touch") flyout.keepOpen();
       }}
@@ -1373,7 +1378,6 @@ SidebarSubContent.displayName = "Sidebar.SubContent";
 // ─── Brand ────────────────────────────────────────────────────────────────────
 
 export type SidebarBrandLogoProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /** The product mark (`<img>`, `<svg>`); it fills a square on the icon axis. */
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
@@ -1475,8 +1479,9 @@ export type SidebarAccountProps = Omit<React.ComponentPropsWithoutRef<"button">,
  * button, so it can be a `Dropdown.Trigger` child; in compact mode only the avatar stays.
  */
 function SidebarAccount({ description, className, children, type, ...rest }: SidebarAccountProps) {
+  const { size } = useSidebar();
   const nodes = React.Children.toArray(children);
-  const avatar = nodes.find((node) => isElementOf(node, Avatar.Root));
+  const avatar = nodes.find((node) => isElementOf<AvatarRootProps>(node, Avatar.Root));
   const name = nodes.filter((node) => node !== avatar);
 
   return (
@@ -1486,10 +1491,10 @@ function SidebarAccount({ description, className, children, type, ...rest }: Sid
         type={type ?? "button"}
         className={cx(styles.account, touchTargetRowClass, press.press, className)}
       >
-        {/* The slot sizes the avatar to the tier (`--avatar-slot-size`); the name says who it is. */}
+        {/* The avatar takes the rail's tier (`tierMappings.railAvatar`); the name says who it is. */}
         {avatar ? (
           <span className={styles.accountAvatar} aria-hidden="true">
-            {avatar}
+            {React.cloneElement(avatar, { size: tierMappings.railAvatar[size] })}
           </span>
         ) : null}
         <span className={styles.accountText}>
@@ -1533,7 +1538,7 @@ const toggleGlyph = (expanded: boolean): IconName =>
 
 /** The toggle in the rail: the Sidebar's own state, the rail's tooltip and edge motion. */
 function RailToggle({ variant = "item", className, onClick, ref, ...rest }: SidebarToggleProps) {
-  const { mode, offCanvas, open, toggle, navId, labels } = useSidebar();
+  const { mode, offCanvas, open, toggle, navId, labels, size } = useSidebar();
   const expanded = offCanvas ? open : mode === "expanded";
   const label = offCanvas ? labels.close : expanded ? labels.collapse : labels.expand;
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -1542,7 +1547,7 @@ function RailToggle({ variant = "item", className, onClick, ref, ...rest }: Side
   };
 
   if (variant === "header") {
-    // One element for both places: it rides the rail edge and changes shape with transforms.
+    // One disk for both places: it rides the rail edge and changes only by transforms.
     const onEdge = !offCanvas && mode === "compact";
     return (
       <Tooltip.Root>
@@ -1552,7 +1557,8 @@ function RailToggle({ variant = "item", className, onClick, ref, ...rest }: Side
             ref={ref}
             variant={onEdge ? "soft" : "ghost"}
             tone="neutral"
-            size="xs"
+            size={compactTier(size)}
+            shape="circle"
             className={cx(styles.headerToggle, className)}
             aria-expanded={expanded}
             aria-controls={navId}

@@ -1,5 +1,6 @@
 import * as React from "react";
-
+import { Badge } from "@/components/badge/Badge";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useResizeEffect } from "@/hooks/useElementSize";
@@ -15,7 +16,9 @@ import {
   type FieldRootDomProps,
   useFieldFrame,
 } from "@/internal/FieldFrame";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
+import { useLabels } from "@/internal/labels";
 import palette from "@/internal/palette.module.css";
 import { labelPlainText, useTextPartId, useTextParts } from "@/internal/parts";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -29,9 +32,6 @@ import {
 } from "@/internal/selectionIndicator";
 import type { ControlSize, PaletteColor } from "@/internal/states";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
-
-import { Badge } from "../badge/Badge";
-import { Tooltip } from "../tooltip/Tooltip";
 import styles from "./SegmentedControl.module.css";
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -121,19 +121,11 @@ export type SegmentedControlRootProps = Omit<FieldRootDomProps, "dir"> &
     onValueChange?: (value: string) => void;
     disabled?: boolean;
     size?: ControlSize;
-    /**
-     * Stretch to the container width. Single-line segments tend to equal widths but never get
-     * narrower than their label; when they do not fit, the row scrolls.
-     */
     fullWidth?: boolean;
-    /** Invalid state: a danger ring on the track and `aria-invalid` on the radiogroup. */
     invalid?: boolean;
-    /** Always render the support row so an appearing error does not shift the layout. */
     reserveSupportRow?: boolean;
-    /** Id of the `role="radiogroup"` element; generated when omitted. */
     id?: string;
     labels?: Partial<SegmentedControlLabels>;
-    /** `SegmentedControl.Item` segments. */
     children?: React.ReactNode;
   };
 
@@ -165,6 +157,7 @@ function SegmentedControlRoot({
   "aria-describedby": ariaDescribedBy,
   ...rest
 }: SegmentedControlRootProps) {
+  const labels = useLabels(SEGMENTED_CONTROL_LABELS, labelsProp);
   const tier = useHostTier(sizeProp);
   const size = tier.size;
   const disabled = useInheritedDisabled(disabledProp);
@@ -283,7 +276,7 @@ function SegmentedControlRoot({
         error={error}
         disabled={disabled}
         reserveSupportRow={reserveSupportRow}
-        optionalLabel={labelsProp?.optional ?? SEGMENTED_CONTROL_LABELS.optional}
+        optionalLabel={labels.optional}
         group
         className={cx(styles.field, className)}
         data-full-width={fullWidth || undefined}
@@ -297,7 +290,7 @@ function SegmentedControlRoot({
           aria-invalid={ids.invalid || undefined}
           aria-required={required || undefined}
           aria-disabled={disabled || undefined}
-          className={styles.root}
+          className={cx(fieldTierClass, styles.root)}
           onKeyDown={handleKeyDown}
           {...toDataAttributes({
             size,
@@ -356,16 +349,7 @@ export type SegmentedControlItemProps = Omit<
 > & {
   value: string;
   disabled?: boolean;
-  /**
-   * Palette hue of the option (e.g. a status): a dot of that hue before the content, and while
-   * selected the sliding thumb takes a soft fill of the hue with a ring of it.
-   */
   color?: PaletteColor;
-  /**
-   * Text, `SegmentedControl.Icon`, `SegmentedControl.Label`, `SegmentedControl.Count`,
-   * `SegmentedControl.Description`. A description makes the segment two-line. Only an icon makes the
-   * segment square: give it `aria-label` (and wrap it in a Tooltip).
-   */
   children: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLButtonElement>;
@@ -515,7 +499,6 @@ function SegmentedControlLabel({ children, className, ...rest }: SegmentedContro
 SegmentedControlLabel.displayName = "SegmentedControl.Label";
 
 export type SegmentedControlDescriptionProps = {
-  /** Muted second line; wrap the key value in `<strong>` to emphasize it. */
   children: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLSpanElement>;
@@ -543,7 +526,6 @@ export type SegmentedControlCountProps = Omit<
   React.HTMLAttributes<HTMLSpanElement>,
   "children" | "color"
 > & {
-  /** Badge hue. Default `gray`. */
   color?: PaletteColor;
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;

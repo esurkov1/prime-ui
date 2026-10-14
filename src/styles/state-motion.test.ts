@@ -22,20 +22,21 @@ describe("state motion", () => {
     const offenders: string[] = [];
     for (const file of moduleCssFiles().filter((item) => !item.includes("/examples/"))) {
       const rules = cssRules(file);
-      /** The transitioned properties of each base class (`.thumb`), from its plain rules. */
+      /**
+       * The transitioned properties of each base class (`.thumb`), from its plain rules: a bare
+       * class, or one under plain ancestor classes (`.root .toggle`, a host raising a donor's rule).
+       */
       const transitions = new Map<string, Set<string>>();
       for (const rule of rules) {
-        if (!/^\.[\w-]+$/.test(rule.selector)) continue;
+        if (!/^(\.[\w-]+\s+)*\.[\w-]+$/.test(rule.selector)) continue;
+        const key = rule.selector.split(/\s+/).at(-1) ?? rule.selector;
         for (const decl of rule.decls) {
           if (decl.prop !== "transition" && decl.prop !== "transition-property") continue;
           const names = decl.value
             .split(",")
             .map((item) => item.trim().split(/\s+/)[0] ?? "")
             .filter(Boolean);
-          transitions.set(
-            rule.selector,
-            new Set([...(transitions.get(rule.selector) ?? []), ...names]),
-          );
+          transitions.set(key, new Set([...(transitions.get(key) ?? []), ...names]));
         }
       }
       for (const rule of rules) {

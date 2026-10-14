@@ -1,4 +1,4 @@
-/* Layout of the BottomNav scenarios: a phone-wide screen frame. Semantic tokens only. */
+/* Layout of the BottomNav scenarios: a phone-wide screen. The preview stage is the page; the screen only sizes and clips. Semantic tokens only. */
 
 /* A phone screen: the content above, the bar pinned to the bottom edge. */
 .phone {
@@ -9,11 +9,6 @@
   height: calc(var(--prime-space-24) * 5);
   margin-inline: auto;
   overflow: hidden;
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-layer-current);
-  box-shadow:
-    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
-    var(--prime-shadow-raised);
 }
 
 /* The page above the bar. */

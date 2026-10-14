@@ -127,7 +127,7 @@ The name of `AppHeader.Title` (not the icon or the description) is the page's `<
 
 ## Layout & spacing
 - Row min height = control m + `--prime-space-2` (44), padding-block `--prime-space-3` (the top grows to the safe-area inset): 68 in all, the height of the Sidebar header, so the brand and the title share one line.
-- Inline padding: the page gutter `--prime-layout-gutter` (16 → 24 → 32, the same as `AppShell.Main`), so in the shell's header row the header lines up with the page; in a frame inside the page (a preview) the small gutter. Main's top air (24, 32 from 1024px) stands between the header and the page's first block.
+- Inline padding: the page gutter `--prime-layout-gutter` (16 → 24 → 32, the same as `AppShell.Main`), so in the shell's header row the header lines up with the page; in a frame inside the page (a preview) the small gutter. Main's top air ([AppShell](../app-shell/COMPONENT.md)) stands between the header and the page's first block.
 - Icon buttons are `soft` neutral (the menu button is), never `ghost`: every button on the bar has a shape.
 - Gaps: `--prime-space-3` between zones, `--prime-space-2` inside Start and Actions; `AppHeader.Separator` is the `inset` vertical Divider: the tier gap on each side (8 at `m`) and one text line tall (20 at `m`).
 - `AppHeader.Icon` is a 36 tile with the radius and fill of a soft neutral button m, so it lines up with the buttons on the bar.

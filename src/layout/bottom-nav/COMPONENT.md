@@ -55,7 +55,7 @@ BottomNav.Root                 <nav>, safe-area inset below; the bar is a switch
 | `rel` | `string` | — | Relationship of the `<a>` (`href` only). |
 | `asChild` | `boolean` | `false` | Renders the single child (e.g. a router `NavLink`) as the item; its children are the label and parts. |
 | `children` | `ReactNode` | — | `BottomNav.ItemIcon`, an optional `BottomNav.ItemCount` and a short label (one word). |
-| `…rest` | `ButtonHTMLAttributes<HTMLButtonElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `onClick`, `aria-*`, `className` and the other attributes. |
 
 ### BottomNav.ItemIcon
 `ref` → `HTMLSpanElement`. The item glyph (`aria-hidden`, 20) above the label.
@@ -125,6 +125,7 @@ Motion: the color of the icon and the label and the flat pill change over `fast`
 - Floating (the iOS 26 tab bar at three quarters its size): a full-radius capsule `--prime-bottom-nav-floating-height` (46; `--prime-bottom-nav-floating-icon-only-height`, 40, with `iconOnly`), items inset `--prime-bottom-nav-floating-padding` (4) with a `--prime-bottom-nav-floating-icon-size` (18) icon over a `--prime-bottom-nav-floating-label-size` (9, semibold) label, `--prime-bottom-nav-floating-item-gap` (2) apart. The capsule spans the width left beside its actions and the items share it equally. `--prime-bottom-nav-floating-inset` (12) from the sides and above `env(safe-area-inset-bottom)`. Glass: a dense `--prime-color-bg-glass` tint over a strong `blur(--prime-bottom-nav-blur)` (14) with `saturate(var(--prime-glass-saturation))`, so the page shows as soft shapes; the rim is a 1px ring of `--prime-color-bg-glass-edge` that catches at the top-start and bottom-end corners and fades along the sides (a masked gradient), with the overlay shadow. The selection capsule is ink at 12%, no rim. A `BottomNav.Action` is a Button `glass` disk as tall as the capsule (the root sets `--prime-control-height`) with an 18 glyph, `--prime-bottom-nav-floating-gap` (8) beside it. The floating bar positions itself at the bottom of its positioned container; `AppShell.Footer` then takes no height, the page scrolls under the capsule and main gets extra bottom padding so the last line clears it.
 - Flat: a `BottomNav.Action` is a muted disk (Button `shape="circle"`, neutral solid) of the `l` control height at the bar's edge.
 - Surface fill with a faint top divider; inside `AppShell.Footer` the bar sticks to the bottom of the panel.
+- An «Ещё» item that opens the shell's off-canvas navigation (the Sidebar) reads `useAppShellNav()` from inside `AppShell.Root`: `aria-expanded={nav?.open}`, `aria-controls={nav?.navId}`, `onClick={() => nav?.setOpen(true)}` — the AppShell screen example has it.
 
 ## Accessibility
 

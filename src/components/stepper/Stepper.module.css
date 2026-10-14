@@ -7,17 +7,19 @@
  * fill-subtle.
  */
 
+/* Text, support text and radius of the tier come from the one tier table (`fieldTierClass` on the
+   root); the indicator has its own scale (20 → 36). */
 .root {
-  --st-circle: var(--prime-control-xs-height);
+  --st-circle: var(--prime-space-7);
   --st-check: var(--prime-icon-s);
   --st-chevron: var(--prime-icon-s);
   --st-ind-size: var(--prime-text-caption-size);
   --st-ind-line-height: var(--prime-text-caption-line-height);
-  --st-text: var(--prime-control-m-text-size);
-  --st-line-height: var(--prime-control-m-line-height);
-  --st-support: var(--prime-control-m-hint-size);
-  --st-support-line-height: var(--prime-control-m-hint-line-height);
-  --st-radius: var(--prime-control-m-radius);
+  --st-text: var(--field-text);
+  --st-line-height: var(--field-lh);
+  --st-support: var(--field-hint-size);
+  --st-support-line-height: var(--field-hint-lh);
+  --st-radius: var(--field-radius);
   --st-gap: var(--prime-space-3);
   --st-v-pad: var(--prime-space-2);
   --st-root-h-gap: var(--prime-space-4);
@@ -38,11 +40,6 @@
   --st-circle: var(--prime-space-5);
   --st-check: var(--prime-icon-xs);
   --st-chevron: var(--prime-icon-xs);
-  --st-text: var(--prime-control-xs-text-size);
-  --st-line-height: var(--prime-control-xs-line-height);
-  --st-support: var(--prime-control-xs-hint-size);
-  --st-support-line-height: var(--prime-control-xs-hint-line-height);
-  --st-radius: var(--prime-control-xs-radius);
   --st-gap: var(--prime-space-2);
   --st-v-pad: var(--prime-space-1);
   --st-root-h-gap: var(--prime-space-2);
@@ -52,24 +49,14 @@
   --st-circle: var(--prime-space-6);
   --st-check: var(--prime-icon-xs);
   --st-chevron: var(--prime-icon-xs);
-  --st-text: var(--prime-control-s-text-size);
-  --st-line-height: var(--prime-control-s-line-height);
-  --st-support: var(--prime-control-s-hint-size);
-  --st-support-line-height: var(--prime-control-s-hint-line-height);
-  --st-radius: var(--prime-control-s-radius);
   --st-gap: var(--prime-space-2);
   --st-root-h-gap: var(--prime-space-3);
 }
 
 .root[data-size="l"] {
-  --st-circle: var(--prime-control-s-height);
+  --st-circle: var(--prime-space-8);
   --st-ind-size: var(--prime-text-body-s-size);
   --st-ind-line-height: var(--prime-text-body-s-line-height);
-  --st-text: var(--prime-control-l-text-size);
-  --st-line-height: var(--prime-control-l-line-height);
-  --st-support: var(--prime-control-l-hint-size);
-  --st-support-line-height: var(--prime-control-l-hint-line-height);
-  --st-radius: var(--prime-control-l-radius);
   --st-v-pad: var(--prime-space-3);
   --st-root-h-gap: var(--prime-space-5);
 }
@@ -80,11 +67,6 @@
   --st-chevron: var(--prime-icon-m);
   --st-ind-size: var(--prime-text-body-s-size);
   --st-ind-line-height: var(--prime-text-body-s-line-height);
-  --st-text: var(--prime-control-xl-text-size);
-  --st-line-height: var(--prime-control-xl-line-height);
-  --st-support: var(--prime-control-xl-hint-size);
-  --st-support-line-height: var(--prime-control-xl-hint-line-height);
-  --st-radius: var(--prime-control-xl-radius);
   --st-gap: var(--prime-space-4);
   --st-v-pad: var(--prime-space-3);
   --st-root-h-gap: var(--prime-space-6);
@@ -194,12 +176,12 @@
   background: var(--prime-color-fill-subtle-active);
 }
 
-.step[data-status="current"],
+.step[aria-current="step"],
 .step[data-status="completed"] {
   color: var(--prime-color-text-primary);
 }
 
-.root[data-orientation="vertical"] .step[data-status="current"] {
+.root[data-orientation="vertical"] .step[aria-current="step"] {
   background: var(--prime-color-fill-subtle);
 }
 

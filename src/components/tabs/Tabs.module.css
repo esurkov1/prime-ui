@@ -16,19 +16,24 @@
  * width the column turns into the horizontal strip above the panel (it scrolls, never wraps).
  */
 
+/* Height, text, gap, icon, radius and padding of the tier come from the one tier table
+   (`fieldTierClass` on the root); the folder geometry is the tabs' own scale. */
 .root {
-  --tabs-height: var(--prime-control-m-height);
-  --tabs-text-size: var(--prime-control-m-text-size);
-  --tabs-line-height: var(--prime-control-m-line-height);
-  --tabs-gap: var(--prime-control-m-gap);
-  --tabs-icon: var(--prime-control-m-icon);
-  --tabs-radius: var(--prime-control-m-radius);
-  --tabs-pad-x: var(--prime-control-m-padding-x);
+  --tabs-height: var(--field-h);
+  --tabs-text-size: var(--field-text);
+  --tabs-line-height: var(--field-lh);
+  --tabs-gap: var(--field-gap);
+  --tabs-icon: var(--field-icon);
+  --tabs-radius: var(--field-radius);
+  --tabs-pad-x: var(--field-button-px);
   --tabs-folder-radius: var(--prime-radius-l);
   --tabs-flare: var(--prime-radius-m);
   --tabs-rise: var(--prime-space-1);
   --tabs-panel-gap: var(--prime-space-5);
-  --tabs-remove-size: var(--prime-control-xs-height);
+  /* Text of the active tab: primary, accent with `tone="accent"`. */
+  --tabs-active-text: var(--prime-color-text-primary);
+  /* The close button of a removable tab is the compact tier (`compactTier`). */
+  --tabs-remove-size: var(--field-compact-h);
 
   /* Tab width bounds; `minItemWidth` / `maxItemWidth` override them inline. */
   --tabs-item-min: calc(2.5 * var(--tabs-height));
@@ -43,59 +48,29 @@
 }
 
 .root[data-size="xs"] {
-  --tabs-height: var(--prime-control-xs-height);
-  --tabs-text-size: var(--prime-control-xs-text-size);
-  --tabs-line-height: var(--prime-control-xs-line-height);
-  --tabs-gap: var(--prime-control-xs-gap);
-  --tabs-icon: var(--prime-control-xs-icon);
-  --tabs-radius: var(--prime-control-xs-radius);
-  --tabs-pad-x: var(--prime-control-xs-padding-x);
   --tabs-folder-radius: var(--prime-radius-m);
   --tabs-flare: var(--prime-radius-s);
   --tabs-panel-gap: var(--prime-space-3);
 }
 
 .root[data-size="s"] {
-  --tabs-height: var(--prime-control-s-height);
-  --tabs-text-size: var(--prime-control-s-text-size);
-  --tabs-line-height: var(--prime-control-s-line-height);
-  --tabs-gap: var(--prime-control-s-gap);
-  --tabs-icon: var(--prime-control-s-icon);
-  --tabs-radius: var(--prime-control-s-radius);
-  --tabs-pad-x: var(--prime-control-s-padding-x);
   --tabs-folder-radius: var(--prime-radius-m);
   --tabs-flare: var(--prime-radius-s);
   --tabs-panel-gap: var(--prime-space-4);
 }
 
 .root[data-size="l"] {
-  --tabs-height: var(--prime-control-l-height);
-  --tabs-text-size: var(--prime-control-l-text-size);
-  --tabs-line-height: var(--prime-control-l-line-height);
-  --tabs-gap: var(--prime-control-l-gap);
-  --tabs-icon: var(--prime-control-l-icon);
-  --tabs-radius: var(--prime-control-l-radius);
-  --tabs-pad-x: var(--prime-control-l-padding-x);
   --tabs-folder-radius: var(--prime-radius-xl);
   --tabs-flare: var(--prime-radius-l);
   --tabs-rise: var(--prime-space-2);
   --tabs-panel-gap: var(--prime-space-6);
-  --tabs-remove-size: var(--prime-control-s-height);
 }
 
 .root[data-size="xl"] {
-  --tabs-height: var(--prime-control-xl-height);
-  --tabs-text-size: var(--prime-control-xl-text-size);
-  --tabs-line-height: var(--prime-control-xl-line-height);
-  --tabs-gap: var(--prime-control-xl-gap);
-  --tabs-icon: var(--prime-control-xl-icon);
-  --tabs-radius: var(--prime-control-xl-radius);
-  --tabs-pad-x: var(--prime-control-xl-padding-x);
   --tabs-folder-radius: var(--prime-radius-xl);
   --tabs-flare: var(--prime-radius-l);
   --tabs-rise: var(--prime-space-2);
   --tabs-panel-gap: var(--prime-space-8);
-  --tabs-remove-size: var(--prime-control-m-height);
 }
 
 /* ---------- Layout ---------- */
@@ -135,7 +110,7 @@
   min-width: 0;
   /* A host zone that lets the bar run edge to edge hands it its side padding
      (`--prime-bleed-inline`, a dialog header); elsewhere it is 0. */
-  margin-inline: calc(-1 * var(--prime-bleed-inline));
+  margin-inline: calc(var(--prime-bleed-inline) * -1);
   overflow: hidden;
   border-radius: var(--tabs-strip-radius);
   background: var(--prime-color-fill-muted-hover);
@@ -392,17 +367,21 @@
   pointer-events: none;
 }
 
+/* The hover wash: the item sets how much of it shows (`--tabs-wash`), the shape fades to it. */
 .item::before {
   z-index: var(--prime-z-base);
   background: var(--prime-color-fill-faint);
-  opacity: 0;
+  opacity: var(--tabs-wash, 0);
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 @media (hover: hover) {
+  .item:hover:not([data-disabled="true"], [data-state="active"]) {
+    --tabs-wash: 1;
+  }
+
   .item:hover:not([data-disabled="true"], [data-state="active"])::before {
-    opacity: 1;
-    transition-duration: var(--prime-motion-duration-xfast);
+    transition-duration: var(--prime-motion-fade-xfast);
   }
 }
 
@@ -422,13 +401,13 @@
 }
 
 .tab[aria-selected="true"] {
-  color: var(--prime-color-text-primary);
+  color: var(--tabs-active-text);
   font-weight: var(--prime-font-weight-medium);
 }
 
 /* tone="accent": the active label and icon take the accent text colour. */
-.root[data-tone="accent"] .tab[aria-selected="true"] {
-  color: var(--prime-color-accent-text);
+.root[data-tone="accent"] {
+  --tabs-active-text: var(--prime-color-accent-text);
 }
 
 .tab[data-disabled="true"] {
@@ -456,7 +435,8 @@
 }
 
 /* Shown on the active tab, on hover and while the tab has focus — always on touch screens. */
-.item:is([data-state="active"], :focus-within) .remove {
+.item[data-state="active"] .remove,
+.item:focus-within .remove {
   opacity: 1;
 }
 

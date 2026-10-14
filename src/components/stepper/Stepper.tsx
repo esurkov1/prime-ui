@@ -7,6 +7,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { GlyphSwap } from "@/internal/glyphSwap";
 import { useLabels } from "@/internal/labels";
 import press from "@/internal/press.module.css";
@@ -117,8 +118,10 @@ function StepperRoot({
     <StepperRootProvider value={contextValue}>
       {tier.provide(
         <ol
+          // biome-ignore lint/a11y/noRedundantRoles: `list-style: none` drops the list semantics in WebKit; the role keeps them
+          role="list"
           {...rest}
-          className={cx(styles.root, className)}
+          className={cx(fieldTierClass, styles.root, className)}
           {...toDataAttributes({ orientation, size: tier.size })}
         >
           {items}

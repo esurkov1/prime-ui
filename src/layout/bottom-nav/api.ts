@@ -88,7 +88,7 @@ export const api: ComponentApi = {
         },
         {
           name: "…rest",
-          type: "ButtonHTMLAttributes<HTMLButtonElement>",
+          type: "HTMLAttributes<HTMLElement>",
           en: "`onClick`, `aria-*`, `className` and the other attributes.",
           ru: "`onClick`, `aria-*`, `className` и остальные атрибуты.",
         },

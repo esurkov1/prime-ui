@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
 import { cssRule, cssRules, cssValue } from "@/test/css";
 
@@ -24,16 +25,22 @@ function renderSegmented(overrides?: { disabled?: boolean }) {
 }
 
 // The outer height of the control equals the control height of the same tier (it lines up with
-// Button / Input). Segment height is derived as height − 2 × track padding.
+// Button / Input): the track resolves the one tier table. Segment height is derived as
+// height − 2 × track padding.
 describe("SegmentedControl — размеры (регрессия CSS)", () => {
   it("каждый ярус берёт высоту контрола своего же яруса", () => {
-    // m is the default on the base rule; every other tier overrides it.
-    expect(value(".root", "--seg-control-height")).toBe("var(--prime-control-m-height)");
-    for (const tier of ["xs", "s", "l", "xl"] as const) {
-      expect(value(`.root[data-size="${tier}"]`, "--seg-control-height")).toBe(
-        `var(--prime-control-${tier}-height)`,
+    for (const size of ["xs", "s", "m", "l", "xl"] as const) {
+      const { unmount } = render(
+        <SegmentedControl.Root defaultValue="a" size={size} aria-label="Вид">
+          <SegmentedControl.Item value="a">Список</SegmentedControl.Item>
+        </SegmentedControl.Root>,
       );
+      const track = screen.getByRole("radiogroup");
+      expect(track).toHaveClass(fieldTierClass);
+      expect(track).toHaveAttribute("data-size", size);
+      unmount();
     }
+    expect(value(".root", "--seg-control-height")).toBe("var(--field-h)");
     expect(value(".root", "height")).toBe("var(--seg-control-height)");
     expect(value(".root", "--seg-height")).toBe(
       "calc(var(--seg-control-height) - 2 * var(--seg-pad))",

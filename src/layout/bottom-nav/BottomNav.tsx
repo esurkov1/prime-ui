@@ -8,6 +8,8 @@ import { prefersReducedMotion } from "@/hooks/usePresence";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { iconSlotClass } from "@/internal/iconBox";
+import { InteractiveElement } from "@/internal/interactiveElement";
+import { useLabels } from "@/internal/labels";
 import press from "@/internal/press.module.css";
 import { SwitcherScroller } from "@/internal/SwitcherScroller";
 import {
@@ -15,7 +17,7 @@ import {
   placeIndicator,
   selectionIndicatorClass,
 } from "@/internal/selectionIndicator";
-import { Slot } from "@/internal/slot";
+import { slotChild } from "@/internal/slot";
 import type { PaletteColor, Variant } from "@/internal/states";
 import { touchTargetRowClass } from "@/internal/touchTarget";
 
@@ -38,14 +40,7 @@ type BottomNavLook = { iconOnly: boolean; floating: boolean };
 const LookContext = React.createContext<BottomNavLook>({ iconOnly: false, floating: false });
 
 export type BottomNavRootProps = React.HTMLAttributes<HTMLElement> & {
-  /** Icons without visible labels; the labels still name the items for screen readers. */
   iconOnly?: boolean;
-  /**
-   * A glass capsule floating over the content (backdrop blur, inset from the edges) instead of
-   * a flat bar at the edge, with a selection capsule that glides to the current item. It places
-   * itself at the bottom of its positioned container (`AppShell.Footer`), so the page scrolls
-   * under it.
-   */
   floating?: boolean;
   labels?: Partial<BottomNavLabels>;
   /** The `<nav>`. */
@@ -85,11 +80,12 @@ function splitRootChildren(children: React.ReactNode) {
 function BottomNavRoot({
   iconOnly = false,
   floating = false,
-  labels,
+  labels: labelsProp,
   className,
   children,
   ...rest
 }: BottomNavRootProps) {
+  const resolvedLabels = useLabels(BOTTOM_NAV_LABELS, labelsProp);
   const trackRef = React.useRef<HTMLElement>(null);
   const selectionRef = React.useRef<HTMLSpanElement>(null);
   const { start, items, end } = splitRootChildren(children);
@@ -125,7 +121,7 @@ function BottomNavRoot({
   return (
     <LookContext.Provider value={look}>
       <nav
-        aria-label={labels?.nav ?? BOTTOM_NAV_LABELS.nav}
+        aria-label={resolvedLabels.nav}
         {...rest}
         className={cx(styles.root, className)}
         {...toDataAttributes({
@@ -159,9 +155,7 @@ BottomNavRoot.displayName = "BottomNav.Root";
 // ─── Action ───────────────────────────────────────────────────────────────────
 
 export type BottomNavActionProps = Omit<React.ComponentPropsWithoutRef<"button">, "children"> & {
-  /** The glyph, e.g. `<Icon name="action.add" />`. */
   children: React.ReactNode;
-  /** The action has no visible text: `aria-label` names it. */
   "aria-label": string;
   ref?: React.Ref<HTMLButtonElement>;
 };
@@ -208,11 +202,8 @@ export type BottomNavItemCountProps = Omit<
   React.HTMLAttributes<HTMLSpanElement>,
   "children" | "color"
 > & {
-  /** The number (or a short status). */
   children: React.ReactNode;
-  /** Badge hue. Default `red`: a count on a section asks for attention. */
   color?: PaletteColor;
-  /** Badge treatment. Default `solid`. */
   variant?: Exclude<Variant, "ghost">;
   /** The Badge `<span>`. */
   ref?: React.Ref<HTMLSpanElement>;
@@ -264,90 +255,64 @@ function splitItemChildren(children: React.ReactNode, iconOnly: boolean) {
 // ─── Item ─────────────────────────────────────────────────────────────────────
 
 type BottomNavItemOwnProps = {
-  /** Current section: `aria-current="page"`. Links rendered by a router may set it themselves. */
   current?: boolean;
   disabled?: boolean;
-  /** Render the single child element (a router link) as the item; its children are the content. */
   asChild?: boolean;
-  /** `BottomNav.ItemIcon`, an optional `BottomNav.ItemCount` and the label. */
   children?: React.ReactNode;
 };
 
 export type BottomNavItemProps = BottomNavItemOwnProps &
-  Omit<React.ComponentPropsWithoutRef<"button">, keyof BottomNavItemOwnProps> & {
-    /** Renders an `<a>` instead of a `<button>`. */
+  Omit<React.HTMLAttributes<HTMLElement>, keyof BottomNavItemOwnProps> & {
     href?: string;
     target?: string;
     rel?: string;
-    /** The `<a>`, `<button>` or the `asChild` element. */
     ref?: React.Ref<HTMLElement>;
   };
 
-/** A section of the bar: the icon above a short label, both in the primary color while current. */
+/**
+ * A section of the bar: the icon above a short label, both in the primary color while current. A
+ * link (`href`), a button, or the consumer's element (`asChild`, a router link) — the kit's
+ * interactive element with its disabled guard.
+ */
 function BottomNavItem({
   current = false,
   disabled = false,
   asChild = false,
   href,
+  target,
+  rel,
   className,
   children,
-  onClick,
-  type,
-  ref,
   ...rest
 }: BottomNavItemProps) {
   const { iconOnly, floating } = React.useContext(LookContext);
   const shared = {
     ...rest,
+    disabled,
     className: cx(styles.item, press.pressHost, floating && touchTargetRowClass, className),
-    onClick: (event: React.MouseEvent<HTMLElement>) => {
-      if (disabled) {
-        event.preventDefault();
-        return;
-      }
-      onClick?.(event as React.MouseEvent<HTMLButtonElement>);
-    },
     "aria-current": current ? ("page" as const) : rest["aria-current"],
     ...toDataAttributes({ disabled: disabled || undefined }),
   };
 
-  const child =
-    asChild && React.isValidElement<{ children?: React.ReactNode }>(children) ? children : null;
-
+  const child = asChild ? slotChild(children, "BottomNav.Item") : null;
   if (child) {
     return (
-      // A disabled child leaves the Tab order and loses a plain `href` (Slot), like the other kinds.
-      <Slot
-        {...shared}
-        ref={ref}
-        aria-disabled={disabled || undefined}
-        tabIndex={disabled ? -1 : rest.tabIndex}
-      >
+      <InteractiveElement {...shared} element="slot">
         {React.cloneElement(child, undefined, splitItemChildren(child.props.children, iconOnly))}
-      </Slot>
+      </InteractiveElement>
     );
   }
   if (href !== undefined) {
     return (
-      <a
-        {...(shared as React.ComponentPropsWithoutRef<"a">)}
-        ref={ref as React.Ref<HTMLAnchorElement>}
-        href={disabled ? undefined : href}
-        aria-disabled={disabled || undefined}
-      >
+      <InteractiveElement {...shared} element="link" href={href} target={target} rel={rel}>
         {splitItemChildren(children, iconOnly)}
-      </a>
+      </InteractiveElement>
     );
   }
   return (
-    <button
-      {...shared}
-      ref={ref as React.Ref<HTMLButtonElement>}
-      type={type ?? "button"}
-      disabled={disabled}
-    >
+    <InteractiveElement {...shared} element="button">
       {splitItemChildren(children, iconOnly)}
-    </button>
+    </InteractiveElement>
   );
 }
 BottomNavItem.displayName = "BottomNav.Item";

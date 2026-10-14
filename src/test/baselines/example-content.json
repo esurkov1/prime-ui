@@ -1,5 +1,4 @@
 [
-  "src/components/example-frame/examples/controlled.tsx: fields with a submit and no <form>",
   "src/components/login-form/examples/forgot-password.tsx: fields with a submit and no <form>",
   "src/components/login-form/examples/reset-password.tsx: fields with a submit and no <form>",
   "src/components/login-form/examples/verification-code.tsx: fields with a submit and no <form>",

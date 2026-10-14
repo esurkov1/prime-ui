@@ -166,6 +166,6 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: var(--prime-icon-size);
-  height: var(--prime-icon-size);
+  width: var(--field-icon);
+  height: var(--field-icon);
 }

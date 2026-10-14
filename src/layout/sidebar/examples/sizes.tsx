@@ -7,12 +7,9 @@ const SIZES = ["xs", "s", "m", "l", "xl"] as const;
 
 export default function SidebarSizesExample() {
   return (
-    <div className={styles.sizes}>
+    <>
       {SIZES.map((size) => (
-        <div key={size} className={styles.sizeColumn}>
-          <Typography as="span" variant="caption" tone="muted">
-            {size}
-          </Typography>
+        <div key={size}>
           <div className={`${styles.stage} ${styles.stageShort}`}>
             <Sidebar.Root size={size} offCanvas="never">
               <Sidebar.Content>
@@ -32,8 +29,11 @@ export default function SidebarSizesExample() {
               </Sidebar.Content>
             </Sidebar.Root>
           </div>
+          <Typography as="span" variant="caption" tone="muted">
+            {size}
+          </Typography>
         </div>
       ))}
-    </div>
+    </>
   );
 }

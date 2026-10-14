@@ -233,7 +233,7 @@ useSidebar()                       state hook for custom parts inside Root (useA
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `"item" \| "header"` | `"item"` | In the rail: `item` — a row; `header` — an icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode. |
+| `variant` | `"item" \| "header"` | `"item"` | In the rail: `item` — a row; `header` — a round icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "aria-label" \| "aria-expanded" \| "aria-controls">` | — | `onClick` (runs first; `preventDefault()` stops the toggle), `className` and the other button attributes. |
 
 ### Functions
@@ -268,7 +268,7 @@ The rail width does not depend on `size`.
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `item` | an item row with a panel icon and the label | a toggle in `Sidebar.Footer` | yes |
-| `header` | a ghost «‹‹» icon button at the end of the header; on the compact rail a small round soft button across the outer edge, chevrons pointing out | a brand header (`Sidebar.Brand`) | |
+| `header` | a round ghost «‹‹» icon button (a disk of the compact tier) at the end of the header; on the compact rail a smaller soft disk across the outer edge, chevrons pointing out | a brand header (`Sidebar.Brand`) | |
 
 ### ItemCount
 | Value | Looks like | Use when | Default |
@@ -320,7 +320,7 @@ Leaving the narrow viewport closes the off-canvas panel; activating an item (a l
 ## Layout & spacing
 - Panel padding: `--prime-space-3` block, `--prime-space-2` inline; regions 8 apart; groups 16 apart, items 4 apart.
 - Item horizontal padding is derived from the compact width so icons and the brand logo sit on one axis in every mode (the account avatar joins that axis on the rail).
-- Header is one row of the item height + 8. The header toggle (xs, 28) sits at its end, 8 from the rail edge; in compact mode it moves half past the edge, scales to 3/4, turns round and gets a ring in the rail color. The root clips with `clip-path`, reaching past the edge by the toggle's half-width and ring beside the header only; everywhere else the panel ends exactly at the spacer edge.
+- Header is one row of the item height + 8. The header toggle (a disk of the compact tier: 28, 32 at `l` and `xl`) sits at its end, 8 from the rail edge; in compact mode it moves half past the edge, scales to 3/4 and gets a ring in the rail color. The root clips with `clip-path`, reaching past the edge by the toggle's half-width and ring beside the header only; everywhere else the panel ends exactly at the spacer edge.
 - Collapsible group: heading 28 high with the chevron (14) at its end, aligned with the item trail; items start 4 below. A folded group's attention dot sits before the chevron.
 - On the rail a heading keeps its 28 and its layout: the text slides 8 toward the edge, scales to 0.85 and is cut at the rail box with a 12 fade into the rail. A folded group adds one `…` row under its heading. The items and the row share one place: folding or unfolding on the rail glides the group's height one way (list ↔ row) while the two cross-fade, so the rows below never move back.
 - Sub-list: a 1px `border-default` guide line on the parent icon's centre; every child branches off it with an 8 elbow and a 6 bend; child labels line up with the parent label.
@@ -386,7 +386,7 @@ Leaving the narrow viewport closes the off-canvas panel; activating an item (a l
 | [collapsible-groups.tsx](examples/collapsible-groups.tsx) | Group headings that fold their items away, one group open at a time, with a chevron at the end of the heading; on the compact rail a folded group becomes one row whose items open in a flyout — `collapsible`, `open`, `onOpenChange`. |
 | [nested-items.tsx](examples/nested-items.tsx) | A parent item with child items on a guide line: a current child opens it and marks the parent; on the compact rail the children open in a flyout — `Sidebar.Sub`, `Sidebar.SubTrigger`, `Sidebar.SubContent`. |
 | [account.tsx](examples/account.tsx) | Footer items and the collapse row above the signed-in person: avatar, name and email open the account menu; collapse the rail from that row and only the avatar stays, on the icon axis — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`. |
-| [router.tsx](examples/router.tsx) | Router links as the brand and the items: the router sets `aria-current` and the item shows as current; render it inside a router — `asChild`. |
+| [router.tsx](examples/router.tsx) | Router links as the brand and the items: the router marks the current link and the item shows it as current; render it inside a router — `asChild`. |
 | [persist.tsx](examples/persist.tsx) | The first visit opens on the icon rail; the mode and the folded groups are remembered and come back after a reload — `persistKey`, `defaultMode`. |
 | [custom-part.tsx](examples/custom-part.tsx) | A part of your own in the footer reads the rail state: the storage meter shows on the full rail and in the off-canvas panel and steps aside on the icon rail — `useSidebar`. |
 | [dismiss.tsx](examples/dismiss.tsx) | An off-canvas panel only its own toggle closes: a press on the scrim and Escape leave it open, a picked item still closes it — `closeOnOutsideClick`, `closeOnEscape`. |

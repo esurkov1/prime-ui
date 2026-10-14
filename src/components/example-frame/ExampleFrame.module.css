@@ -24,11 +24,6 @@
   text-align: start;
 }
 
-/* Long code lines must not widen the playground column. */
-.root > * {
-  min-width: 0;
-}
-
 /*
  * Toolbar: one line while it fits, wraps otherwise. The pane switch keeps its content width;
  * the device switch is pushed to the end. Narrower than 8 × `--prime-space-20` (`data-narrow`,
@@ -128,6 +123,12 @@
   background-color: var(--prime-color-layer-current);
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-subtle);
   color: var(--prime-color-text-primary);
+}
+
+/* The stack-narrow column width is a default only: a block with its own width (a fit-content SegmentedControl,
+   DigitInput cells) keeps it and stays centered instead of stretching its track. */
+:where(.previewInner[data-preview-layout="stack-narrow"]) > * {
+  width: 100%;
 }
 
 /*
@@ -314,12 +315,6 @@
   min-width: 0;
   max-width: min(100%, calc(var(--prime-space-16) * 7));
   margin-inline: auto;
-}
-
-/* The column width is a default only: a block with its own width (a fit-content SegmentedControl,
-   DigitInput cells) keeps it and stays centered instead of stretching its track. */
-:where(.previewInner[data-preview-layout="stack-narrow"]) > * {
-  width: 100%;
 }
 
 /* Code tab: an explicit well (the previewed theme's page), same inset and radius as the stage. */

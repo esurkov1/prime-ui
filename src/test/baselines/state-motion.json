@@ -8,11 +8,7 @@
   "src/components/gantt/Gantt.module.css: .rowHeader flips opacity",
   "src/components/native-select/NativeSelect.module.css: .placeholder flips color",
   "src/components/scroll-container/ScrollContainer.module.css: .root flips background-color",
-  "src/components/segmented-control/SegmentedControl.module.css: .root flips box-shadow",
   "src/components/select/Select.module.css: .item flips background",
   "src/components/select/Select.module.css: .item flips background #2",
-  "src/components/tabs/Tabs.module.css: .item flips opacity",
-  "src/components/tabs/Tabs.module.css: .item flips opacity #2",
-  "src/components/tag-select/TagSelect.module.css: .colorRow flips background",
-  "src/layout/sidebar/Sidebar.module.css: .headerToggle flips color"
+  "src/components/tag-select/TagSelect.module.css: .colorRow flips background"
 ]

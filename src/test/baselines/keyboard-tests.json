@@ -96,10 +96,5 @@
   "src/components/textarea/api.ts: keyboard Mod + B · Mod + I · Mod + Shift + X · Mod + E · Mod + Shift + H · Mod + K · Mod + Shift + 9 — Mod + Shift + X",
   "src/components/textarea/api.ts: keyboard Tab — Tab",
   "src/components/textarea/api.ts: keyboard ← · → — ←",
-  "src/components/tooltip/api.ts: keyboard Tab — Tab",
-  "src/layout/sidebar/api.ts: keyboard ArrowDown · ArrowUp · Home · End — ArrowUp",
-  "src/layout/sidebar/api.ts: keyboard ArrowDown · ArrowUp · Home · End — End",
-  "src/layout/sidebar/api.ts: keyboard ArrowDown · ArrowUp · Home · End — Home",
-  "src/layout/sidebar/api.ts: keyboard Enter · Space — Space",
-  "src/layout/sidebar/api.ts: keyboard Tab — Tab"
+  "src/components/tooltip/api.ts: keyboard Tab — Tab"
 ]

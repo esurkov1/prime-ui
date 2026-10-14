@@ -40,7 +40,7 @@ export const page: ComponentPageConfig = {
       scenario: "template",
       title: "Шаблон",
       description:
-        "Root, навигация, шапка и main одним компонентом; main прокручивается наверх при каждой смене страницы — `AppShell.Template` со `scrollResetKey`.",
+        "Root, навигация, шапка и main одним компонентом; main прокручивается наверх при каждой смене страницы — `AppShell.Template`, `scrollResetKey`.",
     },
     {
       slot: "screen",

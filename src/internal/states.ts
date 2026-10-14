@@ -38,6 +38,11 @@ export const tierMappings = {
    * indicator, so s and xl read the label of the tier below (xs · xs · m · l · l).
    */
   legendText: { xs: "xs", s: "xs", m: "m", l: "l", xl: "l" },
+  /**
+   * The account Avatar of a Sidebar row: the avatar of the tier, capped so it still fits the
+   * compact rail with even air around it (32 at `l`, 40 at `xl`).
+   */
+  railAvatar: { xs: "xs", s: "s", m: "m", l: "m", xl: "l" },
 } as const satisfies Record<string, Record<ControlSize, ControlSize>>;
 
 /** Visual treatment. */

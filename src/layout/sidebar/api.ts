@@ -491,8 +491,8 @@ export const api: ComponentApi = {
           name: "variant",
           type: '"item" | "header"',
           default: '"item"',
-          en: "In the rail: `item` — a row; `header` — an icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode.",
-          ru: "В рельсе: `item` — пункт; `header` — кнопка-иконка «‹‹» в конце `Sidebar.Header`, в компактном режиме переезжает на кромку рельса.",
+          en: "In the rail: `item` — a row; `header` — a round icon button «‹‹» at the end of `Sidebar.Header` that moves onto the rail edge in compact mode.",
+          ru: "В рельсе: `item` — пункт; `header` — круглая кнопка-иконка «‹‹» в конце `Sidebar.Header`, в компактном режиме переезжает на кромку рельса.",
         },
         {
           name: "…rest",

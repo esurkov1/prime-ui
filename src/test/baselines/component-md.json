@@ -39,7 +39,6 @@
   "src/components/drawer/COMPONENT.md: neither Variants nor States has `closeOnEscape`",
   "src/components/drawer/COMPONENT.md: neither Variants nor States has `closeOnOutsideClick`",
   "src/components/dropdown/COMPONENT.md: neither Variants nor States has `closeOnEscape`",
-  "src/components/example-frame/COMPONENT.md: neither Variants nor States has `showThemeToggle`",
   "src/components/field-list/COMPONENT.md: Built from misses hint",
   "src/components/field-list/COMPONENT.md: threshold 480px",
   "src/components/file-upload/COMPONENT.md: Built from misses spinner",
@@ -60,8 +59,6 @@
   "src/components/progress-bar/COMPONENT.md: names --prime-space-5, not in its CSS",
   "src/components/progress-circle/COMPONENT.md: names --prime-space-3, not in its CSS",
   "src/components/radio/COMPONENT.md: names --prime-space-8, not in its CSS",
-  "src/components/segmented-control/COMPONENT.md: neither Variants nor States has `optional`",
-  "src/components/segmented-control/COMPONENT.md: neither Variants nor States has `reserveSupportRow`",
   "src/components/select/COMPONENT.md: names --prime-space-5, not in its CSS",
   "src/components/select/COMPONENT.md: neither Variants nor States has `defaultOpen`",
   "src/components/select/COMPONENT.md: neither Variants nor States has `filter`",
@@ -91,6 +88,5 @@
   "src/components/textarea/COMPONENT.md: neither Variants nor States has `focusRing`",
   "src/components/tooltip/COMPONENT.md: Built from misses scroll-container",
   "src/components/tooltip/COMPONENT.md: neither Variants nor States has `defaultOpen`",
-  "src/components/typography/COMPONENT.md: names --prime-layout-reading-max-width, not in its CSS",
-  "src/layout/app-header/COMPONENT.md: threshold 1024px"
+  "src/components/typography/COMPONENT.md: names --prime-layout-reading-max-width, not in its CSS"
 ]

@@ -4,19 +4,6 @@
   "src/components/field-list/FieldList.module.css: --fl-lead is never read",
   "src/components/field-list/FieldList.module.css: --fl-m is never read",
   "src/components/field-list/FieldList.module.css: --fl-s is never read",
-  "src/components/segmented-control/SegmentedControl.module.css: * 1 factor in margin-block",
   "src/components/select/Select.module.css: * 1 factor in margin",
-  "src/components/select/Select.module.css: * 1 factor in margin #2",
-  "src/components/tabs/Tabs.module.css: * 1 factor in margin-inline",
-  "src/layout/bottom-nav/BottomNav.module.css: * 1 factor in inset-block-start",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in clip-path",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in clip-path #2",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in clip-path #3",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in inset-block-start",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in inset-block-start #2",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in margin-inline",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #2",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #3",
-  "src/layout/sidebar/Sidebar.module.css: * 1 factor in translate #4"
+  "src/components/select/Select.module.css: * 1 factor in margin #2"
 ]

@@ -1,15 +1,10 @@
-/* Layout of the AppHeader scenarios: an app window and a phone-wide screen. Semantic tokens only. */
+/* Layout of the AppHeader scenarios: app windows and a phone-wide screen. The preview stage is the page; a window only sizes and clips. Semantic tokens only. */
 
-/* The top of an app window: the content panel (the page) with the header on it. */
+/* The top of an app window: the page with the header on it. */
 .window {
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-layer-current);
-  box-shadow:
-    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
-    var(--prime-shadow-raised);
 }
 
 /* narrow.tsx: an app window, phone-wide, so the title and its line of data truncate. */
@@ -25,23 +20,9 @@
   width: 100%;
   height: calc(var(--prime-space-24) * 4);
   overflow: hidden;
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-layer-current);
-  box-shadow:
-    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
-    var(--prime-shadow-raised);
 }
 
 /* The shell fills the window frame instead of the viewport. */
 .shell {
   height: 100%;
-}
-
-/* The product mark inside `Sidebar.BrandLogo`: an accent tile with a glyph. */
-.logo {
-  display: grid;
-  place-items: center;
-  border-radius: var(--prime-radius-m);
-  background: var(--prime-color-accent-default);
-  color: var(--prime-color-accent-fg);
 }

@@ -1,7 +1,7 @@
 /*
  * SegmentedControl — Graphite. Choose one value / mode.
- * Track: `fill-muted` (a step off the host in both themes) with a faint 1px ring, padding 2px (xs, s)
- * or 4px (m–xl). Outer height = control height of the tier, so a single-line group lines up with
+ * Track: `fill-muted` (a step off the host in both themes) with a faint 1px ring, padding 4px.
+ * Outer height = control height of the tier, so a single-line group lines up with
  * Button / Input of the same size. The selected segment is the thumb (`internal/selectionIndicator`)
  * in `--prime-color-control-selected` — white in light, a lighter step above the track in dark —
  * with its own faint ring; it slides between segments. Segment radius = track radius − padding.
@@ -29,12 +29,12 @@
 .root {
   --seg-pad: var(--prime-space-1);
   --seg-item-gap: var(--prime-space-1);
-  --seg-control-height: var(--prime-control-m-height);
+  --seg-control-height: var(--field-h);
   --seg-radius: var(--prime-radius-l);
-  --seg-text: var(--prime-control-m-text-size);
-  --seg-line-height: var(--prime-control-m-line-height);
-  --seg-gap: var(--prime-control-m-gap);
-  --seg-icon: var(--prime-control-m-icon);
+  --seg-text: var(--field-text);
+  --seg-line-height: var(--field-lh);
+  --seg-gap: var(--field-gap);
+  --seg-icon: var(--field-icon);
   --seg-item-pad-x: var(--prime-space-3);
   --seg-height: calc(var(--seg-control-height) - 2 * var(--seg-pad));
   --seg-item-radius: calc(var(--seg-radius) - var(--seg-pad));
@@ -42,10 +42,10 @@
   /* The edge overlays' width: the viewport's fade depth, so a revealed segment clears them. */
   --seg-fade: var(--prime-space-8);
   /* Two-line segment: tier padding; description = tier hint size (one step below the label). */
-  --seg-two-line-pad-x: var(--prime-control-m-padding-x);
+  --seg-two-line-pad-x: var(--field-button-px);
   --seg-two-line-pad-y: var(--prime-space-2);
-  --seg-desc-size: var(--prime-control-m-hint-size);
-  --seg-desc-line-height: var(--prime-control-m-hint-line-height);
+  --seg-desc-size: var(--field-hint-size);
+  --seg-desc-line-height: var(--field-hint-lh);
   /* The thumb keeps a faint 1px ring (a wash of the text color, so it reads on the track in both
      themes); the track is fill only, like a Button beside it, so the two read as one height. */
   --seg-thumb-ring: color-mix(
@@ -67,60 +67,32 @@
   /* Transparent by default; the control outline shows only under prefers-contrast: more. */
   box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-border-control);
   font-family: var(--prime-font-family-sans);
+  transition: box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-/* Per tier: track padding · track radius · segment padding-x (inner radius = radius − padding). */
+/* Per tier: track padding · track radius · segment padding-x (inner radius = radius − padding). The
+   height, text, gap, icon and two-line padding of the tier come from the one tier table
+   (`fieldTierClass` on the track). */
 .root[data-size="xs"] {
-  --seg-control-height: var(--prime-control-xs-height);
-  --seg-two-line-pad-x: var(--prime-control-xs-padding-x);
   --seg-two-line-pad-y: var(--prime-space-1);
-  --seg-desc-size: var(--prime-control-xs-hint-size);
-  --seg-desc-line-height: var(--prime-control-xs-hint-line-height);
   --seg-radius: var(--prime-radius-m);
-  --seg-text: var(--prime-control-xs-text-size);
-  --seg-line-height: var(--prime-control-xs-line-height);
-  --seg-gap: var(--prime-control-xs-gap);
-  --seg-icon: var(--prime-control-xs-icon);
   --seg-item-pad-x: var(--prime-space-2);
 }
 
 .root[data-size="s"] {
-  --seg-control-height: var(--prime-control-s-height);
-  --seg-two-line-pad-x: var(--prime-control-s-padding-x);
   --seg-two-line-pad-y: var(--prime-space-1);
-  --seg-desc-size: var(--prime-control-s-hint-size);
-  --seg-desc-line-height: var(--prime-control-s-hint-line-height);
-  --seg-radius: var(--prime-control-l-radius);
-  --seg-text: var(--prime-control-s-text-size);
-  --seg-line-height: var(--prime-control-s-line-height);
-  --seg-gap: var(--prime-control-s-gap);
-  --seg-icon: var(--prime-control-s-icon);
+  /* Concentric: the segment radius s plus the track padding. */
+  --seg-radius: calc(var(--prime-radius-s) + var(--seg-pad));
   --seg-item-pad-x: var(--prime-space-3);
 }
 
 .root[data-size="l"] {
-  --seg-control-height: var(--prime-control-l-height);
-  --seg-two-line-pad-x: var(--prime-control-l-padding-x);
-  --seg-desc-size: var(--prime-control-l-hint-size);
-  --seg-desc-line-height: var(--prime-control-l-hint-line-height);
-  --seg-text: var(--prime-control-l-text-size);
-  --seg-line-height: var(--prime-control-l-line-height);
-  --seg-gap: var(--prime-control-l-gap);
-  --seg-icon: var(--prime-control-l-icon);
   --seg-item-pad-x: var(--prime-space-4);
 }
 
 .root[data-size="xl"] {
-  --seg-control-height: var(--prime-control-xl-height);
-  --seg-two-line-pad-x: var(--prime-control-xl-padding-x);
   --seg-two-line-pad-y: var(--prime-space-3);
-  --seg-desc-size: var(--prime-control-xl-hint-size);
-  --seg-desc-line-height: var(--prime-control-xl-hint-line-height);
   --seg-radius: var(--prime-radius-xl);
-  --seg-text: var(--prime-control-xl-text-size);
-  --seg-line-height: var(--prime-control-xl-line-height);
-  --seg-gap: var(--prime-control-xl-gap);
-  --seg-icon: var(--prime-control-xl-icon);
   --seg-item-pad-x: var(--prime-space-5);
 }
 
@@ -146,9 +118,12 @@
    growth on both sides (padding in, margin out): the track keeps its height. */
 @media (pointer: coarse) {
   .viewport {
-    --seg-touch-grow: max(0px, calc((var(--prime-control-touch-target) - var(--seg-height)) / 2));
+    --seg-touch-grow: max(
+      var(--prime-space-0),
+      calc((var(--prime-control-touch-target) - var(--seg-height)) / 2)
+    );
 
-    margin-block: calc(-1 * var(--seg-touch-grow));
+    margin-block: calc(var(--seg-touch-grow) * -1);
     padding-block: var(--seg-touch-grow);
   }
 }

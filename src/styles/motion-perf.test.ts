@@ -258,9 +258,9 @@ describe("motion and rendering cost", () => {
   });
 });
 
-/** Properties that may animate: compositor-only, or color / fill / shadow for state. */
+/** Properties that may animate: compositor-only, or color (text fill too), fill, shadow. */
 const SANCTIONED =
-  /^(transform|translate|scale|rotate|opacity|color|background-color|border-color|outline-color|outline-offset|fill|stroke|stroke-dashoffset|box-shadow|filter|backdrop-filter|visibility|text-decoration-color|clip-path|--[\w-]+)$/;
+  /^(transform|translate|scale|rotate|opacity|color|-webkit-text-fill-color|background-color|border-color|outline-color|outline-offset|fill|stroke|stroke-dashoffset|box-shadow|filter|backdrop-filter|visibility|text-decoration-color|clip-path|--[\w-]+)$/;
 
 /** Shared motion modules: the only stylesheets that define keyframes. */
 const KEYFRAME_HOMES = new Set([

@@ -1,4 +1,4 @@
-/* Layout for the AppShell examples: a small "app window" frame. Semantic tokens only. */
+/* Layout for the AppShell examples: a small app window. The preview stage is the page; the window only sizes and clips. Semantic tokens only. */
 
 .stage {
   box-sizing: border-box;
@@ -6,21 +6,6 @@
   width: 100%;
   height: calc(var(--prime-space-24) * 5);
   overflow: hidden;
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-layer-current);
-  /* The window is a page on the preview's page: a hairline keeps its edge visible. */
-  box-shadow:
-    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
-    var(--prime-shadow-raised);
-}
-
-/* The product mark inside `Sidebar.BrandLogo`: an accent tile with a glyph. */
-.logo {
-  display: grid;
-  place-items: center;
-  border-radius: var(--prime-radius-m);
-  background: var(--prime-color-accent-default);
-  color: var(--prime-color-accent-fg);
 }
 
 /* The shell fills the window frame instead of the viewport. */
@@ -36,9 +21,4 @@
   height: calc(var(--prime-space-24) * 5);
   margin-inline: auto;
   overflow: hidden;
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-layer-current);
-  box-shadow:
-    0 0 0 var(--prime-border-width) var(--prime-color-border-subtle),
-    var(--prime-shadow-raised);
 }

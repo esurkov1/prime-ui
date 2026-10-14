@@ -12,9 +12,7 @@ export default function SidebarDismissExample() {
             <Sidebar.Header>
               <Sidebar.Brand href="#home" description="Склад · смена 2">
                 <Sidebar.BrandLogo>
-                  <span className={styles.logo}>
-                    <Icon name="object.package" />
-                  </span>
+                  <Icon name="object.package" />
                 </Sidebar.BrandLogo>
                 Терминал сборки
               </Sidebar.Brand>
