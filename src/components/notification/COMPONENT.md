@@ -60,7 +60,7 @@ No DOM of its own, no ref. Wraps the app once: keeps the toasts and renders thei
 | `description` | `string` | — | Secondary text under the title. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Padding, icon and text tier of the card. Without it the tier of the host (a toast of `notify()` sits outside any host: `m`). |
 | `icon` | `ReactNode` | — | Replaces the tone icon. |
-| `badge` | `string \| number` | — | A counter next to the title (a `Badge` in the tone hue). |
+| `badge` | `string \| number` | — | A counter next to the title (a `Badge` of the same `tone`). |
 | `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`). |
 | `onDismiss` | `() => void` | — | Shows the close button and is called on its click. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "title" \| "children" \| "role">` | — | `className` and the other attributes of the `<article>`. |
@@ -77,7 +77,7 @@ The argument of `notify(options)`: what the toast shows and how it closes.
 | `description` | `string` | — | Secondary text under the title. |
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Padding, icon and text tier of the card. Without it the tier of the host (a toast of `notify()` sits outside any host: `m`). |
 | `icon` | `ReactNode` | — | Replaces the tone icon. |
-| `badge` | `string \| number` | — | A counter next to the title (a `Badge` in the tone hue). |
+| `badge` | `string \| number` | — | A counter next to the title (a `Badge` of the same `tone`). |
 | `action` | `{ label: string; onClick: () => void }` | — | One soft button under the text, one tier below the card; on a toast of `notify()` it closes the toast after its `onClick` (reason `action`). |
 | `position` | `"top-left" \| "top-center" \| "top-right" \| "bottom-left" \| "bottom-center" \| "bottom-right"` | — | Default: the provider's `position`. |
 | `duration` | `number` | `5000` | Auto-close delay in ms; the timer pauses on hover, focus, swipe and in a hidden tab. |

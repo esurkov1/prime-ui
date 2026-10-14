@@ -28,14 +28,13 @@
   --bn-pad-x: var(--prime-space-4);
   --bn-gap: var(--prime-space-3);
   --bn-actions-gap: var(--prime-space-4);
-  --bn-icon: var(--prime-control-m-icon);
-  --bn-title-size: var(--prime-control-m-text-size);
-  --bn-title-line-height: var(--prime-control-m-line-height);
+  /* Icon and title follow the control tier: `fieldTierClass` on the root resolves `--field-*`. */
+  --bn-icon: var(--field-icon);
+  --bn-title-size: var(--field-text);
+  --bn-title-line-height: var(--field-lh);
   --bn-desc-size: var(--prime-text-body-s-size);
   --bn-desc-line-height: var(--prime-text-body-s-line-height);
   --bn-radius: var(--prime-radius-l);
-  /* Height of the corner close Button (xs; s on l / xl banners). */
-  --bn-close: var(--prime-control-xs-height);
 
   position: relative;
   box-sizing: border-box;
@@ -76,9 +75,6 @@
   --bn-pad-x: var(--prime-space-2);
   --bn-gap: var(--prime-space-2);
   --bn-actions-gap: var(--prime-space-3);
-  --bn-icon: var(--prime-control-xs-icon);
-  --bn-title-size: var(--prime-control-xs-text-size);
-  --bn-title-line-height: var(--prime-control-xs-line-height);
   --bn-desc-size: var(--prime-text-caption-size);
   --bn-desc-line-height: var(--prime-text-caption-line-height);
   --bn-radius: var(--prime-radius-m);
@@ -89,9 +85,6 @@
   --bn-pad-x: var(--prime-space-3);
   --bn-gap: var(--prime-space-2);
   --bn-actions-gap: var(--prime-space-3);
-  --bn-icon: var(--prime-control-s-icon);
-  --bn-title-size: var(--prime-control-s-text-size);
-  --bn-title-line-height: var(--prime-control-s-line-height);
   --bn-desc-size: var(--prime-text-caption-size);
   --bn-desc-line-height: var(--prime-text-caption-line-height);
   --bn-radius: var(--prime-radius-m);
@@ -100,12 +93,8 @@
 .root[data-size="l"] {
   --bn-pad-y: var(--prime-space-4);
   --bn-pad-x: var(--prime-space-5);
-  --bn-icon: var(--prime-control-l-icon);
-  --bn-title-size: var(--prime-control-l-text-size);
-  --bn-title-line-height: var(--prime-control-l-line-height);
   --bn-desc-size: var(--prime-text-body-m-size);
   --bn-desc-line-height: var(--prime-text-body-m-line-height);
-  --bn-close: var(--prime-control-s-height);
 }
 
 .root[data-size="xl"] {
@@ -113,13 +102,9 @@
   --bn-pad-x: var(--prime-space-6);
   --bn-gap: var(--prime-space-4);
   --bn-actions-gap: var(--prime-space-6);
-  --bn-icon: var(--prime-control-xl-icon);
-  --bn-title-size: var(--prime-control-xl-text-size);
-  --bn-title-line-height: var(--prime-control-xl-line-height);
   --bn-desc-size: var(--prime-text-body-m-size);
   --bn-desc-line-height: var(--prime-text-body-m-line-height);
   --bn-radius: var(--prime-radius-xl);
-  --bn-close: var(--prime-control-s-height);
 }
 
 /* ---------- Tones ---------- */
@@ -252,13 +237,14 @@
 
 /* Corner close slot (holds a ghost icon Button, `tone="inherit"`: the banner's text color, so it
    reads on solid fills too): top-right, centered on the first text line without growing the
-   banner. The slot carries the placement, so the Button keeps its own box untouched. */
+   banner. The slot carries the placement, so the Button keeps its own box untouched; it is a tier
+   of its own (the close Button's `compactTier`), so `--field-h` is the Button's height. */
 .close {
   display: flex;
   grid-column: 2;
   grid-row: 1;
   align-self: start;
-  margin-block: calc((var(--bn-title-line-height) - var(--bn-close)) / 2);
+  margin-block: calc((var(--bn-title-line-height) - var(--field-h)) / 2);
 }
 
 /* With `Banner.Actions` the dismiss joins that row; the corner close steps aside. */

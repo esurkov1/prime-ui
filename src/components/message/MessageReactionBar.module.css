@@ -9,7 +9,7 @@
  *   «⌄»     — the extra rows glide open and closed on one clock and curve (`Disclosure`,
  *             `base`, standard); their emoji stay mounted and fade / scale in a short stagger
  *             both ways (in from the first, out from the last); the chevron turns;
- *   pick    — the chosen emoji pops while the bar leaves;
+ *   pick    — the chosen emoji swells (the burst scale) while the bar leaves;
  *   close   — the open played back: the same clock and the same ease-in-out curve as a Sidebar
  *             disclosure, back to the corner, scale 0.96 and out, the emoji shrink a touch with it;
  *             nothing reflows (the bar keeps its place, size and state). The layer is promoted for
@@ -17,10 +17,17 @@
  *             repaint frame.
  * Under reduced motion the durations and the stagger collapse to 0 (tokens): instant.
  * The selectors carry the toolbar role and the state to outrank the shared overlay keyframes.
+ * The cell is the `s` tier height (`fieldTierClass` on the bar, `data-size="s"`).
  */
 
+.bar {
+  transition:
+    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
+}
+
 .bar[role="toolbar"] {
-  --cell: var(--prime-control-s-height);
+  --cell: var(--field-h);
   --step: calc(var(--prime-motion-stagger) / 4);
 
   display: grid;
@@ -38,9 +45,6 @@
 
 .bar[role="toolbar"][data-state] {
   animation: none;
-  transition:
-    opacity var(--prime-motion-fade-base) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-base) var(--prime-motion-easing-standard);
 }
 
 @starting-style {
@@ -89,15 +93,15 @@
     background-color var(--prime-motion-fade-xfast) var(--prime-motion-easing-standard),
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-  --out: max(0s, calc((var(--n) - var(--i, 0)) * var(--step) / 2));
-  transition-delay: 0s, var(--out), var(--out);
+  --out: max(var(--prime-motion-instant), calc((var(--n) - var(--i, 0)) * var(--step) / 2));
+  transition-delay: var(--prime-motion-instant), var(--out), var(--out);
 }
 
 .bar[data-expanded] .extra .reaction {
   opacity: 1;
   transform: none;
   --in: calc(var(--step) * 2 + var(--i, 0) * var(--step));
-  transition-delay: 0s, var(--in), var(--in);
+  transition-delay: var(--prime-motion-instant), var(--in), var(--in);
 }
 
 .reaction {
@@ -135,8 +139,7 @@
 
 @media (hover: hover) {
   .reaction[data-hovered] .glyph {
-    transform: translateY(calc(-1 * var(--prime-space-1) / 2))
-      scale(var(--prime-motion-scale-emphasis));
+    transform: translateY(calc(var(--prime-space-1) / -2)) scale(var(--prime-motion-scale-emphasis));
   }
 }
 
@@ -158,7 +161,7 @@
 }
 
 .reaction[data-picked] .glyph {
-  animation: reactionPick var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+  transform: scale(var(--prime-motion-scale-burst));
 }
 
 .more {
@@ -184,17 +187,12 @@
   animation-delay: calc(var(--i, 0) * var(--step));
 }
 
-@keyframes reactionPick {
-  50% {
-    transform: scale(var(--prime-motion-scale-burst));
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .glyph,
   .reaction[data-hovered] .glyph,
   .reaction:focus-visible .glyph,
-  .reaction:active .glyph {
+  .reaction:active .glyph,
+  .reaction[data-picked] .glyph {
     transform: none;
     transition: none;
   }

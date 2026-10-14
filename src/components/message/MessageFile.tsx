@@ -40,15 +40,10 @@ export const MESSAGE_FILE_LABELS: MessageFileLabels = {
 
 export type MessageFileProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> &
   TransferProps & {
-    /** The file name, with its extension (the format tile reads it). */
     name: string;
-    /** Bytes; shown as «1,2 МБ». */
     fileSize?: number;
-    /** Display of `fileSize`. Default Russian digits with Б · КБ · МБ · ГБ. */
     formatSize?: (bytes: number) => string;
-    /** Where to get it: the tile becomes the download button. */
     href?: string;
-    /** A picture of the file (an image, the first page) in the tile instead of the format. */
     preview?: string;
     labels?: Partial<MessageFileLabels>;
     ref?: React.Ref<HTMLDivElement>;

@@ -1,6 +1,5 @@
 [
   "src/components/accordion/Accordion.module.css: control tier tokens outside fieldTier",
-  "src/components/banner/Banner.module.css: control tier tokens outside fieldTier",
   "src/components/breadcrumb/Breadcrumb.module.css: control tier tokens outside fieldTier",
   "src/components/button/Button.module.css: media shade outside mediaPill",
   "src/components/card/Card.module.css: control tier tokens outside fieldTier",
@@ -19,9 +18,7 @@
   "src/components/kanban/Kanban.module.css: control tier tokens outside fieldTier",
   "src/components/list/List.module.css: control tier tokens outside fieldTier",
   "src/components/login-form/LoginForm.module.css: control tier tokens outside fieldTier",
-  "src/components/message/MessageReactionBar.module.css: control tier tokens outside fieldTier",
   "src/components/modal/DialogParts.module.css: control tier tokens outside fieldTier",
-  "src/components/notification/Notification.module.css: control tier tokens outside fieldTier",
   "src/components/pagination/Pagination.module.css: control tier tokens outside fieldTier",
   "src/components/popover/Popover.module.css: control tier tokens outside fieldTier",
   "src/components/progress-bar/ProgressBar.module.css: control tier tokens outside fieldTier",

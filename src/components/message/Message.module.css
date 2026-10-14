@@ -229,7 +229,7 @@
 /* A part that reaches the edges (`bleed`): pulled over the inline padding, the block padding goes
    on the side it starts or ends the bubble. */
 .bubble[data-shell="bubble"] > [data-message-bleed] {
-  margin-inline: calc(-1 * var(--msg-pad-x));
+  margin-inline: calc(var(--msg-pad-x) * -1);
 }
 
 .bubble[data-start="bleed"] {
@@ -300,7 +300,7 @@
 
   position: absolute;
   inset-block-end: 0;
-  inset-inline-start: calc(-1 * var(--prime-message-tail-width));
+  inset-inline-start: calc(var(--prime-message-tail-width) * -1);
   inline-size: calc(var(--prime-message-tail-width) + var(--prime-border-width));
   block-size: var(--prime-message-tail-height);
   background: var(--msg-tail-fill);
@@ -313,7 +313,7 @@
 .root[data-direction="outgoing"] .bubbleTail {
   --msg-tail-fill: var(--prime-color-message-outgoing-bg);
 
-  inset-inline: auto calc(-1 * var(--prime-message-tail-width));
+  inset-inline: auto calc(var(--prime-message-tail-width) * -1);
   scale: -1 1;
 }
 
@@ -725,7 +725,7 @@ button.reply:focus-visible {
 }
 
 .bubble > .reactionsSlot {
-  margin-block-start: calc(-1 * var(--prime-space-1));
+  margin-block-start: calc(var(--prime-space-1) * -1);
 }
 
 .reactions {
@@ -892,7 +892,7 @@ button.reply:focus-visible {
 /* The count is as wide as its digits (tabular): it moves only when their number changes. */
 .tail > [data-part="count"] {
   justify-content: flex-end;
-  inline-size: calc(var(--digits) * 1ch);
+  inline-size: calc(1ch * var(--digits));
 }
 
 .tail[data-show="avatars"] > [data-part="count"],
@@ -945,24 +945,13 @@ button.reply:focus-visible {
     scale: none;
   }
 
-  .tick,
-  .reaction,
-  .tail,
-  .tailPart,
-  .stackAvatar {
-    transition: none;
-  }
-
   .reaction:active,
   button.reply:active {
     transform: none;
   }
 
-  /* No blink: the others stand back (the list lets a jump's go after a moment). */
-  [data-message-list][data-pointing] .root[data-pointed] > :is(.gutter, .column, .retry) {
-    animation: none;
-  }
-
+  /* No blink (its clock is zero): the others stand back (the list lets a jump's go after a
+     moment). */
   [data-message-list][data-pointing]
     .root:not([data-pointed], [data-enter])
     > :is(.gutter, .column, .retry) {

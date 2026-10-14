@@ -6,14 +6,9 @@ import { Icon, type IconName } from "@/icons";
 import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
-import {
-  type ControlSize,
-  compactTier,
-  type PaletteColor,
-  stepDown,
-  type Tone,
-} from "@/internal/states";
+import { type ControlSize, compactTier, stepDown, type Tone } from "@/internal/states";
 
 import styles from "./Notification.module.css";
 
@@ -83,17 +78,12 @@ export type NotificationDismissReason =
 
 /** What a toast shows; shared by `notify()` and the static `NotificationCard`. */
 type NotificationContent = {
-  /** Semantic color and default icon. Default `info`. `danger` and `warning` are announced assertively. */
   tone?: NotificationTone;
   title: string;
   description?: string;
-  /** Default `m`. */
   size?: ControlSize;
-  /** Replaces the tone icon (an `Icon`). */
   icon?: React.ReactNode;
-  /** A small counter next to the title. */
   badge?: string | number;
-  /** One action button under the text. */
   action?: NotificationAction;
 };
 
@@ -129,13 +119,6 @@ const TONE_ICON: Record<NotificationTone, IconName> = {
   success: "status.success",
   warning: "status.warning",
   danger: "status.danger",
-};
-
-const TONE_BADGE_COLOR: Record<NotificationTone, PaletteColor> = {
-  info: "blue",
-  success: "green",
-  warning: "orange",
-  danger: "red",
 };
 
 /** Native attributes of the card `<article>`; `title` is the notification title, not the attribute. */
@@ -187,7 +170,7 @@ function CardView({
   return tier.provide(
     <article
       {...rest}
-      className={cx(styles.card, className)}
+      className={cx(fieldTierClass, styles.card, className)}
       role={liveRole}
       aria-live={liveRole === "alert" ? "assertive" : "polite"}
       data-depth="floating"
@@ -206,7 +189,7 @@ function CardView({
         <header className={styles.header}>
           <p className={styles.title}>{title}</p>
           {badge !== undefined ? (
-            <Badge.Root size="xs" color={TONE_BADGE_COLOR[tone]}>
+            <Badge.Root size="xs" tone={tone}>
               {badge}
             </Badge.Root>
           ) : null}
@@ -245,26 +228,56 @@ function CardView({
       ) : null}
       {countdown ? (
         <div className={styles.progressTrack} aria-hidden="true">
-          {/* A CSS animation: no per-frame JS; it stops in place while paused. */}
-          <span
-            className={styles.progressValue}
-            style={{
-              animationDuration: `${countdown.duration}ms`,
-              animationPlayState: countdown.paused ? "paused" : "running",
-            }}
-            onAnimationEnd={(event) => {
-              if (event.target === event.currentTarget) countdown.onEnd();
-            }}
-          />
+          <CountdownLine {...countdown} />
         </div>
       ) : null}
     </article>,
   );
 }
 
+/**
+ * The countdown line: a linear clock of the toast's `duration` on the compositor (no per-frame
+ * JS). It stops in place while `paused` and resumes from there; the toast expires when it runs
+ * out. Reduced motion keeps it: it is the time left, not a motion.
+ */
+function CountdownLine({ duration, paused, onEnd }: Countdown) {
+  const lineRef = React.useRef<HTMLSpanElement>(null);
+  const clockRef = React.useRef<Animation | null>(null);
+  const latest = React.useRef({ paused, onEnd });
+  React.useLayoutEffect(() => {
+    latest.current = { paused, onEnd };
+  });
+
+  React.useLayoutEffect(() => {
+    const line = lineRef.current;
+    // No Web Animations (a DOM without them, such as jsdom): no clock, the toast stays.
+    if (!line || typeof line.animate !== "function") return;
+    const clock = line.animate([{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }], {
+      duration,
+      easing: "linear",
+      fill: "forwards",
+    });
+    if (latest.current.paused) clock.pause();
+    clock.onfinish = () => latest.current.onEnd();
+    clockRef.current = clock;
+    return () => {
+      clockRef.current = null;
+      clock.cancel();
+    };
+  }, [duration]);
+
+  React.useLayoutEffect(() => {
+    const clock = clockRef.current;
+    if (!clock) return;
+    if (paused) clock.pause();
+    else clock.play();
+  }, [paused]);
+
+  return <span ref={lineRef} className={styles.progressValue} />;
+}
+
 export type NotificationCardProps = NotificationContent &
   CardDomProps & {
-    /** Shows the close button and is called on its click. */
     onDismiss?: () => void;
   };
 

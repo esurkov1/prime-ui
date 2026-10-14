@@ -14,10 +14,10 @@
 /* Zones keep clear of the notch, the home indicator and rounded corners (safe-area insets). */
 .zone {
   --ntf-edge: var(--prime-space-5);
-  --ntf-safe-top: env(safe-area-inset-top, 0px);
-  --ntf-safe-right: env(safe-area-inset-right, 0px);
-  --ntf-safe-bottom: env(safe-area-inset-bottom, 0px);
-  --ntf-safe-left: env(safe-area-inset-left, 0px);
+  --ntf-safe-top: env(safe-area-inset-top);
+  --ntf-safe-right: env(safe-area-inset-right);
+  --ntf-safe-bottom: env(safe-area-inset-bottom);
+  --ntf-safe-left: env(safe-area-inset-left);
 
   position: absolute;
   display: flex;
@@ -128,7 +128,7 @@
 .motion {
   /* The edge the stack lives on: cards enter from it and leave toward it. */
   --ntf-edge-from: -100%;
-  --ntf-edge-shift: calc(-1 * var(--prime-space-2));
+  --ntf-edge-shift: calc(var(--prime-space-2) * -1);
 
   transform-origin: top center;
   touch-action: pan-y;
@@ -186,9 +186,10 @@
   --ntf-accent: var(--prime-color-info-default);
   --ntf-pad: var(--prime-space-4);
   --ntf-gap: var(--prime-space-3);
-  --ntf-icon: var(--prime-control-m-icon);
-  --ntf-title-size: var(--prime-control-m-text-size);
-  --ntf-title-line-height: var(--prime-control-m-line-height);
+  /* Icon and title follow the control tier: `fieldTierClass` on the card resolves `--field-*`. */
+  --ntf-icon: var(--field-icon);
+  --ntf-title-size: var(--field-text);
+  --ntf-title-line-height: var(--field-lh);
   --ntf-desc-size: var(--prime-text-body-s-size);
   --ntf-desc-line-height: var(--prime-text-body-s-line-height);
 
@@ -212,9 +213,6 @@
 .card[data-size="xs"] {
   --ntf-pad: var(--prime-space-2);
   --ntf-gap: var(--prime-space-2);
-  --ntf-icon: var(--prime-control-xs-icon);
-  --ntf-title-size: var(--prime-control-xs-text-size);
-  --ntf-title-line-height: var(--prime-control-xs-line-height);
   --ntf-desc-size: var(--prime-text-caption-size);
   --ntf-desc-line-height: var(--prime-text-caption-line-height);
 }
@@ -222,18 +220,12 @@
 .card[data-size="s"] {
   --ntf-pad: var(--prime-space-3);
   --ntf-gap: var(--prime-space-2);
-  --ntf-icon: var(--prime-control-s-icon);
-  --ntf-title-size: var(--prime-control-s-text-size);
-  --ntf-title-line-height: var(--prime-control-s-line-height);
   --ntf-desc-size: var(--prime-text-caption-size);
   --ntf-desc-line-height: var(--prime-text-caption-line-height);
 }
 
 .card[data-size="l"] {
   --ntf-pad: var(--prime-space-5);
-  --ntf-icon: var(--prime-control-l-icon);
-  --ntf-title-size: var(--prime-control-l-text-size);
-  --ntf-title-line-height: var(--prime-control-l-line-height);
   --ntf-desc-size: var(--prime-text-body-m-size);
   --ntf-desc-line-height: var(--prime-text-body-m-line-height);
 }
@@ -241,9 +233,6 @@
 .card[data-size="xl"] {
   --ntf-pad: var(--prime-space-6);
   --ntf-gap: var(--prime-space-4);
-  --ntf-icon: var(--prime-control-xl-icon);
-  --ntf-title-size: var(--prime-control-xl-text-size);
-  --ntf-title-line-height: var(--prime-control-xl-line-height);
   --ntf-desc-size: var(--prime-text-body-m-size);
   --ntf-desc-line-height: var(--prime-text-body-m-line-height);
 }
@@ -336,26 +325,13 @@
   background: var(--prime-color-fill-muted);
 }
 
-/* The countdown itself: `animation-duration` (the toast's `duration`) and `animation-play-state`
-   (paused on hover, focus, swipe, hidden tab) come inline; the toast expires on `animationend`.
-   Linear on purpose: it is a clock, not a motion. Kept under reduced motion (it is the time left). */
+/* The countdown itself: the card runs it as a linear clock of the toast's `duration` (paused on
+   hover, focus, swipe, hidden tab) and the toast expires when it runs out. Kept under reduced
+   motion: it is the time left, not a motion. */
 .progressValue {
   display: block;
   width: 100%;
   height: 100%;
   transform-origin: left center;
   background: var(--ntf-accent);
-  animation-name: ntfCountdown;
-  animation-timing-function: linear;
-  animation-fill-mode: both;
-}
-
-@keyframes ntfCountdown {
-  from {
-    transform: scaleX(1);
-  }
-
-  to {
-    transform: scaleX(0);
-  }
 }

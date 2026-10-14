@@ -20,7 +20,6 @@ export const MESSAGE_TYPING_LABELS: MessageTypingLabels = { typing: "Собес�
 
 export type MessageTypingProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
   open?: boolean;
-  /** `Message.Avatar` of who types, for a group chat (`Chat.Messages type="group"`). */
   children?: React.ReactNode;
   labels?: Partial<MessageTypingLabels>;
   ref?: React.Ref<HTMLDivElement>;

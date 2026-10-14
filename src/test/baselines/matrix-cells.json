@@ -33,7 +33,6 @@
   "src/components/modal/examples/sizes.tsx: not rows of labelled cells",
   "src/components/native-select/examples/sizes.tsx: not rows of labelled cells",
   "src/components/native-select/examples/states.tsx: not rows of labelled cells",
-  "src/components/notification/examples/sizes.tsx: not rows of labelled cells",
   "src/components/popover/examples/sizes.tsx: not rows of labelled cells",
   "src/components/select/examples/sizes.tsx: not rows of labelled cells",
   "src/components/select/examples/states.tsx: not rows of labelled cells",

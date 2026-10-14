@@ -4,6 +4,7 @@ import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { Disclosure } from "@/internal/Disclosure";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -126,6 +127,12 @@ export function ReactionBar({
 }: ReactionBarProps) {
   const [expanded, setExpanded] = React.useState(false);
   const [picked, setPicked] = React.useState<string | null>(null);
+  // The picked emoji stays swelled while the bar leaves; a new open starts from rest.
+  const [wasOpen, setWasOpen] = React.useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setPicked(null);
+  }
   const floating = useFloatingLayer({
     open,
     onOpenChange,
@@ -161,7 +168,7 @@ export function ReactionBar({
       role="toolbar"
       aria-label={labels.bar}
       aria-orientation="horizontal"
-      className={styles.bar}
+      className={cx(fieldTierClass, styles.bar)}
       data-expanded={expanded || undefined}
       data-align={align}
       onPointerEnter={onPointerEnter}

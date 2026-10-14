@@ -7,6 +7,7 @@ import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { handoffFocus, tabStopBeside } from "@/internal/overlay/focus";
@@ -36,22 +37,10 @@ type BannerContextValue = {
 const BannerContext = React.createContext<BannerContextValue | null>(null);
 
 export type BannerRootProps = React.HTMLAttributes<HTMLDivElement> & {
-  /** Treatment: `soft` tinted fill (default), `solid` saturated fill, `outline` surface with a tone ring. */
   variant?: Exclude<Variant, "ghost">;
-  /** Semantic color. Default `info`. */
   tone?: Tone;
-  /** Spacing and type tier. Default `m`. */
   size?: ControlSize;
-  /**
-   * `inset` (default): rounded block in the content flow or inside a card.
-   * `page`: edge-to-edge strip (no radius) at the top of a page or app shell; content follows the
-   * page content column.
-   */
   placement?: "inset" | "page";
-  /**
-   * Renders a close button and calls this on its click. The parent unmounts the banner; it closes
-   * up in place, and focus inside it moves to the next tab stop of the page.
-   */
   onDismiss?: () => void;
   labels?: Partial<BannerLabels>;
   ref?: React.Ref<HTMLDivElement>;
@@ -97,7 +86,7 @@ function BannerRoot({
     <div
       {...rest}
       ref={mergedRef}
-      className={cx(styles.root, enterMotion.enter, className)}
+      className={cx(fieldTierClass, styles.root, enterMotion.enter, className)}
       data-depth={depth}
       {...toDataAttributes({ variant, tone, size, placement })}
     >
@@ -107,7 +96,7 @@ function BannerRoot({
             <>
               {children}
               {onDismiss ? (
-                <span className={styles.close}>
+                <span className={cx(fieldTierClass, styles.close)} data-size={compactTier(size)}>
                   <Button.Root
                     variant="ghost"
                     tone="inherit"
