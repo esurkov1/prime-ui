@@ -347,7 +347,7 @@
 
 /* Title + text is the header, the footer sits under a full-width hairline. */
 .root[data-variant="cta"] > .footer {
-  --hairline-inset: var(--prime-space-0);
+  --hairline-inset: 0%;
 
   padding-top: var(--prime-space-4);
 }
