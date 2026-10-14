@@ -229,21 +229,16 @@ export type SmartFilterRootProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "defaultValue" | "onChange"
 > & {
-  /** The fields this screen filters by, in display order. Empty: only the search remains. */
   fields: readonly SmartFilterField[];
-  /** Value per field key: a selection, or the bounds of a range field. */
   value?: SmartFilterValue;
   defaultValue?: SmartFilterValue;
   onValueChange?: (value: SmartFilterValue) => void;
-  /** Free-text search. Applied as typed; debounce it in the owner if needed. */
   search?: string;
   defaultSearch?: string;
   onSearchChange?: (search: string) => void;
   size?: ControlSize;
-  /** Values of one field shown before «Ещё N». Default 12. */
   collapsedLimit?: number;
   labels?: Partial<SmartFilterLabels>;
-  /** `SmartFilter.Toolbar` and `SmartFilter.Chips`. */
   children: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -314,10 +309,6 @@ SmartFilterRoot.displayName = "SmartFilter.Root";
 // ---------------------------------------------------------------------------------------------
 
 export type SmartFilterToolbarProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
-  /**
-   * The search input (default `true`). `false` — the filter button alone, for a screen whose
-   * text search lives elsewhere or does not exist.
-   */
   searchable?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
