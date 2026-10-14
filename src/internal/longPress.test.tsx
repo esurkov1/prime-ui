@@ -1,6 +1,9 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 
-import { LONG_PRESS_MS, PRESS_SLOP_PX, useLongPress } from "./longPress";
+import { PRESS_SLOP_PX, useLongPress } from "./longPress";
+
+// The default hold of useLongPress.
+const LONG_PRESS_MS = 500;
 
 function Row({
   onLongPress,

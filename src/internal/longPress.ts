@@ -8,7 +8,7 @@ import * as React from "react";
  */
 
 /** A finger resting this long opens what a right click would (a menu) or creates in place. */
-export const LONG_PRESS_MS = 500;
+const LONG_PRESS_MS = 500;
 /**
  * A finger held this long picks up what it rests on to carry it: shorter than a long press, so a
  * grab never feels like waiting, longer than the slow start of a scroll.
