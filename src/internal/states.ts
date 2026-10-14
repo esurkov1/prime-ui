@@ -33,6 +33,11 @@ export const tierMappings = {
    * (16 · 16 · 20 · 20 · 20), so a loading legend keeps the height of the loaded one.
    */
   legendSkeleton: { xs: "xs", s: "xs", m: "m", l: "m", xl: "m" },
+  /**
+   * The account Avatar of a Sidebar row: the avatar of the tier, capped so it still fits the
+   * compact rail with even air around it (32 at `l`, 40 at `xl`).
+   */
+  railAvatar: { xs: "xs", s: "s", m: "m", l: "m", xl: "l" },
 } as const satisfies Record<string, Record<ControlSize, ControlSize>>;
 
 /** Visual treatment. */
