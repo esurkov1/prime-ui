@@ -12,8 +12,6 @@
   "src/components/chat/Chat.module.css: raw length in translate",
   "src/components/color-picker/ColorPicker.module.css: numeric z-index",
   "src/components/color-picker/ColorPicker.module.css: raw length in font-size",
-  "src/components/command-menu/CommandMenu.module.css: raw length in padding-block-end",
-  "src/components/command-menu/CommandMenu.module.css: raw length in padding-inline",
   "src/components/composer/Composer.module.css: numeric scale() in transform",
   "src/components/composer/Composer.module.css: numeric scale() in transform #2",
   "src/components/composer/Composer.module.css: numeric scale() in transform #3",

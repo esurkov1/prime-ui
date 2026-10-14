@@ -109,9 +109,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the rows and the search row: item height, text, icon.",
-          ru: "Ярус строк и строки поиска: высота пункта, текст, иконка.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Tier of the rows and the search row: item height, text, icon. Without it the tier of the host it opens from, else `m`.",
+          ru: "Ярус строк и строки поиска: высота пункта, текст, иконка. Без него — ярус контейнера, из которого палитра открыта, иначе `m`.",
         },
         {
           name: "labels",

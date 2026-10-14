@@ -10,21 +10,31 @@ import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useLoadMore } from "@/hooks/useLoadMore";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
-import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldInputTextClass, fieldTierClass } from "@/internal/fieldClasses";
 import { highlightChildren } from "@/internal/HighlightMatch";
+import { hasContent } from "@/internal/hasContent";
 import { useLabels } from "@/internal/labels";
-import { isComposingKey, type Store, useCreateStore, useStoreSlice } from "@/internal/listbox";
+import {
+  handleListboxKeyDown,
+  type ListboxRegistry,
+  revealHighlighted,
+  type Store,
+  useCreateStore,
+  useListboxItem,
+  useListboxRegistry,
+  useListboxView,
+  useStoreSlice,
+} from "@/internal/listbox";
 import { MenuGroup } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
-import { focusInto } from "@/internal/overlay/focus";
+import { RegionSwap } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
-import swapMotion from "@/internal/swapMotion.module.css";
-import { isPromiseLike } from "@/internal/usePendingChanges";
+import { usePendingAction } from "@/internal/usePendingChanges";
 
 import styles from "./CommandMenu.module.css";
 
@@ -53,20 +63,6 @@ export const COMMAND_MENU_LABELS: CommandMenuLabels = {
 const LOADING_ROWS = 5;
 const LOADING_MORE_ROWS = 2;
 
-// ─── Item registry and filtering ─────────────────────────────────────────────
-
-type ItemEntry = {
-  order: number;
-  /** `value` and `keywords`, lower-cased: what the query is matched against. */
-  haystack: string;
-  disabled: boolean;
-  groupId: string;
-  /** Shown whatever the query, never counted as a match, walked after the matches. */
-  persistent: boolean;
-};
-
-type ItemRegistration = Omit<ItemEntry, "order">;
-
 /** What the list shows besides its items: the first results loading, a load error, or items. */
 type RegionState = "loading" | "error" | "ready";
 
@@ -87,17 +83,12 @@ type CommandMenuContextValue = LoadProps & {
   size: ControlSize;
   search: string;
   setSearch: (search: string) => void;
+  filter: boolean;
   listboxId: string;
+  /** The items of the palette (`@/internal/listbox`): the query view, Enter, the highlight's node. */
+  registry: ListboxRegistry;
   /** The active option; items subscribe to their own slice of it. */
-  active: Store<string | null>;
-  registerItem: (id: string, item: ItemRegistration) => () => void;
-  /** Items shown (matches and persistent items), disabled ones too. */
-  visible: ReadonlySet<string>;
-  /** Items that match the query, without the persistent ones. */
-  matchCount: number;
-  /** Enabled shown items in render order: what the arrows walk. */
-  navigable: string[];
-  groupOf: (id: string) => string | undefined;
+  active: Store<string | undefined>;
   region: RegionState;
   /** The list's own scroller (the load-more observer root). */
   listRef: React.RefObject<HTMLElement | null>;
@@ -109,11 +100,10 @@ type CommandMenuContextValue = LoadProps & {
 const [CommandMenuProvider, useCommandMenuContext] =
   createComponentContext<CommandMenuContextValue>("CommandMenu");
 
-const CommandMenuGroupContext = React.createContext("");
+/** The items of a `CommandMenu.Group`: the group hides while none of them is shown. */
+const CommandMenuGroupContext = React.createContext<Set<string> | null>(null);
 
 const optionId = (id: string) => `${id}-option`;
-
-const hasContent = (node: React.ReactNode) => node != null && node !== false && node !== "";
 
 /** Lives as long as the open dialog: the item registry, the matches and the active option. */
 function CommandMenuState({
@@ -134,53 +124,22 @@ function CommandMenuState({
   children: React.ReactNode;
 }) {
   const listboxId = React.useId();
-  const itemsRef = React.useRef(new Map<string, ItemEntry>());
-  const orderRef = React.useRef(new Map<string, number>());
-  const [version, bump] = React.useReducer((n: number) => n + 1, 0);
-  const active = useCreateStore<string | null>(null);
+  const registry = useListboxRegistry();
+  const view = useListboxView(registry, search, filter);
+  const active = useCreateStore<string | undefined>(undefined);
   const listRef = React.useRef<HTMLElement | null>(null);
-
-  const registerItem = React.useCallback((id: string, item: ItemRegistration) => {
-    let order = orderRef.current.get(id);
-    if (order === undefined) {
-      order = orderRef.current.size;
-      orderRef.current.set(id, order);
-    }
-    itemsRef.current.set(id, { ...item, order });
-    bump();
-    return () => {
-      itemsRef.current.delete(id);
-      bump();
-    };
-  }, []);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `version` changes when items (de)register
-  const { visible, navigable, matchCount } = React.useMemo(() => {
-    const query = search.trim().toLowerCase();
-    // Persistent items (create from the query) stand at the end of the list: the arrows reach
-    // them after the matches, whenever the matches arrived.
-    const shown = [...itemsRef.current.entries()]
-      .filter(([, item]) => item.persistent || !filter || item.haystack.includes(query))
-      .sort(([, a], [, b]) => Number(a.persistent) - Number(b.persistent) || a.order - b.order);
-    return {
-      visible: new Set(shown.map(([id]) => id)),
-      navigable: shown.filter(([, item]) => !item.disabled).map(([id]) => id),
-      matchCount: shown.filter(([, item]) => !item.persistent).length,
-    };
-  }, [search, filter, version]);
-
-  const groupOf = React.useCallback((id: string) => itemsRef.current.get(id)?.groupId, []);
 
   // The active option stays on screen while the list filters: the first match otherwise.
   React.useLayoutEffect(() => {
     const current = active.get();
-    if (current === null || !navigable.includes(current)) active.set(navigable[0] ?? null);
-  }, [navigable, active]);
+    if (current === undefined || !view.navigable.includes(current)) {
+      active.set(view.navigable[0]);
+    }
+  }, [view, active]);
 
-  const hasError = hasContent(load.loadError);
-  const region: RegionState = hasError
+  const region: RegionState = hasContent(load.loadError)
     ? "error"
-    : load.loading && matchCount === 0
+    : load.loading && view.matchCount === 0
       ? "loading"
       : "ready";
 
@@ -193,7 +152,7 @@ function CommandMenuState({
       !load.loadingMore,
     onLoadMore: load.onLoadMore,
     scrollRef: listRef,
-    round: version,
+    round: view,
   });
 
   const value = React.useMemo(
@@ -203,13 +162,10 @@ function CommandMenuState({
       size,
       search,
       setSearch,
+      filter,
       listboxId,
+      registry,
       active,
-      registerItem,
-      visible,
-      matchCount,
-      navigable,
-      groupOf,
       region,
       listRef,
       sentinelRef,
@@ -221,13 +177,10 @@ function CommandMenuState({
       size,
       search,
       setSearch,
+      filter,
       listboxId,
+      registry,
       active,
-      registerItem,
-      visible,
-      matchCount,
-      navigable,
-      groupOf,
       region,
       sentinelRef,
       requestMore,
@@ -277,7 +230,6 @@ export type CommandMenuRootProps = Omit<
   closeOnEscape?: boolean;
   /** A click on the scrim closes the palette. Default `true`. */
   closeOnOutsideClick?: boolean;
-  /** Tier of the rows and the search row: item height, text, icon. */
   size?: ControlSize;
   labels?: Partial<CommandMenuLabels>;
   /** Name of the dialog when there is no `CommandMenu.Title`. */
@@ -305,12 +257,14 @@ function CommandMenuRoot({
   onRetry,
   closeOnEscape = true,
   closeOnOutsideClick = true,
-  size = "m",
+  size: sizeProp,
   labels: labelsProp,
   className,
   children,
   ...rest
 }: CommandMenuRootProps) {
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
   const labels = useLabels(COMMAND_MENU_LABELS, labelsProp);
   const [isOpen, setOpen] = useControllableState({
     value: open,
@@ -322,26 +276,7 @@ function CommandMenuRoot({
     defaultValue: defaultSearch,
     onChange: onSearchChange,
   });
-  const [retrying, setRetrying] = React.useState(false);
-  const retryingRef = React.useRef(false);
-  const retry = React.useMemo(
-    () =>
-      onRetry
-        ? () => {
-            if (retryingRef.current) return;
-            const outcome = onRetry();
-            if (!isPromiseLike(outcome)) return;
-            retryingRef.current = true;
-            setRetrying(true);
-            const done = () => {
-              retryingRef.current = false;
-              setRetrying(false);
-            };
-            outcome.then(done, done);
-          }
-        : undefined,
-    [onRetry],
-  );
+  const { pending: retrying, run: retry } = usePendingAction(onRetry);
   const load = React.useMemo<LoadProps>(
     () => ({ loading, loadingMore, hasMore, onLoadMore, loadError, onRetry: retry, retrying }),
     [loading, loadingMore, hasMore, onLoadMore, loadError, retry, retrying],
@@ -361,16 +296,10 @@ function CommandMenuRoot({
       closeOnEscape={closeOnEscape}
       closeOnOutsideClick={closeOnOutsideClick}
     >
-      <Modal.Content
-        {...rest}
-        size="l"
-        placement="top"
-        className={cx(styles.content, className)}
-        overlayClassName={styles.overlay}
-      >
+      <Modal.Content {...rest} size="l" placement="top" className={cx(styles.content, className)}>
         {/* `display: contents`: carries the tier variables without breaking the panel's flex column. */}
         <div className={cx(menu.tier, styles.tier)} data-size={size}>
-          <ControlSizeProvider value={size}>
+          {tier.provide(
             <CommandMenuState
               labels={labels}
               size={size}
@@ -380,8 +309,8 @@ function CommandMenuRoot({
               load={load}
             >
               {children}
-            </CommandMenuState>
-          </ControlSizeProvider>
+            </CommandMenuState>,
+          )}
         </div>
       </Modal.Content>
     </Modal.Root>
@@ -437,9 +366,10 @@ function CommandMenuInput({
     labels,
     search,
     setSearch,
+    filter,
     listboxId,
+    registry,
     active,
-    navigable,
     region,
     onRetry,
     loading,
@@ -447,6 +377,7 @@ function CommandMenuInput({
     requestMore,
   } = useCommandMenuContext();
   const activeId = useStoreSlice(active, (id) => id);
+  const { navigable } = useListboxView(registry, search, filter);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     onKeyDown?.(event);
@@ -458,29 +389,25 @@ function CommandMenuInput({
       }
       return;
     }
-    if (navigable.length === 0) return;
-    const current = active.get();
-    const index = current ? navigable.indexOf(current) : -1;
-    const last = navigable.length - 1;
-    const next: Record<string, number> = {
-      ArrowDown: index < 0 || index === last ? 0 : index + 1,
-      ArrowUp: index <= 0 ? last : index - 1,
-      Home: 0,
-      End: last,
-    };
-    if (event.key in next) {
-      event.preventDefault();
-      active.set(navigable[next[event.key]] ?? null);
-      // The keyboard reached the end: ask for more, as the sentinel does for scrolling.
-      if (next[event.key] === last) requestMore();
-    } else if (event.key === "Enter" && current && !isComposingKey(event)) {
-      event.preventDefault();
-      document.getElementById(optionId(current))?.click();
-    }
+    // Space types into the query: only Enter runs the active command.
+    if (event.key === " ") return;
+    const moved = handleListboxKeyDown(event, {
+      ids: navigable,
+      highlight: active,
+      activate: (id) => registry.activate(id),
+    });
+    if (moved === null) return;
+    revealHighlighted(registry.nodeOf(moved));
+    // The keyboard reached the end: ask for more, as the sentinel does for scrolling.
+    if (moved === navigable.at(-1)) requestMore();
   };
 
   return (
-    <div className={cx(menu.searchRow, styles.inputRow)} data-focus-ring="false">
+    // The palette's search is a field of tier `l` (its text and height), whatever the rows' tier.
+    <div
+      className={cx(menu.searchRow, fieldTierClass, fieldInputTextClass, styles.inputRow)}
+      data-size="l"
+    >
       <Icon name="action.search" />
       <input
         {...rest}
@@ -522,7 +449,7 @@ function SkeletonRows({ count }: { count: number }) {
       // biome-ignore lint/suspicious/noArrayIndexKey: identical placeholder rows
       key={index}
       aria-hidden="true"
-      className={cx(menu.item, menu.skeletonRow, styles.item)}
+      className={cx(menu.item, menu.itemPalette, menu.skeletonRow)}
       data-skeleton=""
     >
       <Skeleton />
@@ -550,55 +477,57 @@ function CommandMenuList({ className, children, ref, ...rest }: CommandMenuListP
     listRef,
     sentinelRef,
   } = useCommandMenuContext();
+  // A swap keeps the leaving list on screen a moment: the new one keeps the refs.
   const mergedRef = useMergedRefs(listRef, ref);
-  // The first render stays still; every later state fades in (foundation §1 rule 7).
-  const swapped = useStateSwap(region);
-  const swapClass = swapped ? swapMotion.swapIn : undefined;
+  const setSentinelRef = useMergedRefs(sentinelRef);
+  const regionRef = React.useRef<HTMLDivElement>(null);
 
-  // The retry button leaves with the error: focus goes back to the search field, not the page.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on every region swap
-  React.useEffect(() => {
-    const dialog = listRef.current?.closest<HTMLElement>('[role="dialog"]');
-    if (!swapped || !dialog || dialog.dataset.state === "closed") return;
-    if (!dialog.contains(document.activeElement)) focusInto(dialog);
-  }, [region, swapped, listRef]);
+  // The retry button leaves with the error: focus goes back to the search field, not the list.
+  const returnToSearch = () => {
+    const dialog = regionRef.current?.closest<HTMLElement>('[role="dialog"]');
+    if (!dialog || dialog.dataset.state === "closed") return;
+    const inside = dialog.contains(document.activeElement);
+    if (inside && !regionRef.current?.contains(document.activeElement)) return;
+    dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus({ preventScroll: true });
+  };
 
   return (
     <>
-      <ScrollContainer
-        {...rest}
-        ref={mergedRef}
-        id={listboxId}
-        role="listbox"
-        aria-busy={loading || loadingMore || undefined}
-        hidden={region === "error" ? true : undefined}
-        className={cx(styles.list, className)}
-      >
-        <div key={swapped ? region : undefined} className={cx(styles.region, swapClass)}>
-          {/* Items render while loading too: they register, and the first match ends the state. */}
-          {children}
-          {region === "loading" ? <SkeletonRows count={LOADING_ROWS} /> : null}
-          {region === "ready" && hasMore ? (
-            <div ref={sentinelRef} aria-hidden="true" className={menu.loadSentinel} />
-          ) : null}
-          {region === "ready" && loadingMore ? <SkeletonRows count={LOADING_MORE_ROWS} /> : null}
-        </div>
-      </ScrollContainer>
-      {region === "error" ? (
-        <EmptyPage.Root layout="compact" size={size} role="alert" className={swapClass}>
-          <EmptyPage.Title as="p">{loadError}</EmptyPage.Title>
-          {onRetry ? (
-            <EmptyPage.Actions>
-              <Button.Root variant="soft" tone="neutral" loading={retrying} onClick={onRetry}>
-                <Button.Icon>
-                  <Icon name="action.refresh" />
-                </Button.Icon>
-                {labels.retry}
-              </Button.Root>
-            </EmptyPage.Actions>
-          ) : null}
-        </EmptyPage.Root>
-      ) : null}
+      {/* A load state swap cross-fades the region (foundation §1 rule 7). */}
+      <RegionSwap ref={regionRef} state={region} fill onSwap={returnToSearch}>
+        {region === "error" ? (
+          <EmptyPage.Root layout="compact" size={size} role="alert">
+            <EmptyPage.Title as="p">{loadError}</EmptyPage.Title>
+            {onRetry ? (
+              <EmptyPage.Actions>
+                <Button.Root variant="soft" tone="neutral" loading={retrying} onClick={onRetry}>
+                  <Button.Icon>
+                    <Icon name="action.refresh" />
+                  </Button.Icon>
+                  {labels.retry}
+                </Button.Root>
+              </EmptyPage.Actions>
+            ) : null}
+          </EmptyPage.Root>
+        ) : (
+          <ScrollContainer
+            {...rest}
+            ref={mergedRef}
+            id={listboxId}
+            role="listbox"
+            aria-busy={loading || loadingMore || undefined}
+            className={cx(styles.list, className)}
+          >
+            {/* Items render while loading too: they register, and the first match ends it. */}
+            {children}
+            {region === "loading" ? <SkeletonRows count={LOADING_ROWS} /> : null}
+            {region === "ready" && hasMore ? (
+              <div ref={setSentinelRef} aria-hidden="true" className={menu.loadSentinel} />
+            ) : null}
+            {region === "ready" && loadingMore ? <SkeletonRows count={LOADING_MORE_ROWS} /> : null}
+          </ScrollContainer>
+        )}
+      </RegionSwap>
       <VisuallyHidden live="polite">{loading || loadingMore ? labels.loading : ""}</VisuallyHidden>
     </>
   );
@@ -613,17 +542,15 @@ export type CommandMenuGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
 
 /** A labelled section of items; hidden while none of its items match the query. */
 function CommandMenuGroup({ className, ...rest }: CommandMenuGroupProps) {
-  const groupId = React.useId();
-  const { visible, groupOf } = useCommandMenuContext();
-  const hasVisible = [...visible].some((id) => groupOf(id) === groupId);
+  const [members] = React.useState(() => new Set<string>());
+  const { registry, search, filter } = useCommandMenuContext();
+  // Re-renders when the items register or the query changes.
+  const { visible } = useListboxView(registry, search, filter);
+  const hasVisible = [...members].some((id) => visible.has(id));
 
   return (
-    <CommandMenuGroupContext.Provider value={groupId}>
-      <MenuGroup
-        {...rest}
-        hidden={hasVisible ? undefined : true}
-        className={cx(styles.group, className)}
-      />
+    <CommandMenuGroupContext.Provider value={members}>
+      <MenuGroup {...rest} hidden={hasVisible ? undefined : true} className={className} />
     </CommandMenuGroupContext.Provider>
   );
 }
@@ -665,30 +592,39 @@ function CommandMenuItem({
   ...rest
 }: CommandMenuItemProps) {
   const id = React.useId();
-  const groupId = React.useContext(CommandMenuGroupContext);
-  const { registerItem, active: activeStore, visible, search } = useCommandMenuContext();
+  const group = React.useContext(CommandMenuGroupContext);
+  const { registry, active: activeStore, search, filter } = useCommandMenuContext();
   const nodeRef = React.useRef<HTMLButtonElement>(null);
   const mergedRef = useMergedRefs(nodeRef, ref);
+  const haystack = `${value} ${keywords}`.trim().toLowerCase();
 
-  React.useLayoutEffect(
-    () =>
-      registerItem(id, {
-        haystack: `${value} ${keywords}`.trim().toLowerCase(),
-        disabled,
-        groupId,
-        persistent,
-      }),
-    [id, value, keywords, disabled, groupId, persistent, registerItem],
+  useListboxItem(
+    registry,
+    id,
+    {
+      label: value,
+      haystack,
+      disabled,
+      persistent,
+      onActivate: () => {
+        activeStore.set(id);
+        onSelect?.();
+      },
+    },
+    nodeRef,
   );
+  React.useLayoutEffect(() => {
+    if (!group) return;
+    group.add(id);
+    return () => {
+      group.delete(id);
+    };
+  }, [group, id]);
 
+  const { visible } = useListboxView(registry, search, filter);
   const shown = visible.has(id);
   // Only this item's slice of the active option: moving it re-renders two rows.
   const active = useStoreSlice(activeStore, (current) => current === id);
-  const usable = shown && !disabled;
-
-  React.useEffect(() => {
-    if (active) nodeRef.current?.scrollIntoView?.({ block: "nearest" });
-  }, [active]);
 
   return (
     <button
@@ -701,17 +637,15 @@ function CommandMenuItem({
       aria-selected={active}
       aria-disabled={disabled || undefined}
       hidden={shown ? undefined : true}
-      className={cx(menu.item, styles.item, className)}
+      className={cx(menu.item, menu.itemPalette, className)}
       {...toDataAttributes({ highlighted: active || undefined, disabled: disabled || undefined })}
       onPointerMove={(event) => {
         onPointerMove?.(event);
-        if (!event.defaultPrevented && usable && !active) activeStore.set(id);
+        if (!event.defaultPrevented && shown && !disabled && !active) activeStore.set(id);
       }}
       onClick={(event) => {
         onClick?.(event);
-        if (event.defaultPrevented || !usable) return;
-        activeStore.set(id);
-        onSelect?.();
+        if (!event.defaultPrevented && shown) registry.activate(id);
       }}
     >
       {highlightChildren(children, search)}
@@ -781,10 +715,11 @@ export type CommandMenuEmptyProps = Omit<
  * `CommandMenu.Item` at the end of the list, never a child of `Empty`.
  */
 function CommandMenuEmpty(props: CommandMenuEmptyProps) {
-  const { matchCount, labels, region } = useCommandMenuContext();
+  const { registry, search, filter, labels, region, size } = useCommandMenuContext();
+  const { matchCount } = useListboxView(registry, search, filter);
   if (matchCount > 0 || region !== "ready") return null;
   return (
-    <EmptyPage.Root layout="compact" role="status" {...props}>
+    <EmptyPage.Root layout="compact" size={size} role="status" {...props}>
       <EmptyPage.Title as="p">{labels.empty}</EmptyPage.Title>
       {labels.emptyHint ? <EmptyPage.Description>{labels.emptyHint}</EmptyPage.Description> : null}
     </EmptyPage.Root>

@@ -64,7 +64,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `onRetry` | `() => void \| Promise<void>` | — | A retry button (`labels.retry`) under `loadError`; Enter in the search field runs it too. Return the request's promise to keep the button loading until it settles. |
 | `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the palette; focus returns to the opener. |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the palette. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of the rows and the search row: item height, text, icon. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of the rows and the search row: item height, text, icon. Without it the tier of the host it opens from, else `m`. |
 | `labels` | `Partial<CommandMenuLabels>` | — | Built-in strings, see Labels. |
 | `aria-label · aria-labelledby · aria-describedby` | `string` | — | Name and description of the dialog when there is no `CommandMenu.Title` / `Description`. |
 | `children` | `ReactNode` | — (required) | Title, Description, Input, List, Footer. |
@@ -158,7 +158,7 @@ CommandMenu.Root                 Modal + top-aligned palette panel, query and lo
 | `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the label), `className` and the other span attributes. |
 
 ## Variants
-One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radius`, `shadow-modal`, `--prime-modal-width-l` wide, placed in the top part of the viewport so the search row never jumps while the list filters.
+One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radius`, `shadow-modal`, the width of a Modal of size `l`, placed in the top part of the viewport (`placement="top"`) so the search row never jumps while the list filters.
 
 ### size (Root)
 | Value | Looks like | Use when | Default |
@@ -200,7 +200,7 @@ One look: the floating layer of the ladder (it is a Modal), `--prime-modal-radiu
 | size | `size` | `data-size` on the tier wrapper |
 
 ## Layout & spacing
-- Width `--prime-modal-width-l`, max height 1.5 × `--prime-panel-max-height`; only the list scrolls.
+- The width of a Modal of size `l`; the list is at most 1.5 × `--prime-panel-max-height` tall and only it scrolls.
 - One content column: title, search icon, group labels and item icons start 16 from the edge.
 - `CommandMenu.ItemIcon` holds the glyph at the tier icon size; `CommandMenu.ItemShortcut` is a `Kbd` one tier below, pushed to the end of the item.
 - Search row and footer are separated from the list by hairlines; the search row hairline is faint.

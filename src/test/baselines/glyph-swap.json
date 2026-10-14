@@ -1,8 +1,6 @@
 [
   "src/components/chart-frame/ChartFrame.tsx: useStateSwap outside the engine",
   "src/components/chart-frame/ChartFrame.tsx: useStateSwap outside the engine #2",
-  "src/components/command-menu/CommandMenu.tsx: key={swapped",
-  "src/components/command-menu/CommandMenu.tsx: useStateSwap outside the engine",
   "src/components/composer/Composer.tsx: glyph name ternary",
   "src/components/composer/Composer.tsx: glyph name ternary #2",
   "src/components/data-table/DataTable.tsx: useStateSwap outside the engine",

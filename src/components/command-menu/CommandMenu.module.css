@@ -3,42 +3,11 @@
  * of sections, a footer with key hints (hairline above). Rows come from `internal/menu.module.css`.
  */
 
-/* Top-aligned palette: the list grows downwards, the search row never jumps. `[role]` outranks
-   the Modal scrim layout whatever the CSS order. */
-.overlay[role="presentation"] {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding-block-start: clamp(var(--prime-modal-viewport-padding), 12vh, var(--prime-space-24));
-  padding-block-end: max(var(--prime-modal-viewport-padding), env(safe-area-inset-bottom, 0px));
-  padding-inline: max(var(--prime-modal-viewport-padding), env(safe-area-inset-left, 0px));
-}
-
-/* `[role="dialog"]` outranks the padding and grid of `Modal.Content` whatever the CSS order. */
-.content[role="dialog"] {
-  --cm-max-height: calc(var(--prime-panel-max-height) * 1.5);
+/* The dialog surface, its top placement and the column are Modal's (`placement="top"`). */
+.content {
   /* One content column: title, search icon, group labels and item icons start at 16
      (list padding 8 + row padding 8). */
   --cm-inset: calc(var(--prime-space-2) + var(--prime-panel-item-padding-x));
-
-  box-sizing: border-box;
-  display: flex;
-  /* Hug the results instead of growing into an empty sheet. */
-  flex: 0 1 auto;
-  flex-direction: column;
-  gap: 0;
-  width: min(100%, var(--prime-modal-width-l));
-  min-width: 0;
-  max-width: 100%;
-  max-height: min(var(--cm-max-height), calc(100dvh - 2 * var(--prime-modal-viewport-padding)));
-  padding: 0;
-  overflow: hidden;
-  border-radius: var(--prime-modal-radius);
-  background: var(--prime-color-layer-current);
-  box-shadow: var(--prime-shadow-modal);
-  color: var(--prime-color-text-primary);
-  font-family: var(--prime-font-family-sans);
 }
 
 /* Search row height per tier; the row metrics come from `menu.tier` on the same element. */
@@ -85,44 +54,23 @@
   padding-inline: var(--cm-inset);
 }
 
+/* The search text and height of the row's field tier (`l`, set in TSX). */
 .input {
-  min-height: var(--prime-control-l-height);
-  font-size: var(--prime-text-body-l-size);
-  line-height: var(--prime-text-body-l-line-height);
+  min-height: var(--field-h);
 }
 
 /* ─── List / groups / items ─────────────────────────────────────────────── */
 
+/* The results scroll under the search row, at most one and a half panels tall: the palette hugs
+   short results instead of growing into an empty sheet. */
 .list {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  padding: var(--prime-space-2);
-}
-
-/* A load error replaces the list: `hidden` must win over `display: flex`. */
-.list[hidden] {
-  display: none;
-}
-
-/* The list content of one load state (loading · error · ready); it fades in when the state swaps. */
-.region {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-1);
   min-width: 0;
-}
-
-/* A group whose items are all filtered out: `hidden` must win over `display: flex`. */
-.group[hidden] {
-  display: none;
-}
-
-.item {
-  gap: var(--prime-space-3);
-  padding-block: var(--prime-space-1);
+  min-height: 0;
+  max-height: calc(var(--prime-panel-max-height) * 1.5);
+  padding: var(--prime-space-2);
 }
 
 .itemText {

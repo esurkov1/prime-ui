@@ -7,7 +7,6 @@
   "src/components/chart-frame/ChartFrame.module.css: control tier tokens outside fieldTier",
   "src/components/color-picker/ColorPicker.module.css: control tier tokens outside fieldTier",
   "src/components/color-picker/ColorPresets.module.css: control tier tokens outside fieldTier",
-  "src/components/command-menu/CommandMenu.module.css: control tier tokens outside fieldTier",
   "src/components/data-table/DataTable.module.css: control tier tokens outside fieldTier",
   "src/components/datepicker/Datepicker.module.css: control tier tokens outside fieldTier",
   "src/components/description-list/DescriptionList.module.css: control tier tokens outside fieldTier",

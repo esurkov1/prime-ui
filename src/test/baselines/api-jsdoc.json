@@ -165,7 +165,6 @@
   "src/components/command-menu/CommandMenu.tsx: CommandMenuRootProps.onRetry",
   "src/components/command-menu/CommandMenu.tsx: CommandMenuRootProps.onSearchChange",
   "src/components/command-menu/CommandMenu.tsx: CommandMenuRootProps.search",
-  "src/components/command-menu/CommandMenu.tsx: CommandMenuRootProps.size",
   "src/components/composer/Composer.tsx: ComposerAttachProps.accept",
   "src/components/composer/Composer.tsx: ComposerAttachProps.children",
   "src/components/composer/Composer.tsx: ComposerContextProps.children",
