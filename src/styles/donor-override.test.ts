@@ -33,6 +33,12 @@ const PUBLIC_HOOKS = [
 
 const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);
 
+/**
+ * Tables that publish variables for hosts to read (CLAUDE.md §2: hosts read the tier variables of
+ * fieldTier): what they set is their output, not a donor's private variable.
+ */
+const PUBLISHED = new Set(["src/internal/fieldTier.module.css"]);
+
 const files = moduleCssFiles().filter((file) => !file.includes("/examples/"));
 
 describe("donor overrides", () => {
@@ -62,6 +68,7 @@ describe("donor overrides", () => {
         }
         for (const decl of rule.decls) {
           if (!decl.prop.startsWith("--") || decl.prop.startsWith("--prime-")) continue;
+          if (PUBLISHED.has(file)) continue;
           if (PUBLIC_HOOKS.some((hook) => hook.test(decl.prop))) continue;
           const users = [...(readers.get(decl.prop) ?? [])];
           if (users.length === 0) continue; // unread: css-modules.test.ts
