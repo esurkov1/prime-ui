@@ -16,7 +16,7 @@ export default function EmptyPageSizesExample() {
           <EmptyPage.Title id={`empty-size-${size}`}>Счетов нет · {size}</EmptyPage.Title>
           <EmptyPage.Description>Выставленные счета появятся здесь.</EmptyPage.Description>
           <EmptyPage.Actions>
-            <Button.Root size={size}>Выставить счёт</Button.Root>
+            <Button.Root>Выставить счёт</Button.Root>
           </EmptyPage.Actions>
         </EmptyPage.Root>
       ))}

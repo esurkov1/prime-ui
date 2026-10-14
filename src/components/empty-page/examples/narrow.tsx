@@ -1,4 +1,4 @@
-/** In a 320 px side panel the text wraps under the tile and the actions wrap to a second line. */
+/** In a 320 px side panel the text wraps under the tile and the actions wrap to a second line — `EmptyPage.Actions`. */
 import { Button, Card, EmptyPage, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -15,10 +15,10 @@ export default function EmptyPageNarrowExample() {
           Под выбранные регион и категорию никто не подходит. Ослабьте фильтры.
         </EmptyPage.Description>
         <EmptyPage.Actions>
-          <Button.Root variant="outline" tone="neutral" size="s">
+          <Button.Root variant="outline" tone="neutral">
             Сбросить фильтры
           </Button.Root>
-          <Button.Root size="s">Пригласить поставщика</Button.Root>
+          <Button.Root>Пригласить поставщика</Button.Root>
         </EmptyPage.Actions>
       </EmptyPage.Root>
     </Card.Root>

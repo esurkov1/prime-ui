@@ -2,6 +2,7 @@ import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import enterMotion from "@/internal/enterMotion.module.css";
 
 import { EmptyPage } from "./EmptyPage";
@@ -17,6 +18,21 @@ describe("EmptyPage", () => {
     expect(screen.getByTestId("empty")).toHaveAttribute("data-size", "m");
     expect(screen.getByRole("heading", { level: 2, name: "Нет данных" })).toBeInTheDocument();
     expect(screen.getByText("Добавьте записи, чтобы увидеть список.")).toBeInTheDocument();
+  });
+
+  it("takes the host tier without its own size and hides the decorative icon tile", () => {
+    render(
+      <ControlSizeProvider value="s">
+        <EmptyPage.Root data-testid="empty">
+          <EmptyPage.Icon data-testid="tile">
+            <svg />
+          </EmptyPage.Icon>
+          <EmptyPage.Title>Нет данных</EmptyPage.Title>
+        </EmptyPage.Root>
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByTestId("empty")).toHaveAttribute("data-size", "s");
+    expect(screen.getByTestId("tile")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("renders the title with the tag from `as`", () => {

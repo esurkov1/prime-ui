@@ -11,9 +11,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Icon tile, title type and padding; given to the controls inside.",
-          ru: "Плашка иконки, шрифт заголовка и отступы; передаётся контролам внутри.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Icon tile, title type and padding; given to the controls inside. Without it the tier of its host, else `m`.",
+          ru: "Плашка иконки, шрифт заголовка и отступы; передаётся контролам внутри. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "layout",
@@ -155,8 +155,8 @@ export const api: ComponentApi = {
         ru: 'В фильтруемом меню или списке задайте `role="status"`, чтобы скринридер объявил «Ничего не найдено».',
       },
       {
-        en: "The icon is decorative: pass it with `aria-hidden`.",
-        ru: "Иконка декоративна: передавайте её с `aria-hidden`.",
+        en: "`EmptyPage.Icon` is `aria-hidden`: the tile is decorative, the title says what the state is.",
+        ru: "`EmptyPage.Icon` скрыт от скринридера (`aria-hidden`): плашка декоративна, о состоянии говорит заголовок.",
       },
     ],
   },
