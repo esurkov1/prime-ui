@@ -7,6 +7,7 @@ import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { useDisclosure } from "@/internal/Disclosure";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { fieldTierClass } from "@/internal/fieldClasses";
 import { iconSlotClass } from "@/internal/iconBox";
 import type { ControlSize } from "@/internal/states";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
@@ -116,7 +117,7 @@ function AccordionRoot(props: AccordionRootProps) {
     <AccordionProvider value={contextValue}>
       <div
         {...rest}
-        className={cx(styles.root, className)}
+        className={cx(fieldTierClass, styles.root, className)}
         data-depth={depth}
         {...toDataAttributes({ size: tier.size, layout })}
       >

@@ -152,7 +152,7 @@ describe("Badge", () => {
     expect(badgeOf("Просрочен")).toHaveAttribute("data-tone", "danger");
     expect(badgeOf("Просрочен")).not.toHaveAttribute("data-color");
     expect(badgeOf("Черновик")).toHaveAttribute("data-color", "gray");
-    expect(cssValue(cssRule(CSS, '.root[data-tone="danger"]'), "--hue-soft")).toBe(
+    expect(cssValue(cssRule(CSS, '.root[data-tone="danger"]'), "--badge-soft")).toBe(
       "var(--prime-color-danger-soft)",
     );
     // @ts-expect-error: a status tone and a category hue never go together

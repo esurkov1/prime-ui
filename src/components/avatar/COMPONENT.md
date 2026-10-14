@@ -76,7 +76,7 @@ Avatar.Group           overlapping row, gives its size to members
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | `"m"` | Size of every `Avatar.Root` / `Avatar.Overflow` inside without its own `size`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl" \| "2xl"` | — | Size of every `Avatar.Root` / `Avatar.Overflow` inside without its own `size`; unset, they stay `m`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `aria-label`, `className` and the other div attributes. |
 
 ### Avatar.Overflow
@@ -118,7 +118,7 @@ The soft fill is opaque: the soft hue is composited over the ground the avatar s
 
 ## Layout & spacing
 - Inline-flex, never shrinks, `vertical-align: middle`.
-- Avatar → name: `--prime-space-3` in lists and cards, `--prime-space-2` in table cells.
+- Avatar → name: space step 3 (12px) in lists and cards, step 2 (8px) in table cells.
 - Group: members overlap by 25% of the diameter with a 2px ring in the ground they stand on: the current layer of the surface around them (no surface sets anything), or `--avatar-ring` from a host whose ground is not a layer (a reaction chip sets its own fill); the fills of initials and «+N» are composited over the same ground.
 - An icon fallback is half the diameter: a kit `Icon` reads `--prime-icon-size`, a raw svg too.
 - A host slot may size the avatar by setting `--avatar-slot-size`.

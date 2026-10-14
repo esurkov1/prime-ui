@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import pill from "@/internal/mediaPill.module.css";
 import { cssRule, cssValue } from "@/test/css";
 
@@ -20,6 +21,17 @@ describe("Thumbnail", () => {
     expect(root).toHaveAttribute("data-ratio", "16:9");
     expect(root).toHaveAttribute("data-color", "red");
     expect(root).toHaveAttribute("data-full-width", "true");
+  });
+
+  it("takes its host's tier without a size of its own", () => {
+    render(
+      <ControlSizeProvider value="l">
+        <Thumbnail.Root data-testid="host" />
+        <Thumbnail.Root data-testid="own" size="s" />
+      </ControlSizeProvider>,
+    );
+    expect(screen.getByTestId("host")).toHaveAttribute("data-size", "l");
+    expect(screen.getByTestId("own")).toHaveAttribute("data-size", "s");
   });
 
   it("shows the image once loaded and hides the fallback from assistive tech", () => {

@@ -5,6 +5,7 @@ import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { cx } from "@/internal/cx";
 import { highlightTsx, type TsxTokenKind } from "@/internal/highlightTsx";
 import type { Variant } from "@/internal/states";
+import textRole from "@/internal/textRole.module.css";
 
 import styles from "./CodeBlock.module.css";
 
@@ -14,11 +15,8 @@ export type CodeBlockColorScheme = "light" | "dark";
 export type CodeBlockVariant = Extract<Variant, "soft" | "ghost">;
 
 export type CodeBlockProps = Omit<React.HTMLAttributes<HTMLPreElement>, "children"> & {
-  /** TS/TSX source; highlighted by the kit's TS / TSX tokenizer. */
   code: string;
-  /** Forces a theme for the block. Omit to follow the surrounding theme. */
   colorScheme?: CodeBlockColorScheme;
-  /** Default `soft`. */
   variant?: CodeBlockVariant;
   ref?: React.Ref<HTMLPreElement>;
 };
@@ -66,8 +64,11 @@ export function CodeBlock({
   );
   const shared = {
     ...rest,
-    className: cx(styles.root, className),
+    className: cx(variant === "soft" && textRole.code, styles.root, className),
     "data-theme": colorScheme,
+    // A soft block of a fixed scheme carries its own ground: the floating surface of that scheme,
+    // so the palette stays legible whatever the page around it.
+    "data-depth": variant === "soft" && colorScheme ? "floating" : undefined,
     "data-variant": variant,
   };
 

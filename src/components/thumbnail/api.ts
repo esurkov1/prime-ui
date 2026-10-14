@@ -10,9 +10,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Height 24 · 32 · 40 · 48 · 64 px, radius 4 · 6 · 8 · 8 · 12; width follows `ratio`.",
-          ru: "Высота 24 · 32 · 40 · 48 · 64 px, скругление 4 · 6 · 8 · 8 · 12; ширина по `ratio`.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Height 24 · 32 · 40 · 48 · 64 px, radius 4 · 6 · 8 · 8 · 12; width follows `ratio`. Without it the tile takes the tier of its host, else `m`.",
+          ru: "Высота 24 · 32 · 40 · 48 · 64 px, скругление 4 · 6 · 8 · 8 · 12; ширина по `ratio`. Без него плитка берёт ярус контейнера, иначе `m`.",
         },
         {
           name: "ratio",

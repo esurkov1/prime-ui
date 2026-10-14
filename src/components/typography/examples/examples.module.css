@@ -6,7 +6,6 @@
   gap: var(--prime-space-2);
   max-width: var(--prime-layout-form-width-s);
   margin: 0;
-  text-align: start;
 }
 
 /* inline-emphasis.tsx: a paragraph keeps inline flow, its spans must not become grid rows. */
@@ -18,7 +17,6 @@ p.block {
 .stack {
   display: grid;
   gap: var(--prime-space-3);
-  text-align: start;
 }
 
 /* article.tsx: long-form text at the reading width. */
@@ -26,13 +24,12 @@ p.block {
   display: grid;
   gap: var(--prime-space-4);
   max-width: var(--prime-layout-reading-max-width);
-  text-align: start;
 }
 
+/* The quote stands in from the text column. */
 .article blockquote {
   margin: 0;
-  padding-inline-start: var(--prime-space-3);
-  border-inline-start: var(--prime-space-1) solid var(--prime-color-fill-strong);
+  padding-inline-start: var(--prime-space-4);
 }
 
 /* truncate.tsx: 240px, narrow enough to show the ellipsis. */

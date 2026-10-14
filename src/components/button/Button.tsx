@@ -11,6 +11,7 @@ import { iconSlotClass } from "@/internal/iconBox";
 import { iconLayout } from "@/internal/iconLayout";
 import { InteractiveElement } from "@/internal/interactiveElement";
 import { MorphText } from "@/internal/MorphText";
+import mediaPill from "@/internal/mediaPill.module.css";
 import { readCssDurationMs } from "@/internal/motionTiming";
 import press from "@/internal/press.module.css";
 import { Ring } from "@/internal/ring";
@@ -256,6 +257,7 @@ function ButtonRoot({
     fieldTierClass,
     touchTargetClass,
     circle || layout.iconOnly ? press.pressCompact : press.press,
+    variant === "shade" && mediaPill.inkValue,
     styles.root,
     className,
   );

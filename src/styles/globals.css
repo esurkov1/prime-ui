@@ -119,6 +119,16 @@ textarea:disabled::placeholder {
 }
 
 /*
+ * Host hooks: context variables a host sets for the kit parts inside it, with no value of their
+ * own. `initial` is the guaranteed-invalid value, so a reader's fallback applies until a host
+ * sets one:
+ *   --prime-icon-size   the glyph size of the kit icons inside (a Button, a Badge, an Avatar…)
+ */
+:root {
+  --prime-icon-size: initial;
+}
+
+/*
  * Surface depth (foundation §4). The page (and the AppShell panel) is layer 0; every surface (Card,
  * Sidebar, Accordion, DataTable…) sets `data-depth` one above the surface around it, floating layers set
  * `floating`. Each depth points the context variables at its row of `--prime-color-layer-*`:

@@ -5,6 +5,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useImageStatus } from "@/hooks/useImageStatus";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { prefersReducedMotion } from "@/hooks/usePresence";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { formatClock } from "@/internal/formatClock";
@@ -20,7 +21,7 @@ import { useMediaSession } from "@/internal/mediaSession";
 import palette from "@/internal/palette.module.css";
 import press from "@/internal/press.module.css";
 import { Slot } from "@/internal/slot";
-import type { ControlSize, PaletteColor } from "@/internal/states";
+import { type ControlSize, compactTier, type PaletteColor } from "@/internal/states";
 
 import styles from "./Thumbnail.module.css";
 
@@ -47,22 +48,13 @@ export type ThumbnailRootProps = Omit<
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** The check of a selectable tile follows the frame: small frames take the smallest box. */
-const CHECK_SIZE: Record<ControlSize, ControlSize> = {
-  xs: "xs",
-  s: "xs",
-  m: "xs",
-  l: "s",
-  xl: "s",
-};
-
 /**
  * A preview of an object (product, vehicle, file, cover) at a fixed aspect ratio. People use Avatar.
  * With `asChild` it is a link or a button that opens the object; with the checked triad a
  * selectable tile of a media library.
  */
 function ThumbnailRoot({
-  size = "m",
+  size: sizeProp,
   ratio = "1:1",
   color = "gray",
   variant = "soft",
@@ -77,6 +69,7 @@ function ThumbnailRoot({
   ref,
   ...rest
 }: ThumbnailRootProps) {
+  const { size, provide } = useHostTier(sizeProp);
   const selectable =
     checkedProp !== undefined || defaultChecked !== undefined || onCheckedChange !== undefined;
   const [checked, setChecked] = useControllableState({
@@ -101,7 +94,7 @@ function ThumbnailRoot({
 
   if (selectable) {
     const { onClick } = rest as React.ButtonHTMLAttributes<HTMLButtonElement>;
-    return (
+    return provide(
       <slot.ImageSlotProvider>
         {/* biome-ignore lint/a11y/useSemanticElements: a picture tile cannot be an <input>; the button carries the checkbox role and its state */}
         <button
@@ -118,29 +111,29 @@ function ThumbnailRoot({
         >
           {children}
           <span className={styles.check} aria-hidden="true">
-            <Checkbox.Indicator checked={checked} size={fullWidth ? "s" : CHECK_SIZE[size]} />
+            <Checkbox.Indicator checked={checked} size={fullWidth ? "s" : compactTier(size)} />
           </span>
         </button>
-      </slot.ImageSlotProvider>
+      </slot.ImageSlotProvider>,
     );
   }
 
   if (asChild) {
-    return (
+    return provide(
       <slot.ImageSlotProvider>
-        <Slot {...rest} {...frame} ref={ref as React.Ref<HTMLElement>}>
+        <Slot {...rest} {...frame} ref={ref}>
           {children}
         </Slot>
-      </slot.ImageSlotProvider>
+      </slot.ImageSlotProvider>,
     );
   }
 
-  return (
+  return provide(
     <slot.ImageSlotProvider>
       <div ref={ref} {...frame} {...rest}>
         {children}
       </div>
-    </slot.ImageSlotProvider>
+    </slot.ImageSlotProvider>,
   );
 }
 ThumbnailRoot.displayName = "Thumbnail.Root";

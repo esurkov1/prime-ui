@@ -41,25 +41,25 @@ export default function SkeletonWithCrossfadeExample() {
         </Card.Header>
         <Card.Body>
           <Crossfade state={loading ? "loading" : "ready"} aria-busy={loading}>
-            <ul className={styles.list}>
+            <div className={styles.list}>
               {PAYMENTS.map((payment) =>
                 loading ? (
-                  <li key={payment.id} className={styles.row}>
+                  <div key={payment.id} className={styles.row}>
                     <Skeleton className={styles.payer} />
                     <Skeleton className={styles.amount} />
-                  </li>
+                  </div>
                 ) : (
-                  <li key={payment.id} className={styles.row}>
+                  <div key={payment.id} className={styles.row}>
                     <Typography as="span" variant="body-m">
                       {payment.payer}
                     </Typography>
                     <Typography as="span" variant="body-m" numeric="tabular">
                       {payment.amount}
                     </Typography>
-                  </li>
+                  </div>
                 ),
               )}
-            </ul>
+            </div>
           </Crossfade>
         </Card.Body>
       </Card.Root>

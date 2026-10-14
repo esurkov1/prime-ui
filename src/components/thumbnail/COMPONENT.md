@@ -41,7 +41,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Height 24 · 32 · 40 · 48 · 64 px, radius 4 · 6 · 8 · 8 · 12; width follows `ratio`. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Height 24 · 32 · 40 · 48 · 64 px, radius 4 · 6 · 8 · 8 · 12; width follows `ratio`. Without it the tile takes the tier of its host, else `m`. |
 | `ratio` | `"1:1" \| "4:3" \| "3:2" \| "16:9" \| "3:4"` | `"1:1"` | Aspect ratio, width ÷ height. |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | `"gray"` | Fallback fill and icon hue; a color that means something (category, vehicle color). |
 | `variant` | `"soft" \| "solid"` | `"soft"` | Fallback fill: a soft tint with a hue icon, or a solid hue with a contrasting icon. |

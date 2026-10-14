@@ -1,4 +1,4 @@
-/** In a narrow column a long line scrolls inside the block and never wraps; Tab, then arrow keys. */
+/** In a narrow column a long line scrolls inside the block and never wraps; Tab, then arrow keys — `aria-label`. */
 import { CodeBlock } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

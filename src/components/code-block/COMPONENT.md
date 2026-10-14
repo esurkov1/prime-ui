@@ -54,8 +54,8 @@ CodeBlock        <pre> (a ScrollContainer when `soft`); variant, colorScheme (da
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | — (omitted) | token colors and fill follow the page theme | normal case | yes |
-| `light` | light palette; the soft fill becomes that scheme's floating layer (`layer-floating-bg`) | a light sample inside a dark page | |
-| `dark` | dark palette; the soft fill becomes that scheme's floating layer (`layer-floating-bg`) | a terminal-like sample inside a light page | |
+| `light` | light palette; a soft block becomes a floating surface of that scheme and paints its ground | a light sample inside a dark page | |
+| `dark` | dark palette; a soft block becomes a floating surface of that scheme and paints its ground | a terminal-like sample inside a light page | |
 
 Syntax tokens: keywords purple (weight 500), strings teal, numbers orange, JSX tags blue, comments muted italic — palette text tokens, readable in both themes.
 
@@ -63,13 +63,13 @@ Syntax tokens: keywords purple (weight 500), strings teal, numbers orange, JSX t
 | State | Driven by | DOM |
 |---|---|---|
 | treatment | `variant` | `data-variant` (always set) |
-| fixed scheme | `colorScheme` | `data-theme` re-scopes the palette for the block |
+| fixed scheme | `colorScheme` | `data-theme` re-scopes the palette for the block; a soft block adds `data-depth="floating"` |
 | focus-visible | keyboard focus on a `soft` block | inset focus ring |
 
 ## Layout & spacing
 - `max-width: 100%`; the block takes the column width and long lines scroll horizontally inside it (`white-space: pre`, tab size 2), with the kit's thin scrollbar.
-- Heading / text → code block: `--prime-space-2` to `--prime-space-4`.
-- Constrain the column (`--prime-layout-reading-max-width` for docs), not the block.
+- Heading / text → code block: space step 2–4 (8–16px).
+- Constrain the column (PageContent `maxWidth="readable"` for docs), not the block.
 
 ## Accessibility
 
@@ -99,7 +99,7 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | An API response sample on a filled panel, named for screen readers — `code`, `aria-label`. |
 | [variants.tsx](examples/variants.tsx) | A filled panel and a bare block that takes type and background from its host — `variant`. |
 | [color-scheme.tsx](examples/color-scheme.tsx) | A block fixed to one scheme looks the same in both page themes — `colorScheme`. |
-| [narrow.tsx](examples/narrow.tsx) | In a narrow column a long line scrolls inside the block and never wraps; Tab, then arrow keys. |
+| [narrow.tsx](examples/narrow.tsx) | In a narrow column a long line scrolls inside the block and never wraps; Tab, then arrow keys — `aria-label`. |
 
 ## Mistakes
 - Passing JSX children → pass the source string to `code`.

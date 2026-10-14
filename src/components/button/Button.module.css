@@ -244,15 +244,16 @@
 /* shade: the media disk ground — translucent, under a gentle blur, so the frame shows through —
    and its light glyph: a button over a picture, a video or a video circle; the same in both
    themes (the media is the ground). Danger is the danger disk (a failed transfer). The still
-   disk of `internal/mediaDisk` (a play mark) is the same look. */
+   disk of `internal/mediaDisk` (a play mark) is the same look. The light ink is the media shade's
+   (`internal/mediaPill` `.inkValue`, joined in TSX). */
 .root[data-variant="shade"] {
   --btn-bg: var(--prime-color-media-disk);
   --btn-bg-hover: color-mix(
     in srgb,
-    var(--prime-color-media-shade-fg) var(--prime-tint-soft),
+    var(--media-ink) var(--prime-tint-soft),
     var(--prime-color-media-disk)
   );
-  --btn-fg: var(--prime-color-media-shade-fg);
+  --btn-fg: var(--media-ink);
 
   -webkit-backdrop-filter: blur(var(--prime-media-disk-blur));
   backdrop-filter: blur(var(--prime-media-disk-blur));
@@ -290,10 +291,10 @@
   }
 }
 
-/* A toggle that is on (`pressed`) and the current page (`current`, or `aria-current="page"` set by
-   a router link): the selected look (foundation §8, accent soft) over any tone × variant; the fill
-   and text glide in and out with the shared color transition. */
-.root:is([data-pressed="true"], [data-current="true"], [aria-current="page"])[data-variant] {
+/* A toggle that is on (`aria-pressed`) and the current page (`current`, or `aria-current="page"`
+   set by a router link): the selected look (foundation §8, accent soft) over any tone × variant;
+   the fill and text glide in and out with the shared color transition. */
+.root:is([aria-pressed="true"], [data-current="true"], [aria-current="page"])[data-variant] {
   --btn-bg: var(--prime-color-accent-soft);
   --btn-bg-hover: var(--prime-color-accent-soft-hover);
   --btn-bg-active: var(--prime-color-accent-soft-hover);
@@ -382,19 +383,14 @@
   cursor: progress;
 }
 
-/* No leading icon: the auto spinner is centered over the label, which keeps its space. */
+/* No leading icon: the auto spinner is centered over the label, which keeps its space. The label's
+   glyphs and the other parts hide; the text color stays, so the spinner keeps the button's ink on
+   every tone (an `inherit` button's ink is its host's). */
 .root[data-loading-overlay="true"] {
-  color: transparent;
-}
-
-/* inherit: `color: transparent` would take the spinner's currentColor with it; hide the label's
-   glyphs and the other parts instead. */
-.root[data-tone="inherit"][data-loading-overlay="true"] {
-  color: var(--btn-fg);
   -webkit-text-fill-color: transparent;
 }
 
-.root[data-tone="inherit"][data-loading-overlay="true"] > :not(.spinner) {
+.root[data-loading-overlay="true"] > :not(.spinner) {
   visibility: hidden;
 }
 

@@ -16,8 +16,13 @@
   /* Edge paddings are variables: an icon or dot at an edge turns into a segment and takes that side. */
   --badge-pad-start: var(--chip-px);
   --badge-pad-end: var(--chip-px);
-  --badge-bg: var(--hue-soft);
-  --badge-fg: var(--hue-text);
+  /* Color slots: the palette hue (`--hue-*`), or the role colors of a status tone (below). */
+  --badge-soft: var(--hue-soft);
+  --badge-text: var(--hue-text);
+  --badge-solid: var(--hue-solid);
+  --badge-solid-fg: var(--hue-solid-fg);
+  --badge-bg: var(--badge-soft);
+  --badge-fg: var(--badge-text);
   --badge-line: transparent;
 
   /* A segment holds its mark with equal space on both sides: (padding + gap) / 2 to the edge and
@@ -87,46 +92,46 @@
   text-overflow: clip;
 }
 
-/* ─── Status tones: the role colors in the hue's slots ──────────────────── */
+/* ─── Status tones: the role colors in the badge's color slots ──────────── */
 
 .root[data-tone="success"] {
-  --hue-soft: var(--prime-color-success-soft);
-  --hue-text: var(--prime-color-success-text);
-  --hue-solid: var(--prime-color-success-default);
-  --hue-solid-fg: var(--prime-color-success-fg);
+  --badge-soft: var(--prime-color-success-soft);
+  --badge-text: var(--prime-color-success-text);
+  --badge-solid: var(--prime-color-success-default);
+  --badge-solid-fg: var(--prime-color-success-fg);
 }
 
 .root[data-tone="warning"] {
-  --hue-soft: var(--prime-color-warning-soft);
-  --hue-text: var(--prime-color-warning-text);
-  --hue-solid: var(--prime-color-warning-default);
-  --hue-solid-fg: var(--prime-color-warning-fg);
+  --badge-soft: var(--prime-color-warning-soft);
+  --badge-text: var(--prime-color-warning-text);
+  --badge-solid: var(--prime-color-warning-default);
+  --badge-solid-fg: var(--prime-color-warning-fg);
 }
 
 .root[data-tone="danger"] {
-  --hue-soft: var(--prime-color-danger-soft);
-  --hue-text: var(--prime-color-danger-text);
-  --hue-solid: var(--prime-color-danger-default);
-  --hue-solid-fg: var(--prime-color-danger-fg);
+  --badge-soft: var(--prime-color-danger-soft);
+  --badge-text: var(--prime-color-danger-text);
+  --badge-solid: var(--prime-color-danger-default);
+  --badge-solid-fg: var(--prime-color-danger-fg);
 }
 
 .root[data-tone="info"] {
-  --hue-soft: var(--prime-color-info-soft);
-  --hue-text: var(--prime-color-info-text);
-  --hue-solid: var(--prime-color-info-default);
-  --hue-solid-fg: var(--prime-color-info-fg);
+  --badge-soft: var(--prime-color-info-soft);
+  --badge-text: var(--prime-color-info-text);
+  --badge-solid: var(--prime-color-info-default);
+  --badge-solid-fg: var(--prime-color-info-fg);
 }
 
 /* ─── Variants ──────────────────────────────────────────────────────────── */
 
 .root[data-variant="solid"] {
-  --badge-bg: var(--hue-solid);
-  --badge-fg: var(--hue-solid-fg);
+  --badge-bg: var(--badge-solid);
+  --badge-fg: var(--badge-solid-fg);
 }
 
 .root[data-variant="outline"] {
   --badge-bg: transparent;
-  --badge-line: color-mix(in srgb, var(--hue-text) var(--prime-tint-line), transparent);
+  --badge-line: color-mix(in srgb, var(--badge-text) var(--prime-tint-line), transparent);
 }
 
 /* A toggle that is on: the selected look (foundation §8, accent soft) over any hue and variant;
@@ -399,6 +404,13 @@
   opacity: 1;
   pointer-events: auto;
   transform: none;
+}
+
+/* An action that is on (`pressed`, a value hidden by its «−») stays shown (`persistent` in TSX)
+   and carries the pressed wash at full ink. */
+.action[aria-pressed="true"] {
+  background-color: var(--prime-color-fill-subtle-active);
+  color: inherit;
 }
 
 /* A fine pointer reveals the segment on hover; the slide is a hover transform. */

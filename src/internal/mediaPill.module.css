@@ -11,6 +11,8 @@
  *           caption size in the muted light ink, tabular numbers; a dot or a glyph may follow
  *   .tag    a small square-cornered caption tag on the shade (a file's format over a picture)
  *   .ink    the light ink alone: text standing on media with no ground of its own
+ *   .inkValue  the light ink as `--media-ink`, for a part that paints its own states (a shade
+ *           Button)
  *   .inkMuted  the muted light ink: secondary text on the shade (a time beside a seek, a size)
  *   .fade   a gradient into the shade toward the block end (a band of text along a picture's
  *           bottom edge)
@@ -57,6 +59,12 @@
 
 .ink {
   color: var(--prime-color-media-shade-fg);
+}
+
+/* The light ink as a value (`--media-ink`), for a part that paints its own states from it and
+   keeps its own `color` (a shade Button: its glyph, its hover wash, its disabled ink). */
+.inkValue {
+  --media-ink: var(--prime-color-media-shade-fg);
 }
 
 .inkMuted {

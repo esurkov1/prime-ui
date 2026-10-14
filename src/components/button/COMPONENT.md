@@ -170,7 +170,7 @@ A Button lines up exactly with Input, Select, Datepicker trigger, SegmentedContr
 Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-shape`, `data-density`, `data-align`, `data-full-width`, `data-icon-only`, `data-leading-icon`, `data-trailing-icon`.
 
 ## Layout & spacing
-- Buttons in a row: `gap: var(--prime-space-2)`–`var(--prime-space-3)`; toolbar icon buttons `var(--prime-space-1)`.
+- Buttons in a row: a gap of space step 2–3 (8–12px); toolbar icon buttons step 1 (4px).
 - Form footer: actions at the end, primary last; in a narrow container they stack full width (`fullWidth` in a column).
 - Height: the tier's (`size`), or the host's through `--prime-control-height` (a glass action as tall as the BottomNav capsule).
 - `max-width: 100%`, the label does not wrap (`white-space: nowrap`).
@@ -220,8 +220,8 @@ Other data attributes: `data-variant`, `data-tone`, `data-size`, `data-shape`, `
 | [density.tsx](examples/density.tsx) | Page numbers stay square and the current one takes the selected look; a speed chip sits inside a caption line — `density`, `current`. |
 | [align.tsx](examples/align.tsx) | A column of export actions reads from the start edge, every row the full width — `align`, `fullWidth`. |
 | [hold-to-confirm.tsx](examples/hold-to-confirm.tsx) | A destructive action that needs a held press; letting go early rolls the fill back and does nothing, and the delete request keeps the button loading until the server answers — `holdToConfirm`, `onConfirm`. |
-| [label-morph.tsx](examples/label-morph.tsx) | A new label flows into the button letter by letter while the width glides: save, then saved; a step flow that turns green once paid — `children`, `loading`, `tone`. |
-| [on-colored-host.tsx](examples/on-colored-host.tsx) | Actions on a colored strip take its text color: a ghost icon close and a soft action — `tone="inherit"`. |
+| [label-morph.tsx](examples/label-morph.tsx) | A new label flows into the button letter by letter while the width glides: save, then saved; a step flow that turns green once paid — `loading`, `tone`. |
+| [on-colored-host.tsx](examples/on-colored-host.tsx) | Actions on a solid banner take its text color: a soft action and a ghost one beside it — `tone="inherit"`. |
 | [as-child.tsx](examples/as-child.tsx) | The button look on a real link; a disabled link blocks navigation — `asChild`, `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | A toggle whose state the screen owns: pinning an order shows the note under it — `pressed`, `onPressedChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A full-width submit button that shows the request in progress after the email passes validation — `type`, `loading`, `fullWidth`. |
