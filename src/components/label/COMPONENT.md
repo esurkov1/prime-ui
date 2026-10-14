@@ -94,7 +94,7 @@ Label has no `variant` or `tone`.
 | secondary | `secondary` | `data-secondary="true"` |
 | size | `size`, else the host tier | `data-size` |
 
-The label has no hover or focus state; clicking it focuses the control bound with `htmlFor`. Its color eases between the states.
+The label has no hover or focus state; clicking it focuses the control bound with `htmlFor`. Its color eases between the states. Disabled sets `--label-dimmed`, which every marker and the description read; a field frame sets it on its label when the native control inside is disabled and nothing passed `disabled` (a state only CSS sees).
 
 ## Layout & spacing
 - Label → field: the tier `--field-label-gap` (4 on xs/s, 8 on m–xl) — the same gap fields use for their built-in label. The text comes from the field tier (`--field-label-size`, `--field-label-lh`).

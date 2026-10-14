@@ -34,6 +34,9 @@ const PUBLIC_HOOKS = [
   /^--scroll-fade-depth$/,
   // Avatar's ground on a host that is not a layer of the ladder (Avatar COMPONENT.md).
   /^--avatar-ring$/,
+  // Label's dimmed ink: a field frame dims its label over a disabled native control, which only
+  // CSS sees (`:has(:disabled)`), so it cannot pass `disabled` (Label COMPONENT.md).
+  /^--label-dimmed$/,
 ];
 
 const GLOBAL_HTML = new Set(["src/components/dnd/Dnd.module.css"]);
