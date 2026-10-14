@@ -93,9 +93,9 @@ function FloatingChartTooltip({
   });
 
   return (
-    <FloatingPanel
+    <FloatingPanel<HTMLDivElement>
       {...rest}
-      ref={ref as React.Ref<HTMLElement>}
+      ref={ref}
       floating={floating}
       size="m"
       surface={false}

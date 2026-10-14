@@ -334,6 +334,8 @@ describe("ChartFrame", () => {
 
   it("parts outside the root throw", () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
-    expect(() => render(<ChartFrame.Legend />)).toThrow(/inside ChartFrame.Root/);
+    expect(() => render(<ChartFrame.Legend />)).toThrow(
+      "`ChartFrame.Legend` sub-component must be used inside `ChartFrame.Root`",
+    );
   });
 });

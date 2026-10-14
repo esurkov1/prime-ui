@@ -4,6 +4,7 @@ import { Button } from "@/components/button/Button";
 import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
+import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import enterMotion from "@/internal/enterMotion.module.css";
@@ -250,15 +251,7 @@ type SplitContextValue = {
   lastListFocus: React.RefObject<HTMLElement | null>;
 };
 
-const SplitContext = React.createContext<SplitContextValue | null>(null);
-
-function useSplit(part: string): SplitContextValue {
-  const value = React.useContext(SplitContext);
-  if (value === null) {
-    throw new Error(`[prime-ui-kit] \`${part}\` must be used inside \`PageContent.Split\`.`);
-  }
-  return value;
-}
+const [SplitProvider, useSplit] = createComponentContext<SplitContextValue>("PageContent.Split");
 
 const isHidden = (node: HTMLElement | null) =>
   node === null || getComputedStyle(node).display === "none";
@@ -337,7 +330,7 @@ function PageContentSplit({
   );
 
   return (
-    <SplitContext value={value}>
+    <SplitProvider value={value}>
       <div
         {...rest}
         className={cx(styles.split, className)}
@@ -345,7 +338,7 @@ function PageContentSplit({
       >
         <div className={styles.panes}>{children}</div>
       </div>
-    </SplitContext>
+    </SplitProvider>
   );
 }
 PageContentSplit.displayName = "PageContent.Split";

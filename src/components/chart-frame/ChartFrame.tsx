@@ -5,6 +5,7 @@ import { useElementSize } from "@/hooks/useElementSize";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
+import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { HUE_CHART } from "@/internal/palette";
 import type { TagRef } from "@/internal/polymorphic";
@@ -114,13 +115,8 @@ type ChartFrameContextValue = {
   plotRef: React.RefObject<HTMLDivElement | null>;
 };
 
-const ChartFrameContext = React.createContext<ChartFrameContextValue | null>(null);
-
-function useChartFrame(part: string): ChartFrameContextValue {
-  const context = React.useContext(ChartFrameContext);
-  if (!context) throw new Error(`ChartFrame.${part} must be inside ChartFrame.Root`);
-  return context;
-}
+const [ChartFrameProvider, useChartFrame] =
+  createComponentContext<ChartFrameContextValue>("ChartFrame");
 
 const EMPTY_IDS: string[] = [];
 
@@ -227,7 +223,7 @@ function ChartFrameRoot({
       data-state={state}
     >
       <SurfaceDepthProvider value={depth}>
-        <ChartFrameContext.Provider value={context}>{children}</ChartFrameContext.Provider>
+        <ChartFrameProvider value={context}>{children}</ChartFrameProvider>
       </SurfaceDepthProvider>
       {state === "ready" ? (
         <HiddenTable
@@ -263,7 +259,7 @@ export type ChartFrameTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
 
 /** The name of the chart: heads the panel and names the figure. */
 function ChartFrameTitle({ as: Tag = "h3", className, ref, ...rest }: ChartFrameTitleProps) {
-  const { titleId, setHasTitle } = useChartFrame("Title");
+  const { titleId, setHasTitle } = useChartFrame("ChartFrame.Title");
   React.useLayoutEffect(() => {
     setHasTitle(true);
     return () => setHasTitle(false);
@@ -285,7 +281,7 @@ export type ChartFrameDescriptionProps = React.HTMLAttributes<HTMLParagraphEleme
 
 /** What the chart measures and over which period; describes the figure. */
 function ChartFrameDescription({ className, ...rest }: ChartFrameDescriptionProps) {
-  const { descriptionId, setHasDescription } = useChartFrame("Description");
+  const { descriptionId, setHasDescription } = useChartFrame("ChartFrame.Description");
   React.useLayoutEffect(() => {
     setHasDescription(true);
     return () => setHasDescription(false);
@@ -315,7 +311,7 @@ export type ChartFrameValueProps = React.HTMLAttributes<HTMLDivElement> & {
  * While loading it is a Skeleton of its own geometry; after a load error it is a dash.
  */
 function ChartFrameValue({ className, children, ...rest }: ChartFrameValueProps) {
-  const { state } = useChartFrame("Value");
+  const { state } = useChartFrame("ChartFrame.Value");
   const shown = state === "loading" || state === "error" ? state : "data";
   return (
     <div {...rest} className={cx(textRole.headingM, styles.value, className)}>
@@ -343,9 +339,7 @@ export type ChartFrameDeltaProps = React.HTMLAttributes<HTMLSpanElement> & {
 /** The change of the headline value («+12% к сентябрю»); the sign is in the text, not only the color. */
 function ChartFrameDelta({ tone = "neutral", className, ...rest }: ChartFrameDeltaProps) {
   // The status ink is the shared text tone; `neutral` keeps the secondary ink of `.delta`.
-  return (
-    <span {...rest} className={cx(styles.delta, textTone.tone, className)} data-tone={tone} />
-  );
+  return <span {...rest} className={cx(styles.delta, textTone.tone, className)} data-tone={tone} />;
 }
 ChartFrameDelta.displayName = "ChartFrame.Delta";
 
@@ -381,7 +375,7 @@ function ChartFramePlot({
   ref,
   ...rest
 }: ChartFramePlotProps) {
-  const { state, series, labels, onRetry, plotRef } = useChartFrame("Plot");
+  const { state, series, labels, onRetry, plotRef } = useChartFrame("ChartFrame.Plot");
   const mergedRef = useMergedRefs(plotRef, ref);
   const size = useElementSize(plotRef, { enabled: renderPlot !== undefined });
 
@@ -455,7 +449,7 @@ export type ChartFrameLegendProps = React.HTMLAttributes<HTMLUListElement> & {
  * hidden series keeps its place and color: its swatch turns hollow and its name quiet.
  */
 function ChartFrameLegend({ readOnly = false, className, ...rest }: ChartFrameLegendProps) {
-  const { state, series, toggle, formatValue, labels } = useChartFrame("Legend");
+  const { state, series, toggle, formatValue, labels } = useChartFrame("ChartFrame.Legend");
   const [focusIndex, setFocusIndex] = React.useState(0);
   const buttons = React.useRef<Array<HTMLButtonElement | null>>([]);
   const loading = state === "loading";
@@ -567,7 +561,7 @@ export type ChartFrameTooltipProps = React.HTMLAttributes<HTMLDivElement> & {
  * It must render inside `ChartFrame.Root`.
  */
 function ChartFrameTooltip({ label, items, point, className, ...rest }: ChartFrameTooltipProps) {
-  const { series, formatValue, plotRef } = useChartFrame("Tooltip");
+  const { series, formatValue, plotRef } = useChartFrame("ChartFrame.Tooltip");
   const rows = items.flatMap((item) => {
     const entry = series.find((candidate) => candidate.id === item.id);
     if (entry?.hidden) return [];
