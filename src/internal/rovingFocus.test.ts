@@ -23,6 +23,13 @@ describe("rovingIndex", () => {
     expect(rovingIndex("ArrowLeft", -1, 3)).toBe(2);
   });
 
+  it("stops at the ends when it does not wrap", () => {
+    expect(rovingIndex("ArrowDown", 2, 3, "vertical", { wrap: false })).toBe(2);
+    expect(rovingIndex("ArrowUp", 0, 3, "vertical", { wrap: false })).toBe(0);
+    expect(rovingIndex("ArrowDown", 0, 3, "vertical", { wrap: false })).toBe(1);
+    expect(rovingIndex("ArrowUp", -1, 3, "vertical", { wrap: false })).toBe(2);
+  });
+
   it("ignores other keys and empty groups", () => {
     expect(rovingIndex("Enter", 0, 3)).toBeNull();
     expect(rovingIndex("ArrowRight", 0, 0)).toBeNull();

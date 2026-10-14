@@ -1,5 +1,11 @@
-import { autoScrollStep, scrollableAncestors } from "@/internal/edgeAutoScroll";
+import {
+  createEdgeAutoScroll,
+  type EdgeAutoScroll,
+  edgeScrollers,
+} from "@/internal/edgeAutoScroll";
 import { formatLabel } from "@/internal/formatLabel";
+import { DRAG_HOLD_MS, DRAG_THRESHOLD_PX, PRESS_SLOP_PX } from "@/internal/longPress";
+import { swallowNextClick } from "@/internal/swallowNextClick";
 import { distanceBetween, type Point, type Rect, rectContains, rectOf } from "./geometry";
 
 import { DND_LABELS, type DndLabels } from "./labels";
@@ -116,19 +122,18 @@ type Activation = {
   tolerance: number;
 };
 
-// A mouse or a pen commits as soon as it moves 4px (past the tremor of a click). A finger cannot use
-// travel, because travel is how a list scrolls, so touch waits out a hold and gives up once it runs.
+// The kit's gesture thresholds (`longPress`), on purpose: a mouse or a pen commits once it travels
+// past the tremor of a click. A finger cannot use travel, because travel is how a list scrolls, so
+// touch waits out the carry hold and gives up once the finger moves past the press slop.
 const POINTER_ACTIVATION: Activation = {
-  distance: 4,
+  distance: DRAG_THRESHOLD_PX,
   delay: 0,
   tolerance: Number.POSITIVE_INFINITY,
 };
-// 280 ms: long enough that a slow start of a scroll is not taken for a grab, short enough not to
-// feel like waiting.
 const TOUCH_ACTIVATION: Activation = {
   distance: Number.POSITIVE_INFINITY,
-  delay: 280,
-  tolerance: 10,
+  delay: DRAG_HOLD_MS,
+  tolerance: PRESS_SLOP_PX,
 };
 
 function pointerKindOf(pointerType: string): PointerKind {
@@ -185,11 +190,10 @@ export function createDragController(
     over: DropTargetEntry | null;
     held: DropTargetEntry | null;
     point: Point;
-    scrollers: HTMLElement[];
-    /** The element `scrollers` was computed for; they are re-read only when it changes. */
+    /** Scrolls the box under the pointer while it is held near an edge. */
+    edges: EdgeAutoScroll;
+    /** The element the scrollers were read for; they are re-read only when it changes. */
     scrollersFor: Element | null;
-    frame: number | null;
-    lastFrameAt: number;
     params: BeginDragParams<unknown>;
   } | null = null;
 
@@ -261,44 +265,9 @@ export function createDragController(
     const scrollRoot = next?.element ?? active.element;
     if (active.scrollersFor !== scrollRoot) {
       active.scrollersFor = scrollRoot;
-      active.scrollers = scrollableAncestors(scrollRoot);
+      active.edges.setScrollers(edgeScrollers(scrollRoot));
     }
-  };
-
-  const stopFrames = () => {
-    if (active?.frame != null) cancelAnimationFrame(active.frame);
-    if (active) active.frame = null;
-  };
-
-  const runFrame = (now: number) => {
-    if (!active) return;
-    const elapsed = Math.min(now - active.lastFrameAt, 32);
-    active.lastFrameAt = now;
-    if (autoScrollStep(active.scrollers, active.point, elapsed)) resolveOver();
-    active.frame = requestAnimationFrame(runFrame);
-  };
-
-  const startFrames = () => {
-    if (!active) return;
-    active.lastFrameAt = performance.now();
-    active.frame = requestAnimationFrame(runFrame);
-  };
-
-  // A finished drag is followed by a click on whatever the pointer released over. Only a click back
-  // inside the dragged element is swallowed, and only until the next press.
-  const swallowNextClick = (source: HTMLElement) => {
-    const stop = () => {
-      window.removeEventListener("click", swallow, true);
-      window.removeEventListener("pointerdown", stop, true);
-    };
-    function swallow(event: MouseEvent) {
-      stop();
-      if (!(event.target instanceof Node) || !source.contains(event.target)) return;
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    window.addEventListener("click", swallow, true);
-    window.addEventListener("pointerdown", stop, true);
+    active.edges.follow(active.point);
   };
 
   const detach = () => {
@@ -311,10 +280,11 @@ export function createDragController(
     document.removeEventListener("touchmove", handleTouchMove);
   };
 
-  const finish = (outcome: DragOutcome) => {
+  /** `landing`: the target the item was dropped on, where it may be drawn anew. */
+  const finish = (outcome: DragOutcome, landing: HTMLElement | null = null) => {
     if (!active) return;
     const { item, element, params } = active;
-    stopFrames();
+    active.edges.stop();
     active.over?.leave();
     // A source that leaves the layout while lifted measures as nothing, so the rect it had when the
     // drag began is what the overlay flies back to.
@@ -338,7 +308,9 @@ export function createDragController(
     }));
     emit({ type: "end", item, outcome, origin });
     params.onDragEnd?.(item, outcome);
-    swallowNextClick(element);
+    // The click that follows the release is no press: on the lifted element, or on the element the
+    // target drew it as (a card dropped in another column is a new element there).
+    swallowNextClick(element, landing);
   };
 
   const clearPendingTimer = () => {
@@ -363,10 +335,8 @@ export function createDragController(
       over: null,
       held: null,
       point,
-      scrollers: scrollableAncestors(element),
+      edges: createEdgeAutoScroll({ scrollers: edgeScrollers(element), onScrolled: resolveOver }),
       scrollersFor: element,
-      frame: null,
-      lastFrameAt: 0,
       params,
     };
     const pointerKind = pointerKindOf(params.event.pointerType);
@@ -395,7 +365,6 @@ export function createDragController(
     params.onDragStart?.(params.item, pressPoint, origin);
     say("grabbed", params.item);
     resolveOver();
-    startFrames();
   };
 
   function abandonPending() {
@@ -433,11 +402,12 @@ export function createDragController(
       if (target?.over(point, active.item) === true) {
         target.drop(point, active.item);
         say("dropped", active.item);
-        finish("drop");
+        finish("drop", target.element);
       } else if (!target && active.held) {
-        active.held.dropHeld(active.item);
+        const held = active.held;
+        held.dropHeld(active.item);
         say("dropped", active.item);
-        finish("drop");
+        finish("drop", held.element);
       } else {
         say("returned", active.item);
         finish("release");

@@ -2,7 +2,6 @@ import * as React from "react";
 
 import { Badge } from "@/components/badge/Badge";
 import { Crossfade } from "@/components/crossfade/Crossfade";
-import { useFlipList } from "@/components/dnd/useFlipList";
 import { Dropdown, type DropdownContentProps } from "@/components/dropdown/Dropdown";
 import { EmptyPage } from "@/components/empty-page/EmptyPage";
 import { Input } from "@/components/input/Input";
@@ -26,6 +25,7 @@ import { highlightChildren } from "@/internal/HighlightMatch";
 import { useLabels } from "@/internal/labels";
 import { leaveInPlace } from "@/internal/leaveInPlace";
 import { type ControlSize, compactTier, stepDown } from "@/internal/states";
+import { useFlipList } from "@/internal/useFlipList";
 
 import styles from "./ChatList.module.css";
 import { formatChatTime } from "./formatChatTime";
@@ -296,6 +296,11 @@ const STATUS_ICONS = [
 ] as const;
 
 // ─── Item ─────────────────────────────────────────────────────────────────────
+
+/** The rows that glide to a new order: every row that is not leaving, keyed by its key. */
+const flipRows = (list: HTMLElement) =>
+  list.querySelectorAll<HTMLElement>("li:not([data-leaving]) > [data-dnd-item]");
+const flipRowKey = (row: HTMLElement) => row.dataset.dndItem;
 
 /** How long a finger rests on a row before its menu opens. */
 const LONG_PRESS_MS = 500;
@@ -801,7 +806,13 @@ function ChatListRoot<T>({
   const motion = nextMotion(motionRef.current, keys, order);
   motionRef.current = motion;
   const [listEl, setListEl] = React.useState<HTMLUListElement | null>(null);
-  useFlipList(listEl, order, "li:not([data-leaving]) > [data-dnd-item]", false, motion.settle);
+  useFlipList({
+    container: listEl,
+    nodes: flipRows,
+    keyOf: flipRowKey,
+    layoutKey: order,
+    settle: motion.settle,
+  });
 
   // ── focus ──
   const rowsRef = React.useRef(new Map<string, HTMLElement>());

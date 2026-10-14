@@ -1,3 +1,5 @@
+import { layoutRect } from "@/internal/useFlipList";
+
 export type Point = { x: number; y: number };
 
 export type Rect = {
@@ -15,44 +17,6 @@ export type Axis = "x" | "y" | "grid";
 export function rectOf(element: Element): Rect {
   const { left, top, right, bottom, width, height } = element.getBoundingClientRect();
   return { left, top, right, bottom, width, height };
-}
-
-/** A running glide on the element: its scale and move, and the point it scales around. */
-function currentTransform(
-  element: Element,
-): { a: number; d: number; tx: number; ty: number; ox: number; oy: number } | null {
-  // Only an element mid-animation is drawn away from its layout box; skipping the style read for the
-  // rest keeps a long list cheap to measure on every pointer move.
-  // `getAnimations` is missing in jsdom, where consumers test screens built with the kit.
-  if (!element.getAnimations || element.getAnimations().length === 0) return null;
-  const style = getComputedStyle(element);
-  if (!style.transform || style.transform === "none") return null;
-  try {
-    const m = new DOMMatrixReadOnly(style.transform);
-    const [ox = 0, oy = 0] = style.transformOrigin.split(" ").map((v) => Number.parseFloat(v) || 0);
-    return { a: m.a || 1, d: m.d || 1, tx: m.m41, ty: m.m42, ox, oy };
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Where an element sits in the layout with any animation transform taken back out — its glide and
- * its growth (a tile growing into the cover cell is drawn smaller until it gets there). Every drop
- * decision is measured against this: reading the drawn box makes each answer depend on the
- * animation the previous answer started, and the gap swings between cells under a pointer that
- * barely moves.
- */
-export function layoutRect(element: Element): Rect {
-  const rect = rectOf(element);
-  const t = currentTransform(element);
-  if (!t) return rect;
-  // drawn = layout scaled by (a, d) around the origin, then moved by (tx, ty).
-  const width = rect.width / t.a;
-  const height = rect.height / t.d;
-  const left = rect.left - t.tx - t.ox * (1 - t.a);
-  const top = rect.top - t.ty - t.oy * (1 - t.d);
-  return { left, top, right: left + width, bottom: top + height, width, height };
 }
 
 export function rectContains(rect: Rect, point: Point): boolean {

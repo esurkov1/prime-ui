@@ -106,11 +106,6 @@ type BoardContextValue = {
   /** The card's name (`getLabel`, else its id): the name of its link. */
   labelOf: (id: string) => string;
   /**
-   * Whether this click is the release of a drag (taken once). Dnd swallows the click on the element
-   * it lifted; a card dropped in another column is a new element, so the board keeps its own note.
-   */
-  takeDragClick: () => boolean;
-  /**
    * `plain` / `line`: the depth of a card, a surface one step above the board's host (it stands on it
    * directly). The attribute travels with the carried clone, so it keeps its color in flight.
    * `well`: none — the card is the selected thumb of its well.
@@ -426,24 +421,6 @@ function KanbanBoard<T>({
   latest.current = { byId, getItemHref, onItemClick, getLabel };
   const links = getItemHref !== undefined;
   const opens = onItemClick !== undefined;
-  // A drag that ended: the next click is its release, unless a new press or a key comes first.
-  const dragClick = React.useRef(false);
-  React.useEffect(() => {
-    if (!links && !opens) return;
-    const clear = () => {
-      dragClick.current = false;
-    };
-    const off = controller.subscribeOverlay((event) => {
-      if (event.type === "end") dragClick.current = true;
-    });
-    window.addEventListener("pointerdown", clear, true);
-    window.addEventListener("keydown", clear, true);
-    return () => {
-      off();
-      window.removeEventListener("pointerdown", clear, true);
-      window.removeEventListener("keydown", clear, true);
-    };
-  }, [controller, links, opens]);
   // Stable while the props are: the cards read the latest data and callbacks themselves.
   const context = React.useMemo<BoardContextValue>(
     () => ({
@@ -464,11 +441,6 @@ function KanbanBoard<T>({
         const item = latest.current.byId.get(id);
         const label = latest.current.getLabel;
         return item !== undefined && label ? label(item) : id;
-      },
-      takeDragClick: () => {
-        const was = dragClick.current;
-        dragClick.current = false;
-        return was;
       },
       cardDepth,
     }),
@@ -746,9 +718,8 @@ function KanbanItem({
       className={cx(styles.item, className)}
       onClick={(event: React.MouseEvent<HTMLElement>) => {
         onClick?.(event);
+        // The release of a drag never opens the card: Dnd takes that click.
         if (event.defaultPrevented || href !== undefined || !openItem || !opensRow(event)) return;
-        // The release of a drag never opens the card.
-        if (board.takeDragClick()) return;
         openItem(id, event);
       }}
       onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
@@ -776,11 +747,7 @@ function KanbanItem({
           draggable={false}
           data-dnd-handle=""
           onClick={(event) => {
-            // The release of a drag follows no link.
-            if (board.takeDragClick()) {
-              event.preventDefault();
-              return;
-            }
+            // The release of a drag follows no link: Dnd takes that click.
             // The browser keeps the modified clicks (new tab, new window).
             if (openItem && isPlainClick(event)) openItem(id, event);
           }}

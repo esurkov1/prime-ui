@@ -172,7 +172,7 @@ No `labels`.
 - `overflow: auto` anywhere in a kit component → a ScrollContainer (`src/styles/scroll.test.ts` fails on a raw scroller).
 - A hand-made edge-fade mask, edge shadow or hidden scrollbar → `edges` and `scrollbar="hidden"`.
 - `edges="fade"` on a region that paints its own fill or shadow → the mask dissolves them; use `edges="shadow"`.
-- A hand-made edge auto-scroll loop for a drag → `autoScrollStep` / `edgeSpeed` from `src/internal/edgeAutoScroll`.
+- A hand-made edge auto-scroll loop for a drag → `createEdgeAutoScroll` from `src/internal/edgeAutoScroll`.
 - `snap` together with `anchor="end"` → snapping fights the pin to the end.
 - Wrapping a Modal body or Dropdown panel in another ScrollContainer → they already scroll.
 - `scrollTop = scrollHeight` in an effect after every message → `anchor="end"` (it also leaves a reader who scrolled up alone).

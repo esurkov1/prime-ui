@@ -7,6 +7,8 @@ import { prefersReducedMotion } from "@/hooks/usePresence";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { motionTiming } from "@/internal/motionTiming";
+import { namedRole } from "@/internal/namedRole";
+import type { AsyncHandler } from "@/internal/usePendingChanges";
 
 import { DragControllerContext, useDragController } from "./context";
 import styles from "./Dnd.module.css";
@@ -27,6 +29,12 @@ import { useSortableList } from "./useSortableList";
 export type { DragItem, DragOutcome } from "./dragSession";
 export type { DndLabels } from "./labels";
 
+/**
+ * Set on a `Dnd.Sortable` while an item of its kind is carried: the list may take it. A host scopes
+ * its drag-time look to it (no hover-only actions, no snapping in the scroller around the list).
+ */
+export const DND_CARRYING_ATTRIBUTE = "data-dnd-carrying";
+
 // ---------------------------------------------------------------------------------------------
 // Root
 // ---------------------------------------------------------------------------------------------
@@ -39,9 +47,16 @@ export type DndRootProps = {
 
 /**
  * Owns the one drag session the app shares, the overlay that follows the pointer and the live
- * region. Mount once above every screen that drags: a drag crosses component boundaries.
+ * region. Mount once above every screen that drags: a drag crosses component boundaries. A root
+ * inside another one is its children: the outer session stays the one session.
  */
-function DndRoot({ labels, children }: DndRootProps) {
+function DndRoot(props: DndRootProps) {
+  const outer = React.useContext(DragControllerContext);
+  return outer ? props.children : <DndSession {...props} />;
+}
+DndRoot.displayName = "Dnd.Root";
+
+function DndSession({ labels, children }: DndRootProps) {
   // The controller outlives renders and reads the current strings when it needs them.
   const labelsRef = React.useRef<DndLabels>(DND_LABELS);
   labelsRef.current = { ...DND_LABELS, ...labels };
@@ -58,7 +73,6 @@ function DndRoot({ labels, children }: DndRootProps) {
     </DragControllerContext>
   );
 }
-DndRoot.displayName = "Dnd.Root";
 
 // ---------------------------------------------------------------------------------------------
 // Handle
@@ -68,43 +82,78 @@ export type DndHandleProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "children"
 > & {
-  ref?: React.Ref<HTMLButtonElement>;
+  ref?: React.Ref<HTMLElement>;
 };
 
-/** Whether the item around is `locked`: its grip shows a lock. */
-const LockedContext = React.createContext(false);
+/** What a `Dnd.Handle` needs from the item around it. */
+type ItemContextValue = {
+  /** The item holds its place: the grip is a lock. */
+  locked: boolean;
+  /** The owner is saving the item's move: the grip is busy. */
+  busy: boolean;
+  /** The grip is the item's keyboard target (`handle` list): its keys and role description. */
+  keys: { shortcuts: string; roleDescription: string } | null;
+};
+
+const ItemContext = React.createContext<ItemContextValue>({
+  locked: false,
+  busy: false,
+  keys: null,
+});
 
 /** Stops the browser's own drag of an image or a link inside an item: the kit drag owns the press. */
 function preventNativeDrag(event: React.DragEvent<HTMLElement>) {
   event.preventDefault();
 }
 
+export type DndLockProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children" | "role"> & {
+  ref?: React.Ref<HTMLSpanElement>;
+};
+
+/**
+ * The mark of a thing that holds its place (a pinned row, a system column): the lock a `Dnd.Handle`
+ * turns into in a `locked` item, and the same mark where a host shows a fixed row without a grip
+ * (FieldList). Named `labels.locked` unless the host names it.
+ */
+export function DndLock({ className, "aria-label": ariaLabel, ...rest }: DndLockProps) {
+  const controller = useDragController();
+  return (
+    <span
+      {...rest}
+      role="img"
+      aria-label={ariaLabel ?? controller.labels().locked}
+      className={cx(styles.lock, className)}
+      data-dnd-lock=""
+    >
+      <Icon name="status.locked" />
+    </span>
+  );
+}
+
 /**
  * The grip of a `handle` item: a ghost icon-only Button (`xs`), so it is reachable by keyboard
- * (Alt+arrows reorder). In a `locked` item it is a lock (`labels.locked`) instead.
+ * (Alt+arrows reorder) and carries the item's key shortcuts and role description. In a `locked`
+ * item it is a `Dnd.Lock` instead; while the owner saves the item's move it is busy.
  */
 function DndHandle({ className, "aria-label": ariaLabel, ref, ...rest }: DndHandleProps) {
   const controller = useDragController();
-  // In a locked item the grip turns into a lock: nothing to grab, the place is fixed.
-  if (React.useContext(LockedContext)) {
-    return (
-      <span
-        role="img"
-        aria-label={controller.labels().locked}
-        className={cx(styles.lock, className)}
-        data-dnd-lock=""
-      >
-        <Icon name="status.locked" />
-      </span>
-    );
+  const item = React.useContext(ItemContext);
+  // One callback ref fits the grip and the lock.
+  const elementRef = useMergedRefs<HTMLElement>(ref);
+  if (item.locked) {
+    const { disabled: _disabled, ...attributes } = rest;
+    return <DndLock {...attributes} ref={elementRef} className={className} />;
   }
   return (
     <Button.Root
-      ref={ref}
+      ref={elementRef}
       variant="ghost"
       tone="neutral"
       size="xs"
+      loading={item.busy}
       aria-label={ariaLabel ?? controller.labels().handle}
+      aria-keyshortcuts={item.keys?.shortcuts}
+      aria-roledescription={item.keys?.roleDescription}
       {...rest}
       data-dnd-handle=""
       className={cx(styles.handle, className)}
@@ -137,6 +186,8 @@ type SortableContextValue = {
   itemTag: ItemTag;
   /** The keys that move an item: along the axis, and across it to linked lists. */
   shortcuts: string;
+  /** Items whose move the owner is still saving. */
+  pending: ReadonlySet<string>;
 };
 
 const ALONG: Record<"x" | "y" | "grid", string> = {
@@ -164,7 +215,7 @@ export type DndSortableProps<T> = Omit<React.HTMLAttributes<HTMLElement>, "child
    * Called when an item lands in front of `beforeId` (`null` = last). A returned promise keeps the
    * item drawn in its new place until it settles; a rejection glides it back.
    */
-  onReorder: (id: string, beforeId: string | null) => void | Promise<void>;
+  onReorder: AsyncHandler<[id: string, beforeId: string | null]>;
   /**
    * Renders one item; return a `Dnd.SortableItem`. During a drag `index` is the place the item will
    * have on release. Parts marked `data-dnd-mirror` stay in step on the carried copy.
@@ -256,8 +307,15 @@ function DndSortable<T>({
   const itemTag = ITEM_TAG[Tag];
   const shortcuts = ALONG[axis] + (linked ? ACROSS[axis] : "");
   const context = React.useMemo<SortableContextValue>(
-    () => ({ itemProps: list.itemProps, disabled, handle, itemTag, shortcuts }),
-    [list.itemProps, disabled, handle, itemTag, shortcuts],
+    () => ({
+      itemProps: list.itemProps,
+      disabled,
+      handle,
+      itemTag,
+      shortcuts,
+      pending: list.pending,
+    }),
+    [list.itemProps, disabled, handle, itemTag, shortcuts, list.pending],
   );
 
   const placeholder = list.gap ? (
@@ -317,7 +375,9 @@ function DndSortable<T>({
         // A table body keeps its table layout: the list look (flex column, gap) is for the others.
         className={cx(Tag === "tbody" ? styles.sortableRows : styles.sortable, className)}
         data-axis={axis}
+        data-disabled={disabled || undefined}
         data-dragging={list.draggingId !== null || undefined}
+        {...{ [DND_CARRYING_ATTRIBUTE]: list.carrying || undefined }}
       >
         {header}
         {children}
@@ -382,7 +442,10 @@ export type DndSortableItemProps = {
   ref?: React.Ref<HTMLElement>;
 } & Omit<React.HTMLAttributes<HTMLElement>, "id">;
 
-/** One item of a `Dnd.Sortable`. Renders `li` inside `ul` / `ol`, `tr` inside `tbody`, `div` otherwise. */
+/**
+ * One item of a `Dnd.Sortable`. Renders `li` inside `ul` / `ol`, `tr` inside `tbody`, `div` otherwise.
+ * The item is the keyboard target (a `div` one is a named `button`), or with `handle` its grip is.
+ */
 function DndSortableItem({
   id,
   disabled: itemDisabled = false,
@@ -401,16 +464,36 @@ function DndSortableItem({
   if (context === null) throw new Error("Dnd.SortableItem must be rendered inside Dnd.Sortable");
   const Tag = context.itemTag;
   const disabled = context.disabled || itemDisabled;
-  const still = disabled || locked;
+  const busy = context.pending.has(id);
+  const still = disabled || locked || busy;
   const sortable = context.itemProps(id);
+  const roleDescription = sortable["aria-roledescription"];
+  // The keyboard target carries the keys and says what it is; a generic `div` needs a role for
+  // that, `li` and `tr` have theirs.
+  const ownKeys = !context.handle && !still;
+  const role = ownKeys && Tag === "div" ? namedRole(rest, "button") : rest.role;
+  const describes = ownKeys && (Tag !== "div" || role !== undefined);
+  const item = React.useMemo<ItemContextValue>(
+    () => ({
+      locked,
+      busy,
+      keys:
+        context.handle && !still && roleDescription
+          ? { shortcuts: context.shortcuts, roleDescription }
+          : null,
+    }),
+    [locked, busy, context.handle, still, roleDescription, context.shortcuts],
+  );
   return (
     <Tag
       ref={elementRef}
-      tabIndex={context.handle || still ? undefined : 0}
-      aria-keyshortcuts={still ? undefined : context.shortcuts}
+      tabIndex={ownKeys ? 0 : undefined}
+      aria-keyshortcuts={ownKeys ? context.shortcuts : undefined}
       {...rest}
       {...sortable}
-      aria-roledescription={still ? undefined : sortable["aria-roledescription"]}
+      role={role}
+      aria-roledescription={describes ? roleDescription : undefined}
+      aria-busy={busy || rest["aria-busy"] || undefined}
       onPointerDown={(event: React.PointerEvent<HTMLElement>) => {
         onPointerDown?.(event);
         if (!still && !event.defaultPrevented) sortable.onPointerDown(event);
@@ -426,9 +509,10 @@ function DndSortableItem({
       className={cx(styles.draggable, className)}
       data-disabled={disabled || undefined}
       data-locked={locked || undefined}
+      data-pending={busy || undefined}
       data-handle={context.handle || undefined}
     >
-      <LockedContext value={locked}>{children}</LockedContext>
+      <ItemContext value={item}>{children}</ItemContext>
     </Tag>
   );
 }
@@ -591,11 +675,16 @@ function DndDraggable<TData = unknown>({
   const dragProps = source.props({ id, data, label: label ?? id });
   // A callback ref fits whichever tag `as` picks.
   const elementRef = useMergedRefs<HTMLElement | null>(ref);
+  // A named source is a `button`; a role description needs a role (an `li` has its own).
+  const role = Tag === "li" ? rest.role : namedRole(rest, "button");
+  const describes = Tag === "li" || role !== undefined;
   return (
     <Tag
       ref={elementRef}
       {...rest}
       {...dragProps}
+      role={role}
+      aria-roledescription={describes ? dragProps["aria-roledescription"] : undefined}
       onPointerDown={(event: React.PointerEvent<HTMLElement>) => {
         onPointerDown?.(event);
         if (!event.defaultPrevented) dragProps.onPointerDown(event);

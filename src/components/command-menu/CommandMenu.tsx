@@ -8,6 +8,7 @@ import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useLoadMore } from "@/hooks/useLoadMore";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
@@ -17,7 +18,7 @@ import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { highlightChildren } from "@/internal/HighlightMatch";
 import { useLabels } from "@/internal/labels";
-import { type Store, useCreateStore, useLoadMore, useStoreSlice } from "@/internal/listbox";
+import { isComposingKey, type Store, useCreateStore, useStoreSlice } from "@/internal/listbox";
 import { MenuGroup } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { focusInto } from "@/internal/overlay/focus";
@@ -192,7 +193,7 @@ function CommandMenuState({
       !load.loadingMore,
     onLoadMore: load.onLoadMore,
     scrollRef: listRef,
-    rearm: version,
+    round: version,
   });
 
   const value = React.useMemo(
@@ -472,7 +473,7 @@ function CommandMenuInput({
       active.set(navigable[next[event.key]] ?? null);
       // The keyboard reached the end: ask for more, as the sentinel does for scrolling.
       if (next[event.key] === last) requestMore();
-    } else if (event.key === "Enter" && current) {
+    } else if (event.key === "Enter" && current && !isComposingKey(event)) {
       event.preventDefault();
       document.getElementById(optionId(current))?.click();
     }

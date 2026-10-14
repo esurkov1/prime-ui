@@ -58,7 +58,7 @@ export function RollingNumber({ children, className }: RollingNumberProps) {
           <span
             key={`d${key}`}
             className={styles.digit}
-            // A carried copy of a host (Dnd's overlay) finds its digits by this and rolls them too.
+            // A carried copy of a host finds its digits by this and rolls them too (`carryRolling`).
             data-rolling-digit=""
             style={{ "--rolling-n": char } as React.CSSProperties}
           >
@@ -72,4 +72,25 @@ export function RollingNumber({ children, className }: RollingNumberProps) {
       })}
     </span>
   );
+}
+
+const DIGIT = "[data-rolling-digit]";
+
+/**
+ * A copy of a host carried elsewhere (Dnd's overlay, flying while the real item is hidden) shows
+ * what the host shows now: the copy's rolling digit columns take the destination's values and roll
+ * in flight. Matched from the right, as the number keys its columns; a new leading digit appears
+ * on settle. Returns whether the copy now shows the same number (as many columns on both sides) —
+ * else the caller copies the content as it stands.
+ */
+export function carryRolling(copy: Element, destination: Element): boolean {
+  const to = [...destination.querySelectorAll<HTMLElement>(DIGIT)].reverse();
+  const from = [...copy.querySelectorAll<HTMLElement>(DIGIT)].reverse();
+  to.forEach((digit, index) => {
+    const own = from[index];
+    if (!own) return;
+    own.style.setProperty("--rolling-n", digit.style.getPropertyValue("--rolling-n"));
+    own.textContent = digit.textContent;
+  });
+  return to.length > 0 && to.length === from.length;
 }

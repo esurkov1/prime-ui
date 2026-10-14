@@ -117,6 +117,15 @@ describe("DataTable onReorder", () => {
     expect(order()).toEqual(["b", "a", "c"]);
   });
 
+  it("the handle, not the row, carries the move keys and the role description", () => {
+    render(<Pipeline />);
+    expect(handle("Лиды")).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
+    expect(handle("Лиды")).toHaveAttribute("aria-roledescription");
+    const row = handle("Лиды").closest("tr");
+    expect(row).not.toHaveAttribute("aria-keyshortcuts");
+    expect(row).not.toHaveAttribute("aria-roledescription");
+  });
+
   it("moves a row with Alt+↑ / ↓ on its handle and announces the place", async () => {
     const onMove = vi.fn();
     render(<Pipeline onMove={onMove} />);

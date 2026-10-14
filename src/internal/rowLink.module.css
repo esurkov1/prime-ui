@@ -1,0 +1,36 @@
+/*
+ * A host that opens as a whole through its own stretched link (`data-row-link`, drawn at
+ * `--prime-z-raised`): join `.host` on it while it is a link. Every control inside — the list of
+ * `ROW_CONTROLS` in `rowLink.ts` — stands above the link, so it takes its own press. Zero
+ * specificity: a control's own `position` / `z-index` always wins.
+ */
+:where(.host)
+  :where(
+    a[href]:not([data-row-link]),
+    button,
+    input,
+    select,
+    textarea,
+    label,
+    summary,
+    [contenteditable="true"],
+    [contenteditable=""],
+    [tabindex]:not([tabindex="-1"]),
+    [role="button"],
+    [role="link"],
+    [role="checkbox"],
+    [role="radio"],
+    [role="switch"],
+    [role="menuitem"],
+    [role="menuitemcheckbox"],
+    [role="menuitemradio"],
+    [role="option"],
+    [role="tab"],
+    [role="slider"],
+    [role="combobox"],
+    [role="textbox"],
+    [data-row-click-ignore]
+  ) {
+  position: relative;
+  z-index: var(--prime-z-above);
+}

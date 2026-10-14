@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { autoScrollStep, scrollableAncestors } from "@/internal/edgeAutoScroll";
+import { createEdgeAutoScroll, edgeScrollers } from "@/internal/edgeAutoScroll";
 
 /** A drag paints along the list: only up and down scroll it. */
 const VERTICAL = { x: false, y: true };
@@ -84,9 +84,6 @@ export function useRangeSelection<K>(options: RangeSelectionOptions<K>) {
         let last = index;
         let x = event.clientX;
         let y = event.clientY;
-        let frame = 0;
-        const scrollers = autoScroll ? scrollableAncestors(containerRef.current) : [];
-        let lastTime = 0;
 
         const paintAt = (clientX: number, clientY: number) => {
           const element = document.elementFromPoint(clientX, clientY);
@@ -102,28 +99,22 @@ export function useRangeSelection<K>(options: RangeSelectionOptions<K>) {
           last = next;
           session.current.anchor = keysNow()[next] ?? session.current.anchor;
         };
-        const scroll = (time: number) => {
-          frame = 0;
-          const elapsed = lastTime ? Math.min(time - lastTime, 50) : 16;
-          lastTime = time;
-          if (!autoScrollStep(scrollers, { x, y }, elapsed, VERTICAL)) {
-            lastTime = 0;
-            return;
-          }
-          paintAt(x, y);
-          frame = requestAnimationFrame(scroll);
-        };
+        const edges = createEdgeAutoScroll({
+          scrollers: autoScroll ? edgeScrollers(containerRef.current) : [],
+          axes: VERTICAL,
+          onScrolled: () => paintAt(x, y),
+        });
         const onMove = (move: PointerEvent) => {
           x = move.clientX;
           y = move.clientY;
-          paintAt(move.clientX, move.clientY);
-          if (scrollers.length > 0 && !frame) frame = requestAnimationFrame(scroll);
+          paintAt(x, y);
+          edges.follow({ x, y });
         };
         const stop = () => {
           window.removeEventListener("pointermove", onMove);
           window.removeEventListener("pointerup", stop);
           window.removeEventListener("pointercancel", stop);
-          if (frame) cancelAnimationFrame(frame);
+          edges.stop();
           session.current.stop = null;
           setDragging(false);
         };

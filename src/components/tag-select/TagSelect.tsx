@@ -19,7 +19,13 @@ import {
 } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
-import { optionDomId, type Store, useCreateStore, useStoreSlice } from "@/internal/listbox";
+import {
+  isComposingKey,
+  optionDomId,
+  type Store,
+  useCreateStore,
+  useStoreSlice,
+} from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
@@ -521,6 +527,8 @@ export function TagSelect({
     }
     if (navigable.length === 0) return;
     if (event.key === "Enter") {
+      // Enter of a composing input method confirms its text, not an option.
+      if (isComposingKey(event)) return;
       event.preventDefault();
       pick(highlight.get() ?? navigable[0] ?? "");
       return;

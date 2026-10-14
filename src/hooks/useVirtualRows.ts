@@ -50,7 +50,30 @@ export type VirtualRows = {
   startOf: (index: number) => number;
   /** Callback ref for the element of row `index`: measures it and follows its size. */
   measure: (index: number) => (node: HTMLElement | null) => void;
+  /**
+   * Every rendered row has its own measured size: the offsets of the window are exact, so a host
+   * may scroll to a row by its offset (a chat opening at its end).
+   */
+  measured: boolean;
 };
+
+/** The rendered range, with the key of its first row and the row count it was taken at. */
+type Range = { first: number; last: number; firstKey: React.Key; count: number };
+
+/** Measured sizes by row key and by group, as of the last re-render they caused. */
+type Measured = { sizes: ReadonlyMap<React.Key, number>; groups: ReadonlyMap<React.Key, number> };
+
+/** First row whose bottom is below `y` (binary search over the offsets). */
+function rowAt(offsets: Float64Array, y: number): number {
+  let low = 0;
+  let high = offsets.length - 2;
+  while (low < high) {
+    const mid = (low + high) >> 1;
+    if (offsets[mid + 1] <= y) low = mid + 1;
+    else high = mid;
+  }
+  return Math.max(0, low);
+}
 
 /**
  * Vertical row virtualization inside a component's own scroller: renders the rows that intersect
@@ -74,80 +97,93 @@ export function useVirtualRows({
   initialAlign = "start",
   sticky,
 }: UseVirtualRowsOptions): VirtualRows {
+  // Sizes are written as rows report them and published once per frame: the offsets read the
+  // published copy, so a render never depends on a ref.
   const sizes = React.useRef(new Map<React.Key, number>());
   const groupSizes = React.useRef(new Map<React.Key, number>());
-  const [measuredVersion, setMeasuredVersion] = React.useState(0);
-  const [range, setRange] = React.useState<[number, number] | null>(null);
+  const [measuredSizes, setMeasuredSizes] = React.useState<Measured>(() => ({
+    sizes: new Map(),
+    groups: new Map(),
+  }));
+  const [range, setRange] = React.useState<Range | null>(null);
   const rangeRef = React.useRef(range);
-  rangeRef.current = range;
+  React.useLayoutEffect(() => {
+    rangeRef.current = range;
+  });
 
   // Offsets of every row: measured size, else the group's measured size, else the estimate.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `measuredVersion` invalidates the sizes read from refs
   const starts = React.useMemo(() => {
     const result = new Float64Array(count + 1);
     for (let index = 0; index < count; index++) {
-      const own = sizes.current.get(getKey(index));
-      const group = getGroup ? groupSizes.current.get(getGroup(index)) : undefined;
+      const own = measuredSizes.sizes.get(getKey(index));
+      const group = getGroup ? measuredSizes.groups.get(getGroup(index)) : undefined;
       result[index + 1] = result[index] + (own ?? group ?? estimateSize(index));
     }
     return result;
-  }, [count, getKey, getGroup, estimateSize, measuredVersion]);
+  }, [count, getKey, getGroup, estimateSize, measuredSizes]);
 
   const startsRef = React.useRef(starts);
-  startsRef.current = starts;
-
-  /** First row whose bottom is below `y` (binary search over the offsets). */
-  const rowAt = React.useCallback((y: number) => {
-    const offsets = startsRef.current;
-    let low = 0;
-    let high = offsets.length - 2;
-    while (low < high) {
-      const mid = (low + high) >> 1;
-      if (offsets[mid + 1] <= y) low = mid + 1;
-      else high = mid;
-    }
-    return Math.max(0, low);
-  }, []);
+  React.useLayoutEffect(() => {
+    startsRef.current = starts;
+  });
+  const getKeyRef = React.useRef(getKey);
+  React.useLayoutEffect(() => {
+    getKeyRef.current = getKey;
+  });
 
   /** The rows that intersect the viewport, without overscan; `null` before the scroller has a size. */
-  const visibleRows = React.useCallback((): [number, number] | null => {
-    const node = scrollRef.current;
-    if (!node || node.clientHeight === 0 || count === 0) return null;
-    const start = typeof offset === "function" ? offset() : offset;
-    // Opening at the end, the first range is the end's: the scroller is put there in the same
-    // commit, after this read.
-    const top =
-      rangeRef.current === null && initialAlign === "end"
-        ? startsRef.current[count] - node.clientHeight
-        : node.scrollTop - start;
-    return [rowAt(Math.max(0, top)), rowAt(Math.max(0, top + node.clientHeight))];
-  }, [scrollRef, offset, count, rowAt, initialAlign]);
+  const visibleRows = React.useCallback(
+    (offsets: Float64Array): [number, number] | null => {
+      const node = scrollRef.current;
+      if (!node || node.clientHeight === 0 || count === 0) return null;
+      const start = typeof offset === "function" ? offset() : offset;
+      // Opening at the end, the first range is the end's: the scroller is put there in the same
+      // commit, after this read.
+      const top =
+        rangeRef.current === null && initialAlign === "end"
+          ? offsets[count] - node.clientHeight
+          : node.scrollTop - start;
+      return [
+        rowAt(offsets, Math.max(0, top)),
+        rowAt(offsets, Math.max(0, top + node.clientHeight)),
+      ];
+    },
+    [scrollRef, offset, count, initialAlign],
+  );
 
   /*
    * The rendered range moves in steps: while it still holds the visible rows with a row to spare
    * on each side, scrolling renders nothing — a re-render every few rows, not every frame.
    */
-  const update = React.useCallback(() => {
-    const visible = visibleRows();
-    setRange((prev) => {
-      if (!visible) return prev === null ? prev : null;
-      const [first, last] = visible;
-      if (
-        prev &&
-        prev[0] <= Math.max(0, first - 1) &&
-        prev[1] >= Math.min(count - 1, last + 1) &&
-        prev[1] - prev[0] <= last - first + 2 * overscan &&
-        prev[1] < count
-      ) {
-        return prev;
-      }
-      return [Math.max(0, first - overscan), Math.min(count - 1, last + overscan)];
-    });
-  }, [visibleRows, overscan, count]);
+  const update = React.useCallback(
+    (offsets: Float64Array) => {
+      const visible = visibleRows(offsets);
+      setRange((prev) => {
+        if (!visible) return prev === null ? prev : null;
+        const [first, last] = visible;
+        if (
+          prev &&
+          prev.first <= Math.max(0, first - 1) &&
+          prev.last >= Math.min(count - 1, last + 1) &&
+          prev.last - prev.first <= last - first + 2 * overscan &&
+          prev.last < count
+        ) {
+          return prev;
+        }
+        const from = Math.max(0, first - overscan);
+        return {
+          first: from,
+          last: Math.min(count - 1, last + overscan),
+          firstKey: getKeyRef.current(from),
+          count,
+        };
+      });
+    },
+    [visibleRows, overscan, count],
+  );
 
   // Every new geometry (count, sizes) re-reads the range before paint.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `starts` changes the range
-  React.useLayoutEffect(() => update(), [update, starts]);
+  React.useLayoutEffect(() => update(starts), [update, starts]);
 
   React.useEffect(() => {
     const node = scrollRef.current;
@@ -159,7 +195,7 @@ export function useVirtualRows({
         frame = 0;
         // Rendered in this frame, before it paints: a fast scroll never shows the spacer where
         // the next rows belong.
-        flushSync(update);
+        flushSync(() => update(startsRef.current));
       });
     };
     node.addEventListener("scroll", schedule, { passive: true });
@@ -175,10 +211,10 @@ export function useVirtualRows({
   // Measurement: one observer for all rendered rows; new sizes re-run the offsets once per frame.
   const observed = React.useRef(new Map<Element, number>());
   const measureFrame = React.useRef(0);
-  const getKeyRef = React.useRef(getKey);
-  getKeyRef.current = getKey;
   const getGroupRef = React.useRef(getGroup);
-  getGroupRef.current = getGroup;
+  React.useLayoutEffect(() => {
+    getGroupRef.current = getGroup;
+  });
   const record = React.useCallback((size: number, index: number) => {
     const offsets = startsRef.current;
     if (size <= 0 || index >= offsets.length - 1) return;
@@ -193,7 +229,7 @@ export function useVirtualRows({
     if (!measureFrame.current) {
       measureFrame.current = requestAnimationFrame(() => {
         measureFrame.current = 0;
-        setMeasuredVersion((version) => version + 1);
+        setMeasuredSizes({ sizes: new Map(sizes.current), groups: new Map(groupSizes.current) });
       });
     }
   }, []);
@@ -245,37 +281,32 @@ export function useVirtualRows({
 
   // The range follows its rows by key: when rows were inserted above or removed, the same rows
   // stay rendered (what the reader looks at never unmounts); a range at the last row takes the
-  // rows appended after it.
-  const anchor = React.useRef<{ range: [number, number]; first: React.Key; count: number } | null>(
-    null,
-  );
+  // rows appended after it. The range carries the key and row count it was taken at, so the
+  // adjustment is state from the previous render, set while rendering.
   let held = range;
-  // Only when the rows changed under a range that did not move itself (a scroll moves it).
-  if (range && anchor.current && anchor.current.range === range && count > 0) {
-    let first = Math.min(range[0], count - 1);
-    if (getKey(first) !== anchor.current.first) {
+  if (range && count > 0 && (range.count !== count || getKey(range.first) !== range.firstKey)) {
+    let first = Math.min(range.first, count - 1);
+    if (getKey(first) !== range.firstKey) {
       for (let index = 0; index < count; index++) {
-        if (getKey(index) === anchor.current.first) {
+        if (getKey(index) === range.firstKey) {
           first = index;
           break;
         }
       }
     }
-    const shift = first - range[0];
-    const atEnd = range[1] >= anchor.current.count - 1;
-    const last = atEnd ? count - 1 : Math.min(count - 1, range[1] + shift);
-    if (first !== range[0] || last !== range[1]) held = [Math.min(first, last), last];
+    const shift = first - range.first;
+    const atEnd = range.last >= range.count - 1;
+    const last = atEnd ? count - 1 : Math.min(count - 1, range.last + shift);
+    const from = Math.min(first, last);
+    held = { first: from, last, firstKey: getKey(from), count };
   }
   if (held !== range) setRange(held);
-  React.useLayoutEffect(() => {
-    anchor.current = range && count > 0 ? { range, first: getKey(range[0]), count } : null;
-  });
 
-  const visible =
-    held ??
-    (initialAlign === "end"
+  const visible: [number, number] = held
+    ? [held.first, held.last]
+    : initialAlign === "end"
       ? [Math.max(0, count - initialCount), count - 1]
-      : [0, Math.min(count, initialCount) - 1]);
+      : [0, Math.min(count, initialCount) - 1];
   const indexes = new Set<number>();
   for (let index = visible[0]; index <= Math.min(visible[1], count - 1); index++)
     indexes.add(index);
@@ -292,9 +323,10 @@ export function useVirtualRows({
     .sort((a, b) => a - b)
     .map((index) => ({ index, start: starts[index], size: starts[index + 1] - starts[index] }));
 
-  const startOf = React.useCallback((index: number) => startsRef.current[index] ?? 0, []);
+  const startOf = React.useCallback((index: number) => starts[index] ?? 0, [starts]);
+  const measured = rows.every(({ index }) => measuredSizes.sizes.has(getKey(index)));
 
-  return { rows, totalSize: starts[count] ?? 0, startOf, measure };
+  return { rows, totalSize: starts[count] ?? 0, startOf, measure, measured };
 }
 
 /**

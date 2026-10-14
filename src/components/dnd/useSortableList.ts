@@ -1,14 +1,14 @@
 import * as React from "react";
 
 import { formatLabel } from "@/internal/formatLabel";
-
+import { layoutRect, useFlipList } from "@/internal/useFlipList";
+import { type AsyncHandler, isPromiseLike, usePendingKeys } from "@/internal/usePendingChanges";
 import { useDragController } from "./context";
 import type { DragItem, DropVerdict } from "./dragSession";
-import { type Axis, insertionBefore, layoutRect, ownNodes } from "./geometry";
+import { type Axis, insertionBefore, ownNodes } from "./geometry";
 import { useStoreSelector } from "./store";
 import { type DragSourceProps, useDraggedItem, useDragSource } from "./useDragSource";
 import { type DropTargetProps, useDropTarget } from "./useDropTarget";
-import { useFlipList } from "./useFlipList";
 
 /**
  * Where a dragged item would land: in front of `before`, or last when that is null. `moves` is false
@@ -28,7 +28,7 @@ export type SortableListOptions = {
   items: readonly string[];
   labelOf: (id: string) => string;
   /** A returned promise keeps the move drawn until it settles; a rejection glides it back. */
-  onReorder: (id: string, beforeId: string | null) => void | Promise<void>;
+  onReorder: AsyncHandler<[id: string, beforeId: string | null]>;
   axis?: Axis | undefined;
   disabled?: boolean | undefined;
   /** Refuses an item of this kind (typically one from another list); a string says why. */
@@ -51,6 +51,10 @@ export type SortableListHandle = {
   /** The hole the lifted item left, in px. Set only while a drag is in flight. */
   gap: { width: number; height: number; radius: string | null } | null;
   isOver: boolean;
+  /** A drag of the list's kind is in flight: the list may take the item. */
+  carrying: boolean;
+  /** Items whose move the owner is still saving (a promise from `onReorder`). */
+  pending: ReadonlySet<string>;
   /**
    * The order to DRAW: `items`, except right after a drop, when the owner answers a beat later and
    * drawing the old order until then would snap the item back and then jump again.
@@ -60,8 +64,13 @@ export type SortableListHandle = {
 
 const ITEM_SELECTOR = "[data-dnd-item]";
 const LOCKED_SELECTOR = "[data-dnd-item][data-locked]";
-/** What glides on a layout change: the items and the gap between them. */
-const FLIP_SELECTOR = "[data-dnd-item], [data-dnd-gap]";
+/** What glides on a layout change: the list's own items and the gap between them. */
+const flipNodes = (container: HTMLElement) =>
+  ownNodes(container, "[data-dnd-item], [data-dnd-gap]");
+/** The gap glides between places like an item, so the landing spot never jumps. */
+const GAP_KEY = "\u0000gap";
+const flipKey = (node: HTMLElement) =>
+  node.dataset.dndItem ?? (node.dataset.dndGap !== undefined ? GAP_KEY : undefined);
 
 // How long the drawn order may run ahead of `items` (reached only when a reorder is silently refused).
 const OPTIMISTIC_TIMEOUT_MS = 2000;
@@ -206,6 +215,8 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
   const [settle, setSettle] = React.useState(0);
   const itemsKey = JSON.stringify(items);
   const order = optimistic && itemsKey === optimistic.from ? optimistic.order : items;
+  // The items whose move is being saved: their place holds, their grip is busy.
+  const { pending, track } = usePendingKeys<string>();
 
   React.useEffect(
     () => () => {
@@ -219,7 +230,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
       // An item from another list is not in this order: the owner's answer is the only truth.
       if (!order.includes(id)) {
         try {
-          void Promise.resolve(onReorder(id, before)).catch(() => {});
+          void Promise.resolve(track(id, onReorder(id, before))).catch(() => {});
         } catch {
           // A refusing owner has nothing drawn ahead to roll back.
         }
@@ -239,14 +250,14 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
       };
       let outcome: ReturnType<typeof onReorder>;
       try {
-        outcome = onReorder(id, before);
+        outcome = track(id, onReorder(id, before));
       } catch {
         rollback();
         return;
       }
       // A pending answer (a request in flight) keeps the item where it was put for as long as it
       // takes; the expiry counts only from the answer.
-      if (outcome instanceof Promise) {
+      if (isPromiseLike(outcome)) {
         if (expiryRef.current !== null) clearTimeout(expiryRef.current);
       } else if (drawAhead) {
         expire();
@@ -257,7 +268,7 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
       }
       void Promise.resolve(outcome).then(expire, rollback);
     },
-    [order, onReorder],
+    [order, onReorder, track],
   );
 
   const source = useDragSource<null>({
@@ -366,14 +377,15 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
     }
   }, [axis, gapKey, controller, target.element]);
 
-  useFlipList(
-    target.element,
-    JSON.stringify([order, dragged?.id ?? null, gapKey]),
-    FLIP_SELECTOR,
+  useFlipList({
+    container: target.element,
+    nodes: flipNodes,
+    keyOf: flipKey,
+    layoutKey: JSON.stringify([order, dragged?.id ?? null, gapKey]),
     // Only while the item is in the air: after the drop the list already stands in its final order.
-    dragged !== null,
+    enabled: dragged !== null,
     settle,
-  );
+  });
 
   // The neighbour lists of a linked kind reach this one through the registry.
   const latest = React.useRef({ items, disabled, canDrop: options.canDrop, commit, itemsKey });
@@ -516,6 +528,8 @@ export function useSortableList(options: SortableListOptions): SortableListHandl
     gapBefore,
     gap: showGap && origin ? { width: origin.width, height: origin.height, radius } : null,
     isOver: target.isOver,
+    carrying: dragged !== null,
+    pending,
     order,
   };
 }

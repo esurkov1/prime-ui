@@ -10,20 +10,12 @@ import { toDataAttributes } from "@/internal/data-attributes";
 import { highlightChildren } from "@/internal/HighlightMatch";
 import { optionDomId, useStoreSlice } from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
+import { nodeText } from "@/internal/nodeText";
 import { type ControlSize, stepDown, tierMappings } from "@/internal/states";
 
 import styles from "./Select.module.css";
 import { normalize, useSelectContext } from "./selectContext";
 
-/** Plain text of a node tree (a title made of nodes still has a label). */
-function textOf(node: React.ReactNode): string {
-  if (node == null || typeof node === "boolean") return "";
-  if (typeof node === "string" || typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(textOf).join("");
-  if (React.isValidElement<{ children?: React.ReactNode }>(node))
-    return textOf(node.props.children);
-  return "";
-}
 
 type SpanProps = React.HTMLAttributes<HTMLSpanElement> & { ref?: React.Ref<HTMLSpanElement> };
 
@@ -109,7 +101,7 @@ export function splitItemChildren(children: React.ReactNode): ItemParts {
   let plain = "";
   for (const child of React.Children.toArray(children)) {
     if (!React.isValidElement<{ children?: React.ReactNode }>(child)) {
-      plain += textOf(child);
+      plain += nodeText(child);
       parts.body.push(child);
     } else if (child.type === React.Fragment) {
       const inner = splitItemChildren(child.props.children);
@@ -128,9 +120,9 @@ export function splitItemChildren(children: React.ReactNode): ItemParts {
     } else if (child.type === SelectItemMeta || child.type === Badge.Root) {
       parts.meta.push(child);
     } else {
-      if (child.type === SelectItemText) parts.title = textOf(child.props.children);
+      if (child.type === SelectItemText) parts.title = nodeText(child.props.children);
       if (child.type === SelectItemDescription) {
-        parts.description = textOf(child.props.children);
+        parts.description = nodeText(child.props.children);
         parts.rich = true;
       }
       parts.body.push(child);

@@ -30,20 +30,20 @@ Dnd.Root                         session owner: overlay (portal), live region, l
 ├─ Dnd.Sortable                  list container and drop target; renders items in the drawn order
 │  ├─ header                     optional content before the items that never moves (a group's heading row)
 │  ├─ Dnd.SortableItem           one item (li in ul/ol, div otherwise); the gap is drawn before it
-│  │  └─ Dnd.Handle              optional grip: a ghost icon-only Button (with `handle` on the list); a lock in a `locked` item
+│  │  └─ Dnd.Handle              optional grip: a ghost icon-only Button (with `handle` on the list); a lock in a `locked` item; busy while the item's move is saved
 │  ├─ empty                      the `empty` content while the list has no items
 │  └─ children                   optional content after the items that never moves (an add tile)
 ├─ Dnd.Draggable                 an item to carry elsewhere; stays in place, faded, until the drop
 └─ Dnd.DropZone                  a box that takes dropped items
 ```
-A drag in flight is drawn by `Dnd.Root` as a clone of the lifted element above every layer, following the pointer. The clone flies inside empty copies (`display: contents`) of its ancestors up to the nearest surface (`data-depth`) and that surface's `data-theme`, so the host's variables and selectors (a List row's tier padding and radius) dress it exactly as the item in place, and it sets down without a jump; an item without a fill of its own flies on the fill of the surface it was lifted from (`--prime-color-layer-current`). A refusal with a reason shows the reason in a chip under the clone. The page gets `data-dnd-active="mouse | touch | pen"` on `<html>` for the length of the gesture.
+A drag in flight is drawn by `Dnd.Root` as a clone of the lifted element above every layer, following the pointer. The clone flies inside empty copies (`display: contents`) of its ancestors up to the nearest surface (`data-depth`) and that surface's `data-theme`, so the host's variables and selectors (a List row's tier padding and radius) dress it exactly as the item in place, and it sets down without a jump; an item without a fill of its own flies on the fill of the surface it was lifted from (`--prime-color-layer-current`). A refusal with a reason shows the reason in the tooltip's chip under the clone. The page gets `data-dnd-active="mouse | touch | pen"` on `<html>` for the length of the gesture (the holding cursor), and every list of the carried item's kind gets `data-dnd-carrying`.
 
 ## API
 
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 ### Dnd.Root
-No ref, no DOM of its own besides the portalled overlay and a visually hidden live region. Owns the one drag session the app shares — mount it once above every screen that drags. Without a root the parts render but do not drag.
+No ref, no DOM of its own besides the portalled overlay and a visually hidden live region. Owns the one drag session the app shares: mount it once above every screen that drags; a root inside another renders only its children. Without a root nothing drags.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -51,14 +51,14 @@ No ref, no DOM of its own besides the portalled overlay and a visually hidden li
 | `children` | `ReactNode` | — | The app or the screen that drags. |
 
 ### Dnd.Sortable
-Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target: renders the items through `renderItem` and draws the gap and the optimistic order. Sets `data-axis` and `data-dragging`.
+Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target: renders the items through `renderItem`, draws the gap and the optimistic order. Sets `data-axis`, `data-disabled`, `data-dragging`, `data-dnd-carrying`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `items` | `readonly T[]` | — (required) | Items in their current order. |
 | `getId` | `(item: T) => string` | — (required) | Stable unique id; must match `Dnd.SortableItem id`. |
 | `getLabel` | `(item: T) => string` | the `id` | Spoken by the live region. |
-| `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — (required) | Item `id` lands in front of `beforeId` (`null` = last); in linked lists `id` may come from another list. Apply it with `moveBefore`; return a promise to save on a server (a rejection moves the item back). |
+| `onReorder` | `(id: string, beforeId: string \| null) => void \| Promise<void>` | — (required) | Item `id` lands in front of `beforeId` (`null` = last), maybe from a linked list. Apply it with `moveBefore`; a returned promise keeps the item still and busy until it settles, a rejection moves it back. |
 | `renderItem` | `(item: T, index: number) => ReactNode` | — (required) | Returns a `Dnd.SortableItem`. During a drag `index` is the place the item will have on release, so a shown position follows the gap. |
 | `children` | `ReactNode` | — | Content after the items that never moves and takes no drop position: an add tile at the end of a grid. Inside `ul` / `ol` it must be `li`. |
 | `axis` | `"x" \| "y" \| "grid"` | `"y"` | A column, a single row, or a wrapping grid (`display: grid`; the host sets the tracks and the cells' size, the gap takes a cell). Keyboard: Alt + ↑ / ↓ in a column, Alt + ← / → in a row and a grid. |
@@ -66,14 +66,14 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `disabled` | `boolean` | `false` | No drag, no keyboard reorder. |
 | `kind` | `string` | unique per list | Lists sharing a `kind` exchange items (a board): by pointer at an exact position, by keyboard with Alt + the arrows across the axis. Name each list: the name is spoken on a move. |
 | `canDrop` | `(id: string) => boolean \| string` | — | Refuses an item by id: `false`, or a string that says why (spoken and shown under the carried copy). The list turns `danger` before the release. |
-| `empty` | `ReactNode` | — | Shown while the list has no items; fades out when a gap opens in the list, so the gap takes its place. |
+| `empty` | `ReactNode` | — | Shown while the list has no items, inside a dashed drop slot while the list takes drops; fades out when a gap opens in the list, so the gap takes its place. |
 | `as` | `"div" \| "ul" \| "ol" \| "tbody"` | `"div"` | Root element; `ul` / `ol` render items as `li`, `tbody` as table rows `tr`. |
 | `header` | `ReactNode` | — | Content in front of the items that never moves and takes no drop position: the heading row of a group in a `tbody`. |
 | `aria-label` | `string` | — | Accessible name of the list. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children">` | — | `className` (the list layout), `aria-label` (the name of the list) and the other attributes of the list element. |
 
 ### Dnd.SortableItem
-`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<div>` otherwise; throws outside `Dnd.Sortable`. One item of the list; presses on buttons, fields and links inside never start a drag.
+`ref` → `HTMLElement`. `<li>` inside `ul` / `ol`, `<tr>` inside `tbody`, `<div>` otherwise; throws outside `Dnd.Sortable`. One item; presses on controls inside never drag. Without `handle` it takes the keys, and a named `<div>` item is a `button`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -85,7 +85,7 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `aria-labelledby` / `aria-describedby` (the visible title and description) and the other attributes. |
 
 ### Dnd.Handle
-`ref` → `HTMLButtonElement`. The grip: a ghost icon-only `xs` Button; a press always starts the drag, Alt + arrows on it move its item. In a `locked` item it is a lock instead.
+`ref` → `HTMLButtonElement` (`HTMLSpanElement` in a `locked` item). The grip: a ghost icon-only `xs` Button that starts the drag and takes the item's keys; busy while the item's move is saved. In a `locked` item it is a lock.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -93,7 +93,7 @@ Generic `Dnd.Sortable<T>`; `ref` → `HTMLElement`. The list and its drop target
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" \| "children">` | — | `className`, `disabled` and the other button attributes. |
 
 ### Dnd.Draggable
-Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. An item carried onto a `Dnd.DropZone`; stays in place, faded, while carried. Has no keyboard path: offer a button or a menu for the same move.
+Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. An item carried onto a `Dnd.DropZone`; stays in place, faded, while carried; a named one is a `button`. No keyboard path: offer a button or a menu for the same move.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -155,7 +155,7 @@ Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body
 | `handle` | only the grip starts a drag; the row keeps its controls | rows with buttons, switches, text | `false` |
 | `kind` shared | lists exchange items at an exact position; Alt + ← / → moves across | boards | unique per list |
 | `locked` (item) | a lock where the grip would be; the item holds its place, nothing moves past it | a pinned first row, a system column | `false` |
-| `empty` | a line of the list's own while it is empty; a gap opening takes its place | columns, lists that may run out | — |
+| `empty` | the list's own line inside a dashed drop slot while it is empty (no slot when the list is `disabled`); a gap opening takes its place | columns, lists that may run out | — |
 | `canDrop` → string | the refusal says why: live region and a chip under the clone | workflow rules a person must understand | — |
 | `flashOnDrop` | the zone flashes `accent-soft` after a drop | the eye must follow where the item went | `false` |
 
@@ -165,16 +165,16 @@ Returns `items` with `id` moved in front of `beforeId` (`null` = last): the body
 | idle | — | items show `cursor: grab` |
 | carried | a drag | the clone follows the pointer, lifted on `--prime-shadow-modal`, scale 1.02; a sortable source leaves the layout (`data-lifted`) and a dashed accent gap of its size and radius fades in and glides with the items as the landing spot moves; entering a connected list, it fades out in the list it left and in where it opens; crossing empty space (the gutter between lists) leaves the gap in the last list that takes the item; neighbours glide aside; a `Dnd.Draggable` stays at 0.4 opacity (`data-dragging`) |
 | over a zone | pointer over an accepting zone | `data-dnd-over`: `accent-soft` fill, dashed accent outline |
-| refused | `canDrop` returns `false` or a string | `data-dnd-reject`: `danger-soft` fill; the clone gets a dashed `danger` outline; a string is spoken once and shown in the tooltip's inverse chip under the clone (it fades in, `fast`) |
+| refused | `canDrop` returns `false` or a string | `data-dnd-reject`: `danger-soft` fill fading in (`fast`); the clone gets a dashed `danger` outline; a string is spoken once and shown in the tooltip's inverse chip under the clone (it drops in, `fast`) |
 | locked | `locked` on an item | `data-locked`; no `aria-roledescription` or shortcuts; `Dnd.Handle` is a lock; the gap never stands where it would shift the item, a keyboard step past it does not happen, and an item from another list takes the nearest free place after it |
-| empty | `empty` and no items | `data-dnd-empty` element in the list (an `li` with `role="presentation"` in `ul` / `ol`, a `div` otherwise); out of the flow and faded (`fast`) once a gap opens in the list |
+| empty | `empty` and no items | `data-dnd-empty` element in the list (an `li` with `role="presentation"` in `ul` / `ol`, a `div` otherwise), a dashed drop slot around it; out of the flow and faded (`fast`) once a gap opens in the list |
 | dropped | release over a target, or over empty space while a list holds the gap | the clone glides to the item's new place and is swapped for the real element; `data-dnd-flash` with `flashOnDrop`; the clone sets down into the look the item will have in place — its resting shadow, or under the mouse its hover look: the item gets `data-dnd-hover` until the pointer leaves it or presses, so a host styles its hover lift on `:is(:hover, [data-dnd-hover])` and the card never dips to flat and lifts again |
 | cancelled | Escape, a system-cancelled pointer | the clone flies back, nothing changes |
-| saving | `onReorder` returned a pending promise (a drop or a keyboard move) | the item stays drawn in its new place until the promise settles; apply the new order before resolving; a rejection glides it back over `base` |
+| saving | `onReorder` returned a pending promise (a drop or a keyboard move) | the item stays drawn in its new place until the promise settles, with `aria-busy` and `data-pending`, and holds still; its `Dnd.Handle` is busy; apply the new order before resolving; a rejection glides it back over `base` |
 | moved from the keyboard | Alt + an arrow | the items glide to their new places over `base`, like during a drag |
-| disabled | `disabled` | `data-disabled`, no `aria-roledescription` |
+| disabled | `disabled` | `data-disabled` on the item (and on the list), no `aria-roledescription` |
 
-All motion is on the tokens (lift `fast`, glide and landing `base`, flash `slow`, `standard` easing; `data-dnd-flash` clears when the flash animation ends); under `prefers-reduced-motion` the lift, the gap fade, the glide, the flash, the reason chip and the empty fade are off.
+All motion is on the tokens (lift `fast`, glide and landing `base`, flash `slow`, the faded source and the refusal fill `fast`, `standard` easing; `data-dnd-flash` clears when the flash animation ends); under `prefers-reduced-motion` the lift, the gap fade, the glide, the flash and the reason chip's drop are off, while the faded source, the refusal fill, the reason chip's fade and the empty fade stay (they run on the fade clocks).
 
 An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefault()` in them keeps the drag from starting. Presses on buttons, fields, links and `[data-dnd-ignore]` inside an item never start a drag. The browser's own drag of an image or a link inside an item or a `Dnd.Draggable` is stopped in the capture phase, so `onDragStart` on `Dnd.Draggable` is the kit's event.
 
@@ -182,11 +182,12 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 
 | Attribute | On | Means |
 |---|---|---|
-| `data-dnd-active="mouse \| touch \| pen"` | `<html>` | a drag is in flight (hide hover-only actions, stop snapping) |
+| `data-dnd-active="mouse \| touch \| pen"` | `<html>` | a drag is in flight: the holding cursor everywhere |
+| `data-dnd-carrying` (`DND_CARRYING_ATTRIBUTE`) | a `Dnd.Sortable` | an item of its kind is carried: scope a host's drag-time look to it (hide hover-only actions, stop snapping in the scroller around it) |
 | `data-dnd-item`, `data-dnd-kind` | every draggable | its id and kind |
 | `data-lifted` | a sortable item | it is carried: out of the layout, the gap stands for it |
 | `data-dragging` | a `Dnd.Draggable` / a sortable list | it is carried (the source fades) / an item of the list is in the air |
-| `data-locked`, `data-disabled`, `data-handle` | an item | `locked`, `disabled`, the list has `handle` |
+| `data-locked`, `data-disabled`, `data-handle`, `data-pending` | an item | `locked`, `disabled`, the list has `handle`, its move is being saved |
 | `data-dnd-hover` | an item that just landed under the mouse | style its hover on `:is(:hover, [data-dnd-hover])` |
 | `data-dnd-landing` | an item | hidden while the clone lands on it |
 | `data-axis` | a `Dnd.Sortable` | `x`, `y` or `grid` (a host widens its rule with it: `.gallery[data-axis]`) |
@@ -198,7 +199,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | `data-dnd-ignore`, `data-dnd-handle` | a part the host marks | a press here never drags / always drags |
 
 ## Layout & spacing
-- The list gap is `--prime-space-2`; override it with `className` (widen the rule with `[data-axis]` so it wins: `.gallery[data-axis] { gap: … }`).
+- The distance between items is `--prime-space-2`; a host sets `--dnd-sortable-gap` on the list for another one.
 - A grid (`axis="grid"`) is `display: grid`: the host sets the tracks (`grid-template-columns`) and the cells' size; the gap takes a cell, and a carried item resizes to the cell it would land in.
 - The reason chip stands `--prime-tooltip-offset` under the carried copy, start-aligned, at most `--prime-tooltip-max-width` wide.
 - The look of a row is the consumer's: give `Dnd.SortableItem` / `Dnd.Draggable` a radius on its own class (the gap and the clone's fill take it) and keep the row's look within its ancestors up to the nearest surface (`data-depth`) — the clone flies inside empty copies (`display: contents`) of exactly those, so their variables and selectors still apply. A table row flies in a one-row copy of its table inside them.
@@ -221,10 +222,11 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
 - A live region (`role="status"`, `aria-live="polite"`) announces grabbed, dropped, returned, cancelled, «position N of M», a move to another list by its name and a refusal with its reason, from `labels`.
-- Every draggable item has `aria-roledescription` and `aria-keyshortcuts` (with the across keys in linked lists) and is in the tab order (`tabIndex={0}`); with `handle` the grip takes focus instead. The clone is `aria-hidden`.
+- The keyboard target of a sortable item has `aria-keyshortcuts` (with the across keys in linked lists) and `aria-roledescription` and is in the tab order: the item itself (`tabIndex={0}`; a named `<div>` item is a `button`, an `li` or a `tr` keeps its role), or with `handle` its grip. A role description stands only on an element with a role. The clone is `aria-hidden`.
+- While `onReorder`'s promise is pending, the item has `aria-busy` and holds still, and its `Dnd.Handle` is busy.
 - In lists sharing a `kind`, Alt + the across arrows move the item to the same row of the neighbouring list in document order; focus follows the item.
 - Name an item by what it shows: `aria-labelledby` on its visible title and `aria-describedby` on its description. An `aria-label` on the item replaces its content for assistive tech — use it only when the item shows no text (a photo tile). Name every linked list (`aria-label` or `aria-labelledby` on its heading): that name is spoken when an item moves into it.
-- A `locked` item has no role description or shortcuts; its `Dnd.Handle` is a lock: a `<span role="img">` named `labels.locked` with the `status.locked` icon at the grip's size (no ref).
+- A `locked` item has no role description or shortcuts; its `Dnd.Handle` is a lock: a `<span role="img">` named `labels.locked` with the `status.locked` icon at the grip's size, taking the grip's `ref` and attributes.
 - Touch: a drag starts after a hold; a finger that moves first scrolls the page.
 - `Dnd.Draggable` has no keyboard path of its own — offer a button or a menu for the same move.
 
@@ -235,7 +237,7 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 |---|---|---|
 | `handle` | `"Перетащить"` | Name of `Dnd.Handle`. |
 | `locked` | `"Закреплено"` | Name of the lock a `Dnd.Handle` shows in a `locked` item. |
-| `roleDescription` | `"перетаскиваемый элемент"` | `aria-roledescription` of every draggable item. |
+| `roleDescription` | `"перетаскиваемый элемент"` | `aria-roledescription` of every draggable item (its grip with `handle`). |
 | `grabbed` | `"{label}: взят"` | Live region: picked up. |
 | `dropped` | `"{label}: перемещён"` | Live region: dropped on a target. |
 | `returned` | `"{label}: возвращён на место"` | Live region: released over nothing. |
@@ -269,7 +271,8 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 - `aria-label` on an item that shows a title and a description → it hides them; point `aria-labelledby` / `aria-describedby` at them.
 - `draggable={false}` on every image inside an item → not needed: the kit stops the browser's own drag inside its items.
 - A pinned row kept first by re-sorting the array after every move → `locked` on its item.
-- An empty-list message rendered next to the list → pass it as `empty`: the gap takes its place while an item is over the list.
+- An empty-list message rendered next to the list → pass it as `empty`: it stands in the drop slot, and the gap takes its place while an item is over the list.
+- A drag-time look keyed to `<html data-dnd-active>` → key it to the list's `data-dnd-carrying`.
 - `canDrop` returning `false` where the rule is not obvious → return the reason as a string.
 
 ## Related

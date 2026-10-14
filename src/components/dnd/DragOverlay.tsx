@@ -2,12 +2,16 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 
 import { prefersReducedMotion } from "@/hooks/usePresence";
+import { cx } from "@/internal/cx";
+import enterMotion from "@/internal/enterMotion.module.css";
 import { motionDurationMs, motionTiming } from "@/internal/motionTiming";
+import tooltipSurface from "@/internal/overlay/tooltipSurface.module.css";
+import { carryRolling } from "@/internal/RollingNumber";
+import { layoutRect } from "@/internal/useFlipList";
 
 import styles from "./Dnd.module.css";
 import type { DragController, DragItem, DragPreview } from "./dragSession";
 import type { Point, Rect } from "./geometry";
-import { layoutRect } from "./geometry";
 
 function translate(point: Point, grab: Point): string {
   return `translate3d(${Math.round(point.x - grab.x)}px, ${Math.round(point.y - grab.y)}px, 0)`;
@@ -158,38 +162,18 @@ function resizeCopy(
 
 /**
  * The carried copy keeps showing what the item shows while it is in the air: every part marked
- * `data-dnd-mirror` follows the hidden original — its rolling digits roll, other content is copied.
+ * `data-dnd-mirror` follows the hidden original — its rolling digits roll (`carryRolling`), other
+ * content is copied.
  */
 function mirrorParts(copy: HTMLElement, source: HTMLElement) {
   const own = copy.querySelectorAll<HTMLElement>("[data-dnd-mirror]");
   source.querySelectorAll<HTMLElement>("[data-dnd-mirror]").forEach((part, index) => {
     const target = own[index];
-    if (!target) return;
-    const digits = part.querySelectorAll("[data-rolling-digit]").length;
-    if (digits > 0 && digits === target.querySelectorAll("[data-rolling-digit]").length) {
-      rollDigits(target, part);
-    } else if (target.innerHTML !== part.innerHTML) {
-      target.innerHTML = part.innerHTML;
-      // The copy shows the new content as it stands: an entrance the original plays (a word fading
-      // in) would replay on every change and blink while the item is carried.
-      for (const animation of target.getAnimations?.({ subtree: true }) ?? []) animation.finish();
-    }
-  });
-}
-
-/**
- * The drop changed what the item shows (its position number): the real item is hidden while the
- * copy lands, so the copy's rolling digits (`RollingNumber`) take the new values and roll in flight.
- * Matched from the right, as the number keys its columns; a new leading digit appears on settle.
- */
-function rollDigits(copy: HTMLElement, destination: HTMLElement) {
-  const from = [...copy.querySelectorAll<HTMLElement>("[data-rolling-digit]")].reverse();
-  const to = [...destination.querySelectorAll<HTMLElement>("[data-rolling-digit]")].reverse();
-  to.forEach((digit, index) => {
-    const own = from[index];
-    if (!own) return;
-    own.style.setProperty("--rolling-n", digit.style.getPropertyValue("--rolling-n"));
-    own.textContent = digit.textContent;
+    if (!target || carryRolling(target, part) || target.innerHTML === part.innerHTML) return;
+    target.innerHTML = part.innerHTML;
+    // The copy shows the new content as it stands: an entrance the original plays (a word fading
+    // in) would replay on every change and blink while the item is carried.
+    for (const animation of target.getAnimations?.({ subtree: true }) ?? []) animation.finish();
   });
 }
 
@@ -305,7 +289,7 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         }
         const rect = layoutRect(destination);
         const to = translate({ x: rect.left, y: rect.top }, { x: 0, y: 0 });
-        rollDigits(lifted, destination);
+        carryRolling(lifted, destination);
         destination.setAttribute("data-dnd-landing", "");
         // Where the pointer let go decides the look the item lands in: hovered under a mouse,
         // resting under a finger. Read with transitions off, so it is the end value, not the start.
@@ -463,7 +447,8 @@ export function DragOverlay({ controller }: { controller: DragController }) {
         shown.textContent = state.reason;
       } else {
         const reason = document.createElement("div");
-        reason.className = styles.reason ?? "";
+        // The tooltip's chip, entering like a hint drops in under its anchor.
+        reason.className = cx(tooltipSurface.chip, enterMotion.enter, styles.reason);
         reason.textContent = state.reason;
         host.append(reason);
       }

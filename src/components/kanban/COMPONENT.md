@@ -155,7 +155,7 @@ Do not wrap a `plain` board's columns in your own boxes, and do not put a `well`
 | refused | `limit` reached, `canDrop` returns `false` or a reason | `data-dnd-reject` on the `<ul>`: `danger-soft` fill; the reason in a chip under the carried card |
 | locked column | `locked` | `data-locked` on the column; the grip is a lock named «Закреплено» |
 | full | count ≥ `limit` | `data-full` on the column, orange count `count / limit` |
-| empty | no cards | a compact `EmptyPage` in a dashed drop slot at the top (`fill-strong` dashed line, no fill): «Нет карточек» and the hint «Перетащите сюда карточку» (not on a `disabled` board); the whole column stays a drop area |
+| empty | no cards | a compact `EmptyPage` in Dnd's dashed drop slot at the top (`fill-strong` dashed line, no fill): «Нет карточек» and the hint «Перетащите сюда карточку»; a `disabled` board shows the text alone; the whole column stays a drop area |
 | loading | `loading` | `aria-busy` and `data-loading` on the root; `Skeleton` cards; `Crossfade` swaps them for the cards |
 | disabled | `disabled` / `Kanban.Item disabled` | `data-disabled` on the root / card; no `aria-roledescription`, no shortcuts, no column grips |
 | saving | `onValueChange` / `onColumnOrderChange` returned a pending promise | the card (column) stays in its new place with `aria-busy` and `data-pending`; a card's content quiets to 0.6 under a centred `Spinner`, a column's heading quiets and a spinner stands in for its grip; it does not move again until the answer |

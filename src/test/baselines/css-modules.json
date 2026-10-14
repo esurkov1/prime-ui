@@ -49,7 +49,6 @@
   "src/components/tabs/Tabs.module.css: --tabs-indicator is never read #5",
   "src/components/tag-select/TagSelect.module.css: * 1 factor in margin",
   "src/components/textarea/Textarea.module.css: * 1 factor in margin-block-start",
-  "src/internal/menu.module.css: * 1 factor in margin-inline",
   "src/internal/sticky.module.css: * 1 factor in --sticky-bleed",
   "src/layout/bottom-nav/BottomNav.module.css: * 1 factor in inset-block-start",
   "src/layout/sidebar/Sidebar.module.css: * 1 factor in clip-path",

@@ -56,7 +56,6 @@
   "src/components/datepicker/Datepicker.module.css: raw length in --dp-col-gap",
   "src/components/datepicker/Datepicker.module.css: raw length in font-size",
   "src/components/dnd/Dnd.module.css: numeric scale() in transform",
-  "src/components/dnd/Dnd.module.css: numeric scale() in transform #2",
   "src/components/field-list/FieldList.module.css: px in @container (use rem)",
   "src/components/gallery/Gallery.module.css: numeric z-index",
   "src/components/gallery/Gallery.module.css: numeric z-index #2",

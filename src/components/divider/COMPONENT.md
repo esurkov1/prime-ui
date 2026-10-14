@@ -75,6 +75,7 @@ No `variant`, `tone` or `color`: one hairline in `border-subtle`, label in `text
 ## Layout & spacing
 - No margins: the parent's `gap` sets the rhythm around the line.
 - Horizontal: `width: 100%` in its flex column. Vertical: `align-self: stretch` in a flex row.
+- A host with inline padding (a menu panel) sets `--divider-bleed` to that padding: the line runs across it to the host's edges.
 - Label gap and icon size follow the tier (`--prime-control-<size>-gap`, `-icon`).
 
 ## Accessibility
