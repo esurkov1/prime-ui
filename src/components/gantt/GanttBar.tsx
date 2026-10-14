@@ -5,6 +5,7 @@ import { Spinner } from "@/components/spinner/Spinner";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { DRAG_HOLD_MS, DRAG_THRESHOLD_PX, useLongPress } from "@/internal/longPress";
 import palette from "@/internal/palette.module.css";
 
 import styles from "./Gantt.module.css";
@@ -21,11 +22,6 @@ import {
   stickyRound,
   unitDays,
 } from "./ganttModel";
-
-/** Pointer travel before a press becomes a drag (a gesture threshold, not a style length). */
-const DRAG_THRESHOLD_PX = 4;
-/** A finger held this long on a bar picks it up for a drag; moving earlier scrolls the chart. */
-const LONG_PRESS_MS = 400;
 
 const EDIT_SHORTCUTS = [
   "Shift+ArrowLeft",
@@ -139,7 +135,7 @@ export function GanttBarView({
     steps: number;
     unit: GanttScale;
     /** Touch on the body: the long press has not picked the bar up yet. */
-    waiting: number | null;
+    waiting: boolean;
   } | null>(null);
   /** A drag ends with the browser's click on the same button: that click is not a selection. */
   const swallowClick = React.useRef(false);
@@ -169,8 +165,19 @@ export function GanttBarView({
       ? undefined
       : Math.round(Math.min(Math.max(bar.progress, 0), 1) * 100);
 
+  // On touch the body of a bar scrolls the chart until a finger held on it picks the bar up.
+  const hold = useLongPress({
+    delay: DRAG_HOLD_MS,
+    onLongPress: () => {
+      const current = gesture.current;
+      if (!current?.waiting) return;
+      current.waiting = false;
+      nodeRef.current?.setPointerCapture?.(current.pointerId);
+    },
+  });
+
   const cancel = () => {
-    if (gesture.current?.waiting) window.clearTimeout(gesture.current.waiting);
+    hold.cancel();
     if (gesture.current?.moved) onDragChange(bar.id, false);
     gesture.current = null;
     autoScroll.stop();
@@ -208,7 +215,6 @@ export function GanttBarView({
       .handle as GanttEdit | undefined;
     const node = event.currentTarget;
     const pointerId = event.pointerId;
-    // On touch the body of a bar scrolls the chart until a long press picks the bar up.
     const waitForPress = event.pointerType === "touch" && !handle;
     gesture.current = {
       x: event.clientX,
@@ -220,24 +226,18 @@ export function GanttBarView({
       moved: false,
       steps: 0,
       unit: "day",
-      waiting: waitForPress
-        ? window.setTimeout(() => {
-            const current = gesture.current;
-            if (!current || current.pointerId !== pointerId) return;
-            current.waiting = null;
-            node.setPointerCapture?.(pointerId);
-          }, LONG_PRESS_MS)
-        : null,
+      waiting: waitForPress,
     };
-    if (!waitForPress) node.setPointerCapture?.(pointerId);
+    if (waitForPress) hold.handlers.onPointerDown(event);
+    else node.setPointerCapture?.(pointerId);
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
     const current = gesture.current;
     if (!current || event.pointerId !== current.pointerId) return;
     if (current.waiting) {
-      // Moving before the long press: the finger scrolls the chart, the bar stays.
-      if (Math.abs(event.clientX - current.x) > DRAG_THRESHOLD_PX) cancel();
+      // Moving before the hold ends: the finger scrolls the chart, the bar stays.
+      hold.handlers.onPointerMove(event);
       return;
     }
     current.clientX = event.clientX;
@@ -249,7 +249,7 @@ export function GanttBarView({
   const onPointerUp = (event: React.PointerEvent<HTMLButtonElement>) => {
     const current = gesture.current;
     if (!current || event.pointerId !== current.pointerId) return;
-    if (current.waiting) window.clearTimeout(current.waiting);
+    hold.cancel();
     gesture.current = null;
     autoScroll.stop();
     if (!current.moved) return;

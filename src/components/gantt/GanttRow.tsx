@@ -3,10 +3,12 @@
 import type { Locale } from "date-fns";
 import * as React from "react";
 
-import { isPlainClick, opensRow } from "@/components/data-table/rowEvents";
 import { Skeleton } from "@/components/skeleton/Skeleton";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Icon } from "@/icons";
+import { cx } from "@/internal/cx";
+import enterMotion from "@/internal/enterMotion.module.css";
+import { isPlainClick, opensRow } from "@/internal/rowLink";
 
 import styles from "./Gantt.module.css";
 import { GanttBarView } from "./GanttBar";
@@ -229,7 +231,7 @@ function GanttRowView({
       >
         {hover && !ghost ? (
           <span
-            className={styles.createCell}
+            className={cx(styles.createCell, enterMotion.enterFade)}
             style={{ "--x": hover.x, "--span": hover.span } as React.CSSProperties}
             aria-hidden="true"
           >

@@ -26,13 +26,16 @@ import {
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { createEdgeAutoScroll } from "@/internal/edgeAutoScroll";
 import { formatLabel } from "@/internal/formatLabel";
 import { useLabels } from "@/internal/labels";
+import { DRAG_THRESHOLD_PX, useLongPress } from "@/internal/longPress";
 import { exitTimeoutMs } from "@/internal/motionTiming";
 import { RegionSwap, useSwapIn } from "@/internal/RegionSwap";
 import type { ControlSize } from "@/internal/states";
 import { stickySurfaceClass } from "@/internal/sticky";
 import { SurfaceDepthProvider, useNestedSurfaceDepth } from "@/internal/surfaceDepth";
+import { isPromiseLike } from "@/internal/usePendingChanges";
 
 import styles from "./Gantt.module.css";
 import { GanttRow, type GanttRowContext, type GanttGhost as Ghost } from "./GanttRow";
@@ -55,11 +58,11 @@ import {
   shiftDate,
   snapHysteresis,
   stickyFloor,
+  unitDays,
   unitStart,
   visibleSegment,
   weekOffset,
 } from "./ganttModel";
-import { useEdgeAutoScroll } from "./useEdgeAutoScroll";
 
 export type { GanttBar, GanttDates, GanttScale } from "./ganttModel";
 
@@ -215,10 +218,6 @@ const SKELETON_ROWS: readonly (readonly (readonly [number, number])[])[] = [
   [[1, 3]],
 ];
 
-/** Pointer travel before a press on empty space becomes drawing (a gesture threshold). */
-const DRAW_THRESHOLD_PX = 4;
-/** A held finger on an empty cell creates a bar there. */
-const LONG_PRESS_MS = 500;
 /** Row geometry before the stylesheet can be read (jsdom, first render): the `m` tier. */
 const FALLBACK_GEOMETRY = { padY: 8, barH: 28, laneGap: 4, border: 1 };
 
@@ -233,25 +232,6 @@ type RowModel<Row, Bar> = {
   lanes: Map<string, number>;
   laneCount: number;
 };
-
-function isPromise(value: unknown): value is Promise<unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as Promise<unknown>).then === "function"
-  );
-}
-
-/** A length custom property of `element` in px (`rem` or `px` after the tokens resolve). */
-function readLength(element: Element, name: string, fallback: number): number {
-  const raw = getComputedStyle(element).getPropertyValue(name).trim();
-  const value = Number.parseFloat(raw);
-  if (!Number.isFinite(value)) return fallback;
-  if (raw.endsWith("rem")) {
-    return value * (Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
-  }
-  return raw.endsWith("px") || value === 0 ? value : fallback;
-}
 
 /**
  * A resource or project schedule: rows with bars on a time axis (day / week / month), a sticky
@@ -388,9 +368,9 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     if (!onBarChange || sameDates(dates, bar)) return;
     const result = onBarChange(dates, bar, row);
     if (announce) setAnnouncement(nameFor(bar, dates));
-    if (!isPromise(result)) return;
+    if (!isPromiseLike(result)) return;
     setPending((prev) => new Map(prev).set(bar.id, dates));
-    result
+    Promise.resolve(result)
       .catch(() => setAnnouncement(formatLabel(labels.changeFailed, { label: bar.label })))
       .finally(() =>
         setPending((prev) => {
@@ -421,7 +401,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     const id = `ghost-${++ghostSeq.current}`;
     const result = onBarCreate(dates, item.row);
     setAnnouncement(nameFor({ label: labels.newBar }, dates));
-    if (!isPromise(result)) {
+    if (!isPromiseLike(result)) {
       setGhost(item.key, null);
       return;
     }
@@ -481,11 +461,31 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
   dayPxRef.current = dayPx;
   const directionRef = React.useRef(direction);
   directionRef.current = direction;
-  const timelineStart = React.useCallback(() => {
-    const view = scrollRef.current?.getBoundingClientRect();
-    return (view?.left ?? 0) + labelWidth();
-  }, [labelWidth]);
-  const autoScroll = useEdgeAutoScroll(scrollRef, timelineStart);
+  // A gesture on the time axis scrolls the chart sideways near its edges; the start edge is the
+  // end of the pinned column. One loop for every gesture: each names what it re-reads.
+  const onAutoScrolled = React.useRef<() => void>(() => {});
+  const [edgeScroll] = React.useState(() =>
+    createEdgeAutoScroll({
+      scrollers: [],
+      axes: { x: true, y: false },
+      insets: () => ({ inlineStart: labelWidth() }),
+      onScrolled: () => onAutoScrolled.current(),
+    }),
+  );
+  React.useEffect(() => () => edgeScroll.stop(), [edgeScroll]);
+  const autoScroll = React.useMemo(
+    () => ({
+      follow: (clientX: number, onScrolled: () => void) => {
+        const viewport = scrollRef.current;
+        if (!viewport) return;
+        onAutoScrolled.current = onScrolled;
+        edgeScroll.setScrollers([viewport]);
+        edgeScroll.follow({ x: clientX, y: 0 });
+      },
+      stop: () => edgeScroll.stop(),
+    }),
+    [edgeScroll],
+  );
 
   /** Row heights from the stylesheet of the tier: estimates before a row is measured. */
   const [geometry, setGeometry] = React.useState(FALLBACK_GEOMETRY);
@@ -494,10 +494,10 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     const root = rootRef.current;
     if (!root) return;
     const next = {
-      padY: readLength(root, "--gantt-pad-y", FALLBACK_GEOMETRY.padY),
-      barH: readLength(root, "--gantt-bar-h", FALLBACK_GEOMETRY.barH),
-      laneGap: readLength(root, "--gantt-lane-gap", FALLBACK_GEOMETRY.laneGap),
-      border: readLength(root, "--prime-border-width", FALLBACK_GEOMETRY.border),
+      padY: readCssLengthPx("--gantt-pad-y", FALLBACK_GEOMETRY.padY, root),
+      barH: readCssLengthPx("--gantt-bar-h", FALLBACK_GEOMETRY.barH, root),
+      laneGap: readCssLengthPx("--gantt-lane-gap", FALLBACK_GEOMETRY.laneGap, root),
+      border: readCssLengthPx("--prime-border-width", FALLBACK_GEOMETRY.border, root),
     };
     setGeometry((prev) =>
       prev.padY === next.padY &&
@@ -888,10 +888,19 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
     touch: boolean;
     id: string;
   } | null>(null);
-  const longPress = React.useRef<{ timer: number; x: number; pointerId: number } | null>(null);
+  // A finger resting on an empty cell picks it up: the press names what it starts.
+  const pressStart = React.useRef<(() => void) | null>(null);
+  const longPress = useLongPress({
+    enabled: creatable,
+    onLongPress: () => {
+      const start = pressStart.current;
+      pressStart.current = null;
+      start?.();
+    },
+  });
   const cancelLongPress = () => {
-    if (longPress.current) window.clearTimeout(longPress.current.timer);
-    longPress.current = null;
+    pressStart.current = null;
+    longPress.cancel();
   };
 
   const drawTo = () => {
@@ -980,31 +989,25 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
             if (event.pointerType === "touch") {
               // A long press picks the cell up: release creates one unit, a drag draws days.
               const pointerId = event.pointerId;
-              cancelLongPress();
-              longPress.current = {
-                x: event.clientX,
-                pointerId,
-                timer: window.setTimeout(() => {
-                  longPress.current = null;
-                  const current = start(true);
-                  drawing.current = current;
-                  track.setPointerCapture?.(pointerId);
-                  setGhost(item.key, { id: current.id, dates: datesOf(cell), status: "drawing" });
-                }, LONG_PRESS_MS),
+              pressStart.current = () => {
+                const current = start(true);
+                drawing.current = current;
+                track.setPointerCapture?.(pointerId);
+                setGhost(item.key, { id: current.id, dates: datesOf(cell), status: "drawing" });
               };
+              longPress.handlers.onPointerDown(event);
               return;
             }
             drawing.current = start(false);
             track.setPointerCapture?.(event.pointerId);
           },
           onPointerMove: (event: React.PointerEvent<HTMLDivElement>) => {
-            const press = longPress.current;
-            if (press && Math.abs(event.clientX - press.x) > DRAW_THRESHOLD_PX) cancelLongPress();
+            longPress.handlers.onPointerMove(event);
             const current = drawing.current;
             if (current && event.pointerId === current.pointerId) {
               current.clientX = event.clientX;
               current.alt = event.altKey;
-              if (Math.abs(event.clientX - current.x) < DRAW_THRESHOLD_PX) {
+              if (Math.abs(event.clientX - current.x) < DRAG_THRESHOLD_PX) {
                 // Still on the pressed spot (a touch pick-up keeps its one-unit ghost).
                 if (!current.moved || current.touch) return;
               }
@@ -1042,7 +1045,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
           },
           onContextMenu: (event: React.MouseEvent<HTMLDivElement>) => {
             // A long-press on touch creates; the system menu would cover it.
-            if (longPress.current) event.preventDefault();
+            if (pressStart.current) event.preventDefault();
           },
           onDoubleClick: (event: React.MouseEvent<HTMLDivElement>) => {
             if (event.target !== event.currentTarget) return;
@@ -1333,7 +1336,7 @@ export function Gantt<Row, Bar extends GanttBar = GanttBar>({
 
   let body: React.ReactNode;
   if (bodyState === "loading") {
-    const unit = scale === "day" ? 1 : scale === "week" ? 7 : 30;
+    const unit = unitDays(scale);
     const origin = todayInRange ? todayX : 0;
     body = SKELETON_ROWS.map((bars, index) => (
       // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows
