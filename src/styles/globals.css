@@ -246,10 +246,14 @@ textarea:disabled::placeholder {
  *   layout-gutter   the side air of the page at this viewport (gutter s → m from 640 → l from 1024)
  *   bleed-inline    the side padding of a host that lets a part reach its edges (a dialog header
  *                   hands it to the tab strip inside); 0 everywhere else
+ *   control-height  the height a host gives the Buttons inside it (a glass disk as tall as the
+ *                   BottomNav capsule); unset (`initial`) everywhere else, so a Button keeps the
+ *                   height of its tier
  */
 :root {
   --prime-layout-gutter: var(--prime-layout-gutter-s);
   --prime-bleed-inline: var(--prime-space-0);
+  --prime-control-height: initial;
 }
 
 @media (min-width: 640px) {

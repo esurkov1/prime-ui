@@ -162,8 +162,8 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — | Custom content; default is the pipette icon. |
-| `asChild · fullWidth · holdToConfirm · onConfirm · labels · loading · pressed · progress · shape` | `ButtonRootProps` | — | As on `Button.Root`. |
-| `…rest` | `Omit<ButtonRootProps, "variant" \| "tone" \| "size" \| "aria-label">` | — | `onClick`, `className` and the other button attributes. |
+| `fullWidth · loading · pressed · defaultPressed · onPressedChange · current · density · align · progress · holdToConfirm · onConfirm · labels` | `ButtonRootProps` | — | As on `Button.Root`. |
+| `…rest` | `Omit<ButtonRootProps, "variant" \| "tone" \| "size" \| "aria-label" \| "shape" \| "asChild">` | — | `onClick`, `className` and the other button attributes. |
 
 ### ColorPresets.Root
 No DOM and no ref, except a field frame in a FieldList cell (the column heading as its label). A quick color from a fixed palette: a square trigger and a popover grid of presets.

@@ -39,7 +39,7 @@
   --prime-badge-xs-radius: var(--prime-ref-radius-4);
   --prime-badge-xs-text-size: var(--prime-ref-font-size-12);
   --prime-border-width: 1px;
-  --prime-bottom-nav-blur: 0.875rem;
+  --prime-bottom-nav-blur: var(--prime-glass-blur);
   --prime-bottom-nav-floating-gap: var(--prime-ref-space-2);
   --prime-bottom-nav-floating-height: 2.875rem;
   --prime-bottom-nav-floating-icon-only-height: 2.5rem;
@@ -330,6 +330,7 @@
   --prime-gallery-gap: 2px;
   --prime-gallery-max-size: 22.5rem;
   --prime-gallery-min-size: 16rem;
+  --prime-glass-blur: 0.875rem;
   --prime-glass-saturation: 1.8;
   --prime-icon-gesture-shift: 4px;
   --prime-icon-l: var(--prime-ref-icon-24);

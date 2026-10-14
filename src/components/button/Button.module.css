@@ -1,12 +1,16 @@
 /*
  * Button — fill-based, no visible outline (`outline` draws a 1px inset line); `shade` is the media
- * shade for a button over media. `shape="circle"` is the same button as a disk.
+ * shade for a button over media, `glass` the glass of a floating bar. `shape="circle"` is the same
+ * button as a disk.
  * Geometry comes from the shared field tier (`internal/fieldTier`, set from `data-size` in TSX), so
  * Button, Input and Select of one size align in a row; ButtonGroup segments read the same table.
- * Colors go through private vars: every tone × variant only assigns them.
+ * A host may give the Buttons inside it its own height through `--prime-control-height` (globals).
+ * Colors go through private vars: every tone × variant only assigns them. Press feedback is the
+ * shared `internal/press` (joined in TSX).
  */
 .root {
   --prime-icon-size: var(--field-icon);
+  --btn-h: var(--prime-control-height, var(--field-h));
   /* Optical compensation on the icon side: padX − 4px, never closer than 8px to the edge (xs). */
   --btn-px-icon: max(calc(var(--field-button-px) - var(--prime-space-1)), var(--prime-space-2));
 
@@ -22,8 +26,8 @@
   align-items: center;
   justify-content: center;
   gap: var(--field-gap);
-  height: var(--field-h);
-  min-width: var(--field-h);
+  height: var(--btn-h);
+  min-width: var(--btn-h);
   max-width: 100%;
   padding-block: 0;
   padding-inline: var(--field-button-px);
@@ -46,7 +50,7 @@
     background-color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
     box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /* Optical compensation on the icon side. */
@@ -60,14 +64,15 @@
 
 /* Icon-only buttons are square. */
 .root[data-icon-only="true"] {
-  width: var(--field-h);
+  width: var(--btn-h);
   padding-inline: 0;
 }
 
 /* A circle: the disk itself is the control — width = height of the tier, full radius. The focus
-   ring (outline) follows the radius; the touch area and the press follow the circle below. */
+   ring (outline) follows the radius; the touch area follows the circle below, the press is the
+   compact one. */
 .root[data-shape="circle"] {
-  width: var(--field-h);
+  width: var(--btn-h);
   padding-inline: 0;
   border-radius: var(--prime-radius-full);
 }
@@ -82,6 +87,30 @@
   display: flex;
   width: 100%;
   min-width: 0;
+}
+
+/* A list of choices reads from the start edge (presets, a column of actions). */
+.root[data-align="start"] {
+  justify-content: flex-start;
+}
+
+/* Tight: a number or a short label in a row of controls (page numbers) — tabular figures and 4px
+   side air, so one or two digits stay square (the height is the minimum width). */
+.root[data-density="tight"] {
+  padding-inline: var(--prime-space-1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inline: a chip inside a line of text (a playback speed on a caption row) — as tall as the line
+   it sits in, in the text's own type, 4px side air, a pill. The touch area still applies. */
+.root[data-density="inline"] {
+  height: auto;
+  min-width: 0;
+  padding-inline: var(--prime-space-1);
+  border-radius: var(--prime-radius-full);
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
 }
 
 /* ─── Tone × variant: assign colors only ────────────────────────────────── */
@@ -149,8 +178,8 @@
   --btn-bg: var(--prime-color-success-soft);
   --btn-bg-hover: color-mix(
     in srgb,
-    var(--prime-color-success-soft) 88%,
-    var(--prime-color-success-default)
+    var(--prime-color-success-default) var(--prime-tint-soft),
+    var(--prime-color-success-soft)
   );
   --btn-fg: var(--prime-color-success-text);
 }
@@ -177,8 +206,8 @@
   --btn-bg: var(--prime-color-danger-soft);
   --btn-bg-hover: color-mix(
     in srgb,
-    var(--prime-color-danger-soft) 88%,
-    var(--prime-color-danger-default)
+    var(--prime-color-danger-default) var(--prime-tint-soft),
+    var(--prime-color-danger-soft)
   );
   --btn-fg: var(--prime-color-danger-text);
 }
@@ -220,7 +249,7 @@
   --btn-bg: var(--prime-color-media-disk);
   --btn-bg-hover: color-mix(
     in srgb,
-    var(--prime-color-media-shade-fg) 12%,
+    var(--prime-color-media-shade-fg) var(--prime-tint-soft),
     var(--prime-color-media-disk)
   );
   --btn-fg: var(--prime-color-media-shade-fg);
@@ -235,9 +264,36 @@
   --btn-fg: var(--prime-color-danger-fg);
 }
 
-/* A toggle that is on (`pressed`): the selected look (foundation §8, accent soft) over any tone ×
-   variant; the fill and text glide in and out with the shared color transition. */
-.root[data-pressed="true"][data-variant] {
+/* glass: the glass of a floating bar (a BottomNav action beside the capsule) — a dense tint over
+   a strong blur, the page shows through as soft shapes; ink text in both themes. Where the user
+   asks for less transparency it is the solid floating fill. The host draws the rim and the lift. */
+.root[data-variant="glass"] {
+  --btn-bg: var(--prime-color-bg-glass);
+  --btn-bg-hover: color-mix(
+    in srgb,
+    var(--prime-color-text-primary) var(--prime-tint-faint),
+    var(--prime-color-bg-glass)
+  );
+  --btn-fg: var(--prime-color-text-primary);
+
+  -webkit-backdrop-filter: blur(var(--prime-glass-blur)) saturate(var(--prime-glass-saturation));
+  backdrop-filter: blur(var(--prime-glass-blur)) saturate(var(--prime-glass-saturation));
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .root[data-variant="glass"] {
+    --btn-bg: var(--prime-color-bg-glass-solid);
+    --btn-bg-hover: var(--prime-color-fill-muted-hover);
+
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* A toggle that is on (`pressed`) and the current page (`current`, or `aria-current="page"` set by
+   a router link): the selected look (foundation §8, accent soft) over any tone × variant; the fill
+   and text glide in and out with the shared color transition. */
+.root:is([data-pressed="true"], [data-current="true"], [aria-current="page"])[data-variant] {
   --btn-bg: var(--prime-color-accent-soft);
   --btn-bg-hover: var(--prime-color-accent-soft-hover);
   --btn-bg-active: var(--prime-color-accent-soft-hover);
@@ -256,12 +312,6 @@
 
 .root:active:not([data-disabled="true"], [data-loading="true"]) {
   background-color: var(--btn-bg-active);
-  transform: scale(var(--prime-motion-press-scale));
-}
-
-/* A small disk gives more under the finger, as a Checkbox does. */
-.root[data-shape="circle"]:active:not([data-disabled="true"], [data-loading="true"]) {
-  transform: scale(var(--prime-motion-press-scale-compact));
 }
 
 .root:focus-visible {
@@ -272,16 +322,6 @@
 /* On a colored host the accent ring can vanish (accent fill); the host's text color always reads. */
 .root[data-tone="inherit"]:focus-visible {
   outline-color: currentColor;
-}
-
-/* Current navigation item (e.g. NavLink sets aria-current): ghost / soft get the active fill.
-   Soft accent is already the selected look (foundation §8) and keeps it: a host marks "current"
-   with accent explicitly (Pagination). */
-.root[aria-current="page"]:is([data-variant="ghost"], [data-variant="soft"]):not(
-    [data-tone="accent"][data-variant="soft"]
-  ) {
-  --btn-bg: var(--prime-color-fill-subtle-active);
-  --btn-fg: var(--prime-color-text-primary);
 }
 
 /* `[data-variant]` (every button has one) lifts this over the tone × variant colors. A loading
@@ -326,33 +366,20 @@
   height: var(--prime-icon-size);
 }
 
-/* The glyph layer of the cross-fade (`internal/glyphSwap`) fills the icon box. */
+/* The glyph layer of the cross-fade (`internal/glyphSwap`) fills the icon box; the glyph in it (a
+   kit Icon, the busy Spinner, a raw svg through `iconSlotClass`) takes `--prime-icon-size`. */
 .glyph {
   width: 100%;
   height: 100%;
 }
 
-.glyph > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* Spinner (kit donor) takes the button's text color even when the overlay hides the label. */
+/* The overlay spinner (kit donor) takes the button's text color even when the label is hidden. */
 .root > .spinner {
-  order: -1;
   color: var(--btn-fg);
 }
 
 .root[data-loading="true"] {
   cursor: progress;
-}
-
-/* Spinner (`loading`, or a square `progress` with no share known) takes the place of the leading
-   (or only) icon: width does not change. */
-.root[data-spinner="true"]:is([data-leading-icon="true"], [data-icon-only="true"])
-> .icon:not(.icon ~ .icon) {
-  display: none;
 }
 
 /* No leading icon: the auto spinner is centered over the label, which keeps its space. */
@@ -413,7 +440,7 @@
   translate: calc(var(--btn-fill-dir) * 100%) 0;
   transition:
     opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-exit),
-    translate 0s linear var(--prime-motion-duration-fast);
+    translate var(--prime-motion-instant) linear var(--prime-motion-duration-fast);
 }
 
 .root[data-progress="true"] .fill {

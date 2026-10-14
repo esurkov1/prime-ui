@@ -575,9 +575,13 @@ export const semanticTokens = {
     heavy: "72%",
   },
 
-  /** Glass (`color.bg.glass`): how much the backdrop filter lifts the colors seen through it. */
+  /**
+   * Glass (`color.bg.glass`): how much the backdrop filter lifts the colors seen through it, and
+   * the blur behind it — strong, as the iOS tab bar: the page shows only as soft shapes.
+   */
   glass: {
     saturation: "1.8",
+    blur: "0.875rem",
   },
 
   /**
@@ -933,7 +937,7 @@ export const semanticTokens = {
      * iOS tab bar: the page under the glass shows only as soft shapes.
      */
     floatingInset: "{space.3}",
-    blur: "0.875rem",
+    blur: "{glass.blur}",
   },
 
   /**
