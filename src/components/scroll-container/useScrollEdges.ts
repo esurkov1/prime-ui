@@ -22,6 +22,8 @@ export type ScrollEdgeHandler = () => void | Promise<void>;
  * at the end. The region scrolls only itself.
  */
 export type ScrollRegion = {
+  /** The scrolling element (an IntersectionObserver root for content inside it). */
+  element: () => HTMLElement | null;
   /** The reader is at the end (`anchor="end"`, within 4 px). */
   atEnd: () => boolean;
   /** Follows `atEnd`; returns the unsubscribe. */
@@ -38,7 +40,10 @@ export type ScrollRegion = {
   hold: (ms: number) => void;
 };
 
-const NO_REGION: ScrollRegion = {
+/** What the live scroller answers; `element` is the ref itself. */
+type RegionImpl = Omit<ScrollRegion, "element">;
+
+const NO_REGION: RegionImpl = {
   atEnd: () => true,
   subscribe: () => () => {},
   scrollToEnd: () => {},
@@ -95,6 +100,7 @@ export function useScrollEdges(
       notify: () => {
         for (const listener of listeners) listener();
       },
+      element: () => ref.current,
       atEnd: () => impl.current.atEnd(),
       subscribe: (listener) => {
         listeners.add(listener);

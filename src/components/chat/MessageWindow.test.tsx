@@ -19,6 +19,7 @@ const ROWS: Row[] = Array.from({ length: 500 }, (_, index) => ({
 
 function fakeRegion(): ScrollRegion {
   return {
+    element: () => null,
     atEnd: () => false,
     subscribe: () => () => {},
     scrollToEnd: vi.fn(),

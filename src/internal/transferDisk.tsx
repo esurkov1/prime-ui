@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Button } from "@/components/button/Button";
 import { Spinner } from "@/components/spinner/Spinner";
-import { Icon } from "@/icons";
+import { Icon, type IconName } from "@/icons";
 import { cx } from "@/internal/cx";
 import { mediaDiskClass } from "@/internal/mediaDisk";
 import { Ring } from "@/internal/ring";
@@ -48,7 +48,7 @@ export type TransferDiskProps = {
 
 type Action = "cancel" | "retry" | "download";
 
-export type TransferDiskModel = {
+type TransferDiskModel = {
   /** What a press does now, or `null` when the disk only shows the state. */
   action: Action | null;
   /** The handler of `action` was given. */
@@ -134,21 +134,15 @@ export function useTransferDisk({
     );
   };
 
-  const glyph = busy ? (
-    <Spinner />
-  ) : (
-    <Icon
-      name={
-        remote
-          ? "action.download"
-          : failed
-            ? onRetry
-              ? "action.refresh"
-              : "status.failed"
-            : "action.close"
-      }
-    />
-  );
+  // One glyph slot: the host's `Button.Icon` cross-fades a change of it in place.
+  const glyphName: IconName = remote
+    ? "action.download"
+    : failed
+      ? onRetry
+        ? "action.refresh"
+        : "status.failed"
+      : "action.close";
+  const glyph = busy ? <Spinner /> : <Icon name={glyphName} />;
   const name =
     action === "cancel" ? labels.cancel : action === "retry" ? labels.retry : labels.download;
   // The ring: empty while queued (it turns at its least arc), the share while loading (`null`
@@ -239,6 +233,7 @@ export function TransferDisk({
         // disk in the same colors, with the same ring.
         <span
           className={cx(mediaDiskClass, styles.still)}
+          data-size={size}
           data-variant={variant}
           data-tone={tone}
           {...(inFlight(state)
@@ -265,14 +260,12 @@ export function TransferDisk({
   );
 }
 
-export type TransferOverlayProps = TransferDiskProps;
-
 /**
  * The transfer disk centred over a box (an attachment tile, a picture in a chat message, a video
  * circle). The host positions it (`position: absolute; inset: 0`) and dims its content while the
  * transfer is not done; only the disk takes the pointer.
  */
-export function TransferOverlay({ className, ...props }: TransferOverlayProps) {
+export function TransferOverlay({ className, ...props }: TransferDiskProps) {
   return (
     <span className={cx(styles.overlay, className)} data-state={props.state}>
       <TransferDisk {...props} />

@@ -84,8 +84,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Thumbnail.Image",
-      en: '`ref` → `HTMLImageElement`. The picture; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).',
-      ru: 'Картинка; скрыта, пока грузится и после ошибки, — видна подложка. Новый `src` начинает загрузку заново. Грузится лениво и декодируется вне главного потока (`loading="lazy"`, `decoding="async"`; оба можно переопределить).',
+      en: '`ref` → `HTMLImageElement`. The picture; hidden while it loads and after an error, so the Fallback shows through. A new `src` fades in over the last one. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).',
+      ru: 'Картинка; скрыта, пока грузится и после ошибки, — видна подложка. Новый `src` проявляется поверх прежнего. Грузится лениво и декодируется вне главного потока (`loading="lazy"`, `decoding="async"`; оба можно переопределить).',
       props: [
         {
           name: "src",
@@ -118,8 +118,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Thumbnail.Video",
-      en: '`ref` → `HTMLVideoElement`. A video in the frame (`preload="metadata"`, `playsInline`); the Fallback shows until its first frame. Without `controls` it shows the duration, and a play mark while it is still (not looping, not playing).',
-      ru: 'Видео в рамке (`preload="metadata"`, `playsInline`); до первого кадра видна подложка. Без `controls` показывает длительность, а пока стоит (не по кругу и не играет) — знак воспроизведения.',
+      en: '`ref` → `HTMLVideoElement`. A video in the frame (`preload="metadata"`, `playsInline`); the Fallback shows until its first frame (with a `poster`, its metadata). Without `controls`: the duration pill and a play mark that fades while it plays.',
+      ru: 'Видео в рамке (`preload="metadata"`, `playsInline`); подложка видна до первого кадра (с `poster` — до метаданных). Без `controls`: плашка длительности и знак воспроизведения, гаснущий во время игры.',
       props: [
         {
           name: "src",
@@ -131,8 +131,8 @@ export const api: ComponentApi = {
         {
           name: "poster",
           type: "string",
-          en: "A still shown before playing.",
-          ru: "Кадр-обложка до воспроизведения.",
+          en: "A still shown before playing; with it the video counts as loaded once its metadata is in.",
+          ru: "Кадр-обложка до воспроизведения; с ней видео считается загруженным, когда пришли метаданные.",
         },
         {
           name: "controls",

@@ -26,6 +26,10 @@
   color: var(--hue-text);
   vertical-align: middle;
   user-select: none;
+  /* A pressable frame lifts on hover and gives under a press (`press.press` sets the scale). */
+  transition:
+    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
+    scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-ring="true"]::after {
@@ -151,37 +155,24 @@
 
 /* Over the frame the picture is the ground, one look in both themes. The play mark is the still
    media disk (`internal/mediaDisk`): the same disk, ground and glyph as the play and transfer
-   disks over media (40, a 20 glyph), centred; a frame too low for it gets it at 60% of its height
-   (the glyph follows). The duration stands on the media shade. Both need room: no play mark below
-   `m`, no duration below `l`. */
+   disks over media (its tier's height, a glyph of half of it), centred; a frame too low for it
+   gets it at 60% of its height (the glyph follows). The duration is the media pill
+   (`internal/mediaPill` `.pill`, joined in TSX); here it is only placed. Both need room: no play
+   mark below `m`, no duration below `l`. */
 .root .play {
   position: absolute;
   z-index: var(--prime-z-top);
   inset: 0;
   inline-size: auto;
-  block-size: min(var(--prime-control-l-height), 60%);
+  block-size: min(var(--field-h), 60%);
   margin: auto;
 }
 
 .duration {
   position: absolute;
   z-index: var(--prime-z-top);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--prime-color-media-shade);
-  color: var(--prime-color-media-shade-fg);
-  pointer-events: none;
-  -webkit-backdrop-filter: blur(var(--prime-media-shade-blur));
-  backdrop-filter: blur(var(--prime-media-shade-blur));
   inset-block-end: var(--prime-space-1);
   inset-inline-end: var(--prime-space-1);
-  padding-inline: var(--prime-space-1);
-  border-radius: var(--prime-radius-s);
-  font-size: var(--prime-text-caption-size);
-  font-weight: var(--prime-font-weight-medium);
-  line-height: var(--prime-text-caption-line-height);
-  font-variant-numeric: tabular-nums;
 }
 
 .root:is([data-size="xs"], [data-size="s"]):not([data-full-width="true"]) .play,
@@ -192,7 +183,8 @@
 
 /* ─── Pressable and selectable ──────────────────────────────────────────── */
 
-/* The frame on a `<button>` or an `<a>` (asChild, selectable): no native box of its own. */
+/* The frame on a `<button>` or an `<a>` (asChild, selectable): no native box of its own. The press
+   is `press.press`, joined in TSX. */
 .root[data-interactive="true"] {
   margin: 0;
   padding: 0;
@@ -200,9 +192,6 @@
   font: inherit;
   text-decoration: none;
   cursor: pointer;
-  transition:
-    box-shadow var(--prime-motion-fade-fast) var(--prime-motion-easing-standard),
-    transform var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 .root[data-interactive="true"]:focus-visible {
@@ -215,10 +204,6 @@
   .root[data-interactive="true"]:hover {
     box-shadow: var(--prime-shadow-overlay);
   }
-}
-
-.root[data-interactive="true"]:active {
-  transform: scale(var(--prime-motion-press-scale));
 }
 
 /* Selected: an accent ring over the picture (above the image, like `ring`). */
@@ -246,14 +231,4 @@
 .root:is([data-size="l"], [data-size="xl"]) .check {
   inset-block-start: var(--prime-space-2);
   inset-inline-start: var(--prime-space-2);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .root[data-interactive="true"] {
-    transition: none;
-  }
-
-  .root[data-interactive="true"]:active {
-    transform: none;
-  }
 }

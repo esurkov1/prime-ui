@@ -1,16 +1,11 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { cssRule, cssValue } from "@/test/css";
+
 import { TRANSFER_LABELS, transferDiskLabels } from "./transfer";
 import { TransferDisk } from "./transferDisk";
-
-const css = readFileSync(
-  path.resolve(process.cwd(), "src/internal/transferDisk.module.css"),
-  "utf8",
-);
 
 const LABELS = { ...transferDiskLabels(TRANSFER_LABELS, "upload", 0.4), failed: "Нет связи" };
 
@@ -128,9 +123,10 @@ describe("TransferDisk", () => {
     render(<TransferDisk state="done" progress={1} labels={LABELS} onCancel={() => {}} />);
     expect(diskOf()).toHaveAttribute("inert");
     expect(screen.queryByRole("button")).toBeNull();
-    expect(css).toMatch(
-      /\.disk\[data-state="done"\] \{\s*opacity: 0;\s*transform: scale\(var\(--prime-motion-scale-settle\)\);[^}]*transition-delay: var\(--prime-motion-duration-base\)/,
-    );
+    const done = cssRule("src/internal/transferDisk.module.css", '.disk[data-state="done"]');
+    expect(cssValue(done, "opacity")).toBe("0");
+    expect(cssValue(done, "transform")).toBe("scale(var(--prime-motion-scale-settle))");
+    expect(cssValue(done, "transition-delay")).toBe("var(--prime-motion-duration-base)");
   });
 
   it("has two sizes from the control tiers", () => {

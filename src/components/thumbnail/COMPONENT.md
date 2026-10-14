@@ -54,7 +54,7 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "color" \| "defaultChecked" \| "onChange">` | — | `className`, `aria-label` + `role` for a fallback-only thumbnail, and the other attributes of the frame. |
 
 ### Thumbnail.Image
-`ref` → `HTMLImageElement`. The picture; hidden while it loads and after an error, so the Fallback shows through. A new `src` starts again. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).
+`ref` → `HTMLImageElement`. The picture; hidden while it loads and after an error, so the Fallback shows through. A new `src` fades in over the last one. Loads lazily and decodes off the main thread (`loading="lazy"`, `decoding="async"`; pass either to override).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -64,12 +64,12 @@ Thumbnail.Root          frame (a <div>; the child with asChild; a <button role="
 | `…rest` | `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" \| "alt">` | — | `className`, `onLoad`, `onError` and the other img attributes. |
 
 ### Thumbnail.Video
-`ref` → `HTMLVideoElement`. A video in the frame (`preload="metadata"`, `playsInline`); the Fallback shows until its first frame. Without `controls` it shows the duration, and a play mark while it is still (not looping, not playing).
+`ref` → `HTMLVideoElement`. A video in the frame (`preload="metadata"`, `playsInline`); the Fallback shows until its first frame (with a `poster`, its metadata). Without `controls`: the duration pill and a play mark that fades while it plays.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `src` | `string` | — (required) | Video URL. Without a `poster` the first frame is asked for (`#t=0.001` is added when the URL has no fragment). |
-| `poster` | `string` | — | A still shown before playing. |
+| `poster` | `string` | — | A still shown before playing; with it the video counts as loaded once its metadata is in. |
 | `controls` | `boolean` | `false` | Native controls: a video message or a clip to watch in place; no play mark or duration of the kit. |
 | `autoPlay` | `boolean` | `false` | A GIF-like clip: plays muted, in a loop, inline. Off under `prefers-reduced-motion` (read once): the first frame stands still with the play mark. |
 | `fit` | `"cover" \| "contain"` | `"cover"` | `cover` crops to fill; `contain` letterboxes on the fallback fill. |

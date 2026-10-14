@@ -1,4 +1,5 @@
 import { formatLabel } from "@/internal/formatLabel";
+import type { AsyncHandler } from "@/internal/usePendingChanges";
 
 /**
  * Where a transfer of a file or a recording is, in either direction: `remote` — not fetched yet
@@ -15,24 +16,19 @@ export type TransferState = "remote" | "queued" | "loading" | "failed" | "done";
 export type TransferDirection = "upload" | "download";
 
 /** A cancel, a retry or a download: a returned promise keeps the disk pending until it settles. */
-export type TransferHandler = () => void | Promise<void>;
+export type TransferHandler = AsyncHandler;
 
 /**
  * The transfer props of every part that sends or receives its content (VoicePlayer, VideoNote,
- * Message.File; Message.Media per item, its handlers per index).
+ * Message.File; Message.Media per item, its handlers per index). Each prop is described in
+ * `transfer.api.ts`.
  */
 export type TransferProps = {
-  /** Where the transfer is; without it the content is simply there. */
   transfer?: TransferState;
-  /** Share transferred, 0…1; without it a transfer in flight turns an indeterminate arc. */
   transferProgress?: number;
-  /** Which way it goes: the words only. Default `upload`. */
   transferDirection?: TransferDirection;
-  /** Cancel the transfer in flight (the disk's cross). */
   onCancel?: TransferHandler;
-  /** Transfer it again after a failure (the danger disk). */
   onRetry?: TransferHandler;
-  /** Fetch a `remote` content (the download arrow). */
   onDownload?: TransferHandler;
 };
 

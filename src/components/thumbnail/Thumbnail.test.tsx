@@ -1,13 +1,11 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { mediaDiskClass } from "@/internal/mediaDisk";
+import pill from "@/internal/mediaPill.module.css";
+import { cssRule, cssValue } from "@/test/css";
 
 import { Thumbnail } from "./Thumbnail";
-
-const css = readFileSync(path.resolve(process.cwd(), "src/internal/mediaDisk.module.css"), "utf8");
 
 describe("Thumbnail", () => {
   it("exposes size, ratio and color as data attributes with defaults m · 1:1 · gray", () => {
@@ -88,12 +86,55 @@ describe("Thumbnail", () => {
           <Thumbnail.Video src="/clip.mp4" />
         </Thumbnail.Root>,
       );
-      const mark = container.querySelector(`.${mediaDiskClass}`);
+      const mark = container.querySelector("[aria-hidden='true'][data-shown]");
       expect(mark).toHaveAttribute("aria-hidden", "true");
+      expect(mark).toHaveAttribute("data-size", "l");
       expect(mark?.querySelector("svg")).not.toBeNull();
-      expect(css).toMatch(/\.disk \{[^}]*background: var\(--prime-color-media-disk\);/);
-      expect(css).toMatch(/\.disk \{[^}]*inline-size: var\(--prime-control-l-height\);/);
-      expect(css).toMatch(/backdrop-filter: blur\(var\(--prime-media-disk-blur\)\);/);
+      const disk = cssRule("src/internal/mediaDisk.module.css", ".disk");
+      expect(cssValue(disk, "background")).toBe("var(--prime-color-media-disk)");
+      expect(cssValue(disk, "backdrop-filter")).toBe("blur(var(--prime-media-disk-blur))");
+    });
+
+    it("the play mark stays while the video plays: it fades out and back on a pause", () => {
+      const { container } = render(
+        <Thumbnail.Root size="xl">
+          <Thumbnail.Video src="/clip.mp4" data-testid="video" />
+        </Thumbnail.Root>,
+      );
+      const video = screen.getByTestId("video");
+      const mark = container.querySelector("[data-shown]");
+      expect(mark).toHaveAttribute("data-shown", "true");
+      fireEvent.play(video);
+      expect(container.querySelector("[data-shown]")).toBe(mark);
+      expect(mark).toHaveAttribute("data-shown", "false");
+      fireEvent.pause(video);
+      expect(mark).toHaveAttribute("data-shown", "true");
+    });
+
+    it("with a poster it counts as loaded once its metadata is in", () => {
+      render(
+        <Thumbnail.Root size="xl">
+          <Thumbnail.Video src="/clip.mp4" poster="/clip.jpg" data-testid="video" />
+          <Thumbnail.Fallback data-testid="fallback">V</Thumbnail.Fallback>
+        </Thumbnail.Root>,
+      );
+      const video = screen.getByTestId("video");
+      expect(video).toHaveAttribute("data-status", "loading");
+      fireEvent.loadedMetadata(video);
+      expect(video).toHaveAttribute("data-status", "loaded");
+      expect(screen.getByTestId("fallback")).toHaveAttribute("aria-hidden", "true");
+    });
+
+    it("the duration is the media pill", () => {
+      render(
+        <Thumbnail.Root size="xl">
+          <Thumbnail.Video src="/clip.mp4" data-testid="video" />
+        </Thumbnail.Root>,
+      );
+      const video = screen.getByTestId("video");
+      Object.defineProperty(video, "duration", { configurable: true, value: 42 });
+      fireEvent.loadedMetadata(video);
+      expect(screen.getByText("0:42").className).toContain(pill.pill);
     });
 
     it("keeps a poster's source as it is and leaves controls to the browser", () => {
@@ -178,6 +219,38 @@ describe("Thumbnail", () => {
     expect(tile).toHaveAttribute("aria-checked", "false");
     // Space and Enter are the button's own.
     expect(tile.tagName).toBe("BUTTON");
+  });
+
+  it("keyboard: Tab reaches a pressable or selectable tile; Enter and Space activate it", async () => {
+    const user = userEvent.setup();
+    const onOpen = vi.fn();
+    const onCheckedChange = vi.fn();
+    render(
+      <>
+        <Thumbnail.Root aria-label="Просто превью" />
+        <Thumbnail.Root asChild>
+          <button type="button" aria-label="Открыть фото" onClick={onOpen}>
+            <Thumbnail.Image src="/a.jpg" />
+          </button>
+        </Thumbnail.Root>
+        <Thumbnail.Root aria-label="Фасад" onCheckedChange={onCheckedChange}>
+          <Thumbnail.Image src="/b.jpg" />
+        </Thumbnail.Root>
+      </>,
+    );
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Открыть фото" })).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await user.keyboard(" ");
+    expect(onOpen).toHaveBeenCalledTimes(2);
+    await user.tab();
+    const tile = screen.getByRole("checkbox", { name: "Фасад" });
+    expect(tile).toHaveFocus();
+    await user.keyboard(" ");
+    expect(tile).toHaveAttribute("aria-checked", "true");
+    await user.keyboard("{Enter}");
+    expect(tile).toHaveAttribute("aria-checked", "false");
+    expect(onCheckedChange).toHaveBeenLastCalledWith(false);
   });
 
   it("has no outline by default; ring adds one", () => {

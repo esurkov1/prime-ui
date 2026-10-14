@@ -41,13 +41,9 @@
 }
 
 /* A disk with no action: the still media disk (`internal/mediaDisk`, the look of the shade circle
-   Button); `solid` takes the accent disk of a voice message. */
+   Button, its diameter from its `data-size`); `solid` takes the accent disk of a voice message. */
 .still {
   position: relative;
-}
-
-.disk[data-size="xl"] .still {
-  inline-size: var(--prime-control-xl-height);
 }
 
 .still[data-variant="solid"]:not([data-tone="danger"]) {

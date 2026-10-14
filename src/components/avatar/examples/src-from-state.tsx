@@ -1,4 +1,4 @@
-/** A new photo source restarts loading; initials show until the new photo arrives — `src`. */
+/** A new photo source loads over the last photo and cross-fades in; initials show only until a first photo arrives — `src`. */
 import { Avatar, Button } from "prime-ui-kit";
 import * as React from "react";
 
