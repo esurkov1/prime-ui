@@ -1,4 +1,4 @@
-/** A settings form in a dialog: the footer button submits the form and an empty name shakes the field and keeps it open until it is filled — `Modal.Body`, `Modal.Footer`, `error`. */
+/** A settings form in a dialog: the footer submit button submits the form, Enter in a field does the same, and an empty name shakes the field and keeps it open until it is filled — `Modal.Body`, `Modal.Footer`, `error`. */
 import { Button, Icon, Input, Modal, Select, Switch } from "prime-ui-kit";
 import * as React from "react";
 

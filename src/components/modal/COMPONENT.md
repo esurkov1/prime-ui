@@ -3,7 +3,7 @@
 **Category:** overlays
 **Kind:** overlay
 
-> A dialog over the page for confirmations, short forms and important text.
+> A dialog over the page for a short form or important text that must be finished or acknowledged before the page goes on.
 
 ## When to use
 - A short form that must be finished or cancelled before returning to the page.
@@ -26,7 +26,7 @@ import { Modal } from "prime-ui-kit";
 Modal.Root                    state and dismiss policy (no DOM)
 ├── Modal.Trigger             clones its child; opens on click
 └── Modal.Content             portal + scrim + role="dialog"
-    ├── (grab handle)         below 640px only: aria-hidden bar, a drag starts here
+    ├── (grab handle)         as a phone sheet with `closeOnOutsideClick`: aria-hidden bar, a drag starts here
     ├── Modal.Guard           no DOM: holds the dialog (busy / dirty) from inside
     ├── Modal.Header          grid: [Icon] [Title + Description] [Actions] [close button]
     │   ├── Modal.Icon        40 tile with a tone fill; no tile around an Avatar.Root / Thumbnail.Root
@@ -53,18 +53,19 @@ No DOM, no ref. State and dismiss policy.
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, close button, `Close`, Escape, scrim click, code. A `Guard` holds the dismisses (not code). |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the dialog. |
-| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim (and a swipe down) closes the dialog; turn off for destructive confirms. |
+| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim (and a swipe down, which draws the grab handle) closes the dialog. A destructive action is confirmed in a ConfirmDialog; unsaved changes are held by `Guard`. |
 | `labels` | `Partial<ModalLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Trigger and Content. |
-| `confirmOnEnter` | `boolean` | `true` | Enter inside the dialog clicks the element wrapped in `Modal.Confirm`; Enter on a button or link activates that element instead. |
-| `onEnterConfirm` | `(event: KeyboardEvent) => void` | — | Replaces the default Enter confirm. |
+| `confirmOnEnter` | `boolean` | `true` | Enter inside the dialog clicks the element wrapped in `Modal.Confirm`; Enter on a button, link, `textarea`, `select`, checkbox or in the header keeps its own meaning. |
+| `onEnterConfirm` | `(event: KeyboardEvent) => void` | — | Replaces the default Enter confirm (the `Modal.Confirm` click). |
 
 ### Modal.Content
-`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"`; renders while open and during its exit animation, showing the children it had open (a record cleared with `open` does not empty the panel mid-motion). Controls inside get size `m`.
+`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"`, side by side; renders while open and during its exit animation, showing the children it had open (a record cleared with `open` does not empty the panel mid-motion). Controls inside get size `m`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 360 · 440 · 560 · 720 · 960. Below 640 px of viewport — a full-width bottom sheet with a grab handle; a swipe down from the handle or the header closes it. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Width: 360 · 440 · 560 · 720 · 960. |
+| `placement` | `"center" \| "top"` | `"center"` | `center`: in the middle; on a phone a bottom sheet that swipes down (`closeOnOutsideClick`). `top`: near the top edge at every width, growing downward — a search palette above the on-screen keyboard. |
 | `container` | `HTMLElement \| null` | `document.body` | Portal target. |
 | `aria-label` | `string` | — | Dialog name when there is no Title. |
 | `aria-labelledby` | `string` | — | Overrides the Title id. |
@@ -73,15 +74,20 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Modal.Header
-`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button]. + native `HTMLAttributes<HTMLElement>`.
+`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button].
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`; disabled in place while a `Guard` is `busy`. |
 | `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Modal.Actions
-`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`. + native `<div>` props.
+`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the row. |
 
 ### Modal.Icon
 `ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around an `Avatar.Root` or a `Thumbnail.Root` (the record's picture) no tile — `data-media`, the avatar sized to 40 px.
@@ -89,35 +95,48 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color; not used around a picture. |
-| `children` | `ReactNode` | — (required) | An icon glyph (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
+| `children` | `ReactNode` | — (required) | An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Modal.Title · Modal.Description
-`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.
-
-### Modal.Body
-`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.
-
-### Modal.Footer
-`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start. + native `HTMLAttributes<HTMLElement>`.
+`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `layout` | `"fill" \| "end"` | `"fill" (xs/s/m), "end" (l/xl)` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
+| `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement \| HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
+
+### Modal.Body
+`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the zone. |
+
+### Modal.Footer
+`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `layout` | `"fill" \| "end"` | `"fill"` for `xs` `s` `m`, `"end"` for `l` `xl` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `className`, `children` and the other attributes of the `<footer>`. |
 
 ### Modal.Meta
-`ref` → `HTMLParagraphElement`. A `<p>` at the start of the footer: short muted status text («Есть несохранённые изменения»); the buttons keep their width at the end. Not part of the dialog description. + native `<p>` props.
+`ref` → `HTMLParagraphElement`. A `<p>` at the start of the footer: short muted status text («Есть несохранённые изменения»); the buttons keep their width at the end. Not part of the dialog description.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `className`, `children` and the other attributes of the `<p>`. |
 
 ### Modal.Guard
 No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. Closing from code is never held.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `busy` | `boolean` | `false` | A request runs: Escape, a press outside, a swipe, the close button and `Close` do nothing; the close button and the `Close` child stay in place, disabled. |
-| `dirty` | `boolean` | `false` | Unsaved changes: any of those dismisses first asks «Не сохранять изменения?» (a ConfirmDialog with `labels.discard*`); confirming closes the dialog. |
+| `busy` | `boolean` | `false` | A request runs: Escape, a press outside, a swipe, the close button and `Close` do nothing; the close button and the `Close` child stay in place, disabled. The grab handle stays and takes no drag. |
+| `dirty` | `boolean` | `false` | Unsaved changes: any of those dismisses (a swipe glides back first) asks «Не сохранять изменения?» (a ConfirmDialog with `labels.discard*`); confirming closes the dialog. |
 
 ### Modal.Trigger · Modal.Close · Modal.Confirm
-No DOM: clone the single child and chain its `onClick` (unless the child's handler calls `preventDefault()`). `Close` goes through a `Guard` and makes its child `disabled` while the guard is busy.
+No DOM: each clones its child. `Trigger` and `Close` chain its `onClick` (skipped after `preventDefault()`): open; close through `Guard`, `disabled` while it is busy. `Confirm` adds no handler: it marks the Enter target.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -135,7 +154,13 @@ The dialog has one look: the floating layer of the ladder (`data-depth="floating
 | `l` | 720 wide, footer buttons right-aligned | Two-column forms | |
 | `xl` | 960 wide, footer buttons right-aligned | Tables, previews | |
 
-Below 640px of viewport every size becomes a full-width bottom sheet with a grab handle.
+Below 640px of viewport a centred dialog of every size becomes a full-width bottom sheet (`data-sheet`) with a grab handle while it swipes.
+
+### placement (Content)
+| Value | Looks like | Use when | Default |
+|---|---|---|---|
+| `center` | In the middle of the viewport; a bottom sheet on a phone | Every dialog | yes |
+| `top` | Near the top edge at every width, growing downward; no swipe | A search palette whose field must stay put and above the on-screen keyboard ([CommandMenu](../command-menu/COMPONENT.md)) | |
 
 ### layout (Footer)
 | Value | Looks like | Use when | Default |
@@ -152,7 +177,7 @@ With a `Modal.Meta` the footer is a row in any layout: the status takes the free
 | `accent` | `accent-soft` tile, accent icon | Product features, invitations | |
 | `success` | `success-soft` tile, success icon | Done / completed | |
 | `warning` | `warning-soft` tile, warning icon | Risky but reversible | |
-| `danger` | `danger-soft` tile, danger icon | Delete confirmations | |
+| `danger` | `danger-soft` tile, danger icon | A warning about a risky step | |
 | `info` | `info-soft` tile, info icon | Informational notices | |
 
 Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` (found by element type) — there is no tile and no tone: `data-media`, the avatar sized to 40 px.
@@ -162,12 +187,12 @@ Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` (found by
 |---|---|---|---|
 | `showClose` | Close button at the end of the header | Default | `true` |
 | `showClose={false}` | No close button | The footer has an explicit cancel and Escape is enough | |
-| Header + Footer, no Body | Hairline between them | Confirmations | |
+| Header + Footer, no Body | Hairline between them | An acknowledgement | |
 | Header only | Header with full bottom padding | Short notices | |
 
 **Combinations** — destructive confirm: use [ConfirmDialog](../confirm-dialog/COMPONENT.md). An edit form: `Modal.Guard busy={saving} dirty={changed}`, `Modal.Meta` «Есть несохранённые изменения» while changed, the submit Button `loading` while saving.
 
-**Hierarchy** — one primary action, last in the footer and wrapped in `Modal.Confirm`; the secondary is `outline` neutral.
+**Hierarchy** — one primary action, last in the footer and wrapped in `Modal.Confirm`; the secondary is `outline` neutral. A form is the exception: its primary is the `type="submit" form={formId}` button, outside `Modal.Confirm` — Enter in a field submits the form natively.
 
 ## States
 | State | Driven by | DOM |
@@ -180,8 +205,10 @@ Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` (found by
 | while open | — | focus trapped inside, page scroll locked, siblings of the portal `inert` (the toast region stays usable) |
 | closing | `open` turns false | the dialog keeps showing the children it had open while the exit motion plays |
 | busy | `Modal.Guard busy` | Escape, the scrim, a swipe, the close button and `Modal.Close` do nothing; the close button and the `Close` child are `disabled` in place |
-| dirty | `Modal.Guard dirty` | a dismiss opens the «Не сохранять изменения?» ConfirmDialog (`labels.discard*`); its confirm closes the dialog; no swipe |
-| swiping | below 640px, a drag down from the handle or the header (with `closeOnOutsideClick`) | `data-swiping` and `--swipe-offset` on the dialog while the pointer drags it; past 30% of its height or on a flick it closes, otherwise it glides back |
+| dirty | `Modal.Guard dirty` | a dismiss opens the «Не сохранять изменения?» ConfirmDialog (`labels.discard*`); its confirm closes the dialog; a swipe past the threshold glides back and asks the same |
+| sheet | a centred dialog on a phone viewport | `data-sheet` on the dialog: the bottom-sheet surface, the grab handle while it swipes |
+| swiping | as a phone sheet, a drag down from the handle or the header (with `closeOnOutsideClick`; without it there is no handle and no swipe) | `data-swiping` and `--swipe-offset` on the dialog while the pointer drags it; past 30% of its height or on a flick it closes, otherwise it glides back; a busy `Modal.Guard` sets `data-swipe-disabled` and the handle takes no drag |
+| placement | `placement` on Content | `data-placement` on the dialog |
 
 Loading or disabled actions use the Button props (`loading`, `disabled`) inside the footer.
 
@@ -192,7 +219,8 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - Max height = viewport minus `--prime-modal-viewport-padding` on both sides; only the body scrolls.
 - Tabs in the header: a `Tabs.List` inside `Modal.Header` (with `Tabs.Root` around the header and the body) spans the header's last row. The header becomes the tab strip, edge to edge and without the hairline; the active tab is the body rising into it, the panels sit in the body.
 - Fields inside take the floating layer's fill; a card inside is the next layer (`floating-1`), a flat tile. Group fields with a 20 gap.
-- Narrow viewport (< 640px): bottom sheet, full width, top corners `--prime-sheet-radius`, a grab handle strip on top, up to `100dvh − --prime-sheet-top-gap` high, the bottom safe-area inset below the content.
+- Narrow viewport (< 640px), `placement="center"`: the shared bottom-sheet surface (`src/internal/sheet.module.css`) — full width, rounded top, a grab handle strip on top while it swipes, up to the sheet top gap high, the bottom safe-area inset below the content.
+- `placement="top"`: the dialog hangs from a line 12% of the viewport down (between `--prime-modal-viewport-padding` and `--prime-space-24`) and grows downward.
 
 ## Accessibility
 
@@ -208,12 +236,12 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- `role="dialog"`, `aria-modal="true"`, named by Title (or `aria-label`), described by Description.
+- `role="dialog"`, `aria-modal="true"`, named by `Modal.Title` (or `aria-label`), described by `Modal.Description`.
 - Focus moves into the dialog on open (an `autoFocus` field wins) and returns to the opener on close — also after a scrim click (foundation §8).
 - The page behind is `inert` and its scroll is locked.
 - Only the topmost layer reacts: a Select open inside the dialog closes first.
-- On a narrow viewport a swipe down is an extra way out; the close button and Escape stay. A destructive confirm (`closeOnOutsideClick={false}`) does not close by swipe. The grab handle is `aria-hidden`.
-- A busy `Guard` keeps the close button and the `Close` child in place, `disabled`; a dirty one opens a `role="alertdialog"` confirm with focus on «Продолжить».
+- As a phone sheet a swipe down is an extra way out; the close button and Escape stay. With `closeOnOutsideClick={false}` there is no swipe and no grab handle; the handle is `aria-hidden`.
+- A `Guard` that is `busy` keeps the close button and the `Close` child in place, `disabled`; a `dirty` one opens a `role="alertdialog"` confirm with focus on «Продолжить».
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -230,19 +258,19 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A trigger opens a dialog with a title, a field and two actions; Enter presses the confirm — `Modal.Trigger`, `Modal.Confirm`. |
-| [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile with a header-only notice, and a header with a status before the close button and a footer but no body — `Modal.Icon`, `Modal.Actions`, `Modal.Body`, `Modal.Footer`. |
+| [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile with a header-only notice, and a header with a status before the close button and a footer with no body between them — `Modal.Icon`, `Modal.Actions`, `Modal.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Every width; xs, s and m fill the footer with equal buttons, l and xl align them to the end — `size`. |
-| [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Modal.Body`. |
+| [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place; the primary closes the dialog and is the Enter target — `Modal.Body`, `Modal.Confirm`. |
 | [custom-container.tsx](examples/custom-container.tsx) | The dialog portals into a given node instead of the document body — `container`. |
-| [guard.tsx](examples/guard.tsx) | An edit form that holds the dialog: changes make any dismiss ask first and show a note in the footer; while saving nothing closes it — `Modal.Guard`, `Modal.Meta`. |
+| [guard.tsx](examples/guard.tsx) | An edit form that holds the dialog: changes make any dismiss ask first and show a note in the footer, the submit button saves the form, and while saving nothing closes it — `Modal.Guard`, `Modal.Meta`. |
 | [enter-key.tsx](examples/enter-key.tsx) | Enter in a dialog: deleting a workspace takes a click, never Enter in its field; in the tags dialog Enter adds the typed tag instead of saving — `confirmOnEnter`, `onEnterConfirm`. |
-| [dismiss.tsx](examples/dismiss.tsx) | A destructive confirm closes only from its buttons, and not at all while the request runs — `closeOnOutsideClick`, `closeOnEscape`. |
+| [dismiss.tsx](examples/dismiss.tsx) | A step the person has to finish: the payment details dialog closes only from its buttons, and not at all while they are saved — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state and opens the dialog from code, without a trigger — `open`, `onOpenChange`. |
-| [in-form.tsx](examples/in-form.tsx) | A settings form in a dialog: the footer button submits the form and an empty name shakes the field and keeps it open until it is filled — `Modal.Body`, `Modal.Footer`, `error`. |
+| [in-form.tsx](examples/in-form.tsx) | A settings form in a dialog: the footer submit button submits the form, Enter in a field does the same, and an empty name shakes the field and keeps it open until it is filled — `Modal.Body`, `Modal.Footer`, `error`. |
 
 ## Mistakes
-- Destructive confirm that closes on a stray scrim click → `closeOnOutsideClick={false}`.
-- Primary action not in `Modal.Confirm` → Enter does nothing; wrap it.
+- A destructive confirm built as a Modal → use ConfirmDialog. A destructive step that needs input (type the name to delete) stays a Modal with `closeOnOutsideClick={false}`.
+- Primary action not in `Modal.Confirm` → Enter does nothing; wrap it. In a form, the `type="submit"` button is the primary and stays outside `Modal.Confirm`: Enter in a field submits the form.
 - Primary action first in the footer → put it last (DOM order is the visual order).
 - Busy or unsaved state lifted out of the form into Root props → put `Modal.Guard` next to the form, inside Content.
 - `key` or a conditional around `Modal.Root` to reset a form → the dialog unmounts at once, without its exit; keep the Root mounted and drive `open`.

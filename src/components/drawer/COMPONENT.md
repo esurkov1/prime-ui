@@ -53,12 +53,12 @@ No DOM, no ref. State and dismiss policy.
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, close button, `Close`, Escape, scrim click, code. A `Guard` holds the dismisses (not code). |
 | `closeOnEscape` | `boolean` | `true` | Escape closes the dialog. |
-| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the dialog; turn off for destructive confirms. |
+| `closeOnOutsideClick` | `boolean` | `true` | A click on the scrim closes the dialog. A destructive action is confirmed in a ConfirmDialog; unsaved changes are held by `Guard`. |
 | `labels` | `Partial<DrawerLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — | Trigger and Content. |
 
 ### Drawer.Content
-`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel at the edge; renders while open and during its exit animation, showing the children it had open (a record cleared with `open` does not empty the panel mid-motion).
+`ref` → `HTMLDivElement` (the dialog panel). Portal + scrim + `role="dialog"` panel at the edge, side by side; renders while open and during its exit animation, showing the children it had open (a record cleared with `open` does not empty the panel mid-motion).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -71,15 +71,20 @@ No DOM, no ref. State and dismiss policy.
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other attributes of the `role="dialog"` element. |
 
 ### Drawer.Header
-`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button]. + native `HTMLAttributes<HTMLElement>`.
+`ref` → `HTMLElement`. Renders `<header>`: [Icon] [Title + Description] [Actions] [close button].
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `showClose` | `boolean` | `true` | Built-in square ghost `s` close button named by `labels.close`; disabled in place while a `Guard` is `busy`. |
 | `children` | `ReactNode` | — | Icon, Title, Description, Actions in any order; each goes to its column. A `Tabs.List` (with `Tabs.Root` around header and body) turns the header into a tab strip. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `className` and the other attributes of the `<header>`. |
 
 ### Drawer.Actions
-`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`. + native `<div>` props.
+`ref` → `HTMLDivElement`. A row of controls at the end of the header, before the close button: a status Badge, a ⋯ Dropdown, an icon button. Controls inside take tier `s`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the row. |
 
 ### Drawer.Icon
 `ref` → `HTMLSpanElement`. An `aria-hidden` 40 px tile with a tone fill; around an `Avatar.Root` or a `Thumbnail.Root` (the record's picture) no tile — `data-media`, the avatar sized to 40 px.
@@ -87,24 +92,37 @@ No DOM, no ref. State and dismiss policy.
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Soft fill and icon color; not used around a picture. |
-| `children` | `ReactNode` | — (required) | An icon glyph (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
+| `children` | `ReactNode` | — (required) | An `Icon` (sized to the m icon), or the record's picture: an `Avatar.Root` (sized to the tile) or a `Thumbnail.Root`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other attributes of the tile. |
 
 ### Drawer.Title · Drawer.Description
-`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog. + native props except `id`.
+`ref` → `HTMLHeadingElement` / `HTMLParagraphElement`. `<h2>` (title-m) / `<p>` (body-s, muted); their ids name and describe the dialog.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `Omit<HTMLAttributes<HTMLHeadingElement \| HTMLParagraphElement>, "id">` | — | `className`, `children` and the other attributes except `id` (the dialog owns it). |
 
 ### Drawer.Body
-`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks. + native `<div>` props.
+`ref` → `HTMLDivElement`. The only scrolling zone (a ScrollContainer), 16 gap between blocks.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `children` and the other attributes of the zone. |
 
 ### Drawer.Footer
-`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start. + native `HTMLAttributes<HTMLElement>`.
+`ref` → `HTMLElement`. Renders `<footer>` with the actions, primary last, and an optional `Meta` at the start.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `layout` | `"fill" \| "end"` | `"end"` | `fill`: equal-width buttons in one row; `end`: auto width, at the end. Stacked on phones (viewport below 640 px) and in a dialog narrower than 360 px. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `className`, `children` and the other attributes of the `<footer>`. |
 
 ### Drawer.Meta
-`ref` → `HTMLParagraphElement`. A `<p>` at the start of the footer: short muted status text («Есть несохранённые изменения»); the buttons keep their width at the end. Not part of the dialog description. + native `<p>` props.
+`ref` → `HTMLParagraphElement`. A `<p>` at the start of the footer: short muted status text («Есть несохранённые изменения»); the buttons keep their width at the end. Not part of the dialog description.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLParagraphElement>` | — | `className`, `children` and the other attributes of the `<p>`. |
 
 ### Drawer.Guard
 No DOM, no ref. Holds the dialog from anywhere inside Content, where the form state lives; renders only the built-in «discard changes?» confirm. Closing from code is never held.
@@ -112,10 +130,10 @@ No DOM, no ref. Holds the dialog from anywhere inside Content, where the form st
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `busy` | `boolean` | `false` | A request runs: Escape, a press outside, the close button and `Close` do nothing; the close button and the `Close` child stay in place, disabled. |
-| `dirty` | `boolean` | `false` | Unsaved changes: any of those dismisses first asks «Не сохранять изменения?» (a ConfirmDialog with `labels.discard*`); confirming closes the dialog. |
+| `dirty` | `boolean` | `false` | Unsaved changes: any of those dismisses asks «Не сохранять изменения?» (a ConfirmDialog with `labels.discard*`); confirming closes the dialog. |
 
 ### Drawer.Trigger · Drawer.Close
-No DOM: clone the single child and chain its `onClick` (unless the child's handler calls `preventDefault()`). `Close` goes through a `Guard` and makes its child `disabled` while the guard is busy.
+No DOM: each clones its child. `Trigger` and `Close` chain its `onClick` (skipped after `preventDefault()`): open; close through `Guard`, `disabled` while it is busy.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -184,12 +202,12 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- `role="dialog"`, `aria-modal="true"`, named by Title (or `aria-label`), described by Description.
+- `role="dialog"`, `aria-modal="true"`, named by `Drawer.Title` (or `aria-label`), described by `Drawer.Description`.
 - Focus moves into the panel on open and returns to the opener on close, including after a scrim click.
 - The page behind is `inert`, scroll is locked; only the topmost layer reacts.
 - A drawer opened from a Modal stacks above it.
 - No swipe: the close button, `Drawer.Close`, Escape and the scrim are the ways out.
-- A busy `Guard` keeps the close button and the `Close` child in place, `disabled`; a dirty one opens a `role="alertdialog"` confirm with focus on «Продолжить».
+- A `Guard` that is `busy` keeps the close button and the `Close` child in place, `disabled`; a `dirty` one opens a `role="alertdialog"` confirm with focus on «Продолжить».
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->

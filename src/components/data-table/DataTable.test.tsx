@@ -1340,10 +1340,7 @@ describe("DataTable columns menu", () => {
     );
     expect(screen.queryByRole("columnheader", { name: "Город" })).toBeNull();
     await user.click(screen.getByRole("button", { name: "Колонки" }));
-    expect(screen.getByRole("menuitemcheckbox", { name: "Заказ" })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    expect(screen.getByRole("menuitemcheckbox", { name: "Заказ" })).toBeDisabled();
     expect(screen.getByRole("menuitemcheckbox", { name: "Заказ" })).toHaveAttribute(
       "aria-checked",
       "true",
@@ -1372,10 +1369,7 @@ describe("DataTable columns menu", () => {
       />,
     );
     await user.click(screen.getByRole("button", { name: "Колонки: 1 из 3" }));
-    expect(screen.getByRole("menuitemcheckbox", { name: "Заказ" })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    expect(screen.getByRole("menuitemcheckbox", { name: "Заказ" })).toBeDisabled();
   });
 
   it("works from the keyboard: the menu opens on Enter, Space toggles a column", async () => {

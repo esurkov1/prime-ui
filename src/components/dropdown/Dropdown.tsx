@@ -4,6 +4,7 @@ import { Divider } from "@/components/divider/Divider";
 import { Kbd } from "@/components/kbd/Kbd";
 import { useControllableState } from "@/hooks/useControllableState";
 import {
+  type AnchorPoint,
   DEFAULT_ALIGN,
   DEFAULT_SIDE,
   type PositionAlign,
@@ -13,12 +14,15 @@ import { Icon } from "@/icons";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { InteractiveElement } from "@/internal/interactiveElement";
 import { MenuGroup, type MenuGroupProps } from "@/internal/MenuGroup";
 import menu from "@/internal/menu.module.css";
 import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
-import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import { useAnchorName } from "@/internal/overlay/useAnchorName";
+import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import { useOpenState } from "@/internal/overlay/useOpenState";
 import { rovingIndex } from "@/internal/rovingFocus";
-import { Slot } from "@/internal/slot";
+import { Slot, type SlotPartProps, slotChild } from "@/internal/slot";
 import type { ControlSize, Tone } from "@/internal/states";
 
 import styles from "./Dropdown.module.css";
@@ -31,6 +35,7 @@ type DropdownContextValue = {
   triggerRef: React.RefObject<HTMLElement | null>;
   closeOnOutsideClick: boolean;
   closeOnEscape: boolean;
+  anchorPoint: AnchorPoint | null;
 };
 
 const [DropdownProvider, useDropdownContext] =
@@ -40,10 +45,9 @@ export type DropdownRootProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** A pointerdown outside the menu and its trigger closes it. Default `true`. */
   closeOnOutsideClick?: boolean;
-  /** Escape closes the menu. Default `true`. */
   closeOnEscape?: boolean;
+  anchorPoint?: AnchorPoint | null;
   children: React.ReactNode;
 };
 
@@ -53,13 +57,10 @@ function DropdownRoot({
   onOpenChange,
   closeOnOutsideClick = true,
   closeOnEscape = true,
+  anchorPoint = null,
   children,
 }: DropdownRootProps) {
-  const [isOpen, setOpen] = useControllableState({
-    value: open,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
+  const [isOpen, setOpen] = useOpenState({ open, defaultOpen, onOpenChange });
   const id = React.useId();
   const triggerRef = React.useRef<HTMLElement | null>(null);
 
@@ -72,41 +73,51 @@ function DropdownRoot({
       triggerRef,
       closeOnOutsideClick,
       closeOnEscape,
+      anchorPoint,
     }),
-    [isOpen, setOpen, id, closeOnOutsideClick, closeOnEscape],
+    [isOpen, setOpen, id, closeOnOutsideClick, closeOnEscape, anchorPoint],
   );
 
   return <DropdownProvider value={value}>{children}</DropdownProvider>;
 }
 DropdownRoot.displayName = "Dropdown.Root";
 
-export type DropdownTriggerProps = {
-  /** The element that opens the menu (usually a Button); it receives ref, ARIA and the click handler. */
-  children: React.ReactElement;
-  ref?: React.Ref<HTMLElement>;
-} & Omit<React.HTMLAttributes<HTMLElement>, "children">;
+export type DropdownTriggerProps = SlotPartProps;
 
-/** Other props (handlers, ARIA, `ref`) are forwarded to the child, e.g. from a wrapping `Tooltip.Trigger`. */
-function DropdownTrigger({ children, ...forwarded }: DropdownTriggerProps) {
-  const { isOpen, setOpen, triggerId, menuId, triggerRef } = useDropdownContext();
+/**
+ * Wraps the element that opens the menu (usually a Button): it receives the ref, the ARIA, the
+ * click and the arrow keys (WAI-ARIA menu button). Props a wrapping trigger adds
+ * (`Tooltip.Trigger`) pass on to the child.
+ */
+function DropdownTrigger(props: DropdownTriggerProps) {
+  const { isOpen, setOpen, triggerId, menuId, triggerRef } = useDropdownContext("Dropdown.Trigger");
   return (
     <FloatingTrigger
-      {...forwarded}
+      {...props}
       triggerProps={{
         ref: triggerRef,
         id: triggerId,
-        "aria-expanded": isOpen,
         "aria-haspopup": "menu",
-        "aria-controls": menuId,
-        "data-state": isOpen ? "open" : "closed",
-        onClick: () => setOpen((value) => !value),
+        "aria-controls": isOpen ? menuId : undefined,
+        ...floatingTriggerProps({ open: isOpen, setOpen, openOnArrow: true }),
       }}
-    >
-      {children}
-    </FloatingTrigger>
+    />
   );
 }
 DropdownTrigger.displayName = "Dropdown.Trigger";
+
+export type DropdownAnchorProps = SlotPartProps;
+
+/**
+ * An anchor that is not a trigger: the element a context menu opens against (a row, a list) with
+ * `Dropdown.Root anchorPoint`, the open state driven by `Dropdown.Root open`. It adds no click
+ * handler and no ARIA; presses on it do not close the menu, and focus returns to it on close.
+ */
+function DropdownAnchor({ children }: DropdownAnchorProps) {
+  const { triggerRef } = useDropdownContext("Dropdown.Anchor");
+  return <Slot ref={triggerRef}>{children}</Slot>;
+}
+DropdownAnchor.displayName = "Dropdown.Anchor";
 
 const ENABLED_ITEM =
   ':is([role="menuitem"], [role="menuitemcheckbox"]):not([data-disabled="true"])';
@@ -124,9 +135,7 @@ function moveFocus(event: React.KeyboardEvent<HTMLElement>) {
 export type DropdownContentProps = Omit<React.HTMLAttributes<HTMLElement>, "role"> & {
   side?: PositionSide;
   align?: PositionAlign;
-  /** Row tier: item height, text, icon. */
   size?: ControlSize;
-  /** The menu is at least as wide as the trigger. */
   matchTriggerWidth?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -141,8 +150,8 @@ function DropdownContent({
   onKeyDown,
   ...rest
 }: DropdownContentProps) {
-  const { isOpen, setOpen, triggerRef, menuId, triggerId, closeOnOutsideClick, closeOnEscape } =
-    useDropdownContext();
+  const { isOpen, setOpen, triggerRef, menuId, closeOnOutsideClick, closeOnEscape, anchorPoint } =
+    useDropdownContext("Dropdown.Content");
 
   // WAI-ARIA menu button: focus goes to the first item; Escape, a pick and Tab return it to the
   // trigger (Tab then moves on); an outside press leaves focus where the pointer put it.
@@ -152,23 +161,25 @@ function DropdownContent({
     triggerRef,
     side,
     align,
+    anchorPoint,
     matchAnchorWidth: matchTriggerWidth,
     closeOnEscape,
     closeOnOutsideClick,
-    focusOnOpen: true,
+    focusOnOpen: ENABLED_ITEM,
     tabExit: "always",
     sheet: true,
   });
+  const name = useAnchorName(isOpen, false, triggerRef);
 
   return (
     <FloatingPanel
       {...rest}
+      {...name}
       floating={floating}
       size={size}
       scroll
       id={menuId}
       role="menu"
-      aria-labelledby={triggerRef.current?.id || triggerId}
       className={cx(menu.tier, menu.menu, className)}
       onKeyDown={(event) => {
         onKeyDown?.(event);
@@ -185,15 +196,9 @@ export type DropdownItemProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "type" | "role" | "onSelect"
 > & {
-  /** Runs the action; the menu closes after it. */
   onSelect?: () => void;
   disabled?: boolean;
-  /** `danger` — destructive action (delete, revoke). */
   tone?: Extract<Tone, "neutral" | "danger">;
-  /**
-   * The item is its single child, a link (`<a href>`, a router `Link`): the item props merge onto
-   * it, so Cmd / Ctrl-click and «open in a new tab» work. Its children are the item content.
-   */
   asChild?: boolean;
   /** The item element: `<button>`, or the `asChild` element. */
   ref?: React.Ref<HTMLButtonElement>;
@@ -240,6 +245,11 @@ function useItemContent(children: React.ReactNode) {
   };
 }
 
+/**
+ * An item is no tab stop (`tabIndex -1`): the menu moves focus between items with the arrow keys
+ * (roving focus), and Tab leaves the menu. A disabled item runs no handler at all, the consumer's
+ * `onClick` included (`InteractiveElement`).
+ */
 function DropdownItem({
   onSelect,
   disabled = false,
@@ -251,44 +261,40 @@ function DropdownItem({
   ref,
   ...rest
 }: DropdownItemProps) {
-  const { setOpen } = useDropdownContext();
-  const child =
-    asChild && React.isValidElement<{ children?: React.ReactNode }>(children) ? children : null;
+  const { setOpen } = useDropdownContext("Dropdown.Item");
+  const child = asChild ? slotChild(children, "Dropdown.Item") : null;
   const { content, aria } = useItemContent(child ? child.props.children : children);
-
-  // Enter and Space reach here as the native click (Enter only on a link).
-  const activate = () => {
-    if (disabled) return;
-    onSelect?.();
-    setOpen(false);
-  };
 
   const itemProps = {
     ...rest,
     ...aria,
+    ref,
     role: "menuitem",
-    "aria-disabled": disabled || undefined,
-    tabIndex: disabled ? -1 : 0,
+    tabIndex: -1,
+    disabled,
     className: cx(menu.item, styles.item, className),
     ...toDataAttributes({ tone, disabled: disabled || undefined }),
-    onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
-      onClick?.(event);
-      if (!event.defaultPrevented) activate();
+    // Enter and Space reach here as the native click (Enter only on a link).
+    onClick: (event: React.MouseEvent<HTMLElement>) => {
+      onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+      if (event.defaultPrevented) return;
+      onSelect?.();
+      setOpen(false);
     },
   };
 
   if (child) {
     // A link keeps its native click: a modified click opens a new tab and the menu still closes.
     return (
-      <Slot {...itemProps} ref={ref as React.Ref<HTMLElement>}>
+      <InteractiveElement {...itemProps} element="slot">
         {React.cloneElement(child, undefined, content)}
-      </Slot>
+      </InteractiveElement>
     );
   }
   return (
-    <button {...itemProps} ref={ref} type="button">
+    <InteractiveElement {...itemProps} element="button">
       {content}
-    </button>
+    </InteractiveElement>
   );
 }
 DropdownItem.displayName = "Dropdown.Item";
@@ -317,6 +323,7 @@ function DropdownCheckboxItem({
   className,
   onClick,
   children,
+  ref,
   ...rest
 }: DropdownCheckboxItemProps) {
   const [checked, setChecked] = useControllableState({
@@ -327,26 +334,27 @@ function DropdownCheckboxItem({
   const { content, aria } = useItemContent(children);
 
   return (
-    <button
+    <InteractiveElement
       {...rest}
       {...aria}
-      type="button"
+      ref={ref}
+      element="button"
       role="menuitemcheckbox"
       aria-checked={checked}
-      aria-disabled={disabled || undefined}
-      tabIndex={disabled ? -1 : 0}
+      tabIndex={-1}
+      disabled={disabled}
       className={cx(menu.item, styles.item, className)}
       {...toDataAttributes({ disabled: disabled || undefined, checked: checked || undefined })}
       onClick={(event) => {
-        onClick?.(event);
-        if (!event.defaultPrevented && !disabled) setChecked(!checked);
+        onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+        if (!event.defaultPrevented) setChecked(!checked);
       }}
     >
       {content}
       <span className={menu.check} aria-hidden="true">
         {checked ? <Icon name="action.check" /> : null}
       </span>
-    </button>
+    </InteractiveElement>
   );
 }
 DropdownCheckboxItem.displayName = "Dropdown.CheckboxItem";
@@ -453,6 +461,7 @@ DropdownHeader.displayName = "Dropdown.Header";
 export const Dropdown = {
   Root: DropdownRoot,
   Trigger: DropdownTrigger,
+  Anchor: DropdownAnchor,
   Content: DropdownContent,
   Header: DropdownHeader,
   Title: DropdownTitle,

@@ -7,7 +7,7 @@
 
 ## When to use
 - Name and shortcut of an icon-only button.
-- Why a control is disabled: put the disabled control straight into `Tooltip.Trigger`.
+- Why a control is disabled: put the disabled control straight into `Tooltip.Trigger` — also one a disabled `Fieldset` disables.
 - What a status badge, an avatar or an information icon means.
 - A one-line definition of a term or abbreviation.
 
@@ -58,7 +58,7 @@ No DOM, no ref. Its tooltips form a group: one is open at a time, and once one h
 | `children` | `ReactNode` | — (required) | Subtree. |
 
 ### Tooltip.Trigger
-No DOM of its own: clones the single child and links it to the tooltip with `aria-describedby`. A `disabled` child is wrapped in a focusable `<span>`; a child that is no tab stop becomes one.
+No DOM of its own: clones the single child and links it to the tooltip with `aria-describedby`. A `disabled` child — by its own prop or a disabled `Fieldset` around it — is wrapped in a focusable `<span>`; a child that is no tab stop becomes one.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -79,7 +79,7 @@ No DOM of its own: clones the single child and links it to the tooltip with `ari
 Tooltip has no `variant` or `tone`: it is always a flat inverse chip (`tooltip-bg`, `tooltip-text`) — dark in the light theme, light in the dark one — with an arrow and no shadow, so it reads the same on every layer. The chip is a host of its own: it points the text and fill roles at `tooltip-muted` / `tooltip-fill`, so a Kbd or a secondary line inside reads on it. Content flows inline: a label and its key stay on one line, block children stack. The arrow (`--prime-tooltip-arrow-width` × `--prime-tooltip-arrow-height`) always points at the trigger's centre, also after flipping, aligning or shifting, and never slides into the chip's rounded corner.
 
 ### size (Content)
-A chip of tier T is as tall as a menu item of tier T; text, padding and radius step together (`--prime-tooltip-<tier>-*`).
+A chip of tier T is as tall as a menu item of tier T; text, padding and radius step together (`--prime-tooltip-<tier>-*`). The chip itself is the shared tooltip surface (`src/internal/overlay/tooltipSurface.module.css`), which the drop reason of Dnd wears too.
 
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
@@ -139,7 +139,7 @@ A chip of tier T is as tall as a menu item of tier T; text, padding and radius s
 - The tooltip is a description, not the name: an icon-only button needs its own `aria-label`.
 - The pointer may move onto the chip without closing it (WCAG 1.4.13); a touch does not open it, focus does.
 - Tooltip has no `closeOnEscape` / `closeOnOutsideClick` (foundation §8): it closes on pointer-leave, blur, a press on the trigger and Escape, and Escape cannot be turned off — WCAG 1.4.13 requires the chip to be dismissable without moving the pointer or focus.
-- A `disabled` control is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control.
+- A `disabled` control (its own prop or a disabled `Fieldset`) is wrapped by the kit in a focusable `<span>`: the host takes hover and Tab, the focus ring is drawn on the control. Around a button the host is that button for assistive tech — `role="button"`, `aria-disabled`, named by the control through `aria-labelledby` — and the control itself leaves the tree.
 - A trigger that is no tab stop (Badge, Avatar, ProgressCircle, `Icon` with `label`) gets `tabIndex={0}` and the focus ring; its name comes from `aria-label` or the icon `label`.
 
 ### Labels

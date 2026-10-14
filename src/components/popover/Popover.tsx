@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import { useControllableState } from "@/hooks/useControllableState";
 import {
   DEFAULT_ALIGN,
   DEFAULT_SIDE,
@@ -9,9 +8,15 @@ import {
 } from "@/hooks/usePosition";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
-import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
-import { Slot } from "@/internal/slot";
+import {
+  FloatingPanel,
+  FloatingTrigger,
+  type FloatingWidth,
+} from "@/internal/overlay/FloatingPanel";
+import { useAnchorName } from "@/internal/overlay/useAnchorName";
+import { floatingTriggerProps, useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import { useOpenState } from "@/internal/overlay/useOpenState";
+import { Slot, type SlotPartProps } from "@/internal/slot";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Popover.module.css";
@@ -24,6 +29,7 @@ type PopoverContextValue = {
   triggerRef: React.RefObject<HTMLElement | null>;
   closeOnOutsideClick: boolean;
   closeOnEscape: boolean;
+  openOnArrow: boolean;
   /** Set by `Popover.Anchor`: focus stays in the anchor (a field driving the panel) on open. */
   anchoredRef: React.RefObject<boolean>;
 };
@@ -34,10 +40,9 @@ export type PopoverRootProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** A pointerdown outside the panel and its trigger closes it. Default `true`. */
   closeOnOutsideClick?: boolean;
-  /** Escape closes the panel. Default `true`. */
   closeOnEscape?: boolean;
+  openOnArrow?: boolean;
   children: React.ReactNode;
 };
 
@@ -47,13 +52,10 @@ function PopoverRoot({
   onOpenChange,
   closeOnOutsideClick = true,
   closeOnEscape = true,
+  openOnArrow = false,
   children,
 }: PopoverRootProps) {
-  const [isOpen, setOpen] = useControllableState({
-    value: open,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
+  const [isOpen, setOpen] = useOpenState({ open, defaultOpen, onOpenChange });
   const id = React.useId();
   const triggerRef = React.useRef<HTMLElement | null>(null);
   const anchoredRef = React.useRef(false);
@@ -67,48 +69,42 @@ function PopoverRoot({
       triggerRef,
       closeOnOutsideClick,
       closeOnEscape,
+      openOnArrow,
       anchoredRef,
     }),
-    [isOpen, setOpen, id, closeOnOutsideClick, closeOnEscape],
+    [isOpen, setOpen, id, closeOnOutsideClick, closeOnEscape, openOnArrow],
   );
 
   return <PopoverProvider value={value}>{children}</PopoverProvider>;
 }
 PopoverRoot.displayName = "Popover.Root";
 
-export type PopoverTriggerProps = {
-  /** The element that opens the panel (usually a Button); it receives ref, ARIA and the click handler. */
-  children: React.ReactElement;
-  ref?: React.Ref<HTMLElement>;
-} & Omit<React.HTMLAttributes<HTMLElement>, "children">;
+export type PopoverTriggerProps = SlotPartProps;
 
-/** Other props (handlers, ARIA, `ref`) are forwarded to the child, e.g. from a wrapping `Tooltip.Trigger`. */
-function PopoverTrigger({ children, ...forwarded }: PopoverTriggerProps) {
-  const { isOpen, setOpen, triggerId, contentId, triggerRef } = usePopoverContext();
+/**
+ * Wraps the element that opens the panel (usually a Button): it receives the ref, the ARIA and the
+ * click. Props a wrapping trigger adds (`Tooltip.Trigger`) pass on to the child.
+ */
+function PopoverTrigger(props: PopoverTriggerProps) {
+  const { isOpen, setOpen, triggerId, contentId, triggerRef, openOnArrow } =
+    usePopoverContext("Popover.Trigger");
   // The child's own id wins (a field label's htmlFor points at it).
   return (
     <FloatingTrigger
-      {...forwarded}
+      {...props}
       triggerProps={{
         ref: triggerRef,
         id: triggerId,
-        "aria-expanded": isOpen,
         "aria-haspopup": "dialog",
-        "aria-controls": contentId,
-        "data-state": isOpen ? "open" : "closed",
-        onClick: () => setOpen((value) => !value),
+        "aria-controls": isOpen ? contentId : undefined,
+        ...floatingTriggerProps({ open: isOpen, setOpen, openOnArrow }),
       }}
-    >
-      {children}
-    </FloatingTrigger>
+    />
   );
 }
 PopoverTrigger.displayName = "Popover.Trigger";
 
-export type PopoverAnchorProps = {
-  /** The element the panel is positioned against and that does not count as "outside" for dismissal. */
-  children: React.ReactElement;
-};
+export type PopoverAnchorProps = SlotPartProps;
 
 /**
  * An anchor that is not a trigger: positions the panel against an element (a whole toolbar) and keeps
@@ -118,23 +114,20 @@ export type PopoverAnchorProps = {
  * `Popover.Trigger`, not with it.
  */
 function PopoverAnchor({ children }: PopoverAnchorProps) {
-  const { triggerRef, anchoredRef } = usePopoverContext();
+  const { triggerRef, anchoredRef } = usePopoverContext("Popover.Anchor");
   anchoredRef.current = true;
   return <Slot ref={triggerRef}>{children}</Slot>;
 }
 PopoverAnchor.displayName = "Popover.Anchor";
 
-export type PopoverCloseProps = {
-  /** One element (usually a Button inside the panel); a click closes the panel. */
-  children: React.ReactElement;
-};
+export type PopoverCloseProps = SlotPartProps;
 
 /**
  * Closes the panel on click (focus returns to the trigger), unless the child's own handler calls
  * `preventDefault()`.
  */
 function PopoverClose({ children }: PopoverCloseProps) {
-  const { setOpen } = usePopoverContext();
+  const { setOpen } = usePopoverContext("Popover.Close");
   return <Slot onClick={() => setOpen(false)}>{children}</Slot>;
 }
 PopoverClose.displayName = "Popover.Close";
@@ -142,23 +135,10 @@ PopoverClose.displayName = "Popover.Close";
 export type PopoverContentProps = Omit<React.HTMLAttributes<HTMLDivElement>, "role"> & {
   side?: PositionSide;
   align?: PositionAlign;
-  /** Tier of the text, padding and the controls inside. */
   size?: ControlSize;
-  /** The panel is exactly as wide as the trigger (text wraps). */
-  matchTriggerWidth?: boolean;
-  /** Tab cycles inside the panel (forms). Without it Tab past the edges leaves to the trigger and closes. */
+  width?: FloatingWidth;
   trapFocus?: boolean;
-  /**
-   * Focus moves into the panel when it opens (`[data-autofocus]`, else the first tab stop, else the
-   * panel). Default: on with `Popover.Trigger`, off with `Popover.Anchor` (a field driving the
-   * panel keeps typing). Turn it on for an anchored panel opened by a command — a Dropdown item
-   * («Переименовать…») — so focus lands in the panel, not back on the menu trigger.
-   */
   initialFocus?: boolean;
-  /**
-   * No inner padding and no gap: rows reach the panel edges (lists with full-width dividers, filter
-   * panels). The content lays out its own spacing and uses inset focus rings.
-   */
   flush?: boolean;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -167,7 +147,7 @@ function PopoverContent({
   side = DEFAULT_SIDE,
   align = DEFAULT_ALIGN,
   size = "m",
-  matchTriggerWidth = false,
+  width = "auto",
   trapFocus = false,
   initialFocus,
   flush = false,
@@ -180,11 +160,10 @@ function PopoverContent({
     setOpen,
     triggerRef,
     contentId,
-    triggerId,
     closeOnOutsideClick,
     closeOnEscape,
     anchoredRef,
-  } = usePopoverContext();
+  } = usePopoverContext("Popover.Content");
 
   // Overlay contract (foundation §8): focus moves into the panel on open (not with an Anchor) and
   // returns to the trigger on Escape, Tab out and Popover.Close; an outside press only closes it.
@@ -194,7 +173,7 @@ function PopoverContent({
     triggerRef,
     side,
     align,
-    matchAnchorWidth: matchTriggerWidth,
+    matchAnchorWidth: width === "trigger",
     closeOnEscape,
     closeOnOutsideClick,
     focusOnOpen: initialFocus ?? !anchoredRef.current,
@@ -204,28 +183,30 @@ function PopoverContent({
     sheet: !anchoredRef.current,
   });
 
-  const titleId = `${contentId}-title`;
-  const descriptionId = `${contentId}-description`;
-  const [hasTitle, setHasTitle] = React.useState(false);
-  const [hasDescription, setHasDescription] = React.useState(false);
+  const [titleId, setTitleId] = React.useState<string | null>(null);
+  const [descriptionId, setDescriptionId] = React.useState<string | null>(null);
+  const fallbackId = `${contentId}-title`;
+  const fallbackDescriptionId = `${contentId}-description`;
   const slots = React.useMemo(
-    () => ({ titleId, descriptionId, setHasTitle, setHasDescription }),
-    [titleId, descriptionId],
+    () => ({ fallbackId, fallbackDescriptionId, setTitleId, setDescriptionId }),
+    [fallbackId, fallbackDescriptionId],
   );
+  const anchorName = useAnchorName(isOpen, titleId !== null, triggerRef);
 
   return (
     <FloatingPanel
       {...rest}
       floating={floating}
       size={size}
+      width={width}
       scroll
       id={contentId}
       role="dialog"
       aria-modal={false}
-      aria-labelledby={hasTitle ? titleId : triggerRef.current?.id || triggerId}
-      aria-describedby={hasDescription ? descriptionId : undefined}
+      {...anchorName}
+      aria-labelledby={titleId ?? anchorName["aria-labelledby"]}
+      aria-describedby={descriptionId ?? undefined}
       tabIndex={-1}
-      data-match-trigger-width={matchTriggerWidth || undefined}
       data-flush={flush || undefined}
       className={cx(styles.content, className)}
     >
@@ -238,24 +219,28 @@ PopoverContent.displayName = "Popover.Content";
 // ─── Header / Title / Description / Actions ─────────────────────────────────
 
 type PopoverSlots = {
-  titleId: string;
-  descriptionId: string;
-  setHasTitle: (value: boolean) => void;
-  setHasDescription: (value: boolean) => void;
+  fallbackId: string;
+  fallbackDescriptionId: string;
+  setTitleId: (id: string | null) => void;
+  setDescriptionId: (id: string | null) => void;
 };
 
 const PopoverSlotsContext = React.createContext<PopoverSlots | null>(null);
 
-/** Registers a Title / Description so the dialog is named / described by it. */
-function useSlotId(id: string | undefined, kind: "title" | "description") {
+/**
+ * Registers a Title / Description with the id it renders — its own `id`, else one of the panel —
+ * so the dialog is named / described by exactly that element.
+ */
+function useSlotId(id: string | undefined, kind: "title" | "description"): string | undefined {
   const slots = React.useContext(PopoverSlotsContext);
-  const register = kind === "title" ? slots?.setHasTitle : slots?.setHasDescription;
+  const resolved = id ?? (kind === "title" ? slots?.fallbackId : slots?.fallbackDescriptionId);
+  const register = kind === "title" ? slots?.setTitleId : slots?.setDescriptionId;
   React.useLayoutEffect(() => {
-    if (!register || id) return;
-    register(true);
-    return () => register(false);
-  }, [register, id]);
-  return id ?? (kind === "title" ? slots?.titleId : slots?.descriptionId);
+    if (!register || !resolved) return;
+    register(resolved);
+    return () => register(null);
+  }, [register, resolved]);
+  return resolved;
 }
 
 export type PopoverHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -294,7 +279,7 @@ export type PopoverActionsProps = React.HTMLAttributes<HTMLDivElement> & {
   ref?: React.Ref<HTMLDivElement>;
 };
 
-/** Buttons at the bottom of the panel: at the end, `gap: 8`; stacked full width on a narrow screen. */
+/** Buttons at the bottom of the panel: at the end, `gap: 8`; stacked full width in a bottom sheet. */
 function PopoverActions({ className, ...rest }: PopoverActionsProps) {
   return <div className={cx(styles.actions, className)} {...rest} />;
 }

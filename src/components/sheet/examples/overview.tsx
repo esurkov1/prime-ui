@@ -1,5 +1,6 @@
 /** Actions with an order raised from the bottom edge: a header names the order, a column of actions follows, and each action closes the sheet — `Sheet.Trigger`, `Sheet.Header`, `Sheet.Close`. */
-import { Button, Icon, Sheet } from "prime-ui-kit";
+import { Button, ConfirmDialog, Icon, Sheet } from "prime-ui-kit";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
@@ -9,9 +10,16 @@ const ACTIONS = [
   { label: "Скопировать ссылку", icon: "action.copy" },
 ] as const;
 
+/** Pretends to cancel the order on the server. */
+function cancelOrder() {
+  return new Promise((resolve) => setTimeout(resolve, 900));
+}
+
 export default function SheetOverviewExample() {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Sheet.Root>
+    <Sheet.Root open={open} onOpenChange={setOpen}>
       <Sheet.Trigger>
         <Button.Root variant="soft" tone="neutral">
           Действия с заказом
@@ -34,14 +42,21 @@ export default function SheetOverviewExample() {
                 </Button.Root>
               </Sheet.Close>
             ))}
-            <Sheet.Close>
-              <Button.Root variant="ghost" tone="danger" fullWidth>
-                <Button.Icon>
-                  <Icon name="action.delete" />
-                </Button.Icon>
-                Отменить заказ
-              </Button.Root>
-            </Sheet.Close>
+            <ConfirmDialog.Root
+              title="Отменить заказ № 1042?"
+              description="Клиент получит уведомление, а оплата вернётся на карту."
+              confirmLabel="Отменить заказ"
+              onConfirm={() => cancelOrder().then(() => setOpen(false))}
+            >
+              <ConfirmDialog.Trigger>
+                <Button.Root variant="ghost" tone="danger" fullWidth>
+                  <Button.Icon>
+                    <Icon name="action.delete" />
+                  </Button.Icon>
+                  Отменить заказ
+                </Button.Root>
+              </ConfirmDialog.Trigger>
+            </ConfirmDialog.Root>
           </div>
         </Sheet.Body>
       </Sheet.Content>

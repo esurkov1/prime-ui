@@ -31,7 +31,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "sizes",
       description:
-        "Все ярусы с иконками, подсказками клавиш и опасным пунктом; меню берёт ярус своего триггера — `size`.",
+        "Все ярусы с иконками, подсказками клавиш и опасным пунктом; ярус свой у меню и задаётся на `Dropdown.Content`, а не берётся у триггера — `size`.",
     },
     {
       slot: "placement",
@@ -54,6 +54,12 @@ export const page: ComponentPageConfig = {
       title: "Пункты-ссылки",
       description:
         "Пункты, которые ведут на страницу, — настоящие ссылки: Cmd-клик и контекстное меню открывают их в новой вкладке, обычный выбор закрывает меню — `asChild`.",
+    },
+    {
+      scenario: "context-menu",
+      title: "Контекстное меню",
+      description:
+        "Правый клик по сделке открывает её меню у указателя, а Escape или выбор пункта возвращают фокус на эту строку — `anchorPoint`, `Dropdown.Anchor`.",
     },
     {
       scenario: "match-trigger-width",

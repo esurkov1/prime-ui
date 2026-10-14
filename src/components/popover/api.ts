@@ -41,6 +41,13 @@ export const api: ComponentApi = {
           ru: "Escape закрывает панель и возвращает фокус на триггер.",
         },
         {
+          name: "openOnArrow",
+          type: "boolean",
+          default: "false",
+          en: "ArrowDown and ArrowUp on the trigger open the panel, as on a picker whose trigger reads as a field (a colour, a period); Enter and Space open it either way.",
+          ru: "ArrowDown и ArrowUp на триггере открывают панель, как у выбора, чей триггер похож на поле (цвет, период); Enter и Space открывают её в любом случае.",
+        },
+        {
           name: "children",
           type: "ReactNode",
           required: true,
@@ -51,8 +58,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Trigger · Popover.Anchor · Popover.Close",
-      en: "No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and sets its ARIA; Anchor only positions the panel (open state comes from `open`); Close closes the panel.",
-      ru: "Без DOM: клонируют единственный дочерний элемент и сливают `ref` и `onClick`. Trigger открывает и закрывает панель и ставит ARIA; Anchor только задаёт положение (открытием управляет `open`); Close закрывает панель.",
+      en: "No DOM: clone the single child and merge `ref` and `onClick`. Trigger toggles the panel and sets its ARIA; Anchor only positions the panel (open state comes from `open`), and its control names a panel without a Title; Close closes the panel.",
+      ru: "Без DOM: клонируют единственный дочерний элемент и сливают `ref` и `onClick`. Trigger открывает и закрывает панель и ставит ARIA; Anchor только задаёт положение (открытием управляет `open`), а его контрол даёт имя панели без Title; Close закрывает панель.",
       props: [
         {
           name: "children",
@@ -65,8 +72,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Content",
-      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` floating panel that scrolls inside, named by `Popover.Title`. Below 640px of viewport, opened from a Trigger, it is a bottom sheet.',
-      ru: 'Портал и плавающая панель `role="dialog"` с прокруткой внутри, названная `Popover.Title`. Уже 640px экрана, открытая из Trigger, она становится шторкой снизу.',
+      en: '`ref` → `HTMLDivElement`. Portal + `role="dialog"` floating panel that scrolls inside, named by `Popover.Title` (else by the control it opened from). Below 640px of viewport, opened from a Trigger, it is a bottom sheet (`data-sheet`).',
+      ru: 'Портал и плавающая панель `role="dialog"` с прокруткой внутри; имя — `Popover.Title`, иначе контрол, из которого её открыли. Уже 640px экрана, открытая из Trigger, она становится шторкой снизу (`data-sheet`).',
       props: [
         {
           name: "side",
@@ -90,11 +97,11 @@ export const api: ComponentApi = {
           ru: "Ярус текста, отступов и зазора; его же получают контролы внутри.",
         },
         {
-          name: "matchTriggerWidth",
-          type: "boolean",
-          default: "false",
-          en: "The panel is exactly as wide as the trigger and its text wraps.",
-          ru: "Ширина панели равна ширине триггера, текст переносится.",
+          name: "width",
+          type: '"auto" | "trigger" | "content"',
+          default: '"auto"',
+          en: "`auto`: by content, from the panel minimum to twice that. `trigger`: exactly the trigger's width, below the minimum too. `content`: what the content needs, within the viewport. A sheet is full width.",
+          ru: "`auto` — по содержимому, от минимума панели до двойного. `trigger` — ровно по триггеру, даже уже минимума. `content` — сколько нужно содержимому, в пределах экрана. Шторка — на всю ширину.",
         },
         {
           name: "trapFocus",
@@ -106,7 +113,10 @@ export const api: ComponentApi = {
         {
           name: "initialFocus",
           type: "boolean",
-          default: "true with Trigger, false with Anchor",
+          defaultNote: {
+            en: "`true` with `Popover.Trigger`, `false` with `Popover.Anchor`",
+            ru: "`true` с `Popover.Trigger`, `false` с `Popover.Anchor`",
+          },
           en: "Focus moves into the panel on open (`[data-autofocus]`, else the first tab stop, else the panel). Turn it on for an anchored panel opened by a command, such as a Dropdown item, so focus does not stay on the menu trigger.",
           ru: "Фокус переходит в панель при открытии (`[data-autofocus]`, иначе первый фокусируемый, иначе панель). Включите для панели с `Anchor`, открытой командой — пунктом Dropdown, — чтобы фокус не остался на кнопке меню.",
         },
@@ -127,9 +137,16 @@ export const api: ComponentApi = {
     },
     {
       name: "Popover.Header · Popover.Title · Popover.Description · Popover.Actions",
-      en: "`ref` → the element. `<div>` (title + description with a 4 px step) / `<h2>` (names the dialog) / `<p>` (describes it) / `<div>` (buttons at the end, stacked full width on phones, below 640 px). + native props.",
-      ru: "Шапка, заголовок (имя диалога), описание и ряд кнопок; текст следует ярусу панели.",
-      props: [],
+      en: "`ref` → `HTMLDivElement` / `HTMLHeadingElement` / `HTMLParagraphElement` / `HTMLDivElement`. `<div>` (title + description) / `<h2>` (names the dialog) / `<p>` (describes it) / `<div>` (buttons at the end; stacked in a sheet).",
+      ru: "`<div>` (заголовок и описание) / `<h2>` (имя диалога) / `<p>` (его описание) / `<div>` (кнопки у края; в шторке — столбиком).",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLDivElement | HTMLHeadingElement | HTMLParagraphElement>",
+          en: "`className`, `children` and the other attributes; an own `id` on Title or Description is the one the panel points at.",
+          ru: "`className`, `children` и остальные атрибуты; собственный `id` у Title или Description — тот, на который ссылается панель.",
+        },
+      ],
     },
   ],
   labels: [],
@@ -139,6 +156,11 @@ export const api: ComponentApi = {
         keys: "Enter · Space",
         en: "On the trigger: opens the panel (focus moves into it) and closes it.",
         ru: "На триггере открывает панель (фокус переходит в неё) и закрывает.",
+      },
+      {
+        keys: "ArrowDown · ArrowUp",
+        en: "On the trigger with `openOnArrow`: opens the panel.",
+        ru: "На триггере с `openOnArrow` открывает панель.",
       },
       {
         keys: "Escape",
@@ -153,12 +175,12 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: 'The panel is `role="dialog"` without `aria-modal`, named by `Popover.Title` (else by the trigger) and described by `Popover.Description`.',
-        ru: 'Панель — `role="dialog"` без `aria-modal`; имя — `Popover.Title`, иначе триггер; описание — `Popover.Description`.',
+        en: 'The panel is `role="dialog"` without `aria-modal`, named by `Popover.Title` (its own `id` included), else by the control it opened from — the trigger, or the control inside `Popover.Anchor` — read from the page, and described by `Popover.Description`.',
+        ru: 'Панель — `role="dialog"` без `aria-modal`; имя — `Popover.Title` (с его собственным `id` тоже), иначе контрол, из которого её открыли, — триггер или контрол внутри `Popover.Anchor`, взятый со страницы; описание — `Popover.Description`.',
       },
       {
-        en: 'The trigger gets `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` and `data-state`; the child\'s own `id` wins. Other props given to `Popover.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.',
-        ru: 'Триггер получает `aria-haspopup="dialog"`, `aria-expanded` и `aria-controls`.',
+        en: 'The trigger gets `aria-haspopup="dialog"`, `aria-expanded`, `data-state` and, while open, `aria-controls`; the child\'s own `id` wins. Other props given to `Popover.Trigger` (handlers, ARIA, `ref`) reach the child, so a wrapping `Tooltip.Trigger` keeps working.',
+        ru: 'Триггер получает `aria-haspopup="dialog"`, `aria-expanded`, `data-state`, а пока панель открыта — `aria-controls`; собственный `id` ребёнка сохраняется. Остальные пропсы `Popover.Trigger` (обработчики, ARIA, `ref`) доходят до ребёнка, поэтому обёртка `Tooltip.Trigger` продолжает работать.',
       },
       {
         en: "Opened from a Trigger, focus moves into the panel: `[data-autofocus]`, else the first tab stop, else the panel. Opened at a `Popover.Anchor`, focus stays in the anchor (`initialFocus` moves it in), and presses on the anchor do not dismiss the panel.",
@@ -170,7 +192,7 @@ export const api: ComponentApi = {
       },
       {
         en: "An outside press closes the panel without moving focus back to the trigger: focus follows the pointer (foundation §8).",
-        ru: "Клик снаружи закрывает панель без возврата фокуса на триггер: фокус остаётся там, куда нажали.",
+        ru: "Клик снаружи закрывает панель без возврата фокуса на триггер: фокус остаётся там, куда нажали (foundation §8).",
       },
       {
         en: "Only the topmost layer reacts: a Select open inside the panel closes first.",

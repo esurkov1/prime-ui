@@ -1,73 +1,16 @@
 /*
- * Sheet — a panel raised from the bottom edge on a scrim, for a short task that ends by itself.
- * Same zones as Modal and Drawer (DialogParts.module.css), each optional here: the content alone
- * is a sheet too. A grab handle on top (internal/sheet); height by content up to the top gap;
- * centred at `--prime-sheet-width` on a tablet or desktop, full width on a phone. On the one
- * overlay level: a sheet opened from another overlay is portaled later, so it stacks above it.
+ * Sheet — a panel raised from the bottom edge over the scrim, for a short task that ends by
+ * itself: the dialog shell (DialogParts.module.css; the zones are each optional here, the content
+ * alone is a sheet too) on the shared bottom-sheet surface (internal/sheet: a grab handle on top,
+ * height by content up to the top gap, the scrim following a swipe). Centred at
+ * `--prime-sheet-width` on a tablet or desktop, full width on a phone. On the one overlay level: a
+ * sheet opened from another overlay is portaled later, so it stacks above it.
  */
 
-.root {
-  display: contents;
-}
-
-/*
- * The scrim follows a swipe: `--swipe-progress` (0 at rest … 1 off the edge, written by the sheet's
- * swipe) thins its fill. While the finger drags it tracks at once; on release it glides with the
- * sheet on the same curve, and after a closing swipe it fades by that glide alone.
- */
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: var(--prime-z-overlay);
-  background: color-mix(
-    in srgb,
-    var(--prime-color-bg-scrim) calc((1 - var(--swipe-progress, 0)) * 100%),
-    transparent
-  );
-  transition: background-color var(--prime-motion-fade-base) var(--prime-motion-easing-emphasized);
-}
-
-.overlay:has(+ .panel[data-swiping]) {
-  transition: none;
-}
-
-.overlay:has(+ .panel[data-swipe-dismissed]) {
-  animation: none;
-}
-
-/*
- * A pull upward moves the sheet up to 24 (useSwipeDismiss); an unblurred shadow of its own fill
- * continues it that far below the screen edge, so it never comes away from the edge.
- */
 .panel {
   --dialog-padding: var(--prime-sheet-padding);
 
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: var(--prime-z-overlay);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
   width: min(100vw, var(--prime-sheet-width));
-  min-height: 0;
-  max-height: calc(100dvh - var(--prime-sheet-top-gap));
-  margin-inline: auto;
-  padding-block-end: env(safe-area-inset-bottom, 0px);
-  overflow: hidden;
-  /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-layer-current);
-  border-start-start-radius: var(--prime-sheet-radius);
-  border-start-end-radius: var(--prime-sheet-radius);
-  background: var(--prime-color-layer-current);
-  color: var(--prime-color-text-primary);
-  box-shadow:
-    0 var(--prime-space-6) 0 0 var(--prime-color-layer-current),
-    var(--prime-shadow-modal);
-  outline: none;
-  font-size: var(--prime-text-body-m-size);
-  line-height: var(--prime-text-body-m-line-height);
 }
 
 /* Motion (scrim fade, sheet slide up and down) lives in internal/overlayMotion.module.css. */

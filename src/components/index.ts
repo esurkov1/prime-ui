@@ -451,6 +451,7 @@ export type {
   ModalIconProps,
   ModalLabels,
   ModalMetaProps,
+  ModalPlacement,
   ModalRootProps,
   ModalTitleProps,
   ModalTriggerProps,

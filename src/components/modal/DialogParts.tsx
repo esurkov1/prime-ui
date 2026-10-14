@@ -1,7 +1,8 @@
 /**
- * Shared header / body / footer parts of Modal, Drawer and Sheet. Not exported from the package
- * root: consumers use them as `Modal.*`, `Drawer.*` and `Sheet.*`. The owning content component
- * provides the shell context (ids, close handler, labels, default footer layout).
+ * The dialog of Modal, Drawer and Sheet: one root state, one panel mechanic (`DialogPanel`: the
+ * portal, the scrim and the panel as siblings, the modal layer, the swipe of a sheet, the shell
+ * context) and the shared header / body / footer parts. Not exported from the package root:
+ * consumers use them as `Modal.*`, `Drawer.*` and `Sheet.*`.
  */
 import * as React from "react";
 
@@ -9,22 +10,37 @@ import { Avatar } from "@/components/avatar/Avatar";
 import { Button } from "@/components/button/Button";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
-import { useControllableState } from "@/hooks/useControllableState";
+import { COMPACT_QUERY } from "@/hooks/breakpoints";
+import { useEnterConfirm } from "@/hooks/useEnterConfirm";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useModalLayer } from "@/hooks/useModalLayer";
+import { type PresenceState, usePresence } from "@/hooks/usePresence";
+import { useSwipeDismiss } from "@/hooks/useSwipeDismiss";
 import { Icon } from "@/icons";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
-import type { DismissReason } from "@/internal/overlay/layerStack";
-import { Slot } from "@/internal/slot";
-import type { Tone } from "@/internal/states";
+import { iconBoxStyles } from "@/internal/iconBox";
+import { useLabels } from "@/internal/labels";
+import { SheetHandle } from "@/internal/overlay/FloatingPanel";
+import { LayerProvider } from "@/internal/overlay/layerStack";
+import { useOpenState } from "@/internal/overlay/useOpenState";
+import overlayMotion from "@/internal/overlayMotion.module.css";
+import { Portal } from "@/internal/Portal";
+import sheetStyles from "@/internal/sheet.module.css";
+import { Slot, type SlotPartProps } from "@/internal/slot";
+import type { ControlSize, Tone } from "@/internal/states";
+import { SurfaceDepthProvider } from "@/internal/surfaceDepth";
 
 import styles from "./DialogParts.module.css";
 
-// ─── Root state (shared by Modal.Root and Drawer.Root) ───────────────────────
+// ─── Root state (Modal.Root, Drawer.Root, Sheet.Root) ────────────────────────
 
-/** System strings of the built-in «discard changes?» confirm (`Modal.Guard` / `Drawer.Guard dirty`). */
-export type DialogDiscardLabels = {
+/** System strings of a dialog: its close button and the built-in «discard changes?» confirm. */
+export type DialogLabels = {
+  /** `aria-label` of the header close button. */
+  close: string;
   /** Title of the confirm a dismiss of a `dirty` dialog opens. */
   discardTitle: string;
   /** Its description. */
@@ -35,7 +51,8 @@ export type DialogDiscardLabels = {
   discardCancel: string;
 };
 
-export const DIALOG_DISCARD_LABELS: DialogDiscardLabels = {
+export const DIALOG_LABELS: DialogLabels = {
+  close: "Закрыть",
   discardTitle: "Не сохранять изменения?",
   discardDescription: "Изменения в форме пропадут.",
   discardConfirm: "Не сохранять",
@@ -48,8 +65,7 @@ export type DialogRootOptions = {
   onOpenChange?: (open: boolean) => void;
   closeOnEscape?: boolean;
   closeOnOutsideClick?: boolean;
-  closeLabel: string;
-  discardLabels: DialogDiscardLabels;
+  labels?: Partial<DialogLabels>;
   /** Modal only: Enter clicks `Modal.Confirm`. */
   confirmOnEnter?: boolean;
   onEnterConfirm?: (event: KeyboardEvent) => void;
@@ -82,8 +98,7 @@ export type DialogRootState = {
   setConfirmingClose: (open: boolean) => void;
   closeOnEscape: boolean;
   closeOnOutsideClick: boolean;
-  closeLabel: string;
-  discardLabels: DialogDiscardLabels;
+  labels: DialogLabels;
   confirmOnEnter: boolean;
   onEnterConfirm?: (event: KeyboardEvent) => void;
 };
@@ -91,25 +106,24 @@ export type DialogRootState = {
 const [DialogRootProvider, useDialogRootContext] =
   createComponentContext<DialogRootState>("Modal / Drawer / Sheet");
 
-export { DialogRootProvider, useDialogRootContext };
+export { DialogRootProvider };
 
-/** State of Modal.Root / Drawer.Root: open (controlled or not), the dismiss policy and the guard. */
+/**
+ * State of Modal.Root / Drawer.Root / Sheet.Root: open (controlled or not), the dismiss policy, the
+ * labels and the guard.
+ */
 export function useDialogRoot({
   open,
   defaultOpen = false,
   onOpenChange,
   closeOnEscape = true,
   closeOnOutsideClick = true,
-  closeLabel,
-  discardLabels,
+  labels: labelsProp,
   confirmOnEnter = false,
   onEnterConfirm,
 }: DialogRootOptions): DialogRootState {
-  const [isOpen, setOpen] = useControllableState({
-    value: open,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
+  const [isOpen, setOpen] = useOpenState({ open, defaultOpen, onOpenChange });
+  const labels = useLabels(DIALOG_LABELS, labelsProp);
   const [guard, setGuardState] = React.useState<DialogGuardState>(NO_GUARD);
   const [confirmingClose, setConfirmingClose] = React.useState(false);
   // A closed dialog has no pending question.
@@ -140,8 +154,7 @@ export function useDialogRoot({
       setConfirmingClose,
       closeOnEscape,
       closeOnOutsideClick,
-      closeLabel,
-      discardLabels,
+      labels,
       confirmOnEnter,
       onEnterConfirm,
     }),
@@ -154,8 +167,7 @@ export function useDialogRoot({
       confirmingClose,
       closeOnEscape,
       closeOnOutsideClick,
-      closeLabel,
-      discardLabels,
+      labels,
       confirmOnEnter,
       onEnterConfirm,
     ],
@@ -163,49 +175,193 @@ export function useDialogRoot({
 }
 
 /**
- * Registers a guard from inside the content (`Modal.Guard`, `Drawer.Guard`, ConfirmDialog while it
- * runs); it is lifted when the part unmounts.
+ * Registers a guard from inside the content (`Modal.Guard`, `Drawer.Guard`, `Sheet.Guard`,
+ * ConfirmDialog while it runs); it is lifted when the part unmounts.
  */
 export function useDialogGuard({ busy, dirty }: DialogGuardState): DialogRootState {
-  const root = useDialogRootContext();
+  const root = useDialogRootContext("Guard");
   const { setGuard } = root;
   React.useLayoutEffect(() => setGuard({ busy, dirty }), [busy, dirty, setGuard]);
   React.useLayoutEffect(() => () => setGuard(NO_GUARD), [setGuard]);
   return root;
 }
 
+// ─── Panel (Modal.Content, Drawer.Content, Sheet.Content) ────────────────────
+
+/** Footer actions: `fill` — equal-width buttons in one row; `end` — auto-width, right-aligned. */
+export type DialogFooterLayout = "fill" | "end";
+
 /**
- * The modal layer of a Modal / Drawer panel: Escape and scrim clicks ask to close per the Root's
- * `closeOnEscape` / `closeOnOutsideClick` (and its guard); focus returns to the opener
- * (foundation §8).
+ * When the panel is a bottom sheet that swipes down to close: `never` (Drawer, a Modal near the
+ * top), `compact` (a centred Modal on a viewport below 640px), `always` (Sheet).
  */
-export function useDialogLayer<T extends HTMLElement>({
-  open,
-  requestClose,
-  closeOnEscape,
-  closeOnOutsideClick,
-}: DialogRootState) {
-  const onDismiss = (reason: DismissReason) => {
-    if (reason === "escape" ? closeOnEscape : closeOnOutsideClick) requestClose();
-  };
-  return { ...useModalLayer<T>({ open, onDismiss }), onClose: requestClose };
-}
+export type DialogSwipe = "never" | "compact" | "always";
+
+type DialogPanelProps = React.HTMLAttributes<HTMLDivElement> & {
+  /** The component's own panel class: its geometry and width tiers. */
+  panelClassName: string;
+  /** Its enter / exit motion while it is not a bottom sheet (a sheet slides). */
+  motion: "dialog" | "drawer";
+  swipe: DialogSwipe;
+  footerLayout: DialogFooterLayout;
+  /** Portal target. Default `document.body`. */
+  container?: HTMLElement | null;
+  /** Class on the full-screen scrim. */
+  overlayClassName?: string;
+  /** Enter clicks the action in `Confirm` (Modal: per the Root's `confirmOnEnter`). */
+  enterConfirm?: boolean;
+  /** The tier of the controls inside (Modal: `m`); without it they keep the surrounding tier. */
+  controlSize?: ControlSize;
+  ref?: React.Ref<HTMLDivElement>;
+};
 
 /**
  * The content of a closing dialog: while the exit motion plays it keeps showing the last children
  * it had open, so a record cleared together with `open` does not empty the panel mid-motion.
  */
-export function useExitSnapshot<T>(open: boolean, children: T): T {
+function useExitSnapshot<T>(open: boolean, children: T): T {
   const last = React.useRef(children);
   if (open) last.current = children;
   return open ? children : last.current;
 }
 
-/** Class for the `role="dialog"` element: hairline tokens and the `prime-dialog` container. */
-export const dialogShellClassName = styles.shell;
+/**
+ * The panel of a dialog: portaled while open and during its exit motion (showing the children it
+ * had open), the scrim and the `role="dialog"` panel side by side, the modal layer (Escape and the
+ * scrim ask the Root to close through its guard; focus returns to the opener, foundation §8), and
+ * on a bottom sheet the grab handle and the swipe down — a guarded swipe asks first.
+ */
+export function DialogPanel({ container, children, ...props }: DialogPanelProps) {
+  const { open } = useDialogRootContext("Content");
+  const presence = usePresence(open, { exitDuration: "base" });
+  const shown = useExitSnapshot(open, children);
+  if (!presence.mounted) return null;
+  return (
+    <Portal container={container}>
+      <DialogPanelBody {...props} state={presence.state} onExitEnd={presence.onExitEnd}>
+        {shown}
+      </DialogPanelBody>
+    </Portal>
+  );
+}
 
-/** Footer actions: `fill` — equal-width buttons in one row; `end` — auto-width, right-aligned. */
-export type DialogFooterLayout = "fill" | "end";
+type DialogPanelBodyProps = Omit<DialogPanelProps, "container"> & {
+  state: PresenceState;
+  onExitEnd: (event: React.SyntheticEvent<Element>) => void;
+};
+
+/** Mounted inside the portal so the modal layer sees the attached node. */
+function DialogPanelBody({
+  panelClassName,
+  motion,
+  swipe: swipePolicy,
+  footerLayout,
+  overlayClassName,
+  enterConfirm = false,
+  controlSize,
+  className,
+  children,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
+  state,
+  onExitEnd,
+  onPointerDown,
+  ref,
+  ...rest
+}: DialogPanelBodyProps) {
+  const root = useDialogRootContext("Content");
+  const confirmRef = React.useRef<HTMLElement | null>(null);
+  const scrimRef = React.useRef<HTMLDivElement>(null);
+  const { ref: layerRef, layer } = useModalLayer<HTMLDivElement>({
+    open: root.open,
+    closeOnEscape: root.closeOnEscape,
+    closeOnOutsideClick: root.closeOnOutsideClick,
+    onDismiss: root.requestClose,
+  });
+  const panelRef = useMergedRefs(layerRef, ref);
+  const compact = useMediaQuery(COMPACT_QUERY, swipePolicy === "compact");
+  const sheet = swipePolicy === "always" || (swipePolicy === "compact" && compact);
+  // Swiping down is a dismiss from outside the content, like a scrim click: it follows
+  // `closeOnOutsideClick` and the guard (busy holds the panel, dirty asks first).
+  const swipe = useSwipeDismiss({
+    enabled: sheet && root.closeOnOutsideClick,
+    guard: root.busy ? "busy" : root.dirty ? "dirty" : null,
+    onDismiss: root.requestClose,
+    scrimRef,
+  });
+
+  const shell = useDialogShellValue({
+    ariaLabel,
+    ariaLabelledBy,
+    ariaDescribedBy,
+    onClose: root.requestClose,
+    closeLabel: root.labels.close,
+    busy: root.busy,
+    footerLayout,
+    confirmRef,
+  });
+
+  useEnterConfirm({
+    enabled: enterConfirm && root.open && root.confirmOnEnter,
+    containerRef: layerRef,
+    onEnterConfirm: root.onEnterConfirm,
+    confirmRef,
+  });
+
+  const content = (
+    <DialogShellProvider value={shell.value}>
+      <LayerProvider value={layer}>
+        <SurfaceDepthProvider value="floating">{children}</SurfaceDepthProvider>
+      </LayerProvider>
+    </DialogShellProvider>
+  );
+
+  return (
+    <div className={styles.root}>
+      <div
+        ref={scrimRef}
+        role="presentation"
+        className={cx(sheetStyles.scrim, overlayMotion.scrim, overlayClassName)}
+        data-state={state}
+      />
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        tabIndex={-1}
+        className={cx(
+          styles.shell,
+          panelClassName,
+          sheet
+            ? cx(sheetStyles.surface, sheetStyles.swipeY, overlayMotion.sheet)
+            : overlayMotion[motion],
+          className,
+        )}
+        data-state={state}
+        data-depth="floating"
+        data-sheet={sheet ? "" : undefined}
+        onAnimationEnd={onExitEnd}
+        {...shell.aria}
+        {...swipe.panelProps}
+        {...rest}
+        onPointerDown={(event) => {
+          onPointerDown?.(event);
+          swipe.onPointerDown(event);
+        }}
+      >
+        <SheetHandle swipe={swipe} />
+        {controlSize ? (
+          <ControlSizeProvider value={controlSize}>{content}</ControlSizeProvider>
+        ) : (
+          content
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Shell context (ids, close, footer layout) ───────────────────────────────
 
 type DialogShellContextValue = {
   titleId: string;
@@ -219,7 +375,7 @@ type DialogShellContextValue = {
   busy: boolean;
   footerLayout: DialogFooterLayout;
   /** Enter-confirm target (Modal only). */
-  confirmRef?: React.MutableRefObject<HTMLElement | null>;
+  confirmRef: React.RefObject<HTMLElement | null>;
 };
 
 const DialogShellContext = React.createContext<DialogShellContextValue | null>(null);
@@ -242,11 +398,11 @@ type UseDialogShellOptions = {
   closeLabel: string;
   busy: boolean;
   footerLayout: DialogFooterLayout;
-  confirmRef?: React.MutableRefObject<HTMLElement | null>;
+  confirmRef: React.RefObject<HTMLElement | null>;
 };
 
 /** Builds the shell context and the resolved `aria-*` for the `role="dialog"` element. */
-export function useDialogShellValue({
+function useDialogShellValue({
   ariaLabel,
   ariaLabelledBy,
   ariaDescribedBy,
@@ -289,7 +445,7 @@ export function useDialogShellValue({
   return { value, aria };
 }
 
-export function DialogShellProvider({
+function DialogShellProvider({
   value,
   children,
 }: {
@@ -302,17 +458,12 @@ export function DialogShellProvider({
 // ─── Icon ─────────────────────────────────────────────────────────────────────
 
 export type DialogIconProps = Omit<React.HTMLAttributes<HTMLSpanElement>, "children"> & {
-  /** Soft fill + text color of the role. Default `neutral`. Not used around a picture. */
   tone?: Tone;
-  /**
-   * An `Icon` in a filled box of the role, or the record's picture — an `Avatar.Root` (sized to
-   * the box) or a `Thumbnail.Root` — with no box of its own.
-   */
   children: React.ReactNode;
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** A person or an object stands for itself: a picture child needs no filled box around it. */
+/** A person or an object stands for itself: a picture child needs no filled tile around it. */
 function isMedia(children: React.ReactNode): boolean {
   return (
     React.isValidElement(children) &&
@@ -325,7 +476,7 @@ export function DialogIcon({ tone = "neutral", children, className, ...rest }: D
   return (
     <span
       {...rest}
-      className={cx(styles.icon, className)}
+      className={cx(media ? undefined : iconBoxStyles.tile, styles.icon, className)}
       data-tone={media ? undefined : tone}
       data-media={media || undefined}
       aria-hidden="true"
@@ -369,10 +520,6 @@ DialogDescription.displayName = "Dialog.Description";
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 export type DialogHeaderProps = React.HTMLAttributes<HTMLElement> & {
-  /**
-   * Built-in close button (square ghost `s`, `labels.close`). Default `true`. While a `Guard` is
-   * `busy` it stays in place, disabled.
-   */
   showClose?: boolean;
   ref?: React.Ref<HTMLElement>;
 };
@@ -452,7 +599,6 @@ DialogBody.displayName = "Dialog.Body";
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 export type DialogFooterProps = React.HTMLAttributes<HTMLElement> & {
-  /** `fill` — equal-width buttons; `end` — auto width, right-aligned. Default depends on the container. */
   layout?: DialogFooterLayout;
   ref?: React.Ref<HTMLElement>;
 };
@@ -484,23 +630,18 @@ export function DialogMeta({ className, ...rest }: DialogMetaProps) {
 }
 DialogMeta.displayName = "Dialog.Meta";
 
-// ─── Trigger / Close / Confirm (wrap one child) ───────────────────────────────
+// ─── Trigger / Close / Confirm (slots around one child) ──────────────────────
 
-type SlotChild = React.ReactElement<{
-  onClick?: React.MouseEventHandler;
-  ref?: React.Ref<HTMLElement>;
-}>;
-
-export type DialogTriggerProps = { children: SlotChild };
+export type DialogTriggerProps = SlotPartProps;
 
 /** Adds "open the dialog" to the child's click (unless the child prevents default). */
 export function DialogTrigger({ children }: DialogTriggerProps) {
-  const { setOpen } = useDialogRootContext();
+  const { setOpen } = useDialogRootContext("Trigger");
   return <Slot onClick={() => setOpen(true)}>{children}</Slot>;
 }
 DialogTrigger.displayName = "Dialog.Trigger";
 
-export type DialogCloseProps = { children: SlotChild };
+export type DialogCloseProps = SlotPartProps;
 
 /**
  * Adds "close the dialog" to the child's click (unless the child prevents default); the close
@@ -516,9 +657,12 @@ export function DialogClose({ children }: DialogCloseProps) {
 }
 DialogClose.displayName = "Dialog.Close";
 
-export type DialogConfirmProps = { children: SlotChild };
+export type DialogConfirmProps = SlotPartProps;
 
-/** Marks the primary action: Enter inside the dialog clicks it (`confirmOnEnter`). */
+/**
+ * Marks the primary action as the Enter target (`confirmOnEnter`): Enter inside the dialog clicks
+ * it. It adds no handler of its own; the child's `onClick` (or its `type="submit"`) is the action.
+ */
 export function DialogConfirm({ children }: DialogConfirmProps) {
   const { confirmRef } = useDialogShell("Confirm");
   return <Slot ref={confirmRef}>{children}</Slot>;

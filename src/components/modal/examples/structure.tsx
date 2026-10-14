@@ -1,4 +1,4 @@
-/** Optional parts: an icon tile with a header-only notice, and a header with a status before the close button and a footer but no body — `Modal.Icon`, `Modal.Actions`, `Modal.Body`, `Modal.Footer`. */
+/** Optional parts: an icon tile with a header-only notice, and a header with a status before the close button and a footer with no body between them — `Modal.Icon`, `Modal.Actions`, `Modal.Footer`. */
 import { Badge, Button, Icon, Modal } from "prime-ui-kit";
 
 export default function ModalStructureExample() {

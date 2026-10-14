@@ -12,7 +12,7 @@
   gap: var(--prime-space-3);
 }
 
-/* match-trigger-width.tsx: a narrow sidebar column. */
+/* width.tsx: a narrow sidebar column. */
 .narrowColumn {
   display: flex;
   flex-direction: column;

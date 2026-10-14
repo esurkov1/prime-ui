@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-
 import { Button } from "@/components/button/Button";
 import { swipe } from "@/test/mobile";
+import { describeOverlayConformance } from "@/test/overlayConformance";
 
 import { Sheet, type SheetRootProps } from "./Sheet";
 
@@ -146,27 +146,13 @@ describe("Sheet", () => {
     expect(scrim.style.getPropertyValue("--swipe-progress")).toBe("1");
   });
 
-  it("swiping follows closeOnOutsideClick", () => {
-    render(<BareSheet closeOnOutsideClick={false} />);
+  it("swiping follows closeOnOutsideClick: off, there is no handle and no swipe", () => {
+    render(<TitledSheet closeOnOutsideClick={false} />);
     openSheet();
-    swipe(handleOf(screen.getByRole("dialog")), { x: 0, y: 0 }, { x: 0, y: 300 });
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
-  });
-
-  it("a busy Guard holds every dismiss, the swipe included", () => {
-    render(
-      <Sheet.Root defaultOpen>
-        <Sheet.Content aria-label="Комментарий">
-          <Sheet.Guard busy />
-          <Sheet.Body>
-            <Button.Root>Отправить</Button.Root>
-          </Sheet.Body>
-        </Sheet.Content>
-      </Sheet.Root>,
-    );
-    swipe(handleOf(screen.getByRole("dialog")), { x: 0, y: 0 }, { x: 0, y: 300 });
-    fireEvent.keyDown(document.activeElement ?? document.body, { key: "Escape" });
-    expect(screen.getByRole("dialog")).toHaveAttribute("data-state", "open");
+    const dialog = screen.getByRole("dialog");
+    expect(handleOf(dialog)).toBeNull();
+    swipe(headerOf(dialog), { x: 0, y: 0 }, { x: 0, y: 300 });
+    expect(dialog).toHaveAttribute("data-state", "open");
   });
 
   it("notifies onOpenChange(false) when controlled", () => {
@@ -193,4 +179,29 @@ describe("Sheet", () => {
     render(<TitledSheet defaultOpen labels={{ close: "Скрыть" }} />);
     expect(screen.getByRole("button", { name: "Скрыть" })).toBeInTheDocument();
   });
+});
+
+describeOverlayConformance("Sheet", {
+  render: () => (
+    <Sheet.Root>
+      <Sheet.Trigger>
+        <Button.Root>Открыть</Button.Root>
+      </Sheet.Trigger>
+      <Sheet.Content aria-label="Новый клиент">
+        <Sheet.Body>
+          <input aria-label="Компания" />
+        </Sheet.Body>
+        <Sheet.Footer>
+          <Sheet.Close>
+            <Button.Root variant="soft" tone="neutral">
+              Отмена
+            </Button.Root>
+          </Sheet.Close>
+        </Sheet.Footer>
+      </Sheet.Content>
+    </Sheet.Root>
+  ),
+  trigger: "Открыть",
+  role: "dialog",
+  modal: true,
 });

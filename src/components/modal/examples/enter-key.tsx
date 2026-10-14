@@ -28,6 +28,7 @@ export default function ModalEnterKeyExample() {
           setTyped("");
         }}
         confirmOnEnter={false}
+        closeOnOutsideClick={false}
       >
         <Modal.Trigger>
           <Button.Root variant="outline" tone="danger">

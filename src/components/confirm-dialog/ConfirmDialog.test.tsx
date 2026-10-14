@@ -1,8 +1,10 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
+import { describeOverlayConformance } from "@/test/overlayConformance";
 
 import { ConfirmDialog, type ConfirmDialogRootProps } from "./ConfirmDialog";
 
@@ -67,7 +69,7 @@ describe("ConfirmDialog", () => {
   it("a press outside never closes it; Escape and Cancel do", async () => {
     render(<DeleteProject />);
     const dialog = open();
-    const scrim = dialog.parentElement as HTMLElement;
+    const scrim = dialog.previousElementSibling as HTMLElement;
     fireEvent.pointerDown(scrim);
     fireEvent.click(scrim);
     expect(screen.getByRole("alertdialog")).toBeInTheDocument();
@@ -76,6 +78,31 @@ describe("ConfirmDialog", () => {
     open();
     fireEvent.click(screen.getByRole("button", { name: "Отмена" }));
     await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+  });
+
+  it("closes on a scrim click with closeOnOutsideClick, and keeps Escape off with closeOnEscape={false}", async () => {
+    render(<DeleteProject closeOnOutsideClick closeOnEscape={false} />);
+    const dialog = open();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+    const scrim = dialog.previousElementSibling as HTMLElement;
+    fireEvent.pointerDown(scrim);
+    fireEvent.click(scrim);
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+  });
+
+  it("Enter confirms from the dialog itself; Tab and Shift+Tab stay inside", async () => {
+    const user = userEvent.setup();
+    const onConfirm = vi.fn();
+    render(<DeleteProject onConfirm={onConfirm} />);
+    await user.click(screen.getByRole("button", { name: "Удалить проект" }));
+    const dialog = screen.getByRole("alertdialog");
+    await user.tab();
+    await user.tab({ shift: true });
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    dialog.focus();
+    await user.keyboard("{Enter}");
+    expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
   it("while onConfirm runs: loading confirm, Cancel and close disabled, Escape ignored; resolve closes", async () => {
@@ -98,7 +125,7 @@ describe("ConfirmDialog", () => {
   });
 
   it("reject keeps it open with the default message; the next opening starts clean", async () => {
-    render(<DeleteProject onConfirm={() => Promise.reject(new Error("409"))} />);
+    render(<DeleteProject onConfirm={() => Promise.reject(new Error())} />);
     open();
     fireEvent.click(screen.getByRole("button", { name: "Удалить" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
@@ -114,27 +141,36 @@ describe("ConfirmDialog", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
-  it("shows the owner's error and takes labels", async () => {
-    function WithError() {
-      const [error, setError] = React.useState<string>();
-      return (
-        <DeleteProject
-          error={error}
-          labels={{ cancel: "Не удалять" }}
-          onConfirm={async () => {
-            setError("Проект используется в трёх сделках");
-            throw new Error("in use");
-          }}
-        />
-      );
-    }
-    render(<WithError />);
+  it("shows the reason of the rejection, clears it on the next try, and takes labels", async () => {
+    const run = deferred();
+    let calls = 0;
+    render(
+      <DeleteProject
+        labels={{ cancel: "Не удалять" }}
+        onConfirm={() => {
+          calls += 1;
+          return calls === 1
+            ? Promise.reject(new Error("Проект используется в трёх сделках"))
+            : run.promise;
+        }}
+      />,
+    );
     open();
     fireEvent.click(screen.getByRole("button", { name: "Удалить" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Проект используется в трёх сделках",
     );
     expect(screen.getByRole("button", { name: "Не удалять" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Удалить" }));
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    await act(async () => run.resolve());
+  });
+
+  it("shows a string rejection as it is", async () => {
+    render(<DeleteProject onConfirm={() => Promise.reject("Нет прав на удаление")} />);
+    open();
+    fireEvent.click(screen.getByRole("button", { name: "Удалить" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Нет прав на удаление");
   });
 
   it("is controlled by open / onOpenChange without a Trigger", async () => {
@@ -164,4 +200,19 @@ describe("ConfirmDialog", () => {
       expect(screen.getByRole("button", { name: "Удалить проект" })).toHaveFocus(),
     );
   });
+});
+
+describeOverlayConformance("ConfirmDialog", {
+  render: () => (
+    <ConfirmDialog.Root title="Удалить проект?" confirmLabel="Удалить" onConfirm={() => {}}>
+      <ConfirmDialog.Trigger>
+        <Button.Root variant="outline" tone="danger">
+          Открыть
+        </Button.Root>
+      </ConfirmDialog.Trigger>
+    </ConfirmDialog.Root>
+  ),
+  trigger: "Открыть",
+  role: "alertdialog",
+  modal: true,
 });

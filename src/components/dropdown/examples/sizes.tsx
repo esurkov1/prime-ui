@@ -1,4 +1,4 @@
-/** Every size tier with icons, key hints and a destructive item; the menu takes the tier of its trigger — `size`. */
+/** Every size tier with icons, key hints and a destructive item; the tier is the menu's own, set on `Dropdown.Content`, not taken from its trigger — `size`. */
 import { Button, Dropdown, Icon } from "prime-ui-kit";
 
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;

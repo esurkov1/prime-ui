@@ -7,7 +7,7 @@
   gap: var(--prime-space-2);
 }
 
-/* in-form.tsx: field → field 20 (foundation §1). */
+/* in-form.tsx, dismiss.tsx: field → field 20 (foundation §1). */
 .form {
   display: flex;
   flex-direction: column;

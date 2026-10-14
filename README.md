@@ -296,7 +296,7 @@ accessibility, examples and common mistakes.
 | [**Tooltip**](https://github.com/esurkov1/prime-ui/blob/main/src/components/tooltip/COMPONENT.md) | A short hint that appears next to an element on hover or keyboard focus. |
 | [**Popover**](https://github.com/esurkov1/prime-ui/blob/main/src/components/popover/COMPONENT.md) | A non-modal floating panel anchored to a trigger: short forms, filters, confirmations, explanations. |
 | [**Dropdown**](https://github.com/esurkov1/prime-ui/blob/main/src/components/dropdown/COMPONENT.md) | A menu of actions that opens from a trigger: picking an item runs it and closes the menu. |
-| [**Modal**](https://github.com/esurkov1/prime-ui/blob/main/src/components/modal/COMPONENT.md) | A dialog over the page for confirmations, short forms and important text. |
+| [**Modal**](https://github.com/esurkov1/prime-ui/blob/main/src/components/modal/COMPONENT.md) | A dialog over the page for a short form or important text that must be finished or acknowledged before the page goes on. |
 | [**ConfirmDialog**](https://github.com/esurkov1/prime-ui/blob/main/src/components/confirm-dialog/COMPONENT.md) | The confirm of a destructive or weighty action in one piece: the question, the consequence, Cancel and an action that runs its own request. |
 | [**Drawer**](https://github.com/esurkov1/prime-ui/blob/main/src/components/drawer/COMPONENT.md) | A modal panel that slides in from the side: filters, forms and record details without leaving the page. |
 | [**Command Menu**](https://github.com/esurkov1/prime-ui/blob/main/src/components/command-menu/COMPONENT.md) | A search palette over the page: the query filters commands and pages, Enter runs the active one. |

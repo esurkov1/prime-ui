@@ -1,4 +1,4 @@
-/** Every size tier with a header and actions; the panel takes the tier of its trigger — `size`. */
+/** Every size tier with a header and actions; the tier is the panel's own, set on `Popover.Content`, not taken from its trigger — `size`. */
 import { Button, Popover } from "prime-ui-kit";
 
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;

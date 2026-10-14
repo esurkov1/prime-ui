@@ -1,14 +1,10 @@
 /* Layout of the Tooltip scenarios: semantic tokens only. */
 
-/* toolbar.tsx: a raised strip of icon buttons. */
+/* toolbar.tsx: a strip of icon buttons. */
 .toolbar {
   display: flex;
   align-items: center;
   gap: var(--prime-space-1);
-  padding: var(--prime-space-1);
-  border-radius: var(--prime-radius-l);
-  background: var(--prime-color-layer-nested);
-  box-shadow: var(--prime-shadow-raised);
 }
 
 /* non-interactive-trigger.tsx: the three triggers in one row. */

@@ -1,9 +1,18 @@
 /** The courier is at the door: an icon tile heads the sheet, the payment status and a ⋯ menu sit before the close button, and two equal buttons fill the footer — `Sheet.Icon`, `Sheet.Actions`, `layout`. */
-import { Badge, Button, Dropdown, Icon, Sheet, Typography } from "prime-ui-kit";
+import { Badge, Button, ConfirmDialog, Dropdown, Icon, Sheet, Typography } from "prime-ui-kit";
+import * as React from "react";
+
+/** Pretends to refuse the order on the server. */
+function refuseOrder() {
+  return new Promise((resolve) => setTimeout(resolve, 900));
+}
 
 export default function SheetHeaderActionsExample() {
+  const [open, setOpen] = React.useState(false);
+  const [refusing, setRefusing] = React.useState(false);
+
   return (
-    <Sheet.Root>
+    <Sheet.Root open={open} onOpenChange={setOpen}>
       <Sheet.Trigger>
         <Button.Root variant="soft" tone="neutral">
           Курьер на месте
@@ -30,7 +39,9 @@ export default function SheetHeaderActionsExample() {
                 <Dropdown.Item>Позвонить курьеру</Dropdown.Item>
                 <Dropdown.Item>Перенести доставку</Dropdown.Item>
                 <Dropdown.Separator />
-                <Dropdown.Item tone="danger">Отказаться от заказа</Dropdown.Item>
+                <Dropdown.Item tone="danger" onSelect={() => setRefusing(true)}>
+                  Отказаться от заказа
+                </Dropdown.Item>
               </Dropdown.Content>
             </Dropdown.Root>
           </Sheet.Actions>
@@ -50,6 +61,14 @@ export default function SheetHeaderActionsExample() {
             <Button.Root>Принять заказ</Button.Root>
           </Sheet.Close>
         </Sheet.Footer>
+        <ConfirmDialog.Root
+          open={refusing}
+          onOpenChange={setRefusing}
+          title="Отказаться от заказа № 1042?"
+          description="Курьер увезёт коробки обратно, деньги вернутся в течение трёх дней."
+          confirmLabel="Отказаться"
+          onConfirm={() => refuseOrder().then(() => setOpen(false))}
+        />
       </Sheet.Content>
     </Sheet.Root>
   );

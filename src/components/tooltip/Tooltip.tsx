@@ -5,9 +5,12 @@ import { type PositionAlign, type PositionSide, readCssLengthPx } from "@/hooks/
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { useInheritedDisabled } from "@/internal/disabledContext";
 import { FloatingPanel, FloatingTrigger } from "@/internal/overlay/FloatingPanel";
 import { hasNativeTabStop } from "@/internal/overlay/focus";
+import tooltipSurface from "@/internal/overlay/tooltipSurface.module.css";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import type { SlotPartProps } from "@/internal/slot";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Tooltip.module.css";
@@ -70,9 +73,7 @@ const TooltipGroupContext = React.createContext<TooltipGroup>(defaultGroup);
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export type TooltipProviderProps = {
-  /** Show delay in ms for every Tooltip.Root inside. */
   delayDuration?: number;
-  /** Window in ms after a tooltip closes during which the next one opens instantly. */
   skipDelayDuration?: number;
   children: React.ReactNode;
 };
@@ -114,7 +115,6 @@ export type TooltipRootProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** Show delay in ms for this tooltip; defaults to the Provider's (400). */
   delayDuration?: number;
 };
 
@@ -206,41 +206,57 @@ function TooltipRoot({
 
 // ─── Trigger ─────────────────────────────────────────────────────────────────
 
-export type TooltipTriggerProps = {
-  /**
-   * One element. A focusable one (Button, link) is the trigger as is; a disabled control is wrapped
-   * in a focusable host that takes hover and Tab for it; a non-interactive one (Badge, Avatar,
-   * ProgressCircle, an `Icon` with `label`) becomes a tab stop.
-   */
-  children: React.ReactElement;
-  ref?: React.Ref<HTMLElement>;
-} & Omit<React.HTMLAttributes<HTMLElement>, "children">;
+/** A plain button: a native one without a role of its own, or `role="button"`. */
+const BUTTON = 'button:not([role]), [role="button"]';
+
+export type TooltipTriggerProps = SlotPartProps;
 
 /**
- * The tooltip id joins the child's own `aria-describedby`; the child's handlers run first. Other
- * props (handlers, ARIA, `ref`) are forwarded to the child.
+ * Wraps one element. A focusable one (Button, link) is the trigger as is; a disabled control — by
+ * its own `disabled` or a disabled `Fieldset` around it — is wrapped in a focusable host that takes
+ * hover and Tab for it (around a button the host is the button: `role="button"`, `aria-disabled`,
+ * named by the control); a non-interactive
+ * one (Badge, Avatar, ProgressCircle, an `Icon` with `label`) becomes a tab stop. The tooltip id
+ * joins the child's own `aria-describedby`; the child's handlers run first. Props a wrapping trigger
+ * adds pass on to the child.
  */
-function TooltipTrigger({ children, ...forwarded }: TooltipTriggerProps) {
+function TooltipTrigger(props: TooltipTriggerProps) {
+  const { children } = props;
   const { isOpen, triggerRef, contentId, scheduleOpen, scheduleClose, close } =
-    useTooltipRootContext();
+    useTooltipRootContext("Tooltip.Trigger");
   /* A press hides the tooltip and the focus it causes must not reopen it (until the pointer leaves). */
   const pressedRef = React.useRef(false);
-  // A disabled control gets no pointer events and no focus: a host around it takes both.
-  const childProps = children.props as { disabled?: unknown; tabIndex?: unknown };
-  const disabledChild = childProps.disabled === true;
+  const childProps = children.props as { disabled?: unknown; tabIndex?: unknown; id?: unknown };
+  // A disabled Fieldset around the trigger disables the kit control inside it: read on the DOM,
+  // since only the element knows whether it took the inherited state.
+  const inheritedDisabled = useInheritedDisabled();
+  const [domDisabled, setDomDisabled] = React.useState(false);
+  const disabledChild = childProps.disabled === true || (inheritedDisabled && domDisabled);
   // A child that is no tab stop of its own (a Badge, an Avatar) is made one, so keyboard users
   // reach the tooltip too. Measured on the DOM: only the element knows whether it is focusable.
   const [ownTabStop, setOwnTabStop] = React.useState(true);
+  // Around a disabled button the host is that button for assistive tech; around another role (a
+  // tab in a tablist) the control keeps its own role and the host only takes focus and hover.
+  const [buttonHost, setButtonHost] = React.useState(false);
   React.useLayoutEffect(() => {
     const node = triggerRef.current;
-    if (!node || disabledChild) return;
-    setOwnTabStop(childProps.tabIndex !== undefined || hasNativeTabStop(node));
+    if (!node) return;
+    const host = node.hasAttribute("data-disabled-host");
+    const control = host ? node.firstElementChild : node;
+    setDomDisabled(
+      inheritedDisabled && control?.matches(":disabled, [aria-disabled='true']") === true,
+    );
+    setButtonHost(host && control?.matches(BUTTON) === true);
+    if (!disabledChild) setOwnTabStop(childProps.tabIndex !== undefined || hasNativeTabStop(node));
   });
   const madeFocusable = disabledChild || !ownTabStop;
+  // The host names itself after the control it stands for.
+  const generatedId = React.useId();
+  const controlId = typeof childProps.id === "string" ? childProps.id : generatedId;
 
   return (
     <FloatingTrigger
-      {...forwarded}
+      {...props}
       triggerProps={{
         ref: triggerRef,
         "aria-describedby": isOpen ? contentId : undefined,
@@ -269,8 +285,24 @@ function TooltipTrigger({ children, ...forwarded }: TooltipTriggerProps) {
       }}
     >
       {disabledChild ? (
-        <span className={styles.disabledHost} data-disabled-host="">
-          {children}
+        // Around a button the host is the one button assistive tech meets: disabled, named by the
+        // control, which itself is out of reach (no pointer events, no focus) and out of the tree.
+        <span
+          className={styles.disabledHost}
+          data-disabled-host=""
+          {...(buttonHost
+            ? { role: "button", "aria-disabled": "true", "aria-labelledby": controlId }
+            : null)}
+        >
+          {buttonHost
+            ? React.cloneElement(
+                children as React.ReactElement<{ id?: string }>,
+                {
+                  id: controlId,
+                  "aria-hidden": true,
+                } as { id: string },
+              )
+            : children}
         </span>
       ) : (
         children
@@ -284,7 +316,7 @@ function TooltipTrigger({ children, ...forwarded }: TooltipTriggerProps) {
 /** Closest the arrow centre may come to a chip corner: the chip radius + half the arrow. */
 function arrowInset(chip: HTMLElement): number {
   const radius = Number.parseFloat(getComputedStyle(chip).borderTopLeftRadius) || 0;
-  return radius + readCssLengthPx("--prime-tooltip-arrow-width", 10) / 2;
+  return radius + readCssLengthPx("--prime-tooltip-arrow-width", 10, chip) / 2;
 }
 
 /** Arrow shapes per resolved side: base on the chip edge, a softened tip toward the trigger. */
@@ -302,7 +334,6 @@ export type TooltipContentProps = Omit<
   "id" | "role" | "onPointerEnter" | "onPointerLeave"
 > & {
   children: React.ReactNode;
-  /** Text and padding tier; also the size context of controls inside (a Kbd). */
   size?: ControlSize;
   side?: TooltipSide;
   align?: TooltipAlign;
@@ -318,7 +349,7 @@ function TooltipContent({
   ...rest
 }: TooltipContentProps) {
   const { isOpen, instant, triggerRef, contentId, scheduleClose, cancelPending, close } =
-    useTooltipRootContext();
+    useTooltipRootContext("Tooltip.Content");
   // A passive layer: placed before paint, never takes focus or presses; Escape hides it and focus
   // stays on the trigger (WAI-ARIA tooltip). Replaced by its neighbour, it leaves at once.
   const floating = useFloatingLayer({
@@ -332,6 +363,9 @@ function TooltipContent({
     offsetToken: "--prime-tooltip-offset",
     arrowInset,
     dismiss: "none",
+    // WCAG 1.4.13: Escape always hides a tooltip; a press elsewhere closes it through blur.
+    closeOnEscape: true,
+    closeOnOutsideClick: true,
     skipExit: instant,
   });
 
@@ -345,7 +379,7 @@ function TooltipContent({
       surface={false}
       id={contentId}
       role="tooltip"
-      className={cx(styles.content, className)}
+      className={cx(tooltipSurface.chip, styles.content, className)}
       onPointerEnter={cancelPending}
       onPointerLeave={scheduleClose}
       {...toDataAttributes({ align, instant: instant ? true : undefined })}

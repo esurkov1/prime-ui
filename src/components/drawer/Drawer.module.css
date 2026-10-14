@@ -1,45 +1,20 @@
 /*
- * Drawer — raised edge panel on a scrim. Same zones as Modal (DialogParts.module.css), each
- * with its own side padding; header and footer stay put, only the body scrolls. Width per size
- * tier; full width below 640px. A bottom sheet is its own component (Sheet). On the one overlay
- * level: a drawer opened from a Modal or another drawer is portaled later, so it stacks above it
- * in DOM order.
+ * Drawer — a raised edge panel over the scrim, on the dialog shell (DialogParts.module.css: the
+ * same zones as Modal, each with its own side padding; header and footer stay put, only the body
+ * scrolls). Width per size tier; full width below 640px. A bottom sheet is its own component
+ * (Sheet). On the one overlay level: a drawer opened from a Modal or another drawer is portaled
+ * later, so it stacks above it in DOM order.
  */
-
-.root {
-  display: contents;
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: var(--prime-z-overlay);
-  background: var(--prime-color-bg-scrim);
-}
 
 .panel {
   --drawer-width: var(--prime-drawer-width-m);
-
   --dialog-padding: var(--prime-drawer-padding);
 
   position: fixed;
   top: 0;
   bottom: 0;
-  z-index: var(--prime-z-overlay);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
   width: min(100vw, var(--drawer-width));
-  min-height: 0;
-  overflow: hidden;
-  /* Avatar.Group rings match this surface. */
-  --avatar-ring: var(--prime-color-layer-current);
-  background: var(--prime-color-layer-current);
-  color: var(--prime-color-text-primary);
   box-shadow: var(--prime-shadow-modal);
-  outline: none;
-  font-size: var(--prime-text-body-m-size);
-  line-height: var(--prime-text-body-m-line-height);
 }
 
 .panel[data-size="s"] {

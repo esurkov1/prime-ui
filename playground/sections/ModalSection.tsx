@@ -26,7 +26,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "Необязательные части: плашка с иконкой в окне из одной шапки и шапка со статусом перед крестиком и подвалом без тела — `Modal.Icon`, `Modal.Actions`, `Modal.Body`, `Modal.Footer`.",
+        "Необязательные части: плашка с иконкой в окне из одной шапки и шапка со статусом перед крестиком и подвалом, между которыми нет тела — `Modal.Icon`, `Modal.Actions`, `Modal.Footer`.",
     },
     {
       slot: "sizes",
@@ -37,7 +37,7 @@ export const page: ComponentPageConfig = {
       scenario: "long-content",
       title: "Длинное содержимое",
       description:
-        "Длинное тело прокручивается само, шапка и подвал остаются на месте — `Modal.Body`.",
+        "Длинное тело прокручивается само, шапка и подвал остаются на месте; главная кнопка закрывает окно и срабатывает по Enter — `Modal.Body`, `Modal.Confirm`.",
     },
     {
       scenario: "custom-container",
@@ -48,7 +48,7 @@ export const page: ComponentPageConfig = {
       scenario: "guard",
       title: "Удержание формы",
       description:
-        "Форма правки удерживает окно: после изменений любая попытка закрыть сначала спрашивает, в подвале — заметка; пока идёт сохранение, окно не закрывается — `Modal.Guard`, `Modal.Meta`.",
+        "Форма правки удерживает окно: после изменений любая попытка закрыть сначала спрашивает, в подвале — заметка, кнопка отправки сохраняет форму, а пока идёт сохранение, окно не закрывается — `Modal.Guard`, `Modal.Meta`.",
     },
     {
       scenario: "enter-key",
@@ -59,7 +59,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "dismiss",
       description:
-        "Подтверждение удаления закрывается только кнопками, а пока идёт запрос — никак — `closeOnOutsideClick`, `closeOnEscape`.",
+        "Шаг, который нужно завершить: окно реквизитов закрывают только его кнопки, а пока реквизиты сохраняются — ничто — `closeOnOutsideClick`, `closeOnEscape`.",
     },
     {
       slot: "controlled-open",
@@ -69,7 +69,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "in-form",
       description:
-        "Форма настроек в окне: кнопка подвала отправляет форму, пустое название трясёт поле и не даёт закрыть окно, пока его не заполнят — `Modal.Body`, `Modal.Footer`, `error`.",
+        "Форма настроек в окне: кнопка отправки в подвале отправляет форму, Enter в поле делает то же, а пустое название трясёт поле и не даёт закрыть окно, пока его не заполнят — `Modal.Body`, `Modal.Footer`, `error`.",
     },
   ],
   api,

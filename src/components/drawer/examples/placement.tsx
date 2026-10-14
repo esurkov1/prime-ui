@@ -8,33 +8,38 @@ const SIDES = [
 
 export default function DrawerPlacementExample() {
   return (
-    <>
+    <div>
       {SIDES.map(({ side, title }) => (
-        <Drawer.Root key={side}>
-          <Drawer.Trigger>
-            <Button.Root variant="soft" tone="neutral">
-              {side}
-            </Button.Root>
-          </Drawer.Trigger>
-          <Drawer.Content side={side} size="s">
-            <Drawer.Header>
-              <Drawer.Title>{title}</Drawer.Title>
-            </Drawer.Header>
-            <Drawer.Body>
-              <Typography variant="body-m" tone="secondary">
-                Скругление только со стороны страницы, подложка затемняет остальное.
-              </Typography>
-            </Drawer.Body>
-            <Drawer.Footer>
-              <Drawer.Close>
-                <Button.Root variant="outline" tone="neutral">
-                  Закрыть
-                </Button.Root>
-              </Drawer.Close>
-            </Drawer.Footer>
-          </Drawer.Content>
-        </Drawer.Root>
+        <div key={side}>
+          <Drawer.Root>
+            <Drawer.Trigger>
+              <Button.Root variant="soft" tone="neutral">
+                {title}
+              </Button.Root>
+            </Drawer.Trigger>
+            <Drawer.Content side={side} size="s">
+              <Drawer.Header>
+                <Drawer.Title>{title}</Drawer.Title>
+              </Drawer.Header>
+              <Drawer.Body>
+                <Typography variant="body-m" tone="secondary">
+                  Скругление только со стороны страницы, подложка затемняет остальное.
+                </Typography>
+              </Drawer.Body>
+              <Drawer.Footer>
+                <Drawer.Close>
+                  <Button.Root variant="outline" tone="neutral">
+                    Закрыть
+                  </Button.Root>
+                </Drawer.Close>
+              </Drawer.Footer>
+            </Drawer.Content>
+          </Drawer.Root>
+          <Typography as="span" variant="caption" tone="muted">
+            {side}
+          </Typography>
+        </div>
       ))}
-    </>
+    </div>
   );
 }

@@ -30,7 +30,8 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "sizes",
-      description: "Все ярусы с шапкой и действиями; панель берёт ярус своего триггера — `size`.",
+      description:
+        "Все ярусы с шапкой и действиями; ярус свой у панели и задаётся на `Popover.Content`, а не берётся у триггера — `size`.",
     },
     {
       slot: "placement",
@@ -38,10 +39,10 @@ export const page: ComponentPageConfig = {
         "Все стороны и выравнивания относительно триггера; у края экрана панель переворачивается и сдвигается — `side`, `align`.",
     },
     {
-      scenario: "match-trigger-width",
-      title: "Ширина триггера",
+      scenario: "width",
+      title: "Ширина",
       description:
-        "В узкой колонке панель точно по ширине кнопки на всю ширину, текст переносится — `matchTriggerWidth`.",
+        "В узкой колонке панель точно по ширине кнопки на всю ширину и текст переносится, а таблица лимитов берёт нужную ей ширину — `width`.",
     },
     {
       scenario: "flush",
@@ -58,12 +59,12 @@ export const page: ComponentPageConfig = {
     {
       slot: "dismiss",
       description:
-        "Подтверждение удаления закрывается только кнопками, а пока идёт запрос — никак — `closeOnOutsideClick`, `closeOnEscape`.",
+        "Набираемая заметка не пропадёт от случайного клика: панель закрывают только её кнопки, а пока заметка сохраняется — ничто — `closeOnOutsideClick`, `closeOnEscape`.",
     },
     {
       slot: "controlled-open",
       description:
-        "Открытием владеет родитель: другая кнопка открывает панель из кода, своя кнопка закрывает — `open`, `onOpenChange`.",
+        "Открытием владеет родитель: другая кнопка открывает панель из кода, а своя кнопка в `Popover.Close` закрывает — `open`, `onOpenChange`.",
     },
     {
       slot: "in-form",

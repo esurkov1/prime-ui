@@ -2,8 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
-
 import { Select } from "@/components/select/Select";
+import { describeOverlayConformance } from "@/test/overlayConformance";
 
 import { Popover } from "./Popover";
 
@@ -304,7 +304,9 @@ describe("Popover — overlay contract", () => {
       </Popover.Root>,
     );
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    fireEvent.pointerDown(screen.getByLabelText("field"));
+    // Without a Title the panel is named after the anchor's control.
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("field");
+    fireEvent.pointerDown(screen.getByRole("textbox"));
     expect(onOpenChange).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("anchor"));
     expect(onOpenChange).not.toHaveBeenCalled();
@@ -368,20 +370,34 @@ describe("Popover — overlay contract", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("matchTriggerWidth marks the panel and writes the trigger width", () => {
+  it('width="trigger" marks the panel and writes the trigger width', () => {
     render(
       <Popover.Root defaultOpen>
         <Popover.Trigger>
           <button type="button">Open</button>
         </Popover.Trigger>
-        <Popover.Content matchTriggerWidth>
+        <Popover.Content width="trigger">
           <div>Panel content</div>
         </Popover.Content>
       </Popover.Root>,
     );
     const panel = screen.getByRole("dialog");
-    expect(panel).toHaveAttribute("data-match-trigger-width", "true");
+    expect(panel).toHaveAttribute("data-width", "trigger");
     expect(panel.style.getPropertyValue("--float-min-w")).not.toBe("");
+  });
+
+  it('width="content" lets the panel take what its content needs', () => {
+    render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>
+          <button type="button">Open</button>
+        </Popover.Trigger>
+        <Popover.Content width="content">
+          <div>Два месяца</div>
+        </Popover.Content>
+      </Popover.Root>,
+    );
+    expect(screen.getByRole("dialog")).toHaveAttribute("data-width", "content");
   });
 
   it("flush marks the panel for edge-to-edge content", () => {
@@ -431,4 +447,85 @@ describe("Popover — initialFocus", () => {
     fireEvent.click(anchor);
     expect(await screen.findByLabelText("Название")).toHaveFocus();
   });
+});
+
+describe("Popover — keyboard on the trigger", () => {
+  function Filters({ openOnArrow }: { openOnArrow?: boolean }) {
+    return (
+      <Popover.Root openOnArrow={openOnArrow}>
+        <Popover.Trigger>
+          <button type="button">Фильтры</button>
+        </Popover.Trigger>
+        <Popover.Content>
+          <Popover.Title>Фильтры</Popover.Title>
+          <button type="button">Сбросить</button>
+        </Popover.Content>
+      </Popover.Root>
+    );
+  }
+
+  it("Enter and Space open the panel and move focus in", async () => {
+    const user = userEvent.setup();
+    render(<Filters />);
+    const trigger = screen.getByRole("button", { name: "Фильтры" });
+    trigger.focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("dialog", { name: "Фильтры" })).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(trigger).toHaveFocus();
+    await user.keyboard(" ");
+    expect(screen.getByRole("dialog", { name: "Фильтры" })).toBeInTheDocument();
+  });
+
+  it("ArrowDown and ArrowUp open it only with openOnArrow", async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<Filters />);
+    screen.getByRole("button", { name: "Фильтры" }).focus();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.queryByRole("dialog")).toBeNull();
+    unmount();
+
+    render(<Filters openOnArrow />);
+    const trigger = screen.getByRole("button", { name: "Фильтры" });
+    trigger.focus();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    await user.keyboard("{ArrowUp}");
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("a Title with its own id names the panel by that id", () => {
+    render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>
+          <button type="button">Период</button>
+        </Popover.Trigger>
+        <Popover.Content>
+          <Popover.Title id="period-title">Период отчёта</Popover.Title>
+        </Popover.Content>
+      </Popover.Root>,
+    );
+    const panel = screen.getByRole("dialog");
+    expect(panel).toHaveAttribute("aria-labelledby", "period-title");
+    expect(panel).toHaveAccessibleName("Период отчёта");
+  });
+});
+
+describeOverlayConformance("Popover", {
+  render: () => (
+    <Popover.Root>
+      <Popover.Trigger>
+        <button type="button">Открыть</button>
+      </Popover.Trigger>
+      <Popover.Content trapFocus>
+        <Popover.Title>Фильтры</Popover.Title>
+        <button type="button">Сбросить</button>
+        <button type="button">Применить</button>
+      </Popover.Content>
+    </Popover.Root>
+  ),
+  trigger: "Открыть",
+  role: "dialog",
+  modal: true,
 });

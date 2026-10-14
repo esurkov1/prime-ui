@@ -32,7 +32,12 @@ export const page: ComponentPageConfig = {
       scenario: "failure",
       title: "Ошибка",
       description:
-        "Сервер отказал: окно остаётся открытым, причина от владельца под текстом, кнопка готова к повтору — `error`, `onConfirm`.",
+        "Сервер отказал: окно остаётся открытым, причина отказа под текстом, кнопка готова к повтору — `onConfirm`.",
+    },
+    {
+      slot: "dismiss",
+      description:
+        "Напоминание клиенту весомое, но безопасное: клик мимо закрывает окно, как «Отмена», и Escape тоже — `closeOnOutsideClick`, `closeOnEscape`.",
     },
     {
       slot: "controlled-open",
