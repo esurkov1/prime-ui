@@ -2,9 +2,9 @@ import { format, startOfDay } from "date-fns";
 import { ru } from "date-fns/locale";
 
 import { Popover } from "@/components/popover/Popover";
-import { useControllableState } from "@/hooks/useControllableState";
 import { DEFAULT_ALIGN, type PositionAlign } from "@/hooks/usePosition";
 import { Icon } from "@/icons";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
@@ -15,6 +15,7 @@ import {
   useFieldFrame,
 } from "@/internal/FieldFrame";
 import { fieldTriggerClass } from "@/internal/fieldClasses";
+import { useOpenState } from "@/internal/overlay/useOpenState";
 import type { ControlSize } from "@/internal/states";
 
 import styles from "./Datepicker.module.css";
@@ -78,6 +79,14 @@ export function formatDatepickerValue(
   return `${formatDayShort(fromDay, today, locale)}${time(from)} — ${toText}`;
 }
 
+/**
+ * A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-MM-ddTHH:mm` —
+ * never `toISOString()`, which shifts the day to UTC.
+ */
+export function formatDateValue(date: Date, { withTime = false }: { withTime?: boolean } = {}) {
+  return format(date, withTime ? "yyyy-MM-dd'T'HH:mm" : "yyyy-MM-dd");
+}
+
 export type DatepickerRootProps = DatepickerPanelProps &
   FieldFrameProps &
   FieldFocusRingProps & {
@@ -89,6 +98,8 @@ export type DatepickerRootProps = DatepickerPanelProps &
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
+    closeOnEscape?: boolean;
+    closeOnOutsideClick?: boolean;
     disabled?: boolean;
     /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
     invalid?: boolean;
@@ -114,8 +125,7 @@ function formValues(
   value: { mode: "range"; value: DatepickerRange } | { mode: "single"; value: Date | null },
   withTime: boolean,
 ): string[] {
-  const iso = (date: Date | null) =>
-    date ? format(date, withTime ? "yyyy-MM-dd'T'HH:mm" : "yyyy-MM-dd") : "";
+  const iso = (date: Date | null) => (date ? formatDateValue(date, { withTime }) : "");
   return value.mode === "range" ? [iso(value.value.from), iso(value.value.to)] : [iso(value.value)];
 }
 
@@ -128,12 +138,14 @@ function DatepickerRoot(props: DatepickerRootProps) {
     defaultValue,
     onValueChange,
     resetValue,
-    size = "m",
+    size: sizeProp,
     placeholder,
     valuePrefix,
     open: openProp,
     defaultOpen = false,
     onOpenChange,
+    closeOnEscape = true,
+    closeOnOutsideClick = true,
     disabled: disabledProp = false,
     invalid: invalidProp,
     focusRing,
@@ -153,24 +165,24 @@ function DatepickerRoot(props: DatepickerRootProps) {
     ...other
   } = props;
   const { options, rest } = splitCalendarOptions(other);
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
   const labels = { ...DATEPICKER_LABELS, ...options.labels };
-  const ids = useFieldFrame(id, { hint, error, invalid: invalidProp }, ariaDescribedBy);
+  const ids = useFieldFrame(
+    id,
+    { label, hint, error, invalid: invalidProp, required },
+    ariaDescribedBy,
+  );
   const textId = `${ids.controlId}-value`;
-  const [openState, setOpen] = useControllableState<boolean>({
-    value: openProp,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
-  });
-  const open = openState && !disabled;
+  const [open, setOpen] = useOpenState({ open: openProp, defaultOpen, onOpenChange, disabled });
   const shown = formatDatepickerValue({ ...options, labels, ...value });
   const text = shown
     ? `${valuePrefix ? `${valuePrefix} ` : ""}${shown}`
     : (placeholder ?? labels.placeholder);
-  const hasLabel = label != null && label !== false;
   const submitted = name ? formValues(value, Boolean(options.withTime)) : [];
 
-  return (
+  return tier.provide(
     <FieldFrame
       {...rest}
       size={size}
@@ -182,22 +194,22 @@ function DatepickerRoot(props: DatepickerRootProps) {
       error={error}
       disabled={disabled}
       optionalLabel={labels.optional}
+      requiredLabel={labels.required}
       className={className}
     >
-      <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Root
+        open={open}
+        onOpenChange={setOpen}
+        closeOnEscape={closeOnEscape}
+        closeOnOutsideClick={closeOnOutsideClick}
+        openOnArrow
+      >
         <Popover.Trigger>
           <button
             id={ids.controlId}
             type="button"
             disabled={disabled}
-            aria-label={ariaLabel ? `${ariaLabel}: ${text}` : undefined}
-            aria-labelledby={
-              ariaLabel
-                ? undefined
-                : (ariaLabelledBy ?? (hasLabel ? cx(ids.labelId, textId) : undefined))
-            }
-            aria-describedby={ids.describedBy}
-            aria-invalid={ids.invalid || undefined}
+            {...ids.controlAria({ role: "button", textId, text, ariaLabel, ariaLabelledBy })}
             className={cx(fieldTriggerClass, styles.trigger)}
             {...toDataAttributes({
               size,
@@ -218,7 +230,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
             />
           </button>
         </Popover.Trigger>
-        <Popover.Content align={align} size={size} trapFocus flush className={styles.popover}>
+        <Popover.Content align={align} size={size} width="content" trapFocus flush>
           <PanelView
             {...options}
             {...value}
@@ -233,7 +245,7 @@ function DatepickerRoot(props: DatepickerRootProps) {
         // biome-ignore lint/suspicious/noArrayIndexKey: a range always submits `from`, then `to`
         <input key={index} type="hidden" name={name} value={item} disabled={disabled} />
       ))}
-    </FieldFrame>
+    </FieldFrame>,
   );
 }
 DatepickerRoot.displayName = "Datepicker.Root";

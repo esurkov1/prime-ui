@@ -228,6 +228,7 @@ export {
   DEFAULT_DATEPICKER_PRESETS,
   datepickerPresets,
   formatDatepickerValue,
+  formatDateValue,
   YEARLESS_YEAR,
 } from "./datepicker/Datepicker";
 export type {

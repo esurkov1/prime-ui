@@ -63,6 +63,11 @@ export const page: ComponentPageConfig = {
         "Окно доставки на портале партнёра на английском: названия месяцев и дней из локали date-fns, неделя с воскресенья, системные тексты переведены — `locale`, `weekStartsOn`, `labels`.",
     },
     {
+      slot: "dismiss",
+      description:
+        "Период смены с подвалом: календарь хранит черновик при нажатии рядом и закрывается по Escape, «Сбросить» или «Применить» — `closeOnOutsideClick`, `closeOnEscape`.",
+    },
+    {
       slot: "controlled",
       description:
         "Фильтр отчёта владеет периодом: быстрые кнопки задают его снаружи, поле его показывает — `value`, `onValueChange`.",

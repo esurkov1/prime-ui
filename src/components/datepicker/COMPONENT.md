@@ -25,6 +25,7 @@ import {
   type DatepickerRange,
   datepickerPresets,
   formatDatepickerValue,
+  formatDateValue,
   YEARLESS_YEAR,
 } from "prime-ui-kit";
 ```
@@ -57,7 +58,9 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `open` | `boolean` | — | Controlled visibility of the panel. |
 | `defaultOpen` | `boolean` | `false` | Initial visibility, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Field click, Escape, an outside press or an applied value. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier (height 28 · 32 · 36 · 40 · 48) and panel tier (day cell 24 · 28 · 32 · 36 · 40). |
+| `closeOnEscape` | `boolean` | `true` | Escape closes the calendar and returns focus to the field. |
+| `closeOnOutsideClick` | `boolean` | `true` | A press outside the calendar and the field closes it; focus follows the pointer. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier (height 28 · 32 · 36 · 40 · 48) and panel tier (day cell 24 · 28 · 32 · 36 · 40). Without it the tier of its host, else `m`. |
 | `label` | `ReactNode` | — | Field label; part of the button's accessible name together with the value. |
 | `hint` | `ReactNode` | — | Support text under the field (`aria-describedby`). |
 | `error` | `ReactNode` | — | Error message in place of the hint; implies `invalid`. |
@@ -97,7 +100,7 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `value` | `Date \| null  ·  DatepickerRange` | — | Controlled value: a date (`single`) or `{ from, to }` in wall-clock time (`range`); `null` — not set. |
 | `defaultValue` | `Date \| null  ·  DatepickerRange` | `null` · `{ from: null, to: null }` | Initial value, uncontrolled. |
 | `onValueChange` | `(value) => void` | — | Called when a pick, a preset, Apply or Reset changes the value. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Panel tier (day cell 24 · 28 · 32 · 36 · 40). |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Panel tier (day cell 24 · 28 · 32 · 36 · 40). Without it the tier of its host, else `m`. |
 | `months` | `1 \| 2` | `1` | Months side by side; one when there is no room. |
 | `presets` | `DatepickerPreset[] \| false` | `false` | Preset column (`range` only): `DEFAULT_DATEPICKER_PRESETS` or picks from `datepickerPresets`; a row above the calendar when narrow. |
 | `prompt` | `boolean` | `false` | Step prompt under the calendar (`labels.pickStart` / `pickEnd` / `pickDate`). |
@@ -112,6 +115,13 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `weekStartsOn` | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6` | `1` | First day of the week (1 — Monday). |
 | `labels` | `Partial<DatepickerLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className` and the other attributes of the panel. |
+
+### Functions
+
+#### `formatDateValue(date, { withTime })`
+`(date: Date, options?: { withTime?: boolean }) => string`
+
+A date as a form submits it, in local time: `yyyy-MM-dd`, with `withTime` `yyyy-MM-ddTHH:mm` (the value of a `name`d field) — never `toISOString()`, which shifts the day to UTC.
 
 ## Variants
 
@@ -145,7 +155,9 @@ panel                       presets column (range) · 1–2 month grids · promp
 | `withTime` | HH:mm inputs in the footer | timestamps (with `footer`) | `false` |
 | `yearless` | month title without a year, value «15 октября» | annual dates | `false` |
 | `fullWidth` | the field fills its container | form columns | `false` |
-| `align` | popover at the field's start / center / end | a field near the right edge → `end` | `start` |
+| `align` | popover at the field's start / center / end; `auto` takes the edge with more room | a field near the right edge → `end` | `auto` |
+| `closeOnOutsideClick` | `false`: a press beside the calendar keeps it open with its draft | a `footer` draft the person must apply or reset | `true` |
+| `closeOnEscape` | `false`: Escape leaves the calendar open | the calendar must close only by Apply or Reset | `true` |
 
 ## States
 | State | Driven by | DOM |
@@ -215,6 +227,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 | `until` | `"до"` | Prefix of a range without a start: «до 6 окт». |
 | `presetsTitle` | `"Период"` | Heading and group name of the presets column. |
 | `optional` | `"необязательно"` | Muted marker after the label when `optional`. |
+| `required` | `"обязательное поле"` | Read after the field name of a `required` field: its trigger is a button, which takes no `aria-required`. |
 
 ## Examples
 | Example | Shows |
@@ -227,6 +240,7 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 | [inline-panel.tsx](examples/inline-panel.tsx) | A booking calendar embedded in a card: the card is its container, two months when the parent has room, the range applies at once — `Datepicker.Panel`, `months`, `prompt`. |
 | [yearless.tsx](examples/yearless.tsx) | An annual price change date: day and month without a year, a value prefix and taken days disabled — `yearless`, `valuePrefix`, `isDayDisabled`. |
 | [locale.tsx](examples/locale.tsx) | A delivery window on a partner portal in English: month and weekday names from the date-fns locale, the week from Sunday and the system texts translated — `locale`, `weekStartsOn`, `labels`. |
+| [dismiss.tsx](examples/dismiss.tsx) | A shift period with a footer: the calendar keeps the draft on a press beside it and closes by Escape, Reset or Apply — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | A report filter owns the period: quick buttons set it from outside, the field shows it — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the panel: a reminder button opens the calendar from code, a picked day closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A leave request form: submit reads the period from the form data and checks it, the error shakes in and leaves once the period is fixed; an optional return date — `name`, `required`, `error`, `optional`. |

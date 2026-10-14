@@ -11,49 +11,33 @@
   --dp-cell: var(--dp-cell-tier);
   --dp-text: var(--prime-control-m-text-size);
   --dp-lh: var(--prime-control-m-line-height);
-  --dp-icon: var(--prime-control-m-icon);
   --dp-radius: var(--prime-panel-item-radius);
-  /* Footer fields: one tier down. */
-  --dp-field-h: var(--prime-control-s-height);
-  --dp-field-text: var(--prime-control-s-text-size);
 }
 
 [data-size="xs"]:is(.panel, .trigger) {
   --dp-cell-tier: var(--prime-control-xs-item-height);
   --dp-text: var(--prime-control-xs-text-size);
   --dp-lh: var(--prime-control-xs-line-height);
-  --dp-icon: var(--prime-control-xs-icon);
   --dp-radius: var(--prime-radius-s);
-  --dp-field-h: var(--prime-control-xs-height);
-  --dp-field-text: var(--prime-control-xs-text-size);
 }
 
 [data-size="s"]:is(.panel, .trigger) {
   --dp-cell-tier: var(--prime-control-s-item-height);
   --dp-text: var(--prime-control-s-text-size);
   --dp-lh: var(--prime-control-s-line-height);
-  --dp-icon: var(--prime-control-s-icon);
   --dp-radius: var(--prime-radius-s);
-  --dp-field-h: var(--prime-control-xs-height);
-  --dp-field-text: var(--prime-control-xs-text-size);
 }
 
 [data-size="l"]:is(.panel, .trigger) {
   --dp-cell-tier: var(--prime-control-l-item-height);
   --dp-text: var(--prime-control-l-text-size);
   --dp-lh: var(--prime-control-l-line-height);
-  --dp-icon: var(--prime-control-l-icon);
-  --dp-field-h: var(--prime-control-m-height);
-  --dp-field-text: var(--prime-control-m-text-size);
 }
 
 [data-size="xl"]:is(.panel, .trigger) {
   --dp-cell-tier: var(--prime-control-xl-item-height);
   --dp-text: var(--prime-control-xl-text-size);
   --dp-lh: var(--prime-control-xl-line-height);
-  --dp-icon: var(--prime-control-xl-icon);
-  --dp-field-h: var(--prime-control-l-height);
-  --dp-field-text: var(--prime-control-l-text-size);
 }
 
 /* Touch: a day is a cell of a dense grid, so its hit area cannot grow past its neighbours (an
@@ -109,18 +93,12 @@
   color: var(--prime-color-text-placeholder);
 }
 
-/* ─── Popover shell ─────────────────────────────────────────────────────── */
-
-/* `flush` popover: the panel owns its padding; it is as wide as the months (and presets) need,
-   within the viewport. */
-.popover {
-  width: fit-content;
-  max-width: var(--float-max-w, calc(100vw - 2 * var(--prime-space-2)));
-}
-
 /* ─── Panel ──────────────────────────────────────────────────────────────── */
 
+/* `--dp-chrome`: the padding around the months, read by the layout (panelLayout.ts) too. */
 .panel {
+  --dp-chrome: var(--prime-space-3);
+
   display: flex;
   min-width: 0;
   color: var(--prime-color-text-primary);
@@ -157,12 +135,6 @@
   letter-spacing: var(--prime-text-caption-tracking);
 }
 
-/* Preset rows are Buttons (ghost; soft accent when pressed); a list reads from the start edge. */
-.presetItem[data-size] {
-  flex-shrink: 0;
-  justify-content: flex-start;
-}
-
 /* Narrow: presets become a sideways ScrollContainer row of soft Buttons above the calendar. */
 .panel[data-layout="stacked"] .presets {
   flex-direction: row;
@@ -184,7 +156,7 @@
   flex-direction: column;
   gap: var(--prime-space-2);
   min-width: 0;
-  padding: var(--prime-space-3);
+  padding: var(--dp-chrome);
 }
 
 .months {
@@ -436,21 +408,21 @@
 }
 
 /* A field never shrinks below its whole date and time: the fields wrap above the actions
-   first, and on the narrowest footer they stand one under the other. */
+   first, and on the narrowest footer they stand one under the other. The fill, focus and danger
+   ring are the field surface; the height and text its tier (one below the panel, set in TSX). */
 .field {
   box-sizing: border-box;
   display: flex;
   flex: 1 1 0;
   align-items: center;
   min-width: min-content;
-  height: var(--dp-field-h);
+  height: var(--field-h);
   margin: 0;
   padding: 0;
   overflow: hidden;
   border: 0;
   border-radius: var(--prime-radius-m);
-  background: var(--prime-color-field-bg);
-  font-size: var(--dp-field-text);
+  font-size: var(--field-text);
 }
 
 .fieldDate {
@@ -468,43 +440,27 @@
   color: var(--prime-color-text-placeholder);
 }
 
+/* The time text is the tier's editable text (`fieldInputTextClass`: 16px on touch, so iOS does
+   not zoom); the cell keeps `00:00` whole at any text size. */
 .fieldTime {
   box-sizing: border-box;
   flex-shrink: 0;
-  width: calc(var(--dp-field-h) * 1.75);
+  width: max(calc(var(--field-h) * 1.75), calc(5ch + 2 * var(--prime-space-2)));
   height: 100%;
   padding-inline: var(--prime-space-2);
   border: 0;
   border-inline-start: var(--prime-border-width) solid var(--prime-color-border-subtle);
   background: transparent;
   color: var(--prime-color-text-primary);
-  font: inherit;
+  font-family: inherit;
   font-variant-numeric: tabular-nums;
   text-align: center;
   outline: none;
-}
-
-/* Touch screens and narrow viewports: at least 16px, or iOS zooms into the focused time; the
-   field widens to keep `00:00` whole. The width is `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
-@media (pointer: coarse), (max-width: 639px) {
-  .fieldTime {
-    width: max(calc(var(--dp-field-h) * 1.75), calc(5ch + 2 * var(--prime-space-2)));
-    font-size: max(1em, var(--prime-control-touch-text-size));
-  }
-}
-
-.field:has(.fieldTime:focus-visible) {
-  background: var(--prime-color-field-bg-focus);
-  outline: var(--prime-focus-width) solid var(--prime-color-focus-ring);
-  outline-offset: var(--prime-focus-offset-inset);
+  transition: color var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
 .fieldTime[aria-invalid="true"] {
   color: var(--prime-color-danger-text);
-}
-
-.field:has(.fieldTime[aria-invalid="true"]) {
-  box-shadow: inset 0 0 0 var(--prime-border-width) var(--prime-color-danger-border);
 }
 
 .dash {
@@ -547,8 +503,8 @@
   width: 100%;
 }
 
-.panel[data-embedded="true"] .main {
-  padding: 0;
+.panel[data-embedded="true"] {
+  --dp-chrome: 0;
 }
 
 .panel[data-embedded="true"] .month {
@@ -563,7 +519,7 @@
    one cell — instead of a fit-content month in the corner of the sheet. */
 /* `COMPACT_QUERY` (src/hooks/breakpoints.ts). */
 @media (max-width: 639px) {
-  .popover .month {
+  .panel:not([data-embedded="true"]) .month {
     flex: 1 1 0;
     width: auto;
     min-width: 0;

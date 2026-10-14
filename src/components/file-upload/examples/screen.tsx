@@ -6,6 +6,7 @@ import {
   Crossfade,
   EmptyPage,
   FileUpload,
+  formatDateValue,
   formatFileSize,
   Icon,
   MediaViewer,
@@ -201,7 +202,7 @@ const filesWord = (count: number) => {
   return "файлов";
 };
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => formatDateValue(new Date());
 
 /** Upload attempts per file, and how many files have started: the stand-in drops every third one once. */
 const attempts = new WeakMap<File, number>();

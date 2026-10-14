@@ -23,8 +23,6 @@
   "src/components/data-table/reorder.tsx: imports dnd/context (not its main module or types.ts)",
   "src/components/data-table/reorder.tsx: local promise check",
   "src/components/data-table/useFrozenColumns.ts: biome-ignore useExhaustiveDependencies",
-  "src/components/datepicker/Datepicker.tsx: root default size = \"m\"",
-  "src/components/datepicker/DatepickerPanel.tsx: root default size = \"m\"",
   "src/components/digit-input/DigitInput.tsx: as unknown as",
   "src/components/drawer/Drawer.tsx: imports modal/DialogGuard (not its main module or types.ts)",
   "src/components/drawer/Drawer.tsx: imports modal/DialogParts (not its main module or types.ts)",

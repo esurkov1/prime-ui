@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { Datepicker, datepickerPresets, YEARLESS_YEAR } from "./Datepicker";
+import { Datepicker, datepickerPresets, formatDateValue, YEARLESS_YEAR } from "./Datepicker";
 import { matchPreset, monthGrid, parseTime, rowsNeeded } from "./datepickerModel";
 import { resolvePanelLayout } from "./panelLayout";
 
@@ -166,6 +166,25 @@ describe("Datepicker.Panel", () => {
     expect(screen.getByRole("table", { name: "Январь" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "15 января" }));
     expect(onChange.mock.calls[0][0]).toEqual(new Date(YEARLESS_YEAR, 0, 15));
+  });
+});
+
+describe("Datepicker.Panel — keys outside the days", () => {
+  it("an arrow on a month button stays the button's: the grid walks only from a day", () => {
+    render(<Datepicker.Panel mode="single" value={null} onValueChange={() => {}} today={TODAY} />);
+    const next = screen.getByRole("button", { name: "Следующий месяц" });
+    next.focus();
+    fireEvent.keyDown(next, { key: "ArrowLeft" });
+    expect(next).toHaveFocus();
+    expect(screen.getByRole("table", { name: "Октябрь 2026" })).toBeInTheDocument();
+  });
+
+  it("paging with the month button keeps focus on it", async () => {
+    const user = userEvent.setup();
+    render(<Datepicker.Panel mode="single" value={null} onValueChange={() => {}} today={TODAY} />);
+    await user.click(screen.getByRole("button", { name: "Следующий месяц" }));
+    expect(screen.getByRole("table", { name: "Ноябрь 2026" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Следующий месяц" })).toHaveFocus();
   });
 });
 
@@ -533,6 +552,50 @@ describe("Datepicker labels", () => {
     expect(screen.getByRole("button", { name: "Дата ТО дд.мм.гггг" })).toBeInTheDocument();
     rerender(<Datepicker.Root mode="single" label="Дата ТО" placeholder="Не заполнено" />);
     expect(screen.getByRole("button", { name: "Дата ТО Не заполнено" })).toBeInTheDocument();
+  });
+});
+
+describe("Datepicker.Root — open, dismiss and name", () => {
+  it("ArrowDown on the field opens the calendar", async () => {
+    const user = userEvent.setup();
+    render(<Datepicker.Root mode="single" label="Срок" today={TODAY} />);
+    screen.getByRole("button", { name: /Срок/ }).focus();
+    await user.keyboard("{ArrowDown}");
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("closeOnEscape={false} and closeOnOutsideClick={false} keep the calendar open", async () => {
+    const user = userEvent.setup();
+    render(
+      <div>
+        <Datepicker.Root
+          mode="single"
+          label="Срок"
+          closeOnEscape={false}
+          closeOnOutsideClick={false}
+        />
+        <div data-testid="outside" />
+      </div>,
+    );
+    await user.click(screen.getByRole("button", { name: /Срок/ }));
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.pointerDown(screen.getByTestId("outside"));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("a required field names its value and is described by the required word", () => {
+    render(<Datepicker.Root mode="single" label="Срок" required defaultValue={TODAY} />);
+    const field = screen.getByRole("button", { name: /Срок/ });
+    expect(field).toHaveAccessibleName(/Срок.*7 окт|Срок.*Сегодня/);
+    expect(field).toHaveAccessibleDescription(/обязательное поле/);
+  });
+});
+
+describe("formatDateValue", () => {
+  it("formats the local day (and time), never the UTC one", () => {
+    const lateEvening = new Date(2026, 9, 7, 23, 30);
+    expect(formatDateValue(lateEvening)).toBe("2026-10-07");
+    expect(formatDateValue(lateEvening, { withTime: true })).toBe("2026-10-07T23:30");
   });
 });
 
