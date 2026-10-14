@@ -10,10 +10,13 @@ const ROOMS = Array.from({ length: 16 }, (_, index) => `Зал ${index + 1}`);
 export default function ScrollContainerVariantsExample() {
   return (
     <div className={styles.layout}>
-      <Card.Root role="region" className={styles.card} aria-label="Фильтры">
-        <Typography as="h3" variant="title-s" className={styles.cardTitle}>
-          horizontal
-        </Typography>
+      <Card.Root role="region" className={styles.card} aria-label="Статусы заказов">
+        <Card.Header>
+          <Card.Title>Статусы заказов</Card.Title>
+          <Typography as="span" variant="caption" tone="muted">
+            horizontal
+          </Typography>
+        </Card.Header>
         <ScrollContainer axis="horizontal">
           <div className={styles.strip}>
             {TAGS.map((tag) => (
@@ -23,9 +26,12 @@ export default function ScrollContainerVariantsExample() {
         </ScrollContainer>
       </Card.Root>
       <Card.Root role="region" className={styles.card} aria-label="Расписание залов">
-        <Typography as="h3" variant="title-s" className={styles.cardTitle}>
-          both
-        </Typography>
+        <Card.Header>
+          <Card.Title>Расписание залов</Card.Title>
+          <Typography as="span" variant="caption" tone="muted">
+            both
+          </Typography>
+        </Card.Header>
         <ScrollContainer
           axis="both"
           tabIndex={0}

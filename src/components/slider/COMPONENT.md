@@ -166,13 +166,14 @@ Controlled: `value` + `onValueChange`. Uncontrolled: `defaultValue` (falls back 
 | [overview.tsx](examples/overview.tsx) | A labelled slider with its current value — `label`, `showValue`. |
 | [variants.tsx](examples/variants.tsx) | Every fill color; accent by default, semantic tones when the value carries meaning — `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size; the thumb, the label and the value grow with the tier — `size`. |
-| [states.tsx](examples/states.tsx) | The fill at both ends and a disabled slider — `disabled`. |
+| [states.tsx](examples/states.tsx) | The fill at both ends, an invalid slider and a disabled one — `invalid`, `disabled`. |
 | [orientation.tsx](examples/orientation.tsx) | Notification levels as a row of upright sliders, minimum at the bottom — `orientation`. |
 | [value-format.tsx](examples/value-format.tsx) | Units in the shown value that are also read by screen readers — `formatValue`, `showValue`. |
 | [range-step.tsx](examples/range-step.tsx) | Own bounds and a coarse or fractional step; a slider without a visible label — `min`, `max`, `step`, `aria-label`. |
 | [hint-and-error.tsx](examples/hint-and-error.tsx) | A slider framed like every field: required marker, a hint, and an error in its place — `required`, `hint`, `error`, `optional`. |
 | [autosave.tsx](examples/autosave.tsx) | A setting saved once the thumb is let go, not on every step: the thumb waits dimmed while it saves, and a value the server refuses glides back — `onCommit`, `hint`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value and shares it with a number field for exact entry — `value`, `onValueChange`. |
+| [in-form.tsx](examples/in-form.tsx) | Campaign limits submitted with the form by `name`, a calm note confirms the save — `name`, `label`. |
 
 ## Mistakes
 - `<Slider.Root>` → the slider is a single export: `<Slider />`.

@@ -1,4 +1,4 @@
-/** Contacts of a client checked on save: a field's problem shows under that field in its row, a problem of the whole list under the list, and focus goes to the first wrong field — `error`. */
+/** Contacts of a client checked on save: a field's problem shows under that field in its row, a problem of the whole list under the list, and focus goes to the first wrong field; a `*` after a heading marks a required column — `error`, `required`. */
 import { Button, FieldList, type FieldListColumn, Input } from "prime-ui-kit";
 import * as React from "react";
 
@@ -6,7 +6,10 @@ import styles from "./examples.module.css";
 
 type Contact = { id: string; role: string; phone: string };
 
-const COLUMNS: FieldListColumn[] = [{ label: "Должность" }, { label: "Телефон", width: "m" }];
+const COLUMNS: FieldListColumn[] = [
+  { label: "Должность", required: true },
+  { label: "Телефон", width: "m", required: true },
+];
 
 const CONTACTS: Contact[] = [
   { id: "buyer", role: "Закупщик", phone: "+7 912 404-18-20" },

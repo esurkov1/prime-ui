@@ -31,7 +31,11 @@ export const page: ComponentPageConfig = {
       slot: "sizes",
       description: "Все размеры; ползунок, подпись и значение растут с ярусом — `size`.",
     },
-    { slot: "states", description: "Заливка на обоих краях и неактивный ползунок — `disabled`." },
+    {
+      slot: "states",
+      description:
+        "Заливка на обоих краях, ошибочный и неактивный ползунки — `invalid`, `disabled`.",
+    },
     {
       slot: "orientation",
       description:
@@ -65,6 +69,11 @@ export const page: ComponentPageConfig = {
       slot: "controlled",
       description:
         "Значением владеет родитель и делит его с числовым полем для точного ввода — `value`, `onValueChange`.",
+    },
+    {
+      slot: "in-form",
+      description:
+        "Лимиты кампании уходят с формой по `name`, спокойная заметка подтверждает сохранение — `name`, `label`.",
     },
   ],
   api,

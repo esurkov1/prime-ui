@@ -1,7 +1,5 @@
 /** A record card: its status and a ⋯ menu sit in the header before the close button, one tier smaller — `Drawer.Actions`. */
-import { Badge, Button, Drawer, Dropdown, Icon } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
+import { Badge, Button, DescriptionList, Drawer, Dropdown, Icon } from "prime-ui-kit";
 
 const DEAL = {
   title: "Сделка №1042",
@@ -42,12 +40,10 @@ export default function DrawerHeaderActionsExample() {
           </Drawer.Actions>
         </Drawer.Header>
         <Drawer.Body>
-          <dl className={styles.details}>
-            <dt>Сумма</dt>
-            <dd>{DEAL.amount}</dd>
-            <dt>Ответственный</dt>
-            <dd>{DEAL.owner}</dd>
-          </dl>
+          <DescriptionList.Root>
+            <DescriptionList.Item label="Сумма">{DEAL.amount}</DescriptionList.Item>
+            <DescriptionList.Item label="Ответственный">{DEAL.owner}</DescriptionList.Item>
+          </DescriptionList.Root>
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Close>

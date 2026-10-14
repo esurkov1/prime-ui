@@ -163,7 +163,7 @@ No DOM. Holds the color (React Aria `ColorPicker`) and the value format for ever
 | `…rest` | `Omit<ButtonRootProps, "variant" \| "tone" \| "size" \| "aria-label">` | — | The other Button props. |
 
 ### ColorPresets.Root
-No DOM. A quick color from a fixed palette: a square trigger and a popover grid of presets (Popover overlay contract).
+A quick color from a fixed palette: a square trigger and a popover grid of presets. No DOM, except a field frame in a FieldList cell (the column heading as its label).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -315,13 +315,14 @@ There is no `disabled` on `ColorPicker.Root` — disable parts individually. Con
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A color field: a hex value and a swatch button that opens the picker panel — `ColorPicker.HexInput`, `ColorPicker.TriggerSwatch`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size of the hex field with a swatch button of the same tier — `size`. |
-| [states.tsx](examples/states.tsx) | A disabled area and hue slider keep showing the color but take no input — `disabled`. |
+| [states.tsx](examples/states.tsx) | A disabled area, hue slider and preset trigger keep showing the color but take no input — `disabled`. |
 | [validation.tsx](examples/validation.tsx) | A button color checked live: a too light color shakes in an error that leaves once the color is darker; a hint under the other field, invalid text reverts on blur — `hint`, `error`. |
 | [panel.tsx](examples/panel.tsx) | The full raised panel and its part order: format, area, hue and alpha sliders, channels, brand swatches — `ColorPicker.Panel`, `surface`, `ColorPicker.Swatches`. |
 | [formats.tsx](examples/formats.tsx) | The channel strip in each value format; three pickers edit one color — `defaultFormat`, `ColorPicker.ChannelStrip`. |
-| [presets.tsx](examples/presets.tsx) | A quick color from the palette: a square trigger next to a field and a Button trigger; «no color» allowed — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`. |
+| [presets.tsx](examples/presets.tsx) | A quick color from the palette: a square trigger with «no color» and a Button trigger whose grid of four columns stays open after a pick — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`, `columns`, `closeOnSelect`. |
 | [presets-sizes.tsx](examples/presets-sizes.tsx) | The preset trigger in every size, a square of the control height next to an input of the same tier — `ColorPresets`, `size`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the color: brand swatches and the hex field edit it, a button resets it — `value`, `onValueChange`. |
+| [controlled-open.tsx](examples/controlled-open.tsx) | The parent opens the preset palette from its own button and keeps the chosen color — `open`, `onOpenChange`, `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Theme settings: the color goes with the form, a too light color shakes in an error on save that leaves once the color changes — `value`, `error`. |
 
 ## Mistakes

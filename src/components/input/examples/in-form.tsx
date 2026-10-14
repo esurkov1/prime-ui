@@ -1,5 +1,5 @@
 /** Company details form: required fields checked on submit, each error leaves as its field is fixed and a saved form turns the button green; neighbours keep their bottoms aligned — `required`, `error`, `reserveSupportRow`. */
-import { Button, Input, Typography } from "prime-ui-kit";
+import { Button, Input } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -32,14 +32,6 @@ export default function InputInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <div className={styles.formHeader}>
-        <Typography as="h3" variant="title-m">
-          Реквизиты компании
-        </Typography>
-        <Typography as="p" variant="body-s" tone="secondary">
-          Используются в счетах и закрывающих документах.
-        </Typography>
-      </div>
       <div className={styles.formFields}>
         <div className={styles.formWide}>
           <Input.Root label="Название организации" required error={errors.name}>

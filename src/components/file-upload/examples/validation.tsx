@@ -6,6 +6,9 @@ import styles from "./examples.module.css";
 
 const MAX_SIZE = 20 * 1024 * 1024;
 
+/** The zone names the formats the check takes. */
+const ZONE_LABELS = { description: "PDF до 20 МБ" };
+
 /** A picked file as a file of the set. */
 const toFile = (file: File): FileUploadFile => ({
   id: `${file.name}-${file.size}-${file.lastModified}`,
@@ -30,13 +33,19 @@ export default function FileUploadValidationExample() {
       <FileUpload.Root
         label="Скан договора"
         required
-        hint="PDF до 20 МБ, все страницы"
+        hint="Все страницы, с подписями обеих сторон"
+        labels={ZONE_LABELS}
         error={scanError(scan)}
         value={scan}
         onValueChange={setScan}
         onFilesChange={(files) => setScan(files.map(toFile))}
       />
-      <FileUpload.Root label="Доверенность" optional hint="Если подписывает не директор" />
+      <FileUpload.Root
+        label="Доверенность"
+        optional
+        hint="Если подписывает не директор"
+        labels={ZONE_LABELS}
+      />
     </div>
   );
 }

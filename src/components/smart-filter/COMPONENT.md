@@ -213,7 +213,7 @@ same height and type.
 | [overview.tsx](examples/overview.tsx) | Filters above a request list: the filter button and the search, applied filters as tags, rows narrowed by the value and the text — `fields`, `value`, `search`, `matchesSmartFilter`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: the filter button, the search, the tags and the panel follow one tier — `size`. |
 | [many-values.tsx](examples/many-values.tsx) | An open set of twenty services, degraded ones marked with an icon, collapsed after eight; typing narrows the panel and marks the match in accent — `finite`, `icon`, `collapsedLimit`. |
-| [ranges.tsx](examples/ranges.tsx) | Deals narrowed by an amount from–to and a period from the calendar; each range is one readable chip — `kind`, `formatValue`, `matchesSmartFilter`. |
+| [ranges.tsx](examples/ranges.tsx) | Deals narrowed by an amount from–to and a period from the calendar; each range is one readable chip, and the bounds go to the server as from / to parameters — `kind`, `formatValue`, `matchesSmartFilter`, `isSmartFilterRange`. |
 | [single-value.tsx](examples/single-value.tsx) | For an API that takes one value per field: the filter button without a search, a press picks only that value and nothing can be hidden — `searchable`, `multiple`. |
 | [option-groups.tsx](examples/option-groups.tsx) | Values of different kinds in one field: owner types and people under their own headings — `options`, `group`. |
 | [controlled.tsx](examples/controlled.tsx) | A saved view sets the value from outside; the selection is read back as the list to ask the server for — `value`, `onValueChange`, `resolveSmartFilterValues`. |

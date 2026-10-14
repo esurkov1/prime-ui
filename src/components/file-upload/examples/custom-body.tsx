@@ -1,4 +1,4 @@
-/** A custom body: a muted title with a browse link and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`. */
+/** A custom body: a muted title with a browse link and the formats line and source buttons instead of the built-in one — `FileUpload.Body`, `FileUpload.Title`, `FileUpload.Description`. */
 import { Button, FileUpload, Icon, LinkButton } from "prime-ui-kit";
 import * as React from "react";
 
@@ -23,6 +23,7 @@ export default function FileUploadCustomBodyExample() {
               </button>
             </LinkButton>
           </FileUpload.Title>
+          <FileUpload.Description>PDF, JPG или PNG до 20 МБ</FileUpload.Description>
           <div className={styles.sources}>
             <Button.Root variant="soft" tone="neutral" size="s" onClick={openPicker}>
               <Button.Icon>

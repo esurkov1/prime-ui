@@ -54,7 +54,7 @@ export const page: ComponentPageConfig = {
       scenario: "reference",
       title: "Ориентир",
       description:
-        "Конверсия оформления заказа против плана: пунктир ориентира, шкала от нуля и изменение за весь период — `reference`, `min`, `change`.",
+        "Конверсия оформления заказа против плана: пунктир ориентира, шкала от нуля до 5% и изменение за весь период — `reference`, `min`, `max`, `change`.",
     },
     {
       scenario: "gaps",

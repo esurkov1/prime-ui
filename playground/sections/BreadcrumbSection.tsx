@@ -41,7 +41,7 @@ export const page: ComponentPageConfig = {
       scenario: "ellipsis",
       title: "Пропущенные уровни",
       description:
-        "Намеренно пропущенные уровни как «…» со скрытым текстом для скринридеров — `Breadcrumb.Ellipsis`.",
+        "Намеренно пропущенные уровни как «…», скрытый текст которого называет их скринридеру — `Breadcrumb.Ellipsis`, `labels`.",
     },
   ],
   api,

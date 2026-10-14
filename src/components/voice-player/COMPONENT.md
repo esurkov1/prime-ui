@@ -172,11 +172,11 @@ One look. Colors are semantic roles only (`accent-default`, `accent-fg`, `fill-s
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A client's voice message to support, ready to play — `src`, `waveform`, `duration`. |
 | [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop: the transfer is drawn on the play disk itself — in flight with the cross and the ring, failed with the retry, not fetched with the download arrow — `unplayed`, `transfer`, `transferProgress`, `disabled`. |
-| [call-recording.tsx](examples/call-recording.tsx) | A sales call recording on a deal card: the player takes the card's width — `className`. |
+| [call-recording.tsx](examples/call-recording.tsx) | A sales call recording on a deal card: the telephony stores no levels, so the waveform is read from the audio itself and the calm flat row fills in once it is ready; the player takes the card's width — `getWaveform`, `waveform`, `className`. |
 | [in-message.tsx](examples/in-message.tsx) | Voice messages in a support chat: the player sits on the bubble fill and the bubble's time stands in its corner — `Message.Root`, `time`, `status`. |
 | [transcript.tsx](examples/transcript.tsx) | Voice messages with a transcript: one known, one asked for on the first open — `transcript`, `onTranscribe`. |
 | [transfer.tsx](examples/transfer.tsx) | One look for a recording on its way in either direction: the client's voice message waits to be fetched and then arrives, the reply is being sent — the play disk itself carries the cross and the ring of the share, a dropped connection offers a retry, and the play glyph comes back once it is through — `transfer`, `transferProgress`, `transferDirection`, `onCancel`, `onRetry`, `onDownload`. |
-| [controlled.tsx](examples/controlled.tsx) | The parent knows what plays, marks the message as listened on the first play and keeps the speed — `playing`, `onPlayingChange`, `unplayed`, `rate`, `onRateChange`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent knows what plays, marks the message as listened on the first play and as heard to the end when it ends, keeps the speed and keeps the transcript open — `playing`, `onPlayingChange`, `unplayed`, `onEnded`, `rate`, `onRateChange`, `transcriptExpanded`, `onTranscriptExpandedChange`. |
 
 ## Mistakes
 - A hand-made `<audio controls>` in a bubble → use `VoicePlayer`: it matches the bubble's colors and keeps room for the time.

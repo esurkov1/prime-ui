@@ -19,7 +19,7 @@ export default function ModalDismissExample() {
       open={open}
       onOpenChange={setOpen}
       closeOnOutsideClick={false}
-      closeOnEscape={!deleting}
+      closeOnEscape={false}
     >
       <Modal.Trigger>
         <Button.Root variant="outline" tone="danger">
@@ -27,7 +27,9 @@ export default function ModalDismissExample() {
         </Button.Root>
       </Modal.Trigger>
       <Modal.Content size="s">
-        <Modal.Header showClose={!deleting}>
+        {/* While the request runs, the guard keeps «Отмена» in place, disabled. */}
+        <Modal.Guard busy={deleting} />
+        <Modal.Header showClose={false}>
           <Modal.Icon tone="danger">
             <Icon name="action.delete" />
           </Modal.Icon>
@@ -38,7 +40,7 @@ export default function ModalDismissExample() {
         </Modal.Header>
         <Modal.Footer>
           <Modal.Close>
-            <Button.Root variant="outline" tone="neutral" disabled={deleting}>
+            <Button.Root variant="outline" tone="neutral">
               Отмена
             </Button.Root>
           </Modal.Close>

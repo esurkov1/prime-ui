@@ -10,18 +10,11 @@
   width: min(100%, var(--prime-modal-width-m));
 }
 
-/* applied-filters.tsx: a filter panel above a list. */
+/* applied-filters.tsx, server-tags.tsx: a row of badges above a list. */
 .filters {
   display: grid;
   gap: var(--prime-space-3);
   width: min(100%, var(--prime-modal-width-s));
-}
-
-.filtersHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
 }
 
 .badges {

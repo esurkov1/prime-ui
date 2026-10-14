@@ -8,23 +8,9 @@ const INITIAL = ["Москва", "Санкт-Петербург", "Есть в �
 
 export default function BadgeAppliedFiltersExample() {
   const [filters, setFilters] = React.useState(INITIAL);
-  const titleId = React.useId();
 
   return (
-    <section className={styles.filters} aria-labelledby={titleId}>
-      <div className={styles.filtersHeader}>
-        <Typography as="h3" variant="title-s" id={titleId}>
-          Фильтры
-        </Typography>
-        <Button.Root
-          variant="ghost"
-          tone="neutral"
-          size="s"
-          onClick={() => setFilters(filters.length > 0 ? [] : INITIAL)}
-        >
-          {filters.length > 0 ? "Сбросить все" : "Вернуть"}
-        </Button.Root>
-      </div>
+    <div className={styles.filters}>
       {filters.length > 0 ? (
         <div className={styles.badges}>
           {filters.map((label) => (
@@ -36,12 +22,20 @@ export default function BadgeAppliedFiltersExample() {
               {label}
             </Badge.Root>
           ))}
+          <Button.Root variant="ghost" tone="neutral" size="s" onClick={() => setFilters([])}>
+            Сбросить все
+          </Button.Root>
         </div>
       ) : (
-        <Typography variant="body-s" tone="muted">
-          Фильтры не выбраны — показаны все товары.
-        </Typography>
+        <div className={styles.badges}>
+          <Typography variant="body-s" tone="muted">
+            Фильтры не выбраны — показаны все товары.
+          </Typography>
+          <Button.Root variant="ghost" tone="neutral" size="s" onClick={() => setFilters(INITIAL)}>
+            Вернуть
+          </Button.Root>
+        </div>
       )}
-    </section>
+    </div>
   );
 }

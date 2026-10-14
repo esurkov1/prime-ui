@@ -165,7 +165,7 @@ No `labels`.
 | [variants.tsx](examples/variants.tsx) | Dot hues for categories at reduced emphasis, and status tones on items, values and gaps at full emphasis — `color`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier scales text, dot and row rhythm, rows 40 to 76 px — `size`. |
 | [structure.tsx](examples/structure.tsx) | A service history with intervals between events, a caption on the right of a gap and a second value line — `Timeline.Gap`, `Timeline.GapMeta`, `Timeline.ValueMeta`. |
-| [links.tsx](examples/links.tsx) | Rows that open an operation page become links, one Tab stop each with a focus ring — `href`. |
+| [links.tsx](examples/links.tsx) | Rows that open something: an operation page by a link or by your router link through the slot, a receipt in place by a button; one Tab stop each with a focus ring — `href`, `asChild`, `onClick`. |
 | [narrow.tsx](examples/narrow.tsx) | At 375 px the title wraps and the amount stays right; below 20rem of its own width the amount moves under the meta line. |
 
 ## Mistakes

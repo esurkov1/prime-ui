@@ -155,10 +155,10 @@ One look. The circle is the video; the play disk and the pills stand on the medi
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A foreman's round video report: its still first frame with the play disk and the duration, played with sound on a press — `src`, `duration`. |
 | [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop: the transfer is drawn on the play disk itself — in flight with the cross and the ring, failed with the retry, not fetched with the download arrow — `unplayed`, `transfer`, `transferProgress`, `disabled`. |
-| [in-message.tsx](examples/in-message.tsx) | Round video messages in a field crew chat: the circle is the message itself, the time stands on its pill and the reply follows as text — `Message.Root`, `time`, `status`. |
+| [in-message.tsx](examples/in-message.tsx) | Round video messages in a field crew chat: the circle is the message itself, the time stands on its pill, the reply follows as text and the answer circle shows the cover its server made — `Message.Root`, `time`, `status`, `poster`. |
 | [transcript.tsx](examples/transcript.tsx) | Round video messages with a transcript: the button stands at the circle's top end like a voice message's, one text is known and one is asked for on the first open — `transcript`, `onTranscribe`. |
 | [transfer.tsx](examples/transfer.tsx) | One look for a round video on its way in either direction: the foreman's report waits to be fetched and then arrives, the engineer's answer is being sent — the disk in the middle with the ring of the share, the cross cancels, a dropped connection offers a retry, the circle plays once it is through — `transfer`, `transferProgress`, `transferDirection`, `onCancel`, `onRetry`, `onDownload`. |
-| [controlled.tsx](examples/controlled.tsx) | The parent knows what plays and marks the report as watched on the first play — `playing`, `onPlayingChange`, `unplayed`. |
+| [controlled.tsx](examples/controlled.tsx) | The parent knows what plays, marks the report as watched on the first play and as seen to the end when it ends, and keeps the transcript open — `playing`, `onPlayingChange`, `unplayed`, `onEnded`, `transcriptExpanded`, `onTranscriptExpandedChange`. |
 
 ## Mistakes
 - A `<video>` cropped round by hand in a bubble → use `VideoNote`: it plays one sound at a time, draws the transfer on its disk and keeps the meta on its pill.

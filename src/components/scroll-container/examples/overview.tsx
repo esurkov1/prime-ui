@@ -8,9 +8,9 @@ const EVENTS = Array.from({ length: 16 }, (_, index) => `Заказ № ${1040 +
 export default function ScrollContainerOverviewExample() {
   return (
     <Card.Root role="region" className={styles.card} aria-label="Лента событий">
-      <Typography as="h3" variant="title-s" className={styles.cardTitle}>
-        Лента событий
-      </Typography>
+      <Card.Header>
+        <Card.Title>Лента событий</Card.Title>
+      </Card.Header>
       <ScrollContainer>
         <ul className={styles.list}>
           {EVENTS.map((event) => (

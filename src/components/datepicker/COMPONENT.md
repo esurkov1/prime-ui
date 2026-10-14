@@ -139,7 +139,7 @@ Shared by `Datepicker.Root` and `Datepicker.Panel`.
 | State | Driven by | DOM |
 |---|---|---|
 | empty | no value | `data-empty="true"`, `labels.placeholder` (or `placeholder`) in placeholder color |
-| open | click, `open` | `data-state="open"`, `field-bg-focus` fill, the chevron turns |
+| open | click, `open` | `data-state="open"`, `field-bg-hover` fill, the chevron turns |
 | focus-visible | keyboard | inset focus ring; none with `focusRing={false}` (`data-focus-ring="false"`) |
 | invalid | `invalid`, `error` | `data-invalid`, `aria-invalid`, inset `danger-border` ring; the control shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled`, `data-disabled`, `field-bg-disabled`, cannot open |
@@ -147,7 +147,7 @@ Shared by `Datepicker.Root` and `Datepicker.Panel`.
 | selected / band | value | day `aria-pressed`, `data-edge`; cell `data-band="selected" \| "preview"`, `data-band-start` / `-end` |
 | day disabled | `isDayDisabled`, `disableFuture` | native `disabled`, muted |
 
-Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` · `stacked`). The popover follows the overlay contract: an outside press or Escape closes it, focus is trapped while open, the wheel over the panel does not scroll the page. The panel of `Datepicker.Root` mounts only while the popover is open, so every opening starts from the current value; nothing is rendered for it while closed.
+Panel DOM: `data-size`, `data-embedded`, `data-compact`, `data-layout` (`aside` · `stacked`). The footer row carries `data-time` with `withTime`; a footer field never shrinks below its whole date and time — the fields wrap above the actions, and in a footer narrower than 22rem with time they stand one under the other. The popover follows the overlay contract: an outside press or Escape closes it, focus is trapped while open, the wheel over the panel does not scroll the page. The panel of `Datepicker.Root` mounts only while the popover is open, so every opening starts from the current value; nothing is rendered for it while closed.
 
 Committing: without `footer` a picked day (or the second day of a range) applies at once and closes the popover; with `footer` the pick stays a draft until «Применить», and «Сбросить» sets `resetValue` (else empty) and closes. A preset applies its period at once, with or without `footer`. With `name`, hidden inputs submit `yyyy-MM-dd` (`yyyy-MM-ddTHH:mm` with `withTime`); a range submits `from`, then `to`.
 
@@ -205,11 +205,12 @@ Committing: without `footer` a picked day (or the second day of a range) applies
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A shipping date field: a click opens one month, a picked day applies at once — `mode`, `label`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier: the field is 28 to 48 px high, the day cell of the panel 24 to 40 px — `size`. |
-| [states.tsx](examples/states.tsx) | An empty field with the default placeholder, a filled one and a disabled one — `disabled`. |
+| [states.tsx](examples/states.tsx) | An empty field with the default placeholder, a filled, a disabled and an invalid one, and one whose focus shows without the ring — `disabled`, `invalid`, `focusRing`. |
 | [validation.tsx](examples/validation.tsx) | A leave period checked live: the error shakes in, names the broken rule and leaves once the period fits; an optional return date — `required`, `hint`, `error`, `optional`. |
-| [range-presets.tsx](examples/range-presets.tsx) | A report period: presets aside, two months, a step prompt, time fields with Reset / Apply, no future days — `presets`, `months`, `prompt`, `footer`, `withTime`, `disableFuture`. |
+| [range-presets.tsx](examples/range-presets.tsx) | A report period: presets aside, two months, a step prompt, time fields with Reset / Apply, no future days; Reset returns the current month and the panel lines up with the field's end — `presets`, `months`, `prompt`, `footer`, `withTime`, `disableFuture`, `resetValue`, `align`. |
 | [inline-panel.tsx](examples/inline-panel.tsx) | A booking calendar embedded in a card: the card is its container, two months when the parent has room, the range applies at once — `Datepicker.Panel`, `months`, `prompt`. |
 | [yearless.tsx](examples/yearless.tsx) | An annual price change date: day and month without a year, a value prefix and taken days disabled — `yearless`, `valuePrefix`, `isDayDisabled`. |
+| [locale.tsx](examples/locale.tsx) | A delivery window on a partner portal in English: month and weekday names from the date-fns locale, the week from Sunday and the system texts translated — `locale`, `weekStartsOn`, `labels`. |
 | [controlled.tsx](examples/controlled.tsx) | A report filter owns the period: quick buttons set it from outside, the field shows it — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the panel: a reminder button opens the calendar from code, a picked day closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A leave request form: submit reads the period from the form data and checks it, the error shakes in and leaves once the period is fixed; an optional return date — `name`, `required`, `error`, `optional`. |

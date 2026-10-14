@@ -13,7 +13,7 @@ export default function DescriptionListStructureExample() {
         <DescriptionList.Item label="Договор">
           <LinkButton href="#contract-118">Договор № 118 от 12 марта</LinkButton>
         </DescriptionList.Item>
-        <DescriptionList.Item label="Email">
+        <DescriptionList.Item label="Почта">
           finance@severny-veter.ru
           <DescriptionList.ItemAction
             label="Написать"

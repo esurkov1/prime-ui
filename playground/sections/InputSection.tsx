@@ -22,7 +22,8 @@ export const page: ComponentPageConfig = {
     { slot: "sizes", description: "Все ярусы; подпись и подсказка берут ярус поля — `size`." },
     {
       slot: "states",
-      description: "Обычное поле рядом с неактивным и только для чтения — `disabled`, `readOnly`.",
+      description:
+        "Обычное поле рядом с неактивным, только для чтения и ошибочным без текста — `disabled`, `readOnly`, `invalid`.",
     },
     {
       slot: "validation",
@@ -48,7 +49,7 @@ export const page: ComponentPageConfig = {
       scenario: "password-strength",
       title: "Пароль",
       description:
-        "Новый пароль с кнопкой показа и шкалой, которая заполняется по шагам и называет уровень рядом с подсказкой — `Input.RevealButton`, `strength`.",
+        "Новый пароль с кнопкой показа и шкалой, которая заполняется по шагам и называет уровень рядом с подсказкой, и пароль сервисного аккаунта по собственному правилу компании — `Input.RevealButton`, `strength`, `getStrength`.",
     },
     {
       scenario: "edge-actions",

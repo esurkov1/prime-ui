@@ -188,7 +188,7 @@ Motion: it opens out of the thumbnail it was opened from — the picture grows f
 | [video.tsx](examples/video.tsx) | A video among the photos of a site visit starts once its page settles; its bar has play, time, seek, the sound button and its level, and it has no zoom — `type`, `autoPlay`. |
 | [actions.tsx](examples/actions.tsx) | Photos of a listing with actions for the one on screen: download it or make it the cover — `renderActions`. |
 | [origin.tsx](examples/origin.tsx) | Every photo flies back into its own thumbnail, also after paging, and the last one leads to the first — `getOrigin`, `loop`. |
-| [dismiss.tsx](examples/dismiss.tsx) | Contract scans read closely: a stray swipe or click past the page never closes them, only Escape and the close button — `closeOnOutsideClick`. |
+| [dismiss.tsx](examples/dismiss.tsx) | Contract scans read closely: a stray swipe or click past the page never closes them, only Escape and the close button, and the small print zooms up to eight times — `closeOnOutsideClick`, `maxZoom`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the page: a finding opens its photo, and paging in the viewer moves the mark along the list — `index`, `onIndexChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent opens a single scan from a link in the text: no counter and no arrows for one item — `open`, `onOpenChange`. |
 

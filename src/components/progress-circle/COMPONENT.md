@@ -171,7 +171,7 @@ No keyboard interaction.
 | [states.tsx](examples/states.tsx) | Loading is a Skeleton ring of the same diameter and stroke; the number in the centre waits for the data — `loading`. |
 | [inner-content.tsx](examples/inner-content.tsx) | The center holds a percentage, a count on its own scale or an icon — `children`, `max`. |
 | [under-way.tsx](examples/under-way.tsx) | An import whose share is not known yet turns a quarter arc, then fills and swaps its icon; a sync turns while its share grows — `value`, `spin`, `children`. |
-| [segments.tsx](examples/segments.tsx) | Parts of a whole clockwise from the top: a closed ring, free capacity up to `max`, separate arcs and an empty list — `segments`, `segmentGap`. |
+| [segments.tsx](examples/segments.tsx) | Parts of a whole clockwise from the top: a closed ring, free capacity up to `max`, separate arcs and an empty list with its own spoken text — `segments`, `segmentGap`, `labels`. |
 | [legend.tsx](examples/legend.tsx) | A ring of category shares with a legend beside it, in the categories' chart colors — `color`, `legend`, `formatValue`. |
 
 ## Mistakes

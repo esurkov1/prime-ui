@@ -1,17 +1,27 @@
-/** A sales call recording on a deal card: the player takes the card's width — `className`. */
-import { Card, Typography, VoicePlayer } from "prime-ui-kit";
+/** A sales call recording on a deal card: the telephony stores no levels, so the waveform is read from the audio itself and the calm flat row fills in once it is ready; the player takes the card's width — `getWaveform`, `waveform`, `className`. */
+import { Card, getWaveform, Typography, VoicePlayer } from "prime-ui-kit";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
 const RECORDING_URL = "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3";
 
-const WAVEFORM = [
-  0.2, 0.34, 0.5, 0.42, 0.6, 0.78, 0.66, 0.4, 0.3, 0.52, 0.7, 0.86, 0.74, 0.48, 0.36, 0.58, 0.8,
-  0.62, 0.38, 0.26, 0.44, 0.68, 0.9, 0.72, 0.5, 0.32, 0.46, 0.64, 0.54, 0.3, 0.22, 0.4, 0.6, 0.76,
-  0.56, 0.34,
-];
-
 export default function VoicePlayerCallRecordingExample() {
+  const [waveform, setWaveform] = React.useState<number[]>();
+
+  React.useEffect(() => {
+    let current = true;
+    getWaveform(RECORDING_URL)
+      .then((levels) => {
+        if (current) setWaveform([...levels]);
+      })
+      // Without levels the player keeps its flat row: the recording still plays.
+      .catch(() => {});
+    return () => {
+      current = false;
+    };
+  }, []);
+
   return (
     <Card.Root className={styles.card}>
       <Card.Body className={styles.body}>
@@ -24,7 +34,7 @@ export default function VoicePlayerCallRecordingExample() {
         <VoicePlayer
           className={styles.player}
           src={RECORDING_URL}
-          waveform={WAVEFORM}
+          waveform={waveform}
           duration={754}
           aria-label="Запись звонка"
         />

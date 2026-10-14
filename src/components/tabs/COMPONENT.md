@@ -249,7 +249,7 @@ Other attributes: Root `data-orientation`, `data-size`, `data-tone`, `data-full-
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Sections of one screen; the active tab rises into the strip and glides to the next one — `defaultValue`. |
 | [variants.tsx](examples/variants.tsx) | The active tab in primary text with an accent icon, or all in accent — `tone`. |
-| [sizes.tsx](examples/sizes.tsx) | Every size tier: text, icon, folder radius and spacing grow together — `size`. |
+| [sizes.tsx](examples/sizes.tsx) | Every size tier: text, icon, folder radius and spacing grow together; tabs sized to their content — `size`, `fullWidth`. |
 | [states.tsx](examples/states.tsx) | A disabled tab that clicks and arrow keys skip — `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A muted icon before the label and a hairline before the service section — `Tabs.Icon`, `Tabs.Label`, `Tabs.Separator`. |
 | [orientation.tsx](examples/orientation.tsx) | Account settings with a side list of sections: the active section reaches out of the panel, and below 600px the list moves above it — `orientation`. |

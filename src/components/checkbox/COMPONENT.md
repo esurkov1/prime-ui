@@ -152,7 +152,7 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | A checkbox with its label; a click anywhere on the row toggles it. |
 | [variants.tsx](examples/variants.tsx) | The rounded square next to the circle, in three states — `shape`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size; the box and the text follow the control tier — `size`. |
-| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `checked`, `indeterminate`, `invalid`, `disabled`. |
+| [states.tsx](examples/states.tsx) | Every state side by side, each labelled by its prop — `checked`, `indeterminate`, `readOnly`, `invalid`, `disabled`. |
 | [without-label.tsx](examples/without-label.tsx) | Bare boxes in table rows, named by `aria-label` and submitted with `name` and `value`. |
 | [indicator.tsx](examples/indicator.tsx) | The box alone in a multi-select list: the option row carries `aria-selected`, the box only shows it — `Checkbox.Indicator`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the selection; «select all» turns indeterminate on a partial one — `checked`, `onCheckedChange`, `indeterminate`. |

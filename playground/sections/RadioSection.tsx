@@ -42,6 +42,11 @@ export const page: ComponentPageConfig = {
       description:
         "Выбранным тарифом владеет родитель и показывает его в подсказке — `value`, `onValueChange`.",
     },
+    {
+      slot: "in-form",
+      description:
+        "Выбор в форме заказа: обязательная группа показывает ошибку после отправки без выбора, необязательная помечена — `name`, `required`, `optional`, `error`.",
+    },
   ],
   api,
   accessibility: {

@@ -160,6 +160,7 @@ No `labels`.
 | [auto-scroll.tsx](examples/auto-scroll.tsx) | A task dragged to the top or bottom edge of a scrolling list scrolls it, faster the closer it comes — `ScrollContainer`, `Dnd.Sortable`. |
 | [overscroll.tsx](examples/overscroll.tsx) | At the end of the list the scroll passes on to the page instead of stopping — `overscrollBehavior`. |
 | [chat.tsx](examples/chat.tsx) | A support chat pinned to its last message: a sent message keeps it at the end, scrolling up loads older ones without moving what is on screen — `anchor`, `onReachStart`. |
+| [load-more.tsx](examples/load-more.tsx) | An order log that loads the next page as the reader nears its end, with loading lines in the rows' place — `onReachEnd`. |
 
 ## Mistakes
 - `overflow: auto` on a plain `div` inside a flex column that never shrinks → use ScrollContainer (it sets `min-height: 0`).

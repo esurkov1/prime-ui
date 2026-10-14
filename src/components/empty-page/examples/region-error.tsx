@@ -1,4 +1,4 @@
-/** A data region that failed to load: the error state takes the region, the retry shows its loading until the data cross-fades in — `tone`, `layout`, `EmptyPage.RetryButton`, `onRetry`. */
+/** A data region that failed to load: the error state takes the region, the retry shows its loading until the data cross-fades in; its text comes from labels — `tone`, `layout`, `EmptyPage.RetryButton`, `onRetry`, `labels`. */
 import { Button, Card, Crossfade, EmptyPage, Icon, Skeleton, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -53,7 +53,13 @@ export default function EmptyPageRegionErrorExample() {
           {state === "loading" ? (
             <Skeleton lines={3} />
           ) : state === "error" ? (
-            <EmptyPage.Root layout="fill" size="s" tone="danger" aria-labelledby="invoices-error">
+            <EmptyPage.Root
+              layout="fill"
+              size="s"
+              tone="danger"
+              labels={{ retry: "Загрузить снова" }}
+              aria-labelledby="invoices-error"
+            >
               <EmptyPage.Icon>
                 <Icon name="status.offline" />
               </EmptyPage.Icon>

@@ -295,7 +295,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A labelled field with a placeholder; picking an option closes the list and shows its label — `label`, `placeholder`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; the label, the list rows and the hint take the tier of the field — `size`. |
-| [states.tsx](examples/states.tsx) | A default field next to a disabled, a loading, an invalid one and a list with nothing in it — `disabled`, `loading`, `invalid`, `labels`. |
+| [states.tsx](examples/states.tsx) | A default field next to a disabled, a loading, an invalid one, a list with nothing in it and a field whose focus shows without the ring — `disabled`, `loading`, `invalid`, `labels`, `focusRing`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: unassigning the owner shakes the field and drops the error in, picking someone clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A leading icon in the trigger and an icon before every option label — `Select.TriggerIcon`, `Select.ItemIcon`. |
 | [multiple.tsx](examples/multiple.tsx) | Several values: checkboxes in the list, the list stays open on a pick, labels joined in the trigger — `multiple`. |

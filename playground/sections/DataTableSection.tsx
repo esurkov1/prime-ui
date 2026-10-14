@@ -31,7 +31,7 @@ export const page: ComponentPageConfig = {
       scenario: "numeric",
       title: "Числа и длинный текст",
       description:
-        "Отчёт по складу: числа по правому краю табличными цифрами, длинное название в одну строку с подсказкой — `numeric`, `truncate`, `maxWidth`.",
+        "Отчёт по складу: числа по правому краю табличными цифрами, длинное название в одну строку с подсказкой, форматированные ячейки сортируются по исходному числу, а артикулы — в естественном порядке — `numeric`, `truncate`, `maxWidth`, `sortAccessor`, `sortComparator`.",
     },
     {
       scenario: "heatmap",
@@ -79,7 +79,7 @@ export const page: ComponentPageConfig = {
       scenario: "detail-panel",
       title: "Панель деталей",
       description:
-        "Детали заказа в строке на всю ширину под раскрытым заказом, по краю первой колонки — `renderExpanded`, `defaultExpanded`.",
+        "Детали заказа в строке на всю ширину под раскрытым заказом, по краю первой колонки; у отменённого заказа показывать нечего, и переключателя нет — `renderExpanded`, `defaultExpanded`, `isRowExpandable`.",
     },
     {
       scenario: "sticky",
@@ -153,7 +153,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "screen",
       description:
-        "Страница списка: одно главное действие в шапке, фильтры в панели таблицы, статусы, действия со строкой, страницы и пустой результат фильтра — `toolbar`, `empty`, `stickyFirstColumn`.",
+        "Страница списка: заголовок, строка с цифрами, поиск, фильтры и одно главное действие в шапке приложения, таблица счетов со статусами, действиями со строкой, страницами и пустым результатом фильтра — `empty`, `pageSize`, `stickyFirstColumn`.",
     },
   ],
   api,

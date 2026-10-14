@@ -1,4 +1,4 @@
-/** A record editor: a plan's name, its specs and prices in one form saved from the page header — repeating records as FieldList rows with the headings once, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. */
+/** A record editor as a document page, a long form whose title, description and save stand in the content header: a plan's name, its specs and prices in one form; repeating records as FieldList rows with the headings once, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. */
 import {
   Button,
   Card,

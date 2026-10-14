@@ -59,7 +59,7 @@ ExampleFrame               frame: toolbar + preview stage or code pane
 | `stack-narrow` | column, children capped at `7 × --prime-space-16` and centered | forms and narrow columns | |
 | `full` | column, gap 16, every child takes the whole stage width | page structure: app shells, page regions | |
 | `row` | centered wrapping row, gap 12, extra vertical padding | a few buttons or controls side by side | |
-| `matrix` | centered grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns (up to 12) line up across rows, are never narrower than their content and grow to 320 / 160 / 128px for 1 / 2 / 3+ columns, so width-less specimens (Slider, `width: 100%` blocks) get a real cell; scrolls when wider than the stage | variant, size and state matrices | |
+| `matrix` | centered grid of labelled cells: each direct child is a row, its children are cells (specimen above its caption); columns (up to 12) line up across rows, are never narrower than their content and grow to 320 / 160 / 128px for 1 / 2 / 3+ columns, so width-less specimens (Slider, `width: 100%` blocks) get a real cell; centered vertically too; when the grid is wider than the stage (a phone frame) each row wraps its cells, centered (`data-matrix-wrap` on the stage) | variant, size and state matrices | |
 
 ### viewport
 | Value | Looks like | Use when | Default |
@@ -87,7 +87,7 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 
 ## Layout & spacing
 - The frame is `max-width: 100%`; long code lines scroll inside the code pane instead of widening the page. The code pane is at most `min(512px, 70vh)` high and scrolls both ways.
-- The stage is at least 160 high with `--prime-space-6` / `--prime-space-4` padding; content wider than it is clipped (`matrix` scrolls instead).
+- The stage is at least 160 high with `--prime-space-6` / `--prime-space-4` padding; content wider than it is clipped (`matrix` wraps its rows instead).
 - The toolbar wraps below 40rem of frame width; below 25rem the visible device labels are hidden (icons stay, each option keeps a screen-reader name).
 - The device width switches at once: `max-width` is layout, so it does not animate.
 - Stack frames one per demo block; spacing between blocks comes from the page.
@@ -128,6 +128,7 @@ Frame look: the chrome is a layer of the surface ladder (`data-depth`, one above
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A live example next to its source, with the pane, width, theme and copy controls — `code`, `previewLayout`. |
+| [initial-view.tsx](examples/initial-view.tsx) | A matrix frame that opens at phone width in the dark theme with no theme switch and counts code copies — `previewLayout`, `defaultViewport`, `defaultColorScheme`, `showThemeToggle`, `onCopy`. |
 | [controlled.tsx](examples/controlled.tsx) | Frames of one page share the preview width and theme: the parent owns both — `viewport`, `colorScheme`. |
 
 ## Mistakes

@@ -1,4 +1,4 @@
-/** A quick color from the palette: a square trigger next to a field and a Button trigger; «no color» allowed — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`. */
+/** A quick color from the palette: a square trigger with «no color» and a Button trigger whose grid of four columns stays open after a pick — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`, `columns`, `closeOnSelect`. */
 import { Button, COLOR_PRESETS, ColorPresets } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -19,7 +19,7 @@ export default function ColorPickerPresetsExample() {
         </ColorPresets.Trigger>
         <ColorPresets.Content />
       </ColorPresets.Root>
-      <ColorPresets.Root defaultValue="#22c55e">
+      <ColorPresets.Root presets={ONE_ROW} columns={4} closeOnSelect={false} defaultValue="#22c55e">
         <ColorPresets.Trigger>
           <Button.Root variant="soft" tone="neutral">
             <Button.Icon>

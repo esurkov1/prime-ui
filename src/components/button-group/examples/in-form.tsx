@@ -1,4 +1,4 @@
-/** A task form: the priority toggles are a labelled field checked on submit, and native submit and reset segments sit in one group — `label`, `required`, `error`, `type`. */
+/** A task form: the priority toggles are a labelled field checked on submit, an optional reminder, and native submit and reset segments in one group — `label`, `required`, `hint`, `error`, `optional`, `type`. */
 import { ButtonGroup, Input } from "prime-ui-kit";
 import * as React from "react";
 
@@ -10,8 +10,11 @@ const PRIORITIES = [
   { value: "high", label: "Высокий" },
 ];
 
+const REMINDERS = ["За час", "За день"];
+
 export default function ButtonGroupInFormExample() {
   const [priority, setPriority] = React.useState("");
+  const [reminder, setReminder] = React.useState("");
   const [error, setError] = React.useState<string>();
 
   return (
@@ -24,6 +27,7 @@ export default function ButtonGroupInFormExample() {
       }}
       onReset={() => {
         setPriority("");
+        setReminder("");
         setError(undefined);
       }}
     >
@@ -32,7 +36,12 @@ export default function ButtonGroupInFormExample() {
           <Input.Field name="title" defaultValue="Подготовить акт сверки для «Северного ветра»" />
         </Input.Wrapper>
       </Input.Root>
-      <ButtonGroup.Root label="Приоритет" required error={error}>
+      <ButtonGroup.Root
+        label="Приоритет"
+        required
+        hint="Высокий поднимает задачу в начало списка"
+        error={error}
+      >
         {PRIORITIES.map((option) => (
           <ButtonGroup.Item
             key={option.value}
@@ -43,6 +52,17 @@ export default function ButtonGroupInFormExample() {
             }}
           >
             {option.label}
+          </ButtonGroup.Item>
+        ))}
+      </ButtonGroup.Root>
+      <ButtonGroup.Root label="Напомнить" optional>
+        {REMINDERS.map((option) => (
+          <ButtonGroup.Item
+            key={option}
+            pressed={reminder === option}
+            onClick={() => setReminder(reminder === option ? "" : option)}
+          >
+            {option}
           </ButtonGroup.Item>
         ))}
       </ButtonGroup.Root>

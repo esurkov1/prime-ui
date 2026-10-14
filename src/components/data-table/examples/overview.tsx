@@ -34,6 +34,7 @@ const COLUMNS: DataTableColumn<Order>[] = [
     header: "Статус",
     accessor: "status",
     sortable: true,
+    sortAccessor: (row) => STATUS[row.status].label,
     cell: (row) => (
       <Badge.Root color={STATUS[row.status].color}>{STATUS[row.status].label}</Badge.Root>
     ),

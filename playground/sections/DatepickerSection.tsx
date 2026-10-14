@@ -31,7 +31,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Пустое поле с плейсхолдером по умолчанию, заполненное и отключённое — `disabled`.",
+        "Пустое поле с плейсхолдером по умолчанию, заполненное, отключённое и ошибочное, и поле, где фокус виден без кольца — `disabled`, `invalid`, `focusRing`.",
     },
     {
       slot: "validation",
@@ -42,7 +42,7 @@ export const page: ComponentPageConfig = {
       scenario: "range-presets",
       title: "Период с пресетами",
       description:
-        "Период отчёта: пресеты сбоку, два месяца, подсказка шага, время с «Сбросить» / «Применить», без будущих дней — `presets`, `months`, `prompt`, `footer`, `withTime`, `disableFuture`.",
+        "Период отчёта: пресеты сбоку, два месяца, подсказка шага, время с «Сбросить» / «Применить», без будущих дней; «Сбросить» возвращает текущий месяц, панель выровнена по концу поля — `presets`, `months`, `prompt`, `footer`, `withTime`, `disableFuture`, `resetValue`, `align`.",
     },
     {
       scenario: "inline-panel",
@@ -55,6 +55,12 @@ export const page: ComponentPageConfig = {
       title: "Ежегодная дата",
       description:
         "Ежегодное изменение цены: день и месяц без года, префикс значения и занятые дни отключены — `yearless`, `valuePrefix`, `isDayDisabled`.",
+    },
+    {
+      scenario: "locale",
+      title: "Другой язык",
+      description:
+        "Окно доставки на портале партнёра на английском: названия месяцев и дней из локали date-fns, неделя с воскресенья, системные тексты переведены — `locale`, `weekStartsOn`, `labels`.",
     },
     {
       slot: "controlled",

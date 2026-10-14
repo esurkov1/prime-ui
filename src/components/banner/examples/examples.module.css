@@ -8,17 +8,13 @@
   min-width: 0;
 }
 
-/* placement.tsx: a page frame above a card. */
+/* page-strip.tsx: the page strip above a card with an inset banner. */
 .sections {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-6);
   width: 100%;
   min-width: 0;
-}
-
-.pageBody {
-  padding: var(--prime-space-5) var(--prime-space-4) var(--prime-space-8);
 }
 
 /* narrow.tsx: a 320px column; the banner's container query moves actions under the text. */

@@ -144,11 +144,11 @@ Generic `FieldList<T>`; `ref` → `HTMLDivElement` (the field frame). An editabl
 | [locked.tsx](examples/locked.tsx) | Specs of a plan on one line each: an icon picker and a color swatch take compact columns, the first three specs are pinned with a lock and the rest reorder below them — `getLocked`, `width`, `reorderable`. |
 | [base-row.tsx](examples/base-row.tsx) | A plan price and its changes by month in one table: the base price is the first, pinned row, each change is a row with its month and its price, and the unit sits in the field, not in a heading — `getLocked`, `width`. |
 | [limits.tsx](examples/limits.tsx) | Recipients of invoice reminders, from one to three: the last row cannot be removed and the add button says why it is off once the list is full — `min`, `max`, `hint`. |
-| [errors.tsx](examples/errors.tsx) | Contacts of a client checked on save: a field's problem shows under that field in its row, a problem of the whole list under the list, and focus goes to the first wrong field — `error`. |
+| [errors.tsx](examples/errors.tsx) | Contacts of a client checked on save: a field's problem shows under that field in its row, a problem of the whole list under the list, and focus goes to the first wrong field; a `*` after a heading marks a required column — `error`, `required`. |
 | [states.tsx](examples/states.tsx) | The same list editable and disabled while the request saves it: fields, handles and buttons turn off together — `disabled`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the lines: it sums them under the list and puts the saved lines back on reset — `value`, `onValueChange`. |
 | [narrow.tsx](examples/narrow.tsx) | The invoice lines in a 320 px column: the headings give way, each row stacks its fields with their own labels and rows stand a group apart — `columns`. |
-| [screen.tsx](examples/screen.tsx) | A record editor: a plan's name, its specs and prices in one form saved from the page header — repeating records as FieldList rows with the headings once, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. |
+| [screen.tsx](examples/screen.tsx) | A record editor as a document page, a long form whose title, description and save stand in the content header: a plan's name, its specs and prices in one form; repeating records as FieldList rows with the headings once, a base price pinned above its changes, one value in three currencies in one row — `getLocked`, `compact`. |
 
 ## Mistakes
 - A `label` above every field of every row («Иконка», «Параметр», «Значение» four times) → a FieldList: the headings stand once, the fields take them as hidden labels.

@@ -1,4 +1,4 @@
-/** KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change and a reference line — `variant`, `Card.Delta`, `Card.Meta`. */
+/** KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change in every tone and a reference line — `variant`, `Card.Delta`, `tone`, `Card.Meta`. */
 import { Badge, Card, Icon } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -34,6 +34,20 @@ export default function CardVariantsExample() {
         <Card.Value>3,1%</Card.Value>
         <Card.Delta tone="danger">+0,6 п. п. за неделю</Card.Delta>
         <Card.Meta>Ушло 38 из 1 226 клиентов</Card.Meta>
+      </Card.Root>
+
+      <Card.Root variant="stat-trend">
+        <Card.Label>Первый ответ поддержки</Card.Label>
+        <Card.Value>3,4 ч</Card.Value>
+        <Card.Delta tone="warning">+40 мин — близко к SLA 4 ч</Card.Delta>
+        <Card.Meta>Открыто 62 обращения</Card.Meta>
+      </Card.Root>
+
+      <Card.Root variant="stat-trend">
+        <Card.Label>Средний чек</Card.Label>
+        <Card.Value>38 900 ₽</Card.Value>
+        <Card.Delta>без изменений</Card.Delta>
+        <Card.Meta>Оплачено 214 счетов</Card.Meta>
       </Card.Root>
     </div>
   );

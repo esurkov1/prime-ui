@@ -194,14 +194,14 @@ No `labels`.
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A company settings panel: a header, fields on the surface fill and buttons in the footer — `Card.Header`, `Card.Body`, `Card.Footer`. |
-| [variants.tsx](examples/variants.tsx) | KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change and a reference line — `variant`, `Card.Delta`, `Card.Meta`. |
+| [variants.tsx](examples/variants.tsx) | KPI templates: an icon tile with a value, a badge with a value in the header row, and a large value with its change in every tone and a reference line — `variant`, `Card.Delta`, `tone`, `Card.Meta`. |
 | [kpi-media.tsx](examples/kpi-media.tsx) | A KPI with a sparkline or a fill level in the bottom slot of `mini` — `Card.Media`. |
 | [panel-chart.tsx](examples/panel-chart.tsx) | A chart widget: a header with a short description and a period switch, and a Sparkline with the period total over its chart — `Card.Header`, `Card.Description`, `Card.Body`. |
 | [interactive.tsx](examples/interactive.tsx) | Whole cards as links to their reports: one tab stop each, a lift on hover, a press and the focus ring — `asChild`. |
 | [content-templates.tsx](examples/content-templates.tsx) | Content templates: a call to action, an events list and a campaign tile with a cover — `Card.Footer`, `Card.List`, `Card.Media`. |
 | [flat.tsx](examples/flat.tsx) | A flat tile without the raised shadow next to the default one, for dense grids — `flat`. |
 | [narrow.tsx](examples/narrow.tsx) | The card is a size container: the split template stacks its cells below 22rem and the trend value shrinks below 20rem — `variant`. |
-| [screen.tsx](examples/screen.tsx) | A dashboard: the period switch in the header, a KPI row that cross-fades to the new period, a revenue trend to scrub, invoiced against paid in a ChartFrame with a legend, panels with plan progress and the receivables split, and a short table with a link to the full list — `variant`. |
+| [screen.tsx](examples/screen.tsx) | A dashboard: the title, a line of data, the period switch and the report in the app header; one grid of KPI tiles that cross-fade to the new period, a revenue trend, invoiced against paid beside two panels, and the latest payments with a link to the list — `AppHeader.Tools`, `PageContent.Grid`. |
 
 ## Mistakes
 - A `<div>` with a border styled as a card → use `Card.Root`; depth comes from fill, not lines.

@@ -1,5 +1,5 @@
-/** Optional parts: an icon tile with a header-only notice, and a header with a footer but no body — `Modal.Icon`, `Modal.Body`, `Modal.Footer`. */
-import { Button, Icon, Modal } from "prime-ui-kit";
+/** Optional parts: an icon tile with a header-only notice, and a header with a status before the close button and a footer but no body — `Modal.Icon`, `Modal.Actions`, `Modal.Body`, `Modal.Footer`. */
+import { Badge, Button, Icon, Modal } from "prime-ui-kit";
 
 export default function ModalStructureExample() {
   return (
@@ -35,6 +35,9 @@ export default function ModalStructureExample() {
             <Modal.Description>
               Новые клиенты увидят тариф сразу после публикации.
             </Modal.Description>
+            <Modal.Actions>
+              <Badge.Root color="gray">Черновик</Badge.Root>
+            </Modal.Actions>
           </Modal.Header>
           <Modal.Footer>
             <Modal.Close>

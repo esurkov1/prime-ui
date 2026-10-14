@@ -177,7 +177,7 @@ No keyboard interaction.
 | [sizes.tsx](examples/sizes.tsx) | Every tier: the line grows from 4 to 8 px like the Slider track — `size`. |
 | [states.tsx](examples/states.tsx) | Loading takes the bar's own geometry, so the data lands without a jump — `loading`. |
 | [custom-max.tsx](examples/custom-max.tsx) | A scale of steps instead of percent: 3 of 5 profile steps — `max`. |
-| [segments.tsx](examples/segments.tsx) | Parts of a whole in one bar: joined or separate pills, free capacity up to `max` and an empty list — `segments`, `segmentGap`, `max`. |
+| [segments.tsx](examples/segments.tsx) | Parts of a whole in one bar: joined or separate pills, free capacity up to `max` and an empty list with its own spoken text — `segments`, `segmentGap`, `max`, `labels`. |
 | [legend.tsx](examples/legend.tsx) | Shares of categories in their chart colors with a legend of color · name · value · share — `color`, `legend`, `formatValue`. |
 | [ranking.tsx](examples/ranking.tsx) | Rankings as rows of label · value · share over a bar: top cities against the leader and a funnel against its first step — `layout`, `scale`. |
 | [steps.tsx](examples/steps.tsx) | The scale as whole cells that fill one after another: 2 of 5 onboarding steps, forward and back — `steps`, `max`. |

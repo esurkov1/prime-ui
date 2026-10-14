@@ -1,10 +1,10 @@
-/** Loading draws skeleton cards in the card geometry and cross-fades the cards in; an empty column keeps its drop area; a read-only board drags nothing — `loading`, `disabled`. */
-import { Button, Icon, Kanban, Switch } from "prime-ui-kit";
+/** Loading draws skeleton cards in the card geometry and cross-fades the cards in; an empty column keeps its drop area; a closed order stays in place while the rest move; a read-only board drags nothing — `loading`, `disabled`. */
+import { Badge, Button, Icon, Kanban, Switch } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
 
-type Order = { id: string; title: string; total: string };
+type Order = { id: string; title: string; total: string; closed?: boolean };
 
 const COLUMNS = [
   { id: "new", title: "Новые" },
@@ -12,13 +12,19 @@ const COLUMNS = [
   { id: "shipped", title: "Отгружены" },
 ];
 
+/** A closed order has signed documents: its card stays where it is. */
 const ORDERS: Order[] = [
   { id: "ORD-5531", title: "ООО «Север» · 12 позиций", total: "48 300 ₽" },
   { id: "ORD-5529", title: "ИП Лебедев · 3 позиции", total: "7 950 ₽" },
-  { id: "ORD-5524", title: "АО «Гранит» · 40 позиций", total: "212 000 ₽" },
+  { id: "ORD-5524", title: "АО «Гранит» · 40 позиций", total: "212 000 ₽", closed: true },
+  { id: "ORD-5518", title: "ООО «Вектор» · 6 позиций", total: "31 400 ₽" },
 ];
 
-const PLACEMENT = { new: ["ORD-5531", "ORD-5529"], packing: [], shipped: ["ORD-5524"] };
+const PLACEMENT = {
+  new: ["ORD-5531", "ORD-5529"],
+  packing: [],
+  shipped: ["ORD-5524", "ORD-5518"],
+};
 
 const LOAD_MS = 1200;
 
@@ -62,11 +68,16 @@ export default function KanbanStatesExample() {
         loading={loading}
         disabled={readOnly}
         renderItem={(order) => (
-          <Kanban.Item>
+          <Kanban.Item disabled={order.closed}>
             <Kanban.ItemTitle>{order.id}</Kanban.ItemTitle>
             <Kanban.ItemDescription>
               {order.title} · {order.total}
             </Kanban.ItemDescription>
+            {order.closed ? (
+              <Kanban.ItemBadges>
+                <Badge.Root color="gray">Закрыт</Badge.Root>
+              </Kanban.ItemBadges>
+            ) : null}
           </Kanban.Item>
         )}
       />

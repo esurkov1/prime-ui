@@ -20,9 +20,12 @@ export default function ScrollContainerScrollbarExample() {
   return (
     <div className={styles.layout}>
       <Card.Root role="region" className={styles.card} aria-label="Клиенты">
-        <Typography as="h3" variant="title-s" className={styles.cardTitle}>
-          thin
-        </Typography>
+        <Card.Header>
+          <Card.Title>Клиенты</Card.Title>
+          <Typography as="span" variant="caption" tone="muted">
+            thin
+          </Typography>
+        </Card.Header>
         <ScrollContainer>
           <ul className={styles.list}>
             {CLIENTS.map((client) => (
@@ -35,10 +38,13 @@ export default function ScrollContainerScrollbarExample() {
           </ul>
         </ScrollContainer>
       </Card.Root>
-      <Card.Root role="region" className={styles.card} aria-label="Фильтры заказов">
-        <Typography as="h3" variant="title-s" className={styles.cardTitle}>
-          hidden
-        </Typography>
+      <Card.Root role="region" className={styles.card} aria-label="Статусы заказов">
+        <Card.Header>
+          <Card.Title>Статусы заказов</Card.Title>
+          <Typography as="span" variant="caption" tone="muted">
+            hidden
+          </Typography>
+        </Card.Header>
         <ScrollContainer axis="horizontal" scrollbar="hidden">
           <div className={styles.strip}>
             {TAGS.map((tag) => (

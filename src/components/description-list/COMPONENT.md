@@ -120,7 +120,7 @@ No motion: the list is static text; a row action has the Button's own press and 
 | [structure.tsx](examples/structure.tsx) | Optional pieces of a pair: a Badge or a link as the value, a row action and an empty value with its own mark — `DescriptionList.ItemAction`, `labels`. |
 | [vertical.tsx](examples/vertical.tsx) | Labels above their values at any width, for a side panel of a record — `orientation`. |
 | [narrow.tsx](examples/narrow.tsx) | In a 320 px card the list is narrower than 24rem: each label moves above its value and long values wrap. |
-| [screen.tsx](examples/screen.tsx) | A detail page: breadcrumb and status in the header, actions by weight, a main column with the line items and a side column with the client and the history — `orientation`. |
+| [screen.tsx](examples/screen.tsx) | A nested record: the path, the title with its status and due date and the record's actions by weight in the app header, a main column with the line items and a side column with the client's details and the history — `orientation`. |
 
 ## Mistakes
 - A grid of `Typography` pairs or a two-column table for record details → `DescriptionList`: the `<dl>` semantics and the stacking come with it.

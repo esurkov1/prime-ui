@@ -37,7 +37,6 @@ export const page: ComponentPageConfig = {
       description:
         "В узкой колонке образцы переносятся сами поровну по рядам, а стрелки ходят по видимым рядам.",
     },
-
     {
       slot: "controlled",
       description:

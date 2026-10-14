@@ -7,7 +7,7 @@ export default function AvatarStatesExample() {
   return (
     <div>
       <div>
-        <Avatar.Root size="xl" color="green">
+        <Avatar.Root color="green">
           <Avatar.Image src={PHOTO} alt="Михаил Котов" />
           <Avatar.Fallback>МК</Avatar.Fallback>
         </Avatar.Root>
@@ -16,7 +16,7 @@ export default function AvatarStatesExample() {
         </Typography>
       </div>
       <div>
-        <Avatar.Root size="xl" color="orange">
+        <Avatar.Root color="orange">
           <Avatar.Image src="https://example.com/missing-avatar.png" alt="Сергей Лебедев" />
           <Avatar.Fallback>СЛ</Avatar.Fallback>
         </Avatar.Root>
@@ -25,9 +25,9 @@ export default function AvatarStatesExample() {
         </Typography>
       </div>
       <div>
-        <Avatar.Root size="xl" aria-label="Гость">
+        <Avatar.Root aria-label="Гость">
           <Avatar.Fallback>
-            <Icon name="field.email" />
+            <Icon name="object.user" />
           </Avatar.Fallback>
         </Avatar.Root>
         <Typography as="span" variant="caption" tone="muted">

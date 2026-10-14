@@ -1,4 +1,4 @@
-/** Every size tier: text, icon, folder radius and spacing grow together — `size`. */
+/** Every size tier: text, icon, folder radius and spacing grow together; tabs sized to their content — `size`, `fullWidth`. */
 import { Tabs, Typography } from "prime-ui-kit";
 
 const SIZES = ["xs", "s", "m", "l", "xl"] as const;

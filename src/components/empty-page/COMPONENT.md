@@ -148,7 +148,7 @@ EmptyPage.Root               centered column; size, layout, tone (role="alert" w
 | [variants.tsx](examples/variants.tsx) | The tone tells why the area is empty: no data yet, a first run, or a failed load with a retry — `tone`, `EmptyPage.RetryButton`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier changes the icon tile, the title and the padding; buttons in Actions take the same size — `size`. |
 | [data-region.tsx](examples/data-region.tsx) | An empty data region: the empty state stretches over the rest of a card with a header — `layout`. |
-| [region-error.tsx](examples/region-error.tsx) | A data region that failed to load: the error state takes the region, the retry shows its loading until the data cross-fades in — `tone`, `layout`, `EmptyPage.RetryButton`, `onRetry`. |
+| [region-error.tsx](examples/region-error.tsx) | A data region that failed to load: the error state takes the region, the retry shows its loading until the data cross-fades in; its text comes from labels — `tone`, `layout`, `EmptyPage.RetryButton`, `onRetry`, `labels`. |
 | [compact.tsx](examples/compact.tsx) | The quiet empty state of a search panel: no entrance motion, smaller text, a paragraph title, one action — `layout`, `as`. |
 | [narrow.tsx](examples/narrow.tsx) | In a 320 px side panel the text wraps under the tile and the actions wrap to a second line. |
 

@@ -1,4 +1,4 @@
-/** A team schedule as a work screen: the title and a PageToolbar with search, filters, team sections and the primary action in the app header over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onSelect`. */
+/** A team schedule as a work screen: the title with the people shown and a PageToolbar with search, filters, team sections and the primary action in the app header over a full-height Gantt; moves saved or refused, new work drawn and named in a Modal, details in a Drawer — `scrollHeight`, `onBarChange`, `onBarCreate`, `onSelect`. */
 import {
   AppHeader,
   Avatar,
@@ -446,7 +446,12 @@ export default function GanttScreenExample() {
           the only h1 and the page's tools; main has no PageContent.Header. */}
       <AppHeader.Root>
         <AppHeader.Start>
-          <AppHeader.Title as="h1">Загрузка команды</AppHeader.Title>
+          <AppHeader.Title>
+            Загрузка команды
+            <AppHeader.Description>
+              {loading ? "Загружаем график…" : `Сотрудников: ${rows.length} из ${people.length}`}
+            </AppHeader.Description>
+          </AppHeader.Title>
         </AppHeader.Start>
         <AppHeader.Tools>
           <SmartFilter.Root
@@ -537,11 +542,6 @@ export default function GanttScreenExample() {
             renderBarTooltip={(bar) => (bar.client ? CLIENTS[bar.client].name : KIND[bar.kind])}
             toolbar={
               <>
-                <Typography as="span" variant="body-s" tone="muted">
-                  {loading
-                    ? "Загружаем график…"
-                    : `Сотрудников: ${rows.length} из ${people.length}`}
-                </Typography>
                 {/* The legend of client hues: the bar's hue repeats its client, the tooltip names it. */}
                 {(Object.keys(CLIENTS) as ClientId[]).map((client) => (
                   <Badge.Root key={client} color={CLIENTS[client].color}>

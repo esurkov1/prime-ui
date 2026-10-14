@@ -23,6 +23,12 @@ export const page: ComponentPageConfig = {
       description:
         "Число, которое зрячие считывают по раскладке, словами для скринридера, и вежливое объявление после действия — `VisuallyHidden`, `live`.",
     },
+    {
+      scenario: "assertive",
+      title: "Срочное объявление",
+      description:
+        "Несохранённый счёт: на экране бейдж, а скринридер сообщает об ошибке сразу, прерывая чтение — `live`.",
+    },
   ],
   api,
   accessibility: {

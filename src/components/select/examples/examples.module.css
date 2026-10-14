@@ -16,7 +16,8 @@
 
 .formFields {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Two columns while each keeps 12rem, one column in a narrower form — from its own width. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--prime-space-16) * 3)), 1fr));
   align-items: start;
   gap: var(--prime-space-5) var(--prime-space-4);
 }
@@ -26,10 +27,4 @@
   align-items: center;
   justify-content: flex-end;
   gap: var(--prime-space-2);
-}
-
-@media (max-width: 639px) {
-  .formFields {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }

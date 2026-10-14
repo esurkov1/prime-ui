@@ -1,4 +1,4 @@
-/** A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures under the title, and is edited in a popover — `reorderableColumns`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. */
+/** A sales pipeline whose stages move by the grip in their header while the first and the last stay locked; each stage carries its color on the count, a rule and its figures under the title, and is edited in a popover; the page keeps the order — `reorderableColumns`, `columnOrder`, `onColumnOrderChange`, `locked`, `color`, `description`, `renderColumnMeta`, `renderColumnActions`. */
 import {
   Button,
   ColorSwatches,
@@ -52,6 +52,8 @@ const DEALS: Deal[] = [
   { id: "DL-296", client: "ГК «Меридиан»", amount: 2_750_000 },
 ];
 
+const INITIAL_ORDER = COLUMNS.map((column) => column.id);
+
 const PLACEMENT: KanbanValue = {
   lead: ["DL-318", "DL-322"],
   demo: ["DL-309"],
@@ -77,7 +79,7 @@ const dealsWord = (count: number) => {
 export default function KanbanColumnsExample() {
   const [columns, setColumns] = React.useState(COLUMNS);
   const [placement, setPlacement] = React.useState<KanbanValue>(PLACEMENT);
-  const [savedOrder, setSavedOrder] = React.useState<readonly string[] | null>(null);
+  const [order, setOrder] = React.useState<readonly string[]>(INITIAL_ORDER);
 
   const updateColumn = (id: string, patch: Partial<KanbanColumn>) =>
     setColumns((current) =>
@@ -95,8 +97,8 @@ export default function KanbanColumnsExample() {
   return (
     <div className={styles.stage}>
       <Typography as="span" variant="body-s" tone="muted" aria-live="polite">
-        {savedOrder
-          ? `Порядок этапов сохранён: ${savedOrder.map(titleOf).filter(Boolean).join(" → ")}`
+        {order !== INITIAL_ORDER
+          ? `Порядок этапов сохранён: ${order.map(titleOf).filter(Boolean).join(" → ")}`
           : "Перетащите этап за ручку в шапке или нажмите на ней Alt + ← / →"}
       </Typography>
       <Kanban.Root
@@ -109,7 +111,8 @@ export default function KanbanColumnsExample() {
         value={placement}
         onValueChange={setPlacement}
         reorderableColumns
-        onColumnOrderChange={setSavedOrder}
+        columnOrder={order}
+        onColumnOrderChange={setOrder}
         renderColumnMeta={figures}
         renderColumnActions={(column) => (
           <Popover.Root>

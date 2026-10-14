@@ -53,7 +53,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "dismiss",
       description:
-        "Короткий таймер, уведомление до закрытия и без кнопки закрытия — `duration`, `persistent`, `closable`.",
+        "Короткий таймер, уведомление до закрытия и без кнопки закрытия; имя кнопки закрытия — из labels — `duration`, `persistent`, `closable`, `labels`.",
     },
     {
       slot: "in-form",

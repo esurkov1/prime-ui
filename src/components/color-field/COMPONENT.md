@@ -93,7 +93,7 @@ ColorField                       field frame: label · field button · hint | er
 ## States
 | State | Driven by | DOM |
 |---|---|---|
-| closed / open | click, `Enter` · `Space`, `Escape`, an outside press | `aria-expanded` and `data-state` on the button; the chevron turns; the button keeps the focus fill while open |
+| closed / open | click, `Enter` · `Space`, `Escape`, an outside press | `aria-expanded` and `data-state` on the button; the chevron turns; the button holds the hover fill while open |
 | value | `value` / `defaultValue`, the panel | the chip and the hex follow the color as it is dragged; `onValueChange` gets every change as hex |
 | invalid | `invalid` or `error` | `data-invalid="true"`, `aria-invalid` on the button; the field shakes once when an error arrives (`data-shake` on the frame) |
 | disabled | `disabled` | native `disabled` on the button, `data-disabled` on the frame; the hidden `name` input is disabled too, so the form does not submit the value |

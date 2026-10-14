@@ -173,7 +173,7 @@ Put it in a `Card` for a dashboard tile.
 | [compact.tsx](examples/compact.tsx) | Revenue by month per client in a list: the plot alone at a row's height with the dot on the current month, scrubbing shows the month in a tooltip, the label is the chart's accessible name — `layout`, `label`. |
 | [signed-bars.tsx](examples/signed-bars.tsx) | Monthly profit with a sign: losses go below the zero line, the current month rests highlighted and any bar shows its value under the pointer or the arrows — `variant`, `highlight`. |
 | [curve.tsx](examples/curve.tsx) | The same month of active users as a smooth curve, straight segments and steps — `curve`. |
-| [reference.tsx](examples/reference.tsx) | Checkout conversion against its plan: a dashed reference line, the scale from zero and the change over the whole period — `reference`, `min`, `change`. |
+| [reference.tsx](examples/reference.tsx) | Checkout conversion against its plan: a dashed reference line, the scale from zero to 5% and the change over the whole period — `reference`, `min`, `max`, `change`. |
 | [gaps.tsx](examples/gaps.tsx) | Daily API requests with days the collector was down: the line breaks over a missing day and the headline says there is no data — `data`, `labels`. |
 | [period.tsx](examples/period.tsx) | Another period swaps the series: the line cross-fades in and the headline digits roll to the new total — `data`, `summary`. |
 

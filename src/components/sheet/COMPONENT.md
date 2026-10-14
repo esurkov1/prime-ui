@@ -198,6 +198,8 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Actions with an order raised from the bottom edge: a header names the order, a column of actions follows, and each action closes the sheet — `Sheet.Trigger`, `Sheet.Header`, `Sheet.Close`. |
 | [structure.tsx](examples/structure.tsx) | The content alone: a date sheet with no header and no footer, the calendar across its width, named by `aria-label`; a pick or a swipe down closes it — `aria-label`, `Sheet.Body`. |
+| [header-actions.tsx](examples/header-actions.tsx) | The courier is at the door: an icon tile heads the sheet, the payment status and a ⋯ menu sit before the close button, and two equal buttons fill the footer — `Sheet.Icon`, `Sheet.Actions`, `layout`. |
+| [guard.tsx](examples/guard.tsx) | A review form that holds the sheet: after an edit a swipe, the scrim, Escape and Cancel ask before discarding and the footer says so; sending locks every way out — `Sheet.Guard`, `Sheet.Meta`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A handover the courier must answer: no swipe, scrim or Escape closes the sheet, only its two buttons — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the state and raises the sheet from a link in the text, without a trigger — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A short form that needs an explicit submit: the one case for a footer, Cancel and Send under the field, an empty comment keeps the sheet open — `Sheet.Footer`, `error`. |

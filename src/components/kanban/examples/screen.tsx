@@ -1,4 +1,4 @@
-/** A sales pipeline as a work screen: the title, search, filter, the board / list switch and the one primary action in the app header, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemClick`. */
+/** A sales pipeline as a work screen: the title with the open deals and their sum, search, filter, the board / list switch and the one primary action in the app header, a full-height Kanban of deals by stage with totals, moves saved on the server that can be refused, and the deal in a Drawer — `value`, `onValueChange`, `renderColumnMeta`, `onItemClick`. */
 import {
   AppHeader,
   Avatar,
@@ -305,6 +305,11 @@ export default function KanbanScreenExample() {
   );
   const rows: DealRow[] = deals.map((deal) => ({ ...deal, stage: stageOf(placement, deal.id) }));
   const shown = new Set(deals.map((deal) => deal.id));
+  // The header's data line: what the filtered pipeline holds, open deals only.
+  const inWork = deals.filter((deal) => stageOf(placement, deal.id) !== "won");
+  const pipeline = `${inWork.length} ${dealsWord(inWork.length)} в работе · ${RUBLES.format(
+    inWork.reduce((total, deal) => total + deal.amount, 0),
+  )}`;
 
   const figures = (column: KanbanColumn) => {
     const ids = (placement[column.id] ?? []).filter((id) => shown.has(id));
@@ -357,7 +362,12 @@ export default function KanbanScreenExample() {
           the only h1 and the page's tools; main has no PageContent.Header. */}
       <AppHeader.Root>
         <AppHeader.Start>
-          <AppHeader.Title as="h1">Сделки</AppHeader.Title>
+          <AppHeader.Title>
+            Сделки
+            <AppHeader.Description>
+              {loading ? "Загружаем воронку…" : pipeline}
+            </AppHeader.Description>
+          </AppHeader.Title>
         </AppHeader.Start>
         <AppHeader.Tools>
           <SmartFilter.Root

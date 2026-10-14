@@ -62,7 +62,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "dismiss",
       description:
-        "Сканы договора читают внимательно: случайный свайп или клик мимо страницы их не закрывает, только Escape и кнопка закрытия — `closeOnOutsideClick`.",
+        "Сканы договора читают внимательно: случайный свайп или клик мимо страницы их не закрывает, только Escape и кнопка закрытия, а мелкий шрифт приближается до восьми раз — `closeOnOutsideClick`, `maxZoom`.",
     },
     {
       slot: "controlled",

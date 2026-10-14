@@ -103,7 +103,7 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | A card region that cross-fades between loading, data, empty and error and glides to the new height — `state`. |
 | [record-switch.tsx](examples/record-switch.tsx) | A detail panel keyed by the record id: picking another client cross-fades the details of a different height — `state`. |
 | [fill.tsx](examples/fill.tsx) | A deal board that fills its panel's height while it swaps between loading and data, and a notice slot above it that takes no room while empty — `fill`, `state`. |
-| [screen.tsx](examples/screen.tsx) | Screen states: a page-level error in a Banner with a retry, a region loading with a Skeleton of its rows and a table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states — `state`. |
+| [screen.tsx](examples/screen.tsx) | Screen states: the title and the date of the statement in the app header, a page-level error in a Banner with a retry, a region loading with a Skeleton of its rows and a table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states — `state`. |
 
 ## Mistakes
 - A new `state` on every data refresh (`state={Date.now()}`) → key by what the region shows, not by when it was fetched.

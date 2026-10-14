@@ -149,7 +149,7 @@ No `labels`.
 | [overview.tsx](examples/overview.tsx) | An icon-only button with a tooltip that repeats its name on hover and keyboard focus — `Tooltip.Trigger`, `Tooltip.Content`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier next to buttons of the same tier; take the tier of the control it describes — `size`. |
 | [placement.tsx](examples/placement.tsx) | Every side, and alignment by room, start and end along the trigger; without room the chip flips and shifts, the arrow keeps pointing at the trigger — `side`, `align`. |
-| [toolbar.tsx](examples/toolbar.tsx) | A formatting toolbar in one group: after the first tooltip the neighbours open at once, each with its name and shortcut — `Tooltip.Provider`. |
+| [toolbar.tsx](examples/toolbar.tsx) | A formatting toolbar in one group: after the first tooltip the neighbours open at once for half a second, each with its name and shortcut — `Tooltip.Provider`, `skipDelayDuration`. |
 | [disabled-trigger.tsx](examples/disabled-trigger.tsx) | Why an action is unavailable: the disabled button still shows its tooltip on hover and Tab, no wrapper needed — `Tooltip.Trigger`. |
 | [non-interactive-trigger.tsx](examples/non-interactive-trigger.tsx) | A status badge, an avatar and an information icon explain themselves: the kit makes each a tab stop, so the tooltip opens from the keyboard too — `Tooltip.Trigger`. |
 | [delay.tsx](examples/delay.tsx) | The show delay of one tooltip: at once, the default 400 ms and one second — `delayDuration`. |

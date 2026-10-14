@@ -37,7 +37,7 @@ export const page: ComponentPageConfig = {
       scenario: "toolbar",
       title: "Панель инструментов",
       description:
-        "Панель форматирования в одной группе: после первой подсказки соседние открываются сразу, у каждой имя и сочетание клавиш — `Tooltip.Provider`.",
+        "Панель форматирования в одной группе: после первой подсказки соседние полсекунды открываются сразу, у каждой имя и сочетание клавиш — `Tooltip.Provider`, `skipDelayDuration`.",
     },
     {
       scenario: "disabled-trigger",

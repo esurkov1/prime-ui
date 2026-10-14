@@ -1,4 +1,4 @@
-/** A short timer, a toast that stays until closed, and one without a close button — `duration`, `persistent`, `closable`. */
+/** A short timer, a toast that stays until closed, and one without a close button; the close button's name comes from labels — `duration`, `persistent`, `closable`, `labels`. */
 import { Button, NotificationProvider, useNotifications } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -43,7 +43,7 @@ function DismissButtons() {
 export default function NotificationDismissExample() {
   // In an app NotificationProvider wraps the root once; here it keeps the example self-contained.
   return (
-    <NotificationProvider>
+    <NotificationProvider labels={{ close: "Скрыть уведомление" }}>
       <DismissButtons />
     </NotificationProvider>
   );

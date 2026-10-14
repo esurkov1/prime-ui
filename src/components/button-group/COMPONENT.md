@@ -152,12 +152,12 @@ Group attributes: `data-size`, `data-orientation="vertical"` (only when vertical
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Related actions joined into one bar with a group name — `aria-label`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier, 28 to 48 px high, set once on the root — `size`. |
-| [states.tsx](examples/states.tsx) | A plain segment, a toggled one and a disabled one — `pressed`, `disabled`. |
+| [states.tsx](examples/states.tsx) | A plain segment, a toggled one, a disabled one and a group in error — `pressed`, `disabled`, `invalid`. |
 | [with-icon.tsx](examples/with-icon.tsx) | An icon before the label and square icon-only segments — `ButtonGroup.Icon`, `aria-label`. |
 | [orientation.tsx](examples/orientation.tsx) | A row of segments and a column of related options — `orientation`. |
 | [full-width.tsx](examples/full-width.tsx) | The group fills its column and the segments share the width equally — `fullWidth`. |
 | [controlled.tsx](examples/controlled.tsx) | One of several: the active segment lives in parent state and gets `pressed`. |
-| [in-form.tsx](examples/in-form.tsx) | A task form: the priority toggles are a labelled field checked on submit, and native submit and reset segments sit in one group — `label`, `required`, `error`, `type`. |
+| [in-form.tsx](examples/in-form.tsx) | A task form: the priority toggles are a labelled field checked on submit, an optional reminder, and native submit and reset segments in one group — `label`, `required`, `hint`, `error`, `optional`, `type`. |
 
 ## Mistakes
 - `size` on each `ButtonGroup.Item` → set `size` once on `Root`.

@@ -19,7 +19,7 @@ export default function DrawerDismissExample() {
       open={open}
       onOpenChange={setOpen}
       closeOnOutsideClick={false}
-      closeOnEscape={!importing}
+      closeOnEscape={false}
     >
       <Drawer.Trigger>
         <Button.Root variant="soft" tone="neutral">
@@ -27,7 +27,9 @@ export default function DrawerDismissExample() {
         </Button.Root>
       </Drawer.Trigger>
       <Drawer.Content size="s">
-        <Drawer.Header showClose={!importing}>
+        {/* While the import runs, the guard keeps «Отмена» in place, disabled. */}
+        <Drawer.Guard busy={importing} />
+        <Drawer.Header showClose={false}>
           <Drawer.Title>Импорт товаров</Drawer.Title>
           <Drawer.Description>catalog-october.xlsx · 1 240 строк</Drawer.Description>
         </Drawer.Header>
@@ -41,7 +43,7 @@ export default function DrawerDismissExample() {
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Close>
-            <Button.Root variant="outline" tone="neutral" disabled={importing}>
+            <Button.Root variant="outline" tone="neutral">
               Отмена
             </Button.Root>
           </Drawer.Close>

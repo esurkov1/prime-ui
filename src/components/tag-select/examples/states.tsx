@@ -1,4 +1,4 @@
-/** A default field next to a disabled and an invalid one, with a disabled option in the list — `disabled`, `invalid`. */
+/** A default field next to a disabled and an invalid one and one whose focus shows without the ring, with a disabled option in the list — `disabled`, `invalid`, `focusRing`. */
 import { TagSelect, type TagSelectOption } from "prime-ui-kit";
 
 const OPTIONS: TagSelectOption[] = [
@@ -19,6 +19,13 @@ export default function TagSelectStatesExample() {
       />
       <TagSelect label="disabled" options={OPTIONS} defaultValue={["msk", "kzn"]} disabled />
       <TagSelect label="invalid" options={OPTIONS} invalid placeholder="Добавить город" />
+      <TagSelect
+        label="focusRing={false}"
+        options={OPTIONS}
+        defaultValue={["spb"]}
+        focusRing={false}
+        placeholder="Добавить город"
+      />
     </>
   );
 }

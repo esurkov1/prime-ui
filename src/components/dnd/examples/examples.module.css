@@ -48,6 +48,19 @@
   background: var(--prime-color-fill-muted);
 }
 
+/* drop-zones.tsx: the drag status line above the board. */
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-3);
+  width: 100%;
+}
+
+/* A status badge keeps its own width inside a ticket. */
+.badge {
+  align-self: flex-start;
+}
+
 .columnHeader {
   display: flex;
   align-items: center;
@@ -92,6 +105,43 @@
   border: var(--prime-border-width) dashed var(--prime-color-fill-strong);
   border-radius: var(--prime-radius-m);
   text-align: center;
+}
+
+/* table.tsx: a plain table whose bodies are sortable lists; rows sit on faint dividers. */
+.table {
+  width: 100%;
+  max-width: calc(var(--prime-space-24) * 6);
+  border-collapse: collapse;
+}
+
+.caption {
+  padding-block-end: var(--prime-space-3);
+  text-align: start;
+}
+
+.cell,
+.numeric,
+.grip,
+.groupCell {
+  padding: var(--prime-space-2) var(--prime-space-3);
+  border-block-end: var(--prime-border-width) solid var(--prime-color-border-subtle);
+  text-align: start;
+  vertical-align: middle;
+}
+
+.numeric {
+  text-align: end;
+}
+
+.grip {
+  inline-size: var(--prime-space-10);
+  padding-inline-end: 0;
+}
+
+/* A stage's heading row: a fill marks where a new stage starts. */
+.groupCell {
+  padding-block-start: var(--prime-space-4);
+  background: var(--prime-color-fill-muted);
 }
 
 /* 320 px strip; the padding keeps room for the focus ring of the first and last tag. */

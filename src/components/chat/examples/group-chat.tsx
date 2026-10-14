@@ -1,4 +1,4 @@
-/** A team chat from data: the first message of an author's run opens with the name in the author's hue, a crown for the owner and the member's tag; the avatar — a photo, or initials — closes the run; a direct chat shows neither — `type`, `items`, `renderMessage`, `Message.Author`, `tag`, `Message.AuthorIcon`, `hueOf`. */
+/** A team chat from data: the first message of an author's run opens with the name in the author's hue, a crown for the owner and the member's tag; the avatar — a photo, or initials — closes the run, which holds messages up to a quarter of an hour apart; the dates carry the weekday — `type`, `items`, `renderMessage`, `groupWindow`, `formatDate`, `Message.Author`, `tag`, `Message.AuthorIcon`, `hueOf`. */
 import { Avatar, Card, Chat, hueOf, Icon, Message } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -52,7 +52,7 @@ const MESSAGES: ChatMessage[] = [
     id: "2",
     author: "anna",
     text: "Причина — миграция базы счетов.",
-    sentAt: new Date(2026, 9, 7, 18, 41),
+    sentAt: new Date(2026, 9, 7, 18, 52),
   },
   {
     id: "3",
@@ -79,6 +79,17 @@ const MESSAGES: ChatMessage[] = [
     sentAt: new Date(2026, 9, 8, 9, 30),
   },
 ];
+
+/** A team writes in bursts: a run holds one author's messages up to 15 minutes apart. */
+const RUN_MINUTES = 15;
+
+const DAY = new Intl.DateTimeFormat("ru", { weekday: "long", day: "numeric", month: "long" });
+
+/** «Среда, 8 октября»: the weekday matters in a work week. */
+const formatDay = (date: Date) => {
+  const label = DAY.format(date);
+  return label.charAt(0).toUpperCase() + label.slice(1);
+};
 
 const renderMessage = (message: ChatMessage) => {
   const person = PEOPLE[message.author] as Person;
@@ -122,6 +133,8 @@ export default function ChatGroupChatExample() {
           getAuthor={(message) => message.author}
           getDate={(message) => message.sentAt}
           renderMessage={renderMessage}
+          groupWindow={RUN_MINUTES}
+          formatDate={formatDay}
           now={NOW}
         />
       </Chat.Root>

@@ -1,4 +1,4 @@
-/** A default field next to a disabled, a loading, an invalid one and a list with nothing in it — `disabled`, `loading`, `invalid`, `labels`. */
+/** A default field next to a disabled, a loading, an invalid one, a list with nothing in it and a field whose focus shows without the ring — `disabled`, `loading`, `invalid`, `labels`, `focusRing`. */
 import { Select } from "prime-ui-kit";
 
 const ROLES = [
@@ -61,6 +61,18 @@ export default function SelectStatesExample() {
           <Select.Value />
         </Select.Trigger>
         <Select.Content>{null}</Select.Content>
+      </Select.Root>
+      <Select.Root label="focusRing={false}" defaultValue="editor" focusRing={false}>
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          {ROLES.map((role) => (
+            <Select.Item key={role.value} value={role.value}>
+              {role.label}
+            </Select.Item>
+          ))}
+        </Select.Content>
       </Select.Root>
     </>
   );

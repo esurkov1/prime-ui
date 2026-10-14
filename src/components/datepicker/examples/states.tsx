@@ -1,4 +1,4 @@
-/** An empty field with the default placeholder, a filled one and a disabled one — `disabled`. */
+/** An empty field with the default placeholder, a filled, a disabled and an invalid one, and one whose focus shows without the ring — `disabled`, `invalid`, `focusRing`. */
 import { Datepicker } from "prime-ui-kit";
 
 const CONTRACT_DATE = new Date(2026, 8, 15);
@@ -13,6 +13,14 @@ export default function DatepickerStatesExample() {
         label="disabled"
         defaultValue={CONTRACT_DATE}
         disabled
+        fullWidth
+      />
+      <Datepicker.Root mode="single" label="invalid" invalid fullWidth />
+      <Datepicker.Root
+        mode="single"
+        label="focusRing={false}"
+        defaultValue={CONTRACT_DATE}
+        focusRing={false}
         fullWidth
       />
     </>

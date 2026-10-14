@@ -192,14 +192,14 @@ Item DOM: `data-state`, `data-disabled`, `data-icon-only`, `data-two-line`, `dat
 |---|---|
 | [overview.tsx](examples/overview.tsx) | One value out of a few, with a sliding thumb on the chosen segment — `defaultValue`, `aria-label`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; the outer height equals the control height of the same tier — `size`. |
-| [states.tsx](examples/states.tsx) | No selection yet, a disabled segment and a disabled group next to the default — `disabled`. |
+| [states.tsx](examples/states.tsx) | No selection yet, an invalid group, a disabled segment and a disabled group next to the default — `invalid`, `disabled`. |
 | [with-icon.tsx](examples/with-icon.tsx) | An icon before the label and square icon-only segments named for screen readers — `SegmentedControl.Icon`, `aria-label`. |
 | [colors.tsx](examples/colors.tsx) | A status per option: a dot of its hue before the label and a tinted thumb when chosen — `color`. |
 | [full-width.tsx](examples/full-width.tsx) | The group fills its column; segments tend to equal widths and a long label keeps its own — `fullWidth`. |
 | [scroll.tsx](examples/scroll.tsx) | Segments never wrap: in a column narrower than the row it scrolls with edge fades and brings the chosen segment into view. |
 | [two-line.tsx](examples/two-line.tsx) | A label and a counter on the first line, a metric on the second — `SegmentedControl.Label`, `SegmentedControl.Count`, `SegmentedControl.Description`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the choice and updates other content from it — `value`, `onValueChange`. |
-| [in-form.tsx](examples/in-form.tsx) | An expense form: the choice is a labelled field with a hint, checked on submit, its error leaves as soon as a segment is chosen — `label`, `hint`, `required`, `error`. |
+| [in-form.tsx](examples/in-form.tsx) | An expense form: the choice is a labelled field with a hint, checked on submit, its error leaves as soon as a segment is chosen; an optional choice beside it — `label`, `hint`, `required`, `error`, `optional`. |
 
 ## Mistakes
 - Using it as tabs that show different panels → use `Tabs`.

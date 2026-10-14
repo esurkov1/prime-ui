@@ -1,8 +1,5 @@
 /** Order details next to the list: the three zones of every drawer — a header with a close button, a read-only body and a footer with Close and the main action — `Drawer.Trigger`, `Drawer.Body`, `Drawer.Footer`. */
-import { Button, Drawer, Typography } from "prime-ui-kit";
-import * as React from "react";
-
-import styles from "./examples.module.css";
+import { Button, DescriptionList, Drawer } from "prime-ui-kit";
 
 const DETAILS = [
   { term: "Клиент", value: "Анна Смирнова" },
@@ -25,22 +22,13 @@ export default function DrawerOverviewExample() {
           <Drawer.Description>Оформлен 3 октября</Drawer.Description>
         </Drawer.Header>
         <Drawer.Body>
-          <dl className={styles.details}>
+          <DescriptionList.Root>
             {DETAILS.map(({ term, value }) => (
-              <React.Fragment key={term}>
-                <dt>
-                  <Typography as="span" variant="body-m" tone="muted">
-                    {term}
-                  </Typography>
-                </dt>
-                <dd>
-                  <Typography as="span" variant="body-m">
-                    {value}
-                  </Typography>
-                </dd>
-              </React.Fragment>
+              <DescriptionList.Item key={term} label={term}>
+                {value}
+              </DescriptionList.Item>
             ))}
-          </dl>
+          </DescriptionList.Root>
         </Drawer.Body>
         <Drawer.Footer>
           <Drawer.Close>

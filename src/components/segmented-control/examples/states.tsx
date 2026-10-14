@@ -1,4 +1,4 @@
-/** No selection yet, a disabled segment and a disabled group next to the default — `disabled`. */
+/** No selection yet, an invalid group, a disabled segment and a disabled group next to the default — `invalid`, `disabled`. */
 import { SegmentedControl, Typography } from "prime-ui-kit";
 
 export default function SegmentedControlStatesExample() {
@@ -20,6 +20,15 @@ export default function SegmentedControlStatesExample() {
         </SegmentedControl.Root>
         <Typography as="span" variant="caption" tone="muted">
           empty
+        </Typography>
+      </div>
+      <div>
+        <SegmentedControl.Root invalid aria-label="Статус кампании">
+          <SegmentedControl.Item value="active">Активные</SegmentedControl.Item>
+          <SegmentedControl.Item value="archived">Архив</SegmentedControl.Item>
+        </SegmentedControl.Root>
+        <Typography as="span" variant="caption" tone="muted">
+          invalid
         </Typography>
       </div>
       <div>

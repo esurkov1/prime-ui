@@ -1,4 +1,4 @@
-/** A default field next to a read-only and a disabled one — `readOnly`, `disabled`. */
+/** A default field next to a read-only, a disabled and an invalid one with no message — `readOnly`, `disabled`, `invalid`. */
 import { Textarea } from "prime-ui-kit";
 
 export default function TextareaStatesExample() {
@@ -16,6 +16,7 @@ export default function TextareaStatesExample() {
         placeholder="Причина возврата"
         hint="Станет доступно после выбора заказа"
       />
+      <Textarea.Root label="invalid" invalid defaultValue="Не подошёл размер" />
     </>
   );
 }

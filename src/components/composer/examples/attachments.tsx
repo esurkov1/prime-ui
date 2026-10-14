@@ -1,4 +1,4 @@
-/** Warehouse photos and documents for a client go through an upload queue: the paperclip opens the file picker, a paste or a drop adds files too, every attachment is a tile of one strip that drags into its order, and send waits until the uploads finish — `queue`, `Composer.Attach`, `useUploadQueue`. */
+/** Warehouse photos and documents for a client go through an upload queue: the paperclip opens the file picker for photos, videos and office documents, a paste or a drop adds files too, every attachment is a tile of one strip that drags into its order, and send waits until the uploads finish — `queue`, `Composer.Attach`, `accept`, `useUploadQueue`. */
 import { Composer, type UploadContext, useUploadQueue } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -29,7 +29,7 @@ export default function ComposerAttachmentsExample() {
   return (
     <div className={styles.chat}>
       <Composer.Root queue={queue} onSend={() => {}}>
-        <Composer.Attach />
+        <Composer.Attach accept="image/*,video/*,.pdf,.docx,.xlsx" />
       </Composer.Root>
     </div>
   );

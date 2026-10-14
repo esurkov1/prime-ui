@@ -57,18 +57,6 @@
   min-width: 0;
 }
 
-.details {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: var(--prime-space-1) var(--prime-space-4);
-  margin: 0;
-}
-
-.details dd {
-  margin: 0;
-  min-width: 0;
-}
-
 /* fill-height: a panel of a fixed height (the rest of a page, a pane) the table fills. */
 .fillStage {
   display: flex;

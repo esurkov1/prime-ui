@@ -1,5 +1,6 @@
-/** A list page: header with one primary action, SmartFilter in the table toolbar, DataTable with statuses, row actions, pages and a filtered empty state — `toolbar`, `empty`, `stickyFirstColumn`. */
+/** A list page: the title, a line of figures, search, filters and the one primary action in the app header, a DataTable of invoices with statuses, row actions, pages and a filtered empty state — `empty`, `pageSize`, `stickyFirstColumn`. */
 import {
+  AppHeader,
   Avatar,
   Badge,
   Button,
@@ -10,6 +11,7 @@ import {
   Icon,
   matchesSmartFilter,
   PageContent,
+  PageToolbar,
   type PaletteColor,
   SmartFilter,
   type SmartFilterField,
@@ -140,6 +142,13 @@ const MONEY = new Intl.NumberFormat("ru-RU", {
 });
 const DAY = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
 
+const OVERDUE = INVOICES.filter((row) => row.status === "overdue");
+
+/** The header's line of context carries data: how many invoices and what is overdue. */
+const SUMMARY = `${INVOICES.length} счетов · просрочено ${OVERDUE.length} на ${MONEY.format(
+  OVERDUE.reduce((sum, row) => sum + row.amount, 0),
+)}`;
+
 const asOptions = (values: string[]) => values.map((value) => ({ value, label: value }));
 
 const FIELDS: SmartFilterField[] = [
@@ -268,67 +277,78 @@ export default function DataTableScreenExample() {
   };
 
   return (
-    <PageContent.Page aria-labelledby="invoices-title">
-      <PageContent.Header>
-        <PageContent.Title id="invoices-title">Счета</PageContent.Title>
-        <PageContent.Description>
-          Выставленные клиентам счета и статус их оплаты.
-        </PageContent.Description>
-        <PageContent.Actions>
-          <Button.Root variant="soft" tone="neutral">
-            <Button.Icon>
-              <Icon name="action.download" />
-            </Button.Icon>
-            Экспорт
-          </Button.Root>
-          <Button.Root>
-            <Button.Icon>
-              <Icon name="action.add" />
-            </Button.Icon>
-            Новый счёт
-          </Button.Root>
-        </PageContent.Actions>
-      </PageContent.Header>
-      <PageContent.Body>
-        <DataTable
-          columns={COLUMNS}
-          rows={rows}
-          getRowKey={(row) => row.id}
-          getRowLabel={(row) => `Счёт ${row.id}`}
-          pageSize={6}
-          stickyFirstColumn
-          defaultSort={{ columnId: "due", order: "desc" }}
-          toolbar={
-            <SmartFilter.Root
-              fields={FIELDS}
-              value={filter}
-              onValueChange={setFilter}
-              search={search}
-              onSearchChange={setSearch}
-              className={styles.filter}
-            >
-              <SmartFilter.Toolbar />
-              <SmartFilter.Chips />
-            </SmartFilter.Root>
-          }
-          empty={
-            <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">
-              <EmptyPage.Icon>
-                <Icon name="action.search" />
-              </EmptyPage.Icon>
-              <EmptyPage.Title as="p" id="invoices-empty">
-                Счетов не найдено
-              </EmptyPage.Title>
-              <EmptyPage.Description>Измените запрос или сбросьте фильтры.</EmptyPage.Description>
-              <EmptyPage.Actions>
-                <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
-                  Сбросить фильтры
+    <>
+      {/* The page lives in the app header: the only h1, a line of figures under it, and the page's
+          tools — search, filters, export, the one primary action; main has no PageContent.Header. */}
+      <AppHeader.Root>
+        <AppHeader.Start>
+          <AppHeader.Title>
+            Счета
+            <AppHeader.Description>{SUMMARY}</AppHeader.Description>
+          </AppHeader.Title>
+        </AppHeader.Start>
+        <AppHeader.Tools>
+          <SmartFilter.Root
+            fields={FIELDS}
+            value={filter}
+            onValueChange={setFilter}
+            search={search}
+            onSearchChange={setSearch}
+          >
+            <PageToolbar.Root aria-label="Счета">
+              <PageToolbar.Tools>
+                <SmartFilter.Toolbar />
+              </PageToolbar.Tools>
+              <PageToolbar.Actions>
+                <Button.Root variant="soft" tone="neutral" aria-label="Экспорт в Excel">
+                  <Button.Icon>
+                    <Icon name="action.download" />
+                  </Button.Icon>
                 </Button.Root>
-              </EmptyPage.Actions>
-            </EmptyPage.Root>
-          }
-        />
-      </PageContent.Body>
-    </PageContent.Page>
+                <Button.Root>
+                  <Button.Icon>
+                    <Icon name="action.add" />
+                  </Button.Icon>
+                  Новый счёт
+                </Button.Root>
+              </PageToolbar.Actions>
+              <PageToolbar.Chips>
+                <SmartFilter.Chips />
+              </PageToolbar.Chips>
+            </PageToolbar.Root>
+          </SmartFilter.Root>
+        </AppHeader.Tools>
+      </AppHeader.Root>
+
+      <PageContent.Root>
+        <PageContent.Body>
+          <DataTable
+            columns={COLUMNS}
+            rows={rows}
+            getRowKey={(row) => row.id}
+            getRowLabel={(row) => `Счёт ${row.id}`}
+            pageSize={6}
+            stickyFirstColumn
+            defaultSort={{ columnId: "due", order: "desc" }}
+            empty={
+              <EmptyPage.Root size="s" role="status" aria-labelledby="invoices-empty">
+                <EmptyPage.Icon>
+                  <Icon name="action.search" />
+                </EmptyPage.Icon>
+                <EmptyPage.Title as="p" id="invoices-empty">
+                  Счетов не найдено
+                </EmptyPage.Title>
+                <EmptyPage.Description>Измените запрос или сбросьте фильтры.</EmptyPage.Description>
+                <EmptyPage.Actions>
+                  <Button.Root variant="soft" tone="neutral" onClick={resetFilters}>
+                    Сбросить фильтры
+                  </Button.Root>
+                </EmptyPage.Actions>
+              </EmptyPage.Root>
+            }
+          />
+        </PageContent.Body>
+      </PageContent.Root>
+    </>
   );
 }

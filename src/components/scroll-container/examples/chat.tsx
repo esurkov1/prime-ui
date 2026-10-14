@@ -57,9 +57,9 @@ export default function ScrollContainerChatExample() {
 
   return (
     <Card.Root className={styles.chat}>
-      <Typography as="h3" variant="title-s" className={styles.cardTitle}>
-        ООО «Гранит» · счёт № 4821
-      </Typography>
+      <Card.Header>
+        <Card.Title>ООО «Гранит» · счёт № 4821</Card.Title>
+      </Card.Header>
       <ScrollContainer
         anchor="end"
         onReachStart={loadOlder}

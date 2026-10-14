@@ -30,13 +30,13 @@ export default function SmartFilterControlledExample() {
         <SmartFilter.Chips />
       </SmartFilter.Root>
       <div className={styles.views}>
-        <Button.Root variant="soft" tone="neutral" size="s" onClick={() => setValue(ONLY_PUT)}>
+        <Button.Root variant="soft" tone="neutral" onClick={() => setValue(ONLY_PUT)}>
           Только PUT
         </Button.Root>
-        <Button.Root variant="soft" tone="neutral" size="s" onClick={() => setValue(NO_READS)}>
+        <Button.Root variant="soft" tone="neutral" onClick={() => setValue(NO_READS)}>
           Без GET и POST
         </Button.Root>
-        <Button.Root variant="ghost" tone="neutral" size="s" onClick={() => setValue({})}>
+        <Button.Root variant="ghost" tone="neutral" onClick={() => setValue({})}>
           Сбросить
         </Button.Root>
       </div>

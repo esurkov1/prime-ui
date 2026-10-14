@@ -1,21 +1,15 @@
 /* Layout of the Modal scenarios: semantic tokens only. */
 
+/* enter-key.tsx: the client's tags in a wrapping row. */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--prime-space-2);
+}
+
 /* in-form.tsx: field → field 20 (foundation §1). */
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--prime-space-5);
-}
-
-/* custom-container.tsx: a bounded block (§4) takes the host's card fill so it reads in both themes. */
-.portalHost {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  padding: var(--prime-space-4);
-  border-radius: var(--prime-card-radius);
-  background: var(--prime-color-layer-nested);
-  box-shadow: var(--prime-shadow-raised);
 }

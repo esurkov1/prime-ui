@@ -1,0 +1,14 @@
+/* Layout of the Radio scenarios: semantic tokens only. */
+
+/* in-form.tsx: groups, then actions (group → actions 32). */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--prime-space-6);
+  width: min(100%, var(--prime-modal-width-s));
+}
+
+.formActions {
+  display: flex;
+  margin-top: var(--prime-space-2);
+}

@@ -156,7 +156,7 @@ No `variant` or `tone`. The control is the field look; chips are soft Badges on 
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A labelled tag field: focus opens the list, typing filters it, picked tags become chips — `label`, `options`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier with two picked tags; chips sit one tier below the field — `size`. |
-| [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one, with a disabled option in the list — `disabled`, `invalid`. |
+| [states.tsx](examples/states.tsx) | A default field next to a disabled and an invalid one and one whose focus shows without the ring, with a disabled option in the list — `disabled`, `invalid`, `focusRing`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: removing the last region shakes the field and drops the error in, adding one clears it; required and optional markers and a hint — `required`, `optional`, `hint`, `error`. |
 | [creatable.tsx](examples/creatable.tsx) | A typed text that is not in the list becomes a new tag from the Create row or Enter and is saved on the server: the chip waits busy, and a tag the server refuses leaves again — `creatable`, `onCreate`, `defaultColor`. |
 | [many-tags.tsx](examples/many-tags.tsx) | More tags than fit: at rest one row with «+N», focused every tag on up to three wrapped rows that scroll — `defaultValue`. |

@@ -47,7 +47,7 @@ export const page: ComponentPageConfig = {
       scenario: "ranges",
       title: "Диапазоны",
       description:
-        "Сделки сужаются суммой «от–до» и периодом из календаря; каждый диапазон — один читаемый тег — `kind`, `formatValue`, `matchesSmartFilter`.",
+        "Сделки сужаются суммой «от–до» и периодом из календаря; каждый диапазон — один читаемый тег, а границы уходят на сервер параметрами from / to — `kind`, `formatValue`, `matchesSmartFilter`, `isSmartFilterRange`.",
     },
     {
       scenario: "single-value",

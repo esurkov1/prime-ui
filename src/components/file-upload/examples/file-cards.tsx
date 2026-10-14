@@ -1,4 +1,4 @@
-/** Materials of a warehouse inspection as cards: photos and documents in one grid, each with its picture or format and the name with the size; new files upload in their cards and the order is set by drag or Alt + arrows — `trigger`, `layout`, `defaultValue`, `queue`. */
+/** Materials of a warehouse inspection as cards: photos and documents in one grid, each with its picture or format and the name with the size in megabytes as the report gives it; new files upload in their cards and the order is set by drag or Alt + arrows — `trigger`, `layout`, `defaultValue`, `queue`, `formatSize`. */
 import { FileUpload, type FileUploadFile, type UploadContext, useUploadQueue } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -26,6 +26,14 @@ const MATERIALS: readonly FileUploadFile[] = [
   },
   { id: "insp-stock", name: "Остатки на 12 марта.xlsx", size: 96_000 },
 ];
+
+/** Sizes as the inspection report gives them: megabytes with two decimals. */
+const MEGABYTES = new Intl.NumberFormat("ru-RU", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const formatMegabytes = (bytes: number) => `${MEGABYTES.format(bytes / 1024 / 1024)} МБ`;
 
 /** A stand-in for the server: sends a file in a few steps and answers with its address. */
 function sendFile(file: File, { signal, onProgress }: UploadContext): Promise<string> {
@@ -58,6 +66,7 @@ export default function FileUploadFileCardsExample() {
         multiple
         defaultValue={MATERIALS}
         queue={queue}
+        formatSize={formatMegabytes}
       />
     </div>
   );

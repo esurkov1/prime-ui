@@ -22,9 +22,9 @@ export default function ScrollContainerAutoScrollExample() {
 
   return (
     <Card.Root role="region" className={styles.card} aria-label="План проекта">
-      <Typography as="h3" variant="title-s" className={styles.cardTitle}>
-        План проекта
-      </Typography>
+      <Card.Header>
+        <Card.Title>План проекта</Card.Title>
+      </Card.Header>
       <ScrollContainer>
         <Dnd.Root>
           <Dnd.Sortable

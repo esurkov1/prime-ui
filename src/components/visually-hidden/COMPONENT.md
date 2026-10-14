@@ -69,7 +69,8 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A count that sighted users read from the layout, said in words to screen readers, and a polite announcement after an action — `VisuallyHidden`. |
+| [overview.tsx](examples/overview.tsx) | A count that sighted users read from the layout, said in words to screen readers, and a polite announcement after an action — `VisuallyHidden`, `live`. |
+| [assertive.tsx](examples/assertive.tsx) | A failed save shown by a badge on screen and announced at once, interrupting the screen reader — `live`. |
 
 ## Mistakes
 - `display: none` or `hidden` for screen-reader text → both remove it from the accessibility tree.

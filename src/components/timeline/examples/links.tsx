@@ -1,28 +1,69 @@
-/** Rows that open an operation page become links, one Tab stop each with a focus ring — `href`. */
-import { Timeline } from "prime-ui-kit";
+/** Rows that open something: an operation page by a link or by your router link through the slot, a receipt in place by a button; one Tab stop each with a focus ring — `href`, `asChild`, `onClick`. */
+import { Button, Drawer, Timeline } from "prime-ui-kit";
+import * as React from "react";
 
 import styles from "./examples.module.css";
 
-const EVENTS = [
+const OPERATIONS = [
   { id: "rent-ivan", title: "Аренда закончилась · Иван К.", date: "21.09.26", value: "+6 300 ₽" },
   { id: "oil", title: "ТО: замена масла", date: "10.09.26", value: "−689 ₽" },
-  { id: "wash", title: "Мойка и химчистка салона", date: "01.09.26", value: "−450 ₽" },
 ];
 
+const WASH = { title: "Мойка и химчистка салона", date: "01.09.26", value: "−450 ₽" };
+
 export default function TimelineLinksExample() {
+  const [receiptOpen, setReceiptOpen] = React.useState(false);
+
   return (
-    <Timeline.Root className={styles.feed}>
-      <Timeline.Group label="Операции">
-        {EVENTS.map((event) => (
-          <Timeline.Item key={event.id} href={`#${event.id}`}>
-            <Timeline.Title>{event.title}</Timeline.Title>
+    <>
+      <Timeline.Root className={styles.feed}>
+        <Timeline.Group label="Операции">
+          {OPERATIONS.map((operation) => (
+            <Timeline.Item key={operation.id} href={`#${operation.id}`}>
+              <Timeline.Title>{operation.title}</Timeline.Title>
+              <Timeline.Meta>
+                <Timeline.MetaPrimary>{operation.date}</Timeline.MetaPrimary>
+              </Timeline.Meta>
+              <Timeline.Value>{operation.value}</Timeline.Value>
+            </Timeline.Item>
+          ))}
+          {/* The receipt opens in place: the row is a button. */}
+          <Timeline.Item onClick={() => setReceiptOpen(true)}>
+            <Timeline.Title>{WASH.title}</Timeline.Title>
             <Timeline.Meta>
-              <Timeline.MetaPrimary>{event.date}</Timeline.MetaPrimary>
+              <Timeline.MetaPrimary>{WASH.date}</Timeline.MetaPrimary> · чек
             </Timeline.Meta>
-            <Timeline.Value>{event.value}</Timeline.Value>
+            <Timeline.Value>{WASH.value}</Timeline.Value>
           </Timeline.Item>
-        ))}
-      </Timeline.Group>
-    </Timeline.Root>
+          {/* A router link (`<Link to>`) goes in the same way. */}
+          <Timeline.Item asChild>
+            <a href="#operations-archive">
+              <Timeline.Title>Операции за август</Timeline.Title>
+              <Timeline.Meta>
+                <Timeline.MetaPrimary>14 операций</Timeline.MetaPrimary>
+              </Timeline.Meta>
+            </a>
+          </Timeline.Item>
+        </Timeline.Group>
+      </Timeline.Root>
+
+      <Drawer.Root open={receiptOpen} onOpenChange={setReceiptOpen}>
+        <Drawer.Content size="s">
+          <Drawer.Header>
+            <Drawer.Title>{WASH.title}</Drawer.Title>
+            <Drawer.Description>
+              Чек от {WASH.date} · {WASH.value}
+            </Drawer.Description>
+          </Drawer.Header>
+          <Drawer.Footer>
+            <Drawer.Close>
+              <Button.Root variant="outline" tone="neutral">
+                Закрыть
+              </Button.Root>
+            </Drawer.Close>
+          </Drawer.Footer>
+        </Drawer.Content>
+      </Drawer.Root>
+    </>
   );
 }

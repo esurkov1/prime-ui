@@ -2,13 +2,11 @@
 
 /* A list footer in a Card: the range on the left, rows per page and pages on the right; wraps when narrow. */
 .footer {
-  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--prime-space-3);
-  padding: var(--prime-space-3) var(--prime-space-4);
 }
 
 .controls {

@@ -57,8 +57,12 @@
     var(--prime-motion-easing-standard);
 }
 
+.option[aria-disabled="true"] {
+  cursor: default;
+}
+
 @media (hover: hover) {
-  .option:hover {
+  .option:not([aria-disabled="true"]):hover {
     background: var(--prime-color-fill-subtle);
   }
 }

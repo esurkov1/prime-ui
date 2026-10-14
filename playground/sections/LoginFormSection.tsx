@@ -21,7 +21,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Вход через провайдера или по почте и паролю, ссылка «Забыли пароль?» и регистрация под центрированной шапкой — `align`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`.",
+        "Вход через провайдера или по почте и паролю, ссылка «Забыли пароль?» и регистрация под центрированной шапкой с названным знаком продукта — `align`, `LoginForm.Logo`, `LoginForm.Actions`, `LoginForm.Form`, `LoginForm.Footer`.",
     },
     {
       slot: "sizes",
@@ -31,7 +31,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "Минимальная форма: без логотипа, описания и подвала и без тени для хоста-поверхности — `flat`.",
+        "Минимальная форма: без логотипа, описания и подвала, без тени для хоста-поверхности и с заголовком второго уровня под заголовком страницы хоста — `flat`, `as`.",
     },
     {
       scenario: "register",
@@ -73,6 +73,7 @@ export const page: ComponentPageConfig = {
     keyboard: [],
     aria: [
       "Заголовок — настоящий `h1` (или `as`), форма — нативный `<form>`: Enter отправляет её.",
+      'Логотип декоративен; с `aria-label` он становится изображением знака продукта (`role="img"`).',
       "Дайте `LoginForm.Form` `aria-label` (или `aria-labelledby` на id заголовка), чтобы форма стала ориентиром.",
       "Поля с `autoComplete` (`email`, `current-password`, `new-password`, `one-time-code`) работают с менеджерами паролей и автозаполнением кода.",
       'Ошибке сервера в Banner нужен `role="alert"`; ошибки полей приходят из самих полей.',

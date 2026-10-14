@@ -22,9 +22,12 @@ export default function ScrollContainerEdgesExample() {
     <div className={styles.layout}>
       {EDGES.map((edges) => (
         <Card.Root key={edges} role="region" className={styles.card} aria-label={`Лента: ${edges}`}>
-          <Typography as="h3" variant="title-s" className={styles.cardTitle}>
-            {edges}
-          </Typography>
+          <Card.Header>
+            <Card.Title>Лента событий</Card.Title>
+            <Typography as="span" variant="caption" tone="muted">
+              {edges}
+            </Typography>
+          </Card.Header>
           <ScrollContainer edges={edges}>
             <ul className={styles.list}>
               {EVENTS.map((event) => (

@@ -10,7 +10,7 @@ export default function DividerWithIconExample() {
           Безопасность
         </Divider>
         <Typography as="span" variant="caption" tone="muted">
-          иконка и подпись
+          Icon · children
         </Typography>
       </div>
       <div>
@@ -18,7 +18,7 @@ export default function DividerWithIconExample() {
           <Icon name="status.locked" />
         </Divider>
         <Typography as="span" variant="caption" tone="muted">
-          только иконка
+          Icon · aria-label
         </Typography>
       </div>
     </div>

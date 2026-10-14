@@ -1,4 +1,4 @@
-/** A default field next to a disabled and a read-only one — `disabled`, `readOnly`. */
+/** A default field next to a disabled, a read-only and an invalid one with no message — `disabled`, `readOnly`, `invalid`. */
 import { Icon, Input } from "prime-ui-kit";
 
 export default function InputStatesExample() {
@@ -20,6 +20,11 @@ export default function InputStatesExample() {
           <Input.Icon side="end">
             <Icon name="status.locked" tone="secondary" />
           </Input.Icon>
+        </Input.Wrapper>
+      </Input.Root>
+      <Input.Root label="invalid" invalid>
+        <Input.Wrapper>
+          <Input.Field type="tel" defaultValue="+7 900 12" />
         </Input.Wrapper>
       </Input.Root>
     </>

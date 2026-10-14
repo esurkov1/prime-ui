@@ -4,10 +4,11 @@ import * as React from "react";
 
 import styles from "./examples.module.css";
 
-const CITIES = [
+const CITIES: { value: string; label: string; disabled?: boolean }[] = [
   { value: "msk", label: "Москва" },
   { value: "spb", label: "Санкт-Петербург" },
   { value: "kzn", label: "Казань" },
+  { value: "tver", label: "Тверь · закрыт", disabled: true },
 ];
 
 /** One tab stop: arrows move the focused row (wrapping), Home / End jump to the ends. */
@@ -24,10 +25,14 @@ export default function CheckboxIndicatorExample() {
   const [active, setActive] = React.useState(0);
   const optionRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
-  const toggle = (value: string) =>
+  const toggle = (city: (typeof CITIES)[number]) => {
+    if (city.disabled) return;
     setSelected((current) =>
-      current.includes(value) ? current.filter((item) => item !== value) : [...current, value],
+      current.includes(city.value)
+        ? current.filter((item) => item !== city.value)
+        : [...current, city.value],
     );
+  };
 
   return (
     <div
@@ -53,19 +58,20 @@ export default function CheckboxIndicatorExample() {
             }}
             role="option"
             aria-selected={isSelected}
+            aria-disabled={city.disabled || undefined}
             tabIndex={index === active ? 0 : -1}
             className={styles.option}
             onFocus={() => setActive(index)}
-            onClick={() => toggle(city.value)}
+            onClick={() => toggle(city)}
             onKeyDown={(event) => {
               if (event.key === " " || event.key === "Enter") {
                 event.preventDefault();
-                toggle(city.value);
+                toggle(city);
               }
             }}
           >
-            <Checkbox.Indicator checked={isSelected} />
-            <Typography as="span" variant="body-m">
+            <Checkbox.Indicator checked={isSelected} disabled={city.disabled} />
+            <Typography as="span" variant="body-m" tone={city.disabled ? "muted" : undefined}>
               {city.label}
             </Typography>
           </div>

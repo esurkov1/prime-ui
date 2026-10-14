@@ -26,7 +26,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "Необязательные части: плашка с иконкой в окне из одной шапки и шапка с подвалом без тела — `Modal.Icon`, `Modal.Body`, `Modal.Footer`.",
+        "Необязательные части: плашка с иконкой в окне из одной шапки и шапка со статусом перед крестиком и подвалом без тела — `Modal.Icon`, `Modal.Actions`, `Modal.Body`, `Modal.Footer`.",
     },
     {
       slot: "sizes",
@@ -49,6 +49,12 @@ export const page: ComponentPageConfig = {
       title: "Удержание формы",
       description:
         "Форма правки удерживает окно: после изменений любая попытка закрыть сначала спрашивает, в подвале — заметка; пока идёт сохранение, окно не закрывается — `Modal.Guard`, `Modal.Meta`.",
+    },
+    {
+      scenario: "enter-key",
+      title: "Клавиша Enter",
+      description:
+        "Enter в окне: пространство удаляется только кликом, не Enter в его поле; в окне тегов Enter добавляет набранный тег вместо сохранения — `confirmOnEnter`, `onEnterConfirm`.",
     },
     {
       slot: "dismiss",

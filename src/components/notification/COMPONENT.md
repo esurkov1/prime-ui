@@ -178,7 +178,7 @@ Collapsed stacks show up to 3 cards peeking behind each other. Hover or keyboard
 | [tones.tsx](examples/tones.tsx) | The four tones: the icon carries the meaning; danger and warning are announced at once — `tone`. |
 | [stacking.tsx](examples/stacking.tsx) | Toasts of one position and tone stack; hover expands the stack and pauses the timers — `max`, `items`, `dismissAll`. |
 | [undo.tsx](examples/undo.tsx) | Delete at once and offer to undo: the row leaves the list, the toast brings it back, and the deletion is sent only when the toast leaves without an undo — `onDismiss`, `action`. |
-| [dismiss.tsx](examples/dismiss.tsx) | A short timer, a toast that stays until closed, and one without a close button — `duration`, `persistent`, `closable`. |
+| [dismiss.tsx](examples/dismiss.tsx) | A short timer, a toast that stays until closed, and one without a close button; the close button's name comes from labels — `duration`, `persistent`, `closable`, `labels`. |
 | [in-form.tsx](examples/in-form.tsx) | Saving a form: the button shows loading, then a success toast or an error toast with a retry action — `notify`, `action`. |
 
 ## Mistakes

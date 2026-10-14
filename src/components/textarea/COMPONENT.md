@@ -200,7 +200,7 @@ Inline save (`onCommit`): the text at focus is the committed one; blur and Mod+E
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A labelled multi-line field with a hint; the height follows the text — `label`, `hint`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; text, padding, label and hint follow the tier — `size`. |
-| [states.tsx](examples/states.tsx) | A default field next to a read-only and a disabled one — `readOnly`, `disabled`. |
+| [states.tsx](examples/states.tsx) | A default field next to a read-only, a disabled and an invalid one with no message — `readOnly`, `disabled`, `invalid`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: an error shakes the field as it arrives, drops in and leaves as soon as the text is fixed; required and optional markers, a hint and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
 | [auto-resize.tsx](examples/auto-resize.tsx) | A field that grows with its text, one that starts as a line and stops growing at five, and a fixed one with a resize handle — `autoResize`, `rows`, `maxRows`. |
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single reply composer where the caret and the lighter fill show focus — `focusRing`. |

@@ -27,7 +27,11 @@ export const page: ComponentPageConfig = {
       description:
         "Все ярусы; ячейка — квадрат своей шкалы, на две ступени крупнее контролов — `size`.",
     },
-    { slot: "states", description: "Обычный код рядом с неактивным — `disabled`." },
+    {
+      slot: "states",
+      description:
+        "Обычный код рядом с неактивным, ошибочным без текста и принятым — `disabled`, `invalid`, `success`.",
+    },
     {
       slot: "validation",
       description:
@@ -50,6 +54,12 @@ export const page: ComponentPageConfig = {
       title: "Проверка по заполнению",
       description:
         "Код проверяется на сервере, как только заполнена последняя ячейка: ячейки ждут, верный окрашивает их в успех, неверный стирает код и встаёт причиной с покачиванием — `onComplete`, `hint`.",
+    },
+    {
+      scenario: "without-focus-ring",
+      title: "Без кольца фокуса",
+      description:
+        "Единственный код на экране пункта выдачи, где фокус видно по каретке и светлой заливке ячейки ввода — `focusRing`.",
     },
     {
       slot: "controlled",

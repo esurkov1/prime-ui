@@ -41,7 +41,8 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "sizes",
-      description: "Все ярусы: кегль, иконка, скругление папки и отступы растут вместе — `size`.",
+      description:
+        "Все ярусы: кегль, иконка, скругление папки и отступы растут вместе; вкладки по ширине содержимого — `size`, `fullWidth`.",
     },
     {
       slot: "states",

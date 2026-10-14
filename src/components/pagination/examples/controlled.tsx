@@ -16,36 +16,36 @@ export default function PaginationControlledExample() {
 
   return (
     <Card.Root>
-      <div className={styles.footer}>
-        <Typography as="span" variant="body-s" tone="secondary">
-          Счета {from}–{to} из {TOTAL_INVOICES}
-        </Typography>
-        <div className={styles.controls}>
-          <Select.Root
-            size="s"
-            value={perPage}
-            onValueChange={(next) => {
-              setPerPage(next);
-              setPage(1);
-            }}
-          >
-            <Select.Trigger aria-label="Строк на странице">
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Item value="10">10 строк</Select.Item>
-              <Select.Item value="25">25 строк</Select.Item>
-              <Select.Item value="50">50 строк</Select.Item>
-            </Select.Content>
-          </Select.Root>
-          <Pagination
-            size="s"
-            value={page}
-            onValueChange={setPage}
-            totalPages={Math.ceil(TOTAL_INVOICES / pageSize)}
-          />
+      <Card.Body>
+        <div className={styles.footer}>
+          <Typography as="span" variant="body-s" tone="secondary">
+            Счета {from}–{to} из {TOTAL_INVOICES}
+          </Typography>
+          <div className={styles.controls}>
+            <Select.Root
+              value={perPage}
+              onValueChange={(next) => {
+                setPerPage(next);
+                setPage(1);
+              }}
+            >
+              <Select.Trigger aria-label="Строк на странице">
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value="10">10 строк</Select.Item>
+                <Select.Item value="25">25 строк</Select.Item>
+                <Select.Item value="50">50 строк</Select.Item>
+              </Select.Content>
+            </Select.Root>
+            <Pagination
+              value={page}
+              onValueChange={setPage}
+              totalPages={Math.ceil(TOTAL_INVOICES / pageSize)}
+            />
+          </div>
         </div>
-      </div>
+      </Card.Body>
     </Card.Root>
   );
 }

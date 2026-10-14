@@ -42,7 +42,7 @@ export const page: ComponentPageConfig = {
       scenario: "region-error",
       title: "Ошибка загрузки региона",
       description:
-        "Регион данных не загрузился: ошибка занимает регион, повтор показывает загрузку, пока данные не проявятся — `tone`, `layout`, `EmptyPage.RetryButton`, `onRetry`.",
+        "Регион данных не загрузился: ошибка занимает регион, повтор показывает загрузку, пока данные не проявятся; его текст — из labels — `tone`, `layout`, `EmptyPage.RetryButton`, `onRetry`, `labels`.",
     },
     {
       scenario: "compact",

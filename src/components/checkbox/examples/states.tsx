@@ -1,4 +1,4 @@
-/** Every state side by side, each labelled by its prop — `checked`, `indeterminate`, `invalid`, `disabled`. */
+/** Every state side by side, each labelled by its prop — `checked`, `indeterminate`, `readOnly`, `invalid`, `disabled`. */
 import { Checkbox } from "prime-ui-kit";
 
 export default function CheckboxStatesExample() {
@@ -18,6 +18,11 @@ export default function CheckboxStatesExample() {
         <div>
           <Checkbox.Root indeterminate>
             <Checkbox.Label>indeterminate</Checkbox.Label>
+          </Checkbox.Root>
+        </div>
+        <div>
+          <Checkbox.Root defaultChecked readOnly>
+            <Checkbox.Label>readOnly</Checkbox.Label>
           </Checkbox.Root>
         </div>
         <div>

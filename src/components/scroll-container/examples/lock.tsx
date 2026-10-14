@@ -20,10 +20,8 @@ export default function ScrollContainerLockExample() {
 
   return (
     <Card.Root role="region" className={styles.card} aria-label="Очередь заказов">
-      <div className={styles.cardHeader}>
-        <Typography as="h3" variant="title-s">
-          Очередь заказов
-        </Typography>
+      <Card.Header>
+        <Card.Title>Очередь заказов</Card.Title>
         <Button.Root
           variant="soft"
           tone="neutral"
@@ -32,7 +30,7 @@ export default function ScrollContainerLockExample() {
         >
           {reviewing ? "Закрыть проверку" : "Проверить заказ"}
         </Button.Root>
-      </div>
+      </Card.Header>
       <ScrollContainer lock={reviewing}>
         <ul className={styles.list}>
           {ORDERS.map((order) => (

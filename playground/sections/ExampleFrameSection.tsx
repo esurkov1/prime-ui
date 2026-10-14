@@ -24,6 +24,12 @@ export const page: ComponentPageConfig = {
         "Живой пример рядом с исходником, с переключателями вида, ширины, темы и копированием — `code`, `previewLayout`.",
     },
     {
+      scenario: "initial-view",
+      title: "Начальный вид",
+      description:
+        "Рамка матрицы открывается на ширине телефона в тёмной теме без переключателя темы и считает копирования кода — `previewLayout`, `defaultViewport`, `defaultColorScheme`, `showThemeToggle`, `onCopy`.",
+    },
+    {
       slot: "controlled",
       description:
         "Рамки одной страницы делят ширину превью и тему: обе хранит родитель — `viewport`, `colorScheme`.",

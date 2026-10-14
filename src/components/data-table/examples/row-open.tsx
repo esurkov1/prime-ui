@@ -1,8 +1,6 @@
 /** Deals that open in a side panel: a click, or Enter and Space on the focused row; the panel keeps the last deal while it slides away — `onRowClick`. */
-import { Badge, DataTable, type DataTableColumn, Drawer, Typography } from "prime-ui-kit";
+import { Badge, DataTable, type DataTableColumn, DescriptionList, Drawer } from "prime-ui-kit";
 import * as React from "react";
-
-import styles from "./examples.module.css";
 
 type Stage = "new" | "talks" | "won";
 type Deal = { id: string; title: string; client: string; owner: string; stage: Stage; sum: number };
@@ -47,7 +45,7 @@ const RUB = new Intl.NumberFormat("ru-RU", {
 });
 
 const COLUMNS: DataTableColumn<Deal>[] = [
-  { id: "title", header: "Сделка", accessor: "title", hideable: false },
+  { id: "title", header: "Сделка", accessor: "title" },
   { id: "client", header: "Клиент", accessor: "client" },
   {
     id: "stage",
@@ -88,38 +86,11 @@ export default function DataTableRowOpenExample() {
           </Drawer.Header>
           <Drawer.Body>
             {deal ? (
-              <dl className={styles.details}>
-                <dt>
-                  <Typography as="span" variant="body-m" tone="muted">
-                    Клиент
-                  </Typography>
-                </dt>
-                <dd>
-                  <Typography as="span" variant="body-m">
-                    {deal.client}
-                  </Typography>
-                </dd>
-                <dt>
-                  <Typography as="span" variant="body-m" tone="muted">
-                    Ответственный
-                  </Typography>
-                </dt>
-                <dd>
-                  <Typography as="span" variant="body-m">
-                    {deal.owner}
-                  </Typography>
-                </dd>
-                <dt>
-                  <Typography as="span" variant="body-m" tone="muted">
-                    Сумма
-                  </Typography>
-                </dt>
-                <dd>
-                  <Typography as="span" variant="body-m">
-                    {RUB.format(deal.sum)}
-                  </Typography>
-                </dd>
-              </dl>
+              <DescriptionList.Root>
+                <DescriptionList.Item label="Клиент">{deal.client}</DescriptionList.Item>
+                <DescriptionList.Item label="Ответственный">{deal.owner}</DescriptionList.Item>
+                <DescriptionList.Item label="Сумма">{RUB.format(deal.sum)}</DescriptionList.Item>
+              </DescriptionList.Root>
             ) : null}
           </Drawer.Body>
         </Drawer.Content>

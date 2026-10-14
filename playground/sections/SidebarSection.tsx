@@ -42,7 +42,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "Группы с подписью и необязательные части пункта: простое число, цветной бейдж, подсказка клавиш, иконка в конце, действие в строке и недоступный раздел — `Sidebar.Group`, `Sidebar.ItemCount`, `color`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`, `disabled`.",
+        "Группы с подписью и необязательные части пункта: простое число, цветные и залитый бейджи, подсказка клавиш, иконка в конце, действия в строке со знаком по умолчанию и своим и недоступный раздел — `Sidebar.Group`, `Sidebar.ItemCount`, `color`, `variant`, `Sidebar.ItemShortcut`, `Sidebar.ItemAction`, `disabled`.",
     },
     {
       scenario: "brand-header",
@@ -54,7 +54,7 @@ export const page: ComponentPageConfig = {
       scenario: "collapsible-groups",
       title: "Сворачиваемые группы",
       description:
-        "Заголовки групп сворачивают свои пункты, шеврон — в конце заголовка; в компактном рельсе свёрнутая группа становится одной строкой, пункты которой открываются во всплывающей панели — `collapsible`, `defaultOpen`.",
+        "Заголовки групп сворачивают свои пункты, открыта одна группа за раз, шеврон — в конце заголовка; в компактном рельсе свёрнутая группа становится одной строкой, пункты которой открываются во всплывающей панели — `collapsible`, `open`, `onOpenChange`.",
     },
     {
       scenario: "nested-items",
@@ -66,13 +66,25 @@ export const page: ComponentPageConfig = {
       scenario: "account",
       title: "Аккаунт",
       description:
-        "Пункты подвала над блоком пользователя: аватар, имя и почта открывают меню аккаунта; сверните рельс — останется только аватар, на оси иконок — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`.",
+        "Пункты подвала и строка сворачивания над блоком пользователя: аватар, имя и почта открывают меню аккаунта; сверните рельс этой строкой — останется только аватар, на оси иконок — `Sidebar.Footer`, `Sidebar.Account`, `description`, `Sidebar.Toggle`.",
     },
     {
       scenario: "router",
       title: "Ссылки роутера",
       description:
-        "Ссылка роутера как пункт: роутер ставит `aria-current`, и пункт выглядит текущим; рендерите внутри роутера — `asChild`.",
+        "Ссылки роутера как бренд и пункты: роутер ставит `aria-current`, и пункт выглядит текущим; рендерите внутри роутера — `asChild`.",
+    },
+    {
+      scenario: "persist",
+      title: "Запоминает состояние",
+      description:
+        "Первый визит открывается рельсом из иконок; режим и свёрнутые группы запоминаются и возвращаются после перезагрузки — `persistKey`, `defaultMode`.",
+    },
+    {
+      scenario: "custom-part",
+      title: "Своя часть",
+      description:
+        "Своя часть в подвале читает состояние рельса: шкала хранилища видна в полном рельсе и в выезжающей панели и уходит в рельсе из иконок — `useSidebar`.",
     },
     {
       slot: "controlled",
@@ -83,6 +95,11 @@ export const page: ComponentPageConfig = {
       slot: "controlled-open",
       description:
         "Навигация за кнопкой меню на любой ширине: родитель открывает выезжающую панель, закрывают её подложка, Escape, кнопка в шапке или переход — `offCanvas`, `open`, `onOpenChange`.",
+    },
+    {
+      slot: "narrow",
+      description:
+        "Уже 768px рельс уходит из раскладки и выезжает поверх страницы по кнопке меню; от 768px это снова рельс, а кнопка уходит — `offCanvas`, `labels`.",
     },
   ],
   api,

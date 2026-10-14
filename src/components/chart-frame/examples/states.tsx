@@ -1,4 +1,4 @@
-/** Loading, empty, error and data swap in the plot's place without moving the panel; the error retries — `state`, `onRetry`. */
+/** Loading, empty, error and data swap in the plot's place without moving the panel; the error retries, and the legend of the one series only names it — `state`, `onRetry`, `readOnly`. */
 import {
   ChartFrame,
   type ChartFrameSeries,
@@ -72,6 +72,8 @@ export default function ChartFrameStatesExample() {
             );
           }}
         />
+        {/* One series: the legend only names it, there is nothing to turn off. */}
+        <ChartFrame.Legend readOnly />
       </ChartFrame.Root>
     </>
   );

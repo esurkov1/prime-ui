@@ -109,6 +109,7 @@ No `variant` or `tone`.
 
 ## Layout & spacing
 - The field hugs its cells (label left-aligned above them); with `fullWidth` it fills the container.
+- The code is always one row: in a container narrower than the row the cells narrow and keep the tier height, so no digit or group wraps to a second line.
 - Label → cells: tier `label-gap`; cells → hint: tier `hint-gap` — the same rhythm as every field.
 - Put the submit button below or next to the code; with the same `size` it lines up with the cells.
 
@@ -145,11 +146,12 @@ No `variant` or `tone`.
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A six-digit code from SMS with its label and a hint — `label`, `hint`, `length`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size; the cell is a square on its own scale, two steps above the control heights — `size`. |
-| [states.tsx](examples/states.tsx) | A default code next to a disabled one — `disabled`. |
+| [states.tsx](examples/states.tsx) | A default code next to a disabled one, an invalid one with no message and an accepted one — `disabled`, `invalid`, `success`. |
 | [validation.tsx](examples/validation.tsx) | A confirmation code checked once it is complete: a wrong code shakes in with one message and leaves as soon as you type again; a hint and an optional code — `required`, `optional`, `hint`, `error`. |
 | [grouped.tsx](examples/grouped.tsx) | A long code read in chunks with a wider gap between groups — `groupSize`. |
 | [full-width.tsx](examples/full-width.tsx) | Cells that share the container width and keep the tier height, above a full-width button — `fullWidth`. |
 | [on-complete.tsx](examples/on-complete.tsx) | The code is checked on the server as soon as the last cell is filled: the cells wait, a right one turns them success, a wrong one clears them and shakes in the reason — `onComplete`, `hint`. |
+| [without-focus-ring.tsx](examples/without-focus-ring.tsx) | The one code on a pickup point screen, where the caret and the lighter fill of the entry cell show focus — `focusRing`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the code and clears it with a button — `value`, `onValueChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A masked card PIN submitted with a form; a short or wrong PIN shakes in an error that leaves when you type again — `name`, `mask`, `required`, `error`. |
 

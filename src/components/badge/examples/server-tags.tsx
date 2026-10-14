@@ -19,13 +19,9 @@ function deleteTag(tag: string) {
 export default function BadgeServerTagsExample() {
   const [tags, setTags] = React.useState(TAGS);
   const [failure, setFailure] = React.useState<string | null>(null);
-  const titleId = React.useId();
 
   return (
-    <section className={styles.filters} aria-labelledby={titleId}>
-      <Typography as="h3" variant="title-s" id={titleId}>
-        Теги заказа № 4821
-      </Typography>
+    <div className={styles.filters}>
       <div className={styles.badges}>
         {tags.map((tag) => (
           <Badge.Root
@@ -56,6 +52,6 @@ export default function BadgeServerTagsExample() {
           {failure}
         </Typography>
       ) : null}
-    </section>
+    </div>
   );
 }

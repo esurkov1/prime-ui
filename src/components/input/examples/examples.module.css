@@ -8,12 +8,6 @@
   width: min(100%, var(--prime-modal-width-m));
 }
 
-.formHeader {
-  display: flex;
-  flex-direction: column;
-  gap: var(--prime-space-1);
-}
-
 .formFields {
   display: grid;
   /* Two columns while each keeps 12rem, one column in a narrower form — from its own width. */

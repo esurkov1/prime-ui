@@ -1,4 +1,4 @@
-/** Skeleton rows in the chart's geometry while it loads, an empty period and a plan you may only look at — `loading`, `empty`, `readOnly`. */
+/** Skeleton rows in the chart's geometry while it loads, an empty period and a report you may only look at, its today line on the report day — `loading`, `empty`, `readOnly`, `today`. */
 import { addDays, startOfToday, startOfWeek } from "date-fns";
 import { Gantt, type GanttBar, Typography } from "prime-ui-kit";
 
@@ -23,6 +23,9 @@ const FLEET: Vehicle[] = [
 ];
 
 const NO_VEHICLES: Vehicle[] = [];
+
+/** The day the dispatch report was made: its today line stands there, not on the real today. */
+const REPORT_DAY = at(2);
 
 const chartProps = {
   defaultScale: "day",
@@ -56,11 +59,12 @@ export default function GanttStatesExample() {
           aria-label="Рейсы машин, только просмотр"
           rows={FLEET}
           readOnly
+          today={REPORT_DAY}
           onBarChange={() => undefined}
           {...chartProps}
         />
         <Typography as="span" variant="caption" tone="muted">
-          readOnly
+          readOnly · today
         </Typography>
       </div>
     </div>

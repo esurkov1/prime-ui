@@ -30,7 +30,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Все состояния рядом, каждое подписано своим пропом — `checked`, `indeterminate`, `invalid`, `disabled`.",
+        "Все состояния рядом, каждое подписано своим пропом — `checked`, `indeterminate`, `readOnly`, `invalid`, `disabled`.",
     },
     {
       scenario: "without-label",

@@ -51,7 +51,7 @@ export const page: ComponentPageConfig = {
       scenario: "segments",
       title: "Сегменты",
       description:
-        "Части целого по часовой стрелке от верха: замкнутое кольцо, свободный остаток до `max`, отдельные дуги и пустой список — `segments`, `segmentGap`.",
+        "Части целого по часовой стрелке от верха: замкнутое кольцо, свободный остаток до `max`, отдельные дуги и пустой список со своим текстом для скринридеров — `segments`, `segmentGap`, `labels`.",
     },
     {
       scenario: "legend",

@@ -1,6 +1,6 @@
 /* Layout of the Thumbnail scenarios: semantic tokens only. */
 
-/* ratios.tsx, ring.tsx: thumbnails with captions in one line. */
+/* ratios.tsx, fit.tsx, ring.tsx: thumbnails with captions in one line. */
 .row {
   display: flex;
   flex-wrap: wrap;

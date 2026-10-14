@@ -1,5 +1,6 @@
-/* Chat: the page fills the app panel (`AppShell.Root fillViewport` + `PageContent.Root fill`); each
-   pane is a card with a scrolling region. */
+/* Messenger: a work screen — the header carries the title, the page fills the app panel
+   (`AppShell.Root fillViewport` + `PageContent.Root fill`); each pane is a card with a scrolling
+   region. */
 
 .paneCard {
   display: flex;

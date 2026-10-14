@@ -3,6 +3,9 @@ import { FileUpload, type FileUploadFile } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
+/** The zone names the formats the order takes. */
+const ZONE_LABELS = { description: "PDF или PNG до 20 МБ" };
+
 const ACT: readonly FileUploadFile[] = [
   { id: "act", name: "Акт сверки.pdf", size: 310_000, type: "application/pdf" },
 ];
@@ -10,14 +13,15 @@ const ACT: readonly FileUploadFile[] = [
 export default function FileUploadStatesExample() {
   return (
     <div className={styles.column}>
-      <FileUpload.Root label="default" hint="PDF или PNG до 20 МБ" />
+      <FileUpload.Root label="default" labels={ZONE_LABELS} />
       <FileUpload.Root
         label="disabled"
         disabled
+        labels={ZONE_LABELS}
         defaultValue={ACT}
         hint="Заказ закрыт, документы только для просмотра"
       />
-      <FileUpload.Root label="invalid" invalid hint="PDF или PNG до 20 МБ" />
+      <FileUpload.Root label="invalid" invalid labels={ZONE_LABELS} />
     </div>
   );
 }

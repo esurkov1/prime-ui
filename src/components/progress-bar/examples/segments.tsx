@@ -1,4 +1,4 @@
-/** Parts of a whole in one bar: joined or separate pills, free capacity up to `max` and an empty list — `segments`, `segmentGap`, `max`. */
+/** Parts of a whole in one bar: joined or separate pills, free capacity up to `max` and an empty list with its own spoken text — `segments`, `segmentGap`, `max`, `labels`. */
 import { ProgressBar, type ProgressSegment } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -26,7 +26,7 @@ export default function ProgressBarSegmentsExample() {
         label="Хранилище: 71 из 100 ГБ"
         showValue
       />
-      <ProgressBar segments={[]} label="Нет данных за период" />
+      <ProgressBar segments={[]} label="Заявки за ноябрь" labels={{ empty: "Заявок пока нет" }} />
     </div>
   );
 }

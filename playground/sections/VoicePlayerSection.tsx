@@ -31,7 +31,8 @@ export const page: ComponentPageConfig = {
     {
       scenario: "call-recording",
       title: "Запись звонка",
-      description: "Запись звонка в карточке сделки: плеер занимает ширину карточки — `className`.",
+      description:
+        "Запись звонка в карточке сделки: телефония не хранит уровни, поэтому волна читается из самого звука, и ровный ряд заполняется, когда она готова; плеер занимает ширину карточки — `getWaveform`, `waveform`, `className`.",
     },
     {
       scenario: "in-message",
@@ -54,7 +55,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "controlled",
       description:
-        "Родитель знает, что играет, отмечает сообщение прослушанным при первом запуске и хранит скорость — `playing`, `onPlayingChange`, `unplayed`, `rate`, `onRateChange`.",
+        "Родитель знает, что играет, отмечает сообщение прослушанным при первом запуске и дослушанным, когда оно закончилось, хранит скорость и держит расшифровку открытой — `playing`, `onPlayingChange`, `unplayed`, `onEnded`, `rate`, `onRateChange`, `transcriptExpanded`, `onTranscriptExpandedChange`.",
     },
   ],
   api,

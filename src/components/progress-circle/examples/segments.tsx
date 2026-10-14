@@ -1,4 +1,4 @@
-/** Parts of a whole clockwise from the top: a closed ring, free capacity up to `max`, separate arcs and an empty list — `segments`, `segmentGap`. */
+/** Parts of a whole clockwise from the top: a closed ring, free capacity up to `max`, separate arcs and an empty list with its own spoken text — `segments`, `segmentGap`, `labels`. */
 import { ProgressCircle, type ProgressSegment, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -54,9 +54,14 @@ export default function ProgressCircleSegmentsExample() {
         </Typography>
       </div>
       <div className={styles.item}>
-        <ProgressCircle size="xl" segments={[]} aria-label="Нет данных" />
+        <ProgressCircle
+          size="xl"
+          segments={[]}
+          aria-label="Заявки за ноябрь"
+          labels={{ empty: "Заявок пока нет" }}
+        />
         <Typography as="span" variant="caption" tone="muted">
-          Нет данных
+          Заявки за ноябрь
         </Typography>
       </div>
     </div>

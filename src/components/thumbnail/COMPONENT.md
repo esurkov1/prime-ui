@@ -171,9 +171,10 @@ No `labels`.
 | [sizes.tsx](examples/sizes.tsx) | Every height tier, 24 to 64 px; `m` fits a two-line table cell — `size`. |
 | [states.tsx](examples/states.tsx) | No image (an icon or a short label on the fill) and an image that fails and falls back by itself. |
 | [ratios.tsx](examples/ratios.tsx) | Every aspect ratio at the same height; keep one ratio per list — `ratio`. |
+| [fit.tsx](examples/fit.tsx) | A supplier's wide banner in a square frame: cropped to fill or shown whole on the fill — `fit`. |
 | [ring.tsx](examples/ring.tsx) | A faint inner ring for a white-background photo on a light surface, where the edge would vanish — `ring`. |
 | [full-width.tsx](examples/full-width.tsx) | Covers in a card grid take the card width and keep 16:9, so every cover has one height — `fullWidth`. |
-| [video.tsx](examples/video.tsx) | Videos in the frame: a walkthrough without a poster shows its first frame, a play mark and the duration; a short clip loops muted like a GIF; a video message plays in place with its controls — `Thumbnail.Video`, `autoPlay`, `controls`. |
+| [video.tsx](examples/video.tsx) | Videos in the frame: a walkthrough without a poster shows its first frame, a play mark and the duration; a briefing shows its poster and its own duration format; a short clip loops muted like a GIF; a video message plays in place with its controls — `Thumbnail.Video`, `poster`, `formatDuration`, `autoPlay`, `controls`. |
 | [pressable.tsx](examples/pressable.tsx) | Photos of a delivery that open a viewer: the frame is put on a button, so it lifts on hover, presses and takes the focus ring — `asChild`. |
 | [controlled.tsx](examples/controlled.tsx) | A media library picks photos for a listing: each tile is a checkbox with its check in the corner, the selection lives in the parent and a button clears it — `checked`, `onCheckedChange`. |
 

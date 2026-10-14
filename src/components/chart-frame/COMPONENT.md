@@ -216,7 +216,8 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Revenue by month as a hand-drawn SVG line chart in a dashboard panel: the headline with its change, a period switch, a legend that turns series off and a table for screen readers — `series`, `formatValue`, `renderPlot`. |
 | [tooltip.tsx](examples/tooltip.tsx) | Invoices by week as grouped bars: the kit tooltip follows the pointer with a row per series, the arrows step through the weeks — `ChartFrame.Tooltip`, `items`, `point`. |
-| [states.tsx](examples/states.tsx) | Loading, empty, error and data swap in the plot's place without moving the panel; the error retries — `state`, `onRetry`. |
+| [fill-height.tsx](examples/fill-height.tsx) | Revenue against the plan beside two KPI tiles: the plot takes the height of the stretched grid cell, and the plan line starts hidden until the legend turns it on — `height`, `defaultHiddenSeries`. |
+| [states.tsx](examples/states.tsx) | Loading, empty, error and data swap in the plot's place without moving the panel; the error retries, and the legend of the one series only names it — `state`, `onRetry`, `readOnly`. |
 | [controlled.tsx](examples/controlled.tsx) | Lead sources with totals in the legend; the hidden series live in the page state and one button shows them all again — `hiddenSeries`, `onHiddenSeriesChange`. |
 | [narrow.tsx](examples/narrow.tsx) | A 320px column: the actions drop under the title, the plot gets lower and a self-sizing SVG stretches to it — `children`, `height`. |
 

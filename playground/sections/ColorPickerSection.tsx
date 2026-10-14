@@ -30,7 +30,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Неактивные область и ползунок оттенка показывают цвет, но не принимают ввод — `disabled`.",
+        "Неактивные область, ползунок оттенка и триггер пресетов показывают цвет, но не принимают ввод — `disabled`.",
     },
     {
       slot: "validation",
@@ -53,7 +53,7 @@ export const page: ComponentPageConfig = {
       scenario: "presets",
       title: "Пресеты",
       description:
-        "Быстрый цвет из палитры: квадратный триггер рядом с полем и триггер-кнопка; можно «без цвета» — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`.",
+        "Быстрый цвет из палитры: квадратный триггер с «без цвета» и триггер-кнопка, чья сетка в четыре колонки остаётся открытой после выбора — `ColorPresets`, `allowEmpty`, `ColorPresets.Trigger`, `columns`, `closeOnSelect`.",
     },
     {
       scenario: "presets-sizes",
@@ -65,6 +65,11 @@ export const page: ComponentPageConfig = {
       slot: "controlled",
       description:
         "Цветом владеет родитель: образцы бренда и hex-поле меняют его, кнопка сбрасывает — `value`, `onValueChange`.",
+    },
+    {
+      slot: "controlled-open",
+      description:
+        "Родитель открывает палитру пресетов своей кнопкой и хранит выбранный цвет — `open`, `onOpenChange`, `value`, `onValueChange`.",
     },
     {
       slot: "in-form",

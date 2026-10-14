@@ -1,5 +1,7 @@
-/** Deals narrowed by an amount from–to and a period from the calendar; each range is one readable chip — `kind`, `formatValue`, `matchesSmartFilter`. */
+/** Deals narrowed by an amount from–to and a period from the calendar; each range is one readable chip, and the bounds go to the server as from / to parameters — `kind`, `formatValue`, `matchesSmartFilter`, `isSmartFilterRange`. */
 import {
+  Card,
+  isSmartFilterRange,
   matchesSmartFilter,
   SmartFilter,
   type SmartFilterField,
@@ -59,6 +61,23 @@ const DEALS = [
 
 const INITIAL: SmartFilterValue = { amount: { from: 50_000, to: 500_000 } };
 
+const asParam = (bound: number | Date) =>
+  bound instanceof Date ? bound.toISOString().slice(0, 10) : String(bound);
+
+/** The query a server gets: a range becomes `key_from` / `key_to`, a selection its included values. */
+function toQuery(value: SmartFilterValue) {
+  const params = new URLSearchParams();
+  for (const [key, entry] of Object.entries(value)) {
+    if (isSmartFilterRange(entry)) {
+      if (entry.from !== null) params.set(`${key}_from`, asParam(entry.from));
+      if (entry.to !== null) params.set(`${key}_to`, asParam(entry.to));
+    } else if (entry.include.length > 0) {
+      params.set(key, entry.include.join(","));
+    }
+  }
+  return params.toString();
+}
+
 export default function SmartFilterRangesExample() {
   const [value, setValue] = React.useState<SmartFilterValue>(INITIAL);
   const rows = DEALS.filter(
@@ -74,16 +93,31 @@ export default function SmartFilterRangesExample() {
         <SmartFilter.Toolbar />
         <SmartFilter.Chips />
       </SmartFilter.Root>
-      {rows.map((deal) => (
-        <div key={deal.id} className={styles.request}>
-          <Typography as="span" variant="body-m" truncate className={styles.route}>
-            {deal.client}
+      <Card.Root variant="list">
+        <Card.Header>
+          <Card.Title>Сделки</Card.Title>
+          <Typography as="span" variant="caption" tone="muted">
+            {rows.length} из {DEALS.length}
           </Typography>
-          <Typography as="span" variant="body-m" tone="secondary">
-            {formatRubles(deal.amount)}
-          </Typography>
-        </div>
-      ))}
+        </Card.Header>
+        <Card.List>
+          {rows.map((deal) => (
+            <Card.ListItem key={deal.id}>
+              <span className={styles.request}>
+                <Typography as="span" variant="body-m" truncate className={styles.route}>
+                  {deal.client}
+                </Typography>
+                <Typography as="span" variant="body-m" tone="secondary">
+                  {formatRubles(deal.amount)}
+                </Typography>
+              </span>
+            </Card.ListItem>
+          ))}
+        </Card.List>
+      </Card.Root>
+      <Typography as="span" variant="code" tone="secondary">
+        {`GET /deals?${toQuery(value)}`}
+      </Typography>
     </div>
   );
 }

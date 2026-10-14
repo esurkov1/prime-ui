@@ -226,11 +226,12 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A trigger opens a dialog with a title, a field and two actions; Enter presses the confirm — `Modal.Trigger`, `Modal.Confirm`. |
-| [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile with a header-only notice, and a header with a footer but no body — `Modal.Icon`, `Modal.Body`, `Modal.Footer`. |
+| [structure.tsx](examples/structure.tsx) | Optional parts: an icon tile with a header-only notice, and a header with a status before the close button and a footer but no body — `Modal.Icon`, `Modal.Actions`, `Modal.Body`, `Modal.Footer`. |
 | [sizes.tsx](examples/sizes.tsx) | Every width; xs, s and m fill the footer with equal buttons, l and xl align them to the end — `size`. |
 | [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place — `Modal.Body`. |
 | [custom-container.tsx](examples/custom-container.tsx) | The dialog portals into a given node instead of the document body — `container`. |
 | [guard.tsx](examples/guard.tsx) | An edit form that holds the dialog: changes make any dismiss ask first and show a note in the footer; while saving nothing closes it — `Modal.Guard`, `Modal.Meta`. |
+| [enter-key.tsx](examples/enter-key.tsx) | Enter in a dialog: deleting a workspace takes a click, never Enter in its field; in the tags dialog Enter adds the typed tag instead of saving — `confirmOnEnter`, `onEnterConfirm`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A destructive confirm closes only from its buttons, and not at all while the request runs — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state and opens the dialog from code, without a trigger — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A settings form in a dialog: the footer button submits the form and an empty name shakes the field and keeps it open until it is filled — `Modal.Body`, `Modal.Footer`, `error`. |

@@ -1,4 +1,4 @@
-/** An expense form: the choice is a labelled field with a hint, checked on submit, its error leaves as soon as a segment is chosen — `label`, `hint`, `required`, `error`. */
+/** An expense form: the choice is a labelled field with a hint, checked on submit, its error leaves as soon as a segment is chosen; an optional choice beside it — `label`, `hint`, `required`, `error`, `optional`. */
 import { Button, Input, SegmentedControl } from "prime-ui-kit";
 import * as React from "react";
 
@@ -35,6 +35,10 @@ export default function SegmentedControlInFormExample() {
         <SegmentedControl.Item value="company">Компании</SegmentedControl.Item>
         <SegmentedControl.Item value="project">Проекта</SegmentedControl.Item>
         <SegmentedControl.Item value="personal">Личный</SegmentedControl.Item>
+      </SegmentedControl.Root>
+      <SegmentedControl.Root label="Возмещение" optional defaultValue="salary">
+        <SegmentedControl.Item value="salary">С зарплатой</SegmentedControl.Item>
+        <SegmentedControl.Item value="card">На карту</SegmentedControl.Item>
       </SegmentedControl.Root>
       <Button.Root type="submit">Сохранить расход</Button.Root>
     </form>

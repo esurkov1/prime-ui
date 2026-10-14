@@ -1,5 +1,6 @@
-/** Screen states: a page-level error in a Banner with a retry, a region loading with a Skeleton of its rows and a table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states — `state`. */
+/** Screen states: the title and the date of the statement in the app header, a page-level error in a Banner with a retry, a region loading with a Skeleton of its rows and a table skeleton, the table error in place and a first-run EmptyPage; regions cross-fade between states — `state`. */
 import {
+  AppHeader,
   Banner,
   Button,
   Card,
@@ -66,122 +67,131 @@ export default function CrossfadeScreenExample() {
   };
 
   return (
-    <PageContent.Page aria-labelledby="reconcile-title">
-      <PageContent.Header>
-        <PageContent.Title id="reconcile-title">Сверка с банком</PageContent.Title>
-        <PageContent.Description>
-          Поступления из выписок, которые нужно связать со счетами.
-        </PageContent.Description>
-      </PageContent.Header>
-      <PageContent.Body>
-        {/* The page banner and the panels are one block: the banner, with the 40 below it, comes and
+    <>
+      {/* The header carries the page: the only h1 and a line of data, here the date of the last
+          statement — it moves on once the statement arrives. Main has no PageContent.Header. */}
+      <AppHeader.Root>
+        <AppHeader.Start>
+          <AppHeader.Title>
+            Сверка с банком
+            <AppHeader.Description>
+              2 счёта · выписка на {status === "ready" ? "7" : "6"} октября
+            </AppHeader.Description>
+          </AppHeader.Title>
+        </AppHeader.Start>
+      </AppHeader.Root>
+
+      <PageContent.Root>
+        <PageContent.Body>
+          {/* The page banner and the panels are one block: the banner, with the 40 below it, comes and
             goes inside a Crossfade, so the panels glide instead of jumping. */}
-        <div className={styles.lead}>
-          <Crossfade state={status === "error" ? "error" : "ok"}>
-            {status === "error" ? (
-              <div className={styles.bannerSlot}>
-                <Banner.Root tone="danger">
-                  <Banner.Content>
-                    <Banner.Icon>
-                      <Icon name="status.danger" />
-                    </Banner.Icon>
-                    <Banner.Title>Выписка за 7 октября не получена</Banner.Title>
-                    <Banner.Description>
-                      Т-Банк не ответил на запрос. Остатки показаны на 6 октября.
-                    </Banner.Description>
-                    <Banner.Actions>
-                      <Button.Root tone="danger" onClick={retry}>
-                        Повторить
-                      </Button.Root>
-                    </Banner.Actions>
-                  </Banner.Content>
-                </Banner.Root>
-              </div>
-            ) : null}
-          </Crossfade>
+          <div className={styles.lead}>
+            <Crossfade state={status === "error" ? "error" : "ok"}>
+              {status === "error" ? (
+                <div className={styles.bannerSlot}>
+                  <Banner.Root tone="danger">
+                    <Banner.Content>
+                      <Banner.Icon>
+                        <Icon name="status.danger" />
+                      </Banner.Icon>
+                      <Banner.Title>Выписка за 7 октября не получена</Banner.Title>
+                      <Banner.Description>
+                        Т-Банк не ответил на запрос. Остатки показаны на 6 октября.
+                      </Banner.Description>
+                      <Banner.Actions>
+                        <Button.Root tone="danger" onClick={retry}>
+                          Повторить
+                        </Button.Root>
+                      </Banner.Actions>
+                    </Banner.Content>
+                  </Banner.Root>
+                </div>
+              ) : null}
+            </Crossfade>
 
-          <PageContent.Grid>
-            <PageContent.Cell span={6}>
-              <Card.Root variant="panel" aria-busy={status === "loading"}>
-                <Card.Header>
-                  <Card.Title as="h2">Остатки</Card.Title>
-                  <Typography as="span" variant="caption" tone="muted">
-                    {status === "ready" ? "на 7 октября" : "на 6 октября"}
-                  </Typography>
-                </Card.Header>
-                <Card.Body>
-                  {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
-                  <Crossfade state={status === "loading" ? "loading" : "ready"}>
-                    {status === "loading" ? (
-                      <ul className={styles.accounts}>
-                        {ACCOUNTS.map((account) => (
-                          <li key={account.name} className={styles.account}>
-                            <Skeleton className={styles.nameBar} />
-                            {/* title-m is the l text tier: 16 / 24. */}
-                            <Skeleton size="l" className={styles.balanceBar} />
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <ul className={styles.accounts}>
-                        {ACCOUNTS.map((account) => (
-                          <li key={account.name} className={styles.account}>
-                            <Typography as="span" variant="body-m" tone="secondary">
-                              {account.name}
-                            </Typography>
-                            <Typography as="span" variant="title-m" className={styles.amount}>
-                              {account.balance}
-                            </Typography>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </Crossfade>
-                </Card.Body>
-              </Card.Root>
-            </PageContent.Cell>
+            <PageContent.Grid>
+              <PageContent.Cell span={6}>
+                <Card.Root variant="panel" aria-busy={status === "loading"}>
+                  <Card.Header>
+                    <Card.Title as="h2">Остатки</Card.Title>
+                    <Typography as="span" variant="caption" tone="muted">
+                      {status === "ready" ? "на 7 октября" : "на 6 октября"}
+                    </Typography>
+                  </Card.Header>
+                  <Card.Body>
+                    {/* Loading ↔ data cross-fade in place; the table below swaps its body the same way. */}
+                    <Crossfade state={status === "loading" ? "loading" : "ready"}>
+                      {status === "loading" ? (
+                        <ul className={styles.accounts}>
+                          {ACCOUNTS.map((account) => (
+                            <li key={account.name} className={styles.account}>
+                              <Skeleton className={styles.nameBar} />
+                              {/* title-m is the l text tier: 16 / 24. */}
+                              <Skeleton size="l" className={styles.balanceBar} />
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <ul className={styles.accounts}>
+                          {ACCOUNTS.map((account) => (
+                            <li key={account.name} className={styles.account}>
+                              <Typography as="span" variant="body-m" tone="secondary">
+                                {account.name}
+                              </Typography>
+                              <Typography as="span" variant="title-m" className={styles.amount}>
+                                {account.balance}
+                              </Typography>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </Crossfade>
+                  </Card.Body>
+                </Card.Root>
+              </PageContent.Cell>
 
-            <PageContent.Cell span={6}>
-              <Card.Root variant="panel">
-                <Card.Header>
-                  <Card.Title as="h2">Правила разнесения</Card.Title>
-                </Card.Header>
-                <Card.Body>
-                  <EmptyPage.Root size="s" aria-labelledby="rules-empty">
-                    <EmptyPage.Icon tone="accent">
-                      <Icon name="action.filter" />
-                    </EmptyPage.Icon>
-                    <EmptyPage.Title as="h3" id="rules-empty">
-                      Правил пока нет
-                    </EmptyPage.Title>
-                    <EmptyPage.Description>
-                      Правило свяжет платёж со счётом по ИНН или назначению.
-                    </EmptyPage.Description>
-                    <EmptyPage.Actions>
-                      <Button.Root variant="soft" tone="neutral">
-                        Создать правило
-                      </Button.Root>
-                    </EmptyPage.Actions>
-                  </EmptyPage.Root>
-                </Card.Body>
-              </Card.Root>
-            </PageContent.Cell>
-          </PageContent.Grid>
-        </div>
+              <PageContent.Cell span={6}>
+                <Card.Root variant="panel">
+                  <Card.Header>
+                    <Card.Title as="h2">Правила разнесения</Card.Title>
+                  </Card.Header>
+                  <Card.Body>
+                    <EmptyPage.Root size="s" aria-labelledby="rules-empty">
+                      <EmptyPage.Icon tone="accent">
+                        <Icon name="action.filter" />
+                      </EmptyPage.Icon>
+                      <EmptyPage.Title as="h3" id="rules-empty">
+                        Правил пока нет
+                      </EmptyPage.Title>
+                      <EmptyPage.Description>
+                        Правило свяжет платёж со счётом по ИНН или назначению.
+                      </EmptyPage.Description>
+                      <EmptyPage.Actions>
+                        <Button.Root variant="soft" tone="neutral">
+                          Создать правило
+                        </Button.Root>
+                      </EmptyPage.Actions>
+                    </EmptyPage.Root>
+                  </Card.Body>
+                </Card.Root>
+              </PageContent.Cell>
+            </PageContent.Grid>
+          </div>
 
-        <PageContent.Section label="Неразнесённые платежи">
-          <DataTable
-            columns={COLUMNS}
-            rows={status === "ready" ? PAYMENTS : []}
-            getRowKey={(row) => row.id}
-            paging="none"
-            loading={status === "loading"}
-            loadingRows={3}
-            error={status === "error" ? "Платежи появятся после загрузки выписки" : undefined}
-            empty="Все платежи разнесены"
-          />
-        </PageContent.Section>
-      </PageContent.Body>
-    </PageContent.Page>
+          <PageContent.Section label="Неразнесённые платежи">
+            <DataTable
+              columns={COLUMNS}
+              rows={status === "ready" ? PAYMENTS : []}
+              getRowKey={(row) => row.id}
+              paging="none"
+              loading={status === "loading"}
+              loadingRows={3}
+              error={status === "error" ? "Платежи появятся после загрузки выписки" : undefined}
+              empty="Все платежи разнесены"
+            />
+          </PageContent.Section>
+        </PageContent.Body>
+      </PageContent.Root>
+    </>
   );
 }

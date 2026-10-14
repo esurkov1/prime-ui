@@ -269,12 +269,12 @@ Controlled: `value` + `onChange` (or `onValueChange`) on `Input.Field`. Uncontro
 |---|---|
 | [overview.tsx](examples/overview.tsx) | A labelled field with a hint under it — `label`, `hint`. |
 | [sizes.tsx](examples/sizes.tsx) | Every size tier; the label and the hint follow the field tier — `size`. |
-| [states.tsx](examples/states.tsx) | A default field next to a disabled and a read-only one — `disabled`, `readOnly`. |
+| [states.tsx](examples/states.tsx) | A default field next to a disabled, a read-only and an invalid one with no message — `disabled`, `readOnly`, `invalid`. |
 | [validation.tsx](examples/validation.tsx) | Live validation: an error shakes the field as it arrives, drops in and leaves as soon as the value is fixed; required and optional markers, a hint and a support row that does not shift — `required`, `optional`, `hint`, `error`, `reserveSupportRow`. |
 | [with-icon.tsx](examples/with-icon.tsx) | A decorative icon at either end of the value — `Input.Icon`, `side`. |
 | [affixes.tsx](examples/affixes.tsx) | A fixed prefix and suffix flush with the edges and a unit next to the value — `Input.Affix`, `Input.InlineAffix`. |
 | [without-focus-ring.tsx](examples/without-focus-ring.tsx) | A single search field where the caret and the lighter fill show focus — `focusRing`. |
-| [password-strength.tsx](examples/password-strength.tsx) | A new password with a show toggle and a meter that fills step by step and names the level beside the hint — `Input.RevealButton`, `strength`. |
+| [password-strength.tsx](examples/password-strength.tsx) | A new password with a show toggle and a meter that fills step by step and names the level beside the hint, and a service password measured by the company's own rule — `Input.RevealButton`, `strength`, `getStrength`. |
 | [edge-actions.tsx](examples/edge-actions.tsx) | Actions at the field's end: a mail link with a tooltip beside copying the value, and a profile link on a read-only field — `Input.Action`, `Input.CopyButton`. |
 | [inline-edit.tsx](examples/inline-edit.tsx) | Record card fields that save on blur and Enter, revert on Escape and show the server's refusal — `onCommit`, `error`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: a clear button and a character counter follow it — `value`, `onValueChange`, `Input.ClearButton`, `Input.Counter`. |

@@ -152,6 +152,7 @@ The radiogroup carries `data-size`, `data-orientation`, `aria-orientation`, `ari
 | [group.tsx](examples/group.tsx) | A required group with option descriptions and the group's error under the options — `label`, `required`, `hint`, `error`. |
 | [orientation.tsx](examples/orientation.tsx) | Options stacked in a column and laid out in a wrapping row — `orientation`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the chosen plan and shows it in the hint — `value`, `onValueChange`. |
+| [in-form.tsx](examples/in-form.tsx) | Choices of an order form: a required group shows its error after a submit without a choice, an optional one is marked — `name`, `required`, `optional`, `error`. |
 
 ## Mistakes
 - `Radio.Root` outside `Radio.Group` → it throws; every option needs the group.

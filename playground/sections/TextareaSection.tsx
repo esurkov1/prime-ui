@@ -36,7 +36,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "states",
       description:
-        "Обычное поле рядом с полем только для чтения и неактивным — `readOnly`, `disabled`.",
+        "Обычное поле рядом с полем только для чтения, неактивным и ошибочным без текста — `readOnly`, `disabled`, `invalid`.",
     },
     {
       slot: "validation",

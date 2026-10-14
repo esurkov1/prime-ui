@@ -22,3 +22,11 @@
   display: flex;
   gap: var(--prime-space-8);
 }
+
+/* in-form.tsx: the submit row after the fields, the note beside the button. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--prime-space-3);
+}

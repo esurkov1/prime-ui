@@ -1,12 +1,5 @@
-/* Detail page: two columns that wrap into one on narrow screens, no breakpoints. */
-
-/* Status badge and due date in the header description, one line. */
-.status {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--prime-space-2);
-}
+/* Detail page: the header carries the title; two columns that wrap into one on narrow screens, no
+   breakpoints. */
 
 /* Main column grows; the side column keeps ~18rem and drops below once main would get < 30rem. */
 .columns {

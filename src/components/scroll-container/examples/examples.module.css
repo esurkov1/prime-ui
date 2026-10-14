@@ -17,15 +17,11 @@
   width: auto;
 }
 
-.cardTitle {
-  padding: var(--prime-space-3) var(--prime-space-4);
-}
-
 .list {
   display: flex;
   flex-direction: column;
   margin: 0;
-  padding: 0 var(--prime-space-4) var(--prime-space-3);
+  padding: var(--prime-space-2) var(--prime-space-4) var(--prime-space-3);
   list-style: none;
 }
 
@@ -48,7 +44,7 @@
 }
 
 .messages {
-  padding-top: var(--prime-space-2);
+  min-height: 0;
 }
 
 /* Older messages loading: lines in the messages' geometry, at the top where they will appear. */
@@ -77,7 +73,7 @@
 
 /* Two-axis scroller: the side padding lives on the scrolling element itself (foundation §7). */
 .canvas {
-  padding: 0 var(--prime-space-4) var(--prime-space-3);
+  padding: var(--prime-space-3) var(--prime-space-4);
 }
 
 .grid {
@@ -92,15 +88,6 @@
   border-radius: var(--prime-radius-s);
   background: var(--prime-color-fill-subtle);
   font-variant-numeric: tabular-nums;
-}
-
-/* lock.tsx: the title and the review button in one row above the queue. */
-.cardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--prime-space-3);
-  padding: var(--prime-space-3) var(--prime-space-4);
 }
 
 /* snap.tsx: a row of fixed-width cards; the padding keeps the edge cards' rings unclipped. */
@@ -124,7 +111,7 @@
   flex-direction: column;
   gap: var(--prime-space-1);
   margin: 0;
-  padding: 0 var(--prime-space-3) var(--prime-space-3);
+  padding: var(--prime-space-3);
   list-style: none;
 }
 

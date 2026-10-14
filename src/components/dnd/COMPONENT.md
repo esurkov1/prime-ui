@@ -103,7 +103,7 @@ Generic `Dnd.Draggable<TData>`; `ref` → `HTMLElement`. An item carried onto a 
 | `as` | `"div" \| "li" \| "span" \| "article" \| "section"` | `"div"` | Element. |
 | `onDragStart` | `(item, point, origin) => void` | — | Fired once the press became a drag. |
 | `onDragEnd` | `(item, outcome: "drop" \| "release" \| "cancel") => void` | — | Always fired at the end. |
-| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id">` | — | `className` and the other attributes. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "id" \| "onDragStart" \| "onDragEnd">` | — | `className` and the other attributes. |
 
 ### Dnd.DropZone
 Generic `Dnd.DropZone<TData>`; `ref` → `HTMLElement`. Renders the `as` element; state is mirrored by `data-dnd-over`, `data-dnd-reject`, `data-dnd-flash`. Where zones overlap, the innermost wins.
@@ -238,7 +238,9 @@ An item's own `onPointerDown` / `onKeyDown` run before the kit's: `preventDefaul
 | [grid.tsx](examples/grid.tsx) | Product photos in a wrapping grid: a photo carried across rows lands in reading order, the gap takes a cell, Alt + ← / → steps it one place — `axis`. |
 | [locked.tsx](examples/locked.tsx) | Sections of a workspace menu: the home section is pinned first with a lock in place of its grip, the rest reorder around nothing past it; each row is named by its visible title — `locked`, `handle`, `aria-labelledby`. |
 | [board.tsx](examples/board.tsx) | A ticket board: columns share one kind, so a ticket lands in another column at an exact position or moves there with Alt + ← / →, an empty column says so, and a full column refuses it before the release with the reason under the ticket — `kind`, `canDrop`, `empty`, `onReorder`. |
-| [drop-zones.tsx](examples/drop-zones.tsx) | Documents carried onto folders: a zone takes items by kind, a locked folder refuses before the release and says why under the carried file, the target flashes where the file landed — `Dnd.Draggable`, `Dnd.DropZone`, `canDrop`, `flashOnDrop`. |
+| [drop-zones.tsx](examples/drop-zones.tsx) | Documents carried onto folders: a zone takes items by kind and gets the document as data, a locked folder refuses before the release and says why under the carried file, a syncing folder is no target at all, a document on signing stays put, the line above follows the drag, the target flashes where the file landed — `Dnd.Draggable`, `Dnd.DropZone`, `data`, `canDrop`, `disabled`, `onDragStart`, `onDragEnd`, `onEnter`, `onLeave`, `flashOnDrop`. |
+| [table.tsx](examples/table.tsx) | A project estimate as a table: each stage is its own body of rows under a heading row that never moves, a row is carried by its grip within a stage or into another, and the rows stay table rows — `as`, `header`, `kind`, `handle`. |
+| [states.tsx](examples/states.tsx) | A contract's approval route: a step already signed stays where it is while the rest reorder around it, and once the route is approved the whole list holds still — `Dnd.SortableItem`, `Dnd.Sortable`, `disabled`. |
 | [narrow.tsx](examples/narrow.tsx) | A row of status filters in a 320 px strip: tags reorder sideways and the strip scrolls when a tag is held near its edge — `axis`. |
 
 ## Mistakes

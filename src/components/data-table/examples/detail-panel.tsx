@@ -1,7 +1,5 @@
-/** Order details in a full-width row under an expanded order, aligned with the first content column — `renderExpanded`, `defaultExpanded`. */
-import { DataTable, type DataTableColumn, Typography } from "prime-ui-kit";
-
-import styles from "./examples.module.css";
+/** Order details in a full-width row under an expanded order, aligned with the first content column; a cancelled order has nothing to show and gets no toggle — `renderExpanded`, `defaultExpanded`, `isRowExpandable`. */
+import { DataTable, type DataTableColumn, DescriptionList } from "prime-ui-kit";
 
 type Order = {
   id: string;
@@ -9,8 +7,8 @@ type Order = {
   customer: string;
   date: string;
   total: number;
-  address: string;
-  items: string;
+  /** Delivery details; a cancelled order has none. */
+  delivery: { address: string; items: string } | null;
 };
 
 const ORDERS: Order[] = [
@@ -20,8 +18,10 @@ const ORDERS: Order[] = [
     customer: "Анна Соколова",
     date: "07.10.26",
     total: 12_480,
-    address: "Москва, ул. Тверская, 12, кв. 45",
-    items: "Кабель USB-C, 2 м × 2, док-станция × 1",
+    delivery: {
+      address: "Москва, ул. Тверская, 12, кв. 45",
+      items: "Кабель USB-C, 2 м × 2, док-станция × 1",
+    },
   },
   {
     id: "o2",
@@ -29,17 +29,23 @@ const ORDERS: Order[] = [
     customer: "Дмитрий Орлов",
     date: "06.10.26",
     total: 34_900,
-    address: "Санкт-Петербург, Невский пр., 28",
-    items: 'Монитор 27" × 1',
+    delivery: { address: "Санкт-Петербург, Невский пр., 28", items: 'Монитор 27" × 1' },
   },
   {
     id: "o3",
+    number: "№ 10 479",
+    customer: "Игорь Белов",
+    date: "06.10.26",
+    total: 2_990,
+    delivery: null,
+  },
+  {
+    id: "o4",
     number: "№ 10 477",
     customer: "Мария Ким",
     date: "05.10.26",
     total: 4_350,
-    address: "Казань, ул. Баумана, 7",
-    items: "Клавиатура × 1",
+    delivery: { address: "Казань, ул. Баумана, 7", items: "Клавиатура × 1" },
   },
 ];
 
@@ -51,7 +57,13 @@ const RUB = new Intl.NumberFormat("ru-RU", {
 
 const COLUMNS: DataTableColumn<Order>[] = [
   { id: "number", header: "Заказ", accessor: "number", minWidth: "8rem" },
-  { id: "customer", header: "Покупатель", accessor: "customer", sortable: true },
+  {
+    id: "customer",
+    header: "Покупатель",
+    accessor: "customer",
+    sortable: true,
+    cell: (row) => (row.delivery ? row.customer : `${row.customer} · отменён`),
+  },
   { id: "date", header: "Дата", accessor: "date", numeric: true },
   {
     id: "total",
@@ -70,30 +82,17 @@ export default function DataTableDetailPanelExample() {
       rows={ORDERS}
       getRowKey={(row) => row.id}
       getRowLabel={(row) => row.number}
-      renderExpanded={(row) => (
-        <dl className={styles.details}>
-          <dt>
-            <Typography as="span" variant="body-s" tone="muted">
-              Адрес доставки
-            </Typography>
-          </dt>
-          <dd>
-            <Typography as="span" variant="body-s">
-              {row.address}
-            </Typography>
-          </dd>
-          <dt>
-            <Typography as="span" variant="body-s" tone="muted">
-              Состав
-            </Typography>
-          </dt>
-          <dd>
-            <Typography as="span" variant="body-s">
-              {row.items}
-            </Typography>
-          </dd>
-        </dl>
-      )}
+      isRowExpandable={(row) => row.delivery !== null}
+      renderExpanded={(row) =>
+        row.delivery ? (
+          <DescriptionList.Root size="s">
+            <DescriptionList.Item label="Адрес доставки">
+              {row.delivery.address}
+            </DescriptionList.Item>
+            <DescriptionList.Item label="Состав">{row.delivery.items}</DescriptionList.Item>
+          </DescriptionList.Root>
+        ) : null
+      }
       defaultExpanded={["o1"]}
       paging="none"
     />

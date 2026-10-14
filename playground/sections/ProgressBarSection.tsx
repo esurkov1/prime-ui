@@ -53,7 +53,7 @@ export const page: ComponentPageConfig = {
       scenario: "segments",
       title: "Сегменты",
       description:
-        "Части целого в одной полосе: слитно или отдельными капсулами, свободный остаток до `max` и пустой список — `segments`, `segmentGap`, `max`.",
+        "Части целого в одной полосе: слитно или отдельными капсулами, свободный остаток до `max` и пустой список со своим текстом для скринридеров — `segments`, `segmentGap`, `max`, `labels`.",
     },
     {
       scenario: "legend",

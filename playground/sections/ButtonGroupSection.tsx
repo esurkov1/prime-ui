@@ -28,7 +28,8 @@ export const page: ComponentPageConfig = {
     },
     {
       slot: "states",
-      description: "Обычный сегмент, включённый и неактивный — `pressed`, `disabled`.",
+      description:
+        "Обычный сегмент, включённый, неактивный и группа с ошибкой — `pressed`, `disabled`, `invalid`.",
     },
     {
       slot: "with-icon",
@@ -51,7 +52,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "in-form",
       description:
-        "Форма задачи: переключатели приоритета — поле с подписью, которое проверяется при отправке, а нативные отправка и сброс стоят в одной группе — `label`, `required`, `error`, `type`.",
+        "Форма задачи: переключатели приоритета — поле с подписью, которое проверяется при отправке, необязательное напоминание, а нативные отправка и сброс стоят в одной группе — `label`, `required`, `hint`, `error`, `optional`, `type`.",
     },
   ],
   api,

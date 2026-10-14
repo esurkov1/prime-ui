@@ -1,4 +1,4 @@
-/** A formatting toolbar in one group: after the first tooltip the neighbours open at once, each with its name and shortcut — `Tooltip.Provider`. */
+/** A formatting toolbar in one group: after the first tooltip the neighbours open at once for half a second, each with its name and shortcut — `Tooltip.Provider`, `skipDelayDuration`. */
 import { Button, Icon, Kbd, Tooltip } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -13,7 +13,7 @@ const TOOLS = [
 
 export default function TooltipToolbarExample() {
   return (
-    <Tooltip.Provider>
+    <Tooltip.Provider skipDelayDuration={500}>
       <div className={styles.toolbar} role="toolbar" aria-label="Форматирование">
         {TOOLS.map(({ icon, label, keys }) => (
           <Tooltip.Root key={label}>

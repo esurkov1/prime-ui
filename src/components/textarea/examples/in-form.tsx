@@ -1,5 +1,5 @@
 /** Support request form: the description is checked on submit, its error leaves as soon as the text is long enough and does not shift the form, a sent request turns the button green — `required`, `error`, `reserveSupportRow`. */
-import { Button, Input, Textarea, Typography } from "prime-ui-kit";
+import { Button, Input, Textarea } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
@@ -23,14 +23,6 @@ export default function TextareaInFormExample() {
 
   return (
     <form className={styles.form} noValidate onSubmit={submit}>
-      <div className={styles.formHeader}>
-        <Typography as="h3" variant="title-m">
-          Обращение в поддержку
-        </Typography>
-        <Typography as="p" variant="body-s" tone="secondary">
-          Ответим в течение рабочего дня.
-        </Typography>
-      </div>
       <div className={styles.formFields}>
         <Input.Root label="Тема" required>
           <Input.Wrapper>

@@ -6,16 +6,3 @@
   flex-direction: column;
   gap: var(--prime-space-5);
 }
-
-/* overview.tsx: a term / value grid. */
-.details {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--prime-space-2) var(--prime-space-4);
-  margin: 0;
-}
-
-.details dd {
-  margin: 0;
-  font-variant-numeric: tabular-nums;
-}

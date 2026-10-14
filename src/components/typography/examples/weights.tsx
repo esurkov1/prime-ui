@@ -17,6 +17,9 @@ export default function TypographyWeightsExample() {
       <Typography variant="body-m" weight="semibold">
         {LINE} · semibold
       </Typography>
+      <Typography variant="body-m" tracking="tight">
+        {LINE} · tracking tight
+      </Typography>
       <Typography variant="body-m" tracking="tighter">
         {LINE} · tracking tighter
       </Typography>

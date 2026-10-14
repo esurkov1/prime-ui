@@ -32,7 +32,7 @@ export const page: ComponentPageConfig = {
       scenario: "in-message",
       title: "В сообщении",
       description:
-        "Круглые видео в чате выездной бригады: кружок — само сообщение, время стоит на его плашке, ответ идёт текстом — `Message.Root`, `time`, `status`.",
+        "Круглые видео в чате выездной бригады: кружок — само сообщение, время стоит на его плашке, ответ идёт текстом, а кружок-ответ показывает обложку, сделанную сервером — `Message.Root`, `time`, `status`, `poster`.",
     },
     {
       scenario: "transcript",
@@ -49,7 +49,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "controlled",
       description:
-        "Родитель знает, что играет, и отмечает отчёт просмотренным при первом запуске — `playing`, `onPlayingChange`, `unplayed`.",
+        "Родитель знает, что играет, отмечает отчёт просмотренным при первом запуске и досмотренным, когда он закончился, и держит расшифровку открытой — `playing`, `onPlayingChange`, `unplayed`, `onEnded`, `transcriptExpanded`, `onTranscriptExpandedChange`.",
     },
   ],
   api,

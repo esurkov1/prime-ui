@@ -1,8 +1,11 @@
-/** Documents in a chat: a download link, a file with a picture, a large file fetched from its tile, an upload in flight with its share and cancel, and a failed one with a retry — `Message.File`, `href`, `preview`, `transfer`, `transferProgress`, `transferDirection`, `onDownload`. */
+/** Documents in a chat: a download link, a file with a picture, a large file fetched from its tile, an upload in flight with its share and cancel, and a failed one with a retry whose size reads in whole kilobytes — `Message.File`, `href`, `preview`, `transfer`, `transferProgress`, `transferDirection`, `onDownload`, `formatSize`. */
 import { Message, type TransferState } from "prime-ui-kit";
 import * as React from "react";
 
 import styles from "./examples.module.css";
+
+/** «94 КБ»: the document system reports sizes in whole kilobytes. */
+const formatKilobytes = (bytes: number) => `${Math.ceil(bytes / 1024)} КБ`;
 
 export default function MessageFileExample() {
   const [progress, setProgress] = React.useState(0.1);
@@ -70,6 +73,7 @@ export default function MessageFileExample() {
         <Message.File
           name="Акт приёмки.docx"
           fileSize={96_000}
+          formatSize={formatKilobytes}
           transfer={failed ? "failed" : "done"}
           onRetry={() => setFailed(false)}
         />

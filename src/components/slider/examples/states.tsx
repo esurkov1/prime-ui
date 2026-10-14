@@ -1,4 +1,4 @@
-/** The fill at both ends and a disabled slider — `disabled`. */
+/** The fill at both ends, an invalid slider and a disabled one — `invalid`, `disabled`. */
 import { Slider } from "prime-ui-kit";
 
 export default function SliderStatesExample() {
@@ -9,6 +9,9 @@ export default function SliderStatesExample() {
       </div>
       <div>
         <Slider label="max" showValue defaultValue={100} />
+      </div>
+      <div>
+        <Slider label="invalid" showValue defaultValue={90} invalid />
       </div>
       <div>
         <Slider label="disabled" showValue defaultValue={35} disabled />
