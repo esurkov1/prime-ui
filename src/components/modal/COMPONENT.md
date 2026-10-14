@@ -198,6 +198,8 @@ Around the record's picture — an `Avatar.Root` or a `Thumbnail.Root` (found by
 | State | Driven by | DOM |
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state="open" \| "closed"` on the scrim and the dialog (closed while the exit animation plays) |
+| dismiss | `closeOnEscape`, `closeOnOutsideClick` (both default `true`) | Escape, and a scrim press or the phone sheet's swipe, ask the Root to close; `false` turns that way off (no handle, no swipe) |
+| Enter confirms | `confirmOnEnter` (default `true`), `onEnterConfirm` | Enter in a field clicks the `Modal.Confirm` child, or calls `onEnterConfirm` instead; a focused button or link keeps its own Enter |
 | size | `size` on Content | `data-size` on the dialog |
 | header with description | a `Modal.Description` inside | `data-has-description="true"` on the header |
 | footer layout | `layout` or the size default | `data-layout` on the footer |
@@ -263,7 +265,7 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 | [long-content.tsx](examples/long-content.tsx) | A long body scrolls on its own while the header and the footer stay in place; the primary closes the dialog and is the Enter target — `Modal.Body`, `Modal.Confirm`. |
 | [custom-container.tsx](examples/custom-container.tsx) | The dialog portals into a given node instead of the document body — `container`. |
 | [guard.tsx](examples/guard.tsx) | An edit form that holds the dialog: changes make any dismiss ask first and show a note in the footer, the submit button saves the form, and while saving nothing closes it — `Modal.Guard`, `Modal.Meta`. |
-| [enter-key.tsx](examples/enter-key.tsx) | Enter in a dialog: deleting a workspace takes a click, never Enter in its field; in the tags dialog Enter adds the typed tag instead of saving — `confirmOnEnter`, `onEnterConfirm`. |
+| [enter-key.tsx](examples/enter-key.tsx) | Enter in a dialog: handing a workspace over takes a click, never Enter in its field; in the tags dialog Enter adds the typed tag instead of closing — `confirmOnEnter`, `onEnterConfirm`. |
 | [dismiss.tsx](examples/dismiss.tsx) | A step the person has to finish: the payment details dialog closes only from its buttons, and not at all while they are saved — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the open state and opens the dialog from code, without a trigger — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | A settings form in a dialog: the footer submit button submits the form, Enter in a field does the same, and an empty name shakes the field and keeps it open until it is filled — `Modal.Body`, `Modal.Footer`, `error`. |
@@ -278,5 +280,5 @@ Motion (`overlayMotion`): the scrim fades in and out over `base`; the dialog fad
 - Long multi-section forms in a modal → use Drawer.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (header close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Modal.Body`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Modal.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Drawer and Sheet (`internal/overlay/DialogParts`, `internal/overlay/ModalDialog`), [Button](../button/COMPONENT.md) (header close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Modal.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Modal.Icon`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Modal.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm built on Modal `s`), [Drawer](../drawer/COMPONENT.md) (the same header, body, footer and `Guard` at the edge), [Popover](../popover/COMPONENT.md), [CommandMenu](../command-menu/COMPONENT.md)

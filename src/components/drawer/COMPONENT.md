@@ -170,6 +170,7 @@ Below 640px of viewport every size is full width and loses its corners.
 | State | Driven by | DOM |
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the scrim and the panel; mounted until the slide-out ends |
+| dismiss | `closeOnEscape`, `closeOnOutsideClick` (both default `true`) | Escape and a scrim press ask the Root to close; `false` turns that way off |
 | side / size | Content props | `data-side`, `data-size` on the panel |
 | open: trapped | while open | focus trapped, page scroll locked, siblings of the portal `inert` (the toast region stays usable); a drawer opened from a Modal or another drawer stacks above it |
 | closing | `open` turns false | the panel keeps showing the children it had open while it slides out |
@@ -249,5 +250,5 @@ Motion: the scrim fades, the panel slides from its side over `slow` and leaves o
 - Padding on a wrapper inside Body → Body already pads and scrolls.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Drawer.Body`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Drawer.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Modal and Sheet (`internal/overlay/DialogParts`), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Drawer.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Drawer.Icon`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Drawer.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [Modal](../modal/COMPONENT.md) (the same header, body, footer and `Guard` in the centre), [Sheet](../sheet/COMPONENT.md) (the same parts raised from the bottom edge for a short task), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (a destructive confirm), [Sidebar](../../layout/sidebar/COMPONENT.md), [Popover](../popover/COMPONENT.md), [Avatar](../avatar/COMPONENT.md) (a person's picture in `Drawer.Icon`)

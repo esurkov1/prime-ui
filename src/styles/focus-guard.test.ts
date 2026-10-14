@@ -71,7 +71,7 @@ describe("focus ring guard", () => {
 
   it("keeps side padding on the scrolling body of overlays", () => {
     // Modal and Drawer share header/body/footer parts.
-    for (const rel of ["components/modal/DialogParts.module.css"]) {
+    for (const rel of ["internal/overlay/DialogParts.module.css"]) {
       const body = blocks(read(rel)).find((b) => /(^|,)\s*\.body\s*$/.test(b.selector));
       expect(body, `${rel} .body`).toBeDefined();
       expect(body?.body, `${rel} .body padding`).toMatch(/padding(-inline)?:/);

@@ -1,14 +1,13 @@
 /*
- * Drawer — a raised edge panel over the scrim, on the dialog shell (DialogParts.module.css: the
- * same zones as Modal, each with its own side padding; header and footer stay put, only the body
- * scrolls). Width per size tier; full width below 640px. A bottom sheet is its own component
+ * Drawer — a raised edge panel over the scrim, on the dialog shell (internal/overlay/DialogParts:
+ * the same zones as Modal, each with the drawer's side padding; header and footer stay put, only
+ * the body scrolls). Width per size tier; full width below 640px. A bottom sheet is its own component
  * (Sheet). On the one overlay level: a drawer opened from a Modal or another drawer is portaled
  * later, so it stacks above it in DOM order.
  */
 
 .panel {
   --drawer-width: var(--prime-drawer-width-m);
-  --dialog-padding: var(--prime-drawer-padding);
 
   position: fixed;
   top: 0;

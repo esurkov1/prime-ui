@@ -54,7 +54,7 @@ export const page: ComponentPageConfig = {
       scenario: "enter-key",
       title: "Клавиша Enter",
       description:
-        "Enter в окне: пространство удаляется только кликом, не Enter в его поле; в окне тегов Enter добавляет набранный тег вместо сохранения — `confirmOnEnter`, `onEnterConfirm`.",
+        "Enter в окне: пространство передаётся только кликом, не Enter в его поле; в окне тегов Enter добавляет набранный тег вместо закрытия — `confirmOnEnter`, `onEnterConfirm`.",
     },
     {
       slot: "dismiss",

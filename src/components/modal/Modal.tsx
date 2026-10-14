@@ -1,4 +1,4 @@
-import { DialogGuard } from "./DialogGuard";
+import { DialogGuard } from "@/internal/overlay/DialogGuard";
 import {
   DialogActions,
   DialogBody,
@@ -11,10 +11,10 @@ import {
   DialogMeta,
   DialogTitle,
   DialogTrigger,
-} from "./DialogParts";
-import { ModalContent, ModalRoot } from "./ModalDialog";
+} from "@/internal/overlay/DialogParts";
+import { ModalContent, ModalRoot } from "@/internal/overlay/ModalDialog";
 
-export type { DialogGuardProps as ModalGuardProps } from "./DialogGuard";
+export type { DialogGuardProps as ModalGuardProps } from "@/internal/overlay/DialogGuard";
 export type {
   DialogActionsProps as ModalActionsProps,
   DialogBodyProps as ModalBodyProps,
@@ -27,13 +27,13 @@ export type {
   DialogMetaProps as ModalMetaProps,
   DialogTitleProps as ModalTitleProps,
   DialogTriggerProps as ModalTriggerProps,
-} from "./DialogParts";
+} from "@/internal/overlay/DialogParts";
 export type {
   ModalContentProps,
   ModalLabels,
   ModalPlacement,
   ModalRootProps,
-} from "./ModalDialog";
+} from "@/internal/overlay/ModalDialog";
 
 export const Modal = {
   Root: ModalRoot,

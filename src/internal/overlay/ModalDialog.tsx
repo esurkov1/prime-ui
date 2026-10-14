@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import type { ControlSize } from "@/internal/states";
+import { type ControlSize, OVERLAY_CONTENT_SIZE } from "@/internal/states";
 
 import {
   type DialogLabels,
@@ -9,11 +9,11 @@ import {
   DialogRootProvider,
   useDialogRoot,
 } from "./DialogParts";
-import styles from "./Modal.module.css";
+import styles from "./ModalDialog.module.css";
 
 /*
- * Root and Content of Modal, apart from the public `Modal` object (Modal.tsx): ConfirmDialog is
- * built from them, and `Modal.Guard` is built from ConfirmDialog.
+ * Root and Content of Modal, apart from the public `Modal` object (components/modal/Modal.tsx):
+ * ConfirmDialog is built from them, and `Modal.Guard` is built from ConfirmDialog.
  */
 
 export type ModalLabels = DialogLabels;
@@ -45,16 +45,19 @@ export type ModalContentProps = React.HTMLAttributes<HTMLDivElement> & {
   placement?: ModalPlacement;
   container?: HTMLElement | null;
   overlayClassName?: string;
-  /** The `role="dialog"` panel. */
   ref?: React.Ref<HTMLDivElement>;
 };
 
-export function ModalContent({ size = "m", placement = "center", ...props }: ModalContentProps) {
+export function ModalContent({
+  size = OVERLAY_CONTENT_SIZE,
+  placement = "center",
+  ...props
+}: ModalContentProps) {
   return (
     <DialogPanel
       {...props}
+      kind="modal"
       panelClassName={styles.content}
-      motion="dialog"
       swipe={placement === "center" ? "compact" : "never"}
       footerLayout={size === "xs" || size === "s" || size === "m" ? "fill" : "end"}
       enterConfirm

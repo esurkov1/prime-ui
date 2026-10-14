@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import { DialogGuard } from "@/components/modal/DialogGuard";
+import { DialogGuard } from "@/internal/overlay/DialogGuard";
 import {
   DialogActions,
   DialogBody,
@@ -16,12 +16,12 @@ import {
   DialogTitle,
   DialogTrigger,
   useDialogRoot,
-} from "@/components/modal/DialogParts";
-import type { ControlSize } from "@/internal/states";
+} from "@/internal/overlay/DialogParts";
+import { type ControlSize, OVERLAY_CONTENT_SIZE } from "@/internal/states";
 
 import styles from "./Drawer.module.css";
 
-export type { DialogGuardProps as DrawerGuardProps } from "@/components/modal/DialogGuard";
+export type { DialogGuardProps as DrawerGuardProps } from "@/internal/overlay/DialogGuard";
 export type {
   DialogActionsProps as DrawerActionsProps,
   DialogBodyProps as DrawerBodyProps,
@@ -33,7 +33,7 @@ export type {
   DialogMetaProps as DrawerMetaProps,
   DialogTitleProps as DrawerTitleProps,
   DialogTriggerProps as DrawerTriggerProps,
-} from "@/components/modal/DialogParts";
+} from "@/internal/overlay/DialogParts";
 
 export type DrawerSide = "left" | "right";
 
@@ -63,16 +63,19 @@ export type DrawerContentProps = React.HTMLAttributes<HTMLDivElement> & {
   side?: DrawerSide;
   size?: Exclude<ControlSize, "xs">;
   overlayClassName?: string;
-  /** The `role="dialog"` panel. */
   ref?: React.Ref<HTMLDivElement>;
 };
 
-function DrawerContent({ side = "right", size = "m", ...props }: DrawerContentProps) {
+function DrawerContent({
+  side = "right",
+  size = OVERLAY_CONTENT_SIZE,
+  ...props
+}: DrawerContentProps) {
   return (
     <DialogPanel
       {...props}
+      kind="drawer"
       panelClassName={styles.panel}
-      motion="drawer"
       swipe="never"
       footerLayout="end"
       data-side={side}

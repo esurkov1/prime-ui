@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import { DialogGuard } from "@/components/modal/DialogGuard";
+import { DialogGuard } from "@/internal/overlay/DialogGuard";
 import {
   DialogActions,
   DialogBody,
@@ -16,11 +16,11 @@ import {
   DialogTitle,
   DialogTrigger,
   useDialogRoot,
-} from "@/components/modal/DialogParts";
+} from "@/internal/overlay/DialogParts";
 
 import styles from "./Sheet.module.css";
 
-export type { DialogGuardProps as SheetGuardProps } from "@/components/modal/DialogGuard";
+export type { DialogGuardProps as SheetGuardProps } from "@/internal/overlay/DialogGuard";
 export type {
   DialogActionsProps as SheetActionsProps,
   DialogBodyProps as SheetBodyProps,
@@ -32,7 +32,7 @@ export type {
   DialogMetaProps as SheetMetaProps,
   DialogTitleProps as SheetTitleProps,
   DialogTriggerProps as SheetTriggerProps,
-} from "@/components/modal/DialogParts";
+} from "@/internal/overlay/DialogParts";
 
 export type SheetLabels = DialogLabels;
 
@@ -58,7 +58,6 @@ SheetRoot.displayName = "Sheet.Root";
 
 export type SheetContentProps = React.HTMLAttributes<HTMLDivElement> & {
   overlayClassName?: string;
-  /** The `role="dialog"` panel. */
   ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -66,8 +65,8 @@ function SheetContent(props: SheetContentProps) {
   return (
     <DialogPanel
       {...props}
+      kind="sheet"
       panelClassName={styles.panel}
-      motion="dialog"
       swipe="always"
       footerLayout="end"
     />

@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Avatar } from "@/components/avatar/Avatar";
@@ -68,6 +69,18 @@ async function expectClosed() {
 }
 
 describe("Drawer", () => {
+  it("Tab and Shift+Tab cycle inside the open drawer", async () => {
+    const user = userEvent.setup();
+    render(<BasicDrawer defaultOpen />);
+    const close = screen.getByRole("button", { name: "Закрыть" });
+    const confirm = screen.getByRole("button", { name: "Confirm" });
+    confirm.focus();
+    await user.tab();
+    expect(close).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(confirm).toHaveFocus();
+  });
+
   it("opens from Trigger", () => {
     render(<BasicDrawer />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

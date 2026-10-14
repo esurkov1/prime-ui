@@ -159,6 +159,7 @@ Sheet has no `variant`, `side` or `size`: it always rises from the bottom edge, 
 | State | Driven by | DOM |
 |---|---|---|
 | open / closed | `open` / `defaultOpen` / `onOpenChange` | `data-state` on the scrim and the panel; mounted until the slide-down ends |
+| dismiss | `closeOnEscape`, `closeOnOutsideClick` (both default `true`) | Escape, a scrim press and a swipe down ask the Root to close; `false` turns that way off (`closeOnOutsideClick={false}`: no handle, no swipe) |
 | swiping | a drag down from the handle or the header (with `closeOnOutsideClick`; without it there is no handle and no swipe) | `data-swiping` and `--swipe-offset` on the panel while the pointer drags it, `data-swipe-dismissed` while it glides out after a closing release — both mirrored on the scrim, which carries `--swipe-progress` (0…1) |
 | open: trapped | while open | focus trapped, page scroll locked, siblings of the portal `inert`; a sheet opened from another overlay stacks above it |
 | closing | `open` turns false | the panel keeps showing the children it had open while it slides down |
@@ -236,5 +237,5 @@ Motion: the scrim fades, the sheet slides up over `slow` and down over `base` (`
 - `closeOnOutsideClick={false}` and `closeOnEscape={false}` with no header × and no `Sheet.Close` → nothing closes it; keep a button that answers.
 
 ## Related
-- **Built from:** [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Sheet.Body`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Sheet.Guard` discard confirm), `Icon` (the close glyph)
+- **Built from:** the dialog shared with Modal and Drawer (`internal/overlay/DialogParts`), [Button](../button/COMPONENT.md) (close button), [ScrollContainer](../scroll-container/COMPONENT.md) (`Sheet.Body`), [Avatar](../avatar/COMPONENT.md) and [Thumbnail](../thumbnail/COMPONENT.md) (a record's picture in `Sheet.Icon`), [ConfirmDialog](../confirm-dialog/COMPONENT.md) (the `Sheet.Guard` discard confirm), `Icon` (the close glyph)
 - **See also:** [Drawer](../drawer/COMPONENT.md) (the same parts as a side panel), [Modal](../modal/COMPONENT.md) (the same parts in the centre), [Datepicker](../datepicker/COMPONENT.md) (`Datepicker.Panel` in a sheet), [Dropdown](../dropdown/COMPONENT.md)

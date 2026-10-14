@@ -6,7 +6,7 @@ import {
   dialogParts,
   dialogRootProps,
   dialogSlotsPart,
-} from "./dialog.api";
+} from "../../internal/overlay/dialog.api";
 
 export const api: ComponentApi = {
   parts: [

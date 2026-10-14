@@ -10,34 +10,39 @@ const SIZES = [
 
 export default function DrawerSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map(({ size, width }) => (
-        <Drawer.Root key={size}>
-          <Drawer.Trigger>
-            <Button.Root variant="soft" tone="neutral">
-              {size}
-            </Button.Root>
-          </Drawer.Trigger>
-          <Drawer.Content size={size}>
-            <Drawer.Header>
-              <Drawer.Title>Детали заказа</Drawer.Title>
-              <Drawer.Description>Ширина панели {width}</Drawer.Description>
-            </Drawer.Header>
-            <Drawer.Body>
-              <Typography variant="body-m" tone="secondary">
-                На экране уже 640 px панель занимает всю ширину и теряет скругления.
-              </Typography>
-            </Drawer.Body>
-            <Drawer.Footer>
-              <Drawer.Close>
-                <Button.Root variant="outline" tone="neutral">
-                  Закрыть
-                </Button.Root>
-              </Drawer.Close>
-            </Drawer.Footer>
-          </Drawer.Content>
-        </Drawer.Root>
+        <div key={size}>
+          <Drawer.Root>
+            <Drawer.Trigger>
+              <Button.Root variant="soft" tone="neutral">
+                Детали заказа
+              </Button.Root>
+            </Drawer.Trigger>
+            <Drawer.Content size={size}>
+              <Drawer.Header>
+                <Drawer.Title>Детали заказа</Drawer.Title>
+                <Drawer.Description>Ширина панели {width}</Drawer.Description>
+              </Drawer.Header>
+              <Drawer.Body>
+                <Typography variant="body-m" tone="secondary">
+                  На экране уже 640 px панель занимает всю ширину и теряет скругления.
+                </Typography>
+              </Drawer.Body>
+              <Drawer.Footer>
+                <Drawer.Close>
+                  <Button.Root variant="outline" tone="neutral">
+                    Закрыть
+                  </Button.Root>
+                </Drawer.Close>
+              </Drawer.Footer>
+            </Drawer.Content>
+          </Drawer.Root>
+          <Typography as="span" variant="caption" tone="muted">
+            {size}
+          </Typography>
+        </div>
       ))}
-    </>
+    </div>
   );
 }

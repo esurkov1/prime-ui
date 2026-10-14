@@ -4,10 +4,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Button } from "@/components/button/Button";
 import { Drawer } from "@/components/drawer/Drawer";
+import { Modal } from "@/components/modal/Modal";
 import { Sheet } from "@/components/sheet/Sheet";
 import { mockCompactViewport, swipe } from "@/test/mobile";
-
-import { Modal } from "./Modal";
 
 /**
  * `Guard` is one part shared by Modal, Drawer and Sheet (`DialogGuard` on `useDialogGuard`): its

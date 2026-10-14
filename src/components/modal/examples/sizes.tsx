@@ -11,38 +11,43 @@ const SIZES = [
 
 export default function ModalSizesExample() {
   return (
-    <>
+    <div>
       {SIZES.map(({ size, width }) => (
-        <Modal.Root key={size}>
-          <Modal.Trigger>
-            <Button.Root variant="soft" tone="neutral">
-              {size}
-            </Button.Root>
-          </Modal.Trigger>
-          <Modal.Content size={size}>
-            <Modal.Header>
-              <Modal.Title>Окно размера {size}</Modal.Title>
-              <Modal.Description>{width}</Modal.Description>
-            </Modal.Header>
-            <Modal.Body>
-              <Typography variant="body-m" tone="secondary">
-                Выбирайте самый узкий размер, в который содержимое помещается без переносов строк
-                формы.
-              </Typography>
-            </Modal.Body>
-            <Modal.Footer>
-              <Modal.Close>
-                <Button.Root variant="outline" tone="neutral">
-                  Отмена
-                </Button.Root>
-              </Modal.Close>
-              <Modal.Confirm>
-                <Button.Root>Продолжить</Button.Root>
-              </Modal.Confirm>
-            </Modal.Footer>
-          </Modal.Content>
-        </Modal.Root>
+        <div key={size}>
+          <Modal.Root>
+            <Modal.Trigger>
+              <Button.Root variant="soft" tone="neutral">
+                Открыть окно
+              </Button.Root>
+            </Modal.Trigger>
+            <Modal.Content size={size}>
+              <Modal.Header>
+                <Modal.Title>Окно размера {size}</Modal.Title>
+                <Modal.Description>{width}</Modal.Description>
+              </Modal.Header>
+              <Modal.Body>
+                <Typography variant="body-m" tone="secondary">
+                  Выбирайте самый узкий размер, в который содержимое помещается без переносов строк
+                  формы.
+                </Typography>
+              </Modal.Body>
+              <Modal.Footer>
+                <Modal.Close>
+                  <Button.Root variant="outline" tone="neutral">
+                    Отмена
+                  </Button.Root>
+                </Modal.Close>
+                <Modal.Confirm>
+                  <Button.Root>Продолжить</Button.Root>
+                </Modal.Confirm>
+              </Modal.Footer>
+            </Modal.Content>
+          </Modal.Root>
+          <Typography as="span" variant="caption" tone="muted">
+            {size}
+          </Typography>
+        </div>
       ))}
-    </>
+    </div>
   );
 }
