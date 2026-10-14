@@ -25,9 +25,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Spacing, icon and title follow the control tier; the description is one step smaller.",
-          ru: "Отступы, иконка и заголовок по ярусу контрола; описание на ступень мельче.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус хоста, иначе `"m"`' },
+          en: "Spacing, icon and title follow the control tier; the description is one step smaller. Without it the tier of the host.",
+          ru: "Отступы, иконка и заголовок по ярусу контрола; описание на ступень мельче. Без него — ярус хоста.",
         },
         {
           name: "placement",
@@ -39,8 +39,8 @@ export const api: ComponentApi = {
         {
           name: "onDismiss",
           type: "() => void",
-          en: "Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner, which closes up in place, and moves focus to a sensible place.",
-          ru: "Рендерит кнопку закрытия (в углу или последней в `Banner.Actions`) и вызывается по клику; родитель убирает баннер — он схлопывается на месте — и переводит фокус в разумное место.",
+          en: "Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner, which closes up in place; focus inside it moves to the next tab stop of the page.",
+          ru: "Рендерит кнопку закрытия (в углу или последней в `Banner.Actions`) и вызывается по клику; родитель убирает баннер — он схлопывается на месте, а фокус из него переходит к следующему элементу страницы.",
         },
         {
           name: "labels",
@@ -130,8 +130,8 @@ export const api: ComponentApi = {
         ru: "Иконка скрыта (`aria-hidden`): смысл несёт заголовок, а не цвет.",
       },
       {
-        en: "The close button is named by `labels.dismiss`. It leaves with the banner, so after dismissing the parent moves focus to a sensible place: the control that takes the banner's spot, or the next heading or action of the section (see `dismissible.tsx`).",
-        ru: "Кнопка закрытия названа `labels.dismiss` и уходит вместе с баннером: после закрытия родитель переводит фокус в разумное место — на элемент, занявший место баннера, или на следующий заголовок или действие раздела (см. `dismissible.tsx`).",
+        en: "The close button is named by `labels.dismiss`. It leaves with the banner, and focus inside the banner moves to the next tab stop of the page (the previous one at its end); inside `Crossfade` it moves to the state that takes the banner's place (see `dismissible.tsx`).",
+        ru: "Кнопка закрытия названа `labels.dismiss` и уходит вместе с баннером, а фокус из баннера переходит к следующему элементу страницы (к предыдущему в её конце); внутри `Crossfade` — в состояние, занявшее место баннера (см. `dismissible.tsx`).",
       },
     ],
   },

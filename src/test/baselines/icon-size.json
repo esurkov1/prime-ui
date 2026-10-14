@@ -1,5 +1,4 @@
 [
-  "src/components/banner/Banner.module.css: .icon svg",
   "src/components/card/Card.module.css: .icon svg",
   "src/components/empty-page/EmptyPage.module.css: .iconWrap svg",
   "src/components/login-form/LoginForm.module.css: .logo > svg, .logo > img",

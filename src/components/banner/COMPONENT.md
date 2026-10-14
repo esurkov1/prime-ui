@@ -44,9 +44,9 @@ Banner.Root                 <div>; variant, tone, size, placement
 |---|---|---|---|
 | `variant` | `"solid" \| "soft" \| "outline"` | `"soft"` | `soft` tinted fill, `solid` saturated fill for urgent messages, `outline` card fill with a tone ring. |
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"info"` | Semantic color of the message. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Spacing, icon and title follow the control tier; the description is one step smaller. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Spacing, icon and title follow the control tier; the description is one step smaller. Without it the tier of the host. |
 | `placement` | `"inset" \| "page"` | `"inset"` | `inset` — rounded block in the flow or in a card; `page` — edge-to-edge strip above a page, content aligned to the page column. |
-| `onDismiss` | `() => void` | — | Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner, which closes up in place, and moves focus to a sensible place. |
+| `onDismiss` | `() => void` | — | Renders a close button (top-right, or last in `Banner.Actions`) and calls this on click; the parent unmounts the banner, which closes up in place; focus inside it moves to the next tab stop of the page. |
 | `labels` | `Partial<BannerLabels>` | — | Built-in strings, see Labels. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className`, `role` (`alert`, `status`, `region`), `aria-label` and the other div attributes. |
 
@@ -138,7 +138,7 @@ No `open` prop: the parent mounts and unmounts the banner. A mounted banner ente
 
 - The banner has no role of its own: give an error after an action `role="alert"`, a calm status `role="status"`, a page strip `role="region"` with `aria-label`.
 - The icon is `aria-hidden`: the title carries the meaning, not the color.
-- The close button is named by `labels.dismiss`. It leaves with the banner, so after dismissing the parent moves focus to a sensible place: the control that takes the banner's spot, or the next heading or action of the section (see `dismissible.tsx`).
+- The close button is named by `labels.dismiss`. It leaves with the banner, and focus inside the banner moves to the next tab stop of the page (the previous one at its end); inside `Crossfade` it moves to the state that takes the banner's place (see `dismissible.tsx`).
 
 ### Labels
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
@@ -150,11 +150,11 @@ No `open` prop: the parent mounts and unmounts the banner. A mounted banner ente
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | A maintenance notice: icon, title and description on a soft info fill. |
+| [overview.tsx](examples/overview.tsx) | A maintenance notice: icon, title and description on a soft info fill — `Banner.Icon`, `Banner.Title`, `Banner.Description`. |
 | [variants.tsx](examples/variants.tsx) | Every treatment on every tone: soft by default, solid for urgent, outline for calm — `variant`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier: padding, icon and title follow the control tier, the description is one step smaller — `size`. |
 | [structure.tsx](examples/structure.tsx) | Optional parts: a one-line title, a title with a description, and actions where the close button joins the row — `Banner.Description`, `Banner.Actions`, `onDismiss`. |
-| [dismissible.tsx](examples/dismissible.tsx) | The parent owns visibility: the close button calls back, the banner closes up and focus moves to the restore button; the button name comes from labels — `onDismiss`, `labels`. |
+| [dismissible.tsx](examples/dismissible.tsx) | The parent owns visibility: the close button calls back, the banner fades into the restore button and focus follows it; the button name comes from labels — `onDismiss`, `labels`. |
 | [page-strip.tsx](examples/page-strip.tsx) | An edge-to-edge strip above a page and a rounded block inside a card — `placement`. |
 | [narrow.tsx](examples/narrow.tsx) | Below 36rem of its own width the banner moves the actions under the text — `Banner.Actions`. |
 

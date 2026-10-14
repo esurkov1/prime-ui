@@ -1,5 +1,4 @@
 [
-  "src/components/banner/examples/overview.tsx: JSDoc tail",
   "src/components/chart-frame/examples/states.tsx: biome-ignore",
   "src/components/chart-frame/examples/tooltip.tsx: arrow-key onKeyDown",
   "src/components/chat/examples/overview.tsx: biome-ignore",

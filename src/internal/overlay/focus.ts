@@ -113,6 +113,20 @@ export function handoffFocus(
   return document.activeElement === target;
 }
 
+/**
+ * The tab stop that takes the place of `el` when it leaves the page (a dismissed banner, a closed
+ * toast): the first one after it in document order, else the last one before it. Tab stops inside
+ * `el` do not count.
+ */
+export function tabStopBeside(el: Element): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  const outside = getFocusable(document.body).filter((node) => !el.contains(node));
+  const after = outside.find(
+    (node) => el.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING,
+  );
+  return after ?? outside.at(-1) ?? null;
+}
+
 /** Where focus lands in `container`: itself when a tab stop, else as `handoffFocus` describes. */
 function focusTarget(container: HTMLElement): HTMLElement {
   if (container.matches(FOCUSABLE) || container.isContentEditable) return container;
