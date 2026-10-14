@@ -4,11 +4,12 @@ import { Avatar, type AvatarRootProps } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Checkbox } from "@/components/checkbox/Checkbox";
 import { Thumbnail, type ThumbnailRootProps } from "@/components/thumbnail/Thumbnail";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { highlightChildren } from "@/internal/HighlightMatch";
-import { optionDomId, useStoreSlice } from "@/internal/listbox";
+import { optionDomId, useListboxItem, useStoreSlice } from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
 import { nodeText } from "@/internal/nodeText";
 import { type ControlSize, stepDown, tierMappings } from "@/internal/states";
@@ -150,14 +151,16 @@ export function sizeMedia(leading: React.ReactNode[], size: ControlSize): React.
 
 // ─── Item ────────────────────────────────────────────────────────────────────
 
-export type SelectItemProps = {
+export type SelectItemProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "role" | "id" | "children"
+> & {
   value: string;
   /** Text shown in the trigger and used by typeahead; defaults to `Select.ItemText`, then plain text. */
   label?: string;
   /** Extra words for the search (`Select.Content searchable`). */
   keywords?: string;
   disabled?: boolean;
-  className?: string;
   children: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
 };
@@ -166,10 +169,13 @@ export function SelectItem({
   value,
   label,
   keywords,
-  disabled,
+  disabled = false,
   className,
   children,
+  onClick,
+  onMouseMove,
   ref,
+  ...rest
 }: SelectItemProps) {
   const { multiple, size, selected, highlight, pick, registry, listboxId, query, filter } =
     useSelectContext();
@@ -180,10 +186,13 @@ export function SelectItem({
   const isSelected = selected.includes(value);
   // Only this option's slice of the highlight: moving it re-renders two rows, not the list.
   const isHighlighted = useStoreSlice(highlight, (current) => current === value);
-
-  React.useLayoutEffect(
-    () => registry.register(value, resolvedLabel, haystack),
-    [registry, value, resolvedLabel, haystack],
+  const nodeRef = React.useRef<HTMLDivElement | null>(null);
+  const setRefs = useMergedRefs(nodeRef, ref);
+  useListboxItem(
+    registry,
+    value,
+    { label: resolvedLabel, haystack, disabled, onActivate: () => pick(value) },
+    nodeRef,
   );
 
   const search = normalize(query);
@@ -193,24 +202,26 @@ export function SelectItem({
     // biome-ignore lint/a11y/useFocusableInteractive: focus stays on the listbox / search (aria-activedescendant)
     // biome-ignore lint/a11y/useKeyWithClickEvents: the keyboard is handled on the listbox
     <div
-      ref={ref}
+      {...rest}
+      ref={setRefs}
       id={optionDomId(listboxId, value)}
       role="option"
       aria-selected={isSelected}
       aria-disabled={disabled || undefined}
       className={cx(menu.item, styles.item, className)}
-      onClick={() => {
-        if (!disabled) pick(value);
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) registry.activate(value);
       }}
-      onMouseMove={() => {
+      onMouseMove={(event) => {
+        onMouseMove?.(event);
         if (!disabled && !isHighlighted) highlight.set(value);
       }}
       {...toDataAttributes({
         value,
-        label: resolvedLabel,
         selected: isSelected,
         highlighted: isHighlighted,
-        disabled: Boolean(disabled),
+        disabled,
         rich: parts.rich || undefined,
       })}
     >
@@ -269,26 +280,42 @@ export function SelectAction({
   ref,
   ...rest
 }: SelectActionProps) {
-  const { highlight, listboxId, setOpen, size } = useSelectContext();
+  const { highlight, listboxId, setOpen, size, registry } = useSelectContext();
   const value = `${ACTION_PREFIX}${React.useId()}`;
   const isHighlighted = useStoreSlice(highlight, (current) => current === value);
   const parts = splitItemChildren(children);
+  const nodeRef = React.useRef<HTMLDivElement | null>(null);
+  const setRefs = useMergedRefs(nodeRef, ref);
+  // Persistent: never filtered by the query, the last stop of the arrows.
+  useListboxItem(
+    registry,
+    value,
+    {
+      label: parts.title,
+      haystack: "",
+      disabled,
+      persistent: true,
+      onActivate: () => {
+        onSelect();
+        setOpen(false);
+      },
+    },
+    nodeRef,
+  );
 
   return (
     // biome-ignore lint/a11y/useFocusableInteractive: focus stays on the listbox / search (aria-activedescendant)
     // biome-ignore lint/a11y/useKeyWithClickEvents: the keyboard is handled on the listbox
     <div
       {...rest}
-      ref={ref}
+      ref={setRefs}
       id={optionDomId(listboxId, value)}
       role="option"
       aria-disabled={disabled || undefined}
       className={cx(menu.item, className)}
       onClick={(event) => {
         onClick?.(event);
-        if (event.defaultPrevented || disabled) return;
-        onSelect();
-        setOpen(false);
+        if (!event.defaultPrevented) registry.activate(value);
       }}
       onMouseMove={(event) => {
         onMouseMove?.(event);

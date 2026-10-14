@@ -156,6 +156,8 @@ export const KIND_SLOTS: Record<PageKind, KindSlot[]> = {
     { slot: "validation", required: true, layout: "stack-narrow" },
     { slot: "with-icon", layout: "matrix" },
     { slot: SCENARIOS, layout: "stack-narrow" },
+    // A field with a floating panel (Select, TagSelect, Datepicker): its dismiss props.
+    { slot: "dismiss", layout: "stack-narrow" },
     { slot: "controlled", layout: "stack-narrow" },
     { slot: "controlled-open", layout: "stack-narrow" },
     { slot: "in-form", required: true, layout: "stack" },

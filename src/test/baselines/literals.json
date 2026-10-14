@@ -111,7 +111,6 @@
   "src/components/tabs/Tabs.module.css: numeric z-index #5",
   "src/components/tabs/Tabs.module.css: raw length in margin-inline",
   "src/components/tabs/Tabs.module.css: raw length in padding-inline",
-  "src/components/tag-select/TagSelect.module.css: raw % in color-mix in background",
   "src/components/timeline/Timeline.module.css: raw % in color-mix in --tl-dot-color",
   "src/internal/CheckMark.module.css: numeric scale() in transform",
   "src/internal/CheckMark.module.css: numeric scale() in transform #2",

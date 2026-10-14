@@ -74,7 +74,7 @@
   align-items: center;
   gap: var(--prime-space-1);
   min-width: 0;
-  margin: calc(-1 * var(--prime-focus-space));
+  margin: calc(var(--prime-focus-space) * -1);
   padding: var(--prime-focus-space);
 }
 

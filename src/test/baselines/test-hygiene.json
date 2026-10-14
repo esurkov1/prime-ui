@@ -15,7 +15,6 @@
   "src/components/scroll-container/ScrollContainer.test.tsx: reads a .module.css as text",
   "src/components/scroll-container/useFitFlag.test.tsx: reads a .module.css as text",
   "src/components/segmented-control/SegmentedControl.test.tsx: queries [class*=",
-  "src/components/select/Select.test.tsx: queries [class*=",
   "src/components/switch/Switch.test.tsx: getComputedStyle",
   "src/components/tabs/Tabs.test.tsx: reads a .module.css as text",
   "src/components/timeline/Timeline.test.tsx: reads a .module.css as text",

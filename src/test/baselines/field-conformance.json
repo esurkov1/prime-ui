@@ -1,9 +1,4 @@
 [
   "cell/Datepicker: a required column leaves it optional",
-  "cell/Input: a required column leaves it optional",
-  "cell/NativeSelect: a required column leaves it optional",
-  "cell/Select: a required column leaves it optional",
-  "cell/Textarea: a required column leaves it optional",
-  "disabled-open/Select: disabled + defaultOpen opens",
   "disabled-open/TagSelect: disabled + defaultOpen opens"
 ]

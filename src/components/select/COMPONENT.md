@@ -71,6 +71,8 @@ an icon) goes inside `Select.ItemMeta`.
 | `open` | `boolean` | — | Controlled open state of the list. |
 | `defaultOpen` | `boolean` | `false` | Initial open state, uncontrolled. |
 | `onOpenChange` | `(open: boolean) => void` | — | Called on every open and close: trigger, pick, Escape, an outside press. |
+| `closeOnEscape` | `boolean` | `true` | Escape closes the list and returns focus to the trigger. |
+| `closeOnOutsideClick` | `boolean` | `true` | A press outside the list and its trigger closes it; focus follows the pointer. |
 | `label` | `ReactNode` | — | Field label above; names the trigger. |
 | `hint` | `ReactNode` | — | Support text under the field; linked by `aria-describedby`. |
 | `error` | `ReactNode` | — | Error message; replaces the hint and implies `invalid`. |
@@ -91,7 +93,7 @@ an icon) goes inside `Select.ItemMeta`.
 | `clearable` | `boolean` | `false` | A clear segment before the chevron while a value is set; `Delete` / `Backspace` on the trigger clear too. |
 | `name` | `string` | — | Form field name: hidden inputs submit the value (`""` while empty; one input per value with `multiple`). |
 | `placeholder` | `string` | — | Text in the trigger while nothing is picked. |
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Field tier: trigger height, padding, text; the list rows, the label and the hint follow it. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Field tier: trigger height, padding, text; the list rows, the label and the hint follow it. Without it the tier of its host (a form, a panel with a size), else `m`. |
 | `focusRing` | `boolean` | `true` | `false` hides the visual focus ring (`data-focus-ring="false"`), never focus or the error ring. |
 | `id` | `string` | — | Id of the trigger; generated when omitted. |
 | `labels` | `Partial<SelectLabels>` | — | Built-in strings, see Labels. |
@@ -141,7 +143,7 @@ an icon) goes inside `Select.ItemMeta`.
 | `keywords` | `string` | — | Extra words for the search. |
 | `disabled` | `boolean` | `false` | Muted, skipped by the keyboard, not selectable. |
 | `children` | `ReactNode` | — (required) | Text, or `Select.ItemIcon`, `Avatar.Root`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`, `Badge.Root` as direct children. |
-| `className` | `string` | — | Class on the option row. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role" \| "id" \| "children">` | — | `className`, `data-*`, `onClick` and the other attributes of the option row. |
 
 ### Select.ItemText · Select.ItemDescription · Select.ItemMeta
 `ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line / a trailing muted value. Leading media is an `Avatar.Root` or `Thumbnail.Root` child, a trailing status a `Badge.Root`.
@@ -196,6 +198,8 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | `loading` | spinner instead of the chevron; skeleton rows in the option geometry while no item is on screen | Options load asynchronously | `false` |
 | `loadingMore` | skeleton rows after the items | The next page is loading (`hasMore` + `onLoadMore`) | `false` |
 | `filter={false}` | every item shows whatever the query; the query is still marked in the labels | The owner searches on the server (`search`, `onSearchChange`) | `true` |
+| `closeOnOutsideClick` | `false`: the list stays open on a press beside it; Escape, the trigger, a single pick and Tab still close it | A filter list the person compares with the page | `true` |
+| `closeOnEscape` | `false`: Escape leaves the list open | The list must close only by a pick or the trigger | `true` |
 | `searchable` (Content) | search row with a faint hairline at the top of the list | More than ~10 options | `false` |
 | rich options | `Thumbnail.Root` or `Select.ItemDescription` in an item: a two-line row; `Avatar.Root` before the text and `Badge.Root` after it keep one line; the trigger the same with `renderValue` | Products, people, delivery tariffs | |
 | `Select.Action` | a row under the list behind a faint full-bleed hairline, with an optional leading icon; stays whatever the query | One list-level action: «Новый клиент», «Пригласить в команду» | |
@@ -325,6 +329,7 @@ No `variant` or `tone`. The trigger is the field look (fill, inset control borde
 | [rich-options.tsx](examples/rich-options.tsx) | Options with a picture, a second line and a price; the trigger draws the picked option with the same parts — `renderValue`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`. |
 | [people.tsx](examples/people.tsx) | People in the rows and the trigger: an avatar sized to the tier before the name, a role badge after it — `Avatar.Root`, `Badge.Root`, `renderValue`. |
 | [icon-only.tsx](examples/icon-only.tsx) | An icon picker as wide as its glyph: the trigger holds only the picked icon and the chevron, the value is still read aloud — `Select.TriggerIcon`. |
+| [dismiss.tsx](examples/dismiss.tsx) | A filter list that stays open while the person looks beside it: only Escape, the trigger or Tab close it — `closeOnOutsideClick`, `closeOnEscape`. |
 | [controlled.tsx](examples/controlled.tsx) | The parent owns the value: the plan drives the price under the field and a button resets it — `value`, `onValueChange`. |
 | [controlled-open.tsx](examples/controlled-open.tsx) | The parent owns the list: a button opens it from code, a pick or Escape closes it — `open`, `onOpenChange`. |
 | [in-form.tsx](examples/in-form.tsx) | Regional settings form: the required country is checked on submit, the error shakes the field and leaves once a country is picked, a calm note confirms the save — `required`, `error`, `hint`. |

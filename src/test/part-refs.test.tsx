@@ -131,7 +131,6 @@ const OUTSIDE_API = {
  * fixed part still listed fails to compile).
  */
 const PENDING_DOM_PROPS = {
-  "Select.Item": "SelectItemProps is a closed type: no native attributes reach the option",
   "SmartFilter.Root": "SmartFilterRootProps takes className but no other native attribute",
 } as const;
 
@@ -711,6 +710,47 @@ const CASES: Case[] = [
           <Select.Item value="new">Новый</Select.Item>
         </Select.Content>
       </Select.Root>
+    ),
+  ],
+  [
+    "Select.Item",
+    "DIV",
+    (ref) => (
+      <Select.Root label="Статус" defaultOpen>
+        <Select.Trigger />
+        <Select.Content>
+          <Select.Item ref={ref} data-testid="part" value="new">
+            Новый
+          </Select.Item>
+        </Select.Content>
+      </Select.Root>
+    ),
+  ],
+  [
+    "Select.Action",
+    "DIV",
+    (ref) => (
+      <Select.Root label="Клиент" defaultOpen>
+        <Select.Trigger />
+        <Select.Content>
+          <Select.Item value="c1">Вектор</Select.Item>
+          <Select.Action ref={ref} data-testid="part" onSelect={() => {}}>
+            Новый клиент
+          </Select.Action>
+        </Select.Content>
+      </Select.Root>
+    ),
+  ],
+  [
+    "Input.ClearButton",
+    "BUTTON",
+    (ref) => (
+      <Input.Root label="Поиск">
+        <Input.Wrapper>
+          <Input.Field defaultValue="счёт" />
+          <Input.ClearButton ref={ref} data-testid="part" />
+        </Input.Wrapper>
+      </Input.Root>
     ),
   ],
   [

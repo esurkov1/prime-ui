@@ -113,6 +113,11 @@ export const page: ComponentPageConfig = {
         "Выбор иконки шириной в саму иконку: в триггере только выбранный значок и шеврон, значение по-прежнему читается вслух — `Select.TriggerIcon`.",
     },
     {
+      slot: "dismiss",
+      description:
+        "Список фильтра остаётся открытым, пока человек смотрит рядом: закрывают его только Escape, триггер или Tab — `closeOnOutsideClick`, `closeOnEscape`.",
+    },
+    {
       slot: "controlled",
       description:
         "Значением владеет родитель: тариф меняет цену под полем, кнопка сбрасывает его — `value`, `onValueChange`.",

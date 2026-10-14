@@ -60,6 +60,20 @@ export const api: ComponentApi = {
           ru: "Вызывается при каждом открытии и закрытии: триггер, выбор, Escape, нажатие снаружи.",
         },
         {
+          name: "closeOnEscape",
+          type: "boolean",
+          default: "true",
+          en: "Escape closes the list and returns focus to the trigger.",
+          ru: "Escape закрывает список и возвращает фокус на триггер.",
+        },
+        {
+          name: "closeOnOutsideClick",
+          type: "boolean",
+          default: "true",
+          en: "A press outside the list and its trigger closes it; focus follows the pointer.",
+          ru: "Нажатие вне списка и триггера закрывает его; фокус остаётся там, куда нажали.",
+        },
+        {
           name: "label",
           type: "ReactNode",
           en: "Field label above; names the trigger.",
@@ -191,9 +205,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Field tier: trigger height, padding, text; the list rows, the label and the hint follow it.",
-          ru: "Ярус поля: высота, отступы, текст; строки списка, подпись и подсказка следуют ему.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Field tier: trigger height, padding, text; the list rows, the label and the hint follow it. Without it the tier of its host (a form, a panel with a size), else `m`.",
+          ru: "Ярус поля: высота, отступы, текст; строки списка, подпись и подсказка следуют ему. Без него — ярус контейнера (форма, панель с размером), иначе `m`.",
         },
         {
           name: "focusRing",
@@ -347,10 +361,10 @@ export const api: ComponentApi = {
           ru: "Текст или прямыми детьми `Select.ItemIcon`, `Avatar.Root`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`, `Badge.Root`.",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Class on the option row.",
-          ru: "Класс на строке пункта.",
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "role" | "id" | "children">',
+          en: "`className`, `data-*`, `onClick` and the other attributes of the option row.",
+          ru: "`className`, `data-*`, `onClick` и остальные атрибуты строки пункта.",
         },
       ],
     },

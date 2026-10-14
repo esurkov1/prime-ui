@@ -7,6 +7,8 @@ import { Avatar } from "@/components/avatar/Avatar";
 import { Badge } from "@/components/badge/Badge";
 import { Thumbnail } from "@/components/thumbnail/Thumbnail";
 import { touchTargetBlockClass } from "@/internal/touchTarget";
+import { cssRule, cssValue } from "@/test/css";
+import { withMotion } from "@/test/motion";
 
 import { Select } from "./Select";
 
@@ -90,11 +92,13 @@ describe("Select (composable)", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "true");
   });
 
-  it("sets aria-haspopup and aria-controls", () => {
+  it("sets aria-haspopup; aria-controls names the list while it is open", () => {
     render(<BasicSelect />);
     const trigger = screen.getByRole("combobox");
     expect(trigger).toHaveAttribute("aria-haspopup", "listbox");
-    expect(trigger).toHaveAttribute("aria-controls");
+    expect(trigger).not.toHaveAttribute("aria-controls");
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute("aria-controls", screen.getByRole("listbox").id);
   });
 
   it("selects item on click and closes listbox", () => {
@@ -776,13 +780,15 @@ describe("Select (server search)", () => {
     expect(onRetry).toHaveBeenCalledTimes(2);
   });
 
-  it("a load state change fades the new content in", () => {
+  it("a load state change cross-fades: the old content leaves inert while the new one shows", () => {
+    withMotion();
     const { rerender } = render(<ServerSelect />);
-    expect(screen.getByRole("listbox").className).not.toMatch(/swapIn/);
+    expect(screen.getByRole("listbox").closest("[inert]")).toBeNull();
     rerender(<ServerSelect loadError="Ошибка" />);
-    expect(screen.getByRole("alert").className).toMatch(/swapIn/);
+    expect(screen.getByRole("alert").closest("[inert]")).toBeNull();
+    expect(screen.getByRole("listbox", { hidden: true }).closest("[inert]")).not.toBeNull();
     rerender(<ServerSelect />);
-    expect(screen.getByRole("listbox").className).toMatch(/swapIn/);
+    expect(screen.getByRole("listbox").closest("[inert]")).toBeNull();
   });
 });
 
@@ -894,7 +900,7 @@ describe("Select focusRing", () => {
     expect(trigger).toHaveAttribute("aria-invalid", "true");
   });
 
-  it("the panel search row never draws a ring", () => {
+  it("the panel search takes focus and draws no ring: the row tints instead", () => {
     render(
       <Select.Root placeholder="Pick">
         <Select.Trigger>
@@ -907,7 +913,12 @@ describe("Select focusRing", () => {
     );
     expect(screen.getByRole("combobox")).not.toHaveAttribute("data-focus-ring");
     fireEvent.click(screen.getByRole("combobox"));
-    expect(screen.getByRole("textbox").parentElement).toHaveAttribute("data-focus-ring", "false");
+    expect(screen.getByRole("textbox", { name: "Поиск" })).toHaveFocus();
+    const menuCss = "src/internal/menu.module.css";
+    expect(cssValue(cssRule(menuCss, ".searchInput"), "outline")).toBe("none");
+    expect(cssValue(cssRule(menuCss, ".searchRow:focus-within"), "color")).toBe(
+      "var(--prime-color-text-secondary)",
+    );
   });
 });
 
@@ -930,6 +941,28 @@ describe("Select — overlay contract", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(trigger).not.toHaveFocus();
     expect(document.activeElement).toBe(document.body);
+  });
+
+  it("closeOnEscape={false} and closeOnOutsideClick={false} keep the list open", async () => {
+    const user = userEvent.setup();
+    render(
+      <div>
+        <Select.Root closeOnEscape={false} closeOnOutsideClick={false} placeholder="Статус">
+          <Select.Trigger>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            <Select.Item value="new">Новый</Select.Item>
+          </Select.Content>
+        </Select.Root>
+        <div data-testid="empty-space">empty</div>
+      </div>,
+    );
+    await user.click(screen.getByRole("combobox"));
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+    await user.click(screen.getByTestId("empty-space"));
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
   });
 
   it("an outside click on another control moves focus to that control", async () => {
@@ -1021,7 +1054,7 @@ function RichSelect({ defaultValue }: { defaultValue?: string }) {
             </Thumbnail.Root>
             <Select.ItemText>{v.title}</Select.ItemText>
             <Select.ItemDescription>{v.kind}</Select.ItemDescription>
-            <Select.ItemMeta>{v.price}</Select.ItemMeta>
+            <Select.ItemMeta data-testid="row-meta">{v.price}</Select.ItemMeta>
           </Select.Item>
         ))}
       </Select.Content>
@@ -1042,11 +1075,13 @@ describe("Select rich options", () => {
   it("rich item: title is the label, two-line layout, meta before the check", () => {
     render(<RichSelect defaultValue="adv160" />);
     const option = screen.getByRole("option", { name: /Honda ADV 160/, hidden: true });
-    expect(option).toHaveAttribute("data-label", "Honda ADV 160");
+    expect(screen.getByRole("combobox")).toHaveTextContent("Honda ADV 160");
     expect(option).toHaveAttribute("data-rich", "true");
-    const meta = option.querySelector('[class*="itemMeta"]');
+    const meta = option.querySelector('[data-testid="row-meta"]');
     expect(meta?.textContent).toBe("300 ฿ / день");
-    expect(meta?.nextElementSibling?.className).toMatch(/check/);
+    // The check of the selected option follows the meta.
+    expect(meta?.nextElementSibling).toHaveAttribute("aria-hidden", "true");
+    expect(meta?.nextElementSibling?.querySelector("svg")).not.toBeNull();
   });
 
   it("trigger renders the selected option through renderValue", async () => {
@@ -1132,7 +1167,6 @@ describe("Select rich options", () => {
     expect(option.firstElementChild).toBe(avatar);
     const badge = screen.getByTestId("row-badge");
     expect(badge.previousElementSibling).toHaveTextContent("Анна Смирнова");
-    expect(option).toHaveAttribute("data-label", "Анна Смирнова");
     expect(
       screen.getByRole("option", { name: /Борис Котов/ }).querySelector("[data-size]"),
     ).toHaveAttribute("data-size", "xs");
