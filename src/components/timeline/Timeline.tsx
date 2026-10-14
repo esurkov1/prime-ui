@@ -1,10 +1,12 @@
 import * as React from "react";
-import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { ControlSizeProvider } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
+import { InteractiveElement } from "@/internal/interactiveElement";
 import palette from "@/internal/palette.module.css";
-import { Slot } from "@/internal/slot";
+import { isPart } from "@/internal/parts";
+import press from "@/internal/press.module.css";
+import { slotChild } from "@/internal/slot";
 import type { ControlSize, PaletteColor, Tone } from "@/internal/states";
 import { touchTargetRowClass } from "@/internal/touchTarget";
 
@@ -126,16 +128,23 @@ function TimelineItem({
   children,
   className,
   ref,
+  target,
+  rel,
+  download,
   ...rest
 }: TimelineItemProps) {
   const edge = React.useContext(EdgeContext);
-  // A callback ref fits whichever element the row renders.
-  const rowRef = useMergedRefs<HTMLElement | null>(ref);
   const interactive = Boolean(asChild || href || onClick);
   const rowProps = {
     ...rest,
-    ref: rowRef,
-    className: cx(palette.hue, styles.row, interactive && touchTargetRowClass, className),
+    ref,
+    className: cx(
+      palette.hue,
+      styles.row,
+      interactive && touchTargetRowClass,
+      interactive && press.press,
+      className,
+    ),
     ...toDataAttributes({
       color: tone ? undefined : color,
       tone,
@@ -146,12 +155,9 @@ function TimelineItem({
 
   let row: React.ReactNode;
   if (asChild) {
-    const child = React.Children.only(children);
-    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) {
-      throw new Error("Timeline.Item asChild needs a single element child");
-    }
+    const child = slotChild(children, "Timeline.Item");
     row = (
-      <Slot {...rowProps} onClick={onClick}>
+      <InteractiveElement {...rowProps} element="slot" onClick={onClick}>
         {React.cloneElement(
           child,
           undefined,
@@ -160,28 +166,36 @@ function TimelineItem({
             {child.props.children}
           </>,
         )}
-      </Slot>
+      </InteractiveElement>
     );
   } else if (href) {
     row = (
-      <a {...rowProps} href={href} onClick={onClick}>
+      <InteractiveElement
+        {...rowProps}
+        element="link"
+        href={href}
+        target={target}
+        rel={rel}
+        download={download}
+        onClick={onClick}
+      >
         {dot}
         {children}
-      </a>
+      </InteractiveElement>
     );
   } else if (onClick) {
     row = (
-      <button {...rowProps} type="button" onClick={onClick}>
+      <InteractiveElement {...rowProps} element="button" onClick={onClick}>
         {dot}
         {children}
-      </button>
+      </InteractiveElement>
     );
   } else {
     row = (
-      <div {...rowProps}>
+      <InteractiveElement {...rowProps} element="static">
         {dot}
         {children}
-      </div>
+      </InteractiveElement>
     );
   }
 
@@ -195,102 +209,78 @@ TimelineItem.displayName = "Timeline.Item";
 
 // ─── Parts ────────────────────────────────────────────────────────────────────
 
-export type TimelineTitleProps = {
+type SpanPartProps = {
   children: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLSpanElement>;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
 
+export type TimelineItemTitleProps = SpanPartProps;
+
 /** First line: the event. Medium, primary (accent on the highlighted row); wraps when narrow. */
-function TimelineTitle({ children, className, ...rest }: TimelineTitleProps) {
+function TimelineItemTitle({ children, className, ...rest }: TimelineItemTitleProps) {
   return (
     <span {...rest} className={cx(styles.title, className)}>
       {children}
     </span>
   );
 }
-TimelineTitle.displayName = "Timeline.Title";
+TimelineItemTitle.displayName = "Timeline.ItemTitle";
 
-export type TimelineMetaProps = {
-  children: React.ReactNode;
-  className?: string;
-  ref?: React.Ref<HTMLSpanElement>;
-} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+/** `Timeline.ItemMeta` inside `Timeline.ItemValue` is the value's second line. */
+const ValueContext = React.createContext(false);
 
-/** Second line: date and relative time, muted, tabular numbers. Emphasize a part with `Timeline.MetaPrimary` or `<strong>`. */
-function TimelineMeta({ children, className, ...rest }: TimelineMetaProps) {
-  return (
-    <span {...rest} className={cx(styles.meta, className)}>
-      {children}
-    </span>
-  );
-}
-TimelineMeta.displayName = "Timeline.Meta";
-
-export type TimelineMetaPrimaryProps = {
-  children: React.ReactNode;
-  className?: string;
-  ref?: React.Ref<HTMLSpanElement>;
-} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
-
-/** Emphasized part of the meta line (the date): primary, medium. */
-function TimelineMetaPrimary({ children, className, ...rest }: TimelineMetaPrimaryProps) {
-  return (
-    <span {...rest} className={cx(styles.metaPrimary, className)}>
-      {children}
-    </span>
-  );
-}
-TimelineMetaPrimary.displayName = "Timeline.MetaPrimary";
-
-export type TimelineValueProps = {
-  /** Text color. Default `neutral` (primary text). */
-  tone?: Tone;
-  children: React.ReactNode;
-  className?: string;
-  ref?: React.Ref<HTMLSpanElement>;
-} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
+export type TimelineItemMetaProps = SpanPartProps;
 
 /**
- * Trailing amount: right-aligned, vertically centered, tabular numbers. Add `Timeline.ValueMeta` for a
- * muted second line. Moves under the meta below 20rem.
+ * Secondary line of an event, muted, tabular numbers: under the title (date and relative time;
+ * emphasize a part with `<strong>`), or inside `Timeline.ItemValue` the value's second line
+ * (category, unit), right-aligned under it.
  */
-function TimelineValue({ tone = "neutral", children, className, ...rest }: TimelineValueProps) {
+function TimelineItemMeta({ children, className, ...rest }: TimelineItemMetaProps) {
+  const inValue = React.useContext(ValueContext);
+  return (
+    <span {...rest} className={cx(inValue ? styles.valueMeta : styles.meta, className)}>
+      {children}
+    </span>
+  );
+}
+TimelineItemMeta.displayName = "Timeline.ItemMeta";
+
+export type TimelineItemValueProps = SpanPartProps & {
+  /** Text color. Default `neutral` (primary text). */
+  tone?: Tone;
+};
+
+/**
+ * Trailing amount: right-aligned, vertically centered, tabular numbers; a `Timeline.ItemMeta`
+ * inside is its muted second line. Moves under the meta below 20rem.
+ */
+function TimelineItemValue({
+  tone = "neutral",
+  children,
+  className,
+  ...rest
+}: TimelineItemValueProps) {
   return (
     <span {...rest} className={cx(styles.value, className)} {...toDataAttributes({ tone })}>
-      {children}
+      <ValueContext.Provider value={true}>{children}</ValueContext.Provider>
     </span>
   );
 }
-TimelineValue.displayName = "Timeline.Value";
-
-export type TimelineValueMetaProps = {
-  children: React.ReactNode;
-  className?: string;
-  ref?: React.Ref<HTMLSpanElement>;
-} & Omit<React.HTMLAttributes<HTMLSpanElement>, "children">;
-
-/** Second line inside `Timeline.Value` (category, unit): meta size, muted, right-aligned under the value. */
-function TimelineValueMeta({ children, className, ...rest }: TimelineValueMetaProps) {
-  return (
-    <span {...rest} className={cx(styles.valueMeta, className)}>
-      {children}
-    </span>
-  );
-}
-TimelineValueMeta.displayName = "Timeline.ValueMeta";
+TimelineItemValue.displayName = "Timeline.ItemValue";
 
 // ─── Gap ──────────────────────────────────────────────────────────────────────
 
-export type TimelineGapMetaProps = React.HTMLAttributes<HTMLSpanElement> & {
+export type TimelineDescriptionProps = React.HTMLAttributes<HTMLSpanElement> & {
   ref?: React.Ref<HTMLSpanElement>;
 };
 
-/** A caption on the right of a gap (e.g. «сейчас»). */
-function TimelineGapMeta({ className, ...rest }: TimelineGapMetaProps) {
+/** The secondary caption of a gap, at its end (e.g. «сейчас»). */
+function TimelineDescription({ className, ...rest }: TimelineDescriptionProps) {
   return <span className={cx(styles.gapTrailing, className)} {...rest} />;
 }
-TimelineGapMeta.displayName = "Timeline.GapMeta";
+TimelineDescription.displayName = "Timeline.Description";
 
 export type TimelineGapProps = {
   /** Caption color and hollow dot. Default `neutral` (muted); `warning` / `danger` flag a long interval. */
@@ -306,17 +296,16 @@ export type TimelineGapProps = {
  */
 function TimelineGap({ tone = "neutral", children, className, ...rest }: TimelineGapProps) {
   const parts = React.Children.toArray(children);
-  const isMeta = (child: React.ReactNode) =>
-    React.isValidElement(child) && child.type === TimelineGapMeta;
-  const caption = parts.filter((child) => !isMeta(child));
-  const meta = parts.filter(isMeta);
+  const isDescription = (child: React.ReactNode) => isPart(child, TimelineDescription);
+  const caption = parts.filter((child) => !isDescription(child));
+  const description = parts.filter(isDescription);
   const edge = React.useContext(EdgeContext);
   return (
     <li className={cx(styles.item, styles.gapItem)} {...toDataAttributes(edgeAttributes(edge))}>
       <div {...rest} className={cx(styles.gapRow, className)} {...toDataAttributes({ tone })}>
         <span className={styles.gapDot} aria-hidden="true" />
         <span className={styles.gapCaption}>{caption}</span>
-        {meta}
+        {description}
       </div>
     </li>
   );
@@ -327,11 +316,9 @@ export const Timeline = {
   Root: TimelineRoot,
   Group: TimelineGroup,
   Item: TimelineItem,
-  Title: TimelineTitle,
-  Meta: TimelineMeta,
-  MetaPrimary: TimelineMetaPrimary,
-  Value: TimelineValue,
-  ValueMeta: TimelineValueMeta,
+  ItemTitle: TimelineItemTitle,
+  ItemMeta: TimelineItemMeta,
+  ItemValue: TimelineItemValue,
   Gap: TimelineGap,
-  GapMeta: TimelineGapMeta,
+  Description: TimelineDescription,
 };

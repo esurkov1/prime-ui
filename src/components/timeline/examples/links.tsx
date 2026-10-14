@@ -20,28 +20,28 @@ export default function TimelineLinksExample() {
         <Timeline.Group label="Операции">
           {OPERATIONS.map((operation) => (
             <Timeline.Item key={operation.id} href={`#${operation.id}`}>
-              <Timeline.Title>{operation.title}</Timeline.Title>
-              <Timeline.Meta>
-                <Timeline.MetaPrimary>{operation.date}</Timeline.MetaPrimary>
-              </Timeline.Meta>
-              <Timeline.Value>{operation.value}</Timeline.Value>
+              <Timeline.ItemTitle>{operation.title}</Timeline.ItemTitle>
+              <Timeline.ItemMeta>
+                <strong>{operation.date}</strong>
+              </Timeline.ItemMeta>
+              <Timeline.ItemValue>{operation.value}</Timeline.ItemValue>
             </Timeline.Item>
           ))}
           {/* The receipt opens in place: the row is a button. */}
           <Timeline.Item onClick={() => setReceiptOpen(true)}>
-            <Timeline.Title>{WASH.title}</Timeline.Title>
-            <Timeline.Meta>
-              <Timeline.MetaPrimary>{WASH.date}</Timeline.MetaPrimary> · чек
-            </Timeline.Meta>
-            <Timeline.Value>{WASH.value}</Timeline.Value>
+            <Timeline.ItemTitle>{WASH.title}</Timeline.ItemTitle>
+            <Timeline.ItemMeta>
+              <strong>{WASH.date}</strong> · чек
+            </Timeline.ItemMeta>
+            <Timeline.ItemValue>{WASH.value}</Timeline.ItemValue>
           </Timeline.Item>
           {/* A router link (`<Link to>`) goes in the same way. */}
           <Timeline.Item asChild>
             <a href="#operations-archive">
-              <Timeline.Title>Операции за август</Timeline.Title>
-              <Timeline.Meta>
-                <Timeline.MetaPrimary>14 операций</Timeline.MetaPrimary>
-              </Timeline.Meta>
+              <Timeline.ItemTitle>Операции за август</Timeline.ItemTitle>
+              <Timeline.ItemMeta>
+                <strong>14 операций</strong>
+              </Timeline.ItemMeta>
             </a>
           </Timeline.Item>
         </Timeline.Group>

@@ -30,7 +30,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "overview",
       description:
-        "Лента операций: одна подписанная группа, линия через точки, строка под курсором выделяется — `Timeline.Group`, `Timeline.Value`.",
+        "Лента операций: одна подписанная группа, линия через точки, строка под курсором выделяется — `Timeline.Group`, `Timeline.ItemValue`.",
     },
     {
       slot: "variants",
@@ -44,7 +44,7 @@ export const page: ComponentPageConfig = {
     {
       slot: "structure",
       description:
-        "История обслуживания с промежутками между событиями, подписью справа у промежутка и второй строкой суммы — `Timeline.Gap`, `Timeline.GapMeta`, `Timeline.ValueMeta`.",
+        "История обслуживания с промежутками между событиями, подписью справа у промежутка и второй строкой суммы — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`.",
     },
     {
       scenario: "links",

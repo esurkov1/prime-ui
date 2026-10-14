@@ -26,13 +26,12 @@ import { Timeline } from "prime-ui-kit";
 Timeline.Root                    size container, sets the tier
 └─ Timeline.Group label          labelled <ol>; the line runs from its first dot to its last
    ├─ Timeline.Item              <li> + row (div | button | a | asChild element) with the dot
-   │  ├─ Timeline.Title          first line
-   │  ├─ Timeline.Meta           second line (date)
-   │  │  └─ Timeline.MetaPrimary emphasized part
-   │  └─ Timeline.Value          trailing amount
-   │     └─ Timeline.ValueMeta   second line under the amount
+   │  ├─ Timeline.ItemTitle      first line
+   │  ├─ Timeline.ItemMeta       second line (date); <strong> emphasizes a part
+   │  └─ Timeline.ItemValue      trailing amount
+   │     └─ Timeline.ItemMeta    second line under the amount
    └─ Timeline.Gap               <li>: interval between events (dashed segment, hollow dot)
-      └─ Timeline.GapMeta        caption on the right («сейчас»)
+      └─ Timeline.Description    caption on the right («сейчас»)
 ```
 
 ## API
@@ -44,7 +43,7 @@ Timeline.Root                    size container, sets the tier
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px, dot column → text 8 · 12 · 16 · 16 · 20 px. |
 | `children` | `ReactNode` | — (required) | The `Timeline.Group`s. |
 | `className` | `string` | — | Class on the element. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | The other div attributes. |
@@ -60,7 +59,7 @@ Timeline.Root                    size container, sets the tier
 | `…rest` | `Omit<OlHTMLAttributes<HTMLOListElement>, "children">` | — | The other ol attributes. |
 
 ### Timeline.Item
-`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot).
+`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot); an interactive row gives under the press and has the touch row height.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -69,12 +68,12 @@ Timeline.Root                    size container, sets the tier
 | `onClick` | `MouseEventHandler<HTMLElement>` | — | Renders the row as a `<button>`. |
 | `href` | `string` | — | Renders the row as a link (with `target`, `rel`, `download`). |
 | `asChild` | `boolean` | `false` | Renders the row as the single child element (a router link). |
-| `children` | `ReactNode` | — (required) | Title, Meta, Value. |
+| `children` | `ReactNode` | — (required) | `Timeline.ItemTitle`, `Timeline.ItemMeta`, `Timeline.ItemValue`. |
 | `className` | `string` | — | Class on the element. |
 | `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children" \| "color" \| "onClick">` | — | The other row attributes (`target`, `rel`, `download` with `href`). |
 
-### Timeline.Title · Timeline.Meta · Timeline.MetaPrimary
-`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, accent on the highlighted row, wraps), the muted date line with tabular numbers, and its emphasized part.
+### Timeline.ItemTitle · Timeline.ItemMeta
+`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, accent on the highlighted row, wraps) and the muted secondary line with tabular numbers — under the title the date (emphasize a part with `<strong>`), inside `Timeline.ItemValue` the value's second line.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -82,22 +81,13 @@ Timeline.Root                    size container, sets the tier
 | `className` | `string` | — | Class on the element. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
 
-### Timeline.Value
-`ref` → `HTMLSpanElement`. A `<span>` with the trailing amount (right-aligned, tabular). Moves under the meta below 20rem.
+### Timeline.ItemValue
+`ref` → `HTMLSpanElement`. A `<span>` with the trailing amount (right-aligned, tabular), a `Timeline.ItemMeta` inside under it. Moves under the meta below 20rem.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Text color (income `success`, refund `danger`). |
 | `children` | `ReactNode` | — (required) | The amount. |
-| `className` | `string` | — | Class on the element. |
-| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
-
-### Timeline.ValueMeta
-`ref` → `HTMLSpanElement`. A muted `<span>` line under the value.
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `children` | `ReactNode` | — (required) | The text of the line. |
 | `className` | `string` | — | Class on the element. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
 
@@ -107,12 +97,12 @@ Timeline.Root                    size container, sets the tier
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Caption and dot color; `warning` / `danger` flag a long interval. |
-| `children` | `ReactNode` | — (required) | The interval caption and an optional `Timeline.GapMeta`. |
+| `children` | `ReactNode` | — (required) | The interval caption and an optional `Timeline.Description`. |
 | `className` | `string` | — | Class on the element. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | The other div attributes. |
 
-### Timeline.GapMeta
-`ref` → `HTMLSpanElement`. A caption on the right of the gap («сейчас»), in the gap tone.
+### Timeline.Description
+`ref` → `HTMLSpanElement`. The secondary caption of a gap, at its end («сейчас»), in the gap tone.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -123,10 +113,10 @@ Timeline.Root                    size container, sets the tier
 ### size
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `xs` | rows 40, title 12/16, dot 8 | very dense side panels | |
-| `s` | rows 52, title 13/20 | side panels, drawers | |
-| `m` | rows 64, title 14/20, dot 10 | page content and cards | yes |
-| `l` · `xl` | rows 68 / 76, title 16/24, dot 12 | spacious feeds, detail pages | |
+| `xs` | rows 40, title 12/16, dot 8, dot column → text 8 | very dense side panels | |
+| `s` | rows 52, title 13/20, dot column → text 12 | side panels, drawers | |
+| `m` | rows 64, title 14/20, dot 10, dot column → text 16 | page content and cards | yes |
+| `l` · `xl` | rows 68 / 76, title 16/24, dot 12, dot column → text 16 / 20 | spacious feeds, detail pages | |
 
 ### color (Item)
 | Value | Looks like | Use when | Default |
@@ -134,10 +124,10 @@ Timeline.Root                    size container, sets the tier
 | `blue` | blue dot at reduced emphasis | default category | yes |
 | `gray` · `green` · `orange` · `red` · `yellow` · `purple` · `sky` · `pink` · `teal` | dot in the hue | categories | |
 
-### tone (Item · Value · Gap)
+### tone (Item · ItemValue · Gap)
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
-| `neutral` | muted dot / primary value / muted gap caption | a status without meaning | Value, Gap |
+| `neutral` | muted dot / primary value / muted gap caption | a status without meaning | ItemValue, Gap |
 | `accent` | accent | a pending action | |
 | `success` | success | paid, income | |
 | `warning` | warning | overdue, a too-long interval | |
@@ -152,13 +142,14 @@ On an Item `tone` wins over `color` and shows at full emphasis.
 | tier | `size` | `data-size` on the root |
 | highlighted | pointer over the row, keyboard focus | `:hover`, `:focus-visible`: `fill-subtle-active` pill, accent title and dot (a `tone` keeps its dot) |
 | dot color | `color` / `tone` | `data-color` (without a tone) or `data-tone` |
-| interactive | `onClick`, `href`, `asChild` | `data-interactive`; pointer cursor, inset focus ring |
+| interactive | `onClick`, `href`, `asChild` | `data-interactive`; pointer cursor, inset focus ring, the touch row height (`touchTargetRowClass`) |
+| pressed | pointer or key down on an interactive row | the row gives (`press`: scale over `fast`), back on release |
 
 Timeline keeps no state and has no persistent selection: every row is highlighted only while it is under the pointer or focused.
 
 ## Layout & spacing
 - The root is a size container: give it a definite width (`width: min(100%, 30rem)`).
-- Row grid: dot column · text · value; below 20rem of root width the value moves under the meta line.
+- Row grid: dot column · text · value; the dot column and the text stand 8 · 12 · 16 · 16 · 20 apart by tier (`--tl-gap`); below 20rem of root width the value moves under the meta line.
 - Rows touch so the line is continuous; group → group `--prime-space-4`.
 - Inside a Card put it in `Card.Body`; the card owns the padding.
 
@@ -186,10 +177,10 @@ No `labels`.
 ## Examples
 | Example | Shows |
 |---|---|
-| [overview.tsx](examples/overview.tsx) | An operations feed: one labelled group, a line through the dots, the row under the pointer highlighted — `Timeline.Group`, `Timeline.Value`. |
+| [overview.tsx](examples/overview.tsx) | An operations feed: one labelled group, a line through the dots, the row under the pointer highlighted — `Timeline.Group`, `Timeline.ItemValue`. |
 | [variants.tsx](examples/variants.tsx) | Dot hues for categories at reduced emphasis, and status tones on items, values and gaps at full emphasis — `color`, `tone`. |
 | [sizes.tsx](examples/sizes.tsx) | Every tier scales text, dot and row rhythm, rows 40 to 76 px — `size`. |
-| [structure.tsx](examples/structure.tsx) | A service history with intervals between events, a caption on the right of a gap and a second value line — `Timeline.Gap`, `Timeline.GapMeta`, `Timeline.ValueMeta`. |
+| [structure.tsx](examples/structure.tsx) | A service history with intervals between events, a caption on the right of a gap and a second value line — `Timeline.Gap`, `Timeline.Description`, `Timeline.ItemMeta`. |
 | [links.tsx](examples/links.tsx) | Rows that open something: an operation page by a link or by your router link through the slot, a receipt in place by a button; one Tab stop each with a focus ring — `href`, `asChild`, `onClick`. |
 | [narrow.tsx](examples/narrow.tsx) | At 375 px the title wraps and the amount stays right; below 20rem of its own width the amount moves under the meta line. |
 

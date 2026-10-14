@@ -39,8 +39,8 @@ export const api: ComponentApi = {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
           default: '"m"',
-          en: "Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px.",
-          ru: "Текст, точка и ритм строк: высота 40 · 52 · 64 · 68 · 76 px.",
+          en: "Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px, dot column → text 8 · 12 · 16 · 16 · 20 px.",
+          ru: "Текст, точка и ритм строк: высота 40 · 52 · 64 · 68 · 76 px, от колонки точки до текста 8 · 12 · 16 · 16 · 20 px.",
         },
         {
           name: "children",
@@ -87,8 +87,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Timeline.Item",
-      en: "`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot).",
-      ru: "`<li>` со строкой: `<div>`, `<button>` (`onClick`), `<a>` (`href`) или свой элемент (`asChild`); точка добавляется в начало. Строка под курсором или в фокусе выделяется (плашка, акцентные заголовок и точка).",
+      en: "`ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot); an interactive row gives under the press and has the touch row height.",
+      ru: "`<li>` со строкой: `<div>`, `<button>` (`onClick`), `<a>` (`href`) или свой элемент (`asChild`); точка добавляется в начало. Строка под курсором или в фокусе выделяется (плашка, акцентные заголовок и точка); интерактивная строка поддаётся при нажатии и не ниже сенсорной строки.",
       props: [
         {
           name: "color",
@@ -126,8 +126,8 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "Title, Meta, Value.",
-          ru: "Title, Meta, Value.",
+          en: "`Timeline.ItemTitle`, `Timeline.ItemMeta`, `Timeline.ItemValue`.",
+          ru: "`Timeline.ItemTitle`, `Timeline.ItemMeta`, `Timeline.ItemValue`.",
         },
         CLASS_NAME,
         {
@@ -139,15 +139,15 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Timeline.Title · Timeline.Meta · Timeline.MetaPrimary",
-      en: "`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, accent on the highlighted row, wraps), the muted date line with tabular numbers, and its emphasized part.",
-      ru: "Строки `<span>`: событие (medium, акцент на выделенной строке, переносится), приглушённая строка даты и её выделенная часть.",
+      name: "Timeline.ItemTitle · Timeline.ItemMeta",
+      en: "`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, accent on the highlighted row, wraps) and the muted secondary line with tabular numbers — under the title the date (emphasize a part with `<strong>`), inside `Timeline.ItemValue` the value's second line.",
+      ru: "Строки `<span>`: событие (medium, акцент на выделенной строке, переносится) и приглушённая вторая строка с табличными цифрами — под заголовком дата (часть выделяет `<strong>`), внутри `Timeline.ItemValue` вторая строка значения.",
       props: textProps("The text of the line.", "Текст строки."),
     },
     {
-      name: "Timeline.Value",
-      en: "`ref` → `HTMLSpanElement`. A `<span>` with the trailing amount (right-aligned, tabular). Moves under the meta below 20rem.",
-      ru: "`<span>` с суммой справа (по правому краю, табличные цифры). Уже 20rem уходит под мету.",
+      name: "Timeline.ItemValue",
+      en: "`ref` → `HTMLSpanElement`. A `<span>` with the trailing amount (right-aligned, tabular), a `Timeline.ItemMeta` inside under it. Moves under the meta below 20rem.",
+      ru: "`<span>` с суммой справа (по правому краю, табличные цифры), `Timeline.ItemMeta` внутри — под ней. Уже 20rem уходит под мету.",
       props: [
         {
           name: "tone",
@@ -158,12 +158,6 @@ export const api: ComponentApi = {
         },
         ...textProps("The amount.", "Сумма."),
       ],
-    },
-    {
-      name: "Timeline.ValueMeta",
-      en: "`ref` → `HTMLSpanElement`. A muted `<span>` line under the value.",
-      ru: "Приглушённая строка `<span>` под значением.",
-      props: textProps("The text of the line.", "Текст строки."),
     },
     {
       name: "Timeline.Gap",
@@ -181,8 +175,8 @@ export const api: ComponentApi = {
           name: "children",
           type: "ReactNode",
           required: true,
-          en: "The interval caption and an optional `Timeline.GapMeta`.",
-          ru: "Подпись промежутка и необязательный `Timeline.GapMeta`.",
+          en: "The interval caption and an optional `Timeline.Description`.",
+          ru: "Подпись промежутка и необязательный `Timeline.Description`.",
         },
         CLASS_NAME,
         {
@@ -194,9 +188,9 @@ export const api: ComponentApi = {
       ],
     },
     {
-      name: "Timeline.GapMeta",
-      en: "`ref` → `HTMLSpanElement`. A caption on the right of the gap («сейчас»), in the gap tone.",
-      ru: "Подпись справа у промежутка («сейчас»), в тоне промежутка.",
+      name: "Timeline.Description",
+      en: "`ref` → `HTMLSpanElement`. The secondary caption of a gap, at its end («сейчас»), in the gap tone.",
+      ru: "Вторая подпись промежутка, в его конце («сейчас»), в тоне промежутка.",
       props: [spanRest],
     },
   ],

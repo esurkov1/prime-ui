@@ -774,7 +774,7 @@ const CASES: Case[] = [
       <Timeline.Root>
         <Timeline.Group label="Сегодня">
           <Timeline.Item ref={ref} data-testid="part">
-            <Timeline.Title>Счёт оплачен</Timeline.Title>
+            <Timeline.ItemTitle>Счёт оплачен</Timeline.ItemTitle>
           </Timeline.Item>
         </Timeline.Group>
       </Timeline.Root>

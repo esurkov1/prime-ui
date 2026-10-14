@@ -12,18 +12,18 @@ export default function TimelineSizesExample() {
         <Timeline.Root key={size} size={size} className={styles.feed}>
           <Timeline.Group label={size}>
             <Timeline.Item>
-              <Timeline.Title>Аренда закончилась · Иван К.</Timeline.Title>
-              <Timeline.Meta>
-                <Timeline.MetaPrimary>21.09.26</Timeline.MetaPrimary> · 15 д. назад
-              </Timeline.Meta>
-              <Timeline.Value>+6 300 ₽</Timeline.Value>
+              <Timeline.ItemTitle>Аренда закончилась · Иван К.</Timeline.ItemTitle>
+              <Timeline.ItemMeta>
+                <strong>21.09.26</strong> · 15 д. назад
+              </Timeline.ItemMeta>
+              <Timeline.ItemValue>+6 300 ₽</Timeline.ItemValue>
             </Timeline.Item>
             <Timeline.Item>
-              <Timeline.Title>ТО: замена масла</Timeline.Title>
-              <Timeline.Meta>
-                <Timeline.MetaPrimary>10.09.26</Timeline.MetaPrimary> · 26 д. назад
-              </Timeline.Meta>
-              <Timeline.Value>−689 ₽</Timeline.Value>
+              <Timeline.ItemTitle>ТО: замена масла</Timeline.ItemTitle>
+              <Timeline.ItemMeta>
+                <strong>10.09.26</strong> · 26 д. назад
+              </Timeline.ItemMeta>
+              <Timeline.ItemValue>−689 ₽</Timeline.ItemValue>
             </Timeline.Item>
           </Timeline.Group>
         </Timeline.Root>

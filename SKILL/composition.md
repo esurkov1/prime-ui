@@ -424,7 +424,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 - Columns are a CSS module on flex-wrap without breakpoints: the main one grows, the side one holds ~18rem and drops below when the main one runs out of room.
 - A section without a frame is `PageContent.Section label`: an h2 heading 16 px above the table; `Card variant="panel"` only for standalone blocks of the side column. A table is already a filled block — never put it in a card.
 - «Label → value» pairs about the client are `DescriptionList.Root orientation="vertical"` with `DescriptionList.Item label`; amounts are tabular figures, the total is larger (`title-m`) and ends where the «Сумма» column ends (the table cell inset).
-- History is a `Timeline`: events top-down from the latest, dates in `Timeline.Meta`; a row highlights on hover.
+- History is a `Timeline`: events top-down from the latest, dates in `Timeline.ItemMeta`; a row highlights on hover.
 
 ### Settings page
 

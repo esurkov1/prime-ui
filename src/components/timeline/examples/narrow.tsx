@@ -26,11 +26,11 @@ export default function TimelineNarrowExample() {
           <Timeline.Group label={width.label}>
             {EVENTS.map((event) => (
               <Timeline.Item key={event.id}>
-                <Timeline.Title>{event.title}</Timeline.Title>
-                <Timeline.Meta>
-                  <Timeline.MetaPrimary>{event.date}</Timeline.MetaPrimary>
-                </Timeline.Meta>
-                <Timeline.Value>{event.value}</Timeline.Value>
+                <Timeline.ItemTitle>{event.title}</Timeline.ItemTitle>
+                <Timeline.ItemMeta>
+                  <strong>{event.date}</strong>
+                </Timeline.ItemMeta>
+                <Timeline.ItemValue>{event.value}</Timeline.ItemValue>
               </Timeline.Item>
             ))}
           </Timeline.Group>

@@ -668,16 +668,14 @@ export type {
 } from "./thumbnail/Thumbnail";
 export { Thumbnail } from "./thumbnail/Thumbnail";
 export type {
-  TimelineGapMetaProps,
+  TimelineDescriptionProps,
   TimelineGapProps,
   TimelineGroupProps,
+  TimelineItemMetaProps,
   TimelineItemProps,
-  TimelineMetaPrimaryProps,
-  TimelineMetaProps,
+  TimelineItemTitleProps,
+  TimelineItemValueProps,
   TimelineRootProps,
-  TimelineTitleProps,
-  TimelineValueMetaProps,
-  TimelineValueProps,
 } from "./timeline/Timeline";
 export { Timeline } from "./timeline/Timeline";
 export type {
