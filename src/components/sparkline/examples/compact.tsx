@@ -1,4 +1,4 @@
-/** Revenue by month per client in a list: the plot alone at a row's height with the dot on the current month, the label is the chart's accessible name — `layout`, `label`. */
+/** Revenue by month per client in a list: the plot alone at a row's height with the dot on the current month, scrubbing shows the month in a tooltip, the label is the chart's accessible name — `layout`, `label`. */
 import { Card, Sparkline, type SparklinePoint, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";

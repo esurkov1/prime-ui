@@ -1,4 +1,4 @@
-/** Revenue for 30 days in a dashboard card: drag across the chart, the headline follows and the trend arrow turns — `data`, `label`, `formatValue`. */
+/** Revenue for 30 days in a dashboard card: at rest the total for the period against the previous 30 days, drag across the chart to see a day — `data`, `label`, `summary`, `compareTo`, `formatValue`. */
 import { Card, Sparkline, type SparklinePoint } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -14,13 +14,22 @@ const REVENUE: SparklinePoint[] = Array.from({ length: 30 }, (_, i) => {
   };
 });
 
+/** Revenue for the 30 days before, 10 August — 8 September 2026. */
+const PREVIOUS_TOTAL = 8_240_000;
+
 const formatRubles = (value: number) => `${value.toLocaleString("ru-RU")} ₽`;
 
 export default function SparklineOverviewExample() {
   return (
     <Card.Root className={styles.card}>
       <Card.Body>
-        <Sparkline data={REVENUE} label="Выручка за 30 дней" formatValue={formatRubles} />
+        <Sparkline
+          data={REVENUE}
+          label="Выручка за 30 дней"
+          summary="sum"
+          compareTo={PREVIOUS_TOTAL}
+          formatValue={formatRubles}
+        />
       </Card.Body>
     </Card.Root>
   );

@@ -194,7 +194,12 @@ export default function DashboardPattern() {
 
         <Card.Root variant="panel">
           <Card.Body>
-            <Sparkline data={REVENUE[period]} label="Выручка по дням" formatValue={formatRubles} />
+            <Sparkline
+              data={REVENUE[period]}
+              label="Выручка по дням"
+              summary="sum"
+              formatValue={formatRubles}
+            />
           </Card.Body>
         </Card.Root>
 

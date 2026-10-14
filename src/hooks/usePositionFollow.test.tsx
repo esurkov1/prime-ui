@@ -4,7 +4,12 @@ import { describe, expect, it, vi } from "vitest";
 
 import { AnchorRectProvider, type AnchorRectResolver } from "@/internal/AnchorRectContext";
 
-import { computeFloatingPosition, type PositionSide, usePosition } from "./usePosition";
+import {
+  type AnchorPoint,
+  computeFloatingPosition,
+  type PositionSide,
+  usePosition,
+} from "./usePosition";
 
 const OFFSET = 8;
 const PAD = 8;
@@ -115,6 +120,83 @@ describe("usePosition", () => {
     expect(seen[0]).toBe(screen.getByRole("button", { name: "anchor" }));
     expect(layer.style.left).toBe("8px");
     expect(layer.style.getPropertyValue("--float-min-w")).toBe("40px");
+  });
+});
+
+/** A layer at a point inside its anchor: the pointer over a chart. */
+function AtPoint({ point }: { point: AnchorPoint | null }) {
+  const anchorRef = React.useRef<HTMLDivElement>(null);
+  const layerRef = React.useRef<HTMLDivElement>(null);
+  const { side, attachLayer } = usePosition(true, anchorRef, layerRef, {
+    side: "right",
+    align: "center",
+    anchorPoint: point,
+  });
+  return (
+    <>
+      <div ref={anchorRef} data-testid="anchor" />
+      <div ref={attachLayer} data-testid="layer" data-side={side} />
+    </>
+  );
+}
+
+describe("usePosition at an anchor point", () => {
+  const anchorAt = () => {
+    const anchor = screen.getByTestId("anchor");
+    anchor.getBoundingClientRect = () =>
+      rect({ left: 100, top: 200, right: 500, bottom: 280, width: 400, height: 80 });
+  };
+
+  it("places the layer against the point, not the anchor, and follows each new point", () => {
+    const { rerender } = render(<AtPoint point={null} />);
+    anchorAt();
+    rerender(<AtPoint point={{ x: 40, y: 20 }} />);
+    const layer = screen.getByTestId("layer");
+    // jsdom has no tokens: the fallback panel offset (4) right of x = 140, centred on y = 220.
+    expect(layer.style.left).toBe("144px");
+    expect(layer.style.top).toBe("220px");
+    rerender(<AtPoint point={{ x: 360, y: 60 }} />);
+    expect(layer.style.left).toBe("464px");
+    expect(layer.style.top).toBe("260px");
+    expect(layer).toHaveAttribute("data-side", "right");
+  });
+
+  it("keeps its side past the middle and flips only where the side has no room", () => {
+    // A 160 wide layer at x = 900 of a 1024 viewport: no room right (900 + 4 + 160 + 8 > 1024).
+    const right = computeFloatingPosition(
+      rect({ left: 600, right: 600, top: 300, bottom: 300 }),
+      160,
+      40,
+      1024,
+      768,
+      {
+        side: "right",
+        align: "center",
+        offset: 16,
+        viewportPad: 8,
+        flip: true,
+        matchAnchorWidth: false,
+      },
+    );
+    expect(right.side).toBe("right");
+    expect(right.left).toBe(616);
+    const flipped = computeFloatingPosition(
+      rect({ left: 900, right: 900, top: 300, bottom: 300 }),
+      160,
+      40,
+      1024,
+      768,
+      {
+        side: "right",
+        align: "center",
+        offset: 16,
+        viewportPad: 8,
+        flip: true,
+        matchAnchorWidth: false,
+      },
+    );
+    expect(flipped.side).toBe("left");
+    expect(flipped.left).toBe(900 - 16 - 160);
   });
 });
 

@@ -90,6 +90,7 @@ reference is each component's `COMPONENT.md` ([components.md](components.md)), t
 - Data the server sorts and pages (thousands of records): `source="server"` + `rowCount`, controlled `sort` / `page` as the request, `page` back to 1 on a new search or filter, old rows kept with `loading` while the next page loads — not a server page passed to the default client mode, and not `rows={[]}` between pages.
 - Categories (sources, platforms, regions) get `color` and the same order of `chartColors` in charts; statuses and meanings get `tone` — never paint categories with tones.
 - A chart with axes or several series: `<ChartFrame.Root series state>` around the library (or your SVG) with `ChartFrame.Plot renderPlot`, `Legend`, `Table` — not a hand-made Card with a grey box while loading and a legend of colored dots.
+- A tooltip on your own SVG chart: `<ChartFrame.Tooltip point={{ x, y }} items>` with the pointer in plot coordinates — not a `foreignObject` or a div placed and clamped by hand; it flips only when out of room.
 - Amounts, counts and dates are `numeric` columns; statuses are `Badge.Root color` from one status → color map.
 - Rows people order by hand: `onReorder(id, beforeId)` (apply it with `moveBefore`, return the save's Promise) — not a Dnd list rebuilt next to the table.
 - A short list of records people order by hand (stages, priorities) is `<List.Root onReorder>` with `List.Item value` — not up / down buttons or a hand-made `Dnd.Sortable`.

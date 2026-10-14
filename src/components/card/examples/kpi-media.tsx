@@ -1,9 +1,19 @@
 /** A KPI with a sparkline or a fill level in the bottom slot of `mini` — `Card.Media`. */
-import { Card, Icon, ProgressBar } from "prime-ui-kit";
+import { Card, Icon, ProgressBar, Sparkline, type SparklinePoint } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
 
-const SPARKLINE = "M0 32 L15 28 L30 30 L45 18 L60 22 L75 12 L90 16 L105 8 L120 4";
+const REQUESTS: SparklinePoint[] = [
+  { label: "12:00", value: 9_120 },
+  { label: "12:10", value: 9_640 },
+  { label: "12:20", value: 9_380 },
+  { label: "12:30", value: 10_910 },
+  { label: "12:40", value: 10_470 },
+  { label: "12:50", value: 11_760 },
+  { label: "13:00", value: 11_290 },
+  { label: "13:10", value: 12_310 },
+  { label: "13:20", value: 12_840 },
+];
 
 export default function CardKpiMediaExample() {
   return (
@@ -15,15 +25,7 @@ export default function CardKpiMediaExample() {
         <Card.Label>Запросы в минуту</Card.Label>
         <Card.Value>12 840</Card.Value>
         <Card.Media>
-          {/* The SVG stretches to the card width; CSS sets its height, not the viewBox. */}
-          <svg
-            className={styles.spark}
-            viewBox="0 0 120 40"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path d={SPARKLINE} className={styles.chartLine} />
-          </svg>
+          <Sparkline layout="compact" data={REQUESTS} label="Запросы в минуту за час" />
         </Card.Media>
       </Card.Root>
 

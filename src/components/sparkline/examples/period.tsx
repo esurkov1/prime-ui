@@ -1,4 +1,4 @@
-/** Another period swaps the series: the line cross-fades in and the headline digits roll to the new total — `data`. */
+/** Another period swaps the series: the line cross-fades in and the headline digits roll to the new total — `data`, `summary`. */
 import { Card, SegmentedControl, Sparkline, type SparklinePoint } from "prime-ui-kit";
 import * as React from "react";
 
@@ -39,7 +39,12 @@ export default function SparklinePeriodExample() {
           <SegmentedControl.Item value="month">Месяц</SegmentedControl.Item>
           <SegmentedControl.Item value="quarter">Квартал</SegmentedControl.Item>
         </SegmentedControl.Root>
-        <Sparkline data={SERIES[period]} label="Новые заказы" formatValue={formatRubles} />
+        <Sparkline
+          data={SERIES[period]}
+          label="Новые заказы"
+          summary="sum"
+          formatValue={formatRubles}
+        />
       </Card.Body>
     </Card.Root>
   );

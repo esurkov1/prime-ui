@@ -28,15 +28,6 @@
   width: min(100%, calc(var(--prime-space-24) * 6));
 }
 
-/* Sparkline: fixed height from tokens, stretches to the card width. */
-.spark {
-  display: block;
-  width: 100%;
-  height: var(--prime-space-10);
-  color: var(--prime-color-accent-default);
-  overflow: visible;
-}
-
 .chart {
   display: block;
   width: 100%;

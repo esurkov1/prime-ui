@@ -167,8 +167,8 @@ export const api: ComponentApi = {
     },
     {
       name: "ChartFrame.Tooltip",
-      en: "`ref` → `HTMLDivElement`. The kit's tooltip body for a chart library's custom tooltip (Recharts `content`, visx `TooltipWithBounds`). The library positions it; render it inside `ChartFrame.Root`.",
-      ru: "Тело подсказки кита для своей подсказки библиотеки графиков (Recharts `content`, visx `TooltipWithBounds`). Положение задаёт библиотека; рендерить внутри `ChartFrame.Root`.",
+      en: "`ref` → `HTMLDivElement`. The kit's chart tooltip: with `point` it floats beside that point of the plot; without it it is the body for a library's tooltip hook (Recharts `content`). Inside `ChartFrame.Root`.",
+      ru: "Подсказка графика кита: с `point` парит рядом с этой точкой графика; без него — тело для подсказки библиотеки (Recharts `content`). Внутри `ChartFrame.Root`.",
       props: [
         {
           name: "label",
@@ -182,6 +182,12 @@ export const api: ComponentApi = {
           required: true,
           en: "`{ id, value }` per series at that point; name and color come from the root's series, rows of hidden series are left out, values go through `formatValue`.",
           ru: "`{ id, value }` для каждого ряда в точке; название и цвет берутся из рядов корня, строки скрытых рядов пропускаются, значения проходят через `formatValue`.",
+        },
+        {
+          name: "point",
+          type: "{ x: number; y: number } | null",
+          en: "A point in `renderPlot` coordinates (the pointer, or the point the arrows reached): the tooltip floats right of it, left only without room; `null` hides it. Floating, it is `aria-hidden`.",
+          ru: "Точка в координатах `renderPlot` (курсор или точка стрелок): подсказка справа от неё, слева — только без места; `null` скрывает. Парящая подсказка `aria-hidden`.",
         },
         rest("HTMLDivElement", "div"),
       ],

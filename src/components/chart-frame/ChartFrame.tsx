@@ -4,6 +4,7 @@ import { useControllableState } from "@/hooks/useControllableState";
 import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { useStateSwap } from "@/hooks/useStateSwap";
 import { Icon } from "@/icons";
+import { type AnchorPoint, ChartTooltip } from "@/internal/ChartTooltip";
 import { cx } from "@/internal/cx";
 import type { TagRef } from "@/internal/polymorphic";
 import { rovingIndex } from "@/internal/rovingFocus";
@@ -116,6 +117,8 @@ type ChartFrameContextValue = {
   descriptionId: string;
   setHasTitle: (has: boolean) => void;
   setHasDescription: (has: boolean) => void;
+  /** The plot element: a floating `ChartFrame.Tooltip` stands at a point of it. */
+  plotRef: React.RefObject<HTMLDivElement | null>;
 };
 
 const ChartFrameContext = React.createContext<ChartFrameContextValue | null>(null);
@@ -176,6 +179,7 @@ function ChartFrameRoot({
   const depth = useNestedSurfaceDepth();
   const titleId = React.useId();
   const descriptionId = React.useId();
+  const plotRef = React.useRef<HTMLDivElement | null>(null);
   const [hasTitle, setHasTitle] = React.useState(false);
   const [hasDescription, setHasDescription] = React.useState(false);
   const [hidden, setHidden] = useControllableState({
@@ -213,6 +217,7 @@ function ChartFrameRoot({
     descriptionId,
     setHasTitle,
     setHasDescription,
+    plotRef,
   };
 
   return (
@@ -368,8 +373,7 @@ function ChartFramePlot({
   ref,
   ...rest
 }: ChartFramePlotProps) {
-  const { state, series, labels, onRetry } = useChartFrame("Plot");
-  const plotRef = React.useRef<HTMLDivElement>(null);
+  const { state, series, labels, onRetry, plotRef } = useChartFrame("Plot");
   const mergedRef = useMergedRefs(plotRef, ref);
   const [size, setSize] = React.useState<{ width: number; height: number } | null>(null);
   const measure = renderPlot !== undefined;
@@ -391,7 +395,7 @@ function ChartFramePlot({
     });
     observer.observe(node);
     return () => observer.disconnect();
-  }, [measure]);
+  }, [measure, plotRef.current]);
 
   const plot =
     renderPlot !== undefined
@@ -555,16 +559,24 @@ export type ChartFrameTooltipProps = React.HTMLAttributes<HTMLDivElement> & {
   label?: string;
   /** One row per series at that point; rows of hidden series are left out. */
   items: ChartFrameTooltipItem[];
+  /**
+   * A point of the plot in the coordinates `renderPlot` draws in (the pointer, or the point the
+   * arrow keys reached): the tooltip floats beside it like every kit layer — right of it, on the
+   * left only where the right has no room; `null` hides it. Without `point` the body renders in
+   * place for a chart library's tooltip hook, which positions it.
+   */
+  point?: AnchorPoint | null;
   ref?: React.Ref<HTMLDivElement>;
 };
 
 /**
- * The kit's tooltip body for a chart library's custom tooltip hook (Recharts `content`, visx
- * `TooltipWithBounds`, a hand-drawn overlay): a floating panel with the point's label and rows of
- * swatch · series name · value. The library positions it; it must render inside `ChartFrame.Root`.
+ * The kit's chart tooltip: the point's label and rows of swatch · series name · value. With
+ * `point` it floats beside that point of the plot (a hand-drawn SVG chart); without it it is the
+ * body for a chart library's custom tooltip hook (Recharts `content`, visx `TooltipWithBounds`).
+ * It must render inside `ChartFrame.Root`.
  */
-function ChartFrameTooltip({ label, items, className, ...rest }: ChartFrameTooltipProps) {
-  const { series, formatValue } = useChartFrame("Tooltip");
+function ChartFrameTooltip({ label, items, point, className, ...rest }: ChartFrameTooltipProps) {
+  const { series, formatValue, plotRef } = useChartFrame("Tooltip");
   const rows = items.flatMap((item) => {
     const entry = series.find((candidate) => candidate.id === item.id);
     if (entry?.hidden) return [];
@@ -578,8 +590,13 @@ function ChartFrameTooltip({ label, items, className, ...rest }: ChartFrameToolt
     ];
   });
   return (
-    <div {...rest} className={cx(styles.tooltip, className)} data-depth="floating">
-      {label ? <div className={styles.tooltipLabel}>{label}</div> : null}
+    <ChartTooltip
+      {...rest}
+      className={cx(styles.tooltip, className)}
+      label={label || undefined}
+      anchorRef={point === undefined ? undefined : plotRef}
+      point={point}
+    >
       {rows.length > 0 ? (
         <ul className={styles.tooltipRows}>
           {rows.map((row) => (
@@ -595,7 +612,7 @@ function ChartFrameTooltip({ label, items, className, ...rest }: ChartFrameToolt
           ))}
         </ul>
       ) : null}
-    </div>
+    </ChartTooltip>
   );
 }
 ChartFrameTooltip.displayName = "ChartFrame.Tooltip";

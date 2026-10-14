@@ -67,7 +67,7 @@ Records with a start and an end compared across time — who is busy when, a pro
 phases and milestones → Gantt (never a DataTable of dates or hand-drawn bars); moved and resized by
 hand through `onBarChange`.
 Chronological events → Timeline; a conversation between people (support, a team chat) → Message —
-never a Timeline or a list of Cards styled as bubbles. Code → CodeBlock. A number with its trend over days or weeks (revenue, orders, sign-ups) → Sparkline: the latest value, its change and a line you can scrub; values with a sign by period → Sparkline `variant="bars"`; a chart with axes or several series → ChartFrame around a chart library or your own SVG (the panel, legend, tooltip, states and the screen-reader table come from the kit, the colors from `series` / `chartColors` — never status tones); values to read, sort or compare row by row → DataTable, not a chart.
+never a Timeline or a list of Cards styled as bubbles. Code → CodeBlock. A number with its trend over days or weeks (revenue, orders, sign-ups) → Sparkline: the latest value, its change and a line you can scrub; values with a sign by period → Sparkline `variant="bars"`; against a plan → `reference`; missing days → `value: null`; a chart with axes or several series → ChartFrame around a chart library or your own SVG (the panel, legend, tooltip, states and the screen-reader table come from the kit, the colors from `series` / `chartColors` — never status tones); values to read, sort or compare row by row → DataTable, not a chart.
 
 **Messages.** A whole conversation → `Chat`: `Chat.Root` with `Chat.Header` (avatar, `Chat.Title`,
 `Chat.Description`, `Chat.Actions` with `Chat.SearchButton`), `Chat.Search`, `Chat.Pinned`,

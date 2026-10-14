@@ -1,8 +1,9 @@
 /*
- * Sparkline — a headline (title · date, value · change) over a line chart. The plot is drawn in a
- * stretched 0–100 viewBox with a non-scaling stroke; the cursor (guide + dot) is HTML over it, so
- * the dot stays round at any width. Scrubbing moves the cursor with the pointer at once (direct
- * manipulation); when it ends the cursor glides back to the latest point (`base` · emphasized).
+ * Sparkline — a headline (title · date, value · change) over a line, area or bar chart. The line is
+ * a monotone curve drawn in a stretched 0–100 viewBox with a non-scaling stroke; the cursor (guide
+ * + dot), lone points and the reference line are HTML over it, so dots stay round and dashes even
+ * at any width. Scrubbing moves the cursor with the pointer at once (direct manipulation); when it
+ * ends the cursor glides back to the point at rest (`base` · emphasized) and the guide fades out.
  * The trend arrow turns half a turn between up and down. A new series cross-fades in (swapMotion).
  */
 .root {
@@ -52,6 +53,11 @@
   white-space: nowrap;
 }
 
+/* A point with no data: «Нет данных» in the value's place, quieter than a number. */
+.value[data-empty] {
+  color: var(--prime-color-text-muted);
+}
+
 .change {
   flex-shrink: 0;
 }
@@ -84,6 +90,11 @@
   outline-offset: var(--prime-focus-offset);
 }
 
+.drawing {
+  position: absolute;
+  inset: 0;
+}
+
 .svg {
   display: block;
   width: 100%;
@@ -100,9 +111,40 @@
   vector-effect: non-scaling-stroke;
 }
 
+/* `area`: the accent fades from under the line to nothing at the bottom edge. */
 .area {
-  fill: color-mix(in srgb, var(--prime-color-accent-default) 12%, transparent);
   stroke: none;
+}
+
+.fadeTop {
+  stop-color: var(--prime-color-accent-default);
+  stop-opacity: 0.24;
+}
+
+.fadeBottom {
+  stop-color: var(--prime-color-accent-default);
+  stop-opacity: 0;
+}
+
+/* A point standing alone between gaps (`null` on both sides): a path would not show it. */
+.lone {
+  position: absolute;
+  left: calc(var(--sparkline-x) * 100%);
+  top: calc(var(--sparkline-y) * 100%);
+  width: calc(var(--prime-border-width) * 4);
+  height: calc(var(--prime-border-width) * 4);
+  margin: calc(var(--prime-border-width) * -2);
+  border-radius: var(--prime-radius-full);
+  background: var(--prime-color-accent-default);
+}
+
+/* `reference`: a plan or a target, a faint dashed line under the data. */
+.reference {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(var(--sparkline-ref) * 100%);
+  border-top: var(--prime-border-width) dashed var(--prime-color-chart-axis);
+  pointer-events: none;
 }
 
 /* A full-plot layer moved by x; its guide and dot sit at its start edge. */
@@ -111,15 +153,29 @@
   inset: 0;
   pointer-events: none;
   transform: translateX(calc(var(--sparkline-x) * 100%));
-  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+  transition:
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
+/* A `sum` / `average` headline at rest stands for the whole period: no point is marked. */
+.cursor[data-hidden] {
+  opacity: 0;
+}
+
+/* The guide is the scrubbing cue: at rest only the dot marks the point. */
 .guide {
   position: absolute;
   inset-block: 0;
   inset-inline-start: 0;
   width: var(--prime-border-width);
   background: var(--prime-color-border-default);
+  opacity: 0;
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+.root[data-scrubbing] .guide {
+  opacity: 1;
 }
 
 .dot {
@@ -133,13 +189,24 @@
   background: var(--prime-color-layer-current);
   box-shadow: 0 0 0 calc(var(--prime-border-width) * 2) var(--prime-color-accent-default);
   transform: translateY(calc(var(--sparkline-y) * var(--sparkline-h)));
-  transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
+  transition:
+    transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized),
+    opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
+}
+
+/* A point with no data has no place on the line: the guide alone marks it. */
+.dot[data-empty] {
+  opacity: 0;
 }
 
 /* Direct manipulation: while scrubbing the cursor sits under the pointer, no easing. */
 .root[data-scrubbing] .cursor,
 .root[data-scrubbing] .dot {
   transition: none;
+}
+
+.root[data-scrubbing] .dot {
+  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
 /*
@@ -196,8 +263,7 @@
 /*
  * Compact (`layout="compact"`): the plot alone for a table cell or a list row. Plot and dot fit the
  * height of an `xs` control (the dot's radius is room above and below the plot), so a DataTable row
- * of any tier keeps its height. The dot stays on the point at rest; the guide line shows only while
- * scrubbing. A cell sized by its content still gets a readable plot (`min-inline-size`).
+ * of any tier keeps its height. The dot stays on the point at rest. A cell sized by its content still gets a readable plot (`min-inline-size`).
  */
 .root[data-layout="compact"] {
   min-inline-size: var(--prime-space-24);
@@ -209,13 +275,10 @@
   margin-block: calc(var(--sparkline-dot) / 2);
 }
 
-.root[data-layout="compact"] .guide {
-  opacity: 0;
-  transition: opacity var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
-}
-
-.root[data-layout="compact"][data-scrubbing] .guide {
-  opacity: 1;
+/* The value in the chart tooltip (`ChartTooltip`): under the date, in the weight of a number. */
+.tooltipValue {
+  font-weight: var(--prime-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Loading: the date, the value line and the plot as Skeletons of their own geometry. */

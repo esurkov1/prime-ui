@@ -260,6 +260,36 @@ describe("ChartFrame", () => {
     expect(screen.queryByText("Продления")).toBeNull();
   });
 
+  it("floats the tooltip beside a point of the plot, aria-hidden, and Escape hides it", () => {
+    function Floating({ point }: { point: { x: number; y: number } | null }) {
+      return (
+        <ChartFrame.Root series={SERIES}>
+          <ChartFrame.Plot data-testid="area">
+            <svg />
+          </ChartFrame.Plot>
+          <ChartFrame.Tooltip point={point} label="Неделя 41" items={[{ id: "new", value: 61 }]} />
+        </ChartFrame.Root>
+      );
+    }
+    const { container, rerender } = render(<Floating point={null} />);
+    expect(screen.queryByText("Неделя 41")).toBeNull();
+    screen.getByTestId("area").getBoundingClientRect = () =>
+      ({ left: 100, top: 50, right: 500, bottom: 290, width: 400, height: 240 }) as DOMRect;
+    rerender(<Floating point={{ x: 40, y: 100 }} />);
+    const tooltip = screen.getByText("Неделя 41").parentElement as HTMLElement;
+    // Portaled out of the figure and placed by usePosition: right of the point at its height.
+    expect(container.contains(tooltip)).toBe(false);
+    expect(tooltip).toHaveAttribute("aria-hidden", "true");
+    expect(tooltip).toHaveAttribute("data-side", "right");
+    expect(tooltip.style.top).toBe("150px");
+    const open = () => document.body.querySelector("[data-side][data-state='open']");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(open()).toBeNull();
+    // The next point shows it again.
+    rerender(<Floating point={{ x: 60, y: 100 }} />);
+    expect(open()).toHaveTextContent("Неделя 41");
+  });
+
   it("renders a self-sizing chart from children", () => {
     render(
       <ChartFrame.Root>

@@ -33,7 +33,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 ├─ ChartFrame.Plot           <div>; fixed height, measured; Crossfade of plot / Skeleton / empty / error
 ├─ ChartFrame.Legend         <ul>; a toggle button per series: swatch · name · value
 ├─ ChartFrame.Table          <table>; visually hidden data, ready state only
-└─ ChartFrame.Tooltip        <div>; rendered by the chart library's tooltip hook, inside the Root
+└─ ChartFrame.Tooltip        <div>; with `point` portaled beside that point of the plot, else in place for a library's tooltip hook
 ```
 
 ## API
@@ -118,12 +118,13 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | `…rest` | `HTMLAttributes<HTMLUListElement>` | — | `className` and the other ul attributes. |
 
 ### ChartFrame.Tooltip
-`ref` → `HTMLDivElement`. The kit's tooltip body for a chart library's custom tooltip (Recharts `content`, visx `TooltipWithBounds`). The library positions it; render it inside `ChartFrame.Root`.
+`ref` → `HTMLDivElement`. The kit's chart tooltip: with `point` it floats beside that point of the plot; without it it is the body for a library's tooltip hook (Recharts `content`). Inside `ChartFrame.Root`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `string` | — | The point the rows belong to («Неделя 41»). |
 | `items` | `ChartFrameTooltipItem[]` | — (required) | `{ id, value }` per series at that point; name and color come from the root's series, rows of hidden series are left out, values go through `formatValue`. |
+| `point` | `{ x: number; y: number } \| null` | — | A point in `renderPlot` coordinates (the pointer, or the point the arrows reached): the tooltip floats right of it, left only without room; `null` hides it. Floating, it is `aria-hidden`. |
 | `…rest` | `HTMLAttributes<HTMLDivElement>` | — | `className` and the other div attributes. |
 
 ### ChartFrame.Table
@@ -177,7 +178,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 - The header puts the title and the description in the first column and the actions at the end; under 24rem of panel width the actions drop under the description.
 - The plot is 240 px high (160 px under 30rem of panel width) unless `height` is set; it never changes height between states.
 - Legend entries wrap onto more lines; each has a 44 px touch hit area on coarse pointers.
-- `ChartFrame.Tooltip` is a floating panel with the point's label over rows of swatch · series name · value; the chart library positions it (Recharts `content`, visx `TooltipWithBounds`, a hand-drawn overlay).
+- `ChartFrame.Tooltip` is the floating layer of the ladder with the point's label over rows of swatch · series name · value. With `point` the kit places it like every anchored layer (`usePosition`): right of the point at its height, on the left only where the right has no room in the viewport, inside the viewport, following the plot on scroll. Without `point` the chart library positions it (Recharts `content`).
 - SVG `<text>` in the plot takes the caption type in `--prime-color-text-muted`; a class of your own still wins.
 - Works from 320 px; the container queries are on the panel's own width, so it adapts in a grid cell as on a phone.
 
@@ -195,6 +196,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 - The root is a `<figure>` named by `ChartFrame.Title` and described by `ChartFrame.Description`; `aria-busy` while loading.
 - A legend entry is a button with `aria-pressed` — pressed while its series is shown; the legend list is named by `labels.legend`. A hidden series differs by the swatch's shape (a ring) and a quiet name, never by color alone.
 - `ChartFrame.Table` is a visually hidden table with the chart's data, named by the title: a row header per point, a column per shown series, values through `formatValue`.
+- A `ChartFrame.Tooltip` with `point` is `aria-hidden` and passive (no focus, no presses; `Escape` hides it until the point moves): it repeats what the plot speaks — give a focusable plot an `aria-valuetext`, like the slider in the tooltip example.
 - The empty state is `role="status"`, the error `role="alert"` with the retry button.
 - The drawing is the library's: hide a decorative SVG (`aria-hidden`) when `ChartFrame.Table` carries the data; marks you make focusable need their own `aria-label`.
 
@@ -213,7 +215,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
 | Example | Shows |
 |---|---|
 | [overview.tsx](examples/overview.tsx) | Revenue by month as a hand-drawn SVG line chart in a dashboard panel: the headline with its change, a period switch, a legend that turns series off and a table for screen readers — `series`, `formatValue`, `renderPlot`. |
-| [tooltip.tsx](examples/tooltip.tsx) | Invoices by week as grouped bars: pointing at a week or stepping with the arrows shows the kit tooltip body with a row per series — `ChartFrame.Tooltip`, `items`. |
+| [tooltip.tsx](examples/tooltip.tsx) | Invoices by week as grouped bars: the kit tooltip follows the pointer with a row per series, the arrows step through the weeks — `ChartFrame.Tooltip`, `items`, `point`. |
 | [states.tsx](examples/states.tsx) | Loading, empty, error and data swap in the plot's place without moving the panel; the error retries — `state`, `onRetry`. |
 | [controlled.tsx](examples/controlled.tsx) | Lead sources with totals in the legend; the hidden series live in the page state and one button shows them all again — `hiddenSeries`, `onHiddenSeriesChange`. |
 | [narrow.tsx](examples/narrow.tsx) | A 320px column: the actions drop under the title, the plot gets lower and a self-sizing SVG stretches to it — `children`, `height`. |
@@ -249,7 +251,7 @@ ChartFrame.Root              <figure>; surface of the depth ladder; state, serie
   <ChartFrame.Table rows={tableRows} />
 </ChartFrame.Root>
 ```
-ECharts and Chart.js take the same `width`, `height` and `series[i].color`; their HTML tooltips are strings, so use their own tooltip there or a React overlay with `ChartFrame.Tooltip`.
+ECharts and Chart.js take the same `width`, `height` and `series[i].color`; their HTML tooltips are strings, so use their own tooltip there or `ChartFrame.Tooltip` with `point` from their hover event.
 
 ## Mistakes
 - Colors picked per chart (`#3b82f6`) → `series[i].color` from `renderPlot`, or `chartColors`; status tones (`success`, `danger`) never paint categories.
@@ -259,7 +261,8 @@ ECharts and Chart.js take the same `width`, `height` and `series[i].color`; thei
 - A legend for a single series → the title already names it; leave `ChartFrame.Legend` out.
 - Two y-axes of different measures in one frame → two ChartFrames side by side.
 - The data only in the drawing → add `ChartFrame.Table`; screen readers cannot read a plot.
+- A hand-drawn chart with its tooltip placed by hand (a `foreignObject`, clamped coordinates) → `ChartFrame.Tooltip` with `point`: it flips only when out of room and never jumps at the middle.
 
 ## Related
-- **Built from:** [Crossfade](../crossfade/COMPONENT.md) (state swap), [Skeleton](../skeleton/COMPONENT.md) (loading), [EmptyPage](../empty-page/COMPONENT.md) (empty, error, retry), `Icon`, `chartColors`
+- **Built from:** [Crossfade](../crossfade/COMPONENT.md) (state swap), [Skeleton](../skeleton/COMPONENT.md) (loading), [EmptyPage](../empty-page/COMPONENT.md) (empty, error, retry), `Icon`, `chartColors`, `ChartTooltip` (the chart tooltip shared with Sparkline)
 - **See also:** [Sparkline](../sparkline/COMPONENT.md), [Card](../card/COMPONENT.md), [ProgressBar](../progress-bar/COMPONENT.md), [DataTable](../data-table/COMPONENT.md), [SegmentedControl](../segmented-control/COMPONENT.md)

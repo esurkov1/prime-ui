@@ -1,4 +1,4 @@
-/** Invoices by week as grouped bars: pointing at a week or stepping with the arrows shows the kit tooltip body with a row per series — `ChartFrame.Tooltip`, `items`. */
+/** Invoices by week as grouped bars: the kit tooltip follows the pointer with a row per series, the arrows step through the weeks — `ChartFrame.Tooltip`, `items`, `point`. */
 import { ChartFrame, type ChartFrameSeries, chartColors } from "prime-ui-kit";
 import * as React from "react";
 
@@ -18,12 +18,13 @@ const WEEKS = [
 
 const MARGIN = { top: 8, right: 0, bottom: 24, left: 32 };
 const TICKS = [0, 20, 40, 60];
-const TOOLTIP = { width: 176, height: 88 };
 
 const formatCount = (value: number) => `${value} шт.`;
 
 export default function ChartFrameTooltipExample() {
   const [active, setActive] = React.useState<number | null>(null);
+  // The pointer in plot coordinates; `null` while the arrow keys step through the weeks.
+  const [pointer, setPointer] = React.useState<{ x: number; y: number } | null>(null);
 
   return (
     <ChartFrame.Root series={SERIES} formatValue={formatCount}>
@@ -39,13 +40,11 @@ export default function ChartFrameTooltipExample() {
           const bar = Math.min(24, (band - 16) / series.length);
           const y = (v: number) => MARGIN.top + innerH * (1 - v / TICKS[TICKS.length - 1]);
           const point = active === null ? null : WEEKS[active];
-          const tooltipX =
+          // Beside the pointer; from the keyboard beside the middle of the active week.
+          const tooltipAt =
             active === null
-              ? 0
-              : Math.min(
-                  Math.max(MARGIN.left + band * active + band / 2 - TOOLTIP.width / 2, 0),
-                  width - TOOLTIP.width,
-                );
+              ? null
+              : (pointer ?? { x: MARGIN.left + band * active + band / 2, y: height / 2 });
           return (
             <div
               role="slider"
@@ -58,6 +57,7 @@ export default function ChartFrameTooltipExample() {
               onPointerMove={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
                 const index = Math.floor((event.clientX - rect.left - MARGIN.left) / band);
+                setPointer({ x: event.clientX - rect.left, y: event.clientY - rect.top });
                 setActive(index >= 0 && index < WEEKS.length ? index : null);
               }}
               onPointerLeave={() => setActive(null)}
@@ -67,6 +67,7 @@ export default function ChartFrameTooltipExample() {
                 const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
                 if (!step) return;
                 event.preventDefault();
+                setPointer(null);
                 setActive((current) =>
                   Math.min(Math.max((current ?? 0) + step, 0), WEEKS.length - 1),
                 );
@@ -124,24 +125,19 @@ export default function ChartFrameTooltipExample() {
                     </g>
                   );
                 })}
-                {point ? (
-                  <foreignObject
-                    x={tooltipX}
-                    y={0}
-                    width={TOOLTIP.width}
-                    height={TOOLTIP.height}
-                    overflow="visible"
-                  >
-                    <ChartFrame.Tooltip
-                      label={point.label}
-                      items={[
+              </svg>
+              <ChartFrame.Tooltip
+                point={tooltipAt}
+                label={point?.label}
+                items={
+                  point
+                    ? [
                         { id: "paid", value: point.paid },
                         { id: "pending", value: point.pending },
-                      ]}
-                    />
-                  </foreignObject>
-                ) : null}
-              </svg>
+                      ]
+                    : []
+                }
+              />
             </div>
           );
         }}

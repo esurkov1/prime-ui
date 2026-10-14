@@ -99,6 +99,11 @@ export type ComputedFloatPosition = {
   arrow?: number;
 };
 
+/** A zero-size anchor at a viewport point. */
+function pointRect(x: number, y: number) {
+  return { left: x, right: x, top: y, bottom: y, width: 0, height: 0 };
+}
+
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(value, Math.max(min, max)));
 
@@ -219,7 +224,16 @@ export type PositionOptions = {
   offsetToken?: string;
   /** Closest the arrow may come to a layer corner, read from the layer; writes `--float-arrow`. */
   arrowInset?: (layer: HTMLElement) => number;
+  /**
+   * A point inside the anchor (px from its top-left corner) to place the layer against instead of
+   * the whole anchor — the pointer over a chart (Floating UI's virtual element). It moves with the
+   * anchor on scroll; every new point re-places the layer before paint. Flipping stays the same:
+   * the layer keeps `side` until it has no room there.
+   */
+  anchorPoint?: AnchorPoint | null;
 };
+
+export type AnchorPoint = { x: number; y: number };
 
 export type Position = {
   /** The side the layer opened on (after flipping). */
@@ -232,9 +246,9 @@ export type Position = {
  * Places a floating layer (`position: fixed`) next to its anchor and follows the anchor while
  * `enabled`: before paint, again on the next frame (fonts), and on window resize, scroll of any
  * scrolling ancestor of the anchor, visual-viewport changes and size changes of the layer or the
- * anchor. Shared by every anchored layer (Popover, Dropdown, Select, TagSelect, Tooltip). A
- * portaled layer reaches the DOM one commit after its owner, so the subscription waits for
- * `attachLayer` instead of reading the ref too early.
+ * anchor. Shared by every anchored layer (Popover, Dropdown, Select, TagSelect, Tooltip, and the
+ * chart tooltip at a point — `anchorPoint`). A portaled layer reaches the DOM one commit after its
+ * owner, so the subscription waits for `attachLayer` instead of reading the ref too early.
  */
 export function usePosition(
   enabled: boolean,
@@ -246,6 +260,7 @@ export function usePosition(
     matchAnchorWidth = false,
     offsetToken = "--prime-panel-offset",
     arrowInset,
+    anchorPoint = null,
   }: PositionOptions = {},
 ): Position {
   const [attached, setAttached] = React.useState(false);
@@ -254,6 +269,9 @@ export function usePosition(
   const resolveBoundary = useFloatingBoundaryResolver();
   /** Token lengths read from CSS: once per activation / option change / resize, not per frame. */
   const metricsRef = React.useRef<{ offset: number; pad: number; arrow?: number } | null>(null);
+  // Read by `update`: a moving point re-places the layer without rebuilding the subscriptions.
+  const pointRef = React.useRef(anchorPoint);
+  pointRef.current = anchorPoint;
 
   const update = React.useCallback(
     (remeasure: boolean) => {
@@ -269,7 +287,12 @@ export function usePosition(
       }
       const { offset, pad, arrow } = metricsRef.current;
       const rawRect = anchor.getBoundingClientRect();
-      const rect = resolveAnchorRect ? resolveAnchorRect(anchor, rawRect) : rawRect;
+      const point = pointRef.current;
+      const rect = point
+        ? pointRect(rawRect.left + point.x, rawRect.top + point.y)
+        : resolveAnchorRect
+          ? resolveAnchorRect(anchor, rawRect)
+          : rawRect;
       const boundary = resolveBoundary?.(anchor) ?? undefined;
       const compute = (width: number, height: number) =>
         computeFloatingPosition(rect, width, height, window.innerWidth, window.innerHeight, {
@@ -355,6 +378,13 @@ export function usePosition(
   React.useLayoutEffect(() => {
     if (active) update(true);
   }, [active, update]);
+
+  // A new anchor point (the pointer moved) re-places the layer before paint.
+  const pointX = anchorPoint?.x;
+  const pointY = anchorPoint?.y;
+  React.useLayoutEffect(() => {
+    if (active && pointX !== undefined && pointY !== undefined) updateRef.current(false);
+  }, [active, pointX, pointY]);
 
   React.useLayoutEffect(() => {
     if (!active) return;
