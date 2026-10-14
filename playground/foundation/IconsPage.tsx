@@ -22,6 +22,12 @@ import { VisuallyHidden } from "@/internal/VisuallyHidden";
 import { DocBlock, DocList, DocPage, DocTable } from "../components/Doc";
 import s from "./IconsPage.module.css";
 import { ICON_CATALOG, ICON_GROUPS, type IconGroupId } from "./iconCatalog";
+import SNIPPET_BASIC from "./snippets/icon-basic.tsx?raw";
+import SNIPPET_BUTTON from "./snippets/icon-button.tsx?raw";
+import SNIPPET_DOMAIN from "./snippets/icon-domain.tsx?raw";
+import SNIPPET_SET from "./snippets/icon-set.tsx?raw";
+import SNIPPET_SIZE from "./snippets/icon-size.tsx?raw";
+import SNIPPET_STILL from "./snippets/icon-still.tsx?raw";
 
 /** A tile of the catalog: one named glyph of `prime-ui-kit/icons`. */
 type Entry = {
@@ -198,61 +204,6 @@ function IconCatalog() {
     </div>
   );
 }
-
-const SNIPPET_BASIC = `
-import { Icon } from "prime-ui-kit";
-
-(<Icon name="action.search" />)`;
-
-const SNIPPET_BUTTON = `;
-import { Button, Icon } from "prime-ui-kit";
-
-// Без size иконка берёт размер хоста: здесь — уровень кнопки.
-(
-  <Button.Root size="l">
-    <Button.Icon>
-      <Icon name="action.add" />
-    </Button.Icon>
-    Создать заказ
-  </Button.Root>
-)`;
-
-const SNIPPET_SIZE = ` < // Размер на шкале иконок: xs 14 · s 16 · m 20 · l 24 · xl 32.
-  Icon;
-name = "object.bell";
-size="l" />
-
-// Цвет: tone, по умолчанию currentColor хоста.
-<Icon name="status.warning" tone="warning" />
-
-// Цвет категории из данных — оттенок палитры вместо tone.
-<Icon name="object.funnel" color="purple" />
-
-// Иконка со смыслом: role="img" с именем; в Tooltip.Trigger становится фокусируемой.
-<Icon name="status.locked" label="Системный статус" />`;
-
-const SNIPPET_SET = `
-import { BellIcon, ShoppingCartIcon } from "prime-ui-kit/icons";
-
-// Полный набор: те же size, tone, animated, что у <Icon>.
-(<BellIcon />) < ShoppingCartIcon;
-size = "l";
-tone="muted" />`;
-
-const SNIPPET_STILL = `// Иконка без жеста: статичная, даже когда хост под курсором.
-<Icon
-name = "status.success";
-animated={false} />`;
-
-const SNIPPET_DOMAIN = `
-
-import { Bike } from "lucide-react";
-import { createIcon } from "prime-ui-kit";
-
-// Доменная иконка, которой нет в наборе: один раз на уровне модуля.
-const BikeIcon = createIcon(Bike);
-
-<BikeIcon size="l" />`;
 
 type Gesture = { motion: string; meaning: string; sample: IconName };
 

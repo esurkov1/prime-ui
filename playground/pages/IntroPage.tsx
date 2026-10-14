@@ -3,34 +3,14 @@ import { LinkButton } from "@/components/link-button/LinkButton";
 import { PageContent } from "@/components/page-content/PageContent";
 import { Typography } from "@/components/typography/Typography";
 
+import INSTALL_CODE from "../foundation/snippets/install.tsx?raw";
+
 const REPO = "https://github.com/esurkov1/prime-ui";
 const README = `${REPO}/blob/main/README.md`;
 const FOUNDATION_DOC = `${REPO}/blob/main/docs/foundation.md`;
 const SKILL = `${REPO}/blob/main/SKILL/SKILL.md`;
 const NPM = "https://www.npmjs.com/package/prime-ui-kit";
 const ISSUES = `${REPO}/issues`;
-
-const INSTALL_CODE = `// Один раз в корне приложения
-import "prime-ui-kit/bundle.css";  // токены, обе темы и стили компонентов
-import "prime-ui-kit/fonts.css";   // по желанию: Golos Text и JetBrains Mono из Google Fonts
-import "prime-ui-kit/reset.css";   // по желанию: минимальный сброс документа
-
-import { Button, Input } from "prime-ui-kit";
-
-export function Example() {
-  return (
-    <form>
-      <Input.Root label="Email" id="email">
-        <Input.Wrapper>
-          <Input.Field type="email" placeholder="you@example.com" />
-        </Input.Wrapper>
-      </Input.Root>
-      <Button.Root>Отправить</Button.Root>
-    </form>
-  );
-}
-
-// Тёмная тема: <html data-theme="dark">`;
 
 export default function IntroPage() {
   return (
