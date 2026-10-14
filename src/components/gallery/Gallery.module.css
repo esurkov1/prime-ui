@@ -11,6 +11,8 @@
  * with the progress ring along its edge (`internal/transferDisk` `TransferOverlay`): pressing it
  * cancels, a failure turns it danger with a retry, a tile not fetched yet carries the download
  * arrow. The picture dims under it until the transfer is done. `children` lie over every tile.
+ * A press on a tile presses the whole album (`press.press` on the root, joined in TSX); in a
+ * message the message gives instead.
  */
 .root {
   --gallery-size: var(--prime-gallery-max-size);
@@ -24,13 +26,14 @@
   aspect-ratio: var(--gallery-ratio, 1);
   overflow: clip;
   border-radius: var(--prime-radius-l);
-  transition: scale var(--prime-motion-duration-fast) var(--prime-motion-easing-standard);
 }
 
-/* Press: the whole album gives in a little, its rounded clip with it (`data-pressed`, set from a
-   tile's press). A large surface takes the subtle press. */
-.root[data-pressed] {
-  scale: var(--prime-motion-press-scale);
+/* `maxSize`: the host's length caps the width, past the host's own box (a chat row, so the media
+   sets its bubble's width); the host shapes and clips it, so no radius of its own. */
+.root[data-max-size] {
+  inline-size: min(calc(var(--gallery-size) * var(--gallery-factor, 1)), var(--gallery-limit));
+  max-inline-size: none;
+  border-radius: 0;
 }
 
 .tile {
@@ -52,21 +55,17 @@
   transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
+/* The play mark (`internal/mediaDisk`, `shown` gives the middle up to a transfer), centred. */
 .play {
   position: absolute;
   inset: 0;
   z-index: var(--prime-z-top);
   margin: auto;
-  transition: opacity var(--prime-motion-fade-fast) var(--prime-motion-easing-standard);
 }
 
-/* A transfer not done yet: the picture dims under the disk, the play mark gives the middle up. */
+/* A transfer not done yet: the picture dims under the disk. */
 .tile:has(> .transfer[data-covered]) > .thumb {
   opacity: var(--prime-opacity-busy);
-}
-
-.tile:has(> .transfer[data-covered]) > .play {
-  opacity: 0;
 }
 
 .length {
@@ -97,16 +96,4 @@
   inset: 0;
   z-index: var(--prime-z-front);
   pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .root,
-  .tile > .thumb,
-  .play {
-    transition: none;
-  }
-
-  .root[data-pressed] {
-    scale: none;
-  }
 }

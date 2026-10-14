@@ -17,6 +17,12 @@ export const galleryProps: ApiPart["props"] = [
     ru: "`{ type?, src, poster?, alt?, width?, height?, duration?, transfer?, transferProgress?, transferDirection? }`; `width` / `height` задают пропорции (по умолчанию 4 : 3). Показываются первые 10.",
   },
   {
+    name: "maxSize",
+    type: "string",
+    en: "Caps the width at this CSS length instead of the host's width (`85cqi` of a chat row); the gallery then draws no radius — the host shapes and clips it.",
+    ru: "Ограничивает ширину этой CSS-длиной вместо ширины хоста (`85cqi` строки чата); тогда галерея не скругляется — форму и обрезку даёт хост.",
+  },
+  {
     name: "viewer",
     type: "boolean",
     default: "true",
