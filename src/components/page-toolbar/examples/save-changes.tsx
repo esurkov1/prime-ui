@@ -13,28 +13,31 @@ const CHANGES = 3;
 export default function PageToolbarSaveChangesExample() {
   const [section, setSection] = React.useState("profile");
 
+  // The toolbar heads the settings form: its save action submits the page's form.
   return (
-    <PageToolbar.Root aria-label="Настройки">
-      <PageToolbar.Sections>
-        <SegmentedControl.Root
-          fullWidth
-          value={section}
-          onValueChange={setSection}
-          aria-label="Раздел настроек"
-        >
-          {SECTIONS.map((item) => (
-            <SegmentedControl.Item key={item.value} value={item.value}>
-              {item.label}
-            </SegmentedControl.Item>
-          ))}
-        </SegmentedControl.Root>
-      </PageToolbar.Sections>
-      <PageToolbar.Actions>
-        <Button.Root variant="ghost" tone="neutral">
-          Отменить
-        </Button.Root>
-        <Button.Root>Сохранить {CHANGES} изменения</Button.Root>
-      </PageToolbar.Actions>
-    </PageToolbar.Root>
+    <form onSubmit={(event) => event.preventDefault()}>
+      <PageToolbar.Root aria-label="Настройки">
+        <PageToolbar.Sections>
+          <SegmentedControl.Root
+            fullWidth
+            value={section}
+            onValueChange={setSection}
+            aria-label="Раздел настроек"
+          >
+            {SECTIONS.map((item) => (
+              <SegmentedControl.Item key={item.value} value={item.value}>
+                {item.label}
+              </SegmentedControl.Item>
+            ))}
+          </SegmentedControl.Root>
+        </PageToolbar.Sections>
+        <PageToolbar.Actions>
+          <Button.Root variant="ghost" tone="neutral">
+            Отменить
+          </Button.Root>
+          <Button.Root type="submit">Сохранить {CHANGES} изменения</Button.Root>
+        </PageToolbar.Actions>
+      </PageToolbar.Root>
+    </form>
   );
 }

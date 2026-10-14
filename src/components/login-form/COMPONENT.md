@@ -45,7 +45,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Tier of padding, gaps and text roles; every field and button inside without its own `size` takes it. |
+| `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | host tier, else `"m"` | Tier of padding, gaps and text roles; every field and button inside without its own `size` takes it. Without it the form takes the tier of a sized host (a Modal). |
 | `align` | `"start" \| "center"` | `"start"` | `start` — the Modal header layout (rounded accent tile left, title over description right); `center` — a round logo above centered text. |
 | `flat` | `boolean` | `false` | Removes the card shadow (inside a Modal or on a plain page). No border either way. |
 | `className` | `string` | — | Class on the card. |
@@ -131,7 +131,7 @@ Every part is optional except `Root`, `Title` and `Form`. Fields, buttons, divid
 | Value | Looks like | Use when | Default |
 |---|---|---|---|
 | `xs` / `s` | padding 16, gap 24, field gap 16, title-s / title-m | inside a Modal or a narrow popover | |
-| `m` | padding 24, gap 32, field gap 20, title-l | a regular sign-in page | yes |
+| `m` | padding 24, gap 32, field gap 20, title-l | a regular sign-in page | the host tier, else `m` |
 | `l` | padding 32, gap 40, field gap 20, heading-s | a standalone sign-in screen on a wide canvas | |
 | `xl` | padding 40, gap 40, field gap 24, heading-m | marketing-grade sign-in, touch-first | |
 

@@ -10,9 +10,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of padding, gaps and text roles; every field and button inside without its own `size` takes it.",
-          ru: "Ярус отступов, зазоров и текста; поля и кнопки внутри без своего `size` берут его.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Tier of padding, gaps and text roles; every field and button inside without its own `size` takes it. Without it the form takes the tier of a sized host (a Modal).",
+          ru: "Ярус отступов, зазоров и текста; поля и кнопки внутри без своего `size` берут его. Без него форма берёт ярус хоста с размером (Modal).",
         },
         {
           name: "align",

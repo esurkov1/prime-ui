@@ -11,7 +11,7 @@
   --lf-pad: var(--prime-card-padding-l);
   --lf-gap: var(--prime-space-8);
   --lf-field-gap: var(--prime-space-5);
-  --lf-logo: var(--prime-control-xl-height);
+  --lf-logo: var(--prime-space-12);
   --lf-logo-icon: var(--prime-icon-l);
 
   width: 100%;
@@ -34,21 +34,21 @@
   --lf-pad: var(--prime-card-padding-s);
   --lf-gap: var(--prime-space-6);
   --lf-field-gap: var(--prime-space-4);
-  --lf-logo: var(--prime-control-l-height);
+  --lf-logo: var(--prime-space-10);
   --lf-logo-icon: var(--prime-icon-m);
 }
 
 .root[data-size="l"] {
   --lf-pad: var(--prime-space-8);
   --lf-gap: var(--prime-space-10);
-  --lf-logo: calc(var(--prime-control-xl-height) + var(--prime-space-2));
+  --lf-logo: var(--prime-space-14);
 }
 
 .root[data-size="xl"] {
   --lf-pad: var(--prime-space-10);
   --lf-gap: var(--prime-space-10);
   --lf-field-gap: var(--prime-space-6);
-  --lf-logo: calc(var(--prime-control-xl-height) + var(--prime-space-4));
+  --lf-logo: var(--prime-space-16);
   --lf-logo-icon: var(--prime-icon-xl);
 }
 

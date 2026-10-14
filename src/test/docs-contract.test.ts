@@ -274,7 +274,8 @@ function contentOffenders(dir: string, file: string, source: string): string[] {
   if (
     FRAMED_FIELDS.test(body) &&
     /<Button\.Root\b[^>]*>\s*(Сохранить|Отправить)/.test(body) &&
-    !/<form\b|\bform=/.test(body)
+    // A kit form part (`LoginForm.Form`) renders the `<form>` itself.
+    !/<form\b|<[A-Z]\w*\.Form\b|\bform=/.test(body)
   ) {
     offenders.push(`${file}: fields with a submit and no <form>`);
   }
