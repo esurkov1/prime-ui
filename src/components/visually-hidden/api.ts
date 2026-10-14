@@ -5,7 +5,7 @@ export const api: ComponentApi = {
     {
       name: "VisuallyHidden",
       en: "`ref` → `HTMLSpanElement`. A `<span>` that is out of sight and still read by screen readers (the sr-only recipe, pinned so it never stretches a scrolling column).",
-      ru: "Текст только для скринридеров: не виден, но зачитывается.",
+      ru: "`<span>` вне поля зрения, который всё равно читают скринридеры (рецепт sr-only, закреплён, чтобы не растягивать прокручиваемую колонку).",
       props: [
         {
           name: "children",

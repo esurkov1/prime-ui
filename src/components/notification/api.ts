@@ -203,7 +203,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'Each stack is an `<ol>` named by the region label of its position; each card is an `<article>`: `role="status"` + `aria-live="polite"`, or `role="alert"` + `aria-live="assertive"` for `warning` / `danger`.',
-        ru: 'Каждая стопка — `<ol>` с именем из `labels` для своей позиции; карточка — `<article>` с `role="status"` (`aria-live="polite"`) или `role="alert"` для danger и warning.',
+        ru: 'Каждая стопка — `<ol>` с именем области своей позиции; карточка — `<article>`: `role="status"` + `aria-live="polite"` или `role="alert"` + `aria-live="assertive"` для `warning` / `danger`.',
       },
       {
         en: "The icon and the countdown are `aria-hidden`; the close button is named by `labels.close`.",

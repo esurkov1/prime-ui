@@ -6,7 +6,7 @@ export const api: ComponentApi = {
     {
       name: "Radio.Group",
       en: '`ref` → `HTMLDivElement` (the field frame). Owns the value, the shared `name` and size; renders the group label and the hint / error. `id` and the `aria-*` naming props go to the `role="radiogroup"` element.',
-      ru: "Держит значение, общий `name` и размер; подпись группы сверху, подсказка или ошибка под вариантами.",
+      ru: 'Держит значение, общий `name` и размер; подпись группы сверху, подсказка или ошибка под вариантами. `id` и пропсы имени `aria-*` уходят на элемент `role="radiogroup"`.',
       props: [
         {
           name: "value",
@@ -102,13 +102,19 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: 'Id of the `role="radiogroup"` element (generated when omitted); also the default `name`.',
-          ru: "Id элемента radiogroup (иначе генерируется); он же `name` по умолчанию.",
+          ru: 'Id элемента `role="radiogroup"` (иначе генерируется); он же `name` по умолчанию.',
         },
         {
           name: "aria-label / aria-labelledby / aria-describedby",
           type: "string",
           en: "Name and description of the radiogroup (`aria-describedby` is merged before the hint / error ids).",
           ru: "Имя и описание radiogroup (`aria-describedby` — перед id подсказки и ошибки).",
+        },
+        {
+          name: "children",
+          type: "ReactNode",
+          en: "The `Radio.Root` options.",
+          ru: "Варианты `Radio.Root`.",
         },
         {
           name: "…rest",
@@ -159,15 +165,22 @@ export const api: ComponentApi = {
           name: "…rest",
           type: 'Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "checked" | "defaultChecked" | "onChange" | "name" | "value">',
           en: "`id`, `aria-label`, `aria-describedby`, `onBlur`… on the native input.",
-          ru: "`id`, `aria-label`, `aria-describedby`… на нативном input.",
+          ru: "`id`, `aria-label`, `aria-describedby`, `onBlur`… на нативном input.",
         },
       ],
     },
     {
       name: "Radio.Label",
       en: "`ref` → `HTMLSpanElement`. The visible text in the text column of the option row. Native `<span>` props.",
-      ru: "Видимый текст варианта в колонке текста.",
-      props: [],
+      ru: "Видимый текст варианта в колонке текста. Нативные пропсы `<span>`.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children`, `className` and the other span attributes.",
+          ru: "`children`, `className` и остальные атрибуты span.",
+        },
+      ],
     },
   ],
   labels: labelRows(RADIO_GROUP_LABELS, {

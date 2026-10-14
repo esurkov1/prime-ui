@@ -55,7 +55,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Label.Icon",
-      en: "`ref` → `HTMLSpanElement`. A muted, non-shrinking icon slot (`aria-hidden`) before the text; kit icons take the label size.",
+      en: "`ref` → `HTMLSpanElement`. A muted, non-shrinking `<span>` icon slot (`aria-hidden`) before the text; kit icons take the label size.",
       ru: "Приглушённый несжимаемый слот `<span>` иконки (`aria-hidden`) перед текстом; иконки кита берут размер подписи.",
       props: [
         {
@@ -68,7 +68,7 @@ export const api: ComponentApi = {
     },
     {
       name: "Label.Description",
-      en: "`ref` → `HTMLSpanElement`. Regular-weight muted text in the same line (units, context); part of the accessible name.",
+      en: "`ref` → `HTMLSpanElement`. A regular-weight muted `<span>` in the same line (units, context); part of the accessible name.",
       ru: "Приглушённый `<span>` обычного начертания в той же строке (единицы, контекст); входит в доступное имя.",
       props: [
         {

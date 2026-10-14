@@ -53,7 +53,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Not interactive: `disabled` / `aria-disabled`, `data-disabled`, out of the Tab order; an `href` link loses its `href`, an `asChild` child keeps its own and only its clicks are blocked.",
-          ru: "Неактивный пункт: `disabled` / `aria-disabled`, `data-disabled`, вне порядка Tab; ссылка теряет `href`, у потомка `asChild` ссылка остаётся, но клики гасятся.",
+          ru: "Неактивный пункт: `disabled` / `aria-disabled`, `data-disabled`, вне порядка Tab; ссылка из `href` теряет `href`, у потомка `asChild` ссылка остаётся, но клики гасятся.",
         },
         {
           name: "href",

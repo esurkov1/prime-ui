@@ -6,7 +6,7 @@ export const api: ComponentApi = {
     {
       name: "Slider",
       en: '`ref` → `HTMLDivElement` (the field frame). A framed field: the label row with the value, a native `<input type="range">` over the visual track, then the hint or the error. `id` and `aria-label` go to the range input.',
-      ru: 'Поле в рамке, как остальные: подпись со значением, нативный `<input type="range">` поверх дорожки, заливки и ползунка, под ним подсказка или ошибка.',
+      ru: 'Поле в рамке, как остальные: подпись со значением, нативный `<input type="range">` поверх дорожки, заливки и ползунка, под ним подсказка или ошибка. `id` и `aria-label` уходят на input.',
       props: [
         {
           name: "value",
@@ -91,13 +91,13 @@ export const api: ComponentApi = {
           name: "label",
           type: "ReactNode",
           en: "Visible label linked to the range input (`<label htmlFor>`). Without it, set `aria-label`.",
-          ru: "Видимая подпись, связанная с input. Без неё задайте `aria-label`.",
+          ru: "Видимая подпись, связанная с input (`<label htmlFor>`). Без неё задайте `aria-label`.",
         },
         {
           name: "required",
           type: "boolean",
           en: "Red `*` after the label (`aria-hidden`); a range always has a value, so there is no native `required`.",
-          ru: "Красная `*` после подписи; у ползунка всегда есть значение, нативного `required` нет.",
+          ru: "Красная `*` после подписи (`aria-hidden`); у ползунка всегда есть значение, нативного `required` нет.",
         },
         {
           name: "optional",
@@ -109,7 +109,7 @@ export const api: ComponentApi = {
           name: "hint",
           type: "ReactNode",
           en: "Help text under the track (`aria-describedby`). Hidden while `error` is shown.",
-          ru: "Подсказка под дорожкой; скрывается, пока показан `error`.",
+          ru: "Подсказка под дорожкой (`aria-describedby`); скрывается, пока показан `error`.",
         },
         {
           name: "error",
@@ -128,7 +128,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Shows the current value at the end of the label row (tabular numbers, `aria-hidden` — the input announces it).",
-          ru: "Текущее значение в конце строки подписи (табличные цифры).",
+          ru: "Текущее значение в конце строки подписи (табличные цифры, `aria-hidden` — его объявляет input).",
         },
         {
           name: "formatValue",
@@ -146,7 +146,7 @@ export const api: ComponentApi = {
           name: "aria-label",
           type: "string",
           en: "Accessible name when there is no visible `label`.",
-          ru: "Доступное имя, когда нет видимой подписи.",
+          ru: "Доступное имя, когда нет видимой `label`.",
         },
         {
           name: "aria-describedby",
@@ -217,7 +217,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While a commit is saved the input has `aria-busy`; say why a refused value went back with `error`.",
-        ru: "Пока значение сохраняется (промис из `onCommit`), у поля `aria-busy`; почему значение вернулось, покажите через `error`.",
+        ru: "Пока значение сохраняется, у поля `aria-busy`; почему значение вернулось, покажите через `error`.",
       },
     ],
   },

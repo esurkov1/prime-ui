@@ -2,6 +2,25 @@ import type { ApiProp, ComponentApi } from "../../../scripts/docs/componentApi";
 
 const TONE = '"neutral" | "accent" | "success" | "warning" | "danger" | "info"';
 
+const CLASS_NAME: ApiProp = {
+  name: "className",
+  type: "string",
+  en: "Class on the element.",
+  ru: "Класс на элементе.",
+};
+
+/** The rows of a text part: its required text, the class and the native span attributes. */
+const textProps = (en: string, ru: string): ApiProp[] => [
+  { name: "children", type: "ReactNode", required: true, en, ru },
+  CLASS_NAME,
+  {
+    name: "…rest",
+    type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
+    en: "The other span attributes.",
+    ru: "Остальные атрибуты span.",
+  },
+];
+
 const spanRest: ApiProp = {
   name: "…rest",
   type: "HTMLAttributes<HTMLSpanElement>",
@@ -24,10 +43,18 @@ export const api: ComponentApi = {
           ru: "Текст, точка и ритм строк: высота 40 · 52 · 64 · 68 · 76 px.",
         },
         {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "The `Timeline.Group`s.",
+          ru: "Группы `Timeline.Group`.",
+        },
+        CLASS_NAME,
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
-          en: "`children` (`Timeline.Group`), `className` and the other div attributes.",
-          ru: "`children` (`Timeline.Group`), `className` и остальные атрибуты div.",
+          en: "The other div attributes.",
+          ru: "Остальные атрибуты div.",
         },
       ],
     },
@@ -43,10 +70,18 @@ export const api: ComponentApi = {
           ru: "Заголовок группы («Недавно»); называет список через `aria-labelledby`.",
         },
         {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "`Timeline.Item` and `Timeline.Gap` rows.",
+          ru: "Строки `Timeline.Item` и `Timeline.Gap`.",
+        },
+        CLASS_NAME,
+        {
           name: "…rest",
           type: 'Omit<OlHTMLAttributes<HTMLOListElement>, "children">',
-          en: "`children` (`Timeline.Item`, `Timeline.Gap`), `className` and the other ol attributes.",
-          ru: "`children` (`Timeline.Item`, `Timeline.Gap`), `className` и остальные атрибуты ol.",
+          en: "The other ol attributes.",
+          ru: "Остальные атрибуты ol.",
         },
       ],
     },
@@ -88,10 +123,18 @@ export const api: ComponentApi = {
           ru: "Строкой становится единственный дочерний элемент (ссылка роутера).",
         },
         {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "Title, Meta, Value.",
+          ru: "Title, Meta, Value.",
+        },
+        CLASS_NAME,
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLElement>, "children" | "color" | "onClick">',
-          en: "`children` (Title, Meta, Value), `className` and the other row attributes.",
-          ru: "`children` (Title, Meta, Value), `className` и остальные атрибуты строки.",
+          en: "The other row attributes (`target`, `rel`, `download` with `href`).",
+          ru: "Остальные атрибуты строки (`target`, `rel`, `download` при `href`).",
         },
       ],
     },
@@ -99,22 +142,28 @@ export const api: ComponentApi = {
       name: "Timeline.Title · Timeline.Meta · Timeline.MetaPrimary",
       en: "`ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, accent on the highlighted row, wraps), the muted date line with tabular numbers, and its emphasized part.",
       ru: "Строки `<span>`: событие (medium, акцент на выделенной строке, переносится), приглушённая строка даты и её выделенная часть.",
-      props: [spanRest],
+      props: textProps("The text of the line.", "Текст строки."),
     },
     {
-      name: "Timeline.Value · Timeline.ValueMeta",
-      en: "`ref` → `HTMLSpanElement`. `<span>`: the trailing amount (right-aligned, tabular) and a muted second line under it. Moves under the meta below 20rem.",
-      ru: "`<span>`: сумма справа (по правому краю, табличные цифры) и приглушённая строка под ней. Уже 20rem уходит под мету.",
+      name: "Timeline.Value",
+      en: "`ref` → `HTMLSpanElement`. A `<span>` with the trailing amount (right-aligned, tabular). Moves under the meta below 20rem.",
+      ru: "`<span>` с суммой справа (по правому краю, табличные цифры). Уже 20rem уходит под мету.",
       props: [
         {
           name: "tone",
           type: TONE,
           default: '"neutral"',
-          en: "Value: text color (income `success`, refund `danger`).",
-          ru: "Value: цвет текста (доход `success`, возврат `danger`).",
+          en: "Text color (income `success`, refund `danger`).",
+          ru: "Цвет текста (доход `success`, возврат `danger`).",
         },
-        spanRest,
+        ...textProps("The amount.", "Сумма."),
       ],
+    },
+    {
+      name: "Timeline.ValueMeta",
+      en: "`ref` → `HTMLSpanElement`. A muted `<span>` line under the value.",
+      ru: "Приглушённая строка `<span>` под значением.",
+      props: textProps("The text of the line.", "Текст строки."),
     },
     {
       name: "Timeline.Gap",
@@ -129,10 +178,18 @@ export const api: ComponentApi = {
           ru: "Цвет подписи и точки; `warning` / `danger` отмечают долгий промежуток.",
         },
         {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "The interval caption and an optional `Timeline.GapMeta`.",
+          ru: "Подпись промежутка и необязательный `Timeline.GapMeta`.",
+        },
+        CLASS_NAME,
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "children">',
-          en: "`children` (the interval caption and an optional `Timeline.GapMeta`), `className` and the other div attributes.",
-          ru: "`children` (подпись промежутка и необязательный `Timeline.GapMeta`), `className` и остальные атрибуты div.",
+          en: "The other div attributes.",
+          ru: "Остальные атрибуты div.",
         },
       ],
     },

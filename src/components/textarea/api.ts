@@ -14,7 +14,7 @@ export const api: ComponentApi = {
     {
       name: "Textarea.Root",
       en: "`ref` → `HTMLTextAreaElement`. Renders the label row, the field box with the native `<textarea>` and the support row. Field-root rule for a leaf without a `Field` part: `className` goes to the field frame; `id`, `ref` and the native `<textarea>` props to the textarea.",
-      ru: "Подпись, поле с нативным `<textarea>` и строка поддержки; нативные пропсы уходят в `<textarea>`.",
+      ru: "Рендерит строку подписи, рамку с нативным `<textarea>` и строку поддержки. Правило корня поля для листа без части `Field`: `className` — на рамку поля; `id`, `ref` и нативные пропсы `<textarea>` — на textarea.",
       props: [
         {
           name: "size",
@@ -59,7 +59,7 @@ export const api: ComponentApi = {
           type: "boolean",
           default: "false",
           en: "Danger inset ring on the field box, `aria-invalid` on the textarea. A non-empty `error` implies it.",
-          ru: "Ошибка без текста: красное кольцо, `aria-invalid`, `data-invalid`. Непустой `error` включает его.",
+          ru: "Красное внутреннее кольцо на рамке поля, `aria-invalid` на textarea. Непустой `error` включает его.",
         },
         {
           name: "focusRing",
@@ -71,7 +71,7 @@ export const api: ComponentApi = {
         {
           name: "counter",
           type: "ReactNode",
-          en: "Right side of the support row, usually `<Textarea.Counter />`.",
+          en: "Right side of the support row, usually `<Textarea.Counter current max />`.",
           ru: "Правая часть строки поддержки, обычно `<Textarea.Counter current max />`.",
         },
         {
@@ -111,7 +111,7 @@ export const api: ComponentApi = {
           name: "id",
           type: "string",
           en: "Id of the `<textarea>` (auto-generated when omitted); hint id is `<id>-hint`, error id is `<id>-error`.",
-          ru: "Явный id поля; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
+          ru: "Id `<textarea>`; иначе генерируется. Связывает подпись, подсказку и ошибку. Id подсказки — `<id>-hint`, ошибки — `<id>-error`.",
         },
         {
           name: "aria-describedby",
@@ -143,7 +143,7 @@ export const api: ComponentApi = {
           name: "…rest",
           type: 'Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size" | "children">',
           en: "`value`, `defaultValue`, `onChange`, `placeholder`, `rows`, `maxLength`, `name`, `disabled`, `readOnly`, `aria-label`…",
-          ru: "`value`, `defaultValue`, `onChange`, `placeholder`, `rows`, `maxLength`, `disabled`, `readOnly`…",
+          ru: "`value`, `defaultValue`, `onChange`, `placeholder`, `rows`, `maxLength`, `name`, `disabled`, `readOnly`, `aria-label`…",
         },
       ],
     },
@@ -164,7 +164,7 @@ export const api: ComponentApi = {
           type: "number",
           required: true,
           en: 'Limit; `current > max` turns the counter danger (`data-invalid="true"`). Add `maxLength` on the root for a hard limit.',
-          ru: "Лимит; при `current > max` счётчик красный. Для жёсткого лимита добавьте `maxLength`.",
+          ru: 'Лимит; при `current > max` счётчик красный (`data-invalid="true"`). Для жёсткого лимита добавьте `maxLength` на корень.',
         },
         {
           name: "…rest",
@@ -244,19 +244,19 @@ export const api: ComponentApi = {
       },
       {
         en: '`Textarea.Counter` shows `12/280` visually and announces `labels.counter` (`aria-live="polite"`).',
-        ru: '`Textarea.Counter` показывает «12/280», а скринридер читает `labels.counter` через `aria-live="polite"`.',
+        ru: '`Textarea.Counter` показывает `12/280`, а скринридер читает `labels.counter` через `aria-live="polite"`.',
       },
       {
         en: "`Textarea.Action` and `Textarea.CopyButton` are buttons (or a link with `asChild`) named by their label, with a tooltip; copying announces `labels.copied`. A press on them never moves focus into the textarea.",
-        ru: "`Textarea.Action` и `Textarea.CopyButton` — кнопки с именем и подсказкой; копирование объявляет `labels.copied`.",
+        ru: "`Textarea.Action` и `Textarea.CopyButton` — кнопки (или ссылка с `asChild`) с именем из подписи и подсказкой; копирование объявляет `labels.copied`. Нажатие на них не переводит фокус в textarea.",
       },
       {
         en: 'With `onCommit` the textarea carries `aria-busy="true"` while saving; a polite live region says `labels.saving`, then `labels.saved`.',
-        ru: "С `onCommit` поле ставит `aria-busy`, пока идёт сохранение, а живой регион говорит `labels.saving` и `labels.saved`.",
+        ru: 'С `onCommit` textarea ставит `aria-busy="true"`, пока идёт сохранение, а вежливая live-область говорит `labels.saving`, затем `labels.saved`.',
       },
       {
         en: 'The formatting toolbar is `role="toolbar"` named `labels.formatting`, `aria-controls` the textarea, with one Tab stop and arrow keys; every button has `aria-keyshortcuts` and a tooltip with its keys (`⌘B` on Apple systems, `Ctrl+B` elsewhere). A press on a tool keeps the focus and the selection in the field.',
-        ru: 'Панель форматирования — `role="toolbar"` с именем `labels.formatting` и `aria-controls` на поле, с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами. Нажатие на кнопку оставляет фокус и выделение в поле.',
+        ru: 'Панель форматирования — `role="toolbar"` с именем `labels.formatting` и `aria-controls` на поле, с одной точкой Tab и стрелками; у кнопок `aria-keyshortcuts` и подсказка с клавишами (`⌘B` на системах Apple, `Ctrl+B` на остальных). Нажатие на кнопку оставляет фокус и выделение в поле.',
       },
     ],
   },

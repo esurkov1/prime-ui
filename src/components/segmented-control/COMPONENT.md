@@ -70,6 +70,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 | `disabled` | `boolean` | `false` | Disables this option; arrow keys skip it. |
 | `color` | `"gray" \| "blue" \| "green" \| "orange" \| "red" \| "yellow" \| "purple" \| "sky" \| "pink" \| "teal"` | — | Palette hue: a dot before the content; while selected the thumb takes a soft fill of the hue with a ring of it. |
 | `children` | `ReactNode` | — (required) | Text, `Icon`, `Label`, `Count`, `Description`. Only an icon → square segment; give it `aria-label`. |
+| `className` | `string` | — | Class on the segment button. |
 | `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" \| "type" \| "role">` | — | `aria-label`, `onClick` (runs first and can `preventDefault()` the selection), `className` and the other button attributes. |
 
 ### SegmentedControl.Icon
@@ -78,6 +79,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | The icon, e.g. `<Icon name="theme.light" />`. |
+| `className` | `string` | — | Class on the icon box. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### SegmentedControl.Label
@@ -86,6 +88,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | Title text. |
+| `className` | `string` | — | Class on the label. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### SegmentedControl.Count
@@ -103,6 +106,7 @@ The root is a field root: `className`, `ref` and the native attributes land on t
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — (required) | Second-line text; wrap a key value in `<strong>`. |
+| `className` | `string` | — | Class on the description. |
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ## Variants

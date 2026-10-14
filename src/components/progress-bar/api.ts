@@ -19,7 +19,7 @@ export const api: ComponentApi = {
           name: "label",
           type: "string",
           en: "Visible label above the line and its accessible name; a value bar without it needs `aria-label`.",
-          ru: "Видимая подпись над линией и доступное имя.",
+          ru: "Видимая подпись над линией и доступное имя; полосе значения без неё нужен `aria-label`.",
         },
         {
           name: "showValue",
@@ -140,11 +140,11 @@ export const api: ComponentApi = {
       },
       {
         en: 'Segments mode: `role="group"`; its text lists the shares of `max` («Видео: 38%, Документы: 21%»). With `label` (or `aria-label`) the group is named by it and described by the distribution — or by the legend when `legend` is on; without a name the distribution is the name.',
-        ru: 'Режим сегментов: `role="group"`; доли читаются текстом «Видео: 38%, Документы: 21%». С `label` полоса названа подписью, а доли — описание; с `legend` описанием становится легенда.',
+        ru: 'Режим сегментов: `role="group"`; его текст перечисляет доли от `max` («Видео: 38%, Документы: 21%»). С `label` (или `aria-label`) группа названа им и описана долями — или легендой, когда включён `legend`; без имени доли и есть имя.',
       },
       {
         en: "Rows: an `<ol>` named by `label`; each row reads as text («Москва 1 284 52%»), the bars are `aria-hidden`.",
-        ru: 'Рейтинг (`layout="rows"`): список `<ol>` с именем из `label`; каждая строка читается текстом «Москва 1 284 52%», полосы скрыты от скринридеров.',
+        ru: "Строки: список `<ol>` с именем из `label`; каждая строка читается текстом («Москва 1 284 52%»), полосы — `aria-hidden`.",
       },
       {
         en: "A category color always sits beside its name (legend, row), so color is never the only cue.",

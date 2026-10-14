@@ -49,7 +49,7 @@ Unlike Input, Textarea has no Wrapper / Field parts: `Textarea.Root` renders the
 | `error` | `ReactNode` | — | Error message in the hint slot; implies `invalid`. |
 | `invalid` | `boolean` | `false` | Danger inset ring on the field box, `aria-invalid` on the textarea. A non-empty `error` implies it. |
 | `focusRing` | `boolean` | `true` | `false` hides only the visual focus ring on the field box (`data-focus-ring="false"`); focus, keyboard, ARIA and the invalid ring stay. |
-| `counter` | `ReactNode` | — | Right side of the support row, usually `<Textarea.Counter />`. |
+| `counter` | `ReactNode` | — | Right side of the support row, usually `<Textarea.Counter current max />`. |
 | `reserveSupportRow` | `boolean` | `false` | Always render the support row (min height = hint line height), so an appearing error does not shift the layout. |
 | `autoResize` | `boolean` | `true` | Height follows the content (minimum `rows` lines, no resize handle; up to `maxRows` lines when set, then it scrolls inside). `false` → fixed height of `rows` lines with native vertical resize. |
 | `rows` | `number` | `3` | Minimum height in lines; with `autoResize={false}` the fixed height. `rows={1}` makes a field that starts as one line, like an Input. |

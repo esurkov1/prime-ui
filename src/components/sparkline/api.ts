@@ -157,7 +157,7 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'The plot is `role="slider"` named by `label`; `aria-valuetext` speaks the point («8 окт: 312 400 ₽», `labels.point`); a point with no data speaks `labels.empty` («8 окт: Нет данных»). At rest with `sum` / `average` it speaks the period and the summary («9 сен – 8 окт: 8 914 000 ₽»). With `reference` the slider is described by `labels.reference` («Ориентир: 3%», `aria-describedby`). The headline follows the point under the pointer or the arrows, in text.',
-        ru: 'График — `role="slider"` с именем из `label`; `aria-valuetext` озвучивает точку: «8 окт: 312 400 ₽»; в покое с `summary="sum"` — период: «9 сен – 8 окт: 8 914 000 ₽».',
+        ru: 'График — `role="slider"` с именем из `label`; `aria-valuetext` озвучивает точку: «8 окт: 312 400 ₽»; точка без данных — `labels.empty` («8 окт: Нет данных»); `labels.point` задаёт формат точки. В покое с `sum` / `average` — период и итог: «9 сен – 8 окт: 8 914 000 ₽». С `reference` слайдер описан `labels.reference` («Ориентир: 3%», `aria-describedby`). Заголовок следует за точкой под указателем или стрелками, текстом.',
       },
       {
         en: "The headline with the value and change reads as plain text.",
@@ -173,11 +173,11 @@ export const api: ComponentApi = {
       },
       {
         en: '`layout="compact"`: no visible title; `label` is only the slider\'s name, the point still goes to `aria-valuetext`.',
-        ru: '`layout="compact"`: видимого заголовка нет, `label` — только имя слайдера, значение точки — в `aria-valuetext`. Указатель и клавиши на графике не открывают строку DataTable (`role="slider"`, `data-row-click-ignore`).',
+        ru: '`layout="compact"`: видимого заголовка нет, `label` — только имя слайдера, значение точки — в `aria-valuetext`.',
       },
       {
         en: "The tooltip is `aria-hidden`: it repeats `aria-valuetext` for sighted users. The plot carries `data-row-click-ignore` (and is a slider), so its pointer and keys never open a DataTable row.",
-        ru: "Подсказка у курсора при ведении скрыта от вспомогательных технологий (`aria-hidden`): она повторяет `aria-valuetext`.",
+        ru: "Подсказка — `aria-hidden`: она повторяет `aria-valuetext` для зрячих. График несёт `data-row-click-ignore` (и он слайдер), поэтому указатель и клавиши на нём не открывают строку DataTable.",
       },
     ],
   },

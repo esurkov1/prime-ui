@@ -14,7 +14,6 @@ import styles from "./Timeline.module.css";
 export type TimelineRootProps = {
   /** Tier of text, dots and row rhythm. Default `m` (rows 64px). */
   size?: ControlSize;
-  /** `Timeline.Group` elements. */
   children: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLDivElement>;
@@ -36,7 +35,6 @@ TimelineRoot.displayName = "Timeline.Root";
 export type TimelineGroupProps = {
   /** Group heading (e.g. «Недавно»); labels the list via `aria-labelledby`. */
   label?: React.ReactNode;
-  /** `Timeline.Item` and `Timeline.Gap` elements. */
   children: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLOListElement>;
@@ -111,7 +109,6 @@ export type TimelineItemProps = {
   asChild?: boolean;
   /** Renders the row as a `button` (unless `href` / `asChild`). */
   onClick?: React.MouseEventHandler<HTMLElement>;
-  /** `Timeline.Title`, `Timeline.Meta`, `Timeline.Value`. */
   children: React.ReactNode;
   className?: string;
   /** The row element (`a`, `button`, `div` or the `asChild` element). */
@@ -297,7 +294,6 @@ TimelineGapMeta.displayName = "Timeline.GapMeta";
 export type TimelineGapProps = {
   /** Caption color and hollow dot. Default `neutral` (muted); `warning` / `danger` flag a long interval. */
   tone?: Tone;
-  /** Interval caption, e.g. «40 дней · 2 200 км без обслуживания», and an optional `Timeline.GapMeta`. */
   children: React.ReactNode;
   className?: string;
   ref?: React.Ref<HTMLDivElement>;

@@ -6,7 +6,7 @@ export const api: ComponentApi = {
     {
       name: "TagSelect",
       en: '`ref` → `HTMLDivElement` (the field frame). The field frame with a chip row and an `<input role="combobox">`, and a portaled multi-select list; options come as data.',
-      ru: 'Поле с чипами и полем ввода `role="combobox"` и выпадающий список с несколькими значениями; опции — данные.',
+      ru: 'Рамка поля со строкой чипов и `<input role="combobox">` и выпадающий список с несколькими значениями; опции — данные.',
       props: [
         {
           name: "options",
@@ -176,6 +176,12 @@ export const api: ComponentApi = {
           ru: "Имя поля и списка, если нет `label`.",
         },
         {
+          name: "className",
+          type: "string",
+          en: "Class on the field frame `<div>`.",
+          ru: "Класс на `<div>` рамки поля.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
           en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
@@ -187,7 +193,7 @@ export const api: ComponentApi = {
   labels: labelRows(TAG_SELECT_LABELS, {
     panelHint: {
       en: 'Line above the list; `""` hides it.',
-      ru: "Строка над списком; пустая строка скрывает её.",
+      ru: 'Строка над списком; `""` скрывает её.',
     },
     create: {
       en: "Action text before the preview of a new tag.",
@@ -285,7 +291,7 @@ export const api: ComponentApi = {
       },
       {
         en: "A tag being created has `aria-busy` on its chip, a row whose rename or recolor is saved has a busy «⋯»; a refused creation or change is announced with `labels.createFailed` / `labels.updateFailed`.",
-        ru: "Пока новый тег сохраняется (промис из `onCreate`), у его чипа `aria-busy`; отказ объявляется через `labels.createFailed`.",
+        ru: "У создаваемого тега на чипе `aria-busy`, у строки, чьё переименование или цвет сохраняется, — занятая «⋯»; отказ в создании или изменении объявляется через `labels.createFailed` / `labels.updateFailed`.",
       },
       {
         en: "The hint and the error are linked by `aria-describedby`; the error sets `aria-invalid`.",

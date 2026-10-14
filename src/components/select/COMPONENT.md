@@ -96,14 +96,16 @@ an icon) goes inside `Select.ItemMeta`.
 | `id` | `string` | — | Id of the trigger; generated when omitted. |
 | `labels` | `Partial<SelectLabels>` | — | Built-in strings, see Labels. |
 | `children` | `ReactNode` | — (required) | Trigger and Content. |
+| `className` | `string` | — | Class on the field frame `<div>`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ### Select.Trigger
-`ref` → `HTMLButtonElement`. `<button role="combobox">` with the value, the clear segment and the chevron (a Spinner while `loading`). + native button props (`onFocus`, `onBlur`, `onKeyDown`… reach the button).
+`ref` → `HTMLButtonElement`. `<button role="combobox">` with the value, the clear segment and the chevron (a Spinner while `loading` or saving).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `children` | `ReactNode` | — | `Select.TriggerIcon`, `Select.Value`, optionally a Badge after it. A `Select.TriggerIcon` alone makes an icon-only trigger (the value read, not shown). |
+| `…rest` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "id" \| "type" \| "role">` | — | `onFocus`, `onBlur`, `onKeyDown`, `className` and the other button attributes reach the button. |
 
 ### Select.Value
 `ref` → `HTMLSpanElement`. The picked label (labels joined with `multiple`) with an ellipsis, or the placeholder.
@@ -114,10 +116,14 @@ an icon) goes inside `Select.ItemMeta`.
 | `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | `className` and the other span attributes. |
 
 ### Select.TriggerIcon · Select.ItemIcon
-`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label. + native `<span>` props.
+`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children` (the `Icon`), `className` and the other span attributes. |
 
 ### Select.Content
-`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel with the search row, the `role="listbox"`, the empty and load states. Closed, the items render hidden so the trigger knows their labels. Below 640px it is a bottom sheet.
+`ref` → `HTMLDivElement` (the panel). Portal + the list panel: search row, `role="listbox"`, empty and load states; closed, the items render hidden so the trigger knows their labels. Below 640px a bottom sheet: scrim, handle, swipe down to close, page scroll locked.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -135,16 +141,23 @@ an icon) goes inside `Select.ItemMeta`.
 | `keywords` | `string` | — | Extra words for the search. |
 | `disabled` | `boolean` | `false` | Muted, skipped by the keyboard, not selectable. |
 | `children` | `ReactNode` | — (required) | Text, or `Select.ItemIcon`, `Avatar.Root`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`, `Badge.Root` as direct children. |
+| `className` | `string` | — | Class on the option row. |
 
 ### Select.ItemText · Select.ItemDescription · Select.ItemMeta
 `ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line / a trailing muted value. Leading media is an `Avatar.Root` or `Thumbnail.Root` child, a trailing status a `Badge.Root`.
 
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | The text. |
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `className` and the other span attributes. |
+
 ### Select.Group
-`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while the search leaves none of its options. + native `<div>` props.
+`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while the search leaves none of its options.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — | Heading of the group (caption, muted); also its accessible name. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "role">` | — | `children` (the items), `className` and the other div attributes. |
 
 ### Select.Separator
 `ref` → `HTMLDivElement`. A full-bleed Divider between groups; hidden while searching.
@@ -154,7 +167,7 @@ an icon) goes inside `Select.ItemMeta`.
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `className` and the other attributes of the divider. |
 
 ### Select.Action
-`ref` → `HTMLDivElement`. A list-level action («Новый клиент»), a direct child of `Select.Content`: a `role="option"` row pinned under the list, never filtered, the last stop of the arrows; highlighted while the search finds nothing.
+`ref` → `HTMLDivElement`. A list-level action («Новый клиент»), a direct child of `Select.Content`: a `role="option"` row under the list (and the empty state), never filtered, the last stop of the arrows; when the search finds nothing it is highlighted and Enter runs it.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

@@ -45,7 +45,9 @@ Timeline.Root                    size container, sets the tier
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `size` | `"xs" \| "s" \| "m" \| "l" \| "xl"` | `"m"` | Text, dot and row rhythm: rows 40 · 52 · 64 · 68 · 76 px. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `children` (`Timeline.Group`), `className` and the other div attributes. |
+| `children` | `ReactNode` | — (required) | The `Timeline.Group`s. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | The other div attributes. |
 
 ### Timeline.Group
 `ref` → `HTMLOListElement`. A labelled `<ol>` of events; the line runs from its first dot to its last.
@@ -53,7 +55,9 @@ Timeline.Root                    size container, sets the tier
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `label` | `ReactNode` | — | Group heading («Недавно»); names the list via `aria-labelledby`. |
-| `…rest` | `Omit<OlHTMLAttributes<HTMLOListElement>, "children">` | — | `children` (`Timeline.Item`, `Timeline.Gap`), `className` and the other ol attributes. |
+| `children` | `ReactNode` | — (required) | `Timeline.Item` and `Timeline.Gap` rows. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `Omit<OlHTMLAttributes<HTMLOListElement>, "children">` | — | The other ol attributes. |
 
 ### Timeline.Item
 `ref` → the row element. An `<li>` with a row: `<div>`, `<button>` (`onClick`), `<a>` (`href`) or your element (`asChild`); the dot is prepended. The row under the pointer or keyboard focus is highlighted (pill, accent title and dot).
@@ -65,22 +69,37 @@ Timeline.Root                    size container, sets the tier
 | `onClick` | `MouseEventHandler<HTMLElement>` | — | Renders the row as a `<button>`. |
 | `href` | `string` | — | Renders the row as a link (with `target`, `rel`, `download`). |
 | `asChild` | `boolean` | `false` | Renders the row as the single child element (a router link). |
-| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children" \| "color" \| "onClick">` | — | `children` (Title, Meta, Value), `className` and the other row attributes. |
+| `children` | `ReactNode` | — (required) | Title, Meta, Value. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `Omit<HTMLAttributes<HTMLElement>, "children" \| "color" \| "onClick">` | — | The other row attributes (`target`, `rel`, `download` with `href`). |
 
 ### Timeline.Title · Timeline.Meta · Timeline.MetaPrimary
 `ref` → `HTMLSpanElement`. `<span>` lines: the event (medium, accent on the highlighted row, wraps), the muted date line with tabular numbers, and its emphasized part.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
+| `children` | `ReactNode` | — (required) | The text of the line. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
 
-### Timeline.Value · Timeline.ValueMeta
-`ref` → `HTMLSpanElement`. `<span>`: the trailing amount (right-aligned, tabular) and a muted second line under it. Moves under the meta below 20rem.
+### Timeline.Value
+`ref` → `HTMLSpanElement`. A `<span>` with the trailing amount (right-aligned, tabular). Moves under the meta below 20rem.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Value: text color (income `success`, refund `danger`). |
-| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
+| `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Text color (income `success`, refund `danger`). |
+| `children` | `ReactNode` | — (required) | The amount. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
+
+### Timeline.ValueMeta
+`ref` → `HTMLSpanElement`. A muted `<span>` line under the value.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `ReactNode` | — (required) | The text of the line. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `Omit<HTMLAttributes<HTMLSpanElement>, "children">` | — | The other span attributes. |
 
 ### Timeline.Gap
 `ref` → `HTMLDivElement`. An `<li>` interval between events: a shorter row with a hollow dot on a dashed segment and a muted caption.
@@ -88,7 +107,9 @@ Timeline.Root                    size container, sets the tier
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `tone` | `"neutral" \| "accent" \| "success" \| "warning" \| "danger" \| "info"` | `"neutral"` | Caption and dot color; `warning` / `danger` flag a long interval. |
-| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | `children` (the interval caption and an optional `Timeline.GapMeta`), `className` and the other div attributes. |
+| `children` | `ReactNode` | — (required) | The interval caption and an optional `Timeline.GapMeta`. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "children">` | — | The other div attributes. |
 
 ### Timeline.GapMeta
 `ref` → `HTMLSpanElement`. A caption on the right of the gap («сейчас»), in the gap tone.

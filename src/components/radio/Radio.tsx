@@ -66,7 +66,6 @@ export type RadioGroupProps = Omit<FieldRootDomProps, "dir"> & {
   /** Id of the `role="radiogroup"` element; generated when omitted. */
   id?: string;
   labels?: Partial<RadioGroupLabels>;
-  /** `Radio.Root` options. */
   children?: React.ReactNode;
 };
 

@@ -54,6 +54,7 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 | `labels` | `Partial<RadioGroupLabels>` | — | Built-in strings, see Labels. |
 | `id` | `string` | — | Id of the `role="radiogroup"` element (generated when omitted); also the default `name`. |
 | `aria-label / aria-labelledby / aria-describedby` | `string` | — | Name and description of the radiogroup (`aria-describedby` is merged before the hint / error ids). |
+| `children` | `ReactNode` | — | The `Radio.Root` options. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange" \| "dir">` | — | `className`, `data-*` and the other attributes of the field frame `<div>`. |
 
 ### Radio.Root
@@ -70,6 +71,10 @@ Radio.Group             field: group label → role="radiogroup" → hint | erro
 
 ### Radio.Label
 `ref` → `HTMLSpanElement`. The visible text in the text column of the option row. Native `<span>` props.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
 
 ## Variants
 No `variant` / `tone` / `color`.

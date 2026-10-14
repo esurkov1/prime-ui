@@ -70,6 +70,7 @@ TagSelect                       field frame: label · control · hint/error (sin
 | `id` | `string` | — | Id of the input; generated when omitted. |
 | `labels` | `Partial<TagSelectLabels>` | — | Built-in strings, see Labels (`colorNames` merges by key). |
 | `aria-label · aria-labelledby` | `string` | — | Name of the input and the list when there is no `label`. |
+| `className` | `string` | — | Class on the field frame `<div>`. |
 | `…rest` | `Omit<HTMLAttributes<HTMLDivElement>, "id" \| "children" \| "defaultValue" \| "defaultChecked" \| "onChange">` | — | `className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control). |
 
 ## Variants

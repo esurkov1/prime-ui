@@ -58,7 +58,7 @@ export function fieldGroupProps(control: string, labelsType: string): ApiProp[] 
       name: "id",
       type: "string",
       en: `Id of the \`${control}\` element (generated when omitted); hint id is \`<id>-hint\`, error id \`<id>-error\`.`,
-      ru: `Id элемента \`${control}\`; иначе генерируется.`,
+      ru: `Id элемента \`${control}\`; иначе генерируется. Id подсказки — \`<id>-hint\`, ошибки — \`<id>-error\`.`,
     },
     {
       name: "labels",

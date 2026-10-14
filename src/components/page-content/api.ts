@@ -171,7 +171,7 @@ export const api: ComponentApi = {
           type: "1 | 2 | … | 12",
           default: "12",
           en: "Columns of 12 on a wide grid (64rem+). Narrower grids round it: see Grid columns in COMPONENT.md.",
-          ru: "Колонок из 12 в широкой сетке (от 64rem). В более узкой сетке округляется: малые плитки — по две в ряд от 30rem, `span` 4 — треть от 40rem, широкие — на весь ряд.",
+          ru: "Колонок из 12 в широкой сетке (от 64rem). В более узкой сетке округляется: см. Grid columns в COMPONENT.md.",
         },
         {
           name: "rows",
@@ -282,7 +282,7 @@ export const api: ComponentApi = {
     ],
     aria: [
       {
-        en: "Title is an `<h1>`; use one per page.",
+        en: "`PageContent.Title` is an `<h1>`; use one per page.",
         ru: "`PageContent.Title` — `<h1>`; один на страницу.",
       },
       {
@@ -295,7 +295,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'Name `PageContent.List` and `PageContent.Detail` with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).',
-        ru: "Назовите панели `PageContent.List` и `PageContent.Detail` через `aria-label`. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера.",
+        ru: 'Назовите панели `PageContent.List` и `PageContent.Detail` через `aria-label`. В узком сплите при открытии деталей фокус переходит в них, при возврате — к элементу списка; скрытая панель — `display: none`, её нет ни для Tab, ни для скринридера. Панели получают фокус только из кода (`tabindex="-1"`, без кольца).',
       },
       {
         en: "`PageContent.BackButton` is named by `labels.back` and is shown only while the split shows one pane.",

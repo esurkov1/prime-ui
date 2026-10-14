@@ -6,7 +6,7 @@ export const api: ComponentApi = {
     {
       name: "Tabs.Root",
       en: "`ref` → `HTMLDivElement`. `<div>` that owns the active value, size and orientation; no surface of its own — it stands in the host's padding. In a Modal or Drawer it wraps `X.Header` (with `Tabs.List` last) and `X.Body`.",
-      ru: "Хранит активную вкладку, размер и направление; своей поверхности нет — стоит в отступах хоста. В Modal и Drawer оборачивает `X.Header` (с `Tabs.List` последним) и `X.Body`.",
+      ru: "`<div>`, который хранит активную вкладку, размер и направление; своей поверхности нет — стоит в отступах хоста. В Modal и Drawer оборачивает `X.Header` (с `Tabs.List` последним) и `X.Body`.",
       props: [
         {
           name: "value",
@@ -151,7 +151,7 @@ export const api: ComponentApi = {
     {
       name: "Tabs.Icon",
       en: "`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`) before the label; muted, accent on the active tab. Hidden first when tabs do not fit; the last thing left when nothing else fits.",
-      ru: "Декоративная иконка перед подписью; приглушённая, на активной вкладке — акцентная. Скрывается первой, когда вкладки не помещаются; остаётся последней, когда не помещается ничего другого.",
+      ru: "Декоративная иконка (`aria-hidden`) перед подписью; приглушённая, на активной вкладке — акцентная. Скрывается первой, когда вкладки не помещаются; остаётся последней, когда не помещается ничего другого.",
       props: [
         {
           name: "children",

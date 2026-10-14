@@ -6,7 +6,7 @@ export const api: ComponentApi = {
     {
       name: "Pagination",
       en: "`ref` → `HTMLElement`. A `<nav>` named by `labels.nav` with ghost `Button`s: previous, page numbers with ellipses, next.",
-      ru: "`<nav>` с именем из `labels.nav` и ghost-кнопками: назад, номера страниц с многоточием, вперёд.",
+      ru: "`<nav>` с именем из `labels.nav` и ghost-кнопками `Button`: назад, номера страниц с многоточием, вперёд.",
       props: [
         {
           name: "totalPages",
@@ -71,7 +71,7 @@ export const api: ComponentApi = {
     },
   ],
   labels: labelRows(PAGINATION_LABELS, {
-    nav: { en: "`aria-label` of the `<nav>`.", ru: "`aria-label` навигации." },
+    nav: { en: "`aria-label` of the `<nav>`.", ru: "`aria-label` у `<nav>`." },
     previous: { en: "Name of the previous-page arrow.", ru: "Имя стрелки «назад»." },
     next: { en: "Name of the next-page arrow.", ru: "Имя стрелки «вперёд»." },
     page: {
@@ -104,7 +104,7 @@ export const api: ComponentApi = {
       },
       {
         en: "The edge arrows are `disabled`; the ellipsis is `aria-hidden`.",
-        ru: "Стрелки на краях отключены (`disabled`), многоточие скрыто от скринридеров.",
+        ru: "Стрелки на краях отключены (`disabled`), многоточие — `aria-hidden`.",
       },
       {
         en: "The compact view reads «3 из 12» through the visually hidden `labels.of`.",

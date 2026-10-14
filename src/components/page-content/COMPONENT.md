@@ -236,7 +236,7 @@ One `PageContent.Title` (`<h1>`) per page; a topic inside Body is a `PageContent
 ### ARIA
 <!-- Generated from api.ts by `bun run docs:build`. Edit api.ts, not this section. -->
 
-- Title is an `<h1>`; use one per page.
+- `PageContent.Title` is an `<h1>`; use one per page.
 - Give `PageContent.Page` an `aria-labelledby` that points at the Title `id` to name the region.
 - `PageContent.Section` is a `<section>` named by its own `<h2>` (`label`) through `aria-labelledby`, so it is a region landmark with the heading's name; the heading levels go h1 (page) → h2 (section) → h3 (a card title inside it).
 - Name `PageContent.List` and `PageContent.Detail` with `aria-label`. On a narrow split opening the detail moves focus into it and going back returns focus to the list control; the hidden pane is `display: none`, out of Tab and the accessibility tree. The panes take focus from code only (`tabindex="-1"`, no ring).

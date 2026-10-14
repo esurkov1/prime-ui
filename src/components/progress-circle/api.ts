@@ -129,7 +129,7 @@ export const api: ComponentApi = {
       },
       {
         en: 'Segments mode: the svg is `role="group"`; with `aria-label` it is described by the distribution («Видео: 38%, Документы: 21%») or by the legend, without it the distribution is its name.',
-        ru: 'Режим сегментов: svg с `role="group"`; с `aria-label` доли — описание (с `legend` — сама легенда), без него доли — имя.',
+        ru: 'Режим сегментов: svg с `role="group"`; с `aria-label` его описание — доли («Видео: 38%, Документы: 21%») или легенда, без него доли — имя.',
       },
       {
         en: "A category color always sits beside its name in the legend, so color is never the only cue.",
@@ -137,7 +137,7 @@ export const api: ComponentApi = {
       },
       {
         en: "While `loading` the root is `aria-busy` and the Skeletons are `aria-hidden`.",
-        ru: "Во время `loading` корень помечен `aria-busy`, заглушки скрыты от скринридеров.",
+        ru: "Во время `loading` корень помечен `aria-busy`, заглушки Skeleton — `aria-hidden`.",
       },
       {
         en: "Always pass `aria-label`: a caption next to the ring is not linked to it.",

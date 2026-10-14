@@ -180,7 +180,7 @@ export const api: ComponentApi = {
           name: "name",
           type: "string",
           en: 'Form field name: hidden inputs submit the value (`""` while empty; one input per value with `multiple`).',
-          ru: "Имя поля формы: скрытые input отправляют значение (пустая строка без выбора; по одному на значение при `multiple`).",
+          ru: 'Имя поля формы: скрытые input отправляют значение (`""` без выбора; по одному на значение при `multiple`).',
         },
         {
           name: "placeholder",
@@ -222,6 +222,12 @@ export const api: ComponentApi = {
           ru: "Trigger и Content.",
         },
         {
+          name: "className",
+          type: "string",
+          en: "Class on the field frame `<div>`.",
+          ru: "Класс на `<div>` рамки поля.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLDivElement>, "id" | "children" | "defaultValue" | "defaultChecked" | "onChange">',
           en: "`className`, `data-*` and the other attributes of the field frame `<div>` (field-root rule: `className`, `ref` and the rest → frame, `id` → control).",
@@ -231,14 +237,20 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Trigger",
-      en: '`ref` → `HTMLButtonElement`. `<button role="combobox">` with the value, the clear segment and the chevron (a Spinner while `loading`). + native button props (`onFocus`, `onBlur`, `onKeyDown`… reach the button).',
-      ru: 'Кнопка `role="combobox"`: значение, сегмент очистки и шеврон (спиннер при загрузке).',
+      en: '`ref` → `HTMLButtonElement`. `<button role="combobox">` with the value, the clear segment and the chevron (a Spinner while `loading` or saving).',
+      ru: '`<button role="combobox">`: значение, сегмент очистки и шеврон (Spinner при `loading` или сохранении).',
       props: [
         {
           name: "children",
           type: "ReactNode",
           en: "`Select.TriggerIcon`, `Select.Value`, optionally a Badge after it. A `Select.TriggerIcon` alone makes an icon-only trigger (the value read, not shown).",
           ru: "`Select.TriggerIcon`, `Select.Value`, при необходимости Badge после него. Один `Select.TriggerIcon` — триггер только с иконкой (значение читается, но не видно).",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "id" | "type" | "role">',
+          en: "`onFocus`, `onBlur`, `onKeyDown`, `className` and the other button attributes reach the button.",
+          ru: "`onFocus`, `onBlur`, `onKeyDown`, `className` и остальные атрибуты кнопки доходят до неё.",
         },
       ],
     },
@@ -258,14 +270,21 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.TriggerIcon · Select.ItemIcon",
-      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label. + native `<span>` props.",
-      ru: "Иконка в начале триггера / пункта по размеру яруса; скрыта от скринридеров.",
-      props: [],
+      en: "`ref` → `HTMLSpanElement`. An `aria-hidden` `<span>` with a leading glyph at the tier icon size: before the value / before the option label.",
+      ru: "`<span>` с ведущим глифом размера иконки яруса, `aria-hidden`: перед значением / перед подписью пункта.",
+      props: [
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`children` (the `Icon`), `className` and the other span attributes.",
+          ru: "`children` (`Icon`), `className` и остальные атрибуты span.",
+        },
+      ],
     },
     {
       name: "Select.Content",
-      en: '`ref` → `HTMLDivElement` (the panel). Portal + the floating list panel with the search row, the `role="listbox"`, the empty and load states. Closed, the items render hidden so the trigger knows their labels. Below 640px it is a bottom sheet.',
-      ru: "Портал и панель списка; смонтирована и в закрытом виде, чтобы триггер знал подписи. Уже 640px экрана панель становится шторкой снизу: подложка, ручка, закрытие свайпом вниз, прокрутка страницы заблокирована.",
+      en: '`ref` → `HTMLDivElement` (the panel). Portal + the list panel: search row, `role="listbox"`, empty and load states; closed, the items render hidden so the trigger knows their labels. Below 640px a bottom sheet: scrim, handle, swipe down to close, page scroll locked.',
+      ru: 'Портал и панель списка: строка поиска, `role="listbox"`, пустое состояние и загрузка; в закрытом виде пункты скрыто рендерятся, чтобы триггер знал подписи. Уже 640px — шторка снизу: подложка, ручка, закрытие свайпом вниз, прокрутка страницы заблокирована.',
       props: [
         {
           name: "searchable",
@@ -292,7 +311,7 @@ export const api: ComponentApi = {
     {
       name: "Select.Item",
       en: '`ref` → `HTMLDivElement`. `role="option"` with `aria-selected`; a check on the end (single) or a Checkbox.Indicator in front (`multiple`).',
-      ru: 'Пункт `role="option"`: галочка справа или чекбокс слева при `multiple`.',
+      ru: 'Пункт `role="option"` с `aria-selected`: галочка в конце (одиночный выбор) или Checkbox.Indicator в начале (`multiple`).',
       props: [
         {
           name: "value",
@@ -325,26 +344,52 @@ export const api: ComponentApi = {
           type: "ReactNode",
           required: true,
           en: "Text, or `Select.ItemIcon`, `Avatar.Root`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`, `Badge.Root` as direct children.",
-          ru: "Текст или части пункта прямыми детьми: иконка, Avatar, Thumbnail, текст, описание, мета, Badge.",
+          ru: "Текст или прямыми детьми `Select.ItemIcon`, `Avatar.Root`, `Thumbnail.Root`, `Select.ItemText`, `Select.ItemDescription`, `Select.ItemMeta`, `Badge.Root`.",
+        },
+        {
+          name: "className",
+          type: "string",
+          en: "Class on the option row.",
+          ru: "Класс на строке пункта.",
         },
       ],
     },
     {
       name: "Select.ItemText · Select.ItemDescription · Select.ItemMeta",
       en: "`ref` → `HTMLSpanElement`. Rich option parts: the title (its text is the label) / a muted second line / a trailing muted value. Leading media is an `Avatar.Root` or `Thumbnail.Root` child, a trailing status a `Badge.Root`.",
-      ru: "Части богатого пункта: заголовок, вторая строка, значение справа; Avatar или Thumbnail слева по ярусу, Badge после текста.",
-      props: [],
+      ru: "Части богатого пункта: заголовок (его текст — подпись) / приглушённая вторая строка / приглушённое значение в конце. Медиа в начале — ребёнок `Avatar.Root` или `Thumbnail.Root`, статус в конце — `Badge.Root`.",
+      props: [
+        {
+          name: "children",
+          type: "ReactNode",
+          required: true,
+          en: "The text.",
+          ru: "Текст.",
+        },
+        {
+          name: "…rest",
+          type: "HTMLAttributes<HTMLSpanElement>",
+          en: "`className` and the other span attributes.",
+          ru: "`className` и остальные атрибуты span.",
+        },
+      ],
     },
     {
       name: "Select.Group",
-      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while the search leaves none of its options. + native `<div>` props.',
-      ru: "Группа пунктов с подписью; скрывается, если поиск не оставил в ней пунктов.",
+      en: '`ref` → `HTMLDivElement`. `<div role="group">` named by its `label`; hidden while the search leaves none of its options.',
+      ru: '`<div role="group">` с именем из `label`; скрывается, если поиск не оставил в ней пунктов.',
       props: [
         {
           name: "label",
           type: "ReactNode",
           en: "Heading of the group (caption, muted); also its accessible name.",
           ru: "Подпись группы (caption, приглушённая) и её доступное имя.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "role">',
+          en: "`children` (the items), `className` and the other div attributes.",
+          ru: "`children` (пункты), `className` и остальные атрибуты div.",
         },
       ],
     },
@@ -363,8 +408,8 @@ export const api: ComponentApi = {
     },
     {
       name: "Select.Action",
-      en: '`ref` → `HTMLDivElement`. A list-level action («Новый клиент»), a direct child of `Select.Content`: a `role="option"` row pinned under the list, never filtered, the last stop of the arrows; highlighted while the search finds nothing.',
-      ru: "Действие уровня списка («Новый клиент»), прямой ребёнок `Select.Content`: строка под прокруткой (и под пустым состоянием), поиск её не фильтрует, стрелки доходят до неё после последнего пункта. Когда поиск ничего не нашёл, подсветка встаёт на неё — Enter запускает действие.",
+      en: '`ref` → `HTMLDivElement`. A list-level action («Новый клиент»), a direct child of `Select.Content`: a `role="option"` row under the list (and the empty state), never filtered, the last stop of the arrows; when the search finds nothing it is highlighted and Enter runs it.',
+      ru: 'Действие уровня списка («Новый клиент»), прямой ребёнок `Select.Content`: строка `role="option"` под списком (и пустым состоянием), поиск её не фильтрует, стрелки доходят до неё последней; когда поиск ничего не нашёл, она подсвечена и Enter её запускает.',
       props: [
         {
           name: "onSelect",
@@ -407,7 +452,7 @@ export const api: ComponentApi = {
     },
     emptyHint: {
       en: 'Second line of the empty state while searching; `""` hides it.',
-      ru: "Вторая строка пустого состояния при поиске; пустая строка скрывает её.",
+      ru: 'Вторая строка пустого состояния при поиске; `""` скрывает её.',
     },
     loading: {
       en: "Announced while `loading` or `loadingMore`.",
@@ -493,11 +538,11 @@ export const api: ComponentApi = {
       },
       {
         en: '`Select.Action` rows are `role="option"` in a `role="group"` under the scroller; the listbox owns the group through `aria-owns`, and the highlight reaches them through `aria-activedescendant`.',
-        ru: '`Select.Action` — `role="option"` в группе под прокруткой; список владеет группой через `aria-owns`, подсветка доходит до действия через `aria-activedescendant`.',
+        ru: '`Select.Action` — `role="option"` в `role="group"` под прокруткой; список владеет группой через `aria-owns`, подсветка доходит до действия через `aria-activedescendant`.',
       },
       {
         en: 'While an `onValueChange` promise is pending the trigger is `aria-busy`; a rejection announces `labels.changeFailed` in a polite `role="status"` region.',
-        ru: "Пока сохраняется обещание из `onValueChange`, триггер — `aria-busy`, а отказ объявляет `labels.changeFailed` вежливо.",
+        ru: 'Пока сохраняется обещание из `onValueChange`, триггер — `aria-busy`, а отказ объявляет `labels.changeFailed` в вежливой области `role="status"`.',
       },
       {
         en: "With `name`, hidden inputs carry the value into a native form submit; native trigger events (`onFocus`, `onBlur`, `onKeyDown`) reach the button.",

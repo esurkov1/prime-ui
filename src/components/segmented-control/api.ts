@@ -10,7 +10,7 @@ export const api: ComponentApi = {
     {
       name: "SegmentedControl.Root",
       en: '`ref` → `HTMLDivElement` (the field frame). The field: label · `<div role="radiogroup">` track with the sliding thumb, keyboard handling and a horizontally scrolling `ScrollContainer` row · support row. The frame hugs the track unless `fullWidth`.',
-      ru: 'Поле: подпись · дорожка `<div role="radiogroup">` со скользящим бегунком, клавиатурой и горизонтальной прокруткой · строка поддержки.',
+      ru: 'Поле: подпись · дорожка `<div role="radiogroup">` со скользящим бегунком, клавиатурой и строкой с горизонтальной прокруткой `ScrollContainer` · строка поддержки. Рамка облегает дорожку, если не задан `fullWidth`.',
       props: [
         {
           name: "value",
@@ -70,7 +70,7 @@ export const api: ComponentApi = {
     {
       name: "SegmentedControl.Item",
       en: '`ref` → `HTMLButtonElement`. One option, a `<button role="radio">` with roving `tabIndex`; plain text is wrapped in a `SegmentedControl.Label`.',
-      ru: 'Один вариант — `<button role="radio">` с перемещаемым `tabIndex`.',
+      ru: 'Один вариант — `<button role="radio">` с перемещаемым `tabIndex`; простой текст оборачивается в `SegmentedControl.Label`.',
       props: [
         {
           name: "value",
@@ -100,17 +100,23 @@ export const api: ComponentApi = {
           ru: "Текст, `Icon`, `Label`, `Count`, `Description`. Только иконка — квадратный сегмент с `aria-label`.",
         },
         {
+          name: "className",
+          type: "string",
+          en: "Class on the segment button.",
+          ru: "Класс на кнопке сегмента.",
+        },
+        {
           name: "…rest",
           type: 'Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "type" | "role">',
           en: "`aria-label`, `onClick` (runs first and can `preventDefault()` the selection), `className` and the other button attributes.",
-          ru: "`aria-label`, `onClick` (выполняется первым и может отменить выбор), `className` и остальные атрибуты кнопки.",
+          ru: "`aria-label`, `onClick` (выполняется первым и может отменить выбор через `preventDefault()`), `className` и остальные атрибуты кнопки.",
         },
       ],
     },
     {
       name: "SegmentedControl.Icon",
       en: "`ref` → `HTMLSpanElement`. Decorative icon (`aria-hidden`) sized to the tier.",
-      ru: "Декоративная иконка размера яруса.",
+      ru: "Декоративная иконка (`aria-hidden`) размера яруса.",
       props: [
         {
           name: "children",
@@ -118,6 +124,12 @@ export const api: ComponentApi = {
           required: true,
           en: 'The icon, e.g. `<Icon name="theme.light" />`.',
           ru: 'Иконка, например `<Icon name="theme.light" />`.',
+        },
+        {
+          name: "className",
+          type: "string",
+          en: "Class on the icon box.",
+          ru: "Класс на блоке иконки.",
         },
         {
           name: "…rest",
@@ -138,6 +150,12 @@ export const api: ComponentApi = {
           required: true,
           en: "Title text.",
           ru: "Текст подписи.",
+        },
+        {
+          name: "className",
+          type: "string",
+          en: "Class on the label.",
+          ru: "Класс на подписи.",
         },
         {
           name: "…rest",
@@ -187,6 +205,12 @@ export const api: ComponentApi = {
           ru: "Текст второй строки; ключевое значение оберните в `<strong>`.",
         },
         {
+          name: "className",
+          type: "string",
+          en: "Class on the description.",
+          ru: "Класс на описании.",
+        },
+        {
           name: "…rest",
           type: 'Omit<HTMLAttributes<HTMLSpanElement>, "children">',
           en: "`className` and the other span attributes.",
@@ -218,11 +242,11 @@ export const api: ComponentApi = {
     aria: [
       {
         en: 'The track is `role="radiogroup"`, named by `label` (`aria-labelledby`); without a label give the root `aria-label`. `aria-disabled` when disabled.',
-        ru: 'Дорожка — `role="radiogroup"`: её называет `label` (`aria-labelledby`), иначе задайте `aria-label`; при `disabled` — `aria-disabled`.',
+        ru: 'Дорожка — `role="radiogroup"`: её называет `label` (`aria-labelledby`), без подписи задайте корню `aria-label`. В выключенном состоянии — `aria-disabled`.',
       },
       {
         en: 'Hint and error are linked through `aria-describedby`; an error sets `aria-invalid="true"`, `required` sets `aria-required="true"`.',
-        ru: "Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid`, `required` — `aria-required`.",
+        ru: 'Подсказка и ошибка связаны через `aria-describedby`; ошибка ставит `aria-invalid="true"`, `required` — `aria-required="true"`.',
       },
       {
         en: 'Items are `<button role="radio" aria-checked>` with roving `tabIndex`.',
@@ -230,7 +254,7 @@ export const api: ComponentApi = {
       },
       {
         en: "Two-line items: `aria-labelledby` = label (+ count), `aria-describedby` = description.",
-        ru: "В двухстрочном сегменте имя — подпись и счётчик, описание — `aria-describedby`.",
+        ru: "В двухстрочном сегменте `aria-labelledby` — подпись (и счётчик), `aria-describedby` — описание.",
       },
       {
         en: "Icons are `aria-hidden`; icon-only items need `aria-label` (and a Tooltip for sighted users).",

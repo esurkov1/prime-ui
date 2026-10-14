@@ -57,6 +57,10 @@ Switch.Root          field grid; ref and input props go to the native input (rol
 ### Switch.Label
 `ref` → `HTMLSpanElement`. The visible text in the text column of the label row. Native `<span>` props.
 
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `…rest` | `HTMLAttributes<HTMLSpanElement>` | — | `children`, `className` and the other span attributes. |
+
 ## Variants
 No `variant` / `tone` / `color`.
 

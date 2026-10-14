@@ -5,8 +5,8 @@ export const api: ComponentApi = {
   parts: [
     {
       name: "NativeSelect",
-      en: "`ref` → `HTMLSelectElement`. The system `<select>` in the field look with the label row and the support row; the kit chevron over its end. + native `<select>` props except `size` and `multiple`.",
-      ru: "Системный `<select>` в виде поля: подпись, поле, строка поддержки.",
+      en: "`ref` → `HTMLSelectElement`. The system `<select>` in the field look with the label row and the support row; the kit chevron over its end.",
+      ru: "Системный `<select>` в виде поля со строкой подписи и строкой поддержки; шеврон кита поверх его конца.",
       props: [
         {
           name: "label",

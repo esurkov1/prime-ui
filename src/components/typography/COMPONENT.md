@@ -44,7 +44,9 @@ Typography       the element from `as` (default <p>); variant, tone, weight, tra
 | `tracking` | `"normal" \| "tight" \| "tighter" \| "wide"` | — | Overrides the role's tracking with a `--prime-font-tracking-*` step. |
 | `italic` | `boolean` | `false` | Italic, for quotes and titles of works. |
 | `truncate` | `boolean` | `false` | One line with an ellipsis; set `title` when the full text matters. |
-| `…rest` | `HTMLAttributes<HTMLElement>` | — | `children`, `className`, `id`, `title` and the other attributes of the element. |
+| `children` | `ReactNode` | — | The text. |
+| `className` | `string` | — | Class on the element. |
+| `…rest` | `HTMLAttributes<HTMLElement>` | — | `id`, `title` and the other attributes of the element. |
 
 ## Variants
 
