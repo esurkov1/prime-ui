@@ -141,6 +141,11 @@
   align-items: stretch;
 }
 
+/* In the column the heading's row basis would turn into a height: it takes its own height only. */
+.section[data-layout="aside"] > .sectionHeader > .sectionHeading {
+  flex: none;
+}
+
 .section[data-layout="aside"] > .sectionContent {
   flex: 999 1 calc(var(--prime-space-24) * 5);
 }
