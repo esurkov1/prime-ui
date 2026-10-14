@@ -27,7 +27,7 @@ adds text that explains what the layout failed to show.
 |---|---|---|
 | One record, read | label · value pairs | `DescriptionList` |
 | One record, edited | a form: fields 20 apart, groups 32 apart | `Fieldset`, fields |
-| One record of 2–4 short fields in a form | one row of fields | an `auto-fit` grid |
+| One record of 2–4 short fields in a form | one row of fields | an [intrinsic grid](responsive.md#intrinsic-grids) |
 | Records of one shape a person adds, edits, removes | one row per record, the headings once above | `FieldList` |
 | Records of one shape a person reads, sorts, filters | a table | `DataTable` |
 | One value in several units or currencies (a deposit in ₽, $, ฿) | the fields side by side in one row under one heading, the unit in each field | `Input.InlineAffix` |
@@ -35,9 +35,12 @@ adds text that explains what the layout failed to show.
 | Small attributes of a record (an icon, a color, a flag) | compact controls in the record's row, not fields of their own | icon-only `Select`, `ColorPresets`, `Checkbox` |
 | Short texts in an order the person sets | one column, a handle per row | `FieldList` `reorderable` |
 | Settings that most people never touch | behind a disclosure, after the common ones | `Accordion`, a «Дополнительно» section |
-| A choice of 2–5 options | all visible | `Radio.Group`, `SegmentedControl` |
-| A choice of 6+ options | a list that opens | `Select` |
+| One of a few options, sent with a form | all visible | `Radio.Group` |
+| One of a few modes of what the screen shows | all visible | `SegmentedControl` |
+| One of many options | a list that opens | `Select` |
 | Many values picked from options | tags | `TagSelect` |
+
+How many options count as «a few» and the other selection cases: [choosing.md](choosing.md#2-inside-a-category).
 
 One record is one row or one block, never half a record per line. If a record does not fit one
 row, it is not a row: open it in a `Drawer`.
@@ -67,8 +70,9 @@ The kit's UI language is Russian; these are the rules of its copy.
 
 - **Buttons say the verb and the object:** «Выставить счёт», «Добавить позицию», «Удалить проект».
   Never «ОК», «Да», «Подтвердить», «Отправить» without an object when the object is not obvious.
-- **A confirm names the thing and the loss:** «Удалить проект «Север»? Задачи и файлы удалятся
-  без возможности восстановления.» — not «Вы уверены?».
+- **A confirm names the thing and the consequence:** «Удалить проект «Север»? Задачи и файлы
+  удалятся без возможности восстановления.», «Выставить счёт на 48 000 ₽ ООО «Север»? Счёт уйдёт
+  клиенту на почту.» — not «Вы уверены?».
 - **An error says how to fix it:** «Формат: +7 912 404-18-20», «Не больше 2 000 символов» — not
   «Неверное значение», «Ошибка».
 - **An empty state says what to do next** and offers it: «Счетов пока нет» + «Выставить счёт». A
@@ -91,17 +95,24 @@ Pick the lightest step that keeps the person safe ([choosing.md](choosing.md) ha
 |---|---|
 | Reversible, frequent (remove a row, archive, move) | do it at once, «Отменить» in a `Notification` (`action`, commit in `onDismiss`) |
 | One standalone action that is easy to redo by hand | `Button.Root holdToConfirm` |
-| Irreversible loss of work, or a weighty outward action (send an invoice) | `ConfirmDialog` that names the thing and the loss |
+| Irreversible loss of work, or an outward action that cannot be called back once it leaves the product (an invoice or a message sent to a client, a payment) | `ConfirmDialog` that names the thing and the consequence |
 | Bulk destructive | `ConfirmDialog` that names the count («Удалить 12 счетов?») |
 | Leaving a form with changes | `Modal.Guard` / `Drawer.Guard dirty` |
 
 A confirm on every action trains people to click through it; the one that mattered is then missed.
+Which button starts each step and how the confirm behaves:
+[api-contract.md](api-contract.md#destructive-actions).
 
 ## 6. Nothing to guess
 
 - **A disabled control says why** when the reason is not on screen: a `hint` under the field, a
-  line beside the button («Не больше 3», as `FieldList` does at `max`), a `Tooltip` on a wrapper.
-  An action a person may never take (no permission) is hidden, not disabled.
+  line beside the button («Не больше 3», as `FieldList` does at `max`), or the disabled control
+  itself in `Tooltip.Trigger`. An action a person may never take (no permission) is hidden, not
+  disabled.
+- **The screen answers the latest question.** A request a value starts (a search, a filter, a page,
+  a period) is cancelled when the value changes again — abort it (`AbortController`) or drop its
+  answer — so a slow answer never replaces a newer one. A simulated request (a `setTimeout` standing
+  in for the server) is cancelled the same way, in the effect's cleanup.
 - **The state of a screen is in the URL:** the tab, the filters, the search, the page, the open
   record. A link copied from the address bar opens the same view; Back undoes the last navigation.
 - **Visible status for every action** (the kit does it when you use it): `loading` on the button,
@@ -137,7 +148,8 @@ A confirm on every action trains people to click through it; the one that matter
 
 Code that passes every check can still read badly. Open the screen in a browser and look:
 
-- **Both themes**, **1280 px and 375 px** wide, and the narrow container of every panel.
+- **Both themes**, every width of [the responsive checklist](responsive.md#checklist-before-handing-a-screen-over),
+  and the narrow container of every panel.
 - **Count:** labels on a form of rows (§3), primary buttons per area (one), sizes per row (one).
 - **Read every text aloud:** a word that repeats its neighbour, a hint that explains the layout, a
   button without an object — remove or rewrite it.

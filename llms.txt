@@ -2,7 +2,7 @@
 
 > React 19 UI kit (npm `prime-ui-kit`) for product interfaces — admin panels, dashboards, settings, forms and data tables — on one design contract: depth from fill, a 4px grid, one size axis `xs–xl` (default `m`), CSS Modules on semantic `--prime-*` tokens, light and dark themes. Compound components (`X.Root` + parts) and leaves (`<Typography>`, `<DataTable>`) share one API vocabulary: `size`, `variant`, `tone`, `color`, `label`/`hint`/`error`, `value`/`onValueChange`, `checked`/`onCheckedChange`, `open`/`onOpenChange`, `labels`. 80 components cover actions, inputs, selection, data display (tables, boards, a Gantt schedule), a chat (the assembled chat, the dialog list, messages, media albums, voice, composer), status and loading, navigation, overlays and the app frame. Every component ships a `COMPONENT.md` reference and copyable `examples/` inside the npm package; an agent skill in `SKILL/` teaches how to build screens with it and ships built in the package (`npx prime-ui-kit skill` installs it into `.claude/skills/prime-ui-kit`).
 
-Read the cheatsheet first, then the skill entry point. Never guess a prop: if a name is not in the component's `COMPONENT.md` API table, the component does not have it. The links below follow `main`, the branch every release is published from; in a consumer project the copies that match the installed version are on disk — the skill under `node_modules/prime-ui-kit/dist/skill/` (component docs in its `reference/`) and the component files under `node_modules/prime-ui-kit/src/`. Prefer those.
+Read the cheatsheet first, then the skill entry point. Never guess a prop: if a name is not in the component's `COMPONENT.md` API table, the component does not have it. The links below follow `main`, the branch every release is published from; in a consumer project the copies that match the installed version are on disk — the skill under `node_modules/prime-ui-kit/dist/skill/` (component docs and the design contract in its `reference/`) and the component files under `node_modules/prime-ui-kit/src/`. Prefer those.
 
 ## Start here
 
@@ -15,7 +15,7 @@ Read the cheatsheet first, then the skill entry point. Never guess a prop: if a 
 - [Choosing a component](https://github.com/esurkov1/prime-ui/blob/main/SKILL/choosing.md): category by task, then the component, then pairs that are easy to confuse
 - [Composition](https://github.com/esurkov1/prime-ui/blob/main/SKILL/composition.md): page skeleton, spacing rhythm, hierarchy, surfaces, actions, forms, tables, feedback, overlays, narrow screens, what to do when the kit lacks a component
 - [Screens](https://github.com/esurkov1/prime-ui/blob/main/SKILL/composition.md#screens): whole working pages to start from, each the `examples/screen.tsx` of its main component — list, detail, settings, form in a Drawer, dashboard, loading / empty / error states, messenger, a sales pipeline board, the app frame for desktop and phone, a media library, a resource schedule, a record editor with repeating rows
-- [Layouts](https://github.com/esurkov1/prime-ui/blob/main/SKILL/layouts.md): the app frame (AppShell + Sidebar, once per app), page wrappers, auth screens
+- [Layouts](https://github.com/esurkov1/prime-ui/blob/main/SKILL/layouts.md): the app frame (AppShell + Sidebar, once per app; every page renders its own AppHeader), page wrappers, auth screens
 
 ## Rules
 

@@ -47,20 +47,21 @@ no title. Never two titles; never no `<h1>`.
 ```
 AppShell.Root                      once per app (layouts.md#app-frame-once-per-app)
 ├─ AppShell.Nav → Sidebar          navigation rail, one layer above the page
-├─ AppHeader.Root                  the page's header: only what this page needs
-│  ├─ AppHeader.Start
-│  │  ├─ AppHeader.MenuButton      opens the Sidebar below 768px
-│  │  ├─ Breadcrumb + Separator    only on a nested record: the path up
-│  │  └─ AppHeader.Title           the one h1 + AppHeader.Description: a line of data
-│  ├─ AppHeader.Actions            the page's own buttons (export, a more menu)
-│  └─ AppHeader.Tools              second row → PageToolbar.Root: search and filter, sections,
-│                                  view, the primary action; Chips under them
+├─ (header row)                    the page's AppHeader.Root shows here
 └─ AppShell.Main                   gutters + top air (24, 32 from 1024px); the page renders here
-   └─ PageContent.Root             the page you deliver
-      └─ PageContent.Body          blocks 24 apart, starting at main's top air
-         ├─ PageContent.Grid       every tile of the screen, 16 on both axes
-         │  └─ PageContent.Cell    span (of 12), rows; the tile fills it
-         └─ PageContent.Section    a new topic: h2 label (+ Actions), 40 from its neighbours
+   └─ the page you deliver
+      ├─ AppHeader.Root            the page's header: only what this page needs
+      │  ├─ AppHeader.Start        led by the menu button the header draws while the Sidebar is off-canvas
+      │  │  ├─ Breadcrumb + Separator  only on a nested record: the path up
+      │  │  └─ AppHeader.Title     the one h1 + AppHeader.Description: a line of data
+      │  ├─ AppHeader.Actions      the page's own buttons (export, a more menu)
+      │  └─ AppHeader.Tools        second row → PageToolbar.Root: search and filter, sections,
+      │                            view, the primary action; Chips under them
+      └─ PageContent.Root as="section"
+         └─ PageContent.Body       blocks 24 apart, starting at main's top air
+            ├─ PageContent.Grid    every tile of the screen, 16 on both axes
+            │  └─ PageContent.Cell span (of 12), rows; the tile fills it
+            └─ PageContent.Section a new topic: h2 label (+ Actions), 40 from its neighbours
 
 Document page: the header without a title, and in main
    └─ PageContent.Root maxWidth="wide" | "readable"
@@ -68,8 +69,9 @@ Document page: the header without a title, and in main
       └─ PageContent.Body
 ```
 
-- A screen component renders its page: its `AppHeader.Root` (through the shell's `header`) and its
-  body. Styles, `applyTheme`, `NotificationProvider` and `AppShell` live at the app root.
+- A screen renders its page: its `AppHeader.Root` and its body. The header shows in the shell's
+  header row wherever the page renders it. Styles, `applyTheme`, `NotificationProvider` and
+  `AppShell` live at the app root.
 - `PageContent.Root as="section"` for app pages (full panel width); `PageContent.Root maxWidth="wide"` for
   settings, `maxWidth="readable"` for one narrow column of text or fields.
 - No outer padding, no margins: `AppShell.Main` has the gutters and the top air under the header,
@@ -200,12 +202,14 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 ## 4. Surfaces
 
 - Inside the app the content panel is the page (layer 0 of the surface ladder); a `Card` on it is
-  layer 1, and fields take the fill of the layer they sit on. The kit sets this by context — never set backgrounds.
+  layer 1, and fields take the fill of the layer they sit on. The kit sets this by context — never
+  set backgrounds ([the one exception](foundations.md#your-own-bounded-block)).
 - **Card when** the block stands alone and has its own title: a KPI tile, a settings panel, facts in a
   side column, a chart. **No card when** the block is the only thing in its region: a section heading
   and the content are enough.
-- `DataTable` is already a filled block — never inside a Card. No card in a card. No borders around
-  blocks; `Divider` only inside a block (list rows, a form and its footer).
+- `DataTable` is already a filled block — never inside a Card; a card in a card only as
+  [the next layer, sparingly](foundations.md#card-in-a-card). No borders around blocks; `Divider`
+  only inside a block (list rows, a form and its footer).
 - Floating layers (menus, popovers, dialogs) come only from kit overlays.
 
 ## 5. Density and size
@@ -214,8 +218,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   a dense back-office table may be `s` with its toolbar; a sign-in card may be `l`.
 - One row = one size: everything in a toolbar or an actions row lines up.
 - A control nested in another component's row is one tier down: buttons and menus in table cells `s`,
-  a segmented switch in a card header `s`. Kit hosts (Popover, Banner, LoginForm, the DataTable toolbar)
-  size their `Button.Root` / `Input.Root` children themselves.
+  a segmented switch in a card header `s`. A sized kit host ([the host tier](api-contract.md#size-and-the-host-tier))
+  sizes the kit controls inside it itself.
 
 ## 6. Actions
 
@@ -242,7 +246,8 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 - One value in several units is one row of fields under one heading, each unit in its field's
   `Input.InlineAffix`; a base value with overrides is one `FieldList` with the base pinned first.
   The shape of the data decides the layout: [ux.md](ux.md#2-the-shape-of-the-data-decides-the-layout).
-- Fields 20 apart; related short fields side by side in an `auto-fit` grid with `align-items: start`
+- Fields 20 apart; related short fields side by side in an
+  [intrinsic grid](responsive.md#intrinsic-grids) with `align-items: start`
   (`reserveSupportRow` on Input / Textarea keeps neighbours aligned); groups 32 apart, each a
   `Fieldset label` (its `title-s` heading 16 above the fields, no frame); no dividers between groups.
 - Form column width: one column up to ~65ch; never stretch a form across a wide panel.
@@ -254,16 +259,23 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   navigates) → a `Notification`; a failure → a `Notification` or the field's `error`.
 - A footer button outside the form submits it with `form={formId}`.
 - Choice controls: Checkbox when the value is submitted later, Switch when it applies at once (no Save
-  in that section), `Radio.Group label` for one of 2–5 visible options.
+  in that section), `Radio.Group label` for one of a few visible options
+  ([choosing.md](choosing.md#2-inside-a-category)).
 
 ## 8. Tables and lists
 
-- A list page is `DataTable` with the filters in its `toolbar` — `SmartFilter.Toolbar` and
-  `SmartFilter.Chips` inside `SmartFilter.Root` (or one SegmentedControl / Select for a single field).
-- Where the filters go: tools of one table live in its `toolbar`; when the page itself carries
-  sections with counts, a view switch (board / list, grid / list) or filters that drive more than one
-  table — a board, a schedule, a media grid — the page gets `PageToolbar` and the table keeps only its
-  own tools (`DataTable.ColumnsMenu`).
+### Where the filters go
+
+- The page's tools — its search and filters, sections, the view, the primary action — are the
+  page's: `AppHeader.Tools` → `SmartFilter.Root` around a `PageToolbar.Root`, `SmartFilter.Toolbar`
+  in `PageToolbar.Tools`, `SmartFilter.Chips` in `PageToolbar.Chips` ([the list page](#list-page)).
+  A search alone is the same SmartFilter with `fields={[]}`.
+- The DataTable `toolbar` keeps the table's own tools: `DataTable.ColumnsMenu`, a bulk bar of the
+  selected rows. Search and filters go there only when the table is not the page's main region (a
+  table in a section of a record, in a Drawer).
+
+### Tables
+
 - Paging is built in: `paging="pages"` (default, Pagination and the «Показано 1–6 из 10» range in the
   footer), `paging="infinite"` for feeds, `paging="none"` for short lists on dashboards and details.
 - When the server holds more than you load (a CRM list, a register): `source="server"` — `rows` is the
@@ -271,11 +283,11 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
   request, a new search or filter sets `page` to 1, and the old rows stay with `loading` until the
   answer comes ([server.tsx](../src/components/data-table/examples/server.tsx)).
 - Columns: `numeric` for amounts, counts and dates (end-aligned, tabular; `headerAlign="end"` to line the
-  head up); statuses as `Badge` from one status → color map; an avatar + two-line cell for people and
+  head up); statuses as `Badge` from one status → tone map; an avatar + two-line cell for people and
   companies; row menu last.
 - States in place: `loading` (+ `loadingRows`) while there are no rows, `empty` for nothing found
-  (string → compact EmptyPage, or your own `EmptyPage size="s"` with «Сбросить фильтры»), `error` for a
-  failed load. The head and toolbar stay.
+  (string → compact EmptyPage, or your own `EmptyPage size="s"` with «Сбросить фильтры»), `loadError`
+  for a failed load. The head and toolbar stay.
 - Phones: the table scrolls inside itself, `stickyFirstColumn` keeps the key column; never let the page
   scroll sideways. Short lists of objects can be `Card variant="list"` instead of a table.
 
@@ -287,7 +299,7 @@ Hierarchy comes from space and a handful of type roles, not from size jumps, col
 | a form saved and still on screen | the submit button's text: «Сохранено» |
 | a state of the page or a section that persists (sync failed, trial ends, read-only) | `Banner` as the first block of `PageContent.Body` (or inside the Card it concerns) |
 | a problem with one field | the field's `error` |
-| a region failed to load | the region shows it in place: DataTable `loadError`, `EmptyPage` with `EmptyPage.Icon tone="danger"` and «Повторить» |
+| a region failed to load | the region shows it in place: DataTable `loadError`, or `EmptyPage tone="danger"` with `EmptyPage.RetryButton` |
 | a region is loading | DataTable `loading`; otherwise a `Skeleton` in the geometry of the content + `aria-busy` on the region; `Spinner` only when there is no shape to hold |
 | a region changes state (loading → data → empty → error, another record) | its content in `Crossfade state={status}` — always, so the change flows instead of flipping |
 | nothing here yet (first run) | `EmptyPage` with one action (`tone="accent"` icon for a call to start) |
@@ -312,20 +324,17 @@ mirror the data's rows and gaps with `Skeleton`, so the swap moves nothing on th
 | a name for an icon button | `Tooltip` |
 | search across commands and pages (⌘K) | `CommandMenu` |
 
-Every overlay takes `closeOnOutsideClick` / `closeOnEscape`. A destructive confirm is `ConfirmDialog`, which
-turns them off itself; a form in a Modal or Drawer holds closing with `Modal.Guard` / `Drawer.Guard`
-(`busy` while a request runs, `dirty` for unsaved changes).
+Every overlay closes on Escape and on a press outside unless you turn it off
+([the Dismiss row](api-contract.md#shared-vocabulary-exported-types)); a form in a Modal or Drawer holds
+closing with `Modal.Guard` / `Drawer.Guard` (`busy` while a request runs, `dirty` for unsaved
+changes) instead.
 
 ## 11. Narrow screens
 
-- Layouts are intrinsic: `repeat(auto-fit, minmax(min(100%, …), 1fr))` grids and flex-wrap with a large
-  `flex-grow` on the main column — no breakpoints needed, and they work in any container. Media queries
-  only for app-frame decisions (the phone menu header) at 640 · 768 · 1024 · 1280.
-- From 320px: the page's tools wrap under the header title and the primary action takes its own row when the search would be squeezed (built in), side columns drop below the main one,
+- Layouts are [intrinsic](responsive.md#intrinsic-grids) — no breakpoints needed, and they work in
+  any container; a media query only in [the breakpoints' scope](responsive.md#breakpoints).
+- From 320px: the page's tools wrap under the header title ([the page panel](responsive.md#page-panel--pagetoolbar)), side columns drop below the main one,
   pairs of fields stack, tables scroll inside themselves, dialogs stack their footers (built in).
-- A page with search and filter, sections, a view switch and the primary action gets `PageToolbar`:
-  search and filter first with the active filters under the top row, one row when wide, stacked rows
-  12 apart when narrow; the primary action at the top row's end, on its own row on a phone.
 - Rearrange, never hide: every function of the desktop screen is on the phone — in another place or a
   menu. App sections on phones: `BottomNav` in `AppShell.Footer`; a short task from the bottom
   edge: `Sheet`.
@@ -362,8 +371,9 @@ Rules for your own component:
 - Follows API v1 ([api-contract.md](api-contract.md)): `size` (default `m`), `tone`/`color`, `X.Root` +
   `X.Part` when it has parts (a single export when it has none), `hint` / `error` props, `labels` for
   system strings, `data-*` for state.
-- Styled with a CSS Module on `--prime-*` tokens. Bounded block: a `Card`, or a plain tile on
-  `--prime-color-layer-nested` + `--prime-card-radius`. Never override kit internals or reach into their class names.
+- Styled with a CSS Module on `--prime-*` tokens. Bounded block:
+  [a `Card`, or the plain tile](foundations.md#your-own-bounded-block). Never override kit internals
+  or reach into their class names.
 - **Threshold:** a pattern used twice becomes a component. Two things that look the same are one
   component with a variant, never two components or two hand-written copies.
 
@@ -409,7 +419,7 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 
 - The page lives in the `AppHeader`: `AppHeader.Title` is the only heading, its `AppHeader.Description` is one line of figures («10 счетов · просрочено 2 на …»), not a sentence about the page; main has no `PageContent.Header`.
 - The tools are `AppHeader.Tools` → `SmartFilter.Root` around a `PageToolbar.Root`: `SmartFilter.Toolbar` in `PageToolbar.Tools`, `SmartFilter.Chips` in `PageToolbar.Chips`, export (an icon-only `soft` + `neutral` button) and the one primary action (`solid`, last) in `PageToolbar.Actions`. The table itself has no `toolbar`.
-- A status is a `Badge` with one color per meaning across the product (`STATUS` is one map); the text carries the meaning, the color repeats it.
+- A status is a `Badge` with one `tone` per meaning across the product (`STATUS` is one map); the text carries the meaning, the tone repeats it.
 - Numbers and dates are `numeric` columns with `headerAlign="end"` (tabular figures, values and heading on the end edge). On a phone the table scrolls inside itself and `stickyFirstColumn` keeps the number in place — the page never scrolls sideways.
 - Row actions are a `Dropdown` behind an `action.more` icon of size `s`: controls in cells are one tier below the table. Delete is `tone="danger"` at the end of the menu.
 - Empty after a filter is the table's `empty` with `EmptyPage size="s"` and a «Сбросить фильтры» action; the header and the filters stay in place.
@@ -524,11 +534,11 @@ What each screen in [the index](#screens) demonstrates — keep these when you s
 [app-shell/examples/screen.tsx](../src/layout/app-shell/examples/screen.tsx)
 
 - The frame is `AppShell.Template` (or `AppShell.Root`): `nav` is `Sidebar.Root`, `header` is `AppHeader.Root`, `footer` is `BottomNav.Root`; the page is the children. `scrollResetKey` is the current section (in a router, the pathname), so a new page opens at the top.
-- The kit decides the switch itself: below 768 px the `Sidebar` goes off the edge, `AppHeader.MenuButton` appears and `AppShell.Footer` shows the `BottomNav`; while the rail is on screen the footer is hidden. No media queries or `position: fixed` of your own.
-- `BottomNav` holds 2–6 main sections, one word each; the rest lives in the `Sidebar`, and «Ещё» opens it as a panel (`aria-expanded`). `floating` is a glass capsule; `AppShell.Main` leaves room under it itself.
+- The kit decides the switch itself: below 768 px the `Sidebar` goes off the edge, the `AppHeader` draws its menu button and `AppShell.Footer` shows the `BottomNav`; while the rail is on screen the footer is hidden. No media queries, menu state or `position: fixed` of your own.
+- `BottomNav` holds 2–6 main sections, one word each; the rest lives in the `Sidebar`, and «Ещё» opens it as a panel through `useAppShellNav()` (`aria-expanded`, `aria-controls`, `setOpen`). `floating` is a glass capsule; `AppShell.Main` leaves room under it itself.
 - Every page titles itself in the header: `AppHeader.Title` with the section's name and an `AppHeader.Description` that carries data («Среда, 14 октября · открытых задач: 3»); main has no `PageContent.Header`, its body starts with the page's blocks.
 - Counts: `Sidebar.ItemCount` (a plain number for information, `color="red"` when it needs action) and `BottomNav.ItemCount` only for what needs attention; the number is the same in both navigations.
-- Choosing a section in either navigation goes through one handler that also closes the Sidebar panel.
+- Choosing a section in either navigation goes through one handler; an activated Sidebar item closes the off-canvas panel by itself.
 - A section change is a `Crossfade` by `state`: the page changes smoothly instead of jumping. Menu items in an app with a router are `asChild` + `NavLink`.
 
 ### Media library

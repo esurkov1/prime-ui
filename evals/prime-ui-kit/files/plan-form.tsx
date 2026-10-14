@@ -8,13 +8,17 @@ import * as React from "react";
 import styles from "./plan-form.module.css";
 
 type Spec = { id: string; icon: string; name: string; value: string; color: string };
+type Point = { id: string; text: string };
 
 export function PlanForm() {
   const [specs, setSpecs] = React.useState<Spec[]>([
     { id: "seats", icon: "users", name: "Сотрудники", value: "до 50", color: "#5068f5" },
     { id: "storage", icon: "storage", name: "Хранилище", value: "200 ГБ", color: "#22c55e" },
   ]);
-  const [points, setPoints] = React.useState(["Вся команда в одном месте", "API и вебхуки"]);
+  const [points, setPoints] = React.useState<Point[]>([
+    { id: "team", text: "Вся команда в одном месте" },
+    { id: "api", text: "API и вебхуки" },
+  ]);
 
   return (
     <form className={styles.form}>
@@ -52,7 +56,7 @@ export function PlanForm() {
           onClick={() =>
             setSpecs((list) => [
               ...list,
-              { id: String(list.length), icon: "users", name: "", value: "", color: "#5068f5" },
+              { id: crypto.randomUUID(), icon: "users", name: "", value: "", color: "#5068f5" },
             ])
           }
         >
@@ -62,13 +66,17 @@ export function PlanForm() {
 
       <Fieldset label="Преимущества">
         {points.map((point, index) => (
-          <Input.Root key={point} label={`Преимущество ${index + 1}`}>
+          <Input.Root key={point.id} label={`Преимущество ${index + 1}`}>
             <Input.Wrapper>
-              <Input.Field defaultValue={point} />
+              <Input.Field defaultValue={point.text} />
             </Input.Wrapper>
           </Input.Root>
         ))}
-        <Button.Root variant="soft" tone="neutral" onClick={() => setPoints((list) => [...list, ""])}>
+        <Button.Root
+          variant="soft"
+          tone="neutral"
+          onClick={() => setPoints((list) => [...list, { id: crypto.randomUUID(), text: "" }])}
+        >
           Добавить преимущество
         </Button.Root>
       </Fieldset>

@@ -1,0 +1,12 @@
+/* The layout of plan-form.tsx as its author wrote it: one stack, one grid per record. */
+.form {
+  display: grid;
+  gap: var(--prime-space-8);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--prime-layout-tile-min-width)), 1fr));
+  gap: var(--prime-space-4);
+  align-items: start;
+}
