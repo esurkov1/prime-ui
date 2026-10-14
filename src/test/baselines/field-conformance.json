@@ -1,4 +1,3 @@
 [
-  "cell/Datepicker: a required column leaves it optional",
-  "disabled-open/TagSelect: disabled + defaultOpen opens"
+  "cell/Datepicker: a required column leaves it optional"
 ]

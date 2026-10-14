@@ -5,8 +5,9 @@ import { Checkbox } from "@/components/checkbox/Checkbox";
 import { ScrollContainer } from "@/components/scroll-container/ScrollContainer";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
-import { ControlSizeProvider } from "@/internal/ControlSizeContext";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { cx } from "@/internal/cx";
 import { toDataAttributes } from "@/internal/data-attributes";
 import { useInheritedDisabled } from "@/internal/disabledContext";
@@ -19,19 +20,25 @@ import {
 } from "@/internal/FieldFrame";
 import { fieldSurfaceClass, fieldTierClass } from "@/internal/fieldClasses";
 import { formatLabel } from "@/internal/formatLabel";
+import { useLabels } from "@/internal/labels";
 import {
   isComposingKey,
+  type ListboxRegistry,
   optionDomId,
+  revealHighlighted,
   type Store,
   useCreateStore,
+  useListboxItem,
+  useListboxRegistry,
   useStoreSlice,
 } from "@/internal/listbox";
 import menu from "@/internal/menu.module.css";
 import { FloatingPanel } from "@/internal/overlay/FloatingPanel";
 import { useFloatingLayer } from "@/internal/overlay/useFloatingLayer";
+import { useOpenState } from "@/internal/overlay/useOpenState";
 import { rovingIndex } from "@/internal/rovingFocus";
 import { type ControlSize, type PaletteColor, stepDown } from "@/internal/states";
-import { isPromiseLike, usePendingChanges } from "@/internal/usePendingChanges";
+import { isPromiseLike, usePendingChanges, usePendingKeys } from "@/internal/usePendingChanges";
 
 import { TagOptionMenu } from "./TagOptionMenu";
 import styles from "./TagSelect.module.css";
@@ -149,6 +156,8 @@ export type TagSelectProps = FieldRootDomProps &
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
+    closeOnEscape?: boolean;
+    closeOnOutsideClick?: boolean;
     /** Allow adding a value that is not in `options`. */
     creatable?: boolean;
     /**
@@ -157,8 +166,7 @@ export type TagSelectProps = FieldRootDomProps &
      * `labels.createFailed` is announced.
      */
     onCreate?: (value: string) => void | Promise<void>;
-    /** Chip color of values without an option color, including created ones. */
-    defaultColor?: PaletteColor;
+    fallbackColor?: PaletteColor;
     /**
      * Enables the «⋯» row menu: tag name and color. `value` never changes. Return the save's
      * promise: the new name or color shows at once and «⋯» spins until it settles; reject — the
@@ -177,7 +185,6 @@ export type TagSelectProps = FieldRootDomProps &
     placeholder?: string;
     /** Danger ring and `aria-invalid`; a non-empty `error` implies it. */
     invalid?: boolean;
-    /** Field tier; the list uses the same tier, chips one tier down. */
     size?: ControlSize;
     /** Id of the text input; generated when omitted. */
     id?: string;
@@ -199,9 +206,11 @@ export function TagSelect({
   open: openProp,
   defaultOpen = false,
   onOpenChange,
+  closeOnEscape = true,
+  closeOnOutsideClick = true,
   creatable = false,
   onCreate,
-  defaultColor = "gray",
+  fallbackColor = "gray",
   onOptionUpdate,
   onOptionDelete,
   disabled: disabledProp = false,
@@ -209,7 +218,7 @@ export function TagSelect({
   placeholder = "",
   invalid: invalidProp,
   focusRing,
-  size = "m",
+  size: sizeProp,
   label,
   required = false,
   optional,
@@ -222,16 +231,19 @@ export function TagSelect({
   "aria-labelledby": ariaLabelledBy,
   ...rest
 }: TagSelectProps) {
+  const tier = useHostTier(sizeProp);
+  const { size } = tier;
   const disabled = useInheritedDisabled(disabledProp);
+  const merged = useLabels(TAG_SELECT_LABELS, labelsProp);
+  // The color names merge one level deeper: a partial `colorNames` keeps the other hues.
   const labels = React.useMemo(
     () => ({
-      ...TAG_SELECT_LABELS,
-      ...labelsProp,
+      ...merged,
       colorNames: { ...TAG_SELECT_LABELS.colorNames, ...labelsProp?.colorNames },
     }),
-    [labelsProp],
+    [merged, labelsProp?.colorNames],
   );
-  const ids = useFieldFrame(idProp, { hint, error, invalid: invalidProp });
+  const ids = useFieldFrame(idProp, { label, hint, error, invalid: invalidProp, required });
   const inputId = ids.controlId;
   const listboxId = `${inputId}-listbox`;
 
@@ -240,10 +252,11 @@ export function TagSelect({
     defaultValue,
     onChange: onValueChange,
   });
-  const [open, setOpen] = useControllableState<boolean>({
-    value: openProp,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange,
+  const [open, setOpen] = useOpenState({
+    open: openProp,
+    defaultOpen,
+    onOpenChange,
+    disabled,
   });
 
   const [inputValue, setInputValue] = React.useState("");
@@ -251,6 +264,8 @@ export function TagSelect({
   const [focusWithin, setFocusWithin] = React.useState(false);
   const [announcement, setAnnouncement] = React.useState("");
   const highlight = useCreateStore<string | undefined>(undefined);
+  /** The rows on screen: Enter activates through it, a keyboard move reveals the row. */
+  const registry = useListboxRegistry();
   const [menuValue, setMenuValue] = React.useState<string | null>(null);
   /**
    * Values created here, kept as options until the parent adds them to `options` (then the copy
@@ -258,9 +273,9 @@ export function TagSelect({
    */
   const [created, setCreated] = React.useState<TagSelectOption[]>([]);
   /** Options whose `onOptionDelete` Promise is pending: the row waits, nothing changes yet. */
-  const [deleting, setDeleting] = React.useState<ReadonlySet<string>>(() => new Set());
+  const { pending: deleting, track: trackDelete } = usePendingKeys<string>();
   /** Values whose `onCreate` Promise is pending: the chip stands, busy, until the answer. */
-  const [creating, setCreating] = React.useState<ReadonlySet<string>>(() => new Set());
+  const { pending: creating, track: trackCreate } = usePendingKeys<string>();
   /** Where focus goes after a chip is removed from the keyboard: a chip index, or -1 for the input. */
   const pendingChipFocus = React.useRef<number | null>(null);
 
@@ -316,8 +331,8 @@ export function TagSelect({
     open: shown,
     onOpenChange: setOpen,
     triggerRef,
-    closeOnEscape: true,
-    closeOnOutsideClick: true,
+    closeOnEscape,
+    closeOnOutsideClick,
     matchAnchorWidth: true,
   });
   const listboxRef = floating.contentRef;
@@ -338,10 +353,7 @@ export function TagSelect({
   const revealOption = (value: string) => {
     const index = virtualized ? listed.findIndex((option) => option.value === value) : -1;
     if (index >= 0) virtualRef.current?.reveal(index);
-    else
-      document
-        .getElementById(optionDomId(listboxId, value))
-        ?.scrollIntoView?.({ block: "nearest" });
+    else revealHighlighted(registry.nodeOf(value));
   };
   const activeDescendant = useStoreSlice(highlight, (value) =>
     shown && value ? optionDomId(listboxId, value) : undefined,
@@ -376,30 +388,23 @@ export function TagSelect({
 
   const handleOptionDelete = onOptionDelete
     ? (optionValue: string) => {
-        const result = onOptionDelete(optionValue);
-        if (!result || typeof result.then !== "function") {
+        const result = trackDelete(optionValue, onOptionDelete(optionValue));
+        if (!isPromiseLike(result)) {
           applyOptionDelete(optionValue);
           return;
         }
-        setDeleting((prev) => new Set(prev).add(optionValue));
         // The busy «⋯» turns disabled: focus waits in the input, where a confirmation the owner
         // opens gives it back.
         inputRef.current?.focus();
-        const settle = (applied: boolean) => {
-          setDeleting((prev) => {
-            const next = new Set(prev);
-            next.delete(optionValue);
-            return next;
-          });
-          if (!applied) return;
-          // Focus left on the row that leaves goes to the input.
-          const row = document.getElementById(optionDomId(listboxId, optionValue));
-          if (row?.contains(document.activeElement)) inputRef.current?.focus();
-          applyOptionDelete(optionValue);
-        };
         result.then(
-          () => settle(true),
-          () => settle(false),
+          () => {
+            // Focus left on the row that leaves goes to the input.
+            if (registry.nodeOf(optionValue)?.contains(document.activeElement)) {
+              inputRef.current?.focus();
+            }
+            applyOptionDelete(optionValue);
+          },
+          () => {},
         );
       }
     : undefined;
@@ -410,29 +415,24 @@ export function TagSelect({
       const text = inputTrim;
       if (!text) return;
       if (!selected.includes(text)) {
-        const result = onCreate?.(text);
+        const result = trackCreate(text, onCreate?.(text));
         setSelected((prev) => (prev.includes(text) ? prev : [...prev, text]));
         if (isPromiseLike(result)) {
-          setCreating((prev) => new Set(prev).add(text));
-          const settle = () =>
-            setCreating((prev) => {
-              const next = new Set(prev);
-              next.delete(text);
-              return next;
-            });
-          result.then(settle, () => {
-            settle();
-            // Refused: the new value goes again, from the selection and from the list.
-            setSelected((prev) => prev.filter((x) => x !== text));
-            setCreated((prev) => prev.filter((o) => o.value !== text));
-            setAnnouncement(formatLabel(labels.createFailed, { label: text }));
-          });
+          result.then(
+            () => {},
+            () => {
+              // Refused: the new value goes again, from the selection and from the list.
+              setSelected((prev) => prev.filter((x) => x !== text));
+              setCreated((prev) => prev.filter((o) => o.value !== text));
+              setAnnouncement(formatLabel(labels.createFailed, { label: text }));
+            },
+          );
         }
       }
       setCreated((prev) =>
         prev.some((o) => o.value === text) || options.some((o) => o.value === text)
           ? prev
-          : [...prev, { value: text, label: text, color: defaultColor }],
+          : [...prev, { value: text, label: text, color: fallbackColor }],
       );
     } else {
       setSelected((prev) =>
@@ -446,9 +446,9 @@ export function TagSelect({
     const byValue = new Map(allOptions.map((o) => [o.value, o]));
     return selected.map((v) => {
       const option = byValue.get(v);
-      return { value: v, label: option?.label ?? v, color: option?.color ?? defaultColor };
+      return { value: v, label: option?.label ?? v, color: option?.color ?? fallbackColor };
     });
-  }, [selected, allOptions, defaultColor]);
+  }, [selected, allOptions, fallbackColor]);
 
   const removeChip = (chip: { value: string; label: string }) => {
     // A tag still being created waits for its answer.
@@ -515,6 +515,15 @@ export function TagSelect({
       chipElements().at(-1)?.focus();
       return;
     }
+    // Shift+F10 or the context menu key opens the «⋯» menu of the highlighted row.
+    if ((event.key === "F10" && event.shiftKey) || event.key === "ContextMenu") {
+      const current = highlight.get();
+      const row = allOptions.find((option) => option.value === current);
+      if (!shown || !manageable || !row || row.disabled || deleting.has(row.value)) return;
+      event.preventDefault();
+      setMenuValue(row.value);
+      return;
+    }
     // Space, Home and End edit the text (a tag may have several words); Escape is the layer
     // stack's.
     if (!["ArrowDown", "ArrowUp", "Enter"].includes(event.key)) return;
@@ -530,7 +539,7 @@ export function TagSelect({
       // Enter of a composing input method confirms its text, not an option.
       if (isComposingKey(event)) return;
       event.preventDefault();
-      pick(highlight.get() ?? navigable[0] ?? "");
+      registry.activate(highlight.get() ?? navigable[0] ?? "");
       return;
     }
     const next = rovingIndex(
@@ -594,7 +603,7 @@ export function TagSelect({
       <>
         <Checkbox.Indicator checked={isSelected} disabled={option.disabled} size={stepDown(size)} />
         <Badge.Root
-          color={option.color ?? defaultColor}
+          color={option.color ?? fallbackColor}
           disabled={option.disabled}
           className={styles.chip}
         >
@@ -612,6 +621,7 @@ export function TagSelect({
         selected={isSelected}
         disabled={Boolean(option.disabled)}
         highlight={highlight}
+        registry={registry}
         managed={manageable}
         pending={pending}
         onPick={pickOption}
@@ -637,7 +647,7 @@ export function TagSelect({
               <TagOptionMenu
                 value={option.value}
                 label={option.label}
-                color={option.color ?? defaultColor}
+                color={option.color ?? fallbackColor}
                 open={menuValue === option.value && !pending}
                 onOpenChange={(next) => setMenuValue(next ? option.value : null)}
                 onUpdate={handleOptionUpdate}
@@ -656,7 +666,7 @@ export function TagSelect({
     );
   };
 
-  return (
+  return tier.provide(
     <FieldFrame
       {...rest}
       size={size}
@@ -670,193 +680,193 @@ export function TagSelect({
       optionalLabel={labels.optional}
       className={className}
     >
-      <ControlSizeProvider value={size}>
-        {/* One tab stop: the input[role=combobox]; a click on the field focuses the input. */}
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: a multi-value field around its combobox */}
-        {/* biome-ignore lint/a11y/useKeyWithClickEvents: the keyboard is handled on the input and the chips */}
-        <div
-          ref={triggerRef}
-          className={cx(fieldTierClass, fieldSurfaceClass, styles.control)}
-          onMouseDown={(event) => {
-            // A press on the field itself keeps focus in the input: no blur, no collapse.
-            const target = event.target as Element;
-            if (target !== inputRef.current && !target.closest("[data-chip-value], button")) {
-              event.preventDefault();
-            }
-          }}
-          onClick={(event) => {
-            if (disabled) return;
-            const target = event.target as Element;
-            // A chip's remove button keeps focus in the field and does not open the list.
-            if (target.closest("[data-chip-value] button")) return;
-            // A click on a chip focuses the chip (for the keyboard); elsewhere the input.
-            if (!target.closest("[data-chip-value]")) inputRef.current?.focus();
-            if (hasPanelContent) setOpen(true);
-          }}
-          onFocus={() => setFocusWithin(true)}
-          onBlur={handleBlur}
-          {...toDataAttributes({
-            size,
-            expanded: expanded || undefined,
-            state: shown ? "open" : "closed",
-            disabled: disabled || undefined,
-            invalid: ids.invalid || undefined,
-            "focus-ring": focusRing,
-          })}
+      {/* One tab stop: the input[role=combobox]; a click on the field focuses the input. */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: a multi-value field around its combobox */}
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: the keyboard is handled on the input and the chips */}
+      <div
+        ref={triggerRef}
+        className={cx(fieldTierClass, fieldSurfaceClass, styles.control)}
+        onMouseDown={(event) => {
+          // A press on the field itself keeps focus in the input: no blur, no collapse.
+          const target = event.target as Element;
+          if (target !== inputRef.current && !target.closest("[data-chip-value], button")) {
+            event.preventDefault();
+          }
+        }}
+        onClick={(event) => {
+          if (disabled) return;
+          const target = event.target as Element;
+          // A chip's remove button keeps focus in the field and does not open the list.
+          if (target.closest("[data-chip-value] button")) return;
+          // A click on a chip focuses the chip (for the keyboard); elsewhere the input.
+          if (!target.closest("[data-chip-value]")) inputRef.current?.focus();
+          if (hasPanelContent) setOpen(true);
+        }}
+        onFocus={() => setFocusWithin(true)}
+        onBlur={handleBlur}
+        {...toDataAttributes({
+          size,
+          expanded: expanded || undefined,
+          state: shown ? "open" : "closed",
+          disabled: disabled || undefined,
+          invalid: ids.invalid || undefined,
+          "focus-ring": focusRing,
+        })}
+      >
+        <ScrollContainer
+          ref={chipsRef}
+          // Collapsed: one row that never scrolls (the rest is the «+N» chip); expanded: up to
+          // three rows, then it scrolls with faded edges.
+          edges={expanded ? "fade" : "none"}
+          lock={!expanded}
+          className={styles.chips}
         >
-          <ScrollContainer
-            ref={chipsRef}
-            // Collapsed: one row that never scrolls (the rest is the «+N» chip); expanded: up to
-            // three rows, then it scrolls with faded edges.
-            edges={expanded ? "fade" : "none"}
-            lock={!expanded}
-            className={styles.chips}
-          >
-            {visibleChips.map((chip, index) => (
-              <Badge.Root
-                key={chip.value}
-                color={chip.color}
-                disabled={disabled}
-                className={styles.chip}
-                labels={{ remove: formatLabel(labels.remove, { label: chip.label }) }}
-                // Reached with the arrow keys from the input (not a tab stop); Delete / Backspace remove.
-                tabIndex={disabled ? undefined : -1}
-                data-chip-value={chip.value}
-                loading={creating.has(chip.value)}
-                onKeyDown={(event) => onChipKeyDown(event, index)}
-                onRemove={() => removeChip(chip)}
-                // Removing keeps focus in the field (the field ignores the click itself).
-                onMouseDown={(event) => {
-                  if ((event.target as Element).closest("button")) event.preventDefault();
-                }}
-              >
-                <span className={styles.chipLabel}>{chip.label}</span>
-              </Badge.Root>
-            ))}
-            {hiddenChips.length > 0 ? (
-              // A real button around the chip; the click bubbles to the field, which expands and
-              // opens the list.
-              <button
-                type="button"
-                className={styles.chipMoreButton}
-                disabled={disabled}
-                title={hiddenChips.map((chip) => chip.label).join(", ")}
-                onClick={() => inputRef.current?.focus()}
-              >
-                <Badge.Root disabled={disabled} className={styles.chipMore}>
-                  <span aria-hidden="true">+{hiddenChips.length}</span>
-                  <VisuallyHidden>
-                    {formatLabel(labels.more, { count: hiddenChips.length })}
-                  </VisuallyHidden>
-                </Badge.Root>
-              </button>
-            ) : null}
-            <input
-              ref={inputRef}
-              id={inputId}
-              type="text"
-              role="combobox"
-              aria-expanded={shown}
-              aria-controls={listboxId}
-              aria-autocomplete="list"
-              aria-label={ariaLabel}
-              aria-labelledby={ariaLabelledBy}
-              aria-invalid={ids.invalid || undefined}
-              aria-required={required || undefined}
-              aria-describedby={ids.describedBy}
-              aria-activedescendant={activeDescendant}
+          {visibleChips.map((chip, index) => (
+            <Badge.Root
+              key={chip.value}
+              color={chip.color}
               disabled={disabled}
-              placeholder={selected.length === 0 ? placeholder : undefined}
-              className={styles.input}
-              data-collapsed={inputCollapsed || undefined}
-              value={inputValue}
-              onChange={(event) => {
-                const next = event.target.value;
-                setInputValue(next);
-                setOpen(
-                  listOptions(allOptions, next, selected).length > 0 ||
-                    canCreate(creatable, next.trim(), selected, allOptions),
-                );
+              className={styles.chip}
+              labels={{ remove: formatLabel(labels.remove, { label: chip.label }) }}
+              // Reached with the arrow keys from the input (not a tab stop); Delete / Backspace remove.
+              tabIndex={disabled ? undefined : -1}
+              data-chip-value={chip.value}
+              loading={creating.has(chip.value)}
+              onKeyDown={(event) => onChipKeyDown(event, index)}
+              onRemove={() => removeChip(chip)}
+              // Removing keeps focus in the field (the field ignores the click itself).
+              onMouseDown={(event) => {
+                if ((event.target as Element).closest("button")) event.preventDefault();
               }}
-              onKeyDown={onInputKeyDown}
-              onFocus={() => {
-                if (!disabled && hasPanelContent) setOpen(true);
-              }}
-            />
-          </ScrollContainer>
-          {name
-            ? selected.map((item) => (
-                <input key={item} type="hidden" name={name} value={item} disabled={disabled} />
-              ))
-            : null}
-          <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
-
-          {/* An invisible row of every chip: the widths behind «+N». */}
-          <MeasureRow
-            ref={measureRef}
-            chips={chips}
-            disabled={disabled}
-            removeLabel={labels.remove}
-          />
-
-          <span className={styles.chevron} aria-hidden="true">
-            <Icon name="nav.chevronDown" />
-          </span>
-        </div>
-
-        <FloatingPanel
-          floating={floating}
-          size={size}
-          scroll
-          id={listboxId}
-          role="listbox"
-          aria-multiselectable="true"
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledBy}
-          tabIndex={-1}
-          ref={scrollerRef}
-          className={cx(menu.tier, menu.menu, styles.panel)}
-        >
-          {labels.panelHint ? <div className={styles.panelHint}>{labels.panelHint}</div> : null}
-          {showCreate ? (
-            <OptionRow
-              id={optionDomId(listboxId, CREATE_VALUE)}
-              value={CREATE_VALUE}
-              label={inputTrim}
-              selected={false}
-              disabled={false}
-              highlight={highlight}
-              managed={false}
-              onPick={() => pick(CREATE_VALUE)}
             >
-              <span className={styles.createIcon} aria-hidden="true">
-                <Icon name="action.add" />
-              </span>
-              <span className={styles.createLabel}>{labels.create}</span>
-              <Badge.Root color={defaultColor} className={styles.chip}>
-                <span className={styles.chipLabel}>{inputTrim}</span>
+              <span className={styles.chipLabel}>{chip.label}</span>
+            </Badge.Root>
+          ))}
+          {hiddenChips.length > 0 ? (
+            // A real button around the chip; the click bubbles to the field, which expands and
+            // opens the list.
+            <button
+              type="button"
+              className={styles.chipMoreButton}
+              disabled={disabled}
+              title={hiddenChips.map((chip) => chip.label).join(", ")}
+              onClick={() => inputRef.current?.focus()}
+            >
+              <Badge.Root color="gray" disabled={disabled} className={styles.chipMore}>
+                <span aria-hidden="true">+{hiddenChips.length}</span>
+                <VisuallyHidden>
+                  {formatLabel(labels.more, { count: hiddenChips.length })}
+                </VisuallyHidden>
               </Badge.Root>
-            </OptionRow>
+            </button>
           ) : null}
-          {virtualized ? (
-            <VirtualOptions
-              ref={virtualRef}
-              count={listed.length}
-              getKey={getOptionKey}
-              scrollRef={scrollerRef}
-              pinned={pinnedOptions}
-              size={size}
-              renderOption={(index, measure) => {
-                const option = listed[index];
-                return option ? optionRow(option, { index, measure }) : null;
-              }}
-            />
-          ) : (
-            listed.map((option) => optionRow(option))
-          )}
-        </FloatingPanel>
-      </ControlSizeProvider>
-    </FieldFrame>
+          <input
+            ref={inputRef}
+            id={inputId}
+            type="text"
+            role="combobox"
+            aria-expanded={shown}
+            aria-controls={shown ? listboxId : undefined}
+            aria-autocomplete="list"
+            aria-label={ariaLabel}
+            aria-labelledby={ariaLabelledBy}
+            aria-invalid={ids.invalid || undefined}
+            aria-required={ids.required || undefined}
+            aria-keyshortcuts={manageable ? "Shift+F10" : undefined}
+            aria-describedby={ids.describedBy}
+            aria-activedescendant={activeDescendant}
+            disabled={disabled}
+            placeholder={selected.length === 0 ? placeholder : undefined}
+            className={styles.input}
+            data-collapsed={inputCollapsed || undefined}
+            value={inputValue}
+            onChange={(event) => {
+              const next = event.target.value;
+              setInputValue(next);
+              setOpen(
+                listOptions(allOptions, next, selected).length > 0 ||
+                  canCreate(creatable, next.trim(), selected, allOptions),
+              );
+            }}
+            onKeyDown={onInputKeyDown}
+            onFocus={() => {
+              if (!disabled && hasPanelContent) setOpen(true);
+            }}
+          />
+        </ScrollContainer>
+        {name
+          ? selected.map((item) => (
+              <input key={item} type="hidden" name={name} value={item} disabled={disabled} />
+            ))
+          : null}
+        <VisuallyHidden live="polite">{announcement}</VisuallyHidden>
+
+        {/* An invisible row of every chip: the widths behind «+N». */}
+        <MeasureRow
+          ref={measureRef}
+          chips={chips}
+          disabled={disabled}
+          removeLabel={labels.remove}
+        />
+
+        <span className={styles.chevron} aria-hidden="true">
+          <Icon name="nav.chevronDown" />
+        </span>
+      </div>
+
+      <FloatingPanel
+        floating={floating}
+        size={size}
+        scroll
+        id={listboxId}
+        role="listbox"
+        aria-multiselectable="true"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabel ? undefined : (ariaLabelledBy ?? ids.labelledBy)}
+        tabIndex={-1}
+        ref={scrollerRef}
+        className={cx(menu.tier, menu.menu, styles.panel)}
+      >
+        {labels.panelHint ? <div className={styles.panelHint}>{labels.panelHint}</div> : null}
+        {showCreate ? (
+          <OptionRow
+            id={optionDomId(listboxId, CREATE_VALUE)}
+            value={CREATE_VALUE}
+            label={inputTrim}
+            selected={false}
+            disabled={false}
+            highlight={highlight}
+            registry={registry}
+            managed={false}
+            onPick={() => pick(CREATE_VALUE)}
+          >
+            <span className={styles.createIcon} aria-hidden="true">
+              <Icon name="action.add" />
+            </span>
+            <span className={styles.createLabel}>{labels.create}</span>
+            <Badge.Root color={fallbackColor} className={styles.chip}>
+              <span className={styles.chipLabel}>{inputTrim}</span>
+            </Badge.Root>
+          </OptionRow>
+        ) : null}
+        {virtualized ? (
+          <VirtualOptions
+            ref={virtualRef}
+            count={listed.length}
+            getKey={getOptionKey}
+            scrollRef={scrollerRef}
+            pinned={pinnedOptions}
+            size={size}
+            renderOption={(index, measure) => {
+              const option = listed[index];
+              return option ? optionRow(option, { index, measure }) : null;
+            }}
+          />
+        ) : (
+          listed.map((option) => optionRow(option))
+        )}
+      </FloatingPanel>
+    </FieldFrame>,
   );
 }
 TagSelect.displayName = "TagSelect";
@@ -882,6 +892,7 @@ type OptionRowProps = {
   selected: boolean;
   disabled: boolean;
   highlight: Store<string | undefined>;
+  registry: ListboxRegistry;
   /** A row with its own pick button and «⋯» menu (a `div`); else the row is the pick button. */
   managed: boolean;
   /** Its deletion is pending: busy, not pickable. */
@@ -902,6 +913,7 @@ function OptionRow({
   selected,
   disabled,
   highlight,
+  registry,
   managed,
   pending = false,
   onPick,
@@ -911,9 +923,22 @@ function OptionRow({
   children,
 }: OptionRowProps) {
   const highlighted = useStoreSlice(highlight, (current) => current === value);
+  const nodeRef = React.useRef<HTMLElement | null>(null);
+  const setRefs = useMergedRefs(nodeRef, ref);
+  useListboxItem(
+    registry,
+    value,
+    {
+      label,
+      haystack: label.toLowerCase(),
+      disabled: disabled || pending,
+      onActivate: onPick,
+    },
+    nodeRef,
+  );
   const props = {
     id,
-    ref,
+    ref: setRefs,
     role: "option",
     "aria-posinset": posInSet,
     "aria-setsize": setSize,
@@ -923,7 +948,7 @@ function OptionRow({
     onMouseMove: () => {
       if (!disabled && !highlighted) highlight.set(value);
     },
-    ...toDataAttributes({ value, label, highlighted, selected, disabled, pending }),
+    ...toDataAttributes({ value, highlighted, selected, disabled, pending }),
   } as const;
 
   if (managed) {
@@ -982,7 +1007,9 @@ const MeasureRow = React.memo(function MeasureRow({
           <span className={styles.chipLabel}>{chip.label}</span>
         </Badge.Root>
       ))}
-      <Badge.Root className={styles.chipMore}>+{Math.max(chips.length, 9)}</Badge.Root>
+      <Badge.Root color="gray" className={styles.chipMore}>
+        +{Math.max(chips.length, 9)}
+      </Badge.Root>
     </div>
   );
 });

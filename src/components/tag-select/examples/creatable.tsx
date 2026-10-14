@@ -1,4 +1,4 @@
-/** A typed text that is not in the list becomes a new tag from the Create row or Enter and is saved on the server: the chip waits busy, and a tag the server refuses leaves again — `creatable`, `onCreate`, `defaultColor`. */
+/** A typed text that is not in the list becomes a new tag from the Create row or Enter and is saved on the server: the chip waits busy, and a tag the server refuses leaves again — `creatable`, `onCreate`, `fallbackColor`. */
 import { TagSelect, type TagSelectOption, Typography } from "prime-ui-kit";
 import * as React from "react";
 
@@ -27,7 +27,7 @@ export default function TagSelectCreatableExample() {
         label="Метки"
         options={OPTIONS}
         creatable
-        defaultColor="purple"
+        fallbackColor="purple"
         error={failure}
         onCreate={async (value) => {
           setFailure(undefined);

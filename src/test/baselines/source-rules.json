@@ -63,7 +63,6 @@
   "src/components/smart-filter/SmartFilter.tsx: root default size = \"m\"",
   "src/components/stepper/Stepper.tsx: root default size = \"m\"",
   "src/components/tabs/Tabs.tsx: root default size = \"m\"",
-  "src/components/tag-select/TagSelect.tsx: root default size = \"m\"",
   "src/components/tag-select/useChipOverflow.ts: biome-ignore useExhaustiveDependencies",
   "src/components/thumbnail/Thumbnail.tsx: root default size = \"m\"",
   "src/components/thumbnail/Thumbnail.tsx: size mapping outside states.ts",
