@@ -226,8 +226,9 @@
   }
 }
 
-/* While a tile is carried no tile offers its delete button. */
-:global(html[data-dnd-active]) .remove {
+/* While a tile of the list is carried (`data-dnd-carrying` on its Dnd.Sortable) no tile offers its
+   delete button. */
+[data-dnd-carrying] .remove {
   opacity: 0;
 }
 

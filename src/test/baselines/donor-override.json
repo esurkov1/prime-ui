@@ -9,7 +9,6 @@
   "src/components/switch/Switch.module.css: sets --choice-bg-disabled-checked, private to src/internal/ChoiceField.module.css",
   "src/components/switch/Switch.module.css: sets --choice-bg-duration, private to src/internal/ChoiceField.module.css",
   "src/internal/FieldFrame.module.css: sets --label-dimmed, private to src/components/label/Label.module.css",
-  "src/internal/attachmentTile.module.css: :global(html)",
   "src/internal/fieldTier.module.css: sets --field-button-px, private to src/components/button/Button.module.css",
   "src/internal/fieldTier.module.css: sets --field-button-px, private to src/components/button/Button.module.css #2",
   "src/internal/fieldTier.module.css: sets --field-button-px, private to src/components/button/Button.module.css #3",
