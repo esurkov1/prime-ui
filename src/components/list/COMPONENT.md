@@ -135,9 +135,9 @@ A second line or an avatar makes a row taller than the one-line height; the vert
 | focus-visible | keyboard | the focus ring inside the row edge |
 | disabled | `disabled` | `disabled` on a button; `aria-disabled="true"`, no `href` on a link, `tabindex="-1"` on an `asChild` element; `data-disabled="true"`; disabled text; in a reorderable list the handle is disabled and the row holds its place |
 | reorderable | `onReorder` | `data-reorderable="true"` on the root (a `Dnd.Sortable` `<ul>`); each `<li>` is a sortable item (`data-dnd-item` = `value`) with a leading `Dnd.Handle`; drag by the handle (a touch hold on touch), Alt + ↑ / ↓ from the handle or the row; a lifted row leaves a dashed gap in the row's radius, its neighbours glide, the copy (handle and row, in the row's padding and radius) follows the pointer and sets down in its new place without a jump |
-| saving a move | `onReorder` returned a pending promise | the row stays in its new place, `aria-busy="true"`, a `Spinner` stands in for the handle, the row content dims to 0.6 (`--prime-motion-duration-fast` both ways); a rejection glides the row back |
+| saving a move | `onReorder` returned a pending promise | the row stays in its new place, `aria-busy="true"`, a `Spinner` stands in for the handle, the row content dims to 0.6 (`--prime-motion-fade-fast` both ways); a rejection glides the row back |
 
-Root attribute: `data-size`. The fill changes on `background-color` with `--prime-motion-duration-xfast` both ways (0 under reduced motion).
+Root attribute: `data-size`. The fill changes on `background-color` with `--prime-motion-fade-xfast` both ways (a fade: reduced motion keeps it).
 
 ## Layout & spacing
 - The root fills its container (`width: 100%`); rows are 4px apart, each row a full-width button with the tier radius and field padding.

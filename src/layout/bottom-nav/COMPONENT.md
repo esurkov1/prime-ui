@@ -110,7 +110,7 @@ Without flags the bar is flat at the screen edge on the surface, with a faint to
 | hidden | inside `AppShell.Footer` while the Sidebar rail is on screen (`AppShell.Nav` without an off-canvas Sidebar) | `display: none` on the footer |
 | floating / icon only | `floating` / `iconOnly` | `data-floating="true"` / `data-icon-only="true"` on the `<nav>` |
 | selection | floating, an item with `aria-current` | the selection capsule `data-visible="true"`, `data-animate="true"` while it glides |
-| less transparency | `prefers-reduced-transparency: reduce` | a floating capsule and action turn opaque (`--prime-color-layer-floating-bg`), no blur |
+| less transparency | `prefers-reduced-transparency: reduce` | a floating capsule and action turn opaque (`--prime-color-bg-glass-solid`), no blur |
 
 Motion: the color of the icon and the label changes over `fast`. Floating, the selection capsule glides to the item that becomes current (`left` / `width` over `base`, emphasized easing — it follows `aria-current`, so a router link moves it too), snaps on a layout change (resize, fonts, new items) and fades when nothing is current; a pressed item's glyph and the action give under the finger (press scale). All instant under reduced motion.
 
