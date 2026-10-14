@@ -33,6 +33,11 @@ export const tierMappings = {
    * (16 · 16 · 20 · 20 · 20), so a loading legend keeps the height of the loaded one.
    */
   legendSkeleton: { xs: "xs", s: "xs", m: "m", l: "m", xl: "m" },
+  /**
+   * A value tag («Поле: значение», a SmartFilter chip) in a row of the tier: an `xs` Badge is too
+   * small for its text, so the floor is `s`.
+   */
+  valueTag: { xs: "s", s: "s", m: "m", l: "l", xl: "xl" },
 } as const satisfies Record<string, Record<ControlSize, ControlSize>>;
 
 /** Visual treatment. */

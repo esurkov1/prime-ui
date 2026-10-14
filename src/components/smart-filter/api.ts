@@ -56,9 +56,9 @@ export const api: ComponentApi = {
         {
           name: "size",
           type: '"xs" | "s" | "m" | "l" | "xl"',
-          default: '"m"',
-          en: "Tier of the filter button, the search, the tags and the panel.",
-          ru: "Ярус кнопки фильтра, поиска, тегов и панели.",
+          defaultNote: { en: 'host tier, else `"m"`', ru: 'ярус контейнера, иначе `"m"`' },
+          en: "Tier of the filter button, the search, the tags and the panel. Without it the tier of its host, else `m`.",
+          ru: "Ярус кнопки фильтра, поиска, тегов и панели. Без него — ярус хоста, иначе `m`.",
         },
         {
           name: "collapsedLimit",
@@ -74,17 +74,17 @@ export const api: ComponentApi = {
           ru: "Системные строки, см. «Доступность».",
         },
         {
-          name: "className",
-          type: "string",
-          en: "Class on the root.",
-          ru: "Класс корня.",
-        },
-        {
           name: "children",
           type: "ReactNode",
           required: true,
           en: "`SmartFilter.Toolbar` and `SmartFilter.Chips`, anywhere inside.",
           ru: "`SmartFilter.Toolbar` и `SmartFilter.Chips` в любом месте внутри.",
+        },
+        {
+          name: "…rest",
+          type: 'Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "onChange">',
+          en: "`className` and the other div attributes.",
+          ru: "`className` и остальные атрибуты div.",
         },
       ],
     },

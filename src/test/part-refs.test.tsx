@@ -130,9 +130,7 @@ const OUTSIDE_API = {
  * this check. It only shrinks — the owner of the part fixes its props and removes the entry (a
  * fixed part still listed fails to compile).
  */
-const PENDING_DOM_PROPS = {
-  "SmartFilter.Root": "SmartFilterRootProps takes className but no other native attribute",
-} as const;
+const PENDING_DOM_PROPS = {} as const;
 
 type TakesRef<C> = "ref" extends keyof PropsOf<C> ? true : false;
 /** The props take a ref of the element: a `RefObject` of it is assignable to their `ref`. */
@@ -822,6 +820,24 @@ const CASES: Case[] = [
         ]}
       >
         <SmartFilter.Toolbar />
+      </SmartFilter.Root>
+    ),
+  ],
+  [
+    "SmartFilter.Chips",
+    "DIV",
+    (ref) => (
+      <SmartFilter.Root
+        fields={[
+          {
+            key: "status",
+            label: "Статус",
+            options: [{ value: "new", label: "Новый" }],
+          },
+        ]}
+        defaultValue={{ status: { include: ["new"], exclude: [] } }}
+      >
+        <SmartFilter.Chips ref={ref} data-testid="part" />
       </SmartFilter.Root>
     ),
   ],

@@ -12,12 +12,15 @@ import { Popover } from "@/components/popover/Popover";
 import { Typography } from "@/components/typography/Typography";
 import { VisuallyHidden } from "@/components/visually-hidden/VisuallyHidden";
 import { useControllableState } from "@/hooks/useControllableState";
+import { useMergedRefs } from "@/hooks/useMergedRefs";
 import { Icon } from "@/icons";
+import { useHostTier } from "@/internal/ControlSizeContext";
 import { createComponentContext } from "@/internal/context";
 import { cx } from "@/internal/cx";
 import { formatLabel } from "@/internal/formatLabel";
 import { HighlightMatch, matchIndex } from "@/internal/HighlightMatch";
-import { type ControlSize, stepDown } from "@/internal/states";
+import { usePartPresence } from "@/internal/partPresence";
+import { type ControlSize, stepDown, tierMappings } from "@/internal/states";
 
 import {
   canExcludeValue,
@@ -222,7 +225,10 @@ const [SmartFilterProvider, useSmartFilter] = createComponentContext<Ctx>("Smart
 // Root
 // ---------------------------------------------------------------------------------------------
 
-export type SmartFilterRootProps = {
+export type SmartFilterRootProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children" | "defaultValue" | "onChange"
+> & {
   /** The fields this screen filters by, in display order. Empty: only the search remains. */
   fields: readonly SmartFilterField[];
   /** Value per field key: a selection, or the bounds of a range field. */
@@ -237,7 +243,6 @@ export type SmartFilterRootProps = {
   /** Values of one field shown before «Ещё N». Default 12. */
   collapsedLimit?: number;
   labels?: Partial<SmartFilterLabels>;
-  className?: string;
   /** `SmartFilter.Toolbar` and `SmartFilter.Chips`. */
   children: React.ReactNode;
   ref?: React.Ref<HTMLDivElement>;
@@ -253,13 +258,15 @@ function SmartFilterRoot({
   search,
   defaultSearch = "",
   onSearchChange,
-  size = "m",
+  size: sizeProp,
   collapsedLimit = 12,
   labels,
   className,
   children,
   ref,
+  ...rest
 }: SmartFilterRootProps) {
+  const { size, provide } = useHostTier(sizeProp);
   const [current, setCurrent] = useControllableState<SmartFilterValue>({
     value,
     defaultValue: defaultValue ?? EMPTY_VALUE,
@@ -290,14 +297,14 @@ function SmartFilterRoot({
     collapsedLimit,
   };
 
-  return (
+  return provide(
     <SmartFilterProvider value={context}>
       <Popover.Root open={open} onOpenChange={setOpen}>
-        <div ref={ref} className={cx(styles.root, className)} data-size={size}>
+        <div {...rest} ref={ref} className={cx(styles.root, className)} data-size={size}>
           {children}
         </div>
       </Popover.Root>
-    </SmartFilterProvider>
+    </SmartFilterProvider>,
   );
 }
 SmartFilterRoot.displayName = "SmartFilter.Root";
@@ -695,13 +702,12 @@ type ValueToggleProps = {
   onMode: (mode: SmartFilterMode) => void;
 };
 
-/** Tags stay readable: an xs Badge is too small for «Поле: значение», so the floor is s. */
-const tagSizeOf = (size: ControlSize): ControlSize => (size === "xs" ? "s" : size);
-
-const COLOR = { none: "gray", include: "blue", exclude: "red" } as const;
+/** Tags stay readable: the value-tag tier of the row. */
+const tagSizeOf = (size: ControlSize): ControlSize => tierMappings.valueTag[size];
 
 /**
- * A value is a pressable Badge: gray, blue = shown, red with «НЕ» = hidden. A press shows it; the «−»
+ * A value is a pressable Badge: gray, pressed (the selected look) = shown, red with «НЕ» = hidden.
+ * A press shows it; the «−»
  * Badge.Action (revealed on hover and focus, kept while hidden) hides it. Alt+click and Shift+Enter
  * hide too. A single-value field has no «−»: a press picks the value.
  */
@@ -712,7 +718,7 @@ function ValueToggle({ option, size, mode, single, canHide, query, onMode }: Val
   return (
     <Badge.Root
       size={tagSizeOf(size)}
-      color={COLOR[mode ?? "none"]}
+      color={mode === "exclude" ? "red" : "gray"}
       pressed={mode === "include"}
       title={formatLabel(labels.showValue, { value: option.label })}
       data-mode={mode ?? undefined}
@@ -756,9 +762,12 @@ export type SmartFilterChipsProps = Omit<React.HTMLAttributes<HTMLDivElement>, "
 };
 
 /** The applied filters as removable tags, with "add" and "clear all". Renders nothing without filters. */
-function SmartFilterChips({ className, ...rest }: SmartFilterChipsProps) {
+function SmartFilterChips({ className, ref, ...rest }: SmartFilterChipsProps) {
   const { fields, value, setEntry, total, clearAll, setOpen, setSearch, labels, size } =
     useSmartFilter();
+  // The row rises in with the first filter and closes up in place with the last.
+  const presence = usePartPresence<HTMLDivElement>({ present: total > 0, axis: "block" });
+  const mergedRef = useMergedRefs(presence.ref, ref);
   if (total === 0) return null;
   const tagSize = tagSizeOf(size);
 
@@ -776,7 +785,12 @@ function SmartFilterChips({ className, ...rest }: SmartFilterChipsProps) {
   );
 
   return (
-    <div {...rest} className={cx(styles.chips, className)} data-slot="smart-filter-chips">
+    <div
+      {...rest}
+      ref={mergedRef}
+      className={cx(styles.chips, presence.className, className)}
+      data-slot="smart-filter-chips"
+    >
       {fields.flatMap((field) => {
         const entry = value[field.key];
         if (!entry) return [];
