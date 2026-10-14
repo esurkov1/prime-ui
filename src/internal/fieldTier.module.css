@@ -132,6 +132,31 @@
   --field-choice: var(--prime-control-xl-choice);
 }
 
+/*
+ * The control icon of a tier as `--field-icon`, by class: for an element that carries no
+ * `data-size` of its own (an Icon or a Spinner without `size` takes the icon of the nearest
+ * `ControlSizeProvider`, `iconBoxClass`).
+ */
+.iconXs {
+  --field-icon: var(--prime-control-xs-icon);
+}
+
+.iconS {
+  --field-icon: var(--prime-control-s-icon);
+}
+
+.iconM {
+  --field-icon: var(--prime-control-m-icon);
+}
+
+.iconL {
+  --field-icon: var(--prime-control-l-icon);
+}
+
+.iconXl {
+  --field-icon: var(--prime-control-xl-icon);
+}
+
 /* Field label text: the label tier, weight 500 (foundation §6). */
 .labelText {
   font-size: var(--field-label-size);

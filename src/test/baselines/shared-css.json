@@ -31,8 +31,6 @@
   "src/components/stepper/Stepper.module.css: control tier tokens outside fieldTier",
   "src/components/tabs/Tabs.module.css: control tier tokens outside fieldTier",
   "src/components/timeline/Timeline.module.css: control tier tokens outside fieldTier",
-  "src/internal/ProgressLegend.module.css: control tier tokens outside fieldTier",
-  "src/internal/iconBox.module.css: control tier tokens outside fieldTier",
   "src/internal/menu.module.css: control tier tokens outside fieldTier",
   "src/layout/sidebar/Sidebar.module.css: control tier tokens outside fieldTier"
 ]

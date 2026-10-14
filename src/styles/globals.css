@@ -249,11 +249,15 @@ textarea:disabled::placeholder {
  *   control-height  the height a host gives the Buttons inside it (a glass disk as tall as the
  *                   BottomNav capsule); unset (`initial`) everywhere else, so a Button keeps the
  *                   height of its tier
+ *   icon-size       the glyph size a host gives the icons inside it (a Button, a Badge, a menu row
+ *                   sets it from its tier; `internal/iconBox`, an Icon without `size`, reads it);
+ *                   unset (`initial`) everywhere else, so an icon takes the nearest control tier
  */
 :root {
   --prime-layout-gutter: var(--prime-layout-gutter-s);
   --prime-bleed-inline: var(--prime-space-0);
   --prime-control-height: initial;
+  --prime-icon-size: initial;
 }
 
 @media (min-width: 640px) {

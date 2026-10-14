@@ -1,7 +1,6 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import { describe, expect, it } from "vitest";
+
+import { cssRule, cssValue } from "@/test/css";
 
 import {
   DARK_LAYERS,
@@ -17,16 +16,11 @@ import { darkThemeOverrides } from "../../tokens/themes/dark";
 import { HUE_CHART } from "./palette";
 import { paletteColors } from "./states";
 
-const css = readFileSync(path.resolve(process.cwd(), "src/internal/palette.module.css"), "utf8");
+const PALETTE_CSS = "src/internal/palette.module.css";
 
-/** `--hue-chart` of a hue's rule block; gray is the base `.hue` rule. */
-function cssHueChart(color: string): string | undefined {
-  const selector = color === "gray" ? ".hue {" : `.hue[data-color="${color}"] {`;
-  const start = css.indexOf(selector);
-  if (start < 0) return undefined;
-  const block = css.slice(start, css.indexOf("}", start));
-  return /--hue-chart:\s*([^;]+);/.exec(block)?.[1]?.trim();
-}
+/** The rule of a hue; gray is the base `.hue` rule. */
+const hueRule = (color: string) =>
+  cssRule(PALETTE_CSS, color === "gray" ? ".hue" : `.hue[data-color="${color}"]`);
 
 /** `{color.gray.925}` → the primitive's hex. */
 function primitiveColor(ref: string): string {
@@ -50,20 +44,16 @@ function wash(ink: string, alpha: number, ground: string): string {
 describe("palette", () => {
   it("HUE_CHART and --hue-chart in palette.module.css are one mapping", () => {
     for (const color of paletteColors) {
-      expect(cssHueChart(color), color).toBe(HUE_CHART[color]);
+      expect(cssValue(hueRule(color), "--hue-chart"), color).toBe(HUE_CHART[color]);
     }
   });
 
   // Gray soft is a wash of the text ink over the chip's own ground, so a gray Badge steps off
   // every surface it can stand on: each layer, the field / track fill on it and the thumb.
   it("keeps a gray chip apart from every ground of both themes", () => {
-    const base = css.slice(css.indexOf(".hue {"), css.indexOf("}", css.indexOf(".hue {")));
-    const soft = base.slice(
-      base.indexOf("--hue-soft:"),
-      base.indexOf(";", base.indexOf("--hue-soft:")),
-    );
+    const soft = cssValue(hueRule("gray"), "--hue-soft");
     expect(soft.split(/\s+/).join(" ")).toBe(
-      "--hue-soft: color-mix( in srgb, var(--prime-color-text-primary) var(--prime-tint-soft), transparent )",
+      "color-mix( in srgb, var(--prime-color-text-primary) var(--prime-tint-soft), transparent )",
     );
     const alpha = Number.parseFloat(semanticTokens.tint.soft) / 100;
     for (const [theme, layers, ink] of [

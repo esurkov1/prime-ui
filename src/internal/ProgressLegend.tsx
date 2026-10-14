@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/skeleton/Skeleton";
 
 import { cx } from "./cx";
 import { toDataAttributes } from "./data-attributes";
+import { fieldTierClass } from "./fieldClasses";
 import styles from "./ProgressLegend.module.css";
 import palette from "./palette.module.css";
 import { type ProgressSegment, segmentFill } from "./progressSegments";
@@ -32,7 +33,11 @@ export function ProgressLegend({
 }: ProgressLegendProps) {
   if (segments.length === 0) return null;
   return (
-    <ul id={id} className={cx(styles.legend, className)} data-size={size}>
+    <ul
+      id={id}
+      className={cx(fieldTierClass, styles.legend, className)}
+      data-size={tierMappings.legendText[size]}
+    >
       {segments.map((segment, index) => {
         const { tone, color } = segmentFill(segment);
         const share = scale > 0 ? Math.round((segment.value / scale) * 100) : 0;

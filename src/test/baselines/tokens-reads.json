@@ -9,9 +9,5 @@
   "src/components/switch/Switch.module.css: --prime-switch-travel",
   "src/components/switch/Switch.module.css: --prime-switch-w",
   "src/icons/glyph.tsx: --prime-icon-size",
-  "src/internal/iconBox.module.css: --prime-icon-size",
-  "src/internal/iconBox.ts: --prime-icon-size",
-  "src/internal/swatch.module.css: --prime-icon-size",
-  "src/internal/swatch.tsx: --prime-icon-size",
   "src/layout/bottom-nav/BottomNav.module.css: --prime-icon-size"
 ]

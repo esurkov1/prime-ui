@@ -1,39 +1,26 @@
 /*
  * Legend of a distribution: rows of swatch · name · value · share on one grid, so values and shares
- * line up in columns. Text sizes follow the host's label tier; the swatch is the part's fill.
+ * line up in columns. The text is the label of the legend's tier (the field tier on the list, its
+ * `data-size` from `tierMappings.legendText`); the swatch is the part's fill.
  */
 .legend,
 .skeleton {
-  --pl-size: var(--prime-control-m-label-size);
-  --pl-line-height: var(--prime-control-m-label-line-height);
-  --pl-swatch: var(--prime-space-2);
-
   min-width: 0;
   margin: 0;
   padding: 0;
   font-family: var(--prime-font-family-sans);
 }
 
-:is(.legend, .skeleton)[data-size="xs"],
-:is(.legend, .skeleton)[data-size="s"] {
-  --pl-size: var(--prime-control-xs-label-size);
-  --pl-line-height: var(--prime-control-xs-label-line-height);
-}
-
-:is(.legend, .skeleton)[data-size="l"],
-:is(.legend, .skeleton)[data-size="xl"] {
-  --pl-size: var(--prime-control-l-label-size);
-  --pl-line-height: var(--prime-control-l-label-line-height);
-}
-
 .legend {
+  --pl-swatch: var(--prime-space-2);
+
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   column-gap: var(--prime-space-2);
   row-gap: var(--prime-space-1);
   list-style: none;
-  font-size: var(--pl-size);
-  line-height: var(--pl-line-height);
+  font-size: var(--field-label-size);
+  line-height: var(--field-label-lh);
 }
 
 .item {

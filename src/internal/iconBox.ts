@@ -1,6 +1,16 @@
 import { cx } from "./cx";
+import fieldTier from "./fieldTier.module.css";
 import styles from "./iconBox.module.css";
 import type { ControlSize } from "./states";
+
+/** The control icon of each tier (`--field-icon`), for an icon that carries no `data-size`. */
+const TIER_ICON: Record<ControlSize, string> = {
+  xs: fieldTier.iconXs,
+  s: fieldTier.iconS,
+  m: fieldTier.iconM,
+  l: fieldTier.iconL,
+  xl: fieldTier.iconXl,
+};
 
 /**
  * Class names of the shared icon box (Icon, Spinner). An explicit `size` takes the global icon
@@ -8,7 +18,8 @@ import type { ControlSize } from "./states";
  * `ControlSizeProvider`), else `m`.
  */
 export function iconBoxClass(size: ControlSize | undefined, tier: ControlSize | undefined): string {
-  return cx(styles.box, styles[size ?? tier ?? "m"], size === undefined && styles.inherit);
+  if (size !== undefined) return cx(styles.box, styles[size]);
+  return cx(styles.box, styles.inherit, TIER_ICON[tier ?? "m"]);
 }
 
 /**

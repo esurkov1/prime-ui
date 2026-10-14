@@ -16,7 +16,7 @@
   align-items: stretch;
   width: var(--floating-width, max-content);
   min-width: min(
-    max(var(--prime-panel-min-width), var(--float-min-w, 0px)),
+    max(var(--prime-panel-min-width), var(--float-min-w, var(--prime-panel-min-width))),
     var(--float-max-w, 100vw)
   );
   max-width: min(calc(var(--prime-panel-min-width) * 2), var(--float-max-w, 100vw));

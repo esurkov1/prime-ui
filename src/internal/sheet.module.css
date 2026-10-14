@@ -95,7 +95,7 @@
 
 /* The iOS sheet curve: a release keeps moving at once and lands softly, back or out. */
 .swipeY {
-  transform: translate3d(0, var(--swipe-offset, 0px), 0);
+  transform: translate3d(0, var(--swipe-offset, var(--prime-space-0)), 0);
   transition: transform var(--prime-motion-duration-base) var(--prime-motion-easing-emphasized);
 }
 
