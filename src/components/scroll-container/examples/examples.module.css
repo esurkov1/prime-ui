@@ -17,24 +17,6 @@
   width: auto;
 }
 
-.list {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  padding: var(--prime-space-2) var(--prime-space-4) var(--prime-space-3);
-  list-style: none;
-}
-
-.list li {
-  padding-block: var(--prime-space-2);
-  border-bottom: var(--prime-border-width) solid var(--prime-color-border-subtle);
-}
-
-/* Dividers only between items. */
-.list li:last-child {
-  border-bottom: 0;
-}
-
 /* log.tsx: title, the scrolling entries in a fixed-height card. */
 .log {
   display: grid;
@@ -73,19 +55,16 @@
 
 .cell {
   padding: var(--prime-space-2);
-  border-radius: var(--prime-radius-s);
-  background: var(--prime-color-fill-subtle);
-  font-variant-numeric: tabular-nums;
 }
 
-/* snap.tsx: a row of fixed-width cards; the padding keeps the edge cards' rings unclipped. */
+/* snap.tsx: a row of fixed-width cards (a flex row: its items draw no list markers); the padding
+   keeps the edge cards' rings unclipped. */
 .tiles {
   display: flex;
   gap: var(--prime-space-3);
   width: max-content;
   margin: 0;
   padding: var(--prime-space-1);
-  list-style: none;
 }
 
 .tile {
@@ -100,15 +79,4 @@
   gap: var(--prime-space-1);
   margin: 0;
   padding: var(--prime-space-3);
-  list-style: none;
-}
-
-.task {
-  display: flex;
-  align-items: center;
-  min-height: var(--prime-space-10);
-  padding-inline: var(--prime-space-3);
-  border-radius: var(--prime-radius-m);
-  background: var(--prime-color-fill-muted);
-  cursor: grab;
 }

@@ -46,6 +46,7 @@ export default function ScrollContainerVariantsExample() {
                   as="div"
                   variant="caption"
                   tone="secondary"
+                  numeric="tabular"
                   className={styles.cell}
                 >
                   {room} · {hour}

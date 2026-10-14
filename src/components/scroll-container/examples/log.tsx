@@ -81,16 +81,16 @@ export default function ScrollContainerLogExample() {
         className={styles.entries}
       >
         {loading ? <Skeleton lines={2} className={styles.older} /> : null}
-        <ul className={styles.list}>
+        <Card.List>
           {entries.map((entry) => (
-            <li key={entry.id}>
+            <Card.ListItem key={entry.id}>
               <Typography as="span" variant="caption" tone="muted">
                 {entry.time}
               </Typography>
               <Typography variant="body-m">{entry.text}</Typography>
-            </li>
+            </Card.ListItem>
           ))}
-        </ul>
+        </Card.List>
       </ScrollContainer>
     </Card.Root>
   );

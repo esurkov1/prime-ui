@@ -21,35 +21,15 @@ export type ScrollContainerAxis = "vertical" | "horizontal" | "both";
 export type ScrollContainerEdges = "fade" | "shadow" | "none";
 
 export type ScrollContainerProps = React.HTMLAttributes<HTMLElement> & {
-  /** Root element. Default `div`; `AppShell.Main` renders `main`, CodeBlock `pre`. */
   as?: "div" | "main" | "aside" | "section" | "nav" | "article" | "pre";
-  /** Scroll axis. Default `vertical`. */
   axis?: ScrollContainerAxis;
-  /** `overscroll-behavior`. Default `contain`: nested panels do not chain scroll into the page. */
   overscrollBehavior?: "auto" | "contain" | "none";
-  /** The edges where more content is hidden, along every scroll axis. Default `fade`. */
   edges?: ScrollContainerEdges;
-  /** `thin` — the kit's quiet scrollbar (default); `hidden` — no scrollbar (keep `edges`). */
   scrollbar?: "thin" | "hidden";
-  /** The person cannot scroll the region (wheel, touch, keys, autoscroll); it keeps its place. */
   lock?: boolean;
-  /**
-   * Scrolling comes to rest on the start of a child: `true` when it ends near one (strips of
-   * tiles), `"mandatory"` always on one (board columns, a carousel). A drag of the kit's Dnd
-   * inside the region turns it off while it lasts.
-   */
   snap?: boolean | "mandatory";
-  /**
-   * `end` — a chat or a log: the region starts at the end and stays there while content arrives,
-   * as long as the person is at the end; scrolled away, what they look at stays put. Default `start`.
-   */
   anchor?: "start" | "end";
-  /**
-   * The scroll position came near the start (older messages). A returned promise is pending until
-   * it settles: no new call meanwhile, `aria-busy`. Content added above keeps the view in place.
-   */
   onReachStart?: ScrollEdgeHandler;
-  /** The scroll position came near the end (the next page of a feed); a promise works the same. */
   onReachEnd?: ScrollEdgeHandler;
   ref?: React.Ref<HTMLElement>;
 };

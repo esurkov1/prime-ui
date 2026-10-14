@@ -32,15 +32,15 @@ export default function ScrollContainerLockExample() {
         </Button.Root>
       </Card.Header>
       <ScrollContainer lock={reviewing}>
-        <ul className={styles.list}>
+        <Card.List>
           {ORDERS.map((order) => (
-            <li key={order}>
+            <Card.ListItem key={order}>
               <Typography as="span" variant="body-m">
                 {order}
               </Typography>
-            </li>
+            </Card.ListItem>
           ))}
-        </ul>
+        </Card.List>
       </ScrollContainer>
     </Card.Root>
   );

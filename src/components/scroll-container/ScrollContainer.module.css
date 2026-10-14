@@ -1,6 +1,7 @@
 /*
  * Thin, quiet scrollbars: thumb in `fill-strong`, transparent track. Standard properties win in
- * Firefox and Chromium 121+; the WebKit pseudo-elements cover Safari.
+ * Firefox and Chromium 121+; the WebKit pseudo-elements cover Safari with the same still thumb (a
+ * scrollbar pseudo-element cannot glide into a hover fill, and the standard path has none).
  */
 .root {
   box-sizing: border-box;
@@ -30,12 +31,6 @@
   border-radius: var(--prime-radius-full);
   background: var(--prime-color-fill-strong);
   background-clip: padding-box;
-}
-
-@media (hover: hover) {
-  .root::-webkit-scrollbar-thumb:hover {
-    background-color: var(--prime-color-fill-strong-hover);
-  }
 }
 
 .root::-webkit-scrollbar-corner {
@@ -190,10 +185,10 @@
 }
 
 .root[data-edges="fade"] {
-  --fade-top: 0px;
-  --fade-bottom: 0px;
-  --fade-start: 0px;
-  --fade-end: 0px;
+  --fade-top: 0%;
+  --fade-bottom: 0%;
+  --fade-start: 0%;
+  --fade-end: 0%;
   --fade-inline: to right;
 }
 

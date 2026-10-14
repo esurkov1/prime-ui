@@ -1,4 +1,4 @@
-/** A feed that scrolls on its own inside a fixed-height card, with the kit's thin scrollbar. */
+/** A feed that scrolls on its own inside a fixed-height card, with the kit's thin scrollbar — `ScrollContainer`. */
 import { Card, ScrollContainer, Typography } from "prime-ui-kit";
 
 import styles from "./examples.module.css";
@@ -12,15 +12,15 @@ export default function ScrollContainerOverviewExample() {
         <Card.Title>Лента событий</Card.Title>
       </Card.Header>
       <ScrollContainer>
-        <ul className={styles.list}>
+        <Card.List>
           {EVENTS.map((event) => (
-            <li key={event}>
+            <Card.ListItem key={event}>
               <Typography as="span" variant="body-m" tone="secondary">
                 {event}
               </Typography>
-            </li>
+            </Card.ListItem>
           ))}
-        </ul>
+        </Card.List>
       </ScrollContainer>
     </Card.Root>
   );

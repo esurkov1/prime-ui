@@ -12,15 +12,15 @@ export default function ScrollContainerOverscrollExample() {
         <Card.Title>Журнал выгрузок</Card.Title>
       </Card.Header>
       <ScrollContainer overscrollBehavior="auto" tabIndex={0} aria-label="Журнал выгрузок">
-        <ul className={styles.list}>
+        <Card.List>
           {HOURS.map((hour) => (
-            <li key={hour}>
+            <Card.ListItem key={hour}>
               <Typography as="span" variant="body-m" tone="secondary">
                 {hour} — отчёт выгружен
               </Typography>
-            </li>
+            </Card.ListItem>
           ))}
-        </ul>
+        </Card.List>
       </ScrollContainer>
     </Card.Root>
   );

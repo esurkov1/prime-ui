@@ -27,15 +27,15 @@ export default function ScrollContainerScrollbarExample() {
           </Typography>
         </Card.Header>
         <ScrollContainer>
-          <ul className={styles.list}>
+          <Card.List>
             {CLIENTS.map((client) => (
-              <li key={client}>
+              <Card.ListItem key={client}>
                 <Typography as="span" variant="body-m">
                   {client}
                 </Typography>
-              </li>
+              </Card.ListItem>
             ))}
-          </ul>
+          </Card.List>
         </ScrollContainer>
       </Card.Root>
       <Card.Root role="region" className={styles.card} aria-label="Статусы заказов">

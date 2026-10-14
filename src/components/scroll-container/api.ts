@@ -89,11 +89,22 @@ export const api: ComponentApi = {
     keyboard: [
       {
         keys: "↑ · ↓ · ← · →",
+        native: true,
         en: "Scroll the focused region (with `tabIndex={0}`) by a step",
         ru: "Прокручивают сфокусированную область (с `tabIndex={0}`) на шаг",
       },
-      { keys: "PageUp · PageDown · Space", en: "Scroll by a screen", ru: "Прокручивают на экран" },
-      { keys: "Home · End", en: "To the start and to the end", ru: "К началу и к концу" },
+      {
+        keys: "PageUp · PageDown · Space",
+        native: true,
+        en: "Scroll by a screen",
+        ru: "Прокручивают на экран",
+      },
+      {
+        keys: "Home · End",
+        native: true,
+        en: "To the start and to the end",
+        ru: "К началу и к концу",
+      },
     ],
     aria: [
       {
